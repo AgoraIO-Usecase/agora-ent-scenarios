@@ -221,6 +221,20 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
     textField.selectedTextRange = [textField textRangeFromPosition:start toPosition:end];
 }
 
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+    NSString *text = [textField.text stringByReplacingCharactersInRange:range withString:string];
+    // 判断输入的是中文还是英文
+    BOOL isChinese = [text canBeConvertedToEncoding:NSASCIIStringEncoding] ? NO : YES;
+    // 设置字数限制
+    NSInteger maxCharacterCount = isChinese ? 5 : 10;
+    // 判断是否超过字数限制
+    if (text.length > maxCharacterCount) {
+        // 如果超过限制，不允许输入
+        return NO;
+    }
+    return YES;
+}
+
 - (UIView *)mineTopView {
     if (!_mineTopView) {
         _mineTopView = [[UIView alloc]init];

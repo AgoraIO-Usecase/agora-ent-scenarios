@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22155" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22131"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -16,9 +16,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="home_bg_image" translatesAutoresizingMaskIntoConstraints="NO" id="zmW-0J-dtz">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="home_bg_image" translatesAutoresizingMaskIntoConstraints="NO" id="zmW-0J-dtz">
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="home_launch_logo.png" translatesAutoresizingMaskIntoConstraints="NO" id="10Y-1i-QcC">
                                 <rect key="frame" x="122.66666666666669" y="262" width="148" height="148"/>
@@ -32,7 +31,11 @@
                         <constraints>
                             <constraint firstItem="qzx-V5-7g2" firstAttribute="top" secondItem="10Y-1i-QcC" secondAttribute="bottom" constant="20" id="Gib-CX-YSF"/>
                             <constraint firstItem="qzx-V5-7g2" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="PCg-xo-LOV"/>
+                            <constraint firstItem="zmW-0J-dtz" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="YsV-G1-Y9g"/>
+                            <constraint firstItem="zmW-0J-dtz" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="ZeB-yU-FYs"/>
                             <constraint firstItem="10Y-1i-QcC" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="-90" id="atw-cU-RaE"/>
+                            <constraint firstItem="zmW-0J-dtz" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="cnq-zD-uhy"/>
+                            <constraint firstAttribute="bottom" secondItem="zmW-0J-dtz" secondAttribute="bottom" id="eMe-0T-YD4"/>
                             <constraint firstItem="10Y-1i-QcC" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="fti-tZ-bpp"/>
                         </constraints>
                     </view>

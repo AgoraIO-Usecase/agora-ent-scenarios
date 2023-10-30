@@ -157,6 +157,11 @@ extension VLRegisterViewController: UITextFieldDelegate {
         verifyCodeButton.alpha = 1.0
         setupCodeView()
     }
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let currentText = textField.text ?? ""
+        let updatedText = currentText.replacingCharacters(in: Range(range, in: currentText)!, with: string)
+        return updatedText.count <= 11
+    }
 }
 extension VLRegisterViewController: VLPopImageVerifyViewDelegate {
     func closeBtnAction() {
