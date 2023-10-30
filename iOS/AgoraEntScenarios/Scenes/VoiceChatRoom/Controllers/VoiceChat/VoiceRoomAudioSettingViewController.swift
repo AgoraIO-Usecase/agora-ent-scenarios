@@ -42,6 +42,7 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
                                          LanguageManager.localValue(key: "voice_AIAEC"),
                                          LanguageManager.localValue(key: "voice_AGC"),
                                          LanguageManager.localValue(key: "In-Ear Monitor"),
+                                         LanguageManager.localValue(key: "voice_SoundCard"),
                                          LanguageManager.localValue(key: "voice_agora_blue_and_red_bot"),
                                          LanguageManager.localValue(key: "voice_robot_volume"),
                                          LanguageManager.localValue(key: "voice_best_agora_sound"),
@@ -52,6 +53,7 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
                                           "AIAEC",
                                           "AGC",
                                           "InEar",
+                                          "icon-park-solid_people-speak",
                                           "jiqi",
                                           "icons／set／laba",
                                           "icons／set／zuijia",
@@ -173,6 +175,15 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     var backgroundMusicPlaying: ((VoiceMusicModel) -> Void)?
     var onClickAccompanyButtonClosure: ((Bool) -> Void)?
     
+    //虚拟声卡相关
+    @objc var clicKBlock:((Int) -> Void)?
+    @objc var gainBlock:((Float) -> Void)?
+    @objc var typeBlock:((Int) -> Void)?
+    @objc var soundCardBlock:((Bool) -> Void)?
+    public var soundOpen: Bool?
+    public var gainValue: String?
+    public var typeValue: Int?
+    public var effectType: Int?
     
     init(rtcKit: VoiceRoomRTCManager?) {
         super.init(nibName: nil, bundle: nil)
@@ -260,7 +271,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
-            return 4
+            return 5
         } else if section == 1 {
             return 2
         } else {
@@ -385,10 +396,12 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 }
             } else if indexPath.row == 3 {
                 if roomInfo?.room?.turn_InEar == true {
-                    cell.contentLabel.text = "On".voice_localized()
+                    cell.contentLabel.text = "voice_on".voice_localized()
                 } else {
-                    cell.contentLabel.text = "Off".voice_localized()
+                    cell.contentLabel.text = "voice_off".voice_localized()
                 }
+            } else if indexPath.row == 4 {
+                cell.contentLabel.text = self.soundOpen == true ? "voice_on".voice_localized() : "voice_off".voice_localized()
             } else {
                 cell.contentLabel.text = "Other".voice_localized()
 
@@ -507,6 +520,54 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         } else if indexPath.section == 1 {
             return
         }
+        
+        //处理虚拟声卡的业务
+        if indexPath.section == 0 && indexPath.row == 4 {
+            
+            if isAudience == true {
+                ToastView.show(text: "请上麦后使用该音效".voice_localized())
+                return
+            }
+            
+            let soundCardVC = VRSoundCardViewController()
+            soundCardVC.effectType = self.effectType ?? 0
+            soundCardVC.soundOpen = self.soundOpen ?? false
+            soundCardVC.gainValue = self.gainValue ?? ""
+            soundCardVC.typeValue = self.typeValue ?? 0
+            soundCardVC.clicKBlock = {[weak self] effect in
+                guard let clicKBlock = self?.clicKBlock else {return}
+                self?.effectType = effect
+                self?.gainValue = "1.0"
+                clicKBlock(effect)
+            }
+            soundCardVC.gainBlock = {[weak self] gain in
+                guard let gainBlock = self?.gainBlock else {return}
+                self?.gainValue = "\(gain)"
+                gainBlock(gain)
+            }
+            
+            soundCardVC.typeBlock = {[weak self] type in
+                guard let typeBlock = self?.typeBlock else {return}
+                self?.typeValue = type
+                typeBlock(type)
+            }
+            
+            soundCardVC.soundCardBlock = {[weak self] flag in
+                guard let soundCardBlock = self?.soundCardBlock else {return}
+                self?.soundOpen = flag
+                if flag == true {
+                    self?.gainValue = "1.0"
+                    self?.effectType = 4
+                }
+                self?.tableView.reloadData()
+                soundCardBlock(flag)
+            }
+            DispatchQueue.main.async {[weak self] in
+                self?.presentView.push(with: soundCardVC, frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 400), maxHeight: 400)
+            }
+            return
+        }
+        
         tableViewHeight = heightType.rawValue - 70
         let detailVC: VoiceRoomAudioSettingDetailViewController = VoiceRoomAudioSettingDetailViewController()
         self.detailVC = detailVC

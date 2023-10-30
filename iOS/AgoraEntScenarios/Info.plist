@@ -11,6 +11,8 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSFileProtection</key>
+	<string>None</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
