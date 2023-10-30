@@ -9,6 +9,7 @@
 #import "VLToast.h"
 #import "AESMacro.h"
 #import "MenuUtils.h"
+#import <Masonry/Masonry.h>
 #import "AgoraEntScenarios-Swift.h"
 
 @interface VLCreateRoomView ()
@@ -20,7 +21,9 @@
 @property (nonatomic, strong) UIButton *publicBtn;
 @property (nonatomic, strong) UIButton *screatBtn;
 @property (nonatomic, strong) VLAddRoomModel *addRoomModel;
-
+@property (nonatomic, strong) UIView *warningView;
+@property (nonatomic, strong) UIButton *enBtn;
+@property (nonatomic, strong) UILabel *setLabel;
 @property (nonatomic, strong) NSArray *titlesArray;
 @end
 
@@ -39,36 +42,55 @@
 - (void)setupView {
     VL(weakSelf);
     self.addRoomModel.isPrivate = NO;
-    UIImageView *iconImgView = [[UIImageView alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-VLREALVALUE_WIDTH(104))*0.5, VLREALVALUE_WIDTH(50), VLREALVALUE_WIDTH(104), VLREALVALUE_WIDTH(104))];
-    iconImgView.layer.cornerRadius = 20;
-    iconImgView.layer.masksToBounds = YES;
-    self.iconImgView = iconImgView;
-    [self addSubview:iconImgView];
+    NSString *text = KTVLocalizedString(@"ktv_create_tips");
+    UIFont *font = UIFontMake(12);
+    CGSize constraintSize = CGSizeMake(self.width - 40, CGFLOAT_MAX);
+    NSDictionary *attributes = @{NSFontAttributeName: font};
+    CGRect textRect = [text boundingRectWithSize:constraintSize
+                                         options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading
+                                      attributes:attributes
+                                         context:nil];
+    CGFloat textHeight = ceil(CGRectGetHeight(textRect));
     
-    UILabel *roomTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(40, iconImgView.bottom+VLREALVALUE_WIDTH(40), 70, 20)];
+    self.warningView = [[UIView alloc]initWithFrame:CGRectMake(10, 10, self.width - 20, textHeight + 10)];
+    self.warningView.backgroundColor = UIColorMakeWithHex(@"#FA396A1A");
+    self.warningView.layer.cornerRadius = 5;
+    self.warningView.layer.masksToBounds = true;
+    [self addSubview:self.warningView];
+    
+    UIImageView *warImgView = [[UIImageView alloc]initWithFrame:CGRectMake(10, 5, 14, 14)];
+    warImgView.image = [UIImage sceneImageWithName:@"add_circle"];
+    [self.warningView addSubview:warImgView];
+    
+    UILabel *contentLabel = [[UILabel alloc]initWithFrame:CGRectMake(30, 5, self.warningView.width - 40, textHeight)];
+    contentLabel.numberOfLines = 0;
+    NSMutableAttributedString *attributedText = [[NSMutableAttributedString alloc] initWithString:text];
+    [attributedText addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0, 77)];
+    [attributedText addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(77, 41)];
+    contentLabel.font = UIFontMake(12);
+    contentLabel.attributedText = attributedText;
+    [self.warningView addSubview:contentLabel];
+    
+    UILabel *roomTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(40, self.warningView.bottom+VLREALVALUE_WIDTH(20), 70, 20)];
     roomTitleLabel.font = UIFontMake(14);
     roomTitleLabel.textColor = UIColorMakeWithHex(@"#000000");
-    roomTitleLabel.text = AGLocalizedString(@"ktv_room_title");
+    roomTitleLabel.text = KTVLocalizedString(@"ktv_room_title");
     [self addSubview:roomTitleLabel];
-    
-//    QMUIButton *randomBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_create_randomIcon"]
-//                                                             title:KTVLocalizedString(@"随机")];
+
     UIButton *randomBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [randomBtn setTitle:KTVLocalizedString(@"ktv_random") forState:UIControlStateNormal];
     [randomBtn setImage:[UIImage sceneImageWithName:@"online_create_randomIcon"] forState:UIControlStateNormal];
-//    randomBtn.imagePosition = QMUIButtonImagePositionLeft;
     randomBtn.spacingBetweenImageAndTitle = 3;
     randomBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [randomBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
     randomBtn.titleLabel.font = UIFontMake(14.0);
-//    randomBtn.adjustsButtonWhenHighlighted = NO;
     [randomBtn addTarget:self action:@selector(randomBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:randomBtn];
     [randomBtn sizeToFit];
     randomBtn.frame = CGRectMake(SCREEN_WIDTH - randomBtn.width - 50, roomTitleLabel.top, randomBtn.width, 20);
     
     UIView *inputBgView = [[UIView alloc] initWithFrame:CGRectMake(30, roomTitleLabel.bottom+15, SCREEN_WIDTH-60, 48)];
-    inputBgView.layer.cornerRadius = 24;
+    inputBgView.layer.cornerRadius = 8;
     inputBgView.layer.masksToBounds = YES;
     inputBgView.backgroundColor = UIColorMakeWithHex(@"#FFFFFF");
     [self addSubview:inputBgView];
@@ -88,63 +110,40 @@
     secretLabel.text = KTVLocalizedString(@"ktv_room_is_encryption");
     [secretLabel sizeToFit];
     [self addSubview:secretLabel];
-
-    UIButton *publicBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [publicBtn setTitle:KTVLocalizedString(@"ktv_open") forState:UIControlStateNormal];
-    [publicBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
-    publicBtn.frame = CGRectMake(secretLabel.left-3, secretLabel.bottom+13, 58, 24);
-    publicBtn.spacingBetweenImageAndTitle = 3;
-    publicBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
-    [publicBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
-    publicBtn.titleLabel.font = UIFontMake(14.0);
-    [publicBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
-    [publicBtn setImage:[UIImage sceneImageWithName:@"online_create_screatSelIcon"] forState:UIControlStateSelected];
-    publicBtn.tag = 0;
-    publicBtn.selected = YES;
-    self.publicBtn = publicBtn;
-    [publicBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:publicBtn];
-    [publicBtn sizeToFit];
     
-    UIButton *screatBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [screatBtn setTitle:KTVLocalizedString(@"ktv_encryption") forState:UIControlStateNormal];
-    [screatBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
-    screatBtn.frame = CGRectMake(publicBtn.right+40, publicBtn.top, 58, 24);
-    screatBtn.spacingBetweenImageAndTitle = 3;
-    screatBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
-    [screatBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
-    screatBtn.titleLabel.font = UIFontMake(14.0);
-    [screatBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
-    [screatBtn setImage:[UIImage sceneImageWithName:@"online_create_screatSelIcon"] forState:UIControlStateSelected];
-    screatBtn.tag = 1;
-    self.screatBtn = screatBtn;
-    [screatBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:screatBtn];
-    [screatBtn sizeToFit];
+    self.enBtn = [[UIButton alloc]initWithFrame:CGRectMake(secretLabel.right + 8, inputBgView.bottom+VLREALVALUE_WIDTH(30), 32, 20)];
+    [self.enBtn setBackgroundImage:[UIImage sceneImageWithName:@"guan"] forState:UIControlStateNormal];
+    [self.enBtn setBackgroundImage:[UIImage sceneImageWithName:@"open"] forState:UIControlStateSelected];
+    [self.enBtn addTarget:self action:@selector(enChange:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:self.enBtn];
     
+    self.setLabel = [[UILabel alloc]initWithFrame:CGRectMake(self.width - 170, inputBgView.bottom+VLREALVALUE_WIDTH(30), 150, 17)];
+    self.setLabel.font = UIFontMake(12);
+    self.setLabel.textColor = UIColorMakeWithHex(@"#FA396A");
+    self.setLabel.text = KTVLocalizedString(@"ktv_please_input_4_pwd");
+    [self.setLabel sizeToFit];
+    [self.setLabel setHidden:true];
+    [self addSubview:self.setLabel];
     
-    self.screatView = [[UIView alloc]initWithFrame:CGRectMake(40, publicBtn.bottom+15, SCREEN_WIDTH-80, 48+12+17)];
+    self.screatView = [[UIView alloc]initWithFrame:CGRectMake(40, self.setLabel.bottom+VLREALVALUE_WIDTH(30), SCREEN_WIDTH-80, 48+12+17)];
     self.screatView.hidden = YES;
     [self addSubview:self.screatView];
 
     VerifyCodeView *pwdView = [[VerifyCodeView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH-80, 55) codeNumbers:4 space:10 padding:10];
     pwdView.inputFinish = ^(NSString * _Nonnull pwd) {
         weakSelf.addRoomModel.password = pwd;
+        if(weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(didCreateRoomAction:)]){
+                [weakSelf.delegate didCreateRoomAction:weakSelf.addRoomModel.isPrivate ? CreateRoomActionTypeEncrypt : CreateRoomActionTypeNormal];
+        }
     };
     [self.screatView addSubview:pwdView];
 
-    UILabel *setLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 55+12, 150, 17)];
-    setLabel.font = UIFontMake(12);
-    setLabel.textColor = UIColorMakeWithHex(@"#FA396A");
-    setLabel.text = KTVLocalizedString(@"ktv_please_input_4_pwd");
-    [setLabel sizeToFit];
-    [self.screatView addSubview:setLabel];
-    
-    UIButton *createBtn = [[UIButton alloc] initWithFrame:CGRectMake(VLREALVALUE_WIDTH(30), SCREEN_HEIGHT-VLREALVALUE_WIDTH(25)-48-kTopNavHeight-kSafeAreaBottomHeight, SCREEN_WIDTH-2*VLREALVALUE_WIDTH(30), 48)];
-    createBtn.layer.cornerRadius = 24;
+    UIButton *createBtn = [[UIButton alloc] init];
+    createBtn.layer.cornerRadius = 5;
     createBtn.layer.masksToBounds = YES;
+    //[createBtn setBackgroundImage:[UIImage sceneImageWithName:@"createRoomBg"] forState:UIControlStateNormal];
     [createBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
-    [createBtn setTitle:KTVLocalizedString(@"ktv_create") forState:UIControlStateNormal];
+    [createBtn setTitle:KTVLocalizedString(@"ktv_create_room") forState:UIControlStateNormal];
     createBtn.accessibilityIdentifier = @"ktv_create_room_button_id";
     createBtn.titleLabel.font = UIFontBoldMake(16.0);
     createBtn.adjustsImageWhenHighlighted = NO;
@@ -152,24 +151,12 @@
     createBtn.backgroundColor = UIColorMakeWithHex(@"#2753FF");
     [self addSubview:createBtn];
     
-//    本应用为测试产品，请勿商用
-    
-    UILabel *topLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-160)*0.5+5, createBtn.top-20-30, 160, 17)];
-    topLabel.font = UIFontMake(12);
-    topLabel.textColor = UIColorMakeWithHex(@"#6C7192");
-    topLabel.text = KTVLocalizedString(@"ktv_create_tips2");
-    [self addSubview:topLabel];
-    
-    UIImageView *tipImgView = [[UIImageView alloc]initWithFrame:CGRectMake(topLabel.left-16, topLabel.centerY-7.5, 16, 15)];
-    tipImgView.image = [UIImage sceneImageWithName:@"online_create_tipIcon"];
-    [self addSubview:tipImgView];
-    
-    UILabel *bottomLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-240)*0.5, topLabel.bottom, 240, 17)];
-    bottomLabel.font = UIFontMake(12);
-    bottomLabel.textAlignment = NSTextAlignmentCenter;
-    bottomLabel.textColor = UIColorMakeWithHex(@"#6C7192");
-    bottomLabel.text = KTVLocalizedString(@"ktv_create_tips3");
-    [self addSubview:bottomLabel];
+    [createBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(self.mas_left).offset(30);
+            make.right.mas_equalTo(self.mas_right).offset(-30);
+            make.height.mas_equalTo(48);
+            make.bottom.mas_equalTo(self.mas_bottom).offset(-30);
+    }];
     
     [self randomBtnClickEvent];
 }
@@ -182,6 +169,17 @@
     self.iconImgView.image = [UIImage sceneImageWithName: iconName];
 }
 
+-(void)enChange:(UIButton *)btn {
+    btn.selected = !btn.selected;
+    self.addRoomModel.isPrivate = btn.isSelected;
+    self.screatView.hidden = !btn.selected;
+    self.setLabel.hidden = !btn.selected;
+    [self endEditing:YES];
+    if(self.delegate && [self.delegate respondsToSelector:@selector(didCreateRoomAction:)]){
+        [self.delegate didCreateRoomAction:btn.isSelected ? CreateRoomActionTypeEncrypt : CreateRoomActionTypeNormal];
+    }
+}
+
 - (void)createBtnClickEvent {
     if (!(self.inputTF.text.length > 0)) {
         [VLToast toast:KTVLocalizedString(@"ktv_insert_title")];
@@ -191,7 +189,6 @@
         [self.delegate createBtnAction:self.addRoomModel];
     }
 }
-
 - (void)createRandomNumber {
     int titleValue = arc4random() % [self.titlesArray count]; //0...5的随机数
     int bgValue = (arc4random() % 9) + 1; //1...9的随机数
@@ -218,6 +215,9 @@
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     [self endEditing:YES];
+    if(self.delegate && [self.delegate respondsToSelector:@selector(didCreateRoomAction:)]){
+        [self.delegate didCreateRoomAction:self.addRoomModel.isPrivate ? CreateRoomActionTypeEncrypt : CreateRoomActionTypeNormal];
+    }
 }
 
 - (NSArray *)titlesArray {
