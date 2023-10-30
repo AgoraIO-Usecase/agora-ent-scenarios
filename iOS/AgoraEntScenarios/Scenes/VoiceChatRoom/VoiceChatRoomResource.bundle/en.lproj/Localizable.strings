@@ -116,6 +116,7 @@
 "voice_mic_pop_filter" = "Mic Pop Filter";
 "voice_audio_feedback" = "Audio Feedback";
 "voice_host_bot" = "Only host can change the robot settings";
+"voice_mic_num" = "号麦";
 "voice_host_sound" = "Only host can change Best Agora Sound";
 "voice_microphone_finger_rub_sound" = "Microphone Finger Rub Sound";
 "voice_screen_tap_sound" = "Screen Tap Sound";
@@ -146,6 +147,8 @@
 "voice_cancel_apply_failed" = "Cancel apply failed!";
 "voice_join_IM_failed" = "join IM failed!";
 "voice_room_welcome" = "Welcome to the voice chat room! Pornography, gambling or violence is strictly prohibited in the room.";
+"voice_room_nobody" = "欢迎来到声网语聊房！\n搭载声网最佳音效实践、最新音频技术的语聊房\n带来更沉浸、更易用、更有趣的语聊体验";
+"voice_create_tips" = "本应用为测试产品，仅用于功能体验，请勿商用。单次使用时长不超过20分钟，过时房问将自动解散。为配合相关部门监管要求，严禁色情、辱骂、暴恐、涉政等违规内容。警惕电信诈骗，请勿在使用过程中进行货款申请和网银转账！国家反诈专用号码：96110";
 "voice_agree_success" = "Agree success!";
 "voice_agree_failed" = "Agree failed!";
 "voice_invitation_sent" = "Invitation sent!";
@@ -169,6 +172,7 @@
 "voice_content_prohibited" = "Content prohibited";
 "voice_AIAEC" = "AIAEC";
 "voice_AGC" = "AGC";
+"voice_SoundCard" = "虚拟声卡";
 "voice_agora_blue_and_red_bot" = "Agora Blue & Red Bot";
 "voice_room_audio_settings" = "Room Audio Settings";
 "voice_the_current_microphone_has_been_muted" = "The current microphone has been muted";

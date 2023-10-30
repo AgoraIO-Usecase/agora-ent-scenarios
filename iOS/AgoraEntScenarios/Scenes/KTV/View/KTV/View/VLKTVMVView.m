@@ -131,7 +131,7 @@
 
 - (void)setupView {
     self.bgImgView = [[UIImageView alloc]initWithFrame:self.bounds];
-    self.bgImgView.image = [UIImage sceneImageWithName:@"ktv_mv_tempBg"];
+    self.bgImgView.image = [UIImage sceneImageWithName:@"bg-lyric"];
     self.bgImgView.layer.cornerRadius = 10;
     self.bgImgView.layer.masksToBounds = YES;
     [self addSubview:self.bgImgView];
@@ -184,7 +184,6 @@
     _karaokeView.lyricsView.activeLinePlayedTextColor = [UIColor colorWithHexString:@"#FF8AB4"];
     _karaokeView.lyricsView.lyricLineSpacing = 6;
    // _karaokeView.scoringView.showDebugView = true;
-    _karaokeView.backgroundImage = [UIImage imageNamed:@"ktv_top_bgIcon"];
     [self.contentView addSubview:_karaokeView];
     
     self.incentiveView = [[IncentiveView alloc]init];

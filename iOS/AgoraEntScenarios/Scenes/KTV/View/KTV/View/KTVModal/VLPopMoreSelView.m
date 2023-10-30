@@ -51,29 +51,51 @@
        // KTVLocalizedString(@"美声"),
 //        KTVLocalizedString(@"ktv_voice_effect"),
         KTVLocalizedString(@"配置"),
-        KTVLocalizedString(@"MV")];
-    for (int i=0; i<itemsArray.count; i++) {
-        UIView *itemBgView = [[UIView alloc]initWithFrame:CGRectMake(leftMargin+(itemWH+middleMargin)*i, itemY, itemWH, itemWH)];
-        itemBgView.layer.cornerRadius = itemWH*0.5;
-        itemBgView.layer.masksToBounds = YES;
-        itemBgView.backgroundColor = UIColorMakeWithRGBA(4, 9, 37, 0.35);
-        [self addSubview:itemBgView];
+       // KTVLocalizedString(@"MV")
+    ];
     
-        UIButton *itemBtn = [[UIButton alloc]initWithFrame:CGRectMake(leftMargin+(itemWH+middleMargin)*i+11, itemY+12, btnItemWH, btnItemWH)];
-        [itemBtn setImage:[UIImage sceneImageWithName:itemsArray[i]] forState:UIControlStateNormal];
-        itemBtn.tag = i;
-        [itemBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
-        [self addSubview:itemBtn];
-        
-        NSString *title = titlesArray[i];
-        UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(leftMargin+(itemWH+middleMargin)*i, itemY+itemWH+8, itemWH, 17)];
-        titleLabel.text = title;
-        titleLabel.textAlignment = NSTextAlignmentCenter;
-        titleLabel.font = UIFontMake(12);
-        titleLabel.textColor = UIColorMakeWithHex(@"#C6C4DE");
-        [self addSubview:titleLabel];
-        
-    }
+    UIView *itemBgView = [[UIView alloc]initWithFrame:CGRectMake((self.bounds.size.width - itemWH)/2.0, itemY, itemWH, itemWH)];
+    itemBgView.layer.cornerRadius = itemWH*0.5;
+    itemBgView.layer.masksToBounds = YES;
+    itemBgView.backgroundColor = UIColorMakeWithRGBA(4, 9, 37, 0.35);
+    [self addSubview:itemBgView];
+
+    UIButton *itemBtn = [[UIButton alloc]initWithFrame:CGRectMake((self.bounds.size.width - itemWH)/2.0+11, itemY+12, btnItemWH, btnItemWH)];
+    [itemBtn setImage:[UIImage sceneImageWithName:itemsArray[0]] forState:UIControlStateNormal];
+    itemBtn.tag = 0;
+    [itemBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:itemBtn];
+    
+    NSString *title = titlesArray[0];
+    UILabel *textLabel = [[UILabel alloc]initWithFrame:CGRectMake((self.bounds.size.width - itemWH)/2.0, itemY+itemWH+8, itemWH, 17)];
+    textLabel.text = title;
+    textLabel.textAlignment = NSTextAlignmentCenter;
+    textLabel.font = UIFontMake(12);
+    textLabel.textColor = UIColorMakeWithHex(@"#C6C4DE");
+    [self addSubview:textLabel];
+    
+    
+  //  for (int i=0; i<itemsArray.count; i++) {
+//        UIView *itemBgView = [[UIView alloc]initWithFrame:CGRectMake(leftMargin+(itemWH+middleMargin)*i, itemY, itemWH, itemWH)];
+//        itemBgView.layer.cornerRadius = itemWH*0.5;
+//        itemBgView.layer.masksToBounds = YES;
+//        itemBgView.backgroundColor = UIColorMakeWithRGBA(4, 9, 37, 0.35);
+//        [self addSubview:itemBgView];
+//
+//        UIButton *itemBtn = [[UIButton alloc]initWithFrame:CGRectMake(leftMargin+(itemWH+middleMargin)*i+11, itemY+12, btnItemWH, btnItemWH)];
+//        [itemBtn setImage:[UIImage sceneImageWithName:itemsArray[i]] forState:UIControlStateNormal];
+//        itemBtn.tag = i;
+//        [itemBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
+//        [self addSubview:itemBtn];
+//
+//        NSString *title = titlesArray[i];
+//        UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(leftMargin+(itemWH+middleMargin)*i, itemY+itemWH+8, itemWH, 17)];
+//        titleLabel.text = title;
+//        titleLabel.textAlignment = NSTextAlignmentCenter;
+//        titleLabel.font = UIFontMake(12);
+//        titleLabel.textColor = UIColorMakeWithHex(@"#C6C4DE");
+//        [self addSubview:titleLabel];
+   // }
 }
 
 - (void)itemBtnClickEvent:(UIButton *)itemBtn {

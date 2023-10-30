@@ -105,6 +105,12 @@ class VoiceRoomViewController: VRBaseViewController {
             }
         }
     }
+    
+    //虚拟声卡的属性
+    public var soundOpen: Bool = false
+    public var gainValue: String = ""
+    public var typeValue: Int = 0
+    public var effectType: Int = 0
 
     convenience init(info: VRRoomInfo) {
         self.init()
@@ -347,7 +353,7 @@ extension VoiceRoomViewController {
     func layoutUI() {
 
         let bgImgView = UIImageView()
-        bgImgView.image = UIImage.sceneImage(name: "lbg", bundleName: "VoiceChatRoomResource")
+        bgImgView.image = UIImage.sceneImage(name: "bg-main", bundleName: "VoiceChatRoomResource")
         view.addSubview(bgImgView)
 
         headerView = AgoraChatRoomHeaderView() 

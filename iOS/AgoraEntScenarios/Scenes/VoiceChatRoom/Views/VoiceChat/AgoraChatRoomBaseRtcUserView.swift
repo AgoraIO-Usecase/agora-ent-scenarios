@@ -29,14 +29,14 @@ class AgoraChatRoomBaseRtcUserView: UIView {
             if cellType == .AgoraChatRoomBaseUserCellTypeAlienActive || cellType == .AgoraChatRoomBaseUserCellTypeAlienNonActive {
                 bgColor = .white
             } else {
-                bgColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.3)
+                bgColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.1)
             }
 
             switch cellType {
             case .AgoraChatRoomBaseUserCellTypeAdd:
                 iconView.isHidden = true
                 micView.isHidden = true
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
+                bgIconView.image = UIImage.sceneImage(name: "voice_wuren", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeMute:
                 iconView.isHidden = false
                 micView.isHidden = false
@@ -157,8 +157,8 @@ class AgoraChatRoomBaseRtcUserView: UIView {
         bgView.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.3)
         addSubview(bgView)
 
-        bgIconView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
-        bgIconView.layer.cornerRadius = 15
+        bgIconView.image = UIImage.sceneImage(name: "voice_wuren", bundleName: "VoiceChatRoomResource")
+        bgIconView.layer.cornerRadius = 30
         bgIconView.layer.masksToBounds = true
         bgView.addSubview(bgIconView)
 
@@ -209,7 +209,7 @@ class AgoraChatRoomBaseRtcUserView: UIView {
         bgIconView.snp.makeConstraints { make in
             make.centerX.equalTo(self)
             make.centerY.equalTo(self.bgView)
-            make.width.height.equalTo(22)
+            make.width.height.equalTo(60)
         }
 
         iconView.snp.makeConstraints { make in

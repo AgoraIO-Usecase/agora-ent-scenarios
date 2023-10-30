@@ -18,6 +18,9 @@ import AgoraChat
             }
         }
     }
+    
+    private var createName: String?
+    private var createPwd: String?
     private let normal = SANormalRoomsViewController()
 
     private var currentUser: VLLoginModel?
@@ -99,7 +102,24 @@ extension SARoomsViewController {
     private func viewsAction() {
         create.action = { [weak self] in
             self?.isDestory = false
-            self?.navigationController?.pushViewController(SACreateRoomViewController(), animated: true)
+            let presentView = SRCreateRoomPresentView.shared
+            let vc = SRCreateViewController()
+            presentView.showView(with: CGRect(x: 0, y: (self?.view.bounds.size.height ?? 0) - 400, width: self?.view.bounds.width ?? 0, height: 350), vc: vc)
+            self?.view.addSubview(presentView)
+            
+            vc.createRoomBlock = { height in
+                presentView.update(height)
+            }
+        
+            vc.createRoomVCBlock = {[weak self] (name, pwd) in
+                presentView.dismiss()
+                //跳转到主控制器
+                self?.createPwd = pwd
+                self?.createName = name
+                Throttler.throttle(queue:.main,delay: 1,shouldRunLatest: true) {
+                    self?.goLive()
+                }
+            }
         }
     }
 
@@ -163,5 +183,61 @@ extension SARoomsViewController {
                 self?.entryRoom(room: room)
             }
         }
+    }
+}
+
+extension SARoomsViewController {
+
+    private func entryCreateRoom(room: SARoomEntity) {
+        let info: SARoomInfo = SARoomInfo()
+        info.room = room
+        info.mic_info = nil
+        let vc = SARoomViewController(info: info)
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    private func createEntity() -> SARoomEntity {
+        guard let code = self.createPwd, let name = self.createName else {return SARoomEntity()}
+        
+        let entity: SARoomEntity = SARoomEntity()
+        entity.sound_effect = 1
+        entity.is_private = !code.isEmpty
+        entity.name = name
+        entity.roomPassword = code
+        entity.rtc_uid = Int(VLUserCenter.user.id)
+        let timeInterval: TimeInterval = Date().timeIntervalSince1970
+        let millisecond = CLongLong(round(timeInterval*1000))
+        entity.room_id = String(millisecond)
+        entity.channel_id = String(millisecond)
+        entity.created_at = UInt(millisecond)
+        entity.click_count = 3
+        entity.member_count = 3
+        return entity
+    }
+    
+    private func entryRoom() {
+        SVProgressHUD.show(withStatus: "spatial_voice_loading".spatial_localized())
+        self.view.window?.isUserInteractionEnabled = false
+        let entity = self.createEntity()
+        entity.chatroom_id = entity.room_id
+            entity.owner = SAUserInfo.shared.user
+            entity.owner?.chat_uid = SAUserInfo.shared.user?.rtc_uid
+                        AppContext.saServiceImp().createRoom(room: entity) {[weak self] error, room in
+                            SVProgressHUD.dismiss()
+                            guard let self = self else {return}
+                            self.view.window?.isUserInteractionEnabled = true
+                            if let room = room,error == nil {
+                                self.entryCreateRoom(room: room)
+                            } else {
+                                SVProgressHUD.showError(withStatus: "spatial_voice_create_failed".spatial_localized())
+                            }
+                        }
+    }
+
+    private func goLive() {
+        if ((self.createName?.isEmpty) != nil) {
+            view.makeToast("spatial_voice_no_room_name".spatial_localized(), point: view.center, title: nil, image: nil, completion: nil)
+        }
+        entryRoom()
     }
 }

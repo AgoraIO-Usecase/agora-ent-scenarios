@@ -21,7 +21,7 @@ class AgoraChatRoom3DMoveUserView: UIView {
             case .AgoraChatRoomBaseUserCellTypeAdd:
                 iconView.isHidden = true
                 micView.isHidden = true
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
+                bgIconView.image = UIImage.sceneImage(name: "voice_wuren", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeMute:
                 iconView.isHidden = false
                 micView.isHidden = false
@@ -151,7 +151,7 @@ class AgoraChatRoom3DMoveUserView: UIView {
             self?.svgaPlayer.startAnimation()
         }
 
-        bgIconView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
+        bgIconView.image = UIImage.sceneImage(name: "voice_wuren", bundleName: "VoiceChatRoomResource")
         bgIconView.layer.cornerRadius = 15
         bgIconView.layer.masksToBounds = true
         addSubview(bgIconView)

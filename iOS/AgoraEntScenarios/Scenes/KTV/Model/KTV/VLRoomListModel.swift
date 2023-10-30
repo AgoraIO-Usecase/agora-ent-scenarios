@@ -28,6 +28,8 @@ class VLRoomListModel: VLBaseModel {
     
     ///新加字段 当前房间的创建者
     @objc var creatorNo: String?
+    @objc var creatorAvatar: String?
+    @objc var creatorName: String?
     
     @objc var objectId: String?
 }

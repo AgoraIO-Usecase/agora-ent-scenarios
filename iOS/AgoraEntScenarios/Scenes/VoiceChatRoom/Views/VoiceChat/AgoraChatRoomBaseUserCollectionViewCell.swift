@@ -50,7 +50,7 @@ class AgoraChatRoomBaseUserCollectionViewCell: UICollectionViewCell {
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = true
             rtcUserView.bgIconView.isHidden = false
-            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "voice_wuren", bundleName: "VoiceChatRoomResource")
         case 0:
             rtcUserView.iconView.isHidden = false
             rtcUserView.micView.isHidden = false
@@ -99,7 +99,8 @@ class AgoraChatRoomBaseUserCollectionViewCell: UICollectionViewCell {
             rtcUserView.iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"))
         }
         rtcUserView.nameBtn.setImage(UIImage.voice_image(mic.mic_index == 0 ? "Landlord" : ""), for: .normal)
-        rtcUserView.nameBtn.setTitle(mic.member?.name ?? "\(mic.mic_index)", for: .normal)
+        let text = LanguageManager.localValue(key: "voice_mic_num")
+        rtcUserView.nameBtn.setTitle(mic.member?.name ?? "\(mic.mic_index)\(text)", for: .normal)
     }
 
     public func refreshVolume(vol: Int) {
