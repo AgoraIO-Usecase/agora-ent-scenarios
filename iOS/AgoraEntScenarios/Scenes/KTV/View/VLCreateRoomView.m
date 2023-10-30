@@ -141,9 +141,9 @@
     UIButton *createBtn = [[UIButton alloc] init];
     createBtn.layer.cornerRadius = 5;
     createBtn.layer.masksToBounds = YES;
-    [createBtn setBackgroundImage:[UIImage sceneImageWithName:@"createRoomBg"] forState:UIControlStateNormal];
+    //[createBtn setBackgroundImage:[UIImage sceneImageWithName:@"createRoomBg"] forState:UIControlStateNormal];
     [createBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
-  //  [createBtn setTitle:KTVLocalizedString(@"ktv_create_room") forState:UIControlStateNormal];
+    [createBtn setTitle:KTVLocalizedString(@"ktv_create_room") forState:UIControlStateNormal];
     createBtn.accessibilityIdentifier = @"ktv_create_room_button_id";
     createBtn.titleLabel.font = UIFontBoldMake(16.0);
     createBtn.adjustsImageWhenHighlighted = NO;
@@ -154,7 +154,7 @@
     [createBtn mas_makeConstraints:^(MASConstraintMaker *make) {
             make.left.mas_equalTo(self.mas_left).offset(30);
             make.right.mas_equalTo(self.mas_right).offset(-30);
-            make.height.mas_equalTo(40);
+            make.height.mas_equalTo(48);
             make.bottom.mas_equalTo(self.mas_bottom).offset(-30);
     }];
     

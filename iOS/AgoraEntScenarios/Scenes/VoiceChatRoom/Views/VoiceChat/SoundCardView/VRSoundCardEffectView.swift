@@ -14,9 +14,9 @@ class VRSoundCardEffectView: UIView {
     var botView: UIView!
     var cancleView: UIButton!
     var sepView: UIView!
-    let voiceArray: [String] = ["大叔音", "妈音", "青叔音", "御妈音", "青年音", "少御音"]
-    let descArray: [String] = ["高混响|KTV", "高混响|KTV", "明亮|磁性", "明亮|磁性", "低沉|温暖",  "醇厚|饱满"]
-    let imgArray: [String] = ["ktv-1", "ktv-2", "ktv-3", "ktv-4", "ktv-5", "ktv-6"]
+    let voiceArray: [String] = ["青叔音", "少御音", "青年音", "少萝音","大叔音", "妈音", "青叔音", "御妈音", "青年音", "少御音"]
+    let descArray: [String] = ["悦耳，磁性", "柔美，磁性", "洪亮，饱满", "夹子音，萝莉","高混响|KTV", "高混响|KTV", "明亮|磁性", "明亮|磁性", "低沉|温暖",  "醇厚|饱满"]
+    let imgArray: [String] = ["chat-1", "chat-2", "chat-3", "chat-4", "chat-5", "chat-6", "chat-7", "chat-8", "chat-9", "chat-10"]
     @objc var effectType: Int = 0
     @objc var clickBlock: ((Int)->Void)?
     override init(frame: CGRect) {
@@ -53,13 +53,13 @@ class VRSoundCardEffectView: UIView {
 //        sepView.backgroundColor = UIColor(red: 245/255.0, green: 244/255.0, blue: 246/255.0, alpha: 1)
 //        self.addSubview(sepView)
         
-        cancleView = UIButton()
-        cancleView.titleLabel?.font = UIFont.systemFont(ofSize: 15)
-        cancleView.setTitleColor(.black, for: .normal)
-        cancleView.setTitle("取消", for: .normal)
-        cancleView.backgroundColor = .white
-        cancleView.addTarget(self, action: #selector(cancel), for: .touchUpInside)
-        self.addSubview(cancleView)
+//        cancleView = UIButton()
+//        cancleView.titleLabel?.font = UIFont.systemFont(ofSize: 15)
+//        cancleView.setTitleColor(.black, for: .normal)
+//        cancleView.setTitle("取消", for: .normal)
+//        cancleView.backgroundColor = .white
+//        cancleView.addTarget(self, action: #selector(cancel), for: .touchUpInside)
+//        self.addSubview(cancleView)
         
         KTVHeadSetUtil.addSoundCardObserver {[weak self] flag in
             guard let block = self?.clickBlock else {return}
@@ -73,7 +73,7 @@ class VRSoundCardEffectView: UIView {
         headTitleLabel.frame = CGRect(x: (self.bounds.width - 80)/2.0, y: 30, width: 80, height: 22)
         tableView.frame = CGRect(x: 0, y: headTitleLabel.frame.maxY + 10, width: self.bounds.width, height: 350)
        // sepView.frame = CGRect(x: 0, y: self.bounds.height - 70, width: self.bounds.width, height: 10)
-        cancleView.frame = CGRect(x: 10, y: 26, width: 50, height: 30)
+       // cancleView.frame = CGRect(x: 10, y: 26, width: 50, height: 30)
     }
     
     @objc private func cancel() {
@@ -84,7 +84,7 @@ class VRSoundCardEffectView: UIView {
 
 extension VRSoundCardEffectView: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 6
+        return 10
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

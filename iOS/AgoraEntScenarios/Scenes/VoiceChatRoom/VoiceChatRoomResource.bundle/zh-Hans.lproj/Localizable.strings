@@ -125,6 +125,7 @@
 "voice_other_sound" = "其他最佳音效";
 "voice_otherSound" = "切换其他最佳音效需退出房间";
 "voice_prompt" = "提醒";
+"voice_mic_num" = "号麦";
 "voice_add_bot" = "添加机器人体验最佳音效？";
 "voice_exit_room" = "离开并重新创建一个新的语聊房?";
 "voice_AINS_AI_noise_suppression" = "AINS: AI降噪";

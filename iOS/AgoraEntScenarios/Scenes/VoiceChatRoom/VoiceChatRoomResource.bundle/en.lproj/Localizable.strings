@@ -116,6 +116,7 @@
 "voice_mic_pop_filter" = "Mic Pop Filter";
 "voice_audio_feedback" = "Audio Feedback";
 "voice_host_bot" = "Only host can change the robot settings";
+"voice_mic_num" = "号麦";
 "voice_host_sound" = "Only host can change Best Agora Sound";
 "voice_microphone_finger_rub_sound" = "Microphone Finger Rub Sound";
 "voice_screen_tap_sound" = "Screen Tap Sound";

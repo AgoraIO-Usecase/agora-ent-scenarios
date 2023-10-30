@@ -130,8 +130,8 @@ class VMManagerView: UIView {
         bgView.layer.masksToBounds = true
         addSubview(bgView)
 
-        addView.frame = CGRect(x: ScreenWidth / 2 - 11, y: 61, width: 22, height: 22)
-        addView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
+        addView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)
+        addView.image = UIImage.sceneImage(name: "voice_wuren", bundleName: "VoiceChatRoomResource")
         addSubview(addView)
 
         iconView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)

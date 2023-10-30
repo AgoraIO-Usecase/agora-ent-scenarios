@@ -19,7 +19,7 @@ import Foundation
     var coverView: UIView!
     @objc var soundOpen:Bool = false
     @objc var gainValue: Float = 0
-    @objc var effectType: Int = 0
+    @objc var effectType: Int = 0 
     @objc var typeValue: Int = 2
     
     @objc var clicKBlock:((Int) -> Void)?
@@ -115,14 +115,14 @@ import Foundation
         
         noSoundCardView.isHidden = true
         
-//        let flag = KTVHeadSetUtil.hasSoundCard()
-//        self.noSoundCardView.isHidden = flag
-//        self.tableView.isHidden = !flag
-//
-//        KTVHeadSetUtil.addSoundCardObserver {[weak self] flag in
-//            self?.noSoundCardView.isHidden = flag
-//            self?.tableView.isHidden = !flag
-//        }
+        let flag = KTVHeadSetUtil.hasSoundCard()
+        self.noSoundCardView.isHidden = flag
+        self.tableView.isHidden = !flag
+
+        KTVHeadSetUtil.addSoundCardObserver {[weak self] flag in
+            self?.noSoundCardView.isHidden = flag
+            self?.tableView.isHidden = !flag
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -149,16 +149,24 @@ import Foundation
     private func getEffectDesc(with type: Int) -> String {
         switch type {
             case 0:
-                return "大叔音(高混响 | KTV)"
+                return "青叔音(悦耳，磁性)"
             case 1:
-                return "妈音(高混响 | KTV)"
+                return "少御音(柔美，磁性)"
             case 2:
-                return "青叔音(明亮 | 磁性)"
+                return "青年音(洪亮，饱满)"
             case 3:
-                return "御妈音(明亮 |磁性)"
+                return "少萝音(夹子音，萝莉)"
             case 4:
-                return "青年音(低沉 | 温暖)"
+                return "大叔音(高混响 | KTV)"
             case 5:
+                return "妈音(高混响 | KTV)"
+            case 6:
+                return "青叔音(明亮 | 磁性)"
+            case 7:
+                return "御妈音(明亮 |磁性)"
+            case 8:
+                return "青年音(低沉 | 温暖)"
+            case 9:
                 return "少御音(醇厚 | 饱满)"
             default:
                 break
@@ -193,14 +201,19 @@ extension VRSoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
         
         if indexPath.row == 0 || indexPath.row == 2 {
             let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-            let rightLabel = UILabel()
-            rightLabel.font = UIFont.systemFont(ofSize: 12)
-            rightLabel.textColor = .gray
-            rightLabel.translatesAutoresizingMaskIntoConstraints = false
-            cell.contentView.addSubview(rightLabel)
-
-            rightLabel.trailingAnchor.constraint(equalTo: cell.contentView.trailingAnchor, constant: -20).isActive = true
-            rightLabel.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor).isActive = true
+            
+            var rightLabel = UILabel()
+            if let view = self.viewWithTag(indexPath.row + 100) as? UILabel {
+                rightLabel = view
+            } else {
+                rightLabel.tag = indexPath.row + 100
+                rightLabel.font = UIFont.systemFont(ofSize: 12)
+                rightLabel.textColor = .gray
+                rightLabel.translatesAutoresizingMaskIntoConstraints = false
+                cell.contentView.addSubview(rightLabel)
+                rightLabel.trailingAnchor.constraint(equalTo: cell.contentView.trailingAnchor, constant: -20).isActive = true
+                rightLabel.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor).isActive = true
+            }
             
             cell.textLabel?.font = UIFont.systemFont(ofSize: 13)
             if indexPath.row == 2 {
@@ -215,16 +228,22 @@ extension VRSoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
             return cell
         } else if indexPath.row == 1 {
             let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+            
             cell.textLabel?.text = "开启虚拟声卡"
             cell.textLabel?.font = UIFont.systemFont(ofSize: 13)
-            let swich = UISwitch()
-            swich.translatesAutoresizingMaskIntoConstraints = false
-            swich.isOn = self.soundOpen
-            swich.addTarget(self, action: #selector(soundChange), for: .valueChanged)
-            cell.contentView.addSubview(swich)
+            var swich = UISwitch()
+            if let view = self.viewWithTag(indexPath.row + 100) as? UISwitch {
+                swich = view
+            } else {
+                swich.tag = 101
+                swich.translatesAutoresizingMaskIntoConstraints = false
+                swich.isOn = self.soundOpen
+                swich.addTarget(self, action: #selector(soundChange), for: .valueChanged)
+                cell.contentView.addSubview(swich)
+                swich.trailingAnchor.constraint(equalTo: cell.contentView.trailingAnchor, constant: -20).isActive = true
+                swich.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor).isActive = true
+            }
 
-            swich.trailingAnchor.constraint(equalTo: cell.contentView.trailingAnchor, constant: -20).isActive = true
-            swich.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor).isActive = true
             cell.selectionStyle = .none
             return cell
         } else if indexPath.row == 3 {
