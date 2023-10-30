@@ -83,15 +83,6 @@ class NetworkManager:NSObject {
         return KeyCenter.baseServerUrl ?? ""
     }
     
-    private func basicAuth(key: String, password: String) -> String {
-        let loginString = String(format: "%@:%@", key, password)
-        guard let loginData = loginString.data(using: String.Encoding.utf8) else {
-            return ""
-        }
-        let base64LoginString = loginData.base64EncodedString()
-        return base64LoginString
-    }
-    
     /// get tokens
     /// - Parameters:
     ///   - channelName: <#channelName description#>
@@ -133,6 +124,7 @@ class NetworkManager:NSObject {
                               expire: UInt = 1500,
                               success: @escaping (String?) -> Void)
     {
+        /*
         let params = ["appCertificate": KeyCenter.Certificate ?? "",
                       "appId": KeyCenter.AppId,
                       "channelName": channelName,
@@ -158,6 +150,17 @@ class NetworkManager:NSObject {
             success(nil)
 //            ToastView.hidden()
         })
+         */
+        
+        let model: NMGenerateTokennNetworkModel = tokenType == .token006 ? NMGenerate006TokennNetworkModel() : NMGenerate007TokennNetworkModel()
+        model.expire = NSNumber(value: expire)
+        model.channelName = channelName
+        model.type = NSNumber(value: type.rawValue)
+        model.uid = uid
+        model.request { error, token in
+            success(token as? String)
+        }
+        
     }
     
     /// generator easemob im token & uid
@@ -178,6 +181,7 @@ class NetworkManager:NSObject {
                           uid: String,
                           sceneType: SceneType,
                           success: @escaping (String?, String?, String?) -> Void) {
+        /*
         var chatParams = [
             "name": channelName,
             "description": "test",
@@ -226,6 +230,40 @@ class NetworkManager:NSObject {
             success(nil, nil, nil)
 //            ToastView.hidden()
         })
+         */
+        
+        let chatParamsModel = NMGenerateIMConfigNetworkModelChatParams()
+        chatParamsModel.name = channelName
+        chatParamsModel.desc = "test"
+        chatParamsModel.owner = uid
+        if let chatId = chatId {
+            chatParamsModel.chatId = chatId
+        }
+        
+        let userParamsModel = NMGenerateIMConfigNetworkModelUserParmas()
+        userParamsModel.username = uid
+        userParamsModel.password = password
+        userParamsModel.nickname = nickName
+      
+        let imConfigModel = NMGenerateIMConfigNetworkModelIMParmas()
+        
+        let payload: String = getPlayloadWithSceneType(.voice) ?? ""
+        
+        let networkModel = NMGenerateIMConfigNetworkModel()
+        networkModel.chat = chatParamsModel
+        networkModel.im = imConfigModel
+        networkModel.payload = payload
+        networkModel.user = userParamsModel
+        networkModel.type = NSNumber(value: type)
+        
+        networkModel.request { error, data in
+            let data = data as? [String: String]
+            let uid = data?["userName"]
+            let chatId = data?["chatId"]
+            let token = data?["chatToken"]
+            success(uid, chatId, token)
+        }
+        
     }
     
     @objc func voiceIdentify(channelName: String,
@@ -233,6 +271,7 @@ class NetworkManager:NSObject {
                              sceneType: SceneType,
                              success: @escaping (String?) -> Void) {
         let payload: String = getPlayloadWithSceneType(sceneType) ?? ""
+        /*
         let params = ["appId": KeyCenter.AppId,
                       "channelName": channelName,
                       "channelType": channelType,
@@ -250,6 +289,17 @@ class NetworkManager:NSObject {
             print(error)
             success(error.description)
         })
+         */
+        let model = NMVoiceIdentifyNetworkModel()
+        model.channelName = channelName
+        model.channelType = NSNumber(value: channelType)
+        model.payload = payload
+        model.request { error, data in
+            let data = data as? [String: Any]
+            let code = data?["code"] as? Int
+            let msg = data?["msg"] as? String
+            success(code == 0 ? nil : msg)
+        }
     }
     
     func getPlayloadWithSceneType(_ type: SceneType) -> String? {
@@ -272,6 +322,7 @@ class NetworkManager:NSObject {
                           robotUid: UInt,
                           streamUrl: String,
                           success: @escaping (String?) -> Void) {
+        /*
         let params: [String: Any] = ["appId": KeyCenter.AppId,
                                      "appCert": KeyCenter.Certificate ?? "",
                                      "basicAuth":basicAuth(key: KeyCenter.CloudPlayerKey ?? "", password: KeyCenter.CloudPlayerSecret ?? ""),
@@ -293,11 +344,26 @@ class NetworkManager:NSObject {
             print(error)
             success(error.description)
         })
+        */
+        
+        let model = NMStartCloudPlayerNetworkModel()
+        model.channelName = channelName
+        model.uid = uid
+        model.robotUid = NSNumber(value: robotUid)
+        model.streamUrl = streamUrl
+        
+        model.request { error, data in
+            let data = data as? [String: Any]
+            let code = data?["code"] as? Int
+            let msg = data?["msg"] as? String
+            success(code == 0 ? nil : msg)
+        }
     }
     
     func cloudPlayerHeartbeat(channelName: String,
                               uid: String,
                               success: @escaping (String?) -> Void) {
+        /*
         let params: [String: String] = ["appId": KeyCenter.AppId,
                                         "channelName": channelName,
                                         "uid": uid,
@@ -314,6 +380,16 @@ class NetworkManager:NSObject {
             print(error)
             success(error.description)
         })
+         */
+        let model = NMCloudPlayerHeartbeatNetworkModel()
+        model.channelName = channelName
+        model.uid = uid
+        model.request { error, data in
+            let data = data as? [String: Any]
+            let code = data?["code"] as? Int
+            let msg = data?["msg"] as? String
+            success(code == 0 ? nil : msg)
+        }
     }
 
     func getRequest(urlString: String, success: SuccessClosure?, failure: FailClosure?) {
@@ -436,6 +512,7 @@ public extension URLRequest {
 //event report
 extension NetworkManager {
     @objc public func reportSceneClick(sceneName: String) {
+        /*
         let src: String = "agora_ent_demo"
         let ts: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
         let params = ["pts": [["m": "event",
@@ -459,10 +536,19 @@ extension NetworkManager {
         }, failure: { error in
             print(error)
         })
+        
+        */
+        
+        let model = NMReportSceneClickNetworkModel()
+        model.setProject(sceneName)
+        model.request { error, data in
+
+        }
     }
     
     @objc
     public func reportDeviceInfo(sceneName: String) {
+        /*
         let appVersion = UIApplication.shared.appVersion ?? ""
         let deviceModel = UIDevice.current.machineModel ?? ""
         let params = ["appVersion": appVersion ,
@@ -477,21 +563,30 @@ extension NetworkManager {
         }, failure: { error in
             print(error)
         })
+        */
+        
+        let model = NMReportDeviceInfoNetworkModel(sceneId: sceneName, userNo: VLUserCenter.user.userNo, appId: KeyCenter.AppId)
+        model.request { error, data in
+
+        }
     }
     
     @objc
     public func reportUserBehavior(sceneName: String) {
-        let appVersion = UIApplication.shared.appVersion ?? ""
-        let deviceModel = UIDevice.current.machineModel ?? ""
-        let params = ["action": sceneName] as [String : Any]
-        let url = KeyCenter.HostUrl + "/api-login/report/action?userNo=\(VLUserCenter.user.userNo)&sceneId=\(sceneName)&appId=\(KeyCenter.AppId)&projectId=agora_ent_demo"
-        NetworkManager.shared.postRequest(urlString: url,
-                                          params: params,
-                                          success: { response in
-            print(response)
+//        let params = ["action": sceneName] as [String : Any]
+//        let url = KeyCenter.HostUrl + "/api-login/report/action?userNo=\(VLUserCenter.user.userNo)&sceneId=\(sceneName)&appId=\(KeyCenter.AppId)&projectId=agora_ent_demo"
+//        NetworkManager.shared.postRequest(urlString: url,
+//                                          params: params,
+//                                          success: { response in
+//            print(response)
+//
+//        }, failure: { error in
+//            print(error)
+//        })
+        
+        let model = NMReportUserBehaviorNetworkModel(sceneId: sceneName, userNo: VLUserCenter.user.userNo, appId: KeyCenter.AppId)
+        model.request { error, data in
 
-        }, failure: { error in
-            print(error)
-        })
+        }
     }
 }

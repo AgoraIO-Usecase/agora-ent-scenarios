@@ -15,7 +15,7 @@
 #import "VLURLPathConfig.h"
 #import "VLFontUtils.h"
 #import "VLToast.h"
-#import "VLAPIRequest.h"
+//#import "VLAPIRequest.h"
 #import "VLGlobalHelper.h"
 #import "MenuUtils.h"
 #import <Photos/Photos.h>
@@ -274,23 +274,52 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 /// 获取用户信息
 - (void)loadRequestUserInfoRequest {
     NSDictionary *param = @{@"userNo":VLUserCenter.user.userNo ?: @""};
-    [VLAPIRequest getRequestURL:kURLPathGetUserInfo parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-        if (response.code == 0) {
-//            VLLoginModel *userInfo = [VLLoginModel vj_modelWithDictionary:response.data];
+//    [VLAPIRequest getRequestURL:kURLPathGetUserInfo parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
+//        if (response.code == 0) {
+////            VLLoginModel *userInfo = [VLLoginModel vj_modelWithDictionary:response.data];
+//        }
+//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
+//
+//    }];
+    
+    VLGetUserInfoNetworkModel *model = [VLGetUserInfoNetworkModel new];
+    model.userNo = VLUserCenter.user.userNo ?: @"";
+    [model requestWithCompletion:^(NSError * _Nullable error, id _Nullable data) {
+        VLResponseData *response = data;
+        if (response.code && response.code.integerValue == 0) {
+            NSLog(@"获取成功");
+            [[VLUserCenter center] storeUserInfo:VLUserCenter.user];
+            [self.mineView refreseUserInfo:VLUserCenter.user];
+        }else{
+            [VLToast toast:response.message];
         }
-    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-        
     }];
 }
 
 - (void)loadUpdateUserIconRequest:(NSString *)iconUrl image:(UIImage *)image{
-    NSDictionary *param = @{
-        @"userNo" : VLUserCenter.user.userNo ?: @"",
-        @"headUrl" : iconUrl ?: @""
-    };
+//    NSDictionary *param = @{
+//        @"userNo" : VLUserCenter.user.userNo ?: @"",
+//        @"headUrl" : iconUrl ?: @""
+//    };
     
-    [VLAPIRequest postRequestURL:kURLPathUploadUserInfo parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-        if (response.code == 0) {
+//    [VLAPIRequest postRequestURL:kURLPathUploadUserInfo parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
+//        if (response.code == 0) {
+//            [VLToast toast:AGLocalizedString(@"app_edit_success")];
+//            [self.mineView refreseAvatar:image];
+//            VLUserCenter.user.headUrl = iconUrl;
+//            [[VLUserCenter center] storeUserInfo:VLUserCenter.user];
+//        }else{
+//            [VLToast toast:response.message];
+//        }
+//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
+//    }];
+    
+    VLUploadUserInfoNetworkModel *model = [VLUploadUserInfoNetworkModel new];
+    model.userNo = VLUserCenter.user.userNo ?: @"";
+    model.headUrl = iconUrl ?: @"";
+    [model requestWithCompletion:^(NSError * _Nullable error, id _Nullable data) {
+        VLResponseData *response = data;
+        if (response.code && response.code.integerValue == 0) {
             [VLToast toast:AGLocalizedString(@"app_edit_success")];
             [self.mineView refreseAvatar:image];
             VLUserCenter.user.headUrl = iconUrl;
@@ -298,7 +327,6 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         }else{
             [VLToast toast:response.message];
         }
-    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
     }];
 }
 
@@ -346,6 +374,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 /// 上传图片
 /// @param image 图片
 - (void)uploadHeadImageWithImage:(UIImage *)image {
+    /*
     [VLAPIRequest uploadImageURL:kURLPathUploadImage showHUD:YES appendKey:@"file" images:@[image] success:^(VLResponseDataModel * _Nonnull response) {
         if (response.code == 0) {
             VLUploadImageResModel *model = [VLUploadImageResModel vj_modelWithDictionary:response.data];
@@ -356,6 +385,20 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         }
     } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
     }];
+     */
+    
+    VLUploadImageNetworkModel *uploadModel = [VLUploadImageNetworkModel new];
+    dispatch_sync(dispatch_get_global_queue(0, 0), ^{
+        uploadModel.image = image;
+        [uploadModel uploadWithProgress:nil completion:^(NSError * _Nullable err, id _Nullable responseObject) {
+            VLResponseData *response = responseObject;
+            if (response.code.intValue == 0) {
+                VLUploadImageResModel *model = [VLUploadImageResModel vj_modelWithDictionary:response.data];
+                [self loadUpdateUserIconRequest:model.url image:image];
+            }
+            [VLToast toast:response.message];
+        }];
+    });
 }
 
 #pragma mark - Public Methods

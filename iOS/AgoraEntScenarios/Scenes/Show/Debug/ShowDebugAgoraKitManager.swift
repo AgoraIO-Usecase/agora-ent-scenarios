@@ -7,6 +7,13 @@
 import Foundation
 import AgoraRtcKit
 
+private let userDefaultKeyTag = "debug"
+// 存储编码配置的key
+private let kEncodeWidth = "kEncodeWidth"
+private let kEncodeHeight = "kEncodeHeight"
+private let kEncodeFPS = "kEncodeFPS"
+private let kEncodeBitrate = "kEncodeBitrate"
+
 
 enum ShowDebug1TFSettingKey: String {
     
@@ -40,7 +47,32 @@ enum ShowDebug2TFSettingKey: String {
     }
 }
 
-extension ShowAgoraKitManager {
+class ShowDebugAgoraKitManager {
+    
+    static let shared = ShowDebugAgoraKitManager()
+    
+    private lazy var encoderConfig :AgoraVideoEncoderConfiguration = {
+        getEncoderConfig()
+    }()
+    
+    public var engine: AgoraRtcEngineKit?
+    
+    var exposureRangeX: Int?
+    var exposureRangeY: Int?
+    var matrixCoefficientsExt: Int?
+    var videoFullrangeExt: Int?
+    
+    private init() {
+//        engine = AgoraRtcEngineKit.sharedEngine(with: AgoraRtcEngineConfig(), delegate: nil)
+    }
+    
+    private func engineConfig() -> AgoraRtcEngineConfig {
+        let config = AgoraRtcEngineConfig()
+         config.appId = KeyCenter.AppId
+         config.channelProfile = .liveBroadcasting
+         config.areaCode = .global
+         return config
+    }
     
     private var debugEncodeItems: [Bool] {
         ShowAgoraEncode.allCases.map({$0.encodeValue})
@@ -63,6 +95,7 @@ extension ShowAgoraKitManager {
         encoderConfig.frameRate = .fps15
         encoderConfig.bitrate = 1800
         engine?.setVideoEncoderConfiguration(encoderConfig)
+        saveVideoEncoderConfiguration()
         
         setExposureRange()
         setColorSpace()
@@ -142,6 +175,7 @@ extension ShowAgoraKitManager {
             }
             encoderConfig.frameRate = fps
             engine?.setVideoEncoderConfiguration(encoderConfig)
+            saveVideoEncoderConfiguration()
             showLogger.info("***Debug*** setVideoEncoderConfiguration.encodeFrameRate = \(encoderConfig.frameRate) ")
         case .bitRate:
             guard let value = Int(text) else {
@@ -150,6 +184,7 @@ extension ShowAgoraKitManager {
             }
             encoderConfig.bitrate = value
             engine?.setVideoEncoderConfiguration(encoderConfig)
+            saveVideoEncoderConfiguration()
             showLogger.info("***Debug*** setVideoEncoderConfiguration.bitrate = \(encoderConfig.bitrate) ")
         }
     }
@@ -163,6 +198,7 @@ extension ShowAgoraKitManager {
         case .encodeVideoSize:
             encoderConfig.dimensions = CGSize(width: value1, height: value2)
             engine?.setVideoEncoderConfiguration(encoderConfig)
+            saveVideoEncoderConfiguration()
             showLogger.info("***Debug*** setVideoEncoderConfiguration.encodeVideoSize = \(encoderConfig.dimensions) ")
         case .exposureRange:
             exposureRangeX = value1
@@ -188,8 +224,6 @@ extension ShowAgoraKitManager {
             engine?.setColorEnhanceOptions(isOn, options: AgoraColorEnhanceOptions())
         case .videoDenoiser:
             engine?.setVideoDenoiserOptions(isOn, options: AgoraVideoDenoiserOptions())
-        case .PVC:
-            engine?.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
         case .focusFace:
             engine?.setCameraAutoFocusFaceModeEnabled(isOn)
             showLogger.info("***Debug*** setCameraAutoFocusFaceModeEnabled  \(isOn)")
@@ -218,7 +252,7 @@ extension ShowAgoraKitManager {
     }
 }
 
-extension ShowAgoraKitManager {
+extension ShowDebugAgoraKitManager {
     
     private func setExposureRange() {
         if let x = exposureRangeX, let y = exposureRangeY {
@@ -234,9 +268,45 @@ extension ShowAgoraKitManager {
             showLogger.info("***Debug*** {\"che.video.videoFullrangeExt\":\(v1)} {\"che.video.matrixCoefficientsExt\":\(v2)} ")
         }
     }
+    
+    /// 设置超分 不保存数据
+    /// - Parameters:
+    ///   - isOn: 开关
+    ///   - srType: 默认1.5倍
+    func setDebugSuperResolutionOn(_ isOn: Bool, srType:SRType = .none) {
+        if srType == .none {
+            engine?.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(false), \"mode\": 2}}")
+        }else{
+            engine?.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(false), \"mode\": 2}}")
+            engine?.setParameters("{\"rtc.video.sr_type\":\(srType.rawValue)}")
+            engine?.setParameters("{\"rtc.video.sr_max_wh\":\(921598)}")
+            // enabled要放在srType之后 否则修改超分倍数可能不会立即生效
+            engine?.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
+        }
+    }
+    
+    func saveVideoEncoderConfiguration() {
+        UserDefaults.standard.set(encoderConfig.dimensions.width, forKey: kEncodeWidth)
+        UserDefaults.standard.set(encoderConfig.dimensions.height, forKey: kEncodeHeight)
+        UserDefaults.standard.set(encoderConfig.frameRate.rawValue, forKey: kEncodeFPS)
+        UserDefaults.standard.set(encoderConfig.bitrate, forKey: kEncodeBitrate)
+        UserDefaults.standard.synchronize()
+    }
+    
+    func getEncoderConfig() ->AgoraVideoEncoderConfiguration{
+        let encoderConfig = AgoraVideoEncoderConfiguration()
+        if let encodeWidth: CGFloat = UserDefaults.standard.value(forKey: kEncodeWidth) as? CGFloat ,let encodeHeight: CGFloat = UserDefaults.standard.value(forKey: kEncodeHeight) as? CGFloat {
+            encoderConfig.dimensions = CGSize(width: encodeWidth, height: encodeHeight)
+        }
+        if let fps: Int = UserDefaults.standard.value(forKey: kEncodeFPS) as? Int {
+            encoderConfig.frameRate =  AgoraVideoFrameRate(rawValue: fps) ?? .fps15
+        }
+        if let bitrate: Int = UserDefaults.standard.value(forKey: kEncodeBitrate) as? Int {
+            encoderConfig.bitrate = bitrate
+        }
+        return encoderConfig
+    }
 }
-
-private let userDefaultKeyTag = "debug"
 
 enum ShowDebugSettingKey: String, CaseIterable {
     
@@ -250,7 +320,6 @@ enum ShowDebugSettingKey: String, CaseIterable {
     case lowlightEnhance        // 暗光增强
     case colorEnhance           // 色彩增强
     case videoDenoiser          // 降噪
-    case PVC                    // pvc
     case focusFace              // 人脸对焦
     case encode                 // 硬编/软编
     case codeCType                // 编码器
@@ -268,8 +337,6 @@ enum ShowDebugSettingKey: String, CaseIterable {
             return "show_advance_setting_colorEnhance_title".show_localized
         case .videoDenoiser:
             return "show_advance_setting_videoDenoiser_title".show_localized
-        case .PVC:
-            return "PVC"
         case .focusFace:
             return "人脸对焦"
         case .encode:
@@ -297,8 +364,6 @@ enum ShowDebugSettingKey: String, CaseIterable {
         case .colorEnhance:
             return .aSwitch
         case .videoDenoiser:
-            return .aSwitch
-        case .PVC:
             return .aSwitch
         case .focusFace:
             return .aSwitch
@@ -328,8 +393,6 @@ enum ShowDebugSettingKey: String, CaseIterable {
             return "show_advance_setting_colorEnhance_tips".show_localized
         case .videoDenoiser:
             return "show_advance_setting_videoDenoiser_tips".show_localized
-        case .PVC:
-            return "show_advance_setting_PVC_tips".show_localized
         default:
             return ""
         }

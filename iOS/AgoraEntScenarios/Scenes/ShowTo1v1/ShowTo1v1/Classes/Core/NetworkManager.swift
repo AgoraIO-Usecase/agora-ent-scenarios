@@ -40,7 +40,7 @@ class NetworkManager:NSObject {
     }()
 
     @objc static let shared = NetworkManager()
-    private let baseServerUrl: String = "https://test-toolbox.bj2.agoralab.co/v1/"
+    private let baseServerUrl: String = "https://service.agora.io/toolbox/"
     
     private func basicAuth(key: String, password: String) -> String {
         let loginString = String(format: "%@:%@", key, password)
@@ -107,8 +107,8 @@ class NetworkManager:NSObject {
                       "uid": uid] as [String: Any]
 //        ToastView.showWait(text: "loading...", view: nil)
         let url = tokenType == .token006 ?
-        "\(baseServerUrl)token006/generate"
-        : "\(baseServerUrl)token/generate"
+        "\(baseServerUrl)v2/token006/generate"
+        : "\(baseServerUrl)v2/token/generate"
         NetworkManager.shared.postRequest(urlString: url,
                                           params: params,
                                           success: { response in
