@@ -393,11 +393,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                     }
                 }
             ).setUpInitMicInfoMap()
-//            binding.rvChatroom3dMicLayout
         }
-        binding.cTopView.setTitleMaxWidth()
-//        roomObservableDelegate.onRoomModel(voiceRoomModel)
-        binding.cTopView.setRoomType(roomKitBean.roomType)
         binding.cTopView.setOnLiveTopClickListener(object : OnLiveTopClickListener {
             override fun onClickBack(view: View) {
                 onBackPressed()

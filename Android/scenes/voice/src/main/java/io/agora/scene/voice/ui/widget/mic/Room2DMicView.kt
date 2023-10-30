@@ -59,7 +59,8 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                 if (micInfo.member == null) { // 没人
                     ivMicInnerIcon.isVisible = true
                     ivMicInfo.setImageResource(0)
-                    mtMicUsername.text = micInfo.micIndex.toString()
+                    ivMicInfo.visibility = View.INVISIBLE
+                    mtMicUsername.text = resources.getString(R.string.voice_room_mic_number, micInfo.micIndex + 1)
                     mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
                     when (micInfo.micStatus) {
                         MicStatus.ForceMute -> {
@@ -77,12 +78,13 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                         }
                         else -> {
                             ivMicTag.isVisible = false
-                            ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_add)
+                            ivMicInnerIcon.setImageResource(R.drawable.voice_ic_mic_empty)
                         }
                     }
                 } else { // 有人
                     ivMicTag.isVisible = true
                     ivMicInnerIcon.isVisible = false
+                    ivMicInfo.visibility = View.VISIBLE
                     ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
                     mtMicUsername.text = micInfo.member?.nickName ?: ""
                     if (micInfo.ownerTag) {

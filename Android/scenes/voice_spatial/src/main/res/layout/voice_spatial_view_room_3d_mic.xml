@@ -74,6 +74,9 @@
         app:layout_constraintCircle="@id/ivSeatOuterRing"
         app:layout_constraintCircleAngle="0"
         app:layout_constraintCircleRadius="50dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:background="@drawable/voice_anim_one_arrow"/>
 
     <androidx.appcompat.widget.AppCompatImageView
