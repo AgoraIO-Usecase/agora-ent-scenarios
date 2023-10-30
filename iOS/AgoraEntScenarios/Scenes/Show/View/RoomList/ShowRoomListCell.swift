@@ -77,7 +77,7 @@ class ShowRoomListCell: UICollectionViewCell {
         attachment.bounds = CGRect(x: 0, y: 0, width: 10, height: 10)
         let attriTipsImg = NSAttributedString(attachment: attachment)
         let attriTips = NSMutableAttributedString(attributedString: attriTipsImg)
-        attriTips.append(NSAttributedString(string: "  \(count)\("show_user_count".show_localized)"))
+        attriTips.append(NSAttributedString(string: " \(count)\("show_user_count".show_localized)"))
         numberLabel.attributedText = attriTips
         avatarImageView.sd_setImage(with: URL(string: avatarUrl ?? ""), placeholderImage: UIImage.sceneImage(name: "show_default_avatar"))
         privateImageView.isHidden = !isPrivate

@@ -44,7 +44,6 @@ import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvActivityRoomLivingBinding;
 import io.agora.scene.ktv.databinding.KtvItemRoomSpeakerBinding;
 import io.agora.scene.ktv.debugSettings.KTVDebugSettingsDialog;
-import io.agora.scene.ktv.live.fragment.dialog.MVFragment;
 import io.agora.scene.ktv.live.listener.LrcActionListenerImpl;
 import io.agora.scene.ktv.live.listener.SongActionListenerImpl;
 import io.agora.scene.ktv.service.JoinRoomOutputModel;
@@ -232,12 +231,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 roomLivingViewModel.init();
             }
         });
-
-        if (!TextUtils.isEmpty(roomLivingViewModel.roomInfoLiveData.getValue().getBgOption())) {
-            setPlayerBgFromMsg(Integer.parseInt(roomLivingViewModel.roomInfoLiveData.getValue().getBgOption()));
-        } else {
-            setPlayerBgFromMsg(0);
-        }
         getBinding().tvRoomName.setText(roomLivingViewModel.roomInfoLiveData.getValue().getRoomName());
 
         if (AgoraApplication.the().isDebugModeOpen()) {
@@ -343,12 +336,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         });
 
         // 房间相关
-        roomLivingViewModel.roomInfoLiveData.observe(this, joinRoomOutputModel -> {
-            //修改背景
-            if (!TextUtils.isEmpty(joinRoomOutputModel.getBgOption())) {
-                setPlayerBgFromMsg(Integer.parseInt(joinRoomOutputModel.getBgOption()));
-            }
-        });
         roomLivingViewModel.roomDeleteLiveData.observe(this, deletedByCreator -> {
             if (deletedByCreator) {
                 showCreatorExitDialog();
@@ -561,8 +548,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().groupResult.setVisibility(View.VISIBLE);
             }
         });
-        roomLivingViewModel.playerMusicCountDownLiveData.observe(this, time ->
-                getBinding().lrcControlView.setCountDown(time));
         roomLivingViewModel.networkStatusLiveData.observe(this, netWorkStatus ->
                 setNetWorkStatus(netWorkStatus.txQuality, netWorkStatus.rxQuality));
     }
@@ -888,15 +873,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             });
         }
         changeMusicDialog.show();
-    }
-
-    public void setPlayerBgFromMsg(int position) {
-        getBinding().lrcControlView.setLrcViewBackground(MVFragment.exampleBackgrounds.get(position));
-    }
-
-    public void setPlayerBg(int position) {
-        roomLivingViewModel.setMV_BG(position);
-        getBinding().lrcControlView.setLrcViewBackground(MVFragment.exampleBackgrounds.get(position));
     }
 
     @Override

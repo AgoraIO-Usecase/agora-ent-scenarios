@@ -103,10 +103,7 @@ class LiveDetailFragment : Fragment() {
     val mRoomInfo by lazy { (arguments?.getParcelable(EXTRA_ROOM_DETAIL_INFO) as? ShowRoomDetailModel)!! }
     private lateinit var mHandler: OnPageScrollEventHandler
     private var mPosition: Int = 0
-    private val mBinding by lazy {
-        ShowLiveDetailFragmentBinding.inflate(LayoutInflater.from(requireContext())
-        )
-    }
+    private val mBinding by lazy { ShowLiveDetailFragmentBinding.inflate(LayoutInflater.from(requireContext())) }
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
     private val isRoomOwner by lazy { mRoomInfo.ownerId == UserManager.getInstance().user.id.toString() }
 
@@ -127,7 +124,6 @@ class LiveDetailFragment : Fragment() {
     // 当前互动状态
     private var interactionInfo: ShowInteractionInfo? = null
     private var isPKCompetition: Boolean = false
-//    private var deletedPKInvitation: ShowPKInvitation? = null
 
     private var mLinkInvitationCountDownLatch: CountDownTimer? = null
     private var mPKInvitationCountDownLatch: CountDownTimer? = null
@@ -189,7 +185,7 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-    fun startLoadPageSafely(){
+    fun startLoadPageSafely() {
         isPageLoaded = true
         activity ?: return
         startLoadPage()
@@ -374,11 +370,12 @@ class LiveDetailFragment : Fragment() {
             showMessageInputDialog()
         }
         bottomLayout.ivSetting.setOnClickListener {
-            if (interactionInfo != null && interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value && isRoomOwner) {
-                showPKSettingsDialog()
-            } else {
-                showSettingDialog()
-            }
+            showSettingDialog()
+//            if (interactionInfo != null && interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value && isRoomOwner) {
+//                showPKSettingsDialog()
+//            } else {
+//                showSettingDialog()
+//            }
         }
         bottomLayout.ivBeauty.setOnClickListener {
             showBeautyDialog()
@@ -1097,6 +1094,7 @@ class LiveDetailFragment : Fragment() {
     private fun showPKSettingsDialog() {
         mPKSettingsDialog.apply {
             resetSettingsItem(interactionInfo!!.ownerMuteAudio)
+            setPKInfo(interactionInfo!!.userName)
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
                     LivePKSettingsDialog.ITEM_ID_CAMERA -> {
@@ -1129,6 +1127,21 @@ class LiveDetailFragment : Fragment() {
                 }
             }
             show()
+        }
+    }
+
+    private fun enableComeBackSoonView(enable: Boolean) {
+        if (isPKing()) {
+            // TODO
+        } else {
+            mBinding.livingComeSoonLayout.root.isVisible = enable
+            if (enable) {
+                mBinding.topLayout.root.bringToFront()
+                mBinding.bottomLayout.root.bringToFront()
+                if (isLinking()) {
+                    mBinding.videoLinkingAudienceLayout.root.bringToFront()
+                }
+            }
         }
     }
 
@@ -1358,6 +1371,7 @@ class LiveDetailFragment : Fragment() {
                 .show()
         } else {
             mBinding.livingEndLayout.root.isVisible = true
+            mBinding.livingEndLayout.root.bringToFront()
         }
     }
 
@@ -1392,6 +1406,14 @@ class LiveDetailFragment : Fragment() {
                 super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
                 if (uid == mRoomInfo.ownerId.toInt()) {
                     isAudioOnlyMode = state == Constants.REMOTE_VIDEO_STATE_STOPPED
+
+                    runOnUiThread {
+                        if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_MUTED) {
+                            enableComeBackSoonView(true)
+                        } else if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED) {
+                            enableComeBackSoonView(false)
+                        }
+                    }
                 }
             }
 
@@ -1639,6 +1661,9 @@ class LiveDetailFragment : Fragment() {
             mRtcEngine.startPreview()
         } else {
             mRtcEngine.stopPreview()
+        }
+        if (isRoomOwner) {
+            enableComeBackSoonView(!enable)
         }
     }
 
@@ -1928,7 +1953,58 @@ class LiveDetailFragment : Fragment() {
             RtcEngineInstance.generalToken(),
             pkRtcConnection,
             channelMediaOptions,
-            null
+            object: IRtcEngineEventHandler() {
+                override fun onRemoteVideoStats(stats: RemoteVideoStats) {
+                    super.onRemoteVideoStats(stats)
+                    if (isRoomOwner) {
+                        activity?.runOnUiThread {
+                            refreshStatisticInfo(
+                                downBitrate = stats.receivedBitrate,
+                                receiveFPS = stats.decoderOutputFrameRate,
+                                downLossPackage = stats.packetLossRate,
+                                receiveVideoSize = Size(stats.width, stats.height),
+                                downDelay = stats.delay
+                            )
+                        }
+                    }
+                }
+
+                override fun onRemoteAudioStats(stats: RemoteAudioStats) {
+                    super.onRemoteAudioStats(stats)
+                    activity?.runOnUiThread {
+                        refreshStatisticInfo(
+                            audioBitrate = stats.receivedBitrate,
+                            audioLossPackage = stats.audioLossRate
+                        )
+                    }
+                }
+
+                override fun onDownlinkNetworkInfoUpdated(info: DownlinkNetworkInfo) {
+                    super.onDownlinkNetworkInfoUpdated(info)
+                    activity?.runOnUiThread {
+                        refreshStatisticInfo(downLinkBps = info.bandwidth_estimation_bps)
+                    }
+                }
+
+                override fun onFirstRemoteVideoFrame(uid: Int, width: Int, height: Int, elapsed: Int) {
+                    super.onFirstRemoteVideoFrame(uid, width, height, elapsed)
+                    if (interactionInfo?.userId == uid.toString()) {
+                        if (pkStartTime != 0L) {
+                            ShowLogger.d(
+                                TAG,
+                                "Interaction user first video frame from host accept pking : ${TimeUtils.currentTimeMillis() - pkStartTime}"
+                            )
+                            pkStartTime = 0L
+                        } else {
+                            ShowLogger.d(
+                                TAG,
+                                "Interaction user first video frame from host accepted pking : ${TimeUtils.currentTimeMillis() - (interactionInfo?.createdAt?.toLong() ?: 0L)}"
+                            )
+                            pkStartTime = 0L
+                        }
+                    }
+                }
+            }
         )
         prepareRkRoomId = pkRoomId
     }
@@ -2038,7 +2114,6 @@ class LiveDetailFragment : Fragment() {
             )
             activity?.let {
                 val view = TextureView(it)
-                mBinding.videoPKLayout.iBroadcasterBView.removeAllViews()
                 mBinding.videoPKLayout.iBroadcasterBView.addView(view)
                 mRtcEngine.setupRemoteVideoEx(
                     VideoCanvas(
@@ -2060,10 +2135,6 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.autoSubscribeAudio = true
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
             channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
-            val pkRtcConnection = RtcConnection(
-                interactionInfo!!.roomId,
-                UserManager.getInstance().user.id.toInt()
-            )
             mHandler.updateRoomInfo(
                 position = mPosition,
                 VideoLoader.RoomInfo(mRoomInfo.roomId, arrayListOf(
