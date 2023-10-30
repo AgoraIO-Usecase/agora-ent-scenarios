@@ -24,7 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
-            tools:background="@color/ktv_music_view_bg"
+            android:background="@color/ktv_music_view_bg"
             tools:visibility="visible">
 
             <TextView

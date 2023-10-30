@@ -107,6 +107,13 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
         mainViewModel.setLifecycleOwner(this)
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (AgoraApplication.the().isDebugModeOpen) {
+            binding.tvDebugMode.visibility = View.VISIBLE
+        }
+    }
+
     @SuppressLint("SetTextI18n")
     override fun initListener() {
         mainViewModel.iSingleCallback = ISingleCallback { type: Int, o: Any? ->
@@ -118,12 +125,11 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
                     .error(R.mipmap.userimage)
                     .transform(CenterCropRoundCornerTransform(999))
                     .into(binding.ivUserAvatar)
-                binding.tvUserPhone.text = user.mobile
+                binding.tvUserPhone.text = hidePhoneNumber(user.mobile)
                 binding.etNickname.setText(user.name)
             } else if (type == Constant.CALLBACK_TYPE_USER_CANCEL_ACCOUNTS) {
-                UserManager.getInstance().logout()
                 requireActivity().finish()
-                PagePilotManager.pageWelcome()
+                PagePilotManager.pageWelcomeClear()
             }
         }
         binding.tvMineAccount.setOnClickListener(object : OnFastClickListener() {
@@ -205,6 +211,12 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
             }
         }
         selectPhotoFromDialog?.show()
+    }
+
+    private fun hidePhoneNumber(phoneNumber: String): String {
+        val prefix = phoneNumber.substring(0, 3)
+        val suffix = phoneNumber.substring(7)
+        return "$prefix****$suffix"
     }
 
     fun openAlbum() {
