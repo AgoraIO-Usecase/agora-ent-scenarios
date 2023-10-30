@@ -2,6 +2,7 @@ package io.agora.scene.ktv.singbattle.live;
 
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION;
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPERVISE;
+import static io.agora.scene.ktv.singbattle.live.KTVApiKt.createKTVApi;
 
 import android.os.Build;
 import android.text.TextUtils;
@@ -70,7 +71,7 @@ public class RoomLivingViewModel extends ViewModel {
 
     private final String TAG = "KTV_Scene_LOG";
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();
-    private final KTVApi ktvApiProtocol = new KTVApiImpl();
+    private final KTVApi ktvApiProtocol = createKTVApi();
 
     // loading dialog
     private final MutableLiveData<Boolean> _loadingDialogVisible = new MutableLiveData<>(false);
@@ -1096,7 +1097,7 @@ public class RoomLivingViewModel extends ViewModel {
                 roomInfoLiveData.getValue().getRoomNo(),
                 UserManager.getInstance().getUser().id.intValue(),
                 roomInfoLiveData.getValue().getRoomNo() + "_ex",
-                roomInfoLiveData.getValue().getAgoraChorusToken(), 10, KTVType.SingBattle)
+                roomInfoLiveData.getValue().getAgoraChorusToken(), 10, KTVType.SingBattle, KTVMusicType.SONG_CODE)
         );
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
@@ -1503,9 +1504,9 @@ public class RoomLivingViewModel extends ViewModel {
             isOwnSong = Objects.equals(music.getWinnerNo(), UserManager.getInstance().getUser().id.toString());
         }
 
+        String jsonOption = "{\"format\":{\"highPart\":0}}";
         long songCode = Long.parseLong(music.getSongNo());
         int mainSingerUid = Integer.parseInt(music.getUserNo());
-        String jsonOption = "{\"format\":{\"highPart\":0}}";
         Long newSongCode = ktvApiProtocol.getMusicContentCenter().getInternalSongCode(songCode, jsonOption);
         if (isOwnSong) {
             // 主唱加载歌曲
