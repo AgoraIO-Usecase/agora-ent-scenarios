@@ -8,11 +8,11 @@ android {
     }
 }
 
-dependencies {
-    api files('libs/agora-rtm-sdk.jar'){
-        builtBy "copyRtmJar2lib"
-    }
-}
+//dependencies {
+//    api files('libs/agora-rtm-sdk.jar'){
+//        builtBy "copyRtmJar2lib"
+//    }
+//}
 
 task downloadRtmLibs {
     def destFile = new File(buildDir, 'rtm.zip')
@@ -49,7 +49,7 @@ task jarRtm(type: Jar, dependsOn: ['unzipRtmJar']){
 }
 task copyRtmJar2lib(type: Copy, dependsOn:["jarRtm"]){
     from "$buildDir/libs/agora-rtm-sdk.jar"
-    into "libs/"
+    into "../../common/base/libs/"
 }
 task cleanRtm(type: Delete){
     delete('third-party')

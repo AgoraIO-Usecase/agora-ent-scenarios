@@ -436,13 +436,11 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         if (!isRoomOwner) {
             mainChannelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
         }
-        mShowTo1v1Manger.mVideoSwitcher.joinChannel(
+        mRtcEngine.joinChannelEx(
+            mShowTo1v1Manger.generalToken(),
             rtcConnection,
             mainChannelMediaOptions,
-            mShowTo1v1Manger.generalToken(),
-            null,
-            false
-        )
+            null)
         if (isRoomOwner) {
             enableContentInspectEx(true, mMainRtcConnection)
             AudioModeration.moderationAudio(
@@ -575,7 +573,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     private fun destroy() {
         mService.leaveRoom(mRoomInfo, completion = {})
         if (isRoomOwner) {
-            mShowTo1v1Manger.mVideoSwitcher.leaveChannel(mMainRtcConnection, true)
+            mRtcEngine.leaveChannelEx(mMainRtcConnection)
             mRtcEngine.stopPreview()
         } else {
             mainChannelMediaOptions.autoSubscribeVideo = true

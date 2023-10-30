@@ -13,19 +13,20 @@ import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import io.agora.rtc2.ChannelMediaOptions
-import io.agora.rtc2.Constants
+import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.GlideOptions
 import io.agora.scene.base.component.BaseBindingFragment
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListFragmentBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.ui.RoomListActivity
 import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
+import io.agora.scene.showTo1v1.videoLoaderAPI.OnPageScrollEventHandler
+import io.agora.scene.showTo1v1.videoLoaderAPI.VideoLoader
 import io.agora.scene.widget.utils.BlurTransformation
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 
@@ -36,16 +37,21 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         const val TAG = "ShowTo1v1_List"
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
 
-        fun newInstance(romInfo: ShowTo1v1RoomInfo) = RoomListFragment().apply {
+        fun newInstance(romInfo: ShowTo1v1RoomInfo, handler: OnPageScrollEventHandler, position: Int) = RoomListFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(EXTRA_ROOM_DETAIL_INFO, romInfo)
             }
+            mHandler = handler
+            mPosition = position
         }
     }
 
+    private lateinit var mHandler: OnPageScrollEventHandler
+    private var mPosition: Int = 0
+
     private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
     private val mRtcEngine by lazy { mShowTo1v1Manger.mRtcEngine }
-    private val mRtcVideoSwitcher by lazy { mShowTo1v1Manger.mVideoSwitcher }
+    private val mRtcVideoLoaderApi by lazy { VideoLoader.getImplInstance(mRtcEngine) }
 
     private val mRoomInfo by lazy { (arguments?.getParcelable(EXTRA_ROOM_DETAIL_INFO) as? ShowTo1v1RoomInfo)!! }
 
@@ -65,7 +71,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         super.onAttach(context)
         onFragmentListener = activity as? RoomListActivity
         if (isPageLoaded) {
-            startLoadPage(false)
+            startLoadPage()
         }
     }
 
@@ -79,6 +85,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
             onBackPressed()
         }
         onFragmentListener?.onFragmentViewCreated()
+        initVideoView()
     }
 
     override fun initView() {
@@ -162,81 +169,90 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
     fun startLoadPageSafely() {
         isPageLoaded = true
         activity ?: return
-        startLoadPage(true)
+        startLoadPage()
     }
 
-    fun onReloadPage() {
+    fun onPageLoaded() {
         Log.d(TAG, "onReloadPage, roomId=${mRoomInfo.roomId}")
 //        startLoadPage(false)
     }
 
+    private fun initVideoView() {
+        activity?.let {
+            if (needRender) {
+                mRtcVideoLoaderApi.renderVideo(
+                    VideoLoader.AnchorInfo(
+                        mRoomInfo.roomId,
+                        mRoomInfo.userId.toInt(),
+                        mShowTo1v1Manger.generalToken()
+                    ),
+                    UserManager.getInstance().user.id.toInt(),
+                    VideoLoader.VideoCanvasContainer(
+                        it,
+                        binding.layoutVideoContainer,
+                        mRoomInfo.userId.toInt()
+                    )
+                )
+            }
+        }
+    }
+
+    private var needRender = false
+
+    fun initAnchorVideoView(info: VideoLoader.AnchorInfo) : VideoLoader.VideoCanvasContainer? {
+        // 判断是否此时view还没有创建，即在View创建后第一时间渲染视频
+        needRender = activity == null
+        activity?.let {
+            return VideoLoader.VideoCanvasContainer(
+                it,
+                binding.layoutVideoContainer,
+                mRoomInfo.userId.toInt()
+            )
+        }
+        return null
+    }
+
     fun onResumePage() {
         activity?.let {
-            mRtcVideoSwitcher.setupRemoteVideo(
-                mMainRtcConnection,
-                VideoSwitcher.VideoCanvasContainer(it, binding.layoutVideoContainer, mRoomInfo.userId.toInt())
+            mRtcVideoLoaderApi.renderVideo(
+                VideoLoader.AnchorInfo(
+                    mRoomInfo.roomId,
+                    mRoomInfo.userId.toInt(),
+                    mShowTo1v1Manger.generalToken()
+                ),
+                UserManager.getInstance().user.id.toInt(),
+                VideoLoader.VideoCanvasContainer(
+                    it,
+                    binding.layoutVideoContainer,
+                    mRoomInfo.userId.toInt()
+                )
             )
         }
     }
 
-    fun onResetPage(){
-        activity?.let {
-            mRtcVideoSwitcher.resetRemoteVideo(
-                mMainRtcConnection,
-                VideoSwitcher.VideoCanvasContainer(it, binding.layoutVideoContainer, mRoomInfo.userId.toInt())
-            )
-        }
-    }
-
-    private fun startLoadPage(isScrolling: Boolean) {
+    private fun startLoadPage() {
         isPageLoaded = true
-
-        initRtcEngine(isScrolling)
-
-        activity?.let {
-            mRtcVideoSwitcher.setupRemoteVideo(
-                mMainRtcConnection,
-                VideoSwitcher.VideoCanvasContainer(it, binding.layoutVideoContainer, mRoomInfo.userId.toInt())
-            )
-        }
+        initRtcEngine()
     }
 
 
     fun stopLoadPage(isScrolling: Boolean) {
         Log.d(TAG, "Fragment PageLoad stop load, roomId=${mRoomInfo.roomId}")
         isPageLoaded = false
-        destroy(isScrolling) // 切页或activity销毁
-    }
-
-    private fun destroy(isScrolling: Boolean): Boolean {
-        return return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection, !isScrolling)
     }
 
     //================== RTC Operation ===================
 
-    private val eventListener = VideoSwitcher.IChannelEventListener(
-        onChannelJoined = {
-            // 静音
+    private val eventListener = object: IRtcEngineEventHandler() {
+        override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
+            super.onJoinChannelSuccess(channel, uid, elapsed)
             val options = ChannelMediaOptions()
             options.autoSubscribeAudio = false
             mRtcEngine.updateChannelMediaOptionsEx(options, mMainRtcConnection)
         }
-    )
-
-    private fun initRtcEngine(isScrolling: Boolean) {
-        if (isScrolling) {
-            Log.d(TAG, "joinRoom from scroll")
-            joinChannel(eventListener)
-        } else {
-            Log.d(TAG, "joinRoom from click")
-            mRtcVideoSwitcher.setChannelEvent(
-                mRoomInfo.roomId, UserManager.getInstance().user.id.toInt(), eventListener
-            )
-        }
     }
 
-    private fun joinChannel(eventListener: VideoSwitcher.IChannelEventListener) {
-        val rtcConnection = mMainRtcConnection
+    private fun initRtcEngine() {
         if (mRtcEngine.queryDeviceScore() < 75) {
             // 低端机观众加入频道前默认开启硬解（解决看高分辨率卡顿问题），但是在410分支硬解码会带来200ms的秒开耗时增加
             mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
@@ -246,19 +262,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
             // 默认关闭硬解
             mRtcEngine.setParameters("{\"che.hardware_decoding\": 0}")
         }
-
-        val channelMediaOptions = ChannelMediaOptions()
-        channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-        channelMediaOptions.autoSubscribeVideo = true
-        channelMediaOptions.autoSubscribeAudio = false
-        channelMediaOptions.publishCameraTrack = false
-        channelMediaOptions.publishMicrophoneTrack = false
-        // 如果是观众 把 ChannelMediaOptions 的 audienceLatencyLevel 设置为 AUDIENCE_LATENCY_LEVEL_LOW_LATENCY（超低延时）
-        channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
-        mRtcVideoSwitcher.joinChannel(
-            rtcConnection, channelMediaOptions, mShowTo1v1Manger.generalToken(),
-            eventListener, true
-        )
+        mRtcEngine.addHandlerEx(eventListener, mMainRtcConnection)
     }
 
     interface OnFragmentListener {
