@@ -361,7 +361,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
 
         if (music.userNo == UserManager.getInstance().user.id.toString()) {
             binding.lrcControlView.postDelayed({
-                mRoomLivingViewModel.haveSeat(0)
+                mRoomLivingViewModel.haveSeat()
             }, 200)
         }
     }
