@@ -18,7 +18,6 @@ import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomCreateActivityBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
-import io.agora.scene.showTo1v1.videoSwitchApi.VideoSwitcher
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 import java.util.Random
