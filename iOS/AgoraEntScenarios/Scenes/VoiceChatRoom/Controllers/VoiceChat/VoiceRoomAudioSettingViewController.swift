@@ -93,14 +93,14 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
         let seatUser = ChatRoomServiceImp.getSharedInstance().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status != -1 })
         let tipsText = hasHeadset ? "开启耳返可实时听到自己的声音, 唱歌的时候及时调整".show_localized : "使用耳返必须插入耳机，当前未检测到耳机".show_localized
         actionView.title(title: "耳返".show_localized)
-            .switchCell(title: "开启耳返".show_localized, isOn: hasHeadset ? isOn : false, isEnabel: hasHeadset && seatUser != nil)
+            .switchCell(title: "开启耳返".show_localized, isOn: hasHeadset ? isOn : false, isEnabel: hasHeadset && seatUser != nil, accessibilityIdentifier: "voice_chat_room_audio_setting_action_switch_inEar")
             .tipsCell(iconName: "inEra_tips_icon", title: tipsText, titleColor: tipsTextColor)
             .sectionHeader(title: "耳返设置".show_localized, desc: nil)
-            .sliderCell(title: "耳返音量".show_localized, value: inEar_volume, isEnable: isOn)
+            .sliderCell(title: "耳返音量".show_localized, value: inEar_volume, isEnable: isOn, accessibilityIdentifier: "voice_chat_room_audio_setting_action_slider_inEar")
 //                    .segmentCell(title: "耳返模式", items: earModes, selectedIndex: inEarModeIndex, isEnable: isOn)
 //                    .customCell(customView: inEarView, viewHeight: 150)
             .config()
-        
+        actionView.backButtonAccessibilityIdentifier = "voice_chat_room_audio_setting_action_back_btn"
         actionView.didSwitchValueChangeClosure = { [weak self] _, isOn in
             self?.roomInfo?.room?.turn_InEar = isOn
             self?.actionView.updateSliderValue(indexPath: IndexPath(row: 0, section: 1), value: inEar_volume, isEnable: isOn)
@@ -405,6 +405,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 cell.swith.isUserInteractionEnabled = !isAudience
                 cell.selectionStyle = .none
                 cell.swith.isOn = roomInfo?.room?.use_robot ?? false
+                cell.swith.accessibilityIdentifier = "voice_chat_room_audio_setting_agora_blue_red_bot_switch"
                 cell.useRobotBlock = { [weak self] flag in
                     guard let useRobotBlock = self?.useRobotBlock else { return }
                     self?.isTouchAble = flag
@@ -428,6 +429,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 let volume = roomInfo?.room?.robot_volume ?? 50
                 cell.slider.value = Float(volume) / 100.0
                 cell.countLabel.text = "\(volume)"
+                cell.slider.accessibilityIdentifier = "voice_chat_room_audio_setting_robot_volume_slider"
                 return cell
             }
         } else if indexPath.section == 2 {
@@ -448,6 +450,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 let text = musicName == nil ? "" : "\(musicName ?? "")-\(singerName ?? "")"
                 cell.contentLabel.text = text
             }
+            cell.accessibilityIdentifier = "voice_chat_room_audio_setting_\(indexPath.section)_\(indexPath.row)"
             return cell
         }
 
