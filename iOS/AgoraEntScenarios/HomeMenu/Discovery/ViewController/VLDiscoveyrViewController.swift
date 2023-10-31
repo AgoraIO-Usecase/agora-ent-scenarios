@@ -34,7 +34,7 @@ class VLDiscoveyrViewController: VLBaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        hiddenBackgroundImage()
         setupUI()
     }
     

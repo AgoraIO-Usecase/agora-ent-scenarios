@@ -17,6 +17,7 @@ public class SAEmptyView: UIView {
 
     override public init(frame: CGRect) {
         super.init(frame: frame)
+        self.backgroundColor = .clear
     }
 
     convenience init(frame: CGRect, title: String, image: UIImage?) {

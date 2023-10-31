@@ -107,8 +107,8 @@ class SA3DMoveUserView: UIView {
         bgView.addGestureRecognizer(tap)
         bgView.isUserInteractionEnabled = true
 
-        bgIconView.image = UIImage.sceneImage(name: "icons／solid／add")
-        bgIconView.layer.cornerRadius = 15
+        bgIconView.image = UIImage.sceneImage(name: "voice_wuren")
+        bgIconView.layer.cornerRadius = 40
         bgIconView.layer.masksToBounds = true
         addSubview(bgIconView)
 
@@ -146,7 +146,7 @@ class SA3DMoveUserView: UIView {
         bgIconView.snp.makeConstraints { make in
             make.centerX.equalTo(self)
             make.centerY.equalTo(self.bgView)
-            make.width.height.equalTo(30)
+            make.width.height.equalTo(82)
         }
 
         avatarImageView.snp.makeConstraints { make in

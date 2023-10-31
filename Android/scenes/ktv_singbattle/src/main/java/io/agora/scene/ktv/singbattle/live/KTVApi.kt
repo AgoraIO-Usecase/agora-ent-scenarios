@@ -8,9 +8,26 @@ import io.agora.musiccontentcenter.MusicChartInfo
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 
+/**
+ * KTV场景类型
+ * @param Normal 普通独唱或多人合唱
+ * @param SingBattle 嗨歌抢唱
+ */
 enum class KTVType(val value: Int)  {
     Normal(0),
-    SingBattle(1)
+    SingBattle(1),
+    Cantata(2),
+    SingRelay(3)
+}
+
+/**
+ * KTV歌曲类型
+ * @param SONG_CODE mcc版权歌单songCode
+ * @param SONG_URL 本地歌曲地址url
+ */
+enum class KTVMusicType(val value: Int) {
+    SONG_CODE(0),
+    SONG_URL(1)
 }
 
 /**
@@ -95,6 +112,9 @@ interface ILrcView {
      */
     fun onDownloadLrcData(url: String?)
 
+    /**
+     * ktvApi获取到抢唱切片歌曲副歌片段时间时，会调用此方法回调给歌词组件
+     */
     fun onHighPartTime(highStartTime: Long, highEndTime: Long)
 }
 
@@ -177,6 +197,12 @@ abstract class IKTVApiEventHandler {
     open fun onChorusChannelAudioVolumeIndication(
         speakers: Array<out IRtcEngineEventHandler.AudioVolumeInfo>?,
         totalVolume: Int) {}
+
+    /**
+     * 播放进度回调
+     * @param position_ms 音乐播放的进度
+     */
+    open fun onMusicPlayerPositionChanged(position_ms: Long, timestamp_ms: Long) {}
 }
 
 /**
@@ -185,26 +211,24 @@ abstract class IKTVApiEventHandler {
  * @param rtmToken 创建 Mcc Engine 需要
  * @param engine RTC engine 对象
  * @param channelName 频道号，子频道名以基于主频道名 + "_ex" 固定规则生成频道号
- * Player 状态同步
- * 打分结果同步
- * 歌词同步
- * pitch同步
- * 建议你为KTVApi单独创建一个新的dataStreamId
  * @param localUid 创建 Mcc engine 和 加入子频道需要用到
  * @param chorusChannelName 子频道名 加入子频道需要用到
  * @param chorusChannelToken 子频道token 加入子频道需要用到
  * @param maxCacheSize 最大缓存歌曲数
+ * @param type KTV场景
+ * @param musicType 音乐类型
  */
-data class KTVApiConfig(
+data class KTVApiConfig constructor(
     val appId: String,
     val rtmToken: String,
     val engine: RtcEngine,
     val channelName: String,
     val localUid: Int,
     val chorusChannelName: String,
-    val chorusChannelToken: String,
+    var chorusChannelToken: String,
     val maxCacheSize: Int = 10,
-    val type: KTVType = KTVType.Normal
+    val type: KTVType = KTVType.Normal,
+    val musicType: KTVMusicType = KTVMusicType.SONG_CODE
 )
 
 /**
@@ -220,6 +244,11 @@ data class KTVLoadMusicConfiguration(
     val mainSingerUid: Int,
     val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
 )
+
+/**
+ * 获取 KTVApi 实例
+ */
+fun createKTVApi(): KTVApi = KTVApiImpl()
 
 interface KTVApi {
     /**
@@ -249,6 +278,11 @@ interface KTVApi {
      * 清空内部变量/缓存，取消在initWithRtcEngine时的监听，以及取消网络请求等
      */
     fun release()
+
+    /**
+     * 开启关闭专业模式
+     */
+    fun enableProfessionalStreamerMode(enable: Boolean)
 
     /**
      * 收到 IKTVApiEventHandler.onTokenPrivilegeWillExpire 回调时需要主动调用方法更新Token
@@ -353,6 +387,34 @@ interface KTVApi {
         url: String,
         config: KTVLoadMusicConfiguration
     )
+
+    /**
+     * 加载歌曲，同时只能为一首歌loadSong，同步调用， 一般使用此loadSong是歌曲已经preload成功（url为本地文件地址）
+     * @param config 加载歌曲配置，config.autoPlay = true，默认播放url1
+     * @param url1 歌曲地址1
+     * @param url2 歌曲地址2
+     *
+     *
+     * 推荐调用：
+     * 歌曲开始时：
+     * 主唱 loadMusic(KTVLoadMusicConfiguration(autoPlay=true, mode=LOAD_MUSIC_AND_LRC, url, mainSingerUid)) switchSingerRole(SoloSinger)
+     * 观众 loadMusic(KTVLoadMusicConfiguration(autoPlay=false, mode=LOAD_LRC_ONLY, url, mainSingerUid))
+     * 加入合唱时：
+     * 准备加入合唱者：loadMusic(KTVLoadMusicConfiguration(autoPlay=false, mode=LOAD_MUSIC_ONLY, url, mainSingerUid))
+     * loadMusic成功后switchSingerRole(CoSinger)
+     */
+    fun load2Music(
+        url1: String,
+        url2: String,
+        config: KTVLoadMusicConfiguration
+    )
+
+    /**
+     * 多文件切换播放资源
+     * @param url 需要切换的播放资源，需要为 load2Music 中 参数 url1，url2 中的一个
+     * @param syncPts 是否同步切换前后的起始播放位置: true 同步，false 不同步，从 0 开始
+     */
+    fun switchPlaySrc(url: String, syncPts: Boolean)
 
     /**
      * 异步切换演唱身份，结果会通过回调通知业务层

@@ -50,7 +50,7 @@ class SABaseUserCollectionViewCell: UICollectionViewCell {
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = true
             rtcUserView.bgIconView.isHidden = false
-            rtcUserView.bgIconView.image = UIImage.sceneImage(name:"icons／solid／add")
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name:"voice_wuren")
         case 0:
             rtcUserView.iconView.isHidden = false
             rtcUserView.micView.isHidden = false

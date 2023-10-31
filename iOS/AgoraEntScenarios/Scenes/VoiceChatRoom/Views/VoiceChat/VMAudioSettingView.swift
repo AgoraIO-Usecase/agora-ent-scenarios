@@ -17,6 +17,7 @@ public enum AUDIO_SETTING_TYPE {
     case AIAEC
     case AGC
     case InEar
+    case SoundCard
     case Music
 }
 
@@ -36,15 +37,16 @@ class VMAudioSettingView: UIView {
     private let swIdentifier = "switch"
     private let slIdentifier = "slider"
     private let nIdentifier = "normal"
+    private var isSoundOpen = false
 
 //    private var settingName: [String] = ["\(LanguageManager.localValue(key: "blue")) & \(LanguageManager.localValue(key: "red"))", LanguageManager.localValue(key: "Robot Volume"), LanguageManager.localValue(key: "Best Sound"), "AINS", "Spatial Audio"]
 //    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
     
-    private var settingName: [String] = [LanguageManager.localValue(key: "voice_AINS"),LanguageManager.localValue(key: "voice_AIAEC"),LanguageManager.localValue(key: "voice_AGC"),LanguageManager.localValue(key: "voice_agora_blue_and_red_bot"), LanguageManager.localValue(key: "voice_robot_volume"), LanguageManager.localValue(key: "voice_best_agora_sound"), "voice_spatial_audio".voice_localized()]
+    private var settingName: [String] = [LanguageManager.localValue(key: "voice_AINS"),LanguageManager.localValue(key: "voice_AIAEC"),LanguageManager.localValue(key: "voice_AGC"),LanguageManager.localValue(key: "voice_SoundCard"),LanguageManager.localValue(key: "voice_agora_blue_and_red_bot"), LanguageManager.localValue(key: "voice_robot_volume"), LanguageManager.localValue(key: "voice_best_agora_sound"), "voice_spatial_audio".voice_localized()]
     
     
     
-    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
+    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS","icon-park-solid_people-speak", "icons／set／3D", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
 
 
     private var soundTitle: [String] = []
@@ -245,7 +247,9 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                 } else {
                     cell.contentLabel.text = "voice_off".voice_localized()
                 }
-            } else {
+            } else if indexPath.row == 4 {
+                cell.contentLabel.text = self.isSoundOpen ? "voice_on".voice_localized() : "voice_off".voice_localized()
+            }else {
                 cell.contentLabel.text = "Other".voice_localized()
 
             }
@@ -419,6 +423,9 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             case 2:
                 block(.AGC)
                 state = .AGC
+            case 4:
+                block(.SoundCard)
+                state = .SoundCard
             default:
                 block(.Spatial)
                 state = .Spatial
