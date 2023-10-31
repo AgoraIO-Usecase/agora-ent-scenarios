@@ -431,7 +431,7 @@ class CantataSyncManagerServiceImp constructor(
                 }
             }
         }
-        val seatInfo = innerGenUserSeatInfo(inputModel.seatIndex)
+        val seatInfo = innerGenUserSeatInfo(inputModel.score)
         innerAddSeatInfo(seatInfo, completion)
     }
 
@@ -965,18 +965,18 @@ class CantataSyncManagerServiceImp constructor(
 
     // --------------------- Seat operation --------------------------
 
-    private fun innerGenUserSeatInfo(seatIndex: Int): RoomSeatModel {
+    private fun innerGenUserSeatInfo(score: Int): RoomSeatModel {
         return RoomSeatModel(
             isMaster = roomMap[currRoomNo]?.creatorNo == UserManager.getInstance().user.id.toString(),
             headUrl = UserManager.getInstance().user.headUrl,
             userNo = UserManager.getInstance().user.id.toString(),
             rtcUid = UserManager.getInstance().user.id.toString(),
             name = UserManager.getInstance().user.name,
-            seatIndex = seatIndex,
+            seatIndex = 0,
             chorusSongCode = "",
             isAudioMuted = RoomSeatModel.MUTED_VALUE_FALSE,
             isVideoMuted = RoomSeatModel.MUTED_VALUE_TRUE,
-            score = 0,
+            score = score,
             isOwner = false
         )
     }

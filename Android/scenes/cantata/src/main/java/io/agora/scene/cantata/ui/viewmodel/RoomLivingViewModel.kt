@@ -36,17 +36,7 @@ import io.agora.scene.cantata.ktvapi.KTVType
 import io.agora.scene.cantata.ktvapi.MusicLoadStatus
 import io.agora.scene.cantata.ktvapi.SwitchRoleFailReason
 import io.agora.scene.cantata.ktvapi.createKTVApi
-import io.agora.scene.cantata.service.CantataServiceProtocol
-import io.agora.scene.cantata.service.ChooseSongInputModel
-import io.agora.scene.cantata.service.JoinRoomOutputModel
-import io.agora.scene.cantata.service.MakeSongTopInputModel
-import io.agora.scene.cantata.service.OnSeatInputModel
-import io.agora.scene.cantata.service.OutSeatInputModel
-import io.agora.scene.cantata.service.RemoveSongInputModel
-import io.agora.scene.cantata.service.RoomListModel
-import io.agora.scene.cantata.service.RoomSeatModel
-import io.agora.scene.cantata.service.RoomSelSongModel
-import io.agora.scene.cantata.service.ScoringAlgoControlModel
+import io.agora.scene.cantata.service.*
 import io.agora.scene.cantata.ui.dialog.MusicSettingBean
 import io.agora.scene.cantata.ui.dialog.MusicSettingCallback
 import io.agora.scene.cantata.ui.widget.rankList.RankItem
@@ -103,6 +93,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
      */
     var mIsOnSeat = false
     val mSeatListLiveData: MutableLiveData<List<RoomSeatModel>> = MutableLiveData<List<RoomSeatModel>>(emptyList())
+    val scoreMap = mutableMapOf<String, UserModel>()
     val mSeatLocalLiveData: MutableLiveData<RoomSeatModel> = MutableLiveData<RoomSeatModel>()
 
     /**
@@ -283,20 +274,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
     // ======================= 麦位相关 =======================
     private fun initSeats() {
-//        val roomInfo: JoinRoomOutputModel = mRoomInfoLiveData.value
-//            ?: throw java.lang.RuntimeException("The roomInfo must be not null before initSeats method calling!")
-//        val seatsArray: List<RoomSeatModel> = roomInfo.seatsArray ?: emptyList()
-//        mSeatListLiveData.postValue(seatsArray)
-//        for (roomSeatModel in seatsArray) {
-//            if (roomSeatModel.userNo == UserManager.getInstance().user.id.toString()) {
-//                mSeatLocalLiveData.postValue(roomSeatModel)
-//                mIsOnSeat = true
-//                if (mRtcEngine != null) {
-//                    updateVolumeStatus(roomSeatModel.isAudioMuted == RoomSeatModel.MUTED_VALUE_FALSE)
-//                }
-//                break
-//            }
-//        }
         mCantataServiceProtocol.getSeatStatusList { e, list ->
             if (e == null && list != null) {
                 mSeatListLiveData.value = list
@@ -389,6 +366,13 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         mCantataServiceProtocol.getSeatStatusList { e, list ->
             if (e == null && list != null) {
                 mSeatListLiveData.value = list
+                list.forEach {
+                    scoreMap[it.rtcUid] = UserModel(
+                        it.name,
+                        it.headUrl,
+                        it.score
+                    )
+                }
             }
         }
     }
@@ -396,9 +380,14 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     /**
      * 上麦
      */
-    fun haveSeat(onSeatIndex: Int) {
-        CantataLogger.d(TAG, "RoomLivingViewModel.haveSeat() called: $onSeatIndex")
-        mCantataServiceProtocol.onSeat(OnSeatInputModel(onSeatIndex)) { e: Exception? ->
+    fun haveSeat() {
+        CantataLogger.d(TAG, "RoomLivingViewModel.haveSeat() called")
+        val score = if (scoreMap.containsKey(UserManager.getInstance().user.id.toString())) {
+            scoreMap[UserManager.getInstance().user.id.toString()]!!.score
+        } else {
+            0
+        }
+        mCantataServiceProtocol.onSeat(OnSeatInputModel(score)) { e: Exception? ->
             if (e == null) {
                 // success
                 CantataLogger.d(TAG, "RoomLivingViewModel.haveSeat() success")
@@ -994,6 +983,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             override fun onMusicPlayerStateChanged(state: MediaPlayerState, error: MediaPlayerError, isLocal: Boolean) {
                 when (state) {
                     MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
+                        if (!isLocal || (mSongPlayingLiveData.value != null && mSongPlayingLiveData.value!!.userNo == UserManager.getInstance().user.id.toString())) {
+                            scoreMap.clear()
+                        }
                         mPlayerMusicOpenDurationLiveData.postValue(mKtvApi.getMediaPlayer().duration)
                     }
 
@@ -1022,8 +1014,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 }
             }
         })
-
-        mKtvApi.renewInnerDataStreamId()
 
         // ------------------ 加入频道 ------------------
         mRtcEngine?.apply {
@@ -1256,7 +1246,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
     // ------------------ 重置歌曲状态(歌曲切换时) ------------------
-    fun resetMusicStatus() {
+    private fun resetMusicStatus() {
         CantataLogger.d(TAG, "RoomLivingViewModel.resetMusicStatus() called")
         mChorusNum = 0
         mRetryTimes = 0
@@ -1264,10 +1254,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_IDLE)
         mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
 
-        //mMusicSetting?.enjoyingMode = false
-
         // 歌曲结束自动下麦
         mSeatLocalLiveData.value?.let { leaveSeat(it) }
+        scoreMap.clear()
     }
 
     // ------------------ 歌曲开始播放 ------------------
@@ -1452,8 +1441,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
     fun getRankList(): List<RankItem> {
         val rankItemList: MutableList<RankItem> = mutableListOf()
-        val seatList: List<RoomSeatModel> = mSeatListLiveData.value ?: emptyList()
-        seatList.forEach { model ->
+        scoreMap.forEach { (_, model) ->
             val item = RankItem()
             item.userName = model.name
             item.score = model.score

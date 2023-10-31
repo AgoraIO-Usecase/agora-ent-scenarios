@@ -60,6 +60,12 @@ data class RoomSeatModel constructor(
     }
 }
 
+data class UserModel constructor(
+    val name: String, // 座位上用户昵称
+    val headUrl: String, // 头像
+    var score:Int // 得分
+)
+
 
 data class CreateRoomInputModel constructor(
     val icon: String,
@@ -105,7 +111,7 @@ data class ChangeMVCoverInputModel constructor(
 )
 
 data class OnSeatInputModel constructor(
-    val seatIndex: Int
+    val score: Int
 )
 
 data class OutSeatInputModel constructor(
