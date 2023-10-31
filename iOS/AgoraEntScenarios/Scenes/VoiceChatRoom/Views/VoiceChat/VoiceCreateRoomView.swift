@@ -98,7 +98,7 @@ class VoiceCreateRoomView: UIView {
         self.addSubview(inputBgView)
         
         self.inputTF = UITextField(frame: CGRect(x: 30, y: 9, width: inputBgView.width - 60, height: 30))
-        self.inputTF.accessibilityIdentifier = "ktv_create_room_textfield_id"
+        self.inputTF.accessibilityIdentifier = "voice_chat_create_room_name_tf"
         self.inputTF.textColor = UIColor(hexString: "#040925")
         self.inputTF.font = UIFont.systemFont(ofSize: 18)
         self.inputTF.clearButtonMode = .whileEditing
@@ -145,7 +145,7 @@ class VoiceCreateRoomView: UIView {
    //     createBtn.setBackgroundImage(UIImage.sceneImage(name: "createRoom", bundleName: "VoiceChatRoomResource"), for: .normal)
         createBtn.setTitle(LanguageManager.localValue(key: "voice_create_room"), for: .normal)
         createBtn.setTitleColor(UIColor(hexString: "#FFFFFF"), for: .normal)
-        createBtn.accessibilityIdentifier = "ktv_create_room_button_id"
+        createBtn.accessibilityIdentifier = "voice_chat_create_room_next_btn"
         createBtn.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .bold)
         createBtn.adjustsImageWhenHighlighted = false
         createBtn.contentMode = .scaleAspectFit
