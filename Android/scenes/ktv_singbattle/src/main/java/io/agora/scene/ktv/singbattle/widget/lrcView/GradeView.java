@@ -105,11 +105,11 @@ public class GradeView extends View {
         int colorOfBackground = 0;
         int colorOfContentGray = 0;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            colorOfBackground = getResources().getColor(R.color.ktv_grade_view_bg, null);
-            colorOfContentGray = getResources().getColor(R.color.ktv_grade_view_content_gray, null);
+            colorOfBackground = getResources().getColor(R.color.ktv_singbattle_grade_view_bg, null);
+            colorOfContentGray = getResources().getColor(R.color.ktv_singbattle_grade_view_content_gray, null);
         } else {
-            colorOfBackground = getResources().getColor(R.color.ktv_grade_view_bg);
-            colorOfContentGray = getResources().getColor(R.color.ktv_grade_view_content_gray);
+            colorOfBackground = getResources().getColor(R.color.ktv_singbattle_grade_view_bg);
+            colorOfContentGray = getResources().getColor(R.color.ktv_singbattle_grade_view_content_gray);
         }
         mDefaultBackgroundPaint.setColor(colorOfBackground);
         mGradeSeparatorIndicatorPaint.setColor(colorOfContentGray);

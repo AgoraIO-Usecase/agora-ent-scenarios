@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.ktv.singbattle.R;
-import io.agora.scene.ktv.singbattle.databinding.KtvItemChooseSongListBinding;
+import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleItemChooseSongListBinding;
 import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
@@ -14,12 +14,12 @@ import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 /**
  * The holder of Item ChooseSong
  */
-abstract class SongChooseViewAdapter extends BindingSingleAdapter<SongItem, KtvItemChooseSongListBinding> {
+abstract class SongChooseViewAdapter extends BindingSingleAdapter<SongItem, KtvSingbattleItemChooseSongListBinding> {
 
     @Override
-    public void onBindViewHolder(@NonNull BindingViewHolder<KtvItemChooseSongListBinding> holder, int position) {
+    public void onBindViewHolder(@NonNull BindingViewHolder<KtvSingbattleItemChooseSongListBinding> holder, int position) {
         SongItem data = getItem(position);
-        KtvItemChooseSongListBinding binding = holder.binding;
+        KtvSingbattleItemChooseSongListBinding binding = holder.binding;
         binding.titleItemSongList.setText(data.songName);
         binding.titleItemSongList.setOnLongClickListener(v -> {
             v.setSelected(!v.isSelected());

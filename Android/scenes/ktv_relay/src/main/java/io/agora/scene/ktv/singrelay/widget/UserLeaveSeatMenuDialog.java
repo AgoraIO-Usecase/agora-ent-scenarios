@@ -13,20 +13,20 @@ import com.bumptech.glide.Glide;
 import io.agora.scene.base.component.BaseDialog;
 import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.ktv.singrelay.R;
-import io.agora.scene.ktv.singrelay.databinding.KtvDialogUserSeatMenuBinding;
+import io.agora.scene.ktv.singrelay.databinding.KtvRelayDialogUserSeatMenuBinding;
 
 /**
  * 房间用户菜单
  */
-public class UserLeaveSeatMenuDialog extends BaseDialog<KtvDialogUserSeatMenuBinding> {
+public class UserLeaveSeatMenuDialog extends BaseDialog<KtvRelayDialogUserSeatMenuBinding> {
     public UserLeaveSeatMenuDialog(@NonNull Context context) {
         super(context);
     }
 
     @NonNull
     @Override
-    protected KtvDialogUserSeatMenuBinding getViewBinding(@NonNull LayoutInflater layoutInflater) {
-        return KtvDialogUserSeatMenuBinding.inflate(layoutInflater);
+    protected KtvRelayDialogUserSeatMenuBinding getViewBinding(@NonNull LayoutInflater layoutInflater) {
+        return KtvRelayDialogUserSeatMenuBinding.inflate(layoutInflater);
     }
 
     public void setAgoraMember(String name, String headUrl) {

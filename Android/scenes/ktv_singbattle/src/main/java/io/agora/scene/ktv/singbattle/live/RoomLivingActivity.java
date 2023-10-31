@@ -9,7 +9,6 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
@@ -25,12 +24,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.card.MaterialCardView;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import io.agora.rtc2.Constants;
 import io.agora.scene.base.GlideApp;
@@ -43,9 +39,8 @@ import io.agora.scene.ktv.singbattle.KTVLogger;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleActivityRoomLivingBinding;
-import io.agora.scene.ktv.singbattle.databinding.KtvItemRoomSpeakerBinding;
+import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleItemRoomSpeakerBinding;
 import io.agora.scene.ktv.singbattle.debugSettings.KTVDebugSettingsDialog;
-import io.agora.scene.ktv.singbattle.live.fragment.dialog.MVFragment;
 import io.agora.scene.ktv.singbattle.live.listener.LrcActionListenerImpl;
 import io.agora.scene.ktv.singbattle.live.listener.SongActionListenerImpl;
 import io.agora.scene.ktv.singbattle.service.JoinRoomOutputModel;
@@ -54,10 +49,8 @@ import io.agora.scene.ktv.singbattle.service.RoomSelSongModel;
 import io.agora.scene.ktv.singbattle.widget.KtvCommonDialog;
 import io.agora.scene.ktv.singbattle.widget.game.SingBattleGameView;
 import io.agora.scene.ktv.singbattle.widget.lrcView.LrcControlView;
-import io.agora.scene.ktv.singbattle.widget.MoreDialog;
 import io.agora.scene.ktv.singbattle.widget.MusicSettingDialog;
 import io.agora.scene.ktv.singbattle.widget.UserLeaveSeatMenuDialog;
-import io.agora.scene.ktv.singbattle.widget.rankList.RankItem;
 import io.agora.scene.ktv.singbattle.widget.song.SongDialog;
 import io.agora.scene.widget.DividerDecoration;
 import io.agora.scene.widget.basic.BindingSingleAdapter;
@@ -75,9 +68,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
     private static final String EXTRA_ROOM_INFO = "roomInfo";
 
     private RoomLivingViewModel roomLivingViewModel;
-    private MoreDialog moreDialog;
     private MusicSettingDialog musicSettingDialog;
-    private BindingSingleAdapter<RoomSeatModel, KtvItemRoomSpeakerBinding> mRoomSpeakerAdapter;
+    private BindingSingleAdapter<RoomSeatModel, KtvSingbattleItemRoomSpeakerBinding> mRoomSpeakerAdapter;
     private KtvCommonDialog creatorExitDialog;
 
     private CommonDialog exitDialog;
@@ -116,11 +108,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
         }).get(RoomLivingViewModel.class);
         roomLivingViewModel.setLrcView(getBinding().lrcControlView);
 
-        mRoomSpeakerAdapter = new BindingSingleAdapter<RoomSeatModel, KtvItemRoomSpeakerBinding>() {
+        mRoomSpeakerAdapter = new BindingSingleAdapter<RoomSeatModel, KtvSingbattleItemRoomSpeakerBinding>() {
             @Override
-            public void onBindViewHolder(@NonNull BindingViewHolder<KtvItemRoomSpeakerBinding> holder, int position) {
+            public void onBindViewHolder(@NonNull BindingViewHolder<KtvSingbattleItemRoomSpeakerBinding> holder, int position) {
                 RoomSeatModel item = getItem(position);
-                KtvItemRoomSpeakerBinding binding = holder.binding;
+                KtvSingbattleItemRoomSpeakerBinding binding = holder.binding;
 
                 boolean isOutSeat = item == null || TextUtils.isEmpty(item.getUserNo());
                 binding.getRoot().setOnClickListener(v -> {
@@ -364,7 +356,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
                 }
             }
         });
-        getBinding().btnMenu.setOnClickListener(this::showMoreDialog);
         getBinding().btnOK.setOnClickListener(view -> getBinding().groupResult.setVisibility(View.GONE));
         LrcActionListenerImpl lrcActionListenerImpl = new LrcActionListenerImpl(this, roomLivingViewModel, getBinding().lrcControlView) {
             @Override
@@ -394,12 +385,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
         });
 
         // 房间相关
-        roomLivingViewModel.roomInfoLiveData.observe(this, joinRoomOutputModel -> {
-            //修改背景
-            if (!TextUtils.isEmpty(joinRoomOutputModel.getBgOption())) {
-                setPlayerBgFromMsg(Integer.parseInt(joinRoomOutputModel.getBgOption()));
-            }
-        });
         roomLivingViewModel.roomDeleteLiveData.observe(this, deletedByCreator -> {
             if (deletedByCreator) {
                 showCreatorExitDialog();
@@ -760,12 +745,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
         mRoomSpeakerAdapter.notifyDataSetChanged();
     }
 
-
-    public void closeMenuDialog() {
-        setDarkStatusIcon(isBlackDarkStatus());
-        moreDialog.dismiss();
-    }
-
     private LinkedHashMap<Integer, String> filterSongTypeMap(LinkedHashMap<Integer, String> typeMap) {
         // 0 -> "项目热歌榜单"
         // 1 -> "声网热歌榜"
@@ -826,26 +805,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
         });
     }
 
-    private boolean showMoreDialogTag = false;
-    private void showMoreDialog(View view) {
-        if (showMoreDialogTag) {
-            return;
-        }
-        showMoreDialogTag = true;
-
-        if (moreDialog == null) {
-            moreDialog = new MoreDialog(roomLivingViewModel.mSetting);
-        }
-
-        if (!moreDialog.isAdded()) {
-            moreDialog.show(getSupportFragmentManager(), MoreDialog.TAG);
-        }
-
-        getBinding().getRoot().post(() -> {
-            showMoreDialogTag = false;
-        });
-    }
-
     private void showMusicSettingDialog() {
         //if (musicSettingDialog == null) {
             musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting, roomLivingViewModel.playerMusicStatusLiveData.getValue() == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE);
@@ -888,12 +847,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
     }
 
     public void setPlayerBgFromMsg(int position) {
-        getBinding().lrcControlView.setLrcViewBackground(MVFragment.exampleBackgrounds.get(position));
-    }
-
-    public void setPlayerBg(int position) {
-        roomLivingViewModel.setMV_BG(position);
-        getBinding().lrcControlView.setLrcViewBackground(MVFragment.exampleBackgrounds.get(position));
+        getBinding().lrcControlView.setLrcViewBackground(R.mipmap.mvbg4);
     }
 
     @Override

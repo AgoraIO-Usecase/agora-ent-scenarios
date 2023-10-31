@@ -9,7 +9,6 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
@@ -36,10 +35,9 @@ import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.ktv.singrelay.KTVLogger;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.singrelay.R;
-import io.agora.scene.ktv.singrelay.databinding.KtvItemRoomSpeakerBinding;
-import io.agora.scene.ktv.singrelay.databinding.KtvSingrelayActivityRoomLivingBinding;
+import io.agora.scene.ktv.singrelay.databinding.KtvRelayActivityRoomLivingBinding;
+import io.agora.scene.ktv.singrelay.databinding.KtvRelayItemRoomSpeakerBinding;
 import io.agora.scene.ktv.singrelay.debugSettings.KTVDebugSettingsDialog;
-import io.agora.scene.ktv.singrelay.live.fragment.dialog.MVFragment;
 import io.agora.scene.ktv.singrelay.live.listener.LrcActionListenerImpl;
 import io.agora.scene.ktv.singrelay.service.JoinRoomOutputModel;
 import io.agora.scene.ktv.singrelay.service.RoomSeatModel;
@@ -47,7 +45,6 @@ import io.agora.scene.ktv.singrelay.service.RoomSelSongModel;
 import io.agora.scene.ktv.singrelay.widget.KtvCommonDialog;
 import io.agora.scene.ktv.singrelay.widget.game.SingRelayGameView;
 import io.agora.scene.ktv.singrelay.widget.lrcView.LrcControlView;
-import io.agora.scene.ktv.singrelay.widget.MoreDialog;
 import io.agora.scene.ktv.singrelay.widget.MusicSettingDialog;
 import io.agora.scene.ktv.singrelay.widget.UserLeaveSeatMenuDialog;
 import io.agora.scene.widget.DividerDecoration;
@@ -62,13 +59,12 @@ import io.agora.scene.widget.utils.UiUtils;
 /**
  * 房间主页
  */
-public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActivityRoomLivingBinding> {
+public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivityRoomLivingBinding> {
     private static final String EXTRA_ROOM_INFO = "roomInfo";
 
     private RoomLivingViewModel roomLivingViewModel;
-    private MoreDialog moreDialog;
     private MusicSettingDialog musicSettingDialog;
-    private BindingSingleAdapter<RoomSeatModel, KtvItemRoomSpeakerBinding> mRoomSpeakerAdapter;
+    private BindingSingleAdapter<RoomSeatModel, KtvRelayItemRoomSpeakerBinding> mRoomSpeakerAdapter;
     private KtvCommonDialog creatorExitDialog;
 
     private CommonDialog exitDialog;
@@ -86,8 +82,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
     }
 
     @Override
-    protected KtvSingrelayActivityRoomLivingBinding getViewBinding(@NonNull LayoutInflater inflater) {
-        return KtvSingrelayActivityRoomLivingBinding.inflate(inflater);
+    protected KtvRelayActivityRoomLivingBinding getViewBinding(@NonNull LayoutInflater inflater) {
+        return KtvRelayActivityRoomLivingBinding.inflate(inflater);
     }
 
     @Override
@@ -106,11 +102,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
         }).get(RoomLivingViewModel.class);
         roomLivingViewModel.setLrcView(getBinding().lrcControlView);
 
-        mRoomSpeakerAdapter = new BindingSingleAdapter<RoomSeatModel, KtvItemRoomSpeakerBinding>() {
+        mRoomSpeakerAdapter = new BindingSingleAdapter<RoomSeatModel, KtvRelayItemRoomSpeakerBinding>() {
             @Override
-            public void onBindViewHolder(@NonNull BindingViewHolder<KtvItemRoomSpeakerBinding> holder, int position) {
+            public void onBindViewHolder(@NonNull BindingViewHolder<KtvRelayItemRoomSpeakerBinding> holder, int position) {
                 RoomSeatModel item = getItem(position);
-                KtvItemRoomSpeakerBinding binding = holder.binding;
+                KtvRelayItemRoomSpeakerBinding binding = holder.binding;
 
                 boolean isOutSeat = item == null || TextUtils.isEmpty(item.getUserNo());
                 binding.getRoot().setOnClickListener(v -> {
@@ -119,14 +115,14 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
                         if (roomLivingViewModel.isRoomOwner()) {
                             if (!item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                                 if (roomLivingViewModel.singRelayGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
-                                    ToastUtils.showToast(R.string.ktv_gaming_seat_tip1);
+                                    ToastUtils.showToast(R.string.ktv_relay_gaming_seat_tip1);
                                     return;
                                 }
                                 showUserLeaveSeatMenuDialog(item);
                             }
                         } else if (item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                             if (roomLivingViewModel.singRelayGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
-                                ToastUtils.showToast(R.string.ktv_gaming_seat_tip2);
+                                ToastUtils.showToast(R.string.ktv_relay_gaming_seat_tip2);
                                 return;
                             }
                             showUserLeaveSeatMenuDialog(item);
@@ -136,7 +132,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
                         RoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
                         if (seatLocal == null || seatLocal.getSeatIndex() < 0) {
                             if (roomLivingViewModel.singRelayGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
-                                ToastUtils.showToast(R.string.ktv_gaming_seat_tip3);
+                                ToastUtils.showToast(R.string.ktv_relay_gaming_seat_tip3);
                                 return;
                             }
                             toggleAudioRun = () -> {
@@ -156,7 +152,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
                     binding.tvHC.setVisibility(View.GONE);
                     binding.tvRoomOwner.setVisibility(View.GONE);
                     binding.ivMute.setVisibility(View.GONE);
-                    binding.tvUserName.setText(getString(R.string.ktv_seat_num, String.valueOf(position + 1)));
+                    binding.tvUserName.setText(getString(R.string.ktv_relay_seat_num, String.valueOf(position + 1)));
                     binding.flVideoContainer.removeAllViews();
                 } else {
                     binding.tvUserName.setText(item.getName());
@@ -199,7 +195,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
                     RoomSelSongModel songModel = roomLivingViewModel.songPlayingLiveData.getValue();
                     if (songModel != null) {
                         if (item.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_FALSE() && roomLivingViewModel.singRelayGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
-                            binding.tvZC.setText(R.string.ktv_zc);
+                            binding.tvZC.setText(R.string.ktv_relay_zc);
                             binding.tvHC.setVisibility(View.GONE);
                             binding.tvZC.setVisibility(View.VISIBLE);
                         } else {
@@ -232,11 +228,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
         });
         getBinding().singRelayGameView.setIsRoomOwner(roomLivingViewModel.isRoomOwner());
 
-        if (!TextUtils.isEmpty(roomLivingViewModel.roomInfoLiveData.getValue().getBgOption())) {
-            setPlayerBgFromMsg(Integer.parseInt(roomLivingViewModel.roomInfoLiveData.getValue().getBgOption()));
-        } else {
-            setPlayerBgFromMsg(0);
-        }
         getBinding().tvRoomName.setText(roomLivingViewModel.roomInfoLiveData.getValue().getRoomName());
 
         if (AgoraApplication.the().isDebugModeOpen()) {
@@ -330,7 +321,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
                 }
             }
         });
-        getBinding().btnMenu.setOnClickListener(this::showMoreDialog);
         getBinding().btnOK.setOnClickListener(view -> getBinding().groupResult.setVisibility(View.GONE));
         LrcActionListenerImpl lrcActionListenerImpl = new LrcActionListenerImpl(this, roomLivingViewModel, getBinding().lrcControlView) {
             @Override
@@ -359,13 +349,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
             }
         });
 
-        // 房间相关
-        roomLivingViewModel.roomInfoLiveData.observe(this, joinRoomOutputModel -> {
-            //修改背景
-            if (!TextUtils.isEmpty(joinRoomOutputModel.getBgOption())) {
-                setPlayerBgFromMsg(Integer.parseInt(joinRoomOutputModel.getBgOption()));
-            }
-        });
         roomLivingViewModel.roomDeleteLiveData.observe(this, deletedByCreator -> {
             if (deletedByCreator) {
                 showCreatorExitDialog();
@@ -374,7 +357,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
             }
         });
         roomLivingViewModel.roomUserCountLiveData.observe(this, count ->
-                getBinding().tvRoomMCount.setText(getString(R.string.ktv_room_count, String.valueOf(count))));
+                getBinding().tvRoomMCount.setText(getString(R.string.ktv_relay_room_count, String.valueOf(count))));
         roomLivingViewModel.roomTimeUpLiveData.observe(this, isTimeUp -> {
             if (roomLivingViewModel.release() && isTimeUp) {
                 showTimeUpExitDialog();
@@ -536,21 +519,21 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
         if (txQuality == Constants.QUALITY_BAD || txQuality == Constants.QUALITY_POOR
                 || rxQuality == Constants.QUALITY_BAD || rxQuality == Constants.QUALITY_POOR) {
             getBinding().ivNetStatus.setImageResource(R.drawable.bg_round_yellow);
-            getBinding().tvNetStatus.setText(R.string.ktv_net_status_m);
+            getBinding().tvNetStatus.setText(R.string.ktv_relay_net_status_m);
         } else if (txQuality == Constants.QUALITY_VBAD || txQuality == Constants.QUALITY_DOWN
                 || rxQuality == Constants.QUALITY_VBAD || rxQuality == Constants.QUALITY_DOWN) {
             getBinding().ivNetStatus.setImageResource(R.drawable.bg_round_red);
-            getBinding().tvNetStatus.setText(R.string.ktv_net_status_low);
+            getBinding().tvNetStatus.setText(R.string.ktv_relay_net_status_low);
         } else if (txQuality == Constants.QUALITY_EXCELLENT || txQuality == Constants.QUALITY_GOOD
                 || rxQuality == Constants.QUALITY_EXCELLENT || rxQuality == Constants.QUALITY_GOOD) {
             getBinding().ivNetStatus.setImageResource(R.drawable.bg_round_green);
-            getBinding().tvNetStatus.setText(R.string.ktv_net_status_good);
+            getBinding().tvNetStatus.setText(R.string.ktv_relay_net_status_good);
         } else if (txQuality == Constants.QUALITY_UNKNOWN || rxQuality == Constants.QUALITY_UNKNOWN) {
             getBinding().ivNetStatus.setImageResource(R.drawable.bg_round_red);
-            getBinding().tvNetStatus.setText(R.string.ktv_net_status_un_know);
+            getBinding().tvNetStatus.setText(R.string.ktv_relay_net_status_un_know);
         } else {
             getBinding().ivNetStatus.setImageResource(R.drawable.bg_round_green);
-            getBinding().tvNetStatus.setText(R.string.ktv_net_status_good);
+            getBinding().tvNetStatus.setText(R.string.ktv_relay_net_status_good);
         }
     }
 
@@ -607,7 +590,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
             } else {
                 timeUpExitDialog.setDescText(getString(R.string.expire_exit_room));
             }
-            timeUpExitDialog.setDialogBtnText("", getString(R.string.ktv_confirm));
+            timeUpExitDialog.setDialogBtnText("", getString(R.string.ktv_relay_confirm));
             timeUpExitDialog.setOnButtonClickListener(new OnButtonClickListener() {
                 @Override
                 public void onLeftButtonClick() {
@@ -627,7 +610,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
             gameExitDialog = new KtvCommonDialog(this);
 
             gameExitDialog.setDescText("当前房间正在游戏中，请退出");
-            gameExitDialog.setDialogBtnText("", getString(R.string.ktv_confirm));
+            gameExitDialog.setDialogBtnText("", getString(R.string.ktv_relay_confirm));
             gameExitDialog.setOnButtonClickListener(new OnButtonClickListener() {
                 @Override
                 public void onLeftButtonClick() {
@@ -653,7 +636,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
                 exitDialog.setDialogTitle(getString(R.string.exit_room));
                 exitDialog.setDescText(getString(R.string.confirm_to_exit_room));
             }
-            exitDialog.setDialogBtnText(getString(R.string.ktv_cancel), getString(R.string.ktv_confirm));
+            exitDialog.setDialogBtnText(getString(R.string.ktv_relay_cancel), getString(R.string.ktv_relay_confirm));
             exitDialog.setOnButtonClickListener(new OnButtonClickListener() {
                 @Override
                 public void onLeftButtonClick() {
@@ -684,32 +667,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
         mRoomSpeakerAdapter.notifyDataSetChanged();
     }
 
-
-    public void closeMenuDialog() {
-        setDarkStatusIcon(isBlackDarkStatus());
-        moreDialog.dismiss();
-    }
-
-    private boolean showMoreDialogTag = false;
-    private void showMoreDialog(View view) {
-        if (showMoreDialogTag) {
-            return;
-        }
-        showMoreDialogTag = true;
-
-        if (moreDialog == null) {
-            moreDialog = new MoreDialog(roomLivingViewModel.mSetting);
-        }
-
-        if (!moreDialog.isAdded()) {
-            moreDialog.show(getSupportFragmentManager(), MoreDialog.TAG);
-        }
-
-        getBinding().getRoot().post(() -> {
-            showMoreDialogTag = false;
-        });
-    }
-
     private void showMusicSettingDialog() {
         //if (musicSettingDialog == null) {
             musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting, roomLivingViewModel.playerMusicStatusLiveData.getValue() == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE);
@@ -726,9 +683,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
         }
         if (changeMusicDialog == null) {
             changeMusicDialog = new CommonDialog(this);
-            changeMusicDialog.setDialogTitle(getString(R.string.ktv_room_change_music_title));
-            changeMusicDialog.setDescText(getString(R.string.ktv_room_change_music_msg));
-            changeMusicDialog.setDialogBtnText(getString(R.string.ktv_cancel), getString(R.string.ktv_confirm));
+            changeMusicDialog.setDialogTitle(getString(R.string.ktv_relay_room_change_music_title));
+            changeMusicDialog.setDescText(getString(R.string.ktv_relay_room_change_music_msg));
+            changeMusicDialog.setDialogBtnText(getString(R.string.ktv_relay_cancel), getString(R.string.ktv_relay_confirm));
             changeMusicDialog.setOnButtonClickListener(new OnButtonClickListener() {
                 @Override
                 public void onLeftButtonClick() {
@@ -748,15 +705,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
             });
         }
         changeMusicDialog.show();
-    }
-
-    public void setPlayerBgFromMsg(int position) {
-        getBinding().lrcControlView.setLrcViewBackground(MVFragment.exampleBackgrounds.get(position));
-    }
-
-    public void setPlayerBg(int position) {
-        roomLivingViewModel.setMV_BG(position);
-        getBinding().lrcControlView.setLrcViewBackground(MVFragment.exampleBackgrounds.get(position));
     }
 
     @Override
@@ -825,7 +773,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingrelayActi
         if (creatorExitDialog == null) {
             creatorExitDialog = new KtvCommonDialog(this);
             creatorExitDialog.setDescText(getString(R.string.room_has_close));
-            creatorExitDialog.setDialogBtnText("", getString(R.string.ktv_iknow));
+            creatorExitDialog.setDialogBtnText("", getString(R.string.ktv_relay_iknow));
             creatorExitDialog.setOnButtonClickListener(new OnButtonClickListener() {
                 @Override
                 public void onLeftButtonClick() {

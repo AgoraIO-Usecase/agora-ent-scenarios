@@ -11,17 +11,17 @@ import androidx.annotation.NonNull;
 
 import io.agora.scene.base.component.BaseDialog;
 import io.agora.scene.base.utils.UiUtil;
-import io.agora.scene.ktv.singrelay.databinding.KtvDialogCommonBinding;
+import io.agora.scene.ktv.singrelay.databinding.KtvRelayDialogCommonBinding;
 
-public class KtvCommonDialog extends BaseDialog<KtvDialogCommonBinding> {
+public class KtvCommonDialog extends BaseDialog<KtvRelayDialogCommonBinding> {
     public KtvCommonDialog(@NonNull Context context) {
         super(context);
     }
 
     @NonNull
     @Override
-    protected KtvDialogCommonBinding getViewBinding(@NonNull LayoutInflater inflater) {
-        return KtvDialogCommonBinding.inflate(inflater);
+    protected KtvRelayDialogCommonBinding getViewBinding(@NonNull LayoutInflater inflater) {
+        return KtvRelayDialogCommonBinding.inflate(inflater);
     }
 
     @Override

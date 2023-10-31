@@ -39,7 +39,7 @@
             android:visibility="gone"
             android:clipChildren="false"
             android:clipToPadding="false"
-            tools:listitem="@layout/item_room_list"
+            tools:listitem="@layout/ktv_singbattle_item_room_list"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="2"
             tools:visibility="visible"/>

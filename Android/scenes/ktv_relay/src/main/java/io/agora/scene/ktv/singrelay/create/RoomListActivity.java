@@ -153,7 +153,7 @@ public class RoomListActivity extends BaseViewBindingActivity<KtvRelayActivityRo
             GlideApp.with(holder.ivAvatar.getContext()).load(data.getCreatorAvatar())
                     .into(holder.ivAvatar);
             holder.tvRoomName.setText(data.getName());
-            holder.tvPersonNum.setText(holder.itemView.getContext().getString(R.string.ktv_people_count, data.getRoomPeopleNum()));
+            holder.tvPersonNum.setText(holder.itemView.getContext().getString(R.string.ktv_relay_people_count, data.getRoomPeopleNum()));
             holder.tvUserName.setText(data.getCreatorName());
             if (data.isPrivate()){
                 holder.ivLock.setVisibility(View.VISIBLE);

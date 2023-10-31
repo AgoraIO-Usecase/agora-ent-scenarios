@@ -18,12 +18,12 @@ import androidx.core.view.WindowInsetsCompat;
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
 import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.ktv.singbattle.R;
-import io.agora.scene.ktv.singbattle.databinding.KtvDialogMusicSettingBinding;
+import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleDialogMusicSettingBinding;
 
 /**
  * 控制台
  */
-public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogMusicSettingBinding> {
+public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialogMusicSettingBinding> {
     public static final String TAG = "MusicSettingDialog";
     private MusicSettingBean mSetting;
     private Boolean isPause = false;
@@ -176,9 +176,9 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
 
     private void setSoundMode() {
         int margin = UiUtil.dp2px(10);
-        String[] stringArray = getResources().getStringArray(R.array.ktv_audioPreset);
+        String[] stringArray = getResources().getStringArray(R.array.ktv_singbattle_audioPreset);
         for (int i = 0; i < stringArray.length; i++) {
-            RadioButton radioButton = (RadioButton) getLayoutInflater().inflate(R.layout.btn_sound_mode, null);
+            RadioButton radioButton = (RadioButton) getLayoutInflater().inflate(R.layout.ktv_singbattle_btn_sound_mode, null);
             radioButton.setText(stringArray[i]);
             if (i % 4 == 0) {
                 radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode4);

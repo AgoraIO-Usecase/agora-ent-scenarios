@@ -6,16 +6,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.CountDownTimer;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,7 +20,6 @@ import android.widget.TextView;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.palette.graphics.Palette;
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
@@ -38,9 +34,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import io.agora.karaoke_view.v11.KaraokeEvent;
 import io.agora.karaoke_view.v11.KaraokeView;
@@ -53,10 +47,9 @@ import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.base.utils.ZipUtils;
 import io.agora.scene.ktv.singrelay.KTVLogger;
 import io.agora.scene.ktv.singrelay.R;
-import io.agora.scene.ktv.singrelay.databinding.KtvSingrelayLayoutLrcControlViewBinding;
-import io.agora.scene.ktv.singrelay.databinding.KtvSingrelayLayoutLrcPrepareBinding;
+import io.agora.scene.ktv.singrelay.databinding.KtvRelayLayoutLrcControlViewBinding;
+import io.agora.scene.ktv.singrelay.databinding.KtvRelayLayoutLrcPrepareBinding;
 import io.agora.scene.ktv.singrelay.ktvapi.ILrcView;
-import io.agora.scene.ktv.singrelay.service.RankModel;
 import io.agora.scene.ktv.singrelay.service.RoomSelSongModel;
 import io.agora.scene.widget.basic.OutlineSpan;
 import io.agora.scene.widget.utils.UiUtils;
@@ -66,8 +59,8 @@ import io.agora.scene.widget.utils.UiUtils;
  */
 public class LrcControlView extends FrameLayout implements View.OnClickListener, ILrcView {
 
-    protected KtvSingrelayLayoutLrcControlViewBinding mBinding;
-    protected KtvSingrelayLayoutLrcPrepareBinding mPrepareBinding;
+    protected KtvRelayLayoutLrcControlViewBinding mBinding;
+    protected KtvRelayLayoutLrcPrepareBinding mPrepareBinding;
 
     protected KaraokeView mKaraokeView;
 
@@ -127,9 +120,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     private void init(Context context) {
-        mBinding = KtvSingrelayLayoutLrcControlViewBinding.inflate(LayoutInflater.from(context), this, true);
+        mBinding = KtvRelayLayoutLrcControlViewBinding.inflate(LayoutInflater.from(context), this, true);
 
-        mPrepareBinding = KtvSingrelayLayoutLrcPrepareBinding.bind(mBinding.getRoot());
+        mPrepareBinding = KtvRelayLayoutLrcPrepareBinding.bind(mBinding.getRoot());
 
         mBinding.ilIDLE.getRoot().setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
@@ -248,12 +241,12 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         if (mBinding == null) return;
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
-        mBinding.clActive.setBackgroundResource(backgroundResId);
+        setLrcViewBackground(R.mipmap.ktv_relay_music_player_background);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.GONE);
         mBinding.ilActive.getRoot().setVisibility(View.VISIBLE);
 
         mBinding.ilActive.ivMusicStart.setIconResource(R.mipmap.ktv_ic_pause);
-        mBinding.ilActive.ivMusicStart.setText(R.string.ktv_room_player_pause);
+        mBinding.ilActive.ivMusicStart.setText(R.string.ktv_relay_room_player_pause);
 
         mBinding.ilActive.switchOriginal.setChecked(false); // reset ui icon for mAudioTrackMode
         mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
@@ -319,7 +312,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.getRoot().setVisibility(View.VISIBLE);
 
         mBinding.ilActive.ivMusicStart.setIconResource(R.drawable.ktv_ic_play);
-        mBinding.ilActive.ivMusicStart.setText(R.string.ktv_room_player_play);
+        mBinding.ilActive.ivMusicStart.setText(R.string.ktv_relay_room_player_play);
     }
 
     public void onIdleStatus() {
@@ -379,7 +372,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mComboControl.reset(mBinding);
         }
         mBinding.ivCumulativeScoreGrade.setVisibility(INVISIBLE);
-        mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_score_formatter), "0"));
+        mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_relay_score_formatter), "0"));
         mBinding.gradeView.setScore(0, 0, 0);
 
         if (mMusic == null) return;
@@ -391,7 +384,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.tvMusicName2.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
     }
 
-    private int backgroundResId = R.mipmap.ktv_mv_default;
+    private int backgroundResId = R.mipmap.ktv_relay_music_player_background;
 
     public void setLrcViewBackground(@DrawableRes int resId) {
         backgroundResId = resId;
@@ -400,7 +393,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             if (palette == null) {
                 return;
             }
-            int defaultColor = ContextCompat.getColor(getContext(), R.color.ktv_lrc_color);
+            int defaultColor = ContextCompat.getColor(getContext(), R.color.ktv_relay_lrc_color);
             mBinding.ilActive.lyricsView.setCurrentLineHighlightedTextColor(defaultColor);
 
             defaultColor = ContextCompat.getColor(getContext(), R.color.white);
@@ -416,7 +409,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
         mBinding.gradeView.setScore((int) score, (int) cumulativeScore, (int) perfectScore);
 
-        mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_score_formatter), "" + (int) cumulativeScore));
+        mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_relay_score_formatter), "" + (int) cumulativeScore));
         int gradeDrawable = mBinding.gradeView.getCumulativeDrawable();
         if (gradeDrawable == 0) {
             mBinding.ivCumulativeScoreGrade.setVisibility(INVISIBLE);
@@ -436,12 +429,12 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
         private int mNumberOfCombos;
 
-        private void reset(KtvSingrelayLayoutLrcControlViewBinding binding) {
+        private void reset(KtvRelayLayoutLrcControlViewBinding binding) {
             mNumberOfCombos = 0;
             binding.comboView.getRoot().setVisibility(INVISIBLE);
         }
 
-        private void checkAndShowCombos(KtvSingrelayLayoutLrcControlViewBinding binding, int score, int cumulativeScore) {
+        private void checkAndShowCombos(KtvRelayLayoutLrcControlViewBinding binding, int score, int cumulativeScore) {
             binding.comboView.getRoot().setVisibility(VISIBLE);
 
             showComboAnimation(binding.comboView.getRoot(), score);

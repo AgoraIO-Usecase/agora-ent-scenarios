@@ -394,7 +394,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
             if (!hasHighlighter && roomLivingViewModel.isRoomOwner() && chorusNowNum >= 0 && !roomLivingViewModel.mSetting.getHighLighterUid().equals("") || (chorusNowNum == 0 && !roomLivingViewModel.mSetting.getHighLighterUid().equals(""))) {
                 // 人声突出者退出合唱
-                ToastUtils.showToast("人声突出功能已失效");
+                ToastUtils.showToast(R.string.ktv_highlight_disable);
                 getBinding().lrcControlView.setHighLightPersonHeadUrl("");
                 roomLivingViewModel.mSetting.setHighLighterUid("");
             }

@@ -23,12 +23,12 @@ import java.util.Objects;
 
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnItemClickListener;
-import io.agora.scene.ktv.singbattle.databinding.KtvFragmentSongListBinding;
+import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleFragmentSongListBinding;
 
 /**
  * 歌单列表
  */
-public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmentSongListBinding>
+public final class SongChooseFragment extends BaseViewBindingFragment<KtvSingbattleFragmentSongListBinding>
         implements OnItemClickListener<SongItem> {
 
     private Listener listener;
@@ -45,8 +45,8 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
 
     @NonNull
     @Override
-    protected KtvFragmentSongListBinding getViewBinding(@NonNull LayoutInflater layoutInflater, @Nullable ViewGroup viewGroup) {
-        return KtvFragmentSongListBinding.inflate(layoutInflater);
+    protected KtvSingbattleFragmentSongListBinding getViewBinding(@NonNull LayoutInflater layoutInflater, @Nullable ViewGroup viewGroup) {
+        return KtvSingbattleFragmentSongListBinding.inflate(layoutInflater);
     }
 
     @Override
@@ -288,7 +288,7 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
     }
 
     private void enableTabLayoutClick(boolean enable) {
-        KtvFragmentSongListBinding binding = getBinding();
+        KtvSingbattleFragmentSongListBinding binding = getBinding();
         if (binding == null) {
             return;
         }

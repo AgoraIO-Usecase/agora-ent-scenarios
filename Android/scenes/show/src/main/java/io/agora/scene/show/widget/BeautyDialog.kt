@@ -401,9 +401,17 @@ class BeautyDialog constructor(context: Context) : BottomDarkDialog(context) {
         when (groupId) {
             // 虚拟背景
             GROUP_ID_VIRTUAL_BG -> {
-                mTopBinding.root.isVisible = true
-                mTopBinding.slider.value = beautyProcessor?.let { it.getGreenScreenStrength() } ?: 0.5f
-                mTopBinding.mSwitchMaterial.isChecked = beautyProcessor?.let { it.greenScreen() } ?: false
+                beautyProcessor?.let {
+                    if (it.greenScreen()) {
+                        mTopBinding.slider.isVisible = true
+                        mTopBinding.tvStrength.isVisible = true
+                        mTopBinding.slider.value = it.getGreenScreenStrength()
+                    } else {
+                        mTopBinding.slider.isVisible = false
+                        mTopBinding.tvStrength.isVisible = false
+                    }
+                }
+                mTopBinding.mSwitchMaterial.isChecked = beautyProcessor?.greenScreen() ?: false
                 mTopBinding.mSwitchMaterial.setOnCheckedChangeListener { _, isChecked ->
                     Log.e("liu0208", "OnCheckedChange    $isChecked")
                     if (isChecked) {
@@ -413,10 +421,15 @@ class BeautyDialog constructor(context: Context) : BottomDarkDialog(context) {
                             setMessage(R.string.show_beauty_green_screen_tip)
                             setPositiveButton(R.string.show_setting_confirm) { dialog, _ ->
                                 changeGreenScreenSwitch(true)
+                                mTopBinding.slider.isVisible = true
+                                mTopBinding.tvStrength.isVisible = true
+                                mTopBinding.slider.value = beautyProcessor?.getGreenScreenStrength() ?: 0.5f
                                 dialog.dismiss()
                             }
                             setNegativeButton(R.string.show_setting_cancel) { dialog, _ ->
                                 mTopBinding.mSwitchMaterial.isChecked = false
+                                mTopBinding.slider.isVisible = false
+                                mTopBinding.tvStrength.isVisible = false
                                 dialog.dismiss()
                             }
                         }.create().show()

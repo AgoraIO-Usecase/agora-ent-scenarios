@@ -140,7 +140,7 @@ public class RoomListActivity extends BaseViewBindingActivity<KtvSingbattleActiv
         @NonNull
         @Override
         public RoomListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(mContext).inflate(R.layout.item_room_list, parent, false);
+            View view = LayoutInflater.from(mContext).inflate(R.layout.ktv_singbattle_item_room_list, parent, false);
             return new ViewHolder(view);
         }
 

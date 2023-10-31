@@ -16,7 +16,7 @@ import java.util.List;
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.ktv.singrelay.KTVLogger;
 import io.agora.scene.ktv.singrelay.R;
-import io.agora.scene.ktv.singrelay.databinding.KtvSingrelayLayoutGameViewBinding;
+import io.agora.scene.ktv.singrelay.databinding.KtvRelayLayoutGameViewBinding;
 import io.agora.scene.ktv.singrelay.widget.lrcView.LrcControlView;
 import io.agora.scene.ktv.singrelay.widget.rankList.RankItem;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
@@ -27,7 +27,7 @@ import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 public class SingRelayGameView extends FrameLayout {
 
     private final String TAG = "SingRelayGameView_LOG";
-    protected KtvSingrelayLayoutGameViewBinding mBinding;
+    protected KtvRelayLayoutGameViewBinding mBinding;
     private boolean isRoomOwner = false;
     private OnSingRelayGameEventListener mSingRelayGameEventListener;
     private int partNum = 1;
@@ -52,7 +52,7 @@ public class SingRelayGameView extends FrameLayout {
     }
 
     private void init(Context context) {
-        mBinding = KtvSingrelayLayoutGameViewBinding.inflate(LayoutInflater.from(context), this, true);
+        mBinding = KtvRelayLayoutGameViewBinding.inflate(LayoutInflater.from(context), this, true);
         initListener();
     }
 
@@ -143,7 +143,7 @@ public class SingRelayGameView extends FrameLayout {
             mBinding.ilIDLE.btGameStart.setVisibility(View.VISIBLE);
         } else {
             mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
-            mBinding.ilIDLE.messageText.setText(R.string.ktv_game_room_owner_choosing_song);
+            mBinding.ilIDLE.messageText.setText(R.string.ktv_relay_game_room_owner_choosing_song);
             mBinding.ilIDLE.btGameStart.setVisibility(View.GONE);
         }
     }
@@ -158,7 +158,7 @@ public class SingRelayGameView extends FrameLayout {
         mBinding.ilIDLE.tvSongTab.setVisibility(View.VISIBLE);
         mBinding.ilIDLE.btGameStart.setVisibility(View.GONE);
         mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
-        mBinding.ilIDLE.messageText.setText(R.string.ktv_game_start);
+        mBinding.ilIDLE.messageText.setText(R.string.ktv_relay_game_start);
         startTimer();
     }
 
@@ -168,9 +168,9 @@ public class SingRelayGameView extends FrameLayout {
         if (mBinding == null || !isGamer) return;
         mBinding.ilActive.lrcControlView.onGraspDisable();
         if (partNum == 4) {
-            mBinding.ilActive.messageText.setText(R.string.ktv_next_round_listener_tips);
+            mBinding.ilActive.messageText.setText(R.string.ktv_relay_next_round_listener_tips);
         } else {
-            mBinding.ilActive.messageText.setText(R.string.ktv_next_round_singer_tips);
+            mBinding.ilActive.messageText.setText(R.string.ktv_relay_next_round_singer_tips);
         }
         mBinding.ilActive.messageText.setVisibility(View.VISIBLE);
         mBinding.ilActive.messageText.bringToFront();
@@ -207,7 +207,7 @@ public class SingRelayGameView extends FrameLayout {
         mBinding.ilActive.messageText.setText("");
         mBinding.ilActive.messageText.setVisibility(View.VISIBLE);
         mBinding.ilActive.messageText.bringToFront();
-        mBinding.ilActive.tvBattleResultName.setText(getResources().getString(R.string.ktv_winner_tip, userName));
+        mBinding.ilActive.tvBattleResultName.setText(getResources().getString(R.string.ktv_relay_winner_tip, userName));
         mBinding.ilActive.tvBattleResultView.setVisibility(View.VISIBLE);
         mBinding.ilActive.tvBattleResultView.bringToFront();
 
@@ -216,7 +216,7 @@ public class SingRelayGameView extends FrameLayout {
                 .error(R.mipmap.userimage)
                 .transform(new CenterCropRoundCornerTransform(100))
                 .into(mBinding.ilActive.ivWinnerHeader);
-        mBinding.ilActive.ivWinnerName.setText(getResources().getString(R.string.ktv_next_round_singer, userName));
+        mBinding.ilActive.ivWinnerName.setText(getResources().getString(R.string.ktv_relay_next_round_singer, userName));
         mBinding.ilActive.winnerTips.setVisibility(VISIBLE);
         mBinding.getRoot().postDelayed(() -> {
             if (mBinding == null) return;
@@ -253,7 +253,7 @@ public class SingRelayGameView extends FrameLayout {
         mBinding.ilActive.winnerTips.setVisibility(View.GONE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
         mBinding.ilRank.setVisibility(View.VISIBLE);
-        mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_idle_text_background);
+        mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_relay_game_idle_text_background);
 
         if (isRoomOwner) {
             mBinding.btGameAgain.setVisibility(View.VISIBLE);

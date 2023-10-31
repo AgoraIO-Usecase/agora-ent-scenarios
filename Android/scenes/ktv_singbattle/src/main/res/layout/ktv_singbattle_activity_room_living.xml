@@ -5,7 +5,7 @@
     android:id="@+id/superLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/ktv_room_bg"
+    android:background="@mipmap/ktv_singbattle_room_bg"
     tools:context=".live.RoomLivingActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -180,20 +180,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/cbMic" />
 
-    <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/btnMenu"
-        android:layout_width="38dp"
-        android:layout_height="38dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginBottom="20dp"
-        android:background="@null"
-        android:padding="5dp"
-        android:src="@mipmap/ic_more"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/cbVideo"
-        tools:ignore="SpeakableTextPresentCheck" />
-
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivNotOnMic"
         android:layout_width="wrap_content"
@@ -332,7 +318,7 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:text="Debug"
-        android:textSize="@dimen/ktv_space_small"
+        android:textSize="@dimen/ktv_singbattle_space_small"
         android:visibility="visible"
         android:textAllCaps="false"
         android:layout_marginBottom="70dp"

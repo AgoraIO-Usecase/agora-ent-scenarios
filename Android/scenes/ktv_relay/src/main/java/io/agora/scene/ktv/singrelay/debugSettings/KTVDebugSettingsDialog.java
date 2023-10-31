@@ -12,12 +12,12 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
-import io.agora.scene.ktv.singrelay.databinding.KtvDialogDebugOptionsBinding;
+import io.agora.scene.ktv.singrelay.databinding.KtvRelayDialogDebugOptionsBinding;
 
 /**
  * 控制台
  */
-public class KTVDebugSettingsDialog extends BaseBottomSheetDialogFragment<KtvDialogDebugOptionsBinding> {
+public class KTVDebugSettingsDialog extends BaseBottomSheetDialogFragment<KtvRelayDialogDebugOptionsBinding> {
     public static final String TAG = "KTVDebugSettingsDialog";
     private KTVDebugSettingBean mSetting;
 

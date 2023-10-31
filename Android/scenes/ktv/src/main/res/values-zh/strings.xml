@@ -179,5 +179,6 @@
     <string name="ktv_sound_mic_phone_type_tips">选择麦克风的预设参数</string>
     <string name="ktv_sound_preset_type">预设音效</string>
     <string name="ktv_sound_preset_off">关闭</string>
+    <string name="ktv_highlight_disable">人声突出已失效</string>
 
 </resources>

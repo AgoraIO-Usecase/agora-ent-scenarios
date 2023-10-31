@@ -7,8 +7,7 @@ import androidx.annotation.Nullable;
 
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.ktv.singbattle.bean.EffectVoiceBean;
-import io.agora.scene.ktv.singbattle.databinding.KtvItemEffectvoiceBinding;
-import io.agora.scene.ktv.singbattle.databinding.KtvItemMvBinding;
+import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleItemEffectvoiceBinding;
 
 /**
  * ---------------------------------------------------------------------------------------------
@@ -21,9 +20,9 @@ import io.agora.scene.ktv.singbattle.databinding.KtvItemMvBinding;
  * 代码备注:
  * ---------------------------------------------------------------------------------------------
  **/
-public class EffectVoiceHolder extends BaseRecyclerViewAdapter.BaseViewHolder<KtvItemEffectvoiceBinding, EffectVoiceBean> {
+public class EffectVoiceHolder extends BaseRecyclerViewAdapter.BaseViewHolder<KtvSingbattleItemEffectvoiceBinding, EffectVoiceBean> {
 
-    public EffectVoiceHolder(@NonNull KtvItemEffectvoiceBinding mBinding) {
+    public EffectVoiceHolder(@NonNull KtvSingbattleItemEffectvoiceBinding mBinding) {
         super(mBinding);
     }
 
