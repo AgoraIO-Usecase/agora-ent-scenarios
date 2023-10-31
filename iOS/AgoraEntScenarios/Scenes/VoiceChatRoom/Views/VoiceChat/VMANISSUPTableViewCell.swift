@@ -30,6 +30,10 @@ class VMANISSUPTableViewCell: UITableViewCell {
         didSet {
             noneBtn.tag = cellTag + 1
             anisBtn.tag = cellTag
+            noneBtn.accessibilityIdentifier = "voice_chat_ains_setting_none_\(noneBtn.tag)"
+            anisBtn.accessibilityIdentifier = "voice_chat_ains_setting_ains_\(anisBtn.tag)"
+            
+            print("\(titleLabel.text ?? "") 无降噪: \(noneBtn.accessibilityIdentifier ?? "") 有降噪: \(anisBtn.accessibilityIdentifier ?? "")")
         }
     }
 
