@@ -173,6 +173,7 @@ extension VoiceRoomChatBar {
         } else {
             cell?.redDot.isHidden = true
         }
+        cell?.accessibilityIdentifier = "voice_chat_live_\(datas[indexPath.row])"
         return cell ?? VoiceRoomChatBarCell()
     }
 

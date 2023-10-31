@@ -72,11 +72,9 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
     override public init(frame: CGRect) {
         super.init(frame: frame)
         isUserInteractionEnabled = true
-        
         encryptBtn.setBackgroundImage(UIImage.sceneImage(name: "guan", bundleName: "VoiceChatRoomResource"), for: .normal)
         encryptBtn.setBackgroundImage(UIImage.sceneImage(name: "open", bundleName: "VoiceChatRoomResource"), for: .selected)
-       
-        
+        roomNameField.accessibilityIdentifier = "voice_chat_create_room_name_tf"
         addSubViews([roomName, randomName, roomBackground, roomNameField, roomEncryption, encryptBtn, pinCode, warnMessage])
         timeLimit.titleLabel?.numberOfLines = 0
 
@@ -91,6 +89,8 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
             self?.code = $0
             self?.recover()
         }
+        
+//        create.titleLabel?.accessibilityIdentifier = "voice_chat_create_room_next_btn"
         
         warnMessage.isHidden = true
  

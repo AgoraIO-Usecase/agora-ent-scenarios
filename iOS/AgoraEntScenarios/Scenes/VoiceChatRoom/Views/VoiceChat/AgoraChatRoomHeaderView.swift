@@ -77,6 +77,7 @@ class AgoraChatRoomHeaderView: UIView {
                                    for: .normal)
         backBtn.addTarget(self, action: #selector(back), for: .touchUpInside)
         backBtn.vm_expandSize(size: 20)
+        backBtn.accessibilityIdentifier = "voice_chat_room_back_btn"
         addSubview(backBtn)
 
         addSubview(moreBtn)

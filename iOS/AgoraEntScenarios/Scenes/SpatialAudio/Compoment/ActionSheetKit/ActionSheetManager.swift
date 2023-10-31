@@ -31,6 +31,7 @@ class ActionSheetModel: NSObject {
     var cutsomView: UIView?
     var customViewHeight: CGFloat = 0
     var isHiddenLine: Bool = true
+    var accessibilityIdentifier: String?
     
     var cellIdentifier: String {
         switch cellType {
@@ -106,6 +107,12 @@ class ActionSheetManager: UIView {
     private var sectionHeaderArray: [ActionSheetSectionModel] = []
     private var tableViewHCons: NSLayoutConstraint?
     private var isVoice: Bool = false
+    
+    var backButtonAccessibilityIdentifier: String? {
+        didSet{
+            backButton.accessibilityIdentifier = backButtonAccessibilityIdentifier
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -197,13 +204,15 @@ class ActionSheetManager: UIView {
     @objc func switchCell(iconName: String? = nil,
                     title: String?,
                     isOn: Bool = false,
-                    isEnabel: Bool = true) -> ActionSheetManager {
+                    isEnabel: Bool = true,
+                    accessibilityIdentifier: String? = nil) -> ActionSheetManager {
         let model = ActionSheetModel()
         model.title = title
         model.isOn = isOn
         model.iconName = iconName
         model.cellType = .sw
         model.isEnable = isEnabel
+        model.accessibilityIdentifier = accessibilityIdentifier
         dataArray.append(model)
         insertEmptyHeaderData()
         return self
@@ -211,13 +220,15 @@ class ActionSheetManager: UIView {
     @objc func sliderCell(iconName: String? = nil,
                     title: String?,
                     value: Double,
-                    isEnable: Bool = true) -> ActionSheetManager {
+                    isEnable: Bool = true,
+                    accessibilityIdentifier: String? = nil) -> ActionSheetManager {
         let model = ActionSheetModel()
         model.title = title
         model.value = value
         model.iconName = iconName
         model.cellType = .slider
         model.isEnable = isEnable
+        model.accessibilityIdentifier = accessibilityIdentifier
         dataArray.append(model)
         insertEmptyHeaderData()
         return self
@@ -801,6 +812,7 @@ class ActionSheetSwitchCell: UITableViewCell {
         iconImageView.image = UIImage.sceneImage(name: model.iconName ?? "")
         sw.setOn(model.isOn, animated: true)
         lineView.isHidden = model.isHiddenLine
+        sw.accessibilityIdentifier = model.accessibilityIdentifier
     }
     
     private func setupUI() {
@@ -918,6 +930,7 @@ class ActionSheetSliderCell: UITableViewCell {
         slider.setValue(Float(model.value), animated: true)
         iconImageView.image = UIImage.sceneImage(name: model.iconName ?? "")
         lineView.isHidden = model.isHiddenLine
+        slider.accessibilityIdentifier = accessibilityIdentifier
     }
     
     private func setupUI() {

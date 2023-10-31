@@ -46,6 +46,7 @@ class HomeContentViewCell: UICollectionViewCell {
                              .font: UIFont.systemFont(ofSize: 10.fit)], range: NSRange(location: (model?.title?.count ?? 0) + 1,
                                                                                        length: model?.desc?.count ?? 0))
         titleLabel.attributedText = attrs
+        titleLabel.accessibilityIdentifier = "home_cell_\(model?.imageName ?? "")"
     }
     
     private func setupUI() {
