@@ -7,30 +7,30 @@ import androidx.annotation.NonNull;
 
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.ktv.singbattle.R;
-import io.agora.scene.ktv.singbattle.databinding.KtvItemRankListBinding;
+import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleItemRankListBinding;
 import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
-public class RankListAdapter extends BindingSingleAdapter<RankItem, KtvItemRankListBinding> {
+public class RankListAdapter extends BindingSingleAdapter<RankItem, KtvSingbattleItemRankListBinding> {
     @Override
-    public void onBindViewHolder(@NonNull BindingViewHolder<KtvItemRankListBinding> holder, int position) {
+    public void onBindViewHolder(@NonNull BindingViewHolder<KtvSingbattleItemRankListBinding> holder, int position) {
         RankItem item = getItem(position);
-        KtvItemRankListBinding mBinding = holder.binding;
+        KtvSingbattleItemRankListBinding mBinding = holder.binding;
         if (position == 0) {
-            mBinding.ivBg.setBackgroundResource(R.mipmap.ktv_game_rank_list_1_background);
+            mBinding.ivBg.setBackgroundResource(R.mipmap.ktv_singbattle_game_rank_list_1_background);
             mBinding.tvTank.setBackgroundResource(R.mipmap.ktv_game_rank_1);
             mBinding.tvTank.setText("");
         } else if (position == 1) {
-            mBinding.ivBg.setBackgroundResource(R.mipmap.ktv_game_rank_list_2_background);
+            mBinding.ivBg.setBackgroundResource(R.mipmap.ktv_singbattle_game_rank_list_2_background);
             mBinding.tvTank.setBackgroundResource(R.mipmap.ktv_game_rank_2);
             mBinding.tvTank.setText("");
         } else if (position == 2) {
-            mBinding.ivBg.setBackgroundResource(R.mipmap.ktv_game_rank_list_3_background);
+            mBinding.ivBg.setBackgroundResource(R.mipmap.ktv_singbattle_game_rank_list_3_background);
             mBinding.tvTank.setBackgroundResource(R.mipmap.ktv_game_rank_3);
             mBinding.tvTank.setText("");
         } else {
-            mBinding.ivBg.setBackgroundResource(R.mipmap.ktv_game_rank_list_default_background);
+            mBinding.ivBg.setBackgroundResource(R.mipmap.ktv_singbattle_game_rank_list_default_background);
             mBinding.tvTank.setBackgroundResource(0);
             mBinding.tvTank.setText("" + (position + 1));
         }

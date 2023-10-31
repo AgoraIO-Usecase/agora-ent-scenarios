@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="ktv_roundStyle">
+    <style name="ktv_singbattle_roundStyle">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
 
-    <style name="ktv_cornerTinyStyle">
+    <style name="ktv_singbattle_cornerTinyStyle">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">8dp</item>
     </style>
 
 
 
-    <style name="ktv_cornerNormalStyle">
+    <style name="ktv_singbattle_cornerNormalStyle">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">@dimen/ktv_space_normal</item>
+        <item name="cornerSize">@dimen/ktv_singbattle_space_normal</item>
     </style>
 
-    <style name="ktvSongRankBtnStyle">
+    <style name="ktvSingbattleSongRankBtnStyle">
         <item name="android:layout_width">76dp</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_marginStart">3dp</item>
@@ -29,7 +29,7 @@
         <item name="android:textSize">12sp</item>
     </style>
 
-    <style name="ktvSongEffectBtnStyle">
+    <style name="ktvSingbattleSongEffectBtnStyle">
         <item name="android:layout_width">90dp</item>
         <item name="android:layout_height">52dp</item>
         <item name="android:button">@null</item>
@@ -40,7 +40,7 @@
         <item name="android:textSize">13sp</item>
     </style>
 
-    <style name="ktvScaleBtnStyle">
+    <style name="ktvSingbattleScaleBtnStyle">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
         <item name="android:button">@null</item>
@@ -52,7 +52,7 @@
         <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="ktvBeautyBtnStyle">
+    <style name="ktvSingbattleBeautyBtnStyle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:button">@null</item>
@@ -64,7 +64,7 @@
         <item name="android:textSize">12sp</item>
     </style>
 
-    <style name="ktvBeautyInputStyle">
+    <style name="ktvSingbattleBeautyInputStyle">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">48dp</item>
         <item name="android:drawablePadding">15dp</item>
