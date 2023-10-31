@@ -1,11 +1,7 @@
 package io.agora.scene.ktv.singbattle.widget.game;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.CountDownTimer;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.ImageSpan;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,10 +9,6 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.transition.Transition;
 
 import java.util.List;
 
@@ -208,12 +200,12 @@ public class SingBattleGameView extends FrameLayout {
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
         if (score < 50) {
             mBinding.ilIDLE.messageText.setText("");
-            mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_defeat_text_background);
+            mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_singbattle_game_defeat_text_background);
             mBinding.ilIDLE.scoreFailText.setVisibility(View.VISIBLE);
             mBinding.ilIDLE.scoreFailText.setText("" + score);
         } else {
             mBinding.ilIDLE.messageText.setText("");
-            mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_win_text_background);
+            mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_singbattle_game_win_text_background);
             mBinding.ilIDLE.scoreSuccessText.setVisibility(View.VISIBLE);
             mBinding.ilIDLE.scoreSuccessText.setText("" + score);
         }
@@ -235,7 +227,7 @@ public class SingBattleGameView extends FrameLayout {
         mBinding.ilIDLE.scoreFailText.setVisibility(View.GONE);
         mBinding.ilIDLE.scoreSuccessText.setVisibility(View.GONE);
         mBinding.ilIDLE.messageText.setText("下一首");
-        mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_idle_text_background);
+        mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_singbattle_game_idle_text_background);
         mBinding.getRoot().postDelayed(() -> {
             if (mSingBattleGameEventListener != null) mSingBattleGameEventListener.onNextSong();
         }, 3000);
@@ -250,7 +242,7 @@ public class SingBattleGameView extends FrameLayout {
         mBinding.ilIDLE.scoreFailText.setVisibility(View.GONE);
         mBinding.ilIDLE.scoreSuccessText.setVisibility(View.GONE);
         mBinding.ilRank.setVisibility(View.VISIBLE);
-        mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_game_idle_text_background);
+        mBinding.ilIDLE.messageText.setBackgroundResource(R.mipmap.ktv_singbattle_game_idle_text_background);
 
         if (isRoomOwner) {
             mBinding.btGameAgain.setVisibility(View.VISIBLE);
