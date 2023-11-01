@@ -655,6 +655,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers
       totalVolume:(NSInteger)totalVolume {
     [self.ktvApi didKTVAPIReceiveAudioVolumeIndicationWith:speakers totalVolume:totalVolume];
+    [self.roomPersonView updateVolumeForSpeakers:speakers];
 }
 
 - (void)rtcEngine:(AgoraRtcEngineKit * _Nonnull)engine

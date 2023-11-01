@@ -9,17 +9,10 @@ import UIKit
 
 
 class RoomNoDataView: UIView {
-    private lazy var gradientLayer: CAGradientLayer = {
-        let layer = CAGradientLayer()
-        layer.colors = [
-            UIColor(hexString: "#FFF6ED")!.cgColor,
-            UIColor(hexString: "#F6F3DB")!.cgColor,
-            UIColor(hexString: "#F7D3B1")!.cgColor,
-            UIColor(hexString: "#EEA3A1")!.cgColor,
-            UIColor(hexString: "#EFC75C")!.cgColor,
-        ]
-        
-        return layer
+    private lazy var bgImgView: UIImageView = {
+        let imgView = UIImageView()
+        imgView.image = UIImage.sceneImage(name: "roomList")
+        return imgView
     }()
     
     private lazy var noDataImageView: UIImageView = {
@@ -43,8 +36,7 @@ class RoomNoDataView: UIView {
     }
     
     private func _loadSubView() {
-        layer.addSublayer(gradientLayer)
-        gradientLayer.frame = bounds
+        addSubview(bgImgView)
         addSubview(noDataImageView)
         addSubview(noDataDialogView)
     }
@@ -52,12 +44,13 @@ class RoomNoDataView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        let padding = 0.0
-        let top = UIDevice.current.aui_SafeDistanceTop + 50
+        let padding = 52.0
+        let top = UIDevice.current.aui_SafeDistanceTop + 200
         let width = self.aui_width - padding * 2
         let imageSize = noDataImageView.image!
         let height = width * imageSize.size.height / imageSize.size.width
         noDataImageView.frame = CGRect(x: padding, y: top, width: width, height: height)
-        noDataDialogView.frame = bounds
+        noDataDialogView.frame = CGRect(x:0 , y: top + height + 30, width: self.aui_width , height: 50)
+        bgImgView.frame = bounds
     }
 }

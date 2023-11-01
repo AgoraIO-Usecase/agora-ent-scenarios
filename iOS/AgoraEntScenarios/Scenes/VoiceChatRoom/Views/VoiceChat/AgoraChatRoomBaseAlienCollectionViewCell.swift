@@ -101,8 +101,8 @@ class AgoraChatRoomBaseAlienCollectionViewCell: UICollectionViewCell {
         linkView.image = UIImage.sceneImage(name: "icons／solid／link", bundleName: "VoiceChatRoomResource")
         contentView.addSubview(linkView)
 
-        blueAlienView.micView.isHidden = true
-        redAlienView.micView.isHidden = true
+//        blueAlienView.micView.isHidden = true
+//        redAlienView.micView.isHidden = true
 
         blueAlienView.snp.makeConstraints { make in
             make.left.top.bottom.equalTo(self.contentView)
