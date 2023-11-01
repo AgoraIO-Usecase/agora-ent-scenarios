@@ -154,7 +154,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     binding.tvHC.setVisibility(View.GONE);
                     binding.tvRoomOwner.setVisibility(View.GONE);
                     binding.ivMute.setVisibility(View.GONE);
-                    binding.tvUserName.setText((position + 1) + "号麦");
+                    binding.tvUserName.setText(getString(R.string.ktv_seat_num, String.valueOf(position + 1)));
                     binding.flVideoContainer.removeAllViews();
                 } else {
                     binding.tvUserName.setText(item.getName());
@@ -851,7 +851,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     private void showChangeMusicDialog() {
         if (UiUtils.isFastClick(2000)) {
-            ToastUtils.showToast("操作太频繁");
+            ToastUtils.showToast(R.string.ktv_too_fast);
             return;
         }
         if (changeMusicDialog == null) {

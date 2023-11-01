@@ -448,6 +448,8 @@ class BeautyDialog constructor(context: Context) : BottomDarkDialog(context) {
             GROUP_ID_BEAUTY -> {
                 mTopBinding.root.isVisible = itemId != ITEM_ID_BEAUTY_NONE
                 if (itemId != ITEM_ID_BEAUTY_NONE) {
+                    mTopBinding.slider.isVisible = true
+                    mTopBinding.tvStrength.isVisible = true
                     mTopBinding.slider.value = BeautyCache.getItemValueWithDefault(itemId)
                     mTopBinding.slider.addOnChangeListener { slider, sValure, fromUser ->
                         beautyProcessor?.setFaceBeautify(itemId, sValure)
@@ -458,6 +460,8 @@ class BeautyDialog constructor(context: Context) : BottomDarkDialog(context) {
             GROUP_ID_FILTER -> {
                 mTopBinding.root.isVisible = itemId != ITEM_ID_FILTER_NONE
                 if (itemId != ITEM_ID_FILTER_NONE) {
+                    mTopBinding.slider.isVisible = true
+                    mTopBinding.tvStrength.isVisible = true
                     mTopBinding.slider.value = BeautyCache.getItemValueWithDefault(itemId)
                     mTopBinding.slider.addOnChangeListener { slider, value, fromUser ->
                         beautyProcessor?.setFilter(itemId, value)
@@ -468,6 +472,8 @@ class BeautyDialog constructor(context: Context) : BottomDarkDialog(context) {
             GROUP_ID_EFFECT -> {
                 mTopBinding.root.isVisible = itemId != ITEM_ID_EFFECT_NONE
                 if (itemId != ITEM_ID_EFFECT_NONE) {
+                    mTopBinding.slider.isVisible = true
+                    mTopBinding.tvStrength.isVisible = true
                     mTopBinding.slider.value = BeautyCache.getItemValueWithDefault(itemId)
                     mTopBinding.slider.addOnChangeListener { slider, value, fromUser ->
                         beautyProcessor?.setEffect(itemId, value)
@@ -478,6 +484,8 @@ class BeautyDialog constructor(context: Context) : BottomDarkDialog(context) {
             GROUP_ID_ADJUST -> {
                 mTopBinding.root.isVisible = itemId != ITEM_ID_ADJUST_NONE
                 if (itemId != ITEM_ID_ADJUST_NONE) {
+                    mTopBinding.slider.isVisible = true
+                    mTopBinding.tvStrength.isVisible = true
                     mTopBinding.slider.value = BeautyCache.getItemValueWithDefault(itemId)
                     mTopBinding.slider.addOnChangeListener { slider, value, fromUser ->
                         beautyProcessor?.setAdjust(itemId, value)
