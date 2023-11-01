@@ -18,12 +18,12 @@ import androidx.core.view.WindowInsetsCompat;
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
 import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.ktv.singrelay.R;
-import io.agora.scene.ktv.singrelay.databinding.KtvDialogMusicSettingBinding;
+import io.agora.scene.ktv.singrelay.databinding.KtvRelayDialogMusicSettingBinding;
 
 /**
  * 控制台
  */
-public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogMusicSettingBinding> {
+public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvRelayDialogMusicSettingBinding> {
     public static final String TAG = "MusicSettingDialog";
     private MusicSettingBean mSetting;
     private Boolean isPause = false;
@@ -76,17 +76,10 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
                     return WindowInsetsCompat.CONSUMED;
                 });
 
-        // 升降调
-        tuningTone(null);
         mBinding.switchEar.setChecked(this.mSetting.isEar());
 
         mBinding.sbVol1.setProgress(this.mSetting.getVolMic());
         mBinding.sbVol2.setProgress(this.mSetting.getVolMusic());
-
-        mBinding.changeToneView.currentPitch = getCurrentPitch(mSetting.getToneValue());
-        setSoundMode();
-        mBinding.btnToneDownDialogSetting.setOnClickListener(v -> tuningTone(false));
-        mBinding.btnToneUpDialogSetting.setOnClickListener(v -> tuningTone(true));
 
         if (isPause) {
             mBinding.textRemoteVolume.setEnabled(false);
@@ -172,75 +165,6 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
                 }
             }
         });
-    }
-
-    private void setSoundMode() {
-        int margin = UiUtil.dp2px(10);
-        String[] stringArray = getResources().getStringArray(R.array.ktv_audioPreset);
-        for (int i = 0; i < stringArray.length; i++) {
-            RadioButton radioButton = (RadioButton) getLayoutInflater().inflate(R.layout.btn_sound_mode, null);
-            radioButton.setText(stringArray[i]);
-            if (i % 4 == 0) {
-                radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode4);
-            } else if (i % 3 == 0) {
-                radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode3);
-            } else if (i % 2 == 0) {
-                radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode2);
-            } else {
-                radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode1);
-            }
-            mBinding.radioGroup.addView(radioButton);
-            ((LinearLayout.LayoutParams) radioButton.getLayoutParams()).setMargins(margin, 0, 0, 0);
-            if (0 == i) {
-                radioButton.setChecked(true);
-            } else if (i == stringArray.length - 1) {
-                ((LinearLayout.LayoutParams) radioButton.getLayoutParams()).setMargins(margin, 0, margin, 0);
-            }
-            int finalI = i;
-            radioButton.setOnCheckedChangeListener((compoundButton, b) -> {
-                if (b) {
-                    mSetting.setEffect(finalI);
-                }
-            });
-        }
-        ((RadioButton) mBinding.radioGroup.getChildAt(mSetting.getEffect())).setChecked(true);
-    }
-
-    /**
-     * IMediaPlayer.java
-     * /**
-     * Sets the pitch of the current media file.
-     * pitch Sets the pitch of the local music file by chromatic scale. The default value is 0,
-     * which means keeping the original pitch. The value ranges from -12 to 12, and the pitch value
-     * between consecutive values is a chromatic value. The greater the absolute value of this
-     * parameter, the higher or lower the pitch of the local music file.
-     * *
-     * - 0: Success.
-     * - < 0: Failure.
-     * int setAudioMixingPitch(int pitch);
-     *
-     * @param toneUp true -> +1 | false -> -1 | null -> update value
-     */
-    private void tuningTone(Boolean toneUp) {
-        int newToneValue = this.mSetting.getToneValue();
-        if (toneUp != null) {
-            if (toneUp) {
-                mBinding.changeToneView.currentPitchPlus();
-                newToneValue += 2;
-            } else {
-                newToneValue -= 2;
-                mBinding.changeToneView.currentPitchMinus();
-            }
-            if (newToneValue > 12)
-                newToneValue = 12;
-
-            if (newToneValue < -12)
-                newToneValue = -12;
-
-            if (newToneValue != this.mSetting.getToneValue())
-                this.mSetting.setToneValue(newToneValue);
-        }
-//        mBinding.textToneDialogSetting.setText(String.valueOf(newToneValue));
     }
 
     public void onStopPlayer() {

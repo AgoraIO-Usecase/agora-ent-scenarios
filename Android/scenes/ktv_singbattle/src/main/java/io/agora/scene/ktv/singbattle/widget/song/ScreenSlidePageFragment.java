@@ -59,7 +59,7 @@ public class ScreenSlidePageFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return (ViewGroup) inflater.inflate(R.layout.fragment_screen_slide_page, container, false);
+        return (ViewGroup) inflater.inflate(R.layout.ktv_singbattle_fragment_screen_slide_page, container, false);
     }
 
     @Override

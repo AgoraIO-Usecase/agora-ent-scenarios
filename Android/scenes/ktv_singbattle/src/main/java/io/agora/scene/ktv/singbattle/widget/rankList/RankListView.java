@@ -11,10 +11,10 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.agora.scene.ktv.singbattle.databinding.KtvLayoutGameRankListViewBinding;
+import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleLayoutGameRankListViewBinding;
 
 public class RankListView extends FrameLayout {
-    protected KtvLayoutGameRankListViewBinding mBinding;
+    protected KtvSingbattleLayoutGameRankListViewBinding mBinding;
     private final RankListAdapter mAdapter = new RankListAdapter();
     public RankListView(@NonNull Context context) {
         this(context, null);
@@ -30,7 +30,7 @@ public class RankListView extends FrameLayout {
     }
 
     private void init(Context context) {
-        mBinding = KtvLayoutGameRankListViewBinding.inflate(LayoutInflater.from(context), this, true);
+        mBinding = KtvSingbattleLayoutGameRankListViewBinding.inflate(LayoutInflater.from(context), this, true);
         mBinding.rvRankList.setAdapter(mAdapter);
     }
 

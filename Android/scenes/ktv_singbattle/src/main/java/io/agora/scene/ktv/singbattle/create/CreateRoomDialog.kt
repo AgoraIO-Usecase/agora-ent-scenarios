@@ -131,7 +131,7 @@ class CreateRoomDialog(
 
     private fun randomName() {
         mBinding.etRoomName.setText(
-            resources.getStringArray(R.array.ktv_roomName)[Random().nextInt(21)]
+            resources.getStringArray(R.array.ktv_singbattle_roomName)[Random().nextInt(21)]
         )
     }
 
