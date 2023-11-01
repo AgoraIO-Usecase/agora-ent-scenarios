@@ -36,11 +36,12 @@
     flowLayOut.scrollDirection = UICollectionViewScrollDirectionVertical;
     
     CGFloat itemW = VLREALVALUE_WIDTH(54);
-    CGFloat middleMargin = (SCREEN_WIDTH - 40 - 2*27 - 4*itemW)/3.0;
+    CGFloat middleMargin = (SCREEN_WIDTH - 40 - 2*27 - 4*itemW - 10 * 2)/3.0;
     CGFloat itemH = VLREALVALUE_WIDTH(54)+33;
     flowLayOut.itemSize = CGSizeMake(itemW, itemH);
     flowLayOut.minimumInteritemSpacing = middleMargin;
     flowLayOut.minimumLineSpacing = 15;
+    flowLayOut.sectionInset = UIEdgeInsetsMake(10, 10, 10, 10);
     
     self.personCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(20, 0, SCREEN_WIDTH - 40, itemH*2+15) collectionViewLayout:flowLayOut];
     self.personCollectionView.dataSource = self;
@@ -140,6 +141,27 @@
     if (self.delegate && [self.delegate respondsToSelector:@selector(onVLRoomPersonView:seatItemTappedWithModel:atIndex:)]) {
         [self.delegate onVLRoomPersonView:self seatItemTappedWithModel:roomSeatModel atIndex:indexPath.row];
     }
+}
+
+- (void)updateVolumeForSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *) speakers {
+    for (AgoraRtcAudioVolumeInfo *speaker in speakers) {
+        for (VLRoomSeatModel *model in self.roomSeatsArray) {
+            NSInteger speakerUid = speaker.uid;
+            // 0是自己在说话
+            if (speakerUid == 0) {
+                speakerUid = VLUserCenter.user.chat_uid.integerValue;
+            }
+            if(model.rtcUid && model.rtcUid.integerValue == speakerUid) {
+                [self updateVolumeForIndex:model.seatIndex volume:speaker.volume];
+                break;
+            }
+        }
+    }
+}
+
+- (void)updateVolumeForIndex:(NSInteger) index volume:(NSInteger) volume {
+    VLMicSeatCell *cell = [self.personCollectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
+    cell.volume = volume;
 }
 
 - (void)updateSingBtnWithChoosedSongArray:(NSArray *)choosedSongArray {
