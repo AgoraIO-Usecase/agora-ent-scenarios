@@ -72,6 +72,7 @@ import io.agora.scene.ktv.ktvapi.KTVSingRole;
 import io.agora.scene.ktv.ktvapi.KTVType;
 import io.agora.scene.ktv.ktvapi.MusicLoadStatus;
 import io.agora.scene.ktv.ktvapi.SwitchRoleFailReason;
+import io.agora.scene.ktv.service.VolumeModel;
 import io.agora.scene.ktv.widget.soundcard.SoundCardSettingBean;
 import io.agora.scene.ktv.service.ChooseSongInputModel;
 import io.agora.scene.ktv.service.JoinRoomOutputModel;
@@ -111,6 +112,8 @@ public class RoomLivingViewModel extends ViewModel {
     boolean isOnSeat = false;
     final MutableLiveData<List<RoomSeatModel>> seatListLiveData = new MutableLiveData<>(new ArrayList<>());
     final MutableLiveData<RoomSeatModel> seatLocalLiveData = new MutableLiveData<>();
+
+    final MutableLiveData<VolumeModel> volumeLiveData = new MutableLiveData<>();
 
     /**
      * 歌词信息
@@ -1397,6 +1400,14 @@ public class RoomLivingViewModel extends ViewModel {
                 super.onLocalAudioStats(stats);
                 if (mSetting == null) return;
                 mSetting.setEarBackDelay(stats.earMonitorDelay);
+            }
+
+            @Override
+            public void onAudioVolumeIndication(AudioVolumeInfo[] speakers, int totalVolume) {
+                super.onAudioVolumeIndication(speakers, totalVolume);
+                for (AudioVolumeInfo speaker : speakers) {
+                    volumeLiveData.postValue(new VolumeModel(speaker.uid, speaker.volume));
+                }
             }
         };
         config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING;
