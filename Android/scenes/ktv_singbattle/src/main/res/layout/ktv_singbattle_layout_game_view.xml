@@ -14,13 +14,13 @@
 
         <include
             android:id="@+id/ilIDLE"
-            layout="@layout/ktv_layout_game_idle_view"
+            layout="@layout/ktv_singbattle_layout_game_idle_view"
             android:visibility="visible"
             tools:visibility="visible" />
 
         <include
             android:id="@+id/ilActive"
-            layout="@layout/ktv_layout_game_active_view"
+            layout="@layout/ktv_singbattle_layout_game_active_view"
             android:visibility="gone"
             tools:visibility="visible" />
 
