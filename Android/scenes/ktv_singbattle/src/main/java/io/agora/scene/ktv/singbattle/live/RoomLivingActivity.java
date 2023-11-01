@@ -121,14 +121,14 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
                         if (roomLivingViewModel.isRoomOwner()) {
                             if (!item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                                 if (roomLivingViewModel.singBattleGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
-                                    ToastUtils.showToast("正在游戏中，游戏结束后方可踢人下麦");
+                                    ToastUtils.showToast(R.string.ktv_singbattle_gaming_seat_tip1);
                                     return;
                                 }
                                 showUserLeaveSeatMenuDialog(item);
                             }
                         } else if (item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                             if (roomLivingViewModel.singBattleGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
-                                ToastUtils.showToast("正在游戏中，游戏结束后方可下麦");
+                                ToastUtils.showToast(R.string.ktv_singbattle_gaming_seat_tip2);
                                 return;
                             }
                             showUserLeaveSeatMenuDialog(item);
@@ -138,7 +138,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
                         RoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
                         if (seatLocal == null || seatLocal.getSeatIndex() < 0) {
                             if (roomLivingViewModel.singBattleGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
-                                ToastUtils.showToast("游戏进行中，请在下局游戏开始前上麦");
+                                ToastUtils.showToast(R.string.ktv_singbattle_gaming_seat_tip3);
                                 return;
                             }
                             toggleAudioRun = () -> {
@@ -158,7 +158,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
                     binding.tvHC.setVisibility(View.GONE);
                     binding.tvRoomOwner.setVisibility(View.GONE);
                     binding.ivMute.setVisibility(View.GONE);
-                    binding.tvUserName.setText(String.valueOf(position + 1));
+                    binding.tvUserName.setText(getString(R.string.ktv_singbattle_seat_num, String.valueOf(position + 1)));
                     binding.flVideoContainer.removeAllViews();
                 } else {
                     binding.tvUserName.setText(item.getName());
@@ -816,7 +816,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
 
     private void showChangeMusicDialog() {
         if (UiUtils.isFastClick(2000)) {
-            ToastUtils.showToast("操作太频繁");
+            ToastUtils.showToast(R.string.ktv_singbattle_too_fast);
             return;
         }
         if (changeMusicDialog == null) {

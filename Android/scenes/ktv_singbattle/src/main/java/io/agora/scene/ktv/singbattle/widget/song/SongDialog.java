@@ -131,7 +131,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
         });
         mBinding.ilGameSong.btStartGame.setOnClickListener(v -> {
             if (chosenSong < 4) {
-                ToastUtils.showToast("至少需要4首歌才能开始游戏");
+                ToastUtils.showToast(R.string.ktv_singbattle_at_least_four);
                 return;
             }
             if (chooseSongListener != null) {
@@ -234,7 +234,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
 
         if (songs.size() == 8) {
             songChooseFragment.setSongItemDisable(false);
-            ToastUtils.showToast("歌曲已满， 开始游戏吧");
+            ToastUtils.showToast(R.string.ktv_singbattle_song_is_enough);
         } else if (songs.size() < 8) {
             songChooseFragment.setSongItemDisable(true);
         }
