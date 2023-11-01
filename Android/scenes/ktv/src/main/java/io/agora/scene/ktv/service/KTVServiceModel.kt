@@ -152,3 +152,8 @@ data class ScoringAverageModel(
     val isLocal: Boolean,
     val score: Int
 )
+
+data class VolumeModel(
+    val uid: Int,
+    val volume: Int
+)
