@@ -24,7 +24,7 @@
             android:id="@+id/tvVocalHighlight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="突出人声"
+            android:text="@string/ktv_voice_highlight"
             android:textColor="@color/white_60_percent"/>
 
         <ImageView

@@ -55,7 +55,7 @@
         android:id="@+id/singBattle"
         android:layout_width="80dp"
         android:layout_height="40dp"
-        android:background="@mipmap/ktv_start_grasp_waiting"
+        android:background="@mipmap/ktv_singbattle_start_grasp_waiting"
         android:gravity="center"
         android:text="3"
         android:paddingBottom="8dp"
