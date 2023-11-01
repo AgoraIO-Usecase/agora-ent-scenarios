@@ -25,6 +25,7 @@ public class BaseRecyclerViewAdapter<B extends ViewBinding, T, H extends BaseRec
 
     public List<T> dataList;
     private final OnItemClickListener<T> mOnItemClickListener;
+    private OnItemChildClickListener<T> mOnItemChildClickListener;
     public int selectedIndex = -1;
 
     private Class<B> bindingClass;
@@ -44,6 +45,18 @@ public class BaseRecyclerViewAdapter<B extends ViewBinding, T, H extends BaseRec
         }
 
         this.mOnItemClickListener = listener;
+    }
+
+    public BaseRecyclerViewAdapter(@Nullable List<T> dataList, @Nullable OnItemClickListener<T> listener, @Nullable OnItemChildClickListener<T> itemChildListener, Class<H> viewHolderClass) {
+        this.viewHolderClass = viewHolderClass;
+        if (dataList == null) {
+            this.dataList = new ArrayList<>();
+        } else {
+            this.dataList = new ArrayList<>(dataList);
+        }
+
+        this.mOnItemClickListener = listener;
+        this.mOnItemChildClickListener = itemChildListener;
     }
 
     @Nullable
@@ -74,6 +87,12 @@ public class BaseRecyclerViewAdapter<B extends ViewBinding, T, H extends BaseRec
                     mOnItemClickListener.onItemClick(view, position, viewType);
                 else
                     mOnItemClickListener.onItemClick(itemData, view, position, viewType);
+            };
+        }
+        if (mOnItemChildClickListener != null) {
+            holder.mChildListener = (view, extData, position, itemViewType) -> {
+                T itemData = getItemData(position);
+                mOnItemChildClickListener.onItemChildClick(itemData, extData, view, position, viewType);
             };
         }
         return holder;
@@ -172,6 +191,17 @@ public class BaseRecyclerViewAdapter<B extends ViewBinding, T, H extends BaseRec
         notifyItemChanged(index);
     }
 
+    public void replaceItems(List<T> replaceList){
+        if (dataList == null) {
+            dataList = new ArrayList<>();
+        }else {
+            dataList.clear();
+        }
+        dataList.addAll(replaceList);
+        notifyDataSetChanged();
+
+    }
+
     public void clear() {
         if (dataList == null || dataList.isEmpty()) {
             return;
@@ -212,6 +242,7 @@ public class BaseRecyclerViewAdapter<B extends ViewBinding, T, H extends BaseRec
 
     public static abstract class BaseViewHolder<B extends ViewBinding, T> extends RecyclerView.ViewHolder {
         public OnHolderItemClickListener mListener;
+        public OnHolderItemChildClickListener mChildListener;
         public final B mBinding;
 
         public BaseViewHolder(@NonNull B mBinding) {
@@ -226,8 +257,18 @@ public class BaseRecyclerViewAdapter<B extends ViewBinding, T, H extends BaseRec
             }
         }
 
+        public void onItemChildClick(Object extData, View view) {
+            if (mChildListener != null) {
+                mChildListener.onItemChildClick(view, extData, getAdapterPosition(), getItemViewType());
+            }
+        }
+
         interface OnHolderItemClickListener {
             void onItemClick(View view, int position, int itemViewType);
+        }
+
+        interface OnHolderItemChildClickListener {
+            void onItemChildClick(View view, Object extData, int position, int itemViewType);
         }
 
         public abstract void binding(@Nullable T data, int selectedIndex);
