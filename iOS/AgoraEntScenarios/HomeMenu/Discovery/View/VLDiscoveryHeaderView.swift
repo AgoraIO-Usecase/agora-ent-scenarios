@@ -38,7 +38,7 @@ class VLDiscoveryHeaderView: UICollectionReusableView {
         webView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         webView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         injectMethod(method: "JSBridge")
-        loadHtml(urlString: "\(VLURLConfig.kURLPathH5Discover)?token=\(VLUserCenter.user.token)")
+        loadHtml(urlString: "\(VLURLConfig.kURLPathH5Discover)#/?token=\(VLUserCenter.user.token)")
     }
     
     func injectMethod(method: String) {
