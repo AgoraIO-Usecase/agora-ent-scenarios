@@ -154,4 +154,12 @@
     <string name="ktv_relay_gaming_seat_tip1">正在游戏中，游戏结束后方可踢人下麦</string>
     <string name="ktv_relay_gaming_seat_tip2">正在游戏中，游戏结束后方可下麦</string>
     <string name="ktv_relay_gaming_seat_tip3">游戏进行中，请在下局游戏开始前上麦</string>
+    <string name="ktv_relay_too_fast">操作太频繁</string>
+
+    <string name="ktv_relay_debug_settings">开发者设置</string>
+    <string name="ktv_relay_debug_settings_scoring_difficulty">打分难度</string>
+    <string name="ktv_relay_debug_settings_scoring_compensation">打分补偿</string>
+    <string name="ktv_relay_debug_settings_private_param">私有参数</string>
+    <string name="ktv_relay_debug_settings_set">设置</string>
+    <string name="ktv_relay_debug_settings_audio_dump">音频Dump</string>
 </resources>
