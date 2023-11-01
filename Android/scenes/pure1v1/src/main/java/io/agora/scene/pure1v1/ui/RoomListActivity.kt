@@ -7,15 +7,14 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.view.animation.Animation
-import android.view.animation.AnimationSet
 import android.view.animation.AnimationUtils
-import android.view.animation.ScaleAnimation
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -25,7 +24,6 @@ import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.GlideOptions
-import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
@@ -240,20 +238,28 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                         user = UserInfo(userMap)
                     }
                     if (user.userId.isEmpty()) { return } // 检验数据是否有效
-                    CallServiceManager.instance.fetchAcceptCallToken(fromRoomId, null)
+                    var acceptCallToken: String? = null
+                    var accepted = false
+                    CallServiceManager.instance.fetchAcceptCallToken(fromRoomId) { rtcToken ->
+                        acceptCallToken = rtcToken
+                        if (accepted && rtcToken != null) {
+                            CallServiceManager.instance.callApi?.accept(fromRoomId, fromUserId, rtcToken) {
+                            }
+                        }
+                        if (rtcToken == null) {
+                            Toast.makeText(this@RoomListActivity, "Fetch RTC token failed", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                     CallServiceManager.instance.remoteUser = user
                     val dialog = CallReceiveDialog(this, user)
                     dialog.setListener(object : CallReceiveDialog.CallReceiveDialogListener {
                         override fun onReceiveViewDidClickAccept() { // 点击接通
                             // 获取多媒体权限
                             permissionHelp.checkCameraAndMicPerms({
-                                // 获取token
-                                CallServiceManager.instance.fetchAcceptCallToken(fromRoomId) { rtcToken ->
-                                    if (rtcToken != null) {
-                                        CallServiceManager.instance.callApi?.accept(fromRoomId, fromUserId, rtcToken) {
-                                        }
-                                    } else {
-                                        Toast.makeText(this@RoomListActivity, "Fetch RTC token failed", Toast.LENGTH_SHORT).show()
+                                accepted = true
+                                val rtcToken = acceptCallToken
+                                if (rtcToken != null) {
+                                    CallServiceManager.instance.callApi?.accept(fromRoomId, fromUserId, rtcToken) {
                                     }
                                 }
                             }, {
@@ -317,12 +323,12 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         }
     }
 
-    fun onCallLogger(tag: String, level: Int, message: String) {
-        when (level) {
-            Log.ERROR -> Pure1v1Logger.e(tag, message)
-            Log.WARN -> Pure1v1Logger.w(tag, message)
-            else -> Pure1v1Logger.d(tag, message)
-        }
+    override fun callDebugInfo(message: String) {
+        Pure1v1Logger.d(tag, message)
+    }
+
+    override fun callDebugWarning(message: String) {
+        Pure1v1Logger.w(tag, message)
     }
 
     private fun setupContentInspectConfig(enable: Boolean, connection: RtcConnection) {

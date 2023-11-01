@@ -2,43 +2,61 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:paddingHorizontal="5dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingHorizontal="5dp"
+    android:clipChildren="false"
+    android:clipToPadding="false">
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivMicInfo"
+    <FrameLayout
+        android:id="@+id/flSeatImages"
         android:layout_width="58dp"
         android:layout_height="58dp"
-        android:background="@drawable/voice_bg_oval_white30"
-        android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:shapeAppearance="@style/voice_seat_roundStyle" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/ivMicBotFloat"
-        android:layout_width="58dp"
-        android:layout_height="58dp"
-        android:background="@drawable/voice_bg_oval_black50"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/ivMicInfo"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toEndOf="@+id/ivMicInfo"
-        app:layout_constraintStart_toStartOf="@+id/ivMicInfo"
-        app:layout_constraintTop_toTopOf="@+id/ivMicInfo"
-        app:shapeAppearance="@style/voice_seat_roundStyle" />
+        <View
+            android:id="@+id/vWave1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0"
+            android:background="@drawable/voice_rect_r999_blue75adff"
+            />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivMicInnerIcon"
-        android:layout_width="58dp"
-        android:layout_height="58dp"
-        android:src="@drawable/voice_ic_mic_empty"
-        app:layout_constraintBottom_toBottomOf="@+id/ivMicInfo"
-        app:layout_constraintEnd_toEndOf="@+id/ivMicInfo"
-        app:layout_constraintStart_toStartOf="@+id/ivMicInfo"
-        app:layout_constraintTop_toTopOf="@+id/ivMicInfo" />
+        <View
+            android:id="@+id/vWave2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0"
+            android:background="@drawable/voice_rect_r999_blue75adff"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivMicInfo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/voice_bg_oval_white30"
+            android:scaleType="centerCrop"
+            app:shapeAppearance="@style/voice_seat_roundStyle"
+            />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivMicBotFloat"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/voice_bg_oval_black50"
+            android:visibility="gone"
+            app:shapeAppearance="@style/voice_seat_roundStyle"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivMicInnerIcon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/voice_ic_mic_empty"
+            />
+    </FrameLayout>
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtMicRotActive"
@@ -52,9 +70,9 @@
         android:textColor="@color/voice_white"
         android:textSize="@dimen/voice_sp_11"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@+id/ivMicInfo"
-        app:layout_constraintStart_toStartOf="@+id/ivMicInfo"
-        app:layout_constraintTop_toBottomOf="@+id/ivMicInfo" />
+        app:layout_constraintEnd_toEndOf="@+id/flSeatImages"
+        app:layout_constraintStart_toStartOf="@+id/flSeatImages"
+        app:layout_constraintTop_toBottomOf="@+id/flSeatImages" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivMicTag"
@@ -62,8 +80,8 @@
         android:layout_height="wrap_content"
         android:src="@drawable/voice_icon_room_mic_mute_tag"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/ivMicInfo"
-        app:layout_constraintEnd_toEndOf="@id/ivMicInfo" />
+        app:layout_constraintBottom_toBottomOf="@id/flSeatImages"
+        app:layout_constraintEnd_toEndOf="@id/flSeatImages" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtMicUsername"
@@ -76,8 +94,8 @@
         android:textColor="#AEABD0"
         android:textSize="@dimen/voice_sp_11"
         android:maxLines="1"
-        app:layout_constraintEnd_toEndOf="@+id/ivMicInfo"
-        app:layout_constraintStart_toStartOf="@+id/ivMicInfo"
-        app:layout_constraintTop_toBottomOf="@+id/ivMicInfo"
+        app:layout_constraintEnd_toEndOf="@+id/flSeatImages"
+        app:layout_constraintStart_toStartOf="@+id/flSeatImages"
+        app:layout_constraintTop_toBottomOf="@+id/flSeatImages"
         tools:text="Susan Stark" />
 </androidx.constraintlayout.widget.ConstraintLayout>

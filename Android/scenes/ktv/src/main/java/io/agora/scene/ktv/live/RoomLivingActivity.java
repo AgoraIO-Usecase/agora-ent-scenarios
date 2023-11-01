@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
@@ -21,14 +22,18 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.agora.rtc2.Constants;
@@ -44,11 +49,13 @@ import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvActivityRoomLivingBinding;
 import io.agora.scene.ktv.databinding.KtvItemRoomSpeakerBinding;
 import io.agora.scene.ktv.debugSettings.KTVDebugSettingsDialog;
+import io.agora.scene.ktv.live.holder.MicSeatWaveView;
 import io.agora.scene.ktv.live.listener.LrcActionListenerImpl;
 import io.agora.scene.ktv.live.listener.SongActionListenerImpl;
 import io.agora.scene.ktv.service.JoinRoomOutputModel;
 import io.agora.scene.ktv.service.RoomSeatModel;
 import io.agora.scene.ktv.service.RoomSelSongModel;
+import io.agora.scene.ktv.service.VolumeModel;
 import io.agora.scene.ktv.widget.KtvCommonDialog;
 import io.agora.scene.ktv.widget.lrcView.LrcControlView;
 import io.agora.scene.ktv.widget.MoreDialog;
@@ -87,7 +94,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     // 房间存活时间，单位ms
     private KtvCommonDialog timeUpExitDialog;
 
-
     public static void launch(Context context, JoinRoomOutputModel roomInfo) {
         Intent intent = new Intent(context, RoomLivingActivity.class);
         intent.putExtra(EXTRA_ROOM_INFO, roomInfo);
@@ -121,7 +127,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             public void onBindViewHolder(@NonNull BindingViewHolder<KtvItemRoomSpeakerBinding> holder, int position) {
                 RoomSeatModel item = getItem(position);
                 KtvItemRoomSpeakerBinding binding = holder.binding;
-
                 boolean isOutSeat = item == null || TextUtils.isEmpty(item.getUserNo());
                 binding.getRoot().setOnClickListener(v -> {
                     if (!isOutSeat) {
@@ -148,6 +153,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 });
 
                 if (isOutSeat) {
+                    binding.vMicWave.endWave();
+                    binding.vMicWave.setVisibility(View.INVISIBLE);
                     binding.avatarItemRoomSpeaker.setImageResource(R.mipmap.ktv_ic_seat);
                     binding.avatarItemRoomSpeaker.setVisibility(View.VISIBLE);
                     binding.tvZC.setVisibility(View.GONE);
@@ -157,6 +164,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     binding.tvUserName.setText((position + 1) + "号麦");
                     binding.flVideoContainer.removeAllViews();
                 } else {
+                    binding.vMicWave.setVisibility(View.VISIBLE);
                     binding.tvUserName.setText(item.getName());
 
                     if (item.isMaster() && position == 0) {
@@ -441,7 +449,23 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.onSeatFull(false);
             }
         });
-
+        roomLivingViewModel.volumeLiveData.observe(this, volumeModel -> {
+            if (volumeModel.getUid() == 0) {
+                volumeModel = new VolumeModel(UserManager.getInstance().getUser().id.intValue(), volumeModel.getVolume());
+            }
+            for (int i = 0; i < mRoomSpeakerAdapter.getItemCount(); i++) {
+                RoomSeatModel seatModel = mRoomSpeakerAdapter.getItem(i);
+                if (seatModel != null && Integer.parseInt(seatModel.getRtcUid()) == volumeModel.getUid()) {
+                    BindingViewHolder<KtvItemRoomSpeakerBinding> holder = (BindingViewHolder<KtvItemRoomSpeakerBinding>) getBinding().rvUserMember.findViewHolderForAdapterPosition(i);
+                   if (holder == null) {return;}
+                   if (volumeModel.getVolume() == 0) {
+                       holder.binding.vMicWave.endWave();
+                   } else {
+                       holder.binding.vMicWave.startWave();
+                   }
+                }
+            }
+        });
 
         // 歌词相关
         roomLivingViewModel.mainSingerScoreLiveData.observe(this, score -> {

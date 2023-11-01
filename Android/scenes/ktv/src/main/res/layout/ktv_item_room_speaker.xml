@@ -4,17 +4,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/superLayout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:clipToPadding="false"
+    android:clipChildren="false">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/avatar_item_room_speaker"
+    <FrameLayout
+        android:id="@+id/flSeatImages"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintTop_toTopOf="parent"
-        app:shapeAppearance="@style/ktv_roundStyle"
-        tools:src="@mipmap/ktv_ic_seat" />
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        >
 
+        <io.agora.scene.ktv.live.holder.MicSeatWaveView
+            android:id="@+id/vMicWave"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:clipChildren="false"
+            android:alpha="1"
+            />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/avatar_item_room_speaker"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:shapeAppearance="@style/ktv_roundStyle"
+            tools:src="@mipmap/ktv_ic_seat"
+            />
+    </FrameLayout>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvRoomOwner"
@@ -26,7 +46,7 @@
         android:textColor="@color/white"
         android:textSize="8sp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/avatar_item_room_speaker"
+        app:layout_constraintBottom_toBottomOf="@id/flSeatImages"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="SmallSp" />
@@ -42,7 +62,7 @@
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/avatar_item_room_speaker" />
+        app:layout_constraintTop_toBottomOf="@+id/flSeatImages" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvZC"
@@ -92,9 +112,9 @@
         android:padding="15dp"
         android:src="@mipmap/ic_has_mute"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/avatar_item_room_speaker"
-        app:layout_constraintEnd_toEndOf="@id/avatar_item_room_speaker"
-        app:layout_constraintStart_toStartOf="@id/avatar_item_room_speaker"
-        app:layout_constraintTop_toTopOf="@id/avatar_item_room_speaker" />
+        app:layout_constraintBottom_toBottomOf="@id/flSeatImages"
+        app:layout_constraintEnd_toEndOf="@id/flSeatImages"
+        app:layout_constraintStart_toStartOf="@id/flSeatImages"
+        app:layout_constraintTop_toTopOf="@id/flSeatImages" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
