@@ -121,6 +121,7 @@
         android:id="@+id/clSoundCardParams"
         android:layout_width="match_parent"
         android:layout_height="180dp"
+        tools:visibility="invisible"
         app:layout_constraintTop_toBottomOf="@id/dvSoundCardSwitch">
 
         <!--  预设音效  -->
@@ -306,30 +307,44 @@
         android:layout_marginStart="20dp"
         android:drawableStart="@mipmap/ic_tip_error"
         android:drawablePadding="5dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="8dp"
+        android:textSize="12sp"
         android:text="@string/voice_sound_card_error"
         android:textColor="@color/red_e0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mtInputDevice" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tvSoundCardSupport"
-        android:layout_width="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/dvInputDevice" />
+    
+    
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvDisableTips"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:lineSpacingExtra="3dp"
-        android:text="@string/voice_sound_card_supports"
-        android:textColor="@color/grey_e5"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvSoundCardError" />
+        app:layout_constraintTop_toBottomOf="@id/tvSoundCardError"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        android:backgroundTint="#FAFBFC">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvSoundCardSupport"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:paddingVertical="12dp"
+            android:textSize="13sp"
+            android:text="@string/voice_sound_card_supports"
+            android:textColor="#3C4267"
+            />
+    </androidx.cardview.widget.CardView>
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/groupSoundCardAbnormal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:constraint_referenced_ids="tvSoundCardError,tvSoundCardSupport"
+        app:constraint_referenced_ids="tvSoundCardError,cvDisableTips"
         tools:visibility="invisible" />
 
     <androidx.constraintlayout.widget.Group

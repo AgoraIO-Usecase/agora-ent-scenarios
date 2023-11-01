@@ -1,8 +1,10 @@
 package io.agora.scene.pure1v1.ui
 
 import android.Manifest
+import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -15,8 +17,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
+import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -67,7 +72,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        setOnApplyWindowInsetsListener()
         setupView()
 
         CallServiceManager.instance.setup(this)
@@ -78,6 +83,14 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         CallServiceManager.instance.callApi?.addListener(this)
     }
 
+    private fun setOnApplyWindowInsetsListener() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v: View, insets: WindowInsetsCompat ->
+            val inset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            binding.root.setPaddingRelative(0, 0, 0, inset.bottom)
+            binding.titleView.setPaddingRelative(0, inset.top, 0, 0)
+            WindowInsetsCompat.CONSUMED
+        }
+    }
     override fun onBackPressed() {
         CallServiceManager.instance.cleanUp()
         super.onBackPressed()
@@ -89,13 +102,12 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
 
     private fun fetchRoomList() {
-        val anim = AnimationUtils.loadAnimation(this, R.anim.pure1v1_center_rotation)
-        binding.ivRefresh.startAnimation(anim)
-        binding.ivRefresh.isEnabled = false
+        animateLoadingIcon()
+        binding.titleView.rightIcon.isEnabled = false
         CallServiceManager.instance.sceneService?.getUserList { msg, list ->
-            binding.ivRefresh.postDelayed({
-                binding.ivRefresh.clearAnimation()
-                binding.ivRefresh.isEnabled = true
+            binding.titleView.postDelayed({
+                binding.titleView.rightIcon.isEnabled = true
+                rotateAnimator?.cancel()
             },1000)
             // 用户是否在线
             val living = list.any { it.userId == CallServiceManager.instance.localUser?.userId }
@@ -123,7 +135,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     false
                 )
             }
-            updateView()
             mayShowGuideView()
         }
     }
@@ -136,18 +147,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     fetchRoomList()
                 }
             }
-        }
-    }
-
-    private fun updateView() {
-        if (dataList.isEmpty()) {
-            binding.tvRoomTitle.setTextColor(Color.BLACK)
-            binding.ivBack.setImageResource(R.drawable.pure1v1_room_list_back_dark)
-            binding.ivRefresh.setImageResource(R.drawable.pure1v1_room_list_refresh_dark)
-        } else {
-            binding.tvRoomTitle.setTextColor(Color.WHITE)
-            binding.ivBack.setImageResource(R.drawable.pure1v1_room_list_back_light)
-            binding.ivRefresh.setImageResource(R.drawable.pure1v1_room_list_refresh_light)
         }
     }
 
@@ -366,12 +365,30 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         })
         binding.viewPager2.offscreenPageLimit = 1
         binding.viewPager2.adapter = adapter
-        binding.ivRefresh.setOnClickListener {
-            fetchRoomList()
-        }
-        binding.ivBack.setOnClickListener {
+        binding.titleView.setLeftClick {
             CallServiceManager.instance.cleanUp()
             finish()
+        }
+        binding.titleView.setRightIconClick {
+            fetchRoomList()
+        }
+    }
+
+    private fun createRotateAnimator(): ObjectAnimator {
+        return ObjectAnimator.ofFloat(binding.titleView.rightIcon, View.ROTATION, 0f, 360f).apply {
+            duration = 1200
+            interpolator = LinearInterpolator()
+            repeatCount = ValueAnimator.INFINITE
+        }
+    }
+
+    private var rotateAnimator: Animator? = null
+
+    private fun animateLoadingIcon() {
+        if (rotateAnimator?.isRunning == true) return // 判断动画是否正在运行
+        rotateAnimator?.cancel() // 停止之前的动画
+        rotateAnimator = createRotateAnimator().apply {
+            start()
         }
     }
 
