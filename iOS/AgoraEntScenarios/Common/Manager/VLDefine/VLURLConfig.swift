@@ -18,6 +18,10 @@ enum VLURLConfig {
     static let kURLPathH5Privacy = "https://fullapp.oss-cn-beijing.aliyuncs.com/scenarios/privacy.html"
     
     //H5
+#if DEBUG
     static let kURLPathH5Discover = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/discover-dev/index.html" // 发现
+#else
+    static let kURLPathH5Discover = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/discover/index.html" // 发现
+#endif
     static let kURLPathH5ktv_feedback = "https://www.shengwang.cn/ktv_feedback" // K 歌曲库检索
 }
