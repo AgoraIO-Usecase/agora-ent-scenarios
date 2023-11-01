@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:background="@mipmap/bg_app_def_white"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -48,14 +49,14 @@
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/btnCreateRoom"
-        android:layout_width="160dp"
-        android:layout_height="70dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:gravity="center"
         android:scaleType="fitXY"
         android:backgroundTint="@android:color/transparent"
         android:textColor="@color/white"
-        android:src="@mipmap/show_img_room_list_create"
+        android:src="@drawable/show_img_room_list_create"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
