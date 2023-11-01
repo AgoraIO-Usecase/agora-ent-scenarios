@@ -145,14 +145,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 }
             }
         }
-        binding.emptyInclude.btnCreateRoom.setOnClickListener(object : OnClickJackingListener() {
-            override fun onClickJacking(view: View) {
-                mCallApi.removeListener(callApiListener)
-                mShowTo1v1Manger.deInitialize()
-                RoomCreateActivity.launch(this@RoomListActivity)
-            }
-        })
-        binding.layoutCreateRoom2.setOnClickListener(object : OnClickJackingListener() {
+        binding.btnCreateRoom.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
                 mCallApi.removeListener(callApiListener)
                 mShowTo1v1Manger.deInitialize()
@@ -304,12 +297,10 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             StatusBarUtil.hideStatusBar(window, true)
             binding.emptyInclude.root.isVisible = true
             binding.viewPager2.isVisible = false
-            binding.layoutCreateRoom2.isVisible = false
         } else {
             StatusBarUtil.hideStatusBar(window, false)
             binding.emptyInclude.root.isVisible = false
             binding.viewPager2.isVisible = true
-            binding.layoutCreateRoom2.isVisible = true
         }
     }
 

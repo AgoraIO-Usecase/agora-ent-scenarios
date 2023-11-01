@@ -261,7 +261,7 @@
     <string name="voice_sound_mic_phone_type">麦克风类型</string>
     <string name="voice_sound_mic_phone_type_tips">选择麦克风的预设参数</string>
     <string name="voice_sound_card_error">当前无法使用虚拟声卡，请连接优先输入设备！</string>
-    <string name="voice_sound_card_supports">目前支持以下设备： \n1.有线耳机 \n2.有线麦克风</string>
+    <string name="voice_sound_card_supports">目前支持以下设备：\n \n1.有线耳机 \n2.有线麦克风</string>
     <string name="voice_preset_sound">预设音效</string>
     <string name="voice_preset_sound_qingshu1">青叔音</string>
     <string name="voice_preset_sound_qingshu1_tips">男声磁性</string>

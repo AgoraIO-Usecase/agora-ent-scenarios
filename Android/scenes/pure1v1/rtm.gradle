@@ -8,12 +8,6 @@ android {
     }
 }
 
-//dependencies {
-//    api files('libs/agora-rtm-sdk.jar'){
-//        builtBy "copyRtmJar2lib"
-//    }
-//}
-
 task downloadRtmLibs {
     def destFile = new File(buildDir, 'rtm.zip')
     download {
