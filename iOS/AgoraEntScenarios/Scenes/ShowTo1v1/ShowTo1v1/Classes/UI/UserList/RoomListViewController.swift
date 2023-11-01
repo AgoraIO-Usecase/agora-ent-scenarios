@@ -93,15 +93,18 @@ class RoomListViewController: UIViewController {
     
     private lazy var createButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.frame = CGRect(x: (self.view.aui_width - 175) / 2,
-                              y: self.view.aui_height - UIDevice.current.aui_SafeDistanceBottom - 42 - 19,
-                              width: 175,
-                              height: 42)
-        button.backgroundColor = UIColor(hexString: "#345dff")
+        let width: CGFloat = 148
+        let height: CGFloat = 46
+        button.frame = CGRect(x: (self.view.aui_width - width) / 2,
+                              y: self.view.aui_height - UIDevice.current.aui_SafeDistanceBottom - height - 19,
+                              width: width,
+                              height: height)
+//        button.backgroundColor = UIColor(hexString: "#345dff")
         button.setCornerRadius(21)
         button.setTitle("user_list_create_room".showTo1v1Localization(), for: .normal)
         button.setImage(UIImage.sceneImage(name: "create_room"), for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        button.setBackgroundImage(UIImage.sceneImage(name: "create_room_bg"), for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .bold)
         button.setTitleColor(.white, for: .normal)
         button.adjustHorizonAlign(spacing: 10)
         button.addTarget(self, action: #selector(_createAction), for: .touchUpInside)
