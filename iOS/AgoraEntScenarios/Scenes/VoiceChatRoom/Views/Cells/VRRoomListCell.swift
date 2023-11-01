@@ -52,7 +52,7 @@ public final class VRRoomListCell: UITableViewCell {
 
     func setupViewsAttributes(room: VRRoomEntity) {
         entity = room
-        if let show = room.is_private, show == true {
+        if room.is_private == true {
             accessSymbol.set(image: UIImage.sceneImage(name: "suo", bundleName: "VoiceChatRoomResource"), title: LanguageManager.localValue(key: "voice_private"), titlePosition: .right, additionalSpacing: 5, state: .normal)
             accessSymbol.setBackgroundImage(UIImage.sceneImage(name: "securityType", bundleName: "VoiceChatRoomResource"), for: .normal)
             accessSymbol.isHidden = false

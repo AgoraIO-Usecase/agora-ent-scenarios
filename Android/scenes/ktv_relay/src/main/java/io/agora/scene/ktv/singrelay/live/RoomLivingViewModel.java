@@ -2,6 +2,7 @@ package io.agora.scene.ktv.singrelay.live;
 
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION;
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPERVISE;
+import static io.agora.scene.ktv.singrelay.ktvapi.KTVApiKt.createKTVApi;
 
 import android.os.Build;
 import android.text.TextUtils;
@@ -51,12 +52,12 @@ import io.agora.scene.ktv.singrelay.ktvapi.KTVApiImpl;
 import io.agora.scene.ktv.singrelay.ktvapi.KTVLoadMusicConfiguration;
 import io.agora.scene.ktv.singrelay.ktvapi.KTVLoadMusicMode;
 import io.agora.scene.ktv.singrelay.ktvapi.KTVLoadSongFailReason;
+import io.agora.scene.ktv.singrelay.ktvapi.KTVMusicType;
 import io.agora.scene.ktv.singrelay.ktvapi.KTVSingRole;
 import io.agora.scene.ktv.singrelay.ktvapi.KTVType;
 import io.agora.scene.ktv.singrelay.ktvapi.MusicLoadStatus;
 import io.agora.scene.ktv.singrelay.ktvapi.SwitchRoleFailReason;
 import io.agora.scene.ktv.singrelay.live.song.SongModel;
-import io.agora.scene.ktv.singrelay.service.ChangeMVCoverInputModel;
 import io.agora.scene.ktv.singrelay.service.JoinRoomOutputModel;
 import io.agora.scene.ktv.singrelay.service.KTVServiceProtocol;
 import io.agora.scene.ktv.singrelay.service.KTVSingRelayGameService;
@@ -76,7 +77,7 @@ public class RoomLivingViewModel extends ViewModel {
 
     private final String TAG = "KTV_Scene_LOG";
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();
-    private final KTVApi ktvApiProtocol = new KTVApiImpl();
+    private final KTVApi ktvApiProtocol = createKTVApi();
 
     // loading dialog
     private final MutableLiveData<Boolean> _loadingDialogVisible = new MutableLiveData<>(false);
@@ -342,25 +343,6 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.exitRoom() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
-            }
-            return null;
-        });
-    }
-
-    /**
-     * 设置背景
-     */
-    public void setMV_BG(int bgPosition) {
-        KTVLogger.d(TAG, "RoomLivingViewModel.setMV_BG() called: " + bgPosition);
-        ktvServiceProtocol.changeMVCover(new ChangeMVCoverInputModel(bgPosition), e -> {
-            if (e == null) {
-                // success
-                // do nothing for the subscriber will callback the new room info.
-                KTVLogger.d(TAG, "RoomLivingViewModel.setMV_BG() success");
-            } else {
-                // failure
-                KTVLogger.e(TAG, "RoomLivingViewModel.setMV_BG() failed: " + e.getMessage());
                 ToastUtils.showToast(e.getMessage());
             }
             return null;
@@ -795,7 +777,7 @@ public class RoomLivingViewModel extends ViewModel {
             public void onContentInspectResult(int result) {
                 super.onContentInspectResult(result);
                 if (result > 1) {
-                    ToastUtils.showToast(R.string.ktv_content);
+                    ToastUtils.showToast(R.string.ktv_relay_content);
                 }
             }
 
@@ -895,7 +877,7 @@ public class RoomLivingViewModel extends ViewModel {
                 roomInfoLiveData.getValue().getRoomNo(),
                 UserManager.getInstance().getUser().id.intValue(),
                 roomInfoLiveData.getValue().getRoomNo() + "_ex",
-                roomInfoLiveData.getValue().getAgoraChorusToken(), 10, KTVType.SingRelay)
+                roomInfoLiveData.getValue().getAgoraChorusToken(), 10, KTVType.SingRelay, KTVMusicType.SONG_CODE)
         );
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {

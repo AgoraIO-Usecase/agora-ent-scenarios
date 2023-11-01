@@ -49,13 +49,13 @@
     <string name="app_home_scene_voice_spatial">语聊房-空\n间音频版</string>
     <string name="app_home_scene_voice_spatial_tips">方位感和空间感</string>
     <string name="app_home_scene_live_show">秀场</string>
-    <string name="app_home_scene_live_show_tips">描述描述描述描</string>
-    <string name="app_home_scene_live_pure1v1">纯1v1私密\n房</string>
-    <string name="app_home_scene_live_pure1v1_tips">描述描述描述描</string>
+    <string name="app_home_scene_live_show_tips">高清流畅人更美</string>
+    <string name="app_home_scene_live_pure1v1">纯1v1私密房</string>
+    <string name="app_home_scene_live_pure1v1_tips">秒接通&amp;秒出图</string>
     <string name="app_home_scene_live_multiplayer">多人团战</string>
-    <string name="app_home_scene_live_multiplayer_tips">描述描述描述描</string>
+    <string name="app_home_scene_live_multiplayer_tips">敬请期待</string>
     <string name="app_home_scene_live_show1v1">秀场转1v1\n私密房</string>
-    <string name="app_home_scene_live_show1v1_tips">描述描述描述描</string>
+    <string name="app_home_scene_live_show1v1_tips">秒转场&amp;秒接通</string>
 
     <string name="app_title_home">首页</string>
     <string name="app_title_find">发现</string>

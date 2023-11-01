@@ -105,6 +105,12 @@ class VoiceRoomViewController: VRBaseViewController {
             }
         }
     }
+    
+    //虚拟声卡的属性
+    public var soundOpen: Bool = false
+    public var gainValue: String = ""
+    public var typeValue: Int = 0
+    public var effectType: Int = 0
 
     convenience init(info: VRRoomInfo) {
         self.init()
@@ -347,7 +353,7 @@ extension VoiceRoomViewController {
     func layoutUI() {
 
         let bgImgView = UIImageView()
-        bgImgView.image = UIImage.sceneImage(name: "lbg", bundleName: "VoiceChatRoomResource")
+        bgImgView.image = UIImage.sceneImage(name: "bg-main", bundleName: "VoiceChatRoomResource")
         view.addSubview(bgImgView)
 
         headerView = AgoraChatRoomHeaderView() 
@@ -637,6 +643,8 @@ extension VoiceRoomViewController {
         compent.destination = .center
         inputBar.hiddenInputBar()
         let micAlert = VoiceRoomEndLiveAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 70, height: 190), title: LanguageManager.localValue(key: "voice_end_live"), content: LanguageManager.localValue(key: "voice_the_room_will_close_after_you_leave."), cancel: LanguageManager.localValue(key: "voice_cancel"), confirm: LanguageManager.localValue(key: "voice_confirm")).cornerRadius(16).backgroundColor(.white)
+        micAlert.cancel.accessibilityIdentifier = "voice_chat_room_end_live_cancel"
+        micAlert.confirm.accessibilityIdentifier = "voice_chat_room_end_live_confirm"
         let vc = VoiceRoomAlertViewController(compent: compent, custom: micAlert)
         micAlert.actionEvents = { [weak self] in
             vc.dismiss(animated: true)

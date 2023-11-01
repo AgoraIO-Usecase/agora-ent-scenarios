@@ -122,13 +122,13 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
     self.editBtn.hidden = self.nickNameTF.isFirstResponder;
 }
 
-- (void)loadUpdateNickNameRequest:(NSString *)nickName {
-    NSDictionary *param = @{
-        @"userNo" : VLUserCenter.user.userNo ?: @"",
-        @"name" : nickName ?: @""
-    };
-    [VLAPIRequest postRequestURL:kURLPathUploadUserInfo parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-        if (response.code == 0) {
+- (void)loadUpdateNickNameRequest:(NSString *)nickName {    
+    VLUploadUserInfoNetworkModel *model = [VLUploadUserInfoNetworkModel new];
+    model.userNo = VLUserCenter.user.userNo ?: @"";
+    model.name = nickName ?: @"";
+    [model requestWithCompletion:^(NSError * _Nullable error, id _Nullable data) {
+        VLResponseData *response = data;
+        if (response.code && response.code.integerValue == 0) {
             [VLToast toast:AGLocalizedString(@"app_edit_success")];
             [self refreseNickName:nickName];
             VLUserCenter.user.name = nickName;
@@ -136,13 +136,12 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
         }else{
             [VLToast toast:response.message];
         }
-    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
     }];
 }
 
 - (void)refreseUserInfo:(VLLoginModel *)loginModel {
     self.nickNameTF.text = loginModel.name;
-    [self.avatarImgView sd_setImageWithURL:[NSURL URLWithString:loginModel.headUrl] placeholderImage:[UIImage imageNamed:@"mine_avatar_placeHolder"]];
+    [self.avatarImgView autoResizeWithAliyunUrlString:loginModel.headUrl placeholderImage:[UIImage imageNamed:@"mine_avatar_placeHolder"]];
     self.IDLabel.text = [loginModel.mobile stringByReplacingCharactersInRange:NSMakeRange(3, 4) withString:@"****"];
 }
 
@@ -220,6 +219,20 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
     UITextPosition *end = [textField positionFromPosition:endDocument offset:0];
     UITextPosition *start = [textField positionFromPosition:end offset:-textField.text.length];
     textField.selectedTextRange = [textField textRangeFromPosition:start toPosition:end];
+}
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+    NSString *text = [textField.text stringByReplacingCharactersInRange:range withString:string];
+    // 判断输入的是中文还是英文
+    BOOL isChinese = [text canBeConvertedToEncoding:NSASCIIStringEncoding] ? NO : YES;
+    // 设置字数限制
+    NSInteger maxCharacterCount = isChinese ? 5 : 10;
+    // 判断是否超过字数限制
+    if (text.length > maxCharacterCount) {
+        // 如果超过限制，不允许输入
+        return NO;
+    }
+    return YES;
 }
 
 - (UIView *)mineTopView {

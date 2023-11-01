@@ -50,7 +50,7 @@ class CreateRoomDialog(
         super.onViewCreated(view, savedInstanceState)
         roomCreateViewModel = ViewModelProvider(this)[RoomCreateViewModel::class.java]
         // 用户提示颜色
-        val spannableString = SpannableString(getString(R.string.ktv_create_room_tips))
+        val spannableString = SpannableString(getString(R.string.ktv_relay_create_room_tips))
         spannableString.setSpan(ForegroundColorSpan(Color.parseColor("#FA396A")), 77, 118, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         mBinding.tvTips.text = spannableString
         // 随机名称
@@ -131,14 +131,14 @@ class CreateRoomDialog(
 
     private fun randomName() {
         mBinding.etRoomName.setText(
-            resources.getStringArray(R.array.ktv_roomName)[Random().nextInt(21)]
+            resources.getStringArray(R.array.ktv_relay_roomName)[Random().nextInt(21)]
         )
     }
 
     private fun createRoom() {
         val roomName = mBinding.etRoomName.text.toString()
         if (TextUtils.isEmpty(roomName)) {
-            ToastUtils.showToast(R.string.ktv_please_input_room_name)
+            ToastUtils.showToast(R.string.ktv_relay_please_input_room_name)
             return
         }
         val isPrivate = mBinding.cbPassword.isChecked
@@ -147,7 +147,7 @@ class CreateRoomDialog(
                 + mBinding.etCode3.text
                 + mBinding.etCode4.text)
         if (isPrivate && password.length < 4) {
-            ToastUtils.showToast(getString(R.string.ktv_please_input_4_pwd))
+            ToastUtils.showToast(getString(R.string.ktv_relay_please_input_4_pwd))
             return
         }
         val userNo = UserManager.getInstance().user.id.toString()

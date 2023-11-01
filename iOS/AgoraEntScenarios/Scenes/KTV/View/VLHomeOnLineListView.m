@@ -102,10 +102,6 @@
     }];
 }
 
-//- (void)exitRoomEvent {
-//    [self getRoomListIfRefresh:YES];
-//}
-
 #pragma mark - UITableViewDelegate,UITableViewDataSource
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     return self.roomListModeArray.count;
@@ -115,6 +111,7 @@
   //  VL(weakSelf);
     VLHomeOnLineListCCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:[VLHomeOnLineListCCell className] forIndexPath:indexPath];
     cell.listModel = self.roomListModeArray[indexPath.row];
+    cell.bgImgView.image = [UIImage sceneImageWithName:[NSString stringWithFormat:@"create_bg_%li" ,indexPath.row % 5]];
     return cell;
 }
 
@@ -154,7 +151,7 @@ static const int INTERVAL = 1000; // 时间间隔为1秒
         flowLayOut.minimumInteritemSpacing = middleMargin;
         flowLayOut.minimumLineSpacing = 20;
         
-        _listCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 22, SCREEN_WIDTH, SCREEN_HEIGHT-kTopNavHeight-34-48-kSafeAreaBottomHeight) collectionViewLayout:flowLayOut];
+        _listCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 22, SCREEN_WIDTH, SCREEN_HEIGHT-kTopNavHeight-34-kSafeAreaBottomHeight) collectionViewLayout:flowLayOut];
         _listCollectionView.dataSource = self;
         _listCollectionView.delegate = self;
         _listCollectionView.alwaysBounceVertical = true;
@@ -178,8 +175,9 @@ static const int INTERVAL = 1000; // 时间间隔为1秒
 //                                                      title:KTVLocalizedString(@"创建房间")];
         _createBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_createBtn setTitle:KTVLocalizedString(@"ktv_create_room") forState:UIControlStateNormal];
+        [_createBtn setImage:[UIImage sceneImageWithName:@"add"] forState:UIControlStateNormal];
         _createBtn.accessibilityIdentifier = @"ktv_create_button_id";
-        [_createBtn setImage:[UIImage sceneImageWithName:@"online_list_addIcon"] forState:UIControlStateNormal];
+        [_createBtn setBackgroundImage:[UIImage sceneImageWithName:@"create_room"] forState:UIControlStateNormal];
         _createBtn.frame = CGRectMake((SCREEN_WIDTH-195)*0.5, SCREEN_HEIGHT-34-kSafeAreaBottomHeight-48-kTopNavHeight, 195, 48);
         _createBtn.layer.cornerRadius = 24;
         _createBtn.layer.masksToBounds = YES;
