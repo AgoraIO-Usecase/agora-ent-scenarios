@@ -71,35 +71,42 @@ class Pure1v1Dialog: UIView {
 }
 
 //房间无人
-class Pure1v1NoDataDialog: Pure1v1Dialog {
+class Pure1v1NoDataDialog: UIView {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
-        label.font = UIFont.systemFont(ofSize: 20)
+        label.textColor = UIColor(hexString: "#303553")
+        label.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
         label.text = "user_list_waitting".pure1v1Localization()
+        label.textAlignment = .center
         return label
     }()
     private lazy var contentLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
+        label.textColor = UIColor(hexString: "#6F738B")
         label.numberOfLines = 0
-        label.font = UIFont.systemFont(ofSize: 14)
+        label.font = UIFont.systemFont(ofSize: 14, weight: .light)
         let text = NSMutableAttributedString(string: "user_list_nodata_tips".pure1v1Localization())
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = 5
         text.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: text.length))
         label.attributedText = text
+        label.textAlignment = .center
 
         return label
     }()
-    override func _loadSubView() {
-        super._loadSubView()
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(contentLabel)
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        _loadSubView()
     }
     
-    override func contentSize() -> CGSize {
-        return CGSize(width: self.width, height: 328)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func _loadSubView() {
+        self.addSubview(titleLabel)
+        self.addSubview(contentLabel)
     }
     
     override func layoutSubviews() {
@@ -112,7 +119,7 @@ class Pure1v1NoDataDialog: Pure1v1Dialog {
         contentLabel.aui_left = 30
         contentLabel.aui_width = self.aui_width - 60
         contentLabel.sizeToFit()
-        contentLabel.aui_top = titleLabel.aui_bottom + 40
+        contentLabel.aui_top = titleLabel.aui_bottom + 20
     }
 }
 

@@ -35,7 +35,7 @@
         android:layout_height="58dp"
         android:gravity="center"
         android:textColor="@color/def_text_color_040"
-        android:textSize="18sp"
+        android:textSize="17sp"
         app:layout_constraintBottom_toBottomOf="@id/iv_back_icon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
