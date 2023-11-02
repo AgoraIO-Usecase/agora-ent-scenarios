@@ -1,11 +1,9 @@
 package com.agora.entfulldemo.home.mine
 
-import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
-import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,32 +13,43 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProvider
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppActivityFeedbackBinding
+import com.agora.entfulldemo.databinding.AppItemFeedbackImageBinding
 import com.agora.entfulldemo.databinding.AppItemFeedbackReasonBinding
 import com.agora.entfulldemo.home.MainViewModel
 import com.agora.entfulldemo.home.constructor.FeedbackModel
+import com.agora.entfulldemo.home.mine.FeedbackActivity.Companion.DeleteImage
 import com.agora.entfulldemo.widget.dp
+import com.agora.entfulldemo.widget.image.GlideEngine
+import com.agora.entfulldemo.widget.image.ImageFileCompressEngine
+import com.agora.entfulldemo.widget.image.MeOnPreviewInterceptListener
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.luck.picture.lib.basic.PictureSelectionModel
+import com.luck.picture.lib.basic.PictureSelector
+import com.luck.picture.lib.config.PictureMimeType
+import com.luck.picture.lib.config.SelectMimeType
+import com.luck.picture.lib.config.SelectModeConfig
+import com.luck.picture.lib.entity.LocalMedia
+import com.luck.picture.lib.interfaces.OnPreviewInterceptListener
+import com.luck.picture.lib.interfaces.OnResultCallbackListener
+import com.luck.picture.lib.style.PictureSelectorStyle
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.PagePathConstant
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnFastClickListener
+import io.agora.scene.base.component.OnItemChildClickListener
 import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.base.utils.UriUtils
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
-import io.agora.scene.widget.utils.ImageCompressUtil
 import io.agora.scene.widget.utils.UiUtils
-import java.io.File
 
 @Route(path = PagePathConstant.pageFeedback)
 class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
 
     companion object {
         private const val servicePhone = "400-632-6626"
-        private const val CHOOSE_PHOTO1 = 1001
-        private const val CHOOSE_PHOTO2 = 1002
-        private const val CHOOSE_PHOTO3 = 1003
+        private const val maxImageSelectable = 3
+        const val DeleteImage = "DeleteImage"
     }
 
     private val mainViewModel: MainViewModel by lazy {
@@ -60,7 +69,9 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
 
     private val mTempImageList by lazy { mutableListOf<String>() }
 
-    private val mReasonAdapter: BaseRecyclerViewAdapter<AppItemFeedbackReasonBinding, FeedbackModel, FeedbackHolder>
+//    private var mFileProvider = com.agora.entfulldemo.BuildConfig.APPLICATION_ID + ".fileProvider"
+
+    private val mReasonAdapter: BaseRecyclerViewAdapter<AppItemFeedbackReasonBinding, FeedbackModel, FeedbackReasonHolder>
             by lazy {
                 BaseRecyclerViewAdapter(
                     mFeedbackReasons,
@@ -74,9 +85,46 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
                             notifyReasonItemChanged(position)
                         }
                     },
-                    FeedbackHolder::class.java
+                    FeedbackReasonHolder::class.java
                 )
             }
+
+    private fun notifyReasonItemChanged(position: Int) {
+        mReasonAdapter.notifyItemChanged(position)
+    }
+
+    private val mImageAdapter: BaseRecyclerViewAdapter<AppItemFeedbackImageBinding, String, FeedbackImageHolder>
+            by lazy {
+                BaseRecyclerViewAdapter(
+                    emptyList<String>(),
+                    null,
+                    object : OnItemChildClickListener<String> {
+                        override fun onItemChildClick(
+                            data: String?,
+                            extData: Any?,
+                            view: View,
+                            position: Int,
+                            itemViewType: Long
+                        ) {
+                            super.onItemChildClick(data, extData, view, position, itemViewType)
+                            if (view.id == R.id.ivDelete) {
+                                Log.d("zhangw", "onItemChildClick delete:$view,position:$position")
+                                dealDeleteImage(position)
+                            }
+
+                        }
+                    },
+                    FeedbackImageHolder::class.java
+                )
+            }
+
+    private fun dealDeleteImage(position: Int) {
+        mSelectedMedia.removeAt(position)
+
+        val selectPaths = mSelectedMedia.map { it.realPath }
+        mImageAdapter.replaceItems(selectPaths)
+        binding.ivAddFeedbackImage.isVisible = mImageAdapter.dataList.size < maxImageSelectable
+    }
 
     override fun getViewBinding(inflater: LayoutInflater): AppActivityFeedbackBinding {
         return AppActivityFeedbackBinding.inflate(inflater)
@@ -90,6 +138,7 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
         binding.rvFeedbackReason.adapter = mReasonAdapter
+        binding.rvFeedbackImage.adapter = mImageAdapter
     }
 
     override fun initListener() {
@@ -97,19 +146,9 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
             val length = it?.length ?: 0
             binding.tvReasonContentCount.text = "$length/200"
         }
-        binding.ivFeedback1.setOnClickListener(object : OnFastClickListener() {
+        binding.ivAddFeedbackImage.setOnClickListener(object : OnFastClickListener() {
             override fun onClickJacking(view: View) {
-                openAlbum()
-            }
-        })
-        binding.ivFeedback2.setOnClickListener(object : OnFastClickListener() {
-            override fun onClickJacking(view: View) {
-                openAlbum()
-            }
-        })
-        binding.ivFeedback3.setOnClickListener(object : OnFastClickListener() {
-            override fun onClickJacking(view: View) {
-                openAlbum()
+                requestReadStoragePermission(true)
             }
         })
         binding.btnSubmit.setOnClickListener(object : OnFastClickListener() {
@@ -122,8 +161,10 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
                 val reasonContent = binding.etFeedbackReason.text
                 val uploadLog = binding.cvIAgree.isChecked
                 // TODO: feedback api
-                Log.d("zhangw","reasons:$selectReasons\n content:$reasonContent\n images:$mTempImageList\n " +
-                        "uploadLog:$uploadLog")
+                Log.d(
+                    "zhangw", "reasons:$selectReasons\n content:$reasonContent\n images:$mTempImageList\n " +
+                            "uploadLog:$uploadLog"
+                )
                 feedbackSuccessView()
             }
         })
@@ -149,6 +190,47 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         })
     }
 
+
+    private val mSelectorStyle = PictureSelectorStyle()
+    private val mSelectedMedia = mutableListOf<LocalMedia>()
+    private val mOnPreviewInterceptListener = MeOnPreviewInterceptListener()
+    private fun startChooseImage() {
+        val systemGalleryMode: PictureSelectionModel = PictureSelector.create(this)
+            .openGallery(SelectMimeType.TYPE_IMAGE)
+            .setSelectorUIStyle(mSelectorStyle)
+            .setSelectionMode(SelectModeConfig.MULTIPLE)
+            .setMaxSelectNum(maxImageSelectable)
+            .setSelectedData(mSelectedMedia)
+            .isMaxSelectEnabledMask(true)
+            .isDisplayCamera(false)
+            .setImageEngine(GlideEngine.createGlideEngine())
+            .setCompressEngine(ImageFileCompressEngine())
+//            .setCropEngine(null)
+            .setSkipCropMimeType(*arrayOf<String>(PictureMimeType.ofGIF(), PictureMimeType.ofWEBP()))
+            .isOriginalControl(false)
+            .setPreviewInterceptListener(mOnPreviewInterceptListener)
+//            .setSandboxFileEngine(MeSandboxFileEngine())
+        systemGalleryMode.forResult(object : OnResultCallbackListener<LocalMedia> {
+            override fun onResult(result: ArrayList<LocalMedia>) {
+                Log.d("zhangw", "startChooseImage onResult:$result")
+                mSelectedMedia.clear()
+                mSelectedMedia.addAll(result)
+                val selectPaths = result.map { it.realPath }
+                mImageAdapter.replaceItems(selectPaths)
+                binding.ivAddFeedbackImage.isVisible = mImageAdapter.dataList.size < maxImageSelectable
+            }
+
+            override fun onCancel() {
+                Log.d("zhangw", "startChooseImage onCancel")
+            }
+        })
+    }
+
+    override fun getPermissions() {
+        super.getPermissions()
+        startChooseImage()
+    }
+
     private fun checkReason(): List<FeedbackModel> {
         val selectReasons = mutableListOf<FeedbackModel>()
         mFeedbackReasons.forEach {
@@ -159,64 +241,6 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         return selectReasons
     }
 
-    private fun notifyReasonItemChanged(position: Int) {
-        mReasonAdapter.notifyItemChanged(position)
-    }
-
-    fun openAlbum() {
-        val intentToPickPic = Intent(Intent.ACTION_PICK, null)
-        intentToPickPic.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        intentToPickPic.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
-        startActivityForResult(intentToPickPic, CHOOSE_PHOTO1)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == CHOOSE_PHOTO1) {
-                val uri = data?.data ?: return
-                val filePath = UriUtils.INSTANCE.getFilePathByUri(this, uri)
-                if (!TextUtils.isEmpty(filePath)) {
-                    setImage(filePath)
-                }
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    private fun setImage(filePath: String?) {
-        if (filePath == null) return
-        var path = ImageCompressUtil.displayPath(this, filePath)
-        if (TextUtils.isEmpty(path) || File(filePath).length() <= 1024 * 1000 * 5) {
-            path = filePath
-        } else {
-            ToastUtils.showToast(R.string.app_feedback_image_limit)
-            return
-        }
-        addReasonImage(path)
-    }
-
-    private fun addReasonImage(path: String) {
-        mTempImageList.add(path)
-        if (mTempImageList.size == 1) {
-            binding.ivFeedback2.isVisible = true
-            GlideApp.with(this)
-                .load(path)
-                .transform(CenterCropRoundCornerTransform(12.dp.toInt()))
-                .into(binding.ivFeedback1)
-        } else if (mTempImageList.size == 2) {
-            binding.ivFeedback3.isVisible = true
-            GlideApp.with(this)
-                .load(path)
-                .transform(CenterCropRoundCornerTransform(12.dp.toInt()))
-                .into(binding.ivFeedback2)
-        } else if (mTempImageList.size == 3) {
-            GlideApp.with(this)
-                .load(path)
-                .transform(CenterCropRoundCornerTransform(12.dp.toInt()))
-                .into(binding.ivFeedback3)
-        }
-    }
-
     private fun feedbackSuccessView() {
         binding.groupFeedback.isVisible = false
         binding.layoutFeedbackSuccess.isVisible = true
@@ -224,7 +248,7 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
     }
 }
 
-class FeedbackHolder constructor(mBinding: AppItemFeedbackReasonBinding) :
+class FeedbackReasonHolder constructor(mBinding: AppItemFeedbackReasonBinding) :
     BaseRecyclerViewAdapter.BaseViewHolder<AppItemFeedbackReasonBinding, FeedbackModel>(mBinding) {
 
     override fun binding(feedbackModel: FeedbackModel?, selectedIndex: Int) {
@@ -235,14 +259,28 @@ class FeedbackHolder constructor(mBinding: AppItemFeedbackReasonBinding) :
             mBinding.tvTabTitle.setBackgroundResource(R.drawable.app_bg_button_303_solid_r8)
         } else {
             mBinding.tvTabTitle.setTextColor(
-                ResourcesCompat.getColor(
-                    context.resources,
-                    R.color.def_text_grey_303,
-                    null
-                )
+                ResourcesCompat.getColor(context.resources, R.color.def_text_grey_303, null)
             )
             mBinding.tvTabTitle.setBackgroundResource(R.drawable.app_bg_button_e9e_solid_r8)
         }
         mBinding.tvTabTitle.text = feedbackModel.reason
+    }
+}
+
+class FeedbackImageHolder constructor(mBinding: AppItemFeedbackImageBinding) :
+    BaseRecyclerViewAdapter.BaseViewHolder<AppItemFeedbackImageBinding, String>(mBinding) {
+
+    override fun binding(imagePath: String?, selectedIndex: Int) {
+        if (imagePath.isNullOrEmpty()) {
+            mBinding.ivImage.setImageResource(0)
+        } else {
+            GlideApp.with(mBinding.root.context)
+                .load(imagePath)
+                .transform(CenterCropRoundCornerTransform(12.dp.toInt()))
+                .into(mBinding.ivImage)
+        }
+        mBinding.ivDelete.setOnClickListener {
+            onItemChildClick(DeleteImage, it)
+        }
     }
 }

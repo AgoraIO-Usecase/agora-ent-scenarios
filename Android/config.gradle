@@ -66,6 +66,8 @@ ext {
             ok2curl            : 'com.github.mrmike:ok2curl:0.8.0',
 
             flexbox            : 'com.google.android.flexbox:flexbox:3.0.0',
+            pictureselector    : 'io.github.lucksiege:pictureselector:v3.11.1',
+            picturecompress    : 'io.github.lucksiege:compress:v3.11.1',
     ]
     android = [
             compileSdkVersion: 31,

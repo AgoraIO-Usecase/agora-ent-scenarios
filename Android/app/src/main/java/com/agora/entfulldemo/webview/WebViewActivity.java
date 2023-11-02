@@ -1,16 +1,22 @@
 package com.agora.entfulldemo.webview;
 
+import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.agora.entfulldemo.R;
 import com.agora.entfulldemo.databinding.AppActivityWebviewBinding;
@@ -40,6 +46,9 @@ public class WebViewActivity extends BaseViewBindingActivity<AppActivityWebviewB
     @Autowired(name = Constant.URL)
     String url = "https://www.agora.io/cn/about-us/";
 
+    @JvmField
+    @Autowired(name = Constant.PARAMS_WITH_BROWSER)
+    Boolean withBrowser = false;
 
     @Override
     protected AppActivityWebviewBinding getViewBinding(@NonNull LayoutInflater layoutInflater) {
@@ -58,24 +67,34 @@ public class WebViewActivity extends BaseViewBindingActivity<AppActivityWebviewB
             getBinding().titleView.setTitle(getString(R.string.app_privacy_agreement));
         } else if (url.contains("privacy/libraries")) {
             getBinding().titleView.setTitle(getString(R.string.app_third_party_info_data_sharing));
-        }else if (url.contains("ent-scenarios/pages/manifest")){
+        } else if (url.contains("ent-scenarios/pages/manifest")) {
             getBinding().titleView.setTitle(getString(R.string.app_personal_info_collection_checklist));
         }
         getBinding().webView.loadUrl(url);
 
+
+        if (withBrowser) {
+            getBinding().titleView.getRightIcon().setVisibility(View.VISIBLE);
+            getBinding().titleView.getRightIcon().setImageResource(R.drawable.app_icon_find_earth);
+            getBinding().titleView.setRightIconClick(v -> {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+            });
+        }
+
         getBinding().titleView.setLeftClick(v -> {
-            if (getBinding().webView.canGoBack()){
+            if (getBinding().webView.canGoBack()) {
                 getBinding().webView.goBack();
-            }else {
+            } else {
                 finish();
             }
         });
 
-        getBinding().webView.setWebViewClient(new CustomWebView.MyWebViewClient(){
+        getBinding().webView.setWebViewClient(new CustomWebView.MyWebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 String title = view.getTitle();
+                Log.d("zhangw", "webView title：" + title);
                 if (!TextUtils.isEmpty(title)) {
                     getBinding().titleView.setTitle(title);
                 }
@@ -85,7 +104,7 @@ public class WebViewActivity extends BaseViewBindingActivity<AppActivityWebviewB
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (getBinding().webView.canGoBack()){
+        if (getBinding().webView.canGoBack()) {
             getBinding().webView.goBack();
             return true;
         }
@@ -115,7 +134,7 @@ public class WebViewActivity extends BaseViewBindingActivity<AppActivityWebviewB
                     // TODO: 2023/5/10
                     User user = UserManager.getInstance().getUser();
                     UserModel userModel = new UserModel(user.headUrl, user.name, user.mobile);
-                    String androidId= Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+                    String androidId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
                     String type = "model:" + Build.MODEL + "\n"
                             + "manufacturer：" + Build.MANUFACTURER + "\n"
                             + "os_version：" + Build.VERSION.RELEASE + "\n"

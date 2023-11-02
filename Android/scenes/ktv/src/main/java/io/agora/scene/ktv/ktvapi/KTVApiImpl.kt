@@ -12,7 +12,6 @@ import io.agora.mediaplayer.data.SrcInfo
 import io.agora.musiccontentcenter.*
 import io.agora.rtc2.*
 import io.agora.rtc2.Constants.*
-import io.agora.utils2.internal.Logging
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.concurrent.*

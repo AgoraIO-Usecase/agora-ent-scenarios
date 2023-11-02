@@ -3,6 +3,7 @@ package io.agora.scene.base;
 public class Constant {
     public static final String CURRENT_USER = "current_user";
     public static final String URL = "url";
+    public static final String PARAMS_WITH_BROWSER = "params_with_browser";
 
     public static final String IS_AGREE = "is_agree";
 

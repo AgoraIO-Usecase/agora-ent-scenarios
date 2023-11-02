@@ -31,7 +31,7 @@ import kotlin.jvm.internal.Intrinsics;
 public final class CommonTitleView extends ConstraintLayout {
     private ViewCommonTitleBinding binding;
 
-    public ImageView getRightIcon(){
+    public ImageView getRightIcon() {
         return binding.ivRightIcon;
     }
     private final void initView(AttributeSet attrs, int defStyleAttr) {

@@ -17,6 +17,16 @@
         android:name="android.permission.FOREGROUND_SERVICE"
         tools:node="remove" />
 
+    <!-- android 13 细化权限   -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <!--适配Android R包可见性 开始-->
+    <queries package="${applicationId}">
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE"/>
+        </intent>
+    </queries>
+
     <application
         android:name="io.agora.scene.base.component.AgoraApplication"
         android:allowBackup="false"
