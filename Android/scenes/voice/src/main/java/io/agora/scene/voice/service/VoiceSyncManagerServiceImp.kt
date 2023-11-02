@@ -34,7 +34,7 @@ class VoiceSyncManagerServiceImp(
 
     private val TAG = "VC_SYNC_LOG"
 
-    private val voiceSceneId = "scene_chatRoom_3.0.2"
+    private val voiceSceneId = "scene_chatRoom_4.0.0"
     private val kRoomBGMCollection = "room_bgm"
     private var kRoomBGMId: String? = null
 
