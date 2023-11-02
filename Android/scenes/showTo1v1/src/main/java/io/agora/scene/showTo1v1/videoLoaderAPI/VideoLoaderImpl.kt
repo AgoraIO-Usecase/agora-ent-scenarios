@@ -147,23 +147,6 @@ class VideoLoaderImpl constructor(private val rtcEngine: RtcEngineEx) : VideoLoa
                     }
                     val ret = rtcEngine.joinChannelEx(token, connection, options, object : IRtcEngineEventHandler() {})
                     Log.d(tag, "joinChannel JOINED, connection:$connection, ret:$ret")
-
-                    val owner = ownerUid ?: return
-                    context?.let {
-                        val videoView = TextureView(it)
-                        val remoteVideoCanvasWrap = RemoteVideoCanvasWrap(
-                            connection,
-                            context as LifecycleOwner,
-                            videoView,
-                            Constants.RENDER_MODE_HIDDEN,
-                            owner
-                        )
-                        Log.d("hugo", "setupRemoteVideoEx777")
-                        rtcEngine.setupRemoteVideoEx(
-                            remoteVideoCanvasWrap,
-                            connection
-                        )
-                    }
                 }
                 AnchorState.JOINED_WITHOUT_AUDIO -> {
                     // 加入频道只收音频流
@@ -216,25 +199,6 @@ class VideoLoaderImpl constructor(private val rtcEngine: RtcEngineEx) : VideoLoa
                         if (ret == -8) {
                             needSubscribe = true
                             needSubscribeConnection = connection
-                        } else {
-                            val owner = ownerUid ?: return
-                            context?.let {
-                                if (remoteVideoCanvasList.none {it.connection.channelId == connection.channelId && it.connection.localUid == connection.localUid}) {
-                                    val videoView = TextureView(it)
-                                    val remoteVideoCanvasWrap = RemoteVideoCanvasWrap(
-                                        connection,
-                                        context as LifecycleOwner,
-                                        videoView,
-                                        Constants.RENDER_MODE_HIDDEN,
-                                        owner
-                                    )
-                                    Log.d("hugo", "setupRemoteVideoEx888")
-                                    rtcEngine.setupRemoteVideoEx(
-                                        remoteVideoCanvasWrap,
-                                        connection
-                                    )
-                                }
-                            }
                         }
                         Log.d(tag, "updateChannelMediaOptionsEx, connection:$connection, ret:$ret")
                     }
@@ -258,24 +222,6 @@ class VideoLoaderImpl constructor(private val rtcEngine: RtcEngineEx) : VideoLoa
                             autoSubscribeAudio = true
                         }
                         val ret = rtcEngine.joinChannelEx(token, connection, options, object : IRtcEngineEventHandler() {})
-                        val owner = ownerUid ?: return
-                        context?.let {
-                            if (remoteVideoCanvasList.none {it.connection.channelId == connection.channelId && it.connection.localUid == connection.localUid}) {
-                                val videoView = TextureView(it)
-                                val remoteVideoCanvasWrap = RemoteVideoCanvasWrap(
-                                    connection,
-                                    context as LifecycleOwner,
-                                    videoView,
-                                    Constants.RENDER_MODE_HIDDEN,
-                                    owner
-                                )
-                                Log.d("hugo", "setupRemoteVideoEx888")
-                                rtcEngine.setupRemoteVideoEx(
-                                    remoteVideoCanvasWrap,
-                                    connection
-                                )
-                            }
-                        }
                         Log.d(tag, "joinChannelEx1, connection:$connection, ret:$ret")
                     }
                     oldState == AnchorState.IDLE && newState == AnchorState.JOINED_WITHOUT_AUDIO -> {
@@ -367,7 +313,8 @@ class VideoLoaderImpl constructor(private val rtcEngine: RtcEngineEx) : VideoLoa
         fun release() {
             Log.d(tag, "RemoteVideoCanvasWrap release: $connection")
             lifecycleOwner.lifecycle.removeObserver(this)
-            view = null
+            setupMode = VIEW_SETUP_MODE_REMOVE
+            rtcEngine.setupRemoteVideoEx(this, connection)
             remoteVideoCanvasList.remove(this)
         }
     }
