@@ -105,6 +105,7 @@ class CreateRoomDialog(
             val initialWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
             mBinding.root.viewTreeObserver.addOnGlobalLayoutListener {
                 Handler(Looper.getMainLooper()).postDelayed({
+                    if (mBinding == null) { return@postDelayed }
                     val currentWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
                     if (currentWindowHeight < initialWindowHeight) {
                     } else {

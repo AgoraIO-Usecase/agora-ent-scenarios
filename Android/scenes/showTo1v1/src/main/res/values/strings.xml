@@ -1,6 +1,6 @@
 <resources>
     <string name="show_to1v1_name">秀场转1v1私密房</string>
-    <string name="show_to1v1_room_list_empty_title">暂无主播在线，你来创建一个吧！</string>
+    <string name="show_to1v1_room_list_empty_title">暂无主播在线</string>
     <string name="show_to1v1_room_list_empty_content">欢迎来到声网1V1私密房，目前暂无主播开播，你可以叫上你的朋友一起来体验我们的场景功能。</string>
     <string name="show_to1v1_create_room">创建房间</string>
     <string name="show_to1v1_room_name">房间名称</string>
