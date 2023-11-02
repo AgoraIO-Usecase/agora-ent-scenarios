@@ -7,6 +7,8 @@
 
 #import "BeautyAPI.h"
 
+static NSString *const beautyAPIVersion = @"1.0.4";
+
 @implementation BeautyStats
 @end
 
@@ -67,6 +69,16 @@
 #if __has_include(<AgoraRtcKit/AgoraRtcKit.h>)
         [LogUtil log:@"captureMode == Agora"];
         [config.rtcEngine setVideoFrameDelegate:self];
+        NSDictionary *dict = @{
+            @"rtcVersion": [AgoraRtcEngineKit getSdkVersion],
+            @"beautyRender": config.beautyRender.description,
+            @"captureMode": @(config.captureMode),
+            @"cameraConfig": @{
+                @"frontMirror": @(config.cameraConfig.frontMirror),
+                @"backMirror": @(config.cameraConfig.backMirror)
+            }
+        };
+        [self rtcReportWithEvent:@"initialize" label:dict];
 #else
         [LogUtil log:@"rtc 未导入" level:(LogLevelError)];
         return -1;
@@ -80,6 +92,8 @@
 - (int)switchCamera {
     _isFrontCamera = !_isFrontCamera;
     [self setupMirror];
+    NSDictionary *dict = @{ @"cameraPosition": @(_isFrontCamera) };
+    [self rtcReportWithEvent:@"cameraPosition" label:dict];
     return [self.config.rtcEngine switchCamera];
 }
 
@@ -94,7 +108,7 @@
             mode = AgoraVideoMirrorModeEnabled;
         }
     }
-    [self.config.rtcEngine setLocalRenderMode:self.renderMode mirror:mode];
+    [self.config.rtcEngine setParameters:[NSString stringWithFormat:@"{\"rtc.camera_capture_mirror_mode\":%d}", mode == AgoraVideoMirrorModeEnabled ? 1 : 0]];
     [LogUtil log:[NSString stringWithFormat:@"AgoraVideoMirrorMode == %ld isFrontCamera == %d", mode, self.isFrontCamera]];
     return mode;
 }
@@ -102,11 +116,20 @@
 - (int)updateCameraConfig:(CameraConfig *)cameraConfig {
     self.config.cameraConfig = cameraConfig;
     [self setupMirror];
+    NSDictionary *dict = @{
+        @"cameraConfig": @{
+            @"frontMirror": @(cameraConfig.frontMirror),
+            @"backMirror": @(cameraConfig.backMirror)
+        }
+    };
+    [self rtcReportWithEvent:@"updateCameraConfig" label:dict];
     return 0;
 }
 
 - (int)enable:(BOOL)enable {
     _isEnable = enable;
+    NSDictionary *dict = @{ @"enable": @(enable) };
+    [self rtcReportWithEvent:@"enable" label:dict];
     return 0;
 }
 
@@ -139,6 +162,8 @@
     localCanvas.view = view;
     localCanvas.renderMode = renderMode;
     localCanvas.uid = 0;
+    NSDictionary *dict = @{ @"renderMode": @(renderMode) };
+    [self rtcReportWithEvent:@"setupLocalVideo" label:dict];
     [LogUtil log:@"setupLocalVideoCanvas"];
     return [self.config.rtcEngine setupLocalVideo:localCanvas];
 }
@@ -168,8 +193,36 @@
     return 0;
 }
 
+- (void)rtcReportWithEvent: (NSString *)event label: (NSDictionary *)label {
+    if (self.config.rtcEngine == nil) {
+        [LogUtil log:@"rtc 不能为空" level:(LogLevelError)];
+        return;
+    }
+    NSString *jsonString = [self convertToJson:label];
+    [self.config.rtcEngine sendCustomReportMessage:@"scenarioAPI"
+                                          category:[NSString stringWithFormat:@"beauty_iOS_%@",[self getVersion]]
+                                             event:event
+                                             label:jsonString
+                                             value:0];
+}
+
+- (NSString *)convertToJson: (NSDictionary *)object {
+    NSError *error = nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:object
+                                                       options:0
+                                                         error:&error];
+    if (error) {
+        // 转换失败
+        NSLog(@"Error: %@", error.localizedDescription);
+        return nil;
+    }
+    NSString *jsonString = [[NSString alloc] initWithData:jsonData
+                                                 encoding:NSUTF8StringEncoding];
+    return jsonString;
+}
+
 - (NSString *)getVersion {
-    return @"1.0.2";
+    return beautyAPIVersion;
 }
 
 #pragma mark - VideoFrameDelegate

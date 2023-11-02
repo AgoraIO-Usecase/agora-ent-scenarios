@@ -15,6 +15,8 @@
     BeautyModel.beautyType = BeautyFactoryTypeSense;
 #elif __has_include("bef_effect_ai_api.h")
     BeautyModel.beautyType = BeautyFactoryTypeByte;
+#elif __has_include(<FURenderKit/FURenderKit.h>)
+    BeautyModel.beautyType = BeautyFactoryTypeFu;
 #endif
 }
 

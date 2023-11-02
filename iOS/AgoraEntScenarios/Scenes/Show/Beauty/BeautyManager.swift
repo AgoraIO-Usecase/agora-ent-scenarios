@@ -31,6 +31,8 @@ class BeautyManager: NSObject {
             beautyAPI.beautyRender = ByteBeautyManager.shareManager.render
         case .sense:
             beautyAPI.beautyRender = SenseBeautyManager.shareManager.render
+        case .fu:
+            beautyAPI.beautyRender = FUBeautyManager.shareManager.render
         }
     }
     
@@ -49,6 +51,8 @@ class BeautyManager: NSObject {
             config.beautyRender = ByteBeautyManager.shareManager.render
         case .sense:
             config.beautyRender = SenseBeautyManager.shareManager.render
+        case .fu:
+            config.beautyRender = FUBeautyManager.shareManager.render
         }
         config.statsEnable = false
         config.statsDuration = 1
@@ -72,6 +76,9 @@ class BeautyManager: NSObject {
             
         case .sense:
             SenseBeautyManager.shareManager.setBeauty(path: path, key: key, value: value)
+            
+        case .fu:
+            FUBeautyManager.shareManager.setBeauty(path: path, key: key, value: value)
         }
     }
     
@@ -82,7 +89,14 @@ class BeautyManager: NSObject {
             
         case .sense:
             SenseBeautyManager.shareManager.setStyle(path: path, key: key, value: value)
+            
+        case .fu:
+            FUBeautyManager.shareManager.setStyle(path: path, key: key, value: value)
         }
+    }
+    
+    func setAnimoji(path: String?) {
+        FUBeautyManager.shareManager.setAnimoji(path: path)
     }
     
     func setFilter(path: String?, value: CGFloat) {
@@ -93,6 +107,9 @@ class BeautyManager: NSObject {
             
         case .sense:
             SenseBeautyManager.shareManager.setFilter(path: path, value: value)
+            
+        case .fu:
+            FUBeautyManager.shareManager.setFilter(path: path, value: value)
         }
         
     }
@@ -104,6 +121,9 @@ class BeautyManager: NSObject {
             
         case .sense:
             SenseBeautyManager.shareManager.setSticker(path: path)
+            
+        case .fu:
+            FUBeautyManager.shareManager.setSticker(path: path)
         }
     }
     
@@ -114,6 +134,9 @@ class BeautyManager: NSObject {
             
         case .sense:
             SenseBeautyManager.shareManager.reset(datas: datas)
+            
+        case .fu:
+            FUBeautyManager.shareManager.reset(datas: datas)
         }
     }
     
@@ -124,6 +147,9 @@ class BeautyManager: NSObject {
             
         case .sense:
             SenseBeautyManager.shareManager.resetStyle(datas: datas)
+            
+        case .fu:
+            FUBeautyManager.shareManager.resetStyle(datas: datas)
         }
     }
     
@@ -134,6 +160,9 @@ class BeautyManager: NSObject {
             
         case .sense:
             SenseBeautyManager.shareManager.resetFilter(datas: datas)
+            
+        case .fu:
+            FUBeautyManager.shareManager.resetFilter(datas: datas)
         }
     }
     
@@ -144,6 +173,9 @@ class BeautyManager: NSObject {
             
         case .sense:
             SenseBeautyManager.shareManager.resetSticker(datas: datas)
+            
+        case .fu:
+            FUBeautyManager.shareManager.resetSticker(datas: datas)
         }
     }
     
@@ -154,7 +186,11 @@ class BeautyManager: NSObject {
             
         case .sense:
             SenseBeautyManager.shareManager.destroy()
+            
+        case .fu:
+            FUBeautyManager.shareManager.destroy()
         }
+        beautyAPI.destroy()
         BeautyManager._sharedManager = nil
         ShowAgoraKitManager.shared.enableVirtualBackground(isOn: false,
                                                            greenCapacity: 0)
