@@ -72,4 +72,9 @@ dependencies {
     implementation rootProject.ext.deps.bugly
     implementation rootProject.ext.deps.flexbox
 
+    // PictureSelector 基础 (必须)
+    implementation rootProject.ext.deps.pictureselector
+
+    // 图片压缩 (按需引入)
+    implementation rootProject.ext.deps.picturecompress
 }

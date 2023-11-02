@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/app_feedback_add"
+    tools:ignore="MissingDefaultResource"
+    android:layout_marginEnd="10dp">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivImage"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:shapeAppearance="@style/app_corner12Style" />
+
+<!--    <androidx.appcompat.widget.AppCompatImageView-->
+<!--        android:id="@+id/ivDelete"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/ivImage"-->
+<!--        android:src="@mipmap/ic_to_del"-->
+<!--        android:padding="4dp"-->
+<!--        app:layout_constraintEnd_toEndOf="@+id/ivImage"/>-->
+</androidx.constraintlayout.widget.ConstraintLayout>
