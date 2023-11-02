@@ -1,19 +1,24 @@
 package com.agora.entfulldemo.home
 
 import android.annotation.SuppressLint
-import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
+import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.agora.entfulldemo.databinding.AppFragmentHomeFindBinding
 import com.agora.entfulldemo.home.constructor.URLStatics
 import com.google.gson.reflect.TypeToken
@@ -36,7 +41,11 @@ class HomeFindFragment : BaseViewBindingFragment<AppFragmentHomeFindBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setOnApplyWindowInsetsListener(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v: View?, insets: WindowInsetsCompat ->
+            val inset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPaddingRelative(inset.left, 0, inset.right, 0)
+            WindowInsetsCompat.CONSUMED
+        }
         binding.webView.setBackgroundColor(Color.TRANSPARENT)
     }
 
@@ -119,15 +128,7 @@ class HomeFindFragment : BaseViewBindingFragment<AppFragmentHomeFindBinding>() {
             }
         }, "JSBridge")
         binding.webView.loadUrl(stringBuilder.toString())
-        binding.webView.webViewClient = object : WebViewClient() {
-            override fun onPageFinished(view: WebView, url: String) {
-                super.onPageFinished(view, url)
-
-            }
-        }
     }
-
-
 }
 
 class AndroidToJs constructor(val callback: ValueCallback<String>) : Any() {
