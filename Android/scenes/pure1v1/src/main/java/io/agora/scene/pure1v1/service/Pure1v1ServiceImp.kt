@@ -15,7 +15,7 @@ class Pure1v1ServiceImp(
 ) {
 
     private val TAG = "1v1_Service_LOG"
-    private val kSceneId = "scene_1v1PrivateVideo_3.6.0"
+    private val kSceneId = "scene_1v1PrivateVideo_4.0.0"
     @Volatile
     private var syncUtilsInited = false
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
