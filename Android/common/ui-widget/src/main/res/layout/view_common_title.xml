@@ -7,22 +7,6 @@
     android:fitsSystemWindows="true"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tv_center_title"
-        android:layout_width="match_parent"
-        android:layout_height="58dp"
-        android:gravity="center"
-        android:layout_marginHorizontal="32dp"
-        android:textColor="@color/def_text_color_040"
-        android:textSize="17sp"
-        android:ellipsize="end"
-        app:layout_constraintBottom_toBottomOf="@id/iv_back_icon"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/iv_back_icon"
-        android:singleLine="true"
-        tools:text="返回" />
-
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/iv_back_icon"
         android:layout_width="wrap_content"
@@ -45,10 +29,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/iv_back_icon" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_center_title"
+        android:layout_width="wrap_content"
+        android:layout_height="58dp"
+        android:gravity="center"
+        android:textColor="@color/def_text_color_040"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="@id/iv_back_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iv_back_icon"
+        tools:text="返回" />
+
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/iv_right_icon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginEnd="15dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/iv_back_icon"
