@@ -75,7 +75,7 @@ class DHCLRCControl: UIView {
     
     @objc public var skipCallBack: ((Int, Bool) -> Void)?
 
-    private var skipBtn: KTVSkipView!
+    public var skipBtn: KTVSkipView!
     private var lyricModel: LyricModel?
     private var hasShowPreludeEndPosition = false
     private var hasShowEndPosition = false
@@ -121,7 +121,7 @@ class DHCLRCControl: UIView {
                 chorusNumBtn.isHidden = false
                 scoreLabel.isHidden = false
                 resultView.isHidden = true
-                skipBtn.isHidden = false
+                skipBtn.isHidden = true
             case .chorusSing:
                 pauseBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -142,6 +142,7 @@ class DHCLRCControl: UIView {
                 originBtn.isHidden = true
                 effectBtn.isHidden = true
                 joinChorusBtn.isHidden = false
+                joinChorusBtn.isSelected = false
                 leaveChorusBtn.isHidden = true
                 musicNameBtn.isHidden = false
                 noSongLabel.isHidden = true
@@ -156,6 +157,7 @@ class DHCLRCControl: UIView {
                 originBtn.isHidden = true
                 effectBtn.isHidden = true
                 joinChorusBtn.isHidden = false
+                joinChorusBtn.isSelected = false
                 leaveChorusBtn.isHidden = true
                 joinChorusBtn.isSelected = false
                 musicNameBtn.isHidden = false
@@ -165,6 +167,7 @@ class DHCLRCControl: UIView {
                 scoreLabel.isHidden = false
                 resultView.isHidden = true
                 skipBtn.isHidden = true
+                originBtn.isSelected = false
             case .beforeJoinChorus:
                 pauseBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -268,7 +271,7 @@ class DHCLRCControl: UIView {
         originBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         originBtn.addTarget(self, action: #selector(trackChange), for: .touchUpInside)
         originBtn.setVerticalLayoutWithCenterAlignment(title: "原唱", image: UIImage.sceneImage(name: "original", bundleName: "DHCResource")!, spacing: 0, for: .selected)
-        originBtn.setVerticalLayoutWithCenterAlignment(title: "伴奏", image: UIImage.sceneImage(name: "acc", bundleName: "DHCResource")!, spacing: 0, for: .normal)
+        originBtn.setVerticalLayoutWithCenterAlignment(title: "原唱", image: UIImage.sceneImage(name: "acc", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         addSubview(originBtn)
         
         effectBtn = UIButton(frame: CGRect(x: self.bounds.width - 108, y: self.bounds.maxY - 50, width: 34, height: 40))
@@ -407,7 +410,9 @@ class DHCLRCControl: UIView {
     }
     
     @objc public func hideSkipView(flag: Bool) {
-        skipBtn.isHidden = flag
+        DispatchQueue.main.async {
+            self.skipBtn.isHidden = flag
+        }
     }
 
     @objc public func showPreludeEnd() {

@@ -1027,14 +1027,16 @@ extension KTVSyncManagerServiceImp {
             //TODO: _getSeatInfo will callback if remove seat invoke
             
             // update seat info (user avater/nick name did changed) if seat existed
-            if let seat = self.seatMap.filter({ $0.value.userNo == VLUserCenter.user.id }).first?.value {
-                let targetSeatInfo = self._getUserSeatInfo(seatIndex: seat.seatIndex, model: seat)
-                targetSeatInfo.objectId = seat.objectId
-                self._updateSeat(seatInfo: targetSeatInfo) { error in
-                    completion(self._getInitSeats())
-                }
-                return
-            }
+//            if let seat = self.seatMap.filter({ $0.value.userNo == VLUserCenter.user.id }).first?.value {
+//                let targetSeatInfo = self._getUserSeatInfo(seatIndex: seat.seatIndex, model: seat)
+//                targetSeatInfo.objectId = seat.objectId
+//                self._updateSeat(seatInfo: targetSeatInfo) { error in
+//                    completion(self._getInitSeats())
+//                }
+//                return
+//            } else {
+//
+//            }
 
             guard VLUserCenter.user.ifMaster else {
                 completion(self._getInitSeats())

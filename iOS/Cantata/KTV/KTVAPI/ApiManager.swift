@@ -109,7 +109,7 @@ class ApiManager {
             
             let transcoderObj: [String: Any] = [
                 "audioInputs": [intObj],
-                "idleTimeout": 30,
+                "idleTimeout": 300,
                 "outputs": [outputsObj]
             ]
             

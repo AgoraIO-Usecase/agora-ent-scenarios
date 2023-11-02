@@ -593,18 +593,23 @@ extension KTVApiImpl {
                                              delegate: self,
                                              mediaOptions: AgoraRtcChannelMediaOptions(),
                                              joinSuccess: {[weak self] _,_, _ in
-                guard let self = self else {return}
-                self.singerRole = newRole
-                self.getEventHander { delegate in
-                    delegate.onSingerRoleChanged(oldRole: oldRole, newRole: newRole)
-                }
-                stateCallBack(.success, .none)
             })
+            self.singerRole = newRole
+            self.getEventHander { delegate in
+                delegate.onSingerRoleChanged(oldRole: oldRole, newRole: newRole)
+            }
+            stateCallBack(.success, .none)
         } else if singerRole == .leadSinger && newRole == .audience {
             // 4、LeadSinger -》Audience
             stopSing()
-            leaveChorus(role: newRole)
-            
+            leaveChorus2(role: singerRole)
+            // 加入观众频道
+            apiConfig?.engine?.joinChannelEx(byToken: gaintConfig?.audienceChannelToken,
+                                             connection: AgoraRtcConnection(channelId: apiConfig?.channelName ?? "", localUid: apiConfig?.localUid ?? 0),
+                                             delegate: self,
+                                             mediaOptions: AgoraRtcChannelMediaOptions(),
+                                             joinSuccess: {[weak self] _,_, _ in
+            })
             self.singerRole = newRole
             self.getEventHander { delegate in
                 delegate.onSingerRoleChanged(oldRole: oldRole, newRole: newRole)
@@ -1206,7 +1211,7 @@ extension KTVApiImpl {
             mediaPlayer?.seek(toPosition: Int(self.localPlayerPosition))
         }
 
-        agoraPrint("recv state with MainSinger: \(state.rawValue)")
+        print("recv state with MainSinger: \(state.rawValue)")
         syncPlayStateFromRemote(state: state, needDisplay: true)
     }
 
@@ -1254,12 +1259,12 @@ extension KTVApiImpl {
         if mediaPlayer?.getPlayerState() != .playing {pitch = 0}
         self.pitch = pitch
         //将主唱的pitch同步到观众
-        if isMainSinger() {
-            let dict: [String: Any] = [ "cmd": "setVoicePitch",
-                                        "pitch": pitch,
-            ]
-            sendStreamMessageWithDict(dict, success: nil)
-        }
+//        if isMainSinger() {
+//            let dict: [String: Any] = [ "cmd": "setVoicePitch",
+//                                        "pitch": pitch,
+//            ]
+//            sendStreamMessageWithDict(dict, success: nil)
+//        }
     }
 
     @objc public func didKTVAPILocalAudioStats(stats: AgoraRtcLocalAudioStats) {
@@ -1448,7 +1453,7 @@ extension KTVApiImpl {
         let code = apiConfig?.engine?.sendStreamMessageEx(dataStreamId, data: messageData ?? Data(), connection: singChannelConnection ?? AgoraRtcConnection())
         if code == 0 && success != nil { success!(true) }
         if code != 0 {
-            agoraPrint("sendStreamMessage fail: \(String(describing: code))")
+            print("sendStreamMessage fail: \(String(describing: code))")
         }
     }
 
@@ -1475,14 +1480,13 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
            let dict: [String: Any] = [ "cmd": "setLrcTime",
                                        "duration": self.playerDuration,
                                        "time": position_ms - audioPlayoutDelay,
-                                       //不同机型delay不同，需要发送同步的时候减去发送机型的delay，在接收同步加上接收机型的delay
                                        "realTime":position_ms,
                                        "ntp": timestamp_ms,
                                        "playerState": self.playerState.rawValue,
                                        "songIdentifier": songIdentifier,
                                        "forward": true
            ]
-           agoraPrint("position_ms:\(position_ms), ntp:\(getNtpTimeInMs()), delta:\(self.getNtpTimeInMs() - position_ms), autoPlayoutDelay:\(self.audioPlayoutDelay)")
+           print("position_ms:\(position_ms), ntp:\(getNtpTimeInMs()), delta:\(self.getNtpTimeInMs() - position_ms), autoPlayoutDelay:\(self.audioPlayoutDelay), state:\(self.playerState.rawValue)")
            sendStreamMessageWithDict(dict, success: nil)
        }
    }
@@ -1517,6 +1521,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         }
 
         if isMainSinger() {
+            print("主唱下发了state:\(state.rawValue)")
             syncPlayState(state: state, error: error)
         }
         agoraPrint("recv state with player callback : \(state.rawValue)")
