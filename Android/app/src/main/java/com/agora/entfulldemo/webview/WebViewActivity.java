@@ -1,17 +1,14 @@
 package com.agora.entfulldemo.webview;
 
 import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
@@ -20,21 +17,13 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.agora.entfulldemo.R;
 import com.agora.entfulldemo.databinding.AppActivityWebviewBinding;
-import com.agora.entfulldemo.webview.constructor.DeviceInfo;
-import com.agora.entfulldemo.webview.constructor.UserModel;
-import com.agora.entfulldemo.webview.constructor.WebUsage;
-import com.agora.entfulldemo.webview.constructor.WebUsageModel;
 import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import io.agora.scene.base.Constant;
 import io.agora.scene.base.PagePathConstant;
-import io.agora.scene.base.api.apiutils.GsonUtils;
-import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.component.BaseViewBindingActivity;
-import io.agora.scene.base.manager.UserManager;
-import io.agora.scene.widget.CustomWebView;
 import kotlin.jvm.JvmField;
 
 @Route(path = PagePathConstant.pageWebView)
@@ -88,14 +77,12 @@ public class WebViewActivity extends BaseViewBindingActivity<AppActivityWebviewB
                 finish();
             }
         });
-
-        getBinding().webView.setWebViewClient(new CustomWebView.MyWebViewClient() {
+        getBinding().webView.setWebChromeClient(new WebChromeClient(){
             @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                String title = view.getTitle();
-                Log.d("zhangw", "webView title：" + title);
-                if (!TextUtils.isEmpty(title)) {
+            public void onReceivedTitle(WebView view, String title) {
+                super.onReceivedTitle(view, title);
+                Log.d("zhangw", "WebChromeClient webView title：");
+                if (!TextUtils.isEmpty(title)&&!view.getUrl().contains(title)){
                     getBinding().titleView.setTitle(title);
                 }
             }
@@ -109,44 +96,5 @@ public class WebViewActivity extends BaseViewBindingActivity<AppActivityWebviewB
             return true;
         }
         return super.onKeyDown(keyCode, event);
-    }
-
-    private void addJavascriptInterface() {
-        getBinding().webView.addJavascriptInterface(new Object() {
-            /**
-             * js 向App请求表单
-             * @param day 获取多长跨度的时间,单位：天
-             * @param callbackFuncName 告知app端获取到数据后往js哪个方法里传递,可选，也可约定好方法名后不带改参数
-             */
-            @JavascriptInterface
-            public void fetchUsage(final int day, final String callbackFuncName) {
-                runOnUiThread(() -> {
-                    // TODO: 2023/5/10
-                });
-            }
-
-            /**
-             * App向js注入数据
-             */
-            @JavascriptInterface
-            public void updateUsage() {
-                runOnUiThread(() -> {
-                    // TODO: 2023/5/10
-                    User user = UserManager.getInstance().getUser();
-                    UserModel userModel = new UserModel(user.headUrl, user.name, user.mobile);
-                    String androidId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-                    String type = "model:" + Build.MODEL + "\n"
-                            + "manufacturer：" + Build.MANUFACTURER + "\n"
-                            + "os_version：" + Build.VERSION.RELEASE + "\n"
-                            + "android_id：" + androidId + "\n"
-                            + "imsi：" + "";
-                    DeviceInfo deviceInfo = new DeviceInfo(type, "content", 111);
-                    WebUsageModel webUsageModel = new WebUsageModel(userModel, deviceInfo);
-                    String usage = GsonUtils.Companion.covertToString(new WebUsage(webUsageModel));
-                    // 将系统信息返回给 H5 页面
-                    getBinding().webView.loadUrl("javascript:updateUsage('" + usage + "')");
-                });
-            }
-        }, "android");
     }
 }
