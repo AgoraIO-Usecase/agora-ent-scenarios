@@ -1,47 +1,54 @@
 package com.agora.entfulldemo.home.mine
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
+import android.graphics.Canvas
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppActivityFeedbackBinding
 import com.agora.entfulldemo.databinding.AppItemFeedbackImageBinding
 import com.agora.entfulldemo.databinding.AppItemFeedbackReasonBinding
 import com.agora.entfulldemo.home.MainViewModel
 import com.agora.entfulldemo.home.constructor.FeedbackModel
-import com.agora.entfulldemo.home.mine.FeedbackActivity.Companion.DeleteImage
 import com.agora.entfulldemo.widget.dp
 import com.agora.entfulldemo.widget.image.GlideEngine
 import com.agora.entfulldemo.widget.image.ImageFileCompressEngine
 import com.agora.entfulldemo.widget.image.MeOnPreviewInterceptListener
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.luck.picture.lib.basic.IBridgeViewLifecycle
 import com.luck.picture.lib.basic.PictureSelectionModel
 import com.luck.picture.lib.basic.PictureSelector
 import com.luck.picture.lib.config.PictureMimeType
 import com.luck.picture.lib.config.SelectMimeType
 import com.luck.picture.lib.config.SelectModeConfig
 import com.luck.picture.lib.entity.LocalMedia
-import com.luck.picture.lib.interfaces.OnPreviewInterceptListener
+import com.luck.picture.lib.interfaces.OnExternalPreviewEventListener
 import com.luck.picture.lib.interfaces.OnResultCallbackListener
 import com.luck.picture.lib.style.PictureSelectorStyle
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.PagePathConstant
-import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnFastClickListener
-import io.agora.scene.base.component.OnItemChildClickListener
-import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
-import io.agora.scene.widget.utils.UiUtils
+import java.util.Collections
 
 @Route(path = PagePathConstant.pageFeedback)
 class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
@@ -49,7 +56,6 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
     companion object {
         private const val servicePhone = "400-632-6626"
         private const val maxImageSelectable = 3
-        const val DeleteImage = "DeleteImage"
     }
 
     private val mainViewModel: MainViewModel by lazy {
@@ -67,63 +73,23 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         )
     }
 
-    private val mTempImageList by lazy { mutableListOf<String>() }
 
-//    private var mFileProvider = com.agora.entfulldemo.BuildConfig.APPLICATION_ID + ".fileProvider"
-
-    private val mReasonAdapter: BaseRecyclerViewAdapter<AppItemFeedbackReasonBinding, FeedbackModel, FeedbackReasonHolder>
-            by lazy {
-                BaseRecyclerViewAdapter(
-                    mFeedbackReasons,
-                    object : OnItemClickListener<FeedbackModel> {
-
-                        override fun onItemClick(
-                            feedbackModel: FeedbackModel, view: View, position: Int, viewType: Long
-                        ) {
-                            if (UiUtils.isFastClick(500)) return
-                            feedbackModel.isSelect = !feedbackModel.isSelect
-                            notifyReasonItemChanged(position)
-                        }
-                    },
-                    FeedbackReasonHolder::class.java
-                )
-            }
-
-    private fun notifyReasonItemChanged(position: Int) {
-        mReasonAdapter.notifyItemChanged(position)
+    private val mReasonAdapter: FeedbackReasonAdapter by lazy {
+        FeedbackReasonAdapter(this, mFeedbackReasons)
     }
 
-    private val mImageAdapter: BaseRecyclerViewAdapter<AppItemFeedbackImageBinding, String, FeedbackImageHolder>
-            by lazy {
-                BaseRecyclerViewAdapter(
-                    emptyList<String>(),
-                    null,
-                    object : OnItemChildClickListener<String> {
-                        override fun onItemChildClick(
-                            data: String?,
-                            extData: Any?,
-                            view: View,
-                            position: Int,
-                            itemViewType: Long
-                        ) {
-                            super.onItemChildClick(data, extData, view, position, itemViewType)
-                            if (view.id == R.id.ivDelete) {
-                                Log.d("zhangw", "onItemChildClick delete:$view,position:$position")
-                                dealDeleteImage(position)
-                            }
+    private val mFeedbackImages: MutableList<String> = mutableListOf()
 
-                        }
-                    },
-                    FeedbackImageHolder::class.java
-                )
-            }
-
-    private fun dealDeleteImage(position: Int) {
-        mSelectedMedia.removeAt(position)
-
-        val selectPaths = mSelectedMedia.map { it.realPath }
-        mImageAdapter.replaceItems(selectPaths)
-        binding.ivAddFeedbackImage.isVisible = mImageAdapter.dataList.size < maxImageSelectable
+    private val mImageAdapter: FeedbackImageAdapter by lazy {
+        FeedbackImageAdapter(this, mFeedbackImages,
+            mOnItemClick = { path, position ->
+                Log.d("zhangw", "mOnItemClick :$path,position:$position")
+                startPreviewImage(position)
+            },
+            mOnItemLongClick = { path, position, holder ->
+                Log.d("zhangw", "mOnItemLongClick :$path,position:$position")
+//                mItemTouchHelper.startDrag(holder)
+            })
     }
 
     override fun getViewBinding(inflater: LayoutInflater): AppActivityFeedbackBinding {
@@ -139,6 +105,8 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         super.initView(savedInstanceState)
         binding.rvFeedbackReason.adapter = mReasonAdapter
         binding.rvFeedbackImage.adapter = mImageAdapter
+        // 绑定拖拽事件
+        mItemTouchHelper.attachToRecyclerView(binding.rvFeedbackImage)
     }
 
     override fun initListener() {
@@ -162,7 +130,9 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
                 val uploadLog = binding.cvIAgree.isChecked
                 // TODO: feedback api
                 Log.d(
-                    "zhangw", "reasons:$selectReasons\n content:$reasonContent\n images:$mTempImageList\n " +
+                    "zhangw", "reasons:$selectReasons\n" +
+                            " content:$reasonContent\n " +
+                            "images:$mFeedbackImages\n " +
                             "uploadLog:$uploadLog"
                 )
                 feedbackSuccessView()
@@ -192,38 +162,66 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
 
 
     private val mSelectorStyle = PictureSelectorStyle()
-    private val mSelectedMedia = mutableListOf<LocalMedia>()
+    private val mSelectedMedia = ArrayList<LocalMedia>()
     private val mOnPreviewInterceptListener = MeOnPreviewInterceptListener()
+    private val mImageEngine: GlideEngine by lazy {
+        GlideEngine.createGlideEngine()
+    }
+
     private fun startChooseImage() {
         val systemGalleryMode: PictureSelectionModel = PictureSelector.create(this)
             .openGallery(SelectMimeType.TYPE_IMAGE)
             .setSelectorUIStyle(mSelectorStyle)
             .setSelectionMode(SelectModeConfig.MULTIPLE)
+            .isPreviewFullScreenMode(true)
             .setMaxSelectNum(maxImageSelectable)
             .setSelectedData(mSelectedMedia)
             .isMaxSelectEnabledMask(true)
             .isDisplayCamera(false)
-            .setImageEngine(GlideEngine.createGlideEngine())
+            .setImageEngine(mImageEngine)
             .setCompressEngine(ImageFileCompressEngine())
 //            .setCropEngine(null)
             .setSkipCropMimeType(*arrayOf<String>(PictureMimeType.ofGIF(), PictureMimeType.ofWEBP()))
             .isOriginalControl(false)
             .setPreviewInterceptListener(mOnPreviewInterceptListener)
+            .isPreviewZoomEffect(true)
 //            .setSandboxFileEngine(MeSandboxFileEngine())
         systemGalleryMode.forResult(object : OnResultCallbackListener<LocalMedia> {
             override fun onResult(result: ArrayList<LocalMedia>) {
                 Log.d("zhangw", "startChooseImage onResult:$result")
                 mSelectedMedia.clear()
                 mSelectedMedia.addAll(result)
-                val selectPaths = result.map { it.realPath }
-                mImageAdapter.replaceItems(selectPaths)
-                binding.ivAddFeedbackImage.isVisible = mImageAdapter.dataList.size < maxImageSelectable
+                mFeedbackImages.clear()
+                mFeedbackImages.addAll(result.map { it.realPath })
+                mImageAdapter.notifyDataSetChanged()
+                binding.ivAddFeedbackImage.isVisible = mFeedbackImages.size < maxImageSelectable
             }
 
             override fun onCancel() {
                 Log.d("zhangw", "startChooseImage onCancel")
             }
         })
+    }
+
+    private fun startPreviewImage(position: Int) {
+        // 预览图片
+        PictureSelector.create(this)
+            .openPreview()
+            .setImageEngine(mImageEngine)
+            .setSelectorUIStyle(mSelectorStyle)
+            .isPreviewFullScreenMode(true)
+//            .isPreviewZoomEffect(true, binding.rvFeedbackImage)
+            .setAttachViewLifecycle(object : IBridgeViewLifecycle {
+                override fun onViewCreated(fragment: Fragment, view: View, savedInstanceState: Bundle?) {
+
+                }
+
+                override fun onDestroy(fragment: Fragment) {
+
+                }
+            })
+            .setExternalPreviewEventListener(MyExternalPreviewEventListener())
+            .startActivityPreview(position, true, mSelectedMedia)
     }
 
     override fun getPermissions() {
@@ -246,41 +244,206 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         binding.layoutFeedbackSuccess.isVisible = true
         binding.tvServiceNumber.text = servicePhone
     }
+
+    private inner class MyExternalPreviewEventListener : OnExternalPreviewEventListener {
+        override fun onPreviewDelete(position: Int) {
+            val imagePath = mFeedbackImages[position]
+            mFeedbackImages.removeAt(position)
+            mImageAdapter.notifyItemRemoved(position)
+            mSelectedMedia.removeIf { it.realPath == imagePath }
+            binding.ivAddFeedbackImage.isVisible = mFeedbackImages.size < maxImageSelectable
+        }
+
+        override fun onLongPressDownload(context: Context, media: LocalMedia): Boolean {
+            return false
+        }
+    }
+
+    private var mNeedScaleBig = true
+    private var mNeedScaleSmall = false
+    private val mItemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
+        override fun isLongPressDragEnabled(): Boolean {
+            return true
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+
+        override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+            viewHolder.itemView.alpha = 0.7f
+            return makeMovementFlags(
+                ItemTouchHelper.DOWN or ItemTouchHelper.UP
+                        or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT, 0
+            )
+        }
+
+        override fun onMove(
+            recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder
+        ): Boolean {
+            try {
+                //得到item原来的position
+                val fromPosition = viewHolder.absoluteAdapterPosition
+                //得到目标position
+                val toPosition = target.absoluteAdapterPosition
+                val itemViewType = target.itemViewType
+                if (fromPosition < toPosition) {
+                    for (i in fromPosition until toPosition) {
+                        Collections.swap(mImageAdapter.getData(), i, i + 1)
+                    }
+                } else {
+                    for (i in fromPosition downTo toPosition + 1) {
+                        Collections.swap(mImageAdapter.getData(), i, i - 1)
+                    }
+                }
+                mImageAdapter.notifyItemMoved(fromPosition, toPosition)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            return true
+        }
+
+        override fun onChildDraw(
+            c: Canvas, recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder, dx: Float, dy: Float, actionState: Int, isCurrentlyActive: Boolean
+        ) {
+            if (mNeedScaleBig) {
+                mNeedScaleBig = false
+                val animatorSet = AnimatorSet()
+                animatorSet.playTogether(
+                    ObjectAnimator.ofFloat(viewHolder.itemView, "scaleX", 1.0f, 1.2f),
+                    ObjectAnimator.ofFloat(viewHolder.itemView, "scaleY", 1.0f, 1.2f)
+                )
+                animatorSet.duration = 50
+                animatorSet.interpolator = LinearInterpolator()
+                animatorSet.start()
+                animatorSet.addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        mNeedScaleSmall = true
+                    }
+                })
+            }
+            super.onChildDraw(c, recyclerView, viewHolder, dx, dy, actionState, isCurrentlyActive)
+        }
+
+        override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+
+            super.onSelectedChanged(viewHolder, actionState)
+        }
+
+        override fun getAnimationDuration(
+            recyclerView: RecyclerView,
+            animationType: Int,
+            animateDx: Float,
+            animateDy: Float
+        ): Long {
+            return super.getAnimationDuration(recyclerView, animationType, animateDx, animateDy)
+        }
+
+        override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+            viewHolder.itemView.alpha = 1.0f
+            if (mNeedScaleSmall) {
+                mNeedScaleSmall = false
+                val animatorSet = AnimatorSet()
+                animatorSet.playTogether(
+                    ObjectAnimator.ofFloat(viewHolder.itemView, "scaleX", 1.2f, 1.0f),
+                    ObjectAnimator.ofFloat(viewHolder.itemView, "scaleY", 1.2f, 1.0f)
+                )
+                animatorSet.interpolator = LinearInterpolator()
+                animatorSet.duration = 50
+                animatorSet.start()
+                animatorSet.addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        mNeedScaleBig = true
+                    }
+                })
+            }
+            super.clearView(recyclerView, viewHolder)
+            mImageAdapter.notifyItemChanged(viewHolder.absoluteAdapterPosition)
+        }
+    })
 }
 
-class FeedbackReasonHolder constructor(mBinding: AppItemFeedbackReasonBinding) :
-    BaseRecyclerViewAdapter.BaseViewHolder<AppItemFeedbackReasonBinding, FeedbackModel>(mBinding) {
+class FeedbackReasonAdapter constructor(
+    private val mContext: Context,
+    private val mFeedbackModels: List<FeedbackModel>,
+) :
+    RecyclerView.Adapter<FeedbackReasonAdapter.FeedbackReasonViewHolder>() {
 
-    override fun binding(feedbackModel: FeedbackModel?, selectedIndex: Int) {
-        feedbackModel ?: return
-        val context = mBinding.root.context
+    inner class FeedbackReasonViewHolder(val binding: AppItemFeedbackReasonBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedbackReasonViewHolder {
+        return FeedbackReasonViewHolder(
+            AppItemFeedbackReasonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
+    }
+
+    override fun getItemCount(): Int {
+        return mFeedbackModels.size
+    }
+
+    override fun onBindViewHolder(holder: FeedbackReasonViewHolder, position: Int) {
+        val feedbackModel = mFeedbackModels[position]
         if (feedbackModel.isSelect) {
-            mBinding.tvTabTitle.setTextColor(ResourcesCompat.getColor(context.resources, R.color.white, null))
-            mBinding.tvTabTitle.setBackgroundResource(R.drawable.app_bg_button_303_solid_r8)
+            holder.binding.tvTabTitle.setTextColor(ResourcesCompat.getColor(mContext.resources, R.color.white, null))
+            holder.binding.tvTabTitle.setBackgroundResource(R.drawable.app_bg_button_303_solid_r8)
         } else {
-            mBinding.tvTabTitle.setTextColor(
-                ResourcesCompat.getColor(context.resources, R.color.def_text_grey_303, null)
+            holder.binding.tvTabTitle.setTextColor(
+                ResourcesCompat.getColor(mContext.resources, R.color.def_text_grey_303, null)
             )
-            mBinding.tvTabTitle.setBackgroundResource(R.drawable.app_bg_button_e9e_solid_r8)
+            holder.binding.tvTabTitle.setBackgroundResource(R.drawable.app_bg_button_e9e_solid_r8)
         }
-        mBinding.tvTabTitle.text = feedbackModel.reason
+        holder.binding.tvTabTitle.text = feedbackModel.reason
+        holder.binding.root.setOnClickListener(object : OnFastClickListener() {
+            override fun onClickJacking(view: View) {
+                feedbackModel.isSelect = !feedbackModel.isSelect
+                notifyItemChanged(holder.absoluteAdapterPosition)
+            }
+        })
     }
 }
 
-class FeedbackImageHolder constructor(mBinding: AppItemFeedbackImageBinding) :
-    BaseRecyclerViewAdapter.BaseViewHolder<AppItemFeedbackImageBinding, String>(mBinding) {
 
-    override fun binding(imagePath: String?, selectedIndex: Int) {
-        if (imagePath.isNullOrEmpty()) {
-            mBinding.ivImage.setImageResource(0)
+class FeedbackImageAdapter constructor(
+    private val mContext: Context,
+    private val mFeedbackImages: List<String>,
+    private val mOnItemClick: ((String, Int) -> Unit),
+    private val mOnItemLongClick: ((String, Int, FeedbackImageViewHolder) -> Unit),
+) :
+    RecyclerView.Adapter<FeedbackImageAdapter.FeedbackImageViewHolder>() {
+
+    inner class FeedbackImageViewHolder(val binding: AppItemFeedbackImageBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
+    fun getData(): List<String> {
+        return mFeedbackImages
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedbackImageViewHolder {
+        return FeedbackImageViewHolder(
+            AppItemFeedbackImageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
+    }
+
+    override fun getItemCount(): Int {
+        return mFeedbackImages.size
+    }
+
+    override fun onBindViewHolder(holder: FeedbackImageViewHolder, position: Int) {
+        val imagePath = mFeedbackImages[position]
+        if (imagePath.isEmpty()) {
+            holder.binding.ivImage.setImageResource(0)
         } else {
-            GlideApp.with(mBinding.root.context)
+            GlideApp.with(mContext)
                 .load(imagePath)
                 .transform(CenterCropRoundCornerTransform(12.dp.toInt()))
-                .into(mBinding.ivImage)
+                .into(holder.binding.ivImage)
         }
-        mBinding.ivDelete.setOnClickListener {
-            onItemChildClick(DeleteImage, it)
+        holder.binding.root.setOnClickListener {
+            mOnItemClick.invoke(imagePath, holder.absoluteAdapterPosition)
+        }
+        holder.binding.root.setOnLongClickListener {
+            mOnItemLongClick.invoke(imagePath, holder.absoluteAdapterPosition, holder)
+            true
         }
     }
 }

@@ -65,22 +65,22 @@ object ScenesConstructor {
                 )
                 subScenes.add(
                     HomeSceneModel(
-                        scene = HomeSubScenes.KTV_Cantata,
-                        clazzName = ktvCantataClazz,
-                        name = context.getString(R.string.app_home_scene_ktv_cantata),
-                        tip = context.getString(R.string.app_home_scene_ktv_cantata_tips),
-                        background = R.drawable.bg_scene_ktv_cantata,
-                        active = true
-                    )
-                )
-                subScenes.add(
-                    HomeSceneModel(
                         scene = HomeSubScenes.KTV_SingRelay,
                         clazzName = ktvSingRelayClazz,
                         name = context.getString(R.string.app_home_scene_ktv_sing_relay),
                         tip = context.getString(R.string.app_home_scene_ktv_sing_relay_tips),
                         background = R.drawable.bg_scene_ktv_singrelay,
                         active = true
+                    )
+                )
+                subScenes.add(
+                    HomeSceneModel(
+                        scene = HomeSubScenes.KTV_Cantata,
+                        clazzName = ktvCantataClazz,
+                        name = context.getString(R.string.app_home_scene_ktv_cantata),
+                        tip = context.getString(R.string.app_home_scene_ktv_cantata_tips),
+                        background = R.drawable.bg_scene_ktv_cantata,
+                        active = false
                     )
                 )
                 return subScenes
@@ -132,22 +132,22 @@ object ScenesConstructor {
                 )
                 subScenes.add(
                     HomeSceneModel(
-                        scene = HomeSubScenes.Live_MultiPlayer,
-                        clazzName = liveMultiPlayersClazz,
-                        name = context.getString(R.string.app_home_scene_live_multiplayer),
-                        tip = context.getString(R.string.app_home_scene_live_multiplayer_tips),
-                        background = R.drawable.bg_scene_live_multiplayer,
-                        active = true
-                    )
-                )
-                subScenes.add(
-                    HomeSceneModel(
                         scene = HomeSubScenes.Live_Show1v1,
                         clazzName = liveShow1v1Clazz,
                         name = context.getString(R.string.app_home_scene_live_show1v1),
                         tip = context.getString(R.string.app_home_scene_live_show1v1_tips),
                         background = R.drawable.bg_scene_live_show,
                         active = true
+                    )
+                )
+                subScenes.add(
+                    HomeSceneModel(
+                        scene = HomeSubScenes.Live_MultiPlayer,
+                        clazzName = liveMultiPlayersClazz,
+                        name = context.getString(R.string.app_home_scene_live_multiplayer),
+                        tip = context.getString(R.string.app_home_scene_live_multiplayer_tips),
+                        background = R.drawable.bg_scene_live_multiplayer,
+                        active = false
                     )
                 )
             }

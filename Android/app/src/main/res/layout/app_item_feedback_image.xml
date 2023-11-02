@@ -16,12 +16,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:shapeAppearance="@style/app_corner12Style" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivDelete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@+id/ivImage"
-        android:src="@mipmap/ic_to_del"
-        android:padding="4dp"
-        app:layout_constraintEnd_toEndOf="@+id/ivImage"/>
+<!--    <androidx.appcompat.widget.AppCompatImageView-->
+<!--        android:id="@+id/ivDelete"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/ivImage"-->
+<!--        android:src="@mipmap/ic_to_del"-->
+<!--        android:padding="4dp"-->
+<!--        app:layout_constraintEnd_toEndOf="@+id/ivImage"/>-->
 </androidx.constraintlayout.widget.ConstraintLayout>
