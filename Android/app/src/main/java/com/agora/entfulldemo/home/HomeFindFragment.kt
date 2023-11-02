@@ -119,15 +119,7 @@ class HomeFindFragment : BaseViewBindingFragment<AppFragmentHomeFindBinding>() {
             }
         }, "JSBridge")
         binding.webView.loadUrl(stringBuilder.toString())
-        binding.webView.webViewClient = object : WebViewClient() {
-            override fun onPageFinished(view: WebView, url: String) {
-                super.onPageFinished(view, url)
-
-            }
-        }
     }
-
-
 }
 
 class AndroidToJs constructor(val callback: ValueCallback<String>) : Any() {
