@@ -72,6 +72,26 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长您的意见将帮助我们更快成长" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvFeedbackImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="@id/layoutInput"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:itemCount="1"
+            tools:listitem="@layout/app_item_feedback_image" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivAddFeedbackImage"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/app_feedback_add"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="@+id/layoutInput"
+            app:layout_constraintStart_toEndOf="@+id/rvFeedbackImage"
+            app:shapeAppearance="@style/app_corner12Style" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.appcompat.widget.AppCompatCheckBox
@@ -139,30 +159,6 @@
             android:textStyle="bold"
             tools:text="PhoneNumb" />
     </LinearLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvFeedbackImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="36dp"
-        android:layout_marginBottom="16dp"
-        android:orientation="horizontal"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="@id/layoutInput"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:itemCount="1"
-        tools:listitem="@layout/app_item_feedback_image" />
-
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/ivAddFeedbackImage"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/app_feedback_add"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@+id/layoutInput"
-        app:layout_constraintStart_toEndOf="@+id/rvFeedbackImage"
-        app:shapeAppearance="@style/app_corner12Style" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/groupFeedback"

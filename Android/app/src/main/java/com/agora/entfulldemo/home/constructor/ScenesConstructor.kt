@@ -136,7 +136,7 @@ object ScenesConstructor {
                         clazzName = liveShow1v1Clazz,
                         name = context.getString(R.string.app_home_scene_live_show1v1),
                         tip = context.getString(R.string.app_home_scene_live_show1v1_tips),
-                        background = R.drawable.bg_scene_live_show,
+                        background = R.drawable.bg_scene_live_showto1v1,
                         active = true
                     )
                 )
