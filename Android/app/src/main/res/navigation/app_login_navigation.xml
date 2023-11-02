@@ -13,10 +13,10 @@
         <action
             android:id="@+id/action_fragmentAdvertise_to_fragmentPhoneInput"
             app:destination="@id/fragmentPhoneInput"
-            app:enterAnim="@anim/fragment_slide_in_right"
-            app:exitAnim="@anim/fragment_slide_out_left"
-            app:popEnterAnim="@anim/fragment_slide_in_left"
-            app:popExitAnim="@anim/fragment_slide_out_right" />
+            app:enterAnim="@anim/app_fragment_slide_in_right"
+            app:exitAnim="@anim/app_fragment_slide_out_left"
+            app:popEnterAnim="@anim/app_fragment_slide_in_left"
+            app:popExitAnim="@anim/app_fragment_slide_out_right" />
     </fragment>
 
     <fragment
@@ -27,10 +27,10 @@
         <action
             android:id="@+id/action_fragmentPhoneInput_to_fragmentVerify"
             app:destination="@id/fragmentVerify"
-            app:enterAnim="@anim/fragment_slide_in_right"
-            app:exitAnim="@anim/fragment_slide_out_left"
-            app:popEnterAnim="@anim/fragment_slide_in_left"
-            app:popExitAnim="@anim/fragment_slide_out_right" />
+            app:enterAnim="@anim/app_fragment_slide_in_right"
+            app:exitAnim="@anim/app_fragment_slide_out_left"
+            app:popEnterAnim="@anim/app_fragment_slide_in_left"
+            app:popExitAnim="@anim/app_fragment_slide_out_right" />
     </fragment>
 
     <fragment
