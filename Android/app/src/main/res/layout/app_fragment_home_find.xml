@@ -4,35 +4,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="28dp"
     android:background="@mipmap/bg_app_def_white">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
         android:overScrollMode="never">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingBottom="40dp">
+            android:paddingBottom="30dp">
 
             <io.agora.scene.widget.CustomWebView
                 android:id="@+id/webView"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:overScrollMode="never"
+                android:layout_marginTop="28dp"
                 app:layout_constraintDimensionRatio="5:3"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <FrameLayout
-                android:id="@+id/full_video"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvScenarioSolution"
