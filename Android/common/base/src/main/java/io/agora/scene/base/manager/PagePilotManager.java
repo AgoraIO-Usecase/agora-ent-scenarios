@@ -40,6 +40,14 @@ public class PagePilotManager {
                 .navigation();
     }
 
+    public static void pageWebViewWithBrowser(String url) {
+        ARouter.getInstance()
+                .build(PagePathConstant.pageWebView)
+                .withString(Constant.URL, url)
+                .withBoolean(Constant.PARAMS_WITH_BROWSER, true)
+                .navigation();
+    }
+
     public static void pageAboutUs() {
         ARouter.getInstance()
                 .build(PagePathConstant.pageAboutUs)
