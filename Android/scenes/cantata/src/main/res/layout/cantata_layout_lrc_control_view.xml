@@ -28,7 +28,6 @@
             android:id="@+id/tvMusicName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
             android:drawableStart="@mipmap/ic_music_name"
             android:gravity="start|center_vertical"
             android:textColor="@android:color/white"

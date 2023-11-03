@@ -125,12 +125,22 @@
 
     </androidx.appcompat.widget.Toolbar>
 
+    <io.agora.scene.cantata.ui.widget.lrcView.LrcControlView
+        android:id="@+id/lrcControlView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tbChatroomTop"
+        android:layout_marginBottom="62dp"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
     <androidx.appcompat.widget.AppCompatCheckBox
         android:id="@+id/cbMic"
         android:layout_width="38dp"
         android:layout_height="38dp"
         android:layout_marginStart="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="12dp"
         android:button="@null"
         android:checked="false"
         android:enabled="false"
@@ -144,19 +154,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
         android:src="@mipmap/ic_diange"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="@id/cbMic"
+        app:layout_constraintBottom_toBottomOf="@id/cbMic"
         app:layout_constraintEnd_toEndOf="parent" />
-
-    <io.agora.scene.cantata.ui.widget.lrcView.LrcControlView
-        android:id="@+id/lrcControlView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="1:1.4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tbChatroomTop" />
 
     <io.agora.scene.cantata.ui.widget.rankList.RankListView
         android:id="@+id/rankListView"
