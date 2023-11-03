@@ -10,9 +10,11 @@ public class Constant {
     /* 用户信息改变 */
     public static final int CALLBACK_TYPE_USER_INFO_CHANGE = 900;
     /* 注销 */
-    public static final int CALLBACK_TYPE_USER_CANCEL_ACCOUNTS = 901;
+    public static final int CALLBACK_TYPE_USER_LOGOFF = 901;
     /* 退出登录*/
     public static final int CALLBACK_TYPE_USER_LOGOUT = 902;
+    /* 获取用户信息成功*/
+    public static final int CALLBACK_TYPE_REQUEST_USER_INFO = 903;
 
 
     /* 登录成功*/

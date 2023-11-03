@@ -35,16 +35,25 @@ class MineAccountActivity : BaseViewBindingActivity<AppActivityMineAccountBindin
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setOnApplyWindowInsetsListener(binding.root)
-        binding.layoutLogoff.setOnClickListener(object :OnFastClickListener(){
+        binding.layoutLogoff.setOnClickListener(object : OnFastClickListener() {
             override fun onClickJacking(view: View) {
                 showLogoffAccountDialog()
             }
         })
-        binding.btnLogout.setOnClickListener(object :OnFastClickListener(){
+        binding.btnLogout.setOnClickListener(object : OnFastClickListener() {
             override fun onClickJacking(view: View) {
                 showLogoutDialog()
             }
         })
+        mainViewModel.setISingleCallback { type, data ->
+            if (type == Constant.CALLBACK_TYPE_USER_LOGOUT) {
+                finish()
+                PagePilotManager.pageWelcomeClear()
+            } else if (type == Constant.CALLBACK_TYPE_USER_LOGOFF) {
+                finish()
+                PagePilotManager.pageWelcomeClear()
+            }
+        }
     }
 
     // 注销账号
@@ -57,7 +66,6 @@ class MineAccountActivity : BaseViewBindingActivity<AppActivityMineAccountBindin
                 setDialogLeftBtnTextColor(ResourcesCompat.getColor(resources, R.color.red_f3, null))
                 onButtonClickListener = object : OnButtonClickListener {
                     override fun onLeftButtonClick() {
-                        SPUtil.putBoolean(Constant.IS_AGREE, false)
                         mainViewModel.requestCancellation(UserManager.getInstance().user.userNo)
                     }
 
@@ -82,10 +90,8 @@ class MineAccountActivity : BaseViewBindingActivity<AppActivityMineAccountBindin
                     }
 
                     override fun onRightButtonClick() {
-                        SPUtil.putBoolean(Constant.IS_AGREE, false)
                         UserManager.getInstance().logout()
-                        this@MineAccountActivity.finishAffinity()
-                        PagePilotManager.pageWelcomeClear()
+                        mainViewModel.iSingleCallback?.onSingleCallback(Constant.CALLBACK_TYPE_USER_LOGOUT, null)
                     }
                 }
             }
