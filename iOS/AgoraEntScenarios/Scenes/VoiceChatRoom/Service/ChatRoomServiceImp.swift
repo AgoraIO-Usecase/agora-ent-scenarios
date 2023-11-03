@@ -11,7 +11,7 @@ import ZSwiftBaseLib
 import AgoraChat.AgoraChatError
 import AgoraSyncManager
 
-private let kSceneId = "scene_chatRoom_3.1.0"
+private let kSceneId = "scene_chatRoom_4.0.0"
 
 
 private func agoraPrint(_ message: String) {

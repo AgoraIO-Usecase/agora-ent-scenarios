@@ -77,7 +77,7 @@ open class AUINetworking: NSObject {
                 return
             }
             
-            agoraEnt_info("request success \(String(data: data, encoding: .utf8) ?? "nil")", tag: "AUINetworking")
+            agoraEnt_info("request success url = \(urlRequest.cURL()) message = \(String(data: data, encoding: .utf8) ?? "nil")", tag: "AUINetworking")
             DispatchQueue.main.async {
                 completion?(nil, obj)
             }
