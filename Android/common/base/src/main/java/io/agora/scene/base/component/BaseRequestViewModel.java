@@ -1,8 +1,6 @@
 package io.agora.scene.base.component;
 
 
-import org.greenrobot.eventbus.EventBus;
-
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
@@ -11,9 +9,6 @@ public class BaseRequestViewModel extends BaseViewModel {
 
 
     public BaseRequestViewModel() {
-        if (isNeedEventBus()) {
-            EventBus.getDefault().register(this);
-        }
     }
 
     public void addDispose(Disposable disposable) {
@@ -30,9 +25,6 @@ public class BaseRequestViewModel extends BaseViewModel {
             mCompositeDisposable.clear();
             mCompositeDisposable = null;
         }
-        if (isNeedEventBus()) {
-            EventBus.getDefault().unregister(this);
-        }
     }
 
     public void clearDispose(){
@@ -40,9 +32,5 @@ public class BaseRequestViewModel extends BaseViewModel {
             mCompositeDisposable.clear();
             mCompositeDisposable = null;
         }
-    }
-
-    protected boolean isNeedEventBus() {
-        return false;
     }
 }

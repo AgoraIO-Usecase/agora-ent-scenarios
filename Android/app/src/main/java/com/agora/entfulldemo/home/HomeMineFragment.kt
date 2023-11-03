@@ -5,8 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.MediaStore
 import android.text.InputFilter
 import android.text.TextUtils
@@ -25,7 +23,6 @@ import io.agora.scene.base.Constant
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingFragment
-import io.agora.scene.base.component.ISingleCallback
 import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.component.OnFastClickListener
 import io.agora.scene.base.manager.PagePilotManager
@@ -38,8 +35,6 @@ import io.agora.scene.widget.dialog.SelectPhotoFromDialog
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 import io.agora.scene.widget.utils.ImageCompressUtil
 import java.io.File
-import java.util.Arrays
-
 
 class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
 
@@ -50,10 +45,6 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
 
     private val mainViewModel: MainViewModel by lazy {
         ViewModelProvider(this)[MainViewModel::class.java]
-    }
-
-    private val mMainHandler: Handler by lazy {
-        Handler(Looper.getMainLooper())
     }
 
     private var selectPhotoFromDialog: SelectPhotoFromDialog? = null
@@ -105,6 +96,19 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
 
     override fun initView() {
         mainViewModel.setLifecycleOwner(this)
+        mainViewModel.setISingleCallback { type, data ->
+            if (type == Constant.CALLBACK_TYPE_USER_INFO_CHANGE || type == Constant.CALLBACK_TYPE_REQUEST_USER_INFO) {
+                val user = UserManager.getInstance().user
+                GlideApp.with(this)
+                    .load(user.headUrl)
+                    .placeholder(R.mipmap.userimage)
+                    .error(R.mipmap.userimage)
+                    .transform(CenterCropRoundCornerTransform(999))
+                    .into(binding.ivUserAvatar)
+                binding.tvUserPhone.text = hidePhoneNumber(user.mobile)
+                binding.etNickname.setText(user.name)
+            }
+        }
     }
 
     override fun onResume() {
@@ -116,22 +120,6 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
 
     @SuppressLint("SetTextI18n")
     override fun initListener() {
-        mainViewModel.iSingleCallback = ISingleCallback { type: Int, o: Any? ->
-            if (type == Constant.CALLBACK_TYPE_USER_INFO_CHANGE) {
-                val user = UserManager.getInstance().user
-                GlideApp.with(this)
-                    .load(user.headUrl)
-                    .placeholder(R.mipmap.userimage)
-                    .error(R.mipmap.userimage)
-                    .transform(CenterCropRoundCornerTransform(999))
-                    .into(binding.ivUserAvatar)
-                binding.tvUserPhone.text = hidePhoneNumber(user.mobile)
-                binding.etNickname.setText(user.name)
-            } else if (type == Constant.CALLBACK_TYPE_USER_CANCEL_ACCOUNTS) {
-                requireActivity().finish()
-                PagePilotManager.pageWelcomeClear()
-            }
-        }
         binding.tvMineAccount.setOnClickListener(object : OnFastClickListener() {
             override fun onClickJacking(view: View) {
                 PagePilotManager.pageMineAccount()
@@ -170,7 +158,7 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
                 PagePilotManager.pageAboutUs()
             }
         })
-        binding.tvFeedback.setOnClickListener(object :OnFastClickListener(){
+        binding.tvFeedback.setOnClickListener(object : OnFastClickListener() {
             override fun onClickJacking(view: View) {
                 PagePilotManager.pageFeedback()
             }
@@ -275,7 +263,7 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
     }
 
     override fun requestData() {
-        mainViewModel.requestUserInfo(UserManager.getInstance().user.userNo)
+        mainViewModel.requestUserInfo(UserManager.getInstance().user.userNo, true)
     }
 
 
