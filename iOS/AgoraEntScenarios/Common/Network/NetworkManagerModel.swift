@@ -196,7 +196,7 @@ open class NMStartCloudPlayerNetworkModel: NMCommonNetworkModel {
 
     public override init() {
         super.init()
-        interfaceName = "v1/cloud-player/start"
+        interfaceName = "v1/rte-cloud-player/start"
     }
    
 }

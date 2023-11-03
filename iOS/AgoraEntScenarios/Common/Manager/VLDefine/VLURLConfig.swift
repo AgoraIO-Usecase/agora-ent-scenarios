@@ -23,5 +23,5 @@ enum VLURLConfig {
 #else
     static let kURLPathH5Discover = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/discover/index.html" // 发现
 #endif
-    static let kURLPathH5ktv_feedback = "https://www.shengwang.cn/ktv_feedback" // K 歌曲库检索
+    static let kURLPathH5ktv_feedback = "https://www.shengwang.cn/ktv_feedback/" // K 歌曲库检索
 }
