@@ -18,8 +18,8 @@
 }
 
 - (void)setupView {
-    UILabel *introduceLabel = [[UILabel alloc]initWithFrame:CGRectMake(30, 0, SCREEN_WIDTH-60, 90)];
-    NSString *introduceStr = SBGLocalizedString(@"欢迎来到声网嗨歌抢唱游戏，\n 热歌劲曲、歌词同步、动态打分等功能一站体验，\n一起来抢吧！");
+    UILabel *introduceLabel = [[UILabel alloc]initWithFrame:CGRectMake(30, 250, SCREEN_WIDTH-60, 90)];
+    NSString *introduceStr = SBGLocalizedString(@"sbg_create_tips1");
     introduceLabel.attributedText = [self attributedString:introduceStr fontSize:14 lineSpace:4 wordSpace:0];
     introduceLabel.textAlignment = NSTextAlignmentCenter;
     introduceLabel.numberOfLines = 0;
@@ -27,7 +27,7 @@
     introduceLabel.font = UIFontMake(14);
     [self addSubview:introduceLabel];
     
-    UIImageView *emptyImgView = [[UIImageView alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-255)*0.5, introduceLabel.bottom+VLREALVALUE_WIDTH(30), 255, 202)];
+    UIImageView *emptyImgView = [[UIImageView alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-255)*0.5, 20, 255, 202)];
     emptyImgView.image = [UIImage sceneImageWithName:@"online_empty_placeHolder"];
     [self addSubview:emptyImgView];
 }
