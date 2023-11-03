@@ -1,5 +1,6 @@
 package com.agora.entfulldemo.login
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -29,9 +30,15 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
     private var mAccounts = ""
 
     private var mCountDownTimerUtils: CountDownTimer? = null
+    private var mIsLoging: Boolean = false
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AppFragmentLoginVerifyBinding {
         return AppFragmentLoginVerifyBinding.inflate(inflater)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        Log.d("zhangw", "LoginVerifyFragment onAttach")
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -72,6 +79,9 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
         binding.etCode.setOnTextChangeListener {
             if (it.length >= binding.etCode.textLength) {
                 hideKeyboard(binding.etCode)
+                Log.d("zhangw", "binding.etCode ${binding.etCode.text} ${it}")
+                if (mIsLoging) return@setOnTextChangeListener
+                mIsLoging = true
                 mLoginViewModel.requestLogin(mAccounts, it)
             }
         }
@@ -102,15 +112,16 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
                 binding.tvCodeError.isVisible = false
                 mCountDownTimerUtils?.cancel()
                 mCountDownTimerUtils?.start()
-            }else if (type ==Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS){
+            } else if (type == Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS) {
                 Log.d("zhangw", "LoginVerifyFragment login success")
                 mCountDownTimerUtils?.cancel()
                 activity?.finish()
                 PagePilotManager.pageMainHome()
-            }else if (type ==Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_FAIL){
+            } else if (type == Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_FAIL) {
                 Log.d("zhangw", "LoginVerifyFragment login failed")
                 binding.tvCodeError.isVisible = true
                 binding.etCode.setText("")
+                mIsLoging = false
             }
         }
         mCountDownTimerUtils = object : CountDownTimer(60000, 1000) {
