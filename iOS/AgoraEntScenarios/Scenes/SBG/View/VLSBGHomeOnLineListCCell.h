@@ -12,7 +12,7 @@
 
 @property (nonatomic, strong) VLSBGRoomListModel *listModel;
 
--(void)handleClick;
+@property (nonatomic, strong) UIImageView *bgImgView;
 
 @property (nonatomic, copy) void (^joinBtnClickBlock)(VLSBGRoomListModel *model);
 @end
