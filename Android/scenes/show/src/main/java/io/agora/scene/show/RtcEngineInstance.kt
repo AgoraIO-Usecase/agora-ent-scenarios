@@ -76,6 +76,7 @@ object RtcEngineInstance {
 
 
     fun destroy() {
+        VideoLoader.release()
         innerRtcEngine?.let {
             workingExecutor.execute { RtcEngineEx.destroy() }
             innerRtcEngine = null

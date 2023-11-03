@@ -80,7 +80,7 @@ public class RoomListActivity extends BaseViewBindingActivity<KtvRelayActivityRo
     @Override
     public void initListener() {
         getBinding().btnCreateRoom.setOnClickListener(view -> {
-            if (UiUtils.isFastClick(2000)) {
+            if (UiUtils.isFastClick(1000)) {
                 return;
             }
             new CreateRoomDialog(this).show(getSupportFragmentManager(), "CreateRoomDialog");

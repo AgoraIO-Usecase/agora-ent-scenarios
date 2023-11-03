@@ -4,10 +4,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.os.Build
-import android.os.Bundle
-import android.os.CountDownTimer
-import android.os.Looper
+import android.os.*
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.Log
@@ -198,7 +195,7 @@ class LiveDetailFragment : Fragment() {
     private fun startLoadPage() {
         ShowLogger.d(TAG, "Fragment PageLoad start load, roomId=${mRoomInfo.roomId}")
         isPageLoaded = true
-
+        subscribeMediaTime = SystemClock.elapsedRealtime()
         if (mRoomInfo.isRobotRoom()) {
             initRtcEngine()
             initServiceWithJoinRoom()
@@ -618,7 +615,7 @@ class LiveDetailFragment : Fragment() {
             topBinding.tvQuickStartTime.text = getString(R.string.show_statistic_quick_start_time, "--")
         } else {
             // TODO
-            //topBinding.tvQuickStartTime.text = getString(R.string.show_statistic_quick_start_time, mRtcVideoSwitcher.getFirstVideoFrameTime())
+            topBinding.tvQuickStartTime.text = getString(R.string.show_statistic_quick_start_time, quickStartTime)
         }
         // 机型等级
         topBinding.tvStatisticDeviceGrade.isVisible = true
@@ -1377,6 +1374,8 @@ class LiveDetailFragment : Fragment() {
 
     //================== RTC Operation ===================
 
+    private var quickStartTime = 0L
+    private var subscribeMediaTime = 0L
     private fun initRtcEngine() {
         val eventListener = object : IRtcEngineEventHandler() {
             override fun onUserOffline(uid: Int, reason: Int) {
@@ -1414,6 +1413,13 @@ class LiveDetailFragment : Fragment() {
                             enableComeBackSoonView(false)
                         }
                     }
+                }
+
+                if (state == Constants.REMOTE_VIDEO_STATE_PLAYING
+                    && (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED || reason == Constants.REMOTE_VIDEO_STATE_REASON_LOCAL_UNMUTED)
+                ) {
+                    val durationFromSubscribe = SystemClock.elapsedRealtime() - subscribeMediaTime
+                    quickStartTime = durationFromSubscribe
                 }
             }
 

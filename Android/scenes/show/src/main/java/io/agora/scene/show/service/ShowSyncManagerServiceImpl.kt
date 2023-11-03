@@ -20,7 +20,7 @@ class ShowSyncManagerServiceImpl constructor(
     private val errorHandler: (Exception) -> Unit
 ) : ShowServiceProtocol {
     private val TAG = "ShowSyncManagerServiceImpl"
-    private val kSceneId = "scene_show_3.2.0"
+    private val kSceneId = "scene_show_4.0.0"
     private val kCollectionIdUser = "userCollection"
     private val kCollectionIdMessage = "show_message_collection"
     private val kCollectionIdSeatApply = "show_seat_apply_collection"
@@ -30,7 +30,7 @@ class ShowSyncManagerServiceImpl constructor(
 
     private val kRobotAvatars = listOf("https://download.agora.io/demo/release/bot1.png")
     private val kRobotUid = 2000000001
-    private val kRobotVideoRoomIds = arrayListOf(2023001, 2023002, 2023003)
+    private val kRobotVideoRoomIds = arrayListOf(2023004, 2023005, 2023006)
     private val kRobotVideoStreamUrls = arrayListOf(
         "https://download.agora.io/demo/test/agora_test_video_10.mp4",
         "https://download.agora.io/demo/test/agora_test_video_11.mp4",
