@@ -48,7 +48,6 @@ NSInteger SBGStreamId = -1;
 
 @interface VLSBGViewController ()<
 VLSBGTopViewDelegate,
-VLSBGMVViewDelegate,
 VLSBGMicSeatListDelegate,
 VLSBGBottomToolbarDelegate,
 VLSBGPopSelBgViewDelegate,
@@ -102,7 +101,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
 @property (nonatomic, assign) SBGPlayerTrackMode trackMode;  //合唱/伴奏
 
 @property (nonatomic, strong) NSArray <VLSBGRoomSelSongModel*>* selSongsArray;
-@property (nonatomic, strong) SBGApiImpl* SBGApi;
+@property (nonatomic, strong) KTVApiImpl* SBGApi;
 
 @property (nonatomic, strong) LyricModel *lyricModel;
 @property (nonatomic, strong) SBGLrcControl *lrcControl;
@@ -165,8 +164,6 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
     
     //MV视图(显示歌词...)
     CGFloat mvViewTop = topView.bottom;
-//    self.MVView = [[VLSBGMVView alloc]initWithFrame:CGRectMake(15, mvViewTop, SCREEN_WIDTH - 30, musicHeight * 0.5) withDelegate:self];
-//    [self.view addSubview:self.MVView];
     self.statusView = [[VLSBGStatusView alloc]initWithFrame:CGRectMake(15, mvViewTop, SCREEN_WIDTH - 30, musicHeight * 0.5)];
     self.statusView.state = [self isRoomOwner] ? SBGStateOwnerOrderMusic : SBGStateAudienceWating;
     self.statusView.delegate = self;
@@ -264,7 +261,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
                 if([weakSelf isRoomOwner]){
                     SingBattleGameModel *model = [[SingBattleGameModel alloc]init];
                     model.status = SingBattleGameStatusWaiting;
-                    [[AppContext sbgServiceImp] innerAddSingBattleGameInfo:model completion:^(NSError * _Nullable) {
+                    [[AppContext sbgServiceImp] innerAddSingBattleGameInfo:model completion:^(NSError * _Nullable err) {
                         if(error) {
                             SBGLogInfo(@"owner add sbg state error");
                         } else {
@@ -400,13 +397,13 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
         NSLog(@"update:%@抢到麦", model.winnerNo);
             if([VLUserCenter.user.id isEqualToString:model.winnerNo]) {
                 self.statusView.state = SBGStateSingingBroadcaster;
-                [self.SBGApi switchSingerRoleWithNewRole:SBGSingRoleSoloSinger onSwitchRoleState:^(enum SBGSwitchRoleState, enum SBGSwitchRoleFailReason) {
-                                    
+                [self.SBGApi switchSingerRoleWithNewRole:KTVSingRoleSoloSinger onSwitchRoleState:^(enum KTVSwitchRoleState state, enum KTVSwitchRoleFailReason reason) {
+                    
                 }];
             } else {
                 self.statusView.state = SBGStateSingingAudience;
-                [self.SBGApi switchSingerRoleWithNewRole:SBGSingRoleAudience onSwitchRoleState:^(enum SBGSwitchRoleState, enum SBGSwitchRoleFailReason) {
-                                    
+                [self.SBGApi switchSingerRoleWithNewRole:KTVSingRoleAudience onSwitchRoleState:^(enum KTVSwitchRoleState state, enum KTVSwitchRoleFailReason reason) {
+                    
                 }];
             }
             [self loadAndPlaySongWith:SBGPlayerTrackModeAcc];
@@ -557,7 +554,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
         [self.view addSubview:_scoreView];
     }
     SBGLogInfo(@"Avg score for the song: %ld", (long)score);
-    [_scoreView configScore:score];
+    [_scoreView configScore:(int)score];
     [self.view bringSubviewToFront:_scoreView];
     self.scoreView.hidden = NO;
 }
@@ -578,7 +575,6 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine
 reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers
       totalVolume:(NSInteger)totalVolume {
-    [self.SBGApi didSBGAPIReceiveAudioVolumeIndicationWith:speakers totalVolume:totalVolume];
 }
 
 -(NSMutableArray *)scoreArray {
@@ -594,8 +590,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
              data:(NSData * _Nonnull)data {    //接收到对方的RTC消息
     
     NSDictionary *dict = [VLGlobalHelper dictionaryForJsonData:data];
-//    SBGLogInfo(@"receiveStreamMessageFromUid:%@,streamID:%d,uid:%d",dict,(int)streamId,(int)uid);
-    [self.SBGApi didSBGAPIReceiveStreamMessageFromUid:uid streamId:streamId data:data];
     kWeakSelf(self);
     if ([dict[@"cmd"] isEqualToString:@"SingingScore"]) {
         int score = [dict[@"score"] intValue];
@@ -641,7 +635,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 if([weakself isRoomOwner]){
     //                //房主把分数给到服务端
                     weakself.gameModel.rank = [weakself convertScoreArrayToRank];
-                    [[AppContext sbgServiceImp] innerUpdateSingBattleGameInfo:weakself.gameModel completion:^(NSError * _Nullable) {
+                    [[AppContext sbgServiceImp] innerUpdateSingBattleGameInfo:weakself.gameModel completion:^(NSError * _Nullable err) {
                                     
                     }];
                 }
@@ -725,17 +719,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine localAudioStats:(AgoraRtcLocalAudioStats *)stats {
-    [self.SBGApi didSBGAPILocalAudioStatsWithStats:stats];
 }
 
 #pragma mark - action utils / business
 - (void)stopPlaySong {
     self.isPause = false;
-//    self.isHighlightSinger = false;
-//    [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
-   // self.MVView.joinCoSingerState = RSJoinCoSingerStateWaitingForJoin;
-    [self.SBGApi switchSingerRoleWithNewRole:SBGSingRoleAudience
-                           onSwitchRoleState:^(SBGSwitchRoleState state, SBGSwitchRoleFailReason reason) {
+    [self.SBGApi switchSingerRoleWithNewRole:KTVSingRoleAudience onSwitchRoleState:^(enum KTVSwitchRoleState state, enum KTVSwitchRoleFailReason reason) {
+        
     }];
 }
 
@@ -769,9 +759,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     self.singRole = role;
     
-    SBGSongConfiguration *songConfig = [[SBGSongConfiguration alloc] init];
-    songConfig.autoPlay = role == SBGSingRoleAudience ? NO : YES ;
-    songConfig.mode = role == SBGSingRoleAudience ? SBGLoadMusicModeLoadLrcOnly : SBGLoadMusicModeLoadMusicAndLrc;
+    KTVSongConfiguration *songConfig = [[KTVSongConfiguration alloc] init];
+    songConfig.autoPlay = role == KTVSingRoleAudience ? NO : YES ;
+    songConfig.mode = role == KTVSingRoleAudience ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc;
     songConfig.mainSingerUid = [model.userNo integerValue];
     //songCode需要特殊转换一下
     NSString *jsonStr = @"{\"format\":{\"highPart\":0}}";
@@ -1034,7 +1024,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         @"cmd": @"checkVoiceHighlight",
         @"uid": model.userNo,
     };
-    [self sendStreamMessageWithDict:dict success:^(BOOL) {
+    [self sendStreamMessageWithDict:dict success:^(BOOL flag) {
             
     }];
     if([model.userNo isEqualToString:VLUserCenter.user.id]){
@@ -1050,7 +1040,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         @"cmd": @"sendVoiceHighlight",
         @"preset": @(self.currentSelectEffect)
     };
-    [self sendStreamMessageWithDict:dict success:^(BOOL) {
+    [self sendStreamMessageWithDict:dict success:^(BOOL flag) {
             
     }];
 }
@@ -1130,20 +1120,22 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                            config:config];
     
     NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
-    SBGApiConfig* apiConfig = [[SBGApiConfig alloc] initWithAppId:[[AppContext shared] appId]
-                                                         rtmToken:VLUserCenter.user.agoraRTMToken
-                                                           engine:self.RTCkit
-                                                      channelName:self.roomModel.roomNo
-                                                         localUid:[VLUserCenter.user.id integerValue]
-                                                        chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:exChannelToken
-                                                             type:KTVTypeSingbattle
-                                                     maxCacheSize:10
-    ];
-    self.SBGApi = [[SBGApiImpl alloc] initWithConfig: apiConfig];
+    KTVApiConfig *apiConfig = [[KTVApiConfig alloc]initWithAppId:[[AppContext shared] appId]
+                                                              rtmToken:VLUserCenter.user.agoraRTMToken
+                                                                engine:self.RTCkit
+                                                            channelName:self.roomModel.roomNo
+                                                                localUid:[VLUserCenter.user.id integerValue]
+                                                        chorusChannelName:@""
+                                                        chorusChannelToken:@""
+                                                                    type:KTVTypeSingbattle
+                                                            maxCacheSize:10
+                                                                musicType:loadMusicTypeMcc
+                                                                isDebugMode:false];
+    self.SBGApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
     [self.SBGApi renewInnerDataStreamId];
     [self.SBGApi setLrcViewWithView:self.statusView.lrcView];
     [self.SBGApi setMicStatusWithIsOnMicOpen:!self.isNowMicMuted];
-    [self.SBGApi addEventHandlerWithSBGApiEventHandler:self];
+    [self.SBGApi addEventHandlerWithKtvApiEventHandler:self];
 //    VL(weakSelf);
     SBGLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
     int ret =
@@ -1161,7 +1153,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)leaveRTCChannel {
-    [self.SBGApi removeEventHandlerWithSBGApiEventHandler:self];
+    [self.SBGApi removeEventHandlerWithKtvApiEventHandler:self];
     [self.SBGApi cleanCache];
     self.SBGApi = nil;
     self.loadMusicCallBack = nil;
@@ -1180,7 +1172,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [option setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     [option setAutoSubscribeAudio:YES];
     [option setAutoSubscribeVideo:YES];
-    [option setPublishMediaPlayerId:[[self.SBGApi getMediaPlayer] getMediaPlayerId]];
+    [option setPublishMediaPlayerId:[[self.SBGApi getMusicPlayer] getMediaPlayerId]];
     [option setEnableAudioRecordingOrPlayout:YES];
     return option;
 }
@@ -1228,7 +1220,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         // 直接开始
         self.gameModel.status = SingBattleGameStatusStarted;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [[AppContext sbgServiceImp] innerUpdateSingBattleGameInfo:self.gameModel completion:^(NSError * _Nullable) {
+            [[AppContext sbgServiceImp] innerUpdateSingBattleGameInfo:self.gameModel completion:^(NSError * _Nullable err) {
                 
             }];
         });
@@ -1261,7 +1253,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 self.gameModel.status = SingBattleGameStatusStarted;
                 
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                    [[AppContext sbgServiceImp] innerUpdateSingBattleGameInfo:self.gameModel completion:^(NSError * _Nullable) {
+                    [[AppContext sbgServiceImp] innerUpdateSingBattleGameInfo:self.gameModel completion:^(NSError * _Nullable err) {
                         
                     }];
                 });
@@ -1386,7 +1378,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //            //房主把分数给到服务端
             self.gameModel.status = SingBattleGameStatusEnded;
             self.gameModel.rank = [self convertScoreArrayToRank];
-            [[AppContext sbgServiceImp] innerUpdateSingBattleGameInfo:self.gameModel completion:^(NSError * _Nullable) {
+            [[AppContext sbgServiceImp] innerUpdateSingBattleGameInfo:self.gameModel completion:^(NSError * _Nullable err) {
                             
             }];
         }
@@ -1412,15 +1404,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             NSLog(@"抢唱成功");
             //立即更新service
             if([self isRoomOwner]){
-                [self.SBGApi switchSingerRoleWithNewRole:SBGSingRoleAudience onSwitchRoleState:^(enum SBGSwitchRoleState, enum SBGSwitchRoleFailReason) {
-                                    
+                [self.SBGApi switchSingerRoleWithNewRole:KTVSingRoleAudience onSwitchRoleState:^(enum KTVSwitchRoleState state, enum KTVSwitchRoleFailReason reason) {
+                    
                 }];
             }
             VLSBGRoomSelSongModel *model = weakself.selSongsArray.firstObject;
             model.winnerNo = VLUserCenter.user.id;
             model.name = VLUserCenter.user.name;
             model.imageUrl = VLUserCenter.user.headUrl;
-            [[AppContext sbgServiceImp] updateChooseSongWithSongInfo:model finished:^(NSError * _Nullable) {
+            [[AppContext sbgServiceImp] updateChooseSongWithSongInfo:model finished:^(NSError * _Nullable err) {
             }];
         }
     }];
@@ -1468,7 +1460,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 weakself.gameModel.status = SingBattleGameStatusEnded;
                 if([weakself isRoomOwner]){
                     weakself.gameModel.rank = [weakself convertScoreArrayToRank];
-                    [[AppContext sbgServiceImp] innerUpdateSingBattleGameInfo:weakself.gameModel completion:^(NSError * _Nullable) {
+                    [[AppContext sbgServiceImp] innerUpdateSingBattleGameInfo:weakself.gameModel completion:^(NSError * _Nullable err) {
                         
                     }];
                 }
@@ -1693,7 +1685,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //        model.status = SingBattleGameStatusStarted;
 //        self.gameModel = model;
         self.gameModel.status = SingBattleGameStatusStarted;
-        [[AppContext sbgServiceImp] innerUpdateSingBattleGameInfo:self.gameModel completion:^(NSError * _Nullable) {
+        [[AppContext sbgServiceImp] innerUpdateSingBattleGameInfo:self.gameModel completion:^(NSError * _Nullable err) {
                     
         }];
     }
@@ -1781,14 +1773,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)onRSMView:(VLSBGMVView *)view lrcViewDidScrolled:(NSInteger)position {
-    [[self.SBGApi getMediaPlayer] seekToPosition:position];
+    [[self.SBGApi getMusicPlayer] seekToPosition:position];
 }
 
 - (void)reloadMusic{
     VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
-    SBGSongConfiguration* songConfig = [[SBGSongConfiguration alloc] init];
+    KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
     songConfig.autoPlay = YES;
-    songConfig.mode = SBGLoadMusicModeLoadLrcOnly;
+    songConfig.mode = KTVLoadMusicModeLoadLrcOnly;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
     
@@ -1824,7 +1816,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         // 调整当前播放的媒体资源的音调
         // 按半音音阶调整本地播放的音乐文件的音调，默认值为 0，即不调整音调。取值范围为 [-12,12]，每相邻两个值的音高距离相差半音。取值的绝对值越大，音调升高或降低得越多
         NSInteger value = setting.toneValue * 2 - 12;
-        [[self.SBGApi getMediaPlayer] setAudioPitch:value];
+        [[self.SBGApi getMusicPlayer] setAudioPitch:value];
     } else if (type == VLSBGValueDidChangedTypeSound) { // 音量
         // 调节音频采集信号音量、取值范围为 [0,400]
         // 0、静音 100、默认原始音量 400、原始音量的4倍、自带溢出保护
@@ -2048,7 +2040,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark - setter
-- (void)setSBGApi:(SBGApiImpl *)SBGApi {
+- (void)setSBGApi:(KTVApiImpl *)SBGApi {
     _SBGApi = SBGApi;
     [[AppContext shared] setSbgAPI:SBGApi];
 }
@@ -2404,11 +2396,11 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
     // 调节本地播放音量 取值范围为 [0,100]
     // 0、无声。 100、（默认）媒体文件的原始播放音量
 //    [self.SBGApi adjustPlayoutVolume:playoutVolume];
-    [[self.SBGApi getMediaPlayer] adjustPlayoutVolume:playoutVolume];
+    [[self.SBGApi getMusicPlayer] adjustPlayoutVolume:playoutVolume];
     
     // 调节远端用户听到的音量 取值范围[0、400]
     // 100: （默认）媒体文件的原始音量。400: 原始音量的四倍（自带溢出保护）
-    [[self.SBGApi getMediaPlayer] adjustPublishSignalVolume:playoutVolume];
+    [[self.SBGApi getMusicPlayer] adjustPublishSignalVolume:playoutVolume];
     
     //update ui
     [self.settingView setAccValue: (float)playoutVolume / 100.0];

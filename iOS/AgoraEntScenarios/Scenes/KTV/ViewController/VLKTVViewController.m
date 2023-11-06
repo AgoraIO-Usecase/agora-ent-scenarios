@@ -501,7 +501,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         [self.view addSubview:_scoreView];
     }
     KTVLogInfo(@"Avg score for the song: %ld", (long)score);
-    [_scoreView configScore:score];
+    [_scoreView configScore:(int)score];
     [self.view bringSubviewToFront:_scoreView];
     self.scoreView.hidden = NO;
 }
@@ -644,17 +644,14 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 }
 
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine didAudioRouteChanged:(AgoraAudioOutputRouting)routing {
-    [self.ktvApi didAudioRouteChangedWithRouting:routing];
 }
 
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine didAudioPublishStateChange:(NSString *)channelId oldState:(AgoraStreamPublishState)oldState newState:(AgoraStreamPublishState)newState elapseSinceLastState:(int)elapseSinceLastState {
-    [self.ktvApi didAudioPublishStateChangeWithNewState:newState];
 }
 
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine
 reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers
       totalVolume:(NSInteger)totalVolume {
-    [self.ktvApi didKTVAPIReceiveAudioVolumeIndicationWith:speakers totalVolume:totalVolume];
     [self.roomPersonView updateVolumeForSpeakers:speakers];
 }
 
@@ -665,7 +662,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     NSDictionary *dict = [VLGlobalHelper dictionaryForJsonData:data];
 //    KTVLogInfo(@"receiveStreamMessageFromUid:%@,streamID:%d,uid:%d",dict,(int)streamId,(int)uid);
-    [self.ktvApi didKTVAPIReceiveStreamMessageFromUid:uid streamId:streamId data:data];
     if ([dict[@"cmd"] isEqualToString:@"SingingScore"]) {
         //伴唱显示自己的分数，观众显示主唱的分数
         int score = [dict[@"score"] intValue];
@@ -799,7 +795,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine localAudioStats:(AgoraRtcLocalAudioStats *)stats {
-    [self.ktvApi didKTVAPILocalAudioStatsWithStats:stats];
 }
 
 #pragma mark - action utils / business
@@ -1104,9 +1099,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         @"cmd": @"checkVoiceHighlight",
         @"uid": model.userNo,
     };
-    [self sendStreamMessageWithDict:dict success:^(BOOL) {
-            
-    }];
+    [self sendStreamMessageWithDict:dict success:nil];
     if([model.userNo isEqualToString:VLUserCenter.user.id]){
         _isHighlightSinger = YES;
         [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
@@ -1121,9 +1114,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         @"cmd": @"sendVoiceHighlight",
         @"preset": @(self.currentSelectEffect)
     };
-    [self sendStreamMessageWithDict:dict success:^(BOOL) {
-            
-    }];
+    [self sendStreamMessageWithDict:dict success:nil];
 }
 
 

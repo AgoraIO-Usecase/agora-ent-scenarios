@@ -38,7 +38,7 @@ class SBGScoreCell: UITableViewCell {
                 iconView.image = UIImage.sceneImage(name: "sbg-rank3")
             }
             headIcon.isHidden = score.poster == ""
-            headIcon.sd_setImage(with: URL(string: score.poster))
+            headIcon.sd_setImage(with: URL(string: score.poster ?? ""))
             
             var bgUrl = ""
             switch score.index {

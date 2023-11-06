@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface AppContext (SBG)
 
-@property (nonatomic, nullable) SBGApiImpl* sbgAPI;
+@property (nonatomic, nullable) KTVApiImpl* sbgAPI;
 + (void)setupSbgConfig;
 
 /// get service imp instance,  thread unsafe

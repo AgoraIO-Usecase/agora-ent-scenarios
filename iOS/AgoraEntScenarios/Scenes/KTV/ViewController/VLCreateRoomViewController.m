@@ -14,6 +14,7 @@
 #import "VLURLPathConfig.h"
 #import "AppContext+KTV.h"
 #import "AESMacro.h"
+#import <AgoraEntScenarios-Swift.h>
 
 @interface VLCreateRoomViewController ()<VLCreateRoomViewDelegate/*,AgoraRtmDelegate*/>
 @property (nonatomic, strong) AgoraRtcEngineKit *RTCkit;

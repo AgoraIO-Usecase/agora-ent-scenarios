@@ -97,11 +97,11 @@ extension UIButton {
         }
     }
     
-    open override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        let extendedBounds = bounds.inset(by: extendedTouchArea)
-        if extendedBounds.contains(point) {
-            return self
-        }
-        return super.hitTest(point, with: event)
-    }
+//    open override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+//        let extendedBounds = bounds.inset(by: extendedTouchArea)
+//        if extendedBounds.contains(point) {
+//            return self
+//        }
+//        return super.hitTest(point, with: event)
+//    }
 }
