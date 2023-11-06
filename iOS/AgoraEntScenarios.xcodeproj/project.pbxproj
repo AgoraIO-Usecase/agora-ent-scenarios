@@ -452,10 +452,7 @@
 		E301BBD02AF4A7480089A79C /* Networktool.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BBCF2AF4A7480089A79C /* Networktool.swift */; };
 		E301BBD92AF4C8F40089A79C /* AgoraRequestTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BBD32AF4C8F30089A79C /* AgoraRequestTask.swift */; };
 		E301BBDA2AF4C8F40089A79C /* AgoraDownLoadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BBD42AF4C8F40089A79C /* AgoraDownLoadManager.swift */; };
-		E301BBDB2AF4C8F40089A79C /* AgoraLrcParse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BBD52AF4C8F40089A79C /* AgoraLrcParse.swift */; };
 		E301BBDC2AF4C8F40089A79C /* AgoraCacheFileHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BBD62AF4C8F40089A79C /* AgoraCacheFileHandle.swift */; };
-		E301BBDD2AF4C8F40089A79C /* AgoraLrcModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BBD72AF4C8F40089A79C /* AgoraLrcModel.swift */; };
-		E301BBDE2AF4C8F40089A79C /* AgoraMiguXmlLrcParse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BBD82AF4C8F40089A79C /* AgoraMiguXmlLrcParse.swift */; };
 		E301BBE12AF4C9000089A79C /* KTVApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BBDF2AF4C9000089A79C /* KTVApi.swift */; };
 		E301BBE22AF4C9000089A79C /* KTVApiImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BBE02AF4C9000089A79C /* KTVApiImpl.swift */; };
 		E301BD572AF4CAFF0089A79C /* HeadSetManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BCB92AF4CAFF0089A79C /* HeadSetManager.m */; };
@@ -1289,10 +1286,7 @@
 		E301BBCF2AF4A7480089A79C /* Networktool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Networktool.swift; sourceTree = "<group>"; };
 		E301BBD32AF4C8F30089A79C /* AgoraRequestTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraRequestTask.swift; sourceTree = "<group>"; };
 		E301BBD42AF4C8F40089A79C /* AgoraDownLoadManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraDownLoadManager.swift; sourceTree = "<group>"; };
-		E301BBD52AF4C8F40089A79C /* AgoraLrcParse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraLrcParse.swift; sourceTree = "<group>"; };
 		E301BBD62AF4C8F40089A79C /* AgoraCacheFileHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraCacheFileHandle.swift; sourceTree = "<group>"; };
-		E301BBD72AF4C8F40089A79C /* AgoraLrcModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraLrcModel.swift; sourceTree = "<group>"; };
-		E301BBD82AF4C8F40089A79C /* AgoraMiguXmlLrcParse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraMiguXmlLrcParse.swift; sourceTree = "<group>"; };
 		E301BBDF2AF4C9000089A79C /* KTVApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApi.swift; sourceTree = "<group>"; };
 		E301BBE02AF4C9000089A79C /* KTVApiImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApiImpl.swift; sourceTree = "<group>"; };
 		E301BCB92AF4CAFF0089A79C /* HeadSetManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HeadSetManager.m; sourceTree = "<group>"; };
@@ -3407,9 +3401,6 @@
 			children = (
 				E301BBD62AF4C8F40089A79C /* AgoraCacheFileHandle.swift */,
 				E301BBD42AF4C8F40089A79C /* AgoraDownLoadManager.swift */,
-				E301BBD72AF4C8F40089A79C /* AgoraLrcModel.swift */,
-				E301BBD52AF4C8F40089A79C /* AgoraLrcParse.swift */,
-				E301BBD82AF4C8F40089A79C /* AgoraMiguXmlLrcParse.swift */,
 				E301BBD32AF4C8F30089A79C /* AgoraRequestTask.swift */,
 			);
 			path = KTVLrcDownload;
@@ -4617,7 +4608,6 @@
 				E301BD672AF4CAFF0089A79C /* VLPopSongList.m in Sources */,
 				DD619AC529E3E247008F63E4 /* SAGifterCell.swift in Sources */,
 				E3735C9D2A5E7E75004737EF /* BeautyLoad.m in Sources */,
-				E301BBDE2AF4C8F40089A79C /* AgoraMiguXmlLrcParse.swift in Sources */,
 				E301BD7B2AF4CAFF0089A79C /* KTVCreateRoomPresentView.swift in Sources */,
 				E34B45F52AE922950082D334 /* SRRoomHomeListView.swift in Sources */,
 				A851C5E92AEF602000071F88 /* AUIError.swift in Sources */,
@@ -4717,7 +4707,6 @@
 				E301BE722AF4E06F0089A79C /* VLSRKindsView.m in Sources */,
 				E71685142ADFCA2700C2915C /* VLPhotoView.swift in Sources */,
 				DDA199E728FFE579009D3E61 /* VLFontUtils.m in Sources */,
-				E301BBDD2AF4C8F40089A79C /* AgoraLrcModel.swift in Sources */,
 				E71685102ADF7AEF00C2915C /* VLSelectTagView.swift in Sources */,
 				DD36109029B70CDC00CE7984 /* ShowCreateLiveVC.swift in Sources */,
 				DD8417C829090C520026B624 /* TemplateSceneCreateController.swift in Sources */,
@@ -5234,7 +5223,6 @@
 				DD84178A29090C520026B624 /* VLMainRootViewController.m in Sources */,
 				E301BD652AF4CAFF0089A79C /* VLMicSeatCell.m in Sources */,
 				DD220BC9295B48FD00F57F30 /* QMUIHelper.m in Sources */,
-				E301BBDB2AF4C8F40089A79C /* AgoraLrcParse.swift in Sources */,
 				E301C03F2AF8E8E90089A79C /* VLSBGViewController.m in Sources */,
 				DD9EBFAD2AD5512300B4551F /* ChatRoomServiceProtocol.swift in Sources */,
 				E301BD7D2AF4CB000089A79C /* VLKTVTonesView.m in Sources */,
