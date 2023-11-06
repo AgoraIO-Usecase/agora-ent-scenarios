@@ -120,7 +120,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 return (T) new RoomLivingViewModel((JoinRoomOutputModel) getIntent().getSerializableExtra(EXTRA_ROOM_INFO));
             }
         }).get(RoomLivingViewModel.class);
-        roomLivingViewModel.setLrcView(getBinding().lrcControlView);
 
         mRoomSpeakerAdapter = new BindingSingleAdapter<RoomSeatModel, KtvItemRoomSpeakerBinding>() {
             @Override
@@ -238,6 +237,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             } else {
                 roomLivingViewModel.init();
             }
+            roomLivingViewModel.setLrcView(getBinding().lrcControlView);
         });
         getBinding().tvRoomName.setText(roomLivingViewModel.roomInfoLiveData.getValue().getRoomName());
 
@@ -457,8 +457,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 RoomSeatModel seatModel = mRoomSpeakerAdapter.getItem(i);
                 if (seatModel != null && Integer.parseInt(seatModel.getRtcUid()) == volumeModel.getUid()) {
                     BindingViewHolder<KtvItemRoomSpeakerBinding> holder = (BindingViewHolder<KtvItemRoomSpeakerBinding>) getBinding().rvUserMember.findViewHolderForAdapterPosition(i);
-                   if (holder == null) {return;}
-                   if (volumeModel.getVolume() == 0) {
+                   if (holder == null) return;
+                   if (volumeModel.getVolume() == 0 || seatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()) {
                        holder.binding.vMicWave.endWave();
                    } else {
                        holder.binding.vMicWave.startWave();
@@ -740,10 +740,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             }
         }
         return ret;
-    }
-
-    private void onClickJoinChorus() {
-        roomLivingViewModel.joinChorus();
     }
 
     private boolean showChooseSongDialogTag = false;
