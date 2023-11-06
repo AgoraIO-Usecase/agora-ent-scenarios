@@ -8,7 +8,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLSBGCreateRoomViewController : VLBaseViewController
+typedef void(^CreateRoomBlock)(CGFloat);
+typedef void(^CreateRoomVCBlock)(UIViewController *);
+@interface VLSBGCreateRoomViewController : UIViewController
+@property (nonatomic, copy) CreateRoomBlock createRoomBlock;
+@property (nonatomic, copy) CreateRoomVCBlock createRoomVCBlock;
 
 @end
 
