@@ -198,10 +198,6 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     public void init() {
-        if (isRoomOwner()) {
-            ktvApiProtocol.setMicStatus(true);
-            isOnSeat = true;
-        }
         initRTCPlayer();
         initRoom();
         initSeats();
@@ -1129,7 +1125,10 @@ public class RoomLivingViewModel extends ViewModel {
            }
         );
 
-        ktvApiProtocol.renewInnerDataStreamId();
+        if (isRoomOwner()) {
+            ktvApiProtocol.setMicStatus(true);
+            isOnSeat = true;
+        }
 
         // ------------------ 加入频道 ------------------
         mRtcEngine.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING);

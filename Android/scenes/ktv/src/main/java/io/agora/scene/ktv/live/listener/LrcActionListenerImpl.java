@@ -21,9 +21,9 @@ public class LrcActionListenerImpl implements LrcControlView.OnKaraokeEventListe
 
 
     @Override
-    public void onSwitchOriginalClick(int aimStatus) {
-        LrcControlView.OnKaraokeEventListener.super.onSwitchOriginalClick(aimStatus);
-        mViewModel.musicToggleOriginal(aimStatus);
+    public void onSwitchOriginalClick(int aimStatus, boolean isMainSinger) {
+        LrcControlView.OnKaraokeEventListener.super.onSwitchOriginalClick(aimStatus, isMainSinger);
+        mViewModel.musicToggleOriginal(aimStatus, isMainSinger);
 
         if (aimStatus == 0 || aimStatus == 2) {
             mLrcControlView.setSwitchOriginalChecked(true);
