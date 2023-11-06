@@ -82,6 +82,7 @@ class ShowBeautyFaceVC: UIViewController {
     }
     
     private func setBeautyHandler(value: CGFloat, isReset: Bool) {
+        guard !dataArray.isEmpty else { return }
         let model = dataArray[defalutSelectIndex]
         model.value = value
         switch type {

@@ -42,6 +42,14 @@ class BeautyManager: NSObject {
         }
     }
     
+    func checkLicense() -> Bool {
+        switch BeautyModel.beautyType {
+        case .byte: return ByteBeautyManager.shareManager.isSuccessLicense
+        case .sense: return SenseBeautyManager.shareManager.isSuccessLicense
+        case .fu: return FUBeautyManager.shareManager.isSuccessLicense
+        }
+    }
+    
     func configBeautyAPIWithRtcEngine(engine: AgoraRtcEngineKit) {
         let config = BeautyConfig()
         config.rtcEngine = engine
@@ -179,7 +187,7 @@ class BeautyManager: NSObject {
         }
     }
     
-    func destroy() {
+    func destroy(isAll: Bool = false) {
         switch BeautyModel.beautyType {
         case .byte:
             ByteBeautyManager.shareManager.destroy()
@@ -190,6 +198,7 @@ class BeautyManager: NSObject {
         case .fu:
             FUBeautyManager.shareManager.destroy()
         }
+        guard isAll else { return }
         beautyAPI.destroy()
         BeautyManager._sharedManager = nil
         ShowAgoraKitManager.shared.enableVirtualBackground(isOn: false,

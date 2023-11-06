@@ -33,7 +33,22 @@ class ShowBeautySettingVC: UIViewController {
     var selectedItem: ((_ item: String)->())?
     var dismissed: (()->())?
     
-    private var slider: UISlider!
+    private lazy var slider: UISlider = {
+       let slider = UISlider()
+        slider.minimumTrackTintColor = .show_zi03
+        slider.maximumTrackTintColor = .show_slider_tint
+        slider.addTarget(self, action: #selector(onTapSliderHandler(sender:)), for: .valueChanged)
+        return slider
+    }()
+    private lazy var sliderLabel: UILabel = {
+        let label = UILabel()
+        label.text = ""
+        label.textColor = UIColor(hex: "#FFFFFF", alpha: 1.0)
+        label.font = .systemFont(ofSize: 12)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    private var sliderLabelCenterCons: NSLayoutConstraint?
     private let titles = ShowBeautyFaceVCType.allCases.filter({
         if BeautyModel.beautyType == .byte {
             return $0 != .adjust
@@ -105,6 +120,22 @@ class ShowBeautySettingVC: UIViewController {
         segmentedView.indicators = [self.indicator]
         return segmentedView
     }()
+    
+    private lazy var beautyVenderButton: UIButton = {
+        let button = UIButton()
+        button.setTitleColor(UIColor(hex: "#FFFFFF", alpha: 0.6), for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 14)
+        button.backgroundColor = UIColor(hex: "#18191B", alpha: 0.4)
+        button.cornerRadius(8)
+        button.set(image: UIImage.sceneImage(name: "show_beauty_vernder_arrow_right"),
+                   title: "火山引擎",
+                   titlePosition: .left,
+                   additionalSpacing: 4,
+                   state: .normal)
+        button.titleLabel?.textAlignment = .left
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
         
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -121,11 +152,13 @@ class ShowBeautySettingVC: UIViewController {
             beautyFaceVC?.selectedItemClosure = { [weak self] value, isHiddenValue, isShowSegSwitch in
                 guard let self = self else { return }
                 self.slider.isHidden = isShowSegSwitch ? !ShowAgoraKitManager.isOpenGreen : isHiddenValue
+                self.sliderLabel.isHidden = self.slider.isHidden
                 self.compareButton.isHidden = isShowSegSwitch ? true : isHiddenValue
                 self.segSwitch.isHidden = !isShowSegSwitch
                 self.segSwitch.isOn = isShowSegSwitch == false ? ShowAgoraKitManager.isOpenGreen : self.segSwitch.isOn
                 self.segLabel.isHidden = !isShowSegSwitch
                 self.slider.setValue(Float(value), animated: true)
+                self.updateSliderLabelPostion()
             }
             beautyFaceVC?.reloadData()
         }
@@ -141,10 +174,6 @@ class ShowBeautySettingVC: UIViewController {
         view.backgroundColor = .clear
         
         // slider
-        slider = UISlider()
-        slider.minimumTrackTintColor = .show_zi03
-        slider.maximumTrackTintColor = .show_slider_tint
-        slider.addTarget(self, action: #selector(onTapSliderHandler(sender:)), for: .valueChanged)
         view.addSubview(slider)
         slider.snp.makeConstraints { make in
             make.left.equalTo(22)
@@ -152,6 +181,9 @@ class ShowBeautySettingVC: UIViewController {
             make.height.equalTo(30)
             make.bottom.equalTo(-214)
         }
+        view.addSubview(sliderLabel)
+        sliderLabel.bottomAnchor.constraint(equalTo: slider.topAnchor, constant: -3).isActive = true
+        sliderLabelCenterCons = sliderLabel.centerXAnchor.constraint(equalTo: slider.leadingAnchor)
         
         // 对比按钮
         view.addSubview(compareButton)
@@ -160,6 +192,12 @@ class ShowBeautySettingVC: UIViewController {
             make.right.equalTo(-20)
             make.width.height.equalTo(36)
         }
+        
+        view.addSubview(beautyVenderButton)
+        beautyVenderButton.leadingAnchor.constraint(equalTo: slider.leadingAnchor).isActive = true
+        beautyVenderButton.bottomAnchor.constraint(equalTo: sliderLabel.topAnchor, constant: 3).isActive = true
+        beautyVenderButton.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        beautyVenderButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
         view.addSubview(segSwitch)
         segSwitch.snp.makeConstraints { make in
@@ -205,6 +243,15 @@ class ShowBeautySettingVC: UIViewController {
     @objc
     private func onTapSliderHandler(sender: UISlider) {
         beautyFaceVC?.changeValueHandler(value: CGFloat(sender.value))
+        updateSliderLabelPostion()
+    }
+    
+    private func updateSliderLabelPostion() {
+        sliderLabel.text = "\(Int(slider.value * 100))"
+        let trackRect = slider.trackRect(forBounds: slider.bounds)
+        let thumbRect = slider.thumbRect(forBounds: slider.bounds, trackRect: trackRect, value: slider.value)
+        sliderLabelCenterCons?.constant = thumbRect.midX
+        sliderLabelCenterCons?.isActive = true
     }
     
     @objc
@@ -212,6 +259,7 @@ class ShowBeautySettingVC: UIViewController {
         func realChange(isOn: Bool){
             ShowAgoraKitManager.isOpenGreen = isOn
             slider.isHidden = !isOn
+            sliderLabel.isHidden = slider.isHidden
             if ShowAgoraKitManager.isBlur {
                 ShowAgoraKitManager.shared.enableVirtualBackground(isOn: true,
                                                                    greenCapacity: slider.value)
@@ -242,13 +290,15 @@ extension ShowBeautySettingVC {
     
     // 点击对比按钮
     @objc private func didClickCompareButton(sender: UIButton){
-        if let _ = Bundle.main.path(forResource: "SENSEME.lic", ofType: nil) {
-            // 存在美颜证书
+        // 判断存在美颜证书
+        if BeautyManager.shareManager.checkLicense() {
             sender.isSelected = !sender.isSelected
             BeautyManager.shareManager.isEnableBeauty = sender.isSelected
         } else {
             ToastView.show(text: "show_beauty_license_disable".show_localized)
         }
+        slider.isHidden = !sender.isSelected
+        sliderLabel.isHidden = slider.isHidden
     }
 }
 

@@ -27,6 +27,8 @@
 
 @property (nonatomic, weak) id<FUManagerProtocol>delegate;
 
+@property (nonatomic, assign, readonly) BOOL isSuccessLicense;
+
 + (FUManager *)shareManager;
 
 /// 销毁全部道具

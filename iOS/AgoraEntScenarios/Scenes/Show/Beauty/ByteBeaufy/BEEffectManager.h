@@ -70,6 +70,7 @@ typedef NS_ENUM(NSInteger, BEEffectPart) {
 @property (nonatomic, weak) id<BEEffectManagerDelegate> delegate;
 @property (nonatomic, strong) NSString *resourcePath;
 @property (atomic, weak) dispatch_queue_t renderQueue;
+@property (nonatomic, assign, readonly) BOOL isSuccessLicense;
 
 
 //   {zh} / @brief 构造函数     {en} /@brief constructor

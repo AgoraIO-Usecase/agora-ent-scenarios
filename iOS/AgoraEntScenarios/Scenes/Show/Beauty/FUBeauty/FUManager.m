@@ -7,10 +7,10 @@
 //
 
 #import "FUManager.h"
-#import "authpack.h"
 #import "BundleUtil.h"
 #if __has_include(<FURenderKit/FURenderKit.h>)
 #import <FURenderKit/FURenderKit.h>
+#import "authpack.h"
 #endif
 
 static FUManager *shareManager = NULL;
@@ -47,7 +47,7 @@ static FUManager *shareManager = NULL;
         setupConfig.authPack = FUAuthPackMake(g_auth_package, sizeof(g_auth_package));
         setupConfig.controllerPath = controllerPath;
         setupConfig.controllerConfigPath = controllerConfigPath;
-                
+        _isSuccessLicense = sizeof(g_auth_package) > 0;
         // 初始化 FURenderKit
         [FURenderKit setupWithSetupConfig:setupConfig];
         

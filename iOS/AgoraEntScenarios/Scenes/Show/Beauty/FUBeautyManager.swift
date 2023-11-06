@@ -24,6 +24,10 @@ class FUBeautyManager: NSObject {
         }
     }
     
+    var isSuccessLicense: Bool {
+        render.fuManager.isSuccessLicense
+    }
+    
     func setBeauty(path: String?, key: String?, value: CGFloat) {
         if path == "init" {
             render.setBeautyPreset()

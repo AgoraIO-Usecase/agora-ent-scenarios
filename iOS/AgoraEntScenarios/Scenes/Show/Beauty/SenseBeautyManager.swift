@@ -28,7 +28,7 @@ class SenseBeautyManager: NSObject {
             _sharedManager = nil
         }
     }
-    private var isSuccessLicense: Bool = false {
+    private(set) var isSuccessLicense: Bool = false {
         didSet {
             guard isSuccessLicense, !datas.isEmpty else { return }
             datas.forEach({

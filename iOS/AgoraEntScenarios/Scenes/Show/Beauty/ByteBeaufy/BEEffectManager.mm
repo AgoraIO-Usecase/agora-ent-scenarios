@@ -102,6 +102,7 @@ static bool USE_3_BUFFER = NO;
     if (self.licenseProvider.licenseMode == OFFLINE_LICENSE) {
         ret = bef_effect_ai_check_license(_handle, [self.licenseProvider licensePath:BEF_EFFECT]);
         CHECK_RET_AND_RETURN(bef_effect_ai_check_license, ret)
+        _isSuccessLicense = ret == 0;
     }
     else if (self.licenseProvider.licenseMode == ONLINE_LICENSE){
         if (![self.licenseProvider checkLicenseResult: @"getLicensePath"])
@@ -109,6 +110,7 @@ static bool USE_3_BUFFER = NO;
 
         ret = bef_effect_ai_check_online_license(_handle, [self.licenseProvider licensePath:BEF_EFFECT]);
         CHECK_RET_AND_RETURN(bef_effect_ai_check_online_license, ret)
+        _isSuccessLicense = ret == 0;
     }
 
     [self setUsePipeline:USE_PIPELINE];
