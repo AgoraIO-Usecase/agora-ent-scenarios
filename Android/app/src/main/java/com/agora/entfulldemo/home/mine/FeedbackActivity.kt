@@ -9,6 +9,7 @@ import android.content.Intent
 import android.graphics.Canvas
 import android.net.Uri
 import android.os.Bundle
+import android.os.HandlerThread
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -25,7 +26,6 @@ import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppActivityFeedbackBinding
 import com.agora.entfulldemo.databinding.AppItemFeedbackImageBinding
 import com.agora.entfulldemo.databinding.AppItemFeedbackReasonBinding
-import com.agora.entfulldemo.home.MainViewModel
 import com.agora.entfulldemo.home.constructor.FeedbackModel
 import com.agora.entfulldemo.widget.dp
 import com.agora.entfulldemo.widget.image.GlideEngine
@@ -44,10 +44,16 @@ import com.luck.picture.lib.interfaces.OnResultCallbackListener
 import com.luck.picture.lib.style.PictureSelectorStyle
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.PagePathConstant
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnFastClickListener
+import io.agora.scene.base.utils.FileUtils
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.base.utils.ZipUtils
+import io.agora.scene.base.utils.ZipUtils.ZipCallback
+import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
+import java.io.File
 import java.util.Collections
 
 @Route(path = PagePathConstant.pageFeedback)
@@ -56,10 +62,26 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
     companion object {
         private const val servicePhone = "400-632-6626"
         private const val maxImageSelectable = 3
+        private val logFolder = AgoraApplication.the().getExternalFilesDir("")!!.absolutePath
+        private val logFileWriteThread by lazy {
+            HandlerThread("AgoraFeedback.$logFolder").apply {
+                start()
+            }
+        }
     }
 
-    private val mainViewModel: MainViewModel by lazy {
-        ViewModelProvider(this)[MainViewModel::class.java]
+    private val mFeedbackViewModel: FeedbackViewModel by lazy {
+        ViewModelProvider(this)[FeedbackViewModel::class.java]
+    }
+
+    private val mLogPaths: List<String> by lazy {
+        mutableListOf(
+            logFolder + File.separator + "agorasdk.log",
+            logFolder + File.separator + "agorasdk.1.log",
+            logFolder + File.separator + "agorasdk.2.log",
+            logFolder + File.separator + "agorasdk.3.log",
+            logFolder + File.separator + "agorasdk.4.log",
+        )
     }
 
     private val mFeedbackReasons: MutableList<FeedbackModel> by lazy {
@@ -106,7 +128,7 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         binding.rvFeedbackReason.adapter = mReasonAdapter
         binding.rvFeedbackImage.adapter = mImageAdapter
         // 绑定拖拽事件
-        mItemTouchHelper.attachToRecyclerView(binding.rvFeedbackImage)
+//        mItemTouchHelper.attachToRecyclerView(binding.rvFeedbackImage)
     }
 
     override fun initListener() {
@@ -121,21 +143,25 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         })
         binding.btnSubmit.setOnClickListener(object : OnFastClickListener() {
             override fun onClickJacking(view: View) {
-                val selectReasons = checkReason()
-                if (selectReasons.isEmpty()) {
+
+                checkReason()
+                if (mSelectReasons.isEmpty()) {
                     ToastUtils.showToast(R.string.app_feedback_reason_empty_tips)
                     return
                 }
                 val reasonContent = binding.etFeedbackReason.text
-                val uploadLog = binding.cvIAgree.isChecked
+                val uploadLog = binding.cvUploadLog.isChecked
                 // TODO: feedback api
                 Log.d(
-                    "zhangw", "reasons:$selectReasons\n" +
+                    "zhangw", "reasons:$mSelectReasons\n" +
                             " content:$reasonContent\n " +
                             "images:$mFeedbackImages\n " +
                             "uploadLog:$uploadLog"
                 )
-                feedbackSuccessView()
+
+                mUploadImageUrls.clear()
+                showLoadingView()
+                uploadImages()
             }
         })
         binding.tvServiceNumber.setOnClickListener(object : OnFastClickListener() {
@@ -152,7 +178,7 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
                 dialog.onClickCallPhone = {
                     val intent = Intent(Intent.ACTION_DIAL)
                     val uri = Uri.parse("tel:$servicePhone")
-                    intent.setData(uri)
+                    intent.data = uri
                     startActivity(intent)
                 }
                 dialog.show(supportFragmentManager, "CallPhoneDialog")
@@ -160,6 +186,80 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         })
     }
 
+    private val mSelectReasons: MutableList<String> by lazy {
+        mutableListOf()
+    }
+    private val mUploadImageUrls: MutableList<String> by lazy {
+        mutableListOf()
+    }
+    private var mUploadLogUrl: String = ""
+
+    // 1. upload images
+    private fun uploadImages() {
+        val imagePath = mFeedbackImages.removeFirstOrNull()
+        if (imagePath.isNullOrEmpty()) {
+            uploadLog()
+        } else {
+            val file = File(imagePath)
+            mFeedbackViewModel.updatePhoto(file, completion = { error, url ->
+                if (error == null) { //success
+                    mUploadImageUrls.add(url)
+                    uploadImages()
+                } else {
+                    uploadImages()
+                    Log.e("tag", "${error.message}")
+                }
+            })
+        }
+    }
+
+    // 2. upload sdk log
+    private fun uploadLog() {
+        mUploadLogUrl = ""
+        val uploadLog = binding.cvUploadLog.isChecked
+        if (uploadLog) {
+            val sdkLogZipPath = logFolder + File.separator + "agoraSdkLog.zip"
+
+            ZipUtils.compressFiles(mLogPaths, sdkLogZipPath, object : ZipCallback {
+                override fun onFileZipped(destinationFilePath: String) {
+                    mFeedbackViewModel.requestUploadLog(File(destinationFilePath), completion = { error, url ->
+                        if (error == null) { // success
+                            mUploadLogUrl = url
+                        } else {
+                            Log.e("zhangw", "upload log failed:${error.message}")
+                        }
+                        FileUtils.deleteFile(sdkLogZipPath)
+                        requestFeedbackApi()
+                    })
+                }
+
+                override fun onError(e: java.lang.Exception?) {
+                    requestFeedbackApi()
+                }
+            })
+        } else {
+            requestFeedbackApi()
+        }
+    }
+
+    // 3. request feedback api
+    private fun requestFeedbackApi() {
+        val screenshotURLS = mutableMapOf<String, String>()
+        if (mUploadImageUrls.isNotEmpty()) {
+            for (i in 0 until mUploadImageUrls.size) {
+                screenshotURLS["${i + 1}"] = mUploadImageUrls[i]
+            }
+        }
+        val tags = mSelectReasons.toTypedArray()
+        val description = binding.etFeedbackReason.text.toString()
+        mFeedbackViewModel.requestFeedbackUpload(screenshotURLS, tags, description, mUploadLogUrl,
+            completion = { error, feedbackRes ->
+                if (error == null) {
+                    feedbackSuccessView()
+                }
+                hideLoadingView()
+            })
+    }
 
     private val mSelectorStyle = PictureSelectorStyle()
     private val mSelectedMedia = ArrayList<LocalMedia>()
@@ -229,14 +329,19 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         startChooseImage()
     }
 
-    private fun checkReason(): List<FeedbackModel> {
-        val selectReasons = mutableListOf<FeedbackModel>()
+    override fun onPermissionDined(permission: String?) {
+        super.onPermissionDined(permission)
+        PermissionLeakDialog(this).show(permission, null) { launchAppSetting(permission) }
+    }
+
+    private fun checkReason(): List<String> {
+        mSelectReasons.clear()
         mFeedbackReasons.forEach {
             if (it.isSelect) {
-                selectReasons.add(it)
+                mSelectReasons.add(it.reason)
             }
         }
-        return selectReasons
+        return mSelectReasons
     }
 
     private fun feedbackSuccessView() {

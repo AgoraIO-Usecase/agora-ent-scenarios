@@ -1,8 +1,11 @@
 package io.agora.scene.base.api;
 
+import java.util.Map;
+
 import io.agora.scene.base.api.base.BaseResponse;
 import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.bean.CommonBean;
+import io.agora.scene.base.bean.FeedbackUploadResBean;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import okhttp3.MultipartBody;
@@ -54,4 +57,11 @@ public interface ApiManagerService {
                                                      @Query("appId") String appId,
                                                      @Query("projectId") String projectId,
                                                      @Body RequestBody requestBody);
+
+    @Multipart
+    @POST(UrlConstants.REQUEST_UPLOAD_LOG)
+    Observable<BaseResponse<CommonBean>> requestUploadLog(@Part MultipartBody.Part body);
+
+    @POST(UrlConstants.REQUEST_FEEDBACK_UPLOAD)
+    Observable<BaseResponse<FeedbackUploadResBean>> requestFeedbackUpload(@Body RequestBody requestBody);
 }
