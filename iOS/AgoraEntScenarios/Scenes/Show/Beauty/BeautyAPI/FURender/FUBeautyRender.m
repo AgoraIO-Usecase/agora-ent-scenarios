@@ -174,7 +174,7 @@
 - (void)setStickerWithPath:(NSString *)path {
     NSBundle *bundle = [BundleUtil bundleWithBundleName:@"FURenderKit" podName:@"fuLib"];
     NSString *stickerPath = [bundle pathForResource:[NSString stringWithFormat:@"sticker/%@", path] ofType:@"bundle"];
-    if (stickerPath == nil) {
+    if (stickerPath == nil && self.currentSticker == nil) {
         return;
     }
 #if __has_include(FURenderMoudle)
@@ -217,7 +217,10 @@
 #if __has_include(FURenderMoudle)
     NSString *faceAIPath = [[NSBundle mainBundle] pathForResource:@"face_beautification" ofType:@"bundle"];
     FUBeauty *beauty = [[FUBeauty alloc] initWithPath:faceAIPath name:@"FUBeauty"];
-    [FURenderKit shareRenderKit].beauty = beauty;
+    dispatch_queue_t referQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
+    dispatch_async(referQueue, ^{
+        [FURenderKit shareRenderKit].beauty = beauty;
+    });
 #endif
 }
 

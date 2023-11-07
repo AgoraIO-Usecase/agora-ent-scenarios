@@ -10,18 +10,18 @@ import JXCategoryView
 
 enum ShowBeautyFaceVCType: CaseIterable {
     case beauty
-//    case filter
     case style
     case adjust
+    case animoj
     case sticker
     case background
     
     var title: String {
         switch self {
         case .beauty: return "create_beauty_setting_beauty_face".show_localized
-//        case .filter: return "create_beauty_setting_filter".show_localized
         case .style: return "create_beauty_setting_special_effects".show_localized
         case .adjust: return "create_beauty_setting_special_adjust".show_localized
+        case .animoj: return "create_beauty_setting_special_animoji".show_localized
         case .sticker: return "create_beauty_setting_sticker".show_localized
         case .background: return "背景".show_localized
         }
@@ -45,17 +45,24 @@ class ShowBeautySettingVC: UIViewController {
         label.text = ""
         label.textColor = UIColor(hex: "#FFFFFF", alpha: 1.0)
         label.font = .systemFont(ofSize: 12)
+        label.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        label.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     private var sliderLabelCenterCons: NSLayoutConstraint?
-    private let titles = ShowBeautyFaceVCType.allCases.filter({
-        if BeautyModel.beautyType == .byte {
-            return $0 != .adjust
-        }
-        return true
-    }).map({ $0.title })
-    private let vcs = ShowBeautyFaceVCType.allCases.map({ ShowBeautyFaceVC(type: $0) })
+    private var titles: [String] {
+        ShowBeautyFaceVCType.allCases.filter({
+            if BeautyModel.beautyType == .byte {
+                return $0 != .adjust && $0 != .animoj
+            } else if BeautyModel.beautyType == .fu {
+                return $0 != .adjust
+            } else {
+                return $0 != .animoj
+            }
+        }).map({ $0.title })
+    }
+    private var vcs: [ShowBeautyFaceVC] = []
     
     // 背景
     private lazy var bgView: UIView = {
@@ -121,21 +128,40 @@ class ShowBeautySettingVC: UIViewController {
         return segmentedView
     }()
     
-    private lazy var beautyVenderButton: UIButton = {
-        let button = UIButton()
+    private lazy var beautyVenderButton: LLButton = {
+        let button = LLButton()
         button.setTitleColor(UIColor(hex: "#FFFFFF", alpha: 0.6), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 14)
+        button.setTitle(BeautyModel.beautyType.title, for: .normal)
         button.backgroundColor = UIColor(hex: "#18191B", alpha: 0.4)
+        let image = UIImage.sceneImage(name: "show_beauty_vernder_arrow_right") ?? UIImage()
+        button.setImage(image, for: .normal)
         button.cornerRadius(8)
-        button.set(image: UIImage.sceneImage(name: "show_beauty_vernder_arrow_right"),
-                   title: "火山引擎",
-                   titlePosition: .left,
-                   additionalSpacing: 4,
-                   state: .normal)
-        button.titleLabel?.textAlignment = .left
+        button.imageAlignment = .right
+        button.spaceBetweenTitleAndImage = 5
+        button.addTarget(self, action: #selector(onClickBeautyVenderButton(sender:)), for: .touchUpInside)
+        button.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        button.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+    private lazy var beautyVenderView: ShowBeautyVenderView = {
+        let view = ShowBeautyVenderView()
+        view.onSelectedBeautyVenderClosure = { [weak self] type in
+            self?.beautyVenderButton.setTitle(type.title, for: .normal)
+            BeautyManager.shareManager.destroy(isAll: false)
+            BeautyModel.beautyType = type
+            ShowBeautyFaceVC.resetData()
+            BeautyManager.shareManager.updateBeautyRedner()
+            self?.vcs = self?.createBeautyVC() ?? []
+            self?.segmentedView.titles = self?.titles
+            self?.segmentedView.reloadData()
+            self?.segmentedView.selectItem(at: 0)
+        }
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    private var beautyVenderViewH: NSLayoutConstraint?
         
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -167,7 +193,20 @@ class ShowBeautySettingVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        vcs = createBeautyVC()
         beautyFaceVC = vcs.first
+    }
+    
+    private func createBeautyVC() -> [ShowBeautyFaceVC] {
+        ShowBeautyFaceVCType.allCases.filter({
+            if BeautyModel.beautyType == .byte {
+                return $0 != .adjust && $0 != .animoj
+            } else if BeautyModel.beautyType == .fu {
+                return $0 != .adjust
+            } else {
+                return $0 != .animoj
+            }
+        }).map({ ShowBeautyFaceVC(type: $0) })
     }
 
     private func setupUI(){
@@ -183,6 +222,7 @@ class ShowBeautySettingVC: UIViewController {
         }
         view.addSubview(sliderLabel)
         sliderLabel.bottomAnchor.constraint(equalTo: slider.topAnchor, constant: -3).isActive = true
+        sliderLabel.heightAnchor.constraint(equalToConstant: 17).isActive = true
         sliderLabelCenterCons = sliderLabel.centerXAnchor.constraint(equalTo: slider.leadingAnchor)
         
         // 对比按钮
@@ -195,9 +235,16 @@ class ShowBeautySettingVC: UIViewController {
         
         view.addSubview(beautyVenderButton)
         beautyVenderButton.leadingAnchor.constraint(equalTo: slider.leadingAnchor).isActive = true
-        beautyVenderButton.bottomAnchor.constraint(equalTo: sliderLabel.topAnchor, constant: 3).isActive = true
+        beautyVenderButton.bottomAnchor.constraint(equalTo: sliderLabel.topAnchor, constant: -5).isActive = true
         beautyVenderButton.widthAnchor.constraint(equalToConstant: 100).isActive = true
         beautyVenderButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        
+        view.addSubview(beautyVenderView)
+        beautyVenderView.leadingAnchor.constraint(equalTo: beautyVenderButton.leadingAnchor).isActive = true
+        beautyVenderView.bottomAnchor.constraint(equalTo: beautyVenderButton.topAnchor).isActive = true
+        beautyVenderView.trailingAnchor.constraint(equalTo: beautyVenderButton.trailingAnchor).isActive = true
+        beautyVenderViewH = beautyVenderView.heightAnchor.constraint(equalToConstant: 0)
+        beautyVenderViewH?.isActive = true
         
         view.addSubview(segSwitch)
         segSwitch.snp.makeConstraints { make in
@@ -279,6 +326,18 @@ class ShowBeautySettingVC: UIViewController {
             realChange(isOn: sender.isOn)
         }
     }
+    
+    @objc
+    private func onClickBeautyVenderButton(sender: UIButton) {
+        sender.isSelected = !sender.isSelected
+        beautyVenderViewH?.constant = sender.isSelected ? CGFloat(40 * BeautyFactoryType.allCases.count) : 0
+        beautyVenderViewH?.isActive = true
+        beautyVenderButton.layer.maskedCorners = sender.isSelected ? [.layerMinXMaxYCorner, .layerMaxXMaxYCorner] : [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        UIView.animate(withDuration: 0.25) {
+            self.view.layoutIfNeeded()
+            sender.imageView?.transform = sender.isSelected ? .init(rotationAngle: -.pi / 2) : .identity
+        }
+    }
 }
 
 extension ShowBeautySettingVC {
@@ -321,5 +380,46 @@ extension ShowBeautySettingVC: JXCategoryListContainerViewDelegate {
     func listContainerView(_ listContainerView: JXCategoryListContainerView?,
                            initListFor index: Int) -> JXCategoryListContentViewDelegate? {
         vcs[index]
+    }
+}
+
+enum LLImageAlignment: NSInteger {
+    case left = 0
+    case top
+    case bottom
+    case right
+}
+class LLButton: UIButton {
+    var imageAlignment: LLImageAlignment = .left
+    var spaceBetweenTitleAndImage: CGFloat = 0
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let space: CGFloat = spaceBetweenTitleAndImage
+        let titleW: CGFloat = titleLabel?.bounds.width ?? 0
+        let titleH: CGFloat = titleLabel?.bounds.height ?? 0
+        let imageW: CGFloat = imageView?.bounds.width ?? 0
+        let imageH: CGFloat = imageView?.bounds.height ?? 0
+        let btnCenterX: CGFloat = bounds.width / 2
+        let imageCenterX: CGFloat = btnCenterX - titleW / 2
+        let titleCenterX = btnCenterX + imageW / 2
+        
+        switch imageAlignment {
+        case .top:
+            titleEdgeInsets = UIEdgeInsets(top: imageH / 2 + space / 2, left: -(titleCenterX - btnCenterX), bottom: -(imageH/2 + space/2), right: titleCenterX-btnCenterX)
+            imageEdgeInsets = UIEdgeInsets(top: -(titleH / 2 + space / 2), left: btnCenterX - imageCenterX, bottom: titleH / 2 + space / 2, right: -(btnCenterX - imageCenterX))
+            
+        case .left:
+            titleEdgeInsets = UIEdgeInsets(top: 0, left: space / 2, bottom: 0, right: -space / 2)
+            imageEdgeInsets = UIEdgeInsets(top: 0, left: -space / 2, bottom: 0, right: space)
+            
+        case .bottom:
+            titleEdgeInsets = UIEdgeInsets(top: -(imageH / 2 + space / 2), left: -(titleCenterX - btnCenterX), bottom: imageH / 2 + space / 2, right: titleCenterX - btnCenterX)
+            imageEdgeInsets = UIEdgeInsets(top: titleH / 2 + space / 2, left: btnCenterX - imageCenterX,bottom: -(titleH / 2 + space / 2), right: -(btnCenterX - imageCenterX))
+            
+        case .right:
+            titleEdgeInsets = UIEdgeInsets(top: 0, left: -(imageW + space / 2), bottom: 0, right: imageW + space / 2)
+            imageEdgeInsets = UIEdgeInsets(top: 0, left: titleW + space / 2, bottom: 0, right: -(titleW + space / 2))
+        }
     }
 }

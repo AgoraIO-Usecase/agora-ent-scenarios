@@ -547,7 +547,6 @@
 		E3735C9A2A5E7E75004737EF /* ByteBeautyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735C6C2A5E7E75004737EF /* ByteBeautyManager.swift */; };
 		E3735C9B2A5E7E75004737EF /* BeautyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735C6D2A5E7E75004737EF /* BeautyManager.swift */; };
 		E3735C9C2A5E7E75004737EF /* BundleUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C702A5E7E75004737EF /* BundleUtil.m */; };
-		E3735C9D2A5E7E75004737EF /* BeautyLoad.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C732A5E7E75004737EF /* BeautyLoad.m */; };
 		E3735C9E2A5E7E75004737EF /* BeautyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735C742A5E7E75004737EF /* BeautyModel.swift */; };
 		E3735C9F2A5E7E75004737EF /* BeautyResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E3735C752A5E7E75004737EF /* BeautyResource.bundle */; };
 		E3735CA12A5E7E75004737EF /* FUBeautyRender.m in Sources */ = {isa = PBXBuildFile; fileRef = E3735C7A2A5E7E75004737EF /* FUBeautyRender.m */; };
@@ -586,6 +585,10 @@
 		E751D85D29F11723001354CA /* AUiMoreDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E751D85C29F11723001354CA /* AUiMoreDialog.swift */; };
 		E76F80192AF34B6900CCB9D6 /* FUBeautyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76F80152AF34B6900CCB9D6 /* FUBeautyManager.swift */; };
 		E76F801A2AF34B6900CCB9D6 /* FUManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E76F80182AF34B6900CCB9D6 /* FUManager.m */; };
+		E7C147682AF8C1840092C7F1 /* BeautyModel+Sense.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C147672AF8C1840092C7F1 /* BeautyModel+Sense.swift */; };
+		E7C1476A2AF8C19A0092C7F1 /* BeautyModel+FU.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C147692AF8C19A0092C7F1 /* BeautyModel+FU.swift */; };
+		E7C1476C2AF8C1AD0092C7F1 /* BeautyModel+Bytes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C1476B2AF8C1AD0092C7F1 /* BeautyModel+Bytes.swift */; };
+		E7C1476E2AF8E8500092C7F1 /* ShowBeautyVenderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C1476D2AF8E8500092C7F1 /* ShowBeautyVenderView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1279,8 +1282,6 @@
 		E3735C6D2A5E7E75004737EF /* BeautyManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeautyManager.swift; sourceTree = "<group>"; };
 		E3735C6F2A5E7E75004737EF /* BundleUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BundleUtil.h; sourceTree = "<group>"; };
 		E3735C702A5E7E75004737EF /* BundleUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BundleUtil.m; sourceTree = "<group>"; };
-		E3735C722A5E7E75004737EF /* BeautyLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BeautyLoad.h; sourceTree = "<group>"; };
-		E3735C732A5E7E75004737EF /* BeautyLoad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BeautyLoad.m; sourceTree = "<group>"; };
 		E3735C742A5E7E75004737EF /* BeautyModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeautyModel.swift; sourceTree = "<group>"; };
 		E3735C752A5E7E75004737EF /* BeautyResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = BeautyResource.bundle; sourceTree = "<group>"; };
 		E3735C782A5E7E75004737EF /* BeautyAPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BeautyAPI.h; sourceTree = "<group>"; };
@@ -1348,6 +1349,10 @@
 		E76F80152AF34B6900CCB9D6 /* FUBeautyManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FUBeautyManager.swift; sourceTree = "<group>"; };
 		E76F80172AF34B6900CCB9D6 /* FUManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FUManager.h; sourceTree = "<group>"; };
 		E76F80182AF34B6900CCB9D6 /* FUManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FUManager.m; sourceTree = "<group>"; };
+		E7C147672AF8C1840092C7F1 /* BeautyModel+Sense.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BeautyModel+Sense.swift"; sourceTree = "<group>"; };
+		E7C147692AF8C19A0092C7F1 /* BeautyModel+FU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BeautyModel+FU.swift"; sourceTree = "<group>"; };
+		E7C1476B2AF8C1AD0092C7F1 /* BeautyModel+Bytes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BeautyModel+Bytes.swift"; sourceTree = "<group>"; };
+		E7C1476D2AF8E8500092C7F1 /* ShowBeautyVenderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautyVenderView.swift; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -1879,6 +1884,7 @@
 				DD36102A29B70CDC00CE7984 /* ShowCreateLiveView.swift */,
 				DD36102B29B70CDC00CE7984 /* ShowBeautyFaceCell.swift */,
 				DD36102C29B70CDC00CE7984 /* ShowSelectQualityCell.swift */,
+				E7C1476D2AF8E8500092C7F1 /* ShowBeautyVenderView.swift */,
 			);
 			path = CreateLive;
 			sourceTree = "<group>";
@@ -3243,9 +3249,10 @@
 		E3735C712A5E7E75004737EF /* BeautyModel */ = {
 			isa = PBXGroup;
 			children = (
-				E3735C722A5E7E75004737EF /* BeautyLoad.h */,
-				E3735C732A5E7E75004737EF /* BeautyLoad.m */,
 				E3735C742A5E7E75004737EF /* BeautyModel.swift */,
+				E7C147672AF8C1840092C7F1 /* BeautyModel+Sense.swift */,
+				E7C147692AF8C19A0092C7F1 /* BeautyModel+FU.swift */,
+				E7C1476B2AF8C1AD0092C7F1 /* BeautyModel+Bytes.swift */,
 			);
 			path = BeautyModel;
 			sourceTree = "<group>";
@@ -3652,7 +3659,6 @@
 				DDA199EF28FFE579009D3E61 /* VLBaseTableView.m in Sources */,
 				DD84177C29090C520026B624 /* VLHomeItemView.m in Sources */,
 				DD619AC529E3E247008F63E4 /* SAGifterCell.swift in Sources */,
-				E3735C9D2A5E7E75004737EF /* BeautyLoad.m in Sources */,
 				DD619BBE29E3E262008F63E4 /* VRCreateRoomViewController.swift in Sources */,
 				E3735CAB2A5E80FC004737EF /* KTVApi.swift in Sources */,
 				DD619A6929E3E247008F63E4 /* SwiftyFitSizeSA.swift in Sources */,
@@ -3731,6 +3737,8 @@
 				DD619A7629E3E247008F63E4 /* SALanagerManager.swift in Sources */,
 				DD619AA329E3E247008F63E4 /* SACreateRoomViewController.swift in Sources */,
 				E3735CA32A5E7E75004737EF /* SenseBeautyRender.m in Sources */,
+				E7C1476E2AF8E8500092C7F1 /* ShowBeautyVenderView.swift in Sources */,
+				E7C1476C2AF8C1AD0092C7F1 /* BeautyModel+Bytes.swift in Sources */,
 				DD619BC529E3E262008F63E4 /* VRRoomMenuBarCell.swift in Sources */,
 				DDA199F228FFE579009D3E61 /* UIViewController+VL.m in Sources */,
 				DD8417CB29090C520026B624 /* TemplateServiceImp.swift in Sources */,
@@ -3881,6 +3889,7 @@
 				DD3610C729B70CDC00CE7984 /* ShowSubscribeServiceProtocol.swift in Sources */,
 				DDA199E028FFE579009D3E61 /* VLEmptyView.m in Sources */,
 				DD619BB629E3E262008F63E4 /* VoiceRoomGiftersViewController.swift in Sources */,
+				E7C147682AF8C1840092C7F1 /* BeautyModel+Sense.swift in Sources */,
 				DD619A9529E3E247008F63E4 /* SAAlertViewController.swift in Sources */,
 				DD619BF829E3E262008F63E4 /* VMConfirmView.swift in Sources */,
 				DD619A8529E3E247008F63E4 /* SASceneConfig.swift in Sources */,
@@ -3914,6 +3923,7 @@
 				DD3610A129B70CDC00CE7984 /* ShowMusicTableHeaderView.swift in Sources */,
 				DD36109129B70CDC00CE7984 /* ShowToolMenuViewController.swift in Sources */,
 				DD619A8D29E3E247008F63E4 /* SAPositionInfo.swift in Sources */,
+				E7C1476A2AF8C19A0092C7F1 /* BeautyModel+FU.swift in Sources */,
 				E3735CAE2A5E8DDD004737EF /* KTVSkipView.swift in Sources */,
 				DD619B8A29E3E262008F63E4 /* CrossZoomAnimation.swift in Sources */,
 				DD619A9829E3E247008F63E4 /* SAHelpViewController.swift in Sources */,

@@ -39,7 +39,12 @@ static FUManager *shareManager = NULL;
 - (instancetype)init
 {
     if (self = [super init]) {
-        
+        [self setupInit];
+    }
+    return self;
+}
+
+- (void) setupInit {
 #if __has_include(<FURenderKit/FURenderKit.h>)
         NSString *controllerPath = [[NSBundle mainBundle] pathForResource:@"controller_cpp" ofType:@"bundle"];
         NSString *controllerConfigPath = [[NSBundle mainBundle] pathForResource:@"controller_config" ofType:@"bundle"];
@@ -78,8 +83,6 @@ static FUManager *shareManager = NULL;
         
         [FUAIKit shareKit].maxTrackFaces = 4;
 #endif
-    }
-    return self;
 }
 
 - (void)destoryItems {

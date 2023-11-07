@@ -11,6 +11,7 @@
 @interface BytesBeautyRender ()
 
 @property (nonatomic, strong) NSMutableArray *bytesNodes;
+@property (nonatomic, weak) BEPixelBufferGLTexture *outTexture;
 
 @end
 
@@ -47,10 +48,12 @@
 
 - (void)destroy {
 #if __has_include(BytesMoudle)
-    [_effectManager destroyTask];
     [_effectManager cleanPipeline];
+    [_effectManager destroyTask];
     _effectManager = nil;
     _imageUtils = nil;
+    [self.outTexture destroy];
+    self.outTexture = nil;
 #endif
 }
 
@@ -73,7 +76,7 @@
                                                                   height:texture.height
                                                                   format:pixelBufferInfo.format
                                                             withPipeline:self.effectManager.usePipeline];
-    
+    self.outTexture = outTexture;
     int ret = [self.effectManager processTexture:texture.texture
                                    outputTexture:outTexture.texture
                                            width:pixelBufferInfo.width

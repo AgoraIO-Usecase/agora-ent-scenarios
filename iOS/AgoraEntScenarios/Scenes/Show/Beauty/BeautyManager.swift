@@ -20,7 +20,7 @@ class BeautyManager: NSObject {
             _sharedManager = nil
         }
     }
-    
+    private var agoraKit: AgoraRtcEngineKit?
     public let beautyAPI = BeautyAPI()
     
     override init() {
@@ -51,6 +51,7 @@ class BeautyManager: NSObject {
     }
     
     func configBeautyAPIWithRtcEngine(engine: AgoraRtcEngineKit) {
+        agoraKit = engine
         let config = BeautyConfig()
         config.rtcEngine = engine
         config.captureMode = .agora
@@ -75,6 +76,12 @@ class BeautyManager: NSObject {
         }
         beautyAPI.initialize(config)
         beautyAPI.enable(true)
+    }
+    
+    func updateBeautyRedner() {
+        guard let agoraKit = agoraKit else { return }
+        configBeautyAPIWithRtcEngine(engine: agoraKit)
+        beautyAPI.setBeautyPreset(.default)
     }
     
     func setBeauty(path: String?, key: String?, value: CGFloat) {
@@ -187,7 +194,7 @@ class BeautyManager: NSObject {
         }
     }
     
-    func destroy(isAll: Bool = false) {
+    func destroy(isAll: Bool = true) {
         switch BeautyModel.beautyType {
         case .byte:
             ByteBeautyManager.shareManager.destroy()
@@ -198,8 +205,8 @@ class BeautyManager: NSObject {
         case .fu:
             FUBeautyManager.shareManager.destroy()
         }
-        guard isAll else { return }
         beautyAPI.destroy()
+        guard isAll else { return }
         BeautyManager._sharedManager = nil
         ShowAgoraKitManager.shared.enableVirtualBackground(isOn: false,
                                                            greenCapacity: 0)
