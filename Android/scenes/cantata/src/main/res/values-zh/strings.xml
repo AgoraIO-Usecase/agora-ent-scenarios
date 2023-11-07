@@ -172,4 +172,5 @@
     <string name="cantata_switch_close">关闭</string>
     <string name="cantata_earback_tips">开启耳返可实时听到自己的声音，唱歌的时候及时调整</string>
     <string name="cantata_kick_off">您已被踢下麦</string>
+    <string name="cantata_dissovle_room_because_no_one_ordered_songs">因长时间未点歌，您的房间已解散，请重新创建房间</string>
 </resources>
