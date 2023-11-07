@@ -19,7 +19,7 @@ class RoomAudienceListViewHolder constructor(private val binding: VoiceSpatialIt
                 // 不在麦位上
                 binding.mtAudienceAction.apply {
                     isClickable = true
-                    text = binding.root.context.getString(R.string.voice_room_invite)
+                    text = binding.root.context.getString(R.string.voice_spatial_room_invite)
                     setTextColor(ResourcesTools.getColor(context.resources, io.agora.voice.common.R.color.voice_white))
                     setBackgroundResource(R.drawable.voice_bg_rect_radius20_gradient_blue)
                     setOnClickListener {
@@ -30,7 +30,7 @@ class RoomAudienceListViewHolder constructor(private val binding: VoiceSpatialIt
                 // 在麦位上
                 binding.mtAudienceAction.apply {
                     isClickable = true
-                    text = binding.root.context.getString(R.string.voice_room_kickoff)
+                    text = binding.root.context.getString(R.string.voice_spatial_kickoff)
                     setTextColor(ResourcesTools.getColor(context.resources, R.color.voice_main_color_156ef3))
                     setBackgroundResource(0)
                     setOnClickListener {

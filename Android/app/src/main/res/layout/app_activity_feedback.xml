@@ -95,7 +95,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.appcompat.widget.AppCompatCheckBox
-        android:id="@+id/cvIAgree"
+        android:id="@+id/cvUploadLog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
@@ -119,7 +119,7 @@
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cvIAgree" />
+        app:layout_constraintTop_toBottomOf="@+id/cvUploadLog" />
 
     <LinearLayout
         android:id="@+id/layoutFeedbackSuccess"
@@ -165,5 +165,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="rvFeedbackReason,tvFeedbackDescribe,tvReasonContentCount,
-layoutInput,cvIAgree,btnSubmit" />
+layoutInput,cvUploadLog,btnSubmit" />
 </androidx.constraintlayout.widget.ConstraintLayout>

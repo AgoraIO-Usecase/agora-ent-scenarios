@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:paddingBottom="12dp"
         android:paddingTop="4dp"
-        android:paddingHorizontal="4dp"
+        android:paddingHorizontal="12dp"
         android:textColor="@color/def_text_grey_6F7"
         android:textSize="14sp"
         android:textStyle="bold"

@@ -26,7 +26,7 @@ import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ResourcesTools
 
 class ChatroomHandsDialog : BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>() {
-    private val titles = intArrayOf(R.string.voice_room_raised_hands_title, R.string.voice_room_invite_hands_title)
+    private val titles = intArrayOf(R.string.voice_spatial_room_raised_hands_title, R.string.voice_spatial_room_invite_hands_title)
     private val fragments: MutableList<Fragment> = mutableListOf()
     private var title: MaterialTextView? = null
     private var index = 0
@@ -77,7 +77,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>()
                         setTypeface(null, Typeface.BOLD)
                         val content =
                             getString(titles[index]) + getString(
-                                R.string.voice_room_tab_layout_count,
+                                R.string.voice_spatial_room_tab_layout_count,
                                 mCount.toString()
                             )
                         text = content
@@ -131,7 +131,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>()
                             mCount = count
                             activity?.let {
                                 val content = requireActivity().getString(titles[index]) + getString(
-                                    R.string.voice_room_tab_layout_count,
+                                    R.string.voice_spatial_room_tab_layout_count,
                                     mCount.toString()
                                 )
                                 "getItemCount content1: $content".logD(TAG)
@@ -145,7 +145,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>()
                                 mCount -= 1
                                 activity?.let {
                                     val content = requireActivity().getString(titles[index]) + getString(
-                                        R.string.voice_room_tab_layout_count,
+                                        R.string.voice_spatial_room_tab_layout_count,
                                         mCount.toString()
                                     )
                                     "getItemCount content1: $content".logD(TAG)
@@ -163,7 +163,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>()
                             mCount = count
                             if (activity != null) {
                                 val content = requireActivity().resources.getString(titles[index]) + getString(
-                                    R.string.voice_room_tab_layout_count,
+                                    R.string.voice_spatial_room_tab_layout_count,
                                     mCount.toString()
                                 )
                                 "getItemCount content2: $content".logD(TAG)

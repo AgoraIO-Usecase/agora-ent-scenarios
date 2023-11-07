@@ -100,7 +100,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
                 return (T) new RoomLivingViewModel((JoinRoomOutputModel) getIntent().getSerializableExtra(EXTRA_ROOM_INFO));
             }
         }).get(RoomLivingViewModel.class);
-        roomLivingViewModel.setLrcView(getBinding().lrcControlView);
 
         mRoomSpeakerAdapter = new BindingSingleAdapter<RoomSeatModel, KtvRelayItemRoomSpeakerBinding>() {
             @Override
@@ -225,6 +224,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
             else{
                 roomLivingViewModel.init();
             }
+            roomLivingViewModel.setLrcView(getBinding().lrcControlView);
         });
         getBinding().singRelayGameView.setIsRoomOwner(roomLivingViewModel.isRoomOwner());
 

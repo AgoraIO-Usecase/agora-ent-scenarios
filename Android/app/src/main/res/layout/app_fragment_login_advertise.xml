@@ -53,20 +53,49 @@
             android:textSize="12sp" />
     </LinearLayout>
 
-    <androidx.appcompat.widget.AppCompatButton
+    <LinearLayout
         android:id="@+id/btnLogin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="18dp"
-        android:layout_marginBottom="15dp"
-        android:background="@drawable/app_def_btn_bg"
-        android:text=""
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/layoutAgree" />
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:paddingHorizontal="15dp"
+        app:layout_constraintBottom_toTopOf="@id/layoutAgree"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/app_def_btn_bg_left" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="@string/app_login_phone_login"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:paddingBottom="12dp"
+            android:background="@drawable/app_def_btn_bg_middle" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/app_def_btn_bg_right" />
+    </LinearLayout>
+<!--    <androidx.appcompat.widget.AppCompatImageView-->
+<!--        android:id="@+id/btnLogin"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginHorizontal="18dp"-->
+<!--        android:layout_marginBottom="15dp"-->
+<!--        android:background="@drawable/app_def_btn_bg"-->
+<!--        android:text=""-->
+<!--        android:textColor="@color/white"-->
+<!--        android:textSize="18sp"-->
+<!--        android:textStyle="bold"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/layoutAgree" />-->
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvAgreementTips"

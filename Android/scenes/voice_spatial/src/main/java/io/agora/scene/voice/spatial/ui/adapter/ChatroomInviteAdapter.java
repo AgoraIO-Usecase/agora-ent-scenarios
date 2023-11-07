@@ -55,11 +55,11 @@ public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemb
                 }
             });
             if (checkMap.containsKey(item.getUserId())){
-                action.setText(mContext.getString(R.string.voice_room_invited));
+                action.setText(mContext.getString(R.string.voice_spatial_room_invited));
                 action.setBackgroundResource(R.drawable.voice_bg_rect_radius20_grey);
                 action.setEnabled(false);
             }else {
-                action.setText(mContext.getString(R.string.voice_room_invite));
+                action.setText(mContext.getString(R.string.voice_spatial_room_invite));
                 action.setBackgroundResource(R.drawable.voice_bg_rect_radius20_gradient_blue);
                 action.setEnabled(true);
             }
