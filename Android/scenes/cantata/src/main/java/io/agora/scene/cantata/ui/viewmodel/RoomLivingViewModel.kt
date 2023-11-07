@@ -86,6 +86,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
     val mRoomDeleteLiveData = MutableLiveData<Boolean>()
     val mRoomTimeUpLiveData = MutableLiveData<Boolean>()
+    val mRoomNoSongsLiveData = MutableLiveData<Boolean>()
+
     val mRoomUserCountLiveData = MutableLiveData<Int>()
 
     /**
@@ -264,6 +266,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 CantataLogger.d(TAG, "RoomLivingViewModel.exitRoom() success")
                 mRoomDeleteLiveData.postValue(false)
                 mRoomTimeUpLiveData.postValue(false)
+                mRoomNoSongsLiveData.postValue(false)
             } else {
                 // failure
                 CantataLogger.e(TAG, "RoomLivingViewModel.exitRoom() failed:${e.message} ")
