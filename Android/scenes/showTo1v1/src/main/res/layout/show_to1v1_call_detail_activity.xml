@@ -212,17 +212,29 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivMore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="16dp"
+            app:layout_constraintBottom_toBottomOf="@id/ivClose"
+            app:layout_constraintEnd_toStartOf="@id/ivClose"
+            app:layout_constraintTop_toTopOf="@id/ivClose"
+            android:src="@mipmap/icon_more" />
+
         <LinearLayout
             android:id="@+id/layoutNumCount"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_marginEnd="15dp"
+            android:layout_marginEnd="6dp"
             android:background="@drawable/show_to1v1_black20_corner"
             android:gravity="center"
             android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="@id/ivClose"
-            app:layout_constraintEnd_toStartOf="@id/ivClose"
-            app:layout_constraintTop_toTopOf="@id/ivClose">
+            app:layout_constraintBottom_toBottomOf="@id/ivMore"
+            app:layout_constraintEnd_toStartOf="@id/ivMore"
+            app:layout_constraintTop_toTopOf="@id/ivMore">
 
             <ImageView
                 android:layout_width="wrap_content"
