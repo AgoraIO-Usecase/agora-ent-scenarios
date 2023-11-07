@@ -47,10 +47,10 @@ class MineAccountActivity : BaseViewBindingActivity<AppActivityMineAccountBindin
         })
         mainViewModel.setISingleCallback { type, data ->
             if (type == Constant.CALLBACK_TYPE_USER_LOGOUT) {
-                finish()
+                finishAffinity()
                 PagePilotManager.pageWelcomeClear()
             } else if (type == Constant.CALLBACK_TYPE_USER_LOGOFF) {
-                finish()
+                finishAffinity()
                 PagePilotManager.pageWelcomeClear()
             }
         }
