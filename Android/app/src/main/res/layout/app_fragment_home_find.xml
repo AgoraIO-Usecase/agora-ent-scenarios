@@ -40,11 +40,13 @@
                 android:textSize="14sp"
                 app:layout_constraintTop_toBottomOf="@+id/webView" />
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cvKtv"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:layout_marginHorizontal="20dp"
+                app:strokeColor="@color/grey_80_percent"
+                app:strokeWidth="0.5dp"
                 app:cardCornerRadius="15dp"
                 app:cardElevation="0dp"
                 app:layout_constraintTop_toBottomOf="@id/tvScenarioSolution">
@@ -124,9 +126,9 @@
                         app:layout_constraintTop_toTopOf="@id/guidelineKtvH50" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cvChatroom"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
@@ -134,6 +136,8 @@
                 android:layout_marginTop="12dp"
                 app:cardCornerRadius="15dp"
                 app:cardElevation="0dp"
+                app:strokeColor="@color/grey_80_percent"
+                app:strokeWidth="0.5dp"
                 app:layout_constraintTop_toBottomOf="@id/cvKtv">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -162,9 +166,9 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cvLive"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
@@ -172,6 +176,8 @@
                 android:layout_marginTop="12dp"
                 app:cardCornerRadius="15dp"
                 app:cardElevation="0dp"
+                app:strokeColor="@color/grey_80_percent"
+                app:strokeWidth="0.5dp"
                 app:layout_constraintTop_toBottomOf="@id/cvChatroom">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -200,7 +206,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvAiEngine"
@@ -221,7 +227,7 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0.5" />
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cvAiDenoise"
                 android:layout_width="0dp"
                 android:layout_height="100dp"
@@ -229,6 +235,8 @@
                 android:layout_marginEnd="6dp"
                 app:cardCornerRadius="15dp"
                 app:cardElevation="0dp"
+                app:strokeColor="@color/grey_80_percent"
+                app:strokeWidth="0.5dp"
                 app:layout_constraintEnd_toEndOf="@id/guidelineV50"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvAiEngine">
@@ -252,9 +260,9 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cvAiSpatial"
                 android:layout_width="0dp"
                 android:layout_height="100dp"
@@ -262,6 +270,8 @@
                 android:layout_marginEnd="20dp"
                 app:cardCornerRadius="15dp"
                 app:cardElevation="0dp"
+                app:strokeColor="@color/grey_80_percent"
+                app:strokeWidth="0.5dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/guidelineV50"
                 app:layout_constraintTop_toBottomOf="@id/tvAiEngine">
@@ -286,7 +296,7 @@
                         app:layout_constraintBottom_toBottomOf="parent" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
