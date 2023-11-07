@@ -11,7 +11,7 @@
         android:id="@+id/title_bar"
         android:layout_marginTop="30dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:voice_titleBarTitle="@string/voice_room_profile"
+        app:voice_titleBarTitle="@string/voice_spatial_room_profile"
         app:voice_titleBarTitleTextColor="@color/voice_black"
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -136,7 +136,7 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/voice_sp_14"
             android:textColor="@color/voice_dark_grey_color_040925"
-            android:text="@string/voice_room_disclaimer"/>
+            android:text="@string/voice_spatial_room_disclaimer"/>
 
         <ImageView
             android:layout_marginEnd="20dp"

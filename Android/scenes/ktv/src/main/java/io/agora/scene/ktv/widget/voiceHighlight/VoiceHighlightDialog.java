@@ -2,7 +2,6 @@ package io.agora.scene.ktv.widget.voiceHighlight;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;

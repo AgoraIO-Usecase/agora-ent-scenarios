@@ -56,7 +56,7 @@ class CreateRoomDialog(
         super.onViewCreated(view, savedInstanceState)
         roomCreateViewModel = ViewModelProvider(this)[VoiceCreateViewModel::class.java]
         // 用户提示颜色
-        val spannableString = SpannableString(getString(R.string.voice_create_room_tips))
+        val spannableString = SpannableString(getString(R.string.voice_spatial_create_room_tips))
         spannableString.setSpan(ForegroundColorSpan(Color.parseColor("#FA396A")), 77, 118, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         mBinding.tvTips.text = spannableString
         // 随机名称
@@ -127,13 +127,13 @@ class CreateRoomDialog(
                     hideLoadingView()
                     when (code) {
                         VoiceServiceProtocol.ERR_LOGIN_ERROR -> {
-                            activity?.let { ToastTools.show(it, getString(R.string.voice_room_login_exception)) }
+                            activity?.let { ToastTools.show(it, getString(R.string.voice_spatial_login_exception)) }
                         }
                         VoiceServiceProtocol.ERR_ROOM_NAME_INCORRECT -> {
-                            activity?.let { ToastTools.show(it, getString(R.string.voice_room_name_rule)) }
+                            activity?.let { ToastTools.show(it, getString(R.string.voice_spatial_name_rule)) }
                         }
                         else -> {
-                            activity?.let { ToastTools.show(it, getString(R.string.voice_room_create_error)) }
+                            activity?.let { ToastTools.show(it, getString(R.string.voice_spatial_room_create_error)) }
                         }
                     }
                 }
@@ -162,14 +162,14 @@ class CreateRoomDialog(
         val date = Date()
         val month = SimpleDateFormat("MM").format(date) //获取月份
         val day = SimpleDateFormat("dd").format(date) //获取分钟
-        val roomName = getString(R.string.voice_room_create_chat_3d_room) + "-" + month + day + "-" + (Math.random() * 999 + 1).roundToInt()
+        val roomName = getString(R.string.voice_spatial_room_create_chat_3d_room) + "-" + month + day + "-" + (Math.random() * 999 + 1).roundToInt()
         mBinding.etRoomName.setText(roomName)
     }
 
     private fun createRoom() {
         val roomName = mBinding.etRoomName.text.toString()
         if (TextUtils.isEmpty(roomName)) {
-            ToastUtils.showToast(R.string.voice_please_input_room_name)
+            ToastUtils.showToast(R.string.voice_spatial_please_input_room_name)
             return
         }
         val isPrivate = mBinding.cbPassword.isChecked
@@ -178,7 +178,7 @@ class CreateRoomDialog(
                 + mBinding.etCode3.text
                 + mBinding.etCode4.text)
         if (isPrivate && password.length < 4) {
-            ToastUtils.showToast(getString(R.string.voice_please_input_4_pwd))
+            ToastUtils.showToast(getString(R.string.voice_spatial_please_input_4_pwd))
             return
         }
         if (!isPrivate) { password = "" }
