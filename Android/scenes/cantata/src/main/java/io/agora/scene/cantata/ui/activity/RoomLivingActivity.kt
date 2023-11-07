@@ -3,6 +3,9 @@ package io.agora.scene.cantata.ui.activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -11,13 +14,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.agora.rtc2.Constants
 import io.agora.scene.base.GlideApp
-import io.agora.scene.base.api.model.User
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.event.NetWorkEvent
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.LiveDataUtils
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.api.ApiManager
@@ -29,7 +30,6 @@ import io.agora.scene.cantata.service.ScoringAlgoControlModel
 import io.agora.scene.cantata.ui.dialog.CantataCommonDialog
 import io.agora.scene.cantata.ui.dialog.ChorusSingerDialog
 import io.agora.scene.cantata.ui.dialog.MusicSettingDialog
-import io.agora.scene.cantata.ui.dialog.UserLeaveSeatMenuDialog
 import io.agora.scene.cantata.ui.viewmodel.JoinChorusStatus
 import io.agora.scene.cantata.ui.viewmodel.PlayerMusicStatus
 import io.agora.scene.cantata.ui.viewmodel.RoomLivingViewModel
@@ -49,6 +49,10 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
     companion object {
         private const val TAG = "RoomLivingActivity"
         private const val EXTRA_ROOM_INFO = "roomInfo"
+
+        private const val ROOM_NO_SONGS_TIMEOUT: Long = 5 * 60 * 1000 // 5min 不点歌，解散房间
+
+        private const val ROOM_NO_SONGS_WHAT= 101
         fun launch(context: Context, roomInfo: JoinRoomOutputModel) {
             val intent = Intent(context, RoomLivingActivity::class.java)
             intent.putExtra(EXTRA_ROOM_INFO, roomInfo)
@@ -72,6 +76,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
     private var musicSettingDialog: MusicSettingDialog? = null
     private var mChangeMusicDialog: CommonDialog? = null
     private var mChorusSingerDialog: ChorusSingerDialog? = null
+    private var mNoSongsDialog: CantataCommonDialog? = null
 
     // 点歌台
     private var mChooseSongDialog: SongDialog? = null
@@ -80,6 +85,16 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
     private var toggleAudioRun: Runnable? = null
 
     private val scheduledThreadPool = Executors.newScheduledThreadPool(5)
+
+    private val mMainHandler  = object :Handler(Looper.getMainLooper()){
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            if (msg.what == ROOM_NO_SONGS_WHAT) {
+                showNoSongsDialog()
+                CantataLogger.d(TAG, "no one order songs exit room!")
+            }
+        }
+    }
 
     override fun getPermissions() {
         toggleAudioRun?.let {
@@ -138,6 +153,8 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
                 ApiManager.getInstance()
                     .fetchStartCloud(mRoomLivingViewModel.mRoomInfoLiveData.value!!.roomNo, 20232023)
             }
+            mMainHandler.sendEmptyMessageDelayed(ROOM_NO_SONGS_WHAT, ROOM_NO_SONGS_TIMEOUT)
+
         }
     }
 
@@ -245,6 +262,9 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         mRoomLivingViewModel.mSongPlayingLiveData.observe(this) { model: RoomSelSongModel? ->
             if (model == null) {
                 mRoomLivingViewModel.musicStop()
+                if (mRoomLivingViewModel.isRoomOwner() && !mMainHandler.hasMessages(ROOM_NO_SONGS_WHAT)){
+                    mMainHandler.sendEmptyMessageDelayed(ROOM_NO_SONGS_WHAT, ROOM_NO_SONGS_TIMEOUT)
+                }
                 return@observe
             }
             onMusicChanged(model)
@@ -348,6 +368,9 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
     }
 
     private fun onMusicChanged(music: RoomSelSongModel) {
+        if (mRoomLivingViewModel.isRoomOwner() && mMainHandler.hasMessages(ROOM_NO_SONGS_WHAT)){
+            mMainHandler.removeMessages(ROOM_NO_SONGS_WHAT)
+        }
         CantataLogger.d(TAG, "onMusicChanged called")
         //mRoomLivingViewModel.resetMusicStatus()
         binding.lrcControlView.setMusic(music)
@@ -533,6 +556,24 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             }
         }
         mChangeMusicDialog?.show()
+    }
+
+    // 无人点歌解散房间 dialog
+    private fun showNoSongsDialog() {
+        if (mNoSongsDialog == null) {
+            mNoSongsDialog = CantataCommonDialog(this).apply {
+                setDescText(getString(R.string.cantata_dissovle_room_because_no_one_ordered_songs))
+                setDialogBtnText("", getString(R.string.cantata_confirm))
+                onButtonClickListener = object : OnButtonClickListener {
+                    override fun onLeftButtonClick() {}
+                    override fun onRightButtonClick() {
+                        mRoomLivingViewModel.exitRoom()
+                    }
+                }
+            }
+
+        }
+        mNoSongsDialog?.show()
     }
 
     // 合唱

@@ -932,6 +932,7 @@ class CantataSyncManagerServiceImp constructor(
     private fun innerUpdateUserCount(count: Int) {
         val roomInfo = roomMap[currRoomNo] ?: return
         if (count == roomInfo.roomPeopleNum) {
+            runOnMainThread { roomUserCountSubscriber?.invoke(count) }
             return
         }
         mSceneReference?.update(
