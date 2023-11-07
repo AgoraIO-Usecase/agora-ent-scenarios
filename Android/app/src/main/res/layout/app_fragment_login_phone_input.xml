@@ -101,7 +101,7 @@
         android:layout_height="48dp"
         android:layout_marginHorizontal="30dp"
         android:layout_marginTop="28dp"
-        android:background="@drawable/bg_def_button_solid"
+        android:background="@drawable/app_bg_button_275_solid_r12"
         android:text="@string/app_login_phone_input_next"
         android:textColor="@color/white"
         android:textSize="16sp"
