@@ -23,7 +23,6 @@ class RoomCreateViewModel constructor(application: Application) : AndroidViewMod
     fun loadRooms() {
         ktvServiceProtocol.getRoomList { e: Exception?, vlRoomListModels: List<RoomListModel>? ->
             if (e != null) {
-                ToastUtils.showToast(e.message)
                 roomModelList.postValue(null)
             }
             roomModelList.postValue(vlRoomListModels)

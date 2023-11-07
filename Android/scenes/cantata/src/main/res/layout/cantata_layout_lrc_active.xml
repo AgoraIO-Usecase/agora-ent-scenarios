@@ -45,7 +45,7 @@
         app:enableDragging="true"
         app:currentLineHighlightedTextColor="@color/pink_b4"
         app:currentLineTextColor="@color/white"
-        app:currentLineTextSize="16sp"
+        app:currentLineTextSize="20sp"
         app:labelWhenNoLyrics=" "
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
@@ -55,7 +55,7 @@
         app:startOfVerseIndicatorPaddingTop="6dp"
         app:startOfVerseIndicatorRadius="4dp"
         app:textGravity="center"
-        app:textSize="14sp" />
+        app:textSize="13sp" />
 
     <View
         android:id="@+id/bgd_control_layout_lrc"
