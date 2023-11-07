@@ -59,10 +59,10 @@ class RoomContributionAndAudienceSheetDialog constructor() :
                     val tabText = customView.findViewById<TextView>(R.id.mtTabText)
                     tab.customView = customView
                     if (position == RoomRankFragmentAdapter.PAGE_INDEX0) {
-                        tabText.text = getString(R.string.voice_room_contribution_ranking)
+                        tabText.text = getString(R.string.voice_spatial_contribution_ranking)
                         onTabLayoutSelected(tab)
                     } else {
-                        tabText.text = getString(R.string.voice_room_audience_list)
+                        tabText.text = getString(R.string.voice_spatial_audience_list)
                         onTabLayoutUnselected(tab)
                     }
 

@@ -13,7 +13,7 @@ object RoomAINSConstructor {
      */
     fun builderDefaultAINSList(context: Context, anisMode: Int): MutableList<AINSModeBean> {
         return mutableListOf(
-            AINSModeBean(context.getString(R.string.voice_chatroom_your_ains), anisMode),
+            AINSModeBean(context.getString(R.string.voice_spatial_your_ains), anisMode),
 //            AINSModeBean(context.getString(R.string.chatroom_agora_blue_bot_ains), AINSUser.BlueBot),
 //            AINSModeBean(context.getString(R.string.chatroom_agora_red_bot_ains), AINSUser.RedBot)
         )
@@ -24,63 +24,63 @@ object RoomAINSConstructor {
      */
     fun builderDefaultSoundList(context: Context): MutableList<AINSSoundsBean> {
         return mutableListOf(
-            AINSSoundsBean(ConfigConstants.AINSSoundType.AINS_TVSound, context.getString(R.string.voice_chatroom_sounds_tv)),
+            AINSSoundsBean(ConfigConstants.AINSSoundType.AINS_TVSound, context.getString(R.string.voice_spatial_sounds_tv)),
             AINSSoundsBean(
                 ConfigConstants.AINSSoundType.AINS_KitchenSound,
-                context.getString(R.string.voice_chatroom_sounds_kitchen)
+                context.getString(R.string.voice_spatial_sounds_kitchen)
             ),
             AINSSoundsBean(
                 ConfigConstants.AINSSoundType.AINS_StreetSound,
-                context.getString(R.string.voice_chatroom_sounds_street),
-                context.getString(R.string.voice_chatroom_sounds_street_tips)
+                context.getString(R.string.voice_spatial_sounds_street),
+                context.getString(R.string.voice_spatial_sounds_street_tips)
             ),
             AINSSoundsBean(
                 ConfigConstants.AINSSoundType.AINS_MachineSound,
-                context.getString(R.string.voice_chatroom_sounds_machine),
-                context.getString(R.string.voice_chatroom_sounds_machine_tips)
+                context.getString(R.string.voice_spatial_sounds_machine),
+                context.getString(R.string.voice_spatial_sounds_machine_tips)
             ),
             AINSSoundsBean(
                 ConfigConstants.AINSSoundType.AINS_OfficeSound,
-                context.getString(R.string.voice_chatroom_sounds_office),
-                context.getString(R.string.voice_chatroom_sounds_office_tips)
+                context.getString(R.string.voice_spatial_sounds_office),
+                context.getString(R.string.voice_spatial_sounds_office_tips)
             ),
             AINSSoundsBean(
                 ConfigConstants.AINSSoundType.AINS_HomeSound,
-                context.getString(R.string.voice_chatroom_sounds_home),
-                context.getString(R.string.voice_chatroom_sounds_home_tips)
+                context.getString(R.string.voice_spatial_sounds_home),
+                context.getString(R.string.voice_spatial_sounds_home_tips)
             ),
             AINSSoundsBean(
                 ConfigConstants.AINSSoundType.AINS_ConstructionSound,
-                context.getString(R.string.voice_chatroom_sounds_construction),
-                context.getString(R.string.voice_chatroom_sounds_construction_tips)
+                context.getString(R.string.voice_spatial_sounds_construction),
+                context.getString(R.string.voice_spatial_sounds_construction_tips)
             ),
             AINSSoundsBean(
                 ConfigConstants.AINSSoundType.AINS_AlertSound,
-                context.getString(R.string.voice_room_sounds_alert)
+                context.getString(R.string.voice_spatial_sounds_alert)
             ),
             AINSSoundsBean(
                 ConfigConstants.AINSSoundType.AINS_ApplauseSound,
-                context.getString(R.string.voice_room_sounds_applause)
+                context.getString(R.string.voice_spatial_sounds_applause)
             ),
             AINSSoundsBean(
                 ConfigConstants.AINSSoundType.AINS_WindSound,
-                context.getString(R.string.voice_room_sounds_wind)
+                context.getString(R.string.voice_spatial_sounds_wind)
             ),
             AINSSoundsBean(
                 ConfigConstants.AINSSoundType.AINS_MicPopFilterSound,
-                context.getString(R.string.voice_room_sounds_mic_pop_filter)
+                context.getString(R.string.voice_spatial_sounds_mic_pop_filter)
             ),
             AINSSoundsBean(
                 ConfigConstants.AINSSoundType.AINS_AudioFeedback,
-                context.getString(R.string.voice_room_sounds_audio_feedback)
+                context.getString(R.string.voice_spatial_sounds_audio_feedback)
             ),
             AINSSoundsBean(
                 ConfigConstants.AINSSoundType.AINS_MicrophoneFingerRub,
-                context.getString(R.string.voice_room_sounds_microphone_finger_rub_sound)
+                context.getString(R.string.voice_spatial_sounds_microphone_finger_rub_sound)
             ),
             AINSSoundsBean(
                 ConfigConstants.AINSSoundType.AINS_MicrophoneScreenTap,
-                context.getString(R.string.voice_room_sounds_microphone_screen_tap_sound)
+                context.getString(R.string.voice_spatial_microphone_screen_tap_sound)
             )
         )
     }

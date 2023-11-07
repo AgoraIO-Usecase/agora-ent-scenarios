@@ -31,7 +31,7 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceSpatialAgoraRoomListLayoutBind
 
     private var title: TextView? = null
     private var index = 0
-    private val titles = intArrayOf(R.string.voice_tab_layout_all)
+    private val titles = intArrayOf(R.string.voice_spatial_tab_layout_all)
 
     private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
     override fun getViewBinding(inflater: LayoutInflater): VoiceSpatialAgoraRoomListLayoutBinding? {
@@ -122,7 +122,7 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceSpatialAgoraRoomListLayoutBind
                         textView.gravity = Gravity.CENTER
                         val content =
                             getString(titles[index]) + getString(
-                                R.string.voice_room_tab_layout_count,
+                                R.string.voice_spatial_room_tab_layout_count,
                                 count.toString()
                             )
                         textView.setTextColor(
