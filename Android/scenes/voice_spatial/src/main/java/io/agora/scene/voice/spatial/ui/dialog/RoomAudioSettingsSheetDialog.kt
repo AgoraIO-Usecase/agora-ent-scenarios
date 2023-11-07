@@ -76,7 +76,7 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceSpatialD
             }
             mcbAgoraBotDisable.setOnClickListener {
                 activity?.let {
-                    ToastTools.showTips(it, getString(R.string.voice_chatroom_only_host_can_change_robot))
+                    ToastTools.showTips(it, getString(R.string.voice_spatial_only_host_can_change_robot))
                 }
             }
             mtSpatialAudioArrow.setOnClickListener {

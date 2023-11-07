@@ -42,7 +42,7 @@
         android:layout_marginTop="40dp"
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="30dp"
-        android:text="@string/voice_room_cancel"
+        android:text="@string/voice_spatial_room_cancel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/gl50"
         app:layout_constraintTop_toBottomOf="@+id/mtContent" />
@@ -60,7 +60,7 @@
         android:layout_width="148dp"
         android:layout_marginStart="12dp"
         android:layout_marginBottom="30dp"
-        android:text="@string/voice_room_submit"
+        android:text="@string/voice_spatial_submit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/gl50"
         app:layout_constraintTop_toBottomOf="@+id/mtContent"

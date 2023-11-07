@@ -29,7 +29,7 @@ internal object RoomMicConstructor {
             micStatus = if (isUserBot) MicStatus.BotActivated else MicStatus.BotInactive,
             audioVolumeType = ConfigConstants.VolumeType.Volume_None,
             member = VoiceMemberModel().apply {
-                nickName = context.getString(R.string.voice_chatroom_agora_blue)
+                nickName = context.getString(R.string.voice_spatial_agora_blue)
                 portrait = "voice_icon_room_blue_robot"
             }
         )
@@ -38,7 +38,7 @@ internal object RoomMicConstructor {
             micStatus = if (isUserBot) MicStatus.BotActivated else MicStatus.BotInactive,
             audioVolumeType = ConfigConstants.VolumeType.Volume_None,
             member = VoiceMemberModel().apply {
-                nickName = context.getString(R.string.voice_chatroom_agora_red)
+                nickName = context.getString(R.string.voice_spatial_agora_red)
                 portrait = "voice_icon_room_red_robot"
             }
         )
@@ -56,7 +56,7 @@ internal object RoomMicConstructor {
                 micStatus = if (isUserBot) MicStatus.BotActivated else MicStatus.BotInactive,
                 audioVolumeType = ConfigConstants.VolumeType.Volume_None,
                 member = VoiceMemberModel().apply {
-                    nickName = context.getString(R.string.voice_chatroom_agora_blue)
+                    nickName = context.getString(R.string.voice_spatial_agora_blue)
                     portrait = "voice_icon_room_blue_robot"
                 }
             ),
@@ -67,7 +67,7 @@ internal object RoomMicConstructor {
                 micStatus = if (isUserBot) MicStatus.BotActivated else MicStatus.BotInactive,
                 audioVolumeType = ConfigConstants.VolumeType.Volume_None,
                 member = VoiceMemberModel().apply {
-                    nickName = context.getString(R.string.voice_chatroom_agora_red)
+                    nickName = context.getString(R.string.voice_spatial_agora_red)
                     portrait = "voice_icon_room_red_robot"
                 }
             ),
@@ -84,11 +84,11 @@ internal object RoomMicConstructor {
         if (isMyself) { // 自己作为一类行为
             if (micInfo.member?.micStatus == MicStatus.Normal) {
                 temp.add(
-                    MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.Mute)
+                    MicManagerBean(context.getString(R.string.voice_spatial_mute), true, MicClickAction.Mute)
                 )
             } else {
                 temp.add(
-                    MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnMute)
+                    MicManagerBean(context.getString(R.string.voice_spatial_unmute), true, MicClickAction.UnMute)
                 )
             }
             return temp
@@ -100,18 +100,18 @@ internal object RoomMicConstructor {
                 MicStatus.Lock,
                 MicStatus.LockForceMute, -> {
                     temp.add(
-                        MicManagerBean(context.getString(R.string.voice_room_invite), false, MicClickAction.Invite),
+                        MicManagerBean(context.getString(R.string.voice_spatial_room_invite), false, MicClickAction.Invite),
                     )
                 }
                 else -> {
                     temp.add(
-                        MicManagerBean(context.getString(R.string.voice_room_invite), true, MicClickAction.Invite),
+                        MicManagerBean(context.getString(R.string.voice_spatial_room_invite), true, MicClickAction.Invite),
                     )
                 }
             }
         } else {// 有人：踢出
             temp.add(
-                MicManagerBean(context.getString(R.string.voice_room_kickoff), true, MicClickAction.KickOff)
+                MicManagerBean(context.getString(R.string.voice_spatial_kickoff), true, MicClickAction.KickOff)
             )
         }
         // 第二项：是否静麦
@@ -120,12 +120,12 @@ internal object RoomMicConstructor {
             MicStatus.ForceMute,
             MicStatus.LockForceMute, -> {
                 temp.add(
-                    MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnForbidMic)
+                    MicManagerBean(context.getString(R.string.voice_spatial_unmute), true, MicClickAction.UnForbidMic)
                 )
             }
             else -> {
                 temp.add(
-                    MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.ForbidMic),
+                    MicManagerBean(context.getString(R.string.voice_spatial_mute), true, MicClickAction.ForbidMic),
                 )
             }
         }
@@ -134,12 +134,12 @@ internal object RoomMicConstructor {
             MicStatus.Lock,
             MicStatus.LockForceMute, -> {
                 temp.add(
-                    MicManagerBean(context.getString(R.string.voice_room_unblock), true, MicClickAction.UnLock)
+                    MicManagerBean(context.getString(R.string.voice_spatial_unblock), true, MicClickAction.UnLock)
                 )
             }
             else -> {
                 temp.add(
-                    MicManagerBean(context.getString(R.string.voice_room_block), true, MicClickAction.Lock)
+                    MicManagerBean(context.getString(R.string.voice_spatial_block), true, MicClickAction.Lock)
                 )
             }
         }
@@ -153,20 +153,20 @@ internal object RoomMicConstructor {
         return when (micInfo.member?.micStatus) {
             MicStatus.Normal -> {
                 mutableListOf(
-                    MicManagerBean(context.getString(R.string.voice_room_off_stage), true, MicClickAction.OffStage),
-                    MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.Mute)
+                    MicManagerBean(context.getString(R.string.voice_spatial_off_stage), true, MicClickAction.OffStage),
+                    MicManagerBean(context.getString(R.string.voice_spatial_mute), true, MicClickAction.Mute)
                 )
             }
             MicStatus.Mute -> {
                 mutableListOf(
-                    MicManagerBean(context.getString(R.string.voice_room_off_stage), true, MicClickAction.OffStage),
-                    MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnMute)
+                    MicManagerBean(context.getString(R.string.voice_spatial_off_stage), true, MicClickAction.OffStage),
+                    MicManagerBean(context.getString(R.string.voice_spatial_unmute), true, MicClickAction.UnMute)
                 )
             }
             else -> {
                 mutableListOf(
-                    MicManagerBean(context.getString(R.string.voice_room_off_stage), true, MicClickAction.OffStage),
-                    MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.Mute)
+                    MicManagerBean(context.getString(R.string.voice_spatial_off_stage), true, MicClickAction.OffStage),
+                    MicManagerBean(context.getString(R.string.voice_spatial_mute), true, MicClickAction.Mute)
                 )
             }
         }

@@ -49,25 +49,25 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         this.roomDetailInfo = voiceRoomModel
         binding.apply {
             tvRoomName.text = roomDetailInfo.roomName
-            tvOnLineCount.text = resources.getString(R.string.voice_room_online_count, roomDetailInfo.memberCount)
-            tvClickCount.text = resources.getString(R.string.voice_room_click_count, roomDetailInfo.clickCount)
+            tvOnLineCount.text = resources.getString(R.string.voice_spatial_room_online_count, roomDetailInfo.memberCount)
+            tvClickCount.text = resources.getString(R.string.voice_spatial_room_click_count, roomDetailInfo.clickCount)
             // 普通房间显示 最佳音效
             if (roomDetailInfo.roomType == ConfigConstants.RoomType.Common_Chatroom) {
                 mtChatroomAgoraSound.isVisible = true
                 llChatroomAgoraSound.isVisible = true
                 ivIcon.isVisible = false
                 mtChatroomAgoraSound.text = when (roomDetailInfo.soundEffect) {
-                    ConfigConstants.SoundSelection.Karaoke -> root.context.getString(R.string.voice_chatroom_karaoke)
-                    ConfigConstants.SoundSelection.Gaming_Buddy -> root.context.getString(R.string.voice_chatroom_gaming_buddy)
-                    ConfigConstants.SoundSelection.Professional_Broadcaster -> root.context.getString(R.string.voice_chatroom_professional_broadcaster)
-                    else -> root.context.getString(R.string.voice_chatroom_social_chat)
+                    ConfigConstants.SoundSelection.Karaoke -> root.context.getString(R.string.voice_spatial_karaoke)
+                    ConfigConstants.SoundSelection.Gaming_Buddy -> root.context.getString(R.string.voice_spatial_gaming_buddy)
+                    ConfigConstants.SoundSelection.Professional_Broadcaster -> root.context.getString(R.string.voice_spatial_professional_broadcaster)
+                    else -> root.context.getString(R.string.voice_spatial_social_chat)
                 }
             }
             // 空间音频
             else if (roomDetailInfo.roomType == ConfigConstants.RoomType.Spatial_Chatroom) {
                 llChatroomAgoraSound.isVisible = true
                 ivIcon.isVisible = true
-                mtChatroomAgoraSound.text = root.context.getString(R.string.voice_chatroom_beginner_guide)
+                mtChatroomAgoraSound.text = root.context.getString(R.string.voice_spatial_beginner_guide)
             } else {
                 llChatroomAgoraSound.isVisible = false
                 mtChatroomAgoraSound.isVisible = false
@@ -137,7 +137,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         if (count < 0) return
         if (this::roomDetailInfo.isInitialized) {
             roomDetailInfo.memberCount = count
-            binding.tvOnLineCount.text = resources.getString(R.string.voice_room_online_count, roomDetailInfo.memberCount)
+            binding.tvOnLineCount.text = resources.getString(R.string.voice_spatial_room_online_count, roomDetailInfo.memberCount)
         }
     }
 
@@ -146,7 +146,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         if (count < 0) return
         if (this::roomDetailInfo.isInitialized) {
             roomDetailInfo.clickCount = count
-            binding.tvClickCount.text = resources.getString(R.string.voice_room_click_count, roomDetailInfo.clickCount)
+            binding.tvClickCount.text = resources.getString(R.string.voice_spatial_room_click_count, roomDetailInfo.clickCount)
         }
     }
 

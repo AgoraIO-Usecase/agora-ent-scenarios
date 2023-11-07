@@ -12,7 +12,7 @@
     <string name="show_live_yes">是</string>
     <string name="show_live_no">否</string>
     <string name="show_text_input_sent">发送</string>
-    <string name="show_text_input_hint">请输入...</string>
+    <string name="show_text_input_hint">请输入…</string>
     <string name="show_text_input_empty">文本为空</string>
     <string name="show_setting_switch_camera">翻转镜头</string>
     <string name="show_setting_video_on">摄像头开</string>

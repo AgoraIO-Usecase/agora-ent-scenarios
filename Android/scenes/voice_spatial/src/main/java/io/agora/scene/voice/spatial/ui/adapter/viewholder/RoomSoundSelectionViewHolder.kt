@@ -22,7 +22,7 @@ class RoomSoundSelectionViewHolder(binding: VoiceSpatialItemRoomSoundSelectionBi
             if (it.isCurrentUsing) {
                 mBinding.mtSoundSelectionCurrentName.isVisible = true
                 mBinding.mtSoundSelectionCurrentName.text =
-                    mBinding.root.context.getString(R.string.voice_chatroom_current_sound_selection)
+                    mBinding.root.context.getString(R.string.voice_spatial_current_sound_selection)
                 mBinding.mcvSoundSelectionContent.strokeColor =
                     ResourcesTools.getColor(context.resources, R.color.voice_main_color_009fff)
                 mBinding.ivSoundSelectionToggle.setImageResource(R.drawable.voice_icon_room_sound_listen)
@@ -30,7 +30,7 @@ class RoomSoundSelectionViewHolder(binding: VoiceSpatialItemRoomSoundSelectionBi
                 mBinding.llSoundSelectionTips.isVisible = false
             } else {
                 mBinding.mtSoundSelectionCurrentName.text =
-                    mBinding.root.context.getString(R.string.voice_chatroom_other_sound_selection)
+                    mBinding.root.context.getString(R.string.voice_spatial_other_sound_selection)
                 // 第二个位置显示其他音效标题和提示
                 mBinding.mtSoundSelectionCurrentName.isVisible = bindingAdapterPosition == 1
                 mBinding.llSoundSelectionTips.isVisible = bindingAdapterPosition == 1
@@ -74,10 +74,10 @@ class RoomSoundSelectionFooterViewHolder(binding: VoiceSpatialItemSoundSelection
     override fun binding(data: String?, selectedIndex: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mBinding.mtChatroomSoundSelectionMore.text =
-                Html.fromHtml(context.getString(R.string.voice_chatroom_sound_selection_more), Html.FROM_HTML_MODE_LEGACY)
+                Html.fromHtml(context.getString(R.string.voice_spatial_sound_selection_more), Html.FROM_HTML_MODE_LEGACY)
         } else {
             mBinding.mtChatroomSoundSelectionMore.text =
-                Html.fromHtml(context.getString(R.string.voice_chatroom_sound_selection_more))
+                Html.fromHtml(context.getString(R.string.voice_spatial_sound_selection_more))
         }
         mBinding.mtChatroomSoundSelectionMore.setOnClickListener {
             onItemChildClick("www.agora.io",it)
