@@ -134,6 +134,7 @@ public class SingRelayGameView extends FrameLayout {
         if (mBinding == null) return;
         partNum = 1;
         mBinding.ilRank.setVisibility(GONE);
+        mBinding.ilActive.winnerTips.setVisibility(View.GONE);
         mBinding.ilIDLE.ivGameTips.setVisibility(View.VISIBLE);
         mBinding.ilIDLE.tvSongTab.setVisibility(View.GONE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
@@ -248,7 +249,6 @@ public class SingRelayGameView extends FrameLayout {
     public void onGameEnd(List<RankItem> list) {
         KTVLogger.d(TAG, "onGameEnd");
         if (mBinding == null) return;
-        //mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
         mBinding.ilIDLE.ivGameTips.setVisibility(View.GONE);
         mBinding.ilActive.winnerTips.setVisibility(View.GONE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);

@@ -91,7 +91,7 @@
         android:paddingBottom="10dp"
         app:currentLineHighlightedTextColor="@color/pink_b4"
         app:currentLineTextColor="@color/white"
-        app:currentLineTextSize="16sp"
+        app:currentLineTextSize="20sp"
         app:labelWhenNoLyrics=" "
         app:layout_constraintBottom_toTopOf="@+id/bgd_control_layout_lrc"
         app:layout_constraintTop_toBottomOf="@+id/scoringView"
@@ -101,7 +101,7 @@
         app:startOfVerseIndicatorPaddingTop="6dp"
         app:startOfVerseIndicatorRadius="4dp"
         app:textGravity="center"
-        app:textSize="14sp"
+        app:textSize="13sp"
         tools:layout_editor_absoluteX="-36dp" />
 
     <View

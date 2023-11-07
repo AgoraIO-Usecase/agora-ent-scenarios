@@ -11,6 +11,7 @@ import android.util.Log
 import android.util.Size
 import android.view.*
 import android.view.ViewGroup.MarginLayoutParams
+import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
@@ -2120,7 +2121,7 @@ class LiveDetailFragment : Fragment() {
             )
             activity?.let {
                 val view = TextureView(it)
-                mBinding.videoPKLayout.iBroadcasterBView.addView(view)
+                mBinding.videoPKLayout.iBroadcasterBView.addView(view, 0)
                 mRtcEngine.setupRemoteVideoEx(
                     VideoCanvas(
                         view,
