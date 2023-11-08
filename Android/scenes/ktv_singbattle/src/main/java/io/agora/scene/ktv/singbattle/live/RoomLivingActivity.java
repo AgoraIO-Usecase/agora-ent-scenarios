@@ -106,7 +106,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
                 return (T) new RoomLivingViewModel((JoinRoomOutputModel) getIntent().getSerializableExtra(EXTRA_ROOM_INFO));
             }
         }).get(RoomLivingViewModel.class);
-        roomLivingViewModel.setLrcView(getBinding().lrcControlView);
 
         mRoomSpeakerAdapter = new BindingSingleAdapter<RoomSeatModel, KtvSingbattleItemRoomSpeakerBinding>() {
             @Override
@@ -231,6 +230,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
             else{
                 roomLivingViewModel.init();
             }
+            roomLivingViewModel.setLrcView(getBinding().lrcControlView);
         });
         getBinding().singBattleGameView.setIsRoomOwner(roomLivingViewModel.isRoomOwner());
 
@@ -240,6 +240,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
             setPlayerBgFromMsg(0);
         }
         getBinding().tvRoomName.setText(roomLivingViewModel.roomInfoLiveData.getValue().getRoomName());
+        GlideApp.with(getBinding().getRoot())
+                .load(roomLivingViewModel.roomInfoLiveData.getValue().getCreatorAvatar())
+                .error(R.mipmap.userimage)
+                .into(getBinding().ivOwnerAvatar);
 
         if (AgoraApplication.the().isDebugModeOpen()) {
             getBinding().btnDebug.setVisibility(View.VISIBLE);

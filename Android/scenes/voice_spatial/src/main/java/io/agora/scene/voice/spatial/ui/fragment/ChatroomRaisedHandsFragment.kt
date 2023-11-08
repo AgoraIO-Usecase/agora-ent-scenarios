@@ -40,7 +40,7 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         emptyView = layoutInflater.inflate(R.layout.voice_spatial_no_data_layout, container, false)
         val textView = emptyView?.findViewById<TextView>(R.id.content_item)
-        textView?.text = getString(R.string.voice_empty_raised_hands)
+        textView?.text = getString(R.string.voice_spatial_empty_raised_hands)
         emptyView?.layoutParams = LinearLayoutCompat.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.MATCH_PARENT

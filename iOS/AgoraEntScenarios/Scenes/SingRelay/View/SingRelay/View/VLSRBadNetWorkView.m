@@ -53,7 +53,7 @@
         [self.delegate onVLBadNetworkView:self dismiss:sender];
         return;
     }
-    
+
     [[LSTPopView getSRPopViewWithCustomView:self] dismiss];
 }
 

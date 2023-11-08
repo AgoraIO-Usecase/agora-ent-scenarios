@@ -14,7 +14,6 @@
 @implementation LSTPopView (SRModal)
 
 #pragma mark private method
-//公共弹窗视图设置
 + (LSTPopView*)_createSRPopContainerWithContentView:(UIView*)contentView
                                       withParentView:(UIView*)parentView {
     LSTPopView *popView = [LSTPopView initWithCustomView:contentView
@@ -35,7 +34,6 @@
 }
 
 #pragma mark public method
-
 + (LSTPopView*)getSRPopViewWithCustomView:(UIView*)customView {
     UIView* superView = customView.superview;
     while (superView != nil) {
@@ -139,7 +137,7 @@
     CGFloat popViewH = 88+17+270+kSafeAreaBottomHeight;                                                                                     
     VLSREffectView* EffectView = [[VLSREffectView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
                                                                                             withDelegate:delegate];
-    
+
     LSTPopView* popView = [self _createSRPopContainerWithContentView:EffectView
                                                        withParentView:parentView];
     [popView pop];

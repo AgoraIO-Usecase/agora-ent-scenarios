@@ -32,7 +32,7 @@
             android:background="@drawable/voice_rect_r999_blue75adff"
             />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/ivMicInfo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

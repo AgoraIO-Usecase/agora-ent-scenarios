@@ -10,7 +10,7 @@ import YYCategories
 import SVProgressHUD
 import AgoraSyncManager
 
-private let sSceneId = "scene_singbattle_3.4.0"
+private let sSceneId = "scene_singbattle_4.0.0"
 
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"
@@ -211,6 +211,8 @@ private func mapConvert(model: NSObject) -> [String: Any] {
         roomInfo.roomPeopleNum = "0"
         roomInfo.icon = inputModel.icon
         roomInfo.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
+        roomInfo.creatorName = VLUserCenter.user.name
+        roomInfo.creatorAvatar = VLUserCenter.user.headUrl
 
         let params = mapConvert(model: roomInfo)
 

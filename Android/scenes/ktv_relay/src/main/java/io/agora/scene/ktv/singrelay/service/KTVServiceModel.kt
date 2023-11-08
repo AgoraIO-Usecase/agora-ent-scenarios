@@ -66,6 +66,7 @@ data class JoinRoomOutputModel(
     val roomName: String,
     val roomNo: String,
     val creatorNo: String,
+    val creatorAvatar: String,
     val bgOption: String,
     val seatsArray: List<RoomSeatModel>?,
     /**

@@ -1670,6 +1670,7 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
         if(seatModel.userNo == VLUserCenter.user.id){
             self.statusView.state = SRStateAudienceWating;
         }
+
         [[LSTPopView getSRPopViewWithCustomView:view] dismiss];
     }];
 }

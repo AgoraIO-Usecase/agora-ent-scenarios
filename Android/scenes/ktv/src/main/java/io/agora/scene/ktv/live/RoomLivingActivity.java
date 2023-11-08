@@ -120,7 +120,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 return (T) new RoomLivingViewModel((JoinRoomOutputModel) getIntent().getSerializableExtra(EXTRA_ROOM_INFO));
             }
         }).get(RoomLivingViewModel.class);
-        roomLivingViewModel.setLrcView(getBinding().lrcControlView);
 
         mRoomSpeakerAdapter = new BindingSingleAdapter<RoomSeatModel, KtvItemRoomSpeakerBinding>() {
             @Override
@@ -238,8 +237,13 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             } else {
                 roomLivingViewModel.init();
             }
+            roomLivingViewModel.setLrcView(getBinding().lrcControlView);
         });
         getBinding().tvRoomName.setText(roomLivingViewModel.roomInfoLiveData.getValue().getRoomName());
+        GlideApp.with(getBinding().getRoot())
+                .load(roomLivingViewModel.roomInfoLiveData.getValue().getCreatorAvatar())
+                .error(R.mipmap.userimage)
+                .into(getBinding().ivOwnerAvatar);
 
         if (AgoraApplication.the().isDebugModeOpen()) {
             getBinding().btnDebug.setVisibility(View.VISIBLE);
@@ -254,7 +258,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             dialog.show(getSupportFragmentManager(), "debugSettings");
         });
         getBinding().ivMore.setOnClickListener(v -> {
-            new TopFunctionDialog(RoomLivingActivity.this).show();
+            new TopFunctionDialog(this).show();
         });
     }
 
@@ -457,8 +461,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 RoomSeatModel seatModel = mRoomSpeakerAdapter.getItem(i);
                 if (seatModel != null && Integer.parseInt(seatModel.getRtcUid()) == volumeModel.getUid()) {
                     BindingViewHolder<KtvItemRoomSpeakerBinding> holder = (BindingViewHolder<KtvItemRoomSpeakerBinding>) getBinding().rvUserMember.findViewHolderForAdapterPosition(i);
-                   if (holder == null) {return;}
-                   if (volumeModel.getVolume() == 0) {
+                   if (holder == null) return;
+                   if (volumeModel.getVolume() == 0 || seatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()) {
                        holder.binding.vMicWave.endWave();
                    } else {
                        holder.binding.vMicWave.startWave();
@@ -740,10 +744,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             }
         }
         return ret;
-    }
-
-    private void onClickJoinChorus() {
-        roomLivingViewModel.joinChorus();
     }
 
     private boolean showChooseSongDialogTag = false;

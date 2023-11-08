@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="9dp"
-        android:text="@string/voice_room_contribution_ranking"
+        android:text="@string/voice_spatial_contribution_ranking"
         android:textColor="@color/voice_dark_grey_color_040925"
         android:textSize="@dimen/voice_sp_15"
         android:textStyle="bold"

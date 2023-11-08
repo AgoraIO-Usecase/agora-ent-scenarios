@@ -176,17 +176,20 @@ static const int INTERVAL = 1000; // 时间间隔为1秒
        // [_createBtn setImage:[UIImage sceneImageWithName:@"add"] forState:UIControlStateNormal];
         _createBtn.accessibilityIdentifier = @"ktv_create_button_id";
         [_createBtn setBackgroundImage:[UIImage sceneImageWithName:@"create_room"] forState:UIControlStateNormal];
+
         _createBtn.frame = CGRectMake((SCREEN_WIDTH-148)*0.5, SCREEN_HEIGHT-34-kSafeAreaBottomHeight-56-kTopNavHeight, 148, 56);
        // _createBtn.layer.cornerRadius = 23;
        // _createBtn.layer.masksToBounds = YES;
         _createBtn.imageView.contentMode = UIViewContentModeScaleAspectFit;
+
 //        _createBtn.imagePosition = QMUIButtonImagePositionLeft;
         _createBtn.spacingBetweenImageAndTitle = 7;
         _createBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
         [_createBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
-        _createBtn.titleLabel.font = UIFontBoldMake(16.0);
+        _createBtn.titleLabel.font = UIFontBoldMake(18.0);
 //        _createBtn.adjustsButtonWhenHighlighted = NO;
         [_createBtn addTarget:self action:@selector(createBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
+
     }
     return _createBtn;
 }

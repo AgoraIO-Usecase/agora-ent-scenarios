@@ -186,7 +186,7 @@ public class RoomLivingViewModel extends ViewModel {
     /**
      * 是否开启后台播放
      */
-    private boolean isBackPlay = false;
+    private final boolean isBackPlay = false;
 
     /**
      * 是否开启耳返
@@ -211,10 +211,6 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     public void init() {
-        if (isRoomOwner()) {
-            ktvApiProtocol.setMicStatus(true);
-            isOnSeat = true;
-        }
         initSettings();
         initRTCPlayer();
         initRoom();
@@ -232,7 +228,7 @@ public class RoomLivingViewModel extends ViewModel {
         }
 
         if (mRtcEngine != null) {
-            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NONE);
+            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
             mRtcEngine.leaveChannel();
             RtcEngineEx.destroy();
             mRtcEngine = null;
@@ -302,6 +298,7 @@ public class RoomLivingViewModel extends ViewModel {
                             _roomInfo.getRoomName(),
                             _roomInfo.getRoomNo(),
                             _roomInfo.getCreatorNo(),
+                            _roomInfo.getCreatorAvatar(),
                             vlRoomListModel.getBgOption(),
                             _roomInfo.getSeatsArray(),
                             _roomInfo.getRoomPeopleNum(),
@@ -616,7 +613,15 @@ public class RoomLivingViewModel extends ViewModel {
         }
 
         // 静音时将本地采集音量改为0
-        if (!isUnMute && mRtcEngine != null) mRtcEngine.adjustRecordingSignalVolume(0);
+//        if (!isUnMute && mRtcEngine != null) {
+//            if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getUserNo() != null && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
+//                // 主唱
+//                mRtcEngine.adjustRecordingSignalVolume(0);
+//            } else {
+//                // 其他人
+//                mRtcEngine.muteLocalAudioStream(true);
+//            }
+//        }
         setMicVolume(micOldVolume);
     }
 
@@ -1104,8 +1109,7 @@ public class RoomLivingViewModel extends ViewModel {
                     return;
                 }
                 if (mRtcEngine != null) {
-                    mRtcEngine.enableInEarMonitoring(isEar, Constants.EAR_MONITORING_FILTER_NONE);
-//                    mRtcEngine.enableInEarMonitoring(isEar, (1 << 1 | 1 << 2));
+                    mRtcEngine.enableInEarMonitoring(isEar, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
                 }
             }
 
@@ -1406,7 +1410,7 @@ public class RoomLivingViewModel extends ViewModel {
             }
         };
         config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING;
-        config.mAudioScenario = Constants.AUDIO_SCENARIO_CHORUS;
+        config.mAudioScenario = Constants.AUDIO_SCENARIO_GAME_STREAMING;
         config.addExtension("agora_ai_echo_cancellation_extension");
         config.addExtension("agora_ai_noise_suppression_extension");
         try {
@@ -1455,6 +1459,11 @@ public class RoomLivingViewModel extends ViewModel {
                                            }
                                        }
         );
+
+        if (isRoomOwner()) {
+            ktvApiProtocol.setMicStatus(true);
+            isOnSeat = true;
+        }
 
         // ------------------ 加入频道 ------------------
         mRtcEngine.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING);
@@ -1582,13 +1591,24 @@ public class RoomLivingViewModel extends ViewModel {
         KTVLogger.d(TAG, "unmute! setMicVolume: " + v);
         micVolume = v;
         if (mRtcEngine != null) {
-            mRtcEngine.adjustRecordingSignalVolume(v);
+            if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getUserNo() != null && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
+                // 主唱
+                //mRtcEngine.adjustRecordingSignalVolume(v);
+            } else {
+                // 其他人
+                mRtcEngine.adjustRecordingSignalVolume(v);
+                //mRtcEngine.muteLocalAudioStream(false);
+            }
         }
     }
 
     // ------------------ 原唱/伴奏 ------------------
-    public void musicToggleOriginal(int aimStatus) {
+    public void musicToggleOriginal(int aimStatus, boolean isMainSinger) {
         KTVLogger.d("musicToggleOriginal called, ", "aim: " + aimStatus);
+        if (!isMainSinger) {
+            ktvApiProtocol.getMediaPlayer().selectAudioTrack(aimStatus);
+            return;
+        }
         if (aimStatus == 0) {
             // 原唱
             ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(0, 0);

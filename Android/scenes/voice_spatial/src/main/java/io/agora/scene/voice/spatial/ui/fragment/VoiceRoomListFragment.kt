@@ -98,7 +98,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutB
                 override fun onError(code: Int, message: String?) {
                     binding?.smartRefreshLayout?.finishRefresh()
                     dismissLoading()
-                    ToastTools.show(requireActivity(), getString(R.string.voice_room_check_password))
+                    ToastTools.show(requireActivity(), getString(R.string.voice_spatial_room_check_password))
                 }
             })
         }
@@ -115,7 +115,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutB
                     if (code == VoiceServiceProtocol.ERR_ROOM_UNAVAILABLE) {
                         ToastTools.show(
                             requireActivity(),
-                            getString(R.string.voice_room_unavailable_tip)
+                            getString(R.string.voice_spatial_unavailable_tip)
                         )
                     } else {
                         ToastTools.show(requireActivity(), message ?: "")
@@ -167,8 +167,8 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutB
 
     private fun showInputDialog(voiceRoomModel: VoiceRoomModel) {
         RoomEncryptionInputDialog()
-            .leftText(requireActivity().getString(R.string.voice_room_cancel))
-            .rightText(requireActivity().getString(R.string.voice_room_confirm))
+            .leftText(requireActivity().getString(R.string.voice_spatial_room_cancel))
+            .rightText(requireActivity().getString(R.string.voice_spatial_room_confirm))
             .setDialogCancelable(true)
             .setOnClickListener(object : RoomEncryptionInputDialog.OnClickBottomListener {
                 override fun onCancelClick() {}
@@ -223,8 +223,8 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutB
             GlideApp.with(holder.ivAvatar.context).load(data.owner?.portrait)
                 .into(holder.ivAvatar)
             holder.tvRoomName.text = data.roomName
-            val countStr = if (data.memberCount > 0) data.memberCount.toString() else "0"
-            holder.tvPersonNum.text = mContext.getString(R.string.voice_room_list_count, countStr)
+            val peopleNum = if (data.memberCount > 0) data.memberCount else 0
+            holder.tvPersonNum.text = mContext.getString(R.string.voice_spatial_room_list_count, peopleNum)
             holder.tvUserName.text = data.owner?.nickName ?: ""
             if (data.isPrivate) {
                 holder.ivLock.visibility = View.VISIBLE
