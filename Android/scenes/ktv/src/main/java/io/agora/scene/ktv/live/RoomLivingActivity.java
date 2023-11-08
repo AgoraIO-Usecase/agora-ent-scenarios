@@ -240,6 +240,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             roomLivingViewModel.setLrcView(getBinding().lrcControlView);
         });
         getBinding().tvRoomName.setText(roomLivingViewModel.roomInfoLiveData.getValue().getRoomName());
+        GlideApp.with(getBinding().getRoot())
+                .load(roomLivingViewModel.roomInfoLiveData.getValue().getCreatorAvatar())
+                .error(R.mipmap.userimage)
+                .into(getBinding().ivOwnerAvatar);
 
         if (AgoraApplication.the().isDebugModeOpen()) {
             getBinding().btnDebug.setVisibility(View.VISIBLE);
@@ -254,7 +258,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             dialog.show(getSupportFragmentManager(), "debugSettings");
         });
         getBinding().ivMore.setOnClickListener(v -> {
-            new TopFunctionDialog(RoomLivingActivity.this).show();
+            new TopFunctionDialog(this).show();
         });
     }
 

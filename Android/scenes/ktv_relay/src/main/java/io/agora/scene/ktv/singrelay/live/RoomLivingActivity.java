@@ -229,6 +229,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
         getBinding().singRelayGameView.setIsRoomOwner(roomLivingViewModel.isRoomOwner());
 
         getBinding().tvRoomName.setText(roomLivingViewModel.roomInfoLiveData.getValue().getRoomName());
+        GlideApp.with(getBinding().getRoot())
+                .load(roomLivingViewModel.roomInfoLiveData.getValue().getCreatorAvatar())
+                .error(R.mipmap.userimage)
+                .into(getBinding().ivOwnerAvatar);
 
         if (AgoraApplication.the().isDebugModeOpen()) {
             getBinding().btnDebug.setVisibility(View.VISIBLE);
