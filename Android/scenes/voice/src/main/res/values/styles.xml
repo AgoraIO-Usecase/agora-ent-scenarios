@@ -82,11 +82,11 @@
     </style>
 
     <style name="voice_bottom_sheet_checkbox">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">45dp</item>
+        <item name="android:layout_height">28dp</item>
         <item name="android:layout_marginEnd">20dp</item>
         <item name="android:background">@color/voice_transparent</item>
-        <item name="android:button">@drawable/voice_cb_checkbox_selector</item>
+        <item name="android:button">@drawable/cb_def_selector</item>
     </style>
 
     <style name="voice_bottom_sheet_progress">

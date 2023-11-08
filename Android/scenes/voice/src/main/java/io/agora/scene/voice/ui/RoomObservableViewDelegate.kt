@@ -28,7 +28,6 @@ import io.agora.scene.voice.ui.dialog.common.CommonFragmentAlertDialog
 import io.agora.scene.voice.ui.dialog.common.CommonFragmentContentDialog
 import io.agora.scene.voice.ui.dialog.common.CommonSheetAlertDialog
 import io.agora.scene.voice.ui.dialog.soundcard.SoundCardSettingDialog
-import io.agora.scene.voice.ui.dialog.soundcard.SoundCardSettingBean
 import io.agora.scene.voice.ui.dialog.soundcard.SoundPresetTypeDialog
 import io.agora.scene.voice.ui.widget.mic.IRoomMicView
 import io.agora.scene.voice.ui.widget.primary.ChatPrimaryMenuView
@@ -665,13 +664,16 @@ class RoomObservableViewDelegate constructor(
         }
         dialog.show(activity.supportFragmentManager, "mtBGMSetting")
     }
-    /** 耳返设置弹框
+    /** 虚拟声卡设置弹框
      */
     fun onVirtualSoundCardSettingDialog() {
         val dialog = SoundCardSettingDialog()
         dialog.onClickSoundCardType = {
             val preset = SoundPresetTypeDialog()
             preset.show(activity.supportFragmentManager, SoundPresetTypeDialog.TAG)
+        }
+        dialog.onSoundCardStateChange = {
+            roomAudioSettingDialog?.updateSoundCardState()
         }
         dialog.show(activity.supportFragmentManager, SoundCardSettingDialog.TAG)
     }
