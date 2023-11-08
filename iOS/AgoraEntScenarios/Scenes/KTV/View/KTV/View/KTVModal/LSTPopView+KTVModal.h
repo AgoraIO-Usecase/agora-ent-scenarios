@@ -20,7 +20,7 @@
 #import "VLVoicePerShowView.h"
 #import "VLEarSettingView.h"
 #import "VLDebugView.h"
-#import "AgoraEntScenarios-swift.h"
+#import "AgoraEntScenarios-Swift.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LSTPopView (KTVModal)

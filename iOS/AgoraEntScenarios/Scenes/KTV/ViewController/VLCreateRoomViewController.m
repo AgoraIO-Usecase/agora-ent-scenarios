@@ -57,7 +57,7 @@
             [VLToast toast:error.description];
             return;
         }
-        //处理座位信息
+        //处理座位信息 
         VLRoomListModel *listModel = [[VLRoomListModel alloc]init];
         listModel.roomNo = outputModel.roomNo;
         listModel.name = outputModel.name;
@@ -73,25 +73,25 @@
 }
 
 - (void)setUpUI {
-    VLCreateRoomView *createRoomView = [[VLCreateRoomView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 330) withDelegate:self];
+    VLCreateRoomView *createRoomView = [[VLCreateRoomView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 343) withDelegate:self];
     [self.view addSubview:createRoomView];
     self.createRoomView = createRoomView;
 }
 
 - (void)keyboardWillShow:(NSNotification *)notification {
-    self.createRoomBlock(self.isRoomPrivate ? 560 : 520);
-    self.createRoomView.frame = CGRectMake(0, 0, SCREEN_WIDTH, self.isRoomPrivate ? 560 : 520);
+    self.createRoomBlock(self.isRoomPrivate ? 520 : 480);
+    self.createRoomView.frame = CGRectMake(0, 0, SCREEN_WIDTH, self.isRoomPrivate ? 520 : 480);
 }
 
 -(void)didCreateRoomAction:(CreateRoomActionType)type{
     if(type == CreateRoomActionTypeNormal){
         self.isRoomPrivate = false;
-        self.createRoomBlock(330);
-        self.createRoomView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 330);
+        self.createRoomBlock(343);
+        self.createRoomView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 343);
     } else if(type == CreateRoomActionTypeEncrypt) {
         self.isRoomPrivate = true;
-        self.createRoomBlock(420);
-        self.createRoomView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 420);
+        self.createRoomBlock(400);
+        self.createRoomView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 400);
     }
 }
 
