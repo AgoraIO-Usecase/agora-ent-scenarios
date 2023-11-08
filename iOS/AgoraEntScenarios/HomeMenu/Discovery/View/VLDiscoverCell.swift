@@ -49,6 +49,7 @@ class VLDiscoverCell: UICollectionViewCell {
         button.adjustImageTitlePosition(.right, spacing: 2)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(onClickDocumentButton), for: .touchUpInside)
+        button.vm_expandSize(size: 15)
         return button
     }()
     private lazy var musicButton: UIButton = {

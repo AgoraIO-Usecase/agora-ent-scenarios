@@ -38,7 +38,6 @@ public class Pure1v1Context: NSObject {
         pure1V1AppCertificate = appCertificate
         let vc = Pure1v1UserListViewController()
         vc.userInfo = userInfo
-        vc.hidesBottomBarWhenPushed = true
         viewController.navigationController?.pushViewController(vc, animated: true)
     }
 }

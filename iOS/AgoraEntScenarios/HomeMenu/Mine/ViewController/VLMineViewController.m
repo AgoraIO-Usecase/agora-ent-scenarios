@@ -121,7 +121,6 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 
 - (void)about {
     AboutAgoraEntertainmentViewController *VC = [[AboutAgoraEntertainmentViewController alloc] init];
-    VC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:VC animated:YES];
 }
 

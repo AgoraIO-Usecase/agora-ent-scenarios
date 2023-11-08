@@ -167,19 +167,25 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
     [cell setTitle:model.titleStr];
     if (self.dataArray[indexPath.section].count == 1) {
         cell.contentView.layer.cornerRadius = 16;
-        cell.contentView.layer.masksToBounds = YES;
+        cell.contentView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
+        
     } else {
         if (indexPath.row == 0) {
             cell.contentView.layer.cornerRadius = 16;
-            cell.contentView.layer.masksToBounds = YES;
             cell.contentView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
-        }
-        if (indexPath.row == self.dataArray[indexPath.section].count - 1) {
+            
+        } else if (indexPath.row == self.dataArray[indexPath.section].count - 1) {
             cell.contentView.layer.cornerRadius = 16;
             cell.contentView.layer.masksToBounds = YES;
             cell.contentView.layer.maskedCorners = kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
+            cell.separatorInset = UIEdgeInsetsZero;
+            
+        } else {
+            cell.contentView.layer.cornerRadius = 0;
+            cell.contentView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
         }
     }
+    cell.contentView.layer.masksToBounds = YES;
     return cell;
 }
 

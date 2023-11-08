@@ -96,13 +96,13 @@ class VLFeedbackViewController: VLBaseViewController {
         setupUI()
     }
     
-    private func  setupUI() {
+    private func setupUI() {
         hiddenBackgroundImage()
         setNaviTitleName(NSLocalizedString("app_submit_feedback", comment: ""))
         setBackBtn()
         
         view.addSubview(selectTagView)
-        selectTagView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
+        selectTagView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 11).isActive = true
         selectTagView.topAnchor.constraint(equalTo: view.topAnchor, constant: Screen.kNavHeight + 20).isActive = true
         selectTagView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
         selectTagView.heightAnchor.constraint(equalToConstant: 84).isActive = true

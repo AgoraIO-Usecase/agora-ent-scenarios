@@ -115,6 +115,9 @@ NSString *const USBaseWebViewController_KVO_Title = @"title";
 }
 
 - (void)systemButtonClickEvent {
+    if (self.isShowSystemWebButton == NO) {
+        return;
+    }
     if ([[UIApplication sharedApplication] canOpenURL:self.webView.URL]) {
         [[UIApplication sharedApplication] openURL:self.webView.URL options:@{} completionHandler:nil];
     }

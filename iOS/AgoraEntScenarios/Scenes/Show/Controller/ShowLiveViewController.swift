@@ -996,7 +996,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
             self.muteLocalVideo = selected
             if selected {
                 ShowAgoraKitManager.shared.engine?.stopPreview()
-                self.thumnbnailCanvasView.isHidden = false
+                self.thumnbnailCanvasView.isHidden = self.currentInteraction?.interactStatus != nil && self.currentInteraction?.interactStatus != .idle
             } else {
                 ShowAgoraKitManager.shared.engine?.startPreview()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {

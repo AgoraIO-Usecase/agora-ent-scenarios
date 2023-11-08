@@ -261,7 +261,6 @@
 		DD84178729090C520026B624 /* VLMineTCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416C429090C520026B624 /* VLMineTCell.m */; };
 		DD84178829090C520026B624 /* VLMineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416C929090C520026B624 /* VLMineViewController.m */; };
 		DD84178929090C520026B624 /* VLMainTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416CB29090C520026B624 /* VLMainTabBarController.m */; };
-		DD84178A29090C520026B624 /* VLMainRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416CE29090C520026B624 /* VLMainRootViewController.m */; };
 		DD84178D29090C520026B624 /* VLPopImageVerifyView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416D829090C520026B624 /* VLPopImageVerifyView.m */; };
 		DD84179029090C520026B624 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DD8416E029090C520026B624 /* Media.xcassets */; };
 		DD84179129090C520026B624 /* WMZCodeView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416E229090C520026B624 /* WMZCodeView.m */; };
@@ -1045,9 +1044,7 @@
 		DD8416C829090C520026B624 /* VLMineViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLMineViewController.h; sourceTree = "<group>"; };
 		DD8416C929090C520026B624 /* VLMineViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLMineViewController.m; sourceTree = "<group>"; };
 		DD8416CB29090C520026B624 /* VLMainTabBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLMainTabBarController.m; sourceTree = "<group>"; };
-		DD8416CC29090C520026B624 /* VLMainRootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLMainRootViewController.h; sourceTree = "<group>"; };
 		DD8416CD29090C520026B624 /* VLMainTabBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLMainTabBarController.h; sourceTree = "<group>"; };
-		DD8416CE29090C520026B624 /* VLMainRootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLMainRootViewController.m; sourceTree = "<group>"; };
 		DD8416CF29090C520026B624 /* UIWindow+Router.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWindow+Router.h"; sourceTree = "<group>"; };
 		DD8416D529090C520026B624 /* VLLoginModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLLoginModel.h; sourceTree = "<group>"; };
 		DD8416D629090C520026B624 /* VLLoginModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLLoginModel.m; sourceTree = "<group>"; };
@@ -2639,10 +2636,8 @@
 		DD8416CA29090C520026B624 /* Main */ = {
 			isa = PBXGroup;
 			children = (
-				DD8416CB29090C520026B624 /* VLMainTabBarController.m */,
-				DD8416CC29090C520026B624 /* VLMainRootViewController.h */,
 				DD8416CD29090C520026B624 /* VLMainTabBarController.h */,
-				DD8416CE29090C520026B624 /* VLMainRootViewController.m */,
+				DD8416CB29090C520026B624 /* VLMainTabBarController.m */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -5224,7 +5219,6 @@
 				E301C0402AF8E8E90089A79C /* SBGDebugManager.m in Sources */,
 				A851C5E12AEF5F8400071F88 /* ShowDebug1TFModel.swift in Sources */,
 				E301C0282AF8E8E90089A79C /* VLSBGVoicePerShowView.m in Sources */,
-				DD84178A29090C520026B624 /* VLMainRootViewController.m in Sources */,
 				E301BD652AF4CAFF0089A79C /* VLMicSeatCell.m in Sources */,
 				DD220BC9295B48FD00F57F30 /* QMUIHelper.m in Sources */,
 				E301C03F2AF8E8E90089A79C /* VLSBGViewController.m in Sources */,

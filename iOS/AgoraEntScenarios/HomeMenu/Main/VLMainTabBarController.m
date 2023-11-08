@@ -30,37 +30,35 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self setViewControllers:[self tabViewControllers]];
-    
-    self.selectedIndex = 0;
     [UITabBar appearance].barStyle = UIBarStyleDefault;
     
     [self.tabBar setBackgroundColor:[UIColor whiteColor]];
-
     [self.tabBar setBackgroundImage:[UIImage new]];
-
+    [self.tabBar setShadowImage:[UIImage new]];
+    [self setViewControllers:[self tabViewControllers]];
+    self.selectedIndex = 0;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 //    self.tabBar.hidden = NO;
+    self.tabBar.layer.borderWidth = 0.3;
+    self.tabBar.layer.borderColor = [UIColor colorWithHexString:@"#CCCCCCCC"].CGColor;
+    self.tabBar.clipsToBounds = NO;
 }
 
 - (NSArray *)tabViewControllers {
     VLHomeViewController *homeViewController = [[VLHomeViewController alloc] init];
-    homeViewController.hidesBottomBarWhenPushed = NO;
     BaseNavigationController *homeNavigationController = [[BaseNavigationController alloc]
                                                           initWithRootViewController:homeViewController];
     homeViewController.tabBarItem = [self tabBarItemsWithIndex:0];
     
     VLDiscoveyrViewController *discoveryVC = [[VLDiscoveyrViewController alloc] init];
-    discoveryVC.hidesBottomBarWhenPushed = NO;
     BaseNavigationController *discoveryNavigationController = [[BaseNavigationController alloc]
                                                   initWithRootViewController:discoveryVC];
     discoveryVC.tabBarItem = [self tabBarItemsWithIndex:1];
 
     VLMineViewController *mineViewController = [[VLMineViewController alloc] init];
-    mineViewController.hidesBottomBarWhenPushed = NO;
     BaseNavigationController *mineNavigationController = [[BaseNavigationController alloc]
                                                    initWithRootViewController:mineViewController];
     mineViewController.tabBarItem = [self tabBarItemsWithIndex:2];
@@ -98,16 +96,12 @@
 
 #pragma mark - UITabBarControllerDelegate
 
-//- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
-//    BOOL should = YES;
-//    [self updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController shouldSelect:should];
-//    return should;
-//}
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController {
+    NSLog(@"didSelectViewController");
 }
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
-    
+    NSLog(@"didSelectControl");
 }
 
 #pragma mark – Getters and Setters
