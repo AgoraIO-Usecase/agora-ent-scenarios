@@ -99,7 +99,9 @@
         [weakself.navigationController pushViewController:vc animated:true];
     };
     KTVCreateRoomPresentView *presentView = [KTVCreateRoomPresentView shared];
-    [presentView showViewWith:CGRectMake(0, SCREEN_HEIGHT - 330, SCREEN_WIDTH, 330) vc:createRoomVC];
+
+    [presentView showViewWith:CGRectMake(0, SCREEN_HEIGHT - 343, SCREEN_WIDTH, 343) vc:createRoomVC];
+
     [self.view addSubview:presentView];
 }
 

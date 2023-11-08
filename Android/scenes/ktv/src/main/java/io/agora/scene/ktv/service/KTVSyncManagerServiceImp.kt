@@ -232,6 +232,7 @@ class KTVSyncManagerServiceImp(
                                                 cacheRoom.name,
                                                 inputModel.roomNo,
                                                 cacheRoom.creatorNo,
+                                                cacheRoom.creatorAvatar,
                                                 cacheRoom.bgOption,
                                                 seats,
                                                 userSize,

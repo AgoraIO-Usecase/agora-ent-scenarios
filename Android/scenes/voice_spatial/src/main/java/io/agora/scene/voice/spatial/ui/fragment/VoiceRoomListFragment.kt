@@ -223,8 +223,8 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutB
             GlideApp.with(holder.ivAvatar.context).load(data.owner?.portrait)
                 .into(holder.ivAvatar)
             holder.tvRoomName.text = data.roomName
-            val countStr = if (data.memberCount > 0) data.memberCount.toString() else "0"
-            holder.tvPersonNum.text = mContext.getString(R.string.voice_spatial_room_list_count, countStr)
+            val peopleNum = if (data.memberCount > 0) data.memberCount else 0
+            holder.tvPersonNum.text = mContext.getString(R.string.voice_spatial_room_list_count, peopleNum)
             holder.tvUserName.text = data.owner?.nickName ?: ""
             if (data.isPrivate) {
                 holder.ivLock.visibility = View.VISIBLE

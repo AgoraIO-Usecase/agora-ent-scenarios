@@ -27,7 +27,7 @@
     <string name="voice_spatial_room_empty_data">暂无房间</string>
     <string name="voice_spatial_room_list_title_private">私密</string>
     <string name="voice_spatial_room_list_item_enter">进入</string>
-    <string name="voice_spatial_room_list_count">%1$s</string>
+    <string name="voice_spatial_room_list_count">%d人</string>
     <string name="voice_spatial_room_tab_layout_count">(%1$s)</string>
     <string name="voice_spatial_room_online_count">%d在线</string>
     <string name="voice_spatial_room_click_count">%d观看</string>

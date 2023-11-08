@@ -269,8 +269,8 @@
         [self.delegate soundEffectViewBackBtnActionWithView:self];
         return;
     }
-    
-    [[LSTPopView getPopViewWithCustomView:self] dismiss];
+
+    [[LSTPopView getSRPopViewWithCustomView:self] dismiss];
 }
 
 @end

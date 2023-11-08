@@ -190,6 +190,9 @@ abstract class OnPageScrollEventHandler constructor(
                 // TODO currLoadPosition 页面消失
                 hideChannel(roomList[currLoadPosition] ?: return)
                 onPageLeft(currLoadPosition)
+
+                joinChannel(position, roomList[position] ?: return, localUid, false)
+                onPageStartLoading(position)
             }
         }
         currLoadPosition = position
@@ -305,6 +308,7 @@ abstract class OnPageScrollEventHandler constructor(
     }
 
     private fun pageLoaded(position: Int, roomInfo: VideoLoader.RoomInfo) {
+        Log.d("hugo", "pageLoaded: $roomInfo")
         onPageLoaded(position)
         if (videoScrollMode == AGSlicingType.END_SCROLL) {
             roomInfo.anchorList.forEach { anchorInfo ->

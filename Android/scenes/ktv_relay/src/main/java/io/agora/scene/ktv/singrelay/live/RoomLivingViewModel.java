@@ -235,7 +235,7 @@ public class RoomLivingViewModel extends ViewModel {
         }
 
         if (mRtcEngine != null) {
-            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NONE);
+            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
             mRtcEngine.leaveChannel();
             RtcEngineEx.destroy();
             mRtcEngine = null;
@@ -301,6 +301,7 @@ public class RoomLivingViewModel extends ViewModel {
                             _roomInfo.getRoomName(),
                             _roomInfo.getRoomNo(),
                             _roomInfo.getCreatorNo(),
+                            _roomInfo.getCreatorAvatar(),
                             vlRoomListModel.getBgOption(),
                             _roomInfo.getSeatsArray(),
                             _roomInfo.getRoomPeopleNum(),
@@ -1009,7 +1010,7 @@ public class RoomLivingViewModel extends ViewModel {
                     return;
                 }
                 if (mRtcEngine != null) {
-                    mRtcEngine.enableInEarMonitoring(isEar, Constants.EAR_MONITORING_FILTER_NONE);
+                    mRtcEngine.enableInEarMonitoring(isEar, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
                 }
             }
 

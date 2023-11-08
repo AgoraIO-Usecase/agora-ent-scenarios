@@ -404,27 +404,27 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 
 //更换MV背景
 - (void)popSelMVBgView {
-    [LSTPopView popSelMVBgViewWithParentView:self.view
+    [LSTPopView popSRSelMVBgViewWithParentView:self.view
                                      bgModel:self.choosedBgModel
                                 withDelegate:self];
 }
 
 //弹出更多
 - (void)popSelMoreView {
-    [LSTPopView popSelMoreViewWithParentView:self.view
+    [LSTPopView popSRSelMoreViewWithParentView:self.view
                                 withDelegate:self];
 }
 
 //弹出下麦视图
 - (void)popDropLineViewWithSeatModel:(VLSRRoomSeatModel *)seatModel {
-    [LSTPopView popDropLineViewWithParentView:self.view
+    [LSTPopView popSRDropLineViewWithParentView:self.view
                                 withSeatModel:seatModel
                                  withDelegate:self];
 }
 
 //弹出美声视图
 - (void)popBelcantoView {
-    [LSTPopView popBelcantoViewWithParentView:self.view
+    [LSTPopView popSRBelcantoViewWithParentView:self.view
                             withBelcantoModel:self.selBelcantoModel
                                  withDelegate:self];
 }
@@ -432,7 +432,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 //弹出点歌视图
 - (void)popUpChooseSongView:(BOOL)ifChorus {
     LSTPopView* popChooseSongView =
-    [LSTPopView popUpChooseSongViewWithParentView:self.view
+    [LSTPopView popSRUpChooseSongViewWithParentView:self.view
                                          isChorus:ifChorus
                                   chooseSongArray:self.selSongsArray
                                        withRoomNo:self.roomModel.roomNo
@@ -444,7 +444,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 //弹出音效
 - (void)popSetSoundEffectView {
     LSTPopView* popView =
-    [LSTPopView popSetSoundEffectViewWithParentView:self.view
+    [LSTPopView popSRSetSoundEffectViewWithParentView:self.view
                                           soundView:self.effectView
                                        withDelegate:self];
     self.effectView = (VLSREffectView*)popView.currCustomView;
@@ -453,7 +453,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 
 //网络差视图
 - (void)popBadNetWrokTipView {
-    [LSTPopView popBadNetWrokTipViewWithParentView:self.view
+    [LSTPopView popSRBadNetWrokTipViewWithParentView:self.view
                                       withDelegate:self];
 }
 
@@ -473,7 +473,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 }
 
 - (void)showSettingView {
-    LSTPopView* popView = [LSTPopView popSettingViewWithParentView:self.view
+    LSTPopView* popView = [LSTPopView popSRSettingViewWithParentView:self.view
                                                        settingView:self.settingView
                                                       withDelegate:self];
     
@@ -1172,7 +1172,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)onVLSRMoreSelView:(VLSRPopMoreSelView *)view
                  btnTapped:(id)sender
                  withValue:(VLSRMoreBtnClickType)typeValue {
-    [[LSTPopView getPopViewWithCustomView:view] dismiss];
+    [[LSTPopView getSRPopViewWithCustomView:view] dismiss];
     switch (typeValue) {
 //        case VLSRMoreBtnClickTypeBelcanto:
 //            [self popBelcantoView];
@@ -1632,7 +1632,7 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
             return;
         }
         
-        [[LSTPopView getPopViewWithCustomView:view] dismiss];
+        [[LSTPopView getSRPopViewWithCustomView:view] dismiss];
         weakSelf.choosedBgModel = selBgModel;
     }];
 }
@@ -1670,7 +1670,8 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
         if(seatModel.userNo == VLUserCenter.user.id){
             self.statusView.state = SRStateAudienceWating;
         }
-        [[LSTPopView getPopViewWithCustomView:view] dismiss];
+
+        [[LSTPopView getSRPopViewWithCustomView:view] dismiss];
     }];
 }
 
