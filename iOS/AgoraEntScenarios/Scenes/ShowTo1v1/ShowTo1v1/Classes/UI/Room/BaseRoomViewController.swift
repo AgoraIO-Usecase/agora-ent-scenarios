@@ -9,6 +9,7 @@ import UIKit
 import CallAPI
 import AgoraRtcKit
 
+let kNormalIconSize = CGSize(width: 32, height: 32)
 class BaseRoomViewController: UIViewController {
     var onBackClosure: (()->())?
     var rtcEngine: AgoraRtcEngineKit?
@@ -32,6 +33,15 @@ class BaseRoomViewController: UIViewController {
         view.clipsToBounds = true
         return view
     }()
+    
+    lazy var moreBtn: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage.sceneImage(name: "icon_live_more"), for: .normal)
+        button.imageView?.contentMode = .scaleAspectFit
+        button.addTarget(self, action: #selector(onMoreAction), for: .touchUpInside)
+        return button
+    }()
+    
     private(set) lazy var bottomBar: RoomBottomBar = {
         let bar = RoomBottomBar(frame: .zero)
         bar.delegate = self
@@ -75,6 +85,12 @@ class BaseRoomViewController: UIViewController {
     }
     
     func switchCanvasAction(canvasView: CallCanvasView) {
+    }
+    
+    @objc func onMoreAction() {
+        let dialog = AUiMoreDialog(frame: view.bounds)
+        view.addSubview(dialog)
+        dialog.show()
     }
 }
 

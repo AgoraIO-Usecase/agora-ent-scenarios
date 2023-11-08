@@ -35,6 +35,13 @@ class Pure1v1CallViewController: UIViewController {
     }
     private lazy var moveViewModel: MoveGestureViewModel = MoveGestureViewModel()
     private lazy var roomInfoView: Pure1v1RoomInfoView = Pure1v1RoomInfoView()
+    lazy var moreBtn: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage.scene1v1Image(name: "icon_live_more"), for: .normal)
+        button.imageView?.contentMode = .scaleAspectFit
+        button.addTarget(self, action: #selector(onMoreAction), for: .touchUpInside)
+        return button
+    }()
     lazy var canvasContainerView = UIView()
     lazy var remoteCanvasView: Pure1v1CanvasView = {
         let view = Pure1v1CanvasView()
@@ -95,6 +102,7 @@ class Pure1v1CallViewController: UIViewController {
         view.addSubview(roomInfoView)
         view.addSubview(bottomBar)
         view.addSubview(hangupButton)
+        view.addSubview(moreBtn)
         
         moveViewModel.touchArea = view.bounds
         roomInfoView.frame = CGRect(x: 15, y: UIDevice.current.aui_SafeDistanceTop, width: 202, height: 40)
@@ -104,6 +112,10 @@ class Pure1v1CallViewController: UIViewController {
         hangupButton.aui_size = CGSize(width: 70, height: 70)
         hangupButton.aui_bottom = self.view.aui_height - 20 - UIDevice.current.aui_SafeDistanceBottom
         hangupButton.aui_centerX = self.view.aui_width / 2
+        
+        moreBtn.aui_size = CGSize(width: 32, height: 32)
+        moreBtn.aui_right = view.aui_width - 15
+        moreBtn.aui_centerY = roomInfoView.aui_centerY
     }
     
     private func _resetCanvas() {
@@ -139,7 +151,6 @@ class Pure1v1CallViewController: UIViewController {
             localCanvasView.removeGestureRecognizer(moveViewModel.gesture)
             remoteCanvasView.addGestureRecognizer(moveViewModel.gesture)
             
-            
             roomInfoView.setRoomInfo(avatar: currentUser?.avatar ?? "",
                                      name: currentUser?.userName ?? "",
                                      id: currentUser?.userId ?? "")
@@ -164,6 +175,12 @@ class Pure1v1CallViewController: UIViewController {
         callApi?.hangup(userId: UInt(targetUser?.userId ?? "") ?? 0, completion: { err in
         })
         dismiss(animated: false)
+    }
+    
+    @objc func onMoreAction() {
+        let dialog = AUiMoreDialog(frame: view.bounds)
+        view.addSubview(dialog)
+        dialog.show()
     }
 }
 
