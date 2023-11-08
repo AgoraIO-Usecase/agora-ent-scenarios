@@ -22,11 +22,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.core.view.isVisible
-import io.agora.scene.voice.rtckit.AgoraPresetSound
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogSoundCardBinding
-import io.agora.scene.voice.rtckit.AgoraRtcEngineController
-import io.agora.scene.voice.rtckit.AgoraSoundCardManager
+import io.agora.scene.voice.rtckit.*
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
 
 class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
@@ -42,7 +40,7 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
     // 有无有线耳机
     private var isPlugIn = false
 
-    var mOnSoundCardChange: (() -> Unit)? = null
+    var onSoundCardStateChange: (() -> Unit)? = null
 
     var onClickSoundCardType: (() -> Unit)? = null
 
@@ -110,7 +108,7 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
                         setupGainView(mManager.gainValue())
                         setupPresetView(mManager.presetValue())
                     }
-                    mOnSoundCardChange?.invoke()
+                    onSoundCardStateChange?.invoke()
                 })
             }
             pbGainAdjust.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -185,37 +183,8 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
     }
 
     private fun setupPresetSoundView(presetSound: AgoraPresetSound) {
-        binding?.apply {
-            when (presetSound) {
-                AgoraPresetSound.Sound2001 -> {
-                    val text = "${getString(R.string.voice_preset_sound_dashu)}（${getString(R.string.voice_preset_sound_dashu_tips)}）"
-                    tvSoundTypeSelect.text = text
-                }
-                AgoraPresetSound.Sound2002 -> {
-                    val text = "${getString(R.string.voice_preset_sound_mum)}（${getString(R.string.voice_preset_sound_mum_tips)}）"
-                    tvSoundTypeSelect.text = text
-                }
-                AgoraPresetSound.Sound2003 -> {
-                    val text = "${getString(R.string.voice_preset_sound_qingshu)}（${getString(R.string.voice_preset_sound_qingshu_tips)}）"
-                    tvSoundTypeSelect.text = text
-                }
-                AgoraPresetSound.Sound2004 -> {
-                    val text = "${getString(R.string.voice_preset_sound_yuma)}（${getString(R.string.voice_preset_sound_yuma_tips)}）"
-                    tvSoundTypeSelect.text = text
-                }
-                AgoraPresetSound.Sound2005 -> {
-                    val text = "${getString(R.string.voice_preset_sound_qingnian)}（${getString(R.string.voice_preset_sound_qingnian_tips)}）"
-                    tvSoundTypeSelect.text = text
-                }
-                AgoraPresetSound.Sound2006 -> {
-                    val text = "${getString(R.string.voice_preset_sound_shaoyu)}（${getString(R.string.voice_preset_sound_shaoyu_tips)}）"
-                    tvSoundTypeSelect.text = text
-                }
-                else -> {
-                    tvSoundTypeSelect.text = ""
-                }
-            }
-        }
+        val text = "${getString(presetSound.titleStringID)}（${getString(presetSound.infoStringID)}）"
+        binding?.tvSoundTypeSelect?.text = text
     }
 
     private fun setHeadPhonePlugin(isPlug: Boolean) {
@@ -245,12 +214,12 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
             val state = intent.getIntExtra("state", -1)
             if (state == 1) {
                 setHeadPhonePlugin(true)
-                mOnSoundCardChange?.invoke()
+                onSoundCardStateChange?.invoke()
                 //耳机插入
                 Log.d("HeadphoneReceiver", "headphone plugged in")
             } else if (state == 0) {
                 setHeadPhonePlugin(false)
-                mOnSoundCardChange?.invoke()
+                onSoundCardStateChange?.invoke()
                 //耳机拔出
                 Log.d("HeadphoneReceiver", "headphone removed")
             }

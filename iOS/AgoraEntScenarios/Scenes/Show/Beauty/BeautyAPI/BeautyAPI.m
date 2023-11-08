@@ -108,7 +108,7 @@ static NSString *const beautyAPIVersion = @"1.0.4";
             mode = AgoraVideoMirrorModeEnabled;
         }
     }
-    [self.config.rtcEngine setLocalRenderMode:self.renderMode mirror:mode];
+    [self.config.rtcEngine setParameters:[NSString stringWithFormat:@"{\"rtc.camera_capture_mirror_mode\":%d}", mode == AgoraVideoMirrorModeEnabled ? 1 : 0]];
     [LogUtil log:[NSString stringWithFormat:@"AgoraVideoMirrorMode == %ld isFrontCamera == %d", mode, self.isFrontCamera]];
     return mode;
 }

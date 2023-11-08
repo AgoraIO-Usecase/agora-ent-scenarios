@@ -133,10 +133,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     
     // setup view
     [self setBackgroundImage:@"sr_main_back"];
-    
-    UIView *bgView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
-    bgView.backgroundColor = UIColorMakeWithRGBA(0, 0, 0, 0.6);
-    [self.view addSubview:bgView];
     //头部视图
     VLSRTopView *topView = [[VLSRTopView alloc]initWithFrame:CGRectMake(0, kStatusBarHeight, SCREEN_WIDTH, 60) withDelegate:self];
     [self.view addSubview:topView];
@@ -144,7 +140,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     topView.listModel = self.roomModel;
     
     //底部按钮视图
-    VLSRBottomToolbar *bottomView = [[VLSRBottomToolbar alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT-50-kSafeAreaBottomHeight, SCREEN_WIDTH, 50) withDelegate:self withRoomNo:self.roomModel.roomNo withData:self.seatsArray];
+    VLSRBottomToolbar *bottomView = [[VLSRBottomToolbar alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT-64-kSafeAreaBottomHeight, SCREEN_WIDTH, 64) withDelegate:self withRoomNo:self.roomModel.roomNo withData:self.seatsArray];
     bottomView.backgroundColor = [UIColor clearColor];
     self.bottomView = bottomView;
     [self.view addSubview:bottomView];
@@ -155,7 +151,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     //MV视图(显示歌词...)
     CGFloat mvViewTop = topView.bottom;
     
-    self.statusView = [[VLSRStatusView alloc]initWithFrame:CGRectMake(15, mvViewTop, SCREEN_WIDTH - 30, musicHeight * 0.5)];
+    self.statusView = [[VLSRStatusView alloc]initWithFrame:CGRectMake(0, mvViewTop, SCREEN_WIDTH, musicHeight * 0.5)];
     self.statusView.state = [self isRoomOwner] ? SRStateOwnerOrderMusic : SRStateAudienceWating;
     self.statusView.delegate = self;
     self.statusView.lrcView.delegate = self;

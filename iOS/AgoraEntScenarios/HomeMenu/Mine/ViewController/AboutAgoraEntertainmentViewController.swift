@@ -9,7 +9,7 @@ import UIKit
 import ZSwiftBaseLib
 import AgoraRtcKit
 
-@objcMembers final class AboutAgoraEntertainmentViewController: VRBaseViewController {
+@objcMembers final class AboutAgoraEntertainmentViewController: VLBaseViewController {
     
     var infos = [["contents":[["title": NSLocalizedString("app_about_customer_service", comment: ""),
                                "detail": "400-632-6626"],
@@ -29,7 +29,7 @@ import AgoraRtcKit
                                        versionText: NSLocalizedString("app_about_version", comment: "")+": "+"20230928-"+UIDevice.current.appVersion+"-\(AgoraRtcEngineKit.getSdkVersion())")
     
     lazy var infoList: UITableView = {
-        UITableView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: ScreenHeight-ZNavgationHeight), style: .plain)
+        UITableView(frame: .zero, style: .plain)
             .registerCell(ContactInfoCell.self, forCellReuseIdentifier: "ContactInfoCell")
             .registerCell(UITableViewCell.self, forCellReuseIdentifier: "SceneVersionCell")
             .delegate(self)
@@ -53,19 +53,24 @@ import AgoraRtcKit
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        view.backgroundColor = .white
+        setNaviTitleName(NSLocalizedString("app_about_app", comment: ""))
+        setBackBtn()
+        hiddenBackgroundImage()
+        
         tableHeader.delegate = self
-        self.view.addSubview(self.infoList)
-        self.view.bringSubviewToFront(navigation)
-        self.navigation.title.text = NSLocalizedString("app_about_app", comment: "")
+        view.addSubview(infoList)
+        infoList.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0)
         
         debugModeButton.isHidden = !AppContext.shared.isDebugMode
-        self.view.addSubview(debugModeButton)
-        self.createConstrains()
+        view.addSubview(debugModeButton)
+        createConstrains()
     }
     
     private func createConstrains() {
         infoList.snp.makeConstraints { make in
-            make.left.top.right.bottom.equalToSuperview()
+            make.left.right.bottom.equalToSuperview()
+            make.top.equalToSuperview().offset(ZNavgationHeight)
         }
         debugModeButton.snp.makeConstraints { make in
             make.left.bottom.right.equalToSuperview()
