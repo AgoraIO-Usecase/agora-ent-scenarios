@@ -141,7 +141,7 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        CGSize(width: Screen.width, height: currentType == .all ? 36 : 0)
+        CGSize(width: Screen.width, height: currentType == .all ? 40 : 0)
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -155,7 +155,7 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        UIEdgeInsets(top: 16.fit, left: 20.fit, bottom: (dataArray?.count ?? 0) - 1 == section ? 20.fit : 0, right: 20.fit)
+        UIEdgeInsets(top: 12.fit, left: 20.fit, bottom: (dataArray?.count ?? 0) - 1 == section ? 20.fit : 0, right: 20.fit)
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
