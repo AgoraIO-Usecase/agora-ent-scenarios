@@ -76,6 +76,7 @@ class VLVerifyCodeViewController: VLBaseViewController {
         setBackBtn()
         setupUI()
         sendVerifyCodeHandler()
+        setupTimer()
     }
     
     deinit {
@@ -98,52 +99,22 @@ class VLVerifyCodeViewController: VLBaseViewController {
     }
     
     private func sendVerifyCodeHandler() {
-        /*
-        let params = ["phone": phoneNumber ?? ""]
-        VLAPIRequest.getURL(VLURLConfig.kURLPathVerifyCode, parameter: params, showHUD: true) { response in
-            if response.code == 0 {
-                self.setupTimer()
-            } else {
-                ToastView.show(text: response.message, postion: .center)
-            }
-        } failure: { _, _ in }
-        */
-        
         let model = VLVerifyCodeNetworkModel()
         model.phone = phoneNumber
-        model.request {[weak self] err, data in
+        model.request { [weak self] err, data in
             if let response: VLResponseData = data as? VLResponseData {
-                if  response.code == 0 {
-                    self?.setupTimer()
-                }else {
+                if  response.code != 0 {
                     ToastView.show(text: response.message ?? "", postion: .center)
+                    self?.count = 1
                 }
             }else{
                 ToastView.show(text: err?.localizedDescription ?? "", postion: .center)
+                self?.count = 1
             }
         }
     }
     
     private func verifyCodeHandler(code: String) {
-        /*
-        let params = ["phone": phoneNumber ?? "", "code": code]
-        VLAPIRequest.getURL(VLURLConfig.kURLPathLogin, parameter: params, showHUD: true) { response in
-            if response.code == 0 {
-                guard let model = VLLoginModel.yy_model(withJSON: response.data) else { return }
-                VLUserCenter.shared().storeUserInfo(model)
-                UIApplication.shared.delegate?.window??.configRootViewController()
-            } else {
-                DispatchQueue.main.async {
-                    self.tipsLabel.isHidden = false
-                }
-            }
-        } failure: { _, _ in
-            DispatchQueue.main.async {
-                self.tipsLabel.isHidden = false
-            }
-        }
-        */
-        
         let model = VLLoginNetworkModel()
         model.phone = phoneNumber
         model.code = code
@@ -153,12 +124,12 @@ class VLVerifyCodeViewController: VLBaseViewController {
                     guard let loginModel = VLLoginModel.yy_model(withJSON: responseData) else { return }
                     VLUserCenter.shared().storeUserInfo(loginModel)
                     UIApplication.shared.delegate?.window??.configRootViewController()
-                }else {
+                } else {
                     DispatchQueue.main.async {
                         self.tipsLabel.isHidden = false
                     }
                 }
-            }else{
+            } else {
                 DispatchQueue.main.async {
                     self.tipsLabel.isHidden = false
                 }
@@ -192,5 +163,6 @@ class VLVerifyCodeViewController: VLBaseViewController {
         guard sendCodeButton.isSelected else { return }
         tipsLabel.isHidden = true
         sendVerifyCodeHandler()
+        setupTimer()
     }
 }
