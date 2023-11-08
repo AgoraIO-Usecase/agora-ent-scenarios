@@ -17,39 +17,19 @@
 
 @interface VLSRCreateRoomViewController ()<VLSRCreateRoomViewDelegate/*,AgoraRtmDelegate*/>
 @property (nonatomic, strong) AgoraRtcEngineKit *RTCkit;
-
+@property (nonatomic, assign) BOOL isRoomPrivate;
+@property (nonatomic, strong) VLSRCreateRoomView *createRoomView;
 @end
 
 @implementation VLSRCreateRoomViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-//    AgoraRtcEngineConfig *config = [[AgoraRtcEngineConfig alloc]init];
-//    config.appId = [AppContext.shared appId];
-//    config.audioScenario = AgoraAudioScenarioChorus;
-//    config.channelProfile = AgoraChannelProfileLiveBroadcasting;
-//    self.RTCkit = [AgoraRtcEngineKit sharedEngineWithConfig:config delegate:nil];
-//    /// 开启唱歌评分功能
-//    int code = [self.RTCkit enableAudioVolumeIndication:20 smooth:3 reportVad:YES];
-//    if (code == 0) {
-//        VLLog(@"评分回调开启成功\n");
-//    } else {
-//        VLLog(@"评分回调开启失败：%d\n",code);
-//    }
-    [self commonUI];
+    self.view.backgroundColor = [UIColor whiteColor];
     [self setUpUI];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
 }
 
-- (void)commonUI {
-    [self setBackgroundImage:@"online_list_BgIcon"];
-    [self setNaviTitleName:KTVLocalizedString(@"ktv_create_room")];
-    [self setBackBtn];
-}
-
-#pragma mark - Public Methods
-- (void)configNavigationBar:(UINavigationBar *)navigationBar {
-    [super configNavigationBar:navigationBar];
-}
 - (BOOL)preferredNavigationBarHidden {
     return true;
 }
@@ -90,10 +70,12 @@
         listModel.name = outputModel.name;
         listModel.bgOption = 0;
         listModel.creatorNo = VLUserCenter.user.id;
+        listModel.creatorName = VLUserCenter.user.name;
+        listModel.creatorAvatar = VLUserCenter.user.headUrl;
         VLSRViewController *srVC = [[VLSRViewController alloc]init];
         srVC.roomModel = listModel;
         srVC.seatsArray = outputModel.seatsArray;
-        [weakSelf.navigationController pushViewController:srVC animated:YES];
+        weakSelf.createRoomVCBlock(srVC);
     }];
 }
 
@@ -127,8 +109,26 @@
 //}
 
 - (void)setUpUI {
-    VLSRCreateRoomView *createRoomView = [[VLSRCreateRoomView alloc]initWithFrame:CGRectMake(0, kTopNavHeight, SCREEN_WIDTH, SCREEN_HEIGHT-kTopNavHeight) withDelegate:self];
+    VLSRCreateRoomView *createRoomView = [[VLSRCreateRoomView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 343) withDelegate:self];
     [self.view addSubview:createRoomView];
+    self.createRoomView = createRoomView;
+}
+
+- (void)keyboardWillShow:(NSNotification *)notification {
+    self.createRoomBlock(self.isRoomPrivate ? 520 : 480);
+    self.createRoomView.frame = CGRectMake(0, 0, SCREEN_WIDTH, self.isRoomPrivate ? 520 : 480);
+}
+
+-(void)didCreateRoomAction:(SRCreateRoomActionType)type{
+    if(type == SRCreateRoomActionTypeNormal){
+        self.isRoomPrivate = false;
+        self.createRoomBlock(343);
+        self.createRoomView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 343);
+    } else if(type == SRCreateRoomActionTypeEncrypt) {
+        self.isRoomPrivate = true;
+        self.createRoomBlock(400);
+        self.createRoomView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 400);
+    }
 }
 
 
