@@ -99,7 +99,7 @@
     [self.naviView.heightAnchor constraintEqualToConstant: totalHeight].active = YES;
     
     [self.view addSubview:self.myCategoryView];
-    [self.myCategoryView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:16].active = YES;
+    [self.myCategoryView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:18].active = YES;
     [self.myCategoryView.bottomAnchor constraintEqualToAnchor:self.naviView.bottomAnchor].active = YES;
     [self.myCategoryView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-80].active = YES;
     [self.myCategoryView.heightAnchor constraintEqualToConstant:44].active = YES;

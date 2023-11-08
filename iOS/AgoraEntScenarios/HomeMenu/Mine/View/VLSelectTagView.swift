@@ -94,6 +94,7 @@ class VLSelectTagView: UIView {
         scrollview.showsVerticalScrollIndicator = false
         scrollview.showsHorizontalScrollIndicator = false
         scrollview.translatesAutoresizingMaskIntoConstraints = false
+        scrollview.isScrollEnabled = false
         return scrollview
     }()
     private var tempContentArr : Array = Array<Any>()
