@@ -50,7 +50,6 @@ open class AGCollectionSlicingDelegateHandler: AGBaseDelegateHandler {
                 if newValue.isDragging == false, newValue.isDecelerating == false {
                     //更新roomlist时，已经完全停止则重新走停止后更新当前状态和上下预加载屏幕的状态
                     visibleRoomInfos = showVisibleRoom(collectionView: newValue, state: .joinedWithAudioVideo)
-                    cleanIdleRoom(collectionView: newValue)
                 } else {
                     //没有停止的时候都改成joinedWithVideo，⚠️会存在当前房间画面无声音，滑动停止的时候才能听到
                     visibleRoomInfos = joinVideo()
