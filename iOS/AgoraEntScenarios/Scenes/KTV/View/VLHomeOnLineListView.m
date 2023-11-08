@@ -171,16 +171,15 @@ static const int INTERVAL = 1000; // 时间间隔为1秒
 - (UIButton *)createBtn {
     if (!_createBtn) {
         
-//        _createBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_list_addIcon"]
-//                                                      title:KTVLocalizedString(@"创建房间")];
         _createBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_createBtn setTitle:KTVLocalizedString(@"ktv_create_room") forState:UIControlStateNormal];
-        [_createBtn setImage:[UIImage sceneImageWithName:@"add"] forState:UIControlStateNormal];
+       // [_createBtn setTitle:KTVLocalizedString(@"ktv_create_room") forState:UIControlStateNormal];
+       // [_createBtn setImage:[UIImage sceneImageWithName:@"add"] forState:UIControlStateNormal];
         _createBtn.accessibilityIdentifier = @"ktv_create_button_id";
         [_createBtn setBackgroundImage:[UIImage sceneImageWithName:@"create_room"] forState:UIControlStateNormal];
-        _createBtn.frame = CGRectMake((SCREEN_WIDTH-195)*0.5, SCREEN_HEIGHT-34-kSafeAreaBottomHeight-48-kTopNavHeight, 195, 48);
-        _createBtn.layer.cornerRadius = 24;
-        _createBtn.layer.masksToBounds = YES;
+        _createBtn.frame = CGRectMake((SCREEN_WIDTH-148)*0.5, SCREEN_HEIGHT-34-kSafeAreaBottomHeight-56-kTopNavHeight, 148, 56);
+       // _createBtn.layer.cornerRadius = 23;
+       // _createBtn.layer.masksToBounds = YES;
+        _createBtn.imageView.contentMode = UIViewContentModeScaleAspectFit;
 //        _createBtn.imagePosition = QMUIButtonImagePositionLeft;
         _createBtn.spacingBetweenImageAndTitle = 7;
         _createBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
@@ -188,7 +187,6 @@ static const int INTERVAL = 1000; // 时间间隔为1秒
         _createBtn.titleLabel.font = UIFontBoldMake(16.0);
 //        _createBtn.adjustsButtonWhenHighlighted = NO;
         [_createBtn addTarget:self action:@selector(createBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
-        _createBtn.backgroundColor = UIColorMakeWithHex(@"#2753FF");
     }
     return _createBtn;
 }

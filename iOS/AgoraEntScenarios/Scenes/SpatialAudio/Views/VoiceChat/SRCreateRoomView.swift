@@ -61,7 +61,7 @@ class SRCreateRoomView: UIView {
         self.addSubview(self.warningView)
         
         let warImgView = UIImageView(frame: CGRect(x: 10, y: 5, width: 14, height: 14))
-        warImgView.image = UIImage.sceneImage(name: "add_circle", bundleName: "SpatialAudioResource")
+        warImgView.image = UIImage.sceneImage(name: "zhuyi", bundleName: "SpatialAudioResource")
         self.warningView.addSubview(warImgView)
         
         let contentLabel = UILabel(frame: CGRect(x: 30, y: 5, width: self.warningView.width - 40, height: textHeight))
