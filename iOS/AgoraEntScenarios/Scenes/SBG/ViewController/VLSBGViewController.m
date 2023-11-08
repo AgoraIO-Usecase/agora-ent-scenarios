@@ -142,11 +142,11 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
     [self subscribeServiceEvent];
     
     // setup view
-    [self setBackgroundImage:@"ktv_room_bg"];
+    [self setBackgroundImage:@"bg-main"];
     
-    UIView *bgView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
-    bgView.backgroundColor = UIColorMakeWithRGBA(0, 0, 0, 0.6);
-    [self.view addSubview:bgView];
+//    UIView *bgView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
+//    bgView.backgroundColor = UIColorMakeWithRGBA(0, 0, 0, 0.6);
+//    [self.view addSubview:bgView];
     //头部视图
     VLSBGTopView *topView = [[VLSBGTopView alloc]initWithFrame:CGRectMake(0, kStatusBarHeight, SCREEN_WIDTH, 60) withDelegate:self];
     [self.view addSubview:topView];
@@ -154,7 +154,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
     topView.listModel = self.roomModel;
     
     //底部按钮视图
-    VLSBGBottomToolbar *bottomView = [[VLSBGBottomToolbar alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT-50-kSafeAreaBottomHeight, SCREEN_WIDTH, 50) withDelegate:self withRoomNo:self.roomModel.roomNo withData:self.seatsArray];
+    VLSBGBottomToolbar *bottomView = [[VLSBGBottomToolbar alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT-64-kSafeAreaBottomHeight, SCREEN_WIDTH, 64) withDelegate:self withRoomNo:self.roomModel.roomNo withData:self.seatsArray];
     bottomView.backgroundColor = [UIColor clearColor];
     self.bottomView = bottomView;
     [self.view addSubview:bottomView];
@@ -164,7 +164,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
     
     //MV视图(显示歌词...)
     CGFloat mvViewTop = topView.bottom;
-    self.statusView = [[VLSBGStatusView alloc]initWithFrame:CGRectMake(15, mvViewTop, SCREEN_WIDTH - 30, musicHeight * 0.5)];
+    self.statusView = [[VLSBGStatusView alloc]initWithFrame:CGRectMake(0, mvViewTop, SCREEN_WIDTH, musicHeight * 0.5)];
     self.statusView.state = [self isRoomOwner] ? SBGStateOwnerOrderMusic : SBGStateAudienceWating;
     self.statusView.delegate = self;
     self.statusView.lrcView.delegate = self;

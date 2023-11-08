@@ -155,7 +155,7 @@ extension VRRoomsViewController {
             self?.isDestory = false
             let presentView = VRCreateRoomPresentView.shared
             let vc = VRCreateViewController()
-            presentView.showView(with: CGRect(x: 0, y: (self?.view.bounds.size.height ?? 0) - 400, width: self?.view.bounds.width ?? 0, height: 350), vc: vc)
+            presentView.showView(with: CGRect(x: 0, y: (self?.view.bounds.size.height ?? 0) - 343, width: self?.view.bounds.width ?? 0, height: 343), vc: vc)
             self?.view.addSubview(presentView)
             
             vc.createRoomBlock = { height in

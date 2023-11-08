@@ -54,6 +54,7 @@ class SRCreateRoomPresentView: UIView, UIGestureRecognizerDelegate {
         self.addSubview(self.bgView)
         
         self.mainView.frame = CGRect(x: 0, y: screenSize.height, width: frame.width, height: frame.height)
+        self.mainView.setTopCornerRadius(radius: 20)
         self.addSubview(self.mainView)
         
         nav = UINavigationController(rootViewController: vc)
@@ -77,6 +78,7 @@ class SRCreateRoomPresentView: UIView, UIGestureRecognizerDelegate {
         UIView.animate(withDuration: 0.5) {
             let rect = CGRect(x: 0, y: UIScreen.main.bounds.height - height, width: self.mainView.frame.width, height: height)
             self.mainView.frame = rect
+            self.mainView.setTopCornerRadius(radius: 20)
         }
     }
     

@@ -93,8 +93,9 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
             navigationController?.pushViewController(vc, animated: true)
         
         case .chorus:
-            let vc = VLOnLineListVC()
-            navigationController?.pushViewController(vc, animated: true)
+            break
+//            let vc = VLOnLineListVC()
+//            navigationController?.pushViewController(vc, animated: true)
             
         case .continue_singing:
             let vc = VLSROnLineListVC()

@@ -49,22 +49,22 @@ class SRCreateRoomView: UIView {
         self.addRoomModel.is_private = false
         let text = LanguageManager.localValue(key: "voice_create_tips")
         let font = UIFont.systemFont(ofSize: 12)
-        let constraintSize = CGSize(width: self.width - 40, height: CGFloat.greatestFiniteMagnitude)
+        let constraintSize = CGSize(width: self.width - 78, height: CGFloat.greatestFiniteMagnitude)
         let attributes = [NSAttributedString.Key.font: font]
         let textRect = text.boundingRect(with: constraintSize, options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: attributes, context: nil)
         let textHeight = ceil(textRect.height)
         
-        self.warningView = UIView(frame: CGRect(x: 10, y: 10, width: self.width - 20, height: textHeight + 10))
+        self.warningView = UIView(frame: CGRect(x: 20, y: 20, width: self.width - 40, height: textHeight + 10))
         self.warningView.backgroundColor = UIColor(hexString: "#FA396A1A")
         self.warningView.layer.cornerRadius = 5
         self.warningView.layer.masksToBounds = true
         self.addSubview(self.warningView)
         
-        let warImgView = UIImageView(frame: CGRect(x: 10, y: 5, width: 14, height: 14))
+        let warImgView = UIImageView(frame: CGRect(x: 10, y: 6, width: 16, height: 16))
         warImgView.image = UIImage.sceneImage(name: "zhuyi", bundleName: "SpatialAudioResource")
         self.warningView.addSubview(warImgView)
         
-        let contentLabel = UILabel(frame: CGRect(x: 30, y: 5, width: self.warningView.width - 40, height: textHeight))
+        let contentLabel = UILabel(frame: CGRect(x: 30, y: 5, width: self.warningView.width - 38, height: textHeight))
         contentLabel.numberOfLines = 0
         let attributedText = NSMutableAttributedString(string: text)
         attributedText.addAttribute(.foregroundColor, value: UIColor.black, range: NSRange(location: 0, length: 77))
@@ -73,7 +73,7 @@ class SRCreateRoomView: UIView {
         contentLabel.attributedText = attributedText
         self.warningView.addSubview(contentLabel)
         
-        let roomTitleLabel = UILabel(frame: CGRect(x: 40, y: self.warningView.bottom + 20, width: 70, height: 20))
+        let roomTitleLabel = UILabel(frame: CGRect(x: 20, y: self.warningView.bottom + 20, width: 70, height: 20))
         roomTitleLabel.font = UIFont.systemFont(ofSize: 14)
         roomTitleLabel.textColor = UIColor(hexString: "#000000")
         roomTitleLabel.text = "spatial_voice_room_name".spatial_localized()
@@ -89,36 +89,37 @@ class SRCreateRoomView: UIView {
         randomBtn.addTarget(self, action: #selector(randomBtnClickEvent), for: .touchUpInside)
         self.addSubview(randomBtn)
         randomBtn.sizeToFit()
-        randomBtn.frame = CGRect(x: screenW - randomBtn.width - 50, y: roomTitleLabel.top, width: randomBtn.width, height: 20)
+        randomBtn.frame = CGRect(x: screenW - randomBtn.width - 20, y: roomTitleLabel.top, width: randomBtn.width, height: 20)
         
-        let inputBgView = UIView(frame: CGRect(x: 30, y: roomTitleLabel.bottom + 15, width: screenW - 60, height: 48))
+        let inputBgView = UIView(frame: CGRect(x: 20, y: roomTitleLabel.bottom + 8, width: screenW - 40, height: 48))
         inputBgView.layer.cornerRadius = 8
         inputBgView.layer.masksToBounds = true
         inputBgView.backgroundColor = UIColor(hexString: "#F5F8FF")
         self.addSubview(inputBgView)
         
-        self.inputTF = UITextField(frame: CGRect(x: 30, y: 9, width: inputBgView.width - 60, height: 30))
+        self.inputTF = UITextField(frame: CGRect(x: 12, y: 9, width: inputBgView.width - 24, height: 30))
         self.inputTF.accessibilityIdentifier = "ktv_create_room_textfield_id"
         self.inputTF.textColor = UIColor(hexString: "#040925")
         self.inputTF.font = UIFont.systemFont(ofSize: 18)
         self.inputTF.clearButtonMode = .whileEditing
         self.inputTF.tintColor = UIColor(hexString: "#345DFF")
+        self.inputTF.delegate = self
         inputBgView.addSubview(self.inputTF)
         
-        let secretLabel = UILabel(frame: CGRect(x: 40, y: inputBgView.bottom + 30, width: 100, height: 20))
+        let secretLabel = UILabel(frame: CGRect(x: 20, y: inputBgView.bottom + 24, width: 100, height: 20))
         secretLabel.font = UIFont.systemFont(ofSize: 14)
         secretLabel.textColor = UIColor(hexString: "#000000")
         secretLabel.text = "spatial_voice_room_access".spatial_localized()
         secretLabel.sizeToFit()
         self.addSubview(secretLabel)
         
-        self.enBtn = UIButton(frame: CGRect(x: secretLabel.right + 8, y: inputBgView.bottom + 30, width: 32, height: 20))
+        self.enBtn = UIButton(frame: CGRect(x: secretLabel.right + 8, y: inputBgView.bottom + 24, width: 32, height: 20))
         self.enBtn.setBackgroundImage(UIImage.sceneImage(name: "guan", bundleName: "SpatialAudioResource"), for: .normal)
         self.enBtn.setBackgroundImage(UIImage.sceneImage(name: "open", bundleName: "SpatialAudioResource"), for: .selected)
         self.enBtn.addTarget(self, action: #selector(enChange), for: .touchUpInside)
         self.addSubview(self.enBtn)
         
-        self.setLabel = UILabel(frame: CGRect(x: self.width - 170, y: inputBgView.bottom + 30, width: 150, height: 17))
+        self.setLabel = UILabel(frame: CGRect(x: self.width - 170, y: inputBgView.bottom + 25.5, width: 150, height: 17))
         self.setLabel.font = UIFont.systemFont(ofSize: 12)
         self.setLabel.textColor = UIColor(hexString: "#FA396A")
         self.setLabel.text = "spatial_voice_enter_4_digit_password".spatial_localized()
@@ -126,11 +127,11 @@ class SRCreateRoomView: UIView {
         self.setLabel.isHidden = true
         self.addSubview(self.setLabel)
         
-        self.screatView = UIView(frame: CGRect(x: 40, y: self.setLabel.bottom + 30, width: screenW - 80, height: 48 + 12 + 17))
+        self.screatView = UIView(frame: CGRect(x: 20, y: self.setLabel.bottom + 8, width: screenW - 40, height: 48 ))
         self.screatView.isHidden = true
         self.addSubview(self.screatView)
         
-        let pwdView = VerifyCodeView(frame: CGRect(x: 0, y: 0, width: screenW - 80, height: 55), codeNumbers: 4, space: 10, padding: 10)
+        let pwdView = VerifyCodeView(frame: CGRect(x: 0, y: 0, width: screenW - 40, height: 48), codeNumbers: 4, space: 10, padding: 0)
         pwdView.inputFinish = { pwd in
             weakSelf.addRoomModel.roomPassword = pwd
             if let delegate = weakSelf.delegate {
@@ -140,15 +141,11 @@ class SRCreateRoomView: UIView {
         self.screatView.addSubview(pwdView)
         
         let createBtn = UIButton()
-        createBtn.layer.cornerRadius = 5
-        createBtn.layer.masksToBounds = true
-        createBtn.setTitle(LanguageManager.localValue(key: "voice_create_room"), for: .normal)
-        createBtn.setTitleColor(UIColor(hexString: "#FFFFFF"), for: .normal)
+        createBtn.setBackgroundImage(UIImage.sceneImage(name: "createRoomBtn", bundleName: "VoiceChatRoomResource"), for: .normal)
         createBtn.accessibilityIdentifier = "ktv_create_room_button_id"
         createBtn.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .bold)
         createBtn.adjustsImageWhenHighlighted = false
         createBtn.addTarget(self, action: #selector(createBtnClickEvent), for: .touchUpInside)
-        createBtn.backgroundColor = UIColor(hexString: "#2753FF")
         self.addSubview(createBtn)
         
         createBtn.mas_makeConstraints { make in
@@ -209,12 +206,15 @@ class SRCreateRoomView: UIView {
         }
         screatView.isHidden = !screatBtn.isSelected
     }
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        self.endEditing(true)
-        if let delegate = delegate {
-            delegate.didCreateRoomAction(addRoomModel.is_private ? .encrypt : .normal)
-        }
-    }
+
 }
 
+extension SRCreateRoomView: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        if let delegate = delegate{
+            delegate.didCreateRoomAction(self.addRoomModel.is_private ? .encrypt : .normal)
+        }
+        return true
+    }
+}
