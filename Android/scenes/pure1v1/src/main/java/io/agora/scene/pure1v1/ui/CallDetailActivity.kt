@@ -20,6 +20,7 @@ import io.agora.scene.pure1v1.callAPI.CallStateType
 import io.agora.scene.pure1v1.callAPI.ICallApiListener
 import io.agora.scene.pure1v1.databinding.Pure1v1CallDetailActivityBinding
 import io.agora.scene.pure1v1.service.CallServiceManager
+import io.agora.scene.widget.dialog.TopFunctionDialog
 import java.util.concurrent.TimeUnit
 
 class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>(), ICallApiListener {
@@ -45,32 +46,6 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
         timerHandler = Handler(Looper.getMainLooper())
         updateTime()
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Log.d(tag,"onResume")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.d(tag,"onStop")
-    }
-
-    override fun onRestart() {
-        super.onRestart()
-        Log.d(tag,"onRestart")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(tag,"onDestroy")
-    }
-
-    override fun onBackPressed() {
-        Log.d(tag,"onBackPressed")
-        onHangup()
-        super.onBackPressed()
     }
 
     private fun setupRTCListener() {
@@ -125,6 +100,9 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
         }
         binding.ivSetting.setOnClickListener {
             onClickSetting()
+        }
+        binding.ivMore.setOnClickListener {
+            TopFunctionDialog(this).show()
         }
         binding.ivClose.setOnClickListener {
             binding.ivClose.visibility = View.INVISIBLE
