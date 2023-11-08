@@ -66,13 +66,13 @@ data class JoinRoomOutputModel(
     val roomName: String,
     val roomNo: String,
     val creatorNo: String,
+    val creatorAvatar: String,
     val bgOption: String,
     val seatsArray: List<RoomSeatModel>?,
     /**
      * 房间内人数
      */
     val roomPeopleNum: Int,
-
     val agoraRTMToken: String,
     val agoraRTCToken: String,
     val agoraChorusToken: String,

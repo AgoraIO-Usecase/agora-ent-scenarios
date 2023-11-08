@@ -298,6 +298,7 @@ public class RoomLivingViewModel extends ViewModel {
                             _roomInfo.getRoomName(),
                             _roomInfo.getRoomNo(),
                             _roomInfo.getCreatorNo(),
+                            _roomInfo.getCreatorAvatar(),
                             vlRoomListModel.getBgOption(),
                             _roomInfo.getSeatsArray(),
                             _roomInfo.getRoomPeopleNum(),
