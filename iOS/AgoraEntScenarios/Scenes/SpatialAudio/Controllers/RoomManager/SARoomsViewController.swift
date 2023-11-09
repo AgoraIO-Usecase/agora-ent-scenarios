@@ -52,7 +52,7 @@ import AgoraChat
     override public func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        navigation.title.text = "spatial_voice_app_name".spatial_localized()
+        navigation.title.text = "spatial_voice_chat_room".spatial_localized()
     }
     
     public override func viewWillAppear(_ animated: Bool) {

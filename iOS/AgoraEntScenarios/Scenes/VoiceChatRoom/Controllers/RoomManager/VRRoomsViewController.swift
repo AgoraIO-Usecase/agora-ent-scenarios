@@ -57,7 +57,7 @@ let page_size = 15
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         //navigation.isHidden = true
-        navigation.title.text = LanguageManager.localValue(key: "voice_app_name")
+        navigation.title.text = LanguageManager.localValue(key: "voice_chat_room")
     }
     
     
