@@ -159,7 +159,7 @@ extension VoiceRoomViewController {
         }
         
         let presentView: VoiceRoomPresentView = VoiceRoomPresentView.shared
-        presentView.showView(with: CGRect(x: 0, y: 0, width: ScreenWidth, height: 500), vc: audioSetVC, maxHeight: 660)
+        presentView.showView(with: CGRect(x: 0, y: 0, width: ScreenWidth, height: 500), vc: audioSetVC, maxHeight: 850)
         view.addSubview(presentView)
         
     }

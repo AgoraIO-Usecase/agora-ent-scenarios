@@ -56,3 +56,44 @@ class VMNorSetTableViewCell: UITableViewCell {
         selectionStyle = .none
     }
 }
+
+class VMAudioSetEngineSurpportCell: UITableViewCell {
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+    }
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        selectionStyle = .none
+        layoutUI()
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func layoutUI() {
+        let view = UIView()
+        let label = UILabel()
+        label.text = "声网凤鸣AI引擎提供支持"
+        label.textColor = UIColor(hexString: "#6C7192")
+        label.font = .systemFont(ofSize: 12)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(label)
+        label.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+        
+        let logoImageView = UIImageView(image: UIImage.sceneImage(name: "AI_logo", bundleName: "VoiceChatRoomResource"))
+        logoImageView.contentMode = .scaleAspectFit
+        logoImageView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(logoImageView)
+        logoImageView.snp.makeConstraints { make in
+            make.centerY.equalTo(label)
+            make.right.equalTo(label.snp.left).offset(-10)
+        }
+    }
+}

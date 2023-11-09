@@ -7,6 +7,20 @@
 
 import UIKit
 
+private enum AudioSettingRowType {
+    case AINS
+    case AIAEC
+    case AGC
+    case EarBack
+    case SoundCard
+    case Robots
+    case RobotsVolume
+    case BesetSoundEffect
+    case BGM
+    case Engine
+}
+
+
 class VoiceRoomAudioSettingViewController: VRBaseViewController {
     
     lazy var cover: UIView = {
@@ -33,32 +47,18 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     private let swIdentifier = "switch"
     private let slIdentifier = "slider"
     private let nIdentifier = "normal"
+    private let spdentifier = "surpport"
     private lazy var inEarView = VoiceRealInEarView()
 
 //    private var settingName: [String] = ["\(LanguageManager.localValue(key: "blue")) & \(LanguageManager.localValue(key: "red"))", LanguageManager.localValue(key: "Robot Volume"), LanguageManager.localValue(key: "Best Sound"), "AINS", "Spatial Audio"]
 //    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
     
-    private var settingName: [String] = [LanguageManager.localValue(key: "voice_AINS"),
-                                         LanguageManager.localValue(key: "voice_AIAEC"),
-                                         LanguageManager.localValue(key: "voice_AGC"),
-                                         LanguageManager.localValue(key: "In-Ear Monitor"),
-                                         LanguageManager.localValue(key: "voice_SoundCard"),
-                                         LanguageManager.localValue(key: "voice_agora_blue_and_red_bot"),
-                                         LanguageManager.localValue(key: "voice_robot_volume"),
-                                         LanguageManager.localValue(key: "voice_best_agora_sound"),
-                                         LanguageManager.localValue(key: "Background Music"),
-                                         "voice_spatial_audio".voice_localized()]
-    
-    private var settingImage: [String] = ["AINS",
-                                          "AIAEC",
-                                          "AGC",
-                                          "InEar",
-                                          "icon-park-solid_people-speak",
-                                          "jiqi",
-                                          "icons／set／laba",
-                                          "icons／set／zuijia",
-                                          "Music"]
-
+    private let dataSource: [[AudioSettingRowType]] = 
+    [
+        [.AINS, .AIAEC, .AGC, .EarBack, .SoundCard],
+        [.Robots, .RobotsVolume],
+        [.BesetSoundEffect, .BGM, .Engine]
+    ]
 
     private var soundTitle: [String] = []
     private var ainsTitle: [String] = []
@@ -232,10 +232,11 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         view.addSubview(titleLabel)
         print("\(self.view.bounds.size.height)")
-        tableView.frame = CGRect(x: 0, y: 70, width: ScreenWidth, height: 600)
+        tableView.frame = CGRect(x: 0, y: 70, width: ScreenWidth, height: 650)
         tableView.registerCell(VMSwitchTableViewCell.self, forCellReuseIdentifier: swIdentifier)
         tableView.registerCell(VMSliderTableViewCell.self, forCellReuseIdentifier: slIdentifier)
         tableView.registerCell(VMNorSetTableViewCell.self, forCellReuseIdentifier: nIdentifier)
+        tableView.registerCell(VMAudioSetEngineSurpportCell.self, forCellReuseIdentifier: spdentifier)
         tableView.dataSource = self
         tableView.delegate = self
         view.addSubview(tableView)
@@ -258,7 +259,7 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
 
 extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 3
+        return dataSource.count
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -270,13 +271,8 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == 0 {
-            return 5
-        } else if section == 1 {
-            return 2
-        } else {
-            return 2
-        }
+        let items = dataSource[section]
+        return items.count
     }
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -327,146 +323,130 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         }
     }
     
-    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        guard section == 2 else { return nil }
-        let view = UIView()
-        let label = UILabel()
-        label.text = "声网凤鸣AI引擎提供支持"
-        label.textColor = UIColor(hexString: "#6C7192")
-        label.font = .systemFont(ofSize: 12)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(label)
-        label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        label.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        
-        let logoImageView = UIImageView(image: UIImage.sceneImage(name: "AI_logo", bundleName: "VoiceChatRoomResource"))
-        logoImageView.contentMode = .scaleAspectFit
-        logoImageView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(logoImageView)
-        logoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        logoImageView.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: -10).isActive = true
-        
-        let lineView = UIView()
-        lineView.backgroundColor = UIColor(hexString: "#F6F6F6")
-        lineView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(lineView)
-        lineView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
-        lineView.topAnchor.constraint(equalTo: view.topAnchor, constant: 10).isActive = true
-        lineView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
-        lineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
-        return view
-    }
-    
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         section == 2 ? 80.0 : 0.1
     }
-
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if indexPath.section == 0 {
+        let items = dataSource[indexPath.section]
+        let type = items[indexPath.row]
+        if (type == .AINS) {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as? VMNorSetTableViewCell else {
                 return UITableViewCell()
             }
-            guard !settingImage.isEmpty else { return cell }
-
-            cell.iconView.image = UIImage.voice_image(settingImage[0 + indexPath.row])
-            cell.titleLabel.text = settingName[0 + indexPath.row]
-            if indexPath.row == 0 {
-                //cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
-                switch ains_state {
-                case .high:
-                    cell.contentLabel.text = "voice_High".voice_localized()
-                case .mid:
-                    cell.contentLabel.text = "voice_Medium".voice_localized()
-                case .off:
-                    cell.contentLabel.text = "voice_off".voice_localized()
-                }
-                
-                
-            } else if indexPath.row == 1 {
-                if roomInfo?.room?.turn_AIAEC == true {
-                    cell.contentLabel.text = "voice_on".voice_localized()
-                } else {
-                    cell.contentLabel.text = "voice_off".voice_localized()
-                }
-            } else if indexPath.row == 2 {
-                if roomInfo?.room?.turn_AGC == true {
-                    cell.contentLabel.text = "voice_on".voice_localized()
-                } else {
-                    cell.contentLabel.text = "voice_off".voice_localized()
-                }
-            } else if indexPath.row == 3 {
-                if roomInfo?.room?.turn_InEar == true {
-                    cell.contentLabel.text = "voice_on".voice_localized()
-                } else {
-                    cell.contentLabel.text = "voice_off".voice_localized()
-                }
-            } else if indexPath.row == 4 {
-                cell.contentLabel.text = self.soundOpen == true ? "voice_on".voice_localized() : "voice_off".voice_localized()
-            } else {
-                cell.contentLabel.text = "Other".voice_localized()
-
-            }
             cell.accessibilityIdentifier = "voice_chat_room_audio_setting_\(indexPath.section)_\(indexPath.row)"
+            cell.iconView.image = UIImage.voice_image("AINS")
+            cell.titleLabel.text = LanguageManager.localValue(key: "voice_AINS")
+            switch ains_state {
+            case .high:
+                cell.contentLabel.text = "voice_High".voice_localized()
+            case .mid:
+                cell.contentLabel.text = "voice_Medium".voice_localized()
+            case .off:
+                cell.contentLabel.text = "voice_off".voice_localized()
+            }
             return cell
-        } else if indexPath.section == 1 {
-            if indexPath.row == 0 {
-                let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
-                guard !settingImage.isEmpty else { return cell}
-                cell.iconView.image = UIImage.voice_image(settingImage[4])
-                cell.titleLabel.text = settingName[4]
-                cell.swith.alpha = isAudience ? 0.5 : 1
-                cell.swith.isUserInteractionEnabled = !isAudience
-                cell.selectionStyle = .none
-                cell.swith.isOn = roomInfo?.room?.use_robot ?? false
-                cell.swith.accessibilityIdentifier = "voice_chat_room_audio_setting_agora_blue_red_bot_switch"
-                cell.useRobotBlock = { [weak self] flag in
-                    guard let useRobotBlock = self?.useRobotBlock else { return }
-                    self?.isTouchAble = flag
-                    useRobotBlock(flag)
-                    self?.roomInfo?.room?.backgroundMusic?.status = .pause
-                    self?.musicListView.updatePlayStatus(model: self?.roomInfo?.room?.backgroundMusic)
-                }
-                return cell
-            } else if indexPath.row == 1 {
-                let cell: VMSliderTableViewCell = tableView.dequeueReusableCell(withIdentifier: slIdentifier) as! VMSliderTableViewCell
-                guard !settingImage.isEmpty else { return cell}
-                cell.iconView.image = UIImage.voice_image(settingImage[5])
-                cell.titleLabel.text = settingName[5]
-                cell.isAudience = isAudience
-                cell.selectionStyle = .none
-                cell.volBlock = { [weak self] vol in
-                    guard let volBlock = self?.volBlock else { return }
-                    volBlock(vol)
-                }
-                
-                let volume = roomInfo?.room?.robot_volume ?? 50
-                cell.slider.value = Float(volume) / 100.0
-                cell.countLabel.text = "\(volume)"
-                cell.slider.accessibilityIdentifier = "voice_chat_room_audio_setting_robot_volume_slider"
-                return cell
-            }
-        } else if indexPath.section == 2 {
-//            let cell: VMNorSetTableViewCell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as! VMNorSetTableViewCell
+        } else if (type == .AIAEC) {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as? VMNorSetTableViewCell else {
-                // handle the failure case here
                 return UITableViewCell()
             }
-            guard !settingImage.isEmpty else { return cell}
-            cell.iconView.image = UIImage.voice_image(settingImage[6 + indexPath.row])
-            cell.titleLabel.text = settingName[6 + indexPath.row]
-      
-            if indexPath.row == 0 {
-                cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
-            } else if indexPath.row == 1 {
-                let musicName = roomInfo?.room?.backgroundMusic?.name
-                let singerName = roomInfo?.room?.backgroundMusic?.singer
-                let text = musicName == nil ? "" : "\(musicName ?? "")-\(singerName ?? "")"
-                cell.contentLabel.text = text
+            cell.iconView.image = UIImage.voice_image("AIAEC")
+            cell.titleLabel.text = LanguageManager.localValue(key: "voice_AIAEC")
+            if roomInfo?.room?.turn_AIAEC == true {
+                cell.contentLabel.text = "voice_on".voice_localized()
+            } else {
+                cell.contentLabel.text = "voice_off".voice_localized()
             }
-            cell.accessibilityIdentifier = "voice_chat_room_audio_setting_\(indexPath.section)_\(indexPath.row)"
+            return cell
+        } else if (type == .AGC) {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as? VMNorSetTableViewCell else {
+                return UITableViewCell()
+            }
+            cell.iconView.image = UIImage.voice_image("AGC")
+            cell.titleLabel.text = LanguageManager.localValue(key: "voice_AGC")
+            if roomInfo?.room?.turn_AGC == true {
+                cell.contentLabel.text = "voice_on".voice_localized()
+            } else {
+                cell.contentLabel.text = "voice_off".voice_localized()
+            }
+            return cell
+        } else if (type == .EarBack) {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as? VMNorSetTableViewCell else {
+                return UITableViewCell()
+            }
+            cell.iconView.image = UIImage.voice_image("InEar")
+            cell.titleLabel.text = LanguageManager.localValue(key: "In-Ear Monitor")
+            if roomInfo?.room?.turn_InEar == true {
+                cell.contentLabel.text = "voice_on".voice_localized()
+            } else {
+                cell.contentLabel.text = "voice_off".voice_localized()
+            }
+            return cell
+        } else if (type == .SoundCard) {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as? VMNorSetTableViewCell else {
+                return UITableViewCell()
+            }
+            cell.iconView.image = UIImage.voice_image("icon-park-solid_people-speak")
+            cell.titleLabel.text = LanguageManager.localValue(key: "voice_SoundCard")
+            cell.contentLabel.text = self.soundOpen == true ? "voice_on".voice_localized() : "voice_off".voice_localized()
+            
+            return cell
+        } else if (type == .Robots) {
+            let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
+            cell.iconView.image = UIImage.voice_image("jiqi")
+            cell.titleLabel.text = LanguageManager.localValue(key: "voice_agora_blue_and_red_bot")
+            cell.swith.alpha = isAudience ? 0.5 : 1
+            cell.swith.isUserInteractionEnabled = !isAudience
+            cell.selectionStyle = .none
+            cell.swith.isOn = roomInfo?.room?.use_robot ?? false
+            cell.swith.accessibilityIdentifier = "voice_chat_room_audio_setting_agora_blue_red_bot_switch"
+            cell.useRobotBlock = { [weak self] flag in
+                guard let useRobotBlock = self?.useRobotBlock else { return }
+                self?.isTouchAble = flag
+                useRobotBlock(flag)
+                self?.roomInfo?.room?.backgroundMusic?.status = .pause
+                self?.musicListView.updatePlayStatus(model: self?.roomInfo?.room?.backgroundMusic)
+            }
+            return cell
+        } else if (type == .RobotsVolume) {
+            let cell: VMSliderTableViewCell = tableView.dequeueReusableCell(withIdentifier: slIdentifier) as! VMSliderTableViewCell
+            cell.iconView.image = UIImage.voice_image("icons／set／laba")
+            cell.titleLabel.text = LanguageManager.localValue(key: "voice_robot_volume")
+            cell.isAudience = isAudience
+            cell.selectionStyle = .none
+            cell.volBlock = { [weak self] vol in
+                guard let volBlock = self?.volBlock else { return }
+                volBlock(vol)
+            }
+            
+            let volume = roomInfo?.room?.robot_volume ?? 50
+            cell.slider.value = Float(volume) / 100.0
+            cell.countLabel.text = "\(volume)"
+            cell.slider.accessibilityIdentifier = "voice_chat_room_audio_setting_robot_volume_slider"
+            return cell
+        } else if (type == .BesetSoundEffect) {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as? VMNorSetTableViewCell else {
+                return UITableViewCell()
+            }
+            cell.iconView.image = UIImage.voice_image("icons／set／zuijia")
+            cell.titleLabel.text = LanguageManager.localValue(key: "voice_best_agora_sound")
+            cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
+            return cell
+        } else if (type == .BGM) {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as? VMNorSetTableViewCell else {
+                return UITableViewCell()
+            }
+            cell.iconView.image = UIImage.voice_image("Music")
+            cell.titleLabel.text = LanguageManager.localValue(key: "Background Music")
+            let musicName = roomInfo?.room?.backgroundMusic?.name
+            let singerName = roomInfo?.room?.backgroundMusic?.singer
+            let text = musicName == nil ? "" : "\(musicName ?? "")-\(singerName ?? "")"
+            cell.contentLabel.text = text
+            return cell
+        } else if (type == .Engine) {
+            let cell = tableView.dequeueReusableCell(withIdentifier: spdentifier) ?? UITableViewCell()
             return cell
         }
-
         return UITableViewCell()
     }
 
