@@ -367,7 +367,7 @@ extension VLSBGLyricView: KaraokeDelegate {
     }
 }
 
-extension VLSBGLyricView: SBGLrcViewDelegate {
+extension VLSBGLyricView: KTVLrcViewDelegate {
     
     func onHighPartTime(highStartTime: Int, highEndTime: Int) {
         self.highEndTime = highEndTime

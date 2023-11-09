@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import SnapKit
 private let kDialogAnimationDuration = 0.3
 class Pure1v1Dialog: UIView {
     private lazy var iconView = UIImageView(image: UIImage.scene1v1Image(name: "dialog_icon"))
@@ -56,10 +56,20 @@ class Pure1v1Dialog: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         let contentSize = contentSize()
-        dialogView.frame = CGRect(x: 0, y: self.aui_height - contentSize.height, width: contentSize.width, height: contentSize.height)
+       // dialogView.frame = CGRect(x: 0, y: self.aui_height - contentSize.height, width: contentSize.width, height: contentSize.height)
         contentView.frame = dialogView.bounds
         gradientLayer.frame = CGRect(x: 0, y: 0, width: contentView.aui_width, height: 58)
-        iconView.aui_size = CGSize(width: 106, height: 100)
+       // iconView.aui_size = CGSize(width: 106, height: 100)
+        
+        iconView.snp.makeConstraints { make in
+                    make.centerX.equalToSuperview()
+                    make.centerY.equalToSuperview().multipliedBy(0.3)
+                }
+        dialogView.snp.makeConstraints { make in
+                    make.top.equalTo(iconView.snp.bottom)
+                    make.left.equalTo(20)
+                    make.right.equalTo(-20)
+                }
     }
     
     func showAnimation() {

@@ -5,7 +5,6 @@
 
 #import "VLSBGViewController.h"
 #import "VLSBGTopView.h"
-#import "VLSBGMVView.h"
 #import "VLSBGMicSeatList.h"
 #import "VLSBGBottomToolbar.h"
 #import "VLSBGAudienceIndicator.h"
@@ -26,7 +25,6 @@
 #import "VLGlobalHelper.h"
 #import "VLURLPathConfig.h"
 #import "VLToast.h"
-#import "VLSBGMVView.h"
 #import "UIView+VL.h"
 #import "AppContext+SBG.h"
 #import "SBGMacro.h"
@@ -63,8 +61,8 @@ AgoraRtcMediaPlayerDelegate,
 AgoraRtcEngineDelegate,
 VLSBGPopScoreViewDelegate,
 SBGLrcControlDelegate,
-SBGApiEventHandlerDelegate,
-ISBGMusicLoadStateListener,
+KTVApiEventHandlerDelegate,
+IMusicLoadStateListener,
 VLSBGVoiceShowViewDelegate,
 VLSBGVoicePerShowViewDelegate,
 VLSBGStatusViewDelegate,
@@ -73,7 +71,6 @@ VLSBGLrcViewDelegate
 
 typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
-@property (nonatomic, strong) VLSBGMVView *MVView;
 @property (nonatomic, strong) VLSBGSelBgModel *choosedBgModel;
 @property (nonatomic, strong) VLSBGBottomToolbar *bottomView;
 @property (nonatomic, strong) VLSBGBelcantoModel *selBelcantoModel;
@@ -95,10 +92,10 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
 @property (nonatomic, assign) BOOL isNowCameraMuted;
 @property (nonatomic, assign) BOOL isOnMicSeat;
 //@property (nonatomic, assign) NSUInteger chorusNum;    //合唱人数
-@property (nonatomic, assign) SBGSingRole singRole;    //角色
+@property (nonatomic, assign) KTVSingRole singRole;    //角色
 @property (nonatomic, assign) BOOL isEarOn;
 @property (nonatomic, assign) int playoutVolume;
-@property (nonatomic, assign) SBGPlayerTrackMode trackMode;  //合唱/伴奏
+@property (nonatomic, assign) KTVPlayerTrackMode trackMode;  //合唱/伴奏
 
 @property (nonatomic, strong) NSArray <VLSBGRoomSelSongModel*>* selSongsArray;
 @property (nonatomic, strong) KTVApiImpl* SBGApi;
@@ -160,7 +157,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
     [self.view addSubview:bottomView];
     
     //去掉首尾的高度
-    CGFloat musicHeight = SCREEN_HEIGHT -50 - kSafeAreaBottomHeight - kStatusBarHeight - 60;
+    CGFloat musicHeight = SCREEN_HEIGHT -64 - kSafeAreaBottomHeight - kStatusBarHeight - 60 - 20;
     
     //MV视图(显示歌词...)
     CGFloat mvViewTop = topView.bottom;
@@ -384,6 +381,8 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
         [[AppContext sbgServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
                                                             completion:^(NSError * error) {
         }];
+    } else {
+        self.isNowMicMuted = true;
     }
     if([self isRoomOwner]){
         [self.SBGApi stopSing];
@@ -406,7 +405,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
                     
                 }];
             }
-            [self loadAndPlaySongWith:SBGPlayerTrackModeAcc];
+            [self loadAndPlaySongWith:KTVPlayerTrackModeAcc];
     });
 }
 
@@ -646,7 +645,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return;
     } else if([dict[@"cmd"] isEqualToString:@"singleLineScore"]) {//观众接收主唱的分数
         NSLog(@"index: %li", [dict[@"index"] integerValue]);
-        if(self.singRole != SBGSingRoleAudience){
+        if(self.singRole != KTVSingRoleAudience){
             return;
         }
         //观众使用主唱的分数来显示
@@ -729,7 +728,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
 }
 
-- (void)loadAndPlaySongWith:(SBGPlayerTrackMode)mode{
+- (void)loadAndPlaySongWith:(KTVPlayerTrackMode)mode{
     //清空分数
     [self.statusView.lrcView resetScore];
     self.trackMode = mode;
@@ -749,18 +748,18 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //    self.retryCount = 0;
     
     //判断用户角色需要根据点歌人和抢歌人
-    SBGSingRole role = SBGSingRoleAudience;
-    if(mode == SBGPlayerTrackModeOrigin){
+    KTVSingRole role = KTVSingRoleAudience;
+    if(mode == KTVPlayerTrackModeOrigin){
         role = [self getUserSingRole];
         [self.statusView.lrcView setAudioTrackWithIndex:0];
     } else {
-        role = [model.winnerNo isEqualToString:VLUserCenter.user.id] ? SBGSingRoleSoloSinger : SBGSingRoleAudience;
+        role = [model.winnerNo isEqualToString:VLUserCenter.user.id] ? KTVSingRoleSoloSinger : KTVSingRoleAudience;
         [self.statusView.lrcView setAudioTrackWithIndex:1];
     }
     self.singRole = role;
     
     KTVSongConfiguration *songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = role == KTVSingRoleAudience ? NO : YES ;
+    songConfig.autoPlay = NO;
     songConfig.mode = role == KTVSingRoleAudience ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc;
     songConfig.mainSingerUid = [model.userNo integerValue];
     //songCode需要特殊转换一下
@@ -771,6 +770,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
         if (!isSuccess) {
             return;
+        }
+        if(weakSelf.singRole == KTVSingRoleSoloSinger){
+            [weakSelf.SBGApi startSingWithSongCode:songcode startPos:0];
         }
     };
     
@@ -1099,8 +1101,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     self.isNowMicMuted = myseat.isAudioMuted;
     self.isNowCameraMuted = myseat.isVideoMuted;
-    self.trackMode = SBGPlayerTrackModeOrigin;
-    self.singRole = SBGSingRoleAudience;
+    self.trackMode = KTVPlayerTrackModeOrigin;
+    self.singRole = KTVSingRoleAudience;
     
     AgoraVideoEncoderConfiguration *encoderConfiguration =
     [[AgoraVideoEncoderConfiguration alloc] initWithSize:CGSizeMake(100, 100)
@@ -1119,7 +1121,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.RTCkit createDataStream:&SBGStreamId
                            config:config];
     
-    NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
     KTVApiConfig *apiConfig = [[KTVApiConfig alloc]initWithAppId:[[AppContext shared] appId]
                                                               rtmToken:VLUserCenter.user.agoraRTMToken
                                                                 engine:self.RTCkit
@@ -1265,7 +1266,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 -(void)onKaraokeViewWithScore:(NSInteger)score totalScore:(NSInteger)totalScore lineScore:(NSInteger)lineScore lineIndex:(NSInteger)lineIndex {
-    if(self.singRole == SBGSingRoleAudience){
+    if(self.singRole == KTVSingRoleAudience){
         return;
     }
 
@@ -1726,55 +1727,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)requestOnlineAction {
 }
 #pragma mark - MVViewDelegate
-// 打分实时回调
-- (void)onRSMVView:(VLSBGMVView *)view scoreDidUpdate:(int)score {
-}
-
-- (void)onRSMVView:(VLSBGMVView *)view btnTappedWithActionType:(VLSBGMVViewActionType)type {
-    if (type == VLSBGMVViewActionTypeSetParam) {
-        [self showSettingView];
-    } else if (type == VLSBGMVViewActionTypeMVPlay) { //播放
-        [self.SBGApi resumeSing];
-        self.isPause = false;
-    } else if (type == VLSBGMVViewActionTypeMVPause) { //暂停
-        [self.SBGApi pauseSing];
-        self.isPause = true;
-    } else if (type == VLSBGMVViewActionTypeMVNext) { //切换
-        
-        if(self.RTCkit.getConnectionState != AgoraConnectionStateConnected){
-            [VLToast toast:@"切歌失败，reson:连接已断开"];
-            return;
-        }
-        
-        VL(weakSelf);
-
-        NSString *title = SBGLocalizedString(@"切换歌曲");
-        NSString *message = SBGLocalizedString(@"切换下一首歌歌曲？");
-        NSArray *array = [[NSArray alloc]initWithObjects:SBGLocalizedString(@"取消"),SBGLocalizedString(@"确定"), nil];
-        [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
-            if(flag == YES){
-                if (weakSelf.selSongsArray.count >= 1) {
-                    [weakSelf stopPlaySong];
-                    NSLog(@"removeCurrentSongWithSync: btnTappedWithActionType");
-                    [weakSelf removeCurrentSongWithSync:YES];
-                }
-            }
-            [[VLAlert shared] dismiss];
-        }];
-    } else if (type == VLSBGMVViewActionTypeSingOrigin) { // 原唱
-        self.trackMode = SBGPlayerTrackModeOrigin;
-    } else if (type == VLSBGMVViewActionTypeSingAcc) { // 伴奏
-        self.trackMode = SBGPlayerTrackModeAcc;
-    } else if (type == VLSBGMVViewActionTypeSingLead){
-        self.trackMode = SBGPlayerTrackModeLead; //导唱
-    }else if (type == VLSBGMVViewActionTypeRetryLrc) {  //歌词重试
-      //  [self reloadMusic];
-    }
-}
-
-- (void)onRSMView:(VLSBGMVView *)view lrcViewDidScrolled:(NSInteger)position {
-    [[self.SBGApi getMusicPlayer] seekToPosition:position];
-}
 
 - (void)reloadMusic{
     VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
@@ -1791,7 +1743,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if (!isSuccess) {
             return;
         }
-        [weakSelf.MVView updateMVPlayerState:VLSBGMVViewActionTypeMVPlay];
     };
     
     [self.SBGApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
@@ -1954,12 +1905,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 /// 计算当前歌曲用户的演唱角色
-- (SBGSingRole)getUserSingRole {
+- (KTVSingRole)getUserSingRole {
     VLSBGRoomSelSongModel* songModel = [[self selSongsArray] firstObject];
     if([songModel.userNo isEqualToString:VLUserCenter.user.id]){
-        return SBGSingRoleSoloSinger;
+        return KTVSingRoleSoloSinger;
     } else {
-        return SBGSingRoleAudience;
+        return KTVSingRoleAudience;
     }
 //    VLSBGRoomSelSongModel* songModel = [[self selSongsArray] firstObject];
 //    BOOL currentSongIsJoinSing = [[self getCurrentUserSeatInfo].chorusSongCode isEqualToString:songModel.chorusSongId];
@@ -2013,7 +1964,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (BOOL)getJoinChorusEnable {
     //不是观众不允许加入
-    if ([self getUserSingRole] != SBGSingRoleAudience) {
+    if ([self getUserSingRole] != KTVSingRoleAudience) {
         return NO;
     }
     
@@ -2096,7 +2047,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
          1.解析结算结果
          2.如果是下一轮，更新service为waiting
          */
-        [_bottomView setAudioBtnEnabled:false];
+        [_bottomView setAudioBtnEnabled:true];
         NSDictionary *dict = gameModel.rank;
         NSMutableArray *array = [NSMutableArray array];
         
@@ -2227,7 +2178,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
                         } else if (i == 1) {
                             self.statusView.contentStr = @"Go";
                         } else {
-                            [self loadAndPlaySongWith:SBGPlayerTrackModeOrigin];
+                            [self loadAndPlaySongWith:KTVPlayerTrackModeOrigin];
                            // [self finalUpdateUI];
                             [self updateWatingUI];
                         }
@@ -2236,7 +2187,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
             });
         }
     } else {
-        [self loadAndPlaySongWith:SBGPlayerTrackModeOrigin];
+        [self loadAndPlaySongWith:KTVPlayerTrackModeOrigin];
        // [self finalUpdateUI];
         [self updateWatingUI];
     }
@@ -2300,7 +2251,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
 }
 
 -(void)onSeatFull{
-    if(self.singRole != SBGSingRoleAudience){
+    if(self.singRole != KTVSingRoleAudience){
         return;
     }
     NSInteger count = [self getOnMicUserCount];
@@ -2364,9 +2315,9 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
     
     [self.SBGApi setMicStatusWithIsOnMicOpen:!isNowMicMuted];
     [self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
-    if(oldValue != isNowMicMuted) {
-        [self.bottomView updateAudioBtn:isNowMicMuted];
-    }
+   // if(oldValue != isNowMicMuted) {
+     [self.bottomView updateAudioBtn:isNowMicMuted];
+    //}
 }
 
 - (void)setIsNowCameraMuted:(BOOL)isNowCameraMuted {
@@ -2412,7 +2363,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
 //    } else {
 //        [self.RTCkit enableInEarMonitoring:NO includeAudioFilters:AgoraEarMonitoringFilterBuiltInAudioFilters];
 //    }
-    if(self.singRole != SBGSingRoleAudience){//主唱伴唱都能开启耳返
+    if(self.singRole != KTVSingRoleAudience){//主唱伴唱都能开启耳返
         [self.RTCkit enableInEarMonitoring:_isEarOn includeAudioFilters:AgoraEarMonitoringFilterNone];
     }
 }
@@ -2428,28 +2379,12 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
     }
 }
 
-- (void)setTrackMode:(SBGPlayerTrackMode)trackMode {
+- (void)setTrackMode:(KTVPlayerTrackMode)trackMode {
     SBGLogInfo(@"setTrackMode: %ld", trackMode);
     _trackMode = trackMode;
-  //  [[self.SBGApi getMediaPlayer] selectAudioTrack: trackMode == SBGPlayerTrackModeOrigin ? 0 : 1 ];
-    VLSBGMVViewActionType type = VLSBGMVViewActionTypeSingAcc;
-    switch (trackMode) {
-        case SBGPlayerTrackModeOrigin:
-            type = VLSBGMVViewActionTypeSingOrigin;
-            break;
-        case SBGPlayerTrackModeAcc:
-            type = VLSBGMVViewActionTypeSingAcc;
-            break;
-        case SBGPlayerTrackModeLead:
-            type = VLSBGMVViewActionTypeSingLead;
-            break;
-        default:
-            break;
-    }
-   // [self.MVView setOriginBtnState: type];
 }
 
-- (void)setSingRole:(SBGSingRole)singRole {
+- (void)setSingRole:(KTVSingRole)singRole {
     _singRole = singRole;
     
    // self.MVView.isOriginLeader = (_singRole == SBGSingRoleSoloSinger || _singRole == SBGSingRoleLeadSinger);
@@ -2459,17 +2394,17 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
 
 }
 
--(void)setCoSingerStateWith:(SBGSingRole)role {
+-(void)setCoSingerStateWith:(KTVSingRole)role {
     switch (role) {
-        case SBGSingRoleSoloSinger:
-        case SBGSingRoleLeadSinger: {
+        case KTVSingRoleSoloSinger:
+        case KTVSingRoleLeadSinger: {
            // self.MVView.joinCoSingerState = RSJoinCoSingerStateIdle;
         } break;
-        case SBGSingRoleCoSinger: {
+        case KTVSingRoleCoSinger: {
 //        case SBGSingRoleFollowSinger:
            // self.MVView.joinCoSingerState = RSJoinCoSingerStateWaitingForLeave;
         } break;
-        case SBGSingRoleAudience:
+        case KTVSingRoleAudience:
         default: {
             //self.MVView.joinCoSingerState = RSJoinCoSingerStateWaitingForJoin;
             [self onSeatFull];
@@ -2492,7 +2427,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
 
         } else if (state == AgoraMediaPlayerStateOpenCompleted) {
             if (isLocal) {
-                [self.SBGApi.getMusicPlayer selectAudioTrack:self.trackMode == SBGPlayerTrackModeOrigin ? 0 : 1 ];
+                [self.SBGApi.getMusicPlayer selectAudioTrack:self.trackMode == KTVPlayerTrackModeOrigin ? 0 : 1 ];
             }
         } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted || state == AgoraMediaPlayerStatePlayBackCompleted) {
             
@@ -2504,14 +2439,14 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
             
             if(isLocal) {
                 SBGLogInfo(@"Playback all loop completed");
-                if(self.singRole != SBGSingRoleAudience){
+                if(self.singRole != KTVSingRoleAudience){
                     self.currentSelSong = nil;
                     self.isNowMicMuted = true;
                     [[AppContext sbgServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
                                                                         completion:^(NSError * error) {
                     }];
 
-                    if(self.singRole == SBGSingRoleLeadSinger || self.singRole == SBGSingRoleSoloSinger){
+                    if(self.singRole == KTVSingRoleLeadSinger || self.singRole == KTVSingRoleSoloSinger){
                         [self syncChoruScore:self.statusView.lrcView.finalScore];
                         //把自己的信息存进去
                         SubRankModel *model = [[SubRankModel alloc]init];
@@ -2537,13 +2472,13 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
         }
         
         //判断伴唱是否是暂停状态
-        if(self.singRole == SBGSingRoleCoSinger){
+        if(self.singRole == KTVSingRoleCoSinger){
             self.isPause = (isLocal && state == AgoraMediaPlayerStatePaused);
         }
     });
 }
 
-- (void)onSingerRoleChangedWithOldRole:(enum SBGSingRole)oldRole newRole:(enum SBGSingRole)newRole {
+- (void)onSingerRoleChangedWithOldRole:(enum KTVSingRole)oldRole newRole:(enum KTVSingRole)newRole {
     if(oldRole == newRole){
         SBGLogInfo(@"old role:%li is equal to new role", oldRole);
     }
@@ -2573,7 +2508,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
     });
 }
 
-- (void)onMusicLoadFailWithSongCode:(NSInteger)songCode reason:(enum SBGLoadSongFailReason)reason{
+- (void)onMusicLoadFailWithSongCode:(NSInteger)songCode reason:(enum KTVLoadSongFailReason)reason{
     
     dispatch_async_on_main_queue(^{
         if(self.loadMusicCallBack) {
@@ -2582,7 +2517,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
         }
         VLSBGRoomSelSongModel *model = self.selSongsArray.firstObject;
         NSLog(@"加载失败的歌曲为:%@---%@", model.songName, model.winnerNo);
-        if (reason == SBGLoadSongFailReasonNoLyricUrl) {
+        if (reason == KTVLoadSongFailReasonNoLyricUrl) {
            // self.MVView.loadingType = VLSBGMVViewStateLoadFail;
         } else {
            // self.MVView.loadingType = VLSBGMVViewStateIdle;
@@ -2620,11 +2555,17 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
         if([model.winnerNo isEqualToString:@""]){
             NSLog(@"加载成功的歌曲为:%@---%@", model.songName, model.winnerNo);
             //如果是主唱歌曲加载成功 发送ds告诉观众同步进度
-            if(self.singRole == SBGSingRoleSoloSinger){
+            if(self.singRole == KTVSingRoleSoloSinger){
                 NSDictionary *dict = @{
                     @"cmd":@"StartSingBattleCountDown"
                 };
-                [self sendStreamMessageWithDict:dict success:nil];
+                [self sendStreamMessageWithDict:dict success:^(BOOL flag) {
+                    
+                }];
+                [self.SBGApi switchSingerRoleWithNewRole:KTVSingRoleSoloSinger onSwitchRoleState:^(enum KTVSwitchRoleState state, enum KTVSwitchRoleFailReason reason) {
+                                    
+                }];
+                [self.SBGApi startSingWithSongCode:songCode startPos:0];
                 [self querySbgStatusAndUpdateUI];
                 [self updateSBGCountDown];
             }
