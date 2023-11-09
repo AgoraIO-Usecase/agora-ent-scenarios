@@ -88,7 +88,7 @@ extension VideoLoaderApiImpl {
             return
         }
         
-        if let connection = exConnectionMap[channelId] {
+        if let _ = exConnectionMap[channelId] {
             return
         }
         
@@ -302,7 +302,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         videoCanvas.renderMode = .hidden
         videoCanvas.setupMode = container.setupMode
         let ret = engine.setupRemoteVideoEx(videoCanvas, connection: connection)
-        debugLoaderPrint("renderVideo[\(connection.channelId)] ret = \(ret), uid:\(anchorInfo.uid) view: \(container.container)")
+        debugLoaderPrint("renderVideo[\(connection.channelId)] ret = \(ret), uid:\(anchorInfo.uid)")
         //查找缓存这个view是不是被其他connection用了，如果有则remove
         let ptrString = String(format: "%p", videoCanvas.view ?? 0)
         if container.setupMode == .add {
@@ -316,7 +316,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
                 videoCanvas.view = container.container
                 videoCanvas.renderMode = .hidden
                 videoCanvas.setupMode = .remove
-                let ret = engine.setupRemoteVideoEx(videoCanvas, connection: connection)
+                let _ = engine.setupRemoteVideoEx(videoCanvas, connection: connection)
             }
         } else if container.setupMode == .remove {
             renderViewMap[ptrString] = nil
@@ -363,6 +363,11 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
 }
 
 extension VideoLoaderApiImpl {
+    func startMediaRenderingTracing(anchorId: String) {
+        guard let engine = config?.rtcEngine, let connection = exConnectionMap[anchorId] else {return}
+        engine.startMediaRenderingTracingEx(connection)
+    }
+    
     func getUsedAnchorIds(tagId: String) -> [String] {
         var anchorIds: [String] = []
         //find anchor id list
