@@ -62,6 +62,14 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
         mainViewModel.setLifecycleOwner(this);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (AgoraApplication.the().isDebugModeOpen()) {
+            getBinding().tvDebugMode.setVisibility(View.VISIBLE);
+        }
+    }
+
     @SuppressLint("SetTextI18n")
     @Override
     public void initListener() {

@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.agora.rtc2.Constants
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.event.NetWorkEvent
@@ -28,6 +29,7 @@ import io.agora.scene.cantata.service.RoomSeatModel
 import io.agora.scene.cantata.service.RoomSelSongModel
 import io.agora.scene.cantata.service.ScoringAlgoControlModel
 import io.agora.scene.cantata.ui.dialog.CantataCommonDialog
+import io.agora.scene.cantata.ui.dialog.CantataDebugSettingsDialog
 import io.agora.scene.cantata.ui.dialog.ChorusSingerDialog
 import io.agora.scene.cantata.ui.dialog.MusicSettingDialog
 import io.agora.scene.cantata.ui.viewmodel.JoinChorusStatus
@@ -155,6 +157,20 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             }
             mMainHandler.sendEmptyMessageDelayed(ROOM_NO_SONGS_WHAT, ROOM_NO_SONGS_TIMEOUT)
 
+        }
+
+        if (AgoraApplication.the().isDebugModeOpen) {
+            binding.btnDebug.visibility = View.VISIBLE
+        } else {
+            binding.btnDebug.visibility = View.INVISIBLE
+        }
+        binding.btnDebug.setOnClickListener { v ->
+            val dialog = CantataDebugSettingsDialog(
+                mRoomLivingViewModel.mDebugSetting,
+                mRoomLivingViewModel.mRoomInfoLiveData.value!!.roomNo,
+                mRoomLivingViewModel.getSDKBuildNum()
+            )
+            dialog.show(supportFragmentManager, "debugSettings")
         }
     }
 
@@ -440,6 +456,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
     override fun onDestroy() {
         super.onDestroy()
         if (mRoomLivingViewModel.isRoomOwner()) {
+            mMainHandler.removeMessages(ROOM_NO_SONGS_WHAT)
             scheduledThreadPool.execute {
                 ApiManager.getInstance().fetchStopCloud()
             }
@@ -560,6 +577,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
 
     // 无人点歌解散房间 dialog
     private fun showNoSongsDialog() {
+        if (this.isFinishing) return
         if (mNoSongsDialog == null) {
             mNoSongsDialog = CantataCommonDialog(this).apply {
                 setDescText(getString(R.string.cantata_dissovle_room_because_no_one_ordered_songs))
