@@ -318,7 +318,7 @@ class ShowSyncManagerServiceImpl constructor(
                 roomId, object : JoinSceneCallback {
                     override fun onSuccess(sceneReference: SceneReference?) {
                         roomInfoController.sceneReference = sceneReference
-
+                        isInteractionCreated = false
                         innerMayAddLocalUser(roomId, {
                             innerSubscribeUserChange(roomId)
                             innerSubscribeSeatApplyChanged(roomId)
@@ -392,6 +392,7 @@ class ShowSyncManagerServiceImpl constructor(
         val sceneReference = roomInfoController.sceneReference ?: return
 
         sendChatMessage(roomId, context.getString(R.string.show_live_chat_leaving))
+        isInteractionCreated = false
 
         // 移除连麦申请
         val targetApply =
@@ -1918,8 +1919,10 @@ class ShowSyncManagerServiceImpl constructor(
                     roomInfoController.objIdOfPKCompetitorInvitation[indexOf] = item.id
                 }
 
-                if (roomInfoController.interactionInfoList.isEmpty() && info.status == ShowRoomRequestStatus.accepted.value && !isInteractionCreated) {
+                ShowLogger.d("hugo", "pk邀请发现变化")
+                if (info.status == ShowRoomRequestStatus.accepted.value && !isInteractionCreated) {
                     isInteractionCreated = true
+                    ShowLogger.d("hugo", "pk对手接受pk邀请了")
                     val interaction = ShowInteractionInfo(
                         info.userId,
                         info.userName,
@@ -1930,31 +1933,6 @@ class ShowSyncManagerServiceImpl constructor(
                         createdAt = info.createAt
                     )
                     innerCreateInteraction(info.fromRoomId, interaction, null, null)
-                } else {
-                    val oldInteraction =
-                        roomInfoController.interactionInfoList.filter { it.userId == info.userId }
-                            .getOrNull(0)
-                    if (oldInteraction != null) {
-                        val indexOf = roomInfoController.interactionInfoList.indexOf(oldInteraction)
-                        val objId = roomInfoController.objIdOfInteractionInfo[indexOf]
-
-                        val interaction = ShowInteractionInfo(
-                            oldInteraction.userId,
-                            oldInteraction.userName,
-                            oldInteraction.roomId,
-                            oldInteraction.interactStatus,
-                            info.userMuteAudio,
-                            info.fromUserMuteAudio,
-                            oldInteraction.createdAt
-                        )
-                        innerUpdateInteraction(
-                            roomInfoController.sceneReference,
-                            objId,
-                            interaction,
-                            success = {},
-                            error = {}
-                        )
-                    }
                 }
 
                 runOnMainThread {

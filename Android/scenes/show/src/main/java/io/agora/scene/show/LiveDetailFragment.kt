@@ -243,7 +243,21 @@ class LiveDetailFragment : Fragment() {
         initMessageLayout()
 
         // Render host video
-        // initVideoView()
+        if (needRender) {
+            mRtcVideoLoaderApi.renderVideo(
+                VideoLoader.AnchorInfo(
+                    mRoomInfo.roomId,
+                    mRoomInfo.ownerId.toInt(),
+                    RtcEngineInstance.generalToken()
+                ),
+                UserManager.getInstance().user.id.toInt(),
+                VideoLoader.VideoCanvasContainer(
+                    viewLifecycleOwner,
+                    mBinding.videoLinkingLayout.videoContainer,
+                    mRoomInfo.ownerId.toInt()
+                )
+            )
+        }
     }
 
     private fun initVideoView() {
@@ -254,16 +268,6 @@ class LiveDetailFragment : Fragment() {
                         it,
                         mBinding.videoLinkingLayout.videoContainer,
                         0
-                    )
-                )
-            } else if (needRender) {
-                mRtcVideoLoaderApi.renderVideo(
-                    VideoLoader.AnchorInfo(mRoomInfo.roomId, mRoomInfo.ownerId.toInt(), RtcEngineInstance.generalToken()),
-                    UserManager.getInstance().user.id.toInt(),
-                    VideoLoader.VideoCanvasContainer(
-                        it,
-                        mBinding.videoLinkingLayout.videoContainer,
-                        mRoomInfo.ownerId.toInt()
                     )
                 )
             }
@@ -278,20 +282,20 @@ class LiveDetailFragment : Fragment() {
             if (interactionInfo != null && interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) {
                 if (info.channelId == mRoomInfo.roomId) {
                     return VideoLoader.VideoCanvasContainer(
-                        it,
+                        viewLifecycleOwner,
                         mBinding.videoPKLayout.iBroadcasterAView,
                         mRoomInfo.ownerId.toInt()
                     )
                 } else if (info.channelId == interactionInfo!!.roomId) {
                     return VideoLoader.VideoCanvasContainer(
-                        it,
+                        viewLifecycleOwner,
                         mBinding.videoPKLayout.iBroadcasterBView,
                         interactionInfo!!.userId.toInt()
                     )
                 }
             } else {
                 return VideoLoader.VideoCanvasContainer(
-                    it,
+                    viewLifecycleOwner,
                     mBinding.videoLinkingLayout.videoContainer,
                     mRoomInfo.ownerId.toInt()
                 )
@@ -762,6 +766,7 @@ class LiveDetailFragment : Fragment() {
                                 if (!isRoomOwner) {
                                     mService.muteAudio(mRoomInfo.roomId, !activated, interactionInfo!!.userId)
                                 } else {
+                                    mService.muteAudio(mRoomInfo.roomId, !activated, mRoomInfo.ownerId)
                                     enableLocalAudio(activated)
                                 }
                             })
@@ -1649,6 +1654,10 @@ class LiveDetailFragment : Fragment() {
             mRtcEngine.stopPreview()
             mRtcEngine.leaveChannelEx(mMainRtcConnection)
             mMediaPlayer?.destroy()
+
+            if (isPKing()) {
+                mRtcEngine.leaveChannelEx(RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()))
+            }
         }
         return true
     }
@@ -2016,6 +2025,7 @@ class LiveDetailFragment : Fragment() {
         prepareRkRoomId = pkRoomId
     }
 
+    private var pkAgainstView: View? = null
     private fun updatePKingMode() {
         // 开始pk
         if (interactionInfo == null) return
@@ -2120,11 +2130,12 @@ class LiveDetailFragment : Fragment() {
                 eventListener
             )
             activity?.let {
-                val view = TextureView(it)
-                mBinding.videoPKLayout.iBroadcasterBView.addView(view, 0)
+                mBinding.videoPKLayout.iBroadcasterBView.removeView(pkAgainstView)
+                pkAgainstView = TextureView(it)
+                mBinding.videoPKLayout.iBroadcasterBView.addView(pkAgainstView, 0)
                 mRtcEngine.setupRemoteVideoEx(
                     VideoCanvas(
-                        view,
+                        pkAgainstView,
                         1,
                         interactionInfo?.userId!!.toInt(),
                     ),

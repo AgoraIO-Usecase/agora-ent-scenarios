@@ -778,7 +778,7 @@ object VideoSetting {
 
     private fun updateRTCAudioSetting(SR: SuperResolution? = null) {
         val rtcEngine = RtcEngineInstance.rtcEngine
-        if (currAudienceDeviceLevel == DeviceLevel.Low) {
+        if (rtcEngine.queryDeviceScore() < 75) {
             ToastUtils.showToast(R.string.show_audience_sr_tips)
         }
         SR?.let {

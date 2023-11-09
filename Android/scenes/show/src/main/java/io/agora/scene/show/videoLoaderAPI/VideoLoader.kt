@@ -1,6 +1,5 @@
 package io.agora.scene.show.videoLoaderAPI
 
-import android.content.Context
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import io.agora.rtc2.Constants
@@ -30,7 +29,7 @@ interface VideoLoader {
 
     /**
      * 视频容器
-     * @param lifecycleOwner 视频容器所在的生命周期
+     * @param lifecycleOwner 视频容器所在的生命周期, 推荐为Fragment的viewLifecycleOwner
      * @param container 视频容器
      * @param uid 需要渲染对象视频流的uid
      * @param viewIndex 视频view在container上的区域index
@@ -81,15 +80,14 @@ interface VideoLoader {
     /**
      * 切换指定主播的状态
      * @param newState 目标状态
-     * @param roomInfo 房间信息
+     * @param anchorInfo 主播信息
      * @param uid 用户uid
-     * @param eventListener 外部需要监听的事件，可自行拓展
      */
     fun switchAnchorState(
         newState: AnchorState,
         anchorInfo: AnchorInfo,
-        uid: Int,
-        context: Context?)
+        uid: Int
+    )
 
     /**
      * 切换指定房间的状态
@@ -101,7 +99,7 @@ interface VideoLoader {
 
     /**
      * 渲染远端视频，相比于RtcEngineEx.setupRemoteVideoEx，这里会缓存渲染视图，减少渲染时不断重复创建渲染视图，提高渲染速度
-     * @param roomInfo 房间信息
+     * @param anchorInfo 主播信息
      * @param localUid 用户id
      * @param container 视频渲染的容器，内部会把view显示在容器的指定区域
      */
