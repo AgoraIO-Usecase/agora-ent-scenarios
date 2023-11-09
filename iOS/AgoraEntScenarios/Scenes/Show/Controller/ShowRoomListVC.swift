@@ -57,7 +57,6 @@ class ShowRoomListVC: UIViewController {
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        hidesBottomBarWhenPushed = true
         showLogger.info("init-- ShowRoomListVC")
         VideoLoaderApiImpl.shared.printClosure = { msg in
             showLogger.info(msg, context: "VideoLoaderApi")
@@ -104,16 +103,16 @@ class ShowRoomListVC: UIViewController {
     }
     
     private func checkDevice() {
-//         let score = ShowAgoraKitManager.shared.engine?.queryDeviceScore() ?? 0
-//        if (score < 85) {// (0, 85)
-//            ShowAgoraKitManager.shared.deviceLevel = .low
-//        } else if (score < 90) {// [85, 90)
-//            ShowAgoraKitManager.shared.deviceLevel = .medium
-//        } else {// (> 90)
-//            ShowAgoraKitManager.shared.deviceLevel = .high
-//        }
-//        ShowAgoraKitManager.shared.deviceScore = Int(score)
-    }
+        let score = ShowAgoraKitManager.shared.engine?.queryDeviceScore() ?? 0
+        if (score < 85) {// (0, 85)
+            ShowAgoraKitManager.shared.deviceLevel = .low
+        } else if (score < 90) {// [85, 90)
+            ShowAgoraKitManager.shared.deviceLevel = .medium
+        } else {// (> 90)
+            ShowAgoraKitManager.shared.deviceLevel = .high
+        }
+        ShowAgoraKitManager.shared.deviceScore = Int(score)
+   }
     
     private func joinRoom(_ room: ShowRoomListModel){
         ShowAgoraKitManager.shared.setupAudienceProfile()

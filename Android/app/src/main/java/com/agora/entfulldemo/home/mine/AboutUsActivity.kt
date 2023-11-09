@@ -158,6 +158,22 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
                 )
             )
         }
+        if (VersionUtils.getVersion("io.agora.scene.ktv.singbattle.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_singbattle),
+                    "QC-" + VersionUtils.getVersion("io.agora.scene.ktv.singbattle.BuildConfig")
+                )
+            )
+        }
+        if (VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_sing_relay),
+                    "JC-" + VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig")
+                )
+            )
+        }
         if (VersionUtils.getVersion("io.agora.scene.show.BuildConfig").isNotEmpty()) {
             scenes.add(
                 SceneInfo(
@@ -166,31 +182,23 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
                 )
             )
         }
-        if (VersionUtils.getVersion("io.agora.scene.ktv.singbattle.BuildConfig").isNotEmpty()) {
-            scenes.add(
-                SceneInfo(
-                    this.getString(R.string.app_about_singbattle),
-                    "HGQC-" + VersionUtils.getVersion("io.agora.scene.ktv.singbattle.BuildConfig")
-                )
-            )
-        }
-        if (VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig").isNotEmpty()) {
-            scenes.add(
-                SceneInfo(
-                    this.getString(R.string.app_sing_relay),
-                    "QMJC-" + VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig")
-                )
-            )
-        }
         if (VersionUtils.getVersion("io.agora.scene.pure1v1.BuildConfig").isNotEmpty()) {
             scenes.add(
                 SceneInfo(
                     this.getString(R.string.app_about_pure1v1),
-                    VersionUtils.getVersion("io.agora.scene.pure1v1.BuildConfig")
+                    "SMF-" + VersionUtils.getVersion("io.agora.scene.pure1v1.BuildConfig")
                 )
             )
         }
-        val versionTime = "20230530-"
+        if (VersionUtils.getVersion("io.agora.scene.showTo1v1.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_showTo1v1),
+                    "XCSMF-" + VersionUtils.getVersion("io.agora.scene.showTo1v1.BuildConfig")
+                )
+            )
+        }
+        val versionTime = "20231230-"
         if (scenes.size == 1) {
             adapter.scenes = mutableListOf()
             val scene = scenes[0]

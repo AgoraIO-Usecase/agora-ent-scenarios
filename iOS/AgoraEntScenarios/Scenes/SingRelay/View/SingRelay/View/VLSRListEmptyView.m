@@ -18,6 +18,7 @@
 }
 
 - (void)setupView {
+
     UILabel *introduceLabel = [[UILabel alloc]init];
     NSString *introduceStr = SRLocalizedString(@"ktv_create_sr_tips1");
     introduceLabel.attributedText = [self attributedString:introduceStr fontSize:14 lineSpace:4 wordSpace:0];

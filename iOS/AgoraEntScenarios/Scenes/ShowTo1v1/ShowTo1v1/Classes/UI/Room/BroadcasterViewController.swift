@@ -14,7 +14,6 @@ import CallAPI
 class CallAgoraExProxy: CallApiProxy, AgoraRtcEngineDelegate {
 }
 
-private let kNormalIconSize = CGSize(width: 32, height: 32)
 class BroadcasterViewController: BaseRoomViewController {
     var currentUser: ShowTo1v1UserInfo?
     override var roomInfo: ShowTo1v1RoomInfo? {
@@ -41,6 +40,7 @@ class BroadcasterViewController: BaseRoomViewController {
         }
     }
     private lazy var rtcProxy: CallAgoraExProxy = CallAgoraExProxy()
+    
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .custom)
         button.aui_size = kNormalIconSize
@@ -104,8 +104,13 @@ class BroadcasterViewController: BaseRoomViewController {
         closeButton.aui_centerY = roomInfoView.aui_centerY
         view.addSubview(closeButton)
         
-        userCountView.aui_right = closeButton.aui_left - 15
-        userCountView.aui_centerY = closeButton.aui_centerY
+        moreBtn.aui_size = kNormalIconSize
+        moreBtn.aui_right = closeButton.aui_left - 8
+        moreBtn.aui_centerY = closeButton.aui_centerY
+        view.addSubview(moreBtn)
+        
+        userCountView.aui_right = moreBtn.aui_left - 8
+        userCountView.aui_centerY = moreBtn.aui_centerY
         view.addSubview(userCountView)
         
         joinRTCChannel()

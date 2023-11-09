@@ -153,7 +153,7 @@ class AgoraChatRoomHeaderView: UIView {
 
         giftBtn.layer.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.1).cgColor
         giftBtn.layer.cornerRadius = 11
-        giftBtn.setImage(UIImage.sceneImage(name: "chip-icon", bundleName: "VoiceChatRoomResource"), for: .normal)
+        giftBtn.setImage(UIImage.sceneImage(name: "voice_ic_gifts", bundleName: "VoiceChatRoomResource"), for: .normal)
         giftBtn.setTitle(" 0", for: .normal)
         giftBtn.titleLabel?.font = UIFont.systemFont(ofSize: 10)
         giftBtn.isUserInteractionEnabled = false
@@ -168,7 +168,7 @@ class AgoraChatRoomHeaderView: UIView {
         noticeView.isUserInteractionEnabled = true
 
         let imgView = UIImageView()
-        imgView.image = UIImage.sceneImage(name: "gonggao", bundleName: "VoiceChatRoomResource")
+        imgView.image = UIImage.sceneImage(name: "voice_ic_notice", bundleName: "VoiceChatRoomResource")
         noticeView.addSubview(imgView)
 
         let notiLabel = UILabel()

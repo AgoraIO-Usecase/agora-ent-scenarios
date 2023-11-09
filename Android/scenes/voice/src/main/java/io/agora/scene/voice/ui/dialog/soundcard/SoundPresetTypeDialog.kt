@@ -8,12 +8,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import io.agora.scene.voice.rtckit.AgoraPresetSound
-import io.agora.scene.voice.rtckit.PresetSoundModel
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogSoundPresetTypeBinding
-import io.agora.scene.voice.rtckit.AgoraRtcEngineController
-import io.agora.scene.voice.rtckit.AgoraSoundCardManager
+import io.agora.scene.voice.rtckit.*
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
 
 class SoundPresetTypeDialog: BaseSheetDialog<VoiceDialogSoundPresetTypeBinding>() {
@@ -24,9 +21,22 @@ class SoundPresetTypeDialog: BaseSheetDialog<VoiceDialogSoundPresetTypeBinding>(
 
     private var adapter: SoundPresetsAdapter? = null
 
+    private var mOnSoundTypeChange: (() -> Unit)? = null
+
     private lateinit var mManager: AgoraSoundCardManager
 
-    private lateinit var soundTypes: List<PresetSoundModel>
+    private val soundTypes = listOf(
+        AgoraPresetSound.Sound1001,
+        AgoraPresetSound.Sound1002,
+        AgoraPresetSound.Sound1003,
+        AgoraPresetSound.Sound1004,
+        AgoraPresetSound.Sound2001,
+        AgoraPresetSound.Sound2002,
+        AgoraPresetSound.Sound2003,
+        AgoraPresetSound.Sound2004,
+        AgoraPresetSound.Sound2005,
+        AgoraPresetSound.Sound2006,
+    )
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceDialogSoundPresetTypeBinding {
         return VoiceDialogSoundPresetTypeBinding.inflate(inflater)
@@ -38,17 +48,16 @@ class SoundPresetTypeDialog: BaseSheetDialog<VoiceDialogSoundPresetTypeBinding>(
             dismiss()
             return
         }
-        setupSoundTypes()
         binding?.let { binding ->
             binding.rvSoundType.layoutManager = LinearLayoutManager(this.context)
             var index = -1
             for ((i, item) in soundTypes.withIndex()) {
-                if (item.type == mManager.presetSound()) {
+                if (item == mManager.presetSound()) {
                     index = i
                 }
             }
             adapter = SoundPresetsAdapter(soundTypes, index) { index ->
-                val soundType = soundTypes[index].type
+                val soundType = soundTypes[index]
                 mManager.setPresetSound(soundType) {}
                 adapter?.notifyDataSetChanged()
             }
@@ -58,75 +67,12 @@ class SoundPresetTypeDialog: BaseSheetDialog<VoiceDialogSoundPresetTypeBinding>(
             }
         }
     }
-
-    private fun setupSoundTypes() {
-        soundTypes = listOf(
-            PresetSoundModel(
-                AgoraPresetSound.Sound1001,
-                getString(R.string.voice_preset_sound_qingshu1),
-                getString(R.string.voice_preset_sound_qingshu1_tips),
-                R.drawable.voice_ic_sound_card_1001
-            ),
-            PresetSoundModel(
-                AgoraPresetSound.Sound1002,
-                getString(R.string.voice_preset_sound_shaoyu1),
-                getString(R.string.voice_preset_sound_shaoyu1_tips),
-                R.drawable.voice_ic_sound_card_1002
-            ),
-            PresetSoundModel(
-                AgoraPresetSound.Sound1003,
-                getString(R.string.voice_preset_sound_qingnian1),
-                getString(R.string.voice_preset_sound_qingnian1_tips),
-                R.drawable.voice_ic_sound_card_1003
-            ),
-            PresetSoundModel(
-                AgoraPresetSound.Sound1004,
-                getString(R.string.voice_preset_sound_shaoluo),
-                getString(R.string.voice_preset_sound_shaoluo_tips),
-                R.drawable.voice_ic_sound_card_1004
-            ),
-            PresetSoundModel(
-                AgoraPresetSound.Sound2001,
-                getString(R.string.voice_preset_sound_dashu),
-                getString(R.string.voice_preset_sound_dashu_tips),
-                R.drawable.voice_ic_sound_card_2001
-            ),
-            PresetSoundModel(
-                AgoraPresetSound.Sound2002,
-                getString(R.string.voice_preset_sound_mum),
-                getString(R.string.voice_preset_sound_mum_tips),
-                R.drawable.voice_ic_sound_card_2002
-            ),
-            PresetSoundModel(
-                AgoraPresetSound.Sound2003,
-                getString(R.string.voice_preset_sound_qingshu),
-                getString(R.string.voice_preset_sound_qingshu_tips),
-                R.drawable.voice_ic_sound_card_2003
-            ),
-            PresetSoundModel(
-                AgoraPresetSound.Sound2004,
-                getString(R.string.voice_preset_sound_yuma),
-                getString(R.string.voice_preset_sound_yuma_tips),
-                R.drawable.voice_ic_sound_card_2004
-            ),
-            PresetSoundModel(
-                AgoraPresetSound.Sound2005,
-                getString(R.string.voice_preset_sound_qingnian),
-                getString(R.string.voice_preset_sound_qingnian_tips),
-                R.drawable.voice_ic_sound_card_2005
-            ),
-            PresetSoundModel(
-                AgoraPresetSound.Sound2006,
-                getString(R.string.voice_preset_sound_shaoyu),
-                getString(R.string.voice_preset_sound_shaoyu_tips),
-                R.drawable.voice_ic_sound_card_2006
-            )
-        )
+    fun setOnSoundTypeChange(action: (() -> Unit)?) {
+        mOnSoundTypeChange = action
     }
 }
-
 private class SoundPresetsAdapter(
-    private var list: List<PresetSoundModel>,
+    private var list: List<AgoraPresetSound>,
     private var selectedIndex: Int,
     private var onDidSelectIndex: ((Int) -> Unit)? = null
 ) : RecyclerView.Adapter<SoundPresetsAdapter.ViewHolder>() {
@@ -147,11 +93,11 @@ private class SoundPresetsAdapter(
     // 将数据绑定到视图项
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val data = list[position]
-        holder.tvPresetName.text = data.name
-        holder.tvPresetInfo.text = data.tips
+        holder.tvPresetName.text = holder.itemView.context.getString(data.titleStringID)
+        holder.tvPresetInfo.text = holder.itemView.context.getString(data.infoStringID)
         holder.checkBox.visibility = if (selectedIndex == position) View.VISIBLE else View.INVISIBLE
         holder.borderView.visibility = if (selectedIndex == position) View.VISIBLE else View.INVISIBLE
-        holder.ivAvatar.setImageResource(data.resId)
+        holder.ivAvatar.setImageResource(data.resID)
         holder.itemView.setOnClickListener {
             selectedIndex = position
             onDidSelectIndex?.invoke(position)
