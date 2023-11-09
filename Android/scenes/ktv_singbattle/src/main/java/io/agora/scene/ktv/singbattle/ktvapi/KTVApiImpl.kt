@@ -2,7 +2,6 @@ package io.agora.scene.ktv.singbattle.live
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
@@ -1101,7 +1100,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         try {
             val strMsg = String(messageData)
             jsonMsg = JSONObject(strMsg)
-            Log.d("ttt", strMsg)
             if (jsonMsg.getString("cmd") == "setLrcTime") { //同步歌词
                 val position = jsonMsg.getLong("time")
                 val realPosition = jsonMsg.getLong("realTime")
