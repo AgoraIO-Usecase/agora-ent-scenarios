@@ -172,7 +172,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [self.view addSubview:bottomView];
     
     //去掉首尾的高度
-    CGFloat musicHeight = SCREEN_HEIGHT -50 - kSafeAreaBottomHeight - kStatusBarHeight - 60;
+    CGFloat musicHeight = SCREEN_HEIGHT -64 - kSafeAreaBottomHeight - kStatusBarHeight - 60 - 20;
     
     //MV视图(显示歌词...)
     CGFloat mvViewTop = topView.bottom;
@@ -1246,10 +1246,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                           channelId:self.roomModel.roomNo
                                 uid:[VLUserCenter.user.id integerValue]
                        mediaOptions:[self channelMediaOptions]
-                        joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
-        KTVLogInfo(@"Agora - 加入RTC成功");
-//        [weakSelf.RTCkit setParameters: @"{\"che.audio.enable.md \": false}"];sin
-    }];
+                        joinSuccess:nil];
     if (ret != 0) {
         KTVLogError(@"joinChannelByToken fail: %d, uid: %ld, token: %@", ret, [VLUserCenter.user.id integerValue], VLUserCenter.user.agoraRTCToken);
     }
