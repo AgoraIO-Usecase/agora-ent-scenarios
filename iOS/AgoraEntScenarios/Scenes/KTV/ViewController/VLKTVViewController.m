@@ -166,7 +166,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     topView.listModel = self.roomModel;
     
     //底部按钮视图
-    VLKTVBottomToolbar *bottomView = [[VLKTVBottomToolbar alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT-50-kSafeAreaBottomHeight, SCREEN_WIDTH, 50) withDelegate:self withRoomNo:self.roomModel.roomNo withData:self.seatsArray];
+    VLKTVBottomToolbar *bottomView = [[VLKTVBottomToolbar alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT-64-kSafeAreaBottomHeight, SCREEN_WIDTH, 64) withDelegate:self withRoomNo:self.roomModel.roomNo withData:self.seatsArray];
     bottomView.backgroundColor = [UIColor clearColor];
     self.bottomView = bottomView;
     [self.view addSubview:bottomView];

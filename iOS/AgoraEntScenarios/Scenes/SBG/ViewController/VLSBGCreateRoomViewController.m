@@ -75,24 +75,25 @@
 }
 
 - (void)setUpUI {
-    VLSBGCreateRoomView *createRoomView = [[VLSBGCreateRoomView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 330) withDelegate:self];
+    VLSBGCreateRoomView *createRoomView = [[VLSBGCreateRoomView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 343) withDelegate:self];
     [self.view addSubview:createRoomView];
     self.createRoomView = createRoomView;
 }
+
 - (void)keyboardWillShow:(NSNotification *)notification {
-    self.createRoomBlock(self.isRoomPrivate ? 560 : 520);
-    self.createRoomView.frame = CGRectMake(0, 0, SCREEN_WIDTH, self.isRoomPrivate ? 560 : 520);
+    self.createRoomBlock(self.isRoomPrivate ? 520 : 480);
+    self.createRoomView.frame = CGRectMake(0, 0, SCREEN_WIDTH, self.isRoomPrivate ? 520 : 480);
 }
 
 -(void)didCreateRoomAction:(SBGCreateRoomActionType)type{
     if(type == SBGCreateRoomActionTypeNormal){
         self.isRoomPrivate = false;
-        self.createRoomBlock(330);
-        self.createRoomView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 330);
+        self.createRoomBlock(343);
+        self.createRoomView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 343);
     } else if(type == SBGCreateRoomActionTypeEncrypt) {
         self.isRoomPrivate = true;
-        self.createRoomBlock(420);
-        self.createRoomView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 420);
+        self.createRoomBlock(400);
+        self.createRoomView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 400);
     }
 }
 

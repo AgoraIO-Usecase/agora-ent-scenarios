@@ -39,16 +39,16 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
 }
 
 - (void)setupView {
-    self.audioBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(25, (self.height-24)*0.5, 24, 24)];
-    [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateNormal];
-    [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateSelected];
+    self.audioBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(12, (self.height-38)*0.5, 38, 38)];
+    [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_mute"] forState:UIControlStateNormal];
+    [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_unmute"] forState:UIControlStateSelected];
     self.audioBtn.tag = VLSRBottomBtnClickTypeAudio;
     [self.audioBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.audioBtn];
     
-    self.videoBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(self.audioBtn.right+15, (self.height-24)*0.5, 24, 24)];
-    [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
-    [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_muteIcon"] forState:UIControlStateSelected];
+    self.videoBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(self.audioBtn.right+8, (self.height-38)*0.5, 38, 38)];
+    [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_cam_mute"] forState:UIControlStateNormal];
+    [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_cam_unmute"] forState:UIControlStateSelected];
     self.videoBtn.tag = VLSRBottomBtnClickTypeVideo;
     [self.videoBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.videoBtn];
@@ -74,19 +74,9 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
             //TODO
             self.isSelfMuted = info.isAudioMuted;
             self.isVideoMuted = info.isVideoMuted;
-
-            if (!info.isAudioMuted) {
-                [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateNormal];
-            }
-            else{
-                [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_self_muteIcon"] forState:UIControlStateNormal];
-            }
-            if (!info.isVideoMuted) {
-                [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_icon"] forState:UIControlStateNormal];
-            }
-            else{
-                [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
-            }
+            
+            self.audioBtn.selected = !self.isSelfMuted;
+            self.videoBtn.selected = !self.isVideoMuted;
 //            if (self.delegate && [self.delegate respondsToSelector:@selector(bottomSetAudioMute:)]) {
 //                [self.delegate bottomSetAudioMute:info.isSelfMuted];
 //            }
@@ -173,31 +163,21 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
 - (void)updateAudioBtn:(BOOL)audioMuted
 {
     self.isSelfMuted = audioMuted;
-    if (!audioMuted) {
-        [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateNormal];
-    }
-    else{
-        [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_self_muteIcon"] forState:UIControlStateNormal];
-    }
+    self.audioBtn.selected = !audioMuted;
 }
 
 - (void)updateVideoBtn:(BOOL)videoMuted
 {
     self.isVideoMuted = videoMuted;
-    if (!videoMuted) {
-        [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_icon"] forState:UIControlStateNormal];
-    }
-    else{
-        [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
-    }
+    self.videoBtn.selected = !videoMuted;
 }
 
 - (void)resetBtnStatus
 {
     self.isSelfMuted = NO;
     self.isVideoMuted = YES;
-    [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateNormal];
-    [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
+    self.audioBtn.selected = NO;
+    self.videoBtn.selected = NO;
 }
 
 @end

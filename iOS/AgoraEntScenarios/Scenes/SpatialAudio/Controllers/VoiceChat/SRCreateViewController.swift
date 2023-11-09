@@ -31,25 +31,25 @@ class SRCreateViewController: UIViewController, SRCreateRoomViewDelegate {
         }
         
         func setUpUI() {
-            let createRoomView = SRCreateRoomView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 330), withDelegate: self)
+            let createRoomView = SRCreateRoomView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 343), withDelegate: self)
             view.addSubview(createRoomView)
             self.createRoomView = createRoomView
         }
         
         @objc func keyboardWillShow(_ notification: Notification) {
-            createRoomBlock?(isRoomPrivate ? 560 : 520)
-            createRoomView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: isRoomPrivate ? 560 : 520)
+            createRoomBlock?(isRoomPrivate ? 520 : 480)
+            createRoomView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: isRoomPrivate ? 520 : 480)
         }
         
         func didCreateRoomAction(_ type: VRCreateRoomActionType) {
             if type == .normal {
                 isRoomPrivate = false
-                createRoomBlock?(330)
-                createRoomView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 330)
+                createRoomBlock?(343)
+                createRoomView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 343)
             } else if type == .encrypt {
                 isRoomPrivate = true
-                createRoomBlock?(420)
-                createRoomView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 420)
+                createRoomBlock?(400)
+                createRoomView?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 400)
             }
         }
 }

@@ -264,13 +264,13 @@
     <string name="voice_sound_card_supports">目前支持以下设备：\n \n1.有线耳机 \n2.有线麦克风</string>
     <string name="voice_preset_sound">预设音效</string>
     <string name="voice_preset_sound_qingshu1">青叔音</string>
-    <string name="voice_preset_sound_qingshu1_tips">男声磁性</string>
+    <string name="voice_preset_sound_qingshu1_tips">悦耳，磁性</string>
     <string name="voice_preset_sound_shaoyu1">少御音</string>
-    <string name="voice_preset_sound_shaoyu1_tips">男声甜美</string>
+    <string name="voice_preset_sound_shaoyu1_tips">柔美，磁性</string>
     <string name="voice_preset_sound_qingnian1">青年音</string>
-    <string name="voice_preset_sound_qingnian1_tips">男声唱歌1：高混响|KTV</string>
+    <string name="voice_preset_sound_qingnian1_tips">洪亮，饱满</string>
     <string name="voice_preset_sound_shaoluo">少萝音</string>
-    <string name="voice_preset_sound_shaoluo_tips">女声甜美</string>
+    <string name="voice_preset_sound_shaoluo_tips">夹子音，萝莉</string>
     <string name="voice_preset_sound_dashu">大叔音</string>
     <string name="voice_preset_sound_dashu_tips">男声唱歌1：高混响|KTV</string>
     <string name="voice_preset_sound_mum">妈音</string>

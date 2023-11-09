@@ -1,19 +1,8 @@
 package io.agora.scene.voice.rtckit
 
 import android.util.Log
-import androidx.annotation.DrawableRes
 import io.agora.rtc2.RtcEngineEx
-
-data class PresetSoundModel constructor(
-    val type: AgoraPresetSound,
-    val name: String,
-    val tips: String,
-    @DrawableRes val resId: Int
-) {
-    override fun toString(): String {
-        return name
-    }
-}
+import io.agora.scene.voice.R
 
 enum class AgoraPresetSound constructor(
     val presetValue: Int,
@@ -33,6 +22,51 @@ enum class AgoraPresetSound constructor(
     Sound2005(4,1f,0,4),
     Sound2006(4,1f,1,4)
 }
+
+val AgoraPresetSound.titleStringID: Int
+    get() = when (this) {
+        AgoraPresetSound.Sound1001 -> R.string.voice_preset_sound_qingshu1
+        AgoraPresetSound.Sound1002 -> R.string.voice_preset_sound_shaoyu1
+        AgoraPresetSound.Sound1003 -> R.string.voice_preset_sound_qingnian1
+        AgoraPresetSound.Sound1004 -> R.string.voice_preset_sound_shaoluo
+        AgoraPresetSound.Sound2001 -> R.string.voice_preset_sound_dashu
+        AgoraPresetSound.Sound2002 -> R.string.voice_preset_sound_mum
+        AgoraPresetSound.Sound2003 -> R.string.voice_preset_sound_qingshu
+        AgoraPresetSound.Sound2004 -> R.string.voice_preset_sound_yuma
+        AgoraPresetSound.Sound2005 -> R.string.voice_preset_sound_qingnian
+        AgoraPresetSound.Sound2006 -> R.string.voice_preset_sound_shaoyu
+        else -> 0
+    }
+
+val AgoraPresetSound.infoStringID: Int
+    get() = when (this) {
+        AgoraPresetSound.Sound1001 -> R.string.voice_preset_sound_qingshu1_tips
+        AgoraPresetSound.Sound1002 -> R.string.voice_preset_sound_shaoyu1_tips
+        AgoraPresetSound.Sound1003 -> R.string.voice_preset_sound_qingnian1_tips
+        AgoraPresetSound.Sound1004 -> R.string.voice_preset_sound_shaoluo_tips
+        AgoraPresetSound.Sound2001 -> R.string.voice_preset_sound_dashu_tips
+        AgoraPresetSound.Sound2002 -> R.string.voice_preset_sound_mum_tips
+        AgoraPresetSound.Sound2003 -> R.string.voice_preset_sound_qingshu_tips
+        AgoraPresetSound.Sound2004 -> R.string.voice_preset_sound_yuma_tips
+        AgoraPresetSound.Sound2005 -> R.string.voice_preset_sound_qingnian_tips
+        AgoraPresetSound.Sound2006 -> R.string.voice_preset_sound_shaoyu_tips
+        else -> 0
+    }
+
+val AgoraPresetSound.resID: Int
+    get() = when (this) {
+        AgoraPresetSound.Sound1001 -> R.drawable.voice_ic_sound_card_1001
+        AgoraPresetSound.Sound1002 -> R.drawable.voice_ic_sound_card_1002
+        AgoraPresetSound.Sound1003 -> R.drawable.voice_ic_sound_card_1003
+        AgoraPresetSound.Sound1004 -> R.drawable.voice_ic_sound_card_1004
+        AgoraPresetSound.Sound2001 -> R.drawable.voice_ic_sound_card_2001
+        AgoraPresetSound.Sound2002 -> R.drawable.voice_ic_sound_card_2002
+        AgoraPresetSound.Sound2003 -> R.drawable.voice_ic_sound_card_2003
+        AgoraPresetSound.Sound2004 -> R.drawable.voice_ic_sound_card_2004
+        AgoraPresetSound.Sound2005 -> R.drawable.voice_ic_sound_card_2005
+        AgoraPresetSound.Sound2006 -> R.drawable.voice_ic_sound_card_2006
+        else -> 0
+    }
 
 class AgoraSoundCardManager constructor(private val rtcEngineEx: RtcEngineEx) {
     private var presetSound: AgoraPresetSound = AgoraPresetSound.Close

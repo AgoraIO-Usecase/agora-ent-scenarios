@@ -69,6 +69,7 @@ class RoomAudioSettingsSheetDialog : BaseSheetDialog<VoiceDialogAudioSettingBind
             updateBotStateView()
             updateBGMView()
             updateEarBackState()
+            updateSoundCardState()
 
             mcbAgoraBot.setOnCheckedChangeListener { button, isChecked ->
                 if (!button.isPressed) return@setOnCheckedChangeListener
@@ -162,6 +163,14 @@ class RoomAudioSettingsSheetDialog : BaseSheetDialog<VoiceDialogAudioSettingBind
             binding?.tvInEarArrow?.text = view?.context?.getString(R.string.voice_chatroom_on)
         } else {
             binding?.tvInEarArrow?.text = view?.context?.getString(R.string.voice_chatroom_off)
+        }
+    }
+
+    fun updateSoundCardState() {
+        if (AgoraRtcEngineController.get().soundCardManager()?.isEnable() == true) {
+            binding?.tvSoundCardArrow?.text = view?.context?.getString(R.string.voice_chatroom_on)
+        } else {
+            binding?.tvSoundCardArrow?.text = view?.context?.getString(R.string.voice_chatroom_off)
         }
     }
 
