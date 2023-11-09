@@ -15,12 +15,15 @@ enum BeautyFactoryType: Int, CaseIterable {
     case sense
     // 相芯
     case fu
+    // 声网
+    case agora
     
     var title: String {
         switch self {
         case .byte: return "火山引擎"
         case .sense: return "商汤"
         case .fu: return "相芯"
+        case .agora: return "声网"
         }
     }
 }
@@ -34,7 +37,7 @@ class BeautyBaseModel: NSObject, Codable {
 }
 
 class BeautyModel: BeautyBaseModel {
-    static var beautyType: BeautyFactoryType = .byte
+    static var beautyType: BeautyFactoryType = .sense
     /// 特效素材相对于 ComposeMakeup.bundle/ComposeMakeup 的路径
     var path: String?
     /// key 素材中的功能 key
@@ -47,6 +50,7 @@ class BeautyModel: BeautyBaseModel {
         case .byte: return createByteBeautyData()
         case .sense: return createSenseBeautyData()
         case .fu: return createFUBeautyData()
+        case .agora: return createAgoraBeautyData()
         }
     }
     
@@ -55,6 +59,7 @@ class BeautyModel: BeautyBaseModel {
         case .byte: return createBytesStyleData()
         case .sense: return createSenseStyleData()
         case .fu: return createFUStyleData()
+        case .agora: return []
         }
     }
     
@@ -63,6 +68,7 @@ class BeautyModel: BeautyBaseModel {
         case .byte: return []
         case .sense: return []
         case .fu: return createFUAnimojiData()
+        case .agora: return []
         }
     }
     
@@ -71,6 +77,7 @@ class BeautyModel: BeautyBaseModel {
         case .byte: return createBytesFilterData()
         case .sense: return []
         case .fu: return []
+        case .agora: return []
         }
     }
     
@@ -79,6 +86,7 @@ class BeautyModel: BeautyBaseModel {
         case .byte: return createBytesStickerData()
         case .sense: return createSenseStickerData()
         case .fu: return createFUStickerData()
+        case .agora: return []
         }
     }
     
@@ -87,6 +95,7 @@ class BeautyModel: BeautyBaseModel {
         case .byte: return []
         case .sense: return createSenseAdjustData()
         case .fu: return []
+        case .agora: return []
         }
     }
     

@@ -44,7 +44,7 @@ static FUManager *shareManager = NULL;
     return self;
 }
 
-- (void) setupInit {
+- (void)setupInit {
 #if __has_include(<FURenderKit/FURenderKit.h>)
         NSString *controllerPath = [[NSBundle mainBundle] pathForResource:@"controller_cpp" ofType:@"bundle"];
         NSString *controllerConfigPath = [[NSBundle mainBundle] pathForResource:@"controller_config" ofType:@"bundle"];

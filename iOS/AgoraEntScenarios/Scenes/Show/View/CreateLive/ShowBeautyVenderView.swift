@@ -54,7 +54,7 @@ extension ShowBeautyVenderView: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "beautyVenderCell", for: indexPath) as! ShowBeautyVenderViewCell
         let titles = dataArray.map({ $0.title })
         cell.setupTitle(title: titles[indexPath.row])
-        if preCell == nil && indexPath.row == 0 {
+        if preCell == nil && indexPath.row == 1 {
             cell.isSelected = true
             preCell = cell
         }

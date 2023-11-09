@@ -585,6 +585,9 @@
 		E751D85D29F11723001354CA /* AUiMoreDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E751D85C29F11723001354CA /* AUiMoreDialog.swift */; };
 		E76F80192AF34B6900CCB9D6 /* FUBeautyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76F80152AF34B6900CCB9D6 /* FUBeautyManager.swift */; };
 		E76F801A2AF34B6900CCB9D6 /* FUManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E76F80182AF34B6900CCB9D6 /* FUManager.m */; };
+		E7883ACD2AFDCE44003CCF44 /* BeautyModel+Agora.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7883ACC2AFDCE44003CCF44 /* BeautyModel+Agora.swift */; };
+		E7883ACF2AFDD48C003CCF44 /* AgoraBeautyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7883ACE2AFDD48C003CCF44 /* AgoraBeautyManager.swift */; };
+		E7883AD72AFDD9F3003CCF44 /* AgoraBeautyRender.m in Sources */ = {isa = PBXBuildFile; fileRef = E7883AD62AFDD9F3003CCF44 /* AgoraBeautyRender.m */; };
 		E7C147682AF8C1840092C7F1 /* BeautyModel+Sense.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C147672AF8C1840092C7F1 /* BeautyModel+Sense.swift */; };
 		E7C1476A2AF8C19A0092C7F1 /* BeautyModel+FU.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C147692AF8C19A0092C7F1 /* BeautyModel+FU.swift */; };
 		E7C1476C2AF8C1AD0092C7F1 /* BeautyModel+Bytes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C1476B2AF8C1AD0092C7F1 /* BeautyModel+Bytes.swift */; };
@@ -1349,6 +1352,10 @@
 		E76F80152AF34B6900CCB9D6 /* FUBeautyManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FUBeautyManager.swift; sourceTree = "<group>"; };
 		E76F80172AF34B6900CCB9D6 /* FUManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FUManager.h; sourceTree = "<group>"; };
 		E76F80182AF34B6900CCB9D6 /* FUManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FUManager.m; sourceTree = "<group>"; };
+		E7883ACC2AFDCE44003CCF44 /* BeautyModel+Agora.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BeautyModel+Agora.swift"; sourceTree = "<group>"; };
+		E7883ACE2AFDD48C003CCF44 /* AgoraBeautyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgoraBeautyManager.swift; sourceTree = "<group>"; };
+		E7883AD52AFDD9F3003CCF44 /* AgoraBeautyRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AgoraBeautyRender.h; sourceTree = "<group>"; };
+		E7883AD62AFDD9F3003CCF44 /* AgoraBeautyRender.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AgoraBeautyRender.m; sourceTree = "<group>"; };
 		E7C147672AF8C1840092C7F1 /* BeautyModel+Sense.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BeautyModel+Sense.swift"; sourceTree = "<group>"; };
 		E7C147692AF8C19A0092C7F1 /* BeautyModel+FU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BeautyModel+FU.swift"; sourceTree = "<group>"; };
 		E7C1476B2AF8C1AD0092C7F1 /* BeautyModel+Bytes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BeautyModel+Bytes.swift"; sourceTree = "<group>"; };
@@ -1762,6 +1769,7 @@
 				E3735C842A5E7E75004737EF /* SenseBeautyManager.swift */,
 				E76F80162AF34B6900CCB9D6 /* FUBeauty */,
 				E76F80152AF34B6900CCB9D6 /* FUBeautyManager.swift */,
+				E7883ACE2AFDD48C003CCF44 /* AgoraBeautyManager.swift */,
 				E3735C6E2A5E7E75004737EF /* Util */,
 			);
 			path = Beauty;
@@ -3253,6 +3261,7 @@
 				E7C147672AF8C1840092C7F1 /* BeautyModel+Sense.swift */,
 				E7C147692AF8C19A0092C7F1 /* BeautyModel+FU.swift */,
 				E7C1476B2AF8C1AD0092C7F1 /* BeautyModel+Bytes.swift */,
+				E7883ACC2AFDCE44003CCF44 /* BeautyModel+Agora.swift */,
 			);
 			path = BeautyModel;
 			sourceTree = "<group>";
@@ -3265,6 +3274,7 @@
 				E3735C792A5E7E75004737EF /* FURender */,
 				E3735C7E2A5E7E75004737EF /* SenseRender */,
 				E3735C812A5E7E75004737EF /* BytesRender */,
+				E7883AD42AFDD9BD003CCF44 /* AgoraRender */,
 			);
 			path = BeautyAPI;
 			sourceTree = "<group>";
@@ -3359,6 +3369,15 @@
 				E76F80182AF34B6900CCB9D6 /* FUManager.m */,
 			);
 			path = FUBeauty;
+			sourceTree = "<group>";
+		};
+		E7883AD42AFDD9BD003CCF44 /* AgoraRender */ = {
+			isa = PBXGroup;
+			children = (
+				E7883AD52AFDD9F3003CCF44 /* AgoraBeautyRender.h */,
+				E7883AD62AFDD9F3003CCF44 /* AgoraBeautyRender.m */,
+			);
+			path = AgoraRender;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -3830,6 +3849,7 @@
 				DD619A6529E3E247008F63E4 /* SABusinessRequest.swift in Sources */,
 				E3735CA12A5E7E75004737EF /* FUBeautyRender.m in Sources */,
 				DD0292EF295BF0DC00485225 /* VLHomeOnLineListCCell.m in Sources */,
+				E7883ACD2AFDCE44003CCF44 /* BeautyModel+Agora.swift in Sources */,
 				DD619A7D29E3E247008F63E4 /* String + SAExtension.swift in Sources */,
 				DD619C0829E3E84D008F63E4 /* SceneVersionCell.swift in Sources */,
 				DDA19A0B28FFE579009D3E61 /* JSONObject.swift in Sources */,
@@ -3954,6 +3974,7 @@
 				DD619BA129E3E262008F63E4 /* VoiceRoomRTCManager.swift in Sources */,
 				DD619BFC29E3E262008F63E4 /* VRCreateRoomInputView.swift in Sources */,
 				DD619AAE29E3E247008F63E4 /* SARoomPresentView.swift in Sources */,
+				E7883ACF2AFDD48C003CCF44 /* AgoraBeautyManager.swift in Sources */,
 				DD619BD029E3E262008F63E4 /* VoiceRoomEndLiveAlert.swift in Sources */,
 				DD619BBC29E3E262008F63E4 /* VRRoomsViewController.swift in Sources */,
 				DD3610A629B70CDC00CE7984 /* ShowBeautyFaceCell.swift in Sources */,
@@ -4070,6 +4091,7 @@
 				DD619B8129E3E262008F63E4 /* VoiceRoomBusinessRequest.swift in Sources */,
 				DD36106929B70CDC00CE7984 /* ShowSettingKey.swift in Sources */,
 				DD0292E1295BF0DC00485225 /* VLListEmptyView.m in Sources */,
+				E7883AD72AFDD9F3003CCF44 /* AgoraBeautyRender.m in Sources */,
 				DD619AB729E3E247008F63E4 /* SANormalRtcView.swift in Sources */,
 				DD3610B829B70CDC00CE7984 /* ShowSettingBaseCell.swift in Sources */,
 				DD36109F29B70CDC00CE7984 /* ShowBaseViewController.swift in Sources */,

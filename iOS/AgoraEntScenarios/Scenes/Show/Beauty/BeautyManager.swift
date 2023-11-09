@@ -33,6 +33,7 @@ class BeautyManager: NSObject {
             beautyAPI.beautyRender = SenseBeautyManager.shareManager.render
         case .fu:
             beautyAPI.beautyRender = FUBeautyManager.shareManager.render
+        case .agora: break
         }
     }
     
@@ -47,6 +48,7 @@ class BeautyManager: NSObject {
         case .byte: return ByteBeautyManager.shareManager.isSuccessLicense
         case .sense: return SenseBeautyManager.shareManager.isSuccessLicense
         case .fu: return FUBeautyManager.shareManager.isSuccessLicense
+        case .agora: return true
         }
     }
     
@@ -62,6 +64,9 @@ class BeautyManager: NSObject {
             config.beautyRender = SenseBeautyManager.shareManager.render
         case .fu:
             config.beautyRender = FUBeautyManager.shareManager.render
+        case .agora:
+            config.beautyRender = AgoraBeautyManager.shareManager.render
+            AgoraBeautyManager.shareManager.agoraKit = engine
         }
         config.statsEnable = false
         config.statsDuration = 1
@@ -81,7 +86,11 @@ class BeautyManager: NSObject {
     func updateBeautyRedner() {
         guard let agoraKit = agoraKit else { return }
         configBeautyAPIWithRtcEngine(engine: agoraKit)
-        beautyAPI.setBeautyPreset(.default)
+        if BeautyModel.beautyType == .agora {
+            AgoraBeautyManager.shareManager.setBeauty(path: nil, key: "init", value: 0)
+        } else {
+            beautyAPI.setBeautyPreset(.default)
+        }
     }
     
     func setBeauty(path: String?, key: String?, value: CGFloat) {
@@ -94,6 +103,9 @@ class BeautyManager: NSObject {
             
         case .fu:
             FUBeautyManager.shareManager.setBeauty(path: path, key: key, value: value)
+            
+        case .agora:
+            AgoraBeautyManager.shareManager.setBeauty(path: path, key: key, value: value)
         }
     }
     
@@ -107,6 +119,8 @@ class BeautyManager: NSObject {
             
         case .fu:
             FUBeautyManager.shareManager.setStyle(path: path, key: key, value: value)
+            
+        case .agora: break
         }
     }
     
@@ -125,6 +139,8 @@ class BeautyManager: NSObject {
             
         case .fu:
             FUBeautyManager.shareManager.setFilter(path: path, value: value)
+            
+        case .agora: break
         }
         
     }
@@ -139,6 +155,8 @@ class BeautyManager: NSObject {
             
         case .fu:
             FUBeautyManager.shareManager.setSticker(path: path)
+            
+        case .agora: break
         }
     }
     
@@ -152,6 +170,9 @@ class BeautyManager: NSObject {
             
         case .fu:
             FUBeautyManager.shareManager.reset(datas: datas)
+            
+        case .agora:
+            AgoraBeautyManager.shareManager.reset(datas: datas)
         }
     }
     
@@ -165,6 +186,8 @@ class BeautyManager: NSObject {
             
         case .fu:
             FUBeautyManager.shareManager.resetStyle(datas: datas)
+            
+        case .agora: break
         }
     }
     
@@ -178,6 +201,8 @@ class BeautyManager: NSObject {
             
         case .fu:
             FUBeautyManager.shareManager.resetFilter(datas: datas)
+            
+        case .agora: break
         }
     }
     
@@ -191,6 +216,8 @@ class BeautyManager: NSObject {
             
         case .fu:
             FUBeautyManager.shareManager.resetSticker(datas: datas)
+            
+        case .agora: break
         }
     }
     
@@ -204,6 +231,9 @@ class BeautyManager: NSObject {
             
         case .fu:
             FUBeautyManager.shareManager.destroy()
+            
+        case .agora:
+            AgoraBeautyManager.shareManager.destroy()
         }
         beautyAPI.destroy()
         guard isAll else { return }
@@ -211,5 +241,6 @@ class BeautyManager: NSObject {
         ShowAgoraKitManager.shared.enableVirtualBackground(isOn: false,
                                                            greenCapacity: 0)
         ShowAgoraKitManager.shared.seVirtualtBackgoundImage(imagePath: nil, isOn: false)
+        BeautyModel.beautyType = .sense
     }
 }

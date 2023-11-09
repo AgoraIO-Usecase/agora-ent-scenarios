@@ -19,3 +19,4 @@
 #import "BytesBeautyRender.h"
 #import "SenseBeautyRender.h"
 #import "FUBeautyRender.h"
+#import "AgoraBeautyRender.h"
