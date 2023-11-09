@@ -7,8 +7,13 @@ import androidx.lifecycle.ViewModel
 import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.musiccontentcenter.Music
-import io.agora.rtc2.*
-import io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE
+import io.agora.rtc2.ChannelMediaOptions
+import io.agora.rtc2.Constants
+import io.agora.rtc2.IRtcEngineEventHandler
+import io.agora.rtc2.RtcConnection
+import io.agora.rtc2.RtcEngine
+import io.agora.rtc2.RtcEngineConfig
+import io.agora.rtc2.RtcEngineEx
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.ContentInspectModule
 import io.agora.scene.base.AudioModeration
@@ -36,7 +41,20 @@ import io.agora.scene.cantata.ktvapi.KTVType
 import io.agora.scene.cantata.ktvapi.MusicLoadStatus
 import io.agora.scene.cantata.ktvapi.SwitchRoleFailReason
 import io.agora.scene.cantata.ktvapi.createKTVApi
-import io.agora.scene.cantata.service.*
+import io.agora.scene.cantata.service.CantataServiceProtocol
+import io.agora.scene.cantata.service.ChooseSongInputModel
+import io.agora.scene.cantata.service.JoinRoomOutputModel
+import io.agora.scene.cantata.service.MakeSongTopInputModel
+import io.agora.scene.cantata.service.OnSeatInputModel
+import io.agora.scene.cantata.service.OutSeatInputModel
+import io.agora.scene.cantata.service.RemoveSongInputModel
+import io.agora.scene.cantata.service.RoomListModel
+import io.agora.scene.cantata.service.RoomSeatModel
+import io.agora.scene.cantata.service.RoomSelSongModel
+import io.agora.scene.cantata.service.ScoringAlgoControlModel
+import io.agora.scene.cantata.service.UserModel
+import io.agora.scene.cantata.ui.dialog.CantataDebugSettingBean
+import io.agora.scene.cantata.ui.dialog.CantataDebugSettingsDialog
 import io.agora.scene.cantata.ui.dialog.MusicSettingBean
 import io.agora.scene.cantata.ui.dialog.MusicSettingCallback
 import io.agora.scene.cantata.ui.widget.rankList.RankItem
@@ -139,6 +157,11 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     var mMusicSetting: MusicSettingBean? = null
 
     /**
+     * 开发者模式
+     */
+    var mDebugSetting: CantataDebugSettingBean? = null
+
+    /**
      * 是否开启后台播放
      */
     private var mIsBackPlay = false
@@ -181,6 +204,11 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
         return false
     }
+
+    fun getSDKBuildNum(): String? {
+        return RtcEngineEx.getSdkVersion()
+    }
+
 
     // ======================= 断网重连相关 =======================
     private fun initReConnectEvent() {
@@ -1175,6 +1203,27 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     mRtcEngine?.setInEarMonitoringVolume(volume)
                 }
             })
+
+        // -------------------  debug 模式设置
+
+        mDebugSetting = CantataDebugSettingBean(object : CantataDebugSettingsDialog.Callback {
+            override fun onAudioDumpEnable(enable: Boolean) {
+                if (enable) {
+                    mRtcEngine?.setParameters("{\"rtc.debug.enable\": true}")
+                    mRtcEngine?.setParameters("{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}");
+                } else {
+                    mRtcEngine?.setParameters("{\"rtc.debug.enable\": false}")
+                }
+            }
+
+            override fun onScoringControl(level: Int, offset: Int) {
+                mScoringAlgoControlLiveData.postValue(ScoringAlgoControlModel(level, offset))
+            }
+
+            override fun onSetParameters(parameters: String?) {
+                mRtcEngine?.setParameters(parameters)
+            }
+        })
     }
 
     private fun setAudioEffectPreset(effect: Int) {
