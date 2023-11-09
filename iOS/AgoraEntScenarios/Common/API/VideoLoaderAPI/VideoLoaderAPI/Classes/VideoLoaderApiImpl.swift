@@ -361,3 +361,15 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         return rtcProxys[anchorId]
     }
 }
+
+extension VideoLoaderApiImpl {
+    func getUsedAnchorIds(tagId: String) -> [String] {
+        var anchorIds: [String] = []
+        //find anchor id list
+        exConnectionDeps.forEach { key, value in
+            if value[tagId] == nil { return }
+            anchorIds.append(key)
+        }
+        return anchorIds
+    }
+}

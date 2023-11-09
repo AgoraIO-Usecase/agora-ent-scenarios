@@ -49,6 +49,11 @@ class CallViewController: BaseRoomViewController {
         moveViewModel.touchArea = view.bounds
         _resetCanvas()
         
+        moreBtn.aui_size = kNormalIconSize
+        moreBtn.aui_right = view.aui_width - 15
+        moreBtn.aui_centerY = roomInfoView.aui_centerY
+        view.addSubview(moreBtn)
+        
         view.addSubview(hangupButton)
         
         hangupButton.aui_size = CGSize(width: 70, height: 70)
