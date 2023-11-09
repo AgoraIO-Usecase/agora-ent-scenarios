@@ -1434,15 +1434,17 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
     // ------------------ 重新获取歌词url ------------------
     fun reGetLrcUrl() {
-        val songPlayingModel = mSongPlayingLiveData.value ?: return
-        loadMusic(
-            KTVLoadMusicConfiguration(
-                songPlayingModel.songNo,
-                false,
-                songPlayingModel.userNo!!.toInt(),
-                KTVLoadMusicMode.LOAD_LRC_ONLY
-            ), songPlayingModel.songNo.toLong(), true
-        )
+        mSongPlayingLiveData.value?.let {
+            val isOwnSong = it.userNo == UserManager.getInstance().user.id.toString()
+            loadMusic(
+                KTVLoadMusicConfiguration(
+                    it.songNo,
+                    false,
+                    it.userNo!!.toInt(),
+                    KTVLoadMusicMode.LOAD_LRC_ONLY
+                ), it.songNo.toLong(), isOwnSong
+            )
+        }
     }
 
     // ------------------ 歌曲seek ------------------

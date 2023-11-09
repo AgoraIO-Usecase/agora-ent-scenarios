@@ -157,7 +157,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mPlayer.registerPlayerObserver(this)
         setKTVParameters()
         startDisplayLrc()
-        startSyncPitch()
+        //startSyncPitch()
         startSyncScore()
         startSyncCloudConvergenceStatus()
         isRelease = false
