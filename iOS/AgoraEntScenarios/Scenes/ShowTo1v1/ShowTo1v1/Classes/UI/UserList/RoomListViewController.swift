@@ -411,7 +411,7 @@ extension RoomListViewController {
             self?.service.subscribeListener(listener: nil)
             self?.service.leaveRoom(roomInfo: roomInfo, completion: { err in
             })
-            
+            self?.preJoinRoom = nil
             //主播回到列表页面要从callee变成caller
             if isBroadcaster {
                 self?._reinitCallerAPI { err in
@@ -511,6 +511,17 @@ extension RoomListViewController: CallApiListenerProtocol {
                 AUIToast.show(text: "call_toast_hangup".showTo1v1Localization())
             case .remoteRejected:
                 AUIToast.show(text: "call_user_busy_tips".showTo1v1Localization())
+            case .rtmLost:
+                callVC.dismiss(animated: false)
+                AUIToast.show(text: "call_toast_disconnect".showTo1v1Localization())
+                if let vc = navigationController?.visibleViewController as? BroadcasterViewController {
+                    guard let roomInfo = vc.roomInfo else { return }
+                    _reinitCalleeAPI(room: roomInfo) { err in 
+                    }
+                } else {
+                    _reinitCallerAPI { err in
+                    }
+                }
             default:
                 break
             }
