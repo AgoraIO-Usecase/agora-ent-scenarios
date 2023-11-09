@@ -255,7 +255,6 @@ class RoomListActivity : AppCompatActivity() {
             holder.ivLock.visibility = View.GONE
 
             val onTouchEventHandler = object : OnLiveRoomItemTouchEventHandler(
-                context = mContext,
                 RtcEngineInstance.rtcEngine,
                 VideoLoader.RoomInfo(
                     data.roomId,
@@ -282,6 +281,10 @@ class RoomListActivity : AppCompatActivity() {
                                 if (RtcEngineInstance.generalToken() == "") {
                                     mOnNeedFetchToken?.invoke()
                                 } else {
+                                    if (RtcEngineInstance.rtcEngine.queryDeviceScore() < 75) {
+                                        RtcEngineInstance.rtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
+                                        RtcEngineInstance.rtcEngine.setParameters("{\"rtc.video.decoder_out_byte_frame\": true}")
+                                    }
                                     super.onTouch(v, event)
                                     mOnNeedStartCloudPlayer?.invoke()
                                 }
