@@ -149,7 +149,6 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
 //            ROOM_AVAILABLE_DURATION / 1000 + 10 // 20min + 10s，加10s防止临界条件下报token无效
 
         onPageScrollEventHandler = object : OnPageScrollEventHandler(
-            this,
             RtcEngineInstance.rtcEngine,
             UserManager.getInstance().user.id.toInt(),
             true,
