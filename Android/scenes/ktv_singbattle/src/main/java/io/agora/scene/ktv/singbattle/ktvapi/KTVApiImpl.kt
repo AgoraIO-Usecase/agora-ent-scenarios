@@ -1095,7 +1095,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     // ------------------------ AgoraRtcEvent ------------------------
     override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
         super.onStreamMessage(uid, streamId, data)
-        if (uid != mainSingerUid) return
         val jsonMsg: JSONObject
         val messageData = data ?: return
         try {
