@@ -158,7 +158,7 @@ extension Pure1v1UserListViewController {
     
     private func _call(user: Pure1v1UserInfo) {
         pure1v1Print("_call with state:\(callState.rawValue)")
-        if callState == .idle {
+        if callState == .idle || callState == .failed {
             _setupCallApi()
             AUIToast.show(text: "call_not_init".pure1v1Localization())
             return
@@ -365,6 +365,11 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             connectedUserId = nil
             connectedChannelId = nil
             callDialog?.hiddenAnimation()
+            callVC.dismiss(animated: false)
+            if stateReason == .rtmLost {
+                AUIToast.show(text: "call_toast_disconnect".pure1v1Localization())
+                _setupCallApi()
+            }
             break
         default:
             break

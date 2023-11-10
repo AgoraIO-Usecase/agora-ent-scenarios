@@ -12,7 +12,7 @@ import Foundation
     case visible = 0   //显示时
     case endDrag       //放手时
     case endScroll     //滑动停止时
-    case never = 100   //不展示
+    case never = 100   //不展示(只对声音有效)
 }
 
 //秒切CollectionView delegate handler
@@ -21,7 +21,7 @@ open class AGCollectionSlicingDelegateHandler: AGBaseDelegateHandler {
     public var videoSlicingType: AGSlicingType = .visible      //视频出图时机
     public var audioSlicingType: AGSlicingType = .endScroll    //声音出图时机
     public var onRequireRenderVideo:((AnchorInfo, UICollectionViewCell, IndexPath)->UIView?)? = nil
-    private var needPrejoin: Bool = true    //是否需要秒切加速
+    private var needPrejoin: Bool = true    //是否需要秒切加速(上下未显示但是已经初始化的页面是否走默认join的策略)
     private var prejoinCount: Int = 1
     private var needReloadData: Bool = false
     
@@ -49,7 +49,8 @@ open class AGCollectionSlicingDelegateHandler: AGBaseDelegateHandler {
                 var visibleRoomInfos:[IVideoLoaderRoomInfo] = []
                 if newValue.isDragging == false, newValue.isDecelerating == false {
                     //更新roomlist时，已经完全停止则重新走停止后更新当前状态和上下预加载屏幕的状态
-                    visibleRoomInfos = showVisibleRoom(collectionView: newValue, state: .joinedWithAudioVideo)
+                    let state: AnchorState = audioSlicingType == .never ? .joinedWithVideo : .joinedWithAudioVideo
+                    visibleRoomInfos = showVisibleRoom(collectionView: newValue, state: state)
                 } else {
                     //没有停止的时候都改成joinedWithVideo，⚠️会存在当前房间画面无声音，滑动停止的时候才能听到
                     visibleRoomInfos = joinVideo()
@@ -142,7 +143,7 @@ extension AGCollectionSlicingDelegateHandler {
     }
     
     fileprivate func showVisibleRoom(collectionView: UICollectionView?, state: AnchorState) -> [IVideoLoaderRoomInfo] {
-        debugLoaderPrint("showVisibleRoom start ===== \(collectionView?.visibleCells.count)")
+        debugLoaderPrint("showVisibleRoom start ===== \(collectionView?.visibleCells.count ?? 0)")
         var visibleRoomInfos: [IVideoLoaderRoomInfo] = []
         guard let collectionView = collectionView else {return visibleRoomInfos}
         for (i, cell) in collectionView.visibleCells.enumerated() {
@@ -164,7 +165,6 @@ extension AGCollectionSlicingDelegateHandler {
     
     fileprivate func switchState(room: IVideoLoaderRoomInfo, state: AnchorState, cell: UICollectionViewCell, indexPath: IndexPath) {
         let videoLoaderApi = VideoLoaderApiImpl.shared
-        var anchorIds: [String] = []
         for anchorInfo in room.anchorInfoList {
             videoLoaderApi.switchAnchorState(newState: state,
                                              localUid: localUid,
@@ -184,10 +184,10 @@ extension AGCollectionSlicingDelegateHandler {
     open func cleanIdleRoom(collectionView: UICollectionView) {
         guard roomList?.count() ?? 0 > 0 else {return}
         let tuple = _getVisibleCellTuple(collectionView: collectionView)
-        var visibleCell = tuple.1
-        var visibleIndex = tuple.0
+        let visibleCell = tuple.1
+        let visibleIndex = tuple.0
         
-        guard let visibleIndex = visibleIndex, let visibleCell = visibleCell, let roomList = roomList else {return}
+        guard let visibleIndex = visibleIndex, let _ = visibleCell, let roomList = roomList else {return}
         let visibleIndexs = [(visibleIndex + roomList.count() - 1) % roomList.count(), visibleIndex, (visibleIndex + 1) % roomList.count()]
         var visibleRoomIds: [String] = []
         let videoLoaderApi = VideoLoaderApiImpl.shared
@@ -236,16 +236,19 @@ extension AGCollectionSlicingDelegateHandler: UICollectionViewDelegate, UICollec
         
         if videoSlicingType == .visible || needReloadData {
             var state: AnchorState = .joinedWithVideo
-            if audioSlicingType == .visible {
+            if audioSlicingType == .never {
+            } else if audioSlicingType == .visible {
                 state = .joinedWithAudioVideo
             } else if needReloadData {
                 state = .joinedWithAudioVideo
             }
-            
             switchState(room: room,
                         state: state,
                         cell: cell,
                         indexPath: indexPath)
+            
+            //上报开始计算秒切出图
+            VideoLoaderApiImpl.shared.startMediaRenderingTracing(anchorId: room.channelName())
         }
         needReloadData = false
         self.scrollView = collectionView
@@ -270,7 +273,12 @@ extension AGCollectionSlicingDelegateHandler: UICollectionViewDelegate, UICollec
     open func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         guard videoSlicingType == .endDrag, let collectionView = scrollView as? UICollectionView else {return}
         let state: AnchorState = audioSlicingType == .endScroll ? .joinedWithVideo : .joinedWithAudioVideo
-        showVisibleRoom(collectionView: collectionView, state: state)
+        let room = showVisibleRoom(collectionView: collectionView, state: state).first
+        
+        if let room = room {
+            //上报开始计算秒切出图
+            VideoLoaderApiImpl.shared.startMediaRenderingTracing(anchorId: room.channelName())
+        }
     }
     
     open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
@@ -278,6 +286,11 @@ extension AGCollectionSlicingDelegateHandler: UICollectionViewDelegate, UICollec
         cleanIdleRoom(collectionView: collectionView)
         //停止之后永远是把可视的变成
         let state: AnchorState = audioSlicingType == .never ? .joinedWithVideo : .joinedWithAudioVideo
-        showVisibleRoom(collectionView: collectionView, state: state)
+        let room = showVisibleRoom(collectionView: collectionView, state: state).first
+        
+        if videoSlicingType == .endScroll, let room = room {
+            //上报开始计算秒切出图
+            VideoLoaderApiImpl.shared.startMediaRenderingTracing(anchorId: room.channelName())
+        }
     }
 }

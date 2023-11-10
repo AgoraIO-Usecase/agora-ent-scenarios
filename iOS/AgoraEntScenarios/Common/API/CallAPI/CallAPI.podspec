@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'CallAPI'
-  s.version          = '0.1.0'
+  s.version          = '0.3.0'
   s.summary          = 'A short description of CallAPI.'
 
 # This description is used to generate tags and improve search results.
@@ -28,7 +28,7 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/AgoraIO-Community/CallAPI.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
     
-  s.ios.deployment_target = '10.0'
+  s.ios.deployment_target = '12.0'
   
   s.xcconfig = {'ENABLE_BITCODE' => 'NO'}
   
@@ -42,6 +42,6 @@ TODO: Add long description of the pod here.
   # }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
-  s.dependency 'AgoraRtcEngine_Special_iOS'
-  s.dependency 'AgoraRtm_iOS', '2.1.4'
+  s.dependency 'AgoraRtcEngine_Special_iOS', '4.1.1.19'
+  s.dependency 'AgoraRtm_iOS', '2.1.7'
 end
