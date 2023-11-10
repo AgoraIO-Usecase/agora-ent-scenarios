@@ -177,7 +177,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         
         let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
         let expiredDuration = 20 * 60 * 1000
-        agoraPrint("checkRoomExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
+//        agoraPrint("checkRoomExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
         guard currentTs - room.createdAt > expiredDuration else { return }
         
         self.subscribeDelegate?.onRoomExpired()

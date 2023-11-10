@@ -42,11 +42,12 @@ private class CallQueueInfo: NSObject {
     }
 }
 
-protocol CallMessageDelegate: NSObjectProtocol {
-    
+protocol CallMessageDelegate: NSObjectProtocol, AgoraRtmClientDelegate {
     /// 回执没有收到
     /// - Parameter message: <#message description#>
     func onMissReceipts(message: [String: Any])
+    
+    func onConnectionFail()
     
     func debugInfo(message: String)
     func debugWarning(message: String)
@@ -56,10 +57,7 @@ class CallMessageManager: NSObject {
     public weak var delegate: CallMessageDelegate?
     private var config: CallConfig!
     private var rtmClient: AgoraRtmClientKit!
-    private weak var rtmDelegate: AgoraRtmClientDelegate?
-    
-    private var loginSuccess: ((AgoraRtmErrorInfo?)->())?
-    
+
     /// RTM是否已经登录
     private var isLoginedRTM: Bool = false
     /// RTM 是否已经订阅频道
@@ -79,54 +77,43 @@ class CallMessageManager: NSObject {
         #endif
     }
     
-    init(config: CallConfig, rtmDelegate: AgoraRtmClientDelegate?, delegate: CallMessageDelegate?) {
+    required init(config: CallConfig, rtmClient: AgoraRtmClientKit, delegate: CallMessageDelegate?) {
         super.init()
         self.config = config
         self.delegate = delegate
-        self.rtmClient = _createRtmClient(delegate: rtmDelegate)
+        self.rtmClient = rtmClient
+        if rtmClient == config.rtmClient {
+            //如果外部传入rtmclient，默认登陆成功
+            self.isLoginedRTM = true
+        }
         callMessagePrint("init-- CallMessageManager ")
-    }
-    
-    func logout() {
-        callMessagePrint("logout")
-        self.rtmClient?.logout()
-        self.rtmClient?.destroy()
     }
 }
 
 //MARK: private method
 extension CallMessageManager {
-    //创建RTM
-    private func _createRtmClient(delegate: AgoraRtmClientDelegate?) -> AgoraRtmClientKit {
-        let rtmConfig = AgoraRtmClientConfig()
-        rtmConfig.userId = "\(config.userId)"
-        rtmConfig.appId = config.appId
-        if rtmConfig.userId.count == 0 {
-            callWarningPrint("userId is empty")
-        }
-        if rtmConfig.appId.count == 0 {
-            callWarningPrint("appId is empty")
-        }
-        
-        self.rtmDelegate = delegate
-        let rtmClient = AgoraRtmClientKit(config: rtmConfig, delegate: self)!
-        return rtmClient
-    }
-    
     /// 根据策略订阅频道消息
     /// - Parameters:
     ///   - roomId: <#prepareConfig description#>
     ///   - completion: <#completion description#>
     private func _subscribeRTM(userId: String, completion: ((NSError?)->())?) {
-        /*
-         移除所有的presence，所有缓存由调用的业务服务器去控制
-         订阅自己频道的message，用来收消息
-         */
+        guard let rtmClient = self.rtmClient else {
+            completion?(NSError(domain: "rtmClient is nil, please invoke 'initialize' to setup config", code: -1))
+            return
+        }
         let options = AgoraRtmSubscribeOptions()
-        options.withMessage = true
-        options.withMetadata = false
-        options.withPresence = false
-        _subscribe(channelName: userId, option: options, completion: completion)
+        options.features = .message
+        callMessagePrint("will subscribe[\(userId)] features: \(options.features)")
+        rtmClient.unsubscribe(userId)
+        rtmClient.subscribe(channelName: userId, option: options) {[weak self] resp, err in
+            guard let self = self else {return}
+            self.callMessagePrint("subscribe[\(userId)] finished = \(err?.errorCode.rawValue ?? 0)")
+            if let err = err {
+                completion?(NSError(domain: err.reason, code: err.errorCode.rawValue))
+                return
+            }
+            completion?(nil)
+        }
     }
     
     /// 发送回执消息
@@ -138,18 +125,14 @@ extension CallMessageManager {
         var message: [String: Any] = [:]
         message[kReceiptsKey] = messageId
         callMessagePrint("_sendReceipts to '\(roomId)', message: \(message)")
-        let data = try? JSONSerialization.data(withJSONObject: message) as NSData
+        let data = try? JSONSerialization.data(withJSONObject: message)
         let options = AgoraRtmPublishOptions()
-//        let date = Date()
-        rtmClient.publish(roomId, message: data!, withOption: options) { resp, err in
-//            guard let self = self else {return}
-            let error = err.errorCode == .ok ? nil : NSError(domain: err.reason, code: err.errorCode.rawValue)
-//            self.callMessagePrint("_sendReceipts cost \(-date.timeIntervalSinceNow * 1000) ms")
-            if error == nil {
-                completion?(nil)
+        rtmClient.publish(channelName: roomId, data: data!, option: options) { resp, err in
+            if let err = err {
+                completion?(NSError(domain: err.reason, code: err.errorCode.rawValue))
                 return
             }
-            completion?(error)
+            completion?(nil)
         }
     }
     
@@ -160,64 +143,40 @@ extension CallMessageManager {
         }
         callMessagePrint("_sendMessage to '\(userId)', message: \(message)")
         let msgId = message[kMessageId] as? Int ?? 0
-        let data = try? JSONSerialization.data(withJSONObject: message) as NSData
+        let data = try? JSONSerialization.data(withJSONObject: message)
         let options = AgoraRtmPublishOptions()
         let date = Date()
-        rtmClient.publish(userId, message: data!, withOption: options) { [weak self] resp, err in
-            
-            let error: NSError? = err.errorCode == .ok ? nil : NSError(domain: err.reason, code: err.errorCode.rawValue)
-            self?.callMessagePrint("publish cost \(-date.timeIntervalSinceNow * 1000) ms")
-            if error == nil {
-                completion?(nil)
-                if error == nil {
-                    if let receiptInfo = self?.receiptsQueue.first(where: {$0.messageId == msgId}) {
-                        receiptInfo.checkReceipt()
-                        return
-                    }
-                    let receiptInfo = CallQueueInfo()
-                    receiptInfo.messageId = msgId
-                    receiptInfo.messageInfo = message
-                    receiptInfo.callback = completion
-                    receiptInfo.checkReceiptsFail = { info in
-                        guard let self = self else {return}
-                        guard info.retryTimes > 0 else {
-                            let message = info.messageInfo ?? [:]
-//                            self.callMessagePrint("get receipts fail, msg: \(message)")
-                            self.receiptsQueue = self.receiptsQueue.filter({$0.messageId != msgId})
-                            self.delegate?.onMissReceipts(message: message)
-                            return
-                        }
-                        self._sendMessage(userId: userId, message: message, completion: completion)
-                    }
-                    self?.receiptsQueue.append(receiptInfo)
-                    receiptInfo.checkReceipt()
-                }
-                return
-            }
-            if let error = error {
+        rtmClient.publish(channelName: userId, data: data!, option: options) { [weak self] resp, err in
+            if let err = err {
+                let error = NSError(domain: err.reason, code: err.errorCode.rawValue)
                 self?.callWarningPrint("_sendMessage: fail: \(error)")
-            }
-            completion?(error)
-        }
-    }
-    
-    private func _subscribe(channelName: String, option: AgoraRtmSubscribeOptions, completion: ((NSError?) -> ())?) {
-        guard let rtmClient = self.rtmClient else {
-            completion?(NSError(domain: "rtmClient is nil, please invoke 'initialize' to setup config", code: -1))
-            return
-        }
-        
-        callMessagePrint("will subscribe[\(channelName)] message: \(option.withMessage) presence: \(option.withPresence)")
-        rtmClient.unsubscribe(withChannel: channelName)
-        rtmClient.subscribe(withChannel: channelName, option: option) {[weak self] resp, err in
-            guard let self = self else {return}
-            self.callMessagePrint("subscribe[\(channelName)] finished = \(err.errorCode.rawValue)")
-            guard err.errorCode == .ok else {
-                completion?(NSError(domain: err.reason, code: err.errorCode.rawValue))
+                completion?(error)
                 return
             }
-            
+            self?.callMessagePrint("publish cost \(-date.timeIntervalSinceNow * 1000) ms")
             completion?(nil)
+            //发送成功检查回执，没收到则重试
+            if let receiptInfo = self?.receiptsQueue.first(where: {$0.messageId == msgId}) {
+                receiptInfo.checkReceipt()
+                return
+            }
+            let receiptInfo = CallQueueInfo()
+            receiptInfo.messageId = msgId
+            receiptInfo.messageInfo = message
+            receiptInfo.callback = completion
+            receiptInfo.checkReceiptsFail = { info in
+                guard let self = self else {return}
+                guard info.retryTimes > 0 else {
+                    let message = info.messageInfo ?? [:]
+                    self.receiptsQueue = self.receiptsQueue.filter({$0.messageId != msgId})
+                    self.delegate?.onMissReceipts(message: message)
+                    return
+                }
+                self._sendMessage(userId: userId, message: message) { _ in
+                }
+            }
+            self?.receiptsQueue.append(receiptInfo)
+            receiptInfo.checkReceipt()
         }
     }
     
@@ -226,32 +185,36 @@ extension CallMessageManager {
             completion(nil)
             return
         }
-        
         callMessagePrint("will login")
-        self.loginSuccess = completion
         rtmClient.logout()
-        rtmClient.login(byToken: token) {[weak self] resp, error in
+        rtmClient.login(token) {[weak self] resp, error in
             guard let self = self else {return}
-            //TODO(RTM Team): timeout to reconnect bug (callback multi times)
-            self.callMessagePrint("login completion: \(error.errorCode.rawValue)")
-            self.isLoginedRTM = error.errorCode == .ok ? true : false
-            self.loginSuccess?(error)
-            self.loginSuccess = nil
+            self.callMessagePrint("login completion: \(error?.errorCode.rawValue ?? 0)")
+            self.isLoginedRTM = error == nil ? true : false
+            completion(error)
         }
     }
 }
 
 //MARK: public method
 extension CallMessageManager {
+    func rtmDeinitialize() {
+        rtmClient.removeDelegate(self)
+        callMessagePrint("unsubscribe[\(config.userId)]")
+        rtmClient.unsubscribe("\(config.userId)")
+        receiptsQueue.removeAll()
+    }
+    
     /// 根据配置初始化RTM
     /// - Parameters:
     ///   - prepareConfig: <#prepareConfig description#>
     ///   - tokenConfig: <#tokenConfig description#>
     ///   - completion: <#completion description#>
-    public func rtmInitialize(prepareConfig: PrepareConfig, tokenConfig: CallTokenConfig?, completion: ((NSError?) -> ())?) {
+    func rtmInitialize(prepareConfig: PrepareConfig, tokenConfig: CallTokenConfig?, completion: ((NSError?) -> ())?) {
         callMessagePrint("_rtmInitialize")
         self.prepareConfig = prepareConfig
         self.tokenConfig = tokenConfig
+        rtmClient.addDelegate(self)
         guard let rtmToken = tokenConfig?.rtmToken else {
             let reason = "RTM Token is Empty"
             completion?(NSError(domain: reason, code: -1))
@@ -292,10 +255,11 @@ extension CallMessageManager {
     }
     
     /// 更新RTM token
-    /// - Parameter rtmToken: <#rtmToken description#>
-    public func renewToken(rtmToken: String) {
+    /// - Parameter tokenConfig: CallTokenConfig
+    public func renewToken(tokenConfig: CallTokenConfig) {
         guard isLoginedRTM else {
             if let prepareConfig = prepareConfig, prepareConfig.autoLoginRTM {
+                //没有登陆成功，但是需要自动登陆，可能是初始token问题，这里重新initialize
                 callMessagePrint("renewToken need to reinit")
                 self.rtmClient.logout()
                 rtmInitialize(prepareConfig: prepareConfig, tokenConfig: tokenConfig) { err in
@@ -303,8 +267,9 @@ extension CallMessageManager {
             }
             return
         }
-        rtmClient?.renewToken(rtmToken,completion: {[weak self] resp, err in
-            self?.callMessagePrint("rtm renewToken: \(err.errorCode.rawValue)")
+        self.tokenConfig = tokenConfig
+        rtmClient?.renewToken(tokenConfig.rtmToken, completion: {[weak self] resp, err in
+            self?.callMessagePrint("rtm renewToken: \(err?.errorCode.rawValue ?? 0)")
         })
     }
     
@@ -331,22 +296,24 @@ extension CallMessageManager {
 
 //MARK: AgoraRtmClientDelegate
 extension CallMessageManager: AgoraRtmClientDelegate {
-    func rtmKit(_ kit: AgoraRtmClientKit, channel channelName: String, connectionStateChanged state: AgoraRtmClientConnectionState, reason: AgoraRtmClientConnectionChangeReason) {
-        callMessagePrint("rtm connectionStateChanged: \(state.rawValue) reason: \(reason.rawValue)")
+    func rtmKit(_ kit: AgoraRtmClientKit, channel channelName: String, connectionChangedToState state: AgoraRtmClientConnectionState, reason: AgoraRtmClientConnectionChangeReason) {
+        callMessagePrint("rtm connectionChangedToState: \(state.rawValue) reason: \(reason.rawValue)")
         if reason == .changedTokenExpired {
-            self.rtmDelegate?.rtmKit?(kit, onTokenPrivilegeWillExpire: nil)
+            self.delegate?.rtmKit?(kit, tokenPrivilegeWillExpire: nil)
+        } else if reason == .changedChangedLost {
+            self.delegate?.onConnectionFail()
         }
     }
     
-    func rtmKit(_ rtmKit: AgoraRtmClientKit, onTokenPrivilegeWillExpire channel: String?) {
+    func rtmKit(_ rtmKit: AgoraRtmClientKit, tokenPrivilegeWillExpire channel: String?) {
         callMessagePrint("rtm onTokenPrivilegeWillExpire[\(channel ?? "nil")]")
-        self.rtmDelegate?.rtmKit?(rtmKit, onTokenPrivilegeWillExpire: channel)
+        self.delegate?.rtmKit?(rtmKit, tokenPrivilegeWillExpire: channel)
     }
     
     //收到RTM消息
-    public func rtmKit(_ rtmKit: AgoraRtmClientKit, on event: AgoraRtmMessageEvent) {
+    public func rtmKit(_ rtmKit: AgoraRtmClientKit, didReceiveMessageEvent event: AgoraRtmMessageEvent) {
         let message = event.message
-        if let data = message.getData() as? Data,
+        if let data = message.rawData,
            let dic = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
             if let messageId = dic[kMessageId] as? Int,
                let receiptsRoomId = dic[kReceiptsRoomIdKey] as? String {
@@ -358,12 +325,13 @@ extension CallMessageManager: AgoraRtmClientDelegate {
             
             callMessagePrint("on event message: \(String(data: data, encoding: .utf8) ?? "")")
         } else {
-            callWarningPrint("on event message parse fail, \(message.getType().rawValue) \(message.getData())")
+            callWarningPrint("on event message parse fail, \(message.rawData?.count ?? 0) )")
         }
         
-        self.rtmDelegate?.rtmKit?(rtmKit, on: event)
+        self.delegate?.rtmKit?(rtmKit, didReceiveMessageEvent: event)
     }
 }
+
 
 extension CallMessageManager {
     private func callMessagePrint(_ message: String) {
@@ -371,7 +339,7 @@ extension CallMessageManager {
         delegate?.debugInfo(message: "\(tag)\(message)")
         #if DEBUG
         if let _ = delegate {return}
-        print("[CallApi]\(tag)\(message)")
+        print("\(formatter.string(from: Date()))[CallApi]\(tag)\(message)")
         #endif
     }
     
@@ -380,7 +348,7 @@ extension CallMessageManager {
         delegate?.debugWarning(message: "\(tag)\(message)")
         #if DEBUG
         if let _ = delegate {return}
-        print("[CallApi][Warning]\(tag)\(message)")
+        print("\(formatter.string(from: Date()))[CallApi][Warning]\(tag)\(message)")
         #endif
     }
 }
