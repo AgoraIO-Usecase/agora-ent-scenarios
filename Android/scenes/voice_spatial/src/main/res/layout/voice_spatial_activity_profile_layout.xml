@@ -35,10 +35,10 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            android:background="@drawable/avatar1"
+            android:background="@mipmap/default_user_avatar"
             android:src="@drawable/voice_bg_oval_black20"
             app:layout_constraintDimensionRatio="1:1"
-            app:shapeAppearance="@style/voice_seat_roundStyle"
+            app:shapeAppearance="@style/ui_widget_roundStyle"
             android:layout_marginStart="20dp"
             android:layout_width="60dp"
             android:layout_height="60dp"/>

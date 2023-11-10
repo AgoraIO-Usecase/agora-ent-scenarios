@@ -10,6 +10,8 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.bumptech.glide.request.RequestOptions;
+
 import java.util.List;
 
 import io.agora.scene.base.GlideApp;
@@ -17,7 +19,6 @@ import io.agora.scene.ktv.singbattle.KTVLogger;
 import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleLayoutGameViewBinding;
 import io.agora.scene.ktv.singbattle.widget.rankList.RankItem;
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
 public class SingBattleGameView extends FrameLayout {
 
@@ -159,8 +160,8 @@ public class SingBattleGameView extends FrameLayout {
         mBinding.ilIDLE.tvBattleResultView.setVisibility(View.VISIBLE);
         GlideApp.with(mBinding.getRoot())
                 .load(headUrl)
-                .error(R.mipmap.userimage)
-                .transform(new CenterCropRoundCornerTransform(100))
+                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                .apply(RequestOptions.circleCropTransform())
                 .into(mBinding.ilIDLE.ivHeader);
         mBinding.ilIDLE.tvBattleResultName.setText(" " + userName + " 抢到麦");
         mBinding.ilIDLE.messageText.setText("");

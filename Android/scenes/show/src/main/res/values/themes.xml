@@ -11,12 +11,6 @@
         <item name="cornerSize">12%</item>
     </style>
 
-    <style name="show_roundStyle_50">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">50%</item>
-    </style>
-
-
     <style name="show_text_input_dialog" parent="Theme.AppCompat.Dialog">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">false</item>

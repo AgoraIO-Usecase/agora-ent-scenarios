@@ -4,12 +4,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
@@ -22,18 +22,16 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.load.Transformation;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.agora.rtc2.Constants;
@@ -49,7 +47,6 @@ import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvActivityRoomLivingBinding;
 import io.agora.scene.ktv.databinding.KtvItemRoomSpeakerBinding;
 import io.agora.scene.ktv.debugSettings.KTVDebugSettingsDialog;
-import io.agora.scene.ktv.live.holder.MicSeatWaveView;
 import io.agora.scene.ktv.live.listener.LrcActionListenerImpl;
 import io.agora.scene.ktv.live.listener.SongActionListenerImpl;
 import io.agora.scene.ktv.service.JoinRoomOutputModel;
@@ -71,7 +68,6 @@ import io.agora.scene.widget.basic.BindingViewHolder;
 import io.agora.scene.widget.dialog.CommonDialog;
 import io.agora.scene.widget.dialog.PermissionLeakDialog;
 import io.agora.scene.widget.dialog.TopFunctionDialog;
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 import io.agora.scene.widget.utils.UiUtils;
 
 /**
@@ -185,8 +181,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         binding.flVideoContainer.removeAllViews();
                         GlideApp.with(binding.getRoot())
                                 .load(item.getHeadUrl())
-                                .error(R.mipmap.userimage)
-                                .transform(new CenterCropRoundCornerTransform(100))
+                                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                                .apply(RequestOptions.circleCropTransform())
                                 .into(binding.avatarItemRoomSpeaker);
                     } else {
                         binding.avatarItemRoomSpeaker.setVisibility(View.INVISIBLE);
@@ -242,7 +238,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         getBinding().tvRoomName.setText(roomLivingViewModel.roomInfoLiveData.getValue().getRoomName());
         GlideApp.with(getBinding().getRoot())
                 .load(roomLivingViewModel.roomInfoLiveData.getValue().getCreatorAvatar())
-                .error(R.mipmap.userimage)
+                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                .apply(RequestOptions.circleCropTransform())
                 .into(getBinding().ivOwnerAvatar);
 
         if (AgoraApplication.the().isDebugModeOpen()) {

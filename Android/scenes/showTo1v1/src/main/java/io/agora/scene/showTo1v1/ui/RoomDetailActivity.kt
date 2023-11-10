@@ -58,7 +58,6 @@ import io.agora.scene.showTo1v1.ui.fragment.DashboardFragment
 import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 import io.agora.scene.widget.utils.StatusBarUtil
 import org.json.JSONException
 import org.json.JSONObject
@@ -693,8 +692,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 binding.tvCallingUid.text = it.userId
                 GlideApp.with(this)
                     .load(it.avatar)
-                    .error(R.mipmap.userimage)
-                    .transform(CenterCropRoundCornerTransform(100))
+                    .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                    .apply(RequestOptions.circleCropTransform())
                     .into(binding.ivCallingAvatar)
             }
         } else {
@@ -710,8 +709,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 binding.tvCallingUid.text = it.userId
                 GlideApp.with(this)
                     .load(it.avatar)
-                    .error(R.mipmap.userimage)
-                    .transform(CenterCropRoundCornerTransform(100))
+                    .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                    .apply(RequestOptions.circleCropTransform())
                     .into(binding.ivCallingAvatar)
             }
         }
@@ -931,8 +930,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     binding.tvCallingUid.text = it.userId
                     GlideApp.with(this)
                         .load(it.avatar)
-                        .error(R.mipmap.userimage)
-                        .transform(CenterCropRoundCornerTransform(100))
+                        .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                        .apply(RequestOptions.circleCropTransform())
                         .into(binding.ivCallingAvatar)
                 }
                 if (mShowTo1v1Manger.mRemoteUser == null) {
@@ -953,8 +952,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     mShowTo1v1Manger.mRemoteUser?.let {
                         GlideApp.with(this)
                             .load(it.avatar)
-                            .error(R.mipmap.userimage)
-                            .transform(CenterCropRoundCornerTransform(100))
+                            .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                            .apply(RequestOptions.circleCropTransform())
                             .into(binding.includeConnectedView.ivUserAvatar)
                         binding.includeConnectedView.tvNickname.text = it.userName
                     }

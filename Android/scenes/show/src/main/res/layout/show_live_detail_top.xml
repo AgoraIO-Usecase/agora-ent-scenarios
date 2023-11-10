@@ -26,7 +26,7 @@
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearance="@style/show_roundStyle_50"
+            app:shapeAppearance="@style/ui_widget_roundStyle"
             app:strokeColor="@android:color/transparent"
             tools:src="@mipmap/portrait01" />
 

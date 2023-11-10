@@ -8,17 +8,19 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+
 import java.util.List;
 
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.manager.UserManager;
+import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvFragmentSongOrderListBinding;
 import io.agora.scene.ktv.databinding.KtvItemChoosedSongListBinding;
 import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
 /**
  * 已点歌单列表
@@ -40,7 +42,7 @@ public final class SongChosenFragment extends BaseViewBindingFragment<KtvFragmen
                 GlideApp.with(binding.ivCover).load(item.imageUrl)
                         .fallback(R.mipmap.ktv_ic_song_default)
                         .error(R.mipmap.ktv_ic_song_default)
-                        .transform(new CenterCropRoundCornerTransform(10))
+                        .transform(new RoundedCorners(UiUtil.dp2px(10)))
                         .into(binding.ivCover);
                 if (position == 0) {
                     binding.tvSing.setVisibility(View.VISIBLE);

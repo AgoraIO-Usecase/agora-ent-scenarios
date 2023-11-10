@@ -22,6 +22,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.Arrays;
@@ -58,7 +59,6 @@ import io.agora.scene.widget.basic.BindingViewHolder;
 import io.agora.scene.widget.dialog.CommonDialog;
 import io.agora.scene.widget.dialog.PermissionLeakDialog;
 import io.agora.scene.widget.dialog.TopFunctionDialog;
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 import io.agora.scene.widget.utils.UiUtils;
 
 /**
@@ -181,8 +181,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
                         binding.flVideoContainer.removeAllViews();
                         GlideApp.with(binding.getRoot())
                                 .load(item.getHeadUrl())
-                                .error(R.mipmap.userimage)
-                                .transform(new CenterCropRoundCornerTransform(100))
+                                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                                .apply(RequestOptions.circleCropTransform())
                                 .into(binding.avatarItemRoomSpeaker);
                     } else {
                         binding.avatarItemRoomSpeaker.setVisibility(View.INVISIBLE);
@@ -242,7 +242,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
         getBinding().tvRoomName.setText(roomLivingViewModel.roomInfoLiveData.getValue().getRoomName());
         GlideApp.with(getBinding().getRoot())
                 .load(roomLivingViewModel.roomInfoLiveData.getValue().getCreatorAvatar())
-                .error(R.mipmap.userimage)
+                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                .apply(RequestOptions.circleCropTransform())
                 .into(getBinding().ivOwnerAvatar);
 
         if (AgoraApplication.the().isDebugModeOpen()) {

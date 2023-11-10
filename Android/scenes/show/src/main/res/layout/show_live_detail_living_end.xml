@@ -47,12 +47,12 @@
         android:id="@+id/ivAvatar"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:src="@mipmap/show_default_avatar"
+        android:src="@mipmap/default_user_avatar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:shapeAppearance="@style/show_roundStyle_50" />
+        app:shapeAppearance="@style/ui_widget_roundStyle" />
 
     <TextView
         android:id="@+id/tvUserName"

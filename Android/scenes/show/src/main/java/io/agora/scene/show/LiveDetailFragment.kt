@@ -11,7 +11,6 @@ import android.util.Log
 import android.util.Size
 import android.view.*
 import android.view.ViewGroup.MarginLayoutParams
-import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
@@ -21,6 +20,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.IMediaPlayerObserver
 import io.agora.mediaplayer.data.PlayerUpdatedInfo
@@ -55,7 +55,6 @@ import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowRoomRequestStatus
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.service.ShowUser
-import io.agora.scene.show.videoLoaderAPI.AnchorState
 import io.agora.scene.show.videoLoaderAPI.OnPageScrollEventHandler
 import io.agora.scene.show.videoLoaderAPI.VideoLoader
 import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
@@ -322,7 +321,7 @@ class LiveDetailFragment : Fragment() {
         livingEndLayout.tvUserName.text = mRoomInfo.ownerName
         Glide.with(this@LiveDetailFragment)
             .load(mRoomInfo.ownerAvatar)
-            .error(R.mipmap.show_default_avatar)
+            .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
             .into(livingEndLayout.ivAvatar)
         livingEndLayout.ivClose.setOnClickListener {
             activity?.finish()
@@ -333,7 +332,8 @@ class LiveDetailFragment : Fragment() {
         val topLayout = mBinding.topLayout
         Glide.with(this)
             .load(mRoomInfo.ownerAvatar)
-            .error(R.mipmap.show_default_avatar)
+            .error(R.mipmap.default_user_avatar)
+            .apply(RequestOptions.circleCropTransform())
             .into(topLayout.ivOwnerAvatar)
         topLayout.tvRoomName.text = mRoomInfo.roomName
         topLayout.tvRoomId.text = getString(R.string.show_room_id, mRoomInfo.roomId)

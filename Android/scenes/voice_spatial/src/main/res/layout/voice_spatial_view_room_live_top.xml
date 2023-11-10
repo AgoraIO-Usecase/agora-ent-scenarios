@@ -37,7 +37,7 @@
                     android:src="@drawable/voice_bg_oval_black20"
                     android:visibility="gone"
                     app:layout_constraintDimensionRatio="1:1"
-                    app:shapeAppearance="@style/voice_seat_roundStyle" />
+                    app:shapeAppearance="@style/ui_widget_roundStyle" />
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/ivChatroomMember2"
@@ -48,7 +48,7 @@
                     android:src="@drawable/voice_bg_oval_black20"
                     android:visibility="gone"
                     app:layout_constraintDimensionRatio="1:1"
-                    app:shapeAppearance="@style/voice_seat_roundStyle" />
+                    app:shapeAppearance="@style/ui_widget_roundStyle" />
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/ivChatroomMember3"
@@ -59,7 +59,7 @@
                     android:src="@drawable/voice_bg_oval_black20"
                     android:visibility="gone"
                     app:layout_constraintDimensionRatio="1:1"
-                    app:shapeAppearance="@style/voice_seat_roundStyle" />
+                    app:shapeAppearance="@style/ui_widget_roundStyle" />
             </LinearLayout>
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -106,7 +106,7 @@
         android:scaleType="centerCrop"
         android:src="@drawable/voice_bg_oval_black20"
         app:layout_constraintDimensionRatio="1:1"
-        app:shapeAppearance="@style/voice_seat_roundStyle"
+        app:shapeAppearance="@style/ui_widget_roundStyle"
         />
 
     <androidx.appcompat.widget.AppCompatTextView

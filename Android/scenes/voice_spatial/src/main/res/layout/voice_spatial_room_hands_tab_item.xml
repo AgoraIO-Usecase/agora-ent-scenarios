@@ -24,7 +24,7 @@
         android:layout_height="3dp"
         android:layout_marginTop="10dp"
         app:layout_constraintDimensionRatio="1:1"
-        app:shapeAppearance="@style/voice_seat_roundStyle"
+        app:shapeAppearance="@style/ui_widget_roundStyle"
         app:layout_constraintEnd_toEndOf="@id/mtTabText"
         app:layout_constraintStart_toStartOf="@id/mtTabText"
         app:layout_constraintTop_toBottomOf="@id/mtTabText" />

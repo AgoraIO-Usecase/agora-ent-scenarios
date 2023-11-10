@@ -3,25 +3,18 @@ package com.agora.entfulldemo.welcome
 import android.content.Context
 import android.text.Spannable
 import android.text.SpannableStringBuilder
-import android.text.TextUtils
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppDialogUserAgreement2Binding
-import com.agora.entfulldemo.databinding.AppDialogUserAgreementBinding
 import com.agora.entfulldemo.home.constructor.URLStatics
-import com.agora.entfulldemo.widget.dp
 import io.agora.scene.base.component.BaseDialog
 import io.agora.scene.base.manager.PagePilotManager
-import io.agora.scene.base.utils.UiUtil
 import io.agora.scene.base.utils.UiUtil.*
 
 class UserAgreementDialog2(context: Context) : BaseDialog<AppDialogUserAgreement2Binding>(context) {
