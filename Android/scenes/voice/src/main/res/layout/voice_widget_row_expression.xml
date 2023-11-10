@@ -10,7 +10,7 @@
         android:id="@+id/iv_expression"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        app:shapeAppearance="@style/voice_seat_roundStyle"
+        app:shapeAppearance="@style/ui_widget_roundStyle"
         android:scaleType="fitCenter" />
 
 </LinearLayout>

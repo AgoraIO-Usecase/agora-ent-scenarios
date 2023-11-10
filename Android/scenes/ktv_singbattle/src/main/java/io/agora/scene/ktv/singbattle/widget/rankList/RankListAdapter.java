@@ -5,12 +5,13 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import com.bumptech.glide.request.RequestOptions;
+
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleItemRankListBinding;
 import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
 public class RankListAdapter extends BindingSingleAdapter<RankItem, KtvSingbattleItemRankListBinding> {
     @Override
@@ -53,8 +54,8 @@ public class RankListAdapter extends BindingSingleAdapter<RankItem, KtvSingbattl
         } else {
             GlideApp.with(mBinding.getRoot())
                     .load(item.poster)
-                    .error(R.mipmap.userimage)
-                    .transform(new CenterCropRoundCornerTransform(100))
+                    .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                    .apply(RequestOptions.circleCropTransform())
                     .into(mBinding.ivHeader);
         }
     }

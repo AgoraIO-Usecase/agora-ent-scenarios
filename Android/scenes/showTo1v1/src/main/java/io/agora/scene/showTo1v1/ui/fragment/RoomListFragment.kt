@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
@@ -28,7 +29,6 @@ import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
 import io.agora.scene.showTo1v1.videoLoaderAPI.OnPageScrollEventHandler
 import io.agora.scene.showTo1v1.videoLoaderAPI.VideoLoader
 import io.agora.scene.widget.utils.BlurTransformation
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 
 class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>() {
 
@@ -109,13 +109,13 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
                 .into(binding.ivBackground)
             GlideApp.with(this)
                 .load(mRoomInfo.avatar)
-                .error(R.mipmap.userimage)
-                .transform(CenterCropRoundCornerTransform(100))
+                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                .apply(RequestOptions.circleCropTransform())
                 .into(binding.ivUserAvatar)
             GlideApp.with(this)
                 .load(currentUser.avatar)
-                .error(R.mipmap.userimage)
-                .transform(CenterCropRoundCornerTransform(100))
+                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                .apply(RequestOptions.circleCropTransform())
                 .into(binding.ivCurrentAvatar)
             Glide.with(this)
                 .asGif()

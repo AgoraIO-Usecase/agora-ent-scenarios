@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
-        app:shapeAppearance="@style/voice_seat_roundStyle"
+        app:shapeAppearance="@style/ui_widget_roundStyle"
         android:layout_width="36dp"
         android:layout_height="36dp"/>
 

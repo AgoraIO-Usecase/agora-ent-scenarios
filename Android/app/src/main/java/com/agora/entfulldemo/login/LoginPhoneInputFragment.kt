@@ -15,14 +15,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppFragmentLoginPhoneInputBinding
-import com.agora.entfulldemo.widget.dp
+import io.agora.scene.base.utils.dp
 import io.agora.scene.base.Constant
 import io.agora.scene.base.component.BaseViewBindingFragment
-import io.agora.scene.base.component.ISingleCallback
 import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.component.OnFastClickListener
-import io.agora.scene.base.manager.PagePilotManager
-import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.StringUtils
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.widget.dialog.SwipeCaptchaDialog
