@@ -13,7 +13,7 @@
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <!-- Status bar color. -->
         <!-- Customize your theme here. -->
-        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
+        <item name="android:statusBarColor" >@android:color/transparent</item>
     </style>
 
     <style name="app_tv_mine_style">

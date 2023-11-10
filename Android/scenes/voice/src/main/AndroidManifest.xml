@@ -25,13 +25,6 @@
             android:windowSoftInputMode="adjustPan" />
 
         <activity
-            android:name="io.agora.scene.voice.ui.activity.VoiceRoomCreateActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/voice_Theme.AgoraScenesChatroom"
-            android:windowSoftInputMode="adjustPan" />
-
-        <activity
             android:name="io.agora.scene.voice.ui.activity.VoiceRoomSoundSelectionActivity"
             android:exported="false"
             android:screenOrientation="portrait"

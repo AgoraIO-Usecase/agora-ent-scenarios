@@ -25,7 +25,7 @@ import io.agora.scene.ktv.singbattle.service.CreateRoomOutputModel
 import io.agora.scene.ktv.singbattle.service.JoinRoomOutputModel
 import java.util.*
 
-class CreateRoomDialog(
+class CreateRoomDialog constructor(
     private val context: Context,
 ): BaseBottomSheetDialogFragment<KtvSingbattleDialogCreateRoomBinding>() {
 

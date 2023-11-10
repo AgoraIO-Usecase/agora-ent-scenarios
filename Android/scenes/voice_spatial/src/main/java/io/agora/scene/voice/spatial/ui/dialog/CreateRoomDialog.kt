@@ -31,7 +31,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
 
-class CreateRoomDialog(
+class CreateRoomDialog constructor(
     private val context: Context,
 ): BaseBottomSheetDialogFragment<VoiceSpatialDialogCreateRoomBinding>(), IParserSource {
 

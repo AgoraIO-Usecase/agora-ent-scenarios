@@ -39,10 +39,6 @@
         </activity>
 
         <activity
-            android:name="io.agora.scene.ktv.create.RoomCreateActivity"
-            android:screenOrientation="portrait" />
-
-        <activity
             android:name="io.agora.scene.ktv.live.RoomLivingActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
