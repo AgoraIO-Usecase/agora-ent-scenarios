@@ -6,15 +6,17 @@ import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.*
 import io.agora.scene.base.AudioModeration
+import io.agora.scene.base.utils.SPUtil
+import io.agora.scene.voice.R
+import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.model.SoundAudioBean
-import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.scene.voice.rtckit.listener.MediaPlayerObserver
 import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
-import io.agora.scene.voice.global.VoiceBuddyFactory
-import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.constant.ConfigConstants
+import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.LogTools.logE
+import io.agora.voice.common.utils.ThreadManager
 
 /**
  * @author create by zhangwei03
@@ -49,6 +51,11 @@ class AgoraRtcEngineController {
         joinCallback: VRValueCallBack<Boolean>
     ) {
         initRtcEngine(context)
+
+        val kAudioSamplingMode = "AUDIO_SAMPLING_MODE"
+        val oboe = SPUtil.getBoolean(kAudioSamplingMode, true)
+        setAudioSamplingOboe(oboe)
+        
         this.joinCallback = joinCallback
         VoiceBuddyFactory.get().rtcChannelTemp.broadcaster = broadcaster
         checkJoinChannel(channelId, rtcUid, soundEffect, broadcaster)
@@ -347,6 +354,14 @@ class AgoraRtcEngineController {
             rtcEngine?.leaveChannel()
             RtcEngineEx.destroy()
             rtcEngine = null
+        }
+    }
+
+    fun setAudioSamplingOboe(isOboe: Boolean) {
+        if (isOboe) { // Oboe
+            rtcEngine?.setParameters("{\"che.audio.oboe.enable\": true}")
+        } else { // java
+            rtcEngine?.setParameters("{\"che.audio.oboe.enable\": false}")
         }
     }
 
