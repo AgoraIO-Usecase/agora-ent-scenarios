@@ -202,7 +202,7 @@
 
         <EditText
             android:id="@+id/text_remote_volume"
-            style="@style/ktvBeautyInputStyle"
+            style="@style/ktvSingbattleBeautyInputStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="15"
