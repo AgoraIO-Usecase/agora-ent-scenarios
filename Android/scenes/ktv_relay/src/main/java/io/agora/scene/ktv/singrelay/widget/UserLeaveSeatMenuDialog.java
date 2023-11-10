@@ -32,7 +32,7 @@ public class UserLeaveSeatMenuDialog extends BaseDialog<KtvRelayDialogUserSeatMe
     public void setAgoraMember(String name, String headUrl) {
         getBinding().tvName.setText(name);
         Glide.with(getContext())
-                .load(headUrl).error(R.mipmap.userimage)
+                .load(headUrl).error(R.mipmap.default_user_avatar)
                 .into(getBinding().ivUser);
     }
 

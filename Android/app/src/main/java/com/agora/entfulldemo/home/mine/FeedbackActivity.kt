@@ -27,11 +27,12 @@ import com.agora.entfulldemo.databinding.AppActivityFeedbackBinding
 import com.agora.entfulldemo.databinding.AppItemFeedbackImageBinding
 import com.agora.entfulldemo.databinding.AppItemFeedbackReasonBinding
 import com.agora.entfulldemo.home.constructor.FeedbackModel
-import com.agora.entfulldemo.widget.dp
+import io.agora.scene.base.utils.dp
 import com.agora.entfulldemo.widget.image.GlideEngine
 import com.agora.entfulldemo.widget.image.ImageFileCompressEngine
 import com.agora.entfulldemo.widget.image.MeOnPreviewInterceptListener
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.luck.picture.lib.basic.IBridgeViewLifecycle
 import com.luck.picture.lib.basic.PictureSelectionModel
 import com.luck.picture.lib.basic.PictureSelector
@@ -52,7 +53,6 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.base.utils.ZipUtils
 import io.agora.scene.base.utils.ZipUtils.ZipCallback
 import io.agora.scene.widget.dialog.PermissionLeakDialog
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 import java.io.File
 import java.util.Collections
 
@@ -540,7 +540,7 @@ class FeedbackImageAdapter constructor(
         } else {
             GlideApp.with(mContext)
                 .load(imagePath)
-                .transform(CenterCropRoundCornerTransform(12.dp.toInt()))
+                .transform(RoundedCorners(12.dp.toInt()))
                 .into(holder.binding.ivImage)
         }
         holder.binding.root.setOnClickListener {
