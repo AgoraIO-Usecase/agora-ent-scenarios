@@ -1,15 +1,15 @@
 package io.agora.scene.show
 
+import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
 import io.agora.rtc2.video.CameraCapturerConfiguration
+import io.agora.rtc2.video.SegmentationProperty
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.show.beauty.IBeautyProcessor
-import io.agora.scene.show.beauty.sensetime.BeautySenseTimeImpl
 import io.agora.scene.show.debugSettings.DebugSettingModel
 import io.agora.scene.show.videoSwitcherAPI.VideoSwitcher
 import java.util.concurrent.Executors
@@ -22,21 +22,13 @@ object RtcEngineInstance {
     val virtualBackgroundSource = VirtualBackgroundSource().apply {
         backgroundSourceType = VirtualBackgroundSource.BACKGROUND_COLOR
     }
+    val virtualBackgroundSegmentation = SegmentationProperty()
     val videoCaptureConfiguration = CameraCapturerConfiguration(CameraCapturerConfiguration.CaptureFormat()).apply {
         followEncodeDimensionRatio = false
     }
     val debugSettingModel = DebugSettingModel().apply { }
 
     private val workingExecutor = Executors.newSingleThreadExecutor()
-
-    private var innerBeautyProcessor: IBeautyProcessor? = null
-    val beautyProcessor: IBeautyProcessor
-        get() {
-            if (innerBeautyProcessor == null) {
-                innerBeautyProcessor = BeautySenseTimeImpl(AgoraApplication.the())
-            }
-            return innerBeautyProcessor!!
-        }
 
     // 万能通用 token ,进入房间列表默认获取万能 token
     private var generalToken: String = ""
@@ -62,6 +54,14 @@ object RtcEngineInstance {
                             "Rtc Error code:$err, msg:" + RtcEngine.getErrorDescription(err)
                         )
                     }
+
+                    override fun onLocalVideoStateChanged(
+                        source: Constants.VideoSourceType?,
+                        state: Int,
+                        error: Int
+                    ) {
+                        super.onLocalVideoStateChanged(source, state, error)
+                    }
                 }
                 innerRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
                     enableVideo()
@@ -79,10 +79,6 @@ object RtcEngineInstance {
         innerRtcEngine?.let {
             workingExecutor.execute { RtcEngineEx.destroy() }
             innerRtcEngine = null
-        }
-        innerBeautyProcessor?.let { processor ->
-            processor.release()
-            innerBeautyProcessor = null
         }
         debugSettingModel.apply {
             pvcEnabled = true

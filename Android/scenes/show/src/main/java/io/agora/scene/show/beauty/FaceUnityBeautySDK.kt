@@ -1,0 +1,303 @@
+package io.agora.scene.show.beauty
+
+import android.content.Context
+import android.text.TextUtils
+import android.util.Log
+import com.faceunity.core.callback.OperateCallback
+import com.faceunity.core.entity.FUBundleData
+import com.faceunity.core.enumeration.FUAITypeEnum
+import com.faceunity.core.faceunity.FUAIKit
+import com.faceunity.core.faceunity.FURenderConfig.OPERATE_SUCCESS_AUTH
+import com.faceunity.core.faceunity.FURenderKit
+import com.faceunity.core.faceunity.FURenderManager
+import com.faceunity.core.model.facebeauty.FaceBeauty
+import com.faceunity.core.model.makeup.SimpleMakeup
+import com.faceunity.core.model.prop.sticker.Sticker
+import com.faceunity.core.utils.FULogger
+import com.faceunity.wrapper.faceunity
+import java.io.File
+
+object FaceUnityBeautySDK {
+
+    private const val TAG = "FaceUnityBeautySDK"
+
+    /* AI道具*/
+    private const val BUNDLE_AI_FACE = "model/ai_face_processor.bundle"
+    private const val BUNDLE_AI_HUMAN = "model/ai_human_processor.bundle"
+
+    // 美颜配置
+    val beautyConfig = BeautyConfig()
+
+    fun initBeauty(context: Context): Boolean {
+        val auth = try {
+            getAuth()
+        } catch (e: Exception) {
+            Log.w(TAG, e)
+            return false
+        } ?: return false
+
+        FURenderManager.setKitDebug(FULogger.LogLevel.TRACE)
+        FURenderManager.setCoreDebug(FULogger.LogLevel.ERROR)
+        FURenderManager.registerFURender(context, auth, object : OperateCallback {
+            override fun onSuccess(code: Int, msg: String) {
+                Log.i(TAG, "FURenderManager onSuccess -- code=$code, msg=$msg")
+                if (code == OPERATE_SUCCESS_AUTH) {
+                    faceunity.fuSetUseTexAsync(1)
+                    FUAIKit.getInstance()
+                        .loadAIProcessor(BUNDLE_AI_FACE, FUAITypeEnum.FUAITYPE_FACEPROCESSOR)
+                    FUAIKit.getInstance().loadAIProcessor(
+                        BUNDLE_AI_HUMAN,
+                        FUAITypeEnum.FUAITYPE_HUMAN_PROCESSOR
+                    )
+                    beautyConfig.resume()
+                }
+            }
+
+            override fun onFail(errCode: Int, errMsg: String) {
+                Log.e(TAG, "FURenderManager onFail -- code=$errCode, msg=$errMsg")
+            }
+        })
+        return true
+    }
+
+    fun unInitBeauty() {
+        beautyConfig.reset()
+        FUAIKit.getInstance().releaseAllAIProcessor()
+        FURenderKit.getInstance().release()
+    }
+
+    private fun getAuth(): ByteArray? {
+        val authpack = Class.forName("io.agora.scene.show.beauty.authpack")
+        val aMethod = authpack.getDeclaredMethod("A")
+        aMethod.isAccessible = true
+        return aMethod.invoke(null) as? ByteArray
+    }
+
+
+    class BeautyConfig {
+
+        private val fuRenderKit = FURenderKit.getInstance()
+
+        // 美颜配置
+        private val faceBeauty =
+            FaceBeauty(FUBundleData("graphics" + File.separator + "face_beautification.bundle"))
+
+        // 资源基础路径
+        private val resourceBase = "beauty_faceunity"
+
+        // 磨皮
+        var smooth = 0.7f
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                faceBeauty.blurIntensity = value * 6.0
+            }
+
+        // 美白
+        var whiten = 0.0f
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                faceBeauty.colorIntensity = value * 2.0
+            }
+
+        // 瘦脸
+        var thinFace = 0.5f
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                faceBeauty.cheekThinningIntensity = value.toDouble()
+            }
+
+        // 大眼
+        var enlargeEye = 0.4f
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                faceBeauty.eyeEnlargingIntensity = value.toDouble()
+            }
+
+        // 红润
+        var redden = 0.3f
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                faceBeauty.redIntensity = value * 2.0
+            }
+
+        // 瘦颧骨
+        var shrinkCheekbone = 0.0f
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                faceBeauty.cheekBonesIntensity = value.toDouble()
+            }
+
+        // 下颌骨
+        var shrinkJawbone = 0.0f
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                faceBeauty.lowerJawIntensity = value.toDouble()
+            }
+
+        // 美牙
+        var whiteTeeth = 0.0f
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                faceBeauty.toothIntensity = value.toDouble()
+            }
+
+        // 额头
+        var hairlineHeight = 0.3f
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                faceBeauty.forHeadIntensity = value.toDouble()
+            }
+
+        // 瘦鼻
+        var narrowNose = 0.5f
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                faceBeauty.noseIntensity = value.toDouble()
+            }
+
+        // 嘴形
+        var mouthSize = 0.5f
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                faceBeauty.mouthIntensity = value.toDouble()
+            }
+
+        // 下巴
+        var chinLength = 0.3f
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                faceBeauty.chinIntensity = value.toDouble()
+            }
+
+        // 亮眼
+        var brightEye = 0.0f
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                faceBeauty.eyeBrightIntensity = value.toDouble()
+            }
+
+        // 祛黑眼圈
+        var darkCircles = 0.0f
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                faceBeauty.removePouchIntensity = value.toDouble()
+            }
+
+        // 祛法令纹
+        var nasolabialFolds = 0.0f
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                faceBeauty.removeLawPatternIntensity = value.toDouble()
+            }
+
+        // 贴纸
+        var sticker: String? = null
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                fuRenderKit.propContainer.removeAllProp()
+                if (!TextUtils.isEmpty(value)) {
+                    val prop = Sticker(FUBundleData("$resourceBase/$sticker"))
+                    fuRenderKit.propContainer.addProp(prop)
+                }
+            }
+
+        // 美妆
+        var makeUp: MakeUpItem? = null
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                if (value == null) {
+                    fuRenderKit.makeup = null
+                } else {
+                    val makeup =
+                        SimpleMakeup(FUBundleData("graphics" + File.separator + "face_makeup.bundle"))
+                    makeup.setCombinedConfig(FUBundleData("$resourceBase/${value.path}"))
+                    makeup.makeupIntensity = value.intensity.toDouble()
+                    fuRenderKit.makeup = makeup
+                }
+            }
+
+
+        internal fun reset() {
+            smooth = 0.7f
+            whiten = 0.2f
+            thinFace = 0.5f
+            enlargeEye = 0.4f
+            redden = 0.3f
+            shrinkCheekbone = 0.0f
+            shrinkJawbone = 0.0f
+            whiteTeeth = 0.0f
+            hairlineHeight = 0.3f
+            narrowNose = 0.5f
+            mouthSize = 0.5f
+            chinLength = 0.3f
+            brightEye = 0.0f
+            darkCircles = 0.0f
+            nasolabialFolds = 0.0f
+
+            makeUp = null
+            sticker = null
+        }
+
+        internal fun resume() {
+            fuRenderKit.faceBeauty = faceBeauty
+        }
+    }
+
+    data class MakeUpItem(
+        val path: String,
+        val intensity: Float
+    )
+
+
+}
