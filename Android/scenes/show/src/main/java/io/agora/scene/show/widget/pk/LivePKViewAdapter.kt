@@ -1,13 +1,14 @@
 package io.agora.scene.show.widget.pk
 
 import android.view.View
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.utils.dp
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLivePkRequestMessageBinding
 import io.agora.scene.show.service.ShowInteractionStatus
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 
 class LivePKViewAdapter: BindingSingleAdapter<LiveRoomConfig, ShowLivePkRequestMessageBinding>() {
     override fun onBindViewHolder(
@@ -21,7 +22,7 @@ class LivePKViewAdapter: BindingSingleAdapter<LiveRoomConfig, ShowLivePkRequestM
         GlideApp.with(binding.coverBoardcasterIcon).load(roomItem.getOwnerAvatar())
             .fallback(R.mipmap.show_default_icon)
             .error(R.mipmap.show_default_icon)
-            .transform(CenterCropRoundCornerTransform(10))
+            .transform(RoundedCorners(10.dp.toInt()))
             .into(binding.coverBoardcasterIcon)
         when (roomItem.getInteractStatus()) {
             ShowInteractionStatus.idle.value -> {

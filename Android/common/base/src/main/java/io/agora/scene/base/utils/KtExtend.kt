@@ -1,4 +1,4 @@
-package com.agora.entfulldemo.widget
+package io.agora.scene.base.utils
 
 import android.content.res.Resources
 import android.util.TypedValue

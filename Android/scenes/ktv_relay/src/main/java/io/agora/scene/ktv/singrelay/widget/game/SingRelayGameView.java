@@ -11,6 +11,8 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.bumptech.glide.request.RequestOptions;
+
 import java.util.List;
 
 import io.agora.scene.base.GlideApp;
@@ -19,7 +21,6 @@ import io.agora.scene.ktv.singrelay.R;
 import io.agora.scene.ktv.singrelay.databinding.KtvRelayLayoutGameViewBinding;
 import io.agora.scene.ktv.singrelay.widget.lrcView.LrcControlView;
 import io.agora.scene.ktv.singrelay.widget.rankList.RankItem;
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
 /**
  * 游戲View
@@ -202,8 +203,8 @@ public class SingRelayGameView extends FrameLayout {
         mBinding.ilActive.lrcControlView.onGraspDisable();
         GlideApp.with(mBinding.getRoot())
                 .load(headUrl)
-                .error(R.mipmap.userimage)
-                .transform(new CenterCropRoundCornerTransform(100))
+                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                .apply(RequestOptions.circleCropTransform())
                 .into(mBinding.ilActive.ivHeader);
         mBinding.ilActive.messageText.setText("");
         mBinding.ilActive.messageText.setVisibility(View.VISIBLE);
@@ -214,8 +215,8 @@ public class SingRelayGameView extends FrameLayout {
 
         GlideApp.with(mBinding.getRoot())
                 .load(headUrl)
-                .error(R.mipmap.userimage)
-                .transform(new CenterCropRoundCornerTransform(100))
+                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                .apply(RequestOptions.circleCropTransform())
                 .into(mBinding.ilActive.ivWinnerHeader);
         mBinding.ilActive.ivWinnerName.setText(getResources().getString(R.string.ktv_relay_next_round_singer, userName));
         mBinding.ilActive.winnerTips.setVisibility(VISIBLE);

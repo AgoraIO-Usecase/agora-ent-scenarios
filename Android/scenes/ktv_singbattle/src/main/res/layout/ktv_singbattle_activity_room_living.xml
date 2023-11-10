@@ -37,7 +37,7 @@
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:shapeAppearance="@style/ktv_singbattle_ui_widget_roundStyle"
+                app:shapeAppearance="@style/ui_widget_roundStyle"
                 app:strokeColor="@android:color/transparent"
                 tools:src="@mipmap/portrait01" />
 
