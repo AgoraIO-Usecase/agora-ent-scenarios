@@ -30,6 +30,7 @@
         <activity
             android:name="io.agora.scene.ktv.sing.create.RoomListActivity"
             android:screenOrientation="portrait"
+            android:theme="@style/def_material_theme"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,10 +38,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name="io.agora.scene.ktv.singrelay.create.RoomCreateActivity"
-            android:screenOrientation="portrait" />
 
         <activity
             android:name="io.agora.scene.ktv.singrelay.live.RoomLivingActivity"

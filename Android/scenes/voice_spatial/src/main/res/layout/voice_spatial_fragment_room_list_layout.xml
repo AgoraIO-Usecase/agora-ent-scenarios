@@ -30,7 +30,7 @@
             android:visibility="gone"
             android:clipChildren="false"
             android:clipToPadding="false"
-            tools:listitem="@layout/voice_item_room_list"
+            tools:listitem="@layout/voice_spatial_item_room_list"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="2"
             tools:visibility="visible"/>
@@ -59,7 +59,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:gravity="center"
-        android:text="@string/voice_chat_room_list_tips"
+        android:text="@string/voice_spatial_chat_room_list_tips"
         android:textColor="@color/def_text_grey_6F7"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
