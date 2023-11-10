@@ -26,6 +26,7 @@ import io.agora.scene.ktv.databinding.ItemRoomListBinding;
 import io.agora.scene.ktv.live.RoomLivingActivity;
 import io.agora.scene.ktv.service.KTVServiceProtocol;
 import io.agora.scene.ktv.service.RoomListModel;
+import io.agora.scene.ktv.widget.AudioSamplingSettingDialog;
 import io.agora.scene.widget.dialog.InputPasswordDialog;
 import io.agora.scene.widget.utils.UiUtils;
 
@@ -82,6 +83,10 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
         getBinding().rvRooms.setAdapter(mAdapter);
         getBinding().smartRefreshLayout.setEnableLoadMore(false);
         setOnApplyWindowInsetsListener(getBinding().getRoot());
+
+        getBinding().titleView.setRightIconClick((view) -> {
+            new AudioSamplingSettingDialog().show(getSupportFragmentManager(), "AudioSamplingSettingDialog");
+        });
     }
 
     @Override

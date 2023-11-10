@@ -25,6 +25,8 @@ class AgoraRtcEngineController {
 
     companion object {
 
+        const val kAudioSamplingMode = "VOICE_AUDIO_SAMPLING_MODE"
+
         @JvmStatic
         fun get() = InstanceHelper.sSingle
 
@@ -51,11 +53,6 @@ class AgoraRtcEngineController {
         joinCallback: VRValueCallBack<Boolean>
     ) {
         initRtcEngine(context)
-
-        val kAudioSamplingMode = "AUDIO_SAMPLING_MODE"
-        val oboe = SPUtil.getBoolean(kAudioSamplingMode, true)
-        setAudioSamplingOboe(oboe)
-        
         this.joinCallback = joinCallback
         VoiceBuddyFactory.get().rtcChannelTemp.broadcaster = broadcaster
         checkJoinChannel(channelId, rtcUid, soundEffect, broadcaster)
@@ -130,6 +127,13 @@ class AgoraRtcEngineController {
                 e.printStackTrace()
                 "voice rtc engine init error:${e.message}".logE(TAG)
                 return false
+            }
+
+            val oboe = SPUtil.getBoolean(kAudioSamplingMode, true)
+            if (oboe) { // Oboe
+                rtcEngine?.setParameters("{\"che.audio.oboe.enable\": true}")
+            } else { // java
+                rtcEngine?.setParameters("{\"che.audio.oboe.enable\": false}")
             }
             return true
         }
@@ -354,14 +358,6 @@ class AgoraRtcEngineController {
             rtcEngine?.leaveChannel()
             RtcEngineEx.destroy()
             rtcEngine = null
-        }
-    }
-
-    fun setAudioSamplingOboe(isOboe: Boolean) {
-        if (isOboe) { // Oboe
-            rtcEngine?.setParameters("{\"che.audio.oboe.enable\": true}")
-        } else { // java
-            rtcEngine?.setParameters("{\"che.audio.oboe.enable\": false}")
         }
     }
 

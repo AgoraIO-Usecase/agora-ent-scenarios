@@ -1,22 +1,18 @@
-package io.agora.scene.voice.ui.dialog
+package io.agora.scene.ktv.widget
 
-import android.app.Dialog
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import io.agora.scene.base.utils.SPUtil
-import io.agora.scene.voice.R
-import io.agora.scene.voice.databinding.VoiceDialogAudioSamplingSettingBinding
-import io.agora.scene.voice.rtckit.AgoraRtcEngineController
-import io.agora.voice.common.ui.dialog.BaseFragmentDialog
+import io.agora.scene.ktv.R
+import io.agora.scene.ktv.databinding.KtvDialogAudioSamplingSettingBinding
+import io.agora.scene.ktv.live.RoomLivingViewModel
 
 class AudioSamplingSettingDialog: DialogFragment() {
 
-    lateinit var binding: VoiceDialogAudioSamplingSettingBinding
+    lateinit var binding: KtvDialogAudioSamplingSettingBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,7 +20,7 @@ class AudioSamplingSettingDialog: DialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = VoiceDialogAudioSamplingSettingBinding.inflate(inflater, container, false)
+        binding = KtvDialogAudioSamplingSettingBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -34,13 +30,14 @@ class AudioSamplingSettingDialog: DialogFragment() {
         binding.btnCancel.setOnClickListener {
             dismiss()
         }
-        val key = AgoraRtcEngineController.kAudioSamplingMode
+        val key = RoomLivingViewModel.kAudioSamplingMode
         val oboe = SPUtil.getBoolean(key, true)
         if (oboe) {
             binding.rgSamplingMode.check(R.id.rbOboe)
         } else {
             binding.rgSamplingMode.check(R.id.rbJava)
         }
+
         binding.rgSamplingMode.setOnCheckedChangeListener { group, checkedId ->
             when (checkedId) {
                 R.id.rbOboe -> {
