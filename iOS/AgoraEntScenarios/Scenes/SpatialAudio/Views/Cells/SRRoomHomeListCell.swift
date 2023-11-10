@@ -44,8 +44,9 @@ class SRRoomHomeListCell: UICollectionViewCell {
         contentView.addSubview(bgImgView)
         
         iconImgView = UIImageView(frame: CGRect(x: (self.bounds.width - 64) * 0.5, y: 20, width: 64, height: 64))
-        iconImgView.layer.cornerRadius = 20
+        iconImgView.layer.cornerRadius = 32
         iconImgView.layer.masksToBounds = true
+        iconImgView.contentMode = .scaleAspectFill
         iconImgView.isUserInteractionEnabled = true
         bgImgView.addSubview(iconImgView)
         
