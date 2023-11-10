@@ -514,13 +514,14 @@ extension RoomListViewController: CallApiListenerProtocol {
             case .rtmLost:
                 callVC.dismiss(animated: false)
                 AUIToast.show(text: "call_toast_disconnect".showTo1v1Localization())
-                if let vc = navigationController?.visibleViewController as? BroadcasterViewController {
-                    guard let roomInfo = vc.roomInfo else { return }
-                    _reinitCalleeAPI(room: roomInfo) { err in 
+                if let vc = navigationController?.visibleViewController as? BroadcasterViewController,
+                   let roomInfo = vc.roomInfo,
+                   roomInfo.uid == userInfo?.uid {
+                    _reinitCalleeAPI(room: roomInfo) { err in
                     }
-                } else {
-                    _reinitCallerAPI { err in
-                    }
+                    return
+                }
+                _reinitCallerAPI { err in
                 }
             default:
                 break
