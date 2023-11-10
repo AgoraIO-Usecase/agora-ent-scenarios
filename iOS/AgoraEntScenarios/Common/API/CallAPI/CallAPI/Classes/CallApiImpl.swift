@@ -50,9 +50,9 @@ public class CallApiImpl: NSObject {
     private var tokenConfig: CallTokenConfig?
     private var messageManager: CallMessageManager?
     private var prepareConfig: PrepareConfig? = nil
-    private var rtmClient: AgoraRtmClientKit? {
+    private var internalRtmClient: AgoraRtmClientKit? {
         didSet {
-            if oldValue == rtmClient { return }
+            if oldValue == internalRtmClient { return }
             oldValue?.logout()
             oldValue?.destroy()
         }
@@ -218,7 +218,7 @@ extension CallApiImpl {
             isPreparing = false
             self.messageManager?.rtmDeinitialize()
             self.messageManager = nil
-            rtmClient = nil
+            internalRtmClient = nil
 //            delegates.removeAllObjects()
         } else if prevState != .idle, state == .prepared {
             _leaveRTC()
@@ -733,8 +733,8 @@ extension CallApiImpl: CallApiProtocol {
         self.tokenConfig = token
         var rtmClient = config.rtmClient
         if rtmClient == nil {
-            self.rtmClient = _createRtmClient(delegate: nil)
-            rtmClient = self.rtmClient
+            self.internalRtmClient = _createRtmClient(delegate: nil)
+            rtmClient = self.internalRtmClient
         }
         self.messageManager = CallMessageManager(config: config, rtmClient: rtmClient!, delegate: self)
         
