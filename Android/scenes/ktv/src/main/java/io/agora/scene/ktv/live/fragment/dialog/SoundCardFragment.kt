@@ -42,28 +42,40 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
 
     private val presetSoundArray: Array<PresetSoundModel> = arrayOf(
         PresetSoundModel(
-            AgoraPresetSound.Uncle, appContext().getString(R.string.ktv_preset_sound_uncle),
-            appContext().getString(R.string.ktv_preset_sound_uncle_tips), io.agora.scene.base.R.mipmap.portrait01
+            AgoraPresetSound.Sound2001,
+            appContext().getString(R.string.ktv_preset_sound_dashu),
+            appContext().getString(R.string.ktv_preset_sound_dashu_tips),
+            R.mipmap.portrait01
         ),
         PresetSoundModel(
-            AgoraPresetSound.Announcer, appContext().getString(R.string.ktv_preset_sound_announcer),
-            appContext().getString(R.string.ktv_preset_sound_announcer_tips), io.agora.scene.base.R.mipmap.portrait01
+            AgoraPresetSound.Sound2002,
+            appContext().getString(R.string.ktv_preset_sound_mum),
+            appContext().getString(R.string.ktv_preset_sound_mum_tips),
+            R.mipmap.portrait01
         ),
         PresetSoundModel(
-            AgoraPresetSound.Oba, appContext().getString(R.string.ktv_preset_sound_oba),
-            appContext().getString(R.string.ktv_preset_sound_oba_tips), io.agora.scene.base.R.mipmap.portrait01
+            AgoraPresetSound.Sound2003,
+            appContext().getString(R.string.ktv_preset_sound_qingshu),
+            appContext().getString(R.string.ktv_preset_sound_qingshu_tips),
+            R.mipmap.portrait01
         ),
         PresetSoundModel(
-            AgoraPresetSound.Lady, appContext().getString(R.string.ktv_preset_sound_lady),
-            appContext().getString(R.string.ktv_preset_sound_lady_tips), io.agora.scene.base.R.mipmap.portrait01
+            AgoraPresetSound.Sound2004,
+            appContext().getString(R.string.ktv_preset_sound_yuma),
+            appContext().getString(R.string.ktv_preset_sound_yuma_tips),
+            R.mipmap.portrait01
         ),
         PresetSoundModel(
-            AgoraPresetSound.Boy, appContext().getString(R.string.ktv_preset_sound_boy),
-            appContext().getString(R.string.ktv_preset_sound_boy_tips), io.agora.scene.base.R.mipmap.portrait01
+            AgoraPresetSound.Sound2005,
+            appContext().getString(R.string.ktv_preset_sound_qingnian),
+            appContext().getString(R.string.ktv_preset_sound_qingnian_tips),
+            R.mipmap.portrait01
         ),
         PresetSoundModel(
-            AgoraPresetSound.Sweet, appContext().getString(R.string.ktv_preset_sound_sweet),
-            appContext().getString(R.string.ktv_preset_sound_sweet_tips), io.agora.scene.base.R.mipmap.portrait01
+            AgoraPresetSound.Sound2006,
+            appContext().getString(R.string.ktv_preset_sound_shaoyu),
+            appContext().getString(R.string.ktv_preset_sound_shaoyu_tips),
+            R.mipmap.portrait01
         )
     )
 
@@ -208,34 +220,29 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
     private fun setupPresetSoundView(presetSound: AgoraPresetSound) {
         binding?.apply {
             when (presetSound) {
-                AgoraPresetSound.Uncle -> {
-                    mtPresetSoundType.setText(R.string.ktv_preset_sound_uncle)
-                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_uncle_tips)
+                AgoraPresetSound.Sound2001 -> {
+                    mtPresetSoundType.setText(R.string.ktv_preset_sound_dashu)
+                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_dashu_tips)
                 }
-
-                AgoraPresetSound.Announcer -> {
-                    mtPresetSoundType.setText(R.string.ktv_preset_sound_announcer)
-                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_announcer_tips)
+                AgoraPresetSound.Sound2002 -> {
+                    mtPresetSoundType.setText(R.string.ktv_preset_sound_mum)
+                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_mum_tips)
                 }
-
-                AgoraPresetSound.Oba -> {
-                    mtPresetSoundType.setText(R.string.ktv_preset_sound_oba)
-                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_oba_tips)
+                AgoraPresetSound.Sound2003 -> {
+                    mtPresetSoundType.setText(R.string.ktv_preset_sound_qingshu)
+                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_qingshu_tips)
                 }
-
-                AgoraPresetSound.Boy -> {
-                    mtPresetSoundType.setText(R.string.ktv_preset_sound_boy)
-                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_boy_tips)
+                AgoraPresetSound.Sound2004 -> {
+                    mtPresetSoundType.setText(R.string.ktv_preset_sound_yuma)
+                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_yuma_tips)
                 }
-
-                AgoraPresetSound.Lady -> {
-                    mtPresetSoundType.setText(R.string.ktv_preset_sound_lady)
-                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_lady_tips)
+                AgoraPresetSound.Sound2005 -> {
+                    mtPresetSoundType.setText(R.string.ktv_preset_sound_qingnian)
+                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_qingnian_tips)
                 }
-
-                AgoraPresetSound.Sweet -> {
-                    mtPresetSoundType.setText(R.string.ktv_preset_sound_sweet)
-                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_sweet_tips)
+                AgoraPresetSound.Sound2006 -> {
+                    mtPresetSoundType.setText(R.string.ktv_preset_sound_shaoyu)
+                    mtPresetSoundTypeTips.setText(R.string.ktv_preset_sound_shaoyu_tips)
                 }
             }
         }

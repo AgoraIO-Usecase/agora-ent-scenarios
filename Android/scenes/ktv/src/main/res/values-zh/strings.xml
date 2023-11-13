@@ -179,4 +179,17 @@
     <string name="ktv_mircrophone_type">麦克风类型</string>
     <string name="ktv_mircrophone_type_tips">选择一套更适合当前麦克风的预设参数</string>
 
+    <string name="ktv_preset_sound_dashu">大叔音</string>
+    <string name="ktv_preset_sound_dashu_tips">男声唱歌1：高混响|KTV</string>
+    <string name="ktv_preset_sound_mum">妈音</string>
+    <string name="ktv_preset_sound_mum_tips">女声唱歌1：高混响|KTV</string>
+    <string name="ktv_preset_sound_qingshu">青叔音</string>
+    <string name="ktv_preset_sound_qingshu_tips">男声唱歌2：明亮 | 磁性</string>
+    <string name="ktv_preset_sound_yuma">御妈音</string>
+    <string name="ktv_preset_sound_yuma_tips">女声唱歌2：明亮 |磁性</string>
+    <string name="ktv_preset_sound_qingnian">青年音</string>
+    <string name="ktv_preset_sound_qingnian_tips">男声唱歌3：低沉 | 温暖</string>
+    <string name="ktv_preset_sound_shaoyu">少御音</string>
+    <string name="ktv_preset_sound_shaoyu_tips">女声唱歌3：醇厚 | 饱满</string>
+
 </resources>
