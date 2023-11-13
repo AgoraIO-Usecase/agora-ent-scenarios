@@ -28,8 +28,8 @@ class CantataSyncManagerServiceImp constructor(
     private val kCollectionIdSeatInfo = "seat_info"
     private val kCollectionIdUser = "userCollection"
 
-    private data class VLLoginModel(
-        val userNo: String,
+    private data class VLLoginModel constructor(
+        val id: String,
         //val isWaitAutoOnSeat: Boolean = false
     )
 
@@ -811,9 +811,9 @@ class CantataSyncManagerServiceImp constructor(
                 item ?: return
                 //将用户信息存在本地列表
                 val userInfo = item.toObject(VLLoginModel::class.java)
-                if (!userMap.containsKey(userInfo?.userNo)) {
-                    userMap[userInfo?.userNo.toString()] = userInfo
-                    objIdOfUserNo[userInfo?.userNo.toString()] = item.id
+                if (!userMap.containsKey(userInfo?.id)) {
+                    userMap[userInfo?.id.toString()] = userInfo
+                    objIdOfUserNo[userInfo?.id.toString()] = item.id
                 }
                 innerUpdateUserCount(userMap.size)
             }
@@ -849,10 +849,10 @@ class CantataSyncManagerServiceImp constructor(
                 val ret = ArrayList<VLLoginModel>()
                 result?.forEach {
                     val obj = it.toObject(VLLoginModel::class.java)
-                    objIdOfUserNo[obj.userNo] = it.id
+                    objIdOfUserNo[obj.id] = it.id
                     ret.add(obj)
 
-                    userMap[obj.userNo] = obj
+                    userMap[obj.id] = obj
                 }
                 innerUpdateUserCount(userMap.count())
                 runOnMainThread { completion.invoke(null, ret) }
@@ -879,7 +879,7 @@ class CantataSyncManagerServiceImp constructor(
     }
 
     private fun innerUpdateUserInfo(user: VLLoginModel, completion: (exception: SyncManagerException?) -> Unit) {
-        val objectId = objIdOfUserNo[user.userNo] ?: return
+        val objectId = objIdOfUserNo[user.id] ?: return
         mSceneReference?.collection(kCollectionIdUser)
             ?.update(objectId, user, object : Callback {
                 override fun onSuccess() {
