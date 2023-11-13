@@ -5,7 +5,8 @@
     <application>
         <activity
             android:name="io.agora.scene.ktv.singrelay.create.RoomListActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/def_material_theme"/>
         <activity
             android:name="io.agora.scene.ktv.singrelay.live.RoomLivingActivity"
             android:launchMode="singleTop"
