@@ -8,6 +8,7 @@ import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.*
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.voice.model.SoundAudioBean
 import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.scene.voice.rtckit.listener.MediaPlayerObserver
@@ -24,6 +25,8 @@ import io.agora.voice.common.utils.LogTools.logE
 class AgoraRtcEngineController {
 
     companion object {
+
+        const val kAudioSamplingMode = "VOICE_AUDIO_SAMPLING_MODE"
 
         @JvmStatic
         fun get() = InstanceHelper.sSingle
@@ -176,6 +179,12 @@ class AgoraRtcEngineController {
                 e.printStackTrace()
                 "voice rtc engine init error:${e.message}".logE(TAG)
                 return false
+            }
+            val oboe = SPUtil.getBoolean(kAudioSamplingMode, true)
+            if (oboe) { // Oboe
+                rtcEngine?.setParameters("{\"che.audio.oboe.enable\": true}")
+            } else { // java
+                rtcEngine?.setParameters("{\"che.audio.oboe.enable\": false}")
             }
             mEarBackManager = AgoraEarBackManager(rtcEngine!!)
             return true

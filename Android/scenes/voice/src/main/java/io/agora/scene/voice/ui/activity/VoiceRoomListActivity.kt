@@ -22,6 +22,7 @@ import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceAgoraRoomListLayoutBinding
 import io.agora.scene.voice.global.VoiceConfigManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
+import io.agora.scene.voice.ui.dialog.AudioSamplingSettingDialog
 import io.agora.scene.voice.ui.fragment.VoiceRoomListFragment
 import io.agora.voice.common.ui.BaseUiActivity
 import io.agora.voice.common.utils.*
@@ -74,6 +75,9 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
         binding.titleBar.setOnBackPressListener{
             finish()
         }
+        binding.titleBar.setRightLayoutClickListener {
+            onClickDecodeSetting()
+        }
         binding.bottomLayout.setOnClickListener {
             if (FastClickTools.isFastClick(it)) return@setOnClickListener
             startActivity(Intent(this@VoiceRoomListActivity, VoiceRoomCreateActivity::class.java))
@@ -94,7 +98,9 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
         binding.avatarLayout.setOnClickListener {
         }
     }
-
+    private fun onClickDecodeSetting() {
+        AudioSamplingSettingDialog().show(supportFragmentManager, "AudioSamplingSettingDialog")
+    }
     private fun onTabLayoutSelected(tab: TabLayout.Tab) {
         tab.customView?.let {
             val tabText = it.findViewById<TextView>(R.id.tab_item_title)

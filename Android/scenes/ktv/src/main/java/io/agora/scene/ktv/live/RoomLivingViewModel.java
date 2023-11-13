@@ -43,6 +43,7 @@ import io.agora.scene.base.TokenGenerator;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.event.NetWorkEvent;
 import io.agora.scene.base.manager.UserManager;
+import io.agora.scene.base.utils.SPUtil;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.KTVLogger;
 import io.agora.scene.ktv.R;
@@ -66,6 +67,7 @@ import io.agora.scene.ktv.widget.lrcView.LrcControlView;
 
 public class RoomLivingViewModel extends ViewModel {
 
+    public static String kAudioSamplingMode = "KTV_AUDIO_SAMPLING_MODE";
     private final String TAG = "KTV_Scene_LOG";
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();
     private final KTVApi ktvApiProtocol = new KTVApiImpl();
@@ -1112,6 +1114,12 @@ public class RoomLivingViewModel extends ViewModel {
         }
         mRtcEngine.loadExtensionProvider("agora_drm_loader");
 
+        boolean oboe = SPUtil.getBoolean(kAudioSamplingMode, true);
+        if (oboe) { // Oboe
+            mRtcEngine.setParameters("{\"che.audio.oboe.enable\": true}");
+        } else { // java
+            mRtcEngine.setParameters("{\"che.audio.oboe.enable\": false}");
+        }
 
         // ------------------ 场景化api初始化 ------------------
         ktvApiProtocol.initialize(new KTVApiConfig(

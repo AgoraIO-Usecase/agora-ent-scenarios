@@ -26,6 +26,7 @@ import io.agora.scene.ktv.databinding.ItemRoomListBinding;
 import io.agora.scene.ktv.live.RoomLivingActivity;
 import io.agora.scene.ktv.service.KTVServiceProtocol;
 import io.agora.scene.ktv.service.RoomListModel;
+import io.agora.scene.ktv.widget.AudioSamplingSettingDialog;
 import io.agora.scene.widget.dialog.InputPasswordDialog;
 import io.agora.scene.widget.utils.UiUtils;
 
@@ -115,6 +116,10 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
                 getBinding().ivBgMobile.setVisibility(View.GONE);
                 getBinding().btnCreateRoom2.setVisibility(View.GONE);
             }
+
+            getBinding().titleView.setRightIconClick((view) -> {
+                new AudioSamplingSettingDialog().show(getSupportFragmentManager(), "AudioSamplingSettingDialog");
+            });
         });
         roomCreateViewModel.joinRoomResult.observe(this, ktvJoinRoomOutputModel -> {
             isJoining = false;

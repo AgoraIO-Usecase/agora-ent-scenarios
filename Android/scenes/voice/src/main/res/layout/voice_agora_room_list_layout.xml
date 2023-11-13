@@ -12,9 +12,11 @@
         android:layout_marginTop="30dp"
         app:layout_constraintTop_toTopOf="parent"
         app:voice_titleBarDisplayHomeAsUpEnabled="true"
-        app:voice_titleBarRightVisible="false"
         app:voice_titleBarTitle="@string/voice_room_list_title_name"
-        app:voice_titleBarTitleTextColor="@color/voice_black" />
+        app:voice_titleBarTitleTextColor="@color/voice_black"
+        app:voice_titleBarRightVisible="true"
+        app:voice_titleBarRightTitle="设置"
+        />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/avatar_layout"
