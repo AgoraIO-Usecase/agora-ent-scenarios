@@ -7,7 +7,6 @@ import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.*
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.utils.SPUtil
-import io.agora.scene.voice.R
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.model.SoundAudioBean
 import io.agora.scene.voice.rtckit.listener.MediaPlayerObserver

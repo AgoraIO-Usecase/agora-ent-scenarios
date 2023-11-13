@@ -13,14 +13,14 @@ object ScenesConstructor {
     @JvmStatic
     fun buildData(context: Context): List<ScenesModel> {
         return mutableListOf(
-            ScenesModel(
-                AgoraScene.ChatRoom,
-                "io.agora.scene.voice.ui.activity.VoiceRoomListActivity",
-                context.getString(R.string.app_voice_chat),
-                R.mipmap.bg_btn_home3,
-                R.mipmap.bg_btn_home_chat,
-                true
-            ),
+//            ScenesModel(
+//                AgoraScene.ChatRoom,
+//                "io.agora.scene.voice.ui.activity.VoiceRoomListActivity",
+//                context.getString(R.string.app_voice_chat),
+//                R.mipmap.bg_btn_home3,
+//                R.mipmap.bg_btn_home_chat,
+//                true
+//            ),
 //            ScenesModel(
 //                AgoraScene.SpatialAudioChatRoom,
 //                "io.agora.scene.voice.spatial.ui.activity.VoiceRoomListActivity",
