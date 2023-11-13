@@ -13,6 +13,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.FileProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.agora.entfulldemo.R
@@ -58,7 +60,11 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setOnApplyWindowInsetsListener(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v: View?, insets: WindowInsetsCompat ->
+            val inset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPaddingRelative(inset.left, inset.top, inset.right, 0)
+            WindowInsetsCompat.CONSUMED
+        }
         activity?.window?.let { window ->
             // 获取根布局可见区域的高度
             val initialWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
