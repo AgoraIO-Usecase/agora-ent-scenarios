@@ -414,6 +414,7 @@ class AgoraRtcEngineController {
         mBgmManager = null
 
         mEarBackManager = null
+        innerSoundCardManager = null
 
         if (mediaPlayer != null) {
             mediaPlayer?.unRegisterPlayerObserver(firstMediaPlayerObserver)

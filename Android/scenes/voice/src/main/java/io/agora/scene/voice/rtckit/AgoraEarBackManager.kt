@@ -1,6 +1,7 @@
 package io.agora.scene.voice.rtckit
 
 import android.util.Log
+import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcEngineEx
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController.Companion.get
 
@@ -81,7 +82,7 @@ class AgoraEarBackManager constructor(
 
     fun updateEnableInEarMonitoring() {
         if (!params.isForbidden && params.isOn) {
-            mRtcEngine.enableInEarMonitoring(true, (1 shl 1) or (1 shl 2))
+            mRtcEngine.enableInEarMonitoring(true, Constants.EAR_MONITORING_FILTER_BUILT_IN_AUDIO_FILTERS or Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION)
         } else {
             mRtcEngine.enableInEarMonitoring(false)
         }
