@@ -36,7 +36,7 @@ class KeyCenter: NSObject {
      进入声网控制台(https://console.agora.io/)，创建一个带证书鉴权的项目，进入项目配置页，即可看到APP证书。
      注意：如果项目没有开启证书鉴权，这个字段留空。
      */
-    static let Certificate: String? = <#YOUR Certificate#>
+    static let Certificate: String? = nil
     /**
      Token.
      Agora provides Temporary Access Token to join the spatial channel with APP ID which enable App Certificate.
@@ -51,7 +51,7 @@ class KeyCenter: NSObject {
 
     static var Token: String? = nil
     
-    static var HostUrl: String = "https://gateway-fulldemo.agoralab.co"
+    static var HostUrl: String = "https://gateway-fulldemo-staging.agoralab.co"
     /**
      EaseMob APPKEY.
      The application name filled in when creating an application on the EaseMob  console.
@@ -94,7 +94,7 @@ class KeyCenter: NSObject {
     static let CloudPlayerKey: String? = nil
     static let CloudPlayerSecret: String? = nil
 
-    static var baseServerUrl: String? = "https://service.agora.io/toolbox/"
+    static var baseServerUrl: String? = "https://service-staging.agora.io/toolbox/"
     static var onlineBaseServerUrl: String? = baseServerUrl
 
 }
