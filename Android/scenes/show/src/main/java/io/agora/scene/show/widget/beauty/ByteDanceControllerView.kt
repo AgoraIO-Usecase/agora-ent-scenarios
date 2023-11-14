@@ -213,14 +213,6 @@ class ByteDanceControllerView : BaseControllerView {
                         onValueChanged = { _ ->
                             beautyConfig.sticker = "huahua"
                         }
-                    ),
-                    ItemInfo(
-                        R.string.show_beauty_item_sticker_wochaotian,
-                        R.mipmap.show_beauty_ic_filter_naiyou,
-                        isSelected = beautyConfig.sticker == "wochaotian",
-                        onValueChanged = { _ ->
-                            beautyConfig.sticker = "wochaotian"
-                        }
                     )
                 )
             )

@@ -124,6 +124,7 @@ object BeautyManager {
                             )
                         )
                         senseTimeBeautyAPI?.enable(enable)
+                        SenseTimeBeautySDK.setBeautyAPI(senseTimeBeautyAPI)
                         mainExecutor.post {
                             videoView?.get()?.let {
                                 senseTimeBeautyAPI?.setupLocalVideo(it, renderMode)
@@ -193,6 +194,7 @@ object BeautyManager {
                             )
                         )
                         byteDanceBeautyAPI?.enable(enable)
+                        ByteDanceBeautySDK.setBeautyAPI(byteDanceBeautyAPI)
                         mainExecutor.post {
                             videoView?.get()?.let {
                                 byteDanceBeautyAPI?.setupLocalVideo(it, renderMode)
@@ -233,6 +235,7 @@ object BeautyManager {
                 senseTimeBeautyAPI?.let {
                     it.release()
                     senseTimeBeautyAPI = null
+                    SenseTimeBeautySDK.setBeautyAPI(null)
                     workerExecutor.execute {
                         SenseTimeBeautySDK.unInitBeautySDK()
                     }
@@ -251,6 +254,7 @@ object BeautyManager {
                 byteDanceBeautyAPI?.let {
                     it.release()
                     byteDanceBeautyAPI = null
+                    ByteDanceBeautySDK.setBeautyAPI(null)
                 }
 
             BeautyType.Agora ->

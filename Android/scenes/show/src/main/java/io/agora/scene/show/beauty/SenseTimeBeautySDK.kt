@@ -3,13 +3,12 @@ package io.agora.scene.show.beauty
 import android.content.Context
 import android.text.TextUtils
 import android.util.Log
-import com.softsugar.stmobile.STCommonNative
 import com.softsugar.stmobile.STMobileAuthentificationNative
 import com.softsugar.stmobile.STMobileEffectNative
 import com.softsugar.stmobile.STMobileEffectParams
 import com.softsugar.stmobile.STMobileHumanActionNative
 import com.softsugar.stmobile.params.STEffectBeautyType
-import com.softsugar.stmobile.params.STHumanActionParamsType
+import io.agora.beautyapi.sensetime.SenseTimeBeautyAPI
 import io.agora.scene.show.utils.FileUtils
 
 object SenseTimeBeautySDK {
@@ -19,25 +18,25 @@ object SenseTimeBeautySDK {
     private val humanActionCreateConfig = 0
 
     private const val MODEL_106 = "models/M_SenseME_Face_Video_Template_p_3.9.0.3.model" // 106
-    private const val MODEL_FACE_EXTRA = "models/M_SenseME_Face_Extra_Advanced_Template_p_2.0.0.model" // 282
-    private const val MODEL_AVATAR_HELP = "models/M_SenseME_Avatar_Help_p_2.3.7.model" // avatar人脸驱动
-    private const val MODEL_LIPS_PARSING = "models/M_SenseME_MouthOcclusion_p_1.3.0.1.model" // 嘴唇分割
-    private const val MODEL_HAND = "models/M_SenseME_Hand_p_6.0.8.1.model" // 手势
-    private const val MODEL_SEGMENT = "models/M_SenseME_Segment_Figure_p_4.14.1.1.model" // 前后背景分割
-    private const val MODEL_SEGMENT_HAIR = "models/M_SenseME_Segment_Hair_p_4.4.0.model" // 头发分割
-    private const val MODEL_FACE_OCCLUSION = "models/M_SenseME_FaceOcclusion_p_1.0.7.1.model" // 妆容遮挡
-    private const val MODEL_SEGMENT_SKY = "models/M_SenseME_Segment_Sky_p_1.1.0.1.model" // 天空分割
+    // private const val MODEL_FACE_EXTRA = "models/M_SenseME_Face_Extra_Advanced_Template_p_2.0.0.model" // 282
+    // private const val MODEL_AVATAR_HELP = "models/M_SenseME_Avatar_Help_p_2.3.7.model" // avatar人脸驱动
+    // private const val MODEL_LIPS_PARSING = "models/M_SenseME_MouthOcclusion_p_1.3.0.1.model" // 嘴唇分割
+    // private const val MODEL_HAND = "models/M_SenseME_Hand_p_6.0.8.1.model" // 手势
+    // private const val MODEL_SEGMENT = "models/M_SenseME_Segment_Figure_p_4.14.1.1.model" // 前后背景分割
+    // private const val MODEL_SEGMENT_HAIR = "models/M_SenseME_Segment_Hair_p_4.4.0.model" // 头发分割
+    // private const val MODEL_FACE_OCCLUSION = "models/M_SenseME_FaceOcclusion_p_1.0.7.1.model" // 妆容遮挡
+    // private const val MODEL_SEGMENT_SKY = "models/M_SenseME_Segment_Sky_p_1.1.0.1.model" // 天空分割
     // private const val MODEL_SEGMENT_SKIN = "models/M_SenseME_Segment_Skin_p_1.0.1.1.model" // 皮肤分割
-    private const val MODEL_3DMESH = "models/M_SenseME_3DMesh_Face2396pt_280kpts_Ear_p_1.1.0v2.model" // 3DMesh
+    // private const val MODEL_3DMESH = "models/M_SenseME_3DMesh_Face2396pt_280kpts_Ear_p_1.1.0v2.model" // 3DMesh
     // private const val MODEL_HEAD_P_EAR = "models/M_SenseME_Ear_p_1.0.1.1.model" // 搭配 mesh 耳朵模型
-    private const val MODEL_360HEAD_INSTANCE = "models/M_SenseME_3Dmesh_360Head2396pt_p_1.0.0.1.model" // 360度人头mesh
-    ///private const val MODEL_FOOT = "models/M_SenseME_Foot_p_2.10.7.model" // 鞋子检测模型
-    //private const val MODEL_PANT = "models/M_SenseME_Segment_Trousers_p_1.1.10.model" // 裤腿的检测
-    private const val MODEL_WRIST = "models/M_SenseME_Wrist_p_1.4.0.model" // 试表
-    private const val MODEL_CLOTH = "models/M_SenseME_Segment_Clothes_p_1.0.2.2.model" // 衣服分割
-    private const val MODEL_HEAD_INSTANCE = "models/M_SenseME_Segment_Head_Instance_p_1.1.0.1.model" // 实例分割版本
+    // private const val MODEL_360HEAD_INSTANCE = "models/M_SenseME_3Dmesh_360Head2396pt_p_1.0.0.1.model" // 360度人头mesh
+    // private const val MODEL_FOOT = "models/M_SenseME_Foot_p_2.10.7.model" // 鞋子检测模型
+    // private const val MODEL_PANT = "models/M_SenseME_Segment_Trousers_p_1.1.10.model" // 裤腿的检测
+    // private const val MODEL_WRIST = "models/M_SenseME_Wrist_p_1.4.0.model" // 试表
+    // private const val MODEL_CLOTH = "models/M_SenseME_Segment_Clothes_p_1.0.2.2.model" // 衣服分割
+    // private const val MODEL_HEAD_INSTANCE = "models/M_SenseME_Segment_Head_Instance_p_1.1.0.1.model" // 实例分割版本
     // private const val MODEL_HEAD_P_INSTANCE = "models/M_SenseME_Head_p_1.3.0.1.model" // 360度人头-头部模型
-    private const val MODEL_NAIL = "models/M_SenseME_Nail_p_2.4.0.model" // 指甲检测
+    // private const val MODEL_NAIL = "models/M_SenseME_Nail_p_2.4.0.model" // 指甲检测
 
     private var stickerPackageId = 0
 
@@ -53,6 +52,8 @@ object SenseTimeBeautySDK {
 
     // 美颜配置
     val beautyConfig = BeautyConfig()
+
+    private var beautyAPI: SenseTimeBeautyAPI? = null
 
     fun initBeautySDK(context: Context): Boolean {
         if (checkLicense(context)) {
@@ -109,55 +110,36 @@ object SenseTimeBeautySDK {
         }
         _humanActionNative = STMobileHumanActionNative()
         val assets = context.assets
-        val result = _humanActionNative?.createInstanceFromAssetFile(
-            "$resourcePath/$MODEL_106",
-            humanActionCreateConfig,
-            assets
-        )
+        val result = _humanActionNative?.createInstanceFromAssetFile("$resourcePath/$MODEL_106", humanActionCreateConfig, assets)
         Log.d(TAG, "SenseTime >> STMobileHumanActionNative create result : $result")
 
         if (result != 0) {
             return
         }
 
-        _humanActionNative?.addSubModelFromAssetFile("$resourcePath/$MODEL_HAND", assets)
-        _humanActionNative?.addSubModelFromAssetFile("$resourcePath/$MODEL_SEGMENT", assets)
-        _humanActionNative?.addSubModelFromAssetFile("$resourcePath/$MODEL_FACE_EXTRA", assets)
-        _humanActionNative?.addSubModelFromAssetFile("$resourcePath/$MODEL_SEGMENT_HAIR", assets)
-        _humanActionNative?.addSubModelFromAssetFile("$resourcePath/$MODEL_LIPS_PARSING", assets)
-        _humanActionNative?.addSubModelFromAssetFile("$resourcePath/$MODEL_FACE_OCCLUSION", assets)
-        _humanActionNative?.addSubModelFromAssetFile("$resourcePath/$MODEL_SEGMENT_SKY", assets)
-        _humanActionNative?.addSubModelFromAssetFile("$resourcePath/$MODEL_AVATAR_HELP", assets)
-        _humanActionNative?.addSubModelFromAssetFile("$resourcePath/$MODEL_3DMESH", assets)
-        _humanActionNative?.addSubModelFromAssetFile("$resourcePath/$MODEL_WRIST", assets)
-        _humanActionNative?.addSubModelFromAssetFile("$resourcePath/$MODEL_CLOTH", assets)
-        _humanActionNative?.addSubModelFromAssetFile("$resourcePath/$MODEL_HEAD_INSTANCE", assets)
-        _humanActionNative?.addSubModelFromAssetFile(
-            "$resourcePath/$MODEL_360HEAD_INSTANCE",
-            assets
-        )
-        _humanActionNative?.addSubModelFromAssetFile("$resourcePath/$MODEL_NAIL", assets)
+        // 其他模型配置
+        // _humanActionNative?.addSubModelFromAssetFile("$resourcePath/$MODEL_FACE_EXTRA", assets)
 
         // 背景分割羽化程度[0,1](默认值0.35),0 完全不羽化,1羽化程度最高,在strenth较小时,羽化程度基本不变.值越大,前景与背景之间的过度边缘部分越宽.
-        _humanActionNative?.setParam(
-            STHumanActionParamsType.ST_HUMAN_ACTION_PARAM_BACKGROUND_BLUR_STRENGTH,
-            0.35f
-        )
+        // _humanActionNative?.setParam(
+        //     STHumanActionParamsType.ST_HUMAN_ACTION_PARAM_BACKGROUND_BLUR_STRENGTH,
+        //     0.35f
+        // )
         // 设置face mesh结果输出坐标系,(0: 屏幕坐标系， 1：3d世界坐标系， 2:3d摄像机坐标系,是摄像头透视投影坐标系, 原点在摄像机 默认是0）
-        _humanActionNative?.setParam(
-            STHumanActionParamsType.ST_HUMAN_ACTION_PARAM_FACE_MESH_OUTPUT_FORMAT,
-            1.0f
-        )
+        // _humanActionNative?.setParam(
+        //     STHumanActionParamsType.ST_HUMAN_ACTION_PARAM_FACE_MESH_OUTPUT_FORMAT,
+        //     1.0f
+        // )
         // 设置mesh渲染模式
-        _humanActionNative?.setParam(
-            STHumanActionParamsType.ST_HUMAN_ACTION_PARAM_MESH_MODE,
-            STCommonNative.MESH_CONFIG.toFloat()
-        )
+        // _humanActionNative?.setParam(
+        //     STHumanActionParamsType.ST_HUMAN_ACTION_PARAM_MESH_MODE,
+        //     STCommonNative.MESH_CONFIG.toFloat()
+        // )
         // 设置人头实例分割
-        _humanActionNative?.setParam(
-            STHumanActionParamsType.ST_HUMAN_ACTION_PARAM_HEAD_SEGMENT_INSTANCE,
-            1.0f
-        )
+        // _humanActionNative?.setParam(
+        //     STHumanActionParamsType.ST_HUMAN_ACTION_PARAM_HEAD_SEGMENT_INSTANCE,
+        //     1.0f
+        // )
     }
 
 
@@ -167,58 +149,74 @@ object SenseTimeBeautySDK {
     }
 
 
+    internal fun setBeautyAPI(beautyAPI: SenseTimeBeautyAPI?){
+        this.beautyAPI = beautyAPI
+    }
+
+    private fun runOnBeautyThread(run: () -> Unit) {
+        beautyAPI?.runOnProcessThread(run) ?: run.invoke()
+    }
+
     open class BeautyConfig {
         // 磨皮
-        var smooth = 0.55f
+        var smooth = 0.75f
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyMode(
-                    STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH,
-                    STEffectBeautyType.SMOOTH2_MODE
-                )
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyMode(
+                        STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH,
+                        STEffectBeautyType.SMOOTH2_MODE
+                    )
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH,
+                        value
+                    )
+                }
             }
 
         // 美白
-        var whiten = 0.2f
+        var whiten = 0.75f
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyMode(
-                    STEffectBeautyType.EFFECT_BEAUTY_BASE_WHITTEN,
-                    STEffectBeautyType.WHITENING3_MODE
-                )
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_BASE_WHITTEN,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyMode(
+                        STEffectBeautyType.EFFECT_BEAUTY_BASE_WHITTEN,
+                        STEffectBeautyType.WHITENING3_MODE
+                    )
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_BASE_WHITTEN,
+                        value
+                    )
+                }
             }
 
         // 瘦脸
-        var thinFace = 0.4f
+        var thinFace = 0.3f
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_THIN_FACE,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_THIN_FACE,
+                        value
+                    )
+                }
             }
 
 
         // 大眼
-        var enlargeEye = 0.3f
+        var enlargeEye = 0.0f
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_RESHAPE_ENLARGE_EYE,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_RESHAPE_ENLARGE_EYE,
+                        value
+                    )
+                }
             }
 
         // 红润
@@ -226,22 +224,26 @@ object SenseTimeBeautySDK {
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_BASE_REDDEN,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_BASE_REDDEN,
+                        value
+                    )
+                }
             }
 
 
         // 瘦颧骨
-        var shrinkCheekbone = 0.0f
+        var shrinkCheekbone = 0.3f
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_SHRINK_CHEEKBONE,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_SHRINK_CHEEKBONE,
+                        value
+                    )
+                }
             }
 
         // 下颌骨
@@ -249,10 +251,12 @@ object SenseTimeBeautySDK {
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_SHRINK_JAWBONE,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_SHRINK_JAWBONE,
+                        value
+                    )
+                }
             }
 
         // 美牙
@@ -260,10 +264,12 @@ object SenseTimeBeautySDK {
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_WHITE_TEETH,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_WHITE_TEETH,
+                        value
+                    )
+                }
             }
 
         // 额头
@@ -271,10 +277,12 @@ object SenseTimeBeautySDK {
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_HAIRLINE_HEIGHT,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_HAIRLINE_HEIGHT,
+                        value
+                    )
+                }
             }
 
         // 瘦鼻
@@ -282,10 +290,12 @@ object SenseTimeBeautySDK {
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_NARROW_NOSE,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_NARROW_NOSE,
+                        value
+                    )
+                }
             }
 
         // 嘴形
@@ -293,10 +303,12 @@ object SenseTimeBeautySDK {
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_MOUTH_SIZE,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_MOUTH_SIZE,
+                        value
+                    )
+                }
             }
 
 
@@ -305,9 +317,11 @@ object SenseTimeBeautySDK {
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_CHIN_LENGTH, value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_CHIN_LENGTH, value
+                    )
+                }
             }
 
         // 亮眼
@@ -315,10 +329,12 @@ object SenseTimeBeautySDK {
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_BRIGHT_EYE,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_BRIGHT_EYE,
+                        value
+                    )
+                }
             }
 
         // 祛黑眼圈
@@ -326,10 +342,12 @@ object SenseTimeBeautySDK {
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_REMOVE_DARK_CIRCLES,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_REMOVE_DARK_CIRCLES,
+                        value
+                    )
+                }
             }
 
         // 祛法令纹
@@ -337,10 +355,12 @@ object SenseTimeBeautySDK {
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_REMOVE_NASOLABIAL_FOLDS,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_REMOVE_NASOLABIAL_FOLDS,
+                        value
+                    )
+                }
             }
 
         // 饱和度
@@ -348,10 +368,12 @@ object SenseTimeBeautySDK {
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_TONE_SATURATION,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_TONE_SATURATION,
+                        value
+                    )
+                }
             }
 
         // 对比度
@@ -359,33 +381,39 @@ object SenseTimeBeautySDK {
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_TONE_CONTRAST,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_TONE_CONTRAST,
+                        value
+                    )
+                }
             }
 
         // 锐化
-        var sharpen = 0.5f
+        var sharpen = 0.0f
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_TONE_SHARPEN,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_TONE_SHARPEN,
+                        value
+                    )
+                }
             }
 
 
         // 清晰度
-        var clear = 1.0f
+        var clear = 0.0f
             set(value) {
                 field = value
                 val effectNative = _mobileEffectNative ?: return
-                effectNative.setBeautyStrength(
-                    STEffectBeautyType.EFFECT_BEAUTY_TONE_CLEAR,
-                    value
-                )
+                runOnBeautyThread {
+                    effectNative.setBeautyStrength(
+                        STEffectBeautyType.EFFECT_BEAUTY_TONE_CLEAR,
+                        value
+                    )
+                }
             }
 
         // 美妆
@@ -415,28 +443,30 @@ object SenseTimeBeautySDK {
         var sticker: StickerItem? = null
             set(value) {
                 field = value
-                if (value == null) {
-                    if (stickerPackageId > 0) {
-                        _mobileEffectNative?.removeEffect(stickerPackageId)
-                        stickerPackageId = 0
+                runOnBeautyThread {
+                    if (value == null) {
+                        if (stickerPackageId > 0) {
+                            _mobileEffectNative?.removeEffect(stickerPackageId)
+                            stickerPackageId = 0
+                        }
+                    } else {
+                        stickerPackageId = _mobileEffectNative?.changePackageFromAssetsFile(
+                            "$resourcePath/${value.path}",
+                            value.context.assets
+                        ) ?: 0
                     }
-                } else {
-                    stickerPackageId = _mobileEffectNative?.changePackageFromAssetsFile(
-                        "$resourcePath/${value.path}",
-                        value.context.assets
-                    ) ?: 0
                 }
             }
 
         internal fun reset() {
-            smooth = 0.55f
-            whiten = 0.2f
-            thinFace = 0.4f
-            enlargeEye = 0.3f
-            sharpen = 0.5f
-            clear = 1.0f
+            smooth = 0.75f
+            whiten = 0.75f
+            thinFace = 0.3f
+            enlargeEye = 0.0f
+            sharpen = 0.0f
+            clear = 0.0f
             redden = 0.0f
-            shrinkCheekbone = 0.0f
+            shrinkCheekbone = 0.3f
             shrinkJawbone = 0.0f
             whiteTeeth = 0.0f
             hairlineHeight = 0.0f

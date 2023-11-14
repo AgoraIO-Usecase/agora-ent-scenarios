@@ -166,20 +166,20 @@ class FaceUnityControllerView : BaseControllerView {
                         }
                     ),
                     ItemInfo(
-                        R.string.show_beauty_item_effect_cwei,
+                        R.string.show_beauty_item_effect_dousha,
                         R.mipmap.show_beauty_ic_effect_cwei,
-                        isSelected = beautyConfig.makeUp?.path == "makeup/chaoa.bundle",
-                        value = if (beautyConfig.makeUp?.path == "makeup/chaoa.bundle") beautyConfig.makeUp?.intensity
+                        isSelected = beautyConfig.makeUp?.path == "makeup/dousha.bundle",
+                        value = if (beautyConfig.makeUp?.path == "makeup/dousha.bundle") beautyConfig.makeUp?.intensity
                             ?: 0.69f else 0.69f,
                         onValueChanged = { value ->
                             beautyConfig.makeUp = FaceUnityBeautySDK.MakeUpItem(
-                                "makeup/chaoa.bundle",
+                                "makeup/dousha.bundle",
                                 value
                             )
                         }
                     ),
                     ItemInfo(
-                        R.string.show_beauty_item_effect_yuanqi,
+                        R.string.show_beauty_item_effect_naicha,
                         R.mipmap.show_beauty_ic_effect_yuanqi,
                         isSelected = beautyConfig.makeUp?.path == "makeup/naicha.bundle",
                         value = if (beautyConfig.makeUp?.path == "makeup/naicha.bundle") beautyConfig.makeUp?.intensity
@@ -205,11 +205,11 @@ class FaceUnityControllerView : BaseControllerView {
                         }
                     ),
                     ItemInfo(
-                        R.string.show_beauty_item_sticker_520,
+                        R.string.show_beauty_item_sticker_sdlu,
                         R.mipmap.show_beauty_ic_filter_naiyou,
-                        isSelected = beautyConfig.sticker == "sticker/fu_zh_fenshu.bundle",
+                        isSelected = beautyConfig.sticker == "sticker/sdlu.bundle",
                         onValueChanged = { _ ->
-                            beautyConfig.sticker = "sticker/fu_zh_fenshu.bundle"
+                            beautyConfig.sticker = "sticker/sdlu.bundle"
                         }
                     )
                 )

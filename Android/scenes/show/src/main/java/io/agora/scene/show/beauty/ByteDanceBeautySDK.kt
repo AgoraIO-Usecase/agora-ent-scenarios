@@ -3,6 +3,7 @@ package io.agora.scene.show.beauty
 import android.content.Context
 import android.util.Log
 import com.effectsar.labcv.effectsdk.RenderManager
+import io.agora.beautyapi.bytedance.ByteDanceBeautyAPI
 import io.agora.scene.show.utils.FileUtils
 import java.io.File
 
@@ -20,12 +21,15 @@ object ByteDanceBeautySDK {
     private var reSharpNodePath = ""
     private var stickerPath = ""
 
+    private val nodesLoaded = mutableListOf<String>()
+
+    private var beautyAPI: ByteDanceBeautyAPI? = null
+
     // 特效句柄
     val renderManager = RenderManager()
 
     // 美颜配置
     val beautyConfig = BeautyConfig()
-
 
 
     fun initBeautySDK(context: Context): Boolean {
@@ -88,12 +92,9 @@ object ByteDanceBeautySDK {
         }
         renderManager.useBuiltinSensor(true)
         renderManager.set3Buffer(false)
+        nodesLoaded.add(beautyNodePath)
         renderManager.appendComposerNodes(
-            arrayOf(
-                beautyNodePath,
-                beauty4ItemsNodePath,
-                reSharpNodePath
-            )
+            nodesLoaded.toTypedArray()
         )
         renderManager.loadResourceWithTimeout(-1)
         beautyConfig.resume()
@@ -101,8 +102,29 @@ object ByteDanceBeautySDK {
 
     // GL Thread
     fun unInitEffect() {
+        nodesLoaded.clear()
         beautyConfig.reset()
         renderManager.release()
+    }
+
+    private fun mayLoadBeauty4ItemsNode() {
+        if (!nodesLoaded.contains(beauty4ItemsNodePath)) {
+            nodesLoaded.add(beauty4ItemsNodePath)
+            renderManager.appendComposerNodes(
+                arrayOf(beauty4ItemsNodePath)
+            )
+            renderManager.loadResourceWithTimeout(-1)
+        }
+    }
+
+    private fun mayLoadReSharpNode() {
+        if (!nodesLoaded.contains(reSharpNodePath)) {
+            nodesLoaded.add(reSharpNodePath)
+            renderManager.appendComposerNodes(
+                arrayOf(reSharpNodePath)
+            )
+            renderManager.loadResourceWithTimeout(-1)
+        }
     }
 
     private fun checkResult(msg: String, ret: Int): Boolean {
@@ -114,111 +136,230 @@ object ByteDanceBeautySDK {
         return true
     }
 
+    internal fun setBeautyAPI(beautyAPI: ByteDanceBeautyAPI?) {
+        this.beautyAPI = beautyAPI
+    }
+
+    private fun runOnBeautyThread(run: () -> Unit) {
+        beautyAPI?.runOnProcessThread(run) ?: run.invoke()
+    }
+
 
     class BeautyConfig {
 
         // 磨皮
-        var smooth = 0.3f
+        var smooth = 0.65f
             set(value) {
                 field = value
-                renderManager.updateComposerNodes(beautyNodePath, "smooth", value)
+                runOnBeautyThread {
+                    renderManager.updateComposerNodes(beautyNodePath, "smooth", value)
+                }
             }
 
         // 美白
         var whiten = 0.5f
             set(value) {
                 field = value
-                renderManager.updateComposerNodes(beautyNodePath, "whiten", value)
+                runOnBeautyThread {
+                    renderManager.updateComposerNodes(beautyNodePath, "whiten", value)
+                }
             }
 
         // 红润
         var redden = 0.0f
             set(value) {
                 field = value
-                renderManager.updateComposerNodes(beautyNodePath, "sharp", value)
+                runOnBeautyThread {
+                    renderManager.updateComposerNodes(beautyNodePath, "sharp", value)
+                }
             }
 
         // 瘦脸
-        var thinFace = 0.15f
+        var thinFace = 0.3f
             set(value) {
                 field = value
-                renderManager.updateComposerNodes(reSharpNodePath, "Internal_Deform_Overall", value)
+                runOnBeautyThread {
+                    if (value > 0) {
+                        mayLoadReSharpNode()
+                    }
+                    renderManager.updateComposerNodes(
+                        reSharpNodePath,
+                        "Internal_Deform_Overall",
+                        value
+                    )
+                }
             }
 
         // 大眼
-        var enlargeEye = 0.15f
+        var enlargeEye = 0.0f
             set(value) {
                 field = value
-                renderManager.updateComposerNodes(reSharpNodePath, "Internal_Deform_Eye", value)
+                runOnBeautyThread {
+                    if (value > 0) {
+                        mayLoadReSharpNode()
+                    }
+                    renderManager.updateComposerNodes(reSharpNodePath, "Internal_Deform_Eye", value)
+                }
             }
 
         // 瘦颧骨
         var shrinkCheekbone = 0.3f
             set(value) {
                 field = value
-                renderManager.updateComposerNodes(reSharpNodePath, "Internal_Deform_Zoom_Cheekbone", value)
+                runOnBeautyThread {
+                    if (value > 0) {
+                        mayLoadReSharpNode()
+                    }
+                    renderManager.updateComposerNodes(
+                        reSharpNodePath,
+                        "Internal_Deform_Zoom_Cheekbone",
+                        value
+                    )
+                }
             }
 
         // 下颌骨
-        var shrinkJawbone = 0.46f
+        var shrinkJawbone = 0.0f
             set(value) {
                 field = value
-                renderManager.updateComposerNodes(reSharpNodePath, "Internal_Deform_Zoom_Jawbone", value)
+                runOnBeautyThread {
+                    if (value > 0) {
+                        mayLoadReSharpNode()
+                    }
+                    renderManager.updateComposerNodes(
+                        reSharpNodePath,
+                        "Internal_Deform_Zoom_Jawbone",
+                        value
+                    )
+                }
             }
+
         // 美牙
-        var whiteTeeth = 0.2f
+        var whiteTeeth = 0.0f
             set(value) {
                 field = value
-                renderManager.updateComposerNodes(reSharpNodePath, "BEF_BEAUTY_WHITEN_TEETH", value)
+                runOnBeautyThread {
+                    if (value > 0) {
+                        mayLoadReSharpNode()
+                    }
+                    renderManager.updateComposerNodes(
+                        reSharpNodePath,
+                        "BEF_BEAUTY_WHITEN_TEETH",
+                        value
+                    )
+                }
             }
 
         // 额头
-        var hairlineHeight = 0.4f
+        var hairlineHeight = 0.0f
             set(value) {
                 field = value
-                renderManager.updateComposerNodes(reSharpNodePath, "Internal_Deform_Forehead", value)
+                runOnBeautyThread {
+                    if (value > 0) {
+                        mayLoadReSharpNode()
+                    }
+                    renderManager.updateComposerNodes(
+                        reSharpNodePath,
+                        "Internal_Deform_Forehead",
+                        value
+                    )
+                }
             }
 
         // 瘦鼻
-        var narrowNose = 0.15f
+        var narrowNose = 0.0f
             set(value) {
                 field = value
-                renderManager.updateComposerNodes(reSharpNodePath, "Internal_Deform_Nose", value)
+                runOnBeautyThread {
+                    if (value > 0) {
+                        mayLoadReSharpNode()
+                    }
+                    renderManager.updateComposerNodes(
+                        reSharpNodePath,
+                        "Internal_Deform_Nose",
+                        value
+                    )
+                }
             }
 
         // 嘴形
-        var mouthSize = 0.16f
+        var mouthSize = 0.0f
             set(value) {
                 field = value
-                renderManager.updateComposerNodes(reSharpNodePath, "Internal_Deform_ZoomMouth", value)
+                runOnBeautyThread {
+                    if (value > 0) {
+                        mayLoadReSharpNode()
+                    }
+                    renderManager.updateComposerNodes(
+                        reSharpNodePath,
+                        "Internal_Deform_ZoomMouth",
+                        value
+                    )
+                }
             }
 
         // 下巴
-        var chinLength = 0.46f
+        var chinLength = 0.0f
             set(value) {
                 field = value
-                renderManager.updateComposerNodes(reSharpNodePath, "Internal_Deform_Chin", value)
+                runOnBeautyThread {
+                    if (value > 0) {
+                        mayLoadReSharpNode()
+                    }
+                    renderManager.updateComposerNodes(
+                        reSharpNodePath,
+                        "Internal_Deform_Chin",
+                        value
+                    )
+                }
             }
 
         // 亮眼
         var brightEye = 0.0f
             set(value) {
                 field = value
-                renderManager.updateComposerNodes(beauty4ItemsNodePath, "BEF_BEAUTY_BRIGHTEN_EYE", value)
+                runOnBeautyThread {
+                    if (value > 0) {
+                        mayLoadBeauty4ItemsNode()
+                    }
+                    renderManager.updateComposerNodes(
+                        beauty4ItemsNodePath,
+                        "BEF_BEAUTY_BRIGHTEN_EYE",
+                        value
+                    )
+                }
             }
 
         // 祛黑眼圈
         var darkCircles = 0.0f
             set(value) {
                 field = value
-                renderManager.updateComposerNodes(beauty4ItemsNodePath, "BEF_BEAUTY_REMOVE_POUCH", value)
+                runOnBeautyThread {
+                    if (value > 0) {
+                        mayLoadBeauty4ItemsNode()
+                    }
+                    renderManager.updateComposerNodes(
+                        beauty4ItemsNodePath,
+                        "BEF_BEAUTY_REMOVE_POUCH",
+                        value
+                    )
+                }
             }
 
         // 祛法令纹
         var nasolabialFolds = 0.0f
             set(value) {
                 field = value
-                renderManager.updateComposerNodes(beauty4ItemsNodePath, "BEF_BEAUTY_SMILES_FOLDS", value)
+                runOnBeautyThread {
+                    if (value > 0) {
+                        mayLoadBeauty4ItemsNode()
+                    }
+                    renderManager.updateComposerNodes(
+                        beauty4ItemsNodePath,
+                        "BEF_BEAUTY_SMILES_FOLDS",
+                        value
+                    )
+                }
             }
 
         // 美妆
@@ -231,9 +372,11 @@ object ByteDanceBeautySDK {
                 field = value
                 if (oMakeUp?.style != value?.style) {
                     if (oMakeUp != null) {
-                        val oNodePath =
-                            "$storagePath/beauty_bytedance/ComposeMakeup.bundle/ComposeMakeup/style_makeup/${oMakeUp.style}"
-                        renderManager.removeComposerNodes(arrayOf(oNodePath))
+                        runOnBeautyThread {
+                            val oNodePath =
+                                "$storagePath/beauty_bytedance/ComposeMakeup.bundle/ComposeMakeup/style_makeup/${oMakeUp.style}"
+                            renderManager.removeComposerNodes(arrayOf(oNodePath))
+                        }
                     }
 
                     if (value != null) {
@@ -244,24 +387,28 @@ object ByteDanceBeautySDK {
                             "$assetsPath/ComposeMakeup.bundle/ComposeMakeup/style_makeup/${value.style}",
                             nodePath
                         )
-                        renderManager.appendComposerNodes(arrayOf(nodePath))
-                        renderManager.loadResourceWithTimeout(-1)
+                        runOnBeautyThread {
+                            renderManager.appendComposerNodes(arrayOf(nodePath))
+                            renderManager.loadResourceWithTimeout(-1)
+                        }
                     }
                 }
 
                 if (value != null) {
                     val nodePath =
                         "$storagePath/beauty_bytedance/ComposeMakeup.bundle/ComposeMakeup/style_makeup/${value.style}"
-                    renderManager.updateComposerNodes(
-                        nodePath,
-                        "Filter_ALL",
-                        value.identity
-                    )
-                    renderManager.updateComposerNodes(
-                        nodePath,
-                        "Makeup_ALL",
-                        value.identity
-                    )
+                    runOnBeautyThread {
+                        renderManager.updateComposerNodes(
+                            nodePath,
+                            "Filter_ALL",
+                            value.identity
+                        )
+                        renderManager.updateComposerNodes(
+                            nodePath,
+                            "Makeup_ALL",
+                            value.identity
+                        )
+                    }
                 }
             }
 
@@ -273,26 +420,28 @@ object ByteDanceBeautySDK {
                     return
                 }
                 field = value
-                if (value != null) {
-                    renderManager.setSticker("$stickerPath/$value")
-                } else {
-                    renderManager.setSticker(null)
+                runOnBeautyThread {
+                    if (value != null) {
+                        renderManager.setSticker("$stickerPath/$value")
+                    } else {
+                        renderManager.setSticker(null)
+                    }
                 }
             }
 
-        internal fun reset(){
-            smooth = 0.3f
+        internal fun reset() {
+            smooth = 0.65f
             whiten = 0.5f
-            thinFace = 0.15f
-            enlargeEye = 0.15f
+            thinFace = 0.3f
+            enlargeEye = 0.0f
             redden = 0.0f
             shrinkCheekbone = 0.3f
-            shrinkJawbone = 0.46f
-            whiteTeeth = 0.2f
-            hairlineHeight = 0.4f
-            narrowNose = 0.15f
-            mouthSize = 0.16f
-            chinLength = 0.46f
+            shrinkJawbone = 0.0f
+            whiteTeeth = 0.0f
+            hairlineHeight = 0.0f
+            narrowNose = 0.0f
+            mouthSize = 0.0f
+            chinLength = 0.0f
             brightEye = 0.0f
             darkCircles = 0.0f
             nasolabialFolds = 0.0f

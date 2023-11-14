@@ -215,31 +215,31 @@ class SenseTimeControllerView : BaseControllerView {
                     }
                 ),
                 ItemInfo(
-                    R.string.show_beauty_item_effect_cwei,
+                    R.string.show_beauty_item_effect_qise,
                     R.mipmap.show_beauty_ic_effect_cwei,
-                    isSelected = SenseTimeBeautySDK.beautyConfig.makeUp?.path == "makeup_lip/6自然.zip",
-                    value = if (SenseTimeBeautySDK.beautyConfig.makeUp?.path == "makeup_lip/6自然.zip")
+                    isSelected = SenseTimeBeautySDK.beautyConfig.makeUp?.path == "style_lightly/qise.zip",
+                    value = if (SenseTimeBeautySDK.beautyConfig.makeUp?.path == "style_lightly/qise.zip")
                         SenseTimeBeautySDK.beautyConfig.makeUp?.strength
                             ?: 0.5f else 0.5f,
                     onValueChanged = { value ->
                         SenseTimeBeautySDK.beautyConfig.makeUp = SenseTimeBeautySDK.MakeUpItem(
                             context,
-                            "makeup_lip/6自然.zip",
+                            "style_lightly/qise.zip",
                             value
                         )
                     }
                 ),
                 ItemInfo(
-                    R.string.show_beauty_item_effect_yuanqi,
+                    R.string.show_beauty_item_effect_wanneng,
                     R.mipmap.show_beauty_ic_effect_yuanqi,
-                    isSelected = SenseTimeBeautySDK.beautyConfig.makeUp?.path == "makeup_lip/12自然.zip",
-                    value = if (SenseTimeBeautySDK.beautyConfig.makeUp?.path == "makeup_lip/12自然.zip")
+                    isSelected = SenseTimeBeautySDK.beautyConfig.makeUp?.path == "style_lightly/wanneng.zip",
+                    value = if (SenseTimeBeautySDK.beautyConfig.makeUp?.path == "style_lightly/wanneng.zip")
                         SenseTimeBeautySDK.beautyConfig.makeUp?.strength
                             ?: 0.5f else 0.5f,
                     onValueChanged = { value ->
                         SenseTimeBeautySDK.beautyConfig.makeUp = SenseTimeBeautySDK.MakeUpItem(
                             context,
-                            "makeup_lip/12自然.zip",
+                            "style_lightly/wanneng.zip",
                             value
                         )
                     }
