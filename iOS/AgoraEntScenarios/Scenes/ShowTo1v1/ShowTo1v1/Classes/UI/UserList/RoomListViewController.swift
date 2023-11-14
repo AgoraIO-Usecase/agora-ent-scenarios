@@ -175,7 +175,7 @@ extension RoomListViewController {
             guard let self = self else {return}
             guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue],
                   let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
-                debugInfo("renewTokens fail")
+                self.debugInfo("renewTokens fail")
                 completion?(false)
                 return
             }
@@ -185,7 +185,7 @@ extension RoomListViewController {
                 info.token = rtcToken
             }
             self.listView.roomList = self.listView.roomList
-            debugInfo("renewTokens success")
+            self.debugInfo("renewTokens success")
             completion?(true)
         }
     }
