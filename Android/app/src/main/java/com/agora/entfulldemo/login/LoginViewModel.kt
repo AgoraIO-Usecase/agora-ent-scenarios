@@ -1,6 +1,5 @@
 package com.agora.entfulldemo.login
 
-import androidx.lifecycle.MutableLiveData
 import com.agora.entfulldemo.R
 import io.agora.scene.base.Constant
 import io.agora.scene.base.api.ApiException
