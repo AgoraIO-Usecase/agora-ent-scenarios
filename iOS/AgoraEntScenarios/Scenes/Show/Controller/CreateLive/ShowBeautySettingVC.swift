@@ -10,18 +10,18 @@ import JXCategoryView
 
 enum ShowBeautyFaceVCType: CaseIterable {
     case beauty
-//    case filter
     case style
     case adjust
+    case animoj
     case sticker
     case background
     
     var title: String {
         switch self {
         case .beauty: return "create_beauty_setting_beauty_face".show_localized
-//        case .filter: return "create_beauty_setting_filter".show_localized
         case .style: return "create_beauty_setting_special_effects".show_localized
         case .adjust: return "create_beauty_setting_special_adjust".show_localized
+        case .animoj: return "create_beauty_setting_special_animoji".show_localized
         case .sticker: return "create_beauty_setting_sticker".show_localized
         case .background: return "背景".show_localized
         }
@@ -33,14 +33,38 @@ class ShowBeautySettingVC: UIViewController {
     var selectedItem: ((_ item: String)->())?
     var dismissed: (()->())?
     
-    private var slider: UISlider!
-    private let titles = ShowBeautyFaceVCType.allCases.filter({
-        if BeautyModel.beautyType == .byte {
-            return $0 != .adjust
-        }
-        return true
-    }).map({ $0.title })
-    private let vcs = ShowBeautyFaceVCType.allCases.map({ ShowBeautyFaceVC(type: $0) })
+    private lazy var slider: UISlider = {
+       let slider = UISlider()
+        slider.minimumTrackTintColor = .show_zi03
+        slider.maximumTrackTintColor = .show_slider_tint
+        slider.addTarget(self, action: #selector(onTapSliderHandler(sender:)), for: .valueChanged)
+        return slider
+    }()
+    private lazy var sliderLabel: UILabel = {
+        let label = UILabel()
+        label.text = ""
+        label.textColor = UIColor(hex: "#FFFFFF", alpha: 1.0)
+        label.font = .systemFont(ofSize: 12)
+        label.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        label.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    private var sliderLabelCenterCons: NSLayoutConstraint?
+    private var titles: [String] {
+        ShowBeautyFaceVCType.allCases.filter({
+            if BeautyModel.beautyType == .byte {
+                return $0 != .adjust && $0 != .animoj
+            } else if BeautyModel.beautyType == .fu {
+                return $0 != .adjust
+            } else if BeautyModel.beautyType == .agora {
+                return $0 != .adjust && $0 != .animoj && $0 != .sticker && $0 != .style
+            } else {
+                return $0 != .animoj
+            }
+        }).map({ $0.title })
+    }
+    private var vcs: [ShowBeautyFaceVC] = []
     
     // 背景
     private lazy var bgView: UIView = {
@@ -105,6 +129,43 @@ class ShowBeautySettingVC: UIViewController {
         segmentedView.indicators = [self.indicator]
         return segmentedView
     }()
+    
+    private lazy var beautyVenderButton: LLButton = {
+        let button = LLButton()
+        button.setTitleColor(UIColor(hex: "#FFFFFF", alpha: 0.6), for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 14)
+        button.setTitle(BeautyModel.beautyType.title, for: .normal)
+        button.backgroundColor = UIColor(hex: "#18191B", alpha: 0.4)
+        let image = UIImage.sceneImage(name: "show_beauty_vernder_arrow_right") ?? UIImage()
+        button.setImage(image, for: .normal)
+        button.cornerRadius(8)
+        button.imageAlignment = .right
+        button.spaceBetweenTitleAndImage = 5
+        button.addTarget(self, action: #selector(onClickBeautyVenderButton(sender:)), for: .touchUpInside)
+        button.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        button.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    private lazy var beautyVenderView: ShowBeautyVenderView = {
+        let view = ShowBeautyVenderView()
+        view.onSelectedBeautyVenderClosure = { [weak self] type in
+            guard let self = self else { return }
+            self.beautyVenderButton.setTitle(type.title, for: .normal)
+            BeautyManager.shareManager.destroy(isAll: false)
+            BeautyModel.beautyType = type
+            ShowBeautyFaceVC.resetData()
+            BeautyManager.shareManager.updateBeautyRedner()
+            self.vcs = self.createBeautyVC()
+            self.segmentedView.titles = self.titles
+            self.segmentedView.reloadData()
+            self.segmentedView.selectItem(at: 0)
+            self.onClickBeautyVenderButton(sender: self.beautyVenderButton)
+        }
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    private var beautyVenderViewH: NSLayoutConstraint?
         
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -121,11 +182,13 @@ class ShowBeautySettingVC: UIViewController {
             beautyFaceVC?.selectedItemClosure = { [weak self] value, isHiddenValue, isShowSegSwitch in
                 guard let self = self else { return }
                 self.slider.isHidden = isShowSegSwitch ? !ShowAgoraKitManager.isOpenGreen : isHiddenValue
+                self.sliderLabel.isHidden = self.slider.isHidden
                 self.compareButton.isHidden = isShowSegSwitch ? true : isHiddenValue
                 self.segSwitch.isHidden = !isShowSegSwitch
                 self.segSwitch.isOn = isShowSegSwitch == false ? ShowAgoraKitManager.isOpenGreen : self.segSwitch.isOn
                 self.segLabel.isHidden = !isShowSegSwitch
                 self.slider.setValue(Float(value), animated: true)
+                self.updateSliderLabelPostion()
             }
             beautyFaceVC?.reloadData()
         }
@@ -134,17 +197,28 @@ class ShowBeautySettingVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        vcs = createBeautyVC()
         beautyFaceVC = vcs.first
+    }
+    
+    private func createBeautyVC() -> [ShowBeautyFaceVC] {
+        ShowBeautyFaceVCType.allCases.filter({
+            if BeautyModel.beautyType == .byte {
+                return $0 != .adjust && $0 != .animoj
+            } else if BeautyModel.beautyType == .fu {
+                return $0 != .adjust
+            } else if BeautyModel.beautyType == .agora {
+                return $0 != .adjust && $0 != .animoj && $0 != .sticker && $0 != .style
+            } else {
+                return $0 != .animoj
+            }
+        }).map({ ShowBeautyFaceVC(type: $0) })
     }
 
     private func setupUI(){
         view.backgroundColor = .clear
         
         // slider
-        slider = UISlider()
-        slider.minimumTrackTintColor = .show_zi03
-        slider.maximumTrackTintColor = .show_slider_tint
-        slider.addTarget(self, action: #selector(onTapSliderHandler(sender:)), for: .valueChanged)
         view.addSubview(slider)
         slider.snp.makeConstraints { make in
             make.left.equalTo(22)
@@ -152,6 +226,10 @@ class ShowBeautySettingVC: UIViewController {
             make.height.equalTo(30)
             make.bottom.equalTo(-214)
         }
+        view.addSubview(sliderLabel)
+        sliderLabel.bottomAnchor.constraint(equalTo: slider.topAnchor, constant: -3).isActive = true
+        sliderLabel.heightAnchor.constraint(equalToConstant: 17).isActive = true
+        sliderLabelCenterCons = sliderLabel.centerXAnchor.constraint(equalTo: slider.leadingAnchor)
         
         // 对比按钮
         view.addSubview(compareButton)
@@ -160,6 +238,19 @@ class ShowBeautySettingVC: UIViewController {
             make.right.equalTo(-20)
             make.width.height.equalTo(36)
         }
+        
+        view.addSubview(beautyVenderButton)
+        beautyVenderButton.leadingAnchor.constraint(equalTo: slider.leadingAnchor).isActive = true
+        beautyVenderButton.bottomAnchor.constraint(equalTo: sliderLabel.topAnchor, constant: -5).isActive = true
+        beautyVenderButton.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        beautyVenderButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        
+        view.addSubview(beautyVenderView)
+        beautyVenderView.leadingAnchor.constraint(equalTo: beautyVenderButton.leadingAnchor).isActive = true
+        beautyVenderView.bottomAnchor.constraint(equalTo: beautyVenderButton.topAnchor).isActive = true
+        beautyVenderView.trailingAnchor.constraint(equalTo: beautyVenderButton.trailingAnchor).isActive = true
+        beautyVenderViewH = beautyVenderView.heightAnchor.constraint(equalToConstant: 0)
+        beautyVenderViewH?.isActive = true
         
         view.addSubview(segSwitch)
         segSwitch.snp.makeConstraints { make in
@@ -205,6 +296,15 @@ class ShowBeautySettingVC: UIViewController {
     @objc
     private func onTapSliderHandler(sender: UISlider) {
         beautyFaceVC?.changeValueHandler(value: CGFloat(sender.value))
+        updateSliderLabelPostion()
+    }
+    
+    private func updateSliderLabelPostion() {
+        sliderLabel.text = "\(Int(slider.value * 100))"
+        let trackRect = slider.trackRect(forBounds: slider.bounds)
+        let thumbRect = slider.thumbRect(forBounds: slider.bounds, trackRect: trackRect, value: slider.value)
+        sliderLabelCenterCons?.constant = thumbRect.midX
+        sliderLabelCenterCons?.isActive = true
     }
     
     @objc
@@ -212,6 +312,7 @@ class ShowBeautySettingVC: UIViewController {
         func realChange(isOn: Bool){
             ShowAgoraKitManager.isOpenGreen = isOn
             slider.isHidden = !isOn
+            sliderLabel.isHidden = slider.isHidden
             if ShowAgoraKitManager.isBlur {
                 ShowAgoraKitManager.shared.enableVirtualBackground(isOn: true,
                                                                    greenCapacity: slider.value)
@@ -231,6 +332,18 @@ class ShowBeautySettingVC: UIViewController {
             realChange(isOn: sender.isOn)
         }
     }
+    
+    @objc
+    private func onClickBeautyVenderButton(sender: UIButton) {
+        sender.isSelected = !sender.isSelected
+        beautyVenderViewH?.constant = sender.isSelected ? CGFloat(40 * BeautyFactoryType.allCases.count) : 0
+        beautyVenderViewH?.isActive = true
+        beautyVenderButton.layer.maskedCorners = sender.isSelected ? [.layerMinXMaxYCorner, .layerMaxXMaxYCorner] : [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        UIView.animate(withDuration: 0.25) {
+            self.view.layoutIfNeeded()
+            sender.imageView?.transform = sender.isSelected ? .init(rotationAngle: -.pi / 2) : .identity
+        }
+    }
 }
 
 extension ShowBeautySettingVC {
@@ -242,13 +355,15 @@ extension ShowBeautySettingVC {
     
     // 点击对比按钮
     @objc private func didClickCompareButton(sender: UIButton){
-        if let _ = Bundle.main.path(forResource: "SENSEME.lic", ofType: nil) {
-            // 存在美颜证书
+        // 判断存在美颜证书
+        if BeautyManager.shareManager.checkLicense() {
             sender.isSelected = !sender.isSelected
             BeautyManager.shareManager.isEnableBeauty = sender.isSelected
         } else {
             ToastView.show(text: "show_beauty_license_disable".show_localized)
         }
+        slider.isHidden = !sender.isSelected
+        sliderLabel.isHidden = slider.isHidden
     }
 }
 
@@ -271,5 +386,46 @@ extension ShowBeautySettingVC: JXCategoryListContainerViewDelegate {
     func listContainerView(_ listContainerView: JXCategoryListContainerView?,
                            initListFor index: Int) -> JXCategoryListContentViewDelegate? {
         vcs[index]
+    }
+}
+
+enum LLImageAlignment: NSInteger {
+    case left = 0
+    case top
+    case bottom
+    case right
+}
+class LLButton: UIButton {
+    var imageAlignment: LLImageAlignment = .left
+    var spaceBetweenTitleAndImage: CGFloat = 0
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let space: CGFloat = spaceBetweenTitleAndImage
+        let titleW: CGFloat = titleLabel?.bounds.width ?? 0
+        let titleH: CGFloat = titleLabel?.bounds.height ?? 0
+        let imageW: CGFloat = imageView?.bounds.width ?? 0
+        let imageH: CGFloat = imageView?.bounds.height ?? 0
+        let btnCenterX: CGFloat = bounds.width / 2
+        let imageCenterX: CGFloat = btnCenterX - titleW / 2
+        let titleCenterX = btnCenterX + imageW / 2
+        
+        switch imageAlignment {
+        case .top:
+            titleEdgeInsets = UIEdgeInsets(top: imageH / 2 + space / 2, left: -(titleCenterX - btnCenterX), bottom: -(imageH/2 + space/2), right: titleCenterX-btnCenterX)
+            imageEdgeInsets = UIEdgeInsets(top: -(titleH / 2 + space / 2), left: btnCenterX - imageCenterX, bottom: titleH / 2 + space / 2, right: -(btnCenterX - imageCenterX))
+            
+        case .left:
+            titleEdgeInsets = UIEdgeInsets(top: 0, left: space / 2, bottom: 0, right: -space / 2)
+            imageEdgeInsets = UIEdgeInsets(top: 0, left: -space / 2, bottom: 0, right: space)
+            
+        case .bottom:
+            titleEdgeInsets = UIEdgeInsets(top: -(imageH / 2 + space / 2), left: -(titleCenterX - btnCenterX), bottom: imageH / 2 + space / 2, right: titleCenterX - btnCenterX)
+            imageEdgeInsets = UIEdgeInsets(top: titleH / 2 + space / 2, left: btnCenterX - imageCenterX,bottom: -(titleH / 2 + space / 2), right: -(btnCenterX - imageCenterX))
+            
+        case .right:
+            titleEdgeInsets = UIEdgeInsets(top: 0, left: -(imageW + space / 2), bottom: 0, right: imageW + space / 2)
+            imageEdgeInsets = UIEdgeInsets(top: 0, left: titleW + space / 2, bottom: 0, right: -(titleW + space / 2))
+        }
     }
 }
