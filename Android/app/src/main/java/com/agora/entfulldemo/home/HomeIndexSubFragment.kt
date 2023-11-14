@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppFragmentHomeIndexSubBinding
 import com.agora.entfulldemo.databinding.AppItemHomeIndexSubBinding
@@ -58,7 +57,7 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
         val scenesModels = ScenesConstructor.buildScene(cxt, mHomeScenesType)
         val homeIndexAdapter = BaseRecyclerViewAdapter(scenesModels, object : OnItemClickListener<HomeSceneModel?> {
             override fun onItemClick(scenesModel: HomeSceneModel, view: View, position: Int, viewType: Long) {
-                if (UiUtils.isFastClick(2000)) return
+                if (UiUtils.isFastClick(1000)) return
                 if (scenesModel.active) {
                     reportEnter(scenesModel)
                     UserManager.getInstance().user?.let { user ->

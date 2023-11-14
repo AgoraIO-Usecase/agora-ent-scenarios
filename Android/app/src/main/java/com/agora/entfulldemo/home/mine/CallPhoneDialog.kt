@@ -1,12 +1,10 @@
 package com.agora.entfulldemo.home.mine
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.isVisible
 import com.agora.entfulldemo.databinding.AppDialogCallPhoneBinding
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
-import io.agora.scene.base.component.BaseDialog
 
 class CallPhoneDialog constructor() : BaseBottomSheetDialogFragment<AppDialogCallPhoneBinding>() {
 

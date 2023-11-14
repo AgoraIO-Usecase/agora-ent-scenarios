@@ -12,7 +12,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppFragmentHomeIndexBinding
 import com.agora.entfulldemo.home.constructor.HomeScenesType

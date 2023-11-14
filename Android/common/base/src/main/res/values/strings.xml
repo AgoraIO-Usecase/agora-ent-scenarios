@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-    <string name="try_again_to_exit">Press again to exit the app</string>
-    <string name="permission_leak_tip">Appropriate permissions are required, please open</string>
+    <string name="try_again_to_exit">再按一次退出应用</string>
+    <string name="permission_leak_tip">需要相应权限，请打开</string>
     <string name="id_is_">ID:%s</string>
 </resources>

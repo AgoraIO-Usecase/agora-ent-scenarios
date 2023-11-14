@@ -49,7 +49,7 @@
                         android:background="@null"
                         android:gravity="center"
                         android:imeOptions="actionDone"
-                        android:inputType="text"
+                        android:inputType="textNoSuggestions"
                         android:maxLength="10"
                         android:textColor="@color/def_text_color_040"
                         android:textSize="18sp"
