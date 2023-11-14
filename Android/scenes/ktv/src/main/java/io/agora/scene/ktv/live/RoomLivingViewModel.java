@@ -1871,6 +1871,7 @@ public class RoomLivingViewModel extends ViewModel {
 
     public void resetAudioPreset() {
         KTVLogger.d(TAG, "resetAudioPreset: " + audioPreset);
+        if (mRtcEngine == null || mSetting == null) return;
         mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF);
         mSetting.updateEffect(AUDIO_EFFECT_OFF);
     }
