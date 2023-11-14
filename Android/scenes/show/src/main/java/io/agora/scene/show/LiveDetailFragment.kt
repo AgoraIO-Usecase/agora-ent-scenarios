@@ -2306,10 +2306,8 @@ class LiveDetailFragment : Fragment() {
 
         // 停止推流，使用updateChannelMediaOptionEx
         val mediaOptions = ChannelMediaOptions()
-        if (mediaOptions.isPublishMediaPlayerAudioTrack) {
-            mediaOptions.publishMediaPlayerAudioTrack = false
-            mRtcEngine.updateChannelMediaOptionsEx(mediaOptions, mMainRtcConnection)
-        }
+        mediaOptions.publishMediaPlayerAudioTrack = false
+        mRtcEngine.updateChannelMediaOptionsEx(mediaOptions, mMainRtcConnection)
     }
 
     private fun adjustAudioMixingVolume(volume: Int) {
