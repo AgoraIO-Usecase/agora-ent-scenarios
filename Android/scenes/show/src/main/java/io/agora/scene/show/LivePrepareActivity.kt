@@ -101,32 +101,33 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 showPresetDialog()
             }
         }
-        mBeautyProcessor.initialize(
-            rtcEngine = mRtcEngine,
-            captureMode = CaptureMode.Agora,
-            statsEnable = true,
-            eventCallback = object : IEventCallback {
-                override fun onBeautyStats(stats: BeautyStats) {
-                }
-            }
-        )
-        // 低端机 或 无证书则关闭美颜
-        if (mRtcEngine.queryDeviceScore() >= 75) {
-            mBeautyProcessor.setBeautyEnable(true)
-        } else {
-            mBeautyProcessor.setBeautyEnable(false)
-        }
-        mBeautyProcessor.getSenseTimeBeautyAPI().setupLocalVideo(SurfaceView(this).apply {
-            binding.flVideoContainer.addView(this)
-        }, Constants.RENDER_MODE_HIDDEN)
 
         toggleVideoRun = Runnable {
+            mBeautyProcessor.initialize(
+                rtcEngine = mRtcEngine,
+                captureMode = CaptureMode.Agora,
+                statsEnable = true,
+                eventCallback = object : IEventCallback {
+                    override fun onBeautyStats(stats: BeautyStats) {
+                    }
+                }
+            )
+            // 低端机 或 无证书则关闭美颜
+            if (mRtcEngine.queryDeviceScore() >= 75) {
+                mBeautyProcessor.setBeautyEnable(true)
+            } else {
+                mBeautyProcessor.setBeautyEnable(false)
+            }
+            binding.flVideoContainer.post {
+                mBeautyProcessor.getSenseTimeBeautyAPI().setupLocalVideo(SurfaceView(this).apply {
+                    binding.flVideoContainer.addView(this)
+                }, Constants.RENDER_MODE_HIDDEN)
+            }
             mBeautyProcessor.reset()
             initRtcEngine()
-            //getDeviceScoreAndUpdateVideoProfile()
-            showPresetDialog()
         }
         requestCameraPermission(true)
+        showPresetDialog()
     }
 
     private var toggleVideoRun: Runnable? = null
@@ -138,10 +139,12 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     }
 
     override fun getPermissions() {
-        if (toggleVideoRun != null) {
-            toggleVideoRun?.run()
-            toggleVideoRun = null
-        }
+        Thread {
+            if (toggleVideoRun != null) {
+                toggleVideoRun?.run()
+                toggleVideoRun = null
+            }
+        }.start()
     }
 
     private fun showPresetDialog() = PresetDialog(this, mRtcEngine.queryDeviceScore(), RtcConnection(mRoomId, UserManager.getInstance().user.id.toInt())).show()
