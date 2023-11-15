@@ -406,6 +406,7 @@ class RoomObservableViewDelegate constructor(
         val onStage = localUserIndex() >= 0
         chatPrimaryMenuView.showMicVisible(onStage, isOn)
         AgoraRtcEngineController.get().earBackManager()?.setForbidden(!onStage)
+        AgoraRtcEngineController.get().soundCardManager()?.setForbidden(!onStage)
     }
 
     /**
@@ -667,6 +668,10 @@ class RoomObservableViewDelegate constructor(
     /** 虚拟声卡设置弹框
      */
     fun onVirtualSoundCardSettingDialog() {
+        if (AgoraRtcEngineController.get().soundCardManager()?.isForbidden() == true) {
+            ToastTools.showTips(activity, activity.getString(R.string.voice_settings_sound_card_forbidden_toast))
+            return
+        }
         val dialog = SoundCardSettingDialog()
         dialog.onClickSoundCardType = {
             val preset = SoundPresetTypeDialog()
@@ -1152,6 +1157,7 @@ class RoomObservableViewDelegate constructor(
         val onStage = localUserIndex() >= 0
         chatPrimaryMenuView.showMicVisible(onStage, isOn)
         AgoraRtcEngineController.get().earBackManager()?.setForbidden(!onStage)
+        AgoraRtcEngineController.get().soundCardManager()?.setForbidden(!onStage)
         if (roomKitBean.isOwner) {
             val handsCheckMap = mutableMapOf<Int, String>()
             newMicMap.forEach { (t, u) ->

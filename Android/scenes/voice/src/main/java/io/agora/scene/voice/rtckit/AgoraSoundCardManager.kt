@@ -69,12 +69,14 @@ val AgoraPresetSound.resID: Int
     }
 
 class AgoraSoundCardManager constructor(private val rtcEngineEx: RtcEngineEx) {
+
     private var presetSound: AgoraPresetSound = AgoraPresetSound.Close
     private var isEnable: Boolean = false
     private var gainValue: Float = -1f
     private var presetValue: Int = -1
     private var gender: Int = -1
     private var effect: Int = -1
+    private var isForbidden = true
 
     private val tag: String = "AgoraSoundCardManager"
 
@@ -85,6 +87,14 @@ class AgoraSoundCardManager constructor(private val rtcEngineEx: RtcEngineEx) {
     fun gainValue(): Float = gainValue
 
     fun presetValue(): Int = presetValue
+
+    fun isForbidden(): Boolean = isForbidden
+
+    fun setForbidden(isOn: Boolean) {
+        if (isForbidden != isOn) {
+            isForbidden = isOn
+        }
+    }
 
     /**
      * 开启/关闭 虚拟声卡
