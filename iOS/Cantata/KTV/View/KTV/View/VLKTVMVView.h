@@ -4,9 +4,9 @@
 //
 
 #import <UIKit/UIKit.h>
+@import AgoraCommon;
 @import ScoreEffectUI;
 @import AgoraLyricsScore;
-@import AgoraCommon;
 NS_ASSUME_NONNULL_BEGIN
 @class VLKTVSelBgModel;
 

@@ -29,6 +29,5 @@ import AgoraCommon
     ///新加字段 当前房间的创建者
     @objc public var creatorNo: String?
     @objc public var creatorAvatar: String?
-    
-    @objc var objectId: String?
+    @objc public var objectId: String?
 }

@@ -120,7 +120,7 @@
         return;
     }
     
-    KTVJoinRoomInputModel* inputModel = [KTVJoinRoomInputModel new];
+    KTVJoinRoomInputModel* inputModel = [[KTVJoinRoomInputModel alloc]init];
     inputModel.roomNo = listModel.roomNo;
 //    inputModel.userNo = VLUserCenter.user.id;
     inputModel.password = inputText;
