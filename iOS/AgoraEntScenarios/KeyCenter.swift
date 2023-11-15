@@ -94,7 +94,7 @@ class KeyCenter: NSObject {
     static let CloudPlayerKey: String? = nil
     static let CloudPlayerSecret: String? = nil
 
-    static var baseServerUrl: String? = "https://service.agora.io/toolbox/"
+    static var baseServerUrl: String? = "https://service-.agora.io/toolbox/"
     static var onlineBaseServerUrl: String? = baseServerUrl
 
 }

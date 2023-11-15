@@ -201,4 +201,19 @@
     
     return popView;
 }
+
+//弹出DebugView
++ (LSTPopView*)popDebugViewWithParentView:(UIView*)parentView
+                                   isDebugMode:(BOOL)isDebugMode
+                             withDelegate:(id<DHCDebugViewDelegate>)delegate {
+    CGFloat popViewH = 480;
+    DHCDebugView *debugView = [[DHCDebugView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) isDumpMode:isDebugMode withDelegate:delegate];
+    
+    LSTPopView* popView = [self _createKTVPopContainerWithContentView:debugView
+                                                       withParentView:parentView];
+    [popView pop];
+    
+    return popView;
+}
+
 @end

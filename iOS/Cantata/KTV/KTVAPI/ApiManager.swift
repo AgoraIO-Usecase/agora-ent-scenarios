@@ -41,6 +41,7 @@ class ApiManager {
             let task = session.dataTask(with: request) { (data, response, error) in
                 if let error = error {
                     print("getToken error: \(error.localizedDescription)")
+                    VLToast.toast("云端合流服务开启失败，请重新创建房间")
                 } else if let data = data {
                     do {
                         guard let responseDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any], let tokenName = responseDict["tokenName"] as? String else {
@@ -50,6 +51,7 @@ class ApiManager {
                         token = tokenName
                     } catch {
                         print("getToken error: \(error.localizedDescription)")
+                        VLToast.toast("云端合流服务开启失败，请重新创建房间")
                     }
                 }
                 
@@ -61,6 +63,7 @@ class ApiManager {
             
         } catch {
             print("getToken error: \(error.localizedDescription)")
+            VLToast.toast("云端合流服务开启失败，请重新创建房间")
         }
         
         return token
@@ -132,11 +135,12 @@ class ApiManager {
             request.setValue(getBasicAuth(), forHTTPHeaderField: "Authorization")
             request.httpBody = try JSONSerialization.data(withJSONObject: postBody, options: [])
             
-            let semaphore = DispatchSemaphore(value: 0)
+         //   let semaphore = DispatchSemaphore(value: 0)
             
             let task = session.dataTask(with: request) { (data, response, error) in
                 if let error = error {
                     print("云端合流uid 请求报错: \(error.localizedDescription)")
+                    VLToast.toast("云端合流服务开启失败，请重新创建房间")
                 } else if let data = data {
                     do {
                         guard let responseDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any], let taskId = responseDict["taskId"] as? String else {
@@ -144,19 +148,22 @@ class ApiManager {
                         }
                         
                         self.taskId = taskId
+                        VLToast.toast("云端合流服务开启成功")
                     } catch {
                         print("云端合流uid 请求报错: \(error.localizedDescription)")
+                        VLToast.toast("云端合流服务开启失败，请重新创建房间")
                     }
                 }
                 
-                semaphore.signal()
+             //   semaphore.signal()
             }
             
             task.resume()
-            semaphore.wait()
+           // semaphore.wait()
             
         } catch {
             print("云端合流uid 请求报错: \(error.localizedDescription)")
+            VLToast.toast("云端合流服务开启失败，请重新创建房间")
         }
     }
     
@@ -174,16 +181,16 @@ class ApiManager {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue(getBasicAuth(), forHTTPHeaderField: "Authorization")
             
-            let semaphore = DispatchSemaphore(value: 0)
+          //  let semaphore = DispatchSemaphore(value: 0)
             
             let task = session.dataTask(with: request) { (data, response, error) in
                 // Handle response
                 
-                semaphore.signal()
+             //   semaphore.signal()
             }
             
             task.resume()
-            semaphore.wait()
+           // semaphore.wait()
             
         } catch {
             print("云端合流任务停止失败: \(error.localizedDescription)")

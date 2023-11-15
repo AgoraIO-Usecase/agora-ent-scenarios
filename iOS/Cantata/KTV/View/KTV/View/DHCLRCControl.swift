@@ -44,6 +44,7 @@ public enum DHCGameState: Int {
     case noSong
     case ownerSing //房主主唱
     case chorusSing //非房主主唱
+    case ownerChorusSing //房主合唱
     case ownerChorus //房主加入合唱
     case joinChorus //加入合唱
     case beforeJoinChorus //加入合唱loading的时候
@@ -93,112 +94,139 @@ class DHCLRCControl: UIView {
     private var downloadManager = AgoraDownLoadManager()
     public var controlState: DHCGameState = .noSong {
         didSet {
-            switch controlState {
-            case .noSong:
-                pauseBtn.isHidden = true
-                nextBtn.isHidden = true
-                originBtn.isHidden = true
-                effectBtn.isHidden = true
-                joinChorusBtn.isHidden = true
-                leaveChorusBtn.isHidden = true
-                musicNameBtn.isHidden = true
-                noSongLabel.isHidden = false
-                lrcView.isHidden = true
-                chorusNumBtn.isHidden = true
-                scoreLabel.isHidden = true
-                resultView.isHidden = true
-                skipBtn.isHidden = true
-            case .ownerSing:
-                pauseBtn.isHidden = false
-                nextBtn.isHidden = false
-                originBtn.isHidden = false
-                effectBtn.isHidden = false
-                joinChorusBtn.isHidden = true
-                leaveChorusBtn.isHidden = true
-                musicNameBtn.isHidden = false
-                noSongLabel.isHidden = true
-                lrcView.isHidden = false
-                chorusNumBtn.isHidden = false
-                scoreLabel.isHidden = false
-                resultView.isHidden = true
-                skipBtn.isHidden = true
-            case .chorusSing:
-                pauseBtn.isHidden = true
-                nextBtn.isHidden = true
-                originBtn.isHidden = false
-                effectBtn.isHidden = false
-                joinChorusBtn.isHidden = true
-                leaveChorusBtn.isHidden = false
-                musicNameBtn.isHidden = false
-                noSongLabel.isHidden = true
-                lrcView.isHidden = false
-                chorusNumBtn.isHidden = false
-                scoreLabel.isHidden = false
-                resultView.isHidden = true
-                skipBtn.isHidden = true
-            case .ownerChorus:
-                pauseBtn.isHidden = true
-                nextBtn.isHidden = false
-                originBtn.isHidden = true
-                effectBtn.isHidden = true
-                joinChorusBtn.isHidden = false
-                joinChorusBtn.isSelected = false
-                leaveChorusBtn.isHidden = true
-                musicNameBtn.isHidden = false
-                noSongLabel.isHidden = true
-                lrcView.isHidden = false
-                chorusNumBtn.isHidden = false
-                scoreLabel.isHidden = false
-                resultView.isHidden = true
-                skipBtn.isHidden = true
-            case .joinChorus:
-                pauseBtn.isHidden = true
-                nextBtn.isHidden = true
-                originBtn.isHidden = true
-                effectBtn.isHidden = true
-                joinChorusBtn.isHidden = false
-                joinChorusBtn.isSelected = false
-                leaveChorusBtn.isHidden = true
-                joinChorusBtn.isSelected = false
-                musicNameBtn.isHidden = false
-                noSongLabel.isHidden = true
-                lrcView.isHidden = false
-                chorusNumBtn.isHidden = false
-                scoreLabel.isHidden = false
-                resultView.isHidden = true
-                skipBtn.isHidden = true
-                originBtn.isSelected = false
-            case .beforeJoinChorus:
-                pauseBtn.isHidden = true
-                nextBtn.isHidden = true
-                originBtn.isHidden = true
-                effectBtn.isHidden = true
-                joinChorusBtn.isHidden = false
-                joinChorusBtn.isSelected = true
-                leaveChorusBtn.isHidden = true
-                musicNameBtn.isHidden = false
-                noSongLabel.isHidden = true
-                lrcView.isHidden = false
-                chorusNumBtn.isHidden = false
-                scoreLabel.isHidden = false
-                resultView.isHidden = true
-                skipBtn.isHidden = true
-            case .nextSong:
-                pauseBtn.isHidden = true
-                nextBtn.isHidden = true
-                originBtn.isHidden = true
-                effectBtn.isHidden = true
-                joinChorusBtn.isHidden = true
-                leaveChorusBtn.isHidden = true
-                musicNameBtn.isHidden = true
-                noSongLabel.isHidden = true
-                lrcView.isHidden = true
-                chorusNumBtn.isHidden = true
-                scoreLabel.isHidden = true
-                resultView.isHidden = false
-                skipBtn.isHidden = true
+            DispatchQueue.main.async {
+                self.updateUI(with: self.controlState)
             }
+        }
+    }
+    
+    private func updateUI(with state: DHCGameState) {
+        switch controlState {
+        case .noSong:
+            pauseBtn.isHidden = true
+            nextBtn.isHidden = true
+            originBtn.isHidden = true
+            effectBtn.isHidden = true
+            joinChorusBtn.isHidden = true
+            leaveChorusBtn.isHidden = true
+            musicNameBtn.isHidden = true
+            noSongLabel.isHidden = false
+            lrcView.isHidden = true
+            chorusNumBtn.isHidden = true
+            scoreLabel.isHidden = true
+            resultView.isHidden = true
+            skipBtn.isHidden = true
+        case .ownerSing:
+            pauseBtn.isHidden = false
+            nextBtn.isHidden = false
+            originBtn.isHidden = false
+            effectBtn.isHidden = false
+            joinChorusBtn.isHidden = true
+            leaveChorusBtn.isHidden = true
+            musicNameBtn.isHidden = false
+            noSongLabel.isHidden = true
+            lrcView.isHidden = false
+            chorusNumBtn.isHidden = false
+            scoreLabel.isHidden = false
+            resultView.isHidden = true
+            skipBtn.isHidden = true
+        case .chorusSing:
+            pauseBtn.isHidden = true
+            nextBtn.isHidden = true
+            originBtn.isHidden = false
+            effectBtn.isHidden = false
+            joinChorusBtn.isHidden = true
+            leaveChorusBtn.isHidden = false
+            musicNameBtn.isHidden = false
+            noSongLabel.isHidden = true
+            lrcView.isHidden = false
+            chorusNumBtn.isHidden = false
+            scoreLabel.isHidden = false
+            resultView.isHidden = true
+            skipBtn.isHidden = true
+        case .ownerChorusSing:
+            pauseBtn.isHidden = true
+            nextBtn.isHidden = false
+            originBtn.isHidden = false
+            effectBtn.isHidden = false
+            joinChorusBtn.isHidden = true
+            leaveChorusBtn.isHidden = false
+            musicNameBtn.isHidden = false
+            noSongLabel.isHidden = true
+            lrcView.isHidden = false
+            chorusNumBtn.isHidden = false
+            scoreLabel.isHidden = false
+            resultView.isHidden = true
+            skipBtn.isHidden = true
+        case .ownerChorus:
+            pauseBtn.isHidden = true
+            nextBtn.isHidden = false
+            originBtn.isHidden = true
+            effectBtn.isHidden = true
+            joinChorusBtn.isHidden = false
+            joinChorusBtn.isSelected = false
+            leaveChorusBtn.isHidden = true
+            musicNameBtn.isHidden = false
+            noSongLabel.isHidden = true
+            lrcView.isHidden = false
+            chorusNumBtn.isHidden = false
+            scoreLabel.isHidden = false
+            resultView.isHidden = true
+            skipBtn.isHidden = true
+        case .joinChorus:
+            pauseBtn.isHidden = true
+            nextBtn.isHidden = true
+            originBtn.isHidden = true
+            effectBtn.isHidden = true
+            joinChorusBtn.isHidden = false
+            joinChorusBtn.isSelected = false
+            leaveChorusBtn.isHidden = true
+            joinChorusBtn.isSelected = false
+            musicNameBtn.isHidden = false
+            noSongLabel.isHidden = true
+            lrcView.isHidden = false
+            chorusNumBtn.isHidden = false
+            scoreLabel.isHidden = false
+            resultView.isHidden = true
+            skipBtn.isHidden = true
+            originBtn.isSelected = false
+        case .beforeJoinChorus:
+            pauseBtn.isHidden = true
+            nextBtn.isHidden = true
+            originBtn.isHidden = true
+            effectBtn.isHidden = true
+            joinChorusBtn.isHidden = false
+            joinChorusBtn.isSelected = true
+            leaveChorusBtn.isHidden = true
+            musicNameBtn.isHidden = false
+            noSongLabel.isHidden = true
+            lrcView.isHidden = false
+            chorusNumBtn.isHidden = false
+            scoreLabel.isHidden = false
+            resultView.isHidden = true
+            skipBtn.isHidden = true
+        case .nextSong:
+            pauseBtn.isHidden = true
+            nextBtn.isHidden = true
+            originBtn.isHidden = true
+            effectBtn.isHidden = true
+            joinChorusBtn.isHidden = true
+            leaveChorusBtn.isHidden = true
+            musicNameBtn.isHidden = true
+            noSongLabel.isHidden = true
+            lrcView.isHidden = true
+            chorusNumBtn.isHidden = true
+            scoreLabel.isHidden = true
+            resultView.isHidden = false
+            skipBtn.isHidden = true
+        }
+        
+        if self.leaveChorusBtn.isHidden == true {
             nextBtn.frame = CGRect(x: pauseBtn.isHidden ? 20 : 74, y: self.bounds.maxY - 50, width: 34, height: 40)
+        } else {
+            if controlState == .ownerChorusSing {
+                nextBtn.frame = CGRect(x: 84, y: self.bounds.maxY - 50, width: 34, height: 40)
+            }
         }
     }
     
@@ -214,11 +242,11 @@ class DHCLRCControl: UIView {
     private func layoutUI() {
         musicNameBtn = UIButton(frame: CGRect(x: 20, y: 0, width: 300, height: 30))
         musicNameBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
-        musicNameBtn.contentMode = .scaleAspectFit
+        musicNameBtn.contentMode = .scaleAspectFill
         musicNameBtn.setImage(UIImage.sceneImage(name: "ktv_currentPlay_icon", bundleName: "DHCResource"), for: .normal)
         musicNameBtn.contentHorizontalAlignment = .left
-        let spacing: CGFloat = 10
-        musicNameBtn.imageEdgeInsets = UIEdgeInsets(top: 0, left: -spacing, bottom: 0, right: 0)
+//        let spacing: CGFloat = 10
+//        musicNameBtn.imageEdgeInsets = UIEdgeInsets(top: 0, left: -spacing, bottom: 0, right: 0)
         musicNameBtn.titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         addSubview(musicNameBtn)
         musicNameBtn.isHidden = true
@@ -228,9 +256,9 @@ class DHCLRCControl: UIView {
         chorusNumBtn.addTarget(self, action: #selector(showChorus), for: .touchUpInside)
         addSubview(chorusNumBtn)
         
-        scoreLabel = UILabel(frame: CGRect(x: self.bounds.width - 160, y: 0, width: 60, height: 30))
+        scoreLabel = UILabel(frame: CGRect(x: self.bounds.width - 190, y: 0, width: 100, height: 30))
         scoreLabel.textColor = .white
-        scoreLabel.font = UIFont.systemFont(ofSize: 13)
+        scoreLabel.font = UIFont.systemFont(ofSize: 12)
         scoreLabel.textAlignment = .right
         addSubview(scoreLabel)
         setScore(with: 0)
@@ -256,8 +284,8 @@ class DHCLRCControl: UIView {
 
         pauseBtn = UIButton(frame: CGRect(x: 20, y: self.bounds.maxY - 50, width: 34, height: 40))
         pauseBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
-        pauseBtn.setVerticalLayoutWithCenterAlignment(title: "暂停", image: UIImage.sceneImage(name: "ktv_pause_resumeicon", bundleName: "DHCResource")!, spacing: 0, for: .selected)
-        pauseBtn.setVerticalLayoutWithCenterAlignment(title: "播放", image: UIImage.sceneImage(name: "ktv_pause_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
+        pauseBtn.setVerticalLayoutWithCenterAlignment(title: "播放", image: UIImage.sceneImage(name: "ktv_pause_resumeicon", bundleName: "DHCResource")!, spacing: 0, for: .selected)
+        pauseBtn.setVerticalLayoutWithCenterAlignment(title: "暂停", image: UIImage.sceneImage(name: "ktv_pause_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         pauseBtn.addTarget(self, action: #selector(pause), for: .touchUpInside)
         addSubview(pauseBtn)
         
@@ -374,6 +402,7 @@ class DHCLRCControl: UIView {
         skipBtn.setSkipType(.prelude)
         musicNameBtn.isHidden = true
         musicNameBtn.setTitle("", for: .normal)
+        scoreLabel.text = "0总分"
         currentLoadLrcPath = nil
     }
     
@@ -534,7 +563,8 @@ extension DHCLRCControl: KTVLrcViewDelegate {
         totalLines = 0
         totalScore = 0
         lrcView?.setLyricData(data: model)
-        musicNameBtn.setTitle("\(model.name)-\(model.singer)", for: .normal)
+        musicNameBtn.setTitle("\(model.name)", for: .normal)
+      //  musicNameBtn.setTitle("\(model.name)-\(model.singer)", for: .normal)
         musicNameBtn.isHidden = false
         print("获取地址解析:\(url)")
     }
@@ -549,10 +579,22 @@ extension DHCLRCControl: KTVLrcViewDelegate {
     
     public func setScore(with score: Int) {
         scoreLabel.text = "\(score) 总分"
+        let width = calculateLabelWidth(text: scoreLabel.text!, font: UIFont.systemFont(ofSize: 12))
+        scoreLabel.frame = CGRect(x: self.bounds.width - width - 90, y: 0, width: width, height: 30)
+        musicNameBtn.frame =  CGRect(x: 20, y: 0, width: self.bounds.width - width - 90 - 20 - 10, height: 30)
     }
 
     public func setResultData(with totalScore: Int, models:[SubRankModel], musicStr: String, isRoomOwner: Bool) {
         resultView.setResultData(with: totalScore, models: models, musicStr: musicStr, isRoomOwner: isRoomOwner)
+    }
+    
+    func calculateLabelWidth(text: String, font: UIFont) -> CGFloat {
+        let label = UILabel()
+        label.text = text
+        label.font = font
+        label.numberOfLines = 1 // 设置为单行显示
+        let size = label.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude))
+        return size.width
     }
 }
 

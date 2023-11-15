@@ -803,6 +803,7 @@ extension KTVApiImpl {
             if mcc?.isPreloaded(songCode: songCode) != 0 {
                 onMusicLoadStateListener.onMusicLoadProgress(songCode: self.songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
             }
+            apiConfig?.engine
             preloadMusic(with: songCode) { [weak self] status, songCode in
                 guard let self = self else { return }
                 if self.songCode != songCode {

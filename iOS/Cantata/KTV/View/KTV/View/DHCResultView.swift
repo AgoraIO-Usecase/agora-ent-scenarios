@@ -64,8 +64,36 @@ class DHCResultView: UIView {
     
     var nextBlock: (()->Void)?
     
+    private var basicScoreModels  = {
+        var models = [SubRankModel]()
+        var model1 = SubRankModel()
+        model1.index = 0
+        
+        var model2 = SubRankModel()
+        model2.index = 1
+        
+        var model3 = SubRankModel()
+        model3.index = 2
+        
+        models.append(model1)
+        models.append(model2)
+        models.append(model3)
+        return models
+    }()
+    
     @objc public var dataSource: [SubRankModel]? {
         didSet {
+            if dataSource == nil {
+                dataSource = basicScoreModels
+            } else {
+                if let data = dataSource, data.count < 3 {
+                    for i in data.count..<3 {
+                        if let scoreModel = basicScoreModels[safe: i] {
+                            dataSource!.append(scoreModel)
+                        }
+                    }
+                }
+            }
             tableView.reloadData()
         }
     }

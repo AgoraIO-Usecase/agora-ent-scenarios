@@ -218,7 +218,6 @@ import AgoraRtcKit
     
     func printObjectContent() -> String {
         var content = ""
-        
         let mirror = Mirror(reflecting: self)
         for child in mirror.children {
             if let propertyName = child.label {

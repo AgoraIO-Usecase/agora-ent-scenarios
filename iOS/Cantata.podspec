@@ -64,6 +64,9 @@ TODO: Add long description of the pod here.
     "Cantata/**/VLEffectView.h",
     "Cantata/**/DHCVLKTVSettingView.h",
     "Cantata/**/VLEarSettingView.h",
+    "Cantata/**/DHCDebugView.h",
+    "Cantata/**/KTVDebugInfo.h",
+    "Cantata/**/KTVDebugManager.h",
     ]
     
   s.dependency 'AgoraRtcEngine_Special_iOS'

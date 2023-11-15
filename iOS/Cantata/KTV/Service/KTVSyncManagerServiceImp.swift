@@ -142,9 +142,12 @@ private func mapConvert(model: NSObject) ->[String: Any] {
             agoraPrint("subscribeConnectState: \(state) \(self.syncUtilsInited)")
             self.networkDidChanged?(KTVServiceNetworkStatus(rawValue: state.rawValue) ?? .fail)
             guard !self.syncUtilsInited else {
-                self._seatListReloadIfNeed()
                 self._getUserInfo { err, list in
                     self.userListCountDidChanged?(UInt(list?.count ?? 0))
+                }
+                //延迟执行
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    self._seatListReloadIfNeed()
                 }
                 return
             }
@@ -1018,6 +1021,7 @@ extension KTVSyncManagerServiceImp {
 
             
             list.forEach { seat in
+                guard let uid = seat.rtcUid else {return}
                 self.seatMap["\(seat.rtcUid)"] = seat
             }
             
@@ -1067,13 +1071,15 @@ extension KTVSyncManagerServiceImp {
             
             var _seatMap: [String: VLRoomSeatModel] = .init()
             seatList.forEach { seat in
-                _seatMap["\(seat.seatIndex)"] = seat
+                guard let uid = seat.rtcUid else {return}
+                _seatMap["\(uid)"] = seat
             }
             
             self.seatMap.forEach { (key, origSeat) in
+                if key == nil {return}
+                print(_seatMap[key])
                 guard let seat = _seatMap[key] else {
                     let seat = VLRoomSeatModel()
-                    seat.seatIndex = origSeat.seatIndex
                     _seatMap[key] = seat
                     self.seatListDidChanged?(.deleted, origSeat)
                     return
@@ -1200,21 +1206,25 @@ extension KTVSyncManagerServiceImp {
                 agoraPrint("imp seat subscribe oncreated... [\(object.getId())]")
                 guard let self = self,
                       let jsonStr = object.toJson(),
-                      let model = VLRoomSeatModel.yy_model(withJSON: jsonStr)
+                      let model = VLRoomSeatModel.yy_model(withJSON: jsonStr),
+                      let userNo = model.userNo,
+                      let uid = model.rtcUid
                 else {
                     return
                 }
-                self.seatMap["\(model.rtcUid)"] = model
+                self.seatMap["\(uid)"] = model
                 self.seatListDidChanged?(.created, model)
             }, onUpdated: { [weak self] object in
                 agoraPrint("imp seat subscribe onupdated... [\(object.getId())]")
                 guard let self = self,
                       let jsonStr = object.toJson(),
-                      let model = VLRoomSeatModel.yy_model(withJSON: jsonStr)
+                      let model = VLRoomSeatModel.yy_model(withJSON: jsonStr),
+                      let userNo = model.userNo,
+                      let uid = model.rtcUid
                 else {
                     return
                 }
-                self.seatMap["\(model.rtcUid)"] = model
+                self.seatMap["\(uid)"] = model
                 self.seatListDidChanged?(.updated, model)
             }, onDeleted: { [weak self] object in
                 agoraPrint("imp seat subscribe ondeleted... [\(object.getId())]")
@@ -1222,6 +1232,7 @@ extension KTVSyncManagerServiceImp {
                     return
                 }
                 let objectId = object.getId()
+                if objectId.isEmpty {return}
                 guard let origSeat = self.seatMap.filter({ $0.value.objectId == objectId }).first?.value else {
                     agoraPrint("delete seat not found")
                     return
@@ -1230,7 +1241,8 @@ extension KTVSyncManagerServiceImp {
                 seat.seatIndex = origSeat.seatIndex
                 seat.userNo = origSeat.userNo
                 seat.chorusSongCode = origSeat.chorusSongCode
-                self.seatMap["\(origSeat.rtcUid)"] = seat
+                guard let uid = origSeat.rtcUid else {return}
+                self.seatMap["\(uid)"] = seat
                 self.seatListDidChanged?(.deleted, seat)
             }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
@@ -1276,9 +1288,11 @@ extension KTVSyncManagerServiceImp {
                     return
                 }
                 agoraPrint("imp song get success... \(list.count)")
-                let totalList = list.compactMap({
+                var totalList = list.compactMap({
                     VLRoomSelSongModel.yy_model(withJSON: $0.toJson()!)!
                 })
+                //self.songList需要剔除掉songNO或者userNo为空的model
+                totalList = totalList.filter { $0.songNo != nil}
                 self.songList = totalList.filterDuplicates({$0.songNo})
                 self._sortChooseSongList()
                 let songList = self.songList
