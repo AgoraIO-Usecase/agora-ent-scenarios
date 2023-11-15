@@ -1199,8 +1199,8 @@ public class RoomLivingViewModel extends ViewModel {
                 } else {
                     // 和超高音质同时开启会发生崩溃，先注释aec相关操作
                     //mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\": 0}");
-                    //mRtcEngine.setParameters("{\"che.audio.ains_mode\": 0}");
-                    mRtcEngine.setParameters("{\"che.audio.aec.nlp_size\": 512}");
+                    mRtcEngine.setParameters("{\"che.audio.ains_mode\": 0}");
+                    //mRtcEngine.setParameters("{\"che.audio.aec.nlp_size\": 512}");
                     //mRtcEngine.setParameters("{\"che.audio.aec.nlp_hop_size\": 64}");
                 }
             }
@@ -1871,6 +1871,7 @@ public class RoomLivingViewModel extends ViewModel {
 
     public void resetAudioPreset() {
         KTVLogger.d(TAG, "resetAudioPreset: " + audioPreset);
+        if (mRtcEngine == null || mSetting == null) return;
         mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF);
         mSetting.updateEffect(AUDIO_EFFECT_OFF);
     }
