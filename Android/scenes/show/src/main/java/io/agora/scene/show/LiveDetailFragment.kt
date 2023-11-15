@@ -212,7 +212,7 @@ class LiveDetailFragment : Fragment() {
         startTopLayoutTimer()
     }
 
-    fun stopLoadPage(isScrolling: Boolean){
+    fun stopLoadPage(isScrolling: Boolean) {
         ShowLogger.d(TAG, "Fragment PageLoad stop load, roomId=${mRoomInfo.roomId}")
         isPageLoaded = false
         destroy(isScrolling) // 切页或activity销毁
@@ -229,6 +229,7 @@ class LiveDetailFragment : Fragment() {
         if (isRoomOwner) {
             showEndRoomDialog()
         } else {
+            stopLoadPage(false)
             activity?.finish()
         }
     }
@@ -324,6 +325,7 @@ class LiveDetailFragment : Fragment() {
             .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
             .into(livingEndLayout.ivAvatar)
         livingEndLayout.ivClose.setOnClickListener {
+            stopLoadPage(false)
             activity?.finish()
         }
     }
@@ -828,6 +830,7 @@ class LiveDetailFragment : Fragment() {
             .setTitle(R.string.show_tip)
             .setMessage(R.string.show_live_end_room_or_not)
             .setPositiveButton(R.string.show_setting_confirm) { dialog, id ->
+                stopLoadPage(false)
                 activity?.finish()
                 dialog.dismiss()
             }
@@ -1832,7 +1835,7 @@ class LiveDetailFragment : Fragment() {
         channelMediaOptions.publishCustomAudioTrack = false
         channelMediaOptions.enableAudioRecordingOrPlayout = true
         channelMediaOptions.autoSubscribeVideo = true
-        channelMediaOptions.autoSubscribeAudio = false
+        channelMediaOptions.autoSubscribeAudio = true
         channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
 
         (activity as? LiveDetailActivity)?.let {
