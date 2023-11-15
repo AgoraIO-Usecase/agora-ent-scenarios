@@ -6,13 +6,13 @@
 #import "VLCreateRoomViewController.h"
 #import <AgoraRtcKit/AgoraRtcKit.h>
 #import "VLCreateRoomView.h"
-#import "VLKTVViewController.h"
+//#import "VLKTVViewController.h"
 #import "VLAddRoomModel.h"
 #import "VLMacroDefine.h"
 #import "VLUserCenter.h"
 #import "VLToast.h"
 #import "VLURLPathConfig.h"
-#import "AppContext+KTV.h"
+#import "AppContext+DHCKTV.h"
 #import "AESMacro.h"
 
 @interface VLCreateRoomViewController ()<VLCreateRoomViewDelegate/*,AgoraRtmDelegate*/>
@@ -62,10 +62,11 @@
     KTVCreateRoomInputModel* intputModel = [KTVCreateRoomInputModel new];
     intputModel.belCanto = @"0";
     intputModel.icon = [NSString stringWithFormat:@"%@",roomModel.icon];
-    intputModel.isPrivate = roomModel.isPrivate ? @(1) : @(0);
+    intputModel.isPrivate = roomModel.isPrivate == true ? @(1) : @(0);
     intputModel.name = [NSString stringWithFormat:@"%@",roomModel.name];
     intputModel.password = roomModel.password.length > 0 ? [NSString stringWithFormat:@"%@",roomModel.password] : @"";
     intputModel.soundEffect = @"0";
+    intputModel.creatorAvatar = VLUserCenter.user.headUrl;
 //    intputModel.userNo = VLUserCenter.user.id;
     VL(weakSelf);
     self.view.userInteractionEnabled = NO;
@@ -85,15 +86,20 @@
 //            [self.RTCkit setClientRole:AgoraClientRoleBroadcaster];
 //        }];
         //处理座位信息
-        VLRoomListModel *listModel = [[VLRoomListModel alloc]init];
-        listModel.roomNo = outputModel.roomNo;
-        listModel.name = outputModel.name;
-        listModel.bgOption = 0;
-        listModel.creatorNo = VLUserCenter.user.id;
-        VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
-        ktvVC.roomModel = listModel;
-        ktvVC.seatsArray = outputModel.seatsArray;
-        [weakSelf.navigationController pushViewController:ktvVC animated:YES];
+        UIViewController *topViewController = self.navigationController.viewControllers.lastObject;
+        if(![topViewController isMemberOfClass:[VLCreateRoomViewController class]]){
+            return;
+        }
+        if (error == nil) {
+            VLRoomListModel *listModel = [[VLRoomListModel alloc]init];
+            listModel.roomNo = outputModel.roomNo;
+            listModel.name = outputModel.name;
+            listModel.bgOption = 0;
+            listModel.creatorAvatar = outputModel.creatorAvatar;
+            listModel.creatorNo = VLUserCenter.user.id;
+            UIViewController *VC = [ViewControllerFactory createCustomViewControllerWithTitle:listModel seatsArray:outputModel.seatsArray];
+            [weakSelf.navigationController pushViewController:VC animated:YES];
+        }
     }];
 }
 

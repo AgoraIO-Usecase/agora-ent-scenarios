@@ -28,7 +28,7 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/AgoraIO-Community/VideoLoaderAPI.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
     
-  s.ios.deployment_target = '10.0'
+  s.ios.deployment_target = '13.0'
   
   s.xcconfig = {'ENABLE_BITCODE' => 'NO'}
   
@@ -39,12 +39,36 @@ TODO: Add long description of the pod here.
     s.prefix_header_contents = '
     #if __has_include(<Cantata/Cantata-Swift.h>)
         #import <Cantata/Cantata-Swift.h>
-    #else
-        #import "Cantata-Swift.h"
+        #import "Cantata-Prefix.h"
     #endif
   '
+#  s.pod_target_xcconfig = {
+ #   'SWIFT_OBJC_BRIDGING_HEADER' => 'Cantata/KTV/**/Cantata-Bridging-Header.h'
+ # }
+ 
+  s.resources = ['Cantata/**/*.bundle', 'Cantata/**/*.xib']
 
-  # s.public_header_files = 'Pod/Classes/**/*.h'
+#  s.public_header_files = ['Cantata/**/CantataPlugin.h','Cantata/**/VLKTVTopView.h', 'Cantata/**/VLKTVSelBgModel.h']
+  s.public_header_files = [
+    'Cantata/Cantata.h',
+    'Cantata/**/CantataPlugin.h',
+    'Cantata/**/VLKTVTopView.h',
+    'Cantata/**/VLKTVSelBgModel.h',
+    'Cantata/**/LSTPopView+KTVModal.h',
+    "Cantata/**/VLPopMoreSelView.h",
+    "Cantata/**/VLPopSelBgView.h",
+    "Cantata/**/VLDropOnLineView.h",
+    "Cantata/**/VLAudioEffectPicker.h",
+    "Cantata/**/VLBadNetWorkView.h",
+    "Cantata/**/VLPopSongList.h",
+    "Cantata/**/VLEffectView.h",
+    "Cantata/**/DHCVLKTVSettingView.h",
+    "Cantata/**/VLEarSettingView.h",
+    "Cantata/**/DHCDebugView.h",
+    "Cantata/**/KTVDebugInfo.h",
+    "Cantata/**/KTVDebugManager.h",
+    ]
+    
   s.dependency 'AgoraRtcEngine_Special_iOS'
   s.dependency 'AgoraCommon'
   s.dependency 'LSTPopView'
@@ -53,5 +77,8 @@ TODO: Add long description of the pod here.
   s.dependency 'AgoraLyricsScore'
   s.dependency 'AgoraCommon'
   s.dependency 'SDWebImage'
+  s.dependency 'Zip'
+  s.dependency 'MJRefresh'
+  s.dependency 'AUIKitCore/UI'
 end
 

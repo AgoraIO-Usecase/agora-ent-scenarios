@@ -10,7 +10,7 @@ import YYCategories
 import SVProgressHUD
 import AgoraCommon
 
-private let kSceneId = "scene_ktv_3.0.1"
+private let kSceneId = "scene_ktv_3.8.0"
 
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"
@@ -142,9 +142,12 @@ private func mapConvert(model: NSObject) ->[String: Any] {
             agoraPrint("subscribeConnectState: \(state) \(self.syncUtilsInited)")
             self.networkDidChanged?(KTVServiceNetworkStatus(rawValue: state.rawValue) ?? .fail)
             guard !self.syncUtilsInited else {
-                self._seatListReloadIfNeed()
                 self._getUserInfo { err, list in
                     self.userListCountDidChanged?(UInt(list?.count ?? 0))
+                }
+                //延迟执行
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    self._seatListReloadIfNeed()
                 }
                 return
             }
@@ -157,7 +160,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     // MARK: protocol method
     
     // MARK: room info
-    func getRoomList(with page: UInt, completion: @escaping (Error?, [VLRoomListModel]?) -> Void) {
+    public func getRoomList(with page: UInt, completion: @escaping (Error?, [VLRoomListModel]?) -> Void) {
         initScene { [weak self] error in
             if let error = error  {
                 _hideLoadingIfNeed()
@@ -186,13 +189,13 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         }
     }
 
-    func createRoom(with inputModel: KTVCreateRoomInputModel,
+    public func createRoom(with inputModel: KTVCreateRoomInputModel,
                     completion: @escaping (Error?, KTVCreateRoomOutputModel?) -> Void)
     {
         let roomInfo = VLRoomListModel() // LiveRoomInfo(roomName: inputModel.name)
 //        roomInfo.id = VLUserCenter.user.id//NSString.withUUID().md5() ?? ""
         roomInfo.name = inputModel.name
-        roomInfo.isPrivate = ((inputModel.isPrivate?.boolValue) != nil)
+        roomInfo.isPrivate = inputModel.isPrivate?.intValue != 0
         roomInfo.password = inputModel.password
         roomInfo.creatorNo = VLUserCenter.user.id
         roomInfo.roomNo = "\(arc4random_uniform(899999) + 100000)" // roomInfo.id
@@ -200,6 +203,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         roomInfo.roomPeopleNum = "0"
         roomInfo.icon = inputModel.icon
         roomInfo.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
+        roomInfo.creatorAvatar = inputModel.creatorAvatar
 
         let params = mapConvert(model: roomInfo)
 
@@ -222,7 +226,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 self?.roomNo = channelName
                 
                 let playerRTCUid = UserInfo.userId//VLUserCenter.user.agoraPlayerRTCUid;
-                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
+                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:], tokenMap3:[Int: String] = [:]
                 
                 let dispatchGroup = DispatchGroup()
                 dispatchGroup.enter()
@@ -235,11 +239,20 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 }
                 
                 dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")_ex",
-                                                     uid: "\(playerRTCUid)",
+                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")_ad",
+                                                     uid: "\(UserInfo.userId)",
                                                      tokenGeneratorType: .token006,
                                                      tokenTypes: [.rtc]) { tokenMap in
                     tokenMap2 = tokenMap
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.enter()
+                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")",
+                                                     uid: "2023",
+                                                     tokenGeneratorType: .token006,
+                                                     tokenTypes: [.rtc]) { tokenMap in
+                    tokenMap3 = tokenMap
                     dispatchGroup.leave()
                 }
                 
@@ -248,7 +261,8 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                     guard let self = self,
                           let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
                           let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
-                          let rtcPlayerToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue]
+                          let audienceToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue],
+                          let rtcPlayerToken = tokenMap3[NetworkManager.AgoraTokenType.rtc.rawValue]
                     else {
                         agoraAssert(tokenMap1.count == 2, "rtcToken == nil || rtmToken == nil")
                         agoraAssert(tokenMap2.count == 1, "playerRtcToken == nil")
@@ -259,6 +273,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                     VLUserCenter.user.agoraRTCToken = rtcToken
                     VLUserCenter.user.agoraRTMToken = rtmToken
                     VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
+                    VLUserCenter.user.audienceChannelToken = audienceToken
                     self.roomList?.append(roomInfo)
                     self._autoOnSeatIfNeed { seatArray in
                         agoraPrint("createRoom _autoOnSeatIfNeed cost: \(-date.timeIntervalSinceNow * 1000) ms")
@@ -267,6 +282,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                         output.name = inputModel.name
                         output.roomNo = roomInfo.roomNo ?? ""
                         output.seatsArray = seatArray
+                        output.creatorAvatar = inputModel.creatorAvatar
                         completion(nil, output)
                     }
                     self._addUserIfNeed()
@@ -279,7 +295,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         }
     }
 
-    func joinRoom(with inputModel: KTVJoinRoomInputModel,
+    public func joinRoom(with inputModel: KTVJoinRoomInputModel,
                   completion: @escaping (Error?, KTVJoinRoomOutputModel?) -> Void)
     {
         guard let roomInfo = roomList?.filter({ $0.roomNo == inputModel.roomNo }).first else {
@@ -309,7 +325,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 self?.roomNo = channelName
                 
                 let playerRTCUid = UserInfo.userId//VLUserCenter.user.agoraPlayerRTCUid
-                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
+                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:], tokenMap3:[Int: String] = [:]
                 
                 let dispatchGroup = DispatchGroup()
                 dispatchGroup.enter()
@@ -322,11 +338,20 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 }
                 
                 dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")_ex",
-                                                     uid: "\(playerRTCUid)",
+                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")_ad",
+                                                     uid: "\(UserInfo.userId)",
                                                      tokenGeneratorType: .token006,
                                                      tokenTypes: [.rtc]) { tokenMap in
                     tokenMap2 = tokenMap
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.enter()
+                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")",
+                                                     uid: "2023",
+                                                     tokenGeneratorType: .token006,
+                                                     tokenTypes: [.rtc]) { tokenMap in
+                    tokenMap3 = tokenMap
                     dispatchGroup.leave()
                 }
                 
@@ -335,7 +360,8 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                     guard let self = self,
                           let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
                           let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
-                          let rtcPlayerToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue]
+                          let audienceToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue],
+                          let rtcPlayerToken = tokenMap3[NetworkManager.AgoraTokenType.rtc.rawValue]
                     else {
                         _hideLoadingIfNeed()
                         agoraAssert(tokenMap1.count == 2, "rtcToken == nil || rtmToken == nil")
@@ -347,6 +373,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                     VLUserCenter.user.agoraRTCToken = rtcToken
                     VLUserCenter.user.agoraRTMToken = rtmToken
                     VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
+                    VLUserCenter.user.audienceChannelToken = audienceToken
                     self._autoOnSeatIfNeed { seatArray in
                         agoraPrint("joinRoom _autoOnSeatIfNeed cost: \(-date.timeIntervalSinceNow * 1000) ms")
                         _hideLoadingIfNeed()
@@ -365,7 +392,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         }
     }
     
-    func leaveRoom(completion: @escaping (Error?) -> Void) {
+    public func leaveRoom(completion: @escaping (Error?) -> Void) {
         guard let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first else {
             agoraAssert("leaveRoom channelName = nil")
             completion(nil)
@@ -380,7 +407,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         _leaveRoom(completion: completion)
     }
 
-    func changeMVCover(with inputModel: KTVChangeMVCoverInputModel,
+    public func changeMVCover(with inputModel: KTVChangeMVCoverInputModel,
                        completion: @escaping (Error?) -> Void) {
         guard let channelName = roomNo,
               let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first
@@ -414,16 +441,17 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     }
     
     // MARK: mic seat
-    func enterSeat(with inputModel: KTVOnSeatInputModel,
+    public func enterSeat(with inputModel: KTVOnSeatInputModel,
                    completion: @escaping (Error?) -> Void) {
         let seatInfo = _getUserSeatInfo(seatIndex: Int(inputModel.seatIndex))
+        seatInfo.isAudioMuted = 0
         _addSeatInfo(seatInfo: seatInfo,
                      finished: completion)
     }
 
-    func leaveSeat(with inputModel: KTVOutSeatInputModel,
+    public func leaveSeat(with inputModel: KTVOutSeatInputModel,
                    completion: @escaping (Error?) -> Void) {
-        let seatInfo = seatMap["\(inputModel.seatIndex)"]!
+        let seatInfo = seatMap["\(inputModel.userNo)"]!
         _removeSeat(seatInfo: seatInfo) { error in
         }
         
@@ -432,7 +460,13 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         completion(nil)
     }
     
-    func updateSeatAudioMuteStatus(with muted: Bool,
+    public func leaveSeatWithoutRemoveSong(with seatModel: VLRoomSeatModel, completion: @escaping (Error?) -> Void) {
+        _removeSeat(seatInfo: seatModel) { error in
+        }
+        completion(nil)
+    }
+    
+    public func updateSeatAudioMuteStatus(with muted: Bool,
                                    completion: @escaping (Error?) -> Void) {
         guard let seatInfo = self.seatMap
             .filter({ $0.value.userNo == VLUserCenter.user.id })
@@ -447,7 +481,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                     finished: completion)
     }
 
-    func updateSeatVideoMuteStatus(with muted: Bool,
+    public func updateSeatVideoMuteStatus(with muted: Bool,
                                    completion: @escaping (Error?) -> Void) {
         guard let seatInfo = self.seatMap
             .filter({ $0.value.userNo == VLUserCenter.user.id })
@@ -462,19 +496,48 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                     finished: completion)
     }
 
+    public func updateSeatScoreStatus(with score: Int,
+                                   completion: @escaping (Error?) -> Void) {
+        guard let seatInfo = self.seatMap
+            .filter({ $0.value.userNo == VLUserCenter.user.id })
+            .first?.value else {
+            agoraAssert("open video seat not found")
+            completion(nil)
+            return
+        }
+        
+        seatInfo.score = score
+        _updateSeat(seatInfo: seatInfo,
+                    finished: completion)
+    }
+    
+    public func updateSongEndStatus(with musicEnd: Bool, inputModel: KTVRemoveSongInputModel, completion: @escaping (Error?) -> Void) {
+        guard let topSong = songList.first,
+              let song = songList.filter({ $0.objectId == inputModel.objectId }).first
+        else {
+            agoraAssert("make song to top not found! \(inputModel.songNo)")
+            completion(nil)
+            return
+        }
+
+        song.musicEnded = musicEnd
+        _updateChooseSong(songInfo: song) { error in
+            completion(error)
+        }
+    }
     
     // MARK: choose songs
-    func removeSong(with inputModel: KTVRemoveSongInputModel,
+    public func removeSong(with inputModel: KTVRemoveSongInputModel,
                     completion: @escaping (Error?) -> Void) {
         _removeChooseSong(songId: inputModel.objectId,
                           completion: completion)
     }
 
-    func getChoosedSongsList(completion: @escaping (Error?, [VLRoomSelSongModel]?) -> Void) {
+    public func getChoosedSongsList(completion: @escaping (Error?, [VLRoomSelSongModel]?) -> Void) {
         _getChooseSongInfo(finished: completion)
     }
 
-    func joinChorus(with inputModel: KTVJoinChorusInputModel,
+    public func joinChorus(with inputModel: KTVJoinChorusInputModel,
                         completion: @escaping (Error?) -> Void) {
         guard let topSong = self.songList.filter({ $0.songNo == inputModel.songNo}).first else {
             agoraAssert("join Chorus fail")
@@ -485,18 +548,18 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         _markSeatChoursStatus(songCode: topSong.chorusSongId(),  completion: completion)
     }
     
-    func coSingerLeaveChorus(completion: @escaping (Error?) -> Void) {
+    public func coSingerLeaveChorus(completion: @escaping (Error?) -> Void) {
         //TODO: _markSeatToPlaying without callback
         _markSeatChoursStatus(songCode: "", completion: completion)
     }
 
-    func markSongDidPlay(with inputModel: VLRoomSelSongModel,
+    public func markSongDidPlay(with inputModel: VLRoomSelSongModel,
                          completion: @escaping (Error?) -> Void) {
         inputModel.status = .playing
         _updateChooseSong(songInfo: inputModel, finished: completion)
     }
 
-    func chooseSong(with inputModel: KTVChooseSongInputModel,
+    public func chooseSong(with inputModel: KTVChooseSongInputModel,
                     completion: @escaping (Error?) -> Void)
     {
         //添加歌曲前先判断
@@ -532,7 +595,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         }
     }
     
-    func pinSong(with inputModel: KTVMakeSongTopInputModel,
+    public func pinSong(with inputModel: KTVMakeSongTopInputModel,
                  completion: @escaping (Error?) -> Void) {
 //        assert(false)
         guard let topSong = songList.first,
@@ -561,29 +624,29 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     
     
     //MARK: about lyrics
-    func enterSoloMode() {
+    public func enterSoloMode() {
         _markSoloSongIfNeed()
     }
 
     //MARK: subscribe
-    func subscribeUserListCountChanged(with changedBlock: @escaping (UInt) -> Void) {
+    public func subscribeUserListCountChanged(with changedBlock: @escaping (UInt) -> Void) {
 //        _unsubscribeAll()
         userListCountDidChanged = changedBlock
         _subscribeOnlineUsers {
         }
     }
     
-    func subscribeUserChanged(with changedBlock: @escaping (KTVSubscribe, VLLoginModel) -> Void) {
+    public func subscribeUserChanged(with changedBlock: @escaping (KTVSubscribe, VLLoginModel) -> Void) {
         userDidChanged = changedBlock
     }
 
-    func subscribeSeatListChanged(with changedBlock: @escaping (KTVSubscribe, VLRoomSeatModel) -> Void) {
+    public func subscribeSeatListChanged(with changedBlock: @escaping (KTVSubscribe, VLRoomSeatModel) -> Void) {
         seatListDidChanged = changedBlock
         _subscribeSeats {
         }
     }
     
-    func subscribeRoomStatusChanged(with changedBlock: @escaping (KTVSubscribe, VLRoomListModel) -> Void) {
+    public func subscribeRoomStatusChanged(with changedBlock: @escaping (KTVSubscribe, VLRoomListModel) -> Void) {
         roomStatusDidChanged = changedBlock
 
         guard let channelName = roomNo else {
@@ -616,17 +679,17 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                        })
     }
 
-    func subscribeChooseSongChanged(with changedBlock: @escaping (KTVSubscribe, VLRoomSelSongModel, [VLRoomSelSongModel]) -> Void) {
+    public func subscribeChooseSongChanged(with changedBlock: @escaping (KTVSubscribe, VLRoomSelSongModel, [VLRoomSelSongModel]) -> Void) {
         chooseSongDidChanged = changedBlock
         _subscribeChooseSong {
         }
     }
     
-    func subscribeNetworkStatusChanged(with changedBlock: @escaping (KTVServiceNetworkStatus) -> Void) {
+    public func subscribeNetworkStatusChanged(with changedBlock: @escaping (KTVServiceNetworkStatus) -> Void) {
         networkDidChanged = changedBlock
     }
     
-    func subscribeRoomWillExpire(with changedBlock: @escaping () -> Void) {
+    public func subscribeRoomWillExpire(with changedBlock: @escaping () -> Void) {
         roomExpiredDidChanged = changedBlock
         Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] timer in
             guard let self = self else { return }
@@ -642,7 +705,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         }
     }
     
-    func unsubscribeAll() {
+    public func unsubscribeAll() {
         _unsubscribeAll()
     }
 }
@@ -952,36 +1015,47 @@ extension KTVSyncManagerServiceImp {
                 return
             }
             
-            //TODO: _getSeatInfo will callback if remove seat invoke
             guard self.seatMap.count == 0 else {
                 return
             }
+
             
             list.forEach { seat in
-                self.seatMap["\(seat.seatIndex)"] = seat
+                guard let uid = seat.rtcUid else {return}
+                self.seatMap["\(seat.rtcUid)"] = seat
             }
-
+            
+            completion(list)
+            return
+            
+            //TODO: _getSeatInfo will callback if remove seat invoke
+            
             // update seat info (user avater/nick name did changed) if seat existed
-            if let seat = self.seatMap.filter({ $0.value.userNo == VLUserCenter.user.id }).first?.value {
-                let targetSeatInfo = self._getUserSeatInfo(seatIndex: seat.seatIndex, model: seat)
-                targetSeatInfo.objectId = seat.objectId
-                self._updateSeat(seatInfo: targetSeatInfo) { error in
-                    completion(self._getInitSeats())
-                }
-                return
-            }
+//            if let seat = self.seatMap.filter({ $0.value.userNo == VLUserCenter.user.id }).first?.value {
+//                let targetSeatInfo = self._getUserSeatInfo(seatIndex: seat.seatIndex, model: seat)
+//                targetSeatInfo.objectId = seat.objectId
+//                self._updateSeat(seatInfo: targetSeatInfo) { error in
+//                    completion(self._getInitSeats())
+//                }
+//                return
+//            } else {
+//
+//            }
+
             guard VLUserCenter.user.ifMaster else {
                 completion(self._getInitSeats())
                 return
             }
+            
+            completion(self._getInitSeats())
 
             // add master to first seat
-            let targetSeatInfo = self._getUserSeatInfo(seatIndex: 0)
-            targetSeatInfo.isAudioMuted = 0
-            targetSeatInfo.isMaster = true
-            self._addSeatInfo(seatInfo: targetSeatInfo) { error in
-                completion(self._getInitSeats())
-            }
+//            let targetSeatInfo = self._getUserSeatInfo(seatIndex: 0)
+//            targetSeatInfo.isAudioMuted = 0
+//            targetSeatInfo.isMaster = true
+//            self._addSeatInfo(seatInfo: targetSeatInfo) { error in
+//                completion(self._getInitSeats())
+//            }
         }
     }
     
@@ -997,13 +1071,15 @@ extension KTVSyncManagerServiceImp {
             
             var _seatMap: [String: VLRoomSeatModel] = .init()
             seatList.forEach { seat in
-                _seatMap["\(seat.seatIndex)"] = seat
+                guard let uid = seat.rtcUid else {return}
+                _seatMap["\(uid)"] = seat
             }
             
             self.seatMap.forEach { (key, origSeat) in
+                if key == nil {return}
+                print(_seatMap[key])
                 guard let seat = _seatMap[key] else {
                     let seat = VLRoomSeatModel()
-                    seat.seatIndex = origSeat.seatIndex
                     _seatMap[key] = seat
                     self.seatListDidChanged?(.deleted, origSeat)
                     return
@@ -1109,7 +1185,7 @@ extension KTVSyncManagerServiceImp {
                  success: {[weak self] obj in
                 agoraPrint("imp seat add success...")
                 seatInfo.objectId = obj.getId()
-                self?.seatMap["\(seatInfo.seatIndex)"] = seatInfo
+                self?.seatMap["\(seatInfo.rtcUid)"] = seatInfo
                 finished(nil)
             }, fail: { error in
                 agoraPrint("imp seat add fail...")
@@ -1130,21 +1206,25 @@ extension KTVSyncManagerServiceImp {
                 agoraPrint("imp seat subscribe oncreated... [\(object.getId())]")
                 guard let self = self,
                       let jsonStr = object.toJson(),
-                      let model = VLRoomSeatModel.yy_model(withJSON: jsonStr)
+                      let model = VLRoomSeatModel.yy_model(withJSON: jsonStr),
+                      let userNo = model.userNo,
+                      let uid = model.rtcUid
                 else {
                     return
                 }
-                self.seatMap["\(model.seatIndex)"] = model
+                self.seatMap["\(uid)"] = model
                 self.seatListDidChanged?(.created, model)
             }, onUpdated: { [weak self] object in
                 agoraPrint("imp seat subscribe onupdated... [\(object.getId())]")
                 guard let self = self,
                       let jsonStr = object.toJson(),
-                      let model = VLRoomSeatModel.yy_model(withJSON: jsonStr)
+                      let model = VLRoomSeatModel.yy_model(withJSON: jsonStr),
+                      let userNo = model.userNo,
+                      let uid = model.rtcUid
                 else {
                     return
                 }
-                self.seatMap["\(model.seatIndex)"] = model
+                self.seatMap["\(uid)"] = model
                 self.seatListDidChanged?(.updated, model)
             }, onDeleted: { [weak self] object in
                 agoraPrint("imp seat subscribe ondeleted... [\(object.getId())]")
@@ -1152,13 +1232,17 @@ extension KTVSyncManagerServiceImp {
                     return
                 }
                 let objectId = object.getId()
+                if objectId.isEmpty {return}
                 guard let origSeat = self.seatMap.filter({ $0.value.objectId == objectId }).first?.value else {
                     agoraPrint("delete seat not found")
                     return
                 }
                 let seat = VLRoomSeatModel()
                 seat.seatIndex = origSeat.seatIndex
-                self.seatMap["\(origSeat.seatIndex)"] = seat
+                seat.userNo = origSeat.userNo
+                seat.chorusSongCode = origSeat.chorusSongCode
+                guard let uid = origSeat.rtcUid else {return}
+                self.seatMap["\(uid)"] = seat
                 self.seatListDidChanged?(.deleted, seat)
             }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
@@ -1204,9 +1288,11 @@ extension KTVSyncManagerServiceImp {
                     return
                 }
                 agoraPrint("imp song get success... \(list.count)")
-                let totalList = list.compactMap({
+                var totalList = list.compactMap({
                     VLRoomSelSongModel.yy_model(withJSON: $0.toJson()!)!
                 })
+                //self.songList需要剔除掉songNO或者userNo为空的model
+                totalList = totalList.filter { $0.songNo != nil}
                 self.songList = totalList.filterDuplicates({$0.songNo})
                 self._sortChooseSongList()
                 let songList = self.songList

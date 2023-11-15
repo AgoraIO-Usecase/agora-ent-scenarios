@@ -61,7 +61,9 @@ class KTVSkipView: UIView {
         
     func setSkipType(_ type: SkipType) {
         let title = type == .prelude ? "跳过前奏" : "跳过尾奏"
-        skipBtn.setTitle(title, for: .normal)
+        DispatchQueue.main.async {
+            self.skipBtn.setTitle(title, for: .normal)
+        }
     }
     
     @objc private func skip(_ btn: UIButton) {

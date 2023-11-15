@@ -21,11 +21,16 @@ class VoiceRoomPresentView: UIView, UIGestureRecognizerDelegate {
     fileprivate let animationDuration: Double = 0.2
     
     fileprivate let keyWindow: UIWindow? = {
-        return UIApplication.shared.connectedScenes
-            .filter { $0.activationState == .foregroundActive }
-            .first(where: { $0 is UIWindowScene })
-            .flatMap({ $0 as? UIWindowScene })?.windows
-            .first(where: \.isKeyWindow)
+        if #available(iOS 13.0, *) {
+            return UIApplication.shared.connectedScenes
+                .filter { $0.activationState == .foregroundActive }
+                .first(where: { $0 is UIWindowScene })
+                .flatMap({ $0 as? UIWindowScene })?.windows
+                .first(where: \.isKeyWindow)
+        } else {
+            // Fallback on earlier versions
+            return nil
+        }
     }()
     
     fileprivate var frames: [CGRect] = [.zero] //保存所有的frame 保证你回来的各个高度都是你之前设定的

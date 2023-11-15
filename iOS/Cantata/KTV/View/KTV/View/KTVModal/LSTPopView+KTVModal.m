@@ -10,8 +10,8 @@
 #import "AESMacro.h"
 #import "UIView+VL.h"
 #import "VLEffectView.h"
-
-@implementation LSTPopView (KTVModal)
+#import "VLEarSettingView.h"
+@implementation LSTPopView (DHCModal)
 
 #pragma mark private method
 //公共弹窗视图设置
@@ -81,7 +81,7 @@
 //弹出下麦视图
 + (LSTPopView*)popDropLineViewWithParentView:(UIView*)parentView
                                withSeatModel:(VLRoomSeatModel *)seatModel
-                               withDelegate:(id<VLDropOnLineViewDelegate>)delegate {
+                               withDelegate:(id)delegate {
     CGFloat popViewH = 212 + kSafeAreaBottomHeight + 32;
     VLDropOnLineView* dropLineView = [[VLDropOnLineView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
                                                                withDelegate:delegate];
@@ -110,27 +110,27 @@
     return popView;
 }
 
-//弹出点歌视图
-+ (LSTPopView*)popUpChooseSongViewWithParentView:(UIView*)parentView
-                                        isChorus:(BOOL)isChorus
-                                 chooseSongArray: (NSArray*)chooseSongArray
-                                      withRoomNo:(NSString*)roomNo
-                                    withDelegate:(id<VLPopSongListDelegate>)delegate {
-    CGFloat popViewH = SCREEN_HEIGHT * 0.7;
-    VLPopSongList *chooseSongView = [[VLPopSongList alloc]
-                                           initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
-                                           withDelegate:delegate
-                                           withRoomNo:roomNo
-                                           ifChorus:isChorus];
-    chooseSongView.selSongsArray = chooseSongArray;
-    chooseSongView = chooseSongView;
-    LSTPopView* popView = [self _createKTVPopContainerWithContentView:chooseSongView
-                                                          withParentView:parentView];
-    popView.isAvoidKeyboard = NO;
-    [popView pop];
-    
-    return popView;
-}
+////弹出点歌视图
+//+ (LSTPopView*)popUpChooseSongViewWithParentView:(UIView*)parentView
+//                                        isChorus:(BOOL)isChorus
+//                                 chooseSongArray: (NSArray*)chooseSongArray
+//                                      withRoomNo:(NSString*)roomNo
+//                                    withDelegate:(id<VLPopSongListDelegate>)delegate {
+//    CGFloat popViewH = SCREEN_HEIGHT * 0.7;
+//    VLPopSongList *chooseSongView = [[VLPopSongList alloc]
+//                                           initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
+//                                           withDelegate:delegate
+//                                           withRoomNo:roomNo
+//                                           ifChorus:isChorus];
+//    chooseSongView.selSongsArray = chooseSongArray;
+//    chooseSongView = chooseSongView;
+//    LSTPopView* popView = [self _createKTVPopContainerWithContentView:chooseSongView
+//                                                          withParentView:parentView];
+//    popView.isAvoidKeyboard = NO;
+//    [popView pop];
+//
+//    return popView;
+//}
 
 //弹出音效
 + (LSTPopView*)popSetSoundEffectViewWithParentView:(UIView*)parentView
@@ -171,10 +171,10 @@
 
 //控制台
 + (LSTPopView*)popSettingViewWithParentView:(UIView*)parentView
-                               settingView:(VLKTVSettingView*)settingView
-                               withDelegate:(id<VLKTVSettingViewDelegate>)delegate {
-    VLKTVSettingView* _settingView = settingView ? settingView : [[VLKTVSettingView alloc] initWithSetting:nil];
-    _settingView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 300);
+                               settingView:(nullable DHCVLKTVSettingView*)settingView
+                               withDelegate:(id)delegate {
+    VLKTVSettingView* _settingView = settingView ? settingView : [[DHCVLKTVSettingView alloc] initWithSetting:nil];
+    _settingView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 400);
     _settingView.backgroundColor = UIColorMakeWithHex(@"#152164");
     [_settingView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
     _settingView.delegate = delegate;
@@ -186,4 +186,34 @@
     
     return popView;
 }
+
+//弹出耳返视图
++ (LSTPopView*)popEarSettingViewWithParentView:(UIView*)parentView
+                                   isEarOn:(BOOL)isEarOn
+                                           vol:(CGFloat)vol
+                                  withDelegate:(id<VLEarSettingViewViewDelegate>)delegate {
+    CGFloat popViewH = 88+17+270+kSafeAreaBottomHeight;
+    VLEarSettingView *earView = [[VLEarSettingView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) isEarOn:isEarOn vol:vol withDelegate:delegate];
+    
+    LSTPopView* popView = [self _createKTVPopContainerWithContentView:earView
+                                                       withParentView:parentView];
+    [popView pop];
+    
+    return popView;
+}
+
+//弹出DebugView
++ (LSTPopView*)popDebugViewWithParentView:(UIView*)parentView
+                                   isDebugMode:(BOOL)isDebugMode
+                             withDelegate:(id<DHCDebugViewDelegate>)delegate {
+    CGFloat popViewH = 480;
+    DHCDebugView *debugView = [[DHCDebugView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) isDumpMode:isDebugMode withDelegate:delegate];
+    
+    LSTPopView* popView = [self _createKTVPopContainerWithContentView:debugView
+                                                       withParentView:parentView];
+    [popView pop];
+    
+    return popView;
+}
+
 @end

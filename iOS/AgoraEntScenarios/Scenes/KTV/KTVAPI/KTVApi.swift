@@ -17,10 +17,15 @@ import AgoraRtcKit
 //    case followSinger       //跟唱
 }
 
+@objc public enum loadMusicType: Int {
+    case mcc
+    case local
+}
 
 /// 歌曲状态
 @objc public enum KTVPlayerTrackMode: Int {
     case origin = 0    //原唱
+    case lead          //导唱
     case acc           //伴奏
 }
 
@@ -69,6 +74,7 @@ import AgoraRtcKit
 @objc public enum KTVType: Int {
     case normal
     case singbattle
+    case cantata
 }
 
 @objc public protocol IMusicLoadStateListener: NSObjectProtocol {
@@ -99,16 +105,6 @@ import AgoraRtcKit
 }
 
 
-//public protocol KTVJoinChorusStateListener: NSObjectProtocol {
-//
-//    /// 加入合唱成功
-//    func onJoinChorusSuccess()
-//
-//    /// 加入合唱失败
-//    /// - Parameter reason: 失败原因
-//    func onJoinChorusFail(reason: KTVJoinChorusFailReason)
-//}
-
 @objc public protocol KTVLrcViewDelegate: NSObjectProtocol {
     func onUpdatePitch(pitch: Float)
     func onUpdateProgress(progress: Int)
@@ -131,18 +127,15 @@ import AgoraRtcKit
     /// 歌曲得分回调
     /// - Parameter score: <#score description#>
     func onSingingScoreResult(score: Float)
-
-    
+     
     /// 角色切换回调
     /// - Parameters:
     ///   - oldRole: <#oldRole description#>
     ///   - newRole: <#newRole description#>
     func onSingerRoleChanged(oldRole: KTVSingRole, newRole: KTVSingRole)
     
+    func onTokenPrivilegeWillExpire()
     
-
-   func onTokenPrivilegeWillExpire()
-        
     /**
          * 合唱频道人声音量提示
          * @param speakers 不同用户音量信息
@@ -163,6 +156,8 @@ import AgoraRtcKit
     var chorusChannelToken: String
     var type: KTVType = .normal
     var maxCacheSize: Int = 10
+    var musicType: loadMusicType = .mcc
+    var isDebugMode: Bool = false
     @objc public
     init(appId: String,
          rtmToken: String,
@@ -172,7 +167,9 @@ import AgoraRtcKit
          chorusChannelName: String,
          chorusChannelToken: String,
          type: KTVType,
-         maxCacheSize: Int
+         maxCacheSize: Int,
+         musicType: loadMusicType,
+         isDebugMode: Bool
     ) {
         self.appId = appId
         self.rtmToken = rtmToken
@@ -183,6 +180,27 @@ import AgoraRtcKit
         self.chorusChannelToken = chorusChannelToken
         self.type = type
         self.maxCacheSize = maxCacheSize
+        self.musicType = musicType
+        self.isDebugMode = isDebugMode
+        super.init()
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+@objc open class GiantChorusConfiguration: NSObject {
+    let audienceChannelToken: String
+    let musicStreamUid: Int
+    let musicChannelToken: String
+    let topN: Int
+    
+    init(audienceChannelToken: String, musicStreamUid: Int, musicChannelToken: String, topN: Int = 0) {
+        self.audienceChannelToken = audienceChannelToken
+        self.musicStreamUid = musicStreamUid
+        self.musicChannelToken = musicChannelToken
+        self.topN = topN
         super.init()
     }
     
@@ -197,6 +215,23 @@ import AgoraRtcKit
     public var autoPlay: Bool = false   //是否加载完成自动播放
     public var mainSingerUid: Int = 0     //主唱uid
     public var mode: KTVLoadMusicMode = .loadMusicAndLrc
+    
+    func printObjectContent() -> String {
+        var content = ""
+        
+        let mirror = Mirror(reflecting: self)
+        for child in mirror.children {
+            if let propertyName = child.label {
+                if let propertyValue = child.value as? CustomStringConvertible {
+                    content += "\(propertyName): \(propertyValue)\n"
+                } else {
+                    content += "\(propertyName): \(child.value)\n"
+                }
+            }
+        }
+        
+        return content
+   }
 }
 
 
@@ -293,6 +328,12 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     ///   - onSwitchRoleState: <#onSwitchRoleState description#>
     func switchSingerRole(newRole: KTVSingRole, onSwitchRoleState:@escaping ISwitchRoleStateListener)
     
+    /// 切换角色
+    /// - Parameters:
+    ///   - newRole: <#newRole description#>
+    ///   - stateCallBack: <#onSwitchRoleState description#>
+    func switchSingerRole2(newRole: KTVSingRole, stateCallBack:@escaping ISwitchRoleStateListener)
+    
     
     /// 播放
     /// - Parameter startPos: <#startPos description#>
@@ -336,16 +377,55 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     /// - Parameter isOnMicOpen: <#isOnMicOpen description#>
     func setMicStatus(isOnMicOpen: Bool)
     
-    /// 获取mpk实例
-    /// - Returns: <#description#>
-    func getMediaPlayer() -> AgoraMusicPlayerProtocol?
+    func getMusicPlayer() -> AgoraRtcMediaPlayerProtocol?
     
     /// 获取MCC实例
     /// - Returns: <#description#>
     func getMusicContentCenter() -> AgoraMusicContentCenter?
     
+    // 开启专业主播模式
+    func enableProfessionalStreamerMode(_ enable: Bool)
+    
     /**
      创建dataStreamID
      */
     func renewInnerDataStreamId()
+    
+    /**
+     * 初始化内部变量/缓存数据，并注册相应的监听，必须在其他KTVApi调用前调用initialize初始化KTVApi
+     * @param config 初始化KTVApi的配置
+     */
+    func initCantata(with config: KTVApiConfig, giantChorusConfig: GiantChorusConfiguration)
+    
+    
+  /**
+   * 加载歌曲，同时只能为一首歌loadSong，同步调用， 一般使用此loadSong是歌曲已经preload成功（url为本地文件地址）
+   * @param config 加载歌曲配置，config.autoPlay = true，默认播放url1
+   * @param url1 歌曲地址1
+   * @param url2 歌曲地址2
+   *
+   *
+   * 推荐调用：
+   * 歌曲开始时：
+   * 主唱 loadMusic(KTVSongConfiguration(autoPlay=true, mode=LOAD_MUSIC_AND_LRC, url, mainSingerUid)) switchSingerRole(SoloSinger)
+   * 观众 loadMusic(KTVSongConfiguration(autoPlay=false, mode=LOAD_LRC_ONLY, url, mainSingerUid))
+   * 加入合唱时：
+   * 准备加入合唱者：loadMusic(KTVSongConfiguration(autoPlay=false, mode=LOAD_MUSIC_ONLY, url, mainSingerUid))
+   * loadMusic成功后switchSingerRole(CoSinger)
+   */
+  func load2Music(
+      url1: String,
+      url2: String,
+      config: KTVSongConfiguration
+  )
+  
+  /**
+   * 多文件切换播放资源
+   * @param url 需要切换的播放资源，需要为 load2Music 中 参数 url1，url2 中的一个
+   * @param syncPts 是否同步切换前后的起始播放位置: true 同步，false 不同步，从 0 开始
+   */
+  func switchPlaySrc(url: String, syncPts: Bool)
+    
+  @objc func setAudienceStreamMessage(dict: [String: Any])
+      
 }

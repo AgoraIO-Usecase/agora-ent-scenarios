@@ -4,20 +4,19 @@
 //
 
 #import <UIKit/UIKit.h>
-
 NS_ASSUME_NONNULL_BEGIN
-@class VLRoomListModel, VLKTVTopView;
-@protocol VLKTVTopViewDelegate <NSObject>
+@class VLRoomListModel, DHCVLKTVTopView;
+@protocol DHCVLKTVTopViewDelegate <NSObject>
 
-- (void)onVLKTVTopView:(VLKTVTopView*)view closeBtnTapped:(id)sender;
+- (void)onVLKTVTopView:(DHCVLKTVTopView*)view closeBtnTapped:(id)sender;
 
-- (void)onVLKTVTopView:(VLKTVTopView*)view moreBtnTapped:(id)sender;
+- (void)onVLKTVTopView:(DHCVLKTVTopView*)view moreBtnTapped:(id)sender;
 
 @end
 
-@interface VLKTVTopView : UIView
+@interface DHCVLKTVTopView : UIView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLKTVTopViewDelegate>)delegate;
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<DHCVLKTVTopViewDelegate>)delegate;
 
 - (void)setNetworkQuality:(int)quality;
 

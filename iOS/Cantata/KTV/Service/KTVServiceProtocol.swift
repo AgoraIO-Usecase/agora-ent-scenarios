@@ -6,16 +6,16 @@
 //
 
 import Foundation
-import AgoraRtmKit
+import AgoraCommon
 
-@objc enum KTVServiceNetworkStatus: Int {
+@objc public enum KTVServiceNetworkStatus: Int {
     case connecting = 0 // 连接中
     case open // 已打开
     case fail // 失败
     case closed // 已关闭
 }
 
-@objc enum KTVSubscribe: Int {
+@objc public enum KTVSubscribe: Int {
     case created // 创建
     case deleted // 删除
     case updated // 更新
@@ -55,11 +55,17 @@ import AgoraRtmKit
     ///   - completion: 完成回调
     func enterSeat(with inputModel: KTVOnSeatInputModel, completion: @escaping (Error?) -> Void)
     
-    /// 下麦
+    /// 下麦删除所有歌曲
     /// - Parameters:
     ///   - inputModel: 输入模型
     ///   - completion: 完成回调
     func leaveSeat(with inputModel: KTVOutSeatInputModel, completion: @escaping (Error?) -> Void)
+    
+    /// 下麦但是只删除当前歌曲
+    /// - Parameters:
+    ///   - inputModel: 输入模型
+    ///   - completion: 完成回调
+    func leaveSeatWithoutRemoveSong(with seatModel: VLRoomSeatModel, completion: @escaping (Error?) -> Void)
     
     /// 设置麦位声音
     /// - Parameters:
@@ -73,7 +79,17 @@ import AgoraRtmKit
     ///   - completion: 完成回调
     func updateSeatVideoMuteStatus(with muted: Bool, completion: @escaping (Error?) -> Void)
     
-    // choose songs
+    /// 修改麦位对应的分数
+    /// - Parameters:
+    ///   - score: 对应麦位的实时分数
+    ///   - completion: 完成回调
+    func updateSeatScoreStatus(with score: Int, completion: @escaping (Error?) -> Void)
+    
+    /// 修改歌曲结束状态
+    /// - Parameters:
+    ///   - isEnd: 歌曲结束状态
+    ///   - completion: 完成回调
+    func updateSongEndStatus(with musicEnd: Bool, inputModel: KTVRemoveSongInputModel, completion: @escaping (Error?) -> Void)
     
     /// 删除选中歌曲
     /// - Parameters:

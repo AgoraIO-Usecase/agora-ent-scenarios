@@ -5,19 +5,20 @@
 
 #import "VLKTVTopView.h"
 #import "VLHotSpotBtn.h"
+#import <SDWebImage/UIImageView+WebCache.h>
 @import AgoraCommon;
-@interface VLKTVTopView ()
+@interface DHCVLKTVTopView ()
 
-@property(nonatomic, weak) id <VLKTVTopViewDelegate>delegate;
+@property(nonatomic, weak) id <DHCVLKTVTopViewDelegate>delegate;
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) UIButton *networkStatusBtn;
 @property (nonatomic, strong) UILabel *countLabel;
-
+@property (nonatomic, strong) UIImageView *logoImgView;
 @end
 
-@implementation VLKTVTopView
+@implementation DHCVLKTVTopView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLKTVTopViewDelegate>)delegate {
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id)delegate {
     if (self = [super initWithFrame:frame]) {
         self.delegate = delegate;
         [self setupView];
@@ -26,12 +27,22 @@
 }
 
 - (void)setupView {
-    UIImageView *logoImgView = [[UIImageView alloc]initWithFrame:CGRectMake(20, 10, 20, 20)];
-    logoImgView.image = [UIImage sceneImageWithName:@"ktv_logo_icon"];
-    [self addSubview:logoImgView];
     
-    VLHotSpotBtn *closeBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(SCREEN_WIDTH-27-20, logoImgView.top, 20, 20)];
-    [closeBtn setImage:[UIImage sceneImageWithName:@"ktv_close_icon"] forState:UIControlStateNormal];
+    UIView *backView = [[UIView alloc]initWithFrame:CGRectMake(20, 10, 191, 34)];
+    backView.backgroundColor = [UIColor colorWithRed:8/255.0 green:6/255.0 blue:47/255.0 alpha:0.3];
+    backView.layer.cornerRadius = 17;
+    backView.layer.masksToBounds = true;
+    [self addSubview:backView];
+    
+    UIImageView *logoImgView = [[UIImageView alloc]initWithFrame:CGRectMake(20, 10, 34, 34)];
+    logoImgView.image = [UIImage sceneImageWithName:@""];
+    logoImgView.layer.cornerRadius = 17;
+    logoImgView.layer.masksToBounds = true;
+    [self addSubview:logoImgView];
+    self.logoImgView = logoImgView;
+    
+    VLHotSpotBtn *closeBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(SCREEN_WIDTH-27-20, logoImgView.top + 7, 20, 20)];
+    [closeBtn setImage:[UIImage sceneImageWithName:@"dhc_close" bundleName:@"DHCResource"] forState:UIControlStateNormal];
     [closeBtn addTarget:self action:@selector(closeBtnEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:closeBtn];
     
@@ -44,31 +55,31 @@
     [[moreButton.centerYAnchor constraintEqualToAnchor:closeBtn.centerYAnchor]setActive:YES];
     [[moreButton.widthAnchor constraintEqualToConstant:24]setActive:YES];
     
-    self.titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(logoImgView.right+5, logoImgView.centerY-11, 120, 22)];
-    self.titleLabel.font = UIFontBoldMake(16);
+    self.titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(logoImgView.right+10, 10, 120, 18)];
+    self.titleLabel.font = UIFontBoldMake(14);
     self.titleLabel.textColor = UIColorWhite;
     [self addSubview:self.titleLabel];
     
 //    self.networkStatusBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"]
 //                                                             title:KTVLocalizedString(@"本机网络好")];
-    self.networkStatusBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.networkStatusBtn setTitle:KTVLocalizedString(@"ktv_net_status_good") forState:UIControlStateNormal];
-    [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
-//    self.networkStatusBtn.frame = CGRectMake(closeBtn.left-15-75, closeBtn.top, 75, 20);
-//    self.networkStatusBtn.imagePosition = QMUIButtonImagePositionLeft;
-    self.networkStatusBtn.spacingBetweenImageAndTitle = 4;
-    self.networkStatusBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
-    [self.networkStatusBtn setTitleColor:UIColorMakeWithHex(@"#979CBB") forState:UIControlStateNormal];
-    self.networkStatusBtn.titleLabel.font = UIFontMake(10.0);
-    [self addSubview:self.networkStatusBtn];
-    self.networkStatusBtn.translatesAutoresizingMaskIntoConstraints = NO;
-    [[self.networkStatusBtn.trailingAnchor constraintEqualToAnchor:moreButton.leadingAnchor constant:-10]setActive:YES];
-    [[self.networkStatusBtn.centerYAnchor constraintEqualToAnchor:moreButton.centerYAnchor]setActive:YES];
     
-    self.countLabel = [[UILabel alloc]initWithFrame:CGRectMake(logoImgView.left, logoImgView.bottom+10, 120, 14)];
-    self.countLabel.font = UIFontMake(10);
+    self.countLabel = [[UILabel alloc]initWithFrame:CGRectMake(logoImgView.right + 5, 30, 60, 12)];
+    self.countLabel.font = UIFontMake(12);
+    self.countLabel.textAlignment = NSTextAlignmentRight;
     self.countLabel.textColor = UIColorMakeWithHex(@"#979CBB");
     [self addSubview:self.countLabel];
+    
+    self.networkStatusBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.networkStatusBtn.frame = CGRectMake(self.countLabel.right + 5, 30, 70, 12);
+    [self.networkStatusBtn setTitle:KTVLocalizedString(@"ktv_net_status_good") forState:UIControlStateNormal];
+    [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
+  //  self.networkStatusBtn.imagePosition = QMUIButtonImagePositionLeft;
+    self.networkStatusBtn.spacingBetweenImageAndTitle = 0;
+    self.networkStatusBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
+    [self.networkStatusBtn setTitleColor:UIColorMakeWithHex(@"#979CBB") forState:UIControlStateNormal];
+    self.networkStatusBtn.titleLabel.font = UIFontMake(12.0);
+    [self addSubview:self.networkStatusBtn];
+    
 }
 
 #pragma mark --Event
@@ -87,13 +98,13 @@
 - (void)setListModel:(VLRoomListModel *)listModel {
     _listModel = listModel;
     self.titleLabel.text = listModel.name;
-    NSString *roomCountPre = KTVLocalizedString(@"ktv_room_count");
-    
+    NSString *roomCountPre = [@"ktv_room_count" toSceneLocalizationWithBundleName:@"DHCResource"];
+    [self.logoImgView sd_setImageWithURL:listModel.creatorAvatar];
     if (listModel.roomPeopleNum) {
-        NSString *roomCountString = [NSString stringWithFormat:@"%@:%@", roomCountPre, listModel.roomPeopleNum];
+        NSString *roomCountString = [NSString stringWithFormat:@"%@%@  |",  listModel.roomPeopleNum, roomCountPre];
         self.countLabel.text = roomCountString;
     }else{
-        NSString *roomCountString = [NSString stringWithFormat:@"%@:%i", roomCountPre, 1];
+        NSString *roomCountString = [NSString stringWithFormat:@"%i%@  |",1, roomCountPre];
         self.countLabel.text = roomCountString;
     }
 }

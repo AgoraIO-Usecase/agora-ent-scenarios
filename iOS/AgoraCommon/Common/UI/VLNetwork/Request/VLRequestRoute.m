@@ -23,10 +23,10 @@
     return url;
 }
 + (NSString*)getHostUrl {
-    return @"";//[NSString stringWithFormat:@"%@", [AppContext.shared appHostUrl]];
+    return AppContext.shared.hostUrl;
 }
 + (NSString*)getRequestUrl:(NSString *)url {
-    return @"";//[NSString stringWithFormat:@"%@%@", [AppContext.shared appHostUrl], url];
+    return [NSString stringWithFormat:@"%@%@", AppContext.shared.hostUrl, url];
 }
 
 + (NSString *)getToken {

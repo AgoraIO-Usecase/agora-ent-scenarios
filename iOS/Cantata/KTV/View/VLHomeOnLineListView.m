@@ -9,7 +9,7 @@
 #import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
 #import "AESMacro.h"
-#import "AppContext+KTV.h"
+#import "AppContext+DHCKTV.h"
 @import MJRefresh;
 
 @interface VLHomeOnLineListView ()<UICollectionViewDataSource,UICollectionViewDelegate>

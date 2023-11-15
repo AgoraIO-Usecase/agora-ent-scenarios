@@ -16,7 +16,7 @@
 
 @implementation VLDropOnLineView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLDropOnLineViewDelegate>)delegate{
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id)delegate{
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorClear;
         self.delegate = delegate;
@@ -71,6 +71,7 @@
 }
 
 - (void)dropLineBtnClickEvent {
+    // cp todo
     if (self.delegate && [self.delegate respondsToSelector:@selector(onVLDropOnLineView:action:)]) {
         [self.delegate onVLDropOnLineView:self action:self.seatModel];
     }

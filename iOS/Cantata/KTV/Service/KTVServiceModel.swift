@@ -13,27 +13,29 @@ import Foundation
     @objc public var name: String?
     @objc public var password: String?
     @objc public var soundEffect: String?
+    @objc public var creatorAvatar: String?
     //@objc var userNo: String?
 }
 
-@objc public class KTVCreateRoomOutputModel: NSObject {
+public class KTVCreateRoomOutputModel: NSObject {
     @objc public var name: String?
     @objc public var roomNo: String?
+    @objc public var creatorAvatar: String?
     @objc public var seatsArray: [VLRoomSeatModel]?
 }
 
-@objc public class KTVJoinRoomInputModel: NSObject {
+public class KTVJoinRoomInputModel: NSObject {
     @objc public var roomNo: String?
     //@objc var userNo: String?
     @objc public var password: String?
 }
 
-@objc public class KTVJoinRoomOutputModel: NSObject {
+public class KTVJoinRoomOutputModel: NSObject {
     @objc public var creatorNo: String?
     @objc public var seatsArray: [VLRoomSeatModel]?
 }
 
-@objc public class KTVChangeMVCoverInputModel: NSObject {
+public class KTVChangeMVCoverInputModel: NSObject {
     //@objc var roomNo: String?
     @objc public var mvIndex: UInt = 0
     //@objc var userNo: String?
@@ -48,11 +50,11 @@ class KTVChangeMVCoverOutputModel: NSObject {
 }
 */
 
-@objc public class KTVOnSeatInputModel: NSObject {
+public class KTVOnSeatInputModel: NSObject {
     @objc public var seatIndex: UInt = 0
 }
 
-@objc public class KTVOutSeatInputModel: NSObject {
+public class KTVOutSeatInputModel: NSObject {
     @objc public var userNo: String?
     @objc public var userId: String?
     @objc public var userName: String?
@@ -60,27 +62,27 @@ class KTVChangeMVCoverOutputModel: NSObject {
     @objc public var seatIndex: NSInteger = 0
 }
 
-@objc public class KTVRemoveSongInputModel: NSObject {
+public class KTVRemoveSongInputModel: NSObject {
     @objc public var songNo: String?
     @objc public var objectId: String?
 }
 
-@objc public class KTVJoinChorusInputModel: NSObject {
-    @objc var isChorus: Bool = false
-    @objc var songNo: String?
+public class KTVJoinChorusInputModel: NSObject {
+    @objc public var isChorus: Bool = false
+    @objc public var songNo: String?
 }
 
-@objc public class KTVChooseSongInputModel: NSObject {
-    @objc var isChorus: Bool = false
-    @objc var songName: String?
-    @objc var songNo: String?
+public class KTVChooseSongInputModel: NSObject {
+    @objc public var isChorus: Bool = false
+    @objc public var songName: String?
+    @objc public var songNo: String?
     //@objc var songUrl: String?
-    @objc var singer: String?
-    @objc var imageUrl: String?
+    @objc public var singer: String?
+    @objc public var imageUrl: String?
 }
 
-@objc public class KTVMakeSongTopInputModel: NSObject {
-    @objc var songNo: String?
-    @objc var sort: NSNumber?
-    @objc var objectId: String?
+public class KTVMakeSongTopInputModel: NSObject {
+    @objc public var songNo: String?
+    @objc public var sort: NSNumber?
+    @objc public var objectId: String?
 }

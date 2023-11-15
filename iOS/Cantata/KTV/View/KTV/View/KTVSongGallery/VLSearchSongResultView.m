@@ -5,12 +5,11 @@
 
 #import "VLSearchSongResultView.h"
 #import "VLSelectedSongListCell.h"
-#import "VLSongItmModel.h"
 #import "VLURLPathConfig.h"
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
 #import "VLUserCenter.h"
-#import "AppContext+KTV.h"
+#import "AppContext+DHCKTV.h"
 #import "AESMacro.h"
 #import "NSString+Helper.h"
 @import MJRefresh;
@@ -107,25 +106,25 @@ UITableViewDelegate
     };
     NSString *extra = [NSString convertToJsonData:dict];
     
-    [[AppContext shared].ktvAPI searchMusicWithKeyword:keyWord ? keyWord : @""
-                                                  page:self.page
-                                              pageSize:5
-                                            jsonOption:extra
-                                            completion:^(NSString * requestId, AgoraMusicContentCenterStatusCode status, AgoraMusicCollection * result) {
-        NSMutableArray* songArray = [NSMutableArray array];
-        [result.musicList enumerateObjectsUsingBlock:^(AgoraMusic * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            VLSongItmModel* model = [VLSongItmModel new];
-            model.songNo = [NSString stringWithFormat:@"%ld", obj.songCode];
-            model.songName = obj.name;
-            model.singer = obj.singer;
-            model.imageUrl = obj.poster;
-            [songArray addObject:model];
-        }];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self appendDatasWithSongList:songArray];
-        });
-    }];
+//    [[AppContext shared].ktvAPI searchMusicWithKeyword:keyWord ? keyWord : @""
+//                                                  page:self.page
+//                                              pageSize:5
+//                                            jsonOption:extra
+//                                            completion:^(NSString * requestId, AgoraMusicContentCenterStatusCode status, AgoraMusicCollection * result) {
+//        NSMutableArray* songArray = [NSMutableArray array];
+//        [result.musicList enumerateObjectsUsingBlock:^(AgoraMusic * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+//            VLSongItmModel* model = [VLSongItmModel new];
+//            model.songNo = [NSString stringWithFormat:@"%ld", obj.songCode];
+//            model.songName = obj.name;
+//            model.singer = obj.singer;
+//            model.imageUrl = obj.poster;
+//            [songArray addObject:model];
+//        }];
+//
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            [self appendDatasWithSongList:songArray];
+//        });
+  //  }];
 }
 
 - (void)setupView{

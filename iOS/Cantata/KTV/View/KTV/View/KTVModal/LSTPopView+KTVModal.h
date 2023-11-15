@@ -11,10 +11,10 @@
 #import "VLDropOnLineView.h"
 #import "VLAudioEffectPicker.h"
 #import "VLBadNetWorkView.h"
-#import "VLPopSongList.h"
 #import "VLEffectView.h"
-#import "VLKTVSettingView.h"
-
+#import "DHCVLKTVSettingView.h"
+#import "VLEarSettingView.h"
+#import "DHCDebugView.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LSTPopView (KTVModal)
@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 //弹出下麦视图
 + (LSTPopView*)popDropLineViewWithParentView:(UIView*)parentView
                                withSeatModel:(VLRoomSeatModel *)seatModel
-                                withDelegate:(id<VLDropOnLineViewDelegate>)delegate;
+                                withDelegate:(id)delegate;
 
 //弹出美声视图
 + (LSTPopView*)popBelcantoViewWithParentView:(UIView*)parentView
@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
                                         isChorus:(BOOL)isChorus
                                  chooseSongArray: (NSArray*)chooseSongArray
                                       withRoomNo:(NSString*)roomNo
-                                    withDelegate:(id<VLPopSongListDelegate>)delegate;
+                                    withDelegate:(id)delegate;
 
 //弹出音效
 + (LSTPopView*)popSetSoundEffectViewWithParentView:(UIView*)parentView
@@ -60,8 +60,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 //控制台
 + (LSTPopView*)popSettingViewWithParentView:(UIView*)parentView
-                               settingView:(VLKTVSettingView*)settingView
-                               withDelegate:(id<VLKTVSettingViewDelegate>)delegate;
+                               settingView:(nullable DHCVLKTVSettingView*)settingView
+                               withDelegate:(id)delegate;
+
+//弹出耳返视图
++ (LSTPopView*)popEarSettingViewWithParentView:(UIView*)parentView
+                                   isEarOn:(BOOL)isEarOn
+                                           vol:(CGFloat)vol
+                                  withDelegate:(id<VLEarSettingViewViewDelegate>)delegate;
+
+//弹出DebugView
++ (LSTPopView*)popDebugViewWithParentView:(UIView*)parentView
+                                   isDebugMode:(BOOL)isDebugMode
+                                  withDelegate:(id<DHCDebugViewDelegate>)delegate;
+
 @end
 
 NS_ASSUME_NONNULL_END

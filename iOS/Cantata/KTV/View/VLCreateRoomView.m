@@ -8,7 +8,7 @@
 #import "VLMacroDefine.h"
 #import "VLToast.h"
 #import "AESMacro.h"
-#import "MenuUtils.h"
+//#import "MenuUtils.h"
 
 @interface VLCreateRoomView ()
 
@@ -47,7 +47,11 @@
     UILabel *roomTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(40, iconImgView.bottom+VLREALVALUE_WIDTH(40), 70, 20)];
     roomTitleLabel.font = UIFontMake(14);
     roomTitleLabel.textColor = UIColorMakeWithHex(@"#000000");
-    roomTitleLabel.text = AGLocalizedString(@"ktv_room_title");
+#if DEBUG
+#else
+#warning fix it by chenpan
+    roomTitleLabel.text = KTVLocalizedString(@"ktv_room_title");
+#endif
     [self addSubview:roomTitleLabel];
     
 //    QMUIButton *randomBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_create_randomIcon"]
@@ -154,7 +158,7 @@
     UILabel *topLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-160)*0.5+5, createBtn.top-20-30, 160, 17)];
     topLabel.font = UIFontMake(12);
     topLabel.textColor = UIColorMakeWithHex(@"#6C7192");
-    topLabel.text = KTVLocalizedString(@"ktv_create_tips2");
+    topLabel.text = [@"ktv_create_tips2" toSceneLocalizationWithBundleName:@"DHCResource"];
     [self addSubview:topLabel];
     
     UIImageView *tipImgView = [[UIImageView alloc]initWithFrame:CGRectMake(topLabel.left-16, topLabel.centerY-7.5, 16, 15)];
@@ -165,7 +169,7 @@
     bottomLabel.font = UIFontMake(12);
     bottomLabel.textAlignment = NSTextAlignmentCenter;
     bottomLabel.textColor = UIColorMakeWithHex(@"#6C7192");
-    bottomLabel.text = KTVLocalizedString(@"ktv_create_tips3");
+    bottomLabel.text = [@"ktv_create_tips3" toSceneLocalizationWithBundleName:@"DHCResource"];
     [self addSubview:bottomLabel];
     
     [self randomBtnClickEvent];
