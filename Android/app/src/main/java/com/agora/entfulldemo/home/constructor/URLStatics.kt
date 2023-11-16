@@ -18,7 +18,7 @@ class URLStatics {
         const val findScenarioChatroomURL = "https://www.shengwang.cn/solution/voicechat/"
         const val findDocChatroomURL = "https://doc.shengwang.cn/doc/chatroom/android/landing-page"
         const val findScenarioLiveURL = "https://www.shengwang.cn/solution/hd-video/"
-        const val findDocLiveURL = "https://docportal.shengwang.cn/cn/showroom/landing-page?platform=Android"
+        const val findDocLiveURL = "https://doc.shengwang.cn/doc/showroom/android/landing-page"
         const val findAIDenoiseURL = "https://www.shengwang.cn/AI-denoiser/"
         const val findAISpatialURL = "https://www.shengwang.cn/3D-spatial/"
     }

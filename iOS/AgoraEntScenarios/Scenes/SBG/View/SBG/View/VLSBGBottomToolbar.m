@@ -112,7 +112,7 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
 }
 
 -(void)setAudioBtnEnabled:(BOOL)enabled {
-    _audioBtn.enabled = enabled;
+    _audioBtn.userInteractionEnabled = enabled;
 }
 
 - (void)bottomBtnClickEvent:(VLHotSpotBtn *)sender {

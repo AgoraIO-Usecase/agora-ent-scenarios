@@ -11,7 +11,6 @@ import android.util.Log
 import android.util.Size
 import android.view.*
 import android.view.ViewGroup.MarginLayoutParams
-import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
@@ -21,6 +20,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.IMediaPlayerObserver
 import io.agora.mediaplayer.data.PlayerUpdatedInfo
@@ -55,7 +55,6 @@ import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowRoomRequestStatus
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.service.ShowUser
-import io.agora.scene.show.videoLoaderAPI.AnchorState
 import io.agora.scene.show.videoLoaderAPI.OnPageScrollEventHandler
 import io.agora.scene.show.videoLoaderAPI.VideoLoader
 import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
@@ -213,7 +212,7 @@ class LiveDetailFragment : Fragment() {
         startTopLayoutTimer()
     }
 
-    fun stopLoadPage(isScrolling: Boolean){
+    fun stopLoadPage(isScrolling: Boolean) {
         ShowLogger.d(TAG, "Fragment PageLoad stop load, roomId=${mRoomInfo.roomId}")
         isPageLoaded = false
         destroy(isScrolling) // 切页或activity销毁
@@ -230,6 +229,7 @@ class LiveDetailFragment : Fragment() {
         if (isRoomOwner) {
             showEndRoomDialog()
         } else {
+            stopLoadPage(false)
             activity?.finish()
         }
     }
@@ -243,7 +243,21 @@ class LiveDetailFragment : Fragment() {
         initMessageLayout()
 
         // Render host video
-        // initVideoView()
+        if (needRender) {
+            mRtcVideoLoaderApi.renderVideo(
+                VideoLoader.AnchorInfo(
+                    mRoomInfo.roomId,
+                    mRoomInfo.ownerId.toInt(),
+                    RtcEngineInstance.generalToken()
+                ),
+                UserManager.getInstance().user.id.toInt(),
+                VideoLoader.VideoCanvasContainer(
+                    viewLifecycleOwner,
+                    mBinding.videoLinkingLayout.videoContainer,
+                    mRoomInfo.ownerId.toInt()
+                )
+            )
+        }
     }
 
     private fun initVideoView() {
@@ -254,16 +268,6 @@ class LiveDetailFragment : Fragment() {
                         it,
                         mBinding.videoLinkingLayout.videoContainer,
                         0
-                    )
-                )
-            } else if (needRender) {
-                mRtcVideoLoaderApi.renderVideo(
-                    VideoLoader.AnchorInfo(mRoomInfo.roomId, mRoomInfo.ownerId.toInt(), RtcEngineInstance.generalToken()),
-                    UserManager.getInstance().user.id.toInt(),
-                    VideoLoader.VideoCanvasContainer(
-                        it,
-                        mBinding.videoLinkingLayout.videoContainer,
-                        mRoomInfo.ownerId.toInt()
                     )
                 )
             }
@@ -278,20 +282,20 @@ class LiveDetailFragment : Fragment() {
             if (interactionInfo != null && interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) {
                 if (info.channelId == mRoomInfo.roomId) {
                     return VideoLoader.VideoCanvasContainer(
-                        it,
+                        viewLifecycleOwner,
                         mBinding.videoPKLayout.iBroadcasterAView,
                         mRoomInfo.ownerId.toInt()
                     )
                 } else if (info.channelId == interactionInfo!!.roomId) {
                     return VideoLoader.VideoCanvasContainer(
-                        it,
+                        viewLifecycleOwner,
                         mBinding.videoPKLayout.iBroadcasterBView,
                         interactionInfo!!.userId.toInt()
                     )
                 }
             } else {
                 return VideoLoader.VideoCanvasContainer(
-                    it,
+                    viewLifecycleOwner,
                     mBinding.videoLinkingLayout.videoContainer,
                     mRoomInfo.ownerId.toInt()
                 )
@@ -318,9 +322,10 @@ class LiveDetailFragment : Fragment() {
         livingEndLayout.tvUserName.text = mRoomInfo.ownerName
         Glide.with(this@LiveDetailFragment)
             .load(mRoomInfo.ownerAvatar)
-            .error(R.mipmap.show_default_avatar)
+            .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
             .into(livingEndLayout.ivAvatar)
         livingEndLayout.ivClose.setOnClickListener {
+            stopLoadPage(false)
             activity?.finish()
         }
     }
@@ -329,7 +334,8 @@ class LiveDetailFragment : Fragment() {
         val topLayout = mBinding.topLayout
         Glide.with(this)
             .load(mRoomInfo.ownerAvatar)
-            .error(R.mipmap.show_default_avatar)
+            .error(R.mipmap.default_user_avatar)
+            .apply(RequestOptions.circleCropTransform())
             .into(topLayout.ivOwnerAvatar)
         topLayout.tvRoomName.text = mRoomInfo.roomName
         topLayout.tvRoomId.text = getString(R.string.show_room_id, mRoomInfo.roomId)
@@ -762,6 +768,7 @@ class LiveDetailFragment : Fragment() {
                                 if (!isRoomOwner) {
                                     mService.muteAudio(mRoomInfo.roomId, !activated, interactionInfo!!.userId)
                                 } else {
+                                    mService.muteAudio(mRoomInfo.roomId, !activated, mRoomInfo.ownerId)
                                     enableLocalAudio(activated)
                                 }
                             })
@@ -823,6 +830,7 @@ class LiveDetailFragment : Fragment() {
             .setTitle(R.string.show_tip)
             .setMessage(R.string.show_live_end_room_or_not)
             .setPositiveButton(R.string.show_setting_confirm) { dialog, id ->
+                stopLoadPage(false)
                 activity?.finish()
                 dialog.dismiss()
             }
@@ -1649,6 +1657,10 @@ class LiveDetailFragment : Fragment() {
             mRtcEngine.stopPreview()
             mRtcEngine.leaveChannelEx(mMainRtcConnection)
             mMediaPlayer?.destroy()
+
+            if (isPKing()) {
+                mRtcEngine.leaveChannelEx(RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()))
+            }
         }
         return true
     }
@@ -1823,7 +1835,7 @@ class LiveDetailFragment : Fragment() {
         channelMediaOptions.publishCustomAudioTrack = false
         channelMediaOptions.enableAudioRecordingOrPlayout = true
         channelMediaOptions.autoSubscribeVideo = true
-        channelMediaOptions.autoSubscribeAudio = false
+        channelMediaOptions.autoSubscribeAudio = true
         channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
 
         (activity as? LiveDetailActivity)?.let {
@@ -2016,6 +2028,7 @@ class LiveDetailFragment : Fragment() {
         prepareRkRoomId = pkRoomId
     }
 
+    private var pkAgainstView: View? = null
     private fun updatePKingMode() {
         // 开始pk
         if (interactionInfo == null) return
@@ -2120,11 +2133,12 @@ class LiveDetailFragment : Fragment() {
                 eventListener
             )
             activity?.let {
-                val view = TextureView(it)
-                mBinding.videoPKLayout.iBroadcasterBView.addView(view, 0)
+                mBinding.videoPKLayout.iBroadcasterBView.removeView(pkAgainstView)
+                pkAgainstView = TextureView(it)
+                mBinding.videoPKLayout.iBroadcasterBView.addView(pkAgainstView, 0)
                 mRtcEngine.setupRemoteVideoEx(
                     VideoCanvas(
-                        view,
+                        pkAgainstView,
                         1,
                         interactionInfo?.userId!!.toInt(),
                     ),
@@ -2295,10 +2309,8 @@ class LiveDetailFragment : Fragment() {
 
         // 停止推流，使用updateChannelMediaOptionEx
         val mediaOptions = ChannelMediaOptions()
-        if (mediaOptions.isPublishMediaPlayerAudioTrack) {
-            mediaOptions.publishMediaPlayerAudioTrack = false
-            mRtcEngine.updateChannelMediaOptionsEx(mediaOptions, mMainRtcConnection)
-        }
+        mediaOptions.publishMediaPlayerAudioTrack = false
+        mRtcEngine.updateChannelMediaOptionsEx(mediaOptions, mMainRtcConnection)
     }
 
     private fun adjustAudioMixingVolume(volume: Int) {

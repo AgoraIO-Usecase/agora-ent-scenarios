@@ -144,12 +144,7 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
 
         val selectedRoomIndex = intent.getIntExtra(EXTRA_ROOM_DETAIL_INFO_LIST_SELECTED_INDEX, 0)
 
-//        // 设置token有效期为房间存活时长，到期后关闭并退出房间
-//        TokenGenerator.expireSecond =
-//            ROOM_AVAILABLE_DURATION / 1000 + 10 // 20min + 10s，加10s防止临界条件下报token无效
-
         onPageScrollEventHandler = object : OnPageScrollEventHandler(
-            this,
             RtcEngineInstance.rtcEngine,
             UserManager.getInstance().user.id.toInt(),
             true,

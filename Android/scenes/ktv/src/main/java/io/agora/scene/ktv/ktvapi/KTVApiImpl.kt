@@ -677,7 +677,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun setLrcView(view: ILrcView) {
-        reportCallScenarioApi("setLrcView", JSONObject())
+        //reportCallScenarioApi("setLrcView", JSONObject())
         this.lrcView = view
     }
 
@@ -1356,6 +1356,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     ) {
         val mediaPlayerState = state ?: return
         val mediaPlayerError = error ?: return
+        ktvApiLog("onPlayerStateChanged: $state")
         this.mediaPlayerState = mediaPlayerState
         when (mediaPlayerState) {
             MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {

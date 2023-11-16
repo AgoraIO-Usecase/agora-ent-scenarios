@@ -22,7 +22,7 @@ NSString* sAgoraSBGAPIKey = @"sAgoraSBGAPIKey";
     [[AppContext shared].extDic setValue:sbgAPI forKey:sAgoraSBGAPIKey];
 }
 
-- (SBGApiImpl*)sbgAPI {
+- (KTVApiImpl*)sbgAPI {
     return [[AppContext shared].extDic valueForKey:sAgoraSBGAPIKey];
 }
 

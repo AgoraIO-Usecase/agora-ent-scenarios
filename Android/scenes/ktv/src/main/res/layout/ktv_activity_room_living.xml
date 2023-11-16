@@ -38,10 +38,10 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintStart_toStartOf="parent"
+                app:shapeAppearance="@style/ui_widget_roundStyle"
                 app:layout_constraintTop_toTopOf="parent"
-                app:shapeAppearance="@style/ktv_ui_widget_roundStyle"
                 app:strokeColor="@android:color/transparent"
-                tools:src="@mipmap/portrait01" />
+                tools:src="@mipmap/mvbg0" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvRoomName"

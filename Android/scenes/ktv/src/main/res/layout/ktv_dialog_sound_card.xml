@@ -7,12 +7,12 @@
     android:layout_height="wrap_content"
     tools:theme="@style/Theme.AppCompat"
     android:paddingBottom="24dp"
-    android:background="@drawable/bg_full_blue_top_20">
+    android:background="@drawable/ktv_rect_white_top_r20">
 
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@drawable/bg_full_blue_top_20"
+        android:background="@drawable/ktv_rect_white_top_r20"
         app:layout_constraintTop_toTopOf="@+id/ivBottomSheetTitle"
         app:layout_constraintBottom_toBottomOf="@+id/mtBottomSheetTitle"/>
 
@@ -44,7 +44,7 @@
         android:textSize="18sp"
         android:text="@string/ktv_virtual_sound_card"
         android:textStyle="bold"
-        android:textColor="@color/white"
+        android:textColor="@color/def_text_color_040"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
@@ -57,7 +57,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="18dp"
         android:text="@string/ktv_input_device"
-        android:textColor="@color/white"
+        android:textColor="@color/def_text_color_3c4"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle" />
@@ -67,7 +67,7 @@
         android:layout_width="wrap_content"
         android:layout_marginEnd="20dp"
         android:text="@string/ktv_external_mircrophone"
-        android:textColor="@color/grey_e1"
+        android:textColor="@color/def_text_color_3c4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/mtInputDevice"
         app:layout_constraintBottom_toBottomOf="@id/mtInputDevice" />
@@ -79,7 +79,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="18dp"
-        android:background="@color/bg_color_blue_31_t10"
+        app:dividerColor="#F2F2F6"
         app:layout_constraintTop_toBottomOf="@+id/mtInputDevice"
         />
 
@@ -90,8 +90,9 @@
         android:layout_width="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="18dp"
+        android:textStyle="bold"
         android:text="@string/ktv_sound_card_switch"
-        android:textColor="@color/white"
+        android:textColor="@color/def_text_color_3c4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/dvInputDevice" />
 
@@ -113,7 +114,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="18dp"
-        android:background="@color/bg_color_blue_31_t10"
+        app:dividerColor="#F2F2F6"
         app:layout_constraintTop_toBottomOf="@+id/mtSoundCardSwitch"
         />
 
@@ -121,6 +122,7 @@
         android:id="@+id/clSoundCardParams"
         android:layout_width="match_parent"
         android:layout_height="180dp"
+        tools:visibility="invisible"
         app:layout_constraintTop_toBottomOf="@id/dvSoundCardSwitch">
 
         <!--  预设音效  -->
@@ -130,8 +132,9 @@
             android:layout_width="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="18dp"
+            android:textStyle="bold"
             android:text="@string/ktv_sound_preset_type"
-            android:textColor="@color/white"
+            android:textColor="@color/def_text_color_3c4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -140,9 +143,9 @@
             android:layout_height="48dp"
             android:layout_width="220dp"
             android:layout_marginEnd="20dp"
-            android:textColor="@color/white"
+            android:textColor="@color/def_text_color_3c4"
             app:layout_constraintEnd_toEndOf="parent"
-            android:drawableRight="@mipmap/ktv_ic_arrow_riight"
+            android:drawableEnd="@mipmap/ktv_ic_arrow_riight"
             android:textSize="13sp"
             tools:text="TypeA"
             android:gravity="center_vertical|end"
@@ -156,7 +159,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="18dp"
-            android:background="@color/bg_color_blue_31_t10"
+            app:dividerColor="#F2F2F6"
             app:layout_constraintTop_toBottomOf="@+id/tvSoundType"
             />
 
@@ -169,7 +172,8 @@
             android:layout_marginTop="8dp"
             android:textSize="13sp"
             android:text="@string/ktv_gain_adjust"
-            android:textColor="@color/white"
+            android:textColor="@color/def_text_color_3c4"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dvSoundType" />
 
@@ -178,7 +182,7 @@
             android:layout_height="18dp"
             android:layout_width="30dp"
             android:layout_marginEnd="20dp"
-            android:textColor="@color/white"
+            android:textColor="@color/def_text_color_3c4"
             android:background="@drawable/ktv_edit_text_selector"
             android:gravity="center"
             android:maxLines="1"
@@ -200,8 +204,8 @@
             android:contentDescription="@string/ktv_gain_adjust"
             android:max="40"
             tools:progress="10"
-            android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
-            android:thumb="@mipmap/ic_seekbar_btn"
+            android:progressDrawable="@drawable/ktv_seekbar_progress"
+            android:thumb="@drawable/ktv_seekbar_thumb20"
             app:layout_constraintEnd_toStartOf="@id/etGainAdjust"
             app:layout_constraintBottom_toBottomOf="@id/etGainAdjust"
             app:layout_constraintTop_toTopOf="@id/etGainAdjust"
@@ -216,7 +220,7 @@
             android:gravity="center"
             android:layout_marginTop="0dp"
             android:text="@string/ktv_gain_adjust_tips"
-            android:textColor="@color/grey_d5"
+            android:textColor="@color/def_text_grey_979"
             android:textSize="12sp"
             app:layout_constraintStart_toStartOf="@id/mtGainAdjust"
             app:layout_constraintTop_toBottomOf="@id/mtGainAdjust" />
@@ -228,7 +232,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="8dp"
-            android:background="@color/bg_color_blue_31_t10"
+            app:dividerColor="#F2F2F6"
             app:layout_constraintTop_toBottomOf="@+id/mtGainAdjustTips"
             />
 
@@ -241,7 +245,8 @@
             android:layout_marginTop="8dp"
             android:textSize="13sp"
             android:text="@string/ktv_sound_mic_phone_type"
-            android:textColor="@color/white"
+            android:textColor="@color/def_text_color_3c4"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dvGainAdjust" />
 
@@ -250,7 +255,7 @@
             android:layout_height="wrap_content"
             android:layout_width="30dp"
             android:layout_marginEnd="20dp"
-            android:textColor="@color/white"
+            android:textColor="@color/def_text_color_3c4"
             app:layout_constraintEnd_toEndOf="parent"
             android:textSize="13sp"
             tools:text="12"
@@ -266,8 +271,8 @@
             android:contentDescription="@string/ktv_gain_adjust"
             android:max="16"
             tools:progress="10"
-            android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
-            android:thumb="@mipmap/ic_seekbar_btn"
+            android:progressDrawable="@drawable/ktv_seekbar_progress"
+            android:thumb="@drawable/ktv_seekbar_thumb20"
             app:layout_constraintStart_toStartOf="@+id/pbGainAdjust"
             app:layout_constraintEnd_toStartOf="@id/tvMicType"
             app:layout_constraintTop_toTopOf="@id/tvMicType"
@@ -282,7 +287,7 @@
             android:gravity="center"
             android:layout_marginTop="0dp"
             android:text="@string/ktv_sound_mic_phone_type_tips"
-            android:textColor="@color/grey_d5"
+            android:textColor="@color/def_text_grey_979"
             android:textSize="12sp"
             app:layout_constraintStart_toStartOf="@id/mtMicType"
             app:layout_constraintTop_toBottomOf="@id/mtMicType" />
@@ -294,7 +299,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="8dp"
-            android:background="@color/bg_color_blue_31_t10"
+            app:dividerColor="#F2F2F6"
             app:layout_constraintTop_toBottomOf="@+id/mtMicTypeTips"
             />
 
@@ -302,7 +307,6 @@
             android:id="@+id/vPramsMark"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -311,32 +315,46 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:drawableStart="@mipmap/ktv_ic_tips_mark_red"
+        android:drawableStart="@mipmap/ic_tip_error"
         android:drawablePadding="5dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="8dp"
+        android:textSize="12sp"
         android:text="@string/ktv_sound_card_error"
         android:textColor="@color/red_e0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mtInputDevice" />
+        app:layout_constraintTop_toBottomOf="@id/dvInputDevice" />
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tvSoundCardSupport"
-        android:layout_width="wrap_content"
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvDisableTips"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:lineSpacingExtra="3dp"
-        android:text="@string/ktv_sound_card_supports"
-        android:textColor="@color/grey_e5"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvSoundCardError" />
+        app:layout_constraintTop_toBottomOf="@id/tvSoundCardError"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        android:backgroundTint="#FAFBFC">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvSoundCardSupport"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:paddingVertical="12dp"
+            android:textSize="13sp"
+            android:text="@string/ktv_sound_card_supports"
+            android:textColor="#3C4267"
+            />
+    </androidx.cardview.widget.CardView>
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/groupSoundCardAbnormal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:constraint_referenced_ids="tvSoundCardError,tvSoundCardSupport"
+        app:constraint_referenced_ids="tvSoundCardError,cvDisableTips"
         tools:visibility="invisible" />
 
     <androidx.constraintlayout.widget.Group

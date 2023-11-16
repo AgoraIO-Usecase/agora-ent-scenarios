@@ -39,9 +39,10 @@
     [self.contentView addSubview:self.bgImgView];
     
     self.iconImgView = [[UIImageView alloc]initWithFrame:CGRectMake((self.width - 64) * 0.5, 20, 64, 64)];
-    self.iconImgView.layer.cornerRadius = 20;
+    self.iconImgView.layer.cornerRadius = 32;
     self.iconImgView.layer.masksToBounds = YES;
     self.iconImgView.userInteractionEnabled = YES;
+    self.iconImgView.contentMode = UIViewContentModeScaleAspectFill;
     [self.bgImgView addSubview:self.iconImgView];
     
     self.lockImgView = [[UIImageView alloc]initWithFrame:CGRectMake(self.width - 26, 10, 16, 16)];

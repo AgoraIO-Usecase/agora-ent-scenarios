@@ -151,6 +151,11 @@
             if (speakerUid == 0) {
                 speakerUid = VLUserCenter.user.chat_uid.integerValue;
             }
+            
+            if (model.seatIndex == 0 && model.isAudioMuted == true) {
+                return;
+            }
+            
             if(model.rtcUid && model.rtcUid.integerValue == speakerUid) {
                 [self updateVolumeForIndex:model.seatIndex volume:speaker.volume];
                 break;

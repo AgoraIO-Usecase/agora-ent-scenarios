@@ -2,8 +2,6 @@ package io.agora.scene.ktv.widget.lrcView;
 
 import android.animation.Animator;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.text.Spannable;
@@ -20,7 +18,6 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.palette.graphics.Palette;
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
 
 import com.bumptech.glide.Glide;
@@ -51,7 +48,6 @@ import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
 import io.agora.scene.ktv.ktvapi.ILrcView;
 import io.agora.scene.ktv.service.RoomSelSongModel;
 import io.agora.scene.widget.basic.OutlineSpan;
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 import io.agora.scene.widget.utils.UiUtils;
 
 /**
@@ -726,7 +722,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         GlideApp.with(mBinding.getRoot())
                 .load(url)
                 .error(R.mipmap.ktv_highlight_head_bg)
-                .transform(new CenterCropRoundCornerTransform(100))
+                .apply(RequestOptions.circleCropTransform())
                 .into(mBinding.ilActive.ivVocalHighlight);
     }
 

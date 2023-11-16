@@ -5,13 +5,14 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import com.bumptech.glide.request.RequestOptions;
+
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.ktv.singrelay.KTVLogger;
 import io.agora.scene.ktv.singrelay.R;
 import io.agora.scene.ktv.singrelay.databinding.KtvRelayItemRankListBinding;
 import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
 public class RankListAdapter extends BindingSingleAdapter<RankItem, KtvRelayItemRankListBinding> {
     @Override
@@ -56,8 +57,8 @@ public class RankListAdapter extends BindingSingleAdapter<RankItem, KtvRelayItem
             mBinding.ivHeader.setVisibility(View.VISIBLE);
             GlideApp.with(mBinding.getRoot())
                     .load(item.poster)
-                    .error(R.mipmap.userimage)
-                    .transform(new CenterCropRoundCornerTransform(100))
+                    .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                    .apply(RequestOptions.circleCropTransform())
                     .into(mBinding.ivHeader);
         }
     }

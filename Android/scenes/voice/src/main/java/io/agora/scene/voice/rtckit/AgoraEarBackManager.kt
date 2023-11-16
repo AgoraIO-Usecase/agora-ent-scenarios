@@ -76,7 +76,7 @@ class AgoraEarBackManager(
 
     fun updateEnableInEarMonitoring() {
         if (!params.isForbidden && params.isOn) {
-            mRtcEngine.enableInEarMonitoring(true, Constants.EAR_MONITORING_FILTER_BUILT_IN_AUDIO_FILTERS and Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION)
+            mRtcEngine.enableInEarMonitoring(true, Constants.EAR_MONITORING_FILTER_BUILT_IN_AUDIO_FILTERS or Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION)
         } else {
             mRtcEngine.enableInEarMonitoring(false)
         }

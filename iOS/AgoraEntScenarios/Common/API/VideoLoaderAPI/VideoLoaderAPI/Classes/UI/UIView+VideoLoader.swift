@@ -6,6 +6,8 @@
 //
 
 import Foundation
+
+private var ag_tapRoomId: String = ""
  
 struct APIRuntimeKey {
     static let handler = UnsafeRawPointer.init(bitPattern: "api_handler".hashValue)!
@@ -85,14 +87,12 @@ extension UIView {
     
     @objc func onGesture(_ ges: UIGestureRecognizer) {
         guard let roomInfo = ag_eventHandler?.roomInfo, let localUid = ag_eventHandler?.localUid else {return}
-        let map = VideoLoaderApiImpl.shared.getConnectionMap()
         //只允许一个item被预加载到
-        if map[roomInfo.channelName()] == nil, map.count > 0 {
-            return
-        }
+        guard ag_tapRoomId.count == 0 || ag_tapRoomId == roomInfo.channelName() else { return }
         
         switch ges.state {
         case .began:
+            ag_tapRoomId = roomInfo.channelName()
             self.ag_touchTL = NSValue(cgPoint: convert(CGPoint.zero, to: api_getWinwdow()))
             debugLoaderPrint("[UI]onGesture began")
             guard ag_eventHandler?.enableProcess?(.began) ?? true else {
@@ -106,6 +106,7 @@ extension UIView {
                                                             tagId: roomInfo.channelName())
             }
         case .cancelled, .ended:
+            ag_tapRoomId = ""
             let point = ges.location(in: self)
             let currentTl = convert(CGPoint.zero, to:api_getWinwdow())
             
@@ -125,6 +126,9 @@ extension UIView {
                                                             anchorInfo: anchorInfo,
                                                             tagId: roomInfo.channelName())
             }
+            
+            //上报耗时开始
+            VideoLoaderApiImpl.shared.startMediaRenderingTracing(anchorId: roomInfo.channelName())
         default:
             break
         }

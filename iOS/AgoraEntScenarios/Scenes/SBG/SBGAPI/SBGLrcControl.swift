@@ -80,7 +80,7 @@ extension SBGLrcControl: KaraokeDelegate {
     }
 }
 
-extension SBGLrcControl: SBGLrcViewDelegate {
+extension SBGLrcControl: KTVLrcViewDelegate {
     
     func onHighPartTime(highStartTime: Int, highEndTime: Int) {
         self.startTime = highStartTime

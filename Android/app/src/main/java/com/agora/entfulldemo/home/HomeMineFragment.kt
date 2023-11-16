@@ -13,11 +13,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.FileProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppFragmentHomeMineBinding
 import com.agora.entfulldemo.home.constructor.URLStatics
+import com.bumptech.glide.request.RequestOptions
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.Constant
 import io.agora.scene.base.GlideApp
@@ -32,7 +35,6 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.base.utils.UriUtils
 import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.dialog.SelectPhotoFromDialog
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 import io.agora.scene.widget.utils.ImageCompressUtil
 import java.io.File
 
@@ -58,7 +60,11 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setOnApplyWindowInsetsListener(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v: View?, insets: WindowInsetsCompat ->
+            val inset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPaddingRelative(inset.left, inset.top, inset.right, 0)
+            WindowInsetsCompat.CONSUMED
+        }
         activity?.window?.let { window ->
             // 获取根布局可见区域的高度
             val initialWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
@@ -101,9 +107,9 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
                 val user = UserManager.getInstance().user
                 GlideApp.with(this)
                     .load(user.headUrl)
-                    .placeholder(R.mipmap.userimage)
-                    .error(R.mipmap.userimage)
-                    .transform(CenterCropRoundCornerTransform(999))
+                    .placeholder(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                    .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                    .apply(RequestOptions.circleCropTransform())
                     .into(binding.ivUserAvatar)
                 binding.tvUserPhone.text = hidePhoneNumber(user.mobile)
                 binding.etNickname.setText(user.name)

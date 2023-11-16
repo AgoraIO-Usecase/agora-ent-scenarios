@@ -38,7 +38,7 @@
             android:layout_height="match_parent"
             android:background="@drawable/voice_bg_oval_white30"
             android:scaleType="centerCrop"
-            app:shapeAppearance="@style/voice_seat_roundStyle"
+            app:shapeAppearance="@style/ui_widget_roundStyle"
             />
 
         <com.google.android.material.imageview.ShapeableImageView
@@ -47,7 +47,7 @@
             android:layout_height="match_parent"
             android:background="@drawable/voice_bg_oval_black50"
             android:visibility="gone"
-            app:shapeAppearance="@style/voice_seat_roundStyle"
+            app:shapeAppearance="@style/ui_widget_roundStyle"
             />
 
         <androidx.appcompat.widget.AppCompatImageView
