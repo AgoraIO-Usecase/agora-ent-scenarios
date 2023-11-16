@@ -62,7 +62,7 @@ class VLSelectTagView: UIView {
     /// isDefaultChoice 为true时 改属性有效 defaultSelIndex 属性无效，为每各组设置单选选项
     public var defaultSelSingleIndeArr : Array = Array<Any>()
     /// 为每个组设置单选或多选，设置该属性时 isSingle 参数无效, 0 = 多选， 1 = 单选
-    public var defaultGroupSingleArr = Array<Int>(){
+    public var defaultGroupSingleArr = [Int](){
         didSet{
             for value in defaultGroupSingleArr {
                 if !(value == 0 || value == 1){
@@ -72,10 +72,10 @@ class VLSelectTagView: UIView {
         }
     }
     /// isDefaultChoice 为true时 该属性有效，设置每组默认选择项，可传数组
-    public var defaultSelIndexArr = Array<Any>() {
+    public var defaultSelIndexArr = [Any]() {
         didSet{
             for (index,value) in defaultSelIndexArr.enumerated() {
-                if value is Array<Any>{
+                if value is [Any] {
                     if !defaultGroupSingleArr.isEmpty{
                         defaultGroupSingleArr[index] = 0
                     }

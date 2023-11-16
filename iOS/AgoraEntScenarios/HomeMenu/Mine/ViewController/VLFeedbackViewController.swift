@@ -229,24 +229,30 @@ class VLFeedbackViewController: VLBaseViewController {
     private func uploadImagesHandler(images: [UIImage], completion: @escaping ([String]) -> Void) {
         var urls: [String] = []
         let group = DispatchGroup()
-        images.forEach({
-            group.enter()
-            VLAPIRequest.uploadImageURL(VLURLConfig.kURLPathUploadImage, showHUD: true, appendKey: "file", images: [$0]) { response in
-                guard response.code == 0 else { ToastView.show(text: response.message); return }
-                let model = VLUploadImageResModel.yy_model(withJSON: response.data)
-                urls.append(model?.url ?? "")
-                group.leave()
-            } failure: { error, _ in
-                print(error?.localizedDescription ?? "")
-                group.leave()
+        let semaphore = DispatchSemaphore(value: 1)
+        DispatchQueue.global().async {
+            for item in images {
+                group.enter()
+                semaphore.wait()
+                VLAPIRequest.uploadImageURL(VLURLConfig.kURLPathUploadImage, showHUD: true, appendKey: "file", images: [item]) { response in
+                    guard response.code == 0 else { ToastView.show(text: response.message); return }
+                    let model = VLUploadImageResModel.yy_model(withJSON: response.data)
+                    urls.append(model?.url ?? "")
+                    group.leave()
+                    semaphore.signal()
+                } failure: { error, _ in
+                    print(error?.localizedDescription ?? "")
+                    group.leave()
+                    semaphore.signal()
+                }
             }
-        })
-        group.notify(queue: .main) {
-            if urls.count != images.count {
-                ToastView.show(text: NSLocalizedString("feedback_upload_image_fail", comment: ""))
-                return
+            group.notify(queue: .main) {
+                if urls.count != images.count {
+                    ToastView.show(text: NSLocalizedString("feedback_upload_image_fail", comment: ""))
+                    return
+                }
+                completion(urls)
             }
-            completion(urls)
         }
     }
 }
@@ -256,7 +262,7 @@ extension VLFeedbackViewController: VLSelectTagViewDelegate {
         view.endEditing(true)
     }
     func confimrReturnAllSelValueWithDelegate(selArr: [Any], groupArr: [Any]) {
-        let results = (selArr.first as? [String]) ?? []
+        let results = selArr.first is String ? ["\((selArr.first as? String) ?? "")"] : (selArr.first as? [String]) ?? []
         selectedTags = results.isEmpty ? nil : results
         view.endEditing(true)
     }
@@ -271,7 +277,7 @@ extension VLFeedbackViewController: UITextViewDelegate {
     }
     // 触发检查
     func textViewDidEndEditing(_ textView: UITextView) {
-        var currentText = textView.text ?? ""
+        let currentText = textView.text ?? ""
         // 获取中文和英文字符数
         let totalChars = currentText.count
         let chineseChars = currentText.countOfCharacters(for: .chinese)
