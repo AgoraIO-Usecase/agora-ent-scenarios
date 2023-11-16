@@ -132,9 +132,9 @@ class VLFeedbackViewController: VLBaseViewController {
         textView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 12).isActive = true
         textView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 6).isActive = true
         textView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12).isActive = true
-        textView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -112).isActive = true
         
         containerView.addSubview(photoView)
+        photoView.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: 10).isActive = true
         photoView.leadingAnchor.constraint(equalTo: textView.leadingAnchor).isActive = true
         photoView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16).isActive = true
         photoView.trailingAnchor.constraint(equalTo: textView.trailingAnchor).isActive = true
@@ -267,16 +267,22 @@ extension VLFeedbackViewController: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         let currentText = textView.text ?? ""
         let updatedText = currentText.replacingCharacters(in: Range(range, in: currentText)!, with: text)
-        textCountLabel.text = "\(updatedText.count > maxLength ? maxLength : updatedText.count)/\(maxLength)"
         return updatedText.count <= maxLength
     }
     // 触发检查
     func textViewDidEndEditing(_ textView: UITextView) {
         var currentText = textView.text ?? ""
-        if currentText.count > maxLength {
-            let endIndex = currentText.index(currentText.startIndex, offsetBy: maxLength)
-            currentText = String(currentText[..<endIndex])
-            textView.text = currentText
+        // 获取中文和英文字符数
+        let totalChars = currentText.count
+        let chineseChars = currentText.countOfCharacters(for: .chinese)
+        let englishChars = totalChars - chineseChars
+        
+        if chineseChars > maxLength || englishChars > maxLength {
+            let index = currentText.index(currentText.startIndex, offsetBy: maxLength)
+            textView.text = String(currentText[..<index])
         }
+    }
+    func textViewDidChange(_ textView: UITextView) {
+        textCountLabel.text = "\(textView.text.count > maxLength ? maxLength : textView.text.count)/\(maxLength)"
     }
 }
