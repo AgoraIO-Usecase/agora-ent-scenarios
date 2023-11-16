@@ -48,7 +48,7 @@ class CreateRoomDialog constructor(
             118,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
-        mBinding.tvTips.text = spannableString
+        mBinding.tvNotice.text = spannableString
         // 随机名称
         randomName()
         mBinding.btnRandom.setOnClickListener {

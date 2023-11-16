@@ -6,4 +6,4 @@ data class CallReportInfo(
     var event: String,
     var label: String,
     var value: Int
-)
+    )

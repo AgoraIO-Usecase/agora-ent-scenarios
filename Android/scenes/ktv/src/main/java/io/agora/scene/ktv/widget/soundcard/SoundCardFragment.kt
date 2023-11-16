@@ -36,14 +36,6 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
 
     var onClickSoundCardType: (() -> Unit)? = null
 
-    init {
-        soundCardSetting.setEarPhoneCallback(object : EarPhoneCallback {
-            override fun onHasEarPhoneChanged(hasEarPhone: Boolean) {
-                view?.post { setHeadPhonePlugin(hasEarPhone) }
-            }
-        })
-    }
-
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): KtvDialogSoundCardBinding {
         return KtvDialogSoundCardBinding.inflate(inflater)
     }
@@ -51,6 +43,7 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         isPlugIn = audioManager.isWiredHeadsetOn
+
         super.onViewCreated(view, savedInstanceState)
         val filter = IntentFilter(Intent.ACTION_HEADSET_PLUG)
         context?.registerReceiver(mReceiver, filter)
@@ -80,7 +73,7 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                 mcbSoundCardSwitch.isChecked = soundCardSetting.isEnable()
             } else {
                 groupSoundCardSettings.visibility = View.INVISIBLE
-                clSoundCardParams.visibility = if (soundCardSetting.isEnable()) View.VISIBLE else View.INVISIBLE
+                clSoundCardParams.visibility =  View.INVISIBLE
                 groupSoundCardAbnormal.visibility = View.VISIBLE
                 mcbSoundCardSwitch.isChecked = false
             }
@@ -211,21 +204,19 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
     }
 
     private fun setHeadPhonePlugin(isPlug: Boolean) {
-        if (isPlugIn != isPlug) {
-            isPlugIn = isPlug
-            if (isPlugIn) {
-                // 插入有线耳机
-                binding.groupSoundCardSettings.visibility = View.VISIBLE
-                binding.groupSoundCardAbnormal.visibility = View.INVISIBLE
-                binding.mcbSoundCardSwitch.isChecked = soundCardSetting.isEnable()
-            } else {
-                // 未插入有线耳机
-                binding.groupSoundCardSettings.visibility = View.INVISIBLE
-                binding.groupSoundCardAbnormal.visibility = View.VISIBLE
-                binding.mcbSoundCardSwitch.isChecked = false
-                soundCardSetting.enable(false, force = true, callback = {
-                })
-            }
+        isPlugIn = isPlug
+        if (isPlugIn) {
+            // 插入有线耳机
+            binding.groupSoundCardSettings.visibility = View.VISIBLE
+            binding.groupSoundCardAbnormal.visibility = View.INVISIBLE
+            binding.mcbSoundCardSwitch.isChecked = soundCardSetting.isEnable()
+        } else {
+            // 未插入有线耳机
+            binding.groupSoundCardSettings.visibility = View.INVISIBLE
+            binding.groupSoundCardAbnormal.visibility = View.VISIBLE
+            binding.mcbSoundCardSwitch.isChecked = false
+            soundCardSetting.enable(false, force = true, callback = {
+            })
         }
     }
 
