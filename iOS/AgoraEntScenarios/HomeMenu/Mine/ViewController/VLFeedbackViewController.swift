@@ -255,8 +255,9 @@ extension VLFeedbackViewController: VLSelectTagViewDelegate {
     func currentSelValueWithDelegate(valueStr: String, index: Int, groupId: Int) {
         view.endEditing(true)
     }
-    func confimrReturnAllSelValueWithDelegate(selArr: Array<Any>, groupArr: Array<Any>) {
-        selectedTags = selArr.compactMap({ "\($0)" })
+    func confimrReturnAllSelValueWithDelegate(selArr: [Any], groupArr: [Any]) {
+        let results = (selArr.first as? [String]) ?? []
+        selectedTags = results.isEmpty ? nil : results
         view.endEditing(true)
     }
 }
