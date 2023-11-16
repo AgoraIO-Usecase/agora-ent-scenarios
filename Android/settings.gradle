@@ -48,17 +48,17 @@ include ':scenes:voice_spatial:common'
 /*
  * 秀场直播
  */
-//include ':scenes:show'
-//include ':scenes:show:aars:SenseArSourceManager'
-//include ':scenes:show:aars:STMobileJNI'
-//include ':scenes:show:aars:HardwareBuffer'
-//
-///*
-// * 1V1私密房
-// */
-//include ':scenes:pure1v1'
+include ':scenes:show'
+include ':scenes:show:aars:SenseArSourceManager'
+include ':scenes:show:aars:STMobileJNI'
+include ':scenes:show:aars:HardwareBuffer'
+
+/*
+ * 1V1私密房
+ */
+include ':scenes:pure1v1'
 
 /**
  * 秀场转1V1私密房
  */
-//include ':scenes:showTo1v1'
+include ':scenes:showTo1v1'
