@@ -23,7 +23,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -31,7 +31,7 @@
             android:src="@mipmap/ic_tip_error" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@id/tvTips"
+            android:id="@+id/tvNotice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -39,7 +39,6 @@
             android:text="@string/ktv_create_room_tips"
             android:textColor="#303553"
             android:textSize="12sp" />
-
     </androidx.cardview.widget.CardView>
 
     <androidx.appcompat.widget.AppCompatTextView
