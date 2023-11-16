@@ -126,14 +126,20 @@ public class EarBackFragment extends BaseViewBindingFragment<KtvDialogEarbackSet
                     getBinding().vSettingMark.setOnClickListener(v -> {});
                 }
             });
-            getBinding().tvTips.setVisibility(View.VISIBLE);
+            getBinding().tvTips1.setVisibility(View.VISIBLE);
+            getBinding().tvTips2.setVisibility(View.VISIBLE);
+            getBinding().ivTips2.setVisibility(View.VISIBLE);
+            getBinding().clSettings.setVisibility(View.VISIBLE);
             getBinding().tvTipsNoEarPhone.setVisibility(View.INVISIBLE);
         } else {
             // 未检测到耳机
             getBinding().cbSwitch.setEnabled(false);
             mSetting.setEar(false);
             getBinding().cbSwitch.setChecked(false);
-            getBinding().tvTips.setVisibility(View.INVISIBLE);
+            getBinding().tvTips1.setVisibility(View.INVISIBLE);
+            getBinding().tvTips2.setVisibility(View.INVISIBLE);
+            getBinding().ivTips2.setVisibility(View.INVISIBLE);
+            getBinding().clSettings.setVisibility(View.INVISIBLE);
             getBinding().tvTipsNoEarPhone.setVisibility(View.VISIBLE);
         }
     }

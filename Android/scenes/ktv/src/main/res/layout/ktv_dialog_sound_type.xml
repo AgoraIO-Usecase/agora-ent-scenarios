@@ -6,14 +6,7 @@
     android:layout_height="wrap_content"
     tools:theme="@style/Theme.AppCompat"
     android:paddingBottom="24dp"
-    android:background="@drawable/bg_full_blue_top_20">
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@drawable/bg_full_blue_top_20"
-        app:layout_constraintTop_toTopOf="@+id/ivBottomSheetTitle"
-        app:layout_constraintBottom_toBottomOf="@+id/mtBottomSheetTitle"/>
+    android:background="@drawable/ktv_rect_white_top_r20">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivBottomSheetTitle"
@@ -32,7 +25,7 @@
         android:textSize="18sp"
         android:text="@string/ktv_sound_preset_type"
         android:textStyle="bold"
-        android:textColor="@color/white"
+        android:textColor="@color/def_text_color_040"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
@@ -45,7 +38,7 @@
         android:layout_marginStart="5dp"
         android:gravity="center"
         android:textSize="16sp"
-        android:textColor="@color/white"
+        android:textColor="@color/def_text_grey_6c7"
         android:text="@string/cancel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

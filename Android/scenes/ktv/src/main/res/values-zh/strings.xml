@@ -153,6 +153,15 @@
     <string name="ktv_retry">点击重试</string>
     <string name="ktv_join_chorus_failed">加入合唱失败</string>
 
+    <string name="ktv_earback_title">耳返</string>
+    <string name="ktv_earback_mode">耳返模式</string>
+    <string name="ktv_earback_switch">耳返开关</string>
+    <string name="ktv_earback_setting">耳返设置</string>
+    <string name="ktv_earback_volume">耳返音量</string>
+    <string name="ktv_earback_auto">自动</string>
+    <string name="ktv_earback_tips1">开启耳返可实时听到自己的声音，唱歌的时候及时调整</string>
+    <string name="ktv_earback_tips2">因为延时和体验问题，在耳返里听到的声音是没有音效的（包括虚拟声卡、场景塑造（KTV、演唱会））</string>
+    <string name="ktv_earback_no_micphone">使用耳返必须插入耳机，当前未检测到耳机</string>
     <string name="ktv_virtual_sound_card">虚拟声卡</string>
     <string name="ktv_input_device">麦克风类型</string>
     <string name="ktv_sound_card_mic_type">麦克风类型%d</string>

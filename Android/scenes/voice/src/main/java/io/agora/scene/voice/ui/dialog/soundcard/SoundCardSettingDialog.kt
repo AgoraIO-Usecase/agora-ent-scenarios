@@ -58,18 +58,18 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
             dismiss()
             return
         }
-        val spannableString = SpannableString(getString(R.string.voice_sound_card_supports))
-        spannableString.setSpan(StyleSpan(Typeface.BOLD), 0, 9, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        binding?.tvSoundCardSupport?.text = spannableString
+        super.onViewCreated(view, savedInstanceState)
         val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         isPlugIn = audioManager.isWiredHeadsetOn
-        super.onViewCreated(view, savedInstanceState)
         val filter = IntentFilter(Intent.ACTION_HEADSET_PLUG)
         context?.registerReceiver(mReceiver, filter)
         setupView()
     }
 
     private fun setupView() {
+        val spannableString = SpannableString(getString(R.string.voice_sound_card_supports))
+        spannableString.setSpan(StyleSpan(Typeface.BOLD), 0, 9, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        binding?.tvSoundCardSupport?.text = spannableString
         binding?.apply {
             if (isPlugIn) {
                 groupSoundCardSettings.visibility = View.VISIBLE
@@ -188,22 +188,20 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
     }
 
     private fun setHeadPhonePlugin(isPlug: Boolean) {
-        if (isPlugIn != isPlug) {
-            isPlugIn = isPlug
-            binding?.let { binding ->
-                if (isPlugIn) {
-                    // 插入有线耳机
-                    binding.groupSoundCardSettings.visibility = View.VISIBLE
-                    binding.groupSoundCardAbnormal.visibility = View.INVISIBLE
-                    binding.mcbSoundCardSwitch.isChecked = mManager.isEnable()
-                } else {
-                    // 未插入有线耳机
-                    binding.groupSoundCardSettings.visibility = View.INVISIBLE
-                    binding.groupSoundCardAbnormal.visibility = View.VISIBLE
-                    binding.mcbSoundCardSwitch.isChecked = false
-                    mManager.enable(false, force = true, callback = {
-                    })
-                }
+        isPlugIn = isPlug
+        binding?.let { binding ->
+            if (isPlugIn) {
+                // 插入有线耳机
+                binding.groupSoundCardSettings.visibility = View.VISIBLE
+                binding.groupSoundCardAbnormal.visibility = View.INVISIBLE
+                binding.mcbSoundCardSwitch.isChecked = mManager.isEnable()
+            } else {
+                // 未插入有线耳机
+                binding.groupSoundCardSettings.visibility = View.INVISIBLE
+                binding.groupSoundCardAbnormal.visibility = View.VISIBLE
+                binding.mcbSoundCardSwitch.isChecked = false
+                mManager.enable(false, force = true, callback = {
+                })
             }
         }
     }

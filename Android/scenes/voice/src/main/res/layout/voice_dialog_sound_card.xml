@@ -91,6 +91,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="18dp"
         android:text="@string/voice_sound_card_switch"
+        android:textStyle="bold"
         android:textColor="@color/def_text_color_3c4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/dvInputDevice" />
@@ -132,6 +133,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="18dp"
             android:text="@string/voice_sound_preset_type"
+            android:textStyle="bold"
             android:textColor="@color/def_text_color_3c4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -170,6 +172,7 @@
             android:layout_marginTop="8dp"
             android:textSize="13sp"
             android:text="@string/voice_gain_adjust"
+            android:textStyle="bold"
             android:textColor="@color/def_text_color_3c4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dvSoundType" />
@@ -239,6 +242,7 @@
             android:layout_marginTop="8dp"
             android:textSize="13sp"
             android:text="@string/voice_sound_mic_phone_type"
+            android:textStyle="bold"
             android:textColor="@color/def_text_color_3c4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dvGainAdjust" />

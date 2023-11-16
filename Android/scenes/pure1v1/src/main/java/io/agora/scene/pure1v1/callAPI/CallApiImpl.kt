@@ -741,7 +741,7 @@ class CallApiImpl(
         _notifyState(CallStateType.Calling, eventInfo = message)
         _notifyEvent(CallEvent.OnCalling)
 
-        callingRoomId = fromRoomId
+        callingRoomId = roomId
         callingUserId = remoteUserId
         //不等响应即加入频道，加快join速度，失败则leave
         _joinRTCAndNotify(fromRoomId, tokenConfig?.rtcToken ?: "") { error ->
@@ -898,7 +898,7 @@ class CallApiImpl(
         _notifyEvent(CallEvent.RemoteJoin, _getNtpTimeInMs() - (callTs ?: 0))
     }
     override fun onUserOffline(uid: Int, reason: Int) {
-        callPrint("didOfflineOfUid: $uid $reason")
+        callPrint("didOfflineOfUid: $uid")
         if (callingUserId != uid) {
             return
         }
@@ -966,8 +966,8 @@ class CallApiImpl(
         delegates.forEach { listener ->
             listener.callDebugInfo(message)
         }
-        Log.d(TAG, "[CallApi]$message")
         if (delegates.size == 0) else {return}
+        Log.d(TAG, "[CallApi]$message")
     }
 
     private fun callWarningPrint(message: String) {

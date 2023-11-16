@@ -129,6 +129,7 @@ class AgoraBGMManager(
     }
 
     fun loadMusic(music: Music?) {
+        bgm?.let { mMusicCenter.removeCache(it.songCode) }
         bgm = music
         mPlayer.stop()
         params.song = music?.name ?: ""
@@ -143,7 +144,8 @@ class AgoraBGMManager(
         }
         Log.d(TAG, "loadMusic: ${music.songCode}, name: ${music.name}")
         preLoadMusic {songCode, percent, status, msg, lrcUrl ->
-            if (bgm?.songCode == songCode) {
+            Log.d(TAG, "loadMusic: status $status")
+            if (bgm?.songCode == songCode && status == 0) {
                 mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
                 mPlayer.open(songCode, 0)
             }

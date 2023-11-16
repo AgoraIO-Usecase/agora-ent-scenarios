@@ -69,6 +69,7 @@ class CallServiceManager {
         remoteCanvas = null
         callApi?.deinitialize {
             RtcEngine.destroy()
+
             RtmClient.release()
         }
         callApi = null
