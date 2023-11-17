@@ -14,6 +14,11 @@ class VRSoundEffectViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let path = UIBezierPath(roundedRect: self.view.bounds, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 20.0, height: 20.0))
+        let layer = CAShapeLayer()
+        layer.path = path.cgPath
+        self.view.layer.mask = layer
+        
         effectView = VRSoundCardEffectView(frame: self.view.bounds)
         effectView.effectType = effectType
         effectView.clickBlock = {[weak self] index in
@@ -30,7 +35,7 @@ class VRSoundEffectViewController: UIViewController {
     }
     
     @objc private func back() {
-        self.navigationController?.popViewController(animated: false)
+        VoiceRoomPresentView.shared.pop()
     }
     
 }

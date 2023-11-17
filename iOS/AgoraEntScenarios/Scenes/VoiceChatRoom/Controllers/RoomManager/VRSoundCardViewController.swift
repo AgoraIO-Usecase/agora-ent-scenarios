@@ -23,6 +23,11 @@ class VRSoundCardViewController: UIViewController {
     var settingView: VRSoundCardSettingView!
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let path = UIBezierPath(roundedRect: self.view.bounds, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 20.0, height: 20.0))
+        let layer = CAShapeLayer()
+        layer.path = path.cgPath
+        self.view.layer.mask = layer
 
         settingView = VRSoundCardSettingView(frame: self.view.bounds)
         settingView.effectType = self.effectType
@@ -65,8 +70,8 @@ class VRSoundCardViewController: UIViewController {
             self?.soundOpen = flag
             if flag == true {
                 self?.gainValue = "1.0"
-                self?.effectType = 4
-                self?.settingView.effectType = 4
+                self?.effectType = 0
+                self?.settingView.effectType = 0
                 self?.settingView.tableView.reloadData()
             }
             soundCardBlock(flag)
@@ -81,7 +86,7 @@ class VRSoundCardViewController: UIViewController {
     }
     
     @objc private func back() {
-        self.navigationController?.popViewController(animated: false)
+        VoiceRoomPresentView.shared.pop()
     }
     
 }
