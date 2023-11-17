@@ -363,6 +363,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
 }
 
 extension VideoLoaderApiImpl {
+
     func startMediaRenderingTracing(anchorId: String) {
         guard let engine = config?.rtcEngine, let connection = exConnectionMap[anchorId] else {return}
         engine.startMediaRenderingTracingEx(connection)
