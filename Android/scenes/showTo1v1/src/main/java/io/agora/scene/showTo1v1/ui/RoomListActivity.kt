@@ -217,7 +217,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             // 设置vp当前页面外的页面数
             binding.viewPager2.offscreenPageLimit = 1
             val fragmentAdapter = object : FragmentStateAdapter(this) {
-                override fun getItemCount() = if (mRoomInfoList.size <= 1) Int.MAX_VALUE else 1
+                override fun getItemCount() = if (mRoomInfoList.size <= 1) mRoomInfoList.size else Int.MAX_VALUE
 
                 override fun createFragment(position: Int): Fragment {
                     val roomInfo = mRoomInfoList[position % mRoomInfoList.size]
@@ -225,7 +225,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                         roomInfo,
                         onPageScrollEventHandler as OnPageScrollEventHandler, position
                     ).apply {
-                        Log.d(tag, "position：$position, room:${roomInfo.roomId}")
+                        Log.d(TAG, "position：$position, room:${roomInfo.roomId}")
                         mVpFragments.put(position, this)
                         if (roomInfo.userId != UserManager.getInstance().user.id.toString()) {
                             val anchorList = arrayListOf(
@@ -246,13 +246,19 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                         }
                     }
                 }
+
+                override fun getItemId(position: Int): Long {
+                    // 防止 fragment 变了不刷新
+                    val roomInfo = mRoomInfoList[position % mRoomInfoList.size]
+                    return (roomInfo.roomId.hashCode() + position).toLong()
+                }
             }
             binding.viewPager2.adapter = fragmentAdapter
             binding.viewPager2.registerOnPageChangeCallback(onPageScrollEventHandler as OnPageChangeCallback)
             binding.viewPager2.setCurrentItem(Int.MAX_VALUE / 2, false)
             mCurrLoadPosition = binding.viewPager2.currentItem
-        } else {
-//            mFragmentAdapter?.let {
+//        } else {
+//            binding.viewPager2.adapter?.let {
 //                it.notifyDataSetChanged()
 //                binding.viewPager2.setCurrentItem(Int.MAX_VALUE / 2, false)
 //                mCurrLoadPosition = binding.viewPager2.currentItem
