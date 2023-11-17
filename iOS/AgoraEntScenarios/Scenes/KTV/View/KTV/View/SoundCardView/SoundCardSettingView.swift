@@ -122,6 +122,11 @@ import Foundation
         KTVHeadSetUtil.addSoundCardObserver {[weak self] flag in
             self?.noSoundCardView.isHidden = flag
             self?.tableView.isHidden = !flag
+            if flag == false {
+                self?.soundOpen = false
+                guard let soundCardBlock = self?.soundCardBlock else {return}
+                soundCardBlock(false)
+            }
         }
     }
     

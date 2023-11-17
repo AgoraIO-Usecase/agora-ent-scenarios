@@ -53,8 +53,10 @@ import Foundation
         tableView.dataSource = self
         tableView.delegate = self
         tableView.registerCell(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.registerCell(UITableViewCell.self, forCellReuseIdentifier: "switch")
+        tableView.registerCell(UITableViewCell.self, forCellReuseIdentifier: "effect")
         tableView.registerCell(VRSoundCardMicCell.self, forCellReuseIdentifier: "mic")
-        tableView.registerCell(VRSoundCardSwitchCell.self, forCellReuseIdentifier: "switch")
+        tableView.registerCell(VRSoundCardSwitchCell.self, forCellReuseIdentifier: "gain")
         self.addSubview(tableView)
         
         coverView = UIView()
@@ -122,6 +124,11 @@ import Foundation
         KTVHeadSetUtil.addSoundCardObserver {[weak self] flag in
             self?.noSoundCardView.isHidden = flag
             self?.tableView.isHidden = !flag
+            if flag == false {
+                self?.soundOpen = false
+                guard let soundCardBlock = self?.soundCardBlock else {return}
+                soundCardBlock(false)
+            }
         }
     }
     
@@ -182,6 +189,7 @@ import Foundation
         }
         self.soundOpen = swich.isOn
         coverView.isHidden = swich.isOn
+        tableView.reloadData()
         guard let soundCardBlock = soundCardBlock else {return}
         soundCardBlock(swich.isOn)
     }
@@ -199,7 +207,7 @@ extension VRSoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        if indexPath.row == 0 || indexPath.row == 2 {
+        if indexPath.row == 0 {
             let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
             
             var rightLabel = UILabel()
@@ -216,18 +224,12 @@ extension VRSoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
             }
             
             cell.textLabel?.font = UIFont.systemFont(ofSize: 13)
-            if indexPath.row == 2 {
-                cell.accessoryType = .disclosureIndicator
-                cell.textLabel?.text = "预设音效"
-                rightLabel.text = getEffectDesc(with: self.effectType)
-            } else {
-                cell.textLabel?.text = "麦克风类型"
-                rightLabel.text = "default 外置麦克风"
-            }
+            cell.textLabel?.text = "麦克风类型"
+            rightLabel.text = "default 外置麦克风"
             cell.selectionStyle = .none
             return cell
         } else if indexPath.row == 1 {
-            let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+            let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "switch", for: indexPath)
             
             cell.textLabel?.text = "开启虚拟声卡"
             cell.textLabel?.font = UIFont.systemFont(ofSize: 13)
@@ -246,8 +248,30 @@ extension VRSoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
 
             cell.selectionStyle = .none
             return cell
-        } else if indexPath.row == 3 {
-            let cell: VRSoundCardSwitchCell = tableView.dequeueReusableCell(withIdentifier: "switch", for: indexPath) as! VRSoundCardSwitchCell
+        } else if indexPath.row == 2 {
+            let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "effect", for: indexPath)
+            
+            var rightLabel = UILabel()
+            if let view = self.viewWithTag(indexPath.row + 200) as? UILabel {
+                rightLabel = view
+            } else {
+                rightLabel.tag = indexPath.row + 200
+                rightLabel.font = UIFont.systemFont(ofSize: 12)
+                rightLabel.textColor = .gray
+                rightLabel.translatesAutoresizingMaskIntoConstraints = false
+                cell.contentView.addSubview(rightLabel)
+                rightLabel.trailingAnchor.constraint(equalTo: cell.contentView.trailingAnchor, constant: -20).isActive = true
+                rightLabel.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor).isActive = true
+            }
+            
+            cell.textLabel?.font = UIFont.systemFont(ofSize: 13)
+            cell.accessoryType = .disclosureIndicator
+            cell.textLabel?.text = "预设音效"
+            rightLabel.text = getEffectDesc(with: self.effectType)
+            cell.selectionStyle = .none
+            return cell
+        }else if indexPath.row == 3 {
+            let cell: VRSoundCardSwitchCell = tableView.dequeueReusableCell(withIdentifier: "gain", for: indexPath) as! VRSoundCardSwitchCell
             cell.selectionStyle = .none
             cell.slider.value = Float(1/4.0 * gainValue)
             cell.numLable.text = String(format: "%.1f",gainValue)

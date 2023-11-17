@@ -223,12 +223,13 @@
     return YES;
 }
 
-//- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-//    [self endEditing:YES];
-//    if(self.delegate && [self.delegate respondsToSelector:@selector(didCreateRoomAction:)]){
-//        [self.delegate didCreateRoomAction:self.addRoomModel.isPrivate ? SBGCreateRoomActionTypeEncrypt : SBGCreateRoomActionTypeNormal];
-//    }
-//}
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+    [super touchesBegan:touches withEvent:event];
+    [self endEditing:YES];
+    if(self.delegate && [self.delegate respondsToSelector:@selector(didCreateRoomAction:)]){
+        [self.delegate didCreateRoomAction:self.addRoomModel.isPrivate ? SBGCreateRoomActionTypeEncrypt : SBGCreateRoomActionTypeNormal];
+    }
+}
 
 
 - (NSArray *)titlesArray {

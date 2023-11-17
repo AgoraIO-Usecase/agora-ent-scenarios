@@ -200,6 +200,7 @@ public extension SACreateRoomInputView {
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
         pinCode.resignFirstResponder()
         endEditing(true)
     }

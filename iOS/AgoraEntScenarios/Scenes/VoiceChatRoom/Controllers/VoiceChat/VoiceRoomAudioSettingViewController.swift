@@ -508,7 +508,8 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         //处理虚拟声卡的业务
         if indexPath.section == 0 && indexPath.row == 4 {
             
-            if isAudience == true {
+            let seatUser = ChatRoomServiceImp.getSharedInstance().mics.first(where: { $0.member?.uid == VLUserCenter.user.id && $0.status != -1 })
+            if seatUser == nil {
                 ToastView.show(text: "请上麦后使用该音效".voice_localized())
                 return
             }
