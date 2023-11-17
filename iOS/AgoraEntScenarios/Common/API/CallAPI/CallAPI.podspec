@@ -42,6 +42,6 @@ TODO: Add long description of the pod here.
   # }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
-  s.dependency 'AgoraRtcEngine_Special_iOS', '4.1.1.19'
+  s.dependency 'AgoraRtcEngine_Special_iOS'
   s.dependency 'AgoraRtm_iOS', '2.1.7'
 end
