@@ -65,8 +65,8 @@ class VRSoundCardViewController: UIViewController {
             self?.soundOpen = flag
             if flag == true {
                 self?.gainValue = "1.0"
-                self?.effectType = 4
-                self?.settingView.effectType = 4
+                self?.effectType = 0
+                self?.settingView.effectType = 0
                 self?.settingView.tableView.reloadData()
             }
             soundCardBlock(flag)

@@ -5447,7 +5447,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3KX4NAGXWC;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5477,11 +5477,9 @@
 					"-ld64",
 					"-ObjC",
 					"-l\"c++\"",
-					"-l\"effect-sdk\"",
 					"-l\"iconv\"",
 					"-l\"icucore\"",
 					"-l\"resolv\"",
-					"-l\"st_mobile\"",
 					"-l\"z\"",
 					"-framework",
 					"\"AFNetworking\"",
@@ -5503,8 +5501,6 @@
 					"\"AgoraContentInspectExtension\"",
 					"-framework",
 					"\"AgoraDav1d\"",
-					"-framework",
-					"\"AgoraDrmLoaderExtension\"",
 					"-framework",
 					"\"AgoraFaceDetectionExtension\"",
 					"-framework",
@@ -5668,7 +5664,7 @@
 					"-weak_framework",
 					"\"Photos\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice.test1;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -5689,7 +5685,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3KX4NAGXWC;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5719,11 +5715,9 @@
 					"-ld64",
 					"-ObjC",
 					"-l\"c++\"",
-					"-l\"effect-sdk\"",
 					"-l\"iconv\"",
 					"-l\"icucore\"",
 					"-l\"resolv\"",
-					"-l\"st_mobile\"",
 					"-l\"z\"",
 					"-framework",
 					"\"AFNetworking\"",
@@ -5745,8 +5739,6 @@
 					"\"AgoraContentInspectExtension\"",
 					"-framework",
 					"\"AgoraDav1d\"",
-					"-framework",
-					"\"AgoraDrmLoaderExtension\"",
 					"-framework",
 					"\"AgoraFaceDetectionExtension\"",
 					"-framework",
@@ -5910,7 +5902,7 @@
 					"-weak_framework",
 					"\"Photos\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice.test1;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
