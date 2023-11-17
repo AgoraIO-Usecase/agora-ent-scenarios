@@ -219,6 +219,7 @@ extension SRCreateRoomView: UITextFieldDelegate {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
         self.endEditing(true)
         if let delegate = delegate{
             delegate.didCreateRoomAction(self.addRoomModel.is_private ? .encrypt : .normal)
