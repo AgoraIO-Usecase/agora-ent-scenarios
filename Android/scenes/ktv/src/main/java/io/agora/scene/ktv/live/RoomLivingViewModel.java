@@ -601,15 +601,14 @@ public class RoomLivingViewModel extends ViewModel {
 
     private void updateVolumeStatus(boolean isUnMute) {
         ktvApiProtocol.setMicStatus(isUnMute);
-        if (!isUnMute) {
-            if (mSetting.isEar()) {
-                isOpnEar = true;
-                mSetting.setEar(false);
-            } else {
-                isOpnEar = false;
+        if (!isUnMute && mSetting.isEar()) {
+            if (mRtcEngine != null) {
+                mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
             }
-        } else {
-            mSetting.setEar(isOpnEar);
+        } else if (isUnMute && mSetting.isEar()) {
+            if (mRtcEngine != null) {
+                mRtcEngine.enableInEarMonitoring(true, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+            }
         }
 
         // 静音时将本地采集音量改为0
@@ -1035,6 +1034,12 @@ public class RoomLivingViewModel extends ViewModel {
             ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null);
             joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS);
         }
+
+        // 重置耳返
+        mSetting.setEar(false);
+        if (mRtcEngine != null) {
+            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+        }
     }
 
     /**
@@ -1191,17 +1196,9 @@ public class RoomLivingViewModel extends ViewModel {
             public void onLowLatencyModeChanged(boolean enable) {
                 KTVLogger.d(TAG, "onLowLatencyModeChanged: " + enable);
                 if (enable) {
-                    // 和超高音质同时开启会发生崩溃，先注释aec相关操作
-                    //mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\": 0}");
                     mRtcEngine.setParameters("{\"che.audio.ains_mode\": -1}");
-                    //mRtcEngine.setParameters("{\"che.audio.aec.nlp_size\": 128}");
-                    //mRtcEngine.setParameters("{\"che.audio.aec.nlp_hop_size\": 64}");
                 } else {
-                    // 和超高音质同时开启会发生崩溃，先注释aec相关操作
-                    //mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\": 0}");
                     mRtcEngine.setParameters("{\"che.audio.ains_mode\": 0}");
-                    //mRtcEngine.setParameters("{\"che.audio.aec.nlp_size\": 512}");
-                    //mRtcEngine.setParameters("{\"che.audio.aec.nlp_hop_size\": 64}");
                 }
             }
 
@@ -1421,6 +1418,7 @@ public class RoomLivingViewModel extends ViewModel {
         }
         mRtcEngine.loadExtensionProvider("agora_drm_loader");
 
+        mRtcEngine.setParameters("{\"che.audio.ains_mode\": 0}");
 
         // ------------------ 场景化api初始化 ------------------
         ktvApiProtocol.initialize(new KTVApiConfig(
@@ -1656,6 +1654,12 @@ public class RoomLivingViewModel extends ViewModel {
         mSetting.updateEffect(AUDIO_EFFECT_OFF);
         this.audioPreset = AUDIO_EFFECT_OFF;
         isHighlightSinger = false;
+
+        // 重置耳返
+        mSetting.setEar(false);
+        if (mRtcEngine != null) {
+            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+        }
     }
 
     // ------------------ 歌曲开始播放 ------------------
