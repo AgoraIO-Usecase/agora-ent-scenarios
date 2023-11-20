@@ -5474,13 +5474,6 @@
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"-ld64",
-					"-ObjC",
-					"-l\"c++\"",
-					"-l\"iconv\"",
-					"-l\"icucore\"",
-					"-l\"resolv\"",
-					"-l\"z\"",
 					"-framework",
 					"\"AFNetworking\"",
 					"-framework",
@@ -5710,13 +5703,6 @@
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"-ld64",
-					"-ObjC",
-					"-l\"c++\"",
-					"-l\"iconv\"",
-					"-l\"icucore\"",
-					"-l\"resolv\"",
-					"-l\"z\"",
 					"-framework",
 					"\"AFNetworking\"",
 					"-framework",
