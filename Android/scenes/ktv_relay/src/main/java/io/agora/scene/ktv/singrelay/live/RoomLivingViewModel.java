@@ -1392,7 +1392,7 @@ public class RoomLivingViewModel extends ViewModel {
                         loadMusic(config, songCode);
                     } else {
                         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                        ToastUtils.showToastLong("已尝试三次，请自动切歌");
+                        ToastUtils.showToastLong(R.string.ktv_relay_try);
                     }
                 } else if (reason == KTVLoadSongFailReason.CANCELED) {
                     // 当前已被切歌
