@@ -162,4 +162,5 @@
     <string name="ktv_relay_debug_settings_private_param">私有参数</string>
     <string name="ktv_relay_debug_settings_set">设置</string>
     <string name="ktv_relay_debug_settings_audio_dump">音频Dump</string>
+    <string name="ktv_relay_try">已尝试三次，请手动切歌</string>
 </resources>
