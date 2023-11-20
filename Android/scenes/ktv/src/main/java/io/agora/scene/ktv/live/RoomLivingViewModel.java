@@ -611,16 +611,6 @@ public class RoomLivingViewModel extends ViewModel {
             }
         }
 
-        // 静音时将本地采集音量改为0
-//        if (!isUnMute && mRtcEngine != null) {
-//            if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getUserNo() != null && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
-//                // 主唱
-//                mRtcEngine.adjustRecordingSignalVolume(0);
-//            } else {
-//                // 其他人
-//                mRtcEngine.muteLocalAudioStream(true);
-//            }
-//        }
         setMicVolume(micOldVolume);
     }
 
