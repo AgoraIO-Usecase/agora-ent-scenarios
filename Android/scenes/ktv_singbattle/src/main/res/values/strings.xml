@@ -101,7 +101,7 @@
     <string name="ktv_singbattle_room_big_woman">大房间(女)</string>
     <string name="ktv_singbattle_room_small_woman">小房间(女)</string>
     <string name="ktv_singbattle_your_score">你的得分</string>
-    <string name="ktv_singbattle_room_count">当前在线人数：%s</string>
+    <string name="ktv_singbattle_room_count">%s在线</string>
     <string name="ktv_singbattle_zc">主唱</string>
     <string name="ktv_singbattle_song_ordering_person">点唱：</string>
     <string name="ktv_singbattle_song_ordering_person_chorus">合唱：</string>
