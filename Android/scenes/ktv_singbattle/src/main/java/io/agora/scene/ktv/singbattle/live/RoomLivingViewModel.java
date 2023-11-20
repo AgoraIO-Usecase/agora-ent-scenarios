@@ -557,11 +557,11 @@ public class RoomLivingViewModel extends ViewModel {
      */
     public void toggleMic(boolean isUnMute) {
         KTVLogger.d(TAG, "RoomLivingViewModel.toggleMic() called：" + isUnMute);
+        updateVolumeStatus(isUnMute);
         ktvServiceProtocol.updateSeatAudioMuteStatus(!isUnMute, e -> {
             if (e == null) {
                 // success
                 KTVLogger.d(TAG, "RoomLivingViewModel.toggleMic() success");
-                updateVolumeStatus(isUnMute);
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.toggleMic() failed: " + e.getMessage());
