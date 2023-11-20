@@ -2,6 +2,7 @@ package io.agora.scene.cantata.ui.widget
 
 import android.content.Context
 import io.agora.karaoke_view.v11.model.LyricsLineModel
+import io.agora.scene.cantata.ui.activity.RoomLivingActivity
 import io.agora.scene.cantata.ui.viewmodel.RoomLivingViewModel
 import io.agora.scene.cantata.ui.widget.lrcView.LrcControlView
 
@@ -25,7 +26,11 @@ open class LrcActionListenerImpl constructor(
     }
 
     override fun onJoinChorus() {
-        mViewModel.joinChorus()
+        if (mContext is RoomLivingActivity) {
+            mContext.toggleSelfAudio(true, callback = {
+                mViewModel.joinChorus()
+            })
+        }
     }
 
     override fun onLeaveChorus() {

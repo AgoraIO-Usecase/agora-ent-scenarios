@@ -98,6 +98,17 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
     }
 
+    fun toggleSelfAudio(isOpen: Boolean, callback : () -> Unit) {
+        if (isOpen) {
+            toggleAudioRun = Runnable {
+                callback.invoke()
+            }
+            requestRecordPermission(true)
+        } else {
+            callback.invoke()
+        }
+    }
+
     override fun getPermissions() {
         toggleAudioRun?.let {
             it.run()
@@ -130,8 +141,9 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         binding.lrcControlView.post {
             // TODO workaround 先强制申请权限， 避免首次安装无声
             if (mRoomLivingViewModel.isRoomOwner()) {
-                toggleAudioRun = Runnable { mRoomLivingViewModel.initViewModel() }
-                requestRecordPermission()
+                toggleSelfAudio(true, callback = {
+                    mRoomLivingViewModel.initViewModel()
+                })
             } else {
                 mRoomLivingViewModel.initViewModel()
             }
