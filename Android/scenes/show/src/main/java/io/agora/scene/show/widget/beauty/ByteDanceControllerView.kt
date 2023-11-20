@@ -3,6 +3,7 @@ package io.agora.scene.show.widget.beauty
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.view.isVisible
 import io.agora.scene.show.R
 import io.agora.scene.show.beauty.ByteDanceBeautySDK
 
@@ -45,8 +46,9 @@ class ByteDanceControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_beauty_smooth,
-                        R.mipmap.show_beauty_ic_smooth,
+                        R.mipmap.show_beauty_ic_face_mopi,
                         beautyConfig.smooth,
+                        isSelected = true,
                         onValueChanged = { value ->
                             beautyConfig.smooth = value
                         }
@@ -55,7 +57,6 @@ class ByteDanceControllerView : BaseControllerView {
                         R.string.show_beauty_item_beauty_whiten,
                         R.mipmap.show_beauty_ic_face_meibai,
                         beautyConfig.whiten,
-                        isSelected = true,
                         onValueChanged = { value ->
                             beautyConfig.whiten = value
                         }
@@ -167,7 +168,7 @@ class ByteDanceControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_effect_cwei,
-                        R.mipmap.show_beauty_ic_effect_cwei,
+                        R.mipmap.show_beauty_ic_effect_bd_cwei,
                         isSelected = beautyConfig.makeUp?.style == "cwei",
                         value = if (beautyConfig.makeUp?.style == "cwei") beautyConfig.makeUp?.identity
                             ?: 0.5f else 0.5f,
@@ -181,7 +182,7 @@ class ByteDanceControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_effect_yuanqi,
-                        R.mipmap.show_beauty_ic_effect_yuanqi,
+                        R.mipmap.show_beauty_ic_effect_bd_yuanqi,
                         isSelected = beautyConfig.makeUp?.style == "yuanqi",
                         value = if (beautyConfig.makeUp?.style == "yuanqi") beautyConfig.makeUp?.identity
                             ?: 0.5f else 0.5f,
@@ -193,6 +194,56 @@ class ByteDanceControllerView : BaseControllerView {
                             )
                         }
                     )
+                )
+            ),
+            PageInfo(
+                R.string.show_beauty_group_adjust,
+                listOf(
+                    ItemInfo(
+                        R.string.show_beauty_item_none,
+                        R.mipmap.show_beauty_ic_none,
+                        0.0f,
+                        onValueChanged = { _ ->
+                            beautyConfig.sharpen = 0.0f
+                            beautyConfig.clear = 0.0f
+                            beautyConfig.saturation = 0.0f
+                            beautyConfig.contrast = 0.0f
+                        },
+                    ),
+//                    ItemInfo(
+//                        R.string.show_beauty_item_adjust_contrast,
+//                        R.mipmap.show_beauty_ic_adjust_contrast,
+//                        beautyConfig.contrast,
+//                        isSelected = true,
+//                        onValueChanged = { value ->
+//                            beautyConfig.contrast = value
+//                        }
+//                    ),
+//                    ItemInfo(
+//                        R.string.show_beauty_item_adjust_saturation,
+//                        R.mipmap.show_beauty_ic_adjust_saturation,
+//                        beautyConfig.saturation,
+//                        onValueChanged = { value ->
+//                            beautyConfig.saturation = value
+//                        }
+//                    ),
+                    ItemInfo(
+                        R.string.show_beauty_item_adjust_sharpen,
+                        R.mipmap.show_beauty_ic_adjust_sharp,
+                        beautyConfig.sharpen,
+                        isSelected = true,
+                        onValueChanged = { value ->
+                            beautyConfig.sharpen = value
+                        }
+                    ),
+                    ItemInfo(
+                        R.string.show_beauty_item_adjust_clarity,
+                        R.mipmap.show_beauty_ic_adjust_clear,
+                        beautyConfig.clear,
+                        onValueChanged = { value ->
+                            beautyConfig.clear = value
+                        }
+                    ),
                 )
             ),
             PageInfo(
@@ -208,7 +259,7 @@ class ByteDanceControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_sticker_huahua,
-                        R.mipmap.show_beauty_ic_filter_naiyou,
+                        R.mipmap.show_beauty_ic_sticker_huahua,
                         isSelected = beautyConfig.sticker == "huahua",
                         onValueChanged = { _ ->
                             beautyConfig.sticker = "huahua"
@@ -227,8 +278,13 @@ class ByteDanceControllerView : BaseControllerView {
             || pageInfo.name == R.string.show_beauty_group_sticker
         ) {
             viewBinding.slider.visibility = View.INVISIBLE
-        } else {
+            viewBinding.ivCompare.isVisible = false
+        } else if (pageInfo.name == R.string.show_beauty_group_beauty
+            || pageInfo.name == R.string.show_beauty_group_effect
+            || pageInfo.name == R.string.show_beauty_group_adjust
+        ) {
             viewBinding.slider.visibility = View.VISIBLE
+            viewBinding.ivCompare.isVisible = true
         }
     }
 }

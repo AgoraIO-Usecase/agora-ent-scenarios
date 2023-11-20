@@ -269,6 +269,11 @@
     <string name="show_beauty_item_effect_dousha">豆沙</string>
     <string name="show_beauty_item_effect_naicha">奶茶</string>
     <string name="show_beauty_item_sticker_sdlu">麋鹿</string>
+    <string name="show_beauty_item_beauty_face_three">五官立体</string>
+    <string name="show_beauty_item_beauty_teeth2">白牙</string>
+    <string name="show_beauty_item_effect_oumei">欧美</string>
+    <string name="show_beauty_item_effect_hunxue">混血</string>
+    <string name="show_beauty_item_effect_diadiatu">嗲嗲兔</string>
 
     <string-array name="show_encoder">
         <item>硬编码</item>

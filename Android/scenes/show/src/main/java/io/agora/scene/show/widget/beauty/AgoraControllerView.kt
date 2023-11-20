@@ -3,6 +3,7 @@ package io.agora.scene.show.widget.beauty
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.view.isVisible
 import io.agora.scene.show.R
 import io.agora.scene.show.beauty.AgoraBeautySDK
 
@@ -77,8 +78,10 @@ class AgoraControllerView : BaseControllerView {
         val itemInfo = pageInfo.itemList[itemIndex]
         if (itemInfo.name == R.string.show_beauty_item_none) {
             viewBinding.slider.visibility = View.INVISIBLE
-        } else {
+            viewBinding.ivCompare.isVisible = false
+        } else if (pageInfo.name == R.string.show_beauty_group_beauty) {
             viewBinding.slider.visibility = View.VISIBLE
+            viewBinding.ivCompare.isVisible = true
         }
     }
 

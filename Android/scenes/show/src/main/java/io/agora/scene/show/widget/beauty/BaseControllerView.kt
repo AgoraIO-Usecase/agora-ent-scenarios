@@ -10,11 +10,13 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import io.agora.scene.base.GlideApp
 import io.agora.scene.show.databinding.ShowWidgetBeautyBaseLayoutBinding
 import io.agora.scene.show.databinding.ShowWidgetBeautyDialogItemBinding
 import io.agora.scene.show.databinding.ShowWidgetBeautyDialogPageBinding
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
+import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 
 open class BaseControllerView : FrameLayout {
 
@@ -106,9 +108,14 @@ open class BaseControllerView : FrameLayout {
                 pageList.forEachIndexed { index, pageInfo ->
                     pageInfo.isSelected = index == selectedPosition
                 }
+                var itemIndex = pageList[selectedPosition].itemList.indexOfFirst { it.isSelected }
+                if(itemIndex < 0){
+                    itemIndex = 0
+                }
                 onSelectedChanged(
                     selectedPosition,
-                    pageList[selectedPosition].itemList.indexOfFirst { it.isSelected })
+                    itemIndex
+                )
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
@@ -142,7 +149,10 @@ open class BaseControllerView : FrameLayout {
                 val itemInfo = getItem(position) ?: return
 
                 holder.binding.ivIcon.isActivated = itemInfo.isSelected
-                holder.binding.ivIcon.setImageResource(itemInfo.icon)
+                GlideApp.with(holder.binding.ivIcon)
+                    .load(itemInfo.icon)
+                    .transform(CenterCropRoundCornerTransform(999))
+                    .into(holder.binding.ivIcon)
                 holder.binding.tvName.setText(itemInfo.name)
                 if (itemInfo.isSelected) {
                     selectedHolder = holder

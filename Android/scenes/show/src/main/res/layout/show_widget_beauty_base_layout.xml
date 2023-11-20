@@ -14,16 +14,6 @@
         android:paddingHorizontal="20dp"
         android:theme="@style/Theme.Material3.Dark">
 
-        <TextView
-            android:id="@+id/tvStrength"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:text="@string/show_beauty_strength"
-            android:visibility="gone"
-            android:textColor="@color/white"
-            android:textSize="12sp" />
-
         <com.google.android.material.slider.Slider
             android:id="@+id/slider"
             android:layout_width="0dp"

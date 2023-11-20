@@ -11,13 +11,15 @@ object ByteDanceBeautySDK {
 
     private const val TAG = "ByteDanceBeautySDK"
 
-    private val LICENSE_NAME = "Agora_test_20230815_20231115_io.agora.test.entfull_4.5.0_599.licbag"
+    private val LICENSE_NAME = "Agora_test_20231116_20240116_io.agora.test.entfull_4.5.0_893.licbag"
     private var storagePath = ""
     private var assetsPath = ""
     private var licensePath = ""
     private var modelsPath = ""
     private var beautyNodePath = ""
     private var beauty4ItemsNodePath = ""
+    private var paletteColorNodePath = ""
+    private var paletteContrastNodePath = ""
     private var reSharpNodePath = ""
     private var stickerPath = ""
 
@@ -63,6 +65,24 @@ object ByteDanceBeautySDK {
             context,
             "$assetsPath/ComposeMakeup.bundle/ComposeMakeup/beauty_4Items",
             beauty4ItemsNodePath
+        )
+
+        // copy palette color node
+        paletteColorNodePath =
+            "$storagePath/beauty_bytedance/ComposeMakeup.bundle/ComposeMakeup/palette/color"
+        FileUtils.copyAssets(
+            context,
+            "$assetsPath/ComposeMakeup.bundle/ComposeMakeup/palette/color",
+            paletteColorNodePath
+        )
+
+        // copy beauty 4items node
+        paletteContrastNodePath =
+            "$storagePath/beauty_bytedance/ComposeMakeup.bundle/ComposeMakeup/palette/contrast"
+        FileUtils.copyAssets(
+            context,
+            "$assetsPath/ComposeMakeup.bundle/ComposeMakeup/palette/contrast",
+            paletteContrastNodePath
         )
 
         // copy resharp node
@@ -112,6 +132,26 @@ object ByteDanceBeautySDK {
             nodesLoaded.add(beauty4ItemsNodePath)
             renderManager.appendComposerNodes(
                 arrayOf(beauty4ItemsNodePath)
+            )
+            renderManager.loadResourceWithTimeout(-1)
+        }
+    }
+
+    private fun mayLoadPaletteContrastNode() {
+        if (!nodesLoaded.contains(paletteContrastNodePath)) {
+            nodesLoaded.add(paletteContrastNodePath)
+            renderManager.appendComposerNodes(
+                arrayOf(paletteContrastNodePath)
+            )
+            renderManager.loadResourceWithTimeout(-1)
+        }
+    }
+
+    private fun mayLoadPaletteColorNode() {
+        if (!nodesLoaded.contains(paletteColorNodePath)) {
+            nodesLoaded.add(paletteColorNodePath)
+            renderManager.appendComposerNodes(
+                arrayOf(paletteColorNodePath)
             )
             renderManager.loadResourceWithTimeout(-1)
         }
@@ -362,6 +402,65 @@ object ByteDanceBeautySDK {
                 }
             }
 
+        // 锐化
+        var sharpen = 0.0f
+            set(value) {
+                field = value
+                runOnBeautyThread {
+                    renderManager.updateComposerNodes(
+                        beautyNodePath,
+                        "sharp",
+                        value
+                    )
+                }
+            }
+
+        // 清晰度
+        var clear = 0.0f
+            set(value) {
+                field = value
+                runOnBeautyThread {
+                    renderManager.updateComposerNodes(
+                        beautyNodePath,
+                        "clear",
+                        value
+                    )
+                }
+            }
+
+        // 饱和度
+        var saturation = 0.0f
+            set(value) {
+                field = value
+                runOnBeautyThread {
+                    if (value > 0) {
+                        mayLoadPaletteColorNode()
+                    }
+                    renderManager.updateComposerNodes(
+                        paletteColorNodePath,
+                        "Intensity_Saturation",
+                        value
+                    )
+                }
+            }
+
+        // 对比度
+        var contrast = 0.0f
+            set(value) {
+                field = value
+                runOnBeautyThread {
+                    if (value > 0) {
+                        mayLoadPaletteContrastNode()
+                    }
+                    renderManager.updateComposerNodes(
+                        paletteContrastNodePath,
+                        "Intensity_Contrast",
+                        value
+                    )
+                }
+            }
+
+
         // 美妆
         var makeUp: MakeUpItem? = null
             set(value) {
@@ -445,6 +544,10 @@ object ByteDanceBeautySDK {
             brightEye = 0.0f
             darkCircles = 0.0f
             nasolabialFolds = 0.0f
+            sharpen = 0.0f
+            clear = 0.0f
+            contrast = 0.0f
+            saturation = 0.0f
 
             makeUp = null
             sticker = null
@@ -466,6 +569,10 @@ object ByteDanceBeautySDK {
             brightEye = brightEye
             darkCircles = darkCircles
             nasolabialFolds = nasolabialFolds
+            sharpen = sharpen
+            clear = clear
+            contrast = contrast
+            saturation = saturation
 
             makeUp = makeUp
             sticker = sticker

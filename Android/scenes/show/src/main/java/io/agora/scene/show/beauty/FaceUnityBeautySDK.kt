@@ -156,6 +156,18 @@ object FaceUnityBeautySDK {
                 }
             }
 
+        // 五官立体
+        var faceThree = 0.0f
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                runOnBeautyThread {
+                    faceBeauty.faceThreeIntensity = value.toDouble()
+                }
+            }
+
         // 瘦颧骨
         var shrinkCheekbone = 0.3f
             set(value) {
@@ -276,6 +288,18 @@ object FaceUnityBeautySDK {
                 }
             }
 
+        // 锐化
+        var sharpen = 0.0f
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                runOnBeautyThread {
+                    faceBeauty.sharpenIntensity = value.toDouble()
+                }
+            }
+
         // 贴纸
         var sticker: String? = null
             set(value) {
@@ -329,6 +353,7 @@ object FaceUnityBeautySDK {
             brightEye = 0.0f
             darkCircles = 0.0f
             nasolabialFolds = 0.0f
+            faceThree = 0.0f
 
             makeUp = null
             sticker = null

@@ -3,6 +3,7 @@ package io.agora.scene.show.widget.beauty
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.view.isVisible
 import io.agora.scene.show.R
 import io.agora.scene.show.beauty.FaceUnityBeautySDK
 
@@ -41,12 +42,14 @@ class FaceUnityControllerView : BaseControllerView {
                             beautyConfig.brightEye = 0.0f
                             beautyConfig.darkCircles = 0.0f
                             beautyConfig.nasolabialFolds = 0.0f
+                            beautyConfig.faceThree = 0.0f
                         }
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_beauty_smooth,
-                        R.mipmap.show_beauty_ic_smooth,
+                        R.mipmap.show_beauty_ic_face_mopi,
                         beautyConfig.smooth,
+                        isSelected = true,
                         onValueChanged = { value ->
                             beautyConfig.smooth = value
                         }
@@ -55,17 +58,16 @@ class FaceUnityControllerView : BaseControllerView {
                         R.string.show_beauty_item_beauty_whiten,
                         R.mipmap.show_beauty_ic_face_meibai,
                         beautyConfig.whiten,
-                        isSelected = true,
                         onValueChanged = { value ->
                             beautyConfig.whiten = value
                         }
                     ),
                     ItemInfo(
-                        R.string.show_beauty_item_beauty_redden,
-                        R.mipmap.show_beauty_ic_face_redden,
-                        beautyConfig.redden,
+                        R.string.show_beauty_item_beauty_face_three,
+                        R.mipmap.show_beauty_ic_face_liti,
+                        beautyConfig.faceThree,
                         onValueChanged = { value ->
-                            beautyConfig.redden = value
+                            beautyConfig.faceThree = value
                         }
                     ), ItemInfo(
                         R.string.show_beauty_item_beauty_overall,
@@ -124,7 +126,7 @@ class FaceUnityControllerView : BaseControllerView {
                             beautyConfig.mouthSize = value
                         }
                     ), ItemInfo(
-                        R.string.show_beauty_item_beauty_teeth,
+                        R.string.show_beauty_item_beauty_teeth2,
                         R.mipmap.show_beauty_ic_face_meiya,
                         beautyConfig.whiteTeeth,
                         onValueChanged = { value ->
@@ -138,18 +140,18 @@ class FaceUnityControllerView : BaseControllerView {
                             beautyConfig.brightEye = value
                         }
                     ), ItemInfo(
-                        R.string.show_beauty_item_beauty_remove_dark_circles,
-                        R.mipmap.show_beauty_ic_face_remove_dark_circles,
-                        beautyConfig.darkCircles,
-                        onValueChanged = { value ->
-                            beautyConfig.darkCircles = value
-                        }
-                    ), ItemInfo(
                         R.string.show_beauty_item_beauty_remove_nasolabial_folds,
                         R.mipmap.show_beauty_ic_face_remove_nasolabial_folds,
                         beautyConfig.nasolabialFolds,
                         onValueChanged = { value ->
                             beautyConfig.nasolabialFolds = value
+                        }
+                    ), ItemInfo(
+                        R.string.show_beauty_item_beauty_remove_dark_circles,
+                        R.mipmap.show_beauty_ic_face_remove_dark_circles,
+                        beautyConfig.darkCircles,
+                        onValueChanged = { value ->
+                            beautyConfig.darkCircles = value
                         }
                     )
                 )
@@ -166,31 +168,53 @@ class FaceUnityControllerView : BaseControllerView {
                         }
                     ),
                     ItemInfo(
-                        R.string.show_beauty_item_effect_dousha,
-                        R.mipmap.show_beauty_ic_effect_cwei,
-                        isSelected = beautyConfig.makeUp?.path == "makeup/dousha.bundle",
-                        value = if (beautyConfig.makeUp?.path == "makeup/dousha.bundle") beautyConfig.makeUp?.intensity
-                            ?: 0.69f else 0.69f,
+                        R.string.show_beauty_item_effect_diadiatu,
+                        R.mipmap.show_beauty_ic_effect_diadiatu,
+                        isSelected = beautyConfig.makeUp?.path == "makeup/diadiatu.bundle",
+                        value = if (beautyConfig.makeUp?.path == "makeup/diadiatu.bundle") beautyConfig.makeUp?.intensity
+                            ?: 0.8f else 0.8f,
                         onValueChanged = { value ->
                             beautyConfig.makeUp = FaceUnityBeautySDK.MakeUpItem(
-                                "makeup/dousha.bundle",
+                                "makeup/diadiatu.bundle",
                                 value
                             )
                         }
                     ),
                     ItemInfo(
-                        R.string.show_beauty_item_effect_naicha,
-                        R.mipmap.show_beauty_ic_effect_yuanqi,
-                        isSelected = beautyConfig.makeUp?.path == "makeup/naicha.bundle",
-                        value = if (beautyConfig.makeUp?.path == "makeup/naicha.bundle") beautyConfig.makeUp?.intensity
-                            ?: 0.69f else 0.69f,
+                        R.string.show_beauty_item_effect_hunxue,
+                        R.mipmap.show_beauty_ic_effect_fu_hunxue,
+                        isSelected = beautyConfig.makeUp?.path == "makeup/hunxue.bundle",
+                        value = if (beautyConfig.makeUp?.path == "makeup/hunxue.bundle") beautyConfig.makeUp?.intensity
+                            ?: 0.8f else 0.8f,
                         onValueChanged = { value ->
                             beautyConfig.makeUp = FaceUnityBeautySDK.MakeUpItem(
-                                "makeup/naicha.bundle",
+                                "makeup/hunxue.bundle",
                                 value
                             )
                         }
                     )
+                )
+            ),
+            PageInfo(
+                R.string.show_beauty_group_adjust,
+                listOf(
+                    ItemInfo(
+                        R.string.show_beauty_item_none,
+                        R.mipmap.show_beauty_ic_none,
+                        0.0f,
+                        isSelected = true,
+                        onValueChanged = { _ ->
+                            beautyConfig.sharpen = 0.0f
+                        },
+                    ),
+                    ItemInfo(
+                        R.string.show_beauty_item_adjust_sharpen,
+                        R.mipmap.show_beauty_ic_adjust_sharp,
+                        beautyConfig.sharpen,
+                        onValueChanged = { value ->
+                            beautyConfig.sharpen = value
+                        }
+                    ),
                 )
             ),
             PageInfo(
@@ -206,7 +230,7 @@ class FaceUnityControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_sticker_sdlu,
-                        R.mipmap.show_beauty_ic_filter_naiyou,
+                        R.mipmap.show_beauty_ic_sticker_elk,
                         isSelected = beautyConfig.sticker == "sticker/sdlu.bundle",
                         onValueChanged = { _ ->
                             beautyConfig.sticker = "sticker/sdlu.bundle"
@@ -225,8 +249,13 @@ class FaceUnityControllerView : BaseControllerView {
             || pageInfo.name == R.string.show_beauty_group_sticker
         ) {
             viewBinding.slider.visibility = View.INVISIBLE
-        } else {
+            viewBinding.ivCompare.isVisible = false
+        } else if (pageInfo.name == R.string.show_beauty_group_beauty
+            || pageInfo.name == R.string.show_beauty_group_effect
+            || pageInfo.name == R.string.show_beauty_group_adjust
+        ) {
             viewBinding.slider.visibility = View.VISIBLE
+            viewBinding.ivCompare.isVisible = true
         }
     }
 }

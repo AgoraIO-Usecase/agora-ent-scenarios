@@ -3,6 +3,7 @@ package io.agora.scene.show.widget.beauty
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.view.isVisible
 import io.agora.scene.show.R
 import io.agora.scene.show.beauty.SenseTimeBeautySDK
 
@@ -44,9 +45,9 @@ class SenseTimeControllerView : BaseControllerView {
                 ),
                 ItemInfo(
                     R.string.show_beauty_item_beauty_smooth,
-                    R.mipmap.show_beauty_ic_smooth,
+                    R.mipmap.show_beauty_ic_face_mopi,
                     SenseTimeBeautySDK.beautyConfig.smooth,
-
+                    isSelected = true,
                     onValueChanged = { value ->
                         SenseTimeBeautySDK.beautyConfig.smooth = value
                     }
@@ -55,19 +56,11 @@ class SenseTimeControllerView : BaseControllerView {
                     R.string.show_beauty_item_beauty_whiten,
                     R.mipmap.show_beauty_ic_face_meibai,
                     SenseTimeBeautySDK.beautyConfig.whiten,
-                    isSelected = true,
                     onValueChanged = { value ->
                         SenseTimeBeautySDK.beautyConfig.whiten = value
                     }
                 ),
                 ItemInfo(
-                    R.string.show_beauty_item_beauty_redden,
-                    R.mipmap.show_beauty_ic_face_redden,
-                    SenseTimeBeautySDK.beautyConfig.redden,
-                    onValueChanged = { value ->
-                        SenseTimeBeautySDK.beautyConfig.redden = value
-                    }
-                ), ItemInfo(
                     R.string.show_beauty_item_beauty_overall,
                     R.mipmap.show_beauty_ic_face_shoulian,
                     SenseTimeBeautySDK.beautyConfig.thinFace,
@@ -138,18 +131,61 @@ class SenseTimeControllerView : BaseControllerView {
                         SenseTimeBeautySDK.beautyConfig.brightEye = value
                     }
                 ), ItemInfo(
+                    R.string.show_beauty_item_beauty_remove_nasolabial_folds,
+                    R.mipmap.show_beauty_ic_face_remove_nasolabial_folds,
+                    SenseTimeBeautySDK.beautyConfig.nasolabialFolds,
+                    onValueChanged = { value ->
+                        SenseTimeBeautySDK.beautyConfig.nasolabialFolds = value
+                    }
+                ), ItemInfo(
                     R.string.show_beauty_item_beauty_remove_dark_circles,
                     R.mipmap.show_beauty_ic_face_remove_dark_circles,
                     SenseTimeBeautySDK.beautyConfig.darkCircles,
                     onValueChanged = { value ->
                         SenseTimeBeautySDK.beautyConfig.darkCircles = value
                     }
-                ), ItemInfo(
-                    R.string.show_beauty_item_beauty_remove_nasolabial_folds,
-                    R.mipmap.show_beauty_ic_face_remove_nasolabial_folds,
-                    SenseTimeBeautySDK.beautyConfig.nasolabialFolds,
+                )
+            )
+        ),
+        PageInfo(
+            R.string.show_beauty_group_effect,
+            listOf(
+                ItemInfo(
+                    R.string.show_beauty_item_none,
+                    R.mipmap.show_beauty_ic_none,
+                    isSelected = SenseTimeBeautySDK.beautyConfig.makeUp == null,
+                    onValueChanged = { _ ->
+                        SenseTimeBeautySDK.beautyConfig.makeUp = null
+                    }
+                ),
+                ItemInfo(
+                    R.string.show_beauty_item_effect_oumei,
+                    R.mipmap.show_beauty_ic_effect_oumei,
+                    isSelected = SenseTimeBeautySDK.beautyConfig.makeUp?.path == "style_lightly/oumei.zip",
+                    value = if (SenseTimeBeautySDK.beautyConfig.makeUp?.path == "style_lightly/oumei.zip")
+                        SenseTimeBeautySDK.beautyConfig.makeUp?.strength
+                            ?: 0.8f else 0.8f,
                     onValueChanged = { value ->
-                        SenseTimeBeautySDK.beautyConfig.nasolabialFolds = value
+                        SenseTimeBeautySDK.beautyConfig.makeUp = SenseTimeBeautySDK.MakeUpItem(
+                            context,
+                            "style_lightly/oumei.zip",
+                            value
+                        )
+                    }
+                ),
+                ItemInfo(
+                    R.string.show_beauty_item_effect_hunxue,
+                    R.mipmap.show_beauty_ic_effect_hunxue,
+                    isSelected = SenseTimeBeautySDK.beautyConfig.makeUp?.path == "style_lightly/hunxue.zip",
+                    value = if (SenseTimeBeautySDK.beautyConfig.makeUp?.path == "style_lightly/hunxue.zip")
+                        SenseTimeBeautySDK.beautyConfig.makeUp?.strength
+                            ?: 0.8f else 0.8f,
+                    onValueChanged = { value ->
+                        SenseTimeBeautySDK.beautyConfig.makeUp = SenseTimeBeautySDK.MakeUpItem(
+                            context,
+                            "style_lightly/hunxue.zip",
+                            value
+                        )
                     }
                 )
             )
@@ -204,49 +240,6 @@ class SenseTimeControllerView : BaseControllerView {
             )
         ),
         PageInfo(
-            R.string.show_beauty_group_effect,
-            listOf(
-                ItemInfo(
-                    R.string.show_beauty_item_none,
-                    R.mipmap.show_beauty_ic_none,
-                    isSelected = SenseTimeBeautySDK.beautyConfig.makeUp == null,
-                    onValueChanged = { _ ->
-                        SenseTimeBeautySDK.beautyConfig.makeUp = null
-                    }
-                ),
-                ItemInfo(
-                    R.string.show_beauty_item_effect_qise,
-                    R.mipmap.show_beauty_ic_effect_cwei,
-                    isSelected = SenseTimeBeautySDK.beautyConfig.makeUp?.path == "style_lightly/qise.zip",
-                    value = if (SenseTimeBeautySDK.beautyConfig.makeUp?.path == "style_lightly/qise.zip")
-                        SenseTimeBeautySDK.beautyConfig.makeUp?.strength
-                            ?: 0.5f else 0.5f,
-                    onValueChanged = { value ->
-                        SenseTimeBeautySDK.beautyConfig.makeUp = SenseTimeBeautySDK.MakeUpItem(
-                            context,
-                            "style_lightly/qise.zip",
-                            value
-                        )
-                    }
-                ),
-                ItemInfo(
-                    R.string.show_beauty_item_effect_wanneng,
-                    R.mipmap.show_beauty_ic_effect_yuanqi,
-                    isSelected = SenseTimeBeautySDK.beautyConfig.makeUp?.path == "style_lightly/wanneng.zip",
-                    value = if (SenseTimeBeautySDK.beautyConfig.makeUp?.path == "style_lightly/wanneng.zip")
-                        SenseTimeBeautySDK.beautyConfig.makeUp?.strength
-                            ?: 0.5f else 0.5f,
-                    onValueChanged = { value ->
-                        SenseTimeBeautySDK.beautyConfig.makeUp = SenseTimeBeautySDK.MakeUpItem(
-                            context,
-                            "style_lightly/wanneng.zip",
-                            value
-                        )
-                    }
-                )
-            )
-        ),
-        PageInfo(
             R.string.show_beauty_group_sticker,
             listOf(
                 ItemInfo(
@@ -259,7 +252,7 @@ class SenseTimeControllerView : BaseControllerView {
                 ),
                 ItemInfo(
                     R.string.show_beauty_item_sticker_shangbanle,
-                    R.mipmap.show_beauty_ic_filter_naiyou,
+                    R.mipmap.show_beauty_ic_sticker_shangbanle,
                     isSelected = SenseTimeBeautySDK.beautyConfig.sticker?.path == "sticker_face_shape/ShangBanLe.zip",
                     onValueChanged = { _ ->
                         SenseTimeBeautySDK.beautyConfig.sticker = SenseTimeBeautySDK.StickerItem(
@@ -280,8 +273,13 @@ class SenseTimeControllerView : BaseControllerView {
             || pageInfo.name == R.string.show_beauty_group_sticker
         ) {
             viewBinding.slider.visibility = View.INVISIBLE
-        } else {
+            viewBinding.ivCompare.isVisible = false
+        } else if (pageInfo.name == R.string.show_beauty_group_beauty
+            || pageInfo.name == R.string.show_beauty_group_effect
+            || pageInfo.name == R.string.show_beauty_group_adjust
+        ) {
             viewBinding.slider.visibility = View.VISIBLE
+            viewBinding.ivCompare.isVisible = true
         }
     }
 

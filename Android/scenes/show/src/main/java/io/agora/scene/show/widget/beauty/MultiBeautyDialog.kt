@@ -2,6 +2,7 @@ package io.agora.scene.show.widget.beauty
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.View.OnClickListener
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
@@ -86,11 +87,14 @@ class MultiBeautyDialog : BottomSheetDialog {
                 R.id.rbByteDance -> BeautyManager.beautyType = BeautyManager.BeautyType.ByteDance
                 R.id.rbAgora -> BeautyManager.beautyType = BeautyManager.BeautyType.Agora
             }
+            // resetVirtualBackground()
             mBinding.ctvBeauty.performClick()
             updateControllerView(BeautyManager.beautyType)
         }
         updateControllerView(BeautyManager.beautyType)
     }
+
+
 
     private fun updateControllerView(beautyType: BeautyManager.BeautyType) {
         mBinding.controllerContainer.removeAllViews()
@@ -186,6 +190,7 @@ class MultiBeautyDialog : BottomSheetDialog {
                     setTitle(R.string.show_tip)
                     setMessage(R.string.show_beauty_green_screen_tip)
                     setPositiveButton(R.string.show_setting_confirm) { dialog, _ ->
+                        controllerView.viewBinding.slider.visibility = View.VISIBLE
                         changeVirtualBGMode(SegmentationProperty.SEG_MODEL_GREEN)
                         dialog.dismiss()
                     }
@@ -196,6 +201,7 @@ class MultiBeautyDialog : BottomSheetDialog {
                 }.create().show()
                 return@setOnCheckedChangeListener
             } else {
+                controllerView.viewBinding.slider.visibility = View.INVISIBLE
                 changeVirtualBGMode(SegmentationProperty.SEG_MODEL_AI)
             }
         }
@@ -206,18 +212,30 @@ class MultiBeautyDialog : BottomSheetDialog {
             if (pageInfo.name == R.string.show_beauty_group_virtual_bg) {
                 controllerView.viewBinding.ivCompare.isVisible = false
                 if (itemInfo.name == R.string.show_beauty_item_none) {
-                    controllerView.viewBinding.tvStrength.isVisible = false
                     controllerView.viewBinding.topCustomView.isVisible = false
+                    controllerView.viewBinding.slider.visibility = View.INVISIBLE
                 } else {
-                    controllerView.viewBinding.tvStrength.isVisible = true
                     controllerView.viewBinding.topCustomView.isVisible = true
+                    controllerView.viewBinding.slider.visibility = if(virtualBgBinding.mSwitchMaterial.isChecked) View.VISIBLE else View.INVISIBLE
                 }
             } else {
-                controllerView.viewBinding.tvStrength.isVisible = false
                 controllerView.viewBinding.topCustomView.isVisible = false
                 controllerView.viewBinding.ivCompare.isVisible = true
             }
         }
+    }
+
+    private fun resetVirtualBackground() {
+        RtcEngineInstance.virtualBackgroundSegmentation.modelType =
+            SegmentationProperty.SEG_MODEL_AI
+        RtcEngineInstance.virtualBackgroundSegmentation.greenCapacity = 0.5f
+        RtcEngineInstance.virtualBackgroundSource.backgroundSourceType =
+            VirtualBackgroundSource.BACKGROUND_COLOR
+        RtcEngineInstance.rtcEngine.enableVirtualBackground(
+            false,
+            RtcEngineInstance.virtualBackgroundSource,
+            RtcEngineInstance.virtualBackgroundSegmentation
+        )
     }
 
     private fun changeVirtualBGMode(modelType: Int) {
