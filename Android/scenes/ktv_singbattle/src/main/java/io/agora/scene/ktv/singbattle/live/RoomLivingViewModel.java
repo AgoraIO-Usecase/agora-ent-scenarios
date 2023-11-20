@@ -557,11 +557,11 @@ public class RoomLivingViewModel extends ViewModel {
      */
     public void toggleMic(boolean isUnMute) {
         KTVLogger.d(TAG, "RoomLivingViewModel.toggleMic() called：" + isUnMute);
+        updateVolumeStatus(isUnMute);
         ktvServiceProtocol.updateSeatAudioMuteStatus(!isUnMute, e -> {
             if (e == null) {
                 // success
                 KTVLogger.d(TAG, "RoomLivingViewModel.toggleMic() success");
-                updateVolumeStatus(isUnMute);
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.toggleMic() failed: " + e.getMessage());
@@ -1510,15 +1510,15 @@ public class RoomLivingViewModel extends ViewModel {
         Long newSongCode = ktvApiProtocol.getMusicContentCenter().getInternalSongCode(songCode, jsonOption);
         if (isOwnSong) {
             // 主唱加载歌曲
-            loadMusic(new KTVLoadMusicConfiguration(newSongCode.toString(), true, mainSingerUid, KTVLoadMusicMode.LOAD_MUSIC_AND_LRC), newSongCode);
+            loadMusic(new KTVLoadMusicConfiguration(newSongCode.toString(), false, mainSingerUid, KTVLoadMusicMode.LOAD_MUSIC_AND_LRC), newSongCode, isOwnSong);
         } else {
             // 观众
-            loadMusic(new KTVLoadMusicConfiguration(newSongCode.toString(), false, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY), newSongCode);
+            loadMusic(new KTVLoadMusicConfiguration(newSongCode.toString(), false, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY), newSongCode, isOwnSong);
         }
     }
 
     private boolean hasReceiveStartSingBattle = false;
-    private void loadMusic(KTVLoadMusicConfiguration config, Long songCode) {
+    private void loadMusic(KTVLoadMusicConfiguration config, Long songCode, Boolean isOwnSong) {
 
         ktvApiProtocol.loadMusic(songCode, config, new IMusicLoadStateListener() {
             @Override
@@ -1529,10 +1529,7 @@ public class RoomLivingViewModel extends ViewModel {
             @Override
             public void onMusicLoadSuccess(long songCode, @NonNull String lyricUrl) {
                 // 当前已被切歌
-                if (songPlayingLiveData.getValue() == null) {
-                    ToastUtils.showToastLong("load失败，当前已无歌曲");
-                    return;
-                }
+                if (songPlayingLiveData.getValue() == null) return;
 
                 // 重置settings
                 retryTimes = 0;
@@ -1558,13 +1555,17 @@ public class RoomLivingViewModel extends ViewModel {
                 } else if (songPlayingLiveData.getValue() != null && !songPlayingLiveData.getValue().getWinnerNo().equals("")) {
                     playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                 }
+
+                if (isOwnSong) {
+                    ktvApiProtocol.switchSingerRole(KTVSingRole.SoloSinger, null);
+                    ktvApiProtocol.startSing(songCode, 0);
+                }
             }
 
             @Override
             public void onMusicLoadFail(long songCode, @NonNull KTVLoadSongFailReason reason) {
                 // 当前已被切歌
                 if (songPlayingLiveData.getValue() == null) {
-                    ToastUtils.showToastLong("load失败，当前已无歌曲");
                     return;
                 }
 
@@ -1581,17 +1582,13 @@ public class RoomLivingViewModel extends ViewModel {
                     noLrcLiveData.postValue(true);
                 } else if (reason == KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL) {
                     // 歌曲加载失败 ，重试3次
-                    ToastUtils.showToastLong("歌曲加载失败");
                     retryTimes = retryTimes + 1;
                     if (retryTimes < 3) {
-                        loadMusic(config, songCode);
+                        loadMusic(config, songCode, isOwnSong);
                     } else {
                         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                        ToastUtils.showToastLong("已尝试三次，请自动切歌");
+                        ToastUtils.showToastLong(R.string.ktv_singbattle_try);
                     }
-                } else if (reason == KTVLoadSongFailReason.CANCELED) {
-                    // 当前已被切歌
-                    ToastUtils.showToastLong("load失败，当前已切换到另一首歌");
                 }
             }
         });
@@ -1600,7 +1597,13 @@ public class RoomLivingViewModel extends ViewModel {
     // ------------------ 重新获取歌词url ------------------
     public void reGetLrcUrl() {
         if (songPlayingLiveData.getValue() == null) return;
-        loadMusic(new KTVLoadMusicConfiguration(songPlayingLiveData.getValue().getSongNo(), true, Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_LRC_ONLY), Long.parseLong(songPlayingLiveData.getValue().getSongNo()));
+        boolean isOwnSong;
+        if (songPlayingLiveData.getValue().getWinnerNo().equals("")) {
+            isOwnSong = Objects.equals(songPlayingLiveData.getValue().getUserNo(), UserManager.getInstance().getUser().id.toString());
+        } else {
+            isOwnSong = Objects.equals(songPlayingLiveData.getValue().getWinnerNo(), UserManager.getInstance().getUser().id.toString());
+        }
+        loadMusic(new KTVLoadMusicConfiguration(songPlayingLiveData.getValue().getSongNo(), false, Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_LRC_ONLY), Long.parseLong(songPlayingLiveData.getValue().getSongNo()), isOwnSong);
     }
 
     // ------------------ 歌曲seek ------------------

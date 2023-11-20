@@ -108,11 +108,13 @@
     <string name="ktv_singbattle_people">人</string>
     <string name="ktv_singbattle_music_menu_dialog_mv">MV</string>
     <string name="ktv_singbattle_score_formatter">%s分</string>
+    <string name="ktv_singbattle_song_num_formatter">%d首</string>
     <string name="ktv_singbattle_beauty_voice">美声</string>
     <string name="ktv_singbattle_voice_effect">音效</string>
     <string name="ktv_singbattle_camera">摄像头</string>
     <string name="ktv_singbattle_leave_chorus">退出合唱</string>
     <string name="ktv_singbattle_seat_num">%s号麦</string>
+    <string name="ktv_singbattle_no_preson">暂无上榜</string>
 
     <!--    Content Description-->
     <string name="ktv_singbattle_toggle_mic">麦克风启用或静音</string>
@@ -157,4 +159,5 @@
     <string name="ktv_singbattle_debug_settings_private_param">私有参数</string>
     <string name="ktv_singbattle_debug_settings_set">设置</string>
     <string name="ktv_singbattle_debug_settings_audio_dump">音频Dump</string>
+    <string name="ktv_singbattle_try">已尝试三次，请手动切歌</string>
 </resources>
