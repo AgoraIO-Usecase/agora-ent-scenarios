@@ -38,6 +38,7 @@ class AgoraControllerView : BaseControllerView {
                         R.string.show_beauty_item_beauty_smooth,
                         R.mipmap.show_beauty_ic_smooth,
                         beautyConfig.smooth,
+                        isSelected = true,
                         onValueChanged = { value ->
                             beautyConfig.smooth = value
                         }
@@ -46,7 +47,6 @@ class AgoraControllerView : BaseControllerView {
                         R.string.show_beauty_item_beauty_whiten,
                         R.mipmap.show_beauty_ic_face_meibai,
                         beautyConfig.whiten,
-                        isSelected = true,
                         onValueChanged = { value ->
                             beautyConfig.whiten = value
                         }

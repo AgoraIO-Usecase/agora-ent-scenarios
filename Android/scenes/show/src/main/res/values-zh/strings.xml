@@ -62,7 +62,7 @@
     <string name="show_beauty_item_beauty_chin">下巴</string>
     <string name="show_beauty_item_beauty_jawbone">下颌骨</string>
     <string name="show_beauty_item_beauty_forehead">额头</string>
-    <string name="show_beauty_item_beauty_mouth">嘴型</string>
+    <string name="show_beauty_item_beauty_mouth">嘴形</string>
     <string name="show_beauty_item_beauty_teeth">美牙</string>
     <string name="show_beauty_group_filter">滤镜</string>
     <string name="show_beauty_group_effect">风格妆</string>
@@ -228,8 +228,8 @@
     <string name="show_beauty_item_adjust_clarity">清晰度</string>
     <string name="show_beauty_item_beauty_redden">红润</string>
     <string name="show_beauty_item_beauty_bright_eye">亮眼</string>
-    <string name="show_beauty_item_beauty_remove_dark_circles">祛黑眼圈</string>
-    <string name="show_beauty_item_beauty_remove_nasolabial_folds">祛法令纹</string>
+    <string name="show_beauty_item_beauty_remove_dark_circles">去黑眼圈</string>
+    <string name="show_beauty_item_beauty_remove_nasolabial_folds">去法令纹</string>
     <string name="show_beauty_group_virtual_bg">背景</string>
     <string name="show_beauty_green_screen">绿幕</string>
     <string name="show_beauty_strength">强度</string>
@@ -272,6 +272,8 @@
     <string name="show_beauty_item_effect_oumei">欧美</string>
     <string name="show_beauty_item_effect_hunxue">混血</string>
     <string name="show_beauty_item_effect_diadiatu">嗲嗲兔</string>
+    <string name="show_beauty_item_beauty_fajixian">发际线</string>
+    <string name="show_beauty_item_beauty_white_teeth">白牙</string>
 
     <string-array name="show_encoder">
         <item>硬编码</item>

@@ -268,6 +268,7 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
         VideoSetting.resetAudienceSetting()
         TokenGenerator.expireSecond = -1
         RtcEngineInstance.cleanCache()
+        RtcEngineInstance.resetVirtualBackground()
         BeautyManager.destroy()
         super.finish()
     }

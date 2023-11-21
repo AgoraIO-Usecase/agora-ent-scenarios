@@ -225,19 +225,6 @@ class MultiBeautyDialog : BottomSheetDialog {
         }
     }
 
-    private fun resetVirtualBackground() {
-        RtcEngineInstance.virtualBackgroundSegmentation.modelType =
-            SegmentationProperty.SEG_MODEL_AI
-        RtcEngineInstance.virtualBackgroundSegmentation.greenCapacity = 0.5f
-        RtcEngineInstance.virtualBackgroundSource.backgroundSourceType =
-            VirtualBackgroundSource.BACKGROUND_COLOR
-        RtcEngineInstance.rtcEngine.enableVirtualBackground(
-            false,
-            RtcEngineInstance.virtualBackgroundSource,
-            RtcEngineInstance.virtualBackgroundSegmentation
-        )
-    }
-
     private fun changeVirtualBGMode(modelType: Int) {
         RtcEngineInstance.virtualBackgroundSegmentation.modelType = modelType
         RtcEngineInstance.rtcEngine.enableVirtualBackground(

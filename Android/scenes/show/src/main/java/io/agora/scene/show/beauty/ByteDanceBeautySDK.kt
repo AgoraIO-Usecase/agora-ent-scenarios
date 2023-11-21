@@ -102,6 +102,7 @@ object ByteDanceBeautySDK {
 
     // GL Thread
     fun unInitEffect() {
+        beautyAPI = null
         nodesLoaded.clear()
         beautyConfig.reset()
         renderManager.release()
@@ -136,7 +137,7 @@ object ByteDanceBeautySDK {
         return true
     }
 
-    internal fun setBeautyAPI(beautyAPI: ByteDanceBeautyAPI?) {
+    internal fun setBeautyAPI(beautyAPI: ByteDanceBeautyAPI) {
         this.beautyAPI = beautyAPI
     }
 

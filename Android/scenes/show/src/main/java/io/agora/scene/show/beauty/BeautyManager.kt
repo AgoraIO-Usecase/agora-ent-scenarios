@@ -94,7 +94,6 @@ object BeautyManager {
 
 
     private fun switchBeauty(oldType: BeautyType, newType: BeautyType) {
-        val ctx = context ?: return
         val rtc = rtcEngine ?: return
 
         videoView?.get()?.let {
@@ -124,7 +123,7 @@ object BeautyManager {
                             )
                         )
                         senseTimeBeautyAPI?.enable(enable)
-                        SenseTimeBeautySDK.setBeautyAPI(senseTimeBeautyAPI)
+                        SenseTimeBeautySDK.setBeautyAPI(senseTimeBeautyAPI!!)
                         mainExecutor.post {
                             videoView?.get()?.let {
                                 senseTimeBeautyAPI?.setupLocalVideo(it, renderMode)
@@ -156,6 +155,7 @@ object BeautyManager {
                             )
                         )
                         faceUnityBeautyAPI?.enable(enable)
+                        FaceUnityBeautySDK.setBeautyAPI(faceUnityBeautyAPI!!)
                         mainExecutor.post {
                             videoView?.get()?.let {
                                 faceUnityBeautyAPI?.setupLocalVideo(it, renderMode)
@@ -194,7 +194,7 @@ object BeautyManager {
                             )
                         )
                         byteDanceBeautyAPI?.enable(enable)
-                        ByteDanceBeautySDK.setBeautyAPI(byteDanceBeautyAPI)
+                        ByteDanceBeautySDK.setBeautyAPI(byteDanceBeautyAPI!!)
                         mainExecutor.post {
                             videoView?.get()?.let {
                                 byteDanceBeautyAPI?.setupLocalVideo(it, renderMode)
@@ -235,7 +235,6 @@ object BeautyManager {
                 senseTimeBeautyAPI?.let {
                     it.release()
                     senseTimeBeautyAPI = null
-                    SenseTimeBeautySDK.setBeautyAPI(null)
                     workerExecutor.execute {
                         SenseTimeBeautySDK.unInitBeautySDK()
                     }
@@ -254,7 +253,6 @@ object BeautyManager {
                 byteDanceBeautyAPI?.let {
                     it.release()
                     byteDanceBeautyAPI = null
-                    ByteDanceBeautySDK.setBeautyAPI(null)
                 }
 
             BeautyType.Agora ->

@@ -52,7 +52,7 @@ object FaceUnityBeautySDK {
                         BUNDLE_AI_HUMAN,
                         FUAITypeEnum.FUAITYPE_HUMAN_PROCESSOR
                     )
-                    beautyConfig.resume()
+
                 }
             }
 
@@ -64,6 +64,7 @@ object FaceUnityBeautySDK {
     }
 
     fun unInitBeauty() {
+        beautyAPI = null
         beautyConfig.reset()
         FUAIKit.getInstance().releaseAllAIProcessor()
         FURenderKit.getInstance().release()
@@ -76,8 +77,9 @@ object FaceUnityBeautySDK {
         return aMethod.invoke(null) as? ByteArray
     }
 
-    internal fun setBeautyAPI(beautyAPI: FaceUnityBeautyAPI?) {
+    internal fun setBeautyAPI(beautyAPI: FaceUnityBeautyAPI) {
         this.beautyAPI = beautyAPI
+        beautyConfig.resume()
     }
 
     private fun runOnBeautyThread(run: () -> Unit) {
@@ -99,9 +101,6 @@ object FaceUnityBeautySDK {
         // 磨皮
         var smooth = 0.65f
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     faceBeauty.blurIntensity = value * 6.0
@@ -111,9 +110,6 @@ object FaceUnityBeautySDK {
         // 美白
         var whiten = 0.65f
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     faceBeauty.colorIntensity = value * 2.0
@@ -123,9 +119,6 @@ object FaceUnityBeautySDK {
         // 瘦脸
         var thinFace = 0.3f
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     faceBeauty.cheekThinningIntensity = value.toDouble()
@@ -135,9 +128,6 @@ object FaceUnityBeautySDK {
         // 大眼
         var enlargeEye = 0.0f
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     faceBeauty.eyeEnlargingIntensity = value.toDouble()
@@ -147,9 +137,6 @@ object FaceUnityBeautySDK {
         // 红润
         var redden = 0.0f
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     faceBeauty.redIntensity = value * 2.0
@@ -159,9 +146,6 @@ object FaceUnityBeautySDK {
         // 五官立体
         var faceThree = 0.0f
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     faceBeauty.faceThreeIntensity = value.toDouble()
@@ -171,9 +155,6 @@ object FaceUnityBeautySDK {
         // 瘦颧骨
         var shrinkCheekbone = 0.3f
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     faceBeauty.cheekBonesIntensity = value.toDouble()
@@ -183,9 +164,6 @@ object FaceUnityBeautySDK {
         // 下颌骨
         var shrinkJawbone = 0.0f
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     faceBeauty.lowerJawIntensity = value.toDouble()
@@ -195,9 +173,6 @@ object FaceUnityBeautySDK {
         // 美牙
         var whiteTeeth = 0.0f
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     faceBeauty.toothIntensity = value.toDouble()
@@ -207,9 +182,6 @@ object FaceUnityBeautySDK {
         // 额头
         var hairlineHeight = 0.0f
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     faceBeauty.forHeadIntensity = value.toDouble()
@@ -219,9 +191,6 @@ object FaceUnityBeautySDK {
         // 瘦鼻
         var narrowNose = 0.0f
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     faceBeauty.noseIntensity = value.toDouble()
@@ -231,9 +200,6 @@ object FaceUnityBeautySDK {
         // 嘴形
         var mouthSize = 0.0f
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     faceBeauty.mouthIntensity = value.toDouble()
@@ -243,9 +209,6 @@ object FaceUnityBeautySDK {
         // 下巴
         var chinLength = 0.0f
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     faceBeauty.chinIntensity = value.toDouble()
@@ -255,9 +218,6 @@ object FaceUnityBeautySDK {
         // 亮眼
         var brightEye = 0.0f
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     faceBeauty.eyeBrightIntensity = value.toDouble()
@@ -267,9 +227,6 @@ object FaceUnityBeautySDK {
         // 祛黑眼圈
         var darkCircles = 0.0f
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     faceBeauty.removePouchIntensity = value.toDouble()
@@ -279,9 +236,6 @@ object FaceUnityBeautySDK {
         // 祛法令纹
         var nasolabialFolds = 0.0f
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     faceBeauty.removeLawPatternIntensity = value.toDouble()
@@ -291,9 +245,6 @@ object FaceUnityBeautySDK {
         // 锐化
         var sharpen = 0.0f
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     faceBeauty.sharpenIntensity = value.toDouble()
@@ -303,9 +254,6 @@ object FaceUnityBeautySDK {
         // 贴纸
         var sticker: String? = null
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     fuRenderKit.propContainer.removeAllProp()
@@ -319,9 +267,6 @@ object FaceUnityBeautySDK {
         // 美妆
         var makeUp: MakeUpItem? = null
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     if (value == null) {

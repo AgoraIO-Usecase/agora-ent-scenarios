@@ -60,14 +60,6 @@ class ByteDanceControllerView : BaseControllerView {
                         onValueChanged = { value ->
                             beautyConfig.whiten = value
                         }
-                    ),
-                    ItemInfo(
-                        R.string.show_beauty_item_beauty_redden,
-                        R.mipmap.show_beauty_ic_face_redden,
-                        beautyConfig.redden,
-                        onValueChanged = { value ->
-                            beautyConfig.redden = value
-                        }
                     ), ItemInfo(
                         R.string.show_beauty_item_beauty_overall,
                         R.mipmap.show_beauty_ic_face_shoulian,
@@ -111,7 +103,7 @@ class ByteDanceControllerView : BaseControllerView {
                             beautyConfig.shrinkJawbone = value
                         }
                     ), ItemInfo(
-                        R.string.show_beauty_item_beauty_forehead,
+                        R.string.show_beauty_item_beauty_fajixian,
                         R.mipmap.show_beauty_ic_face_etou,
                         beautyConfig.hairlineHeight,
                         onValueChanged = { value ->
@@ -125,7 +117,7 @@ class ByteDanceControllerView : BaseControllerView {
                             beautyConfig.mouthSize = value
                         }
                     ), ItemInfo(
-                        R.string.show_beauty_item_beauty_teeth,
+                        R.string.show_beauty_item_beauty_white_teeth,
                         R.mipmap.show_beauty_ic_face_meiya,
                         beautyConfig.whiteTeeth,
                         onValueChanged = { value ->
@@ -139,18 +131,18 @@ class ByteDanceControllerView : BaseControllerView {
                             beautyConfig.brightEye = value
                         }
                     ), ItemInfo(
-                        R.string.show_beauty_item_beauty_remove_dark_circles,
-                        R.mipmap.show_beauty_ic_face_remove_dark_circles,
-                        beautyConfig.darkCircles,
-                        onValueChanged = { value ->
-                            beautyConfig.darkCircles = value
-                        }
-                    ), ItemInfo(
                         R.string.show_beauty_item_beauty_remove_nasolabial_folds,
                         R.mipmap.show_beauty_ic_face_remove_nasolabial_folds,
                         beautyConfig.nasolabialFolds,
                         onValueChanged = { value ->
                             beautyConfig.nasolabialFolds = value
+                        }
+                    ), ItemInfo(
+                        R.string.show_beauty_item_beauty_remove_dark_circles,
+                        R.mipmap.show_beauty_ic_face_remove_dark_circles,
+                        beautyConfig.darkCircles,
+                        onValueChanged = { value ->
+                            beautyConfig.darkCircles = value
                         }
                     )
                 )

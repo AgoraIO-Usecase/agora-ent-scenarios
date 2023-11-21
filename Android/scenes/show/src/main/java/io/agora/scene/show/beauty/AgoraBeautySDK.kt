@@ -1,6 +1,5 @@
 package io.agora.scene.show.beauty
 
-import android.util.Log
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.video.BeautyOptions
 
@@ -22,8 +21,8 @@ object AgoraBeautySDK {
         rtcEngine?.setBeautyEffectOptions(false, beautyConfig.beautyOption)
         rtcEngine?.enableExtension("agora_video_filters_clear_vision", "clear_vision", false)
         rtcEngine = null
-        beautyConfig.reset()
         enable = false
+        beautyConfig.reset()
     }
 
     fun enable(enable: Boolean) {
@@ -68,25 +67,17 @@ object AgoraBeautySDK {
             }
 
         internal fun reset() {
-            smooth = 0.5f
-            whiten = 0.6f
-            redden = 0.1f
-            sharpen = 0.3f
+            smooth = 0.75f
+            whiten = 0.75f
+            redden = 0.0f
+            sharpen = 0.0f
         }
 
         internal fun resume() {
-            try {
-                val fields = this.javaClass.declaredFields
-                fields.forEach {
-                    val get = it.get(this)
-                    if (get != null) {
-                        it.isAccessible = true
-                        it.set(this, get)
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "BeautyConfig resume error.", e)
-            }
+            smooth = smooth
+            whiten = whiten
+            redden = redden
+            sharpen = sharpen
         }
     }
 }

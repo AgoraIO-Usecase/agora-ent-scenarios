@@ -59,13 +59,13 @@ object SenseTimeBeautySDK {
         if (checkLicense(context)) {
             initHumanAction(context)
             initMobileEffect(context)
-            beautyConfig.resume()
             return true
         }
         return false
     }
 
     fun unInitBeautySDK() {
+        beautyAPI = null
         unInitMobileEffect()
         unInitHumanActionNative()
         beautyConfig.reset()
@@ -149,8 +149,9 @@ object SenseTimeBeautySDK {
     }
 
 
-    internal fun setBeautyAPI(beautyAPI: SenseTimeBeautyAPI?){
+    internal fun setBeautyAPI(beautyAPI: SenseTimeBeautyAPI){
         this.beautyAPI = beautyAPI
+        beautyConfig.resume()
     }
 
     private fun runOnBeautyThread(run: () -> Unit) {

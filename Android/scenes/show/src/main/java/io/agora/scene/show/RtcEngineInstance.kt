@@ -1,6 +1,7 @@
 package io.agora.scene.show
 
 import io.agora.rtc2.Constants
+import io.agora.rtc2.IMediaExtensionObserver
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
@@ -46,6 +47,46 @@ object RtcEngineInstance {
                 val config = RtcEngineConfig()
                 config.mContext = AgoraApplication.the()
                 config.mAppId = io.agora.scene.base.BuildConfig.AGORA_APP_ID
+                config.mExtensionObserver = object: IMediaExtensionObserver{
+                    override fun onEvent(
+                        provider: String?,
+                        extension: String?,
+                        key: String?,
+                        value: String?
+                    ) {
+                        ShowLogger.d(
+                            "RtcEngineInstance",
+                            "Rtc Extension onEvent >> provider=$provider, extension=$extension, key=$key, value=$value"
+                        )
+                    }
+
+                    override fun onStarted(provider: String?, extension: String?) {
+                        ShowLogger.d(
+                            "RtcEngineInstance",
+                            "Rtc Extension onStarted >> provider=$provider, extension=$extension"
+                        )
+                    }
+
+                    override fun onStopped(provider: String?, extension: String?) {
+                        ShowLogger.d(
+                            "RtcEngineInstance",
+                            "Rtc Extension onStopped >> provider=$provider, extension=$extension"
+                        )
+                    }
+
+                    override fun onError(
+                        provider: String?,
+                        extension: String?,
+                        error: Int,
+                        message: String?
+                    ) {
+                        ShowLogger.d(
+                            "RtcEngineInstance",
+                            "Rtc Extension onError >> provider=$provider, extension=$extension, error=$error, message=$message"
+                        )
+                    }
+
+                }
                 config.mEventHandler = object : IRtcEngineEventHandler() {
                     override fun onError(err: Int) {
                         super.onError(err)
@@ -72,6 +113,18 @@ object RtcEngineInstance {
 
     fun cleanCache() {
         VideoSwitcher.getImplInstance(rtcEngine).unloadConnections()
+    }
+
+    fun resetVirtualBackground() {
+        virtualBackgroundSegmentation.modelType = SegmentationProperty.SEG_MODEL_AI
+        virtualBackgroundSegmentation.greenCapacity = 0.5f
+        virtualBackgroundSource.backgroundSourceType =
+            VirtualBackgroundSource.BACKGROUND_COLOR
+        innerRtcEngine?.enableVirtualBackground(
+            false,
+            virtualBackgroundSource,
+            virtualBackgroundSegmentation
+        )
     }
 
 

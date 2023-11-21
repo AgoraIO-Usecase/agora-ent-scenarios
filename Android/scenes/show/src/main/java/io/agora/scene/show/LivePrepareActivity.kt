@@ -152,6 +152,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     override fun finish() {
         super.finish()
         if (!isFinishToLiveDetail) {
+            RtcEngineInstance.resetVirtualBackground()
             BeautyManager.destroy()
         }
     }
