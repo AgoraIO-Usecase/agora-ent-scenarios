@@ -6,6 +6,7 @@ import static io.agora.scene.ktv.singrelay.ktvapi.KTVApiKt.createKTVApi;
 
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
@@ -896,6 +897,7 @@ public class RoomLivingViewModel extends ViewModel {
                @Override
                public void onMusicPlayerPositionChanged(long position_ms, long timestamp_ms) {
                    super.onMusicPlayerPositionChanged(position_ms, timestamp_ms);
+                   Log.d("hugo", "onMusicPlayerPositionChanged: " + position_ms);
                    if (!hasRecievedFirstPosition && isOnSeat) {
                        hasRecievedFirstPosition = true;
                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_BATTLE);
@@ -935,6 +937,7 @@ public class RoomLivingViewModel extends ViewModel {
            }
         );
 
+        ktvApiProtocol.getMediaPlayer().setPlayerOption("play_pos_change_callback", 500);
         if (isRoomOwner()) {
             ktvApiProtocol.setMicStatus(true);
             isOnSeat = true;
