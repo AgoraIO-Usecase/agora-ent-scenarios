@@ -11,6 +11,7 @@ import androidx.annotation.StringRes
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.base.GlideApp
+import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowWidgetBeautyBaseLayoutBinding
 import io.agora.scene.show.databinding.ShowWidgetBeautyDialogItemBinding
 import io.agora.scene.show.databinding.ShowWidgetBeautyDialogPageBinding
@@ -49,9 +50,10 @@ open class BaseControllerView : FrameLayout {
                 itemAdapterList.add(tabPosition, itemAdapter)
 
                 (context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager)?.defaultDisplay?.width?.let {
-                    holder.binding.recycleView.layoutParams = holder.binding.recycleView.layoutParams.apply {
-                        width = it
-                    }
+                    holder.binding.recycleView.layoutParams =
+                        holder.binding.recycleView.layoutParams.apply {
+                            width = it
+                        }
                 }
                 holder.binding.recycleView.adapter = itemAdapter
             }
@@ -109,7 +111,7 @@ open class BaseControllerView : FrameLayout {
                     pageInfo.isSelected = index == selectedPosition
                 }
                 var itemIndex = pageList[selectedPosition].itemList.indexOfFirst { it.isSelected }
-                if(itemIndex < 0){
+                if (itemIndex < 0) {
                     itemIndex = 0
                 }
                 onSelectedChanged(
@@ -153,6 +155,15 @@ open class BaseControllerView : FrameLayout {
                     .load(itemInfo.icon)
                     .transform(CenterCropRoundCornerTransform(999))
                     .into(holder.binding.ivIcon)
+                if (itemInfo.withPadding) {
+                    val padding =
+                        holder.binding.ivIcon.context.resources.getDimensionPixelSize(R.dimen.show_beauty_item_padding)
+                    holder.binding.ivIcon.setPadding(padding, padding, padding, padding)
+                } else {
+                    val padding =
+                        holder.binding.ivIcon.context.resources.getDimensionPixelSize(R.dimen.show_beauty_item_padding_background)
+                    holder.binding.ivIcon.setPadding(padding, padding, padding, padding)
+                }
                 holder.binding.tvName.setText(itemInfo.name)
                 if (itemInfo.isSelected) {
                     selectedHolder = holder
@@ -203,6 +214,7 @@ open class BaseControllerView : FrameLayout {
         @DrawableRes val icon: Int,
         var value: Float = 0.0f,
         val onValueChanged: (value: Float) -> Unit,
-        var isSelected: Boolean = false
+        var isSelected: Boolean = false,
+        var withPadding: Boolean = true
     )
 }

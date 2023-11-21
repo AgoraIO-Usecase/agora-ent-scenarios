@@ -169,6 +169,7 @@ class ByteDanceControllerView : BaseControllerView {
                     ItemInfo(
                         R.string.show_beauty_item_effect_cwei,
                         R.mipmap.show_beauty_ic_effect_bd_cwei,
+                        withPadding = false,
                         isSelected = beautyConfig.makeUp?.style == "cwei",
                         value = if (beautyConfig.makeUp?.style == "cwei") beautyConfig.makeUp?.identity
                             ?: 0.5f else 0.5f,
@@ -183,6 +184,7 @@ class ByteDanceControllerView : BaseControllerView {
                     ItemInfo(
                         R.string.show_beauty_item_effect_yuanqi,
                         R.mipmap.show_beauty_ic_effect_bd_yuanqi,
+                        withPadding = false,
                         isSelected = beautyConfig.makeUp?.style == "yuanqi",
                         value = if (beautyConfig.makeUp?.style == "yuanqi") beautyConfig.makeUp?.identity
                             ?: 0.5f else 0.5f,

@@ -170,6 +170,7 @@ class FaceUnityControllerView : BaseControllerView {
                     ItemInfo(
                         R.string.show_beauty_item_effect_diadiatu,
                         R.mipmap.show_beauty_ic_effect_diadiatu,
+                        withPadding = false,
                         isSelected = beautyConfig.makeUp?.path == "makeup/diadiatu.bundle",
                         value = if (beautyConfig.makeUp?.path == "makeup/diadiatu.bundle") beautyConfig.makeUp?.intensity
                             ?: 0.8f else 0.8f,
@@ -183,6 +184,7 @@ class FaceUnityControllerView : BaseControllerView {
                     ItemInfo(
                         R.string.show_beauty_item_effect_hunxue,
                         R.mipmap.show_beauty_ic_effect_fu_hunxue,
+                        withPadding = false,
                         isSelected = beautyConfig.makeUp?.path == "makeup/hunxue.bundle",
                         value = if (beautyConfig.makeUp?.path == "makeup/hunxue.bundle") beautyConfig.makeUp?.intensity
                             ?: 0.8f else 0.8f,

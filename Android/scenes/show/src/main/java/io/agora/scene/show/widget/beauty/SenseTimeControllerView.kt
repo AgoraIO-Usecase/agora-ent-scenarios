@@ -161,6 +161,7 @@ class SenseTimeControllerView : BaseControllerView {
                 ItemInfo(
                     R.string.show_beauty_item_effect_oumei,
                     R.mipmap.show_beauty_ic_effect_oumei,
+                    withPadding = false,
                     isSelected = SenseTimeBeautySDK.beautyConfig.makeUp?.path == "style_lightly/oumei.zip",
                     value = if (SenseTimeBeautySDK.beautyConfig.makeUp?.path == "style_lightly/oumei.zip")
                         SenseTimeBeautySDK.beautyConfig.makeUp?.strength
@@ -176,6 +177,7 @@ class SenseTimeControllerView : BaseControllerView {
                 ItemInfo(
                     R.string.show_beauty_item_effect_hunxue,
                     R.mipmap.show_beauty_ic_effect_hunxue,
+                    withPadding = false,
                     isSelected = SenseTimeBeautySDK.beautyConfig.makeUp?.path == "style_lightly/hunxue.zip",
                     value = if (SenseTimeBeautySDK.beautyConfig.makeUp?.path == "style_lightly/hunxue.zip")
                         SenseTimeBeautySDK.beautyConfig.makeUp?.strength
@@ -253,7 +255,8 @@ class SenseTimeControllerView : BaseControllerView {
                 ItemInfo(
                     R.string.show_beauty_item_sticker_shangbanle,
                     R.mipmap.show_beauty_ic_sticker_shangbanle,
-                    isSelected = SenseTimeBeautySDK.beautyConfig.sticker?.path == "sticker_face_shape/ShangBanLe.zip",
+                    withPadding = false,
+                    isSelected = SenseTimeBeautySDK.beautyConfig.sticker?.path == "stick er_face_shape/ShangBanLe.zip",
                     onValueChanged = { _ ->
                         SenseTimeBeautySDK.beautyConfig.sticker = SenseTimeBeautySDK.StickerItem(
                             context,
