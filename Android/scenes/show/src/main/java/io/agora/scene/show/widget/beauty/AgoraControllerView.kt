@@ -31,7 +31,6 @@ class AgoraControllerView : BaseControllerView {
                             beautyConfig.smooth = 0.0f
                             beautyConfig.whiten = 0.0f
                             beautyConfig.redden = 0.0f
-                            beautyConfig.sharpen = 0.0f
                         }
                     ),
                     ItemInfo(
@@ -59,6 +58,20 @@ class AgoraControllerView : BaseControllerView {
                             beautyConfig.redden = value
                         }
                     ),
+                )
+            ),
+            PageInfo(
+                R.string.show_beauty_group_adjust,
+                listOf(
+                    ItemInfo(
+                        R.string.show_beauty_item_none,
+                        R.mipmap.show_beauty_ic_none,
+                        0.0f,
+                        isSelected = true,
+                        onValueChanged = { _ ->
+                            beautyConfig.sharpen = 0.0f
+                        },
+                    ),
                     ItemInfo(
                         R.string.show_beauty_item_adjust_sharpen,
                         R.mipmap.show_beauty_ic_adjust_sharp,
@@ -66,7 +79,7 @@ class AgoraControllerView : BaseControllerView {
                         onValueChanged = { value ->
                             beautyConfig.sharpen = value
                         }
-                    )
+                    ),
                 )
             )
         )
@@ -79,7 +92,8 @@ class AgoraControllerView : BaseControllerView {
         if (itemInfo.name == R.string.show_beauty_item_none) {
             viewBinding.slider.visibility = View.INVISIBLE
             viewBinding.ivCompare.isVisible = false
-        } else if (pageInfo.name == R.string.show_beauty_group_beauty) {
+        } else if (pageInfo.name == R.string.show_beauty_group_beauty
+            || pageInfo.name == R.string.show_beauty_group_adjust) {
             viewBinding.slider.visibility = View.VISIBLE
             viewBinding.ivCompare.isVisible = true
         }

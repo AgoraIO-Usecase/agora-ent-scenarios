@@ -164,7 +164,7 @@ class ByteDanceControllerView : BaseControllerView {
                         withPadding = false,
                         isSelected = beautyConfig.makeUp?.style == "cwei",
                         value = if (beautyConfig.makeUp?.style == "cwei") beautyConfig.makeUp?.identity
-                            ?: 0.5f else 0.5f,
+                            ?: 0.8f else 0.8f,
                         onValueChanged = { value ->
                             beautyConfig.makeUp = ByteDanceBeautySDK.MakeUpItem(
                                 context,
@@ -179,7 +179,7 @@ class ByteDanceControllerView : BaseControllerView {
                         withPadding = false,
                         isSelected = beautyConfig.makeUp?.style == "yuanqi",
                         value = if (beautyConfig.makeUp?.style == "yuanqi") beautyConfig.makeUp?.identity
-                            ?: 0.5f else 0.5f,
+                            ?: 0.8f else 0.8f,
                         onValueChanged = { value ->
                             beautyConfig.makeUp = ByteDanceBeautySDK.MakeUpItem(
                                 context,

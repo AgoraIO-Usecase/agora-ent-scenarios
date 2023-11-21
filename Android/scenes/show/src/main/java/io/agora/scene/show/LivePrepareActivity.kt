@@ -101,7 +101,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         }
         // 低端机 或 无证书则关闭美颜
         BeautyManager.initialize(this, mRtcEngine)
-        BeautyManager.enable = mRtcEngine.queryDeviceScore() >= 75
         BeautyManager.setupLocalVideo(SurfaceView(this).apply {
             binding.flVideoContainer.addView(this)
         }, Constants.RENDER_MODE_HIDDEN)

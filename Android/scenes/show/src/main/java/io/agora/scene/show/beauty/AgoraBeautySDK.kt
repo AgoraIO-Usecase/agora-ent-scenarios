@@ -35,7 +35,7 @@ object AgoraBeautySDK {
         internal val beautyOption = BeautyOptions()
 
         // 磨皮
-        var smooth: Float = beautyOption.smoothnessLevel
+        var smooth: Float = 0.75f
             set(value) {
                 field = value
                 beautyOption.smoothnessLevel = value
@@ -43,7 +43,7 @@ object AgoraBeautySDK {
             }
 
         // 美白
-        var whiten: Float = beautyOption.lighteningLevel
+        var whiten: Float = 0.75f
             set(value) {
                 field = value
                 beautyOption.lighteningLevel = value
@@ -51,7 +51,7 @@ object AgoraBeautySDK {
             }
 
         // 红润
-        var redden = beautyOption.rednessLevel
+        var redden = 0.0f
             set(value) {
                 field = value
                 beautyOption.rednessLevel = value
@@ -59,7 +59,7 @@ object AgoraBeautySDK {
             }
 
         // 锐化
-        var sharpen = beautyOption.sharpnessLevel
+        var sharpen = 0.0f
             set(value) {
                 field = value
                 beautyOption.sharpnessLevel = value

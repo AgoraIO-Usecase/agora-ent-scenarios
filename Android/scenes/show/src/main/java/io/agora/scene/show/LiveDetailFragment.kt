@@ -1826,6 +1826,7 @@ class LiveDetailFragment : Fragment() {
                                     mRoomInfo.ownerId.toInt()
                                 )
                             )
+                            BeautyManager.initialize(context, mRtcEngine)
                             setupLocalVideo(
                                 VideoSwitcher.VideoCanvasContainer(
                                     context,

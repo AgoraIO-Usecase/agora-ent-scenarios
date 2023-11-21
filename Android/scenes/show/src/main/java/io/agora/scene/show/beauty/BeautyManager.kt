@@ -70,6 +70,7 @@ object BeautyManager {
         this.context = context.applicationContext as Application
         this.rtcEngine = rtcEngine
         this.beautyType = BeautyType.SenseTime
+        this.enable = rtcEngine.queryDeviceScore() >= 75
     }
 
     fun setupLocalVideo(view: View, renderMode: Int) {
@@ -79,6 +80,7 @@ object BeautyManager {
             BeautyType.SenseTime -> senseTimeBeautyAPI?.setupLocalVideo(view, renderMode)
             BeautyType.FaceUnity -> faceUnityBeautyAPI?.setupLocalVideo(view, renderMode)
             BeautyType.ByteDance -> byteDanceBeautyAPI?.setupLocalVideo(view, renderMode)
+            BeautyType.Agora -> rtcEngine?.setupLocalVideo(VideoCanvas(view, renderMode))
         }
     }
 
