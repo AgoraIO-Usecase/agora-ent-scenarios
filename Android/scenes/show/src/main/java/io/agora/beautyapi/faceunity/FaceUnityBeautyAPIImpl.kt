@@ -72,6 +72,7 @@ class FaceUnityBeautyAPIImpl : FaceUnityBeautyAPI, IVideoFrameObserver {
     private var config: Config? = null
     private var enable: Boolean = false
     private var enableChange: Boolean = false
+    @Volatile
     private var isReleased: Boolean = false
     private var captureMirror = false
     private var renderMirror = false
@@ -364,7 +365,7 @@ class FaceUnityBeautyAPIImpl : FaceUnityBeautyAPI, IVideoFrameObserver {
         if (captureMirror != cMirror || renderMirror != rMirror) {
             LogUtils.w(TAG, "processBeauty >> enable=$enable, captureMirror=$captureMirror->$cMirror, renderMirror=$renderMirror->$rMirror")
             captureMirror = cMirror
-            if(renderMirror != rMirror){
+            if(renderMirror != rMirror && !isReleased){
                 renderMirror = rMirror
                 config?.rtcEngine?.setLocalRenderMode(
                     localVideoRenderMode,

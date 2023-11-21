@@ -62,6 +62,7 @@ class ByteDanceBeautyAPIImpl : ByteDanceBeautyAPI, IVideoFrameObserver {
     private var nv21ByteBuffer: ByteBuffer? = null
     private var config: Config? = null
     private var enable: Boolean = false
+    @Volatile
     private var isReleased: Boolean = false
     private var captureMirror = true
     private var renderMirror = true
@@ -355,7 +356,7 @@ class ByteDanceBeautyAPIImpl : ByteDanceBeautyAPI, IVideoFrameObserver {
         if (captureMirror != cMirror || renderMirror != rMirror) {
             LogUtils.w(TAG, "processBeauty >> enable=$enable, captureMirror=$captureMirror->$cMirror, renderMirror=$renderMirror->$rMirror")
             captureMirror = cMirror
-            if(renderMirror != rMirror){
+            if(renderMirror != rMirror && !isReleased){
                 renderMirror = rMirror
                 config?.rtcEngine?.setLocalRenderMode(
                     localVideoRenderMode,

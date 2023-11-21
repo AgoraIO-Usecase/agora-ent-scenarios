@@ -74,42 +74,41 @@ object BeautyManager {
     }
 
     fun setupLocalVideo(view: View, renderMode: Int) {
-        this.videoView = WeakReference(view)
-        this.renderMode = renderMode
-        when (beautyType) {
-            BeautyType.SenseTime -> senseTimeBeautyAPI?.setupLocalVideo(view, renderMode)
-            BeautyType.FaceUnity -> faceUnityBeautyAPI?.setupLocalVideo(view, renderMode)
-            BeautyType.ByteDance -> byteDanceBeautyAPI?.setupLocalVideo(view, renderMode)
-            BeautyType.Agora -> rtcEngine?.setupLocalVideo(VideoCanvas(view, renderMode))
+        mainExecutor.post {
+            this.videoView = WeakReference(view)
+            this.renderMode = renderMode
+            when (beautyType) {
+                BeautyType.SenseTime -> senseTimeBeautyAPI?.setupLocalVideo(view, renderMode)
+                BeautyType.FaceUnity -> faceUnityBeautyAPI?.setupLocalVideo(view, renderMode)
+                BeautyType.ByteDance -> byteDanceBeautyAPI?.setupLocalVideo(view, renderMode)
+                BeautyType.Agora -> rtcEngine?.setupLocalVideo(VideoCanvas(view, renderMode, Constants.VIDEO_MIRROR_MODE_AUTO, 0))
+            }
         }
     }
 
     fun destroy() {
-        videoView?.get()?.let {
-            rtcEngine?.setupLocalVideo(VideoCanvas(null))
+        mainExecutor.post {
+            videoView?.get()?.let {
+                rtcEngine?.setupLocalVideo(VideoCanvas(null))
+            }
+            videoView = null
         }
         context = null
         rtcEngine = null
-        videoView = null
         destroyBeauty(beautyType)
     }
 
 
     private fun switchBeauty(oldType: BeautyType, newType: BeautyType) {
-        val rtc = rtcEngine ?: return
-
-        videoView?.get()?.let {
-            rtc.setupLocalVideo(VideoCanvas(null))
-        }
-
         destroyBeauty(oldType)
         createBeauty(newType)
     }
 
     private fun createBeauty(type: BeautyType) {
-        val ctx = context ?: return
-        val rtc = rtcEngine ?: return
         workerExecutor.execute {
+            val ctx = context ?: return@execute
+            val rtc = rtcEngine ?: return@execute
+            rtcEngine?.enableLocalVideo(true)
             when (type) {
                 BeautyType.SenseTime -> {
                     if (SenseTimeBeautySDK.initBeautySDK(ctx)) {
@@ -140,7 +139,7 @@ object BeautyManager {
                                 Toast.LENGTH_LONG
                             ).show()
                             videoView?.get()?.let {
-                                rtc.setupLocalVideo(VideoCanvas(it))
+                                rtc.setupLocalVideo(VideoCanvas(it, renderMode, Constants.VIDEO_MIRROR_MODE_AUTO, 0))
                             }
                         }
                     }
@@ -171,7 +170,7 @@ object BeautyManager {
                                 Toast.LENGTH_LONG
                             ).show()
                             videoView?.get()?.let {
-                                rtc.setupLocalVideo(VideoCanvas(it))
+                                rtc.setupLocalVideo(VideoCanvas(it, renderMode, Constants.VIDEO_MIRROR_MODE_AUTO, 0))
                             }
                         }
                     }
@@ -211,7 +210,7 @@ object BeautyManager {
                                 Toast.LENGTH_LONG
                             ).show()
                             videoView?.get()?.let {
-                                rtc.setupLocalVideo(VideoCanvas(it, renderMode))
+                                rtc.setupLocalVideo(VideoCanvas(it, renderMode, Constants.VIDEO_MIRROR_MODE_AUTO, 0))
                             }
                         }
                     }
@@ -222,7 +221,7 @@ object BeautyManager {
                     AgoraBeautySDK.enable(enable)
                     mainExecutor.post {
                         videoView?.get()?.let {
-                            rtc.setupLocalVideo(VideoCanvas(it, renderMode))
+                            rtc.setupLocalVideo(VideoCanvas(it, renderMode, Constants.VIDEO_MIRROR_MODE_AUTO, 0))
                         }
                     }
 
@@ -232,34 +231,40 @@ object BeautyManager {
     }
 
     private fun destroyBeauty(type: BeautyType) {
-        when (type) {
-            BeautyType.SenseTime ->
-                senseTimeBeautyAPI?.let {
-                    it.release()
-                    senseTimeBeautyAPI = null
-                    workerExecutor.execute {
+        workerExecutor.execute {
+            rtcEngine?.enableLocalVideo(false)
+            mainExecutor.post {
+                videoView?.get()?.let {
+                    rtcEngine?.setupLocalVideo(VideoCanvas(null))
+                }
+            }
+
+            when (type) {
+                BeautyType.SenseTime ->
+                    senseTimeBeautyAPI?.let {
+                        it.release()
+                        senseTimeBeautyAPI = null
                         SenseTimeBeautySDK.unInitBeautySDK()
                     }
-                }
 
-            BeautyType.FaceUnity ->
-                faceUnityBeautyAPI?.let {
-                    it.release()
-                    faceUnityBeautyAPI = null
-                    workerExecutor.execute {
+                BeautyType.FaceUnity ->
+                    faceUnityBeautyAPI?.let {
+                        it.release()
+                        faceUnityBeautyAPI = null
                         FaceUnityBeautySDK.unInitBeauty()
                     }
-                }
 
-            BeautyType.ByteDance ->
-                byteDanceBeautyAPI?.let {
-                    it.release()
-                    byteDanceBeautyAPI = null
-                }
+                BeautyType.ByteDance ->
+                    byteDanceBeautyAPI?.let {
+                        it.release()
+                        byteDanceBeautyAPI = null
+                    }
 
-            BeautyType.Agora ->
-                AgoraBeautySDK.unInitBeautySDK()
+                BeautyType.Agora ->
+                    AgoraBeautySDK.unInitBeautySDK()
+            }
         }
+
     }
 
 
