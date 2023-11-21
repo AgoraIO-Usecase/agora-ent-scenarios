@@ -870,6 +870,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
             }
         }
         alertVC.addAction(ok)
+        
         if info.interactStatus == .onSeat {
             let actionTitle = info.muteAudio ? "show_setting_mic_on".show_localized : "show_setting_mic_off".show_localized
             let micAction = UIAlertAction(title: actionTitle, style: .default) { _ in
@@ -877,6 +878,9 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
                 }
             }
             alertVC.addAction(micAction)
+        } else {
+            let cancel = UIAlertAction(title: "show_alert_cancel_btn_title".show_localized, style: .cancel)
+            alertVC.addAction(cancel)
         }
         present(alertVC, animated: true)
     }
