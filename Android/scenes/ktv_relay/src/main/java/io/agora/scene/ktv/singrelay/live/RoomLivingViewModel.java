@@ -585,28 +585,24 @@ public class RoomLivingViewModel extends ViewModel {
 
     private void updateVolumeStatus(boolean isUnMute) {
         ktvApiProtocol.setMicStatus(isUnMute);
-        if (!isUnMute) {
-            if (mSetting.isEar()) {
-                isOpnEar = true;
-                mSetting.setEar(false);
-            } else {
-                isOpnEar = false;
+
+        // 调整耳返
+        if (!isUnMute && mSetting.isEar()) {
+            if (mRtcEngine != null) {
+                mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
             }
-        } else {
-            mSetting.setEar(isOpnEar);
+        } else if (isUnMute && mSetting.isEar()) {
+            if (mRtcEngine != null) {
+                mRtcEngine.enableInEarMonitoring(true, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+            }
         }
 
-        // 静音时将本地采集音量改为0
-        if (!isUnMute && mRtcEngine != null) {
-            if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getUserNo() != null && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
-                // 主唱
-                mRtcEngine.adjustRecordingSignalVolume(0);
-            } else {
-                // 其他人
-                mRtcEngine.muteLocalAudioStream(true);
+        if (isUnMute) {
+            KTVLogger.d(TAG, "unmute! setMicVolume: " + micOldVolume);
+            if (mRtcEngine != null) {
+                mRtcEngine.adjustRecordingSignalVolume(micOldVolume);
             }
         }
-        setMicVolume(micOldVolume);
     }
 
 
@@ -1210,7 +1206,6 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     // ------------------ 音量调整 ------------------
-    private int micVolume = 100;
     private int micOldVolume = 100;
 
     private void setMusicVolume(int v) {
@@ -1222,21 +1217,13 @@ public class RoomLivingViewModel extends ViewModel {
         RoomSeatModel value = seatLocalLiveData.getValue();
         int isMuted = value == null ? RoomSeatModel.Companion.getMUTED_VALUE_TRUE() : value.isAudioMuted();
         if (isMuted == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()) {
-            micOldVolume = v;
             KTVLogger.d(TAG, "muted! setMicVolume: " + v);
+            micOldVolume = v;
             return;
         }
         KTVLogger.d(TAG, "unmute! setMicVolume: " + v);
-        micVolume = v;
         if (mRtcEngine != null) {
-            if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getUserNo() != null && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
-                // 主唱
-                mRtcEngine.adjustRecordingSignalVolume(v);
-            } else {
-                // 其他人
-                mRtcEngine.adjustRecordingSignalVolume(v);
-                mRtcEngine.muteLocalAudioStream(false);
-            }
+            mRtcEngine.adjustRecordingSignalVolume(v);
         }
     }
 
@@ -1248,7 +1235,11 @@ public class RoomLivingViewModel extends ViewModel {
     protected KTVPlayerTrackMode mAudioTrackMode = KTVPlayerTrackMode.Acc;
     public void musicToggleOriginal() {
         if (mAudioTrackMode == KTVPlayerTrackMode.Origin) {
-            ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(1, 1);
+            if (isRoomOwner()) {
+                ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(1, 1);
+            } else {
+                ktvApiProtocol.getMediaPlayer().selectAudioTrack(1);
+            }
             mAudioTrackMode = KTVPlayerTrackMode.Acc;
         } else {
             if (isRoomOwner()) {
@@ -1256,7 +1247,7 @@ public class RoomLivingViewModel extends ViewModel {
                 ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(0, 1);
             } else {
                 // 其他游戏者开原唱
-                ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(0, 0);
+                ktvApiProtocol.getMediaPlayer().selectAudioTrack(0);
             }
             mAudioTrackMode = KTVPlayerTrackMode.Origin;
         }
@@ -1298,6 +1289,12 @@ public class RoomLivingViewModel extends ViewModel {
         mLastPostSongPartChangeStatusTime = 0L;
         mAudioTrackMode = KTVPlayerTrackMode.Acc;
         ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null);
+
+        // 重置耳返
+        mSetting.setEar(false);
+        if (mRtcEngine != null) {
+            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+        }
     }
 
     // ------------------ 歌曲开始播放 ------------------
@@ -1332,7 +1329,6 @@ public class RoomLivingViewModel extends ViewModel {
             public void onMusicLoadSuccess(long songCode, @NonNull String lyricUrl) {
                 // 当前已被切歌
                 if (songPlayingLiveData.getValue() == null) {
-                    ToastUtils.showToastLong("load失败，当前已无歌曲");
                     return;
                 }
 
@@ -1369,7 +1365,6 @@ public class RoomLivingViewModel extends ViewModel {
             public void onMusicLoadFail(long songCode, @NonNull KTVLoadSongFailReason reason) {
                 // 当前已被切歌
                 if (songPlayingLiveData.getValue() == null) {
-                    ToastUtils.showToastLong("load失败，当前已无歌曲");
                     return;
                 }
 
@@ -1386,7 +1381,6 @@ public class RoomLivingViewModel extends ViewModel {
                     noLrcLiveData.postValue(true);
                 } else if (reason == KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL) {
                     // 歌曲加载失败 ，重试3次
-                    ToastUtils.showToastLong("歌曲加载失败");
                     retryTimes = retryTimes + 1;
                     if (retryTimes < 3) {
                         loadMusic(config, songCode);
@@ -1394,9 +1388,6 @@ public class RoomLivingViewModel extends ViewModel {
                         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                         ToastUtils.showToastLong(R.string.ktv_relay_try);
                     }
-                } else if (reason == KTVLoadSongFailReason.CANCELED) {
-                    // 当前已被切歌
-                    ToastUtils.showToastLong("load失败，当前已切换到另一首歌");
                 }
             }
         });
