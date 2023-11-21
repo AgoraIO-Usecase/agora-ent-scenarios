@@ -585,11 +585,11 @@ public class RoomLivingViewModel extends ViewModel {
      */
     public void toggleMic(boolean isUnMute) {
         KTVLogger.d(TAG, "RoomLivingViewModel.toggleMic() called：" + isUnMute);
+        updateVolumeStatus(isUnMute);
         ktvServiceProtocol.updateSeatAudioMuteStatus(!isUnMute, e -> {
             if (e == null) {
                 // success
                 KTVLogger.d(TAG, "RoomLivingViewModel.toggleMic() success");
-                updateVolumeStatus(isUnMute);
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.toggleMic() failed: " + e.getMessage());
@@ -611,7 +611,12 @@ public class RoomLivingViewModel extends ViewModel {
             }
         }
 
-        setMicVolume(micOldVolume);
+        if (isUnMute) {
+            KTVLogger.d(TAG, "unmute! setMicVolume: " + micOldVolume);
+            if (mRtcEngine != null) {
+                mRtcEngine.adjustRecordingSignalVolume(micOldVolume);
+            }
+        }
     }
 
 
@@ -1560,7 +1565,6 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     // ------------------ 音量调整 ------------------
-    private int micVolume = 100;
     private int micOldVolume = 100;
 
     private void setMusicVolume(int v) {
@@ -1572,21 +1576,13 @@ public class RoomLivingViewModel extends ViewModel {
         RoomSeatModel value = seatLocalLiveData.getValue();
         int isMuted = value == null ? RoomSeatModel.Companion.getMUTED_VALUE_TRUE() : value.isAudioMuted();
         if (isMuted == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()) {
-            micOldVolume = v;
             KTVLogger.d(TAG, "muted! setMicVolume: " + v);
+            micOldVolume = v;
             return;
         }
         KTVLogger.d(TAG, "unmute! setMicVolume: " + v);
-        micVolume = v;
         if (mRtcEngine != null) {
-            if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getUserNo() != null && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
-                // 主唱
-                //mRtcEngine.adjustRecordingSignalVolume(v);
-            } else {
-                // 其他人
-                mRtcEngine.adjustRecordingSignalVolume(v);
-                //mRtcEngine.muteLocalAudioStream(false);
-            }
+            mRtcEngine.adjustRecordingSignalVolume(v);
         }
     }
 

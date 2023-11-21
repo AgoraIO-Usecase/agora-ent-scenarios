@@ -18,6 +18,7 @@ interface VideoLoader {
             rtcEngine = engine
             if (instance == null) {
                 instance = VideoLoaderImpl(rtcEngine!!)
+                engine.enableInstantMediaRendering()
             }
             return instance as VideoLoader
         }

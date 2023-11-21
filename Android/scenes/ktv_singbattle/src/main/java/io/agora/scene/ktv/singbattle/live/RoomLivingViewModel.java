@@ -573,20 +573,24 @@ public class RoomLivingViewModel extends ViewModel {
 
     private void updateVolumeStatus(boolean isUnMute) {
         ktvApiProtocol.setMicStatus(isUnMute);
-        if (!isUnMute) {
-            if (mSetting.isEar()) {
-                isOpnEar = true;
-                mSetting.setEar(false);
-            } else {
-                isOpnEar = false;
+
+        // 调整耳返
+        if (!isUnMute && mSetting.isEar()) {
+            if (mRtcEngine != null) {
+                mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
             }
-        } else {
-            mSetting.setEar(isOpnEar);
+        } else if (isUnMute && mSetting.isEar()) {
+            if (mRtcEngine != null) {
+                mRtcEngine.enableInEarMonitoring(true, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+            }
         }
 
-        // 静音时将本地采集音量改为0
-        if (!isUnMute && mRtcEngine != null) mRtcEngine.adjustRecordingSignalVolume(0);
-        setMicVolume(micOldVolume);
+        if (isUnMute) {
+            KTVLogger.d(TAG, "unmute! setMicVolume: " + micOldVolume);
+            if (mRtcEngine != null) {
+                mRtcEngine.adjustRecordingSignalVolume(micOldVolume);
+            }
+        }
     }
 
 
@@ -1417,7 +1421,6 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     // ------------------ 音量调整 ------------------
-    private int micVolume = 100;
     private int micOldVolume = 100;
 
     private void setMusicVolume(int v) {
@@ -1434,7 +1437,6 @@ public class RoomLivingViewModel extends ViewModel {
             return;
         }
         KTVLogger.d(TAG, "unmute! setMicVolume: " + v);
-        micVolume = v;
         if (mRtcEngine != null) {
             mRtcEngine.adjustRecordingSignalVolume(v);
         }
@@ -1448,10 +1450,10 @@ public class RoomLivingViewModel extends ViewModel {
     protected KTVPlayerTrackMode mAudioTrackMode = KTVPlayerTrackMode.Acc;
     public void musicToggleOriginal() {
         if (mAudioTrackMode == KTVPlayerTrackMode.Origin) {
-            ktvApiProtocol.getMediaPlayer().selectAudioTrack(1);
+            ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(1, 1);
             mAudioTrackMode = KTVPlayerTrackMode.Acc;
         } else {
-            ktvApiProtocol.getMediaPlayer().selectAudioTrack(0);
+            ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(0, 0);
             mAudioTrackMode = KTVPlayerTrackMode.Origin;
         }
     }

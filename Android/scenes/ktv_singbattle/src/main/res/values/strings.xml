@@ -160,4 +160,5 @@
     <string name="ktv_singbattle_debug_settings_set">设置</string>
     <string name="ktv_singbattle_debug_settings_audio_dump">音频Dump</string>
     <string name="ktv_singbattle_try">已尝试三次，请手动切歌</string>
+    <string name="ktv_singbattle_next">下一首</string>
 </resources>
