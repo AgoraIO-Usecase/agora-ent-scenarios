@@ -506,7 +506,7 @@ extension RoomListViewController: CallApiListenerProtocol {
             callDialog?.hiddenAnimation()
             connectedUserId = nil
             switch stateReason {
-            case .localHangup, .remoteHangup:
+            case .remoteHangup:
                 callVC.dismiss(animated: false)
                 AUIToast.show(text: "call_toast_hangup".showTo1v1Localization())
             case .remoteRejected:
