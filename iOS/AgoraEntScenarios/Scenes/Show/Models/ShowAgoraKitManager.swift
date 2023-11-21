@@ -388,6 +388,7 @@ class ShowAgoraKitManager: NSObject {
         engine.enableVirtualBackground(false, backData: nil, segData: nil)
         engine.setAudioEffectPreset(.off)
         engine.setVoiceConversionPreset(.off)
+        ShowAgoraKitManager.isOpenGreen = false
     }
     
     func leaveChannelEx(roomId: String, channelId: String) {
