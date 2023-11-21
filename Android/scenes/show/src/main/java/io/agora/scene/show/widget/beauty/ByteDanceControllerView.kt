@@ -208,27 +208,8 @@ class ByteDanceControllerView : BaseControllerView {
                         onValueChanged = { _ ->
                             beautyConfig.sharpen = 0.0f
                             beautyConfig.clear = 0.0f
-                            beautyConfig.saturation = 0.0f
-                            beautyConfig.contrast = 0.0f
                         },
                     ),
-//                    ItemInfo(
-//                        R.string.show_beauty_item_adjust_contrast,
-//                        R.mipmap.show_beauty_ic_adjust_contrast,
-//                        beautyConfig.contrast,
-//                        isSelected = true,
-//                        onValueChanged = { value ->
-//                            beautyConfig.contrast = value
-//                        }
-//                    ),
-//                    ItemInfo(
-//                        R.string.show_beauty_item_adjust_saturation,
-//                        R.mipmap.show_beauty_ic_adjust_saturation,
-//                        beautyConfig.saturation,
-//                        onValueChanged = { value ->
-//                            beautyConfig.saturation = value
-//                        }
-//                    ),
                     ItemInfo(
                         R.string.show_beauty_item_adjust_sharpen,
                         R.mipmap.show_beauty_ic_adjust_sharp,
