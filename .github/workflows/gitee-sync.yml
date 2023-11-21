@@ -16,7 +16,7 @@ jobs:
       - name: Gitee sync repo
         uses: Yikun/hub-mirror-action@v1.3
         with:
-          src: github/AgoraIO
+          src: github/AgoraIO-Usecase
           dst: gitee/agoraio-community
           white_list: "agora-ent-scenarios"
           static_list: "agora-ent-scenarios"
