@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
@@ -402,13 +403,14 @@ class BeautyDialog constructor(context: Context) : BottomDarkDialog(context) {
             // 虚拟背景
             GROUP_ID_VIRTUAL_BG -> {
                 beautyProcessor?.let {
+                    mTopBinding.root.isVisible = itemId != ITEM_ID_VIRTUAL_BG_NONE
                     if (it.greenScreen()) {
                         mTopBinding.slider.isVisible = true
                         mTopBinding.tvStrength.isVisible = true
                         mTopBinding.slider.value = it.getGreenScreenStrength()
                     } else {
-                        mTopBinding.slider.isVisible = false
-                        mTopBinding.tvStrength.isVisible = false
+                        mTopBinding.slider.isInvisible = true
+                        mTopBinding.tvStrength.isInvisible = true
                     }
                 }
                 mTopBinding.mSwitchMaterial.isChecked = beautyProcessor?.greenScreen() ?: false
@@ -510,6 +512,7 @@ class BeautyDialog constructor(context: Context) : BottomDarkDialog(context) {
                 when (itemId) {
                     // 无
                     ITEM_ID_VIRTUAL_BG_NONE -> {
+                        beautyProcessor?.setGreenScreen(false)
                         RtcEngineInstance.rtcEngine.enableVirtualBackground(
                             false,
                             RtcEngineInstance.virtualBackgroundSource.apply { backgroundSourceType = VirtualBackgroundSource.BACKGROUND_COLOR },
