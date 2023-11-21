@@ -54,6 +54,7 @@
     homeViewController.tabBarItem = [self tabBarItemsWithIndex:0];
     
     VLDiscoveyrViewController *discoveryVC = [[VLDiscoveyrViewController alloc] init];
+    [discoveryVC loadViewIfNeeded];
     BaseNavigationController *discoveryNavigationController = [[BaseNavigationController alloc]
                                                   initWithRootViewController:discoveryVC];
     discoveryVC.tabBarItem = [self tabBarItemsWithIndex:1];
