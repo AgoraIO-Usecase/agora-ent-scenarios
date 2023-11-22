@@ -240,7 +240,13 @@ static AFHTTPSessionManager *_sessionManager;
     
     // 设置公共参数
     NSDictionary *paramenter = [self setCommonParamenter:json];
-    if (show) [SVProgressHUD show];
+    if ([NSThread isMainThread]) {
+        if (show) [SVProgressHUD show];
+    } else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (show) [SVProgressHUD show];
+        });
+    }
     [_sessionManager.requestSerializer setValue:[self getToken] forHTTPHeaderField:@"Authorization"];
 
     NSURLSessionDataTask *sessionTask = [_sessionManager POST:url parameters:paramenter headers:@{} constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
@@ -269,13 +275,25 @@ static AFHTTPSessionManager *_sessionManager;
         [self requestProgress:progressBlock value:uploadProgress];
 
     } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-        if (show) [SVProgressHUD dismiss];
+        if ([NSThread isMainThread]) {
+            if (show) [SVProgressHUD dismiss];
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (show) [SVProgressHUD dismiss];
+            });
+        }
         NSString *resultStr = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
         VLResponseDataModel *model = [VLResponseDataModel yy_modelWithJSON:resultStr];
         VLLog(@"\n完成请求:\n%@\nheader:\n%@\n参数:\n%@\n响应原数据:\n%@\n响应模型:%@",task.currentRequest.URL,_sessionManager.requestSerializer.HTTPRequestHeaders,paramenter,resultStr,[model yy_modelDescription]);
         [self requestSuccess:completeBlock object:responseObject method:method task:task];
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        if (show) [SVProgressHUD dismiss];
+        if ([NSThread isMainThread]) {
+            if (show) [SVProgressHUD dismiss];
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (show) [SVProgressHUD dismiss];
+            });
+        }
         VLLog(@"\n完成请求:\n%@\nheader:\n%@\n参数:\n%@\n响应数据:%@",task.currentRequest.URL,_sessionManager.requestSerializer.HTTPRequestHeaders,paramenter,error);
         [self requestError:errorBlock error:error task:task];
 
