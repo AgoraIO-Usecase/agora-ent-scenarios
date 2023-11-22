@@ -51,7 +51,6 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
         mBinding.apply {
             if (micInfo.micStatus == MicStatus.BotActivated || micInfo.micStatus == MicStatus.BotInactive) { // 机器人
                 ivMicTag.isVisible = false
-                ivMicInnerIcon.isVisible = false
                 ivMicInfo.setBackgroundResource(R.drawable.voice_bg_oval_white)
                 val botDrawable = ResourcesTools.getDrawableId(context, micInfo.member?.portrait ?: "")
                 ImageTools.loadImage(ivMicInfo, botDrawable)
@@ -65,38 +64,32 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                 if (micInfo.member == null) { // 没人
                     vWave1.isVisible = false
                     vWave2.isVisible = false
-                    ivMicInnerIcon.isVisible = true
-                    ivMicInfo.setImageResource(0)
-                    ivMicInfo.visibility = View.INVISIBLE
                     mtMicUsername.text = resources.getString(R.string.voice_room_mic_number, micInfo.micIndex + 1)
                     mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
                     when (micInfo.micStatus) {
                         MicStatus.ForceMute -> {
-                            ivMicTag.isVisible = false
-                            ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_mute)
+                            ivMicTag.isVisible = true
+                            ivMicInfo.setImageResource(R.drawable.voice_ic_mic_empty)
                         }
                         MicStatus.Lock -> {
-                            ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_close)
+                            ivMicInfo.setImageResource(R.drawable.voice_ic_mic_close)
                             ivMicTag.isVisible = false
                         }
                         MicStatus.LockForceMute -> {
-                            ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_close)
+                            ivMicInfo.setImageResource(R.drawable.voice_ic_mic_close)
                             ivMicTag.isVisible = true
-                            ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
                         }
                         else -> {
                             ivMicTag.isVisible = false
-                            ivMicInnerIcon.setImageResource(R.drawable.voice_ic_mic_empty)
+                            ivMicInfo.setImageResource(R.drawable.voice_ic_mic_empty)
                         }
                     }
                 } else { // 有人
                     vWave1.isVisible = true
                     vWave2.isVisible = true
-                    ivMicInnerIcon.isVisible = false
-                    ivMicInfo.visibility = View.VISIBLE
                     ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
                     mtMicUsername.text = micInfo.member?.nickName ?: ""
-                    if (micInfo.ownerTag) {
+                    if (micInfo.micIndex == 0) {
                         mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(
                             R.drawable.voice_icon_room_mic_owner_tag, 0, 0, 0
                         )
@@ -107,15 +100,9 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                         MicStatus.Mute,
                         MicStatus.ForceMute -> {
                             ivMicTag.isVisible = true
-                            ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
                         }
                         else -> {
-                            if (micInfo.member?.micStatus == 0){
-                                ivMicTag.isVisible = true
-                                ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
-                            }else{
-                                ivMicTag.isVisible = false
-                            }
+                            ivMicTag.isVisible = micInfo.member?.micStatus == 0
                         }
                     }
                 }

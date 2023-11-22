@@ -69,14 +69,6 @@ data class ShowRoomDetailModel constructor(
         )
     }
 
-    fun getThumbnailIcon() = when (thumbnailId) {
-        "0" -> R.mipmap.show_room_cover_0
-        "1" -> R.mipmap.show_room_cover_1
-        "2" -> R.mipmap.show_room_cover_2
-        "3" -> R.mipmap.show_room_cover_3
-        else -> R.mipmap.show_room_cover_0
-    }
-
     fun isRobotRoom() = roomId.length > 6
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

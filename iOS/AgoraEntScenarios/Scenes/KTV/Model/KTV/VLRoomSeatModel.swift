@@ -51,5 +51,9 @@ class VLRoomSeatModel: VLBaseModel {
         self.isVideoMuted = seatInfo?.isVideoMuted ?? 0
         self.chorusSongCode = seatInfo?.chorusSongCode
     }
+    
+    override var description: String {
+        return "i: \(seatIndex) - userNo: \(userNo ?? "null") - isAudioMuted: \(isAudioMuted)"
+    }
 
 }

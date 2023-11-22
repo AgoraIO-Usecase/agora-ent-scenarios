@@ -185,6 +185,7 @@ class AgoraChatRoomBaseRtcUserView: UIView {
         iconView.image = UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource")
         iconView.layer.cornerRadius = 30
         iconView.layer.masksToBounds = true
+        iconView.contentMode = .scaleAspectFill
         bgView.addSubview(iconView)
 
         muteMicView.image = UIImage.sceneImage(name: "micoff", bundleName: "VoiceChatRoomResource")

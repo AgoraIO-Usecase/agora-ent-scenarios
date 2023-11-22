@@ -315,7 +315,7 @@
 
 -(void)leaveChorus{
     //离开合唱
-    if([self.delegate respondsToSelector:@selector(didJoinChours)]) {
+    if([self.delegate respondsToSelector:@selector(didLeaveChours)]) {
         [self.delegate didLeaveChours];
     }
 }

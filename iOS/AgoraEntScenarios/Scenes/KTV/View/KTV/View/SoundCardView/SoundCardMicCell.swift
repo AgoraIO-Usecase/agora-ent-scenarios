@@ -15,11 +15,18 @@ class SoundCardMicCell: UITableViewCell {
     var valueBlock: ((Int)-> Void)?
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        accessoryType = .none
+        selectionStyle = .none
         layoutUI()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setupValue(_ v: Int) {
+        slider.value = Float(v)
+        preset()
     }
     
     private func layoutUI() {
@@ -42,38 +49,28 @@ class SoundCardMicCell: UITableViewCell {
         self.contentView.addSubview(numLable)
         
         slider = UISlider()
-        slider.value = 0.5
+        slider.value = 4
+        slider.maximumValue = 15
+        slider.minimumValue = -1
         self.contentView.addSubview(slider)
         
-        slider.addTarget(self, action: #selector(gain), for: .valueChanged)
-        slider.addTarget(self, action: #selector(gainSend), for: .touchUpInside)
+        slider.addTarget(self, action: #selector(preset), for: .valueChanged)
+        slider.addTarget(self, action: #selector(presetSend), for: .touchUpInside)
     }
     
-    @objc func gain() {
-        let gain = slider.value
-        numLable.text = String(calculateLevel(for: gain))
-    }
-
-    @objc func gainSend() {
-        let gain = slider.value
-        let level = String(calculateLevel(for: gain))
-        let levNum = Double(level)
-        print("send lev:\(calculateLevel(for: gain))")
-        guard let valueBlock = valueBlock else {return}
-        valueBlock(calculateLevel(for: gain))
-    }
-    
-    func calculateLevel(for value: Float) -> Int {
-        let stepSize: Float = 1/14
-
-        if value <= 0 {
-            return 0
-        } else if value >= 1 {
-            return 14
+    @objc func preset() {
+        let preset = Int(slider.value)
+        if (preset == -1) {
+            numLable.text = "关闭"
         } else {
-            let level = Int(value / stepSize)
-            return level
+            numLable.text = String(preset)
         }
+    }
+
+    @objc func presetSend() {
+        let preset = Int(slider.value)
+        guard let valueBlock = valueBlock else {return}
+        valueBlock(preset)
     }
 
     override func layoutSubviews() {

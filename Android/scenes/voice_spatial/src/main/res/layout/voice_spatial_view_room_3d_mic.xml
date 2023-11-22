@@ -31,17 +31,6 @@
         app:layout_constraintTop_toTopOf="@+id/ivSeatOuterRing"
         app:shapeAppearance="@style/ui_widget_roundStyle" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivMicInnerIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/voice_icon_room_mic_add"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@+id/ivMicInfo"
-        app:layout_constraintEnd_toEndOf="@+id/ivMicInfo"
-        app:layout_constraintStart_toStartOf="@+id/ivMicInfo"
-        app:layout_constraintTop_toTopOf="@+id/ivMicInfo" />
-
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtMicUsername"
         android:layout_width="wrap_content"

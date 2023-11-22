@@ -88,73 +88,33 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceSpatialDial
             // 座位状态
             if (micInfo.member == null) { // 没人
                 binding?.mtChatroomMicTag?.isVisible = false
-                ivMicInnerIcon.isVisible = true
                 mtMicUsername.text = micInfo.micIndex.toString()
                 when (micInfo.micStatus) {
                     MicStatus.ForceMute -> {
-                        ivMicTag.isVisible = false
-                        ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_mute)
+                        ivMicTag.isVisible = true
+                        ivMicTag.setImageResource(R.drawable.voice_ic_mic_mute_tag)
+                        ivMicInfo.setImageResource(R.drawable.voice_ic_mic_empty)
                     }
                     MicStatus.Lock -> {
-                        ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_close)
                         ivMicTag.isVisible = false
+                        ivMicInfo.setImageResource(R.drawable.voice_ic_mic_close)
                     }
                     MicStatus.LockForceMute -> {
-                        ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_close)
-//                        ivMicTag.isVisible = true
-//                        ivMicTag.setImageResource(R.drawable.icon_chatroom_mic_mute_tag)
+                        ivMicTag.isVisible = true
+                        ivMicTag.setImageResource(R.drawable.voice_ic_mic_mute_tag)
+                        ivMicInfo.setImageResource(R.drawable.voice_ic_mic_close)
                     }
                     else -> {
                         ivMicTag.isVisible = false
-                        ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_add)
+                        ivMicInfo.setImageResource(R.drawable.voice_ic_mic_empty)
                     }
                 }
             } else { // 有人
                 binding?.mtChatroomMicTag?.isVisible = micInfo.ownerTag
-                ivMicInnerIcon.isVisible = false
                 ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
                 mtMicUsername.text = micInfo.member?.nickName ?: ""
                 mtChatroomMicTag.isVisible = micInfo.ownerTag
-//                when (micInfo.micStatus) {
-//                    MicStatus.Mute,
-//                    MicStatus.ForceMute -> {
-//                        ivMicTag.isVisible = true
-//                        ivMicTag.setImageResource(R.drawable.icon_chatroom_mic_mute_tag)
-//                    }
-//                    else -> {
-//                        ivMicTag.isVisible = false
-//                    }
-//                }
             }
-            // 用户音量
-//            when (micInfo.audioVolumeType) {
-//                ConfigConstants.VolumeType.Volume_Unknown -> {
-//                    ivMicTag.isVisible = false
-//                }
-//                ConfigConstants.VolumeType.Volume_None -> {
-//                    ivMicTag.isVisible = true
-//                    ivMicTag.setImageResource(R.drawable.icon_chatroom_mic_open0)
-//                }
-//                ConfigConstants.VolumeType.Volume_Low -> {
-//                    ivMicTag.isVisible = true
-//                    ivMicTag.setImageResource(R.drawable.icon_chatroom_mic_open1)
-//                }
-//                ConfigConstants.VolumeType.Volume_Medium -> {
-//                    ivMicTag.isVisible = true
-//                    ivMicTag.setImageResource(R.drawable.icon_chatroom_mic_open2)
-//                }
-//                ConfigConstants.VolumeType.Volume_High -> {
-//                    ivMicTag.isVisible = true
-//                    ivMicTag.setImageResource(R.drawable.icon_chatroom_mic_open3)
-//                }
-//                ConfigConstants.VolumeType.Volume_Max -> {
-//                    ivMicTag.isVisible = true
-//                    ivMicTag.setImageResource(R.drawable.icon_chatroom_mic_open4)
-//                }
-//                else -> {
-//
-//                }
-//            }
         }
     }
 }

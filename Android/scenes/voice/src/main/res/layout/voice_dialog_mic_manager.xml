@@ -53,7 +53,7 @@
         android:id="@+id/ivMicTag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/voice_icon_room_mic_mute_tag"
+        android:src="@drawable/voice_ic_mic_mute_tag"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/ivMicInfo"
         app:layout_constraintEnd_toEndOf="@id/ivMicInfo"
