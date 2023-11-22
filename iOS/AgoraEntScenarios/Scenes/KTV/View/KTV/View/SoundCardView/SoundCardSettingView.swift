@@ -52,6 +52,7 @@ import Foundation
         tableView = UITableView()
         tableView.dataSource = self
         tableView.delegate = self
+        tableView.separatorColor = UIColor(hexString: "#F2F2F6")
         tableView.registerCell(UITableViewCell.self, forCellReuseIdentifier: "cell")
         tableView.registerCell(SoundCardMicCell.self, forCellReuseIdentifier: "mic")
         tableView.registerCell(SoundCardSwitchCell.self, forCellReuseIdentifier: "switch")
@@ -116,8 +117,8 @@ import Foundation
         noSoundCardView.isHidden = true
         
         let flag = KTVHeadSetUtil.hasSoundCard()
-        self.noSoundCardView.isHidden = flag
-        self.tableView.isHidden = !flag
+        self.noSoundCardView.isHidden = true
+        self.tableView.isHidden = !true
 
         KTVHeadSetUtil.addSoundCardObserver {[weak self] flag in
             self?.noSoundCardView.isHidden = flag
@@ -245,11 +246,7 @@ extension SoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
             return cell
         } else {
             let cell: SoundCardMicCell = tableView.dequeueReusableCell(withIdentifier: "mic", for: indexPath) as! SoundCardMicCell
-            cell.accessoryType = .none
-            cell.selectionStyle = .none
-            let text = self.typeValue > 0 ? "\(self.typeValue)" : "关闭"
-            cell.numLable.text = "\(text)"
-            cell.slider.value = Float(1.0/14 * Float(typeValue))
+            cell.setupValue(self.typeValue)
             cell.valueBlock = {[weak self] type in
                 guard let self = self, let  typeBlock = typeBlock else {return}
                 self.typeValue = type

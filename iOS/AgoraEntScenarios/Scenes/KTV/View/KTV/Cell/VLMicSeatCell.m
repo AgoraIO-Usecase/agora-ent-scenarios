@@ -61,6 +61,7 @@
     self.avatarImgView.layer.cornerRadius = VLREALVALUE_WIDTH(54)*0.5;
     self.avatarImgView.layer.masksToBounds = YES;
     self.avatarImgView.userInteractionEnabled = YES;
+    self.avatarImgView.contentMode = UIViewContentModeScaleAspectFill;
     [self.contentView addSubview:self.avatarImgView];
     
     self.videoView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, VLREALVALUE_WIDTH(54), VLREALVALUE_WIDTH(54))];
@@ -183,7 +184,6 @@
 
 - (void)setVolume:(NSInteger)volume {
     _volume = volume;
-    NSLog(@" ===== setVolume  = %zd",volume);
     if(_volume > 0) {
         [self startAnimation];
     }else{

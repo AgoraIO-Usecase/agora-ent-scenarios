@@ -56,12 +56,6 @@
     }
     [self.personCollectionView registerClass:[VLMicSeatCell class] forCellWithReuseIdentifier:[VLMicSeatCell className]];
     [self addSubview:self.personCollectionView];
-    
-}
-
-- (void)setRoomSeatsArray:(NSArray *)roomSeatsArray {
-    _roomSeatsArray = [[NSArray alloc]initWithArray:roomSeatsArray];
-//    [self.personCollectionView reloadData];
 }
 
 - (void)reloadSeatIndex: (NSUInteger)seatIndex {
@@ -108,6 +102,7 @@
         [cell.avatarImgView sd_setImageWithURL:[NSURL URLWithString:seatModel.headUrl]];
     }else{
         cell.avatarImgView.image = [UIImage sceneImageWithName:@"ktv_emptySeat_icon"];
+        cell.volume = 0;
     }
     cell.singingBtn.hidden = !seatModel.isOwner;
     
@@ -145,18 +140,16 @@
 
 - (void)updateVolumeForSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *) speakers {
     for (AgoraRtcAudioVolumeInfo *speaker in speakers) {
+        // 0是自己在说话
+        NSInteger speakerUid = (speaker.uid == 0) ? VLUserCenter.user.id.integerValue : speaker.uid;
         for (VLRoomSeatModel *model in self.roomSeatsArray) {
-            NSInteger speakerUid = speaker.uid;
-            // 0是自己在说话
-            if (speakerUid == 0) {
-                speakerUid = VLUserCenter.user.chat_uid.integerValue;
+            if (model.userNo == nil) {
+                continue;
             }
-            
-            if (model.seatIndex == 0 && model.isAudioMuted == true) {
-                return;
+            if (model.seatIndex == 0 && model.isAudioMuted == 1) {
+                continue;
             }
-            
-            if(model.rtcUid && model.rtcUid.integerValue == speakerUid) {
+            if(model.userNo.integerValue == speakerUid) {
                 [self updateVolumeForIndex:model.seatIndex volume:speaker.volume];
                 break;
             }

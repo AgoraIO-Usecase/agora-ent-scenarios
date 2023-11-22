@@ -94,6 +94,7 @@ class AgoraChatRoomHeaderView: UIView {
 
         iconImgView.layer.cornerRadius = 16
         iconImgView.layer.masksToBounds = true
+        iconImgView.contentMode = .scaleAspectFill
         addSubview(iconImgView)
 
         roomLabel.textColor = .white

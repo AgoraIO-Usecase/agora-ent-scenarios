@@ -42,7 +42,6 @@ object RoomInfoConstructor {
                 micIndex = serverMicInfo.micIndex
                 serverMicInfo.member?.let { roomUser ->
                     member = roomUser
-                    ownerTag = !TextUtils.isEmpty(ownerUid) && TextUtils.equals(ownerUid, roomUser.userId)
                     // 有人默认显示音量柱
                     audioVolumeType = ConfigConstants.VolumeType.Volume_None
                 }
@@ -67,7 +66,6 @@ object RoomInfoConstructor {
                     this.micStatus = attrBean.micStatus
                     attrBean.member?.let { roomUser ->
                         member = roomUser
-                        ownerTag = !TextUtils.isEmpty(ownerUid) && TextUtils.equals(ownerUid, roomUser.userId)
                     }
                 }
                 micInfoBeanMap[index] = micInfo
