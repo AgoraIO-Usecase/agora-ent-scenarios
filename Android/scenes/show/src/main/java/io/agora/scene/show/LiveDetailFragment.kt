@@ -1661,6 +1661,8 @@ class LiveDetailFragment : Fragment() {
             if (isPKing()) {
                 mRtcEngine.leaveChannelEx(RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()))
             }
+            mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CONVERSION_OFF)
+            mRtcEngine.setAudioEffectPreset(Constants.AUDIO_EFFECT_OFF)
         }
         return true
     }
