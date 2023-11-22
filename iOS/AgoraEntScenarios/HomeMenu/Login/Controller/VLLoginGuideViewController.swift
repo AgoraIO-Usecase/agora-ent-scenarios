@@ -140,7 +140,7 @@ class VLLoginGuideViewController: VLBaseViewController {
             guard let self = self else { return }
             var index = self.pageControl.currentPage + 1
             index = index >= self.dataArray.count ? 0 : index
-            collectionView.scrollToItem(at: IndexPath(item: index, section: 0), at: .centeredHorizontally, animated: true)
+            self.collectionView.scrollToItem(at: IndexPath(item: index, section: 0), at: .centeredHorizontally, animated: true)
         })
         RunLoop.main.add(timer!, forMode: .default)
     }

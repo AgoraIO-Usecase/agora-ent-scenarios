@@ -89,10 +89,8 @@ class ShowApplyView: UIView {
     }
     
     func getAllMicSeatList(autoApply: Bool) {
-        guard let imp = AppContext.showServiceImp(roomId) else {
-            return
-        }
-        imp.getAllMicSeatApplyList {[weak self] _, list in
+        var imp = AppContext.showServiceImp(roomId)
+        imp?.getAllMicSeatApplyList {[weak self] _, list in
             guard let list = list?.filter({ $0.userId != self?.interactionModel?.userId }) else { return }
             let seatUserModel = list.filter({ $0.userId == VLUserCenter.user.id }).first
             if seatUserModel == nil, autoApply, self?.interactionModel?.userId != VLUserCenter.user.id {
@@ -103,7 +101,7 @@ class ShowApplyView: UIView {
                                           spacing: 5)
                 self?.revokeutton.tag = 0
                 self?.revokeutton.isHidden = false
-                imp.createMicSeatApply { error in
+                imp?.createMicSeatApply { error in
                     if let error = error {
                         self?.revokeutton.isHidden = true
                         ToastView.show(text: error.localizedDescription)
@@ -117,6 +115,7 @@ class ShowApplyView: UIView {
             }
             self?.setupTipsInfo(count: list.count)
             self?.tableView.dataArray = list
+            imp = nil
         }
     }
     
