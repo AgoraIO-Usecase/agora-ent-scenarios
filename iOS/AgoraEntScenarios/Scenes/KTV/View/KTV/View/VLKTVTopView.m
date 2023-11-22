@@ -39,6 +39,7 @@
     logoImgView.image = [UIImage sceneImageWithName:@""];
     logoImgView.layer.cornerRadius = 17;
     logoImgView.layer.masksToBounds = true;
+    logoImgView.contentMode = UIViewContentModeScaleAspectFill;
     [self addSubview:logoImgView];
     self.logoImgView = logoImgView;
     

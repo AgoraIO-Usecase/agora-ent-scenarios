@@ -231,7 +231,7 @@
 + (LSTPopView*)popSoundCardViewWithParentView:(UIView*)parentView
                                 soundCardView:(UIView *)soundCardView
 {
-    CGFloat popViewH = 500+kSafeAreaBottomHeight;
+    CGFloat popViewH = 355+kSafeAreaBottomHeight;
     [soundCardView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
     soundCardView.frame = CGRectMake(0, 0, SCREEN_WIDTH, popViewH);
     LSTPopView* popView = [self _createKTVPopContainerWithContentView:soundCardView

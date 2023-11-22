@@ -36,7 +36,7 @@
             android:id="@+id/ivMicInfo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/voice_bg_oval_white30"
+            android:src="@drawable/voice_ic_mic_empty"
             android:scaleType="centerCrop"
             app:shapeAppearance="@style/ui_widget_roundStyle"
             />
@@ -50,12 +50,6 @@
             app:shapeAppearance="@style/ui_widget_roundStyle"
             />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivMicInnerIcon"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/voice_ic_mic_empty"
-            />
     </FrameLayout>
 
     <com.google.android.material.textview.MaterialTextView
@@ -78,7 +72,7 @@
         android:id="@+id/ivMicTag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/voice_icon_room_mic_mute_tag"
+        android:src="@drawable/voice_ic_mic_mute_tag"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/flSeatImages"
         app:layout_constraintEnd_toEndOf="@id/flSeatImages" />

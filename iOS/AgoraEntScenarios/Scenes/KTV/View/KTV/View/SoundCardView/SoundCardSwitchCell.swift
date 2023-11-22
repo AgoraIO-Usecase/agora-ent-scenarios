@@ -72,7 +72,6 @@ class SoundCardSwitchCell: UITableViewCell {
     @objc func gainSend() {
         let gain = slider.value
         let level = String(format: "%.1f", Double(calculateLevel(for: gain)) * 0.1)
-        let levNum = Double(level)
         print("send lev:\(round(Double(calculateLevel(for: gain)) * 0.1, decimalPlaces: 1))")
         guard let valueBlock = valueBlock else {return}
         valueBlock(round(Double(calculateLevel(for: gain)) * 0.1, decimalPlaces: 1))
