@@ -198,4 +198,5 @@
     <string name="ktv_debug_settings_private_param">私有参数</string>
     <string name="ktv_debug_settings_set">设置</string>
     <string name="ktv_debug_settings_audio_dump">音频Dump</string>
+    <string name="ktv_ear_phone_tip">耳返已关闭，请插入耳机重新开启</string>
 </resources>
