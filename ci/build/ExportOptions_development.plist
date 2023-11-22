@@ -16,6 +16,8 @@
 		<string>apiexamples_all</string>
 		<key>io.agora.test.enfull</key>
 		<string>apiexamples_all</string>
+		<key>io.agora.AgoraVoice</key>
+		<string>apiexamples_all</string>
 	</dict>
 	<key>signingCertificate</key>
 	<string>E40A63338EDCCBA764C8E0FC2D2184973746F22E</string>

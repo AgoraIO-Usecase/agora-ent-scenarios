@@ -16,7 +16,7 @@ import UIKit
     ///   - selArr: 所有选中的值
     ///   - groupArr: gtoupIdArr
     
-    @objc optional func confimrReturnAllSelValueWithDelegate(selArr : Array<Any>, groupArr : Array<Any>)
+    @objc optional func confimrReturnAllSelValueWithDelegate(selArr: [Any], groupArr: [Any])
     
     /// 当前选择的值
     ///
@@ -24,7 +24,7 @@ import UIKit
     ///   - valueStr: Value
     ///   - index: 当前下标
     ///   - groupId: groupId
-    @objc optional func currentSelValueWithDelegate(valueStr : String, index : Int, groupId : Int)
+    @objc optional func currentSelValueWithDelegate(valueStr: String, index: Int, groupId: Int)
 }
 
 class VLSelectTagView: UIView {
@@ -62,7 +62,7 @@ class VLSelectTagView: UIView {
     /// isDefaultChoice 为true时 改属性有效 defaultSelIndex 属性无效，为每各组设置单选选项
     public var defaultSelSingleIndeArr : Array = Array<Any>()
     /// 为每个组设置单选或多选，设置该属性时 isSingle 参数无效, 0 = 多选， 1 = 单选
-    public var defaultGroupSingleArr = Array<Int>(){
+    public var defaultGroupSingleArr = [Int](){
         didSet{
             for value in defaultGroupSingleArr {
                 if !(value == 0 || value == 1){
@@ -72,10 +72,10 @@ class VLSelectTagView: UIView {
         }
     }
     /// isDefaultChoice 为true时 该属性有效，设置每组默认选择项，可传数组
-    public var defaultSelIndexArr = Array<Any>() {
+    public var defaultSelIndexArr = [Any]() {
         didSet{
             for (index,value) in defaultSelIndexArr.enumerated() {
-                if value is Array<Any>{
+                if value is [Any] {
                     if !defaultGroupSingleArr.isEmpty{
                         defaultGroupSingleArr[index] = 0
                     }
@@ -85,11 +85,11 @@ class VLSelectTagView: UIView {
         }
     }
     
-    public var confirmReturnValueClosure : ((Array<Any>, Array<Any>) -> Void)?
-    public var currentSelValueClosure : ((String, Int, Int) -> Void)?
-    public weak var delegate : VLSelectTagViewDelegate?
+    public var confirmReturnValueClosure: (([Any], [Any]) -> Void)?
+    public var currentSelValueClosure: ((String, Int, Int) -> Void)?
+    public weak var delegate: VLSelectTagViewDelegate?
     
-    private let scrollView : UIScrollView = {
+    private let scrollView: UIScrollView = {
         let scrollview = UIScrollView()
         scrollview.showsVerticalScrollIndicator = false
         scrollview.showsHorizontalScrollIndicator = false
@@ -97,12 +97,12 @@ class VLSelectTagView: UIView {
         scrollview.isScrollEnabled = false
         return scrollview
     }()
-    private var tempContentArr : Array = Array<Any>()
-    private var tempTitleArr : Array = Array<Any>()
-    private var frameRect : CGRect = .zero
-    private var dataSourceArr : Array = Array<Any>()
-    private var saveSelButValueArr : Array = Array<Any>()
-    private var saveSelGroupIndexeArr : Array = Array<Any>()
+    private var tempContentArr = [[Any]]()
+    private var tempTitleArr = [String]()
+    private var frameRect: CGRect = .zero
+    private var dataSourceArr = [Any]()
+    private var saveSelButValueArr = [Any]()
+    private var saveSelGroupIndexeArr = [Any]()
     private let itemTag: Int = 100
     
     
@@ -118,7 +118,7 @@ class VLSelectTagView: UIView {
         super.init(coder: aDecoder)
     }
     
-    func setDataSource(contetnArr : Array<Any>, titleArr : Array<String>){
+    func setDataSource(contetnArr: [[Any]], titleArr: [String]) {
         saveSelButValueArr.removeAll()
         saveSelGroupIndexeArr.removeAll()
         
@@ -134,16 +134,16 @@ class VLSelectTagView: UIView {
         dataSourceArr.removeAll()
         dataSourceArr.append(contentsOf: tempContentArr)
         
-        for (index,title) in titleArr.enumerated() {
+        for (index, title) in titleArr.enumerated() {
             saveSelButValueArr.append("")
             saveSelGroupIndexeArr.append("")
-            frameRect = setupGroupAndStream(content: contetnArr[index] as! Array<Any>, titleStr: title, currFrame: frameRect, groupId: index)
+            frameRect = setupGroupAndStream(content: contetnArr[index], titleStr: title, currFrame: frameRect, groupId: index)
         }
         scrollView.contentSize = CGSize(width: frame.width, height: frameRect.size.height + frameRect.origin.y + 20)
     }
     
     // 设置数据源，创建
-    func setupGroupAndStream(content : Array<Any>, titleStr : String, currFrame : CGRect, groupId : Int) -> CGRect{
+    func setupGroupAndStream(content: [Any], titleStr: String, currFrame: CGRect, groupId: Int) -> CGRect {
         layoutIfNeeded()
         let groupTitleLab = UILabel.init(frame: CGRect(x: 15, y: currFrame.size.height + currFrame.origin.y + 10, width: 0, height: CGFloat(titleLabHeight)))
         groupTitleLab.text = titleStr
@@ -156,9 +156,9 @@ class VLSelectTagView: UIView {
         var alineButWidth = CGFloat(0)
         var current_rect = CGRect()
         var margin_x = CGFloat(content_x)
-        var tempSaveSelIndexArr = Array<Any>()
+        var tempSaveSelIndexArr = [Any]()
         
-        for (index,value) in content.enumerated() {
+        for (index, value) in content.enumerated() {
             let sender = UIButton.init(type: .custom)
             scrollView.addSubview(sender)
             sender.setTitle(value as? String, for: .normal)
@@ -210,22 +210,21 @@ class VLSelectTagView: UIView {
     
     public func comfirm() {
         if (confirmReturnValueClosure != nil) {
-            confirmReturnValueClosure!(saveSelButValueArr,saveSelGroupIndexeArr)
+            confirmReturnValueClosure?(saveSelButValueArr, saveSelGroupIndexeArr)
         }
         
         delegate?.confimrReturnAllSelValueWithDelegate?(selArr: saveSelButValueArr, groupArr: saveSelGroupIndexeArr)
-        
     }
 
     public func reload() {
         for value in scrollView.subviews {
             value.removeFromSuperview()
         }
-        setDataSource(contetnArr: tempContentArr, titleArr: tempTitleArr as! Array<String>)
+        setDataSource(contetnArr: tempContentArr, titleArr: tempTitleArr)
     }
     
     // 单选
-    private func setDefaultSingleSelect(index : Int , groupId : Int ,value : String, sender : UIButton, content : Array<Any>){
+    private func setDefaultSingleSelect(index: Int , groupId: Int ,value: String, sender: UIButton, content: [Any]) {
         let valueStr = "\(value)"
         if defaultSelSingleIndeArr.isEmpty{
             assert( !(defaultSelIndex  > content.count - 1), "在groupId = \(groupId) 设置默认选中项不能超过\(content.count - 1)")
@@ -245,19 +244,19 @@ class VLSelectTagView: UIView {
         saveSelGroupIndexeArr[groupId] = String(groupId)
     }
     // 多选
-    private func setDefaultMultipleSelect(index : Int , groupId : Int ,value : String, sender : UIButton, content : Array<Any>) -> Array<Any>{
+    private func setDefaultMultipleSelect(index: Int, groupId: Int, value: String, sender: UIButton, content: [Any]) -> [Any] {
         let content = defaultSelIndexArr[groupId]
-        var tempSaveSelIndexArr = Array<Any>()
-        if content is Int{
+        var tempSaveSelIndexArr = [Any]()
+        if content is Int {
             if index == content as! Int{
                 sender.isSelected = true
                 sender.backgroundColor = content_backSelColor
                 tempSaveSelIndexArr.append("\(value)")
             }
         }
-        if content is Array<Any>{
-            for contenIndex in content as! Array<Any>{
-                if index == contenIndex as! Int{
+        if content is [Any] {
+            for contenIndex in content as! [Any] {
+                if index == contenIndex as! Int {
                     sender.isSelected = true
                     sender.backgroundColor = content_backSelColor
                     tempSaveSelIndexArr.append("\(value)")
@@ -269,7 +268,7 @@ class VLSelectTagView: UIView {
         return tempSaveSelIndexArr
     }
     
-    @objc private func senderEvent(sender : UIButton){
+    @objc private func senderEvent(sender: UIButton){
         sender.isSelected = !sender.isSelected
         if defaultGroupSingleArr.isEmpty{
             isSingle ? singalSelectEvent(sender: sender) : multipleSelectEvent(sender: sender)
@@ -279,9 +278,9 @@ class VLSelectTagView: UIView {
     }
     
     // 单选
-    private func singalSelectEvent(sender : UIButton){
+    private func singalSelectEvent(sender: UIButton){
         var valueStr : String = ""
-        let tempDetailArr = dataSourceArr[sender.tag / itemTag] as! Array<Any>
+        let tempDetailArr = dataSourceArr[sender.tag / itemTag] as! [Any]
         if sender.isSelected {
             for (index, _) in tempDetailArr.enumerated(){
                 if index + 1 == sender.tag % itemTag {
@@ -307,16 +306,16 @@ class VLSelectTagView: UIView {
     }
     
     // 多选
-    private func multipleSelectEvent(sender : UIButton){
+    private func multipleSelectEvent(sender: UIButton){
         var valueStr = ""
-        var tempSaveArr = Array<Any>()
-        if ((saveSelButValueArr[sender.tag / itemTag]) is Array<Any>){
-            tempSaveArr = saveSelButValueArr[sender.tag / itemTag] as! Array<Any>
-        }else{
+        var tempSaveArr = [Any]()
+        if (saveSelButValueArr[sender.tag / itemTag]) is [Any] {
+            tempSaveArr = saveSelButValueArr[sender.tag / itemTag] as! [Any]
+        } else {
             tempSaveArr.append(saveSelButValueArr[sender.tag / itemTag])
         }
         
-        let tempDetailArr = dataSourceArr[sender.tag / itemTag] as! Array<Any>
+        let tempDetailArr = dataSourceArr[sender.tag / itemTag] as! [Any]
         valueStr = "\(tempDetailArr[sender.tag % itemTag - 1])"
         if sender.isSelected {
             sender.backgroundColor = content_backSelColor
@@ -337,17 +336,23 @@ class VLSelectTagView: UIView {
         
     }
         
-    private func calcuateLabSizeWidth(str : String, font : UIFont, maxHeight : CGFloat) -> CGFloat{
+    private func calcuateLabSizeWidth(str: String, font: UIFont, maxHeight: CGFloat) -> CGFloat {
         let attributes = [kCTFontAttributeName: font]
         let norStr = NSString(string: str)
-        let size = norStr.boundingRect(with: CGSize(width: CGFloat(MAXFLOAT), height: maxHeight), options: .usesLineFragmentOrigin, attributes: attributes as [NSAttributedString.Key : Any], context: nil)
+        let size = norStr.boundingRect(with: CGSize(width: CGFloat(MAXFLOAT), height: maxHeight),
+                                       options: .usesLineFragmentOrigin,
+                                       attributes: attributes as [NSAttributedString.Key : Any],
+                                       context: nil)
         return size.width
     }
     
-    private func calcuateLabSizeHeight(str : String, font : UIFont, maxWidth : CGFloat) -> CGFloat{
+    private func calcuateLabSizeHeight(str: String, font: UIFont, maxWidth: CGFloat) -> CGFloat {
         let attributes = [kCTFontAttributeName: font]
         let norStr = NSString(string: str)
-        let size = norStr.boundingRect(with: CGSize(width: maxWidth, height: CGFloat(MAXFLOAT)), options: .usesLineFragmentOrigin, attributes: attributes as [NSAttributedString.Key : Any], context: nil)
+        let size = norStr.boundingRect(with: CGSize(width: maxWidth, height: CGFloat(MAXFLOAT)), 
+                                       options: .usesLineFragmentOrigin,
+                                       attributes: attributes as [NSAttributedString.Key : Any],
+                                       context: nil)
         return size.height + 15
     }
 }

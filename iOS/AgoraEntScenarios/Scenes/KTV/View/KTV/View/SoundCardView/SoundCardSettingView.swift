@@ -238,7 +238,7 @@ extension SoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
             cell.slider.value = Float(1/4.0 * gainValue)
             cell.numLable.text = String(format: "%.1f",gainValue)
             cell.valueBlock = {[weak self] gain in
-                guard let self = self, let gainBlock = gainBlock else {return}
+                guard let self = self, let gainBlock = self.gainBlock else {return}
                 self.gainValue = Float(gain)
                 gainBlock(self.gainValue)
             }
@@ -251,7 +251,7 @@ extension SoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
             cell.numLable.text = "\(text)"
             cell.slider.value = Float(1.0/14 * Float(typeValue))
             cell.valueBlock = {[weak self] type in
-                guard let self = self, let  typeBlock = typeBlock else {return}
+                guard let self = self, let typeBlock = self.typeBlock else {return}
                 self.typeValue = type
                 typeBlock(self.typeValue)
             }

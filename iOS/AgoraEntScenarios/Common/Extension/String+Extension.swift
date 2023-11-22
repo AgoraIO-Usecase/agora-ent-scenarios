@@ -152,3 +152,30 @@ extension String {
     }
 }
 
+extension String {
+    // 判断字符串中的字符类型
+    enum CharacterType {
+        case chinese
+        case english
+    }
+    // 计算指定类型的字符数
+    func countOfCharacters(for type: CharacterType) -> Int {
+        var count = 0
+        for scalar in unicodeScalars {
+            switch type {
+            case .chinese:
+                // 判断字符是否为中文字符（Unicode 编码范围为 4E00 到 9FFF）
+                if scalar.value >= 0x4E00 && scalar.value <= 0x9FFF {
+                    count += 1
+                }
+
+            case .english:
+                // 判断字符是否为英文字符（Unicode 编码范围为 0000 到 007F）
+                if scalar.value <= 0x007F {
+                    count += 1
+                }
+            }
+        }
+        return count
+    }
+}

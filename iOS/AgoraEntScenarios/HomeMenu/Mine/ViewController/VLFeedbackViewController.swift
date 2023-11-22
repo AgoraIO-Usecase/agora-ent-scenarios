@@ -132,9 +132,9 @@ class VLFeedbackViewController: VLBaseViewController {
         textView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 12).isActive = true
         textView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 6).isActive = true
         textView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12).isActive = true
-        textView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -112).isActive = true
         
         containerView.addSubview(photoView)
+        photoView.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: 10).isActive = true
         photoView.leadingAnchor.constraint(equalTo: textView.leadingAnchor).isActive = true
         photoView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16).isActive = true
         photoView.trailingAnchor.constraint(equalTo: textView.trailingAnchor).isActive = true
@@ -229,24 +229,30 @@ class VLFeedbackViewController: VLBaseViewController {
     private func uploadImagesHandler(images: [UIImage], completion: @escaping ([String]) -> Void) {
         var urls: [String] = []
         let group = DispatchGroup()
-        images.forEach({
-            group.enter()
-            VLAPIRequest.uploadImageURL(VLURLConfig.kURLPathUploadImage, showHUD: true, appendKey: "file", images: [$0]) { response in
-                guard response.code == 0 else { ToastView.show(text: response.message); return }
-                let model = VLUploadImageResModel.yy_model(withJSON: response.data)
-                urls.append(model?.url ?? "")
-                group.leave()
-            } failure: { error, _ in
-                print(error?.localizedDescription ?? "")
-                group.leave()
+        let semaphore = DispatchSemaphore(value: 1)
+        DispatchQueue.global().async {
+            for item in images {
+                group.enter()
+                semaphore.wait()
+                VLAPIRequest.uploadImageURL(VLURLConfig.kURLPathUploadImage, showHUD: true, appendKey: "file", images: [item]) { response in
+                    guard response.code == 0 else { ToastView.show(text: response.message); return }
+                    let model = VLUploadImageResModel.yy_model(withJSON: response.data)
+                    urls.append(model?.url ?? "")
+                    group.leave()
+                    semaphore.signal()
+                } failure: { error, _ in
+                    print(error?.localizedDescription ?? "")
+                    group.leave()
+                    semaphore.signal()
+                }
             }
-        })
-        group.notify(queue: .main) {
-            if urls.count != images.count {
-                ToastView.show(text: NSLocalizedString("feedback_upload_image_fail", comment: ""))
-                return
+            group.notify(queue: .main) {
+                if urls.count != images.count {
+                    ToastView.show(text: NSLocalizedString("feedback_upload_image_fail", comment: ""))
+                    return
+                }
+                completion(urls)
             }
-            completion(urls)
         }
     }
 }
@@ -255,8 +261,9 @@ extension VLFeedbackViewController: VLSelectTagViewDelegate {
     func currentSelValueWithDelegate(valueStr: String, index: Int, groupId: Int) {
         view.endEditing(true)
     }
-    func confimrReturnAllSelValueWithDelegate(selArr: Array<Any>, groupArr: Array<Any>) {
-        selectedTags = selArr.compactMap({ "\($0)" })
+    func confimrReturnAllSelValueWithDelegate(selArr: [Any], groupArr: [Any]) {
+        let results = selArr.first is String ? ["\((selArr.first as? String) ?? "")"] : (selArr.first as? [String]) ?? []
+        selectedTags = results.isEmpty ? nil : results
         view.endEditing(true)
     }
 }
@@ -266,16 +273,22 @@ extension VLFeedbackViewController: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         let currentText = textView.text ?? ""
         let updatedText = currentText.replacingCharacters(in: Range(range, in: currentText)!, with: text)
-        textCountLabel.text = "\(updatedText.count > maxLength ? maxLength : updatedText.count)/\(maxLength)"
         return updatedText.count <= maxLength
     }
     // 触发检查
     func textViewDidEndEditing(_ textView: UITextView) {
-        var currentText = textView.text ?? ""
-        if currentText.count > maxLength {
-            let endIndex = currentText.index(currentText.startIndex, offsetBy: maxLength)
-            currentText = String(currentText[..<endIndex])
-            textView.text = currentText
+        let currentText = textView.text ?? ""
+        // 获取中文和英文字符数
+        let totalChars = currentText.count
+        let chineseChars = currentText.countOfCharacters(for: .chinese)
+        let englishChars = totalChars - chineseChars
+        
+        if chineseChars > maxLength || englishChars > maxLength {
+            let index = currentText.index(currentText.startIndex, offsetBy: maxLength)
+            textView.text = String(currentText[..<index])
         }
+    }
+    func textViewDidChange(_ textView: UITextView) {
+        textCountLabel.text = "\(textView.text.count > maxLength ? maxLength : textView.text.count)/\(maxLength)"
     }
 }

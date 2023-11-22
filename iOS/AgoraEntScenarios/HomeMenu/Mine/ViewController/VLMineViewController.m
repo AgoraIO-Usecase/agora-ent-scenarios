@@ -373,7 +373,6 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 /// 上传图片
 /// @param image 图片
 - (void)uploadHeadImageWithImage:(UIImage *)image {
-    /*
     [VLAPIRequest uploadImageURL:kURLPathUploadImage showHUD:YES appendKey:@"file" images:@[image] success:^(VLResponseDataModel * _Nonnull response) {
         if (response.code == 0) {
             VLUploadImageResModel *model = [VLUploadImageResModel vj_modelWithDictionary:response.data];
@@ -383,21 +382,8 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
             [VLToast toast:response.message];
         }
     } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
+        [VLToast toast:error.localizedDescription];
     }];
-     */
-    
-    VLUploadImageNetworkModel *uploadModel = [VLUploadImageNetworkModel new];
-    dispatch_sync(dispatch_get_global_queue(0, 0), ^{
-        uploadModel.image = image;
-        [uploadModel uploadWithProgress:nil completion:^(NSError * _Nullable err, id _Nullable responseObject) {
-            VLResponseData *response = responseObject;
-            if (response.code.intValue == 0) {
-                VLUploadImageResModel *model = [VLUploadImageResModel vj_modelWithDictionary:response.data];
-                [self loadUpdateUserIconRequest:model.url image:image];
-            }
-            [VLToast toast:response.message];
-        }];
-    });
 }
 
 #pragma mark - Public Methods

@@ -5474,13 +5474,6 @@
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"-ld64",
-					"-ObjC",
-					"-l\"c++\"",
-					"-l\"iconv\"",
-					"-l\"icucore\"",
-					"-l\"resolv\"",
-					"-l\"z\"",
 					"-framework",
 					"\"AFNetworking\"",
 					"-framework",
@@ -5661,6 +5654,7 @@
 					"\"MetalPerformanceShaders\"",
 					"-weak_framework",
 					"\"Photos\"",
+					"-ld_classic",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5710,13 +5704,6 @@
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"-ld64",
-					"-ObjC",
-					"-l\"c++\"",
-					"-l\"iconv\"",
-					"-l\"icucore\"",
-					"-l\"resolv\"",
-					"-l\"z\"",
 					"-framework",
 					"\"AFNetworking\"",
 					"-framework",
@@ -5897,6 +5884,7 @@
 					"\"MetalPerformanceShaders\"",
 					"-weak_framework",
 					"\"Photos\"",
+					"-ld_classic",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
