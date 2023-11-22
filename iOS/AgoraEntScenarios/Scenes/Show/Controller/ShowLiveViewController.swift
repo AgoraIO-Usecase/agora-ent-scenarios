@@ -90,6 +90,7 @@ class ShowLiveViewController: UIViewController {
     private var role: AgoraClientRole {
         return room?.ownerId == VLUserCenter.user.id ? .broadcaster : .audience
     }
+    private var isSendJointBroadcasting: Bool = false
     
     let channelOptions:AgoraRtcChannelMediaOptions = AgoraRtcChannelMediaOptions()
     
@@ -498,6 +499,10 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onMicSeatApplyDeleted(apply: ShowMicSeatApply) {
         _updateApplyMenu()
+        isSendJointBroadcasting = false
+        ShowAgoraKitManager.shared.updateMediaOptions(publishCamera: false,
+                                                      channelId: room?.roomId ?? "",
+                                                      canvasView: nil)
     }
     
     func onMicSeatApplyAccepted(apply: ShowMicSeatApply) {
@@ -511,7 +516,11 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     func onMicSeatInvitationUpdated(invitation: ShowMicSeatInvitation) {
         guard invitation.userId == VLUserCenter.user.id else { return }
         if invitation.status == .waitting {
-            ShowAgoraKitManager.shared.updateMediaOptions(publishCamera: true)
+            isSendJointBroadcasting = true
+            muteLocalVideo = true
+            ShowAgoraKitManager.shared.updateMediaOptions(publishCamera: true,
+                                                          channelId: room?.roomId ?? "",
+                                                          canvasView: liveView.canvasView.remoteView)
             ShowReceivePKAlertVC.present(name: invitation.userName, style: .mic) { result in
                 switch result {
                 case .accept:
@@ -532,7 +541,10 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
 //                    }
 
                 default:
-                    ShowAgoraKitManager.shared.updateMediaOptions(publishCamera: false)
+                    self.isSendJointBroadcasting = false
+                    ShowAgoraKitManager.shared.updateMediaOptions(publishCamera: false,
+                                                                  channelId: self.room?.roomId ?? "",
+                                                                  canvasView: nil)
                     self.serviceImp?.rejectMicSeatInvitation { error in
                     }
                     break
@@ -922,7 +934,10 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
                 self.applyView.getAllMicSeatList(autoApply: self.role == .audience)
                 AlertManager.show(view: self.applyView, alertPostion: .bottom)
                 guard self.role == .audience else { return }
-                ShowAgoraKitManager.shared.updateMediaOptions(publishCamera: true)
+                self.isSendJointBroadcasting = true
+                ShowAgoraKitManager.shared.updateMediaOptions(publishCamera: true,
+                                                              channelId: self.room?.roomId ?? "",
+                                                              canvasView: self.liveView.canvasView.remoteView)
             }
         }
     }
@@ -970,10 +985,10 @@ extension ShowLiveViewController {
         DispatchQueue.main.async {
             var receive = true
             var send = true
-            if self.role == .broadcaster && self.interactionStatus != .pking && self.interactionStatus != .onSeat {
+            if self.role == .broadcaster && self.interactionStatus != .pking && self.interactionStatus != .onSeat && self.liveView.bottomBar.linkButton.isShowRedDot == false {
                 receive = false
             }
-            if self.role == .audience && self.currentInteraction?.userId != VLUserCenter.user.id {
+            if self.role == .audience && self.currentInteraction?.userId != VLUserCenter.user.id && self.isSendJointBroadcasting == false {
                 send = false
             }
             let data = self.panelPresenter.generatePanelData(send: send, receive: receive, audience: (self.role == .audience))

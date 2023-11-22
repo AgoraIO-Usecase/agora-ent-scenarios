@@ -345,12 +345,15 @@ class ShowAgoraKitManager: NSObject {
         }
     }
     
-    func updateMediaOptions(publishCamera: Bool) {
+    func updateMediaOptions(publishCamera: Bool, channelId: String, canvasView: UIView?) {
         let mediaOptions = AgoraRtcChannelMediaOptions()
         mediaOptions.publishCameraTrack = publishCamera
         mediaOptions.publishMicrophoneTrack = false
-        mediaOptions.clientRoleType = publishCamera ? .broadcaster : .audience
-        engine?.updateChannel(with: mediaOptions)
+        switchRole(role: publishCamera ? .broadcaster : .audience,
+                   channelId: channelId,
+                   options: mediaOptions,
+                   uid: VLUserCenter.user.id,
+                   canvasView: canvasView)
     }
     func updateMediaOptionsEx(channelId: String, publishCamera: Bool, publishMic: Bool = false) {
         let mediaOptions = AgoraRtcChannelMediaOptions()
