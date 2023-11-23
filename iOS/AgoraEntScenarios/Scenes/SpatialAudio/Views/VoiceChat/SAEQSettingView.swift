@@ -279,7 +279,7 @@ extension SAEQSettingView: UITableViewDelegate, UITableViewDataSource {
                               range: NSRange(location: 0, length: text.length))
             text.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor(hex: "0x3C4267"), range: NSRange(location: 0, length: text.length))
 
-            let interactableText = NSMutableAttributedString(string: "www.agora.io")
+            let interactableText = NSMutableAttributedString(string: "www.shengwang.cn")
             interactableText.addAttribute(NSAttributedString.Key.font,
                                           value: UIFont.systemFont(ofSize: 12, weight: .bold),
                                           range: NSRange(location: 0, length: interactableText.length))
