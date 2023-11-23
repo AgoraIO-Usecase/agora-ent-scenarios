@@ -182,11 +182,14 @@ class SyncUtilsWrapper {
         joinSceneQueue.append({
             SyncUtil.joinScene(id: id, userId: userId, isOwner: isOwner, property: property) { obj in
                 _resetTimer()
-                success?(obj)
-                if joinSceneQueue.count > 0 {
-                    joinSceneQueue.removeFirst()
+                //TODO: delay success closure to ensure that if there is a fail closure, it can be called(syncmanager workaround)
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.01) {
+                    success?(obj)
+                    if joinSceneQueue.count > 0 {
+                        joinSceneQueue.removeFirst()
+                    }
+                    _dequeueJoinScene()
                 }
-                _dequeueJoinScene()
             } fail: { err in
                 _resetTimer()
                 fail?(err)
