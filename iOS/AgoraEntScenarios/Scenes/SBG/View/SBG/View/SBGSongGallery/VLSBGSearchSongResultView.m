@@ -210,6 +210,7 @@ UITableViewDelegate
     inputModel.isChorus = self.ifChorus;
     inputModel.songName = model.songName;
     inputModel.songNo = model.songNo;
+    inputModel.imageUrl = model.imageUrl;
 //    inputModel.songUrl = model.songUrl;
     inputModel.singer = model.singer;
     [[AppContext sbgServiceImp] chooseSongWithInput:inputModel

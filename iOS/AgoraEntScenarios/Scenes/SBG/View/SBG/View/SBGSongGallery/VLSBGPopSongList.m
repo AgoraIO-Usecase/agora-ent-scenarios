@@ -176,7 +176,7 @@
 
 - (UILabel *)songNumLabel {
     if (!_songNumLabel) {
-        _songNumLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 20, 90, 14)];
+        _songNumLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 33, 90, 14)];
         _songNumLabel.textColor = [UIColor whiteColor];
         _songNumLabel.font = UIFontMake(16);
         _songNumLabel.text = @"已点0/8";
@@ -187,7 +187,8 @@
 
 - (UIButton *)songNumBtn {
     if (!_songNumBtn) {
-        _songNumBtn = [[UIButton alloc]initWithFrame:CGRectMake(self.width - 140, 20, 120, 34)];
+        _songNumBtn = [[UIButton alloc]initWithFrame:CGRectMake(self.width - 140, 16, 120, 48)];
+     //   _songNumBtn.contentMode = UIViewContentModeScaleAspectFit;
         [_songNumBtn setBackgroundImage:[UIImage sceneImageWithName:@"sbg-btn-start-disabled"] forState:UIControlStateSelected];
         [_songNumBtn setBackgroundImage:[UIImage sceneImageWithName:@"sbg-btn-start"] forState:UIControlStateNormal];
         [_songNumBtn addTarget:self action:@selector(startSbg) forControlEvents:UIControlEventTouchUpInside];

@@ -2340,12 +2340,10 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 }
 
 - (void)onMusicPlayerProgressChangedWith:(NSInteger)progress{
-    //if(self.singRole == SRSingRoleLeadSinger){
-        if(labs(progress - 1000) < 500 && !self.hasCountDown) {
-            [self updateSBGCountDown];
-            self.hasCountDown = true;
-        }
-    //}
+    if(!self.hasCountDown) {
+        [self updateSBGCountDown];
+        self.hasCountDown = true;
+    }
 }
 
 #pragma mark SRMusicLoadStateListener

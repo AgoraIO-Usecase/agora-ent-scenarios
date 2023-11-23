@@ -61,10 +61,10 @@ class SoundCardEffectView: UIView {
         cancleView.addTarget(self, action: #selector(cancel), for: .touchUpInside)
         self.addSubview(cancleView)
         
-        KTVHeadSetUtil.addSoundCardObserver {[weak self] flag in
-            guard let block = self?.clickBlock else {return}
-            block(-2)
-        }
+//        KTVHeadSetUtil.addSoundCardObserver {[weak self] flag in
+//            guard let block = self?.clickBlock else {return}
+//            block(-2)
+//        }
     }
     
     override func layoutSubviews() {

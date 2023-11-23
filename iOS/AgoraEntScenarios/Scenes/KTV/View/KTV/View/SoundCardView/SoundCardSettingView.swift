@@ -116,19 +116,19 @@ import Foundation
         
         noSoundCardView.isHidden = true
         
-        let flag = KTVHeadSetUtil.hasSoundCard()
-        self.noSoundCardView.isHidden = true
-        self.tableView.isHidden = !true
-
-        KTVHeadSetUtil.addSoundCardObserver {[weak self] flag in
-            self?.noSoundCardView.isHidden = flag
-            self?.tableView.isHidden = !flag
-            if flag == false {
-                self?.soundOpen = false
-                guard let soundCardBlock = self?.soundCardBlock else {return}
-                soundCardBlock(false)
-            }
-        }
+//        let flag = KTVHeadSetUtil.hasSoundCard()
+//        self.noSoundCardView.isHidden = flag
+//        self.tableView.isHidden = !flag
+//
+//        KTVHeadSetUtil.addSoundCardObserver {[weak self] flag in
+//            self?.noSoundCardView.isHidden = flag
+//            self?.tableView.isHidden = !flag
+//            if flag == false {
+//                self?.soundOpen = false
+//                guard let soundCardBlock = self?.soundCardBlock else {return}
+//                soundCardBlock(false)
+//            }
+//        }
     }
     
     required init?(coder: NSCoder) {
