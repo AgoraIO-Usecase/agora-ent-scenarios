@@ -2433,12 +2433,10 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
         } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted || state == AgoraMediaPlayerStatePlayBackCompleted) {
             
             VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
-            NSLog(@"添加到service得model:我唱完了");
             if (model.winnerNo == nil || [model.winnerNo isEqualToString:@""]) {
                 //表示无人抢唱
                 return;
             }
-            NSLog(@"添加到service得model:我111");
             if(isLocal) {
                 SBGLogInfo(@"Playback all loop completed");
                 if (self.isEarOn) { // 自己的片段播放完关闭耳返
@@ -2450,7 +2448,6 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
                     [[AppContext sbgServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
                                                                         completion:^(NSError * error) {
                     }];
-                    NSLog(@"添加到service得model:我222");
                     if(self.singRole == KTVSingRoleLeadSinger || self.singRole == KTVSingRoleSoloSinger){
                         [self syncChoruScore:self.statusView.lrcView.finalScore];
                         //把自己的信息存进去
@@ -2462,7 +2459,6 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
                         model.songNum = 1;
                         model.userId = VLUserCenter.user.id;
                         [self.scoreArray addObject:model];
-                        NSLog(@"添加到service得model:userId:%@---count%li---score:%li---%@", model.userName, model.score, model.songNum, currentSong.songName);
                     }
                 }
                 

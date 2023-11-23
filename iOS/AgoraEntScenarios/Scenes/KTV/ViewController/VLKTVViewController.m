@@ -2167,26 +2167,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //update booleans
     self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
     
-    //判断wo的人是否退出合唱
-//    if([self getChorusSingerArrayWithSeatArray:self.seatsArray].count >= 1 && ![self.selectUserNo isEqualToString:@""] ){
-//        BOOL flag = [self checkIfCosingerWith:self.selectedVoiceShowIndex];
-//        if (self.selectedVoiceShowIndex >= 0 ){
-//            VLRoomSeatModel *model = seatsArray[self.selectedVoiceShowIndex];
-//            if(!flag && self.selectedVoiceShowIndex != -2 && self.singRole == KTVSingRoleSoloSinger){//表示突出的人退出合唱
-//                [VLToast toast:@"人声突出功能已失效，请重设"];
-//                self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
-//                [self.MVView setPerViewAvatar:@""];
-//            }
-//        }
-//    }
-//
-//    if([self isRoomOwner]){
-//        [self.MVView setPerViewHidden:[self getChorusSingerArrayWithSeatArray:_seatsArray].count < 2];
-//        if(self.selSongsArray.count == 0 || (self.voiceShowHasSeted == true && self.selectedVoiceShowIndex == -2) ){
-//            [self.MVView setPerViewAvatar:@""];
-//        }
-//    }
-    
     //如果退出合唱的人的userNo不存在了说明他退出人生突出了
     if((![self.selectUserNo isEqualToString:@""] && self.selectUserNo != nil) && self.selectedVoiceShowIndex != -2){
         //看下麦位上有没有这个人 如果没有就说明它下麦了
