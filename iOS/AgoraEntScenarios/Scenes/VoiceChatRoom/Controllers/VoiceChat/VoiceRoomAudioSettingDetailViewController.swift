@@ -418,7 +418,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
                     warningView.addSubview(iconView)
 
                     let warningLabel = UILabel(frame: CGRect(x: 30, y: 6, width: screenWidth - 100, height: otherSoundHeaderHeight))
-                    warningLabel.text = "otherSound".voice_localized()
+                    warningLabel.text = "voice_otherSound".voice_localized()
                     warningLabel.numberOfLines = 0
                     warningLabel.lineBreakMode = .byCharWrapping
                     warningLabel.font = UIFont.systemFont(ofSize: 12)
