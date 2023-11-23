@@ -131,6 +131,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) NSInteger effectType;
 @property (nonatomic, strong) SoundCardSettingView *soundSettingView;
 @property (nonatomic, strong) LSTPopView *popSoundSettingView;
+@property (nonatomic, strong) HeadSetManager *headeSet;
 @end
 
 @implementation VLKTVViewController
@@ -222,6 +223,16 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         [debugBtn addTarget:self action:@selector(showDebug) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:debugBtn];
     }
+    kWeakSelf(self);
+    self.headeSet = [HeadSetManager initHeadsetObserverWithCallback:^(BOOL inserted) {
+        if(!inserted){
+            //拔下耳机了 关闭耳返
+            if(weakself.isEarOn){
+                [weakself onVLKTVEarSettingViewSwitchChanged:false];
+                [VLToast toast:SRLocalizedString(@"ktv_earback_micphone_pull")];
+            }
+        }
+    }];
 }
 
 -(void)testCosinger{
@@ -1449,10 +1460,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 [AgoraEntAuthorizedManager checkAudioAuthorizedWithParent:self completion:nil];
             }
             self.isNowMicMuted = !self.isNowMicMuted;
-            //如果当前是关闭麦克风，并且耳返开启状态 需要关闭耳返
-            if(self.isEarOn && self.isNowMicMuted){
-                self.isEarOn = false;
-                [self.RTCkit enableInEarMonitoring:_isEarOn includeAudioFilters:AgoraEarMonitoringFilterNone];
+            // 开关麦克风会对耳返状态进行检查并临时关闭
+            if(self.isEarOn){
+                [self.RTCkit enableInEarMonitoring:!self.isNowMicMuted includeAudioFilters:AgoraEarMonitoringFilterNone];
             }
             self.checkType = checkAuthTypeAudio;
             [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
