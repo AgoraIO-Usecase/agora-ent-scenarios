@@ -394,15 +394,15 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
     });
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW , (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         NSLog(@"update:%@抢到麦", model.winnerNo);
+        kWeakSelf(self);
             if([VLUserCenter.user.id isEqualToString:model.winnerNo]) {
-                self.statusView.state = SBGStateSingingBroadcaster;
+                
                 [self.SBGApi switchSingerRoleWithNewRole:KTVSingRoleSoloSinger onSwitchRoleState:^(enum KTVSwitchRoleState state, enum KTVSwitchRoleFailReason reason) {
-                    
+                    weakself.statusView.state = SBGStateSingingBroadcaster;
                 }];
             } else {
-                self.statusView.state = SBGStateSingingAudience;
                 [self.SBGApi switchSingerRoleWithNewRole:KTVSingRoleAudience onSwitchRoleState:^(enum KTVSwitchRoleState state, enum KTVSwitchRoleFailReason reason) {
-                    
+                    weakself.statusView.state = SBGStateSingingAudience;
                 }];
             }
             [self loadAndPlaySongWith:KTVPlayerTrackModeAcc];
@@ -775,7 +775,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [weakSelf.SBGApi startSingWithSongCode:songcode startPos:0];
         }
     };
-    
+    NSLog(@"加载的歌曲:%@---%@---%ld", model.name, model.songNo, (long)songcode);
     [self.SBGApi loadMusicWithSongCode:songcode config:songConfig onMusicLoadStateListener:self];
 
 //    [weakSelf.SBGApi switchSingerRoleWithNewRole:role
@@ -1414,6 +1414,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             model.name = VLUserCenter.user.name;
             model.imageUrl = VLUserCenter.user.headUrl;
             [[AppContext sbgServiceImp] updateChooseSongWithSongInfo:model finished:^(NSError * _Nullable err) {
+                NSLog(@"song: %@", model.name);
             }];
         }
     }];
@@ -2432,11 +2433,12 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
         } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted || state == AgoraMediaPlayerStatePlayBackCompleted) {
             
             VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
+            NSLog(@"添加到service得model:我唱完了");
             if (model.winnerNo == nil || [model.winnerNo isEqualToString:@""]) {
                 //表示无人抢唱
                 return;
             }
-            
+            NSLog(@"添加到service得model:我111");
             if(isLocal) {
                 SBGLogInfo(@"Playback all loop completed");
                 if(self.singRole != KTVSingRoleAudience){
@@ -2445,7 +2447,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
                     [[AppContext sbgServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
                                                                         completion:^(NSError * error) {
                     }];
-
+                    NSLog(@"添加到service得model:我222");
                     if(self.singRole == KTVSingRoleLeadSinger || self.singRole == KTVSingRoleSoloSinger){
                         [self syncChoruScore:self.statusView.lrcView.finalScore];
                         //把自己的信息存进去
@@ -2457,7 +2459,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
                         model.songNum = 1;
                         model.userId = VLUserCenter.user.id;
                         [self.scoreArray addObject:model];
-                        NSLog(@"添加到service得model:userId:%@---count%li---score:%li", model.userName, model.score, model.songNum);
+                        NSLog(@"添加到service得model:userId:%@---count%li---score:%li---%@", model.userName, model.score, model.songNum, currentSong.songName);
                     }
                 }
                 
@@ -2516,7 +2518,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
             self.loadMusicCallBack = nil;
         }
         VLSBGRoomSelSongModel *model = self.selSongsArray.firstObject;
-        NSLog(@"加载失败的歌曲为:%@---%@", model.songName, model.winnerNo);
+        NSLog(@"加载失败的歌曲为:%@---%@----%ld", model.songName, model.winnerNo, (long)songCode);
         if (reason == KTVLoadSongFailReasonNoLyricUrl) {
            // self.MVView.loadingType = VLSBGMVViewStateLoadFail;
         } else {
@@ -2553,7 +2555,6 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
         self.retryCount = 0;
         VLSBGRoomSelSongModel *model = self.selSongsArray.firstObject;
         if([model.winnerNo isEqualToString:@""]){
-            NSLog(@"加载成功的歌曲为:%@---%@", model.songName, model.winnerNo);
             //如果是主唱歌曲加载成功 发送ds告诉观众同步进度
             if(self.singRole == KTVSingRoleSoloSinger){
                 NSDictionary *dict = @{
@@ -2568,6 +2569,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
                 [self.SBGApi startSingWithSongCode:songCode startPos:0];
                 [self querySbgStatusAndUpdateUI];
                 [self updateSBGCountDown];
+                NSLog(@"加载成功的歌曲为:%@---%@", model.songName, model.winnerNo);
             }
         }
     });

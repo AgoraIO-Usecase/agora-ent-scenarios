@@ -1235,13 +1235,13 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
            sendStreamMessageWithDict(dict) { _ in
                
            }
-           
-           if apiConfig?.type == .singRelay {
-               getEventHander { delegate in
-                    delegate.onMusicPlayerProgressChanged(with: position_ms)
-               }
-           }
        }
+        
+        if apiConfig?.type == .singRelay {
+            getEventHander { delegate in
+                 delegate.onMusicPlayerProgressChanged(with: position_ms)
+            }
+        }
    }
 
    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo position: Int) {

@@ -96,6 +96,15 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         SyncUtil
             .scene(id: channelName)?
             .unsubscribeScene()
+        SyncUtil
+            .scene(id: channelName)?
+            .unsubscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION)
+        SyncUtil
+            .scene(id: channelName)?
+            .unsubscribe(key: SYNC_MANAGER_SEAT_INFO)
+        SyncUtil
+            .scene(id: channelName)?
+            .unsubscribe(key: SYNC_MANAGER_CHOOSE_SONG_INFO)
         
         userListCountDidChanged = nil
         seatListDidChanged = nil
