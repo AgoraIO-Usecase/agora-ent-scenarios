@@ -124,7 +124,7 @@
     [earWarningLabel sizeToFit]; // 自适应内容尺寸
     [self addSubview:earWarningLabel];
     self.earWarningLabel = earWarningLabel;
-    self.earWarningLabel.hidden = ![HeadSetManager hasHeadset];
+    self.earWarningLabel.hidden = ![self.headeSet hasHeadset];
 
     [self addSubview:_earWarningBtn];
     [self addSubview:self.earWarningLabel];
@@ -132,7 +132,7 @@
     _earSetView = [[UIView alloc]init];
     _earSetView.backgroundColor = [UIColor colorWithRed:0.031 green:0.028 blue:0.185 alpha:0.2];
     [self addSubview:_earSetView];
-    _earSetView.hidden = ![HeadSetManager hasHeadset];
+    _earSetView.hidden = ![self.headeSet hasHeadset];
     
     _earSetLabel = [[UILabel alloc]init];
     _earSetLabel.text = @"耳返设置";
@@ -141,7 +141,7 @@
     [_earSetView addSubview:_earSetLabel];
     
     [self addSubview:self.earSlider];
-    self.earSlider.hidden = ![HeadSetManager hasHeadset];
+    self.earSlider.hidden = ![self.headeSet hasHeadset];
 }
 
 -(void)addSubViewConstraints {
