@@ -11,7 +11,7 @@ android {
 task downloadRtmLibs {
     def destFile = new File(buildDir, 'rtm.zip')
     download {
-        src 'https://download.agora.io/rtm2/release/Agora_RTM_JAVA_SDK_for_Android_v214.zip'
+        src 'https://download.agora.io/rtm2/release/Agora_RTM_JAVA_SDK_for_Android_v216.zip'
         dest destFile
         overwrite false
     }
