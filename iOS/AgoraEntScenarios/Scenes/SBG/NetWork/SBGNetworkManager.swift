@@ -55,22 +55,25 @@ class SBGNetworkManager: NSObject {
             case .success(let data):
                 do {
                     if let obj = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                       let code = obj["code"] as? Int,
-                       code == 0 {
-                        let userData = obj["data"] as? [String: Any]
-                        let userId = userData?["userId"]
-                        let userName = userData?["userName"]
-                        success(userId as? String, userName as? String, true)
+                       let code = obj["code"] as? Int{
+                        if code == 0 {
+                            let userData = obj["data"] as? [String: Any]
+                            let userId = userData?["userId"]
+                            let userName = userData?["userName"]
+                            success(userId as? String, userName as? String, true)
+                        } else if code == 961 {
+                            success(nil, nil, false)
+                        }
                     } else {
-                        success(nil,nil, false)
+                       // success(nil,nil, false)
                     }
                 } catch {
-                    print(error)
-                    success(nil, nil, false)
+//                    print(error)
+//                    success(nil, nil, false)
                 }
             case .failure(let error):
                 print(error)
-                success(nil, nil, false)
+             //   success(nil, nil, false)
             }
         }
     }
