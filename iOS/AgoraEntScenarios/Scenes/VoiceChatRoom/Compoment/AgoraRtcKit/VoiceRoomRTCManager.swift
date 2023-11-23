@@ -270,8 +270,8 @@ public let kMPK_RTC_UID: UInt = 1
                 } else if musicPath.contains("-B&R-") {
                     delegate?.reportAlien?(with: .blueAndRed, musicType: musicType)
                 }
-                let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "voice_lau".voice_localized() : "EN"
-                musicPath = musicPath.replacingOccurrences(of: "CN", with: lanuagePath)
+//                let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "voice_lau".voice_localized() : "EN"
+//                musicPath = musicPath.replacingOccurrences(of: "CN", with: lanuagePath)
                 rtcKit.startAudioMixing(musicPath, loopback: false, cycle: 1)
             }
         }
@@ -513,8 +513,8 @@ public let kMPK_RTC_UID: UInt = 1
         } else if type == .ainsOff {
             path = AgoraConfig.NoneSound[index]
         }
-        let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "voice_lau".voice_localized() : "EN"
-        path = path.replacingOccurrences(of: "CN", with: lanuagePath)
+//        let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "voice_lau".voice_localized() : "EN"
+//        path = path.replacingOccurrences(of: "CN", with: lanuagePath)
         rtcKit.startAudioMixing(path, loopback: false, cycle: 1)
     }
 
