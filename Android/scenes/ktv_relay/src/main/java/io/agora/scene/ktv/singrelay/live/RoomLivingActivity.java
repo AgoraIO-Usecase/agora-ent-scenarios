@@ -476,6 +476,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
                 getBinding().cbMic.setEnabled(false);
                 getBinding().groupEmptyPrompt.setVisibility(View.GONE);
             } else if (status == RoomLivingViewModel.GameStatus.ON_WAITING) {
+                getBinding().cbMic.setEnabled(true);
                 getBinding().singRelayGameView.onGameWaitingStatus();
             } else if (status == RoomLivingViewModel.GameStatus.ON_END) {
                 getBinding().singRelayGameView.onGameEnd(roomLivingViewModel.getRankList());

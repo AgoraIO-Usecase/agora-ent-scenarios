@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -15,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.SceneAliveTime
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
@@ -66,6 +66,12 @@ class RoomListActivity : AppCompatActivity() {
         })
         initView()
         initVideoSettings()
+
+        SceneAliveTime.fetchShowAliveTime ({ show, pk ->
+            ShowLogger.d("RoomListActivity", "fetchShowAliveTime: show: $show, pk: $pk")
+            ShowServiceProtocol.ROOM_AVAILABLE_DURATION = show * 1000L
+            ShowServiceProtocol.PK_AVAILABLE_DURATION = pk * 1000L
+        })
     }
 
     private fun initView() {
@@ -304,7 +310,7 @@ class RoomListActivity : AppCompatActivity() {
                 }
 
                 override fun onRequireRenderVideo(info: VideoLoader.AnchorInfo): VideoLoader.VideoCanvasContainer? {
-                    Log.d("RoomListActivity", "onRequireRenderVideo")
+                    ShowLogger.d("RoomListActivity", "onRequireRenderVideo")
                     return null
                 }
             }
