@@ -5654,7 +5654,6 @@
 					"\"MetalPerformanceShaders\"",
 					"-weak_framework",
 					"\"Photos\"",
-					"-ld_classic",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5884,7 +5883,6 @@
 					"\"MetalPerformanceShaders\"",
 					"-weak_framework",
 					"\"Photos\"",
-					"-ld_classic",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
