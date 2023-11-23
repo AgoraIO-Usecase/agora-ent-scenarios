@@ -232,6 +232,7 @@ class ShowLivePagesSlicingDelegateHandler: AGCollectionSlicingDelegateHandler {
         vc.delegate = vcDelegate
         vc.view.frame = parentVC!.view.bounds
         vc.view.tag = kShowLiveRoomViewTag
+        vc.loadingType = .joinedWithVideo
         cell.contentView.addSubview(vc.view)
         parentVC!.addChild(vc)
         return cell

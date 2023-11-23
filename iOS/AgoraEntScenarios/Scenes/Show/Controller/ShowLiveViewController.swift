@@ -132,12 +132,6 @@ class ShowLiveViewController: UIViewController {
         }
     }
     
-    private lazy var thumnbnailCanvasView: ShowThumnbnailCanvasView = {
-        let view = ShowThumnbnailCanvasView(frame: view.bounds)
-        view.isHidden = true
-        return view
-    }()
-    
     //interaction list
     private var interactionList: [ShowInteractionInfo]? {
         didSet {
@@ -279,7 +273,6 @@ class ShowLiveViewController: UIViewController {
         
     private func setupUI(){
         view.layer.contents = UIImage.show_sceneImage(name: "show_live_room_bg")?.cgImage
-        view.addSubview(thumnbnailCanvasView)
         navigationController?.isNavigationBarHidden = true
         liveView.room = room
         view.addSubview(liveView)
@@ -439,7 +432,10 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onRoomExpired() {
-        AppContext.expireShowImp(roomId)
+        // TODO: 打开这两行会导致 _joinRoom不会再重试 进而导致快速上下滑动真人直播间出现结束页
+        if let roomId = room?.roomId {
+            AppContext.unloadShowServiceImp(roomId)
+        }
         serviceImp = nil
         finishView?.removeFromSuperview()
         finishView = ShowReceiveFinishView()
@@ -814,6 +810,16 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
         throttleRefreshRealTimeInfo()
     }
     
+    func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStateChangedOfUid uid: UInt, state: AgoraVideoRemoteState, reason: AgoraVideoRemoteReason, elapsed: Int) {
+        if uid == roomOwnerId {
+            if reason == .remoteMuted {
+                liveView.thumnbnailCanvasView.isHidden = false
+            }else if reason == .remoteUnmuted {
+                liveView.thumnbnailCanvasView.isHidden = true
+            }
+        }
+    }
+    
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
         panelPresenter.updateAudioStats(stats)
         throttleRefreshRealTimeInfo()
@@ -996,11 +1002,11 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
             self.muteLocalVideo = selected
             if selected {
                 ShowAgoraKitManager.shared.engine?.stopPreview()
-                self.thumnbnailCanvasView.isHidden = self.currentInteraction?.interactStatus != nil && self.currentInteraction?.interactStatus != .idle
+                self.liveView.thumnbnailCanvasView.isHidden = self.currentInteraction?.interactStatus != nil && self.currentInteraction?.interactStatus != .idle
             } else {
                 ShowAgoraKitManager.shared.engine?.startPreview()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    self.thumnbnailCanvasView.isHidden = true
+                    self.liveView.thumnbnailCanvasView.isHidden = true
                 }
             }
         }
