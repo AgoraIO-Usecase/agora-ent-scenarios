@@ -2439,6 +2439,9 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
             
             if(isLocal) {
                 SBGLogInfo(@"Playback all loop completed");
+                if (self.isEarOn) { // 自己的片段播放完关闭耳返
+                    self.isEarOn = false;
+                }
                 if(self.singRole != KTVSingRoleAudience){
                     self.currentSelSong = nil;
                     self.isNowMicMuted = true;
