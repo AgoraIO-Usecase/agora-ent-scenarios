@@ -2441,6 +2441,9 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
             NSLog(@"添加到service得model:我111");
             if(isLocal) {
                 SBGLogInfo(@"Playback all loop completed");
+                if (self.isEarOn) { // 自己的片段播放完关闭耳返
+                    self.isEarOn = false;
+                }
                 if(self.singRole != KTVSingRoleAudience){
                     self.currentSelSong = nil;
                     self.isNowMicMuted = true;
