@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.media.AudioManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -71,7 +72,7 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
         spannableString.setSpan(StyleSpan(Typeface.BOLD), 0, 9, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         binding?.tvSoundCardSupport?.text = spannableString
         binding?.apply {
-            if (isPlugIn) {
+            if (true) {
                 groupSoundCardSettings.visibility = View.VISIBLE
                 if (mManager.isEnable()) {
                     setupPresetSoundView(mManager.presetSound())
@@ -164,6 +165,13 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
                     }, 300)
                 }
             }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                tvInputDevice.text = audioManager.microphones.getOrNull(0)?.description.toString()
+            } else {
+                val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                tvInputDevice.text = audioManager.getDevices(AudioManager.GET_DEVICES_INPUTS).getOrNull(0)?.productName.toString()
+            }
         }
     }
 
@@ -190,7 +198,7 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
     private fun setHeadPhonePlugin(isPlug: Boolean) {
         isPlugIn = isPlug
         binding?.let { binding ->
-            if (isPlugIn) {
+            if (true) {
                 // 插入有线耳机
                 binding.groupSoundCardSettings.visibility = View.VISIBLE
                 binding.groupSoundCardAbnormal.visibility = View.INVISIBLE
