@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Rect
 import android.media.AudioManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -57,7 +58,7 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
     override fun initView() {
         super.initView()
         binding?.apply {
-            if (isPlugIn) {
+            if (true) {
                 groupSoundCardSettings.visibility = View.VISIBLE
                 if (soundCardSetting.isEnable()) {
                     setupPresetSoundView(soundCardSetting.presetSound())
@@ -152,6 +153,14 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                 }
             }
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            binding.tvInputDevice.text = audioManager.microphones.getOrNull(0)?.description.toString()
+        } else {
+            val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            binding.tvInputDevice.text = audioManager.getDevices(AudioManager.GET_DEVICES_INPUTS).getOrNull(0)?.productName.toString()
+        }
     }
 
     private fun setupGainView(gainValue: Float) {
@@ -205,7 +214,7 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
 
     private fun setHeadPhonePlugin(isPlug: Boolean) {
         isPlugIn = isPlug
-        if (isPlugIn) {
+        if (true) {
             // 插入有线耳机
             binding.groupSoundCardSettings.visibility = View.VISIBLE
             binding.groupSoundCardAbnormal.visibility = View.INVISIBLE

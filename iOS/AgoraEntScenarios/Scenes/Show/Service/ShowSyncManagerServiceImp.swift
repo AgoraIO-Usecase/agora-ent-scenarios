@@ -422,6 +422,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             return
         }
         _removeMicSeatApply(apply: apply, completion: completion)
+        
     }
     
     func acceptMicSeatApply(apply: ShowMicSeatApply, completion: @escaping (NSError?) -> Void) {
@@ -1235,6 +1236,7 @@ extension ShowSyncManagerServiceImp {
             .delete(id: apply.objectId!,
                     success: { _ in
                 agoraPrint("imp seat apply remove success...")
+                self.subscribeDelegate?.onMicSeatApplyDeleted(apply: ShowMicSeatApply())
                 completion(nil)
             }, fail: { error in
                 agoraPrint("imp seat apply remove fail :\(error.message)...")

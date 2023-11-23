@@ -131,6 +131,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) NSInteger effectType;
 @property (nonatomic, strong) SoundCardSettingView *soundSettingView;
 @property (nonatomic, strong) LSTPopView *popSoundSettingView;
+@property (nonatomic, strong) HeadSetManager *headeSet;
 @end
 
 @implementation VLKTVViewController
@@ -222,6 +223,16 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         [debugBtn addTarget:self action:@selector(showDebug) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:debugBtn];
     }
+    kWeakSelf(self);
+    self.headeSet = [HeadSetManager initHeadsetObserverWithCallback:^(BOOL inserted) {
+        if(!inserted){
+            //拔下耳机了 关闭耳返
+            if(weakself.isEarOn){
+                [weakself onVLKTVEarSettingViewSwitchChanged:false];
+                [VLToast toast:SRLocalizedString(@"ktv_earback_micphone_pull")];
+            }
+        }
+    }];
 }
 
 -(void)testCosinger{
@@ -422,6 +433,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 
 //人声突出
 - (void)popVoiceShowView {
+    
     //获取唱歌的人
     NSArray *array = [self getChorusSingerArrayWithSeatArray:self.seatsArray];
     NSMutableArray *nameArray = [NSMutableArray array];
@@ -443,6 +455,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     LSTPopView* popView =
     [LSTPopView popVoiceShowViewWithParentView:self.view showView:self.voiceShowView imgSource:imgArray nameSource:nameArray  selectUserNo:userNo userNoArray:userNoArray UIUpdateAble:self.selectedVoiceShowIndex != -2 withDelegate:self];
     self.voiceShowView = (VLVoiceShowView*)popView.currCustomView;
+    
 }
 
 //专业主播
@@ -644,6 +657,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 }
 
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine didAudioRouteChanged:(AgoraAudioOutputRouting)routing {
+    
 }
 
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine didAudioPublishStateChange:(NSString *)channelId oldState:(AgoraStreamPublishState)oldState newState:(AgoraStreamPublishState)newState elapseSinceLastState:(int)elapseSinceLastState {
@@ -806,6 +820,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
                            onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
     }];
+    // 歌曲播完关闭耳返状态
+    if(self.isEarOn){
+        self.isEarOn = false;
+        [self.RTCkit enableInEarMonitoring:_isEarOn includeAudioFilters:AgoraEarMonitoringFilterNone];
+    }
 }
 
 - (void)loadAndPlaySong{
@@ -1358,6 +1377,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 -(void)didLeaveChours {
     //退出合唱
+    
+    if([self isRoomOwner] && self.singRole == KTVSingRoleCoSinger && self.selectUserNo == VLUserCenter.user.id){
+        [VLToast toast:@"人声突出功能已失效，请重设"];
+        self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
+        [self.MVView setPerViewAvatar:@""];
+    }
+    
     [[AppContext ktvServiceImp] coSingerLeaveChorusWithCompletion:^(NSError * error) {
     }];
     [self stopPlaySong];
@@ -1372,6 +1398,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:YES
                                                         completion:^(NSError * error) {
     }];
+    
+    
 }
 
 - (void)didShowVoiceChooseView {
@@ -1444,10 +1472,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 [AgoraEntAuthorizedManager checkAudioAuthorizedWithParent:self completion:nil];
             }
             self.isNowMicMuted = !self.isNowMicMuted;
-            //如果当前是关闭麦克风，并且耳返开启状态 需要关闭耳返
-            if(self.isEarOn && self.isNowMicMuted){
-                self.isEarOn = false;
-                [self.RTCkit enableInEarMonitoring:_isEarOn includeAudioFilters:AgoraEarMonitoringFilterNone];
+            // 开关麦克风会对耳返状态进行检查并临时关闭
+            if(self.isEarOn){
+                [self.RTCkit enableInEarMonitoring:!self.isNowMicMuted includeAudioFilters:AgoraEarMonitoringFilterNone];
             }
             self.checkType = checkAuthTypeAudio;
             [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
@@ -2139,26 +2166,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     //update booleans
     self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
-    
-    //判断突出人声的人是否退出合唱
-//    if([self getChorusSingerArrayWithSeatArray:self.seatsArray].count >= 1 && ![self.selectUserNo isEqualToString:@""] ){
-//        BOOL flag = [self checkIfCosingerWith:self.selectedVoiceShowIndex];
-//        if (self.selectedVoiceShowIndex >= 0 ){
-//            VLRoomSeatModel *model = seatsArray[self.selectedVoiceShowIndex];
-//            if(!flag && self.selectedVoiceShowIndex != -2 && self.singRole == KTVSingRoleSoloSinger){//表示突出的人退出合唱
-//                [VLToast toast:@"人声突出功能已失效，请重设"];
-//                self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
-//                [self.MVView setPerViewAvatar:@""];
-//            }
-//        }
-//    }
-//
-//    if([self isRoomOwner]){
-//        [self.MVView setPerViewHidden:[self getChorusSingerArrayWithSeatArray:_seatsArray].count < 2];
-//        if(self.selSongsArray.count == 0 || (self.voiceShowHasSeted == true && self.selectedVoiceShowIndex == -2) ){
-//            [self.MVView setPerViewAvatar:@""];
-//        }
-//    }
     
     //如果退出合唱的人的userNo不存在了说明他退出人生突出了
     if((![self.selectUserNo isEqualToString:@""] && self.selectUserNo != nil) && self.selectedVoiceShowIndex != -2){

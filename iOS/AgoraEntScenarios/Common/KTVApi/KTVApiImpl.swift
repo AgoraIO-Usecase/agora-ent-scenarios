@@ -157,6 +157,7 @@ private func agoraPrint(_ message: String) {
         engine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
         engine.setParameters("{\"che.audio.ans.noise_gate\": 20}")
+        engine.setParameters("{\"che.audio.ains_mode\": 0}")
         if apiConfig?.type == .singRelay {
             engine.setParameters("{\"che.audio.aiaec.working_mode\": 1}")
         }
@@ -829,7 +830,7 @@ extension KTVApiImpl {
         apiConfig?.engine?.setParameters("{\"che.audio.aec.enable\":\((enable && isWearingHeadPhones) ? false : true)}")
         apiConfig?.engine?.setParameters("{\"che.audio.agc.enable\":\((enable && isWearingHeadPhones) ? false : true)}")
         apiConfig?.engine?.setParameters("{\"che.audio.ans.enable\":\((enable && isWearingHeadPhones) ? false : true)}")
-        apiConfig?.engine?.setParameters("{\"che.audio.md.enable\": false)}")
+        apiConfig?.engine?.setParameters("{\"che.audio.md.enable\": false}")
     }
 
     private func syncNewLeadSinger(with uid: Int) {
@@ -1235,13 +1236,13 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
            sendStreamMessageWithDict(dict) { _ in
                
            }
-           
-           if apiConfig?.type == .singRelay {
-               getEventHander { delegate in
-                    delegate.onMusicPlayerProgressChanged(with: position_ms)
-               }
-           }
        }
+        
+        if apiConfig?.type == .singRelay {
+            getEventHander { delegate in
+                 delegate.onMusicPlayerProgressChanged(with: position_ms)
+            }
+        }
    }
 
    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo position: Int) {

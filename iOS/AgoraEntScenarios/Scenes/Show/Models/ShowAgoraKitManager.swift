@@ -12,8 +12,18 @@ import YYCategories
 import VideoLoaderAPI
 
 class ShowAgoraKitManager: NSObject {
-    
-    static let shared = ShowAgoraKitManager()
+    private static var _sharedManager: ShowAgoraKitManager?
+    static var shared: ShowAgoraKitManager {
+        get {
+            if let sharedManager = _sharedManager { return sharedManager }
+            let sharedManager = ShowAgoraKitManager()
+            _sharedManager = sharedManager
+            return sharedManager
+        }
+        set {
+            _sharedManager = nil
+        }
+    }
         
     // 是否开启绿幕功能
     static var isOpenGreen: Bool = false
@@ -70,6 +80,7 @@ class ShowAgoraKitManager: NSObject {
     
     func destoryEngine() {
         AgoraRtcEngineKit.destroy()
+        ShowAgoraKitManager._sharedManager = nil
         showLogger.info("deinit-- ShowAgoraKitManager")
     }
     // 退出已加入的频道和子频道
@@ -334,12 +345,15 @@ class ShowAgoraKitManager: NSObject {
         }
     }
     
-    func updateMediaOptions(publishCamera: Bool) {
+    func updateMediaOptions(publishCamera: Bool, channelId: String, canvasView: UIView?) {
         let mediaOptions = AgoraRtcChannelMediaOptions()
         mediaOptions.publishCameraTrack = publishCamera
         mediaOptions.publishMicrophoneTrack = false
-        mediaOptions.clientRoleType = publishCamera ? .broadcaster : .audience
-        engine?.updateChannel(with: mediaOptions)
+        switchRole(role: publishCamera ? .broadcaster : .audience,
+                   channelId: channelId,
+                   options: mediaOptions,
+                   uid: VLUserCenter.user.id,
+                   canvasView: canvasView)
     }
     func updateMediaOptionsEx(channelId: String, publishCamera: Bool, publishMic: Bool = false) {
         let mediaOptions = AgoraRtcChannelMediaOptions()
@@ -374,6 +388,10 @@ class ShowAgoraKitManager: NSObject {
 //        setupContentInspectConfig(false)
         engine.stopPreview()
         engine.setVideoFrameDelegate(nil)
+        engine.enableVirtualBackground(false, backData: nil, segData: nil)
+        engine.setAudioEffectPreset(.off)
+        engine.setVoiceConversionPreset(.off)
+        ShowAgoraKitManager.isOpenGreen = false
     }
     
     func leaveChannelEx(roomId: String, channelId: String) {

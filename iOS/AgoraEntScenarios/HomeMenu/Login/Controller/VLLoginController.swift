@@ -140,6 +140,8 @@ class VLLoginController: VLBaseViewController {
             VLAlert.shared().dismiss()
             if flag == false {
                 exit(0)
+            } else {
+                self.onClickAgressButton()
             }
         }, linkCompletion: { tag in
             VLAlert.shared().dismiss()

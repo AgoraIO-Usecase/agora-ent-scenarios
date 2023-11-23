@@ -57,31 +57,26 @@ class Room3DMicView : ConstraintLayout, IRoomMicBinding {
     override fun binding(micInfo: VoiceMicInfoModel) {
         mBinding.apply {
             if (micInfo.member == null) { // 没人
-                ivMicInnerIcon.isVisible = true
                 ivMicInfo.setImageResource(0)
                 mtMicUsername.text = micInfo.micIndex.toString()
                 mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
                 when (micInfo.micStatus) {
                     MicStatus.ForceMute -> {
-                        ivMicTag.isVisible = false
-                        ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_mute)
+                        ivMicTag.isVisible = true
+                        ivMicTag.setImageResource(R.drawable.voice_ic_mic_mute_tag)
                     }
                     MicStatus.Lock -> {
-                        ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_close)
                         ivMicTag.isVisible = false
                     }
                     MicStatus.LockForceMute -> {
-                        ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_close)
                         ivMicTag.isVisible = true
-                        ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
+                        ivMicTag.setImageResource(R.drawable.voice_ic_mic_mute_tag)
                     }
                     else -> {
                         ivMicTag.isVisible = false
-                        ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_add)
                     }
                 }
             } else { // 有人
-                ivMicInnerIcon.isVisible = false
                 ivMicTag.isVisible = true
                 ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
                 mtMicUsername.text = micInfo.member?.nickName ?: ""
@@ -96,7 +91,7 @@ class Room3DMicView : ConstraintLayout, IRoomMicBinding {
             if (micInfo.micStatus == MicStatus.Mute ||
                 micInfo.micStatus == MicStatus.ForceMute ||
                 micInfo.member?.micStatus == MicStatus.Mute) {
-                ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
+                ivMicTag.setImageResource(R.drawable.voice_ic_mic_mute_tag)
             } else {
                 // 用户音量
                 when (micInfo.audioVolumeType) {

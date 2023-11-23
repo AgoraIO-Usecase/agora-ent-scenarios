@@ -45,7 +45,6 @@ import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
 import io.agora.scene.show.databinding.ShowLivingEndDialogBinding
 import io.agora.scene.show.debugSettings.DebugAudienceSettingDialog
 import io.agora.scene.show.debugSettings.DebugSettingDialog
-import io.agora.scene.show.service.ROOM_AVAILABLE_DURATION
 import io.agora.scene.show.service.RoomException
 import io.agora.scene.show.service.ShowInteractionInfo
 import io.agora.scene.show.service.ShowInteractionStatus
@@ -201,9 +200,9 @@ class LiveDetailFragment : Fragment() {
             initServiceWithJoinRoom()
         } else {
             val roomLeftTime =
-                ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong())
+                ShowServiceProtocol.ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong())
             if (roomLeftTime > 0) {
-                mBinding.root.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
+                mBinding.root.postDelayed(timerRoomEndRun, ShowServiceProtocol.ROOM_AVAILABLE_DURATION)
                 initRtcEngine()
                 initServiceWithJoinRoom()
             }
@@ -318,7 +317,7 @@ class LiveDetailFragment : Fragment() {
 
     private fun initLivingEndLayout() {
         val livingEndLayout = mBinding.livingEndLayout
-        livingEndLayout.root.isVisible = ROOM_AVAILABLE_DURATION < (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong()) && !isRoomOwner && !mRoomInfo.isRobotRoom()
+        livingEndLayout.root.isVisible = ShowServiceProtocol.ROOM_AVAILABLE_DURATION < (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong()) && !isRoomOwner && !mRoomInfo.isRobotRoom()
         livingEndLayout.tvUserName.text = mRoomInfo.ownerName
         Glide.with(this@LiveDetailFragment)
             .load(mRoomInfo.ownerAvatar)
@@ -705,7 +704,7 @@ class LiveDetailFragment : Fragment() {
                 mPKCountDownLatch!!.cancel()
                 mPKCountDownLatch = null
             }
-            mPKCountDownLatch = object : CountDownTimer(120 * 1000 - 1, 1000) {
+            mPKCountDownLatch = object : CountDownTimer(ShowServiceProtocol.PK_AVAILABLE_DURATION - 1, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                     val min: Long = (millisUntilFinished / 1000) / 60
                     val sec: Long = (millisUntilFinished / 1000) % 60
@@ -1661,6 +1660,8 @@ class LiveDetailFragment : Fragment() {
             if (isPKing()) {
                 mRtcEngine.leaveChannelEx(RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()))
             }
+            mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CONVERSION_OFF)
+            mRtcEngine.setAudioEffectPreset(Constants.AUDIO_EFFECT_OFF)
         }
         return true
     }

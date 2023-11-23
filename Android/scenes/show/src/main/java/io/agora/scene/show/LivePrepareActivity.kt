@@ -63,7 +63,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             binding.root.setPaddingRelative(inset.left, 0, inset.right, inset.bottom)
             WindowInsetsCompat.CONSUMED
         }
-        binding.ivRoomCover.setImageResource(getThumbnailIcon(mThumbnailId))
         binding.tvRoomId.text = getString(R.string.show_room_id, mRoomId)
         binding.etRoomName.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -238,14 +237,5 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
     private fun getRandomThumbnailId() =
         Random(TimeUtils.currentTimeMillis()).nextInt(0, 3).toString()
-
-    @DrawableRes
-    private fun getThumbnailIcon(thumbnailId: String) = when (thumbnailId) {
-        "0" -> R.mipmap.show_room_cover_0
-        "1" -> R.mipmap.show_room_cover_1
-        "2" -> R.mipmap.show_room_cover_2
-        "3" -> R.mipmap.show_room_cover_3
-        else -> R.mipmap.show_room_cover_0
-    }
 
 }

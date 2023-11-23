@@ -117,19 +117,19 @@ import Foundation
         
         noSoundCardView.isHidden = true
         
-        let flag = KTVHeadSetUtil.hasSoundCard()
-        self.noSoundCardView.isHidden = flag
-        self.tableView.isHidden = !flag
-
-        KTVHeadSetUtil.addSoundCardObserver {[weak self] flag in
-            self?.noSoundCardView.isHidden = flag
-            self?.tableView.isHidden = !flag
-            if flag == false {
-                self?.soundOpen = false
-                guard let soundCardBlock = self?.soundCardBlock else {return}
-                soundCardBlock(false)
-            }
-        }
+//        let flag = KTVHeadSetUtil.hasSoundCard()
+//        self.noSoundCardView.isHidden = flag
+//        self.tableView.isHidden = !flag
+//
+//        KTVHeadSetUtil.addSoundCardObserver {[weak self] flag in
+//            self?.noSoundCardView.isHidden = flag
+//            self?.tableView.isHidden = !flag
+//            if flag == false {
+//                self?.soundOpen = false
+//                guard let soundCardBlock = self?.soundCardBlock else {return}
+//                soundCardBlock(false)
+//            }
+//        }
     }
     
     required init?(coder: NSCoder) {
@@ -276,7 +276,7 @@ extension VRSoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
             cell.slider.value = Float(1/4.0 * gainValue)
             cell.numLable.text = String(format: "%.1f",gainValue)
             cell.valueBlock = {[weak self] gain in
-                guard let self = self, let gainBlock = gainBlock else {return}
+                guard let self = self, let gainBlock = self.gainBlock else {return}
                 self.gainValue = Float(gain)
                 gainBlock(self.gainValue)
             }
@@ -289,7 +289,7 @@ extension VRSoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
             cell.numLable.text = "\(text)"
             cell.slider.value = Float(1.0/14 * Float(typeValue))
             cell.valueBlock = {[weak self] type in
-                guard let self = self, let  typeBlock = typeBlock else {return}
+                guard let self = self, let typeBlock = self.typeBlock else {return}
                 self.typeValue = type
                 typeBlock(self.typeValue)
             }

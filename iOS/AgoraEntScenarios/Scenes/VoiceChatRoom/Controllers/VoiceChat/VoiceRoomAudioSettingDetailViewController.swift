@@ -343,7 +343,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
                               range: NSRange(location: 0, length: text.length))
             text.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor(hex: 0x3C4267, alpha: 1), range: NSRange(location: 0, length: text.length))
 
-            let interactableText = NSMutableAttributedString(string: "www.agora.io")
+            let interactableText = NSMutableAttributedString(string: "www.shengwang.cn")
             interactableText.addAttribute(NSAttributedString.Key.font,
                                           value: UIFont.systemFont(ofSize: 12, weight: .bold),
                                           range: NSRange(location: 0, length: interactableText.length))
@@ -418,7 +418,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
                     warningView.addSubview(iconView)
 
                     let warningLabel = UILabel(frame: CGRect(x: 30, y: 6, width: screenWidth - 100, height: otherSoundHeaderHeight))
-                    warningLabel.text = "otherSound".voice_localized()
+                    warningLabel.text = "voice_otherSound".voice_localized()
                     warningLabel.numberOfLines = 0
                     warningLabel.lineBreakMode = .byCharWrapping
                     warningLabel.font = UIFont.systemFont(ofSize: 12)

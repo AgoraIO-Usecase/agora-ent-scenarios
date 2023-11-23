@@ -132,8 +132,8 @@
 - (void)setupView {
     self.bgImgView = [[UIImageView alloc]initWithFrame:self.bounds];
     self.bgImgView.image = [UIImage sceneImageWithName:@"bg-lyric"];
-    self.bgImgView.layer.cornerRadius = 10;
-    self.bgImgView.layer.masksToBounds = YES;
+//    self.bgImgView.layer.cornerRadius = 10;
+//    self.bgImgView.layer.masksToBounds = YES;
     [self addSubview:self.bgImgView];
     
     self.contentView = [[UIView alloc] initWithFrame:self.bounds];
@@ -315,7 +315,7 @@
 
 -(void)leaveChorus{
     //离开合唱
-    if([self.delegate respondsToSelector:@selector(didJoinChours)]) {
+    if([self.delegate respondsToSelector:@selector(didLeaveChours)]) {
         [self.delegate didLeaveChours];
     }
 }
@@ -492,17 +492,17 @@
         case VLKTVMVViewActionTypeSingOrigin:
             _trackBtn.selected = YES;
             [_trackBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
-            [self.trackBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_origin"] forState:UIControlStateSelected];
+            [self.trackBtn setImage:[UIImage sceneImageWithName:@"original"] forState:UIControlStateSelected];
             break;
         case VLKTVMVViewActionTypeSingLead:
             _trackBtn.selected = NO;
             [_trackBtn setTitle:KTVLocalizedString(@"导唱") forState:UIControlStateNormal];
-            [self.trackBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_origin"] forState:UIControlStateNormal];
+            [self.trackBtn setImage:[UIImage sceneImageWithName:@"original"] forState:UIControlStateNormal];
             break;
         case VLKTVMVViewActionTypeSingAcc:
             _trackBtn.selected = NO;
             [_trackBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
-            [self.trackBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_acc"] forState:UIControlStateNormal];
+            [self.trackBtn setImage:[UIImage sceneImageWithName:@"acc"] forState:UIControlStateNormal];
             break;
         default:
             break;
@@ -585,8 +585,8 @@
          _pauseBtn = [[VLHotSpotBtn alloc] init];
         [self.pauseBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.pauseBtn.titleLabel.font = UIFontMake(10.0);
-        [self.pauseBtn setTitle:@"暂停" forState:UIControlStateNormal];
-        [self.pauseBtn setTitle:@"播放" forState:UIControlStateSelected];
+        [self.pauseBtn setTitle:@"播放" forState:UIControlStateNormal];
+        [self.pauseBtn setTitle:@"暂停" forState:UIControlStateSelected];
         [_pauseBtn setImage:[UIImage sceneImageWithName:@"ktv_pause_icon"] forState:UIControlStateSelected];
         [_pauseBtn setImage:[UIImage sceneImageWithName:@"ktv_pause_resumeicon"] forState:UIControlStateNormal];
         _pauseBtn.selected = NO;
