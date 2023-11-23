@@ -19,7 +19,6 @@ import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.show.databinding.ShowLiveDetailActivityBinding
-import io.agora.scene.show.service.ROOM_AVAILABLE_DURATION
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.utils.RunnableWithDenied
 import io.agora.scene.show.videoLoaderAPI.AGSlicingType

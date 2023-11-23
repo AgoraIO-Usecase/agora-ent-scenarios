@@ -1379,7 +1379,7 @@ public class RoomLivingViewModel extends ViewModel {
                 if (mSetting == null) return;
                 if (routing == 0 || routing == 2 || routing == 5 || routing == 6) {
                     mSetting.setHasEarPhone(true);
-                    mSoundCardSettingBean.setHasEarPhone(true);
+                    //mSoundCardSettingBean.setHasEarPhone(true);
                 } else {
                     if (songPlayingLiveData.getValue() != null && mSetting.isEar()) {
                         ToastUtils.showToast(R.string.ktv_ear_phone_tip);
@@ -1389,7 +1389,7 @@ public class RoomLivingViewModel extends ViewModel {
                         }
                     }
                     mSetting.setHasEarPhone(false);
-                    mSoundCardSettingBean.setHasEarPhone(false);
+                    //mSoundCardSettingBean.setHasEarPhone(false);
                 }
             }
 
