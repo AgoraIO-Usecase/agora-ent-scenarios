@@ -175,7 +175,7 @@
     _isEarOn = isEarOn;
     if([HeadSetManager hasHeadset] == NO){
         self.earSwitch.on = false;
-        _earSlider.alpha =  0.6;
+        _earSlider.alpha = 0.6;
         _earSlider.userInteractionEnabled = false;
     } else {
         _earSwitch.on = isEarOn;
