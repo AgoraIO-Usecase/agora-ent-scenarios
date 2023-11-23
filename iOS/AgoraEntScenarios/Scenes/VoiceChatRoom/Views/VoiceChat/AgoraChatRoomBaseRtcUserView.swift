@@ -41,7 +41,7 @@ class AgoraChatRoomBaseRtcUserView: UIView {
                 iconView.isHidden = false
 //                micView.isHidden = false
                 setMicState(.forbidden)
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／mute", bundleName: "VoiceChatRoomResource")
+//                bgIconView.image = UIImage.sceneImage(name: "icons／solid／mute", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeForbidden:
                 iconView.isHidden = false
 //                micView.isHidden = false
@@ -137,11 +137,15 @@ class AgoraChatRoomBaseRtcUserView: UIView {
     }
 
     private var bgView: UIView = .init()
-    public var iconView: UIImageView = .init()
-    public var bgIconView: UIImageView = .init()
+    private var iconView: UIImageView = .init()
+    private lazy var bgIconView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .center
+        return imageView
+    }()
 //    private var micView: AgoraMicVolView = .init()
     private var muteMicView: UIImageView = UIImageView()
-    public var nameBtn: UIButton = .init()
+    private var nameBtn: UIButton = .init()
     private var coverView: UIView = .init()
     private var activeButton: UIButton = .init()
     private var targetBtn: UIButton = .init()
@@ -366,4 +370,56 @@ extension AgoraChatRoomBaseRtcUserView {
         waveLayer2.isHidden = true
     }
     
+}
+
+extension AgoraChatRoomBaseRtcUserView {
+    public func refreshUser(with mic: VRRoomMic) {
+        let status = VRRoomMicStatus(rawValue: mic.status) ?? .idle
+        var enableIdleIcon = mic.member == nil ? true : false
+        switch status {
+        case .idle:
+            iconView.isHidden = true
+            setMicState(.on)
+            self.volume = 0
+        case .normal:
+            iconView.isHidden = false
+            if mic.member?.micStatus ?? 0 == 1 {
+                setMicState(.on)
+                bgIconView.isHidden = true
+                nameBtn.setImage(UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"), for: .normal)
+            } else {
+                setMicState(.off)
+                self.volume = 0
+            }
+        case .close:
+            setMicState(.off)
+        case .forbidden:
+            setMicState(.off)
+            bgIconView.isHidden = false
+        case .lock:
+            iconView.isHidden = true
+            bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
+            bgIconView.isHidden = false
+            enableIdleIcon = false
+            setMicState(.on)
+            self.volume = 0
+        case .forbiddenAndLock:
+            iconView.isHidden = true
+            setMicState(.forbidden)
+            bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
+            bgIconView.isHidden = false
+            enableIdleIcon = false
+        }
+        if enableIdleIcon {
+            bgIconView.isHidden = false
+            bgIconView.image = UIImage.sceneImage(name: "voice_wuren", bundleName: "VoiceChatRoomResource")
+        }
+        iconView.isHidden = mic.member == nil
+        if mic.member?.portrait != nil {
+            iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"))
+        }
+        nameBtn.setImage(UIImage.voice_image(mic.mic_index == 0 ? "Landlord" : ""), for: .normal)
+        let text = LanguageManager.localValue(key: "voice_mic_num")
+        nameBtn.setTitle(mic.member?.name ?? "\(mic.mic_index)\(text)", for: .normal)
+    }
 }

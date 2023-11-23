@@ -55,6 +55,15 @@ import KakaJSON
     }
 }
 
+enum VRRoomMicStatus: Int {
+    case idle = -1              //空闲
+    case normal = 0             //正常
+    case close = 1              //闭麦
+    case forbidden = 2          //禁言
+    case lock = 3               //锁麦
+    case forbiddenAndLock = 4   //锁麦和禁言
+}
+
 @objc open class VRRoomMic: NSObject, Convertible {
     var mic_index: Int = 0
 
