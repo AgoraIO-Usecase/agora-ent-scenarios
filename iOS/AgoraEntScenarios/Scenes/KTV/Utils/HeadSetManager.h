@@ -11,9 +11,9 @@
 
 typedef void (^HeadsetStatusCallback)(BOOL inserted);
 
-+ (BOOL)hasHeadset;
+- (BOOL)hasHeadset;
 
-+ (void)addHeadsetObserverWithCallback:(HeadsetStatusCallback)callback;
++ (instancetype)initHeadsetObserverWithCallback:(HeadsetStatusCallback)callback;
 
 @end
 
