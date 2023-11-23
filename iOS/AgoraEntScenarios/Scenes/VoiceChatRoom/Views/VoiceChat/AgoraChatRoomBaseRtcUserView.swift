@@ -127,7 +127,7 @@ class AgoraChatRoomBaseRtcUserView: UIView {
     public var volume: Int = 0 {
         didSet {
 //            micView.setVolume(volume)
-            print(" volume == \(volume)")
+//            print(" volume == \(volume)")
             if(volume > 0) {
                 startAnimation()
             }else{
