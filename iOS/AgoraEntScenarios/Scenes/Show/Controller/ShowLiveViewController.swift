@@ -433,10 +433,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onRoomExpired() {
-        // TODO: 打开这两行会导致 _joinRoom不会再重试 进而导致快速上下滑动真人直播间出现结束页
-        if let roomId = room?.roomId {
-            AppContext.unloadShowServiceImp(roomId)
-        }
+        AppContext.expireShowImp(roomId)
         serviceImp = nil
         finishView?.removeFromSuperview()
         finishView = ShowReceiveFinishView()
