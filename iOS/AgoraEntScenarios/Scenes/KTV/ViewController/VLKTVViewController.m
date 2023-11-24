@@ -2372,25 +2372,31 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)setTrackMode:(KTVPlayerTrackMode)trackMode {
     KTVLogInfo(@"setTrackMode: %ld", trackMode);
     _trackMode = trackMode;
-//    [[self.ktvApi getMediaPlayer] selectAudioTrack:self.trackMode == KTVPlayerTrackModeOrigin ? 0 : 1];
-//
-    [self.MVView setOriginBtnState: trackMode == KTVPlayerTrackModeOrigin ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc];
-    [[self.ktvApi getMusicPlayer] selectMultiAudioTrack:trackMode == KTVPlayerTrackModeAcc ? 1 : 0 publishTrackIndex:trackMode == KTVPlayerTrackModeOrigin ? 0 : 1 ];
     VLKTVMVViewActionType type = VLKTVMVViewActionTypeSingAcc;
-    switch (trackMode) {
-        case KTVPlayerTrackModeOrigin:
-            type = VLKTVMVViewActionTypeSingOrigin;
-            break;
-        case KTVPlayerTrackModeAcc:
-            type = VLKTVMVViewActionTypeSingAcc;
-            break;
-        case KTVPlayerTrackModeLead:
-            type = VLKTVMVViewActionTypeSingLead;
-            break;
-        default:
-            break;
+    if(self.singRole == KTVSingRoleCoSinger){
+        [[self.ktvApi getMusicPlayer] selectAudioTrack:self.trackMode == KTVPlayerTrackModeOrigin ? 0 : 1];
+        type = trackMode == KTVPlayerTrackModeOrigin ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc;
+        [self.MVView setOriginBtnState: type];
+        return;
+    } else if(self.singRole == KTVSingRoleSoloSinger || self.singRole == KTVSingRoleLeadSinger) {
+        [self.MVView setOriginBtnState: trackMode == KTVPlayerTrackModeOrigin ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc];
+        [[self.ktvApi getMusicPlayer] selectMultiAudioTrack:trackMode == KTVPlayerTrackModeAcc ? 1 : 0 publishTrackIndex:trackMode == KTVPlayerTrackModeOrigin ? 0 : 1 ];
+        
+        switch (trackMode) {
+            case KTVPlayerTrackModeOrigin:
+                type = VLKTVMVViewActionTypeSingOrigin;
+                break;
+            case KTVPlayerTrackModeAcc:
+                type = VLKTVMVViewActionTypeSingAcc;
+                break;
+            case KTVPlayerTrackModeLead:
+                type = VLKTVMVViewActionTypeSingLead;
+                break;
+            default:
+                break;
+        }
+        [self.MVView setOriginBtnState: type];
     }
-    [self.MVView setOriginBtnState: type];
 }
 
 - (void)setSingRole:(KTVSingRole)singRole {

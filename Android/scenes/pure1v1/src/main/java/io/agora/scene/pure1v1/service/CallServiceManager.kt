@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import android.view.TextureView
 import io.agora.rtc2.*
-import io.agora.rtm2.RtmClient
+import io.agora.rtm.RtmClient
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
@@ -144,6 +144,7 @@ class CallServiceManager {
             user.userId.toInt(),
             user.toMap(),
             engine,
+            null,
             CallMode.Pure1v1,
             CallRole.CALLER,
             localView,
