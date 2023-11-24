@@ -16,7 +16,7 @@ public class VoiceRoomInviteUsersController: UITableViewController {
 
     private var idx = 0
 
-    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "voice_no_audience_yet", image: nil).backgroundColor(.white)
+    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 84, width: ScreenWidth, height: 360), title: "voice_no_audience_yet", image: nil).backgroundColor(.white)
 
     public convenience init(roomId: String, mic_index: Int?) {
         self.init()
