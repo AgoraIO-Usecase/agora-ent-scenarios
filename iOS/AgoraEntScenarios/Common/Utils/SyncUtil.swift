@@ -173,30 +173,37 @@ class SyncUtilsWrapper {
                                 property: [String: Any]?,
                                 success: SuccessBlockObj? = nil,
                                 fail: FailBlock? = nil) {
-//        if isOwner == false {
-//            SyncUtil.joinScene(id: id, userId: userId, isOwner: isOwner, property: property, success: success, fail:fail)
-//            return
-//        }
-        
         //TODO: syncmanager does not support parallel calls 'create'
         joinSceneQueue.append({
-            SyncUtil.joinScene(id: id, userId: userId, isOwner: isOwner, property: property) { obj in
+            var joinError: SyncError?
+            var joinObj: IObject?
+            
+            //TODO: Merge success and fail, as both methods will fail when joining the scene
+            func processJoin(error: SyncError?, obj: IObject?) {
                 _resetTimer()
-                //TODO: delay success closure to ensure that if there is a fail closure, it can be called(syncmanager workaround)
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.01) {
+                if let err = error {
+                    fail?(err)
+                } else if let obj = joinObj{
                     success?(obj)
-                    if joinSceneQueue.count > 0 {
-                        joinSceneQueue.removeFirst()
-                    }
-                    _dequeueJoinScene()
+                } else {
+                    assert(false)
                 }
-            } fail: { err in
-                _resetTimer()
-                fail?(err)
                 if joinSceneQueue.count > 0 {
                     joinSceneQueue.removeFirst()
                 }
                 _dequeueJoinScene()
+            }
+            
+            SyncUtil.joinScene(id: id, userId: userId, isOwner: isOwner, property: property) { obj in
+                joinObj = obj
+                Throttler.throttle(queue: .main,delay: .seconds(0.01),shouldRunLatest: true) {
+                    processJoin(error: joinError, obj: joinObj)
+                }
+            } fail: { err in
+                joinError = err
+                Throttler.throttle(queue: .main,delay: .seconds(0.01),shouldRunLatest: true) {
+                    processJoin(error: joinError, obj: joinObj)
+                }
             }
         })
         _dequeueJoinScene()
