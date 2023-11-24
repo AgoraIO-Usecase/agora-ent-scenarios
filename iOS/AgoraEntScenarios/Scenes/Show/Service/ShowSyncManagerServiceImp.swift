@@ -176,7 +176,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         guard let room = self.room else { return }
         
         let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
-        let expiredDuration = 20 * 60 * 1000
+        let expiredDuration = (AppContext.shared.sceneConfig?.show ?? 20 * 60) * 1000
 //        agoraPrint("checkRoomExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
         guard currentTs - room.createdAt > expiredDuration else { return }
         
@@ -878,7 +878,10 @@ extension ShowSyncManagerServiceImp {
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
             .get(success: { [weak self] list in
                 agoraPrint("imp user get success...")
-                guard (list.first?.getId().count ?? 0) > 0 else { return }
+                guard (list.first?.getId().count ?? 0) > 0 else {
+                    finished(nil, nil)
+                    return
+                }
                 let users = list.compactMap({ ShowUser.yy_model(withJSON: $0.toJson()!)! })
 //            guard !users.isEmpty else { return }
                 self?.userList = users

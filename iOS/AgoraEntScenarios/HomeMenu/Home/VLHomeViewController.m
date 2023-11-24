@@ -86,6 +86,15 @@
     [[NetworkManager shared] reportDeviceInfoWithSceneName: @""];
     
     [self setUpUI];
+    [self getSceneConfigs];
+}
+
+- (void)getSceneConfigs{
+    [[VLSceneConfigsNetworkModel new] requestWithCompletion:^(NSError * _Nullable error, id _Nullable data) {
+        if([data isKindOfClass:VLSceneConfigsModel.class]) {
+            AppContext.shared.sceneConfig = data;
+        }
+    }];
 }
 
 - (void)setUpUI {

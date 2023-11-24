@@ -112,7 +112,7 @@ extension AboutAgoraEntertainmentViewController: UITableViewDelegate,UITableView
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 1 {
-            return 54
+            return 64
         }
         return 72
     }

@@ -42,8 +42,8 @@ public class ChatRoomServiceImp: NSObject {
         guard let room = self.roomList?.filter({$0.room_id == roomId}).first, let created_at = room.created_at else { return }
         
         let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
-        let expiredDuration = 20 * 60 * 1000
-//        agoraPrint("checkRoomExpire: \(currentTs - Int64(created_at)) / \(expiredDuration)")
+        let expiredDuration = (AppContext.shared.sceneConfig?.chat ?? 20 * 60) * 1000
+        agoraPrint("checkRoomExpire: \(currentTs - Int64(created_at)) / \(expiredDuration)")
         guard currentTs - Int64(created_at) > expiredDuration else { return }
         
         self.roomServiceDelegate?.onRoomExpired()

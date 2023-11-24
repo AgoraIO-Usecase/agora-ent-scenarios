@@ -61,17 +61,17 @@ class ShowCreateLiveView: UIView {
         }
         
         // 房间背景图
-        roomBgImgView = UIImageView()
-        roomBgImgView.contentMode = .scaleAspectFill
-        roomBgImgView.clipsToBounds = true
-        roomBgImgView.layer.cornerRadius = 10
-        roomBgImgView.image = UIImage.show_sceneImage(name: "show_room_bg_\(roomBg)")
-        roomInfoCoverVeiw.addSubview(roomBgImgView)
-        roomBgImgView.snp.makeConstraints { make in
-            make.left.equalTo(10)
-            make.centerY.equalToSuperview()
-            make.width.height.equalTo(60)
-        }
+//        roomBgImgView = UIImageView()
+//        roomBgImgView.contentMode = .scaleAspectFill
+//        roomBgImgView.clipsToBounds = true
+//        roomBgImgView.layer.cornerRadius = 10
+//        roomBgImgView.image = UIImage.show_sceneImage(name: "show_room_bg_\(roomBg)")
+//        roomInfoCoverVeiw.addSubview(roomBgImgView)
+//        roomBgImgView.snp.makeConstraints { make in
+//            make.left.equalTo(10)
+//            make.centerY.equalToSuperview()
+//            make.width.height.equalTo(60)
+//        }
         
         // 名称
         nameTextField = UITextField()
@@ -80,7 +80,7 @@ class ShowCreateLiveView: UIView {
         nameTextField.font = .show_M_15
         nameTextField.textColor = .show_main_text
         nameTextField.snp.makeConstraints { make in
-            make.left.equalTo(roomBgImgView.snp.right).offset(10)
+            make.left.equalTo(10)
             make.top.equalTo(18)
             make.right.equalTo(-50)
         }

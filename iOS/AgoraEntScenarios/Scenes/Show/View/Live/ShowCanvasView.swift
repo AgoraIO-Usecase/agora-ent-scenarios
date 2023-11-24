@@ -149,7 +149,8 @@ class ShowCanvasView: UIView {
                 remoteBgView.cornerRadius(0)
                 timer.scheduledSecondsTimer(withName: "pk", timeInterval: 1, queue: .main) { [weak self] _, duration in
                     guard let self = self else { return }
-                    var timeLeft = 120 - duration
+                    let maxTime: TimeInterval = TimeInterval(AppContext.shared.sceneConfig?.showpk ?? 120)
+                    var timeLeft = maxTime - duration
                     if timeLeft < 0 {
                         self.timer.destoryAllTimer()
                         self.delegate?.onPKDidTimeout()

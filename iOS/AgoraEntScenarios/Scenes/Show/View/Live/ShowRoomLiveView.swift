@@ -47,6 +47,12 @@ class ShowRoomLiveView: UIView {
         return view
     }()
     
+    lazy var thumnbnailCanvasView: ShowThumnbnailCanvasView = {
+        let view = ShowThumnbnailCanvasView(frame: self.bounds)
+        view.isHidden = true
+        return view
+    }()
+    
     private var chatArray = [ShowChatModel]()
     
     private lazy var roomInfoView: ShowRoomInfoView = {
@@ -132,6 +138,11 @@ class ShowRoomLiveView: UIView {
         
         addSubview(canvasView)
         canvasView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        addSubview(thumnbnailCanvasView)
+        thumnbnailCanvasView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
         

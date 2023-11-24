@@ -16,6 +16,7 @@ import Bugly
     @objc var isDebugMode = false
     @objc var imageCahe = [String: AnyObject]()
     @objc var localizedCache = [String: String]()
+    @objc var sceneConfig: VLSceneConfigsModel?
     
     @objc var isAgreeLicense: Bool = false {
         didSet {

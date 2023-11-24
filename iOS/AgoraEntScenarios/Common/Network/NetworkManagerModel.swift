@@ -277,4 +277,3 @@ open class NMReportUserBehaviorNetworkModel: NMCommonNetworkModel {
     
 }
 
-

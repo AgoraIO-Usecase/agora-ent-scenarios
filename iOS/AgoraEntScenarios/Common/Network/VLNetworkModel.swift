@@ -24,6 +24,17 @@ open class VLResponseData: NSObject, Convertible {
 }
 
 @objcMembers
+open class VLSceneConfigsModel: NSObject,Convertible {
+    
+    var chat: Int = 0
+    var ktv: Int = 0
+    var show: Int = 0
+    var showpk: Int = 0
+    
+    override public required init() {}
+}
+
+@objcMembers
 open class VLCommonNetworkModel: AUINetworkModel {
     public var userId: String?
     public override init() {
@@ -180,3 +191,26 @@ open class VLVerifyCodeNetworkModel: VLCommonNetworkModel {
     }
 }
 
+open class VLSceneConfigsNetworkModel: VLCommonNetworkModel {
+    
+    public override init() {
+        super.init()
+//        host = "https://test-toolbox.bj2.agoralab.co"
+        interfaceName = "/v1/configs/scene"
+        method = .get
+    }
+    
+    public override func parse(data: Data?) throws -> Any? {
+        var dic: VLResponseData? = nil
+        do {
+            try dic = super.parse(data: data) as? VLResponseData
+        } catch let err {
+            throw err
+        }
+        guard let dic = dic?.data as? [String: Any] else {
+            throw AUICommonError.networkParseFail.toNSError()
+        }
+        let model = dic.kj.model(VLSceneConfigsModel.self)
+        return model
+    }
+}
