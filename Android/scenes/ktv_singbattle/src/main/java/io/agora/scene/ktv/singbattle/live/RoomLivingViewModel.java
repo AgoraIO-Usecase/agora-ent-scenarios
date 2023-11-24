@@ -1194,6 +1194,7 @@ public class RoomLivingViewModel extends ViewModel {
         mSetting = new MusicSettingBean(false, 100, 50, 0, new MusicSettingDialog.Callback() {
             @Override
             public void onEarChanged(boolean isEar) {
+                if (seatLocalLiveData.getValue() == null) return;
                 int isMuted = seatLocalLiveData.getValue().isAudioMuted();
                 if (isMuted == 1) {
                     isOpnEar = isEar;
