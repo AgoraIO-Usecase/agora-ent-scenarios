@@ -3,6 +3,7 @@ package io.agora.scene.pure1v1.callAPI
 import android.view.TextureView
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngineEx
+import io.agora.rtm.RtmClient
 
 enum class CallRole(val value: Int) {
     // 被叫
@@ -20,21 +21,23 @@ enum class CallMode(val value: Int) {
 open class CallConfig(
     //声网App Id
     var appId: String = "",
-    //用户id
+    //用户id，通过该用户id来发送信令消息
     var userId: Int = 0,
     //[可选]用户扩展字段,用在呼叫上，对端收到calling时可以通过kFromUserExtension字段读到
     var userExtension: Map<String, Any>? = null,
     //rtc engine实例
     var rtcEngine: RtcEngineEx? = null,
+    //[可选]rtm client实例，如果设置则需要负责rtmClient的login和logout，需要使用appId和userId创建
+    var rtmClient: RtmClient? = null,
     // 模式
     var mode: CallMode = CallMode.ShowTo1v1,
-    //角色，纯1v1需要设置成caller
+    //角色，仅在秀场转1v1模式下可用
     var role: CallRole = CallRole.CALLEE,
     //显示本地流的画布
     var localView: TextureView,
     //显示远端流的画布
     var remoteView: TextureView,
-    //是否收到被叫后自动接受，秀场转1v1可用
+    //是否收到被叫后自动接受，秀场转1v1可用，如果设置为true，CallTokenConfig传入的token需要是万能token
     var autoAccept: Boolean = true,
 ){}
 
@@ -83,7 +86,8 @@ enum class CallReason(val value: Int) {
     RemoteCancel(12),           // 远端用户取消呼叫
     RecvRemoteFirstFrame(13),   // 收到远端首帧
     CallingTimeout (14),        // 呼叫超时
-    CancelByCallerRecall(15)    // 同样的主叫呼叫不同频道导致取消
+    CancelByCallerRecall(15),   // 同样的主叫呼叫不同频道导致取消
+    RtmLost(16)                 //rtm超时断连
 }
 
 enum class CallEvent(val value: Int) {
@@ -111,7 +115,8 @@ enum class CallEvent(val value: Int) {
     LocalJoin(111),                 // 本地用户加入RTC频道
     LocalLeave(112),                // 本地用户离开RTC频道
     RecvRemoteFirstFrame(113),      // 收到远端首帧
-    CancelByCallerRecall(114)       // 同样的主叫呼叫不同频道导致取消
+    CancelByCallerRecall(114),      // 同样的主叫呼叫不同频道导致取消
+    RtmLost(115)                    //rtm超时断连
 }
 
 /**
@@ -182,12 +187,11 @@ interface ICallApi {
     /** 释放缓存 */
     fun deinitialize(completion: (() -> Unit))
 
-    /** 更新 rtc/rtm 的token*
+    /** 更新自己的rtc/rtm的token
      */
     fun renewToken(config: CallTokenConfig)
 
-    /** 更新呼叫token
-     *
+    /** 更新呼叫token，纯1v1的被叫更新token时需要更新主叫呼叫的频道token
      * @param roomId
      * @param token
      */
