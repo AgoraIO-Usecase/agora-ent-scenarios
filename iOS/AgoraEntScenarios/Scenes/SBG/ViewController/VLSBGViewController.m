@@ -1281,10 +1281,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)didLrcViewActionChangedWithState:(enum SBGClickAction)state{
     switch (state) {
         case SBGClickActionAac://aac
-            [self.SBGApi.getMusicPlayer selectAudioTrack:1];
+            [self.SBGApi.getMusicPlayer selectMultiAudioTrack:1 publishTrackIndex:1];
             break;
         case SBGClickActionOrigin://原唱
-            [self.SBGApi.getMusicPlayer selectAudioTrack:0];
+            [self.SBGApi.getMusicPlayer selectMultiAudioTrack:0 publishTrackIndex:0];
             break;
         case SBGClickActionSbg://抢唱发起
             [self startSBGGrap];
@@ -2428,7 +2428,8 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
 
         } else if (state == AgoraMediaPlayerStateOpenCompleted) {
             if (isLocal) {
-                [self.SBGApi.getMusicPlayer selectAudioTrack:self.trackMode == KTVPlayerTrackModeOrigin ? 0 : 1 ];
+                int flag = self.trackMode == KTVPlayerTrackModeOrigin ? 0 : 1;
+                [self.SBGApi.getMusicPlayer selectMultiAudioTrack:flag publishTrackIndex:flag];
             }
         } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted || state == AgoraMediaPlayerStatePlayBackCompleted) {
             

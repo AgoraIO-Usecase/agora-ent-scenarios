@@ -53,6 +53,7 @@ import Foundation
         tableView.dataSource = self
         tableView.delegate = self
         tableView.separatorColor = UIColor(hexString: "#F2F2F6")
+        tableView.registerCell(UITableViewCell.self, forCellReuseIdentifier: "effect")
         tableView.registerCell(UITableViewCell.self, forCellReuseIdentifier: "cell")
         tableView.registerCell(SoundCardMicCell.self, forCellReuseIdentifier: "mic")
         tableView.registerCell(SoundCardSwitchCell.self, forCellReuseIdentifier: "switch")
@@ -188,7 +189,7 @@ import Foundation
 
 extension SoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        return 4
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -197,8 +198,8 @@ extension SoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        if indexPath.row == 0 || indexPath.row == 2 {
-            let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        if indexPath.row == 1 {
+            let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "effect", for: indexPath)
             let rightLabel = UILabel()
             rightLabel.font = UIFont.systemFont(ofSize: 12)
             rightLabel.textColor = .gray
@@ -209,31 +210,33 @@ extension SoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
             rightLabel.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor).isActive = true
             
             cell.textLabel?.font = UIFont.systemFont(ofSize: 13)
-            if indexPath.row == 2 {
-                cell.accessoryType = .disclosureIndicator
-                cell.textLabel?.text = "预设音效"
-                rightLabel.text = getEffectDesc(with: self.effectType)
-            } else {
-                cell.textLabel?.text = "麦克风类型"
-                rightLabel.text = "default 外置麦克风"
-            }
+            cell.accessoryType = .disclosureIndicator
+            cell.textLabel?.text = "预设音效"
+            rightLabel.text = getEffectDesc(with: self.effectType)
             cell.selectionStyle = .none
             return cell
-        } else if indexPath.row == 1 {
+        } else if indexPath.row == 0 {
             let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-            cell.textLabel?.text = "开启虚拟声卡"
-            cell.textLabel?.font = UIFont.systemFont(ofSize: 13)
-            let swich = UISwitch()
-            swich.translatesAutoresizingMaskIntoConstraints = false
-            swich.isOn = self.soundOpen
-            swich.addTarget(self, action: #selector(soundChange), for: .valueChanged)
-            cell.contentView.addSubview(swich)
+            // 检查是否已经存在开关控件，如果不存在则创建并添加
+           var switchControl: UISwitch? = cell.contentView.viewWithTag(100) as? UISwitch
+           if switchControl == nil {
+               switchControl = UISwitch()
+               switchControl?.translatesAutoresizingMaskIntoConstraints = false
+               switchControl?.tag = 100
+               switchControl?.addTarget(self, action: #selector(soundChange), for: .valueChanged)
+               cell.contentView.addSubview(switchControl!)
+               
+               switchControl?.trailingAnchor.constraint(equalTo: cell.contentView.trailingAnchor, constant: -20).isActive = true
+               switchControl?.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor).isActive = true
+           }
+           
+           cell.textLabel?.text = "开启虚拟声卡"
+           cell.textLabel?.font = UIFont.systemFont(ofSize: 13)
+           switchControl?.isOn = self.soundOpen
 
-            swich.trailingAnchor.constraint(equalTo: cell.contentView.trailingAnchor, constant: -20).isActive = true
-            swich.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor).isActive = true
-            cell.selectionStyle = .none
-            return cell
-        } else if indexPath.row == 3 {
+           cell.selectionStyle = .none
+           return cell
+        } else if indexPath.row == 2 {
             let cell: SoundCardSwitchCell = tableView.dequeueReusableCell(withIdentifier: "switch", for: indexPath) as! SoundCardSwitchCell
             cell.selectionStyle = .none
             cell.slider.value = Float(1/4.0 * gainValue)
@@ -259,10 +262,10 @@ extension SoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let block = clicKBlock else {return}
-        if indexPath.row == 2 {
+        if indexPath.row == 1 {
             //弹出音效选择
             block(2)
-        } else if indexPath.row == 4 {
+        } else if indexPath.row == 3 {
 //            //弹出麦克风类型
 //            block(4)
         }
