@@ -433,8 +433,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onRoomExpired() {
-        AppContext.expireShowImp(roomId)
-        serviceImp = nil
         finishView?.removeFromSuperview()
         finishView = ShowReceiveFinishView()
         finishView?.headImg = room?.ownerAvatar ?? ""

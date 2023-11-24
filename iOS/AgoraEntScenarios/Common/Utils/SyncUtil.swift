@@ -173,27 +173,37 @@ class SyncUtilsWrapper {
                                 property: [String: Any]?,
                                 success: SuccessBlockObj? = nil,
                                 fail: FailBlock? = nil) {
-//        if isOwner == false {
-//            SyncUtil.joinScene(id: id, userId: userId, isOwner: isOwner, property: property, success: success, fail:fail)
-//            return
-//        }
-        
         //TODO: syncmanager does not support parallel calls 'create'
         joinSceneQueue.append({
+            var joinError: SyncError?
+            var joinObj: IObject?
+            
+            //TODO: Merge success and fail, as both methods will fail when joining the scene
+            func processJoin(error: SyncError?, obj: IObject?) {
+                _resetTimer()
+                if let err = error {
+                    fail?(err)
+                } else if let obj = joinObj{
+                    success?(obj)
+                } else {
+                    assert(false)
+                }
+                if joinSceneQueue.count > 0 {
+                    joinSceneQueue.removeFirst()
+                }
+                _dequeueJoinScene()
+            }
+            
             SyncUtil.joinScene(id: id, userId: userId, isOwner: isOwner, property: property) { obj in
-                _resetTimer()
-                success?(obj)
-                if joinSceneQueue.count > 0 {
-                    joinSceneQueue.removeFirst()
+                joinObj = obj
+                Throttler.throttle(queue: .main,delay: .seconds(0.01),shouldRunLatest: true) {
+                    processJoin(error: joinError, obj: joinObj)
                 }
-                _dequeueJoinScene()
             } fail: { err in
-                _resetTimer()
-                fail?(err)
-                if joinSceneQueue.count > 0 {
-                    joinSceneQueue.removeFirst()
+                joinError = err
+                Throttler.throttle(queue: .main,delay: .seconds(0.01),shouldRunLatest: true) {
+                    processJoin(error: joinError, obj: joinObj)
                 }
-                _dequeueJoinScene()
             }
         })
         _dequeueJoinScene()
