@@ -15,7 +15,10 @@ final class ContactInfoCell: UITableViewCell {
     }()
     
     lazy var detail: UITextView = {
-        UITextView(frame: CGRect(x: 20, y: self.title.frame.maxY+5, width: ScreenWidth-64, height: 25)).isEditable(false)
+        let textView =  UITextView(frame: CGRect(x: 20, y: self.title.frame.maxY+5, width: ScreenWidth-64, height: 25)).isEditable(false)
+        textView.isScrollEnabled = false
+        textView.showsVerticalScrollIndicator = false
+        return textView
     }()
     
     lazy var separaLine: UIView = {
@@ -45,12 +48,22 @@ final class ContactInfoCell: UITableViewCell {
     func refreshInfo(info: Dictionary<String,String>) {
         self.title.text = info["title"]
         guard let link = info["detail"] else { return }
-        var url = URL(string: "https://www.shengwang.cn")!
-        if link.z.hasNumbers {
-            url = URL(string: "tel:\(link)")!
+        var url: URL?
+        if let first = link.first {
+            if first.isNumber {
+                url = URL(string: "tel:\(link)")!
+            }else if link.hasPrefix("http://") || link.hasPrefix("https://"){
+                url = URL(string: link)!
+            }
         }
-        self.detail.attributedText = NSAttributedString {
-            Link(link, url: url).font(.systemFont(ofSize: 13, weight: .medium)).foregroundColor(Color(0x009FFF))
+        if let url = url {
+            self.detail.attributedText = NSAttributedString {
+                Link(link, url: url).font(.systemFont(ofSize: 13, weight: .medium)).foregroundColor(Color(0x009FFF))
+            }
+        }else {
+            self.detail.attributedText = NSAttributedString{
+                AttributedText(link).font(.systemFont(ofSize: 13, weight: .medium)).foregroundColor(Color(0x009FFF))
+            }
         }
     }
 
