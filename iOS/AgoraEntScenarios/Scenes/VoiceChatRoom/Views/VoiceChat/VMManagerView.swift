@@ -21,7 +21,11 @@ class VMManagerView: UIView {
 
     private var lineImgView: UIImageView = .init()
     private var bgView: UIView = .init()
-    private var addView: UIImageView = .init()
+    private lazy var addView: UIImageView = {
+        let view = UIImageView()
+        view.contentMode = .center
+        return view
+    }()
     private var iconView: UIImageView = .init()
     private var nameLabel: UILabel = .init()
     private var roleBtn: UIButton = .init()
