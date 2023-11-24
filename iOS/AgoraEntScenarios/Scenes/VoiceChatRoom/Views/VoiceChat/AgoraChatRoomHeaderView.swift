@@ -261,12 +261,12 @@ class AgoraChatRoomHeaderView: UIView {
         rankSBtn.snp.makeConstraints { make in
             make.centerY.equalTo(self.backBtn)
             make.width.height.equalTo(26)
-            make.right.equalTo(-84)
+            make.trailing.equalTo(-84)
         }
         rankTBtn.snp.makeConstraints { make in
             make.centerY.equalTo(self.backBtn)
             make.width.height.equalTo(26)
-            make.right.equalTo(-64)
+            make.trailing.equalTo(-64)
         }
     }
 
