@@ -49,7 +49,7 @@ class AgoraChatRoomBaseRtcUserView: UIView {
             case .AgoraChatRoomBaseUserCellTypeLock:
                 iconView.isHidden = true
 //                micView.isHidden = true
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
+                bgIconView.image = UIImage.sceneImage(name: "voice_ic_seat_lock", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeNormalUser:
                 iconView.isHidden = false
 //                micView.isHidden = false
@@ -59,7 +59,7 @@ class AgoraChatRoomBaseRtcUserView: UIView {
                 iconView.isHidden = true
 //                micView.isHidden = false
                 setMicState(.forbidden)
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
+                bgIconView.image = UIImage.sceneImage(name: "voice_ic_seat_lock", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeAlienNonActive:
                 iconView.isHidden = false
 //                micView.isHidden = false
@@ -398,7 +398,7 @@ extension AgoraChatRoomBaseRtcUserView {
             bgIconView.isHidden = false
         case .lock:
             iconView.isHidden = true
-            bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
+            bgIconView.image = UIImage.sceneImage(name: "voice_ic_seat_lock", bundleName: "VoiceChatRoomResource")
             bgIconView.isHidden = false
             enableIdleIcon = false
             setMicState(.on)
@@ -406,7 +406,7 @@ extension AgoraChatRoomBaseRtcUserView {
         case .forbiddenAndLock:
             iconView.isHidden = true
             setMicState(.forbidden)
-            bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
+            bgIconView.image = UIImage.sceneImage(name: "voice_ic_seat_lock", bundleName: "VoiceChatRoomResource")
             bgIconView.isHidden = false
             enableIdleIcon = false
         }
