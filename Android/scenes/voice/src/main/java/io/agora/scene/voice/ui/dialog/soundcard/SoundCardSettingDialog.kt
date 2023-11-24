@@ -34,12 +34,7 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
         const val TAG: String = "SoundCardFragment"
     }
 
-    private val mReceiver = HeadphoneReceiver()
-
     private lateinit var mManager: AgoraSoundCardManager
-
-    // 有无有线耳机
-    private var isPlugIn = false
 
     var onSoundCardStateChange: (() -> Unit)? = null
 
@@ -49,21 +44,12 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
         return VoiceDialogSoundCardBinding.inflate(inflater)
     }
 
-    override fun onDestroyView() {
-        context?.unregisterReceiver(mReceiver)
-        super.onDestroyView()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         mManager = AgoraRtcEngineController.get().soundCardManager() ?: run {
             dismiss()
             return
         }
         super.onViewCreated(view, savedInstanceState)
-        val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        isPlugIn = audioManager.isWiredHeadsetOn
-        val filter = IntentFilter(Intent.ACTION_HEADSET_PLUG)
-        context?.registerReceiver(mReceiver, filter)
         setupView()
     }
 
@@ -72,26 +58,19 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
         spannableString.setSpan(StyleSpan(Typeface.BOLD), 0, 9, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         binding?.tvSoundCardSupport?.text = spannableString
         binding?.apply {
-            if (true) {
-                groupSoundCardSettings.visibility = View.VISIBLE
-                if (mManager.isEnable()) {
-                    setupPresetSoundView(mManager.presetSound())
-                    setupGainView(mManager.gainValue())
-                    setupPresetView(mManager.presetValue())
-                    vPramsMark.visibility = View.INVISIBLE
-                    clSoundCardParams.alpha = 1f
-                } else {
-                    vPramsMark.visibility = View.VISIBLE
-                    clSoundCardParams.alpha = 0.4f
-                }
-                groupSoundCardAbnormal.isVisible = false
-                mcbSoundCardSwitch.isChecked = mManager.isEnable()
+            groupSoundCardSettings.visibility = View.VISIBLE
+            if (mManager.isEnable()) {
+                setupPresetSoundView(mManager.presetSound())
+                setupGainView(mManager.gainValue())
+                setupPresetView(mManager.presetValue())
+                vPramsMark.visibility = View.INVISIBLE
+                clSoundCardParams.alpha = 1f
             } else {
-                groupSoundCardSettings.visibility = View.INVISIBLE
-                clSoundCardParams.visibility = if (mManager.isEnable()) View.VISIBLE else View.INVISIBLE
-                groupSoundCardAbnormal.visibility = View.VISIBLE
-                mcbSoundCardSwitch.isChecked = false
+                vPramsMark.visibility = View.VISIBLE
+                clSoundCardParams.alpha = 0.4f
             }
+            groupSoundCardAbnormal.isVisible = false
+            mcbSoundCardSwitch.isChecked = mManager.isEnable()
             ivBackIcon.setOnClickListener {
                 dismiss()
             }
@@ -165,13 +144,6 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
                     }, 300)
                 }
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                tvInputDevice.text = audioManager.microphones.getOrNull(0)?.description.toString()
-            } else {
-                val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                tvInputDevice.text = audioManager.getDevices(AudioManager.GET_DEVICES_INPUTS).getOrNull(0)?.productName.toString()
-            }
         }
     }
 
@@ -193,42 +165,5 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
     private fun setupPresetSoundView(presetSound: AgoraPresetSound) {
         val text = "${getString(presetSound.titleStringID)}（${getString(presetSound.infoStringID)}）"
         binding?.tvSoundTypeSelect?.text = text
-    }
-
-    private fun setHeadPhonePlugin(isPlug: Boolean) {
-        isPlugIn = isPlug
-        binding?.let { binding ->
-            if (true) {
-                // 插入有线耳机
-                binding.groupSoundCardSettings.visibility = View.VISIBLE
-                binding.groupSoundCardAbnormal.visibility = View.INVISIBLE
-                binding.mcbSoundCardSwitch.isChecked = mManager.isEnable()
-            } else {
-                // 未插入有线耳机
-                binding.groupSoundCardSettings.visibility = View.INVISIBLE
-                binding.groupSoundCardAbnormal.visibility = View.VISIBLE
-                binding.mcbSoundCardSwitch.isChecked = false
-                mManager.enable(false, force = true, callback = {
-                })
-            }
-        }
-    }
-
-    private inner class HeadphoneReceiver : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action != Intent.ACTION_HEADSET_PLUG) return
-            val state = intent.getIntExtra("state", -1)
-            if (state == 1) {
-                setHeadPhonePlugin(true)
-                onSoundCardStateChange?.invoke()
-                //耳机插入
-                Log.d("HeadphoneReceiver", "headphone plugged in")
-            } else if (state == 0) {
-                setHeadPhonePlugin(false)
-                onSoundCardStateChange?.invoke()
-                //耳机拔出
-                Log.d("HeadphoneReceiver", "headphone removed")
-            }
-        }
     }
 }
