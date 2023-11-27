@@ -18,7 +18,6 @@
 @property (nonatomic, strong) VLHotSpotBtn *dianGeBtn;
 @property (nonatomic, strong) VLHotSpotBtn *choosedBtn;
 @property (nonatomic, strong) UILabel      *choosedCountLabel;
-@property (nonatomic, strong) UILabel      *sourceLabel;
 @property (nonatomic, strong) VLSBGSelectedSongList *selsectSongView;
 @property (nonatomic, strong) VLSBGSongList *choosedSongView;
 
@@ -50,7 +49,6 @@
     [self addSubview:self.dianGeBtn];
     [self addSubview:self.choosedBtn];
     [self addSubview:self.choosedCountLabel];
-    [self addSubview:self.sourceLabel];
     [self addSubview:self.selsectSongView];
     [self addSubview:self.choosedSongView];
     [self addSubview:self.songNumView];
@@ -85,7 +83,7 @@
 
 -(void)startSbg{
     if(self.selSongsArray.count < 4){
-        [VLToast toast:@"至少需要4首歌才能开始游戏"];
+        [VLToast toast:SBGLocalizedString(@"sbg_atleast_4")];
         return;
     }
     //开始抢唱
@@ -103,11 +101,8 @@
 
     self.selsectSongView.selSongsArray = selSongsArray;
     self.choosedSongView.selSongsArray = selSongsArray;
-    self.songNumLabel.text = [NSString stringWithFormat:@"已点%lu/8", (unsigned long)selSongsArray.count];
+    self.songNumLabel.text = [NSString stringWithFormat:@"%@%lu/8",SBGLocalizedString(@"sbg_room_chosen_song_list"),  (unsigned long)selSongsArray.count];
     self.songNumBtn.selected = selSongsArray.count < 4;
-  //  self.songNumBtn.enabled = selSongsArray.count >= 4;
-//    [self.choosedSongView setSelSongsUIWithArray:selSongsArray];
-//    [self.selsectSongView setSelSongArrayWith: selSongsArray];
 
     self.choosedCountLabel.text = [NSString stringWithFormat:@"%d",(int)selSongsArray.count];
 }
@@ -115,7 +110,7 @@
 - (VLHotSpotBtn *)dianGeBtn {
     if (!_dianGeBtn) {
         _dianGeBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(30, 20, 34, 22)];
-        [_dianGeBtn setTitle:SBGLocalizedString(@"点歌") forState:UIControlStateNormal];
+        [_dianGeBtn setTitle:SBGLocalizedString(@"sbg_room_choose_song") forState:UIControlStateNormal];
         _dianGeBtn.titleLabel.font = UIFontBoldMake(16);
         [_dianGeBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
         _dianGeBtn.tag = 0;
@@ -128,7 +123,7 @@
 - (VLHotSpotBtn *)choosedBtn {
     if (!_choosedBtn) {
         _choosedBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(_dianGeBtn.right+28, 20, 34, 22)];
-        [_choosedBtn setTitle:SBGLocalizedString(@"已点") forState:UIControlStateNormal];
+        [_choosedBtn setTitle:SBGLocalizedString(@"sbg_room_chosen_song_list") forState:UIControlStateNormal];
         _choosedBtn.titleLabel.font = UIFontMake(14);
         [_choosedBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
         _choosedBtn.tag = 1;
@@ -151,18 +146,6 @@
     return _choosedCountLabel;
 }
 
-- (UILabel *)sourceLabel {
-    if (!_sourceLabel) {
-        _sourceLabel = [[UILabel alloc]initWithFrame:CGRectMake(self.width-25-90, _dianGeBtn.centerY-7, 90, 14)];
-        _sourceLabel.textColor = UIColorMakeWithHex(@"#979CBB");
-        _sourceLabel.font = UIFontMake(10);
-        _sourceLabel.text = SBGLocalizedString(@"歌曲来自咪咕音乐");
-        _sourceLabel.textAlignment = NSTextAlignmentRight;
-        _sourceLabel.hidden = YES;
-    }
-    return _sourceLabel;
-}
-
 - (UIView *)songNumView {
     if (!_songNumView) {
         _songNumView = [[UIView alloc]initWithFrame:CGRectMake(0, self.height - 80, self.width, 80)];
@@ -179,7 +162,7 @@
         _songNumLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 33, 90, 14)];
         _songNumLabel.textColor = [UIColor whiteColor];
         _songNumLabel.font = UIFontMake(16);
-        _songNumLabel.text = @"已点0/8";
+        _songNumLabel.text = SBGLocalizedString(@"sbg_room_chosen_song_list_0");
         _songNumLabel.textAlignment = NSTextAlignmentLeft;
     }
     return _songNumLabel;
@@ -207,7 +190,6 @@
 
 - (VLSBGSongList *)choosedSongView {
     if (!_choosedSongView) {
-      //  _choosedSongView = [[VLSBGSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20 - 100) withDelegate:self ];
         _choosedSongView = [[VLSBGSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, SCREEN_HEIGHT * 0.7 - 200) withDelegate:self ];
         _choosedSongView.hidden = YES;
     }

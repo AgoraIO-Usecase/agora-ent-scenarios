@@ -36,7 +36,7 @@
     self.requestImgView = requestImgView;
     
     UILabel *tipsLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-300)*0.5, requestImgView.bottom+20, 300, 20)];
-    tipsLabel.text = SBGLocalizedString(@"点击空麦位上麦后加入游戏");
+    tipsLabel.text = SBGLocalizedString(@"sbg_empty_seat");
     tipsLabel.textAlignment = NSTextAlignmentCenter;
     tipsLabel.textColor = UIColorMakeWithHex(@"#C6C4DE");
     tipsLabel.font = UIFontMake(14);

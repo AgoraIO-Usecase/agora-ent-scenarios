@@ -631,7 +631,6 @@
 		E301C0212AF8E8E90089A79C /* VLSBGKindsCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BFB82AF8E8E90089A79C /* VLSBGKindsCell.m */; };
 		E301C0222AF8E8E90089A79C /* VLSBGKindsView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BFB92AF8E8E90089A79C /* VLSBGKindsView.m */; };
 		E301C0232AF8E8E90089A79C /* VLSBGRemoteVolumeView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BFBA2AF8E8E90089A79C /* VLSBGRemoteVolumeView.m */; };
-		E301C0242AF8E8E90089A79C /* VLSBGMVIdleView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BFBC2AF8E8E90089A79C /* VLSBGMVIdleView.m */; };
 		E301C0252AF8E8E90089A79C /* VLSBGTopView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BFBE2AF8E8E90089A79C /* VLSBGTopView.m */; };
 		E301C0262AF8E8E90089A79C /* VLSBGLyricView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BFC02AF8E8E90089A79C /* VLSBGLyricView.swift */; };
 		E301C0272AF8E8E90089A79C /* VLSBGBadNetWorkView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BFC12AF8E8E90089A79C /* VLSBGBadNetWorkView.m */; };
@@ -643,13 +642,10 @@
 		E301C02D2AF8E8E90089A79C /* VLSBGSearchEmptyView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BFCF2AF8E8E90089A79C /* VLSBGSearchEmptyView.m */; };
 		E301C02E2AF8E8E90089A79C /* VLSBGSongList.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BFD12AF8E8E90089A79C /* VLSBGSongList.m */; };
 		E301C02F2AF8E8E90089A79C /* VLSBGListEmptyView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BFD22AF8E8E90089A79C /* VLSBGListEmptyView.m */; };
-		E301C0302AF8E8E90089A79C /* VLSBGEffectView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BFD32AF8E8E90089A79C /* VLSBGEffectView.m */; };
 		E301C0312AF8E8E90089A79C /* SBGScoreTitleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BFD62AF8E8E90089A79C /* SBGScoreTitleCell.swift */; };
 		E301C0322AF8E8E90089A79C /* VLSBGMicSeatList.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BFD92AF8E8E90089A79C /* VLSBGMicSeatList.m */; };
 		E301C0332AF8E8E90089A79C /* VLSBGBottomToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BFDC2AF8E8E90089A79C /* VLSBGBottomToolbar.m */; };
-		E301C0342AF8E8E90089A79C /* VLSBGSoundEffectView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BFDF2AF8E8E90089A79C /* VLSBGSoundEffectView.m */; };
 		E301C0352AF8E8E90089A79C /* VLSBGAudioEffectPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BFE02AF8E8E90089A79C /* VLSBGAudioEffectPicker.m */; };
-		E301C0362AF8E8E90089A79C /* VLSBGVoiceShowView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BFE22AF8E8E90089A79C /* VLSBGVoiceShowView.m */; };
 		E301C0372AF8E8E90089A79C /* SBGLrcNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BFE32AF8E8E90089A79C /* SBGLrcNameView.swift */; };
 		E301C0382AF8E8E90089A79C /* VLSBGAudienceIndicator.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BFE42AF8E8E90089A79C /* VLSBGAudienceIndicator.m */; };
 		E301C0392AF8E8E90089A79C /* VLSBGHomeOnLineListView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BFE72AF8E8E90089A79C /* VLSBGHomeOnLineListView.m */; };
@@ -1588,14 +1584,12 @@
 		E301BFB92AF8E8E90089A79C /* VLSBGKindsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGKindsView.m; sourceTree = "<group>"; };
 		E301BFBA2AF8E8E90089A79C /* VLSBGRemoteVolumeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGRemoteVolumeView.m; sourceTree = "<group>"; };
 		E301BFBB2AF8E8E90089A79C /* VLSBGTonesView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGTonesView.h; sourceTree = "<group>"; };
-		E301BFBC2AF8E8E90089A79C /* VLSBGMVIdleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGMVIdleView.m; sourceTree = "<group>"; };
 		E301BFBD2AF8E8E90089A79C /* VLSBGBottomToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGBottomToolbar.h; sourceTree = "<group>"; };
 		E301BFBE2AF8E8E90089A79C /* VLSBGTopView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGTopView.m; sourceTree = "<group>"; };
 		E301BFBF2AF8E8E90089A79C /* VLSBGMicSeatList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGMicSeatList.h; sourceTree = "<group>"; };
 		E301BFC02AF8E8E90089A79C /* VLSBGLyricView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VLSBGLyricView.swift; sourceTree = "<group>"; };
 		E301BFC12AF8E8E90089A79C /* VLSBGBadNetWorkView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGBadNetWorkView.m; sourceTree = "<group>"; };
 		E301BFC22AF8E8E90089A79C /* VLSBGVoicePerShowView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGVoicePerShowView.m; sourceTree = "<group>"; };
-		E301BFC32AF8E8E90089A79C /* VLSBGSoundEffectView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGSoundEffectView.h; sourceTree = "<group>"; };
 		E301BFC42AF8E8E90089A79C /* VLSBGAudioEffectPicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGAudioEffectPicker.h; sourceTree = "<group>"; };
 		E301BFC62AF8E8E90089A79C /* VLSBGSelectSongTableItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGSelectSongTableItemView.h; sourceTree = "<group>"; };
 		E301BFC72AF8E8E90089A79C /* VLSBGSearchEmptyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGSearchEmptyView.h; sourceTree = "<group>"; };
@@ -1610,21 +1604,15 @@
 		E301BFD02AF8E8E90089A79C /* VLSBGSelectedSongList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGSelectedSongList.h; sourceTree = "<group>"; };
 		E301BFD12AF8E8E90089A79C /* VLSBGSongList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGSongList.m; sourceTree = "<group>"; };
 		E301BFD22AF8E8E90089A79C /* VLSBGListEmptyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGListEmptyView.m; sourceTree = "<group>"; };
-		E301BFD32AF8E8E90089A79C /* VLSBGEffectView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGEffectView.m; sourceTree = "<group>"; };
 		E301BFD42AF8E8E90089A79C /* VLSBGAudienceIndicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGAudienceIndicator.h; sourceTree = "<group>"; };
-		E301BFD52AF8E8E90089A79C /* VLSBGVoiceShowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGVoiceShowView.h; sourceTree = "<group>"; };
 		E301BFD62AF8E8E90089A79C /* SBGScoreTitleCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBGScoreTitleCell.swift; sourceTree = "<group>"; };
-		E301BFD72AF8E8E90089A79C /* VLSBGMVIdleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGMVIdleView.h; sourceTree = "<group>"; };
 		E301BFD92AF8E8E90089A79C /* VLSBGMicSeatList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGMicSeatList.m; sourceTree = "<group>"; };
 		E301BFDA2AF8E8E90089A79C /* VLSBGBadNetWorkView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGBadNetWorkView.h; sourceTree = "<group>"; };
 		E301BFDB2AF8E8E90089A79C /* VLSBGTopView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGTopView.h; sourceTree = "<group>"; };
 		E301BFDC2AF8E8E90089A79C /* VLSBGBottomToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGBottomToolbar.m; sourceTree = "<group>"; };
-		E301BFDD2AF8E8E90089A79C /* VLSBGEffectView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGEffectView.h; sourceTree = "<group>"; };
 		E301BFDE2AF8E8E90089A79C /* VLSBGListEmptyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGListEmptyView.h; sourceTree = "<group>"; };
-		E301BFDF2AF8E8E90089A79C /* VLSBGSoundEffectView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGSoundEffectView.m; sourceTree = "<group>"; };
 		E301BFE02AF8E8E90089A79C /* VLSBGAudioEffectPicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGAudioEffectPicker.m; sourceTree = "<group>"; };
 		E301BFE12AF8E8E90089A79C /* VLSBGVoicePerShowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGVoicePerShowView.h; sourceTree = "<group>"; };
-		E301BFE22AF8E8E90089A79C /* VLSBGVoiceShowView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGVoiceShowView.m; sourceTree = "<group>"; };
 		E301BFE32AF8E8E90089A79C /* SBGLrcNameView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBGLrcNameView.swift; sourceTree = "<group>"; };
 		E301BFE42AF8E8E90089A79C /* VLSBGAudienceIndicator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGAudienceIndicator.m; sourceTree = "<group>"; };
 		E301BFE52AF8E8E90089A79C /* VLSBGCreateRoomView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGCreateRoomView.h; sourceTree = "<group>"; };
@@ -3996,32 +3984,24 @@
 				E301BF9C2AF8E8E90089A79C /* SBGScoreCell.swift */,
 				E301BF9E2AF8E8E90089A79C /* SBGModal */,
 				E301BFAB2AF8E8E90089A79C /* SBGSettingView */,
-				E301BFBC2AF8E8E90089A79C /* VLSBGMVIdleView.m */,
 				E301BFBD2AF8E8E90089A79C /* VLSBGBottomToolbar.h */,
 				E301BFBE2AF8E8E90089A79C /* VLSBGTopView.m */,
 				E301BFBF2AF8E8E90089A79C /* VLSBGMicSeatList.h */,
 				E301BFC02AF8E8E90089A79C /* VLSBGLyricView.swift */,
 				E301BFC12AF8E8E90089A79C /* VLSBGBadNetWorkView.m */,
 				E301BFC22AF8E8E90089A79C /* VLSBGVoicePerShowView.m */,
-				E301BFC32AF8E8E90089A79C /* VLSBGSoundEffectView.h */,
 				E301BFC42AF8E8E90089A79C /* VLSBGAudioEffectPicker.h */,
 				E301BFC52AF8E8E90089A79C /* SBGSongGallery */,
 				E301BFD22AF8E8E90089A79C /* VLSBGListEmptyView.m */,
-				E301BFD32AF8E8E90089A79C /* VLSBGEffectView.m */,
 				E301BFD42AF8E8E90089A79C /* VLSBGAudienceIndicator.h */,
-				E301BFD52AF8E8E90089A79C /* VLSBGVoiceShowView.h */,
 				E301BFD62AF8E8E90089A79C /* SBGScoreTitleCell.swift */,
-				E301BFD72AF8E8E90089A79C /* VLSBGMVIdleView.h */,
 				E301BFD92AF8E8E90089A79C /* VLSBGMicSeatList.m */,
 				E301BFDA2AF8E8E90089A79C /* VLSBGBadNetWorkView.h */,
 				E301BFDB2AF8E8E90089A79C /* VLSBGTopView.h */,
 				E301BFDC2AF8E8E90089A79C /* VLSBGBottomToolbar.m */,
-				E301BFDD2AF8E8E90089A79C /* VLSBGEffectView.h */,
 				E301BFDE2AF8E8E90089A79C /* VLSBGListEmptyView.h */,
-				E301BFDF2AF8E8E90089A79C /* VLSBGSoundEffectView.m */,
 				E301BFE02AF8E8E90089A79C /* VLSBGAudioEffectPicker.m */,
 				E301BFE12AF8E8E90089A79C /* VLSBGVoicePerShowView.h */,
-				E301BFE22AF8E8E90089A79C /* VLSBGVoiceShowView.m */,
 				E301BFE32AF8E8E90089A79C /* SBGLrcNameView.swift */,
 				E301BFE42AF8E8E90089A79C /* VLSBGAudienceIndicator.m */,
 			);
@@ -4655,7 +4635,6 @@
 				E301BE9A2AF4E0700089A79C /* SRDebugManager.m in Sources */,
 				E34B460A2AEA8A3B0082D334 /* VoiceRoomViewController+SoundCard.swift in Sources */,
 				E301BD8D2AF4CB000089A79C /* VLKTVMVView.m in Sources */,
-				E301C0302AF8E8E90089A79C /* VLSBGEffectView.m in Sources */,
 				DD36106129B70CDC00CE7984 /* ShowMusicPresenter.swift in Sources */,
 				DD36109429B70CDC00CE7984 /* ShowSettingActionSheetVC.swift in Sources */,
 				E34B45F72AE92E910082D334 /* SRRoomHomeListCell.swift in Sources */,
@@ -4664,7 +4643,6 @@
 				DD619A7129E3E247008F63E4 /* SACrossZoomAnimation.swift in Sources */,
 				DD9EBFFF2AD5512400B4551F /* HorizontalCardsView.swift in Sources */,
 				DD3610B329B70CDC00CE7984 /* ShowRoomInfoView.swift in Sources */,
-				E301C0362AF8E8E90089A79C /* VLSBGVoiceShowView.m in Sources */,
 				DD36109A29B70CDC00CE7984 /* ShowPresentTransitioningDelegate.swift in Sources */,
 				DD9EBFBE2AD5512300B4551F /* VRNormalRoomsViewController.swift in Sources */,
 				E716851F2AE22C3600C2915C /* VLDiscoverySessionView.swift in Sources */,
@@ -4720,7 +4698,6 @@
 				E301C03B2AF8E8E90089A79C /* SBGSyncManagerServiceImp.swift in Sources */,
 				DD619A9B29E3E247008F63E4 /* SAAudioSettingDetailViewController.swift in Sources */,
 				E301BD5B2AF4CAFF0089A79C /* VLAddRoomModel.m in Sources */,
-				E301C0242AF8E8E90089A79C /* VLSBGMVIdleView.m in Sources */,
 				E301C0072AF8E8E90089A79C /* VLSBGSongItmModel.m in Sources */,
 				DD3610C829B70CDC00CE7984 /* ShowServiceModel.swift in Sources */,
 				DD619A9029E3E247008F63E4 /* AppContext+SpatialAudio.swift in Sources */,
@@ -4997,7 +4974,6 @@
 				DD619ADB29E3E247008F63E4 /* SAChatBar.swift in Sources */,
 				DDA19A0028FFE579009D3E61 /* NSString+Emoji.m in Sources */,
 				E301C0142AF8E8E90089A79C /* SBGScoreCell.swift in Sources */,
-				E301C0342AF8E8E90089A79C /* VLSBGSoundEffectView.m in Sources */,
 				A851C5DE2AEF5F8400071F88 /* ShowDebugAgoraKitManager.swift in Sources */,
 				E301BD9D2AF4CB000089A79C /* KTVServiceProtocol.swift in Sources */,
 				DDA199EB28FFE579009D3E61 /* VLRequestRoute.m in Sources */,

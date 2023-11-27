@@ -26,7 +26,7 @@ class SBGAttributeView: UIView {
         addSubview(contentView)
         
         preLabel = UILabel(frame: .zero)
-        preLabel.text = "本轮由 "
+        preLabel.text = getLocalizeString(with: "sbg_this_time")
         preLabel.textColor = .white
         contentView.addSubview(preLabel)
         
@@ -34,7 +34,7 @@ class SBGAttributeView: UIView {
         contentView.addSubview(icon)
         
         endLabel = UILabel(frame: .zero)
-        endLabel.text = " 抢到麦"
+        endLabel.text = getLocalizeString(with: "sbg_get_mic")
         endLabel.textColor = .white
         contentView.addSubview(endLabel)
     }
@@ -45,7 +45,7 @@ class SBGAttributeView: UIView {
             return
         }
         icon.image = image
-        endLabel.text = " \(owner) 抢到麦"
+        endLabel.text = " \(owner)\(getLocalizeString(with: "sbg_get_mic"))"
         let endWidth = textAutoWidth(text: endLabel.text ?? "", height: 25, fontSize: 18)
         let preWidth = textAutoWidth(text: preLabel.text ?? "", height: 25, fontSize: 18)
         let totalWidth = endWidth + preWidth + 25
@@ -60,6 +60,10 @@ class SBGAttributeView: UIView {
         let lead = NSStringDrawingOptions.usesFontLeading
         let rect = text.boundingRect(with:CGSize(width:0, height: height), options: [origin,lead], attributes: [NSAttributedString.Key.font:UIFont.systemFont(ofSize: fontSize)], context:nil)
         return rect.width
+    }
+    
+    private func getLocalizeString(with key: String) -> String {
+        return Bundle.localizedString(key, bundleName: "sbgResource")
     }
 }
 
