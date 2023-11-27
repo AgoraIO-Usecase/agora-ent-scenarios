@@ -43,7 +43,7 @@
     [self addSubview:backBtn];
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = SBGLocalizedString(@"美声");
+    titleLabel.text = SBGLocalizedString(@"sbg_beauty_voice");
     titleLabel.font = VLUIFontMake(16);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -123,11 +123,11 @@
 - (NSArray *)itemsArray {
     if (!_itemsArray) {
         _itemsArray = @[
-        @{@"imageName":@"ktv_belcanto_defaultNo",@"titleStr":@"默认无",@"ifSelect":@(false)},
-        @{@"imageName":@"ktv_belcanto_bigRoomMale",@"titleStr":SBGLocalizedString(@"大房间(男)"), @"ifSelect":@(false)},
-        @{@"imageName":@"ktv_belcanto_smallRoomMale",@"titleStr":SBGLocalizedString(@"小房间(男)"), @"ifSelect":@(false)},
-        @{@"imageName":@"ktv_belcanto_bigRoomFemale",@"titleStr":SBGLocalizedString(@"大房间(女)"), @"ifSelect":@(false)},
-        @{@"imageName":@"ktv_belcanto_smallRoomFemale",@"titleStr":SBGLocalizedString(@"小房间(女)"), @"ifSelect":@(false)}];
+        @{@"imageName":@"ktv_belcanto_defaultNo",@"titleStr":SBGLocalizedString(@"sbg_def_nothing"),@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_belcanto_bigRoomMale",@"titleStr":SBGLocalizedString(@"sbg_room_big_man"), @"ifSelect":@(false)},
+        @{@"imageName":@"ktv_belcanto_smallRoomMale",@"titleStr":SBGLocalizedString(@"sbg_room_small_man"), @"ifSelect":@(false)},
+        @{@"imageName":@"ktv_belcanto_bigRoomFemale",@"titleStr":SBGLocalizedString(@"sbg_room_big_woman"), @"ifSelect":@(false)},
+        @{@"imageName":@"ktv_belcanto_smallRoomFemale",@"titleStr":SBGLocalizedString(@"sbg_room_small_woman"), @"ifSelect":@(false)}];
     }
     return _itemsArray;
 }

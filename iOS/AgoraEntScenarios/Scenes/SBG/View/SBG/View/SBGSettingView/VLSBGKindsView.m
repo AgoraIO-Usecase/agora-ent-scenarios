@@ -112,14 +112,14 @@
 
 + (NSArray<VLSBGKindsModel *> *)kinds {
     NSArray *titlesArray = @[
-        SBGLocalizedString(@"原唱"),
-        SBGLocalizedString(@"RS"),
-        SBGLocalizedString(@"演唱会"),
-        SBGLocalizedString(@"录音棚"),
-        SBGLocalizedString(@"留声机"),
-        SBGLocalizedString(@"空旷"),
-        SBGLocalizedString(@"空灵"),
-        SBGLocalizedString(@"流行"),
+        SBGLocalizedString(@"sbg_ori_sing"),
+        SBGLocalizedString(@"KTV"),
+        SBGLocalizedString(@"sbg_room_concert"),
+        SBGLocalizedString(@"sbg_room_recording studio"),
+        SBGLocalizedString(@"sbg_room_gramophone"),
+        SBGLocalizedString(@"sbg_room_spacious"),
+        SBGLocalizedString(@"sbg_room_ethereal"),
+        SBGLocalizedString(@"sbg_room_pop"),
         SBGLocalizedString(@"R&B")];
     NSArray *imagesArray = @[@"ktv_console_setting1",
                              @"ktv_console_setting2",
