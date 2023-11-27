@@ -316,6 +316,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         mCallApi.removeListener(callApiListener)
         mShowTo1v1Manger.destroy()
         mRtcVideoLoaderApi.cleanCache()
+        VideoLoader.release()
     }
 
 
