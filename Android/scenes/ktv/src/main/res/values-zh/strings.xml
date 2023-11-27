@@ -28,6 +28,7 @@
     <string name="ktv_room_sing1">演唱中</string>
     <string name="ktv_room_sing1_1">合唱中</string>
     <string name="ktv_room_original">原唱</string>
+    <string name="ktv_room_daochang">导唱</string>
     <string name="ktv_room_change_song">切歌</string>
     <string name="ktv_room_seat_off">下麦</string>
     <string name="ktv_room_player_pause">暂停</string>
