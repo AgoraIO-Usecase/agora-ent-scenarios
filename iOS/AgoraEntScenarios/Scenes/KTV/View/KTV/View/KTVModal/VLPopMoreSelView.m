@@ -43,15 +43,10 @@
   //  CGFloat middleMargin = (SCREEN_WIDTH-itemWH*3-2*leftMargin)/2.0;
     CGFloat middleMargin = (SCREEN_WIDTH-itemWH*2-2*leftMargin);
     CGFloat itemY = titleLabel.bottom + 26;
-    
-   // NSArray *itemsArray = @[@"ktv_more_belcantoIcon",@"ktv_more_soundIcon",@"ktv_more_mvIcon"];
-  //  NSArray *itemsArray = @[@"ktv_more_soundIcon",@"ktv_more_mvIcon"];
+
     NSArray *itemsArray = @[@"ktv_more_soundIcon",@"ktv_more_mvIcon"];
     NSArray *titlesArray = @[
-       // KTVLocalizedString(@"美声"),
-//        KTVLocalizedString(@"ktv_voice_effect"),
-        KTVLocalizedString(@"配置"),
-       // KTVLocalizedString(@"MV")
+        KTVLocalizedString(@"ktv_per_setting"),
     ];
     
     UIView *itemBgView = [[UIView alloc]initWithFrame:CGRectMake((self.bounds.size.width - itemWH)/2.0, itemY, itemWH, itemWH)];

@@ -38,12 +38,12 @@ class SoundCardEffectCell: UITableViewCell {
         backImgView.layer.masksToBounds = true
         
         titleLabel = UILabel()
-        titleLabel.text = "性感欧巴"
+        titleLabel.text = Bundle.localizedString("ktv_sex_kr", bundleName: "KtvResource")
         titleLabel.font = UIFont.systemFont(ofSize: 13)
         backImgView.addSubview(titleLabel)
         
         detailLabel = UILabel()
-        detailLabel.text = "悦耳 | 磁性"
+        detailLabel.text = Bundle.localizedString("ktv_sec_kr_desc", bundleName: "KtvResource")
         detailLabel.font = UIFont.systemFont(ofSize: 13)
         detailLabel.textColor = .lightGray
         backImgView.addSubview(detailLabel)

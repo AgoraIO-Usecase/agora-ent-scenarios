@@ -35,7 +35,7 @@ class SoundCardMicTypeView: UIView {
         self.addSubview(headIconView)
         
         headTitleLabel = UILabel()
-        headTitleLabel.text = "麦克风类型"
+        headTitleLabel.text = Bundle.localizedString("ktv_mic_type", bundleName: "KtvResource")
         headTitleLabel.textAlignment = .center
         headTitleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         self.addSubview(headTitleLabel)
@@ -92,7 +92,7 @@ extension SoundCardMicTypeView: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! SoundCardMicTypeCell
         let text = indexPath.row > 0 ? "\(indexPath.row)" : ""
-        cell.titleLabel.text = "麦克风类型\(text)"
+        cell.titleLabel.text =  Bundle.localizedString("ktv_mic_type", bundleName: "KtvResource") + "\(text)"
         cell.setIsSelected(self.micType == indexPath.row)
         return cell
     }

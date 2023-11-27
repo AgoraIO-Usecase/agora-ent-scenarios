@@ -8,6 +8,7 @@
 #import "KTVDebugViewController.h"
 #import "KTVDebugInfo.h"
 #import "KTVDebugManager.h"
+#import "AESMacro.h"
 @import AgoraRtcKit;
 
 @interface KTVDebugViewController () <UITableViewDelegate, UITableViewDataSource>
@@ -32,17 +33,17 @@
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBtn];
     
     UIButton* cleanDumpBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [cleanDumpBtn setTitle:@"清除dump" forState:UIControlStateNormal];
+    [cleanDumpBtn setTitle:KTVLocalizedString(@"ktv_clear_dump") forState:UIControlStateNormal];
     [cleanDumpBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     [cleanDumpBtn addTarget:self action:@selector(onClickClearDump) forControlEvents:(UIControlEventTouchUpInside)];
     
     UIButton* cleanBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [cleanBtn setTitle:@"清除log" forState:UIControlStateNormal];
+    [cleanBtn setTitle:KTVLocalizedString(@"ktv_clear_log") forState:UIControlStateNormal];
     [cleanBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     [cleanBtn addTarget:self action:@selector(onClickClearLog) forControlEvents:(UIControlEventTouchUpInside)];
     
     UIButton* exportBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [exportBtn setTitle:@"导出log" forState:UIControlStateNormal];
+    [exportBtn setTitle:KTVLocalizedString(@"ktv_export_log") forState:UIControlStateNormal];
     [exportBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     [exportBtn addTarget:self action:@selector(onClickExport) forControlEvents:(UIControlEventTouchUpInside)];
     self.navigationItem.rightBarButtonItems = @[

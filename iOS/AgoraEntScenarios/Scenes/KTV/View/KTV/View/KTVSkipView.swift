@@ -60,7 +60,7 @@ class KTVSkipView: UIView {
     }
         
     func setSkipType(_ type: SkipType) {
-        let title = type == .prelude ? "跳过前奏" : "跳过尾奏"
+        let title = type == .prelude ? Bundle.localizedString("ktv_skip_pre", bundleName: "KtvResource") : Bundle.localizedString("ktv_skip_end", bundleName: "KtvResource")
         skipBtn.setTitle(title, for: .normal)
     }
     

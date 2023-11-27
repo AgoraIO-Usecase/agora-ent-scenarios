@@ -46,14 +46,14 @@
 
 -(void)layoutUI {
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = KTVLocalizedString(@"配置");
+    titleLabel.text = KTVLocalizedString(@"ktv_per_setting");
     titleLabel.font = UIFontMake(18);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:titleLabel];
     
     UILabel *headLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 60, 80, 30)];
-    headLabel.text = @"专业模式";
+    headLabel.text = KTVLocalizedString(@"ktv_per_style");
     headLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:headLabel];
     
@@ -68,7 +68,7 @@
     [self addSubview:sepView3];
     
     UILabel *volLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 123, 150, 30)];
-    volLabel.text = @"音质";
+    volLabel.text = KTVLocalizedString(@"ktv_per_vol_quality");
     volLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:volLabel];
     
@@ -79,7 +79,7 @@
     [self addSubview:sepView];
     
     UILabel *qualityLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 186, 150, 30)];
-    qualityLabel.text = @"降低背景噪音";
+    qualityLabel.text = KTVLocalizedString(@"ktv_per_ans");
     qualityLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:qualityLabel];
     _qualityLabel = qualityLabel;
@@ -91,7 +91,7 @@
     [self addSubview:sepView5];
     
     UILabel *AECLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 249, 150, 30)];
-    AECLabel.text = @"AIAEC开关";
+    AECLabel.text = KTVLocalizedString(@"ktv_aiaec_switch");
     AECLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:AECLabel];
     
@@ -106,7 +106,7 @@
     [self addSubview:sepView6];
     
     UILabel *AECGradeLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 312, 150, 30)];
-    AECGradeLabel.text = @"AIAEC强度选择";
+    AECGradeLabel.text = KTVLocalizedString(@"ktv_aiaec_level");
     AECGradeLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:AECGradeLabel];
     
@@ -116,7 +116,7 @@
     [self addSubview:_aecTF];
     
     UIButton *aecSetBtn = [[UIButton alloc]initWithFrame:CGRectMake(300, 312, 80, 30)];
-    [aecSetBtn setTitle:@"设置" forState:UIControlStateNormal];
+    [aecSetBtn setTitle: KTVLocalizedString(@"ktv_perSetting") forState:UIControlStateNormal];
     [aecSetBtn addTarget:self action:@selector(aecSet) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:aecSetBtn];
     
@@ -125,7 +125,7 @@
     [self addSubview:sepView2];
     
     UILabel *delayLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 375, 100, 30)];
-    delayLabel.text = @"低延时模式";
+    delayLabel.text = KTVLocalizedString(@"ktv_low_delay_mode");
     delayLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:delayLabel];
     
@@ -178,7 +178,7 @@
 //初始化Segmented控件
 - (void)initSegmentedControl
 {
-    NSArray *segmentedData = [[NSArray alloc]initWithObjects:@"关闭",@"中",@"高",nil];
+    NSArray *segmentedData = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"ktv_close_aec"),KTVLocalizedString(@"ktv_aec_mid"),KTVLocalizedString(@"ktv_aec_high"),nil];
     self.qualitySegment = [[UISegmentedControl alloc]initWithItems:segmentedData];
     self.qualitySegment.frame = CGRectMake(SCREEN_WIDTH - 209, 184, 189, 34);
     //这个是设置按下按钮时的颜色
@@ -199,8 +199,7 @@
 //初始化音质Segmented控件
 - (void)initVolSegmentedControl
 {
-   // NSArray *segmentedData = [[NSArray alloc]initWithObjects:@"标准音质",@"高音质",@"超高音质",nil];
-    NSArray *segmentedData = [[NSArray alloc]initWithObjects:@"标准音质",@"高音质",nil];
+    NSArray *segmentedData = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"ktv_normal_vol"),KTVLocalizedString(@"ktv_high_vol"),nil];
     self.volSegment = [[UISegmentedControl alloc]initWithItems:segmentedData];
     self.volSegment.frame = CGRectMake(SCREEN_WIDTH - 309, 121, 289, 34);
     //这个是设置按下按钮时的颜色

@@ -14,8 +14,8 @@ class SoundCardEffectView: UIView {
     var botView: UIView!
     var cancleView: UIButton!
     var sepView: UIView!
-    let voiceArray: [String] = ["大叔音", "妈音", "青叔音", "御妈音", "青年音", "少御音"]
-    let descArray: [String] = ["高混响|KTV", "高混响|KTV", "明亮|磁性", "明亮|磁性", "低沉|温暖",  "醇厚|饱满"]
+    var voiceArray: [String] = []
+    var descArray: [String] = []
     let imgArray: [String] = ["ktv-1", "ktv-2", "ktv-3", "ktv-4", "ktv-5", "ktv-6"]
     @objc var effectType: Int = 0
     @objc var clickBlock: ((Int)->Void)?
@@ -31,6 +31,10 @@ class SoundCardEffectView: UIView {
     private func layoutUI() {
         self.backgroundColor = .white
         
+        voiceArray = [getString(with: "ktv_voice_type1"), getString(with: "ktv_voice_type2"), getString(with: "ktv_voice_type3"), getString(with: "ktv_voice_type4"), getString(with: "ktv_voice_type5"), getString(with: "ktv_voice_type6")]
+        
+        descArray = [getString(with: "ktv_voice_desc1"), getString(with: "ktv_voice_desc2"), getString(with: "ktv_voice_desc3"), getString(with: "ktv_voice_desc4"), getString(with: "ktv_voice_desc5"), getString(with: "ktv_voice_desc6")]
+        
         headIconView = UIView()
         headIconView.backgroundColor = UIColor(red: 212/255.0, green: 207/255.0, blue: 229/255.0, alpha: 1)
         headIconView.layer.cornerRadius = 2
@@ -38,7 +42,7 @@ class SoundCardEffectView: UIView {
         self.addSubview(headIconView)
         
         headTitleLabel = UILabel()
-        headTitleLabel.text = "预设音效"
+        headTitleLabel.text = getString(with: "ktv_pre_effect")
         headTitleLabel.textAlignment = .center
         headTitleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         self.addSubview(headTitleLabel)
@@ -79,6 +83,10 @@ class SoundCardEffectView: UIView {
     @objc private func cancel() {
         guard let block = clickBlock else {return}
         block(-1)
+    }
+    
+    private func getString(with key: String)->String {
+        return Bundle.localizedString(key, bundleName: "KtvResource")
     }
 }
 

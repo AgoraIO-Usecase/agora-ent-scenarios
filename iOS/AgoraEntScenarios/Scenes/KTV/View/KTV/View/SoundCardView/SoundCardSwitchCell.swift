@@ -24,12 +24,12 @@ class SoundCardSwitchCell: UITableViewCell {
     
     private func layoutUI() {
         titleLabel = UILabel()
-        titleLabel.text = "增益调节"
+        titleLabel.text = Bundle.localizedString("ktv_vol_gain", bundleName: "KtvResource")
         titleLabel.font = UIFont.systemFont(ofSize: 13)
         self.contentView.addSubview(titleLabel)
         
         detailLabel = UILabel()
-        detailLabel.text = "调节声音信号的增益倍数"
+        detailLabel.text = Bundle.localizedString("ktv_vol_gain_level", bundleName: "KtvResource")
         detailLabel.font = UIFont.systemFont(ofSize: 12)
         detailLabel.textColor = .lightGray
         self.contentView.addSubview(detailLabel)

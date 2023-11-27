@@ -54,7 +54,7 @@
 
 - (void)setOn:(BOOL)on {
     _on = on;
-    self.subLabel.text = _on ? @"开启" : @"关闭";
+    self.subLabel.text = _on ? KTVLocalizedString(@"ktv_soundcard_open") : KTVLocalizedString(@"ktv_close_aec");
 }
 
 - (UILabel *)subLabel {
