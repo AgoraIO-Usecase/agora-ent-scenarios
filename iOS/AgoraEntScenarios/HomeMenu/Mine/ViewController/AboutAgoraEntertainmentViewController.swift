@@ -24,14 +24,14 @@ import AgoraRtcKit
                                ["title": NSLocalizedString("app_about_show", comment: ""), "detail":"ZB-3.2.0"],
                                ["title": NSLocalizedString("app_about_1v1", comment: ""), "detail":"SMF-3.6.0"],
                                ["title": NSLocalizedString("app_about_live_to_1v1", comment: ""), "detail":"XCSMF-3.7.0"]],
-                  "sectionName": NSLocalizedString("app_mine_current_version", comment: "")]]
+                  "sectionName": NSLocalizedString("app_about_scene_version", comment: "")]]
     
     let tableHeader = AboutAgoraHeader(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 220),
                                        name: NSLocalizedString("app_about_name", comment: ""),
                                        versionText: NSLocalizedString("app_about_version", comment: "")+": "+"20230928-"+UIDevice.current.appVersion+"-\(AgoraRtcEngineKit.getSdkVersion())")
     
     lazy var infoList: UITableView = {
-        UITableView(frame: .zero, style: .plain)
+        UITableView(frame: .zero, style: .grouped)
             .registerCell(ContactInfoCell.self, forCellReuseIdentifier: "ContactInfoCell")
             .registerCell(UITableViewCell.self, forCellReuseIdentifier: "SceneVersionCell")
             .delegate(self)
@@ -40,6 +40,9 @@ import AgoraRtcKit
             .tableHeaderView(tableHeader)
             .backgroundColor(.white)
             .separatorStyle(.none)
+            .estimatedSectionFooterHeight(0)
+            .estimatedSectionHeaderHeight(0)
+            .estimatedRowHeight(0)
     }()
     
     lazy var debugModeButton: UIButton = {
@@ -108,6 +111,9 @@ extension AboutAgoraEntertainmentViewController: UITableViewDelegate,UITableView
             return 44
         }
         return 0
+    }
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        0.1
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
