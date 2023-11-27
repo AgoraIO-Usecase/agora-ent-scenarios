@@ -97,7 +97,7 @@ class SAMuteView: UIView {
         addSubview(bgView)
 
         addView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)
-        addView.image = UIImage.sceneImage(name: "voice_wuren")
+        addView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
         addSubview(addView)
 
         iconView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)

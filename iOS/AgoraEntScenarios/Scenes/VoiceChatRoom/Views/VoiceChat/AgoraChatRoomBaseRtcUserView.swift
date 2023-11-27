@@ -35,42 +35,32 @@ class AgoraChatRoomBaseRtcUserView: UIView {
             switch cellType {
             case .AgoraChatRoomBaseUserCellTypeAdd:
                 iconView.isHidden = true
-//                micView.isHidden = true
                 bgIconView.image = UIImage.sceneImage(name: "voice_wuren", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeMute:
                 iconView.isHidden = false
-//                micView.isHidden = false
                 setMicState(.forbidden)
-//                bgIconView.image = UIImage.sceneImage(name: "icons／solid／mute", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeForbidden:
                 iconView.isHidden = false
-//                micView.isHidden = false
                 setMicState(.forbidden)
             case .AgoraChatRoomBaseUserCellTypeLock:
                 iconView.isHidden = true
-//                micView.isHidden = true
                 bgIconView.image = UIImage.sceneImage(name: "voice_ic_seat_lock", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeNormalUser:
                 iconView.isHidden = false
-//                micView.isHidden = false
                 setMicState(.on)
-                nameBtn.setImage(UIImage.sceneImage(name: ""), for: .normal)
+                nameBtn.setImage(nil, for: .normal)
             case .AgoraChatRoomBaseUserCellTypeMuteAndLock:
                 iconView.isHidden = true
-//                micView.isHidden = false
                 setMicState(.forbidden)
                 bgIconView.image = UIImage.sceneImage(name: "voice_ic_seat_lock", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeAlienNonActive:
                 iconView.isHidden = false
-//                micView.isHidden = false
                 setMicState(.on)
-//                micView.isHidden = true
                 nameBtn.setImage(UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), for: .normal)
                 coverView.isHidden = false
                 activeButton.isHidden = false
             case .AgoraChatRoomBaseUserCellTypeAlienActive:
                 iconView.isHidden = false
-//                micView.isHidden = true
                 nameBtn.setImage(UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), for: .normal)
                 coverView.isHidden = true
                 activeButton.isHidden = true
@@ -93,11 +83,8 @@ class AgoraChatRoomBaseRtcUserView: UIView {
     public var showMicView: Bool = false {
         didSet {
             if showMicView {
-//                micView.isHidden = false
                 setMicState(.on)
-//                micView.setVolume(100)
             } else {
-//                micView.isHidden = true
             }
         }
     }
@@ -172,7 +159,6 @@ class AgoraChatRoomBaseRtcUserView: UIView {
 
     fileprivate func layoutUI() {
         bgView.layer.cornerRadius = 30
-//        bgView.layer.masksToBounds = true
         bgView.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.3)
         addSubview(bgView)
         
