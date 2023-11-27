@@ -13,9 +13,7 @@
 #import "VLSBGAudioEffectPicker.h"
 #import "VLSBGBadNetWorkView.h"
 #import "VLSBGPopSongList.h"
-#import "VLSBGEffectView.h"
 #import "VLSBGSettingView.h"
-#import "VLSBGVoiceShowView.h"
 #import "VLSBGVoicePerShowView.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -51,11 +49,6 @@ NS_ASSUME_NONNULL_BEGIN
                                       withRoomNo:(NSString*)roomNo
                                     withDelegate:(id<VLSBGPopSongListDelegate>)delegate;
 
-//弹出音效
-+ (LSTPopView*)popSBGSetSoundEffectViewWithParentView:(UIView*)parentView
-                                         soundView:(VLSBGEffectView*)soundView
-                                      withDelegate:(id<VLSBGEffectViewDelegate>)delegate;
-
 //网络差视图
 + (LSTPopView*)popSBGBadNetWrokTipViewWithParentView:(UIView*)parentView
                                      withDelegate:(id<VLSBGBadNetWorkViewDelegate>)delegate;
@@ -65,11 +58,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (LSTPopView*)popSBGSettingViewWithParentView:(UIView*)parentView
                                settingView:(VLSBGSettingView*)settingView
                                withDelegate:(id<VLSBGSettingViewDelegate>)delegate;
-
-+ (LSTPopView*)popSBGVoiceShowViewWithParentView:(UIView*)parentView
-                                         showView:(VLSBGVoiceShowView*)showView
-                                   dataSource:(NSArray *)array
-                                      withDelegate:(id<VLSBGVoiceShowViewDelegate>)delegate;
 
 
 //弹出专业主播

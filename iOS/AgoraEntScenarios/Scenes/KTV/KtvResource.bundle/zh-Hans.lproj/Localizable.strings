@@ -220,7 +220,7 @@
 "ktv_ear_setting" = "耳返设置";
 "ktv_ear_vol" = "耳返音量";
 "ktv_ear_warning" = "开启耳返可实时听到自己的声音，唱歌的时候及时调整";
-"ktv_ear_warning2" = " 因为延时和体验问题，在耳返里听到的声音都是没有音效的(包括虚拟声卡,场景塑造,(KTV, 演唱会))";
+"ktv_ear_warning2" = " 因为延时和体验问题，在耳返里听到的声音是没有音效的（包括虚拟声卡、场景塑造（KTV、演唱会））";
 "ktv_ear_without_headset" = "使用耳返必须插入耳机，当前未检测到耳机";
 
 "ktv_create_room_title1" = "和你一起看月亮";

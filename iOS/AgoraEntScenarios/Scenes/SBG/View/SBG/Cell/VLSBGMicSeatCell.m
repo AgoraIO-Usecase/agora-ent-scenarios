@@ -71,7 +71,7 @@
     
     self.singingBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.singingBtn setImage:[UIImage sceneImageWithName:@"ktv_seatsinging_icon"] forState:UIControlStateNormal];
-    [self.singingBtn setTitle:SBGLocalizedString(@"主唱") forState:UIControlStateNormal];
+    [self.singingBtn setTitle:SBGLocalizedString(@"sbg_zc") forState:UIControlStateNormal];
     self.singingBtn.frame = CGRectMake((self.width-36)*0.5, self.nickNameLabel.bottom+2, 36, 12);
     self.singingBtn.layer.cornerRadius = 6;
     self.singingBtn.layer.masksToBounds = YES;
