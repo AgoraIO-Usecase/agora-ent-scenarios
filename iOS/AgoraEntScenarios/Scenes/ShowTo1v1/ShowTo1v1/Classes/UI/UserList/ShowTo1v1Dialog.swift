@@ -376,6 +376,7 @@ class CallerDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
     private lazy var avatarView: UIImageView = {
         let view = UIImageView()
         view.clipsToBounds = true
+        view.contentMode = .scaleAspectFill
         return view
     }()
     
