@@ -117,7 +117,7 @@ extension SARoomsViewController {
                 self?.createPwd = pwd
                 self?.createName = name
                 Throttler.throttle(queue:.main,delay: 1,shouldRunLatest: true) {
-                    self?.goLive()
+                    self?.entryRoom()
                 }
             }
         }
@@ -232,12 +232,5 @@ extension SARoomsViewController {
                                 SVProgressHUD.showError(withStatus: "spatial_voice_create_failed".spatial_localized())
                             }
                         }
-    }
-
-    private func goLive() {
-        if ((self.createName?.isEmpty) != nil) {
-            view.makeToast("spatial_voice_no_room_name".spatial_localized(), point: view.center, title: nil, image: nil, completion: nil)
-        }
-        entryRoom()
     }
 }
