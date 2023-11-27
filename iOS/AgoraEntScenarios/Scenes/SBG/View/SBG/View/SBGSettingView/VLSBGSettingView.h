@@ -30,7 +30,6 @@ typedef enum : NSUInteger {
 
 - (void)setIsEarOn:(BOOL)isEarOn;
 - (void)setAccValue:(float)accValue;
--(void)setIspause:(BOOL)isPause;
 @end
 
 @interface VLSBGSettingModel : NSObject

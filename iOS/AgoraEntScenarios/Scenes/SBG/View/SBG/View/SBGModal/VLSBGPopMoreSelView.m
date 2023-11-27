@@ -30,7 +30,7 @@
 - (void)setupView {
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = SBGLocalizedString(@"更多操作");
+    titleLabel.text = SBGLocalizedString(@"sbg_more_actions");
     titleLabel.font = VLUIFontMake(16);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -45,10 +45,9 @@
     CGFloat itemY = titleLabel.bottom + 26;
     
     NSArray *itemsArray = @[@"ktv_more_belcantoIcon",@"ktv_more_soundIcon",@"ktv_more_mvIcon"];
-   // NSArray *itemsArray = @[@"ktv_more_soundIcon",@"ktv_more_mvIcon"];
     NSArray *titlesArray = @[
-        SBGLocalizedString(@"音效"),
-        SBGLocalizedString(@"配置"),
+        SBGLocalizedString(@"sbg_voice_effect"),
+        SBGLocalizedString(@"sbg_per_setting"),
         SBGLocalizedString(@"MV")];
     for (int i=0; i<itemsArray.count; i++) {
         UIView *itemBgView = [[UIView alloc]initWithFrame:CGRectMake(leftMargin+(itemWH+middleMargin)*i, itemY, itemWH, itemWH)];

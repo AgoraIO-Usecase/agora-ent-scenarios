@@ -27,7 +27,6 @@ VLSBGRemoteVolumeViewDelegate
 @property (nonatomic, strong) VLSBGSliderView *soundSlider;
 @property (nonatomic, strong) VLSBGSliderView *accSlider;
 @property (nonatomic, strong) VLSBGKindsView *kindsView;
-@property (nonatomic, strong) VLSBGRemoteVolumeView* remoteVolumeView;
 @property (nonatomic, strong, readonly) VLSBGSettingModel *setting;
 
 @end
@@ -61,11 +60,8 @@ VLSBGRemoteVolumeViewDelegate
 - (void)initSubViews {
     [self addSubview:self.titleLabel];
     [self addSubview:self.soundSwitcher];
-//    [self addSubview:self.tonesView];
     [self addSubview:self.soundSlider];
     [self addSubview:self.accSlider];
-    [self addSubview:self.remoteVolumeView];
-//    [self addSubview:self.kindsView];
 }
 
 - (void)addSubViewConstraints {
@@ -79,12 +75,6 @@ VLSBGRemoteVolumeViewDelegate
         make.top.mas_equalTo(self.titleLabel.mas_bottom).offset(16);
     }];
     
-//    [self.tonesView mas_makeConstraints:^(MASConstraintMaker *make) {
-//        make.left.right.mas_equalTo(self);
-//        make.top.mas_equalTo(self.soundSwitcher.mas_bottom).offset(25);
-//        make.height.mas_equalTo(26);
-//    }];
-    
     [self.soundSlider mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.mas_equalTo(self);
         make.top.mas_equalTo(self.soundSwitcher.mas_bottom).offset(25);
@@ -97,17 +87,6 @@ VLSBGRemoteVolumeViewDelegate
         make.height.mas_equalTo(22);
     }];
     
-    [self.remoteVolumeView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.right.mas_equalTo(self);
-        make.top.mas_equalTo(self.accSlider.mas_bottom).offset(25);
-        make.height.mas_equalTo(22);
-    }];
-    
-//    [self.kindsView mas_makeConstraints:^(MASConstraintMaker *make) {
-//        make.top.mas_equalTo(self.remoteVolumeView.mas_bottom).offset(35);
-//        make.left.right.mas_equalTo(self);
-//        make.bottom.mas_equalTo(self).offset(-64);
-//    }];
 }
 
 #pragma mark - VLSBGSwitcherViewDelegate
@@ -161,20 +140,12 @@ VLSBGRemoteVolumeViewDelegate
     }
 }
 
-#pragma mark VLSBGRemoteVolumeViewDelegate
-- (void)view:(VLSBGRemoteVolumeView *)view remoteVolumeValueChanged:(int)value {
-    self.setting.remoteVolume = value;
-    if ([self.delegate respondsToSelector:@selector(settingViewSettingChanged:valueDidChangedType:)]) {
-        [self.delegate settingViewSettingChanged:self.setting valueDidChangedType:VLSBGValueDidChangedTypeRemoteValue];
-    }
-}
-
 #pragma mark - Lazy
 
 - (UILabel *)titleLabel {
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] init];
-        _titleLabel.text = SBGLocalizedString(@"控制台");
+        _titleLabel.text = SBGLocalizedString(@"sbg_music_menu_dialog_title");
         _titleLabel.font = VLUIFontMake(16);
         _titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     }
@@ -184,8 +155,8 @@ VLSBGRemoteVolumeViewDelegate
 - (VLSBGSwitcherView *)soundSwitcher {
     if (!_soundSwitcher) {
         _soundSwitcher = [[VLSBGSwitcherView alloc] init];
-        _soundSwitcher.titleLabel.text = SBGLocalizedString(@"耳返");
-        _soundSwitcher.subText = SBGLocalizedString(@"请插入耳机使用耳返功能");
+        _soundSwitcher.titleLabel.text = SBGLocalizedString(@"sbg_music_menu_dialog_ear");
+        _soundSwitcher.subText = SBGLocalizedString(@"sbg_please_use_headset");
         _soundSwitcher.delegate = self;
     }
     return _soundSwitcher;
@@ -194,7 +165,7 @@ VLSBGRemoteVolumeViewDelegate
 - (VLSBGTonesView *)tonesView {
     if (!_tonesView) {
         _tonesView = [[VLSBGTonesView alloc] initWithMaxLevel:12 currentLevel:6];
-        _tonesView.titleLabel.text = SBGLocalizedString(@"升降调");
+        _tonesView.titleLabel.text = SBGLocalizedString(@"sbg_music_menu_dialog_tone");
         _tonesView.delegate = self;
     }
     return _tonesView;
@@ -203,7 +174,7 @@ VLSBGRemoteVolumeViewDelegate
 - (VLSBGSliderView *)soundSlider {
     if (!_soundSlider) {
         _soundSlider = [[VLSBGSliderView alloc] initWithMax:1 min:0];
-        _soundSlider.titleLabel.text = SBGLocalizedString(@"音量");
+        _soundSlider.titleLabel.text = SBGLocalizedString(@"sbg_music_menu_dialog_vol1");
         _soundSlider.delegate = self;
     }
     return _soundSlider;
@@ -212,20 +183,10 @@ VLSBGRemoteVolumeViewDelegate
 - (VLSBGSliderView *)accSlider {
     if (!_accSlider) {
         _accSlider = [[VLSBGSliderView alloc] initWithMax:1 min:0];
-        _accSlider.titleLabel.text = SBGLocalizedString(@"伴奏");
+        _accSlider.titleLabel.text = SBGLocalizedString(@"sbg_music_menu_dialog_vol2");
         _accSlider.delegate = self;
     }
     return _accSlider;
-}
-
-- (VLSBGRemoteVolumeView*)remoteVolumeView {
-    if (!_remoteVolumeView) {
-        _remoteVolumeView = [[VLSBGRemoteVolumeView alloc] initWithMin:0 withMax:100 withCurrent:40];
-        _remoteVolumeView.titleLabel.text = SBGLocalizedString(@"RemoteVolume");
-        _remoteVolumeView.delegate = self;
-        _setting.remoteVolume = 40;
-    }
-    return _remoteVolumeView;
 }
 
 - (VLSBGKindsView *)kindsView {
@@ -246,11 +207,6 @@ VLSBGRemoteVolumeViewDelegate
 - (void)setAccValue:(float)accValue {
     self.setting.accValue = accValue;
     self.accSlider.value = accValue;
-}
-
--(void)setIspause:(BOOL)isPause{
-    _remoteVolumeView.userInteractionEnabled = !isPause;
-    [_remoteVolumeView setCurrent:isPause ? 100 : self.setting.remoteVolume];
 }
 
 @end

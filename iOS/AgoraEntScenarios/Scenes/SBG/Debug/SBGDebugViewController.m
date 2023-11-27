@@ -7,6 +7,7 @@
 
 #import "SBGDebugViewController.h"
 #import "SBGDebugInfo.h"
+#import "SBGMacro.h"
 #import "SBGDebugManager.h"
 @import AgoraRtcKit;
 
@@ -33,13 +34,13 @@
     
     
     UIButton* cleanBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [cleanBtn setTitle:@"清除log缓存" forState:UIControlStateNormal];
+    [cleanBtn setTitle:SBGLocalizedString(@"sbg_clear_log") forState:UIControlStateNormal];
     [cleanBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     [cleanBtn addTarget:self action:@selector(onClickClear) forControlEvents:(UIControlEventTouchUpInside)];
     
     
     UIButton* exportBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [exportBtn setTitle:@"导出log" forState:UIControlStateNormal];
+    [exportBtn setTitle:SBGLocalizedString(@"sbg_export_log") forState:UIControlStateNormal];
     [exportBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     [exportBtn addTarget:self action:@selector(onClickExport) forControlEvents:(UIControlEventTouchUpInside)];
     self.navigationItem.rightBarButtonItems = @[

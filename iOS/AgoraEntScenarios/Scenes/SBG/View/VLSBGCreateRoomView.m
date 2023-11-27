@@ -182,7 +182,7 @@
 
 - (void)createBtnClickEvent {
     if (!(self.inputTF.text.length > 0)) {
-        [VLToast toast:SBGLocalizedString(@"请输入标题")];
+        [VLToast toast:SBGLocalizedString(@"sbg_insert_title")];
     }
     self.addRoomModel.name = self.inputTF.text;
     if (self.delegate && [self.delegate respondsToSelector:@selector(createBtnAction:)]) {
@@ -235,28 +235,28 @@
 - (NSArray *)titlesArray {
     if (!_titlesArray) {
         _titlesArray = @[
-            SBGLocalizedString(@"和你一起看月亮"),
-            SBGLocalizedString(@"治愈"),
-            SBGLocalizedString(@"一锤定音"),
-            SBGLocalizedString(@"有酒吗"),
-            SBGLocalizedString(@"早安序曲"),
-            SBGLocalizedString(@"风情万种的歌房"),
-            SBGLocalizedString(@"近在远方"),
-            SBGLocalizedString(@"风中诗"),
-            SBGLocalizedString(@"那年风月"),
-            SBGLocalizedString(@"那年风月"),
-            SBGLocalizedString(@"三万余年"),
-            SBGLocalizedString(@"七十二街"),
-            SBGLocalizedString(@"情怀如诗"),
-            SBGLocalizedString(@"简遇而安"),
-            SBGLocalizedString(@"十里笙歌"),
-            SBGLocalizedString(@"回风舞雪"),
-            SBGLocalizedString(@"梦初醒处"),
-            SBGLocalizedString(@"别来无恙"),
-            SBGLocalizedString(@"三里清风"),
-            SBGLocalizedString(@"烟雨万重"),
-            SBGLocalizedString(@"水洗晴空"),
-            SBGLocalizedString(@"轻风淡月"),
+            SBGLocalizedString(@"sbg_create_room_title1"),
+            SBGLocalizedString(@"sbg_create_room_title2"),
+            SBGLocalizedString(@"sbg_create_room_title3"),
+            SBGLocalizedString(@"sbg_create_room_title4"),
+            SBGLocalizedString(@"sbg_create_room_title5"),
+            SBGLocalizedString(@"sbg_create_room_title6"),
+            SBGLocalizedString(@"sbg_create_room_title7"),
+            SBGLocalizedString(@"sbg_create_room_title8"),
+            SBGLocalizedString(@"sbg_create_room_title9"),
+            SBGLocalizedString(@"sbg_create_room_title10"),
+            SBGLocalizedString(@"sbg_create_room_title11"),
+            SBGLocalizedString(@"sbg_create_room_title12"),
+            SBGLocalizedString(@"sbg_create_room_title13"),
+            SBGLocalizedString(@"sbg_create_room_title14"),
+            SBGLocalizedString(@"sbg_create_room_title15"),
+            SBGLocalizedString(@"sbg_create_room_title16"),
+            SBGLocalizedString(@"sbg_create_room_title17"),
+            SBGLocalizedString(@"sbg_create_room_title18"),
+            SBGLocalizedString(@"sbg_create_room_title19"),
+            SBGLocalizedString(@"sbg_create_room_title20"),
+            SBGLocalizedString(@"sbg_create_room_title21"),
+            SBGLocalizedString(@"sbg_create_room_title22"),
         ];
     }
     return _titlesArray;

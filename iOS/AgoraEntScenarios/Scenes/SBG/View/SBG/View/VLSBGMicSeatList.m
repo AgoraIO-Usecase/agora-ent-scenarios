@@ -93,7 +93,8 @@
     if (seatModel.name.length > 0) {
         cell.nickNameLabel.text = seatModel.name;
     }else{
-        cell.nickNameLabel.text = [NSString stringWithFormat:SBGLocalizedString(@"%d号麦"), (int)indexPath.row + 1];
+        NSString *micIndex = [NSString stringWithFormat:@"%d%@", (int)indexPath.row + 1, SBGLocalizedString(@"sbg_mic_index")];
+        cell.nickNameLabel.text = micIndex;
     }
     if (seatModel.isMaster) {
         cell.avatarImgView.layer.borderWidth = 2.0;
@@ -105,7 +106,7 @@
         cell.nickNameLabel.textColor = UIColorMakeWithHex(@"#AEABD0");
         cell.avatarImgView.layer.borderColor = UIColorClear.CGColor;
     }
-    cell.roomerLabel.text = SBGLocalizedString(@"房主");
+    cell.roomerLabel.text = SBGLocalizedString(@"sbg_room_owner");
     if (seatModel.headUrl.length > 0) {
         [cell.avatarImgView sd_setImageWithURL:[NSURL URLWithString:seatModel.headUrl]];
     }else{

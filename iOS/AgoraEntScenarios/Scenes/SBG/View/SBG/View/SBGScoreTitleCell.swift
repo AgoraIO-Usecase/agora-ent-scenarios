@@ -24,34 +24,38 @@ class SBGScoreTitleCell: UITableViewCell {
     
     private func layoutUI() {
         indexLabel = UILabel()
-        indexLabel.text = "排名"
+        indexLabel.text = getLocalizeString(with: "sbg_rank_list")
         indexLabel.textAlignment = .center
         indexLabel.textColor = .white
         indexLabel.font = UIFont.systemFont(ofSize: 10)
         self.contentView.addSubview(indexLabel)
         
         playerLabel = UILabel()
-        playerLabel.text = "玩家"
+        playerLabel.text = getLocalizeString(with: "sbg_rank_player")
         playerLabel.textAlignment = .center
         playerLabel.textColor = .white
         playerLabel.font = UIFont.systemFont(ofSize: 10)
         self.contentView.addSubview(playerLabel)
         
         sbgCountLabel = UILabel()
-        sbgCountLabel.text = "抢唱成功"
+        sbgCountLabel.text = getLocalizeString(with: "sbg_success")
         sbgCountLabel.textAlignment = .center
         sbgCountLabel.textColor = .white
         sbgCountLabel.font = UIFont.systemFont(ofSize: 10)
         self.contentView.addSubview(sbgCountLabel)
         
         scoreLabel = UILabel()
-        scoreLabel.text = "总分"
+        scoreLabel.text = getLocalizeString(with: "sbg_total_score")
         scoreLabel.textAlignment = .center
         scoreLabel.textColor = .white
         scoreLabel.font = UIFont.systemFont(ofSize: 10)
         self.contentView.addSubview(scoreLabel)
         
         self.backgroundColor = .clear
+    }
+    
+    private func getLocalizeString(with key: String) -> String {
+        return Bundle.localizedString(key, bundleName: "sbgResource")
     }
     
     override func layoutSubviews() {

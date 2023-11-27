@@ -132,7 +132,7 @@
 - (UILabel *)scoreTitleLabel {
     if (!_scoreTitleLabel) {
         _scoreTitleLabel = [[UILabel alloc] init];
-        _scoreTitleLabel.text = SBGLocalizedString(@"你的总分");
+        _scoreTitleLabel.text = SBGLocalizedString(@"sbg_your_score");
         _scoreTitleLabel.font = VLUIFontMake(14);
         _scoreTitleLabel.textColor = [UIColor whiteColor];
     }
@@ -177,7 +177,7 @@
         _confirmButton.layer.cornerRadius = 20;
         _confirmButton.layer.masksToBounds = YES;
         [_confirmButton setBackgroundColor:UIColorMakeWithHex(@"#345DFF")];
-        [_confirmButton setTitle:SBGLocalizedString(@"好的") forState:UIControlStateNormal];
+        [_confirmButton setTitle:SBGLocalizedString(@"sbg_ok") forState:UIControlStateNormal];
         _confirmButton.titleLabel.font = UIFontBoldMake(16);
         [_confirmButton setTitleColor:UIColorWhite forState:UIControlStateNormal];
         [_confirmButton addTarget:self action:@selector(click) forControlEvents:UIControlEventTouchUpInside];
