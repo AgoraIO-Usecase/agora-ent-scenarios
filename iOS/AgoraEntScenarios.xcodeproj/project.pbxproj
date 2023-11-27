@@ -377,7 +377,6 @@
 		DD9EBFF12AD5512400B4551F /* VMMuteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBF712AD5512300B4551F /* VMMuteView.swift */; };
 		DD9EBFF22AD5512400B4551F /* VoiceRoomAudienceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBF722AD5512300B4551F /* VoiceRoomAudienceCell.swift */; };
 		DD9EBFF32AD5512400B4551F /* VMEQSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBF732AD5512300B4551F /* VMEQSettingView.swift */; };
-		DD9EBFF42AD5512400B4551F /* AgoraChatRoom3DMoveUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBF742AD5512300B4551F /* AgoraChatRoom3DMoveUserView.swift */; };
 		DD9EBFF52AD5512400B4551F /* VoiceRoomApplyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBF752AD5512300B4551F /* VoiceRoomApplyCell.swift */; };
 		DD9EBFF62AD5512400B4551F /* VoiceRoomUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBF762AD5512300B4551F /* VoiceRoomUserView.swift */; };
 		DD9EBFF72AD5512400B4551F /* VoiceRoomInviteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBF772AD5512300B4551F /* VoiceRoomInviteCell.swift */; };
@@ -1164,7 +1163,6 @@
 		DD9EBF712AD5512300B4551F /* VMMuteView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VMMuteView.swift; sourceTree = "<group>"; };
 		DD9EBF722AD5512300B4551F /* VoiceRoomAudienceCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomAudienceCell.swift; sourceTree = "<group>"; };
 		DD9EBF732AD5512300B4551F /* VMEQSettingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VMEQSettingView.swift; sourceTree = "<group>"; };
-		DD9EBF742AD5512300B4551F /* AgoraChatRoom3DMoveUserView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraChatRoom3DMoveUserView.swift; sourceTree = "<group>"; };
 		DD9EBF752AD5512300B4551F /* VoiceRoomApplyCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomApplyCell.swift; sourceTree = "<group>"; };
 		DD9EBF762AD5512300B4551F /* VoiceRoomUserView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomUserView.swift; sourceTree = "<group>"; };
 		DD9EBF772AD5512300B4551F /* VoiceRoomInviteCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomInviteCell.swift; sourceTree = "<group>"; };
@@ -2970,7 +2968,6 @@
 				DD9EBF712AD5512300B4551F /* VMMuteView.swift */,
 				DD9EBF722AD5512300B4551F /* VoiceRoomAudienceCell.swift */,
 				DD9EBF732AD5512300B4551F /* VMEQSettingView.swift */,
-				DD9EBF742AD5512300B4551F /* AgoraChatRoom3DMoveUserView.swift */,
 				DD9EBF752AD5512300B4551F /* VoiceRoomApplyCell.swift */,
 				DD9EBF762AD5512300B4551F /* VoiceRoomUserView.swift */,
 				DD9EBF772AD5512300B4551F /* VoiceRoomInviteCell.swift */,
@@ -4848,7 +4845,6 @@
 				E301BE762AF4E06F0089A79C /* VLSRMVIdleView.m in Sources */,
 				E301C0182AF8E8E90089A79C /* VLSBGPopOnLineTypeView.m in Sources */,
 				E301C0312AF8E8E90089A79C /* SBGScoreTitleCell.swift in Sources */,
-				DD9EBFF42AD5512400B4551F /* AgoraChatRoom3DMoveUserView.swift in Sources */,
 				DD619A6F29E3E247008F63E4 /* SAFlipHorizontalAnimation.swift in Sources */,
 				DDA19A0C28FFE579009D3E61 /* SyncUtil.swift in Sources */,
 				DD84178829090C520026B624 /* VLMineViewController.m in Sources */,
@@ -5677,7 +5673,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = B8JXV8ZYC7;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;

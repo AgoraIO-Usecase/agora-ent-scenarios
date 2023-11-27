@@ -146,11 +146,12 @@
             if (model.userNo == nil) {
                 continue;
             }
-            if (model.seatIndex == 0 && model.isAudioMuted == 1) {
-                continue;
-            }
             if(model.userNo.integerValue == speakerUid) {
-                [self updateVolumeForIndex:model.seatIndex volume:speaker.volume];
+                if (model.isAudioMuted == 1) {
+                    [self updateVolumeForIndex:model.seatIndex volume:0];
+                } else {
+                    [self updateVolumeForIndex:model.seatIndex volume:speaker.volume];
+                }
                 break;
             }
         }
