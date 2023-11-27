@@ -28,11 +28,6 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
         const val TAG: String = "SoundCardFragment"
     }
 
-    private val mReceiver = HeadphoneReceiver()
-
-    // 有无有线耳机
-    private var isPlugIn = false
-
     var mOnSoundCardChange: (() -> Unit)? = null
 
     var onClickSoundCardType: (() -> Unit)? = null
@@ -41,43 +36,22 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
         return KtvDialogSoundCardBinding.inflate(inflater)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        isPlugIn = audioManager.isWiredHeadsetOn
-
-        super.onViewCreated(view, savedInstanceState)
-        val filter = IntentFilter(Intent.ACTION_HEADSET_PLUG)
-        context?.registerReceiver(mReceiver, filter)
-    }
-
-    override fun onDestroyView() {
-        context?.unregisterReceiver(mReceiver)
-        super.onDestroyView()
-    }
-
     override fun initView() {
         super.initView()
         binding?.apply {
-            if (true) {
-                groupSoundCardSettings.visibility = View.VISIBLE
-                if (soundCardSetting.isEnable()) {
-                    setupPresetSoundView(soundCardSetting.presetSound())
-                    setupGainView(soundCardSetting.gainValue())
-                    setupPresetView(soundCardSetting.presetValue())
-                    vPramsMark.visibility = View.INVISIBLE
-                    clSoundCardParams.alpha = 1f
-                } else {
-                    vPramsMark.visibility = View.VISIBLE
-                    clSoundCardParams.alpha = 0.4f
-                }
-                groupSoundCardAbnormal.isVisible = false
-                mcbSoundCardSwitch.isChecked = soundCardSetting.isEnable()
+            groupSoundCardSettings.visibility = View.VISIBLE
+            if (soundCardSetting.isEnable()) {
+                setupPresetSoundView(soundCardSetting.presetSound())
+                setupGainView(soundCardSetting.gainValue())
+                setupPresetView(soundCardSetting.presetValue())
+                vPramsMark.visibility = View.INVISIBLE
+                clSoundCardParams.alpha = 1f
             } else {
-                groupSoundCardSettings.visibility = View.INVISIBLE
-                clSoundCardParams.visibility =  View.INVISIBLE
-                groupSoundCardAbnormal.visibility = View.VISIBLE
-                mcbSoundCardSwitch.isChecked = false
+                vPramsMark.visibility = View.VISIBLE
+                clSoundCardParams.alpha = 0.4f
             }
+            groupSoundCardAbnormal.isVisible = false
+            mcbSoundCardSwitch.isChecked = soundCardSetting.isEnable()
 
             ivBackIcon.setOnClickListener {
                 (requireActivity() as RoomLivingActivity).closeMusicSettingsDialog()
@@ -153,14 +127,6 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                 }
             }
         }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            binding.tvInputDevice.text = audioManager.microphones.getOrNull(0)?.description.toString()
-        } else {
-            val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            binding.tvInputDevice.text = audioManager.getDevices(AudioManager.GET_DEVICES_INPUTS).getOrNull(0)?.productName.toString()
-        }
     }
 
     private fun setupGainView(gainValue: Float) {
@@ -208,41 +174,6 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                 else -> {
                     tvSoundTypeSelect.text = ""
                 }
-            }
-        }
-    }
-
-    private fun setHeadPhonePlugin(isPlug: Boolean) {
-        isPlugIn = isPlug
-        if (true) {
-            // 插入有线耳机
-            binding.groupSoundCardSettings.visibility = View.VISIBLE
-            binding.groupSoundCardAbnormal.visibility = View.INVISIBLE
-            binding.mcbSoundCardSwitch.isChecked = soundCardSetting.isEnable()
-        } else {
-            // 未插入有线耳机
-            binding.groupSoundCardSettings.visibility = View.INVISIBLE
-            binding.groupSoundCardAbnormal.visibility = View.VISIBLE
-            binding.mcbSoundCardSwitch.isChecked = false
-            soundCardSetting.enable(false, force = true, callback = {
-            })
-        }
-    }
-
-    private inner class HeadphoneReceiver : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action != Intent.ACTION_HEADSET_PLUG) return
-            val state = intent.getIntExtra("state", -1)
-            if (state == 1) {
-                setHeadPhonePlugin(true)
-                mOnSoundCardChange?.invoke()
-                //耳机插入
-                Log.d("HeadphoneReceiver", "headphone plugged in")
-            } else if (state == 0) {
-                setHeadPhonePlugin(false)
-                mOnSoundCardChange?.invoke()
-                //耳机拔出
-                Log.d("HeadphoneReceiver", "headphone removed")
             }
         }
     }

@@ -76,6 +76,10 @@ enum VRRoomMicStatus: Int {
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
     }
+    
+    open override var description: String {
+        return "seat: \(mic_index), status: \(status), memeber: \(member?.rtc_uid ?? "empty")"
+    }
 }
 
 @objc open class VRUsers: NSObject, Convertible {
