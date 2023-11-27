@@ -192,6 +192,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
         mBinding.ilActive.switchOriginal.setChecked(false); // reset ui icon for mAudioTrackMode
         mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
+        mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_original);
         mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
         mBinding.ilActive.ivJoinChorusBtn.setVisibility(View.INVISIBLE);
         mBinding.ilActive.ivLeaveChorus.setVisibility(View.VISIBLE);
@@ -273,6 +274,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mBinding.ilActive.ivSkipPostlude.setVisibility(View.INVISIBLE);
             mBinding.ilActive.switchOriginal.setChecked(false); // reset ui icon for mAudioTrackMode
             mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
+            mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_original);
             mBinding.ilActive.ivJoinChorusBtn.setVisibility(View.INVISIBLE);
             mBinding.ilActive.ivLeaveChorus.setVisibility(View.INVISIBLE);
         } else if (this.mRole == Role.Listener) {
@@ -535,12 +537,12 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                     mAudioTrack = AudioTrack.DaoChang;
                     mOnKaraokeActionListener.onSwitchOriginalClick(2, true);
                     mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ktv_ic_daochang);
-                    mBinding.ilActive.switchOriginal.setText("导唱");
+                    mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_daochang);
                 } else if (mAudioTrack == AudioTrack.DaoChang) {
                     mAudioTrack = AudioTrack.Origin;
                     mOnKaraokeActionListener.onSwitchOriginalClick(0, true);
                     mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_on);
-                    mBinding.ilActive.switchOriginal.setText("原唱");
+                    mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_original);
                 } else {
                     mAudioTrack = AudioTrack.Acc;
                     mOnKaraokeActionListener.onSwitchOriginalClick(1, true);
@@ -551,7 +553,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                     mAudioTrack = AudioTrack.Origin;
                     mOnKaraokeActionListener.onSwitchOriginalClick(0, false);
                     mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_on);
-                    mBinding.ilActive.switchOriginal.setText("原唱");
+                    mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_original);
                 } else {
                     mAudioTrack = AudioTrack.Acc;
                     mOnKaraokeActionListener.onSwitchOriginalClick(1, false);

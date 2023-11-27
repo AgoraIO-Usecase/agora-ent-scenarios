@@ -1,6 +1,7 @@
 package io.agora.scene.ktv.singbattle.widget.lrcView;
 
 import android.animation.Animator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -203,6 +204,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private void setCountDown(int second) {
         if (mBinding == null) return;
         mBinding.ilActive.singBattle.setText("" + (second + 1));
@@ -519,6 +521,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
         private float mInitialYOfScoreView; // Only for showScoreAnimation
 
+        @SuppressLint("SetTextI18n")
         private void showScoreAnimation(View lyricsControlView, double score) {
             TextView lineScore = lyricsControlView.findViewById(R.id.line_score);
             int widthOfParent = ((View) (lineScore.getParent())).getWidth();

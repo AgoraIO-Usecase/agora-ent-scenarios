@@ -740,8 +740,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
                 // 预加载歌曲成功
                 if (ktvApiConfig.musicType == KTVMusicType.SONG_CODE) {
+                    mPlayer.setPlayerOption("enable_multi_audio_track", 0)
                     (mPlayer as IAgoraMusicPlayer).open(songCode, 0) // TODO open failed
                 } else {
+                    mPlayer.setPlayerOption("enable_multi_audio_track", 0)
                     mPlayer.open(songUrl, 0) // TODO open failed
                 }
 

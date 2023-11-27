@@ -1644,7 +1644,9 @@ public class RoomLivingViewModel extends ViewModel {
         ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null);
 
         // 清空音效
-        mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF);
+        if (mRtcEngine != null) {
+            mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF);
+        }
         mSetting.updateEffect(AUDIO_EFFECT_OFF);
         this.audioPreset = AUDIO_EFFECT_OFF;
         isHighlightSinger = false;

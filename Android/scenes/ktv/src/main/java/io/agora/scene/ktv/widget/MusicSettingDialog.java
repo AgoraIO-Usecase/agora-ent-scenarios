@@ -137,7 +137,7 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         mBinding.sbVol1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                if (seekBar.isPressed()) {
+                if (b) {
                     mSetting.setVolMic(i);
                 }
             }
@@ -158,7 +158,7 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         mBinding.sbVol2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                if (seekBar.isPressed()) {
+                if (b) {
                     mSetting.setVolMusic(i);
                 }
             }
@@ -176,17 +176,21 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         mBinding.btnRemoteVolumeDownDialogSetting.setOnClickListener(v -> {
             int volume = mSetting.getRemoteVolume();
             int newVolume = volume - 1;
+            if (newVolume < 0) newVolume = 0;
+            mSetting.setRemoteVolume(newVolume);
             mBinding.sbRemoteVol.setProgress(newVolume);
         });
         mBinding.btnRemoteVolumeUpDialogSetting.setOnClickListener(v -> {
             int volume = mSetting.getRemoteVolume();
             int newVolume = volume + 1;
+            if (newVolume > 100) newVolume = 100;
+            mSetting.setRemoteVolume(newVolume);
             mBinding.sbRemoteVol.setProgress(newVolume);
         });
         mBinding.sbRemoteVol.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                if (seekBar.isPressed()) {
+                if (b) {
                     mSetting.setRemoteVolume(i);
                     mBinding.sbRemoteVol.setProgress(i);
                 }
