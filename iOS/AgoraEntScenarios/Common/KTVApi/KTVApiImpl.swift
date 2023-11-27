@@ -566,6 +566,7 @@ extension KTVApiImpl {
             mediaOption.publishMediaPlayerAudioTrack = false
             apiConfig?.engine?.updateChannel(with: mediaOption)
 
+            mediaPlayer?.setPlayerOption("enable_multi_audio_track", value: 0)
             if apiConfig?.musicType == .mcc {
                 (mediaPlayer as? AgoraMusicPlayerProtocol)?.openMedia(songCode: self.songCode , startPos: 0)
             } else {

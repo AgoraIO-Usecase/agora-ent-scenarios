@@ -52,7 +52,7 @@ UICollectionViewDataSource
         self.remoteSlider.value = 0.3;
         self.setting.remoteVolume = 40;
         self.cellWidth = (CGRectGetWidth([UIScreen mainScreen].bounds) - 48) / 4.0;
-        self.titles = @[@"原声", @"KTV",@"演唱会", @"录音棚", @"留声机", @"空旷", @"空灵", @"流行",@"R&B"];
+        self.titles = @[ KTVLocalizedString(@"ktv_effect_off"), @"KTV",KTVLocalizedString(@"ktv_effect_concert"), KTVLocalizedString(@"ktv_effect_studio"), KTVLocalizedString(@"ktv_effect_phonograph"), KTVLocalizedString(@"ktv_effect_spatial"), KTVLocalizedString(@"ktv_effect_ethereal"), KTVLocalizedString(@"ktv_effect_pop"),@"R&B"];
         self.effectImgs = @[@"ktv_console_setting1",@"ktv_console_setting2",@"ktv_console_setting3",@"ktv_console_setting4"];
     }
     return self;
@@ -279,8 +279,8 @@ UICollectionViewDataSource
 - (VLKTVSwitcherView *)soundCardSwitcher {
     if (!_soundCardSwitcher) {
         _soundCardSwitcher = [[VLKTVSwitcherView alloc] init];
-        _soundCardSwitcher.titleLabel.text = KTVLocalizedString(@"虚拟声卡");
-        _soundCardSwitcher.subText = KTVLocalizedString(@"请插入耳机使用耳返功能");
+        _soundCardSwitcher.titleLabel.text = KTVLocalizedString(@"ktv_soundcard");
+        _soundCardSwitcher.subText = KTVLocalizedString(@"ktv_please_use_headset");
         _soundCardSwitcher.delegate = self;
     }
     return _soundCardSwitcher;

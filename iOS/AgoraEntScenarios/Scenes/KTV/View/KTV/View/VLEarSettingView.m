@@ -13,9 +13,6 @@
 #import "HeadSetManager.h"
 #import "VLToast.h"
 
-#define withEarWarning @"开启耳返可实时听到自己的声音，唱歌的时候及时调整"
-#define withEarWarning2 @" 因为延时和体验问题，在耳返里听到的声音都是没有音效的(包括虚拟声卡,场景塑造,(KTV, 演唱会))"
-#define withoutEarWarning @"使用耳返必须插入耳机，当前未检测到耳机"
 @interface VLEarSettingView()<VLKTVSliderViewDelegate>
 @property (nonatomic,strong) UILabel *titleLabel;
 @property (nonatomic,strong) UILabel *earLabel;
@@ -68,13 +65,13 @@
     self.backgroundColor = UIColorMakeWithHex(@"#152164");
     
     _titleLabel = [[UILabel alloc]init];
-    _titleLabel.text = @"耳返";
+    _titleLabel.text = KTVLocalizedString(@"ktv_music_menu_dialog_ear");
     _titleLabel.textAlignment = NSTextAlignmentCenter;
     _titleLabel.textColor = [UIColor whiteColor];
     [self addSubview:_titleLabel];
     
     _earLabel = [[UILabel alloc]init];
-    _earLabel.text = @"耳返开关";
+    _earLabel.text = KTVLocalizedString(@"ktv_ear_switch");
     _earLabel.textColor = [UIColor whiteColor];
     [self addSubview:_earLabel];
     
@@ -86,8 +83,8 @@
     [self addSubview:_earSwitch];
     
     _earWarningBtn = [[UIButton alloc]init];
-    [_earWarningBtn setTitle:withoutEarWarning forState:UIControlStateNormal] ;
-    [_earWarningBtn setTitle:withEarWarning forState:UIControlStateSelected] ;
+    [_earWarningBtn setTitle:KTVLocalizedString(@"ktv_ear_without_headset") forState:UIControlStateNormal] ;
+    [_earWarningBtn setTitle:KTVLocalizedString(@"ktv_ear_warning") forState:UIControlStateSelected] ;
     _earWarningBtn.font = [UIFont systemFontOfSize:12];
     _earWarningBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
     _earWarningBtn.imageView.contentMode = UIViewContentModeScaleAspectFit;
@@ -96,9 +93,9 @@
     [_earWarningBtn setImage:[UIImage sceneImageWithName:@"ktv_add_circle"] forState:UIControlStateNormal];
     [_earWarningBtn setImage:[UIImage sceneImageWithName:@"ktv_add_circle_in"] forState:UIControlStateSelected];
     _earWarningBtn.selected = [self.headeSet hasHeadset];
-    
+
     // 创建一个 NSMutableAttributedString 对象
-    NSMutableAttributedString *attributedText = [[NSMutableAttributedString alloc] initWithString:withEarWarning2];
+    NSMutableAttributedString *attributedText = [[NSMutableAttributedString alloc] initWithString:KTVLocalizedString(@"ktv_ear_warning2")];
 
     // 添加图片到富文本中
     NSTextAttachment *textAttachment = [[NSTextAttachment alloc] init];
@@ -135,7 +132,7 @@
     _earSetView.hidden = ![self.headeSet hasHeadset];
     
     _earSetLabel = [[UILabel alloc]init];
-    _earSetLabel.text = @"耳返设置";
+    _earSetLabel.text = KTVLocalizedString(@"ktv_ear_setting");
     _earSetLabel.textColor = [UIColor grayColor];
     _earSetLabel.font = [UIFont systemFontOfSize:12];
     [_earSetView addSubview:_earSetLabel];
@@ -202,7 +199,7 @@
 - (VLKTVSliderView *)earSlider {
     if (!_earSlider) {
         _earSlider = [[VLKTVSliderView alloc] initWithMax:1 min:0];
-        _earSlider.titleLabel.text = @"耳返音量";
+        _earSlider.titleLabel.text = KTVLocalizedString(@"ktv_ear_vol");
         _earSlider.titleLabel.textColor = [UIColor whiteColor];
         _earSlider.delegate = self;
     }

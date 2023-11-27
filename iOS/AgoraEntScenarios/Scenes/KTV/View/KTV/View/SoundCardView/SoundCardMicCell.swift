@@ -31,19 +31,19 @@ class SoundCardMicCell: UITableViewCell {
     
     private func layoutUI() {
         titleLabel = UILabel()
-        titleLabel.text = "麦克风类型"
+        titleLabel.text = Bundle.localizedString("ktv_mic_type", bundleName: "KtvResource")
         titleLabel.font = UIFont.systemFont(ofSize: 13)
         self.contentView.addSubview(titleLabel)
         
         detailLabel = UILabel()
-        detailLabel.text = "选择麦克风的预设参数"
+        detailLabel.text = Bundle.localizedString("ktv_choose_sc_params", bundleName: "KtvResource")
         detailLabel.font = UIFont.systemFont(ofSize: 12)
         detailLabel.textColor = .lightGray
         self.contentView.addSubview(detailLabel)
         
         numLable = UILabel()
         numLable.font = UIFont.systemFont(ofSize: 12)
-        numLable.text = "关闭"
+        numLable.text = Bundle.localizedString("ktv_close_aec", bundleName: "KtvResource")
         numLable.textColor = .gray
         numLable.textAlignment = .center
         self.contentView.addSubview(numLable)
@@ -61,7 +61,7 @@ class SoundCardMicCell: UITableViewCell {
     @objc func preset() {
         let preset = Int(slider.value)
         if (preset == -1) {
-            numLable.text = "关闭"
+            numLable.text = Bundle.localizedString("ktv_close_aec", bundleName: "KtvResource")
         } else {
             numLable.text = String(preset)
         }

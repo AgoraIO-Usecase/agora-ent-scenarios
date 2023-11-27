@@ -85,7 +85,7 @@
     if (seatModel.name.length > 0) {
         cell.nickNameLabel.text = seatModel.name;
     }else{
-        cell.nickNameLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"%d号麦"), (int)indexPath.row + 1];
+        cell.nickNameLabel.text = [NSString stringWithFormat:@"%d%@", (int)indexPath.row + 1, KTVLocalizedString(@"ktv_mic_index")];
     }
     if (seatModel.isMaster) {
         cell.avatarImgView.layer.borderWidth = 2.0;
