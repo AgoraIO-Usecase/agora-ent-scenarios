@@ -31,18 +31,6 @@
     self.nameLabel.font = UIFontBoldMake(15);
     [self addSubview:self.nameLabel];
     
-
-//    self.typeLabel = [[UILabel alloc]init];
-//    self.typeLabel.textColor = UIColorMakeWithHex(@"#6C7192");
-//    self.typeLabel.font = UIFontMake(9);
-//    self.typeLabel.layer.cornerRadius = 4;
-//    self.typeLabel.layer.masksToBounds = YES;
-//    self.typeLabel.layer.borderWidth = 1.0f;
-//    self.typeLabel.textAlignment = NSTextAlignmentCenter;
-//    self.typeLabel.layer.borderColor = UIColorMakeWithHex(@"#6C7192").CGColor;
-//    [self addSubview:self.typeLabel];
-//    self.typeLabel.text = @"合唱";
-    
     self.singerLabel = [[UILabel alloc]init];
     self.singerLabel.textColor = UIColorMakeWithHex(@"#6C7192");
     self.singerLabel.font = UIFontMake(12);

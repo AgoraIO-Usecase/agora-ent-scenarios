@@ -16,7 +16,6 @@
 @property (nonatomic, strong) VLHotSpotBtn *dianGeBtn;
 @property (nonatomic, strong) VLHotSpotBtn *choosedBtn;
 @property (nonatomic, strong) UILabel      *choosedCountLabel;
-@property (nonatomic, strong) UILabel      *sourceLabel;
 @property (nonatomic, strong) VLSelectedSongList *selsectSongView;
 @property (nonatomic, strong) VLSongList *choosedSongView;
 
@@ -46,7 +45,6 @@
     [self addSubview:self.dianGeBtn];
     [self addSubview:self.choosedBtn];
     [self addSubview:self.choosedCountLabel];
-    [self addSubview:self.sourceLabel];
     [self addSubview:self.selsectSongView];
     [self addSubview:self.choosedSongView];
 }
@@ -88,9 +86,6 @@
     self.selsectSongView.selSongsArray = selSongsArray;
     self.choosedSongView.selSongsArray = selSongsArray;
 
-//    [self.choosedSongView setSelSongsUIWithArray:selSongsArray];
-//    [self.selsectSongView setSelSongArrayWith: selSongsArray];
-
     self.choosedCountLabel.text = [NSString stringWithFormat:@"%d",(int)selSongsArray.count];
 }
 
@@ -131,18 +126,6 @@
         _choosedCountLabel.backgroundColor = UIColorMakeWithHex(@"#156EF3");
     }
     return _choosedCountLabel;
-}
-
-- (UILabel *)sourceLabel {
-    if (!_sourceLabel) {
-        _sourceLabel = [[UILabel alloc]initWithFrame:CGRectMake(self.width-25-90, _dianGeBtn.centerY-7, 90, 14)];
-        _sourceLabel.textColor = UIColorMakeWithHex(@"#979CBB");
-        _sourceLabel.font = UIFontMake(10);
-        _sourceLabel.text = KTVLocalizedString(@"歌曲来自咪咕音乐");
-        _sourceLabel.textAlignment = NSTextAlignmentRight;
-        _sourceLabel.hidden = YES;
-    }
-    return _sourceLabel;
 }
 
 - (VLSelectedSongList *)selsectSongView {

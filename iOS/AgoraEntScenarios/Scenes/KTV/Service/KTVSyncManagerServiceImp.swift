@@ -119,7 +119,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         guard let room = self.room else { return }
         
         let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
-        let expiredDuration = 20 * 60 * 1000
+        let expiredDuration = (AppContext.shared.sceneConfig?.ktv ?? 20 * 60) * 1000
 //        agoraPrint("checkRoomExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
         guard currentTs - room.createdAt > expiredDuration else { return }
         
