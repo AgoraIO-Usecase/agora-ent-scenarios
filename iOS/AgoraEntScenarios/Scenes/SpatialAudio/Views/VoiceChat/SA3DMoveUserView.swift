@@ -107,7 +107,7 @@ class SA3DMoveUserView: UIView {
         bgView.addGestureRecognizer(tap)
         bgView.isUserInteractionEnabled = true
 
-        bgIconView.image = UIImage.sceneImage(name: "voice_wuren")
+        bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
         bgIconView.layer.cornerRadius = 40
         bgIconView.layer.masksToBounds = true
         addSubview(bgIconView)
@@ -115,6 +115,7 @@ class SA3DMoveUserView: UIView {
         avatarImageView.image = UIImage(named: "")
         avatarImageView.layer.cornerRadius = 37
         avatarImageView.layer.masksToBounds = true
+        avatarImageView.contentMode = .scaleAspectFill
         addSubview(avatarImageView)
         
         addSubview(icon3dImageView)

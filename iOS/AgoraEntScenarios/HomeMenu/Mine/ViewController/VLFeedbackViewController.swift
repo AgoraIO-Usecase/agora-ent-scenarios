@@ -234,14 +234,9 @@ class VLFeedbackViewController: VLBaseViewController {
             for item in images {
                 group.enter()
                 semaphore.wait()
-                VLAPIRequest.uploadImageURL(VLURLConfig.kURLPathUploadImage, showHUD: true, appendKey: "file", images: [item]) { response in
-                    guard response.code == 0 else { ToastView.show(text: response.message); return }
-                    let model = VLUploadImageResModel.yy_model(withJSON: response.data)
-                    urls.append(model?.url ?? "")
-                    group.leave()
-                    semaphore.signal()
-                } failure: { error, _ in
-                    print(error?.localizedDescription ?? "")
+                Task {
+                    guard let url = try? await self.uploadImages(image: item) else { return }
+                    urls.append(url)
                     group.leave()
                     semaphore.signal()
                 }
@@ -252,6 +247,20 @@ class VLFeedbackViewController: VLBaseViewController {
                     return
                 }
                 completion(urls)
+            }
+        }
+    }
+    
+    private func uploadImages(image: UIImage) async throws -> String? {
+        try await withUnsafeThrowingContinuation { continuation in
+            VLAPIRequest.uploadImageURL(VLURLConfig.kURLPathUploadImage, showHUD: true, appendKey: "file", images: [image]) { response in
+                guard response.code == 0 else { ToastView.show(text: response.message); return }
+                let model = VLUploadImageResModel.yy_model(withJSON: response.data)
+                continuation.resume(returning: model?.url)
+            } failure: { error, _ in
+                guard let error = error else { return }
+                print(error.localizedDescription)
+                continuation.resume(throwing: error)
             }
         }
     }

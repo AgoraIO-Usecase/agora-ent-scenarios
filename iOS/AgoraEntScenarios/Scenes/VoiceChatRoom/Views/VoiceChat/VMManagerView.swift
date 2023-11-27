@@ -58,7 +58,7 @@ class VMManagerView: UIView {
             } else if m_type == 3 {
                 iconView.isHidden = true
                 roleBtn.isHidden = true
-                 micView.isHidden = true
+                micView.isHidden = true
                 addView.image = UIImage.sceneImage(name: "voice_ic_seat_lock", bundleName: "VoiceChatRoomResource")
                 lockBtn.setTitle(LanguageManager.localValue(key: "voice_unblock"), for: .normal)
                 inviteBtn.setTitleColor(UIColor(hex: 0x979cbb, alpha: 1), for: .normal)

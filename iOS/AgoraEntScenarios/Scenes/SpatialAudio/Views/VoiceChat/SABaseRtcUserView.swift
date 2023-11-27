@@ -36,12 +36,12 @@ class SABaseRtcUserView: UIView {
             case .AgoraChatRoomBaseUserCellTypeAdd:
                 iconView.isHidden = true
                 micView.isHidden = true
-                bgIconView.image = UIImage.sceneImage(name: "voice_wuren", bundleName: "VoiceChatRoomResource")
+                bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
             case .AgoraChatRoomBaseUserCellTypeMute:
                 iconView.isHidden = false
                 micView.isHidden = false
                 micView.setState(.forbidden)
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／mute", bundleName: "VoiceChatRoomResource")
+                bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_lock", bundleName: "SpatialAudioResource")
             case .AgoraChatRoomBaseUserCellTypeForbidden:
                 iconView.isHidden = false
                 micView.isHidden = false
@@ -49,23 +49,23 @@ class SABaseRtcUserView: UIView {
             case .AgoraChatRoomBaseUserCellTypeLock:
                 iconView.isHidden = true
                 micView.isHidden = true
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
+                bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_lock", bundleName: "SpatialAudioResource")
             case .AgoraChatRoomBaseUserCellTypeNormalUser:
                 iconView.isHidden = false
                 micView.isHidden = false
                 micView.setState(.on)
-                nameBtn.setImage(UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"), for: .normal)
+                nameBtn.setImage(nil, for: .normal)
             case .AgoraChatRoomBaseUserCellTypeMuteAndLock:
                 iconView.isHidden = true
                 micView.isHidden = false
                 micView.setState(.forbidden)
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
+                bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_lock", bundleName: "SpatialAudioResource")
             case .AgoraChatRoomBaseUserCellTypeAlienNonActive:
                 iconView.isHidden = false
                 micView.isHidden = false
                 micView.setState(.on)
                 micView.isHidden = true
-                nameBtn.setImage(UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), for: .normal)
+                nameBtn.setImage(UIImage.sceneImage(name: "guanfang", bundleName: "SpatialAudioResource"), for: .normal)
                 coverView.isHidden = false
                 activeButton.isHidden = false
             case .AgoraChatRoomBaseUserCellTypeAlienActive:
@@ -174,7 +174,7 @@ class SABaseRtcUserView: UIView {
         bgView.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.3)
         addSubview(bgView)
         
-        bgIconView.image = UIImage.sceneImage(name: "voice_wuren", bundleName: "VoiceChatRoomResource")
+        bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
         bgIconView.layer.cornerRadius = 30
         bgIconView.layer.masksToBounds = true
         bgView.addSubview(bgIconView)
@@ -207,7 +207,7 @@ class SABaseRtcUserView: UIView {
         activeButton.layer.masksToBounds = true
         activeButton.setTitle("spatial_voice_active".voice_localized(), for: .normal)
         activeButton.setTitleColor(.white, for: .normal)
-        activeButton.setBackgroundImage(UIImage.sceneImage(name: "active", bundleName: "VoiceChatRoomResource"), for: .normal)
+        activeButton.setBackgroundImage(UIImage.sceneImage(name: "active", bundleName: "SpatialAudioResource"), for: .normal)
         activeButton.titleLabel?.font = UIFont.systemFont(ofSize: 9)
         activeButton.addTargetFor(self, action: #selector(active), for: .touchUpInside)
         addSubview(activeButton)
