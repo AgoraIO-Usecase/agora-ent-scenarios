@@ -695,7 +695,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                                 })?.mic_index = mic_index
                 let currentMic = self.mics[safe: mic_index]
                 if currentMic?.status ?? 0 == -1 || currentMic?.status ?? 0 == 2 {
-                    self.mics[mic_index]  = mic
+                    self.mics[mic_index] = mic
                     completion(nil,mic)
                 } else {
                     completion(self.normalError(),nil)
