@@ -777,7 +777,7 @@ extension VoiceRoomViewController: VMManagerDelegate {
     }
 
     func reportAudioVolumeIndicationOfSpeakers(speakers: [AgoraRtcAudioVolumeInfo]) {
-        guard let micinfo = roomInfo?.mic_info else { return }
+        let micinfo = ChatRoomServiceImp.getSharedInstance().mics
         for speaker in speakers {
             for mic in micinfo where mic.member != nil{
                 let user = mic.member
