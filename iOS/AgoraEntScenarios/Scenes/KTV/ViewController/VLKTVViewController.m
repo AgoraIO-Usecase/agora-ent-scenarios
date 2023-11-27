@@ -330,8 +330,8 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         } else if (status == KTVSubscribeDeleted) {
             //房主关闭房间
             if ([roomInfo.creatorNo isEqualToString:VLUserCenter.user.id]) {
-                NSString *mes = @"连接超时，房间已解散";
-                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:KTVLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
+                NSString *mes = KTVLocalizedString(@"ktv_room_exit");
+                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:KTVLocalizedString(@"ktv_confirm") completion:^(bool flag, NSString * _Nullable text) {
                     [[VLKTVAlert shared]dismiss];
                     [weakSelf leaveRoom];
                 }];
@@ -374,8 +374,8 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     
     [[AppContext ktvServiceImp] subscribeRoomWillExpireWithChangedBlock:^{
         bool isOwner = [weakSelf.roomModel.creatorNo isEqualToString:VLUserCenter.user.id];
-        NSString *mes = isOwner ? @"您已体验超过20分钟，当前房间已过期，请退出重新创建房间" : @"当前房间已过期,请退出";
-        [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:KTVLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
+        NSString *mes = isOwner ? KTVLocalizedString(@"ktv_room_timeout") : KTVLocalizedString(@"ktv_room_offline");
+        [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:KTVLocalizedString(@"ktv_confirm") completion:^(bool flag, NSString * _Nullable text) {
             [[VLKTVAlert shared]dismiss];
             [weakSelf leaveRoom];
         }];
@@ -447,10 +447,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
             [userNoArray addObject:model.userNo];
         }
     }
-    if(array.count == 0){
-        NSLog(@"没有唱歌的人");
-    }
-    
+
     NSString *userNo = self.selectedVoiceShowIndex == -2 ? @"" : self.selectUserNo;
     LSTPopView* popView =
     [LSTPopView popVoiceShowViewWithParentView:self.view showView:self.voiceShowView imgSource:imgArray nameSource:nameArray  selectUserNo:userNo userNoArray:userNoArray UIUpdateAble:self.selectedVoiceShowIndex != -2 withDelegate:self];
@@ -485,7 +482,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 //用户弹框离开房间
 - (void)popForceLeaveRoom {
     VL(weakSelf);
-    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:KTVLocalizedString(@"房主已解散房间,请确认离开房间") buttonTitle:KTVLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
+    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:KTVLocalizedString(@"ktv_owner_leave") buttonTitle:KTVLocalizedString(KTVLocalizedString(@"ktv_confirm")) completion:^(bool flag, NSString * _Nullable text) {
         for (VLBaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLOnLineListVC class]]) {
 //                [weakSelf destroyMediaPlayer];
@@ -962,13 +959,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
   //  [self.MVView.gradeView reset];
 
     if([self getOnMicUserCount] == 8 && !_isOnMicSeat){
-        [VLToast toast:@"“麦位已满，请在他人下麦后重试"];
+        [VLToast toast:KTVLocalizedString(@"ktv_mic_full")];
         return;
     }
     
     if(self.RTCkit.getConnectionState != AgoraConnectionStateConnected){
         self.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
-        [VLToast toast:@"加入合唱失败，reson:连接已断开"];
+        [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
         return;
     }
     
@@ -1001,7 +998,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
         
         //TODO(chenpan):没有空麦位，show error
-        [VLToast toast:@"麦位已满，请在他人下麦后重试"];
+        [VLToast toast:KTVLocalizedString(@"ktv_mic_full")];
         return;
     }
     
@@ -1320,7 +1317,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if (code == 0 && success) {
         success(YES);
     } else{
-//        VLLog(@"发送失败-streamId:%ld\n",streamId);
     };
 }
 
@@ -1379,7 +1375,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //退出合唱
     
     if([self isRoomOwner] && self.singRole == KTVSingRoleCoSinger && self.selectUserNo == VLUserCenter.user.id){
-        [VLToast toast:@"人声突出功能已失效，请重设"];
+        [VLToast toast:KTVLocalizedString(@"ktv_per_lose")];
         self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
         [self.MVView setPerViewAvatar:@""];
     }
@@ -1409,9 +1405,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 #pragma mark -- VLKTVTopViewDelegate
 - (void)onVLKTVTopView:(VLKTVTopView *)view closeBtnTapped:(id)sender {
     VL(weakSelf);
-    NSString *title = VLUserCenter.user.ifMaster ? KTVLocalizedString(@"解散房间") : KTVLocalizedString(@"退出房间");
-    NSString *message = VLUserCenter.user.ifMaster ? KTVLocalizedString(@"确定解散该房间吗？") : KTVLocalizedString(@"确定退出该房间吗？");
-    NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"取消"),KTVLocalizedString(@"确定"), nil];
+    NSString *title = VLUserCenter.user.ifMaster ? KTVLocalizedString(@"ktv_disband_room") : KTVLocalizedString(@"ktv_exit_room");
+    NSString *message = VLUserCenter.user.ifMaster ? KTVLocalizedString(@"ktv_confirm_disband_room") : KTVLocalizedString(@"ktv_confirm_exit_room");
+    NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"ktv_cancel"),KTVLocalizedString(@"ktv_confirm"), nil];
     [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
         if(flag == YES){
             [weakSelf leaveRoom];
@@ -1617,15 +1613,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     } else if (type == VLKTVMVViewActionTypeMVNext) { //切换
         
         if(self.RTCkit.getConnectionState != AgoraConnectionStateConnected){
-            [VLToast toast:@"切歌失败，reson:连接已断开"];
+            [VLToast toast:KTVLocalizedString(@"ktv_change_failed")];
             return;
         }
         
         VL(weakSelf);
 
-        NSString *title = KTVLocalizedString(@"切换歌曲");
-        NSString *message = KTVLocalizedString(@"切换下一首歌歌曲？");
-        NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"取消"),KTVLocalizedString(@"确定"), nil];
+        NSString *title = KTVLocalizedString(@"ktv_change_song");
+        NSString *message = KTVLocalizedString(@"ktv_change_next_song");
+        NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"ktv_cancel"),KTVLocalizedString(@"ktv_confirm"), nil];
         [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
             if(flag == YES){
                 if (weakSelf.selSongsArray.count >= 1) {
@@ -1699,19 +1695,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(self.soundVolume != setting.soundValue){
             [self.RTCkit adjustRecordingSignalVolume:setting.soundValue];
             self.soundVolume = setting.soundValue;
-            NSLog(@"当前设置人声%i",self.soundVolume);
         }
     } else if (type == VLKTVValueDidChangedTypeAcc) { // 伴奏
         int value = setting.accValue;
         if(self.playoutVolume != value){
             self.playoutVolume = value;
-            NSLog(@"当前设置伴奏%i",self.playoutVolume);
         }
     } else if (type == VLKTVValueDidChangedTypeListItem) {
         AgoraAudioEffectPreset preset = [self audioEffectPreset:setting.kindIndex];
         [self.RTCkit setAudioEffectPreset:preset];
     } else if (type == VLKTVValueDidChangedTypeRemoteValue) {
-        NSLog(@"当前设置远端音量%i",setting.remoteVolume);
         [self.RTCkit adjustPlaybackSignalVolume:setting.remoteVolume];
     }
 }
@@ -1870,7 +1863,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //人声突出设置
 - (void)voiceItemClickAction:(NSInteger)ItemIndex {
     if(self.voiceShowHasSeted){
-        [VLToast toast:@"每首歌仅可设置一次人声突出对象，请在下首歌再设置"];
+        [VLToast toast:KTVLocalizedString(@"ktv_per_set_once")];
         return;
     }
     self.voiceShowHasSeted = true;
@@ -2178,7 +2171,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
            }
         }
         if(flag == true && [self isRoomOwner]){// 已下麦
-            [VLToast toast:@"人声突出功能已失效，请重设"];
+            [VLToast toast:KTVLocalizedString(@"ktv_per_lose")];
             self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
             [self.MVView setPerViewAvatar:@""];
         }
@@ -2191,13 +2184,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
            }
         }
         if(offline == false && [self isRoomOwner]){// 已下麦
-            [VLToast toast:@"人声突出功能已失效，请重设"];
+            [VLToast toast:KTVLocalizedString(@"ktv_per_lose")];
             self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
             [self.MVView setPerViewAvatar:@""];
         }
         
         if([self.selectUserNo isEqualToString:seatsArray.firstObject.userNo] && ([self getChorusNumWithSeatArray:seatsArray] < 1 || (self.singRole == KTVSingRoleAudience && [self isRoomOwner]))){
-            [VLToast toast:@"人声突出功能已失效，请重设"];
+            [VLToast toast:KTVLocalizedString(@"ktv_per_lose")];
             self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
             [self.MVView setPerViewAvatar:@""];
         }
@@ -2494,7 +2487,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     dispatch_async_on_main_queue(^{
         
         if(status == AgoraMusicContentCenterPreloadStatusError){
-            [VLToast toast:@"加载歌曲失败，请切歌"];
+            [VLToast toast:KTVLocalizedString(@"ktv_load_failed_and_change")];
             [self.MVView setBotViewHidden:false];
             self.MVView.loadingType = VLKTVMVViewStateIdle;
             return;
