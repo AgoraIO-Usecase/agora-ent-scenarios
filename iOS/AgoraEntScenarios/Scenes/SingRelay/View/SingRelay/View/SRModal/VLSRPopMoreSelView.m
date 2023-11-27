@@ -30,7 +30,7 @@
 - (void)setupView {
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = KTVLocalizedString(@"ktv_more_actions");
+    titleLabel.text = SRLocalizedString(@"sr_more_actions");
     titleLabel.font = VLUIFontMake(16);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -47,9 +47,8 @@
    // NSArray *itemsArray = @[@"ktv_more_belcantoIcon",@"ktv_more_soundIcon",@"ktv_more_mvIcon"];
     NSArray *itemsArray = @[@"ktv_more_soundIcon",@"ktv_more_mvIcon"];
     NSArray *titlesArray = @[
-       // KTVLocalizedString(@"美声"),
-        KTVLocalizedString(@"ktv_voice_effect"),
-        KTVLocalizedString(@"MV")];
+        SRLocalizedString(@"sr_voice_effect"),
+        SRLocalizedString(@"MV")];
     for (int i=0; i<itemsArray.count; i++) {
         UIView *itemBgView = [[UIView alloc]initWithFrame:CGRectMake(leftMargin+(itemWH+middleMargin)*i, itemY, itemWH, itemWH)];
         itemBgView.layer.cornerRadius = itemWH*0.5;
