@@ -491,9 +491,11 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     func onMicSeatApplyDeleted(apply: ShowMicSeatApply) {
         _updateApplyMenu()
         isSendJointBroadcasting = false
-        ShowAgoraKitManager.shared.updateMediaOptions(publishCamera: false,
-                                                      channelId: room?.roomId ?? "",
-                                                      canvasView: nil)
+        if currentUserId != room?.ownerId {
+            ShowAgoraKitManager.shared.updateMediaOptions(publishCamera: false,
+                                                          channelId: room?.roomId ?? "",
+                                                          canvasView: nil)
+        }
     }
     
     func onMicSeatApplyAccepted(apply: ShowMicSeatApply) {
@@ -1016,7 +1018,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
             self.muteLocalVideo = selected
             if selected {
                 ShowAgoraKitManager.shared.engine?.stopPreview()
-                if let ownerId = self.room?.userId(), ownerId == self.currentUserId {
+                if let ownerId = self.room?.userId(), ownerId == self.currentUserId, self.currentInteraction?.interactStatus != .pking {
                     self.liveView.showThumnbnailCanvasView = true
                 }
             } else {
