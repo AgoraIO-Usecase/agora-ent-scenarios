@@ -712,7 +712,7 @@ class RoomObservableViewDelegate constructor(
             roomMicMangerDialog.show(activity.supportFragmentManager, "RoomMicManagerSheetDialog")
         } else if (micInfo.micStatus == MicStatus.Lock || micInfo.micStatus == MicStatus.LockForceMute) {
             // 座位被锁麦
-            ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_muted_by_host))
+            ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_close_by_host))
         } else if ((micInfo.micStatus == MicStatus.Idle || micInfo.micStatus == MicStatus.ForceMute) && micInfo.member == null) {
             val mineMicIndex = iRoomMicView.findMicByUid(VoiceBuddyFactory.get().getVoiceBuddy().userId())
             if (mineMicIndex >= 0) {

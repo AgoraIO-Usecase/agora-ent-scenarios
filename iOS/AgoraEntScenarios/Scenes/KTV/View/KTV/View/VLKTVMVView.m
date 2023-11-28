@@ -95,7 +95,7 @@
         [self.contentView setHidden:NO];
         [self.retryButton setHidden:NO];
         [self.loadingTipsLabel setHidden:NO];
-        self.loadingTipsLabel.text = @"歌词加载失败";
+        self.loadingTipsLabel.text = KTVLocalizedString(@"ktv_lrc_load_failed");
     } else if (loadingType == VLKTVMVViewStateIdle){
         [self.loadingView stopAnimating];
         [self.loadingView setHidden:YES];
@@ -111,7 +111,7 @@
 #if DEBUG
     self.loadingTipsLabel.text = [NSString stringWithFormat:@"loading %ld%%", loadingProgress];
 #else
-    self.loadingTipsLabel.text = @"加载中";
+    self.loadingTipsLabel.text = KTVLocalizedString(@"ktv_lrc_loading");
 #endif
 }
 
@@ -154,7 +154,7 @@
     self.retryButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.retryButton addTarget:self action:@selector(onRetryAction:) forControlEvents:UIControlEventTouchUpInside];
     self.retryButton.titleLabel.font = self.loadingTipsLabel.font;
-    [self.retryButton setTitle:@"  点击重试  " forState:UIControlStateNormal];
+    [self.retryButton setTitle:KTVLocalizedString(@"ktv_retry") forState:UIControlStateNormal];
     [self.retryButton sizeToFit];
     self.retryButton.layer.cornerRadius = self.retryButton.height / 2;
     self.retryButton.layer.borderWidth = 1;
@@ -231,7 +231,7 @@
     [self.BotView addSubview:_joinChorusBtn];
     
     self.leaveChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(15, 0, 54, 54)];
-    [self.leaveChorusBtn setTitle:@"退出合唱" forState:UIControlStateNormal];
+    [self.leaveChorusBtn setTitle:KTVLocalizedString(@"ktv_leave_chorus") forState:UIControlStateNormal];
     [self.leaveChorusBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [self.leaveChorusBtn setFont:UIFontMake(10.0)];
     [self.leaveChorusBtn setImage:[UIImage sceneImageWithName:@"Union"] forState:UIControlStateNormal];
@@ -251,7 +251,7 @@
     [self addSubview:_perShowView];
     
     UILabel *perLabel = [[UILabel alloc]initWithFrame:CGRectMake(8, 6, 45, 12)];
-    perLabel.text = @"突出人声";
+    perLabel.text = KTVLocalizedString(@"ktv_show_vol");
     perLabel.font = [UIFont systemFontOfSize:11];
     perLabel.textColor = [UIColor whiteColor];
     [_perShowView addSubview:perLabel];
@@ -297,11 +297,11 @@
 
 - (void)_refreshOriginButton {
     if(self.actionType == VLKTVMVViewActionTypeSingAcc){
-        [self.trackBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
+        [self.trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateNormal];
     } else if (self.actionType == VLKTVMVViewActionTypeSingLead) {
-        [self.trackBtn setTitle:KTVLocalizedString(@"导唱") forState:UIControlStateHighlighted];
+        [self.trackBtn setTitle:KTVLocalizedString(@"ktv_lead_sing") forState:UIControlStateHighlighted];
     } else if (self.actionType == VLKTVMVViewActionTypeSingOrigin) {
-        [self.trackBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
+        [self.trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateSelected];
     }
     [self setNeedsLayout];
 }
@@ -491,17 +491,17 @@
     switch (type) {
         case VLKTVMVViewActionTypeSingOrigin:
             _trackBtn.selected = YES;
-            [_trackBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
+            [_trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateNormal];
             [self.trackBtn setImage:[UIImage sceneImageWithName:@"original"] forState:UIControlStateSelected];
             break;
         case VLKTVMVViewActionTypeSingLead:
             _trackBtn.selected = NO;
-            [_trackBtn setTitle:KTVLocalizedString(@"导唱") forState:UIControlStateNormal];
+            [_trackBtn setTitle:KTVLocalizedString(@"ktv_lead_sing") forState:UIControlStateNormal];
             [self.trackBtn setImage:[UIImage sceneImageWithName:@"original"] forState:UIControlStateNormal];
             break;
         case VLKTVMVViewActionTypeSingAcc:
             _trackBtn.selected = NO;
-            [_trackBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
+            [_trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateNormal];
             [self.trackBtn setImage:[UIImage sceneImageWithName:@"acc"] forState:UIControlStateNormal];
             break;
         default:
@@ -585,8 +585,8 @@
          _pauseBtn = [[VLHotSpotBtn alloc] init];
         [self.pauseBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.pauseBtn.titleLabel.font = UIFontMake(10.0);
-        [self.pauseBtn setTitle:@"播放" forState:UIControlStateNormal];
-        [self.pauseBtn setTitle:@"暂停" forState:UIControlStateSelected];
+        [self.pauseBtn setTitle:KTVLocalizedString(@"ktv_room_player_play") forState:UIControlStateNormal];
+        [self.pauseBtn setTitle:KTVLocalizedString(@"ktv_room_player_pause") forState:UIControlStateSelected];
         [_pauseBtn setImage:[UIImage sceneImageWithName:@"ktv_pause_icon"] forState:UIControlStateSelected];
         [_pauseBtn setImage:[UIImage sceneImageWithName:@"ktv_pause_resumeicon"] forState:UIControlStateNormal];
         _pauseBtn.selected = NO;
@@ -599,7 +599,7 @@
     if (!_nextButton) {
         _nextButton = [[VLHotSpotBtn alloc] init];
         [_nextButton setImage:[UIImage sceneImageWithName:@"ktv_playNext_icon"] forState:UIControlStateNormal];
-        [self.nextButton setTitle:@"切歌" forState:UIControlStateNormal];
+        [self.nextButton setTitle:KTVLocalizedString(@"ktv_room_change_song") forState:UIControlStateNormal];
         [self.nextButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.nextButton.titleLabel.font = UIFontMake(10.0);
         [_nextButton addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
@@ -613,8 +613,8 @@
         _trackBtn = [[VLHotSpotBtn alloc] init];
         [self.trackBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.trackBtn.titleLabel.font = UIFontMake(10.0);
-        [self.trackBtn setTitle:@"导唱" forState:UIControlStateNormal];
-        [self.trackBtn setTitle:@"原唱" forState:UIControlStateSelected];
+        [self.trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateNormal];
+        [self.trackBtn setTitle:KTVLocalizedString(@"ktv_lead_sing") forState:UIControlStateSelected];
         [_trackBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_acc"] forState:UIControlStateSelected];
         [_trackBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_origin"] forState:UIControlStateNormal];
         _trackBtn.selected = NO;

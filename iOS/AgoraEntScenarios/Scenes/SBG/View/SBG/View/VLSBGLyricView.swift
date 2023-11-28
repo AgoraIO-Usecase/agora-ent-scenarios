@@ -170,7 +170,7 @@ class VLSBGLyricView: UIView {
     
     private lazy var nextBtn: UIButton = {
         let btn = UIButton()
-        btn.setTitle("切歌", for: .normal)
+        btn.setTitle(getLocalizeString(with: "sbg_room_change_song"), for: .normal)
         btn.setTitleColor(.white, for: .normal)
         btn.titleLabel?.font = UIFont.systemFont(ofSize: 11)
         btn.setImage(UIImage.sceneImage(name: "ktv_playNext_icon"), for: .normal)
@@ -182,7 +182,7 @@ class VLSBGLyricView: UIView {
     
     private lazy var effectBtn: UIButton = {
         let btn = UIButton()
-        btn.setTitle("调音", for: .normal)
+        btn.setTitle(getLocalizeString(with: "sbg_room_player_tweak"), for: .normal)
         btn.setTitleColor(.white, for: .normal)
         btn.titleLabel?.font = UIFont.systemFont(ofSize: 11)
         btn.setImage(UIImage.sceneImage(name: "ktv_subtitle_icon"), for: .normal)
@@ -194,8 +194,8 @@ class VLSBGLyricView: UIView {
     
     private lazy var originBtn: UIButton = {
         let btn = UIButton()
-        btn.setTitle("原唱", for: .normal)
-        btn.setTitle("原唱", for: .selected)
+        btn.setTitle(getLocalizeString(with: "sbg_ori_sing"), for: .normal)
+        btn.setTitle(getLocalizeString(with: "sbg_ori_sing"), for: .selected)
         btn.setTitleColor(.white, for: .normal)
         btn.titleLabel?.font = UIFont.systemFont(ofSize: 11)
         btn.setImage(UIImage.sceneImage(name: "original"), for: .normal)
@@ -228,6 +228,10 @@ class VLSBGLyricView: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func getLocalizeString(with key: String) -> String {
+        return Bundle.localizedString(key, bundleName: "sbgResource")
     }
     
     private func layoutUI() {

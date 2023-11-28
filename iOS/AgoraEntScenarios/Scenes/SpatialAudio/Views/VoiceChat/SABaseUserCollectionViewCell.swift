@@ -44,13 +44,12 @@ class SABaseUserCollectionViewCell: UICollectionViewCell {
 
     public func refreshUser(with mic: SARoomMic) {
         let status = mic.status
-        var bgIcon = ""
         switch status {
         case -1:
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = true
             rtcUserView.bgIconView.isHidden = false
-            rtcUserView.bgIconView.image = UIImage.sceneImage(name:"voice_wuren")
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
         case 0:
             rtcUserView.iconView.isHidden = false
             rtcUserView.micView.isHidden = false
@@ -58,36 +57,23 @@ class SABaseUserCollectionViewCell: UICollectionViewCell {
             rtcUserView.bgIconView.isHidden = true
             rtcUserView.nameBtn.setImage(UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"), for: .normal)
         case 1:
-            // 需要区分有用户还是没有用户
-            bgIcon = mic.member == nil ? "icons／solid／mute" : ""
-            if mic.member != nil {
-                rtcUserView.micView.isHidden = false
-                rtcUserView.micView.setState(.off)
-            } else {
-                rtcUserView.micView.isHidden = true
-            }
-            rtcUserView.bgIconView.image = UIImage.sceneImage(name:bgIcon)
-            rtcUserView.bgIconView.isHidden = mic.member != nil
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
+            rtcUserView.micView.isHidden = false
+            rtcUserView.micView.setState(.off)
         case 2:
-            bgIcon = mic.member == nil ? "icons／solid／mute" : ""
-            if mic.member != nil {
-                rtcUserView.micView.isHidden = false
-                rtcUserView.micView.setState(.off)
-            } else {
-                rtcUserView.micView.isHidden = true
-            }
-            rtcUserView.bgIconView.image = UIImage.sceneImage(name:bgIcon)
-            rtcUserView.bgIconView.isHidden = mic.member != nil
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
+            rtcUserView.micView.isHidden = false
+            rtcUserView.micView.setState(.off)
         case 3:
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = true
-            rtcUserView.bgIconView.image = UIImage.sceneImage(name:"icons／solid／lock")
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_lock", bundleName: "SpatialAudioResource")
             rtcUserView.bgIconView.isHidden = false
         case 4:
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = false
             rtcUserView.micView.setState(.forbidden)
-            rtcUserView.bgIconView.image = UIImage.sceneImage(name:"icons／solid／lock")
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_lock", bundleName: "SpatialAudioResource")
             rtcUserView.bgIconView.isHidden = false
         default:
             break
