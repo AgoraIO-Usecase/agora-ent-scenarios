@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.agora.scene.joy">
+
+    <application>
+
+        <activity
+            android:name="io.agora.scene.joy.ui.RoomListActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/joy_def_material_theme"/>
+    </application>
+</manifest>
