@@ -30,4 +30,6 @@ dependencies {
 
     implementation rootProject.ext.deps.syncManager
 
+    implementation 'commons-codec:commons-codec:1.16.0'
+
 }

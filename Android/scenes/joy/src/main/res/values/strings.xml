@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources translatable="false">
     <string name="joy_play">弹幕玩法</string>
+    <string name="joy_play_empty_room">欢迎来到声网弹幕玩法方案\n目前暂无房间</string>
+    <string name="joy_live_prepare_tip">本产品仅用于功能体验，单次直播时长不超过10mins</string>
 </resources>

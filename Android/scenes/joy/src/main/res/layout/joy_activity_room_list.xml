@@ -39,6 +39,7 @@
             android:visibility="gone"
             android:clipChildren="false"
             android:clipToPadding="false"
+            tools:listitem="@layout/joy_item_room_list"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="2"
             tools:visibility="visible"/>
@@ -55,6 +56,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:gravity="center"
+        android:src="@drawable/joy_icon_room_list_create"
         android:backgroundTint="@android:color/transparent"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -79,6 +81,8 @@
         android:layout_marginHorizontal="47dp"
         android:gravity="center"
         android:textSize="14sp"
+        android:textColor="#6F738B"
+        android:text="@string/joy_play_empty_room"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ivBgMobile" />
