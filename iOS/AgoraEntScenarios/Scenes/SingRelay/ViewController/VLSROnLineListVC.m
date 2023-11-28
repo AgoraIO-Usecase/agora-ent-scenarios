@@ -46,7 +46,7 @@
 
 - (void)commonUI {
     [self setBackgroundImage:@"online_list_BgIcon"];
-    [self setNaviTitleName:SRLocalizedString(@"ktv_singRelay")];
+    [self setNaviTitleName:SRLocalizedString(@"sr_name")];
     if ([VLUserCenter center].isLogin) {
         [self setBackBtn];
     }
@@ -109,9 +109,9 @@
 //    if (![self checkIsLogin]) return;
      
     if (listModel.isPrivate) {
-        NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"ktv_cancel"),KTVLocalizedString(@"ktv_confirm"), nil];
+        NSArray *array = [[NSArray alloc]initWithObjects:SRLocalizedString(@"sr_cancel"),SRLocalizedString(@"sr_confirm"), nil];
         VL(weakSelf);
-        [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:KTVLocalizedString(@"ktv_input_pwd") message:@"" placeHolder:KTVLocalizedString(@"ktv_pls_input_pwd") type:ALERTYPETEXTFIELD buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
+        [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:SRLocalizedString(@"sr_input_pwd") message:@"" placeHolder:SRLocalizedString(@"sr_pls_input_pwd") type:ALERTYPETEXTFIELD buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
             [weakSelf joinInRoomWithModel:listModel withInPutText:text];
             [[VLAlert shared] dismiss];
         }];
@@ -122,7 +122,7 @@
 
 - (void)joinInRoomWithModel:(VLSRRoomListModel *)listModel withInPutText:(NSString *)inputText {
     if (listModel.isPrivate && ![listModel.password isEqualToString:inputText]) {
-        [VLToast toast:KTVLocalizedString(@"PasswordError")];
+        [VLToast toast:SRLocalizedString(@"PasswordError")];
         return;
     }
     

@@ -120,7 +120,7 @@ class VLSRStatusView: UIView {
                 contentImgView.isHidden = false
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = false
-                contentTextLabel.text = "房主点歌中，游戏即将开始"
+                contentTextLabel.text = getLocalizeString(with: "sr_bro_choose")
                 lrcView.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -132,7 +132,7 @@ class VLSRStatusView: UIView {
                 contentImgView.isHidden = false
                 tableView.isHidden = true
                 contentTextLabel.isHidden = false
-                contentTextLabel.text = "房主点歌中，游戏即将开始"
+                contentTextLabel.text = getLocalizeString(with: "sr_bro_choose")
                 lrcView.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -145,7 +145,7 @@ class VLSRStatusView: UIView {
                 contentImgView.isHidden = true
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "房主点歌中，游戏即将开始"
+                contentTextLabel.text = getLocalizeString(with: "sr_bro_choose")
                 lrcView.isHidden = false
                 lrcView.state = .singingAudience
                 orderBtn.isHidden = true
@@ -160,7 +160,7 @@ class VLSRStatusView: UIView {
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
                 contentTextLabel.isHidden = false
-                contentTextLabel.text = "嗨唱开始"
+                contentTextLabel.text = getLocalizeString(with: "sr_start")
                 lrcView.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -173,7 +173,7 @@ class VLSRStatusView: UIView {
                 tableView.isHidden = true
                 contentTextLabel.isHidden = false
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "嗨唱开始"
+                contentTextLabel.text = getLocalizeString(with: "sr_start")
                 lrcView.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -186,7 +186,7 @@ class VLSRStatusView: UIView {
                 tableView.isHidden = true
                 contentTextLabel.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "嗨唱开始"
+                contentTextLabel.text = getLocalizeString(with: "sr_start")
                 lrcView.isHidden = false
                 lrcView.state = .playerWithSinging
                 orderBtn.isHidden = true
@@ -201,7 +201,7 @@ class VLSRStatusView: UIView {
                 tableView.isHidden = true
                 contentTextLabel.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "嗨唱开始"
+                contentTextLabel.text = getLocalizeString(with: "sr_start")
                 lrcView.isHidden = false
                 lrcView.state = .broadcasterWithSinging
                 orderBtn.isHidden = true
@@ -216,7 +216,7 @@ class VLSRStatusView: UIView {
                 tableView.isHidden = true
                 contentTextLabel.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "嗨唱开始"
+                contentTextLabel.text = getLocalizeString(with: "sr_start")
                 lrcView.isHidden = false
                 lrcView.state = .broadcasterWithoutSinging
                 orderBtn.isHidden = true
@@ -231,7 +231,7 @@ class VLSRStatusView: UIView {
                 tableView.isHidden = true
                 contentTextLabel.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "嗨唱开始"
+                contentTextLabel.text = getLocalizeString(with: "sr_start")
                 lrcView.isHidden = false
                 lrcView.state = .playerWithoutSinging
                 orderBtn.isHidden = true
@@ -245,7 +245,7 @@ class VLSRStatusView: UIView {
                 contentImgView.isHidden = false
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "即将抢唱下轮歌曲"
+                contentTextLabel.text = getLocalizeString(with: "sr_ready_choose")
                 lrcView.isHidden = false
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -271,7 +271,7 @@ class VLSRStatusView: UIView {
                 contentImgView.isHidden = true
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "房主点歌中，游戏即将开始"
+                contentTextLabel.text = getLocalizeString(with: "sr_bro_choose")
                 lrcView.isHidden = false
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -282,7 +282,7 @@ class VLSRStatusView: UIView {
                 contentImgView.isHidden = true
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "嗨唱开始"
+                contentTextLabel.text = getLocalizeString(with: "sr_start")
                 lrcView.isHidden = false
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
@@ -419,7 +419,7 @@ class VLSRStatusView: UIView {
     
     private lazy var noticeBtn: UIButton = {
         let btn = UIButton()
-        btn.setTitle("公告 >", for: .normal)
+        btn.setTitle(getLocalizeString(with: "sr_notice"), for: .normal)
         btn.setTitleColor(.white, for: .normal)
         btn.layer.cornerRadius = 10
         btn.layer.masksToBounds = true
@@ -465,7 +465,7 @@ class VLSRStatusView: UIView {
     
     private lazy var resultTitleLabel: UILabel = { //本轮评分
         let label = UILabel()
-        label.text = "本轮评分"
+        label.text = getLocalizeString(with: "sr_this_score")
         label.textAlignment = .center
         label.textColor = .white
         return label
@@ -718,6 +718,10 @@ class VLSRStatusView: UIView {
         notiView.frame = CGRect(x: 12, y: 10, width: self.bounds.width - 24, height: 105)
         
         srBtn.frame = CGRect(x: (self.bounds.width - 88)/2.0, y: self.bounds.height - 58, width: 88, height: 38)
+    }
+    
+    private func getLocalizeString(with key: String) -> String {
+        return Bundle.localizedString(key, bundleName: "SRResource")
     }
 }
 

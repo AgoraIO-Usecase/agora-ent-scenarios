@@ -20,7 +20,7 @@
 - (void)setupView {
 
     UILabel *introduceLabel = [[UILabel alloc]init];
-    NSString *introduceStr = SRLocalizedString(@"ktv_create_sr_tips1");
+    NSString *introduceStr = SRLocalizedString(@"sr_create_tips1");
     introduceLabel.attributedText = [self attributedString:introduceStr fontSize:14 lineSpace:4 wordSpace:0];
     introduceLabel.textAlignment = NSTextAlignmentCenter;
     introduceLabel.numberOfLines = 0;

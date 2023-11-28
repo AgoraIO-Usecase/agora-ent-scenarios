@@ -16,7 +16,6 @@
 @property (nonatomic, strong) VLHotSpotBtn *dianGeBtn;
 @property (nonatomic, strong) VLHotSpotBtn *choosedBtn;
 @property (nonatomic, strong) UILabel      *choosedCountLabel;
-@property (nonatomic, strong) UILabel      *sourceLabel;
 @property (nonatomic, strong) VLSRSelectedSongList *selsectSongView;
 @property (nonatomic, strong) VLSRSongList *choosedSongView;
 
@@ -46,7 +45,6 @@
     [self addSubview:self.dianGeBtn];
     [self addSubview:self.choosedBtn];
     [self addSubview:self.choosedCountLabel];
-    [self addSubview:self.sourceLabel];
     [self addSubview:self.selsectSongView];
     [self addSubview:self.choosedSongView];
 }
@@ -97,7 +95,7 @@
 - (VLHotSpotBtn *)dianGeBtn {
     if (!_dianGeBtn) {
         _dianGeBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(30, 20, 34, 22)];
-        [_dianGeBtn setTitle:KTVLocalizedString(@"ktv_order_song") forState:UIControlStateNormal];
+        [_dianGeBtn setTitle:SRLocalizedString(@"sr_order_song") forState:UIControlStateNormal];
         _dianGeBtn.titleLabel.font = UIFontBoldMake(16);
         [_dianGeBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
         _dianGeBtn.tag = 0;
@@ -110,7 +108,7 @@
 - (VLHotSpotBtn *)choosedBtn {
     if (!_choosedBtn) {
         _choosedBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(_dianGeBtn.right+28, 20, 34, 22)];
-        [_choosedBtn setTitle:KTVLocalizedString(@"ktv_room_chosen_song_list") forState:UIControlStateNormal];
+        [_choosedBtn setTitle:SRLocalizedString(@"sr_room_chosen_song_list") forState:UIControlStateNormal];
         _choosedBtn.titleLabel.font = UIFontMake(14);
         [_choosedBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
         _choosedBtn.tag = 1;
@@ -131,18 +129,6 @@
         _choosedCountLabel.backgroundColor = UIColorMakeWithHex(@"#156EF3");
     }
     return _choosedCountLabel;
-}
-
-- (UILabel *)sourceLabel {
-    if (!_sourceLabel) {
-        _sourceLabel = [[UILabel alloc]initWithFrame:CGRectMake(self.width-25-90, _dianGeBtn.centerY-7, 90, 14)];
-        _sourceLabel.textColor = UIColorMakeWithHex(@"#979CBB");
-        _sourceLabel.font = UIFontMake(10);
-        _sourceLabel.text = KTVLocalizedString(@"歌曲来自咪咕音乐");
-        _sourceLabel.textAlignment = NSTextAlignmentRight;
-        _sourceLabel.hidden = YES;
-    }
-    return _sourceLabel;
 }
 
 - (VLSRSelectedSongList *)selsectSongView {

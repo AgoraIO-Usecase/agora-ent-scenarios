@@ -9,7 +9,6 @@
 #import "VLMacroDefine.h"
 #import "AESMacro.h"
 #import "UIView+VL.h"
-#import "VLSREffectView.h"
 
 @implementation LSTPopView (SRModal)
 
@@ -125,21 +124,6 @@
     LSTPopView* popView = [self _createSRPopContainerWithContentView:chooseSongView
                                                           withParentView:parentView];
     popView.isAvoidKeyboard = NO;
-    [popView pop];
-    
-    return popView;
-}
-
-//弹出音效
-+ (LSTPopView*)popSRSetSoundEffectViewWithParentView:(UIView*)parentView
-                                         soundView:(VLSREffectView*)soundView
-                                      withDelegate:(id<VLSREffectViewDelegate>)delegate {
-    CGFloat popViewH = 88+17+270+kSafeAreaBottomHeight;                                                                                     
-    VLSREffectView* EffectView = [[VLSREffectView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
-                                                                                            withDelegate:delegate];
-
-    LSTPopView* popView = [self _createSRPopContainerWithContentView:EffectView
-                                                       withParentView:parentView];
     [popView pop];
     
     return popView;

@@ -40,7 +40,7 @@ class SRKaraokeLoadingView: UIView {
         
         titleLabel.frame = CGRect(x: 50, y: 10, width: 87, height: 20)
         titleLabel.textColor = .white
-        titleLabel.text = "歌曲准备中..."
+        titleLabel.text = Bundle.localizedString("sr_song_loading", bundleName: "SRResource")
         titleLabel.font = UIFont.systemFont(ofSize: 14)
         loadingView.addSubview(titleLabel)
         

@@ -44,7 +44,7 @@ class SRSkipView: UIView {
         
         skipBtn = UIButton()
         skipBtn.titleLabel?.font = UIFont.systemFont(ofSize: 15)
-        skipBtn.setTitle("  跳过前奏", for: .normal)
+        skipBtn.setTitle(getLocalizeString(with: "sr_skip_pre"), for: .normal)
         skipBtn.setTitleColor(.white, for: .normal)
         skipBtn.addTarget(self, action: #selector(skip(_:)), for: .touchUpInside)
         skipBtn.tag = 200
@@ -60,7 +60,7 @@ class SRSkipView: UIView {
     }
         
     func setSkipType(_ type: SkipType) {
-        let title = type == .prelude ? "跳过前奏" : "跳过尾奏"
+        let title = type == .prelude ? getLocalizeString(with: "sr_skip_pre") : getLocalizeString(with: "sr_skip_end")
         skipBtn.setTitle(title, for: .normal)
     }
     
@@ -77,5 +77,9 @@ class SRSkipView: UIView {
         self.bgView.layer.borderWidth = 1
         self.skipBtn.frame = CGRect(x: 10, y: 0, width: self.bounds.size.width / 3.0 * 2 , height: self.bounds.size.height)
         self.canCelBtn.frame = CGRect(x: self.bounds.size.width / 3.0 * 2, y: 0, width: self.bounds.size.width / 3.0 , height: self.bounds.size.height)
+    }
+    
+    private func getLocalizeString(with key: String) -> String {
+        return Bundle.localizedString(key, bundleName: "SRResource")
     }
 }

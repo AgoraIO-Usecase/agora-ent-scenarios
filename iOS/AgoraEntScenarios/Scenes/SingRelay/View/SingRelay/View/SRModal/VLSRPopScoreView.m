@@ -122,7 +122,7 @@
 - (UILabel *)scoreLabel {
     if (!_scoreLabel) {
         _scoreLabel = [[UILabel alloc] init];
-        _scoreLabel.text = KTVLocalizedString(@"99");
+        _scoreLabel.text = SRLocalizedString(@"99");
         _scoreLabel.font = VLUIFontMake(30);
         _scoreLabel.textColor = [UIColor whiteColor];
     }
@@ -132,7 +132,7 @@
 - (UILabel *)scoreTitleLabel {
     if (!_scoreTitleLabel) {
         _scoreTitleLabel = [[UILabel alloc] init];
-        _scoreTitleLabel.text = KTVLocalizedString(@"ktv_score");
+        _scoreTitleLabel.text = SRLocalizedString(@"sr_score");
         _scoreTitleLabel.font = VLUIFontMake(14);
         _scoreTitleLabel.textColor = [UIColor whiteColor];
     }
@@ -177,7 +177,7 @@
         _confirmButton.layer.cornerRadius = 20;
         _confirmButton.layer.masksToBounds = YES;
         [_confirmButton setBackgroundColor:UIColorMakeWithHex(@"#345DFF")];
-        [_confirmButton setTitle:KTVLocalizedString(@"ktv_ok") forState:UIControlStateNormal];
+        [_confirmButton setTitle:SRLocalizedString(@"sr_ok") forState:UIControlStateNormal];
         _confirmButton.titleLabel.font = UIFontBoldMake(16);
         [_confirmButton setTitleColor:UIColorWhite forState:UIControlStateNormal];
         [_confirmButton addTarget:self action:@selector(click) forControlEvents:UIControlEventTouchUpInside];

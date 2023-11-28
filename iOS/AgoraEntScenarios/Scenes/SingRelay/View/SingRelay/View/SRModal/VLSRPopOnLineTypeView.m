@@ -39,7 +39,7 @@
     [self addSubview:backBtn];
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = @"上麦";
+    titleLabel.text = SRLocalizedString(@"sr_onMi");
     titleLabel.font = VLUIFontMake(16);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -47,14 +47,10 @@
     
     CGFloat margin = VLREALVALUE_WIDTH(20);
     CGFloat itemW = (SCREEN_WIDTH-3*margin)/2.0;
-    
-//    QMUIButton *audioBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"KTV_onLineType_audionIcon"]
-//                                                            title:KTVLocalizedString(@"音频上麦")];
     UIButton *audioBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [audioBtn setTitle:KTVLocalizedString(@"ktv_audio_onmic") forState:UIControlStateNormal];
+    [audioBtn setTitle:SRLocalizedString(@"sr_audio_onmic") forState:UIControlStateNormal];
     [audioBtn setImage:[UIImage sceneImageWithName:@"KTV_onLineType_audionIcon"] forState:UIControlStateNormal];
     audioBtn.frame = CGRectMake(margin, titleLabel.bottom+26, itemW, VLREALVALUE_WIDTH(72));
-//    audioBtn.imagePosition = QMUIButtonImagePositionLeft;
     audioBtn.spacingBetweenImageAndTitle = 16;
     audioBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [audioBtn setTitleColor:UIColorMakeWithHex(@"#C6C4DE") forState:UIControlStateNormal];
@@ -63,7 +59,6 @@
     audioBtn.layer.masksToBounds = YES;
     audioBtn.tag = 0;
     self.audioBtn = audioBtn;
-//    self.audioBtn.adjustsButtonWhenHighlighted = NO;
     self.audioBtn.layer.borderWidth = 1.5f;
     self.audioSelImgView.hidden = YES;
     [audioBtn addTarget:self action:@selector(typeBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
@@ -74,14 +69,11 @@
     self.audioSelImgView.image = [UIImage sceneImageWithName:@"ktv_selbg_icon"];
     self.audioSelImgView.hidden = YES;
     [self addSubview:self.audioSelImgView];
-    
-//    QMUIButton *videoBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"KTV_onLineType_videoIcon"]
-//                                                            title:KTVLocalizedString(@"视频上麦")];
+
     UIButton *videoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [audioBtn setTitle:KTVLocalizedString(@"ktv_video_onmic") forState:UIControlStateNormal];
+    [audioBtn setTitle:SRLocalizedString(@"sr_video_onmic") forState:UIControlStateNormal];
     [audioBtn setImage:[UIImage sceneImageWithName:@"KTV_onLineType_videoIcon"] forState:UIControlStateNormal];
     videoBtn.frame = CGRectMake(audioBtn.right+margin, audioBtn.top, itemW, VLREALVALUE_WIDTH(72));
-//    videoBtn.imagePosition = QMUIButtonImagePositionLeft;
     videoBtn.spacingBetweenImageAndTitle = 16;
     videoBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [videoBtn setTitleColor:UIColorMakeWithHex(@"#C6C4DE") forState:UIControlStateNormal];
@@ -91,7 +83,6 @@
     videoBtn.tag = 1;
     self.videoBtn = videoBtn;
     self.videoBtn.layer.borderWidth = 1.5f;
-//    self.videoBtn.adjustsButtonWhenHighlighted = NO;
     [videoBtn addTarget:self action:@selector(typeBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [videoBtn setBackgroundColor:UIColorMakeWithHex(@"#000000")];
     [self addSubview:videoBtn];

@@ -20,7 +20,6 @@ class SRGameRuleView: UIView {
     
     private let ruleLabel: UILabel = {
         let label = UILabel()
-        label.text = "游戏规则"
         label.textColor = .white
         label.font = UIFont.systemFont(ofSize: 15)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -29,7 +28,6 @@ class SRGameRuleView: UIView {
     
     private let hideButton: UIButton = {
         let button = UIButton()
-        button.setTitle("收起", for: .normal)
         button.setTitleColor(.blue, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
@@ -44,7 +42,6 @@ class SRGameRuleView: UIView {
     
     private let contentLabel: UILabel = {
         let label = UILabel()
-        label.text = "系统随机播放一首分好的歌曲，首段由房主主唱，抢到演唱权的玩家演唱下一段，游戏末显示评分排名。"
         label.textAlignment = .left
         label.numberOfLines = 0
         label.font = UIFont.systemFont(ofSize: 12)
@@ -52,6 +49,10 @@ class SRGameRuleView: UIView {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
+    private func getLocalizeString(with key: String) -> String {
+        return Bundle.localizedString(key, bundleName: "SRResource")
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -88,6 +89,11 @@ class SRGameRuleView: UIView {
         
         self.layer.cornerRadius = 10
         self.layer.masksToBounds = true
+        
+        ruleLabel.text = getLocalizeString(with: "sr_game_rule")
+        hideButton.setTitle(getLocalizeString(with: "sr_tip_off"), for: .normal)
+        contentLabel.text = getLocalizeString(with: "sr_rule_desc")
+        
     }
     
     required init?(coder: NSCoder) {

@@ -54,20 +54,20 @@
     [[moreButton.centerYAnchor constraintEqualToAnchor:closeBtn.centerYAnchor]setActive:YES];
     [[moreButton.widthAnchor constraintEqualToConstant:24]setActive:YES];
     
-    self.titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(54+10, 10, 120, 18)];
+    self.titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(54+10, 10, 100, 18)];
     self.titleLabel.font = [UIFont systemFontOfSize:14];
     self.titleLabel.textColor = [UIColor whiteColor];
     [self addSubview:self.titleLabel];
 
-    self.countLabel = [[UILabel alloc]initWithFrame:CGRectMake(54 + 5, 30, 60, 12)];
+    self.countLabel = [[UILabel alloc]initWithFrame:CGRectMake(54 + 5, 30, 50, 12)];
     self.countLabel.font = [UIFont systemFontOfSize:12];
     self.countLabel.textAlignment = NSTextAlignmentRight;
     self.countLabel.textColor = [UIColor whiteColor];
     [self addSubview:self.countLabel];
     
     self.networkStatusBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    self.networkStatusBtn.frame = CGRectMake(120 + 5, 30, 70, 12);
-    [self.networkStatusBtn setTitle:SRLocalizedString(@"本机网络好") forState:UIControlStateNormal];
+    self.networkStatusBtn.frame = CGRectMake(110 + 5, 30, 70, 12);
+    [self.networkStatusBtn setTitle:SRLocalizedString(@"sr_net_status_good") forState:UIControlStateNormal];
     [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
     self.networkStatusBtn.spacingBetweenImageAndTitle = 0;
     self.networkStatusBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
@@ -92,7 +92,7 @@
 - (void)setListModel:(VLSRRoomListModel *)listModel {
     _listModel = listModel;
     self.titleLabel.text = listModel.name;
-    NSString *roomCountPre = SRLocalizedString(@"ktv_room_count");
+    NSString *roomCountPre = SRLocalizedString(@"sr_room_count");
     [self.logoImgView sd_setImageWithURL:[NSURL URLWithString: listModel.creatorAvatar]];
     if (listModel.roomPeopleNum) {
         NSString *roomCountString = [NSString stringWithFormat:@"%@%@  |",  listModel.roomPeopleNum, roomCountPre];
@@ -108,19 +108,19 @@
 {
     if(quality == 0) {
         [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
-        [self.networkStatusBtn setTitle:SRLocalizedString(@"ktv_net_status_good") forState:UIControlStateNormal];
+        [self.networkStatusBtn setTitle:SRLocalizedString(@"sr_net_status_good") forState:UIControlStateNormal];
     }
     else if (quality == 1) {
         [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_okIcon"] forState:UIControlStateNormal];
-        [self.networkStatusBtn setTitle:SRLocalizedString(@"ktv_net_status_m") forState:UIControlStateNormal];
+        [self.networkStatusBtn setTitle:SRLocalizedString(@"sr_net_status_m") forState:UIControlStateNormal];
     }
     else if(quality == 2) {
         [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_badIcon"] forState:UIControlStateNormal];
-        [self.networkStatusBtn setTitle:SRLocalizedString(@"ktv_net_status_low") forState:UIControlStateNormal];
+        [self.networkStatusBtn setTitle:SRLocalizedString(@"sr_net_status_low") forState:UIControlStateNormal];
     }
     else {
         [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
-        [self.networkStatusBtn setTitle:SRLocalizedString(@"ktv_net_status_good") forState:UIControlStateNormal];
+        [self.networkStatusBtn setTitle:SRLocalizedString(@"sr_net_status_good") forState:UIControlStateNormal];
     }
 }
 
