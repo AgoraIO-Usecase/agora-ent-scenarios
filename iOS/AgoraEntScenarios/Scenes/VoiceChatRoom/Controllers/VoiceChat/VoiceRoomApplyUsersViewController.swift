@@ -17,7 +17,7 @@ public class VoiceRoomApplyUsersViewController: UITableViewController {
     
     var agreeApply:((VRRoomMic) -> Void)?
     
-    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "voice_no_one_raised_hands_yet", image: nil).backgroundColor(.white)
+    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 84, width: ScreenWidth, height: 360), title: "voice_no_one_raised_hands_yet", image: nil).backgroundColor(.white)
 
     public convenience init(roomId: String) {
         self.init()

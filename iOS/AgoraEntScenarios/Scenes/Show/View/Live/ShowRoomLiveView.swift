@@ -47,11 +47,11 @@ class ShowRoomLiveView: UIView {
         return view
     }()
     
-    lazy var thumnbnailCanvasView: ShowThumnbnailCanvasView = {
-        let view = ShowThumnbnailCanvasView(frame: self.bounds)
-        view.isHidden = true
-        return view
-    }()
+    var showThumnbnailCanvasView = false {
+        didSet{
+            canvasView.thumnbnailCanvasView.isHidden = !showThumnbnailCanvasView
+        }
+    }
     
     private var chatArray = [ShowChatModel]()
     
@@ -141,11 +141,6 @@ class ShowRoomLiveView: UIView {
             make.edges.equalToSuperview()
         }
         
-        addSubview(thumnbnailCanvasView)
-        thumnbnailCanvasView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        
         addSubview(roomInfoView)
         roomInfoView.snp.makeConstraints { make in
             let top = Screen.safeAreaTopHeight()
@@ -174,7 +169,7 @@ class ShowRoomLiveView: UIView {
         
         addSubview(tableView)
         tableView.snp.makeConstraints { make in
-            let bottomOffset = Screen.safeAreaBottomHeight() + 109
+//            let bottomOffset = Screen.safeAreaBottomHeight() + 109
             make.left.equalTo(15)
             make.bottom.equalTo(-kTableViewBottomOffset)
             make.right.equalTo(-70)

@@ -22,6 +22,12 @@ protocol ShowCanvasViewDelegate: NSObjectProtocol {
 class ShowCanvasView: UIView {
     weak var delegate: ShowCanvasViewDelegate?
     
+    lazy var thumnbnailCanvasView: ShowThumnbnailCanvasView = {
+        let view = ShowThumnbnailCanvasView(frame: self.bounds)
+        view.isHidden = true
+        return view
+    }()
+    
     lazy var localView = UIView()
     lazy var remoteView: UIView = {
         let view = UIView()
@@ -241,6 +247,11 @@ class ShowCanvasView: UIView {
     
     private func setupUI() {
         addSubview(localView)
+        addSubview(thumnbnailCanvasView)
+        thumnbnailCanvasView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
         addSubview(remoteView)
         addSubview(timerView)
         addSubview(pkView)
