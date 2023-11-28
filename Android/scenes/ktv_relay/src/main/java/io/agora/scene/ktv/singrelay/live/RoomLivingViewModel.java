@@ -1093,6 +1093,7 @@ public class RoomLivingViewModel extends ViewModel {
             if (gameModel.getStatus() == SingRelayGameStatus.waitting.getValue()) {
                 singRelayGameStatusMutableLiveData.postValue(GameStatus.ON_WAITING);
                 isGaming = false;
+                resetMusicStatus();
             } else if (gameModel.getStatus() == SingRelayGameStatus.started.getValue()) {
                 singRelayGameStatusMutableLiveData.postValue(GameStatus.ON_START);
                 rankMap.clear();

@@ -1103,6 +1103,7 @@ class ShowSyncManagerServiceImpl constructor(
 
         // pk
         if (roomInfoController.pKCompetitorInvitationList.isEmpty()) {
+            ShowLogger.d(TAG, "pk competitor mute audio")
             // pk 对象
             val invitation =
                 roomInfoController.pKInvitationList.filter { it.userId == userId }.getOrNull(0)
@@ -1131,6 +1132,7 @@ class ShowSyncManagerServiceImpl constructor(
             }
         } else {
             // pk 发起者
+            ShowLogger.d(TAG, "pk sender mute audio")
             val invitation =
                 roomInfoController.pKCompetitorInvitationList.filter { it.fromUserId == userId }
                     .getOrNull(0)
@@ -1780,6 +1782,7 @@ class ShowSyncManagerServiceImpl constructor(
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
+        ShowLogger.d(TAG, "innerUpdatePKInvitation called")
         sceneReference?.collection(kCollectionIdPKInvitation)
             ?.update(objectId, pkInvitation, object : Sync.Callback {
                 override fun onSuccess() {
@@ -1819,6 +1822,7 @@ class ShowSyncManagerServiceImpl constructor(
             }
 
             override fun onUpdated(item: IObject?) {
+                ShowLogger.d(TAG, "innerSubscribePKInvitationChanged onUpdated")
                 val info = item?.toObject(ShowPKInvitation::class.java) ?: return
                 // pk对象
                 val list = roomInfoController.pKInvitationList.filter { it.userId == info.userId }
@@ -1919,10 +1923,10 @@ class ShowSyncManagerServiceImpl constructor(
                     roomInfoController.objIdOfPKCompetitorInvitation[indexOf] = item.id
                 }
 
-                ShowLogger.d("hugo", "pk邀请发现变化")
+                ShowLogger.d(TAG, "pk邀请发现变化")
                 if (info.status == ShowRoomRequestStatus.accepted.value && !isInteractionCreated) {
                     isInteractionCreated = true
-                    ShowLogger.d("hugo", "pk对手接受pk邀请了")
+                    ShowLogger.d(TAG, "pk对手接受pk邀请了")
                     val interaction = ShowInteractionInfo(
                         info.userId,
                         info.userName,
@@ -1933,6 +1937,31 @@ class ShowSyncManagerServiceImpl constructor(
                         createdAt = info.createAt
                     )
                     innerCreateInteraction(info.fromRoomId, interaction, null, null)
+                } else {
+                    val oldInteraction =
+                        roomInfoController.interactionInfoList.filter { it.userId == info.userId }
+                            .getOrNull(0)
+                    if (oldInteraction != null) {
+                        val indexOf = roomInfoController.interactionInfoList.indexOf(oldInteraction)
+                        val objId = roomInfoController.objIdOfInteractionInfo[indexOf]
+
+                        val interaction = ShowInteractionInfo(
+                            oldInteraction.userId,
+                            oldInteraction.userName,
+                            oldInteraction.roomId,
+                            oldInteraction.interactStatus,
+                            info.userMuteAudio,
+                            info.fromUserMuteAudio,
+                            oldInteraction.createdAt
+                        )
+                        innerUpdateInteraction(
+                            roomInfoController.sceneReference,
+                            objId,
+                            interaction,
+                            success = {},
+                            error = {}
+                        )
+                    }
                 }
 
                 runOnMainThread {
@@ -2033,6 +2062,7 @@ class ShowSyncManagerServiceImpl constructor(
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
+        ShowLogger.d(TAG, "innerUpdateInteraction called")
         sceneReference?.collection(kCollectionIdInteractionInfo)
             ?.update(objectId, info, object : Sync.Callback {
                 override fun onSuccess() {
