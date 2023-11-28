@@ -31,8 +31,7 @@ public class ApiManager {
         private static ApiManager apiManager = new ApiManager();
     }
 
-    private final String domain = "http://218.205.37.50:16000";
-    private final String testIp = "218.205.37.50";
+    private final String domain = "https://api.sd-rtn.com";
 
     private final String TAG = "ApiManager";
 
@@ -53,7 +52,6 @@ public class ApiManager {
         try {
             JSONObject acquireOjb = new JSONObject();
             acquireOjb.put("instanceId", System.currentTimeMillis() + "");
-            acquireOjb.put("testIp", testIp);
             Request request = new Request.Builder()
                     .url(getTokenUrl(domain, BuildConfig.AGORA_APP_ID))
                     .addHeader("Content-Type", "application/json")
@@ -197,7 +195,7 @@ public class ApiManager {
 
     private String getBasicAuth() {
         // 拼接客户 ID 和客户密钥并使用 base64 编码
-        String plainCredentials = BuildConfig.AGORA_APP_ID + ":" + BuildConfig.AGORA_APP_CERTIFICATE;
+        String plainCredentials = BuildConfig.CLOUD_PLAYER_KEY + ":" + BuildConfig.CLOUD_PLAYER_SECRET;
         String base64Credentials = null;
         base64Credentials = new String(Base64.getEncoder().encode(plainCredentials.getBytes()));
         // 创建 authorization header
