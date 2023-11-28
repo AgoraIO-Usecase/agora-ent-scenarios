@@ -48,7 +48,7 @@ class VMSoundSelTableViewCell: UITableViewCell {
                 bgView.layer.borderWidth = 1
                 bgView.layer.borderColor = UIColor.lightGray.cgColor
                 selView.isHidden = true
-                iconView.image = UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource")
+                iconView.image = UIImage.sceneImage(name: "icons／Stock／change", bundleName: "VoiceChatRoomResource")
             }
         }
     }
@@ -100,7 +100,7 @@ class VMSoundSelTableViewCell: UITableViewCell {
         detailLabel.lineBreakMode = .byCharWrapping
         bgView.addSubview(detailLabel)
 
-        selView.image = UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource")
+        selView.image = UIImage.sceneImage(name: "dan-check", bundleName: "VoiceChatRoomResource")
         addSubview(selView)
 
         usageLabel.text = LanguageManager.localValue(key: "voice_current_customer_usage")
