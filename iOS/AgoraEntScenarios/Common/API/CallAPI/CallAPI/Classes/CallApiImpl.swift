@@ -69,6 +69,7 @@ public class CallApiImpl: NSObject {
             _flushReport()
         }
     }
+    private var prevMessageTs: Int = 0
     
     /// 当前状态
     private var state: CallStateType = .idle {
@@ -160,7 +161,19 @@ public class CallApiImpl: NSObject {
         var dic: [String: Any] = [:]
         dic[kMessageAction] = action.rawValue
         dic[kMessageVersion] = kCurrentMessageVersion
-        dic[kMessageTs] = _getNtpTimeInMs()
+        var ts = _getNtpTimeInMs()
+        if ts <= prevMessageTs {
+            // invalid ts
+            callWarningPrint("get ntp time invalid \(ts)/\(prevMessageTs)")
+            
+            let stackSymbols = Thread.callStackSymbols
+            let stackString = stackSymbols.joined(separator: " \n ")
+            callWarningPrint(stackString)
+            
+            ts = prevMessageTs + 1
+        }
+        prevMessageTs = ts
+        dic[kMessageTs] = ts
         dic[kFromUserId] = config?.userId ?? 0
         if  callId.count > 0 {
             dic[kCallId] = callId
@@ -535,6 +548,7 @@ extension CallApiImpl {
         callTs = nil
         timer = nil
         callId = ""
+        prevMessageTs = 0
     }
     
     private func _flushReport() {
