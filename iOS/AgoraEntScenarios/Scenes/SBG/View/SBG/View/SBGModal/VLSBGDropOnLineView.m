@@ -54,7 +54,7 @@
     UIButton *dropLineBtn = [[UIButton alloc]initWithFrame:CGRectMake((self.width-102)*0.5, nickNameLabel.bottom+48, 102, 32)];
     dropLineBtn.layer.cornerRadius = 16;
     dropLineBtn.layer.masksToBounds = YES;
-    [dropLineBtn setTitle:SBGLocalizedString(@"下麦") forState:UIControlStateNormal];
+    [dropLineBtn setTitle:SBGLocalizedString(@"sbg_room_seat_off") forState:UIControlStateNormal];
     [dropLineBtn setTitleColor:UIColorWhite forState:UIControlStateNormal];
     dropLineBtn.titleLabel.font = UIFontMake(12);
     [dropLineBtn setBackgroundColor:UIColorMakeWithHex(@"#2753FF")];

@@ -101,7 +101,7 @@ class VLSBGStatusView: UIView {
                 contentImgView.isHidden = false
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "暂无演唱歌单，开始点歌吧！"
+                contentTextLabel.text = getLocalizeString(with: "sbg_no_song")
                 lrcView.isHidden = true
                 randomBtn.isHidden = false
                 orderBtn.isHidden = false
@@ -111,7 +111,7 @@ class VLSBGStatusView: UIView {
                 contentImgView.isHidden = false
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "房主点歌中，游戏即将开始"
+                contentTextLabel.text = getLocalizeString(with: "sbg_bro_choose")
                 lrcView.isHidden = true
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
@@ -121,7 +121,7 @@ class VLSBGStatusView: UIView {
                 contentImgView.isHidden = false
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "嗨唱开始"
+                contentTextLabel.text = getLocalizeString(with: "sbg_start")
                 lrcView.isHidden = true
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
@@ -181,7 +181,7 @@ class VLSBGStatusView: UIView {
                 contentImgView.isHidden = false
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "本轮无人演唱\n即将播放下一首"
+                contentTextLabel.text = getLocalizeString(with: "sbg_nobody_next")
                 contentTextLabel.numberOfLines = 0
                 lrcView.isHidden = true
                 randomBtn.isHidden = true
@@ -212,7 +212,6 @@ class VLSBGStatusView: UIView {
                 contentImgView.isHidden = false
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-               // contentTextLabel.text = "挑战失败"
                 lrcView.isHidden = true
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
@@ -222,7 +221,6 @@ class VLSBGStatusView: UIView {
                 contentImgView.isHidden = false
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-               // contentTextLabel.text = "挑战成功"
                 lrcView.isHidden = true
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
@@ -232,7 +230,7 @@ class VLSBGStatusView: UIView {
                 contentImgView.isHidden = false
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "下一首"
+                contentTextLabel.text = getLocalizeString(with: "sbg_next_song")
                 lrcView.isHidden = true
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
@@ -347,7 +345,7 @@ class VLSBGStatusView: UIView {
     
     private lazy var resultTitleLabel: UILabel = { //本轮评分
         let label = UILabel()
-        label.text = "本轮评分"
+        label.text = getLocalizeString(with: "sbg_this_score")
         label.textAlignment = .center
         label.textColor = .white
         return label
@@ -431,6 +429,10 @@ class VLSBGStatusView: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func getLocalizeString(with key: String) -> String {
+        return Bundle.localizedString(key, bundleName: "sbgResource")
     }
     
     private func layoutUI() {

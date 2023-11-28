@@ -769,6 +769,9 @@ class LiveDetailFragment : Fragment() {
                                 } else {
                                     mService.muteAudio(mRoomInfo.roomId, !activated, mRoomInfo.ownerId)
                                     enableLocalAudio(activated)
+                                    if (isPKing()) {
+                                        mBinding.videoPKLayout.userNameA.isActivated = activated
+                                    }
                                 }
                             })
                         }

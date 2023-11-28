@@ -9,8 +9,6 @@
 #import "VLMacroDefine.h"
 #import "SBGMacro.h"
 #import "UIView+VL.h"
-#import "VLSBGEffectView.h"
-#import "VLSBGVoiceShowView.h"
 #import "VLSBGVoicePerShowView.h"
 
 @implementation LSTPopView (SBGModal)
@@ -134,21 +132,6 @@
     return popView;
 }
 
-//弹出音效
-+ (LSTPopView*)popSBGSetSoundEffectViewWithParentView:(UIView*)parentView
-                                         soundView:(VLSBGEffectView*)soundView
-                                      withDelegate:(id<VLSBGEffectViewDelegate>)delegate {
-    CGFloat popViewH = 88+17+270+kSafeAreaBottomHeight;                                                                                     
-    VLSBGEffectView* EffectView = [[VLSBGEffectView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
-                                                                                            withDelegate:delegate];
-    
-    LSTPopView* popView = [self _createRSPopContainerWithContentView:EffectView
-                                                       withParentView:parentView];
-    [popView pop];
-    
-    return popView;
-}
-
 //弹出专业主播
 + (LSTPopView*)popSBGVoicePerViewWithParentView:(UIView*)parentView
                                          perView:(VLSBGVoicePerShowView*)perView
@@ -156,22 +139,6 @@
    // CGFloat popViewH = 88+17+270+kSafeAreaBottomHeight;
     VLSBGVoicePerShowView* voiceView = [[VLSBGVoicePerShowView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 120)
                                                                                             withDelegate:delegate ];
-    
-    LSTPopView* popView = [self _createRSPopContainerWithContentView:voiceView
-                                                       withParentView:parentView];
-    [popView pop];
-    
-    return popView;
-}
-
-//弹出人声突出
-+ (LSTPopView*)popSBGVoiceShowViewWithParentView:(UIView*)parentView
-                                         showView:(VLSBGVoiceShowView*)showView
-                                   dataSource:(NSArray *)array
-                                      withDelegate:(id<VLSBGVoiceShowViewDelegate>)delegate {
-    CGFloat popViewH = 88+17+270+kSafeAreaBottomHeight;
-    VLSBGVoiceShowView* voiceView = [[VLSBGVoiceShowView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
-                                                                                            withDelegate:delegate dataSource:array];
     
     LSTPopView* popView = [self _createRSPopContainerWithContentView:voiceView
                                                        withParentView:parentView];

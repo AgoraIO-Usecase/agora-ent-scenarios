@@ -70,8 +70,6 @@
     [self.sortBtn addTarget:self action:@selector(sortBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.sortBtn];
     
-//    self.singingBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_singing_icon"]
-//                                                       title:KTVLocalizedString(@"演唱中")];
     self.singingBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.singingBtn setTitle:KTVLocalizedString(@"ktv_room_sing1") forState:UIControlStateNormal];
     [self.singingBtn setImage:[UIImage sceneImageWithName:@"ktv_singing_icon"] forState:UIControlStateNormal];
@@ -106,11 +104,6 @@
 
 - (void)setSelSongModel:(VLRoomSelSongModel *)selSongModel {
     _selSongModel = selSongModel;
-//    if (selSongModel.isChorus) {
-//        self.typeLabel.text = KTVLocalizedString(@"合唱");
-//    }else{
-//        self.typeLabel.text = KTVLocalizedString(@"独唱");
-//    }
     self.nameLabel.text = selSongModel.songName;
     NSString *localizedPropertyName = KTVLocalizedString(@"ktv_song_ordering_person");
     NSString *formattedString = [NSString stringWithFormat:@"%@ %@", localizedPropertyName, selSongModel.name];

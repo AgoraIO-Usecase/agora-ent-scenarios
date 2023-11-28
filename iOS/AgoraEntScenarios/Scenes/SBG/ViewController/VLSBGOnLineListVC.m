@@ -48,7 +48,7 @@
 
 - (void)commonUI {
     [self setBackgroundImage:@"online_list_BgIcon"];
-    [self setNaviTitleName:SBGLocalizedString(@"嗨歌抢唱")];
+    [self setNaviTitleName:SBGLocalizedString(@"sbg_name")];
     if ([VLUserCenter center].isLogin) {
         [self setBackBtn];
     }
@@ -110,9 +110,9 @@
     if (![self checkIsLogin]) return;
      
     if (listModel.isPrivate) {
-        NSArray *array = [[NSArray alloc]initWithObjects:SBGLocalizedString(@"取消"),SBGLocalizedString(@"确认"), nil];
+        NSArray *array = [[NSArray alloc]initWithObjects:SBGLocalizedString(@"sbg_cancel"),SBGLocalizedString(@"sbg_confirm"), nil];
         VL(weakSelf);
-        [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:SBGLocalizedString(@"输入密码") message:@"" placeHolder:SBGLocalizedString(@"请输入房间密码") type:ALERTYPETEXTFIELD buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
+        [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:SBGLocalizedString(@"sbg_input_pwd") message:@"" placeHolder:SBGLocalizedString(@"sbg_pls_input_pwd") type:ALERTYPETEXTFIELD buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
             [weakSelf joinInRoomWithModel:listModel withInPutText:text];
             [[VLAlert shared] dismiss];
         }];

@@ -29,14 +29,14 @@
 
 -(void)layoutUI {
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = SBGLocalizedString(@"专业主播");
+    titleLabel.text = SBGLocalizedString(@"sbg_per_bro");
     titleLabel.font = UIFontMake(18);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:titleLabel];
     
     UILabel *headLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 60, 80, 30)];
-    headLabel.text = @"专业模式";
+    headLabel.text = SBGLocalizedString(@"sbg_per_style");
     headLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:headLabel];
     

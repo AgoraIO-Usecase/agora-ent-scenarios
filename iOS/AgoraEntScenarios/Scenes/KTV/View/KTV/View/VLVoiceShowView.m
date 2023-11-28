@@ -40,7 +40,7 @@
     }
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = KTVLocalizedString(@"设置人声");
+    titleLabel.text = KTVLocalizedString(@"ktv_vol_setting");
     titleLabel.font = UIFontMake(18);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");

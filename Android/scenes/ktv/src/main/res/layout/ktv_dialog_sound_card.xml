@@ -49,41 +49,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
 
-    <!-- 输入设备  -->
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/mtInputDevice"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="18dp"
-        android:text="@string/ktv_input_device"
-        android:textColor="@color/def_text_color_3c4"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tvInputDevice"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:text="@string/ktv_external_mircrophone"
-        android:textColor="@color/def_text_color_3c4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/mtInputDevice"
-        app:layout_constraintBottom_toBottomOf="@id/mtInputDevice" />
-
-    <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/dvInputDevice"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="18dp"
-        app:dividerColor="#F2F2F6"
-        app:layout_constraintTop_toBottomOf="@+id/mtInputDevice"
-        />
-
     <!--虚拟声卡开关  -->
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtSoundCardSwitch"
@@ -95,7 +60,7 @@
         android:text="@string/ktv_sound_card_switch"
         android:textColor="@color/def_text_color_3c4"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/dvInputDevice" />
+        app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle" />
 
     <androidx.appcompat.widget.AppCompatCheckBox
         android:id="@+id/mcbSoundCardSwitch"
@@ -323,7 +288,7 @@
         android:text="@string/ktv_sound_card_error"
         android:textColor="@color/red_e0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dvInputDevice" />
+        app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle" />
 
 
     <androidx.cardview.widget.CardView

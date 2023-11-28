@@ -33,28 +33,6 @@ class AgoraChatRoomNormalRtcView: UIView {
         }
     }
 
-    public func updateVolume(with uid: String, vol: Int) {
-        /**
-         1.根据uid来判断是哪个cell需要更新音量
-         2.更新音量
-         */
-        guard let micInfos = micInfos else {
-            return
-        }
-        for i in micInfos {
-            guard let member = i.member else { return }
-            guard let cur_uid = member.uid else { return }
-            if cur_uid == uid {
-                guard let mic_index = member.mic_index else { return }
-                let indexPath = IndexPath(item: mic_index, section: 0)
-                guard let cell: AgoraChatRoomBaseUserCollectionViewCell = collectionView.cellForItem(at: indexPath) as? AgoraChatRoomBaseUserCollectionViewCell else { return }
-                DispatchQueue.main.async {
-                    cell.refreshVolume(vol: vol)
-                }
-            }
-        }
-    }
-
     public func updateVolume(with index: Int, vol: Int) {
         let indexPath = IndexPath(item: index, section: 0)
         guard let cell: AgoraChatRoomBaseUserCollectionViewCell = collectionView.cellForItem(at: indexPath) as? AgoraChatRoomBaseUserCollectionViewCell else { return }

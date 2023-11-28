@@ -41,7 +41,7 @@
                 app:shapeAppearance="@style/ui_widget_roundStyle"
                 app:layout_constraintTop_toTopOf="parent"
                 app:strokeColor="@android:color/transparent"
-                tools:src="@mipmap/mvbg0" />
+                tools:src="@mipmap/portrait01" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvRoomName"
@@ -331,7 +331,7 @@
         android:id="@+id/btnDebug"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:text="Debug"
+        android:text="@string/ktv_debug"
         android:textSize="@dimen/ktv_space_small"
         android:visibility="visible"
         android:textAllCaps="false"

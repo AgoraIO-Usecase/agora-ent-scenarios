@@ -86,7 +86,8 @@
     }
     self.titleLabel.text = listModel.name;
     self.roomOwnerLabel.text = listModel.creatorName;
-    self.countLabel.text = [NSString stringWithFormat:SBGLocalizedString(@"%@人"),listModel.roomPeopleNum];
+    self.countLabel.text = [NSString stringWithFormat:@"%@%@"
+                            ,listModel.roomPeopleNum, SBGLocalizedString(@"sbg_people")];
 }
 
 @end

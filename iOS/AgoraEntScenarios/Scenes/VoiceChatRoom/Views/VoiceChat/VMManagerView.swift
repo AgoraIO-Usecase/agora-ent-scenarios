@@ -27,6 +27,7 @@ class VMManagerView: UIView {
         return view
     }()
     private var iconView: UIImageView = .init()
+    private var micView: UIImageView = .init()
     private var nameLabel: UILabel = .init()
     private var roleBtn: UIButton = .init()
     private var lineView: UIView = .init()
@@ -52,13 +53,13 @@ class VMManagerView: UIView {
             if m_type == -1 {
                 iconView.isHidden = true
                 roleBtn.isHidden = true
-                // micView.isHidden = true
+                micView.isHidden = true
                 nameLabel.text = username
             } else if m_type == 3 {
                 iconView.isHidden = true
                 roleBtn.isHidden = true
-                // micView.isHidden = true
-                addView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
+                micView.isHidden = true
+                addView.image = UIImage.sceneImage(name: "voice_ic_seat_lock", bundleName: "VoiceChatRoomResource")
                 lockBtn.setTitle(LanguageManager.localValue(key: "voice_unblock"), for: .normal)
                 inviteBtn.setTitleColor(UIColor(hex: 0x979cbb, alpha: 1), for: .normal)
                 inviteBtn.isUserInteractionEnabled = false
@@ -66,9 +67,8 @@ class VMManagerView: UIView {
             } else if m_type == 4 {
                 iconView.isHidden = true
                 roleBtn.isHidden = true
-//                micView.isHidden = false
-//                micView.setState(.forbidden)
-                addView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
+                micView.isHidden = false
+                addView.image = UIImage.sceneImage(name: "voice_ic_seat_lock", bundleName: "VoiceChatRoomResource")
                 lockBtn.setTitle(LanguageManager.localValue(key: "voice_unblock"), for: .normal)
                 muteBtn.setTitle(LanguageManager.localValue(key: "voice_unmute"), for: .normal)
                 inviteBtn.setTitleColor(UIColor(hex: 0x979cbb, alpha: 1), for: .normal)
@@ -77,24 +77,20 @@ class VMManagerView: UIView {
             } else if m_type == 1 {
                 iconView.isHidden = true
                 roleBtn.isHidden = true
-//                micView.isHidden = false
-//                micView.setState(.forbidden)
+                micView.isHidden = false
                 muteBtn.setTitle(LanguageManager.localValue(key: "voice_unmute"), for: .normal)
                 nameLabel.text = username
             } else if m_type == 0 {
                 iconView.isHidden = false
                 iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage.sceneImage(name: "mine_avatar_placeHolder", bundleName: "VoiceChatRoomResource"))
                 nameLabel.text = username
-//                micView.setState(.on)
-//                micView.setVolume(100)
-                // micView.isHidden = false
+                micView.isHidden = true
                 inviteBtn.setTitle(LanguageManager.localValue(key: "voice_kick_mic"), for: .normal)
             } else if m_type == 2 {
                 iconView.isHidden = false
                 iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage.sceneImage(name: "mine_avatar_placeHolder", bundleName: "VoiceChatRoomResource"))
                 nameLabel.text = username
-//                micView.setState(.forbidden)
-//                micView.isHidden = false
+                micView.isHidden = false
                 inviteBtn.setTitle(LanguageManager.localValue(key: micInfo?.member != nil ? "voice_kick_mic" : "voice_invite"), for: .normal)
                 muteBtn.setTitle(LanguageManager.localValue(key: "voice_unmute"), for: .normal)
             }
@@ -142,6 +138,7 @@ class VMManagerView: UIView {
         iconView.image = UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource")
         iconView.layer.cornerRadius = 32
         iconView.layer.masksToBounds = true
+        iconView.contentMode = .scaleAspectFill
         addSubview(iconView)
         iconView.layer.borderColor = UIColor(hex: 0x979797, alpha: 0.12).cgColor
         iconView.layer.borderWidth = 0.5
@@ -174,11 +171,10 @@ class VMManagerView: UIView {
         inviteBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
         addSubview(inviteBtn)
 
-//        micView.frame = CGRect(x: self.bounds.size.width / 2.0 + 10, y: 85, width: 20, height: 20)
-//        micView.setState(.on)
-//        micView.setVolume(100)
-//        self.addSubview(micView)
-//        micView.isHidden = true
+        micView.frame = CGRect(x: self.bounds.size.width / 2.0 + 10, y: 85, width: 20, height: 20)
+        micView.image = UIImage.sceneImage(name: "micoff", bundleName: "VoiceChatRoomResource")
+        micView.isHidden = true
+        self.addSubview(micView)
 
         muteBtn.frame = CGRect(x: ScreenWidth / 3.0 + 20, y: 170, width: ScreenWidth / 3.0 - 40, height: 40)
         muteBtn.setTitleColor(UIColor(hex: 0x156ef3, alpha: 1), for: .normal)
