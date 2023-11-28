@@ -2,3 +2,4 @@
 strings_config.xml
 *.so
 /sdk-4_1_1-kk
+*-sdk
