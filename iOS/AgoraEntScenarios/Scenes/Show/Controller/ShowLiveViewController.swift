@@ -821,7 +821,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStateChangedOfUid uid: UInt, state: AgoraVideoRemoteState, reason: AgoraVideoRemoteReason, elapsed: Int) {
         if uid == roomOwnerId {
-            if reason == .remoteMuted {
+            if reason == .remoteMuted , currentInteraction?.interactStatus != .pking{
                 liveView.showThumnbnailCanvasView = true
             }else if reason == .remoteUnmuted {
                 liveView.showThumnbnailCanvasView = false
