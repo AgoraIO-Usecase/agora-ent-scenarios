@@ -14,6 +14,7 @@
 
 @import Pure1v1;
 @import ShowTo1v1;
+@import Joy;
 
 @interface VLHomeViewController ()<VLHomeViewDelegate>
 
@@ -52,7 +53,7 @@
 
 - (void)itemClickAction:(int)tagValue {
 
-    NSArray* sceneNames = @[@"ChatRoom", @"SpatialAudioChatRoom", @"KTV", @"LiveShow", @"", @"Pure1v1", @"ShowTo1v1"];
+    NSArray* sceneNames = @[@"ChatRoom", @"SpatialAudioChatRoom", @"KTV", @"LiveShow", @"", @"Pure1v1", @"ShowTo1v1", @"Joy"];
     [[NetworkManager shared] reportSceneClickWithSceneName:sceneNames[tagValue]];
     [[NetworkManager shared] reportDeviceInfoWithSceneName:sceneNames[tagValue]];
     [[NetworkManager shared] reportUserBehaviorWithSceneName:sceneNames[tagValue]];
@@ -96,6 +97,16 @@
             userInfo.userName = VLUserCenter.user.name;
             userInfo.avatar = VLUserCenter.user.headUrl;
             [ShowTo1v1Context showSceneWithViewController:self
+                                                  appId:KeyCenter.AppId
+                                         appCertificate:KeyCenter.Certificate
+                                               userInfo:userInfo];
+        } break;
+        case 7: {
+            JoyUserInfo* userInfo = [JoyUserInfo new];
+            userInfo.userId = [VLUserCenter.user.id unsignedIntegerValue];
+            userInfo.userName = VLUserCenter.user.name;
+            userInfo.avatar = VLUserCenter.user.headUrl;
+            [JoyContext showSceneWithViewController:self
                                                   appId:KeyCenter.AppId
                                          appCertificate:KeyCenter.Certificate
                                                userInfo:userInfo];

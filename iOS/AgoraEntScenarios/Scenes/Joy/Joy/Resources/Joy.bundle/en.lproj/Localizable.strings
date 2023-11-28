@@ -1,0 +1,42 @@
+/*
+  Localizable.strings
+  AgoraScene_iOS
+
+  Created by 朱继超 on 2022/9/19.
+  
+*/
+
+
+"authorized_microphone_fail"="麦克风权限未设置,请设置麦克风权限";
+"authorized_camera_fail"="摄像头权限未设置,请设置摄像头权限";
+"authorized_title"="提示";
+"authorized_ok"="确定";
+"authorized_cancel"="取消";
+
+"user_list_title"="弹幕玩法";
+"room_list_refresh_tips"="房间列表已刷新";
+"room_list_empty_desc"="欢迎来到声网弹幕玩法方案\n目前暂无房间";
+"call_not_init"="网络异常";
+"call_state_connecting"="连接中";
+"user_list_create_room"="创建房间";
+"user_list_create"="创建";
+"user_list_creating"="创建中";
+"user_list_live_tag"="Live";
+"create_room_tips"="填写房间名称，吸引更多观众";
+"create_room_title"="房间名称";
+"create_room_random"="随机";
+"create_room_name_empty_tips"="房间名称不能为空";
+"call_usage_tips"=" 本产品仅用于功能体验，单次直播时长不超过10mins";
+"setting_statistic" = "实时数据";
+"call_content_inspect_warning"="监测到当前内容存在违规行为";
+
+"show_create_room_name1"="小可爱是我呀";
+"show_create_room_name2"="我是你的小可爱";
+"show_create_room_name3"="一往情深";
+"show_create_room_name4"="情不知所起";
+"show_create_room_name5"="沪上挖掘机";
+"show_create_room_name6"="张江推土机";
+"show_create_room_name7"="川沙妲己痴迷粉丝";
+"show_create_room_name8"="疯狂星期几";
+"show_create_room_name9"="小黄鸭";
+"show_create_room_name10"="西二旗老板娘";

@@ -12,6 +12,7 @@
 @import YYCategories;
 @import Pure1v1;
 @import ShowTo1v1;
+@import Joy;
 
 @interface VLHomeView ()<UICollectionViewDelegate,UICollectionViewDataSource>
 
@@ -116,7 +117,8 @@
                 @"subTitleStr":@""
             },
             [Pure1v1Context thumbnailInfo],
-            [ShowTo1v1Context thumbnailInfo]
+            [ShowTo1v1Context thumbnailInfo],
+            [JoyContext thumbnailInfo]
         ];
     }
     return _itemsArray;
