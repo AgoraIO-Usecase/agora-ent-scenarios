@@ -385,8 +385,8 @@ extension KTVApiImpl: KTVApiDelegate {
         self.isNowMicMuted = !isOnMicOpen
         if self.singerRole == .leadSinger || self.singerRole == .soloSinger {
             apiConfig?.engine?.adjustRecordingSignalVolume(isOnMicOpen ? 100 : 0)
-        } else if self.singerRole == .coSinger {
-            apiConfig?.engine?.muteLocalAudioStream(isOnMicOpen)
+        } else {
+            apiConfig?.engine?.muteLocalAudioStream(!isOnMicOpen)
         }
     }
     
