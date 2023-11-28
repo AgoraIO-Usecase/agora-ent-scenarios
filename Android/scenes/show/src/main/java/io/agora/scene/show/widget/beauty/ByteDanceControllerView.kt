@@ -197,6 +197,7 @@ class ByteDanceControllerView : BaseControllerView {
                         R.string.show_beauty_item_none,
                         R.mipmap.show_beauty_ic_none,
                         0.0f,
+                        isSelected = true,
                         onValueChanged = { _ ->
                             beautyConfig.sharpen = 0.0f
                             beautyConfig.clear = 0.0f
@@ -206,7 +207,6 @@ class ByteDanceControllerView : BaseControllerView {
                         R.string.show_beauty_item_adjust_sharpen,
                         R.mipmap.show_beauty_ic_adjust_sharp,
                         beautyConfig.sharpen,
-                        isSelected = true,
                         onValueChanged = { value ->
                             beautyConfig.sharpen = value
                         }

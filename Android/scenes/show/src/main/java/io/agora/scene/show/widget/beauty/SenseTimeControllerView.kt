@@ -199,6 +199,7 @@ class SenseTimeControllerView : BaseControllerView {
                     R.string.show_beauty_item_none,
                     R.mipmap.show_beauty_ic_none,
                     0.0f,
+                    isSelected = true,
                     onValueChanged = { _ ->
                         SenseTimeBeautySDK.beautyConfig.sharpen = 0.0f
                         SenseTimeBeautySDK.beautyConfig.clear = 0.0f
@@ -210,7 +211,6 @@ class SenseTimeControllerView : BaseControllerView {
                     R.string.show_beauty_item_adjust_contrast,
                     R.mipmap.show_beauty_ic_adjust_contrast,
                     SenseTimeBeautySDK.beautyConfig.contrast,
-                    isSelected = true,
                     onValueChanged = { value ->
                         SenseTimeBeautySDK.beautyConfig.contrast = value
                     }

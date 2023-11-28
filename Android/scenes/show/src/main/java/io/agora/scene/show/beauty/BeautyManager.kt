@@ -6,21 +6,26 @@ import android.os.Looper
 import android.view.View
 import android.widget.Toast
 import com.faceunity.core.faceunity.FURenderKit
+import io.agora.base.VideoFrame
 import io.agora.beautyapi.bytedance.ByteDanceBeautyAPI
 import io.agora.beautyapi.bytedance.EventCallback
 import io.agora.beautyapi.bytedance.createByteDanceBeautyAPI
 import io.agora.beautyapi.faceunity.FaceUnityBeautyAPI
 import io.agora.beautyapi.faceunity.createFaceUnityBeautyAPI
+import io.agora.beautyapi.sensetime.CaptureMode
 import io.agora.beautyapi.sensetime.Config
 import io.agora.beautyapi.sensetime.STHandlers
 import io.agora.beautyapi.sensetime.SenseTimeBeautyAPI
 import io.agora.beautyapi.sensetime.createSenseTimeBeautyAPI
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcEngine
+import io.agora.rtc2.video.IVideoFrameObserver
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.show.R
 import java.lang.ref.WeakReference
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
+import java.util.concurrent.Future
 
 object BeautyManager {
 
@@ -35,6 +40,8 @@ object BeautyManager {
 
     private val workerExecutor = Executors.newSingleThreadExecutor()
     private val mainExecutor = android.os.Handler(Looper.getMainLooper())
+    private var createBeautyFuture: Future<*>? = null
+    private var destroyBeautyFuture: Future<*>? = null
 
     // 美颜类型
     var beautyType = BeautyType.SenseTime
@@ -44,12 +51,12 @@ object BeautyManager {
                     BeautyType.SenseTime -> senseTimeBeautyAPI?.let { return }
                     BeautyType.FaceUnity -> faceUnityBeautyAPI?.let { return }
                     BeautyType.ByteDance -> byteDanceBeautyAPI?.let { return }
+                    BeautyType.Agora -> return
                 }
             }
             val oldType = field
             field = value
             switchBeauty(oldType, value)
-
         }
 
 
@@ -71,6 +78,7 @@ object BeautyManager {
         this.rtcEngine = rtcEngine
         this.beautyType = BeautyType.SenseTime
         this.enable = rtcEngine.queryDeviceScore() >= 75
+        rtcEngine.registerVideoFrameObserver(MultiBeautyVideoObserver())
     }
 
     fun setupLocalVideo(view: View, renderMode: Int) {
@@ -81,12 +89,20 @@ object BeautyManager {
                 BeautyType.SenseTime -> senseTimeBeautyAPI?.setupLocalVideo(view, renderMode)
                 BeautyType.FaceUnity -> faceUnityBeautyAPI?.setupLocalVideo(view, renderMode)
                 BeautyType.ByteDance -> byteDanceBeautyAPI?.setupLocalVideo(view, renderMode)
-                BeautyType.Agora -> rtcEngine?.setupLocalVideo(VideoCanvas(view, renderMode, Constants.VIDEO_MIRROR_MODE_AUTO, 0))
+                BeautyType.Agora -> rtcEngine?.setupLocalVideo(
+                    VideoCanvas(
+                        view,
+                        renderMode,
+                        Constants.VIDEO_MIRROR_MODE_DISABLED,
+                        0
+                    )
+                )
             }
         }
     }
 
     fun destroy() {
+        rtcEngine?.registerVideoFrameObserver(null)
         mainExecutor.post {
             videoView?.get()?.let {
                 rtcEngine?.setupLocalVideo(VideoCanvas(null))
@@ -100,35 +116,43 @@ object BeautyManager {
 
 
     private fun switchBeauty(oldType: BeautyType, newType: BeautyType) {
-        destroyBeauty(oldType)
-        createBeauty(newType)
+        createBeautyFuture?.cancel(true)
+        destroyBeautyFuture?.cancel(true)
+
+        destroyBeautyFuture = destroyBeauty(oldType)
+        createBeautyFuture = createBeauty(newType)
+
     }
 
-    private fun createBeauty(type: BeautyType) {
-        workerExecutor.execute {
-            val ctx = context ?: return@execute
-            val rtc = rtcEngine ?: return@execute
-            rtcEngine?.enableLocalVideo(true)
+    private fun createBeauty(type: BeautyType) =
+        workerExecutor.submit {
+            val ctx = context ?: return@submit
+            val rtc = rtcEngine ?: return@submit
+
+            val setupLocalVideoCountDownLatch = CountDownLatch(1)
             when (type) {
                 BeautyType.SenseTime -> {
                     if (SenseTimeBeautySDK.initBeautySDK(ctx)) {
-                        senseTimeBeautyAPI = createSenseTimeBeautyAPI()
-                        senseTimeBeautyAPI?.initialize(
+                        val senseTimeBeautyAPI = createSenseTimeBeautyAPI()
+                        senseTimeBeautyAPI.initialize(
                             Config(
                                 ctx,
                                 rtc,
                                 STHandlers(
                                     SenseTimeBeautySDK.mobileEffectNative,
                                     SenseTimeBeautySDK.humanActionNative
-                                )
+                                ),
+                                captureMode = CaptureMode.Custom
                             )
                         )
-                        senseTimeBeautyAPI?.enable(enable)
-                        SenseTimeBeautySDK.setBeautyAPI(senseTimeBeautyAPI!!)
+                        senseTimeBeautyAPI.enable(enable)
+                        SenseTimeBeautySDK.setBeautyAPI(senseTimeBeautyAPI)
+                        this.senseTimeBeautyAPI = senseTimeBeautyAPI
                         mainExecutor.post {
                             videoView?.get()?.let {
-                                senseTimeBeautyAPI?.setupLocalVideo(it, renderMode)
+                                senseTimeBeautyAPI.setupLocalVideo(it, renderMode)
                             }
+                            setupLocalVideoCountDownLatch.countDown()
                         }
 
                     } else {
@@ -139,28 +163,39 @@ object BeautyManager {
                                 Toast.LENGTH_LONG
                             ).show()
                             videoView?.get()?.let {
-                                rtc.setupLocalVideo(VideoCanvas(it, renderMode, Constants.VIDEO_MIRROR_MODE_AUTO, 0))
+                                rtc.setupLocalVideo(
+                                    VideoCanvas(
+                                        it,
+                                        renderMode,
+                                        Constants.VIDEO_MIRROR_MODE_AUTO,
+                                        0
+                                    )
+                                )
                             }
+                            setupLocalVideoCountDownLatch.countDown()
                         }
                     }
                 }
 
                 BeautyType.FaceUnity -> {
                     if (FaceUnityBeautySDK.initBeauty(ctx)) {
-                        faceUnityBeautyAPI = createFaceUnityBeautyAPI()
-                        faceUnityBeautyAPI?.initialize(
+                        val faceUnityBeautyAPI = createFaceUnityBeautyAPI()
+                        faceUnityBeautyAPI.initialize(
                             io.agora.beautyapi.faceunity.Config(
                                 ctx,
                                 rtc,
-                                FURenderKit.getInstance()
+                                FURenderKit.getInstance(),
+                                captureMode = io.agora.beautyapi.faceunity.CaptureMode.Custom
                             )
                         )
-                        faceUnityBeautyAPI?.enable(enable)
-                        FaceUnityBeautySDK.setBeautyAPI(faceUnityBeautyAPI!!)
+                        faceUnityBeautyAPI.enable(enable)
+                        FaceUnityBeautySDK.setBeautyAPI(faceUnityBeautyAPI)
+                        this.faceUnityBeautyAPI = faceUnityBeautyAPI
                         mainExecutor.post {
                             videoView?.get()?.let {
-                                faceUnityBeautyAPI?.setupLocalVideo(it, renderMode)
+                                faceUnityBeautyAPI.setupLocalVideo(it, renderMode)
                             }
+                            setupLocalVideoCountDownLatch.countDown()
                         }
                     } else {
                         mainExecutor.post {
@@ -170,16 +205,24 @@ object BeautyManager {
                                 Toast.LENGTH_LONG
                             ).show()
                             videoView?.get()?.let {
-                                rtc.setupLocalVideo(VideoCanvas(it, renderMode, Constants.VIDEO_MIRROR_MODE_AUTO, 0))
+                                rtc.setupLocalVideo(
+                                    VideoCanvas(
+                                        it,
+                                        renderMode,
+                                        Constants.VIDEO_MIRROR_MODE_AUTO,
+                                        0
+                                    )
+                                )
                             }
+                            setupLocalVideoCountDownLatch.countDown()
                         }
                     }
                 }
 
                 BeautyType.ByteDance -> {
                     if (ByteDanceBeautySDK.initBeautySDK(ctx)) {
-                        byteDanceBeautyAPI = createByteDanceBeautyAPI()
-                        byteDanceBeautyAPI?.initialize(
+                        val byteDanceBeautyAPI = createByteDanceBeautyAPI()
+                        byteDanceBeautyAPI.initialize(
                             io.agora.beautyapi.bytedance.Config(
                                 ctx,
                                 rtc,
@@ -191,15 +234,18 @@ object BeautyManager {
                                     onEffectDestroyed = {
                                         ByteDanceBeautySDK.unInitEffect()
                                     }
-                                )
+                                ),
+                                captureMode = io.agora.beautyapi.bytedance.CaptureMode.Custom
                             )
                         )
-                        byteDanceBeautyAPI?.enable(enable)
-                        ByteDanceBeautySDK.setBeautyAPI(byteDanceBeautyAPI!!)
+                        byteDanceBeautyAPI.enable(enable)
+                        ByteDanceBeautySDK.setBeautyAPI(byteDanceBeautyAPI)
+                        this.byteDanceBeautyAPI = byteDanceBeautyAPI
                         mainExecutor.post {
                             videoView?.get()?.let {
-                                byteDanceBeautyAPI?.setupLocalVideo(it, renderMode)
+                                byteDanceBeautyAPI.setupLocalVideo(it, renderMode)
                             }
+                            setupLocalVideoCountDownLatch.countDown()
                         }
 
                     } else {
@@ -210,8 +256,16 @@ object BeautyManager {
                                 Toast.LENGTH_LONG
                             ).show()
                             videoView?.get()?.let {
-                                rtc.setupLocalVideo(VideoCanvas(it, renderMode, Constants.VIDEO_MIRROR_MODE_AUTO, 0))
+                                rtc.setupLocalVideo(
+                                    VideoCanvas(
+                                        it,
+                                        renderMode,
+                                        Constants.VIDEO_MIRROR_MODE_AUTO,
+                                        0
+                                    )
+                                )
                             }
+                            setupLocalVideoCountDownLatch.countDown()
                         }
                     }
                 }
@@ -221,23 +275,36 @@ object BeautyManager {
                     AgoraBeautySDK.enable(enable)
                     mainExecutor.post {
                         videoView?.get()?.let {
-                            rtc.setupLocalVideo(VideoCanvas(it, renderMode, Constants.VIDEO_MIRROR_MODE_AUTO, 0))
+                            rtc.setupLocalVideo(
+                                VideoCanvas(
+                                    it,
+                                    renderMode,
+                                    Constants.VIDEO_MIRROR_MODE_DISABLED,
+                                    0
+                                )
+                            )
                         }
+                        setupLocalVideoCountDownLatch.countDown()
                     }
 
                 }
             }
+            setupLocalVideoCountDownLatch.await()
         }
-    }
 
-    private fun destroyBeauty(type: BeautyType) {
-        workerExecutor.execute {
-            rtcEngine?.enableLocalVideo(false)
+
+    private fun destroyBeauty(type: BeautyType) =
+        workerExecutor.submit {
+            val setupLocalVideoCountDownLatch = CountDownLatch(1)
+
             mainExecutor.post {
                 videoView?.get()?.let {
                     rtcEngine?.setupLocalVideo(VideoCanvas(null))
                 }
+                setupLocalVideoCountDownLatch.countDown()
             }
+
+            setupLocalVideoCountDownLatch.await()
 
             when (type) {
                 BeautyType.SenseTime ->
@@ -265,8 +332,6 @@ object BeautyManager {
             }
         }
 
-    }
-
 
     enum class BeautyType {
         SenseTime,
@@ -275,4 +340,68 @@ object BeautyManager {
         Agora
     }
 
+
+    class MultiBeautyVideoObserver : IVideoFrameObserver {
+        private var isFront = true
+        override fun onCaptureVideoFrame(type: Int, videoFrame: VideoFrame?): Boolean {
+            if (createBeautyFuture?.isDone != true) {
+                return false
+            }
+            val frame = videoFrame ?: return false
+            isFront = frame.sourceType == VideoFrame.SourceType.kFrontCamera
+
+            when (beautyType) {
+                BeautyType.SenseTime -> {
+                    return when (senseTimeBeautyAPI?.onFrame(frame)) {
+                        io.agora.beautyapi.sensetime.ErrorCode.ERROR_FRAME_SKIPPED.value -> false
+                        else -> true
+                    }
+                }
+
+                BeautyType.FaceUnity -> {
+                    return when (faceUnityBeautyAPI?.onFrame(frame)) {
+                        io.agora.beautyapi.faceunity.ErrorCode.ERROR_FRAME_SKIPPED.value -> false
+                        else -> true
+                    }
+                }
+
+                BeautyType.ByteDance -> {
+                    return when (byteDanceBeautyAPI?.onFrame(frame)) {
+                        io.agora.beautyapi.bytedance.ErrorCode.ERROR_FRAME_SKIPPED.value -> false
+                        else -> true
+                    }
+                }
+
+                BeautyType.Agora -> return true
+            }
+        }
+
+        override fun onPreEncodeVideoFrame(type: Int, videoFrame: VideoFrame?) = true
+
+        override fun onMediaPlayerVideoFrame(videoFrame: VideoFrame?, mediaPlayerId: Int) = true
+
+        override fun onRenderVideoFrame(
+            channelId: String?,
+            uid: Int,
+            videoFrame: VideoFrame?
+        ) = true
+
+        override fun getVideoFrameProcessMode() = IVideoFrameObserver.PROCESS_MODE_READ_WRITE
+
+        override fun getVideoFormatPreference() = IVideoFrameObserver.VIDEO_PIXEL_DEFAULT
+
+        override fun getRotationApplied() = false
+
+        override fun getMirrorApplied(): Boolean {
+            return when (beautyType) {
+                BeautyType.SenseTime -> senseTimeBeautyAPI?.getMirrorApplied() ?: false
+                BeautyType.FaceUnity -> faceUnityBeautyAPI?.getMirrorApplied() ?: false
+                BeautyType.ByteDance -> byteDanceBeautyAPI?.getMirrorApplied() ?: false
+                BeautyType.Agora -> false
+            }
+        }
+
+        override fun getObservedFramePosition() = IVideoFrameObserver.POSITION_POST_CAPTURER
+
+    }
 }

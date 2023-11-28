@@ -14,12 +14,14 @@ object AgoraBeautySDK {
     fun initBeautySDK(rtcEngine: RtcEngine) {
         this.rtcEngine = rtcEngine
         rtcEngine.enableExtension("agora_video_filters_clear_vision", "clear_vision", true)
+        rtcEngine.setParameters("{\"rtc.camera_capture_mirror_mode\":0}")
         beautyConfig.resume()
     }
 
     fun unInitBeautySDK() {
         rtcEngine?.setBeautyEffectOptions(false, beautyConfig.beautyOption)
         rtcEngine?.enableExtension("agora_video_filters_clear_vision", "clear_vision", false)
+        rtcEngine?.setParameters("{\"rtc.camera_capture_mirror_mode\":2}")
         rtcEngine = null
         enable = false
         beautyConfig.reset()
