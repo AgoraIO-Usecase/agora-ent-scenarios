@@ -30,7 +30,7 @@ class SRNextWarningView: UIView {
         contentView.addSubview(imgView)
         
         preLabel = UILabel(frame: .zero)
-        preLabel.text = "下段由 "
+        preLabel.text = getLocalizeString(with: "sr_current_tbd")
         preLabel.textColor = .white
         preLabel.font = UIFont.systemFont(ofSize: 12)
         contentView.addSubview(preLabel)
@@ -39,7 +39,7 @@ class SRNextWarningView: UIView {
         contentView.addSubview(icon)
         
         endLabel = UILabel(frame: .zero)
-        endLabel.text = " 演唱"
+        endLabel.text = getLocalizeString(with: "sr_next_sing")
         endLabel.font = UIFont.systemFont(ofSize: 12)
         endLabel.textColor = .white
         contentView.addSubview(endLabel)
@@ -51,7 +51,7 @@ class SRNextWarningView: UIView {
             return
         }
         icon.image = image
-        endLabel.text = " \(owner) 演唱"
+        endLabel.text = " \(owner)\(getLocalizeString(with: "sr_next_sing"))"
         imgView.frame = CGRect(x: 2, y: 5, width: 32, height: 16)
         let endWidth = textAutoWidth(text: endLabel.text ?? "", height: 20, fontSize: 12)
         let preWidth = textAutoWidth(text: preLabel.text ?? "", height: 20, fontSize: 12)
@@ -72,5 +72,9 @@ class SRNextWarningView: UIView {
         let lead = NSStringDrawingOptions.usesFontLeading
         let rect = text.boundingRect(with:CGSize(width:0, height: height), options: [origin,lead], attributes: [NSAttributedString.Key.font:UIFont.systemFont(ofSize: fontSize)], context:nil)
         return rect.width
+    }
+    
+    private func getLocalizeString(with key: String) -> String {
+        return Bundle.localizedString(key, bundleName: "SRResource")
     }
 }

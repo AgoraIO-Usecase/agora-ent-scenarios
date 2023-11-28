@@ -28,12 +28,12 @@ class SRScoreCell: UITableViewCell {
         didSet {
             indexLabel.text = "\(score.index)"
             if let userName = score.userName {
-                nameLabel.text = score.userName == "" ? "暂无上榜" : userName
+                nameLabel.text = score.userName == "" ? getLocalizeString(with: "sr_empty_list") : userName
             } else {
-                nameLabel.text = "暂无上榜"
+                nameLabel.text = getLocalizeString(with: "sr_empty_list")
             }
-            srCountLabel.text = score.songNum == 0 ? "-" : "\(score.songNum)段"
-            gradeLabel.text = score.songNum == 0 ? "-" : "\(score.score)分"
+            srCountLabel.text = score.songNum == 0 ? "-" : "\(score.songNum)\(getLocalizeString(with: "sr_song_count"))"
+            gradeLabel.text = score.songNum == 0 ? "-" : "\(score.score)\(getLocalizeString(with: "sr_song_score"))"
             if(score.index == 1){
                 iconView.image = UIImage.sceneImage(name: "sr-rank1")
             } else if score.index == 2 {
@@ -57,6 +57,10 @@ class SRScoreCell: UITableViewCell {
             }
             bgImgView.image = UIImage.sceneImage(name: bgUrl)
         }
+    }
+    
+    private func getLocalizeString(with key: String) -> String {
+        return Bundle.localizedString(key, bundleName: "SRResource")
     }
     
     private func layoutUI() {

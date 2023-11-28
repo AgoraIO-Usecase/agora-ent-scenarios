@@ -56,14 +56,7 @@
             [VLToast toast:error.description];
             return;
         }
-        
-//        [self.RTCkit joinChannelByToken:VLUserCenter.user.agoraRTCToken
-//                              channelId:outputModel.roomNo
-//                                   info:nil uid:[VLUserCenter.user.id integerValue]
-//                            joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
-//            VLLog(@"Agora - 加入RTC成功");
-//            [self.RTCkit setClientRole:AgoraClientRoleBroadcaster];
-//        }];
+
         //处理座位信息
         VLSRRoomListModel *listModel = [[VLSRRoomListModel alloc]init];
         listModel.roomNo = outputModel.roomNo;
@@ -78,35 +71,6 @@
         weakSelf.createRoomVCBlock(srVC);
     }];
 }
-
-//- (NSArray *)configureSeatsWithArray:(NSArray *)seatsArray songArray:(NSArray *)songArray {
-//    NSMutableArray *seatMuArray = [NSMutableArray array];
-//    NSArray *modelArray = [VLRoomSeatModel vj_modelArrayWithJson:seatsArray];
-//    for (int i=0; i<8; i++) {
-//        BOOL ifFind = NO;
-//        for (VLRoomSeatModel *model in modelArray) {
-//            if (model.seatIndex == i) { //这个位置已经有人了
-//                ifFind = YES;
-//                if(songArray != nil && [songArray count] >= 1) {
-//                    if([model.userNo isEqualToString:songArray[0][@"userNo"]]) {
-//                        model.isSelTheSingSong = YES;
-//                    }
-//                    else if([model.userNo isEqualToString:songArray[0][@"chorusNo"]]) {
-//                        model.isJoinedChorus = YES;
-//                    }
-//                }
-//                
-//                [seatMuArray addObject:model];
-//            }
-//        }
-//        if (!ifFind) {
-//            VLRoomSeatModel *model = [[VLRoomSeatModel alloc]init];
-//            model.seatIndex = i;
-//            [seatMuArray addObject:model];
-//        }
-//    }
-//    return seatMuArray.mutableCopy;
-//}
 
 - (void)setUpUI {
     VLSRCreateRoomView *createRoomView = [[VLSRCreateRoomView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 343) withDelegate:self];

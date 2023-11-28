@@ -52,14 +52,14 @@
     [self addSubview:backBtn];
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = KTVLocalizedString(@"ktv_voice_effect");
+    titleLabel.text = SRLocalizedString(@"sr_voice_effect");
     titleLabel.font = UIFontMake(16);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:titleLabel];
     
     UILabel *electronicLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, titleLabel.bottom+25, 55, 17)];
-    electronicLabel.text = KTVLocalizedString(@"ktv_enable_electronic");
+    electronicLabel.text = SRLocalizedString(@"sr_enable_electronic");
     electronicLabel.font = UIFontMake(13);
     electronicLabel.textColor = UIColorMakeWithHex(@"#C6C4DE");
     [self addSubview:electronicLabel];
@@ -76,7 +76,7 @@
     [self addSubview:self.openSwitch];
     
     UILabel *typeLabel = [[UILabel alloc]initWithFrame:CGRectMake(electronicLabel.left, electronicLabel.bottom+24, 55, 17)];
-    typeLabel.text = KTVLocalizedString(@"ktv_select_mode");
+    typeLabel.text = SRLocalizedString(@"sr_select_mode");
     typeLabel.font = UIFontMake(13);
     typeLabel.textColor = UIColorMakeWithHex(@"#C6C4DE");
     [self addSubview:typeLabel];
@@ -100,7 +100,7 @@
     [bgView addSubview:self.rotateImgView];
     
     self.heFengLabel = [[UILabel alloc]initWithFrame:CGRectMake(10, self.rotateImgView.centerY-12, 26, 17)];
-    self.heFengLabel.text = KTVLocalizedString(@"ktv_gentle_wind");
+    self.heFengLabel.text = SRLocalizedString(@"sr_gentle_wind");
     self.heFengLabel.font = UIFontBoldMake(12);
     self.heFengLabel.textAlignment = NSTextAlignmentCenter;
     self.heFengLabel.textColor = UIColorMakeWithHex(@"#C6C4DE");
@@ -118,7 +118,7 @@
     [bgView addSubview:heFengBtn];
     
     self.xiaoDiaoLabel = [[UILabel alloc]initWithFrame:CGRectMake((220-26)*0.5, 15, 26, 17)];
-    self.xiaoDiaoLabel.text = KTVLocalizedString(@"ktv_minor");
+    self.xiaoDiaoLabel.text = SRLocalizedString(@"sr_minor");
     self.xiaoDiaoLabel.font = UIFontBoldMake(12);
     self.xiaoDiaoLabel.textAlignment = NSTextAlignmentCenter;
     self.xiaoDiaoLabel.textColor = UIColorMakeWithHex(@"#979CBB");
@@ -142,7 +142,7 @@
     [bgView addSubview:self.daDiaoView];
     
     self.daDiaoLabel = [[UILabel alloc]initWithFrame:CGRectMake(self.daDiaoView.right+5, self.heFengLabel.top, 26, 17)];
-    self.daDiaoLabel.text = KTVLocalizedString(@"ktv_major");
+    self.daDiaoLabel.text = SRLocalizedString(@"sr_major");
     self.daDiaoLabel.font = UIFontBoldMake(12);
     self.daDiaoLabel.textAlignment = NSTextAlignmentCenter;
     self.daDiaoLabel.textColor = UIColorMakeWithHex(@"#979CBB");
