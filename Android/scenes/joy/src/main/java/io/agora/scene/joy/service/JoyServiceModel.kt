@@ -1,57 +1,34 @@
 package io.agora.scene.joy.service
 
-data class RoomListModel constructor(
-    val roomNo: String = "",
-    val name: String = "",
-    val icon: String = "",
-    val isPrivate: Boolean = false,
-    val password: String = "",
-    val creatorNo: String = "",
-    val creatorName: String = "",
-    val creatorAvatar: String = "",
-    val createdAt: String = System.currentTimeMillis().toString(),
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import java.io.Serializable
 
-    /**
-     * 背景图
-     */
-    val bgOption: String = "",
-    /**
-     * 房间内人数
-     */
-    val roomPeopleNum: Int = 0,
+data class JoyUserInfo constructor(
+    var userId: Int = 0,
+    var userName: String = "",
+    var avatar: String = "",
+    var createdAt: Long = System.currentTimeMillis(),
+
+    var objectId: String = ""
 )
 
-data class CreateRoomInputModel constructor(
-    val icon: String,
-    val isPrivate: Int,
-    val name: String,
-    val password: String,
-    val userNo: String,
+data class JoyRoomInfo constructor(
+    var roomNo: String = "",//房间号
+    var roomName: String = "", //房间名
+    var roomUserCount: Int = 0,//房间内人数
+    var thumbnailId: String?,  //缩略图id
+    var ownerId: Int = 0, // 房主 userid(rtc uid)
+    var ownerAvatar: String?, // 房主头像
+    var ownerName: String?, // 房主名
+    var gameId: String="", // 游戏 id
+    var badgeTitle: String="",//胖可争霸/羊羊抗狼
+    var assistantUid: Int = 0, //游戏画面uid
+    var createdAt: Long = System.currentTimeMillis(),
+
+    var objectId: String = ""
+):Serializable
+
+data class JoyGameInfo constructor(
+    @DrawableRes val drawableId: Int
 )
-
-data class CreateRoomOutputModel constructor(
-    val roomNo: String?,
-    val password: String?,
-)
-
-
-data class JoinRoomInputModel constructor(
-    val roomNo: String,
-    val password: String?,
-)
-
-data class JoinRoomOutputModel constructor(
-    val roomName: String,
-    val roomNo: String,
-    val creatorNo: String,
-    val creatorAvatar: String,
-    val bgOption: String,
-    /**
-     * 房间内人数
-     */
-    val roomPeopleNum: Int,
-    val agoraRTMToken: String,
-    val agoraRTCToken: String,
-    val agoraChorusToken: String,
-    val createdAt: String
-) : java.io.Serializable

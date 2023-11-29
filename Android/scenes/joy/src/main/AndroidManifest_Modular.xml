@@ -37,5 +37,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="io.agora.scene.joy.ui.LivePrepareActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="io.agora.scene.joy.ui.RoomLivingActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
     </application>
 </manifest>

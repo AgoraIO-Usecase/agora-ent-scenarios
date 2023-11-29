@@ -2,8 +2,32 @@ package io.agora.scene.joy.service
 
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.joy.JoyLogger
+import io.agora.syncmanager.rtm.Sync
+
+interface JoyServiceListenerProtocol{
+    /**
+     *  网络状况变化
+     */
+    fun onNetworkStatusChanged(status: Sync.ConnectionState)
+
+    /**
+     * 用户变化
+     */
+    fun onUserListDidChanged(userList:List<JoyUserInfo>)
+
+    /**
+     * 房间销毁
+     */
+    fun onRoomDidDestroy(roomInfo: JoyRoomInfo)
+
+    /**
+     * 房间超时
+     */
+    fun onRoomTimeUp()
+}
 
 interface JoyServiceProtocol {
+
 
     enum class JoySubscribe {
         JoySubscribeCreated,      //创建
@@ -29,49 +53,27 @@ interface JoyServiceProtocol {
     /**
      * 获取房间列表
      */
-    fun getRoomList(completion: (error: Exception?, list: List<RoomListModel>?) -> Unit)
+    fun getRoomList(completion: (list: List<JoyRoomInfo>) -> Unit)
 
     /**
      * 创建房间
      */
-    fun createRoom(
-        inputModel: CreateRoomInputModel,
-        completion: (error: Exception?, out: CreateRoomOutputModel?) -> Unit
-    )
+    fun createRoom(roomName: String, completion: (error: Exception?, out: JoyRoomInfo?) -> Unit)
 
     /**
      * 加入房间
      */
-    fun joinRoom(
-        inputModel: JoinRoomInputModel,
-        completion: (error: Exception?, out: JoinRoomOutputModel?) -> Unit
-    )
+    fun joinRoom(roomInfo: JoyRoomInfo, completion: (error: Exception?) -> Unit)
 
     /**
      * 离开房间
      */
-    fun leaveRoom(completion: (error: Exception?) -> Unit)
+    fun leaveRoom(roomInfo: JoyRoomInfo,completion: (error: Exception?) -> Unit)
 
     /**
-     * room status did changed
+     * 订阅回调变化
      */
-    fun subscribeRoomStatus(changedBlock: (JoySubscribe, RoomListModel?) -> Unit)
-
-    /**
-     * user count did changed
-     */
-    fun subscribeUserListCount(changedBlock: (count: Int) -> Unit)
-
-    /**
-     * 房间超时
-     */
-    fun subscribeRoomTimeUp(onRoomTimeUp: () -> Unit)
+    fun subscribeListener(listener: JoyServiceListenerProtocol)
 
 
-    // =================== 断网重连相关 =========================
-
-    /**
-     * 订阅重连事件
-     */
-    fun subscribeReConnectEvent(onReconnect: () -> Unit)
 }

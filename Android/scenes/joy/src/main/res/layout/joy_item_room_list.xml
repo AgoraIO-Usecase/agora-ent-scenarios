@@ -18,11 +18,13 @@
         app:strokeWidth="0.5dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@mipmap/joy_img_room_item_bg_0">
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvGameTag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
