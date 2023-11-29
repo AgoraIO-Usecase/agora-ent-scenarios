@@ -462,7 +462,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
                                                       withDelegate:self];
     
     self.settingView = (VLSRSettingView*)popView.currCustomView;
-    [self.settingView setIspause:self.isPause];
 }
 
 - (void)showScoreViewWithScore:(NSInteger)score {
