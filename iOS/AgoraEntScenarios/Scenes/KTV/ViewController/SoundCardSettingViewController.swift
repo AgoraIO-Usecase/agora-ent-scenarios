@@ -19,7 +19,6 @@ class SoundCardSettingViewController: UIViewController {
     @IBOutlet weak var deviceLabel: UILabel!
     @IBOutlet weak var gainLabel: UILabel!
     @IBOutlet weak var volGainSlider: UISlider!
-    @IBOutlet weak var warningView: UIView!
     @IBOutlet weak var soundSetView: UIView!
     @IBOutlet weak var soundSwitch: UISwitch!
     @IBOutlet weak var iconView: UIImageView!
@@ -39,16 +38,6 @@ class SoundCardSettingViewController: UIViewController {
         super.viewDidLoad()
         iconView.layer.cornerRadius = 30
         iconView.layer.masksToBounds = true
-        
-        let flag = HeadSetUtil.hasSoundCard()
-        warningView.isHidden = flag
-        HeadSetUtil.addSoundCardObserver {[weak self] flag in
-            self?.warningView.isHidden = flag
-            if(!flag) {
-                guard let delegate = self?.delegate else {return}
-                delegate.didUpdateSoundSetting(false)
-            }
-        }
         
         volGainSlider.addTarget(self, action: #selector(gain), for: .valueChanged)
         volGainSlider.addTarget(self, action: #selector(gainSend), for: .touchUpInside)
