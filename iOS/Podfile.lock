@@ -32,6 +32,7 @@ PODS:
     - AgoraSyncManager
     - SDWebImage
     - SnapKit
+    - SwiftProtobuf (= 1.24.0)
     - SwiftyBeaver
     - YYCategories
     - YYModel
@@ -89,6 +90,7 @@ PODS:
   - SVGAPlayer/ProtoFiles (2.5.7):
     - Protobuf (~> 3.4)
   - SVProgressHUD (2.2.5)
+  - SwiftProtobuf (1.24.0)
   - SwiftyBeaver (1.9.5)
   - VideoLoaderAPI (0.1.0):
     - AgoraRtcEngine_Special_iOS
@@ -161,6 +163,7 @@ SPEC REPOS:
     - SSZipArchive
     - SVGAPlayer
     - SVProgressHUD
+    - SwiftProtobuf
     - SwiftyBeaver
     - YYCategories
     - YYModel
@@ -191,7 +194,7 @@ SPEC CHECKSUMS:
   CallAPI: f40f9694c310b613f20958fabdbe69f8bc1d6ca5
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
-  Joy: 459b7d07dc1e0a45d0dadb50fd1e18b601a17e0a
+  Joy: 873f1483af8ba0e2102714ebfe8a0315bd756723
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
   LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb
@@ -210,6 +213,7 @@ SPEC CHECKSUMS:
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
+  SwiftProtobuf: bcfd2bc231cf9ae552cdc7c4e877bd3b41fe57b1
   SwiftyBeaver: 84069991dd5dca07d7069100985badaca7f0ce82
   VideoLoaderAPI: d50ad8f8767ddaad5328c4cf64dd9c5d8ee32d3e
   YYCategories: 6bcd4314c6661a561410dce4a793379ebd306abd
