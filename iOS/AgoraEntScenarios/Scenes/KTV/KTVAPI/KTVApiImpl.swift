@@ -961,7 +961,7 @@ extension KTVApiImpl {
         }
         // 加入演唱频道
         apiConfig?.engine?.joinChannelEx(byToken: apiConfig?.chorusChannelToken, connection: singChannelConnection ?? AgoraRtcConnection(), delegate: self, mediaOptions: singChannelMediaOptions)
-        
+        apiConfig?.engine?.setParameters("{\"rtc.use_audio4\": true}")
         switch newRole {
         case .leadSinger:
             // 更新音频配置
@@ -992,7 +992,7 @@ extension KTVApiImpl {
         case .coSinger:
             // 防止主唱和合唱听见mpk流的声音
             apiConfig?.engine?.muteRemoteAudioStreamEx(UInt(gaintConfig?.musicStreamUid ?? 0), mute: true, connection: singChannelConnection ?? AgoraRtcConnection())
-
+            
             // 更新音频配置
             apiConfig?.engine?.setAudioScenario(.chorus)
             apiConfig?.engine?.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":false}")

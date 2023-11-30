@@ -38,6 +38,7 @@ public enum DHCGameEvent: Int {
     case acc
     case showChorus
     case resultNext
+    case retryLrc
 }
 
 public enum DHCGameState: Int {
@@ -74,6 +75,7 @@ class DHCLRCControl: UIView {
     private var totalCount: Int = 0
     private var currentLoadLrcPath: String?
     
+    public var retryBtn: UIButton!
     @objc public var skipCallBack: ((Int, Bool) -> Void)?
 
     public var skipBtn: KTVSkipView!
@@ -281,6 +283,18 @@ class DHCLRCControl: UIView {
         lrcView.lyricsView.draggable = true
         lrcView.delegate = self
         addSubview(lrcView!)
+        
+        //重试歌词按钮
+        retryBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 100, height: 40))
+        retryBtn.center = lrcView.center
+        retryBtn.setTitle("点击重试", for: .normal)
+        retryBtn.layer.cornerRadius = 5
+        retryBtn.layer.masksToBounds = true
+        retryBtn.layer.borderColor = UIColor.white.cgColor
+        retryBtn.layer.borderWidth = 1
+        retryBtn.addTarget(self, action: #selector(retryLrc), for: .touchUpInside)
+        lrcView.addSubview(retryBtn)
+        retryBtn.isHidden = true
 
         pauseBtn = UIButton(frame: CGRect(x: 20, y: self.bounds.maxY - 50, width: 34, height: 40))
         pauseBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
@@ -393,6 +407,11 @@ class DHCLRCControl: UIView {
     @objc private func showChorus() {
         guard let delegate = self.delegate else {return}
         delegate.didGameEventChanged(with: .showChorus)
+    }
+    
+    @objc private func retryLrc() {
+        guard let delegate = self.delegate else {return}
+        delegate.didGameEventChanged(with: .retryLrc)
     }
     
     public func resetStatus() {
@@ -578,10 +597,12 @@ extension DHCLRCControl: KTVLrcViewDelegate {
     }
     
     public func setScore(with score: Int) {
-        scoreLabel.text = "\(score) 总分"
-        let width = calculateLabelWidth(text: scoreLabel.text!, font: UIFont.systemFont(ofSize: 12))
-        scoreLabel.frame = CGRect(x: self.bounds.width - width - 90, y: 0, width: width, height: 30)
-        musicNameBtn.frame =  CGRect(x: 20, y: 0, width: self.bounds.width - width - 90 - 20 - 10, height: 30)
+        DispatchQueue.main.async {
+            self.scoreLabel.text = "\(score) 总分"
+            let width = self.calculateLabelWidth(text: self.scoreLabel.text!, font: UIFont.systemFont(ofSize: 12))
+            self.scoreLabel.frame = CGRect(x: self.bounds.width - width - 90, y: 0, width: width, height: 30)
+            self.musicNameBtn.frame =  CGRect(x: 20, y: 0, width: self.bounds.width - width - 90 - 20 - 10, height: 30)
+        }
     }
 
     public func setResultData(with totalScore: Int, models:[SubRankModel], musicStr: String, isRoomOwner: Bool) {

@@ -3,8 +3,7 @@ import AgoraCommon
 class ApiManager {
     static let shared = ApiManager()
     
-    private let domain = "http://218.205.37.50:16000"
-    private let testIp = "218.205.37.50"
+    private let domain = "https://api.sd-rtn.com"
     
     private let TAG = "ApiManager"
     
@@ -25,7 +24,6 @@ class ApiManager {
         do {
             let acquireOjb = try JSONSerialization.data(withJSONObject: [
                 "instanceId": "\(Int(Date().milListamp))",
-                "testIp": testIp
             ])
 
             let url = getTokenUrl(domain: domain, appId: AppContext.shared.appId)
@@ -211,7 +209,7 @@ class ApiManager {
 
     private func getBasicAuth() -> String {
         // 拼接客户 ID 和客户密钥并使用 base64 编码
-        let plainCredentials = "\(AppContext.shared.appId):\(AppContext.shared.certificate)"
+        let plainCredentials = "\(AppContext.shared.cloudPlayerKey):\(AppContext.shared.cloudPlayerSecret)"
         guard let base64Credentials = plainCredentials.data(using: .utf8)?.base64EncodedString() else {
             return ""
         }

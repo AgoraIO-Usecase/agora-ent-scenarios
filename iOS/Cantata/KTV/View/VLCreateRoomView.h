@@ -15,5 +15,5 @@
 @interface VLCreateRoomView : UIView
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLCreateRoomViewDelegate>)delegate;
-
+@property (nonatomic, strong) UIButton *createBtn;
 @end

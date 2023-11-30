@@ -42,7 +42,7 @@ class VLBottomView: UIView {
     }
     
     public func updateMicState(_ isOpen: Bool) {
-        audioBtn.isSelected = isOpen ? false : true
+        audioBtn.isSelected = isOpen
     }
     
     override func layoutSubviews() {

@@ -137,6 +137,7 @@ class CantataMainViewController: BaseViewController{
     
     private var testBtn: UIButton!
     private var isDumpAble:Bool = false
+    private var timeManager: TimerManager = TimerManager()
     private var playoutVolume: Int = 50 {
         didSet {
             self.ktvApi.getMusicPlayer()?.adjustPlayoutVolume(Int32(playoutVolume))
@@ -150,9 +151,14 @@ class CantataMainViewController: BaseViewController{
         super.viewDidLoad()
         layoutUI()
         
+        isRoomOwner = VLUserCenter.user.ifMaster
+        
+        if isRoomOwner {
+            self.timeManager.startTimer(withTarget: self, andSelector: #selector(giveupRoom))
+        }
+        
         addDebugLogic()
         
-        isRoomOwner = VLUserCenter.user.ifMaster
         if isRoomOwner {
             guard let roomNo = roomModel?.roomNo else {return}
             ApiManager.shared.fetchStartCloud(mainChannel: roomNo, cloudRtcUid: 232425)
@@ -179,6 +185,18 @@ class CantataMainViewController: BaseViewController{
     @objc func showDebug() {
         let presentView = LSTPopView.popDebugView(withParentView: self.view, isDebugMode: self.isDumpAble, with: self)
         
+    }
+    
+    @objc private func giveupRoom() {
+        let mes = "因长时间未点歌，您的房间已解散，请重新创建房间"
+        DispatchQueue.main.async {
+            VLKTVAlert.shared().showKTVToast(withFrame: UIScreen.main.bounds, image: UIImage.sceneImage(name: "empty", bundleName: "DHCResource")!, message: mes, buttonTitle: "ktv_confirm".toSceneLocalization()) {[weak self] flag, text in
+                guard let self = self else {return}
+                VLKTVAlert.shared().dismiss()
+                self.timeManager.stopTimer()
+                self.leaveRoom()
+            }
+        }
     }
 
     public override func viewWillAppear(_ animated: Bool) {
@@ -317,8 +335,7 @@ extension CantataMainViewController {
 //            isNowMicMuted = true
 //        }
 //
-        botView.updateMicState(!isNowMicMuted)
-        
+        botView.updateMicState(true)
     }
     
     private func loadKtvApi() {
@@ -687,6 +704,12 @@ extension CantataMainViewController: IMusicLoadStateListener {
             VLToast.toast("网络中断，请切歌重试", duration: 5.0)
         }
         
+        if reason == .noLyricUrl {//歌词加载失败
+            self.lrcControlView.retryBtn.isHidden = false
+        } else if reason == .cancled || reason == .musicPreloadFail {//歌曲加载失败 切歌
+            
+        }
+        
         if self.singerRole == .soloSinger || self.singerRole == .leadSinger {
             self.lrcControlView.updateLoadingView(with: 100)
         }
@@ -781,9 +804,9 @@ extension CantataMainViewController {
                         }
                     }
                     
-                    if let topMusic = self.selSongArray?.first, topMusic.status == .playing, seatModel.userNo == topMusic.userNo {
-                        return
-                    }
+//                    if let topMusic = self.selSongArray?.first, topMusic.status == .playing, seatModel.userNo == topMusic.userNo {
+//                        return
+//                    }
                     
                     if let seatArray = self.seatsArray,let index = seatArray.firstIndex(where: { $0.userNo == seatModel.userNo }) {
                         self.seatsArray?.remove(at: index)
@@ -796,9 +819,6 @@ extension CantataMainViewController {
                 }
                 
                 if status == .updated && self.singerRole == .audience {//
-//                    let totalScore = self.seatsArray?.reduce(0, { (result, seatModel) -> Int in
-//                        return result + seatModel.score
-//                    })
                     let totalScore = self.scoreMap.values.reduce(0, { (result, scoreModel) -> Int in
                         return result + scoreModel.score
                     })
@@ -849,6 +869,12 @@ extension CantataMainViewController {
             // update in-ear monitoring
             self.checkInEarMonitoring()
             
+            if status == .created && isRoomOwner {
+                if self.selSongArray?.count == 0 {
+                    self.timeManager.stopTimer() //有人点歌 需要关闭
+                }
+            }
+            
             if status == .deleted {
                 if songArray.count == 0 {
                     self.chorusMicView.isHidden = true
@@ -872,6 +898,10 @@ extension CantataMainViewController {
                 }
                 let success = self.removeSelSong(songNo: Int(songInfo.songNo ?? "")!, sync: false)
                 self.selSongArray = songArray
+                
+                if self.selSongArray?.count == 0 && isRoomOwner {
+                    self.timeManager.restartTimer()
+                }
 
             } else {
                 let song = self.selSong(with: songInfo.songNo ?? "")
@@ -981,6 +1011,7 @@ extension CantataMainViewController {
     }
     
     private func leaveRoom() {
+        leaveSeat()
         AppContext.ktvServiceImp()?.leaveRoom(completion: {[weak self] error in
             
             guard let self = self else {return}
@@ -1147,9 +1178,6 @@ extension CantataMainViewController {
     private func stopPlaySong() {
         self.isPause = false
         self.ktvApi?.stopSing()
-//        ktvApi.switchSingerRole2(newRole: .audience) { state, reason in
-//
-//        }
     }
     
     private func selSong(with songNo: String) -> VLRoomSelSongModel? {
@@ -1288,7 +1316,6 @@ extension CantataMainViewController {
                     self.lrcControlView.setScore(with: 0)
                     self.removeCurrentSong()
                 }
-               // self.leaveSeat()
             }
             VLAlert.shared().dismiss()
         }
@@ -1443,6 +1470,10 @@ extension CantataMainViewController: DHCGameDelegate {
             self.lrcControlView.setScore(with: 0)
             self.removeCurrentSong()
             self.leaveSeat()
+        } else if event == .retryLrc {
+            //歌词重试
+            self.lrcControlView.retryBtn.isHidden = true
+            self.loadAndPlaySong()
         }
     }
 }
@@ -1489,8 +1520,10 @@ extension CantataMainViewController: KTVApiEventHandlerDelegate {
     
     public func onSingerRoleChanged(oldRole: KTVSingRole, newRole: KTVSingRole) {
         self.singerRole = newRole
-        self.botView.audioBtn.isUserInteractionEnabled = self.singerRole != .audience
-        self.lrcControlView.isMainSinger = (self.singerRole == .leadSinger || self.singerRole == .soloSinger)
+        DispatchQueue.main.async {
+            self.botView.audioBtn.isUserInteractionEnabled = self.singerRole != .audience
+            self.lrcControlView.isMainSinger = (self.singerRole == .leadSinger || self.singerRole == .soloSinger)
+        }
     }
     
     public func onChorusChannelAudioVolumeIndication(speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
@@ -1765,3 +1798,40 @@ struct ScoreModel {
     var score: Int
     var headUrl: String
 }
+
+class TimerManager {
+    var workItem: DispatchWorkItem?
+    var target: AnyObject?
+    var selector: Selector?
+    
+    func startTimer(withTarget target: AnyObject, andSelector selector: Selector) {
+        self.target = target
+        self.selector = selector
+        
+        workItem = DispatchWorkItem { [weak self] in
+            self?.timerAction()
+        }
+        
+        DispatchQueue.global().asyncAfter(deadline: .now() + 300, execute: workItem!)
+    }
+    
+    func stopTimer() {
+        workItem?.cancel()
+        workItem = nil
+    }
+    
+    func restartTimer() {
+        guard let target = target, let selector = selector else {
+            return
+        }
+        
+        stopTimer()  // 先停止之前的计时器
+        startTimer(withTarget: target, andSelector: selector)  // 然后启动新的计时器
+    }
+    
+    @objc func timerAction() {
+        target?.perform(selector)
+    }
+}
+
+
