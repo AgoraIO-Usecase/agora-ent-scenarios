@@ -33,3 +33,14 @@ public class JoyRoomInfo: NSObject {
     
     var objectId: String = ""
 }
+
+/// 聊天消息
+@objcMembers
+public class JoyMessage: NSObject {
+    var userId: String = ""      //用户id (rtc uid)
+    var userName: String?        //用户名
+    var message: String?         //消息文本内容
+    var createAt: Int64 = 0      //创建时间，与19700101时间比较的毫秒数
+    
+    var objectId: String = ""
+}

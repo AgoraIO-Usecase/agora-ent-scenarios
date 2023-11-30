@@ -98,13 +98,13 @@ class RoomListViewController: UIViewController {
         view.addSubview(createButton)
         _refreshAction()
         
-        renewTokens {[weak self] token in
+        renewRTMTokens {[weak self] token in
             guard let self = self else {return}
             guard let token = token else {
                 self.navigationController?.popViewController(animated: true)
                 return
             }
-            let config = CloudBarrageConfig(appId: joyAppId, engine: self.rtcEngine, rtcToken: token)
+            let config = CloudBarrageConfig(appId: joyAppId, engine: self.rtcEngine, rtmToken: token)
             CloudBarrageAPI.shared.setup(apiConfig: config)
         }
     }
@@ -136,28 +136,52 @@ extension RoomListViewController: UICollectionViewDataSource, UICollectionViewDe
 }
 
 extension RoomListViewController {
-    private func renewTokens(completion: ((String?)->Void)?) {
+    private func renewRTCTokens(roomId: String, completion: ((String?)->Void)?) {
         guard let userInfo = userInfo else {
             assert(false, "userInfo == nil")
             joyError("renewTokens fail,userInfo == nil")
             completion?(nil)
             return
         }
-        joyPrint("renewTokens")
+        joyPrint("renewRTCTokens[\(roomId)]")
         NetworkManager.shared.generateTokens(appId: joyAppId,
                                              appCertificate: joyAppCertificate,
-                                             channelName: ""/*tokenConfig.roomId*/,
+                                             channelName: roomId,
                                              uid: "\(userInfo.userId)",
                                              tokenGeneratorType: .token007,
                                              tokenTypes: [.rtc]) {[weak self] tokens in
             guard let self = self else {return}
             guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue] else {
-                joyWarn("renewTokens fail")
+                joyWarn("renewRTCTokens[\(roomId)] fail")
                 completion?(nil)
                 return
             }
-            joyPrint("renewTokens success")
+            joyPrint("renewRTCTokens[\(roomId)] success")
             completion?(rtcToken)
+        }
+    }
+    private func renewRTMTokens(completion: ((String?)->Void)?) {
+        guard let userInfo = userInfo else {
+            assert(false, "userInfo == nil")
+            joyError("renewTokens fail,userInfo == nil")
+            completion?(nil)
+            return
+        }
+        joyPrint("renewRTMTokens")
+        NetworkManager.shared.generateTokens(appId: joyAppId,
+                                             appCertificate: joyAppCertificate,
+                                             channelName: ""/*tokenConfig.roomId*/,
+                                             uid: "\(userInfo.userId)",
+                                             tokenGeneratorType: .token007,
+                                             tokenTypes: [.rtm]) {[weak self] tokens in
+            guard let self = self else {return}
+            guard let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
+                joyWarn("renewRTMTokens fail")
+                completion?(nil)
+                return
+            }
+            joyPrint("renewRTMTokens success")
+            completion?(rtmToken)
         }
     }
     
@@ -192,8 +216,14 @@ extension RoomListViewController {
         
         let roomNameIdx = Int(arc4random()) % randomRoomName.count
         let roomName = randomRoomName[roomNameIdx]
-        service.createRoom(roomName: "\(roomName)\(Int(arc4random()) % 1000000)") { info, error in
-            
+        service.createRoom(roomName: "\(roomName)\(Int(arc4random()) % 1000000)") {[weak self] info, error in
+            if let error = error {
+                AUIToast.show(text: error.localizedDescription)
+                return
+            }
+            let vc = RoomViewController()
+            vc.roomInfo = info
+//            self.navigationController?.pushViewController(vc, animated: <#T##Bool#>)
         }
     }
 }

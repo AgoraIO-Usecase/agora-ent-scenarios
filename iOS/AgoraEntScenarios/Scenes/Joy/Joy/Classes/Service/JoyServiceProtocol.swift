@@ -25,6 +25,9 @@ protocol JoyServiceListenerProtocol: NSObjectProtocol {
     /// - Parameter userList: <#userList description#>
     func onUserListDidChanged(userList: [JoyUserInfo])
     
+    /// 接收到新消息
+    /// - Parameter message: <#message description#>
+    func onMessageDidAdded(message: JoyMessage)
     
     /// <#Description#>
     /// - Parameter roomInfo: <#roomInfo description#>
@@ -54,6 +57,15 @@ protocol JoyServiceProtocol: NSObjectProtocol {
     /// 获取房间列表
     /// - Parameter completion: 完成回调
     func getRoomList(completion: @escaping ([JoyRoomInfo]) -> Void)
+    
+    /// 发送聊天消息
+    /// - Parameters:
+    ///   - roomId: roomId description
+    ///   - message: message description
+    ///   - completion: completion description
+    func sendChatMessage(roomId: String,
+                         message: String,
+                         completion: ((NSError?) -> Void)?)
     
     /// 订阅回调变化
     /// - Parameter listener: <#listener description#>

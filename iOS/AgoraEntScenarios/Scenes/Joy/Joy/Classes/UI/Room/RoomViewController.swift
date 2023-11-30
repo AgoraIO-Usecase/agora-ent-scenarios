@@ -8,5 +8,5 @@
 import UIKit
 
 class RoomViewController: UIViewController {
-    
+    var roomInfo: JoyRoomInfo?
 }

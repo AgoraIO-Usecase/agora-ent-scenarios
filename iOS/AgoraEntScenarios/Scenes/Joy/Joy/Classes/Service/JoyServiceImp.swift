@@ -219,6 +219,12 @@ extension JoyServiceImp: JoyServiceProtocol {
         completion(nil)
     }
     
+    func sendChatMessage(roomId: String,
+                         message: String,
+                         completion: ((NSError?) -> Void)?) {
+        
+    }
+    
     func subscribeListener(listener: JoyServiceListenerProtocol?) {
         self.listener = listener
     }

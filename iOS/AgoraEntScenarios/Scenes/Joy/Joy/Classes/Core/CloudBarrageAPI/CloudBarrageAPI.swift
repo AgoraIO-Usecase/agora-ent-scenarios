@@ -23,7 +23,7 @@ public struct CloudBarrageConfig {
     var appId: String?
     var host: String? = "https://api-test.agora.io/v1/apps/"
     var engine: AgoraRtcEngineKit?
-    var rtcToken: String?
+    var rtmToken: String?
 }
 
 public class CloudBarrageAPI: NSObject {
@@ -55,12 +55,13 @@ extension CloudBarrageAPI {
         let params = ["page_num": pageNum, "page_size": pageSize]
         let interfaceName = "cloud-bullet-game/games"
         getRequest(interface: interfaceName, params: params) { err, result  in
-            if let result = result as? [[String: Any]] {
+            if let result = result?["list"] as? [[String: Any]] {
                 let model: [CloudGameInfo]? = self.decodeModelArray(result)
                 completion(err, model)
                 return
             }
-            completion(err, nil)        }
+            completion(err, nil)
+        }
     }
     
     
@@ -338,11 +339,14 @@ extension CloudBarrageAPI {
                              httpMethod:String,
                              params:[String: Any]? = nil,
                              completion: @escaping (NSError?, [String: Any]?)->()) {
-        guard let apiConfig = apiConfig else {
+        guard let apiConfig = apiConfig,
+              let host = apiConfig.host,
+              let appId = apiConfig.appId,
+              let rtmToken = apiConfig.rtmToken else {
             completion(NSError(domain: "api config == nil", code: -1), nil)
             return
         }
-        var url = URL(string: "\(apiConfig.host)\(apiConfig.appId)/\(interface)")!
+        var url = URL(string: "\(host)\(appId)/\(interface)")!
         if let params = params {
             if httpMethod == "GET" {
                 url = appendQueryParams(to: url, queryParams: params) ?? url
@@ -352,8 +356,8 @@ extension CloudBarrageAPI {
        
         var request = URLRequest(url: url)
         request.addValue("text/plain", forHTTPHeaderField: "Con1tent-Type")
-        request.addValue("agora token=\(apiConfig.rtcToken)", forHTTPHeaderField: "Authorization")
-        joyPrint("agora token=\(apiConfig.rtcToken)")
+        request.addValue("agora token=\(rtmToken)", forHTTPHeaderField: "Authorization")
+        joyPrint("agora token=\(rtmToken)")
 
         request.httpMethod = httpMethod
         if let params = params {
