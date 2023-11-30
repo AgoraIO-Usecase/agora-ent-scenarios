@@ -97,6 +97,15 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         SyncUtil
             .scene(id: channelName)?
             .unsubscribeScene()
+        SyncUtil
+            .scene(id: channelName)?
+            .unsubscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION)
+        SyncUtil
+            .scene(id: channelName)?
+            .unsubscribe(key: SYNC_MANAGER_SEAT_INFO)
+        SyncUtil
+            .scene(id: channelName)?
+            .unsubscribe(key: SYNC_MANAGER_CHOOSE_SONG_INFO)
         
         userListCountDidChanged = nil
         seatListDidChanged = nil
@@ -1185,7 +1194,8 @@ extension KTVSyncManagerServiceImp {
                  success: {[weak self] obj in
                 agoraPrint("imp seat add success...")
                 seatInfo.objectId = obj.getId()
-                self?.seatMap["\(seatInfo.rtcUid)"] = seatInfo
+                guard let seatKey = seatInfo.rtcUid else {return}
+                self?.seatMap["\(seatKey)"] = seatInfo
                 finished(nil)
             }, fail: { error in
                 agoraPrint("imp seat add fail...")
@@ -1242,8 +1252,12 @@ extension KTVSyncManagerServiceImp {
                 seat.userNo = origSeat.userNo
                 seat.chorusSongCode = origSeat.chorusSongCode
                 guard let uid = origSeat.rtcUid else {return}
-                self.seatMap["\(uid)"] = seat
+                if self.seatMap.keys.contains("\(uid)") {
+                    self.seatMap.removeValue(forKey: "\(uid)")
+                }
+              //  self.seatMap["\(uid)"] = seat
                 self.seatListDidChanged?(.deleted, seat)
+                print("\(seat.userNo)已下麦")
             }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
                 finished()

@@ -14,10 +14,10 @@
 #import "VLURLPathConfig.h"
 #import "AppContext+DHCKTV.h"
 #import "AESMacro.h"
-
+#import <SVProgressHUD/SVProgressHUD.h>
 @interface VLCreateRoomViewController ()<VLCreateRoomViewDelegate/*,AgoraRtmDelegate*/>
 @property (nonatomic, strong) AgoraRtcEngineKit *RTCkit;
-
+@property (nonatomic, strong) DHCVLCreateRoomView *createView;
 @end
 
 @implementation VLCreateRoomViewController
@@ -46,6 +46,11 @@
     [self setBackBtn];
 }
 
+- (void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    [SVProgressHUD dismiss];
+}
+
 #pragma mark - Public Methods
 - (void)configNavigationBar:(UINavigationBar *)navigationBar {
     [super configNavigationBar:navigationBar];
@@ -69,10 +74,10 @@
     intputModel.creatorAvatar = VLUserCenter.user.headUrl;
 //    intputModel.userNo = VLUserCenter.user.id;
     VL(weakSelf);
-    self.view.userInteractionEnabled = NO;
+    self.createView.createBtn.userInteractionEnabled = NO;
     [[AppContext ktvServiceImp] createRoomWith:intputModel
                                          completion:^(NSError * error, KTVCreateRoomOutputModel * outputModel) {
-        weakSelf.view.userInteractionEnabled = YES;
+        self.createView.createBtn.userInteractionEnabled = YES;
         if (error != nil) {
             [VLToast toast:error.description];
             return;
@@ -135,6 +140,7 @@
 - (void)setUpUI {
     VLCreateRoomView *createRoomView = [[VLCreateRoomView alloc]initWithFrame:CGRectMake(0, kTopNavHeight, SCREEN_WIDTH, SCREEN_HEIGHT-kTopNavHeight) withDelegate:self];
     [self.view addSubview:createRoomView];
+    self.createView = createRoomView;
 }
 
 

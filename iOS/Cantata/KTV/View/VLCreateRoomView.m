@@ -19,7 +19,6 @@
 @property (nonatomic, strong) UIButton *publicBtn;
 @property (nonatomic, strong) UIButton *screatBtn;
 @property (nonatomic, strong) VLAddRoomModel *addRoomModel;
-
 @property (nonatomic, strong) NSArray *titlesArray;
 @end
 
@@ -152,6 +151,7 @@
     [createBtn addTarget:self action:@selector(createBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
     createBtn.backgroundColor = UIColorMakeWithHex(@"#2753FF");
     [self addSubview:createBtn];
+    self.createBtn = createBtn;
     
 //    本应用为测试产品，请勿商用
     

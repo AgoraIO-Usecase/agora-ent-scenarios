@@ -224,6 +224,7 @@ private func agoraPrint(_ message: String) {
         engine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
         engine.setParameters("{\"che.audio.ans.noise_gate\": 20}")
+        engine.setParameters("{\"rtc.use_audio4\": true}")
     }
     
     func renewInnerDataStreamId() {
@@ -1204,13 +1205,13 @@ extension KTVApiImpl {
         let mainSingerState: Int = dict["state"] as? Int ?? 0
         let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .idle
 
-        if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
-            //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
-            self.localPlayerPosition = getPlayerCurrentTime()
-            print("localPlayerPosition:playerKit:handlePlayerStateCommand \(localPlayerPosition)")
-            agoraPrint("seek toPosition: \(self.localPlayerPosition)")
-            mediaPlayer?.seek(toPosition: Int(self.localPlayerPosition))
-        }
+//        if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
+//            //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
+//            self.localPlayerPosition = getPlayerCurrentTime()
+//            print("localPlayerPosition:playerKit:handlePlayerStateCommand \(localPlayerPosition)")
+//            agoraPrint("seek toPosition: \(self.localPlayerPosition)")
+//            mediaPlayer?.seek(toPosition: Int(self.localPlayerPosition))
+//        }
 
         print("recv state with MainSinger: \(state.rawValue)")
         syncPlayStateFromRemote(state: state, needDisplay: true)
