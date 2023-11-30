@@ -12,7 +12,7 @@ extension UIColor {
     
     // 主文字颜色
     @objc static var joy_main_text: UIColor {
-        return .white
+        return .black
     }
     
     // 未选中字体颜色

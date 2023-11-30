@@ -35,6 +35,7 @@ class RoomListViewController: UIViewController {
     private var roomList: [JoyRoomInfo] = [] {
         didSet {
             emptyView.isHidden = !roomList.isEmpty
+            listView.reloadData()
         }
     }
     private lazy var refreshControl: UIRefreshControl = {
@@ -46,8 +47,8 @@ class RoomListViewController: UIViewController {
         let layout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         let itemWidth = (self.view.width - 15 - 20 * 2) * 0.5
-        layout.itemSize = CGSize(width: itemWidth, height: 234.0 / 160.0 * itemWidth)
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        layout.itemSize = CGSize(width: itemWidth, height: itemWidth)
+        let collectionView = UICollectionView(frame: self.view.bounds, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.register(RoomListCell.self, forCellWithReuseIdentifier: NSStringFromClass(RoomListCell.self))
         collectionView.delegate = self
@@ -96,6 +97,16 @@ class RoomListViewController: UIViewController {
         view.addSubview(naviBar)
         view.addSubview(createButton)
         _refreshAction()
+        
+        renewTokens {[weak self] token in
+            guard let self = self else {return}
+            guard let token = token else {
+                self.navigationController?.popViewController(animated: true)
+                return
+            }
+            let config = CloudBarrageConfig(appId: joyAppId, engine: self.rtcEngine, rtcToken: token)
+            CloudBarrageAPI.shared.setup(apiConfig: config)
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -125,6 +136,31 @@ extension RoomListViewController: UICollectionViewDataSource, UICollectionViewDe
 }
 
 extension RoomListViewController {
+    private func renewTokens(completion: ((String?)->Void)?) {
+        guard let userInfo = userInfo else {
+            assert(false, "userInfo == nil")
+            joyError("renewTokens fail,userInfo == nil")
+            completion?(nil)
+            return
+        }
+        joyPrint("renewTokens")
+        NetworkManager.shared.generateTokens(appId: joyAppId,
+                                             appCertificate: joyAppCertificate,
+                                             channelName: ""/*tokenConfig.roomId*/,
+                                             uid: "\(userInfo.userId)",
+                                             tokenGeneratorType: .token007,
+                                             tokenTypes: [.rtc]) {[weak self] tokens in
+            guard let self = self else {return}
+            guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue] else {
+                joyWarn("renewTokens fail")
+                completion?(nil)
+                return
+            }
+            joyPrint("renewTokens success")
+            completion?(rtcToken)
+        }
+    }
+    
     private func _createRtcEngine() ->AgoraRtcEngineKit {
         let config = AgoraRtcEngineConfig()
         config.appId = joyAppId
@@ -146,7 +182,7 @@ extension RoomListViewController {
         service.getRoomList {[weak self] list in
             guard let self = self else {return}
             self.roomList = list
-            
+            self.refreshControl.endRefreshing()
             AUIToast.show(text: "room_list_refresh_tips".joyLocalization())
         }
     }
@@ -154,7 +190,11 @@ extension RoomListViewController {
     @objc private func _createAction() {
         guard let userInfo = userInfo else {return}
         
-        
+        let roomNameIdx = Int(arc4random()) % randomRoomName.count
+        let roomName = randomRoomName[roomNameIdx]
+        service.createRoom(roomName: "\(roomName)\(Int(arc4random()) % 1000000)") { info, error in
+            
+        }
     }
 }
 

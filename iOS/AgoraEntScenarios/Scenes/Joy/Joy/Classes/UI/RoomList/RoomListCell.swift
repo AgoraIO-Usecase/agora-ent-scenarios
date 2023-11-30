@@ -34,7 +34,7 @@ class RoomListCell: UICollectionViewCell {
         idLablel.text = "ID: \(id ?? "0")"
         var attachment = NSTextAttachment()
         if #available(iOS 13.0, *) {
-            attachment = NSTextAttachment(image: UIImage.sceneImage(name: "show_room_person")!)
+            attachment = NSTextAttachment(image: UIImage.sceneImage(name: "room_person")!)
         } else {
             attachment.image = UIImage.sceneImage(name: "show_room_person")
         }
