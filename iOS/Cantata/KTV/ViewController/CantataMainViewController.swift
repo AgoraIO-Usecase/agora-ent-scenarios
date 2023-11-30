@@ -337,8 +337,7 @@ extension CantataMainViewController {
 //            isNowMicMuted = true
 //        }
 //
-        botView.updateMicState(!isNowMicMuted)
-        
+        botView.updateMicState(true)
     }
     
     private func loadKtvApi() {

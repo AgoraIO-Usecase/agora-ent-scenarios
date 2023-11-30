@@ -682,6 +682,7 @@ extension KTVSyncManagerServiceImp {
         _unsubscribeAll()
         SyncUtil.leaveScene(id: channelName)
         roomNo = nil
+        seatMap.removeAll()
         completion(nil)
     }
 

@@ -1213,7 +1213,7 @@ extension KTVApiImpl {
 //            mediaPlayer?.seek(toPosition: Int(self.localPlayerPosition))
 //        }
 
-        print("recv state with MainSinger: \(state.rawValue)")
+        agoraPrint("recv state with MainSinger: \(state.rawValue)")
         syncPlayStateFromRemote(state: state, needDisplay: true)
     }
 
