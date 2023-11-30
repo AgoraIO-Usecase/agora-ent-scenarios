@@ -130,36 +130,12 @@ extension RoomListViewController: UICollectionViewDataSource, UICollectionViewDe
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let room = roomList[indexPath.item]
-        
+        let info = roomList[indexPath.item]
+        self.gotoRoom(roomInfo: info)
     }
 }
 
 extension RoomListViewController {
-    private func renewRTCTokens(roomId: String, completion: ((String?)->Void)?) {
-        guard let userInfo = userInfo else {
-            assert(false, "userInfo == nil")
-            joyError("renewTokens fail,userInfo == nil")
-            completion?(nil)
-            return
-        }
-        joyPrint("renewRTCTokens[\(roomId)]")
-        NetworkManager.shared.generateTokens(appId: joyAppId,
-                                             appCertificate: joyAppCertificate,
-                                             channelName: roomId,
-                                             uid: "\(userInfo.userId)",
-                                             tokenGeneratorType: .token007,
-                                             tokenTypes: [.rtc]) {[weak self] tokens in
-            guard let self = self else {return}
-            guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue] else {
-                joyWarn("renewRTCTokens[\(roomId)] fail")
-                completion?(nil)
-                return
-            }
-            joyPrint("renewRTCTokens[\(roomId)] success")
-            completion?(rtcToken)
-        }
-    }
     private func renewRTMTokens(completion: ((String?)->Void)?) {
         guard let userInfo = userInfo else {
             assert(false, "userInfo == nil")
@@ -217,14 +193,22 @@ extension RoomListViewController {
         let roomNameIdx = Int(arc4random()) % randomRoomName.count
         let roomName = randomRoomName[roomNameIdx]
         service.createRoom(roomName: "\(roomName)\(Int(arc4random()) % 1000000)") {[weak self] info, error in
+            guard let self = self else {return}
             if let error = error {
                 AUIToast.show(text: error.localizedDescription)
                 return
             }
-            let vc = RoomViewController()
-            vc.roomInfo = info
-//            self.navigationController?.pushViewController(vc, animated: <#T##Bool#>)
+            guard let info = info else { return }
+            self.gotoRoom(roomInfo: info)
         }
+    }
+    
+    private func gotoRoom(roomInfo: JoyRoomInfo) {
+        let vc = RoomViewController()
+        vc.roomInfo = roomInfo
+        vc.service = service
+        vc.currentUserInfo = userInfo
+        self.navigationController?.pushViewController(vc, animated: true)
     }
 }
 

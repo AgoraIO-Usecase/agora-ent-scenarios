@@ -27,7 +27,7 @@ public struct CloudBarrageConfig {
 }
 
 public class CloudBarrageAPI: NSObject {
-    private var apiConfig: CloudBarrageConfig?
+    public private(set) var apiConfig: CloudBarrageConfig?
     public static let shared: CloudBarrageAPI = CloudBarrageAPI()
     
     private lazy var throttler: AUIThrottler = AUIThrottler()

@@ -12,7 +12,7 @@ extension UIColor {
     
     // 主文字颜色
     @objc static var joy_main_text: UIColor {
-        return .black
+        return .white
     }
     
     // 未选中字体颜色
@@ -50,12 +50,7 @@ extension UIColor {
     
     // 直播场景背景色
     @objc static var joy_room_info_cover: UIColor {
-        return .black.withAlphaComponent(0.25)
-    }
-    
-    // 音乐设置背景色
-    @objc static var joy_music_item_bg: UIColor {
-        return .black.withAlphaComponent(0.35)
+        return UIColor(hexString: "08062f")!.withAlphaComponent(0.3)
     }
     
     // 背景色
@@ -65,7 +60,7 @@ extension UIColor {
     
     // 按钮背景
     @objc static var joy_btn_bg: UIColor {
-        return UIColor(hexString: "345DFF")!
+        return UIColor(hexString: "2F70FF")!
     }
 
     // 不推荐按钮背景

@@ -30,6 +30,8 @@
 "setting_statistic" = "实时数据";
 "call_content_inspect_warning"="监测到当前内容存在违规行为";
 
+"gamelist_selected_confirm"="确认";
+
 "show_create_room_name1"="小可爱是我呀";
 "show_create_room_name2"="我是你的小可爱";
 "show_create_room_name3"="一往情深";
