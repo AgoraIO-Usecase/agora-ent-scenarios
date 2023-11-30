@@ -137,7 +137,7 @@ class CantataMainViewController: BaseViewController{
     
     private var testBtn: UIButton!
     private var isDumpAble:Bool = false
-    private var timeManager: TimerManager!
+    private var timeManager: TimerManager = TimerManager()
     private var playoutVolume: Int = 50 {
         didSet {
             self.ktvApi.getMusicPlayer()?.adjustPlayoutVolume(Int32(playoutVolume))
@@ -154,9 +154,7 @@ class CantataMainViewController: BaseViewController{
         isRoomOwner = VLUserCenter.user.ifMaster
         
         if isRoomOwner {
-            self.timeManager = TimerManager()
             self.timeManager.startTimer(withTarget: self, andSelector: #selector(giveupRoom))
-            print("timer: timer begin")
         }
         
         addDebugLogic()
@@ -874,7 +872,6 @@ extension CantataMainViewController {
             if status == .created && isRoomOwner {
                 if self.selSongArray?.count == 0 {
                     self.timeManager.stopTimer() //有人点歌 需要关闭
-                    print("timer: song add, timer off")
                 }
             }
             
@@ -904,7 +901,6 @@ extension CantataMainViewController {
                 
                 if self.selSongArray?.count == 0 && isRoomOwner {
                     self.timeManager.restartTimer()
-                    print("timer: song delete all, timer on")
                 }
 
             } else {
