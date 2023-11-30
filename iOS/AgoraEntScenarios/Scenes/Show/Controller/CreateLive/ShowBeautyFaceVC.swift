@@ -81,7 +81,6 @@ class ShowBeautyFaceVC: UIViewController {
         adjustData = BeautyModel.createAdjustData()
         filterData = BeautyModel.createFilterData()
         stickerData = BeautyModel.createStickerData()
-        backgroundData = BeautyModel.createBackgroundData()
     }
     
     private func setBeautyHandler(value: CGFloat, isReset: Bool) {
