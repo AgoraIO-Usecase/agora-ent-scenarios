@@ -809,10 +809,6 @@ extension CantataMainViewController {
                         self.botView.updateMicState(true)
                     }
                     
-//                    if let topMusic = self.selSongArray?.first, topMusic.status == .playing, seatModel.userNo == topMusic.userNo {
-//                        return
-//                    }
-                    
                     if let seatArray = self.seatsArray,let index = seatArray.firstIndex(where: { $0.userNo == seatModel.userNo }) {
                         self.seatsArray?.remove(at: index)
                     }
