@@ -96,7 +96,7 @@ static bool USE_3_BUFFER = NO;
     ret = bef_effect_ai_create(&_handle);
     CHECK_RET_AND_RETURN(bef_effect_ai_create, ret)
 #ifdef EFFECT_LOG_ENABLED
-    bef_effect_ai_set_log_level(BEF_AI_LOG_LEVEL_WARN);
+    bef_effect_ai_set_log_level(BEF_AI_LOG_LEVEL_ERROR);
     bef_effect_ai_set_log_callback(effectLogCallback);
 #endif
     if (self.licenseProvider.licenseMode == OFFLINE_LICENSE) {
@@ -136,6 +136,7 @@ static bool USE_3_BUFFER = NO;
 - (int)destroyTask {
 #if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     [self removeMsgHandler:self];
+    bef_effect_ai_clean_pipeline_processor_task(_handle);
     bef_effect_ai_destroy(_handle);
     [_msgDelegateManager destoryDelegate];
     _msgDelegateManager = nil;
@@ -145,6 +146,8 @@ static bool USE_3_BUFFER = NO;
     free(_faceMaskInfo);
     free(_mouthMaskInfo);
     free(_teethMaskInfo);
+    _glContext = nil;
+    _handle = nil;
 #endif
     return 0;
 }
@@ -160,6 +163,9 @@ static bool USE_3_BUFFER = NO;
         }
     }
 #endif
+    if (_handle == nil) {
+        return BEF_RESULT_FAIL;
+    }
     if ([[EAGLContext currentContext] sharegroup] != [_glContext sharegroup]) {
         NSLog(@"effectsar init and process are not run in the same glContext");
         [EAGLContext setCurrentContext:_glContext];

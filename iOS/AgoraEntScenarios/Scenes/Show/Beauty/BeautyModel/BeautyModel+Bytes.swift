@@ -18,7 +18,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = "/beauty_IOS_lite"
         model.key = "smooth"
-        model.value = 0.3
+        model.value = 0.5
         model.name = "show_beauty_item_beauty_smooth".show_localized
         model.icon = "meiyan_icon_mopi"
         model.isSelected = true
