@@ -4,4 +4,10 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+
+    <style name="joy_alert_dialog" parent="Theme.AppCompat.Dialog">
+        <item name="alertDialogStyle">@style/AlertDialog.AppCompat</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="enableEdgeToEdge">true</item>
+    </style>
 </resources>

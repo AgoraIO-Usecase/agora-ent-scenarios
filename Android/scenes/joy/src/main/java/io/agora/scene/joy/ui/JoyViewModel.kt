@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class JoyViewModel : ViewModel() {
 
-    private val TAG = "JoyViewModel"
+    private val TAG = "Joy_JoyViewModel"
 
     private val mJoyApiService: JoyApiService by lazy {
         JoyApiManager.create(JoyApiService::class.java)

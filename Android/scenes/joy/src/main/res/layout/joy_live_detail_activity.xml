@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="32dp"
         android:background="@drawable/joy_live_detail_top_view_bg"
         android:paddingHorizontal="5dp"
         android:paddingVertical="4dp"
@@ -80,7 +80,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginVertical="4dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="12dp"
         android:padding="10dp"
         android:scaleType="fitXY"
         android:src="@mipmap/icon_close"
@@ -126,10 +126,99 @@
         app:layout_constraintStart_toStartOf="@id/vertical34"
         app:layout_constraintTop_toBottomOf="@+id/clRoomTitle" />
 
-    <include
-        android:id="@+id/chooseGameLayout"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRules"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/joy_bg_rect_radius_black20"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:text="@string/joy_rules_of_play"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/flVideoContainer" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvSendMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/joy_bg_send_message"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="11dp"
+        android:text="@string/joy_send_message"
+        android:textColor="@color/white"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="gone" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivLike"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:src="@drawable/joy_icon_like"
+        app:layout_constraintBottom_toBottomOf="@id/tvSendMessage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvSendMessage"
+        tools:visibility="gone" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivGift"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:src="@drawable/joy_icon_gift"
+        app:layout_constraintBottom_toBottomOf="@id/tvSendMessage"
+        app:layout_constraintEnd_toStartOf="@id/ivLike"
+        app:layout_constraintTop_toTopOf="@id/tvSendMessage"
+        tools:visibility="gone" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutEtMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginBottom="12dp"
+        android:background="@android:color/transparent"
+        android:paddingVertical="8dp"
+        android:visibility="gone"
+        app:boxBackgroundMode="none"
+        app:boxStrokeColor="@android:color/transparent"
+        app:hintEnabled="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etMessage"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:background="@drawable/joy_bg_send_message"
+            android:gravity="start|center"
+            android:hint="@string/joy_send_message"
+            android:imeOptions="actionSend"
+            android:maxLines="1"
+            android:padding="12dp"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white_80_percent"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnRandom" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <include
+        android:id="@+id/chooseGameLayout"
         layout="@layout/joy_include_game_info_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

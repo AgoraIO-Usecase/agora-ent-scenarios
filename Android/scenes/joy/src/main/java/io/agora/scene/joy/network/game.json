@@ -1,0 +1,28 @@
+{
+  "code": 0,
+  "result": {
+    "list": [
+      {
+        "game_id": "1000",
+        "name": "pwnk争霸",
+        "vendor": "pwnk",
+        "thumbnail": "/pwnk.png",
+        "introduce": "胖可争霸玩法说明：\n主播功能：\n控制视角：\n按键盘1，自由模式：主播任意控制视野。\n按键盘2，锁定模式：锁定观看红方。\n按键盘3，锁定模式：锁定观看蓝方。\n按键盘4、5，巡航模式：动态视野，只能控制远近\n按键盘Q，拉近镜头\n按键盘E，拉远镜头\n按键盘W、A、S、D，移动镜头\n按键盘Z，召唤一波暖场兵\n按键盘空格，暂停或恢复巡航\n\n观众功能：\n在游戏开始时，\n评论 1，加入蓝方阵营\n评论2，加入红方阵营\n点赞，出一排基础兵种\n送不同礼物，出不同种类的兵",
+        "vendor_game_id": "pkzb"
+      }
+    ],
+    "page_size": 10,
+    "page_num": 1,
+    "total": 1
+  }
+}
+
+2023-11-29 14:21:34.116 AIGCService DEBUG user speak by vad end
+2023-11-29 14:21:34.320 AIGCService DEBUG xf text:{"code":0,"message":"success","sid":"ist000d6f68@dx18c19bd6a55a196822","data":{"status":0,"result":{"sn":1,"ls":false,"bg":0,"ed":260,"pgs":"apd","sub_end":false,"ws":[{"bg":13,"cw":[{"rl":0,"sc":0.00,"w":"是","wb":13,"wc":0.00,"we":26,"wp":"n"}]}]}},"context_id":"ZHhpc3QIIKwVoZbS6cZ/wgOcF9Qe"}
+2023-11-29 14:21:34.321 AIGCService DEBUG onSttResult: 是,isFinish:false,isRecognizedSpeech:false
+2023-11-29 14:21:34.794 AIGCService DEBUG xf text:{"code":0,"message":"success","sid":"ist000d6f68@dx18c19bd6a55a196822","data":{"status":1,"result":{"sn":2,"ls":false,"bg":260,"ed":520,"pgs":"rpl","rg":[1,1],"sub_end":false,"ws":[{"bg":26,"cw":[{"rl":0,"sc":0.00,"w":"中国","wb":26,"wc":0.00,"we":52,"wp":"n"}]}]}},"context_id":"ZHhpc3QIIKwVoZbS6cZ/wgOcF9Qe"}
+2023-11-29 14:21:34.795 AIGCService DEBUG onSttResult: 中国,isFinish:false,isRecognizedSpeech:false
+2023-11-29 14:21:35.257 AIGCService DEBUG xf text:{"code":0,"message":"success","sid":"ist000d6f68@dx18c19bd6a55a196822","data":{"result":{"sn":3,"ls":false,"bg":0,"ed":1560,"pgs":"rpl","rg":[1,2],"sub_end":true,"ws":[{"bg":1,"cw":[{"rl":0,"sc":0.00,"w":"是","wb":1,"wc":0.00,"we":12,"wp":"n"}]},{"bg":13,"cw":[{"rl":0,"sc":0.00,"w":"中国","wb":13,"wc":0.00,"we":72,"wp":"n"}]},{"bg":73,"cw":[{"rl":0,"sc":0.00,"w":"人","wb":73,"wc":0.00,"we":92,"wp":"n"}]},{"bg":93,"cw":[{"rl":0,"sc":0.00,"w":"吗","wb":93,"wc":0.00,"we":144,"wp":"n"}]}]},"status":1},"context_id":"ZHhpc3QIIKwVoZbS6cZ/wgOcF9Qe"}
+2023-11-29 14:21:35.258 AIGCService DEBUG onSttResult: 是中国人吗,isFinish:false,isRecognizedSpeech:true
+2023-11-29 14:21:35.427 AIGCService DEBUG xf text:{"code":0,"message":"success","sid":"ist000d6f68@dx18c19bd6a55a196822","data":{"status":2,"result":{"sn":4,"ls":true,"bg":0,"ed":0,"pgs":"apd","sub_end":true,"ws":[{"bg":144,"cw":[{"rl":0,"sc":0.00,"w":"？","wb":144,"wc":0.00,"we":144,"wp":"p"}]}]}},"context_id":"ZHhpc3QIIKwVoZbS6cZ/wgOcF9Qe"}
+2023-11-29 14:21:35.428 AIGCService DEBUG onSttResult: ？,isFinish:true,isRecognizedSpeech:true

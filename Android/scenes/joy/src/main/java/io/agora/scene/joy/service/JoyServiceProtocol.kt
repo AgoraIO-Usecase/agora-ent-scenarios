@@ -2,9 +2,10 @@ package io.agora.scene.joy.service
 
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.joy.JoyLogger
+import io.agora.scene.joy.network.JoySendMessage
 import io.agora.syncmanager.rtm.Sync
 
-interface JoyServiceListenerProtocol{
+interface JoyServiceListenerProtocol {
     /**
      *  网络状况变化
      */
@@ -13,7 +14,12 @@ interface JoyServiceListenerProtocol{
     /**
      * 用户变化
      */
-    fun onUserListDidChanged(userList:List<JoyUserInfo>)
+    fun onUserListDidChanged(userList: List<JoyUserInfo>)
+
+    /**
+     * 接收到新消息
+     */
+    fun onMessageDidAdded(message: JoyMessage)
 
     /**
      * 房间销毁
@@ -36,6 +42,9 @@ interface JoyServiceProtocol {
     }
 
     companion object {
+        // time limit
+        val ROOM_AVAILABLE_DURATION: Long = 10 * 60 * 1000 // 10min
+
         private val instance by lazy {
             // JOyServiceImp()
             JoySyncManagerServiceImp(AgoraApplication.the()) { error ->
@@ -68,7 +77,7 @@ interface JoyServiceProtocol {
     /**
      * 离开房间
      */
-    fun leaveRoom(roomInfo: JoyRoomInfo,completion: (error: Exception?) -> Unit)
+    fun leaveRoom(roomInfo: JoyRoomInfo, completion: (error: Exception?) -> Unit)
 
     /**
      * 订阅回调变化

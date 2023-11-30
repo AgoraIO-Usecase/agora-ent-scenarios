@@ -56,8 +56,6 @@ class JoySyncManagerServiceImp constructor(
     private val mRoomMap = mutableMapOf<String, JoyRoomInfo>() // key: roomNo
     private val mCurrentRoomUserList = mutableListOf<JoyUserInfo>()
 
-    // time limit
-    private val ROOM_AVAILABLE_DURATION: Long = 10 * 60 * 1000 // 10min
     private val mTimerRoomEndRun = Runnable {
         runOnMainThread {
             JoyLogger.d(TAG, "time up exit room!")
@@ -127,9 +125,9 @@ class JoySyncManagerServiceImp constructor(
                     val ret = ArrayList<JoyRoomInfo>()
                     result?.forEach {
                         val obj = it.toObject(JoyRoomInfo::class.java)
-                        objIdOfRoomNo[obj.roomNo] = it.id
+                        objIdOfRoomNo[obj.roomId] = it.id
                         ret.add(obj)
-                        mRoomMap[obj.roomNo] = obj
+                        mRoomMap[obj.roomId] = obj
                     }
                     //按照创建时间顺序排序
                     ret.sortBy { it.createdAt }
@@ -150,7 +148,7 @@ class JoySyncManagerServiceImp constructor(
             val user = UserManager.getInstance().user
             val createdAt = TimeUtils.currentTimeMillis()
             val roomInfo = JoyRoomInfo(
-                roomNo = roomId,
+                roomId = roomId,
                 roomName = roomName,
                 ownerId = user.id.toInt(),
                 ownerAvatar = user.headUrl,
@@ -160,7 +158,7 @@ class JoySyncManagerServiceImp constructor(
                 objectId = roomId,
             )
             val scene = Scene()
-            scene.id = roomInfo.roomNo
+            scene.id = roomInfo.roomId
             scene.userId = roomInfo.ownerId.toString()
 
             scene.property = GsonUtils.covertToMap(roomInfo)
@@ -168,7 +166,7 @@ class JoySyncManagerServiceImp constructor(
             Sync.Instance().createScene(scene, object : Sync.Callback {
                 override fun onSuccess() {
                     JoyLogger.d(TAG, "createRoom onSuccess")
-                    mRoomMap[roomInfo.roomNo] = roomInfo
+                    mRoomMap[roomInfo.roomId] = roomInfo
                     runOnMainThread {
                         completion.invoke(null, roomInfo)
                     }
@@ -188,19 +186,19 @@ class JoySyncManagerServiceImp constructor(
     override fun joinRoom(roomInfo: JoyRoomInfo, completion: (error: Exception?) -> Unit) {
         mCurrRoomNo = ""
         initSync {
-            Sync.Instance().joinScene(true, true, roomInfo.roomNo, object : Sync.JoinSceneCallback {
+            Sync.Instance().joinScene(true, true, roomInfo.roomId, object : Sync.JoinSceneCallback {
                 override fun onSuccess(sceneReference: SceneReference) {
                     JoyLogger.d(TAG, "joinRoom onSuccess $sceneReference")
                     mSceneReference = sceneReference
-                    mCurrRoomNo = roomInfo.roomNo
-                    mSceneReferenceMap[roomInfo.roomNo] = sceneReference
-                    innerAddUserIfNeed(roomInfo.roomNo)
-                    innerSubscribeRoomChanged(roomInfo.roomNo)
-                    innerSubscribeUserChanged(roomInfo.roomNo)
+                    mCurrRoomNo = roomInfo.roomId
+                    mSceneReferenceMap[roomInfo.roomId] = sceneReference
+                    innerAddUserIfNeed(roomInfo.roomId)
+                    innerSubscribeRoomChanged(roomInfo.roomId)
+                    innerSubscribeUserChanged(roomInfo.roomId)
                     // 重置体验时间事件
                     mMainHandler.removeCallbacks(mTimerRoomEndRun)
                     // 定时删除房间
-                    val expireLeftTime = ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - roomInfo.createdAt)
+                    val expireLeftTime = JoyServiceProtocol.ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - roomInfo.createdAt)
                     JoyLogger.d(TAG, "expireLeftTime: $expireLeftTime")
                     mMainHandler.postDelayed(mTimerRoomEndRun, expireLeftTime)
                     runOnMainThread {
@@ -368,16 +366,16 @@ class JoySyncManagerServiceImp constructor(
         }
         mRoomSubscribeListener.clear()
 
-        innerRemoveUserInfo(roomInfo.roomNo, completion = {
+        innerRemoveUserInfo(roomInfo.roomId, completion = {
 
         })
         val user = UserManager.getInstance().user
         if (roomInfo.ownerId == user.id.toInt() ||
-            TimeUtils.currentTimeMillis() - roomInfo.createdAt >= ROOM_AVAILABLE_DURATION
+            TimeUtils.currentTimeMillis() - roomInfo.createdAt >= JoyServiceProtocol.ROOM_AVAILABLE_DURATION
         ) {
             sceneReference.delete(object : Sync.Callback {
                 override fun onSuccess() {
-                    JoyLogger.d(TAG, "leaveRoom onSuccess ${roomInfo.roomNo}")
+                    JoyLogger.d(TAG, "leaveRoom onSuccess ${roomInfo.roomId}")
                     mCurrRoomNo = ""
                     mSceneReference = null
                     runOnMainThread {
@@ -391,7 +389,7 @@ class JoySyncManagerServiceImp constructor(
                 }
             })
         } else {
-            mSceneReferenceMap.remove(roomInfo.roomNo)
+            mSceneReferenceMap.remove(roomInfo.roomId)
         }
     }
 

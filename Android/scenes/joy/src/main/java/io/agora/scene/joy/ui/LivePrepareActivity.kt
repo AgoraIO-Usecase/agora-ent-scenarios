@@ -29,6 +29,7 @@ import io.agora.scene.joy.databinding.JoyLivePrepareActivityBinding
 import io.agora.scene.joy.service.JoyGameInfo
 import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.widget.dialog.PermissionLeakDialog
+import io.agora.scene.widget.utils.StatusBarUtil
 import java.util.Random
 import java.util.Timer
 import java.util.TimerTask
@@ -36,7 +37,7 @@ import java.util.TimerTask
 class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBinding>() {
 
     companion object {
-        private const val TAG = "LivePrepareActivity"
+        private const val TAG = "Joy_LivePrepareActivity"
 
         fun launch(context: Context) {
             val intent = Intent(context, LivePrepareActivity::class.java)
@@ -92,13 +93,14 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBindin
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
+        StatusBarUtil.hideStatusBar(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v: View?, insets: WindowInsetsCompat ->
             val inset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             binding.root.setPaddingRelative(inset.left, 0, inset.right, inset.bottom)
             WindowInsetsCompat.CONSUMED
         }
-        binding.llTitle.setLeftClick { onBackPressed() }
+        binding.ivTitleBack.setOnClickListener { onBackPressed() }
         binding.iBtnRefresh.setOnClickListener {
             val nameIndex = mRandom.nextInt(mRoomNameArray.size)
             binding.etRoomName.setText(mRoomNameArray[nameIndex])

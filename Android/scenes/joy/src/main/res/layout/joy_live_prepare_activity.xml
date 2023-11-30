@@ -11,22 +11,36 @@
         android:layout_height="match_parent"
         android:background="@color/black_80_percent" />
 
-    <io.agora.scene.widget.CommonTitleView
-        android:id="@+id/llTitle"
-        style="@style/title_view"
-        app:ctv_centerText="@string/joy_play"
-        android:layout_marginTop="25dp"
-        app:ctv_leftImageSrc="@mipmap/icon_close"
-        app:ctv_centerTextColor="@color/white"
-        tools:ignore="MissingConstraints" />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvTitleContent"
+        android:layout_width="wrap_content"
+        android:layout_height="58dp"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:text="@string/joy_gameplay"
+        android:layout_marginTop="25dp"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivTitleBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingVertical="9dp"
+        android:paddingHorizontal="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvTitleContent"
+        app:layout_constraintBottom_toBottomOf="@id/tvTitleContent"
+        android:src="@mipmap/icon_close"/>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/vpGame"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintDimensionRatio="2:1"
-        android:layout_marginHorizontal="20dp"
-        app:layout_constraintTop_toBottomOf="@+id/llTitle"/>
+        app:layout_constraintTop_toBottomOf="@+id/tvTitleContent"/>
 
     <io.agora.scene.joy.ui.widget.FadeDotsIndicator
         android:id="@+id/dotIndicator"

@@ -7,7 +7,7 @@ import com.moczul.ok2curl.CurlInterceptor
 import com.moczul.ok2curl.logger.Logger
 import io.agora.rtm.RtmTokenBuilder2
 import io.agora.scene.base.BuildConfig
-import io.agora.scene.base.manager.UserManager
+import io.agora.scene.joy.RtcEngineInstance
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -22,24 +22,13 @@ import java.util.concurrent.TimeUnit
 
 object JoyApiManager {
 
-    fun getRtmToken2(uid: Long): String? {
-        return try {
-            RtmTokenBuilder2().buildToken(
-                BuildConfig.AGORA_APP_ID,
-                BuildConfig.AGORA_APP_CERTIFICATE, uid.toString(),
-                24 * 60 * 60
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
+    private const val baseUrl = "https://api-test.agora.io/v1/apps/"
 
     internal class AuthorizationInterceptor : Interceptor {
         var apiHost: String?
 
         init {
-            apiHost = Uri.parse(BuildConfig.TOOLBOX_SERVER_HOST).host
+            apiHost = Uri.parse(baseUrl).host
         }
 
         @Throws(IOException::class)
@@ -48,13 +37,15 @@ object JoyApiManager {
             if (originalRequest.url.host != apiHost) {
                 return chain.proceed(originalRequest)
             }
-            val authRequest = originalRequest.newBuilder()
+            val builder = originalRequest.newBuilder()
                 .addHeader("Content-Type", "application/json")
-                .addHeader(
+            if (RtcEngineInstance.generalToken().isNotEmpty()) {
+                builder.addHeader(
                     "Authorization",
-                    String.format("agora token=%s", getRtmToken2(UserManager.getInstance().user.id))
+                    String.format("agora token=%s", RtcEngineInstance.generalToken())
                 )
-                .method(originalRequest.method, originalRequest.body)
+            }
+            val authRequest = builder.method(originalRequest.method, originalRequest.body)
                 .build()
             return chain.proceed(authRequest)
         }
@@ -105,7 +96,7 @@ object JoyApiManager {
         val factory = DynamicModelRuntimeTypeAdapterFactory.of(DynamicModel::class.java)
 
         val builder = Retrofit.Builder()
-            .baseUrl("https://api-test.agora.io/v1/apps/")
+            .baseUrl(baseUrl)
             .addConverterFactory(
                 GsonConverterFactory.create(
                     GsonBuilder()

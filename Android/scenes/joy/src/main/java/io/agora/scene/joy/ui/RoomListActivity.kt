@@ -29,7 +29,7 @@ import io.agora.scene.joy.videoLoaderAPI.VideoLoader
 class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
 
     companion object {
-        private const val TAG = "RoomListActivity"
+        private const val TAG = "Joy_RoomListActivity"
     }
 
     private val mJoyService by lazy { JoyServiceProtocol.getImplInstance() }
@@ -54,10 +54,10 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
             mJoyRoomInfoList.forEach { room ->
                 roomList.add(
                     VideoLoader.RoomInfo(
-                        room.roomNo,
+                        room.roomId,
                         arrayListOf(
                             VideoLoader.AnchorInfo(
-                                room.roomNo,
+                                room.roomId,
                                 room.ownerId.toInt(),
                                 RtcEngineInstance.generalToken()
                             )
@@ -101,10 +101,10 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
                 mJoyRoomInfoList.forEach { room ->
                     roomList.add(
                         VideoLoader.RoomInfo(
-                            room.roomNo,
+                            room.roomId,
                             arrayListOf(
                                 VideoLoader.AnchorInfo(
-                                    room.roomNo,
+                                    room.roomId,
                                     room.ownerId,
                                     RtcEngineInstance.generalToken()
                                 )
@@ -133,10 +133,10 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
                         it.forEach { room ->
                             roomList.add(
                                 VideoLoader.RoomInfo(
-                                    room.roomNo,
+                                    room.roomId,
                                     arrayListOf(
                                         VideoLoader.AnchorInfo(
-                                            room.roomNo,
+                                            room.roomId,
                                             room.ownerId.toInt(),
                                             RtcEngineInstance.generalToken()
                                         )
@@ -200,15 +200,15 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
                 .into(holder.ivAvatar)
             holder.tvRoomName.text = data.roomName
             holder.tvPersonNum.text = mContext.getString(R.string.joy_user_count, data.roomUserCount)
-            holder.tvRoomId.text = mContext.getString(R.string.joy_room_id, data.roomNo)
+            holder.tvRoomId.text = mContext.getString(R.string.joy_room_id, data.roomId)
 
             val onTouchEventHandler = object : OnLiveRoomItemTouchEventHandler(
                 RtcEngineInstance.rtcEngine,
                 VideoLoader.RoomInfo(
-                    data.roomNo,
+                    data.roomId,
                     arrayListOf(
                         VideoLoader.AnchorInfo(
-                            data.roomNo,
+                            data.roomId,
                             data.ownerId,
                             RtcEngineInstance.generalToken()
                         )
