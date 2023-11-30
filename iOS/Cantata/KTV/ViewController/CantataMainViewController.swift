@@ -405,6 +405,7 @@ extension CantataMainViewController {
             if role == .leadSinger {
                 DispatchQueue.main.async {
                     self.lrcControlView.skipBtn.isHidden = false
+                    self.botView.updateMicState(false)
                 }
             }
             isLeavingChorus = false
@@ -804,6 +805,10 @@ extension CantataMainViewController {
                         }
                     }
                     
+                    if seatModel.userNo == VLUserCenter.user.id {
+                        self.botView.updateMicState(true)
+                    }
+                    
 //                    if let topMusic = self.selSongArray?.first, topMusic.status == .playing, seatModel.userNo == topMusic.userNo {
 //                        return
 //                    }
@@ -825,7 +830,11 @@ extension CantataMainViewController {
                     self.lrcControlView.setScore(with: totalScore ?? 0)
                 }
                 
-                self.botView.updateMicState(!self.isNowMicMuted)
+                let currentSeat = getCurrentUserMicSeat()
+                self.botView.updateMicState(currentSeat == nil)
+                if status == .deleted && seatModel.userNo == VLUserCenter.user.id {
+                    self.botView.updateMicState(true)
+                }
 
                 let realSeatArray = self.makeChorusArray()
                 self.chorusMicView.seatArray = realSeatArray
@@ -1313,6 +1322,7 @@ extension CantataMainViewController {
             if flag {
                 if selSongArray.count >= 1 {
                     self.stopPlaySong()
+                    self.botView.updateMicState(true)
                     self.lrcControlView.setScore(with: 0)
                     self.removeCurrentSong()
                 }
