@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import io.agora.rtc2.Constants
@@ -41,6 +42,10 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBindin
             val intent = Intent(context, LivePrepareActivity::class.java)
             context.startActivity(intent)
         }
+    }
+
+    private val mJoyViewModel: JoyViewModel by lazy {
+        ViewModelProvider(this)[JoyViewModel::class.java]
     }
 
     private val mJoyService by lazy { JoyServiceProtocol.getImplInstance() }
@@ -161,6 +166,14 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBindin
         }
         binding.vpGame.currentItem = 1
         startAutoScroll()
+    }
+
+    override fun requestData() {
+        super.requestData()
+        mJoyViewModel.getGames()
+        mJoyViewModel.mGameEntityList.observe(this){
+
+        }
     }
 
     private fun startAutoScroll() {

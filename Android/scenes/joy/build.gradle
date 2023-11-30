@@ -31,5 +31,6 @@ dependencies {
     implementation rootProject.ext.deps.syncManager
 
     implementation 'commons-codec:commons-codec:1.16.0'
+    implementation 'io.agora:authentication:2.0.0'
 
 }
