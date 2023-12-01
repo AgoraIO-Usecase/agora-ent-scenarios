@@ -16,7 +16,7 @@ public class SAInviteUsersController: UITableViewController {
 
     private var idx = 0
 
-    lazy var empty: SAEmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "spatial_voice_no_audience_yet".spatial_localized(), image: nil).backgroundColor(.white)
+    lazy var emptyView: SAEmptyView = .init(frame: .zero, title: "spatial_voice_no_audience_yet".spatial_localized(), image: nil).backgroundColor(.white)
 
     public convenience init(roomId: String, mic_index: Int?) {
         self.init()
@@ -28,10 +28,15 @@ public class SAInviteUsersController: UITableViewController {
 
     override public func viewDidLoad() {
         super.viewDidLoad()
-        view.insertSubview(empty, belowSubview: tableView)
+        
         tableView.tableFooterView(UIView()).registerCell(SAInviteCell.self, forCellReuseIdentifier: "VoiceRoomInviteCell").rowHeight(73).backgroundColor(.white).separatorInset(edge: UIEdgeInsets(top: 72, left: 15, bottom: 0, right: 15)).separatorColor(UIColor(0xF2F2F2)).showsVerticalScrollIndicator(false).backgroundColor(.clear)
         tableView.refreshControl = UIRefreshControl()
         tableView.refreshControl?.addTarget(self, action: #selector(refresh), for: .valueChanged)
+        
+        view.addSubview(emptyView)
+        emptyView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
     }
 
     override public func viewWillAppear(_ animated: Bool) {
@@ -89,7 +94,7 @@ extension SAInviteUsersController {
                 } else {
                     self.apply?.members?.append(contentsOf: users ?? [])
                 }
-                self.empty.isHidden = (self.apply?.members?.count ?? 0) > 0
+                self.emptyView.isHidden = (self.apply?.members?.count ?? 0) > 0
                 self.tableView.reloadData()
             } else {
                 self.view.makeToast("\(error?.localizedDescription ?? "")")

@@ -7,7 +7,7 @@
 #import "VLHotSpotBtn.h"
 #import "VLUserCenter.h"
 #import "VLURLPathConfig.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "AgoraEntScenarios-swift.h"
 #import "AppContext+KTV.h"
 #import "VLMacroDefine.h"
 #import "AESMacro.h"

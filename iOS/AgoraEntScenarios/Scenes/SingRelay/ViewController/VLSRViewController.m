@@ -50,7 +50,6 @@ VLSRDropOnLineViewDelegate,
 VLSRAudienceIndicatorDelegate,
 VLSRAudioEffectPickerDelegate,
 VLSRPopSongListDelegate,
-VLSREffectViewDelegate,
 VLSRSettingViewDelegate,
 VLSRBadNetWorkViewDelegate,
 AgoraRtcMediaPlayerDelegate,
@@ -73,7 +72,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, strong) VLSRMicSeatList *roomPersonView; //房间麦位视图
 @property (nonatomic, strong) VLSRAudienceIndicator *requestOnLineView;//空位上麦
 @property (nonatomic, strong) VLSRPopSongList *chooseSongView; //点歌视图
-@property (nonatomic, strong) VLSREffectView *effectView; // 音效视图
 
 @property (nonatomic, strong) VLSRSongItmModel *choosedSongModel; //点的歌曲
 @property (nonatomic, strong) AgoraRtcEngineKit *RTCkit;
@@ -239,8 +237,8 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
                 if(self.gameModel.status == SingRelayStatusStarted){
                     return;
                 }
-                NSString *mes = SRLocalizedString(@"当前房间正在游戏中，请退出");
-                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SRLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
+                NSString *mes = SRLocalizedString(@"sr_game_isOn");
+                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SRLocalizedString(@"sr_confirm") completion:^(bool flag, NSString * _Nullable text) {
                     [[VLKTVAlert shared]dismiss];
                     [weakSelf leaveRoom];
                 }];
@@ -308,8 +306,8 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         } else if (status == SRSubscribeDeleted) {
             //房主关闭房间
             if ([roomInfo.creatorNo isEqualToString:VLUserCenter.user.id]) {
-                NSString *mes = @"连接超时，房间已解散";
-                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SRLocalizedString(@"ktv_confirm") completion:^(bool flag, NSString * _Nullable text) {
+                NSString *mes = SRLocalizedString(@"sr_room_exit");
+                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SRLocalizedString(@"sr_confirm") completion:^(bool flag, NSString * _Nullable text) {
                     [[VLKTVAlert shared]dismiss];
                     [weakSelf leaveRoom];
                 }];
@@ -370,8 +368,8 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     }];
     [[AppContext srServiceImp] subscribeRoomWillExpireWith:^{
         bool isOwner = [weakSelf.roomModel.creatorNo isEqualToString:VLUserCenter.user.id];
-        NSString *mes = isOwner ? @"您已体验超过20分钟，当前房间已过期，请退出重新创建房间" : @"当前房间已过期,请退出";
-        [[VLKTVAlert shared] showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"]  message:mes buttonTitle:SRLocalizedString(@"ktv_confirm") completion:^(bool flag, NSString * _Nullable text) {
+        NSString *mes = isOwner ? SRLocalizedString(@"sr_room_timeout") : SRLocalizedString(@"sr_room_offline");
+        [[VLKTVAlert shared] showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"]  message:mes buttonTitle:SRLocalizedString(@"sr_confirm") completion:^(bool flag, NSString * _Nullable text) {
             [[VLKTVAlert shared]dismiss];
             [weakSelf leaveRoom];
         }];
@@ -437,16 +435,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     self.chooseSongView = (VLSRPopSongList*)popChooseSongView.currCustomView;
 }
 
-//弹出音效
-- (void)popSetSoundEffectView {
-    LSTPopView* popView =
-    [LSTPopView popSRSetSoundEffectViewWithParentView:self.view
-                                          soundView:self.effectView
-                                       withDelegate:self];
-    self.effectView = (VLSREffectView*)popView.currCustomView;
-    [self.effectView setSelectedIndex:self.selectedEffectIndex];
-}
-
 //网络差视图
 - (void)popBadNetWrokTipView {
     [LSTPopView popSRBadNetWrokTipViewWithParentView:self.view
@@ -474,7 +462,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
                                                       withDelegate:self];
     
     self.settingView = (VLSRSettingView*)popView.currCustomView;
-    [self.settingView setIspause:self.isPause];
 }
 
 - (void)showScoreViewWithScore:(NSInteger)score {
@@ -761,13 +748,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
    // [self.MVView.gradeView reset];
 
     if([self getOnMicUserCount] == 8 && !_isOnMicSeat){
-        [VLToast toast:@"“麦位已满，请在他人下麦后重试"];
+        [VLToast toast:SRLocalizedString(@"sr_mic_full")];
         return;
     }
     
     if(self.RTCkit.getConnectionState != AgoraConnectionStateConnected){
       //  self.MVView.joinCoSingerState = SRJoinCoSingerStateWaitingForJoin;
-        [VLToast toast:@"加入合唱失败，reson:连接已断开"];
+        [VLToast toast:SRLocalizedString(@"sr_join_chorus_failed")];
         return;
     }
     
@@ -800,7 +787,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
         
         //TODO(chenpan):没有空麦位，show error
-        [VLToast toast:@"麦位已满，请在他人下麦后重试"];
+        [VLToast toast:SRLocalizedString(@"sr_mic_full")];
         return;
     }
     
@@ -1147,9 +1134,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 #pragma mark -- VLSRTopViewDelegate
 - (void)onVLSRTopView:(VLSRTopView *)view closeBtnTapped:(id)sender {
     VL(weakSelf);
-    NSString *title = VLUserCenter.user.ifMaster ? SRLocalizedString(@"ktv_disband_room") : SRLocalizedString(@"ktv_exit_room");
-    NSString *message = VLUserCenter.user.ifMaster ? SRLocalizedString(@"ktv_confirm_disband_room") : SRLocalizedString(@"ktv_confirm_exit_room");
-    NSArray *array = [[NSArray alloc]initWithObjects:SRLocalizedString(@"ktv_cancel"),SRLocalizedString(@"ktv_confirm"), nil];
+    NSString *title = VLUserCenter.user.ifMaster ? SRLocalizedString(@"sr_disband_room") : SRLocalizedString(@"sr_exit_room");
+    NSString *message = VLUserCenter.user.ifMaster ? SRLocalizedString(@"sr_confirm_disband_room") : SRLocalizedString(@"sr_confirm_exit_room");
+    NSArray *array = [[NSArray alloc]initWithObjects:SRLocalizedString(@"sr_cancel"),SRLocalizedString(@"sr_confirm"), nil];
     [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
         if(flag == YES){
             [weakSelf leaveRoom];
@@ -1174,7 +1161,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //            [self popBelcantoView];
 //            break;
         case VLSRMoreBtnClickTypeSound:
-            [self popSetSoundEffectView];
             break;
         case VLSRMoreBtnClickTypeMV:
             [self popSelMVBgView];
@@ -1252,7 +1238,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(lowerBound - progress >= 3000 && lowerBound - progress <= 3050){
             if(i < array.count - 1){
                 if([self isOnMicSeat]){
-                    [self.statusView showContentViewWith: i < (array.count - 2) ? @"下段演唱即将开始，准备抢唱" : @"下段演唱即将开始"];
+                    [self.statusView showContentViewWith: i < (array.count - 2) ? SRLocalizedString(@"sr_next_ready") : SRLocalizedString(@"sr_next_start")];
                     if(self.nextWinNo){
                         for(int i=0;i<self.seatsArray.count;i++) {
                             if([self.seatsArray[i].userNo isEqualToString:self.nextWinNo]){
@@ -1375,9 +1361,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)changeToNextSong {
-    NSString *title = SRLocalizedString(@"切换歌曲");
-    NSString *message = SRLocalizedString(@"切换下一首歌歌曲？");
-    NSArray *array = [[NSArray alloc]initWithObjects:SRLocalizedString(@"取消"),SRLocalizedString(@"确定"), nil];
+    NSString *title = SRLocalizedString(@"sr_change_song");
+    NSString *message = SRLocalizedString(@"sr_change_next_song");
+    NSArray *array = [[NSArray alloc]initWithObjects:SRLocalizedString(@"sr_cancel"),SRLocalizedString(@"sr_confirm"), nil];
     kWeakSelf(self);
     [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
         if(flag == YES){
@@ -1557,9 +1543,9 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
         //is owner
         if(self.gameModel.status == SingRelayStatusStarted){
             if(seatIndex != 0){
-                [VLToast toast:@"正在游戏中，游戏结束后方可踢人下麦"];
+                [VLToast toast:SRLocalizedString(@"sr_game_start_cant_make_down")];
             } else {
-                [VLToast toast:@"正在游戏中，游戏结束后方可下麦"];
+                [VLToast toast:SRLocalizedString(@"sr_game_start_cant_down")];
             }
             return;
         }
@@ -1574,9 +1560,9 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
         
         if(self.gameModel.status == SingRelayStatusStarted){
             if([self isOnMicSeat]){
-                [VLToast toast:@"正在游戏中，游戏结束后方可下麦"];
+                [VLToast toast:SRLocalizedString(@"sr_game_start_cant_down")];
             } else {
-                [VLToast toast:@"游戏进行中，请在下局游戏开始前上麦"];
+                [VLToast toast:SRLocalizedString(@"sr_game_start_join_before")];
             }
             return;
         }
@@ -2357,7 +2343,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
     dispatch_async_on_main_queue(^{
         [self.statusView updateLoadingViewWith:percent];
         if(status == AgoraMusicContentCenterPreloadStatusError){
-            [VLToast toast:@"加载歌曲失败，请切歌"];
+            [VLToast toast:SRLocalizedString(@"sr_load_failed_and_change")];
 //            [self.MVView setBotViewHidden:false];
 //            self.MVView.loadingType = VLSRMVViewStateIdle;
             self.statusView.state = SRStateOwnerUnSredAndPlaying;

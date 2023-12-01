@@ -27,7 +27,6 @@ VLSRRemoteVolumeViewDelegate
 @property (nonatomic, strong) VLSRSliderView *soundSlider;
 @property (nonatomic, strong) VLSRSliderView *accSlider;
 @property (nonatomic, strong) VLSRKindsView *kindsView;
-@property (nonatomic, strong) VLSRRemoteVolumeView* remoteVolumeView;
 @property (nonatomic, strong, readonly) VLSRSettingModel *setting;
 
 @end
@@ -61,12 +60,9 @@ VLSRRemoteVolumeViewDelegate
 - (void)initSubViews {
     [self addSubview:self.titleLabel];
     [self addSubview:self.soundSwitcher];
-//    [self addSubview:self.tonesView];
     [self addSubview:self.soundSlider];
     [self addSubview:self.accSlider];
-    [self addSubview:self.remoteVolumeView];
-    [self.remoteVolumeView setHidden:YES];
-//    [self addSubview:self.kindsView];
+
 }
 
 - (void)addSubViewConstraints {
@@ -79,13 +75,7 @@ VLSRRemoteVolumeViewDelegate
         make.left.right.mas_equalTo(self);
         make.top.mas_equalTo(self.titleLabel.mas_bottom).offset(16);
     }];
-    
-//    [self.tonesView mas_makeConstraints:^(MASConstraintMaker *make) {
-//        make.left.right.mas_equalTo(self);
-//        make.top.mas_equalTo(self.soundSwitcher.mas_bottom).offset(25);
-//        make.height.mas_equalTo(26);
-//    }];
-    
+
     [self.soundSlider mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.mas_equalTo(self);
         make.top.mas_equalTo(self.soundSwitcher.mas_bottom).offset(25);
@@ -97,18 +87,7 @@ VLSRRemoteVolumeViewDelegate
         make.top.mas_equalTo(self.soundSlider.mas_bottom).offset(25);
         make.height.mas_equalTo(22);
     }];
-    
-    [self.remoteVolumeView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.right.mas_equalTo(self);
-        make.top.mas_equalTo(self.accSlider.mas_bottom).offset(25);
-        make.height.mas_equalTo(22);
-    }];
-    
-//    [self.kindsView mas_makeConstraints:^(MASConstraintMaker *make) {
-//        make.top.mas_equalTo(self.remoteVolumeView.mas_bottom).offset(35);
-//        make.left.right.mas_equalTo(self);
-//        make.bottom.mas_equalTo(self).offset(-64);
-//    }];
+
 }
 
 #pragma mark - VLSRSwitcherViewDelegate
@@ -132,7 +111,6 @@ VLSRRemoteVolumeViewDelegate
 - (void)sliderView:(VLSRSliderView *)sliderView valueChanged:(float)value {
     VLSRValueDidChangedType type;
     if (sliderView == self.soundSlider) {
-        NSLog(@"value:%f", value);
         self.setting.soundValue = value;
         type = VLSRValueDidChangedTypeSound;
     } else {
@@ -175,7 +153,7 @@ VLSRRemoteVolumeViewDelegate
 - (UILabel *)titleLabel {
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] init];
-        _titleLabel.text = SRLocalizedString(@"ktv_music_menu_dialog_title");
+        _titleLabel.text = SRLocalizedString(@"sr_music_menu_dialog_title");
         _titleLabel.font = VLUIFontMake(16);
         _titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     }
@@ -185,8 +163,8 @@ VLSRRemoteVolumeViewDelegate
 - (VLSRSwitcherView *)soundSwitcher {
     if (!_soundSwitcher) {
         _soundSwitcher = [[VLSRSwitcherView alloc] init];
-        _soundSwitcher.titleLabel.text = SRLocalizedString(@"ktv_music_menu_dialog_ear");
-        _soundSwitcher.subText = SRLocalizedString(@"ktv_please_use_headset");
+        _soundSwitcher.titleLabel.text = SRLocalizedString(@"sr_music_menu_dialog_ear");
+        _soundSwitcher.subText = SRLocalizedString(@"sr_please_use_headset");
         _soundSwitcher.delegate = self;
     }
     return _soundSwitcher;
@@ -195,7 +173,7 @@ VLSRRemoteVolumeViewDelegate
 - (VLSRTonesView *)tonesView {
     if (!_tonesView) {
         _tonesView = [[VLSRTonesView alloc] initWithMaxLevel:12 currentLevel:6];
-        _tonesView.titleLabel.text = SRLocalizedString(@"ktv_music_menu_dialog_tone");
+        _tonesView.titleLabel.text = SRLocalizedString(@"sr_music_menu_dialog_tone");
         _tonesView.delegate = self;
     }
     return _tonesView;
@@ -204,7 +182,7 @@ VLSRRemoteVolumeViewDelegate
 - (VLSRSliderView *)soundSlider {
     if (!_soundSlider) {
         _soundSlider = [[VLSRSliderView alloc] initWithMax:1 min:0];
-        _soundSlider.titleLabel.text = SRLocalizedString(@"ktv_music_menu_dialog_vol1");
+        _soundSlider.titleLabel.text = SRLocalizedString(@"sr_music_menu_dialog_vol1");
         _soundSlider.delegate = self;
     }
     return _soundSlider;
@@ -213,20 +191,10 @@ VLSRRemoteVolumeViewDelegate
 - (VLSRSliderView *)accSlider {
     if (!_accSlider) {
         _accSlider = [[VLSRSliderView alloc] initWithMax:1 min:0];
-        _accSlider.titleLabel.text = SRLocalizedString(@"ktv_music_menu_dialog_vol2");
+        _accSlider.titleLabel.text = SRLocalizedString(@"sr_music_menu_dialog_vol2");
         _accSlider.delegate = self;
     }
     return _accSlider;
-}
-
-- (VLSRRemoteVolumeView*)remoteVolumeView {
-    if (!_remoteVolumeView) {
-        _remoteVolumeView = [[VLSRRemoteVolumeView alloc] initWithMin:0 withMax:100 withCurrent:40];
-        _remoteVolumeView.titleLabel.text = SRLocalizedString(@"ktv_music_menu_dialog_remote_volume");
-        _remoteVolumeView.delegate = self;
-        _setting.remoteVolume = 40;
-    }
-    return _remoteVolumeView;
 }
 
 - (VLSRKindsView *)kindsView {
@@ -247,11 +215,6 @@ VLSRRemoteVolumeViewDelegate
 - (void)setAccValue:(float)accValue {
     self.setting.accValue = accValue;
     self.accSlider.value = accValue;
-}
-
--(void)setIspause:(BOOL)isPause{
-    _remoteVolumeView.userInteractionEnabled = !isPause;
-    [_remoteVolumeView setCurrent:isPause ? 100 : self.setting.remoteVolume];
 }
 
 @end

@@ -85,6 +85,8 @@ class CallApiImpl(
             if (!isChannelJoined) { return }
             _flushReport()
         }
+    private var prevMessageTs: Long = 0
+
     private val mHandler = Handler(Looper.getMainLooper())
     private var timeOutRunnable: Runnable? = null
     /// 当前状态
@@ -141,7 +143,17 @@ class CallApiImpl(
         val dic: MutableMap<String, Any> = mutableMapOf()
         dic[kMessageAction] = action.value
         dic[kMessageVersion] = kCurrentMessageVersion
-        dic[kMessageTs] = _getNtpTimeInMs()
+        var ts = _getNtpTimeInMs()
+        if (ts <= prevMessageTs) {
+            // invalid ts
+            callWarningPrint("get ntp time invalid $ts $prevMessageTs")
+            val stackTraceElement = Thread.currentThread().stackTrace[1]
+            val stackString = stackTraceElement.className + stackTraceElement.methodName + stackTraceElement.fileName +stackTraceElement.lineNumber
+            callWarningPrint(stackString)
+            ts = prevMessageTs + 1
+        }
+        prevMessageTs = ts
+        dic[kMessageTs] = ts
         dic[kFromUserId] = config?.userId ?: 0
         if (callId.isNotBlank()) {
             dic[kCallId] = callId

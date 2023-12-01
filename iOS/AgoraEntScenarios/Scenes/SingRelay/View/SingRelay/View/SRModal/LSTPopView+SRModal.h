@@ -12,7 +12,6 @@
 #import "VLSRAudioEffectPicker.h"
 #import "VLSRBadNetWorkView.h"
 #import "VLSRPopSongList.h"
-#import "VLSREffectView.h"
 #import "VLSRSettingView.h"
 #import "VLSRBelcantoModel.h"
 NS_ASSUME_NONNULL_BEGIN
@@ -47,11 +46,6 @@ NS_ASSUME_NONNULL_BEGIN
                                  chooseSongArray: (NSArray*)chooseSongArray
                                       withRoomNo:(NSString*)roomNo
                                     withDelegate:(id<VLSRPopSongListDelegate>)delegate;
-
-//弹出音效
-+ (LSTPopView*)popSRSetSoundEffectViewWithParentView:(UIView*)parentView
-                                         soundView:(VLSREffectView*)soundView
-                                      withDelegate:(id<VLSREffectViewDelegate>)delegate;
 
 //网络差视图
 + (LSTPopView*)popSRBadNetWrokTipViewWithParentView:(UIView*)parentView

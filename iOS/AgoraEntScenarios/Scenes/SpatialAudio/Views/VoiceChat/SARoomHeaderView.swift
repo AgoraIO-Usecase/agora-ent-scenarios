@@ -33,7 +33,6 @@ class SARoomHeaderView: UIView {
     private var roomLabel: UILabel = .init()
     private var infoView: UIView = .init()
     private var richView: UIView = .init()
-    private var giftBtn: UIButton = .init()
     private var noticeView: UIView = .init()
     private var configView: UIView = .init()
     private var soundClickBtn: UIButton = .init()
@@ -50,12 +49,6 @@ class SARoomHeaderView: UIView {
         self.iconImgView.sd_setImage(with: URL(string: owner.portrait ?? ""), placeholderImage: nil)
         self.titleLabel.text = "\((room.member_list?.count ?? 0)+(room.owner?.chat_uid ?? "" == VoiceRoomUserInfo.shared.user?.chat_uid ?? "" ? 3:4))在线 ｜ \(room.click_count ?? 0)观看"
         self.roomLabel.text = room.name
-        let gift_count = room.gift_amount ?? 0
-        let count = gift_count >= 1000 ? afterDecimals(value: gift_count) : "\(gift_count)"
-        self.giftBtn.setTitle(" \(count)", for: .normal)
-        self.giftBtn.snp.updateConstraints { make in
-            make.width.greaterThanOrEqualTo(gift_count >= 100 ? 50 : 40)
-        }
         updateGiftList(with: room)
     }
     
@@ -132,14 +125,6 @@ class SARoomHeaderView: UIView {
         addSubview(soundClickBtn)
         soundClickBtn.vm_expandSize(size: 20)
 
-        giftBtn.layer.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.1).cgColor
-        giftBtn.layer.cornerRadius = 11
-        giftBtn.setImage(UIImage.sceneImage(name: "liwu"), for: .normal)
-        giftBtn.setTitle(" 0", for: .normal)
-        giftBtn.titleLabel?.font = UIFont.systemFont(ofSize: 10)
-        giftBtn.isUserInteractionEnabled = false
-        addSubview(giftBtn)
-
         noticeView.layer.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.1).cgColor
         noticeView.layer.cornerRadius = 11
         addSubview(noticeView)
@@ -214,15 +199,6 @@ class SARoomHeaderView: UIView {
             make.height.equalTo(22)
             make.width.equalTo(60)
         }
-
-        giftBtn.snp.makeConstraints { make in
-            make.left.equalTo(self.noticeView.snp.right).offset(5)
-            make.centerY.equalTo(self.configView)
-            make.width.greaterThanOrEqualTo(50)
-            make.height.equalTo(22)
-        }
-
-
         imgView.snp.makeConstraints { make in
             make.left.equalTo(self.noticeView).offset(5)
             make.centerY.equalTo(self.noticeView)

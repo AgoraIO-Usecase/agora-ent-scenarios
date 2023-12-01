@@ -24,34 +24,38 @@ class SRScoreTitleCell: UITableViewCell {
     
     private func layoutUI() {
         indexLabel = UILabel()
-        indexLabel.text = "排名"
+        indexLabel.text = getLocalizeString(with: "sr_rank_list")
         indexLabel.textAlignment = .center
         indexLabel.textColor = .white
         indexLabel.font = UIFont.systemFont(ofSize: 10)
         self.contentView.addSubview(indexLabel)
         
         playerLabel = UILabel()
-        playerLabel.text = "玩家"
+        playerLabel.text = getLocalizeString(with: "sr_rank_player")
         playerLabel.textAlignment = .center
         playerLabel.textColor = .white
         playerLabel.font = UIFont.systemFont(ofSize: 10)
         self.contentView.addSubview(playerLabel)
         
         srCountLabel = UILabel()
-        srCountLabel.text = "抢唱成功"
+        srCountLabel.text = getLocalizeString(with: "sr_success")
         srCountLabel.textAlignment = .center
         srCountLabel.textColor = .white
         srCountLabel.font = UIFont.systemFont(ofSize: 10)
         self.contentView.addSubview(srCountLabel)
         
         scoreLabel = UILabel()
-        scoreLabel.text = "总分"
+        scoreLabel.text = getLocalizeString(with: "sr_total_score")
         scoreLabel.textAlignment = .center
         scoreLabel.textColor = .white
         scoreLabel.font = UIFont.systemFont(ofSize: 10)
         self.contentView.addSubview(scoreLabel)
         
         self.backgroundColor = .clear
+    }
+    
+    private func getLocalizeString(with key: String) -> String {
+        return Bundle.localizedString(key, bundleName: "SRResource")
     }
     
     override func layoutSubviews() {

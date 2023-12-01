@@ -43,7 +43,7 @@
     [self addSubview:backBtn];
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = KTVLocalizedString(@"ktv_beauty_voice");
+    titleLabel.text = SRLocalizedString(@"sr_beauty_voice");
     titleLabel.font = VLUIFontMake(16);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -123,11 +123,11 @@
 - (NSArray *)itemsArray {
     if (!_itemsArray) {
         _itemsArray = @[
-        @{@"imageName":@"ktv_belcanto_defaultNo",@"titleStr":KTVLocalizedString(@"ktv_def_nothing"),@"ifSelect":@(false)},
-        @{@"imageName":@"ktv_belcanto_bigRoomMale",@"titleStr":KTVLocalizedString(@"ktv_room_big_man"), @"ifSelect":@(false)},
-        @{@"imageName":@"ktv_belcanto_smallRoomMale",@"titleStr":KTVLocalizedString(@"ktv_room_small_man"), @"ifSelect":@(false)},
-        @{@"imageName":@"ktv_belcanto_bigRoomFemale",@"titleStr":KTVLocalizedString(@"ktv_room_big_woman"), @"ifSelect":@(false)},
-        @{@"imageName":@"ktv_belcanto_smallRoomFemale",@"titleStr":KTVLocalizedString(@"ktv_room_small_woman"), @"ifSelect":@(false)}];
+        @{@"imageName":@"ktv_belcanto_defaultNo",@"titleStr":SRLocalizedString(@"sr_def_nothing"),@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_belcanto_bigRoomMale",@"titleStr":SRLocalizedString(@"sr_room_big_man"), @"ifSelect":@(false)},
+        @{@"imageName":@"ktv_belcanto_smallRoomMale",@"titleStr":SRLocalizedString(@"sr_room_small_man"), @"ifSelect":@(false)},
+        @{@"imageName":@"ktv_belcanto_bigRoomFemale",@"titleStr":SRLocalizedString(@"sr_room_big_woman"), @"ifSelect":@(false)},
+        @{@"imageName":@"ktv_belcanto_smallRoomFemale",@"titleStr":SRLocalizedString(@"sr_room_small_woman"), @"ifSelect":@(false)}];
     }
     return _itemsArray;
 }

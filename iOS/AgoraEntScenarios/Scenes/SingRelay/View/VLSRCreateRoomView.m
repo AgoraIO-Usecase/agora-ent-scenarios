@@ -43,7 +43,7 @@
 - (void)setupView {
     VL(weakSelf);
     self.addRoomModel.isPrivate = NO;
-    NSString *text = SRLocalizedString(@"ktv_create_tips1");
+    NSString *text = SRLocalizedString(@"sr_create_tips");
     UIFont *font = UIFontMake(12);
     CGSize constraintSize = CGSizeMake(self.width - 78, CGFLOAT_MAX);
     NSDictionary *attributes = @{NSFontAttributeName: font};
@@ -76,11 +76,11 @@
     UILabel *roomTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, self.warningView.bottom+VLREALVALUE_WIDTH(20), 70, 20)];
     roomTitleLabel.font = UIFontMake(14);
     roomTitleLabel.textColor = UIColorMakeWithHex(@"#000000");
-    roomTitleLabel.text = SRLocalizedString(@"ktv_room_title");
+    roomTitleLabel.text = SRLocalizedString(@"sr_room_title");
     [self addSubview:roomTitleLabel];
 
     UIButton *randomBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [randomBtn setTitle:SRLocalizedString(@"ktv_random") forState:UIControlStateNormal];
+    [randomBtn setTitle:SRLocalizedString(@"sr_random") forState:UIControlStateNormal];
     [randomBtn setImage:[UIImage sceneImageWithName:@"online_create_randomIcon"] forState:UIControlStateNormal];
     randomBtn.spacingBetweenImageAndTitle = 3;
     randomBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
@@ -103,7 +103,7 @@
     self.inputTF.font = UIFontBoldMake(15);
     self.inputTF.clearButtonMode = UITextFieldViewModeWhileEditing;
     self.inputTF.tintColor = UIColorMakeWithHex(@"#345DFF");
-    self.inputTF.placeholder = SRLocalizedString(@"ktv_room_placeHolder");
+    self.inputTF.placeholder = SRLocalizedString(@"sr_room_placeHolder");
     [self.inputTF addTarget:self action:@selector(textChangeAction:)forControlEvents:UIControlEventEditingChanged];
     [inputBgView addSubview:self.inputTF];
     self.inputTF.delegate = self;
@@ -111,7 +111,7 @@
     UILabel *secretLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, inputBgView.bottom+VLREALVALUE_WIDTH(24), 100, 20)];
     secretLabel.font = UIFontMake(14);
     secretLabel.textColor = UIColorMakeWithHex(@"#000000");
-    secretLabel.text = SRLocalizedString(@"ktv_room_is_encryption");
+    secretLabel.text = SRLocalizedString(@"sr_room_is_encryption");
     [secretLabel sizeToFit];
     [self addSubview:secretLabel];
     
@@ -124,7 +124,7 @@
     self.setLabel = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 170, inputBgView.bottom+VLREALVALUE_WIDTH(25.5), 150, 17)];
     self.setLabel.font = UIFontMake(12);
     self.setLabel.textColor = UIColorMakeWithHex(@"#FA396A");
-    self.setLabel.text = SRLocalizedString(@"ktv_please_input_4_pwd");
+    self.setLabel.text = SRLocalizedString(@"sr_please_input_4_pwd");
     self.setLabel.textAlignment = NSTextAlignmentRight;
     [self.setLabel setHidden:true];
     [self addSubview:self.setLabel];
@@ -182,7 +182,7 @@
 
 - (void)createBtnClickEvent {
     if (!(self.inputTF.text.length > 0)) {
-        [VLToast toast:KTVLocalizedString(@"ktv_insert_title")];
+        [VLToast toast:SRLocalizedString(@"sr_insert_title")];
     }
     self.addRoomModel.name = self.inputTF.text;
     if (self.delegate && [self.delegate respondsToSelector:@selector(createBtnAction:)]) {
@@ -235,28 +235,27 @@
 - (NSArray *)titlesArray {
     if (!_titlesArray) {
         _titlesArray = @[
-            KTVLocalizedString(@"和你一起看月亮"),
-            KTVLocalizedString(@"治愈"),
-            KTVLocalizedString(@"一锤定音"),
-            KTVLocalizedString(@"有酒吗"),
-            KTVLocalizedString(@"早安序曲"),
-            KTVLocalizedString(@"风情万种的歌房"),
-            KTVLocalizedString(@"近在远方"),
-            KTVLocalizedString(@"风中诗"),
-            KTVLocalizedString(@"那年风月"),
-            KTVLocalizedString(@"那年风月"),
-            KTVLocalizedString(@"三万余年"),
-            KTVLocalizedString(@"七十二街"),
-            KTVLocalizedString(@"情怀如诗"),
-            KTVLocalizedString(@"简遇而安"),
-            KTVLocalizedString(@"十里笙歌"),
-            KTVLocalizedString(@"回风舞雪"),
-            KTVLocalizedString(@"梦初醒处"),
-            KTVLocalizedString(@"别来无恙"),
-            KTVLocalizedString(@"三里清风"),
-            KTVLocalizedString(@"烟雨万重"),
-            KTVLocalizedString(@"水洗晴空"),
-            KTVLocalizedString(@"轻风淡月"),
+            SRLocalizedString(@"sr_create_room_title1"),
+            SRLocalizedString(@"sr_create_room_title2"),
+            SRLocalizedString(@"sr_create_room_title3"),
+            SRLocalizedString(@"sr_create_room_title4"),
+            SRLocalizedString(@"sr_create_room_title5"),
+            SRLocalizedString(@"sr_create_room_title6"),
+            SRLocalizedString(@"sr_create_room_title7"),
+            SRLocalizedString(@"sr_create_room_title8"),
+            SRLocalizedString(@"sr_create_room_title9"),
+            SRLocalizedString(@"sr_create_room_title10"),
+            SRLocalizedString(@"sr_create_room_title11"),
+            SRLocalizedString(@"sr_create_room_title12"),
+            SRLocalizedString(@"sr_create_room_title13"),
+            SRLocalizedString(@"sr_create_room_title14"),
+            SRLocalizedString(@"sr_create_room_title15"),
+            SRLocalizedString(@"sr_create_room_title16"),
+            SRLocalizedString(@"sr_create_room_title17"),
+            SRLocalizedString(@"sr_create_room_title18"),
+            SRLocalizedString(@"sr_create_room_title19"),
+            SRLocalizedString(@"sr_create_room_title20"),
+            SRLocalizedString(@"sr_create_room_title21")
         ];
     }
     return _titlesArray;

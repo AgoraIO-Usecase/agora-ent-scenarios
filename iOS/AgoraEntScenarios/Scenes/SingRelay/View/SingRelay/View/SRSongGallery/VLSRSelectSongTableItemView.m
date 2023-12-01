@@ -194,7 +194,7 @@ UITableViewDelegate
 
 - (void)dianGeWithModel:(VLSRSongItmModel*)model {
     if(model == nil || model.songNo == nil || model.songName == nil ) {
-        [VLToast toast:KTVLocalizedString(@"ktv_chooseSong_failed")];
+        [VLToast toast:SRLocalizedString(@"sr_chooseSong_failed")];
         return;
     }
     
