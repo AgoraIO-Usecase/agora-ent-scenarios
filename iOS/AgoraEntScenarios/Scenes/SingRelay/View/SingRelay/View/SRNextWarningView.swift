@@ -7,42 +7,71 @@
 
 import Foundation
 class SRNextWarningView: UIView {
-    var imgView: UIImageView!
-    var contentView: UIView!
-    var preLabel: UILabel!
-    var icon: UIImageView!
-    var endLabel: UILabel!
+    var imgView = UIImageView()
+    var contentView = UIView(frame: .zero)
+    var preLabel = UILabel(frame: .zero)
+    var icon = UIImageView(frame: .zero)
+    var endLabel = UILabel(frame: .zero)
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        layoutUI()
+        
+        createViews()
+        createConstrains()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func layoutUI() {
-        contentView = UIView(frame: .zero)
-        addSubview(contentView)
-        
-        imgView = UIImageView()
+    private func createViews() {
+        self.layer.cornerRadius = 10
+        self.layer.masksToBounds = true
+        self.layer.borderColor = UIColor.white.cgColor
+        self.layer.borderWidth = 1
+        self.backgroundColor = .systemBlue
+                
         imgView.image = UIImage.sceneImage(name: "micwithbackground")
-        contentView.addSubview(imgView)
+        self.addSubview(imgView)
         
-        preLabel = UILabel(frame: .zero)
-        preLabel.text = getLocalizeString(with: "sr_current_tbd")
+        preLabel.text = getLocalizeString(with: "sr_next_tbd")
         preLabel.textColor = .white
         preLabel.font = UIFont.systemFont(ofSize: 12)
-        contentView.addSubview(preLabel)
+        self.addSubview(preLabel)
         
-        icon = UIImageView(frame: .zero)
-        contentView.addSubview(icon)
+        icon.contentMode = .scaleAspectFill
+        icon.layer.cornerRadius = 8
+        icon.layer.masksToBounds = true
+        self.addSubview(icon)
         
-        endLabel = UILabel(frame: .zero)
         endLabel.text = getLocalizeString(with: "sr_next_sing")
         endLabel.font = UIFont.systemFont(ofSize: 12)
         endLabel.textColor = .white
-        contentView.addSubview(endLabel)
+        self.addSubview(endLabel)
+    }
+    
+    private func createConstrains() {
+        imgView.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.left.equalTo(5)
+            make.width.equalTo(32)
+            make.height.equalTo(16)
+        }
+        preLabel.snp.makeConstraints { make in
+            make.left.equalTo(imgView.snp.right).offset(3)
+            make.centerY.equalToSuperview()
+        }
+        icon.snp.makeConstraints { make in
+            make.left.equalTo(preLabel.snp.right).offset(3)
+            make.centerY.equalToSuperview()
+            make.width.equalTo(16)
+            make.height.equalTo(16)
+        }
+        endLabel.snp.makeConstraints { make in
+            make.left.equalTo(icon.snp.right).offset(3)
+            make.centerY.equalToSuperview()
+            make.right.equalToSuperview().offset(-15)
+        }
     }
     
     public func setMicOwner(with owner: String, url: String) {
@@ -52,19 +81,6 @@ class SRNextWarningView: UIView {
         }
         icon.image = image
         endLabel.text = " \(owner)\(getLocalizeString(with: "sr_next_sing"))"
-        imgView.frame = CGRect(x: 2, y: 5, width: 32, height: 16)
-        let endWidth = textAutoWidth(text: endLabel.text ?? "", height: 20, fontSize: 12)
-        let preWidth = textAutoWidth(text: preLabel.text ?? "", height: 20, fontSize: 12)
-        let totalWidth = endWidth + preWidth + 40 + 16
-        contentView.frame = CGRect(x: self.bounds.width / 2.0 - totalWidth / 2.0, y: self.bounds.height / 2.0 - 12.5, width: totalWidth, height: 20)
-        preLabel.frame = CGRect(x: 40, y: 6, width: preWidth, height: 12)
-        icon.frame = CGRect(x: preWidth + 40, y: 5, width: 16, height: 16)
-        endLabel.frame = CGRect(x: preWidth + 40 + 16, y: 6, width: endWidth, height: 12)
-        self.layer.cornerRadius = 10
-        self.layer.masksToBounds = true
-        self.layer.borderColor = UIColor.white.cgColor
-        self.layer.borderWidth = 1
-        self.backgroundColor = .systemBlue
     }
     
     func textAutoWidth(text: String, height:CGFloat, fontSize:CGFloat) ->CGFloat{
