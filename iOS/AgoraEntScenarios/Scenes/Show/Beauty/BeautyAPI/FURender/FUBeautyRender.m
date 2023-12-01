@@ -132,19 +132,20 @@
 
 - (void)setStyleWithPath:(NSString *)path key:(NSString *)key value:(float)value {
 #if __has_include(FURenderMoudle)
-    NSString *makeupPath = [[NSBundle mainBundle] pathForResource:path ofType:@"bundle"];
     FUMakeup *makeup = [FURenderKit shareRenderKit].makeup;
     if (makeup == nil) {
-        makeup = [[FUMakeup alloc] initWithPath:makeupPath name:@"face_makeup"];
+        NSBundle *bundle = [BundleUtil bundleWithBundleName:@"FURenderKit" podName:@"fuLib"];
+        NSString *stylePath = [bundle pathForResource:key ofType:@"bundle"];
+        makeup = [[FUMakeup alloc] initWithPath:stylePath name:@"makeup"];
         makeup.isMakeupOn = YES;
-        [FURenderKit shareRenderKit].makeup = makeup;
-        [FURenderKit shareRenderKit].makeup.enable = YES;
+        dispatch_queue_t referQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
+        dispatch_async(referQueue, ^{
+            [FURenderKit shareRenderKit].makeup = makeup;
+            [FURenderKit shareRenderKit].makeup.intensity = value;
+            [FURenderKit shareRenderKit].makeup.enable = YES;
+        });
     }
-    NSBundle *bundle = [BundleUtil bundleWithBundleName:@"FURenderKit" podName:@"fuLib"];
-    NSString *stylePath = [bundle pathForResource:key ofType:@"bundle"];
-    FUItem *makupItem = [[FUItem alloc] initWithPath:stylePath name:key];
-    [makeup updateMakeupPackage:makupItem needCleanSubItem:NO];
-    makeup.intensity = value;
+    [FURenderKit shareRenderKit].makeup.intensity = value;
 #endif
 }
 

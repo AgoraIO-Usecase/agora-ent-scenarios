@@ -54,11 +54,9 @@ class ShowBeautySettingVC: UIViewController {
     private var titles: [String] {
         ShowBeautyFaceVCType.allCases.filter({
             if BeautyModel.beautyType == .byte {
-                return $0 != .adjust && $0 != .animoj
-            } else if BeautyModel.beautyType == .fu {
-                return $0 != .adjust
+                return $0 != .animoj
             } else if BeautyModel.beautyType == .agora {
-                return $0 != .adjust && $0 != .animoj && $0 != .sticker && $0 != .style
+                return $0 != .animoj && $0 != .sticker && $0 != .style
             } else {
                 return $0 != .animoj
             }
@@ -204,11 +202,9 @@ class ShowBeautySettingVC: UIViewController {
     private func createBeautyVC() -> [ShowBeautyFaceVC] {
         ShowBeautyFaceVCType.allCases.filter({
             if BeautyModel.beautyType == .byte {
-                return $0 != .adjust && $0 != .animoj
-            } else if BeautyModel.beautyType == .fu {
-                return $0 != .adjust
+                return $0 != .animoj
             } else if BeautyModel.beautyType == .agora {
-                return $0 != .adjust && $0 != .animoj && $0 != .sticker && $0 != .style
+                return $0 != .animoj && $0 != .sticker && $0 != .style
             } else {
                 return $0 != .animoj
             }
