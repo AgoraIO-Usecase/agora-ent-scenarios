@@ -42,6 +42,10 @@ extension UIFont {
         joy_MediumFontSize(15)
     }
     
+    @objc static var joy_M_17: UIFont? {
+        joy_MediumFontSize(17)
+    }
+    
     // 常规
     @objc static var joy_R_9: UIFont? {
         joy_regularFontSize(9)

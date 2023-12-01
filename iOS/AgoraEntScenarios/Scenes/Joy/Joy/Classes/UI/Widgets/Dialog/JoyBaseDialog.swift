@@ -80,8 +80,8 @@ class JoyBaseDialog: UIView {
         super.layoutSubviews()
         let contentSize = contentSize()
         dialogView.frame = CGRect(x: 0, y: self.aui_height - contentSize.height, width: contentSize.width, height: contentSize.height)
-        titleLabel.frame = CGRect(x: 0, y: 32, width: dialogView.width, height: 22)
-        let buttonMargin = UIEdgeInsets(top: titleLabel.aui_bottom + 16, left: 24, bottom: 34, right: 24)
+        titleLabel.frame = CGRect(x: 0, y: 30, width: dialogView.width, height: 22)
+        let buttonMargin = UIEdgeInsets(top: titleLabel.aui_bottom + 14, left: 24, bottom: 34, right: 24)
         button.frame = CGRect(x: buttonMargin.left,
                               y: dialogView.height - 40 - buttonMargin.bottom,
                               width: dialogView.width - buttonMargin.left - buttonMargin.right,

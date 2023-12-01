@@ -14,13 +14,14 @@ class JoyGameListCell: UICollectionViewCell {
             if isSelected {
                 layer.borderWidth = 2
                 layer.borderColor = UIColor.joy_btn_bg.cgColor
+                backgroundColor = .joy_btn_bg
+                nameLabel.textColor = .joy_main_text
             } else {
                 layer.borderWidth = 2
                 layer.borderColor = UIColor.clear.cgColor
+                backgroundColor = .clear
+                nameLabel.textColor = .joy_title_text
             }
-            
-            layer.cornerRadius = 4
-            clipsToBounds = true
         }
     }
     var gameInfo: CloudGameInfo? {
@@ -35,6 +36,7 @@ class JoyGameListCell: UICollectionViewCell {
         let imageView = UIImageView()
         imageView.layer.cornerRadius = 10
         imageView.layer.masksToBounds = true
+        imageView.backgroundColor = .gray
         imageView.contentMode = .scaleAspectFill
         return imageView
     }()
@@ -42,8 +44,6 @@ class JoyGameListCell: UICollectionViewCell {
     private lazy var nameLabel: UILabel = {
         let nameLabel = UILabel()
         nameLabel.font = .joy_M_12
-        nameLabel.backgroundColor = .joy_btn_bg
-        nameLabel.textColor = .joy_main_text
         nameLabel.textAlignment = .center
         return nameLabel
     }()
@@ -58,19 +58,19 @@ class JoyGameListCell: UICollectionViewCell {
     }
     
     private func createSubviews() {
-        // 名称
+        layer.cornerRadius = 15
+        clipsToBounds = true
+        contentView.addSubview(imageView)
         contentView.addSubview(nameLabel)
         nameLabel.snp.makeConstraints { make in
             make.left.right.equalToSuperview()
-            make.bottom.equalTo(0)
+            make.bottom.equalTo(-8)
             make.height.equalTo(17)
         }
         
-        // 背景图
-        contentView.addSubview(imageView)
         imageView.snp.makeConstraints { make in
             make.left.right.top.equalToSuperview()
-            make.bottom.equalTo(nameLabel)
+            make.bottom.equalTo(nameLabel.snp.top).offset(-4)
         }
     }
 }
@@ -92,7 +92,7 @@ class JoyGameListDialog: JoyBaseDialog {
         layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         layout.minimumInteritemSpacing = 8
         let itemWidth = (self.width - 8.0 * 3.0 - 20 * 2) / 4.0
-        layout.itemSize = CGSize(width: floor(itemWidth), height: itemWidth + 17)
+        layout.itemSize = CGSize(width: floor(itemWidth), height: itemWidth + 29)
         let collectionView = UICollectionView(frame: self.bounds, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.register(JoyGameListCell.self, forCellWithReuseIdentifier: NSStringFromClass(JoyGameListCell.self))

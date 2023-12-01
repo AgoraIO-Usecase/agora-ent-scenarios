@@ -22,6 +22,7 @@ class RoomListCell: UICollectionViewCell {
         let imageView = UIImageView(image: UIImage.sceneImage(name: "show_default_avatar"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.cornerRadius = 32
+        imageView.clipsToBounds = true
         return imageView
     }()
     private lazy var privateImageView: UIImageView = {

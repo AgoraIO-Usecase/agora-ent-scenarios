@@ -49,6 +49,18 @@ class RoomViewController: UIViewController {
         return button
     }()
     
+    private lazy var waittingLabel: UILabel = {
+        let label = UILabel()
+        label.text = "room_waitting_for_startgame".joyLocalization()
+        label.numberOfLines = 2
+        label.textAlignment = .center
+        label.textColor = .joy_main_text
+        label.font = .joy_M_17
+        label.sizeToFit()
+        return label
+        
+    }()
+    
     private lazy var broadcasterCanvasView: UIView = UIView()
     private lazy var assistantCanvasView: UIView = UIView()
     
@@ -83,6 +95,11 @@ class RoomViewController: UIViewController {
         gameIntroduceButton.snp.makeConstraints { make in
             make.top.equalTo(closeButton.snp.bottom).offset(15)
             make.right.equalTo(closeButton)
+        }
+        
+        view.addSubview(waittingLabel)
+        waittingLabel.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
         
         view.addSubview(broadcasterCanvasView)
