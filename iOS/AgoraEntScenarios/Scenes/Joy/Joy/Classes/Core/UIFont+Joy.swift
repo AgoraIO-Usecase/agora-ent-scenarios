@@ -71,6 +71,10 @@ extension UIFont {
         joy_regularFontSize(16)
     }
     
+    @objc static var joy_S_16: UIFont? {
+        joy_SemiboldFontSize(16)
+    }
+    
     @objc static var joy_S_18: UIFont? {
         joy_SemiboldFontSize(18)
     }

@@ -27,9 +27,15 @@ class JoyBaseDialog: UIView {
         return view
     }()
     
-    private(set) lazy var contentView: UIView = {
-        let view = UIView()
-        return view
+    private(set) lazy var contentView: UIView = UIView()
+    
+    private(set) lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .joy_title_text
+        label.font = .joy_S_16
+        label.text = labelTitle()
+        label.textAlignment = .center
+        return label
     }()
     
     private(set) lazy var button: UIButton = {
@@ -52,6 +58,10 @@ class JoyBaseDialog: UIView {
         return .zero
     }
     
+    func labelTitle() -> String {
+        return ""
+    }
+    
     func buttonTitle() -> String {
         return ""
     }
@@ -60,32 +70,24 @@ class JoyBaseDialog: UIView {
         backgroundColor = .clear
         addSubview(dialogView)
         dialogView.addSubview(contentView)
+        dialogView.addSubview(titleLabel)
         dialogView.addSubview(button)
 //        contentView.layer.addSublayer(gradientLayer)
         loadCustomContentView(contentView: contentView)
-    }
-    
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        // 检查是否有子视图响应触摸事件
-        if let superViewHitTestView = super.hitTest(point, with: event), superViewHitTestView != self {
-            return superViewHitTestView
-        } else {
-            // 如果没有子视图响应，则返回父视图，使触摸事件穿透到下一层视图
-            return nil
-        }
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
         let contentSize = contentSize()
         dialogView.frame = CGRect(x: 0, y: self.aui_height - contentSize.height, width: contentSize.width, height: contentSize.height)
-        let buttonMargin = UIEdgeInsets(top: 20, left: 24, bottom: 34, right: 24)
-        button.frame = CGRect(x: buttonMargin.left, 
+        titleLabel.frame = CGRect(x: 0, y: 32, width: dialogView.width, height: 22)
+        let buttonMargin = UIEdgeInsets(top: titleLabel.aui_bottom + 16, left: 24, bottom: 34, right: 24)
+        button.frame = CGRect(x: buttonMargin.left,
                               y: dialogView.height - 40 - buttonMargin.bottom,
                               width: dialogView.width - buttonMargin.left - buttonMargin.right,
                               height: 40)
         button.setjoyDefaultGradientBackground()
-        contentView.frame = CGRect(x: 0, y: 20, width: dialogView.width, height: button.aui_top - buttonMargin.top - 20)
+        contentView.frame = CGRect(x: 0, y: buttonMargin.top, width: dialogView.width, height: button.aui_top - buttonMargin.top - 20)
 //        gradientLayer.frame = CGRect(x: 0, y: 0, width: contentView.aui_width, height: 19)
     }
     

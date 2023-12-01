@@ -112,6 +112,20 @@ class JoyGameListDialog: JoyBaseDialog {
         }
     }
     
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        // 检查是否有子视图响应触摸事件
+        if let superViewHitTestView = super.hitTest(point, with: event), superViewHitTestView != self {
+            return superViewHitTestView
+        } else {
+            // 如果没有子视图响应，则返回父视图，使触摸事件穿透到下一层视图
+            return nil
+        }
+    }
+    
+    override func labelTitle() -> String {
+        return "dialog_title_gamelist".joyLocalization()
+    }
+    
     override func buttonTitle() -> String {
         return "gamelist_selected_confirm".joyLocalization()
     }

@@ -15,6 +15,10 @@ extension UIColor {
         return .white
     }
     
+    @objc static var joy_title_text: UIColor {
+        return UIColor(hexString: "#040925")!
+    }
+    
     // 未选中字体颜色
     @objc static var joy_beauty_deselect: UIColor {
         return UIColor(hexString: "989DBA")!

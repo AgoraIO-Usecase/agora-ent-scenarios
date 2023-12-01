@@ -13,7 +13,11 @@ class RoomViewController: UIViewController {
     var currentUserInfo: JoyUserInfo?
     var service: JoyServiceProtocol?
     
-    private var gameInfo: CloudGameInfo?
+    private var gameInfo: CloudGameDetailInfo? {
+        didSet {
+            gameIntroduceButton.isHidden = gameInfo == nil ? true : false
+        }
+    }
     private var taskId: String?
     private lazy var roomInfoView = RoomInfoView()
     private lazy var closeButton: UIButton = {
@@ -28,6 +32,20 @@ class RoomViewController: UIViewController {
         button.setImage(UIImage.sceneImage(name: "icon_live_more"), for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
         button.addTarget(self, action: #selector(onMoreAction), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var gameIntroduceButton: UIButton = {
+        let button = UIButton()
+        button.titleLabel?.font = .joy_R_12
+        button.setTitle("game_play_introduce".joyLocalization(), for: .normal)
+        button.backgroundColor = UIColor(hexString: "#08062F4D")!.withAlphaComponent(0.3)
+        button.contentEdgeInsets = UIEdgeInsets(top: 4, left: 7, bottom: 4, right: 7)
+        button.sizeToFit()
+        button.layer.cornerRadius = button.height / 2
+        button.clipsToBounds = true
+        button.isHidden = true
+        button.addTarget(self, action: #selector(onIntroduceAction), for: .touchUpInside)
         return button
     }()
     
@@ -59,6 +77,12 @@ class RoomViewController: UIViewController {
             make.trailing.equalTo(closeButton.snp_leadingMargin).offset(-18)
             make.centerY.equalTo(closeButton.snp.centerY)
             make.width.equalTo(24)
+        }
+        
+        view.addSubview(gameIntroduceButton)
+        gameIntroduceButton.snp.makeConstraints { make in
+            make.top.equalTo(closeButton.snp.bottom).offset(15)
+            make.right.equalTo(closeButton)
         }
         
         view.addSubview(broadcasterCanvasView)
@@ -139,11 +163,17 @@ extension RoomViewController {
                 AUIToast.show(text: err.localizedDescription)
                 return
             }
-            self?.gameInfo = gameInfo
-            self?.taskId = taskId
             
             CloudBarrageAPI.shared.getGameInfo(gameId: gameInfo.gameId!) { err, detail in
-    
+                if let err = err {
+                    AUIToast.show(text: err.localizedDescription)
+                    return
+                }
+                
+                self?.gameInfo = detail
+                self?.taskId = taskId
+                
+                self?.onIntroduceAction()
             }
             JoyGameListDialog.hiddenAnimation()
         }
@@ -173,6 +203,12 @@ extension RoomViewController {
     
     @objc func onMoreAction() {
         
+    }
+    
+    @objc func onIntroduceAction() {
+        guard let introduce = gameInfo?.introduce, !introduce.isEmpty else {return}
+        let dialog: JoyGameNoticeDialog? = JoyGameNoticeDialog.show()
+        dialog?.text = introduce
     }
 }
 
