@@ -43,9 +43,10 @@ class RoomListViewController: UIViewController {
         ctrl.addTarget(self, action: #selector(_refreshAction), for: .valueChanged)
         return ctrl
     }()
+    
     private lazy var listView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
+        layout.sectionInset = UIEdgeInsets(top: UIDevice.current.aui_SafeDistanceTop + 44, left: 20, bottom: 0, right: 20)
         let itemWidth = (self.view.width - 15 - 20 * 2) * 0.5
         layout.itemSize = CGSize(width: itemWidth, height: itemWidth)
         let collectionView = UICollectionView(frame: self.view.bounds, collectionViewLayout: layout)
@@ -66,7 +67,8 @@ class RoomListViewController: UIViewController {
         button.backgroundColor = UIColor(hexString: "#345dff")
         button.setCornerRadius(21)
         button.setTitle("user_list_create_room".joyLocalization(), for: .normal)
-        button.setImage(UIImage.sceneImage(name: "create_room"), for: .normal)
+        button.setImage(UIImage.sceneImage(name: "icon_add"), for: .normal)
+        button.setjoyDefaultGradientBackground()
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         button.setTitleColor(.white, for: .normal)
         button.adjustHorizonAlign(spacing: 10)
@@ -122,10 +124,12 @@ extension RoomListViewController: UICollectionViewDataSource, UICollectionViewDe
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: RoomListCell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(RoomListCell.self), for: indexPath) as! RoomListCell
         let room = roomList[indexPath.item]
-        cell.setBgImge((room.thumbnailId?.isEmpty ?? true) ? "0" : room.thumbnailId ?? "0",
+        cell.setBgImge("\(indexPath.item % 5)",
                        name: room.roomName,
                        id: room.roomId,
-                       count: room.roomUserCount)
+                       count: room.roomUserCount,
+                       avatarUrl: room.ownerAvatar,
+                       isPrivate: false)
         return cell
     }
     
@@ -168,7 +172,7 @@ extension RoomListViewController {
         config.audioScenario = .gameStreaming
         config.areaCode = .global
         let engine = AgoraRtcEngineKit.sharedEngine(with: config,
-                                                    delegate: nil)
+                                                    delegate: self)
         
         engine.setClientRole(.broadcaster)
         return engine
@@ -237,5 +241,9 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
 //                showTo1v1Print("renew token tokenPrivilegeWillExpire: \(channelId) \(ret)")
 //            }
 //        }
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
+        joyPrint("didJoinedOfUid: \(uid) ownerId: \(userInfo?.userId ?? 0)")
     }
 }

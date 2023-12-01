@@ -52,4 +52,5 @@ TODO: Add long description of the pod here.
   s.dependency 'SnapKit'
   s.dependency 'SwiftyBeaver'
   s.dependency 'SwiftProtobuf', '1.24.0'
+  s.dependency 'YYCategories'
 end

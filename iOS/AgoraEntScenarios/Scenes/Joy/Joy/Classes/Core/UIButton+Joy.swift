@@ -23,4 +23,15 @@ extension UIButton {
         
         setBackgroundImage(backgroundImage, for: .normal)
     }
+    
+    func setjoyDefaultGradientBackground() {
+        let colors = [
+            UIColor(red: 0.13, green: 0.608, blue: 1, alpha: 1),
+            UIColor(red: 0.204, green: 0.366, blue: 1, alpha: 1)
+        ] // 渐变颜色数组
+        let startPoint = CGPoint(x: 0, y: 0) // 渐变起点
+        let endPoint = CGPoint(x: 0, y: 1) // 渐变终点
+        let cornerRadius: CGFloat = aui_height / 2 // 圆角半径
+        setGradientBackground(colors: colors, startPoint: startPoint, endPoint: endPoint, cornerRadius: cornerRadius)
+    }
 }

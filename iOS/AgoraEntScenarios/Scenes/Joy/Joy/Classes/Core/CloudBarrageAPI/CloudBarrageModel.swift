@@ -155,33 +155,30 @@ public struct CloudGameEncryption: Codable {
 public struct CloudGameRtcConfig: Codable {
     public var broadcastUid: UInt = 0              // 主播uid
     public var assistantUid: UInt = 0              // 主播助手rtc uid
-    public var token: String?                      // 主播助手rtc token
+    public var assistantToken: String?             // 主播助手rtc token
     public var channelName: String?                // agora rtc cname
     public var encryption: CloudGameEncryption?    // agora encryption，无加密不填
     
     enum CodingKeys: String, CodingKey {
-        case broadcastUid = "broadcast_uid"
         case assistantUid = "uid"
-        case channelName = "channel_name"
-        case token, encryption
+        case assistantToken = "token"
+        case broadcastUid, channelName, encryption
     }
 }
 
 public struct CloudGameStartConfig: Codable {
-    public var vid: String?                        // agora vid
     public var roomId: String?                     // 主播room_id
-    public var userId:String?
+    public var gameId: String?                     // 游戏id
+    public var userId: String?
     public var userAvatar: String?
     public var userName: String?
     public var rtcConfig: CloudGameRtcConfig?
     
     enum CodingKeys: String, CodingKey {
-        case vid
-        case roomId = "room_id"
-        case userId = "open_id"
+        case roomId, gameId, rtcConfig
+        case userId = "openId"
         case userAvatar = "avatar"
         case userName = "nickname"
-        case rtcConfig = "rtc_config"
     }
 }
 

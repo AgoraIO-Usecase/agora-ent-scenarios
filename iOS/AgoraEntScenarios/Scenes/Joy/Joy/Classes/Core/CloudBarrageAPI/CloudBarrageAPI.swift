@@ -7,6 +7,7 @@
 
 import Foundation
 import AgoraRtcKit
+import YYCategories
 
 public enum UserGameStatus: String {
     case unknown = "unknown"
@@ -21,7 +22,8 @@ public enum UserGameStatus: String {
 
 public struct CloudBarrageConfig {
     var appId: String?
-    var host: String? = "https://api-test.agora.io/v1/apps/"
+    var basicAuth: String?
+    var host: String? = "https://service-staging.agora.io/toolbox/v1/"
     var engine: AgoraRtcEngineKit?
     var rtmToken: String?
 }
@@ -39,6 +41,7 @@ public class CloudBarrageAPI: NSObject {
         self.apiConfig = apiConfig
         createDataStream()
     }
+    
 }
 
 // MARK: public
@@ -46,15 +49,10 @@ extension CloudBarrageAPI {
     
     /// 获取游戏列表信息
     /// - Parameters:
-    ///   - pageNum: 页数
-    ///   - pageSize: 每页显示数量
     ///   - completion: <#completion description#>
-    public func getGameList(pageNum: Int = 1,
-                            pageSize: Int = 10,
-                            completion: @escaping (NSError?, [CloudGameInfo]?) -> Void) {
-        let params = ["page_num": pageNum, "page_size": pageSize]
+    public func getGameList(completion: @escaping (NSError?, [CloudGameInfo]?) -> Void) {
         let interfaceName = "cloud-bullet-game/games"
-        getRequest(interface: interfaceName, params: params) { err, result  in
+        postRequest(interface: interfaceName) { err, result  in
             if let result = result?["list"] as? [[String: Any]] {
                 let model: [CloudGameInfo]? = self.decodeModelArray(result)
                 completion(err, model)
@@ -70,8 +68,8 @@ extension CloudBarrageAPI {
     ///   - gameId: 游戏id
     ///   - completion: <#completion description#>
     public func getGameInfo(gameId: String, completion: @escaping (NSError?, CloudGameDetailInfo?) -> Void) {
-        let interfaceName = "cloud-bullet-game/gameid/\(gameId)"
-        getRequest(interface: interfaceName) { err, result  in
+        let interfaceName = "cloud-bullet-game/games/game"
+        postRequest(interface: interfaceName, params: ["gameId": gameId]) { err, result  in
             if let result = result {
                 let model: CloudGameDetailInfo? = self.decodeModel(result)
                 completion(err, model)
@@ -121,17 +119,15 @@ extension CloudBarrageAPI {
     
     /// 开始游戏
     /// - Parameters:
-    ///   - gameId: 游戏id
     ///   - config: 开始内容
     ///   - completion: <#completion description#>
-    public func startGame(gameId: String,
-                          config: CloudGameStartConfig,
+    public func startGame(config: CloudGameStartConfig,
                           completion: @escaping ((NSError?, String?)->Void)) {
         guard let params = encodeModel(config) else {
             completion(NSError(domain: "parse model fail", code: -1), nil)
             return
         }
-        let interfaceName = "cloud-bullet-game/gameid/\(gameId)/start"
+        let interfaceName = "cloud-bullet-game/games/start"
         postRequest(interface: interfaceName, params: params) { err, result  in
             let taskId = result?["task_id"] as? String
             completion(err, taskId)
@@ -148,17 +144,10 @@ extension CloudBarrageAPI {
     ///   - taskId:  启动游戏的任务ID，通过startGame返回
     ///   - completion: <#completion description#>
     public func endGame(gameId:String,
-                        vid: String,
-                        roomId: String,
-                        openId: String,
                         taskId: String,
                         completion: @escaping ((NSError?)->Void)) {
-        var params = [String: Any]()
-        params["vid"] = vid
-        params["room_id"] = roomId
-        params["open_id"] = openId
-        params["task_id"] = taskId
-        let interfaceName = "cloud-bullet-game/gameid/\(gameId)/stop"
+        let params = ["gameId": gameId, "taskId": taskId]
+        let interfaceName = "cloud-bullet-game/games/stop"
         postRequest(interface: interfaceName, params: params) { err, result  in
             completion(err)
         }
@@ -172,9 +161,9 @@ extension CloudBarrageAPI {
     public func getGameStatus(gameId:String,
                               taskId: String,
                               completion: @escaping ((_ status: UserGameStatus?)->Void)) {
-        let params = ["task_id": taskId]
-        let interfaceName = "cloud-bullet-game/gameid/\(gameId)/status"
-        getRequest(interface: interfaceName, params: params) { err, result  in
+        let params = ["gameId": gameId, "taskId": taskId]
+        let interfaceName = "cloud-bullet-game/games/status"
+        postRequest(interface: interfaceName, params: params) { err, result  in
             let status = UserGameStatus(rawValue: result?["status"] as? String ?? "") ?? .unknown
             completion(status)
         }
@@ -266,9 +255,8 @@ extension CloudBarrageAPI {
     }
     
     private func encodeModel(_ model: Codable) -> [String: Any]? {
-        // 使用JSONEncoder将person编码为字典
         let encoder = JSONEncoder()
-        encoder.keyEncodingStrategy = .convertToSnakeCase // 如果希望使用蛇形命名法，可以设置keyEncodingStrategy
+        encoder.keyEncodingStrategy = .useDefaultKeys
         var dictionary: [String: Any]?
         do {
             let data = try encoder.encode(model)
@@ -322,6 +310,11 @@ extension CloudBarrageAPI {
     }
 }
 
+public let kAppProjectName = "appProject"
+public let kAppProjectValue = "agora_ent_demo"
+public let kAppOS = "appOs"
+public let kAppOSValue = "iOS"
+public let kAppVersion = "versionName"
 extension CloudBarrageAPI {
     private func getRequest(interface: String,
                             params:[String: Any]? = nil,
@@ -346,44 +339,61 @@ extension CloudBarrageAPI {
             completion(NSError(domain: "api config == nil", code: -1), nil)
             return
         }
-        var url = URL(string: "\(host)\(appId)/\(interface)")!
-        if let params = params {
-            if httpMethod == "GET" {
-                url = appendQueryParams(to: url, queryParams: params) ?? url
-                print(" GET url = \(url)")
-            }
+        var params: [String: Any] = params ?? [:]
+        params["appId"] = appId
+        if let basicAuth = apiConfig.basicAuth {
+            params["basicAuth"] = basicAuth
+        }
+        params["src"] = "iOS"
+        params["traceId"] = NSString.withUUID().md5() ?? ""
+        
+        var url = URL(string: "\(host)\(interface)")!
+        if httpMethod == "GET" {
+            url = appendQueryParams(to: url, queryParams: params) ?? url
+//            joyPrint(" GET url = \(url)")
         }
        
-        var request = URLRequest(url: url)
-        request.addValue("text/plain", forHTTPHeaderField: "Con1tent-Type")
-        request.addValue("agora token=\(rtmToken)", forHTTPHeaderField: "Authorization")
-        joyPrint("agora token=\(rtmToken)")
-
+        var request = getHeaderRequest(url: url)
         request.httpMethod = httpMethod
-        if let params = params {
-            if httpMethod == "POST" {
-                let jsonBody = try? JSONSerialization.data(withJSONObject: params)
-                request.httpBody = jsonBody
-                print(" POST url = \(url), params = \(params.debugDescription)")
-            }
+        if httpMethod == "POST" {
+            let jsonBody = try? JSONSerialization.data(withJSONObject: params)
+            request.httpBody = jsonBody
+//            joyPrint(" POST url = \(url), params = \(params.debugDescription)")
         }
+        
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data, error == nil else {
-                print("Error: \(error?.localizedDescription ?? "Unknown error")")
+                joyError("Error: \(error?.localizedDescription ?? "Unknown error")")
                 return
             }
-            print(" httpRequest data = \(data) ")
+            joyPrint(" httpRequest request:\n \(request.cURL(pretty: true)) \nresp:\n \(NSString(data: data, encoding: NSUTF8StringEncoding)) ")
             if let dic = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                let result = dic["result"] as? [String: Any]
+                let result = dic["data"] as? [String: Any]
                 let code = dic["code"] as? Int ?? 0
-                let error = code == 0 ? nil : NSError(domain: "http request fail", code: code ?? -1)
-                joyPrint("result = \(String(describing: result)), code = \(String(describing: code))")
+                let msg = dic["msg"] as? String ?? ""
+                let error = code == 0 ? nil : NSError(domain: msg, code: code)
+//                joyPrint("result = \(String(describing: result)), code = \(code)")
                 DispatchQueue.main.async {
                     completion(error, result)
                 }
             }
         }
         task.resume()
+    }
+    
+    private func getHeaderRequest(url: URL) -> URLRequest {
+        var request = URLRequest(url: url)
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("fkUjxadPMmvYF3F3BI4uvmjo-gzGzoHsz", forHTTPHeaderField: "X-LC-Id")
+        request.addValue("QAvFS62IOR28GfSFQO5ze45s", forHTTPHeaderField: "X-LC-Key")
+        request.addValue("qmdj8pdidnmyzp0c7yqil91oc", forHTTPHeaderField: "X-LC-Session")
+        request.addValue(kAppProjectValue, forHTTPHeaderField: kAppProjectName)
+        request.addValue(kAppOSValue, forHTTPHeaderField: kAppOS)
+        request.addValue(UIApplication.shared.appVersion ?? "", forHTTPHeaderField: kAppVersion)
+        if let token = self.apiConfig?.rtmToken {
+            request.addValue(token, forHTTPHeaderField: "Authorization")
+        }
+        return request
     }
     
     private func appendQueryParams(to url: URL, queryParams: [String: Any]) -> URL? {

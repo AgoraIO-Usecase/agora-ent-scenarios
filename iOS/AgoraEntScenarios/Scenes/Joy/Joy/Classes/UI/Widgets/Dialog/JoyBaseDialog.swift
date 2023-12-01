@@ -84,14 +84,7 @@ class JoyBaseDialog: UIView {
                               y: dialogView.height - 40 - buttonMargin.bottom,
                               width: dialogView.width - buttonMargin.left - buttonMargin.right,
                               height: 40)
-        let colors = [
-            UIColor(red: 0.13, green: 0.608, blue: 1, alpha: 1),
-            UIColor(red: 0.204, green: 0.366, blue: 1, alpha: 1)
-        ] // 渐变颜色数组
-        let startPoint = CGPoint(x: 0, y: 0) // 渐变起点
-        let endPoint = CGPoint(x: 0, y: 1) // 渐变终点
-        let cornerRadius: CGFloat = button.height / 2 // 圆角半径
-        button.setGradientBackground(colors: colors, startPoint: startPoint, endPoint: endPoint, cornerRadius: cornerRadius)
+        button.setjoyDefaultGradientBackground()
         contentView.frame = CGRect(x: 0, y: 20, width: dialogView.width, height: button.aui_top - buttonMargin.top - 20)
 //        gradientLayer.frame = CGRect(x: 0, y: 0, width: contentView.aui_width, height: 19)
     }
@@ -124,6 +117,14 @@ class JoyBaseDialog: UIView {
         } completion: { success in
             self.removeFromSuperview()
         }
+    }
+    
+    static func hiddenAnimation() {
+        guard let dialog = getWindow()?.viewWithTag(kDialogTag) as? JoyBaseDialog else {
+            return
+        }
+        
+        dialog.hiddenAnimation()
     }
     
     static func hidden() {

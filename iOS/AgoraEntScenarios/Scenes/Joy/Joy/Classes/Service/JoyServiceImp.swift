@@ -127,6 +127,7 @@ extension JoyServiceImp: JoyServiceProtocol {
         roomInfo.ownerName = user.userName
         roomInfo.ownerAvatar = user.avatar
         roomInfo.roomName = roomName
+        roomInfo.assistantUid = 1000000000 + user.userId
         roomInfo.roomId = "\(arc4random_uniform(899999) + 100000)"
         let reqId = NSString.withUUID()
         initScene(reqId) {[weak self] rid, error in

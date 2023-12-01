@@ -10,14 +10,50 @@ import SDWebImage
 import SnapKit
 
 class RoomListCell: UICollectionViewCell {
-    // 背景图
-    var imageView: UIImageView!
-    // 房间名称
-    var nameLabel: UILabel!
-    // id
-    var idLablel: UILabel!
-    // 人数
-    var numberLabel: UILabel!
+    private lazy var imageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.layer.cornerRadius = 16
+        imageView.layer.masksToBounds = true
+        imageView.contentMode = .scaleAspectFill
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+    private lazy var avatarImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage.sceneImage(name: "show_default_avatar"))
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.layer.cornerRadius = 32
+        return imageView
+    }()
+    private lazy var privateImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage.sceneImage(name: "show_private_room_icon"))
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.isHidden = true
+        return imageView
+    }()
+    private lazy var nameLabel: UILabel = {
+        let nameLabel = UILabel()
+        nameLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        nameLabel.textColor = UIColor(hexString: "#000000")
+        nameLabel.numberOfLines = 2
+        nameLabel.textAlignment = .center
+        nameLabel.text = "Chat with Eve tonight and merry Christmas"
+        nameLabel.translatesAutoresizingMaskIntoConstraints = false
+        return nameLabel
+    }()
+    private lazy var idLablel: UILabel = {
+        let idLablel = UILabel()
+        idLablel.font = .joy_R_10
+        idLablel.textColor = UIColor(hexString: "#303553")
+        idLablel.translatesAutoresizingMaskIntoConstraints = false
+        return idLablel
+    }()
+    private lazy var numberLabel: UILabel = {
+        let numberLabel = UILabel()
+        numberLabel.font = .joy_R_10
+        numberLabel.textColor = UIColor(hexString: "#303553")
+        numberLabel.translatesAutoresizingMaskIntoConstraints = false
+        return numberLabel
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -28,83 +64,59 @@ class RoomListCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setBgImge(_ img: String, name: String?, id: String?, count: Int) {
-        imageView.image = UIImage.sceneImage(name: "show_room_bg_\(img)")
+    func setBgImge(_ img: String, name: String?, id: String?, count: Int, avatarUrl: String?, isPrivate: Bool) {
+        imageView.image = UIImage.sceneImage(name: "room_bg_\(img)")
         nameLabel.text = name
         idLablel.text = "ID: \(id ?? "0")"
         var attachment = NSTextAttachment()
+        let image = UIImage.sceneImage(name: "room_person")?.withTintColor(UIColor(hexString: "#303553")!, renderingMode: .alwaysOriginal)
         if #available(iOS 13.0, *) {
-            attachment = NSTextAttachment(image: UIImage.sceneImage(name: "room_person")!)
+            attachment = NSTextAttachment(image: image!)
         } else {
-            attachment.image = UIImage.sceneImage(name: "show_room_person")
+            attachment.image = image
         }
         attachment.bounds = CGRect(x: 0, y: 0, width: 10, height: 10)
         let attriTipsImg = NSAttributedString(attachment: attachment)
         let attriTips = NSMutableAttributedString(attributedString: attriTipsImg)
-        attriTips.append(NSAttributedString(string: "  \(count)人"))
+        attriTips.append(NSAttributedString(string: " \(count)\("joy_user_count".joyLocalization())"))
         numberLabel.attributedText = attriTips
+        avatarImageView.sd_setImage(with: URL(string: avatarUrl ?? ""), placeholderImage: UIImage.sceneImage(name: "show_default_avatar"))
+        privateImageView.isHidden = !isPrivate
     }
     
     private func createSubviews(){
         // 背景图
-        imageView = UIImageView()
-        imageView.layer.cornerRadius = 10
-        imageView.layer.masksToBounds = true
-        imageView.contentMode = .scaleAspectFill
         contentView.addSubview(imageView)
-        imageView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+        imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        imageView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         
-        // 直播标识
-        let indicatorImgView = UIImageView()
-        indicatorImgView.image = UIImage.sceneImage(name: "show_live_indictor")
-        contentView.addSubview(indicatorImgView)
-        indicatorImgView.snp.makeConstraints { make in
-            make.top.equalTo(5)
-            make.right.equalTo(-5)
-        }
+        contentView.addSubview(avatarImageView)
+        avatarImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+        avatarImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16).isActive = true
+        avatarImageView.widthAnchor.constraint(equalToConstant: 64).isActive = true
+        avatarImageView.heightAnchor.constraint(equalToConstant: 64).isActive = true
         
-        // 蒙版
-        let coverImgView = UIImageView()
-        coverImgView.image = UIImage.sceneImage(name: "show_list_cover")
-        contentView.addSubview(coverImgView)
-        coverImgView.snp.makeConstraints { make in
-            make.left.right.bottom.equalToSuperview()
-        }
+        contentView.addSubview(privateImageView)
+        privateImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
+        privateImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 9).isActive = true
         
         // 名称
-        nameLabel = UILabel()
-        nameLabel.font = .joy_M_12
-        nameLabel.textColor = .joy_main_text
-        nameLabel.numberOfLines = 2
-        nameLabel.text = "Chat with Eve tonight and merry Christmas"
         contentView.addSubview(nameLabel)
-        nameLabel.snp.makeConstraints { make in
-            make.left.equalTo(10)
-            make.bottom.equalTo(coverImgView).offset(-30)
-            make.right.equalTo(-10)
-        }
+        nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12).isActive = true
+        nameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12).isActive = true
+        nameLabel.topAnchor.constraint(equalTo: avatarImageView.bottomAnchor, constant: 7).isActive = true
         
         // id
-        idLablel = UILabel()
-        idLablel.font = .joy_R_10
-        idLablel.textColor = .joy_main_text
         contentView.addSubview(idLablel)
-        idLablel.snp.makeConstraints { make in
-            make.left.equalTo(nameLabel)
-            make.bottom.equalTo(-10)
-        }
+        idLablel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 7).isActive = true
+        idLablel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor).isActive = true
+        idLablel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12).isActive = true
         
         // 人数
-        numberLabel = UILabel()
-        numberLabel.font = .joy_R_10
-        numberLabel.textColor = .joy_main_text
         contentView.addSubview(numberLabel)
-        numberLabel.snp.makeConstraints { make in
-            make.centerY.equalTo(idLablel)
-            make.left.equalTo(102)
-            make.width.equalTo(60)
-        }
+        numberLabel.centerYAnchor.constraint(equalTo: idLablel.centerYAnchor).isActive = true
+        numberLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor).isActive = true
     }
 }

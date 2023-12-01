@@ -13,6 +13,7 @@ class RoomViewController: UIViewController {
     var currentUserInfo: JoyUserInfo?
     var service: JoyServiceProtocol?
     
+    private var gameInfo: CloudGameInfo?
     private var taskId: String?
     private lazy var roomInfoView = RoomInfoView()
     private lazy var closeButton: UIButton = {
@@ -30,11 +31,15 @@ class RoomViewController: UIViewController {
         return button
     }()
     
-    private lazy var canvasView: UIView = UIView()
+    private lazy var broadcasterCanvasView: UIView = UIView()
+    private lazy var assistantCanvasView: UIView = UIView()
     
     override func viewDidLoad(){
         super.viewDidLoad()
         view.backgroundColor = .darkGray
+        
+        view.addSubview(assistantCanvasView)
+        assistantCanvasView.frame = view.bounds
         
         view.addSubview(roomInfoView)
         let top = UIDevice.current.aui_SafeDistanceTop
@@ -56,8 +61,8 @@ class RoomViewController: UIViewController {
             make.width.equalTo(24)
         }
         
-        view.addSubview(canvasView)
-        canvasView.snp.makeConstraints { make in
+        view.addSubview(broadcasterCanvasView)
+        broadcasterCanvasView.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.width.equalTo(120)
             make.height.equalTo(160)
@@ -85,7 +90,14 @@ class RoomViewController: UIViewController {
                 let dialog: JoyGameListDialog? = JoyGameListDialog.show()
                 dialog?.onSelectedGame = { game in
                     guard let self = self else {return}
-                    self.startGame(gameInfo: game)
+                    self.renewRTCTokens(roomId: roomInfo.roomId,
+                                        userId: roomInfo.assistantUid) { token in
+                        guard let token = token else {
+                            AUIToast.show(text: "assistant token is empty")
+                            return
+                        }
+                        self.startGame(gameInfo: game, assistantToken: token)
+                    }
                 }
                 #if DEBUG
                 var aaa = [CloudGameInfo]()
@@ -110,16 +122,37 @@ class RoomViewController: UIViewController {
 }
 
 extension RoomViewController {
-    private func startGame(gameInfo: CloudGameInfo) {
-        let config = CloudGameStartConfig()
-        
-        CloudBarrageAPI.shared.startGame(gameId: gameInfo.gameId ?? "",
-                                         config: config) {[weak self] err, taskId in
+    private func startGame(gameInfo: CloudGameInfo, assistantToken: String) {
+        guard let roomInfo = roomInfo, let currentUserInfo = currentUserInfo else {return}
+        let rtcConfig = CloudGameRtcConfig(broadcastUid: roomInfo.ownerId,
+                                           assistantUid: roomInfo.assistantUid,
+                                           assistantToken: assistantToken,
+                                           channelName: roomInfo.roomId)
+        var startConfig = CloudGameStartConfig(roomId: roomInfo.roomId ?? "",
+                                               gameId: gameInfo.gameId,
+                                               userId: "\(currentUserInfo.userId)",
+                                               userAvatar: currentUserInfo.avatar,
+                                               userName: currentUserInfo.userName,
+                                               rtcConfig: rtcConfig)
+        CloudBarrageAPI.shared.startGame(config: startConfig) {[weak self] err, taskId in
             if let err = err {
                 AUIToast.show(text: err.localizedDescription)
                 return
             }
+            self?.gameInfo = gameInfo
             self?.taskId = taskId
+            
+            CloudBarrageAPI.shared.getGameInfo(gameId: gameInfo.gameId!) { err, detail in
+    
+            }
+            JoyGameListDialog.hiddenAnimation()
+        }
+    }
+    
+    private func stopGame() {
+        guard let gameId = gameInfo?.gameId, let taskId = taskId else {return}
+        CloudBarrageAPI.shared.endGame(gameId: gameId,
+                                       taskId: taskId) { err in
         }
     }
 }
@@ -135,6 +168,7 @@ extension RoomViewController {
             self.navigationController?.popViewController(animated: true)
         })
         leaveRTCChannel()
+        stopGame()
     }
     
     @objc func onMoreAction() {
@@ -168,17 +202,22 @@ extension RoomViewController {
             }
         }
         
-        let canvas = AgoraRtcVideoCanvas()
-        canvas.uid = currentUserInfo.userId
-        canvas.view = canvasView
+        let broadcasterCanvas = AgoraRtcVideoCanvas()
+        broadcasterCanvas.uid = roomInfo.ownerId
+        broadcasterCanvas.view = broadcasterCanvasView
         if mediaOptions.publishCameraTrack {
             engine.enableVideo()
             engine.enableAudio()
             engine.startPreview()
-            engine.setupLocalVideo(canvas)
+            engine.setupLocalVideo(broadcasterCanvas)
         } else {
-            engine.setupRemoteVideo(canvas)
+            engine.setupRemoteVideo(broadcasterCanvas)
         }
+        
+        let assistantCanvas = AgoraRtcVideoCanvas()
+        broadcasterCanvas.uid = roomInfo.assistantUid
+        broadcasterCanvas.view = assistantCanvasView
+        engine.setupRemoteVideo(broadcasterCanvas)
     }
     
     private func leaveRTCChannel() {
