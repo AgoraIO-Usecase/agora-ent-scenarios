@@ -135,11 +135,14 @@ class FadeDotsIndicator @JvmOverloads constructor(
 
     fun refreshDots() {
         pager?.let {
+
             post {
                 // Check if we need to refresh the dots count
-                refreshDotsCount()
-                refreshDotsColors()
-                refreshOnPageChangedListener()
+                if (it.isNotEmpty){
+                    refreshDotsCount()
+                    refreshDotsColors()
+                    refreshOnPageChangedListener()
+                }
             }
         }
     }

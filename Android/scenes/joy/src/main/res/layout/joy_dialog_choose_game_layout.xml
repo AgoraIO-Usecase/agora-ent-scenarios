@@ -49,6 +49,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:spanCount="4"
         tools:itemCount="40"
+        android:background="@color/white"
+        android:paddingHorizontal="16dp"
         tools:listitem="@layout/joy_item_game_choose_layout" />
 
     <androidx.appcompat.widget.AppCompatButton

@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 
 object JoyApiManager {
 
-    private const val baseUrl = "https://api-test.agora.io/v1/apps/"
+    private const val baseUrl = BuildConfig.TOOLBOX_SERVER_HOST
 
     internal class AuthorizationInterceptor : Interceptor {
         var apiHost: String?
@@ -39,12 +39,12 @@ object JoyApiManager {
             }
             val builder = originalRequest.newBuilder()
                 .addHeader("Content-Type", "application/json")
-            if (RtcEngineInstance.generalToken().isNotEmpty()) {
-                builder.addHeader(
-                    "Authorization",
-                    String.format("agora token=%s", RtcEngineInstance.generalToken())
-                )
-            }
+//            if (RtcEngineInstance.generalToken().isNotEmpty()) {
+//                builder.addHeader(
+//                    "Authorization",
+//                    String.format("agora token=%s", RtcEngineInstance.generalToken())
+//                )
+//            }
             val authRequest = builder.method(originalRequest.method, originalRequest.body)
                 .build()
             return chain.proceed(authRequest)
@@ -58,8 +58,6 @@ object JoyApiManager {
     const val DBError = 1004
     const val DBNotFound = 1005
     const val GameScheduled = 1101
-
-    private const val BASE_URL = BuildConfig.TOOLBOX_SERVER_HOST
 
     fun base64Encoding(): String {
         // 客户 ID
@@ -96,7 +94,7 @@ object JoyApiManager {
         val factory = DynamicModelRuntimeTypeAdapterFactory.of(DynamicModel::class.java)
 
         val builder = Retrofit.Builder()
-            .baseUrl(baseUrl)
+            .baseUrl("$baseUrl/")
             .addConverterFactory(
                 GsonConverterFactory.create(
                     GsonBuilder()

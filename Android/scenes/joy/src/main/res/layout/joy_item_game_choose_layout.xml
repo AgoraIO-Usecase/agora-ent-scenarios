@@ -2,33 +2,48 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_width="90dp"
+    android:layout_height="120dp"
+    android:orientation="vertical"
+    android:paddingHorizontal="4dp"
+    android:paddingVertical="6dp">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cvGame"
-        android:layout_width="78dp"
+        android:layout_width="82dp"
         android:layout_height="108dp"
+        android:elevation="0dp"
+        android:padding="2dp"
         app:cardCornerRadius="16dp"
-        app:strokeColor="#2F70FF"
-        android:background="#2F70FF"
+        app:strokeColor="@color/joy_color_2F7"
         app:strokeWidth="2dp">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivGame"
-            android:layout_width="78dp"
-            android:layout_height="78dp"
-            tools:src="@mipmap/joy_img_room_item_bg_0" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:textSize="12sp"
-            tools:text="胖可争霸"
-            android:layout_marginBottom="8dp"
-            android:textColor="@color/white"/>
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivGame"
+                android:layout_width="78dp"
+                android:layout_height="78dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@mipmap/joy_img_room_item_bg_0" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvGameName"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:gravity="center_horizontal|top"
+                android:paddingTop="4dp"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ivGame"
+                tools:text="胖可争霸" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </com.google.android.material.card.MaterialCardView>
 
 </LinearLayout>

@@ -26,7 +26,9 @@ import io.agora.scene.joy.R
 import io.agora.scene.joy.RtcEngineInstance
 import io.agora.scene.joy.databinding.JoyItemGameBannerLayoutBinding
 import io.agora.scene.joy.databinding.JoyLivePrepareActivityBinding
+import io.agora.scene.joy.network.JoyGameEntity
 import io.agora.scene.joy.service.JoyGameInfo
+import io.agora.scene.joy.service.JoyRoomInfo
 import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
@@ -61,18 +63,15 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBindin
         TextureView(this)
     }
 
-    private val mJoyGameInfoList = mutableListOf<JoyGameInfo>()
-
     private val mMainHandler by lazy {
         Handler(Looper.getMainLooper())
     }
-
 
     private var mCurrentPos = 1
     private var mTimer: Timer? = null
 
     private val mGameInfoAdapter by lazy {
-        GameInfoAdapter(mJoyGameInfoList, itemClick = {
+        GameInfoAdapter(emptyList(), itemClick = {
             ToastUtils.showToast("click $it")
         })
     }
@@ -84,11 +83,6 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBindin
     override fun init() {
         super.init()
         mRoomNameArray = resources.getStringArray(R.array.joy_roomName_array)
-        mJoyGameInfoList.add(JoyGameInfo(R.mipmap.joy_img_room_item_bg_0))
-        mJoyGameInfoList.add(JoyGameInfo(R.mipmap.joy_img_room_item_bg_1))
-        mJoyGameInfoList.add(JoyGameInfo(R.mipmap.joy_img_room_item_bg_2))
-        mJoyGameInfoList.add(JoyGameInfo(R.mipmap.joy_img_room_item_bg_3))
-        mJoyGameInfoList.add(JoyGameInfo(R.mipmap.joy_img_room_item_bg_4))
     }
 
     override fun initView(savedInstanceState: Bundle?) {
@@ -125,7 +119,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBindin
         }
         mToggleVideoRun = Runnable {
             binding.flVideoContainer.post {
-                mRtcEngine.setupLocalVideo(VideoCanvas(mTextureView,Constants.RENDER_MODE_HIDDEN))
+                mRtcEngine.setupLocalVideo(VideoCanvas(mTextureView, Constants.RENDER_MODE_HIDDEN))
                 binding.flVideoContainer.addView(mTextureView)
             }
             initRtcEngine()
@@ -151,9 +145,9 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBindin
                 //只有在空闲状态，才让自动滚动
                 if (state == ViewPager2.SCROLL_STATE_IDLE) {
                     if (mCurrentPos == 0) {
-                        binding.vpGame.setCurrentItem(mJoyGameInfoList.size - 2, false)
+                        binding.vpGame.setCurrentItem(mGameInfoAdapter.itemCount - 2, false)
                     }
-                    if (mCurrentPos == mJoyGameInfoList.size - 1) {
+                    if (mCurrentPos == mGameInfoAdapter.itemCount - 1) {
                         binding.vpGame.setCurrentItem(1, false)
                     }
                 }
@@ -173,8 +167,8 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBindin
     override fun requestData() {
         super.requestData()
         mJoyViewModel.getGames()
-        mJoyViewModel.mGameEntityList.observe(this){
-
+        mJoyViewModel.mGameEntityList.observe(this) {
+            mGameInfoAdapter.setDataList(it)
         }
     }
 
@@ -204,8 +198,8 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBindin
         mRtcEngine.setCameraCapturerConfiguration(
             CameraCapturerConfiguration(
                 CameraCapturerConfiguration.CaptureFormat(
-                   540,
-                   960,
+                    540,
+                    960,
                     15
                 )
             )
@@ -255,12 +249,17 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBindin
 
 
     class GameInfoAdapter constructor(
-        private val gameInfoList: List<JoyGameInfo>,
+        private var gameInfoList: List<JoyGameEntity>,
         private val itemClick: (position: Int) -> Unit
     ) :
         RecyclerView.Adapter<GameInfoAdapter.GameViewHolder>() {
 
         inner class GameViewHolder(val binding: JoyItemGameBannerLayoutBinding) : RecyclerView.ViewHolder(binding.root)
+
+        fun setDataList(list: List<JoyGameEntity>) {
+            gameInfoList = list
+            notifyDataSetChanged()
+        }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GameViewHolder {
             return GameViewHolder(
@@ -274,7 +273,8 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBindin
 
         override fun onBindViewHolder(holder: GameViewHolder, position: Int) {
             val data = gameInfoList[position]
-            holder.binding.ivGuide.setImageResource(data.drawableId)
+            // TODO:
+            holder.binding.ivGuide.setImageResource(R.mipmap.joy_img_room_item_bg_0)
             holder.binding.root.setOnClickListener {
                 itemClick.invoke(position)
             }

@@ -181,7 +181,7 @@
 
     <include
         android:id="@+id/chooseGameLayout"
-        layout="@layout/joy_include_game_info_layout"
+        layout="@layout/joy_dialog_choose_game_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"

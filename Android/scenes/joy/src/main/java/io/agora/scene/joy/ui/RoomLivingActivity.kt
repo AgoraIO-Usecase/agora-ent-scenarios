@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
@@ -28,6 +29,7 @@ import io.agora.scene.joy.RtcEngineInstance
 import io.agora.scene.joy.databinding.JoyLiveDetailActivityBinding
 import io.agora.scene.joy.service.JoyRoomInfo
 import io.agora.scene.joy.service.JoyServiceProtocol
+import io.agora.scene.joy.ui.widget.JoyChooseGameDialog
 import io.agora.scene.joy.ui.widget.JoyGameRulesDialog
 import io.agora.scene.joy.ui.widget.JoyGiftDialog
 import io.agora.scene.joy.ui.widget.KeyboardStatusWatcher
@@ -52,6 +54,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyLiveDetailActivityBinding>
             intent.putExtra(EXTRA_ROOM_DETAIL_INFO, roomInfo)
             context.startActivity(intent)
         }
+    }
+
+    private val mJoyViewModel: JoyViewModel by lazy {
+        ViewModelProvider(this)[JoyViewModel::class.java]
     }
 
     val mRoomInfo by lazy { (intent?.getSerializableExtra(EXTRA_ROOM_DETAIL_INFO) as? JoyRoomInfo)!! }
@@ -101,6 +107,9 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyLiveDetailActivityBinding>
             .error(R.mipmap.userimage)
             .apply(RequestOptions.circleCropTransform())
             .into(binding.ivOwnerAvatar)
+        if (mIsRoomOwner){
+            binding.chooseGameLayout.root.isVisible = true
+        }
         binding.ivClose.setOnClickListener {
             showEndRoomDialog()
         }
@@ -151,6 +160,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyLiveDetailActivityBinding>
             binding.vKeyboardBg.layoutParams = lp
             null
         }
+        JoyChooseGameDialog(mJoyViewModel).show(supportFragmentManager, "chooseGameDialog")
+
     }
 
     fun setViewLayoutParams(view: View, width: Int, height: Int) {

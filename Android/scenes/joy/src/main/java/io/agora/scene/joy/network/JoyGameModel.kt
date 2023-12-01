@@ -19,7 +19,7 @@ data class JoyApiResult<T> constructor(
     @SerializedName("code")
     var code: Int = 0,
     @Expose
-    @SerializedName("result")
+    @SerializedName("data")
     var data: T? = null,
     @SerializedName("trace")
     var trace: String? = null,
@@ -46,6 +46,18 @@ data class JoyRtcConfig constructor(
 ) : JoyJsonModel
 
 data class JoyGameEntity constructor(
+    @Expose
+    @SerializedName("appId")
+    var appId: String? = null,
+    @Expose
+    @SerializedName("basicAuth")
+    var basicAuth: String? = null, //basicAuth 认证凭据，白名单AppID 无须上传
+    @Expose
+    @SerializedName("src")
+    var src: String? = "Android", // 来源/请求方
+    @Expose
+    @SerializedName("traceId")
+    var traceId: String? = null, // 请求ID
     @Expose
     @SerializedName("id")
     var id: Long? = null,
@@ -78,10 +90,19 @@ data class JoyGameEntity constructor(
     var gameId: String? = null,
     @Expose
     @SerializedName("introduce")
-    var brief: String? = null,
+    var introduce: String? = null,
     @Expose
     @SerializedName("name")
     var name: String? = null,
+    @Expose
+    @SerializedName("thumbnail")
+    var thumbnail: String? = null,
+    @Expose
+    @SerializedName("vendor")
+    var vendor: String? = null,
+    @Expose
+    @SerializedName("vendor_game_id")
+    var vendorGameId: String? = null,
     @Expose
     @SerializedName("channel_name")
     var channelName: String? = null,
