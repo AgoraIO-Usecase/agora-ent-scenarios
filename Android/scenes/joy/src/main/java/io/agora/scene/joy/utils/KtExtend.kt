@@ -1,4 +1,4 @@
-package io.agora.scene.joy
+package io.agora.scene.joy.utils
 
 import android.content.res.Resources
 import android.util.TypedValue

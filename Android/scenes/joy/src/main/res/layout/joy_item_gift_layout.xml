@@ -2,25 +2,35 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="105dp"
-    android:layout_height="120dp"
-    android:background="@drawable/joy_bg_gift_selected"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="5dp"
+    android:paddingVertical="4dp">
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivGift"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        tools:src="@mipmap/joy_img_room_item_bg_0" />
+    <LinearLayout
+        android:id="@+id/itemLayout"
+        android:layout_width="105dp"
+        android:layout_height="120dp"
+        android:background="@drawable/joy_bg_gift_selected"
+        android:gravity="center"
+        android:orientation="vertical">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvGiftName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginTop="4dp"
-        android:textColor="@color/black"
-        android:textSize="12sp"
-        tools:text="火箭" />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivGift"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            tools:src="@mipmap/joy_img_room_item_bg_0" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvGiftName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            tools:text="火箭" />
+    </LinearLayout>
+
 </LinearLayout>

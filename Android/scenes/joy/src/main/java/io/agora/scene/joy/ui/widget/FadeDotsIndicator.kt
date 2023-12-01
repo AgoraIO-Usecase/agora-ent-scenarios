@@ -14,7 +14,7 @@ import androidx.core.view.get
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import io.agora.scene.joy.R
-import io.agora.scene.joy.dp
+import io.agora.scene.joy.utils.dp
 
 class FadeDotsIndicator @JvmOverloads constructor(
     context: Context,

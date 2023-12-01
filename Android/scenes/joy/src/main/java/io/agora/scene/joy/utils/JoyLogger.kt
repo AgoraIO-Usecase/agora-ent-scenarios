@@ -1,4 +1,4 @@
-package io.agora.scene.joy
+package io.agora.scene.joy.utils
 
 import io.agora.scene.base.EntLogger
 

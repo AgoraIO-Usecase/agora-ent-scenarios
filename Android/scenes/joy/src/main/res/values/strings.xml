@@ -3,6 +3,7 @@
     <string name="joy_gameplay">弹幕玩法</string>
     <string name="joy_play_empty_room">欢迎来到声网弹幕玩法方案\n目前暂无房间</string>
     <string name="joy_live_prepare_tip">本产品仅用于功能体验，单次直播时长不超过10mins</string>
+    <string name="joy_living">直播中</string>
     <string name="joy_room_id">ID: %s</string>
     <string name="joy_user_count">%d人</string>
     <string name="joy_broadcaster_bad_exit">检测到上次直播异常退出，请重新创建直播间开播</string>

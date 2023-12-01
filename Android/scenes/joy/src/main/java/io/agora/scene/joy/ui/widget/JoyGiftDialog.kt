@@ -1,12 +1,10 @@
 package io.agora.scene.joy.ui.widget
 
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
@@ -14,7 +12,6 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.joy.R
 import io.agora.scene.joy.databinding.JoyDialogGiftLayoutBinding
 import io.agora.scene.joy.databinding.JoyItemGiftLayoutBinding
-import io.agora.scene.joy.dp
 
 class JoyGiftDialog : BaseBottomSheetDialogFragment<JoyDialogGiftLayoutBinding>() {
 
@@ -28,16 +25,18 @@ class JoyGiftDialog : BaseBottomSheetDialogFragment<JoyDialogGiftLayoutBinding>(
 
     private val mGiftList: List<JoyGift> by lazy {
         mutableListOf(
-            JoyGift(R.drawable.joy_icon_gift1,"爱心"),
-            JoyGift(R.drawable.joy_icon_gift1,"鲜花"),
-            JoyGift(R.drawable.joy_icon_gift1,"小兔子"),
-            JoyGift(R.drawable.joy_icon_gift1,"金拱门"),
-            JoyGift(R.drawable.joy_icon_gift1,"钻戒"),
-            JoyGift(R.drawable.joy_icon_gift1,"火箭"),
+            JoyGift(R.drawable.joy_icon_gift1, "爱心"),
+            JoyGift(R.drawable.joy_icon_gift2, "鲜花"),
+            JoyGift(R.drawable.joy_icon_gift3, "小兔子"),
+            JoyGift(R.drawable.joy_icon_gift4, "金拱门"),
+            JoyGift(R.drawable.joy_icon_gift5, "钻戒"),
+            JoyGift(R.drawable.joy_icon_gift6, "火箭"),
         )
     }
 
-    private var mGiftAdapter: JoyGiftAdapter?=null
+    private var mGiftAdapter: JoyGiftAdapter? = null
+
+    private var mGiftCount = 1
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -45,16 +44,32 @@ class JoyGiftDialog : BaseBottomSheetDialogFragment<JoyDialogGiftLayoutBinding>(
             dismiss()
             ToastUtils.showToast("send")
         }
-        mGiftAdapter = JoyGiftAdapter(mGiftList,0, onDidSelectIndex = {
+        mGiftAdapter = JoyGiftAdapter(mGiftList, 0, onDidSelectIndex = {
             ToastUtils.showToast("select $it")
         })
         mBinding.rvGift.adapter = mGiftAdapter
+        setupGiftCountView()
+        mBinding.ivSubCount.setOnClickListener {
+            if (mGiftCount > 1) {
+                mGiftCount--
+            }
+            setupGiftCountView()
+        }
+        mBinding.ivPlusCount.setOnClickListener {
+            mGiftCount++
+            setupGiftCountView()
+        }
+    }
 
-        //设置item 间距
-        val itemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
-        val drawable = GradientDrawable()
-        drawable.setSize(0, 8.dp.toInt())
-        mBinding.rvGift.addItemDecoration(itemDecoration)
+    private fun setupGiftCountView() {
+        mBinding.tvGiftCount.text = "$mGiftCount"
+        if (mGiftCount > 1) {
+            mBinding.ivSubCount.isEnabled = true
+            mBinding.ivSubCount.setImageResource(R.drawable.joy_icon_sub)
+        } else {
+            mBinding.ivSubCount.isEnabled = false
+            mBinding.ivSubCount.setImageResource(R.drawable.joy_icon_sub_grey)
+        }
     }
 }
 
@@ -81,9 +96,9 @@ private class JoyGiftAdapter constructor(
         holder.binding.ivGift.setImageResource(data.drawableRes)
         holder.binding.tvGiftName.text = data.giftName
         if (selectedIndex == position) {
-            holder.binding.root.setBackgroundResource(R.drawable.joy_bg_gift_selected)
+            holder.binding.itemLayout.setBackgroundResource(R.drawable.joy_bg_gift_selected)
         } else {
-            holder.binding.root.setBackgroundColor(
+            holder.binding.itemLayout.setBackgroundColor(
                 ResourcesCompat.getColor(AgoraApplication.the().resources, android.R.color.transparent, null)
             )
         }
@@ -95,7 +110,7 @@ private class JoyGiftAdapter constructor(
     }
 }
 
-data class JoyGift(
+data class JoyGift constructor(
     val drawableRes: Int,
     val giftName: String
 )

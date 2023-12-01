@@ -140,57 +140,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/flVideoContainer" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvSendMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/joy_bg_send_message"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="11dp"
-        android:text="@string/joy_send_message"
-        android:textColor="@color/white"
-        android:textSize="13sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:visibility="gone" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivLike"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
-        android:src="@drawable/joy_icon_like"
-        app:layout_constraintBottom_toBottomOf="@id/tvSendMessage"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/tvSendMessage"
-        tools:visibility="gone" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivGift"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
-        android:src="@drawable/joy_icon_gift"
-        app:layout_constraintBottom_toBottomOf="@id/tvSendMessage"
-        app:layout_constraintEnd_toStartOf="@id/ivLike"
-        app:layout_constraintTop_toTopOf="@id/tvSendMessage"
-        tools:visibility="gone" />
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layoutEtMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="12dp"
-        android:layout_marginBottom="12dp"
         android:background="@android:color/transparent"
         android:paddingVertical="8dp"
         android:visibility="gone"
         app:boxBackgroundMode="none"
         app:boxStrokeColor="@android:color/transparent"
         app:hintEnabled="false"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/vKeyboardBg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:visibility="visible">
@@ -204,7 +165,11 @@
             android:hint="@string/joy_send_message"
             android:imeOptions="actionSend"
             android:maxLines="1"
-            android:padding="12dp"
+            android:inputType="text"
+            android:ellipsize="end"
+            android:textCursorDrawable="@drawable/joy_bg_edit_cursor"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="0dp"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textColorHint="@color/white_80_percent"
@@ -221,4 +186,49 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <View
+        android:id="@+id/vKeyboardBg"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@android:color/transparent"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvInput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/joy_bg_send_message"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="11dp"
+        android:text="@string/joy_send_message"
+        android:textColor="@color/white"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivGift"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/joy_icon_gift"
+        app:layout_constraintBottom_toBottomOf="@id/tvInput"
+        app:layout_constraintEnd_toStartOf="@id/likeView" />
+
+    <io.agora.scene.joy.ui.widget.like.LikeLayout
+        android:id="@+id/likeView"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/tvInput"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupBottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="tvInput,ivGift,likeView"
+        tools:visibility="gone" />
 </androidx.constraintlayout.widget.ConstraintLayout>
