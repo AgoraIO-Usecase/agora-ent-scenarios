@@ -258,9 +258,9 @@ extension BeautyModel {
         dataArray.append(model)
         
         model = BeautyModel()
-        model.path = "heimaoyanjing"
-        model.name = "show_beauty_item_sticker_heimaoyanjing".show_localized
-        model.icon = "meiyan_lj_beihaidao"
+        model.path = "stickers_zhaocaimao"
+        model.name = "show_beauty_item_sticker_zhaocaimao".show_localized
+        model.icon = "meiyan_sticker_zhaocaimao"
         dataArray.append(model)
         
         return dataArray

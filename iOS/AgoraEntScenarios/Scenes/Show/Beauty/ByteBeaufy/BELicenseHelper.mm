@@ -12,6 +12,7 @@
 #import <vector>
 #import <iostream>
 #import "Core.h"
+#import "BundleUtil.h"
 
 #define CHECK_LICENSE_RET(MSG, ret) \
 if (ret != 0 && ret != -11 && ret != 1) {\
@@ -36,7 +37,7 @@ static NSString *OFFLIN_BUNDLE = @"bundle";
 static NSString *LICENSE_URL = @"https://cv.iccvlog.com/cv_tob/v1/api/sdk/tob_license/getlicense";
 static NSString *KEY = @"jiaoyang_test";
 static NSString *SECRET = @"04273924-9a77-11eb-94da-0c42a1b32a30";
-static LICENSE_MODE_ENUM LICENSE_MODE = ONLINE_LICENSE;
+static LICENSE_MODE_ENUM LICENSE_MODE = OFFLINE_LICENSE;
 BOOL overSeasVersion = NO;
 
 @interface BELicenseHelper() {
@@ -117,7 +118,8 @@ static BELicenseHelper* _instance = nil;
         {
             _licenseProvider->setParam("mode", "OFFLINE");
             NSString *licenseName = [NSString stringWithFormat:@"/%s", LICENSE_NAME];
-            NSString* licensePath = [[NSBundle mainBundle] pathForResource:OFFLIN_LICENSE_PATH ofType:OFFLIN_BUNDLE];
+            NSBundle *bundle = [BundleUtil bundleWithBundleName:@"ByteEffectLib" podName:@"bytedEffect"];
+            NSString* licensePath = [bundle pathForResource:OFFLIN_LICENSE_PATH ofType:OFFLIN_BUNDLE];
             licensePath = [licensePath stringByAppendingString:licenseName];
             _licenseProvider->setParam("licensePath", [licensePath UTF8String]);
         }
