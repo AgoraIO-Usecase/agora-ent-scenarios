@@ -31,6 +31,9 @@ class SRAttributeView: UIView {
         contentView.addSubview(preLabel)
         
         icon = UIImageView(frame: .zero)
+        icon.layer.cornerRadius = 12
+        icon.layer.masksToBounds = true
+        icon.contentMode = .scaleAspectFill
         contentView.addSubview(icon)
         
         endLabel = UILabel(frame: .zero)

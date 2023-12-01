@@ -169,15 +169,12 @@
 		DD619A9A29E3E247008F63E4 /* SAInviteUsersController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A1029E3E246008F63E4 /* SAInviteUsersController.swift */; };
 		DD619A9B29E3E247008F63E4 /* SAAudioSettingDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A1129E3E246008F63E4 /* SAAudioSettingDetailViewController.swift */; };
 		DD619A9C29E3E247008F63E4 /* SAGiftersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A1229E3E246008F63E4 /* SAGiftersViewController.swift */; };
-		DD619A9D29E3E247008F63E4 /* SAAudiencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A1329E3E246008F63E4 /* SAAudiencesViewController.swift */; };
 		DD619A9E29E3E247008F63E4 /* SARoomViewController+ChatBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A1429E3E246008F63E4 /* SARoomViewController+ChatBar.swift */; };
 		DD619A9F29E3E247008F63E4 /* SARoomViewController+IM.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A1529E3E246008F63E4 /* SARoomViewController+IM.swift */; };
-		DD619AA029E3E247008F63E4 /* SAAllRoomsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A1729E3E246008F63E4 /* SAAllRoomsViewController.swift */; };
 		DD619AA129E3E247008F63E4 /* SANormalRoomsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A1829E3E246008F63E4 /* SANormalRoomsViewController.swift */; };
 		DD619AA229E3E247008F63E4 /* SASoundEffectsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A1929E3E246008F63E4 /* SASoundEffectsViewController.swift */; };
 		DD619AA329E3E247008F63E4 /* SACreateRoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A1A29E3E246008F63E4 /* SACreateRoomViewController.swift */; };
 		DD619AA429E3E247008F63E4 /* SARoomsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A1B29E3E247008F63E4 /* SARoomsViewController.swift */; };
-		DD619AA529E3E247008F63E4 /* SASpatialSoundViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A1C29E3E247008F63E4 /* SASpatialSoundViewController.swift */; };
 		DD619AA629E3E247008F63E4 /* SARoomListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A1F29E3E247008F63E4 /* SARoomListCell.swift */; };
 		DD619AA729E3E247008F63E4 /* SACreateRoomCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A2029E3E247008F63E4 /* SACreateRoomCardCell.swift */; };
 		DD619AA829E3E247008F63E4 /* SAHorizontalCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A2129E3E247008F63E4 /* SAHorizontalCardCell.swift */; };
@@ -938,15 +935,12 @@
 		DD619A1029E3E246008F63E4 /* SAInviteUsersController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAInviteUsersController.swift; sourceTree = "<group>"; };
 		DD619A1129E3E246008F63E4 /* SAAudioSettingDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAAudioSettingDetailViewController.swift; sourceTree = "<group>"; };
 		DD619A1229E3E246008F63E4 /* SAGiftersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAGiftersViewController.swift; sourceTree = "<group>"; };
-		DD619A1329E3E246008F63E4 /* SAAudiencesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAAudiencesViewController.swift; sourceTree = "<group>"; };
 		DD619A1429E3E246008F63E4 /* SARoomViewController+ChatBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SARoomViewController+ChatBar.swift"; sourceTree = "<group>"; };
 		DD619A1529E3E246008F63E4 /* SARoomViewController+IM.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SARoomViewController+IM.swift"; sourceTree = "<group>"; };
-		DD619A1729E3E246008F63E4 /* SAAllRoomsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAAllRoomsViewController.swift; sourceTree = "<group>"; };
 		DD619A1829E3E246008F63E4 /* SANormalRoomsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SANormalRoomsViewController.swift; sourceTree = "<group>"; };
 		DD619A1929E3E246008F63E4 /* SASoundEffectsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SASoundEffectsViewController.swift; sourceTree = "<group>"; };
 		DD619A1A29E3E246008F63E4 /* SACreateRoomViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SACreateRoomViewController.swift; sourceTree = "<group>"; };
 		DD619A1B29E3E247008F63E4 /* SARoomsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SARoomsViewController.swift; sourceTree = "<group>"; };
-		DD619A1C29E3E247008F63E4 /* SASpatialSoundViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SASpatialSoundViewController.swift; sourceTree = "<group>"; };
 		DD619A1F29E3E247008F63E4 /* SARoomListCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SARoomListCell.swift; sourceTree = "<group>"; };
 		DD619A2029E3E247008F63E4 /* SACreateRoomCardCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SACreateRoomCardCell.swift; sourceTree = "<group>"; };
 		DD619A2129E3E247008F63E4 /* SAHorizontalCardCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAHorizontalCardCell.swift; sourceTree = "<group>"; };
@@ -2370,7 +2364,6 @@
 				DD619A1029E3E246008F63E4 /* SAInviteUsersController.swift */,
 				DD619A1129E3E246008F63E4 /* SAAudioSettingDetailViewController.swift */,
 				DD619A1229E3E246008F63E4 /* SAGiftersViewController.swift */,
-				DD619A1329E3E246008F63E4 /* SAAudiencesViewController.swift */,
 				DD619A1429E3E246008F63E4 /* SARoomViewController+ChatBar.swift */,
 				DD619A1529E3E246008F63E4 /* SARoomViewController+IM.swift */,
 			);
@@ -2380,12 +2373,10 @@
 		DD619A1629E3E246008F63E4 /* RoomManager */ = {
 			isa = PBXGroup;
 			children = (
-				DD619A1729E3E246008F63E4 /* SAAllRoomsViewController.swift */,
 				DD619A1829E3E246008F63E4 /* SANormalRoomsViewController.swift */,
 				DD619A1929E3E246008F63E4 /* SASoundEffectsViewController.swift */,
 				DD619A1A29E3E246008F63E4 /* SACreateRoomViewController.swift */,
 				DD619A1B29E3E247008F63E4 /* SARoomsViewController.swift */,
-				DD619A1C29E3E247008F63E4 /* SASpatialSoundViewController.swift */,
 			);
 			path = RoomManager;
 			sourceTree = "<group>";
@@ -4576,7 +4567,6 @@
 				E301BE582AF4E06F0089A79C /* VLSRHomeOnLineListView.m in Sources */,
 				DD3610AE29B70CDC00CE7984 /* ShowRoomMembersCountView.swift in Sources */,
 				DD9EBFD72AD5512300B4551F /* VoiceRoomChatView.swift in Sources */,
-				DD619AA529E3E247008F63E4 /* SASpatialSoundViewController.swift in Sources */,
 				E301BD632AF4CAFF0089A79C /* VLSongListCell.m in Sources */,
 				E34B45EF2AE917760082D334 /* SRCreateViewController.swift in Sources */,
 				E34B45EB2AE8FDB60082D334 /* VRCreateViewController.swift in Sources */,
@@ -4594,7 +4584,6 @@
 				E301BD712AF4CAFF0089A79C /* VLAudioEffectPicker.m in Sources */,
 				DD619AB029E3E247008F63E4 /* SAGiftView.swift in Sources */,
 				E301C01C2AF8E8E90089A79C /* VLSBGSwitcherView.m in Sources */,
-				DD619AA029E3E247008F63E4 /* SAAllRoomsViewController.swift in Sources */,
 				DD619AC629E3E247008F63E4 /* SABaseRtcUserView.swift in Sources */,
 				DD9EBFF32AD5512400B4551F /* VMEQSettingView.swift in Sources */,
 				DD36108C29B70CDC00CE7984 /* ShowMusicEffectVC.swift in Sources */,
@@ -4883,7 +4872,6 @@
 				DD619AB229E3E247008F63E4 /* SASliderTableViewCell.swift in Sources */,
 				E301C03E2AF8E8E90089A79C /* VLSBGOnLineListVC.m in Sources */,
 				DD619AE029E3E247008F63E4 /* SARoomMenuBar.swift in Sources */,
-				DD619A9D29E3E247008F63E4 /* SAAudiencesViewController.swift in Sources */,
 				DD619AE729E3E247008F63E4 /* SACreateRoomView.swift in Sources */,
 				E301C0352AF8E8E90089A79C /* VLSBGAudioEffectPicker.m in Sources */,
 				DD619A9729E3E247008F63E4 /* SAAudioSettingViewController.swift in Sources */,
@@ -5413,7 +5401,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = B8JXV8ZYC7;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5642,7 +5630,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = B8JXV8ZYC7;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;

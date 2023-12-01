@@ -376,7 +376,6 @@ class VLSRStatusView: UIView {
             if numLabel.isHidden == false {
                 numLabel.frame = CGRect(x: noticeBtn.isHidden ? 12 : 70 , y: 10, width: 50, height: 20)
             }
-            nextAttrView.frame = CGRect(x: numLabel.frame.maxX + 10, y: 10, width: 160, height: 20)
         }
     }
     
@@ -615,6 +614,11 @@ class VLSRStatusView: UIView {
         
         addSubview(numLabel)
         addSubview(nextAttrView)
+        nextAttrView.snp.makeConstraints { make in
+            make.left.equalTo(numLabel.snp.right).offset(10)
+            make.top.equalTo(10)
+            make.height.equalTo(20)
+        }
         
         addSubview(noticeBtn)
         

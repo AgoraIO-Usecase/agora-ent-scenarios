@@ -100,7 +100,7 @@
         [self.loadingView stopAnimating];
         [self.loadingView setHidden:YES];
         [self.contentView setHidden:NO];
-        [self.retryButton setHidden:YES];
+        [self.retryButton setHidden:false];
         [self.loadingTipsLabel setHidden:YES];
     }
     [self setNeedsLayout];

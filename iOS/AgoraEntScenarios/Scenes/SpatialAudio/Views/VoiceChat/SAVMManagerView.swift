@@ -81,7 +81,7 @@ class SAVMManagerView: UIView {
                 iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: nil)
                 nameLabel.text = username
                  micView.isHidden = true
-                inviteBtn.setTitle("spatial_voice_kick_micick".spatial_localized(), for: .normal)
+                inviteBtn.setTitle("spatial_voice_kick_mic".spatial_localized(), for: .normal)
             } else if m_type == 2 {
                 iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: nil)
                 iconView.isHidden = iconStr.count == 0

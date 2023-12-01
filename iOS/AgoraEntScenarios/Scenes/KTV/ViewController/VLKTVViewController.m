@@ -1649,7 +1649,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)reloadMusic{
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = YES;
+    KTVSingRole role = [self getUserSingRole];
+    songConfig.autoPlay = (role == KTVSingRoleAudience || role == KTVSingRoleCoSinger) ? NO : YES ;
     songConfig.mode = KTVLoadMusicModeLoadLrcOnly;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
@@ -2540,6 +2541,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [self.MVView.incentiveView reset];
         }
         self.MVView.loadingType = VLKTVMVViewStateIdle;
+        [self.MVView setBotViewHidden:false];
         if(lyricUrl.length > 0){
             KTVLogInfo(@"onMusicLoadSuccessWithSongCode: %ld", self.singRole);
         }

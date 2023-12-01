@@ -17,7 +17,7 @@ public class SAApplyUsersViewController: UITableViewController {
     
     var agreeApply:((SARoomMic) -> Void)?
     
-    lazy var empty: SAEmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "spatial_voice_no_one_raised_hands_yet".spatial_localized(), image: nil).backgroundColor(.white)
+    lazy var emptyView: SAEmptyView = .init(frame: .zero, title: "spatial_voice_no_one_raised_hands_yet".spatial_localized(), image: nil).backgroundColor(.white)
 
     public convenience init(roomId: String) {
         self.init()
@@ -26,10 +26,15 @@ public class SAApplyUsersViewController: UITableViewController {
 
     override public func viewDidLoad() {
         super.viewDidLoad()
-        view.insertSubview(empty, belowSubview: tableView)
+        
         tableView.tableFooterView(UIView()).registerCell(SAApplyCell.self, forCellReuseIdentifier: "VoiceRoomApplyCell").rowHeight(73).backgroundColor(.white).separatorInset(edge: UIEdgeInsets(top: 72, left: 15, bottom: 0, right: 15)).separatorColor(UIColor(0xF2F2F2)).showsVerticalScrollIndicator(false).backgroundColor(.clear)
         tableView.refreshControl = UIRefreshControl()
         tableView.refreshControl?.addTarget(self, action: #selector(refresh), for: .valueChanged)
+        
+        view.addSubview(emptyView)
+        emptyView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
     }
 
     override public func viewWillAppear(_ animated: Bool) {
@@ -77,7 +82,7 @@ extension SAApplyUsersViewController {
             guard let datas = applicants else {
                 return
             }
-            self.empty.isHidden = datas.count > 0
+            self.emptyView.isHidden = datas.count > 0
         }
     }
     

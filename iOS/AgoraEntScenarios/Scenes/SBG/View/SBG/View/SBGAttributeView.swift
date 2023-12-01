@@ -31,6 +31,9 @@ class SBGAttributeView: UIView {
         contentView.addSubview(preLabel)
         
         icon = UIImageView(frame: .zero)
+        icon.layer.cornerRadius = 12
+        icon.clipsToBounds = true
+        icon.contentMode = .scaleAspectFill
         contentView.addSubview(icon)
         
         endLabel = UILabel(frame: .zero)
@@ -51,7 +54,7 @@ class SBGAttributeView: UIView {
         let totalWidth = endWidth + preWidth + 25
         contentView.frame = CGRect(x: self.bounds.width / 2.0 - totalWidth / 2.0, y: self.bounds.height / 2.0 - 12.5, width: totalWidth, height: 25)
         preLabel.frame = CGRect(x: 0, y: 0, width: preWidth, height: 25)
-        icon.frame = CGRect(x: preWidth, y: 0, width: 25, height: 25)
+        icon.frame = CGRect(x: preWidth, y: 0, width: 24, height: 24)
         endLabel.frame = CGRect(x: preWidth + 25, y: 0, width: endWidth, height: 25)
     }
     

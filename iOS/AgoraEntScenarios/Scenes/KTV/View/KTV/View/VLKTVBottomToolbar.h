@@ -5,7 +5,7 @@
 
 #import <UIKit/UIKit.h>
 #import "VLHotSpotBtn.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "AgoraEntScenarios-swift.h"
 typedef enum : NSUInteger {
     VLKTVBottomBtnClickTypeAudio = 0,       // 声音
     VLKTVBottomBtnClickTypeVideo,           // 视频
