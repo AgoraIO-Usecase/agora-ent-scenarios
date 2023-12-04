@@ -58,6 +58,12 @@ protocol JoyServiceProtocol: NSObjectProtocol {
     /// - Parameter completion: 完成回调
     func getRoomList(completion: @escaping ([JoyRoomInfo]) -> Void)
     
+    /// 修改房间信息
+    /// - Parameters:
+    ///   - roomInfo: <#roomInfo description#>
+    ///   - completion: <#completion description#>
+    func updateRoom(roomInfo: JoyRoomInfo, completion: @escaping (NSError?) -> Void)
+    
     /// 发送聊天消息
     /// - Parameters:
     ///   - roomId: roomId description

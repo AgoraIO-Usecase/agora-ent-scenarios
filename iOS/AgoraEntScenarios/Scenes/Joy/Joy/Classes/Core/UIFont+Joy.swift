@@ -30,6 +30,10 @@ extension UIFont {
     }
     
     // 中等
+    @objc static var joy_M_10: UIFont? {
+        joy_MediumFontSize(10)
+    }
+    
     @objc static var joy_M_12: UIFont? {
         joy_MediumFontSize(12)
     }

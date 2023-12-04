@@ -129,6 +129,7 @@ extension JoyServiceImp: JoyServiceProtocol {
         roomInfo.roomName = roomName
         roomInfo.assistantUid = 1000000000 + user.userId
         roomInfo.roomId = "\(arc4random_uniform(899999) + 100000)"
+        roomInfo.objectId = roomInfo.roomId
         let reqId = NSString.withUUID()
         initScene(reqId) {[weak self] rid, error in
             guard reqId == rid else {return}
@@ -207,6 +208,26 @@ extension JoyServiceImp: JoyServiceProtocol {
                 }
             }
         }
+    }
+    
+    func updateRoom(roomInfo: JoyRoomInfo, completion: @escaping (NSError?) -> Void) {
+        let channelName = roomInfo.roomId
+        guard let scene = sceneRefs[channelName], roomInfo.ownerId == user?.userId else {
+            completion(NSError(domain: "no permission to update room", code: -1))
+            return
+        }
+        assert(!roomInfo.objectId.isEmpty, "roomInfo.objectId is empty")
+        let params = roomInfo.yy_modelToJSONObject() as! [String: Any]
+        joyPrint("imp room update... [\(channelName)]")
+        scene
+            .update(key: "",
+                    data: params,
+                    success: { obj in
+                joyPrint("imp room update user count success...")
+            }, fail: { error in
+                joyError("imp room update user count fail \(error.message)...")
+            })
+        completion(nil)
     }
     
     func leaveRoom(roomInfo: JoyRoomInfo, completion: @escaping (Error?) -> Void) {

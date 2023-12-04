@@ -10,6 +10,19 @@ import SDWebImage
 import SnapKit
 
 class RoomListCell: UICollectionViewCell {
+    lazy var badgeLabel: UILabel = {
+        let label = GradientLabel()
+        label.textColor = .joy_main_text
+        label.font = .joy_M_10
+        label.textAlignment = .center
+        label.setGradientBackground(colors: [
+            UIColor(red: 1, green: 0.467, blue: 0.851, alpha: 1),
+            UIColor(red: 0.801, green: 0.379, blue: 1, alpha: 1)
+            ])
+
+        return label
+    }()
+    
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.layer.cornerRadius = 16
@@ -65,7 +78,13 @@ class RoomListCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setBgImge(_ img: String, name: String?, id: String?, count: Int, avatarUrl: String?, isPrivate: Bool) {
+    func setBgImge(_ img: String, 
+                   name: String?,
+                   id: String?,
+                   badge: String?,
+                   count: Int,
+                   avatarUrl: String?,
+                   isPrivate: Bool) {
         imageView.image = UIImage.sceneImage(name: "room_bg_\(img)")
         nameLabel.text = name
         idLablel.text = "ID: \(id ?? "0")"
@@ -83,6 +102,10 @@ class RoomListCell: UICollectionViewCell {
         numberLabel.attributedText = attriTips
         avatarImageView.sd_setImage(with: URL(string: avatarUrl ?? ""), placeholderImage: UIImage.sceneImage(name: "show_default_avatar"))
         privateImageView.isHidden = !isPrivate
+        badgeLabel.text = badge == nil ? nil : "\(badge ?? "")🔥"
+        badgeLabel.sizeToFit()
+        badgeLabel.size = CGSize(width: badgeLabel.width + 24, height: badgeLabel.height + 4)
+        badgeLabel.setRoundedCorner(topLeft: badgeLabel.height, topRight: 0, bottomLeft: 0, bottomRight: badgeLabel.height)
     }
     
     private func createSubviews(){
@@ -119,5 +142,10 @@ class RoomListCell: UICollectionViewCell {
         contentView.addSubview(numberLabel)
         numberLabel.centerYAnchor.constraint(equalTo: idLablel.centerYAnchor).isActive = true
         numberLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor).isActive = true
+        
+        //游戏名
+        contentView.addSubview(badgeLabel)
+        badgeLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        badgeLabel.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
     }
 }

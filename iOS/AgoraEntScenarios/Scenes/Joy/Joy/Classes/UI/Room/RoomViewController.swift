@@ -181,6 +181,13 @@ extension RoomViewController {
                 return
             }
             
+            if let roomInfo = self?.roomInfo {
+                roomInfo.gameId = gameInfo.gameId ?? ""
+                roomInfo.badgeTitle = gameInfo.name ?? ""
+                self?.service?.updateRoom(roomInfo: roomInfo, completion: { err in
+                })
+            }
+            
             CloudBarrageAPI.shared.getGameInfo(gameId: gameInfo.gameId!) { err, detail in
                 if let err = err {
                     AUIToast.show(text: err.localizedDescription)

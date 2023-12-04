@@ -127,6 +127,7 @@ extension RoomListViewController: UICollectionViewDataSource, UICollectionViewDe
         cell.setBgImge("\(indexPath.item % 5)",
                        name: room.roomName,
                        id: room.roomId,
+                       badge: room.badgeTitle,
                        count: room.roomUserCount,
                        avatarUrl: room.ownerAvatar,
                        isPrivate: false)
