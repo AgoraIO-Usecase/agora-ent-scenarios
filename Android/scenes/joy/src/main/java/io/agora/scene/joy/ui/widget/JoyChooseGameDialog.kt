@@ -6,19 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
-import io.agora.scene.base.component.AgoraApplication
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.joy.R
 import io.agora.scene.joy.databinding.JoyDialogChooseGameLayoutBinding
-import io.agora.scene.joy.databinding.JoyDialogGiftLayoutBinding
 import io.agora.scene.joy.databinding.JoyItemGameChooseLayoutBinding
-import io.agora.scene.joy.databinding.JoyItemGiftLayoutBinding
 import io.agora.scene.joy.network.JoyGameEntity
-import io.agora.scene.joy.service.JoyRoomInfo
-import io.agora.scene.joy.ui.JoyViewModel
 
-class JoyChooseGameDialog constructor(val mJoyViewModel: JoyViewModel):
+
+class JoyChooseGameDialog constructor(var gamList: List<JoyGameEntity>, var completion: (game: JoyGameEntity) -> Unit) :
     BaseBottomSheetDialogFragment<JoyDialogChooseGameLayoutBinding>() {
 
     companion object {
@@ -31,40 +28,45 @@ class JoyChooseGameDialog constructor(val mJoyViewModel: JoyViewModel):
 
     private var mChooseGameAdapter: JoyChooseGameAdapter? = null
 
+    override fun onStart() {
+        super.onStart()
+        dialog?.let {
+            it.setCanceledOnTouchOutside(false)
+            val behavior: BottomSheetBehavior<*> = BottomSheetBehavior.from(it.findViewById(R.id.design_bottom_sheet))
+            behavior.setHideable(false)
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setEnableConfirm(true)
         mBinding.btnConfirm.setOnClickListener {
-            dismiss()
+            setEnableConfirm(false)
             ToastUtils.showToast("confirm")
-        }
-        mChooseGameAdapter = JoyChooseGameAdapter(emptyList(), 0, onDidSelectIndex = {
-            ToastUtils.showToast("select $it")
-        })
-        mBinding.rvGame.adapter = mChooseGameAdapter
+            mChooseGameAdapter?.apply {
+                val game = gamList[selectedIndex]
+                completion.invoke(game)
+            }
 
-        mJoyViewModel.getGames()
-        mJoyViewModel.mGameEntityList.observe(this) {
-            val en = mutableListOf<JoyGameEntity>()
-            en.addAll(it)
-            en.addAll(it)
-            en.addAll(it)
-            en.addAll(it)
-            en.addAll(it)
-            mChooseGameAdapter?.setDataList(en)
         }
+        mChooseGameAdapter = JoyChooseGameAdapter(gamList, 0)
+        mBinding.rvGame.adapter = mChooseGameAdapter
+    }
+
+    fun setEnableConfirm(isEnable: Boolean) {
+        mBinding.btnConfirm.isEnabled = isEnable
     }
 }
 
 private class JoyChooseGameAdapter constructor(
-    private var mList: List<JoyGameEntity>,
-    private var selectedIndex: Int,
-    private var onDidSelectIndex: ((Int) -> Unit)? = null
+    var mList: List<JoyGameEntity>,
+    var selectedIndex: Int,
 ) : RecyclerView.Adapter<JoyChooseGameAdapter.ViewHolder>() {
     inner class ViewHolder(val binding: JoyItemGameChooseLayoutBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            JoyItemGameChooseLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            JoyItemGameChooseLayoutBinding.inflate(LayoutInflater.from(parent.context))
         )
     }
 
@@ -84,20 +86,19 @@ private class JoyChooseGameAdapter constructor(
         holder.binding.tvGameName.text = data.name
         val context = holder.binding.root.context
         if (selectedIndex == position) {
-            holder.binding.tvGameName.setBackgroundColor(
-                ResourcesCompat.getColor(context.resources, R.color.joy_color_2F7, null)
+            holder.binding.tvGameName.setTextColor(
+                ResourcesCompat.getColor(context.resources, R.color.white, null)
             )
-            holder.binding.cvGame.strokeColor = ResourcesCompat.getColor(context.resources, R.color.joy_color_2F7, null)
+            holder.binding.layoutGame.setBackgroundResource(R.drawable.joy_bg_item_choose_game)
         } else {
-            holder.binding.tvGameName.setBackgroundColor(
-                ResourcesCompat.getColor(context.resources, android.R.color.transparent, null)
+            holder.binding.tvGameName.setTextColor(
+                ResourcesCompat.getColor(context.resources, R.color.def_text_color_040, null)
             )
-            holder.binding.cvGame.strokeColor = ResourcesCompat.getColor(context.resources, R.color.white, null)
+            holder.binding.layoutGame.setBackgroundResource(R.color.white)
         }
         holder.itemView.setOnClickListener {
             selectedIndex = position
             notifyDataSetChanged()
-            onDidSelectIndex?.invoke(position)
         }
     }
 }

@@ -28,10 +28,6 @@ data class JoyRoomInfo constructor(
     var objectId: String = ""
 ) : Serializable
 
-data class JoyGameInfo constructor(
-    @DrawableRes val drawableId: Int
-)
-
 data class JoyMessage constructor(
     var userId: String = "",     //用户id (rtc uid)
     var userName: String?,        //用户名

@@ -96,7 +96,6 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mJoyService.reset()
         RtcEngineInstance.destroy()
         RtcEngineInstance.setupGeneralToken("")
     }

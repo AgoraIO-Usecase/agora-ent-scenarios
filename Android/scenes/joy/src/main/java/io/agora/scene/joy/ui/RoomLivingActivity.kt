@@ -21,12 +21,15 @@ import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.joy.R
 import io.agora.scene.joy.RtcEngineInstance
 import io.agora.scene.joy.databinding.JoyLiveDetailActivityBinding
+import io.agora.scene.joy.network.JoyGameEntity
 import io.agora.scene.joy.service.JoyRoomInfo
 import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.joy.ui.widget.JoyChooseGameDialog
@@ -39,6 +42,7 @@ import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone
@@ -48,10 +52,14 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyLiveDetailActivityBinding>
     companion object {
         private const val TAG = "Joy_RoomLivingActivity"
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
+        private const val EXTRA_GAME_LIST = "gameList"
 
-        fun launch(context: Context, roomInfo: JoyRoomInfo) {
+        fun launch(context: Context, roomInfo: JoyRoomInfo, gameList: List<JoyGameEntity>? = null) {
             val intent = Intent(context, RoomLivingActivity::class.java)
             intent.putExtra(EXTRA_ROOM_DETAIL_INFO, roomInfo)
+            gameList?.let {
+                intent.putExtra(EXTRA_GAME_LIST, it as Serializable)
+            }
             context.startActivity(intent)
         }
     }
@@ -80,6 +88,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyLiveDetailActivityBinding>
         JoyLogger.d("showLivingEndLayout", "timer end!")
     }
 
+    private var mGameChooseGameDialog: JoyChooseGameDialog? = null
+
     private var mToggleVideoRun: Runnable? = null
 
     override fun getPermissions() {
@@ -107,17 +117,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyLiveDetailActivityBinding>
             .error(R.mipmap.userimage)
             .apply(RequestOptions.circleCropTransform())
             .into(binding.ivOwnerAvatar)
-        if (mIsRoomOwner){
-            binding.chooseGameLayout.root.isVisible = true
-        }
+
         binding.ivClose.setOnClickListener {
             showEndRoomDialog()
         }
         binding.ivMore.setOnClickListener {
             TopFunctionDialog(this).show()
-        }
-        binding.chooseGameLayout.btnConfirm.setOnClickListener {
-            binding.chooseGameLayout.root.isVisible = false
         }
         binding.tvRules.setOnClickListener {
             val bundle = Bundle().apply {
@@ -132,7 +137,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyLiveDetailActivityBinding>
             JoyGiftDialog().show(supportFragmentManager, "giftDialog")
         }
         binding.tvInput.setOnClickListener {
-           showKeyboardInputLayout()
+            showKeyboardInputLayout()
         }
         binding.etMessage.setOnEditorActionListener { v, actionId, event ->
             when (actionId) {
@@ -160,17 +165,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyLiveDetailActivityBinding>
             binding.vKeyboardBg.layoutParams = lp
             null
         }
-        JoyChooseGameDialog(mJoyViewModel).show(supportFragmentManager, "chooseGameDialog")
-
+        if (mIsRoomOwner) {
+            showGameChooseDialog()
+        }
     }
-
-    fun setViewLayoutParams(view: View, width: Int, height: Int) {
-        val lp = view.layoutParams
-        lp.width = width
-        lp.height = height
-        view.layoutParams = lp
-    }
-
 
     private fun showNormalInputLayout(): Boolean {
         if (!binding.groupBottom.isVisible) {
@@ -184,7 +182,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyLiveDetailActivityBinding>
         return false
     }
 
-    private fun showKeyboardInputLayout(){
+    private fun showKeyboardInputLayout() {
         binding.layoutEtMessage.isVisible = true
         binding.groupBottom.isVisible = false
         binding.tvInput.isEnabled = false
@@ -204,6 +202,27 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyLiveDetailActivityBinding>
             requestCameraPermission(true)
             startTopLayoutTimer()
         }
+        mJoyViewModel.mStartGame.observe(this) {
+            if (it) {
+                ToastUtils.showToast("启动游戏成功")
+                mGameChooseGameDialog?.dismiss()
+                mJoyViewModel.mCurrentGame?.let {
+                    val updateRoomInfo = mRoomInfo.copy()
+                    updateRoomInfo.gameId = it.gameId ?: ""
+                    updateRoomInfo.badgeTitle = it.name ?: ""
+                    mJoyService.updateRoom(updateRoomInfo, completion = { error ->
+                        if (error == null) {
+                            ToastUtils.showToast("更新房间信息成功（游戏）")
+                        } else {
+                            ToastUtils.showToast("更新房间信息失败（游戏）")
+                        }
+                    })
+                }
+            } else {
+                ToastUtils.showToast("启动游戏失败")
+                mGameChooseGameDialog?.setEnableConfirm(true)
+            }
+        }
     }
 
     private fun initRtcEngine() {
@@ -216,6 +235,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyLiveDetailActivityBinding>
 
         joinChannel(eventListener)
         setupVideoView()
+        setupAssistantVideoView()
     }
 
     private fun setupVideoView() {
@@ -230,6 +250,17 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyLiveDetailActivityBinding>
                 mMainRtcConnection
             )
         }
+    }
+
+
+    private fun setupAssistantVideoView() {
+        val textureView = TextureView(this)
+        binding.flAssistantContainer.removeAllViews()
+        binding.flAssistantContainer.addView(textureView)
+        mRtcEngine.setupRemoteVideoEx(
+            VideoCanvas(textureView, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.assistantUid),
+            mMainRtcConnection
+        )
     }
 
     private fun initServiceWithJoinRoom() {
@@ -301,6 +332,19 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyLiveDetailActivityBinding>
                 binding.tvTimer.tag = this
             }
         })
+    }
+
+    private fun showGameChooseDialog() {
+        val gameList = intent?.getSerializableExtra(EXTRA_GAME_LIST) as? List<JoyGameEntity>
+        if (!gameList.isNullOrEmpty()) {
+            mGameChooseGameDialog = JoyChooseGameDialog(gameList, completion = {
+                mJoyViewModel.startGame(
+                    roomInfo = mRoomInfo,
+                    gameEntity = it
+                )
+            })
+            mGameChooseGameDialog?.show(supportFragmentManager, "chooseGameDialog")
+        }
     }
 
     private fun showLivingEndLayout() {

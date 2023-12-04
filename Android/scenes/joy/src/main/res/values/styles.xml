@@ -10,6 +10,12 @@
         <item name="cornerSize">6%</item>
     </style>
 
+    <style name="joy_roundStyle_16">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+
     <!-- like自定义属性 -->
     <declare-styleable name="joy_LikeLayout">
         <attr name="joy_initX" format="dimension" />

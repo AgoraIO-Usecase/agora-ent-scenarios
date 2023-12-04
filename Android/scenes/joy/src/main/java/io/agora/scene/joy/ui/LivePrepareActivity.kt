@@ -27,8 +27,6 @@ import io.agora.scene.joy.RtcEngineInstance
 import io.agora.scene.joy.databinding.JoyItemGameBannerLayoutBinding
 import io.agora.scene.joy.databinding.JoyLivePrepareActivityBinding
 import io.agora.scene.joy.network.JoyGameEntity
-import io.agora.scene.joy.service.JoyGameInfo
-import io.agora.scene.joy.service.JoyRoomInfo
 import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
@@ -108,9 +106,13 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBindin
             enableCrateRoomButton(false)
             mJoyService.createRoom(roomName, completion = { error, roomInfo ->
                 if (error == null && roomInfo != null) { // success
-                    mIsFinishToLiveDetail = true
-                    RoomLivingActivity.launch(this, roomInfo)
-                    finish()
+                    if (mGameInfoAdapter.gameInfoList.isEmpty()){
+                        ToastUtils.showToast("游戏资源获取中...")
+                    }else{
+                        mIsFinishToLiveDetail = true
+                        RoomLivingActivity.launch(this, roomInfo, mGameInfoAdapter.gameInfoList)
+                        finish()
+                    }
                 } else { //failed
                     ToastUtils.showToast(error?.message)
                     enableCrateRoomButton(true)
@@ -249,7 +251,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBindin
 
 
     class GameInfoAdapter constructor(
-        private var gameInfoList: List<JoyGameEntity>,
+        var gameInfoList: List<JoyGameEntity>,
         private val itemClick: (position: Int) -> Unit
     ) :
         RecyclerView.Adapter<GameInfoAdapter.GameViewHolder>() {

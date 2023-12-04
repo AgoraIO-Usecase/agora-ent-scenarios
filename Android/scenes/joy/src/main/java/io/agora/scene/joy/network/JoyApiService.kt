@@ -8,49 +8,48 @@ interface JoyApiService {
         @Body entity: JoyGameEntity
     ): JoyApiResult<JoyGameResult>
 
-    @POST("/v1/cloud-bullet-game/gameid/start")
+    @POST("/toolbox/v1/cloud-bullet-game/games/game")
+    suspend fun gamesDetails(
+        @Body entity: JoyGameEntity
+    ): JoyApiResult<JoyGameResult>
+
+    @POST("/toolbox/v1/cloud-bullet-game/games/start")
     suspend fun startGame(
         @Body entity: JoyGameEntity
     ): JoyApiResult<JoyGameResult>
 
-    @POST("/v1/cloud-bullet-game/gameid/stop")
+    @POST("/toolbox/v1/cloud-bullet-game/games/stop")
     suspend fun stopGame(
         @Body entity: JoyGameEntity
     ): JoyApiResult<JoyJsonModel.JoyEmpty>
 
-    @GET("/v1/cloud-bullet-game/gameid/status")
+    @GET("/toolbox/v1/cloud-bullet-game/games/status")
     suspend fun gameState(
         @Query("task_id") taskId: String
     ): JoyApiResult<JoyGameResult>
 
-    @GET("/v1/cloud-bullet-game/gameid/{game_id}")
-    suspend fun gamesDetails(
-        @Path("app_id") appId: String,
-        @Path("game_id") gameId: String
-    ): JoyApiResult<JoyGameResult>
-
-    @POST("/v1/cloud-bullet-game/gameid/gift")
+    @POST("/toolbox/v1/cloud-bullet-game/games/gift")
     suspend fun sendGift(
         @Path("app_id") appId: String,
         @Path("game_id") gameId: String,
         @Body entity: JoySendMessage
     ): JoyApiResult<JoyJsonModel.JoyEmpty>
 
-    @POST("/v1/cloud-bullet-game/gameid/comment")
+    @POST("/toolbox/v1/cloud-bullet-game/games/comment")
     suspend fun gameComment(
         @Path("app_id") appId: String,
         @Path("game_id") gameId: String,
         @Body entity: JoySendMessage
     ): JoyApiResult<JoyJsonModel.JoyEmpty>
 
-    @POST("/v1/cloud-bullet-game/gameid/like")
+    @POST("/toolbox/v1/cloud-bullet-game/games/like")
     suspend fun gameLike(
         @Path("app_id") appId: String,
         @Path("game_id") gameId: String,
         @Body entity: JoySendMessage
     ): JoyApiResult<JoyJsonModel.JoyEmpty>
 
-    @POST("/v1/cloud-bullet-game/gameid/renew-token")
+    @POST("/toolbox/v1/cloud-bullet-game/games/renew-token")
     suspend fun renewToken(
         @Path("app_id") appId: String,
         @Path("game_id") gameId: String,

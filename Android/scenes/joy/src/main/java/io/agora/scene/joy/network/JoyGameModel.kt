@@ -2,8 +2,9 @@ package io.agora.scene.joy.network
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-interface JoyJsonModel {
+interface JoyJsonModel : Serializable {
 
     class JoyEmpty : JoyJsonModel
 }

@@ -2,30 +2,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="90dp"
+    android:layout_width="wrap_content"
     android:layout_height="120dp"
-    android:orientation="vertical"
-    android:paddingHorizontal="4dp"
-    android:paddingVertical="6dp">
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cvGame"
-        android:layout_width="82dp"
-        android:layout_height="108dp"
-        android:elevation="0dp"
-        android:padding="2dp"
-        app:cardCornerRadius="16dp"
-        app:strokeColor="@color/joy_color_2F7"
-        app:strokeWidth="2dp">
+    android:paddingHorizontal="1dp"
+    android:orientation="vertical">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:id="@+id/layoutGame"
+            android:layout_width="82dp"
+            android:layout_height="108dp"
+            android:background="@drawable/joy_bg_item_choose_game"
+            android:padding="2dp">
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/ivGame"
                 android:layout_width="78dp"
                 android:layout_height="78dp"
+                app:shapeAppearance="@style/joy_roundStyle_16"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -43,7 +36,4 @@
                 app:layout_constraintTop_toBottomOf="@+id/ivGame"
                 tools:text="胖可争霸" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
 </LinearLayout>

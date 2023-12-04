@@ -54,14 +54,17 @@ interface JoyServiceProtocol {
         fun getImplInstance(): JoyServiceProtocol = instance
     }
 
-    fun reset()
-
     // ============== 房间相关 ==============
 
     /**
      * 获取房间列表
      */
     fun getRoomList(completion: (list: List<JoyRoomInfo>) -> Unit)
+
+    /**
+     * 修改房间信息
+     */
+    fun updateRoom(roomInfo: JoyRoomInfo, completion: (error: Exception?) -> Unit)
 
     /**
      * 创建房间
