@@ -152,14 +152,15 @@ class CantataMainViewController: BaseViewController{
         layoutUI()
         
         isRoomOwner = VLUserCenter.user.ifMaster
-        
-        if isRoomOwner {
+
+        if isRoomOwner == true {
             self.timeManager.startTimer(withTarget: self, andSelector: #selector(giveupRoom))
+            KTVLog.info(text: "ROOM owner start timer")
         }
         
         addDebugLogic()
-        
-        if isRoomOwner {
+
+        if isRoomOwner == true {
             guard let roomNo = roomModel?.roomNo else {return}
             ApiManager.shared.fetchStartCloud(mainChannel: roomNo, cloudRtcUid: 232425)
         }
@@ -194,6 +195,7 @@ class CantataMainViewController: BaseViewController{
                 guard let self = self else {return}
                 VLKTVAlert.shared().dismiss()
                 self.timeManager.stopTimer()
+                KTVLog.info(text: "ROOM owner stop timer")
                 self.leaveRoom()
             }
         }
@@ -809,6 +811,10 @@ extension CantataMainViewController {
                         self.botView.updateMicState(true)
                     }
                     
+//                    if let topMusic = self.selSongArray?.first, topMusic.status == .playing, seatModel.userNo == topMusic.userNo {
+//                        return
+//                    }
+                    
                     if let seatArray = self.seatsArray,let index = seatArray.firstIndex(where: { $0.userNo == seatModel.userNo }) {
                         self.seatsArray?.remove(at: index)
                     }
@@ -820,14 +826,14 @@ extension CantataMainViewController {
                 }
                 
                 if status == .updated && self.singerRole == .audience {//
-                    let totalScore = self.scoreMap.values.reduce(0, { (result, scoreModel) -> Int in
-                        return result + scoreModel.score
-                    })
+                    KTVLog.info(text: "观众分数更新")
+                    let totalScore = self.scoreMap.values.map({ $0.score }).reduce(0, +)
                     self.lrcControlView.setScore(with: totalScore ?? 0)
+                    KTVLog.info(text: "观众分数更新完毕")
                 }
                 
                 let currentSeat = getCurrentUserMicSeat()
-                self.botView.updateMicState(currentSeat == nil)
+                self.botView.updateMicState(currentSeat == nil || currentSeat?.isAudioMuted == 1)
                 if status == .deleted && seatModel.userNo == VLUserCenter.user.id {
                     self.botView.updateMicState(true)
                 }
@@ -874,8 +880,9 @@ extension CantataMainViewController {
             // update in-ear monitoring
             self.checkInEarMonitoring()
             
-            if status == .created && isRoomOwner {
+            if status == .created && isRoomOwner == true {
                 if self.selSongArray?.count == 0 {
+                    KTVLog.info(text: "ROOM owner stop timer")
                     self.timeManager.stopTimer() //有人点歌 需要关闭
                 }
             }
@@ -904,7 +911,8 @@ extension CantataMainViewController {
                 let success = self.removeSelSong(songNo: Int(songInfo.songNo ?? "")!, sync: false)
                 self.selSongArray = songArray
                 
-                if self.selSongArray?.count == 0 && isRoomOwner {
+                if self.selSongArray?.count == 0 && isRoomOwner == true{
+                    KTVLog.info(text: "ROOM owner restart timer:\(self.singerRole)")
                     self.timeManager.restartTimer()
                 }
 
@@ -1817,7 +1825,7 @@ class TimerManager {
         workItem = DispatchWorkItem { [weak self] in
             self?.timerAction()
         }
-        
+
         DispatchQueue.global().asyncAfter(deadline: .now() + 300, execute: workItem!)
     }
     

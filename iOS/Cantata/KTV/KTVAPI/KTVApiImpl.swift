@@ -981,6 +981,7 @@ extension KTVApiImpl {
         
         // 加入演唱频道
        let ret = apiConfig?.engine?.joinChannelEx(byToken: token, connection: singConnection, delegate: self, mediaOptions: singChannelMediaOptions)
+        apiConfig?.engine?.setParameters("{\"rtc.use_audio4\": true}")
        let res = apiConfig?.engine?.enableAudioVolumeIndicationEx(50, smooth: 10, reportVad: true, connection: singConnection)
         switch newRole {
             case .leadSinger:
