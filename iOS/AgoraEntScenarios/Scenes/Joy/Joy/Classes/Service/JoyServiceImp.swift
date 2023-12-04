@@ -28,12 +28,14 @@ extension SyncError {
 /// 房间内用户列表
 private let kSceneId = "scene_joy_4.10.0"
 private let SYNC_SCENE_ROOM_USER_COLLECTION = "userCollection"
+private let SYNC_MANAGER_MESSAGE_COLLECTION = "joy_message_collection"
 class JoyServiceImp: NSObject {
     private var appId: String = ""
     private var user: JoyUserInfo?
     private var sceneRefs: [String: SceneReference] = [:]
     private var syncUtilsInited: Bool = false
     private var roomList: [JoyRoomInfo] = []
+    private var messageList: [JoyMessage] = []
     private weak var listener: JoyServiceListenerProtocol?
     
     private var userList: [JoyUserInfo] = []
@@ -150,6 +152,7 @@ extension JoyServiceImp: JoyServiceProtocol {
                         self._addUserIfNeed(channelName: roomInfo.roomId) { err in
                         }
                         self._subscribeUsersChanged(channelName: roomInfo.roomId)
+                        self._subscribeMessageChanged(channelName: roomInfo.roomId)
                         self.subscribeRoomStatusChanged(channelName: roomInfo.roomId)
                         completion(roomInfo, nil)
                     }
@@ -190,6 +193,7 @@ extension JoyServiceImp: JoyServiceProtocol {
                         self._addUserIfNeed(channelName: roomInfo.roomId) { err in
                         }
                         self._subscribeUsersChanged(channelName: roomInfo.roomId)
+                        self._subscribeMessageChanged(channelName: roomInfo.roomId)
                         self.subscribeRoomStatusChanged(channelName: roomInfo.roomId)
                         completion(nil)
                     }
@@ -244,7 +248,23 @@ extension JoyServiceImp: JoyServiceProtocol {
     func sendChatMessage(roomId: String,
                          message: String,
                          completion: ((NSError?) -> Void)?) {
-        
+        guard let scene = sceneRefs[roomId] else {return}
+        joyPrint("imp message add...")
+        let model = JoyMessage()
+        model.message = message
+        model.userId = "\(user?.userId ?? 0)"
+        model.userName = user?.userName ?? "unknown"
+        model.createAt = Int64(Date().timeIntervalSince1970 * 1000)
+        let params = model.yy_modelToJSONObject() as! [String: Any]
+        scene
+            .collection(className: SYNC_MANAGER_MESSAGE_COLLECTION)
+            .add(data: params, success: { object in
+                joyPrint("imp message add success...\(roomId) params = \(params)")
+                completion?(nil)
+            }, fail: { error in
+                joyError("imp message add fail :\(error.message)...\(roomId)")
+                completion?(error.toNSError())
+            })
     }
     
     func subscribeListener(listener: JoyServiceListenerProtocol?) {
@@ -385,6 +405,32 @@ extension JoyServiceImp {
                        }, onSubscribed: {
                        }, fail: { error in
                            joyWarn("imp user subscribe fail \(error.message)...")
+                       })
+    }
+    
+    private func _subscribeMessageChanged(channelName: String) {
+        guard let scene = sceneRefs[channelName] else {return}
+        joyPrint("imp message subscribe ...")
+        scene
+            .subscribe(key: SYNC_MANAGER_MESSAGE_COLLECTION,
+                       onCreated: { _ in
+                       }, onUpdated: {[weak self] object in
+                           joyPrint("imp message subscribe onUpdated... [\(object.getId())] \(channelName)")
+                           guard let self = self,
+                                 let jsonStr = object.toJson(),
+                                 let model = JoyMessage.yy_model(withJSON: jsonStr)
+                           else {
+                               return
+                           }
+                           self.messageList.append(model)
+                           self.listener?.onMessageDidAdded(message: model)
+                       }, onDeleted: { object in
+                           joyPrint("imp message subscribe onDeleted... [\(object.getId())] \(channelName)")
+                           joyPrint("not implemented")
+                       }, onSubscribed: {
+                       }, fail: { error in
+                           joyError("imp message subscribe fail \(error.message)...")
+//                           ToastView.show(text: error.message)
                        })
     }
 }

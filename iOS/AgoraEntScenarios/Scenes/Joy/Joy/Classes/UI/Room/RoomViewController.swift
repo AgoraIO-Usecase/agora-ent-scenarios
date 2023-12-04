@@ -18,7 +18,7 @@ class RoomViewController: UIViewController {
             gameIntroduceButton.isHidden = gameInfo == nil ? true : false
         }
     }
-    private var taskId: String?
+    private var taskId: String? 
     private lazy var roomInfoView = RoomInfoView()
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -64,6 +64,11 @@ class RoomViewController: UIViewController {
         let bar = ShowRoomBottomBar()
         bar.delegate = self
         return bar
+    }()
+    
+    private lazy var chatTableView: ChatTableView = {
+        let tableView = ChatTableView()
+        return tableView
     }()
     
     private lazy var chatInputView: ChatInputView = {
@@ -121,6 +126,15 @@ class RoomViewController: UIViewController {
             make.height.equalTo(160)
             make.top.equalTo(roomInfoView.snp.bottom).offset(20)
         }
+
+        view.addSubview(chatTableView)
+        chatTableView.snp.makeConstraints { make in
+            make.left.equalTo(15)
+            make.bottom.equalTo(-kTableViewBottomOffset)
+            make.right.equalTo(-70)
+            make.height.equalTo(168)
+        }
+        chatTableView.addObserver()
         
         view.addSubview(bottomBar)
         bottomBar.snp.makeConstraints { make in
@@ -148,6 +162,7 @@ class RoomViewController: UIViewController {
                                  time: roomInfo.createdAt)
         
         joinRTCChannel()
+        service?.subscribeListener(listener: self)
         if roomInfo.ownerId == currentUserInfo.userId {
             let gameId = roomInfo.gameId
             let taskId = roomInfo.taskId
@@ -180,17 +195,24 @@ class RoomViewController: UIViewController {
                     #endif
                 }
             } else {
-                CloudBarrageAPI.shared.getGameInfo(gameId: gameId) {[weak self] err, detail in
+                service?.joinRoom(roomInfo: roomInfo, completion: { err in
                     if let err = err {
                         AUIToast.show(text: err.localizedDescription)
+                        self.onCloseAction()
                         return
                     }
-                    
-                    self?.gameInfo = detail
-                    self?.taskId = taskId
-                    
-                    self?.onIntroduceAction()
-                }
+                    CloudBarrageAPI.shared.getGameInfo(gameId: gameId) {[weak self] err, detail in
+                        if let err = err {
+                            AUIToast.show(text: err.localizedDescription)
+                            return
+                        }
+                        
+                        self?.gameInfo = detail
+                        self?.taskId = taskId
+                        
+                        self?.onIntroduceAction()
+                    }
+                })
             }
         } else {
             service?.joinRoom(roomInfo: roomInfo, completion: { err in
@@ -386,6 +408,22 @@ extension RoomViewController: ChatInputViewDelegate {
 
         }
     }
+}
+
+extension RoomViewController: JoyServiceListenerProtocol {
+    func onNetworkStatusChanged(status: JoyServiceNetworkStatus) {
+        
+    }
     
-      
+    func onUserListDidChanged(userList: [JoyUserInfo]) {
+        
+    }
+    
+    func onMessageDidAdded(message: JoyMessage) {
+        chatTableView.appendMessage(msg: message)
+    }
+    
+    func onRoomDidDestroy(roomInfo: JoyRoomInfo) {
+        
+    }
 }
