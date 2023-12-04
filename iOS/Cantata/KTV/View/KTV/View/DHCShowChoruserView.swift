@@ -55,6 +55,7 @@ extension DHCShowChoruserView: UITableViewDataSource, UITableViewDelegate {
         let cell: DHCShowChorusCell = tableView.dequeueReusableCell(withIdentifier: "ShowCourse") as! DHCShowChorusCell
         var data = dataSource[indexPath.row]
         data.level = indexPath.row
+        cell.setModel(with: data)
         cell.leaveBlock = {[weak self] userNo in
             guard let leaveBlock = self?.leaveBlock else {return}
             leaveBlock(userNo)
