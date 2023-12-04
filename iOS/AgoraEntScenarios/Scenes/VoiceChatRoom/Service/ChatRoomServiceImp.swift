@@ -21,12 +21,17 @@ let roomBGMKey = "room_bgm"
 
 let voiceLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "VoiceChat"))
 public class ChatRoomServiceImp: NSObject {
+    typealias ConnectStateChanged = (_ state: ChatRoomServiceConnectState)->Void
+    
+    private var connectionChanged: ConnectStateChanged?
+    
     static var _sharedInstance: ChatRoomServiceImp?
     var roomId: String?
     var roomList: [VRRoomEntity]?
     var userList: [VRUser]?
     public var mics: [VRRoomMic] = [VRRoomMic]()
     public var applicants: [VoiceRoomApply] = [VoiceRoomApply]()
+    public var connectState: ChatRoomServiceConnectState?
     var syncUtilsInited: Bool = false
     @objc public weak var roomServiceDelegate:ChatRoomServiceSubscribeDelegate?
     
@@ -737,7 +742,11 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             guard let self = self else {
                 return
             }
-            
+            self.connectState = ChatRoomServiceConnectState(rawValue: state.rawValue)
+            if let chatState = self.connectState {
+                self.roomServiceDelegate?.onConnectStateChanged(state: chatState)
+                self.connectionChanged?(chatState)
+            }
             agoraPrint("subscribeConnectState: \(state) \(self.syncUtilsInited)")
 //            self.networkDidChanged?(KTVServiceNetworkStatus(rawValue: UInt(state.rawValue)))
             guard !self.syncUtilsInited else {
@@ -748,6 +757,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             self.syncUtilsInited = true
             completion()
         }
+    }
+    
+    func onConnectStateChnaged(_ action: ConnectStateChanged?) {
+        self.connectionChanged = action
     }
     
     /// 获取房间列表

@@ -5401,7 +5401,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = B8JXV8ZYC7;
+				DEVELOPMENT_TEAM = 3KX4NAGXWC;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5608,8 +5608,9 @@
 					"\"MetalPerformanceShaders\"",
 					"-weak_framework",
 					"\"Photos\"",
+					"-ld64",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice222;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -5630,7 +5631,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = B8JXV8ZYC7;
+				DEVELOPMENT_TEAM = FRCN2HWL92;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5837,8 +5838,9 @@
 					"\"MetalPerformanceShaders\"",
 					"-weak_framework",
 					"\"Photos\"",
+					"-ld64",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice333;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;

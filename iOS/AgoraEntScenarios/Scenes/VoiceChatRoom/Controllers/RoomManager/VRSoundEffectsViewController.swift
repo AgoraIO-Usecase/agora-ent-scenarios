@@ -48,8 +48,27 @@ class VRSoundEffectsViewController: VRBaseViewController {
     deinit {
         SVProgressHUD.dismiss()
     }
+    
+    func isConnected()-> Bool {
+        if ChatRoomServiceImp.getSharedInstance().connectState == .open {
+            return true
+        }
+        SVProgressHUD.show()
+        ChatRoomServiceImp.getSharedInstance().onConnectStateChnaged {[weak self] state in
+            DispatchQueue.main.async {
+                if state == .open {
+                    SVProgressHUD.dismiss()
+                    self?.goLive()
+                }
+            }
+        }
+        return false
+    }
 
     @objc func goLive() {
+        guard isConnected() else {
+            return
+        }
         if name.isEmpty {
             view.makeToast("voice_no_room_name".voice_localized(), point: view.center, title: nil, image: nil, completion: nil)
         }

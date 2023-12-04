@@ -13,6 +13,10 @@ import ZSwiftBaseLib
 
 // MARK: - ChatRoomServiceSubscribeDelegate
 extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
+    func onConnectStateChanged(state: ChatRoomServiceConnectState) {
+        
+    }
+    
     func onRoomExpired() {
         ToastView.show(text: ChatRoomServiceKickedReason.destroyed.errorDesc())
         fetchDetailError()
