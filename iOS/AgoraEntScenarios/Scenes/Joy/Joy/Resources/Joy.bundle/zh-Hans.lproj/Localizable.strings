@@ -30,6 +30,7 @@
 "setting_statistic" = "实时数据";
 "call_content_inspect_warning"="监测到当前内容存在违规行为";
 
+"room_send_message"="发送弹幕";
 "room_waitting_for_startgame"="主播尚未开启玩法\n请耐心等待";
 "game_play_introduce"="玩法规则";
 "dialog_title_gamelist"="选择弹幕玩法";

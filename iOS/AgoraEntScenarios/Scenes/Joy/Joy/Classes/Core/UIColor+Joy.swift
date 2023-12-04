@@ -31,7 +31,7 @@ extension UIColor {
     
     // slider
     @objc static var joy_slider_tint: UIColor {
-        return UIColor(hexString: "FFFFFF")!.withAlphaComponent(0.7)
+        return UIColor(hexString: "FFFFFF")!.withAlphaComponent(0.6)
     }
     
     @objc static var joy_zi01: UIColor {
@@ -49,7 +49,7 @@ extension UIColor {
     
     // 蒙版
     @objc static var joy_cover: UIColor {
-        return UIColor(hexString: "0C0923")!.withAlphaComponent(0.3)
+        return UIColor(hexString: "000000")!.withAlphaComponent(0.25)
     }
     
     // 直播场景背景色
@@ -72,24 +72,14 @@ extension UIColor {
         return UIColor(hexString: "EFF4FF")!
     }
     
-    // 红点颜色
-    @objc static var joy_red_dot: UIColor {
-        return UIColor(hexString: "FF317B")!
-    }
-    
-    // 红点颜色
-    @objc static var joy_chat_user_name: UIColor {
-        return UIColor(hexString: "A6C4FF")!
-    }
-    
     // 输入框背景
     @objc static var joy_chat_input_bg: UIColor {
-        return UIColor(hexString: "F1F3F8")!
+        return UIColor(hexString: "000000")!.withAlphaComponent(0.25)
     }
     
     // 输入框文字
     @objc static var joy_chat_input_text: UIColor {
-        return UIColor(hexString: "3C4267")!
+        return UIColor(hexString: "FFFFFF")!
     }
     
     // segment未选中的背景

@@ -58,7 +58,19 @@ class RoomViewController: UIViewController {
         label.font = .joy_M_17
         label.sizeToFit()
         return label
-        
+    }()
+    
+    private lazy var bottomBar: ShowRoomBottomBar = {
+        let bar = ShowRoomBottomBar()
+        bar.delegate = self
+        return bar
+    }()
+    
+    private lazy var chatInputView: ChatInputView = {
+        let textField = ChatInputView()
+        textField.isHidden = true
+        textField.delegate = self
+        return textField
     }()
     
     private lazy var broadcasterCanvasView: UIView = UIView()
@@ -110,6 +122,20 @@ class RoomViewController: UIViewController {
             make.top.equalTo(roomInfoView.snp.bottom).offset(20)
         }
         
+        view.addSubview(bottomBar)
+        bottomBar.snp.makeConstraints { make in
+            make.bottom.equalToSuperview().offset(-UIDevice.current.aui_SafeDistanceBottom)
+            make.left.right.equalToSuperview()
+            make.height.equalTo(58)
+        }
+        
+        view.addSubview(chatInputView)
+        chatInputView.snp.makeConstraints { make in
+            make.left.right.equalToSuperview()
+            make.height.equalTo(kChatInputViewHeight)
+            make.bottom.equalToSuperview()
+        }
+        
         guard let roomInfo = roomInfo, let currentUserInfo = currentUserInfo else {
             AUIToast.show(text: "room info error")
             onCloseAction()
@@ -123,32 +149,48 @@ class RoomViewController: UIViewController {
         
         joinRTCChannel()
         if roomInfo.ownerId == currentUserInfo.userId {
-            CloudBarrageAPI.shared.getGameList { [weak self] err, list in
-                if let err = err {
-                    AUIToast.show(text: err.localizedDescription)
-                    return
-                }
-                let dialog: JoyGameListDialog? = JoyGameListDialog.show()
-                dialog?.onSelectedGame = { game in
-                    guard let self = self else {return}
-                    self.renewRTCTokens(roomId: roomInfo.roomId,
-                                        userId: roomInfo.assistantUid) { token in
-                        guard let token = token else {
-                            AUIToast.show(text: "assistant token is empty")
-                            return
-                        }
-                        self.startGame(gameInfo: game, assistantToken: token)
+            let gameId = roomInfo.gameId
+            let taskId = roomInfo.taskId
+            if gameId.isEmpty || taskId.isEmpty {
+                CloudBarrageAPI.shared.getGameList { [weak self] err, list in
+                    if let err = err {
+                        AUIToast.show(text: err.localizedDescription)
+                        return
                     }
+                    let dialog: JoyGameListDialog? = JoyGameListDialog.show()
+                    dialog?.onSelectedGame = { game in
+                        guard let self = self else {return}
+                        self.renewRTCTokens(roomId: roomInfo.roomId,
+                                            userId: roomInfo.assistantUid) { token in
+                            guard let token = token else {
+                                AUIToast.show(text: "assistant token is empty")
+                                return
+                            }
+                            self.startGame(gameInfo: game, assistantToken: token)
+                        }
+                    }
+                    #if DEBUG
+                    var aaa = [CloudGameInfo]()
+                    for i in 0...100 {
+                        aaa += list!
+                    }
+                    dialog?.gameList = aaa
+                    #else
+                    dialog?.gameList = list!
+                    #endif
                 }
-                #if DEBUG
-                var aaa = [CloudGameInfo]()
-                for i in 0...100 {
-                    aaa += list!
+            } else {
+                CloudBarrageAPI.shared.getGameInfo(gameId: gameId) {[weak self] err, detail in
+                    if let err = err {
+                        AUIToast.show(text: err.localizedDescription)
+                        return
+                    }
+                    
+                    self?.gameInfo = detail
+                    self?.taskId = taskId
+                    
+                    self?.onIntroduceAction()
                 }
-                dialog?.gameList = aaa
-                #else
-                dialog?.gameList = list!
-                #endif
             }
         } else {
             service?.joinRoom(roomInfo: roomInfo, completion: { err in
@@ -181,9 +223,10 @@ extension RoomViewController {
                 return
             }
             
-            if let roomInfo = self?.roomInfo {
+            if let roomInfo = self?.roomInfo, let taskId = taskId {
                 roomInfo.gameId = gameInfo.gameId ?? ""
                 roomInfo.badgeTitle = gameInfo.name ?? ""
+                roomInfo.taskId = taskId
                 self?.service?.updateRoom(roomInfo: roomInfo, completion: { err in
                 })
             }
@@ -303,4 +346,46 @@ extension RoomViewController {
             completion?(rtcToken)
         }
     }
+}
+
+extension RoomViewController: RoomBottomBarDelegate {
+    func onClickSendButton() {
+        chatInputView.isHidden = false
+        chatInputView.textField.becomeFirstResponder()
+    }
+    
+    func onClickGiftButton() {
+        
+    }
+    
+    func onClickLikeButton() {
+        
+    }
+}
+
+extension RoomViewController: ChatInputViewDelegate {
+    func onEndEditing() {
+        chatInputView.isHidden = true
+//        bottomBar.isHidden = false
+    }
+    
+    func onClickEmojiButton() {
+        
+    }
+    
+    func onClickSendButton(text: String) {
+        guard let roomId = roomInfo?.roomId, let gameId = gameInfo?.gameId else {return}
+        service?.sendChatMessage(roomId: roomId,
+                                 message: text,
+                                 completion: { err in
+        })
+        
+        let config = CloudGameSendCommentConfig()
+        CloudBarrageAPI.shared.sendComment(gameId: gameId,
+                                           commentConfig: config) { err in
+
+        }
+    }
+    
+      
 }

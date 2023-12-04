@@ -102,7 +102,12 @@ class RoomListCell: UICollectionViewCell {
         numberLabel.attributedText = attriTips
         avatarImageView.sd_setImage(with: URL(string: avatarUrl ?? ""), placeholderImage: UIImage.sceneImage(name: "show_default_avatar"))
         privateImageView.isHidden = !isPrivate
-        badgeLabel.text = badge == nil ? nil : "\(badge ?? "")🔥"
+        if let text = badge, !text.isEmpty {
+            badgeLabel.text = "\(text ?? "")🔥"
+            badgeLabel.isHidden = false
+        } else {
+            badgeLabel.isHidden = true
+        }
         badgeLabel.sizeToFit()
         badgeLabel.size = CGSize(width: badgeLabel.width + 24, height: badgeLabel.height + 4)
         badgeLabel.setRoundedCorner(topLeft: badgeLabel.height, topRight: 0, bottomLeft: 0, bottomRight: badgeLabel.height)

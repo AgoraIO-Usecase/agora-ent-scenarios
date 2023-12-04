@@ -68,7 +68,7 @@ class RoomListViewController: UIViewController {
         button.setCornerRadius(21)
         button.setTitle("user_list_create_room".joyLocalization(), for: .normal)
         button.setImage(UIImage.sceneImage(name: "icon_add"), for: .normal)
-        button.setjoyDefaultGradientBackground()
+        button.setjoyHorizonalDefaultGradientBackground()
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         button.setTitleColor(.white, for: .normal)
         button.adjustHorizonAlign(spacing: 10)

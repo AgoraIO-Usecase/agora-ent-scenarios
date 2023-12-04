@@ -100,12 +100,10 @@ public struct CloudGameCommentInfo: Codable {
 }
 
 public struct CloudGameSendCommentConfig: Codable {
-    public var vid: String?
     public var roomId: String?
     public var commentList: [CloudGameCommentInfo]?
     
     enum CodingKeys: String, CodingKey {
-        case vid
         case roomId = "room_id"
         case commentList = "payload"
     }
@@ -130,12 +128,10 @@ public struct CloudGameSendLikeInfo: Codable {
 }
 
 public struct CloudGameSendLikeConfig: Codable {
-    public var vid: String?
     public var roomId: String?
     public var likeList: [CloudGameCommentInfo]?
     
     enum CodingKeys: String, CodingKey {
-        case vid
         case roomId = "room_id"
         case likeList = "payload"
     }
@@ -185,7 +181,6 @@ public struct CloudGameStartConfig: Codable {
 
 /// 更新token
 public struct CloudGameTokenConfig: Codable {
-    public var vid: String?
     public var roomId: String?
     public var userId: String?
     public var taskId: String?
@@ -193,7 +188,6 @@ public struct CloudGameTokenConfig: Codable {
     public var rtcToken: String?     // 主播助手rtc uid
     
     enum CodingKeys: String, CodingKey {
-        case vid
         case roomId = "room_id"
         case userId = "open_id"
         case taskId = "task_id"

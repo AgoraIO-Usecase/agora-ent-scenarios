@@ -86,7 +86,7 @@ class JoyBaseDialog: UIView {
                               y: dialogView.height - 40 - buttonMargin.bottom,
                               width: dialogView.width - buttonMargin.left - buttonMargin.right,
                               height: 40)
-        button.setjoyDefaultGradientBackground()
+        button.setjoyVerticalDefaultGradientBackground()
         contentView.frame = CGRect(x: 0, y: buttonMargin.top, width: dialogView.width, height: button.aui_top - buttonMargin.top - 20)
 //        gradientLayer.frame = CGRect(x: 0, y: 0, width: contentView.aui_width, height: 19)
     }

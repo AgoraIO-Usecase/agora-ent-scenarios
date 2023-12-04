@@ -27,6 +27,7 @@ public class JoyRoomInfo: NSObject {
     var ownerAvatar: String?       //房主头像
     var ownerName: String?         //房主名
     var gameId: String = ""        //游戏id
+    var taskId: String = ""        //游戏taskid
     var badgeTitle: String = ""    //胖可争霸/羊羊抗狼
     var assistantUid: UInt = 0     //游戏画面uid
     var createdAt: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
