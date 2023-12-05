@@ -215,3 +215,4 @@
 "Background Music" = "背景音乐";
 "Host Music" = "只有房主可以播放音乐";
 "voice_kick" = "踢出";
+"voice_network_disconnected" = "网络断开";

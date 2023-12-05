@@ -801,7 +801,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let params = room.kj.JSONObject()
         self.initScene {
             if self.connectState != .open {
-                completion(SyncError(message: "网络断开", code: self.connectState?.rawValue ?? -1),nil)
+                completion(SyncError(message: "voice_network_disconnected".voice_localized(), code: self.connectState?.rawValue ?? -1),nil)
                 return
             }
             SyncUtil.joinScene(id: room.room_id ?? "",
