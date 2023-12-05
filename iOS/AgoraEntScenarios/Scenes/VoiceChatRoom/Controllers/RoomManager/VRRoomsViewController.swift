@@ -238,8 +238,13 @@ extension VRRoomsViewController {
             VLUserCenter.user.agoraRTCToken = token ?? ""
             ChatRoomServiceImp.getSharedInstance().joinRoom(room.room_id ?? "") { error, room_entity in
                 SVProgressHUD.dismiss()
+                self.normal.roomList.isUserInteractionEnabled = true
                 if VLUserCenter.user.chat_uid.isEmpty || VLUserCenter.user.im_token.isEmpty || self.initialError != nil {
                     SVProgressHUD.showError(withStatus: "Fetch IMconfig failed!")
+                    return
+                }
+                if error != nil {
+                    SVProgressHUD.showError(withStatus: error?.localizedDescription)
                     return
                 }
                 self.mapUser(user: VLUserCenter.user)
@@ -249,8 +254,6 @@ extension VRRoomsViewController {
                 self.isDestory = false
                 let vc = VoiceRoomViewController(info: info)
                 self.navigationController?.pushViewController(vc, animated: true)
-                self.normal.roomList.isUserInteractionEnabled = true
-
             }
         }
     }

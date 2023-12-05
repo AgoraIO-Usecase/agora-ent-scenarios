@@ -762,6 +762,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     func fetchRoomList(page: Int,
                      completion: @escaping (Error?, [VRRoomEntity]?) -> Void) {
         initScene { [weak self] in
+            if self?.connectState != .open {
+                completion(self?.networkError(),nil)
+                return
+            }
             SyncUtil.fetchAll { [weak self] results in
                 agoraPrint("result == \(results.compactMap { $0.toJson() })")
                 
@@ -780,6 +784,13 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let error = VoiceRoomError()
         error.code = "403"
         error.message = "voice_members_reach_limit".voice_localized()
+        return error
+    }
+    
+    private func networkError() -> VoiceRoomError {
+        let error = VoiceRoomError()
+        error.code = "-1"
+        error.message = "voice_network_disconnected".voice_localized()
         return error
     }
 
@@ -880,6 +891,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                     let params = updateRoom.kj.JSONObject()
                     
                     initScene{
+                        if self.connectState != .open {
+                            completion(self.networkError(),nil)
+                            return
+                        }
                         SyncUtil.joinScene(id: roomId,
                                            userId: VLUserCenter.user.id,
                                            isOwner: VLUserCenter.user.id == room.owner?.uid,

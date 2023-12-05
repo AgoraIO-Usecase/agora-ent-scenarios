@@ -71,6 +71,9 @@ extension VRNormalRoomsViewController {
             } else {
                 self.empty.isHidden = true
                 self.view.makeToast("\(error?.localizedDescription ?? "")")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    self.roomList.refreshControl.endRefreshing()
+                }
             }
         }
     }
