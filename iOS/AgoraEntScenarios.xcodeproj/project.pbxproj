@@ -192,7 +192,6 @@
 		DD619AB429E3E247008F63E4 /* SAMuteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A2E29E3E247008F63E4 /* SAMuteView.swift */; };
 		DD619AB529E3E247008F63E4 /* SAANISSUPTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A2F29E3E247008F63E4 /* SAANISSUPTableViewCell.swift */; };
 		DD619AB629E3E247008F63E4 /* SA3DMoveUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A3029E3E247008F63E4 /* SA3DMoveUserView.swift */; };
-		DD619AB729E3E247008F63E4 /* SANormalRtcView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A3129E3E247008F63E4 /* SANormalRtcView.swift */; };
 		DD619AB829E3E247008F63E4 /* SAPraiseEmitterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A3229E3E247008F63E4 /* SAPraiseEmitterView.swift */; };
 		DD619AB929E3E247008F63E4 /* SAEQSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A3329E3E247008F63E4 /* SAEQSettingView.swift */; };
 		DD619ABA29E3E247008F63E4 /* SAAudioSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A3429E3E247008F63E4 /* SAAudioSettingView.swift */; };
@@ -214,7 +213,6 @@
 		DD619ACA29E3E247008F63E4 /* SAChatBarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A4429E3E247008F63E4 /* SAChatBarCell.swift */; };
 		DD619ACB29E3E247008F63E4 /* SAMicVolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A4529E3E247008F63E4 /* SAMicVolView.swift */; };
 		DD619ACC29E3E247008F63E4 /* SAUserListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A4629E3E247008F63E4 /* SAUserListView.swift */; };
-		DD619ACD29E3E247008F63E4 /* SABaseUserCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A4729E3E247008F63E4 /* SABaseUserCollectionViewCell.swift */; };
 		DD619ACE29E3E247008F63E4 /* SAUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A4829E3E247008F63E4 /* SAUserView.swift */; };
 		DD619ACF29E3E247008F63E4 /* SAAudienceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A4929E3E247008F63E4 /* SAAudienceCell.swift */; };
 		DD619AD029E3E247008F63E4 /* SAANISSetTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A4A29E3E247008F63E4 /* SAANISSetTableViewCell.swift */; };
@@ -222,7 +220,6 @@
 		DD619AD229E3E247008F63E4 /* SASoundSelTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A4C29E3E247008F63E4 /* SASoundSelTableViewCell.swift */; };
 		DD619AD329E3E247008F63E4 /* SAPopTip+Transitions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A4D29E3E247008F63E4 /* SAPopTip+Transitions.swift */; };
 		DD619AD429E3E247008F63E4 /* SAInviteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A4E29E3E247008F63E4 /* SAInviteCell.swift */; };
-		DD619AD529E3E247008F63E4 /* SABaseAlienCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A4F29E3E247008F63E4 /* SABaseAlienCollectionViewCell.swift */; };
 		DD619AD629E3E247008F63E4 /* SAEmojiListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A5029E3E247008F63E4 /* SAEmojiListView.swift */; };
 		DD619AD729E3E247008F63E4 /* SAPopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A5129E3E247008F63E4 /* SAPopView.swift */; };
 		DD619AD829E3E247008F63E4 /* SANorSetTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619A5229E3E247008F63E4 /* SANorSetTableViewCell.swift */; };
@@ -958,7 +955,6 @@
 		DD619A2E29E3E247008F63E4 /* SAMuteView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAMuteView.swift; sourceTree = "<group>"; };
 		DD619A2F29E3E247008F63E4 /* SAANISSUPTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAANISSUPTableViewCell.swift; sourceTree = "<group>"; };
 		DD619A3029E3E247008F63E4 /* SA3DMoveUserView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SA3DMoveUserView.swift; sourceTree = "<group>"; };
-		DD619A3129E3E247008F63E4 /* SANormalRtcView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SANormalRtcView.swift; sourceTree = "<group>"; };
 		DD619A3229E3E247008F63E4 /* SAPraiseEmitterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAPraiseEmitterView.swift; sourceTree = "<group>"; };
 		DD619A3329E3E247008F63E4 /* SAEQSettingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAEQSettingView.swift; sourceTree = "<group>"; };
 		DD619A3429E3E247008F63E4 /* SAAudioSettingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAAudioSettingView.swift; sourceTree = "<group>"; };
@@ -980,7 +976,6 @@
 		DD619A4429E3E247008F63E4 /* SAChatBarCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAChatBarCell.swift; sourceTree = "<group>"; };
 		DD619A4529E3E247008F63E4 /* SAMicVolView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAMicVolView.swift; sourceTree = "<group>"; };
 		DD619A4629E3E247008F63E4 /* SAUserListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAUserListView.swift; sourceTree = "<group>"; };
-		DD619A4729E3E247008F63E4 /* SABaseUserCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SABaseUserCollectionViewCell.swift; sourceTree = "<group>"; };
 		DD619A4829E3E247008F63E4 /* SAUserView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAUserView.swift; sourceTree = "<group>"; };
 		DD619A4929E3E247008F63E4 /* SAAudienceCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAAudienceCell.swift; sourceTree = "<group>"; };
 		DD619A4A29E3E247008F63E4 /* SAANISSetTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAANISSetTableViewCell.swift; sourceTree = "<group>"; };
@@ -988,7 +983,6 @@
 		DD619A4C29E3E247008F63E4 /* SASoundSelTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SASoundSelTableViewCell.swift; sourceTree = "<group>"; };
 		DD619A4D29E3E247008F63E4 /* SAPopTip+Transitions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SAPopTip+Transitions.swift"; sourceTree = "<group>"; };
 		DD619A4E29E3E247008F63E4 /* SAInviteCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAInviteCell.swift; sourceTree = "<group>"; };
-		DD619A4F29E3E247008F63E4 /* SABaseAlienCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SABaseAlienCollectionViewCell.swift; sourceTree = "<group>"; };
 		DD619A5029E3E247008F63E4 /* SAEmojiListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAEmojiListView.swift; sourceTree = "<group>"; };
 		DD619A5129E3E247008F63E4 /* SAPopView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SAPopView.swift; sourceTree = "<group>"; };
 		DD619A5229E3E247008F63E4 /* SANorSetTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SANorSetTableViewCell.swift; sourceTree = "<group>"; };
@@ -2422,7 +2416,6 @@
 				DD619A2E29E3E247008F63E4 /* SAMuteView.swift */,
 				DD619A2F29E3E247008F63E4 /* SAANISSUPTableViewCell.swift */,
 				DD619A3029E3E247008F63E4 /* SA3DMoveUserView.swift */,
-				DD619A3129E3E247008F63E4 /* SANormalRtcView.swift */,
 				DD619A3229E3E247008F63E4 /* SAPraiseEmitterView.swift */,
 				DD619A3329E3E247008F63E4 /* SAEQSettingView.swift */,
 				DD619A3429E3E247008F63E4 /* SAAudioSettingView.swift */,
@@ -2444,7 +2437,6 @@
 				DD619A4429E3E247008F63E4 /* SAChatBarCell.swift */,
 				DD619A4529E3E247008F63E4 /* SAMicVolView.swift */,
 				DD619A4629E3E247008F63E4 /* SAUserListView.swift */,
-				DD619A4729E3E247008F63E4 /* SABaseUserCollectionViewCell.swift */,
 				DD619A4829E3E247008F63E4 /* SAUserView.swift */,
 				DD619A4929E3E247008F63E4 /* SAAudienceCell.swift */,
 				DD619A4A29E3E247008F63E4 /* SAANISSetTableViewCell.swift */,
@@ -2452,7 +2444,6 @@
 				DD619A4C29E3E247008F63E4 /* SASoundSelTableViewCell.swift */,
 				DD619A4D29E3E247008F63E4 /* SAPopTip+Transitions.swift */,
 				DD619A4E29E3E247008F63E4 /* SAInviteCell.swift */,
-				DD619A4F29E3E247008F63E4 /* SABaseAlienCollectionViewCell.swift */,
 				DD619A5029E3E247008F63E4 /* SAEmojiListView.swift */,
 				DD619A5129E3E247008F63E4 /* SAPopView.swift */,
 				DD619A5229E3E247008F63E4 /* SANorSetTableViewCell.swift */,
@@ -4724,7 +4715,6 @@
 				DD9EBFC62AD5512300B4551F /* VoiceRoomApplyAlert.swift in Sources */,
 				DDA19A0328FFE579009D3E61 /* NSArray+JKSafeAccess.m in Sources */,
 				DD9EBFBA2AD5512300B4551F /* VRAllRoomsViewController.swift in Sources */,
-				DD619ACD29E3E247008F63E4 /* SABaseUserCollectionViewCell.swift in Sources */,
 				DD3610BD29B70CDC00CE7984 /* ShowPresettingCell.swift in Sources */,
 				E34B46032AEA5CAD0082D334 /* VRSoundCardSettingView.swift in Sources */,
 				E301C00B2AF8E8E90089A79C /* VLSBGSelBgModel.m in Sources */,
@@ -5106,13 +5096,11 @@
 				DD9EBFD32AD5512300B4551F /* VoiceRoomChatCell.swift in Sources */,
 				DD619AE629E3E247008F63E4 /* SAHorizontalCardsView.swift in Sources */,
 				DD36106929B70CDC00CE7984 /* ShowSettingKey.swift in Sources */,
-				DD619AB729E3E247008F63E4 /* SANormalRtcView.swift in Sources */,
 				DD3610B829B70CDC00CE7984 /* ShowSettingBaseCell.swift in Sources */,
 				DD36109F29B70CDC00CE7984 /* ShowBaseViewController.swift in Sources */,
 				DD9EBFE62AD5512400B4551F /* VoiceRoomPopView.swift in Sources */,
 				DD9EBFCE2AD5512300B4551F /* AgoraChatRoomBaseUserCollectionViewCell.swift in Sources */,
 				E3735C342A5E4AFF004737EF /* UITextView+Extension.swift in Sources */,
-				DD619AD529E3E247008F63E4 /* SABaseAlienCollectionViewCell.swift in Sources */,
 				DDA19A0628FFE579009D3E61 /* NSObject+JKAutoCoding.m in Sources */,
 				E301BD6D2AF4CAFF0089A79C /* VLKTVMVIdleView.m in Sources */,
 				ABE4B37A2A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift in Sources */,
@@ -5609,7 +5597,7 @@
 					"-weak_framework",
 					"\"Photos\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -5838,7 +5826,7 @@
 					"-weak_framework",
 					"\"Photos\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;

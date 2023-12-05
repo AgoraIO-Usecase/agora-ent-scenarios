@@ -227,8 +227,8 @@ extension SARoomViewController {
             sRtcView.isHidden = entity.type == 0
             headerView.updateHeader(with: entity)
         }
-        sRtcView.clickBlock = {[weak self] type, tag in
-            self?.didRtcAction(with: type, tag: tag)
+        sRtcView.clickBlock = {[weak self] tag in
+            self?.didRtcAction(with: tag)
         }
 
         bgImgView.snp.makeConstraints { make in
@@ -301,7 +301,7 @@ extension SARoomViewController {
         }
     }
 
-    func didRtcAction(with type: SABaseUserCellType, tag: Int) {
+    func didRtcAction(with tag: Int) {
         let index: Int = tag - 200
         //TODO: remove as!
         guard let mic: SARoomMic = AppContext.saTmpServiceImp().mics[safe:index] else { return }
@@ -589,7 +589,7 @@ extension SARoomViewController: SAManagerDelegate {
 //        self.didHeaderAction(with: .back, destroyed: true)
     }
 
-    func reportAlien(with type: SARtcType.ALIEN_TYPE, musicType: SARtcType.VMMUSIC_TYPE) {
+    func reportAlien(with type: SARtcType.ALIEN_TYPE) {
         print("musicPath:\(type.rawValue)")
         sRtcView.updateAlienMic(with: type)
     }

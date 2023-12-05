@@ -25,8 +25,7 @@ class SA3DRtcView: UIView {
     private lazy var blueSpatialParams = AgoraSpatialAudioParams()
     private var isPlaying: Bool = false
     
-    public var clickBlock: ((SABaseUserCellType, Int) -> Void)?
-    public var activeBlock: ((SABaseUserCellType) -> Void)?
+    public var clickBlock: ((Int) -> Void)?
     
     public var rtcKit: SARTCManager?
 
@@ -60,44 +59,12 @@ class SA3DRtcView: UIView {
         rtcKit?.playMusic(with: .Spatical, isPlay: isPlay)
     }
     
-    
-    
     //因为麦位顺序的特殊性 需要对数据进行调整
     private func getRealIndex(with index: Int) -> Int {//4表示中间的用户
         let realIndexs: [Int] = [3, 1, 0, 4, 5, 6, 2]
         return realIndexs[index]
     }
     
-    public func updateVolume(with uid: String, vol: Int) {
-        /**
-         1.根据uid来判断是哪个cell需要更新音量
-         2.更新音量
-         */
-        guard let micInfos = micInfos else {
-            return
-        }
-        for i in micInfos {
-            guard let member = i.member else { return }
-            guard let cur_uid = member.uid else { return }
-            if cur_uid == uid {
-                guard let mic_index = member.mic_index else { return }
-                let realIndex = getRealIndex(with: mic_index)
-                let indexPath = IndexPath(item: realIndex, section: 0)
-                if realIndex != 3 {
-                    DispatchQueue.main.async {[weak self] in
-                        guard let cell: SA3DUserCollectionViewCell = self?.collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
-                        cell.refreshVolume(vol: vol)
-                    }
-                } else {
-                    //更新可移动view的数据
-                    let micInfo = micInfos[0]
-                    rtcUserView.tag = 200
-                    rtcUserView.user = micInfo.member
-                }
-            }
-        }
-    }
-
     public func updateVolume(with index: Int, vol: Int) {
         let realIndex: Int = getRealIndex(with: index)
         let indexPath = IndexPath(item: index, section: 0)
@@ -219,11 +186,7 @@ class SA3DRtcView: UIView {
         rtcUserView.tag = 200
         rtcUserView.tapClickBlock = {[weak self] in
             guard let clickBlock = self?.clickBlock else {return}
-            if let micinfo: SARoomMic = self?.micInfos?[0] {
-                clickBlock(self?.getCellType(With: micinfo.status) ?? .AgoraChatRoomBaseUserCellTypeAdd, 200)
-            } else {
-                clickBlock(.AgoraChatRoomBaseUserCellTypeAdd, 200)
-            }
+            clickBlock(200)
         }
         rtcUserView.snp.makeConstraints { make in
             make.center.equalTo(self)
@@ -263,32 +226,6 @@ class SA3DRtcView: UIView {
             rtcKit?.setPlayerAttenuation(attenuation: attenuation,
                                          playerId: rtcKit?.blueMediaPlayer?.getMediaPlayerId() ?? 0)
         }
-    }
-    
-    func getCellType(With status: Int) -> SABaseUserCellType {
-        if let _ = self.micInfos?[0] {
-            switch status {
-                case 0:
-                    return .AgoraChatRoomBaseUserCellTypeNormalUser
-                case 1:
-                    return .AgoraChatRoomBaseUserCellTypeMute
-                case 2:
-                    return .AgoraChatRoomBaseUserCellTypeForbidden
-                case 3:
-                    return .AgoraChatRoomBaseUserCellTypeLock
-                case 4:
-                    return .AgoraChatRoomBaseUserCellTypeMuteAndLock
-                case -1:
-                    return .AgoraChatRoomBaseUserCellTypeAdd
-                case -2:
-                    return .AgoraChatRoomBaseUserCellTypeAlienNonActive
-                default:
-                    break
-            }
-        } else {
-            return .AgoraChatRoomBaseUserCellTypeAdd
-        }
-        return .AgoraChatRoomBaseUserCellTypeAdd
     }
 }
 
@@ -471,14 +408,13 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             cell.clickBlock = {[weak self] tag in
                 print("tag:----\(tag)")
                 guard let block = self?.clickBlock else { return }
-                block(cell.cellType, tag)
+                block(tag)
             }
             switch indexPath.item {
             case 0:
                 if let mic_info = micInfos?[2] {
                     cell.tag = 202
                     cell.setArrowInfo(imageName: "sa_downright_arrow", margin: 6)
-                    cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeDown
                     cell.refreshUser(with: mic_info)
                 }
@@ -486,7 +422,6 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 if let mic_info = micInfos?[1] {
                     cell.tag = 201
                     cell.setArrowInfo(imageName: "sa_down_arrow", margin: 6)
-                    cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeUp
                     cell.refreshUser(with: mic_info)
                 }
@@ -498,11 +433,9 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                     member.portrait = "red"
                     mic_info.member = member
                     cell.setArrowInfo(imageName: "sa_downleft_arrow", margin: 6)
-                    cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeDown
                     cell.refreshUser(with: mic_info)
                 }
-                
             case 4:
                 if let mic_info = micInfos?[3] {
                     cell.tag = 203
@@ -511,7 +444,6 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                     member.portrait = "blue"
                     mic_info.member = member
                     cell.setArrowInfo(imageName: "sa_upright_arrow", margin: -6)
-                    cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeUp
                     cell.refreshUser(with: mic_info)
                 }
@@ -519,8 +451,6 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 if let mic_info = micInfos?[4] {
                     cell.tag = 204
                     cell.setArrowInfo(imageName: "sa_up_arrow", margin: -5)
-                    
-                    cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeDown
                     cell.refreshUser(with: mic_info)
                 }
@@ -528,8 +458,6 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 if let mic_info = micInfos?[5] {
                     cell.tag = 205
                     cell.setArrowInfo(imageName: "sa_upleft_arrow", margin: -4)
-                    
-                    cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeUp
                     cell.refreshUser(with: mic_info)
                 }
@@ -593,29 +521,6 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("index === \(indexPath.item)")
         
-    }
-    
-    private func getCellTypeWithStatus(_ status: Int) -> SABaseUserCellType {
-        switch status {
-            case -2:
-                return .AgoraChatRoomBaseUserCellTypeAlienNonActive
-            case -1:
-                return .AgoraChatRoomBaseUserCellTypeAdd
-            case 0:
-                return .AgoraChatRoomBaseUserCellTypeNormalUser
-            case 1:
-                return .AgoraChatRoomBaseUserCellTypeMute
-            case 2:
-                return .AgoraChatRoomBaseUserCellTypeForbidden
-            case 3:
-                return .AgoraChatRoomBaseUserCellTypeLock
-            case 4:
-                return .AgoraChatRoomBaseUserCellTypeMuteAndLock
-            case 5:
-                return .AgoraChatRoomBaseUserCellTypeAlienActive
-            default:
-                return .AgoraChatRoomBaseUserCellTypeAdd
-        }
     }
 }
 extension SA3DRtcView: SAMusicPlayerDelegate {

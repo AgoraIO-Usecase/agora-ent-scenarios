@@ -8,75 +8,11 @@
 import SnapKit
 import UIKit
 
-public enum SABaseUserCellType {
-    case AgoraChatRoomBaseUserCellTypeAdd
-    case AgoraChatRoomBaseUserCellTypeMute
-    case AgoraChatRoomBaseUserCellTypeForbidden
-    case AgoraChatRoomBaseUserCellTypeLock
-    case AgoraChatRoomBaseUserCellTypeNormalUser
-    case AgoraChatRoomBaseUserCellTypeMuteAndLock
-    case AgoraChatRoomBaseUserCellTypeAlienNonActive
-    case AgoraChatRoomBaseUserCellTypeAlienActive
-}
-
 protocol SARtcUserViewDelegate: NSObjectProtocol {
     func didRtcUserViewClicked(tag: Int)
 }
 
 class SABaseRtcUserView: UIView {
-    public var cellType: SABaseUserCellType = .AgoraChatRoomBaseUserCellTypeAdd {
-        didSet {
-            if cellType == .AgoraChatRoomBaseUserCellTypeAlienActive || cellType == .AgoraChatRoomBaseUserCellTypeAlienNonActive {
-                bgColor = .white
-            } else {
-                bgColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.1)
-            }
-
-            switch cellType {
-            case .AgoraChatRoomBaseUserCellTypeAdd:
-                iconView.isHidden = true
-                micView.isHidden = true
-                bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
-            case .AgoraChatRoomBaseUserCellTypeMute:
-                iconView.isHidden = false
-                micView.isHidden = false
-                micView.setState(.forbidden)
-                bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_lock", bundleName: "SpatialAudioResource")
-            case .AgoraChatRoomBaseUserCellTypeForbidden:
-                iconView.isHidden = false
-                micView.isHidden = false
-                micView.setState(.forbidden)
-            case .AgoraChatRoomBaseUserCellTypeLock:
-                iconView.isHidden = true
-                micView.isHidden = true
-                bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_lock", bundleName: "SpatialAudioResource")
-            case .AgoraChatRoomBaseUserCellTypeNormalUser:
-                iconView.isHidden = false
-                micView.isHidden = false
-                micView.setState(.on)
-                nameBtn.setImage(nil, for: .normal)
-            case .AgoraChatRoomBaseUserCellTypeMuteAndLock:
-                iconView.isHidden = true
-                micView.isHidden = false
-                micView.setState(.forbidden)
-                bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_lock", bundleName: "SpatialAudioResource")
-            case .AgoraChatRoomBaseUserCellTypeAlienNonActive:
-                iconView.isHidden = false
-                micView.isHidden = false
-                micView.setState(.on)
-                micView.isHidden = true
-                nameBtn.setImage(UIImage.sceneImage(name: "guanfang", bundleName: "SpatialAudioResource"), for: .normal)
-                coverView.isHidden = false
-                activeButton.isHidden = false
-            case .AgoraChatRoomBaseUserCellTypeAlienActive:
-                iconView.isHidden = false
-                micView.isHidden = false
-                nameBtn.setImage(UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), for: .normal)
-                coverView.isHidden = true
-                activeButton.isHidden = true
-            }
-        }
-    }
 
     public var iconImgUrl: String = "" {
         didSet {
@@ -96,24 +32,6 @@ class SABaseRtcUserView: UIView {
         }
     }
 
-    public var ownerIcon: String = "" {
-        didSet {
-            nameBtn.setImage(UIImage.spatial_image(ownerIcon), for: .normal)
-        }
-    }
-
-    public var showMicView: Bool = false {
-        didSet {
-            if showMicView {
-                micView.isHidden = false
-                micView.setState(.on)
-                micView.setVolume(100)
-            } else {
-                micView.isHidden = true
-            }
-        }
-    }
-
     public var iconWidth: CGFloat = 60 {
         didSet {
             self.iconView.layer.cornerRadius = (iconWidth / 2.0)
@@ -127,12 +45,6 @@ class SABaseRtcUserView: UIView {
     public var nameStr: String = "" {
         didSet {
             nameBtn.setTitle(nameStr, for: .normal)
-        }
-    }
-
-    public var bgColor: UIColor = .black {
-        didSet {
-            bgView.backgroundColor = bgColor
         }
     }
 
@@ -182,6 +94,7 @@ class SABaseRtcUserView: UIView {
         iconView.image = UIImage(named: "")
         iconView.layer.cornerRadius = 30
         iconView.layer.masksToBounds = true
+        iconView.backgroundColor = .white
         bgView.addSubview(iconView)
         
         addSubview(arrowImageView)
