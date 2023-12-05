@@ -763,7 +763,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                      completion: @escaping (Error?, [VRRoomEntity]?) -> Void) {
         initScene { [weak self] in
             if self?.connectState != .open {
-                completion(self?.networkError(),nil)
+                DispatchQueue.main.async {
+                    completion(self?.networkError(),nil)
+                }
                 return
             }
             SyncUtil.fetchAll { [weak self] results in
