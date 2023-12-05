@@ -1120,7 +1120,7 @@ class KTVSyncManagerServiceImp(
                 val ret = ArrayList<RoomSeatModel>()
                 result?.forEach {
                     val obj = it.toObject(RoomSeatModel::class.java)
-                    objIdOfSeatIndex[obj.seatIndex] = it.id
+                    if (it.id != null) objIdOfSeatIndex[obj.seatIndex] = it.id
                     ret.add(obj)
 
                     // 储存在本地map中
@@ -1199,7 +1199,7 @@ class KTVSyncManagerServiceImp(
 
             override fun onUpdated(item: IObject?) {
                 val obj = item?.toObject(RoomSeatModel::class.java) ?: return
-                objIdOfSeatIndex[obj.seatIndex] = item.id
+                if (item.id != null) objIdOfSeatIndex[obj.seatIndex] = item.id
 
                 if (obj.rtcUid == UserManager.getInstance().user.id.toString()) {
                     localSeatModel = obj
@@ -1320,11 +1320,15 @@ class KTVSyncManagerServiceImp(
                 objIdOfSongNo.addAll(retObjId)
 
                 val sortList = innerSortChooseSongList(songChosenList)
-                completion.invoke(null, sortList)
+                runOnMainThread {
+                    completion.invoke(null, sortList)
+                }
             }
 
             override fun onFail(exception: SyncManagerException?) {
-                completion.invoke(exception, null)
+                runOnMainThread {
+                    completion.invoke(exception, null)
+                }
             }
         })
     }
@@ -1352,6 +1356,9 @@ class KTVSyncManagerServiceImp(
         completion: (error: Exception?) -> Unit
     ) {
         KTVLogger.d(TAG, "innerAddChooseSongInfo: $songInfo")
+        if (songChosenList.size != 0) {
+            songInfo.userNo?.let { innerRemoveAllUsersChooseSong(it) }
+        }
         mSceneReference?.collection(kCollectionIdChooseSong)
             ?.add(songInfo, object : DataItemCallback {
                 override fun onSuccess(result: IObject) {

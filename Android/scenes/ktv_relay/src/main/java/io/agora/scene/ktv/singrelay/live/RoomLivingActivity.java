@@ -489,6 +489,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
             }
         });
         roomLivingViewModel.graspStatusMutableLiveData.observe(this, model -> {
+            if (model == null) return;
             if (model.status == RoomLivingViewModel.GraspStatus.SUCCESS) {
                 getBinding().singRelayGameView.onGraspSongSuccess(model.userName, model.headUrl);
             } else if (model.status == RoomLivingViewModel.GraspStatus.IDLE) {
@@ -496,11 +497,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
                 if (roomLivingViewModel.isNextRoundSinger()) {
                     getBinding().singRelayGameView.onNextPart(true);
                     roomLivingViewModel.toggleMic(true);
+                    getBinding().cbMic.setChecked(true);
                 } else {
                     getBinding().singRelayGameView.onNextPart(false);
                     roomLivingViewModel.toggleMic(false);
+                    getBinding().cbMic.setChecked(false);
                 }
-                roomLivingViewModel.plusSingPartNum();
             } else if (model.status == RoomLivingViewModel.GraspStatus.Mention && roomLivingViewModel.songsOrderedLiveData.getValue() != null && roomLivingViewModel.songsOrderedLiveData.getValue().size() != 0) {
                 getBinding().singRelayGameView.onBattleGamePrepare(roomLivingViewModel.songsOrderedLiveData.getValue().get(0).getWinnerNo().split("_")[0].equals(UserManager.getInstance().getUser().id.toString()));
             }
