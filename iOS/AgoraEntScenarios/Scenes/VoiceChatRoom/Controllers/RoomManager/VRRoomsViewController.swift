@@ -243,8 +243,8 @@ extension VRRoomsViewController {
                     SVProgressHUD.showError(withStatus: "Fetch IMconfig failed!")
                     return
                 }
-                if error != nil {
-                    SVProgressHUD.showError(withStatus: error?.localizedDescription)
+                if let error = error {
+                    SVProgressHUD.showError(withStatus: error.localizedDescription)
                     return
                 }
                 self.mapUser(user: VLUserCenter.user)
