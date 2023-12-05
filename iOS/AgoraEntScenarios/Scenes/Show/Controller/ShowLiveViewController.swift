@@ -160,6 +160,9 @@ class ShowLiveViewController: UIViewController {
     
     private var currentInteraction: ShowInteractionInfo? {
         didSet {
+            if self.room?.userId() == self.currentUserId {
+                self.liveView.showThumnbnailCanvasView = false
+            }
             //update audio status
             if let interaction = currentInteraction {
                 liveView.canvasView.setLocalUserInfo(name: room?.ownerName ?? "")
@@ -821,7 +824,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStateChangedOfUid uid: UInt, state: AgoraVideoRemoteState, reason: AgoraVideoRemoteReason, elapsed: Int) {
         if uid == roomOwnerId {
-            if reason == .remoteMuted {
+            if reason == .remoteMuted , currentInteraction?.interactStatus != .pking{
                 liveView.showThumnbnailCanvasView = true
             }else if reason == .remoteUnmuted {
                 liveView.showThumnbnailCanvasView = false
