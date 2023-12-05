@@ -15,6 +15,10 @@ extension UIColor {
         return .white
     }
     
+    @objc static var joy_placeholder_text: UIColor {
+        return UIColor(red: 0.8, green: 0.8, blue: 0.8, alpha: 1)
+    }
+    
     @objc static var joy_title_text: UIColor {
         return UIColor(hexString: "#040925")!
     }

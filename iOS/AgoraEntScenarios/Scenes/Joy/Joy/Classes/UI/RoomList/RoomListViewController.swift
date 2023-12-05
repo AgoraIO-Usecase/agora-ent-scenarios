@@ -9,25 +9,13 @@ import UIKit
 import YYCategories
 import AgoraRtcKit
 
-private let randomRoomName = [
-    "show_create_room_name1".joyLocalization(),
-    "show_create_room_name2".joyLocalization(),
-    "show_create_room_name3".joyLocalization(),
-    "show_create_room_name4".joyLocalization(),
-    "show_create_room_name5".joyLocalization(),
-    "show_create_room_name6".joyLocalization(),
-    "show_create_room_name7".joyLocalization(),
-    "show_create_room_name8".joyLocalization(),
-    "show_create_room_name9".joyLocalization(),
-    "show_create_room_name10".joyLocalization(),
-]
 
 class RoomListViewController: UIViewController {
     var userInfo: JoyUserInfo?
     private lazy var rtcEngine: AgoraRtcEngineKit = _createRtcEngine()
     private lazy var service: JoyServiceProtocol = JoyServiceImp(appId: joyAppId, user: userInfo)
-    private lazy var naviBar: RoomListNavigationBar = {
-        let bar = RoomListNavigationBar(frame: CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop, width: self.view.width, height: 44))
+    private lazy var naviBar: JoyNavigationBar = {
+        let bar = JoyNavigationBar(frame: CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop, width: self.view.width, height: 44))
         return bar
     }()
     private lazy var backgroundView = UIImageView(frame: self.view.bounds)
@@ -195,17 +183,8 @@ extension RoomListViewController {
     @objc private func _createAction() {
         guard let userInfo = userInfo else {return}
         
-        let roomNameIdx = Int(arc4random()) % randomRoomName.count
-        let roomName = randomRoomName[roomNameIdx]
-        service.createRoom(roomName: "\(roomName)\(Int(arc4random()) % 1000000)") {[weak self] info, error in
-            guard let self = self else {return}
-            if let error = error {
-                AUIToast.show(text: error.localizedDescription)
-                return
-            }
-            guard let info = info else { return }
-            self.gotoRoom(roomInfo: info)
-        }
+        let vc = CreateRoomViewController()
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     private func gotoRoom(roomInfo: JoyRoomInfo) {

@@ -19,7 +19,7 @@
 "call_not_init"="网络异常";
 "call_state_connecting"="连接中";
 "user_list_create_room"="创建房间";
-"user_list_create"="创建";
+"user_list_create"="开始直播";
 "user_list_creating"="创建中";
 "user_list_live_tag"="Live";
 "create_room_tips"="填写房间名称，吸引更多观众";
