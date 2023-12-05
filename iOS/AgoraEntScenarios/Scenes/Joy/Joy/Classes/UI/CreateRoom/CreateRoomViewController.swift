@@ -22,6 +22,7 @@ private let randomRoomName = [
 
 class CreateRoomViewController: UIViewController {
     private var service: JoyServiceProtocol!
+    private var currentUserInfo: JoyUserInfo!
     private lazy var naviBar: JoyNavigationBar = {
         let bar = JoyNavigationBar(frame: CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop, width: self.view.width, height: 44))
         bar.navibarType = .light
@@ -75,9 +76,10 @@ class CreateRoomViewController: UIViewController {
         return button
     }()
     
-    required init(service: JoyServiceProtocol? = nil) {
+    required init(currentUserInfo: JoyUserInfo, service: JoyServiceProtocol) {
         super.init(nibName: nil, bundle: nil)
         self.service = service
+        self.currentUserInfo = currentUserInfo
     }
     
     required init?(coder: NSCoder) {
@@ -91,6 +93,11 @@ class CreateRoomViewController: UIViewController {
         view.addSubview(naviBar)
         view.addSubview(textField)
         view.addSubview(createButton)
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        self.view.endEditing(true)
     }
 }
 
@@ -113,7 +120,8 @@ extension CreateRoomViewController {
                 return
             }
             guard let info = info else { return }
-//            self.gotoRoom(roomInfo: info)
+            let vc = RoomViewController(roomInfo: info, currentUserInfo: currentUserInfo, service: service)
+            self.navigationController?.pushViewController(vc, animated: true)
         }
     }
 }

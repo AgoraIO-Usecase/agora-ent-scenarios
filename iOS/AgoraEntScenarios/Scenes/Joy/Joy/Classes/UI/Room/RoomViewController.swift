@@ -81,6 +81,17 @@ class RoomViewController: UIViewController {
     private lazy var broadcasterCanvasView: UIView = UIView()
     private lazy var assistantCanvasView: UIView = UIView()
     
+    required init(roomInfo: JoyRoomInfo, currentUserInfo: JoyUserInfo, service: JoyServiceProtocol) {
+        super.init(nibName: nil, bundle: nil)
+        self.roomInfo = roomInfo
+        self.currentUserInfo = currentUserInfo
+        self.service = service
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad(){
         super.viewDidLoad()
         view.backgroundColor = .darkGray

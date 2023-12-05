@@ -11,7 +11,7 @@ import AgoraRtcKit
 
 
 class RoomListViewController: UIViewController {
-    var userInfo: JoyUserInfo?
+    private var userInfo: JoyUserInfo!
     private lazy var rtcEngine: AgoraRtcEngineKit = _createRtcEngine()
     private lazy var service: JoyServiceProtocol = JoyServiceImp(appId: joyAppId, user: userInfo)
     private lazy var naviBar: JoyNavigationBar = {
@@ -68,8 +68,9 @@ class RoomListViewController: UIViewController {
         joyPrint("deinit-- RoomListViewController")
     }
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    required init(userInfo: JoyUserInfo) {
+        super.init(nibName: nil, bundle: nil)
+        self.userInfo = userInfo
         joyPrint("init-- RoomListViewController")
     }
     
@@ -183,15 +184,12 @@ extension RoomListViewController {
     @objc private func _createAction() {
         guard let userInfo = userInfo else {return}
         
-        let vc = CreateRoomViewController()
+        let vc = CreateRoomViewController(currentUserInfo: userInfo, service: service)
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
     private func gotoRoom(roomInfo: JoyRoomInfo) {
-        let vc = RoomViewController()
-        vc.roomInfo = roomInfo
-        vc.service = service
-        vc.currentUserInfo = userInfo
+        let vc = RoomViewController(roomInfo: roomInfo, currentUserInfo: userInfo, service: service)
         self.navigationController?.pushViewController(vc, animated: true)
     }
 }

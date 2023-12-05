@@ -42,8 +42,7 @@ public class JoyContext: NSObject {
                                  userInfo: JoyUserInfo) {
         joyAppId = appId
         joyAppCertificate = appCertificate
-        let vc = RoomListViewController()
-        vc.userInfo = userInfo
+        let vc = RoomListViewController(userInfo: userInfo)
         vc.hidesBottomBarWhenPushed = true
         viewController.navigationController?.pushViewController(vc, animated: true)
     }
