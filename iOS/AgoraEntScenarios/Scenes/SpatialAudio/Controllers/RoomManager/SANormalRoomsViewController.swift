@@ -13,7 +13,7 @@ public class SANormalRoomsViewController: UIViewController {
     
     public var totalCountClosure: ((Int) -> Void)?
     
-    lazy var empty: SAEmptyView = .init(frame: CGRect(x: 0, y: 120, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "spatial_voice_no_chat_room_yet".spatial_localized(), image: nil)
+    lazy var empty: SARoomListEmptyView = .init(frame: CGRect(x: 0, y: 120, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "spatial_voice_no_chat_room_yet".spatial_localized(), image: nil)
     
     lazy var roomList: SRRoomHomeListView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30))
     
@@ -80,16 +80,4 @@ extension SANormalRoomsViewController {
         let vc = SARoomViewController(info: info)
         self.navigationController?.pushViewController(vc, animated: true)
     }
-
-//    private func roomListEvent() {
-//        roomList.didSelected = { [weak self] in
-//            guard let self = self else { return }
-//            if self.didSelected != nil { self.didSelected!($0) }
-//        }
-//        roomList.loadMore = { [weak self] in
-//            if self?.roomList.rooms?.total ?? 0 > self?.roomList.rooms?.rooms?.count ?? 0 {
-//                self?.fetchRooms(cursor: self?.roomList.rooms?.cursor ?? "")
-//            }
-//        }
-//    }
 }

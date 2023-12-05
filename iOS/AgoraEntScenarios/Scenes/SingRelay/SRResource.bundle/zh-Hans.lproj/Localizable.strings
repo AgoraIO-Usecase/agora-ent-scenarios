@@ -330,4 +330,5 @@
 "sr_ready_choose" = "即将抢唱下轮歌曲";
 "sr_notice" = "公告 >";
 "sr_song_loading" = "歌曲准备中...";
+"sr_room_before_gameStart" = "点击空白麦位，上麦后加入游戏";
 
