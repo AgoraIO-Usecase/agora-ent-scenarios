@@ -287,7 +287,9 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
         VLSBGRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
        // [weakSelf.MVView updateUIWithSong:song role:weakSelf.singRole];
         [weakSelf.roomPersonView reloadSeatIndex:model.seatIndex];
-        
+        VLSBGRoomSeatModel *owner = self.seatsArray.firstObject;
+        NSString *msg = [NSString stringWithFormat:@"owner:%@---%@, updater:%@---%@", owner.name, owner.headUrl, seatModel.name, seatModel.headUrl];
+        SBGLogInfo(@"%@", msg);
         [weakSelf onSeatFull];
 
     }];

@@ -97,7 +97,7 @@ class SRSubRankModel : SRRankModel {
     @objc var userId: String?
     @objc var index: Int = 0
     @objc var count: Int = 0
-    @objc var segCount: Int = 0
+    @objc var lines: Int = 0
 }
 
 @objc enum SingRelayStatus: Int {

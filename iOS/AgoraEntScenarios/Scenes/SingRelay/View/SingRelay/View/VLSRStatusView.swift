@@ -15,6 +15,7 @@ import UIKit
     case origin
     case again
     case aac
+    case retryLrc
 }
 
 @objc protocol VLSRStatusViewDelegate: NSObjectProtocol {
@@ -83,6 +84,8 @@ class VLSRStatusView: UIView {
         models.append(model3)
         return models
     }()
+    
+    @objc public var retryBtn: UIButton!
     
     @objc public var dataSource: [SRSubRankModel]? {
         didSet {
@@ -582,6 +585,11 @@ class VLSRStatusView: UIView {
     }
     
     @objc func sr(btn: UIButton) {
+        srBtn.isEnabled = false
+        // 延迟两秒后恢复按钮的可点击状态
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            self.srBtn.isEnabled = true
+        }
         guard let delegate = delegate else {return}
         delegate.didSrActionChanged(.sbg)
     }
@@ -624,6 +632,9 @@ class VLSRStatusView: UIView {
         
         addSubview(lrcView)
         
+        //重试歌词按钮
+        addRetryBtn()
+        
         addSubview(srBtn)
 
         addSubview(orderBtn)
@@ -650,6 +661,20 @@ class VLSRStatusView: UIView {
         addSubview(notiView)
         notiView.isHidden = true
         
+    }
+    
+    private func addRetryBtn() {
+        //重试歌词按钮
+        retryBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 100, height: 40))
+        retryBtn.center = lrcView.center
+        retryBtn.setTitle("点击重试", for: .normal)
+        retryBtn.layer.cornerRadius = 5
+        retryBtn.layer.masksToBounds = true
+        retryBtn.layer.borderColor = UIColor.white.cgColor
+        retryBtn.layer.borderWidth = 1
+        retryBtn.addTarget(self, action: #selector(retryLrc), for: .touchUpInside)
+        lrcView.addSubview(retryBtn)
+        retryBtn.isHidden = true
     }
     
     @objc private func choose() {//点歌
@@ -690,6 +715,11 @@ class VLSRStatusView: UIView {
         }
     }
     
+    @objc private func retryLrc() {
+        guard let delegate = self.delegate else {return}
+        delegate.didSrActionChanged(.retryLrc)
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         bgImgView.frame = self.bounds
@@ -718,6 +748,9 @@ class VLSRStatusView: UIView {
         nextBtn.frame = CGRect(x: self.bounds.width / 2.0 - 55, y: self.bounds.height - 18 - 34, width: 110, height: 34)
         
         lrcView.frame = CGRect(x: 12, y: 36, width: self.bounds.width - 24, height: self.bounds.height - 40)
+        
+        retryBtn.frame = CGRect(x: 0, y: 0, width: 100, height: 40)
+        retryBtn.center = lrcView.center
         
         notiView.frame = CGRect(x: 12, y: 10, width: self.bounds.width - 24, height: 105)
         

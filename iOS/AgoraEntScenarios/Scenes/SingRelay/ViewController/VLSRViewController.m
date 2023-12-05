@@ -288,6 +288,9 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
             
             VLSRRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
            // [weakSelf.MVView updateUIWithSong:song role:weakSelf.singRole];
+            VLSRRoomSeatModel *owner = self.seatsArray.firstObject;
+            NSString *msg = [NSString stringWithFormat:@"owner:%@---%@, updater:%@---%@", owner.name, owner.headUrl, seatModel.name, seatModel.headUrl];
+            SRLogInfo(@"%@", msg);
             [weakSelf.roomPersonView reloadSeatIndex:model.seatIndex];
             
             [weakSelf onSeatFull];
@@ -1184,6 +1187,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         case SRClickActionAgain:
             [self renewGame];
             break;
+        case SRClickActionRetryLrc:
+            self.statusView.retryBtn.hidden = true;
+            [self loadAndPlaySRSong];
+            break;
         default:
             break;
     }
@@ -1235,7 +1242,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         NSInteger upperBound = (i < (array.count - 1)) ? [array[i+1] integerValue] : NSIntegerMax;
         
         //每段开始前3秒需要提示即将开始抢唱
-        if(lowerBound - progress >= 3000 && lowerBound - progress <= 3050){
+        if(lowerBound - progress >= 2000 && lowerBound - progress <= 3000){
             if(i < array.count - 1){
                 if([self isOnMicSeat]){
                     [self.statusView showContentViewWith: i < (array.count - 2) ? SRLocalizedString(@"sr_next_ready") : SRLocalizedString(@"sr_next_start")];
@@ -1320,7 +1327,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         model.poster = seatModel.headUrl;
         model.score = self.segmentScore;
         model.songNum = 1;
-        model.segCount = self.segmentCount;
+        model.lines = self.segmentCount;
         model.userId = seatModel.userNo;
         NSLog(@"index:seatModel:%@--%@---%li---%li---%li", seatModel.name, seatModel.userNo, model.score, self.sumScore, self.segmentCount);
         [self.scoreArray addObject:model];
@@ -1394,6 +1401,25 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
         [[VLAlert shared] dismiss];
     }];
+}
+
+-(NSDictionary *)convertScoreArrayToRank {
+    NSMutableDictionary *muDict = [NSMutableDictionary dictionary];
+    //先进性数组合并
+    NSArray *mergeModels = mergeSRModelsWithSameUserIds(self.scoreArray);
+    NSInteger count = mergeModels.count;
+    if(count == 0){
+        return muDict;
+    }
+    for(SubRankModel *model in mergeModels){
+        RankModel *model1 = [[RankModel alloc]init];
+        model1.userName = model.userName;
+        model1.poster = model.poster;
+        model1.score = model.score;
+        model1.songNum = model.songNum;
+        [muDict setValue:model1 forKey:model.userId];
+    }
+    return muDict;
 }
 
 -(void)reNewAllData {
@@ -1474,7 +1500,7 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
             [userDict setObject:model forKey:model.userId];
         } else { // 已有该用户，累加分数
             existModel.score += model.score;
-            existModel.segCount += model.segCount;
+            existModel.lines += model.lines;
             existModel.songNum += model.songNum;
         }
     }
@@ -1482,7 +1508,7 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
     NSMutableArray *finaModels = [NSMutableArray array];
     for(SRSubRankModel *model in [userDict allValues]){
         SRSubRankModel *newModel = model;
-        newModel.score = (int)model.score / model.segCount;
+        newModel.score = (int)model.score / model.lines;
         [finaModels addObject:newModel];
     }
     return finaModels;
@@ -1980,10 +2006,37 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
         [self.SRApi switchSingerRoleWithNewRole:KTVSingRoleAudience onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
 
         }];
+        
+        NSMutableArray *res = [NSMutableArray array];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.statusView hideNextMicOwner];
-            NSArray *mergeModels = mergeSRModelsWithSameUserIds(self.scoreArray);
-            self.statusView.dataSource = sortSRModels(mergeModels, NO);
+            NSDictionary *subDict = gameModel.rank;
+            NSMutableArray *res = [[NSMutableArray alloc] init]; // 确保res已经初始化
+
+            for (NSString *key in subDict) {
+                NSDictionary *value = subDict[key];
+                if (![value isKindOfClass:[NSDictionary class]]) {
+                    continue;
+                }
+
+                NSLog(@"Key: %@, Value: %@", key, value);
+                NSString *image = value[@"poster"];
+                NSString *name = value[@"userName"];
+
+                int score = [value[@"score"] isKindOfClass:[NSNumber class]] ? [value[@"score"] intValue] : 0;
+                int songNum = [value[@"songNum"] isKindOfClass:[NSNumber class]] ? [value[@"songNum"] intValue] : 0;
+                
+                VLSRRoomSelSongModel *topSong = self.selSongsArray.firstObject;
+                SRSubRankModel *model = [[SRSubRankModel alloc] init];
+                model.userName = name;
+                model.poster = image;
+                model.score = score;
+                model.songNum = songNum;
+                model.userId = key;
+                [res addObject:model];
+            }
+         //   NSArray *mergeModels = mergeSRModelsWithSameUserIds(res);
+            self.statusView.dataSource = sortSRModels(res, NO);
             self.statusView.state = [self isRoomOwner] ? SRStateResultOwner : SRStateResultAudience;
             [self.roomPersonView.personCollectionView reloadData];
             [self.scoreArray removeAllObjects];
@@ -2280,6 +2333,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
                         [self removeCurrentSongWithSync:YES];
                         
                         self.gameModel.status = SingRelayStatusEnded;
+                        self.gameModel.rank = [self convertScoreArrayToRank];
                         [[AppContext srServiceImp] innerUpdateSingRelayInfo:self.gameModel completion:^(NSError * error) {
                                         
                         }];
@@ -2365,7 +2419,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
             self.loadMusicCallBack = nil;
         }
         if (reason == KTVLoadSongFailReasonNoLyricUrl) {
-          //  self.MVView.loadingType = VLSRMVViewStateLoadFail;
+           
         } else {
            // self.MVView.loadingType = VLSRMVViewStateIdle;
 //            if(reason == SRLoadSongFailReasonMusicPreloadFail){
@@ -2383,6 +2437,8 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 //                }
 //            }
         }
+        self.statusView.retryBtn.hidden = false;
+        [self.statusView bringSubviewToFront:self.statusView.retryBtn];
         SRLogError(@"onMusicLoadFail songCode: %ld error: %ld", songCode, reason);
     });
 }
@@ -2390,12 +2446,13 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 - (void)onMusicLoadSuccessWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl {
     [self.statusView updateLoadingViewWith:100];
     self.trackMode = KTVPlayerTrackModeAcc;//切换为伴奏
+    
     dispatch_async_on_main_queue(^{
         if(self.loadMusicCallBack){
             self.loadMusicCallBack(YES, songCode);
             self.loadMusicCallBack = nil;
         }
-       // self.MVView.loadingType = VLSRMVViewStateIdle;
+        
         if(lyricUrl.length > 0){
             SRLogInfo(@"onMusicLoadSuccessWithSongCode: %ld", self.singRole);
         }

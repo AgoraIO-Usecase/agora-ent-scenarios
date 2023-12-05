@@ -974,14 +974,14 @@ extension KTVApiImpl {
     private func handlePlayerStateCommand(dict: [String: Any], role: KTVSingRole) {
         let mainSingerState: Int = dict["state"] as? Int ?? 0
         let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .idle
-
-        if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
-            //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
-            self.localPlayerPosition = getPlayerCurrentTime()
-            print("localPlayerPosition:playerKit:handlePlayerStateCommand \(localPlayerPosition)")
-            agoraPrint("seek toPosition: \(self.localPlayerPosition)")
-            mediaPlayer?.seek(toPosition: Int(self.localPlayerPosition))
-        }
+//
+//        if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
+//            //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
+//            self.localPlayerPosition = getPlayerCurrentTime()
+//            print("localPlayerPosition:playerKit:handlePlayerStateCommand \(localPlayerPosition)")
+//            agoraPrint("seek toPosition: \(self.localPlayerPosition)")
+//            mediaPlayer?.seek(toPosition: Int(self.localPlayerPosition))
+//        }
 
         agoraPrint("recv state with MainSinger: \(state.rawValue)")
         syncPlayStateFromRemote(state: state, needDisplay: true)
