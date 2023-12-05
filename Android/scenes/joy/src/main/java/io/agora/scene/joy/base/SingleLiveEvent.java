@@ -1,4 +1,4 @@
-package io.agora.scene.joy.network;
+package io.agora.scene.joy.base;
 
 import android.util.Log;
 

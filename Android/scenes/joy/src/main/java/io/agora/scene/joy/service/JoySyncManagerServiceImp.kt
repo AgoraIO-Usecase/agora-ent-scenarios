@@ -27,6 +27,7 @@ class JoySyncManagerServiceImp constructor(
         private const val TAG = "Joy_Service_LOG"
         private const val kSceneId = "scene_joy_4.10.0"
         private const val SYNC_SCENE_ROOM_USER_COLLECTION = "userCollection"
+        private const val SYNC_MANAGER_MESSAGE_COLLECTION = "joy_message_collection"
     }
 
     @Volatile
@@ -64,9 +65,13 @@ class JoySyncManagerServiceImp constructor(
     private val mTimerRoomEndRun = Runnable {
         runOnMainThread {
             JoyLogger.d(TAG, "time up exit room!")
-            mJoyServiceListener?.onRoomTimeUp()
+            val roomInfo = mRoomMap[mCurrRoomNo]?: return@runOnMainThread
+            mJoyServiceListener?.onRoomDidDestroy(roomInfo)
         }
     }
+
+    private fun getRandomThumbnailId(crateAt: Long) =
+        Random(crateAt).nextInt(0, 4).toString()
 
     private fun initSync(complete: () -> Unit) {
         if (syncInitialized) {
@@ -106,22 +111,6 @@ class JoySyncManagerServiceImp constructor(
                 }
             }
         }
-    }
-
-
-    private fun innerReset(isRoomDestroy: Boolean) {
-        if (!isRoomDestroy) {
-            innerRemoveUserInfo {}
-            innerUpdateUserCount(mCurrentRoomUserMap.size - 1)
-        }
-        mCurrentRoomUserMap.clear()
-        objIdOfUserNo.clear()
-
-        if (isRoomDestroy){
-            mRoomMap.remove(mCurrRoomNo)
-        }
-        mSceneReference = null
-        mCurrRoomNo = ""
     }
 
     override fun getRoomList(completion: (list: List<JoyRoomInfo>) -> Unit) {
@@ -208,9 +197,6 @@ class JoySyncManagerServiceImp constructor(
         }
     }
 
-    private fun getRandomThumbnailId(crateAt: Long) =
-        Random(crateAt).nextInt(0, 4).toString()
-
     override fun joinRoom(roomInfo: JoyRoomInfo, completion: (error: Exception?) -> Unit) {
         mCurrRoomNo = ""
         initSync {
@@ -223,6 +209,7 @@ class JoySyncManagerServiceImp constructor(
                     innerAddUserIfNeed(roomInfo.roomId)
                     innerSubscribeRoomChanged()
                     innerSubscribeUserChanged()
+                    innerSubscribeMessageChanged()
                     // 重置体验时间事件
                     mMainHandler.removeCallbacks(mTimerRoomEndRun)
                     // 定时删除房间
@@ -241,6 +228,92 @@ class JoySyncManagerServiceImp constructor(
                 }
             })
         }
+    }
+
+    override fun leaveRoom(roomInfo: JoyRoomInfo, completion: (error: Exception?) -> Unit) {
+        // 重置体验时间事件
+        mMainHandler.removeCallbacks(mTimerRoomEndRun)
+        // 取消所有订阅
+        mRoomSubscribeListener.forEach {
+            mSceneReference?.unsubscribe(it)
+        }
+        mRoomSubscribeListener.clear()
+
+        innerRemoveUserInfo(completion = {
+
+        })
+        val user = UserManager.getInstance().user
+        if (roomInfo.ownerId == user.id.toInt() ||
+            TimeUtils.currentTimeMillis() - roomInfo.createdAt >= JoyServiceProtocol.ROOM_AVAILABLE_DURATION
+        ) {
+            mSceneReference?.delete(object : Sync.Callback {
+                override fun onSuccess() {
+                    JoyLogger.d(TAG, "leaveRoom onSuccess ${roomInfo.roomId}")
+                    innerReset(true)
+                    runOnMainThread {
+                        completion.invoke(null)
+                    }
+                }
+
+                override fun onFail(exception: SyncManagerException?) {
+                    JoyLogger.e(TAG, "leaveRoom onFail ${exception?.message}")
+                    runOnMainThread { completion.invoke(exception) }
+                }
+            })
+        } else {
+            innerReset(false)
+            runOnMainThread {
+                completion.invoke(null)
+            }
+        }
+    }
+
+    override fun sendChatMessage(roomId: String, message: String, completion: (error: Exception?) -> Unit) {
+        val joyMessage = JoyMessage(
+            userId = mUser.id.toString(),
+            userName = mUser.name,
+            message = message,
+            createAt = TimeUtils.currentTimeMillis()
+        )
+        mSceneReference?.collection(SYNC_MANAGER_MESSAGE_COLLECTION)?.add(joyMessage, object : Sync.DataItemCallback {
+            override fun onSuccess(result: IObject?) {
+                result ?: return
+                JoyLogger.d(TAG, "sendChatMessage onSuccess roomId:$roomId objectId:${result.id}")
+                val addUser = result.toObject(JoyUserInfo::class.java)
+                objIdOfUserNo[addUser.userId.toString()] = result.id
+                mCurrentRoomUserMap[addUser.userId.toString()]
+                runOnMainThread {
+                    mJoyServiceListener?.onUserListDidChanged(mCurrentRoomUserMap.values.toList())
+                }
+                completion.invoke(null)
+            }
+
+            override fun onFail(exception: SyncManagerException?) {
+                JoyLogger.e(TAG, "sendChatMessage onFail roomId:$roomId ${exception?.message}")
+                completion.invoke(exception)
+            }
+
+        })
+    }
+
+    override fun subscribeListener(listener: JoyServiceListenerProtocol) {
+        mJoyServiceListener = listener
+    }
+
+
+    private fun innerReset(isRoomDestroy: Boolean) {
+        if (!isRoomDestroy) {
+            innerRemoveUserInfo {}
+            innerUpdateUserCount(mCurrentRoomUserMap.size - 1)
+        }
+        mCurrentRoomUserMap.clear()
+        objIdOfUserNo.clear()
+
+        if (isRoomDestroy) {
+            mRoomMap.remove(mCurrRoomNo)
+        }
+        mSceneReference = null
+        mCurrRoomNo = ""
     }
 
     private fun innerAddUserIfNeed(roomNo: String) {
@@ -275,6 +348,7 @@ class JoySyncManagerServiceImp constructor(
         })
     }
 
+    // 添加用户
     private fun innerAddUserInfo(roomId: String, completion: (objectId: String?, error: Exception?) -> Unit) {
         val userInfo = JoyUserInfo(
             userId = mUser.id.toInt(),
@@ -296,13 +370,14 @@ class JoySyncManagerServiceImp constructor(
             }
 
             override fun onFail(exception: SyncManagerException?) {
-                JoyLogger.e(TAG, "innerAddUserInfo onFail roomId:$roomId ${exception?.toString()}")
+                JoyLogger.e(TAG, "innerAddUserInfo onFail roomId:$roomId ${exception?.message}")
                 completion.invoke(null, exception)
             }
 
         })
     }
 
+    //移除用户
     private fun innerRemoveUserInfo(completion: (error: Exception?) -> Unit) {
         val objectId = objIdOfUserNo[mUser.id.toString()] ?: return
         mSceneReference?.collection(SYNC_SCENE_ROOM_USER_COLLECTION)?.delete(objectId, object : Sync.Callback {
@@ -313,12 +388,13 @@ class JoySyncManagerServiceImp constructor(
             }
 
             override fun onFail(exception: SyncManagerException?) {
-                JoyLogger.e(TAG, "innerRemoveUserInfo onFail  ${exception?.toString()}")
+                JoyLogger.e(TAG, "innerRemoveUserInfo onFail  ${exception?.message}")
                 completion.invoke(exception)
             }
         })
     }
 
+    // 订阅房间变化
     private fun innerSubscribeRoomChanged() {
         val listener = object : Sync.EventListener {
             override fun onCreated(item: IObject?) {
@@ -353,6 +429,7 @@ class JoySyncManagerServiceImp constructor(
         mRoomSubscribeListener.add(listener)
     }
 
+    // 订阅用户变化
     private fun innerSubscribeUserChanged() {
         val listener = object : Sync.EventListener {
             override fun onCreated(item: IObject?) {
@@ -399,6 +476,38 @@ class JoySyncManagerServiceImp constructor(
         mRoomSubscribeListener.add(listener)
     }
 
+    // 订阅消息变化
+    private fun innerSubscribeMessageChanged() {
+        val listener = object : Sync.EventListener {
+            override fun onCreated(item: IObject?) {
+
+            }
+
+            override fun onUpdated(item: IObject?) {
+                item ?: return
+                JoyLogger.d(TAG, "innerSubscribeMessageChanged onUpdated:${item}")
+                val joyMessage = item.toObject(JoyMessage::class.java)
+                joyMessage.objectId = item.id
+
+                runOnMainThread {
+                    mJoyServiceListener?.onMessageDidAdded(joyMessage)
+                }
+            }
+
+            override fun onDeleted(item: IObject?) {
+                item ?: return
+                JoyLogger.d(TAG, "innerSubscribeMessageChanged onDeleted:${item.id}")
+            }
+
+            override fun onSubscribeError(ex: SyncManagerException) {
+                errorHandler.invoke(ex)
+            }
+        }
+        mSceneReference?.collection(SYNC_MANAGER_MESSAGE_COLLECTION)?.subscribe(listener)
+        mRoomSubscribeListener.add(listener)
+    }
+
+    // 更新房间用户
     private fun innerUpdateUserCount(count: Int) {
         val roomInfo = mRoomMap[mCurrRoomNo]?.copy() ?: return
         if (count == roomInfo.roomUserCount) {
@@ -408,48 +517,5 @@ class JoySyncManagerServiceImp constructor(
         updateRoom(roomInfo, completion = {
 
         })
-    }
-
-
-    override fun leaveRoom(roomInfo: JoyRoomInfo, completion: (error: Exception?) -> Unit) {
-        // 重置体验时间事件
-        mMainHandler.removeCallbacks(mTimerRoomEndRun)
-        // 取消所有订阅
-        mRoomSubscribeListener.forEach {
-            mSceneReference?.unsubscribe(it)
-        }
-        mRoomSubscribeListener.clear()
-
-        innerRemoveUserInfo(completion = {
-
-        })
-        val user = UserManager.getInstance().user
-        if (roomInfo.ownerId == user.id.toInt() ||
-            TimeUtils.currentTimeMillis() - roomInfo.createdAt >= JoyServiceProtocol.ROOM_AVAILABLE_DURATION
-        ) {
-            mSceneReference?.delete(object : Sync.Callback {
-                override fun onSuccess() {
-                    JoyLogger.d(TAG, "leaveRoom onSuccess ${roomInfo.roomId}")
-                    innerReset(true)
-                    runOnMainThread {
-                        completion.invoke(null)
-                    }
-                }
-
-                override fun onFail(exception: SyncManagerException?) {
-                    JoyLogger.e(TAG, "leaveRoom onFail ${exception?.message}")
-                    runOnMainThread { completion.invoke(exception) }
-                }
-            })
-        } else {
-            innerReset(false)
-            runOnMainThread {
-                completion.invoke(null)
-            }
-        }
-    }
-
-    override fun subscribeListener(listener: JoyServiceListenerProtocol) {
-        mJoyServiceListener = listener
     }
 }

@@ -4,22 +4,27 @@ import android.os.Bundle
 import android.view.View
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.joy.databinding.JoyDialogGameRulesLayoutBinding
+import io.agora.scene.joy.network.JoyGameDetailResult
+import io.agora.scene.joy.network.JoyGameResult
 
 class JoyGameRulesDialog : BaseBottomSheetDialogFragment<JoyDialogGameRulesLayoutBinding>() {
 
     companion object {
-        const val Key_Content = "key_content"
+        const val Key_Game = "key_game"
+        const val Key_IsOwner = "key_is_owner"
     }
 
-    private val mContent by lazy {
-        arguments?.getString(Key_Content) ?: ""
+    private val mGameInfo by lazy {
+        arguments?.getSerializable(Key_Game) as JoyGameDetailResult
     }
 
-
+    private val mIsOwner by lazy {
+        arguments?.getBoolean(Key_IsOwner) ?: false
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mBinding.tvIntroduceContent.text = mContent
+        mBinding.tvIntroduceContent.text = mGameInfo.introduce
         mBinding.btnConfirm.setOnClickListener {
             dismiss()
         }

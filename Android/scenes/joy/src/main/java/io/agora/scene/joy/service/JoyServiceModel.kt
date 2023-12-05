@@ -24,6 +24,7 @@ data class JoyRoomInfo constructor(
     var badgeTitle: String = "",//胖可争霸/羊羊抗狼
     var assistantUid: Int = 0, //游戏画面uid
     var createdAt: Long = System.currentTimeMillis(),
+    var taskId: String? = null, // 游戏 taskId
 
     var objectId: String = ""
 ) : Serializable

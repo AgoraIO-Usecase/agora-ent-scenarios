@@ -12,10 +12,10 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.joy.R
 import io.agora.scene.joy.databinding.JoyDialogChooseGameLayoutBinding
 import io.agora.scene.joy.databinding.JoyItemGameChooseLayoutBinding
-import io.agora.scene.joy.network.JoyGameEntity
+import io.agora.scene.joy.network.JoyGameListResult
 
 
-class JoyChooseGameDialog constructor(var gamList: List<JoyGameEntity>, var completion: (game: JoyGameEntity) -> Unit) :
+class JoyChooseGameDialog constructor(var gamList: List<JoyGameListResult>, var completion: (game: JoyGameListResult) -> Unit) :
     BaseBottomSheetDialogFragment<JoyDialogChooseGameLayoutBinding>() {
 
     companion object {
@@ -59,7 +59,7 @@ class JoyChooseGameDialog constructor(var gamList: List<JoyGameEntity>, var comp
 }
 
 private class JoyChooseGameAdapter constructor(
-    var mList: List<JoyGameEntity>,
+    var mList: List<JoyGameListResult>,
     var selectedIndex: Int,
 ) : RecyclerView.Adapter<JoyChooseGameAdapter.ViewHolder>() {
     inner class ViewHolder(val binding: JoyItemGameChooseLayoutBinding) : RecyclerView.ViewHolder(binding.root)
@@ -70,7 +70,7 @@ private class JoyChooseGameAdapter constructor(
         )
     }
 
-    fun setDataList(list: List<JoyGameEntity>) {
+    fun setDataList(list: List<JoyGameListResult>) {
         mList = list
         notifyDataSetChanged()
     }

@@ -24,9 +24,10 @@ import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.joy.R
 import io.agora.scene.joy.RtcEngineInstance
+import io.agora.scene.joy.base.DataState
+import io.agora.scene.joy.databinding.JoyActivityLivePrepareBinding
 import io.agora.scene.joy.databinding.JoyItemGameBannerLayoutBinding
-import io.agora.scene.joy.databinding.JoyLivePrepareActivityBinding
-import io.agora.scene.joy.network.JoyGameEntity
+import io.agora.scene.joy.network.JoyGameListResult
 import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
@@ -34,7 +35,7 @@ import java.util.Random
 import java.util.Timer
 import java.util.TimerTask
 
-class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBinding>() {
+class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBinding>() {
 
     companion object {
         private const val TAG = "Joy_LivePrepareActivity"
@@ -74,8 +75,8 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBindin
         })
     }
 
-    override fun getViewBinding(inflater: LayoutInflater): JoyLivePrepareActivityBinding {
-        return JoyLivePrepareActivityBinding.inflate(inflater)
+    override fun getViewBinding(inflater: LayoutInflater): JoyActivityLivePrepareBinding {
+        return JoyActivityLivePrepareBinding.inflate(inflater)
     }
 
     override fun init() {
@@ -106,9 +107,9 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBindin
             enableCrateRoomButton(false)
             mJoyService.createRoom(roomName, completion = { error, roomInfo ->
                 if (error == null && roomInfo != null) { // success
-                    if (mGameInfoAdapter.gameInfoList.isEmpty()){
+                    if (mGameInfoAdapter.gameInfoList.isEmpty()) {
                         ToastUtils.showToast("游戏资源获取中...")
-                    }else{
+                    } else {
                         mIsFinishToLiveDetail = true
                         RoomLivingActivity.launch(this, roomInfo, mGameInfoAdapter.gameInfoList)
                         finish()
@@ -169,8 +170,16 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBindin
     override fun requestData() {
         super.requestData()
         mJoyViewModel.getGames()
-        mJoyViewModel.mGameEntityList.observe(this) {
-            mGameInfoAdapter.setDataList(it)
+        mJoyViewModel.mGameListLiveData.observe(this) {
+            when (it.dataState) {
+                DataState.STATE_SUCCESS -> {
+                    val list = it.data?.list
+                    if (!list.isNullOrEmpty()) {
+                        mGameInfoAdapter.setDataList(list)
+                    }
+
+                }
+            }
         }
     }
 
@@ -251,14 +260,14 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyLivePrepareActivityBindin
 
 
     class GameInfoAdapter constructor(
-        var gameInfoList: List<JoyGameEntity>,
+        var gameInfoList: List<JoyGameListResult>,
         private val itemClick: (position: Int) -> Unit
     ) :
         RecyclerView.Adapter<GameInfoAdapter.GameViewHolder>() {
 
         inner class GameViewHolder(val binding: JoyItemGameBannerLayoutBinding) : RecyclerView.ViewHolder(binding.root)
 
-        fun setDataList(list: List<JoyGameEntity>) {
+        fun setDataList(list: List<JoyGameListResult>) {
             gameInfoList = list
             notifyDataSetChanged()
         }

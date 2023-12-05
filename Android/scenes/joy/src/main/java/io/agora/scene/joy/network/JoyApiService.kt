@@ -1,5 +1,7 @@
 package io.agora.scene.joy.network
 
+import io.agora.scene.joy.base.JoyApiResult
+import io.agora.scene.joy.base.JoyJsonModel
 import retrofit2.http.*
 
 interface JoyApiService {
@@ -9,9 +11,9 @@ interface JoyApiService {
     ): JoyApiResult<JoyGameResult>
 
     @POST("/toolbox/v1/cloud-bullet-game/games/game")
-    suspend fun gamesDetails(
+    suspend fun gameDetails(
         @Body entity: JoyGameEntity
-    ): JoyApiResult<JoyGameResult>
+    ): JoyApiResult<JoyGameDetailResult>
 
     @POST("/toolbox/v1/cloud-bullet-game/games/start")
     suspend fun startGame(
@@ -23,36 +25,28 @@ interface JoyApiService {
         @Body entity: JoyGameEntity
     ): JoyApiResult<JoyJsonModel.JoyEmpty>
 
-    @GET("/toolbox/v1/cloud-bullet-game/games/status")
+    @POST("/toolbox/v1/cloud-bullet-game/games/status")
     suspend fun gameState(
-        @Query("task_id") taskId: String
+        @Body entity: JoyGameEntity
     ): JoyApiResult<JoyGameResult>
 
     @POST("/toolbox/v1/cloud-bullet-game/games/gift")
     suspend fun sendGift(
-        @Path("app_id") appId: String,
-        @Path("game_id") gameId: String,
         @Body entity: JoySendMessage
     ): JoyApiResult<JoyJsonModel.JoyEmpty>
 
     @POST("/toolbox/v1/cloud-bullet-game/games/comment")
-    suspend fun gameComment(
-        @Path("app_id") appId: String,
-        @Path("game_id") gameId: String,
+    suspend fun sendComment(
         @Body entity: JoySendMessage
     ): JoyApiResult<JoyJsonModel.JoyEmpty>
 
     @POST("/toolbox/v1/cloud-bullet-game/games/like")
-    suspend fun gameLike(
-        @Path("app_id") appId: String,
-        @Path("game_id") gameId: String,
+    suspend fun sendLike(
         @Body entity: JoySendMessage
     ): JoyApiResult<JoyJsonModel.JoyEmpty>
 
     @POST("/toolbox/v1/cloud-bullet-game/games/renew-token")
     suspend fun renewToken(
-        @Path("app_id") appId: String,
-        @Path("game_id") gameId: String,
         @Body entity: JoyGameEntity
     ): JoyApiResult<JoyJsonModel.JoyEmpty>
 }

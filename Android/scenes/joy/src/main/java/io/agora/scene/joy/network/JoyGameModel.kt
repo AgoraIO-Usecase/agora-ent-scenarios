@@ -2,38 +2,11 @@ package io.agora.scene.joy.network
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import java.io.Serializable
-
-interface JoyJsonModel : Serializable {
-
-    class JoyEmpty : JoyJsonModel
-}
-
-data class JoyApiResult<T> constructor(
-    @Expose
-    @SerializedName("message")
-    var msg: String? = null,
-    @Expose
-    @SerializedName("err_msg")
-    var errorMsg: String? = null,
-    @Expose
-    @SerializedName("code")
-    var code: Int = 0,
-    @Expose
-    @SerializedName("data")
-    var data: T? = null,
-    @SerializedName("trace")
-    var trace: String? = null,
-    @SerializedName("uri")
-    var uri: String? = null
-) {
-    val isSucceed: Boolean
-        get() = code == 200 || code == 0
-}
+import io.agora.scene.joy.base.JoyJsonModel
 
 data class JoyRtcConfig constructor(
     @Expose
-    @SerializedName("broadcast_uid")
+    @SerializedName("broadcastUid")
     var broadcastUid: Int = 0,
     @Expose
     @SerializedName("uid")
@@ -42,7 +15,7 @@ data class JoyRtcConfig constructor(
     @SerializedName("token")
     var token: String? = null,
     @Expose
-    @SerializedName("channel_name")
+    @SerializedName("channelName")
     var channelName: String? = null
 ) : JoyJsonModel
 
@@ -63,19 +36,16 @@ data class JoyGameEntity constructor(
     @SerializedName("id")
     var id: Long? = null,
     @Expose
-    @SerializedName("vid")
-    var vid: String? = null,
-    @Expose
     @SerializedName("uid")
-    var uid: Int = 0,
+    var uid: Int? = null,
     @Expose
-    @SerializedName("room_id")
+    @SerializedName("roomId")
     var roomId: String? = null,
     @Expose
-    @SerializedName("open_id")
+    @SerializedName("openId")
     var openId: String? = null,
     @Expose
-    @SerializedName("task_id")
+    @SerializedName("taskId")
     var taskId: String? = null,
     @Expose
     @SerializedName("nickname")
@@ -84,10 +54,10 @@ data class JoyGameEntity constructor(
     @SerializedName("avatar")
     var avatar: String? = null,
     @Expose
-    @SerializedName("rtc_config")
+    @SerializedName("rtcConfig")
     var rtcConfig: JoyRtcConfig? = null,
     @Expose
-    @SerializedName("game_id")
+    @SerializedName("gameId")
     var gameId: String? = null,
     @Expose
     @SerializedName("introduce")
@@ -126,80 +96,107 @@ data class JoyFeatureEntity constructor(
 
 data class JoyGiftEntity constructor(
     @Expose
-    @SerializedName("name")
-    var name: String? = null,
+    @SerializedName("game_id")
+    var gameId: String? = null,
     @Expose
     @SerializedName("id")
     var id: String? = null,
     @Expose
-    @SerializedName("msg_id")
-    var msgId: String? = null,
+    @SerializedName("name")
+    var name: String? = null,
     @Expose
-    @SerializedName("open_id")
-    var openId: String? = null,
-    @Expose
-    @SerializedName("avatar")
-    var avatar: String? = null,
-    @Expose
-    @SerializedName("nickname")
-    var nickname: String? = null,
-    @Expose
-    @SerializedName("gift_id")
-    var giftId: String? = null,
-    @Expose
-    @SerializedName("gift_num")
-    var giftNum: Int = 0,
-    @Expose
-    @SerializedName("value")
-    var value: Int = 0,
-    @Expose
-    @SerializedName("gift_value")
-    var giftValue: Int = 0,
-    @Expose
-    @SerializedName("vendor_gift_id")
-    var vendorGiftId: String? = null,
-    @Expose
-    @SerializedName("timestamp")
-    var timestamp: Long? = null,
-    @Expose
-    @SerializedName("game_id")
-    var gameId: String? = null,
+    @SerializedName("price")
+    var price: Int = 0,
     @Expose
     @SerializedName("thumbnail")
     var thumbnail: String? = null,
     @Expose
-    @SerializedName("smallPath")
-    var smallPath: String? = null,
+    @SerializedName("value")
+    var value: Int = 0,
     @Expose
-    @SerializedName("price")
-    var price: Int = 0,
+    @SerializedName("vendor_gift_id")
+    var vendorGiftId: String? = null,
     var isSelect: Boolean = false
 ) : JoyJsonModel
 
-data class JoyGameResult constructor(
+/**
+ * 游戏列表
+ */
+data class JoyGameListResult constructor(
     @Expose
-    @SerializedName("list")
-    var list: List<JoyGameEntity>? = null,
+    @SerializedName("game_id")
+    var gameId: String? = null,
     @Expose
-    @SerializedName("task_id")
-    var taskId: String? = null,
+    @SerializedName("introduce")
+    var introduce: String? = null,
     @Expose
-    @SerializedName("status")
-    var status: String? = null,
+    @SerializedName("name")
+    var name: String? = null,
+    @Expose
+    @SerializedName("thumbnail")
+    var thumbnail: String? = null,
+    @Expose
+    @SerializedName("vendor")
+    var vendor: String? = null,
+    @Expose
+    @SerializedName("vendor_game_id")
+    var vendorGameId: String? = null,
+): JoyJsonModel
+
+data class JoyGameDetailResult constructor(
     @Expose
     @SerializedName("feature")
     var feature: JoyFeatureEntity? = null,
     @Expose
+    @SerializedName("game_id")
+    var gameId: String? = null,
+    @Expose
     @SerializedName("gifts")
-    var gifts: List<JoyGiftEntity>? = null
+    var gifts: JoyGiftEntity? = null,
+    @Expose
+    @SerializedName("instruct")
+    var instruct: List<Any>? = null,
+    @Expose
+    @SerializedName("introduce")
+    var introduce: String? = null,
+    @Expose
+    @SerializedName("name")
+    var name: String? = null,
+    @Expose
+    @SerializedName("thumbnail")
+    var thumbnail: String? = null,
+    @Expose
+    @SerializedName("vendor")
+    var vendor: String? = null,
+):JoyJsonModel
+
+data class JoyGameResult constructor(
+    @Expose
+    @SerializedName("list")
+    var list: List<JoyGameListResult>? = null,
+    @Expose
+    @SerializedName("status")
+    var status: String? = null,
+    @Expose
+    @SerializedName("page_num")
+    var pageNum: Int? = null,
+    @Expose
+    @SerializedName("page_size")
+    var pageSize: Int? = null,
+    @Expose
+    @SerializedName("total")
+    var total: Int? = null,
+    @Expose
+    @SerializedName("task_id")
+    var taskId: String? = null
 ) : JoyJsonModel
 
 data class JoyMessageEntity constructor(
     @Expose
-    @SerializedName("msg_id")
+    @SerializedName("msgId")
     var msgId: String? = null,
     @Expose
-    @SerializedName("open_id")
+    @SerializedName("openId")
     var openId: String? = null,
     @Expose
     @SerializedName("avatar")
@@ -211,16 +208,16 @@ data class JoyMessageEntity constructor(
     @SerializedName("content")
     var content: String? = null,
     @Expose
-    @SerializedName("gift_id")
+    @SerializedName("giftId")
     var giftId: String? = null,
     @Expose
-    @SerializedName("gift_num")
+    @SerializedName("giftNum")
     var giftNum: Int = 0,
     @Expose
-    @SerializedName("like_num")
+    @SerializedName("likeNum")
     var likeNum: Int = 0,
     @Expose
-    @SerializedName("gift_value")
+    @SerializedName("giftValue")
     var giftValue: Int = 0,
     @Expose
     @SerializedName("timestamp")
@@ -229,12 +226,24 @@ data class JoyMessageEntity constructor(
 
 data class JoySendMessage constructor(
     @Expose
-    @SerializedName("vid")
-    var vid: String? = null,
+    @SerializedName("appId")
+    var appId: String? = null,
     @Expose
-    @SerializedName("room_id")
+    @SerializedName("basicAuth")
+    var basicAuth: String? = null, //basicAuth 认证凭据，白名单AppID 无须上传
+    @Expose
+    @SerializedName("src")
+    var src: String? = "Android", // 来源/请求方
+    @Expose
+    @SerializedName("traceId")
+    var traceId: String? = null, // 请求ID
+    @Expose
+    @SerializedName("gameId")
+    var gameId: String? = null,
+    @Expose
+    @SerializedName("roomId")
     var roomId: String? = null,
     @Expose
     @SerializedName("payload")
-    var payload: List<JoyMessageEntity>? = null
+    var payload: List<JoyMessageEntity>? = null,
 ) : JoyJsonModel

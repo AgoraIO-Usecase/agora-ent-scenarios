@@ -222,6 +222,13 @@
         app:layout_constraintBottom_toBottomOf="@id/tvInput"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <include
+        android:id="@+id/messageLayout"
+        layout="@layout/joy_view_detail_message"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        app:layout_constraintBottom_toTopOf="@id/ivGift" />
+
     <androidx.constraintlayout.widget.Group
         android:id="@+id/groupBottom"
         android:layout_width="wrap_content"

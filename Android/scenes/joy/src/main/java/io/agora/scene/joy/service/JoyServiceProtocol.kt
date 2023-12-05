@@ -24,21 +24,9 @@ interface JoyServiceListenerProtocol {
      * 房间销毁
      */
     fun onRoomDidDestroy(roomInfo: JoyRoomInfo)
-
-    /**
-     * 房间超时
-     */
-    fun onRoomTimeUp()
 }
 
 interface JoyServiceProtocol {
-
-
-    enum class JoySubscribe {
-        JoySubscribeCreated,      //创建
-        JoySubscribeDeleted,      //删除
-        JoySubscribeUpdated,      //更新
-    }
 
     companion object {
         // time limit
@@ -80,6 +68,12 @@ interface JoyServiceProtocol {
      * 离开房间
      */
     fun leaveRoom(roomInfo: JoyRoomInfo, completion: (error: Exception?) -> Unit)
+
+
+    /**
+     * 发送消息
+     */
+    fun sendChatMessage(roomId:String,message: String,completion: (error: Exception?) -> Unit)
 
     /**
      * 订阅回调变化
