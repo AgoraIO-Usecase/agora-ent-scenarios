@@ -140,7 +140,7 @@ extension SARoomViewController {
         let _ = self.rtckit.joinVoicRoomWith(with: "\(channel_id)",token: VLUserCenter.user.agoraRTCToken, rtcUid: Int(rtcUid) ?? 0, type: self.vmType ) == 0
         rtckit.initSpatialAudio(recvRange: 15)
         // 收集APM全链路音频
-        rtckit.setAPMOn(isOn: true)
+        rtckit.setAPMOn(isOn: AppContext.shared.isApmOn)
     }
     
     func refreshRoomInfo() {
@@ -263,9 +263,10 @@ extension SARoomViewController {
     private func onTapDebugButton() {
         actionView
             .title(title: "Dump数据类型")
-            .switchCell(iconName: "icons／set／jiqi", title: "APM全链路音频", isOn: true)
+            .switchCell(iconName: "icons／set／jiqi", title: "APM全链路音频", isOn: AppContext.shared.isApmOn)
             .config()
         actionView.didSwitchValueChangeClosure = { [weak self] _, isOn in
+            AppContext.shared.isApmOn = isOn
             self?.rtckit.setAPMOn(isOn: isOn)
         }
         actionView.show()

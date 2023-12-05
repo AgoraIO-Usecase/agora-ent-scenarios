@@ -160,7 +160,7 @@ class ShowLiveViewController: UIViewController {
     
     private var currentInteraction: ShowInteractionInfo? {
         didSet {
-            if let ownerId = self.room?.userId(), ownerId == self.currentUserId {
+            if self.room?.userId() == self.currentUserId {
                 self.liveView.showThumnbnailCanvasView = false
             }
             //update audio status

@@ -1,0 +1,20 @@
+//
+//  AppContext+SA.swift
+//  AgoraEntScenarios
+//
+//  Created by FanPengpeng on 2023/12/5.
+//
+
+private let kIsApmOn = "kIsApmOn"
+
+extension AppContext {
+    
+    var isApmOn: Bool {
+        set{
+            UserDefaults.standard.setValue(newValue, forKey: kIsApmOn)
+        }
+        get{
+            UserDefaults.standard.bool(forKey: kIsApmOn)
+        }
+    }
+}
