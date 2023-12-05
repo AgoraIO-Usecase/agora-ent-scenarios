@@ -21,12 +21,14 @@ let roomBGMKey = "room_bgm"
 
 let voiceLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "VoiceChat"))
 public class ChatRoomServiceImp: NSObject {
+    
     static var _sharedInstance: ChatRoomServiceImp?
     var roomId: String?
     var roomList: [VRRoomEntity]?
     var userList: [VRUser]?
     public var mics: [VRRoomMic] = [VRRoomMic]()
     public var applicants: [VoiceRoomApply] = [VoiceRoomApply]()
+    private var connectState: ChatRoomServiceConnectState?
     var syncUtilsInited: Bool = false
     @objc public weak var roomServiceDelegate:ChatRoomServiceSubscribeDelegate?
     
@@ -737,7 +739,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             guard let self = self else {
                 return
             }
-            
+            self.connectState = ChatRoomServiceConnectState(rawValue: state.rawValue)
+            if let chatState = self.connectState {
+                self.roomServiceDelegate?.onConnectStateChanged(state: chatState)
+            }
             agoraPrint("subscribeConnectState: \(state) \(self.syncUtilsInited)")
 //            self.networkDidChanged?(KTVServiceNetworkStatus(rawValue: UInt(state.rawValue)))
             guard !self.syncUtilsInited else {
@@ -795,6 +800,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         self.roomList?.append(room)
         let params = room.kj.JSONObject()
         self.initScene {
+            if self.connectState != .open {
+                completion(SyncError(message: "voice_network_disconnected".voice_localized(), code: self.connectState?.rawValue ?? -1),nil)
+                return
+            }
             SyncUtil.joinScene(id: room.room_id ?? "",
                                userId:VLUserCenter.user.id,
                                isOwner: true,

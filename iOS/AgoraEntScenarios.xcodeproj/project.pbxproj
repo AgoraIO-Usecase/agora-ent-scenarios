@@ -20,6 +20,7 @@
 		A851C5EE2AEF602000071F88 /* VLNetworkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A851C5E82AEF602000071F88 /* VLNetworkModel.swift */; };
 		A851C5F02AEF608F00071F88 /* UIImage+Resize.swift in Sources */ = {isa = PBXBuildFile; fileRef = A851C5EF2AEF608F00071F88 /* UIImage+Resize.swift */; };
 		A851C5F22AEF614800071F88 /* UIImageView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A851C5F12AEF614800071F88 /* UIImageView+Extension.swift */; };
+		A897D00E2B1F0BF700D89AC7 /* AppContext+SA.swift in Sources */ = {isa = PBXBuildFile; fileRef = A897D00D2B1F0BF700D89AC7 /* AppContext+SA.swift */; };
 		AB4746E72A5E82AB00E68FBA /* ShowRobotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */; };
 		ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */; };
 		ABE4B37A2A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */; };
@@ -779,6 +780,7 @@
 		A851C5E82AEF602000071F88 /* VLNetworkModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VLNetworkModel.swift; sourceTree = "<group>"; };
 		A851C5EF2AEF608F00071F88 /* UIImage+Resize.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Resize.swift"; sourceTree = "<group>"; };
 		A851C5F12AEF614800071F88 /* UIImageView+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImageView+Extension.swift"; sourceTree = "<group>"; };
+		A897D00D2B1F0BF700D89AC7 /* AppContext+SA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppContext+SA.swift"; sourceTree = "<group>"; };
 		AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRobotService.swift; sourceTree = "<group>"; };
 		ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingBitrateCell.swift; sourceTree = "<group>"; };
 		ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNetStateSelectViewController.swift; sourceTree = "<group>"; };
@@ -2276,6 +2278,7 @@
 				DD6199EB29E3E246008F63E4 /* String + SAExtension.swift */,
 				DD6199EC29E3E246008F63E4 /* UIImageBundleExtensionSA.swift */,
 				DD6199EE29E3E246008F63E4 /* ResourceBundleExtensionSA.swift */,
+				A897D00D2B1F0BF700D89AC7 /* AppContext+SA.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -4902,6 +4905,7 @@
 				E301BD962AF4CB000089A79C /* VLHomeOnLineListCCell.m in Sources */,
 				DD9EBFB62AD5512300B4551F /* VoiceRoomAlertViewController.swift in Sources */,
 				ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */,
+				A897D00E2B1F0BF700D89AC7 /* AppContext+SA.swift in Sources */,
 				E301BD782AF4CAFF0089A79C /* LSTPopView+KTVModal.m in Sources */,
 				DD619B8429E3E262008F63E4 /* VerifyCodeView.swift in Sources */,
 				E74F81922AD91A73009CA280 /* VLLoginGuideViewCell.swift in Sources */,
@@ -5401,7 +5405,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = B8JXV8ZYC7;
+				DEVELOPMENT_TEAM = 3KX4NAGXWC;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5608,6 +5612,7 @@
 					"\"MetalPerformanceShaders\"",
 					"-weak_framework",
 					"\"Photos\"",
+					"-ld64",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5630,7 +5635,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = B8JXV8ZYC7;
+				DEVELOPMENT_TEAM = FRCN2HWL92;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5837,6 +5842,7 @@
 					"\"MetalPerformanceShaders\"",
 					"-weak_framework",
 					"\"Photos\"",
+					"-ld64",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -189,7 +189,7 @@
 "voice_close_bot" = "关闭机器人";
 "voice_other_settings" = "其他设置";
 "voice_welcome" = "欢迎";
-"voice_you_were_kicked_off_from_the_room" = "您已被移出房间";
+"voice_you_were_kicked_off_from_the_room" = "已被踢出房间";
 "voice_this_room_has_been_dissolved_by_the_host" = "本房间已被房主解散";
 "voice_you_were_offline" = "您已离线";
 "voice_illegal_check" = "不能有违反相关法律法规和政策的内容，请重新编辑";
@@ -215,3 +215,4 @@
 "Background Music" = "背景音乐";
 "Host Music" = "只有房主可以播放音乐";
 "voice_kick" = "踢出";
+"voice_network_disconnected" = "网络断开";
