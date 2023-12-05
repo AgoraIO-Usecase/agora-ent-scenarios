@@ -374,11 +374,6 @@ class LiveDetailFragment : Fragment() {
         }
         bottomLayout.ivSetting.setOnClickListener {
             showSettingDialog()
-//            if (interactionInfo != null && interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value && isRoomOwner) {
-//                showPKSettingsDialog()
-//            } else {
-//                showSettingDialog()
-//            }
         }
         bottomLayout.ivBeauty.setOnClickListener {
             showBeautyDialog()
@@ -745,7 +740,7 @@ class LiveDetailFragment : Fragment() {
     private fun showSettingDialog() {
         mSettingDialog.apply {
             setHostView(isRoomOwner || isMeLinking())
-            if (isMeLinking()) {
+            if (isMeLinking() || (isRoomOwner && isPKing())) {
                 resetSettingsItem(interactionInfo!!.muteAudio)
             }
             setOnItemActivateChangedListener { _, itemId, activated ->
@@ -1804,6 +1799,8 @@ class LiveDetailFragment : Fragment() {
 
         if (isRoomOwner) {
             enableLocalAudio(true)
+            enableLocalVideo(true)
+            mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_VIDEO, true)
             activity?.let {
                 setupLocalVideo(VideoLoader.VideoCanvasContainer(it, mBinding.videoLinkingLayout.videoContainer, 0))
             }
@@ -2097,6 +2094,7 @@ class LiveDetailFragment : Fragment() {
         mBinding.videoPKLayout.userNameB.isActivated = interactionInfo!!.muteAudio.not()
         if (isRoomOwner) {
             // pk 主播
+            mBinding.livingComeSoonLayout.root.isVisible = false
             mBinding.videoPKLayout.iBroadcasterBView.setOnClickListener {
                 showPKSettingsDialog()
             }
