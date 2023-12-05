@@ -91,7 +91,7 @@ extension CloudBarrageAPI {
             completion(NSError(domain: "parse model fail", code: -1))
             return
         }
-        let interfaceName = "cloud-bullet-game/gameid/\(gameId)/comment"
+        let interfaceName = "cloud-bullet-game/games/comment"
         postRequest(interface: interfaceName, params: params) { err, _  in
             completion(err)
         }
@@ -110,7 +110,7 @@ extension CloudBarrageAPI {
             completion(NSError(domain: "parse model fail", code: -1))
             return
         }
-        let interfaceName = "cloud-bullet-game/gameid/\(gameId)/like"
+        let interfaceName = "cloud-bullet-game/games/like"
         postRequest(interface: interfaceName, params: params) { err, _  in
             completion(err)
         }
@@ -176,14 +176,13 @@ extension CloudBarrageAPI {
             completion(NSError(domain: "parse model fail", code: -1))
             return
         }
-        let interfaceName = "cloud-bullet-game/gameid/\(gameId)/renew-token"
+        let interfaceName = "cloud-bullet-game/games/renew-token"
         postRequest(interface: interfaceName, params: params) { err, result  in
             completion(err)
         }
     }
     
-    
-     func sendKeyboardEvent(type: Agora_Pb_Rctrl_KeyboardEventType, key:Character) {
+    func sendKeyboardEvent(type: Agora_Pb_Rctrl_KeyboardEventType, key:Character) {
         msgId += 1
         let currentDate = Date()
         var event = Agora_Pb_Rctrl_KeyboardEventMsg()
@@ -202,7 +201,7 @@ extension CloudBarrageAPI {
         sendEventMessage(msg: msg)
     }
     
-     func sendMouseEvent(type: Agora_Pb_Rctrl_MouseEventType,
+    func sendMouseEvent(type: Agora_Pb_Rctrl_MouseEventType,
                                point: CGPoint,
                                gameViewSize: CGSize) {
         msgId += 1

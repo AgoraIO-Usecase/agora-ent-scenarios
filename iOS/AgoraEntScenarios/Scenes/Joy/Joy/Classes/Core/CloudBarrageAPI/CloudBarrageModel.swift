@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import YYCategories
 
 //public struct CloudGameUser: Codable {
 //    public var openId:String?
@@ -83,56 +84,56 @@ public struct CloudGameDetailInfo: Codable {
 
 /// 评论内容
 public struct CloudGameCommentInfo: Codable {
-    public var msgId: String?
+    public var msgId: String? = NSString.withUUID().md5() as? String
     public var userId:String?
     public var userAvatar: String?
     public var userName: String?
     public var content: String?
-    public var timestamp: Int?
+    public var timestamp: Int = Int(Date().timeIntervalSince1970 * 1000)
     
     enum CodingKeys: String, CodingKey {
-        case msgId = "msg_id"
-        case userId = "open_id"
+        case userId = "openId"
         case userAvatar = "avatar"
         case userName = "nickname"
-        case content, timestamp
+        case msgId, content, timestamp
     }
 }
 
 public struct CloudGameSendCommentConfig: Codable {
     public var roomId: String?
+    public var gameId: String?
     public var commentList: [CloudGameCommentInfo]?
     
     enum CodingKeys: String, CodingKey {
-        case roomId = "room_id"
+        case roomId, gameId
         case commentList = "payload"
     }
 }
 
 /// 点赞内容
-public struct CloudGameSendLikeInfo: Codable {
-    public var msgId: String?
+public struct CloudGameLikeInfo: Codable {
+    public var msgId: String? = NSString.withUUID().md5() as? String
     public var userId:String?
     public var userAvatar: String?
     public var userName: String?
     public var likeNum = 1
-    public var timestamp: Int?
+    public var timestamp: Int = Int(Date().timeIntervalSince1970 * 1000)
     
     enum CodingKeys: String, CodingKey {
-        case msgId = "msg_id"
-        case userId = "open_id"
+        case userId = "openId"
         case userAvatar = "avatar"
         case userName = "nickname"
-        case likeNum, timestamp
+        case msgId, likeNum, timestamp
     }
 }
 
 public struct CloudGameSendLikeConfig: Codable {
     public var roomId: String?
-    public var likeList: [CloudGameCommentInfo]?
+    public var gameId: String?
+    public var likeList: [CloudGameLikeInfo]?
     
     enum CodingKeys: String, CodingKey {
-        case roomId = "room_id"
+        case roomId, gameId
         case likeList = "payload"
     }
 }
@@ -182,16 +183,14 @@ public struct CloudGameStartConfig: Codable {
 /// 更新token
 public struct CloudGameTokenConfig: Codable {
     public var roomId: String?
+    public var gameId: String?
     public var userId: String?
     public var taskId: String?
     public var rtcUid: String?       // 主播助手rtc uid
     public var rtcToken: String?     // 主播助手rtc uid
     
     enum CodingKeys: String, CodingKey {
-        case roomId = "room_id"
-        case userId = "open_id"
-        case taskId = "task_id"
-        case rtcUid = "rtc_uid"
-        case rtcToken = "rtc_token"
+        case roomId, gameId, taskId, rtcUid, rtcToken
+        case userId = "openId"
     }
 }

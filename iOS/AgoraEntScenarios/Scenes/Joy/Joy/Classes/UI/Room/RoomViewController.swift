@@ -209,8 +209,6 @@ class RoomViewController: UIViewController {
                         
                         self?.gameInfo = detail
                         self?.taskId = taskId
-                        
-                        self?.onIntroduceAction()
                     }
                 })
             }
@@ -396,13 +394,21 @@ extension RoomViewController: ChatInputViewDelegate {
     }
     
     func onClickSendButton(text: String) {
-        guard let roomId = roomInfo?.roomId, let gameId = gameInfo?.gameId else {return}
+        guard let roomId = roomInfo?.roomId,
+              let gameId = gameInfo?.gameId,
+              let user = currentUserInfo else {
+            return
+        }
         service?.sendChatMessage(roomId: roomId,
                                  message: text,
                                  completion: { err in
         })
         
-        let config = CloudGameSendCommentConfig()
+        let comment = CloudGameCommentInfo(userId: "\(user.userId)",
+                                           userAvatar: user.avatar,
+                                           userName: user.userName,
+                                           content: text)
+        let config = CloudGameSendCommentConfig(roomId:roomId, gameId: gameId, commentList: [comment])
         CloudBarrageAPI.shared.sendComment(gameId: gameId,
                                            commentConfig: config) { err in
 
