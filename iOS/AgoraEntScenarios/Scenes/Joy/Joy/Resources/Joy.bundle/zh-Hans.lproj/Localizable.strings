@@ -32,6 +32,11 @@
 "gamenotice_selected_confirm"="我知道了";
 "joy_user_count" = "人";
 
+"query_title_exit"="结束游戏";
+"query_subtitle_exit"="是否退出游戏直播?";
+"query_button_confirm"="确认";
+"query_button_cancel"="取消";
+
 "show_create_room_name1"="小可爱是我呀";
 "show_create_room_name2"="我是你的小可爱";
 "show_create_room_name3"="一往情深";

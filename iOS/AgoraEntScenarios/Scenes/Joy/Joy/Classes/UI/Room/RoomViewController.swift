@@ -163,7 +163,7 @@ class RoomViewController: UIViewController {
         
         guard let roomInfo = roomInfo, let currentUserInfo = currentUserInfo else {
             AUIToast.show(text: "room info error")
-            onCloseAction()
+            leaveRoom()
             return
         }
         
@@ -209,7 +209,7 @@ class RoomViewController: UIViewController {
                 service?.joinRoom(roomInfo: roomInfo, completion: { err in
                     if let err = err {
                         AUIToast.show(text: err.localizedDescription)
-                        self.onCloseAction()
+                        self.leaveRoom()
                         return
                     }
                     CloudBarrageAPI.shared.getGameInfo(gameId: gameId) {[weak self] err, detail in
@@ -227,7 +227,7 @@ class RoomViewController: UIViewController {
             service?.joinRoom(roomInfo: roomInfo, completion: { err in
                 if let err = err {
                     AUIToast.show(text: err.localizedDescription)
-                    self.onCloseAction()
+                    self.leaveRoom()
                     return
                 }
             })
@@ -235,6 +235,7 @@ class RoomViewController: UIViewController {
     }
 }
 
+//MARK: game handler
 extension RoomViewController {
     private func startGame(gameInfo: CloudGameInfo, assistantToken: String) {
         guard let roomInfo = roomInfo, let currentUserInfo = currentUserInfo else {return}
@@ -287,16 +288,17 @@ extension RoomViewController {
 
 extension RoomViewController {
     @objc func onCloseAction() {
-        JoyBaseDialog.hidden()
-        guard let roomInfo = roomInfo else {
-            self.navigationController?.popViewController(animated: true)
-            return
+        let alertController = UIAlertController(title: "query_title_exit".joyLocalization(),
+                                                message: "query_subtitle_exit".joyLocalization(),
+                                                preferredStyle: .alert)
+        let action1 = UIAlertAction(title: "query_button_confirm".joyLocalization(), style: .default) { action in
+            self.leaveRoom()
         }
-        service?.leaveRoom(roomInfo: roomInfo, completion: { err in
-            self.navigationController?.popViewController(animated: true)
-        })
-        leaveRTCChannel()
-        stopGame()
+        let action2 = UIAlertAction(title: "query_button_cancel".joyLocalization(), style: .default) { action in
+        }
+        alertController.addAction(action2)
+        alertController.addAction(action1)
+        present(alertController, animated: true, completion: nil)
     }
     
     @objc func onMoreAction() {
@@ -376,6 +378,19 @@ extension RoomViewController {
             joyPrint("renewRTCTokens[\(roomId)] success")
             completion?(rtcToken)
         }
+    }
+    
+    private func leaveRoom() {
+        JoyBaseDialog.hidden()
+        guard let roomInfo = roomInfo else {
+            self.navigationController?.popViewController(animated: true)
+            return
+        }
+        service?.leaveRoom(roomInfo: roomInfo, completion: { err in
+            self.navigationController?.popViewController(animated: true)
+        })
+        leaveRTCChannel()
+        stopGame()
     }
 }
 
@@ -458,6 +473,6 @@ extension RoomViewController: JoyServiceListenerProtocol {
     }
     
     func onRoomDidDestroy(roomInfo: JoyRoomInfo) {
-        onCloseAction()
+        leaveRoom()
     }
 }
