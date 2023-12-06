@@ -390,18 +390,24 @@ extension RoomViewController: RoomBottomBarDelegate {
     }
     
     func onClickLikeButton() {
-        
+        guard let roomId = roomInfo?.roomId,
+              let gameId = gameInfo?.gameId,
+              let user = currentUserInfo else {
+            return
+        }
+        let like = CloudGameLikeInfo(userId: "\(user.userId)", userAvatar: user.avatar, userName: user.userName)
+        let config = CloudGameSendLikeConfig(roomId: roomId, gameId: gameId, likeList: [like])
+        CloudBarrageAPI.shared.sendLike(likeConfig: config) { err in
+            guard let err = err else {return}
+            AUIToast.show(text: err.localizedDescription)
+        }
     }
 }
 
 extension RoomViewController: ChatInputViewDelegate {
     func onEndEditing() {
         chatInputView.isHidden = true
-//        bottomBar.isHidden = false
-    }
-    
-    func onClickEmojiButton() {
-        
+        self.view.endEditing(true)
     }
     
     func onClickSendButton(text: String) {
@@ -420,9 +426,9 @@ extension RoomViewController: ChatInputViewDelegate {
                                            userName: user.userName,
                                            content: text)
         let config = CloudGameSendCommentConfig(roomId:roomId, gameId: gameId, commentList: [comment])
-        CloudBarrageAPI.shared.sendComment(gameId: gameId,
-                                           commentConfig: config) { err in
-
+        CloudBarrageAPI.shared.sendComment(commentConfig: config) { err in
+            guard let err = err else {return}
+            AUIToast.show(text: err.localizedDescription)
         }
     }
 }

@@ -12,7 +12,6 @@ let kChatInputViewHeight: CGFloat = 56
 
 protocol ChatInputViewDelegate: UITextFieldDelegate {
     func onEndEditing()
-    func onClickEmojiButton()
     func onClickSendButton(text: String)
 }
 
@@ -100,10 +99,6 @@ class ChatInputView: UIView {
             make.left.equalTo(16)
             make.right.equalTo(-16)
         }
-    }
-    
-    @objc private func didClickEmojiButton(){
-        delegate?.onClickEmojiButton()
     }
     
     @objc private func didClickSendButton(){

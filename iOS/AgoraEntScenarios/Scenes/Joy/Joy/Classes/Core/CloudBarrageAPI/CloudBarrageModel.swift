@@ -138,6 +138,17 @@ public struct CloudGameSendLikeConfig: Codable {
     }
 }
 
+public struct CloudGameSendGiftConfig: Codable {
+    public var roomId: String?
+    public var gameId: String?
+    public var giftList: [CloudGameGiftInfo]?
+    
+    enum CodingKeys: String, CodingKey {
+        case roomId, gameId
+        case giftList = "payload"
+    }
+}
+
 // 开始游戏
 public struct CloudGameEncryption: Codable {
     public var mode:Int = 0             // agora加密mode

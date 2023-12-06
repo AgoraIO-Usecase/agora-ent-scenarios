@@ -81,11 +81,9 @@ extension CloudBarrageAPI {
     
     /// 发送评论
     /// - Parameters:
-    ///   - gameId: 游戏id
     ///   - commentConfig: 评论内容
     ///   - completion: <#completion description#>
-    public func sendComment(gameId: String,
-                            commentConfig: CloudGameSendCommentConfig,
+    public func sendComment(commentConfig: CloudGameSendCommentConfig,
                             completion: @escaping (NSError?) -> Void) {
         guard let params = encodeModel(commentConfig) else {
             completion(NSError(domain: "parse model fail", code: -1))
@@ -100,17 +98,27 @@ extension CloudBarrageAPI {
     
     /// 发送点赞
     /// - Parameters:
-    ///   - gameId: 游戏id
     ///   - likeConfig: 点赞内容
     ///   - completion: <#completion description#>
-    public func sendLike(gameId: String,
-                         likeConfig: CloudGameSendLikeConfig,
+    public func sendLike(likeConfig: CloudGameSendLikeConfig,
                          completion: @escaping (NSError?) -> Void) {
         guard let params = encodeModel(likeConfig) else {
             completion(NSError(domain: "parse model fail", code: -1))
             return
         }
         let interfaceName = "cloud-bullet-game/games/like"
+        postRequest(interface: interfaceName, params: params) { err, _  in
+            completion(err)
+        }
+    }
+    
+    public func sendGift(likeConfig: CloudGameSendGiftConfig,
+                         completion: @escaping (NSError?) -> Void) {
+        guard let params = encodeModel(likeConfig) else {
+            completion(NSError(domain: "parse model fail", code: -1))
+            return
+        }
+        let interfaceName = "cloud-bullet-game/games/gift"
         postRequest(interface: interfaceName, params: params) { err, _  in
             completion(err)
         }

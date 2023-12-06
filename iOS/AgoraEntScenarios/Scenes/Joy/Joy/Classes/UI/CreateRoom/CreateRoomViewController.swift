@@ -41,8 +41,11 @@ class CreateRoomViewController: UIViewController {
                                            width: view.width - 24, height: 48))
         tf.font = .joy_M_15
         tf.textColor = .joy_main_text
-        tf.tintColor = .joy_placeholder_text
-        tf.placeholder = "create_room_title".joyLocalization()
+        let attributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.joy_placeholder_text
+        ]
+        tf.attributedPlaceholder = NSAttributedString(string: "create_room_title".joyLocalization(),
+                                                      attributes: attributes)
         let leftPaddingView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: tf.frame.height))
         tf.leftView = leftPaddingView
         tf.leftViewMode = .always
@@ -54,10 +57,31 @@ class CreateRoomViewController: UIViewController {
         tf.rightView = button
         tf.rightViewMode = .always
         
-        tf.backgroundColor = .joy_cover
+        tf.backgroundColor = UIColor(red: 0.047, green: 0.035, blue: 0.137, alpha: 0.3)
         tf.layer.cornerRadius = 8
         tf.layer.masksToBounds = true
         return tf
+    }()
+    
+    private lazy var tipsLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.textColor = .joy_main_text
+        label.font = .joy_R_11
+        label.clipsToBounds = true
+        
+        let textAttr = NSAttributedString(string: "joy_usage_tips".joyLocalization())
+        let attach = NSTextAttachment()
+        attach.image = UIImage.sceneImage(name: "icon_notice")!
+        let imageSize = CGSize(width: 14, height: 14)
+        attach.bounds = CGRect(origin: CGPoint(x: 0, y: (label.font.capHeight - imageSize.height).rounded() / 2), size: imageSize)
+        let imgAttr = NSAttributedString(attachment: attach)
+        let attr = NSMutableAttributedString()
+        attr.append(imgAttr)
+        attr.append(textAttr)
+        label.attributedText = attr
+        label.sizeToFit()
+        return label
     }()
     
     private lazy var createButton: UIButton = {
@@ -92,7 +116,10 @@ class CreateRoomViewController: UIViewController {
         view.addSubview(backgroundImageView)
         view.addSubview(naviBar)
         view.addSubview(textField)
+        view.addSubview(tipsLabel)
         view.addSubview(createButton)
+        tipsLabel.aui_bottom = createButton.aui_top - 25
+        tipsLabel.aui_centerX = view.width / 2
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
