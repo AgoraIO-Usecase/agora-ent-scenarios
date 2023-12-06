@@ -37,6 +37,7 @@ class JoyServiceImp: NSObject {
     private var roomList: [JoyRoomInfo] = []
     private var messageList: [JoyMessage] = []
     private weak var listener: JoyServiceListenerProtocol?
+    private var state: SocketConnectState = .closed
     
     private var userList: [JoyUserInfo] = []
     
@@ -73,6 +74,7 @@ class JoyServiceImp: NSObject {
                 return
             }
             
+            self.state = state
             defer {
                 completion(reqId, state == .open ? nil : NSError(domain: "network error", code: 1000))
             }
@@ -124,6 +126,12 @@ extension JoyServiceImp: JoyServiceProtocol {
             completion(nil, nil)
             return
         }
+        
+        guard state == .open else {
+            completion(nil, NSError(domain: "network error", code: 1000))
+            return
+        }
+        
         let roomInfo = JoyRoomInfo()
         roomInfo.ownerId = user.userId
         roomInfo.ownerName = user.userName
@@ -173,6 +181,10 @@ extension JoyServiceImp: JoyServiceProtocol {
     
     func joinRoom(roomInfo: JoyRoomInfo, completion: @escaping (Error?) -> Void) {
         let reqId = NSString.withUUID()
+        guard state == .open else {
+            completion(NSError(domain: "network error", code: 1000))
+            return
+        }
         initScene(reqId) {[weak self] rid, error in
             guard reqId == rid else {return}
             if let error = error {
