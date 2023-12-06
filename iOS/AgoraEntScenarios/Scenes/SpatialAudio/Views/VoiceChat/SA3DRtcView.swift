@@ -24,6 +24,7 @@ class SA3DRtcView: UIView {
     private lazy var redSpatialParams = AgoraSpatialAudioParams()
     private lazy var blueSpatialParams = AgoraSpatialAudioParams()
     private var isPlaying: Bool = false
+    private var isPlayerSetted: Bool = false
     
     public var clickBlock: ((Int) -> Void)?
     
@@ -59,6 +60,31 @@ class SA3DRtcView: UIView {
         rtcKit?.playMusic(with: .Spatical, isPlay: isPlay)
     }
     
+    private func setupMeidaPlayerSpatial() {
+        if (isPlayerSetted) { return }
+        if let playerId = rtcKit?.blueMediaPlayer?.getMediaPlayerId(),
+           let micInfo = micInfos?[3],
+           let pos = micInfo.pos {// blue
+            print("spatial pos: blue: \(micInfo.mic_index) \(micInfo.pos ?? [0 ,0 ,0])")
+            rtcKit?.setMediaPlayerPositionInfo(playerId: Int(playerId),
+                                               position: pos,
+                                               forward: micInfo.forward)
+        } else {
+            return
+        }
+        if let playerId = rtcKit?.redMediaPlayer?.getMediaPlayerId(),
+           let micInfo = micInfos?[6],
+           let pos = micInfo.pos {// red
+            print("spatial pos: red: \(micInfo.mic_index) \(micInfo.pos ?? [0 ,0 ,0])")
+            rtcKit?.setMediaPlayerPositionInfo(playerId: Int(playerId),
+                                               position: pos,
+                                               forward: micInfo.forward)
+        } else {
+            return
+        }
+        isPlayerSetted = true
+    }
+    
     //因为麦位顺序的特殊性 需要对数据进行调整
     private func getRealIndex(with index: Int) -> Int {//4表示中间的用户
         let realIndexs: [Int] = [3, 1, 0, 4, 5, 6, 2]
@@ -67,11 +93,12 @@ class SA3DRtcView: UIView {
     
     public func updateVolume(with index: Int, vol: Int) {
         let realIndex: Int = getRealIndex(with: index)
-        let indexPath = IndexPath(item: index, section: 0)
+        let indexPath = IndexPath(item: realIndex, section: 0)
         DispatchQueue.main.async {[weak self] in
             if realIndex != 3 {
-                guard let cell: SA3DUserCollectionViewCell = self?.collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
-                cell.refreshVolume(vol: vol)
+                if let cell = self?.collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell {
+                    cell.refreshVolume(vol: vol)
+                }
             } else {
                 //更新可移动view的数据
                 guard let micInfos = self?.micInfos else { return }
@@ -83,7 +110,6 @@ class SA3DRtcView: UIView {
     }
 
     public func updateUser(_ mic: SARoomMic) {
-        
         // 更新micinfos数组
         let info = micInfos?[mic.mic_index]
         mic.pos = info?.pos
@@ -92,7 +118,7 @@ class SA3DRtcView: UIView {
         micInfos?[mic.mic_index] = mic
         
         // 更新空间音频位置
-        updateSpatialPos()
+        self.updateSpatialPos(with: mic)
         
         let realIndex: Int = getRealIndex(with: mic.mic_index)
         let indexPath = IndexPath(item: realIndex, section: 0)
@@ -101,43 +127,29 @@ class SA3DRtcView: UIView {
                 guard let cell = self?.collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
                 cell.refreshUser(with: mic)
             }
-        } else {
-            //更新可移动view的数据
-            rtcUserView.user = mic.member
-            panGesture?.isEnabled = mic.member?.uid == VLUserCenter.user.id
-//            if mic.member == nil {
-//                UIView.animate(withDuration: 0.25, animations: {
-//                    self.rtcUserView.center = self.collectionView.center
-//                    self.rtcUserView.angle = 90
-//                })
-//            }
-        }
-    }
-
-    public func updateAlienMic(_ index: Int, flag: Bool) {
-        let indexPath = IndexPath(item: index, section: 0)
-        DispatchQueue.main.async {[weak self] in
-            guard let cell: SA3DUserCollectionViewCell = self?.collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
-            cell.updateAlienMic(flag: flag)
         }
     }
     
     public func updateAlienMic(with type: SARtcType.ALIEN_TYPE) {
-        if type == .red {
-            updateAlienMic(2,flag: true)
-            updateAlienMic(4, flag: false)
-            
-        } else if type == .blue  {
-            updateAlienMic(4, flag: true)
-            updateAlienMic(2, flag: false)
-            
-        } else if type == .blueAndRed {
-            updateAlienMic(2, flag: true)
-            updateAlienMic(4, flag: true)
-            
-        } else if (type == .none || type == .ended) {
-            updateAlienMic(2, flag: false)
-            updateAlienMic(4, flag: false)
+        DispatchQueue.main.async {[weak self] in
+            guard let red = self?.collectionView.cellForItem(at: IndexPath(item: 2, section: 0)) as? SA3DUserCollectionViewCell,
+                  let blue = self?.collectionView.cellForItem(at: IndexPath(item: 4, section: 0)) as? SA3DUserCollectionViewCell
+            else {
+                return
+            }
+            if type == .red {
+                red.refreshVolume(vol: 60)
+                blue.refreshVolume(vol: 0)
+            } else if type == .blue  {
+                red.refreshVolume(vol: 0)
+                blue.refreshVolume(vol: 60)
+            } else if type == .blueAndRed {
+                red.refreshVolume(vol: 60)
+                blue.refreshVolume(vol: 60)
+            } else if (type == .none || type == .ended) {
+                red.refreshVolume(vol: 0)
+                blue.refreshVolume(vol: 0)
+            }
         }
     }
 
@@ -351,40 +363,27 @@ extension SA3DRtcView {
     }
     
     private func updateSpatialPos() {
-        micInfos?.enumerated().forEach({ index, info in
-            guard info.member != nil else { return }
-            switch index {
-            case 6: //red robot
-                setMediaPlayerPosition(pos: info.pos ?? [],
-                                       forward: info.forward,
-                                       playerId: Int(rtcKit?.redMediaPlayer?.getMediaPlayerId() ?? 0))
-//                rtcKit?.redMediaPlayer?.setSpatialAudioParams(redSpatialParams)
-                
-            case 3: // blue robot
-                setMediaPlayerPosition(pos: info.pos ?? [],
-                                       forward: info.forward,
-                                       playerId: Int(rtcKit?.blueMediaPlayer?.getMediaPlayerId() ?? 0))
-//                rtcKit?.blueMediaPlayer?.setSpatialAudioParams(blueSpatialParams)
-                
-            default:
-                if info.member?.uid == VLUserCenter.user.id {
-                    rtcKit?.updateSpetialPostion(position: info.pos ?? [0 ,0 ,0],
-                                                 axisForward: info.forward ?? [1, 0, 0],
-                                                 axisRight: info.right ?? [0, 1, 0],
-                                                 axisUp: info.up)
-                } else {
-                    rtcKit?.updateRemoteSpetialPostion(uid: info.member?.uid,
-                                                       position: info.pos ?? [0, 0, 0],
-                                                       forward: info.forward ?? [1, 0, 0])
-                }
-            }
-        })
+        guard let ary = micInfos else {
+            return
+        }
+        for micInfo in ary {
+            self.updateSpatialPos(with: micInfo)
+        }
     }
     
-    private func setMediaPlayerPosition(pos: [NSNumber], forward: [NSNumber]?, playerId: Int) {
-        rtcKit?.setMediaPlayerPositionInfo(playerId: playerId,
-                                           position: pos,
-                                           forward: forward)
+    private func updateSpatialPos(with micInfo: SARoomMic) {
+        guard let member = micInfo.member else { return }
+        if member.uid == VLUserCenter.user.id {
+            print("spatial pos: local: \(micInfo.mic_index) \(micInfo.pos ?? [0 ,0 ,0])")
+            rtcKit?.updateSpetialPostion(position: micInfo.pos ?? [0 ,0 ,0],
+                                         axisForward: micInfo.forward ?? [1, 0, 0],
+                                         axisRight: micInfo.right ?? [0, 1, 0],
+                                         axisUp: micInfo.up)
+            return
+        }
+        rtcKit?.updateRemoteSpetialPostion(uid: member.uid,
+                                           position: micInfo.pos ?? [0, 0, 0],
+                                           forward: micInfo.forward ?? [1, 0, 0])
     }
 }
 
@@ -549,8 +548,8 @@ extension SA3DRtcView: SAMusicPlayerDelegate {
     
     func didMPKChangedTo(_ playerKit: AgoraRtcMediaPlayerProtocol, state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
         if state == .playing && isPlaying == false {
-            updateSpatialPos()
             updateCenterUserPosition()
+            setupMeidaPlayerSpatial()
         }
         isPlaying = state == .playing
     }

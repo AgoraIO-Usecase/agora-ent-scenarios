@@ -205,9 +205,6 @@ public let kMPK_RTC_UID_SA: UInt = 1
                 blueMediaPlayer?.stop()
                 delegate?.reportAlien?(with: .ended)
             } else {
-//                let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "spatial_voice_lau".spatial_localized() : "EN"
-//                musicPath = musicPath.replacingOccurrences(of: "CN", with: lanuagePath)
-//                print("musicPath:\(musicPath)")
                 if musicPath.contains("-B-") {
                     blueMediaPlayer?.open(musicPath, startPos: 0)
                     delegate?.reportAlien?(with: .blue)
@@ -256,13 +253,10 @@ public let kMPK_RTC_UID_SA: UInt = 1
     }
     
     func initSpatialAudio(recvRange: Float) {
-//        rtcKit.muteAllRemoteAudioStreams(true)
         localSpatial = AgoraLocalSpatialAudioKit()
         let localSpatialConfig = AgoraLocalSpatialAudioConfig()
         localSpatialConfig.rtcEngine = rtcKit
         localSpatial = AgoraLocalSpatialAudioKit.sharedLocalSpatialAudio(with: localSpatialConfig)
-//        localSpatial?.muteLocalAudioStream(false)
-//        localSpatial?.muteAllRemoteAudioStreams(false)
         localSpatial?.setAudioRecvRange(recvRange)
         localSpatial?.setMaxAudioRecvCount(6)
         localSpatial?.setDistanceUnit(1)
@@ -364,11 +358,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
      */
     public func playMusic(with type: SARtcType.VMMUSIC_TYPE, isPlay: Bool) {
         if isPlay {
-            let lanuage = /*LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ?*/ "spatial_voice_lau".spatial_localized()// : "EN"
-            let redPath = "https://download.agora.io/demo/test/spatial-\(lanuage)-red.wav"
-            let bluePath = "https://download.agora.io/demo/test/spatial-\(lanuage)-blue.wav"
-            blueMediaPlayer?.open(bluePath, startPos: 0)
-            redMediaPlayer?.open(redPath, startPos: 0)
+            baseMusicCount = 0
         } else {
             redMediaPlayer?.stop()
             blueMediaPlayer?.stop()

@@ -66,12 +66,12 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = false
             rtcUserView.micView.setState(.on)
-            rtcUserView.volume = 60
             rtcUserView.coverView.isHidden = true
             rtcUserView.activeButton.isHidden = true
         case -2:
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = true
+            rtcUserView.micView.setState(.off)
             rtcUserView.coverView.isHidden = false
             rtcUserView.activeButton.isHidden = false
         default:
@@ -91,10 +91,6 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
 
     public func refreshVolume(vol: Int) {
         rtcUserView.volume = vol
-    }
-    
-    public func updateAlienMic( flag: Bool) {
-        rtcUserView.micView.isHidden = !flag
     }
     
     public var clickBlock: ((Int) -> Void)?

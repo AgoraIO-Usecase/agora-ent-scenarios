@@ -138,7 +138,7 @@ extension SARoomViewController {
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
         let _ = self.rtckit.joinVoicRoomWith(with: "\(channel_id)",token: VLUserCenter.user.agoraRTCToken, rtcUid: Int(rtcUid) ?? 0, type: self.vmType ) == 0
-        rtckit.initSpatialAudio(recvRange: 15)
+        rtckit.initSpatialAudio(recvRange: 20)
         // 收集APM全链路音频
         rtckit.setAPMOn(isOn: true)
     }
