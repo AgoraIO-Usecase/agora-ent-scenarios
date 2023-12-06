@@ -7,9 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat
 import com.github.penfeizhou.animation.apng.APNGDrawable
+import io.agora.mediaplayer.Constants
+import io.agora.mediaplayer.IMediaPlayer
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogChatroomAiaecBinding
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
+import io.agora.scene.voice.rtckit.listener.MediaPlayerObserver
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
 import java.util.*
 
@@ -18,9 +21,6 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
     companion object {
         const val KEY_IS_ON = "isOn"
     }
-
-    private val beforeSoundId = 201001
-    private val afterSoundId = 201002
 
     private val isOn by lazy {
         arguments?.getBoolean(KEY_IS_ON, true) ?: true
@@ -34,6 +34,12 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
     private var afterDrawable: APNGDrawable? = null
     private var afterTimer: Timer? = null
 
+    private val mediaPlayer: IMediaPlayer? by lazy {
+        AgoraRtcEngineController.get().createLocalMediaPlayer()?.apply {
+            this.registerPlayerObserver(mediaPlayerObserver)
+        }
+    }
+
     override fun getViewBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
@@ -44,6 +50,7 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
     override fun onDestroy() {
         super.onDestroy()
         resetTimer()
+        mediaPlayer?.stop()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -98,14 +105,15 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
         binding?.btnBefore?.setOnClickListener {
             resetTimer()
             if (it.isSelected) { // stop play
-                AgoraRtcEngineController.get().resetMediaPlayer()
+                mediaPlayer?.stop()
                 beforeDrawable?.stop()
                 afterDrawable?.stop()
                 it.isSelected = false
             } else { // start play
                 val file = "sounds/voice_sample_aec_before.m4a"
                 io.agora.scene.base.utils.FileUtils.copyFileFromAssets(this.context!!, file, context?.externalCacheDir!!.absolutePath).apply {
-                    AgoraRtcEngineController.get().playMusic(beforeSoundId, this, 0)
+                    mediaPlayer?.stop()
+                    mediaPlayer?.open(this, 0)
                 }
                 val timer = Timer()
                 beforeTimer = timer
@@ -127,14 +135,15 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
         binding?.btnAfter?.setOnClickListener {
             resetTimer()
             if (it.isSelected) { // stop play
-                AgoraRtcEngineController.get().resetMediaPlayer()
+                mediaPlayer?.stop()
                 beforeDrawable?.stop()
                 afterDrawable?.stop()
                 it.isSelected = false
             } else { // start play
                 val file = "sounds/voice_sample_aec_after.m4a"
                 io.agora.scene.base.utils.FileUtils.copyFileFromAssets(this.context!!, file, context?.externalCacheDir!!.absolutePath).apply {
-                    AgoraRtcEngineController.get().playMusic(afterSoundId, this, 0)
+                    mediaPlayer?.stop()
+                    mediaPlayer?.open(this, 0)
                 }
                 val timer = Timer()
                 afterTimer = timer
@@ -152,6 +161,24 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
                 afterDrawable?.resume()
                 beforeDrawable?.stop()
             }
+        }
+    }
+
+    private val mediaPlayerObserver = object : MediaPlayerObserver() {
+        override fun onPlayerStateChanged(state: Constants.MediaPlayerState?, error: Constants.MediaPlayerError?) {
+            when (state) {
+                Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
+                    mediaPlayer?.play()
+                }
+                Constants.MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
+                }
+                Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
+                }
+                else -> {}
+            }
+        }
+
+        override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
         }
     }
 }

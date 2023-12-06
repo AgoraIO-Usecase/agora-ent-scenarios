@@ -35,7 +35,7 @@
     <string name="voice_spatial_empty_invite_hands">暂无听众</string>
     <string name="voice_spatial_empty_raised_hands">暂无上麦请求</string>
     <string name="voice_spatial_room_profile">个人信息</string>
-    <string name="voice_spatial_room_close">房间销毁</string>
+    <string name="voice_spatial_room_close">房间已解散</string>
     <string name="voice_spatial_room_kick_member">您已被移出房间</string>
     <string name="voice_spatial_chatroom_time_up_tips">已到达体验限制时间，本房间已被关闭</string>
     <!-- gift -->
