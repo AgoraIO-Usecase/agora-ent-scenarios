@@ -29,11 +29,15 @@ protocol JoyServiceListenerProtocol: NSObjectProtocol {
     /// - Parameter message: <#message description#>
     func onMessageDidAdded(message: JoyMessage)
     
+    /// 房间内进行的游戏变化
+    /// - Parameter gameInfo: <#gameInfo description#>
+    func onStartGameInfoDidChanged(startGameInfo: JoyStartGameInfo)
+    
     /// 房间信息变化
     /// - Parameter roomInfo: <#roomInfo description#>
     func onRoomDidChanged(roomInfo: JoyRoomInfo)
     
-    /// <#Description#>
+    /// 房间被销毁
     /// - Parameter roomInfo: <#roomInfo description#>
     func onRoomDidDestroy(roomInfo: JoyRoomInfo)
 }
@@ -67,6 +71,22 @@ protocol JoyServiceProtocol: NSObjectProtocol {
     ///   - roomInfo: <#roomInfo description#>
     ///   - completion: <#completion description#>
     func updateRoom(roomInfo: JoyRoomInfo, completion: @escaping (NSError?) -> Void)
+    
+    
+    /// 更新正在进行的游戏信息
+    /// - Parameters:
+    ///   - roomId: <#roomId description#>
+    ///   - completion: <#completion description#>
+    func getStartGame(roomId: String, completion: @escaping (NSError?, JoyStartGameInfo?) -> Void) 
+    
+    /// 更新正在进行的游戏信息
+    /// - Parameters:
+    ///   - roomId: <#roomId description#>
+    ///   - gameInfo: <#gameInfo description#>
+    ///   - completion: <#completion description#>
+    func updateStartGame(roomId: String,
+                         gameInfo: JoyStartGameInfo,
+                         completion: @escaping (NSError?) -> Void)
     
     /// 发送聊天消息
     /// - Parameters:

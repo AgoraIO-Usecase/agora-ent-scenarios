@@ -28,6 +28,7 @@ extension SyncError {
 /// 房间内用户列表
 private let kSceneId = "scene_joy_4.10.0"
 private let SYNC_SCENE_ROOM_USER_COLLECTION = "userCollection"
+private let SYNC_SCENE_ROOM_STARTGAME_COLLECTION = "startGameCollection"
 private let SYNC_MANAGER_MESSAGE_COLLECTION = "joy_message_collection"
 class JoyServiceImp: NSObject {
     private var appId: String = ""
@@ -137,7 +138,7 @@ extension JoyServiceImp: JoyServiceProtocol {
         roomInfo.ownerName = user.userName
         roomInfo.ownerAvatar = user.avatar
         roomInfo.roomName = roomName
-        roomInfo.assistantUid = 1000000000 + user.userId
+//        roomInfo.assistantUid = 1000000000 + user.userId
         roomInfo.roomId = "\(arc4random_uniform(899999) + 100000)"
         roomInfo.objectId = roomInfo.roomId
         let reqId = NSString.withUUID()
@@ -156,12 +157,7 @@ extension JoyServiceImp: JoyServiceProtocol {
                 self.manager.joinScene(sceneId: roomInfo.roomId) { sceneRef in
                     joyPrint("createRoom success")
                     mainTreadTask {
-                        self.sceneRefs[roomInfo.roomId] = sceneRef
-                        self._addUserIfNeed(channelName: roomInfo.roomId) { err in
-                        }
-                        self._subscribeUsersChanged(channelName: roomInfo.roomId)
-                        self._subscribeMessageChanged(channelName: roomInfo.roomId)
-                        self.subscribeRoomStatusChanged(channelName: roomInfo.roomId)
+                        self.startScene(roomId: roomInfo.roomId, scene: sceneRef)
                         completion(roomInfo, nil)
                     }
                 } fail: { error in
@@ -201,12 +197,7 @@ extension JoyServiceImp: JoyServiceProtocol {
                 self.manager.joinScene(sceneId: roomInfo.roomId) { sceneRef in
                     joyPrint("joinRoom success")
                     mainTreadTask {
-                        self.sceneRefs[roomInfo.roomId] = sceneRef
-                        self._addUserIfNeed(channelName: roomInfo.roomId) { err in
-                        }
-                        self._subscribeUsersChanged(channelName: roomInfo.roomId)
-                        self._subscribeMessageChanged(channelName: roomInfo.roomId)
-                        self.subscribeRoomStatusChanged(channelName: roomInfo.roomId)
+                        self.startScene(roomId: roomInfo.roomId, scene: sceneRef)
                         completion(nil)
                     }
                 } fail: {[weak self] error in
@@ -246,11 +237,45 @@ extension JoyServiceImp: JoyServiceProtocol {
         completion(nil)
     }
     
+    func getStartGame(roomId: String, completion: @escaping (NSError?, JoyStartGameInfo?) -> Void)  {
+        guard let scene = sceneRefs[roomId] else {return}
+        joyPrint("imp start game get...")
+        scene
+            .collection(className: SYNC_SCENE_ROOM_STARTGAME_COLLECTION)
+            .get(success: { [weak self] list in
+                joyPrint("imp start game get success...")
+                let startGame = list.compactMap({ JoyStartGameInfo.yy_model(withJSON: $0.toJson()!)! }).first
+                completion(nil, startGame)
+            }, fail: { error in
+                joyWarn("imp user get fail :\(error.message)...")
+                completion(error.toNSError(), nil)
+            })
+    }
+    
+    func updateStartGame(roomId: String,
+                         gameInfo: JoyStartGameInfo,
+                         completion: @escaping (NSError?) -> Void) {
+        guard let scene = sceneRefs[roomId] else {return}
+        joyPrint("imp start game add...")
+        gameInfo.objectId = roomId
+        let params = gameInfo.yy_modelToJSONObject() as! [String: Any]
+        scene
+            .collection(className: SYNC_SCENE_ROOM_STARTGAME_COLLECTION)
+            .add(data: params, success: { object in
+                joyPrint("imp start game add success...\(roomId) params = \(params)")
+                completion(nil)
+            }, fail: { error in
+                joyError("imp start game add fail :\(error.message)...\(roomId)")
+                completion(error.toNSError())
+            })
+    }
+    
     func leaveRoom(roomInfo: JoyRoomInfo, completion: @escaping (Error?) -> Void) {
         self._removeUser(channelName: roomInfo.roomId) { err in
         }
         sceneRefs[roomInfo.roomId]?.unsubscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION)
         sceneRefs[roomInfo.roomId]?.unsubscribe(key: SYNC_MANAGER_MESSAGE_COLLECTION)
+        sceneRefs[roomInfo.roomId]?.unsubscribe(key: SYNC_SCENE_ROOM_STARTGAME_COLLECTION)
         if roomInfo.ownerId == user?.userId {
             sceneRefs[roomInfo.roomId]?.deleteScenes()
         } else {
@@ -283,6 +308,16 @@ extension JoyServiceImp: JoyServiceProtocol {
     
     func subscribeListener(listener: JoyServiceListenerProtocol?) {
         self.listener = listener
+    }
+    
+    func startScene(roomId: String, scene: SceneReference) {
+        self.sceneRefs[roomId] = scene
+        self._addUserIfNeed(channelName: roomId) { err in
+        }
+        self._subscribeUsersChanged(channelName: roomId)
+        self._subscribeMessageChanged(channelName: roomId)
+        self.subscribeRoomStatusChanged(channelName: roomId)
+        self._subscribeStartGameChanged(channelName: roomId)
     }
 }
 
@@ -450,6 +485,31 @@ extension JoyServiceImp {
                        }, onSubscribed: {
                        }, fail: { error in
                            joyError("imp message subscribe fail \(error.message)...")
+//                           ToastView.show(text: error.message)
+                       })
+    }
+    
+    private func _subscribeStartGameChanged(channelName: String) {
+        guard let scene = sceneRefs[channelName] else {return}
+        joyPrint("imp start game subscribe ...")
+        scene
+            .subscribe(key: SYNC_SCENE_ROOM_STARTGAME_COLLECTION,
+                       onCreated: { _ in
+                       }, onUpdated: {[weak self] object in
+                           joyPrint("imp start game subscribe onUpdated... [\(object.getId())] \(channelName)")
+                           guard let self = self,
+                                 let jsonStr = object.toJson(),
+                                 let model = JoyStartGameInfo.yy_model(withJSON: jsonStr)
+                           else {
+                               return
+                           }
+                           self.listener?.onStartGameInfoDidChanged(startGameInfo: model)
+                       }, onDeleted: { object in
+                           joyPrint("imp start game subscribe onDeleted... [\(object.getId())] \(channelName)")
+                           joyPrint("not implemented")
+                       }, onSubscribed: {
+                       }, fail: { error in
+                           joyError("imp start game subscribe fail \(error.message)...")
 //                           ToastView.show(text: error.message)
                        })
     }

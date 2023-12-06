@@ -189,8 +189,16 @@ extension RoomListViewController {
     }
     
     private func gotoRoom(roomInfo: JoyRoomInfo) {
-        let vc = RoomViewController(roomInfo: roomInfo, currentUserInfo: userInfo, service: service)
-        self.navigationController?.pushViewController(vc, animated: true)
+        service.joinRoom(roomInfo: roomInfo, completion: {[weak self] err in
+            guard let self = self else { return }
+            if let err = err {
+                AUIToast.show(text: err.localizedDescription)
+                return
+            }
+            
+            let vc = RoomViewController(roomInfo: roomInfo, currentUserInfo: self.userInfo, service: self.service)
+            self.navigationController?.pushViewController(vc, animated: true)
+        })
     }
 }
 
