@@ -440,6 +440,11 @@ extension RoomViewController: JoyServiceListenerProtocol {
     
     func onUserListDidChanged(userList: [JoyUserInfo]) {
         roomInfo.roomUserCount = userList.count
+        /*
+         owner control prevents game information loss due to simultaneous conflicts
+         between owner and audience members
+         */
+        guard roomInfo.ownerId == currentUserInfo.userId else {return}
         service?.updateRoom(roomInfo: roomInfo, completion: { err in
         })
     }
@@ -449,7 +454,7 @@ extension RoomViewController: JoyServiceListenerProtocol {
     }
     
     func onRoomDidChanged(roomInfo: JoyRoomInfo) {
-        
+        self.roomInfo = roomInfo
     }
     
     func onRoomDidDestroy(roomInfo: JoyRoomInfo) {

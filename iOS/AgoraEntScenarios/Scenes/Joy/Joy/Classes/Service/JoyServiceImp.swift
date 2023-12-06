@@ -237,6 +237,8 @@ extension JoyServiceImp: JoyServiceProtocol {
     func leaveRoom(roomInfo: JoyRoomInfo, completion: @escaping (Error?) -> Void) {
         self._removeUser(channelName: roomInfo.roomId) { err in
         }
+        sceneRefs[roomInfo.roomId]?.unsubscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION)
+        sceneRefs[roomInfo.roomId]?.unsubscribe(key: SYNC_MANAGER_MESSAGE_COLLECTION)
         if roomInfo.ownerId == user?.userId {
             sceneRefs[roomInfo.roomId]?.deleteScenes()
         } else {
