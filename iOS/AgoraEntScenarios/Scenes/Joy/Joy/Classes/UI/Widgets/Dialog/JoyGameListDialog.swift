@@ -92,7 +92,7 @@ class JoyGameListDialog: JoyBaseDialog {
         layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         layout.minimumInteritemSpacing = 8
         let itemWidth = (self.width - 8.0 * 3.0 - 20 * 2) / 4.0
-        layout.itemSize = CGSize(width: floor(itemWidth), height: itemWidth + 29)
+        layout.itemSize = CGSize(width: floor(itemWidth), height: 115)
         let collectionView = UICollectionView(frame: self.bounds, collectionViewLayout: layout)
         collectionView.showsVerticalScrollIndicator = false
         collectionView.backgroundColor = .clear

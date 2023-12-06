@@ -12,15 +12,12 @@ class JoyGiftListCell: UICollectionViewCell {
         didSet {
             if isSelected {
                 layer.borderWidth = 2
-                layer.borderColor = UIColor.joy_btn_bg.cgColor
-                backgroundColor = .joy_btn_bg
-                nameLabel.textColor = .joy_main_text
+                layer.borderColor = UIColor(red: 0.823, green: 0.742, blue: 1, alpha: 1).cgColor
             } else {
                 layer.borderWidth = 2
                 layer.borderColor = UIColor.clear.cgColor
-                backgroundColor = .clear
-                nameLabel.textColor = .joy_title_text
             }
+            highlightBgLayer.isHidden = !isSelected
         }
     }
     var giftInfo: CloudGameGiftInfo? {
@@ -30,10 +27,26 @@ class JoyGiftListCell: UICollectionViewCell {
             nameLabel.text = giftInfo?.name ?? ""
         }
     }
+    
+    private lazy var highlightBgLayer: CAGradientLayer = {
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [
+            UIColor(red: 0.905, green: 0.765, blue: 1, alpha: 1).cgColor,
+            UIColor(red: 0.994, green: 0.985, blue: 1, alpha: 1).cgColor,
+            UIColor(red: 1, green: 1, blue: 1, alpha: 1).cgColor
+            ]
+        gradientLayer.locations = [0, 0.72, 1]
+        gradientLayer.startPoint = CGPoint(x: 0.25, y: 0.5)
+        gradientLayer.endPoint = CGPoint(x: 0.75, y: 0.5)
+        gradientLayer.transform = CATransform3DMakeAffineTransform(CGAffineTransform(a: 0, b: 1, c: -1, d: 0, tx: 0.5, ty: 0))
+        gradientLayer.isHidden = true
+        return gradientLayer
+    }()
+    
     // 背景图
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.backgroundColor = .white
+        imageView.backgroundColor = .clear
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
@@ -42,6 +55,7 @@ class JoyGiftListCell: UICollectionViewCell {
         let nameLabel = UILabel()
         nameLabel.font = .joy_M_12
         nameLabel.textAlignment = .center
+        nameLabel.textColor = .joy_title_text
         return nameLabel
     }()
     
@@ -55,8 +69,9 @@ class JoyGiftListCell: UICollectionViewCell {
     }
     
     private func createSubviews() {
-        layer.cornerRadius = 15
+        layer.cornerRadius = 12
         clipsToBounds = true
+        contentView.layer.addSublayer(highlightBgLayer)
         contentView.addSubview(imageView)
         contentView.addSubview(nameLabel)
         nameLabel.snp.makeConstraints { make in
@@ -69,6 +84,11 @@ class JoyGiftListCell: UICollectionViewCell {
             make.left.right.top.equalToSuperview()
             make.bottom.equalTo(nameLabel.snp.top).offset(-4)
         }
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        highlightBgLayer.frame = contentView.bounds.insetBy(dx: -2, dy: -2)
     }
 }
 
