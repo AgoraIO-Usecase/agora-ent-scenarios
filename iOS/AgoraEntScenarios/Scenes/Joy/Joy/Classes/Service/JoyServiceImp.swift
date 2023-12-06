@@ -280,12 +280,18 @@ extension JoyServiceImp {
         scene
             .subscribe(key: "",
                        onCreated: { _ in
-                       }, onUpdated: { _ in
+                       }, onUpdated: { [weak self] object in
+                           guard let self = self else {return}
+                           guard let model = self.roomList.filter({ $0.objectId == object.getId()}).first,
+                                 model.roomId == channelName else {
+                               return
+                           }
+                           joyPrint("imp room subscribe onUpdated...")
+                           self.listener?.onRoomDidChanged(roomInfo: model)
                        }, onDeleted: { [weak self] object in
                            guard let self = self else {return}
                            guard let model = self.roomList.filter({ $0.objectId == object.getId()}).first,
-                                 model.roomId == channelName
-                           else {
+                                 model.roomId == channelName else {
                                return
                            }
                            joyPrint("imp room subscribe onDeleted...")

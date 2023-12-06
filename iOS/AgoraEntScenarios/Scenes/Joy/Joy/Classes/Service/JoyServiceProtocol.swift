@@ -29,6 +29,10 @@ protocol JoyServiceListenerProtocol: NSObjectProtocol {
     /// - Parameter message: <#message description#>
     func onMessageDidAdded(message: JoyMessage)
     
+    /// 房间信息变化
+    /// - Parameter roomInfo: <#roomInfo description#>
+    func onRoomDidChanged(roomInfo: JoyRoomInfo)
+    
     /// <#Description#>
     /// - Parameter roomInfo: <#roomInfo description#>
     func onRoomDidDestroy(roomInfo: JoyRoomInfo)

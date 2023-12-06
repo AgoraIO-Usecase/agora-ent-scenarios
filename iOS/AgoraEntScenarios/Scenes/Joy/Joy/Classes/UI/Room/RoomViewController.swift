@@ -448,7 +448,11 @@ extension RoomViewController: JoyServiceListenerProtocol {
         chatTableView.appendMessage(msg: message)
     }
     
-    func onRoomDidDestroy(roomInfo: JoyRoomInfo) {
+    func onRoomDidChanged(roomInfo: JoyRoomInfo) {
         
+    }
+    
+    func onRoomDidDestroy(roomInfo: JoyRoomInfo) {
+        onCloseAction()
     }
 }
