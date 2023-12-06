@@ -9,9 +9,9 @@ import UIKit
 import AgoraRtcKit
 
 class RoomViewController: UIViewController {
-    var roomInfo: JoyRoomInfo?
-    var currentUserInfo: JoyUserInfo?
-    var service: JoyServiceProtocol?
+    private var roomInfo: JoyRoomInfo!
+    private var currentUserInfo: JoyUserInfo!
+    private var service: JoyServiceProtocol!
     
     private var gameInfo: CloudGameDetailInfo? {
         didSet {
@@ -439,7 +439,9 @@ extension RoomViewController: JoyServiceListenerProtocol {
     }
     
     func onUserListDidChanged(userList: [JoyUserInfo]) {
-        
+        roomInfo.roomUserCount = userList.count
+        service?.updateRoom(roomInfo: roomInfo, completion: { err in
+        })
     }
     
     func onMessageDidAdded(message: JoyMessage) {

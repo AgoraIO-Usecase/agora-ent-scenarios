@@ -19,6 +19,12 @@ class JoyBaseDialog: UIView {
 //
 //        return layer
 //    }()
+    private lazy var indicatorView: UIView = {
+        let view = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 37, height: 3)))
+        view.setCornerRadius(1.5)
+        view.backgroundColor = UIColor(red: 0.83, green: 0.81, blue: 0.899, alpha: 1)
+        return view
+    }()
     private(set) lazy var dialogView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
@@ -70,6 +76,7 @@ class JoyBaseDialog: UIView {
         backgroundColor = .clear
         addSubview(dialogView)
         dialogView.addSubview(contentView)
+        dialogView.addSubview(indicatorView)
         dialogView.addSubview(titleLabel)
         dialogView.addSubview(button)
 //        contentView.layer.addSublayer(gradientLayer)
@@ -79,6 +86,8 @@ class JoyBaseDialog: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         let contentSize = contentSize()
+        indicatorView.aui_centerX = width / 2
+        indicatorView.aui_top = 8
         dialogView.frame = CGRect(x: 0, y: self.aui_height - contentSize.height, width: contentSize.width, height: contentSize.height)
         titleLabel.frame = CGRect(x: 0, y: 30, width: dialogView.width, height: 22)
         let buttonMargin = UIEdgeInsets(top: titleLabel.aui_bottom + 14, left: 24, bottom: 34, right: 24)

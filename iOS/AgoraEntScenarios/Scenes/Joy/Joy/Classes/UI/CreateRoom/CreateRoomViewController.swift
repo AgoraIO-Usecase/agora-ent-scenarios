@@ -136,7 +136,8 @@ extension CreateRoomViewController {
     }
     
     @objc private func onCreateAction() {
-        guard let roomName = textField.text else {
+        guard let roomName = textField.text, !roomName.isEmpty else {
+            AUIToast.show(text: "create_room_name_empty_tips".joyLocalization())
             return
         }
         
