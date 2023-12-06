@@ -1,6 +1,5 @@
 package io.agora.scene.joy.service
 
-import androidx.annotation.DrawableRes
 import java.io.Serializable
 
 data class JoyUserInfo constructor(
@@ -20,12 +19,17 @@ data class JoyRoomInfo constructor(
     var ownerId: Int = 0, // 房主 userid(rtc uid)
     var ownerAvatar: String?, // 房主头像
     var ownerName: String?, // 房主名
-    var gameId: String = "", // 游戏 id
     var badgeTitle: String = "",//胖可争霸/羊羊抗狼
-    var assistantUid: Int = 0, //游戏画面uid
     var createdAt: Long = System.currentTimeMillis(),
-    var taskId: String? = null, // 游戏 taskId
 
+    var objectId: String = ""
+) : Serializable
+
+data class JoyStartGameInfo constructor(
+    var gameId: String = "", //游戏 id
+    var taskId: String = "", // 游戏 taskid
+    var assistantUid: Int = 0, //游戏画面uid
+    var gameName: String = "",
     var objectId: String = ""
 ) : Serializable
 

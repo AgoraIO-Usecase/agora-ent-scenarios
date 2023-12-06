@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,6 +25,7 @@ import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
+import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.AudioModeration
@@ -42,6 +44,7 @@ import io.agora.scene.joy.service.JoyMessage
 import io.agora.scene.joy.service.JoyRoomInfo
 import io.agora.scene.joy.service.JoyServiceListenerProtocol
 import io.agora.scene.joy.service.JoyServiceProtocol
+import io.agora.scene.joy.service.JoyStartGameInfo
 import io.agora.scene.joy.service.JoyUserInfo
 import io.agora.scene.joy.ui.widget.JoyChooseGameDialog
 import io.agora.scene.joy.ui.widget.JoyGameRulesDialog
@@ -86,7 +89,9 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         ViewModelProvider(this)[JoyViewModel::class.java]
     }
 
-    val mRoomInfo by lazy { (intent?.getSerializableExtra(EXTRA_ROOM_DETAIL_INFO) as? JoyRoomInfo)!! }
+    private val mRoomInfo by lazy { (intent?.getSerializableExtra(EXTRA_ROOM_DETAIL_INFO) as? JoyRoomInfo)!! }
+
+    private var mStartGameInfo: JoyStartGameInfo? = null
 
     private val mMainRtcConnection by lazy {
         RtcConnection(
@@ -95,7 +100,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         )
     }
     private val mIsRoomOwner by lazy { mRoomInfo.ownerId.toLong() == UserManager.getInstance().user.id }
-
 
     private val mJoyService by lazy { JoyServiceProtocol.getImplInstance() }
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
@@ -148,7 +152,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         binding.ivMore.setOnClickListener {
             TopFunctionDialog(this).show()
         }
-        binding.tvRules.isVisible = mRoomInfo.gameId.isNotEmpty()
         binding.tvRules.setOnClickListener {
             showRulesDialog()
         }
@@ -212,11 +215,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             binding.vKeyboardBg.layoutParams = lp
             null
         }
-        if (mRoomInfo.gameId.isNotEmpty()) {
-            mJoyViewModel.getGameDetail(mRoomInfo.gameId)
-        } else {
-            showGameChooseDialog()
-        }
     }
 
     private fun showNormalInputLayout(): Boolean {
@@ -264,22 +262,23 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 binding.messageLayout.rvMessage.scrollToPosition(mMessageAdapter.itemCount - 1)
             }
 
+            override fun onStartGameInfoDidChanged(startGameInfo: JoyStartGameInfo) {
+                mStartGameInfo = startGameInfo
+                val gameId = mStartGameInfo?.gameId ?: ""
+                if (!mIsRoomOwner && gameId.isNotEmpty()) {
+                    // 观众收到房间开始游戏
+                    mJoyViewModel.getGameDetail(gameId)
+                }
+            }
+
             override fun onRoomDidDestroy(roomInfo: JoyRoomInfo) {
-                destroy() // 房间到了限制时间
                 showLivingEndLayout() // 房间到了限制时间
                 JoyLogger.d("showLivingEndLayout", "timer end!")
             }
 
             override fun onRoomDidChanged(roomInfo: JoyRoomInfo) {
 
-                if (!mIsRoomOwner && mRoomInfo.gameId.isEmpty()) {
-                    if (roomInfo.gameId.isNotEmpty()) {
-                        // 观众收到房间开始游戏
-                        mRoomInfo.gameId = roomInfo.gameId
-                        mRoomInfo.badgeTitle = roomInfo.badgeTitle
-                        mJoyViewModel.getGameDetail(mRoomInfo.gameId)
-                    }
-                }
+
             }
         })
 
@@ -290,7 +289,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     binding.groupBottom.isVisible = true
                     if (mIsRoomOwner) {
                         showRulesDialog()
-                        mRoomInfo.gameId = mJoyViewModel.mGamId
                         mRoomInfo.badgeTitle = mJoyViewModel.mGameDetail?.name ?: ""
                         mJoyService.updateRoom(mRoomInfo, completion = {
 
@@ -302,11 +300,23 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         mJoyViewModel.mStartGameLiveData.observe(this) {
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
-                    mTaskId = it.data?.taskId
+                    val mTaskId = it.data?.taskId ?: return@observe
+                    val gameSelect = mGameChooseGameDialog?.mSelectGame ?: return@observe
                     mGameChooseGameDialog?.let { dialog ->
                         dialog.dismiss()
                         mGameChooseGameDialog = null
                     }
+                    mStartGameInfo = JoyStartGameInfo(
+                        gameId = gameSelect.gameId ?: "",
+                        taskId = mTaskId,
+                        assistantUid = 1000000000 + mRoomInfo.ownerId,
+                        gameName = gameSelect.name ?: ""
+                    )
+                    mJoyService.updateStartGame(mRoomInfo.roomId, mStartGameInfo!!, completion = { error ->
+                        if (error == null) { //启动游戏成功
+                            setupAssistantVideoView()
+                        }
+                    })
                 }
             }
         }
@@ -350,11 +360,15 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 super.onJoinChannelSuccess(channel, uid, elapsed)
 
             }
+
+            override fun onError(err: Int) {
+                super.onError(err)
+                JoyLogger.e(TAG, "rtc onError:${RtcEngine.getErrorDescription(err)}")
+            }
         }
 
         joinChannel(eventListener)
         setupVideoView()
-        setupAssistantVideoView()
     }
 
     private fun setupVideoView() {
@@ -373,11 +387,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
 
     private fun setupAssistantVideoView() {
+        val assistantUid = mStartGameInfo?.assistantUid ?: return
         val textureView = TextureView(this)
         binding.flAssistantContainer.removeAllViews()
         binding.flAssistantContainer.addView(textureView)
         mRtcEngine.setupRemoteVideoEx(
-            VideoCanvas(textureView, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.assistantUid),
+            VideoCanvas(textureView, VideoCanvas.RENDER_MODE_HIDDEN, assistantUid),
             mMainRtcConnection
         )
     }
@@ -385,9 +400,34 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     private fun initServiceWithJoinRoom() {
         mJoyService.joinRoom(mRoomInfo, completion = {
             if (it == null) { //success
-
+                getStartGameInfo()
             } else {
+                ToastUtils.showToast("加入房间失败，请重试")
+                destroy()
+                finish()
+            }
+        })
+    }
 
+    private fun getStartGameInfo(){
+        mJoyService.getStartGame(mRoomInfo.roomId, completion = { error, startGameInfo ->
+            if (error == null) { //success
+                mStartGameInfo = startGameInfo
+                val gameId = mStartGameInfo?.gameId ?: ""
+                binding.tvRules.isVisible = gameId.isNotEmpty()
+                if (gameId.isNotEmpty()) {
+                    // 获取游戏详情
+                    mJoyViewModel.getGameDetail(gameId)
+                    // 加载游戏画面
+                    setupAssistantVideoView()
+                } else {
+                    if (mIsRoomOwner) {
+                        // 选择游戏
+                        showGameChooseDialog()
+                    }
+                }
+            } else {
+                ToastUtils.showToast("获取进行中的游戏失败")
             }
         })
     }
@@ -463,8 +503,13 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 mGameChooseGameDialog = JoyChooseGameDialog().apply {
                     setBundleArgs(bundle)
                     mSelectedCompletion = {
-                        mJoyViewModel.startGame(mRoomInfo, it)
+                        // 开始游戏
+                        val assistantUid = 1000000000 + (UserManager.getInstance().user.id).toInt()
+                        mJoyViewModel.startGame(mRoomInfo.roomId, it.gameId ?: "", assistantUid)
+                        // 获取游戏详情
                         mJoyViewModel.getGameDetail(it.gameId!!)
+                        // 加载游戏画面
+                        setupAssistantVideoView()
                     }
                 }
             }

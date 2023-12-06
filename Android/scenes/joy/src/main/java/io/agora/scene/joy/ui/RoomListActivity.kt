@@ -138,7 +138,7 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
             holder.binding.tvRoomName.text = data.roomName
             holder.binding.tvUserCount.text = mContext.getString(R.string.joy_user_count, data.roomUserCount)
             holder.binding.tvRoomId.text = mContext.getString(R.string.joy_room_id, data.roomId)
-            holder.binding.tvGameTag.isVisible = data.gameId.isNotEmpty()
+            holder.binding.tvGameTag.isVisible = data.badgeTitle.isNotEmpty()
             holder.binding.tvGameTag.text = data.badgeTitle
             holder.binding.ivCover.setImageResource(getThumbnailIcon(data.thumbnailId))
             holder.itemView.setOnClickListener {

@@ -27,7 +27,12 @@ class JoyChooseGameDialog : BaseBottomSheetDialogFragment<JoyDialogChooseGameLay
         arguments?.getSerializable(Key_Games) as List<JoyGameListResult>
     }
 
-    private var mChooseGameAdapter: JoyChooseGameAdapter? = null
+    private val mChooseGameAdapter: JoyChooseGameAdapter by lazy{
+        JoyChooseGameAdapter(mGamList, 0)
+    }
+
+    val mSelectGame:JoyGameListResult
+        get() = mGamList[mChooseGameAdapter.selectedIndex]
 
     override fun onStart() {
         super.onStart()
@@ -44,13 +49,10 @@ class JoyChooseGameDialog : BaseBottomSheetDialogFragment<JoyDialogChooseGameLay
         setEnableConfirm(true)
         mBinding.btnConfirm.setOnClickListener {
             setEnableConfirm(false)
-            mChooseGameAdapter?.apply {
-                val game = mGamList[selectedIndex]
+                val game = mGamList[mChooseGameAdapter.selectedIndex]
                 mSelectedCompletion?.invoke(game)
-            }
 
         }
-        mChooseGameAdapter = JoyChooseGameAdapter(mGamList, 0)
         mBinding.rvGame.adapter = mChooseGameAdapter
     }
 

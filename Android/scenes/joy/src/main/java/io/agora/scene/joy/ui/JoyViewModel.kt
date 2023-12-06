@@ -8,10 +8,8 @@ import io.agora.scene.joy.base.StateLiveData
 import io.agora.scene.joy.network.JoyApiManager
 import io.agora.scene.joy.network.JoyApiService
 import io.agora.scene.joy.network.JoyGameDetailResult
-import io.agora.scene.joy.network.JoyGameListResult
 import io.agora.scene.joy.network.JoyGameRepo
 import io.agora.scene.joy.network.JoyGameResult
-import io.agora.scene.joy.service.JoyRoomInfo
 import kotlinx.coroutines.launch
 
 class JoyViewModel : BaseViewModel() {
@@ -34,7 +32,7 @@ class JoyViewModel : BaseViewModel() {
     val mGameStatusLiveData = StateLiveData<JoyGameResult>()
     val mGameRenewTokenLiveData = StateLiveData<JoyJsonModel.JoyEmpty>()
 
-    val mGameDetail:JoyGameDetailResult?
+    val mGameDetail: JoyGameDetailResult?
         get() = mGameDetailLiveData.value?.data
 
     val mGamId: String
@@ -55,18 +53,18 @@ class JoyViewModel : BaseViewModel() {
         }
     }
 
-    fun startGame(roomInfo: JoyRoomInfo, gameInfo: JoyGameListResult) {
+    fun startGame(roomId: String, gameId: String, assistantUid: Int) {
         viewModelScope.launch {
             val assistantToken = TokenGenerator.fetchToken(
-                roomInfo.roomId,
-                roomInfo.assistantUid.toString(),
+                roomId,
+                assistantUid.toString(),
                 TokenGenerator.TokenGeneratorType.token007,
                 TokenGenerator.AgoraTokenType.rtc
             )
             mJoyGameRepo.startGame(
-                gameId = gameInfo.gameId ?: "",
-                roomId = roomInfo.roomId,
-                assistantUid = roomInfo.assistantUid,
+                gameId = gameId,
+                roomId = roomId,
+                assistantUid = assistantUid,
                 assistantToken = assistantToken,
                 mStartGameLiveData
             )

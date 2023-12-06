@@ -21,6 +21,11 @@ interface JoyServiceListenerProtocol {
     fun onMessageDidAdded(message: JoyMessage)
 
     /**
+     * 房间进行的游戏变化
+     */
+    fun onStartGameInfoDidChanged(startGameInfo: JoyStartGameInfo)
+
+    /**
      * 房间信息变化
      */
     fun onRoomDidChanged(roomInfo: JoyRoomInfo)
@@ -60,6 +65,16 @@ interface JoyServiceProtocol {
     fun updateRoom(roomInfo: JoyRoomInfo, completion: (error: Exception?) -> Unit)
 
     /**
+     * 获取正在进行的游戏信息
+     */
+    fun getStartGame(roomId: String, completion: (error: Exception?, out: JoyStartGameInfo?) -> Unit)
+
+    /**
+     * 更新正在进行的游戏信息
+     */
+    fun updateStartGame(roomId: String,gameInfo: JoyStartGameInfo,completion: (error: Exception?) -> Unit)
+
+    /**
      * 创建房间
      */
     fun createRoom(roomName: String, completion: (error: Exception?, out: JoyRoomInfo?) -> Unit)
@@ -78,7 +93,7 @@ interface JoyServiceProtocol {
     /**
      * 发送消息
      */
-    fun sendChatMessage(roomId:String,message: String,completion: (error: Exception?) -> Unit)
+    fun sendChatMessage(roomId: String, message: String, completion: (error: Exception?) -> Unit)
 
     /**
      * 订阅回调变化

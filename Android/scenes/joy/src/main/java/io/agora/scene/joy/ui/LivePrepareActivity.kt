@@ -285,7 +285,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
         override fun onBindViewHolder(holder: GameViewHolder, position: Int) {
             val data = gameInfoList[position]
             // TODO:
-            holder.binding.ivGuide.setImageResource(R.mipmap.joy_img_room_item_bg_0)
+            holder.binding.ivGuide.setImageResource(R.drawable.joy_banner_pkzb)
             holder.binding.root.setOnClickListener {
                 itemClick.invoke(position)
             }
