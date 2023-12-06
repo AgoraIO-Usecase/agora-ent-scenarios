@@ -53,4 +53,5 @@ TODO: Add long description of the pod here.
   s.dependency 'SwiftyBeaver'
   s.dependency 'SwiftProtobuf', '1.24.0'
   s.dependency 'YYCategories'
+  s.dependency 'SVProgressHUD'
 end

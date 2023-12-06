@@ -5,7 +5,8 @@
 //  Created by wushengtao on 2023/12/5.
 //
 
-import Foundation
+import UIKit
+import SVProgressHUD
 
 private let randomRoomName = [
     "show_create_room_name1".joyLocalization(),
@@ -140,9 +141,10 @@ extension CreateRoomViewController {
             AUIToast.show(text: "create_room_name_empty_tips".joyLocalization())
             return
         }
-        
+        SVProgressHUD.show()
         service.createRoom(roomName: roomName) {[weak self] info, error in
             guard let self = self else {return}
+            SVProgressHUD.dismiss()
             if let error = error {
                 AUIToast.show(text: error.localizedDescription)
                 return

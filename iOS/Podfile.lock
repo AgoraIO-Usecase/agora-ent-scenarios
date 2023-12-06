@@ -32,6 +32,7 @@ PODS:
     - AgoraSyncManager
     - SDWebImage
     - SnapKit
+    - SVProgressHUD
     - SwiftProtobuf (= 1.24.0)
     - SwiftyBeaver
     - YYCategories
@@ -194,7 +195,7 @@ SPEC CHECKSUMS:
   CallAPI: f40f9694c310b613f20958fabdbe69f8bc1d6ca5
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
-  Joy: 873f1483af8ba0e2102714ebfe8a0315bd756723
+  Joy: 3deda8672a197f760ba6c840c8c20657a5278df3
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
   LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb
