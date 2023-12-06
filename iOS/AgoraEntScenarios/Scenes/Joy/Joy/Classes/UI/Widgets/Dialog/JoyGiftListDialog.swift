@@ -1,14 +1,13 @@
 //
-//  JoyGameListDialog.swift
+//  JoyGiftListDialog.swift
 //  Joy
 //
-//  Created by wushengtao on 2023/11/30.
+//  Created by wushengtao on 2023/12/6.
 //
 
 import UIKit
-import SDWebImage
 
-class JoyGameListCell: UICollectionViewCell {
+class JoyGiftListCell: UICollectionViewCell {
     override var isSelected: Bool {
         didSet {
             if isSelected {
@@ -24,20 +23,18 @@ class JoyGameListCell: UICollectionViewCell {
             }
         }
     }
-    var gameInfo: CloudGameInfo? {
+    var giftInfo: CloudGameGiftInfo? {
         didSet {
-            imageView.sd_setImage(with: URL(string: gameInfo?.thumbnail ?? ""),
+            imageView.sd_setImage(with: URL(string: giftInfo?.thumbnail ?? ""),
                                   placeholderImage: UIImage.sceneImage(name: "game_placeholder"))
-            nameLabel.text = gameInfo?.name ?? ""
+            nameLabel.text = giftInfo?.name ?? ""
         }
     }
     // 背景图
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.layer.cornerRadius = 10
-        imageView.layer.masksToBounds = true
-        imageView.backgroundColor = .gray
-        imageView.contentMode = .scaleAspectFill
+        imageView.backgroundColor = .white
+        imageView.contentMode = .scaleAspectFit
         return imageView
     }()
     // 房间名称
@@ -75,35 +72,35 @@ class JoyGameListCell: UICollectionViewCell {
     }
 }
 
-class JoyGameListDialog: JoyBaseDialog {
-    var onSelectedGame: ((CloudGameInfo)->())?
-    var gameList: [CloudGameInfo] = [] {
+class JoyGiftListDialog: JoyBaseDialog {
+    var onSelectedGift: ((CloudGameGiftInfo)->())?
+    var giftList: [CloudGameGiftInfo] = [] {
         didSet {
             listView.reloadData()
         }
     }
-    private var selectedGame: CloudGameInfo? {
+    private var selectedGift: CloudGameGiftInfo? {
         didSet {
-            button.isEnabled = selectedGame == nil ? false : true
+            button.isEnabled = selectedGift == nil ? false : true
         }
     }
     private lazy var listView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         layout.minimumInteritemSpacing = 8
-        let itemWidth = (self.width - 8.0 * 3.0 - 20 * 2) / 4.0
-        layout.itemSize = CGSize(width: floor(itemWidth), height: itemWidth + 29)
+        let itemWidth = (self.width - 8.0 * 2.0 - 20 * 2) / 3.0
+        layout.itemSize = CGSize(width: floor(itemWidth), height: 120)
         let collectionView = UICollectionView(frame: self.bounds, collectionViewLayout: layout)
-        collectionView.showsVerticalScrollIndicator = false
         collectionView.backgroundColor = .clear
-        collectionView.register(JoyGameListCell.self, forCellWithReuseIdentifier: NSStringFromClass(JoyGameListCell.self))
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.register(JoyGiftListCell.self, forCellWithReuseIdentifier: NSStringFromClass(JoyGiftListCell.self))
         collectionView.delegate = self
         collectionView.dataSource = self
         return collectionView
     }()
     
     override func contentSize() -> CGSize {
-        return CGSize(width: self.width, height: 268)
+        return CGSize(width: self.width, height: 401)
     }
     
     override func loadCustomContentView(contentView: UIView) {
@@ -113,47 +110,55 @@ class JoyGameListDialog: JoyBaseDialog {
         }
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        button.frame = CGRect(x: dialogView.width - 96 - 20,
+                              y: button.aui_top,
+                              width: 96,
+                              height: 36)
+        button.setjoyVerticalDefaultGradientBackground()
+    }
+    
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        // 检查是否有子视图响应触摸事件
         if let superViewHitTestView = super.hitTest(point, with: event), superViewHitTestView != self {
             return superViewHitTestView
         } else {
-            // 如果没有子视图响应，则返回父视图，使触摸事件穿透到下一层视图
-            return nil
+            hiddenAnimation()
+            return self
         }
     }
     
     override func labelTitle() -> String {
-        return "dialog_title_gamelist".joyLocalization()
+        return "dialog_title_giftlist".joyLocalization()
     }
     
     override func buttonTitle() -> String {
-        return "gamelist_selected_confirm".joyLocalization()
+        return "dialog_selected_send".joyLocalization()
     }
     
     override func onClickButton() {
-        guard let selectedGame = selectedGame else {return}
-        onSelectedGame?(selectedGame)
+        guard let selectedGift = selectedGift else {return}
+        onSelectedGift?(selectedGift)
     }
 }
 
-extension JoyGameListDialog: UICollectionViewDelegate, UICollectionViewDataSource {
+extension JoyGiftListDialog: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell: JoyGameListCell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(JoyGameListCell.self), for: indexPath) as! JoyGameListCell
-        let game = gameList[indexPath.item]
-        cell.gameInfo = game
+        let cell: JoyGiftListCell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(JoyGiftListCell.self), for: indexPath) as! JoyGiftListCell
+        let gift = giftList[indexPath.item]
+        cell.giftInfo = gift
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        selectedGame = gameList[indexPath.item]
+        selectedGift = giftList[indexPath.item]
         if let cell = collectionView.cellForItem(at: indexPath) {
             cell.isSelected = true
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return gameList.count
+        return giftList.count
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {

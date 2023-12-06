@@ -401,7 +401,24 @@ extension RoomViewController: RoomBottomBarDelegate {
     }
     
     func onClickGiftButton() {
+        guard let bundlePath = Bundle.main.path(forResource: "Joy", ofType: "bundle"),
+              let bundle = Bundle(path: bundlePath),
+              let path = bundle.path(forResource: "Image/gift", ofType: "json"),
+              let jsonData = try? Data(contentsOf: URL(fileURLWithPath: path)),
+              let jsonObj = try? JSONSerialization.jsonObject(with: jsonData) as? [[String: Any]],
+              let giftList: [CloudGameGiftInfo] = self.decodeModelArray(jsonObj) else {
+            assert(false, "gift is empty")
+            joyWarn("show gift fail!")
+            return
+        }
         
+        JoyGiftListDialog.hidden()
+        let dialog: JoyGiftListDialog? = JoyGiftListDialog.show()
+        dialog?.giftList = giftList
+        dialog?.onSelectedGift = {[weak self] game in
+            guard let self = self else {return}
+            
+        }
     }
     
     func onClickLikeButton() {

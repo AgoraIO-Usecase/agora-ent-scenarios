@@ -30,6 +30,8 @@
 "dialog_title_gamelist"="选择弹幕玩法";
 "gamelist_selected_confirm"="确认";
 "gamenotice_selected_confirm"="我知道了";
+"dialog_title_giftlist"="礼物";
+"dialog_selected_send"="发送";
 "joy_user_count" = "人";
 
 "query_title_exit"="结束游戏";

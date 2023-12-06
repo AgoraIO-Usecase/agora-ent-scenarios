@@ -55,10 +55,9 @@ public struct CloudGameGiftInfo: Codable {
     
     enum CodingKeys: String, CodingKey {
         case giftId = "id"
-        case price = "value"
         case vendorGiftId = "vendor_gift_id"
         case gameId = "game_id"
-        case name, thumbnail
+        case price, name, thumbnail
     }
 }
 
