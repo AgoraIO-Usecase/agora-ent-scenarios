@@ -21,6 +21,11 @@ interface JoyServiceListenerProtocol {
     fun onMessageDidAdded(message: JoyMessage)
 
     /**
+     * 房间信息变化
+     */
+    fun onRoomDidChanged(roomInfo: JoyRoomInfo)
+
+    /**
      * 房间销毁
      */
     fun onRoomDidDestroy(roomInfo: JoyRoomInfo)

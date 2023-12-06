@@ -65,7 +65,7 @@ class JoySyncManagerServiceImp constructor(
     private val mTimerRoomEndRun = Runnable {
         runOnMainThread {
             JoyLogger.d(TAG, "time up exit room!")
-            val roomInfo = mRoomMap[mCurrRoomNo]?: return@runOnMainThread
+            val roomInfo = mRoomMap[mCurrRoomNo] ?: return@runOnMainThread
             mJoyServiceListener?.onRoomDidDestroy(roomInfo)
         }
     }
@@ -279,12 +279,6 @@ class JoySyncManagerServiceImp constructor(
             override fun onSuccess(result: IObject?) {
                 result ?: return
                 JoyLogger.d(TAG, "sendChatMessage onSuccess roomId:$roomId objectId:${result.id}")
-                val addUser = result.toObject(JoyUserInfo::class.java)
-                objIdOfUserNo[addUser.userId.toString()] = result.id
-                mCurrentRoomUserMap[addUser.userId.toString()]
-                runOnMainThread {
-                    mJoyServiceListener?.onUserListDidChanged(mCurrentRoomUserMap.values.toList())
-                }
                 completion.invoke(null)
             }
 
@@ -304,7 +298,6 @@ class JoySyncManagerServiceImp constructor(
     private fun innerReset(isRoomDestroy: Boolean) {
         if (!isRoomDestroy) {
             innerRemoveUserInfo {}
-            innerUpdateUserCount(mCurrentRoomUserMap.size - 1)
         }
         mCurrentRoomUserMap.clear()
         objIdOfUserNo.clear()
@@ -321,12 +314,10 @@ class JoySyncManagerServiceImp constructor(
         mSceneReference?.collection(SYNC_SCENE_ROOM_USER_COLLECTION)?.get(object : Sync.DataListCallback {
             override fun onSuccess(result: MutableList<IObject>?) {
                 JoyLogger.d(TAG, "getUserList onSuccess roomId:$roomNo userCount:${result?.size}")
-                val ret = mutableListOf<JoyUserInfo>()
                 result?.forEach {
                     val obj = it.toObject(JoyUserInfo::class.java)
                     obj.objectId = it.id
                     objIdOfUserNo[obj.userId.toString()] = it.id
-                    ret.add(obj)
                     mCurrentRoomUserMap[obj.userId.toString()] = obj
                 }
                 // not in --> add user
@@ -334,8 +325,6 @@ class JoySyncManagerServiceImp constructor(
                     innerAddUserInfo(roomNo, completion = { objectId, error ->
 
                     })
-                } else {
-
                 }
                 runOnMainThread {
                     mJoyServiceListener?.onUserListDidChanged(mCurrentRoomUserMap.values.toList())
@@ -446,6 +435,10 @@ class JoySyncManagerServiceImp constructor(
                     objIdOfUserNo[updateUser.userId.toString()] = item.id
                     mCurrentRoomUserMap[updateUser.userId.toString()] = updateUser
                 }
+                val roomInfo = mRoomMap[mCurrRoomNo]
+                if (roomInfo?.ownerId==mUser.id.toInt()){
+                    innerUpdateUserCount(mCurrentRoomUserMap.size)
+                }
                 runOnMainThread {
                     mJoyServiceListener?.onUserListDidChanged(mCurrentRoomUserMap.values.toList())
                 }
@@ -462,6 +455,10 @@ class JoySyncManagerServiceImp constructor(
                         objIdOfUserNo.remove(entry.key)
                         return
                     }
+                }
+                val roomInfo = mRoomMap[mCurrRoomNo]
+                if (roomInfo?.ownerId==mUser.id.toInt()){
+                    innerUpdateUserCount(mCurrentRoomUserMap.size)
                 }
                 runOnMainThread {
                     mJoyServiceListener?.onUserListDidChanged(mCurrentRoomUserMap.values.toList())

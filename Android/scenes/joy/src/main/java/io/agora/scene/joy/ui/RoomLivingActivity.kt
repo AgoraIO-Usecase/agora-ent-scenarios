@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.TextureView
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
@@ -49,6 +50,7 @@ import io.agora.scene.joy.utils.JoyLogger
 import io.agora.scene.joy.utils.dp
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.utils.StatusBarUtil
 import io.agora.syncmanager.rtm.Sync
 import org.json.JSONException
 import org.json.JSONObject
@@ -119,6 +121,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
+        StatusBarUtil.hideStatusBar(window, false)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         binding.tvRoomName.text = mRoomInfo.roomName
         binding.tvRoomId.text = mRoomInfo.roomId
         GlideApp.with(this)
@@ -128,6 +132,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             .apply(RequestOptions.circleCropTransform())
             .into(binding.ivOwnerAvatar)
 
+        binding.tvEmptyGame.isVisible = !mIsRoomOwner
         // 消息
         val messageLayout = binding.messageLayout
         (messageLayout.rvMessage.layoutManager as LinearLayoutManager).let {
@@ -171,7 +176,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     Log.d(TAG, "action send：${v.text}")
                     showNormalInputLayout()
                     if (content.isNotEmpty()) {
-                        mJoyViewModel.sendComment(mJoyViewModel.mGamId, mRoomInfo.roomId, v.text.toString())
+                        mJoyViewModel.sendComment(mJoyViewModel.mGamId, mRoomInfo.roomId, content)
                         mJoyService.sendChatMessage(mRoomInfo.roomId, content, completion = {
                         })
                     }
@@ -200,7 +205,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             null
         }
         if (mRoomInfo.gameId.isNotEmpty()) {
-            mJoyViewModel.getGameDetail(mJoyViewModel.mGamId)
+            mJoyViewModel.getGameDetail(mRoomInfo.gameId)
         } else {
             showGameChooseDialog()
         }
@@ -243,6 +248,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             }
 
             override fun onUserListDidChanged(userList: List<JoyUserInfo>) {
+                mRoomInfo.roomUserCount = userList.size
             }
 
             override fun onMessageDidAdded(message: JoyMessage) {
@@ -254,6 +260,18 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 destroy() // 房间到了限制时间
                 showLivingEndLayout() // 房间到了限制时间
                 JoyLogger.d("showLivingEndLayout", "timer end!")
+            }
+
+            override fun onRoomDidChanged(roomInfo: JoyRoomInfo) {
+
+                if (!mIsRoomOwner && mRoomInfo.gameId.isEmpty()) {
+                    if (roomInfo.gameId.isNotEmpty()) {
+                        // 观众收到房间开始游戏
+                        mRoomInfo.gameId = roomInfo.gameId
+                        mRoomInfo.badgeTitle = roomInfo.badgeTitle
+                        mJoyViewModel.getGameDetail(mRoomInfo.gameId)
+                    }
+                }
             }
         })
 
@@ -285,6 +303,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
         mJoyViewModel.mStopGameLiveData.observe(this) {
             when (it.dataState) {
+                DataState.STATE_EMPTY,
                 DataState.STATE_SUCCESS -> {
                     ToastUtils.showToast("停止游戏")
                 }
@@ -292,6 +311,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
         mJoyViewModel.mSendGiftLiveData.observe(this) {
             when (it.dataState) {
+                DataState.STATE_EMPTY,
                 DataState.STATE_SUCCESS -> {
                     ToastUtils.showToast("送礼物成功")
                 }
@@ -299,6 +319,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
         mJoyViewModel.mSendCommentLiveData.observe(this) {
             when (it.dataState) {
+                DataState.STATE_EMPTY,
                 DataState.STATE_SUCCESS -> {
                     ToastUtils.showToast("发送弹幕成功")
                 }
@@ -306,6 +327,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
         mJoyViewModel.mSendLikeLiveData.observe(this) {
             when (it.dataState) {
+                DataState.STATE_EMPTY,
                 DataState.STATE_SUCCESS -> {
                     ToastUtils.showToast("点赞成功")
                 }
@@ -442,9 +464,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     }
 
     private fun showRulesDialog() {
-        val gameDetail = mJoyViewModel.mGameDetailLiveData.value?.data
+        val gameDetail = mJoyViewModel.mGameDetailLiveData.value?.data ?: return
         val bundle = Bundle().apply {
             putSerializable(JoyGameRulesDialog.Key_Game, gameDetail)
+            putBoolean(JoyGameRulesDialog.Key_IsOwner, mIsRoomOwner)
         }
         val dialog = JoyGameRulesDialog().apply {
             setBundleArgs(bundle)
