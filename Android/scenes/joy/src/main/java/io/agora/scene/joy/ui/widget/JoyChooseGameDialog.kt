@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -31,6 +32,7 @@ class JoyChooseGameDialog : BaseBottomSheetDialogFragment<JoyDialogChooseGameLay
     override fun onStart() {
         super.onStart()
         dialog?.let {
+            it.setCancelable(false)
             it.setCanceledOnTouchOutside(false)
             val behavior: BottomSheetBehavior<*> = BottomSheetBehavior.from(it.findViewById(R.id.design_bottom_sheet))
             behavior.setHideable(false)
@@ -54,6 +56,14 @@ class JoyChooseGameDialog : BaseBottomSheetDialogFragment<JoyDialogChooseGameLay
 
     fun setEnableConfirm(isEnable: Boolean) {
         mBinding.btnConfirm.isEnabled = isEnable
+    }
+
+    override fun onResume() {
+        super.onResume()
+        dialog?.window?.setFlags(
+            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL)
+        dialog?.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
     }
 }
 

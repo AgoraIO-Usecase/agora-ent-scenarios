@@ -3,6 +3,7 @@ package io.agora.scene.joy.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
@@ -73,11 +74,9 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
         binding.smartRefreshLayout.setEnableLoadMore(false)
         binding.smartRefreshLayout.setEnableRefresh(true)
         binding.smartRefreshLayout.setOnRefreshListener {
-            mJoyService.getRoomList(
-                completion = {
-                    updateList(it)
-                },
-            )
+            mJoyService.getRoomList {
+                updateList(it)
+            }
         }
         binding.smartRefreshLayout.autoRefresh()
         binding.btnCreateRoom.setOnClickListener {
@@ -92,6 +91,12 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
         mJoyListAdapter?.setDataList(data)
 
         binding.smartRefreshLayout.finishRefresh()
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        binding.smartRefreshLayout.autoRefresh()
+        Log.d(TAG, "joy roomList activity onRestart")
     }
 
     override fun onDestroy() {

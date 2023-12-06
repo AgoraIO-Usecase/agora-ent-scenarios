@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.TextureView
 import android.view.ViewGroup
@@ -46,6 +47,7 @@ import io.agora.scene.joy.ui.widget.JoyChooseGameDialog
 import io.agora.scene.joy.ui.widget.JoyGameRulesDialog
 import io.agora.scene.joy.ui.widget.JoyGiftDialog
 import io.agora.scene.joy.ui.widget.KeyboardStatusWatcher
+import io.agora.scene.joy.utils.CustomToast
 import io.agora.scene.joy.utils.JoyLogger
 import io.agora.scene.joy.utils.dp
 import io.agora.scene.widget.dialog.PermissionLeakDialog
@@ -178,6 +180,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     if (content.isNotEmpty()) {
                         mJoyViewModel.sendComment(mJoyViewModel.mGamId, mRoomInfo.roomId, content)
                         mJoyService.sendChatMessage(mRoomInfo.roomId, content, completion = {
+                            it?.message?.let { errorMsg ->
+                                CustomToast.showError(errorMsg)
+                            }
+                            if (it == null) {
+                                CustomToast.show(getString(R.string.joy_send_message_success))
+                            }
                         })
                     }
                 }
@@ -279,6 +287,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
                     binding.tvRules.isVisible = true
+                    binding.groupBottom.isVisible = true
                     if (mIsRoomOwner) {
                         showRulesDialog()
                         mRoomInfo.gameId = mJoyViewModel.mGamId
@@ -313,7 +322,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             when (it.dataState) {
                 DataState.STATE_EMPTY,
                 DataState.STATE_SUCCESS -> {
-                    ToastUtils.showToast("送礼物成功")
+                    CustomToast.show("送礼物成功")
                 }
             }
         }
@@ -321,7 +330,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             when (it.dataState) {
                 DataState.STATE_EMPTY,
                 DataState.STATE_SUCCESS -> {
-                    ToastUtils.showToast("发送弹幕成功")
+//                    CustomToast.show("发送弹幕成功")
                 }
             }
         }
@@ -329,7 +338,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             when (it.dataState) {
                 DataState.STATE_EMPTY,
                 DataState.STATE_SUCCESS -> {
-                    ToastUtils.showToast("点赞成功")
+                    CustomToast.show("点赞成功")
                 }
             }
         }
@@ -524,6 +533,13 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
         mRtcEngine.leaveChannelEx(mMainRtcConnection)
     }
+
+//    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+//        if (keyCode == KeyEvent.KEYCODE_BACK && event.repeatCount == 0) {
+//            return false;
+//        }
+//        return super.onKeyDown(keyCode, event)
+//    }
 }
 
 private class RoomMessageAdapter constructor(

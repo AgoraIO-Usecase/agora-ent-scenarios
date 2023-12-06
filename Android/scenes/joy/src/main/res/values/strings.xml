@@ -20,6 +20,8 @@
     <string name="joy_living_end_content">是否退出游戏直播？</string>
     <string name="joy_living_timeout_title">游戏超时自动退出</string>
     <string name="joy_living_timeout_content">重新体验游戏请返回创建房间</string>
+    <string name="joy_send_message_success">指令发送成功</string>
+    <string name="joy_join_the_camp_first">请先加入阵营</string>
 
     <string-array name="joy_gift_array">
         <item>爱心</item>
