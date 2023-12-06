@@ -112,9 +112,9 @@ extension CloudBarrageAPI {
         }
     }
     
-    public func sendGift(likeConfig: CloudGameSendGiftConfig,
+    public func sendGift(giftConfig: CloudGameSendGiftConfig,
                          completion: @escaping (NSError?) -> Void) {
-        guard let params = encodeModel(likeConfig) else {
+        guard let params = encodeModel(giftConfig) else {
             completion(NSError(domain: "parse model fail", code: -1))
             return
         }

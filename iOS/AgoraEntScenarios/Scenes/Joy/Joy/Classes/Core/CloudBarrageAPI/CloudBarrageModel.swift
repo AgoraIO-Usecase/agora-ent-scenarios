@@ -137,10 +137,28 @@ public struct CloudGameSendLikeConfig: Codable {
     }
 }
 
+public struct CloudGameSendGiftInfo: Codable {
+    public var msgId: String? = NSString.withUUID().md5() as? String
+    public var userId:String?
+    public var userAvatar: String?
+    public var userName: String?
+    public var giftId: String?      //礼物id，须按约定的礼物编号发送，**此处用vendor_gift_id的值**
+    public var giftNum: Int = 0     //送出的礼物数量，整形值，否则参数错误
+    public var giftValue: Int = 0   //礼物总价值，折算成分，整形值
+    public var timestamp: Int = Int(Date().timeIntervalSince1970 * 1000)
+    
+    enum CodingKeys: String, CodingKey {
+        case userId = "openId"
+        case userAvatar = "avatar"
+        case userName = "nickname"
+        case msgId, giftId, giftNum, giftValue, timestamp
+    }
+}
+
 public struct CloudGameSendGiftConfig: Codable {
     public var roomId: String?
     public var gameId: String?
-    public var giftList: [CloudGameGiftInfo]?
+    public var giftList: [CloudGameSendGiftInfo]?
     
     enum CodingKeys: String, CodingKey {
         case roomId, gameId

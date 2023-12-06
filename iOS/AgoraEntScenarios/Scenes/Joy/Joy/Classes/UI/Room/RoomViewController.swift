@@ -165,7 +165,7 @@ class RoomViewController: UIViewController {
             make.bottom.equalToSuperview()
         }
         
-        guard let roomInfo = roomInfo, let currentUserInfo = currentUserInfo else {
+        guard let roomInfo = roomInfo else {
             AUIToast.show(text: "room info error")
             leaveRoom()
             return
@@ -240,7 +240,7 @@ class RoomViewController: UIViewController {
 //MARK: game handler
 extension RoomViewController {
     private func startGame(gameInfo: CloudGameInfo, assistantUid: UInt, assistantToken: String) {
-        guard let roomInfo = roomInfo, let currentUserInfo = currentUserInfo else {return}
+        guard let roomInfo = roomInfo else {return}
         let rtcConfig = CloudGameRtcConfig(broadcastUid: roomInfo.ownerId,
                                            assistantUid: assistantUid,
                                            assistantToken: assistantToken,
@@ -325,7 +325,6 @@ extension RoomViewController {
 extension RoomViewController {
     private func joinRTCChannel() {
         guard let roomInfo = roomInfo,
-              let currentUserInfo = currentUserInfo,
               let engine = CloudBarrageAPI.shared.apiConfig?.engine else {
             AUIToast.show(text: "room info error")
             onCloseAction()
@@ -338,11 +337,12 @@ extension RoomViewController {
         mediaOptions.clientRoleType = mediaOptions.publishCameraTrack ? .broadcaster : .audience
         mediaOptions.autoSubscribeAudio = true
         mediaOptions.autoSubscribeVideo = true
+        let userId = currentUserInfo.userId
         renewRTCTokens(roomId: roomInfo.roomId,
                        userId: currentUserInfo.userId) { token in
             engine.joinChannel(byToken: token,
                                channelId: roomInfo.roomId,
-                               uid: currentUserInfo.userId,
+                               uid: userId,
                                mediaOptions: mediaOptions) { channel, uid, elapsed in
                 joyPrint("joinChannel[\(channel)][\(uid)] cost: \(elapsed)ms")
             }
@@ -420,6 +420,7 @@ extension RoomViewController: RoomBottomBarDelegate {
     func onClickGiftButton() {
         guard let bundlePath = Bundle.main.path(forResource: "Joy", ofType: "bundle"),
               let bundle = Bundle(path: bundlePath),
+              let gameId = gameInfo?.gameId,
               let path = bundle.path(forResource: "Image/gift", ofType: "json"),
               let jsonData = try? Data(contentsOf: URL(fileURLWithPath: path)),
               let jsonObj = try? JSONSerialization.jsonObject(with: jsonData) as? [[String: Any]],
@@ -432,19 +433,30 @@ extension RoomViewController: RoomBottomBarDelegate {
         JoyGiftListDialog.hidden()
         let dialog: JoyGiftListDialog? = JoyGiftListDialog.show()
         dialog?.giftList = giftList
-        dialog?.onSelectedGift = {[weak self] game in
+        dialog?.onSelectedGift = {[weak self] gift, count in
             guard let self = self else {return}
-            
+            let sendGift = CloudGameSendGiftInfo(userId: "\(currentUserInfo.userId)",
+                                                 userAvatar: currentUserInfo.avatar,
+                                                 userName: currentUserInfo.userName,
+                                                 giftId: gift.giftId,
+                                                 giftNum: count,
+                                                 giftValue: gift.price * count)
+            let sendConfig = CloudGameSendGiftConfig(roomId: roomInfo.roomId, gameId: gameId, giftList: [sendGift])
+            CloudBarrageAPI.shared.sendGift(giftConfig: sendConfig) { err in
+                guard let err = err else {return}
+                AUIToast.show(text: err.localizedDescription)
+            }
         }
     }
     
     func onClickLikeButton() {
         guard let roomId = roomInfo?.roomId,
-              let gameId = gameInfo?.gameId,
-              let user = currentUserInfo else {
+              let gameId = gameInfo?.gameId else {
             return
         }
-        let like = CloudGameLikeInfo(userId: "\(user.userId)", userAvatar: user.avatar, userName: user.userName)
+        let like = CloudGameLikeInfo(userId: "\(currentUserInfo.userId)", 
+                                     userAvatar: currentUserInfo.avatar,
+                                     userName: currentUserInfo.userName)
         let config = CloudGameSendLikeConfig(roomId: roomId, gameId: gameId, likeList: [like])
         CloudBarrageAPI.shared.sendLike(likeConfig: config) { err in
             guard let err = err else {return}
@@ -461,8 +473,7 @@ extension RoomViewController: ChatInputViewDelegate {
     
     func onClickSendButton(text: String) {
         guard let roomId = roomInfo?.roomId,
-              let gameId = gameInfo?.gameId,
-              let user = currentUserInfo else {
+              let gameId = gameInfo?.gameId else {
             return
         }
         service?.sendChatMessage(roomId: roomId,
@@ -470,9 +481,9 @@ extension RoomViewController: ChatInputViewDelegate {
                                  completion: { err in
         })
         
-        let comment = CloudGameCommentInfo(userId: "\(user.userId)",
-                                           userAvatar: user.avatar,
-                                           userName: user.userName,
+        let comment = CloudGameCommentInfo(userId: "\(currentUserInfo.userId)",
+                                           userAvatar: currentUserInfo.avatar,
+                                           userName: currentUserInfo.userName,
                                            content: text)
         let config = CloudGameSendCommentConfig(roomId:roomId, gameId: gameId, commentList: [comment])
         CloudBarrageAPI.shared.sendComment(commentConfig: config) { err in

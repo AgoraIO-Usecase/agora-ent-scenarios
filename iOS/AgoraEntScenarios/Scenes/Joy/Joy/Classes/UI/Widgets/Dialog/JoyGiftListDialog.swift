@@ -93,7 +93,7 @@ class JoyGiftListCell: UICollectionViewCell {
 }
 
 class JoyGiftListDialog: JoyBaseDialog {
-    var onSelectedGift: ((CloudGameGiftInfo)->())?
+    var onSelectedGift: ((CloudGameGiftInfo, Int)->())?
     var giftList: [CloudGameGiftInfo] = [] {
         didSet {
             listView.reloadData()
@@ -158,7 +158,7 @@ class JoyGiftListDialog: JoyBaseDialog {
     
     override func onClickButton() {
         guard let selectedGift = selectedGift else {return}
-        onSelectedGift?(selectedGift)
+        onSelectedGift?(selectedGift, 1)
     }
 }
 
