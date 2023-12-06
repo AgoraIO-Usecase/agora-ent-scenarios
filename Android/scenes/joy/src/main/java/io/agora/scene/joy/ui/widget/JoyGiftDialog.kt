@@ -12,41 +12,34 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.joy.R
 import io.agora.scene.joy.databinding.JoyDialogGiftLayoutBinding
 import io.agora.scene.joy.databinding.JoyItemGiftLayoutBinding
+import io.agora.scene.joy.network.JoyGiftEntity
 
 class JoyGiftDialog : BaseBottomSheetDialogFragment<JoyDialogGiftLayoutBinding>() {
 
     companion object {
-        const val Key_Content = "key_content"
+        const val Key_Gifts = "key_gifts"
     }
 
-    private val mContent by lazy {
-        arguments?.getString(Key_Content) ?: ""
+    private val mGiftList by lazy {
+        arguments?.getSerializable(Key_Gifts) as List<JoyGiftEntity>
     }
 
-    private val mGiftList: List<JoyGift> by lazy {
-        mutableListOf(
-            JoyGift(R.drawable.joy_icon_gift1, "爱心"),
-            JoyGift(R.drawable.joy_icon_gift2, "鲜花"),
-            JoyGift(R.drawable.joy_icon_gift3, "小兔子"),
-            JoyGift(R.drawable.joy_icon_gift4, "金拱门"),
-            JoyGift(R.drawable.joy_icon_gift5, "钻戒"),
-            JoyGift(R.drawable.joy_icon_gift6, "火箭"),
-        )
+    private val mGiftAdapter: JoyGiftAdapter by lazy {
+        JoyGiftAdapter(mGiftList, 0, onDidSelectIndex = {
+        })
     }
-
-    private var mGiftAdapter: JoyGiftAdapter? = null
 
     private var mGiftCount = 1
+
+    var mSelectedCompletion: ((game: JoyGiftEntity, count: Int) -> Unit)? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mBinding.tvSend.setOnClickListener {
             dismiss()
-            ToastUtils.showToast("send")
+            mSelectedCompletion?.invoke(mGiftAdapter.selectGift, mGiftCount)
         }
-        mGiftAdapter = JoyGiftAdapter(mGiftList, 0, onDidSelectIndex = {
-            ToastUtils.showToast("select $it")
-        })
+
         mBinding.rvGift.adapter = mGiftAdapter
         setupGiftCountView()
         mBinding.ivSubCount.setOnClickListener {
@@ -74,8 +67,8 @@ class JoyGiftDialog : BaseBottomSheetDialogFragment<JoyDialogGiftLayoutBinding>(
 }
 
 private class JoyGiftAdapter constructor(
-    private var list: List<JoyGift>,
-    private var selectedIndex: Int,
+    private var list: List<JoyGiftEntity>,
+    var selectedIndex: Int,
     private var onDidSelectIndex: ((Int) -> Unit)? = null
 ) : RecyclerView.Adapter<JoyGiftAdapter.ViewHolder>() {
     inner class ViewHolder(val binding: JoyItemGiftLayoutBinding) : RecyclerView.ViewHolder(binding.root)
@@ -86,6 +79,9 @@ private class JoyGiftAdapter constructor(
         )
     }
 
+    val selectGift: JoyGiftEntity
+        get() = list[selectedIndex]
+
     override fun getItemCount(): Int {
         return list.size
     }
@@ -93,8 +89,18 @@ private class JoyGiftAdapter constructor(
     // 将数据绑定到视图项
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val data = list[position]
-        holder.binding.ivGift.setImageResource(data.drawableRes)
-        holder.binding.tvGiftName.text = data.giftName
+        val context = AgoraApplication.the()
+        var resourceId: Int
+        try {
+            resourceId = context.resources.getIdentifier(
+                "joy_icon_gift${position + 1}", "drawable", context.packageName
+            )
+        } catch (e: Exception) {
+            resourceId = R.drawable.joy_icon_gift1
+        }
+
+        holder.binding.ivGift.setImageResource(resourceId)
+        holder.binding.tvGiftName.text = data.name
         if (selectedIndex == position) {
             holder.binding.itemLayout.setBackgroundResource(R.drawable.joy_bg_gift_selected)
         } else {
@@ -109,8 +115,3 @@ private class JoyGiftAdapter constructor(
         }
     }
 }
-
-data class JoyGift constructor(
-    val drawableRes: Int,
-    val giftName: String
-)

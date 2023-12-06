@@ -35,7 +35,6 @@ import io.agora.scene.joy.RtcEngineInstance
 import io.agora.scene.joy.base.DataState
 import io.agora.scene.joy.databinding.JoyActivityLiveDetailBinding
 import io.agora.scene.joy.databinding.JoyItemLiveDetailMessageBinding
-import io.agora.scene.joy.network.JoyGameDetailResult
 import io.agora.scene.joy.network.JoyGameListResult
 import io.agora.scene.joy.service.JoyMessage
 import io.agora.scene.joy.service.JoyRoomInfo
@@ -97,7 +96,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     private val mJoyService by lazy { JoyServiceProtocol.getImplInstance() }
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
 
-    private var mGameDetail: JoyGameDetailResult? = null
     private var mTaskId: String? = null
 
     private var mGameChooseGameDialog: JoyChooseGameDialog? = null
@@ -145,14 +143,23 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
         binding.tvRules.isVisible = mRoomInfo.gameId.isNotEmpty()
         binding.tvRules.setOnClickListener {
-            if (mGameDetail == null) {
-                ToastUtils.showToast("正在获取游戏详情")
-            } else {
-                showRulesDialog(mGameDetail!!)
-            }
+            showRulesDialog()
         }
         binding.ivGift.setOnClickListener {
-            JoyGiftDialog().show(supportFragmentManager, "giftDialog")
+            mJoyViewModel.mGameDetail?.gifts?.let { gifts ->
+                val bundle = Bundle().apply {
+                    putSerializable(JoyGiftDialog.Key_Gifts, gifts as Serializable)
+                }
+                val dialog = JoyGiftDialog().apply {
+                    setBundleArgs(bundle)
+                    mSelectedCompletion = { giftEntity, count ->
+                        mJoyViewModel.sendGift(
+                            mJoyViewModel.mGamId, mRoomInfo.roomId, giftEntity.id ?: "", count, giftEntity.price
+                        )
+                    }
+                }
+                dialog.show(supportFragmentManager, "giftDialog")
+            }
         }
         binding.tvInput.setOnClickListener {
             showKeyboardInputLayout()
@@ -164,11 +171,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     Log.d(TAG, "action send：${v.text}")
                     showNormalInputLayout()
                     if (content.isNotEmpty()) {
-                        mGameDetail?.let { gameInfo ->
-                            mJoyViewModel.sendComment(gameInfo.gameId ?: "", mRoomInfo.roomId, v.text.toString())
-                        }
+                        mJoyViewModel.sendComment(mJoyViewModel.mGamId, mRoomInfo.roomId, v.text.toString())
                         mJoyService.sendChatMessage(mRoomInfo.roomId, content, completion = {
-
                         })
                     }
                 }
@@ -177,7 +181,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
         binding.likeView.likeView.setOnClickListener {
             binding.likeView.addFavor()
-
+            mJoyViewModel.sendLike(mJoyViewModel.mGamId, mRoomInfo.roomId, 1)
         }
         binding.root.setOnTouchListener { v, event ->
             showNormalInputLayout()
@@ -195,7 +199,9 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             binding.vKeyboardBg.layoutParams = lp
             null
         }
-        if (mIsRoomOwner) {
+        if (mRoomInfo.gameId.isNotEmpty()) {
+            mJoyViewModel.getGameDetail(mJoyViewModel.mGamId)
+        } else {
             showGameChooseDialog()
         }
     }
@@ -254,9 +260,14 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         mJoyViewModel.mGameDetailLiveData.observe(this) {
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
-                    mGameDetail = it.data
-                    if (mIsRoomOwner && mGameDetail != null) {
-                        showRulesDialog(mGameDetail!!)
+                    binding.tvRules.isVisible = true
+                    if (mIsRoomOwner) {
+                        showRulesDialog()
+                        mRoomInfo.gameId = mJoyViewModel.mGamId
+                        mRoomInfo.badgeTitle = mJoyViewModel.mGameDetail?.name ?: ""
+                        mJoyService.updateRoom(mRoomInfo, completion = {
+
+                        })
                     }
                 }
             }
@@ -275,28 +286,28 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         mJoyViewModel.mStopGameLiveData.observe(this) {
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
-                    // TODO:  
+                    ToastUtils.showToast("停止游戏")
                 }
             }
         }
         mJoyViewModel.mSendGiftLiveData.observe(this) {
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
-                    // TODO:
+                    ToastUtils.showToast("送礼物成功")
                 }
             }
         }
         mJoyViewModel.mSendCommentLiveData.observe(this) {
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
-                    // TODO:
+                    ToastUtils.showToast("发送弹幕成功")
                 }
             }
         }
         mJoyViewModel.mSendLikeLiveData.observe(this) {
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
-                    // TODO:
+                    ToastUtils.showToast("点赞成功")
                 }
             }
         }
@@ -414,15 +425,24 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     private fun showGameChooseDialog() {
         val gameList = intent?.getSerializableExtra(EXTRA_GAME_LIST) as? List<JoyGameListResult>
         if (!gameList.isNullOrEmpty()) {
-            mGameChooseGameDialog = JoyChooseGameDialog(gameList, completion = {
-                mJoyViewModel.startGame(mRoomInfo, it)
-                mJoyViewModel.getGameDetail(it.gameId!!)
-            })
+            if (mGameChooseGameDialog == null) {
+                val bundle = Bundle().apply {
+                    putSerializable(JoyChooseGameDialog.Key_Games, gameList as Serializable)
+                }
+                mGameChooseGameDialog = JoyChooseGameDialog().apply {
+                    setBundleArgs(bundle)
+                    mSelectedCompletion = {
+                        mJoyViewModel.startGame(mRoomInfo, it)
+                        mJoyViewModel.getGameDetail(it.gameId!!)
+                    }
+                }
+            }
             mGameChooseGameDialog?.show(supportFragmentManager, "chooseGameDialog")
         }
     }
 
-    private fun showRulesDialog(gameDetail: JoyGameDetailResult) {
+    private fun showRulesDialog() {
+        val gameDetail = mJoyViewModel.mGameDetailLiveData.value?.data
         val bundle = Bundle().apply {
             putSerializable(JoyGameRulesDialog.Key_Game, gameDetail)
         }
@@ -474,8 +494,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
         mJoyService.leaveRoom(mRoomInfo, {})
         if (mIsRoomOwner) {
-            if (mGameDetail != null && mTaskId != null) {
-                mJoyViewModel.stopGame(mGameDetail?.gameId!!, mTaskId!!)
+            mTaskId?.let { taskId ->
+                mJoyViewModel.stopGame(mJoyViewModel.mGamId, taskId)
             }
             mRtcEngine.stopPreview()
         }

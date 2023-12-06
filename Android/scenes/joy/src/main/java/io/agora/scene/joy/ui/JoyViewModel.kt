@@ -34,6 +34,12 @@ class JoyViewModel : BaseViewModel() {
     val mGameStatusLiveData = StateLiveData<JoyGameResult>()
     val mGameRenewTokenLiveData = StateLiveData<JoyJsonModel.JoyEmpty>()
 
+    val mGameDetail:JoyGameDetailResult?
+        get() = mGameDetailLiveData.value?.data
+
+    val mGamId: String
+        get() = mGameDetail?.gameId ?: ""
+
     fun getGames() {
         viewModelScope.launch {
             mJoyGameRepo.getGames(mGameListLiveData)

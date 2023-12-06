@@ -14,16 +14,16 @@ import io.agora.scene.joy.databinding.JoyDialogChooseGameLayoutBinding
 import io.agora.scene.joy.databinding.JoyItemGameChooseLayoutBinding
 import io.agora.scene.joy.network.JoyGameListResult
 
-
-class JoyChooseGameDialog constructor(var gamList: List<JoyGameListResult>, var completion: (game: JoyGameListResult) -> Unit) :
-    BaseBottomSheetDialogFragment<JoyDialogChooseGameLayoutBinding>() {
+class JoyChooseGameDialog : BaseBottomSheetDialogFragment<JoyDialogChooseGameLayoutBinding>() {
 
     companion object {
-        const val Key_Content = "key_content"
+        const val Key_Games = "key_games"
     }
 
-    private val mContent by lazy {
-        arguments?.getString(Key_Content) ?: ""
+    var mSelectedCompletion: ((game: JoyGameListResult) -> Unit)?=null
+
+    private val mGamList by lazy {
+        arguments?.getSerializable(Key_Games) as List<JoyGameListResult>
     }
 
     private var mChooseGameAdapter: JoyChooseGameAdapter? = null
@@ -42,14 +42,13 @@ class JoyChooseGameDialog constructor(var gamList: List<JoyGameListResult>, var 
         setEnableConfirm(true)
         mBinding.btnConfirm.setOnClickListener {
             setEnableConfirm(false)
-            ToastUtils.showToast("confirm")
             mChooseGameAdapter?.apply {
-                val game = gamList[selectedIndex]
-                completion.invoke(game)
+                val game = mGamList[selectedIndex]
+                mSelectedCompletion?.invoke(game)
             }
 
         }
-        mChooseGameAdapter = JoyChooseGameAdapter(gamList, 0)
+        mChooseGameAdapter = JoyChooseGameAdapter(mGamList, 0)
         mBinding.rvGame.adapter = mChooseGameAdapter
     }
 

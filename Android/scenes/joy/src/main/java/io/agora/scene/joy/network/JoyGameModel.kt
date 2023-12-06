@@ -141,7 +141,7 @@ data class JoyGameListResult constructor(
     @Expose
     @SerializedName("vendor_game_id")
     var vendorGameId: String? = null,
-): JoyJsonModel
+) : JoyJsonModel
 
 data class JoyGameDetailResult constructor(
     @Expose
@@ -152,7 +152,7 @@ data class JoyGameDetailResult constructor(
     var gameId: String? = null,
     @Expose
     @SerializedName("gifts")
-    var gifts: JoyGiftEntity? = null,
+    var gifts: List<JoyGiftEntity>? = null,
     @Expose
     @SerializedName("instruct")
     var instruct: List<Any>? = null,
@@ -168,7 +168,7 @@ data class JoyGameDetailResult constructor(
     @Expose
     @SerializedName("vendor")
     var vendor: String? = null,
-):JoyJsonModel
+) : JoyJsonModel
 
 data class JoyGameResult constructor(
     @Expose
@@ -212,13 +212,13 @@ data class JoyMessageEntity constructor(
     var giftId: String? = null,
     @Expose
     @SerializedName("giftNum")
-    var giftNum: Int = 0,
+    var giftNum: Int? = null,
     @Expose
     @SerializedName("likeNum")
-    var likeNum: Int = 0,
+    var likeNum: Int? = null,
     @Expose
     @SerializedName("giftValue")
-    var giftValue: Int = 0,
+    var giftValue: Int? = null,
     @Expose
     @SerializedName("timestamp")
     var timestamp: Long? = null,
