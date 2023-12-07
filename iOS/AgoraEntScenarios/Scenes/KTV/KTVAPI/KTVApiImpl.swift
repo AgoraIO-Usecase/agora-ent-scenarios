@@ -945,7 +945,7 @@ extension KTVApiImpl {
         apiConfig?.engine?.setParameters("{\"che.audio.aec.enable\":\((enable && isWearingHeadPhones) ? false : true)}")
         apiConfig?.engine?.setParameters("{\"che.audio.agc.enable\":\((enable && isWearingHeadPhones) ? false : true)}")
         apiConfig?.engine?.setParameters("{\"che.audio.ans.enable\":\((enable && isWearingHeadPhones) ? false : true)}")
-        apiConfig?.engine?.setParameters("{\"che.audio.md.enable\": false)}")
+        apiConfig?.engine?.setParameters("{\"che.audio.md.enable\": false}")
     }
     
     func joinChorus(newRole: KTVSingRole) {

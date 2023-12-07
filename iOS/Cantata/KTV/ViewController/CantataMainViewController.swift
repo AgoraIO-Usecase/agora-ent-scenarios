@@ -1547,6 +1547,7 @@ extension CantataMainViewController: DHCLrcControlDelegate {
             }
         }
         lrcControlView.setScore(with: realScore)
+        self.ktvApi.setSingingScore(score: lineScore)
         AppContext.ktvServiceImp()?.updateSeatScoreStatus(with: realScore, completion: { err in
             if err == nil {
             }
