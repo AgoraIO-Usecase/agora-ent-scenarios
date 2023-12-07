@@ -11,7 +11,7 @@ import UIKit
 
 class DHCResultView: UIView {
     
-    let countdownTimer = CountdownTimer()
+    var countdownTimer: CountdownTimer?
     
     private lazy var resultTitleLabel: UILabel = { //本轮评分
         let label = UILabel()
@@ -133,16 +133,15 @@ class DHCResultView: UIView {
             nextLabel.text = "\(musicStr)"
         }
         nextBtn.isHidden = !isRoomOwner
-        
+        nextBtn.setTitle("下一首 10S", for: .normal)
         if isRoomOwner {
             // 开始倒计时
-            var count = 10
-            countdownTimer.start(totalTime: 9, update: { timeRemaining in
+            countdownTimer = CountdownTimer()
+            countdownTimer?.start(totalTime: 10, update: { timeRemaining in
                 // 更新UI，显示剩余时间
-                count -= 1
                 print("Time remaining: \(timeRemaining) seconds")
                 DispatchQueue.main.async {
-                    self.nextBtn.setTitle("下一首 \(count)S", for: .normal)
+                    self.nextBtn.setTitle("下一首 \(Int(timeRemaining))S", for: .normal)
                 }
             }) {
                 // 倒计时结束处理
@@ -157,7 +156,8 @@ class DHCResultView: UIView {
     
     @objc func nextSong() {
         guard let block = nextBlock else {return}
-        countdownTimer.stop()
+        countdownTimer?.stop()
+        countdownTimer = nil
         block()
     }
 }
@@ -194,11 +194,11 @@ class CountdownTimer {
     
     func start(totalTime: TimeInterval, update: ((_ timeRemaining: TimeInterval) -> Void)? = nil, completion: (() -> Void)? = nil) {
         self.totalTime = totalTime
-        self.timeRemaining = totalTime
+        self.timeRemaining = totalTime // 设置timeRemaining为totalTime
         self.update = update
         self.completion = completion
         
-        timer?.invalidate()
+        timer?.invalidate() // 停止旧的计时器（如果存在）
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
         
         RunLoop.current.add(timer!, forMode: .common)
@@ -207,12 +207,12 @@ class CountdownTimer {
     func stop() {
         timer?.invalidate()
         timer = nil
+        // 不需要在这里设置timeRemaining，因为start方法会负责设置它
     }
     
     @objc private func updateTimer() {
         timeRemaining -= 1
         update?(timeRemaining)
-        
         if timeRemaining <= 0 {
             stop()
             completion?()

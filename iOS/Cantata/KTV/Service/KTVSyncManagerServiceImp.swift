@@ -460,7 +460,8 @@ private func mapConvert(model: NSObject) ->[String: Any] {
 
     public func leaveSeat(with inputModel: KTVOutSeatInputModel,
                    completion: @escaping (Error?) -> Void) {
-        let seatInfo = seatMap["\(inputModel.userNo)"]!
+        guard let userNo = inputModel.userNo else {return}
+        let seatInfo = seatMap["\(userNo)"]!
         _removeSeat(seatInfo: seatInfo) { error in
         }
         
@@ -1031,7 +1032,7 @@ extension KTVSyncManagerServiceImp {
             
             list.forEach { seat in
                 guard let uid = seat.rtcUid else {return}
-                self.seatMap["\(seat.rtcUid)"] = seat
+                self.seatMap["\(uid)"] = seat
             }
             
             completion(list)

@@ -67,7 +67,7 @@ class DHCLRCControl: UIView {
     private var joinChorusBtn: UIButton! //加入合唱
     private var leaveChorusBtn: UIButton! //离开合唱
     private var resultView: DHCResultView! //结算界面
-    private var noSongLabel: UILabel!
+    public var noSongLabel: UILabel!
     private var chorusNumBtn: UIButton!
     private var progress: Int = 0
     private var totalLines: Int = 0
@@ -280,7 +280,7 @@ class DHCLRCControl: UIView {
         lrcView.lyricsView.textNormalColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
         lrcView.lyricsView.textHighlightedColor = UIColor(hexString: "#EEFF25")!
         lrcView.lyricsView.lyricLineSpacing = 6
-        lrcView.lyricsView.draggable = true
+        lrcView.lyricsView.draggable = false
         lrcView.delegate = self
         addSubview(lrcView!)
         
@@ -348,6 +348,17 @@ class DHCLRCControl: UIView {
         loadingView.isHidden = true
         
         setupSkipBtn()
+    }
+    
+    public func hideBotView() {
+        pauseBtn.isHidden = true
+        nextBtn.isHidden = true
+        effectBtn.isHidden = true
+        originBtn.isHidden = true
+        leaveChorusBtn.isHidden = true
+        joinChorusBtn.isHidden = true
+        resultView.isHidden = true
+        lrcView.isHidden = true
     }
     
     private func setupSkipBtn() {
@@ -418,7 +429,7 @@ class DHCLRCControl: UIView {
         pauseBtn.isSelected = false
         originBtn.isSelected = false
         lrcView.reset()
-        skipBtn.setSkipType(.prelude)
+        skipBtn.isHidden = true
         musicNameBtn.isHidden = true
         musicNameBtn.setTitle("", for: .normal)
         scoreLabel.text = "0总分"
@@ -585,6 +596,7 @@ extension DHCLRCControl: KTVLrcViewDelegate {
         musicNameBtn.setTitle("\(model.name)", for: .normal)
       //  musicNameBtn.setTitle("\(model.name)-\(model.singer)", for: .normal)
         musicNameBtn.isHidden = false
+        skipBtn.setSkipType(.prelude)
         print("获取地址解析:\(url)")
     }
     

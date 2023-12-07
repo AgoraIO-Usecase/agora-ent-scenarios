@@ -19,7 +19,7 @@ class CantataMainViewController: BaseViewController{
     @objc public var selSongArray: [VLRoomSelSongModel]? {
         didSet {
             if let newSongs = self.selSongArray, let controlView = lrcControlView, let chorusView = chorusMicView {
-                
+ 
                 //需要更新点歌台歌曲列表
                 var usefullSongs = newSongs.filter { (model) -> Bool in
                     return model.songNo != nil
@@ -31,6 +31,13 @@ class CantataMainViewController: BaseViewController{
                     controlView.controlState = .noSong
                     chorusView.isHidden = true
                     return
+                }
+                
+                if let topSong = newSongs.first {
+                    if topSong.musicEnded == true {
+                        //结算时刻点歌不做歌曲更新
+                        return
+                    }
                 }
                 
                 if let oldSongs = oldValue {
@@ -152,14 +159,12 @@ class CantataMainViewController: BaseViewController{
         layoutUI()
         
         isRoomOwner = VLUserCenter.user.ifMaster
-
         if isRoomOwner == true {
             self.timeManager.startTimer(withTarget: self, andSelector: #selector(giveupRoom))
             KTVLog.info(text: "ROOM owner start timer")
         }
         
         addDebugLogic()
-
         if isRoomOwner == true {
             guard let roomNo = roomModel?.roomNo else {return}
             ApiManager.shared.fetchStartCloud(mainChannel: roomNo, cloudRtcUid: 232425)
@@ -189,6 +194,11 @@ class CantataMainViewController: BaseViewController{
     }
     
     @objc private func giveupRoom() {
+        let topSong = self.selSongArray?.first
+        if topSong != nil {
+            return
+        }
+        if self.isRoomOwner == false {return}
         let mes = "因长时间未点歌，您的房间已解散，请重新创建房间"
         DispatchQueue.main.async {
             VLKTVAlert.shared().showKTVToast(withFrame: UIScreen.main.bounds, image: UIImage.sceneImage(name: "empty", bundleName: "DHCResource")!, message: mes, buttonTitle: "ktv_confirm".toSceneLocalization()) {[weak self] flag, text in
@@ -224,6 +234,7 @@ class CantataMainViewController: BaseViewController{
         super.viewDidDisappear(animated)
         if isRoomOwner {
             ApiManager.shared.fetchStopCloud()
+            self.timeManager.stopTimer()
         }
         AgoraRtcEngineKit.destroy()
     }
@@ -374,6 +385,10 @@ extension CantataMainViewController {
         guard let seatsArray = self.seatsArray else {return}
         lrcControlView.setChoursNum(with: seatsArray.count)
         lrcControlView.resetStatus()
+        chorusMicView.isHidden = true
+        lrcControlView.noSongLabel.isHidden = true
+        lrcControlView.hideBotView()
+        
         self.chorusMicView.seatArray = self.makeChorusArray()
 
         let config = KTVSongConfiguration()
@@ -384,11 +399,19 @@ extension CantataMainViewController {
         
         self.loadMusicCallBack = {[weak self] flag, songCode in
             guard let self = self else {return}
+            
+            DispatchQueue.main.async {
+                self.lrcControlView.noSongLabel.isHidden = false
+                self.chorusMicView.isHidden = false
+            }
+
             if flag == false {
-                if VLUserCenter.user.id == model.userNo {
-                    self.lrcControlView.controlState = .ownerSing
-                } else {
-                    self.lrcControlView.controlState = isRoomOwner ? .ownerChorus : .joinChorus
+                DispatchQueue.main.async {
+                    if VLUserCenter.user.id == model.userNo {
+                        self.lrcControlView.controlState = .ownerSing
+                    } else {
+                        self.lrcControlView.controlState = self.isRoomOwner ? .ownerChorus : .joinChorus
+                    }
                 }
                 return
             }
@@ -411,6 +434,15 @@ extension CantataMainViewController {
                 }
             }
             isLeavingChorus = false
+            
+            DispatchQueue.main.async {
+                if VLUserCenter.user.id == model.userNo {
+                    self.lrcControlView.controlState = .ownerSing
+                    //self.checkEnterSeatAudioAuthorized()
+                } else {
+                    self.lrcControlView.controlState = self.isRoomOwner ? .ownerChorus : .joinChorus
+                }
+            }
         }
         
         self.ktvApi?.loadMusic(songCode: Int(model.songNo ?? "") ?? 0, config: config, onMusicLoadStateListener: self)
@@ -420,12 +452,7 @@ extension CantataMainViewController {
             }
         }
         
-        if VLUserCenter.user.id == model.userNo {
-            self.lrcControlView.controlState = .ownerSing
-            //self.checkEnterSeatAudioAuthorized()
-        } else {
-            self.lrcControlView.controlState = isRoomOwner ? .ownerChorus : .joinChorus
-        }
+
     }
     
     public func checkChorus() {
@@ -483,6 +510,7 @@ extension CantataMainViewController {
                 if state == .fail && reason != .noPermission {
                     DispatchQueue.main.async {
                         weakSelf.lrcControlView.controlState = weakSelf.isRoomOwner ? .ownerChorus : .joinChorus
+                        weakSelf.chorusMicView.isHidden = false
                     }
                     
                     VLToast.toast(String(format: "join chorus fail: %ld", reason.rawValue))
@@ -505,7 +533,7 @@ extension CantataMainViewController {
                 //加入频道成功。更新自己的分数
                 let scoreModel = weakSelf.scoreMap[VLUserCenter.user.id ?? ""]
                 weakSelf.lrcControlView.setScore(with: scoreModel?.score ?? 0)
-
+                weakSelf.chorusMicView.isHidden = false
                 // 开麦
 //                AppContext.ktvServiceImp()?.updateSeatAudioMuteStatus(with: false) { error in
 //                    // completion block
@@ -546,7 +574,7 @@ extension CantataMainViewController {
         guard let seatModel = getCurrentUserMicSeat() else {return}
         
         leaveSeat(with: seatModel) { err in
-            
+            self.lrcControlView.controlState = self.isRoomOwner ? .ownerChorus : .joinChorus
         }
     }
     
@@ -707,14 +735,16 @@ extension CantataMainViewController: IMusicLoadStateListener {
             VLToast.toast("网络中断，请切歌重试", duration: 5.0)
         }
         
-        if reason == .noLyricUrl {//歌词加载失败
-            self.lrcControlView.retryBtn.isHidden = false
-        } else if reason == .cancled || reason == .musicPreloadFail {//歌曲加载失败 切歌
+        DispatchQueue.main.async {
+            if reason == .noLyricUrl {//歌词加载失败
+                self.lrcControlView.retryBtn.isHidden = false
+            } else if reason == .cancled || reason == .musicPreloadFail {//歌曲加载失败 切歌
+                
+            }
             
-        }
-        
-        if self.singerRole == .soloSinger || self.singerRole == .leadSinger {
-            self.lrcControlView.updateLoadingView(with: 100)
+            if self.singerRole == .soloSinger || self.singerRole == .leadSinger {
+                self.lrcControlView.updateLoadingView(with: 100)
+            }
         }
     }
     
@@ -795,12 +825,12 @@ extension CantataMainViewController {
 
                 } else if status == .deleted {
                     // 下麦消息
-                    if !self.isRoomOwner && VLUserCenter.user.id == seatModel.userNo && self.isLeavingChorus == false {
+                    if VLUserCenter.user.id == seatModel.userNo && self.isLeavingChorus == false && self.singerRole == .coSinger {
                         DispatchQueue.main.async {
                             VLToast.toast("您已被踢下麦")
                             self.leaveSeat()
                             self.singerRole = .audience
-                            self.lrcControlView.controlState = .joinChorus
+                            self.lrcControlView.controlState = self.isRoomOwner ? .ownerChorus : .joinChorus
                             self.ktvApi.switchSingerRole2(newRole: .audience) { _, _ in
 
                             }
@@ -1446,6 +1476,7 @@ extension CantataMainViewController: AgoraRtcEngineDelegate {
 extension CantataMainViewController: DHCGameDelegate {
     public func didGameEventChanged(with event: DHCGameEvent) {
         if event == .join {//加入合唱
+            self.isLeavingChorus = false
             checkChorus()
         } else if event == .showChorus {//显示演唱者列表
             showChorusListView()
@@ -1470,7 +1501,6 @@ extension CantataMainViewController: DHCGameDelegate {
         } else if event == .leave {//退出合唱
             self.isLeavingChorus = true
             leaveSeat()
-            self.lrcControlView.controlState = isRoomOwner ? .ownerChorus : .joinChorus
             self.ktvApi.switchSingerRole2(newRole: .audience, stateCallBack: { state, reason in
                 self.singerRole = .audience
             })
@@ -1825,7 +1855,6 @@ class TimerManager {
         workItem = DispatchWorkItem { [weak self] in
             self?.timerAction()
         }
-
         DispatchQueue.global().asyncAfter(deadline: .now() + 300, execute: workItem!)
     }
     
