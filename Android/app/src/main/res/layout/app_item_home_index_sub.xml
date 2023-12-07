@@ -50,20 +50,4 @@
             android:textSize="11sp"
             tools:text="@string/app_home_scene_ktv_solo_chorus_tips" />
     </LinearLayout>
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvBigSceneTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="12dp"
-        android:paddingTop="4dp"
-        android:paddingHorizontal="12dp"
-        android:textColor="@color/def_text_grey_6F7"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/ivScenesBg"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:text="@string/app_home_scene_ktv"
-        tools:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>
