@@ -67,7 +67,7 @@ class DHCLRCControl: UIView {
     private var joinChorusBtn: UIButton! //加入合唱
     private var leaveChorusBtn: UIButton! //离开合唱
     private var resultView: DHCResultView! //结算界面
-    private var noSongLabel: UILabel!
+    public var noSongLabel: UILabel!
     private var chorusNumBtn: UIButton!
     private var progress: Int = 0
     private var totalLines: Int = 0
@@ -350,6 +350,17 @@ class DHCLRCControl: UIView {
         setupSkipBtn()
     }
     
+    public func hideBotView() {
+        pauseBtn.isHidden = true
+        nextBtn.isHidden = true
+        effectBtn.isHidden = true
+        originBtn.isHidden = true
+        leaveChorusBtn.isHidden = true
+        joinChorusBtn.isHidden = true
+        resultView.isHidden = true
+        lrcView.isHidden = true
+    }
+    
     private func setupSkipBtn() {
         let frame = CGRect(x: centerX - 61, y: self.bounds.maxY - 50 , width: 122, height: 38)
         skipBtn = KTVSkipView(frame: frame) { [weak self] type in
@@ -418,7 +429,7 @@ class DHCLRCControl: UIView {
         pauseBtn.isSelected = false
         originBtn.isSelected = false
         lrcView.reset()
-        skipBtn.setSkipType(.prelude)
+        skipBtn.isHidden = true
         musicNameBtn.isHidden = true
         musicNameBtn.setTitle("", for: .normal)
         scoreLabel.text = "0总分"
@@ -585,6 +596,7 @@ extension DHCLRCControl: KTVLrcViewDelegate {
         musicNameBtn.setTitle("\(model.name)", for: .normal)
       //  musicNameBtn.setTitle("\(model.name)-\(model.singer)", for: .normal)
         musicNameBtn.isHidden = false
+        skipBtn.setSkipType(.prelude)
         print("获取地址解析:\(url)")
     }
     
