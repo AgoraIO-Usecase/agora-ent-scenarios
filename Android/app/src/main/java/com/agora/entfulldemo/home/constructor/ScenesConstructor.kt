@@ -154,15 +154,12 @@ object ScenesConstructor {
 
             else -> {
                 val ktvScenes = buildScene(context, HomeScenesType.KTV)
-                ktvScenes[0].title = context.getString(R.string.app_home_scene_ktv)
                 subScenes.addAll(ktvScenes)
 
                 val voiceScenes = buildScene(context, HomeScenesType.Voice)
-                voiceScenes[0].title = context.getString(R.string.app_home_scene_voice)
                 subScenes.addAll(voiceScenes)
 
                 val liveScenes = buildScene(context, HomeScenesType.Live)
-                liveScenes[0].title = context.getString(R.string.app_home_scene_live)
                 subScenes.addAll(liveScenes)
             }
         }

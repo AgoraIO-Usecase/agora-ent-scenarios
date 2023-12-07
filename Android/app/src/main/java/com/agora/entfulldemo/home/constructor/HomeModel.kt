@@ -26,7 +26,6 @@ enum class HomeSubScenes {
  * 场景 model
  */
 data class HomeSceneModel constructor(
-    var title: String = "", // 标题 "" 隐藏
     val scene: HomeSubScenes,
     val clazzName: String,
     val name: String,
