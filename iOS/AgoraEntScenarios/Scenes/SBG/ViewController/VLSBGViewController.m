@@ -373,7 +373,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
     
     [[AppContext sbgServiceImp] subscribeRoomWillExpire:^{
         bool isOwner = [weakSelf.roomModel.creatorNo isEqualToString:VLUserCenter.user.id];
-        NSString *mes = isOwner ? @"sbg_room_timeout" : @"sbg_room_offline";
+        NSString *mes = isOwner ? SBGLocalizedString(@"sbg_room_timeout") : SBGLocalizedString(@"sbg_room_offline");
         [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SBGLocalizedString(@"sbg_confirm") completion:^(bool flag, NSString * _Nullable text) {
             [[VLKTVAlert shared]dismiss];
             [weakSelf leaveRoom];
