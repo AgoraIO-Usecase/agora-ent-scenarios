@@ -147,7 +147,6 @@ class SAVMManagerView: UIView {
         addSubview(nameLabel)
 
         roleBtn.frame = CGRect(x: ScreenWidth / 2.0 - 50, y: 135, width: 100, height: 20)
-        roleBtn.setImage(UIImage.sceneImage(name:"Landlord"), for: .normal)
         roleBtn.setTitle("spatial_voice_host".spatial_localized(), for: .normal)
         roleBtn.setTitleColor(.black, for: .normal)
         roleBtn.font(UIFont.systemFont(ofSize: 11))

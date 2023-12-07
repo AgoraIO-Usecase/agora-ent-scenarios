@@ -52,9 +52,6 @@ class SAMicVolView: UIView {
     }
 
     public func setState(_ state: AgoraMicVolViewState) {
-        guard micState != state else {
-            return
-        }
         micState = state
         switch state {
         case .on:
@@ -73,7 +70,7 @@ class SAMicVolView: UIView {
 private extension SAMicVolView {
     func layoutUI() {
         imageView = UIImageView()
-        imageView.image = UIImage.sceneImage(name:  "micon", bundleName: "VoiceChatRoomResource")
+        imageView.image = UIImage.sceneImage(name: "micon", bundleName: "VoiceChatRoomResource")
         addSubview(imageView)
 
         animateView = UIView()
