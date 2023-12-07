@@ -31,6 +31,7 @@
 #import "VLAlert.h"
 #import "VLKTVAlert.h"
 #import "SRDebugManager.h"
+#import "SRDebugInfo.h"
 @import AgoraRtcKit;
 @import AgoraLyricsScore;
 @import YYCategories;
@@ -58,7 +59,8 @@ VLSRPopScoreViewDelegate,
 KTVApiEventHandlerDelegate,
 VLSRStatusViewDelegate,
 VLSRLrcViewDelegate,
-IMusicLoadStateListener
+IMusicLoadStateListener,
+VLSRDebugViewDelegate
 >
 
 typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
@@ -114,6 +116,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) NSInteger cosingerLoadCount; //合唱歌曲加载成功的个数
 @property (nonatomic, assign) BOOL MainSingerPlayFlag; //主唱歌曲加载成功
 @property (nonatomic, assign) BOOL hasCountDown; //已经倒计时过
+@property (nonatomic, assign) BOOL isDumpMode;
 @end
 
 @implementation VLSRViewController
@@ -160,7 +163,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     self.roomPersonView = personView;
     self.roomPersonView.roomSeatsArray = self.seatsArray;
     [self.view addSubview:personView];
-
+    
     //空位上麦视图
     VLSRAudienceIndicator *requestOnLineView = [[VLSRAudienceIndicator alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT-kSafeAreaBottomHeight-56-VLREALVALUE_WIDTH(30), SCREEN_WIDTH, 56) withDelegate:self];
     self.requestOnLineView = requestOnLineView;
@@ -168,6 +171,18 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     
     //start join
     [self joinRTCChannel];
+    
+    if(AppContext.shared.isDebugMode){
+        //如果开启了debug模式
+        UIButton *debugBtn = [[UIButton alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 200, 80, 80)];
+        [debugBtn setBackgroundColor:[UIColor blueColor]];
+        debugBtn.layer.cornerRadius = 40;
+        debugBtn.layer.masksToBounds = true;
+        [debugBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [debugBtn setTitle:@"Debug" forState:UIControlStateNormal];
+        [debugBtn addTarget:self action:@selector(showDebug) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:debugBtn];
+    }
     
     self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
     
@@ -216,6 +231,10 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 // 是否允许手动滑回 @return true 是、 false否
 - (BOOL)forceEnableInteractivePopGestuzreRecognizer {
     return NO;
+}
+
+-(void)showDebug {
+    [LSTPopView popSRDebugViewWithParentView:self.view channelName:self.roomModel.roomNo sdkVer:[AgoraRtcEngineKit getSdkVersion]  isDebugMode:self.isDumpMode withDelegate:self];
 }
 
 #pragma mark service handler
@@ -442,6 +461,47 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 - (void)popBadNetWrokTipView {
     [LSTPopView popSRBadNetWrokTipViewWithParentView:self.view
                                       withDelegate:self];
+}
+
+#pragma mark - VLDebugViewDelegate
+- (void)didExportLogWith:(NSString *)path {
+    UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:@[[NSURL fileURLWithPath:path isDirectory:YES]] applicationActivities:nil];
+    activityController.modalPresentationStyle = UIModalPresentationFullScreen;
+    [self presentViewController:activityController animated:YES completion:nil];
+}
+
+- (void)didDumpModeChanged:(BOOL)enable {
+    self.isDumpMode = enable;
+    NSString* key = @"dump enable";
+    BOOL status = ![SRDebugInfo getSelectedStatusForKey:key];
+    [SRDebugInfo setSelectedStatus:status forKey:key];
+    [SRDebugManager reLoadParamAll];
+}
+
+-(void)didParamsSetWith:(NSString *)key value:(NSString *)value{
+    if([value.lowercaseString isEqualToString:@"true"] || [value.lowercaseString isEqualToString:@"false"] || [value.lowercaseString isEqualToString:@"yes"] || [value.lowercaseString isEqualToString:@"no"]){
+        BOOL flag = [value.lowercaseString isEqualToString:@"true"] || [value.lowercaseString isEqualToString:@"yes"];
+        NSString *params = @"";
+        if(flag){
+            params = [NSString stringWithFormat:@"{\"%@\":true", key];
+        } else {
+            params = [NSString stringWithFormat:@"{\"%@\":false", key];
+        }
+        [self.RTCkit setParameters:params];
+    }else if([self isPureNumberString:value]){
+        NSInteger num = [value integerValue];
+        NSString *params = [NSString stringWithFormat:@"{\"%@\":%li", key, (long)num];
+        [self.RTCkit setParameters:params];
+    } else {
+        NSString *params = [NSString stringWithFormat:@"{\"%@\":\"%@\"", key, value];
+        [self.RTCkit setParameters:params];
+    }
+}
+
+- (BOOL)isPureNumberString:(NSString *)string {
+    NSCharacterSet *numberSet = [NSCharacterSet characterSetWithCharactersInString:@"0123456789"];
+    NSRange range = [string rangeOfCharacterFromSet:numberSet.invertedSet];
+    return (range.location == NSNotFound);
 }
 
 //用户弹框离开房间

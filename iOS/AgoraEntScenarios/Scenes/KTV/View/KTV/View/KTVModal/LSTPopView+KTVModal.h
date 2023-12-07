@@ -109,8 +109,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 //弹出DebugView
 + (LSTPopView*)popDebugViewWithParentView:(UIView*)parentView
+                                    channelName:(NSString *)name
+                                   sdkVer:(NSString *)ver
                                    isDebugMode:(BOOL)isDebugMode
-                                  withDelegate:(id<VLDebugViewDelegate>)delegate;
+                             withDelegate:(id<VLDebugViewDelegate>)delegate;
 
 @end
 

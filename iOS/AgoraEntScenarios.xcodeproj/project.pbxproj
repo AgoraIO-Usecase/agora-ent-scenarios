@@ -693,6 +693,8 @@
 		E3C7726A2AE7B0E6008D17B7 /* VRCreateRoomPresentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C772692AE7B0E6008D17B7 /* VRCreateRoomPresentView.swift */; };
 		E3C7EF2C2AE66BC70023B069 /* VRRoomHomeListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C7EF2B2AE66BC70023B069 /* VRRoomHomeListCell.swift */; };
 		E3C7EF2E2AE66F1F0023B069 /* VRRoomHomeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C7EF2D2AE66F1F0023B069 /* VRRoomHomeListView.swift */; };
+		E3FE65382B21C76D001D6BF9 /* VLSRDebugView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3FE65362B21C76D001D6BF9 /* VLSRDebugView.m */; };
+		E3FE653B2B21CE33001D6BF9 /* VLSBGDebugView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3FE65392B21CE33001D6BF9 /* VLSBGDebugView.m */; };
 		E7054B3D2AEB97FB00AFD93C /* home_launch_logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E7054B3B2AEB97FA00AFD93C /* home_launch_logo@2x.png */; };
 		E7054B3E2AEB97FB00AFD93C /* home_launch_logo@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = E7054B3C2AEB97FB00AFD93C /* home_launch_logo@3x.png */; };
 		E7054B422AEB987300AFD93C /* home_launch_text@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E7054B402AEB987300AFD93C /* home_launch_text@2x.png */; };
@@ -1679,6 +1681,10 @@
 		E3C772692AE7B0E6008D17B7 /* VRCreateRoomPresentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRCreateRoomPresentView.swift; sourceTree = "<group>"; };
 		E3C7EF2B2AE66BC70023B069 /* VRRoomHomeListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VRRoomHomeListCell.swift; sourceTree = "<group>"; };
 		E3C7EF2D2AE66F1F0023B069 /* VRRoomHomeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VRRoomHomeListView.swift; sourceTree = "<group>"; };
+		E3FE65362B21C76D001D6BF9 /* VLSRDebugView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSRDebugView.m; sourceTree = "<group>"; };
+		E3FE65372B21C76D001D6BF9 /* VLSRDebugView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSRDebugView.h; sourceTree = "<group>"; };
+		E3FE65392B21CE33001D6BF9 /* VLSBGDebugView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGDebugView.m; sourceTree = "<group>"; };
+		E3FE653A2B21CE33001D6BF9 /* VLSBGDebugView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGDebugView.h; sourceTree = "<group>"; };
 		E7054B3B2AEB97FA00AFD93C /* home_launch_logo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "home_launch_logo@2x.png"; sourceTree = "<group>"; };
 		E7054B3C2AEB97FB00AFD93C /* home_launch_logo@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "home_launch_logo@3x.png"; sourceTree = "<group>"; };
 		E7054B402AEB987300AFD93C /* home_launch_text@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "home_launch_text@2x.png"; sourceTree = "<group>"; };
@@ -3734,6 +3740,8 @@
 				E301BDE62AF4E06F0089A79C /* VLSRListEmptyView.m */,
 				E301BDE72AF4E06F0089A79C /* SRGameRuleView.swift */,
 				E301BDE82AF4E06F0089A79C /* VLSRTopView.m */,
+				E3FE65372B21C76D001D6BF9 /* VLSRDebugView.h */,
+				E3FE65362B21C76D001D6BF9 /* VLSRDebugView.m */,
 				E301BDE92AF4E06F0089A79C /* SRModal */,
 				E301BDF62AF4E06F0089A79C /* SRScoreCell.swift */,
 				E301BDF72AF4E06F0089A79C /* VLSRSoundEffectView.h */,
@@ -3993,6 +4001,8 @@
 				E301BFE12AF8E8E90089A79C /* VLSBGVoicePerShowView.h */,
 				E301BFE32AF8E8E90089A79C /* SBGLrcNameView.swift */,
 				E301BFE42AF8E8E90089A79C /* VLSBGAudienceIndicator.m */,
+				E3FE653A2B21CE33001D6BF9 /* VLSBGDebugView.h */,
+				E3FE65392B21CE33001D6BF9 /* VLSBGDebugView.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -4759,6 +4769,7 @@
 				E301C02A2AF8E8E90089A79C /* VLSBGSelectedSongList.m in Sources */,
 				E301BE5E2AF4E06F0089A79C /* SRLrcNameView.swift in Sources */,
 				DD619A8C29E3E247008F63E4 /* SARoomEntity.swift in Sources */,
+				E3FE65382B21C76D001D6BF9 /* VLSRDebugView.m in Sources */,
 				DD619ADF29E3E247008F63E4 /* SARoomListView.swift in Sources */,
 				DD619A6429E3E247008F63E4 /* SARequest.swift in Sources */,
 				E301C00C2AF8E8E90089A79C /* VLSBGRoomListModel.m in Sources */,
@@ -5054,6 +5065,7 @@
 				E3C7EF2C2AE66BC70023B069 /* VRRoomHomeListCell.swift in Sources */,
 				E301C03C2AF8E8E90089A79C /* SBGServiceModel.m in Sources */,
 				E71685212AE22D8300C2915C /* VLDiscoverCell.swift in Sources */,
+				E3FE653B2B21CE33001D6BF9 /* VLSBGDebugView.m in Sources */,
 				DD619AE329E3E247008F63E4 /* SAEmptyView.swift in Sources */,
 				E301BE742AF4E06F0089A79C /* VLSRSettingView.m in Sources */,
 				DD9EBFC92AD5512300B4551F /* VREQOperationAlert.swift in Sources */,

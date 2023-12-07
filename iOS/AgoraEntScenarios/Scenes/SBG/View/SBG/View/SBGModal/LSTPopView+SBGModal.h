@@ -15,7 +15,7 @@
 #import "VLSBGPopSongList.h"
 #import "VLSBGSettingView.h"
 #import "VLSBGVoicePerShowView.h"
-
+#import "VLSBGDebugView.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LSTPopView (SBGModal)
@@ -64,6 +64,14 @@ NS_ASSUME_NONNULL_BEGIN
 + (LSTPopView*)popSBGVoicePerViewWithParentView:(UIView*)parentView
                                          perView:(VLSBGVoicePerShowView*)perView
                                 withDelegate:(id<VLSBGVoicePerShowViewDelegate>)delegate;
+
+//弹出DebugView
++ (LSTPopView*)popSBGDebugViewWithParentView:(UIView*)parentView
+                                    channelName:(NSString *)name
+                                   sdkVer:(NSString *)ver
+                                   isDebugMode:(BOOL)isDebugMode
+                                withDelegate:(id<VLSBGDebugViewDelegate>)delegate;
+
 @end
 
 NS_ASSUME_NONNULL_END
