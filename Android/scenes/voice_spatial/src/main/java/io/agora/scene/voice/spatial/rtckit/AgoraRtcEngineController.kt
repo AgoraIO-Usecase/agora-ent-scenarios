@@ -517,6 +517,7 @@ class AgoraRtcEngineController {
     }
 
     fun destroy() {
+        spatial = null
         VoiceBuddyFactory.get().rtcChannelTemp.reset()
         if (mediaPlayer != null) {
             mediaPlayer?.unRegisterPlayerObserver(firstMediaPlayerObserver)

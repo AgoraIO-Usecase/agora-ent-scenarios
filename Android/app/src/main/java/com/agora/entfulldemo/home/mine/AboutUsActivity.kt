@@ -70,6 +70,11 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         setupClickPhoneAction()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacksAndMessages(null)
+    }
+
     // 设置K歌房App的信息
     private fun setupKtvRoomAppInfo() {
         adapter.scenes = mutableListOf<SceneInfo>()
@@ -242,19 +247,21 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         }
     }
 
+    private val handler = Handler()
     private fun setupDebugMode() {
         binding.tvDebugMode.visibility = View.INVISIBLE
-        adapter.onClickVersionListener = {
-            if (counts == 0 || System.currentTimeMillis() - beginTime > debugModeOpenTime) {
-                beginTime = System.currentTimeMillis()
-                counts = 0
-            }
-            counts++
-            if (counts > 5) {
-                counts = 0
-                binding.tvDebugMode.visibility = View.VISIBLE
-                AgoraApplication.the().enableDebugMode(true)
-                ToastUtils.showToast(R.string.app_debug_open)
+        adapter.onTouchVersionListener = { event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    handler.postDelayed({
+                        binding.tvDebugMode.visibility = View.VISIBLE
+                        AgoraApplication.the().enableDebugMode(true)
+                        ToastUtils.showToast(R.string.app_debug_open)
+                    }, 5000)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    handler.removeCallbacksAndMessages(null)
+                }
             }
         }
         binding.tvDebugMode.setOnClickListener {
@@ -311,7 +318,7 @@ private class AboutUsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>()
 
     var onClickWebSiteListener: (() -> Unit)? = null
 
-    var onClickVersionListener: (() -> Unit)? = null
+    var onTouchVersionListener: ((MotionEvent) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == VIEW_TYPE_APP_INFO) {
@@ -333,8 +340,9 @@ private class AboutUsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>()
                 current.binding.tvHomeWebSite.text = it.webSite
             }
             current.binding.tvSceneSubTitle.visibility = if (scenes.size > 1) View.VISIBLE else View.INVISIBLE
-            current.binding.tvVersion.setOnClickListener {
-                onClickVersionListener?.invoke()
+            current.binding.tvVersion.setOnTouchListener { _, event ->
+                onTouchVersionListener?.invoke(event)
+                false
             }
             current.binding.vServicePhone.setOnClickListener {
                 onClickPhoneListener?.invoke()

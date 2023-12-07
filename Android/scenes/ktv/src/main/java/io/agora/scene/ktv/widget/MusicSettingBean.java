@@ -13,7 +13,7 @@ public class MusicSettingBean {
     private int remoteVolume = 30;
     private boolean professionalMode = false; // 专业模式
     private int aecLevel = 0; // 0(16K),1(24K),2(48K)
-    private boolean lowLatencyMode = false;  // 低延时模式
+    private boolean lowLatencyMode = true;  // 低延时模式
 
     // 耳返设置
     private boolean isEar; // 耳返开关
