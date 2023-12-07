@@ -195,27 +195,34 @@ public let kMPK_RTC_UID_SA: UInt = 1
         return instance
     }
 
-    private var baseMusicCount: Int = 0 {
+    private var voiceIndex: Int = 0 {
         didSet {
-            let count = SAConfig.spatialAlienMic.count
-            let musicIndex: Int = baseMusicCount < count ? baseMusicCount : count - 1
-            let musicPath = "\(SAConfig.CreateSpatialRoom)\(SAConfig.spatialAlienMic[musicIndex])"
-            if baseMusicCount >= count {
+            if (voiceIndex > SAConfig.spatialAlienMic.count - 1) {
+                voiceIndex = 0
                 redMediaPlayer?.stop()
                 blueMediaPlayer?.stop()
                 delegate?.reportAlien?(with: .ended)
-            } else {
-                if musicPath.contains("-B-") {
-                    blueMediaPlayer?.open(musicPath, startPos: 0)
-                    delegate?.reportAlien?(with: .blue)
-                } else if musicPath.contains("-R-") {
-                    redMediaPlayer?.open(musicPath, startPos: 0)
-                    delegate?.reportAlien?(with: .red)
-                } else if musicPath.contains("-B&R-") {
-                    blueMediaPlayer?.open(musicPath, startPos: 0)
-                    redMediaPlayer?.open(musicPath, startPos: 0)
-                    delegate?.reportAlien?(with: .blueAndRed)
+                return
+            }
+            voicePath = "\(SAConfig.CreateSpatialRoom)\(SAConfig.spatialAlienMic[voiceIndex])"
+        }
+    }
+    
+    private var voicePath: String? = nil {
+        didSet {
+            if let path = voicePath {
+                if path.contains("-B-") {
+                    blueMediaPlayer?.open(path, startPos: 0)
+                } else if path.contains("-R-") {
+                    redMediaPlayer?.open(path, startPos: 0)
+                } else if path.contains("-B&R-") {
+                    blueMediaPlayer?.open(path, startPos: 0)
+                    redMediaPlayer?.open(path, startPos: 0)
                 }
+            } else {
+                redMediaPlayer?.stop()
+                blueMediaPlayer?.stop()
+                delegate?.reportAlien?(with: .ended)
             }
         }
     }
@@ -358,7 +365,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
      */
     public func playMusic(with type: SARtcType.VMMUSIC_TYPE, isPlay: Bool) {
         if isPlay {
-            baseMusicCount = 0
+            voiceIndex = 0
         } else {
             redMediaPlayer?.stop()
             blueMediaPlayer?.stop()
@@ -367,7 +374,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
 
     public func stopPlayMusic() {
         delegate?.reportAlien?(with: .none)
-        baseMusicCount = SAConfig.spatialAlienMic.count
+        voiceIndex = SAConfig.spatialAlienMic.count
     }
 
     public func stopPlaySound() {
@@ -717,10 +724,10 @@ extension SARTCManager: AgoraRtcEngineDelegate {
 extension SARTCManager: AgoraRtcMediaPlayerDelegate {
     public func rtcEngine(_ engine: AgoraRtcEngineKit, audioMixingStateChanged state: AgoraAudioMixingStateType, reasonCode: AgoraAudioMixingReasonCode) {
         if state == .stopped {
-            let count = SAConfig.spatialAlienMic.count
-            if baseMusicCount < count {
-                baseMusicCount += 1
-            }
+            redMediaPlayer?.stop()
+            blueMediaPlayer?.stop()
+            // load next
+            voiceIndex += 1
         }
     }
 
@@ -738,11 +745,21 @@ extension SARTCManager: AgoraRtcMediaPlayerDelegate {
         if state == .playing {
         } else if state == .openCompleted {
             playerKit.play()
+            if let path = voicePath {
+                if path.contains("-B-") {
+                    delegate?.reportAlien?(with: .blue)
+                } else if path.contains("-R-") {
+                    delegate?.reportAlien?(with: .red)
+                } else if path.contains("-B&R-") {
+                    delegate?.reportAlien?(with: .blueAndRed)
+                }
+            }
         } else if (state == .playBackAllLoopsCompleted || state == .playBackCompleted)  {
             playerKit.stop()
-            let count = SAConfig.spatialAlienMic.count
-            if baseMusicCount < count {
-                baseMusicCount += 1
+            if redMediaPlayer?.getPlayerState() != .playing,
+               blueMediaPlayer?.getPlayerState() != .playing {
+                // load next
+                voiceIndex += 1
             }
         }
         DispatchQueue.main.async {

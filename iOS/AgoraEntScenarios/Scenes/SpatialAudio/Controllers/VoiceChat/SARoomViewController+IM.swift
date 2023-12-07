@@ -305,7 +305,6 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                         AppContext.saTmpServiceImp().userList.first(where: { $0.chat_uid ?? "" == fromId })?.mic_index = -1
                         view.makeToast("spatial_voice_removed_stage".spatial_localized())
                     }  else {
-                        rtckit.muteLocalAudioStream(mute: seatUser == nil)
                         self.refreshApplicants(chat_uid: fromId)
                     }
                 } else {

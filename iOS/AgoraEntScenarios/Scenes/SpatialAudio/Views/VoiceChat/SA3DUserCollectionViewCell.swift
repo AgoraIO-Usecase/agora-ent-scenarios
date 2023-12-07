@@ -26,10 +26,6 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
 
     public func refreshUser(with mic: SARoomMic) {
         var status = mic.status
-        let user_mic_status = mic.member?.mic_status ?? .none
-        if user_mic_status == .mute {
-            status = 1
-        }
         // 0:正常状态 1:闭麦 2:禁言 3:锁麦 4:锁麦和禁言 5:机器人生效 -1:空闲 -2: 机器人失效
         switch status {
         case -1:
@@ -40,9 +36,13 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
         case 0:
             rtcUserView.iconView.isHidden = false
             rtcUserView.micView.isHidden = false
-            rtcUserView.micView.setState(.on)
             rtcUserView.bgIconView.isHidden = true
             rtcUserView.nameBtn.setImage(nil, for: .normal)
+            if mic.member?.mic_status == .mute {
+                rtcUserView.micView.setState(.off)
+            } else {
+                rtcUserView.micView.setState(.on)
+            }
         case 1:
             rtcUserView.bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
             rtcUserView.micView.isHidden = false
