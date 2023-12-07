@@ -2,15 +2,19 @@ package com.agora.entfulldemo.home
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.Nullable
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.viewbinding.ViewBinding
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppFragmentHomeIndexSubBinding
+import com.agora.entfulldemo.databinding.AppItemHomeHeadSubBinding
 import com.agora.entfulldemo.databinding.AppItemHomeIndexSubBinding
 import com.agora.entfulldemo.home.constructor.HomeSceneModel
 import com.agora.entfulldemo.home.constructor.HomeScenesType
@@ -54,34 +58,75 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
         }
 
         val cxt = context ?: return
+        if (mHomeScenesType == HomeScenesType.Full) {
+            setupFullSceneAdapter()
+            return
+        }
         val scenesModels = ScenesConstructor.buildScene(cxt, mHomeScenesType)
         val homeIndexAdapter = BaseRecyclerViewAdapter(scenesModels, object : OnItemClickListener<HomeSceneModel?> {
             override fun onItemClick(scenesModel: HomeSceneModel, view: View, position: Int, viewType: Long) {
-                if (UiUtils.isFastClick(1000)) return
-                if (scenesModel.active) {
-                    reportEnter(scenesModel)
-                    UserManager.getInstance().user?.let { user ->
-                        mainViewModel.requestReportDevice(user.userNo, "")
-                        mainViewModel.requestReportAction(user.userNo, scenesModel.scene.name)
-                    }
-                    goScene(scenesModel)
-                }
+                onItemClickScene(scenesModel)
             }
         }, HomeIndexSubHolder::class.java)
         binding.rvScenes.adapter = homeIndexAdapter
+    }
 
-        binding.rvScenes.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                Log.d("zhangw", "$mHomeScenesType onScrollStateChanged $newState")
+    private fun onItemClickScene(scenesModel: HomeSceneModel) {
+        if (UiUtils.isFastClick(1000)) return
+        if (scenesModel.active) {
+            reportEnter(scenesModel)
+            UserManager.getInstance().user?.let { user ->
+                mainViewModel.requestReportDevice(user.userNo, "")
+                mainViewModel.requestReportAction(user.userNo, scenesModel.scene.name)
             }
+            goScene(scenesModel)
+        }
+    }
 
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                Log.d("zhangw", "onScrolled $mHomeScenesType onScrolled $dx $dy")
+    // 全场景 adapter
+    private fun setupFullSceneAdapter() {
+        val cxt = context ?: return
+
+        val ktvHeadAdapter = HomeHeadAdapter(
+            mutableListOf(cxt.getString(R.string.app_home_scene_ktv)), HomeHeadSubHolder::class.java
+        )
+        val ktvScenesModels = ScenesConstructor.buildScene(cxt, HomeScenesType.KTV)
+        val ktvAdapter = BaseRecyclerViewAdapter(ktvScenesModels, object : OnItemClickListener<HomeSceneModel?> {
+            override fun onItemClick(scenesModel: HomeSceneModel, view: View, position: Int, viewType: Long) {
+                onItemClickScene(scenesModel)
             }
-        })
+        }, HomeIndexSubHolder::class.java)
+
+        val voiceHeadAdapter = HomeHeadAdapter(
+            mutableListOf(cxt.getString(R.string.app_home_scene_voice)), HomeHeadSubHolder::class.java
+        )
+        val voiceScenesModels = ScenesConstructor.buildScene(cxt, HomeScenesType.Voice)
+        val voiceAdapter = BaseRecyclerViewAdapter(voiceScenesModels, object : OnItemClickListener<HomeSceneModel?> {
+            override fun onItemClick(scenesModel: HomeSceneModel, view: View, position: Int, viewType: Long) {
+                onItemClickScene(scenesModel)
+            }
+        }, HomeIndexSubHolder::class.java)
+
+        val liveHeadAdapter = HomeHeadAdapter(
+            mutableListOf(cxt.getString(R.string.app_home_scene_live)), HomeHeadSubHolder::class.java
+        )
+        val liveScenesModels = ScenesConstructor.buildScene(cxt, HomeScenesType.Live)
+        val liveAdapter = BaseRecyclerViewAdapter(liveScenesModels, object : OnItemClickListener<HomeSceneModel?> {
+            override fun onItemClick(scenesModel: HomeSceneModel, view: View, position: Int, viewType: Long) {
+                onItemClickScene(scenesModel)
+            }
+        }, HomeIndexSubHolder::class.java)
+
+
+        val config = ConcatAdapter.Config.Builder().setIsolateViewTypes(true).build()
+
+        val concatAdapter = ConcatAdapter(
+            config,
+            ktvHeadAdapter, ktvAdapter,
+            voiceHeadAdapter, voiceAdapter,
+            liveHeadAdapter, liveAdapter
+        )
+        binding.rvScenes.adapter = concatAdapter
     }
 
     private fun reportEnter(scenesModel: HomeSceneModel) {
@@ -104,15 +149,27 @@ class HomeIndexSubHolder constructor(mBinding: AppItemHomeIndexSubBinding) :
 
     override fun binding(scensModel: HomeSceneModel?, selectedIndex: Int) {
         scensModel ?: return
-        if (scensModel.title.isEmpty()) {
-            mBinding.tvBigSceneTitle.isVisible = false
-        } else {
-            mBinding.tvBigSceneTitle.isVisible = true
-            mBinding.tvBigSceneTitle.text = scensModel.title
-        }
         mBinding.tvScenesName.text = scensModel.name
         mBinding.tvScenesTips.text = if (scensModel.active) scensModel.tip else
             mBinding.root.context.getString(R.string.app_coming_soon)
         mBinding.ivScenesBg.setImageResource(scensModel.background)
+    }
+}
+
+class HomeHeadAdapter<B : ViewBinding, T, H : BaseRecyclerViewAdapter.BaseViewHolder<B, T>>(
+    dataList: List<T>,
+    viewHolderClass: Class<H>
+) : BaseRecyclerViewAdapter<B,T,H>(dataList, viewHolderClass) {
+    override fun onViewAttachedToWindow(holder: H) {
+        super.onViewAttachedToWindow(holder)
+        (holder.itemView.layoutParams as StaggeredGridLayoutManager.LayoutParams).isFullSpan = true
+    }
+}
+
+class HomeHeadSubHolder constructor(mBinding: AppItemHomeHeadSubBinding) :
+    BaseRecyclerViewAdapter.BaseViewHolder<AppItemHomeHeadSubBinding, String>(mBinding) {
+    override fun binding(data: String?, selectedIndex: Int) {
+        data ?: return
+        mBinding.tvBigSceneTitle.text = data
     }
 }
