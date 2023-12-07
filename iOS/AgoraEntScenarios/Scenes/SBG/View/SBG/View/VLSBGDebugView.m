@@ -5,12 +5,11 @@
 //  Created by CP on 2023/3/3.
 //
 
-#import "VLDebugView.h"
-#import "AESMacro.h"
+#import "VLSBGDebugView.h"
+#import "SBGMacro.h"
 #import "VLMacroDefine.h"
-#import "KTVDebugInfo.h"
-@interface VLDebugView()
-@property(nonatomic, weak) id <VLDebugViewDelegate>delegate;
+@interface VLSBGDebugView()
+@property(nonatomic, weak) id <VLSBGDebugViewDelegate>delegate;
 @property (nonatomic,strong) UISwitch *dumpSwitch;
 @property (nonatomic, assign) BOOL isDumpMode;
 @property (nonatomic, strong) UITextField *keyTf;
@@ -19,9 +18,9 @@
 @property (nonatomic, strong) NSString *sdkVer;
 @end
 
-@implementation VLDebugView
+@implementation VLSBGDebugView
 
-- (instancetype)initWithFrame:(CGRect)frame channelName:(NSString *)name sdkVer:(NSString *)ver isDumpMode:(BOOL)isDumpMode withDelegate:(id<VLDebugViewDelegate>)delegate {
+- (instancetype)initWithFrame:(CGRect)frame channelName:(NSString *)name sdkVer:(NSString *)ver isDumpMode:(BOOL)isDumpMode withDelegate:(id<VLSBGDebugViewDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
         self.delegate = delegate;
@@ -43,14 +42,14 @@
     [self addSubview:roomMsgLabel];
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = KTVLocalizedString(@"Debug Settings");
+    titleLabel.text = SBGLocalizedString(@"Debug Settings");
     titleLabel.font = UIFontMake(18);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:titleLabel];
     
     UILabel *headLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 90, 150, 30)];
-    headLabel.text = KTVLocalizedString(@"ktv_dump");
+    headLabel.text = SBGLocalizedString(@"sbg_dump");
     headLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:headLabel];
     
@@ -65,13 +64,13 @@
     [self addSubview:sepView3];
     
     UILabel *logLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 153, 150, 30)];
-    logLabel.text = KTVLocalizedString(@"ktv_export_log");
+    logLabel.text = SBGLocalizedString(@"sbg_export_log");
     logLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:logLabel];
     
     UIButton *exportLogBtn = [[UIButton alloc]initWithFrame:CGRectMake(190, 153, 150, 30)];
     [exportLogBtn setBackgroundColor:[UIColor blueColor]];
-    [exportLogBtn setTitle:KTVLocalizedString(@"ktv_debug_confirm") forState:UIControlStateNormal];
+    [exportLogBtn setTitle:SBGLocalizedString(@"sbg_debug_confirm") forState:UIControlStateNormal];
     [exportLogBtn setFont:[UIFont systemFontOfSize:13]];
     [exportLogBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     exportLogBtn.layer.cornerRadius = 5;
@@ -84,13 +83,13 @@
     [self addSubview:sepView];
     
     UILabel *clearDumpLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 216, 150, 30)];
-    clearDumpLabel.text = KTVLocalizedString(@"ktv_clear_dump");
+    clearDumpLabel.text = SBGLocalizedString(@"sbg_clear_dump");
     clearDumpLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:clearDumpLabel];
     
     UIButton *clearDumpBtn = [[UIButton alloc]initWithFrame:CGRectMake(190, 216, 150, 30)];
     [clearDumpBtn setBackgroundColor:[UIColor blueColor]];
-    [clearDumpBtn setTitle:KTVLocalizedString(@"ktv_debug_confirm") forState:UIControlStateNormal];
+    [clearDumpBtn setTitle:SBGLocalizedString(@"sbg_debug_confirm") forState:UIControlStateNormal];
     clearDumpBtn.layer.cornerRadius = 5;
     clearDumpBtn.layer.masksToBounds = true;
     [clearDumpBtn setFont:[UIFont systemFontOfSize:13]];
@@ -103,13 +102,13 @@
     [self addSubview:sepView2];
     
     UILabel *clearLogLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 279, 100, 30)];
-    clearLogLabel.text = KTVLocalizedString(@"ktv_clear_log");
+    clearLogLabel.text = SBGLocalizedString(@"sbg_clear_log");
     clearLogLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:clearLogLabel];
     
     UIButton *clearLogBtn = [[UIButton alloc]initWithFrame:CGRectMake(190, 279, 150, 30)];
     [clearLogBtn setBackgroundColor:[UIColor blueColor]];
-    [clearLogBtn setTitle:KTVLocalizedString(@"ktv_debug_confirm") forState:UIControlStateNormal];
+    [clearLogBtn setTitle:SBGLocalizedString(@"sbg_debug_confirm") forState:UIControlStateNormal];
     clearLogBtn.layer.cornerRadius = 5;
     clearLogBtn.layer.masksToBounds = true;
     [clearLogBtn setFont:[UIFont systemFontOfSize:13]];
@@ -127,13 +126,13 @@
     };
 
     self.keyTf = [[UITextField alloc]initWithFrame:CGRectMake(20, 340, SCREEN_WIDTH - 40, 20)];
-    NSAttributedString *keyPlaceholder = [[NSAttributedString alloc] initWithString:KTVLocalizedString(@"ktv_input_key") attributes:attributes];
+    NSAttributedString *keyPlaceholder = [[NSAttributedString alloc] initWithString:SBGLocalizedString(@"sbg_input_key") attributes:attributes];
     self.keyTf.attributedPlaceholder = keyPlaceholder;
     self.keyTf.textColor = [UIColor whiteColor];
     [self addSubview:self.keyTf];
     
     self.valueTf = [[UITextField alloc]initWithFrame:CGRectMake(20, 375, SCREEN_WIDTH - 40, 20)];
-    NSAttributedString *valuePlaceholder = [[NSAttributedString alloc] initWithString:KTVLocalizedString(@"ktv_input_value") attributes:attributes];
+    NSAttributedString *valuePlaceholder = [[NSAttributedString alloc] initWithString:SBGLocalizedString(@"sbg_input_value") attributes:attributes];
     self.valueTf.attributedPlaceholder = valuePlaceholder;
     self.valueTf.textColor = [UIColor whiteColor];
     [self addSubview:self.valueTf];
@@ -144,7 +143,7 @@
     setParamsBtn.layer.cornerRadius = 5;
     setParamsBtn.layer.masksToBounds = true;
     [setParamsBtn setFont:[UIFont systemFontOfSize:13]];
-    [setParamsBtn setTitle:KTVLocalizedString(@"ktv_set_params") forState:UIControlStateNormal];
+    [setParamsBtn setTitle:SBGLocalizedString(@"sbg_set_params") forState:UIControlStateNormal];
     [setParamsBtn addTarget:self action:@selector(setParams) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:setParamsBtn];
 }

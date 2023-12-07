@@ -186,4 +186,20 @@
     
     return popView;
 }
+
+//弹出DebugView
++ (LSTPopView*)popSBGDebugViewWithParentView:(UIView*)parentView
+                                    channelName:(NSString *)name
+                                   sdkVer:(NSString *)ver
+                                   isDebugMode:(BOOL)isDebugMode
+                             withDelegate:(id<VLSBGDebugViewDelegate>)delegate {
+    CGFloat popViewH = 480;
+    VLSBGDebugView *debugView = [[VLSBGDebugView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) channelName:(NSString *)name sdkVer:(NSString *)ver isDumpMode:isDebugMode withDelegate:delegate];
+    
+    LSTPopView* popView = [self _createRSPopContainerWithContentView:debugView
+                                                       withParentView:parentView];
+    [popView pop];
+    
+    return popView;
+}
 @end

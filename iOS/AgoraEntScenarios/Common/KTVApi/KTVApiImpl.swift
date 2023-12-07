@@ -157,7 +157,6 @@ private func agoraPrint(_ message: String) {
         engine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
         engine.setParameters("{\"che.audio.ans.noise_gate\": 20}")
-        engine.setParameters("{\"che.audio.ains_mode\": 0}")
         if apiConfig?.type == .singRelay {
             engine.setParameters("{\"che.audio.aiaec.working_mode\": 1}")
         }
@@ -1285,7 +1284,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
             if isMainSinger() { //主唱播放，通过同步消息“setLrcTime”通知伴唱play
                 playerKit.play()
                 playerKit.selectMultiAudioTrack(1, publishTrackIndex: 1)
-            } else if self.singerRole == .coSinger {
+            } else {
                 playerKit.selectAudioTrack(1)
             }
         } else if state == .stopped {

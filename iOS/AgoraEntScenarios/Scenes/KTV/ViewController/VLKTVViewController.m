@@ -150,6 +150,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     self.gainValue = @"1.0";
     self.effectType = 0;
     self.typeValue = 4;
+    self.isDelay = true;
     self.checkType = checkAuthTypeAll;
 
     [self subscribeServiceEvent];
@@ -241,7 +242,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 }
 
 -(void)showDebug {
-    [LSTPopView popDebugViewWithParentView:self.view isDebugMode:self.isDumpMode withDelegate:self];
+    [LSTPopView popDebugViewWithParentView:self.view channelName:self.roomModel.roomNo sdkVer:[AgoraRtcEngineKit getSdkVersion]  isDebugMode:self.isDumpMode withDelegate:self];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -1255,6 +1256,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     };
     [self.ktvApi setMicStatusWithIsOnMicOpen:!self.isNowMicMuted];
     [self.ktvApi addEventHandlerWithKtvApiEventHandler:self];
+    
+    [self.RTCkit setParameters:@"{\"che.audio.ains_mode\": -1}"];
+    
 //    VL(weakSelf);
     KTVLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
     int ret =

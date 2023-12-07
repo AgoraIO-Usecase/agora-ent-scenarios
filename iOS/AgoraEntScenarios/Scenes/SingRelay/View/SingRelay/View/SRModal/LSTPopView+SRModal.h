@@ -14,6 +14,7 @@
 #import "VLSRPopSongList.h"
 #import "VLSRSettingView.h"
 #import "VLSRBelcantoModel.h"
+#import "VLSRDebugView.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LSTPopView (SRModal)
@@ -56,6 +57,13 @@ NS_ASSUME_NONNULL_BEGIN
 + (LSTPopView*)popSRSettingViewWithParentView:(UIView*)parentView
                                settingView:(VLSRSettingView*)settingView
                                withDelegate:(id<VLSRSettingViewDelegate>)delegate;
+
+//弹出DebugView
++ (LSTPopView*)popSRDebugViewWithParentView:(UIView*)parentView
+                                    channelName:(NSString *)name
+                                   sdkVer:(NSString *)ver
+                                   isDebugMode:(BOOL)isDebugMode
+                             withDelegate:(id<VLSRDebugViewDelegate>)delegate;
 @end
 
 NS_ASSUME_NONNULL_END

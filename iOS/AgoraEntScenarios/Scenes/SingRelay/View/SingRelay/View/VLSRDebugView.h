@@ -9,8 +9,8 @@
 #import <UIKit/UIKit.h>
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLDebugView;
-@protocol VLDebugViewDelegate <NSObject>
+@class VLSRDebugView;
+@protocol VLSRDebugViewDelegate <NSObject>
 
 @optional
 -(void)didDumpModeChanged:(BOOL)enable;
@@ -18,8 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 -(void)didParamsSetWith:(NSString *)key value:(NSString *)value;
 @end
 
-@interface VLDebugView : UIView
-- (instancetype)initWithFrame:(CGRect)frame channelName:(NSString *)name sdkVer:(NSString *)ver isDumpMode:(BOOL)isDumpMode withDelegate:(id<VLDebugViewDelegate>)delegate;
+@interface VLSRDebugView : UIView
+- (instancetype)initWithFrame:(CGRect)frame channelName:(NSString *)name sdkVer:(NSString *)ver isDumpMode:(BOOL)isDumpMode withDelegate:(id<VLSRDebugViewDelegate>)delegate;
 @end
 
 NS_ASSUME_NONNULL_END
