@@ -960,7 +960,7 @@ extension KTVApiImpl {
         apiConfig?.engine?.setParameters("{\"che.audio.aec.enable\":\((enable && isWearingHeadPhones) ? false : true)}")
         apiConfig?.engine?.setParameters("{\"che.audio.agc.enable\":\((enable && isWearingHeadPhones) ? false : true)}")
         apiConfig?.engine?.setParameters("{\"che.audio.ans.enable\":\((enable && isWearingHeadPhones) ? false : true)}")
-        apiConfig?.engine?.setParameters("{\"che.audio.md.enable\": false)}")
+        apiConfig?.engine?.setParameters("{\"che.audio.md.enable\": false}")
     }
     
     func joinChorus(newRole: KTVSingRole) {
@@ -1665,7 +1665,7 @@ extension KTVApiImpl {
         dictionary["version"] = "V1"
         var payload: [String: Any] = [:]
         payload["cname"] = apiConfig?.chorusChannelName
-        payload["uid"] = apiConfig?.localUid
+        payload["uid"] = String(apiConfig?.localUid ?? 0)
         payload["uLv"] = -1
         payload["specialLabel"] = 0
         payload["audioRoute"] = audioRouting
@@ -1724,7 +1724,7 @@ extension KTVApiImpl {
         payload["cname"] = apiConfig?.chorusChannelName
         payload["status"] = getCloudConvergenceStatus()
         payload["bgmUID"] = mpkConnection?.localUid
-        payload["leadsingerUID"] = songConfig?.mainSingerUid
+        payload["leadsingerUID"] = String(songConfig?.mainSingerUid ?? 0)
         dictionary["payload"] = payload
         sendStreamMessageWithDict(dictionary) { _ in
             
