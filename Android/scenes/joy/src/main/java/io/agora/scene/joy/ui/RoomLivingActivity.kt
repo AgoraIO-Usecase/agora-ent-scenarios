@@ -40,6 +40,7 @@ import io.agora.scene.joy.base.DataState
 import io.agora.scene.joy.databinding.JoyActivityLiveDetailBinding
 import io.agora.scene.joy.databinding.JoyItemLiveDetailMessageBinding
 import io.agora.scene.joy.network.JoyGameListResult
+import io.agora.scene.joy.network.JoyGameStatus
 import io.agora.scene.joy.service.JoyMessage
 import io.agora.scene.joy.service.JoyRoomInfo
 import io.agora.scene.joy.service.JoyServiceListenerProtocol
@@ -103,8 +104,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     private val mJoyService by lazy { JoyServiceProtocol.getImplInstance() }
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
-
-    private var mTaskId: String? = null
 
     private var mGameChooseGameDialog: JoyChooseGameDialog? = null
 
@@ -247,6 +246,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             }
             requestCameraPermission(true)
             startTopLayoutTimer()
+        } else {
+            ToastUtils.showToast(getString(R.string.joy_living_end))
+            finish()
+            return
         }
         mJoyService.subscribeListener(object : JoyServiceListenerProtocol {
             override fun onNetworkStatusChanged(status: Sync.ConnectionState) {
@@ -312,6 +315,9 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                         assistantUid = 1000000000 + mRoomInfo.ownerId,
                         gameName = gameSelect.name ?: ""
                     )
+                    // 获取游戏状态
+//                    mJoyViewModel.gameState(gameSelect.gameId ?: "", mTaskId)
+
                     mJoyService.updateStartGame(mRoomInfo.roomId, mStartGameInfo!!, completion = { error ->
                         if (error == null) { //启动游戏成功
                             setupAssistantVideoView()
@@ -349,6 +355,19 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 DataState.STATE_EMPTY,
                 DataState.STATE_SUCCESS -> {
                     CustomToast.show("点赞成功")
+                }
+            }
+        }
+        mJoyViewModel.mGameStatusLiveData.observe(this) {
+            when (it.dataState) {
+                DataState.STATE_SUCCESS -> {
+                    // TODO:
+                    if (it.data?.status == JoyGameStatus.stopped.name) {
+                        // 游戏暂停，需要重启
+                        val gameId = mStartGameInfo?.gameId ?: return@observe
+                        val assistantUid = mStartGameInfo?.assistantUid ?: return@observe
+                        mJoyViewModel.startGame(mRoomInfo.roomId, gameId, assistantUid)
+                    }
                 }
             }
         }
@@ -409,7 +428,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         })
     }
 
-    private fun getStartGameInfo(){
+    private fun getStartGameInfo() {
         mJoyService.getStartGame(mRoomInfo.roomId, completion = { error, startGameInfo ->
             if (error == null) { //success
                 mStartGameInfo = startGameInfo
@@ -420,9 +439,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     mJoyViewModel.getGameDetail(gameId)
                     // 加载游戏画面
                     setupAssistantVideoView()
+                    val taskId = mStartGameInfo?.taskId ?: return@getStartGame
+                    // 获取游戏状态
+                    mJoyViewModel.gameState(gameId, taskId)
                 } else {
+                    // 房主未开启游戏，选择游戏
                     if (mIsRoomOwner) {
-                        // 选择游戏
                         showGameChooseDialog()
                     }
                 }
@@ -571,7 +593,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
         mJoyService.leaveRoom(mRoomInfo, {})
         if (mIsRoomOwner) {
-            mTaskId?.let { taskId ->
+            mStartGameInfo?.taskId?.let { taskId ->
                 mJoyViewModel.stopGame(mJoyViewModel.mGamId, taskId)
             }
             mRtcEngine.stopPreview()

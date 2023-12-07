@@ -247,3 +247,13 @@ data class JoySendMessage constructor(
     @SerializedName("payload")
     var payload: List<JoyMessageEntity>? = null,
 ) : JoyJsonModel
+
+enum class JoyGameStatus {
+    schedule,
+    scheduled,
+    starting,
+    start_failed,
+    started,
+    stopping,
+    stopped
+}
