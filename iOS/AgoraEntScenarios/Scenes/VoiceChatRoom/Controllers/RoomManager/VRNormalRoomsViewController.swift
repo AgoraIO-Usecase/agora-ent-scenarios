@@ -20,7 +20,7 @@ public class VRNormalRoomsViewController: UIViewController {
     override public func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .clear
-        view.addSubViews([roomList, empty])
+        view.addSubViews([ empty,roomList])
         refresh()
         
         roomList.refreshBlock = {[weak self] _ in
