@@ -159,14 +159,12 @@ class CantataMainViewController: BaseViewController{
         layoutUI()
         
         isRoomOwner = VLUserCenter.user.ifMaster
-        
         if isRoomOwner == true {
             self.timeManager.startTimer(withTarget: self, andSelector: #selector(giveupRoom))
             KTVLog.info(text: "ROOM owner start timer")
         }
         
         addDebugLogic()
-        
         if isRoomOwner == true {
             guard let roomNo = roomModel?.roomNo else {return}
             ApiManager.shared.fetchStartCloud(mainChannel: roomNo, cloudRtcUid: 232425)
@@ -1855,7 +1853,6 @@ class TimerManager {
         workItem = DispatchWorkItem { [weak self] in
             self?.timerAction()
         }
-        
         DispatchQueue.global().asyncAfter(deadline: .now() + 300, execute: workItem!)
     }
     
