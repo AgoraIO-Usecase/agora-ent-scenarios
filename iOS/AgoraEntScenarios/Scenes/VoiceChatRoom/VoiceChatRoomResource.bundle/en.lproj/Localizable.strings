@@ -185,12 +185,12 @@
 "voice_AIAEC_audition" = "AI回声消除试听";
 "voice_AGC_audition" = "人声自动增益试听";
 "voice_room_announcement_changed" = "语聊房公告变更!";
-"voice_time_limit_desc" = "已踢出房间";
+"voice_time_limit_desc" = "房间已解散";
 "voice_close_bot" = "关闭机器人";
 "voice_other_settings" = "其他设置";
 "voice_welcome" = "欢迎";
 "voice_you_were_kicked_off_from_the_room" = "已被踢出房间";
-"voice_this_room_has_been_dissolved_by_the_host" = "本房间已被房主解散";
+"voice_this_room_has_been_dissolved_by_the_host" = "房间已解散";
 "voice_you_were_offline" = "您已离线";
 "voice_illegal_check" = "不能有违反相关法律法规和政策的内容，请重新编辑";
 "voice_contribution_empty" = "暂无贡献者";

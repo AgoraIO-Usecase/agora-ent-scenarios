@@ -26,7 +26,6 @@ public class SANormalRoomsViewController: UIViewController {
         super.viewDidLoad()
         view.addSubViews([empty, roomList])
         // Do any additional setup after loading the view.
-        view.addSubViews([roomList, empty])
         refresh()
         
         roomList.refreshBlock = {[weak self] _ in
