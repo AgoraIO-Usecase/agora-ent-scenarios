@@ -24,6 +24,7 @@ public class SAInviteCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         contentView.backgroundColor = .white
         contentView.addSubViews([avatar, userName, operation])
+        avatar.contentMode = .scaleAspectFill
         operation.layer.shadowColor = UIColor(red: 0, green: 0.55, blue: 0.98, alpha: 0.2).cgColor
         operation.layer.shadowOffset = CGSize(width: 0, height: 4)
         operation.layer.shadowRadius = 8
