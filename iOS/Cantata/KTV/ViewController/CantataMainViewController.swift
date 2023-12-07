@@ -737,14 +737,16 @@ extension CantataMainViewController: IMusicLoadStateListener {
             VLToast.toast("网络中断，请切歌重试", duration: 5.0)
         }
         
-        if reason == .noLyricUrl {//歌词加载失败
-            self.lrcControlView.retryBtn.isHidden = false
-        } else if reason == .cancled || reason == .musicPreloadFail {//歌曲加载失败 切歌
+        DispatchQueue.main.async {
+            if reason == .noLyricUrl {//歌词加载失败
+                self.lrcControlView.retryBtn.isHidden = false
+            } else if reason == .cancled || reason == .musicPreloadFail {//歌曲加载失败 切歌
+                
+            }
             
-        }
-        
-        if self.singerRole == .soloSinger || self.singerRole == .leadSinger {
-            self.lrcControlView.updateLoadingView(with: 100)
+            if self.singerRole == .soloSinger || self.singerRole == .leadSinger {
+                self.lrcControlView.updateLoadingView(with: 100)
+            }
         }
     }
     
