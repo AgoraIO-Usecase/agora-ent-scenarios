@@ -15,12 +15,6 @@ public enum SA3DUserDirectionType {
 class SA3DUserCollectionViewCell: UICollectionViewCell {
     var rtcUserView: SABaseRtcUserView = .init()
 
-    public var cellType: SABaseUserCellType = .AgoraChatRoomBaseUserCellTypeAdd {
-        didSet {
-            rtcUserView.cellType = cellType
-        }
-    }
-
     public var directionType: SA3DUserDirectionType = .AgoraChatRoom3DUserDirectionTypeDown {
         didSet {
             rtcUserView.snp.updateConstraints { make in
@@ -32,11 +26,7 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
 
     public func refreshUser(with mic: SARoomMic) {
         var status = mic.status
-        let user_mic_status = mic.member?.mic_status ?? .none
-        if user_mic_status == .mute {
-            status = 1
-        }
-        // 0:正常状态 1:闭麦 2:禁言 3:锁麦 4:锁麦和禁言 5: -1:空闲
+        // 0:正常状态 1:闭麦 2:禁言 3:锁麦 4:锁麦和禁言 5:机器人生效 -1:空闲 -2: 机器人失效
         switch status {
         case -1:
             rtcUserView.iconView.isHidden = true
@@ -46,9 +36,13 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
         case 0:
             rtcUserView.iconView.isHidden = false
             rtcUserView.micView.isHidden = false
-            rtcUserView.micView.setState(.on)
             rtcUserView.bgIconView.isHidden = true
             rtcUserView.nameBtn.setImage(nil, for: .normal)
+            if mic.member?.mic_status == .mute {
+                rtcUserView.micView.setState(.off)
+            } else {
+                rtcUserView.micView.setState(.on)
+            }
         case 1:
             rtcUserView.bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
             rtcUserView.micView.isHidden = false
@@ -70,12 +64,14 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
             rtcUserView.bgIconView.isHidden = false
         case 5:
             rtcUserView.iconView.isHidden = true
-            rtcUserView.micView.isHidden = true
+            rtcUserView.micView.isHidden = false
+            rtcUserView.micView.setState(.on)
             rtcUserView.coverView.isHidden = true
             rtcUserView.activeButton.isHidden = true
         case -2:
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = true
+            rtcUserView.micView.setState(.off)
             rtcUserView.coverView.isHidden = false
             rtcUserView.activeButton.isHidden = false
         default:
@@ -88,7 +84,7 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
         } else {
             rtcUserView.iconView.image = UIImage.spatial_image(mic.member?.portrait ?? "")
         }
-        rtcUserView.nameBtn.setImage(UIImage.spatial_image((mic.mic_index == 0 || mic.mic_index == 3 || mic.mic_index == 6) ? "Landlord" : ""), for: .normal)
+        rtcUserView.nameBtn.setImage((mic.mic_index == 3 || mic.mic_index == 6) ? UIImage.spatial_image("guanfang"): nil, for: .normal)
         let title = mic.status == -1 ? "\(mic.mic_index)" : (mic.member?.name ?? "\(mic.mic_index)")
         rtcUserView.nameBtn.setTitle(title, for: .normal)
     }
@@ -97,12 +93,7 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
         rtcUserView.volume = vol
     }
     
-    public func updateAlienMic( flag: Bool) {
-        rtcUserView.micView.isHidden = !flag
-    }
-    
     public var clickBlock: ((Int) -> Void)?
-    public var activeBlock: ((SABaseUserCellType) -> Void)?
 
     override init(frame: CGRect) {
         super.init(frame: frame)

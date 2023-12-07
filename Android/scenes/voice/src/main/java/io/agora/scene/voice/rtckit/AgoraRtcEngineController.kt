@@ -336,6 +336,10 @@ class AgoraRtcEngineController {
         }
     }
 
+    fun createLocalMediaPlayer(): IMediaPlayer? {
+        return rtcEngine?.createMediaPlayer()
+    }
+
     /**
      * 音效队列
      */

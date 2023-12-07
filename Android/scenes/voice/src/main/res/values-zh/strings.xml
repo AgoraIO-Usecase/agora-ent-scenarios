@@ -42,7 +42,7 @@
     <string name="voice_empty_invite_hands">暂无听众</string>
     <string name="voice_empty_raised_hands">暂无上麦请求</string>
     <string name="voice_room_profile">个人信息</string>
-    <string name="voice_room_close">房间销毁</string>
+    <string name="voice_room_close">房间已解散</string>
     <string name="voice_room_kick_member">已踢出房间</string>
     <string name="voice_member_count_action_kick">踢出</string>
     <string name="voice_room_welcome">欢迎来到声网语聊房！房间内严禁色情、赌博或暴力内容。</string>
