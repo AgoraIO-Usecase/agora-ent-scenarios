@@ -171,7 +171,7 @@ class AgoraRtcEngineController {
         localSpatialAudioConfig.mRtcEngine = rtcEngine
         localSpatial.initialize(localSpatialAudioConfig)
         localSpatial.setMaxAudioRecvCount(6)
-        localSpatial.setAudioRecvRange(15f)
+        localSpatial.setAudioRecvRange(20f)
         localSpatial.setDistanceUnit(1f)
         spatial = localSpatial
     }

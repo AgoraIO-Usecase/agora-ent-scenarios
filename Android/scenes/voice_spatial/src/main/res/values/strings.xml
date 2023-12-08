@@ -111,7 +111,7 @@
     <string name="voice_spatial_agora_blue_bot">声蓝⽻</string>
     <string name="voice_spatial_agora_red_bot">声红颜</string>
     <string name="voice_spatial_attenuation_factor">衰减系数</string>
-    <string name="voice_spatial_air_absorb">空⽓衰减</string>
+    <string name="voice_spatial_air_absorb">空⽓传播模拟</string>
     <string name="voice_spatial_voice_blur">⼈声模糊</string>
     <string name="voice_spatial_sound_selection">最佳⾳效</string>
     <string name="voice_spatial_sound_selection_tips">切换其他最佳⾳效需退出房间</string>
