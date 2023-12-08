@@ -348,6 +348,12 @@ public let kMPK_RTC_UID: UInt = 1
         rtcKit.setParameters(string)
     }
     
+    //Dump 全链路音频数据收集
+    public func setAPMOn(isOn: Bool){
+        rtcKit.setParameters("{\"rtc.debug.enable\": \(isOn)}")
+        rtcKit.setParameters("{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}");
+    }
+    
     /**
      * 加载RTC
      */

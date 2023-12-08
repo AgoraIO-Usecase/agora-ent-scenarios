@@ -349,7 +349,11 @@ class ActionSheetManager: UIView {
                                                    custom: self,
                                                    isLayout: true)
             let nav = SAAlertNavigationController(rootViewController: controller)
-            (vc as? SABaseViewController)?.sa_navigationViewController(nav)
+            if let savc = vc as? SABaseViewController {
+                savc.sa_navigationViewController(nav)
+            }else{
+                vc.present(nav, animated: true)
+            }
         }
     }
     
