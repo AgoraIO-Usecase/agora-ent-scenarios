@@ -923,15 +923,16 @@ class VoiceSyncManagerServiceImp(
         val uid = VoiceBuddyFactory.get().getVoiceBuddy().userId()
         innerGetUserList({ list ->
             if (list.none { it.userId == it.toString() }) {
-                innerAddUser(VoiceMemberModel().apply {
+                val user = VoiceMemberModel().apply {
                     rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()
                     nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName()
                     userId = VoiceBuddyFactory.get().getVoiceBuddy().userId()
                     micIndex = -1
                     portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
-                },
-                    {
+                }
+                innerAddUser(user, {
                         objIdOfUserId[uid] = it
+                        userMap[uid] = user
                         success.invoke()
                     },
                     { e -> error.invoke(e) }
@@ -1056,6 +1057,9 @@ class VoiceSyncManagerServiceImp(
                             it.onUserJoinedRoom(currRoomNo, userInfo)
                         }
                     }
+                } else {
+                    val map = userMap
+                    val i = item
                 }
                 userMap[userInfo.userId.toString()] = userInfo
                 objIdOfUserId[userInfo.userId.toString()] = item.id
