@@ -96,7 +96,7 @@ extension SpatialAudioSyncSerciceImp {
         for i in 1...8 {
             if i == 8 { return 0 }
             let mic = self.mics[safe: i]
-            if mic?.member == nil && mic?.status != 3 {
+            if mic?.member == nil && mic?.status != 3 && mic?.status != 4 {
                 mic_index = mic?.mic_index ?? 1
                 break
             }
