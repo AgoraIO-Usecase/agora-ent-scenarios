@@ -77,6 +77,21 @@ class VoiceRoomViewController: VRBaseViewController {
         }
         return view
     }()
+    
+    private lazy var actionView = ActionSheetManager()
+
+    private lazy var debugButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Debug", for: .normal)
+        button.setTitleColor(.black, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 12)
+        button.cornerRadius(25)
+        button.backgroundColor = .white
+        button.addTarget(self, action: #selector(onTapDebugButton), for: .touchUpInside)
+        button.isHidden = !AppContext.shared.isDebugMode
+        return button
+    }()
+    
     var isShowPreSentView: Bool = false
     var rtckit: VoiceRoomRTCManager = VoiceRoomRTCManager.getSharedInstance()
     var isOwner: Bool = false
@@ -173,6 +188,20 @@ class VoiceRoomViewController: VRBaseViewController {
 }
 
 extension VoiceRoomViewController {
+    
+    @objc
+    private func onTapDebugButton() {
+        actionView
+            .title(title: "Dump数据类型")
+            .switchCell(iconName: "icons／set／jiqi", title: "APM全链路音频", isOn: AppContext.shared.isVRApmOn)
+            .config()
+        actionView.didSwitchValueChangeClosure = { [weak self] _, isOn in
+            AppContext.shared.isVRApmOn = isOn
+            self?.rtckit.setAPMOn(isOn: isOn)
+        }
+        actionView.show()
+    }
+    
     // 加载RTC
     func loadKit() {
         guard let channel_id = roomInfo?.room?.channel_id else { return }
@@ -237,6 +266,8 @@ extension VoiceRoomViewController {
                 }
             }
         }
+        // 收集APM全链路音频
+        rtckit.setAPMOn(isOn: AppContext.shared.isVRApmOn)
     }
     
     private func setChatroomAttributes() {
@@ -406,6 +437,13 @@ extension VoiceRoomViewController {
             inputBar.isHidden = true
         }
         chatView.messages?.append(startMessage())
+        
+        view.addSubview(debugButton)
+        debugButton.translatesAutoresizingMaskIntoConstraints = false
+        debugButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -35).isActive = true
+        debugButton.bottomAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        debugButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        debugButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
     }
 
 
