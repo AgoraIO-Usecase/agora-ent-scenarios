@@ -44,8 +44,9 @@ public class SAInviteCell: UITableViewCell {
     func refresh(item: SAUser?) {
         user = item
         userName.text = item?.name
-//        item?.invited = (item?.mic_index ?? 0 != -1)
-        avatar.sd_setImage(with: URL(string: item?.portrait ?? "")!, placeholderImage: nil)
+        if let url = URL(string: item?.portrait ?? "") {
+            avatar.sd_setImage(with: url, placeholderImage: nil)
+        }
         operation.setTitle((item?.invited == true || item?.status == .waitting) ? "spatial_voice_invited".spatial_localized() : "spatial_voice_invite".spatial_localized(), for: .normal)
         operation.setBackgroundImage((item?.invited == true || item?.status == .waitting) ? nil : UIImage.sceneImage(name: "blue_btn_bg"), for: .normal)
         var color = UIColor.white

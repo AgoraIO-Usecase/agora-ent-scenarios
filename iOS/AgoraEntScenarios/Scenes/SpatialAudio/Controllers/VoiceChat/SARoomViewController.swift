@@ -181,7 +181,17 @@ extension SARoomViewController {
         headerView.updateHeader(with: info.room)
         guard let mics = roomInfo?.mic_info else { return }
         roomInfo?.room?.member_list = AppContext.saTmpServiceImp().userList
-        onRobotUpdate(robotInfo: info.robotInfo)
+        // robot state
+        if let mic_info = roomInfo?.mic_info,
+           mic_info.isEmpty == false,
+           let robotInfo = roomInfo?.robotInfo {
+            let red_mic: SARoomMic = mic_info[6]
+            let blue_mic: SARoomMic = mic_info[3]
+            red_mic.status = robotInfo.use_robot ? 5 : -2
+            blue_mic.status = robotInfo.use_robot ? 5 : -2
+            self.sRtcView.updateUser(blue_mic)
+            self.sRtcView.updateUser(red_mic)
+        }
         
         AppContext.saTmpServiceImp().mics = mics
         roomInfo?.room?.ranking_list = info.room?.ranking_list
