@@ -156,7 +156,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
         new KeyboardStatusWatcher(activity, activity, new Function2<Boolean, Integer, Unit>() {
             @Override
             public Unit invoke(Boolean isKeyboardShowed, Integer keyboardHeight) {
-                LogTools.e("KeyboardStatusWatcher"," isKeyboardShowed: " + isKeyboardShowed + " keyboardHeight: "+ keyboardHeight);
+                LogTools.d("KeyboardStatusWatcher"," isKeyboardShowed: " + isKeyboardShowed + " keyboardHeight: "+ keyboardHeight);
                 ViewGroup.LayoutParams lp = mKeyboardBg.getLayoutParams();
                 if (isKeyboardShowed){
                     lp.height = keyboardHeight;
@@ -181,9 +181,9 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
     }
 
     public void SoftShowing(boolean isShowEmoji){
-        LogTools.e("MenuView","SoftShowing: " + isShowEmoji);
+        LogTools.d("MenuView","SoftShowing: " + isShowEmoji);
         if (isShowEmoji){
-            LogTools.e("KeyboardStatusWatcher","SoftShowing softKeyHeight: " + softKeyHeight);
+            LogTools.d("KeyboardStatusWatcher","SoftShowing softKeyHeight: " + softKeyHeight);
             setViewLayoutParams(expressionView, ViewGroup.LayoutParams.MATCH_PARENT,softKeyHeight);
             setViewLayoutParams(mKeyboardBg, ViewGroup.LayoutParams.MATCH_PARENT,softKeyHeight);
         }else {
@@ -213,7 +213,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
     }
 
     public void initMenu(int roomType) {
-        LogTools.e("initMenu","roomType: " + roomType);
+        LogTools.d("initMenu","roomType: " + roomType);
         if (roomType == 0){
             normalLayout.setVisibility(VISIBLE);
             registerMenuItem(R.drawable.voice_icon_close_mic,R.id.voice_extend_item_mic);
@@ -311,10 +311,10 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
         });
     }
 
-    public void setEnableMic(boolean isEnable){
+    public void setEnableMic(boolean isOn){
         post(()-> {
             ImageView mic = menuLayout.findViewById(R.id.voice_extend_item_mic);
-            if (isEnable){
+            if (isOn){
                 mic.setImageResource(R.drawable.voice_icon_mic);
             }else {
                 mic.setImageResource(R.drawable.voice_icon_close_mic);
@@ -322,13 +322,13 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
         });
     }
 
-    public void showMicVisible(boolean muteLocal,boolean isVisible){
+    public void showMicVisible(boolean isVisible, boolean isOn){
         post(()-> {
             ImageView mic = menuLayout.findViewById(R.id.voice_extend_item_mic);
-            if (muteLocal) {
-                mic.setImageResource(R.drawable.voice_icon_close_mic);
-            } else {
+            if (isOn){
                 mic.setImageResource(R.drawable.voice_icon_mic);
+            }else {
+                mic.setImageResource(R.drawable.voice_icon_close_mic);
             }
             if (isVisible){
                 mic.setVisibility(VISIBLE);
@@ -375,9 +375,9 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
     public void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm!=null && activity.getWindow().getAttributes().softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
-            LogTools.e("MenuView","hideKeyboard" + activity.getCurrentFocus());
+            LogTools.d("MenuView","hideKeyboard" + activity.getCurrentFocus());
             if (activity.getCurrentFocus() != null){
-                LogTools.e("MenuView","hideKeyboard" + activity.getCurrentFocus());
+                LogTools.d("MenuView","hideKeyboard" + activity.getCurrentFocus());
                 imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
             }
         }

@@ -52,10 +52,10 @@ public class KtvCommonDialog extends BaseDialog<KtvDialogCommonBinding> {
 
     @Override
     protected void setGravity() {
-        getWindow().setLayout(
-                UiUtil.dp2px(300),
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
+//        getWindow().setLayout(
+//                UiUtil.dp2px(300),
+//                ViewGroup.LayoutParams.WRAP_CONTENT
+//        );
         getWindow().getAttributes().gravity = Gravity.CENTER;
     }
 }

@@ -262,7 +262,7 @@ public class LikeLayout extends RelativeLayout implements View.OnClickListener {
         int i = v.getId();
         if (i == R.id.img) {
             if (onHearLayoutListener != null) {
-                LogTools.e("setOnHearLayoutListener","onClick");
+                LogTools.d("setOnHearLayoutListener","onClick");
                 onHearLayoutListener.onLikeClick(v);
                 boolean isAdd = onHearLayoutListener.onAddFavor();
                 if (isAdd) addFavor();

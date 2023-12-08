@@ -8,15 +8,14 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.agora.entfulldemo.R;
 import com.agora.entfulldemo.databinding.AppFragmentHomeIndexBinding;
 import com.agora.entfulldemo.databinding.AppItemHomeIndexBinding;
-import com.agora.entfulldemo.databinding.AppItemHomeIndexBinding;
 import com.agora.entfulldemo.home.constructor.ScenesConstructor;
 import com.agora.entfulldemo.home.constructor.ScenesModel;
 import com.agora.entfulldemo.home.holder.HomeIndexHolder;
-import com.agora.entfulldemo.databinding.AppFragmentHomeIndexBinding;
 
 import java.util.List;
 
@@ -24,12 +23,15 @@ import io.agora.scene.base.ReportApi;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnItemClickListener;
+import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.widget.utils.UiUtils;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 
 public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIndexBinding> {
+
+    private MainViewModel mainViewModel;
 
     @NonNull
     @Override
@@ -39,6 +41,8 @@ public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIn
 
     @Override
     public void initView() {
+        mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        mainViewModel.setLifecycleOwner(this);
 
         Context context = getContext();
         if (context != null) {
@@ -51,12 +55,15 @@ public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIn
                     }
                     if (scenesModel.getActive()) {
                         reportEnter(scenesModel);
+                        mainViewModel.requestReportDevice(UserManager.getInstance().getUser().userNo, scenesModel.getScene().name());
+                        mainViewModel.requestReportAction(UserManager.getInstance().getUser().userNo, scenesModel.getScene().name());
                         goScene(scenesModel);
                     }
                 }
             }, HomeIndexHolder.class);
             getBinding().rvScenes.setAdapter(homeIndexAdapter);
         }
+        mainViewModel.requestReportDevice(UserManager.getInstance().getUser().userNo, "");
     }
 
     private void reportEnter(@NonNull ScenesModel scenesModel){

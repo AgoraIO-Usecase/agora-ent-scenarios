@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white"
+    android:paddingTop="@dimen/base_status_height"
     tools:theme="@style/Theme.AppCompat"
     android:orientation="vertical">
 

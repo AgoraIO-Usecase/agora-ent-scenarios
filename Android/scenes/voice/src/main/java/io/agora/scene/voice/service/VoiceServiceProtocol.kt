@@ -122,7 +122,7 @@ interface VoiceServiceProtocol {
      * 取消上麦
      * @param chatUid im uid
      */
-    fun cancelMicSeatApply(chatUid: String, completion: (error: Int, result: Boolean) -> Unit)
+    fun cancelMicSeatApply(chatroomId: String, chatUid: String, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
      * 邀请用户上麦

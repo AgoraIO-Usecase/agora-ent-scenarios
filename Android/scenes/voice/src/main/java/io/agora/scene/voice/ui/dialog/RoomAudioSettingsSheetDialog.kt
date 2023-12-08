@@ -68,7 +68,6 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             mtBestSoundEffectArrow.text =
                 RoomAudioSettingsConstructor.getSoundEffectName(view.context, audioSettingsInfo.soundSelection)
 
-            mtSpatialAudioArrow.text = view.context.getString(R.string.voice_chatroom_off)
             updateAINSView()
             updateAIAECView()
             updateAIAGCView()

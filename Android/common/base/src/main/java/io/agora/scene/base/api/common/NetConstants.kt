@@ -10,6 +10,7 @@ object NetConstants {
   const val STRING_SET = 6
   const val BOOLEAN_TRUE = 7
 
+  const val HEADER_PROJECT_NAME = "appProject"
   const val HEADER_DEVICE_Id = "deviceId"
   const val HEADER_APP_OS = "appOs"
   const val HEADER_APP_VER = "appVer"

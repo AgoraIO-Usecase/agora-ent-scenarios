@@ -45,10 +45,10 @@ public class SelectPhotoFromDialog extends BaseDialog<DialogSelectPhotoFromBindi
 
     @Override
     protected void setGravity() {
-        getWindow().setLayout(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                UiUtil.dp2px(222)
-        );
+//        getWindow().setLayout(
+//                ViewGroup.LayoutParams.MATCH_PARENT,
+//                UiUtil.dp2px(222)
+//        );
         getWindow().getAttributes().gravity = Gravity.BOTTOM;
     }
 }

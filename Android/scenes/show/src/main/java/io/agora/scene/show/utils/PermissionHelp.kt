@@ -103,7 +103,7 @@ class PermissionHelp(val activity: ComponentActivity) {
     }
 
     /**
-     * 检查外置存储权限
+     * 检查外置存储读权限
      *
      * @param force 是：如果权限被禁用则会跳转到系统应用权限设置页面
      */
@@ -112,9 +112,7 @@ class PermissionHelp(val activity: ComponentActivity) {
         unGranted: () -> Unit,
         force: Boolean = false
     ) {
-        checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, {
-            checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, granted, force, unGranted)
-        }, force, unGranted)
+        checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, granted, force, unGranted)
     }
 
     private fun checkPermission(

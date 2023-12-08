@@ -39,13 +39,13 @@ data class ShowRoomDetailModel(
 ) : Parcelable {
 
     constructor(parcel: Parcel) : this(
-        parcel.readString()!!,
-        parcel.readString()!!,
+        parcel.readString()!!, // 房间号
+        parcel.readString()?:"",
         parcel.readInt(),
-        parcel.readString()!!,
-        parcel.readString()!!,
-        parcel.readString()!!,
-        parcel.readString()!!,
+        parcel.readString()?:"",
+        parcel.readString()!!, // 房主id
+        parcel.readString()?:"",
+        parcel.readString()?:"",
         parcel.readInt(),
         parcel.readInt(),
         parcel.readDouble(),

@@ -6,6 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white"
     tools:theme="@style/Theme.AppCompat"
+    android:paddingTop="@dimen/base_status_height"
     android:orientation="vertical">
 
     <FrameLayout

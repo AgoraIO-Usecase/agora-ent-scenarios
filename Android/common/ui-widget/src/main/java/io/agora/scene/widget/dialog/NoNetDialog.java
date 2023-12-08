@@ -31,10 +31,10 @@ public class NoNetDialog extends BaseDialog<DialogNoNetBinding> {
 
     @Override
     protected void setGravity() {
-        getWindow().setLayout(
-                UiUtil.dp2px(295),
-                UiUtil.dp2px(276)
-        );
+//        getWindow().setLayout(
+//                UiUtil.dp2px(295),
+//                UiUtil.dp2px(276)
+//        );
         getWindow().getAttributes().gravity = Gravity.CENTER;
     }
 }

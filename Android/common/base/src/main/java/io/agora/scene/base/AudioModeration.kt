@@ -1,5 +1,6 @@
 package io.agora.scene.base
 
+import io.agora.scene.base.manager.UserManager
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -51,6 +52,8 @@ object AudioModeration {
 
         val payload = JSONObject()
         payload.put("id", uid)
+        payload.put("userNo", UserManager.getInstance().user.userNo)
+        payload.put("userName", UserManager.getInstance().user.name)
         payload.put("sceneName", sceneName)
         postBody.put("payload", payload.toString())
 

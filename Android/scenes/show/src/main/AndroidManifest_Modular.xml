@@ -19,7 +19,7 @@
 
     <application
         android:name="io.agora.scene.base.component.AgoraApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/ktv_online"
         android:networkSecurityConfig="@xml/security_config"

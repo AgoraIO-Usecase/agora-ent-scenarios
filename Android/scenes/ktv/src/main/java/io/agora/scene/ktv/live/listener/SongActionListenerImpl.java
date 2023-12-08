@@ -44,6 +44,10 @@ public class SongActionListenerImpl implements OnSongActionListener {
         // 点歌-列表刷新
         mCurrPage = 1;
         int songType = getSongType(index);
+        if (songType==-1) {
+            Log.e("KTV","getSongType null");
+            return;
+        }
         Log.e("liu0228", "index = " + index + "    songType = " + songType);
         LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.getSongList(songType, mCurrPage), list -> {
             if (dialog.isVisible()) {
@@ -56,7 +60,13 @@ public class SongActionListenerImpl implements OnSongActionListener {
     public void onChooseSongLoadMore(@NonNull SongDialog dialog, int index) {
         // 点歌-列表加载更多
         mCurrPage++;
-        LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.getSongList(getSongType(index), mCurrPage), list -> {
+
+        int songType = getSongType(index);
+        if (songType == -1) {
+            Log.e("KTV", "getSongType null");
+            return;
+        }
+        LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.getSongList(songType, mCurrPage), list -> {
             if (dialog.isVisible()) {
                 dialog.setChooseLoadMoreResult(transSongModel(list), list.size() > 0, index);
             }
@@ -124,7 +134,8 @@ public class SongActionListenerImpl implements OnSongActionListener {
             }
             i++;
         }
-        throw new RuntimeException("songsDialogGetSongType out of index: " + index);
+        return -1;
+//        throw new RuntimeException("songsDialogGetSongType out of index: " + index);
     }
 
     public static List<SongItem> transSongModel(@Nullable List<RoomSelSongModel> data) {

@@ -7,7 +7,7 @@ import io.agora.scene.show.R
 import io.agora.scene.show.VideoSetting
 import io.agora.scene.show.databinding.ShowSettingPresetDialogBinding
 
-class PresetDialog(context: Context) : BottomFullDialog(context) {
+class PresetDialog constructor(context: Context) : BottomFullDialog(context) {
 
     private val mBinding by lazy {
         ShowSettingPresetDialogBinding.inflate(

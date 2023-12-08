@@ -6,8 +6,6 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -18,17 +16,17 @@
         <activity
             android:name=".RoomListActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="behind" />
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".LivePrepareActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="behind" />
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".LiveDetailActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="behind"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing" />
 
     </application>

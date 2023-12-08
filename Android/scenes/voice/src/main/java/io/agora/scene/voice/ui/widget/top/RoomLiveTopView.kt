@@ -48,6 +48,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         binding.mtChatroomNotice.setOnClickListener(this)
         binding.mtChatroomAgoraSound.setOnClickListener(this)
         binding.mtChatroomWatch.setOnClickListener(this)
+        binding.ivChatroomMore.setOnClickListener(this)
 
     }
 
@@ -173,15 +174,17 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
     override fun onClick(v: View?) {
         when (v?.id) {
             // 返回
-            binding.ivChatroomBack.id -> {onLiveTopClickListener?.onClickBack(v)}
+            binding.ivChatroomBack.id -> onLiveTopClickListener?.onClickBack(v)
             // 公告
-            binding.mtChatroomNotice.id -> {onLiveTopClickListener?.onClickNotice(v)}
+            binding.mtChatroomNotice.id -> onLiveTopClickListener?.onClickNotice(v)
             //音效
-            binding.mtChatroomAgoraSound.id -> {onLiveTopClickListener?.onClickSoundSocial(v)}
+            binding.mtChatroomAgoraSound.id -> onLiveTopClickListener?.onClickSoundSocial(v)
             // 排行榜
-            binding.llChatroomMemberRank.id ->{onLiveTopClickListener?.onClickRank(v,0)}
+            binding.llChatroomMemberRank.id -> onLiveTopClickListener?.onClickRank(v, 0)
             // 成员列表
-            binding.mtChatroomMembers.id -> {onLiveTopClickListener?.onClickRank(v,1)}
+            binding.mtChatroomMembers.id -> onLiveTopClickListener?.onClickRank(v, 1)
+            // 更多
+            binding.ivChatroomMore.id -> onLiveTopClickListener?.onClickMore(v)
         }
     }
 }

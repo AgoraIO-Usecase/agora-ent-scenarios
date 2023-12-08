@@ -40,7 +40,7 @@
         <item name="android:paddingTop">5dp</item>
         <item name="android:paddingBottom">5dp</item>
         <item name="android:textColor">@color/voice_white</item>
-        <item name="android:textSize">@dimen/voice_sp_11</item>
+        <item name="android:textSize">@dimen/voice_sp_12</item>
         <item name="android:gravity">center</item>
         <item name="android:background">@drawable/voice_bg_rect_radius13_black20</item>
     </style>

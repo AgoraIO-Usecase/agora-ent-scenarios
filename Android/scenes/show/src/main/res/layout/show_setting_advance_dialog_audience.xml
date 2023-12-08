@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/white"
     tools:theme="@style/Theme.AppCompat"
+    android:paddingTop="@dimen/base_status_height"
     android:orientation="vertical">
 
     <FrameLayout

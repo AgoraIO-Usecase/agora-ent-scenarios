@@ -10,6 +10,11 @@ interface OnLiveTopClickListener {
     fun onClickBack(view: View)
 
     /**
+     * 更多
+     */
+    fun onClickMore(view: View)
+
+    /**
      * 排行榜
      */
     fun onClickRank(view: View)

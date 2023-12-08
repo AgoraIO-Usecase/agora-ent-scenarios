@@ -27,6 +27,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.viewbinding.ViewBinding;
 
 import java.util.ArrayList;
@@ -133,6 +137,7 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         }
         if (VERSION.SDK_INT < Build.VERSION_CODES.M) {
             mPermissionArray = new PermissionItem[1];
+            mPermissionArray[0] = new PermissionItem(Manifest.permission.READ_EXTERNAL_STORAGE, PERM_REQID_RDSTORAGE);
             for (PermissionItem item : mPermissionArray) {
                 item.granted = true;
             }
@@ -162,6 +167,7 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         }
         if (VERSION.SDK_INT < Build.VERSION_CODES.M) {
             mPermissionArray = new PermissionItem[1];
+            mPermissionArray[0] = new PermissionItem(Manifest.permission.CAMERA, PERM_REQID_CAMERA);
             for (PermissionItem item : mPermissionArray) {
                 item.granted = true;
             }
@@ -192,6 +198,7 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         }
         if (VERSION.SDK_INT < Build.VERSION_CODES.M) {
             mPermissionArray = new PermissionItem[1];
+            mPermissionArray[0] = new PermissionItem(Manifest.permission.RECORD_AUDIO, PERM_REQID_RECORD_AUDIO);
             for (PermissionItem item : mPermissionArray) {
                 item.granted = true;
             }
@@ -411,5 +418,13 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
 //                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION//| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 //                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);//| View.SYSTEM_UI_FLAG_FULLSCREEN
 //        }
+    }
+
+    protected void setOnApplyWindowInsetsListener(View view){
+        ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
+            Insets inset = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            view.setPaddingRelative(inset.left, inset.top, inset.right, inset.bottom);
+            return WindowInsetsCompat.CONSUMED;
+        });
     }
 }

@@ -68,10 +68,10 @@ public class UserAgreementDialog2 extends BaseDialog<io.agora.scene.widget.datab
 
     @Override
     protected void setGravity() {
-        getWindow().setLayout(
-                UiUtil.dp2px(280),
-                UiUtil.dp2px(200)
-        );
+//        getWindow().setLayout(
+//                UiUtil.dp2px(280),
+//                UiUtil.dp2px(200)
+//        );
         getWindow().getAttributes().gravity = Gravity.CENTER;
     }
 }

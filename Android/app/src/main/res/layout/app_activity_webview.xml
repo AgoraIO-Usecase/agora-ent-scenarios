@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/superLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -9,7 +10,7 @@
     <io.agora.scene.widget.CommonTitleView
         android:id="@+id/title_view"
         style="@style/title_view"
-        app:ctv_centerText=""
+        app:ctv_centerText="@string/app_name"
         tools:ignore="MissingConstraints" />
 
     <io.agora.scene.widget.CustomWebView

@@ -1,5 +1,6 @@
 package io.agora.scene.show.widget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +9,9 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.slider.Slider
 import com.google.android.material.tabs.TabLayoutMediator
+import io.agora.rtc2.RtcConnection
 import io.agora.scene.show.R
 import io.agora.scene.show.VideoSetting
 import io.agora.scene.show.VideoSetting.toIndex
@@ -20,7 +23,7 @@ import java.util.*
 /**
  * 高级设置弹窗
  */
-class AdvanceSettingDialog(context: Context) : BottomFullDialog(context) {
+class AdvanceSettingDialog constructor(context: Context,val rtcConnection: RtcConnection) : BottomFullDialog(context) {
 
     companion object {
         private const val ITEM_ID_SWITCH_BASE = 0x00000001
@@ -351,18 +354,35 @@ class AdvanceSettingDialog(context: Context) : BottomFullDialog(context) {
         binding.slider.value = defaultValue
         binding.tvValue.text = String.format(Locale.US, valueFormat, binding.slider.value.toInt())
         binding.slider.clearOnChangeListeners()
+        binding.slider.clearOnSliderTouchListeners()
         onSeekbarChanged(itemId, defaultValue.toInt())
-        binding.slider.addOnChangeListener { _, nValue, fromUser ->
+        var changed = false
+        binding.slider.addOnChangeListener { status, nValue, fromUser ->
             if (fromUser) {
                 if (checkPresetMode()) {
                     binding.slider.value = defaultValue
                 } else {
                     binding.tvValue.text = String.format(Locale.US, valueFormat, nValue.toInt())
                     defaultItemValues[itemId] = nValue.toInt()
-                    onSeekbarChanged(itemId, nValue.toInt())
+                    changed = true
                 }
             }
         }
+        binding.slider.addOnSliderTouchListener(object: Slider.OnSliderTouchListener {
+            @SuppressLint("RestrictedApi")
+            override fun onStartTrackingTouch(slider: Slider) {
+
+            }
+
+            @SuppressLint("RestrictedApi")
+            override fun onStopTrackingTouch(slider: Slider) {
+                if(changed){
+                    onSeekbarChanged(itemId, slider.value.toInt())
+                    changed = false
+                }
+            }
+        })
+
     }
 
     private fun checkPresetMode(): Boolean {
@@ -392,7 +412,7 @@ class AdvanceSettingDialog(context: Context) : BottomFullDialog(context) {
             ITEM_ID_SEEKBAR_VOCAL_VOLUME -> VideoSetting.updateBroadcastSetting(
                 recordingSignalVolume = value
             )
-            ITEM_ID_SEEKBAR_MUSIC_VOLUME -> VideoSetting.updateBroadcastSetting(audioMixingVolume = value)
+            ITEM_ID_SEEKBAR_MUSIC_VOLUME -> VideoSetting.updateBroadcastSetting(rtcConnection, audioMixingVolume = value)
         }
     }
 

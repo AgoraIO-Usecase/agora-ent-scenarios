@@ -48,7 +48,8 @@ object RtcEngineInstance {
                 config.mEventHandler = object : IRtcEngineEventHandler() {
                     override fun onError(err: Int) {
                         super.onError(err)
-                        ToastUtils.showToast(
+                        ShowLogger.d(
+                            "RtcEngineInstance",
                             "Rtc Error code:$err, msg:" + RtcEngine.getErrorDescription(err)
                         )
                     }

@@ -47,6 +47,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
 //        binding.mtChatroomMembers.setOnClickListener(this)
         binding.mtChatroomNotice.setOnClickListener(this)
         binding.llChatroomAgoraSound.setOnClickListener(this)
+        binding.ivChatroomMore.setOnClickListener(this)
 
     }
 
@@ -59,10 +60,10 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
     fun setRoomType(roomType: Int) {
         // 3D空间音频
         if (roomType == 1) {
-            binding.ivChatroomOwner.visibility = GONE // 头像
-            binding.llTitle.visibility = GONE // 标题栏（包含房间名与房主名）
-            binding.iv3DLogo.visibility = VISIBLE // xxx
-            binding.tvChatroomName.visibility = VISIBLE // xxx
+            binding.ivChatroomOwner.visibility = VISIBLE // 头像
+            binding.llTitle.visibility = VISIBLE // 标题栏（包含房间名与房主名）
+            binding.iv3DLogo.visibility = INVISIBLE // xxx
+            binding.tvChatroomName.visibility = INVISIBLE // xxx
             binding.mtChatroomGifts.visibility = GONE // 排行榜
         }
         // 其他房间类型
@@ -89,6 +90,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             mtChatroomWatch.text = watchText
             // 普通房间显示 最佳音效
             if (roomDetailInfo.roomType == ConfigConstants.RoomType.Common_Chatroom) {
+                mtChatroomAgoraSound.isVisible = true
                 llChatroomAgoraSound.isVisible = true
                 ivIcon.isVisible = false
                 mtChatroomAgoraSound.text = when (roomDetailInfo.soundEffect) {
@@ -105,6 +107,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
                 mtChatroomAgoraSound.text = root.context.getString(R.string.voice_chatroom_beginner_guide)
             } else {
                 llChatroomAgoraSound.isVisible = false
+                mtChatroomAgoraSound.isVisible = false
             }
 
             // 房主头像
@@ -207,6 +210,8 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             binding.mtChatroomNotice -> onLiveTopClickListener?.onClickNotice(v)
             //音效
             binding.llChatroomAgoraSound -> onLiveTopClickListener?.onClickSoundSocial(v)
+            // 更多
+            binding.ivChatroomMore -> onLiveTopClickListener?.onClickMore(v)
         }
     }
 }

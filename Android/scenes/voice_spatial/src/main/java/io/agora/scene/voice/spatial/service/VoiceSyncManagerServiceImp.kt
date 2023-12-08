@@ -24,7 +24,7 @@ class VoiceSyncManagerServiceImp(
     private val errorHandler: ((Exception?) -> Unit)?
 ) : VoiceServiceProtocol {
 
-    private val voiceSceneId = "scene_spatialChatRoom"
+    private val voiceSceneId = "scene_spatialChatRoom_3.0.0"
     private val kCollectionIdUser = "user_collection"
     private val kCollectionIdSeatInfo = "seat_info_collection"
     private val kCollectionIdSeatApply = "show_seat_apply_collection"
@@ -1091,29 +1091,25 @@ class VoiceSyncManagerServiceImp(
         mSceneReference?.collection(kCollectionIdUser)?.subscribe(listener)
     }
 
+    /** 获取空麦位
+     *
+     * 传入某个index，当该麦位可用的时候使用该麦位，不可用的时候往下顺延至有效麦位
+     */
     private fun selectEmptySeat(index: Int) : Int {
-        var micIndex = index
+        // 判断该麦位是否可用
+        val toSeat = micSeatMap[index.toString()]
+        if (toSeat != null && toSeat.member == null && toSeat.micStatus == MicStatus.Idle) {
+            return index
+        }
+        var toIndex = -1
         for (i in 1 until 5) {
-            if (micIndex == -1 && i != 3) {
-                if (!micSeatMap.containsKey(i.toString())) {
-                    micIndex = i
-                    break
-                }
-                if (micSeatMap[i.toString()]?.member == null) {
-                    micIndex = i
-                    break
-                }
+            val toSeat = micSeatMap[i.toString()]
+            if (toSeat != null && toSeat.member == null && toSeat.micStatus == MicStatus.Idle) {
+                toIndex = i
+                break
             }
         }
-        if (micIndex == -1) {
-            if (!micSeatMap.containsKey("0")) {
-                micIndex = 0
-            }
-            if (micSeatMap["0"]?.member == null) {
-                micIndex = 0
-            }
-        }
-        return micIndex
+        return toIndex
     }
 
     // ----------------------------- 上麦申请 -----------------------------

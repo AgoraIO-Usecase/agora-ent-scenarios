@@ -86,6 +86,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         return mKaraokeView;
     }
 
+    @Override
+    public void onHighPartTime(long highStartTime, long highEndTime) {
+
+    }
+
     public enum Role {
         Singer, Listener, CoSinger
     }

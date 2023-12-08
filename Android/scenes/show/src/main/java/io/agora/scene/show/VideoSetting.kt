@@ -14,12 +14,14 @@ object VideoSetting {
         //1.5倍：  n=8
         //2倍：     n=3
         //锐化：    n=10(android是10，iOS是11)
+        //超级画质  n=20
         SR_1(6),
         SR_1_33(7),
         SR_1_5(8),
         SR_2(3),
         SR_SHARP(10),
-        SR_NONE(0)
+        SR_NONE(0),
+        SR_SUPER(20)
     }
 
     enum class Resolution(val width: Int, val height: Int) {
@@ -509,8 +511,7 @@ object VideoSetting {
     ) {
         val rtcEngine = RtcEngineInstance.rtcEngine
         SR?.let {
-            // pk 中关闭超分
-            val enableSR = currAudienceEnhanceSwitch && SR != SuperResolution.SR_NONE && !isPkMode
+            val enableSR = currAudienceEnhanceSwitch && SR != SuperResolution.SR_NONE
             ShowLogger.d(
                 "VideoSetting",
                 "SR_Config -- enable=$enableSR sr_type=$SR currAudienceEnhanceSwitch=$currAudienceEnhanceSwitch"
@@ -519,13 +520,19 @@ object VideoSetting {
             if (enableSR) {
                 // 设置最大分辨率
                 rtcEngine.setParameters("{\"rtc.video.sr_max_wh\":921600}")
+                // 在切换时必须先关闭sr再设置倍数再打开,，即
+                //i.   "rtc.video.enable_sr":("enabled": false, "mode" :2)
+                //ii.  "rtc.video.sr_type"：（超分倍数类型 推荐3、7、20）
+                //iii. "rtc.video.enable_sr": {"enabled": true, "mode":2)
+                rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":false, \"mode\": 2}}")
                 /**
                  * 超分倍数选项
                  * 1倍：      n=6
                  * 1.33倍:   n=7
                  * 1.5倍：   n=8
                  * 2倍：     n=3
-                 * 锐化：    n=10(android是10，iOS是11)
+                 * 锐化：    n=10(android是10，iOS是11)Å
+                 * 超级画质： n=20
                  */
                 rtcEngine.setParameters("{\"rtc.video.sr_type\":${SR.value}}")
             }
@@ -555,6 +562,7 @@ object VideoSetting {
     ) {
         val rtcEngine = RtcEngineInstance.rtcEngine
         val videoEncoderConfiguration = RtcEngineInstance.videoEncoderConfiguration
+        val videoSwitcher = RtcEngineInstance.videoSwitcher
         h265?.let {
             if (!isJoinedRoom) {
                 // 只能在加入房间前设置，否则rtc sdk会崩溃
@@ -616,7 +624,12 @@ object VideoSetting {
             rtcEngine.adjustRecordingSignalVolume(it)
         }
         audioMixingVolume?.let {
-            rtcEngine.adjustAudioMixingVolume(it)
+            // fix 播放用的是mpk
+            if (rtcConnection != null) {
+                videoSwitcher.adjustAudioMixingVolume(rtcConnection, it)
+            } else {
+                rtcEngine.adjustAudioMixingVolume(it)
+            }
         }
     }
 

@@ -60,10 +60,10 @@ public class CommonDialog extends BaseDialog<DialogCommonBinding> {
 
     @Override
     protected void setGravity() {
-        getWindow().setLayout(
-                UiUtil.dp2px(300),
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
+//        getWindow().setLayout(
+//                UiUtil.dp2px(300),
+//                ViewGroup.LayoutParams.WRAP_CONTENT
+//        );
         getWindow().getAttributes().gravity = Gravity.CENTER;
     }
 }

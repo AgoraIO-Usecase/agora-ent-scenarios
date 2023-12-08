@@ -277,8 +277,8 @@ class VoiceRoomLivingViewModel : ViewModel() {
     }
 
     //取消上麦
-    fun cancelMicSeatApply(chatUid: String) {
-        _cancelMicSeatApplyObservable.setSource(mRepository.cancelMicSeatApply(chatUid))
+    fun cancelMicSeatApply(chatroomId: String, chatUid: String) {
+        _cancelMicSeatApplyObservable.setSource(mRepository.cancelMicSeatApply(chatroomId, chatUid))
     }
 
     // 换麦

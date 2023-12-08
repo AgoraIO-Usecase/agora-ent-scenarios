@@ -31,10 +31,10 @@ public class CloseRoomDialog extends BaseDialog<DialogCloseRoomBinding> {
 
     @Override
     protected void setGravity() {
-        getWindow().setLayout(
-                UiUtil.dp2px(300),
-                UiUtil.dp2px(120)
-        );
+//        getWindow().setLayout(
+//                UiUtil.dp2px(300),
+//                UiUtil.dp2px(120)
+//        );
         getWindow().getAttributes().gravity = Gravity.CENTER;
     }
 }

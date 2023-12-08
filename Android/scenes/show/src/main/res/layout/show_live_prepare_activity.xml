@@ -17,6 +17,7 @@
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
         android:orientation="horizontal"
+        android:paddingTop="@dimen/base_status_height"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView

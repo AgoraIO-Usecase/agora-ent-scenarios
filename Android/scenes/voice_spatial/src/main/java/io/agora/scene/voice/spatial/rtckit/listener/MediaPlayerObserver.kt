@@ -12,7 +12,7 @@ open class MediaPlayerObserver : IMediaPlayerObserver {
     override fun onPlayerStateChanged(state: Constants.MediaPlayerState?, error: Constants.MediaPlayerError?) {
     }
 
-    override fun onPositionChanged(position_ms: Long) {
+    override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
     }
 
     override fun onPlayerEvent(eventCode: Constants.MediaPlayerEvent?, elapsedTime: Long, message: String?) {

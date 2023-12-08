@@ -48,7 +48,7 @@ ext {
             gson              : 'com.google.code.gson:gson:2.9.0',
             autosize          : 'com.github.JessYanCoding:AndroidAutoSize:v1.2.1',
 
-            rtc               : 'io.agora.rtc:full-sdk:4.1.1',
+            rtc               : 'io.agora.rtc:agora-special-full:4.1.1.142',
             rtm               : 'com.github.agorabuilder:rtm-sdk:1.4.10',
             syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.2.4',
             lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.1.1-beta.8',
@@ -58,14 +58,12 @@ ext {
             recyclerview       : "androidx.recyclerview:recyclerview:1.2.1",
             databinding_runtime: "androidx.databinding:databinding-runtime:4.2.2",
 
-            easypermissions    : "pub.devrel:easypermissions:3.0.0",
-
-            // rtc && im
-//            agora_rtc          : 'io.agora.rtc:full-sdk:4.0.1',
+            // im
             agora_im           : 'io.agora.rtm:rtm-sdk:1.5.0',
             bugly              : 'com.tencent.bugly:crashreport:4.0.4',
             svga_player        : 'com.github.yyued:SVGAPlayer-Android:2.6.1',
             agora_chat         : 'io.agora.rtc:chat-sdk:1.1.0',
+            ok2curl            : 'com.github.mrmike:ok2curl:0.8.0',
     ]
     android = [
             compileSdkVersion: 31,

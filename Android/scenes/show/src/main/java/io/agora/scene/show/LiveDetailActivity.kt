@@ -1,28 +1,33 @@
 package io.agora.scene.show
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.SparseArray
 import android.view.LayoutInflater
+import android.view.View
 import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import io.agora.rtc2.RtcConnection
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.show.databinding.ShowLiveDetailActivityBinding
 import io.agora.scene.show.service.ROOM_AVAILABLE_DURATION
 import io.agora.scene.show.service.ShowRoomDetailModel
-import io.agora.scene.show.utils.PermissionHelp
+import io.agora.scene.show.utils.RunnableWithDenied
+import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 
 
-class LiveDetailActivity : AppCompatActivity() , LiveDetailFragment.OnMeLinkingListener {
+class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding>(), LiveDetailFragment.OnMeLinkingListener {
     private val TAG = "LiveDetailActivity"
 
     companion object {
@@ -50,8 +55,6 @@ class LiveDetailActivity : AppCompatActivity() , LiveDetailFragment.OnMeLinkingL
         }
     }
 
-    internal lateinit var mPermissionHelp: PermissionHelp
-
     private val mRoomInfoList by lazy {
         intent.getParcelableArrayListExtra<ShowRoomDetailModel>(
             EXTRA_ROOM_DETAIL_INFO_LIST
@@ -63,26 +66,81 @@ class LiveDetailActivity : AppCompatActivity() , LiveDetailFragment.OnMeLinkingL
             true
         )
     }
-    private val mBinding by lazy { ShowLiveDetailActivityBinding.inflate(LayoutInflater.from(this)) }
 
     private val mVideoSwitcher by lazy { RtcEngineInstance.videoSwitcher }
-
 
     private val POSITION_NONE = -1
     private val vpFragments = SparseArray<LiveDetailFragment>()
     private var currLoadPosition = POSITION_NONE
 
-    override fun onMeLinking(isLinking: Boolean) {
-        // 连麦观众禁止切换房间
-        mBinding.viewPager2.isUserInputEnabled = !isLinking
+    private var toggleVideoRun: RunnableWithDenied? = null
+    private var toggleAudioRun: Runnable? = null
+
+    override fun getPermissions() {
+        if (toggleVideoRun != null) {
+            toggleVideoRun?.run()
+            toggleVideoRun = null
+        }
+        if (toggleAudioRun != null) {
+            toggleAudioRun?.run()
+            toggleAudioRun = null
+        }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+
+    fun toggleSelfVideo(isOpen: Boolean, callback : (result:Boolean) -> Unit) {
+        if (isOpen) {
+            toggleVideoRun = object :RunnableWithDenied(){
+                override fun onDenied() {
+                    callback.invoke(false)
+                }
+
+                override fun run() {
+                    callback.invoke(true)
+                }
+            }
+            requestCameraPermission(true)
+        } else {
+            callback.invoke(true)
+        }
+    }
+
+    fun toggleSelfAudio(isOpen: Boolean, callback : () -> Unit) {
+        if (isOpen) {
+            toggleAudioRun = Runnable {
+                callback.invoke()
+            }
+            requestRecordPermission(true)
+        } else {
+            callback.invoke()
+        }
+    }
+    override fun onPermissionDined(permission: String?) {
+        if (toggleVideoRun != null && permission == Manifest.permission.CAMERA) {
+            toggleVideoRun?.onDenied()
+        }
+        PermissionLeakDialog(this).show(permission, { getPermissions() }
+        ) { launchAppSetting(permission) }
+    }
+
+    override fun onMeLinking(isLinking: Boolean) {
+        // 连麦观众禁止切换房间
+        binding.viewPager2.isUserInputEnabled = !isLinking
+    }
+
+    override fun getViewBinding(inflater: LayoutInflater): ShowLiveDetailActivityBinding {
+        return  ShowLiveDetailActivityBinding.inflate(inflater)
+    }
+
+    override fun initView(savedInstanceState: Bundle?) {
+        super.initView(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, false)
-        setContentView(mBinding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.viewPager2) { v: View?, insets: WindowInsetsCompat ->
+            val inset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            binding.viewPager2.setPaddingRelative(inset.left, 0, inset.right, inset.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        mPermissionHelp = PermissionHelp(this)
 
         val selectedRoomIndex = intent.getIntExtra(EXTRA_ROOM_DETAIL_INFO_LIST_SELECTED_INDEX, 0)
 
@@ -101,7 +159,7 @@ class LiveDetailActivity : AppCompatActivity() , LiveDetailFragment.OnMeLinkingL
         })
 
         // 设置vp当前页面外的页面数
-        mBinding.viewPager2.offscreenPageLimit = preloadCount - 2
+        binding.viewPager2.offscreenPageLimit = preloadCount - 2
         val fragmentAdapter = object : FragmentStateAdapter(this) {
             override fun getItemCount() = if (mScrollable) Int.MAX_VALUE else 1
 
@@ -113,16 +171,16 @@ class LiveDetailActivity : AppCompatActivity() , LiveDetailFragment.OnMeLinkingL
                 }
                 return LiveDetailFragment.newInstance(roomInfo).apply {
                     vpFragments.put(position, this)
-                    if (position == mBinding.viewPager2.currentItem) {
+                    if (position == binding.viewPager2.currentItem) {
                         startLoadPageSafely()
                     }
                 }
             }
         }
-        mBinding.viewPager2.adapter = fragmentAdapter
-        mBinding.viewPager2.isUserInputEnabled = mScrollable
+        binding.viewPager2.adapter = fragmentAdapter
+        binding.viewPager2.isUserInputEnabled = mScrollable
         if (mScrollable) {
-            mBinding.viewPager2.registerOnPageChangeCallback(object : OnPageChangeCallback() {
+            binding.viewPager2.registerOnPageChangeCallback(object : OnPageChangeCallback() {
 
                 private val PRE_LOAD_OFFSET = 0.01f
 
@@ -136,9 +194,9 @@ class LiveDetailActivity : AppCompatActivity() , LiveDetailFragment.OnMeLinkingL
                     super.onPageScrollStateChanged(state)
                     Log.d(TAG, "PageChange onPageScrollStateChanged state=$state hasPageSelected=$hasPageSelected")
                     when(state){
-                        ViewPager2.SCROLL_STATE_SETTLING -> mBinding.viewPager2.isUserInputEnabled = false
+                        ViewPager2.SCROLL_STATE_SETTLING -> binding.viewPager2.isUserInputEnabled = false
                         ViewPager2.SCROLL_STATE_IDLE -> {
-                            mBinding.viewPager2.isUserInputEnabled = true
+                            binding.viewPager2.isUserInputEnabled = true
                             if(!hasPageSelected){
                                 if(preLoadPosition != POSITION_NONE){
                                     vpFragments[preLoadPosition]?.stopLoadPage()
@@ -201,7 +259,7 @@ class LiveDetailActivity : AppCompatActivity() , LiveDetailFragment.OnMeLinkingL
                 }
 
             })
-            mBinding.viewPager2.setCurrentItem(
+            binding.viewPager2.setCurrentItem(
                 Int.MAX_VALUE / 2 - Int.MAX_VALUE / 2 % mRoomInfoList.size + selectedRoomIndex,
                 false
             )
