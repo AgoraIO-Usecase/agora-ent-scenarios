@@ -61,7 +61,8 @@ import UIKit
     case playerUnsredAndPlaying
     case resultOwner
     case resultAudience
-
+    case ownerFailed
+    case playerFailed
 }
 
 class VLSRStatusView: UIView {
@@ -149,6 +150,34 @@ class VLSRStatusView: UIView {
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
                 contentTextLabel.text = getLocalizeString(with: "sr_bro_choose")
+                lrcView.isHidden = false
+                lrcView.state = .singingAudience
+                orderBtn.isHidden = true
+                nextBtn.isHidden = true
+                noticeBtn.isHidden = false
+                srBtn.isHidden = true
+                notiView.isHidden = true
+            } else if state == .ownerFailed {
+                //显示歌曲的序号 同时需要修改布局
+                numLabel.isHidden = true
+                contentImgView.isHidden = true
+                tableView.isHidden = true
+                resultTitleLabel.isHidden = true
+                contentTextLabel.isHidden = true
+                lrcView.isHidden = false
+                lrcView.state = .ownerChangeSongOnly
+                orderBtn.isHidden = true
+                nextBtn.isHidden = true
+                noticeBtn.isHidden = false
+                srBtn.isHidden = true
+                notiView.isHidden = true
+            }  else if state == .playerFailed {
+                //显示歌曲的序号 同时需要修改布局
+                numLabel.isHidden = true
+                contentImgView.isHidden = true
+                tableView.isHidden = true
+                resultTitleLabel.isHidden = true
+                contentTextLabel.isHidden = true
                 lrcView.isHidden = false
                 lrcView.state = .singingAudience
                 orderBtn.isHidden = true
@@ -627,6 +656,7 @@ class VLSRStatusView: UIView {
             make.top.equalTo(10)
             make.height.equalTo(20)
         }
+        nextAttrView.isHidden = true
         
         addSubview(noticeBtn)
         
