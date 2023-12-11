@@ -5,19 +5,18 @@ import android.util.Log
 import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
-import io.agora.musiccontentcenter.Music
 import io.agora.rtc2.*
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.model.SoundAudioBean
-import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.scene.voice.rtckit.listener.MediaPlayerObserver
 import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
-import io.agora.scene.voice.global.VoiceBuddyFactory
-import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.constant.ConfigConstants
+import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.LogTools.logE
+import io.agora.voice.common.utils.ThreadManager
 
 /**
  * @author create by zhangwei03
@@ -170,6 +169,7 @@ class AgoraRtcEngineController {
             config.addExtension("agora_ai_echo_cancellation_extension")
             try {
                 rtcEngine = RtcEngineEx.create(config) as RtcEngineEx?
+                rtcEngine?.setParameters("{\"che.audio.input_sample_rate\" : 48000}")
             } catch (e: Exception) {
                 e.printStackTrace()
                 "voice rtc engine init error:${e.message}".logE(TAG)
