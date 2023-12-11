@@ -740,8 +740,12 @@ class LiveDetailFragment : Fragment() {
     private fun showSettingDialog() {
         mSettingDialog.apply {
             setHostView(isRoomOwner || isMeLinking())
-            if (isMeLinking() || (isRoomOwner && isPKing())) {
+            if (isMeLinking()) {
                 resetSettingsItem(interactionInfo!!.muteAudio)
+            }
+
+            if (isRoomOwner && isPKing()) {
+                resetSettingsItem(interactionInfo!!.ownerMuteAudio)
             }
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
