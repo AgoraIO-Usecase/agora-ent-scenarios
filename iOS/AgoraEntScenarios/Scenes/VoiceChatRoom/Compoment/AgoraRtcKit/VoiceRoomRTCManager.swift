@@ -319,6 +319,7 @@ public let kMPK_RTC_UID: UInt = 1
         }
         setAINS(with: .mid)
         rtcKit.setParameters("{\"che.audio.start_debug_recording\":\"all\"}")
+        rtcKit.setParameters("{\"che.audio.input_sample_rate\":48000}")
         rtcKit.setEnableSpeakerphone(true)
         rtcKit.setDefaultAudioRouteToSpeakerphone(true)
         let mediaOption = AgoraRtcChannelMediaOptions()

@@ -1501,7 +1501,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
   self.cosingerLoadCount = 0;
   self.MainSingerPlayFlag = false;
   self.hasCountDown = false;
-  self.currentIndex = 0;
+  self.currentIndex = 1;
   [self.SRApi stopSing];
   [self.statusView resetLrcView];
   [self.SRApi switchSingerRoleWithNewRole:KTVSingRoleAudience onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason)     {
@@ -2060,7 +2060,7 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
         self.cosingerLoadCount = 0;
         self.MainSingerPlayFlag = false;
         self.hasCountDown = false;
-        self.currentIndex = 0;
+        self.currentIndex = 1;
         [self.SRApi stopSing];
         [self.statusView resetLrcView];
         [self.SRApi switchSingerRoleWithNewRole:KTVSingRoleAudience onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
