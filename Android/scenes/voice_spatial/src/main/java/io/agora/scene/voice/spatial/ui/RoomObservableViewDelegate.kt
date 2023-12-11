@@ -58,7 +58,7 @@ class RoomObservableViewDelegate constructor(
     private var localUserMicInfo: VoiceMicInfoModel? = null
 
     /**举手dialog*/
-    private var handsDialog: ChatroomHandsDialog? = null
+//    private var handsDialog: ChatroomHandsDialog? = null
 
     /**申请上麦标志*/
     private var isRequesting: Boolean = false
@@ -819,20 +819,20 @@ class RoomObservableViewDelegate constructor(
 
     /**房主举手弹框*/
     fun showOwnerHandsDialog(micIndex: Int) {
-        handsDialog = activity.supportFragmentManager.findFragmentByTag("room_hands") as ChatroomHandsDialog?
+        var handsDialog = activity.supportFragmentManager.findFragmentByTag("room_hands") as ChatroomHandsDialog?
         if (handsDialog == null) {
-            handsDialog = ChatroomHandsDialog.newInstance
+            handsDialog = ChatroomHandsDialog()
+            handsDialog.setFragmentListener(object : ChatroomHandsDialog.OnFragmentListener {
+                override fun onAcceptMicSeatApply(voiceMicInfoModel: VoiceMicInfoModel) {
+                    // 更新麦位
+                    val newMicMap = mutableMapOf(voiceMicInfoModel.micIndex to voiceMicInfoModel)
+                    dealMicDataMap(newMicMap)
+                    updateViewByMicMap(newMicMap)
+                }
+            })
+            handsDialog.setMicIndex(micIndex)
+            handsDialog.show(activity.supportFragmentManager, "room_hands")
         }
-        handsDialog?.setFragmentListener(object : ChatroomHandsDialog.OnFragmentListener {
-            override fun onAcceptMicSeatApply(voiceMicInfoModel: VoiceMicInfoModel) {
-                // 更新麦位
-                val newMicMap = mutableMapOf(voiceMicInfoModel.micIndex to voiceMicInfoModel)
-                dealMicDataMap(newMicMap)
-                updateViewByMicMap(newMicMap)
-            }
-        })
-        handsDialog?.setMicIndex(micIndex)
-        handsDialog?.show(activity.supportFragmentManager, "room_hands")
         chatPrimaryMenuView.setShowHandStatus(true, false)
     }
 
@@ -859,6 +859,7 @@ class RoomObservableViewDelegate constructor(
     }
 
     fun handsUpdate(index: Int) {
+        val handsDialog = activity.supportFragmentManager.findFragmentByTag("room_hands") as ChatroomHandsDialog?
         handsDialog?.update(index)
     }
 
@@ -1037,6 +1038,7 @@ class RoomObservableViewDelegate constructor(
             newMicMap.forEach { (t, u) ->
                 handsCheckMap[t] = u.member?.userId ?: ""
             }
+            val handsDialog = activity.supportFragmentManager.findFragmentByTag("room_hands") as ChatroomHandsDialog?
             handsDialog?.check(handsCheckMap)
         } else {
             chatPrimaryMenuView.setEnableHand(localUserIndex() >= 0)
