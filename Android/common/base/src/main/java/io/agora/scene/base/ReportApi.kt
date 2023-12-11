@@ -74,7 +74,7 @@ object ReportApi {
         postBody.put("sign", UUIDUtil.uuid("src=$src&ts=$ts").lowercase())
 
         val request = Request.Builder()
-            .url("https://report-ad.agoralab.co/v1/report")
+            .url("https://report-ad.shengwang.cn/v1/report")
             .addHeader("Content-Type", "application/json")
             .post(postBody.toString().toRequestBody())
             .build()

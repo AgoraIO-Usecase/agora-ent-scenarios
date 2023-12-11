@@ -921,9 +921,9 @@ public class RoomLivingViewModel extends ViewModel {
                                graspModel.headUrl = graspStatusMutableLiveData.getValue().headUrl;
                                graspModel.partNum = graspStatusMutableLiveData.getValue().partNum;
                            }
-                           graspStatusMutableLiveData.postValue(graspModel);
                            mLastPostSongPartChangeStatusTime = System.currentTimeMillis();
                            partNum = i + 2;
+                           graspStatusMutableLiveData.postValue(graspModel);
                            break;
                        } else if ((position_ms - relayList.get(i)) > -3000 && (position_ms - relayList.get(i) < -2000)) {
                            // 提前3s下一段提示

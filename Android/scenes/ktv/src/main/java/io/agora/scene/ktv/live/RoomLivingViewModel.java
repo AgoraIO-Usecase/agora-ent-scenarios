@@ -1422,6 +1422,7 @@ public class RoomLivingViewModel extends ViewModel {
         mRtcEngine.loadExtensionProvider("agora_drm_loader");
 
         mRtcEngine.setParameters("{\"che.audio.ains_mode\": -1}");
+        mRtcEngine.setParameters("{\"che.audio.input_sample_rate\" : 48000}");
 
         // ------------------ 场景化api初始化 ------------------
         ktvApiProtocol.initialize(new KTVApiConfig(
