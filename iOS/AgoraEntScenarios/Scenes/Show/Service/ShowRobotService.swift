@@ -15,13 +15,13 @@ class ShowRobotService {
     private let kRobotUid = 2000000001
     
     private let robotStreamURL = [
-        "https://download.agora.io/demo/test/agora_test_video_10.mp4",
-        "https://download.agora.io/demo/test/agora_test_video_11.mp4",
-        "https://download.agora.io/demo/test/agora_test_video_12.mp4"
+        "https://download.shengwang.cn/demo/test/agora_test_video_10.mp4",
+        "https://download.shengwang.cn/demo/test/agora_test_video_11.mp4",
+        "https://download.shengwang.cn/demo/test/agora_test_video_12.mp4"
     ]
     private let robotRoomIds = ["4", "5", "6"]
     private let robotRoomOwnerHeaders = [
-        "https://download.agora.io/demo/release/bot1.png"
+        "https://download.shengwang.cn/demo/release/bot1.png"
     ]
     public func startCloudPlayers() {
         robotRoomIds.forEach { robotId in

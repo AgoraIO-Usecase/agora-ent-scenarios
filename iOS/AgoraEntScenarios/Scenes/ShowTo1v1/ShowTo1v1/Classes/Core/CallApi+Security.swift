@@ -73,7 +73,7 @@ extension CallApiImpl {
                                      "traceId": NSString.withUUID().md5(),
                                      "src": "iOS",
                                      "payload": userInfo.yy_modelToJSONString()]
-        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/moderation/audio",
+        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.shengwang.cn/v1/moderation/audio",
                                           params: parasm) { response in
             showTo1v1Print("moderationAudio response === \(response)")
         } failure: { errr in

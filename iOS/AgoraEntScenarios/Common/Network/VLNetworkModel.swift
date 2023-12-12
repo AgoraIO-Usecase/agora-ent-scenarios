@@ -195,7 +195,7 @@ open class VLSceneConfigsNetworkModel: VLCommonNetworkModel {
     
     public override init() {
         super.init()
-//        host = "https://test-toolbox.bj2.agoralab.co"
+//        host = "https://test-toolbox.bj2.shengwang.cn"
         interfaceName = "/v1/configs/scene"
         method = .get
     }
