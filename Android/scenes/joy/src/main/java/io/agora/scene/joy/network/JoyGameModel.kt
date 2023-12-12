@@ -188,7 +188,10 @@ data class JoyGameResult constructor(
     var total: Int? = null,
     @Expose
     @SerializedName("task_id")
-    var taskId: String? = null
+    var taskId: String? = null,
+    @Expose
+    @SerializedName("carousel")
+    var bannerList: List<JoyGameBanner>? = null
 ) : JoyJsonModel
 
 data class JoyMessageEntity constructor(
@@ -247,6 +250,15 @@ data class JoySendMessage constructor(
     @SerializedName("payload")
     var payload: List<JoyMessageEntity>? = null,
 ) : JoyJsonModel
+
+data class JoyGameBanner constructor(
+    @Expose
+    @SerializedName("index")
+    var roomId: Int? = null,
+    @Expose
+    @SerializedName("url")
+    var url: String? = null,
+)
 
 enum class JoyGameStatus {
     schedule,

@@ -70,11 +70,14 @@ class JoyGameRepo constructor(private val service: JoyApiService) : BaseReposito
         executeResp({ service.startGame(entity = requestEntity) }, stateLiveData)
     }
 
-    suspend fun stopGame(gameId: String, taskId: String, stateLiveData: StateLiveData<JoyJsonModel.JoyEmpty>) {
+    suspend fun stopGame(roomId: String,gameId: String, taskId: String, stateLiveData: StateLiveData<JoyJsonModel
+        .JoyEmpty>) {
         val requestEntity = JoyGameEntity(
             appId = mAppId,
             src = mSrc,
             traceId = mTraceId,
+            roomId = roomId,
+            openId = mUser.id.toString(),
             gameId = gameId,
             taskId = taskId
         )
@@ -107,8 +110,8 @@ class JoyGameRepo constructor(private val service: JoyApiService) : BaseReposito
     }
 
     suspend fun sendComment(
-        gameId: String, roomId: String, content: String, stateLiveData:
-        StateLiveData<JoyJsonModel.JoyEmpty>
+        gameId: String, roomId: String, content: String,
+        stateLiveData: StateLiveData<JoyJsonModel.JoyEmpty>
     ) {
         val commentMsg = JoyMessageEntity(
             msgId = 32.getRandomString,
@@ -178,5 +181,10 @@ class JoyGameRepo constructor(private val service: JoyApiService) : BaseReposito
             rtcToken = rtcToken,
         )
         executeResp({ service.renewToken(entity = requestEntity) }, stateLiveData)
+    }
+
+    suspend fun getGameConfig(stateLiveData: StateLiveData<JoyGameResult>) {
+
+        executeResp({ service.gameConfig("game") }, stateLiveData)
     }
 }

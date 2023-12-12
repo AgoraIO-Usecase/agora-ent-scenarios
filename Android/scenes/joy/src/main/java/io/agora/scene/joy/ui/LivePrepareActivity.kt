@@ -17,9 +17,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import io.agora.rtc2.Constants
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.joy.R
@@ -27,6 +29,7 @@ import io.agora.scene.joy.RtcEngineInstance
 import io.agora.scene.joy.base.DataState
 import io.agora.scene.joy.databinding.JoyActivityLivePrepareBinding
 import io.agora.scene.joy.databinding.JoyItemGameBannerLayoutBinding
+import io.agora.scene.joy.network.JoyGameBanner
 import io.agora.scene.joy.network.JoyGameListResult
 import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.widget.dialog.PermissionLeakDialog
@@ -107,13 +110,9 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
             enableCrateRoomButton(false)
             mJoyService.createRoom(roomName, completion = { error, roomInfo ->
                 if (error == null && roomInfo != null) { // success
-                    if (mGameInfoAdapter.gameInfoList.isEmpty()) {
-                        ToastUtils.showToast("游戏资源获取中...")
-                    } else {
-                        mIsFinishToLiveDetail = true
-                        RoomLivingActivity.launch(this, roomInfo, mGameInfoAdapter.gameInfoList)
-                        finish()
-                    }
+                    mIsFinishToLiveDetail = true
+                    RoomLivingActivity.launch(this, roomInfo)
+                    finish()
                 } else { //failed
                     ToastUtils.showToast(error?.message)
                     enableCrateRoomButton(true)
@@ -169,15 +168,14 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
 
     override fun requestData() {
         super.requestData()
-        mJoyViewModel.getGames()
-        mJoyViewModel.mGameListLiveData.observe(this) {
+        mJoyViewModel.getGameConfig()
+        mJoyViewModel.mGameConfigLiveData.observe(this) {
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
-                    val list = it.data?.list
+                    val list = it.data?.bannerList
                     if (!list.isNullOrEmpty()) {
                         mGameInfoAdapter.setDataList(list)
                     }
-
                 }
             }
         }
@@ -260,14 +258,14 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
 
 
     class GameInfoAdapter constructor(
-        var gameInfoList: List<JoyGameListResult>,
+        var gameInfoList: List<JoyGameBanner>,
         private val itemClick: (position: Int) -> Unit
     ) :
         RecyclerView.Adapter<GameInfoAdapter.GameViewHolder>() {
 
         inner class GameViewHolder(val binding: JoyItemGameBannerLayoutBinding) : RecyclerView.ViewHolder(binding.root)
 
-        fun setDataList(list: List<JoyGameListResult>) {
+        fun setDataList(list: List<JoyGameBanner>) {
             gameInfoList = list
             notifyDataSetChanged()
         }
@@ -284,8 +282,11 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
 
         override fun onBindViewHolder(holder: GameViewHolder, position: Int) {
             val data = gameInfoList[position]
-            // TODO:
-            holder.binding.ivGuide.setImageResource(R.drawable.joy_banner_pkzb)
+            GlideApp.with(holder.binding.ivGuide)
+                .load(data.url)
+                .error(R.drawable.joy_banner_pkzb)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .into(holder.binding.ivGuide)
             holder.binding.root.setOnClickListener {
                 itemClick.invoke(position)
             }

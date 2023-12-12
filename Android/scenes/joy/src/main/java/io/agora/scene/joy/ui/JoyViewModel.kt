@@ -22,6 +22,7 @@ class JoyViewModel : BaseViewModel() {
         JoyGameRepo(mJoyApiService)
     }
 
+    val mGameConfigLiveData = StateLiveData<JoyGameResult>()
     val mGameListLiveData = StateLiveData<JoyGameResult>()
     val mGameDetailLiveData = StateLiveData<JoyGameDetailResult>()
     val mStartGameLiveData = StateLiveData<JoyGameResult>()
@@ -37,6 +38,12 @@ class JoyViewModel : BaseViewModel() {
 
     val mGamId: String
         get() = mGameDetail?.gameId ?: ""
+
+    fun getGameConfig() {
+        viewModelScope.launch {
+            mJoyGameRepo.getGameConfig(mGameConfigLiveData)
+        }
+    }
 
     fun getGames() {
         viewModelScope.launch {
@@ -71,9 +78,10 @@ class JoyViewModel : BaseViewModel() {
         }
     }
 
-    fun stopGame(gameId: String, taskId: String) {
+    fun stopGame(roomId: String, gameId: String, taskId: String) {
         viewModelScope.launch {
             mJoyGameRepo.stopGame(
+                roomId = roomId,
                 gameId = gameId,
                 taskId = taskId,
                 mStopGameLiveData

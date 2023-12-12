@@ -49,4 +49,11 @@ interface JoyApiService {
     suspend fun renewToken(
         @Body entity: JoyGameEntity
     ): JoyApiResult<JoyJsonModel.JoyEmpty>
+
+    @GET("/toolbox/v1/configs/{scenario}")
+    suspend fun gameConfig(
+        @Path("scenario") scenario: String
+    ): JoyApiResult<JoyGameResult>
 }
+
+//{"code":0,"data"data:{"carousel":[{"index":1,"url":""},{"index":2,"url":""},{"index":3,"url":""}]},"msg":"success", "tip":"this is demo api, don't use in production!"}

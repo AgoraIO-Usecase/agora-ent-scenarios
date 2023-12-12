@@ -1,5 +1,6 @@
 ext { joy_is_modular = false }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
+apply plugin: 'com.google.protobuf'
 
 final def VERSION_SCENE_KTV = "4.10.0"
 android {
@@ -8,6 +9,32 @@ android {
             applicationId "io.agora.scenes.joy"
         }
         buildConfigField "String", "VERSION", "\"${VERSION_SCENE_KTV}\""
+    }
+    sourceSets {
+        main {
+            //实际测试指不指定无所谓，不影响 Java 文件生成
+            proto {
+                srcDir 'src/main'
+            }
+        }
+    }
+}
+
+protobuf {
+    //配置 protoc 编译器
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.19.2'
+    }
+    //配置生成目录，编译后会在 build 的目录下生成对应的java文件
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                remove java
+            }
+            task.builtins {
+                java {}
+            }
+        }
     }
 }
 
@@ -30,7 +57,6 @@ dependencies {
 
     implementation rootProject.ext.deps.syncManager
 
-    implementation 'commons-codec:commons-codec:1.16.0'
-    implementation 'io.agora:authentication:2.0.0'
-
+    implementation 'com.google.protobuf:protobuf-java:3.19.3'
+    implementation 'com.google.protobuf:protobuf-java-util:3.19.3'
 }

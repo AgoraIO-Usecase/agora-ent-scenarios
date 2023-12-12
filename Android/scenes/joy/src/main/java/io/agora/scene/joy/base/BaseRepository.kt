@@ -1,5 +1,7 @@
 package io.agora.scene.joy.base
 
+import kotlin.reflect.KClass
+
 open class BaseRepository {
 
     companion object {
@@ -12,7 +14,11 @@ open class BaseRepository {
      * @param block api的请求方法
      * @param stateLiveData 每个请求传入相应的LiveData，主要负责网络状态的监听
      */
-    suspend fun <T : Any> executeResp(block: suspend () -> JoyApiResult<T>, stateLiveData: StateLiveData<T>) {
+    suspend inline fun <reified T : Any> executeResp(
+        block: suspend () -> JoyApiResult<T>,
+        stateLiveData: StateLiveData<T>,
+        kClass: KClass<*>? = T::class
+    ) {
         var baseResp = JoyApiResult<T>()
         try {
             baseResp.dataState = DataState.STATE_LOADING
@@ -22,13 +28,18 @@ open class BaseRepository {
             baseResp = invoke
             if (baseResp.code == 0) {
                 //请求成功，判断数据是否为空，
-                //因为数据有多种类型，需要自己设置类型进行判断
-                if (baseResp.data == null || baseResp.data is List<*> && (baseResp.data as List<*>).isEmpty()) {
-                    //TODO: 数据为空,结构变化时需要修改判空条件
-                    baseResp.dataState = DataState.STATE_EMPTY
+                baseResp.dataState = if (baseResp.data == null) {
+                    if (kClass == JoyJsonModel.JoyEmpty::class) {
+                        // 空类型
+                        DataState.STATE_SUCCESS
+                    } else {
+                        DataState.STATE_EMPTY
+                    }
+                } else if (baseResp.data is List<*> && (baseResp.data as List<*>).isEmpty()) {
+                    // 列表为空
+                    DataState.STATE_EMPTY
                 } else {
-                    //请求成功并且数据为空的情况下，为STATE_SUCCESS
-                    baseResp.dataState = DataState.STATE_SUCCESS
+                    DataState.STATE_SUCCESS
                 }
             } else {
                 //服务器请求错误

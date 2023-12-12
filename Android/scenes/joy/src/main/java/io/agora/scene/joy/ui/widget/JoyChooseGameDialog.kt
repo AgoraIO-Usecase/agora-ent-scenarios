@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.joy.R
@@ -58,6 +60,7 @@ class JoyChooseGameDialog : BaseBottomSheetDialogFragment<JoyDialogChooseGameLay
 
     fun setEnableConfirm(isEnable: Boolean) {
         mBinding.btnConfirm.isEnabled = isEnable
+        mBinding.btnConfirm.alpha = if (isEnable) 1.0f else 0.5f
     }
 
     override fun onResume() {
@@ -107,6 +110,11 @@ private class JoyChooseGameAdapter constructor(
             )
             holder.binding.layoutGame.setBackgroundResource(R.color.white)
         }
+        GlideApp.with(holder.binding.ivGame)
+            .load(data.thumbnail)
+            .error(R.drawable.joy_banner_pkzb)
+            .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+            .into(holder.binding.ivGame)
         holder.itemView.setOnClickListener {
             selectedIndex = position
             notifyDataSetChanged()

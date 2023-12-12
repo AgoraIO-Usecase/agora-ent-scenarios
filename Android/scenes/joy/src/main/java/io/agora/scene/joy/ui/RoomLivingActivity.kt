@@ -1,5 +1,6 @@
 package io.agora.scene.joy.ui
 
+import agora.pb.rctrl.RemoteCtrlMsg
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -8,14 +9,13 @@ import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.Log
-import android.view.KeyEvent
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.TextureView
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
+import io.agora.rtc2.DataStreamConfig
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.RtcEngine
@@ -51,6 +52,7 @@ import io.agora.scene.joy.ui.widget.JoyChooseGameDialog
 import io.agora.scene.joy.ui.widget.JoyGameRulesDialog
 import io.agora.scene.joy.ui.widget.JoyGiftDialog
 import io.agora.scene.joy.ui.widget.KeyboardStatusWatcher
+import io.agora.scene.joy.ui.widget.VideoTextureView
 import io.agora.scene.joy.utils.CustomToast
 import io.agora.scene.joy.utils.JoyLogger
 import io.agora.scene.joy.utils.dp
@@ -70,14 +72,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     companion object {
         private const val TAG = "Joy_RoomLivingActivity"
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
-        private const val EXTRA_GAME_LIST = "gameList"
 
         fun launch(context: Context, roomInfo: JoyRoomInfo, gameList: List<JoyGameListResult>? = null) {
             val intent = Intent(context, RoomLivingActivity::class.java)
             intent.putExtra(EXTRA_ROOM_DETAIL_INFO, roomInfo)
-            gameList?.let {
-                intent.putExtra(EXTRA_GAME_LIST, it as Serializable)
-            }
             context.startActivity(intent)
         }
     }
@@ -92,6 +90,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     private val mRoomInfo by lazy { (intent?.getSerializableExtra(EXTRA_ROOM_DETAIL_INFO) as? JoyRoomInfo)!! }
 
+    private val mGameList = mutableListOf<JoyGameListResult>()
+
     private var mStartGameInfo: JoyStartGameInfo? = null
 
     private val mMainRtcConnection by lazy {
@@ -104,6 +104,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     private val mJoyService by lazy { JoyServiceProtocol.getImplInstance() }
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
+
+    private var mStreamId = -1
 
     private var mGameChooseGameDialog: JoyChooseGameDialog? = null
 
@@ -202,6 +204,20 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             showNormalInputLayout()
             true
         }
+        binding.flAssistantContainer.setOnTouchListener { view, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> sendMouseMessage(
+                    event,
+                    RemoteCtrlMsg.MouseEventType.MOUSE_EVENT_LBUTTON_DOWN.getNumber()
+                )
+
+                MotionEvent.ACTION_UP -> sendMouseMessage(
+                    event,
+                    RemoteCtrlMsg.MouseEventType.MOUSE_EVENT_LBUTTON_UP.getNumber()
+                )
+            }
+            true
+        }
         KeyboardStatusWatcher(this, this) { isKeyboardShowed: Boolean, keyboardHeight: Int ->
             Log.d(TAG, " isKeyboardShowed: $isKeyboardShowed keyboardHeight: $keyboardHeight")
             val lp: ViewGroup.LayoutParams = binding.vKeyboardBg.layoutParams
@@ -214,6 +230,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             binding.vKeyboardBg.layoutParams = lp
             null
         }
+
     }
 
     private fun showNormalInputLayout(): Boolean {
@@ -244,7 +261,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 initRtcEngine()
                 initServiceWithJoinRoom()
             }
-            requestCameraPermission(true)
+            requestCameraPermission(mIsRoomOwner)
             startTopLayoutTimer()
         } else {
             ToastUtils.showToast(getString(R.string.joy_living_end))
@@ -275,6 +292,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             }
 
             override fun onRoomDidDestroy(roomInfo: JoyRoomInfo) {
+                destroy()
                 showLivingEndLayout() // 房间到了限制时间
                 JoyLogger.d("showLivingEndLayout", "timer end!")
             }
@@ -324,13 +342,18 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                         }
                     })
                 }
+
+                else -> {
+                    it.msg?.let { errorMsg ->
+                        CustomToast.show(errorMsg)
+                    }
+                }
             }
         }
         mJoyViewModel.mStopGameLiveData.observe(this) {
             when (it.dataState) {
                 DataState.STATE_EMPTY,
                 DataState.STATE_SUCCESS -> {
-                    ToastUtils.showToast("停止游戏")
                 }
             }
         }
@@ -371,21 +394,87 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 }
             }
         }
+        mJoyViewModel.mGameListLiveData.observe(this) {
+            when (it.dataState) {
+                DataState.STATE_SUCCESS -> {
+                    it.data?.list?.apply {
+                        mGameList.clear()
+                        mGameList.addAll(this)
+                    }
+                    showGameChooseDialog()
+                }
+            }
+        }
     }
 
     private fun initRtcEngine() {
         val eventListener = object : IRtcEngineEventHandler() {
             override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
                 super.onJoinChannelSuccess(channel, uid, elapsed)
+                Log.d(TAG, "rtc onJoinChannelSuccess channel:$channel ,uid:$uid }")
+            }
 
+            override fun onUserJoined(uid: Int, elapsed: Int) {
+                super.onUserJoined(uid, elapsed)
+                Log.d(TAG, "rtc onUserJoined uid:$uid }")
+            }
+
+            override fun onRemoteVideoStateChanged(uid: Int, state: Int, reason: Int, elapsed: Int) {
+                super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
+                Log.d(TAG, "rtc onRemoteVideoStateChanged uid:$uid,state:$state,reason:$reason}")
+            }
+
+            override fun onFirstRemoteVideoFrame(uid: Int, width: Int, height: Int, elapsed: Int) {
+                super.onFirstRemoteVideoFrame(uid, width, height, elapsed)
+                Log.d(TAG, "rtc onFirstRemoteVideoFrame uid:$uid")
             }
 
             override fun onError(err: Int) {
                 super.onError(err)
-                JoyLogger.e(TAG, "rtc onError:${RtcEngine.getErrorDescription(err)}")
+                JoyLogger.e(TAG, "rtc onError:$err ${RtcEngine.getErrorDescription(err)} ")
+            }
+
+            override fun onVideoSizeChanged(
+                source: Constants.VideoSourceType?,
+                uid: Int,
+                width: Int,
+                height: Int,
+                rotation: Int
+            ) {
+                super.onVideoSizeChanged(source, uid, width, height, rotation)
+                mVideoTextureView ?: return
+                binding.root.post {
+                    val rootViewWidth: Int = binding.root.measuredWidth
+                    val rootViewHeight: Int = binding.root.measuredHeight
+                    Log.i(TAG, "onVideoSizeChanged->rootViewWidth:$rootViewWidth,rootViewHeight:$rootViewHeight")
+                    val targetWidth: Int
+                    val targetHeight: Int
+                    if (rootViewWidth.toFloat() / rootViewHeight > width.toFloat() / height) {
+                        targetHeight = rootViewHeight
+                        val scale = targetHeight.toFloat() / height
+                        targetWidth = (width * scale).toInt()
+                    } else {
+                        targetWidth = rootViewWidth
+                        val scale = targetWidth.toFloat() / width
+                        targetHeight = (height * scale).toInt()
+                    }
+                    Log.i(TAG, "onVideoSizeChanged->targetWidth:$targetWidth,targetHeight:$targetHeight")
+                    mVideoTextureView?.setVideoSize(targetWidth, targetHeight)
+                    mVideoTextureView?.post {
+                        val layoutParams: ViewGroup.LayoutParams = binding.flAssistantContainer.layoutParams
+                        layoutParams.width = targetWidth
+                        layoutParams.height = targetHeight
+                        binding.flAssistantContainer.layoutParams = layoutParams
+                    }
+                }
+
             }
         }
 
+        val config = DataStreamConfig()
+        config.ordered = true
+        config.syncWithAudio = true
+        mStreamId = mRtcEngine.createDataStream(config)
         joinChannel(eventListener)
         setupVideoView()
     }
@@ -405,13 +494,14 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     }
 
 
+    private var mVideoTextureView: VideoTextureView? = null
     private fun setupAssistantVideoView() {
         val assistantUid = mStartGameInfo?.assistantUid ?: return
-        val textureView = TextureView(this)
+        mVideoTextureView = VideoTextureView(this)
         binding.flAssistantContainer.removeAllViews()
-        binding.flAssistantContainer.addView(textureView)
+        binding.flAssistantContainer.addView(mVideoTextureView)
         mRtcEngine.setupRemoteVideoEx(
-            VideoCanvas(textureView, VideoCanvas.RENDER_MODE_HIDDEN, assistantUid),
+            VideoCanvas(mVideoTextureView, VideoCanvas.RENDER_MODE_HIDDEN, assistantUid),
             mMainRtcConnection
         )
     }
@@ -445,7 +535,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 } else {
                     // 房主未开启游戏，选择游戏
                     if (mIsRoomOwner) {
-                        showGameChooseDialog()
+                        mJoyViewModel.getGames()
                     }
                 }
             } else {
@@ -516,11 +606,11 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     }
 
     private fun showGameChooseDialog() {
-        val gameList = intent?.getSerializableExtra(EXTRA_GAME_LIST) as? List<JoyGameListResult>
-        if (!gameList.isNullOrEmpty()) {
+        if (!mIsRoomOwner) return
+        if (mGameList.isNotEmpty()) {
             if (mGameChooseGameDialog == null) {
                 val bundle = Bundle().apply {
-                    putSerializable(JoyChooseGameDialog.Key_Games, gameList as Serializable)
+                    putSerializable(JoyChooseGameDialog.Key_Games, mGameList as Serializable)
                 }
                 mGameChooseGameDialog = JoyChooseGameDialog().apply {
                     setBundleArgs(bundle)
@@ -557,7 +647,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             .setMessage(R.string.joy_living_timeout_content)
             .setCancelable(false)
             .setPositiveButton(R.string.i_know) { dialog, _ ->
-                destroy()
                 dialog.dismiss()
                 finish()
             }
@@ -594,7 +683,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         mJoyService.leaveRoom(mRoomInfo, {})
         if (mIsRoomOwner) {
             mStartGameInfo?.taskId?.let { taskId ->
-                mJoyViewModel.stopGame(mJoyViewModel.mGamId, taskId)
+                mJoyViewModel.stopGame(mRoomInfo.roomId, mJoyViewModel.mGamId, taskId)
             }
             mRtcEngine.stopPreview()
         }
@@ -607,51 +696,76 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 //        }
 //        return super.onKeyDown(keyCode, event)
 //    }
-}
 
-private class RoomMessageAdapter constructor(
-    private var mList: MutableList<JoyMessage>,
-) : RecyclerView.Adapter<RoomMessageAdapter.ViewHolder?>() {
-
-    inner class ViewHolder(val binding: JoyItemLiveDetailMessageBinding) : RecyclerView.ViewHolder(binding.root)
-
-    fun insertLast(item: JoyMessage) {
-        insert(itemCount, item)
-    }
-
-    fun insert(position: Int, item: JoyMessage) {
-        var index = position
-        val itemCount = itemCount
-        if (index < 0) {
-            index = 0
-        }
-        if (index > itemCount) {
-            index = itemCount
-        }
-        mList.add(index, item)
-        notifyItemInserted(index)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
-            JoyItemLiveDetailMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+    private fun sendMouseMessage(event: MotionEvent, value: Int) {
+        Log.i(TAG, "sendMouseMessage:event x:${event.x},event y:${event.y},value:$value")
+        Log.i(
+            TAG,
+            "sendMouseMessage:event x/width: ${event.x / binding.flAssistantContainer.measuredWidth} ,event y/height:${event.y / binding.flAssistantContainer.measuredHeight}"
         )
+        val x: Int = (event.x.toInt() shl 16) / binding.flAssistantContainer.measuredWidth
+        val y: Int = (event.y.toInt() shl 16) / binding.flAssistantContainer.measuredHeight
+        val eventMsg: RemoteCtrlMsg.MouseEventMsg = RemoteCtrlMsg.MouseEventMsg.newBuilder()
+            .setMouseEvent(value)
+            .setX(x)
+            .setY(y)
+            .build()
+        val rctrlMsg: RemoteCtrlMsg.RctrlMsg = RemoteCtrlMsg.RctrlMsg.newBuilder()
+            .setType(RemoteCtrlMsg.MsgType.MOUSE_EVENT_TYPE)
+            .setTimestamp(System.currentTimeMillis())
+            .setPayload(eventMsg.toByteString())
+            .build()
+        val rctrlMsges: RemoteCtrlMsg.RctrlMsges = RemoteCtrlMsg.RctrlMsges.newBuilder()
+            .addMsges(rctrlMsg)
+            .build()
+        mRtcEngine.sendStreamMessage(mStreamId, rctrlMsges.toByteArray())
+
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
-        val joyMessage: JoyMessage = mList[position]
-        holder.binding.text.text = SpannableStringBuilder().append(
-            "${joyMessage.userName}: ",
-            ForegroundColorSpan(Color.parseColor("#A6C4FF")),
-            SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE
-        ).append(
-            joyMessage.message,
-            ForegroundColorSpan(Color.WHITE),
-            SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE
-        )
-    }
+    private class RoomMessageAdapter constructor(
+        private var mList: MutableList<JoyMessage>,
+    ) : RecyclerView.Adapter<RoomMessageAdapter.ViewHolder?>() {
 
-    override fun getItemCount(): Int {
-        return mList.size
+        inner class ViewHolder(val binding: JoyItemLiveDetailMessageBinding) : RecyclerView.ViewHolder(binding.root)
+
+        fun insertLast(item: JoyMessage) {
+            insert(itemCount, item)
+        }
+
+        fun insert(position: Int, item: JoyMessage) {
+            var index = position
+            val itemCount = itemCount
+            if (index < 0) {
+                index = 0
+            }
+            if (index > itemCount) {
+                index = itemCount
+            }
+            mList.add(index, item)
+            notifyItemInserted(index)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            return ViewHolder(
+                JoyItemLiveDetailMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            )
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
+            val joyMessage: JoyMessage = mList[position]
+            holder.binding.text.text = SpannableStringBuilder().append(
+                "${joyMessage.userName}: ",
+                ForegroundColorSpan(Color.parseColor("#A6C4FF")),
+                SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE
+            ).append(
+                joyMessage.message,
+                ForegroundColorSpan(Color.WHITE),
+                SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE
+            )
+        }
+
+        override fun getItemCount(): Int {
+            return mList.size
+        }
     }
 }
