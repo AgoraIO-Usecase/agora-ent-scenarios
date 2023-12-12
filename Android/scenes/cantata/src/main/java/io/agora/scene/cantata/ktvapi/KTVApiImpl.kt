@@ -200,8 +200,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         // TopN
         mRtcEngine.setParameters("{\"rtc.use_audio4\": true}")
-
-        mRtcEngine.setParameters("{\"rtc.max_audio_metadata_length\": 200}")
+        if (ktvApiConfig.type == KTVType.Cantata) {
+            mRtcEngine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
+        }
     }
 
     override fun addEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {
