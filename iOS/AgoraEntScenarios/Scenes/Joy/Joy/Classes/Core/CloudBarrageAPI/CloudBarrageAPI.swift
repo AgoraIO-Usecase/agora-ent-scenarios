@@ -142,19 +142,19 @@ extension CloudBarrageAPI {
         }
     }
     
-    
     /// 结束游戏
     /// - Parameters:
     ///   - gameId: 游戏id
-    ///   - vid: agora app对应的vid
+    ///   - taskId: 启动游戏的任务ID，通过startGame返回
     ///   - roomId: 主播房间ID
-    ///   - openId: 主播ID
-    ///   - taskId:  启动游戏的任务ID，通过startGame返回
+    ///   - userId: 主播ID
     ///   - completion: <#completion description#>
     public func endGame(gameId:String,
                         taskId: String,
+                        roomId: String,
+                        userId: String,
                         completion: @escaping ((NSError?)->Void)) {
-        let params = ["gameId": gameId, "taskId": taskId]
+        let params = ["gameId": gameId, "taskId": taskId, "openId": userId, "roomId": roomId]
         let interfaceName = "cloud-bullet-game/games/stop"
         postRequest(interface: interfaceName, params: params) { err, result  in
             completion(err)
@@ -210,8 +210,8 @@ extension CloudBarrageAPI {
     }
     
     func sendMouseEvent(type: Agora_Pb_Rctrl_MouseEventType,
-                               point: CGPoint,
-                               gameViewSize: CGSize) {
+                        point: CGPoint,
+                        gameViewSize: CGSize) {
         msgId += 1
         let currentDate = Date()
         
@@ -232,6 +232,7 @@ extension CloudBarrageAPI {
         }
         
         sendEventMessage(msg: msg)
+        joyPrint("sendMouseEvent: type: \(type.rawValue) x: \(event.x) y: \(event.y)")
     }
 }
 

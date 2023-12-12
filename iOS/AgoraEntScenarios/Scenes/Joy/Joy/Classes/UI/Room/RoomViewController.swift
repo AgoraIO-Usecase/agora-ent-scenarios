@@ -8,10 +8,30 @@
 import UIKit
 import AgoraRtcKit
 
+class TouchGameView: UIView {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        guard let point = touches.first?.location(in: self) else {return}
+        CloudBarrageAPI.shared.sendMouseEvent(type: .mouseEventLbuttonDown, point: point, gameViewSize: frame.size)
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesMoved(touches, with: event)
+        guard let point = touches.first?.location(in: self) else {return}
+        CloudBarrageAPI.shared.sendMouseEvent(type: .mouseEventMove, point: point, gameViewSize: frame.size)
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        guard let point = touches.first?.location(in: self) else {return}
+        CloudBarrageAPI.shared.sendMouseEvent(type: .mouseEventLbuttonUp, point: point, gameViewSize: frame.size)
+    }
+}
+
 class RoomViewController: UIViewController {
-    private var roomInfo: JoyRoomInfo!
-    private var currentUserInfo: JoyUserInfo!
-    private var service: JoyServiceProtocol!
+    private var roomInfo: JoyRoomInfo
+    private var currentUserInfo: JoyUserInfo
+    private var service: JoyServiceProtocol
     private var startGameInfo: JoyStartGameInfo? {
         didSet {
             joinAssistantChannel()
@@ -86,10 +106,10 @@ class RoomViewController: UIViewController {
     private lazy var assistantCanvasView: UIView = UIView()
     
     required init(roomInfo: JoyRoomInfo, currentUserInfo: JoyUserInfo, service: JoyServiceProtocol) {
-        super.init(nibName: nil, bundle: nil)
         self.roomInfo = roomInfo
         self.currentUserInfo = currentUserInfo
         self.service = service
+        super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -108,25 +128,6 @@ class RoomViewController: UIViewController {
         roomInfoView.snp.makeConstraints { make in
             make.top.equalTo(max(top, 20))
             make.left.equalTo(15)
-        }
-        
-        view.addSubview(closeButton)
-        closeButton.snp.makeConstraints { make in
-            make.right.equalTo(-15)
-            make.centerY.equalTo(roomInfoView)
-        }
-        
-        view.addSubview(moreBtn)
-        moreBtn.snp.makeConstraints { make in
-            make.trailing.equalTo(closeButton.snp_leadingMargin).offset(-18)
-            make.centerY.equalTo(closeButton.snp.centerY)
-            make.width.equalTo(24)
-        }
-        
-        view.addSubview(gameIntroduceButton)
-        gameIntroduceButton.snp.makeConstraints { make in
-            make.top.equalTo(closeButton.snp.bottom).offset(15)
-            make.right.equalTo(closeButton)
         }
         
         view.addSubview(waittingLabel)
@@ -151,6 +152,12 @@ class RoomViewController: UIViewController {
         }
         chatTableView.addObserver()
         
+        let touchView = TouchGameView()
+        view.addSubview(touchView)
+        touchView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
         view.addSubview(bottomBar)
         bottomBar.snp.makeConstraints { make in
             make.bottom.equalToSuperview().offset(-UIDevice.current.aui_SafeDistanceBottom)
@@ -165,10 +172,23 @@ class RoomViewController: UIViewController {
             make.bottom.equalToSuperview()
         }
         
-        guard let roomInfo = roomInfo else {
-            AUIToast.show(text: "room info error")
-            leaveRoom()
-            return
+        view.addSubview(closeButton)
+        closeButton.snp.makeConstraints { make in
+            make.right.equalTo(-15)
+            make.centerY.equalTo(roomInfoView)
+        }
+        
+        view.addSubview(moreBtn)
+        moreBtn.snp.makeConstraints { make in
+            make.trailing.equalTo(closeButton.snp_leadingMargin).offset(-18)
+            make.centerY.equalTo(closeButton.snp.centerY)
+            make.width.equalTo(24)
+        }
+        
+        view.addSubview(gameIntroduceButton)
+        gameIntroduceButton.snp.makeConstraints { make in
+            make.top.equalTo(closeButton.snp.bottom).offset(15)
+            make.right.equalTo(closeButton)
         }
         
         roomInfoView.setRoomInfo(avatar: roomInfo.ownerAvatar,
@@ -177,15 +197,16 @@ class RoomViewController: UIViewController {
                                  time: roomInfo.createdAt)
         
         joinRTCChannel()
-        service?.subscribeListener(listener: self)
+        service.subscribeListener(listener: self)
         service.getStartGame(roomId: roomInfo.roomId) {[weak self] err, gameInfo in
+            guard let self = self else {return}
             if let err = err {
                 AUIToast.show(text: err.localizedDescription)
                 return
             }
             
-            self?.startGameInfo = gameInfo
-            self?.startScene(roomInfo: roomInfo)
+            self.startGameInfo = gameInfo
+            self.startScene(roomInfo: self.roomInfo)
         }
     }
     
@@ -193,7 +214,7 @@ class RoomViewController: UIViewController {
         if roomInfo.ownerId == currentUserInfo.userId {
             let gameId = startGameInfo?.gameId ?? ""
             let taskId = startGameInfo?.taskId ?? ""
-            let assistantUid = startGameInfo?.assistantUid ?? 0
+            let assistantUid = startGameInfo?.assistantUid ?? (roomInfo.ownerId + 1000000)
             if gameId.isEmpty || taskId.isEmpty {
                 CloudBarrageAPI.shared.getGameList { [weak self] err, list in
                     if let err = err {
@@ -212,15 +233,7 @@ class RoomViewController: UIViewController {
                             self.startGame(gameInfo: game, assistantUid: assistantUid, assistantToken: token)
                         }
                     }
-                    #if DEBUG
-                    var aaa = [CloudGameInfo]()
-                    for i in 0...100 {
-                        aaa += list!
-                    }
-                    dialog?.gameList = aaa
-                    #else
-                    dialog?.gameList = list!
-                    #endif
+                    dialog?.gameList = list ?? []
                 }
             } else {
                 CloudBarrageAPI.shared.getGameInfo(gameId: gameId) {[weak self] err, detail in
@@ -240,7 +253,6 @@ class RoomViewController: UIViewController {
 //MARK: game handler
 extension RoomViewController {
     private func startGame(gameInfo: CloudGameInfo, assistantUid: UInt, assistantToken: String) {
-        guard let roomInfo = roomInfo else {return}
         let rtcConfig = CloudGameRtcConfig(broadcastUid: roomInfo.ownerId,
                                            assistantUid: assistantUid,
                                            assistantToken: assistantToken,
@@ -259,13 +271,13 @@ extension RoomViewController {
             
             if let roomInfo = self?.roomInfo, let taskId = taskId {
                 roomInfo.badgeTitle = gameInfo.name ?? ""
-                self?.service?.updateRoom(roomInfo: roomInfo, completion: { err in
+                self?.service.updateRoom(roomInfo: roomInfo, completion: { err in
                 })
                 let startGame = JoyStartGameInfo()
                 startGame.gameId = gameInfo.gameId ?? ""
                 startGame.taskId = taskId
                 startGame.gameName = gameInfo.name ?? ""
-                startGame.assistantUid = roomInfo.ownerId + 1000000
+                startGame.assistantUid = assistantUid
                 self?.service.updateStartGame(roomId: roomInfo.roomId,
                                               gameInfo: startGame,
                                               completion: { err in
@@ -289,9 +301,13 @@ extension RoomViewController {
     }
     
     private func stopGame() {
-        guard let gameId = gameInfo?.gameId, let taskId = taskId else {return}
+        guard let gameId = gameInfo?.gameId, 
+                let taskId = taskId,
+              roomInfo.ownerId == currentUserInfo.userId else {return}
         CloudBarrageAPI.shared.endGame(gameId: gameId,
-                                       taskId: taskId) { err in
+                                       taskId: taskId, 
+                                       roomId: roomInfo.roomId,
+                                       userId: "\(roomInfo.ownerId)") { err in
         }
     }
 }
@@ -324,9 +340,8 @@ extension RoomViewController {
 
 extension RoomViewController {
     private func joinRTCChannel() {
-        guard let roomInfo = roomInfo,
-              let engine = CloudBarrageAPI.shared.apiConfig?.engine else {
-            AUIToast.show(text: "room info error")
+        guard let engine = CloudBarrageAPI.shared.apiConfig?.engine else {
+            AUIToast.show(text: "rtc engine is nil")
             onCloseAction()
             return
         }
@@ -338,10 +353,11 @@ extension RoomViewController {
         mediaOptions.autoSubscribeAudio = true
         mediaOptions.autoSubscribeVideo = true
         let userId = currentUserInfo.userId
+        let roomId = roomInfo.roomId
         renewRTCTokens(roomId: roomInfo.roomId,
                        userId: currentUserInfo.userId) { token in
             engine.joinChannel(byToken: token,
-                               channelId: roomInfo.roomId,
+                               channelId: roomId,
                                uid: userId,
                                mediaOptions: mediaOptions) { channel, uid, elapsed in
                 joyPrint("joinChannel[\(channel)][\(uid)] cost: \(elapsed)ms")
@@ -399,11 +415,7 @@ extension RoomViewController {
     
     private func leaveRoom() {
         JoyBaseDialog.hidden()
-        guard let roomInfo = roomInfo else {
-            self.navigationController?.popViewController(animated: true)
-            return
-        }
-        service?.leaveRoom(roomInfo: roomInfo, completion: { err in
+        service.leaveRoom(roomInfo: roomInfo, completion: { err in
             self.navigationController?.popViewController(animated: true)
         })
         leaveRTCChannel()
@@ -450,11 +462,11 @@ extension RoomViewController: RoomBottomBarDelegate {
     }
     
     func onClickLikeButton() {
-        guard let roomId = roomInfo?.roomId,
-              let gameId = gameInfo?.gameId else {
+        guard let gameId = gameInfo?.gameId else {
             return
         }
-        let like = CloudGameLikeInfo(userId: "\(currentUserInfo.userId)", 
+        let roomId = roomInfo.roomId
+        let like = CloudGameLikeInfo(userId: "\(currentUserInfo.userId)",
                                      userAvatar: currentUserInfo.avatar,
                                      userName: currentUserInfo.userName)
         let config = CloudGameSendLikeConfig(roomId: roomId, gameId: gameId, likeList: [like])
@@ -472,14 +484,14 @@ extension RoomViewController: ChatInputViewDelegate {
     }
     
     func onClickSendButton(text: String) {
-        guard let roomId = roomInfo?.roomId,
-              let gameId = gameInfo?.gameId else {
+        guard let gameId = gameInfo?.gameId else {
             return
         }
-        service?.sendChatMessage(roomId: roomId,
-                                 message: text,
-                                 completion: { err in
-        })
+        let roomId = roomInfo.roomId
+        service.sendChatMessage(roomId: roomId,
+                                message: text,
+                                completion: { err in
+       })
         
         let comment = CloudGameCommentInfo(userId: "\(currentUserInfo.userId)",
                                            userAvatar: currentUserInfo.avatar,
@@ -509,7 +521,7 @@ extension RoomViewController: JoyServiceListenerProtocol {
          between owner and audience members
          */
         guard roomInfo.ownerId == currentUserInfo.userId else {return}
-        service?.updateRoom(roomInfo: roomInfo, completion: { err in
+        service.updateRoom(roomInfo: roomInfo, completion: { err in
         })
     }
     
