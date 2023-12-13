@@ -517,8 +517,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
 - (void)didDumpModeChanged:(BOOL)enable {
     self.isDumpMode = enable;
     NSString* key = @"dump enable";
-    BOOL status = ![SBGDebugInfo getSelectedStatusForKey:key];
-    [SBGDebugInfo setSelectedStatus:status forKey:key];
+    [SBGDebugInfo setSelectedStatus:enable forKey:key];
     [SBGDebugManager reLoadParamAll];
 }
 
