@@ -199,6 +199,12 @@
 #endif
 }
 
+- (void)resetAdjust {
+#if __has_include(FURenderMoudle)
+    [FURenderKit shareRenderKit].beauty.sharpen = 0;
+#endif
+}
+
 - (void)resetStyle {
 #if __has_include(FURenderMoudle)
     dispatch_queue_t referQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);

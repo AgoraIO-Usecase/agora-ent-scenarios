@@ -90,7 +90,7 @@ class ShowBeautyFaceVC: UIViewController {
         switch type {
         case .beauty, .adjust:
             if isReset {
-                BeautyManager.shareManager.reset(datas: dataArray)
+                BeautyManager.shareManager.reset(datas: dataArray, type: type)
                 return
             }
             BeautyManager.shareManager.setBeauty(path: model.path,

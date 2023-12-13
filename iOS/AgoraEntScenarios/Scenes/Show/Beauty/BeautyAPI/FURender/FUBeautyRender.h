@@ -35,6 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)reset;
 
+- (void)resetAdjust;
+
 - (void)resetStyle;
 
 - (void)resetSticker;

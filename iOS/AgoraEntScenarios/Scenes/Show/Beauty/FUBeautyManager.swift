@@ -50,8 +50,13 @@ class FUBeautyManager: NSObject {
         render.setStickerWithPath(path ?? "")
     }
     
-    func reset(datas: [BeautyModel]) {
-        render.reset()
+    func reset(datas: [BeautyModel], type: ShowBeautyFaceVCType) {
+        switch type {
+        case .adjust:
+            render.resetAdjust()
+        default:
+            render.reset()
+        }
     }
     
     func resetStyle(datas: [BeautyModel]) {

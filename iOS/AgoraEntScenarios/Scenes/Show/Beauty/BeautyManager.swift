@@ -79,7 +79,6 @@ class BeautyManager: NSObject {
         if result != 0 {
             print("initialize error == \(result)")
         }
-        beautyAPI.initialize(config)
         beautyAPI.enable(true)
     }
     
@@ -160,7 +159,7 @@ class BeautyManager: NSObject {
         }
     }
     
-    func reset(datas: [BeautyModel]) {
+    func reset(datas: [BeautyModel], type: ShowBeautyFaceVCType) {
         switch BeautyModel.beautyType {
         case .byte:
             ByteBeautyManager.shareManager.reset(datas: datas)
@@ -169,7 +168,7 @@ class BeautyManager: NSObject {
             SenseBeautyManager.shareManager.reset(datas: datas)
             
         case .fu:
-            FUBeautyManager.shareManager.reset(datas: datas)
+            FUBeautyManager.shareManager.reset(datas: datas, type: type)
             
         case .agora:
             AgoraBeautyManager.shareManager.reset(datas: datas)
