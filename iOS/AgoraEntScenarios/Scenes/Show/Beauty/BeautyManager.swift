@@ -236,6 +236,9 @@ class BeautyManager: NSObject {
             AgoraBeautyManager.shareManager.destroy()
         }
         beautyAPI.destroy()
+        ShowBeautyFaceVC.backgroundData.enumerated().forEach({
+             $0.element.isSelected = $0.offset == 0
+        })
         guard isAll else { return }
         BeautyManager._sharedManager = nil
         ShowAgoraKitManager.shared.enableVirtualBackground(isOn: false,
