@@ -23,6 +23,7 @@ import io.agora.voice.common.ui.BaseUiFragment
 import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ThreadManager
+import io.agora.voice.common.utils.ToastTools
 
 class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsListLayoutBinding>(),
     ChatroomRaisedAdapter.onActionListener {
@@ -122,6 +123,13 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
                                 adapter?.notifyItemRemoved(currentIndex)
                             }
                             onFragmentListener?.onAcceptMicSeatApply(it)
+                        }
+                    }
+
+                    override fun onError(code: Int, message: String?) {
+                        super.onError(code, message)
+                        activity?.let {
+                            ToastTools.show(it,getString(R.string.voice_spatial_room_agree_fail))
                         }
                     }
                 })
