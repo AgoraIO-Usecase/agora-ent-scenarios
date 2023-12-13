@@ -174,4 +174,6 @@
     <string name="voice_spatial_unavailable_tip">房间不存在，请刷新列表重试</string>
     <string name="voice_spatial_send_tip">发送</string>
     <string name="voice_spatial_name_rule">房间名不合规</string>
+    <string name="voice_spatial_room_agree_fail">同意上麦失败!</string>
+    <string name="voice_spatial_room_invitation_fail">邀请失败</string>
 </resources>

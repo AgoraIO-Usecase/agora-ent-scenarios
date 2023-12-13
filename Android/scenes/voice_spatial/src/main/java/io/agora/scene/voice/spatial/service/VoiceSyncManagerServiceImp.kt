@@ -435,15 +435,11 @@ class VoiceSyncManagerServiceImp(
             if (e == 0) {
                 list.forEach { it ->
                     if (it.member?.userId == userId) {
-                        // 1、移除这个申请
-                        val index = micSeatApplyList.indexOf(it)
-                        micSeatApplyList.removeAt(index)
-                        val objId = objIdOfSeatApply.removeAt(index)
-                        innerRemoveMicSeatApply(objId, it) { _,_ -> }
-                        // 2、更改麦位状态
+                        // 更改麦位状态
                         val micIndex = selectEmptySeat(it.index!!)
                         if (micSeatMap.containsKey(micIndex.toString()) &&
                             micSeatMap[micIndex.toString()]?.member != null) {
+                            completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
                             // 麦上有人
                             return@forEach
                         }
@@ -460,6 +456,11 @@ class VoiceSyncManagerServiceImp(
                             innerUpdateUserInfo(member, {}, {})
                             innerUpdateSeat(toSeat) { e ->
                                 if (e == null) {
+                                    // 成功后再移除这个申请
+                                    val index = micSeatApplyList.indexOf(it)
+                                    micSeatApplyList.removeAt(index)
+                                    val objId = objIdOfSeatApply.removeAt(index)
+                                    innerRemoveMicSeatApply(objId, it) { _,_ -> }
                                     completion.invoke(VoiceServiceProtocol.ERR_OK, toSeat)
                                 } else {
                                     completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
@@ -507,6 +508,12 @@ class VoiceSyncManagerServiceImp(
         micIndex: Int?,
         completion: (error: Int, result: Boolean) -> Unit
     ) {
+        val micIndex = selectEmptySeat(micIndex?:-1)
+        val toSeat = micSeatMap[micIndex.toString()]
+        if (toSeat == null) {
+            completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
+            return
+        }
         val userInfo = userMap[userId] ?: return
         val index = micIndex ?: return
         userInfo.micIndex = index
