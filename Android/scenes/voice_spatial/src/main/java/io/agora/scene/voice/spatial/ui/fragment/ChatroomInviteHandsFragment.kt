@@ -117,6 +117,13 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
                         ToastTools.show(it, getString(R.string.voice_spatial_room_invited))
                     }
                 }
+
+                override fun onError(code: Int, message: String?) {
+                    super.onError(code, message)
+                    activity?.let {
+                        ToastTools.show(it, getString(R.string.voice_spatial_room_invitation_fail))
+                    }
+                }
             })
         }
 
