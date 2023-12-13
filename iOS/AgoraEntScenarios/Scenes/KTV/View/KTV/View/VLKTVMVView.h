@@ -36,6 +36,21 @@ typedef enum : NSUInteger {
     VLKTVMVViewActionTypeRetryLrc    // 歌曲重试
 } VLKTVMVViewActionType;
 
+typedef enum : NSUInteger {
+    VLKTVMVViewStateNone = 0,  // 当前无人点歌
+    VLKTVMVViewStateMusicLoading = 1,  // 当前歌曲加载中
+    VLKTVMVViewStateAudience = 2, //观众
+    VLKTVMVViewStateOwnerSing = 3, //房主点歌演唱
+    VLKTVMVViewStateOwnerAudience = 4, //房主未加入合唱
+    VLKTVMVViewStateJoinChorus = 5,//加入合唱中
+    VLKTVMVViewStateOwnerChorus = 6, //房主合唱
+    VLKTVMVViewStateNotOwnerChorus = 7, //非房主演唱
+    VLKTVMVViewStateMusicOwnerLoadFailed = 8, //点歌人歌曲加载失败(房主或者点歌者 一样的)
+    VLKTVMVViewStateMusicLoadFailed = 9, //观众歌曲加载失败
+    VLKTVMVViewStateMusicOwnerLoadLrcFailed = 10, //点歌人歌曲加载失败(房主)
+    VLKTVMVViewStateMusicLoadLrcFailed = 11, //观众歌词加载失败
+} VLKTVMVViewState; //主要用来记录各种情况下的显示状态
+
 @class VLKTVMVView;
 @protocol VLKTVMVViewDelegate <NSObject>
 
@@ -54,8 +69,6 @@ typedef enum : NSUInteger {
 @end
 
 @interface VLKTVMVView : UIView
-@property (nonatomic, assign) VLKTVMVLoadingState loadingType;
-@property (nonatomic, assign) KTVJoinCoSingerState joinCoSingerState;   //加入合唱状态
 @property (nonatomic, assign) NSInteger loadingProgress;
 @property (nonatomic, strong) KaraokeView *karaokeView;
 @property (nonatomic, strong) GradeView *gradeView;
@@ -67,25 +80,15 @@ typedef enum : NSUInteger {
 
 //更改背景
 - (void)changeBgViewByModel:(VLKTVSelBgModel *)selBgModel;
-
-/// 更换播放按钮状态
-/// @param state 状态
-- (void)updateMVPlayerState:(VLKTVMVViewActionType)state;
-
-
 @property (nonatomic, strong) UIImageView *bgImgView;
 
-/// 当前用户上麦下麦
-/// @param song 歌曲信息
-/// @param role 当前用户角色
-- (void)updateUIWithSong:(VLRoomSelSongModel * __nullable)song role:(KTVSingRole)role;
+@property (nonatomic, assign) VLKTVMVViewState mvState;//记录各种情况下的按钮状态
 
 //- (void)cleanMusicText;
 - (int)getSongScore;
 - (void)setSongScore:(int)score;
 - (int)getAvgSongScore;
 
-//- (void)setPlayerViewsHidden:(BOOL)hidden nextButtonHidden:(BOOL)nextButtonHidden;
 - (void)setOriginBtnState:(VLKTVMVViewActionType)type;
 
 #pragma mark - 歌词相关
@@ -93,11 +96,11 @@ typedef enum : NSUInteger {
 /// 重置分数
 - (void)reset;
 
--(void)setBotViewHidden:(BOOL)isHidden;
-
 -(void)setPerViewHidden:(BOOL)isHidden;
 
 -(void)setPerViewAvatar:(NSString *)url;
+
+-(void)setSongNameWith:(NSString *)text;
 
 @end
 
