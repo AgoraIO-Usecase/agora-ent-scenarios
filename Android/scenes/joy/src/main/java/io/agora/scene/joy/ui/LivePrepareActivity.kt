@@ -162,8 +162,6 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
             }
             return@setOnTouchListener false
         }
-        binding.vpGame.currentItem = 1
-        startAutoScroll()
     }
 
     override fun requestData() {
@@ -173,8 +171,19 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
                     val list = it.data?.bannerList
+
                     if (!list.isNullOrEmpty()) {
-                        mGameInfoAdapter.setDataList(list)
+                        // 头尾各添加一个数据，无缝循环播放
+                        val first = list.first()
+                        val last = list.last()
+                        val dataList = mutableListOf<JoyGameBanner>()
+                        dataList.add(last)
+                        dataList.addAll(list)
+                        dataList.add(first)
+                        mGameInfoAdapter.setDataList(dataList)
+
+                        binding.vpGame.currentItem = 1
+                        startAutoScroll()
                     }
                 }
             }

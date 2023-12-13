@@ -110,11 +110,16 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     private var mGameChooseGameDialog: JoyChooseGameDialog? = null
 
     private var mToggleVideoRun: Runnable? = null
+    private var mToggleAudioRun: Runnable? = null
 
     override fun getPermissions() {
         mToggleVideoRun?.let {
             it.run()
             mToggleVideoRun = null
+        }
+        mToggleAudioRun?.let {
+            it.run()
+            mToggleAudioRun = null
         }
     }
 
@@ -252,16 +257,39 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         showInput(binding.etMessage)
     }
 
+    private fun toggleSelfVideo(callback:() -> Unit){
+        if (mIsRoomOwner){
+            mToggleVideoRun = Runnable {
+               callback.invoke()
+            }
+            requestCameraPermission(true)
+        }else{
+            callback.invoke()
+        }
+    }
+
+    private fun toggleSelfAudio(callback:() -> Unit){
+        if (mIsRoomOwner){
+            mToggleAudioRun = Runnable {
+                callback.invoke()
+            }
+            requestRecordPermission(true)
+        }else{
+            callback.invoke()
+        }
+    }
+
+
     override fun requestData() {
         super.requestData()
         val roomLeftTime =
             JoyServiceProtocol.ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt)
         if (roomLeftTime > 0) {
-            mToggleVideoRun = Runnable {
+            toggleSelfVideo {
                 initRtcEngine()
                 initServiceWithJoinRoom()
             }
-            requestCameraPermission(mIsRoomOwner)
+            toggleSelfAudio {  }
             startTopLayoutTimer()
         } else {
             ToastUtils.showToast(getString(R.string.joy_living_end))

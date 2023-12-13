@@ -83,12 +83,13 @@ class FadeDotsIndicator @JvmOverloads constructor(
     private fun addDot(index: Int) {
         val dot = LayoutInflater.from(context).inflate(R.layout.joy_view_fade_dots_indicator, this, false)
         dot.layoutDirection = View.LAYOUT_DIRECTION_LTR
-        val dotLight = dot.findViewById<ImageView>(R.id.dotLight)
+        val dotLight = dot.findViewById<ImageView>(R.id.dotNormal)
         setUpDotCornerRadiusView(dotLight)
 
-        val imageView = dot.findViewById<ImageView>(R.id.dotDark)
+        val imageView = dot.findViewById<ImageView>(R.id.dotCurrent)
         setUpDotCornerRadiusView(imageView)
         setUpDotAlpha(index, imageView)
+
 
         dot.setOnClickListener {
             pager?.let { pager ->
