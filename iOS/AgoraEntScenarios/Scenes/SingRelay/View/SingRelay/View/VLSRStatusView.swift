@@ -545,7 +545,6 @@ class VLSRStatusView: UIView {
     
     @objc public var countTime: Int = 0{
         didSet {
-            print("countTime:\(countTime)")
             srBtn.setTitle("\(countTime)", for: .disabled)
         }
     }
@@ -614,10 +613,10 @@ class VLSRStatusView: UIView {
     }
     
     @objc func sr(btn: UIButton) {
-        srBtn.isEnabled = false
+        srBtn.isUserInteractionEnabled = false
         // 延迟两秒后恢复按钮的可点击状态
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            self.srBtn.isEnabled = true
+            self.srBtn.isUserInteractionEnabled = true
         }
         guard let delegate = delegate else {return}
         delegate.didSrActionChanged(.sbg)

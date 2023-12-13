@@ -473,8 +473,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 - (void)didDumpModeChanged:(BOOL)enable {
     self.isDumpMode = enable;
     NSString* key = @"dump enable";
-    BOOL status = ![SRDebugInfo getSelectedStatusForKey:key];
-    [SRDebugInfo setSelectedStatus:status forKey:key];
+    [SRDebugInfo setSelectedStatus:enable forKey:key];
     [SRDebugManager reLoadParamAll];
 }
 
