@@ -26,10 +26,10 @@ extension BeautyModel {
         
         model = BeautyModel()
         model.path = "face_beautification"
-        model.key = "rosy"
-        model.value = 0.65
-        model.name = "show_beauty_item_beauty_rosy".show_localized
-        model.icon = "meiyan_icon_meibai_hongrun"
+        model.key = "whiten"
+        model.value = 0.75
+        model.name = "show_beauty_item_beauty_whiten".show_localized
+        model.icon = "meiyan_icon_meibai"
         dataArray.append(model)
         
         model = BeautyModel()
@@ -92,7 +92,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = "face_beautification"
         model.key = "forehead"
-        model.value = 0.3
+        model.value = 0
         model.name = "show_beauty_item_beauty_forehead".show_localized
         model.icon = "meiyan_icon_etou"
         model.enableNegative = true
@@ -101,7 +101,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = "face_beautification"
         model.key = "mouth"
-        model.value = 0.4
+        model.value = 0
         model.name = "show_beauty_item_beauty_mouth".show_localized
         model.icon = "meiyan_icon_zuixing"
         model.enableNegative = true

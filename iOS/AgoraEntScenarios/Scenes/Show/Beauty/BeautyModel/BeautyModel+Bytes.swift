@@ -90,7 +90,7 @@ extension BeautyModel {
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Forehead"
         model.value = 0
-        model.name = "show_beauty_item_beauty_forehead".show_localized
+        model.name = "show_beauty_item_beauty_hairline".show_localized
         model.icon = "meiyan_icon_etou"
         model.enableNegative = true
         dataArray.append(model)
@@ -150,7 +150,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = "/style_makeup/cwei"
         model.key = "Makeup_ALL"
-        model.value = 0.6
+        model.value = 0.8
         model.name = "show_beauty_item_effect_C".show_localized
         model.icon = "meiyan_fgz_cwei"
         dataArray.append(model)
@@ -158,7 +158,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = "/style_makeup/yuanqi"
         model.key = "Makeup_ALL"
-        model.value = 0.6
+        model.value = 0.8
         model.name = "show_beauty_item_effect_yuanqi".show_localized
         model.icon = "meiyan_fgz_yuanqi"
         dataArray.append(model)

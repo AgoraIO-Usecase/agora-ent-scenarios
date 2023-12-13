@@ -210,7 +210,7 @@ extension BeautyModel {
         model.icon = "show_beauty_ic_adjust_sharp"
         model.path = ""
         model.key = "603"
-        model.value = 0.5
+        model.value = 0
         dataArray.append(model)
         
         model = BeautyModel()
@@ -218,7 +218,7 @@ extension BeautyModel {
         model.icon = "show_beauty_ic_adjust_clear"
         model.path = ""
         model.key = "604"
-        model.value = 1.0
+        model.value = 0
         dataArray.append(model)
      
         return dataArray
