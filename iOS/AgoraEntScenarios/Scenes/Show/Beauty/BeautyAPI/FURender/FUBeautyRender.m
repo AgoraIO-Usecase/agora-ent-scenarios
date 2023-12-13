@@ -15,6 +15,7 @@
 @property (nonatomic, strong) FUSticker *currentSticker;
 @property (nonatomic, strong) FUAnimoji *currentAnimoji;
 #endif
+@property (nonatomic, copy) NSString *makeupKey;
 
 @end
 
@@ -133,7 +134,7 @@
 - (void)setStyleWithPath:(NSString *)path key:(NSString *)key value:(float)value {
 #if __has_include(FURenderMoudle)
     FUMakeup *makeup = [FURenderKit shareRenderKit].makeup;
-    if (makeup == nil) {
+    if (makeup == nil || self.makeupKey != key) {
         NSBundle *bundle = [BundleUtil bundleWithBundleName:@"FURenderKit" podName:@"fuLib"];
         NSString *stylePath = [bundle pathForResource:key ofType:@"bundle"];
         makeup = [[FUMakeup alloc] initWithPath:stylePath name:@"makeup"];
@@ -146,6 +147,7 @@
         });
     }
     [FURenderKit shareRenderKit].makeup.intensity = value;
+    self.makeupKey = key;
 #endif
 }
 
@@ -205,6 +207,7 @@
         [FURenderKit shareRenderKit].makeup = nil;
     });
 #endif
+    self.makeupKey = nil;
 }
 
 - (void)resetSticker {
