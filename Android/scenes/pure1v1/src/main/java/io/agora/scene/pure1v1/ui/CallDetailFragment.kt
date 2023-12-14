@@ -6,24 +6,26 @@ import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.WindowManager
+import android.view.ViewGroup
 import android.widget.FrameLayout.LayoutParams
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.IRtcEngineEventHandler
-import io.agora.scene.base.component.BaseBindingActivity
 import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.callAPI.CallEvent
 import io.agora.scene.pure1v1.callAPI.CallReason
 import io.agora.scene.pure1v1.callAPI.CallStateType
 import io.agora.scene.pure1v1.callAPI.ICallApiListener
-import io.agora.scene.pure1v1.databinding.Pure1v1CallDetailActivityBinding
+import io.agora.scene.pure1v1.databinding.Pure1v1CallDetailFragmentBinding
 import io.agora.scene.pure1v1.service.CallServiceManager
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import java.util.concurrent.TimeUnit
 
-class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>(), ICallApiListener {
+class CallDetailFragment : Fragment(), ICallApiListener {
+
+    private lateinit var binding: Pure1v1CallDetailFragmentBinding
 
     private val tag = "CallDetailActivity_LOG"
 
@@ -32,20 +34,19 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
     private var dashboard: DashboardFragment? = null
     private var rtcEventHandler: IRtcEngineEventHandler? = null
 
-    override fun getViewBinding(inflater: LayoutInflater): Pure1v1CallDetailActivityBinding {
-        return Pure1v1CallDetailActivityBinding.inflate(inflater)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = Pure1v1CallDetailFragmentBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setupView()
         CallServiceManager.instance.callApi?.addListener(this)
         setupRTCListener()
 
         timerHandler = Handler(Looper.getMainLooper())
         updateTime()
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     private fun setupRTCListener() {
@@ -53,7 +54,7 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
             override fun onContentInspectResult(result: Int) {
                 Log.d(tag, "onContentInspectResult = $result")
                 if (result > 1) {
-                    Toast.makeText(this@CallDetailActivity, getText(R.string.pure1v1_call_content_inspect), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getText(R.string.pure1v1_call_content_inspect), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -102,7 +103,9 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
             onClickSetting()
         }
         binding.ivMore.setOnClickListener {
-            TopFunctionDialog(this).show()
+            this.activity?.let {
+                TopFunctionDialog(it).show()
+            }
         }
         binding.ivClose.setOnClickListener {
             binding.ivClose.visibility = View.INVISIBLE
@@ -117,7 +120,7 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
             binding.tvRoomNum.text = userInfo.userId
         }
         val fragment = DashboardFragment()
-        val fragmentTransaction = supportFragmentManager.beginTransaction()
+        val fragmentTransaction = parentFragmentManager.beginTransaction()
         fragmentTransaction.add(binding.flDashboard.id, fragment)
         fragmentTransaction.commit()
         dashboard = fragment
@@ -166,7 +169,8 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
     }
 
     private fun onClickSetting() {
-        val dialog = CallDetailSettingDialog(this)
+        val context = context ?: return
+        val dialog = CallDetailSettingDialog(context)
         dialog.setListener(object: CallDetailSettingDialog.CallDetailSettingItemListener {
             override fun onClickDashboard() {
                 binding.flDashboard.visibility = View.VISIBLE
@@ -186,8 +190,14 @@ class CallDetailActivity : BaseBindingActivity<Pure1v1CallDetailActivityBinding>
         binding.vDragWindow2.canvasContainer.removeAllViews()
         timerHandler?.removeCallbacksAndMessages(null)
         timerHandler = null
-        finish()
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        if (isAdded && !parentFragmentManager.isDestroyed) {
+            val fragment = parentFragmentManager.findFragmentByTag("CallDetailFragment")
+            fragment?.let {
+                val transaction = parentFragmentManager.beginTransaction()
+                transaction.remove(it)
+                transaction.commit()
+            }
+        }
     }
 
     override fun onCallStateChanged(

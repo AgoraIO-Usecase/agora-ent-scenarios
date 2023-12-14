@@ -7,16 +7,11 @@ import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import android.view.animation.AnimationUtils
 import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -179,8 +174,12 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
 
     private fun connectCallDetail() {
-        val intent = Intent(this, CallDetailActivity::class.java)
-        startActivity(intent)
+        binding.flCallContainer.visibility = View.VISIBLE
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        val callDetailFragment = CallDetailFragment()
+        fragmentTransaction.add(R.id.flCallContainer, callDetailFragment, "CallDetailFragment")
+        fragmentTransaction.commit()
         // 开启鉴黄鉴暴
         val channelId = CallServiceManager.instance.remoteUser?.getRoomId() ?: ""
         val localUid = CallServiceManager.instance.localUser?.userId?.toInt() ?: 0
@@ -309,6 +308,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 CallServiceManager.instance.connectedChannelId = null
                 CallServiceManager.instance.resetAcceptCallToken()
                 finishCallDialog()
+                binding.flCallContainer.visibility = View.INVISIBLE
             }
             CallStateType.Failed -> {
                 Toast.makeText(this, eventReason, Toast.LENGTH_SHORT).show()
