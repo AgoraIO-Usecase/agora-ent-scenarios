@@ -206,7 +206,7 @@ class VLSBGLyricView: UIView {
         return btn
     }()
     
-    private lazy var sbgBtn: UIButton = {
+    public lazy var sbgBtn: UIButton = {
         let btn = UIButton()
         btn.setBackgroundImage(UIImage.sceneImage(name: "sbg-btn-disabled"), for: .disabled)
         btn.setBackgroundImage(UIImage.sceneImage(name: "sbg-btn-qiang"), for: .normal)
