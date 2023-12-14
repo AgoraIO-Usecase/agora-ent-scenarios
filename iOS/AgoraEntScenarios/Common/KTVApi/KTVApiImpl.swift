@@ -779,8 +779,8 @@ extension KTVApiImpl {
             callback(.OK, songCode)
             return
         }
-        let err = self.mcc?.preload(songCode: songCode)
-        if err == nil {
+        let err = self.mcc?.preload(songCode: songCode, jsonOption: nil)
+        if err != 0 {
             musicCallbacks.removeValue(forKey: String(songCode))
             callback(.error, songCode)
             return
@@ -1387,6 +1387,7 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
             listener.onMusicLoadProgress(songCode: songCode, percent: percent, status: status, msg: String(errorCode.rawValue), lyricUrl: lyricUrl)
         }
         if (status == .preloading) { return }
+        agoraPrint("songCode:\(songCode), status:\(status.rawValue), code:\(errorCode.rawValue)")
         let SongCode = "\(songCode)"
         guard let block = self.musicCallbacks[SongCode] else { return }
         self.musicCallbacks.removeValue(forKey: SongCode)
