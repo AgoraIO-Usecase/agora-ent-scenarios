@@ -58,6 +58,7 @@ dependencies {
     implementation rootProject.ext.deps.core_ktx
     implementation rootProject.ext.deps.constraintlayout
     implementation rootProject.ext.deps.material
+    implementation rootProject.ext.deps.rtm
 
     implementation rootProject.ext.deps.gson
     implementation rootProject.ext.deps.syncManager
