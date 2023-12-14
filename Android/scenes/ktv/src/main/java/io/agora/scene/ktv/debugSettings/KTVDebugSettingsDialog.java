@@ -86,7 +86,7 @@ public class KTVDebugSettingsDialog extends BaseBottomSheetDialogFragment<KtvDia
         mBinding.btSetParams.setOnClickListener(v -> {
             String key = mBinding.etParms.getText().toString();
             String value = mBinding.etParmsNum.getText().toString();
-            String parameters = "{\"" + key + "\":" + value;
+            String parameters = "{\"" + key + "\":" + value + "}";
             mSetting.setParameters(parameters);
         });
 
