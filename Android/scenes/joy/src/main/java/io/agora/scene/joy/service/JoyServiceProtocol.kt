@@ -72,7 +72,7 @@ interface JoyServiceProtocol {
     /**
      * 更新正在进行的游戏信息
      */
-    fun updateStartGame(roomId: String,gameInfo: JoyStartGameInfo,completion: (error: Exception?) -> Unit)
+    fun updateStartGame(roomId: String, gameInfo: JoyStartGameInfo, completion: (error: Exception?) -> Unit)
 
     /**
      * 创建房间

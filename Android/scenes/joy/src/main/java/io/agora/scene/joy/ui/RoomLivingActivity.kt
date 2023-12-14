@@ -1,6 +1,10 @@
 package io.agora.scene.joy.ui
 
 import agora.pb.rctrl.RemoteCtrlMsg
+import agora.pb.rctrl.RemoteCtrlMsg.KeyboardEventMsg
+import agora.pb.rctrl.RemoteCtrlMsg.KeyboardEventType
+import agora.pb.rctrl.RemoteCtrlMsg.RctrlMsg
+import agora.pb.rctrl.RemoteCtrlMsg.RctrlMsges
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -34,7 +38,6 @@ import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.joy.R
 import io.agora.scene.joy.RtcEngineInstance
 import io.agora.scene.joy.base.DataState
@@ -58,7 +61,6 @@ import io.agora.scene.joy.utils.JoyLogger
 import io.agora.scene.joy.utils.dp
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
-import io.agora.scene.widget.utils.StatusBarUtil
 import io.agora.syncmanager.rtm.Sync
 import org.json.JSONException
 import org.json.JSONObject
@@ -133,7 +135,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
-        StatusBarUtil.hideStatusBar(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         binding.tvRoomName.text = mRoomInfo.roomName
         binding.tvRoomId.text = mRoomInfo.roomId
@@ -146,11 +147,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
         binding.tvEmptyGame.isVisible = !mIsRoomOwner
         // 消息
-        val messageLayout = binding.messageLayout
-        (messageLayout.rvMessage.layoutManager as LinearLayoutManager).let {
+        (binding.rvMessage.layoutManager as LinearLayoutManager).let {
             it.stackFromEnd = true
         }
-        messageLayout.rvMessage.adapter = mMessageAdapter
+        binding.rvMessage.adapter = mMessageAdapter
 
         binding.ivClose.setOnClickListener {
             showEndRoomDialog()
@@ -189,12 +189,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     if (content.isNotEmpty()) {
                         mJoyViewModel.sendComment(mJoyViewModel.mGamId, mRoomInfo.roomId, content)
                         mJoyService.sendChatMessage(mRoomInfo.roomId, content, completion = {
-                            it?.message?.let { errorMsg ->
-                                CustomToast.showError(errorMsg)
-                            }
-                            if (it == null) {
-                                CustomToast.show(getString(R.string.joy_send_message_success))
-                            }
+//                            it?.message?.let { errorMsg ->
+//                                CustomToast.showError(errorMsg)
+//                            }
+//                            if (it == null) {
+//                                CustomToast.show(getString(R.string.joy_send_message_success))
+//                            }
                         })
                     }
                 }
@@ -206,10 +206,16 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             mJoyViewModel.sendLike(mJoyViewModel.mGamId, mRoomInfo.roomId, 1)
         }
         binding.root.setOnTouchListener { v, event ->
+            if (mIsRoomOwner) {
+                return@setOnTouchListener false
+            }
             showNormalInputLayout()
-            true
+            return@setOnTouchListener true
         }
         binding.flAssistantContainer.setOnTouchListener { view, event ->
+            if (!mIsRoomOwner) {
+                return@setOnTouchListener false
+            }
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> sendMouseMessage(
                     event,
@@ -221,7 +227,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     RemoteCtrlMsg.MouseEventType.MOUSE_EVENT_LBUTTON_UP.getNumber()
                 )
             }
-            true
+            return@setOnTouchListener true
         }
         KeyboardStatusWatcher(this, this) { isKeyboardShowed: Boolean, keyboardHeight: Int ->
             Log.d(TAG, " isKeyboardShowed: $isKeyboardShowed keyboardHeight: $keyboardHeight")
@@ -257,24 +263,24 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         showInput(binding.etMessage)
     }
 
-    private fun toggleSelfVideo(callback:() -> Unit){
-        if (mIsRoomOwner){
+    private fun toggleSelfVideo(callback: () -> Unit) {
+        if (mIsRoomOwner) {
             mToggleVideoRun = Runnable {
-               callback.invoke()
+                callback.invoke()
             }
             requestCameraPermission(true)
-        }else{
+        } else {
             callback.invoke()
         }
     }
 
-    private fun toggleSelfAudio(callback:() -> Unit){
-        if (mIsRoomOwner){
+    private fun toggleSelfAudio(callback: () -> Unit) {
+        if (mIsRoomOwner) {
             mToggleAudioRun = Runnable {
                 callback.invoke()
             }
             requestRecordPermission(true)
-        }else{
+        } else {
             callback.invoke()
         }
     }
@@ -289,10 +295,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 initRtcEngine()
                 initServiceWithJoinRoom()
             }
-            toggleSelfAudio {  }
+            toggleSelfAudio { }
             startTopLayoutTimer()
         } else {
-            ToastUtils.showToast(getString(R.string.joy_living_end))
+            CustomToast.show(getString(R.string.joy_living_end))
             finish()
             return
         }
@@ -307,7 +313,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
             override fun onMessageDidAdded(message: JoyMessage) {
                 mMessageAdapter.insertLast(message)
-                binding.messageLayout.rvMessage.scrollToPosition(mMessageAdapter.itemCount - 1)
+                binding.rvMessage.scrollToPosition(mMessageAdapter.itemCount - 1)
             }
 
             override fun onStartGameInfoDidChanged(startGameInfo: JoyStartGameInfo) {
@@ -361,14 +367,17 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                         assistantUid = 1000000000 + mRoomInfo.ownerId,
                         gameName = gameSelect.name ?: ""
                     )
+                    // 获取游戏详情
+                    mJoyViewModel.getGameDetail(gameSelect.gameId!!)
                     // 获取游戏状态
 //                    mJoyViewModel.gameState(gameSelect.gameId ?: "", mTaskId)
-
+                    // 加载游戏画面
+                    setupAssistantVideoView()
                     mJoyService.updateStartGame(mRoomInfo.roomId, mStartGameInfo!!, completion = { error ->
                         if (error == null) { //启动游戏成功
-                            setupAssistantVideoView()
                         }
                     })
+
                 }
 
                 else -> {
@@ -389,7 +398,13 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             when (it.dataState) {
                 DataState.STATE_EMPTY,
                 DataState.STATE_SUCCESS -> {
-                    CustomToast.show("送礼物成功")
+                    CustomToast.show(getString(R.string.joy_send_gift_success))
+                }
+
+                else -> {
+                    it.msg?.let { errorMsg ->
+                        CustomToast.show(errorMsg)
+                    }
                 }
             }
         }
@@ -397,7 +412,13 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             when (it.dataState) {
                 DataState.STATE_EMPTY,
                 DataState.STATE_SUCCESS -> {
-//                    CustomToast.show("发送弹幕成功")
+                    CustomToast.show(getString(R.string.joy_send_message_success))
+                }
+
+                else -> {
+                    it.msg?.let { errorMsg ->
+                        CustomToast.show(errorMsg)
+                    }
                 }
             }
         }
@@ -405,7 +426,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             when (it.dataState) {
                 DataState.STATE_EMPTY,
                 DataState.STATE_SUCCESS -> {
-                    CustomToast.show("点赞成功")
+                }
+
+                else -> {
+                    it.msg?.let { errorMsg ->
+                        CustomToast.show(errorMsg)
+                    }
                 }
             }
         }
@@ -440,11 +466,28 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
                 super.onJoinChannelSuccess(channel, uid, elapsed)
                 Log.d(TAG, "rtc onJoinChannelSuccess channel:$channel ,uid:$uid }")
+                val config = DataStreamConfig()
+                config.ordered = true
+                config.syncWithAudio = true
+                mStreamId = mRtcEngine.createDataStreamEx(config, mMainRtcConnection)
             }
 
             override fun onUserJoined(uid: Int, elapsed: Int) {
                 super.onUserJoined(uid, elapsed)
                 Log.d(TAG, "rtc onUserJoined uid:$uid }")
+            }
+
+            override fun onUserOffline(uid: Int, reason: Int) {
+                super.onUserOffline(uid, reason)
+                Log.d(TAG, "rtc onUserOffline uid:$uid }")
+                binding.root.post {
+                    if (uid == mRoomInfo.ownerId) {
+                        // 房主退出
+                        CustomToast.show(getString(R.string.joy_automatic_exit_of_gameplay_exception))
+                        destroy()
+                        finish()
+                    }
+                }
             }
 
             override fun onRemoteVideoStateChanged(uid: Int, state: Int, reason: Int, elapsed: Int) {
@@ -470,39 +513,35 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 rotation: Int
             ) {
                 super.onVideoSizeChanged(source, uid, width, height, rotation)
-                mVideoTextureView ?: return
-                binding.root.post {
-                    val rootViewWidth: Int = binding.root.measuredWidth
-                    val rootViewHeight: Int = binding.root.measuredHeight
-                    Log.i(TAG, "onVideoSizeChanged->rootViewWidth:$rootViewWidth,rootViewHeight:$rootViewHeight")
-                    val targetWidth: Int
-                    val targetHeight: Int
-                    if (rootViewWidth.toFloat() / rootViewHeight > width.toFloat() / height) {
-                        targetHeight = rootViewHeight
-                        val scale = targetHeight.toFloat() / height
-                        targetWidth = (width * scale).toInt()
-                    } else {
-                        targetWidth = rootViewWidth
-                        val scale = targetWidth.toFloat() / width
-                        targetHeight = (height * scale).toInt()
-                    }
-                    Log.i(TAG, "onVideoSizeChanged->targetWidth:$targetWidth,targetHeight:$targetHeight")
-                    mVideoTextureView?.setVideoSize(targetWidth, targetHeight)
-                    mVideoTextureView?.post {
-                        val layoutParams: ViewGroup.LayoutParams = binding.flAssistantContainer.layoutParams
-                        layoutParams.width = targetWidth
-                        layoutParams.height = targetHeight
-                        binding.flAssistantContainer.layoutParams = layoutParams
-                    }
-                }
+//                mVideoTextureView ?: return
+//                binding.root.post {
+//                    val rootViewWidth: Int = binding.flAssistantContainer.measuredWidth
+//                    val rootViewHeight: Int = binding.flAssistantContainer.measuredHeight
+//                    Log.i(TAG, "onVideoSizeChanged->rootViewWidth:$rootViewWidth,rootViewHeight:$rootViewHeight")
+//                    val targetWidth: Int
+//                    val targetHeight: Int
+//                    if (rootViewWidth.toFloat() / rootViewHeight > width.toFloat() / height) {
+//                        targetHeight = rootViewHeight
+//                        val scale = targetHeight.toFloat() / height
+//                        targetWidth = (width * scale).toInt()
+//                    } else {
+//                        targetWidth = rootViewWidth
+//                        val scale = targetWidth.toFloat() / width
+//                        targetHeight = (height * scale).toInt()
+//                    }
+//                    Log.i(TAG, "onVideoSizeChanged->targetWidth:$targetWidth,targetHeight:$targetHeight")
+//                    mVideoTextureView?.setVideoSize(targetWidth, targetHeight)
+//                    mVideoTextureView?.post {
+//                        val layoutParams: ViewGroup.LayoutParams = binding.flAssistantContainer.layoutParams
+//                        layoutParams.width = targetWidth
+//                        layoutParams.height = targetHeight
+//                        binding.flAssistantContainer.layoutParams = layoutParams
+//                    }
+//                }
 
             }
         }
 
-        val config = DataStreamConfig()
-        config.ordered = true
-        config.syncWithAudio = true
-        mStreamId = mRtcEngine.createDataStream(config)
         joinChannel(eventListener)
         setupVideoView()
     }
@@ -539,7 +578,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             if (it == null) { //success
                 getStartGameInfo()
             } else {
-                ToastUtils.showToast("加入房间失败，请重试")
+                CustomToast.show(getString(R.string.joy_join_room_error))
                 destroy()
                 finish()
             }
@@ -567,7 +606,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     }
                 }
             } else {
-                ToastUtils.showToast("获取进行中的游戏失败")
+                CustomToast.show(getString(R.string.joy_get_start_game_error))
             }
         })
     }
@@ -646,10 +685,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                         // 开始游戏
                         val assistantUid = 1000000000 + (UserManager.getInstance().user.id).toInt()
                         mJoyViewModel.startGame(mRoomInfo.roomId, it.gameId ?: "", assistantUid)
-                        // 获取游戏详情
-                        mJoyViewModel.getGameDetail(it.gameId!!)
-                        // 加载游戏画面
-                        setupAssistantVideoView()
                     }
                 }
             }
@@ -726,6 +761,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 //    }
 
     private fun sendMouseMessage(event: MotionEvent, value: Int) {
+        if (!mIsRoomOwner) return
         Log.i(TAG, "sendMouseMessage:event x:${event.x},event y:${event.y},value:$value")
         Log.i(
             TAG,
@@ -746,9 +782,28 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         val rctrlMsges: RemoteCtrlMsg.RctrlMsges = RemoteCtrlMsg.RctrlMsges.newBuilder()
             .addMsges(rctrlMsg)
             .build()
-        mRtcEngine.sendStreamMessage(mStreamId, rctrlMsges.toByteArray())
-
+        mRtcEngine.sendStreamMessageEx(mStreamId, rctrlMsges.toByteArray(), mMainRtcConnection)
     }
+
+    private fun sendKeyboardMessage(eventType: KeyboardEventType, key: Char) {
+        if (!mIsRoomOwner) return
+        val eventMsg = KeyboardEventMsg.newBuilder()
+            .setVkey(key.code)
+            .setState(if (eventType == KeyboardEventType.KEYBOARD_EVENT_KEY_DOWN) 1 else -0x3fffffff)
+            .setKeyboardEvent(eventType.number)
+            .build()
+        val rctrlMsg = RctrlMsg.newBuilder()
+            .setType(RemoteCtrlMsg.MsgType.KEYBOARD_EVENT_TYPE)
+            .setTimestamp(System.currentTimeMillis())
+            .setPayload(eventMsg.toByteString())
+            .build()
+        val rctrlMsges = RctrlMsges.newBuilder()
+            .addMsges(rctrlMsg)
+            .build()
+        mRtcEngine.sendStreamMessageEx(mStreamId, rctrlMsges.toByteArray(), mMainRtcConnection)
+        Log.i(TAG, "sendKeyboardMessage:$eventType,key:$key")
+    }
+
 
     private class RoomMessageAdapter constructor(
         private var mList: MutableList<JoyMessage>,

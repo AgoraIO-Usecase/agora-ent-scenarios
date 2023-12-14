@@ -6,6 +6,20 @@
     android:layout_height="match_parent"
     android:background="@drawable/joy_room_bg">
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvEmptyGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/joy_anchor_not_open_gameplay"
+        android:textColor="@color/white"
+        android:textSize="17sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <FrameLayout
         android:id="@+id/flAssistantContainer"
         android:layout_width="match_parent"
@@ -120,19 +134,7 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.68" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvEmptyGame"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/joy_anchor_not_open_gameplay"
-        android:textColor="@color/white"
-        android:textSize="17sp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+
 
     <FrameLayout
         android:id="@+id/flVideoContainer"
@@ -237,12 +239,17 @@
         app:layout_constraintBottom_toBottomOf="@id/tvInput"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <include
-        android:id="@+id/messageLayout"
-        layout="@layout/joy_view_detail_message"
+    <io.agora.scene.joy.ui.widget.NonInterceptingRecyclerView
+        android:id="@+id/rvMessage"
         android:layout_width="match_parent"
         android:layout_height="220dp"
-        app:layout_constraintBottom_toTopOf="@id/ivGift" />
+        android:layout_span="1"
+        android:paddingBottom="10dp"
+        android:paddingHorizontal="10dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/ivGift"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/joy_item_live_detail_message" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/groupBottom"
