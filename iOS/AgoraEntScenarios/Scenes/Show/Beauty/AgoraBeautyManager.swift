@@ -36,11 +36,7 @@ class AgoraBeautyManager: NSObject {
     }
     
     func reset(datas: [BeautyModel]) {
-        beautifyOption.smoothnessLevel = 0.75
-        beautifyOption.lighteningLevel = 0.75
-        beautifyOption.rednessLevel = 0
-        beautifyOption.sharpnessLevel = 0
-        agoraKit?.setBeautyEffectOptions(true, options: beautifyOption)
+        agoraKit?.setBeautyEffectOptions(false, options: beautifyOption)
     }
             
     func destroy() {
