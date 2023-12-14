@@ -27,6 +27,9 @@ public class Constant {
     /* 验证码发送失败*/
     public static final int CALLBACK_TYPE_LOGIN_REQUEST_CODE_FAIL = 406;
 
+    /* 上传了非法内容*/
+    public static final int CALLBACK_TYPE_UPLOAD_ILLEGAL_CONTENT = 90002;
+
     // 是否设置了超分
     public static final String IS_SET_SETTING = "isSetSetting";
 

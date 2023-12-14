@@ -164,6 +164,7 @@
     <string name="app_vcode_send_success_tip">验证码发送成功</string>
     <string name="app_vcode_send_failed_tip">验证码发送失败</string>
     <string name="app_edit_success">修改成功</string>
+    <string name="app_upload_illegal_content_error">请勿上传非法内容</string>
 
 
 </resources>

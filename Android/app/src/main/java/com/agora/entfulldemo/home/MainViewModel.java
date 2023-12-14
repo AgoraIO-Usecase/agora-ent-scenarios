@@ -86,7 +86,13 @@ public class MainViewModel extends BaseRequestViewModel {
 
                             @Override
                             public void onFailure(@Nullable ApiException t) {
-                                ToastUtils.showToast(t.getMessage());
+                                // 恢复ui
+                                getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_INFO_CHANGE, null);
+                                if (t.errCode == Constant.CALLBACK_TYPE_UPLOAD_ILLEGAL_CONTENT) {
+                                    ToastUtils.showToast(R.string.app_upload_illegal_content_error);
+                                } else {
+                                    ToastUtils.showToast(t.getMessage());
+                                }
                             }
                         });
     }
