@@ -1091,6 +1091,7 @@ public class RoomLivingViewModel extends ViewModel {
 
 
         // ------------------ 场景化api初始化 ------------------
+        ((KTVApiImpl) ktvApiProtocol).setDebugMode(AgoraApplication.the().isDebugModeOpen());
         ktvApiProtocol.initialize(new KTVApiConfig(
                 BuildConfig.AGORA_APP_ID,
                 roomInfoLiveData.getValue().getAgoraRTMToken(),
