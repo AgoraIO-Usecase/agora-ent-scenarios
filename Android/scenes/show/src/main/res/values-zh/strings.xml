@@ -274,6 +274,7 @@
     <string name="show_beauty_item_effect_diadiatu">嗲嗲兔</string>
     <string name="show_beauty_item_beauty_fajixian">发际线</string>
     <string name="show_beauty_item_beauty_white_teeth">白牙</string>
+    <string name="show_beauty_item_sticker_zhaocaimao">招财猫</string>
 
     <string-array name="show_encoder">
         <item>硬编码</item>
