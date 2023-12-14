@@ -344,13 +344,16 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [[AppContext srServiceImp] subscribeChooseSongChangedWith:^(SRSubscribe status, VLSRRoomSelSongModel * songInfo, NSArray<VLSRRoomSelSongModel*>* songArray) {
         // update in-ear monitoring
         [weakSelf _checkInEarMonitoring];
-        
+        NSLog(@"update:%@歌曲被删掉了", songInfo.songName);
         if (SRSubscribeDeleted == status) {
             BOOL success = [weakSelf removeSelSongWithSongNo:[songInfo.songNo integerValue] sync:NO];
             if (!success) {
                 weakSelf.selSongsArray = songArray;
                 SRLogInfo(@"removeSelSongWithSongNo fail, reload it");
             }
+            //歌曲删除关闭耳返
+            weakSelf.isEarOn = false;
+            [self.RTCkit enableInEarMonitoring:false includeAudioFilters:AgoraEarMonitoringFilterNone];
         } else {
             VLSRRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
             //add new song
@@ -708,10 +711,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self markSongPlaying:model];
 
     [self setPlayoutVolume:50];
-    //[self.RTCkit adjustRecordingSignalVolume:role == SRSingRoleLeadSinger ? 100 : 0 ];
     if([self isRoomOwner]){
         self.isNowMicMuted = false;
-        [self.RTCkit muteRecordingSignal:self.isNowMicMuted];
+        [self.RTCkit adjustRecordingSignalVolume:(role == KTVSingRoleLeadSinger || role == KTVSingRoleSoloSinger) ? 100 : 0];
     } else {
         self.isNowMicMuted = true;
         [self.RTCkit muteLocalAudioStream:self.isNowMicMuted];
@@ -2239,11 +2241,9 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 - (void)setIsNowMicMuted:(BOOL)isNowMicMuted {
     BOOL oldValue = _isNowMicMuted;
     _isNowMicMuted = isNowMicMuted;
-    NSLog(@"我进来了");
     [self.SRApi setMicStatusWithIsOnMicOpen:!isNowMicMuted];
-    //[self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
     if([self isRoomOwner]){
-        [self.RTCkit muteRecordingSignal:isNowMicMuted];
+        [self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
     } else {
         [self.RTCkit muteLocalAudioStream:isNowMicMuted];
     }
@@ -2268,7 +2268,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 - (void)setIsEarOn:(BOOL)isEarOn {
     _isEarOn = isEarOn;
     [self _checkInEarMonitoring];
-    NSAssert(self.settingView != nil, @"self.settingView == nil");
+
     [self.settingView setIsEarOn:isEarOn];
 }
 
@@ -2499,7 +2499,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 //                }
 //            }
         }
-        SRLogError(@"onMusicLoadFail songCode: %ld error: %ld", songCode, reason);
+        SRLogInfo(@"onMusicLoadFail songCode: %ld error: %ld", songCode, reason);
     });
 }
 
