@@ -273,7 +273,7 @@ object BeautyManager {
                 BeautyType.Agora -> {
                     AgoraBeautySDK.initBeautySDK(rtc)
                     AgoraBeautySDK.enable(enable)
-                    mainExecutor.post {
+                    mainExecutor.postDelayed({
                         videoView?.get()?.let {
                             rtc.setupLocalVideo(
                                 VideoCanvas(
@@ -285,8 +285,7 @@ object BeautyManager {
                             )
                         }
                         setupLocalVideoCountDownLatch.countDown()
-                    }
-
+                    }, 140)
                 }
             }
             setupLocalVideoCountDownLatch.await()
