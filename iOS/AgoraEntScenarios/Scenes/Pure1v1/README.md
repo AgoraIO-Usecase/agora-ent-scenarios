@@ -69,7 +69,6 @@
 ---
   
 
-
 ## 3. 项目介绍
 
 ### 3.1 概述
@@ -108,17 +107,14 @@
   包含场景内用户的加入和退出，用户列表的获取等，相关协议请参考: [Pure1v1ServiceProtocol.swift](Pure1v1/Classes/Service/Pure1v1ServiceProtocol.swift)， 相关协议的实现请参考[Pure1v1ServiceImp.swift](Pure1v1/Classes/Service/Pure1v1ServiceImp.swift)
 
 
+## 4.集成遇到困难，该如何联系声网获取协助
 
-## 4. FAQ
-
-### 如何获取声网APPID
-
-> - 声网APPID申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
-> 
-### 集成遇到困难，该如何联系声网获取协助
-
-> 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
+> 方案1：可以从智能客服获取帮助或联系销售人员 [Agora 支持](https://agora-ticket.agora.io/) 
 > 
 > 方案2：发送邮件给[support@agora.io](mailto:support@agora.io)咨询
+>
+> 方案3：加入微信群提问
+>
+> ![](https://download.agora.io/demo/release/SDHY_QA.jpg)
 
 ---
