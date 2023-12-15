@@ -302,7 +302,7 @@
 
 ### 程序运行后，歌曲列表为空
 
-> 需要联系销售给 APPID 开通 K 歌权限
+**<span style="font-size: larger; color: red;">需要联系销售给 APPID 开通 K 歌权限</span>**
 
 ### K歌房中的歌曲资源使用的是哪家？是否可以自己选择供应商？
 
@@ -313,5 +313,8 @@
 > 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
 >
 > 方案2：发送邮件给 [support@agora.io](mailto:support@agora.io) 咨询
-
+>
+> 方案3：扫码加入我们的微信交流群提问
+>
+> <img src="https://download.agora.io/demo/release/SDHY_QA.jpg" width="360" height="360">
 ---
