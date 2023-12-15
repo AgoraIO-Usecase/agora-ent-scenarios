@@ -27,6 +27,7 @@ import ScoreEffectUI
     case broadcasterWithSinging
     case playerWithoutSinging
     case playerWithSinging
+    case ownerChangeSongOnly
 }
 
 @objc class SRScoreModel: NSObject {
@@ -97,6 +98,18 @@ class VLSRLyricView: UIView {
                 lineScoreView.isHidden = false
                 gradeView.isHidden = false
                 nextBtn.isHidden = true
+                effectBtn.isHidden = true
+                originBtn.isHidden = true
+            } else if state == .ownerChangeSongOnly {
+                songNameView.isHidden = true
+                songNameView.setName(with: songContent, isCenter: true)
+               // songNameView.frame = CGRect(x: 75, y:8, width:self.bounds.width - 150 , height: 20)
+                lrcView.scoringEnabled = true
+                lrcView.isHidden = false
+                incentiveView.isHidden = false
+                lineScoreView.isHidden = false
+                gradeView.isHidden = false
+                nextBtn.isHidden = false
                 effectBtn.isHidden = true
                 originBtn.isHidden = true
             }

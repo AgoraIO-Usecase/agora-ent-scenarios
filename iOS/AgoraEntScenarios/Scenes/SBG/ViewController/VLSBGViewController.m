@@ -349,10 +349,14 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
                 weakSelf.selSongsArray = songArray;
                 SBGLogInfo(@"removeSelSongWithSongNo fail, reload it");
             }
+            //歌曲删除关闭耳返
+            weakSelf.isEarOn = false;
+            [self.RTCkit enableInEarMonitoring:false includeAudioFilters:AgoraEarMonitoringFilterNone];
+            SBGLogInfo(@"%@ has deleted", songInfo.songName);
         } else {
             VLSBGRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
-            NSLog(@"update:%@---%lu", songInfo.winnerNo, (unsigned long)status);
-            if(![songInfo.winnerNo isEqualToString:@""] && status == SBGSubscribeUpdated ){
+            SBGLogInfo(@"update:%@---%lu", songInfo.winnerNo, (unsigned long)status);
+            if(([songInfo.winnerNo length] > 0 || songInfo.winnerNo != nil) && status == SBGSubscribeUpdated ){
                 [weakSelf dealWithSbgEventWithUserNo:songInfo];
             }
             
@@ -403,15 +407,13 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
         [self.SBGApi stopSing];
     }
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@"update: time2---%f", [[NSDate date] timeIntervalSince1970] * 1000);
         [self.statusView setMicOwnerWith:model.name url:model.imageUrl];
         self.statusView.state = SBGStateSbgSuccess;
     });
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW , (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        NSLog(@"update:%@抢到麦", model.winnerNo);
+        SBGLogInfo(@"update:%@抢到麦%@", model.winnerNo, VLUserCenter.user.id);
         kWeakSelf(self);
             if([VLUserCenter.user.id isEqualToString:model.winnerNo]) {
-                
                 [self.SBGApi switchSingerRoleWithNewRole:KTVSingRoleSoloSinger onSwitchRoleState:^(enum KTVSwitchRoleState state, enum KTVSwitchRoleFailReason reason) {
                     weakself.statusView.state = SBGStateSingingBroadcaster;
                 }];
@@ -517,8 +519,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
 - (void)didDumpModeChanged:(BOOL)enable {
     self.isDumpMode = enable;
     NSString* key = @"dump enable";
-    BOOL status = ![SBGDebugInfo getSelectedStatusForKey:key];
-    [SBGDebugInfo setSelectedStatus:status forKey:key];
+    [SBGDebugInfo setSelectedStatus:enable forKey:key];
     [SBGDebugManager reLoadParamAll];
 }
 
@@ -802,8 +803,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [weakSelf.SBGApi startSingWithSongCode:songcode startPos:0];
         }
     };
-    NSLog(@"加载的歌曲:%@---%@---%ld", model.name, model.songNo, (long)songcode);
+    SBGLogInfo(@"加载的歌曲:%@---%@---%ld", model.name, model.songNo, (long)songcode);
     [self.SBGApi loadMusicWithSongCode:songcode config:songConfig onMusicLoadStateListener:self];
+
 
 //    [weakSelf.SBGApi switchSingerRoleWithNewRole:role
 //                           onSwitchRoleState:^( SBGSwitchRoleState state, SBGSwitchRoleFailReason reason) {
@@ -1130,6 +1132,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                     NSLog(@"%@", error.localizedDescription);
                 }
             }];
+            break;
+        case SRClickActionRetryLrc:
+            [self reloadMusic];
             break;
         default:
             break;
@@ -1606,8 +1611,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
     
-//    self.MVView.loadingType = VLSBGMVViewStateLoading;
-//    [self.MVView setBotViewHidden:true];
     VL(weakSelf);
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
         if (!isSuccess) {
@@ -2206,7 +2209,6 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
 - (void)setIsEarOn:(BOOL)isEarOn {
     _isEarOn = isEarOn;
     [self _checkInEarMonitoring];
-    NSAssert(self.settingView != nil, @"self.settingView == nil");
     [self.settingView setIsEarOn:isEarOn];
 }
 
@@ -2387,10 +2389,14 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
             self.loadMusicCallBack = nil;
         }
         VLSBGRoomSelSongModel *model = self.selSongsArray.firstObject;
-        NSLog(@"加载失败的歌曲为:%@---%@----%ld", model.songName, model.winnerNo, (long)songCode);
+        SBGLogInfo(@"加载失败的歌曲为:%@---%@----%ld", model.songName, model.winnerNo, (long)songCode);
         if (reason == KTVLoadSongFailReasonNoLyricUrl) {
            // self.MVView.loadingType = VLSBGMVViewStateLoadFail;
+            [VLToast toast:@"歌词加载失败"];
+           // self.statusView.state = SBGStateLoadFailedLrc;
         } else {
+            [VLToast toast:@"歌曲加载失败"];
+           // self.statusView.state = SBGStateLoadFailedLrc;
            // self.MVView.loadingType = VLSBGMVViewStateIdle;
             //            if(reason == SBGLoadSongFailReasonMusicPreloadFail){
             //                if(self.retryCount < 3){
@@ -2417,13 +2423,13 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
             self.loadMusicCallBack(YES, songCode);
             self.loadMusicCallBack = nil;
         }
-      //  self.MVView.loadingType = VLSBGMVViewStateIdle;
         if(lyricUrl.length > 0){
             SBGLogInfo(@"onMusicLoadSuccessWithSongCode: %ld", self.singRole);
         }
         self.retryCount = 0;
         VLSBGRoomSelSongModel *model = self.selSongsArray.firstObject;
-        if([model.winnerNo isEqualToString:@""]){
+        SBGLogInfo(@"加载成功的歌曲为:%@---%@---%li", model.songName, model.winnerNo, (long)self.singRole);
+        if([model.winnerNo length] == 0 || model.winnerNo == nil){
             //如果是主唱歌曲加载成功 发送ds告诉观众同步进度
             if(self.singRole == KTVSingRoleSoloSinger){
                 NSDictionary *dict = @{
@@ -2438,7 +2444,6 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
                 [self.SBGApi startSingWithSongCode:songCode startPos:0];
                 [self querySbgStatusAndUpdateUI];
                 [self updateSBGCountDown];
-                NSLog(@"加载成功的歌曲为:%@---%@", model.songName, model.winnerNo);
             }
         }
     });

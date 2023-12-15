@@ -37,8 +37,8 @@ public struct SARequestHTTPMethod: RawRepresentable, Equatable, Hashable {
 @objcMembers public class SARequest: NSObject, URLSessionDelegate {
     public static var shared = SARequest()
 
-    // var host: String =  "https://gateway-fulldemo-staging.agoralab.co"
-    var host = "http://ad-fulldemo-gateway-chat-staging.sh2.agoralab.co"
+    // var host: String =  "https://gateway-fulldemo-staging.shengwang.cn"
+    var host = "http://ad-fulldemo-gateway-chat-staging.sh2.shengwang.cn"
     private lazy var config: URLSessionConfiguration = {
         // MARK: - session config
 

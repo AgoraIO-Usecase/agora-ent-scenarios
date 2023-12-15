@@ -344,13 +344,16 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [[AppContext srServiceImp] subscribeChooseSongChangedWith:^(SRSubscribe status, VLSRRoomSelSongModel * songInfo, NSArray<VLSRRoomSelSongModel*>* songArray) {
         // update in-ear monitoring
         [weakSelf _checkInEarMonitoring];
-        
+        NSLog(@"update:%@歌曲被删掉了", songInfo.songName);
         if (SRSubscribeDeleted == status) {
             BOOL success = [weakSelf removeSelSongWithSongNo:[songInfo.songNo integerValue] sync:NO];
             if (!success) {
                 weakSelf.selSongsArray = songArray;
                 SRLogInfo(@"removeSelSongWithSongNo fail, reload it");
             }
+            //歌曲删除关闭耳返
+            weakSelf.isEarOn = false;
+            [self.RTCkit enableInEarMonitoring:false includeAudioFilters:AgoraEarMonitoringFilterNone];
         } else {
             VLSRRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
             //add new song
@@ -473,8 +476,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 - (void)didDumpModeChanged:(BOOL)enable {
     self.isDumpMode = enable;
     NSString* key = @"dump enable";
-    BOOL status = ![SRDebugInfo getSelectedStatusForKey:key];
-    [SRDebugInfo setSelectedStatus:status forKey:key];
+    [SRDebugInfo setSelectedStatus:enable forKey:key];
     [SRDebugManager reLoadParamAll];
 }
 
@@ -709,10 +711,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self markSongPlaying:model];
 
     [self setPlayoutVolume:50];
-    //[self.RTCkit adjustRecordingSignalVolume:role == SRSingRoleLeadSinger ? 100 : 0 ];
     if([self isRoomOwner]){
         self.isNowMicMuted = false;
-        [self.RTCkit muteRecordingSignal:self.isNowMicMuted];
+        [self.RTCkit adjustRecordingSignalVolume:(role == KTVSingRoleLeadSinger || role == KTVSingRoleSoloSinger) ? 100 : 0];
     } else {
         self.isNowMicMuted = true;
         [self.RTCkit muteLocalAudioStream:self.isNowMicMuted];
@@ -1501,7 +1502,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
   self.cosingerLoadCount = 0;
   self.MainSingerPlayFlag = false;
   self.hasCountDown = false;
-  self.currentIndex = 0;
+  self.currentIndex = 1;
   [self.SRApi stopSing];
   [self.statusView resetLrcView];
   [self.SRApi switchSingerRoleWithNewRole:KTVSingRoleAudience onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason)     {
@@ -2060,7 +2061,7 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
         self.cosingerLoadCount = 0;
         self.MainSingerPlayFlag = false;
         self.hasCountDown = false;
-        self.currentIndex = 0;
+        self.currentIndex = 1;
         [self.SRApi stopSing];
         [self.statusView resetLrcView];
         [self.SRApi switchSingerRoleWithNewRole:KTVSingRoleAudience onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
@@ -2240,11 +2241,9 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 - (void)setIsNowMicMuted:(BOOL)isNowMicMuted {
     BOOL oldValue = _isNowMicMuted;
     _isNowMicMuted = isNowMicMuted;
-    NSLog(@"我进来了");
     [self.SRApi setMicStatusWithIsOnMicOpen:!isNowMicMuted];
-    //[self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
     if([self isRoomOwner]){
-        [self.RTCkit muteRecordingSignal:isNowMicMuted];
+        [self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
     } else {
         [self.RTCkit muteLocalAudioStream:isNowMicMuted];
     }
@@ -2269,7 +2268,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 - (void)setIsEarOn:(BOOL)isEarOn {
     _isEarOn = isEarOn;
     [self _checkInEarMonitoring];
-    NSAssert(self.settingView != nil, @"self.settingView == nil");
+
     [self.settingView setIsEarOn:isEarOn];
 }
 
@@ -2479,8 +2478,11 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
             self.loadMusicCallBack = nil;
         }
         if (reason == KTVLoadSongFailReasonNoLyricUrl) {
-           
+            
+            self.statusView.retryBtn.hidden = false;
+            [self.statusView bringSubviewToFront:self.statusView.retryBtn];
         } else {
+            self.statusView.state = [self isRoomOwner] ? SRStateOwnerFailed : SRStatePlayerFailed;
            // self.MVView.loadingType = VLSRMVViewStateIdle;
 //            if(reason == SRLoadSongFailReasonMusicPreloadFail){
 //                if(self.retryCount < 3){
@@ -2497,9 +2499,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 //                }
 //            }
         }
-        self.statusView.retryBtn.hidden = false;
-        [self.statusView bringSubviewToFront:self.statusView.retryBtn];
-        SRLogError(@"onMusicLoadFail songCode: %ld error: %ld", songCode, reason);
+        SRLogInfo(@"onMusicLoadFail songCode: %ld error: %ld", songCode, reason);
     });
 }
 
@@ -2611,13 +2611,13 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 }
 
 -(NSMutableArray *)getChooseSongArray{
-    SRChooseSongInputModel *model = [[SRChooseSongInputModel alloc]init];
-    model.isChorus = false;
-    model.songName = @"勇气大爆发";
-    model.songNo = @"6805795303139450";
-    model.singer = @"贝乐虎；土豆王国小乐队；奶糖乐团";
-    model.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/CASW1078064.jpg";
-    model.playCounts = @[@32000, @47000, @81433, @142000, @176000];
+//    SRChooseSongInputModel *model = [[SRChooseSongInputModel alloc]init];
+//    model.isChorus = false;
+//    model.songName = @"勇气大爆发";
+//    model.songNo = @"6805795303139450";
+//    model.singer = @"贝乐虎；土豆王国小乐队；奶糖乐团";
+//    model.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/CASW1078064.jpg";
+//    model.playCounts = @[@32000, @47000, @81433, @142000, @176000];
 
     SRChooseSongInputModel *model1 = [[SRChooseSongInputModel alloc]init];
     model1.isChorus = false;
@@ -2627,13 +2627,13 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
     model1.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/661208.jpg";
     model1.playCounts = @[@55000, @97000, @150000, @190000, @243000];
     
-    SRChooseSongInputModel *model2 = [[SRChooseSongInputModel alloc]init];
-    model2.isChorus = false;
-    model2.songName = @"天外来物";
-    model2.songNo = @"6654550266760610";
-    model2.singer = @"薛之谦";
-    model2.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/CJ1420004109.jpg";
-    model2.playCounts = @[@91000, @129000, @173000, @212000, @251000];
+//    SRChooseSongInputModel *model2 = [[SRChooseSongInputModel alloc]init];
+//    model2.isChorus = false;
+//    model2.songName = @"天外来物";
+//    model2.songNo = @"6654550266760610";
+//    model2.singer = @"薛之谦";
+//    model2.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/CJ1420004109.jpg";
+//    model2.playCounts = @[@91000, @129000, @173000, @212000, @251000];
     
     SRChooseSongInputModel *model3 = [[SRChooseSongInputModel alloc]init];
     model3.isChorus = false;
@@ -2651,29 +2651,29 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
     model4.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/961853.jpg";
     model4.playCounts = @[@57000, @76000, @130000, @148000, @210000];
     
-    SRChooseSongInputModel *model5 = [[SRChooseSongInputModel alloc]init];
-    model5.isChorus = false;
-    model5.songName = @"他不懂";
-    model5.songNo = @"6625526604594370";
-    model5.singer = @"张杰";
-    model5.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/792885.jpg";
-    model5.playCounts = @[@46000, @81000, @124000, @159000, @207000];
+//    SRChooseSongInputModel *model5 = [[SRChooseSongInputModel alloc]init];
+//    model5.isChorus = false;
+//    model5.songName = @"他不懂";
+//    model5.songNo = @"6625526604594370";
+//    model5.singer = @"张杰";
+//    model5.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/792885.jpg";
+//    model5.playCounts = @[@46000, @81000, @124000, @159000, @207000];
     
-    SRChooseSongInputModel *model6 = [[SRChooseSongInputModel alloc]init];
-    model6.isChorus = false;
-    model6.songName = @"一路向北";
-    model6.songNo = @"6654550232990700";
-    model6.singer = @"周杰伦";
-    model6.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/961979.jpg";
-    model6.playCounts = @[@90000, @118000, @194000, @222000, @262000];
+//    SRChooseSongInputModel *model6 = [[SRChooseSongInputModel alloc]init];
+//    model6.isChorus = false;
+//    model6.songName = @"一路向北";
+//    model6.songNo = @"6654550232990700";
+//    model6.singer = @"周杰伦";
+//    model6.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/961979.jpg";
+//    model6.playCounts = @[@90000, @118000, @194000, @222000, @262000];
     
-    SRChooseSongInputModel *model7 = [[SRChooseSongInputModel alloc]init];
-    model7.isChorus = false;
-    model7.songName = @"天黑黑";
-    model7.songNo = @"6625526604489740";
-    model7.singer = @"孙燕姿";
-    model7.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/147907.jpg";
-    model7.playCounts = @[@51000, @85000, @122000, @176000, @223000];
+//    SRChooseSongInputModel *model7 = [[SRChooseSongInputModel alloc]init];
+//    model7.isChorus = false;
+//    model7.songName = @"天黑黑";
+//    model7.songNo = @"6625526604489740";
+//    model7.singer = @"孙燕姿";
+//    model7.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/147907.jpg";
+//    model7.playCounts = @[@51000, @85000, @122000, @176000, @223000];
     
     SRChooseSongInputModel *model8 = [[SRChooseSongInputModel alloc]init];
     model8.isChorus = false;
@@ -2683,15 +2683,16 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
     model8.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/385062.jpg";
     model8.playCounts = @[@63000, @109000, @154000, @194000, @274000];
     
-    SRChooseSongInputModel *model9 = [[SRChooseSongInputModel alloc]init];
-    model9.isChorus = false;
-    model9.songName = @"这世界那么多人";
-    model9.songNo = @"6654550267486590";
-    model9.singer = @"莫文蔚";
-    model9.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/CJ1420010039.jpg";
-    model9.playCounts = @[@91000, @147000, @191000, @235000, @295000];
+//    SRChooseSongInputModel *model9 = [[SRChooseSongInputModel alloc]init];
+//    model9.isChorus = false;
+//    model9.songName = @"这世界那么多人";
+//    model9.songNo = @"6654550267486590";
+//    model9.singer = @"莫文蔚";
+//    model9.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/CJ1420010039.jpg";
+//    model9.playCounts = @[@91000, @147000, @191000, @235000, @295000];
     
-    NSMutableArray *arrayM = [[NSMutableArray alloc]initWithObjects:model,model1, model2, model3, model4, model5, model6, model7, model8, model9, nil];
+   // NSMutableArray *arrayM = [[NSMutableArray alloc]initWithObjects:model,model1, model2, model3, model4, model5, model6, model7, model8, model9, nil];
+    NSMutableArray *arrayM = [[NSMutableArray alloc]initWithObjects:model1, model3, model4,model8, nil];
     return arrayM;
 }
 

@@ -113,8 +113,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:gravity="left"
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
@@ -126,7 +126,6 @@
             android:id="@+id/etParms"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
             android:text="Input Key"
             android:textColor="@color/def_text_grey_979"
             />
@@ -135,7 +134,6 @@
             android:id="@+id/etParmsNum"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
             android:text="Input Value"
             android:textColor="@color/def_text_grey_979"
             />
@@ -144,7 +142,6 @@
             android:id="@+id/btSetParams"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
             android:alpha="0.3"
             android:text="@string/ktv_debug_settings_set"/>
     </LinearLayout>

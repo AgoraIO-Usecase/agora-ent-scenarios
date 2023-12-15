@@ -123,7 +123,7 @@ private func agoraPrint(_ message: String) {
             contentCenterConfiguration.maxCacheSize = UInt(config.maxCacheSize)
             if config.isDebugMode {
                 //如果这一块报错为contentCenterConfiguration没有mccDomain这个属性 说明该版本不支持这个 可以注释掉这行代码。完全不影响
-                contentCenterConfiguration.mccDomain = "api-test.agora.io"
+                contentCenterConfiguration.mccDomain = "api-test.shengwang.cn"
             }
             mcc = AgoraMusicContentCenter.sharedContentCenter(config: contentCenterConfiguration)
             mcc?.register(self)
@@ -779,8 +779,8 @@ extension KTVApiImpl {
             callback(.OK, songCode)
             return
         }
-        let err = self.mcc?.preload(songCode: songCode)
-        if err == nil {
+        let err = self.mcc?.preload(songCode: songCode, jsonOption: nil)
+        if err != 0 {
             musicCallbacks.removeValue(forKey: String(songCode))
             callback(.error, songCode)
             return
@@ -1387,6 +1387,7 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
             listener.onMusicLoadProgress(songCode: songCode, percent: percent, status: status, msg: String(errorCode.rawValue), lyricUrl: lyricUrl)
         }
         if (status == .preloading) { return }
+        agoraPrint("songCode:\(songCode), status:\(status.rawValue), code:\(errorCode.rawValue)")
         let SongCode = "\(songCode)"
         guard let block = self.musicCallbacks[SongCode] else { return }
         self.musicCallbacks.removeValue(forKey: SongCode)

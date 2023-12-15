@@ -229,7 +229,7 @@ open class NMReportSceneClickNetworkModel: NMCommonNetworkModel {
          
     public override init() {
         super.init()
-        host = "https://report-ad.agoralab.co/"
+        host = "https://report-ad.shengwang.cn/"
         interfaceName = "v1/report"
         sign = "src=\(src ?? "agora_ent_demo")&ts=\(ts)".md5Encrypt
     }

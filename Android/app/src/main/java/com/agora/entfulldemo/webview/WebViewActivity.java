@@ -8,8 +8,10 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +25,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import io.agora.scene.base.Constant;
 import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseViewBindingActivity;
+import io.agora.scene.base.utils.UiUtil;
 import kotlin.jvm.JvmField;
 
 @Route(path = PagePathConstant.pageWebView)
@@ -62,8 +65,14 @@ public class WebViewActivity extends BaseViewBindingActivity<AppActivityWebviewB
 
 
         if (withBrowser) {
-            getBinding().titleView.getRightIcon().setVisibility(View.VISIBLE);
-            getBinding().titleView.getRightIcon().setImageResource(R.drawable.app_icon_find_earth);
+            getBinding().titleView.getLeftIcon().setImageResource(R.drawable.app_icon_back_black);
+            ImageView right = getBinding().titleView.getRightIcon();
+            right.setVisibility(View.VISIBLE);
+            ViewGroup.LayoutParams layoutParams = right.getLayoutParams();
+            layoutParams.width = UiUtil.dp2px(22);
+            layoutParams.height = UiUtil.dp2px(22);
+            right.setLayoutParams(layoutParams);
+            right.setImageResource(R.drawable.app_icon_find_earth);
             getBinding().titleView.setRightIconClick(v -> {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
             });

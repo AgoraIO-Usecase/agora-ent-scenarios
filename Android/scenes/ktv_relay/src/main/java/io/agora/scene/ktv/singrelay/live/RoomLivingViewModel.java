@@ -870,6 +870,7 @@ public class RoomLivingViewModel extends ViewModel {
 
 
         // ------------------ 场景化api初始化 ------------------
+        ((KTVApiImpl) ktvApiProtocol).setDebugMode(AgoraApplication.the().isDebugModeOpen());
         ktvApiProtocol.initialize(new KTVApiConfig(
                 BuildConfig.AGORA_APP_ID,
                 roomInfoLiveData.getValue().getAgoraRTMToken(),
@@ -921,9 +922,9 @@ public class RoomLivingViewModel extends ViewModel {
                                graspModel.headUrl = graspStatusMutableLiveData.getValue().headUrl;
                                graspModel.partNum = graspStatusMutableLiveData.getValue().partNum;
                            }
-                           graspStatusMutableLiveData.postValue(graspModel);
                            mLastPostSongPartChangeStatusTime = System.currentTimeMillis();
                            partNum = i + 2;
+                           graspStatusMutableLiveData.postValue(graspModel);
                            break;
                        } else if ((position_ms - relayList.get(i)) > -3000 && (position_ms - relayList.get(i) < -2000)) {
                            // 提前3s下一段提示

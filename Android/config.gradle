@@ -49,7 +49,8 @@ ext {
             autosize          : 'com.github.JessYanCoding:AndroidAutoSize:v1.2.1',
 
             rtc               : 'io.agora.rtc:agora-special-full:4.1.1.22',
-            syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.2.8',
+            rtm               : 'io.agora:agora-rtm:2.1.8',
+            syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.2.9',
             lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.1.1-beta.8',
 
             // android native libraries

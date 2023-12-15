@@ -9,8 +9,8 @@ import Foundation
 
 class SRNetworkManager: NSObject {
     @objc static let shared = SRNetworkManager()
-    let testUrl = "https://test-toolbox.bj2.agoralab.co/v1/ktv/song/grab"
-    let url = "https://toolbox.bj2.agoralab.co/v1/ktv/song/grab"
+    let testUrl = "https://test-toolbox.bj2.shengwang.cn/v1/ktv/song/grab"
+    let url = "https://toolbox.bj2.shengwang.cn/v1/ktv/song/grab"
     let networkTool = NetworkTools()
     //发起抢唱
     @objc func startSongGrab(_ appid: String, sceneId: String, roomId: String, headUrl: String, userId: String, userName: String, songCode: String, success: @escaping (Bool) -> Void) {
