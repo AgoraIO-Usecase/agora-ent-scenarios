@@ -10,7 +10,7 @@
 ## 1. 环境准备
 
 - <mark>最低兼容 iOS 13.0</mark>
-- Xcode
+- Xcode 14+
 
 ---
 
