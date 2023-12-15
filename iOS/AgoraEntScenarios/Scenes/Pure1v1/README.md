@@ -46,9 +46,8 @@
 
 - 更新pod
 
-   打开终端，cd到Podfile所在目录，执行
-  > 
-  > pod install
+   打开终端，cd到[Podfile](../../../Podfile)所在目录，执行`pod install`生成`AgoraEntScenarios.xcworkspace`
+ 
   > 
    如果xcode14编译失败并遇到下图错误
   >
@@ -64,7 +63,7 @@
   >  将Team里的None替换成你自己的签名即可
   >  
 
-- 运行项目即可开始您的体验
+- 双击打开`AgoraEntScenarios.xcworkspace`运行项目即可开始您的体验
 
 ---
   
