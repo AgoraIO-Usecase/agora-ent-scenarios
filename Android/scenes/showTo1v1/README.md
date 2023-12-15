@@ -29,7 +29,12 @@
     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_2.jpg)
 
   - 在"服务配置"中启用"RTM"功能
-    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/start_rtm.jpg)
+  
+    ![图片](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/rtm_config1.jpg)
+
+    ![图片](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/rtm_config2.jpg)
+
+    ![图片](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/rtm_config3.jpg)
 
   - 得到App ID与App 证书
 
