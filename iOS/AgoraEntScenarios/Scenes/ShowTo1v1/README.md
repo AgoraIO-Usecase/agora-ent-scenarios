@@ -20,19 +20,26 @@
   
   > - 点击创建应用
   >   
-  >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_1.jpg)
+  >   ![](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_1.jpg)
   > 
   > - 选择你要创建的应用类型
   >   
-  >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_2.jpg)
+  >   ![](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_2.jpg)
   > 
-  > - 得到App ID与App 证书
-  >   
-  >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
-  >   
-
 
 - 获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
+  
+  > 在声网控制台的项目管理页面，找到你的项目，点击配置。
+  > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/1641871111769.png)
+  > 点击主要证书下面的复制图标，即可获取项目的 App 证书。
+  > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/1637637672988.png)
+
+- 开启RTM
+  > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/rtm_config1.jpg)
+  > 
+  > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/rtm_config2.jpg)
+  > 
+  > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/rtm_config3.jpg)
 
 - 在项目的[KeyCenter.swift](../../KeyCenter.swift)里填写需要的声网 App ID 和 App证书
   
@@ -108,16 +115,14 @@
   包含场景内用户的加入和退出，用户列表的获取等，相关协议请参考: [ShowTo1v1ServiceProtocol.swift](ShowTo1v1/Classes/Service/ShowTo1v1ServiceProtocol.swift)， 相关协议的实现请参考[ShowTo1v1ServiceImp.swift](Pure1v1/Classes/Service/ShowTo1v1ServiceImp.swift)
 
 
-## 4. FAQ
 
-### 如何获取声网APPID
-
-> - 声网APPID申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
-> 
-### 集成遇到困难，该如何联系声网获取协助
+## 集成遇到困难，该如何联系声网获取协助
 
 > 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
 > 
 > 方案2：发送邮件给[support@agora.io](mailto:support@agora.io)咨询
-
+>
+> 方案3：加入微信群提问
+>
+> ![](https://download.agora.io/demo/release/SDHY_QA.jpg)
 ---
