@@ -232,6 +232,14 @@
         app:layout_constraintBottom_toBottomOf="@id/tvInput"
         app:layout_constraintEnd_toStartOf="@id/likeView" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivDeployTroops"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/joy_icon_deploy_troops"
+        app:layout_constraintBottom_toBottomOf="@id/tvInput"
+        app:layout_constraintEnd_toStartOf="@id/likeView" />
+
     <io.agora.scene.joy.ui.widget.like.LikeLayout
         android:id="@+id/likeView"
         android:layout_width="70dp"
@@ -250,11 +258,4 @@
         app:layout_constraintBottom_toTopOf="@id/ivGift"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/joy_item_live_detail_message" />
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/groupBottom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:constraint_referenced_ids="tvInput,ivGift,likeView"
-        android:visibility="gone" />
 </androidx.constraintlayout.widget.ConstraintLayout>

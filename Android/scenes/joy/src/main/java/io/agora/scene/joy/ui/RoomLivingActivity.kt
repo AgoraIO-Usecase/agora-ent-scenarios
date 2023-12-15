@@ -9,6 +9,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.opengl.Visibility
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
@@ -19,6 +20,7 @@ import android.view.TextureView
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
+import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -146,6 +148,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             .into(binding.ivOwnerAvatar)
 
         binding.tvEmptyGame.isVisible = !mIsRoomOwner
+        if (mIsRoomOwner) {
+            binding.ivGift.isVisible = false
+        } else {
+            binding.ivDeployTroops.isVisible = false
+        }
+
         // 消息
         (binding.rvMessage.layoutManager as LinearLayoutManager).let {
             it.stackFromEnd = true
@@ -206,13 +214,30 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             binding.likeView.addFavor()
             mJoyViewModel.sendLike(mJoyViewModel.mGamId, mRoomInfo.roomId, 1)
         }
-        binding.root.setOnTouchListener { v, event ->
-            if (mIsRoomOwner) {
+        binding.ivDeployTroops.setOnTouchListener { v, event ->
+            if (!mIsRoomOwner) {
                 return@setOnTouchListener false
             }
-            showNormalInputLayout()
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    setControllerView(binding.ivDeployTroops, false)
+                    sendKeyboardMessage(KeyboardEventType.KEYBOARD_EVENT_KEY_DOWN, 'Z')
+                }
+
+                MotionEvent.ACTION_UP -> {
+                    setControllerView(binding.ivDeployTroops, true)
+                    sendKeyboardMessage(KeyboardEventType.KEYBOARD_EVENT_KEY_UP, 'Z')
+                }
+            }
             return@setOnTouchListener true
         }
+//        binding.root.setOnTouchListener { v, event ->
+//            if (mIsRoomOwner) {
+//                return@setOnTouchListener false
+//            }
+//            showNormalInputLayout()
+//            return@setOnTouchListener true
+//        }
         binding.flAssistantContainer.setOnTouchListener { view, event ->
             if (!mIsRoomOwner) {
                 return@setOnTouchListener false
@@ -245,22 +270,45 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     }
 
+    private fun setControllerView(view: ImageView, isClick: Boolean) {
+        view.alpha = if (isClick) 1.0f else 0.5f
+        view.isFocusable = isClick
+        view.isClickable = isClick
+    }
+
     private fun showNormalInputLayout(): Boolean {
-        if (!binding.groupBottom.isVisible) {
+        if (!binding.tvInput.isVisible) {
             hideInput()
             binding.etMessage.setText("")
             binding.layoutEtMessage.isVisible = false
-            binding.groupBottom.isVisible = true
             binding.tvInput.isEnabled = true
+
+            showBottomView(true)
             return true
         }
         return false
     }
 
+    private fun showBottomView(show: Boolean) {
+        if (show) {
+            binding.tvInput.isVisible = true
+            binding.likeView.isVisible = true
+            binding.ivGift.isVisible = !mIsRoomOwner
+            binding.ivDeployTroops.isVisible = mIsRoomOwner
+        } else {
+            binding.tvInput.isVisible = false
+            binding.likeView.isVisible = false
+            binding.ivGift.isVisible = false
+            binding.ivDeployTroops.isVisible = false
+        }
+    }
+
     private fun showKeyboardInputLayout() {
         binding.layoutEtMessage.isVisible = true
-        binding.groupBottom.isVisible = false
         binding.tvInput.isEnabled = false
+
+        // 隐藏
+        showBottomView(false)
         showInput(binding.etMessage)
     }
 
@@ -342,7 +390,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
                     binding.tvRules.isVisible = true
-                    binding.groupBottom.isVisible = true
+                    showBottomView(true)
                     if (mIsRoomOwner) {
                         showRulesDialog()
                         mRoomInfo.badgeTitle = mJoyViewModel.mGameDetail?.name ?: ""
@@ -392,42 +440,38 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
         mJoyViewModel.mStopGameLiveData.observe(this) {
             when (it.dataState) {
-                DataState.STATE_EMPTY,
                 DataState.STATE_SUCCESS -> {
                 }
             }
         }
         mJoyViewModel.mSendGiftLiveData.observe(this) {
             when (it.dataState) {
-                DataState.STATE_EMPTY,
                 DataState.STATE_SUCCESS -> {
                     CustomToast.showTips(getString(R.string.joy_send_gift_success))
                 }
 
-                else -> {
+                DataState.STATE_FAILED,
+                DataState.STATE_ERROR -> {
                     CustomToast.showError(getString(R.string.joy_send_gift_failed))
                 }
             }
         }
         mJoyViewModel.mSendCommentLiveData.observe(this) {
             when (it.dataState) {
-                DataState.STATE_EMPTY,
                 DataState.STATE_SUCCESS -> {
                     CustomToast.showTips(getString(R.string.joy_send_message_success))
                 }
 
-                else -> {
+                DataState.STATE_FAILED,
+                DataState.STATE_ERROR -> {
                     CustomToast.showError(getString(R.string.joy_instruction_error))
                 }
             }
         }
         mJoyViewModel.mSendLikeLiveData.observe(this) {
             when (it.dataState) {
-                DataState.STATE_EMPTY,
-                DataState.STATE_SUCCESS -> {
-                }
-
-                else -> {
+                DataState.STATE_FAILED,
+                DataState.STATE_ERROR -> {
                     CustomToast.showError(getString(R.string.joy_request_failed))
                 }
             }
