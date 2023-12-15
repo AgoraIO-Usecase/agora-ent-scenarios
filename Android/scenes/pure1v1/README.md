@@ -18,7 +18,7 @@
 ## 2. 运行示例
 
 - 获取声网App ID 和 App 证书  
-  [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
+  [声网Agora - 文档中心 - 如何获取 App ID]((https://docportal.shengwang.cn/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id))
 
   - 点击创建应用
 
@@ -28,11 +28,19 @@
 
     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_2.jpg)
 
+  - 在"服务配置"中启用"RTM"功能
+
+    ![图片](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/rtm_config1.jpg)
+
+    ![图片](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/rtm_config2.jpg)
+
+    ![图片](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/rtm_config3.jpg)
+
   - 得到App ID与App 证书
 
     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
 
-  [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
+- 获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docportal.shengwang.cn/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
 - 在项目的[**gradle.properties**](../../gradle.properties)里填写需要的声网 App ID
 
@@ -72,14 +80,12 @@ AGORA_APP_CERTIFICATE=（从声网console获取）
 ---
 
 ## 4. FAQ
-- 如何获取声网和环信APP ID：
-  - 声网APP ID申请：https://www.agora.io/cn/
-  - 环信APP ID申请：https://www.easemob.com/
 
 - 集成遇到困难，该如何联系声网获取协助
-  - 方案1：可以从智能客服获取帮助或联系销售人员[Agora 支持](https://agora-ticket.agora.io/) ；
-  - 方案2：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
-  - 方案3：发送邮件给 [support@agora.io](mailto:support@agora.io) 咨询
+  - 方案1：可以从智能客服获取帮助或联系销售人员[Agora 支持](https://agora-ticket.agora.io/)
+  - 方案2：发送邮件给 [support@agora.io](mailto:support@agora.io) 咨询
+  - 方案3：加入微信群提问
+    ![](https://download.agora.io/demo/release/SDHY_QA.jpg)
 
 ## 代码许可
 
