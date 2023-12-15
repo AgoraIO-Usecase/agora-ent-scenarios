@@ -16,7 +16,7 @@
 
 ## 2. 运行示例
 
-- 获取声网App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
+- 获取声网App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docportal.shengwang.cn/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
   
   > - 点击创建应用
   >   
@@ -32,11 +32,11 @@
   >   
 
 
-- 获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
+- 获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docportal.shengwang.cn/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
 - 在项目的[KeyCenter.swift](../../KeyCenter.swift)里填写需要的声网 App ID 和 App证书
   
-  ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/KeyCenter.png)
+  ![](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/KeyCenter.png)
   
   ```texag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0
   static let AppId: String = 声网AppID
@@ -46,9 +46,8 @@
 
 - 更新pod
 
-   打开终端，cd到Podfile所在目录，执行
-  > 
-  > pod install
+   打开终端，cd到[Podfile](../../../Podfile)所在目录，执行`pod install`生成`AgoraEntScenarios.xcworkspace`
+ 
   > 
    如果xcode14编译失败并遇到下图错误
   >
@@ -64,11 +63,10 @@
   >  将Team里的None替换成你自己的签名即可
   >  
 
-- 运行项目即可开始您的体验
+- 双击打开`AgoraEntScenarios.xcworkspace`运行项目即可开始您的体验
 
 ---
   
-
 
 ## 3. 项目介绍
 
@@ -108,17 +106,14 @@
   包含场景内用户的加入和退出，用户列表的获取等，相关协议请参考: [Pure1v1ServiceProtocol.swift](Pure1v1/Classes/Service/Pure1v1ServiceProtocol.swift)， 相关协议的实现请参考[Pure1v1ServiceImp.swift](Pure1v1/Classes/Service/Pure1v1ServiceImp.swift)
 
 
+## 4.集成遇到困难，该如何联系声网获取协助
 
-## 4. FAQ
-
-### 如何获取声网APPID
-
-> - 声网APPID申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
-> 
-### 集成遇到困难，该如何联系声网获取协助
-
-> 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
+> 方案1：可以从智能客服获取帮助或联系销售人员 [Agora 支持](https://agora-ticket.agora.io/) 
 > 
 > 方案2：发送邮件给[support@agora.io](mailto:support@agora.io)咨询
+>
+> 方案3：加入微信群提问
+>
+> ![](https://download.agora.io/demo/release/SDHY_QA.jpg)
 
 ---
