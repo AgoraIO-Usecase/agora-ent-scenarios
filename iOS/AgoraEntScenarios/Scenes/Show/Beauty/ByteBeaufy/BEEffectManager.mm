@@ -14,9 +14,23 @@
 #import "BEImageUtils.h"
 #import "BEGLUtils.h"
 
-#define EFFECT_LOG_ENABLED
-
 #ifdef EFFECT_LOG_ENABLED
+typedef enum {
+    BEF_LOG_LEVEL_NONE = 0,
+    BEF_LOG_LEVEL_DEFAULT = 1,
+    BEF_LOG_LEVEL_VERBOSE  = 2,
+    BEF_LOG_LEVEL_DEBUG = 3,
+    BEF_LOG_LEVEL_INFO = 4,
+    BEF_LOG_LEVEL_WARN = 5,
+    BEF_LOG_LEVEL_ERROR = 6,
+    BEF_LOG_LEVEL_FATAL = 7,
+    BEF_LOG_LEVEL_SILENT = 8,
+}bef_log_level;
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
+BEF_SDK_API void bef_effect_set_log_level(bef_effect_handle_t handle, bef_log_level logLevel);
+BEF_SDK_API typedef int(*logFileFuncPointer)(int logLevel, const char* msg);
+BEF_SDK_API bef_effect_result_t bef_effect_set_log_to_local_func(logFileFuncPointer pfunc);
+#endif
 
 int effectLogCallback(int logLevel, const char* msg) {
     printf("[EffectSDK] %s\n", msg);
@@ -24,10 +38,10 @@ int effectLogCallback(int logLevel, const char* msg) {
 }
 #endif
 
-static bool USE_PIPELINE = YES;
-static bool USE_3_BUFFER = NO;
+static const bool USE_PIPELINE = YES;
 
-#define BE_LOAD_RESOURCE_TIMEOUT false
+#define BE_LOAD_RESOURCE_TIMEOUT true
+
 #if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 @interface BEEffectManager () <RenderMsgDelegate> {
     bef_effect_handle_t         _handle;
@@ -49,7 +63,6 @@ static bool USE_3_BUFFER = NO;
 #else
 }
 #endif
-
 @end
 #endif
 
@@ -85,8 +98,9 @@ static bool USE_3_BUFFER = NO;
 - (int)initTask {
 #if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     _effectOn = true;
-    _glContext = [EAGLContext currentContext];
+    _glContext = [EAGLContext currentContext];  // 运行在主线程，使用的是self.glView.context
     if (_glContext == nil) {
+        NSLog(@"initTask is not run in thread with glContext!!!");
         _glContext = [BEGLUtils createContextWithDefaultAPI:kEAGLRenderingAPIOpenGLES3];
     }
     if ([EAGLContext currentContext] != _glContext) {
@@ -96,11 +110,11 @@ static bool USE_3_BUFFER = NO;
     ret = bef_effect_ai_create(&_handle);
     CHECK_RET_AND_RETURN(bef_effect_ai_create, ret)
 #ifdef EFFECT_LOG_ENABLED
-    bef_effect_ai_set_log_level(BEF_AI_LOG_LEVEL_ERROR);
-    bef_effect_ai_set_log_callback(effectLogCallback);
+    bef_effect_set_log_level(_handle, 1);
+    bef_effect_set_log_to_local_func(effectLogCallback);
 #endif
     if (self.licenseProvider.licenseMode == OFFLINE_LICENSE) {
-        ret = bef_effect_ai_check_license(_handle, [self.licenseProvider licensePath:BEF_EFFECT]);
+        ret = bef_effect_ai_check_license(_handle, self.licenseProvider.licensePath);
         CHECK_RET_AND_RETURN(bef_effect_ai_check_license, ret)
         _isSuccessLicense = ret == 0;
     }
@@ -108,9 +122,8 @@ static bool USE_3_BUFFER = NO;
         if (![self.licenseProvider checkLicenseResult: @"getLicensePath"])
             return self.licenseProvider.errorCode;
 
-        ret = bef_effect_ai_check_online_license(_handle, [self.licenseProvider licensePath:BEF_EFFECT]);
+        ret = bef_effect_ai_check_online_license(_handle, self.licenseProvider.licensePath);
         CHECK_RET_AND_RETURN(bef_effect_ai_check_online_license, ret)
-        _isSuccessLicense = ret == 0;
     }
 
     [self setUsePipeline:USE_PIPELINE];
@@ -122,21 +135,25 @@ static bool USE_3_BUFFER = NO;
     ret = bef_effect_ai_init(_handle, 10, 10, self.provider.modelDirPath, "");
     CHECK_RET_AND_RETURN(bef_effect_ai_init, ret)
     
-    ret = bef_effect_ai_use_3buffer(_handle, USE_3_BUFFER);
+    ret = bef_effect_ai_use_3buffer(_handle, false);
     CHECK_RET_AND_RETURN(bef_effect_ai_use_3buffer, ret);
     
     _msgDelegateManager = [[IRenderMsgDelegateManager alloc] init];
     [self addMsgHandler:self];
+    
     return ret;
 #else
-    return 0;
+    return -1;
 #endif
 }
 
 - (int)destroyTask {
 #if __has_include(<effect-sdk/bef_effect_ai_api.h>)
+    if ([EAGLContext currentContext] != _glContext) {
+        NSLog(@"effectsar init and destroy are not run in the same glContext");
+        [EAGLContext setCurrentContext:_glContext];
+    }
     [self removeMsgHandler:self];
-    bef_effect_ai_clean_pipeline_processor_task(_handle);
     bef_effect_ai_destroy(_handle);
     [_msgDelegateManager destoryDelegate];
     _msgDelegateManager = nil;
@@ -146,10 +163,10 @@ static bool USE_3_BUFFER = NO;
     free(_faceMaskInfo);
     free(_mouthMaskInfo);
     free(_teethMaskInfo);
-    _glContext = nil;
-    _handle = nil;
-#endif
     return 0;
+#else
+    return -1;
+#endif
 }
 
 #pragma mark - public
@@ -163,10 +180,7 @@ static bool USE_3_BUFFER = NO;
         }
     }
 #endif
-    if (_handle == nil) {
-        return BEF_RESULT_FAIL;
-    }
-    if ([[EAGLContext currentContext] sharegroup] != [_glContext sharegroup]) {
+    if ([EAGLContext currentContext] != _glContext) {
         NSLog(@"effectsar init and process are not run in the same glContext");
         [EAGLContext setCurrentContext:_glContext];
     }
@@ -212,8 +226,10 @@ static bool USE_3_BUFFER = NO;
     
     CHECK_RET_AND_RETURN_RESULT(bef_effect_ai_set_intensity, status, ;)
 }
+#endif
 
 - (void)setStickerPath:(NSString *)path {
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     if (![self be_empty:path]) {
         path = [self.provider stickerPath:path];
     }
@@ -222,33 +238,40 @@ static bool USE_3_BUFFER = NO;
     status = bef_effect_ai_set_effect(_handle, [path UTF8String]);
     
     CHECK_RET_AND_RETURN_RESULT(bef_effect_ai_set_effect, status, ;)
+#endif
 }
 
 - (void)setStickerAbsolutePath:(NSString*)path
 {
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     bef_effect_result_t status = BEF_RESULT_SUC;
     status = bef_effect_ai_set_effect(_handle, [path UTF8String]);
 
     CHECK_RET_AND_RETURN_RESULT(bef_effect_ai_set_effect, status, ;)
+#endif
 }
 
 - (void)setAvatarPath:(NSString*) path {
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     bef_effect_result_t status = BEF_RESULT_SUC;
     status = bef_effect_ai_set_effect(_handle, [path UTF8String]);
 
     CHECK_RET_AND_RETURN_RESULT(bef_effect_ai_set_effect, status, ;)
-
+#endif
 }
 
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 - (void)releaseEffectManager {
     bef_effect_ai_destroy(_handle);
 }
+#endif
 
 - (void)updateComposerNodes:(NSArray<NSString *> *)nodes {
     [self updateComposerNodes:nodes withTags:nil];
 }
 
 - (void)updateComposerNodes:(NSArray<NSString *> *)nodes withTags:(NSArray<NSString *> *)tags {
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     if (tags != nil && nodes.count != tags.count) {
         NSLog(@"bef_effect_ai_composer_set_nodes error: count of tags must equal to nodes");
         return;
@@ -335,6 +358,7 @@ static bool USE_3_BUFFER = NO;
         });
     }
 #endif
+#endif
 }
 
 - (void)appendComposerNodes:(NSArray<NSString *> *)nodes {
@@ -347,6 +371,7 @@ static bool USE_3_BUFFER = NO;
         return;
     }
     
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 #if BE_LOAD_RESOURCE_TIMEOUT
     for (NSString *node in nodes) {
         if (![_existResourcePathes containsObject:node]) {
@@ -356,7 +381,7 @@ static bool USE_3_BUFFER = NO;
     }
     [_existResourcePathes addObjectsFromArray:nodes];
 #endif
-
+#endif
     NSMutableArray<NSString *> *paths = [NSMutableArray arrayWithCapacity:nodes.count];
     for (int i = 0; i < nodes.count; i++) {
         if ([self.resourcePath isEqualToString:@"sticker"]) {
@@ -401,7 +426,7 @@ static bool USE_3_BUFFER = NO;
         
         count++;
     }
-    
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     bef_effect_result_t result = BEF_RESULT_SUC;
     if (tags == nil) {
         result = bef_effect_ai_composer_append_nodes(_handle, (const char **)nodesPath, count);
@@ -433,9 +458,11 @@ static bool USE_3_BUFFER = NO;
         });
     }
 #endif
+#endif
 }
 
 - (void)removeComposerNodes:(NSArray<NSString *> *)nodes {
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 #if BE_LOAD_RESOURCE_TIMEOUT
     for (NSString *node in nodes) {
         [_existResourcePathes removeObject:node];
@@ -484,6 +511,7 @@ static bool USE_3_BUFFER = NO;
         free(nodesPath[i]);
     }
     free(nodesPath);
+#endif
 }
 
 - (void)updateComposerNodeIntensity:(NSString *)node key:(NSString *)key intensity:(float)intensity {
@@ -494,11 +522,13 @@ static bool USE_3_BUFFER = NO;
     else {
         node = [self.provider composerNodePath:node];
     }
-    
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     bef_effect_result_t result = bef_effect_ai_composer_update_node(_handle, (const char *)[node UTF8String], (const char *)[key UTF8String], intensity);
     CHECK_RET_AND_RETURN_RESULT(bef_effect_ai_composer_update_node, result, ;)
+#endif
 }
 
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 - (NSArray<NSString *> *)availableFeatures {
     //Dynamic lookup feature availability
     int feature_len = 60;
@@ -728,23 +758,7 @@ static bool USE_3_BUFFER = NO;
 
 #pragma mark - RenderMsgDelegate
 - (BOOL)msgProc:(unsigned int)unMsgID arg1:(int)nArg1 arg2:(int)nArg2 arg3:(const char *)cArg3 {
-    NSString* str = [NSString stringWithFormat:@"%u", unMsgID];
-    switch(unMsgID) {
-        case BEF_MSG_TYPE_LICENSE_CHECK:
-            str = @"BEF_MSG_TYPE_LICENSE_CHECK";
-            break;
-        case BEF_MSG_TYPE_MODEL_MISS:
-            str = @"BEF_MSG_TYPE_MODEL_MISS";
-            break;
-        case RENDER_MSG_TYPE_RESOURCE:
-            str = @"RENDER_MSG_TYPE_RESOURCE";
-            break;
-        case BEF_MSG_TYPE_EFFECT_INIT:
-            str = @"BEF_MSG_TYPE_EFFECT_INIT";
-            break;
-        default:break;
-    }
-    NSLog(@"message received, type: %s, arg: %d, %d, %s", [str UTF8String], nArg1, nArg2, cArg3);
+    BELog(@"message received, type: %d, arg: %d, %d, %s", unMsgID, nArg1, nArg2, cArg3);
     [self.delegate msgProc:unMsgID arg1:nArg1 arg2:nArg2 arg3:cArg3];
     return NO;
 }
@@ -784,22 +798,6 @@ static bool USE_3_BUFFER = NO;
 {
     bef_effect_result_t ret = bef_effect_ai_set_algorithm_force_detect(_handle,detection);
     CHECK_RET_AND_RETURN_RESULT(bef_effect_ai_set_algorithm_force_detect, ret, ;)
-}
-
-+ (void)setUse3buffer:(bool)use {
-    USE_3_BUFFER = use;
-}
-
-+ (void)setUsePipeline:(bool)use {
-    USE_PIPELINE = use;
-}
-
-+ (bool)use3buffer {
-    return USE_3_BUFFER;
-}
-
-+ (bool)usePipeline {
-    return USE_PIPELINE;
 }
 #endif
 @end
