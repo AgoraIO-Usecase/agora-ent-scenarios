@@ -82,9 +82,6 @@ AGORA_APP_CERTIFICATE=（从声网console获取）
 ---
 
 ## 4. FAQ
-- 如何获取声网APP ID：
-  - 声网APP ID申请：https://www.shengwang.cn/
-
 - 集成遇到困难，该如何联系声网获取协助
   - 方案1：可以从智能客服获取帮助或联系销售人员[Agora 支持](https://agora-ticket.agora.io/) ；
   - 方案2：发送邮件给 [support@agora.io](mailto:support@agora.io) 咨询
