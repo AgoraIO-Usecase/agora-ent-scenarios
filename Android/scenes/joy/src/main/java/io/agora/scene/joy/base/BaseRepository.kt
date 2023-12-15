@@ -22,6 +22,7 @@ open class BaseRepository {
         var baseResp = JoyApiResult<T>()
         try {
             baseResp.dataState = DataState.STATE_LOADING
+            stateLiveData.postValue(baseResp)
             //开始请求数据
             val invoke = block.invoke()
             //将结果复制给baseResp

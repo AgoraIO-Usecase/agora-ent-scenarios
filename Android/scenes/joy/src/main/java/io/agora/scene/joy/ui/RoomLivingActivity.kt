@@ -170,7 +170,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     setBundleArgs(bundle)
                     mSelectedCompletion = { giftEntity, count ->
                         mJoyViewModel.sendGift(
-                            mJoyViewModel.mGamId, mRoomInfo.roomId, giftEntity.id ?: "", count, giftEntity.price
+                            mJoyViewModel.mGamId, mRoomInfo.roomId, giftEntity.vendorGiftId ?: "", count,
+                            giftEntity.price * count
                         )
                     }
                 }
@@ -354,7 +355,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
         mJoyViewModel.mStartGameLiveData.observe(this) {
             when (it.dataState) {
+                DataState.STATE_LOADING -> {
+                    showLoadingView()
+                }
+
                 DataState.STATE_SUCCESS -> {
+                    hideLoadingView()
                     val mTaskId = it.data?.taskId ?: return@observe
                     val gameSelect = mGameChooseGameDialog?.mSelectGame ?: return@observe
                     mGameChooseGameDialog?.let { dialog ->
@@ -369,21 +375,18 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     )
                     // 获取游戏详情
                     mJoyViewModel.getGameDetail(gameSelect.gameId!!)
-                    // 获取游戏状态
-//                    mJoyViewModel.gameState(gameSelect.gameId ?: "", mTaskId)
                     // 加载游戏画面
                     setupAssistantVideoView()
                     mJoyService.updateStartGame(mRoomInfo.roomId, mStartGameInfo!!, completion = { error ->
                         if (error == null) { //启动游戏成功
                         }
                     })
-
                 }
 
                 else -> {
-                    it.msg?.let { errorMsg ->
-                        CustomToast.show(errorMsg)
-                    }
+                    mGameChooseGameDialog?.setEnableConfirm(true)
+                    hideLoadingView()
+                    CustomToast.showError(getString(R.string.joy_request_failed))
                 }
             }
         }
@@ -398,13 +401,11 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             when (it.dataState) {
                 DataState.STATE_EMPTY,
                 DataState.STATE_SUCCESS -> {
-                    CustomToast.show(getString(R.string.joy_send_gift_success))
+                    CustomToast.showTips(getString(R.string.joy_send_gift_success))
                 }
 
                 else -> {
-                    it.msg?.let { errorMsg ->
-                        CustomToast.show(errorMsg)
-                    }
+                    CustomToast.showError(getString(R.string.joy_send_gift_failed))
                 }
             }
         }
@@ -412,13 +413,11 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             when (it.dataState) {
                 DataState.STATE_EMPTY,
                 DataState.STATE_SUCCESS -> {
-                    CustomToast.show(getString(R.string.joy_send_message_success))
+                    CustomToast.showTips(getString(R.string.joy_send_message_success))
                 }
 
                 else -> {
-                    it.msg?.let { errorMsg ->
-                        CustomToast.show(errorMsg)
-                    }
+                    CustomToast.showError(getString(R.string.joy_instruction_error))
                 }
             }
         }
@@ -429,21 +428,21 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 }
 
                 else -> {
-                    it.msg?.let { errorMsg ->
-                        CustomToast.show(errorMsg)
-                    }
+                    CustomToast.showError(getString(R.string.joy_request_failed))
                 }
             }
         }
         mJoyViewModel.mGameStatusLiveData.observe(this) {
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
-                    // TODO:
-                    if (it.data?.status == JoyGameStatus.stopped.name) {
-                        // 游戏暂停，需要重启
-                        val gameId = mStartGameInfo?.gameId ?: return@observe
-                        val assistantUid = mStartGameInfo?.assistantUid ?: return@observe
-                        mJoyViewModel.startGame(mRoomInfo.roomId, gameId, assistantUid)
+                    if (it.data?.status == JoyGameStatus.started.name) {
+                        val gameId = mStartGameInfo?.gameId ?: ""
+                        mJoyViewModel.getGameDetail(gameId)
+                    } else if (it.data?.status == JoyGameStatus.stopped.name) {
+                        // 游戏暂停，直接重新选择游戏
+                        if (mIsRoomOwner) {
+                            mJoyViewModel.getGames()
+                        }
                     }
                 }
             }
@@ -481,9 +480,9 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 super.onUserOffline(uid, reason)
                 Log.d(TAG, "rtc onUserOffline uid:$uid }")
                 binding.root.post {
-                    if (uid == mRoomInfo.ownerId) {
-                        // 房主退出
-                        CustomToast.show(getString(R.string.joy_automatic_exit_of_gameplay_exception))
+                    if (uid == mStartGameInfo?.assistantUid) {
+                        // 远端游戏退出
+                        CustomToast.showError(getString(R.string.joy_automatic_exit_of_gameplay_exception))
                         destroy()
                         finish()
                     }
@@ -564,7 +563,9 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     private var mVideoTextureView: VideoTextureView? = null
     private fun setupAssistantVideoView() {
         val assistantUid = mStartGameInfo?.assistantUid ?: return
-        mVideoTextureView = VideoTextureView(this)
+        if (mVideoTextureView == null) {
+            mVideoTextureView = VideoTextureView(this)
+        }
         binding.flAssistantContainer.removeAllViews()
         binding.flAssistantContainer.addView(mVideoTextureView)
         mRtcEngine.setupRemoteVideoEx(
@@ -578,7 +579,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             if (it == null) { //success
                 getStartGameInfo()
             } else {
-                CustomToast.show(getString(R.string.joy_join_room_error))
+                CustomToast.showError(getString(R.string.joy_join_room_error))
                 destroy()
                 finish()
             }
@@ -592,12 +593,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 val gameId = mStartGameInfo?.gameId ?: ""
                 binding.tvRules.isVisible = gameId.isNotEmpty()
                 if (gameId.isNotEmpty()) {
-                    // 获取游戏详情
-                    mJoyViewModel.getGameDetail(gameId)
                     // 加载游戏画面
                     setupAssistantVideoView()
                     val taskId = mStartGameInfo?.taskId ?: return@getStartGame
-                    // 获取游戏状态
+                    // 获取获取游戏状态
                     mJoyViewModel.gameState(gameId, taskId)
                 } else {
                     // 房主未开启游戏，选择游戏
@@ -606,7 +605,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     }
                 }
             } else {
-                CustomToast.show(getString(R.string.joy_get_start_game_error))
+                CustomToast.showError(getString(R.string.joy_get_start_game_error))
             }
         })
     }

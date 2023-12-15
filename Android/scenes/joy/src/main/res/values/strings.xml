@@ -27,6 +27,9 @@
     <string name="joy_join_room_error">加入房间失败，请重试</string>
     <string name="joy_get_start_game_error">获取进行中的游戏失败</string>
     <string name="joy_automatic_exit_of_gameplay_exception">玩法异常自动退出</string>
+    <string name="joy_request_failed">请求失败</string>
+    <string name="joy_instruction_error">玩法指令错误</string>
+    <string name="joy_send_gift_failed">送礼失败</string>
 
     <string-array name="joy_gift_array">
         <item>爱心</item>
