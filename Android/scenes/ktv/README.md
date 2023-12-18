@@ -35,7 +35,9 @@
 
 - 联系销售给 AppID 开通 K 歌权限(如果您没有销售人员的联系方式可通过智能客服联系销售人员 [Agora 支持](https://agora-ticket.agora.io/))
 
-  - 注: 拉取榜单、歌单、歌词等功能是需要开通权限的
+  ```json
+  注: 拉取榜单、歌单、歌词等功能是需要开通权限的
+  ```
 
 - 在项目的 [**gradle.properties**](../../gradle.properties) 里填写需要的声网 App ID 和 App 证书
 
