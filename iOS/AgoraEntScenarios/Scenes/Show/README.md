@@ -137,10 +137,10 @@
 
 ### 想体验更多场景
 
-> 详情请查看 [声动互娱](../../../../README.md)
+  详情请查看 [声动互娱](../../../../README.md)
 
 ### 集成遇到困难，该如何联系声网获取协助
-  - 方案1：可以从智能客服获取帮助或联系销售人员[Agora 支持](https://agora-ticket.agora.io/) ；
+  - 方案1：可以从智能客服获取帮助或联系销售人员[Agora 支持](https://agora-ticket.agora.io/)
   - 方案2：发送邮件给 [support@agora.io](mailto:support@agora.io) 咨询
   - 方案3：加入微信群提问
   
