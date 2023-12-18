@@ -7,6 +7,7 @@
 
 import UIKit
 import AgoraRtcKit
+import SVProgressHUD
 
 class TouchGameView: UIView {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -165,6 +166,7 @@ class RoomViewController: UIViewController {
         touchView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        touchView.isHidden = roomInfo.ownerId == currentUserInfo.userId ? false : true
         
         view.addSubview(bottomBar)
         bottomBar.snp.makeConstraints { make in
@@ -245,6 +247,13 @@ class RoomViewController: UIViewController {
                     dialog?.gameList = list ?? []
                 }
             } else {
+                CloudBarrageAPI.shared.getGameStatus(gameId: gameId, taskId: taskId) { status in
+                    joyPrint("getGameStatus: \(status?.rawValue ?? .none)")
+                    if status == .started {
+                        return
+                    }
+                    
+                }
                 CloudBarrageAPI.shared.getGameInfo(gameId: gameId) {[weak self] err, detail in
                     if let err = err {
                         AUIToast.show(text: err.localizedDescription)
@@ -272,8 +281,10 @@ extension RoomViewController {
                                                userAvatar: currentUserInfo.avatar,
                                                userName: currentUserInfo.userName,
                                                rtcConfig: rtcConfig)
+        SVProgressHUD.show()
         CloudBarrageAPI.shared.startGame(config: startConfig) {[weak self] err, taskId in
             if let err = err {
+                SVProgressHUD.dismiss()
                 AUIToast.show(text: err.localizedDescription)
                 return
             }
@@ -295,6 +306,7 @@ extension RoomViewController {
             }
             
             CloudBarrageAPI.shared.getGameInfo(gameId: gameInfo.gameId!) { err, detail in
+                SVProgressHUD.dismiss()
                 if let err = err {
                     AUIToast.show(text: err.localizedDescription)
                     return
