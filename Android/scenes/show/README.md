@@ -110,11 +110,15 @@ if(!isShowEmpty){
    ```
  - 虚拟背景和虚化背景
    
-   相关代码参考：[BeautyDialog](src/main//java//io//agora//scene//show//widget//BeautyDialog.kt) 中 onItemSelected.GROUP_ID_VIRTUAL_BG 部分。
+   相关代码参考：[BeautyDialog](src/main/java/io/agora/scene/show/widget/BeautyDialog.kt) 中 onItemSelected.GROUP_ID_VIRTUAL_BG 部分。
 
 ## 4.FAQ
 
-- 集成遇到困难，该如何联系声网获取协助
+### 想体验更多场景
+
+> 详情请查看 [声动互娱](../../../README.md)
+
+### 集成遇到困难，该如何联系声网获取协助
   - 方案1：可以从智能客服获取帮助或联系销售人员[Agora 支持](https://agora-ticket.agora.io/) ；
   - 方案2：发送邮件给 [support@agora.io](mailto:support@agora.io) 咨询
   - 方案3：加入微信群提问
