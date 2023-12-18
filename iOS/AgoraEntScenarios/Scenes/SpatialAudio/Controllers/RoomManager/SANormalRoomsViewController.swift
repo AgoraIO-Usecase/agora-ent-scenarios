@@ -77,7 +77,6 @@ extension SANormalRoomsViewController {
         info.room = room
         info.mic_info = nil
         let vc = SARoomViewController(info: info)
-        print(" entryRoom(room: 80 ===")
         self.navigationController?.pushViewController(vc, animated: true)
     }
 }
