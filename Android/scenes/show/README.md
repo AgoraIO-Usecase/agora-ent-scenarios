@@ -71,9 +71,12 @@ if(!isShowEmpty){
      - sticker_face_shape/lianxingface.zip : 贴纸资源
      - style_lightly/*.zip : 风格妆资源
 
-2. 添加license（```json 如果不添加美颜证书无法体验美颜效果```）：
+2. 添加license：
 
-   - 将SDK里的证书文件复制到**scenes/show/src/main/assets/license/SenseME.lic**路径下
+   - 将SDK里的证书文件复制到**scenes/show/src/main/assets/license/SenseME.lic**路径下  
+   ```json
+     如果不添加美颜证书无法体验美颜效果
+   ```
 
 ![美颜资源示例](image/SamplePicture5.png)
 
