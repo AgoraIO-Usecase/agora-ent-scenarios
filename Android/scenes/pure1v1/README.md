@@ -85,6 +85,7 @@ AGORA_APP_CERTIFICATE=（从声网console获取）
   - 方案1：可以从智能客服获取帮助或联系销售人员[Agora 支持](https://agora-ticket.agora.io/)
   - 方案2：发送邮件给 [support@agora.io](mailto:support@agora.io) 咨询
   - 方案3：加入微信群提问
+  
     ![](https://download.agora.io/demo/release/SDHY_QA.jpg)
 
 ## 代码许可
