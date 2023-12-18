@@ -7,6 +7,7 @@
 
 import UIKit
 import SVProgressHUD
+import AgoraRtcKit
 
 private let randomRoomName = [
     "show_create_room_name1".joyLocalization(),
@@ -30,12 +31,7 @@ class CreateRoomViewController: UIViewController {
         return bar
     }()
     
-    private lazy var backgroundImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage.sceneImage(name: "room_bg"))
-        imageView.frame = view.bounds
-        imageView.contentMode = .scaleAspectFill
-        return imageView
-    }()
+    private lazy var backgroundCanvasView: UIView = UIView(frame: self.view.bounds)
     
     private lazy var bannerView: JoyBannerView = JoyBannerView(frame: CGRect(x: 0, y: naviBar.aui_bottom, width: self.view.aui_width, height: 168))
     
@@ -116,7 +112,7 @@ class CreateRoomViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.addSubview(backgroundImageView)
+        view.addSubview(backgroundCanvasView)
         view.addSubview(naviBar)
         view.addSubview(bannerView)
         view.addSubview(textField)
@@ -125,6 +121,18 @@ class CreateRoomViewController: UIViewController {
         tipsLabel.aui_bottom = createButton.aui_top - 25
         tipsLabel.aui_centerX = view.width / 2
         
+        
+        if let engine = CloudBarrageAPI.shared.apiConfig?.engine {
+            let broadcasterCanvas = AgoraRtcVideoCanvas()
+            broadcasterCanvas.uid = 0
+            broadcasterCanvas.view = backgroundCanvasView
+            engine.enableVideo()
+//            engine.enableAudio()
+            engine.startPreview()
+            engine.setupLocalVideo(broadcasterCanvas)
+        }
+        
+        AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
         CloudBarrageAPI.shared.getBannerList {[weak self] err, bannerList in
             self?.bannerView.bannerList = JoyBannerArray(bannerList: bannerList)
         }
@@ -157,6 +165,7 @@ extension CreateRoomViewController {
                 return
             }
             guard let info = info else { return }
+            AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
             let vc = RoomViewController(roomInfo: info, currentUserInfo: currentUserInfo, service: service)
             self.navigationController?.pushViewController(vc, animated: true)
         }
