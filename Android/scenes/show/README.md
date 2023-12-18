@@ -31,7 +31,10 @@
      
      ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
    
-   - 秒切机器人`CloudPlayer`服务配置（***如果不添加CloudPlayer，机器人将无法出图***）
+   - 秒切机器人`CloudPlayer`服务配置
+     ```json
+     如果不添加CloudPlayer，机器人将无法出图
+     ```
   
      ![xxx](image/SamplePicture6.png)
 
@@ -62,7 +65,7 @@ if(!isShowEmpty){
   
 **美颜资源请联系"商汤科技"商务获取。**
 
-1. 添加资源（***如果不添加美颜资源无法体验美颜效果***）：
+1. 添加资源：
 
    - 将STMobileJNI-release.aar放在**scenes/show/aars/STMobileJNI**目录下
    - 将SenseArSourceManager-release.aar放在**scenes/show/aars/SenseArSourceManager**目录下
@@ -70,12 +73,15 @@ if(!isShowEmpty){
      - models/*.model : AI等训练模型资源
      - sticker_face_shape/lianxingface.zip : 贴纸资源
      - style_lightly/*.zip : 风格妆资源
+   ```json
+   如果不添加美颜资源无法体验美颜效果
+   ```
 
 2. 添加license：
 
    - 将SDK里的证书文件复制到**scenes/show/src/main/assets/license/SenseME.lic**路径下  
    ```json
-     如果不添加美颜证书无法体验美颜效果
+   如果不添加美颜证书无法体验美颜效果
    ```
 
 ![美颜资源示例](image/SamplePicture5.png)
