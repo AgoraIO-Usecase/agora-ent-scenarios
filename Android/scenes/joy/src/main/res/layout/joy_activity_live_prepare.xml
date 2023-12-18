@@ -120,6 +120,8 @@
             android:layout_marginBottom="15dp"
             android:background="@drawable/joy_icon_room_start_living"
             android:gravity="center"
+            android:text="@string/joy_start_living"
+            android:textSize="16sp"
             android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

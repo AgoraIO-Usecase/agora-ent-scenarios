@@ -9,6 +9,7 @@
     <string name="joy_broadcaster_bad_exit">检测到上次直播异常退出，请重新创建直播间开播</string>
     <string name="joy_room_name_empty_tips">请输入房间名</string>
     <string name="joy_live_prepare_room_name_hint">请输入房间名称</string>
+    <string name="joy_start_living">开始直播</string>
     <string name="joy_choose_game">选择弹幕玩法</string>
     <string name="joy_tips_for_launching_anchors">主播开播须知</string>
     <string name="joy_rules_of_play">玩法规则</string>

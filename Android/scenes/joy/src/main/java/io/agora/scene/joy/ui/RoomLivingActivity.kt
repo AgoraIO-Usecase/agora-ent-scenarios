@@ -9,7 +9,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.opengl.Visibility
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
@@ -57,7 +56,6 @@ import io.agora.scene.joy.ui.widget.JoyChooseGameDialog
 import io.agora.scene.joy.ui.widget.JoyGameRulesDialog
 import io.agora.scene.joy.ui.widget.JoyGiftDialog
 import io.agora.scene.joy.ui.widget.KeyboardStatusWatcher
-import io.agora.scene.joy.ui.widget.VideoTextureView
 import io.agora.scene.joy.utils.CustomToast
 import io.agora.scene.joy.utils.JoyLogger
 import io.agora.scene.joy.utils.dp
@@ -198,12 +196,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     if (content.isNotEmpty()) {
                         mJoyViewModel.sendComment(mJoyViewModel.mGamId, mRoomInfo.roomId, content)
                         mJoyService.sendChatMessage(mRoomInfo.roomId, content, completion = {
-//                            it?.message?.let { errorMsg ->
-//                                CustomToast.showError(errorMsg)
-//                            }
-//                            if (it == null) {
-//                                CustomToast.show(getString(R.string.joy_send_message_success))
-//                            }
                         })
                     }
                 }
@@ -231,30 +223,30 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             }
             return@setOnTouchListener true
         }
-//        binding.root.setOnTouchListener { v, event ->
-//            if (mIsRoomOwner) {
-//                return@setOnTouchListener false
-//            }
-//            showNormalInputLayout()
-//            return@setOnTouchListener true
-//        }
-        binding.flAssistantContainer.setOnTouchListener { view, event ->
-            if (!mIsRoomOwner) {
-                return@setOnTouchListener false
-            }
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> sendMouseMessage(
-                    event,
-                    RemoteCtrlMsg.MouseEventType.MOUSE_EVENT_LBUTTON_DOWN.getNumber()
-                )
+        if (mIsRoomOwner) {
+            binding.flAssistantContainer.setOnTouchListener { view, event ->
+                if (!mIsRoomOwner) return@setOnTouchListener false
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> sendMouseMessage(
+                        event,
+                        RemoteCtrlMsg.MouseEventType.MOUSE_EVENT_LBUTTON_DOWN.getNumber()
+                    )
 
-                MotionEvent.ACTION_UP -> sendMouseMessage(
-                    event,
-                    RemoteCtrlMsg.MouseEventType.MOUSE_EVENT_LBUTTON_UP.getNumber()
-                )
+                    MotionEvent.ACTION_UP -> sendMouseMessage(
+                        event,
+                        RemoteCtrlMsg.MouseEventType.MOUSE_EVENT_LBUTTON_UP.getNumber()
+                    )
+                }
+                return@setOnTouchListener true
             }
-            return@setOnTouchListener true
+        } else {
+            binding.root.setOnTouchListener { v, event ->
+                if (mIsRoomOwner) return@setOnTouchListener false
+                showNormalInputLayout()
+                return@setOnTouchListener true
+            }
         }
+
         KeyboardStatusWatcher(this, this) { isKeyboardShowed: Boolean, keyboardHeight: Int ->
             Log.d(TAG, " isKeyboardShowed: $isKeyboardShowed keyboardHeight: $keyboardHeight")
             val lp: ViewGroup.LayoutParams = binding.vKeyboardBg.layoutParams
@@ -547,42 +539,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 super.onError(err)
                 JoyLogger.e(TAG, "rtc onError:$err ${RtcEngine.getErrorDescription(err)} ")
             }
-
-            override fun onVideoSizeChanged(
-                source: Constants.VideoSourceType?,
-                uid: Int,
-                width: Int,
-                height: Int,
-                rotation: Int
-            ) {
-                super.onVideoSizeChanged(source, uid, width, height, rotation)
-//                mVideoTextureView ?: return
-//                binding.root.post {
-//                    val rootViewWidth: Int = binding.flAssistantContainer.measuredWidth
-//                    val rootViewHeight: Int = binding.flAssistantContainer.measuredHeight
-//                    Log.i(TAG, "onVideoSizeChanged->rootViewWidth:$rootViewWidth,rootViewHeight:$rootViewHeight")
-//                    val targetWidth: Int
-//                    val targetHeight: Int
-//                    if (rootViewWidth.toFloat() / rootViewHeight > width.toFloat() / height) {
-//                        targetHeight = rootViewHeight
-//                        val scale = targetHeight.toFloat() / height
-//                        targetWidth = (width * scale).toInt()
-//                    } else {
-//                        targetWidth = rootViewWidth
-//                        val scale = targetWidth.toFloat() / width
-//                        targetHeight = (height * scale).toInt()
-//                    }
-//                    Log.i(TAG, "onVideoSizeChanged->targetWidth:$targetWidth,targetHeight:$targetHeight")
-//                    mVideoTextureView?.setVideoSize(targetWidth, targetHeight)
-//                    mVideoTextureView?.post {
-//                        val layoutParams: ViewGroup.LayoutParams = binding.flAssistantContainer.layoutParams
-//                        layoutParams.width = targetWidth
-//                        layoutParams.height = targetHeight
-//                        binding.flAssistantContainer.layoutParams = layoutParams
-//                    }
-//                }
-
-            }
         }
 
         joinChannel(eventListener)
@@ -604,11 +560,11 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     }
 
 
-    private var mVideoTextureView: VideoTextureView? = null
+    private var mVideoTextureView: TextureView? = null
     private fun setupAssistantVideoView() {
         val assistantUid = mStartGameInfo?.assistantUid ?: return
         if (mVideoTextureView == null) {
-            mVideoTextureView = VideoTextureView(this)
+            mVideoTextureView = TextureView(this)
         }
         binding.flAssistantContainer.removeAllViews()
         binding.flAssistantContainer.addView(mVideoTextureView)
