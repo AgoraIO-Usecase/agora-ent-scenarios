@@ -135,14 +135,16 @@
 >  
 ## 4. FAQ
 
-### 如何获取声网APPID
+### 想体验更多场景
 
-> - 声网APPID申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
-> 
+> 详情请查看 [声动互娱](../../../../README.md)
+
 ### 集成遇到困难，该如何联系声网获取协助
+  - 方案1：可以从智能客服获取帮助或联系销售人员[Agora 支持](https://agora-ticket.agora.io/) ；
+  - 方案2：发送邮件给 [support@agora.io](mailto:support@agora.io) 咨询
+  - 方案3：加入微信群提问
+  
+    ![xxx](https://download.agora.io/demo/release/SDHY_QA.jpg)
 
-> 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
-> 
-> 方案2：发送邮件给[support@agora.io](mailto:support@agora.io)咨询
 
 ---
