@@ -126,7 +126,7 @@ class CreateRoomViewController: UIViewController {
         tipsLabel.aui_centerX = view.width / 2
         
         CloudBarrageAPI.shared.getBannerList {[weak self] err, bannerList in
-            self?.bannerView.bannerList = bannerList ?? []
+            self?.bannerView.bannerList = JoyBannerArray(bannerList: bannerList)
         }
     }
     
