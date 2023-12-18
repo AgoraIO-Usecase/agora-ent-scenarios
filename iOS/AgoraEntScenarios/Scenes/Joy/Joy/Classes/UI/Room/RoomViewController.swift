@@ -120,6 +120,11 @@ class RoomViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .darkGray
         
+        view.addSubview(waittingLabel)
+        waittingLabel.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+        
         view.addSubview(assistantCanvasView)
         assistantCanvasView.frame = view.bounds
         
@@ -128,11 +133,6 @@ class RoomViewController: UIViewController {
         roomInfoView.snp.makeConstraints { make in
             make.top.equalTo(max(top, 20))
             make.left.equalTo(15)
-        }
-        
-        view.addSubview(waittingLabel)
-        waittingLabel.snp.makeConstraints { make in
-            make.center.equalToSuperview()
         }
         
         view.addSubview(broadcasterCanvasView)
@@ -214,7 +214,8 @@ class RoomViewController: UIViewController {
         if roomInfo.ownerId == currentUserInfo.userId {
             let gameId = startGameInfo?.gameId ?? ""
             let taskId = startGameInfo?.taskId ?? ""
-            let assistantUid = startGameInfo?.assistantUid ?? (roomInfo.ownerId + 1000000)
+            var assistantUid = startGameInfo?.assistantUid ?? 0
+            assistantUid = assistantUid == 0 ? (roomInfo.ownerId + 1000000) : assistantUid
             if gameId.isEmpty || taskId.isEmpty {
                 CloudBarrageAPI.shared.getGameList { [weak self] err, list in
                     if let err = err {
@@ -375,6 +376,8 @@ extension RoomViewController {
         } else {
             engine.setupRemoteVideo(broadcasterCanvas)
         }
+        
+        CloudBarrageAPI.shared.apiConfig?.engine?.addDelegate(self)
     }
     
     private func joinAssistantChannel() {
@@ -392,6 +395,7 @@ extension RoomViewController {
     private func leaveRTCChannel() {
         CloudBarrageAPI.shared.apiConfig?.engine?.leaveChannel()
         CloudBarrageAPI.shared.apiConfig?.engine?.stopPreview()
+        CloudBarrageAPI.shared.apiConfig?.engine?.removeDelegate(self)
     }
     
     private func renewRTCTokens(roomId: String, userId: UInt, completion: ((String?)->Void)?) {
@@ -430,13 +434,7 @@ extension RoomViewController: RoomBottomBarDelegate {
     }
     
     func onClickGiftButton() {
-        guard let bundlePath = Bundle.main.path(forResource: "Joy", ofType: "bundle"),
-              let bundle = Bundle(path: bundlePath),
-              let gameId = gameInfo?.gameId,
-              let path = bundle.path(forResource: "Image/gift", ofType: "json"),
-              let jsonData = try? Data(contentsOf: URL(fileURLWithPath: path)),
-              let jsonObj = try? JSONSerialization.jsonObject(with: jsonData) as? [[String: Any]],
-              let giftList: [CloudGameGiftInfo] = self.decodeModelArray(jsonObj) else {
+        guard let gameId = gameInfo?.gameId, let giftList = gameInfo?.gifts else {
             assert(false, "gift is empty")
             joyWarn("show gift fail!")
             return
@@ -450,7 +448,7 @@ extension RoomViewController: RoomBottomBarDelegate {
             let sendGift = CloudGameSendGiftInfo(userId: "\(currentUserInfo.userId)",
                                                  userAvatar: currentUserInfo.avatar,
                                                  userName: currentUserInfo.userName,
-                                                 giftId: gift.giftId,
+                                                 vendorGiftId: gift.vendorGiftId,
                                                  giftNum: count,
                                                  giftValue: gift.price * count)
             let sendConfig = CloudGameSendGiftConfig(roomId: roomInfo.roomId, gameId: gameId, giftList: [sendGift])
@@ -535,5 +533,26 @@ extension RoomViewController: JoyServiceListenerProtocol {
     
     func onRoomDidDestroy(roomInfo: JoyRoomInfo) {
         leaveRoom()
+    }
+}
+
+
+extension RoomViewController: AgoraRtcEngineDelegate {
+    private func resetAssistantCanvasView(size: CGSize) {
+        assistantCanvasView.frame = view.bounds.size.fitRect(imageSize: size)
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, firstRemoteVideoFrameOfUid uid: UInt, size: CGSize, elapsed: Int) {
+        if uid == startGameInfo?.assistantUid ?? 0 {
+            print("size = \(size)")
+            resetAssistantCanvasView(size: size)
+        }
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
+//        gameViewHeightCon.constant = CGFloat(stats.height) / CGFloat(stats.width) * view.bounds.width
+        let width: CGFloat = CGFloat(stats.width)
+        let height: CGFloat = CGFloat(stats.height)
+        resetAssistantCanvasView(size: CGSize(width: width, height: height))
     }
 }

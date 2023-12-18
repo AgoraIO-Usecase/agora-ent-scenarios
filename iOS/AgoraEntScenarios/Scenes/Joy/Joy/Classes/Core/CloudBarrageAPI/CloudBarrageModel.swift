@@ -57,7 +57,8 @@ public struct CloudGameGiftInfo: Codable {
         case giftId = "id"
         case vendorGiftId = "vendor_gift_id"
         case gameId = "game_id"
-        case price, name, thumbnail
+        case thumbnail = "thumbnail "
+        case price, name
     }
 }
 
@@ -142,7 +143,7 @@ public struct CloudGameSendGiftInfo: Codable {
     public var userId:String?
     public var userAvatar: String?
     public var userName: String?
-    public var giftId: String?      //礼物id，须按约定的礼物编号发送，**此处用vendor_gift_id的值**
+    public var vendorGiftId: String?      //礼物id，须按约定的礼物编号发送，**此处用vendor_gift_id的值**
     public var giftNum: Int = 0     //送出的礼物数量，整形值，否则参数错误
     public var giftValue: Int = 0   //礼物总价值，折算成分，整形值
     public var timestamp: Int = Int(Date().timeIntervalSince1970 * 1000)
@@ -151,7 +152,8 @@ public struct CloudGameSendGiftInfo: Codable {
         case userId = "openId"
         case userAvatar = "avatar"
         case userName = "nickname"
-        case msgId, giftId, giftNum, giftValue, timestamp
+        case vendorGiftId = "giftId"
+        case msgId, giftNum, giftValue, timestamp
     }
 }
 
@@ -220,5 +222,13 @@ public struct CloudGameTokenConfig: Codable {
     enum CodingKeys: String, CodingKey {
         case roomId, gameId, taskId, rtcUid, rtcToken
         case userId = "openId"
+    }
+}
+
+
+public struct CloudBannerInfo: Codable {
+    public var url: String?
+    enum CodingKeys: String, CodingKey {
+        case url
     }
 }

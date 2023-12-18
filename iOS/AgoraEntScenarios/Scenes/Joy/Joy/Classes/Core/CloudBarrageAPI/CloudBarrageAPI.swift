@@ -279,6 +279,23 @@ extension CloudBarrageAPI {
     }
 }
 
+extension CloudBarrageAPI {
+    func getBannerList(completion:@escaping((NSError?, [CloudBannerInfo]?)->())) {
+//        let url = "https://service.agora.io/toolbox/v1/configs/game?key=carousel"
+        let url = "https://test-toolbox.bj2.agoralab.co/v1/configs/game?key=carousel"
+        let request = URLRequest(url: URL(string: "\(url)")!)
+        httpRequest(request: request) { err, data in
+            if let err = err {
+                completion(err, nil)
+                return
+            }
+            let result: [[String: Any]] = data as? [[String: Any]] ?? []
+            let model: [CloudBannerInfo]? = self.decodeModelArray(result)
+            completion(err, model)
+        }
+    }
+}
+
 public let kAppProjectName = "appProject"
 public let kAppProjectValue = "agora_ent_demo"
 public let kAppOS = "appOs"
@@ -287,20 +304,24 @@ public let kAppVersion = "versionName"
 extension CloudBarrageAPI {
     private func getRequest(interface: String,
                             params:[String: Any]? = nil,
-                            completion: @escaping (NSError?, [String: Any]?)->()) {
-        httpRequest(interface: interface, httpMethod: "GET", params: params, completion: completion)
+                            completion: @escaping (NSError?, Any?)->()) {
+        httpRequest(interface: interface, httpMethod: "GET", params: params) { err, ret in
+            completion(err, ret as? [String: Any])
+        }
     }
     
     private func postRequest(interface: String,
                              params:[String: Any]? = nil,
                              completion: @escaping (NSError?, [String: Any]?)->()) {
-        httpRequest(interface: interface, httpMethod: "POST", params: params, completion: completion)
+        httpRequest(interface: interface, httpMethod: "POST", params: params) { err, ret in
+            completion(err, ret as? [String: Any])
+        }
     }
     
     private func httpRequest(interface: String,
                              httpMethod:String,
                              params:[String: Any]? = nil,
-                             completion: @escaping (NSError?, [String: Any]?)->()) {
+                             completion: @escaping (NSError?, Any?)->()) {
         guard let apiConfig = apiConfig,
               let host = apiConfig.host,
               let appId = apiConfig.appId,
@@ -330,6 +351,11 @@ extension CloudBarrageAPI {
 //            joyPrint(" POST url = \(url), params = \(params.debugDescription)")
         }
         
+        httpRequest(request: request, completion: completion)
+    }
+    
+    private func httpRequest(request: URLRequest,
+                             completion: @escaping (NSError?, Any?)->()) {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data, error == nil else {
                 joyError("Error: \(error?.localizedDescription ?? "Unknown error")")
@@ -337,7 +363,7 @@ extension CloudBarrageAPI {
             }
             joyPrint(" httpRequest request:\n \(request.cURL(pretty: true)) \nresp:\n \(NSString(data: data, encoding: NSUTF8StringEncoding)) ")
             if let dic = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                let result = dic["data"] as? [String: Any]
+                let result = dic["data"]
                 let code = dic["code"] as? Int ?? 0
                 let msg = dic["msg"] as? String ?? ""
                 let error = code == 0 ? nil : NSError(domain: msg, code: code)

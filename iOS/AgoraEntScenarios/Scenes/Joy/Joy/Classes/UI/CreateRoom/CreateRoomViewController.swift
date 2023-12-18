@@ -37,6 +37,8 @@ class CreateRoomViewController: UIViewController {
         return imageView
     }()
     
+    private lazy var bannerView: JoyBannerView = JoyBannerView(frame: CGRect(x: 0, y: naviBar.aui_bottom, width: self.view.aui_width, height: 168))
+    
     private lazy var textField: UITextField = {
         let tf = UITextField(frame: CGRect(x: 12, y: UIDevice.current.aui_SafeDistanceTop + 224,
                                            width: view.width - 24, height: 48))
@@ -116,11 +118,16 @@ class CreateRoomViewController: UIViewController {
         
         view.addSubview(backgroundImageView)
         view.addSubview(naviBar)
+        view.addSubview(bannerView)
         view.addSubview(textField)
         view.addSubview(tipsLabel)
         view.addSubview(createButton)
         tipsLabel.aui_bottom = createButton.aui_top - 25
         tipsLabel.aui_centerX = view.width / 2
+        
+        CloudBarrageAPI.shared.getBannerList {[weak self] err, bannerList in
+            self?.bannerView.bannerList = bannerList ?? []
+        }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {

@@ -164,7 +164,7 @@ extension RoomListViewController {
         let engine = AgoraRtcEngineKit.sharedEngine(with: config,
                                                     delegate: self)
         
-        engine.setClientRole(.broadcaster)
+//        engine.setClientRole(.broadcaster)
         return engine
     }
     
@@ -227,9 +227,5 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
 //                showTo1v1Print("renew token tokenPrivilegeWillExpire: \(channelId) \(ret)")
 //            }
 //        }
-    }
-    
-    func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-        joyPrint("didJoinedOfUid: \(uid) ownerId: \(userInfo?.userId ?? 0)")
     }
 }
