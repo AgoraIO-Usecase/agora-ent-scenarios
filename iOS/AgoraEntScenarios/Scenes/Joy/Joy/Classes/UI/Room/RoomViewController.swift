@@ -102,6 +102,12 @@ class RoomViewController: UIViewController {
         return textField
     }()
     
+    private lazy var backgroundImageView = {
+        let imageView = UIImageView(frame: self.view.bounds)
+        imageView.image = UIImage.sceneImage(name: "joy_room_bg")
+        return imageView
+    }()
+    
     private lazy var broadcasterCanvasView: UIView = UIView()
     private lazy var assistantCanvasView: UIView = UIView()
     
@@ -119,6 +125,8 @@ class RoomViewController: UIViewController {
     override func viewDidLoad(){
         super.viewDidLoad()
         view.backgroundColor = .darkGray
+        
+        view.addSubview(backgroundImageView)
         
         view.addSubview(waittingLabel)
         waittingLabel.snp.makeConstraints { make in

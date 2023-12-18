@@ -92,7 +92,7 @@ class CreateRoomViewController: UIViewController {
         button.backgroundColor = UIColor(hexString: "#345dff")
         button.setCornerRadius(21)
         button.setTitle("user_list_create".joyLocalization(), for: .normal)
-        button.setjoyHorizonalDefaultGradientBackground()
+        button.setBackgroundImage(UIImage.sceneImage(name: "room_create_button_bg2"), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         button.setTitleColor(.white, for: .normal)
         button.addTarget(self, action: #selector(onCreateAction), for: .touchUpInside)
@@ -121,7 +121,28 @@ class CreateRoomViewController: UIViewController {
         tipsLabel.aui_bottom = createButton.aui_top - 25
         tipsLabel.aui_centerX = view.width / 2
         
+        startPreview()
         
+        CloudBarrageAPI.shared.getBannerList {[weak self] err, bannerList in
+            self?.bannerView.bannerList = JoyBannerArray(bannerList: bannerList)
+        }
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        self.view.endEditing(true)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if navigationController?.visibleViewController is RoomViewController {
+            return
+        }
+        stopPreview()
+    }
+    
+    private func startPreview() {
+        AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
         if let engine = CloudBarrageAPI.shared.apiConfig?.engine {
             let broadcasterCanvas = AgoraRtcVideoCanvas()
             broadcasterCanvas.uid = 0
@@ -131,16 +152,13 @@ class CreateRoomViewController: UIViewController {
             engine.startPreview()
             engine.setupLocalVideo(broadcasterCanvas)
         }
-        
-        AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
-        CloudBarrageAPI.shared.getBannerList {[weak self] err, bannerList in
-            self?.bannerView.bannerList = JoyBannerArray(bannerList: bannerList)
-        }
     }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesEnded(touches, with: event)
-        self.view.endEditing(true)
+    private func stopPreview() {
+        if let engine = CloudBarrageAPI.shared.apiConfig?.engine {
+//            engine.disableVideo()
+            engine.stopPreview()
+        }
     }
 }
 
@@ -168,6 +186,13 @@ extension CreateRoomViewController {
             AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
             let vc = RoomViewController(roomInfo: info, currentUserInfo: currentUserInfo, service: service)
             self.navigationController?.pushViewController(vc, animated: true)
+            
+            if let nv = self.navigationController, let index = nv.viewControllers.firstIndex(of: self) {
+                // 创建一个新的导航控制器堆栈数组，将vc1移除
+                var viewControllers = nv.viewControllers
+                viewControllers.remove(at: index)
+                nv.viewControllers = viewControllers
+            }
         }
     }
 }
