@@ -30,7 +30,7 @@ class DHCShowChoruserView: UIViewController {
         countLabel.textColor = .white
         view.addSubview(countLabel)
         
-        tableView = UITableView(frame: CGRect(x: 0, y: 60, width: self.view.bounds.width, height: self.view.bounds.height - 60))
+        tableView = UITableView(frame: CGRect(x: 0, y: 60, width: self.view.bounds.width, height: 440))
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UINib(nibName: "DHCShowChorusCell", bundle: nil), forCellReuseIdentifier: "ShowCourse")

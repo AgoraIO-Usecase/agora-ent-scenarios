@@ -225,7 +225,6 @@ private func agoraPrint(_ message: String) {
         engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
         engine.setParameters("{\"che.audio.ans.noise_gate\": 20}")
         engine.setParameters("{\"rtc.use_audio4\": true}")
-        engine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
     }
     
     func renewInnerDataStreamId() {
@@ -969,6 +968,7 @@ extension KTVApiImpl {
         singChannelMediaOptions.autoSubscribeAudio = true
         singChannelMediaOptions.publishMicrophoneTrack = true
         singChannelMediaOptions.clientRoleType = .broadcaster
+        singChannelMediaOptions.parameters = "{\"che.audio.max_mixed_participants\": 8}"
         if newRole == .leadSinger {
             // 主唱不参加TopN
             singChannelMediaOptions.isAudioFilterable = false
