@@ -1030,14 +1030,13 @@ extension SpatialAudioSyncSerciceImp {
             .get(success: { [weak self] list in
                 agoraPrint("imp seat apply list get success...")
                 let applys = list.map({$0.toJson()}).kj.modelArray(SAApply.self)
-                self?.micApplys = applys.filter({ apply in
-                    for mic in self?.mics ?? [] {
-                        if mic.member?.uid == apply.member?.uid {
-                            return false
-                        }
+                guard let self = self else {return}
+                self.micApplys.removeAll()
+                applys.forEach { apply in
+                    if !self.micApplys.contains(where: {$0.member?.uid == apply.member?.uid}) && !self.mics.contains(where: {$0.member?.uid == apply.member?.uid}) {
+                        self.micApplys.append(apply)
                     }
-                    return true
-                })
+                }
                 completion(nil, applys)
             }, fail: { error in
                 agoraPrint("imp seat apply list get fail :\(error.message)...")
