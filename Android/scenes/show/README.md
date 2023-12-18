@@ -33,7 +33,7 @@
    
    - 秒切机器人`CloudPlayer`服务配置
      ```json
-     如果不添加CloudPlayer，机器人将无法出图
+     如果不填写CloudPlayer配置，机器人房间将无法出图
      ```
   
      ![xxx](image/SamplePicture6.png)
