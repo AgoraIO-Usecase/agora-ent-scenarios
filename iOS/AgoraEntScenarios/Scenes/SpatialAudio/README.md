@@ -113,7 +113,7 @@ AgoraRtc管理类：[SARTCManager](AgoraEntScenarios/Scenes/SpatialAudio/Compome
   - 声网APPID申请：https://www.agora.io/cn/
 
 - 想体验更多场景
-  - 详情请查看 [声动互娱](../../../README.md)
+  - 详情请查看 [声动互娱](../../../../README.md)
 
 - 集成遇到困难，该如何联系声网获取协助
   - 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务
