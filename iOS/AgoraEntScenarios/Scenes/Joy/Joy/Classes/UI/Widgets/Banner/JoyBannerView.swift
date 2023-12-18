@@ -10,7 +10,6 @@ import SDWebImage
 
 private let kBannerEdge = 20.0
 
-
 @objcMembers
 open class JoyBannerArray: NSObject {
     public private(set) var bannerList: [CloudBannerInfo] = []
@@ -34,6 +33,10 @@ open class JoyBannerArray: NSObject {
             return bannerList.count
         }
         return bannerList.count * 3
+    }
+    
+    var realCount: Int {
+        return bannerList.count
     }
     
     func fakeIndex(index: Int) -> Int {
@@ -76,6 +79,7 @@ class JoyBannerViewCell: UICollectionViewCell {
 }
 
 class JoyBannerView: UIView {
+    private var timer: Timer?
     private lazy var listView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -99,6 +103,7 @@ class JoyBannerView: UIView {
         didSet {
             listView.reloadData()
             scrollToCenter()
+            startTimer()
         }
     }
     
@@ -120,10 +125,34 @@ class JoyBannerView: UIView {
 extension JoyBannerView {
     private func scrollToCenter() {
         var index = listView.indexPathsForVisibleItems.first?.row ?? 0
-        index = index % bannerList.count
+        index = index % bannerList.realCount
         let offset: CGFloat = (self.listView.width - kBannerEdge) * CGFloat(bannerList.fakeIndex(index: index))
         let newContentOffset = targetContentOffsetForProposedContentOffset(CGPoint(x: offset, y: 0), withScrollingVelocity: .zero)
         listView.setContentOffset(newContentOffset, animated: false)
+    }
+    
+    private func scrollToNext() {
+        var index = listView.indexPathsForVisibleItems.first?.row ?? 0
+        if index == 0 || index == bannerList.count - 1 {
+            scrollToCenter()
+            index = index % bannerList.realCount
+        }
+        index += 1
+        let offset: CGFloat = (self.listView.width - kBannerEdge) * CGFloat(index)
+        let newContentOffset = targetContentOffsetForProposedContentOffset(CGPoint(x: offset, y: 0), withScrollingVelocity: .zero)
+        listView.setContentOffset(newContentOffset, animated: true)
+    }
+    
+    private func stopTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    private func startTimer() {
+        stopTimer()
+        timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false, block: {[weak self] timer in
+            self?.scrollToNext()
+        })
     }
 }
 
@@ -139,22 +168,33 @@ extension JoyBannerView: UICollectionViewDelegate, UICollectionViewDataSource, U
         return cell
     }
     
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        stopTimer()
+    }
+    
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         let proposedContentOffset = targetContentOffset.pointee
         
         // 在这里手动调用 targetContentOffsetForProposedContentOffset 方法
         let newContentOffset = targetContentOffsetForProposedContentOffset(scrollView.contentOffset, withScrollingVelocity: velocity)
         targetContentOffset.pointee = newContentOffset
+        
+        startTimer()
     }
     
     open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         guard let collectionView = scrollView as? UICollectionView else {return}
+        startTimer()
         if scrollView.contentOffset.x > -1,
            scrollView.contentOffset.x + scrollView.width + 1 < scrollView.contentSize.width {
             return
         }
         
         scrollToCenter()
+    }
+    
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        startTimer()
     }
     
     func targetContentOffsetForProposedContentOffset(_ proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
