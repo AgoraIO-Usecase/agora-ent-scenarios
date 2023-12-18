@@ -35,7 +35,9 @@
 
 - 联系销售给  AppID  开通 K 歌权限 </mark>(如果您没有销售人员的联系方式可通过智能客服联系销售人员 [Agora 支持](https://agora-ticket.agora.io/)
 
-  - 注: 拉取榜单、歌单、歌词等功能是需要开通权限的
+  ```json
+  注: 拉取榜单、歌单、歌词等功能是需要开通权限的
+  ```
 
 - 在项目的 agora-ent-scenarios/iOS/AgoraEntScenarios/ 目录下会有一个 KeyCenter.swift 文件，需要在 KeyCenter.swift 里填写需要的声网 App ID 和 App 证书
 
