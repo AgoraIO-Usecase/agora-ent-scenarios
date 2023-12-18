@@ -296,10 +296,6 @@
 
 ## 4. FAQ
 
-### 如何获取声网 APPID
-
-> 声网 APPID 申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
-
 ### 程序运行后，歌曲列表为空
 
 **<span style="font-size: larger; color: red;">需要联系销售给 APPID 开通 K 歌权限</span>**
@@ -307,6 +303,10 @@
 ### K歌房中的歌曲资源使用的是哪家？是否可以自己选择供应商？
 
 > K歌房的歌曲资源使用的是Agora内容中心服务，暂不支持自行切换供应商，详情请查看 [版权音乐 - 在线 K 歌房 - 文档中心 - 声网Agora](https://docs.agora.io/cn/online-ktv/API%20Reference/ios_ng/API/toc_drm.html)
+
+### 想体验更多场景
+
+> 详情请查看 [声动互娱](../../../README.md)
 
 ### 集成遇到困难，该如何联系声网获取协助
 
