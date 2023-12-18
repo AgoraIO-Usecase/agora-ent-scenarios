@@ -7,10 +7,10 @@
 
 import Foundation
 
-private let resourceBundle = Bundle(path: Bundle.main.path(forResource: "VoiceChatRoomResource", ofType: "bundle") ?? "") ?? Bundle.main
+private let voice_bundle = Bundle(path: Bundle.main.path(forResource: "VoiceChatRoomResource", ofType: "bundle") ?? "") ?? Bundle.main
 public let spatialResourceBundle = Bundle(path: Bundle.main.path(forResource: "SpatialAudioResource", ofType: "bundle") ?? "") ?? Bundle.main
 
 public extension Bundle {
-    static var voiceRoomBundle: Bundle { resourceBundle }
+    static var voiceRoomBundle: Bundle { voice_bundle }
     static var spatialRoomBundle: Bundle { spatialResourceBundle }
 }
