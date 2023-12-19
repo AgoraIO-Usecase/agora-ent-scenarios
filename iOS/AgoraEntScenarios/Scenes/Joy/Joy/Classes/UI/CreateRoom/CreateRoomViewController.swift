@@ -111,7 +111,7 @@ class CreateRoomViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        view.backgroundColor = .black
         view.addSubview(backgroundCanvasView)
         view.addSubview(naviBar)
         view.addSubview(bannerView)

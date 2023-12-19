@@ -95,7 +95,7 @@ class RoomViewController: UIViewController {
     }()
     
     private lazy var bottomBar: ShowRoomBottomBar = {
-        let bar = ShowRoomBottomBar()
+        let bar = ShowRoomBottomBar(isBroadcastor: isRoomOwner())
         bar.delegate = self
         return bar
     }()
