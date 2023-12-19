@@ -169,23 +169,37 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             TopFunctionDialog(this).show()
         }
         binding.tvRules.setOnClickListener {
-            showRulesDialog()
+            if (mJoyViewModel.mGameDetail == null) {
+                mStartGameInfo?.gameId?.let { gameId ->
+                    mJoyViewModel.getGameDetail(gameId)
+                }
+                JoyLogger.d(TAG, "click rules mGameDetail is null gameId:${mStartGameInfo?.gameId}")
+            } else {
+                showRulesDialog()
+            }
         }
         binding.ivGift.setOnClickListener {
-            mJoyViewModel.mGameDetail?.gifts?.let { gifts ->
-                val bundle = Bundle().apply {
-                    putSerializable(JoyGiftDialog.Key_Gifts, gifts as Serializable)
+            if (mJoyViewModel.mGameDetail == null) {
+                mStartGameInfo?.gameId?.let { gameId ->
+                    mJoyViewModel.getGameDetail(gameId)
                 }
-                val dialog = JoyGiftDialog().apply {
-                    setBundleArgs(bundle)
-                    mSelectedCompletion = { giftEntity, count ->
-                        mJoyViewModel.sendGift(
-                            mJoyViewModel.mGamId, mRoomInfo.roomId, giftEntity.vendorGiftId ?: "", count,
-                            giftEntity.price * count
-                        )
+                JoyLogger.d(TAG, "click gift mGameDetail is null gameId:${mStartGameInfo?.gameId}")
+            } else {
+                mJoyViewModel.mGameDetail?.gifts?.let { gifts ->
+                    val bundle = Bundle().apply {
+                        putSerializable(JoyGiftDialog.Key_Gifts, gifts as Serializable)
                     }
+                    val dialog = JoyGiftDialog().apply {
+                        setBundleArgs(bundle)
+                        mSelectedCompletion = { giftEntity, count ->
+                            mJoyViewModel.sendGift(
+                                mJoyViewModel.mGamId, mRoomInfo.roomId, giftEntity.vendorGiftId ?: "", count,
+                                giftEntity.price * count
+                            )
+                        }
+                    }
+                    dialog.show(supportFragmentManager, "giftDialog")
                 }
-                dialog.show(supportFragmentManager, "giftDialog")
             }
         }
         binding.tvInput.setOnClickListener {
@@ -755,7 +769,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     }
 
     private fun showRulesDialog() {
-        val gameDetail = mJoyViewModel.mGameDetailLiveData.value?.data ?: return
+        val gameDetail = mJoyViewModel.mGameDetail ?: return
         val bundle = Bundle().apply {
             putSerializable(JoyGameRulesDialog.Key_Game, gameDetail)
             putBoolean(JoyGameRulesDialog.Key_IsOwner, mIsRoomOwner)

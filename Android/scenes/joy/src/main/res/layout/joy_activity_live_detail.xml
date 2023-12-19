@@ -42,7 +42,7 @@
         app:layout_constraintDimensionRatio="3:4"
         app:layout_constraintEnd_toEndOf="@id/vertical68"
         app:layout_constraintStart_toStartOf="@id/vertical34"
-        app:layout_constraintTop_toTopOf="@+id/clRoomTitle" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clRoomTitle"
