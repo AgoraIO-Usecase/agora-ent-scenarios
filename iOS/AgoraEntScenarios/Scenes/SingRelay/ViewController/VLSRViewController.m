@@ -12,8 +12,6 @@
 #import "VLSROnLineListVC.h"
 #import "AgoraEntScenarios-Swift.h"
 #import "VLSRSettingView.h"
-//model
-#import "ChooseSongInputModel.h"
 #import "VLSRSongItmModel.h"
 #import "VLSRSelBgModel.h"
 #import "UIViewController+VL.h"
@@ -388,8 +386,12 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 //            [VLToast toast:[NSString stringWithFormat:@"network changed: %ld", status]];
             return;
         }
-        [weakSelf subscribeServiceEvent];
-        [weakSelf _fetchServiceAllData];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            // 在主线程中执行的代码
+            [weakSelf subscribeServiceEvent];
+            [weakSelf _fetchServiceAllData];
+        });
+        
     }];
     [[AppContext srServiceImp] subscribeRoomWillExpireWith:^{
         bool isOwner = [weakSelf.roomModel.creatorNo isEqualToString:VLUserCenter.user.id];
@@ -1536,7 +1538,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)startSBGGrapWith:(int)index {
     VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
     kWeakSelf(self);
-    [[SRNetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"sing_battle_game_info" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
+    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"sing_battle_game_info" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
         if(flag){
             //抢唱成功
             NSLog(@"抢唱成功");
@@ -2611,89 +2613,38 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 }
 
 -(NSMutableArray *)getChooseSongArray{
-//    SRChooseSongInputModel *model = [[SRChooseSongInputModel alloc]init];
-//    model.isChorus = false;
-//    model.songName = @"勇气大爆发";
-//    model.songNo = @"6805795303139450";
-//    model.singer = @"贝乐虎；土豆王国小乐队；奶糖乐团";
-//    model.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/CASW1078064.jpg";
-//    model.playCounts = @[@32000, @47000, @81433, @142000, @176000];
+    
+    NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@"SRResource" ofType:@"bundle"];
+    NSBundle *yourBundle = [NSBundle bundleWithPath:bundlePath];
 
-    SRChooseSongInputModel *model1 = [[SRChooseSongInputModel alloc]init];
-    model1.isChorus = false;
-    model1.songName = @"美人鱼";
-    model1.songNo = @"6625526604232820";
-    model1.singer = @"林俊杰";
-    model1.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/661208.jpg";
-    model1.playCounts = @[@55000, @97000, @150000, @190000, @243000];
+    NSString *filePath = [yourBundle pathForResource:@"SRMusicSource" ofType:@"json"];
+    NSData *jsonData = [NSData dataWithContentsOfFile:filePath];
+    NSMutableArray<SRChooseSongInputModel *> *models = [NSMutableArray array];
+    if (jsonData) {
+        NSError *error;
+        NSArray *jsonArray = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&error];
+        
+        if (jsonArray && [jsonArray isKindOfClass:[NSArray class]]) {
+
+            for (NSDictionary *dict in jsonArray) {
+                SRChooseSongInputModel *model = [[SRChooseSongInputModel alloc] init];
+                model.isChorus = [dict[@"isChorus"] boolValue];
+                model.songName = dict[@"songName"];
+                model.songNo = dict[@"songNo"];
+                model.singer = dict[@"singer"];
+                model.imageUrl = dict[@"imageUrl"];
+                model.playCounts = dict[@"playCounts"];
+                
+                [models addObject:model];
+            }
+        } else {
+            NSLog(@"Invalid JSON format.");
+        }
+    } else {
+           NSLog(@"Failed to read JSON file.");
+    }
     
-//    SRChooseSongInputModel *model2 = [[SRChooseSongInputModel alloc]init];
-//    model2.isChorus = false;
-//    model2.songName = @"天外来物";
-//    model2.songNo = @"6654550266760610";
-//    model2.singer = @"薛之谦";
-//    model2.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/CJ1420004109.jpg";
-//    model2.playCounts = @[@91000, @129000, @173000, @212000, @251000];
-    
-    SRChooseSongInputModel *model3 = [[SRChooseSongInputModel alloc]init];
-    model3.isChorus = false;
-    model3.songName = @"凄美地";
-    model3.songNo = @"6625526611288130";
-    model3.singer = @"郭顶";
-    model3.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/126936.jpg";
-    model3.playCounts = @[@44000, @89000, @132000, @192000, @244000];
-    
-    SRChooseSongInputModel *model4 = [[SRChooseSongInputModel alloc]init];
-    model4.isChorus = false;
-    model4.songName = @"一直很安静";
-    model4.songNo = @"6654550232746660";
-    model4.singer = @"阿桑";
-    model4.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/961853.jpg";
-    model4.playCounts = @[@57000, @76000, @130000, @148000, @210000];
-    
-//    SRChooseSongInputModel *model5 = [[SRChooseSongInputModel alloc]init];
-//    model5.isChorus = false;
-//    model5.songName = @"他不懂";
-//    model5.songNo = @"6625526604594370";
-//    model5.singer = @"张杰";
-//    model5.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/792885.jpg";
-//    model5.playCounts = @[@46000, @81000, @124000, @159000, @207000];
-    
-//    SRChooseSongInputModel *model6 = [[SRChooseSongInputModel alloc]init];
-//    model6.isChorus = false;
-//    model6.songName = @"一路向北";
-//    model6.songNo = @"6654550232990700";
-//    model6.singer = @"周杰伦";
-//    model6.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/961979.jpg";
-//    model6.playCounts = @[@90000, @118000, @194000, @222000, @262000];
-    
-//    SRChooseSongInputModel *model7 = [[SRChooseSongInputModel alloc]init];
-//    model7.isChorus = false;
-//    model7.songName = @"天黑黑";
-//    model7.songNo = @"6625526604489740";
-//    model7.singer = @"孙燕姿";
-//    model7.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/147907.jpg";
-//    model7.playCounts = @[@51000, @85000, @122000, @176000, @223000];
-    
-    SRChooseSongInputModel *model8 = [[SRChooseSongInputModel alloc]init];
-    model8.isChorus = false;
-    model8.songName = @"起风了";
-    model8.songNo = @"6625526603305730";
-    model8.singer = @"买辣椒也用券";
-    model8.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/385062.jpg";
-    model8.playCounts = @[@63000, @109000, @154000, @194000, @274000];
-    
-//    SRChooseSongInputModel *model9 = [[SRChooseSongInputModel alloc]init];
-//    model9.isChorus = false;
-//    model9.songName = @"这世界那么多人";
-//    model9.songNo = @"6654550267486590";
-//    model9.singer = @"莫文蔚";
-//    model9.imageUrl = @"https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/CJ1420010039.jpg";
-//    model9.playCounts = @[@91000, @147000, @191000, @235000, @295000];
-    
-   // NSMutableArray *arrayM = [[NSMutableArray alloc]initWithObjects:model,model1, model2, model3, model4, model5, model6, model7, model8, model9, nil];
-    NSMutableArray *arrayM = [[NSMutableArray alloc]initWithObjects:model1, model3, model4,model8, nil];
-    return arrayM;
+    return models;
 }
 
 -(SRChooseSongInputModel *)getRandomSongModel{

@@ -103,8 +103,11 @@ class VLSBGStatusView: UIView {
             if state == .ownerOrderMusic {
                 numLabel.isHidden = true
                 contentImgView.isHidden = false
+                fightImage.isHidden = true
+                fightResult.isHidden = true
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
+                contentTextLabel.isHidden = false
                 contentTextLabel.text = getLocalizeString(with: "sbg_no_song")
                 lrcView.isHidden = true
                 randomBtn.isHidden = false
@@ -114,8 +117,11 @@ class VLSBGStatusView: UIView {
             } else if state == .audienceWating {
                 numLabel.isHidden = true
                 contentImgView.isHidden = false
+                fightImage.isHidden = true
+                fightResult.isHidden = true
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
+                contentTextLabel.isHidden = false
                 contentTextLabel.text = getLocalizeString(with: "sbg_bro_choose")
                 lrcView.isHidden = true
                 randomBtn.isHidden = true
@@ -125,8 +131,11 @@ class VLSBGStatusView: UIView {
             } else if state == .ready {
                 numLabel.isHidden = true
                 contentImgView.isHidden = false
+                fightImage.isHidden = true
+                fightResult.isHidden = true
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
+                contentTextLabel.isHidden = false
                 contentTextLabel.text = getLocalizeString(with: "sbg_start")
                 lrcView.isHidden = true
                 randomBtn.isHidden = true
@@ -180,6 +189,8 @@ class VLSBGStatusView: UIView {
             } else if state == .sbgSuccess {
                 numLabel.isHidden = true
                 contentImgView.isHidden = false
+                fightImage.isHidden = true
+                fightResult.isHidden = true
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
                 contentTextLabel.text = ""
@@ -191,6 +202,8 @@ class VLSBGStatusView: UIView {
             } else if state == .sbgNobody {
                 numLabel.isHidden = true
                 contentImgView.isHidden = false
+                fightImage.isHidden = true
+                fightResult.isHidden = true
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
                 contentTextLabel.text = getLocalizeString(with: "sbg_nobody_next")
@@ -225,8 +238,11 @@ class VLSBGStatusView: UIView {
             } else if state == .singFailed {
                 numLabel.isHidden = true
                 contentImgView.isHidden = false
+                fightImage.isHidden = false
+                fightResult.isHidden = false
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
+                contentTextLabel.isHidden = true
                 lrcView.isHidden = true
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
@@ -235,8 +251,11 @@ class VLSBGStatusView: UIView {
             } else if state == .singSuccess {
                 numLabel.isHidden = true
                 contentImgView.isHidden = false
+                fightImage.isHidden = false
+                fightResult.isHidden = false
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
+                contentTextLabel.isHidden = true
                 lrcView.isHidden = true
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
@@ -245,8 +264,11 @@ class VLSBGStatusView: UIView {
             } else if state == .next {
                 numLabel.isHidden = true
                 contentImgView.isHidden = false
+                fightImage.isHidden = true
+                fightResult.isHidden = true
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
+                contentTextLabel.isHidden = false
                 contentTextLabel.text = getLocalizeString(with: "sbg_next_song")
                 lrcView.isHidden = true
                 randomBtn.isHidden = true
@@ -273,19 +295,7 @@ class VLSBGStatusView: UIView {
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
                 retryBtn.isHidden = true
-            } else if state == .singFailed {
-                contentImgView.image = UIImage.sceneImage(name: "sbg-bg-fail")
-                fightImage.isHidden = false
-                fightResult.isHidden = false
-                contentTextLabel.isHidden = true
-                retryBtn.isHidden = true
-            } else if state == .singSuccess {
-                contentImgView.image = UIImage.sceneImage(name: "sbg-bg-success")
-                fightResult.isHidden = false
-                fightImage.isHidden = false
-                contentTextLabel.isHidden = true
-                retryBtn.isHidden = true
-            }  else if state == .loadFailedLrc {
+            } else if state == .loadFailedLrc {
                 numLabel.isHidden = false
                 contentImgView.isHidden = true
                 tableView.isHidden = true

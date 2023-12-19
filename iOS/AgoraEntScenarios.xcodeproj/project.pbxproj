@@ -524,14 +524,12 @@
 		E301BDAD2AF4CB000089A79C /* KTVDebugInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BD562AF4CAFF0089A79C /* KTVDebugInfo.m */; };
 		E301BDAF2AF4CC5B0089A79C /* VLOnLineListVC.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BDAE2AF4CC5B0089A79C /* VLOnLineListVC.m */; };
 		E301BE4B2AF4E06F0089A79C /* SRResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E301BDB72AF4E06F0089A79C /* SRResource.bundle */; };
-		E301BE4C2AF4E06F0089A79C /* SRNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BDB92AF4E06F0089A79C /* SRNetworkManager.swift */; };
 		E301BE4D2AF4E06F0089A79C /* SRLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BDBA2AF4E06F0089A79C /* SRLog.swift */; };
 		E301BE4F2AF4E06F0089A79C /* VLSRAddRoomModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BDBD2AF4E06F0089A79C /* VLSRAddRoomModel.m */; };
 		E301BE502AF4E06F0089A79C /* VLSRRoomSeatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BDBF2AF4E06F0089A79C /* VLSRRoomSeatModel.swift */; };
 		E301BE512AF4E06F0089A79C /* VLSRRoomSelSongModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BDC12AF4E06F0089A79C /* VLSRRoomSelSongModel.swift */; };
 		E301BE522AF4E06F0089A79C /* VLSRSongItmModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BDC32AF4E06F0089A79C /* VLSRSongItmModel.m */; };
 		E301BE532AF4E06F0089A79C /* VLSRSelBgModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BDC42AF4E06F0089A79C /* VLSRSelBgModel.m */; };
-		E301BE552AF4E06F0089A79C /* ChooseSongInputModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BDC62AF4E06F0089A79C /* ChooseSongInputModel.m */; };
 		E301BE562AF4E06F0089A79C /* VLSRRoomListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BDC72AF4E06F0089A79C /* VLSRRoomListModel.swift */; };
 		E301BE572AF4E06F0089A79C /* VLSRBelcantoModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BDC82AF4E06F0089A79C /* VLSRBelcantoModel.m */; };
 		E301BE582AF4E06F0089A79C /* VLSRHomeOnLineListView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BDD12AF4E06F0089A79C /* VLSRHomeOnLineListView.m */; };
@@ -591,7 +589,6 @@
 		E301BE992AF4E0700089A79C /* SRDebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BE462AF4E06F0089A79C /* SRDebugViewController.m */; };
 		E301BE9A2AF4E0700089A79C /* SRDebugManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BE472AF4E06F0089A79C /* SRDebugManager.m */; };
 		E301BFFD2AF8E8E90089A79C /* sbgResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E301BF702AF8E8E90089A79C /* sbgResource.bundle */; };
-		E301BFFE2AF8E8E90089A79C /* SBGNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BF722AF8E8E90089A79C /* SBGNetworkManager.swift */; };
 		E301BFFF2AF8E8E90089A79C /* LyricsCutter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BF742AF8E8E90089A79C /* LyricsCutter.swift */; };
 		E301C0012AF8E8E90089A79C /* SBGLrcControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BF762AF8E8E90089A79C /* SBGLrcControl.swift */; };
 		E301C0032AF8E8E90089A79C /* SBGLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BF792AF8E8E90089A79C /* SBGLog.swift */; };
@@ -1400,16 +1397,13 @@
 		E301BD562AF4CAFF0089A79C /* KTVDebugInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KTVDebugInfo.m; sourceTree = "<group>"; };
 		E301BDAE2AF4CC5B0089A79C /* VLOnLineListVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLOnLineListVC.m; sourceTree = "<group>"; };
 		E301BDB72AF4E06F0089A79C /* SRResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = SRResource.bundle; sourceTree = "<group>"; };
-		E301BDB92AF4E06F0089A79C /* SRNetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SRNetworkManager.swift; sourceTree = "<group>"; };
 		E301BDBA2AF4E06F0089A79C /* SRLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SRLog.swift; sourceTree = "<group>"; };
 		E301BDBD2AF4E06F0089A79C /* VLSRAddRoomModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSRAddRoomModel.m; sourceTree = "<group>"; };
 		E301BDBF2AF4E06F0089A79C /* VLSRRoomSeatModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VLSRRoomSeatModel.swift; sourceTree = "<group>"; };
-		E301BDC02AF4E06F0089A79C /* ChooseSongInputModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChooseSongInputModel.h; sourceTree = "<group>"; };
 		E301BDC12AF4E06F0089A79C /* VLSRRoomSelSongModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VLSRRoomSelSongModel.swift; sourceTree = "<group>"; };
 		E301BDC22AF4E06F0089A79C /* VLSRBelcantoModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSRBelcantoModel.h; sourceTree = "<group>"; };
 		E301BDC32AF4E06F0089A79C /* VLSRSongItmModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSRSongItmModel.m; sourceTree = "<group>"; };
 		E301BDC42AF4E06F0089A79C /* VLSRSelBgModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSRSelBgModel.m; sourceTree = "<group>"; };
-		E301BDC62AF4E06F0089A79C /* ChooseSongInputModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChooseSongInputModel.m; sourceTree = "<group>"; };
 		E301BDC72AF4E06F0089A79C /* VLSRRoomListModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VLSRRoomListModel.swift; sourceTree = "<group>"; };
 		E301BDC82AF4E06F0089A79C /* VLSRBelcantoModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSRBelcantoModel.m; sourceTree = "<group>"; };
 		E301BDC92AF4E06F0089A79C /* VLSRSongItmModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSRSongItmModel.h; sourceTree = "<group>"; };
@@ -1514,7 +1508,6 @@
 		E301BE472AF4E06F0089A79C /* SRDebugManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRDebugManager.m; sourceTree = "<group>"; };
 		E301BE482AF4E06F0089A79C /* SRDebugInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRDebugInfo.h; sourceTree = "<group>"; };
 		E301BF702AF8E8E90089A79C /* sbgResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = sbgResource.bundle; sourceTree = "<group>"; };
-		E301BF722AF8E8E90089A79C /* SBGNetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBGNetworkManager.swift; sourceTree = "<group>"; };
 		E301BF742AF8E8E90089A79C /* LyricsCutter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsCutter.swift; sourceTree = "<group>"; };
 		E301BF762AF8E8E90089A79C /* SBGLrcControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBGLrcControl.swift; sourceTree = "<group>"; };
 		E301BF792AF8E8E90089A79C /* SBGLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBGLog.swift; sourceTree = "<group>"; };
@@ -3648,7 +3641,6 @@
 		E301BDB82AF4E06F0089A79C /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				E301BDB92AF4E06F0089A79C /* SRNetworkManager.swift */,
 				E301BDBA2AF4E06F0089A79C /* SRLog.swift */,
 			);
 			path = Utils;
@@ -3668,12 +3660,10 @@
 			isa = PBXGroup;
 			children = (
 				E301BDBF2AF4E06F0089A79C /* VLSRRoomSeatModel.swift */,
-				E301BDC02AF4E06F0089A79C /* ChooseSongInputModel.h */,
 				E301BDC12AF4E06F0089A79C /* VLSRRoomSelSongModel.swift */,
 				E301BDC22AF4E06F0089A79C /* VLSRBelcantoModel.h */,
 				E301BDC32AF4E06F0089A79C /* VLSRSongItmModel.m */,
 				E301BDC42AF4E06F0089A79C /* VLSRSelBgModel.m */,
-				E301BDC62AF4E06F0089A79C /* ChooseSongInputModel.m */,
 				E301BDC72AF4E06F0089A79C /* VLSRRoomListModel.swift */,
 				E301BDC82AF4E06F0089A79C /* VLSRBelcantoModel.m */,
 				E301BDC92AF4E06F0089A79C /* VLSRSongItmModel.h */,
@@ -3879,7 +3869,6 @@
 		E301BF712AF8E8E90089A79C /* NetWork */ = {
 			isa = PBXGroup;
 			children = (
-				E301BF722AF8E8E90089A79C /* SBGNetworkManager.swift */,
 			);
 			path = NetWork;
 			sourceTree = "<group>";
@@ -4900,7 +4889,6 @@
 				E301C01B2AF8E8E90089A79C /* VLSBGPopScoreView.m in Sources */,
 				E301BD762AF4CAFF0089A79C /* VLPopSelBgView.m in Sources */,
 				DD619AA929E3E247008F63E4 /* SASoundEffectsCell.swift in Sources */,
-				E301BE4C2AF4E06F0089A79C /* SRNetworkManager.swift in Sources */,
 				DD8417CC29090C520026B624 /* TemplateServiceProtocol.swift in Sources */,
 				DD619A7729E3E247008F63E4 /* SAThrottle.swift in Sources */,
 				DD9EBF882AD5512300B4551F /* VoiceRoomBusinessRequest.swift in Sources */,
@@ -5100,7 +5088,6 @@
 				DD9EBFD42AD5512300B4551F /* VMANISSUPTableViewCell.swift in Sources */,
 				DD9EBF9B2AD5512300B4551F /* ResourceBundleExtension.swift in Sources */,
 				E301BD902AF4CB000089A79C /* VLVoiceShowView.m in Sources */,
-				E301BFFE2AF8E8E90089A79C /* SBGNetworkManager.swift in Sources */,
 				DDA199F128FFE579009D3E61 /* BaseNavigationController.m in Sources */,
 				DD9EBFAB2AD5512300B4551F /* VoiceChatServiceModel.swift in Sources */,
 				DD619ACC29E3E247008F63E4 /* SAUserListView.swift in Sources */,
@@ -5153,7 +5140,6 @@
 				E301BD752AF4CAFF0089A79C /* VLPopScoreView.m in Sources */,
 				DD3610D029B70F3800CE7984 /* VLMineCellModel.m in Sources */,
 				DD36106229B70CDC00CE7984 /* ShowMusicModel.swift in Sources */,
-				E301BE552AF4E06F0089A79C /* ChooseSongInputModel.m in Sources */,
 				E716856D2AE61BB700C2915C /* EffectsAttribute.m in Sources */,
 				E301C03D2AF8E8E90089A79C /* VLSBGCreateRoomViewController.m in Sources */,
 				DDA19A1028FFE579009D3E61 /* VLGlobalHelper.m in Sources */,

@@ -371,7 +371,11 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
 //            [VLToast toast:[NSString stringWithFormat:@"network changed: %ld", status]];
             return;
         }
-        [weakSelf subscribeServiceEvent];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            // 在主线程中执行的代码
+            [weakSelf subscribeServiceEvent];
+        });
+        
        // [weakSelf _fetchServiceAllData];
     }];
     
@@ -1223,8 +1227,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)stopSingAndShowFailedStateWithScore:(NSInteger)score {
     [self.SBGApi stopSing];
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.statusView.state = SBGStateSingFailed;
         [self.statusView setFight:false score:score];
+        self.statusView.state = SBGStateSingFailed;
     });
 }
 
@@ -1242,8 +1246,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)stopSingAndShowSuccessStateWithScore:(NSInteger)score {
     [self.SBGApi stopSing];
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.statusView.state = SBGStateSingSuccess;
         [self.statusView setFight:true score:score];
+        self.statusView.state = SBGStateSingSuccess;
     });
 }
 
@@ -1275,7 +1279,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)startSBGGrap {
     VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
     kWeakSelf(self);
-    [[SBGNetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singbattle_3.4.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
+    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singbattle_3.4.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
         if(flag){
             //抢唱成功
             NSLog(@"抢唱成功");
@@ -1308,7 +1312,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return;
     }
     kWeakSelf(self);
-    [[SBGNetworkManager shared] songGrabQuery:[AppContext.shared appId] sceneId:@"scene_singbattle_3.4.0" roomId:_roomModel.roomNo songCode:model.songNo src:@"postman" success:^(NSString *userId,NSString *userName, BOOL flag) {
+    [[NetworkManager shared] songGrabQuery:[AppContext.shared appId] sceneId:@"scene_singbattle_3.4.0" roomId:_roomModel.roomNo songCode:model.songNo src:@"postman" success:^(NSString *userId,NSString *userName, BOOL flag) {
         if(flag){
             return;
         }
