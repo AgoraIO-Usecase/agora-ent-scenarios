@@ -54,7 +54,11 @@ interface VideoLoader {
         val channelId: String = "",
         val anchorUid: Int = 0,
         val token: String = ""
-    )
+    ) {
+        override fun toString(): String {
+            return "{channelId=$channelId, anchorUid=$anchorUid"
+        }
+    }
 
     /**
      * 房间信息

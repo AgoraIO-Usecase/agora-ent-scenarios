@@ -82,7 +82,7 @@ class VoiceToolboxServerHttpManager {
             .setRequestMethod(VRHttpClientManager.Method_POST)
             .asyncExecute(object : VRHttpCallback {
                 override fun onSuccess(result: String) {
-                    "voice generateToken success: $result".logD(TAG)
+                    "voice generateToken success".logD(TAG)
                     val bean = GsonTools.toBean<VRGenerateTokenResponse>(
                         result,
                         object : TypeToken<VRGenerateTokenResponse>() {}.type
