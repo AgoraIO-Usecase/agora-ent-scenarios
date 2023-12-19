@@ -96,7 +96,7 @@ extension SpatialAudioSyncSerciceImp {
         for i in 1...8 {
             if i == 8 { return 0 }
             let mic = self.mics[safe: i]
-            if mic?.member == nil && mic?.status != 3 {
+            if mic?.member == nil && mic?.status != 3 && mic?.status != 4 {
                 mic_index = mic?.mic_index ?? 1
                 break
             }
@@ -1030,14 +1030,13 @@ extension SpatialAudioSyncSerciceImp {
             .get(success: { [weak self] list in
                 agoraPrint("imp seat apply list get success...")
                 let applys = list.map({$0.toJson()}).kj.modelArray(SAApply.self)
-                self?.micApplys = applys.filter({ apply in
-                    for mic in self?.mics ?? [] {
-                        if mic.member?.uid == apply.member?.uid {
-                            return false
-                        }
+                guard let self = self else {return}
+                self.micApplys.removeAll()
+                applys.forEach { apply in
+                    if !self.micApplys.contains(where: {$0.member?.uid == apply.member?.uid}) && !self.mics.contains(where: {$0.member?.uid == apply.member?.uid}) {
+                        self.micApplys.append(apply)
                     }
-                    return true
-                })
+                }
                 completion(nil, applys)
             }, fail: { error in
                 agoraPrint("imp seat apply list get fail :\(error.message)...")

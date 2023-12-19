@@ -292,7 +292,9 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                         let apply = AppContext.saTmpServiceImp().micApplys[safe: index] ?? SAApply()
                         AppContext.saTmpServiceImp()._removeMicSeatApply(roomId: self.roomInfo?.room?.room_id ?? "", apply: apply) { error in
                             if error == nil {
-                                AppContext.saTmpServiceImp().micApplys.remove(at: index)
+                                if AppContext.saTmpServiceImp().micApplys.count > index {
+                                    AppContext.saTmpServiceImp().micApplys.remove(at: index)
+                                }
                             }
                         }
                     }

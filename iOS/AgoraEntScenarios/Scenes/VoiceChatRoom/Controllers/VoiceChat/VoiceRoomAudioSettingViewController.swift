@@ -350,6 +350,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             guard let cell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as? VMNorSetTableViewCell else {
                 return UITableViewCell()
             }
+            cell.accessibilityIdentifier = "voice_chat_room_audio_setting_\(indexPath.section)_\(indexPath.row)"
             cell.iconView.image = UIImage.voice_image("AIAEC")
             cell.titleLabel.text = LanguageManager.localValue(key: "voice_AIAEC")
             if roomInfo?.room?.turn_AIAEC == true {
@@ -362,6 +363,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             guard let cell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as? VMNorSetTableViewCell else {
                 return UITableViewCell()
             }
+            cell.accessibilityIdentifier = "voice_chat_room_audio_setting_\(indexPath.section)_\(indexPath.row)"
             cell.iconView.image = UIImage.voice_image("AGC")
             cell.titleLabel.text = LanguageManager.localValue(key: "voice_AGC")
             if roomInfo?.room?.turn_AGC == true {
@@ -374,6 +376,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             guard let cell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as? VMNorSetTableViewCell else {
                 return UITableViewCell()
             }
+            cell.accessibilityIdentifier = "voice_chat_room_audio_setting_\(indexPath.section)_\(indexPath.row)"
             cell.iconView.image = UIImage.voice_image("InEar")
             cell.titleLabel.text = LanguageManager.localValue(key: "In-Ear Monitor")
             if roomInfo?.room?.turn_InEar == true {
@@ -386,6 +389,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             guard let cell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as? VMNorSetTableViewCell else {
                 return UITableViewCell()
             }
+            cell.accessibilityIdentifier = "voice_chat_room_audio_setting_\(indexPath.section)_\(indexPath.row)"
             cell.iconView.image = UIImage.voice_image("icon-park-solid_people-speak")
             cell.titleLabel.text = LanguageManager.localValue(key: "voice_SoundCard")
             cell.contentLabel.text = self.soundOpen == true ? "voice_on".voice_localized() : "voice_off".voice_localized()
@@ -393,6 +397,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             return cell
         } else if (type == .Robots) {
             let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
+            cell.accessibilityIdentifier = "voice_chat_room_audio_setting_\(indexPath.section)_\(indexPath.row)"
             cell.iconView.image = UIImage.voice_image("jiqi")
             cell.titleLabel.text = LanguageManager.localValue(key: "voice_agora_blue_and_red_bot")
             cell.swith.alpha = isAudience ? 0.5 : 1
@@ -410,6 +415,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             return cell
         } else if (type == .RobotsVolume) {
             let cell: VMSliderTableViewCell = tableView.dequeueReusableCell(withIdentifier: slIdentifier) as! VMSliderTableViewCell
+            cell.accessibilityIdentifier = "voice_chat_room_audio_setting_\(indexPath.section)_\(indexPath.row)"
             cell.iconView.image = UIImage.voice_image("icons／set／laba")
             cell.titleLabel.text = LanguageManager.localValue(key: "voice_robot_volume")
             cell.isAudience = isAudience
@@ -428,6 +434,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             guard let cell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as? VMNorSetTableViewCell else {
                 return UITableViewCell()
             }
+            cell.accessibilityIdentifier = "voice_chat_room_audio_setting_\(indexPath.section)_\(indexPath.row)"
             cell.iconView.image = UIImage.voice_image("icons／set／zuijia")
             cell.titleLabel.text = LanguageManager.localValue(key: "voice_best_agora_sound")
             cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
@@ -436,6 +443,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             guard let cell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as? VMNorSetTableViewCell else {
                 return UITableViewCell()
             }
+            cell.accessibilityIdentifier = "voice_chat_room_audio_setting_\(indexPath.section)_\(indexPath.row)"
             cell.iconView.image = UIImage.voice_image("Music")
             cell.titleLabel.text = LanguageManager.localValue(key: "Background Music")
             let musicName = roomInfo?.room?.backgroundMusic?.name
@@ -445,6 +453,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             return cell
         } else if (type == .Engine) {
             let cell = tableView.dequeueReusableCell(withIdentifier: spdentifier) ?? UITableViewCell()
+            cell.accessibilityIdentifier = "voice_chat_room_audio_setting_\(indexPath.section)_\(indexPath.row)"
             return cell
         }
         return UITableViewCell()
