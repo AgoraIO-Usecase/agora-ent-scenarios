@@ -38,7 +38,7 @@
             android:visibility="gone"
             android:clipChildren="false"
             android:clipToPadding="false"
-            tools:listitem="@layout/joy_item_room_list_3"
+            tools:listitem="@layout/joy_item_room_list_4"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="2"
             tools:visibility="visible"/>

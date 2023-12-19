@@ -9,6 +9,9 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
+import io.agora.scene.base.GlideApp
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
@@ -17,7 +20,7 @@ import io.agora.scene.joy.utils.JoyLogger
 import io.agora.scene.joy.R
 import io.agora.scene.joy.RtcEngineInstance
 import io.agora.scene.joy.databinding.JoyActivityRoomListBinding
-import io.agora.scene.joy.databinding.JoyItemRoomList3Binding
+import io.agora.scene.joy.databinding.JoyItemRoomList4Binding
 import io.agora.scene.joy.service.JoyRoomInfo
 import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.widget.utils.UiUtils
@@ -113,14 +116,14 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
 
         @DrawableRes
         private fun getThumbnailIcon(thumbnailId: String?) = when (thumbnailId) {
-            "0" -> R.drawable.joy_room_cover_0
-            "1" -> R.drawable.joy_room_cover_1
-            "2" -> R.drawable.joy_room_cover_2
-            "3" -> R.drawable.joy_room_cover_3
-            else -> R.drawable.joy_room_cover_1
+            "0" -> R.drawable.joy_img_room_item_bg_0
+            "1" -> R.drawable.joy_img_room_item_bg_1
+            "2" -> R.drawable.joy_img_room_item_bg_2
+            "3" -> R.drawable.joy_img_room_item_bg_3
+            else -> R.drawable.joy_img_room_item_bg_4
         }
 
-        inner class ViewHolder(val binding: JoyItemRoomList3Binding) : RecyclerView.ViewHolder(binding.root)
+        inner class ViewHolder(val binding: JoyItemRoomList4Binding) : RecyclerView.ViewHolder(binding.root)
 
         fun setDataList(list: List<JoyRoomInfo>) {
             mList = list
@@ -129,7 +132,7 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             return ViewHolder(
-                JoyItemRoomList3Binding.inflate(LayoutInflater.from(parent.context), parent, false)
+                JoyItemRoomList4Binding.inflate(LayoutInflater.from(parent.context), parent, false)
             )
         }
 
@@ -145,6 +148,12 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
                 if (UiUtils.isFastClick()) return@setOnClickListener
                 mOnGotoRoom?.invoke(position, data)
             }
+            GlideApp.with(holder.binding.ivAvatar)
+                .load(data.ownerAvatar)
+                .error(R.mipmap.userimage)
+                .apply(RequestOptions.circleCropTransform())
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .into(holder.binding.ivAvatar)
         }
 
         override fun getItemCount(): Int {

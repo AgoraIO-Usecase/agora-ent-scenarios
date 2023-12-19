@@ -73,7 +73,7 @@ class JoySyncManagerServiceImp constructor(
     }
 
     private fun getRandomThumbnailId(crateAt: Long) =
-        Random(crateAt).nextInt(0, 4).toString()
+        Random(crateAt).nextInt(0, 5).toString()
 
     private fun initSync(complete: () -> Unit) {
         if (syncInitialized) {
