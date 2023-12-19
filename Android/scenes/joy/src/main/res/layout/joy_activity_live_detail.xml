@@ -23,9 +23,25 @@
     <FrameLayout
         android:id="@+id/flAssistantContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/vertical68"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.65" />
+
+    <FrameLayout
+        android:id="@+id/flVideoContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/joy_bg_empty_video"
+        app:layout_constraintDimensionRatio="3:4"
+        app:layout_constraintEnd_toEndOf="@id/vertical68"
+        app:layout_constraintStart_toStartOf="@id/vertical34"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clRoomTitle"
@@ -127,27 +143,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.34" />
+        app:layout_constraintGuide_percent="0.35" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/vertical68"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.68" />
-
-
-
-    <FrameLayout
-        android:id="@+id/flVideoContainer"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="6dp"
-        android:background="@drawable/joy_bg_empty_video"
-        app:layout_constraintDimensionRatio="3:4"
-        app:layout_constraintEnd_toEndOf="@id/vertical68"
-        app:layout_constraintStart_toStartOf="@id/vertical34"
-        app:layout_constraintTop_toBottomOf="@+id/clRoomTitle" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvRules"
@@ -162,7 +159,7 @@
         android:textSize="12sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/flVideoContainer" />
+        app:layout_constraintTop_toBottomOf="@id/clRoomTitle" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layoutEtMessage"

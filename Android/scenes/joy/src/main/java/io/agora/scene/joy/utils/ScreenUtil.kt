@@ -72,7 +72,7 @@ private val Context.statusBarResId
  * 当前虚拟导航栏是否显示
  */
 val Activity.isNavBarShowed: Boolean
-    get()  {
+    get() {
         val viewGroup = window.decorView as ViewGroup? ?: return false
         return (0 until viewGroup.childCount).firstOrNull {
             viewGroup.getChildAt(it).id != View.NO_ID
@@ -106,4 +106,3 @@ val Context.statusBarHeight: Int
 val Context.hasNavBar
     @JvmName("hasNavBar")
     get() = navBarResId != 0
-

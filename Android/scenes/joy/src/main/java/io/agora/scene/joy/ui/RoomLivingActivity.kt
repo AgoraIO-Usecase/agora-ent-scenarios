@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.Log
+import android.util.Size
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.TextureView
@@ -113,6 +114,9 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     private var mToggleVideoRun: Runnable? = null
     private var mToggleAudioRun: Runnable? = null
+
+    // 保存视频宽高
+    private var mVideoSizes = mutableMapOf<Int, Size>()
 
     override fun getPermissions() {
         mToggleVideoRun?.let {
@@ -366,10 +370,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 }
             }
 
-            override fun onRoomDidDestroy(roomInfo: JoyRoomInfo) {
+            override fun onRoomDidDestroy(roomInfo: JoyRoomInfo, abnormal: Boolean) {
                 destroy()
-                showLivingEndLayout() // 房间到了限制时间
-                JoyLogger.d("showLivingEndLayout", "timer end!")
+                showLivingEndLayout(abnormal) // 房间到了限制时间
+                JoyLogger.d("showLivingEndLayout", "timer end! abnormal:$abnormal")
             }
 
             override fun onRoomDidChanged(roomInfo: JoyRoomInfo) {
@@ -525,6 +529,21 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 }
             }
 
+            override fun onVideoSizeChanged(
+                source: Constants.VideoSourceType?,
+                uid: Int,
+                width: Int,
+                height: Int,
+                rotation: Int
+            ) {
+                super.onVideoSizeChanged(source, uid, width, height, rotation)
+                mVideoSizes[uid] = Size(width, height)
+                Log.i(TAG, "onVideoSizeChanged->uid:$uid,width:$width,height:$height,rotation:$rotation")
+                binding.root.post {
+                    adjustAssistantVideoSize(uid)
+                }
+            }
+
             override fun onRemoteVideoStateChanged(uid: Int, state: Int, reason: Int, elapsed: Int) {
                 super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
                 Log.d(TAG, "rtc onRemoteVideoStateChanged uid:$uid,state:$state,reason:$reason}")
@@ -543,6 +562,37 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
         joinChannel(eventListener)
         setupVideoView()
+    }
+
+    private fun adjustAssistantVideoSize(uid: Int) {
+        if (mVideoTextureView == null) return
+        val assistantUid = mStartGameInfo?.assistantUid ?: return
+        if (uid != assistantUid) return
+        val width: Int = mVideoSizes[assistantUid]?.width ?: return
+        val height = mVideoSizes[assistantUid]?.height ?: return
+        val rootViewWidth: Int = binding.root.measuredWidth
+        val rootViewHeight: Int = binding.root.measuredHeight
+
+        Log.i(TAG, "onVideoSizeChanged->rootViewWidth:$rootViewWidth,rootViewHeight:$rootViewHeight")
+        val targetWidth: Int
+        val targetHeight: Int
+        if (rootViewHeight.toFloat() / rootViewWidth > height.toFloat() / width) {
+            targetHeight = rootViewHeight
+            val scale = height.toFloat() / width
+            targetWidth = (rootViewHeight / scale).toInt()
+        } else {
+            targetWidth = rootViewWidth
+            val scale = height.toFloat() / width
+            targetHeight = (rootViewWidth * scale).toInt()
+        }
+        Log.i(TAG, "onVideoSizeChanged->targetWidth:$targetWidth,targetHeight:$targetHeight")
+        mVideoTextureView?.post {
+            val layoutParams: ViewGroup.LayoutParams = binding.flAssistantContainer.layoutParams
+            layoutParams.width = targetWidth
+            layoutParams.height = targetHeight
+            binding.flAssistantContainer.layoutParams = layoutParams
+        }
+        mVideoSizes.remove(assistantUid)
     }
 
     private fun setupVideoView() {
@@ -569,9 +619,11 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         binding.flAssistantContainer.removeAllViews()
         binding.flAssistantContainer.addView(mVideoTextureView)
         mRtcEngine.setupRemoteVideoEx(
-            VideoCanvas(mVideoTextureView, VideoCanvas.RENDER_MODE_HIDDEN, assistantUid),
+            VideoCanvas(mVideoTextureView, VideoCanvas.RENDER_MODE_FIT, assistantUid),
             mMainRtcConnection
         )
+        Log.d(TAG, "setupAssistantVideoView $assistantUid")
+        adjustAssistantVideoSize(assistantUid)
     }
 
     private fun initServiceWithJoinRoom() {
@@ -703,10 +755,13 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         dialog.show(supportFragmentManager, "rulesDialog")
     }
 
-    private fun showLivingEndLayout() {
+    private fun showLivingEndLayout(abnormal: Boolean) {
+        val title =
+            if (abnormal && !mIsRoomOwner) R.string.joy_living_abnormal_title else R.string.joy_living_timeout_title
+        val message = if (mIsRoomOwner) R.string.joy_living_host_timeout else R.string.joy_living_user_timeout
         AlertDialog.Builder(this, R.style.joy_alert_dialog)
-            .setTitle(R.string.joy_living_timeout_title)
-            .setMessage(R.string.joy_living_timeout_content)
+            .setTitle(title)
+            .setMessage(message)
             .setCancelable(false)
             .setPositiveButton(R.string.i_know) { dialog, _ ->
                 dialog.dismiss()
@@ -716,9 +771,11 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     }
 
     private fun showEndRoomDialog() {
+        val title = if (mIsRoomOwner) R.string.joy_living_host_end_title else R.string.joy_living_user_end_title
+        val message = if (mIsRoomOwner) R.string.joy_living_host_end_content else R.string.joy_living_user_end_content
         AlertDialog.Builder(this, R.style.joy_alert_dialog)
-            .setTitle(R.string.joy_living_end_title)
-            .setMessage(R.string.joy_living_end_content)
+            .setTitle(title)
+            .setMessage(message)
             .setPositiveButton(R.string.confirm) { dialog, id ->
                 destroy()
                 dialog.dismiss()

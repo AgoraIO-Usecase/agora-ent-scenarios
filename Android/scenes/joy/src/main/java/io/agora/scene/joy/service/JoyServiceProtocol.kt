@@ -33,7 +33,7 @@ interface JoyServiceListenerProtocol {
     /**
      * 房间销毁
      */
-    fun onRoomDidDestroy(roomInfo: JoyRoomInfo)
+    fun onRoomDidDestroy(roomInfo: JoyRoomInfo, abnormal: Boolean = false)
 }
 
 interface JoyServiceProtocol {

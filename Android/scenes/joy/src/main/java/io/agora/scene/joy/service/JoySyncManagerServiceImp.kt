@@ -68,7 +68,7 @@ class JoySyncManagerServiceImp constructor(
         runOnMainThread {
             JoyLogger.d(TAG, "time up exit room!")
             val roomInfo = mRoomMap[mCurrRoomNo] ?: return@runOnMainThread
-            mJoyServiceListener?.onRoomDidDestroy(roomInfo)
+            mJoyServiceListener?.onRoomDidDestroy(roomInfo, false)
         }
     }
 
@@ -104,7 +104,7 @@ class JoySyncManagerServiceImp constructor(
                             val roomInfo = mRoomMap[mCurrRoomNo]
                             if (roomInfo == null) {
                                 runOnMainThread {
-                                    mJoyServiceListener?.onRoomDidDestroy(oldRoomInfo)
+                                    mJoyServiceListener?.onRoomDidDestroy(oldRoomInfo, false)
                                 }
                             }
                         }
@@ -172,7 +172,7 @@ class JoySyncManagerServiceImp constructor(
                         ret.add(obj)
                     }
                     runOnMainThread {
-                        completion.invoke(null,ret.firstOrNull())
+                        completion.invoke(null, ret.firstOrNull())
                     }
                 }
 
@@ -186,19 +186,20 @@ class JoySyncManagerServiceImp constructor(
     override fun updateStartGame(roomId: String, gameInfo: JoyStartGameInfo, completion: (error: Exception?) -> Unit) {
         initSync {
             gameInfo.objectId = roomId
-            mSceneReference?.collection(SYNC_SCENE_ROOM_START_GAME_COLLECTION)?.add(gameInfo, object : Sync.DataItemCallback {
-                override fun onSuccess(result: IObject?) {
-                    result ?: return
-                    JoyLogger.d(TAG, "updateStartGame onSuccess roomId:$roomId objectId:${result.id}")
-                    completion.invoke(null)
-                }
+            mSceneReference?.collection(SYNC_SCENE_ROOM_START_GAME_COLLECTION)
+                ?.add(gameInfo, object : Sync.DataItemCallback {
+                    override fun onSuccess(result: IObject?) {
+                        result ?: return
+                        JoyLogger.d(TAG, "updateStartGame onSuccess roomId:$roomId objectId:${result.id}")
+                        completion.invoke(null)
+                    }
 
-                override fun onFail(exception: SyncManagerException?) {
-                    JoyLogger.e(TAG, "updateStartGame onFail roomId:$roomId ${exception?.message}")
-                    completion.invoke( exception)
-                }
+                    override fun onFail(exception: SyncManagerException?) {
+                        JoyLogger.e(TAG, "updateStartGame onFail roomId:$roomId ${exception?.message}")
+                        completion.invoke(exception)
+                    }
 
-            })
+                })
         }
     }
 
@@ -449,7 +450,7 @@ class JoySyncManagerServiceImp constructor(
                 if (item.id != mCurrRoomNo) return
                 innerReset(true)
                 runOnMainThread {
-                    mJoyServiceListener?.onRoomDidDestroy(roomInfo)
+                    mJoyServiceListener?.onRoomDidDestroy(roomInfo, true)
                 }
 
             }
