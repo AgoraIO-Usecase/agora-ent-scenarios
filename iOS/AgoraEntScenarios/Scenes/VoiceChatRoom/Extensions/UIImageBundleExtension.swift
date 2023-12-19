@@ -12,9 +12,9 @@ public extension UIImage {
     
     static func voice_image(_ named: String) -> UIImage? {
         if #available(iOS 13.0, *) {
-            return self.init(named: named, in: Bundle.voiceChat, with: nil)
+            return self.init(named: named, in: Bundle.voiceRoomBundle, with: nil)
         } else {
-            return self.init(named: named, in: Bundle.voiceChat, compatibleWith: nil)
+            return self.init(named: named, in: Bundle.voiceRoomBundle, compatibleWith: nil)
         }
     }
 

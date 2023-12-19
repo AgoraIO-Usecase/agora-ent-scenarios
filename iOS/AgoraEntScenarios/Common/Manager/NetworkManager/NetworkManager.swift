@@ -607,7 +607,9 @@ extension NetworkManager {
             "headUrl":headUrl
         ]
         
-        NetworkTools().request(KeyCenter.grapUrl, method: .post, parameters: params) {[weak self] result in
+        guard let baseUrl = KeyCenter.baseServerUrl else {return}
+        
+        NetworkTools().request("\(baseUrl)/v1/ktv/song/grab", method: .post, parameters: params) {[weak self] result in
             switch result{
                 case .success(let data):
                     let obj = self?.data2Dict(with: data)
@@ -632,7 +634,9 @@ extension NetworkManager {
             "src": "postman"
         ]
         
-        NetworkTools().request("\(KeyCenter.grapUrl)/query".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "", method: .get, parameters: params) { result in
+        guard let baseUrl = KeyCenter.baseServerUrl else {return}
+        
+        NetworkTools().request("\(baseUrl)/v1/ktv/song/grab/query".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "", method: .get, parameters: params) { result in
             switch result {
             case .success(let data):
                 do {
