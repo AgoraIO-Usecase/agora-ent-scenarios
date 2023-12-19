@@ -38,7 +38,7 @@ public extension CGSize {
                 CGSize(width: imageSize.width * fitRatio, height: imageSize.height * fitRatio)
             var x: CGFloat = 0.0, y: CGFloat = 0.0
             if fitSize.width > maxSize.width {
-                x = (fitSize.width - maxSize.width) / 2.0
+                x = (maxSize.width - fitSize.width) / 2.0
             } else if fitSize.height > maxSize.height {
                 y = maxSize.height - fitSize.height
             }

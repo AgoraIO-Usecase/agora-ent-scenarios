@@ -148,19 +148,20 @@ class RoomViewController: UIViewController {
         view.addSubview(assistantCanvasView)
         assistantCanvasView.frame = view.bounds
         
-        view.addSubview(roomInfoView)
-        let top = UIDevice.current.aui_SafeDistanceTop
-        roomInfoView.snp.makeConstraints { make in
-            make.top.equalTo(max(top, 20))
-            make.left.equalTo(15)
-        }
         
+        let top = max(UIDevice.current.aui_SafeDistanceTop, 20)
         view.addSubview(broadcasterCanvasView)
         broadcasterCanvasView.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.width.equalTo(120)
-            make.height.equalTo(160)
-            make.top.equalTo(roomInfoView.snp.bottom).offset(20)
+            make.width.equalTo(90)
+            make.height.equalTo(120)
+            make.top.equalTo(top)
+        }
+        
+        view.addSubview(roomInfoView)
+        roomInfoView.snp.makeConstraints { make in
+            make.top.equalTo(top)
+            make.left.equalTo(15)
         }
 
         view.addSubview(chatTableView)
@@ -604,7 +605,7 @@ extension RoomViewController: ChatInputViewDelegate {
                 self.showToastFail(text: "game_send_msg_fail".joyLocalization())
                 return
             }
-            self.showToastSuccess(text: "game_send_msg_fail".joyLocalization())
+            self.showToastSuccess(text: "game_send_msg_success".joyLocalization())
         }
     }
 }
@@ -638,7 +639,18 @@ extension RoomViewController: JoyServiceListenerProtocol {
     }
     
     func onRoomDidDestroy(roomInfo: JoyRoomInfo) {
-        leaveRoom()
+//        leaveRoom()
+        if isRoomOwner() { return }
+        let title = "query_title_destroy".joyLocalization()
+        let message = "query_subtitle_timeout_guest".joyLocalization()
+        let alertController = UIAlertController(title: title,
+                                                message: message,
+                                                preferredStyle: .alert)
+        let action = UIAlertAction(title: "query_button_confirm".joyLocalization(), style: .default) { action in
+            self.leaveRoom()
+        }
+        alertController.addAction(action)
+        present(alertController, animated: true, completion: nil)
     }
 }
 
@@ -651,7 +663,7 @@ extension RoomViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, firstRemoteVideoFrameOfUid uid: UInt, size: CGSize, elapsed: Int) {
         if uid == startGameInfo?.assistantUid ?? 0 {
-            print("size = \(size)")
+//            joyPrint("size = \(size)")
             resetAssistantCanvasView(size: size)
         }
     }
