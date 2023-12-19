@@ -6,7 +6,6 @@
   
 */
 
-
 "authorized_microphone_fail"="麦克风权限未设置,请设置麦克风权限";
 "authorized_camera_fail"="摄像头权限未设置,请设置摄像头权限";
 "authorized_title"="提示";
@@ -34,10 +33,26 @@
 "dialog_selected_send"="发送";
 "joy_user_count" = "人";
 
+"game_send_gift_success"="送礼成功";
+"game_send_gift_fail"="送礼失败";
+"game_send_msg_success"="发送成功";
+"game_send_msg_fail"="发送失败";
+"game_send_like_success"="点赞成功";
+"game_send_like_fail"="点赞失败";
+"game_connect_fail"="连接失败";
+
 "query_title_exit"="结束游戏";
 "query_subtitle_exit"="是否退出游戏直播?";
+"query_title_exit_guest"="结束玩法";
+"query_subtitle_exit_guest"="是否退出直播?";
 "query_button_confirm"="确认";
 "query_button_cancel"="取消";
+
+"query_title_timeout"="游戏超时自动退出";
+"query_subtitle_timeout"="重新体验请返回创建房间";
+"query_title_timeout_guest"="玩法超时自动退出";
+"query_subtitle_timeout_guest"="重新体验请返回进入房间";
+
 
 "show_create_room_name1"="小可爱是我呀";
 "show_create_room_name2"="我是你的小可爱";

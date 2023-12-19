@@ -44,7 +44,16 @@ class RoomViewController: UIViewController {
         }
     }
     private var taskId: String? 
-    private lazy var roomInfoView = RoomInfoView()
+    private lazy var roomInfoView = {
+        let infoView = RoomInfoView()
+        infoView.onTimerCallback = {[weak self] ts in
+            guard ts > 10 * 60 else {
+                return
+            }
+            self?.onTimeoutAction()
+        }
+        return infoView
+    }()
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage.sceneImage(name: "icon_close"), for: .normal)
@@ -164,7 +173,7 @@ class RoomViewController: UIViewController {
         chatTableView.addObserver()
         
         view.addSubview(touchView)
-        touchView.isHidden = roomInfo.ownerId == currentUserInfo.userId ? false : true
+        touchView.isHidden = isRoomOwner() ? false : true
         
         view.addSubview(bottomBar)
         bottomBar.snp.makeConstraints { make in
@@ -208,8 +217,8 @@ class RoomViewController: UIViewController {
         service.subscribeListener(listener: self)
         service.getStartGame(roomId: roomInfo.roomId) {[weak self] err, gameInfo in
             guard let self = self else {return}
-            if let err = err {
-                AUIToast.show(text: err.localizedDescription)
+            if let _ = err {
+                self.showToastFail()
                 return
             }
             
@@ -219,15 +228,15 @@ class RoomViewController: UIViewController {
     }
     
     private func startScene(roomInfo: JoyRoomInfo) {
-        if roomInfo.ownerId == currentUserInfo.userId {
-            let gameId = startGameInfo?.gameId ?? ""
+        let gameId = startGameInfo?.gameId ?? ""
+        if isRoomOwner() {
             let taskId = startGameInfo?.taskId ?? ""
             var assistantUid = startGameInfo?.assistantUid ?? 0
             assistantUid = assistantUid == 0 ? (roomInfo.ownerId + 1000000) : assistantUid
             if gameId.isEmpty || taskId.isEmpty {
                 CloudBarrageAPI.shared.getGameList { [weak self] err, list in
-                    if let err = err {
-                        AUIToast.show(text: err.localizedDescription)
+                    if let _ = err {
+                        self?.showToastFail()
                         return
                     }
                     let dialog: JoyGameListDialog? = JoyGameListDialog.show()
@@ -245,8 +254,8 @@ class RoomViewController: UIViewController {
                     
                     //restart game
                     CloudBarrageAPI.shared.getGameList { [weak self] err, list in
-                        if let err = err {
-                            AUIToast.show(text: err.localizedDescription)
+                        if let _ = err {
+                            self?.showToastFail()
                             return
                         }
                         
@@ -258,8 +267,8 @@ class RoomViewController: UIViewController {
                     }
                 }
                 CloudBarrageAPI.shared.getGameInfo(gameId: gameId) {[weak self] err, detail in
-                    if let err = err {
-                        AUIToast.show(text: err.localizedDescription)
+                    if let _ = err {
+                        self?.showToastFail()
                         return
                     }
                     
@@ -267,6 +276,20 @@ class RoomViewController: UIViewController {
                     self?.taskId = taskId
                 }
             }
+        } else {
+            if gameId.isEmpty { return }
+            CloudBarrageAPI.shared.getGameInfo(gameId: gameId, completion: {[weak self] err, game in
+                if let _ = err {
+                    self?.showToastFail()
+                    return
+                }
+                
+                guard let game = game else {
+                    joyError("guest get game info[\(gameId)] not found!")
+                    return
+                }
+                self?.gameInfo = game
+            })
         }
     }
 }
@@ -278,7 +301,7 @@ extension RoomViewController {
                             userId: assistantUid) {[weak self] token in
             guard let self = self else {return}
             guard let token = token else {
-                AUIToast.show(text: "assistant token is empty")
+                self.showToastFail()
                 return
             }
             self.startGame(gameInfo: gameInfo, assistantUid: assistantUid, assistantToken: token)
@@ -298,9 +321,9 @@ extension RoomViewController {
                                                rtcConfig: rtcConfig)
         SVProgressHUD.show()
         CloudBarrageAPI.shared.startGame(config: startConfig) {[weak self] err, taskId in
-            if let err = err {
+            if let _ = err {
                 SVProgressHUD.dismiss()
-                AUIToast.show(text: err.localizedDescription)
+                self?.showToastFail()
                 return
             }
             
@@ -322,8 +345,8 @@ extension RoomViewController {
             
             CloudBarrageAPI.shared.getGameInfo(gameId: gameInfo.gameId!) { err, detail in
                 SVProgressHUD.dismiss()
-                if let err = err {
-                    AUIToast.show(text: err.localizedDescription)
+                if let _ = err {
+                    self?.showToastFail()
                     return
                 }
                 
@@ -337,9 +360,9 @@ extension RoomViewController {
     }
     
     private func stopGame() {
-        guard let gameId = gameInfo?.gameId, 
-                let taskId = taskId,
-              roomInfo.ownerId == currentUserInfo.userId else {return}
+        guard let gameId = gameInfo?.gameId,
+              let taskId = taskId,
+              isRoomOwner() else {return}
         CloudBarrageAPI.shared.endGame(gameId: gameId,
                                        taskId: taskId, 
                                        roomId: roomInfo.roomId,
@@ -350,8 +373,10 @@ extension RoomViewController {
 
 extension RoomViewController {
     @objc func onCloseAction() {
-        let alertController = UIAlertController(title: "query_title_exit".joyLocalization(),
-                                                message: "query_subtitle_exit".joyLocalization(),
+        let title = (isRoomOwner() ? "query_title_exit" : "query_title_exit_guest").joyLocalization()
+        let message = (isRoomOwner() ? "query_subtitle_exit" : "query_subtitle_exit_guest").joyLocalization()
+        let alertController = UIAlertController(title: title,
+                                                message: message,
                                                 preferredStyle: .alert)
         let action1 = UIAlertAction(title: "query_button_confirm".joyLocalization(), style: .default) { action in
             self.leaveRoom()
@@ -372,9 +397,27 @@ extension RoomViewController {
         let dialog: JoyGameNoticeDialog? = JoyGameNoticeDialog.show()
         dialog?.text = introduce
     }
+    
+    @objc func onTimeoutAction() {
+        roomInfoView.onTimerCallback = nil
+        let title = (isRoomOwner() ? "query_title_timeout" : "query_title_timeout_guest").joyLocalization()
+        let message = (isRoomOwner() ? "query_subtitle_timeout" : "query_subtitle_timeout_guest").joyLocalization()
+        let alertController = UIAlertController(title: title,
+                                                message: message,
+                                                preferredStyle: .alert)
+        let action = UIAlertAction(title: "query_button_confirm".joyLocalization(), style: .default) { action in
+            self.leaveRoom()
+        }
+        alertController.addAction(action)
+        present(alertController, animated: true, completion: nil)
+    }
 }
 
 extension RoomViewController {
+    private func isRoomOwner() -> Bool {
+        return roomInfo.ownerId == currentUserInfo.userId
+    }
+    
     private func joinRTCChannel() {
         guard let engine = CloudBarrageAPI.shared.apiConfig?.engine else {
             AUIToast.show(text: "rtc engine is nil")
@@ -383,7 +426,7 @@ extension RoomViewController {
         }
         
         let mediaOptions = AgoraRtcChannelMediaOptions()
-        mediaOptions.publishCameraTrack = roomInfo.ownerId == currentUserInfo.userId ? true : false
+        mediaOptions.publishCameraTrack = isRoomOwner()
         mediaOptions.publishMicrophoneTrack = mediaOptions.publishCameraTrack
         mediaOptions.clientRoleType = mediaOptions.publishCameraTrack ? .broadcaster : .audience
         mediaOptions.autoSubscribeAudio = true
@@ -463,6 +506,18 @@ extension RoomViewController {
 }
 
 extension RoomViewController: RoomBottomBarDelegate {
+    func showToastSuccess(text: String) {
+        AUIToast.show(text: text,
+                      tagImage: UIImage.sceneImage(name: "toast_success_icon"))
+        
+    }
+    
+    func showToastFail(text: String? = nil) {
+        AUIToast.show(text: text ?? "game_connect_fail".joyLocalization(),
+                      tagImage: UIImage.sceneImage(name: "toast_fail_icon"))
+        
+    }
+    
     func onClickSendButton() {
         chatInputView.isHidden = false
         chatInputView.textField.becomeFirstResponder()
@@ -478,7 +533,6 @@ extension RoomViewController: RoomBottomBarDelegate {
     
     func onClickGiftButton() {
         guard let gameId = gameInfo?.gameId, let giftList = gameInfo?.gifts else {
-            assert(false, "gift is empty")
             joyWarn("show gift fail!")
             return
         }
@@ -496,8 +550,11 @@ extension RoomViewController: RoomBottomBarDelegate {
                                                  giftValue: gift.price * count)
             let sendConfig = CloudGameSendGiftConfig(roomId: roomInfo.roomId, gameId: gameId, giftList: [sendGift])
             CloudBarrageAPI.shared.sendGift(giftConfig: sendConfig) { err in
-                guard let err = err else {return}
-                AUIToast.show(text: err.localizedDescription)
+                if let _ = err {
+                    self.showToastFail(text: "game_send_gift_fail".joyLocalization())
+                    return
+                }
+                self.showToastSuccess(text: "game_send_gift_success".joyLocalization())
             }
         }
     }
@@ -512,8 +569,11 @@ extension RoomViewController: RoomBottomBarDelegate {
                                      userName: currentUserInfo.userName)
         let config = CloudGameSendLikeConfig(roomId: roomId, gameId: gameId, likeList: [like])
         CloudBarrageAPI.shared.sendLike(likeConfig: config) { err in
-            guard let err = err else {return}
-            AUIToast.show(text: err.localizedDescription)
+            if let _ = err {
+                self.showToastFail(text: "game_send_like_fail".joyLocalization())
+                return
+            }
+            self.showToastSuccess(text: "game_send_like_success".joyLocalization())
         }
     }
 }
@@ -540,8 +600,11 @@ extension RoomViewController: ChatInputViewDelegate {
                                            content: text)
         let config = CloudGameSendCommentConfig(roomId:roomId, gameId: gameId, commentList: [comment])
         CloudBarrageAPI.shared.sendComment(commentConfig: config) { err in
-            guard let err = err else {return}
-            AUIToast.show(text: err.localizedDescription)
+            if let _ = err {
+                self.showToastFail(text: "game_send_msg_fail".joyLocalization())
+                return
+            }
+            self.showToastSuccess(text: "game_send_msg_fail".joyLocalization())
         }
     }
 }
@@ -561,7 +624,7 @@ extension RoomViewController: JoyServiceListenerProtocol {
          owner control prevents game information loss due to simultaneous conflicts
          between owner and audience members
          */
-        guard roomInfo.ownerId == currentUserInfo.userId else {return}
+        guard isRoomOwner() else {return}
         service.updateRoom(roomInfo: roomInfo, completion: { err in
         })
     }

@@ -13,7 +13,7 @@ private let bgViewHeight: CGFloat = 40
 private let imgViewHeight: CGFloat = 32
 
 class RoomInfoView: UIView {
-    
+    var onTimerCallback: ((Int64) -> ())?
     private var startTime: Int64!
     
     private lazy var timer: Timer = {
@@ -147,5 +147,6 @@ class RoomInfoView: UIView {
         let hours = duration / 3600
         let durationStr = String(format: "%02d:%02d:%02d", hours, minutes, seconds)
         timeLabel.text = durationStr
+        onTimerCallback?(duration)
     }
 }

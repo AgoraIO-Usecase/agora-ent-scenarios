@@ -97,8 +97,10 @@ open class AUIToast: UIView {
     public static func show(text: String, duration: CGFloat = 2.5, view: UIView? = nil) {
         hidden()
         DispatchQueue.main.async {
-            let toastView = show(text: text, tagImage: nil,
-                                 textColor: .white, font: nil,
+            let toastView = show(text: text, 
+                                 tagImage: nil,
+                                 textColor: .white,
+                                 font: nil,
                                  postion: .center,
                                  view: view)
             self.currentToastView = toastView
@@ -109,8 +111,10 @@ open class AUIToast: UIView {
     public static func show(text: String, postion: AUIToastPostion = .center) {
         hidden()
         DispatchQueue.main.async {
-            let toastView = show(text: text, tagImage: nil,
-                                 textColor: .white, font: nil,
+            let toastView = show(text: text, 
+                                 tagImage: nil,
+                                 textColor: .white, 
+                                 font: nil,
                                  postion: postion,
                                  view: nil)
             self.currentToastView = toastView
@@ -119,13 +123,15 @@ open class AUIToast: UIView {
     }
     
     public static func show(text: String,
-                     postion: AUIToastPostion = .center,
-                     duration: CGFloat = 2.5,
-                     view: UIView? = nil) {
+                            postion: AUIToastPostion = .center,
+                            duration: CGFloat = 2.5,
+                            view: UIView? = nil) {
         hidden()
         DispatchQueue.main.async {
-            let toastView = show(text: text, tagImage: nil,
-                                 textColor: .white, font: nil,
+            let toastView = show(text: text, 
+                                 tagImage: nil,
+                                 textColor: .white, 
+                                 font: nil,
                                  postion: postion,
                                  view: view)
             self.currentToastView = toastView
@@ -135,8 +141,10 @@ open class AUIToast: UIView {
     
     static func show(text: String, tagImage: UIImage? = nil, postion: AUIToastPostion = .center, view: UIView? = nil) {
         DispatchQueue.main.async {
-            let toastView = show(text: text, tagImage: tagImage,
-                                 textColor: .white, font: nil,
+            let toastView = show(text: text, 
+                                 tagImage: tagImage,
+                                 textColor: .white, 
+                                 font: nil,
                                  postion: postion,
                                  view: view)
             showAnimation(toastView: toastView)
@@ -194,12 +202,12 @@ open class AUIToast: UIView {
         addSubview(tagImageView)
         addSubview(label)
         
-        tagImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
-        tagImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        tagImageView.topAnchor.constraint(equalTo: topAnchor, constant: 16).isActive = true
+        tagImageView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         
-        label.leadingAnchor.constraint(equalTo: tagImageView.trailingAnchor, constant: 5).isActive = true
-        label.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
-        label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10).isActive = true
-        label.bottomAnchor.constraint(equalTo: bottomAnchor,constant: -10).isActive = true
+        label.topAnchor.constraint(equalTo: tagImageView.bottomAnchor, constant: 8).isActive = true
+        label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20).isActive = true
+        label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20).isActive = true
+        label.bottomAnchor.constraint(equalTo: bottomAnchor,constant: -16).isActive = true
     }
 }
