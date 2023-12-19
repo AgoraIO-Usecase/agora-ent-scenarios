@@ -276,30 +276,13 @@ class RoomViewController: UIViewController {
                         self?.startGame(gameInfo: game, assistantUid: assistantUid)
                     }
                 }
-                CloudBarrageAPI.shared.getGameInfo(gameId: gameId) {[weak self] err, detail in
-                    if let _ = err {
-                        self?.showToastFail()
-                        return
-                    }
-                    
-                    self?.gameInfo = detail
+                getGameInfo(gameId: gameId) { [weak self] in
                     self?.taskId = taskId
                 }
             }
         } else {
             if gameId.isEmpty { return }
-            CloudBarrageAPI.shared.getGameInfo(gameId: gameId, completion: {[weak self] err, game in
-                if let _ = err {
-                    self?.showToastFail()
-                    return
-                }
-                
-                guard let game = game else {
-                    joyError("guest get game info[\(gameId)] not found!")
-                    return
-                }
-                self?.gameInfo = game
-            })
+            getGameInfo(gameId: gameId)
         }
     }
 }
@@ -353,17 +336,12 @@ extension RoomViewController {
                 })
             }
             
-            CloudBarrageAPI.shared.getGameInfo(gameId: gameInfo.gameId!) { err, detail in
+            self?.getGameInfo(gameId: gameInfo.gameId ?? "") {
                 SVProgressHUD.dismiss()
-                if let _ = err {
-                    self?.showToastFail()
-                    return
-                }
-                
-                self?.gameInfo = detail
                 self?.taskId = taskId
-                
                 self?.onIntroduceAction()
+            } fail: { _ in
+                SVProgressHUD.dismiss()
             }
             JoyGameListDialog.hiddenAnimation()
         }
@@ -377,6 +355,21 @@ extension RoomViewController {
                                        taskId: taskId, 
                                        roomId: roomInfo.roomId,
                                        userId: "\(roomInfo.ownerId)") { err in
+        }
+    }
+    
+    private func getGameInfo(gameId: String, success: (()-> ())? = nil, fail: ((NSError?)-> ())? = nil) {
+        CloudBarrageAPI.shared.getGameInfo(gameId: gameId) {[weak self] err, detail in
+            if let _ = err {
+                self?.showToastFail()
+                fail?(err)
+                return
+            }
+            
+            if let detail = detail {
+                self?.gameInfo = detail
+            }
+            success?()
         }
     }
 }
@@ -548,6 +541,7 @@ extension RoomViewController: RoomBottomBarDelegate {
     func onClickGiftButton() {
         guard let gameId = gameInfo?.gameId, let giftList = gameInfo?.gifts else {
             joyWarn("show gift fail!")
+            getGameInfo(gameId: gameInfo?.gameId ?? "")
             return
         }
         
