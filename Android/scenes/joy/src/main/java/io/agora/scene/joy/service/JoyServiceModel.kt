@@ -1,5 +1,6 @@
 package io.agora.scene.joy.service
 
+import io.agora.scene.base.manager.UserManager
 import java.io.Serializable
 
 data class JoyUserInfo constructor(
@@ -23,7 +24,11 @@ data class JoyRoomInfo constructor(
     var createdAt: Long = System.currentTimeMillis(),
 
     var objectId: String = ""
-) : Serializable
+) : Serializable {
+
+    val mIsOwner: Boolean
+        get() = ownerId.toLong() == UserManager.getInstance().user.id
+}
 
 data class JoyStartGameInfo constructor(
     var gameId: String = "", //游戏 id

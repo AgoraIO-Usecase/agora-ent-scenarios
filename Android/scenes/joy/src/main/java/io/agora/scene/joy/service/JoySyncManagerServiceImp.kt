@@ -245,7 +245,7 @@ class JoySyncManagerServiceImp constructor(
     override fun joinRoom(roomInfo: JoyRoomInfo, completion: (error: Exception?) -> Unit) {
         mCurrRoomNo = ""
         initSync {
-            Sync.Instance().joinScene(true, true, roomInfo.roomId, object : Sync.JoinSceneCallback {
+            Sync.Instance().joinScene(roomInfo.mIsOwner, true, roomInfo.roomId, object : Sync.JoinSceneCallback {
                 override fun onSuccess(sceneReference: SceneReference) {
                     JoyLogger.d(TAG, "joinRoom onSuccess $sceneReference")
                     mSceneReference = sceneReference

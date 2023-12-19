@@ -20,6 +20,7 @@
             android:name="io.agora.scene.joy.ui.RoomLivingActivity"
             android:exported="false"
             android:keepScreenOn="true"
+            android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/joy_def_material_theme"
             android:windowSoftInputMode="adjustNothing" />

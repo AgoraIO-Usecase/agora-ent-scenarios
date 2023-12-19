@@ -520,12 +520,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 super.onUserOffline(uid, reason)
                 Log.d(TAG, "rtc onUserOffline uid:$uid }")
                 binding.root.post {
-                    if (uid == mStartGameInfo?.assistantUid) {
-                        // 远端游戏退出
-                        CustomToast.showError(getString(R.string.joy_automatic_exit_of_gameplay_exception))
-                        destroy()
-                        finish()
-                    }
+//                    if (uid == mStartGameInfo?.assistantUid) {
+//                        // 远端游戏退出
+//                        CustomToast.showError(getString(R.string.joy_automatic_exit_of_gameplay_exception))
+//                        destroy()
+//                        finish()
+//                    }
                 }
             }
 
