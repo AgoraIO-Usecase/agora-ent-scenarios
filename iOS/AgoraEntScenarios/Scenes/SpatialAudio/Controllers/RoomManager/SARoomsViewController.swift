@@ -36,6 +36,8 @@ import AgoraChat
     private var initialError: AgoraChatError?
     private var isDestory: Bool = false
     
+    private weak var roomVC: SARoomViewController?
+    
     @objc convenience init(user: VLLoginModel) {
         AppContext.shared.sceneImageBundleName = "SpatialAudioResource"
         AppContext.shared.sceneLocalizeBundleName = "SpatialAudioResource"
@@ -160,14 +162,17 @@ extension SARoomsViewController {
             SVProgressHUD.dismiss()
             guard let self = self else {return}
             if error == nil {
-                self.mapUser(user: VLUserCenter.user)
-                let info: SARoomInfo = SARoomInfo()
-                info.room = room
-                info.robotInfo = robot ?? SARobotAudioInfo()
-                info.mic_info = nil
-                self.isDestory = false
-                let vc = SARoomViewController(info: info)
-                self.navigationController?.pushViewController(vc, animated: true)
+                if self.roomVC == nil {
+                    self.mapUser(user: VLUserCenter.user)
+                    let info: SARoomInfo = SARoomInfo()
+                    info.room = room
+                    info.robotInfo = robot ?? SARobotAudioInfo()
+                    info.mic_info = nil
+                    self.isDestory = false
+                    let vc = SARoomViewController(info: info)
+                    self.roomVC = vc
+                    self.navigationController?.pushViewController(vc, animated: true)
+                }
             } else {
                 SVProgressHUD.showError(withStatus: "join room failed!")
             }
@@ -189,6 +194,9 @@ extension SARoomsViewController {
 extension SARoomsViewController {
 
     private func entryCreateRoom(room: SARoomEntity) {
+        guard self.roomVC == nil else {
+            return
+        }
         let info: SARoomInfo = SARoomInfo()
         info.room = room
         info.mic_info = nil
