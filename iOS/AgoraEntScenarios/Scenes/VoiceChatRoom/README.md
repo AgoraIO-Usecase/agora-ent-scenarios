@@ -115,7 +115,11 @@
 - 环信APPKey申请：[https://www.easemob.com/](https://www.easemob.com/)
 ## 5.2 语聊房中的弹幕组件使用的是哪家？是否可以自己选择供应商？
 声动语聊源码使用的是环信AgoraChat的IM和信令服务，您也可以使用自己的服务
+## 5.3 想体验更多场景
+详情请查看 [声动互娱](../../../../README.md)
+## 5.4 集成遇到困难，该如何联系声网获取协助
+- 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务
+- 方案2：发送邮件给 [support@agora.io](mailto:support@agora.io) 咨询
+- 方案3：扫码加入我们的微信交流群提问
 
-## 5.3 集成遇到困难，该如何联系声网获取协助
-- 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
-- 方案2：发送邮件给support@agora.io咨询。
+  <img src="https://download.agora.io/demo/release/SDHY_QA.jpg" width="360" height="360">
