@@ -20,6 +20,17 @@ private let randomRoomName = [
     "show_create_room_name8".joyLocalization(),
     "show_create_room_name9".joyLocalization(),
     "show_create_room_name10".joyLocalization(),
+    "show_create_room_name11".joyLocalization(),
+    "show_create_room_name12".joyLocalization(),
+    "show_create_room_name13".joyLocalization(),
+    "show_create_room_name14".joyLocalization(),
+    "show_create_room_name15".joyLocalization(),
+    "show_create_room_name16".joyLocalization(),
+    "show_create_room_name17".joyLocalization(),
+    "show_create_room_name18".joyLocalization(),
+    "show_create_room_name19".joyLocalization(),
+    "show_create_room_name20".joyLocalization(),
+    "show_create_room_name21".joyLocalization(),
 ]
 
 class CreateRoomViewController: UIViewController {
@@ -166,7 +177,7 @@ extension CreateRoomViewController {
     @objc private func onRandomAction() {
         let roomNameIdx = Int(arc4random()) % randomRoomName.count
         let roomName = randomRoomName[roomNameIdx]
-        textField.text = "\(roomName)\(Int(arc4random()) % 1000000)"
+        textField.text = roomName
     }
     
     @objc private func onCreateAction() {
