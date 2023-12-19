@@ -123,7 +123,7 @@ extension ShowMusicPresenter {
                   let bundle = Bundle(path: path) else {
                 return
             }
-            let musicPath = bundle.path(forResource: musicNames[i], ofType: "wav") ?? ""
+            let musicPath = bundle.path(forResource: musicNames[i], ofType: "mp3") ?? ""
             player.stop()
             let source = AgoraMediaSource()
             source.url = musicPath
