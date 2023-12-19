@@ -388,8 +388,10 @@ extension RoomViewController {
         let alertController = UIAlertController(title: title,
                                                 message: message,
                                                 preferredStyle: .alert)
-        let action1 = UIAlertAction(title: "query_button_confirm".joyLocalization(), style: .default) { action in
-            self.leaveRoom()
+        let action1 = UIAlertAction(title: "query_button_confirm".joyLocalization(), style: .default) {[weak self] action in
+            self?.leaveRoom {
+                self?.navigationController?.popViewController(animated: true)
+            }
         }
         let action2 = UIAlertAction(title: "query_button_cancel".joyLocalization(), style: .default) { action in
         }
@@ -409,14 +411,16 @@ extension RoomViewController {
     }
     
     @objc func onTimeoutAction() {
+        leaveRoom {
+        }
         roomInfoView.onTimerCallback = nil
         let title = (isRoomOwner() ? "query_title_timeout" : "query_title_timeout_guest").joyLocalization()
         let message = (isRoomOwner() ? "query_subtitle_timeout" : "query_subtitle_timeout_guest").joyLocalization()
         let alertController = UIAlertController(title: title,
                                                 message: message,
                                                 preferredStyle: .alert)
-        let action = UIAlertAction(title: "query_button_confirm".joyLocalization(), style: .default) { action in
-            self.leaveRoom()
+        let action = UIAlertAction(title: "query_button_confirm".joyLocalization(), style: .default) {[weak self] action in
+            self?.navigationController?.popViewController(animated: true)
         }
         alertController.addAction(action)
         present(alertController, animated: true, completion: nil)
@@ -505,10 +509,10 @@ extension RoomViewController {
         }
     }
     
-    private func leaveRoom() {
+    private func leaveRoom(completion:@escaping ()->()) {
         JoyBaseDialog.hidden()
         service.leaveRoom(roomInfo: roomInfo, completion: { err in
-            self.navigationController?.popViewController(animated: true)
+            completion()
         })
         leaveRTCChannel()
         stopGame()
@@ -649,15 +653,16 @@ extension RoomViewController: JoyServiceListenerProtocol {
     }
     
     func onRoomDidDestroy(roomInfo: JoyRoomInfo) {
-//        leaveRoom()
         if isRoomOwner() { return }
+        leaveRoom {
+        }
         let title = "query_title_destroy".joyLocalization()
         let message = "query_subtitle_timeout_guest".joyLocalization()
         let alertController = UIAlertController(title: title,
                                                 message: message,
                                                 preferredStyle: .alert)
         let action = UIAlertAction(title: "query_button_confirm".joyLocalization(), style: .default) { action in
-            self.leaveRoom()
+            self.navigationController?.popViewController(animated: true)
         }
         alertController.addAction(action)
         present(alertController, animated: true, completion: nil)
