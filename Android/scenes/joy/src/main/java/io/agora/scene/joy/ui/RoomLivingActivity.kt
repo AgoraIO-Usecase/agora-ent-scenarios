@@ -587,10 +587,21 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
         Log.i(TAG, "onVideoSizeChanged->targetWidth:$targetWidth,targetHeight:$targetHeight")
         mVideoTextureView?.post {
-            val layoutParams: ViewGroup.LayoutParams = binding.flAssistantContainer.layoutParams
-            layoutParams.width = targetWidth
-            layoutParams.height = targetHeight
-            binding.flAssistantContainer.layoutParams = layoutParams
+//            val layoutParams: ViewGroup.LayoutParams = binding.flAssistantContainer.layoutParams
+//            layoutParams.width = targetWidth
+//            layoutParams.height = targetHeight
+//            binding.flAssistantContainer.layoutParams = layoutParams
+
+            if (targetWidth == rootViewWidth) {
+                // 宽度对齐
+                mVideoTextureView?.layout(0, rootViewHeight - targetHeight, rootViewWidth, rootViewHeight)
+            } else {
+                mVideoTextureView?.layout(
+                    (rootViewWidth - targetWidth) / 2, 0,
+                    (rootViewWidth + targetWidth) / 2, rootViewHeight
+                )
+            }
+
         }
         mVideoSizes.remove(assistantUid)
     }

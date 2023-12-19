@@ -63,6 +63,13 @@ class JoyGiftDialog : BaseBottomSheetDialogFragment<JoyDialogGiftLayoutBinding>(
             mBinding.ivSubCount.isEnabled = false
             mBinding.ivSubCount.setImageResource(R.drawable.joy_icon_sub_grey)
         }
+        if (mGiftCount >= 20) {
+            mBinding.ivPlusCount.isEnabled = false
+            mBinding.ivPlusCount.setImageResource(R.drawable.joy_icon_plus_grey)
+        } else {
+            mBinding.ivPlusCount.isEnabled = true
+            mBinding.ivPlusCount.setImageResource(R.drawable.joy_icon_plus)
+        }
     }
 }
 
