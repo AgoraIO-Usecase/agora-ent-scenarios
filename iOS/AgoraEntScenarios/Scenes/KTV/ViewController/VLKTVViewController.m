@@ -365,8 +365,11 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 //            [VLToast toast:[NSString stringWithFormat:@"network changed: %ld", status]];
             return;
         }
-        [weakSelf subscribeServiceEvent];
-        [weakSelf _fetchServiceAllData];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            // 在主线程中执行的代码
+            [weakSelf subscribeServiceEvent];
+            [weakSelf _fetchServiceAllData];
+        });
     }];
     
     [[AppContext ktvServiceImp] subscribeRoomWillExpireWithChangedBlock:^{

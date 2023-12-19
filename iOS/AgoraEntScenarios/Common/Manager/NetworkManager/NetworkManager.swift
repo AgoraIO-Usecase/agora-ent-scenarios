@@ -590,3 +590,87 @@ extension NetworkManager {
         }
     }
 }
+
+// sbg and sr
+extension NetworkManager {
+    //发起抢唱
+    @objc func startSongGrab(_ appid: String, sceneId: String, roomId: String, headUrl: String, userId: String, userName: String, songCode: String, success: @escaping (Bool) -> Void) {
+        let params = [
+            "appId": appid,
+            "sceneId": sceneId,
+            "roomId": roomId,
+            
+            "userId": userId,
+            "userName": userName,
+            "songCode": songCode,
+            "src": "postman",
+            "headUrl":headUrl
+        ]
+        
+        NetworkTools().request(KeyCenter.grapUrl, method: .post, parameters: params) {[weak self] result in
+            switch result{
+                case .success(let data):
+                    let obj = self?.data2Dict(with: data)
+                    print("obj:\(String(describing: obj))")
+                    guard let code: Int = obj?["code"] as? Int else {return}
+                    success(code == 0 ? true : false)
+                case .failure(let error):
+                    print(error)
+                    success(false)
+            }
+        }
+        
+    }
+    
+    //抢唱结果查询
+    @objc func songGrabQuery(_ appid: String, sceneId: String, roomId: String, songCode: String, src: String, success: @escaping (String?, String?,Bool) -> Void) {
+        let params = [
+            "appId": appid,
+            "sceneId": sceneId,
+            "roomId": roomId,
+            "songCode": songCode,
+            "src": "postman"
+        ]
+        
+        NetworkTools().request("\(KeyCenter.grapUrl)/query".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "", method: .get, parameters: params) { result in
+            switch result {
+            case .success(let data):
+                do {
+                    if let obj = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                       let code = obj["code"] as? Int{
+                        if code == 0 {
+                            let userData = obj["data"] as? [String: Any]
+                            let userId = userData?["userId"]
+                            let userName = userData?["userName"]
+                            success(userId as? String, userName as? String, true)
+                        } else if code == 961 {
+                            success(nil, nil, false)
+                        }
+                    } else {
+                       // success(nil,nil, false)
+                    }
+                } catch {
+//                    print(error)
+//                    success(nil, nil, false)
+                }
+            case .failure(let error):
+                print(error)
+             //   success(nil, nil, false)
+            }
+        }
+    }
+    
+    private func data2Dict(with data: Data) -> [String: Any]? {
+        do {
+            if let jsonObject = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String: Any] {
+                return jsonObject
+            } else {
+                // data 转换为字典失败，处理错误
+                return nil
+            }
+        } catch {
+            // 发生异常，处理错误
+            return nil
+        }
+    }
+}
