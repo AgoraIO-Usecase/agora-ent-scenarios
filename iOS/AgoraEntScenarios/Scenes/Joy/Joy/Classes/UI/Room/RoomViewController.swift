@@ -10,21 +10,24 @@ import AgoraRtcKit
 import SVProgressHUD
 
 class TouchGameView: UIView {
+    var touchEnd: (()->())?
+    var isMouseEnable: Bool = true
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
-        guard let point = touches.first?.location(in: self) else {return}
+        guard let point = touches.first?.location(in: self), isMouseEnable else {return}
         CloudBarrageAPI.shared.sendMouseEvent(type: .mouseEventLbuttonDown, point: point, gameViewSize: frame.size)
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesMoved(touches, with: event)
-        guard let point = touches.first?.location(in: self) else {return}
+        guard let point = touches.first?.location(in: self), isMouseEnable else {return}
         CloudBarrageAPI.shared.sendMouseEvent(type: .mouseEventMove, point: point, gameViewSize: frame.size)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        guard let point = touches.first?.location(in: self) else {return}
+        touchEnd?()
+        guard let point = touches.first?.location(in: self), isMouseEnable else {return}
         CloudBarrageAPI.shared.sendMouseEvent(type: .mouseEventLbuttonUp, point: point, gameViewSize: frame.size)
     }
 }
@@ -121,7 +124,13 @@ class RoomViewController: UIViewController {
     private lazy var broadcasterCanvasView: UIView = UIView()
     private lazy var assistantCanvasView: UIView = UIView()
     
-    private let touchView = TouchGameView()
+    private lazy var touchView: TouchGameView = {
+        let view = TouchGameView()
+        view.touchEnd = { [weak self] in
+            self?.view.endEditing(true)
+        }
+        return view
+    }()
     
     required init(roomInfo: JoyRoomInfo, currentUserInfo: JoyUserInfo, service: JoyServiceProtocol) {
         self.roomInfo = roomInfo
@@ -174,7 +183,7 @@ class RoomViewController: UIViewController {
         chatTableView.addObserver()
         
         view.addSubview(touchView)
-        touchView.isHidden = isRoomOwner() ? false : true
+        touchView.isMouseEnable = isRoomOwner()
         
         view.addSubview(bottomBar)
         bottomBar.snp.makeConstraints { make in
@@ -613,6 +622,7 @@ extension RoomViewController: ChatInputViewDelegate {
 extension RoomViewController: JoyServiceListenerProtocol {
     func onStartGameInfoDidChanged(startGameInfo: JoyStartGameInfo) {
         self.startGameInfo = startGameInfo
+        startScene(roomInfo: roomInfo)
     }
     
     func onNetworkStatusChanged(status: JoyServiceNetworkStatus) {

@@ -119,6 +119,8 @@ class JoyGiftListDialog: JoyBaseDialog {
         return collectionView
     }()
     
+    private lazy var stepper = JoyStepper()
+    
     override func contentSize() -> CGSize {
         return CGSize(width: self.width, height: 401)
     }
@@ -128,6 +130,7 @@ class JoyGiftListDialog: JoyBaseDialog {
         listView.snp.makeConstraints { make in
             make.edges.equalTo(contentView)
         }
+        dialogView.addSubview(stepper)
     }
     
     override func layoutSubviews() {
@@ -137,6 +140,7 @@ class JoyGiftListDialog: JoyBaseDialog {
                               width: 96,
                               height: 36)
         button.setjoyVerticalDefaultGradientBackground()
+        stepper.frame = CGRect(x: 20, y: button.aui_top, width: 120, height: button.aui_height)
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
@@ -158,7 +162,7 @@ class JoyGiftListDialog: JoyBaseDialog {
     
     override func onClickButton() {
         guard let selectedGift = selectedGift else {return}
-        onSelectedGift?(selectedGift, 1)
+        onSelectedGift?(selectedGift, stepper.currentValue)
     }
 }
 

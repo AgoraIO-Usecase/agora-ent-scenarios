@@ -133,4 +133,11 @@ extension UIColor {
     @objc static var joy_end_bg: UIColor {
         return UIColor(hexString: "141650")!
     }
+    
+    @objc static var joy_stepper_disable: UIColor {
+        return UIColor(hexString: "A5ADBA")!
+    }
+    @objc static var joy_stepper: UIColor {
+        return UIColor(hexString: "191919")!
+    }
 }

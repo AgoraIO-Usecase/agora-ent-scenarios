@@ -58,7 +58,7 @@ class RoomChatCell: UITableViewCell {
         paragraphStyle.lineHeightMultiple = 1.2
         let nameAttributes = [NSAttributedString.Key.paragraphStyle: paragraphStyle,
                               NSAttributedString.Key.font: UIFont.joy_chat_user_name,
-                              NSAttributedString.Key.foregroundColor: UIColor.joy_room_info_cover]
+                              NSAttributedString.Key.foregroundColor: UIColor(hexString: "A6C4FF")!]
         let msgAttributes = [NSAttributedString.Key.font: UIFont.joy_chat_msg, NSAttributedString.Key.foregroundColor: UIColor.joy_main_text]
         let attributedText = NSMutableAttributedString(string: "\(userName): ", attributes: nameAttributes as [NSAttributedString.Key : Any])
         let attributedMsg = NSAttributedString(string: msg, attributes: msgAttributes as [NSAttributedString.Key : Any])
