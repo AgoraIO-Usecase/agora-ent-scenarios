@@ -112,6 +112,8 @@ class RoomViewController: UIViewController {
     private lazy var broadcasterCanvasView: UIView = UIView()
     private lazy var assistantCanvasView: UIView = UIView()
     
+    private let touchView = TouchGameView()
+    
     required init(roomInfo: JoyRoomInfo, currentUserInfo: JoyUserInfo, service: JoyServiceProtocol) {
         self.roomInfo = roomInfo
         self.currentUserInfo = currentUserInfo
@@ -161,11 +163,7 @@ class RoomViewController: UIViewController {
         }
         chatTableView.addObserver()
         
-        let touchView = TouchGameView()
         view.addSubview(touchView)
-        touchView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
         touchView.isHidden = roomInfo.ownerId == currentUserInfo.userId ? false : true
         
         view.addSubview(bottomBar)
@@ -234,25 +232,30 @@ class RoomViewController: UIViewController {
                     }
                     let dialog: JoyGameListDialog? = JoyGameListDialog.show()
                     dialog?.onSelectedGame = { game in
-                        guard let self = self else {return}
-                        self.renewRTCTokens(roomId: roomInfo.roomId,
-                                            userId: assistantUid) { token in
-                            guard let token = token else {
-                                AUIToast.show(text: "assistant token is empty")
-                                return
-                            }
-                            self.startGame(gameInfo: game, assistantUid: assistantUid, assistantToken: token)
-                        }
+                        self?.startGame(gameInfo: game, assistantUid: assistantUid)
                     }
                     dialog?.gameList = list ?? []
                 }
             } else {
                 CloudBarrageAPI.shared.getGameStatus(gameId: gameId, taskId: taskId) { status in
                     joyPrint("getGameStatus: \(status?.rawValue ?? .none)")
-                    if status == .started {
+                    guard status == .startFailed else {
                         return
                     }
                     
+                    //restart game
+                    CloudBarrageAPI.shared.getGameList { [weak self] err, list in
+                        if let err = err {
+                            AUIToast.show(text: err.localizedDescription)
+                            return
+                        }
+                        
+                        guard let game = list?.first(where: { $0.gameId == gameId }) else {
+                            joyError("restart game[\(gameId)] not found! game list count: \(list?.count ?? 0)")
+                            return
+                        }
+                        self?.startGame(gameInfo: game, assistantUid: assistantUid)
+                    }
                 }
                 CloudBarrageAPI.shared.getGameInfo(gameId: gameId) {[weak self] err, detail in
                     if let err = err {
@@ -270,6 +273,18 @@ class RoomViewController: UIViewController {
 
 //MARK: game handler
 extension RoomViewController {
+    private func startGame(gameInfo: CloudGameInfo, assistantUid: UInt) {
+        renewRTCTokens(roomId: roomInfo.roomId,
+                            userId: assistantUid) {[weak self] token in
+            guard let self = self else {return}
+            guard let token = token else {
+                AUIToast.show(text: "assistant token is empty")
+                return
+            }
+            self.startGame(gameInfo: gameInfo, assistantUid: assistantUid, assistantToken: token)
+        }
+    }
+    
     private func startGame(gameInfo: CloudGameInfo, assistantUid: UInt, assistantToken: String) {
         let rtcConfig = CloudGameRtcConfig(broadcastUid: roomInfo.ownerId,
                                            assistantUid: assistantUid,
@@ -453,6 +468,14 @@ extension RoomViewController: RoomBottomBarDelegate {
         chatInputView.textField.becomeFirstResponder()
     }
     
+    func onClickDeployButton(isUp: Bool) {
+        if isUp {
+            CloudBarrageAPI.shared.sendKeyboardEvent(type: .keyboardEventKeyUp, key: "Z")
+        } else {
+            CloudBarrageAPI.shared.sendKeyboardEvent(type: .keyboardEventKeyDown, key: "Z")
+        }
+    }
+    
     func onClickGiftButton() {
         guard let gameId = gameInfo?.gameId, let giftList = gameInfo?.gifts else {
             assert(false, "gift is empty")
@@ -560,6 +583,7 @@ extension RoomViewController: JoyServiceListenerProtocol {
 extension RoomViewController: AgoraRtcEngineDelegate {
     private func resetAssistantCanvasView(size: CGSize) {
         assistantCanvasView.frame = view.bounds.size.fitRect(imageSize: size)
+        touchView.frame = assistantCanvasView.frame
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, firstRemoteVideoFrameOfUid uid: UInt, size: CGSize, elapsed: Int) {

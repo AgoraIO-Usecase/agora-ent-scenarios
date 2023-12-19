@@ -57,8 +57,7 @@ public struct CloudGameGiftInfo: Codable {
         case giftId = "id"
         case vendorGiftId = "vendor_gift_id"
         case gameId = "game_id"
-        case thumbnail = "thumbnail "
-        case price, name
+        case price, name, thumbnail
     }
 }
 

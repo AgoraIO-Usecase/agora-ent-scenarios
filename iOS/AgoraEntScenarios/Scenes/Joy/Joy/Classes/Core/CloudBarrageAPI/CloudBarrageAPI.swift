@@ -39,9 +39,7 @@ public class CloudBarrageAPI: NSObject {
     
     public func setup(apiConfig: CloudBarrageConfig) {
         self.apiConfig = apiConfig
-        createDataStream()
     }
-    
 }
 
 // MARK: public
@@ -135,6 +133,8 @@ extension CloudBarrageAPI {
             completion(NSError(domain: "parse model fail", code: -1), nil)
             return
         }
+        
+        createDataStream()
         let interfaceName = "cloud-bullet-game/games/start"
         postRequest(interface: interfaceName, params: params) { err, result  in
             let taskId = result?["task_id"] as? String

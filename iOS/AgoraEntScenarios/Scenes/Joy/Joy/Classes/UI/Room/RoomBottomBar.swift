@@ -13,6 +13,7 @@ protocol RoomBottomBarDelegate: NSObjectProtocol {
     func onClickSendButton()
     func onClickGiftButton()
     func onClickLikeButton()
+    func onClickDeployButton(isUp: Bool)
 }
 
 
@@ -47,6 +48,18 @@ class ShowRoomBottomBar: UIView {
         return button
     }()
     
+    
+    private lazy var deployButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage.sceneImage(name: "bar_deploy"), for: .normal)
+        button.backgroundColor = .joy_cover
+        button.addTarget(self, action: #selector(didClickDeployDownButton), for: .touchDown)
+        button.addTarget(self, action: #selector(didClickDeployUpButton), for: .touchUpInside)
+        button.addTarget(self, action: #selector(didClickDeployUpButton), for: .touchCancel)
+        button.addTarget(self, action: #selector(didClickDeployUpButton), for: .touchUpOutside)
+        return button
+    }()
+    
     private var buttonArray = [UIButton]()
     private var isBroadcastor = false
     
@@ -62,7 +75,7 @@ class ShowRoomBottomBar: UIView {
     
     private func createSubviews(){
         if isBroadcastor {
-            buttonArray = [giftButton, likeButton]
+            buttonArray = [likeButton, deployButton]
         }else{
             buttonArray = [giftButton, likeButton]
         }
@@ -106,5 +119,13 @@ class ShowRoomBottomBar: UIView {
     
     @objc private func didClickLikeButton() {
         delegate?.onClickLikeButton()
+    }
+    
+    @objc private func didClickDeployDownButton() {
+        delegate?.onClickDeployButton(isUp: false)
+    }
+    
+    @objc private func didClickDeployUpButton() {
+        delegate?.onClickDeployButton(isUp: true)
     }
 }

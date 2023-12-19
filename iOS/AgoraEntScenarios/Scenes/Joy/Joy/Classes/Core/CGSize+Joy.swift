@@ -8,21 +8,14 @@
 import Foundation
 
 public extension CGSize {
-    
-    func fitSize(with maxValue:CGFloat) ->CGSize{
-
-        //短边最大1080，如果iphonex拍的3840 x 2160 视频进来内存直接爆炸
-        let scale: CGFloat = width < height ? min(maxValue / width, 1) : min(maxValue / height, 1);
-        return CGSize(width: width * scale, height: height * scale)
-    }
-    
-    func fitRect(imageSize: CGSize, scaleToHeight: Bool = false) -> CGRect {
+    func fitRect(imageSize: CGSize, scaleToInner: Bool = false) -> CGRect {
         guard imageSize.width != 0, imageSize.height != 0 else {
             assert(imageSize.width != 0)
             assert(imageSize.height != 0)
             return .zero
         }
-        if (!scaleToHeight) {
+        if (scaleToInner) {
+            //缩放到self内
             let maxSize = CGSize(width: abs(self.width), height: abs(self.height))
             let ratio: CGFloat = abs(imageSize.width / imageSize.height)
             let maxRatio: CGFloat = abs(maxSize.width / maxSize.height)
@@ -35,8 +28,8 @@ public extension CGSize {
             fitSize = CGSize(width:round(fitSize.width * scale), height:round(fitSize.height * scale));
             
             return CGRect(x: (maxSize.width - fitSize.width) / 2, y: (maxSize.height - fitSize.height) / 2, width: fitSize.width, height: fitSize.height);
-            
         } else {
+            //缩放到撑满self
             let maxSize = CGSize(width: abs(self.width), height: abs(self.height))
             let ratio: CGFloat = abs(maxSize.width / imageSize.width)
             let maxRatio: CGFloat = abs(maxSize.height / imageSize.height)
@@ -47,9 +40,9 @@ public extension CGSize {
             if fitSize.width > maxSize.width {
                 x = (fitSize.width - maxSize.width) / 2.0
             } else if fitSize.height > maxSize.height {
-                y = (fitSize.height - maxSize.height) / 2.0
+                y = maxSize.height - fitSize.height
             }
-            return CGRect(origin: .zero, size: fitSize)
+            return CGRect(origin: CGPoint(x: x, y: y), size: fitSize)
 
         }
     }
