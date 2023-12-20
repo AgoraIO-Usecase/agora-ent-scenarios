@@ -48,7 +48,7 @@ def all_pods
   pod 'ShowTo1v1', :path => 'AgoraEntScenarios/Scenes/ShowTo1v1'
 
   #ThirdParty
-  pod 'HWWeakTimer', '1.0'
+#  pod 'HWWeakTimer', '1.0'
   pod 'LSTPopView', '0.3.10'
   pod 'SocketRocket', '0.7.0'
   pod 'Agora-Scene-Utils', '1.1.0'
@@ -96,6 +96,9 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      # 为每个配置添加 `-fstack-protector`
+#      config.build_settings['OTHER_CFLAGS'] ||= ['$(inherited)']
+#      config.build_settings['OTHER_CFLAGS'] << '-fstack-protector'
       shell_script_path = "Pods/Target Support Files/#{target.name}/#{target.name}-frameworks.sh"
       if File::exist?(shell_script_path)
         shell_script_input_lines = File.readlines(shell_script_path)
