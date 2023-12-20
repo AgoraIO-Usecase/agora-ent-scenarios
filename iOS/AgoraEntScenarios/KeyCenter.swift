@@ -24,7 +24,7 @@ class KeyCenter: NSObject {
      */
     
     static let AppId: String = ""
-  
+
     /**
      Certificate.
      Agora provides App certificate to generate Token. You can deploy and generate a token on your server,

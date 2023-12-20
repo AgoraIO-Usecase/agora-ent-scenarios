@@ -102,6 +102,8 @@ typedef enum : NSUInteger {
 
 -(void)setSongNameWith:(NSString *)text;
 
+-(void)setPlayState:(BOOL)isPlaying;
+
 @end
 
 NS_ASSUME_NONNULL_END

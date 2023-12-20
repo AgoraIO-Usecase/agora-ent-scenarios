@@ -191,17 +191,26 @@ UITableViewDelegate
     if (cell == nil) {
         cell = [[VLSBGSelectedSongListCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseCell];
     }
-    cell.userInteractionEnabled = !self.isTaped;
+
     VLSBGSongItmModel *model = self.songsMuArray[indexPath.row];
     model.isFull = self.isFull;
     cell.songItemModel = model;
+    
+    // 设置按钮点击事件
     cell.dianGeBtnClickBlock = ^(VLSBGSongItmModel * _Nonnull model) {
+        if (weakSelf.isTaped) {
+            return;
+        }
+        
         weakSelf.isTaped = true;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(300 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
-                weakSelf.isTaped = false;
-            });
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(500 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
+            weakSelf.isTaped = false;
+        });
+        
         [weakSelf dianGeWithModel:model];
     };
+        
     return cell;
 }
 
@@ -232,7 +241,7 @@ UITableViewDelegate
         //点歌完成发送通知
         [self dianGeSuccessWithModel:model];
         if(self.selSongsArray.count == 7){
-            [VLToast toast:@"sbg_full_song"];
+            [VLToast toast:SBGLocalizedString(@"sbg_full_song")];
         }
     }];
 }
