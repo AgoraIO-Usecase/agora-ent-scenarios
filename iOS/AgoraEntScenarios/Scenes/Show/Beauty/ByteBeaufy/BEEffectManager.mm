@@ -180,11 +180,6 @@ static const bool USE_PIPELINE = YES;
         }
     }
 #endif
-    if ([EAGLContext currentContext] != _glContext) {
-        NSLog(@"effectsar init and process are not run in the same glContext");
-        [EAGLContext setCurrentContext:_glContext];
-    }
-
     RECORD_TIME(totalProcess)
     bef_effect_result_t ret = bef_effect_ai_set_width_height(_handle, width, height);
     CHECK_RET_AND_RETURN(bef_effect_ai_set_width_height, ret)
