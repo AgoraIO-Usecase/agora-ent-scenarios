@@ -170,6 +170,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
                     // microphone
                     if (item.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()) {
+                        binding.vMicWave.endWave();
                         binding.ivMute.setVisibility(View.VISIBLE);
                     } else {
                         binding.ivMute.setVisibility(View.GONE);
