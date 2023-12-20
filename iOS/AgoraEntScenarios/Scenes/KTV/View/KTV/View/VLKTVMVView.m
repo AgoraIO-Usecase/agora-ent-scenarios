@@ -552,6 +552,10 @@
     self.scoreLabel.text = [NSString stringWithFormat:@"%d",score];
 }
 
+-(void)setPlayState:(BOOL)isPlaying{
+    self.pauseBtn.selected = !isPlaying;
+}
+
 -(void)setPerViewAvatar:(NSString *)url {
     if([url isEqualToString:@""]){
         _iconView.image = [UIImage sceneImageWithName:@"ktv_showVoice"];
@@ -566,7 +570,7 @@
     switch (type) {
         case VLKTVMVViewActionTypeSingOrigin:
             _trackBtn.selected = YES;
-            [_trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateNormal];
+            [_trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateSelected];
             [self.trackBtn setImage:[UIImage sceneImageWithName:@"original"] forState:UIControlStateSelected];
             break;
         case VLKTVMVViewActionTypeSingLead:
