@@ -110,11 +110,9 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
                 afterDrawable?.stop()
                 it.isSelected = false
             } else { // start play
-                val file = "sounds/voice_sample_aec_before.m4a"
-                io.agora.scene.base.utils.FileUtils.copyFileFromAssets(this.context!!, file, context?.externalCacheDir!!.absolutePath).apply {
-                    mediaPlayer?.stop()
-                    mediaPlayer?.open(this, 0)
-                }
+                val file = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/voice_sample_aec_before.m4a"
+                mediaPlayer?.stop()
+                mediaPlayer?.open(file, 0)
                 val timer = Timer()
                 beforeTimer = timer
                 timer.schedule(object: TimerTask() {
@@ -140,11 +138,9 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
                 afterDrawable?.stop()
                 it.isSelected = false
             } else { // start play
-                val file = "sounds/voice_sample_aec_after.m4a"
-                io.agora.scene.base.utils.FileUtils.copyFileFromAssets(this.context!!, file, context?.externalCacheDir!!.absolutePath).apply {
-                    mediaPlayer?.stop()
-                    mediaPlayer?.open(this, 0)
-                }
+                val file = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/voice_sample_aec_after.m4a"
+                mediaPlayer?.stop()
+                mediaPlayer?.open(file, 0)
                 val timer = Timer()
                 afterTimer = timer
                 timer.schedule(object: TimerTask() {
