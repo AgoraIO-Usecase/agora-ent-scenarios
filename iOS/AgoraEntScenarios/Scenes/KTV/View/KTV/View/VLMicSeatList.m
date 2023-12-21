@@ -43,7 +43,7 @@
     flowLayOut.minimumLineSpacing = 15;
     flowLayOut.sectionInset = UIEdgeInsetsMake(10, 10, 10, 10);
     
-    self.personCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(20, 0, SCREEN_WIDTH - 40, itemH*2+15) collectionViewLayout:flowLayOut];
+    self.personCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(20, 0, self.frame.size.width - 40, self.frame.size.height) collectionViewLayout:flowLayOut];
     self.personCollectionView.dataSource = self;
     self.personCollectionView.delegate = self;
     self.personCollectionView.alwaysBounceVertical = true;
@@ -105,8 +105,12 @@
         cell.volume = 0;
     }
     cell.singingBtn.hidden = !seatModel.isOwner;
-    
-    cell.muteImgView.hidden = !seatModel.isAudioMuted;
+    if (seatModel.isAudioMuted) {
+        cell.muteImgView.hidden = false;
+        cell.volume = 0;
+    } else {
+        cell.muteImgView.hidden = true;
+    }
     
     if([seatModel.chorusSongCode isEqualToString:self.currentPlayingSongCode]){
         cell.joinChorusBtn.hidden = NO;
