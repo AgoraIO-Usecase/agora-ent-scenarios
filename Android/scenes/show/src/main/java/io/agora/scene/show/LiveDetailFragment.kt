@@ -848,13 +848,13 @@ class LiveDetailFragment : Fragment() {
                     stopAudioMixing()
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY -> {
-                    startAudioMixing("/assets/happy.mp3", false, -1)
+                    startAudioMixing("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/happy.mp3", false, -1)
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_ROMANTIC -> {
-                    startAudioMixing("/assets/romantic.mp3", false, -1)
+                    startAudioMixing("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/romantic.mp3", false, -1)
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY2 -> {
-                    startAudioMixing("/assets/relax.mp3", false, -1)
+                    startAudioMixing("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/relax.mp3", false, -1)
                 }
 
                 MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_ORIGINAL -> {

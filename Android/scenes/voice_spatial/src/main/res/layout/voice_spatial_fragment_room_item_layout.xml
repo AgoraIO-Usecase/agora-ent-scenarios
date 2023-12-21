@@ -12,7 +12,6 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:background="@drawable/voice_bg_room_list_type_nomal"
         android:layout_width="0dp"
         android:layout_height="match_parent">
 

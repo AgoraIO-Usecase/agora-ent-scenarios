@@ -381,7 +381,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.tvMusicName2.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
     }
 
-    private int backgroundResId = R.mipmap.ktv_mv_default;
+    private int backgroundResId = R.mipmap.mvbg4;
 
     public void setLrcViewBackground(@DrawableRes int resId) {
         backgroundResId = resId;
