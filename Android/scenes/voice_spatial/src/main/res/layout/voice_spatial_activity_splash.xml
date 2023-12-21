@@ -5,7 +5,7 @@
     android:id="@+id/clRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/voice_bg_room_splash"
+    android:background="@mipmap/bg_app_def_white"
     tools:context=".ui.activity.ChatroomSplashActivity">
 
     <androidx.constraintlayout.widget.Guideline

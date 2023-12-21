@@ -28,7 +28,7 @@
 #import "AppContext+KTV.h"
 #import "AESMacro.h"
 #import "LSTPopView+KTVModal.h"
-#import "HWWeakTimer.h"
+//#import "HWWeakTimer.h"
 #import "VLAlert.h"
 #import "VLKTVAlert.h"
 #import "KTVDebugManager.h"
@@ -295,7 +295,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 //            if (!granted) { return; }
             VLRoomSeatModel* model = [self getUserSeatInfoWithIndex:seatModel.seatIndex];
             if (model == nil) {
-                NSAssert(NO, @"model == nil");
                 return;
             }
             
@@ -389,9 +388,11 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         switch (self.singRole) {
             case KTVSingRoleSoloSinger:
                 self.MVView.mvState = VLKTVMVViewStateOwnerSing;
+                [self.MVView setPlayState:_isPause];
                 break;
             case KTVSingRoleLeadSinger:
                 self.MVView.mvState = VLKTVMVViewStateOwnerSing;
+                [self.MVView setPlayState:_isPause];
                 break;
             case KTVSingRoleCoSinger:
                 self.MVView.mvState = [self isRoomOwner] ? VLKTVMVViewStateOwnerChorus : VLKTVMVViewStateNotOwnerChorus;
@@ -1010,6 +1011,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                        // weakSelf.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
                         [self.MVView setMvState: [self isRoomOwner] ? VLKTVMVViewStateOwnerAudience : VLKTVMVViewStateAudience];
                         weakSelf.isJoinChorus = false;
+                        [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
                         return;
                     }
                     [weakSelf _joinChorus];
@@ -1042,6 +1044,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
         if (!isSuccess) {
             weakSelf.isJoinChorus = false;
+            [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
             return;
         }
         
@@ -1055,6 +1058,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 weakSelf.isJoinChorus = false;
                 KTVLogInfo(@"join chorus fail");
                 //TODO: error toast?
+                [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
                 return;
             }
 
@@ -1402,6 +1406,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.isNowMicMuted = true;
     [self.MVView.gradeView reset];
     [self.MVView.incentiveView reset];
+    [self.MVView setOriginBtnState: VLKTVMVViewActionTypeSingAcc];
     if(self.isHighlightSinger){
         [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
         [self sendStreamMessageWithDict:@{@"cmd": @"cancelVoiceHighlight"} success:nil];
@@ -2483,6 +2488,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         
         if(status == AgoraMusicContentCenterPreloadStatusError){
             [VLToast toast:KTVLocalizedString(@"ktv_load_failed_and_change")];
+            if(self.loadMusicCallBack) {
+                self.loadMusicCallBack(NO, songCode);
+                self.loadMusicCallBack = nil;
+            }
             return;
         }
         

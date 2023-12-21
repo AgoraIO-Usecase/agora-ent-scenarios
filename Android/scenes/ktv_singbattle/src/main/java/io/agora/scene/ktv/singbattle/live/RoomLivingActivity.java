@@ -318,7 +318,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
 
             @Override
             public void onAutoSelectSongClick() {
-                roomLivingViewModel.autoSelectMusic();
+                //roomLivingViewModel.autoSelectMusic();
             }
 
             @Override
