@@ -39,7 +39,7 @@ class KeyCenter: NSObject {
      */
 
     static let Certificate: String? = ""
-
+  
     /**
      Token.
      Agora provides Temporary Access Token to join the spatial channel with APP ID which enable App Certificate.
