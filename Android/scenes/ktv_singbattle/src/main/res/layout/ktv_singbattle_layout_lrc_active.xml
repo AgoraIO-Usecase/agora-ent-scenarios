@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@mipmap/ktv_mv_default"
+    tools:background="@mipmap/mvbg4"
     tools:layout_height="230dp"
     tools:theme="@style/Theme.MaterialComponents.Light">
 

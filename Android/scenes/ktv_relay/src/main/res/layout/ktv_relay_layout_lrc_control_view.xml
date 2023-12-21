@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
-            tools:background="@mipmap/ktv_mv_default"
+            tools:background="@mipmap/ktv_relay_music_player_background"
             tools:visibility="visible">
 
             <TextView

@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/base_layout"
-    android:background="@drawable/voice_bg_app_def_white"
+    android:background="@mipmap/bg_app_def_white"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
