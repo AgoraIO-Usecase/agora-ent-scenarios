@@ -51,6 +51,8 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
             rtcUserView.bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
             rtcUserView.micView.isHidden = false
             rtcUserView.micView.setState(.off)
+            rtcUserView.bgIconView.isHidden = false
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
         case 3:
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = true

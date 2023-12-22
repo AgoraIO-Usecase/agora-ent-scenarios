@@ -95,11 +95,13 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     
     func onReceiveSeatRequest(roomId: String, applicant: SAApply) {
         guard isOwner else { return }
+        self.applyListVC?.refreshEnd()
         self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: isOwner)
     }
 
     func onReceiveSeatRequestRejected(roomId: String, chat_uid: String) {
         self.refreshApplicants(chat_uid: chat_uid)
+        self.applyListVC?.refreshEnd()
     }
     
     /// Description 刷新申请人列表

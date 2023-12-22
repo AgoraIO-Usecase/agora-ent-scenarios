@@ -113,6 +113,7 @@ extension SARoomViewController {
     
     func applyMembersAlert(position: SASwitchBarDirection, index: Int) {
         let apply = SAApplyUsersViewController(roomId: roomInfo?.room?.room_id ?? "")
+        self.applyListVC = apply
         //apply.agreeApply = {
            // self.rtcView.updateUser($0)
         //}
