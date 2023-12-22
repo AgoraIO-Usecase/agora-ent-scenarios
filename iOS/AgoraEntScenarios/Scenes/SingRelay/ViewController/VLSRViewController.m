@@ -1070,7 +1070,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //    self.lrcControl = lrcControl;
 //    self.lrcControl.delegate = self;
     [self.SRApi setLrcViewWithView:self.statusView.lrcView];
-    [self.SRApi muteMicWithIsOnMicOpen:!self.isNowMicMuted];
+    [self.SRApi muteMicWithMuteStatus:self.isNowMicMuted];
     [self.SRApi addEventHandlerWithKtvApiEventHandler:self];
 //    VL(weakSelf);
     SRLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
@@ -2243,7 +2243,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 - (void)setIsNowMicMuted:(BOOL)isNowMicMuted {
     BOOL oldValue = _isNowMicMuted;
     _isNowMicMuted = isNowMicMuted;
-    [self.SRApi muteMicWithIsOnMicOpen:!isNowMicMuted];
+    [self.SRApi muteMicWithMuteStatus:isNowMicMuted];
     if([self isRoomOwner]){
         [self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
     } else {

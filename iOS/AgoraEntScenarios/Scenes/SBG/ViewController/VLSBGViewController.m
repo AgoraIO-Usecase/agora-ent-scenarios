@@ -1064,7 +1064,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.SBGApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
     [self.SBGApi renewInnerDataStreamId];
     [self.SBGApi setLrcViewWithView:self.statusView.lrcView];
-    [self.SBGApi muteMicWithIsOnMicOpen:!self.isNowMicMuted];
+    [self.SBGApi muteMicWithMuteStatus:self.isNowMicMuted];
     [self.SBGApi addEventHandlerWithKtvApiEventHandler:self];
 //    VL(weakSelf);
     SBGLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
@@ -2190,7 +2190,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
     BOOL oldValue = _isNowMicMuted;
     _isNowMicMuted = isNowMicMuted;
     
-    [self.SBGApi muteMicWithIsOnMicOpen:!isNowMicMuted];
+    [self.SBGApi muteMicWithMuteStatus:isNowMicMuted];
     [self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
    // if(oldValue != isNowMicMuted) {
      [self.bottomView updateAudioBtn:isNowMicMuted];
