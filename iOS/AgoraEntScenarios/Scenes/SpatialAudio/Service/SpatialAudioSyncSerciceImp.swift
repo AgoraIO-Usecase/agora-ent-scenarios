@@ -53,6 +53,7 @@ private let kCollectionIdSeatInfo = "seat_info_collection"
 private let kCollectionIdSeatApply = "show_seat_apply_collection"
 private let kCollectionIdRobotInfo = "robot_info_collection"
 class SpatialAudioSyncSerciceImp: NSObject {
+    private var _getMicSeatApplyListBlock: SuccessBlock?
     fileprivate weak var subscribeDelegate: SpatialAudioServiceSubscribeDelegate?
     fileprivate var roomId: String?
     fileprivate var roomList: [SARoomEntity] = [SARoomEntity]()
@@ -65,6 +66,7 @@ class SpatialAudioSyncSerciceImp: NSObject {
 
 //MARK: private
 extension SpatialAudioSyncSerciceImp {
+    
     fileprivate func initScene(completion: @escaping () -> Void) {
         if syncUtilsInited {
             completion()
@@ -1024,20 +1026,24 @@ extension SpatialAudioSyncSerciceImp {
     
     fileprivate func _getMicSeatApplyList(roomId: String, completion: @escaping (Error?, [SAApply]?) -> Void) {
         agoraPrint("imp seat apply list get...")
+        self._getMicSeatApplyListBlock = { [weak self] list in
+            agoraPrint("imp seat apply list get success...")
+            let applys = list.map({$0.toJson()}).kj.modelArray(SAApply.self)
+            guard let self = self else {return}
+            self.micApplys.removeAll()
+            applys.forEach { apply in
+                if !self.micApplys.contains(where: {$0.member?.uid == apply.member?.uid}) && !self.mics.contains(where: {$0.member?.uid == apply.member?.uid}) {
+                    self.micApplys.append(apply)
+                }
+            }
+            completion(nil, applys)
+        }
         SyncUtil
             .scene(id: roomId)?
             .collection(className: kCollectionIdSeatApply)
             .get(success: { [weak self] list in
-                agoraPrint("imp seat apply list get success...")
-                let applys = list.map({$0.toJson()}).kj.modelArray(SAApply.self)
-                guard let self = self else {return}
-                self.micApplys.removeAll()
-                applys.forEach { apply in
-                    if !self.micApplys.contains(where: {$0.member?.uid == apply.member?.uid}) && !self.mics.contains(where: {$0.member?.uid == apply.member?.uid}) {
-                        self.micApplys.append(apply)
-                    }
-                }
-                completion(nil, applys)
+                self?._getMicSeatApplyListBlock?(list)
+                self?._getMicSeatApplyListBlock = nil
             }, fail: { error in
                 agoraPrint("imp seat apply list get fail :\(error.message)...")
                 completion(SAErrorType.unknown("get seat apply list", error.message).error(), nil)
