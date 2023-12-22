@@ -127,7 +127,8 @@ final class AuditionEffectView: UIView {
             type = "WAV"
             wavName = "AGC"
         }
-        if sender.tag == 11 {
+        let beforeTag = 11
+        if sender.tag == beforeTag {
             self.beforePlay.isSelected = !self.beforePlay.isSelected
             if self.beforePlay.isSelected {
                 self.afterPlay.isSelected = !self.beforePlay.isSelected
@@ -143,7 +144,7 @@ final class AuditionEffectView: UIView {
             wavName += "-After"
         }
         guard let path = Bundle.voiceRoomBundle.path(forResource: resourceName, ofType: "png") else { return }
-        let statusStr = sender.tag == 11 ? "before" : "after"
+        let statusStr = sender.tag == beforeTag ? "before" : "after"
         let resourceNameStr = resourceName.contains("AGC") ? "agc" : "aec"
         let wavPath = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/voice_sample_\(resourceNameStr)_\(statusStr).\(type)"
         VoiceRoomRTCManager.getSharedInstance().rtcKit.stopAudioMixing()
