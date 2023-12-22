@@ -9,9 +9,9 @@
 
 ## 1. 环境准备
 
-- <mark>最低兼容 Android 5.0</mark>（SDK API Level 21）
-- Android Studio 3.5及以上版本。
-- Android 5.0 及以上的手机设备。
+- 最低兼容 Android 7.0（SDK API Level 24）
+- Android Studio 4.0及以上版本。
+- Android 7.0 及以上的手机设备。
 
 ---
 
