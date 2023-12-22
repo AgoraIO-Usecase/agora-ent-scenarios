@@ -28,6 +28,8 @@ class SARoomViewController: SABaseViewController {
     override public var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
+    
+    weak var applyListVC: SAApplyUsersViewController?
 
     var headerView: SARoomHeaderView!
    // var rtcView: SANormalRtcView!
