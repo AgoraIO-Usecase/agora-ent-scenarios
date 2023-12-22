@@ -1270,7 +1270,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         NSInteger seekTime = flag ? [weakSelf.ktvApi getMusicPlayer].getDuration - 800 : time;
         [weakSelf.ktvApi seekSingWithTime:seekTime];
     };
-    [self.ktvApi setMicStatusWithIsOnMicOpen:!self.isNowMicMuted];
+    [self.ktvApi muteMicWithIsOnMicOpen:!self.isNowMicMuted];
     [self.ktvApi addEventHandlerWithKtvApiEventHandler:self];
     
     [self.RTCkit setParameters:@"{\"che.audio.ains_mode\": -1}"];
@@ -2298,7 +2298,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     BOOL oldValue = _isNowMicMuted;
     _isNowMicMuted = isNowMicMuted;
     
-    [self.ktvApi setMicStatusWithIsOnMicOpen:!isNowMicMuted];
+    [self.ktvApi muteMicWithIsOnMicOpen:!isNowMicMuted];
     [self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
     if(oldValue != isNowMicMuted) {
         [self.bottomView updateAudioBtn:isNowMicMuted];

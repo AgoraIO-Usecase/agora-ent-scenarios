@@ -379,7 +379,7 @@ extension KTVApiImpl: KTVApiDelegate {
     /**
      * 设置当前mic开关状态
      */
-    @objc public func setMicStatus(isOnMicOpen: Bool) {
+    @objc public func muteMic(isOnMicOpen: Bool) {
         sendCustomMessage(with: "setMicStatus", label: "\(isOnMicOpen)")
         self.isNowMicMuted = !isOnMicOpen
         if self.singerRole == .leadSinger || self.singerRole == .soloSinger {
