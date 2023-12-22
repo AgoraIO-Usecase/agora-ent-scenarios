@@ -130,37 +130,39 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
 
         binding.vpGame.adapter = mGameInfoAdapter
         binding.dotIndicator.setViewPager2(binding.vpGame, true)
-        binding.vpGame.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                mCurrentPos = position
-                Log.e("zhangw", "onPageSelected-1: pos:$position")
-            }
-
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-            }
-
-            override fun onPageScrollStateChanged(state: Int) {
-                super.onPageScrollStateChanged(state)
-                Log.e("zhangw", "onPageScrollStateChanged-3: state:$state")
-                //只有在空闲状态，才让自动滚动
-                if (state == ViewPager2.SCROLL_STATE_IDLE) {
-                    if (mCurrentPos == 0) {
-                        binding.vpGame.setCurrentItem(mGameInfoAdapter.itemCount - 2, false)
-                    }
-                    if (mCurrentPos == mGameInfoAdapter.itemCount - 1) {
-                        binding.vpGame.setCurrentItem(1, false)
-                    }
-                }
-            }
-        })
+        binding.vpGame.registerOnPageChangeCallback(onPageCallback)
         binding.vpGame.getChildAt(0).setOnTouchListener { v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> stopAutoScroll()
                 MotionEvent.ACTION_UP -> startAutoScroll()
             }
             return@setOnTouchListener false
+        }
+    }
+
+    private val onPageCallback = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            super.onPageSelected(position)
+            mCurrentPos = position
+            Log.e(TAG, "onPageSelected-1: pos:$position")
+        }
+
+        override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+            super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+        }
+
+        override fun onPageScrollStateChanged(state: Int) {
+            super.onPageScrollStateChanged(state)
+            Log.e(TAG, "onPageScrollStateChanged-3: state:$state")
+            //只有在空闲状态，才让自动滚动
+            if (state == ViewPager2.SCROLL_STATE_IDLE) {
+                if (mCurrentPos == 0) {
+                    binding.vpGame.setCurrentItem(mGameInfoAdapter.itemCount - 2, false)
+                }
+                if (mCurrentPos == mGameInfoAdapter.itemCount - 1) {
+                    binding.vpGame.setCurrentItem(1, false)
+                }
+            }
         }
     }
 
@@ -250,19 +252,32 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
 
     override fun onResume() {
         super.onResume()
+        Log.d(TAG,"onResume")
         mRtcEngine.startPreview()
     }
 
     override fun onPause() {
         super.onPause()
+        Log.d(TAG,"onPause")
         if (mIsFinishToLiveDetail) {
             mRtcEngine.stopPreview()
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG,"onStop")
+    }
+
     override fun onBackPressed() {
         mRtcEngine.stopPreview()
         super.onBackPressed()
+    }
+
+    override fun onDestroy() {
+        binding.vpGame.unregisterOnPageChangeCallback(onPageCallback)
+        super.onDestroy()
+        Log.d(TAG,"onDestroy")
     }
 
 

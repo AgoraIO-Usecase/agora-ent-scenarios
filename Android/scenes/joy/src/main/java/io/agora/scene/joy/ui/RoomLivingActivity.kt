@@ -37,6 +37,7 @@ import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.api.model.User
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
@@ -97,13 +98,16 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     private var mStartGameInfo: JoyStartGameInfo? = null
 
+    private val mUser: User
+        get() = UserManager.getInstance().user
+
     private val mMainRtcConnection by lazy {
         RtcConnection(
             mRoomInfo.roomId,
-            UserManager.getInstance().user.id.toInt()
+            mUser.id.toInt()
         )
     }
-    private val mIsRoomOwner by lazy { mRoomInfo.ownerId.toLong() == UserManager.getInstance().user.id }
+    private val mIsRoomOwner by lazy { mRoomInfo.ownerId.toLong() == mUser.id }
 
     private val mJoyService by lazy { JoyServiceProtocol.getImplInstance() }
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
@@ -723,8 +727,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         try {
             val jsonObject = JSONObject()
             jsonObject.put("sceneName", "show")
-            jsonObject.put("id", UserManager.getInstance().user.id)
-            jsonObject.put("userNo", UserManager.getInstance().user.userNo)
+            jsonObject.put("id", mUser.id)
+            jsonObject.put("userNo", mUser.userNo)
             contentInspectConfig.extraInfo = jsonObject.toString()
             val module = ContentInspectConfig.ContentInspectModule()
             module.interval = 10
@@ -759,7 +763,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     setBundleArgs(bundle)
                     mSelectedCompletion = {
                         // 开始游戏
-                        val assistantUid = 1000000000 + (UserManager.getInstance().user.id).toInt()
+                        val assistantUid = 1000000000 + (mUser.id).toInt()
                         mJoyViewModel.startGame(mRoomInfo.roomId, it.gameId ?: "", assistantUid)
                     }
                 }

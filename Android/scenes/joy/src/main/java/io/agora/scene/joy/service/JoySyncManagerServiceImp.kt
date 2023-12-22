@@ -206,15 +206,13 @@ class JoySyncManagerServiceImp constructor(
     override fun createRoom(roomName: String, completion: (error: Exception?, out: JoyRoomInfo?) -> Unit) {
         initSync {
             val roomId = (Random(System.currentTimeMillis()).nextInt(100000) + 1000000).toString()
-            val user = UserManager.getInstance().user
             val createdAt = TimeUtils.currentTimeMillis()
             val roomInfo = JoyRoomInfo(
                 roomId = roomId,
                 roomName = roomName,
-                ownerId = user.id.toInt(),
-                ownerAvatar = user.headUrl,
-                ownerName = user.name,
-//                assistantUid = 1000000000 + (user.id).toInt(),
+                ownerId = mUser.id.toInt(),
+                ownerAvatar = mUser.headUrl,
+                ownerName = mUser.name,
                 createdAt = createdAt,
                 thumbnailId = getRandomThumbnailId(createdAt),
                 objectId = roomId,
@@ -288,8 +286,7 @@ class JoySyncManagerServiceImp constructor(
         innerRemoveUserInfo(completion = {
 
         })
-        val user = UserManager.getInstance().user
-        if (roomInfo.ownerId == user.id.toInt() ||
+        if (roomInfo.ownerId.toLong() == mUser.id ||
             TimeUtils.currentTimeMillis() - roomInfo.createdAt >= JoyServiceProtocol.ROOM_AVAILABLE_DURATION
         ) {
             mSceneReference?.delete(object : Sync.Callback {
