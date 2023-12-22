@@ -710,6 +710,7 @@ class RoomObservableViewDelegate constructor(
      * 超时退出房间
      */
     fun onTimeUpExitRoom(content: String, finishBack: () -> Unit) {
+        if (activity.isFinishing) { return }
         CommonFragmentContentDialog().contentText(content)
             .setOnClickListener(object : CommonFragmentContentDialog.OnClickBottomListener {
                 override fun onConfirmClick() {

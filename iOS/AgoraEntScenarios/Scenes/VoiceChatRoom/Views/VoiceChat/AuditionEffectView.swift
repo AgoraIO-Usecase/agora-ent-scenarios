@@ -10,8 +10,11 @@ import ZSwiftBaseLib
 import SDWebImage
 import SDWebImageAPNGCoder
 //162 height
+
+private let beforPlayTag = 11
+
 final class AuditionEffectView: UIView {
-    
+        
     private var type: AUDIO_SETTING_TYPE = .AIAEC
     
     private var beforePlaceHolderImage = UIImage()
@@ -35,7 +38,7 @@ final class AuditionEffectView: UIView {
     }()
     
     private lazy var beforePlay: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.whiteContainer.frame.width-44, y: 27, width: 24, height: 24)).tag(11).addTargetFor(self, action: #selector(playAnimation(sender:)), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: self.whiteContainer.frame.width-44, y: 27, width: 24, height: 24)).tag(beforPlayTag).addTargetFor(self, action: #selector(playAnimation(sender:)), for: .touchUpInside)
     }()
     
     private lazy var beforeSeparaLine: UIView = {
@@ -127,7 +130,8 @@ final class AuditionEffectView: UIView {
             type = "WAV"
             wavName = "AGC"
         }
-        if sender.tag == 11 {
+        
+        if sender.tag == beforPlayTag {
             self.beforePlay.isSelected = !self.beforePlay.isSelected
             if self.beforePlay.isSelected {
                 self.afterPlay.isSelected = !self.beforePlay.isSelected
@@ -143,7 +147,11 @@ final class AuditionEffectView: UIView {
             wavName += "-After"
         }
         guard let path = Bundle.voiceRoomBundle.path(forResource: resourceName, ofType: "png") else { return }
-        guard let wavPath = Bundle.voiceRoomBundle.path(forResource: wavName, ofType: type) else { return }
+
+        let statusStr = sender.tag == beforPlayTag ? "before" : "after"
+        let resourceNameStr = resourceName.contains("AGC") ? "agc" : "aec"
+        let wavPath = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/voice_sample_\(resourceNameStr)_\(statusStr).\(type)"
+
         VoiceRoomRTCManager.getSharedInstance().rtcKit.stopAudioMixing()
         self.afterPlay.setImage(UIImage.sceneImage(name: "play2"), for: .normal)
         self.beforePlay.setImage(UIImage.sceneImage(name: "play2"), for: .normal)
