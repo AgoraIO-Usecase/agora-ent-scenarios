@@ -9,9 +9,9 @@
 
 ## 1. 环境准备
 
-- <mark>最低兼容 Android 5.0</mark>（SDK API Level 21）
+- <mark>最低兼容 Android 7.0</mark>（SDK API Level 24）
 - Android Studio 3.5及以上版本。
-- Android 5.0 及以上的手机设备。
+- Android 7.0 及以上的手机设备。
 
 ---
 
@@ -33,9 +33,11 @@
 
 - 获取 App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
-- <mark>联系销售给 AppID 开通 K 歌权限</mark>(如果您没有销售人员的联系方式可通过智能客服联系销售人员 [Agora 支持](https://agora-ticket.agora.io/))
+- 联系销售给 AppID 开通 K 歌权限(如果您没有销售人员的联系方式可通过智能客服联系销售人员 [Agora 支持](https://agora-ticket.agora.io/))
 
-  - 注: 拉取榜单、歌单、歌词等功能是需要开通权限的
+  ```json
+  注: 拉取榜单、歌单、歌词等功能是需要开通权限的
+  ```
 
 - 在项目的 [**gradle.properties**](../../gradle.properties) 里填写需要的声网 App ID 和 App 证书
 
@@ -101,7 +103,7 @@
 
 > 在线K歌房场景目前已涵盖以下功能，您可以参考注释按需从代码中调用
 >
-> 场景功能代码根目录 **Android/scenes/ktv**
+> 场景功能代码根目录 **Android/scenes/ktv_relay**
 >
 > ---
 >
@@ -329,10 +331,6 @@
 
 ## 4. FAQ
 
-### 如何获取声网 APPID
-
-> 声网 APPID 申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
-
 ### 程序运行后，歌曲列表为空
 
 > 需要联系销售给 APPID 开通 K 歌权限
@@ -341,10 +339,17 @@
 
 > K歌房的歌曲资源使用的是Agora内容中心服务，暂不支持自行切换供应商，详情请查看 [版权音乐 - 在线 K 歌房 - 文档中心 - 声网Agora](https://docs.agora.io/cn/online-ktv/API%20Reference/ios_ng/API/toc_drm.html)
 
+### 想体验更多场景
+
+> 详情请查看 [声动互娱](../../../README.md)
+
 ### 集成遇到困难，该如何联系声网获取协助
 
 > 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
 >
 > 方案2：发送邮件给 [support@agora.io](mailto:support@agora.io) 咨询
-
+>
+> 方案3：扫码加入我们的微信交流群提问
+>
+> <img src="https://download.agora.io/demo/release/SDHY_QA.jpg" width="360" height="360">
 ---
