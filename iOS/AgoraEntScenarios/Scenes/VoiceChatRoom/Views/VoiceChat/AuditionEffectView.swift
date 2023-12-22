@@ -147,9 +147,11 @@ final class AuditionEffectView: UIView {
             wavName += "-After"
         }
         guard let path = Bundle.voiceRoomBundle.path(forResource: resourceName, ofType: "png") else { return }
+
         let statusStr = sender.tag == beforPlayTag ? "before" : "after"
         let resourceNameStr = resourceName.contains("AGC") ? "agc" : "aec"
         let wavPath = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/voice_sample_\(resourceNameStr)_\(statusStr).\(type)"
+
         VoiceRoomRTCManager.getSharedInstance().rtcKit.stopAudioMixing()
         self.afterPlay.setImage(UIImage.sceneImage(name: "play2"), for: .normal)
         self.beforePlay.setImage(UIImage.sceneImage(name: "play2"), for: .normal)
