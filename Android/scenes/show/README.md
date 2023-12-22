@@ -36,7 +36,7 @@
      如果不填写CloudPlayer配置，机器人房间将无法出图
      ```
   
-     ![xxx](image/SamplePicture6.png)
+     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/config_cloud_player_android.png)
 
   获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docportal.shengwang.cn/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
@@ -52,7 +52,7 @@ if(!isShowEmpty){
 
 ### 2.3 在项目的[**gradle.properties**](../../gradle.properties)里填写需要的声网 App ID 和 App证书
 
-  ![xxx](image/SamplePicture1.png)  
+  ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/config_app_id_android.jpg)  
   
   ```texag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0
   AGORA_APP_ID：声网appid  
@@ -84,7 +84,7 @@ if(!isShowEmpty){
    如果不添加美颜证书无法体验美颜效果
    ```
 
-![美颜资源示例](image/SamplePicture5.png)
+![美颜资源示例](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/beauty_resources_android.png)
 
 ### 2.5 用 Android Studio 运行项目即可开始您的体验
 
