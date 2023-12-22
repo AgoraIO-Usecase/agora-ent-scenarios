@@ -580,11 +580,22 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             } else if (status == 2) {
                 // 预加载歌曲加载中
                 musicLoadStateListener.onMusicLoadProgress(song, percent, MusicLoadStatus.values().firstOrNull { it.value == status } ?: MusicLoadStatus.FAILED, msg, lrcUrl)
+            } else if (status == 3) {
+                // 主动停止下载
+                musicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.CANCELED)
             } else {
                 // 预加载歌曲失败
                 ktvApiLogError("loadMusic failed: MUSIC_PRELOAD_FAIL")
                 musicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL)
             }
+        }
+    }
+
+    override fun removeMusic(songCode: Long) {
+        reportCallScenarioApi("removeMusic", JSONObject().put("songCode", songCode))
+        val ret = mMusicCenter.removeCache(songCode)
+        if (ret < 0) {
+            ktvApiLogError("removeMusic failed, ret: $ret")
         }
     }
 
@@ -677,13 +688,12 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun setLrcView(view: ILrcView) {
-        //reportCallScenarioApi("setLrcView", JSONObject())
         this.lrcView = view
     }
 
-    override fun setMicStatus(isOnMicOpen: Boolean) {
-        reportCallScenarioApi("setMicStatus", JSONObject().put("isOnMicOpen", isOnMicOpen))
-        this.isOnMicOpen = isOnMicOpen
+    override fun muteMic(mute: Boolean) {
+        reportCallScenarioApi("muteMic", JSONObject().put("mute", isOnMicOpen))
+        this.isOnMicOpen = !mute
         if (this.singerRole == KTVSingRole.SoloSinger || this.singerRole == KTVSingRole.LeadSinger) {
             mRtcEngine.adjustRecordingSignalVolume(if (isOnMicOpen) 100 else 0)
         } else {
@@ -1357,6 +1367,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     ) {
         val mediaPlayerState = state ?: return
         val mediaPlayerError = error ?: return
+        ktvApiLog("onPlayerStateChanged: $state")
         this.mediaPlayerState = mediaPlayerState
         when (mediaPlayerState) {
             MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {

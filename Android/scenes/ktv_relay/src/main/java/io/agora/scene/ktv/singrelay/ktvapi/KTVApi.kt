@@ -371,6 +371,12 @@ interface KTVApi {
     )
 
     /**
+     * 取消加载歌曲，会打断加载歌曲的进程并移除歌曲缓存
+     * @param songCode 歌曲唯一编码
+     */
+    fun removeMusic(songCode: Long)
+
+    /**
      * 加载歌曲，同时只能为一首歌loadSong，同步调用， 一般使用此loadSong是歌曲已经preload成功（url为本地文件地址）
      * @param config 加载歌曲配置
      * @param url 歌曲地址
@@ -478,10 +484,10 @@ interface KTVApi {
     fun setLrcView(view: ILrcView)
 
     /**
-     * 设置当前mic开关状态
-     * 目前关麦调用 adjustRecordSignalVolume(0) 后 onAudioVolumeIndication 仍然会执行， ktvApi需要增加一个变量判断当前是否关麦， 如果关麦把设置给歌词组件的pitch改为0
+     * 开关麦
+     * @param mute true 关麦 false 开麦
      */
-    fun setMicStatus(isOnMicOpen: Boolean)
+    fun muteMic(mute: Boolean)
 
     /**
      * 设置当前音频播放delay， 适用于音频自采集的情况

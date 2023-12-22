@@ -358,8 +358,8 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     
     /// 设置当前mic开关状态目前关麦调用
     /// 目前关麦调用 adjustRecordSignalVolume(0) 后 onAudioVolumeIndication 仍然会执行， ktvApi需要增加一个变量判断当前是否关麦， 如果关麦把设置给歌词组件的pitch改为0
-    /// - Parameter isOnMicOpen: <#isOnMicOpen description#>
-    func setMicStatus(isOnMicOpen: Bool)
+    /// - Parameter muteStatus: mute mic status
+    func muteMic(muteStatus: Bool)
     
     func getMusicPlayer() -> AgoraRtcMediaPlayerProtocol?
     

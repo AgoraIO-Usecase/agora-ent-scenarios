@@ -32,11 +32,11 @@ def all_pods
   pod 'JXCategoryView', '1.6.1'
 
   # 火山美颜
-  pod 'BytedEffect', :path => 'bytedEffect.podspec'
+#  pod 'BytedEffect', :path => 'bytedEffect.podspec'
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
 
-  pod 'AgoraSyncManager', '~> 2.1.5'
+  pod 'AgoraSyncManager', '~> 2.1.6'
 
 #  pod 'AgoraRtcEngine_Special_iOS', :path => 'AgoraRtcEngine_iOS.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
