@@ -70,7 +70,7 @@ extension VRNormalRoomsViewController {
                 self.empty.isHidden = (rooms.count > 0)
             } else {
                 self.empty.isHidden = true
-                self.view.makeToast("\(error?.localizedDescription ?? "")")
+                // self.view.makeToast("\(error?.localizedDescription ?? "")")
             }
         }
     }
