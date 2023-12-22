@@ -582,7 +582,7 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     private void updateVolumeStatus(boolean isUnMute) {
-        ktvApiProtocol.setMicStatus(isUnMute);
+        ktvApiProtocol.muteMic(!isUnMute);
 
         // 调整耳返
         if (!isUnMute && mSetting.isEar()) {
@@ -946,7 +946,7 @@ public class RoomLivingViewModel extends ViewModel {
 
         ktvApiProtocol.getMediaPlayer().setPlayerOption("play_pos_change_callback", 500);
         if (isRoomOwner()) {
-            ktvApiProtocol.setMicStatus(true);
+            ktvApiProtocol.muteMic(false);
             isOnSeat = true;
         }
 

@@ -600,7 +600,7 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     private void updateVolumeStatus(boolean isUnMute) {
-        ktvApiProtocol.setMicStatus(isUnMute);
+        ktvApiProtocol.muteMic(!isUnMute);
         if (!isUnMute && mSetting.isEar()) {
             if (mRtcEngine != null) {
                 mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
@@ -1464,7 +1464,7 @@ public class RoomLivingViewModel extends ViewModel {
         );
 
         if (isRoomOwner()) {
-            ktvApiProtocol.setMicStatus(true);
+            ktvApiProtocol.muteMic(false);
             isOnSeat = true;
         }
 
