@@ -13,6 +13,10 @@ import java.util.UUID
 
 class JoyGameRepo constructor(private val service: JoyApiService) : BaseRepository() {
 
+    companion object{
+        const val CODE_NO_CLOUD_HOST = 2002
+    }
+
     private val mUser: User
         get() = UserManager.getInstance().user
 

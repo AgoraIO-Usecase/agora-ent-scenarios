@@ -42,14 +42,13 @@
         app:layout_constraintDimensionRatio="3:4"
         app:layout_constraintEnd_toEndOf="@id/vertical68"
         app:layout_constraintStart_toStartOf="@id/vertical34"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/clRoomTitle" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clRoomTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="32dp"
         android:background="@drawable/joy_live_detail_top_view_bg"
         android:paddingHorizontal="5dp"
         android:paddingVertical="4dp"
@@ -230,7 +229,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/joy_icon_gift"
         app:layout_constraintBottom_toBottomOf="@id/tvInput"
-        app:layout_constraintEnd_toStartOf="@id/likeView" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivDeployTroops"
@@ -238,27 +237,26 @@
         android:layout_height="wrap_content"
         android:src="@drawable/joy_icon_deploy_troops"
         app:layout_constraintBottom_toBottomOf="@id/tvInput"
-        app:layout_constraintEnd_toStartOf="@id/likeView" />
+        app:layout_constraintEnd_toStartOf="@id/ivGift" />
 
     <io.agora.scene.joy.ui.widget.like.LikeLayout
         android:id="@+id/likeView"
         android:layout_width="70dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@id/tvInput"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/ivGift" />
 
     <io.agora.scene.joy.ui.widget.NonInterceptingRecyclerView
         android:id="@+id/rvMessage"
         android:layout_width="match_parent"
         android:layout_height="220dp"
         android:layout_span="1"
-        android:layout_marginBottom="60dp"
-        android:paddingBottom="10dp"
+        android:paddingBottom="8dp"
         android:paddingHorizontal="10dp"
         android:orientation="vertical"
         android:fadingEdgeLength="30dp"
         android:requiresFadingEdge="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tvInput"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/joy_item_live_detail_message" />
 </androidx.constraintlayout.widget.ConstraintLayout>

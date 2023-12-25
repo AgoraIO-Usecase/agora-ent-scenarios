@@ -35,6 +35,7 @@
     <string name="joy_request_failed">请求失败</string>
     <string name="joy_instruction_error">玩法指令错误</string>
     <string name="joy_send_gift_failed">送礼失败</string>
+    <string name="joy_request_no_cloud_host">暂无可用云机</string>
 
     <string-array name="joy_gift_array">
         <item>爱心</item>

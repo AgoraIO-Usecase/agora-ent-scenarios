@@ -17,11 +17,16 @@ import android.util.Size
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.TextureView
+import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -47,6 +52,7 @@ import io.agora.scene.joy.base.DataState
 import io.agora.scene.joy.databinding.JoyActivityLiveDetailBinding
 import io.agora.scene.joy.databinding.JoyItemLiveDetailMessageBinding
 import io.agora.scene.joy.network.JoyGameListResult
+import io.agora.scene.joy.network.JoyGameRepo
 import io.agora.scene.joy.network.JoyGameStatus
 import io.agora.scene.joy.service.JoyMessage
 import io.agora.scene.joy.service.JoyRoomInfo
@@ -61,6 +67,8 @@ import io.agora.scene.joy.ui.widget.KeyboardStatusWatcher
 import io.agora.scene.joy.utils.CustomToast
 import io.agora.scene.joy.utils.JoyLogger
 import io.agora.scene.joy.utils.dp
+import io.agora.scene.joy.utils.navBarHeight
+import io.agora.scene.joy.utils.statusBarHeight
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import io.agora.syncmanager.rtm.Sync
@@ -141,8 +149,22 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         return JoyActivityLiveDetailBinding.inflate(inflater)
     }
 
+    private lateinit var mRootInset: Insets
+
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v: View?, insets: WindowInsetsCompat ->
+            val inset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            mRootInset = inset
+            binding.root.setPaddingRelative(inset.left, 0, inset.right, inset.bottom)
+            Log.d(TAG, "getInsets ${inset.left},${inset.top},${inset.right},${inset.bottom}")
+            WindowInsetsCompat.CONSUMED
+        }
+        Log.d(TAG, "status height:$statusBarHeight")
+        val titleParams: MarginLayoutParams = binding.clRoomTitle.layoutParams as MarginLayoutParams
+        titleParams.topMargin = statusBarHeight
+        binding.clRoomTitle.layoutParams = titleParams
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         binding.tvRoomName.text = mRoomInfo.roomName
         binding.tvRoomId.text = mRoomInfo.roomId
@@ -385,6 +407,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 if (!mIsRoomOwner && gameId.isNotEmpty()) {
                     // 观众收到房间开始游戏
                     mJoyViewModel.getGameDetail(gameId)
+                    // 加载游戏画面
+                    setupAssistantVideoView()
                 }
             }
 
@@ -448,7 +472,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 else -> {
                     mGameChooseGameDialog?.setEnableConfirm(true)
                     hideLoadingView()
-                    CustomToast.showError(getString(R.string.joy_request_failed))
+
+                    if (it.errorMessage?.code == JoyGameRepo.CODE_NO_CLOUD_HOST) {
+                        CustomToast.showError(getString(R.string.joy_request_no_cloud_host))
+                    } else {
+                        CustomToast.showError(getString(R.string.joy_request_failed))
+                    }
                 }
             }
         }
@@ -538,12 +567,11 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 super.onUserOffline(uid, reason)
                 Log.d(TAG, "rtc onUserOffline uid:$uid }")
                 binding.root.post {
-//                    if (uid == mStartGameInfo?.assistantUid) {
-//                        // 远端游戏退出
-//                        CustomToast.showError(getString(R.string.joy_automatic_exit_of_gameplay_exception))
-//                        destroy()
-//                        finish()
-//                    }
+                    if (uid == mStartGameInfo?.assistantUid) {
+                        // todo 远端游戏退出
+                        destroy()
+                        showLivingEndLayout(true)
+                    }
                 }
             }
 
@@ -603,21 +631,24 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             val scale = height.toFloat() / width
             targetHeight = (rootViewWidth * scale).toInt()
         }
-        Log.i(TAG, "onVideoSizeChanged->targetWidth:$targetWidth,targetHeight:$targetHeight")
+        Log.i(TAG, "onVideoSizeChanged->targetWidth:$targetWidth,targetHeight:$targetHeight,navBarHeight:$navBarHeight")
         mVideoTextureView?.post {
-//            val layoutParams: ViewGroup.LayoutParams = binding.flAssistantContainer.layoutParams
-//            layoutParams.width = targetWidth
-//            layoutParams.height = targetHeight
-//            binding.flAssistantContainer.layoutParams = layoutParams
-
+            val navHeight = if (::mRootInset.isInitialized) mRootInset.bottom else navBarHeight
             if (targetWidth == rootViewWidth) {
                 // 宽度对齐
-                mVideoTextureView?.layout(0, rootViewHeight - targetHeight, rootViewWidth, rootViewHeight)
+                mVideoTextureView?.layout(
+                    0,
+                    rootViewHeight - targetHeight - navHeight,
+                    rootViewWidth,
+                    rootViewHeight
+                )
+                Log.i(TAG, "onVideoSizeChanged->layout:111")
             } else {
                 mVideoTextureView?.layout(
                     (rootViewWidth - targetWidth) / 2, 0,
-                    (rootViewWidth + targetWidth) / 2, rootViewHeight
+                    (rootViewWidth + targetWidth) / 2, rootViewHeight - navHeight
                 )
+                Log.i(TAG, "onVideoSizeChanged->layout:222")
             }
 
         }
@@ -785,8 +816,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     }
 
     private fun showLivingEndLayout(abnormal: Boolean) {
-        val title =
-            if (abnormal && !mIsRoomOwner) R.string.joy_living_abnormal_title else R.string.joy_living_timeout_title
+        val title = if (abnormal) R.string.joy_living_abnormal_title else R.string.joy_living_timeout_title
         val message = if (mIsRoomOwner) R.string.joy_living_host_timeout else R.string.joy_living_user_timeout
         AlertDialog.Builder(this, R.style.joy_alert_dialog)
             .setTitle(title)
@@ -817,7 +847,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
         if (showNormalInputLayout()) return
         showEndRoomDialog()
     }
@@ -837,13 +866,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
         mRtcEngine.leaveChannelEx(mMainRtcConnection)
     }
-
-//    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-//        if (keyCode == KeyEvent.KEYCODE_BACK && event.repeatCount == 0) {
-//            return false;
-//        }
-//        return super.onKeyDown(keyCode, event)
-//    }
 
     private fun sendMouseMessage(event: MotionEvent, value: Int) {
         if (!mIsRoomOwner) return

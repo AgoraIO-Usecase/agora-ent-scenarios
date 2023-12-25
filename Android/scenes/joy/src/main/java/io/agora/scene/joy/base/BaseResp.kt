@@ -41,10 +41,10 @@ data class JoyApiResult<T> constructor(
 data class ErrorMessage constructor(
     @Expose
     @SerializedName("code")
-    var code: String? = null,
+    var code: Int? = null,
     @Expose
     @SerializedName("err")
-    var err: Int = 0,
+    var err: String? = null,
     @Expose
     @SerializedName("err_msg")
     var errMsg: String? = null,

@@ -5,9 +5,14 @@ import android.content.Context
 import android.content.Context.WINDOW_SERVICE
 import android.content.res.Configuration
 import android.graphics.Point
+import android.os.Build
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+
+
+private const val TAG = "Joy_screen"
 
 /**
  * 获取屏幕宽度
@@ -87,7 +92,7 @@ val Activity.isNavBarShowed: Boolean
 val Context.navBarHeight: Int
     get() {
         val resourceId = navBarResId
-        return if (resourceId != 0) {
+        return if (resourceId != 0 && checkNavigationBarShow(this)) {
             resources.getDimensionPixelSize(resourceId)
         } else 0
     }
@@ -105,4 +110,22 @@ val Context.statusBarHeight: Int
  */
 val Context.hasNavBar
     @JvmName("hasNavBar")
-    get() = navBarResId != 0
+    get() = navBarResId != 0 && checkNavigationBarShow(this)
+
+private fun checkNavigationBarShow(context: Context): Boolean {
+    val display = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        context.display
+    } else {
+        @Suppress("DEPRECATION")
+        (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
+    }
+
+    val appUsableSize = Point()
+    val realScreenSize = Point()
+
+    display?.getSize(appUsableSize)
+    display?.getRealSize(realScreenSize)
+
+    Log.d(TAG, "checkNavigationBar ${realScreenSize.y} ${appUsableSize.y}")
+    return realScreenSize.y != appUsableSize.y
+}
