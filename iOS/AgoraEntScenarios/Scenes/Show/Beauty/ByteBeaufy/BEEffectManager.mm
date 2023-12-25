@@ -59,6 +59,7 @@ static const bool USE_PIPELINE = YES;
 #if BE_LOAD_RESOURCE_TIMEOUT
     NSMutableSet<NSString *>    *_existResourcePathes;
     BOOL                        _needLoadResource;
+    BOOL                        _isInitSuccess;
 }
 #else
 }
@@ -101,7 +102,7 @@ static const bool USE_PIPELINE = YES;
     _glContext = [EAGLContext currentContext];  // 运行在主线程，使用的是self.glView.context
     if (_glContext == nil) {
         NSLog(@"initTask is not run in thread with glContext!!!");
-        _glContext = [BEGLUtils createContextWithDefaultAPI:kEAGLRenderingAPIOpenGLES3];
+        _glContext = [BEGLUtils createContextWithDefaultAPI:kEAGLRenderingAPIOpenGLES2];
     }
     if ([EAGLContext currentContext] != _glContext) {
         [EAGLContext setCurrentContext: _glContext];
@@ -140,7 +141,7 @@ static const bool USE_PIPELINE = YES;
     
     _msgDelegateManager = [[IRenderMsgDelegateManager alloc] init];
     [self addMsgHandler:self];
-    
+    _isInitSuccess = ret == 0;
     return ret;
 #else
     return -1;
@@ -151,7 +152,7 @@ static const bool USE_PIPELINE = YES;
 #if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     if ([EAGLContext currentContext] != _glContext) {
         NSLog(@"effectsar init and destroy are not run in the same glContext");
-        [EAGLContext setCurrentContext:_glContext];
+        [EAGLContext setCurrentContext: _glContext];
     }
     [self removeMsgHandler:self];
     bef_effect_ai_destroy(_handle);
@@ -163,6 +164,7 @@ static const bool USE_PIPELINE = YES;
     free(_faceMaskInfo);
     free(_mouthMaskInfo);
     free(_teethMaskInfo);
+    _isInitSuccess = NO;
     return 0;
 #else
     return -1;
@@ -172,6 +174,9 @@ static const bool USE_PIPELINE = YES;
 #pragma mark - public
 #if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 - (bef_effect_result_t)processTexture:(GLuint)texture outputTexture:(GLuint)outputTexture width:(int)width height:(int)height rotate:(bef_ai_rotate_type)rotate timeStamp:(double)timeStamp {
+    if (!_isInitSuccess) {
+        return BEF_RESULT_FAIL;
+    }
 #if BE_LOAD_RESOURCE_TIMEOUT
     if (_renderQueue) {
         if (_needLoadResource) {
@@ -180,6 +185,10 @@ static const bool USE_PIPELINE = YES;
         }
     }
 #endif
+    if ([EAGLContext currentContext] != _glContext) {
+        NSLog(@"effectsar init and process are not run in the same glContext");
+        [EAGLContext setCurrentContext:_glContext];
+    }
     RECORD_TIME(totalProcess)
     bef_effect_result_t ret = bef_effect_ai_set_width_height(_handle, width, height);
     CHECK_RET_AND_RETURN(bef_effect_ai_set_width_height, ret)

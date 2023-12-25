@@ -25,6 +25,12 @@ class AgoraBeautyManager: NSObject {
     private lazy var beautifyOption = AgoraBeautyOptions()
     
     func setBeauty(path: String?, key: String?, value: CGFloat) {
+        if key == "init" {
+            agoraKit?.enableExtension(withVendor: "agora_video_filters_clear_vision",
+                                      extension: "clear_vision",
+                                      enabled: true,
+                                      sourceType: .primaryCamera)
+        }
         switch key ?? "" {
         case "smoothnessLevel": beautifyOption.smoothnessLevel = Float(value)
         case "lighteningLevel": beautifyOption.lighteningLevel = Float(value)
@@ -40,6 +46,10 @@ class AgoraBeautyManager: NSObject {
     }
             
     func destroy() {
+        agoraKit?.enableExtension(withVendor: "agora_video_filters_clear_vision",
+                                  extension: "clear_vision",
+                                  enabled: false,
+                                  sourceType: .primaryCamera)
         agoraKit?.setBeautyEffectOptions(false, options: beautifyOption)
         AgoraBeautyManager._sharedManager = nil
     }
