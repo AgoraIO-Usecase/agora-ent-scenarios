@@ -1,0 +1,18 @@
+bash
+#!/bin/bash
+
+check_variable() {
+  variable_name=$1
+  if git diff --cached | grep -q "^+$variable_name="; then
+    echo "ERROR: $variable_name cannot be committed."
+    exit 1
+  fi
+}
+
+check_variable "AGORA_APP_ID"
+check_variable "AGORA_APP_CERTIFICATE"
+check_variable "IM_APP_KEY"
+check_variable "IM_APP_CLIENT_ID"
+check_variable "IM_APP_CLIENT_SECRET"
+check_variable "CLOUD_PLAYER_KEY"
+check_variable "CLOUD_PLAYER_SECRET"
