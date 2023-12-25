@@ -325,6 +325,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         // 调整开关麦状态
         if ((oldRole == KTVSingRole.LeadSinger || oldRole == KTVSingRole.SoloSinger) && (newRole == KTVSingRole.CoSinger || newRole == KTVSingRole.Audience) && !isOnMicOpen) {
             mRtcEngine.muteLocalAudioStream(true)
+            mRtcEngine.adjustRecordingSignalVolume(100)
         } else if ((oldRole == KTVSingRole.Audience || oldRole == KTVSingRole.CoSinger) && (newRole == KTVSingRole.LeadSinger || newRole == KTVSingRole.SoloSinger) && !isOnMicOpen) {
             mRtcEngine.adjustRecordingSignalVolume(0)
             mRtcEngine.muteLocalAudioStream(false)
