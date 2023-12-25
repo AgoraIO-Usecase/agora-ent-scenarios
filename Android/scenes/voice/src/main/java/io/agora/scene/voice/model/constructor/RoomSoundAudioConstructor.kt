@@ -54,7 +54,7 @@ object RoomSoundAudioConstructor {
     val createRoomSoundAudioMap: Map<Int, List<SoundAudioBean>> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         mutableMapOf(
             ConfigConstants.RoomType.Common_Chatroom to
-                    if (ResourcesTools.getIsZh()) mutableListOf(
+                    mutableListOf(
                         SoundAudioBean(
                             ConfigConstants.BotSpeaker.BotBlue,
                             CreateCommonRoomSoundId + 1,
@@ -95,51 +95,9 @@ object RoomSoundAudioConstructor {
                             CreateCommonRoomSoundId + 8,
                             getCreateCommonRoomUrl("/CN/01-08-B-CN.wav")
                         )
-                    )
-                    else mutableListOf(
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            CreateCommonRoomSoundId + 1,
-                            getCreateCommonRoomUrl("/EN/01-01-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            CreateCommonRoomSoundId + 2,
-                            getCreateCommonRoomUrl("/EN/01-02-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBoth,
-                            CreateCommonRoomSoundId + 3,
-                            getCreateCommonRoomUrl("/EN/01-03-B&R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            CreateCommonRoomSoundId + 4,
-                            getCreateCommonRoomUrl("/EN/01-04-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            CreateCommonRoomSoundId + 5,
-                            getCreateCommonRoomUrl("/EN/01-05-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            CreateCommonRoomSoundId + 6,
-                            getCreateCommonRoomUrl("/EN/01-06-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            CreateCommonRoomSoundId + 7,
-                            getCreateCommonRoomUrl("/EN/01-07-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            CreateCommonRoomSoundId + 8,
-                            getCreateCommonRoomUrl("/EN/01-08-B-EN.wav")
-                        )
                     ),
             ConfigConstants.RoomType.Spatial_Chatroom to
-                    if (ResourcesTools.getIsZh()) mutableListOf(
+                    mutableListOf(
                         SoundAudioBean(
                             ConfigConstants.BotSpeaker.BotBlue,
                             CreateSpatialRoomSoundId + 1,
@@ -231,98 +189,6 @@ object RoomSoundAudioConstructor {
                             getCreateSpatialRoomUrl("/CN/02-18-B-CN.wav")
                         )
                     )
-                    else mutableListOf(
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            CreateSpatialRoomSoundId + 1,
-                            getCreateSpatialRoomUrl("/EN/02-01-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            CreateSpatialRoomSoundId + 2,
-                            getCreateSpatialRoomUrl("/EN/02-02-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBoth,
-                            CreateSpatialRoomSoundId + 3,
-                            getCreateSpatialRoomUrl("/EN/02-03-B&R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            CreateSpatialRoomSoundId + 4,
-                            getCreateSpatialRoomUrl("/EN/02-04-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            CreateSpatialRoomSoundId + 5,
-                            getCreateSpatialRoomUrl("/EN/02-05-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            CreateSpatialRoomSoundId + 6,
-                            getCreateSpatialRoomUrl("/EN/02-06-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            CreateSpatialRoomSoundId + 7,
-                            getCreateSpatialRoomUrl("/EN/02-07-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            CreateSpatialRoomSoundId + 8,
-                            getCreateSpatialRoomUrl("/EN/02-08-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            CreateSpatialRoomSoundId + 9,
-                            getCreateSpatialRoomUrl("/EN/02-09-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            CreateSpatialRoomSoundId + 10,
-                            getCreateSpatialRoomUrl("/EN/02-10-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            CreateSpatialRoomSoundId + 11,
-                            getCreateSpatialRoomUrl("/EN/02-11-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            CreateSpatialRoomSoundId + 12,
-                            getCreateSpatialRoomUrl("/EN/02-12-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            CreateSpatialRoomSoundId + 13,
-                            getCreateSpatialRoomUrl("/EN/02-13-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            CreateSpatialRoomSoundId + 14,
-                            getCreateSpatialRoomUrl("/EN/02-14-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            CreateSpatialRoomSoundId + 15,
-                            getCreateSpatialRoomUrl("/EN/02-15-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            CreateSpatialRoomSoundId + 16,
-                            getCreateSpatialRoomUrl("/EN/02-16-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            CreateSpatialRoomSoundId + 17,
-                            getCreateSpatialRoomUrl("/EN/02-17-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            CreateSpatialRoomSoundId + 18,
-                            getCreateSpatialRoomUrl("/EN/02-18-B-EN.wav")
-                        )
-                    )
         )
     }
 
@@ -332,7 +198,7 @@ object RoomSoundAudioConstructor {
     val soundSelectionAudioMap: Map<Int, List<SoundAudioBean>> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         mutableMapOf(
             ConfigConstants.SoundSelection.Social_Chat to
-                    if (ResourcesTools.getIsZh()) mutableListOf(
+                    mutableListOf(
                         SoundAudioBean(
                             ConfigConstants.BotSpeaker.BotBlue,
                             SocialChatSoundId + 1,
@@ -373,51 +239,9 @@ object RoomSoundAudioConstructor {
                             SocialChatSoundId + 8,
                             getSocialChatUrl("/CN/03-08-R-CN.wav")
                         )
-                    )
-                    else mutableListOf(
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            SocialChatSoundId + 1,
-                            getSocialChatUrl("/EN/03-01-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            SocialChatSoundId + 2,
-                            getSocialChatUrl("/EN/03-02-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            SocialChatSoundId + 3,
-                            getSocialChatUrl("/EN/03-03-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            SocialChatSoundId + 4,
-                            getSocialChatUrl("/EN/03-04-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            SocialChatSoundId + 5,
-                            getSocialChatUrl("/EN/03-05-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            SocialChatSoundId + 6,
-                            getSocialChatUrl("/EN/03-06-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            SocialChatSoundId + 7,
-                            getSocialChatUrl("/EN/03-07-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            SocialChatSoundId + 8,
-                            getSocialChatUrl("/EN/03-08-R-EN.wav")
-                        ),
                     ),
             ConfigConstants.SoundSelection.Karaoke to
-                    if (ResourcesTools.getIsZh()) mutableListOf(
+                    mutableListOf(
                         SoundAudioBean(
                             ConfigConstants.BotSpeaker.BotBlue,
                             KaraokeSoundId + 1,
@@ -428,21 +252,9 @@ object RoomSoundAudioConstructor {
                             KaraokeSoundId + 2,
                             getKaraokeUrl("/CN/04-02-B-CN.wav")
                         ),
-                    )
-                    else mutableListOf(
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            KaraokeSoundId + 1,
-                            getKaraokeUrl("/EN/04-01-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            KaraokeSoundId + 2,
-                            getKaraokeUrl("/EN/04-02-B-EN.wav")
-                        )
                     ),
             ConfigConstants.SoundSelection.Gaming_Buddy to
-                    if (ResourcesTools.getIsZh()) mutableListOf(
+                    mutableListOf(
                         SoundAudioBean(
                             ConfigConstants.BotSpeaker.BotBlue,
                             GamingBuddySoundId + 1,
@@ -493,66 +305,9 @@ object RoomSoundAudioConstructor {
                             GamingBuddySoundId + 11,
                             getGamingBuddyUrl("/CN/05-11-R-CN.wav")
                         ),
-                    )
-                    else mutableListOf(
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            GamingBuddySoundId + 1,
-                            getGamingBuddyUrl("/EN/05-01-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            GamingBuddySoundId + 2,
-                            getGamingBuddyUrl("/EN/05-02-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            GamingBuddySoundId + 3,
-                            getGamingBuddyUrl("/EN/05-03-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            GamingBuddySoundId + 4,
-                            getGamingBuddyUrl("/EN/05-04-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            GamingBuddySoundId + 5,
-                            getGamingBuddyUrl("/EN/05-05-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            GamingBuddySoundId + 6,
-                            getGamingBuddyUrl("/EN/05-06-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            GamingBuddySoundId + 7,
-                            getGamingBuddyUrl("/EN/05-07-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            GamingBuddySoundId + 8,
-                            getGamingBuddyUrl("/EN/05-08-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            GamingBuddySoundId + 9,
-                            getGamingBuddyUrl("/EN/05-09-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            GamingBuddySoundId + 10,
-                            getGamingBuddyUrl("/EN/05-10-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            GamingBuddySoundId + 11,
-                            getGamingBuddyUrl("/EN/05-11-R-EN.wav")
-                        ),
                     ),
             ConfigConstants.SoundSelection.Professional_Broadcaster to
-                    if (ResourcesTools.getIsZh()) mutableListOf(
+                    mutableListOf(
                         SoundAudioBean(
                             ConfigConstants.BotSpeaker.BotRed,
                             ProfessionalBroadcasterSoundId + 1,
@@ -569,18 +324,6 @@ object RoomSoundAudioConstructor {
                             getProfessionalBroadcasterUrl("/CN/06-03-R-CN.wav")
                         ),
                     )
-                    else mutableListOf(
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            ProfessionalBroadcasterSoundId + 1,
-                            getProfessionalBroadcasterUrl("/EN/06-01-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            ProfessionalBroadcasterSoundId + 2,
-                            getProfessionalBroadcasterUrl("/EN/06-02-R-EN.wav")
-                        ),
-                    )
         )
     }
 
@@ -590,7 +333,7 @@ object RoomSoundAudioConstructor {
     val anisIntroduceAudioMap: Map<Int, List<SoundAudioBean>> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         mutableMapOf(
             ConfigConstants.AINSMode.AINS_High to
-                    if (ResourcesTools.getIsZh()) mutableListOf(
+                    mutableListOf(
                         SoundAudioBean(
                             ConfigConstants.BotSpeaker.BotRed,
                             AINSIntroduceSoundId + 1,
@@ -626,46 +369,9 @@ object RoomSoundAudioConstructor {
                             AINSIntroduceSoundId + 7,
                             getANISIntroduceUrl("/CN/Share/07-07-R-CN.wav")
                         )
-                    )
-                    else mutableListOf(
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            AINSIntroduceSoundId + 1,
-                            getANISIntroduceUrl("/EN/Share/07-01-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            AINSIntroduceSoundId + 2,
-                            getANISIntroduceUrl("/EN/High/07-02-B-EN-High.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            AINSIntroduceSoundId + 3,
-                            getANISIntroduceUrl("/EN/High/07-03-R-EN-High.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            AINSIntroduceSoundId + 4,
-                            getANISIntroduceUrl("/EN/Share/07-04-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            AINSIntroduceSoundId + 5,
-                            getANISIntroduceUrl("/EN/Share/07-05-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            AINSIntroduceSoundId + 6,
-                            getANISIntroduceUrl("/EN/Share/07-06-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            AINSIntroduceSoundId + 7,
-                            getANISIntroduceUrl("/EN/Share/07-07-R-EN.wav")
-                        )
                     ),
             ConfigConstants.AINSMode.AINS_Medium to
-                    if (ResourcesTools.getIsZh()) mutableListOf(
+                    mutableListOf(
                         SoundAudioBean(
                             ConfigConstants.BotSpeaker.BotRed,
                             AINSIntroduceSoundId + 1,
@@ -701,46 +407,9 @@ object RoomSoundAudioConstructor {
                             AINSIntroduceSoundId + 7,
                             getANISIntroduceUrl("/CN/Share/07-07-R-CN.wav")
                         )
-                    )
-                    else mutableListOf(
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            AINSIntroduceSoundId + 1,
-                            getANISIntroduceUrl("/EN/Share/07-01-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            AINSIntroduceSoundId + 2,
-                            getANISIntroduceUrl("/EN/Medium/07-02-B-EN-Medium.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            AINSIntroduceSoundId + 3,
-                            getANISIntroduceUrl("/EN/Medium/07-03-R-EN-Medium.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            AINSIntroduceSoundId + 4,
-                            getANISIntroduceUrl("/EN/Share/07-04-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            AINSIntroduceSoundId + 5,
-                            getANISIntroduceUrl("/EN/Share/07-05-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            AINSIntroduceSoundId + 6,
-                            getANISIntroduceUrl("/EN/Share/07-06-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            AINSIntroduceSoundId + 7,
-                            getANISIntroduceUrl("/EN/Share/07-07-R-EN.wav")
-                        )
                     ),
             ConfigConstants.AINSMode.AINS_Off to
-                    if (ResourcesTools.getIsZh()) mutableListOf(
+                    mutableListOf(
                         SoundAudioBean(
                             ConfigConstants.BotSpeaker.BotRed,
                             AINSIntroduceSoundId + 1,
@@ -775,43 +444,6 @@ object RoomSoundAudioConstructor {
                             ConfigConstants.BotSpeaker.BotRed,
                             AINSIntroduceSoundId + 7,
                             getANISIntroduceUrl("/CN/Share/07-07-R-CN.wav")
-                        )
-                    )
-                    else mutableListOf(
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            AINSIntroduceSoundId + 1,
-                            getANISIntroduceUrl("/EN/Share/07-01-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            AINSIntroduceSoundId + 2,
-                            getANISIntroduceUrl("/EN/07-02-B-EN-None.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            AINSIntroduceSoundId + 3,
-                            getANISIntroduceUrl("/EN/07-03-R-EN-None.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            AINSIntroduceSoundId + 4,
-                            getANISIntroduceUrl("/EN/Share/07-04-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            AINSIntroduceSoundId + 5,
-                            getANISIntroduceUrl("/EN/Share/07-05-R-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotBlue,
-                            AINSIntroduceSoundId + 6,
-                            getANISIntroduceUrl("/EN/Share/07-06-B-EN.wav")
-                        ),
-                        SoundAudioBean(
-                            ConfigConstants.BotSpeaker.BotRed,
-                            AINSIntroduceSoundId + 7,
-                            getANISIntroduceUrl("/EN/Share/07-07-R-EN.wav")
                         )
                     )
         )
