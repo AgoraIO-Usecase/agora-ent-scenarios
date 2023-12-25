@@ -68,7 +68,7 @@ def all_pods
 #  pod 'SwiftFormat/CLI'
 
   #VoiceChatRoom rely
-  pod 'ZSwiftBaseLib', '0.1.6.1'
+  pod 'ZSwiftBaseLib', '0.1.6.2'
 
   pod 'SnapKit'
   pod 'SVGAPlayer'
