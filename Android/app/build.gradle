@@ -16,6 +16,8 @@ android {
     }
 }
 
+apply from: "${rootDir.absolutePath}/git-hooks.gradle"
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     implementation project(':common:base')
