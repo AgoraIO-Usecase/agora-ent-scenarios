@@ -9,6 +9,12 @@ import Foundation
 import AVFoundation
 import UIKit
 
+@objc public enum checkAuthType: Int {
+    case all
+    case audio
+    case video
+}
+
 open class AgoraEntAuthorizedManager: NSObject {
     @objc class func showAudioAuthorizedFail(parent: UIViewController) {
         showAuthorizedFail(parent: parent, message: "麦克风权限未设置,请设置麦克风权限")
@@ -36,6 +42,35 @@ open class AgoraEntAuthorizedManager: NSObject {
             }
             isPermission = granted
             group.leave()
+        }
+        group.notify(queue: .main) {
+            completion?(isPermission)
+        }
+    }
+    
+    @objc class func checkMediaAuthorized(parent: UIViewController, type: checkAuthType, completion: ((Bool) -> Void)? = nil) {
+        var isPermission: Bool = true
+        let group = DispatchGroup()
+        if type != .video {
+            group.enter()
+            requestAudioSession { granted in
+                if !granted {
+                    showAudioAuthorizedFail(parent: parent)
+                }
+                isPermission = granted
+                group.leave()
+            }
+        }
+        
+        if type != .audio {
+            group.enter()
+            requestCapture { granted in
+                if !granted {
+                    showCameraAuthorizedFail(parent: parent)
+                }
+                isPermission = granted
+                group.leave()
+            }
         }
         group.notify(queue: .main) {
             completion?(isPermission)

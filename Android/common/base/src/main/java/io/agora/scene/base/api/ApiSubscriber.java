@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 
 import com.google.gson.JsonParseException;
 
-import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 
 import java.net.ConnectException;
@@ -13,10 +12,9 @@ import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.concurrent.TimeoutException;
 
-import io.agora.scene.base.Constant;
 import io.agora.scene.base.api.base.BaseResponse;
-import io.agora.scene.base.event.UserLogoutEvent;
-import io.agora.scene.base.utils.SPUtil;
+import io.agora.scene.base.manager.PagePilotManager;
+import io.agora.scene.base.manager.UserManager;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import retrofit2.HttpException;
@@ -32,17 +30,9 @@ public abstract class ApiSubscriber<T> implements Observer<T> {
     @Override
     public void onNext(@NonNull T t) {
         if (t instanceof BaseResponse) {
-//            if (((BaseResponse<?>) t).getCode() == 401) {
-//                ToastUtils.showToast("登录超时，请重新登录");
-//                EventBus.getDefault().post(new UserLogoutEvent());
-//                onFailure(new ApiException(((BaseResponse<?>) t).getCode(), ((BaseResponse<?>) t).getMessage()));
-//            } else
             if (((BaseResponse<?>) t).getCode() != 0) {
                 String error = ((BaseResponse<?>) t).getMessage();
                 onFailure(new ApiException(((BaseResponse<?>) t).getCode(), error));
-//                if (!TextUtils.isEmpty(error)) {
-//                    ToastUtils.showToast(error);
-//                }
             } else {
                 onSuccess(t);
             }
@@ -94,8 +84,8 @@ public abstract class ApiSubscriber<T> implements Observer<T> {
             if (((HttpException) e).code() == ErrorCode.TOKEN_ERROR) {
                 errorMsg = "登录超时，请重新登录";
                 errorCode = ErrorCode.TOKEN_ERROR;
-                EventBus.getDefault().post(new UserLogoutEvent());
-                SPUtil.putBoolean(Constant.IS_AGREE, false);
+                UserManager.getInstance().logout();
+                PagePilotManager.pageWelcomeClear();
             } else {
                 errorMsg = "错误 : errorCode = " + ((HttpException) e).code() + " ; errorMsg = " + e.getMessage();
             }

@@ -23,6 +23,7 @@ import io.agora.voice.common.ui.BaseUiFragment
 import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ThreadManager
+import io.agora.voice.common.utils.ToastTools
 
 class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsListLayoutBinding>(),
     ChatroomRaisedAdapter.onActionListener {
@@ -40,7 +41,7 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         emptyView = layoutInflater.inflate(R.layout.voice_spatial_no_data_layout, container, false)
         val textView = emptyView?.findViewById<TextView>(R.id.content_item)
-        textView?.text = getString(R.string.voice_empty_raised_hands)
+        textView?.text = getString(R.string.voice_spatial_empty_raised_hands)
         emptyView?.layoutParams = LinearLayoutCompat.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.MATCH_PARENT
@@ -122,6 +123,13 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
                                 adapter?.notifyItemRemoved(currentIndex)
                             }
                             onFragmentListener?.onAcceptMicSeatApply(it)
+                        }
+                    }
+
+                    override fun onError(code: Int, message: String?) {
+                        super.onError(code, message)
+                        activity?.let {
+                            ToastTools.show(it,getString(R.string.voice_spatial_room_agree_fail))
                         }
                     }
                 })

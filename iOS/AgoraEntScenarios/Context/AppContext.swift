@@ -16,6 +16,7 @@ import Bugly
     @objc var isDebugMode = false
     @objc var imageCahe = [String: AnyObject]()
     @objc var localizedCache = [String: String]()
+    @objc var sceneConfig: VLSceneConfigsModel?
     
     @objc var isAgreeLicense: Bool = false {
         didSet {
@@ -63,10 +64,6 @@ import Bugly
 
     @objc func appId() -> String {
         return KeyCenter.AppId
-    }
-
-    @objc func appCertificate() -> String? {
-        return KeyCenter.Certificate
     }
 
     @objc func appHostUrl() -> String {

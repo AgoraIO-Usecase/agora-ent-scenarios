@@ -11,11 +11,6 @@
         <item name="android:layout_marginStart">16dp</item>
     </style>
 
-    <style name="voice_seat_roundStyle">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">50%</item>
-    </style>
-
     <style name="voice_RoundedStyle">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">16dp</item>
@@ -33,16 +28,14 @@
 
     <style name="voice_top_text_style">
         <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">24dp</item>
         <item name="android:drawablePadding">3dp</item>
         <item name="android:paddingStart">8dp</item>
         <item name="android:paddingEnd">8dp</item>
-        <item name="android:paddingTop">5dp</item>
-        <item name="android:paddingBottom">5dp</item>
         <item name="android:textColor">@color/voice_white</item>
         <item name="android:textSize">@dimen/voice_sp_12</item>
-        <item name="android:gravity">center</item>
-        <item name="android:background">@drawable/voice_bg_rect_radius13_black20</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">@drawable/voice_rect_r999_black08062f</item>
     </style>
 
     <style name="voice_bottom_sheet_title_style">
@@ -84,11 +77,11 @@
     </style>
 
     <style name="voice_bottom_sheet_checkbox">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">45dp</item>
+        <item name="android:layout_height">28dp</item>
         <item name="android:layout_marginEnd">20dp</item>
         <item name="android:background">@color/voice_transparent</item>
-        <item name="android:button">@drawable/voice_cb_checkbox_selector</item>
+        <item name="android:button">@drawable/cb_def_selector</item>
     </style>
 
     <style name="voice_bottom_sheet_progress">

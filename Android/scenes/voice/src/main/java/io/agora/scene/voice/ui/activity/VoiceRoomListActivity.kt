@@ -1,6 +1,5 @@
 package io.agora.scene.voice.ui.activity
 
-import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.TypedValue
@@ -22,6 +21,7 @@ import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceAgoraRoomListLayoutBinding
 import io.agora.scene.voice.global.VoiceConfigManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
+import io.agora.scene.voice.ui.dialog.CreateRoomDialog
 import io.agora.scene.voice.ui.fragment.VoiceRoomListFragment
 import io.agora.voice.common.ui.BaseUiActivity
 import io.agora.voice.common.utils.*
@@ -58,13 +58,11 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
     override fun onCreate(savedInstanceState: Bundle?) {
         StatusBarCompat.setLightStatusBar(this, true)
         super.onCreate(savedInstanceState)
-        if (io.agora.scene.base.BuildConfig.IM_APP_KEY.isEmpty() ||
-            io.agora.scene.base.BuildConfig.IM_APP_CLIENT_ID.isEmpty() ||
-            io.agora.scene.base.BuildConfig.IM_APP_CLIENT_SECRET.isEmpty()) {
-            finish()
-            ToastTools.show(this, "IM_APP_KEY / IM_APP_CLIENT_ID / IM_APP_CLIENT_SECRET 未配置")
-            return
-        }
+         if (BuildConfig.IM_APP_KEY.isEmpty()) {
+             finish()
+             ToastTools.show(this, "IM_APP_KEY / IM_APP_CLIENT_ID / IM_APP_CLIENT_SECRET 未配置")
+             return
+         }
         binding.titleBar.title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
         setupWithViewPager()
         initListener()
@@ -74,9 +72,9 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
         binding.titleBar.setOnBackPressListener{
             finish()
         }
-        binding.bottomLayout.setOnClickListener {
+        binding.btnCreateRoom.setOnClickListener {
             if (FastClickTools.isFastClick(it)) return@setOnClickListener
-            startActivity(Intent(this@VoiceRoomListActivity, VoiceRoomCreateActivity::class.java))
+            CreateRoomDialog(this).show(supportFragmentManager, "CreateRoomDialog")
         }
         binding.agoraTabLayout.addOnTabSelectedListener(object : OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {

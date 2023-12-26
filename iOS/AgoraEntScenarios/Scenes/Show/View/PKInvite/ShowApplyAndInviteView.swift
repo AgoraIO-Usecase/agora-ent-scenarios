@@ -14,8 +14,8 @@ enum ShowApplyAndInviteType: String, CaseIterable {
     
     var title: String {
         switch self {
-        case .apply: return "申请消息".show_localized
-        case .invite: return "连麦邀请".show_localized
+        case .apply: return "show_linking_request_message".show_localized
+        case .invite: return "show_onseat_invite".show_localized
         }
     }
 }
@@ -40,10 +40,10 @@ class ShowApplyAndInviteView: UIView {
         segmentView.valueChange = { [weak self] index in
             self?.tableView.dataArray = []
             if index == 0 {
-                self?.tableView.emptyTitle = "暂无上麦申请".show_localized
+                self?.tableView.emptyTitle = "show_empty_onseat_apply".show_localized
                 self?.getApplyList()
             } else {
-                self?.tableView.emptyTitle = "暂无用户".show_localized
+                self?.tableView.emptyTitle = "show_no_user_yet".show_localized
                 self?.getInviteList()
             }
         }
@@ -75,7 +75,7 @@ class ShowApplyAndInviteView: UIView {
     }()
     private lazy var endButton: AGEButton = {
         let button = AGEButton()
-        button.setTitle("结束".show_localized, for: .normal)
+        button.setTitle("show_stop_pking".show_localized, for: .normal)
         button.setTitleColor(UIColor(hex: "#684BF2"), for: .normal)
         button.setImage(UIImage.show_sceneImage(name: "show_live_close"),
                         for: .normal,
@@ -87,7 +87,7 @@ class ShowApplyAndInviteView: UIView {
     private lazy var tableView: AGETableView = {
         let view = AGETableView()
         view.rowHeight = 67
-        view.emptyTitle = "暂无上麦申请".show_localized
+        view.emptyTitle = "show_empty_onseat_apply".show_localized
         view.emptyTitleColor = UIColor(hex: "#989DBA")
         view.emptyImage = UIImage.show_sceneImage(name: "show_pkInviteViewEmpty")
         view.delegate = self
@@ -104,7 +104,7 @@ class ShowApplyAndInviteView: UIView {
                 return
             }
             self.tipsContainerView.isHidden = seatMicModel == nil
-            self.tipsLabel.text = String(format: "与%@连麦中".show_localized, seatMicModel?.userName ?? "")
+            self.tipsLabel.text = String(format: "show_onseat_with_broadcastor".show_localized, seatMicModel?.userName ?? "")
             self.updateLayout(isHidden: seatMicModel == nil)
             self.tableView.reloadData()
         }
@@ -131,22 +131,22 @@ class ShowApplyAndInviteView: UIView {
     }
     
     private func getApplyList() {
-        AppContext.showServiceImp(roomId).getAllMicSeatApplyList {[weak self] _, list in
+        AppContext.showServiceImp(roomId)?.getAllMicSeatApplyList {[weak self] _, list in
             guard let list = list?.filterDuplicates({ $0.userId }) else { return }
             self?.tableView.dataArray = list.filter({ $0.status == .waitting })
         }
     }
     private func getInviteList() {
-        AppContext.showServiceImp(roomId).getAllUserList {[weak self] _, list in
+        AppContext.showServiceImp(roomId)?.getAllUserList {[weak self] _, list in
             guard let list = list?.filter({$0.userId != VLUserCenter.user.id}) else { return }
             self?.tableView.dataArray = list.filter({ $0.status != .accepted })
         }
     }
     
     private func getApplyPKInfo() {
-        AppContext.showServiceImp(roomId).getCurrentApplyUser(roomId: roomId) {[weak self] roomModel in
+        AppContext.showServiceImp(roomId)?.getCurrentApplyUser(roomId: roomId) {[weak self] roomModel in
             self?.tipsContainerView.isHidden = roomModel == nil
-            self?.tipsLabel.text = String(format: "与主播%@PK中".show_localized, roomModel?.ownerName ?? "")
+            self?.tipsLabel.text = String(format: "show_pking_with_broadcastor".show_localized, roomModel?.ownerName ?? "")
         }
     }
     private func getApplyLinkInfo() {
@@ -212,7 +212,7 @@ class ShowApplyAndInviteView: UIView {
     private func onTapEndButton(sender: AGEButton) {
         updateLayout(isHidden: true)
         if let model = seatMicModel {
-            AppContext.showServiceImp(roomId).stopInteraction(interaction: model) { _ in }
+            AppContext.showServiceImp(roomId)?.stopInteraction(interaction: model) { _ in }
         }
         applyStatusClosure?(.idle)
     }

@@ -25,6 +25,8 @@
 @property (nonatomic) dispatch_queue_t renderQueue;
 ///贴纸id
 @property (nonatomic, assign) int stickerId;
+@property (nonatomic, copy) NSString *stickerPath;
+@property (nonatomic, assign) int filterId;
 
 @end
 
@@ -66,10 +68,26 @@
 }
 
 - (void)addStylePath: (NSString *)stylePath groupId: (int)groudId strength: (CGFloat)strength callBack:(void (^)(int))callback {
-    NSString *path = [[NSBundle mainBundle] pathForResource:stylePath ofType:nil];
 #if __has_include("st_mobile_common.h")
+    if (self.stickerId && [stylePath isEqualToString:self.stickerPath]) {
+        if (groudId == 0) {
+            [self.effectsProcess setPackageId:self.stickerId groupType:EFFECT_BEAUTY_GROUP_MAKEUP strength:strength];
+        } else {
+            [self.effectsProcess setPackageId:self.stickerId groupType:EFFECT_BEAUTY_GROUP_FILTER strength:strength];
+        }
+        if (callback) {
+            callback(self.stickerId);
+        }
+        return;
+    }
+    if (self.stickerId) {
+        [self removeStickerId:self.stickerId];
+    }
+    NSString *path = [[NSBundle mainBundle] pathForResource:stylePath ofType:nil];
     __weak VideoProcessingManager *weakself = self;
     [self.effectsProcess addStickerWithPath:path callBack:^(st_result_t state, int sticker, uint64_t action) {
+        weakself.stickerId = sticker;
+        weakself.stickerPath = stylePath;
         if (groudId == 0) {
             [weakself.effectsProcess setPackageId:sticker groupType:EFFECT_BEAUTY_GROUP_MAKEUP strength:strength];
         } else {
@@ -126,27 +144,22 @@
                                     pixelBuffer:&_outputPixelBuffer
                                       cvTexture:&_outputCVTexture];
     }
-#endif
-#if __has_include("st_mobile_common.h")
     st_mobile_human_action_t detectResult;
     memset(&detectResult, 0, sizeof(st_mobile_human_action_t));
     st_result_t ret = [self.effectsProcess detectWithPixelBuffer:pixelBuffer
                                                           rotate:[self getRotateType]
                                                   cameraPosition:AVCaptureDevicePositionFront
                                                      humanAction:&detectResult
-                                                    animalResult:nil
-                                                     animalCount:nil];
+                                                    animalResult:nil];
     if (ret != ST_OK) {
         NSLog(@"人脸检测失败");
         CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
         return pixelBuffer;
     }
-
     [self.effectsProcess renderPixelBuffer:pixelBuffer
                                     rotate:[self getRotateType]
                                humanAction:detectResult
                               animalResult:nil
-                               animalCount:0
                                 outTexture:self->_outTexture
                             outPixelFormat:ST_PIX_FMT_BGRA8888
                                    outData:nil];

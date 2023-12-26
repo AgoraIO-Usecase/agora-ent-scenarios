@@ -44,7 +44,7 @@ class VMSwitchTableViewCell: UITableViewCell {
 
     private func layoutUI() {
         iconView.frame = CGRect(x: 20, y: 17, width: 20, height: 20)
-        iconView.image = UIImage("icons／set／jiqi")
+        iconView.image = UIImage.sceneImage(name: "icons／set／jiqi", bundleName: "VoiceChatRoomResource")
         contentView.addSubview(iconView)
 
         titleLabel.frame = CGRect(x: 50, y: 17, width: 200, height: 20)

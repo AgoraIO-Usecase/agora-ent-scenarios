@@ -12,7 +12,7 @@ import ZSwiftBaseLib
 public final class SARoomListCell: UITableViewCell {
     var entity = SARoomEntity()
 
-    lazy var background: UIImageView = .init(frame: CGRect(x: 20, y: 15, width: ScreenWidth - 40, height: self.frame.height - 15)).image(UIImage("normal_room") ?? UIImage()).backgroundColor(.clear)
+    lazy var background: UIImageView = .init(frame: CGRect(x: 20, y: 15, width: ScreenWidth - 40, height: self.frame.height - 15)).image(UIImage.sceneImage(name: "normal_room", bundleName: "VoiceChatRoomResource") ?? UIImage()).backgroundColor(.clear)
 
     lazy var accessSymbol: UIButton = .init(type: .custom).frame(CGRect(x: 0, y: 0, width: 68, height: 24)).font(UIFont.systemFont(ofSize: 10, weight: .regular)).backgroundColor(.clear)
 
@@ -22,7 +22,7 @@ public final class SARoomListCell: UITableViewCell {
 
     lazy var seenCount: UIButton = .init(type: .custom).frame(CGRect(x: self.roomName.frame.minX - 10, y: self.background.frame.height - 36, width: 55, height: 16)).isUserInteractionEnabled(false).font(UIFont.systemFont(ofSize: 10, weight: .regular))
 
-    lazy var entryRoom: UIButton = .init(type: .custom).frame(CGRect(x: self.background.frame.width - 72, y: self.background.frame.height - 40, width: 56, height: 24)).font(UIFont.systemFont(ofSize: 12, weight: .semibold)).backgroundColor(.clear).title(sceneLocalized( "Enter"), .normal)
+    lazy var entryRoom: UIButton = .init(type: .custom).frame(CGRect(x: self.background.frame.width - 72, y: self.background.frame.height - 40, width: 56, height: 24)).font(UIFont.systemFont(ofSize: 12, weight: .semibold)).backgroundColor(.clear).title("spatial_voice_enter".spatial_localized(), .normal)
 
     lazy var entryBlur: UIView = .init(frame: self.entryRoom.frame).backgroundColor(UIColor(white: 1, alpha: 0.3)).cornerRadius(self.entryRoom.frame.height / 2.0)
 
@@ -53,8 +53,8 @@ public final class SARoomListCell: UITableViewCell {
     func setupViewsAttributes(room: SARoomEntity) {
         entity = room
         if let show = room.is_private, show == true {
-            accessSymbol.set(image: UIImage("suo"), title: sceneLocalized( "Private"), titlePosition: .right, additionalSpacing: 5, state: .normal)
-            accessSymbol.setBackgroundImage(UIImage("securityType"), for: .normal)
+            accessSymbol.set(image:UIImage.sceneImage(name: "suo", bundleName: "VoiceChatRoomResource"), title: "Spatial_voice_private".spatial_localized(), titlePosition: .right, additionalSpacing: 5, state: .normal)
+            accessSymbol.setBackgroundImage(UIImage.sceneImage(name: "securityType", bundleName: "VoiceChatRoomResource"), for: .normal)
             accessSymbol.isHidden = false
         } else {
             accessSymbol.isHidden = true

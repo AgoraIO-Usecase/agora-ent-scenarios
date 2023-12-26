@@ -6,18 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import io.agora.scene.base.component.BaseFragment
+import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLivePkRequestMessageListBinding
 import io.agora.scene.show.service.ShowInteractionInfo
 import io.agora.scene.show.service.ShowInteractionStatus
 
 class LivePKRequestMessageFragment : BaseFragment() {
-    private var mBinding : ShowLivePkRequestMessageListBinding? = null
+    private var mBinding: ShowLivePkRequestMessageListBinding? = null
     private val binding get() = mBinding!!
-    private lateinit var mListener : Listener
-    private val linkPKViewAdapter : LivePKViewAdapter = LivePKViewAdapter()
+    private lateinit var mListener: Listener
+    private val linkPKViewAdapter: LivePKViewAdapter = LivePKViewAdapter()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        linkPKViewAdapter.setClickListener(object: LivePKViewAdapter.OnClickListener{
+        linkPKViewAdapter.setClickListener(object : LivePKViewAdapter.OnClickListener {
             override fun onClick(roomItem: LiveRoomConfig, position: Int) {
                 mListener.onAcceptMicSeatItemChosen(roomItem)
             }
@@ -44,7 +45,7 @@ class LivePKRequestMessageFragment : BaseFragment() {
     /**
      * 设置连麦申请列表
      */
-    fun setOnlineBroadcasterList(interactionInfo: ShowInteractionInfo?, roomList : List<LiveRoomConfig>) {
+    fun setOnlineBroadcasterList(interactionInfo: ShowInteractionInfo?, roomList: List<LiveRoomConfig>) {
         if (mBinding == null) return
         if (roomList.isEmpty()) {
             binding.linkRequestListEmptyImg.visibility = View.VISIBLE
@@ -70,7 +71,7 @@ class LivePKRequestMessageFragment : BaseFragment() {
         updateUI(userName, status)
     }
 
-    fun setListener(listener : Listener) {
+    fun setListener(listener: Listener) {
         mListener = listener
     }
 
@@ -84,7 +85,9 @@ class LivePKRequestMessageFragment : BaseFragment() {
         if (status == ShowInteractionStatus.pking.value) {
             binding.textPking.isVisible = true
             binding.iBtnStopPK.isVisible = true
-            binding.textPking.text = "与主播 $userName PK中"
+            if (isAdded) {
+                binding.textPking.text = getString(R.string.show_pk_to, userName)
+            }
         } else if (status == null) {
             binding.iBtnStopPK.isVisible = false
             binding.textPking.isVisible = false

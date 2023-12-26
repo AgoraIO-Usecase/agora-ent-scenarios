@@ -1,7 +1,5 @@
 package io.agora.scene.ktv.debugSettings;
 
-import io.agora.scene.ktv.widget.MusicSettingDialog;
-
 public class KTVDebugSettingBean {
     private final KTVDebugSettingsDialog.Callback mCallback;
 
@@ -40,5 +38,9 @@ public class KTVDebugSettingBean {
         this.mScoringOffset = offset;
 
         this.mCallback.onScoringControl(level, offset);
+    }
+
+    public void setParameters(String parameters) {
+        this.mCallback.onSetParameters(parameters);
     }
 }

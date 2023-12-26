@@ -36,6 +36,6 @@ struct TemplateScene {
         var userId: String = "\(UserInfo.userId)"
         var backgroundId: String = .init(format: "portrait%02d", Int.random(in: 1...2))
         var objectId: String?
-        var videoUrl: String? = "https://webdemo-pull-hdl.agora.io/lbhd/sample1.flv"
+        var videoUrl: String? = ""
     }
 }

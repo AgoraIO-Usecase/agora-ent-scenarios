@@ -125,9 +125,9 @@
                         android:gravity="center"
                         android:paddingHorizontal="6dp"
                         android:text="@string/show_setting_preset_recommend"
-                        android:visibility="gone"
                         android:textColor="#CE27FB"
                         android:textSize="12sp"
+                        android:visibility="gone"
                         app:layout_constraintBottom_toBottomOf="@+id/enhanceLowDeviceDes"
                         app:layout_constraintStart_toEndOf="@id/enhanceLowDeviceDes"
                         app:layout_constraintTop_toTopOf="@id/enhanceLowDeviceDes" />
@@ -293,9 +293,9 @@
                         android:gravity="center"
                         android:paddingHorizontal="6dp"
                         android:text="@string/show_setting_preset_recommend"
-                        android:visibility="gone"
                         android:textColor="#CE27FB"
                         android:textSize="12sp"
+                        android:visibility="gone"
                         app:layout_constraintBottom_toBottomOf="@+id/basicLowDeviceDes"
                         app:layout_constraintStart_toEndOf="@id/basicLowDeviceDes"
                         app:layout_constraintTop_toTopOf="@id/basicLowDeviceDes" />

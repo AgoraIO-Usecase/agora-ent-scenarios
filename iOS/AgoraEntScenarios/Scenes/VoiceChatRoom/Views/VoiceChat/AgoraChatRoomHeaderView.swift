@@ -36,10 +36,8 @@ class AgoraChatRoomHeaderView: UIView {
     private var richView: UIView = .init()
     private var totalCountLabel: UILabel = .init()
     private var giftBtn: UIButton = .init()
-    private var lookBtn: UIButton = .init()
     private var noticeView: UIView = .init()
     private var configView: UIView = .init()
-    private var soundSetLabel: UILabel = .init()
     private var soundClickBtn: UIButton = .init()
 
     private var rankFBtn: UIButton = .init() // 榜一大哥
@@ -51,24 +49,21 @@ class AgoraChatRoomHeaderView: UIView {
     func updateHeader(with room_entity: VRRoomEntity?) {
         guard let room = room_entity else {return}
         guard let owner = room.owner else { return }
-        self.iconImgView.sd_setImage(with: URL(string: owner.portrait ?? ""), placeholderImage: UIImage("mine_avatar_placeHolder"))
-        self.titleLabel.text = owner.name
+        self.iconImgView.sd_setImage(with: URL(string: owner.portrait ?? ""), placeholderImage:UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"))
+        self.titleLabel.text = "\((room.member_list?.count ?? 0)+(room.owner?.chat_uid ?? "" == VoiceRoomUserInfo.shared.user?.chat_uid ?? "" ? 3:4))在线 ｜ \(room.click_count ?? 0)观看"
         self.roomLabel.text = room.name
-        self.lookBtn.setTitle(" \(room.click_count ?? 0)", for: .normal)
-        self.totalCountLabel.text = "\((room.member_list?.count ?? 0)+(room.owner?.chat_uid ?? "" == VoiceRoomUserInfo.shared.user?.chat_uid ?? "" ? 3:4))"
         let gift_count = room.gift_amount ?? 0
         let count = gift_count >= 1000 ? afterDecimals(value: gift_count) : "\(gift_count)"
         self.giftBtn.setTitle(" \(count)", for: .normal)
         self.giftBtn.snp.updateConstraints { make in
             make.width.greaterThanOrEqualTo(gift_count >= 100 ? 50 : 40)
         }
-        self.soundSetLabel.text = getSoundType(with: room.sound_effect)
+        self.soundClickBtn.setTitle(" \(getSoundType(with: room.sound_effect))", for: .normal)
         updateGiftList(with: room)
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
         layoutUI()
     }
 
@@ -82,12 +77,24 @@ class AgoraChatRoomHeaderView: UIView {
                                    for: .normal)
         backBtn.addTarget(self, action: #selector(back), for: .touchUpInside)
         backBtn.vm_expandSize(size: 20)
+        backBtn.accessibilityIdentifier = "voice_chat_room_back_btn"
         addSubview(backBtn)
 
         addSubview(moreBtn)
+        
+        let backView = UIView()
+        backView.backgroundColor = UIColor(red: 8/255.0, green: 6/255.0, blue: 47/255.0, alpha: 0.3)
+        backView.layer.cornerRadius = 16
+        backView.layer.masksToBounds = true
+        addSubview(backView)
+        
+        let backTap = UITapGestureRecognizer(target: self, action: #selector(members))
+        backView.addGestureRecognizer(backTap)
+        backView.isUserInteractionEnabled = true
 
-        iconImgView.layer.cornerRadius = 16~
+        iconImgView.layer.cornerRadius = 16
         iconImgView.layer.masksToBounds = true
+        iconImgView.contentMode = .scaleAspectFill
         addSubview(iconImgView)
 
         roomLabel.textColor = .white
@@ -101,7 +108,7 @@ class AgoraChatRoomHeaderView: UIView {
         addSubview(titleLabel)
 
         totalCountLabel.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.2)
-        totalCountLabel.layer.cornerRadius = 13~
+        totalCountLabel.layer.cornerRadius = 13
         totalCountLabel.text = "0"
         totalCountLabel.font = UIFont.systemFont(ofSize: 11)
         totalCountLabel.textColor = .white
@@ -110,26 +117,27 @@ class AgoraChatRoomHeaderView: UIView {
         totalCountLabel.isUserInteractionEnabled = true
         totalCountLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(members)))
         addSubview(totalCountLabel)
+        totalCountLabel.isHidden = true
 
-        rankFBtn.layer.cornerRadius = 13~
+        rankFBtn.layer.cornerRadius = 13
         rankFBtn.layer.masksToBounds = true
         rankFBtn.addTargetFor(self, action: #selector(rankClick), for: .touchUpInside)
         addSubview(rankFBtn)
         rankFBtn.isHidden = true
 
-        rankSBtn.layer.cornerRadius = 13~
+        rankSBtn.layer.cornerRadius = 13
         rankSBtn.layer.masksToBounds = true
         rankSBtn.addTargetFor(self, action: #selector(rankClick), for: .touchUpInside)
         addSubview(rankSBtn)
         rankSBtn.isHidden = true
 
-        rankTBtn.layer.cornerRadius = 13~
+        rankTBtn.layer.cornerRadius = 13
         rankTBtn.layer.masksToBounds = true
         rankTBtn.addTargetFor(self, action: #selector(rankClick), for: .touchUpInside)
         addSubview(rankTBtn)
         rankTBtn.isHidden = true
 
-        configView.layer.cornerRadius = 11~
+        configView.layer.cornerRadius = 11
         configView.layer.masksToBounds = true
         configView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.1)
         addSubview(configView)
@@ -137,38 +145,23 @@ class AgoraChatRoomHeaderView: UIView {
         let soundSetView = UIView()
         addSubview(soundSetView)
 
-        soundSetLabel.text = ""
-        soundSetLabel.textColor = .white
-        soundSetLabel.font = UIFont.systemFont(ofSize: 10)
-        addSubview(soundSetLabel)
-
-        let soundImgView = UIImageView()
-        soundImgView.image = UIImage("icons／outlined／arrow_right")
-        addSubview(soundImgView)
-
         soundClickBtn.backgroundColor = .clear
+        soundClickBtn.setImage(UIImage.sceneImage(name: "voice_type_set", bundleName: "VoiceChatRoomResource"), for: .normal)
         soundClickBtn.addTargetFor(self, action: #selector(soundClick), for: .touchUpInside)
         addSubview(soundClickBtn)
+        soundClickBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         soundClickBtn.vm_expandSize(size: 20)
 
         giftBtn.layer.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.1).cgColor
-        giftBtn.layer.cornerRadius = 11~
-        giftBtn.setImage(UIImage("liwu"), for: .normal)
+        giftBtn.layer.cornerRadius = 11
+        giftBtn.setImage(UIImage.sceneImage(name: "voice_ic_gifts", bundleName: "VoiceChatRoomResource"), for: .normal)
         giftBtn.setTitle(" 0", for: .normal)
         giftBtn.titleLabel?.font = UIFont.systemFont(ofSize: 10)
         giftBtn.isUserInteractionEnabled = false
         addSubview(giftBtn)
 
-        lookBtn.layer.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.1).cgColor
-        lookBtn.layer.cornerRadius = 11~
-        lookBtn.titleLabel?.font = UIFont.systemFont(ofSize: 10)~
-        lookBtn.setTitle(" 0", for: .normal)
-        lookBtn.isUserInteractionEnabled = false
-        lookBtn.setImage(UIImage(named: "guankan"), for: .normal)
-        addSubview(lookBtn)
-
         noticeView.layer.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.1).cgColor
-        noticeView.layer.cornerRadius = 11~
+        noticeView.layer.cornerRadius = 11
         addSubview(noticeView)
 
         let tap = UITapGestureRecognizer(target: self, action: #selector(click))
@@ -176,42 +169,45 @@ class AgoraChatRoomHeaderView: UIView {
         noticeView.isUserInteractionEnabled = true
 
         let imgView = UIImageView()
-        imgView.image = UIImage("gonggao")
+        imgView.image = UIImage.sceneImage(name: "voice_ic_notice", bundleName: "VoiceChatRoomResource")
         noticeView.addSubview(imgView)
 
         let notiLabel = UILabel()
-        notiLabel.text = LanguageManager.localValue(key: "Notice")
+        notiLabel.text = LanguageManager.localValue(key: "voice_notice")
         notiLabel.font = UIFont.systemFont(ofSize: 12)
         notiLabel.textColor = .white
         noticeView.addSubview(notiLabel)
 
-        let arrowImgView = UIImageView()
-        arrowImgView.image = UIImage("icons／outlined／arrow_right")
-        noticeView.addSubview(arrowImgView)
-
-        let isHairScreen = SwiftyFitsize.isFullScreen
+        let isHairScreen =  Screen.isFullScreen
         backBtn.snp.makeConstraints { make in
             make.trailing.equalTo(-15)
-            make.top.equalTo(isHairScreen ? 54~ : 54~ - 25)
+            make.top.equalTo(isHairScreen ? 54 : 54 - 25)
+        }
+        
+        backView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(12)
+            make.centerY.equalTo(self.backBtn)
+            make.width.equalTo(200)
+            make.height.equalTo(32)
         }
 
         iconImgView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(12)
             make.centerY.equalTo(self.backBtn)
-            make.width.height.equalTo(32~)
+            make.width.height.equalTo(32)
         }
 
         roomLabel.snp.makeConstraints { make in
             make.left.equalTo(self.iconImgView.snp.right).offset(8)
             make.height.equalTo(20)
-            make.width.lessThanOrEqualTo(150~)
+            make.width.lessThanOrEqualTo(150)
             make.top.equalTo(self.iconImgView)
         }
 
         titleLabel.snp.makeConstraints { make in
             make.left.equalTo(self.iconImgView.snp.right).offset(8)
             make.height.equalTo(14)
-            make.width.lessThanOrEqualTo(150~)
+            make.width.lessThanOrEqualTo(150)
             make.bottom.equalTo(self.iconImgView)
         }
         
@@ -220,87 +216,57 @@ class AgoraChatRoomHeaderView: UIView {
             make.centerY.equalTo(backBtn.snp.centerY)
             make.width.equalTo(24)
         }
-        
-        totalCountLabel.snp.makeConstraints { make in
-            make.right.equalTo(moreBtn.snp.left).offset(-10)
-            make.centerY.equalTo(self.backBtn)
-            make.width.height.equalTo(26~)
-        }
-
-        soundImgView.snp.makeConstraints { make in
-            make.top.equalTo(isHairScreen ? 98~ : 98~ - 25)
-            make.right.equalTo(self.snp.right).offset(-15)
-            make.width.height.equalTo(10~)
-        }
-
-        soundSetLabel.snp.makeConstraints { make in
-            make.right.equalTo(soundImgView.snp.left).offset(-2)
-            make.centerY.equalTo(soundImgView)
-        }
 
         configView.snp.makeConstraints { make in
-            make.right.equalTo(self.snp.right).offset(19)
-            make.height.equalTo(22~)
-            make.left.equalTo(soundSetLabel.snp.left).offset(-9)
-            make.centerY.equalTo(soundImgView)
+            make.height.equalTo(22)
+            make.right.equalTo(self.snp.right).offset(-15)
+            make.top.equalTo(isHairScreen ? 98 : 98 - 25)
+            make.width.equalTo(100)
         }
 
         soundClickBtn.snp.makeConstraints { make in
             make.top.right.bottom.left.equalTo(self.configView)
         }
-
-        giftBtn.snp.makeConstraints { make in
+        
+        noticeView.snp.makeConstraints { make in
             make.left.equalTo(self.snp.left).offset(15)
             make.centerY.equalTo(self.configView)
+            make.height.equalTo(22)
+        }
+
+        giftBtn.snp.makeConstraints { make in
+            make.left.equalTo(self.noticeView.snp.right).offset(5)
+            make.centerY.equalTo(self.configView)
             make.width.greaterThanOrEqualTo(50)
-            make.height.equalTo(22~)
-        }
-
-        lookBtn.snp.makeConstraints { make in
-            make.left.equalTo(self.giftBtn.snp.right).offset(5)
-            make.centerY.equalTo(self.configView)
-            make.width.greaterThanOrEqualTo(40)
-            make.height.equalTo(22~)
-        }
-
-        noticeView.snp.makeConstraints { make in
-            make.left.equalTo(self.lookBtn.snp.right).offset(5)
-            make.centerY.equalTo(self.configView)
-            make.height.equalTo(22~)
+            make.height.equalTo(22)
         }
 
         imgView.snp.makeConstraints { make in
             make.left.equalTo(self.noticeView).offset(5)
             make.centerY.equalTo(self.noticeView)
-            make.width.height.equalTo(15~)
-        }
-
-        arrowImgView.snp.makeConstraints { make in
-            make.right.equalTo(self.noticeView).offset(-5~)
-            make.centerY.equalTo(self.noticeView)
-            make.width.height.equalTo(10~)
+            make.width.height.equalTo(15)
         }
 
         notiLabel.snp.makeConstraints { make in
-            make.left.equalTo(imgView.snp.right).offset(5~)
-            make.right.equalTo(arrowImgView.snp.left).offset(-5~)
+            make.left.equalTo(imgView.snp.right).offset(5)
+            make.right.equalTo(noticeView.snp.right).offset(-5)
             make.centerY.equalTo(self.noticeView)
         }
 
         rankFBtn.snp.makeConstraints { make in
             make.centerY.equalTo(self.backBtn)
             make.width.height.equalTo(26)
-            make.right.equalTo(self.totalCountLabel.snp.left).offset(-70)
+            make.trailing.equalTo(-104)
         }
         rankSBtn.snp.makeConstraints { make in
             make.centerY.equalTo(self.backBtn)
             make.width.height.equalTo(26)
-            make.right.equalTo(self.totalCountLabel.snp.left).offset(-40)
+            make.trailing.equalTo(-84)
         }
         rankTBtn.snp.makeConstraints { make in
             make.centerY.equalTo(self.backBtn)
             make.width.height.equalTo(26)
-            make.right.equalTo(self.totalCountLabel.snp.left).offset(-10)
+            make.trailing.equalTo(-64)
         }
     }
 
@@ -351,7 +317,7 @@ class AgoraChatRoomHeaderView: UIView {
                 
                 rankFBtn.isHidden = false
                 rankFBtn.snp.updateConstraints { make in
-                    make.right.equalTo(totalCountLabel.snp.left).offset(-10)
+                    make.trailing.equalTo(-64)
                 }
                 var img_first: UIImage?
                 getImage(with: fImg) { img in
@@ -369,10 +335,10 @@ class AgoraChatRoomHeaderView: UIView {
                 rankFBtn.isHidden = false
                 rankSBtn.isHidden = false
                 rankFBtn.snp.updateConstraints { make in
-                    make.right.equalTo(self.totalCountLabel.snp.left).offset(-40)
+                    make.trailing.equalTo(-84)
                 }
                 rankSBtn.snp.updateConstraints { make in
-                    make.right.equalTo(self.totalCountLabel.snp.left).offset(-10)
+                    make.trailing.equalTo(-64)
                 }
                 
                 var img_second: UIImage?
@@ -392,13 +358,13 @@ class AgoraChatRoomHeaderView: UIView {
                 rankSBtn.isHidden = false
                 rankTBtn.isHidden = false
                 rankFBtn.snp.updateConstraints { make in
-                    make.right.equalTo(self.totalCountLabel.snp.left).offset(-70)
+                    make.trailing.equalTo(-104)
                 }
                 rankSBtn.snp.updateConstraints { make in
-                    make.right.equalTo(self.totalCountLabel.snp.left).offset(-40)
+                    make.trailing.equalTo(-84)
                 }
                 rankTBtn.snp.updateConstraints { make in
-                    make.right.equalTo(self.totalCountLabel.snp.left).offset(-10)
+                    make.trailing.equalTo(-64)
                 }
                 
                 var img_third: UIImage?
@@ -417,18 +383,18 @@ class AgoraChatRoomHeaderView: UIView {
     }
     
     private func getSoundType(with index: Int) -> String {
-        var soundType: String = "Social Chat".localized()
+        var soundType: String = "voice_social_chat".voice_localized()
         switch index {
         case 1:
-            soundType = "Social Chat".localized()
+            soundType = "voice_social_chat".voice_localized()
         case 2:
-            soundType = "Karaoke".localized()
+            soundType = "voice_karaoke".voice_localized()
         case 3:
-            soundType = "Gaming Buddy".localized()
+            soundType = "voice_gaming_buddy".voice_localized()
         case 4:
-            soundType = "Professional Podcaster".localized()
+            soundType = "voice_professional_podcaster".voice_localized()
         default:
-            soundType = "Social Chat".localized()
+            soundType = "voice_social_chat".voice_localized()
         }
         return soundType
     }

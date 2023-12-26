@@ -5,7 +5,7 @@
 
 #import "VLSelectedSongListCell.h"
 #import "VLSongItmModel.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import SDWebImage;
 
 @implementation VLSelectedSongListCell
@@ -31,18 +31,6 @@
     self.nameLabel.font = UIFontBoldMake(15);
     [self addSubview:self.nameLabel];
     
-
-//    self.typeLabel = [[UILabel alloc]init];
-//    self.typeLabel.textColor = UIColorMakeWithHex(@"#6C7192");
-//    self.typeLabel.font = UIFontMake(9);
-//    self.typeLabel.layer.cornerRadius = 4;
-//    self.typeLabel.layer.masksToBounds = YES;
-//    self.typeLabel.layer.borderWidth = 1.0f;
-//    self.typeLabel.textAlignment = NSTextAlignmentCenter;
-//    self.typeLabel.layer.borderColor = UIColorMakeWithHex(@"#6C7192").CGColor;
-//    [self addSubview:self.typeLabel];
-//    self.typeLabel.text = @"合唱";
-    
     self.singerLabel = [[UILabel alloc]init];
     self.singerLabel.textColor = UIColorMakeWithHex(@"#6C7192");
     self.singerLabel.font = UIFontMake(12);
@@ -52,7 +40,8 @@
     self.chooseBtn = [[UIButton alloc]init];
     [self.chooseBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
     self.chooseBtn.titleLabel.font = UIFontMake(12.0);
-    [self.chooseBtn setTitle:KTVLocalizedString(@"点歌") forState:UIControlStateNormal];
+    [self.chooseBtn setTitle:KTVLocalizedString(@"ktv_room_choose_song") forState:UIControlStateNormal];
+    self.chooseBtn.accessibilityIdentifier = @"ktv_choose_song_button_id";
     [self.chooseBtn setBackgroundColor:UIColorMakeWithHex(@"#2753FF")];
     self.chooseBtn.layer.cornerRadius = 14;
     self.chooseBtn.layer.masksToBounds = YES;
@@ -89,11 +78,11 @@
     
     if (songItemModel.ifChoosed) {
         self.chooseBtn.enabled = NO;
-        [self.chooseBtn setTitle:KTVLocalizedString(@"已点") forState:UIControlStateNormal];
+        [self.chooseBtn setTitle:KTVLocalizedString(@"ktv_room_chosen_song_list") forState:UIControlStateNormal];
         [self.chooseBtn setBackgroundColor:UIColorMakeWithRGBA(0, 0, 0, 0.4)];
     }else{
         self.chooseBtn.enabled = YES;
-        [self.chooseBtn setTitle:KTVLocalizedString(@"点歌") forState:UIControlStateNormal];
+        [self.chooseBtn setTitle:KTVLocalizedString(@"ktv_room_choose_song") forState:UIControlStateNormal];
         [self.chooseBtn setBackgroundColor:UIColorMakeWithHex(@"#2753FF")];
     }
 

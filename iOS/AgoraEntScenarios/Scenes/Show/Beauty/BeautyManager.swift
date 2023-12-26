@@ -21,16 +21,48 @@ class BeautyManager: NSObject {
         }
     }
     
+    public let beautyAPI = BeautyAPI()
+    
+    override init() {
+        super.init()
+    
+        switch BeautyModel.beautyType {
+        case .byte:
+            beautyAPI.beautyRender = ByteBeautyManager.shareManager.render
+        case .sense:
+            beautyAPI.beautyRender = SenseBeautyManager.shareManager.render
+        }
+    }
+    
     var isEnableBeauty: Bool = true {
         didSet {
-            switch BeautyModel.beautyType {
-            case .byte:
-                ByteBeautyManager.shareManager.isEnableBeauty = isEnableBeauty
-                
-            case .sense:
-                SenseBeautyManager.shareManager.isEnableBeauty = isEnableBeauty
-            }
+            beautyAPI.enable(isEnableBeauty)
         }
+    }
+    
+    func configBeautyAPIWithRtcEngine(engine: AgoraRtcEngineKit) {
+        let config = BeautyConfig()
+        config.rtcEngine = engine
+        config.captureMode = .agora
+        switch BeautyModel.beautyType {
+        case .byte:
+            config.beautyRender = ByteBeautyManager.shareManager.render
+        case .sense:
+            config.beautyRender = SenseBeautyManager.shareManager.render
+        }
+        config.statsEnable = false
+        config.statsDuration = 1
+        config.eventCallback = { stats in
+            print("min == \(stats.minCostMs)")
+            print("max == \(stats.maxCostMs)")
+            print("averageCostMs == \(stats.averageCostMs)")
+        }
+        let result = beautyAPI.initialize(config)
+        if result != 0 {
+            print("initialize error == \(result)")
+        }
+        beautyAPI.initialize(config)
+        beautyAPI.enable(true)
     }
     
     func setBeauty(path: String?, key: String?, value: CGFloat) {
@@ -115,16 +147,6 @@ class BeautyManager: NSObject {
         }
     }
     
-    func processFrame(pixelBuffer: CVPixelBuffer?) -> CVPixelBuffer? {
-        switch BeautyModel.beautyType {
-        case .byte:
-            return ByteBeautyManager.shareManager.processFrame(pixelBuffer: pixelBuffer)
-            
-        case .sense:
-            return SenseBeautyManager.shareManager.processFrame(pixelBuffer: pixelBuffer)
-        }
-    }
-    
     func destroy() {
         switch BeautyModel.beautyType {
         case .byte:
@@ -134,5 +156,8 @@ class BeautyManager: NSObject {
             SenseBeautyManager.shareManager.destroy()
         }
         BeautyManager._sharedManager = nil
+        ShowAgoraKitManager.shared.enableVirtualBackground(isOn: false,
+                                                           greenCapacity: 0)
+        ShowAgoraKitManager.shared.seVirtualtBackgoundImage(imagePath: nil, isOn: false)
     }
 }
