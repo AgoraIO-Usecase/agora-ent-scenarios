@@ -73,6 +73,7 @@
             android:singleLine="true"
             android:textColor="@color/white"
             android:hint="@string/joy_live_prepare_room_name_hint"
+            app:layout_constraintEnd_toStartOf="@+id/iBtnRefresh"
             android:textColorHint="@color/white_60_percent"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"

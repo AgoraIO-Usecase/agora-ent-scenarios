@@ -14,6 +14,7 @@ import java.util.UUID
 class JoyGameRepo constructor(private val service: JoyApiService) : BaseRepository() {
 
     companion object{
+        const val ERROR_CODE_ERROR = 1300
         const val CODE_NO_CLOUD_HOST = 2002
     }
 

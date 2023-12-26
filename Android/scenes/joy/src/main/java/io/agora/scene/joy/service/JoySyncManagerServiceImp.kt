@@ -119,7 +119,7 @@ class JoySyncManagerServiceImp constructor(
         initSync {
             Sync.Instance().getScenes(object : Sync.DataListCallback {
                 override fun onSuccess(result: MutableList<IObject>?) {
-                    JoyLogger.d(TAG, "getRoomList success")
+                    JoyLogger.d(TAG, "getRoomList success ${result?.size}")
                     mRoomMap.clear()
                     val ret = ArrayList<JoyRoomInfo>()
                     result?.forEach {

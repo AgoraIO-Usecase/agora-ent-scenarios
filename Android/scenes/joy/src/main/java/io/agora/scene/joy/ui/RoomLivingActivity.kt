@@ -414,7 +414,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
             override fun onRoomDidDestroy(roomInfo: JoyRoomInfo, abnormal: Boolean) {
                 destroy()
-                showLivingEndLayout(abnormal) // 房间到了限制时间
+                showLivingEndLayout(abnormal)
                 JoyLogger.d("showLivingEndLayout", "timer end! abnormal:$abnormal")
             }
 
@@ -865,6 +865,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             mRtcEngine.stopPreview()
         }
         mRtcEngine.leaveChannelEx(mMainRtcConnection)
+        binding.flVideoContainer.removeAllViews()
+        binding.flAssistantContainer.removeAllViews()
+        binding.flVideoContainer.isVisible = false
+        binding.flAssistantContainer.isVisible = false
     }
 
     private fun sendMouseMessage(event: MotionEvent, value: Int) {
