@@ -29,16 +29,16 @@ enum HomeContentType: Int {
     
     var sceneName: String {
         switch self {
-        case .solo: return "KTV"
-        case .snatch_singing: return "KTV"
-        case .chorus: return "KTV"
-        case .continue_singing: return "KTV"
-        case .voice_chat: return "ChatRoom"
-        case .spatial_voice: return "SpatialAudioChatRoom"
-        case .show: return "LiveShow"
-        case .one_v_one: return "Pure1v1"
-        case .multiple: return ""
-        case .show_private_one_v_one: return "ShowTo1v1"
+        case .solo: return "KTV_SoloChorus"
+        case .snatch_singing: return "KTV_SingBattle"
+        case .chorus: return "KTV_Cantata"
+        case .continue_singing: return "KTV_SingRelay"
+        case .voice_chat: return "Voice_ChatRoom"
+        case .spatial_voice: return "Voice_Spatial"
+        case .show: return "Live_Show"
+        case .one_v_one: return "Live_Pure1v1"
+        case .multiple: return "Live_MultiPlayer"
+        case .show_private_one_v_one: return "Live_Show1v1"
         }
     }
 }
