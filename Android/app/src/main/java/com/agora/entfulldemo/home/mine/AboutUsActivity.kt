@@ -34,6 +34,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val kKtvRoomAppID = "io.agora.ktv"
     private val kChatRoomAppID = "io.agora.chatroom"
     private val kFullAppID = "io.agora.AgoraVoice"
+    private val kSingRelayAppID = "io.agora.singrelay"
     private val kSingBattleRoomAppID = "io.agora.singbattle"
     private val kShowRoomAppID = "io.agora.test.entfull"
 
@@ -59,12 +60,19 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             setupSingBattleRoomAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kShowRoomAppID) {
             setupShowRoomAppInfo()
+        } else if (BuildConfig.APPLICATION_ID == kSingRelayAppID) {
+            setupSingRelayAppInfo()
         } else {
             setupFullAppInfo()
         }
         setupDebugMode()
         setupClickWebAction()
         setupClickPhoneAction()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacksAndMessages(null)
     }
 
     // 设置K歌房App的信息
@@ -85,6 +93,19 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             adapter.appInfo = AppInfo(
                 this.getString(R.string.app_about_name),
                 "20230110-" + VersionUtils.getVersion("io.agora.scene.voice.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
+                servicePhone,
+                webSite
+            )
+        }
+    }
+
+    // 设置接唱App的信息
+    private fun setupSingRelayAppInfo() {
+        adapter.scenes = mutableListOf<SceneInfo>()
+        if (VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig").isNotEmpty()) {
+            adapter.appInfo = AppInfo(
+                this.getString(R.string.app_sing_relay),
+                "20230830-" + VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
@@ -142,6 +163,22 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
                 )
             )
         }
+        if (VersionUtils.getVersion("io.agora.scene.ktv.singbattle.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_singbattle),
+                    "QC-" + VersionUtils.getVersion("io.agora.scene.ktv.singbattle.BuildConfig")
+                )
+            )
+        }
+        if (VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_sing_relay),
+                    "JC-" + VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig")
+                )
+            )
+        }
         if (VersionUtils.getVersion("io.agora.scene.show.BuildConfig").isNotEmpty()) {
             scenes.add(
                 SceneInfo(
@@ -150,23 +187,23 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
                 )
             )
         }
-        if (VersionUtils.getVersion("io.agora.scene.ktv.singbattle.BuildConfig").isNotEmpty()) {
-            scenes.add(
-                SceneInfo(
-                    this.getString(R.string.app_about_singbattle),
-                    "HGQC-" + VersionUtils.getVersion("io.agora.scene.ktv.singbattle.BuildConfig")
-                )
-            )
-        }
         if (VersionUtils.getVersion("io.agora.scene.pure1v1.BuildConfig").isNotEmpty()) {
             scenes.add(
                 SceneInfo(
                     this.getString(R.string.app_about_pure1v1),
-                    VersionUtils.getVersion("io.agora.scene.pure1v1.BuildConfig")
+                    "SMF-" + VersionUtils.getVersion("io.agora.scene.pure1v1.BuildConfig")
                 )
             )
         }
-        val versionTime = "20230530-"
+        if (VersionUtils.getVersion("io.agora.scene.showTo1v1.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_showTo1v1),
+                    "XCSMF-" + VersionUtils.getVersion("io.agora.scene.showTo1v1.BuildConfig")
+                )
+            )
+        }
+        val versionTime = "20231230-"
         if (scenes.size == 1) {
             adapter.scenes = mutableListOf()
             val scene = scenes[0]
@@ -210,19 +247,21 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         }
     }
 
+    private val handler = Handler()
     private fun setupDebugMode() {
         binding.tvDebugMode.visibility = View.INVISIBLE
-        adapter.onClickVersionListener = {
-            if (counts == 0 || System.currentTimeMillis() - beginTime > debugModeOpenTime) {
-                beginTime = System.currentTimeMillis()
-                counts = 0
-            }
-            counts++
-            if (counts > 5) {
-                counts = 0
-                binding.tvDebugMode.visibility = View.VISIBLE
-                AgoraApplication.the().enableDebugMode(true)
-                ToastUtils.showToast(R.string.app_debug_open)
+        adapter.onTouchVersionListener = { event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    handler.postDelayed({
+                        binding.tvDebugMode.visibility = View.VISIBLE
+                        AgoraApplication.the().enableDebugMode(true)
+                        ToastUtils.showToast(R.string.app_debug_open)
+                    }, 5000)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    handler.removeCallbacksAndMessages(null)
+                }
             }
         }
         binding.tvDebugMode.setOnClickListener {
@@ -279,7 +318,7 @@ private class AboutUsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>()
 
     var onClickWebSiteListener: (() -> Unit)? = null
 
-    var onClickVersionListener: (() -> Unit)? = null
+    var onTouchVersionListener: ((MotionEvent) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == VIEW_TYPE_APP_INFO) {
@@ -301,8 +340,9 @@ private class AboutUsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>()
                 current.binding.tvHomeWebSite.text = it.webSite
             }
             current.binding.tvSceneSubTitle.visibility = if (scenes.size > 1) View.VISIBLE else View.INVISIBLE
-            current.binding.tvVersion.setOnClickListener {
-                onClickVersionListener?.invoke()
+            current.binding.tvVersion.setOnTouchListener { _, event ->
+                onTouchVersionListener?.invoke(event)
+                false
             }
             current.binding.vServicePhone.setOnClickListener {
                 onClickPhoneListener?.invoke()

@@ -11,11 +11,12 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.agora.scene.ktv.singbattle.databinding.KtvLayoutGameRankListViewBinding;
+import io.agora.scene.ktv.singbattle.R;
+import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleLayoutGameRankListViewBinding;
 
 public class RankListView extends FrameLayout {
-    protected KtvLayoutGameRankListViewBinding mBinding;
-    private final RankListAdapter mAdapter = new RankListAdapter();
+    protected KtvSingbattleLayoutGameRankListViewBinding mBinding;
+    private final RankListAdapter mAdapter = new RankListAdapter(getContext());
     public RankListView(@NonNull Context context) {
         this(context, null);
     }
@@ -30,20 +31,19 @@ public class RankListView extends FrameLayout {
     }
 
     private void init(Context context) {
-        mBinding = KtvLayoutGameRankListViewBinding.inflate(LayoutInflater.from(context), this, true);
+        mBinding = KtvSingbattleLayoutGameRankListViewBinding.inflate(LayoutInflater.from(context), this, true);
         mBinding.rvRankList.setAdapter(mAdapter);
     }
 
     public void resetRankList(List<RankItem> list) {
-        List<RankItem> newList = new ArrayList<>();
-        newList.addAll(list);
+        List<RankItem> newList = new ArrayList<>(list);
         if (list.size() < 3) {
             for (int i = 0; i < 3 - list.size(); i++) {
                 RankItem emptyItem = new RankItem();
                 emptyItem.score = -1;
                 emptyItem.songNum = -1;
-                emptyItem.userName = "暂无上榜";
-                emptyItem.poster = "";
+                emptyItem.userName = getContext().getString(R.string.ktv_singbattle_no_preson);
+                emptyItem.poster = "null";
                 newList.add(emptyItem);
             }
         }

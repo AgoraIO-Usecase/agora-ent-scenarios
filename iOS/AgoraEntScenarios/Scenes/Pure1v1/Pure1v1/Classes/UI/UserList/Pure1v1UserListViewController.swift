@@ -158,7 +158,7 @@ extension Pure1v1UserListViewController {
     
     private func _call(user: Pure1v1UserInfo) {
         pure1v1Print("_call with state:\(callState.rawValue)")
-        if callState == .idle {
+        if callState == .idle || callState == .failed {
             _setupCallApi()
             AUIToast.show(text: "call_not_init".pure1v1Localization())
             return
@@ -365,6 +365,11 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             connectedUserId = nil
             connectedChannelId = nil
             callDialog?.hiddenAnimation()
+            callVC.dismiss(animated: false)
+            if stateReason == .rtmLost {
+                AUIToast.show(text: "call_toast_disconnect".pure1v1Localization())
+                _setupCallApi()
+            }
             break
         default:
             break
@@ -429,10 +434,10 @@ extension Pure1v1UserListViewController {
         config.extraInfo = jsonStr
         let module = AgoraContentInspectModule()
         module.interval = 30
-        module.type = .imageModeration
-        config.modules = [module]
-        let ret = rtcEngine.enableContentInspectEx(enable, config: config, connection: connection)
-        pure1v1Print("setupContentInspectConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret)")
+//        module.type = .imageModeration
+//        config.modules = [module]
+//        let ret = rtcEngine.enableContentInspectEx(enable, config: config, connection: connection)
+//        pure1v1Print("setupContentInspectConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret)")
     }
     
     /// 语音审核
@@ -447,7 +452,7 @@ extension Pure1v1UserListViewController {
                                      "traceId": NSString.withUUID().md5(),
                                      "src": "iOS",
                                      "payload": userInfo.yy_modelToJSONString()]
-        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/moderation/audio",
+        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.shengwang.cn/v1/moderation/audio",
                                           params: parasm) { response in
             pure1v1Print("moderationAudio response === \(response)")
         } failure: { errr in

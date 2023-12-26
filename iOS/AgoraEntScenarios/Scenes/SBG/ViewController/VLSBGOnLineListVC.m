@@ -6,12 +6,10 @@
 #import "VLSBGOnLineListVC.h"
 #import "VLSBGHomeOnLineListView.h"
 #import "VLSBGViewController.h"
-//#import "AgoraRtm.h"
 #import "VLSBGRoomListModel.h"
 #import "VLSBGRoomSeatModel.h"
 
 #import "VLSBGPopScoreView.h"
-#import "VLLoginViewController.h"
 #import "VLSBGCreateRoomViewController.h"
 #import "LSTPopView.h"
 #import "VLUserCenter.h"
@@ -21,6 +19,7 @@
 #import "AppContext+SBG.h"
 #import "SBGMacro.h"
 #import "VLAlert.h"
+#import "AgoraEntScenarios-Swift.h"
 
 @interface VLSBGOnLineListVC ()<VLSBGHomeOnLineListViewDelegate/*,AgoraRtmDelegate*/,VLSBGPopScoreViewDelegate>
 
@@ -49,7 +48,7 @@
 
 - (void)commonUI {
     [self setBackgroundImage:@"online_list_BgIcon"];
-    [self setNaviTitleName:SBGLocalizedString(@"嗨歌抢唱")];
+    [self setNaviTitleName:SBGLocalizedString(@"sbg_name")];
     if ([VLUserCenter center].isLogin) {
         [self setBackBtn];
     }
@@ -69,7 +68,7 @@
 
 - (BOOL)checkIsLogin {
     if (![VLUserCenter center].isLogin) {
-        VLLoginViewController *loginVC = [[VLLoginViewController alloc] init];
+        VLLoginController *loginVC = [[VLLoginController alloc] init];
         [self.navigationController pushViewController:loginVC animated:YES];
         return NO;
     }
@@ -92,7 +91,18 @@
     if (![self checkIsLogin]) return;
     
     VLSBGCreateRoomViewController *createRoomVC = [[VLSBGCreateRoomViewController alloc]init];
-    [self.navigationController pushViewController:createRoomVC animated:YES];
+    createRoomVC.createRoomBlock = ^(CGFloat height) {
+        [[KTVCreateRoomPresentView shared] update:height];
+    };
+    
+    kWeakSelf(self);
+    createRoomVC.createRoomVCBlock = ^(UIViewController *vc) {
+        [[KTVCreateRoomPresentView shared] dismiss];
+        [weakself.navigationController pushViewController:vc animated:true];
+    };
+    KTVCreateRoomPresentView *presentView = [KTVCreateRoomPresentView shared];
+    [presentView showViewWith:CGRectMake(0, SCREEN_HEIGHT - 343, SCREEN_WIDTH, 343) vc:createRoomVC];
+    [self.view addSubview:presentView];
 
 }
 
@@ -100,9 +110,9 @@
     if (![self checkIsLogin]) return;
      
     if (listModel.isPrivate) {
-        NSArray *array = [[NSArray alloc]initWithObjects:SBGLocalizedString(@"取消"),SBGLocalizedString(@"确认"), nil];
+        NSArray *array = [[NSArray alloc]initWithObjects:SBGLocalizedString(@"sbg_cancel"),SBGLocalizedString(@"sbg_confirm"), nil];
         VL(weakSelf);
-        [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:SBGLocalizedString(@"输入密码") message:@"" placeHolder:SBGLocalizedString(@"请输入房间密码") type:ALERTYPETEXTFIELD buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
+        [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:SBGLocalizedString(@"sbg_input_pwd") message:@"" placeHolder:SBGLocalizedString(@"sbg_pls_input_pwd") type:ALERTYPETEXTFIELD buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
             [weakSelf joinInRoomWithModel:listModel withInPutText:text];
             [[VLAlert shared] dismiss];
         }];

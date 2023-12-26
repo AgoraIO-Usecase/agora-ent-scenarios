@@ -2,7 +2,6 @@ package io.agora.scene.ktv.widget.voiceHighlight;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -51,9 +50,8 @@ public class VoiceHighlightDialog extends BaseBottomSheetDialogFragment<KtvDialo
     @Override
     public void onItemClick(@NonNull VoiceHighlightBean data, View view, int position, long viewType) {
         OnItemClickListener.super.onItemClick(data, view, position, viewType);
-        Log.d("hugo", "onItemClick    " + position);
         if (hasHigher) {
-            ToastUtils.showToast("每首歌仅可设置一次人声突出对象，请在下首歌再设置");
+            ToastUtils.showToast(R.string.ktv_highlight_limit);
             return;
         }
         hasHigher = true;

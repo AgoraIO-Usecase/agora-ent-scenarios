@@ -3,12 +3,16 @@
 //  VoiceOnLine
 //
 
-#import "BaseViewController.h"
+#import "VLBaseViewController.h"
 #import "AgoraEntScenarios-Swift.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCreateRoomViewController : BaseViewController
+typedef void(^CreateRoomBlock)(CGFloat);
+typedef void(^CreateRoomVCBlock)(UIViewController *);
+@interface VLCreateRoomViewController : UIViewController
+@property (nonatomic, copy) CreateRoomBlock createRoomBlock;
+@property (nonatomic, copy) CreateRoomVCBlock createRoomVCBlock;
 
 @end
 

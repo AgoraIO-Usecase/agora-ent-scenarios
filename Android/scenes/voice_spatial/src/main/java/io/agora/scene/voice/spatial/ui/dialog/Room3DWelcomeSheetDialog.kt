@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogRoomWelcomeBinding
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
 
@@ -20,7 +22,10 @@ import io.agora.voice.common.ui.dialog.BaseSheetDialog
  **/
 class Room3DWelcomeSheetDialog : BaseSheetDialog<VoiceSpatialDialogRoomWelcomeBinding>() {
     // 绑定ViewBinding
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceSpatialDialogRoomWelcomeBinding? {
+    override fun getViewBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): VoiceSpatialDialogRoomWelcomeBinding {
         return VoiceSpatialDialogRoomWelcomeBinding.inflate(inflater, container, false)
     }
 
@@ -32,7 +37,13 @@ class Room3DWelcomeSheetDialog : BaseSheetDialog<VoiceSpatialDialogRoomWelcomeBi
             mbNext.setOnClickListener {
                 dismiss()
             }
+            dialog?.window?.let {
+                ViewCompat.setOnApplyWindowInsetsListener(root) { v: View?, insets: WindowInsetsCompat ->
+                    val systemInset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                    root.setPadding(0, 0, 0, root.paddingBottom + systemInset.bottom)
+                    WindowInsetsCompat.CONSUMED
+                }
+            }
         }
-
     }
 }

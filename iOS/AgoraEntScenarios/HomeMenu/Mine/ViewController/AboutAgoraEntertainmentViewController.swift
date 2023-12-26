@@ -9,27 +9,29 @@ import UIKit
 import ZSwiftBaseLib
 import AgoraRtcKit
 
-@objcMembers final class AboutAgoraEntertainmentViewController: VRBaseViewController {
+@objcMembers final class AboutAgoraEntertainmentViewController: VLBaseViewController {
     
     var infos = [["contents":[["title": NSLocalizedString("app_about_customer_service", comment: ""),
                                "detail": "400-632-6626"],
                               ["title": NSLocalizedString("app_about_official_website", comment: ""),
                                "detail":"https://www.shengwang.cn"]],
                   "sectionName": ""],
-                 ["contents": [["title": NSLocalizedString("app_voice_chat", comment: ""), "detail":"YL-2.1.0"],
-                               ["title": NSLocalizedString("app_about_chat_room_spatial", comment: ""), "detail":"YLKJ-2.1.0"],
-                               ["title": NSLocalizedString("app_about_karaoke", comment: ""),"detail":"KTV-2.3.0"],
-                               ["title": NSLocalizedString("app_about_show", comment: ""), "detail":"ZB-2.4.0"],
-                               ["title": NSLocalizedString("app_about_1v1", comment: ""), "detail":"1V1-3.6.0"],
-                               ["title": NSLocalizedString("app_about_live_to_1v1", comment: ""), "detail":"LiveTo1V1-3.7.0"]],
-                  "sectionName": NSLocalizedString("app_mine_current_version", comment: "")]]
+                 ["contents": [["title": NSLocalizedString("app_voice_chat", comment: ""), "detail":"YL-3.1.0"],
+                               ["title": NSLocalizedString("app_about_chat_room_spatial", comment: ""), "detail":"YLKJ-3.1.0"],
+                               ["title": NSLocalizedString("app_about_karaoke", comment: ""),"detail":"KTV-3.3.0"],
+                               ["title": NSLocalizedString("app_about_hiSong", comment: ""),"detail":"QC-3.4.0"],
+                               ["title": NSLocalizedString("app_about_continuesinging", comment: ""),"detail":"JC-3.5.0"],
+                               ["title": NSLocalizedString("app_about_show", comment: ""), "detail":"ZB-3.2.0"],
+                               ["title": NSLocalizedString("app_about_1v1", comment: ""), "detail":"SMF-3.6.0"],
+                               ["title": NSLocalizedString("app_about_live_to_1v1", comment: ""), "detail":"XCSMF-3.7.0"]],
+                  "sectionName": NSLocalizedString("app_about_scene_version", comment: "")]]
     
     let tableHeader = AboutAgoraHeader(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 220),
                                        name: NSLocalizedString("app_about_name", comment: ""),
-                                       versionText: NSLocalizedString("app_about_version", comment: "")+": "+"20230928-"+UIDevice.current.appVersion+"-\(AgoraRtcEngineKit.getSdkVersion())")
+                                       versionText: NSLocalizedString("app_about_version", comment: "")+": "+"20231230-"+UIDevice.current.appVersion+"-\(AgoraRtcEngineKit.getSdkVersion())")
     
     lazy var infoList: UITableView = {
-        UITableView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: ScreenHeight-ZNavgationHeight), style: .plain)
+        UITableView(frame: .zero, style: .grouped)
             .registerCell(ContactInfoCell.self, forCellReuseIdentifier: "ContactInfoCell")
             .registerCell(UITableViewCell.self, forCellReuseIdentifier: "SceneVersionCell")
             .delegate(self)
@@ -38,6 +40,9 @@ import AgoraRtcKit
             .tableHeaderView(tableHeader)
             .backgroundColor(.white)
             .separatorStyle(.none)
+            .estimatedSectionFooterHeight(0)
+            .estimatedSectionHeaderHeight(0)
+            .estimatedRowHeight(0)
     }()
     
     lazy var debugModeButton: UIButton = {
@@ -53,19 +58,24 @@ import AgoraRtcKit
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        view.backgroundColor = .white
+        setNaviTitleName(NSLocalizedString("app_about_app", comment: ""))
+        setBackBtn()
+        hiddenBackgroundImage()
+        
         tableHeader.delegate = self
-        self.view.addSubview(self.infoList)
-        self.view.bringSubviewToFront(navigation)
-        self.navigation.title.text = NSLocalizedString("app_about_app", comment: "")
+        view.addSubview(infoList)
+        infoList.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0)
         
         debugModeButton.isHidden = !AppContext.shared.isDebugMode
-        self.view.addSubview(debugModeButton)
-        self.createConstrains()
+        view.addSubview(debugModeButton)
+        createConstrains()
     }
     
     private func createConstrains() {
         infoList.snp.makeConstraints { make in
-            make.left.top.right.bottom.equalToSuperview()
+            make.left.right.bottom.equalToSuperview()
+            make.top.equalToSuperview().offset(ZNavgationHeight)
         }
         debugModeButton.snp.makeConstraints { make in
             make.left.bottom.right.equalToSuperview()
@@ -102,10 +112,13 @@ extension AboutAgoraEntertainmentViewController: UITableViewDelegate,UITableView
         }
         return 0
     }
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        0.1
+    }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 1 {
-            return 54
+            return 64
         }
         return 72
     }

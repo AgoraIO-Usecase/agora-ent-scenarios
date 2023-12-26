@@ -28,6 +28,7 @@ UICollectionViewDataSource
 @property (nonatomic, strong) VLKTVSwitcherView *soundSwitcher;
 @property (nonatomic, strong) VLKTVTonesView *tonesView;
 @property (nonatomic, strong) VLKTVSliderView *soundSlider;
+@property (nonatomic, strong) VLKTVSwitcherView *soundCardSwitcher;
 @property (nonatomic, strong) VLKTVSliderView *accSlider;
 @property (nonatomic, strong) VLKTVSliderView *remoteSlider;
 @property (nonatomic, strong) VLKTVKindsView *kindsView;
@@ -51,7 +52,7 @@ UICollectionViewDataSource
         self.remoteSlider.value = 0.3;
         self.setting.remoteVolume = 40;
         self.cellWidth = (CGRectGetWidth([UIScreen mainScreen].bounds) - 48) / 4.0;
-        self.titles = @[@"原声", @"KTV",@"演唱会", @"录音棚", @"留声机", @"空旷", @"空灵", @"流行",@"R&B"];
+        self.titles = @[ KTVLocalizedString(@"ktv_effect_off"), @"KTV",KTVLocalizedString(@"ktv_effect_concert"), KTVLocalizedString(@"ktv_effect_studio"), KTVLocalizedString(@"ktv_effect_phonograph"), KTVLocalizedString(@"ktv_effect_spatial"), KTVLocalizedString(@"ktv_effect_ethereal"), KTVLocalizedString(@"ktv_effect_pop"),@"R&B"];
         self.effectImgs = @[@"ktv_console_setting1",@"ktv_console_setting2",@"ktv_console_setting3",@"ktv_console_setting4"];
     }
     return self;
@@ -64,7 +65,7 @@ UICollectionViewDataSource
     } else {
         _setting = setting;
     }
-    
+    self.soundCardSwitcher.on = self.setting.soundCardOn;
     self.soundSwitcher.on = self.setting.soundOn;
     self.soundSlider.value = self.setting.soundValue;
     self.accSlider.value = self.setting.accValue;
@@ -74,6 +75,7 @@ UICollectionViewDataSource
 - (void)initSubViews {
     [self addSubview:self.titleLabel];
     [self addSubview:self.soundSwitcher];
+    [self addSubview:self.soundCardSwitcher];
 //    [self addSubview:self.tonesView];
     [self addSubview:self.soundSlider];
     [self addSubview:self.accSlider];
@@ -94,6 +96,11 @@ UICollectionViewDataSource
         make.top.mas_equalTo(self.titleLabel.mas_bottom).offset(16);
     }];
     
+    [self.soundCardSwitcher mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.mas_equalTo(self);
+        make.top.mas_equalTo(self.soundSwitcher.mas_bottom).offset(16);
+    }];
+    
 //    [self.tonesView mas_makeConstraints:^(MASConstraintMaker *make) {
 //        make.left.right.mas_equalTo(self);
 //        make.top.mas_equalTo(self.soundSwitcher.mas_bottom).offset(25);
@@ -102,7 +109,7 @@ UICollectionViewDataSource
     
     [self.soundSlider mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.mas_equalTo(self);
-        make.top.mas_equalTo(self.soundSwitcher.mas_bottom).offset(25);
+        make.top.mas_equalTo(self.soundCardSwitcher.mas_bottom).offset(25);
         make.height.mas_equalTo(22);
     }];
     
@@ -144,6 +151,9 @@ UICollectionViewDataSource
     if (switcherView == self.soundSwitcher) {
         self.setting.soundOn = on;
         type = VLKTVValueDidChangedTypeEar;
+    } else if (switcherView == self.soundCardSwitcher) {
+        self.setting.soundCardOn = on;
+        type = VLKTVValueDidChangedTypeSoundCard;
     } else {
         type = VLKTVValueDidChangedTypeMV;
         self.setting.mvOn = on;
@@ -266,6 +276,16 @@ UICollectionViewDataSource
     return _soundSwitcher;
 }
 
+- (VLKTVSwitcherView *)soundCardSwitcher {
+    if (!_soundCardSwitcher) {
+        _soundCardSwitcher = [[VLKTVSwitcherView alloc] init];
+        _soundCardSwitcher.titleLabel.text = KTVLocalizedString(@"ktv_soundcard");
+        _soundCardSwitcher.subText = KTVLocalizedString(@"ktv_please_use_headset");
+        _soundCardSwitcher.delegate = self;
+    }
+    return _soundCardSwitcher;
+}
+
 - (VLKTVTonesView *)tonesView {
     if (!_tonesView) {
         _tonesView = [[VLKTVTonesView alloc] initWithMaxLevel:12 currentLevel:6];
@@ -342,6 +362,12 @@ UICollectionViewDataSource
 {
     self.setting.soundOn = isEarOn;
     self.soundSwitcher.on = isEarOn;
+}
+
+-(void)setUseSoundCard:(BOOL)useSoundCard
+{
+    self.setting.soundCardOn = useSoundCard;
+    self.soundCardSwitcher.on = useSoundCard;
 }
 
 - (void)setAccValue:(float)accValue {

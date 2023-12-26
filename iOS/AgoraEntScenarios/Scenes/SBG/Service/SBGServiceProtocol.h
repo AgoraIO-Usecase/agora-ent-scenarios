@@ -10,7 +10,6 @@
 #import "VLSBGRoomListModel.h"
 #import "VLSBGRoomSelSongModel.h"
 #import "VLLoginModel.h"
-@import AgoraRtmKit;
 
 typedef enum : NSUInteger {
     SBGServiceNetworkStatusConnecting = 0,

@@ -1,6 +1,7 @@
 package io.agora.scene.ktv.singbattle.widget.lrcView;
 
 import android.animation.Animator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -203,6 +204,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private void setCountDown(int second) {
         if (mBinding == null) return;
         mBinding.ilActive.singBattle.setText("" + (second + 1));
@@ -212,7 +214,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         if (mBinding == null) return;
         mBinding.ilActive.singBattle.setEnabled(true);
         mBinding.ilActive.singBattle.setText("");
-        mBinding.ilActive.singBattle.setBackgroundResource(R.mipmap.ktv_start_grasp);
+        mBinding.ilActive.singBattle.setBackgroundResource(R.mipmap.ktv_singbattle_start_grasp);
     }
 
     public void startTimerCount() {
@@ -315,7 +317,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         if (isOnSeat) {
             mBinding.ilActive.singBattle.setVisibility(View.VISIBLE);
             mBinding.ilActive.singBattle.setEnabled(false);
-            mBinding.ilActive.singBattle.setBackgroundResource(R.mipmap.ktv_start_grasp_waiting);
+            mBinding.ilActive.singBattle.setBackgroundResource(R.mipmap.ktv_singbattle_start_grasp_waiting);
         } else {
             mBinding.ilActive.singBattle.setVisibility(View.GONE);
         }
@@ -379,7 +381,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.tvMusicName2.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
     }
 
-    private int backgroundResId = R.mipmap.ktv_mv_default;
+    private int backgroundResId = R.mipmap.mvbg4;
 
     public void setLrcViewBackground(@DrawableRes int resId) {
         backgroundResId = resId;
@@ -519,6 +521,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
         private float mInitialYOfScoreView; // Only for showScoreAnimation
 
+        @SuppressLint("SetTextI18n")
         private void showScoreAnimation(View lyricsControlView, double score) {
             TextView lineScore = lyricsControlView.findViewById(R.id.line_score);
             int widthOfParent = ((View) (lineScore.getParent())).getWidth();

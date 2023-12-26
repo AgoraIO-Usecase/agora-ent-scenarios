@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="show_create_room">创建房间</string>
-    <string name="show_create_tips1">欢迎来到声网秀场直播！</string>
+    <string name="show_create_tips1">欢迎来到声网直播！\n视频『高清』升级，人更美、物更真，体验更流畅，\n为直播变现增添更多 buff</string>
     <string name="show_living">直播中</string>
     <string name="show_room_id">ID: %s</string>
     <string name="show_user_count">%d人</string>
@@ -12,7 +12,7 @@
     <string name="show_live_yes">是</string>
     <string name="show_live_no">否</string>
     <string name="show_text_input_sent">发送</string>
-    <string name="show_text_input_hint">请输入...</string>
+    <string name="show_text_input_hint">请输入…</string>
     <string name="show_text_input_empty">文本为空</string>
     <string name="show_setting_switch_camera">翻转镜头</string>
     <string name="show_setting_video_on">摄像头开</string>
@@ -150,9 +150,11 @@
     <string name="show_empty_online_audience">暂无在线观众</string>
     <string name="show_setting_preset">预设</string>
     <string name="show_pk">连线互动</string>
+    <string name="show_pk_dialog_header">对主播%s</string>
     <string name="show_can_pk">可邀请PK</string>
     <string name="show_pk_is_stopped">PK已断开哦</string>
     <string name="show_content">监测到当前内容存在违规行为</string>
+    <string name="show_come_soon">Hi，我暂时有事，很快回来…</string>
 
     <string name="show_cannot_accept">正在互动， 请互动结束后再接受连麦申请</string>
     <string name="show_cannot_invite">正在互动， 请互动结束后再邀请观众连麦</string>

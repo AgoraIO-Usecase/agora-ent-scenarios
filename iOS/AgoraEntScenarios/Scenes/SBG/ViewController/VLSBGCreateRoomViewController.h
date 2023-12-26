@@ -3,12 +3,16 @@
 //  VoiceOnLine
 //
 
-#import "BaseViewController.h"
+#import "VLBaseViewController.h"
 #import "SBGServiceProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLSBGCreateRoomViewController : BaseViewController
+typedef void(^CreateRoomBlock)(CGFloat);
+typedef void(^CreateRoomVCBlock)(UIViewController *);
+@interface VLSBGCreateRoomViewController : UIViewController
+@property (nonatomic, copy) CreateRoomBlock createRoomBlock;
+@property (nonatomic, copy) CreateRoomVCBlock createRoomVCBlock;
 
 @end
 

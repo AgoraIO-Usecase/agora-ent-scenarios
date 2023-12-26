@@ -9,6 +9,8 @@ data class RoomListModel(
     val isPrivate: Boolean = false,
     val password: String = "",
     val creatorNo: String = "",
+    val creatorName: String = "",
+    val creatorAvatar: String = "",
     val createdAt: String = System.currentTimeMillis().toString(),
 
     /**
@@ -19,22 +21,7 @@ data class RoomListModel(
      * 房间内人数
      */
     val roomPeopleNum: Int = 0,
-) {
-    fun getCoverRes(): Int {
-        return when (icon) {
-            "1" -> R.mipmap.icon_room_cover1
-            "2" -> R.mipmap.icon_room_cover2
-            "3" -> R.mipmap.icon_room_cover3
-            "4" -> R.mipmap.icon_room_cover4
-            "5" -> R.mipmap.icon_room_cover5
-            "6" -> R.mipmap.icon_room_cover6
-            "7" -> R.mipmap.icon_room_cover7
-            "8" -> R.mipmap.icon_room_cover8
-            "9" -> R.mipmap.icon_room_cover9
-            else -> R.mipmap.icon_room_cover1
-        }
-    }
-}
+) {}
 
 data class RoomSeatModel(
     val isMaster: Boolean,// 是否是房主
@@ -79,6 +66,7 @@ data class JoinRoomOutputModel(
     val roomName: String,
     val roomNo: String,
     val creatorNo: String,
+    val creatorAvatar: String,
     val bgOption: String,
     val seatsArray: List<RoomSeatModel>?,
     /**

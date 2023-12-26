@@ -16,6 +16,7 @@ import UIKit
     case origin
     case again
     case aac
+    case retryLrc
 }
 
 @objc protocol VLSBGStatusViewDelegate: NSObjectProtocol {
@@ -53,12 +54,15 @@ import UIKit
     case next
     case resultOwner
     case resultAudience
-
+    case loadFailedLrc
+    case loadFailedMusic
 }
 
 class VLSBGStatusView: UIView {
     
     @objc weak var delegate: VLSBGStatusViewDelegate?
+    
+    private var retryBtn: UIButton = UIButton()
     
     private var basicScoreModels  = {
         var models = [SubRankModel]()
@@ -99,33 +103,45 @@ class VLSBGStatusView: UIView {
             if state == .ownerOrderMusic {
                 numLabel.isHidden = true
                 contentImgView.isHidden = false
+                fightImage.isHidden = true
+                fightResult.isHidden = true
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "暂无演唱歌单，开始点歌吧！"
+                contentTextLabel.isHidden = false
+                contentTextLabel.text = getLocalizeString(with: "sbg_no_song")
                 lrcView.isHidden = true
                 randomBtn.isHidden = false
                 orderBtn.isHidden = false
                 nextBtn.isHidden = true
+                retryBtn.isHidden = true
             } else if state == .audienceWating {
                 numLabel.isHidden = true
                 contentImgView.isHidden = false
+                fightImage.isHidden = true
+                fightResult.isHidden = true
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "房主点歌中，游戏即将开始"
+                contentTextLabel.isHidden = false
+                contentTextLabel.text = getLocalizeString(with: "sbg_bro_choose")
                 lrcView.isHidden = true
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
+                retryBtn.isHidden = true
             } else if state == .ready {
                 numLabel.isHidden = true
                 contentImgView.isHidden = false
+                fightImage.isHidden = true
+                fightResult.isHidden = true
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "嗨唱开始"
+                contentTextLabel.isHidden = false
+                contentTextLabel.text = getLocalizeString(with: "sbg_start")
                 lrcView.isHidden = true
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
+                retryBtn.isHidden = true
             } else if state == .timeDownAudience {
                 numLabel.isHidden = false
                 contentImgView.isHidden = true
@@ -136,6 +152,7 @@ class VLSBGStatusView: UIView {
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
+                retryBtn.isHidden = true
             } else if state == .timeDownBroadcaster {
                 numLabel.isHidden = false
                 contentImgView.isHidden = true
@@ -146,6 +163,7 @@ class VLSBGStatusView: UIView {
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
+                retryBtn.isHidden = true
             } else if state == .sbgingOnSeat {
                 numLabel.isHidden = false
                 contentImgView.isHidden = true
@@ -156,6 +174,7 @@ class VLSBGStatusView: UIView {
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
+                retryBtn.isHidden = true
             }else if state == .sbgingOffSeat {
                 numLabel.isHidden = false
                 contentImgView.isHidden = true
@@ -166,9 +185,12 @@ class VLSBGStatusView: UIView {
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
+                retryBtn.isHidden = true
             } else if state == .sbgSuccess {
                 numLabel.isHidden = true
                 contentImgView.isHidden = false
+                fightImage.isHidden = true
+                fightResult.isHidden = true
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
                 contentTextLabel.text = ""
@@ -176,17 +198,21 @@ class VLSBGStatusView: UIView {
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
+                retryBtn.isHidden = true
             } else if state == .sbgNobody {
                 numLabel.isHidden = true
                 contentImgView.isHidden = false
+                fightImage.isHidden = true
+                fightResult.isHidden = true
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "本轮无人演唱\n即将播放下一首"
+                contentTextLabel.text = getLocalizeString(with: "sbg_nobody_next")
                 contentTextLabel.numberOfLines = 0
                 lrcView.isHidden = true
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
+                retryBtn.isHidden = true
             } else if state == .singingBroadcaster {
                 numLabel.isHidden = false
                 contentImgView.isHidden = true
@@ -197,6 +223,7 @@ class VLSBGStatusView: UIView {
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
+                retryBtn.isHidden = true
             } else if state == .singingAudience {
                 numLabel.isHidden = false
                 contentImgView.isHidden = true
@@ -207,36 +234,47 @@ class VLSBGStatusView: UIView {
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
+                retryBtn.isHidden = true
             } else if state == .singFailed {
                 numLabel.isHidden = true
                 contentImgView.isHidden = false
+                fightImage.isHidden = false
+                fightResult.isHidden = false
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-               // contentTextLabel.text = "挑战失败"
+                contentTextLabel.isHidden = true
                 lrcView.isHidden = true
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
+                retryBtn.isHidden = true
             } else if state == .singSuccess {
                 numLabel.isHidden = true
                 contentImgView.isHidden = false
+                fightImage.isHidden = false
+                fightResult.isHidden = false
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-               // contentTextLabel.text = "挑战成功"
+                contentTextLabel.isHidden = true
                 lrcView.isHidden = true
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
+                retryBtn.isHidden = true
             } else if state == .next {
                 numLabel.isHidden = true
                 contentImgView.isHidden = false
+                fightImage.isHidden = true
+                fightResult.isHidden = true
                 tableView.isHidden = true
                 resultTitleLabel.isHidden = true
-                contentTextLabel.text = "下一首"
+                contentTextLabel.isHidden = false
+                contentTextLabel.text = getLocalizeString(with: "sbg_next_song")
                 lrcView.isHidden = true
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
+                retryBtn.isHidden = true
             } else if state == .resultOwner {
                 numLabel.isHidden = true
                 contentImgView.isHidden = true
@@ -246,6 +284,7 @@ class VLSBGStatusView: UIView {
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = false
+                retryBtn.isHidden = true
             } else if state == .resultAudience {
                 numLabel.isHidden = true
                 contentImgView.isHidden = true
@@ -255,18 +294,29 @@ class VLSBGStatusView: UIView {
                 randomBtn.isHidden = true
                 orderBtn.isHidden = true
                 nextBtn.isHidden = true
-            }
-            
-            if state == .singFailed {
-                contentImgView.image = UIImage.sceneImage(name: "sbg-bg-fail")
-                fightImage.isHidden = false
-                fightResult.isHidden = false
-                contentTextLabel.isHidden = true
-            } else if state == .singSuccess {
-                contentImgView.image = UIImage.sceneImage(name: "sbg-bg-success")
-                fightResult.isHidden = false
-                fightImage.isHidden = false
-                contentTextLabel.isHidden = true
+                retryBtn.isHidden = true
+            } else if state == .loadFailedLrc {
+                numLabel.isHidden = false
+                contentImgView.isHidden = true
+                tableView.isHidden = true
+                resultTitleLabel.isHidden = true
+                lrcView.isHidden = false
+                lrcView.state = .singingAudience
+                randomBtn.isHidden = true
+                orderBtn.isHidden = true
+                nextBtn.isHidden = true
+                retryBtn.isHidden = false
+            }   else if state == .loadFailedMusic {
+                numLabel.isHidden = false
+                contentImgView.isHidden = true
+                tableView.isHidden = true
+                resultTitleLabel.isHidden = true
+                lrcView.isHidden = false
+                lrcView.state = .singingAudience
+                randomBtn.isHidden = true
+                orderBtn.isHidden = true
+                nextBtn.isHidden = true
+                retryBtn.isHidden = false
             } else {
                 contentImgView.image = UIImage.sceneImage(name: "sbg-bg-text")
                 fightImage.isHidden = true
@@ -347,7 +397,7 @@ class VLSBGStatusView: UIView {
     
     private lazy var resultTitleLabel: UILabel = { //本轮评分
         let label = UILabel()
-        label.text = "本轮评分"
+        label.text = getLocalizeString(with: "sbg_this_score")
         label.textAlignment = .center
         label.textColor = .white
         return label
@@ -388,6 +438,20 @@ class VLSBGStatusView: UIView {
         let lrcView: VLSBGLyricView = VLSBGLyricView()
         return lrcView
     }()
+    
+    private func addRetryBtn() {
+        //重试歌词按钮
+        retryBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 100, height: 40))
+        retryBtn.center = lrcView.center
+        retryBtn.setTitle("点击重试", for: .normal)
+        retryBtn.layer.cornerRadius = 5
+        retryBtn.layer.masksToBounds = true
+        retryBtn.layer.borderColor = UIColor.white.cgColor
+        retryBtn.layer.borderWidth = 1
+        retryBtn.addTarget(self, action: #selector(retryLrc), for: .touchUpInside)
+        lrcView.addSubview(retryBtn)
+        retryBtn.isHidden = true
+    }
     
     @objc public var countTime: Int = 0{
         didSet {
@@ -433,6 +497,10 @@ class VLSBGStatusView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private func getLocalizeString(with key: String) -> String {
+        return Bundle.localizedString(key, bundleName: "sbgResource")
+    }
+    
     private func layoutUI() {
         addSubview(bgImgView)
         
@@ -445,6 +513,8 @@ class VLSBGStatusView: UIView {
         attributeView.isHidden = true
         
         addSubview(lrcView)
+        //重试歌词按钮
+        addRetryBtn()
         
         addSubview(orderBtn)
         
@@ -491,6 +561,11 @@ class VLSBGStatusView: UIView {
     @objc private func trackChange() {//原唱
         guard let delegate = delegate else {return}
         delegate.didSbgActionChanged(.origin)
+    }
+    
+    @objc private func retryLrc() {
+        guard let delegate = self.delegate else {return}
+        delegate.didSbgActionChanged(.retryLrc)
     }
     
     override func layoutSubviews() {

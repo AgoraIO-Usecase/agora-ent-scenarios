@@ -145,7 +145,7 @@ UITableViewDelegate
     self.emptyLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 60, SCREEN_WIDTH, 30)];
     self.emptyLabel.font = VLUIFontMake(13);
     self.emptyLabel.textColor = [UIColor colorWithHexString:@"#979CBB"];
-    self.emptyLabel.text = SBGLocalizedString(@"未找到相关结果");
+    self.emptyLabel.text = SBGLocalizedString(@"sbg_empty_search");
     self.emptyLabel.textAlignment = NSTextAlignmentCenter;
     [self addSubview:self.emptyLabel];
     self.emptyLabel.hidden = YES;
@@ -210,6 +210,7 @@ UITableViewDelegate
     inputModel.isChorus = self.ifChorus;
     inputModel.songName = model.songName;
     inputModel.songNo = model.songNo;
+    inputModel.imageUrl = model.imageUrl;
 //    inputModel.songUrl = model.songUrl;
     inputModel.singer = model.singer;
     [[AppContext sbgServiceImp] chooseSongWithInput:inputModel
@@ -244,7 +245,7 @@ UITableViewDelegate
         }
     }
     if(self.selSongsArray.count == 8){
-        [VLToast toast:@"歌曲已满，开始游戏吧"];
+        [VLToast toast:SBGLocalizedString(@"sbg_full_song")];
     }
     [self.tableView reloadData];
 }

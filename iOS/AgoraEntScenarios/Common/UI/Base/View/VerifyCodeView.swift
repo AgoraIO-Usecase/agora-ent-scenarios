@@ -23,7 +23,7 @@ public class VerifyCodeView: UIView {
     /// 输入框
     @objc lazy var textFiled: VRVerifyCodeTextView = {
         let textFiled = VRVerifyCodeTextView(frame: CGRect(x: self.padding, y: 0, width: self.frame.width - 2 * self.padding, height: self.frame.height)).backgroundColor(.clear).textColor(.clear).delegate(self)
-        textFiled.tintColor = .darkText
+       // textFiled.tintColor = .darkText
         textFiled.keyboardType = .decimalPad
         textFiled.addTarget(self, action: #selector(textFiledDidChange(_:)), for: .editingChanged)
         textFiled.addTarget(self, action: #selector(textFiledDidEnd(_:)), for: .editingDidEnd)
@@ -62,12 +62,22 @@ public class VerifyCodeView: UIView {
         NotificationCenter.default.removeObserver(self)
     }
 
-    func initSubviews() {
+    private func initSubviews() {
         // 每个验证码框宽度
         let itemWidth = CGFloat(frame.width - padding * 2 - spacing * (CGFloat(inputTextNum) - 1)) / CGFloat(inputTextNum)
         for i in 0..<inputTextNum {
-            let codeNumView = VRVerifyCodeNumberView(frame: CGRect(x: padding + CGFloat(i) * (spacing + itemWidth), y: 0, width: itemWidth, height: frame.height)).isUserInteractionEnabled(false).backgroundColor(.white).cornerRadius(8).layerProperties(UIColor(0xE4E3ED), 1)
-            codeNumView.setCursorStatus(true)
+            let codeNumView = VRVerifyCodeNumberView(frame: CGRect(x: padding + CGFloat(i) * (spacing + itemWidth), y: 0, width: itemWidth, height: frame.height)).isUserInteractionEnabled(false).backgroundColor(UIColor.init(hexString: "#F5F8FF")!).cornerRadius(8)
+            
+            if i != 0 {
+                codeNumView.setCursorStatus(true)
+                codeNumView.layer.borderWidth = 0
+            } else {
+                codeNumView.setCursorStatus(false)
+                codeNumView.setBottomLineFocus(isFocus: true)
+                codeNumView.setNum(num: nil)
+                codeNumView.layer.borderWidth = 2.0
+                codeNumView.layer.borderColor = UIColor.init(hexString: "#2E6CF6")?.cgColor
+            }
             codeViews.append(codeNumView)
         }
         addSubViews(codeViews)
@@ -163,16 +173,20 @@ extension VerifyCodeView: UITextFieldDelegate {
                 codeView.setNum(num: inputStr[String.Index(utf16Offset: i, in: inputStr)].description)
                 codeView.setBottomLineFocus(isFocus: true)
                 codeView.setCursorStatus(true)
+                codeView.layer.borderWidth = 0
             } else {
                 if inputStr.count == 0, i == 0 {
                     codeView.setCursorStatus(false)
                     codeView.setBottomLineFocus(isFocus: true)
                     codeView.setNum(num: nil)
+                    codeView.layer.borderWidth = 2.0
                 } else {
                     codeView.setCursorStatus(i != inputStr.count)
                     codeView.setNum(num: nil)
                     codeView.setBottomLineFocus(isFocus: i == inputStr.count)
+                    codeView.layer.borderWidth = i == inputStr.count ? 2.0 : 0.0
                 }
+                codeView.layer.borderColor = UIColor.init(hexString: "#2E6CF6")?.cgColor
             }
         }
 

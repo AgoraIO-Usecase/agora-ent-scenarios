@@ -29,48 +29,38 @@ class AgoraChatRoomBaseRtcUserView: UIView {
             if cellType == .AgoraChatRoomBaseUserCellTypeAlienActive || cellType == .AgoraChatRoomBaseUserCellTypeAlienNonActive {
                 bgColor = .white
             } else {
-                bgColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.3)
+                bgColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.1)
             }
 
             switch cellType {
             case .AgoraChatRoomBaseUserCellTypeAdd:
                 iconView.isHidden = true
-                micView.isHidden = true
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
+                bgIconView.image = UIImage.sceneImage(name: "voice_wuren", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeMute:
                 iconView.isHidden = false
-                micView.isHidden = false
-                micView.setState(.forbidden)
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／mute", bundleName: "VoiceChatRoomResource")
+                setMicState(.forbidden)
             case .AgoraChatRoomBaseUserCellTypeForbidden:
                 iconView.isHidden = false
-                micView.isHidden = false
-                micView.setState(.forbidden)
+                setMicState(.forbidden)
             case .AgoraChatRoomBaseUserCellTypeLock:
                 iconView.isHidden = true
-                micView.isHidden = true
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
+                bgIconView.image = UIImage.sceneImage(name: "voice_ic_seat_lock", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeNormalUser:
                 iconView.isHidden = false
-                micView.isHidden = false
-                micView.setState(.on)
-                nameBtn.setImage(UIImage.sceneImage(name: ""), for: .normal)
+                setMicState(.on)
+                nameBtn.setImage(nil, for: .normal)
             case .AgoraChatRoomBaseUserCellTypeMuteAndLock:
                 iconView.isHidden = true
-                micView.isHidden = false
-                micView.setState(.forbidden)
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
+                setMicState(.forbidden)
+                bgIconView.image = UIImage.sceneImage(name: "voice_ic_seat_lock", bundleName: "VoiceChatRoomResource")
             case .AgoraChatRoomBaseUserCellTypeAlienNonActive:
                 iconView.isHidden = false
-                micView.isHidden = false
-                micView.setState(.on)
-                micView.isHidden = true
+                setMicState(.on)
                 nameBtn.setImage(UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), for: .normal)
                 coverView.isHidden = false
                 activeButton.isHidden = false
             case .AgoraChatRoomBaseUserCellTypeAlienActive:
                 iconView.isHidden = false
-                micView.isHidden = true
                 nameBtn.setImage(UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), for: .normal)
                 coverView.isHidden = true
                 activeButton.isHidden = true
@@ -93,11 +83,8 @@ class AgoraChatRoomBaseRtcUserView: UIView {
     public var showMicView: Bool = false {
         didSet {
             if showMicView {
-                micView.isHidden = false
-                micView.setState(.on)
-                micView.setVolume(100)
+                setMicState(.on)
             } else {
-                micView.isHidden = true
             }
         }
     }
@@ -126,18 +113,37 @@ class AgoraChatRoomBaseRtcUserView: UIView {
 
     public var volume: Int = 0 {
         didSet {
-            micView.setVolume(volume)
+            if(volume > 0) {
+                startAnimation()
+            }else{
+                stopAnimation()
+            }
         }
     }
 
     private var bgView: UIView = .init()
-    public var iconView: UIImageView = .init()
-    public var bgIconView: UIImageView = .init()
-    public var micView: AgoraMicVolView = .init()
-    public var nameBtn: UIButton = .init()
+    private var iconView: UIImageView = .init()
+    private lazy var bgIconView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .center
+        return imageView
+    }()
+    
+    private var muteMicView: UIImageView = UIImageView()
+    private var nameBtn: UIButton = .init()
     private var coverView: UIView = .init()
     private var activeButton: UIButton = .init()
     private var targetBtn: UIButton = .init()
+    
+    private lazy var waveLayer1: CALayer = {
+        createWaveLayer()
+    }()
+    
+    private lazy var waveLayer2: CALayer = {
+        createWaveLayer()
+    }()
+    
+    private var isAnimating = false
 
     var clickBlock: (() -> Void)?
 
@@ -153,21 +159,26 @@ class AgoraChatRoomBaseRtcUserView: UIView {
 
     fileprivate func layoutUI() {
         bgView.layer.cornerRadius = 30
-        bgView.layer.masksToBounds = true
         bgView.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.3)
         addSubview(bgView)
+        
+        bgView.layer.addSublayer(waveLayer2)
+        bgView.layer.addSublayer(waveLayer1)
 
-        bgIconView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
-        bgIconView.layer.cornerRadius = 15
+        bgIconView.image = UIImage.sceneImage(name: "voice_wuren", bundleName: "VoiceChatRoomResource")
+        bgIconView.layer.cornerRadius = 30
         bgIconView.layer.masksToBounds = true
         bgView.addSubview(bgIconView)
 
         iconView.image = UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource")
         iconView.layer.cornerRadius = 30
         iconView.layer.masksToBounds = true
+        iconView.contentMode = .scaleAspectFill
         bgView.addSubview(iconView)
 
-        addSubview(micView)
+        muteMicView.image = UIImage.sceneImage(name: "micoff", bundleName: "VoiceChatRoomResource")
+        muteMicView.isHidden = true
+        addSubview(muteMicView)
 
         coverView.backgroundColor = .black
         coverView.alpha = 0.5
@@ -209,7 +220,7 @@ class AgoraChatRoomBaseRtcUserView: UIView {
         bgIconView.snp.makeConstraints { make in
             make.centerX.equalTo(self)
             make.centerY.equalTo(self.bgView)
-            make.width.height.equalTo(22)
+            make.width.height.equalTo(60)
         }
 
         iconView.snp.makeConstraints { make in
@@ -218,7 +229,7 @@ class AgoraChatRoomBaseRtcUserView: UIView {
             make.width.height.equalTo(60)
         }
 
-        micView.snp.makeConstraints { make in
+        muteMicView.snp.makeConstraints { make in
             make.right.equalTo(self.iconView).offset(-3)
             make.width.height.equalTo(18)
             make.bottom.equalTo(self.iconView.snp.bottom).offset(-2)
@@ -269,5 +280,130 @@ class AgoraChatRoomBaseRtcUserView: UIView {
             return
         }
         clickBlock()
+    }
+    
+    public func setMicState(_ state: AgoraMicVolView.AgoraMicVolViewState) {
+        if state == .off || state == .forbidden {
+            muteMicView.isHidden = false
+        }else {
+            muteMicView.isHidden = true
+        }
+        if state != .on {
+            volume = 0
+        }
+    }
+}
+
+extension AgoraChatRoomBaseRtcUserView {
+    
+    private func createWaveLayer() -> CALayer {
+        let layer = CALayer()
+        layer.backgroundColor = UIColor(hex: 0x75ADFF, alpha: 1).cgColor
+        layer.frame = CGRect(x: 0, y: 0, width: 60, height: 60)
+        layer.cornerRadius = 30
+        layer.isHidden = true
+        return layer
+    }
+    
+    private func startAnimation() {
+        if isAnimating {
+            return
+        }
+        isAnimating = true
+        waveLayer1.isHidden = false
+        waveLayer2.isHidden = false
+          
+        let animation = CAKeyframeAnimation(keyPath: "transform.scale")
+        animation.values = [1, 1.1, 1]
+        animation.keyTimes = [0, 0.5, 1]
+          
+        let alphaAnimation = CAKeyframeAnimation(keyPath: "opacity")
+        alphaAnimation.values = [1, 0.5, 0.3]
+        alphaAnimation.keyTimes = [0, 0.5, 1]
+          
+        let groupAnimation = CAAnimationGroup()
+        groupAnimation.animations = [animation, alphaAnimation]
+        // groupAnimation.autoreverses = true
+        groupAnimation.repeatCount = Float.infinity
+        groupAnimation.duration = 1.4
+          
+        waveLayer1.add(groupAnimation, forKey: nil)
+          
+        let animation2 = CAKeyframeAnimation(keyPath: "transform.scale")
+        animation2.values = [1, 1.4]
+        animation2.keyTimes = [0, 1]
+          
+        let alphaAnimation2 = CAKeyframeAnimation(keyPath: "opacity")
+        alphaAnimation2.values = [0.6, 0.3, 0]
+        alphaAnimation2.keyTimes = [0, 0.5, 1]
+          
+        let groupAnimation2 = CAAnimationGroup()
+        groupAnimation2.animations = [animation2, alphaAnimation2]
+        // groupAnimation2.autoreverses = true
+        groupAnimation2.repeatCount = Float.infinity
+        groupAnimation2.duration = 1.4
+          
+        waveLayer2.add(groupAnimation2, forKey: nil)
+    }
+      
+    private func stopAnimation() {
+        isAnimating = false
+        waveLayer1.removeAllAnimations()
+        waveLayer2.removeAllAnimations()
+        waveLayer1.isHidden = true
+        waveLayer2.isHidden = true
+    }
+    
+}
+
+extension AgoraChatRoomBaseRtcUserView {
+    public func refreshUser(with mic: VRRoomMic) {
+        let status = VRRoomMicStatus(rawValue: mic.status) ?? .idle
+        var enableIdleIcon = mic.member == nil ? true : false
+        switch status {
+        case .idle:
+            iconView.isHidden = true
+            setMicState(.on)
+            self.volume = 0
+        case .normal:
+            iconView.isHidden = false
+            if mic.member?.micStatus ?? 0 == 1 {
+                setMicState(.on)
+                bgIconView.isHidden = true
+                nameBtn.setImage(UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"), for: .normal)
+            } else {
+                setMicState(.off)
+                self.volume = 0
+            }
+        case .close:
+            setMicState(.off)
+        case .forbidden:
+            setMicState(.off)
+            bgIconView.isHidden = false
+        case .lock:
+            iconView.isHidden = true
+            bgIconView.image = UIImage.sceneImage(name: "voice_ic_seat_lock", bundleName: "VoiceChatRoomResource")
+            bgIconView.isHidden = false
+            enableIdleIcon = false
+            setMicState(.on)
+            self.volume = 0
+        case .forbiddenAndLock:
+            iconView.isHidden = true
+            setMicState(.forbidden)
+            bgIconView.image = UIImage.sceneImage(name: "voice_ic_seat_lock", bundleName: "VoiceChatRoomResource")
+            bgIconView.isHidden = false
+            enableIdleIcon = false
+        }
+        if enableIdleIcon {
+            bgIconView.isHidden = false
+            bgIconView.image = UIImage.sceneImage(name: "voice_wuren", bundleName: "VoiceChatRoomResource")
+        }
+        iconView.isHidden = mic.member == nil
+        if mic.member?.portrait != nil {
+            iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"))
+        }
+        nameBtn.setImage(UIImage.voice_image(mic.mic_index == 0 ? "Landlord" : ""), for: .normal)
+        let text = LanguageManager.localValue(key: "voice_mic_num")
+        nameBtn.setTitle(mic.member?.name ?? "\(mic.mic_index)\(text)", for: .normal)
     }
 }

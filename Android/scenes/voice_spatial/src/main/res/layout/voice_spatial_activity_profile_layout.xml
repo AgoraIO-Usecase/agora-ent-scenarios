@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/base_layout"
-    android:background="@drawable/voice_bg_app_def_white"
+    android:background="@mipmap/bg_app_def_white"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,7 +11,7 @@
         android:id="@+id/title_bar"
         android:layout_marginTop="30dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:voice_titleBarTitle="@string/voice_room_profile"
+        app:voice_titleBarTitle="@string/voice_spatial_room_profile"
         app:voice_titleBarTitleTextColor="@color/voice_black"
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -35,10 +35,10 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            android:background="@drawable/avatar1"
+            android:background="@mipmap/default_user_avatar"
             android:src="@drawable/voice_bg_oval_black20"
             app:layout_constraintDimensionRatio="1:1"
-            app:shapeAppearance="@style/voice_seat_roundStyle"
+            app:shapeAppearance="@style/ui_widget_roundStyle"
             android:layout_marginStart="20dp"
             android:layout_width="60dp"
             android:layout_height="60dp"/>
@@ -136,7 +136,7 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/voice_sp_14"
             android:textColor="@color/voice_dark_grey_color_040925"
-            android:text="@string/voice_room_disclaimer"/>
+            android:text="@string/voice_spatial_room_disclaimer"/>
 
         <ImageView
             android:layout_marginEnd="20dp"

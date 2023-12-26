@@ -8,9 +8,6 @@ import androidx.annotation.Nullable;
 
 import com.agora.entfulldemo.R;
 
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
 import java.io.File;
 
 import io.agora.scene.base.Constant;
@@ -22,36 +19,17 @@ import io.agora.scene.base.api.base.BaseResponse;
 import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.bean.CommonBean;
 import io.agora.scene.base.component.BaseRequestViewModel;
-import io.agora.scene.base.event.UserInfoChangeEvent;
-import io.agora.scene.base.event.UserLogoutEvent;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
 import io.reactivex.disposables.Disposable;
 
 public class MainViewModel extends BaseRequestViewModel {
-    @Override
-    protected boolean isNeedEventBus() {
-        return true;
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(@Nullable UserInfoChangeEvent event) {
-        if (getISingleCallback() != null) {
-            getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_INFO_CHANGE, null);
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(@Nullable UserLogoutEvent event) {
-        if (getISingleCallback() != null) {
-            getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_LOGOUT, null);
-        }
-    }
 
     /**
      * 获取用户信息
+     * @param syncUi 是否通知更新 ui
      */
-    public void requestUserInfo(String userNo) {
+    public void requestUserInfo(String userNo, boolean syncUi) {
         ApiManager.getInstance().requestUserInfo(userNo)
                 .compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
                         new ApiSubscriber<BaseResponse<User>>() {
@@ -65,7 +43,9 @@ public class MainViewModel extends BaseRequestViewModel {
                                 UserManager.getInstance().getUser().name = data.getData().name;
                                 UserManager.getInstance().getUser().headUrl = data.getData().headUrl;
                                 UserManager.getInstance().saveUserInfo(UserManager.getInstance().getUser());
-                                getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS, null);
+                                if (syncUi){
+                                    getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_REQUEST_USER_INFO, null);
+                                }
                             }
 
                             @Override
@@ -93,7 +73,6 @@ public class MainViewModel extends BaseRequestViewModel {
                             @Override
                             public void onSuccess(BaseResponse<User> data) {
                                 ToastUtils.showToast(R.string.app_edit_success);
-                                getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_INFO_CHANGE, null);
                                 if (!TextUtils.isEmpty(name)) {
                                     UserManager.getInstance().getUser().name = name;
                                 }
@@ -101,12 +80,19 @@ public class MainViewModel extends BaseRequestViewModel {
                                     UserManager.getInstance().getUser().headUrl = headUrl;
                                 }
                                 UserManager.getInstance().saveUserInfo(UserManager.getInstance().getUser());
-                                requestUserInfo(UserManager.getInstance().getUser().userNo);
+                                getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_INFO_CHANGE, null);
+                                requestUserInfo(UserManager.getInstance().getUser().userNo, false);
                             }
 
                             @Override
                             public void onFailure(@Nullable ApiException t) {
-                                ToastUtils.showToast(t.getMessage());
+                                // 恢复ui
+                                getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_INFO_CHANGE, null);
+                                if (t.errCode == Constant.CALLBACK_TYPE_UPLOAD_ILLEGAL_CONTENT) {
+                                    ToastUtils.showToast(R.string.app_upload_illegal_content_error);
+                                } else {
+                                    ToastUtils.showToast(t.getMessage());
+                                }
                             }
                         });
     }
@@ -148,7 +134,10 @@ public class MainViewModel extends BaseRequestViewModel {
 
                             @Override
                             public void onSuccess(BaseResponse<String> data) {
-                                getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_CANCEL_ACCOUNTS, null);
+                                UserManager.getInstance().logoff();
+                                if (getISingleCallback() != null) {
+                                    getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_LOGOFF, null);
+                                }
                             }
 
                             @Override
@@ -181,14 +170,15 @@ public class MainViewModel extends BaseRequestViewModel {
                 );
     }
 
-    public void requestReportAction(String userNo, String action){
-        ApiManager.getInstance().requestReportAction(userNo,action)
+    public void requestReportAction(String userNo, String action) {
+        ApiManager.getInstance().requestReportAction(userNo, action)
                 .compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
-                        new ApiSubscriber<BaseResponse<String>>(){
+                        new ApiSubscriber<BaseResponse<String>>() {
                             @Override
                             public void onSubscribe(@NonNull Disposable d) {
                                 addDispose(d);
                             }
+
                             @Override
                             public void onSuccess(BaseResponse<String> stringBaseResponse) {
                                 Log.d("requestReportAction", "onSuccess");

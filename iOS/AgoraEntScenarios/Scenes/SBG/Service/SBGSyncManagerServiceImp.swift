@@ -10,7 +10,7 @@ import YYCategories
 import SVProgressHUD
 import AgoraSyncManager
 
-private let sSceneId = "scene_singbattle_3.4.0"
+private let sSceneId = "scene_singbattle_4.0.0"
 
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"
@@ -116,6 +116,15 @@ private func mapConvert(model: NSObject) -> [String: Any] {
         SyncUtil
             .scene(id: channelName)?
             .unsubscribeScene()
+        SyncUtil
+            .scene(id: channelName)?
+            .unsubscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION)
+        SyncUtil
+            .scene(id: channelName)?
+            .unsubscribe(key: SYNC_MANAGER_SEAT_INFO)
+        SyncUtil
+            .scene(id: channelName)?
+            .unsubscribe(key: SYNC_MANAGER_CHOOSE_SONG_INFO)
         
         userListCountDidChanged = nil
         seatListDidChanged = nil
@@ -211,6 +220,8 @@ private func mapConvert(model: NSObject) -> [String: Any] {
         roomInfo.roomPeopleNum = "0"
         roomInfo.icon = inputModel.icon
         roomInfo.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
+        roomInfo.creatorName = VLUserCenter.user.name
+        roomInfo.creatorAvatar = VLUserCenter.user.headUrl
 
         let params = mapConvert(model: roomInfo)
 
@@ -1359,7 +1370,7 @@ extension SBGSyncManagerServiceImp {
             .update(id: objectId,
                     data: params,
                     success: {
-                agoraPrint("imp song update success...")
+                agoraPrint("imp song update success...\(songInfo.songName)")
                 finished(nil)
             }, fail: { error in
                 agoraPrint("imp song update fail \(error.description)...")
@@ -1381,7 +1392,7 @@ extension SBGSyncManagerServiceImp {
             .collection(className: SYNC_MANAGER_CHOOSE_SONG_INFO)
             .add(data: params,
                  success: { obj in
-                agoraPrint("imp song add success...")
+                agoraPrint("imp song add success...\(songInfo.songName)---\(songInfo.songNo)")
                 finished(nil)
             }, fail: { error in
                 agoraPrint("imp song add fail...")

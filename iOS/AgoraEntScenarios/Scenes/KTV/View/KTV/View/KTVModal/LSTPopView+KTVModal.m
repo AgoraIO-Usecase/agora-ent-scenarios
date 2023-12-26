@@ -209,6 +209,38 @@
     return popView;
 }
 
+//弹出虚拟声卡视图
++ (LSTPopView*)popSoundCardViewWithParentView:(UIView*)parentView
+                                soundCardView:(UIView *)soundCardView
+                                    soundOpen:(BOOL)isOpen
+                                    gainValue:(double)gain
+                                    typeValue:(NSInteger)type
+                                   effectType:(NSInteger)effect
+{
+    CGFloat popViewH = 400+kSafeAreaBottomHeight;
+
+    [soundCardView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
+    soundCardView.frame = CGRectMake(0, 0, SCREEN_WIDTH, popViewH);
+    LSTPopView* popView = [self _createKTVPopContainerWithContentView:soundCardView
+                                                       withParentView:parentView];
+    [popView pop];
+    
+    return popView;
+}
+
++ (LSTPopView*)popSoundCardViewWithParentView:(UIView*)parentView
+                                soundCardView:(UIView *)soundCardView
+{
+    CGFloat popViewH = 355+kSafeAreaBottomHeight;
+    [soundCardView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
+    soundCardView.frame = CGRectMake(0, 0, SCREEN_WIDTH, popViewH);
+    LSTPopView* popView = [self _createKTVPopContainerWithContentView:soundCardView
+                                                       withParentView:parentView];
+    [popView pop];
+    
+    return popView;
+}
+
 //网络差视图
 + (LSTPopView*)popBadNetWrokTipViewWithParentView:(UIView*)parentView
                                      withDelegate:(id<VLBadNetWorkViewDelegate>)delegate {
@@ -236,7 +268,7 @@
                                settingView:(VLKTVSettingView*)settingView
                                withDelegate:(id<VLKTVSettingViewDelegate>)delegate {
     VLKTVSettingView* _settingView = settingView ? settingView : [[VLKTVSettingView alloc] initWithSetting:nil];
-    _settingView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 340);
+    _settingView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 380);
     _settingView.backgroundColor = UIColorMakeWithHex(@"#152164");
     [_settingView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
     _settingView.delegate = delegate;
@@ -251,10 +283,12 @@
 
 //弹出DebugView
 + (LSTPopView*)popDebugViewWithParentView:(UIView*)parentView
+                                    channelName:(NSString *)name
+                                   sdkVer:(NSString *)ver
                                    isDebugMode:(BOOL)isDebugMode
                              withDelegate:(id<VLDebugViewDelegate>)delegate {
     CGFloat popViewH = 480;
-    VLDebugView *debugView = [[VLDebugView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) isDumpMode:isDebugMode withDelegate:delegate];
+    VLDebugView *debugView = [[VLDebugView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) channelName:(NSString *)name sdkVer:(NSString *)ver isDumpMode:isDebugMode withDelegate:delegate];
     
     LSTPopView* popView = [self _createKTVPopContainerWithContentView:debugView
                                                        withParentView:parentView];

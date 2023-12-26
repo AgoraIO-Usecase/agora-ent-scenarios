@@ -14,9 +14,7 @@ import CallAPI
 class CallAgoraExProxy: CallApiProxy, AgoraRtcEngineDelegate {
 }
 
-private let kNormalIconSize = CGSize(width: 32, height: 32)
 class BroadcasterViewController: BaseRoomViewController {
-    var videoLoader: IVideoLoaderApi?
     var currentUser: ShowTo1v1UserInfo?
     override var roomInfo: ShowTo1v1RoomInfo? {
         didSet {
@@ -42,6 +40,7 @@ class BroadcasterViewController: BaseRoomViewController {
         }
     }
     private lazy var rtcProxy: CallAgoraExProxy = CallAgoraExProxy()
+    
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .custom)
         button.aui_size = kNormalIconSize
@@ -105,8 +104,13 @@ class BroadcasterViewController: BaseRoomViewController {
         closeButton.aui_centerY = roomInfoView.aui_centerY
         view.addSubview(closeButton)
         
-        userCountView.aui_right = closeButton.aui_left - 15
-        userCountView.aui_centerY = closeButton.aui_centerY
+        moreBtn.aui_size = kNormalIconSize
+        moreBtn.aui_right = closeButton.aui_left - 8
+        moreBtn.aui_centerY = closeButton.aui_centerY
+        view.addSubview(moreBtn)
+        
+        userCountView.aui_right = moreBtn.aui_left - 8
+        userCountView.aui_centerY = moreBtn.aui_centerY
         view.addSubview(userCountView)
         
         joinRTCChannel()
@@ -119,9 +123,9 @@ class BroadcasterViewController: BaseRoomViewController {
     }
     
     private func joinRTCChannel() {
-        guard let currentUser = currentUser, let roomInfo = roomInfo, let uid = UInt(currentUser.userId) else {return}
-        if currentUser.userId == roomInfo.userId {
-            videoLoader?.cleanCache()
+        guard let currentUser = currentUser, let roomInfo = roomInfo, let uid = UInt(currentUser.uid) else {return}
+        if currentUser.uid == roomInfo.uid {
+            VideoLoaderApiImpl.shared.cleanCache()
             let channelId = roomInfo.roomId
             rtcEngine?.setClientRole(.broadcaster)
             rtcEngine?.enableLocalVideo(true)
@@ -155,40 +159,41 @@ class BroadcasterViewController: BaseRoomViewController {
                 assert(false, "render fail")
                 return
             }
-            let room = roomInfo.createRoomInfo(token: token)
+            roomInfo.token = token
+            let room = roomInfo.anchorInfoList.first!
             let container = VideoCanvasContainer()
             container.container = remoteCanvasView
             container.uid = roomInfo.getUIntUserId()
-            videoLoader?.renderVideo(roomInfo: room, container: container)
+            VideoLoaderApiImpl.shared.renderVideo(anchorInfo: room, container: container)
             
-            videoLoader?.addRTCListener(roomId: room.channelName, listener: self.realTimeView)
-            
+            VideoLoaderApiImpl.shared.addRTCListener(anchorId: room.channelName, listener: self.realTimeView)
             
             bottomBar.buttonTypes = [.call, .more]
         }
     }
     
     private func _leaveRTCChannel() {
-        guard let currentUser = currentUser, let roomInfo = roomInfo, let uid = UInt(currentUser.userId) else {return}
-        if currentUser.userId == roomInfo.userId {
+        guard let currentUser = currentUser, let roomInfo = roomInfo, let uid = UInt(currentUser.uid) else {return}
+        if currentUser.uid == roomInfo.uid {
             rtcEngine?.leaveChannel()
             
             rtcEngine?.delegate = nil
             rtcProxy.removeAllListener()
         } else {
-            let room = roomInfo.createRoomInfo(token: "")
-            let container = VideoCanvasContainer()
-            container.container = nil
-            container.uid = roomInfo.getUIntUserId()
-            videoLoader?.renderVideo(roomInfo: room, container: container)
+//            roomInfo.token = ""
+//            let room = roomInfo.anchorInfoList.first!
+//            let container = VideoCanvasContainer()
+//            container.container = nil
+//            container.uid = roomInfo.getUIntUserId()
+//            VideoLoaderApiImpl.shared.renderVideo(anchorInfo: room, container: container)
             
-            videoLoader?.removeRTCListener(roomId: room.channelName, listener: self.realTimeView)
+            VideoLoaderApiImpl.shared.removeRTCListener(anchorId: roomInfo.channelName(), listener: self.realTimeView)
         }
     }
     
     private func _publishMedia(_ publish: Bool) {
-        guard let currentUser = currentUser, let roomInfo = roomInfo, let uid = UInt(currentUser.userId) else {return}
-        if currentUser.userId == roomInfo.userId {
+        guard let currentUser = currentUser, let roomInfo = roomInfo, let uid = UInt(currentUser.uid) else {return}
+        if currentUser.uid == roomInfo.uid {
             let mediaOptions = AgoraRtcChannelMediaOptions()
             mediaOptions.publishCameraTrack = publish
             mediaOptions.publishMicrophoneTrack = publish
@@ -197,8 +202,8 @@ class BroadcasterViewController: BaseRoomViewController {
     }
     
     private func _setupCanvas(view: UIView?) {
-        guard let currentUser = currentUser, let roomInfo = roomInfo, let uid = UInt(currentUser.userId) else {return}
-        if currentUser.userId == roomInfo.userId {
+        guard let currentUser = currentUser, let roomInfo = roomInfo, let uid = UInt(currentUser.uid) else {return}
+        if currentUser.uid == roomInfo.uid {
             let canvas = AgoraRtcVideoCanvas()
             canvas.view = view
             canvas.uid = uid
@@ -240,8 +245,8 @@ extension BroadcasterViewController {
                             eventReason: String,
                             elapsed: Int,
                             eventInfo: [String : Any]) {
-        let publisher = eventInfo[kPublisher] as? String ?? currentUser?.userId
-        guard publisher == currentUser?.userId else {return}
+        let publisher = eventInfo[kPublisher] as? String ?? currentUser?.uid
+        guard publisher == currentUser?.uid else {return}
         
         switch state {
         case .calling:

@@ -5,7 +5,9 @@
     android:id="@+id/clMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/voice_bg_room_image"
+    android:clipToPadding="false"
+    android:clipChildren="false"
+    android:background="@drawable/voice_img_room_bg"
     tools:context=".ui.activity.ChatroomLiveActivity">
 
     <io.agora.scene.voice.ui.widget.top.RoomLiveTopView
@@ -29,6 +31,8 @@
         android:id="@+id/rvChatroom2dMicLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/subtitle" />

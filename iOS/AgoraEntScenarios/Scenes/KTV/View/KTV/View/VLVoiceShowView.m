@@ -14,6 +14,7 @@
 @property (nonatomic,strong) UIImageView *selCoverImg;
 @property (nonatomic, assign) NSInteger selectIndex;
 @property (nonatomic, assign) BOOL UIUpdateAble;
+@property (nonatomic, assign) BOOL perHasSet;
 @end
 
 @implementation VLVoiceShowView
@@ -24,6 +25,7 @@
         self.delegate = delegate;
        // self.selectIndex = selectIndex;
         self.UIUpdateAble = UIUpdateAble;
+        self.perHasSet = (UIUpdateAble == false || selectUserNo.length > 0);
         [self layoutUIWithDataSource: imgSource nameSource:nameSource selectUserNo:selectUserNo userNoArray:userNoArray];
     }
     return self;
@@ -38,7 +40,7 @@
     }
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = KTVLocalizedString(@"设置人声");
+    titleLabel.text = KTVLocalizedString(@"ktv_vol_setting");
     titleLabel.font = UIFontMake(18);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -93,12 +95,22 @@
 
 -(void)click:(UIButton *)btn {
     
-    if(self.UIUpdateAble == false){
+//    if(self.UIUpdateAble == false){
+//        if([self.delegate respondsToSelector:@selector(voiceItemClickAction:)]){
+//            [self.delegate voiceItemClickAction:-1];
+//            return;
+//        }
+//    }
+    
+    if(self.perHasSet == true){
         if([self.delegate respondsToSelector:@selector(voiceItemClickAction:)]){
             [self.delegate voiceItemClickAction:-1];
             return;
         }
+        return;
     }
+    
+    self.perHasSet = true;
     self.selLabel.textColor = [UIColor lightGrayColor];
     self.selCoverImg.hidden = true;
     

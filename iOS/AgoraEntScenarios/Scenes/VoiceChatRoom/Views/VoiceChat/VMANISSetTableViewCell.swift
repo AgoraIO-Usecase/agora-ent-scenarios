@@ -62,6 +62,7 @@ class VMANISSetTableViewCell: UITableViewCell {
         offBtn.layer.masksToBounds = true
         offBtn.tag = 100
         offBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
+        offBtn.accessibilityIdentifier = "voice_chat_ains_setting_self_off"
         addSubview(offBtn)
 
         midBtn.backgroundColor = .white
@@ -75,6 +76,7 @@ class VMANISSetTableViewCell: UITableViewCell {
         midBtn.layer.borderWidth = 1
         midBtn.tag = 101
         midBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
+        midBtn.accessibilityIdentifier = "voice_chat_ains_setting_self_mid"
         addSubview(midBtn)
         selBtn = midBtn
 
@@ -86,6 +88,7 @@ class VMANISSetTableViewCell: UITableViewCell {
         highBtn.layer.masksToBounds = true
         highBtn.tag = 102
         highBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
+        highBtn.accessibilityIdentifier = "voice_chat_ains_setting_self_high"
         addSubview(highBtn)
 
         titleLabel.snp.makeConstraints { make in

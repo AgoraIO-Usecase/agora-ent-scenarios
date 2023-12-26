@@ -106,15 +106,21 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
         didSet {
             if settingType == .Spatial {
                 titleLabel.text = "Spatial Setting".voice_localized()
+                backBtn.accessibilityIdentifier = "voice_chat_room_audio_setting_back_Spatial"
             } else if settingType == .Noise {
                 titleLabel.text = "voice_noise_setting".voice_localized()
+                backBtn.accessibilityIdentifier = "voice_chat_room_audio_setting_back_Noise"
             } else if settingType == .effect {
                 titleLabel.text = "voice_effect_setting".voice_localized()
+                backBtn.accessibilityIdentifier = "voice_chat_room_audio_setting_back_effect"
             } else if settingType == .AIAEC {
                 titleLabel.text = "voice_AIAEC".voice_localized()
+                backBtn.accessibilityIdentifier = "voice_chat_room_audio_setting_back_AIAEC"
             } else if settingType == .AGC {
                 titleLabel.text = "voice_AGC".voice_localized()
+                backBtn.accessibilityIdentifier = "voice_chat_room_audio_setting_back_AGC"
             }
+            print("\(titleLabel.text!)  \(backBtn.accessibilityIdentifier!)")
             if tableView.tableFooterView == nil {
                 switch settingType {
                 case .AGC,.AIAEC:
@@ -245,6 +251,8 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
             return 54
         case .InEar:
             return 54
+        case .SoundCard:
+            return 54
         case .Music:
             return 54
         }
@@ -335,7 +343,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
                               range: NSRange(location: 0, length: text.length))
             text.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor(hex: 0x3C4267, alpha: 1), range: NSRange(location: 0, length: text.length))
 
-            let interactableText = NSMutableAttributedString(string: "www.agora.io")
+            let interactableText = NSMutableAttributedString(string: "www.shengwang.cn")
             interactableText.addAttribute(NSAttributedString.Key.font,
                                           value: UIFont.systemFont(ofSize: 12, weight: .bold),
                                           range: NSRange(location: 0, length: interactableText.length))
@@ -410,7 +418,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
                     warningView.addSubview(iconView)
 
                     let warningLabel = UILabel(frame: CGRect(x: 30, y: 6, width: screenWidth - 100, height: otherSoundHeaderHeight))
-                    warningLabel.text = "otherSound".voice_localized()
+                    warningLabel.text = "voice_otherSound".voice_localized()
                     warningLabel.numberOfLines = 0
                     warningLabel.lineBreakMode = .byCharWrapping
                     warningLabel.font = UIFont.systemFont(ofSize: 12)
@@ -465,6 +473,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
                  let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
                  cell.isNoiseSet = true
                  cell.titleLabel.text = settingName[indexPath.row]
+                 cell.swith.accessibilityIdentifier = "voice_chat_room_audio_setting_switch_Spatial"
                  return cell
              }
          } else if settingType == .AIAEC {
@@ -478,6 +487,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
 //                 guard let backBlock = self?.backBlock else {return}
 //                 backBlock();
              }
+             cell.swith.accessibilityIdentifier = "voice_chat_room_audio_setting_switch_AIAEC"
              return cell
 
          } else if settingType == .InEar {
@@ -491,6 +501,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
 //                 guard let backBlock = self?.backBlock else {return}
 //                 backBlock();
              }
+             cell.swith.accessibilityIdentifier = "voice_chat_room_audio_setting_switch_InEar"
              return cell
 
          }  else if settingType == .AGC {
@@ -504,7 +515,9 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
 //                 guard let backBlock = self?.backBlock else {return}
 //                 backBlock();
              }
-             return cell         }
+             cell.swith.accessibilityIdentifier = "voice_chat_room_audio_setting_switch_AGC"
+             return cell
+         }
         else {
              if indexPath.section == 0 {
                  let cell: VMANISSetTableViewCell = tableView.dequeueReusableCell(withIdentifier: sIdentifier) as! VMANISSetTableViewCell

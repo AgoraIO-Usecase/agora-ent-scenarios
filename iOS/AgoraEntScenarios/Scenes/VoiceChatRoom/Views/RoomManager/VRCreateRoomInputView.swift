@@ -14,6 +14,10 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
     var name = ""
 
     var action: (() -> Void)?
+    
+    var isPrivate: Bool = false
+    
+    var privateBlock: ((Bool)->Void)?
 
     private let PinHeight = ((ScreenWidth - 90 - 3 * 16) / 4.0) * (53 / 60.0)
 
@@ -33,15 +37,17 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
 
     lazy var roomNameField: UITextField = .init(frame: CGRect(x: 45, y: self.roomName.frame.maxY + 15, width: ScreenWidth - 90, height: 40)).placeholder(LanguageManager.localValue(key: "voice_set_room_name")).font(.systemFont(ofSize: 18, weight: .regular)).textColor(.darkText).delegate(self)
 
-    lazy var roomEncryption: UILabel = .init(frame: CGRect(x: self.roomName.frame.minX, y: self.roomBackground.frame.maxY + 12, width: 150, height: 20)).font(.systemFont(ofSize: 14, weight: .regular)).textColor(.darkText).text(LanguageManager.localValue(key: "voice_room_access")).backgroundColor(.clear)
+    lazy var roomEncryption: UILabel = .init(frame: CGRect(x: self.roomName.frame.minX, y: self.roomBackground.frame.maxY + 12, width: 60, height: 20)).font(.systemFont(ofSize: 14, weight: .regular)).textColor(.darkText).text(LanguageManager.localValue(key: "voice_room_access")).backgroundColor(.clear)
 
-    lazy var publicChoice: UIButton = .init(type: .custom).frame(CGRect(x: self.roomEncryption.frame.minX, y: self.roomEncryption.frame.maxY + 12, width: 90, height: 32)).title(LanguageManager.localValue(key: "voice_public"), .normal).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x3C4267), .normal).backgroundColor(.clear).tag(21).addTargetFor(self, action: #selector(chooseEncryption(_:)), for: .touchUpInside)
+    lazy var encryptBtn: UIButton = .init(frame: CGRect(x: Int(self.roomEncryption.frame.maxX + 20.0), y: Int(self.roomBackground.frame.maxY) + 12, width: 32, height: 20)).addTargetFor(self, action: #selector(encrypt), for: .touchUpInside)
+    
+//    lazy var publicChoice: UIButton = .init(type: .custom).frame(CGRect(x: self.roomEncryption.frame.minX, y: self.roomEncryption.frame.maxY + 12, width: 90, height: 32)).title(LanguageManager.localValue(key: "voice_public"), .normal).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x3C4267), .normal).backgroundColor(.clear).tag(21).addTargetFor(self, action: #selector(chooseEncryption(_:)), for: .touchUpInside)
+//
+//    lazy var privateChoice: UIButton = .init(type: .custom).frame(CGRect(x: self.publicChoice.frame.maxX + 20, y: self.roomEncryption.frame.maxY + 12, width: 90, height: 32)).title(LanguageManager.localValue(key: "voice_private"), .normal).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x3C4267), .normal).backgroundColor(.clear).tag(22).addTargetFor(self, action: #selector(chooseEncryption(_:)), for: .touchUpInside)
 
-    lazy var privateChoice: UIButton = .init(type: .custom).frame(CGRect(x: self.publicChoice.frame.maxX + 20, y: self.roomEncryption.frame.maxY + 12, width: 90, height: 32)).title(LanguageManager.localValue(key: "voice_private"), .normal).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x3C4267), .normal).backgroundColor(.clear).tag(22).addTargetFor(self, action: #selector(chooseEncryption(_:)), for: .touchUpInside)
+    lazy var pinCode: VerifyCodeView = .init(frame: CGRect(x: 0, y: self.roomEncryption.frame.maxY + 15, width: ScreenWidth, height: self.PinHeight), codeNumbers: 4, space: 16, padding: 45)
 
-    lazy var pinCode: VerifyCodeView = .init(frame: CGRect(x: 0, y: self.publicChoice.frame.maxY + 15, width: ScreenWidth, height: self.PinHeight), codeNumbers: 4, space: 16, padding: 45)
-
-    lazy var warnMessage: UILabel = .init(frame: CGRect(x: self.publicChoice.frame.minX, y: self.pinCode.frame.maxY + 12, width: ScreenWidth - 80, height: 20)).font(.systemFont(ofSize: 12, weight: .regular)).textColor(UIColor(0xFA396A)).text(self.codeMessage)
+    lazy var warnMessage: UILabel = .init(frame: CGRect(x: self.frame.size.width - 120, y: self.roomEncryption.frame.origin.y, width: ScreenWidth - 80, height: 20)).font(.systemFont(ofSize: 12, weight: .regular)).textColor(UIColor(0xFA396A)).text(self.codeMessage)
 
     lazy var timeLimit: UIButton = .init(type: .custom).frame(CGRect(x: 30, y: self.frame.height - CGFloat(ZTabbarHeight) - 58, width: ScreenWidth - 60, height: 40)).isUserInteractionEnabled(false).attributedTitle(self.timeWarning, .normal)
 
@@ -60,23 +66,18 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
         })
         return space
     }()
-
-    lazy var create: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: 30, y: self.frame.height - CGFloat(ZTabbarHeight), width: ScreenWidth - 60, height: 48)).cornerRadius(24).title(LanguageManager.localValue(key: "voice_next"), .normal).textColor(.white, .normal).font(.systemFont(ofSize: 16, weight: .semibold)).addTargetFor(self, action: #selector(createAction), for: .touchUpInside).setGradient([UIColor(red: 0.13, green: 0.608, blue: 1, alpha: 1), UIColor(red: 0.204, green: 0.366, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)])
-    }()
-
-    lazy var createContainer: UIView = .init(frame: CGRect(x: 30, y: self.frame.height - CGFloat(ZTabbarHeight), width: ScreenWidth - 60, height: 48)).backgroundColor(.white)
+    
+    
 
     override public init(frame: CGRect) {
         super.init(frame: frame)
         isUserInteractionEnabled = true
-        addSubViews([roomName, randomName, roomBackground, roomNameField, roomEncryption, publicChoice, privateChoice, pinCode, warnMessage, timeLimit, createContainer, create])
+        encryptBtn.setBackgroundImage(UIImage.sceneImage(name: "guan", bundleName: "VoiceChatRoomResource"), for: .normal)
+        encryptBtn.setBackgroundImage(UIImage.sceneImage(name: "open", bundleName: "VoiceChatRoomResource"), for: .selected)
+        roomNameField.accessibilityIdentifier = "voice_chat_create_room_name_tf"
+        addSubViews([roomName, randomName, roomBackground, roomNameField, roomEncryption, encryptBtn, pinCode, warnMessage])
         timeLimit.titleLabel?.numberOfLines = 0
-        createContainer.layer.cornerRadius = 24
-        createContainer.layer.shadowRadius = 8
-        createContainer.layer.shadowOffset = CGSize(width: 0, height: 4)
-        createContainer.layer.shadowColor = UIColor(red: 0, green: 0.55, blue: 0.98, alpha: 0.2).cgColor
-        createContainer.layer.shadowOpacity = 1
+
         setupAttributes()
         pinCode.textValueChange = { [weak self] in
             self?.code = $0
@@ -88,11 +89,11 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
             self?.code = $0
             self?.recover()
         }
-        create.layer.shadowColor = UIColor(red: 0, green: 0.546, blue: 0.979, alpha: 0.2).cgColor
-        create.layer.shadowOpacity = 1
-        create.layer.shadowRadius = 8
-        create.layer.shadowOffset = CGSize(width: 0, height: 4)
+        
+//        create.titleLabel?.accessibilityIdentifier = "voice_chat_create_room_next_btn"
+        
         warnMessage.isHidden = true
+ 
     }
 
     private func stateImage(button: UIButton) {
@@ -110,32 +111,38 @@ public extension VRCreateRoomInputView {
     private func setupAttributes() {
         pinCode.alpha = 0
         randomName.set(image:UIImage.sceneImage(name: "random", bundleName: "VoiceChatRoomResource"), title: LanguageManager.localValue(key: "voice_random"), titlePosition: .right, additionalSpacing: 5, state: .normal)
-        stateImage(button: publicChoice)
-        stateImage(button: privateChoice)
-        publicChoice.titleEdgeInsets = UIEdgeInsets(top: publicChoice.titleEdgeInsets.top, left: 10, bottom: publicChoice.titleEdgeInsets.bottom, right: publicChoice.titleEdgeInsets.right)
-        privateChoice.titleEdgeInsets(UIEdgeInsets(top: privateChoice.titleEdgeInsets.top, left: 10, bottom: privateChoice.titleEdgeInsets.bottom, right: privateChoice.titleEdgeInsets.right))
-        publicChoice.isSelected = true
-        publicChoice.contentHorizontalAlignment = .left
+//        stateImage(button: publicChoice)
+//        stateImage(button: privateChoice)
+//        publicChoice.titleEdgeInsets = UIEdgeInsets(top: publicChoice.titleEdgeInsets.top, left: 10, bottom: publicChoice.titleEdgeInsets.bottom, right: publicChoice.titleEdgeInsets.right)
+//        privateChoice.titleEdgeInsets(UIEdgeInsets(top: privateChoice.titleEdgeInsets.top, left: 10, bottom: privateChoice.titleEdgeInsets.bottom, right: privateChoice.titleEdgeInsets.right))
+//        publicChoice.isSelected = true
+//        publicChoice.contentHorizontalAlignment = .left
     }
-
-    @objc internal func chooseEncryption(_ sender: UIButton) {
-        if sender.tag == 21 {
-            privateChoice.isSelected = false
-            publicChoice.isSelected = true
+    
+    @objc private func encrypt(_ btn: UIButton) {
+        btn.isSelected = !btn.isSelected
+        guard let block = privateBlock else {return}
+        if !btn.isSelected {
+//            privateChoice.isSelected = false
+//            publicChoice.isSelected = true
             recover()
             warnMessage.isHidden = true
-            endEditing(true)
-            timeLimit.isHidden = false
+//            endEditing(true)
+            //timeLimit.isHidden = false
+            self.isPrivate = false
+            block(false)
         } else {
-            timeLimit.isHidden = ScreenHeight < 812
+           // timeLimit.isHidden = ScreenHeight < 812
             warnMessage.isHidden = false
-            privateChoice.isSelected = true
-            publicChoice.isSelected = false
-            roomNameField.resignFirstResponder()
-            pinCode.textFiled.becomeFirstResponder()
+//            privateChoice.isSelected = true
+//            publicChoice.isSelected = false
+//            roomNameField.resignFirstResponder()
+//            pinCode.textFiled.becomeFirstResponder()
+            self.isPrivate = true
+            block(true)
         }
         UIView.animate(withDuration: 0.3) {
-            self.pinCode.alpha = self.publicChoice.isSelected ? 0 : 1
+            self.pinCode.alpha = btn.isSelected ? 1 : 0
         }
     }
 
@@ -153,7 +160,7 @@ public extension VRCreateRoomInputView {
     }
 
     @objc private func createAction() {
-        if privateChoice.isSelected {
+        if self.isPrivate {
             if let name = roomNameField.text,!name.isEmpty,!self.code.isEmpty {
                 if action != nil {
                     action!()

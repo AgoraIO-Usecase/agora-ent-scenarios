@@ -24,14 +24,14 @@ import KakaJSON
     public var room_id: String? // 房间id
     public var channel_id: String? // agora rtc channel id
     public var chatroom_id: String? // agora chat chatroom id
-    public var name: String? // 房间名称
+    @objc public var name: String? // 房间名称
     public var member_count: Int? = 0 // 房间人数
     public var gift_amount: Int? = 0 // 礼物数
     public var owner: VRUser?
-    public var is_private: Bool? // 是否为私密房间
+    @objc public var is_private: Bool = false // 是否为私密房间
     public var type: Int? = 0 // 房间类型， 0 ：普通房间，1:3D房间
     public var created_at: UInt? // 创建房间时间戳，单位毫秒
-    public var roomPassword = ""
+    @objc public var roomPassword = ""
     public var click_count: Int? = 0 // 观看人数
     public var announcement: String? // Notice
     public var ranking_list: [VRUser]? = [VRUser]() // 土豪榜
@@ -55,6 +55,15 @@ import KakaJSON
     }
 }
 
+enum VRRoomMicStatus: Int {
+    case idle = -1              //空闲
+    case normal = 0             //正常
+    case close = 1              //闭麦
+    case forbidden = 2          //禁言
+    case lock = 3               //锁麦
+    case forbiddenAndLock = 4   //锁麦和禁言
+}
+
 @objc open class VRRoomMic: NSObject, Convertible {
     var mic_index: Int = 0
 
@@ -66,6 +75,10 @@ import KakaJSON
 
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
+    }
+    
+    open override var description: String {
+        return "seat: \(mic_index), status: \(status), memeber: \(member?.rtc_uid ?? "empty")"
     }
 }
 

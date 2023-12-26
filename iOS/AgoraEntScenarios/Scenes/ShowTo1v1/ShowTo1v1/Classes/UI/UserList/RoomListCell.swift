@@ -65,6 +65,7 @@ class RoomUserInfoView: UIView {
         avatarView.frame = CGRect(x: 15, y: avatartViewTop, width: wh, height: wh)
         avatarView.layer.cornerRadius = wh / 2
         avatarView.clipsToBounds = true
+        avatarView.contentMode = .scaleAspectFill
         
         nameLabel.aui_left = avatarView.aui_right + 10
         nameLabel.aui_size = CGSize(width: aui_width - nameLabel.aui_left - 10, height: avatarView.aui_height)

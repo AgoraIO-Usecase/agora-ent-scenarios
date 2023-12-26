@@ -82,7 +82,7 @@
         android:id="@+id/ilGameSong"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        layout="@layout/ktv_dialog_game_song"
+        layout="@layout/ktv_singbattle_dialog_game_song"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pager"

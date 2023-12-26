@@ -2,7 +2,6 @@ package io.agora.scene.show
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.res.AssetManager
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
@@ -20,6 +19,8 @@ import io.agora.beautyapi.sensetime.*
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
+import io.agora.rtc2.video.SegmentationProperty
+import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
@@ -62,7 +63,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             binding.root.setPaddingRelative(inset.left, 0, inset.right, inset.bottom)
             WindowInsetsCompat.CONSUMED
         }
-        binding.ivRoomCover.setImageResource(getThumbnailIcon(mThumbnailId))
         binding.tvRoomId.text = getString(R.string.show_room_id, mRoomId)
         binding.etRoomName.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -100,38 +100,33 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 showPresetDialog()
             }
         }
-        mBeautyProcessor.initialize(
-            rtcEngine = mRtcEngine,
-            captureMode = CaptureMode.Agora,
-            statsEnable = true,
-            eventCallback = object : IEventCallback {
-                override fun onBeautyStats(stats: BeautyStats) {
-                }
-            }
-        )
-        var licenseExists = false
-        try { // 美颜license是否存在
-            this.assets.open("license/SenseME.lic").use { inputStream ->
-                licenseExists = true
-            }
-        } catch (_: Exception) {}
-        // 低端机 或 无证书则关闭美颜
-        if (mRtcEngine.queryDeviceScore() >= 75 && licenseExists) {
-            mBeautyProcessor.setBeautyEnable(true)
-        } else {
-            mBeautyProcessor.setBeautyEnable(false)
-        }
-        mBeautyProcessor.getSenseTimeBeautyAPI().setupLocalVideo(SurfaceView(this).apply {
-            binding.flVideoContainer.addView(this)
-        }, Constants.RENDER_MODE_HIDDEN)
 
         toggleVideoRun = Runnable {
+            mBeautyProcessor.initialize(
+                rtcEngine = mRtcEngine,
+                captureMode = CaptureMode.Agora,
+                statsEnable = true,
+                eventCallback = object : IEventCallback {
+                    override fun onBeautyStats(stats: BeautyStats) {
+                    }
+                }
+            )
+            // 低端机 或 无证书则关闭美颜
+            if (mRtcEngine.queryDeviceScore() >= 75) {
+                mBeautyProcessor.setBeautyEnable(true)
+            } else {
+                mBeautyProcessor.setBeautyEnable(false)
+            }
+            binding.flVideoContainer.post {
+                mBeautyProcessor.getSenseTimeBeautyAPI().setupLocalVideo(SurfaceView(this).apply {
+                    binding.flVideoContainer.addView(this)
+                }, Constants.RENDER_MODE_HIDDEN)
+            }
             mBeautyProcessor.reset()
             initRtcEngine()
-            //getDeviceScoreAndUpdateVideoProfile()
-            showPresetDialog()
         }
         requestCameraPermission(true)
+        showPresetDialog()
     }
 
     private var toggleVideoRun: Runnable? = null
@@ -143,10 +138,12 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     }
 
     override fun getPermissions() {
-        if (toggleVideoRun != null) {
-            toggleVideoRun?.run()
-            toggleVideoRun = null
-        }
+        Thread {
+            if (toggleVideoRun != null) {
+                toggleVideoRun?.run()
+                toggleVideoRun = null
+            }
+        }.start()
     }
 
     private fun showPresetDialog() = PresetDialog(this, mRtcEngine.queryDeviceScore(), RtcConnection(mRoomId, UserManager.getInstance().user.id.toInt())).show()
@@ -175,6 +172,9 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 )
             )
         )
+        // reset virtual background config
+        RtcEngineInstance.virtualBackgroundSource.backgroundSourceType = 0
+        RtcEngineInstance.rtcEngine.enableVirtualBackground(false, VirtualBackgroundSource(), SegmentationProperty())
 //        mRtcEngine.startPreview()
     }
 
@@ -237,14 +237,5 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
     private fun getRandomThumbnailId() =
         Random(TimeUtils.currentTimeMillis()).nextInt(0, 3).toString()
-
-    @DrawableRes
-    private fun getThumbnailIcon(thumbnailId: String) = when (thumbnailId) {
-        "0" -> R.mipmap.show_room_cover_0
-        "1" -> R.mipmap.show_room_cover_1
-        "2" -> R.mipmap.show_room_cover_2
-        "3" -> R.mipmap.show_room_cover_3
-        else -> R.mipmap.show_room_cover_0
-    }
 
 }

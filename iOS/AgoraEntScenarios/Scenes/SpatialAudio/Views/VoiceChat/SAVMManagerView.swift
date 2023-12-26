@@ -23,6 +23,7 @@ class SAVMManagerView: UIView {
     private var bgView: UIView = .init()
     private var addView: UIImageView = .init()
     private var iconView: UIImageView = .init()
+    private var micView: UIImageView = .init()
     private var nameLabel: UILabel = .init()
     private var roleBtn: UIButton = .init()
     private var lineView: UIView = .init()
@@ -48,13 +49,13 @@ class SAVMManagerView: UIView {
             if m_type == -1 {
                 iconView.isHidden = true
                 roleBtn.isHidden = true
-                // micView.isHidden = true
+                 micView.isHidden = true
                 nameLabel.text = username
             } else if m_type == 3 {
                 iconView.isHidden = true
                 roleBtn.isHidden = true
-                // micView.isHidden = true
-                addView.image = UIImage.sceneImage(name: "icons／solid／lock")
+                 micView.isHidden = true
+                addView.image = UIImage.sceneImage(name: "sa_ic_seat_lock", bundleName: "SpatialAudioResource")
                 lockBtn.setTitle("spatial_voice_unblock".spatial_localized(), for: .normal)
                 inviteBtn.setTitleColor(UIColor(hex: 0x979cbb, alpha: 1), for: .normal)
                 inviteBtn.isUserInteractionEnabled = false
@@ -62,9 +63,8 @@ class SAVMManagerView: UIView {
             } else if m_type == 4 {
                 iconView.isHidden = true
                 roleBtn.isHidden = true
-//                micView.isHidden = false
-//                micView.setState(.forbidden)
-                addView.image = UIImage.sceneImage(name:"icons／solid／lock")
+                micView.isHidden = false
+                addView.image = UIImage.sceneImage(name: "sa_ic_seat_lock", bundleName: "SpatialAudioResource")
                 lockBtn.setTitle("spatial_voice_unblock".spatial_localized(), for: .normal)
                 muteBtn.setTitle("spatial_voice_unmute".spatial_localized(), for: .normal)
                 inviteBtn.setTitleColor(UIColor(hex: 0x979cbb, alpha: 1), for: .normal)
@@ -73,24 +73,20 @@ class SAVMManagerView: UIView {
             } else if m_type == 1 {
                 iconView.isHidden = true
                 roleBtn.isHidden = true
-//                micView.isHidden = false
-//                micView.setState(.forbidden)
+                micView.isHidden = false
                 muteBtn.setTitle("spatial_voice_unmute".spatial_localized(), for: .normal)
                 nameLabel.text = username
             } else if m_type == 0 {
                 iconView.isHidden = false
                 iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: nil)
                 nameLabel.text = username
-//                micView.setState(.on)
-//                micView.setVolume(100)
-                // micView.isHidden = false
-                inviteBtn.setTitle("spatial_voice_kick_micick".spatial_localized(), for: .normal)
+                 micView.isHidden = true
+                inviteBtn.setTitle("spatial_voice_kick_mic".spatial_localized(), for: .normal)
             } else if m_type == 2 {
                 iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: nil)
                 iconView.isHidden = iconStr.count == 0
                 nameLabel.text = username
-//                micView.setState(.forbidden)
-//                micView.isHidden = false
+                micView.isHidden = false
                 inviteBtn.setTitle(micInfo?.member != nil ? "spatial_voice_kick_mic".spatial_localized() : "spatial_voice_invite".spatial_localized(), for: .normal)
                 muteBtn.setTitle("spatial_voice_unmute".spatial_localized(), for: .normal)
             }
@@ -130,8 +126,8 @@ class SAVMManagerView: UIView {
         bgView.layer.masksToBounds = true
         addSubview(bgView)
 
-        addView.frame = CGRect(x: ScreenWidth / 2 - 11, y: 61, width: 22, height: 22)
-        addView.image = UIImage.sceneImage(name:"icons／solid／add")
+        addView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)
+        addView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
         addSubview(addView)
 
         iconView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)
@@ -151,7 +147,6 @@ class SAVMManagerView: UIView {
         addSubview(nameLabel)
 
         roleBtn.frame = CGRect(x: ScreenWidth / 2.0 - 50, y: 135, width: 100, height: 20)
-        roleBtn.setImage(UIImage.sceneImage(name:"Landlord"), for: .normal)
         roleBtn.setTitle("spatial_voice_host".spatial_localized(), for: .normal)
         roleBtn.setTitleColor(.black, for: .normal)
         roleBtn.font(UIFont.systemFont(ofSize: 11))
@@ -170,11 +165,10 @@ class SAVMManagerView: UIView {
         inviteBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
         addSubview(inviteBtn)
 
-//        micView.frame = CGRect(x: self.bounds.size.width / 2.0 + 10, y: 85, width: 20, height: 20)
-//        micView.setState(.on)
-//        micView.setVolume(100)
-//        self.addSubview(micView)
-//        micView.isHidden = true
+        micView.frame = CGRect(x: self.bounds.size.width / 2.0 + 10, y: 85, width: 20, height: 20)
+        micView.image = UIImage.sceneImage(name: "micoff", bundleName: "SpatialAudioResource")
+        micView.isHidden = true
+        self.addSubview(micView)
 
         muteBtn.frame = CGRect(x: ScreenWidth / 3.0 + 20, y: 170, width: ScreenWidth / 3.0 - 40, height: 40)
         muteBtn.setTitleColor(UIColor(hex: 0x156ef3, alpha: 1), for: .normal)

@@ -12,7 +12,6 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:background="@drawable/voice_bg_room_list_type_nomal"
         android:layout_width="0dp"
         android:layout_height="match_parent">
 
@@ -53,7 +52,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="@string/voice_room_list_title_private"/>
+                android:hint="@string/voice_spatial_room_list_title_private"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -91,7 +90,7 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintDimensionRatio="1:1"
                 android:background="@drawable/voice_icon_create_3d_room"
-                app:shapeAppearance="@style/voice_seat_roundStyle"
+                app:shapeAppearance="@style/ui_widget_roundStyle"
                 android:src="@drawable/voice_bg_oval_black20"
                 android:id="@+id/owner_avatar"
                 android:layout_width="16dp"
@@ -140,7 +139,7 @@
                     app:layout_constraintDimensionRatio="1:1"
                     android:id="@+id/icon_count"
                     android:background="@drawable/voice_bg_room_item_count"
-                    app:shapeAppearance="@style/voice_seat_roundStyle"
+                    app:shapeAppearance="@style/ui_widget_roundStyle"
                     android:scaleType="fitCenter"
                     android:layout_width="16dp"
                     android:layout_height="16dp"/>
@@ -152,7 +151,7 @@
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintDimensionRatio="1:1"
                     android:background="@drawable/voice_bg_room_item_count"
-                    app:shapeAppearance="@style/voice_seat_roundStyle"
+                    app:shapeAppearance="@style/ui_widget_roundStyle"
                     android:src="@drawable/voice_icon_count"
                     android:scaleType="fitCenter"
                     android:layout_width="8dp"
@@ -186,7 +185,7 @@
             android:textStyle="bold"
             android:textSize="@dimen/voice_sp_12"
             android:gravity="center"
-            android:text="@string/voice_room_list_item_enter"
+            android:text="@string/voice_spatial_room_list_item_enter"
             android:textColorHint="@color/voice_white"
             android:layout_width="56dp"
             android:layout_height="24dp"/>

@@ -31,10 +31,10 @@ let page_size = 15
     private lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage.sceneImage(name: "roomList", bundleName: "VoiceChatRoomResource")!)
 
     private lazy var container: VoiceRoomPageContainer = {
-        VoiceRoomPageContainer(frame: CGRect(x: 0, y: ZNavgationHeight, width: ScreenWidth, height: ScreenHeight - ZNavgationHeight - 10 - CGFloat(ZBottombarHeight) - 30), viewControllers: [self.normal]).backgroundColor(.clear)
+        VoiceRoomPageContainer(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: ScreenHeight - 10 - 30), viewControllers: [self.normal]).backgroundColor(.clear)
     }()
 
-    private lazy var create: VRRoomCreateView = .init(frame: CGRect(x: 0, y: self.container.frame.maxY - 50, width: ScreenWidth, height: 72)).image(UIImage.sceneImage(name: "blur", bundleName: "VoiceChatRoomResource")!).backgroundColor(.clear)
+    private lazy var create: VRRoomCreateView = .init(frame: CGRect(x: 0, y: self.container.frame.maxY - 50, width: ScreenWidth, height: 56)).image(UIImage.sceneImage(name: "blur", bundleName: "VoiceChatRoomResource")!).backgroundColor(.clear)
     
     private var initialError: AgoraChatError?
     
@@ -56,7 +56,8 @@ let page_size = 15
     override public func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        navigation.title.text = LanguageManager.localValue(key: "voice_app_name")
+        //navigation.isHidden = true
+        navigation.title.text = LanguageManager.localValue(key: "voice_chat_room")
     }
     
     
@@ -74,11 +75,13 @@ let page_size = 15
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+      //  self.navigationController?.navigationBar.isHidden = true
         isDestory = true
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+      //  self.navigationController?.navigationBar.isHidden = false
         if isDestory {
             destory()
         }
@@ -150,7 +153,19 @@ extension VRRoomsViewController {
     private func viewsAction() {
         create.action = { [weak self] in
             self?.isDestory = false
-            self?.navigationController?.pushViewController(VRCreateRoomViewController(), animated: true)
+            let presentView = VRCreateRoomPresentView.shared
+            let vc = VRCreateViewController()
+            presentView.showView(with: CGRect(x: 0, y: (self?.view.bounds.size.height ?? 0) - 343, width: self?.view.bounds.width ?? 0, height: 343), vc: vc)
+            self?.view.addSubview(presentView)
+            
+            vc.createRoomBlock = { height in
+                presentView.update(height)
+            }
+        
+            vc.createRoomVCBlock = {[weak self] (name, pwd) in
+                presentView.dismiss()
+                self?.settingSound(name: name, pwd: pwd)
+            }
         }
 //        self.container.scrollClosure = { [weak self] in
 //            let idx = IndexPath(row: $0, section: 0)
@@ -161,9 +176,18 @@ extension VRRoomsViewController {
 //            self?.index = $0.row
 //        }
     }
+    
+    private func settingSound(name: String, pwd: String) {
+           let vc = VRSoundEffectsViewController()
+           vc.code = pwd
+           vc.type = 0
+           vc.name = name
+           navigationController?.pushViewController(vc, animated: true)
+    }
+
 
     private func entryRoom(room: VRRoomEntity) {
-        if room.is_private ?? false {
+        if room.is_private {
             self.normal.roomList.isUserInteractionEnabled = true
             let alert = VoiceRoomPasswordAlert(frame: CGRect(x: 37.5, y: 168, width: ScreenWidth - 75, height: (ScreenWidth - 63 - 3 * 16) / 4.0 + 177)).cornerRadius(16).backgroundColor(.white)
             let vc = VoiceRoomAlertViewController(compent: component(), custom: alert)
@@ -214,8 +238,13 @@ extension VRRoomsViewController {
             VLUserCenter.user.agoraRTCToken = token ?? ""
             ChatRoomServiceImp.getSharedInstance().joinRoom(room.room_id ?? "") { error, room_entity in
                 SVProgressHUD.dismiss()
+                self.normal.roomList.isUserInteractionEnabled = true
                 if VLUserCenter.user.chat_uid.isEmpty || VLUserCenter.user.im_token.isEmpty || self.initialError != nil {
                     SVProgressHUD.showError(withStatus: "Fetch IMconfig failed!")
+                    return
+                }
+                if let error = error {
+                    SVProgressHUD.showError(withStatus: error.localizedDescription)
                     return
                 }
                 self.mapUser(user: VLUserCenter.user)
@@ -225,8 +254,6 @@ extension VRRoomsViewController {
                 self.isDestory = false
                 let vc = VoiceRoomViewController(info: info)
                 self.navigationController?.pushViewController(vc, animated: true)
-                self.normal.roomList.isUserInteractionEnabled = true
-
             }
         }
     }

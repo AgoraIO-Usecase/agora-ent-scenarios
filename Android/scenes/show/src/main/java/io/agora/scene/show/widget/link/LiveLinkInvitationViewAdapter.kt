@@ -1,6 +1,7 @@
 package io.agora.scene.show.widget.link
 
 import android.view.View
+import com.bumptech.glide.request.RequestOptions
 import io.agora.scene.base.GlideApp
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLiveLinkInvitationMessageBinding
@@ -8,7 +9,6 @@ import io.agora.scene.show.service.ShowRoomRequestStatus
 import io.agora.scene.show.service.ShowUser
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 
 class LiveLinkInvitationViewAdapter: BindingSingleAdapter<ShowUser, ShowLiveLinkInvitationMessageBinding>() {
     override fun onBindViewHolder(
@@ -22,7 +22,7 @@ class LiveLinkInvitationViewAdapter: BindingSingleAdapter<ShowUser, ShowLiveLink
         GlideApp.with(binding.coverUserIcon).load(userItem.avatar)
             .fallback(R.mipmap.show_default_icon)
             .error(R.mipmap.show_default_icon)
-            .transform(CenterCropRoundCornerTransform(10))
+            .apply(RequestOptions.circleCropTransform())
             .into(binding.coverUserIcon)
         when (userItem.status) {
             ShowRoomRequestStatus.accepted.value -> {

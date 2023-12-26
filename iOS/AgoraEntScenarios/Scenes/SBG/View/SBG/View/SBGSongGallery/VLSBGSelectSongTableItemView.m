@@ -191,17 +191,26 @@ UITableViewDelegate
     if (cell == nil) {
         cell = [[VLSBGSelectedSongListCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseCell];
     }
-    cell.userInteractionEnabled = !self.isTaped;
+
     VLSBGSongItmModel *model = self.songsMuArray[indexPath.row];
     model.isFull = self.isFull;
     cell.songItemModel = model;
+    
+    // 设置按钮点击事件
     cell.dianGeBtnClickBlock = ^(VLSBGSongItmModel * _Nonnull model) {
+        if (weakSelf.isTaped) {
+            return;
+        }
+        
         weakSelf.isTaped = true;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(300 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
-                weakSelf.isTaped = false;
-            });
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(500 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
+            weakSelf.isTaped = false;
+        });
+        
         [weakSelf dianGeWithModel:model];
     };
+        
     return cell;
 }
 
@@ -211,7 +220,7 @@ UITableViewDelegate
 
 - (void)dianGeWithModel:(VLSBGSongItmModel*)model {
     if(model == nil || model.songNo == nil || model.songName == nil ) {
-        [VLToast toast:SBGLocalizedString(@"点歌失败，请重试")];
+        [VLToast toast:SBGLocalizedString(@"sbg_chooseSong_failed")];
         return;
     }
     
@@ -232,72 +241,9 @@ UITableViewDelegate
         //点歌完成发送通知
         [self dianGeSuccessWithModel:model];
         if(self.selSongsArray.count == 7){
-            [VLToast toast:@"歌曲已满，开始游戏吧"];
+            [VLToast toast:SBGLocalizedString(@"sbg_full_song")];
         }
     }];
-}
-
-- (NSMutableArray<AgoraMusic *> *)getMockMusicList {
-    NSMutableArray<AgoraMusic *> *musicList = [NSMutableArray<AgoraMusic *> array];
-    
-    AgoraMusic *music1 = [[AgoraMusic alloc] init];
-    music1.songCode = 6625526603247450;
-    music1.name = @"后来";
-    music1.singer = @"刘若英";
-    music1.poster = @"";
-    
-    AgoraMusic *music2 = [[AgoraMusic alloc] init];
-    music2.songCode = 6625526603270070;
-    music2.name = @"追光者";
-    music2.singer = @"岑宁儿";
-    music2.poster = @"";
-    
-    AgoraMusic *music3 = [[AgoraMusic alloc] init];
-    music3.songCode = 6625526603287770;
-    music3.name = @"纸短情长";
-    music3.singer = @"烟把儿乐队";
-    music3.poster = @"";
-    
-    AgoraMusic *music4 = [[AgoraMusic alloc] init];
-    music4.songCode = 6625526604169700;
-    music4.name = @"起风了";
-    music4.singer = @"吴青峰";
-    music4.poster = @"";
-    
-    AgoraMusic *music5 = [[AgoraMusic alloc] init];
-    music5.songCode = 6625526603590690;
-    music5.name = @"月半小夜曲";
-    music5.singer = @"李克勤";
-    music5.poster = @"";
-    
-    AgoraMusic *music6 = [[AgoraMusic alloc] init];
-    music6.songCode = 6625526603907880;
-    music6.name = @"痴心绝对";
-    music6.singer = @"李圣杰";
-    music6.poster = @"";
-    
-    AgoraMusic *music7 = [[AgoraMusic alloc] init];
-    music7.songCode = 6625526603774840;
-    music7.name = @"岁月神偷";
-    music7.singer = @"金玟岐";
-    music7.poster = @"";
-    
-    AgoraMusic *music8 = [[AgoraMusic alloc] init];
-    music8.songCode = 6625526603711050;
-    music8.name = @"我的";
-    music8.singer = @"以东";
-    music7.poster = @"";
-    
-    [musicList addObject:music1];
-    [musicList addObject:music2];
-    [musicList addObject:music3];
-    [musicList addObject:music4];
-    [musicList addObject:music1];
-    [musicList addObject:music2];
-    [musicList addObject:music3];
-    [musicList addObject:music4];
-    
-    return musicList;
 }
 
 - (void)dianGeFailedWithModel:(VLSBGSongItmModel *)songItemModel {

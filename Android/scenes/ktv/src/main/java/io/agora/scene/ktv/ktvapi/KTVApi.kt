@@ -15,7 +15,9 @@ import io.agora.rtc2.RtcEngine
  */
 enum class KTVType(val value: Int)  {
     Normal(0),
-    SingBattle(1)
+    SingBattle(1),
+    Cantata(2),
+    SingRelay(3)
 }
 
 /**
@@ -195,6 +197,12 @@ abstract class IKTVApiEventHandler {
     open fun onChorusChannelAudioVolumeIndication(
         speakers: Array<out IRtcEngineEventHandler.AudioVolumeInfo>?,
         totalVolume: Int) {}
+
+    /**
+     * 播放进度回调
+     * @param position_ms 音乐播放的进度
+     */
+    open fun onMusicPlayerPositionChanged(position_ms: Long, timestamp_ms: Long) {}
 }
 
 /**
@@ -208,6 +216,7 @@ abstract class IKTVApiEventHandler {
  * @param chorusChannelToken 子频道token 加入子频道需要用到
  * @param maxCacheSize 最大缓存歌曲数
  * @param type KTV场景
+ * @param musicType 音乐类型
  */
 data class KTVApiConfig constructor(
     val appId: String,
@@ -216,7 +225,7 @@ data class KTVApiConfig constructor(
     val channelName: String,
     val localUid: Int,
     val chorusChannelName: String,
-    val chorusChannelToken: String,
+    var chorusChannelToken: String,
     val maxCacheSize: Int = 10,
     val type: KTVType = KTVType.Normal,
     val musicType: KTVMusicType = KTVMusicType.SONG_CODE
@@ -362,6 +371,12 @@ interface KTVApi {
     )
 
     /**
+     * 取消加载歌曲，会打断加载歌曲的进程并移除歌曲缓存
+     * @param songCode 歌曲唯一编码
+     */
+    fun removeMusic(songCode: Long)
+
+    /**
      * 加载歌曲，同时只能为一首歌loadSong，同步调用， 一般使用此loadSong是歌曲已经preload成功（url为本地文件地址）
      * @param config 加载歌曲配置
      * @param url 歌曲地址
@@ -469,10 +484,10 @@ interface KTVApi {
     fun setLrcView(view: ILrcView)
 
     /**
-     * 设置当前mic开关状态
-     * 目前关麦调用 adjustRecordSignalVolume(0) 后 onAudioVolumeIndication 仍然会执行， ktvApi需要增加一个变量判断当前是否关麦， 如果关麦把设置给歌词组件的pitch改为0
+     * 开关麦
+     * @param mute true 关麦 false 开麦
      */
-    fun setMicStatus(isOnMicOpen: Boolean)
+    fun muteMic(mute: Boolean)
 
     /**
      * 设置当前音频播放delay， 适用于音频自采集的情况

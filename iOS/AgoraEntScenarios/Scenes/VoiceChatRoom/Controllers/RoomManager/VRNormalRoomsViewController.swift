@@ -13,69 +13,74 @@ public class VRNormalRoomsViewController: UIViewController {
     
     public var totalCountClosure: ((Int) -> Void)?
     
-    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "voice_no_chat_room_yet", image: nil)
-    
-    lazy var roomList: VRRoomListView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), style: .plain)
+    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 200, width: ScreenWidth, height: self.view.frame.height - 10 - 30), title: "voice_room_nobody", image: nil)
+
+    lazy var roomList: VRRoomHomeListView = .init(frame: CGRect(x: 0, y: ZNavgationHeight, width: ScreenWidth, height: self.view.frame.height - 30 - ZNavgationHeight))
     
     override public func viewDidLoad() {
         super.viewDidLoad()
-        view.addSubViews([empty, roomList])
-        // Do any additional setup after loading the view.
-        roomListEvent()
+        self.view.backgroundColor = .clear
+        view.addSubViews([ empty,roomList])
         refresh()
-        roomList.refreshControl?.addTarget(self, action: #selector(refresh), for: .valueChanged)
-        NotificationCenter.default.addObserver(self, selector: #selector(refresh), name: NSNotification.Name("refreshList"), object: nil)
+        
+        roomList.refreshBlock = {[weak self] _ in
+            guard let self = self else {return}
+            self.refresh()
+        }
+        
+        roomList.clickBlock = {[weak self] index in
+            guard let self = self, let room = self.roomList.roomList?[index] else {return}
+            if self.didSelected != nil { self.didSelected!(room) }
+            self.entryRoom(room: room)
+        }
+        
+        roomList.backBlock = {[weak self] in
+            self?.navigationController?.popViewController(animated: true)
+        }
     }
     
     override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+       // self.navigationController?.navigationBar.isHidden = true
         self.refresh()
+    }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+      //  self.navigationController?.navigationBar.isHidden = false
     }
     
 }
 
 extension VRNormalRoomsViewController {
     @objc func refresh() {
-        roomList.rooms = nil
+        roomList.roomList = nil
         fetchRooms(cursor: "")
     }
 
     @objc private func fetchRooms(cursor: String) {
         ChatRoomServiceImp.getSharedInstance().fetchRoomList(page: 0) { error, rooms in
-            self.roomList.refreshControl?.endRefreshing()
+            self.roomList.refreshControl.endRefreshing()
             if error == nil {
                 guard let rooms = rooms else {return}
                 let roomsEntity: VRRoomsEntity = VRRoomsEntity()
                 roomsEntity.rooms = rooms
                 roomsEntity.total = rooms.count
-                self.fillDataSource(rooms: roomsEntity)
-                self.roomList.reloadData()
+                self.roomList.roomList = rooms
                 self.empty.isHidden = (rooms.count > 0)
             } else {
-                self.view.makeToast("\(error?.localizedDescription ?? "")")
+                self.empty.isHidden = true
+                // self.view.makeToast("\(error?.localizedDescription ?? "")")
             }
         }
     }
+    
+    private func entryRoom(room: VRRoomEntity) {
+        let info: VRRoomInfo = VRRoomInfo()
+        info.room = room
+        info.mic_info = nil
+        let vc = VoiceRoomViewController(info: info)
+        self.navigationController?.pushViewController(vc, animated: true)
+  }
 
-    private func fillDataSource(rooms: VRRoomsEntity?) {
-        if roomList.rooms == nil {
-            roomList.rooms = rooms
-        } else {
-            roomList.rooms?.total = rooms?.total
-            roomList.rooms?.cursor = rooms?.cursor
-            roomList.rooms?.rooms?.append(contentsOf: rooms?.rooms ?? [])
-        }
-    }
-
-    private func roomListEvent() {
-        roomList.didSelected = { [weak self] in
-            guard let self = self else { return }
-            if self.didSelected != nil { self.didSelected!($0) }
-        }
-        roomList.loadMore = { [weak self] in
-            if self?.roomList.rooms?.total ?? 0 > self?.roomList.rooms?.rooms?.count ?? 0 {
-                self?.fetchRooms(cursor: self?.roomList.rooms?.cursor ?? "")
-            }
-        }
-    }
 }

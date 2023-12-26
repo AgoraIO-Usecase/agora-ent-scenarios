@@ -8,31 +8,33 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+
 import java.util.List;
 
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.manager.UserManager;
+import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.ktv.singbattle.R;
-import io.agora.scene.ktv.singbattle.databinding.KtvFragmentSongOrderListBinding;
-import io.agora.scene.ktv.singbattle.databinding.KtvItemChoosedSongListBinding;
+import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleFragmentSongOrderListBinding;
+import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleItemChoosedSongListBinding;
 import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
 /**
  * 已点歌单列表
  */
-public final class SongChosenFragment extends BaseViewBindingFragment<KtvFragmentSongOrderListBinding> {
+public final class SongChosenFragment extends BaseViewBindingFragment<KtvSingbattleFragmentSongOrderListBinding> {
 
     private boolean controllable = false;
     private Listener listener;
 
-    private final BindingSingleAdapter<SongItem, KtvItemChoosedSongListBinding> mAdapter = new BindingSingleAdapter<SongItem, KtvItemChoosedSongListBinding>() {
+    private final BindingSingleAdapter<SongItem, KtvSingbattleItemChoosedSongListBinding> mAdapter = new BindingSingleAdapter<SongItem, KtvSingbattleItemChoosedSongListBinding>() {
         @Override
-        public void onBindViewHolder(@NonNull BindingViewHolder<KtvItemChoosedSongListBinding> holder, int position) {
+        public void onBindViewHolder(@NonNull BindingViewHolder<KtvSingbattleItemChoosedSongListBinding> holder, int position) {
             SongItem item = getItem(position);
-            KtvItemChoosedSongListBinding binding = holder.binding;
+            KtvSingbattleItemChoosedSongListBinding binding = holder.binding;
             if (item != null) {
                 binding.tvNo.setText(String.valueOf(position + 1));
                 binding.tvMusicName.setText(item.songName);
@@ -40,7 +42,7 @@ public final class SongChosenFragment extends BaseViewBindingFragment<KtvFragmen
                 GlideApp.with(binding.ivCover).load(item.imageUrl)
                         .fallback(R.mipmap.ktv_ic_song_default)
                         .error(R.mipmap.ktv_ic_song_default)
-                        .transform(new CenterCropRoundCornerTransform(10))
+                        .transform(new RoundedCorners(UiUtil.dp2px(10)))
                         .into(binding.ivCover);
                 if (position == 0 && controllable) {
                     binding.ivToDel.setOnClickListener(v -> {
@@ -83,8 +85,8 @@ public final class SongChosenFragment extends BaseViewBindingFragment<KtvFragmen
 
     @NonNull
     @Override
-    protected KtvFragmentSongOrderListBinding getViewBinding(@NonNull LayoutInflater layoutInflater, @Nullable ViewGroup viewGroup) {
-        return KtvFragmentSongOrderListBinding.inflate(layoutInflater);
+    protected KtvSingbattleFragmentSongOrderListBinding getViewBinding(@NonNull LayoutInflater layoutInflater, @Nullable ViewGroup viewGroup) {
+        return KtvSingbattleFragmentSongOrderListBinding.inflate(layoutInflater);
     }
 
     @Override

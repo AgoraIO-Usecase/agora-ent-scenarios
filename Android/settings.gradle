@@ -1,15 +1,16 @@
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        maven { url 'https://repo1.maven.org/maven2/' }
-        maven { url 'https://www.jitpack.io' }
         mavenCentral()
         google()
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://www.jitpack.io' }
 
         maven { url 'https://maven.aliyun.com/repository/central' }
         maven { url 'https://maven.aliyun.com/repository/google' }
         maven { url 'https://maven.aliyun.com/repository/jcenter' }
         maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        maven { url 'https://developer.huawei.com/repo/' }
     }
 }
 
@@ -27,6 +28,11 @@ include ':scenes:ktv'
  * 嗨歌抢唱
  */
 include ':scenes:ktv_singbattle'
+
+/*
+ * 抢麦接唱
+ */
+include ':scenes:ktv_relay'
 
 /*
  * 语聊房
@@ -47,12 +53,13 @@ include ':scenes:show'
 include ':scenes:show:aars:SenseArSourceManager'
 include ':scenes:show:aars:STMobileJNI'
 include ':scenes:show:aars:HardwareBuffer'
+
 /*
  * 1V1私密房
  */
 include ':scenes:pure1v1'
 
 /**
- * 秀场转1V1私密房 使用了 addHandlerEx 4.1.1.16 版本没有，暂时注掉
+ * 秀场转1V1私密房
  */
-//include ':scenes:showTo1v1'
+include ':scenes:showTo1v1'

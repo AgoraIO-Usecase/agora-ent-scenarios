@@ -24,15 +24,14 @@ class KTVSyncManagerServiceImp(
     private val errorHandler: ((Exception?) -> Unit)?
 ) : KTVServiceProtocol {
     private val TAG = "KTV_Service_LOG"
-    private val kSceneId = "scene_singbattle_3.4.0"
+    private val kSceneId = "scene_singbattle_4.0.0"
     private val kCollectionIdChooseSong = "choose_song"
     private val kCollectionIdSeatInfo = "seat_info"
     private val kCollectionIdUser = "userCollection"
     private val kCollectionSingBattleGameInfo = "sing_battle_game_info"
 
     private data class VLLoginModel(
-        val userNo: String,
-        //val isWaitAutoOnSeat: Boolean = false
+        val id: String,
     )
 
     @Volatile
@@ -145,6 +144,8 @@ class KTVSyncManagerServiceImp(
                 isPrivate = inputModel.isPrivate != 0,
                 password = inputModel.password,
                 creatorNo = UserManager.getInstance().user.id.toString(),
+                creatorName = UserManager.getInstance().user.name,
+                creatorAvatar = UserManager.getInstance().user.headUrl,
                 bgOption = "0",
             )
             val scene = Scene()
@@ -237,6 +238,7 @@ class KTVSyncManagerServiceImp(
                                                 cacheRoom.name,
                                                 inputModel.roomNo,
                                                 cacheRoom.creatorNo,
+                                                cacheRoom.creatorAvatar,
                                                 cacheRoom.bgOption,
                                                 seats,
                                                 userSize,
@@ -375,6 +377,8 @@ class KTVSyncManagerServiceImp(
                         roomInfo.isPrivate,
                         roomInfo.password,
                         roomInfo.creatorNo,
+                        roomInfo.creatorName,
+                        roomInfo.creatorAvatar,
                         roomInfo.createdAt,
                         inputModel.mvIndex.toString(),
                         roomInfo.roomPeopleNum
@@ -922,9 +926,9 @@ class KTVSyncManagerServiceImp(
                 item ?: return
                 //将用户信息存在本地列表
                 val userInfo = item.toObject(VLLoginModel::class.java)
-                if (!userMap.containsKey(userInfo?.userNo)) {
-                    userMap[userInfo?.userNo.toString()] = userInfo
-                    objIdOfUserNo[userInfo?.userNo.toString()] = item.id
+                if (!userMap.containsKey(userInfo?.id)) {
+                    userMap[userInfo?.id.toString()] = userInfo
+                    objIdOfUserNo[userInfo?.id.toString()] = item.id
                 }
                 innerUpdateUserCount(userMap.size)
             }
@@ -960,10 +964,10 @@ class KTVSyncManagerServiceImp(
                 val ret = ArrayList<VLLoginModel>()
                 result?.forEach {
                     val obj = it.toObject(VLLoginModel::class.java)
-                    objIdOfUserNo[obj.userNo] = it.id
+                    objIdOfUserNo[obj.id] = it.id
                     ret.add(obj)
 
-                    userMap[obj.userNo] = obj
+                    userMap[obj.id] = obj
                 }
                 innerUpdateUserCount(userMap.count())
                 runOnMainThread { completion.invoke(null, ret) }
@@ -990,7 +994,7 @@ class KTVSyncManagerServiceImp(
     }
 
     private fun innerUpdateUserInfo(user: VLLoginModel, completion: (exception: SyncManagerException?) -> Unit) {
-        val objectId = objIdOfUserNo[user.userNo] ?: return
+        val objectId = objIdOfUserNo[user.id] ?: return
         mSceneReference?.collection(kCollectionIdUser)
             ?.update(objectId, user, object : Callback {
                 override fun onSuccess() {
@@ -1043,6 +1047,7 @@ class KTVSyncManagerServiceImp(
     private fun innerUpdateUserCount(count: Int) {
         val roomInfo = roomMap[currRoomNo] ?: return
         if (count == roomInfo.roomPeopleNum) {
+            runOnMainThread { roomUserCountSubscriber?.invoke(count) }
             return
         }
         mSceneReference?.update(
@@ -1055,6 +1060,8 @@ class KTVSyncManagerServiceImp(
                         roomInfo.isPrivate,
                         roomInfo.password,
                         roomInfo.creatorNo,
+                        roomInfo.creatorName,
+                        roomInfo.creatorAvatar,
                         roomInfo.createdAt,
                         roomInfo.bgOption,
                         count

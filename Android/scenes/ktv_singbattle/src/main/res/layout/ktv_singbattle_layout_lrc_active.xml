@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@mipmap/ktv_mv_default"
+    tools:background="@mipmap/mvbg4"
     tools:layout_height="230dp"
     tools:theme="@style/Theme.MaterialComponents.Light">
 
@@ -55,7 +55,7 @@
         android:id="@+id/singBattle"
         android:layout_width="80dp"
         android:layout_height="40dp"
-        android:background="@mipmap/ktv_start_grasp_waiting"
+        android:background="@mipmap/ktv_singbattle_start_grasp_waiting"
         android:gravity="center"
         android:text="3"
         android:paddingBottom="8dp"
@@ -91,7 +91,7 @@
         android:paddingBottom="10dp"
         app:currentLineHighlightedTextColor="@color/pink_b4"
         app:currentLineTextColor="@color/white"
-        app:currentLineTextSize="16sp"
+        app:currentLineTextSize="20sp"
         app:labelWhenNoLyrics=" "
         app:layout_constraintBottom_toTopOf="@+id/bgd_control_layout_lrc"
         app:layout_constraintTop_toBottomOf="@+id/scoringView"
@@ -101,7 +101,7 @@
         app:startOfVerseIndicatorPaddingTop="6dp"
         app:startOfVerseIndicatorRadius="4dp"
         app:textGravity="center"
-        app:textSize="14sp"
+        app:textSize="13sp"
         tools:layout_editor_absoluteX="-36dp" />
 
     <View

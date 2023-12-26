@@ -1,6 +1,5 @@
 package io.agora.scene.show
 
-import io.agora.base.internal.video.HardwareVideoEncoder
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.SimulcastStreamConfig
@@ -10,7 +9,6 @@ import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.GsonUtil
 import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.show.videoSwitcherAPI.VideoSwitcher
 
 object VideoSetting {
 
@@ -780,7 +778,7 @@ object VideoSetting {
 
     private fun updateRTCAudioSetting(SR: SuperResolution? = null) {
         val rtcEngine = RtcEngineInstance.rtcEngine
-        if (currAudienceDeviceLevel == DeviceLevel.Low) {
+        if (rtcEngine.queryDeviceScore() < 75) {
             ToastUtils.showToast(R.string.show_audience_sr_tips)
         }
         SR?.let {
@@ -846,7 +844,6 @@ object VideoSetting {
         ShowLogger.d("VideoSettings", "updateRTCBroadcastSetting, frameRate:$frameRate")
         val rtcEngine = RtcEngineInstance.rtcEngine
         val videoEncoderConfiguration = RtcEngineInstance.videoEncoderConfiguration
-        val videoSwitcher = VideoSwitcher.getImplInstance(rtcEngine)
         h265?.let {
             if (!isJoinedRoom) {
                 // 只能在加入房间前设置，否则rtc sdk会崩溃
@@ -924,7 +921,7 @@ object VideoSetting {
         }
         audioMixingVolume?.let {
             if (rtcConnection != null) {
-                videoSwitcher.adjustAudioMixingVolume(rtcConnection, it)
+                //videoLoaderApi.adjustAudioMixingVolume(rtcConnection, it)
             } else {
                 rtcEngine.adjustAudioMixingVolume(it)
             }

@@ -16,6 +16,13 @@ public enum updateRoomState {
     case robotVoleme
 }
 
+@objc public enum ChatRoomServiceConnectState: Int {
+    case connecting = 0
+    case open = 1
+    case fail = 2
+    case closed = 3
+}
+
 @objc public enum ChatRoomServiceKickedReason: UInt {
     case removed
     case destroyed
@@ -24,11 +31,11 @@ public enum updateRoomState {
     func errorDesc() -> String {
         switch self {
         case .removed:
-            return "voice_you_were_kicked_off_from_the_room"
+            return "voice_you_were_kicked_off_from_the_room".voice_localized()
         case .destroyed:
-            return "voice_this_room_has_been_dissolved_by_the_host"
+            return "voice_this_room_has_been_dissolved_by_the_host".voice_localized()
         case .offLined:
-            return "voice_you_were_offline"
+            return "voice_you_were_offline".voice_localized()
         default:
             return ""
         }
@@ -39,6 +46,10 @@ public enum updateRoomState {
     
     /// 房间过期
     func onRoomExpired()
+    
+    /// 网络状态变化
+    /// - Parameter state:
+    func onConnectStateChanged(state: ChatRoomServiceConnectState)
     
     /// Description token 过期
     func chatTokenWillExpire()

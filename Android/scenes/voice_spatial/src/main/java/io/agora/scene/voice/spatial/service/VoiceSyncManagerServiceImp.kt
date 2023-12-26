@@ -24,7 +24,7 @@ class VoiceSyncManagerServiceImp(
     private val errorHandler: ((Exception?) -> Unit)?
 ) : VoiceServiceProtocol {
 
-    private val voiceSceneId = "scene_spatialChatRoom_3.0.2"
+    private val voiceSceneId = "scene_spatialChatRoom_4.0.0"
     private val kCollectionIdUser = "user_collection"
     private val kCollectionIdSeatInfo = "seat_info_collection"
     private val kCollectionIdSeatApply = "show_seat_apply_collection"
@@ -435,15 +435,11 @@ class VoiceSyncManagerServiceImp(
             if (e == 0) {
                 list.forEach { it ->
                     if (it.member?.userId == userId) {
-                        // 1、移除这个申请
-                        val index = micSeatApplyList.indexOf(it)
-                        micSeatApplyList.removeAt(index)
-                        val objId = objIdOfSeatApply.removeAt(index)
-                        innerRemoveMicSeatApply(objId, it) { _,_ -> }
-                        // 2、更改麦位状态
+                        // 更改麦位状态
                         val micIndex = selectEmptySeat(it.index!!)
                         if (micSeatMap.containsKey(micIndex.toString()) &&
                             micSeatMap[micIndex.toString()]?.member != null) {
+                            completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
                             // 麦上有人
                             return@forEach
                         }
@@ -460,6 +456,11 @@ class VoiceSyncManagerServiceImp(
                             innerUpdateUserInfo(member, {}, {})
                             innerUpdateSeat(toSeat) { e ->
                                 if (e == null) {
+                                    // 成功后再移除这个申请
+                                    val index = micSeatApplyList.indexOf(it)
+                                    micSeatApplyList.removeAt(index)
+                                    val objId = objIdOfSeatApply.removeAt(index)
+                                    innerRemoveMicSeatApply(objId, it) { _,_ -> }
                                     completion.invoke(VoiceServiceProtocol.ERR_OK, toSeat)
                                 } else {
                                     completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
@@ -507,6 +508,12 @@ class VoiceSyncManagerServiceImp(
         micIndex: Int?,
         completion: (error: Int, result: Boolean) -> Unit
     ) {
+        val micIndex = selectEmptySeat(micIndex?:-1)
+        val toSeat = micSeatMap[micIndex.toString()]
+        if (toSeat == null) {
+            completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
+            return
+        }
         val userInfo = userMap[userId] ?: return
         val index = micIndex ?: return
         userInfo.micIndex = index
@@ -923,15 +930,16 @@ class VoiceSyncManagerServiceImp(
         val uid = VoiceBuddyFactory.get().getVoiceBuddy().userId()
         innerGetUserList({ list ->
             if (list.none { it.userId == it.toString() }) {
-                innerAddUser(VoiceMemberModel().apply {
+                val user = VoiceMemberModel().apply {
                     rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()
                     nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName()
                     userId = VoiceBuddyFactory.get().getVoiceBuddy().userId()
                     micIndex = -1
                     portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
-                },
-                    {
+                }
+                innerAddUser(user, {
                         objIdOfUserId[uid] = it
+                        userMap[uid] = user
                         success.invoke()
                     },
                     { e -> error.invoke(e) }
@@ -1056,6 +1064,9 @@ class VoiceSyncManagerServiceImp(
                             it.onUserJoinedRoom(currRoomNo, userInfo)
                         }
                     }
+                } else {
+                    val map = userMap
+                    val i = item
                 }
                 userMap[userInfo.userId.toString()] = userInfo
                 objIdOfUserId[userInfo.userId.toString()] = item.id

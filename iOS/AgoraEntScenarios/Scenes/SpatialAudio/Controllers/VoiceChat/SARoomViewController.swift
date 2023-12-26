@@ -28,6 +28,8 @@ class SARoomViewController: SABaseViewController {
     override public var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
+    
+    weak var applyListVC: SAApplyUsersViewController?
 
     var headerView: SARoomHeaderView!
    // var rtcView: SANormalRtcView!
@@ -138,9 +140,9 @@ extension SARoomViewController {
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
         let _ = self.rtckit.joinVoicRoomWith(with: "\(channel_id)",token: VLUserCenter.user.agoraRTCToken, rtcUid: Int(rtcUid) ?? 0, type: self.vmType ) == 0
-        rtckit.initSpatialAudio(recvRange: 15)
+        rtckit.initSpatialAudio(recvRange: 20)
         // 收集APM全链路音频
-        rtckit.setAPMOn(isOn: true)
+        rtckit.setAPMOn(isOn: AppContext.shared.isApmOn)
     }
     
     func refreshRoomInfo() {
@@ -181,7 +183,17 @@ extension SARoomViewController {
         headerView.updateHeader(with: info.room)
         guard let mics = roomInfo?.mic_info else { return }
         roomInfo?.room?.member_list = AppContext.saTmpServiceImp().userList
-        onRobotUpdate(robotInfo: info.robotInfo)
+        // robot state
+        if let mic_info = roomInfo?.mic_info,
+           mic_info.isEmpty == false,
+           let robotInfo = roomInfo?.robotInfo {
+            let red_mic: SARoomMic = mic_info[6]
+            let blue_mic: SARoomMic = mic_info[3]
+            red_mic.status = robotInfo.use_robot ? 5 : -2
+            blue_mic.status = robotInfo.use_robot ? 5 : -2
+            self.sRtcView.updateUser(blue_mic)
+            self.sRtcView.updateUser(red_mic)
+        }
         
         AppContext.saTmpServiceImp().mics = mics
         roomInfo?.room?.ranking_list = info.room?.ranking_list
@@ -211,7 +223,7 @@ extension SARoomViewController {
 
     func layoutUI() {
         let bgImgView = UIImageView()
-        bgImgView.image = UIImage.sceneImage(name: "lbg", bundleName: "VoiceChatRoomResource")
+        bgImgView.image = UIImage.sceneImage(name: "bg-main", bundleName: "VoiceChatRoomResource")
         view.addSubview(bgImgView)
 
         headerView = SARoomHeaderView()
@@ -227,8 +239,8 @@ extension SARoomViewController {
             sRtcView.isHidden = entity.type == 0
             headerView.updateHeader(with: entity)
         }
-        sRtcView.clickBlock = {[weak self] type, tag in
-            self?.didRtcAction(with: type, tag: tag)
+        sRtcView.clickBlock = {[weak self] tag in
+            self?.didRtcAction(with: tag)
         }
 
         bgImgView.snp.makeConstraints { make in
@@ -263,9 +275,10 @@ extension SARoomViewController {
     private func onTapDebugButton() {
         actionView
             .title(title: "Dump数据类型")
-            .switchCell(iconName: "icons／set／jiqi", title: "APM全链路音频", isOn: true)
+            .switchCell(iconName: "icons／set／jiqi", title: "APM全链路音频", isOn: AppContext.shared.isApmOn)
             .config()
         actionView.didSwitchValueChangeClosure = { [weak self] _, isOn in
+            AppContext.shared.isApmOn = isOn
             self?.rtckit.setAPMOn(isOn: isOn)
         }
         actionView.show()
@@ -301,7 +314,7 @@ extension SARoomViewController {
         }
     }
 
-    func didRtcAction(with type: SABaseUserCellType, tag: Int) {
+    func didRtcAction(with tag: Int) {
         let index: Int = tag - 200
         //TODO: remove as!
         guard let mic: SARoomMic = AppContext.saTmpServiceImp().mics[safe:index] else { return }
@@ -589,7 +602,7 @@ extension SARoomViewController: SAManagerDelegate {
 //        self.didHeaderAction(with: .back, destroyed: true)
     }
 
-    func reportAlien(with type: SARtcType.ALIEN_TYPE, musicType: SARtcType.VMMUSIC_TYPE) {
+    func reportAlien(with type: SARtcType.ALIEN_TYPE) {
         print("musicPath:\(type.rawValue)")
         sRtcView.updateAlienMic(with: type)
     }

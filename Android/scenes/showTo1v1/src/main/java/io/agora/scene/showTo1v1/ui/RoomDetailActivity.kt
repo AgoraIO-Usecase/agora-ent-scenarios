@@ -22,10 +22,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import io.agora.scene.showTo1v1.callAPI.CallReason
-import io.agora.scene.showTo1v1.callAPI.CallStateType
-import io.agora.scene.showTo1v1.callAPI.ICallApi
-import io.agora.scene.showTo1v1.callAPI.ICallApiListener
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
@@ -43,7 +39,11 @@ import io.agora.scene.showTo1v1.ShowTo1v1Logger
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.scene.showTo1v1.callAPI.CallApiImpl
 import io.agora.scene.showTo1v1.callAPI.CallEvent
+import io.agora.scene.showTo1v1.callAPI.CallReason
 import io.agora.scene.showTo1v1.callAPI.CallRole
+import io.agora.scene.showTo1v1.callAPI.CallStateType
+import io.agora.scene.showTo1v1.callAPI.ICallApi
+import io.agora.scene.showTo1v1.callAPI.ICallApiListener
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1CallDetailActivityBinding
 import io.agora.scene.showTo1v1.service.ROOM_AVAILABLE_DURATION
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
@@ -57,7 +57,7 @@ import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
 import io.agora.scene.showTo1v1.ui.fragment.DashboardFragment
 import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
 import io.agora.scene.widget.dialog.PermissionLeakDialog
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
+import io.agora.scene.widget.dialog.TopFunctionDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 import org.json.JSONException
 import org.json.JSONObject
@@ -220,6 +220,12 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             override fun onClickJacking(view: View) {
                 Log.d(TAG, "click close end!")
                 onBackPressed()
+            }
+        })
+
+        binding.ivMore.setOnClickListener(object :OnClickJackingListener(){
+            override fun onClickJacking(view: View) {
+                TopFunctionDialog(this@RoomDetailActivity).show()
             }
         })
 
@@ -436,13 +442,11 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         if (!isRoomOwner) {
             mainChannelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
         }
-        mShowTo1v1Manger.mVideoSwitcher.joinChannel(
+        mRtcEngine.joinChannelEx(
+            mShowTo1v1Manger.generalToken(),
             rtcConnection,
             mainChannelMediaOptions,
-            mShowTo1v1Manger.generalToken(),
-            null,
-            false
-        )
+            null)
         if (isRoomOwner) {
             enableContentInspectEx(true, mMainRtcConnection)
             AudioModeration.moderationAudio(
@@ -575,7 +579,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     private fun destroy() {
         mService.leaveRoom(mRoomInfo, completion = {})
         if (isRoomOwner) {
-            mShowTo1v1Manger.mVideoSwitcher.leaveChannel(mMainRtcConnection, true)
+            mRtcEngine.leaveChannelEx(mMainRtcConnection)
             mRtcEngine.stopPreview()
         } else {
             mainChannelMediaOptions.autoSubscribeVideo = true
@@ -688,8 +692,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 binding.tvCallingUid.text = it.userId
                 GlideApp.with(this)
                     .load(it.avatar)
-                    .error(R.mipmap.userimage)
-                    .transform(CenterCropRoundCornerTransform(100))
+                    .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                    .apply(RequestOptions.circleCropTransform())
                     .into(binding.ivCallingAvatar)
             }
         } else {
@@ -705,8 +709,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 binding.tvCallingUid.text = it.userId
                 GlideApp.with(this)
                     .load(it.avatar)
-                    .error(R.mipmap.userimage)
-                    .transform(CenterCropRoundCornerTransform(100))
+                    .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                    .apply(RequestOptions.circleCropTransform())
                     .into(binding.ivCallingAvatar)
             }
         }
@@ -926,8 +930,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     binding.tvCallingUid.text = it.userId
                     GlideApp.with(this)
                         .load(it.avatar)
-                        .error(R.mipmap.userimage)
-                        .transform(CenterCropRoundCornerTransform(100))
+                        .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                        .apply(RequestOptions.circleCropTransform())
                         .into(binding.ivCallingAvatar)
                 }
                 if (mShowTo1v1Manger.mRemoteUser == null) {
@@ -948,8 +952,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     mShowTo1v1Manger.mRemoteUser?.let {
                         GlideApp.with(this)
                             .load(it.avatar)
-                            .error(R.mipmap.userimage)
-                            .transform(CenterCropRoundCornerTransform(100))
+                            .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                            .apply(RequestOptions.circleCropTransform())
                             .into(binding.includeConnectedView.ivUserAvatar)
                         binding.includeConnectedView.tvNickname.text = it.userName
                     }

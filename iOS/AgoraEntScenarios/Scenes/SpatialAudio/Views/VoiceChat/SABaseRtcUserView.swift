@@ -8,75 +8,11 @@
 import SnapKit
 import UIKit
 
-public enum SABaseUserCellType {
-    case AgoraChatRoomBaseUserCellTypeAdd
-    case AgoraChatRoomBaseUserCellTypeMute
-    case AgoraChatRoomBaseUserCellTypeForbidden
-    case AgoraChatRoomBaseUserCellTypeLock
-    case AgoraChatRoomBaseUserCellTypeNormalUser
-    case AgoraChatRoomBaseUserCellTypeMuteAndLock
-    case AgoraChatRoomBaseUserCellTypeAlienNonActive
-    case AgoraChatRoomBaseUserCellTypeAlienActive
-}
-
 protocol SARtcUserViewDelegate: NSObjectProtocol {
     func didRtcUserViewClicked(tag: Int)
 }
 
 class SABaseRtcUserView: UIView {
-    public var cellType: SABaseUserCellType = .AgoraChatRoomBaseUserCellTypeAdd {
-        didSet {
-            if cellType == .AgoraChatRoomBaseUserCellTypeAlienActive || cellType == .AgoraChatRoomBaseUserCellTypeAlienNonActive {
-                bgColor = .white
-            } else {
-                bgColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.3)
-            }
-
-            switch cellType {
-            case .AgoraChatRoomBaseUserCellTypeAdd:
-                iconView.isHidden = true
-                micView.isHidden = true
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
-            case .AgoraChatRoomBaseUserCellTypeMute:
-                iconView.isHidden = false
-                micView.isHidden = false
-                micView.setState(.forbidden)
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／mute", bundleName: "VoiceChatRoomResource")
-            case .AgoraChatRoomBaseUserCellTypeForbidden:
-                iconView.isHidden = false
-                micView.isHidden = false
-                micView.setState(.forbidden)
-            case .AgoraChatRoomBaseUserCellTypeLock:
-                iconView.isHidden = true
-                micView.isHidden = true
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
-            case .AgoraChatRoomBaseUserCellTypeNormalUser:
-                iconView.isHidden = false
-                micView.isHidden = false
-                micView.setState(.on)
-                nameBtn.setImage(UIImage.sceneImage(name: "", bundleName: "VoiceChatRoomResource"), for: .normal)
-            case .AgoraChatRoomBaseUserCellTypeMuteAndLock:
-                iconView.isHidden = true
-                micView.isHidden = false
-                micView.setState(.forbidden)
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock", bundleName: "VoiceChatRoomResource")
-            case .AgoraChatRoomBaseUserCellTypeAlienNonActive:
-                iconView.isHidden = false
-                micView.isHidden = false
-                micView.setState(.on)
-                micView.isHidden = true
-                nameBtn.setImage(UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), for: .normal)
-                coverView.isHidden = false
-                activeButton.isHidden = false
-            case .AgoraChatRoomBaseUserCellTypeAlienActive:
-                iconView.isHidden = false
-                micView.isHidden = false
-                nameBtn.setImage(UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), for: .normal)
-                coverView.isHidden = true
-                activeButton.isHidden = true
-            }
-        }
-    }
 
     public var iconImgUrl: String = "" {
         didSet {
@@ -96,24 +32,6 @@ class SABaseRtcUserView: UIView {
         }
     }
 
-    public var ownerIcon: String = "" {
-        didSet {
-            nameBtn.setImage(UIImage.spatial_image(ownerIcon), for: .normal)
-        }
-    }
-
-    public var showMicView: Bool = false {
-        didSet {
-            if showMicView {
-                micView.isHidden = false
-                micView.setState(.on)
-                micView.setVolume(100)
-            } else {
-                micView.isHidden = true
-            }
-        }
-    }
-
     public var iconWidth: CGFloat = 60 {
         didSet {
             self.iconView.layer.cornerRadius = (iconWidth / 2.0)
@@ -127,12 +45,6 @@ class SABaseRtcUserView: UIView {
     public var nameStr: String = "" {
         didSet {
             nameBtn.setTitle(nameStr, for: .normal)
-        }
-    }
-
-    public var bgColor: UIColor = .black {
-        didSet {
-            bgView.backgroundColor = bgColor
         }
     }
 
@@ -174,14 +86,15 @@ class SABaseRtcUserView: UIView {
         bgView.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.3)
         addSubview(bgView)
         
-        bgIconView.image = UIImage.sceneImage(name: "icons／solid／add", bundleName: "VoiceChatRoomResource")
-        bgIconView.layer.cornerRadius = 15
+        bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
+        bgIconView.layer.cornerRadius = 30
         bgIconView.layer.masksToBounds = true
         bgView.addSubview(bgIconView)
 
         iconView.image = UIImage(named: "")
         iconView.layer.cornerRadius = 30
         iconView.layer.masksToBounds = true
+        iconView.backgroundColor = .white
         bgView.addSubview(iconView)
         
         addSubview(arrowImageView)
@@ -205,9 +118,9 @@ class SABaseRtcUserView: UIView {
 
         activeButton.layer.cornerRadius = 8
         activeButton.layer.masksToBounds = true
-        activeButton.setTitle("spatial_voice_active".voice_localized(), for: .normal)
+        activeButton.setTitle("spatial_voice_active".spatial_localized(), for: .normal)
         activeButton.setTitleColor(.white, for: .normal)
-        activeButton.setBackgroundImage(UIImage.sceneImage(name: "active", bundleName: "VoiceChatRoomResource"), for: .normal)
+        activeButton.setBackgroundImage(UIImage.sceneImage(name: "active", bundleName: "SpatialAudioResource"), for: .normal)
         activeButton.titleLabel?.font = UIFont.systemFont(ofSize: 9)
         activeButton.addTargetFor(self, action: #selector(active), for: .touchUpInside)
         addSubview(activeButton)
@@ -232,7 +145,7 @@ class SABaseRtcUserView: UIView {
         bgIconView.snp.makeConstraints { make in
             make.centerX.equalTo(self)
             make.centerY.equalTo(self.bgView)
-            make.width.height.equalTo(22)
+            make.width.height.equalTo(60)
         }
 
         iconView.snp.makeConstraints { make in

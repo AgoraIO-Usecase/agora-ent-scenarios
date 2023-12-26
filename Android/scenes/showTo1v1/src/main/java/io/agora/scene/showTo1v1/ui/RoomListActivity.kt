@@ -21,6 +21,7 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import io.agora.rtm.RtmClient
 import io.agora.scene.base.component.BaseViewBindingActivity
+import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.showTo1v1.R
@@ -40,6 +41,9 @@ import io.agora.scene.showTo1v1.ui.dialog.CallDialogState
 import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
 import io.agora.scene.showTo1v1.ui.fragment.RoomListFragment
 import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
+import io.agora.scene.showTo1v1.videoLoaderAPI.AGSlicingType
+import io.agora.scene.showTo1v1.videoLoaderAPI.OnPageScrollEventHandler
+import io.agora.scene.showTo1v1.videoLoaderAPI.VideoLoader
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 
@@ -56,9 +60,10 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
     private val mCallApi by lazy { ICallApi.getImplInstance() }
     private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
+    private val mRtcEngine by lazy { mShowTo1v1Manger.mRtcEngine }
 
-    private var mFragmentAdapter: FragmentStateAdapter? = null
     private var mRoomInfoList = mutableListOf<ShowTo1v1RoomInfo>()
+    private val mRtcVideoLoaderApi by lazy { VideoLoader.getImplInstance(mRtcEngine) }
 
     private val mVpFragments = SparseArray<RoomListFragment>()
     private var mCurrLoadPosition = POSITION_NONE
@@ -71,6 +76,8 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     // 当前呼叫的房间
     private var mRoomInfo: ShowTo1v1RoomInfo? = null
+
+    private var onPageScrollEventHandler: OnPageScrollEventHandler? = null
 
     override fun getViewBinding(inflater: LayoutInflater): ShowTo1v1RoomListActivityBinding {
         return ShowTo1v1RoomListActivityBinding.inflate(inflater)
@@ -138,14 +145,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 }
             }
         }
-        binding.emptyInclude.layoutCreateRoom.setOnClickListener(object : OnClickJackingListener() {
-            override fun onClickJacking(view: View) {
-                mCallApi.removeListener(callApiListener)
-                mShowTo1v1Manger.deInitialize()
-                RoomCreateActivity.launch(this@RoomListActivity)
-            }
-        })
-        binding.layoutCreateRoom2.setOnClickListener(object : OnClickJackingListener() {
+        binding.btnCreateRoom.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
                 mCallApi.removeListener(callApiListener)
                 mShowTo1v1Manger.deInitialize()
@@ -157,19 +157,93 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     private fun initOrUpdateViewPage() {
         if (mRoomInfoList.size > 0) {
-            // 设置预加载
-            val preloadCount = 3
-            binding.viewPager2.offscreenPageLimit = preloadCount - 2
-            mFragmentAdapter = object : FragmentStateAdapter(this) {
-
-                override fun getItemCount(): Int {
-                    return if (mRoomInfoList.size <= 1) mRoomInfoList.size else Int.MAX_VALUE
+            onPageScrollEventHandler = object : OnPageScrollEventHandler(
+                this,
+                mRtcEngine,
+                UserManager.getInstance().user.id.toInt(),
+                true,
+                AGSlicingType.VISIABLE
+            ) {
+                override fun onPageScrollStateChanged(state: Int) {
+                    when (state) {
+                        ViewPager2.SCROLL_STATE_SETTLING -> binding.viewPager2.isUserInputEnabled = false
+                        ViewPager2.SCROLL_STATE_IDLE -> binding.viewPager2.isUserInputEnabled = true
+                        ViewPager2.SCROLL_STATE_DRAGGING -> {
+                            // TODO 暂不支持
+                        }
+                    }
+                    super.onPageScrollStateChanged(state)
                 }
+
+                override fun onPageStartLoading(position: Int) {
+                    Log.d(TAG, "onPageLoad, position:$position")
+                    mVpFragments[position]?.startLoadPageSafely()
+                }
+
+                override fun onPageLoaded(position: Int) {
+                    Log.d(TAG, "onPageReLoad, position:$position")
+                    mVpFragments[position]?.onPageLoaded()
+                }
+
+                override fun onPageLeft(position: Int) {
+                    Log.d(TAG, "onPageHide, position:$position")
+                    mVpFragments[position]?.stopLoadPage(true)
+                }
+
+                override fun onRequireRenderVideo(
+                    position: Int,
+                    info: VideoLoader.AnchorInfo
+                ): VideoLoader.VideoCanvasContainer? {
+                    Log.d(TAG, "onRequireRenderVideo, position:$position")
+                    return mVpFragments[position]?.initAnchorVideoView(info)
+                }
+            }
+
+            val list = ArrayList<VideoLoader.RoomInfo>()
+            mRoomInfoList.forEach {
+                val anchorList = arrayListOf(
+                    VideoLoader.AnchorInfo(
+                        it.roomId,
+                        it.userId.toInt(),
+                        mShowTo1v1Manger.generalToken()
+                    )
+                )
+                list.add(
+                    VideoLoader.RoomInfo(it.roomId, anchorList)
+                )
+            }
+            onPageScrollEventHandler?.updateRoomList(list)
+
+            // 设置vp当前页面外的页面数
+            binding.viewPager2.offscreenPageLimit = 1
+            val fragmentAdapter = object : FragmentStateAdapter(this) {
+                override fun getItemCount() = if (mRoomInfoList.size <= 1) mRoomInfoList.size else Int.MAX_VALUE
 
                 override fun createFragment(position: Int): Fragment {
                     val roomInfo = mRoomInfoList[position % mRoomInfoList.size]
-                    return RoomListFragment.newInstance(roomInfo).also {
-                        mVpFragments[position] = it
+                    return RoomListFragment.newInstance(
+                        roomInfo,
+                        onPageScrollEventHandler as OnPageScrollEventHandler, position
+                    ).apply {
+                        Log.d(TAG, "position：$position, room:${roomInfo.roomId}")
+                        mVpFragments.put(position, this)
+                        if (roomInfo.userId != UserManager.getInstance().user.id.toString()) {
+                            val anchorList = arrayListOf(
+                                VideoLoader.AnchorInfo(
+                                    roomInfo.roomId,
+                                    roomInfo.userId.toInt(),
+                                    mShowTo1v1Manger.generalToken()
+                                )
+                            )
+                            onPageScrollEventHandler?.onRoomCreated(position,
+                                VideoLoader.RoomInfo(
+                                    roomInfo.roomId,
+                                    anchorList
+                                ),position == this@RoomListActivity.binding.viewPager2.currentItem)
+                        } else {
+                            // 主播
+                            startLoadPageSafely()
+                        }
                     }
                 }
 
@@ -177,15 +251,14 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     // 防止 fragment 变了不刷新
                     val roomInfo = mRoomInfoList[position % mRoomInfoList.size]
                     return (roomInfo.roomId.hashCode() + position).toLong()
-
                 }
             }
-            binding.viewPager2.adapter = mFragmentAdapter
-            binding.viewPager2.registerOnPageChangeCallback(onPageChangeCallback)
+            binding.viewPager2.adapter = fragmentAdapter
+            binding.viewPager2.registerOnPageChangeCallback(onPageScrollEventHandler as OnPageChangeCallback)
             binding.viewPager2.setCurrentItem(Int.MAX_VALUE / 2, false)
             mCurrLoadPosition = binding.viewPager2.currentItem
-        } else {
-//            mFragmentAdapter?.let {
+//        } else {
+//            binding.viewPager2.adapter?.let {
 //                it.notifyDataSetChanged()
 //                binding.viewPager2.setCurrentItem(Int.MAX_VALUE / 2, false)
 //                mCurrLoadPosition = binding.viewPager2.currentItem
@@ -193,72 +266,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 //                    mVpFragments[mCurrLoadPosition]?.onResetPage()
 //                }, 500)
 //            }
-        }
-    }
-
-    private val onPageChangeCallback = object : OnPageChangeCallback() {
-
-        private val PRE_LOAD_OFFSET = 0.01f
-        private var preLoadPosition = POSITION_NONE
-        private var lastOffset = 0f
-        private var scrollStatus: Int = ViewPager2.SCROLL_STATE_IDLE
-
-        override fun onPageScrollStateChanged(state: Int) {
-            super.onPageScrollStateChanged(state)
-            when (state) {
-                ViewPager2.SCROLL_STATE_SETTLING -> binding.viewPager2.isUserInputEnabled = false
-                ViewPager2.SCROLL_STATE_IDLE -> {
-                    binding.viewPager2.isUserInputEnabled = true
-                    if (preLoadPosition != POSITION_NONE) {
-                        mVpFragments[preLoadPosition]?.stopLoadPage(true)
-                    }
-                    mVpFragments[mCurrLoadPosition]?.onReloadPage()
-                    preLoadPosition = POSITION_NONE
-                    lastOffset = 0f
-                }
-
-                else -> {
-                    // nothing
-                }
-            }
-            scrollStatus = state
-        }
-
-        override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-            super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-            if (scrollStatus == ViewPager2.SCROLL_STATE_DRAGGING) {
-                if (lastOffset > 0f) {
-                    val isMoveUp = (positionOffset - lastOffset) > 0
-                    if (isMoveUp && positionOffset >= PRE_LOAD_OFFSET && preLoadPosition == POSITION_NONE) {
-                        preLoadPosition = mCurrLoadPosition + 1
-                        mVpFragments[preLoadPosition]?.startLoadPageSafely()
-                    } else if (!isMoveUp && positionOffset <= (1 - PRE_LOAD_OFFSET) && preLoadPosition == POSITION_NONE) {
-                        preLoadPosition = mCurrLoadPosition - 1
-                        mVpFragments[preLoadPosition]?.startLoadPageSafely()
-                    }
-                }
-                lastOffset = positionOffset
-            }
-        }
-
-        override fun onPageSelected(position: Int) {
-            super.onPageSelected(position)
-            if (mCurrLoadPosition != POSITION_NONE) {
-                if (preLoadPosition != POSITION_NONE) {
-                    if (position == preLoadPosition) {
-                        mVpFragments[mCurrLoadPosition]?.stopLoadPage(true)
-                    } else {
-                        mVpFragments[preLoadPosition]?.stopLoadPage(true)
-                        mVpFragments[mCurrLoadPosition]?.onReloadPage()
-                    }
-                } else if (mCurrLoadPosition != position) {
-                    mVpFragments[mCurrLoadPosition]?.stopLoadPage(true)
-                    mVpFragments[position]?.startLoadPageSafely()
-                }
-            }
-            mCurrLoadPosition = position
-            preLoadPosition = POSITION_NONE
-            lastOffset = 0f
         }
     }
 
@@ -285,7 +292,10 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         mVpFragments.clear()
         mCurrLoadPosition = POSITION_NONE
         mLoadConnection = false
-        binding.viewPager2.unregisterOnPageChangeCallback(onPageChangeCallback)
+        if (onPageScrollEventHandler != null) {
+            binding.viewPager2.unregisterOnPageChangeCallback(onPageScrollEventHandler as OnPageChangeCallback)
+            onPageScrollEventHandler = null
+        }
     }
 
     private fun updateListView() {
@@ -293,12 +303,10 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             StatusBarUtil.hideStatusBar(window, true)
             binding.emptyInclude.root.isVisible = true
             binding.viewPager2.isVisible = false
-            binding.layoutCreateRoom2.isVisible = false
         } else {
             StatusBarUtil.hideStatusBar(window, false)
             binding.emptyInclude.root.isVisible = false
             binding.viewPager2.isVisible = true
-            binding.layoutCreateRoom2.isVisible = true
         }
     }
 
@@ -307,6 +315,8 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         mVpFragments[mCurrLoadPosition]?.stopLoadPage(false)
         mCallApi.removeListener(callApiListener)
         mShowTo1v1Manger.destroy()
+        mRtcVideoLoaderApi.cleanCache()
+        VideoLoader.release()
     }
 
 

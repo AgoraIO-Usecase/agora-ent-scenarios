@@ -13,11 +13,9 @@
 #import "VLSBGAudioEffectPicker.h"
 #import "VLSBGBadNetWorkView.h"
 #import "VLSBGPopSongList.h"
-#import "VLSBGEffectView.h"
 #import "VLSBGSettingView.h"
-#import "VLSBGVoiceShowView.h"
 #import "VLSBGVoicePerShowView.h"
-
+#import "VLSBGDebugView.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LSTPopView (SBGModal)
@@ -51,11 +49,6 @@ NS_ASSUME_NONNULL_BEGIN
                                       withRoomNo:(NSString*)roomNo
                                     withDelegate:(id<VLSBGPopSongListDelegate>)delegate;
 
-//弹出音效
-+ (LSTPopView*)popSBGSetSoundEffectViewWithParentView:(UIView*)parentView
-                                         soundView:(VLSBGEffectView*)soundView
-                                      withDelegate:(id<VLSBGEffectViewDelegate>)delegate;
-
 //网络差视图
 + (LSTPopView*)popSBGBadNetWrokTipViewWithParentView:(UIView*)parentView
                                      withDelegate:(id<VLSBGBadNetWorkViewDelegate>)delegate;
@@ -66,16 +59,19 @@ NS_ASSUME_NONNULL_BEGIN
                                settingView:(VLSBGSettingView*)settingView
                                withDelegate:(id<VLSBGSettingViewDelegate>)delegate;
 
-+ (LSTPopView*)popSBGVoiceShowViewWithParentView:(UIView*)parentView
-                                         showView:(VLSBGVoiceShowView*)showView
-                                   dataSource:(NSArray *)array
-                                      withDelegate:(id<VLSBGVoiceShowViewDelegate>)delegate;
-
 
 //弹出专业主播
 + (LSTPopView*)popSBGVoicePerViewWithParentView:(UIView*)parentView
                                          perView:(VLSBGVoicePerShowView*)perView
                                 withDelegate:(id<VLSBGVoicePerShowViewDelegate>)delegate;
+
+//弹出DebugView
++ (LSTPopView*)popSBGDebugViewWithParentView:(UIView*)parentView
+                                    channelName:(NSString *)name
+                                   sdkVer:(NSString *)ver
+                                   isDebugMode:(BOOL)isDebugMode
+                                withDelegate:(id<VLSBGDebugViewDelegate>)delegate;
+
 @end
 
 NS_ASSUME_NONNULL_END

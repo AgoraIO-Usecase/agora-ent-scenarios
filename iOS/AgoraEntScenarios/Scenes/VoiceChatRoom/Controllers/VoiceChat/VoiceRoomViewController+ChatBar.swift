@@ -19,6 +19,10 @@ extension VoiceRoomViewController {
         audioSetVC.isAudience = !isOwner
         audioSetVC.ains_state = ains_state
         audioSetVC.isTouchAble = roomInfo?.room?.use_robot ?? false
+        audioSetVC.soundOpen = self.soundOpen
+        audioSetVC.gainValue = self.gainValue
+        audioSetVC.typeValue = self.typeValue
+        audioSetVC.effectType = self.effectType
         audioSetVC.useRobotBlock = { [weak self] flag in
             if flag == true {
                 self?.roomInfo?.room?.use_robot = true
@@ -105,6 +109,8 @@ extension VoiceRoomViewController {
             if let use_robot = self?.roomInfo?.room?.use_robot {
                 if use_robot == false {
                     let applyAlert = VoiceRoomApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: (205 / 375.0) * ScreenWidth), content:"voice_add_bot", cancel: "voice_cancel", confirm: "voice_confirm", position: .bottom).backgroundColor(.white).cornerRadius(20, [.topLeft, .topRight], .clear, 0)
+                    applyAlert.cancel.accessibilityIdentifier = "voice_chat_voice_add_bot_cancel"
+                    applyAlert.confirm.accessibilityIdentifier = "voice_chat_voice_add_bot_comfirm"
                     let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: (205 / 375.0) * ScreenWidth)), custom: applyAlert)
                     applyAlert.actionEvents = { [weak self] in
                         if $0 == 31 {
@@ -133,8 +139,27 @@ extension VoiceRoomViewController {
             self?.navigationController?.pushViewController(VC, animated: true)
         }
         
+        audioSetVC.clicKBlock = {[weak self] effect in
+            self?.effectType = effect
+            self?.didUpdateEffectValue(effect)
+        }
+        audioSetVC.gainBlock = {[weak self] gain in
+            self?.gainValue = "\(gain)"
+            self?.didUpdateGainValue("\(gain)")
+        }
+        
+        audioSetVC.typeBlock = {[weak self] type in
+            self?.typeValue = type
+            self?.didUpdateTypeValue(type)
+        }
+        
+        audioSetVC.soundCardBlock = {[weak self] flag in
+            self?.soundOpen = flag
+            self?.didUpdateSoundSetting(flag)
+        }
+        
         let presentView: VoiceRoomPresentView = VoiceRoomPresentView.shared
-        presentView.showView(with: CGRect(x: 0, y: 0, width: ScreenWidth, height: 500), vc: audioSetVC, maxHeight: 660)
+        presentView.showView(with: CGRect(x: 0, y: 0, width: ScreenWidth, height: 500), vc: audioSetVC, maxHeight: 850)
         view.addSubview(presentView)
         
     }
@@ -249,7 +274,7 @@ extension VoiceRoomViewController {
         player.tag(199)
         view.addSubview(player)
         let parser = SVGAParser()
-        guard let path = Bundle.voiceChat.path(forResource: "rocket", ofType: "svga") else { return }
+        guard let path = Bundle.voiceRoomBundle.path(forResource: "rocket", ofType: "svga") else { return }
         parser.parse(with: URL(fileURLWithPath: path)) { entity in
             player.videoItem = entity
             player.startAnimation()
@@ -301,6 +326,7 @@ extension VoiceRoomViewController {
                     mute = false
                 }
                 self.rtckit.muteLocalAudioStream(mute: mute)
+                self.rtckit.setClientRole(role: mute ? .audience:.owner)
                 self.rtcView.updateUser(mic!)
             } else {
                 self.view.makeToast("Mute local mic failed!")
@@ -371,6 +397,8 @@ extension VoiceRoomViewController {
         }
 
         let applyAlert = VoiceRoomApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: (205 / 375.0) * ScreenWidth), content: "voice_request_to_speak?", cancel: "voice_cancel", confirm: "voice_confirm", position: .bottom).backgroundColor(.white).cornerRadius(20, [.topLeft, .topRight], .clear, 0)
+        applyAlert.cancel.accessibilityIdentifier = "voice_chat_room_request_speak_cancel"
+        applyAlert.confirm.accessibilityIdentifier = "voice_chat_room_request_speak_confirm"
         let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: (205 / 375.0) * ScreenWidth)), custom: applyAlert)
         applyAlert.actionEvents = { [weak self] in
             guard let `self` = self else { return }

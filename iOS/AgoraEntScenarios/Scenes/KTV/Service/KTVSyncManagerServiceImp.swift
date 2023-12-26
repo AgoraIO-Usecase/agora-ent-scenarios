@@ -9,7 +9,7 @@ import Foundation
 import YYCategories
 import SVProgressHUD
 
-private let kSceneId = "scene_ktv_3.3.0"
+private let kSceneId = "scene_ktv_4.0.0"
 
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"
@@ -96,6 +96,15 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         SyncUtil
             .scene(id: channelName)?
             .unsubscribeScene()
+        SyncUtil
+            .scene(id: channelName)?
+            .unsubscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION)
+        SyncUtil
+            .scene(id: channelName)?
+            .unsubscribe(key: SYNC_MANAGER_SEAT_INFO)
+        SyncUtil
+            .scene(id: channelName)?
+            .unsubscribe(key: SYNC_MANAGER_CHOOSE_SONG_INFO)
         
         userListCountDidChanged = nil
         seatListDidChanged = nil
@@ -110,7 +119,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         guard let room = self.room else { return }
         
         let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
-        let expiredDuration = 20 * 60 * 1000
+        let expiredDuration = (AppContext.shared.sceneConfig?.ktv ?? 20 * 60) * 1000
 //        agoraPrint("checkRoomExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
         guard currentTs - room.createdAt > expiredDuration else { return }
         
@@ -191,7 +200,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         let roomInfo = VLRoomListModel() // LiveRoomInfo(roomName: inputModel.name)
 //        roomInfo.id = VLUserCenter.user.id//NSString.withUUID().md5() ?? ""
         roomInfo.name = inputModel.name
-        roomInfo.isPrivate = ((inputModel.isPrivate?.boolValue) != nil)
+        roomInfo.isPrivate = inputModel.isPrivate == 1
         roomInfo.password = inputModel.password
         roomInfo.creatorNo = VLUserCenter.user.id
         roomInfo.roomNo = "\(arc4random_uniform(899999) + 100000)" // roomInfo.id
@@ -199,7 +208,8 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         roomInfo.roomPeopleNum = "0"
         roomInfo.icon = inputModel.icon
         roomInfo.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
-
+        roomInfo.creatorName = VLUserCenter.user.name
+        roomInfo.creatorAvatar = VLUserCenter.user.headUrl
         let params = mapConvert(model: roomInfo)
 
         _showLoadingIfNeed()

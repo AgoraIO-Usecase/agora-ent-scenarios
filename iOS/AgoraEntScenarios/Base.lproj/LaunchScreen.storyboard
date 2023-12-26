@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22155" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22131"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -17,27 +16,38 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="home_launch" translatesAutoresizingMaskIntoConstraints="NO" id="2Wo-ZI-bLw">
-                                <rect key="frame" x="9" y="218.66666666666663" width="375" height="440"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="home_bg_image" translatesAutoresizingMaskIntoConstraints="NO" id="zmW-0J-dtz">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="home_launch_logo.png" translatesAutoresizingMaskIntoConstraints="NO" id="10Y-1i-QcC">
+                                <rect key="frame" x="122.66666666666669" y="262" width="148" height="148"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="home_launch_text.png" translatesAutoresizingMaskIntoConstraints="NO" id="qzx-V5-7g2">
+                                <rect key="frame" x="153.66666666666666" y="430" width="86" height="46"/>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" red="0.96078431372549022" green="0.97254901960784312" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
-                            <constraint firstItem="2Wo-ZI-bLw" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="YIj-5P-WNo"/>
-                            <constraint firstItem="2Wo-ZI-bLw" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="xzf-Cq-v7r"/>
+                            <constraint firstItem="qzx-V5-7g2" firstAttribute="top" secondItem="10Y-1i-QcC" secondAttribute="bottom" constant="20" id="Gib-CX-YSF"/>
+                            <constraint firstItem="qzx-V5-7g2" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="PCg-xo-LOV"/>
+                            <constraint firstItem="zmW-0J-dtz" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="YsV-G1-Y9g"/>
+                            <constraint firstItem="zmW-0J-dtz" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="ZeB-yU-FYs"/>
+                            <constraint firstItem="10Y-1i-QcC" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="-90" id="atw-cU-RaE"/>
+                            <constraint firstItem="zmW-0J-dtz" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="cnq-zD-uhy"/>
+                            <constraint firstAttribute="bottom" secondItem="zmW-0J-dtz" secondAttribute="bottom" id="eMe-0T-YD4"/>
+                            <constraint firstItem="10Y-1i-QcC" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="fti-tZ-bpp"/>
                         </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="53" y="375"/>
+            <point key="canvasLocation" x="52.671755725190835" y="374.64788732394368"/>
         </scene>
     </scenes>
     <resources>
-        <image name="home_launch" width="375" height="440"/>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
+        <image name="home_bg_image" width="375" height="667"/>
+        <image name="home_launch_logo.png" width="148" height="148"/>
+        <image name="home_launch_text.png" width="86" height="46"/>
     </resources>
 </document>

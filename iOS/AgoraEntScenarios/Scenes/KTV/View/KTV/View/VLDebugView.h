@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface VLDebugView : UIView
-- (instancetype)initWithFrame:(CGRect)frame isDumpMode:(BOOL)isDumpMode withDelegate:(id<VLDebugViewDelegate>)delegate;
+- (instancetype)initWithFrame:(CGRect)frame channelName:(NSString *)name sdkVer:(NSString *)ver isDumpMode:(BOOL)isDumpMode withDelegate:(id<VLDebugViewDelegate>)delegate;
 @end
 
 NS_ASSUME_NONNULL_END

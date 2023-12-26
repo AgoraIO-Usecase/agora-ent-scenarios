@@ -27,9 +27,9 @@ class SBGScoreCell: UITableViewCell {
     var score: SubRankModel = SubRankModel() {
         didSet {
             indexLabel.text = "\(score.index)"
-            nameLabel.text = score.userName == "" ? "暂无上榜" : "\(score.userName)"
-            sbgCountLabel.text = score.songNum == 0 ? "-" : "\(score.songNum)首"
-            gradeLabel.text = score.songNum == 0 ? "-" : "\(score.score)分"
+            nameLabel.text = score.userName == "" ? getLocalizeString(with: "sbg_empty_list") : "\(score.userName)"
+            sbgCountLabel.text = score.songNum == 0 ? "-" : "\(score.songNum)\(getLocalizeString(with: "sbg_song_count"))"
+            gradeLabel.text = score.songNum == 0 ? "-" : "\(score.score)\(getLocalizeString(with: "sbg_song_score"))"
             if(score.index == 1){
                 iconView.image = UIImage.sceneImage(name: "sbg-rank1")
             } else if score.index == 2 {
@@ -38,7 +38,7 @@ class SBGScoreCell: UITableViewCell {
                 iconView.image = UIImage.sceneImage(name: "sbg-rank3")
             }
             headIcon.isHidden = score.poster == ""
-            headIcon.sd_setImage(with: URL(string: score.poster))
+            headIcon.sd_setImage(with: URL(string: score.poster ?? ""))
             
             var bgUrl = ""
             switch score.index {
@@ -53,6 +53,10 @@ class SBGScoreCell: UITableViewCell {
             }
             bgImgView.image = UIImage.sceneImage(name: bgUrl)
         }
+    }
+    
+    private func getLocalizeString(with key: String) -> String {
+        return Bundle.localizedString(key, bundleName: "sbgResource")
     }
     
     private func layoutUI() {

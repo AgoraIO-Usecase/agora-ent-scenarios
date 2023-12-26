@@ -7,20 +7,34 @@
 
 #import "HeadSetManager.h"
 
+@interface HeadSetManager ()
+
+@property(nonatomic, copy) HeadsetStatusCallback headsetStatusCallBack;
+
+@end
 @implementation HeadSetManager
 
-static HeadsetStatusCallback headsetStatusCallBack;
-
-+ (void)addHeadsetObserverWithCallback:(HeadsetStatusCallback)callback {
-    headsetStatusCallBack = callback;
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(headsetChangeListener:)
-                                                 name:AVAudioSessionRouteChangeNotification
-                                               object:[AVAudioSession sharedInstance]];
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionRouteChangeNotification object:nil];
 }
 
-+ (BOOL)hasHeadset {
++ (instancetype)initHeadsetObserverWithCallback:(HeadsetStatusCallback)callback {
+    HeadSetManager *instance = [[HeadSetManager alloc] init];
+    instance.headsetStatusCallBack = callback;
+    return instance;
+}
+
+- (instancetype)init {
+    if (self = [super init]) {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(headsetChangeListener:)
+                                                     name:AVAudioSessionRouteChangeNotification
+                                                   object:[AVAudioSession sharedInstance]];
+    }
+    return self;
+}
+
+- (BOOL)hasHeadset {
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
     AVAudioSessionRouteDescription *currentRoute = audioSession.currentRoute;
     
@@ -33,21 +47,21 @@ static HeadsetStatusCallback headsetStatusCallBack;
     return NO;
 }
 
-+ (void)headsetChangeListener:(NSNotification *)notification {
+- (void)headsetChangeListener:(NSNotification *)notification {
     NSDictionary *userInfo = notification.userInfo;
     UInt8 reasonValue = [[userInfo valueForKey:AVAudioSessionRouteChangeReasonKey] intValue];
     AVAudioSessionRouteChangeReason reason = reasonValue;
     
     switch (reason) {
         case AVAudioSessionRouteChangeReasonNewDeviceAvailable:
-            if (headsetStatusCallBack != nil) {
-                headsetStatusCallBack(YES);
+            if (self.headsetStatusCallBack != nil) {
+                self.headsetStatusCallBack(YES);
             }
             break;
             
         case AVAudioSessionRouteChangeReasonOldDeviceUnavailable:
-            if (headsetStatusCallBack != nil) {
-                headsetStatusCallBack(NO);
+            if (self.headsetStatusCallBack != nil) {
+                self.headsetStatusCallBack(NO);
             }
             break;
             

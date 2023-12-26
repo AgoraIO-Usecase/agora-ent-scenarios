@@ -31,7 +31,7 @@ extension CallApiImpl {
         config.extraInfo = jsonStr
         let module = AgoraContentInspectModule()
         module.interval = 30
-        module.type = .imageModeration
+      //  module.type = .imageModeration
         config.modules = [module]
         let ret = rtcEngine.enableContentInspect(enable, config: config)
         showTo1v1Print("setupContentInspectConfig[\(enable)]: uid:\(uid) channelId: \(channelId) ret:\(ret)")
@@ -55,17 +55,17 @@ extension CallApiImpl {
         config.extraInfo = jsonStr
         let module = AgoraContentInspectModule()
         module.interval = 30
-        module.type = .imageModeration
-        config.modules = [module]
-        let ret = rtcEngine.enableContentInspectEx(enable, config: config, connection: connection)
-        showTo1v1Print("setupContentInspectExConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret)")
+//        module.type = .imageModeration
+//        config.modules = [module]
+//        let ret = rtcEngine.enableContentInspectEx(enable, config: config, connection: connection)
+//        showTo1v1Print("setupContentInspectExConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret)")
     }
     
     /// 语音审核
     func moderationAudio(appId: String, channelName: String, user: ShowTo1v1UserInfo) {
-        let userInfo = ["id": user.userId ?? "",
+        let userInfo = ["id": user.uid ?? "",
                         "sceneName": "showTo1v1",
-                        "userNo": user.userId,
+                        "userNo": user.uid,
                         "userName": user.userName] as NSDictionary
         let parasm: [String: Any] = ["appId": appId,
                                      "channelName": channelName,
@@ -73,7 +73,7 @@ extension CallApiImpl {
                                      "traceId": NSString.withUUID().md5(),
                                      "src": "iOS",
                                      "payload": userInfo.yy_modelToJSONString()]
-        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/moderation/audio",
+        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.shengwang.cn/v1/moderation/audio",
                                           params: parasm) { response in
             showTo1v1Print("moderationAudio response === \(response)")
         } failure: { errr in

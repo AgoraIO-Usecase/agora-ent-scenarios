@@ -24,6 +24,9 @@ dependencies {
     if (isProjectLibrary(':scenes:ktv')) {
         runtimeOnly project(':scenes:ktv')
     }
+    if (isProjectLibrary(':scenes:ktv_relay')) {
+        runtimeOnly project(':scenes:ktv_relay')
+    }
     if (isProjectLibrary(':scenes:ktv_singbattle')) {
         runtimeOnly project(':scenes:ktv_singbattle')
     }
@@ -67,4 +70,11 @@ dependencies {
 
     implementation rootProject.ext.deps.gson
     implementation rootProject.ext.deps.bugly
+    implementation rootProject.ext.deps.flexbox
+
+    // PictureSelector 基础 (必须)
+    implementation rootProject.ext.deps.pictureselector
+
+    // 图片压缩 (按需引入)
+    implementation rootProject.ext.deps.picturecompress
 }

@@ -4,11 +4,9 @@
 
     <application>
         <activity
-            android:name=".create.RoomCreateActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".create.RoomListActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/def_material_theme"/>
         <activity
             android:name=".live.RoomLivingActivity"
             android:launchMode="singleTop"

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_full_blue_top_20"
@@ -11,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
-        android:text="Debug Settings"
+        android:text="@string/ktv_debug_settings"
         android:textColor="@color/white"
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -51,7 +50,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="音频dump"
+            android:text="@string/ktv_debug_settings_audio_dump"
             android:textColor="@color/def_text_grey_979" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
@@ -61,12 +60,6 @@
             android:layout_marginStart="35dp"
             android:button="@drawable/cb_def_selector" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="audio dump"
-            android:textColor="@color/def_text_grey_6c7" />
     </LinearLayout>
 
     <LinearLayout
@@ -80,7 +73,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="打分难度"
+            android:text="@string/ktv_debug_settings_scoring_difficulty"
             android:textColor="@color/def_text_grey_979" />
 
         <androidx.appcompat.widget.AppCompatSeekBar
@@ -103,7 +96,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="打分补偿"
+            android:text="@string/ktv_debug_settings_scoring_compensation"
             android:textColor="@color/def_text_grey_979" />
 
         <androidx.appcompat.widget.AppCompatSeekBar
@@ -120,20 +113,19 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:gravity="left"
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="私有参数"
+            android:text="@string/ktv_debug_settings_private_param"
             android:textColor="@color/def_text_grey_979" />
 
         <EditText
             android:id="@+id/etParms"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
             android:text="Input Key"
             android:textColor="@color/def_text_grey_979"
             />
@@ -142,7 +134,6 @@
             android:id="@+id/etParmsNum"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
             android:text="Input Value"
             android:textColor="@color/def_text_grey_979"
             />
@@ -151,9 +142,8 @@
             android:id="@+id/btSetParams"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
             android:alpha="0.3"
-            android:text="设置"/>
+            android:text="@string/ktv_debug_settings_set"/>
     </LinearLayout>
 
 

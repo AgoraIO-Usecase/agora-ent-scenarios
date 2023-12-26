@@ -119,11 +119,7 @@ extension ShowMusicPresenter {
         }
         if let i = index  {
             let musicNames = ["happy", "romantic", "relax"]
-            guard let path = Bundle.main.path(forResource: "showResource", ofType: "bundle"),
-                  let bundle = Bundle(path: path) else {
-                return
-            }
-            let musicPath = bundle.path(forResource: musicNames[i], ofType: "wav") ?? ""
+            let musicPath = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/\(musicNames[i]).mp3"
             player.stop()
             let source = AgoraMediaSource()
             source.url = musicPath

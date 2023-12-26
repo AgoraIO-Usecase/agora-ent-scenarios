@@ -13,9 +13,9 @@ public class SANormalRoomsViewController: UIViewController {
     
     public var totalCountClosure: ((Int) -> Void)?
     
-    lazy var empty: SAEmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "spatial_voice_no_chat_room_yet".spatial_localized(), image: nil)
+    lazy var empty: SARoomListEmptyView = .init(frame: CGRect(x: 0, y: 120, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "spatial_voice_no_chat_room_yet".spatial_localized(), image: nil)
     
-    lazy var roomList: SARoomListView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), style: .plain)
+    lazy var roomList: SRRoomHomeListView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30))
     
     deinit {
         saLogger.info("deinit----- SANormalRoomsViewController")
@@ -26,10 +26,19 @@ public class SANormalRoomsViewController: UIViewController {
         super.viewDidLoad()
         view.addSubViews([empty, roomList])
         // Do any additional setup after loading the view.
-        roomListEvent()
         refresh()
-        roomList.refreshControl?.addTarget(self, action: #selector(refresh), for: .valueChanged)
-        NotificationCenter.default.addObserver(self, selector: #selector(refresh), name: NSNotification.Name("refreshList"), object: nil)
+        
+        roomList.refreshBlock = {[weak self] _ in
+            guard let self = self else {return}
+            self.refresh()
+        }
+        
+        roomList.clickBlock = {[weak self] index in
+            guard let self = self, let room = self.roomList.roomList?[index] else {return}
+            if self.didSelected != nil { self.didSelected!(room) }
+            self.entryRoom(room: room)
+        }
+
     }
     
     override public func viewWillAppear(_ animated: Bool) {
@@ -41,47 +50,33 @@ public class SANormalRoomsViewController: UIViewController {
 
 extension SANormalRoomsViewController {
     @objc func refresh() {
-        roomList.rooms = nil
+        roomList.roomList = nil
         fetchRooms(cursor: "")
     }
 
     @objc private func fetchRooms(cursor: String) {
         AppContext.saServiceImp().fetchRoomList(page: 0) {[weak self] error, rooms in
             guard let self = self else {return}
-            self.roomList.refreshControl?.endRefreshing()
+            self.roomList.refreshControl.endRefreshing()
             if error == nil {
                 guard let rooms = rooms?.filter({ $0.room_id != nil }) else {return}
                 let roomsEntity: SARoomsEntity = SARoomsEntity()
                 roomsEntity.rooms = rooms
                 roomsEntity.total = rooms.count
-                self.fillDataSource(rooms: roomsEntity)
-                self.roomList.reloadData()
+                self.roomList.roomList = rooms
                 self.empty.isHidden = (rooms.count > 0)
             } else {
+                self.empty.isHidden = true
                 self.view.makeToast("\(error?.localizedDescription ?? "")")
             }
         }
     }
-
-    private func fillDataSource(rooms: SARoomsEntity?) {
-        if roomList.rooms == nil {
-            roomList.rooms = rooms
-        } else {
-            roomList.rooms?.total = rooms?.total
-            roomList.rooms?.cursor = rooms?.cursor
-            roomList.rooms?.rooms?.append(contentsOf: rooms?.rooms ?? [])
-        }
-    }
-
-    private func roomListEvent() {
-        roomList.didSelected = { [weak self] in
-            guard let self = self else { return }
-            if self.didSelected != nil { self.didSelected!($0) }
-        }
-        roomList.loadMore = { [weak self] in
-            if self?.roomList.rooms?.total ?? 0 > self?.roomList.rooms?.rooms?.count ?? 0 {
-                self?.fetchRooms(cursor: self?.roomList.rooms?.cursor ?? "")
-            }
-        }
+    
+    private func entryRoom(room: SARoomEntity) {
+        let info: SARoomInfo = SARoomInfo()
+        info.room = room
+        info.mic_info = nil
+        let vc = SARoomViewController(info: info)
+        self.navigationController?.pushViewController(vc, animated: true)
     }
 }

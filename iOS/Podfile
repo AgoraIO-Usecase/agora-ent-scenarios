@@ -32,15 +32,15 @@ def all_pods
   pod 'JXCategoryView', '1.6.1'
 
   # 火山美颜
-  pod 'BytedEffect', :path => 'bytedEffect.podspec'
+#  pod 'BytedEffect', :path => 'bytedEffect.podspec'
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
-  
-  pod 'AgoraSyncManager', '2.1.2'
+
+  pod 'AgoraSyncManager', '~> 2.1.6'
 
 #  pod 'AgoraRtcEngine_Special_iOS', :path => 'AgoraRtcEngine_iOS.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
-  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.17'
+  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.23'
 
   pod 'CallAPI', :path => 'AgoraEntScenarios/Common/API/CallAPI'
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
@@ -48,10 +48,11 @@ def all_pods
   pod 'ShowTo1v1', :path => 'AgoraEntScenarios/Scenes/ShowTo1v1'
 
   #ThirdParty
-  pod 'HWWeakTimer', '1.0'
+#  pod 'HWWeakTimer', '1.0'
   pod 'LSTPopView', '0.3.10'
   pod 'SocketRocket', '0.7.0'
   pod 'Agora-Scene-Utils', '1.1.0'
+#  pod 'Alamofire'
   
   #歌词组件
   pod "ScoreEffectUI", '1.0.2'
@@ -67,7 +68,7 @@ def all_pods
 #  pod 'SwiftFormat/CLI'
 
   #VoiceChatRoom rely
-  pod 'ZSwiftBaseLib', '0.1.6.1'
+  pod 'ZSwiftBaseLib', '0.1.6.2'
 
   pod 'SnapKit'
   pod 'SVGAPlayer'
@@ -79,6 +80,8 @@ def all_pods
 
   #bugly
   pod 'Bugly','2.5.93'
+  
+  pod 'HXPhotoPicker/Lite'
   
   
   #need to remove
@@ -93,8 +96,11 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      # 为每个配置添加 `-fstack-protector`
+#      config.build_settings['OTHER_CFLAGS'] ||= ['$(inherited)']
+#      config.build_settings['OTHER_CFLAGS'] << '-fstack-protector'
       shell_script_path = "Pods/Target Support Files/#{target.name}/#{target.name}-frameworks.sh"
-      if File::exists?(shell_script_path)
+      if File::exist?(shell_script_path)
         shell_script_input_lines = File.readlines(shell_script_path)
         shell_script_output_lines = shell_script_input_lines.map { |line| line.sub("source=\"$(readlink \"${source}\")\"", "source=\"$(readlink -f \"${source}\")\"") }
         File.open(shell_script_path, 'w') do |f|

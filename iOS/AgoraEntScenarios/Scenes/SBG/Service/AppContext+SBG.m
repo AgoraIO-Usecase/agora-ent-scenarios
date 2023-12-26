@@ -18,11 +18,11 @@ NSString* sAgoraSBGAPIKey = @"sAgoraSBGAPIKey";
     [AppContext shared].sceneLocalizeBundleName = @"sbgResource";
 }
 
-- (void)setSbgAPI:(SBGApiImpl *)sbgAPI {
+- (void)setSbgAPI:(KTVApiImpl *)sbgAPI {
     [[AppContext shared].extDic setValue:sbgAPI forKey:sAgoraSBGAPIKey];
 }
 
-- (SBGApiImpl*)sbgAPI {
+- (KTVApiImpl*)sbgAPI {
     return [[AppContext shared].extDic valueForKey:sAgoraSBGAPIKey];
 }
 

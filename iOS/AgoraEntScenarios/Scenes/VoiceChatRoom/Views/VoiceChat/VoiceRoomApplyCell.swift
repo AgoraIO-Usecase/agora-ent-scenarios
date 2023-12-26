@@ -27,6 +27,7 @@ public class VoiceRoomApplyCell: UITableViewCell {
         operation.layer.shadowColor = UIColor(red: 0, green: 0.55, blue: 0.98, alpha: 0.2).cgColor
         operation.layer.shadowOffset = CGSize(width: 0, height: 4)
         operation.layer.shadowRadius = 8
+        operation.accessibilityIdentifier = "voice_chat_room_apply_cell_accept_btn"
     }
 
     @available(*, unavailable)
@@ -43,7 +44,9 @@ public class VoiceRoomApplyCell: UITableViewCell {
     func refresh(item: VoiceRoomApply?) {
         user = item
         userName.text = item?.member?.name
-        avatar.sd_setImage(with: URL(string: item?.member?.portrait ?? "")!, placeholderImage: UIImage(named: "mine_avatar_placeHolder"))
+        if let imgUrl = URL(string: item?.member?.portrait ?? "") {
+            avatar.sd_setImage(with: imgUrl, placeholderImage: UIImage(named: "mine_avatar_placeHolder"))
+        }
         operation.setTitle(item?.member?.invited == true ? LanguageManager.localValue(key: "voice_accepted") : LanguageManager.localValue(key: "voice_accept"), for: .normal)
         operation.setBackgroundImage(UIImage.voice_image(item?.member?.invited == true ? "" : "blue_btn_bg")?.resizableImage(withCapInsets: UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20), resizingMode: .stretch), for: .normal)
         var color = UIColor.white

@@ -96,8 +96,8 @@ class SAMuteView: UIView {
         bgView.layer.masksToBounds = true
         addSubview(bgView)
 
-        addView.frame = CGRect(x: ScreenWidth / 2 - 11, y: 61, width: 22, height: 22)
-        addView.image = UIImage.sceneImage(name: "icons／solid／add")
+        addView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)
+        addView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
         addSubview(addView)
 
         iconView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)
@@ -115,7 +115,6 @@ class SAMuteView: UIView {
         addSubview(nameLabel)
 
         roleBtn.frame = CGRect(x: ScreenWidth / 2.0 - 50, y: 135, width: 100, height: 20)
-        roleBtn.setImage(UIImage.sceneImage(name: "Landlord"), for: .normal)
         roleBtn.setTitle(" \("spatial_voice_host".spatial_localized())", for: .normal)
         roleBtn.setTitleColor(UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1), for: .normal)
         roleBtn.font(UIFont.systemFont(ofSize: 11))

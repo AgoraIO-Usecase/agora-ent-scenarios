@@ -71,10 +71,8 @@
     [self.sortBtn addTarget:self action:@selector(sortBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.sortBtn];
     
-//    self.singingBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_singing_icon"]
-//                                                       title:KTVLocalizedString(@"演唱中")];
     self.singingBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.singingBtn setTitle:SBGLocalizedString(@"演唱中") forState:UIControlStateNormal];
+    [self.singingBtn setTitle:SBGLocalizedString(@"sbg_room_sing1") forState:UIControlStateNormal];
     [self.singingBtn setImage:[UIImage sceneImageWithName:@"ktv_singing_icon"] forState:UIControlStateNormal];
     self.singingBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
 //    self.singingBtn.imagePosition = QMUIButtonImagePositionLeft;
@@ -108,7 +106,7 @@
 - (void)setSelSongModel:(VLSBGRoomSelSongModel *)selSongModel {
     _selSongModel = selSongModel;
     self.nameLabel.text = selSongModel.songName;
-    self.chooserLabel.text = [NSString stringWithFormat:SBGLocalizedString(@"点唱: %@"), selSongModel.name];
+    self.chooserLabel.text = [NSString stringWithFormat:@"%@%@",SBGLocalizedString(@"sbg_song_ordering_person"), selSongModel.name];
     
     if (selSongModel.status == VLSBGSongPlayStatusIdle) {
         if(!VLUserCenter.user.ifMaster) {

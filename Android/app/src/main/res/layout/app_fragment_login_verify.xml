@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/bg_app_def_white">
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginVertical="20dp"
+        android:background="@null"
+        android:src="@mipmap/back_empty"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="142dp"
+        android:text="@string/app_login_phone_input_code"
+        android:textColor="@color/def_text_color_040"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvPageInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/app_login_phone_input_code_info"
+        android:textColor="@color/def_text_grey_979"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="@id/tvTitle"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+    <io.agora.scene.widget.RoomEncryptionInputView
+        android:id="@+id/etCode"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_centerInParent="true"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginTop="40dp"
+        android:inputType="number"
+        android:textCursorDrawable="@drawable/app_bg_edit_cursor"
+        android:visibility="visible"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvPageInfo"
+        app:ui_widget_backColor="@color/white"
+        app:ui_widget_checkedColor="#156EF3"
+        app:ui_widget_defaultColor="@color/white"
+        app:ui_widget_isPwd="false"
+        app:ui_widget_isWaitInput="true"
+        app:ui_widget_round="8dp"
+        app:ui_widget_textColor="#040925"
+        app:ui_widget_textLength="4"
+        app:ui_widget_textSize="18sp"
+        app:ui_widget_waitInputColor="#4E5969" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRegainCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/app_login_regain_code"
+        android:textColor="@color/def_text_grey_979"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@id/etCode"
+        app:layout_constraintTop_toBottomOf="@id/etCode" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvCountDown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="@string/app_login_count_down"
+        android:textColor="@color/def_text_grey_979"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@id/tvRegainCode"
+        app:layout_constraintStart_toEndOf="@id/tvRegainCode"
+        app:layout_constraintTop_toTopOf="@+id/tvRegainCode" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvCodeError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_login_code_wrong_tip"
+        android:textColor="#FA396A"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/tvRegainCode"
+        app:layout_constraintEnd_toEndOf="@+id/etCode"
+        app:layout_constraintTop_toTopOf="@+id/tvRegainCode" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

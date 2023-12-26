@@ -24,6 +24,7 @@ public class SAApplyCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         contentView.backgroundColor = .white
         contentView.addSubViews([avatar, userName, operation])
+        avatar.contentMode = .scaleAspectFill
         operation.layer.shadowColor = UIColor(red: 0, green: 0.55, blue: 0.98, alpha: 0.2).cgColor
         operation.layer.shadowOffset = CGSize(width: 0, height: 4)
         operation.layer.shadowRadius = 8
@@ -43,7 +44,10 @@ public class SAApplyCell: UITableViewCell {
     func refresh(item: SAApply?) {
         user = item
         userName.text = item?.member?.name
-        avatar.sd_setImage(with: URL(string: item?.member?.portrait ?? "")!, placeholderImage: nil)
+        
+        if let imgUrl = URL(string: item?.member?.portrait ?? "") {
+            avatar.sd_setImage(with: imgUrl, placeholderImage: nil)
+        }
         operation.setTitle(item?.member?.invited == true ? "spatial_voice_accepted".spatial_localized() : "spatial_voice_accept".spatial_localized(), for: .normal)
         operation.setBackgroundImage(item?.member?.invited == true ? nil : UIImage.sceneImage(name:"blue_btn_bg"), for: .normal)
         var color = UIColor.white

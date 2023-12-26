@@ -7,13 +7,13 @@
 
 import Foundation
 import AgoraRtcKit
+import AgoraRtmKit
 
 /// 角色
 public enum CallRole: Int {
     case callee = 0    //被叫
     case caller        //主叫
 }
-
 
 /// 模式
 public enum CallMode: UInt {
@@ -24,16 +24,16 @@ public enum CallMode: UInt {
 /// 初始化配置信息
 public class CallConfig: NSObject {
     public var appId: String = ""               //声网App Id
-    public var userId: UInt = 0                 //用户id
+    public var userId: UInt = 0                 //用户id，通过该用户id来发送信令消息
     public var userExtension: [String: Any]?    //[可选]用户扩展字段,用在呼叫上，对端收到calling时可以通过kFromUserExtension字段读到
     public var rtcEngine: AgoraRtcEngineKit!    //rtc engine实例
+    public var rtmClient: AgoraRtmClientKit?    //[可选]rtm client实例，如果设置则需要负责rtmClient的login和logout，需要使用appId和userId创建
     public var mode: CallMode = .showTo1v1      //模式
-    public var role: CallRole = .callee         //角色，纯1v1需要设置成caller
+    public var role: CallRole = .callee         //角色，仅在秀场转1v1模式下可用
     public var localView: UIView!               //显示本地流的画布
     public var remoteView: UIView!              //显示远端流的画布
-    public var autoAccept: Bool = true          //是否收到被叫后自动接受，秀场转1v1可用
+    public var autoAccept: Bool = true          //是否收到被叫后自动接受，秀场转1v1可用，如果设置为true，CallTokenConfig传入的token需要是万能token
 }
-
 
 public class PrepareConfig: NSObject {
     public var autoLoginRTM: Bool = true       //是否自动登录RTM
@@ -48,7 +48,6 @@ public class PrepareConfig: NSObject {
         return config
     }
     
-    
     /// 被叫默认配置
     /// - Returns: <#description#>
     public class func calleeConfig() -> PrepareConfig {
@@ -56,7 +55,6 @@ public class PrepareConfig: NSObject {
         return config
     }
 }
-
 
 /// token renew时的配置
 public class CallTokenConfig: NSObject {
@@ -82,6 +80,7 @@ public class CallTokenConfig: NSObject {
     case recvRemoteFirstFrame //收到远端首帧
     case callingTimeout       //呼叫超时
     case cancelByCallerRecall //同样的主叫呼叫不同频道导致取消
+    case rtmLost              //rtm超时断连
 }
 
 @objc public enum CallEvent: UInt {
@@ -110,6 +109,7 @@ public class CallTokenConfig: NSObject {
     case localLeave               //本地用户离开RTC频道
     case recvRemoteFirstFrame     //收到远端首帧
     case cancelByCallerRecall     //同样的主叫呼叫不同频道导致取消
+    case rtmLost                  //rtm超时断连
 }
 
 @objc public enum CallStateType: UInt {
@@ -144,11 +144,9 @@ public class CallTokenConfig: NSObject {
     /// token快要过期了(需要外部获取新token调用renewToken更新)
     @objc optional func tokenPrivilegeWillExpire()
     
-    
     /// 打印的日志回调
     /// - Parameter message: <#message description#>
     @objc optional func callDebugInfo(message: String)
-    
     
     /// 打印的日志回调
     /// - Parameter message: <#message description#>
@@ -165,15 +163,14 @@ public class CallTokenConfig: NSObject {
                     token: CallTokenConfig,
                     completion: @escaping ((NSError?)->()))
     
-    
     /// 释放缓存
     func deinitialize(completion: @escaping (()->()))
     
-    /// 更新rtc/rtm的token
+    /// 更新自己的rtc/rtm的token
     /// - Parameter config: <#config description#>
     func renewToken(with config: CallTokenConfig)
     
-    /// 更新呼叫token
+    /// 更新呼叫token，纯1v1的被叫更新token时需要更新主叫呼叫的频道token
     /// - Parameter token: <#token description#>
     func renewRemoteCallerChannelToken(roomId: String, token: String)
     
@@ -230,7 +227,6 @@ public class CallTokenConfig: NSObject {
     /// 添加RTC接口回调
     /// - Parameter listener: <#listener description#>
     @objc optional func addRTCListener(listener: AgoraRtcEngineDelegate)
-    
     
     /// 移除RTC接口回调
     /// - Parameter listener: <#listener description#>

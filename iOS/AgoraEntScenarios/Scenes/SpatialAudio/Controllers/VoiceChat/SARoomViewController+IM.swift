@@ -95,11 +95,13 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     
     func onReceiveSeatRequest(roomId: String, applicant: SAApply) {
         guard isOwner else { return }
+        self.applyListVC?.refreshEnd()
         self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: isOwner)
     }
 
     func onReceiveSeatRequestRejected(roomId: String, chat_uid: String) {
         self.refreshApplicants(chat_uid: chat_uid)
+        self.applyListVC?.refreshEnd()
     }
     
     /// Description 刷新申请人列表
@@ -292,7 +294,9 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                         let apply = AppContext.saTmpServiceImp().micApplys[safe: index] ?? SAApply()
                         AppContext.saTmpServiceImp()._removeMicSeatApply(roomId: self.roomInfo?.room?.room_id ?? "", apply: apply) { error in
                             if error == nil {
-                                AppContext.saTmpServiceImp().micApplys.remove(at: index)
+                                if AppContext.saTmpServiceImp().micApplys.count > index {
+                                    AppContext.saTmpServiceImp().micApplys.remove(at: index)
+                                }
                             }
                         }
                     }
@@ -305,7 +309,6 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                         AppContext.saTmpServiceImp().userList.first(where: { $0.chat_uid ?? "" == fromId })?.mic_index = -1
                         view.makeToast("spatial_voice_removed_stage".spatial_localized())
                     }  else {
-                        rtckit.muteLocalAudioStream(mute: seatUser == nil)
                         self.refreshApplicants(chat_uid: fromId)
                     }
                 } else {

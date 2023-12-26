@@ -19,7 +19,7 @@ import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ToastTools
 import io.agora.voice.common.utils.onStopTrackingTouch
 
-class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAudioSettingBinding>() {
+class RoomAudioSettingsSheetDialog : BaseSheetDialog<VoiceDialogAudioSettingBinding>() {
 
     companion object {
         const val KEY_AUDIO_SETTINGS_INFO = "audio_settings"
@@ -69,6 +69,7 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             updateBotStateView()
             updateBGMView()
             updateEarBackState()
+            updateSoundCardState()
 
             mcbAgoraBot.setOnCheckedChangeListener { button, isChecked ->
                 if (!button.isPressed) return@setOnCheckedChangeListener
@@ -94,6 +95,9 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             }
             tvInEarArrow.setOnClickListener {
                 audioSettingsListener?.onEarBackSetting()
+            }
+            tvSoundCardArrow.setOnClickListener {
+                audioSettingsListener?.onVirtualSoundCardSetting()
             }
             tvBGMArrow.setOnClickListener {
                 audioSettingsListener?.onBGMSetting()
@@ -162,6 +166,14 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
         }
     }
 
+    fun updateSoundCardState() {
+        if (AgoraRtcEngineController.get().soundCardManager()?.isEnable() == true) {
+            binding?.tvSoundCardArrow?.text = view?.context?.getString(R.string.voice_chatroom_on)
+        } else {
+            binding?.tvSoundCardArrow?.text = view?.context?.getString(R.string.voice_chatroom_off)
+        }
+    }
+
     /**
      * 更新机器人ui
      */
@@ -199,7 +211,8 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
 
         /**耳返设置*/
         fun onEarBackSetting()
-
+        /**耳返设置*/
+        fun onVirtualSoundCardSetting()
         /** BGM 设置*/
         fun onBGMSetting()
         /**机器人开关*/

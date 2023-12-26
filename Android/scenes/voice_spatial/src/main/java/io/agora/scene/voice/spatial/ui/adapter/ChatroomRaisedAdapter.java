@@ -46,7 +46,7 @@ public class ChatroomRaisedAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemb
         public void setData(VoiceMemberModel item, int position) {
             ImageTools.loadImage(avatar, item.getPortrait());
             name.setText(item.getNickName());
-            action.setText(mContext.getString(R.string.voice_room_accept));
+            action.setText(mContext.getString(R.string.voice_spatial_room_accept));
             action.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -54,14 +54,14 @@ public class ChatroomRaisedAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemb
                         listener.onItemActionClick(view, item.getMicIndex(), item.getUserId());
                 }
             });
-            action.setText(mContext.getString(R.string.voice_room_accept));
+            action.setText(mContext.getString(R.string.voice_spatial_room_accept));
             if (item.getUserId().equals(selectUid)) {
                 if (isAccepted) {
-                    action.setText(mContext.getString(R.string.voice_room_accepted));
+                    action.setText(mContext.getString(R.string.voice_spatial_room_accepted));
                     action.setBackgroundResource(R.drawable.voice_bg_rect_radius20_grey);
                     action.setEnabled(false);
                 } else {
-                    action.setText(mContext.getString(R.string.voice_room_accept));
+                    action.setText(mContext.getString(R.string.voice_spatial_room_accept));
                     action.setBackgroundResource(R.drawable.voice_bg_rect_radius20_gradient_blue);
                     action.setEnabled(true);
                 }

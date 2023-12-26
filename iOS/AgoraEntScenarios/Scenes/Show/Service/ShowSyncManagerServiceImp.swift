@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import AgoraSyncManager
 
-private let kSceneId = "scene_show_3.2.0"
+private let kSceneId = "scene_show_4.0.0"
 
 private let SYNC_MANAGER_MESSAGE_COLLECTION = "show_message_collection"
 private let SYNC_MANAGER_SEAT_APPLY_COLLECTION = "show_seat_apply_collection"
@@ -176,8 +176,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         guard let room = self.room else { return }
         
         let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
-        let expiredDuration = 20 * 60 * 1000
-        agoraPrint("checkRoomExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
+        let expiredDuration = (AppContext.shared.sceneConfig?.show ?? 20 * 60) * 1000
+//        agoraPrint("checkRoomExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
         guard currentTs - room.createdAt > expiredDuration else { return }
         
         self.subscribeDelegate?.onRoomExpired()
@@ -422,6 +422,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             return
         }
         _removeMicSeatApply(apply: apply, completion: completion)
+        
     }
     
     func acceptMicSeatApply(apply: ShowMicSeatApply, completion: @escaping (NSError?) -> Void) {
@@ -877,7 +878,10 @@ extension ShowSyncManagerServiceImp {
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
             .get(success: { [weak self] list in
                 agoraPrint("imp user get success...")
-                guard (list.first?.getId().count ?? 0) > 0 else { return }
+                guard (list.first?.getId().count ?? 0) > 0 else {
+                    finished(nil, nil)
+                    return
+                }
                 let users = list.compactMap({ ShowUser.yy_model(withJSON: $0.toJson()!)! })
 //            guard !users.isEmpty else { return }
                 self?.userList = users
@@ -1232,6 +1236,7 @@ extension ShowSyncManagerServiceImp {
             .delete(id: apply.objectId!,
                     success: { _ in
                 agoraPrint("imp seat apply remove success...")
+                self.subscribeDelegate?.onMicSeatApplyDeleted(apply: ShowMicSeatApply())
                 completion(nil)
             }, fail: { error in
                 agoraPrint("imp seat apply remove fail :\(error.message)...")

@@ -106,3 +106,76 @@ public extension NSAttributedString {
         return result.string
     }
 }
+
+extension String {
+    // 获取时间格式
+    func timeIntervalToMMSSFormat(interval: TimeInterval) -> String {
+        if interval >= 3600 {
+            let hour = interval / 3600
+            let min = interval.truncatingRemainder(dividingBy: 3600) / 60
+            let sec = interval.truncatingRemainder(dividingBy: 3600).truncatingRemainder(dividingBy: 60)
+            return String(format: "%02d:%02d:%02d", Int(hour), Int(min), Int(sec))
+        } else {
+            let min = interval / 60
+            let sec = interval.truncatingRemainder(dividingBy: 60)
+            return String(format: "%02d:%02d", Int(min), Int(sec))
+        }
+    }
+
+    // 字符串截取
+    func textSubstring(startIndex: Int, length: Int) -> String {
+        let startIndex = index(self.startIndex, offsetBy: startIndex)
+        let endIndex = index(startIndex, offsetBy: length)
+        let subvalues = self[startIndex ..< endIndex]
+        return String(subvalues)
+    }
+
+    /**
+     *  临时文件路径
+     */
+    static func tempFilePath() -> String {
+        return NSHomeDirectory().appending("/tmp").appending("/MusicTemp.mp3")
+    }
+
+    /**
+     *  缓存文件夹路径
+     */
+    static func cacheFolderPath() -> String {
+        return NSHomeDirectory().appending("/Library").appending("/MusicCaches")
+    }
+
+    /**
+     *  获取网址中的文件名
+     */
+    var fileName: String {
+        components(separatedBy: "/").last ?? ""
+    }
+}
+
+extension String {
+    // 判断字符串中的字符类型
+    enum CharacterType {
+        case chinese
+        case english
+    }
+    // 计算指定类型的字符数
+    func countOfCharacters(for type: CharacterType) -> Int {
+        var count = 0
+        for scalar in unicodeScalars {
+            switch type {
+            case .chinese:
+                // 判断字符是否为中文字符（Unicode 编码范围为 4E00 到 9FFF）
+                if scalar.value >= 0x4E00 && scalar.value <= 0x9FFF {
+                    count += 1
+                }
+
+            case .english:
+                // 判断字符是否为英文字符（Unicode 编码范围为 0000 到 007F）
+                if scalar.value <= 0x007F {
+                    count += 1
+                }
+            }
+        }
+        return count
+    }
+}

@@ -27,8 +27,8 @@ class VoiceRoomHelpViewController: VRBaseViewController, WKNavigationDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigation.title.text = "Agora"
-        let urlStr = "https://www.agora.io"
+        navigation.title.text = LanguageManager.localValue(key: "voice_agora_name")
+        let urlStr = "https://www.shengwang.cn"
         webView.load(URLRequest(url: URL(string: urlStr)!))
         view.addSubview(webView)
     }

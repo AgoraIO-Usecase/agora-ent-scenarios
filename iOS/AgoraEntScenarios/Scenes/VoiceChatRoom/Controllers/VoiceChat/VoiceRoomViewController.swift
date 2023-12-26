@@ -77,6 +77,21 @@ class VoiceRoomViewController: VRBaseViewController {
         }
         return view
     }()
+    
+    private lazy var actionView = ActionSheetManager()
+
+    private lazy var debugButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Debug", for: .normal)
+        button.setTitleColor(.black, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 12)
+        button.cornerRadius(25)
+        button.backgroundColor = .white
+        button.addTarget(self, action: #selector(onTapDebugButton), for: .touchUpInside)
+        button.isHidden = !AppContext.shared.isDebugMode
+        return button
+    }()
+    
     var isShowPreSentView: Bool = false
     var rtckit: VoiceRoomRTCManager = VoiceRoomRTCManager.getSharedInstance()
     var isOwner: Bool = false
@@ -105,6 +120,12 @@ class VoiceRoomViewController: VRBaseViewController {
             }
         }
     }
+    
+    //虚拟声卡的属性
+    public var soundOpen: Bool = false
+    public var gainValue: String = ""
+    public var typeValue: Int = 0
+    public var effectType: Int = 0
 
     convenience init(info: VRRoomInfo) {
         self.init()
@@ -167,6 +188,20 @@ class VoiceRoomViewController: VRBaseViewController {
 }
 
 extension VoiceRoomViewController {
+    
+    @objc
+    private func onTapDebugButton() {
+        actionView
+            .title(title: "Dump数据类型")
+            .switchCell(iconName: "icons／set／jiqi", title: "APM全链路音频", isOn: AppContext.shared.isVRApmOn)
+            .config()
+        actionView.didSwitchValueChangeClosure = { [weak self] _, isOn in
+            AppContext.shared.isVRApmOn = isOn
+            self?.rtckit.setAPMOn(isOn: isOn)
+        }
+        actionView.show()
+    }
+    
     // 加载RTC
     func loadKit() {
         guard let channel_id = roomInfo?.room?.channel_id else { return }
@@ -231,6 +266,8 @@ extension VoiceRoomViewController {
                 }
             }
         }
+        // 收集APM全链路音频
+        rtckit.setAPMOn(isOn: AppContext.shared.isVRApmOn)
     }
     
     private func setChatroomAttributes() {
@@ -347,7 +384,7 @@ extension VoiceRoomViewController {
     func layoutUI() {
 
         let bgImgView = UIImageView()
-        bgImgView.image = UIImage.sceneImage(name: "lbg", bundleName: "VoiceChatRoomResource")
+        bgImgView.image = UIImage.sceneImage(name: "bg-main", bundleName: "VoiceChatRoomResource")
         view.addSubview(bgImgView)
 
         headerView = AgoraChatRoomHeaderView() 
@@ -400,6 +437,13 @@ extension VoiceRoomViewController {
             inputBar.isHidden = true
         }
         chatView.messages?.append(startMessage())
+        
+        view.addSubview(debugButton)
+        debugButton.translatesAutoresizingMaskIntoConstraints = false
+        debugButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -35).isActive = true
+        debugButton.bottomAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        debugButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        debugButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
     }
 
 
@@ -637,6 +681,8 @@ extension VoiceRoomViewController {
         compent.destination = .center
         inputBar.hiddenInputBar()
         let micAlert = VoiceRoomEndLiveAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 70, height: 190), title: LanguageManager.localValue(key: "voice_end_live"), content: LanguageManager.localValue(key: "voice_the_room_will_close_after_you_leave."), cancel: LanguageManager.localValue(key: "voice_cancel"), confirm: LanguageManager.localValue(key: "voice_confirm")).cornerRadius(16).backgroundColor(.white)
+        micAlert.cancel.accessibilityIdentifier = "voice_chat_room_end_live_cancel"
+        micAlert.confirm.accessibilityIdentifier = "voice_chat_room_end_live_confirm"
         let vc = VoiceRoomAlertViewController(compent: compent, custom: micAlert)
         micAlert.actionEvents = { [weak self] in
             vc.dismiss(animated: true)
@@ -769,7 +815,7 @@ extension VoiceRoomViewController: VMManagerDelegate {
     }
 
     func reportAudioVolumeIndicationOfSpeakers(speakers: [AgoraRtcAudioVolumeInfo]) {
-        guard let micinfo = roomInfo?.mic_info else { return }
+        let micinfo = ChatRoomServiceImp.getSharedInstance().mics
         for speaker in speakers {
             for mic in micinfo where mic.member != nil{
                 let user = mic.member

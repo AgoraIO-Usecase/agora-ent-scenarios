@@ -64,7 +64,6 @@ class SAAudioSettingViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.navigationController?.navigationBar.isHidden = true
     }
     
     private func layoutUI() {

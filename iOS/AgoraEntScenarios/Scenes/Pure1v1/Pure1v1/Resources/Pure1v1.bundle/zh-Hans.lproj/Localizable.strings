@@ -13,7 +13,7 @@
 "authorized_cancel"="取消";
 
 "user_list_title"="1v1私密房";
-"user_list_waitting"="等待其他用户";
+"user_list_waitting"="等待其他用户入场";
 "user_list_nodata_tips"="欢迎来到声网1V1私密房，目前暂无其它用户入场，你可邀约朋友入场体验。";
 "user_list_refresh_tips"="用户列表已刷新";
 "user_list_cell_local_user"="本人信息";
@@ -27,6 +27,11 @@
 "call_usage_tips"=" 本产品仅用于功能体验，单次直播时长不超过20mins";
 "call_toast_hangup"="对方结束连线";
 "call_toast_reject"="对方已拒绝";
+
+"call_toast_disconnect"="连接中断，重连中...";
+
+"report_room" = "举报";
+"report_room_success" = "举报成功";
 
 "call_content_inspect_warning"="监测到当前内容存在违规行为";
 

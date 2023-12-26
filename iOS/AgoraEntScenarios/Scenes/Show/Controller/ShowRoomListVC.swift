@@ -9,15 +9,21 @@ import UIKit
 import VideoLoaderAPI
 
 class ShowRoomListVC: UIViewController {
-    
     let backgroundView = UIImageView()
-    private var preloadRoom: ShowRoomListModel?
+    
+    private lazy var delegateHandler = {
+        let handler = ShowCollectionLoadingDelegateHandler(localUid: UInt(UserInfo.userId)!)
+//        handler.didSelected = {[weak self] room in
+//            self?.joinRoom(room)
+//        }
+        return handler
+    }()
     
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         let itemWidth = (Screen.width - 15 - 20 * 2) * 0.5
-        layout.itemSize = CGSize(width: itemWidth, height: 234.0 / 160.0 * itemWidth)
+        layout.itemSize = CGSize(width: itemWidth, height: itemWidth)
         return UICollectionView(frame: .zero, collectionViewLayout: layout)
     }()
         
@@ -31,9 +37,9 @@ class ShowRoomListVC: UIViewController {
     
     private let createButton = UIButton(type: .custom)
     
-    
     private var roomList = [ShowRoomListModel]() {
         didSet {
+            delegateHandler.roomList = AGRoomArray(roomList: roomList)
             collectionView.reloadData()
             emptyView.isHidden = roomList.count > 0
         }
@@ -51,8 +57,16 @@ class ShowRoomListVC: UIViewController {
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        hidesBottomBarWhenPushed = true
         showLogger.info("init-- ShowRoomListVC")
+        VideoLoaderApiImpl.shared.printClosure = { msg in
+            showLogger.info(msg, context: "VideoLoaderApi")
+        }
+        VideoLoaderApiImpl.shared.warningClosure = { msg in
+            showLogger.warning(msg, context: "VideoLoaderApi")
+        }
+        VideoLoaderApiImpl.shared.errorClosure = { msg in
+            showLogger.error(msg, context: "VideoLoaderApi")
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -89,7 +103,7 @@ class ShowRoomListVC: UIViewController {
     }
     
     private func checkDevice() {
-         let score = ShowAgoraKitManager.shared.engine?.queryDeviceScore() ?? 0
+        let score = ShowAgoraKitManager.shared.engine?.queryDeviceScore() ?? 0
         if (score < 85) {// (0, 85)
             ShowAgoraKitManager.shared.deviceLevel = .low
         } else if (score < 90) {// [85, 90)
@@ -98,12 +112,11 @@ class ShowRoomListVC: UIViewController {
             ShowAgoraKitManager.shared.deviceLevel = .high
         }
         ShowAgoraKitManager.shared.deviceScore = Int(score)
-    }
+   }
     
     private func joinRoom(_ room: ShowRoomListModel){
-        ShowAgoraKitManager.shared.callTimestampStart()
         ShowAgoraKitManager.shared.setupAudienceProfile()
-        ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .joined)
+        ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .joinedWithAudioVideo)
         
         if room.ownerId == VLUserCenter.user.id {
             ToastView.show(text: "show_join_own_room_error".show_localized)
@@ -119,35 +132,14 @@ class ShowRoomListVC: UIViewController {
     
     private func fetchRoomList() {
         AppContext.showServiceImp("")?.getRoomList(page: 1) { [weak self] error, roomList in
-            guard let self = self else {return}
-            self.refreshControl.endRefreshing()
+            self?.refreshControl.endRefreshing()
+            guard let self = self, let roomList = roomList else {return}
             if let error = error {
-                LogUtil.log(error.localizedDescription)
+                showLogger.error(error.localizedDescription)
                 return
             }
-            let list = roomList ?? []
-            self.roomList = list
-            self.preLoadVisibleItems()
+            self.roomList = roomList
         }
-    }
-    
-    private func preLoadVisibleItems() {
-        guard let token = AppContext.shared.rtcToken, token.count > 0, roomList.count > 0 else {
-            return
-        }
-        let firstItem = collectionView.indexPathsForVisibleItems.first?.item ?? 0
-        let start = firstItem - 7 < 0 ? 0 : firstItem - 7
-        let end = start + 19 >= roomList.count ? roomList.count - 1 : start + 19
-        var preloadRoomList: [RoomInfo] = []
-        for i in start...end {
-            let room = roomList[i]
-            let preloadItem = RoomInfo()
-            preloadItem.channelName = room.roomId
-            preloadItem.uid = UInt(VLUserCenter.user.id) ?? 0
-            preloadItem.token = token
-            preloadRoomList.append(preloadItem)
-        }
-        ShowAgoraKitManager.shared.preloadRoom(preloadRoomList: preloadRoomList)
     }
 
     private func preGenerateToken() {
@@ -158,19 +150,17 @@ class ShowRoomListVC: UIViewController {
             tokenType: .token007,
             type: .rtc,
             expire: 24 * 60 * 60
-        ) { token in
-            guard let rtcToken = token else {
+        ) {[weak self] token in
+            guard let self = self, let rtcToken = token, rtcToken.count > 0 else {
                 return
             }
             AppContext.shared.rtcToken = rtcToken
-            self.preLoadVisibleItems()
+            self.delegateHandler.preLoadVisibleItems(scrollView: self.collectionView)
         }
     }
-    
 }
 // MARK: - UICollectionView Call Back
 extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return roomList.count
     }
@@ -178,54 +168,28 @@ extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFl
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: ShowRoomListCell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(ShowRoomListCell.self), for: indexPath) as! ShowRoomListCell
         let room = roomList[indexPath.item]
-        cell.setBgImge((room.thumbnailId?.isEmpty ?? true) ? "0" : room.thumbnailId ?? "0",
+        cell.setBgImge("\(indexPath.item % 5)",
                        name: room.roomName,
                        id: room.roomId,
-                       count: room.roomUserCount)
-        return cell
-    }
-    
-    
-    func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
-        showLogger.info("didHighlightItemAt: \(indexPath.row)", context: "collectionView")
-        let room = roomList[indexPath.item]
-        if let token = AppContext.shared.rtcToken, token.count > 0 {
-            ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .prejoined)
-            preloadRoom = room
-        } else { // fetch token when token is not exist
-            NetworkManager.shared.generateToken(
-                channelName: "",
-                uid: "\(UserInfo.userId)",
-                tokenType: .token007,
-                type: .rtc,
-                expire: 24 * 60 * 60
-            ) { token in
-                guard let rtcToken = token else {
-                    return
+                       count: room.roomUserCount,
+                       avatarUrl: room.ownerAvatar,
+                       isPrivate: false)
+        cell.ag_addPreloadTap(roomInfo: room, localUid: delegateHandler.localUid) {[weak self] state in
+            if AppContext.shared.rtcToken?.count ?? 0 == 0 {
+                if state == .began {
+                    self?.preGenerateToken()
+                } else if state == .ended {
+                    ToastView.show(text: "Token is not exit, try again!")
                 }
-                AppContext.shared.rtcToken = rtcToken
+                return false
             }
+            
+            return true
+        } completion: { [weak self] in
+            self?.joinRoom(room)
         }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        showLogger.info("didSelectItemAt: \(indexPath.row)", context: "collectionView")
-        if let token = AppContext.shared.rtcToken, token.count > 0 {
-            let room = roomList[indexPath.item]
-            joinRoom(room)
-        } else {
-            ToastView.show(text: "Token is not exit, try again!")
-        }
-    }
-    
-    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        preLoadVisibleItems()
-    }
-    
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-//        showLogger.info("scrollViewWillBeginDragging", context: "collectionView")
-        guard let room = preloadRoom else {return}
-        ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .idle)
+
+        return cell
     }
 }
 
@@ -237,7 +201,7 @@ extension ShowRoomListVC {
         
         collectionView.backgroundColor = .clear
         collectionView.register(ShowRoomListCell.self, forCellWithReuseIdentifier: NSStringFromClass(ShowRoomListCell.self))
-        collectionView.delegate = self
+        collectionView.delegate = delegateHandler
         collectionView.dataSource = self
         collectionView.refreshControl = self.refreshControl
         view.addSubview(collectionView)
@@ -245,15 +209,7 @@ extension ShowRoomListVC {
         emptyView.isHidden = true
         collectionView.addSubview(emptyView)
         
-        createButton.setTitleColor(.white, for: .normal)
-        createButton.setTitle("room_list_create_room".show_localized, for: .normal)
-        createButton.setImage(UIImage.show_sceneImage(name: "show_create_add"), for: .normal)
-        createButton.imageEdgeInsets(UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 5))
-        createButton.titleEdgeInsets(UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 0))
-        createButton.backgroundColor = .show_btn_bg
-        createButton.titleLabel?.font = .show_btn_title
-        createButton.layer.cornerRadius = 48 * 0.5
-        createButton.layer.masksToBounds = true
+        createButton.setBackgroundImage(UIImage.show_sceneImage(name: "show_create_add_bg"), for: .normal)
         createButton.addTarget(self, action: #selector(didClickCreateButton), for: .touchUpInside)
         view.addSubview(createButton)
         
@@ -276,9 +232,15 @@ extension ShowRoomListVC {
         createButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.bottom.equalToSuperview().offset(-max(Screen.safeAreaBottomHeight(), 10))
-            make.height.equalTo(48)
-            make.width.equalTo(195)
         }
     }
 }
 
+class ShowCollectionLoadingDelegateHandler: AGCollectionLoadingDelegateHandler {
+    var didSelected: ((ShowRoomListModel) -> Void)?
+    
+    open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let item = roomList?[indexPath.row] as? ShowRoomListModel else {return}
+        didSelected?(item)
+    }
+}

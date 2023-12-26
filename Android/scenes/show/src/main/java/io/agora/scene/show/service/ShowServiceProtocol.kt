@@ -3,9 +3,6 @@ package io.agora.scene.show.service
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.ToastUtils
 
-// 房间存活时间，单位ms
-const val ROOM_AVAILABLE_DURATION: Long = 60 * 20 * 1000// 20min
-
 interface ShowServiceProtocol {
 
     enum class ShowSubscribeStatus {
@@ -14,6 +11,11 @@ interface ShowServiceProtocol {
     }
 
     companion object {
+        // 房间存活时间，单位ms
+        var ROOM_AVAILABLE_DURATION: Long = 1200 * 1000
+        // PK单句时间，单位ms
+        var PK_AVAILABLE_DURATION: Long = 120 * 1000
+
         private val instance by lazy {
             ShowSyncManagerServiceImpl(AgoraApplication.the()){
                 if (it.message != "action error") {

@@ -26,15 +26,18 @@ class SBGAttributeView: UIView {
         addSubview(contentView)
         
         preLabel = UILabel(frame: .zero)
-        preLabel.text = "本轮由 "
+        preLabel.text = getLocalizeString(with: "sbg_this_time")
         preLabel.textColor = .white
         contentView.addSubview(preLabel)
         
         icon = UIImageView(frame: .zero)
+        icon.layer.cornerRadius = 12
+        icon.clipsToBounds = true
+        icon.contentMode = .scaleAspectFill
         contentView.addSubview(icon)
         
         endLabel = UILabel(frame: .zero)
-        endLabel.text = " 抢到麦"
+        endLabel.text = getLocalizeString(with: "sbg_get_mic")
         endLabel.textColor = .white
         contentView.addSubview(endLabel)
     }
@@ -45,13 +48,13 @@ class SBGAttributeView: UIView {
             return
         }
         icon.image = image
-        endLabel.text = " \(owner) 抢到麦"
+        endLabel.text = " \(owner)\(getLocalizeString(with: "sbg_get_mic"))"
         let endWidth = textAutoWidth(text: endLabel.text ?? "", height: 25, fontSize: 18)
         let preWidth = textAutoWidth(text: preLabel.text ?? "", height: 25, fontSize: 18)
         let totalWidth = endWidth + preWidth + 25
         contentView.frame = CGRect(x: self.bounds.width / 2.0 - totalWidth / 2.0, y: self.bounds.height / 2.0 - 12.5, width: totalWidth, height: 25)
         preLabel.frame = CGRect(x: 0, y: 0, width: preWidth, height: 25)
-        icon.frame = CGRect(x: preWidth, y: 0, width: 25, height: 25)
+        icon.frame = CGRect(x: preWidth, y: 0, width: 24, height: 24)
         endLabel.frame = CGRect(x: preWidth + 25, y: 0, width: endWidth, height: 25)
     }
     
@@ -60,6 +63,10 @@ class SBGAttributeView: UIView {
         let lead = NSStringDrawingOptions.usesFontLeading
         let rect = text.boundingRect(with:CGSize(width:0, height: height), options: [origin,lead], attributes: [NSAttributedString.Key.font:UIFont.systemFont(ofSize: fontSize)], context:nil)
         return rect.width
+    }
+    
+    private func getLocalizeString(with key: String) -> String {
+        return Bundle.localizedString(key, bundleName: "sbgResource")
     }
 }
 

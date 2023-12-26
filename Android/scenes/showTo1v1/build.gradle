@@ -12,10 +12,7 @@ android {
         }
         buildConfigField "String", "VERSION", "\"${VERSION_SCENE_SHOW_1V1}\""
     }
-//    ndk {
-//        // 设置支持的SO库架构
-//        abiFilters 'arm64-v8a' //, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
-//    }
+
     sourceSets {
         main {
             jniLibs.srcDirs = ['src/main/jniLibs']
@@ -43,6 +40,7 @@ dependencies {
     implementation rootProject.ext.deps.core_ktx
     implementation rootProject.ext.deps.constraintlayout
     implementation rootProject.ext.deps.material
+    implementation rootProject.ext.deps.rtm
 
     implementation rootProject.ext.deps.glide
     implementation rootProject.ext.deps.gson

@@ -20,7 +20,7 @@ class ShowSyncManagerServiceImpl constructor(
     private val errorHandler: (Exception) -> Unit
 ) : ShowServiceProtocol {
     private val TAG = "ShowSyncManagerServiceImpl"
-    private val kSceneId = "scene_show_3.2.0"
+    private val kSceneId = "scene_show_4.0.0"
     private val kCollectionIdUser = "userCollection"
     private val kCollectionIdMessage = "show_message_collection"
     private val kCollectionIdSeatApply = "show_seat_apply_collection"
@@ -28,13 +28,13 @@ class ShowSyncManagerServiceImpl constructor(
     private val kCollectionIdPKInvitation = "show_pk_invitation_collection"
     private val kCollectionIdInteractionInfo = "show_interaction_collection"
 
-    private val kRobotAvatars = listOf("https://download.agora.io/demo/release/bot1.png")
+    private val kRobotAvatars = listOf("https://download.shengwang.cn/demo/release/bot1.png")
     private val kRobotUid = 2000000001
-    private val kRobotVideoRoomIds = arrayListOf(2023001, 2023002, 2023003)
+    private val kRobotVideoRoomIds = arrayListOf(2023004, 2023005, 2023006)
     private val kRobotVideoStreamUrls = arrayListOf(
-        "https://download.agora.io/demo/test/agora_test_video_10.mp4",
-        "https://download.agora.io/demo/test/agora_test_video_11.mp4",
-        "https://download.agora.io/demo/test/agora_test_video_12.mp4"
+        "https://download.shengwang.cn/demo/test/agora_test_video_10.mp4",
+        "https://download.shengwang.cn/demo/test/agora_test_video_11.mp4",
+        "https://download.shengwang.cn/demo/test/agora_test_video_12.mp4"
     )
 
     @Volatile
@@ -186,7 +186,7 @@ class ShowSyncManagerServiceImpl constructor(
         retRoomList.addAll(roomList)
 
         val expireRoomList = roomList.filter {
-            (TimeUtils.currentTimeMillis() - it.createdAt.toLong() > ROOM_AVAILABLE_DURATION) && !it.isRobotRoom()
+            (TimeUtils.currentTimeMillis() - it.createdAt.toLong() > ShowServiceProtocol.ROOM_AVAILABLE_DURATION) && !it.isRobotRoom()
         }
         if (expireRoomList.isNotEmpty()) {
             val expireLetchCount = CountDownLatch(expireRoomList.size)
@@ -318,7 +318,7 @@ class ShowSyncManagerServiceImpl constructor(
                 roomId, object : JoinSceneCallback {
                     override fun onSuccess(sceneReference: SceneReference?) {
                         roomInfoController.sceneReference = sceneReference
-
+                        isInteractionCreated = false
                         innerMayAddLocalUser(roomId, {
                             innerSubscribeUserChange(roomId)
                             innerSubscribeSeatApplyChanged(roomId)
@@ -392,6 +392,7 @@ class ShowSyncManagerServiceImpl constructor(
         val sceneReference = roomInfoController.sceneReference ?: return
 
         sendChatMessage(roomId, context.getString(R.string.show_live_chat_leaving))
+        isInteractionCreated = false
 
         // 移除连麦申请
         val targetApply =
@@ -431,7 +432,7 @@ class ShowSyncManagerServiceImpl constructor(
         if (roomDetail.isRobotRoom()) {
             // nothing
         } else if (roomDetail.ownerId == UserManager.getInstance().user.id.toString()
-            || TimeUtils.currentTimeMillis() - roomDetail.createdAt.toLong() >= ROOM_AVAILABLE_DURATION
+            || TimeUtils.currentTimeMillis() - roomDetail.createdAt.toLong() >= ShowServiceProtocol.ROOM_AVAILABLE_DURATION
         ) {
             ShowLogger.d(TAG, "leaveRoom delete room")
             sceneReference.delete(object : Sync.Callback {
@@ -1102,6 +1103,7 @@ class ShowSyncManagerServiceImpl constructor(
 
         // pk
         if (roomInfoController.pKCompetitorInvitationList.isEmpty()) {
+            ShowLogger.d(TAG, "pk competitor mute audio")
             // pk 对象
             val invitation =
                 roomInfoController.pKInvitationList.filter { it.userId == userId }.getOrNull(0)
@@ -1130,6 +1132,7 @@ class ShowSyncManagerServiceImpl constructor(
             }
         } else {
             // pk 发起者
+            ShowLogger.d(TAG, "pk sender mute audio")
             val invitation =
                 roomInfoController.pKCompetitorInvitationList.filter { it.fromUserId == userId }
                     .getOrNull(0)
@@ -1779,6 +1782,7 @@ class ShowSyncManagerServiceImpl constructor(
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
+        ShowLogger.d(TAG, "innerUpdatePKInvitation called")
         sceneReference?.collection(kCollectionIdPKInvitation)
             ?.update(objectId, pkInvitation, object : Sync.Callback {
                 override fun onSuccess() {
@@ -1818,6 +1822,7 @@ class ShowSyncManagerServiceImpl constructor(
             }
 
             override fun onUpdated(item: IObject?) {
+                ShowLogger.d(TAG, "innerSubscribePKInvitationChanged onUpdated")
                 val info = item?.toObject(ShowPKInvitation::class.java) ?: return
                 // pk对象
                 val list = roomInfoController.pKInvitationList.filter { it.userId == info.userId }
@@ -1918,8 +1923,10 @@ class ShowSyncManagerServiceImpl constructor(
                     roomInfoController.objIdOfPKCompetitorInvitation[indexOf] = item.id
                 }
 
-                if (roomInfoController.interactionInfoList.isEmpty() && info.status == ShowRoomRequestStatus.accepted.value && !isInteractionCreated) {
+                ShowLogger.d(TAG, "pk邀请发现变化")
+                if (info.status == ShowRoomRequestStatus.accepted.value && !isInteractionCreated) {
                     isInteractionCreated = true
+                    ShowLogger.d(TAG, "pk对手接受pk邀请了")
                     val interaction = ShowInteractionInfo(
                         info.userId,
                         info.userName,
@@ -2055,6 +2062,7 @@ class ShowSyncManagerServiceImpl constructor(
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
+        ShowLogger.d(TAG, "innerUpdateInteraction called")
         sceneReference?.collection(kCollectionIdInteractionInfo)
             ?.update(objectId, info, object : Sync.Callback {
                 override fun onSuccess() {

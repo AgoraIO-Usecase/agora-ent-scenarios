@@ -22,7 +22,7 @@
             android:name=".ui.RoomCreateActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@style/def_theme" />
+            android:theme="@style/def_material_theme" />
         <activity
             android:name=".ui.RoomDetailActivity"
             android:exported="false"

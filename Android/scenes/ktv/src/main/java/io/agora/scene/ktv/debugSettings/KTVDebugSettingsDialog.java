@@ -19,9 +19,9 @@ import io.agora.scene.ktv.databinding.KtvDialogDebugOptionsBinding;
  */
 public class KTVDebugSettingsDialog extends BaseBottomSheetDialogFragment<KtvDialogDebugOptionsBinding> {
     public static final String TAG = "KTVDebugSettingsDialog";
-    private KTVDebugSettingBean mSetting;
-    private String channelName;
-    private String sdkBuildNum;
+    private final KTVDebugSettingBean mSetting;
+    private final String channelName;
+    private final String sdkBuildNum;
 
     public KTVDebugSettingsDialog(KTVDebugSettingBean mSetting, String channelName, String sdkBuildNum) {
         this.mSetting = mSetting;
@@ -86,7 +86,7 @@ public class KTVDebugSettingsDialog extends BaseBottomSheetDialogFragment<KtvDia
         mBinding.btSetParams.setOnClickListener(v -> {
             String key = mBinding.etParms.getText().toString();
             String value = mBinding.etParmsNum.getText().toString();
-            String parameters = "{\"" + key + "\":" + value;
+            String parameters = "{\"" + key + "\":" + value + "}";
             mSetting.setParameters(parameters);
         });
 

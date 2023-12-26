@@ -270,8 +270,8 @@ public let kMPK_RTC_UID: UInt = 1
                 } else if musicPath.contains("-B&R-") {
                     delegate?.reportAlien?(with: .blueAndRed, musicType: musicType)
                 }
-                let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "voice_lau".voice_localized() : "EN"
-                musicPath = musicPath.replacingOccurrences(of: "CN", with: lanuagePath)
+//                let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "voice_lau".voice_localized() : "EN"
+//                musicPath = musicPath.replacingOccurrences(of: "CN", with: lanuagePath)
                 rtcKit.startAudioMixing(musicPath, loopback: false, cycle: 1)
             }
         }
@@ -319,6 +319,7 @@ public let kMPK_RTC_UID: UInt = 1
         }
         setAINS(with: .mid)
         rtcKit.setParameters("{\"che.audio.start_debug_recording\":\"all\"}")
+        rtcKit.setParameters("{\"che.audio.input_sample_rate\":48000}")
         rtcKit.setEnableSpeakerphone(true)
         rtcKit.setDefaultAudioRouteToSpeakerphone(true)
         let mediaOption = AgoraRtcChannelMediaOptions()
@@ -343,6 +344,17 @@ public let kMPK_RTC_UID: UInt = 1
         rtcKit.setParameters("{\"che.audio.md.enable\":false}")
 
     }
+    
+    public func setParameters(with string: String) {
+        rtcKit.setParameters(string)
+    }
+    
+    //Dump 全链路音频数据收集
+    public func setAPMOn(isOn: Bool){
+        rtcKit.setParameters("{\"rtc.debug.enable\": \(isOn)}")
+        rtcKit.setParameters("{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}");
+    }
+    
     /**
      * 加载RTC
      */
@@ -508,8 +520,8 @@ public let kMPK_RTC_UID: UInt = 1
         } else if type == .ainsOff {
             path = AgoraConfig.NoneSound[index]
         }
-        let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "voice_lau".voice_localized() : "EN"
-        path = path.replacingOccurrences(of: "CN", with: lanuagePath)
+//        let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "voice_lau".voice_localized() : "EN"
+//        path = path.replacingOccurrences(of: "CN", with: lanuagePath)
         rtcKit.startAudioMixing(path, loopback: false, cycle: 1)
     }
 

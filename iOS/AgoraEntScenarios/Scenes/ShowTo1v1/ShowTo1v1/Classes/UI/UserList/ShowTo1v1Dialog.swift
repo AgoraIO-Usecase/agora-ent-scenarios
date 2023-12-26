@@ -71,47 +71,56 @@ class ShowTo1v1Dialog: UIView {
 }
 
 //房间无人
-class ShowTo1v1NoDataDialog: ShowTo1v1Dialog {
+class ShowTo1v1NoDataDialog: UIView {
+    
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
-        label.font = UIFont.systemFont(ofSize: 20)
+        label.textColor = UIColor(hexString: "#303553")
+        label.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
         label.text = "user_list_waitting".showTo1v1Localization()
+        label.textAlignment = .center
         return label
     }()
     private lazy var contentLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
+        label.textColor = UIColor(hexString: "#6F738B")
         label.numberOfLines = 0
+        label.font = UIFont.systemFont(ofSize: 14, weight: .light)
         let text = NSMutableAttributedString(string: "user_list_nodata_tips".showTo1v1Localization())
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = 5
         text.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: text.length))
-        label.font = UIFont.systemFont(ofSize: 14)
         label.attributedText = text
+        label.textAlignment = .center
+
         return label
     }()
-    override func _loadSubView() {
-        super._loadSubView()
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(contentLabel)
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        _loadSubView()
     }
     
-    override func contentSize() -> CGSize {
-        return CGSize(width: self.width, height: 214 + UIDevice.current.aui_SafeDistanceBottom)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func _loadSubView() {
+        self.addSubview(titleLabel)
+        self.addSubview(contentLabel)
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
         
         titleLabel.sizeToFit()
-        titleLabel.aui_centerX = contentView.aui_width / 2
+        titleLabel.aui_centerX = self.aui_width / 2
         titleLabel.aui_top = 25
         
         contentLabel.aui_left = 30
-        contentLabel.aui_width = contentView.aui_width - 60
+        contentLabel.aui_width = self.aui_width - 60
         contentLabel.sizeToFit()
-        contentLabel.aui_top = titleLabel.aui_bottom + 16
+        contentLabel.aui_top = titleLabel.aui_bottom + 20
     }
 }
 
@@ -367,6 +376,7 @@ class CallerDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
     private lazy var avatarView: UIImageView = {
         let view = UIImageView()
         view.clipsToBounds = true
+        view.contentMode = .scaleAspectFill
         return view
     }()
     

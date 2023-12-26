@@ -11,7 +11,7 @@ import ZSwiftBaseLib
 import AgoraChat.AgoraChatError
 import AgoraSyncManager
 
-private let kSceneId = "scene_chatRoom_3.1.0"
+private let kSceneId = "scene_chatRoom_4.0.0"
 
 
 private func agoraPrint(_ message: String) {
@@ -21,12 +21,14 @@ let roomBGMKey = "room_bgm"
 
 let voiceLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "VoiceChat"))
 public class ChatRoomServiceImp: NSObject {
+    
     static var _sharedInstance: ChatRoomServiceImp?
     var roomId: String?
     var roomList: [VRRoomEntity]?
     var userList: [VRUser]?
     public var mics: [VRRoomMic] = [VRRoomMic]()
     public var applicants: [VoiceRoomApply] = [VoiceRoomApply]()
+    private var connectState: ChatRoomServiceConnectState?
     var syncUtilsInited: Bool = false
     @objc public weak var roomServiceDelegate:ChatRoomServiceSubscribeDelegate?
     
@@ -42,7 +44,7 @@ public class ChatRoomServiceImp: NSObject {
         guard let room = self.roomList?.filter({$0.room_id == roomId}).first, let created_at = room.created_at else { return }
         
         let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
-        let expiredDuration = 20 * 60 * 1000
+        let expiredDuration = (AppContext.shared.sceneConfig?.chat ?? 20 * 60) * 1000
         agoraPrint("checkRoomExpire: \(currentTs - Int64(created_at)) / \(expiredDuration)")
         guard currentTs - Int64(created_at) > expiredDuration else { return }
         
@@ -695,7 +697,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                                 })?.mic_index = mic_index
                 let currentMic = self.mics[safe: mic_index]
                 if currentMic?.status ?? 0 == -1 || currentMic?.status ?? 0 == 2 {
-                    self.mics[mic_index]  = mic
+                    self.mics[mic_index] = mic
                     completion(nil,mic)
                 } else {
                     completion(self.normalError(),nil)
@@ -737,7 +739,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             guard let self = self else {
                 return
             }
-            
+            self.connectState = ChatRoomServiceConnectState(rawValue: state.rawValue)
+            if let chatState = self.connectState {
+                self.roomServiceDelegate?.onConnectStateChanged(state: chatState)
+            }
             agoraPrint("subscribeConnectState: \(state) \(self.syncUtilsInited)")
 //            self.networkDidChanged?(KTVServiceNetworkStatus(rawValue: UInt(state.rawValue)))
             guard !self.syncUtilsInited else {
@@ -757,6 +762,12 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     func fetchRoomList(page: Int,
                      completion: @escaping (Error?, [VRRoomEntity]?) -> Void) {
         initScene { [weak self] in
+            if self?.connectState != .open {
+                DispatchQueue.main.async {
+                    completion(self?.networkError(),nil)
+                }
+                return
+            }
             SyncUtil.fetchAll { [weak self] results in
                 agoraPrint("result == \(results.compactMap { $0.toJson() })")
                 
@@ -777,6 +788,13 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         error.message = "voice_members_reach_limit".voice_localized()
         return error
     }
+    
+    private func networkError() -> VoiceRoomError {
+        let error = VoiceRoomError()
+        error.code = "-1"
+        error.message = "voice_network_disconnected".voice_localized()
+        return error
+    }
 
     
     /// 创建房间
@@ -795,6 +813,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         self.roomList?.append(room)
         let params = room.kj.JSONObject()
         self.initScene {
+            if self.connectState != .open {
+                completion(SyncError(message: "voice_network_disconnected".voice_localized(), code: self.connectState?.rawValue ?? -1),nil)
+                return
+            }
             SyncUtil.joinScene(id: room.room_id ?? "",
                                userId:VLUserCenter.user.id,
                                isOwner: true,
@@ -871,6 +893,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                     let params = updateRoom.kj.JSONObject()
                     
                     initScene{
+                        if self.connectState != .open {
+                            completion(self.networkError(),nil)
+                            return
+                        }
                         SyncUtil.joinScene(id: roomId,
                                            userId: VLUserCenter.user.id,
                                            isOwner: VLUserCenter.user.id == room.owner?.uid,

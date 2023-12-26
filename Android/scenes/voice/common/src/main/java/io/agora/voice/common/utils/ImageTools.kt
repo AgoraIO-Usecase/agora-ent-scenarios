@@ -3,6 +3,7 @@ package io.agora.voice.common.utils
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import io.agora.voice.common.R
 
 /**
@@ -15,6 +16,7 @@ object ImageTools {
         Glide.with(view)
             .load(url)
             .error(R.drawable.vocie_user_image)
+            .apply(RequestOptions.circleCropTransform())
             .into(view)
     }
 
@@ -23,6 +25,7 @@ object ImageTools {
         Glide.with(view)
             .load(res)
             .error(R.drawable.vocie_user_image)
+            .apply(RequestOptions.circleCropTransform())
             .into(view)
     }
 }

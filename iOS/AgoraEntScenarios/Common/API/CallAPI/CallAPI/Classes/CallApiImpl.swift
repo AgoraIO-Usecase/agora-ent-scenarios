@@ -50,6 +50,13 @@ public class CallApiImpl: NSObject {
     private var tokenConfig: CallTokenConfig?
     private var messageManager: CallMessageManager?
     private var prepareConfig: PrepareConfig? = nil
+    private var internalRtmClient: AgoraRtmClientKit? {
+        didSet {
+            if oldValue == internalRtmClient { return }
+            oldValue?.logout()
+            oldValue?.destroy()
+        }
+    }
     
     private var callId: String = ""
     
@@ -62,6 +69,7 @@ public class CallApiImpl: NSObject {
             _flushReport()
         }
     }
+    private var prevMessageTs: Int = 0
     
     /// 当前状态
     private var state: CallStateType = .idle {
@@ -130,11 +138,42 @@ public class CallApiImpl: NSObject {
         addRTCListener(listener: self)
     }
     
+    //创建RTM
+    private func _createRtmClient(delegate: AgoraRtmClientDelegate?) -> AgoraRtmClientKit {
+        let rtmConfig = AgoraRtmClientConfig(appId: config!.appId, userId: "\(config!.userId)")
+        if rtmConfig.userId.count == 0 {
+            callWarningPrint("userId is empty")
+        }
+        if rtmConfig.appId.count == 0 {
+            callWarningPrint("appId is empty")
+        }
+
+        var rtmClient: AgoraRtmClientKit? = nil
+        do {
+            rtmClient = try AgoraRtmClientKit(rtmConfig, delegate: nil)
+        } catch {
+            callWarningPrint("create rtm client fail: \(error.localizedDescription)")
+        }
+        return rtmClient!
+    }
+    
     private func _messageDic(action: CallAction) -> [String: Any] {
         var dic: [String: Any] = [:]
         dic[kMessageAction] = action.rawValue
         dic[kMessageVersion] = kCurrentMessageVersion
-        dic[kMessageTs] = _getNtpTimeInMs()
+        var ts = _getNtpTimeInMs()
+        if ts <= prevMessageTs {
+            // invalid ts
+            callWarningPrint("get ntp time invalid \(ts)/\(prevMessageTs)")
+            
+            let stackSymbols = Thread.callStackSymbols
+            let stackString = stackSymbols.joined(separator: " \n ")
+            callWarningPrint(stackString)
+            
+            ts = prevMessageTs + 1
+        }
+        prevMessageTs = ts
+        dic[kMessageTs] = ts
         dic[kFromUserId] = config?.userId ?? 0
         if  callId.count > 0 {
             dic[kCallId] = callId
@@ -184,14 +223,16 @@ extension CallApiImpl {
                                stateReason: CallReason,
                                eventReason: String,
                                elapsed: Int) {
-        if prevState != state, state == .idle {
+        if prevState != state, (state == .idle || state == .failed) {
             _leaveRTC(force: true)
             _cleanCallCache()
             config = nil
             tokenConfig = nil
-            messageManager?.logout()
-            messageManager = nil
-            delegates.removeAllObjects()
+            isPreparing = false
+            self.messageManager?.rtmDeinitialize()
+            self.messageManager = nil
+            internalRtmClient = nil
+//            delegates.removeAllObjects()
         } else if prevState != .idle, state == .prepared {
             _leaveRTC()
             _cleanCallCache()
@@ -328,13 +369,12 @@ extension CallApiImpl {
     }
     
     private func _deinitialize() {
-        isPreparing = false
         _notifyState(state: .idle)
         _notifyEvent(event: .deinitialize)
     }
     
     //设置远端画面
-    private func _setupRemoteVideo(roomId: String, uid: UInt, canvasView: UIView) {
+    private func _setupRemoteVideo(uid: UInt, canvasView: UIView) {
         guard let connection = rtcConnection, let engine = config?.rtcEngine else {
             callWarningPrint("_setupRemoteVideo fail: connection or engine is empty")
             return
@@ -345,7 +385,7 @@ extension CallApiImpl {
         videoCanvas.view = canvasView
         videoCanvas.renderMode = .hidden
         let ret = engine.setupRemoteVideoEx(videoCanvas, connection: connection)
-        callPrint("_setupRemoteVideo ret = \(ret) roomId: \(roomId) uid: \(uid)")
+        callPrint("_setupRemoteVideo ret = \(ret) channelId: \(connection.channelId) uid: \(uid)")
     }
     
     //设置本地画面
@@ -425,11 +465,10 @@ extension CallApiImpl {
         mediaOptions.publishMicrophoneTrack = !joinOnly
         mediaOptions.autoSubscribeAudio = !joinOnly
         mediaOptions.autoSubscribeVideo = !joinOnly
-        let ret =
-        config.rtcEngine.joinChannelEx(byToken: token,
-                                       connection: connection,
-                                       delegate: rtcProxy,
-                                       mediaOptions: mediaOptions)
+        let ret = config.rtcEngine.joinChannelEx(byToken: token,
+                                                 connection: connection,
+                                                 delegate: rtcProxy,
+                                                 mediaOptions: mediaOptions)
         callPrint("joinRTC channel roomId: \(roomId) uid: \(config.userId) ret = \(ret)")
         rtcConnection = connection
         joinRtcCompletion = { [weak self] err in
@@ -509,6 +548,7 @@ extension CallApiImpl {
         callTs = nil
         timer = nil
         callId = ""
+        prevMessageTs = 0
     }
     
     private func _flushReport() {
@@ -528,7 +568,7 @@ extension CallApiImpl {
     
     private func _reportMethod(event: String, label: String = "") {
         let msgId = "scenarioAPI"
-        let category = "3_iOS_0.2.0"
+        let category = "3_iOS_0.3.0"
         callPrint("_reportMethod event: \(event)")
         if isChannelJoined {
             _sendCustomReportMessage(msgId: msgId, category: category, event: event, label: label, value: 0)
@@ -537,6 +577,7 @@ extension CallApiImpl {
         
         let info = CallReportInfo(msgId: msgId, category: category, event: event, label: label, value: 0)
         reportInfoList.append(info)
+        reportInfoList = reportInfoList.suffix(10)
 //        callPrint("sendCustomReportMessage not join channel cache it! event: \(event) label: \(label)")
     }
     
@@ -551,6 +592,7 @@ extension CallApiImpl {
         
         let info = CallReportInfo(msgId: msgId, category: category, event: key, label: callId, value: value)
         reportInfoList.append(info)
+        reportInfoList = reportInfoList.suffix(10)
         callPrint("sendCustomReportMessage not join channel cache it! msgId: \(msgId) category: \(category) event: \(key) label: \(callId) value: \(value)")
     }
     
@@ -700,18 +742,23 @@ extension CallApiImpl: CallApiProtocol {
             callWarningPrint("must invoke 'deinitialize' to clean state")
             return
         }
+        
         self.config = config
         self.tokenConfig = token
-        self.messageManager?.logout()
-        self.messageManager = CallMessageManager(config: config, rtmDelegate: self, delegate: self)
+        var rtmClient = config.rtmClient
+        if rtmClient == nil {
+            self.internalRtmClient = _createRtmClient(delegate: nil)
+            rtmClient = self.internalRtmClient
+        }
+        self.messageManager = CallMessageManager(config: config, rtmClient: rtmClient!, delegate: self)
         
-        //纯1v1需要设置成caller
-        if config.mode == .pure1v1, config.role == .callee {
-            config.role = .caller
+        var autoPrepre = true
+        if config.mode == .showTo1v1, config.role == .caller {
+            autoPrepre = false
         }
         
-        //被叫需要自动加入rtm
-        guard config.role == .callee else {
+        //需要自动加入rtm
+        guard autoPrepre else {
             completion(nil)
             return
         }
@@ -723,13 +770,7 @@ extension CallApiImpl: CallApiProtocol {
     
     public func deinitialize(completion: @escaping (()->())) {
         _reportMethod(event: "\(#function)")
-        
         if let callingUserId = self.callingUserId {
-//            var roomId = callingRoomId
-            //秀场转1v1主叫挂断的是房主id
-//            if config?.mode == .showTo1v1, config?.role == .caller {
-//                roomId = config?.ownerRoomId ?? ""
-//            }
             _hangup(userId: "\(callingUserId)") {[weak self] err, message in
                 self?._deinitialize()
                 completion()
@@ -747,16 +788,15 @@ extension CallApiImpl: CallApiProtocol {
         }
         callPrint("renewToken with roomId[\(config.roomId)]")
         self.tokenConfig = config
-        messageManager?.renewToken(rtmToken: config.rtmToken)
+        messageManager?.renewToken(tokenConfig: config)
         guard let connection = rtcConnection, connection.channelId == config.roomId else {
-            callWarningPrint("renewToken fail! connection.channelId[\(rtcConnection?.channelId ?? "")] != config.roomId[\(config.roomId)]")
+//            callWarningPrint("renewToken fail! connection.channelId[\(rtcConnection?.channelId ?? "")] != config.roomId[\(config.roomId)]")
             return
         }
         let options = AgoraRtcChannelMediaOptions()
         options.token = config.rtcToken
-        let ret =
-        self.config?.rtcEngine.updateChannelEx(with: options, connection: connection)
-        callPrint("rtc[\(config.roomId)] renewToken ret = \(ret)")
+        let ret = self.config?.rtcEngine.updateChannelEx(with: options, connection: connection)
+        callPrint("rtc[\(config.roomId)] renewToken ret = \(ret ?? -1)")
     }
     
     public func renewRemoteCallerChannelToken(roomId: String, token: String) {
@@ -775,9 +815,7 @@ extension CallApiImpl: CallApiProtocol {
     
     public func addListener(listener: CallApiListenerProtocol) {
         _reportMethod(event: "\(#function)")
-        if delegates.contains(listener) {
-            return
-        }
+        if delegates.contains(listener) { return }
         delegates.add(listener)
     }
     
@@ -827,7 +865,7 @@ extension CallApiImpl: CallApiProtocol {
         _notifyState(state: .calling, eventInfo: message)
         _notifyEvent(event: .onCalling)
 
-        callingRoomId = roomId
+        callingRoomId = fromRoomId
         callingUserId = remoteUserId
         //不等响应即加入频道，加快join速度，失败则leave
         _joinRTCAndNotify(roomId: fromRoomId, token: tokenConfig?.rtcToken ?? "") {[weak self] error in
@@ -923,20 +961,25 @@ extension CallApiImpl: CallApiProtocol {
 
 //MARK: AgoraRtmClientDelegate
 extension CallApiImpl: AgoraRtmClientDelegate {
-    public func rtmKit(_ rtmKit: AgoraRtmClientKit, onTokenPrivilegeWillExpire channel: String?) {
+    public func rtmKit(_ rtmKit: AgoraRtmClientKit, tokenPrivilegeWillExpire channel: String?) {
         _notifyTokenPrivilegeWillExpire()
     }
     
+    public func onConnectionFail() {
+        _notifyState(state: .failed, stateReason: .rtmLost)
+        _notifyEvent(event: .rtmLost)
+    }
+    
     //收到RTM消息
-    public func rtmKit(_ rtmKit: AgoraRtmClientKit, on event: AgoraRtmMessageEvent) {
+    public func rtmKit(_ rtmKit: AgoraRtmClientKit, didReceiveMessageEvent event: AgoraRtmMessageEvent) {
         let message = event.message
-        guard let data = message.getData() as? Data,
+        guard let data = message.rawData,
               let dic = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let messageAction = CallAction(rawValue: dic[kMessageAction] as? UInt ?? 0),
               let msgTs = dic[kMessageTs] as? Int,
               let userId = dic[kFromUserId] as? UInt,
               let messageVersion = dic[kMessageVersion] as? String else {
-            callWarningPrint("fail to parse message: \(message.getType().rawValue)")
+            callWarningPrint("fail to parse message: \(message.rawData?.count ?? 0)")
             return
         }
         
@@ -972,9 +1015,9 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         callPrint("didJoinedOfUid: \(uid) elapsed: \(elapsed)")
-        guard callingUserId == uid, let roomId = callingRoomId, let config = config else { return }
+        guard callingUserId == uid, let config = config else { return }
         self.timeProfiling(message: "5.呼叫-对端[\(uid)] 加入房间")
-        self._setupRemoteVideo(roomId: roomId, uid: uid, canvasView: config.remoteView)
+        self._setupRemoteVideo(uid: uid, canvasView: config.remoteView)
         _notifyEvent(event: .remoteJoin, elapsed: _getNtpTimeInMs() - (callTs ?? 0))
     }
     
