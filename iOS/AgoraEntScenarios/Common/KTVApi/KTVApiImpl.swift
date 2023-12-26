@@ -329,6 +329,7 @@ extension KTVApiImpl: KTVApiDelegate {
         
         if ((oldRole == .leadSinger || oldRole == .soloSinger) && (newRole == .coSinger || newRole == .audience) && isNowMicMuted) {
             apiConfig?.engine?.muteLocalAudioStream(true)
+            apiConfig?.engine?.adjustRecordingSignalVolume(100)
         } else if ((oldRole == .audience || oldRole == .coSinger) && (newRole == .leadSinger || newRole == .soloSinger) && isNowMicMuted) {
             apiConfig?.engine?.adjustRecordingSignalVolume(0)
             apiConfig?.engine?.muteLocalAudioStream(false)
