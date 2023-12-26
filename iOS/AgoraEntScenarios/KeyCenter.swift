@@ -38,7 +38,7 @@ class KeyCenter: NSObject {
      注意：如果项目没有开启证书鉴权，这个字段留空。
      */
 
-    static let Certificate: String? = nil
+    static let Certificate: String? = "1234"
 
     /**
      Token.
