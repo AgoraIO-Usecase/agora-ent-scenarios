@@ -320,6 +320,7 @@ extension RoomViewController {
                 return
             }
             
+            self?.taskId = taskId
             if let roomInfo = self?.roomInfo, let taskId = taskId {
                 roomInfo.badgeTitle = gameInfo.name ?? ""
                 self?.service.updateRoom(roomInfo: roomInfo, completion: { err in
@@ -338,7 +339,6 @@ extension RoomViewController {
             
             self?.getGameInfo(gameId: gameInfo.gameId ?? "") {
                 SVProgressHUD.dismiss()
-                self?.taskId = taskId
                 self?.onIntroduceAction()
             } fail: { _ in
                 SVProgressHUD.dismiss()
