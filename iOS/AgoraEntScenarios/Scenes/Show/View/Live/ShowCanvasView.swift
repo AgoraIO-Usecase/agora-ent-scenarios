@@ -22,6 +22,12 @@ protocol ShowCanvasViewDelegate: NSObjectProtocol {
 class ShowCanvasView: UIView {
     weak var delegate: ShowCanvasViewDelegate?
     
+    lazy var thumnbnailCanvasView: ShowThumnbnailCanvasView = {
+        let view = ShowThumnbnailCanvasView(frame: self.bounds)
+        view.isHidden = true
+        return view
+    }()
+    
     lazy var localView = UIView()
     lazy var remoteView: UIView = {
         let view = UIView()
@@ -149,7 +155,8 @@ class ShowCanvasView: UIView {
                 remoteBgView.cornerRadius(0)
                 timer.scheduledSecondsTimer(withName: "pk", timeInterval: 1, queue: .main) { [weak self] _, duration in
                     guard let self = self else { return }
-                    var timeLeft = 120 - duration
+                    let maxTime: TimeInterval = TimeInterval(AppContext.shared.sceneConfig?.showpk ?? 120)
+                    var timeLeft = maxTime - duration
                     if timeLeft < 0 {
                         self.timer.destoryAllTimer()
                         self.delegate?.onPKDidTimeout()
@@ -240,6 +247,11 @@ class ShowCanvasView: UIView {
     
     private func setupUI() {
         addSubview(localView)
+        addSubview(thumnbnailCanvasView)
+        thumnbnailCanvasView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
         addSubview(remoteView)
         addSubview(timerView)
         addSubview(pkView)

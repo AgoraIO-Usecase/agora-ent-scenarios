@@ -18,7 +18,7 @@ public enum ROLE_TYPE {
     case audience
 }
 
-let giftMap = [["gift_id": "VoiceRoomGift1", "gift_name": LanguageManager.localValue(key: "Sweet Heart"), "gift_price": "1", "gift_count": "1", "selected": true], ["gift_id": "VoiceRoomGift2", "gift_name": LanguageManager.localValue(key: "Flower"), "gift_price": "5", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift3", "gift_name": LanguageManager.localValue(key: "Crystal Box"), "gift_price": "10", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift4", "gift_name": LanguageManager.localValue(key: "Super Agora"), "gift_price": "20", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift5", "gift_name": LanguageManager.localValue(key: "Star"), "gift_price": "50", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift6", "gift_name": LanguageManager.localValue(key: "Lollipop"), "gift_price": "100", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift7", "gift_name": LanguageManager.localValue(key: "Diamond"), "gift_price": "500", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift8", "gift_name": LanguageManager.localValue(key: "Crown"), "gift_price": "1000", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift9", "gift_name": LanguageManager.localValue(key: "Rocket"), "gift_price": "1500", "gift_count": "1", "selected": false]]
+let giftMap = [["gift_id": "VoiceRoomGift1", "gift_name": LanguageManager.localValue(key: "voice_sweet_heart"), "gift_price": "1", "gift_count": "1", "selected": true], ["gift_id": "VoiceRoomGift2", "gift_name": LanguageManager.localValue(key: "voice_flower"), "gift_price": "5", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift3", "gift_name": LanguageManager.localValue(key: "voice_crystal_box"), "gift_price": "10", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift4", "gift_name": LanguageManager.localValue(key: "voice_super_agora"), "gift_price": "20", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift5", "gift_name": LanguageManager.localValue(key: "voice_star"), "gift_price": "50", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift6", "gift_name": LanguageManager.localValue(key: "voice_lollipop"), "gift_price": "100", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift7", "gift_name": LanguageManager.localValue(key: "voice_diamond"), "gift_price": "500", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift8", "gift_name": LanguageManager.localValue(key: "voice_crown"), "gift_price": "1000", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift9", "gift_name": LanguageManager.localValue(key: "voice_rocket"), "gift_price": "1500", "gift_count": "1", "selected": false]]
 
 fileprivate let ownerMic = ["index":0,"status":0,"member":["uid":VoiceRoomUserInfo.shared.user?.uid ?? "","chat_uid":VoiceRoomUserInfo.shared.user?.chat_uid ?? "","name":VoiceRoomUserInfo.shared.user?.name ?? "","portrait":VoiceRoomUserInfo.shared.user?.portrait ?? "","rtc_uid":VoiceRoomUserInfo.shared.user?.rtc_uid ?? "","mic_index":0]] as [String : Any]
 
@@ -43,11 +43,68 @@ class VoiceRoomViewController: VRBaseViewController {
 
     var preView: VMPresentView!
     private lazy var noticeView = VMNoticeView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 230))
+    private lazy var musicListView: VoiceMusicListView = {
+        let view = VoiceMusicListView(rtcKit: rtckit,
+                                      currentMusic: roomInfo?.room?.backgroundMusic,
+                                      isOrigin: roomInfo?.room?.musicIsOrigin ?? true,
+                                      roomInfo: roomInfo)
+        view.backgroundMusicPlaying = { [weak self] model in
+            self?.roomInfo?.room?.backgroundMusic = model
+            self?.musicView.setupMusic(model: model, isOrigin: self?.roomInfo?.room?.musicIsOrigin ?? true)
+        }
+        view.onClickAccompanyButtonClosure = { [weak self] isOrigin in
+            self?.roomInfo?.room?.musicIsOrigin = isOrigin
+            self?.musicView.updateOriginButtonStatus(isOrigin: isOrigin)
+            self?.rtckit.selectPlayerTrackMode(isOrigin: isOrigin)
+        }
+        return view
+    }()
+    public lazy var musicView: VoiceMusicPlayingView = {
+        let view = VoiceMusicPlayingView(isOwner: isOwner)
+        view.isHidden = true
+        view.onClickAccompanyButtonClosure = { [weak self] isOrigin in
+            self?.roomInfo?.room?.musicIsOrigin = isOrigin
+            view.updateOriginButtonStatus(isOrigin: isOrigin)
+            self?.rtckit.selectPlayerTrackMode(isOrigin: isOrigin)
+        }
+        view.onClickBGMClosure = { [weak self] model in
+            guard let self = self, self.isOwner == true else { return }
+            self.musicListView.show_present()
+        }
+        view.onUpdateBGMClosure = { [weak self] model in
+            guard let self = self, self.isOwner == false else { return }
+            self.roomInfo?.room?.backgroundMusic = model
+        }
+        return view
+    }()
+    
+    private lazy var actionView = ActionSheetManager()
+
+    private lazy var debugButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Debug", for: .normal)
+        button.setTitleColor(.black, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 12)
+        button.cornerRadius(25)
+        button.backgroundColor = .white
+        button.addTarget(self, action: #selector(onTapDebugButton), for: .touchUpInside)
+        button.isHidden = !AppContext.shared.isDebugMode
+        return button
+    }()
+    
     var isShowPreSentView: Bool = false
     var rtckit: VoiceRoomRTCManager = VoiceRoomRTCManager.getSharedInstance()
     var isOwner: Bool = false
     var ains_state: AINS_STATE = .mid
-    var local_index: Int?
+    var local_index: Int? {
+        didSet {
+            if local_index == nil {
+                self.rtckit.setClientRole(role: .audience)
+            } else {
+                self.rtckit.setClientRole(role: .owner)
+            }
+        }
+    }
     var vmType: VMMUSIC_TYPE = .social
     var isHeaderBack = false
 
@@ -63,6 +120,12 @@ class VoiceRoomViewController: VRBaseViewController {
             }
         }
     }
+    
+    //虚拟声卡的属性
+    public var soundOpen: Bool = false
+    public var gainValue: String = ""
+    public var typeValue: Int = 0
+    public var effectType: Int = 0
 
     convenience init(info: VRRoomInfo) {
         self.init()
@@ -97,6 +160,8 @@ class VoiceRoomViewController: VRBaseViewController {
         
         if isOwner {
             checkAudioAuthorized()
+        } else {
+            musicView.eventHandler(roomId: roomInfo?.room?.room_id)
         }
     }
     
@@ -104,7 +169,7 @@ class VoiceRoomViewController: VRBaseViewController {
         SyncUtil.scene(id: self.roomInfo?.room?.room_id ?? "")?.subscribe(key: "",onDeleted: { 
             
             if self.isHeaderBack == false,$0.getId() == self.roomInfo?.room?.room_id ?? "" {
-                self.view.window?.makeToast("Time limit desc".localized())
+                self.view.window?.makeToast("voice_time_limit_desc".voice_localized())
                 self.quitRoom()
             }
         })
@@ -123,6 +188,20 @@ class VoiceRoomViewController: VRBaseViewController {
 }
 
 extension VoiceRoomViewController {
+    
+    @objc
+    private func onTapDebugButton() {
+        actionView
+            .title(title: "Dump数据类型")
+            .switchCell(iconName: "icons／set／jiqi", title: "APM全链路音频", isOn: AppContext.shared.isVRApmOn)
+            .config()
+        actionView.didSwitchValueChangeClosure = { [weak self] _, isOn in
+            AppContext.shared.isVRApmOn = isOn
+            self?.rtckit.setAPMOn(isOn: isOn)
+        }
+        actionView.show()
+    }
+    
     // 加载RTC
     func loadKit() {
         guard let channel_id = roomInfo?.room?.channel_id else { return }
@@ -130,9 +209,11 @@ extension VoiceRoomViewController {
         let rtcUid = VLUserCenter.user.id
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
+        rtckit.playerDelegate = self
         
         if isOwner {
             checkEnterSeatAudioAuthorized()
+            rtckit.initMusicControlCenter()
         }
 
         var rtcJoinSuccess = false
@@ -166,7 +247,7 @@ extension VoiceRoomViewController {
             guard let `self` = self else { return }
             if !joinSuccess {
                 if !IMJoinSuccess {
-                    self.view.window?.makeToast("Join IM failed!")
+                    self.view.window?.makeToast("voice_join_IM_failed")
                 } else {
                     self.view.window?.makeToast("Join RTC failed!")
                 }
@@ -185,6 +266,8 @@ extension VoiceRoomViewController {
                 }
             }
         }
+        // 收集APM全链路音频
+        rtckit.setAPMOn(isOn: AppContext.shared.isVRApmOn)
     }
     
     private func setChatroomAttributes() {
@@ -299,10 +382,9 @@ extension VoiceRoomViewController {
     }
 
     func layoutUI() {
-        SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
 
         let bgImgView = UIImageView()
-        bgImgView.image = UIImage("lbg")
+        bgImgView.image = UIImage.sceneImage(name: "bg-main", bundleName: "VoiceChatRoomResource")
         view.addSubview(bgImgView)
 
         headerView = AgoraChatRoomHeaderView() 
@@ -318,6 +400,12 @@ extension VoiceRoomViewController {
         }
         view.addSubview(rtcView)
 
+        view.addSubview(musicView)
+        musicView.snp.makeConstraints { make in
+            make.trailing.equalToSuperview()
+            make.top.equalTo(headerView.snp.bottom).offset(-13)
+        }
+        
         if let entity = roomInfo?.room {
             rtcView.isHidden = entity.type == 1
             headerView.updateHeader(with: entity)
@@ -327,16 +415,16 @@ extension VoiceRoomViewController {
             make.left.right.top.bottom.equalTo(self.view)
         }
 
-        let isHairScreen = SwiftyFitsize.isFullScreen
+        let isHairScreen =  Screen.isFullScreen
         headerView.snp.makeConstraints { make in
             make.left.top.right.equalTo(self.view)
-            make.height.equalTo(isHairScreen ? 140~ : 140~ - 25)
+            make.height.equalTo(isHairScreen ? 140 : 140 - 25)
         }
 
         rtcView.snp.makeConstraints { make in
             make.top.equalTo(self.headerView.snp.bottom)
             make.left.right.equalTo(self.view)
-            make.height.equalTo(240~)
+            make.height.equalTo(240)
         }
         if roomInfo?.room?.type ?? 0 == 1 {
             view.addSubViews([chatBar])
@@ -349,6 +437,13 @@ extension VoiceRoomViewController {
             inputBar.isHidden = true
         }
         chatView.messages?.append(startMessage())
+        
+        view.addSubview(debugButton)
+        debugButton.translatesAutoresizingMaskIntoConstraints = false
+        debugButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -35).isActive = true
+        debugButton.bottomAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        debugButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        debugButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
     }
 
 
@@ -420,7 +515,7 @@ extension VoiceRoomViewController {
     
     func showEQOperation() {
         if !isOwner {
-            view.makeToast("Host Bot".localized())
+            view.makeToast("voice_host_bot".voice_localized())
             return
         }
         let confirmView = VREQOperationAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: (254/375.0)*ScreenWidth)).backgroundColor(.white).cornerRadius(20, [.topLeft, .topRight], .white, 0)
@@ -450,7 +545,7 @@ extension VoiceRoomViewController {
         inputBar.hiddenInputBar()
         if isShowPreSentView {
             UIView.animate(withDuration: 0.5, animations: {
-                self.preView.frame = CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: 450~)
+                self.preView.frame = CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: 450)
             }) { _ in
                 if self.preView == nil {return}
                 self.preView.removeFromSuperview()
@@ -488,11 +583,11 @@ extension VoiceRoomViewController {
 
     func showActiveAlienView(_ active: Bool) {
         if !isOwner {
-            view.makeToast("Host Bot".localized())
+            view.makeToast("voice_host_bot".voice_localized())
             return
         }
-        let confirmView = VMConfirmView(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 40~, height: 220~), type: .addbot)
-        var compent = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 40~, height: 220~))
+        let confirmView = VMConfirmView(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 40, height: 220), type: .addbot)
+        var compent = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 40, height: 220))
         compent.destination = .center
         let vc = VoiceRoomAlertViewController(compent: compent, custom: confirmView)
         confirmView.resBlock = { [weak self] flag in
@@ -505,7 +600,7 @@ extension VoiceRoomViewController {
 
     func activeAlien(_ flag: Bool) {
         if isOwner == false {
-            view.makeToast("Host Bot".localized())
+            view.makeToast("voice_host_bot".voice_localized())
             return
         }
         guard let mic: VRRoomMic = roomInfo?.mic_info?[6] else { return }
@@ -534,10 +629,10 @@ extension VoiceRoomViewController {
         ChatRoomServiceImp.getSharedInstance().updateAnnouncement(content: str) { result in
             if result {
                 // 如果返回的结果为true 表示上麦成功
-                self.view.makeToast("Notice Posted".localized())
+                self.view.makeToast("voice_notice_posted".voice_localized())
                 self.roomInfo?.room?.announcement = str
             } else {
-                self.view.makeToast("Post Failed".localized())
+                self.view.makeToast("voice_post_failed".voice_localized())
             }
         }
     }
@@ -574,6 +669,10 @@ extension VoiceRoomViewController {
             default: break
             }
         }
+        chatBar.micStateChangeClosure = { [weak self] state in
+            guard let self = self else { return }
+            self.rtckit.enableinearmonitoring(enable: state == .selected ? false : self.roomInfo?.room?.turn_InEar ?? false)
+        }
     }
 
     
@@ -581,7 +680,9 @@ extension VoiceRoomViewController {
         var compent = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 70, height: 190))
         compent.destination = .center
         inputBar.hiddenInputBar()
-        let micAlert = VoiceRoomEndLiveAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 70, height: 190), title: LanguageManager.localValue(key: "End Live"), content: LanguageManager.localValue(key: "The room will close after you leave."), cancel: LanguageManager.localValue(key: "Cancel"), confirm: LanguageManager.localValue(key: "Confirm")).cornerRadius(16).backgroundColor(.white)
+        let micAlert = VoiceRoomEndLiveAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 70, height: 190), title: LanguageManager.localValue(key: "voice_end_live"), content: LanguageManager.localValue(key: "voice_the_room_will_close_after_you_leave."), cancel: LanguageManager.localValue(key: "voice_cancel"), confirm: LanguageManager.localValue(key: "voice_confirm")).cornerRadius(16).backgroundColor(.white)
+        micAlert.cancel.accessibilityIdentifier = "voice_chat_room_end_live_cancel"
+        micAlert.confirm.accessibilityIdentifier = "voice_chat_room_end_live_confirm"
         let vc = VoiceRoomAlertViewController(compent: compent, custom: micAlert)
         micAlert.actionEvents = { [weak self] in
             vc.dismiss(animated: true)
@@ -619,7 +720,7 @@ extension VoiceRoomViewController {
         inputBar.hiddenInputBar()
         var compent = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 75, height: 200))
         compent.destination = .center
-        let micAlert = VoiceRoomApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 75, height: 200), content: "Anchor Invited You On-Stage", cancel: "Decline", confirm: "Accept", position: .center).cornerRadius(16).backgroundColor(.white)
+        let micAlert = VoiceRoomApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 75, height: 200), content: "voice_anchor_invited_you_on_stage", cancel: "voice_decline", confirm: "voice_accept", position: .center).cornerRadius(16).backgroundColor(.white)
         let vc = VoiceRoomAlertViewController(compent: compent, custom: micAlert)
         micAlert.actionEvents = { [weak self] in
             if $0 == 30 {
@@ -645,15 +746,41 @@ extension VoiceRoomViewController {
         var detailStr: String = ""
         switch effect {
         case 1:
-            detailStr = "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat.".localized()
+            detailStr = "voice_chatroom_social_chat_introduce".voice_localized()
         case 2:
-            detailStr = "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful.".localized()
+            detailStr = "voice_chatroom_karaoke_introduce".voice_localized()
         case 3:
-            detailStr = "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. ".localized()
+            detailStr = "voice_chatroom_gaming_buddy_introduce".voice_localized()
         default:
-            detailStr = "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. ".localized()
+            detailStr = "voice_chatroom_professional_broadcaster_introduce".voice_localized()
         }
-        return textHeight(text: detailStr, fontSize: 13, width: self.view.bounds.size.width - 40~)
+        return textHeight(text: detailStr, fontSize: 13, width: self.view.bounds.size.width - 40)
+    }
+}
+
+extension VoiceRoomViewController: VMMusicPlayerDelegate {
+    func didMPKChangedTo(state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+        if !rtckit.backgroundMusics.isEmpty  {
+            if state == .playBackAllLoopsCompleted {
+                let music = roomInfo?.room?.backgroundMusic
+                var index = (rtckit.backgroundMusics.firstIndex(where: { $0.songCode == music?.songCode }) ?? 0) + 1
+                index = index < rtckit.backgroundMusics.count ? index : 0
+                let musicModel = rtckit.backgroundMusics[index]
+                let model = VoiceMusicModel()
+                model.songCode = musicModel.songCode
+                model.name = musicModel.name
+                model.singer = musicModel.singer
+                roomInfo?.room?.backgroundMusic = model
+                rtckit.playMusic(songCode: model.songCode)
+                DispatchQueue.main.async {
+                    self.musicView.setupMusic(model: model, isOrigin: self.roomInfo?.room?.musicIsOrigin ?? false)
+                }
+            } else if state == .paused {
+                roomInfo?.room?.backgroundMusic?.status = .pause
+            } else if state == .playing {
+                rtckit.selectPlayerTrackMode(isOrigin: roomInfo?.room?.musicIsOrigin ?? true)
+            }
+        }
     }
 }
 
@@ -688,7 +815,7 @@ extension VoiceRoomViewController: VMManagerDelegate {
     }
 
     func reportAudioVolumeIndicationOfSpeakers(speakers: [AgoraRtcAudioVolumeInfo]) {
-        guard let micinfo = roomInfo?.mic_info else { return }
+        let micinfo = ChatRoomServiceImp.getSharedInstance().mics
         for speaker in speakers {
             for mic in micinfo where mic.member != nil{
                 let user = mic.member

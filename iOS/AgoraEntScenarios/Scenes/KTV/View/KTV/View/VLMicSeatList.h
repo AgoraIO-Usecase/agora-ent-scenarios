@@ -24,10 +24,12 @@ typedef enum : NSUInteger {
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLMicSeatListDelegate>)delegate withRTCkit:(AgoraRtcEngineKit *)RTCkit;
 
-@property (nonatomic, strong) NSArray *roomSeatsArray;
+@property (nonatomic, copy) NSArray<VLRoomSeatModel *> *roomSeatsArray;
 
 
 - (void)reloadSeatIndex:(NSUInteger)seatIndex;
+
+- (void)updateVolumeForSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *) speakers;
 
 - (void)updateSingBtnWithChoosedSongArray:(NSArray *)choosedSongArray;
 - (void)updateIfNeeded;

@@ -10,7 +10,6 @@ import UIKit
 protocol ShowCreateLiveViewDelegate: NSObjectProtocol {
     func onClickCameraBtnAction()
     func onClickBeautyBtnAction()
-    func onClickQualityBtnAction()
     func onClickSettingBtnAction()
     func onClickStartBtnAction()
 }
@@ -62,17 +61,17 @@ class ShowCreateLiveView: UIView {
         }
         
         // 房间背景图
-        roomBgImgView = UIImageView()
-        roomBgImgView.contentMode = .scaleAspectFill
-        roomBgImgView.clipsToBounds = true
-        roomBgImgView.layer.cornerRadius = 10
-        roomBgImgView.image = UIImage.show_sceneImage(name: "show_room_bg_\(roomBg)")
-        roomInfoCoverVeiw.addSubview(roomBgImgView)
-        roomBgImgView.snp.makeConstraints { make in
-            make.left.equalTo(10)
-            make.centerY.equalToSuperview()
-            make.width.height.equalTo(60)
-        }
+//        roomBgImgView = UIImageView()
+//        roomBgImgView.contentMode = .scaleAspectFill
+//        roomBgImgView.clipsToBounds = true
+//        roomBgImgView.layer.cornerRadius = 10
+//        roomBgImgView.image = UIImage.show_sceneImage(name: "show_room_bg_\(roomBg)")
+//        roomInfoCoverVeiw.addSubview(roomBgImgView)
+//        roomBgImgView.snp.makeConstraints { make in
+//            make.left.equalTo(10)
+//            make.centerY.equalToSuperview()
+//            make.width.height.equalTo(60)
+//        }
         
         // 名称
         nameTextField = UITextField()
@@ -81,7 +80,7 @@ class ShowCreateLiveView: UIView {
         nameTextField.font = .show_M_15
         nameTextField.textColor = .show_main_text
         nameTextField.snp.makeConstraints { make in
-            make.left.equalTo(roomBgImgView.snp.right).offset(10)
+            make.left.equalTo(10)
             make.top.equalTo(18)
             make.right.equalTo(-50)
         }
@@ -205,10 +204,6 @@ class ShowCreateLiveView: UIView {
         let beautyButton = createButton(imgName: "show_create_beauty", title: "create_button_beauty".show_localized)
         beautyButton.addTarget(self, action: #selector(didClickBeautyButton), for: .touchUpInside)
         
-        // 画质
-//        let qualityButton = createButton(imgName: "show_create_quality", title: "create_button_quality".show_localized)
-//        qualityButton.addTarget(self, action: #selector(didClickQualityButton), for: .touchUpInside)
-        
         // 设置
         let settingButton = createButton(imgName: "show_setting", title: "create_button_settings".show_localized)
         settingButton.addTarget(self, action: #selector(didClickSettingButton), for: .touchUpInside)
@@ -246,12 +241,6 @@ extension ShowCreateLiveView {
     @objc private func didClickBeautyButton(){
         delegate?.onClickBeautyBtnAction()
     }
-    
-    // 点击画质按钮
-    @objc private func didClickQualityButton(){
-        delegate?.onClickQualityBtnAction()
-    }
-    
     // 点击设置按钮
     @objc private func didClickSettingButton(){
         delegate?.onClickSettingBtnAction()

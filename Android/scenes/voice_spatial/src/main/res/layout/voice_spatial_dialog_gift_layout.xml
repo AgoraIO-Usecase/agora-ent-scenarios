@@ -31,7 +31,7 @@
             android:textStyle="bold"
             android:textSize="@dimen/voice_sp_16"
             android:textColor="#040925"
-            android:text="@string/voice_chatroom_gift_title"
+            android:text="@string/voice_spatial_chatroom_gift_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
@@ -121,7 +121,7 @@
             android:layout_height="40dp"
             android:textSize="@dimen/voice_sp_18"
             android:textColor="@color/voice_white"
-            android:text="@string/voice_chatroom_gift_dialog_send"
+            android:text="@string/voice_spatial_chatroom_gift_dialog_send"
             />
 
 

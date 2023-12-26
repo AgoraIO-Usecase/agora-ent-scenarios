@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import VideoLoaderAPI
 
 @objc enum ShowRoomStatus: Int {
     /// 直播中
@@ -38,8 +38,8 @@ import Foundation
     var toastTitle: String {
         switch self {
         case .idle: return ""
-        case .onSeat: return "连麦已断开哦".show_localized
-        case .pking: return "PK已断开哦".show_localized
+        case .onSeat: return "show_end_broadcasting".show_localized
+        case .pking: return "show_end_pk".show_localized
         }
     }
     
@@ -60,7 +60,30 @@ class ShowBaseInfo: NSObject {
 
 /// 房间列表信息
 @objcMembers
-class ShowRoomListModel: ShowBaseInfo {
+class ShowRoomListModel: ShowBaseInfo, IVideoLoaderRoomInfo {
+    func channelName() -> String {
+        return roomId
+    }
+    
+    func userId() -> String {
+        return ownerId
+    }
+    
+    var anchorInfoList: [AnchorInfo] {
+        get {
+            let anchorInfo = AnchorInfo()
+            anchorInfo.channelName = roomId
+            if !ownerId.isEmpty {
+                anchorInfo.uid = UInt(ownerId)!
+            }
+            anchorInfo.token = AppContext.shared.rtcToken ?? ""
+            
+            return [anchorInfo] + interactionAnchorInfoList
+        }
+    }
+    
+    var interactionAnchorInfoList: [AnchorInfo] = []
+    
     var roomId: String = ""                                //房间号
     var roomName: String?                              //房间名
     var roomUserCount: Int = 1                         //房间人数

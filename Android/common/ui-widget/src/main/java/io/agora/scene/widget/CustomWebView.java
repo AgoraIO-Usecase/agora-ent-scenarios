@@ -1,7 +1,10 @@
 package io.agora.scene.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -26,8 +29,10 @@ public class CustomWebView extends WebView {
         initView();
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private void initView() {
         getSettings().setJavaScriptEnabled(true);
+        getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         getSettings().setUseWideViewPort(false);
         getSettings().setDomStorageEnabled(true);
         setWebViewClient(new MyWebViewClient());
@@ -38,6 +43,12 @@ public class CustomWebView extends WebView {
         getSettings().setLoadWithOverviewMode(true);
         getSettings().setSupportZoom(false);
         getSettings().setDefaultTextEncodingName("UTF-8");
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        getParent().requestDisallowInterceptTouchEvent(true);
+        return super.onInterceptTouchEvent(ev);
     }
 
     // 监听 所有点击的链接，如果拦截到我们需要的，就跳转到相对应的页面。

@@ -11,7 +11,7 @@ import ZSwiftBaseLib
 public class VoiceRoomChatCell: UITableViewCell {
     var chat: VoiceRoomChatEntity?
 
-    lazy var container: UIImageView = .init(frame: CGRect(x: 15, y: 6, width: self.contentView.frame.width - 30, height: self.frame.height - 6)).image(UIImage("chatBg")!).backgroundColor(.clear)
+    lazy var container: UIImageView = .init(frame: CGRect(x: 15, y: 6, width: self.contentView.frame.width - 30, height: self.frame.height - 6)).image(UIImage.sceneImage(name: "chatBg", bundleName: "VoiceChatRoomResource")!).backgroundColor(.clear)
 
     lazy var content: UILabel = .init(frame: CGRect(x: 10, y: 7, width: self.container.frame.width - 20, height: self.container.frame.height - 18)).backgroundColor(.clear).numberOfLines(0).lineBreakMode(.byWordWrapping)
 
@@ -33,6 +33,6 @@ public class VoiceRoomChatCell: UITableViewCell {
         content.attributedText = chat.attributeContent
         content.preferredMaxLayoutWidth = container.frame.width - 24
         content.frame = CGRect(x: 12, y: 7, width: container.frame.width - 24, height: container.frame.height - 16)
-        container.image = (chat.joined == true ? UIImage("joined_msg_bg")!.resizableImage(withCapInsets: UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12), resizingMode: .stretch) : UIImage("chatBg")!)
+        container.image = (chat.joined == true ? UIImage.sceneImage(name: "joined_msg_bg", bundleName: "VoiceChatRoomResource")!.resizableImage(withCapInsets: UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12), resizingMode: .stretch) : UIImage.sceneImage(name: "chatBg", bundleName: "VoiceChatRoomResource")!)
     }
 }

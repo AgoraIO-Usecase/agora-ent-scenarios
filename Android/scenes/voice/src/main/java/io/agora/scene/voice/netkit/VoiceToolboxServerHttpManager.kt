@@ -83,7 +83,7 @@ class VoiceToolboxServerHttpManager {
             .setRequestMethod(VRHttpClientManager.Method_POST)
             .asyncExecute(object : VRHttpCallback {
                 override fun onSuccess(result: String) {
-                    "voice generateToken success: $result".logD(TAG)
+                    "voice generateToken success".logD(TAG)
                     val bean = GsonTools.toBean<VRGenerateTokenResponse>(
                         result,
                         object : TypeToken<VRGenerateTokenResponse>() {}.type
@@ -149,9 +149,9 @@ class VoiceToolboxServerHttpManager {
             requestUser.putOpt("password", "12345678")
 
             val requestIM = JSONObject()
-            requestIM.putOpt("appKey", BuildConfig.IM_APP_KEY)
-            requestIM.putOpt("clientId", BuildConfig.IM_APP_CLIENT_ID)
-            requestIM.putOpt("clientSecret", BuildConfig.IM_APP_CLIENT_SECRET)
+            requestIM.putOpt("appKey", io.agora.scene.voice.BuildConfig.IM_APP_KEY)
+            requestIM.putOpt("clientId", io.agora.scene.voice.BuildConfig.IM_APP_CLIENT_ID)
+            requestIM.putOpt("clientSecret", io.agora.scene.voice.BuildConfig.IM_APP_CLIENT_SECRET)
             requestBody.putOpt("im", requestIM)
 
             requestBody.putOpt("appId", BuildConfig.AGORA_APP_ID)

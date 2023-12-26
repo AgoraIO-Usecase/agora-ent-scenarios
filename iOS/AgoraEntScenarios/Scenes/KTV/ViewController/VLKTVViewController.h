@@ -3,14 +3,13 @@
 //  VoiceOnLine
 //
 
-#import "BaseViewController.h"
-#import "KTVServiceProtocol.h"
+#import "VLBaseViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 @class VLRoomListModel;
 @class VLRoomSeatModel;
 
-@interface VLKTVViewController : BaseViewController
+@interface VLKTVViewController : VLBaseViewController
 
 @property (nonatomic, strong) VLRoomListModel *roomModel;
 //麦位数组

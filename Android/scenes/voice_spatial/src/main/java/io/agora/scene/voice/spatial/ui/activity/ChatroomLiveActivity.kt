@@ -63,6 +63,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
     /**room viewModel*/
     private lateinit var roomLivingViewModel: VoiceRoomLivingViewModel
     private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
+    private var isActivityStop = false
 
     /**
      * 代理头部view以及麦位view
@@ -87,6 +88,16 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
     override fun getViewBinding(inflater: LayoutInflater): VoiceSpatialActivityChatroomBinding {
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         return VoiceSpatialActivityChatroomBinding.inflate(inflater)
+    }
+
+    override fun onStop() {
+        isActivityStop = true
+        super.onStop()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        isActivityStop = false
     }
 
     override fun onDestroy() {
@@ -151,14 +162,14 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
 
                 override fun onSuccess(data: Boolean?) {
-                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_chatroom_join_room_success))
+                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_spatial_join_room_success))
                     roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
                 }
 
                 override fun onError(code: Int, message: String?) {
                     ToastTools.show(
                         this@ChatroomLiveActivity,
-                        message ?: getString(R.string.voice_chatroom_join_room_failed)
+                        message ?: getString(R.string.voice_spatial_join_room_failed)
                     )
                     ThreadManager.getInstance().runOnMainThreadDelay({
                         finish()
@@ -267,10 +278,10 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                 "userBeKicked $reason".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     if (reason == VoiceRoomServiceKickedReason.destroyed) {
-                        ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close))
+                        ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_spatial_room_close))
                         finish()
                     } else if (reason == VoiceRoomServiceKickedReason.removed) {
-                        ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_kick_member))
+                        ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_spatial_room_kick_member))
                         finish()
                     }
                 }
@@ -307,7 +318,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                 if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
                 "onRoomDestroyed $roomId".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
-                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close))
+                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_spatial_room_close))
                     isRoomOwnerLeave = true
                     finish()
                 }
@@ -322,7 +333,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
 
         voiceServiceProtocol.subscribeRoomTimeUp {
             roomObservableDelegate.onTimeUpExitRoom(
-                getString(R.string.voice_chatroom_time_up_tips), finishBack = {
+                getString(R.string.voice_spatial_chatroom_time_up_tips), finishBack = {
                     if (roomKitBean.isOwner) {
                         finish()
                     } else {
@@ -366,7 +377,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                 object :
                     OnItemClickListener<VoiceMicInfoModel> {
                     override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
-                        roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt))
+                        roomObservableDelegate.onBotMicClick(getString(R.string.voice_spatial_open_bot_prompt))
                     }
                 },
                 object : OnItemMoveListener<VoiceMicInfoModel> {
@@ -382,11 +393,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                     }
                 }
             ).setUpInitMicInfoMap()
-//            binding.rvChatroom3dMicLayout
         }
-        binding.cTopView.setTitleMaxWidth()
-//        roomObservableDelegate.onRoomModel(voiceRoomModel)
-        binding.cTopView.setRoomType(roomKitBean.roomType)
         binding.cTopView.setOnLiveTopClickListener(object : OnLiveTopClickListener {
             override fun onClickBack(view: View) {
                 onBackPressed()
@@ -451,6 +458,9 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
 
             override fun onFragmentStopped(fm: FragmentManager, f: Fragment) {
                 super.onFragmentStopped(fm, f)
+                if (isActivityStop) {
+                    return
+                }
                 if (f is BottomSheetDialogFragment) {
                     val lastFragment = dialogFragments.lastOrNull()
                     if (lastFragment == f) {
@@ -515,8 +525,8 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         }
         if (roomKitBean.isOwner) {
             roomObservableDelegate.onExitRoom(
-                getString(R.string.voice_chatroom_end_live),
-                getString(R.string.voice_chatroom_end_live_tips), finishBack = {
+                getString(R.string.voice_spatial_end_live),
+                getString(R.string.voice_spatial_end_live_tips), finishBack = {
                     finish()
                 })
         } else {

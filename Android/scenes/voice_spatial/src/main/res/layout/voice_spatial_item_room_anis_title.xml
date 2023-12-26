@@ -4,4 +4,4 @@
     style="@style/voice_bottom_sheet_subtitle_style"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="@string/voice_chatroom_agora_ains" />
+    android:text="@string/voice_spatial_agora_ains" />

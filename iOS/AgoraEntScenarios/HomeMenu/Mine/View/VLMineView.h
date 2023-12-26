@@ -9,18 +9,18 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef enum : NSUInteger {
-    VLMineViewClickTypeUserProtocol = 0,   // 用户协议
+    VLMineViewClickTypeNone = 0,           // None
+    VLMineViewClickTypeMyAccount,          // 我的账号
+    VLMineViewClickTypeUserProtocol,       // 用户协议
     VLMineViewClickTypePrivacyProtocol,    // 隐私政策
     VLMineViewClickTypePersonInfo,         // 个人信息
     VLMineViewClickTypeThirdInfoShared,    // 第三方信息
     VLMineViewClickTypeAboutUS,            // 关于我们
-    VLMineViewClickTypeLogout,             // 退出登录
-    VLMineViewClickTypeDestroyAccount,     // 注销账号
     VLMineViewClickTypeDebug,              // 开发者模式
+    VLMineViewClickTypSubmitFeedback       // 提交反馈
 } VLMineViewClickType;
 
 typedef enum : NSUInteger {
-    VLMineViewUserClickTypeNickName = 0, // 点击修改头像
     VLMineViewUserClickTypeAvatar        // 点击头像
 } VLMineViewUserClickType;
 

@@ -19,10 +19,14 @@ import io.agora.scene.ktv.databinding.KtvDialogDebugOptionsBinding;
  */
 public class KTVDebugSettingsDialog extends BaseBottomSheetDialogFragment<KtvDialogDebugOptionsBinding> {
     public static final String TAG = "KTVDebugSettingsDialog";
-    private KTVDebugSettingBean mSetting;
+    private final KTVDebugSettingBean mSetting;
+    private final String channelName;
+    private final String sdkBuildNum;
 
-    public KTVDebugSettingsDialog(KTVDebugSettingBean mSetting) {
+    public KTVDebugSettingsDialog(KTVDebugSettingBean mSetting, String channelName, String sdkBuildNum) {
         this.mSetting = mSetting;
+        this.channelName = channelName;
+        this.sdkBuildNum = sdkBuildNum;
     }
 
     @SuppressLint("SetTextI18n")
@@ -78,11 +82,23 @@ public class KTVDebugSettingsDialog extends BaseBottomSheetDialogFragment<KtvDia
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
+
+        mBinding.btSetParams.setOnClickListener(v -> {
+            String key = mBinding.etParms.getText().toString();
+            String value = mBinding.etParmsNum.getText().toString();
+            String parameters = "{\"" + key + "\":" + value + "}";
+            mSetting.setParameters(parameters);
+        });
+
+        mBinding.tvChannelName.setText("channelName: " + channelName);
+        mBinding.tvSDKVersion.setText("agora sdk ver: " + sdkBuildNum);
     }
 
     public interface Callback {
         void onAudioDumpEnable(boolean enable);
 
         void onScoringControl(int level, int offset);
+
+        void onSetParameters(String parameters);
     }
 }

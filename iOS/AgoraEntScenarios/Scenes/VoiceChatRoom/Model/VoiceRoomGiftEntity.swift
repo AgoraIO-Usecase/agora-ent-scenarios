@@ -28,7 +28,7 @@ import UIKit
     var gift_price: String? = ""
     var portrait: String? = ""
     var avatar: UIImage? {
-        UIImage(portrait ?? "")
+        UIImage.voice_image(portrait ?? "")
     }
 
     var gift_count: String? = "0"

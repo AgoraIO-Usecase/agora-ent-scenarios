@@ -15,16 +15,10 @@ public enum SA3DUserDirectionType {
 class SA3DUserCollectionViewCell: UICollectionViewCell {
     var rtcUserView: SABaseRtcUserView = .init()
 
-    public var cellType: SABaseUserCellType = .AgoraChatRoomBaseUserCellTypeAdd {
-        didSet {
-            rtcUserView.cellType = cellType
-        }
-    }
-
     public var directionType: SA3DUserDirectionType = .AgoraChatRoom3DUserDirectionTypeDown {
         didSet {
             rtcUserView.snp.updateConstraints { make in
-                make.top.equalTo(self.contentView).offset(directionType == .AgoraChatRoom3DUserDirectionTypeUp ? 0~ : 40~)
+                make.top.equalTo(self.contentView).offset(directionType == .AgoraChatRoom3DUserDirectionTypeUp ? 0 : 40)
             }
             contentView.layoutIfNeeded()
         }
@@ -32,63 +26,54 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
 
     public func refreshUser(with mic: SARoomMic) {
         var status = mic.status
-        let user_mic_status = mic.member?.mic_status ?? .none
-        if user_mic_status == .mute {
-            status = 1
-        }
-        var bgIcon = ""
+        // 0:正常状态 1:闭麦 2:禁言 3:锁麦 4:锁麦和禁言 5:机器人生效 -1:空闲 -2: 机器人失效
         switch status {
         case -1:
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = true
             rtcUserView.bgIconView.isHidden = false
-            rtcUserView.bgIconView.image = UIImage("icons／solid／add")
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
         case 0:
             rtcUserView.iconView.isHidden = false
             rtcUserView.micView.isHidden = false
-            rtcUserView.micView.setState(.on)
             rtcUserView.bgIconView.isHidden = true
-            rtcUserView.nameBtn.setImage(UIImage(""), for: .normal)
+            rtcUserView.nameBtn.setImage(nil, for: .normal)
+            if mic.member?.mic_status == .mute {
+                rtcUserView.micView.setState(.off)
+            } else {
+                rtcUserView.micView.setState(.on)
+            }
         case 1:
-            // 需要区分有用户还是没有用户
-            bgIcon = mic.member == nil ? "icons／solid／mute" : ""
-            if mic.member != nil {
-                rtcUserView.micView.isHidden = false
-                rtcUserView.micView.setState(.off)
-            } else {
-                rtcUserView.micView.isHidden = true
-            }
-            rtcUserView.bgIconView.image = UIImage(bgIcon)
-            rtcUserView.bgIconView.isHidden = mic.member != nil
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
+            rtcUserView.micView.isHidden = false
+            rtcUserView.micView.setState(.off)
         case 2:
-            bgIcon = mic.member == nil ? "icons／solid／mute" : ""
-            if mic.member != nil {
-                rtcUserView.micView.isHidden = false
-                rtcUserView.micView.setState(.off)
-            } else {
-                rtcUserView.micView.isHidden = true
-            }
-            rtcUserView.bgIconView.image = UIImage(bgIcon)
-            rtcUserView.bgIconView.isHidden = mic.member != nil
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
+            rtcUserView.micView.isHidden = false
+            rtcUserView.micView.setState(.off)
+            rtcUserView.bgIconView.isHidden = false
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_empty", bundleName: "SpatialAudioResource")
         case 3:
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = true
-            rtcUserView.bgIconView.image = UIImage("icons／solid／lock")
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_lock", bundleName: "SpatialAudioResource")
             rtcUserView.bgIconView.isHidden = false
         case 4:
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = false
             rtcUserView.micView.setState(.forbidden)
-            rtcUserView.bgIconView.image = UIImage("icons／solid／lock")
+            rtcUserView.bgIconView.image = UIImage.sceneImage(name: "sa_ic_seat_lock", bundleName: "SpatialAudioResource")
             rtcUserView.bgIconView.isHidden = false
         case 5:
             rtcUserView.iconView.isHidden = true
-            rtcUserView.micView.isHidden = true
+            rtcUserView.micView.isHidden = false
+            rtcUserView.micView.setState(.on)
             rtcUserView.coverView.isHidden = true
             rtcUserView.activeButton.isHidden = true
         case -2:
             rtcUserView.iconView.isHidden = true
             rtcUserView.micView.isHidden = true
+            rtcUserView.micView.setState(.off)
             rtcUserView.coverView.isHidden = false
             rtcUserView.activeButton.isHidden = false
         default:
@@ -99,9 +84,9 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
         if status != 5 && status != -2 {
             rtcUserView.iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: nil)
         } else {
-            rtcUserView.iconView.image = UIImage(mic.member?.portrait ?? "")
+            rtcUserView.iconView.image = UIImage.spatial_image(mic.member?.portrait ?? "")
         }
-        rtcUserView.nameBtn.setImage(UIImage((mic.mic_index == 0 || mic.mic_index == 3 || mic.mic_index == 6) ? "Landlord" : ""), for: .normal)
+        rtcUserView.nameBtn.setImage((mic.mic_index == 3 || mic.mic_index == 6) ? UIImage.spatial_image("guanfang"): nil, for: .normal)
         let title = mic.status == -1 ? "\(mic.mic_index)" : (mic.member?.name ?? "\(mic.mic_index)")
         rtcUserView.nameBtn.setTitle(title, for: .normal)
     }
@@ -110,16 +95,10 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
         rtcUserView.volume = vol
     }
     
-    public func updateAlienMic( flag: Bool) {
-        rtcUserView.micView.isHidden = !flag
-    }
-    
     public var clickBlock: ((Int) -> Void)?
-    public var activeBlock: ((SABaseUserCellType) -> Void)?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
         layoutUI()
     }
 
@@ -138,7 +117,7 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
 
         rtcUserView.snp.makeConstraints { make in
             make.left.right.bottom.equalTo(self.contentView)
-            make.top.equalTo(self.contentView).offset(-20~)
+            make.top.equalTo(self.contentView).offset(-20)
         }
         layoutIfNeeded()
         

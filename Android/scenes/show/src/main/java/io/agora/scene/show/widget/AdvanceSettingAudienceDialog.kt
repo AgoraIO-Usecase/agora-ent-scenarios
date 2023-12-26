@@ -61,11 +61,6 @@ class AdvanceSettingAudienceDialog constructor(context: Context) : BottomFullDia
         binding.switchCompat.isChecked = VideoSetting.getCurrAudienceEnhanceSwitch()
         onSwitchChanged(itemId, binding.switchCompat.isChecked)
         binding.switchCompat.setOnCheckedChangeListener { btn, isChecked ->
-            if (isChecked && (VideoSetting.getCurrAudiencePlaySetting() == VideoSetting.AudiencePlaySetting.BASE_LOW || VideoSetting.getCurrAudiencePlaySetting() == VideoSetting.AudiencePlaySetting.ENHANCE_LOW)) {
-                binding.switchCompat.isChecked = false
-                ToastUtils.showToast(context.getString(R.string.show_setting_quality_enhance_tip))
-                return@setOnCheckedChangeListener
-            }
             defaultItemValues[itemId] = if (isChecked) 1 else 0
             onSwitchChanged(itemId, isChecked)
         }

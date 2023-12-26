@@ -22,7 +22,7 @@ public class VoiceRoomInputBar: UIView, UITextViewDelegate {
     public lazy var inputField: PlaceHolderTextView = .init(frame: CGRect(x: 20, y: 14, width: ScreenWidth - 146, height: 34)).delegate(self).font(.systemFont(ofSize: 16, weight: .regular)).backgroundColor(.clear).textColor(.darkText)
 
     lazy var send: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: ScreenWidth - 82, y: 12, width: 67, height: 36)).cornerRadius(18).setGradient([UIColor(red: 0.13, green: 0.608, blue: 1, alpha: 1), UIColor(red: 0.204, green: 0.366, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)]).title(LanguageManager.localValue(key: "Send"), .normal).textColor(.white, .normal).font(.systemFont(ofSize: 16, weight: .regular)).addTargetFor(self, action: #selector(sendMessage), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: ScreenWidth - 82, y: 12, width: 67, height: 36)).cornerRadius(18).setGradient([UIColor(red: 0.13, green: 0.608, blue: 1, alpha: 1), UIColor(red: 0.204, green: 0.366, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)]).title(LanguageManager.localValue(key: "voice_send"), .normal).textColor(.white, .normal).font(.systemFont(ofSize: 16, weight: .regular)).addTargetFor(self, action: #selector(sendMessage), for: .touchUpInside)
     }()
 
     private var limitCount: Int {
@@ -39,8 +39,8 @@ public class VoiceRoomInputBar: UIView, UITextViewDelegate {
 
     override public init(frame: CGRect) {
         super.init(frame: frame)
-        rightView.setImage(UIImage("face"), for: .normal)
-        rightView.setImage(UIImage("key"), for: .selected)
+        rightView.setImage(UIImage.sceneImage(name: "face", bundleName: "VoiceChatRoomResource"), for: .normal)
+        rightView.setImage(UIImage.sceneImage(name: "key", bundleName: "VoiceChatRoomResource"), for: .selected)
         addSubViews([inputContainer, inputField, send, line])
         inputField.tintColor = UIColor(0x009FFF)
         inputField.placeHolder = "Aa"
@@ -163,29 +163,11 @@ public class VoiceRoomInputBar: UIView, UITextViewDelegate {
     func convertText(text: NSAttributedString?, key: String) -> NSAttributedString {
         let attribute = NSMutableAttributedString(attributedString: text!)
         let attachment = NSTextAttachment()
-        attachment.image = UIImage(key)
+        attachment.image = UIImage.voice_image(key)
         attachment.bounds = CGRect(x: 0, y: -3.5, width: 18, height: 18)
         let imageText = NSMutableAttributedString(attachment: attachment)
         imageText.addAttributes([.accessibilityTextCustom: key], range: NSMakeRange(0, imageText.length))
         attribute.append(imageText)
         return attribute
-    }
-}
-
-public extension NSAttributedString {
-    func toString() -> String {
-        let result = NSMutableAttributedString(attributedString: self)
-        var replaceList: [(NSRange, String)] = []
-        result.enumerateAttribute(.accessibilityTextCustom, in: NSRange(location: 0, length: result.length), using: { value, range, _ in
-            if let value = value as? String {
-                for i in range.location..<range.location + range.length {
-                    replaceList.append((NSRange(location: i, length: 1), value))
-                }
-            }
-        })
-        for i in replaceList.reversed() {
-            result.replaceCharacters(in: i.0, with: i.1)
-        }
-        return result.string
     }
 }

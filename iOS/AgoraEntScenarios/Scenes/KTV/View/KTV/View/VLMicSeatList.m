@@ -5,11 +5,9 @@
 
 #import "VLMicSeatList.h"
 #import "VLMicSeatCell.h"
-#import "VLRoomSeatModel.h"
-#import "VLRoomSelSongModel.h"
 #import "VLMacroDefine.h"
 #import "VLUserCenter.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import YYCategories;
 @import SDWebImage;
 
@@ -38,13 +36,14 @@
     flowLayOut.scrollDirection = UICollectionViewScrollDirectionVertical;
     
     CGFloat itemW = VLREALVALUE_WIDTH(54);
-    CGFloat middleMargin = (SCREEN_WIDTH - 40 - 2*27 - 4*itemW)/3.0;
+    CGFloat middleMargin = (SCREEN_WIDTH - 40 - 2*27 - 4*itemW - 10 * 2)/3.0;
     CGFloat itemH = VLREALVALUE_WIDTH(54)+33;
     flowLayOut.itemSize = CGSizeMake(itemW, itemH);
     flowLayOut.minimumInteritemSpacing = middleMargin;
     flowLayOut.minimumLineSpacing = 15;
+    flowLayOut.sectionInset = UIEdgeInsetsMake(10, 10, 10, 10);
     
-    self.personCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(20, 0, SCREEN_WIDTH - 40, itemH*2+15) collectionViewLayout:flowLayOut];
+    self.personCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(20, 0, self.frame.size.width - 40, self.frame.size.height) collectionViewLayout:flowLayOut];
     self.personCollectionView.dataSource = self;
     self.personCollectionView.delegate = self;
     self.personCollectionView.alwaysBounceVertical = true;
@@ -57,12 +56,6 @@
     }
     [self.personCollectionView registerClass:[VLMicSeatCell class] forCellWithReuseIdentifier:[VLMicSeatCell className]];
     [self addSubview:self.personCollectionView];
-    
-}
-
-- (void)setRoomSeatsArray:(NSArray *)roomSeatsArray {
-    _roomSeatsArray = [[NSArray alloc]initWithArray:roomSeatsArray];
-//    [self.personCollectionView reloadData];
 }
 
 - (void)reloadSeatIndex: (NSUInteger)seatIndex {
@@ -92,7 +85,7 @@
     if (seatModel.name.length > 0) {
         cell.nickNameLabel.text = seatModel.name;
     }else{
-        cell.nickNameLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"%d号麦"), (int)indexPath.row + 1];
+        cell.nickNameLabel.text = [NSString stringWithFormat:@"%d%@", (int)indexPath.row + 1, KTVLocalizedString(@"ktv_mic_index")];
     }
     if (seatModel.isMaster) {
         cell.avatarImgView.layer.borderWidth = 2.0;
@@ -104,15 +97,20 @@
         cell.nickNameLabel.textColor = UIColorMakeWithHex(@"#AEABD0");
         cell.avatarImgView.layer.borderColor = UIColorClear.CGColor;
     }
-    cell.roomerLabel.text = KTVLocalizedString(@"房主");
+    cell.roomerLabel.text = KTVLocalizedString(@"ktv_room_owner");
     if (seatModel.headUrl.length > 0) {
         [cell.avatarImgView sd_setImageWithURL:[NSURL URLWithString:seatModel.headUrl]];
     }else{
         cell.avatarImgView.image = [UIImage sceneImageWithName:@"ktv_emptySeat_icon"];
+        cell.volume = 0;
     }
     cell.singingBtn.hidden = !seatModel.isOwner;
-    
-    cell.muteImgView.hidden = !seatModel.isAudioMuted;
+    if (seatModel.isAudioMuted) {
+        cell.muteImgView.hidden = false;
+        cell.volume = 0;
+    } else {
+        cell.muteImgView.hidden = true;
+    }
     
     if([seatModel.chorusSongCode isEqualToString:self.currentPlayingSongCode]){
         cell.joinChorusBtn.hidden = NO;
@@ -142,6 +140,31 @@
     if (self.delegate && [self.delegate respondsToSelector:@selector(onVLRoomPersonView:seatItemTappedWithModel:atIndex:)]) {
         [self.delegate onVLRoomPersonView:self seatItemTappedWithModel:roomSeatModel atIndex:indexPath.row];
     }
+}
+
+- (void)updateVolumeForSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *) speakers {
+    for (AgoraRtcAudioVolumeInfo *speaker in speakers) {
+        // 0是自己在说话
+        NSInteger speakerUid = (speaker.uid == 0) ? VLUserCenter.user.id.integerValue : speaker.uid;
+        for (VLRoomSeatModel *model in self.roomSeatsArray) {
+            if (model.userNo == nil) {
+                continue;
+            }
+            if(model.userNo.integerValue == speakerUid) {
+                if (model.isAudioMuted == 1) {
+                    [self updateVolumeForIndex:model.seatIndex volume:0];
+                } else {
+                    [self updateVolumeForIndex:model.seatIndex volume:speaker.volume];
+                }
+                break;
+            }
+        }
+    }
+}
+
+- (void)updateVolumeForIndex:(NSInteger) index volume:(NSInteger) volume {
+    VLMicSeatCell *cell = [self.personCollectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
+    cell.volume = volume;
 }
 
 - (void)updateSingBtnWithChoosedSongArray:(NSArray *)choosedSongArray {

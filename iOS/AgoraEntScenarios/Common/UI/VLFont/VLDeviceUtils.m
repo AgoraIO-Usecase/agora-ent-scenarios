@@ -7,7 +7,7 @@
 #import <sys/utsname.h>
 #import <objc/runtime.h>
 #import "QMUICommonDefines.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 @implementation VLDeviceUtils
 

@@ -4,6 +4,7 @@ import android.os.Looper;
 import android.util.Log;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import io.agora.scene.base.CommonBaseLogger;
 
@@ -157,4 +159,56 @@ public final class ZipUtils {
         void onError(Exception e);
     }
 
+    public interface ZipCallback {
+        void onFileZipped(String destinationFilePath);
+
+        void onError(Exception e);
+    }
+
+    //压缩多个文件
+    public static void compressFiles(List<String> sourceFilePaths, String destinationFilePath, ZipCallback zipCallback) {
+        wokeExecutor.execute(() -> {
+            FileUtils.deleteFile(destinationFilePath);
+            try {
+                // 创建目标压缩文件
+                FileOutputStream fos = new FileOutputStream(destinationFilePath);
+                ZipOutputStream zipOut = new ZipOutputStream(fos);
+
+                // 逐个将源文件添加到压缩文件中
+                for (String sourceFilePath : sourceFilePaths) {
+                    File sourceFile = new File(sourceFilePath);
+                    if (!sourceFile.exists()) {
+                        Log.d("zhangw", "需要压缩的文件不存在：" + sourceFilePath);
+                        continue;
+                    }
+                    // 创建源文件输入流
+                    FileInputStream fis = new FileInputStream(sourceFilePath);
+
+                    // 将源文件添加到压缩文件中
+                    ZipEntry zipEntry = new ZipEntry(new File(sourceFilePath).getName());
+                    zipOut.putNextEntry(zipEntry);
+
+                    // 从源文件输入流读取数据，并写入压缩文件输出流
+                    byte[] buffer = new byte[1024];
+                    int length;
+                    while ((length = fis.read(buffer)) > 0) {
+                        zipOut.write(buffer, 0, length);
+                    }
+
+                    // 关闭流
+                    fis.close();
+                }
+
+                // 关闭流
+                zipOut.close();
+                fos.close();
+
+                zipCallback.onFileZipped(destinationFilePath);
+                Log.d("zhangw", "文件压缩完成");
+            } catch (Exception e) {
+                e.printStackTrace();
+                zipCallback.onError(e);
+            }
+        });
+    }
 }

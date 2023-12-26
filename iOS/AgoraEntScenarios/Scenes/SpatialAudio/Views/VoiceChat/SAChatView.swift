@@ -8,8 +8,6 @@
 import UIKit
 import ZSwiftBaseLib
 
-private let sa_chatViewWidth = ScreenWidth * (287 / 375.0)
-
 public class SAChatView: UIView, UITableViewDelegate, UITableViewDataSource {
     var likeAction: ((UIButton) -> Void)?
 
@@ -19,7 +17,7 @@ public class SAChatView: UIView, UITableViewDelegate, UITableViewDataSource {
 
     var messages: [SAChatEntity]? = [SAChatEntity]()
 
-    lazy var chatView: UITableView = .init(frame: CGRect(x: 0, y: 0, width: sa_chatViewWidth, height: self.frame.height), style: .plain).delegate(self).dataSource(self).separatorStyle(.none).tableFooterView(UIView()).backgroundColor(.clear).registerCell(SAChatCell.self, forCellReuseIdentifier: "VoiceRoomChatCell").showsVerticalScrollIndicator(false)
+    lazy var chatView: UITableView = .init(frame: CGRect(x: 0, y: 0, width: chatViewWidth, height: self.frame.height), style: .plain).delegate(self).dataSource(self).separatorStyle(.none).tableFooterView(UIView()).backgroundColor(.clear).registerCell(SAChatCell.self, forCellReuseIdentifier: "VoiceRoomChatCell").showsVerticalScrollIndicator(false)
 
     lazy var likeView: UIButton = .init(type: .custom).frame(CGRect(x: self.frame.width - 53, y: self.frame.height - 43, width: 38, height: 38)).addTargetFor(self, action: #selector(toLike(_:)), for: .touchUpInside)
 
@@ -29,7 +27,7 @@ public class SAChatView: UIView, UITableViewDelegate, UITableViewDataSource {
         CAGradientLayer().startPoint(CGPoint(x: 0, y: 0)).endPoint(CGPoint(x: 0, y: 0.1)).colors([UIColor.clear.withAlphaComponent(0).cgColor, UIColor.clear.withAlphaComponent(1).cgColor]).locations([NSNumber(0), NSNumber(1)]).rasterizationScale(UIScreen.main.scale).frame(self.blurView.frame)
     }()
 
-    lazy var blurView: UIView = .init(frame: CGRect(x: 0, y: 0, width: sa_chatViewWidth, height: self.frame.height)).backgroundColor(.clear)
+    lazy var blurView: UIView = .init(frame: CGRect(x: 0, y: 0, width: chatViewWidth, height: self.frame.height)).backgroundColor(.clear)
 
     override public init(frame: CGRect) {
         super.init(frame: frame)

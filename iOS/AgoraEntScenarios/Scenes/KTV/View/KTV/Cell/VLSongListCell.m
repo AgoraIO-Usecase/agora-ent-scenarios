@@ -4,10 +4,9 @@
 //
 
 #import "VLSongListCell.h"
-#import "VLRoomSelSongModel.h"
 #import "VLUserCenter.h"
 #import "AgoraEntScenarios-Swift.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import SDWebImage;
 
 @implementation VLSongListCell
@@ -71,10 +70,8 @@
     [self.sortBtn addTarget:self action:@selector(sortBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.sortBtn];
     
-//    self.singingBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_singing_icon"]
-//                                                       title:KTVLocalizedString(@"演唱中")];
     self.singingBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.singingBtn setTitle:KTVLocalizedString(@"演唱中") forState:UIControlStateNormal];
+    [self.singingBtn setTitle:KTVLocalizedString(@"ktv_room_sing1") forState:UIControlStateNormal];
     [self.singingBtn setImage:[UIImage sceneImageWithName:@"ktv_singing_icon"] forState:UIControlStateNormal];
     self.singingBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
 //    self.singingBtn.imagePosition = QMUIButtonImagePositionLeft;
@@ -107,13 +104,10 @@
 
 - (void)setSelSongModel:(VLRoomSelSongModel *)selSongModel {
     _selSongModel = selSongModel;
-//    if (selSongModel.isChorus) {
-//        self.typeLabel.text = KTVLocalizedString(@"合唱");
-//    }else{
-//        self.typeLabel.text = KTVLocalizedString(@"独唱");
-//    }
     self.nameLabel.text = selSongModel.songName;
-    self.chooserLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"点唱: %@"), selSongModel.name];
+    NSString *localizedPropertyName = KTVLocalizedString(@"ktv_song_ordering_person");
+    NSString *formattedString = [NSString stringWithFormat:@"%@ %@", localizedPropertyName, selSongModel.name];
+    self.chooserLabel.text = formattedString;
     
     if (selSongModel.status == VLSongPlayStatusIdle) {
         if(!VLUserCenter.user.ifMaster) {

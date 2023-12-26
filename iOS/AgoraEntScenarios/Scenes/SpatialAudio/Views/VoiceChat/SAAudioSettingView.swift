@@ -38,7 +38,13 @@ class SAAudioSettingView: UIView {
 //    private var settingName: [String] = ["\(sceneLocalized( "blue")) & \(sceneLocalized( "red"))", sceneLocalized( "Robot Volume"), sceneLocalized( "Best Sound"), "AINS", "Spatial Audio"]
 //    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
     
-    private var settingName: [String] = [sceneLocalized( "AINS"),sceneLocalized( "AIAEC"),sceneLocalized( "AGC"),sceneLocalized( "Agora Blue & Red Bot"), sceneLocalized( "Robot Volume"), sceneLocalized( "Best Agora Sound"), "Spatial Audio"]
+    private var settingName: [String] = ["spatial_voice_AINS".spatial_localized(),
+                                         "spatial_voice_AIAEC".spatial_localized(),
+                                         "spatial_voice_AGC".spatial_localized(),
+                                         "spatial_voice_agora_blue_and_red_bot".spatial_localized(),
+                                         "spatial_voice_robot_volume".spatial_localized(),
+                                         "spatial_voice_best_agora_sound".spatial_localized(),
+                                         "spatial_voice_spatial_audio".spatial_localized()]
     
     
     
@@ -81,7 +87,7 @@ class SAAudioSettingView: UIView {
 
         titleLabel.frame = CGRect(x: ScreenWidth / 2.0 - 60, y: 30, width: 120, height: 30)
         titleLabel.textAlignment = .center
-        titleLabel.text = sceneLocalized( "Audio Settings")
+        titleLabel.text = "spatial_voice_audio_settings".spatial_localized()
         titleLabel.textColor = UIColor(red: 0.016, green: 0.035, blue: 0.145, alpha: 1)
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         addSubview(titleLabel)
@@ -138,20 +144,20 @@ extension SAAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 32))
             headerView.backgroundColor = UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
             let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 2, width: 300, height: 30))
-            titleLabel.text = sceneLocalized( "Personal audio Settings")
+            titleLabel.text = "spatial_voice_personal_audio_settings".spatial_localized()
             
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
             headerView.addSubview(titleLabel)
             return headerView
         } else  if section == 1{
-            let width = textAutoWidth(height: 300, font: UIFont.systemFont(ofSize: 13), text: sceneLocalized( "Bot Settings"))
+            let width = textAutoWidth(height: 300, font: UIFont.systemFont(ofSize: 13), text: "spatial_voice_bot_settings".spatial_localized())
             let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 32))
             headerView.backgroundColor = UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
             let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 2, width: width, height: 30))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
-            titleLabel.text = sceneLocalized( "Bot Settings")
+            titleLabel.text = "spatial_voice_bot_settings".spatial_localized()
             headerView.addSubview(titleLabel)
 
             let imgView: UIImageView = .init(frame: CGRect(x: width + 30, y: 6, width: 30, height: 20))
@@ -160,13 +166,13 @@ extension SAAudioSettingView: UITableViewDelegate, UITableViewDataSource {
 
             return headerView
         } else if section == 2 {
-            let width = textAutoWidth(height: 300, font: UIFont.systemFont(ofSize: 13), text: sceneLocalized( "Room Audio Settings"))
+            let width = textAutoWidth(height: 300, font: UIFont.systemFont(ofSize: 13), text: "spatial_voice_room_audio_settings".spatial_localized())
             let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 32))
             headerView.backgroundColor = UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
             let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 2, width: width, height: 30))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
-            titleLabel.text = sceneLocalized( "Room Audio Settings")
+            titleLabel.text = "spatial_voice_room_audio_settings".spatial_localized()
             headerView.addSubview(titleLabel)
 
             let imgView: UIImageView = .init(frame: CGRect(x: width + 30, y: 6, width: 30, height: 20))
@@ -188,17 +194,17 @@ extension SAAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             headerView.addSubview(titleLabel)
             return headerView
         } else {
-            let width = textAutoWidth(height: 300, font: UIFont.systemFont(ofSize: 13), text: sceneLocalized( "ACEQ"))
+            let width = textAutoWidth(height: 300, font: UIFont.systemFont(ofSize: 13), text: sceneLocalized( "spatial_voice_ACEQ"))
             let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 32))
             headerView.backgroundColor = UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
             let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 2, width: width, height: 30))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
-            titleLabel.text = sceneLocalized( "ACEQ")
+            titleLabel.text = sceneLocalized( "spatial_voice_ACEQ")
             headerView.addSubview(titleLabel)
 
             let imgView: UIImageView = .init(frame: CGRect(x: width + 30, y: 6, width: 30, height: 20))
-            imgView.image = UIImage("new")
+            imgView.image =UIImage.sceneImage(name: "new")
             headerView.addSubview(imgView)
 
             return headerView
@@ -223,29 +229,28 @@ extension SAAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                 cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
                 switch ains_state {
                 case .high:
-                    cell.contentLabel.text = "High".localized()
+                    cell.contentLabel.text = "spatial_voice_High".spatial_localized()
                 case .mid:
-                    cell.contentLabel.text = "Middle".localized()
+                    cell.contentLabel.text = "spatial_voice_Medium".spatial_localized()
                 case .off:
-                    cell.contentLabel.text = "Off".localized()
+                    cell.contentLabel.text = "spatial_voice_off".spatial_localized()
                 }
                 
                 
             } else if indexPath.row == 1 {
                 if roomInfo?.room?.turn_AIAEC == true {
-                    cell.contentLabel.text = "On".localized()
+                    cell.contentLabel.text = "spatial_voice_on".spatial_localized()
                 } else {
-                    cell.contentLabel.text = "Off".localized()
+                    cell.contentLabel.text = "spatial_voice_off".spatial_localized()
                 }
             } else if indexPath.row == 2 {
                 if roomInfo?.room?.turn_AGC == true {
-                    cell.contentLabel.text = "On".localized()
+                    cell.contentLabel.text = "spatial_voice_on".spatial_localized()
                 } else {
-                    cell.contentLabel.text = "Off".localized()
+                    cell.contentLabel.text = "spatial_voice_off".spatial_localized()
                 }
             } else {
-                cell.contentLabel.text = "Other".localized()
-
+                cell.contentLabel.text = "Other".spatial_localized()
             }
 //            else {
 //                if roomInfo?.room?.t
@@ -255,7 +260,7 @@ extension SAAudioSettingView: UITableViewDelegate, UITableViewDataSource {
 //            else if indexPath.row == 1 {
 //                switch ains_state {
 //                case .high:
-//                    cell.contentLabel.text = "High".localized()
+//                    cell.contentLabel.text = "spatial_voice_High".localized()
 //                case .mid:
 //                    cell.contentLabel.text = "Middle".localized()
 //                case .off:
@@ -273,7 +278,7 @@ extension SAAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                 } else if indexPath.row == 1 {
                     switch ains_state {
                     case .high:
-                        cell.contentLabel.text = "High".localized()
+                        cell.contentLabel.text = "spatial_voice_High".localized()
                     case .mid:
                         cell.contentLabel.text = "Middle".localized()
                     case .off:
@@ -359,11 +364,11 @@ extension SAAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             } else if indexPath.row == 1 {
                 switch ains_state {
                 case .high:
-                    cell.contentLabel.text = "High".localized()
+                    cell.contentLabel.text = "spatial_voice_High".spatial_localized()
                 case .mid:
-                    cell.contentLabel.text = "Middle".localized()
+                    cell.contentLabel.text = "spatial_voice_Medium".spatial_localized()
                 case .off:
-                    cell.contentLabel.text = "Off".localized()
+                    cell.contentLabel.text = "spatial_voice_off".spatial_localized()
                 }
             }
             return cell
@@ -457,18 +462,18 @@ extension SAAudioSettingView: UITableViewDelegate, UITableViewDataSource {
     }
     
     private func getSoundType(with index: Int) -> String {
-        var soundType: String = "Social Chat".localized()
+        var soundType: String = "spatiaL_voice_social_chat".spatial_localized()
         switch index {
         case 0:
-            soundType = "Social Chat".localized()
+            soundType = "spatiaL_voice_social_chat".spatial_localized()
         case 1:
-            soundType = "Karaoke".localized()
+            soundType = "spatial_voice_karaoke".spatial_localized()
         case 2:
-            soundType = "Gaming Buddy".localized()
+            soundType = "spatial_voice_gaming_buddy".spatial_localized()
         case 3:
-            soundType = "Professional Podcaster".localized()
+            soundType = "spatial_voice_professional_podcaster".spatial_localized()
         default:
-            soundType = "Social Chat".localized()
+            soundType = "spatiaL_voice_social_chat".spatial_localized()
         }
         return soundType
     }

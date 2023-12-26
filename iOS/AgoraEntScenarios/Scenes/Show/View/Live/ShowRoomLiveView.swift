@@ -26,6 +26,7 @@ class ShowRoomLiveView: UIView {
     
     var room: ShowRoomListModel? {
         didSet{
+            clearChatModel()
             roomInfoView.setRoomInfo(avatar: room?.ownerAvatar, name: room?.roomName, id: room?.roomId, time: room?.createdAt)
             guard let count = room?.roomUserCount else {
                 roomUserCount = 1
@@ -45,6 +46,12 @@ class ShowRoomLiveView: UIView {
         let view = ShowCanvasView()
         return view
     }()
+    
+    var showThumnbnailCanvasView = false {
+        didSet{
+            canvasView.thumnbnailCanvasView.isHidden = !showThumnbnailCanvasView
+        }
+    }
     
     private var chatArray = [ShowChatModel]()
     
@@ -162,7 +169,7 @@ class ShowRoomLiveView: UIView {
         
         addSubview(tableView)
         tableView.snp.makeConstraints { make in
-            let bottomOffset = Screen.safeAreaBottomHeight() + 109
+//            let bottomOffset = Screen.safeAreaBottomHeight() + 109
             make.left.equalTo(15)
             make.bottom.equalTo(-kTableViewBottomOffset)
             make.right.equalTo(-70)
@@ -255,6 +262,12 @@ class ShowRoomLiveView: UIView {
 extension ShowRoomLiveView {
     func addChatModel(_ chatModel: ShowChatModel) {
         chatArray.insert(chatModel, at: 0)
+        tableView.reloadData()
+        tableView.scrollToTop()
+    }
+    
+    func clearChatModel(){
+        chatArray.removeAll()
         tableView.reloadData()
         tableView.scrollToTop()
     }

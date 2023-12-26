@@ -24,13 +24,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)postRequestURL:(NSString *)url parameter:(id)parameter showHUD:(BOOL)show success:(completeBlock_success)success failure:(errorBlock_fail)failure;
 
-+ (void)requestRoute:(NSString *)route showHUD:(BOOL)show method:(NSString *)method parameter:(id)json requestType:(VLRequestType)type progressBlock:(progressBlock)progressBlock completeBlock:(completeBlock_success)completeBlock errorBlock:(errorBlock_fail)errorBlock;
++ (void)requestRoute:(NSString *)route showHUD:(BOOL)show method:(NSString *)method parameter:(id)json requestType:(VLRequestType)type progressBlock:(nullable progressBlock)progressBlock completeBlock:(completeBlock_success)completeBlock errorBlock:(errorBlock_fail)errorBlock;
 
 #pragma mark -- 直接获取图片
 + (void)requestImageRoute:(NSString *)route  method:(NSString *)method parameter:(id)json requestType:(VLRequestType)type progressBlock:(progressBlock)progressBlock completeBlock:(completeImageBlock_success)completeBlock errorBlock:(errorBlock_fail)errorBlock;
 
 
 #pragma mark--上传文件
+
++ (NSURLSessionDataTask *)uploadFileURL:(NSString *)url
+                                showHUD:(BOOL)show
+                              appendKey:(NSString *)key
+                               filePath:(NSString *)filePath
+                                success:(completeBlock_success)success
+                                failure:(errorBlock_fail)failure;
 
 + (__kindof NSURLSessionDataTask *)uploadFileRoute:(NSString *)route
                                             method:(NSString *)method
@@ -52,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
                                          fileNames:(NSArray<NSString *> *)fileNames
                                         imageScale:(CGFloat)imageScale
                                          imageType:(NSString *)imageType
-                                          progressBlock:(progressBlock)progressBlock
+                                          progressBlock:(nullable progressBlock)progressBlock
                                            completeBlock:(completeBlock_success)completeBlock
                                            errorBlock:(errorBlock_fail)errorBlock;
 

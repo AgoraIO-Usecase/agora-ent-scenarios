@@ -171,7 +171,7 @@ class AgoraRtcEngineController {
         localSpatialAudioConfig.mRtcEngine = rtcEngine
         localSpatial.initialize(localSpatialAudioConfig)
         localSpatial.setMaxAudioRecvCount(6)
-        localSpatial.setAudioRecvRange(15f)
+        localSpatial.setAudioRecvRange(20f)
         localSpatial.setDistanceUnit(1f)
         spatial = localSpatial
     }
@@ -517,6 +517,7 @@ class AgoraRtcEngineController {
     }
 
     fun destroy() {
+        spatial = null
         VoiceBuddyFactory.get().rtcChannelTemp.reset()
         if (mediaPlayer != null) {
             mediaPlayer?.unRegisterPlayerObserver(firstMediaPlayerObserver)
@@ -557,9 +558,7 @@ class AgoraRtcEngineController {
                 MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                     when (soundSpeakerType) {
                         ConfigConstants.BotSpeaker.BotBlue -> {
-
                             botBluePlayer?.play()
-                            botBluePlayer?.mute(true)
                             playerVoicePositionInfo[botBluePlayer!!.mediaPlayerId]?.let {
                                 spatial?.updatePlayerPositionInfo(botBluePlayer!!.mediaPlayerId, it)
                                 localVoicePositionInfoRun?.run()
@@ -567,7 +566,6 @@ class AgoraRtcEngineController {
                         }
                         ConfigConstants.BotSpeaker.BotRed -> {
                             botRedPlayer?.play()
-                            botRedPlayer?.mute(true)
                             playerVoicePositionInfo[botRedPlayer!!.mediaPlayerId]?.let {
                                 spatial?.updatePlayerPositionInfo(botRedPlayer!!.mediaPlayerId, it)
                                 localVoicePositionInfoRun?.run()
@@ -576,8 +574,6 @@ class AgoraRtcEngineController {
                         ConfigConstants.BotSpeaker.BotBoth -> {
                             botBluePlayer?.play()
                             botRedPlayer?.play()
-                            botBluePlayer?.mute(true)
-                            botRedPlayer?.mute(true)
                             enableRedAbsorb(true)
                             enableBlueAbsorb(true)
                             playerVoicePositionInfo[botBluePlayer!!.mediaPlayerId]?.let {
@@ -591,7 +587,6 @@ class AgoraRtcEngineController {
                         }
                         else -> {
                             mediaPlayer?.play()
-                            mediaPlayer?.mute(true)
                             playerVoicePositionInfo[mediaPlayer!!.mediaPlayerId]?.let {
                                 spatial?.updatePlayerPositionInfo(mediaPlayer!!.mediaPlayerId, it)
                                 localVoicePositionInfoRun?.run()
@@ -616,6 +611,10 @@ class AgoraRtcEngineController {
                 }
                 else -> {}
             }
+        }
+
+        override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
+
         }
     }
 

@@ -58,7 +58,7 @@ class VoiceBuddyImp : IVoiceBuddy {
     }
 
     override fun chatAppKey(): String {
-        return io.agora.scene.base.BuildConfig.IM_APP_KEY
+        return io.agora.scene.voice.BuildConfig.IM_APP_KEY
     }
 
     override fun chatToken(): String {

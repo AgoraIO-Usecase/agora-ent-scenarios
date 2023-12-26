@@ -5,12 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.agora.ValueCallBack
 import io.agora.chat.ChatRoom
-import io.agora.scene.voice.model.RoomKitBean
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
-import io.agora.scene.voice.model.VoiceMicInfoModel
-import io.agora.scene.voice.model.VoiceRoomInfo
-import io.agora.scene.voice.model.VoiceRoomModel
+import io.agora.scene.voice.model.*
 import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.voice.common.viewmodel.NetworkOnlyResource
 import io.agora.scene.voice.viewmodel.repositories.VoiceRoomLivingRepository
@@ -40,6 +37,8 @@ class VoiceRoomLivingViewModel : ViewModel() {
     private val _joinObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()
     private val _roomNoticeObservable: SingleSourceLiveData<Resource<Pair<String,Boolean>>> =
+        SingleSourceLiveData()
+    private val _bgmInfoObservable: SingleSourceLiveData<Resource<VoiceBgmModel>> =
         SingleSourceLiveData()
     private val _openBotObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()
@@ -86,7 +85,8 @@ class VoiceRoomLivingViewModel : ViewModel() {
 
     /**更新公告*/
     fun roomNoticeObservable(): LiveData<Resource<Pair<String,Boolean>>> = _roomNoticeObservable
-
+    /**更新背景音乐*/
+    fun bgmInfoObservable(): LiveData<Resource<VoiceBgmModel>> = _bgmInfoObservable
     /**打开机器人*/
     fun openBotObservable(): LiveData<Resource<Boolean>> = _openBotObservable
 
@@ -219,6 +219,11 @@ class VoiceRoomLivingViewModel : ViewModel() {
     // 更新公告
     fun updateAnnouncement(notice: String) {
         _roomNoticeObservable.setSource(mRepository.updateAnnouncement(notice))
+    }
+
+    // 更新背景音乐信息
+    fun updateBGMInfo(info: VoiceBgmModel) {
+        _bgmInfoObservable.setSource(mRepository.updateBGMInfo(info))
     }
 
     // 本地禁麦

@@ -46,7 +46,10 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
 
     var onItemClickListener: OnItemClickListener<MicManagerBean>? = null
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceDialogMicManagerBinding {
+    override fun getViewBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): VoiceDialogMicManagerBinding {
         return VoiceDialogMicManagerBinding.inflate(inflater, container, false)
     }
 
@@ -56,15 +59,31 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
             micInfo?.let {
                 bindingMicInfo(it)
                 if (isOwner) {
-                    micManagerList.addAll(RoomMicConstructor.builderOwnerMicMangerList(view.context, it, isMyself))
+                    micManagerList.addAll(
+                        RoomMicConstructor.builderOwnerMicMangerList(
+                            view.context,
+                            it,
+                            isMyself
+                        )
+                    )
                 } else {
-                    micManagerList.addAll(RoomMicConstructor.builderGuestMicMangerList(view.context, it))
+                    micManagerList.addAll(
+                        RoomMicConstructor.builderGuestMicMangerList(
+                            view.context,
+                            it
+                        )
+                    )
                 }
             }
         }
         micManagerAdapter = RoomMicManagerAdapter(micManagerList, object :
             OnItemClickListener<MicManagerBean> {
-            override fun onItemClick(data: MicManagerBean, view: View, position: Int, viewType: Long) {
+            override fun onItemClick(
+                data: MicManagerBean,
+                view: View,
+                position: Int,
+                viewType: Long
+            ) {
                 onItemClickListener?.onItemClick(data, view, position, viewType)
                 dismiss()
             }
@@ -72,13 +91,21 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
         binding?.apply {
             setOnApplyWindowInsets(root)
             val itemDecoration =
-                MaterialDividerItemDecoration(root.context, MaterialDividerItemDecoration.HORIZONTAL).apply {
+                MaterialDividerItemDecoration(
+                    root.context,
+                    MaterialDividerItemDecoration.HORIZONTAL
+                ).apply {
                     dividerColor =
-                        ResourcesCompat.getColor(root.context.resources, R.color.voice_divider_color_1f979797, null)
+                        ResourcesCompat.getColor(
+                            root.context.resources,
+                            R.color.voice_divider_color_1f979797,
+                            null
+                        )
                     dividerThickness = 1.dp.toInt()
                 }
             rvChatroomMicManager.addItemDecoration(itemDecoration)
-            rvChatroomMicManager.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+            rvChatroomMicManager.layoutManager =
+                LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
             rvChatroomMicManager.adapter = micManagerAdapter
         }
     }
@@ -89,72 +116,32 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
             if (micInfo.member == null) { // 没人
                 binding?.mtChatroomMicTag?.isVisible = false
                 ivMicInnerIcon.isVisible = true
-                mtMicUsername.text = micInfo.micIndex.toString()
+                mtMicUsername.text = resources.getString(R.string.voice_room_mic_number, micInfo.micIndex + 1)
                 when (micInfo.micStatus) {
                     MicStatus.ForceMute -> {
-                        ivMicTag.isVisible = false
-                        ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_mute)
+                        ivMicTag.isVisible = true
+                        ivMicInnerIcon.setImageResource(R.drawable.voice_ic_mic_empty)
                     }
                     MicStatus.Lock -> {
-                        ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_close)
                         ivMicTag.isVisible = false
+                        ivMicInnerIcon.setImageResource(R.drawable.voice_ic_mic_close)
                     }
                     MicStatus.LockForceMute -> {
-                        ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_close)
-//                        ivMicTag.isVisible = true
-//                        ivMicTag.setImageResource(R.drawable.icon_chatroom_mic_mute_tag)
+                        ivMicInnerIcon.setImageResource(R.drawable.voice_ic_mic_close)
+                        ivMicTag.isVisible = true
                     }
                     else -> {
                         ivMicTag.isVisible = false
-                        ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_add)
+                        ivMicInnerIcon.setImageResource(R.drawable.voice_ic_mic_empty)
                     }
                 }
             } else { // 有人
-                binding?.mtChatroomMicTag?.isVisible = micInfo.ownerTag
                 ivMicInnerIcon.isVisible = false
                 ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
                 mtMicUsername.text = micInfo.member?.nickName ?: ""
-                mtChatroomMicTag.isVisible = micInfo.ownerTag
-//                when (micInfo.micStatus) {
-//                    MicStatus.Mute,
-//                    MicStatus.ForceMute -> {
-//                        ivMicTag.isVisible = true
-//                        ivMicTag.setImageResource(R.drawable.icon_chatroom_mic_mute_tag)
-//                    }
-//                    else -> {
-//                        ivMicTag.isVisible = false
-//                    }
-//                }
+                binding?.mtChatroomMicTag?.isVisible = (micInfo.micIndex == 0)
+                mtChatroomMicTag.isVisible = (micInfo.micIndex == 0)
             }
-            // 用户音量
-//            when (micInfo.audioVolumeType) {
-//                ConfigConstants.VolumeType.Volume_Unknown -> {
-//                    ivMicTag.isVisible = false
-//                }
-//                ConfigConstants.VolumeType.Volume_None -> {
-//                    ivMicTag.isVisible = true
-//                    ivMicTag.setImageResource(R.drawable.icon_chatroom_mic_open0)
-//                }
-//                ConfigConstants.VolumeType.Volume_Low -> {
-//                    ivMicTag.isVisible = true
-//                    ivMicTag.setImageResource(R.drawable.icon_chatroom_mic_open1)
-//                }
-//                ConfigConstants.VolumeType.Volume_Medium -> {
-//                    ivMicTag.isVisible = true
-//                    ivMicTag.setImageResource(R.drawable.icon_chatroom_mic_open2)
-//                }
-//                ConfigConstants.VolumeType.Volume_High -> {
-//                    ivMicTag.isVisible = true
-//                    ivMicTag.setImageResource(R.drawable.icon_chatroom_mic_open3)
-//                }
-//                ConfigConstants.VolumeType.Volume_Max -> {
-//                    ivMicTag.isVisible = true
-//                    ivMicTag.setImageResource(R.drawable.icon_chatroom_mic_open4)
-//                }
-//                else -> {
-//
-//                }
-//            }
         }
     }
 }

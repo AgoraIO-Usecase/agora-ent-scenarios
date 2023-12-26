@@ -166,7 +166,7 @@ class ToastView: UIView {
         case .center:
             toastView.centerYAnchor.constraint(equalTo: currentView.centerYAnchor).isActive = true
         case .bottom:
-            toastView.bottomAnchor.constraint(equalTo: currentView.safeAreaLayoutGuide.bottomAnchor, constant: -100).isActive = true
+            toastView.bottomAnchor.constraint(equalTo: currentView.safeAreaLayoutGuide.bottomAnchor, constant: -130).isActive = true
         }
         return toastView
     }

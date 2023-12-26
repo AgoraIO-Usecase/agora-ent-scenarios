@@ -21,23 +21,23 @@ public class VREQOperationAlert: UIView {
         VoiceRoomAlertContainer(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: 60))
     }()
     private lazy var agoraBlue: UIImageView = {
-        UIImageView(frame: CGRect(x: self.frame.width/2.0-95, y: 36, width: 64, height: 64)).layerProperties(UIColor(0xDAD9E9), 1).cornerRadius(32).image(UIImage("blue")!)
+        UIImageView(frame: CGRect(x: self.frame.width/2.0-95, y: 36, width: 64, height: 64)).layerProperties(UIColor(0xDAD9E9), 1).cornerRadius(32).image(UIImage.sceneImage(name: "blue", bundleName: "VoiceChatRoomResource")!)
     }()
     
     private lazy var neckSymbol: UIImageView = {
-        UIImageView(frame: CGRect(x: self.frame.width/2.0-9, y: self.agoraBlue.frame.maxY+15, width: 18, height: 18)).layerProperties(UIColor(0xDAD9E9), 1).cornerRadius(32).image(UIImage("icons／solid／link")!)
+        UIImageView(frame: CGRect(x: self.frame.width/2.0-9, y: self.agoraBlue.frame.maxY+15, width: 18, height: 18)).layerProperties(UIColor(0xDAD9E9), 1).cornerRadius(32).image(UIImage.sceneImage(name: "icons／solid／link", bundleName: "VoiceChatRoomResource")!)
     }()
     
     private lazy var agoraRed: UIImageView = {
-        UIImageView(frame: CGRect(x: self.frame.width/2.0+31, y: 36, width: 64, height: 64)).layerProperties(UIColor(0xDAD9E9), 1).cornerRadius(32).image(UIImage("red")!)
+        UIImageView(frame: CGRect(x: self.frame.width/2.0+31, y: 36, width: 64, height: 64)).layerProperties(UIColor(0xDAD9E9), 1).cornerRadius(32).image(UIImage.sceneImage(name: "red", bundleName: "VoiceChatRoomResource")!)
     }()
     
     private lazy var blueName: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.frame.width/2.0 - 115, y: self.agoraBlue.frame.maxY+10, width: 85, height: 20)).font(.systemFont(ofSize: 14, weight: .semibold)).title("Agora Blue".localized(), .normal).isUserInteractionEnabled(false).textColor(.black, .normal)
+        UIButton(type: .custom).frame(CGRect(x: self.frame.width/2.0 - 115, y: self.agoraBlue.frame.maxY+10, width: 85, height: 20)).font(.systemFont(ofSize: 14, weight: .semibold)).title("voice_agora_blue".voice_localized(), .normal).isUserInteractionEnabled(false).textColor(.black, .normal)
     }()
     
     private lazy var redName: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.frame.width/2.0 + 18, y: self.agoraRed.frame.maxY+10, width: 85, height: 20)).font(.systemFont(ofSize: 14, weight: .semibold)).title("Agora Red".localized(), .normal).isUserInteractionEnabled(false).textColor(.black, .normal)
+        UIButton(type: .custom).frame(CGRect(x: self.frame.width/2.0 + 18, y: self.agoraRed.frame.maxY+10, width: 85, height: 20)).font(.systemFont(ofSize: 14, weight: .semibold)).title("voice_agora_red".voice_localized(), .normal).isUserInteractionEnabled(false).textColor(.black, .normal)
     }()
     
     private lazy var separateLine: UIView = {
@@ -45,11 +45,11 @@ public class VREQOperationAlert: UIView {
     }()
     
     private lazy var closeBot: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: 0, y: self.separateLine.frame.maxY+20, width: self.frame.width/2.0, height: 20)).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x156EF3), .normal).title("Close Bot".localized(), .normal).tag(11).addTargetFor(self, action: #selector(action(sender:)), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: 0, y: self.separateLine.frame.maxY+20, width: self.frame.width/2.0, height: 20)).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x156EF3), .normal).title("voice_close_bot".voice_localized(), .normal).tag(11).addTargetFor(self, action: #selector(action(sender:)), for: .touchUpInside)
     }()
     
     private lazy var otherSetting: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.frame.width/2.0, y: self.separateLine.frame.maxY+20, width: self.frame.width/2.0, height: 20)).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x156EF3), .normal).title("Other Settings".localized(), .normal).tag(12).addTargetFor(self, action: #selector(action(sender:)), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: self.frame.width/2.0, y: self.separateLine.frame.maxY+20, width: self.frame.width/2.0, height: 20)).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x156EF3), .normal).title("voice_other_settings".voice_localized(), .normal).tag(12).addTargetFor(self, action: #selector(action(sender:)), for: .touchUpInside)
     }()
     
     private lazy var verticalLine: UIView = {
@@ -59,8 +59,8 @@ public class VREQOperationAlert: UIView {
     public override init(frame: CGRect) {
         super.init(frame: frame)
         self.addSubViews([self.header,self.agoraBlue,self.neckSymbol,self.agoraRed,self.blueName,self.redName,self.separateLine,self.closeBot,self.otherSetting,self.verticalLine])
-        self.blueName.set(image: UIImage("guanfang"), title: "Agora Blue".localized(), titlePosition: .right, additionalSpacing: 5, state: .normal)
-        self.redName.set(image: UIImage("guanfang"), title: "Agora Red".localized(), titlePosition: .right, additionalSpacing: 5, state: .normal)
+        self.blueName.set(image: UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), title: "voice_agora_blue".voice_localized(), titlePosition: .right, additionalSpacing: 5, state: .normal)
+        self.redName.set(image: UIImage.sceneImage(name: "guanfang", bundleName: "VoiceChatRoomResource"), title: "voice_agora_red".voice_localized(), titlePosition: .right, additionalSpacing: 5, state: .normal)
     }
     
     required init?(coder: NSCoder) {

@@ -2,8 +2,6 @@ package io.agora.scene.ktv.widget.lrcView;
 
 import android.animation.Animator;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.text.Spannable;
@@ -20,7 +18,6 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.palette.graphics.Palette;
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
 
 import com.bumptech.glide.Glide;
@@ -41,13 +38,14 @@ import io.agora.karaoke_view.v11.LyricsView;
 import io.agora.karaoke_view.v11.ScoringView;
 import io.agora.karaoke_view.v11.model.LyricsLineModel;
 import io.agora.karaoke_view.v11.model.LyricsModel;
+import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.utils.DownloadUtils;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.base.utils.ZipUtils;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
-import io.agora.scene.ktv.live.ILrcView;
+import io.agora.scene.ktv.ktvapi.ILrcView;
 import io.agora.scene.ktv.service.RoomSelSongModel;
 import io.agora.scene.widget.basic.OutlineSpan;
 import io.agora.scene.widget.utils.UiUtils;
@@ -96,6 +94,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     public Role mRole = Role.Listener;
+
+    public enum AudioTrack {
+        Origin, Acc, DaoChang
+    }
+    private AudioTrack mAudioTrack = AudioTrack.Acc;
     private OnKaraokeEventListener mOnKaraokeActionListener;
 
     public LrcControlView(@NonNull Context context) {
@@ -121,6 +124,8 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
         mKaraokeView = new KaraokeView(mBinding.ilActive.lyricsView, mBinding.ilActive.scoringView);
 
+        mBinding.ilActive.btnVocalHighlight.setVisibility(View.GONE);
+
         initListener();
     }
 
@@ -134,7 +139,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     private int chorusScore = 0;
 
     private void initListener() {
-        mBinding.ilChorus.btChorus.setOnClickListener(this);
         mBinding.ilActive.switchOriginal.setOnClickListener(this);
         mBinding.ilActive.ivMusicMenu.setOnClickListener(this);
         mBinding.ilActive.ivMusicStart.setOnClickListener(this);
@@ -146,6 +150,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.ivJoinChorusBtn.setOnClickListener(this);
         mBinding.ilActive.ivLeaveChorus.setOnClickListener(this);
         mBinding.ilActive.downloadLrcFailedBtn.setOnClickListener(this);
+
+        mBinding.ilActive.btnVocalHighlight.setOnClickListener(this);
+        mBinding.ilActive.btnVocalHighlight.bringToFront();
 
         mKaraokeView.setKaraokeEvent(new KaraokeEvent() {
             @Override
@@ -185,6 +192,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
         mBinding.ilActive.switchOriginal.setChecked(false); // reset ui icon for mAudioTrackMode
         mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
+        mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_original);
         mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
         mBinding.ilActive.ivJoinChorusBtn.setVisibility(View.INVISIBLE);
         mBinding.ilActive.ivLeaveChorus.setVisibility(View.VISIBLE);
@@ -232,8 +240,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         this.isMineOwner = isMineOwner;
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
-        mBinding.ilChorus.getRoot().setVisibility(View.GONE);
-        mBinding.clActive.setBackgroundResource(backgroundResId);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
 
@@ -247,13 +253,13 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
-        mBinding.ilChorus.getRoot().setVisibility(View.GONE);
-        mBinding.clActive.setBackgroundResource(backgroundResId);
+        setLrcViewBackground(R.color.ktv_music_view_bg);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.GONE);
         mBinding.ilActive.getRoot().setVisibility(View.VISIBLE);
 
         mBinding.ilActive.ivMusicStart.setIconResource(R.mipmap.ktv_ic_pause);
         mBinding.ilActive.ivMusicStart.setText(R.string.ktv_room_player_pause);
+        mAudioTrack = AudioTrack.Acc;
     }
 
     private void changeViewByRole() {
@@ -268,6 +274,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mBinding.ilActive.ivSkipPostlude.setVisibility(View.INVISIBLE);
             mBinding.ilActive.switchOriginal.setChecked(false); // reset ui icon for mAudioTrackMode
             mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
+            mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_original);
             mBinding.ilActive.ivJoinChorusBtn.setVisibility(View.INVISIBLE);
             mBinding.ilActive.ivLeaveChorus.setVisibility(View.INVISIBLE);
         } else if (this.mRole == Role.Listener) {
@@ -297,8 +304,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     public void onPauseStatus() {
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
-        mBinding.ilChorus.getRoot().setVisibility(View.GONE);
-        mBinding.clActive.setBackgroundResource(backgroundResId);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.GONE);
         mBinding.ilActive.getRoot().setVisibility(View.VISIBLE);
 
@@ -309,8 +314,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     public void onIdleStatus() {
         mBinding.ilIDLE.getRoot().setVisibility(View.VISIBLE);
         mBinding.clActive.setVisibility(View.GONE);
-        mBinding.ilChorus.getRoot().setVisibility(View.GONE);
-        mBinding.clActive.setBackgroundResource(backgroundResId);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.GONE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
     }
@@ -332,38 +335,18 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         }
 
         mBinding.tvMusicName.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
-        mBinding.ilChorus.tvMusicName2.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
 
         mBinding.ivCumulativeScoreGrade.setVisibility(INVISIBLE);
         mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_score_formatter), "0"));
         mBinding.gradeView.setScore(0, 0, 0);
     }
 
-    public void setCountDown(int time) {
-        if (mBinding == null || mBinding.ilChorus == null) return;
-        if (mRole == Role.Singer) {
-            mBinding.ilChorus.tvWaitingTime.setText(getContext().getString(R.string.ktv_room_time_wait_join_chorus));
-        } else if (mRole == Role.Listener) {
-            mBinding.ilChorus.tvWaitingTime.setText(getContext().getString(R.string.ktv_room_time_join_chorus_));
-        }
-        mBinding.ilChorus.tvWaitingTimeCount.setText(getContext().getString(R.string.ktv_room_time_wait, 0, time));
-    }
-
-    private int backgroundResId = R.mipmap.ktv_mv_default;
-
     public void setLrcViewBackground(@DrawableRes int resId) {
-        backgroundResId = resId;
-        Bitmap mBitmap = BitmapFactory.decodeResource(getResources(), resId);
-        Palette.from(mBitmap).generate(palette -> {
-            if (palette == null) {
-                return;
-            }
-            int defaultColor = ContextCompat.getColor(getContext(), R.color.pink_b4);
-            mBinding.ilActive.lyricsView.setCurrentLineHighlightedTextColor(defaultColor);
+        int defaultColor = ContextCompat.getColor(getContext(), R.color.pink_b4);
+        mBinding.ilActive.lyricsView.setCurrentLineHighlightedTextColor(defaultColor);
 
-            defaultColor = ContextCompat.getColor(getContext(), R.color.white);
-            mBinding.ilActive.lyricsView.setCurrentLineTextColor(defaultColor);
-        });
+        defaultColor = ContextCompat.getColor(getContext(), R.color.white);
+        mBinding.ilActive.lyricsView.setCurrentLineTextColor(defaultColor);
         mBinding.clActive.setBackgroundResource(resId);
     }
 
@@ -549,22 +532,40 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     @Override
     public void onClick(View v) {
         if (v == mBinding.ilActive.switchOriginal) {
-            mOnKaraokeActionListener.onSwitchOriginalClick();
-
-            boolean withOriginal = mBinding.ilActive.switchOriginal.isChecked();
-            mBinding.ilActive.switchOriginal.setIconResource(withOriginal ? R.mipmap.ic_play_original_on : R.mipmap.ic_play_original_off);
+            if (mRole == Role.Singer) {
+                if (mAudioTrack == AudioTrack.Acc) {
+                    mAudioTrack = AudioTrack.DaoChang;
+                    mOnKaraokeActionListener.onSwitchOriginalClick(2, true);
+                    mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ktv_ic_daochang);
+                    mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_daochang);
+                } else if (mAudioTrack == AudioTrack.DaoChang) {
+                    mAudioTrack = AudioTrack.Origin;
+                    mOnKaraokeActionListener.onSwitchOriginalClick(0, true);
+                    mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_on);
+                    mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_original);
+                } else {
+                    mAudioTrack = AudioTrack.Acc;
+                    mOnKaraokeActionListener.onSwitchOriginalClick(1, true);
+                    mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
+                }
+            } else if (mRole == Role.CoSinger) {
+                if (mAudioTrack == AudioTrack.Acc) {
+                    mAudioTrack = AudioTrack.Origin;
+                    mOnKaraokeActionListener.onSwitchOriginalClick(0, false);
+                    mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_on);
+                    mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_original);
+                } else {
+                    mAudioTrack = AudioTrack.Acc;
+                    mOnKaraokeActionListener.onSwitchOriginalClick(1, false);
+                    mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
+                }
+            }
         } else if (v == mBinding.ilActive.ivMusicMenu) {
             mOnKaraokeActionListener.onMenuClick();
         } else if (v == mBinding.ilActive.ivMusicStart) {
             mOnKaraokeActionListener.onPlayClick();
         } else if (v == mBinding.ilActive.ivChangeSong) {
             mOnKaraokeActionListener.onChangeMusicClick();
-        } else if (v == mBinding.ilChorus.btChorus) {
-            if (mRole == Role.Singer) {
-                mOnKaraokeActionListener.onStartSing();
-            } else if (mRole == Role.Listener) {
-                mOnKaraokeActionListener.onJoinChorus();
-            }
         } else if (v == mBinding.ilActive.ivSkipPreludeSkip) {
             mOnKaraokeActionListener.onSkipPreludeClick();
             mBinding.ilActive.ivSkipPrelude.setVisibility(INVISIBLE);
@@ -576,7 +577,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mBinding.ilActive.ivSkipPostlude.setVisibility(INVISIBLE);
         } else if (v == mBinding.ilActive.ivJoinChorusBtn) {
             if (UiUtils.isFastClick(2000)) {
-                ToastUtils.showToast("操作太频繁");
+                ToastUtils.showToast(R.string.ktv_too_fast);
                 return;
             }
             mOnKaraokeActionListener.onJoinChorus();
@@ -594,6 +595,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                 mOnKaraokeActionListener.onReGetLrcUrl();
             } else {
                 downloadAndSetLrcData();
+            }
+        } else if (v == mBinding.ilActive.btnVocalHighlight) {
+            if (mOnKaraokeActionListener != null) {
+                mOnKaraokeActionListener.onVocalHighlightClick();
             }
         }
     }
@@ -715,8 +720,25 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         }
     }
 
+    public void setHighLightPersonHeadUrl(String url) {
+        GlideApp.with(mBinding.getRoot())
+                .load(url)
+                .error(R.mipmap.ktv_highlight_head_bg)
+                .apply(RequestOptions.circleCropTransform())
+                .into(mBinding.ilActive.ivVocalHighlight);
+    }
+
+    public void showHighLightButton(boolean show) {
+        if (show) {
+            mBinding.ilActive.btnVocalHighlight.setVisibility(View.VISIBLE);
+            mBinding.ilActive.btnVocalHighlight.bringToFront();
+        } else {
+            mBinding.ilActive.btnVocalHighlight.setVisibility(View.GONE);
+        }
+    }
+
     public interface OnKaraokeEventListener {
-        default void onSwitchOriginalClick() {
+        default void onSwitchOriginalClick(int aimStatus, boolean isMainSinger) { // 0: origin 1: acc 2: daochang
         }
 
         default void onMenuClick() {
@@ -753,6 +775,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         }
 
         default void onReGetLrcUrl() {
+        }
+
+        default void onVocalHighlightClick() {
+
         }
     }
 }

@@ -6,7 +6,7 @@
 //
 
 #import "VLEffectView.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @interface VLEffectView()
 @property(nonatomic, weak) id <VLEffectViewDelegate>delegate;
 @property (nonatomic,strong) UIButton *selBtn;
@@ -35,13 +35,13 @@
 
 -(void)layoutUI {
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = KTVLocalizedString(@"音效");
+    titleLabel.text = KTVLocalizedString(@"ktv_voice_effect");
     titleLabel.font = UIFontMake(18);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:titleLabel];
     
-    NSArray *effects = @[@"原声", @"KTV",@"演唱会", @"录音棚", @"留声机", @"空旷", @"空灵", @"流行",@"R&B"];
+    NSArray *effects = @[ KTVLocalizedString(@"ktv_effect_off"), @"KTV",KTVLocalizedString(@"ktv_effect_concert"), KTVLocalizedString(@"ktv_effect_studio"), KTVLocalizedString(@"ktv_effect_phonograph"), KTVLocalizedString(@"ktv_effect_spatial"), KTVLocalizedString(@"ktv_effect_ethereal"), KTVLocalizedString(@"ktv_effect_pop"),@"R&B"];
     NSArray *imgs = @[@"ktv_console_setting1",@"ktv_console_setting2",@"ktv_console_setting3",@"ktv_console_setting4"];
     for(int i=0;i< effects.count; i++){
         UIButton *btn = [[UIButton alloc]init];

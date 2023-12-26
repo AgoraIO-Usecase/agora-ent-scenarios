@@ -47,12 +47,13 @@ enum SAErrorType {
     }
 }
 
-private let cSceneId = "scene_spatialChatRoom_3.0.0"
+private let cSceneId = "scene_spatialChatRoom_4.0.0"
 private let kCollectionIdUser = "user_collection"
 private let kCollectionIdSeatInfo = "seat_info_collection"
 private let kCollectionIdSeatApply = "show_seat_apply_collection"
 private let kCollectionIdRobotInfo = "robot_info_collection"
 class SpatialAudioSyncSerciceImp: NSObject {
+    private var _getMicSeatApplyListBlock: SuccessBlock?
     fileprivate weak var subscribeDelegate: SpatialAudioServiceSubscribeDelegate?
     fileprivate var roomId: String?
     fileprivate var roomList: [SARoomEntity] = [SARoomEntity]()
@@ -65,6 +66,7 @@ class SpatialAudioSyncSerciceImp: NSObject {
 
 //MARK: private
 extension SpatialAudioSyncSerciceImp {
+    
     fileprivate func initScene(completion: @escaping () -> Void) {
         if syncUtilsInited {
             completion()
@@ -96,7 +98,7 @@ extension SpatialAudioSyncSerciceImp {
         for i in 1...8 {
             if i == 8 { return 0 }
             let mic = self.mics[safe: i]
-            if mic?.member == nil && mic?.status != 3 {
+            if mic?.member == nil && mic?.status != 3 && mic?.status != 4 {
                 mic_index = mic?.mic_index ?? 1
                 break
             }
@@ -218,7 +220,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
                                property: params) {[weak self] result in
                 guard let self = self else {return}
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], SARoomEntity.self)
-                self.roomId = model.room_id!
+                self.roomId = model.room_id
                 self.roomList.append(model)
                 self._startCheckExpire()
                 self._subscribeAll()
@@ -804,7 +806,7 @@ extension SpatialAudioSyncSerciceImp {
         
         let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
         let expiredDuration = 20 * 60 * 1000
-        agoraPrint("checkRoomExpire: \(currentTs - Int64(created_at)) / \(expiredDuration)")
+//        agoraPrint("checkRoomExpire: \(currentTs - Int64(created_at)) / \(expiredDuration)")
         guard currentTs - Int64(created_at) > expiredDuration else { return }
         
         self.subscribeDelegate?.onRoomExpired()
@@ -845,13 +847,19 @@ extension SpatialAudioSyncSerciceImp {
                        onCreated: { _ in
                        }, onUpdated: { [weak self] object in
                            guard let self = self, let jsonStr = object.toJson() else { return }
-                           let room = model(from: jsonStr.z.jsonToDictionary(), SARoomEntity.self)
+                           
+                           let modelDic = jsonStr.z.jsonToDictionary()
+                           if modelDic.isEmpty {
+                               agoraPrint("imp room subscribe jsonStr fail = \(jsonStr)")
+                           }
+                           
+                           let room = model(from: modelDic, SARoomEntity.self)
                            guard room.room_id == channelName else {return}
                            let origRoom = self.roomList.filter({ $0.room_id == room.room_id }).first
                            agoraPrint("imp room subscribe onUpdated...")
                            if origRoom?.announcement != room.announcement {
                                origRoom?.announcement = room.announcement
-                               self.subscribeDelegate?.onRoomAnnouncementChanged(announce: (room.announcement ?? origRoom?.announcement!)!)
+                               self.subscribeDelegate?.onRoomAnnouncementChanged(announce: room.announcement ?? "")
                            } /*else if origRoom?.use_robot != room.use_robot {
                                origRoom?.use_robot = room.use_robot
                                self.subscribeDelegate?.onRobotSwitch(roomId: channelName, enable: room.use_robot ?? false, from: room.owner?.name ?? "")
@@ -907,8 +915,9 @@ extension SpatialAudioSyncSerciceImp {
     
     fileprivate func _subscribeMicSeatInfoChanged() {
         agoraPrint("imp seat info subscribe ...")
+        guard let roomId = self.roomId else { return }
         SyncUtil
-            .scene(id: self.roomId!)?
+            .scene(id: roomId)?
             .subscribe(key: kCollectionIdSeatInfo,
                        onCreated: { _ in
                        }, onUpdated: {[weak self] object in
@@ -917,7 +926,7 @@ extension SpatialAudioSyncSerciceImp {
                                  let jsonStr = object.toJson() else { return }
                            let seat = model(from: jsonStr.z.jsonToDictionary(), SARoomMic.self)
                            defer {
-                               self.subscribeDelegate?.onSeatUpdated(roomId: self.roomId!, mics: [seat], from: "")
+                               self.subscribeDelegate?.onSeatUpdated(roomId: roomId, mics: [seat], from: "")
                            }
                            if let index = self.mics.firstIndex(where: { $0.objectId == seat.objectId }) {
                                self.mics[index] = seat
@@ -968,11 +977,15 @@ extension SpatialAudioSyncSerciceImp {
     
     fileprivate func _updateMicSeat(roomId: String, mic: SARoomMic, completion: @escaping (Error?) -> Void) {
         agoraPrint("imp mic seat update... ")
+        guard let selfRoomId = self.roomId else {
+            completion(SAErrorType.unknown("update mic seat", "room id is nil").error())
+            return
+        }
         let params = mic.kj.JSONObject()
         SyncUtil
-            .scene(id: self.roomId!)?
+            .scene(id: selfRoomId)?
             .collection(className: kCollectionIdSeatInfo)
-            .update(id: mic.objectId!,
+            .update(id: mic.objectId ?? "",
                     data:params,
                     success: {
                 agoraPrint("imp mic seat update success... ")
@@ -988,26 +1001,28 @@ extension SpatialAudioSyncSerciceImp {
 extension SpatialAudioSyncSerciceImp {
     fileprivate func _subscribeMicSeatApplyChanged() {
         agoraPrint("imp seat apply subscribe ...")
+        guard let myRoomId = self.roomId else {
+            return
+        }
         SyncUtil
-            .scene(id: self.roomId!)?
+            .scene(id: myRoomId)?
             .subscribe(key: kCollectionIdSeatApply,
                        onCreated: { _ in
                        }, onUpdated: {[weak self] object in
                            agoraPrint("imp seat apply subscribe onUpdated...")
                            guard let self = self,
-                                 let jsonStr = object.toJson() else { return }
+                                 let jsonStr = object.toJson(),
+                                 let roomId = self.roomId else { return }
                            let apply = model(from: jsonStr.z.jsonToDictionary(), SAApply.self)
                            defer {
-                               if VLUserCenter.user.id != apply.member?.uid {
-                                   self.subscribeDelegate?.onReceiveSeatRequest(roomId: self.roomId!, applicant: apply)
-                               }
+                               self.subscribeDelegate?.onReceiveSeatRequest(roomId: roomId, applicant: apply)
                            }
                            self.micApplys.removeAll { $0.objectId == apply.objectId}
                            self.micApplys.append(apply)
                        }, onDeleted: {[weak self] object in
                            agoraPrint("imp seat apply subscribe onDeleted...")
                            guard let self = self,
-                                 let jsonStr = object.toJson() else {return}
+                                 let jsonStr = object.toJson(), let roomId = self.roomId else {return}
                            let applicant = model(from: jsonStr.z.jsonToDictionary(), SAApply.self)
                            let apply: SAApply? = self.micApplys.first { $0.objectId == applicant.objectId
                            }
@@ -1015,7 +1030,7 @@ extension SpatialAudioSyncSerciceImp {
                            }
                            guard let apply = apply else {return}
                            if VLUserCenter.user.id != apply.member?.uid {
-                               self.subscribeDelegate?.onReceiveSeatRequestRejected(roomId: self.roomId!, chat_uid: apply.member?.uid ?? "")
+                               self.subscribeDelegate?.onReceiveSeatRequestRejected(roomId: roomId, chat_uid: apply.member?.uid ?? "")
                            }
                        }, onSubscribed: {
                        }, fail: { error in
@@ -1026,21 +1041,24 @@ extension SpatialAudioSyncSerciceImp {
     
     fileprivate func _getMicSeatApplyList(roomId: String, completion: @escaping (Error?, [SAApply]?) -> Void) {
         agoraPrint("imp seat apply list get...")
+        self._getMicSeatApplyListBlock = { [weak self] list in
+            agoraPrint("imp seat apply list get success...")
+            let applys = list.map({$0.toJson()}).kj.modelArray(SAApply.self)
+            guard let self = self else {return}
+            self.micApplys.removeAll()
+            applys.forEach { apply in
+                if !self.micApplys.contains(where: {$0.member?.uid == apply.member?.uid}) && !self.mics.contains(where: {$0.member?.uid == apply.member?.uid}) {
+                    self.micApplys.append(apply)
+                }
+            }
+            completion(nil, applys)
+        }
         SyncUtil
             .scene(id: roomId)?
             .collection(className: kCollectionIdSeatApply)
             .get(success: { [weak self] list in
-                agoraPrint("imp seat apply list get success...")
-                let applys = list.map({$0.toJson()}).kj.modelArray(SAApply.self)
-                self?.micApplys = applys.filter({ apply in
-                    for mic in self?.mics ?? [] {
-                        if mic.member?.uid == apply.member?.uid {
-                            return false
-                        }
-                    }
-                    return true
-                })
-                completion(nil, applys)
+                self?._getMicSeatApplyListBlock?(list)
+                self?._getMicSeatApplyListBlock = nil
             }, fail: { error in
                 agoraPrint("imp seat apply list get fail :\(error.message)...")
                 completion(SAErrorType.unknown("get seat apply list", error.message).error(), nil)
@@ -1086,6 +1104,7 @@ extension SpatialAudioSyncSerciceImp {
                     data: params,
                     success: {
                 agoraPrint("imp seat apply update success ...")
+                completion(nil)
             }, fail: { error in
                 agoraPrint("imp seat apply update fail :\(error.message)...")
                 completion(SAErrorType.unknown("update seat apply", error.message).error())
@@ -1189,23 +1208,24 @@ extension SpatialAudioSyncSerciceImp {
     
     fileprivate func _subscribeUsersChanged() {
         agoraPrint("imp user subscribe ...")
+        guard let roomId = self.roomId else { return  }
         SyncUtil
-            .scene(id: roomId!)?
+            .scene(id: roomId)?
             .subscribe(key: kCollectionIdUser,
                        onCreated: { _ in
                        }, onUpdated: { [weak self] object in
                            agoraPrint("imp user subscribe onUpdated...")
                            guard let self = self,
-                                 let jsonStr = object.toJson() else { return }
+                                 let jsonStr = object.toJson(), let roomId = self.roomId else { return }
                            let user = model(from: jsonStr.z.jsonToDictionary(), SAUser.self)
                            if VLUserCenter.user.id == user.uid {
                                if user.status == .waitting {
                                    if let index = self.userList.firstIndex(where: { $0.uid == user.uid }) {
                                        self.userList[index] = user
                                    }
-                                   self.subscribeDelegate?.onReceiveSeatInvitation(roomId: self.roomId!, user: user)
+                                   self.subscribeDelegate?.onReceiveSeatInvitation(roomId: roomId, user: user)
                                } else if user.status == .rejected {
-                                   self.subscribeDelegate?.onReceiveCancelSeatInvitation(roomId: self.roomId!, chat_uid: user.uid!)
+                                   self.subscribeDelegate?.onReceiveCancelSeatInvitation(roomId: roomId, chat_uid: user.uid ?? "")
                                }
                                return
                            }
@@ -1216,7 +1236,7 @@ extension SpatialAudioSyncSerciceImp {
                                self.userList.append(user)
                                self._updateUserCount { error in
                                }
-                               self.subscribeDelegate?.onUserJoinedRoom(roomId: self.roomId!, user: user)
+                               self.subscribeDelegate?.onUserJoinedRoom(roomId: roomId, user: user)
                            }
                        }, onDeleted: { [weak self] object in
                            agoraPrint("imp user subscribe onDeleted... [\(object.getId())]")
@@ -1312,8 +1332,9 @@ extension SpatialAudioSyncSerciceImp {
     
     fileprivate func _subscribeRobotChanged() {
         agoraPrint("imp robot subscribe ...")
+        guard let roomId = self.roomId else { return }
         SyncUtil
-            .scene(id: roomId!)?
+            .scene(id: roomId)?
             .subscribe(key: kCollectionIdRobotInfo,
                        onCreated: { _ in
                        }, onUpdated: { [weak self] object in
@@ -1337,7 +1358,7 @@ extension SpatialAudioSyncSerciceImp {
     
     private func _getRobotInfo(completion: @escaping (Error?, SARobotAudioInfo?)->()) {
         agoraPrint("imp robot get...")
-        let roomId = self.roomId!
+        guard let roomId = self.roomId else { return }
         SyncUtil
             .scene(id: roomId)?
             .collection(className: kCollectionIdRobotInfo)
@@ -1355,10 +1376,10 @@ extension SpatialAudioSyncSerciceImp {
     
     private func _updateRobot(info: SARobotAudioInfo, completion: @escaping (Error?)->()) {
         agoraPrint("imp robot info update...")
-
+        guard let roomId = self.roomId else { return }
         let params = info.kj.JSONObject()
         SyncUtil
-            .scene(id: roomId!)?
+            .scene(id: roomId)?
             .collection(className: kCollectionIdRobotInfo)
             .update(id: info.objectId,
                     data:params,

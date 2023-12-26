@@ -8,6 +8,7 @@
 import UIKit
 
 class VoiceRoomPresentView: UIView, UIGestureRecognizerDelegate {
+    var panViewHeightClosure: ((CGFloat) -> Void)?
     
     fileprivate let screenSize: CGSize = UIScreen.main.bounds.size
     
@@ -93,6 +94,7 @@ class VoiceRoomPresentView: UIView, UIGestureRecognizerDelegate {
         self.frames[frames.count - 1] = rect
         pan.setTranslation(.zero, in: self)
         print(rect)
+        panViewHeightClosure?(rect.height)
     }
     
     @objc func push(with vc: UIViewController, frame: CGRect, maxHeight: CGFloat) {
@@ -100,6 +102,7 @@ class VoiceRoomPresentView: UIView, UIGestureRecognizerDelegate {
         maxHeights.append(maxHeight)
         minHeights.append(frame.height)
         curTableview = getTableView(with: vc)
+        nav.interactivePopGestureRecognizer?.isEnabled = false
         UIView.animate(withDuration: animationDuration) {[weak self] in
             self?.mainView.frame = CGRect(x: 0, y: (self?.screenSize.height ?? 0) - frame.height, width: frame.width, height: frame.height)
             self?.nav.pushViewController(vc, animated: true)
@@ -110,6 +113,7 @@ class VoiceRoomPresentView: UIView, UIGestureRecognizerDelegate {
     @objc func pop() {
         if frames.count < 2 {return}
         let lastFrame: CGRect = frames[frames.count - 2];
+        nav.interactivePopGestureRecognizer?.isEnabled = true
         UIView.animate(withDuration: animationDuration) {[weak self] in
             self?.mainView.frame = CGRect(x: 0, y: (self?.screenSize.height ?? 0) - lastFrame.height, width: lastFrame.width, height: lastFrame.height)
             self?.nav.popViewController(animated: true)
@@ -136,10 +140,9 @@ class VoiceRoomPresentView: UIView, UIGestureRecognizerDelegate {
     
     fileprivate func getTableView(with VC: UIViewController) -> UITableView? {
         var tableView: UITableView? = nil
-        for view in VC.view.subviews {
-            if view.isKind(of: UITableView.self) {
-                tableView = view as? UITableView
-            }
+        for view in VC.view.subviews where view.isKind(of: UITableView.self) {
+            tableView = view as? UITableView
+            break
         }
         return tableView
     }

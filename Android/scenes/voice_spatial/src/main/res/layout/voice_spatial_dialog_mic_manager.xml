@@ -6,7 +6,6 @@
     android:layout_height="wrap_content"
     android:background="@drawable/voice_bg_rect_top_radius20_white">
 
-
     <View
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -34,23 +33,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:shapeAppearance="@style/voice_seat_roundStyle" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivMicInnerIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/voice_icon_room_mic_add"
-        app:layout_constraintBottom_toBottomOf="@+id/ivMicInfo"
-        app:layout_constraintEnd_toEndOf="@+id/ivMicInfo"
-        app:layout_constraintStart_toStartOf="@+id/ivMicInfo"
-        app:layout_constraintTop_toTopOf="@+id/ivMicInfo" />
+        app:shapeAppearance="@style/ui_widget_roundStyle" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivMicTag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/voice_icon_room_mic_mute_tag"
+        android:src="@drawable/voice_ic_mic_mute_tag"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/ivMicInfo"
         app:layout_constraintEnd_toEndOf="@id/ivMicInfo" />
@@ -78,7 +67,7 @@
         android:drawableStart="@drawable/voice_icon_room_mic_owner_tag"
         android:drawablePadding="4dp"
         android:gravity="center"
-        android:text="@string/voice_room_host"
+        android:text="@string/voice_spatial_host"
         android:textColor="@color/voice_color_333333"
         android:textSize="@dimen/voice_sp_11"
         android:visibility="gone"

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:paddingHorizontal="8dp">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivScenesBg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/bg_scene_ktv_solo_chorus"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="2:1"
+        app:strokeWidth="0.5dp"
+        app:strokeColor="@color/grey_80_percent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:shapeAppearance="@style/app_corner16Style" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@id/ivScenesBg"
+        app:layout_constraintStart_toStartOf="@id/ivScenesBg"
+        app:layout_constraintTop_toTopOf="@id/ivScenesBg">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvScenesName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="@string/app_home_scene_ktv_solo_chorus" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvScenesTips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/def_text_grey_303"
+            android:textSize="11sp"
+            tools:text="@string/app_home_scene_ktv_solo_chorus_tips" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

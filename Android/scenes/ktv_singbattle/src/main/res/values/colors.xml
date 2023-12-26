@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ktv_singbattle_dialog_bg_blue">#152164</color>
+    <color name="ktv_singbattle_title">#B3FFFFFF</color>
+    <color name="ktv_singbattle_grade_view_bg">#4D000000</color>
+    <color name="ktv_singbattle_grade_view_content_gray">#4DFFFFFF</color>
+    <color name="ktv_singbattle_list_empty">#4D5D73</color>
+    <color name="ktv_singbattle_dialog_music_list_empty">#7E7E7E</color>
+    <color name="ktv_singbattle_music_view_bg">#152064</color>
+</resources>

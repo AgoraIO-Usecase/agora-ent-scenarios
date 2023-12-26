@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
@@ -15,9 +16,47 @@ import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.rtc2.video.SegmentationProperty
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.utils.FileUtils
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.R
 import io.agora.scene.show.RtcEngineInstance
-import io.agora.scene.show.beauty.*
+import io.agora.scene.show.beauty.BeautyCache
+import io.agora.scene.show.beauty.GROUP_ID_ADJUST
+import io.agora.scene.show.beauty.GROUP_ID_BEAUTY
+import io.agora.scene.show.beauty.GROUP_ID_EFFECT
+import io.agora.scene.show.beauty.GROUP_ID_FILTER
+import io.agora.scene.show.beauty.GROUP_ID_STICKER
+import io.agora.scene.show.beauty.GROUP_ID_VIRTUAL_BG
+import io.agora.scene.show.beauty.IBeautyProcessor
+import io.agora.scene.show.beauty.ITEM_ID_ADJUST_CLARITY
+import io.agora.scene.show.beauty.ITEM_ID_ADJUST_CONTRAST
+import io.agora.scene.show.beauty.ITEM_ID_ADJUST_NONE
+import io.agora.scene.show.beauty.ITEM_ID_ADJUST_SATURATION
+import io.agora.scene.show.beauty.ITEM_ID_ADJUST_SHARPEN
+import io.agora.scene.show.beauty.ITEM_ID_BEAUTY_BRIGHT_EYE
+import io.agora.scene.show.beauty.ITEM_ID_BEAUTY_CHEEKBONE
+import io.agora.scene.show.beauty.ITEM_ID_BEAUTY_CHIN
+import io.agora.scene.show.beauty.ITEM_ID_BEAUTY_EYE
+import io.agora.scene.show.beauty.ITEM_ID_BEAUTY_FOREHEAD
+import io.agora.scene.show.beauty.ITEM_ID_BEAUTY_JAWBONE
+import io.agora.scene.show.beauty.ITEM_ID_BEAUTY_MOUTH
+import io.agora.scene.show.beauty.ITEM_ID_BEAUTY_NONE
+import io.agora.scene.show.beauty.ITEM_ID_BEAUTY_NOSE
+import io.agora.scene.show.beauty.ITEM_ID_BEAUTY_OVERALL
+import io.agora.scene.show.beauty.ITEM_ID_BEAUTY_REDDEN
+import io.agora.scene.show.beauty.ITEM_ID_BEAUTY_REMOVE_DARK_CIRCLES
+import io.agora.scene.show.beauty.ITEM_ID_BEAUTY_REMOVE_NASOLABIAL_FOLDS
+import io.agora.scene.show.beauty.ITEM_ID_BEAUTY_SMOOTH
+import io.agora.scene.show.beauty.ITEM_ID_BEAUTY_TEETH
+import io.agora.scene.show.beauty.ITEM_ID_BEAUTY_WHITEN
+import io.agora.scene.show.beauty.ITEM_ID_EFFECT_CWEI
+import io.agora.scene.show.beauty.ITEM_ID_EFFECT_NONE
+import io.agora.scene.show.beauty.ITEM_ID_EFFECT_YUANQI
+import io.agora.scene.show.beauty.ITEM_ID_FILTER_NONE
+import io.agora.scene.show.beauty.ITEM_ID_STICKER_HUAHUA
+import io.agora.scene.show.beauty.ITEM_ID_STICKER_NONE
+import io.agora.scene.show.beauty.ITEM_ID_VIRTUAL_BG_BLUR
+import io.agora.scene.show.beauty.ITEM_ID_VIRTUAL_BG_MITAO
+import io.agora.scene.show.beauty.ITEM_ID_VIRTUAL_BG_NONE
 import io.agora.scene.show.databinding.ShowWidgetBeautyDialogBottomBinding
 import io.agora.scene.show.databinding.ShowWidgetBeautyDialogItemBinding
 import io.agora.scene.show.databinding.ShowWidgetBeautyDialogPageBinding
@@ -25,7 +64,7 @@ import io.agora.scene.show.databinding.ShowWidgetBeautyDialogTopBinding
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 
-class BeautyDialog(context: Context) : BottomDarkDialog(context) {
+class BeautyDialog constructor(context: Context) : BottomDarkDialog(context) {
 
     private data class ItemInfo(val id: Int, @StringRes val name: Int, @DrawableRes val icon: Int)
     private data class GroupInfo(
@@ -327,12 +366,11 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
 
         mTopBinding.root.isVisible = false
         mTopBinding.ivCompare.setOnClickListener {
-            beautyProcessor?.apply {
-                setEnable(!isEnable())
+            val old = beautyProcessor?.isBeautyEnable() ?: true
+            if (beautyProcessor?.setBeautyEnable(!old) != true) {
+                ToastUtils.showToast(R.string.show_beauty_license_disable)
             }
         }
-
-
     }
 
     // 修改绿幕开关
@@ -364,9 +402,18 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
         when (groupId) {
             // 虚拟背景
             GROUP_ID_VIRTUAL_BG -> {
-                mTopBinding.root.isVisible = true
-                mTopBinding.slider.value = beautyProcessor?.let { it.getGreenScreenStrength() } ?: 0.5f
-                mTopBinding.mSwitchMaterial.isChecked = beautyProcessor?.let { it.greenScreen() } ?: false
+                beautyProcessor?.let {
+                    mTopBinding.root.isVisible = itemId != ITEM_ID_VIRTUAL_BG_NONE
+                    if (it.greenScreen()) {
+                        mTopBinding.slider.isVisible = true
+                        mTopBinding.tvStrength.isVisible = true
+                        mTopBinding.slider.value = it.getGreenScreenStrength()
+                    } else {
+                        mTopBinding.slider.isInvisible = true
+                        mTopBinding.tvStrength.isInvisible = true
+                    }
+                }
+                mTopBinding.mSwitchMaterial.isChecked = beautyProcessor?.greenScreen() ?: false
                 mTopBinding.mSwitchMaterial.setOnCheckedChangeListener { _, isChecked ->
                     Log.e("liu0208", "OnCheckedChange    $isChecked")
                     if (isChecked) {
@@ -376,10 +423,15 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
                             setMessage(R.string.show_beauty_green_screen_tip)
                             setPositiveButton(R.string.show_setting_confirm) { dialog, _ ->
                                 changeGreenScreenSwitch(true)
+                                mTopBinding.slider.isVisible = true
+                                mTopBinding.tvStrength.isVisible = true
+                                mTopBinding.slider.value = beautyProcessor?.getGreenScreenStrength() ?: 0.5f
                                 dialog.dismiss()
                             }
                             setNegativeButton(R.string.show_setting_cancel) { dialog, _ ->
                                 mTopBinding.mSwitchMaterial.isChecked = false
+                                mTopBinding.slider.isVisible = false
+                                mTopBinding.tvStrength.isVisible = false
                                 dialog.dismiss()
                             }
                         }.create().show()
@@ -398,6 +450,8 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
             GROUP_ID_BEAUTY -> {
                 mTopBinding.root.isVisible = itemId != ITEM_ID_BEAUTY_NONE
                 if (itemId != ITEM_ID_BEAUTY_NONE) {
+                    mTopBinding.slider.isVisible = true
+                    mTopBinding.tvStrength.isVisible = true
                     mTopBinding.slider.value = BeautyCache.getItemValueWithDefault(itemId)
                     mTopBinding.slider.addOnChangeListener { slider, sValure, fromUser ->
                         beautyProcessor?.setFaceBeautify(itemId, sValure)
@@ -408,6 +462,8 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
             GROUP_ID_FILTER -> {
                 mTopBinding.root.isVisible = itemId != ITEM_ID_FILTER_NONE
                 if (itemId != ITEM_ID_FILTER_NONE) {
+                    mTopBinding.slider.isVisible = true
+                    mTopBinding.tvStrength.isVisible = true
                     mTopBinding.slider.value = BeautyCache.getItemValueWithDefault(itemId)
                     mTopBinding.slider.addOnChangeListener { slider, value, fromUser ->
                         beautyProcessor?.setFilter(itemId, value)
@@ -418,6 +474,8 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
             GROUP_ID_EFFECT -> {
                 mTopBinding.root.isVisible = itemId != ITEM_ID_EFFECT_NONE
                 if (itemId != ITEM_ID_EFFECT_NONE) {
+                    mTopBinding.slider.isVisible = true
+                    mTopBinding.tvStrength.isVisible = true
                     mTopBinding.slider.value = BeautyCache.getItemValueWithDefault(itemId)
                     mTopBinding.slider.addOnChangeListener { slider, value, fromUser ->
                         beautyProcessor?.setEffect(itemId, value)
@@ -428,6 +486,8 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
             GROUP_ID_ADJUST -> {
                 mTopBinding.root.isVisible = itemId != ITEM_ID_ADJUST_NONE
                 if (itemId != ITEM_ID_ADJUST_NONE) {
+                    mTopBinding.slider.isVisible = true
+                    mTopBinding.tvStrength.isVisible = true
                     mTopBinding.slider.value = BeautyCache.getItemValueWithDefault(itemId)
                     mTopBinding.slider.addOnChangeListener { slider, value, fromUser ->
                         beautyProcessor?.setAdjust(itemId, value)
@@ -452,6 +512,7 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
                 when (itemId) {
                     // 无
                     ITEM_ID_VIRTUAL_BG_NONE -> {
+                        beautyProcessor?.setGreenScreen(false)
                         RtcEngineInstance.rtcEngine.enableVirtualBackground(
                             false,
                             RtcEngineInstance.virtualBackgroundSource.apply { backgroundSourceType = VirtualBackgroundSource.BACKGROUND_COLOR },

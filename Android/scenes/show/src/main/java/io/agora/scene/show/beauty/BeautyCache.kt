@@ -49,36 +49,19 @@ object BeautyCache {
     internal fun reset(){
         cacheItemValueMap.apply {
             clear()
-            put(ITEM_ID_BEAUTY_SMOOTH, defaultItemValueMap[ITEM_ID_BEAUTY_SMOOTH] ?: 0.0f)
-            put(ITEM_ID_BEAUTY_WHITEN, defaultItemValueMap[ITEM_ID_BEAUTY_WHITEN] ?: 0.0f)
-            put(ITEM_ID_BEAUTY_OVERALL, defaultItemValueMap[ITEM_ID_BEAUTY_OVERALL] ?: 0.0f)
-            put(ITEM_ID_BEAUTY_CHEEKBONE, defaultItemValueMap[ITEM_ID_BEAUTY_CHEEKBONE] ?: 0.0f)
-            put(ITEM_ID_BEAUTY_JAWBONE, defaultItemValueMap[ITEM_ID_BEAUTY_JAWBONE] ?: 0.0f)
-            put(ITEM_ID_BEAUTY_EYE, defaultItemValueMap[ITEM_ID_BEAUTY_EYE] ?: 0.0f)
-            put(ITEM_ID_BEAUTY_TEETH, defaultItemValueMap[ITEM_ID_BEAUTY_TEETH] ?: 0.0f)
-            put(ITEM_ID_BEAUTY_FOREHEAD, defaultItemValueMap[ITEM_ID_BEAUTY_FOREHEAD] ?: 0.0f)
-            put(ITEM_ID_BEAUTY_NOSE, defaultItemValueMap[ITEM_ID_BEAUTY_NOSE] ?: 0.0f)
-            put(ITEM_ID_BEAUTY_MOUTH, defaultItemValueMap[ITEM_ID_BEAUTY_MOUTH] ?: 0.0f)
-            put(ITEM_ID_BEAUTY_CHIN, defaultItemValueMap[ITEM_ID_BEAUTY_CHIN] ?: 0.0f)
-            put(ITEM_ID_ADJUST_SHARPEN, defaultItemValueMap[ITEM_ID_ADJUST_SHARPEN] ?: 0.0f)
-            put(ITEM_ID_ADJUST_CLARITY, defaultItemValueMap[ITEM_ID_ADJUST_CLARITY] ?: 0.0f)
+            defaultItemValueMap.entries.forEach { entry ->
+                put(entry.key, entry.value)
+            }
         }
         cacheItemOperation.apply {
             clear()
-            put(
-                GROUP_ID_BEAUTY, arrayListOf(
-                    ITEM_ID_BEAUTY_WHITEN,
-                    ITEM_ID_BEAUTY_OVERALL,
-                    ITEM_ID_BEAUTY_EYE,
-                    ITEM_ID_BEAUTY_SMOOTH,
-                )
-            )
-            put(GROUP_ID_ADJUST, arrayListOf(
-                ITEM_ID_ADJUST_SHARPEN,
-                ITEM_ID_ADJUST_CLARITY,
-                ITEM_ID_ADJUST_CONTRAST,
-                ITEM_ID_ADJUST_NONE
-            ))
+            // 设置默认选中项
+            put(GROUP_ID_BEAUTY, arrayListOf(ITEM_ID_BEAUTY_SMOOTH))
+            put(GROUP_ID_ADJUST, arrayListOf(ITEM_ID_ADJUST_NONE))
+            put(GROUP_ID_FILTER, arrayListOf(ITEM_ID_FILTER_NONE))
+            put(GROUP_ID_EFFECT, arrayListOf(ITEM_ID_EFFECT_NONE))
+            put(GROUP_ID_STICKER, arrayListOf(ITEM_ID_STICKER_NONE))
+            put(GROUP_ID_VIRTUAL_BG, arrayListOf(ITEM_ID_VIRTUAL_BG_NONE))
         }
     }
 

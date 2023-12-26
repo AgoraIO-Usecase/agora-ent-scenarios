@@ -17,6 +17,8 @@
         android:name="android.permission.FOREGROUND_SERVICE"
         tools:node="remove" />
 
+    <uses-sdk tools:overrideLibrary="com.sensetime.hardwarebuffer" />
+
     <application
         android:name="io.agora.scene.base.component.AgoraApplication"
         android:allowBackup="false"

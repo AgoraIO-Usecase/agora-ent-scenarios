@@ -4,15 +4,17 @@
 //
 
 #import "VLMicSeatCell.h"
-#import "VLRoomSeatModel.h"
 #import "VLMacroDefine.h"
 #import "AgoraEntScenarios-Swift.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import YYCategories;
 
 @interface VLMicSeatCell()
 
 //@property (nonatomic, strong) AgoraRtcChannelMediaOptions *mediaOption;
+@property (nonatomic, strong) CALayer *waveLayer1;
+@property (nonatomic, strong) CALayer *waveLayer2;
+@property (nonatomic, assign) BOOL isAnimating;
 
 @end
 
@@ -25,13 +27,41 @@
     }
     return self;
 }
+
+- (CALayer *)waveLayer1 {
+    if(!_waveLayer1) {
+        _waveLayer1 = [self createWaveLayer];
+    }
+    return _waveLayer1;
+}
+
+- (CALayer *)waveLayer2 {
+    if(!_waveLayer2) {
+        _waveLayer2 = [self createWaveLayer];
+    }
+    return _waveLayer2;
+}
+
+- (CALayer *)createWaveLayer {
+    CALayer *layer = [CALayer layer];
+    layer.frame = CGRectMake(0, 0, VLREALVALUE_WIDTH(54),  VLREALVALUE_WIDTH(54));
+    layer.backgroundColor = [UIColor colorWithHexString:@"#75ADFF"].CGColor;
+    layer.cornerRadius = VLREALVALUE_WIDTH(54) * 0.5;
+    layer.hidden = YES;
+    return layer;
+}
+
 #pragma mark - Intial Methods
 - (void)setupView {
+    
+    [self.contentView.layer addSublayer:self.waveLayer2];
+    [self.contentView.layer addSublayer:self.waveLayer1];
     
     self.avatarImgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, VLREALVALUE_WIDTH(54),  VLREALVALUE_WIDTH(54))];
     self.avatarImgView.layer.cornerRadius = VLREALVALUE_WIDTH(54)*0.5;
     self.avatarImgView.layer.masksToBounds = YES;
     self.avatarImgView.userInteractionEnabled = YES;
+    self.avatarImgView.contentMode = UIViewContentModeScaleAspectFill;
     [self.contentView addSubview:self.avatarImgView];
     
     self.videoView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, VLREALVALUE_WIDTH(54), VLREALVALUE_WIDTH(54))];
@@ -71,7 +101,7 @@
     
     self.singingBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.singingBtn setImage:[UIImage sceneImageWithName:@"ktv_seatsinging_icon"] forState:UIControlStateNormal];
-    [self.singingBtn setTitle:KTVLocalizedString(@"主唱") forState:UIControlStateNormal];
+    [self.singingBtn setTitle:KTVLocalizedString(@"ktv_zc") forState:UIControlStateNormal];
     self.singingBtn.frame = CGRectMake((self.width-36)*0.5, self.nickNameLabel.bottom+2, 36, 12);
     self.singingBtn.layer.cornerRadius = 6;
     self.singingBtn.layer.masksToBounds = YES;
@@ -88,7 +118,7 @@
     
     self.joinChorusBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.joinChorusBtn setImage:[UIImage sceneImageWithName:@"ic_hc"] forState:UIControlStateNormal];
-    [self.joinChorusBtn setTitle:KTVLocalizedString(@"合唱") forState:UIControlStateNormal];
+    [self.joinChorusBtn setTitle:KTVLocalizedString(@"ktv_hc") forState:UIControlStateNormal];
     self.joinChorusBtn.frame = CGRectMake((self.width-36)*0.5, self.nickNameLabel.bottom+2, 36, 12);
     self.joinChorusBtn.layer.cornerRadius = 6;
     self.joinChorusBtn.layer.masksToBounds = YES;
@@ -101,8 +131,64 @@
     self.joinChorusBtn.backgroundColor = UIColorMakeWithRGBA(0, 0, 0, 0.5);
     self.joinChorusBtn.alpha = 0.6;
     [self.contentView addSubview:self.joinChorusBtn];
+}
+
+
+- (void)startAnimation {
+    if(_isAnimating) {
+        return;
+    }
+    _isAnimating = YES;
+    self.waveLayer1.hidden = NO;
+    self.waveLayer2.hidden = NO;
+    CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"transform.scale"];
+    animation.values = @[@1,@1.1,@1];
+    animation.keyTimes = @[@0.0,@0.5,@1];
+    
+    CAKeyframeAnimation *alphaAnimation = [CAKeyframeAnimation animationWithKeyPath:@"opacity"];
+    alphaAnimation.values = @[@1,@0.5,@0.3];
+    alphaAnimation.keyTimes = @[@0.0,@0.5,@1];
+    
+    CAAnimationGroup *groupAnimation = [CAAnimationGroup animation];
+    groupAnimation.animations = @[animation,alphaAnimation];
+//    groupAnimation.autoreverses = YES;
+    groupAnimation.repeatCount = MAXFLOAT;
+    groupAnimation.duration = 1.4;
+    [self.waveLayer1 addAnimation:groupAnimation forKey:nil];
     
     
+    CAKeyframeAnimation *animation2 = [CAKeyframeAnimation animationWithKeyPath:@"transform.scale"];
+    animation2.values = @[@1,@1.4];
+    animation2.keyTimes = @[@0.0,@1];
+    
+    CAKeyframeAnimation *alphaAnimation2 = [CAKeyframeAnimation animationWithKeyPath:@"opacity"];
+    alphaAnimation2.values = @[@0.6,@0.3,@0];
+    alphaAnimation2.keyTimes = @[@0.0,@0.5,@1];
+    
+    CAAnimationGroup *groupAnimation2 = [CAAnimationGroup animation];
+    groupAnimation2.animations = @[animation2,alphaAnimation2];
+//    groupAnimation.autoreverses = YES;
+    groupAnimation2.repeatCount = MAXFLOAT;
+    groupAnimation2.duration = 1.4;
+    [self.waveLayer2 addAnimation:groupAnimation2 forKey:nil];
+    
+}
+
+-(void)stopAnimation{
+    _isAnimating = NO;
+    [self.waveLayer1 removeAllAnimations];
+    [self.waveLayer2 removeAllAnimations];
+    self.waveLayer1.hidden = YES;
+    self.waveLayer2.hidden = YES;
+}
+
+- (void)setVolume:(NSInteger)volume {
+    _volume = volume;
+    if(_volume > 0) {
+        [self startAnimation];
+    }else{
+        [self stopAnimation];
+    }
 }
 
 @end

@@ -33,7 +33,13 @@ class ShowBeautySettingVC: UIViewController {
     var selectedItem: ((_ item: String)->())?
     var dismissed: (()->())?
     
-    private var slider: UISlider!
+    private lazy var slider: UISlider = {
+        let slider = UISlider()
+        slider.minimumTrackTintColor = .show_zi03
+        slider.maximumTrackTintColor = .show_slider_tint
+        slider.addTarget(self, action: #selector(onTapSliderHandler(sender:)), for: .valueChanged)
+        return slider
+    }()
     private let titles = ShowBeautyFaceVCType.allCases.filter({
         if BeautyModel.beautyType == .byte {
             return $0 != .adjust
@@ -60,7 +66,7 @@ class ShowBeautySettingVC: UIViewController {
         }
         compareButton.addTarget(self, action: #selector(didClickCompareButton(sender:)), for: .touchUpInside)
         compareButton.backgroundColor = UIColor(hex: "#000000", alpha: 0.25)
-        compareButton.isSelected = true
+        compareButton.isSelected = BeautyManager.shareManager.isEnableBeauty
         compareButton.cornerRadius(18)
         return compareButton
     }()
@@ -105,9 +111,7 @@ class ShowBeautySettingVC: UIViewController {
         segmentedView.indicators = [self.indicator]
         return segmentedView
     }()
-    
-    private lazy var agoraKitManager = ShowAgoraKitManager()
-    
+        
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         modalPresentationStyle = .overCurrentContext
@@ -120,7 +124,7 @@ class ShowBeautySettingVC: UIViewController {
 
     private var beautyFaceVC: ShowBeautyFaceVC? {
         didSet {
-            beautyFaceVC?.selectedItemClosure = { [weak self] value, isHiddenValue, isShowSegSwitch in
+            beautyFaceVC?.selectedItemClosure = { [weak self] min, max, value, isHiddenValue, isShowSegSwitch in
                 guard let self = self else { return }
                 self.slider.isHidden = isShowSegSwitch ? !ShowAgoraKitManager.isOpenGreen : isHiddenValue
                 self.compareButton.isHidden = isShowSegSwitch ? true : isHiddenValue
@@ -128,6 +132,8 @@ class ShowBeautySettingVC: UIViewController {
                 self.segSwitch.isOn = isShowSegSwitch == false ? ShowAgoraKitManager.isOpenGreen : self.segSwitch.isOn
                 self.segLabel.isHidden = !isShowSegSwitch
                 self.slider.setValue(Float(value), animated: true)
+                self.slider.minimumValue = min
+                self.slider.maximumValue = max
             }
             beautyFaceVC?.reloadData()
         }
@@ -143,10 +149,6 @@ class ShowBeautySettingVC: UIViewController {
         view.backgroundColor = .clear
         
         // slider
-        slider = UISlider()
-        slider.minimumTrackTintColor = .show_zi03
-        slider.maximumTrackTintColor = .show_slider_tint
-        slider.addTarget(self, action: #selector(onTapSliderHandler(sender:)), for: .valueChanged)
         view.addSubview(slider)
         slider.snp.makeConstraints { make in
             make.left.equalTo(22)
@@ -215,12 +217,12 @@ class ShowBeautySettingVC: UIViewController {
             ShowAgoraKitManager.isOpenGreen = isOn
             slider.isHidden = !isOn
             if ShowAgoraKitManager.isBlur {
-                agoraKitManager.enableVirtualBackground(isOn: true,
-                                                        greenCapacity: slider.value)
+                ShowAgoraKitManager.shared.enableVirtualBackground(isOn: true,
+                                                                   greenCapacity: slider.value)
             } else {
-                agoraKitManager.seVirtualtBackgoundImage(imagePath: "show_live_mritual_bg",
-                                                         isOn: true,
-                                                         greenCapacity: slider.value)
+                ShowAgoraKitManager.shared.seVirtualtBackgoundImage(imagePath: "show_live_mritual_bg",
+                                                                    isOn: true,
+                                                                    greenCapacity: slider.value)
             }
         }
         if sender.isOn == true {
@@ -244,8 +246,13 @@ extension ShowBeautySettingVC {
     
     // 点击对比按钮
     @objc private func didClickCompareButton(sender: UIButton){
-        sender.isSelected = !sender.isSelected
-        BeautyManager.shareManager.isEnableBeauty = sender.isSelected
+        if let _ = Bundle.main.path(forResource: "SENSEME.lic", ofType: nil) {
+            // 存在美颜证书
+            sender.isSelected = !sender.isSelected
+            BeautyManager.shareManager.isEnableBeauty = sender.isSelected
+        } else {
+            ToastView.show(text: "show_beauty_license_disable".show_localized)
+        }
     }
 }
 

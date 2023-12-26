@@ -15,6 +15,7 @@ import java.util.Map;
 import io.agora.scene.voice.spatial.R;
 import io.agora.scene.voice.spatial.model.VoiceMemberModel;
 import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter;
+import io.agora.voice.common.utils.ImageTools;
 import io.agora.voice.common.utils.LogTools;
 
 public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemberModel> {
@@ -37,15 +38,7 @@ public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemb
 
         @Override
         public void setData(VoiceMemberModel item, int position) {
-            int resId = 0;
-            try {
-                resId = mContext.getResources().getIdentifier(item.getPortrait(), "drawable", mContext.getPackageName());
-            }catch (Exception e){
-                LogTools.e("getResources()", e.getMessage());
-            }
-            if (resId != 0){
-                avatar.setImageResource(resId);
-            }
+            ImageTools.loadImage(avatar, item.getPortrait());
             name.setText(item.getNickName());
             action.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -55,11 +48,11 @@ public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemb
                 }
             });
             if (checkMap.containsKey(item.getUserId())){
-                action.setText(mContext.getString(R.string.voice_room_invited));
+                action.setText(mContext.getString(R.string.voice_spatial_room_invited));
                 action.setBackgroundResource(R.drawable.voice_bg_rect_radius20_grey);
                 action.setEnabled(false);
             }else {
-                action.setText(mContext.getString(R.string.voice_room_invite));
+                action.setText(mContext.getString(R.string.voice_spatial_room_invite));
                 action.setBackgroundResource(R.drawable.voice_bg_rect_radius20_gradient_blue);
                 action.setEnabled(true);
             }

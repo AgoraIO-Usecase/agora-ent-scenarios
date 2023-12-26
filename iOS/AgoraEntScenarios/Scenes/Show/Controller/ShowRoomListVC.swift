@@ -6,28 +6,67 @@
 //
 
 import UIKit
-
-private let kAudienceShowPresetType = "kAudienceShowPresetType"
+import VideoLoaderAPI
 
 class ShowRoomListVC: UIViewController {
-
-    private var roomListView: ShowRoomListView!
-    private var roomList: [ShowRoomListModel]?
+    let backgroundView = UIImageView()
     
-    // 自定义导航栏
+    private lazy var delegateHandler = {
+        let handler = ShowCollectionLoadingDelegateHandler(localUid: UInt(UserInfo.userId)!)
+//        handler.didSelected = {[weak self] room in
+//            self?.joinRoom(room)
+//        }
+        return handler
+    }()
+    
+    private let collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
+        let itemWidth = (Screen.width - 15 - 20 * 2) * 0.5
+        layout.itemSize = CGSize(width: itemWidth, height: itemWidth)
+        return UICollectionView(frame: .zero, collectionViewLayout: layout)
+    }()
+        
+    private lazy var refreshControl: UIRefreshControl = {
+        let ctrl = UIRefreshControl()
+        ctrl.addTarget(self, action: #selector(refreshControlValueChanged), for: .valueChanged)
+        return ctrl
+    }()
+    
+    private let emptyView = ShowEmptyView()
+    
+    private let createButton = UIButton(type: .custom)
+    
+    private var roomList = [ShowRoomListModel]() {
+        didSet {
+            delegateHandler.roomList = AGRoomArray(roomList: roomList)
+            collectionView.reloadData()
+            emptyView.isHidden = roomList.count > 0
+        }
+    }
+    
     private let naviBar = ShowNavigationBar()
     
     private var needUpdateAudiencePresetType = false
     
     deinit {
         AppContext.unloadShowServiceImp()
+        ShowAgoraKitManager.shared.destoryEngine()
         showLogger.info("deinit-- ShowRoomListVC")
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        hidesBottomBarWhenPushed = true
         showLogger.info("init-- ShowRoomListVC")
+        VideoLoaderApiImpl.shared.printClosure = { msg in
+            showLogger.info(msg, context: "VideoLoaderApi")
+        }
+        VideoLoaderApiImpl.shared.warningClosure = { msg in
+            showLogger.warning(msg, context: "VideoLoaderApi")
+        }
+        VideoLoaderApiImpl.shared.errorClosure = { msg in
+            showLogger.error(msg, context: "VideoLoaderApi")
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -36,102 +75,22 @@ class ShowRoomListVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setUpUI()
-        setUpNaviBar()
-//        addRefresh()
-    }
-    
-    @objc private func didClickSettingButton(){
-        if AppContext.shared.isDebugMode {
-            showDebugSetVC()
-        }else {
-            showPresettingVC {[weak self] type in
-                let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
-                let audencePresetType = ShowPresetType(rawValue: value)
-                if audencePresetType != .unknown {
-                    UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
-                }
-                self?.needUpdateAudiencePresetType = true
-            }
-        }
+        AppContext.shared.sceneImageBundleName = "showResource"
+        createViews()
+        createConstrains()
+        ShowAgoraKitManager.shared.prepareEngine()
+        ShowRobotService.shared.startCloudPlayers()
+        preGenerateToken()
+        checkDevice()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        getRoomList()
+        fetchRoomList()
     }
     
-    private func setUpUI(){
-        // 背景图
-        let bgView = UIImageView()
-        bgView.image = UIImage.show_sceneImage(name: "show_list_Bg")
-        view.addSubview(bgView)
-        bgView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        
-        roomListView = ShowRoomListView()
-        roomListView.clickCreateButtonAction = { [weak self] in
-            self?.createRoom()
-        }
-        roomListView.joinRoomAction = { [weak self] room in
-            guard let wSelf = self else { return }
-            let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
-            let audencePresetType = ShowPresetType(rawValue: value)
-            // 如果是owner是自己 或者已经设置过观众模式
-            if AppContext.shared.isDebugMode == false {
-                if room.ownerId == VLUserCenter.user.id || audencePresetType != .unknown {
-                    wSelf.joinRoom(room)
-                }else{
-                    wSelf.showPresettingVC { [weak self] type in
-                        self?.needUpdateAudiencePresetType = true
-                        UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
-                        self?.joinRoom(room)
-                    }
-                }
-            }else {
-                wSelf.joinRoom(room)
-            }
-        }
-        roomListView.refreshValueChanged = { [weak self] in
-            self?.getRoomList()
-        }
-        
-        view.addSubview(roomListView)
-        roomListView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-    }
-    
-    private func showDebugSetVC(){
-        let vc = ShowDebugSettingVC()
-        vc.isBroadcastor = false
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    private func showPresettingVC(selected:((_ type: ShowPresetType)->())? = nil) {
-        let vc = ShowPresettingVC()
-        vc.isBroadcaster = false
-        vc.didSelectedPresetType = { type, modeName in
-            selected?(type)
-        }
-//        let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
-//        let audencePresetType = ShowPresetType(rawValue: value)
-//        vc.selectedType = audencePresetType
-        present(vc, animated: true)
-    }
-    
-    private func setUpNaviBar() {
-        navigationController?.isNavigationBarHidden = true
-        naviBar.title = "navi_title_show_live".show_localized
-        view.addSubview(naviBar)
-        let saveButtonItem = ShowBarButtonItem(title: "room_list_audience_setting".show_localized, target: self, action: #selector(didClickSettingButton))
-        naviBar.rightItems = [saveButtonItem]
-    }
-    
-    // 创建房间
-    private func createRoom(){
+    @objc private func didClickCreateButton(){
         let preVC = ShowCreateLiveVC()
         let preNC = UINavigationController(rootViewController: preVC)
         preNC.navigationBar.setBackgroundImage(UIImage(), for: .default)
@@ -139,44 +98,149 @@ class ShowRoomListVC: UIViewController {
         present(preNC, animated: true)
     }
     
-    // 加入房间
+    @objc private func refreshControlValueChanged() {
+        self.fetchRoomList()
+    }
+    
+    private func checkDevice() {
+        let score = ShowAgoraKitManager.shared.engine?.queryDeviceScore() ?? 0
+        if (score < 85) {// (0, 85)
+            ShowAgoraKitManager.shared.deviceLevel = .low
+        } else if (score < 90) {// [85, 90)
+            ShowAgoraKitManager.shared.deviceLevel = .medium
+        } else {// (> 90)
+            ShowAgoraKitManager.shared.deviceLevel = .high
+        }
+        ShowAgoraKitManager.shared.deviceScore = Int(score)
+   }
+    
     private func joinRoom(_ room: ShowRoomListModel){
-        let vc = ShowLivePagesViewController()
-        let audencePresetType = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
-        vc.audiencePresetType = ShowPresetType(rawValue: audencePresetType)
-        vc.needUpdateAudiencePresetType = needUpdateAudiencePresetType
-        let nc = UINavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .fullScreen
+        ShowAgoraKitManager.shared.setupAudienceProfile()
+        ShowAgoraKitManager.shared.updateLoadingType(roomId: room.roomId, channelId: room.roomId, playState: .joinedWithAudioVideo)
+        
         if room.ownerId == VLUserCenter.user.id {
-            AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, model in
-                if let error = error {
-                    ToastView.show(text: error.localizedDescription)
-                    return
-                }
-                vc.roomList = [room]
-                vc.focusIndex = 0
-                self?.present(nc, animated: true)
-            }
+            ToastView.show(text: "show_join_own_room_error".show_localized)
         } else {
-            vc.roomList = roomList?.filter({ $0.ownerId != VLUserCenter.user.id })
+            let vc = ShowLivePagesViewController()
+            let nc = UINavigationController(rootViewController: vc)
+            nc.modalPresentationStyle = .fullScreen
+            vc.roomList = roomList.filter({ $0.ownerId != VLUserCenter.user.id })
             vc.focusIndex = vc.roomList?.firstIndex(where: { $0.roomId == room.roomId }) ?? 0
             self.present(nc, animated: true)
         }
     }
     
-    private func getRoomList() {
-        AppContext.showServiceImp("").getRoomList(page: 1) { [weak self] error, roomList in
-            guard let self = self else {return}
-//            self.roomListView.collectionView.mj_header?.endRefreshing()
-            self.roomListView.endRefrshing()
+    private func fetchRoomList() {
+        AppContext.showServiceImp("")?.getRoomList(page: 1) { [weak self] error, roomList in
+            self?.refreshControl.endRefreshing()
+            guard let self = self, let roomList = roomList else {return}
             if let error = error {
-                ToastView.show(text: error.localizedDescription)
+                showLogger.error(error.localizedDescription)
                 return
             }
-            let list = roomList ?? []
-            self.roomListView.roomList = list
-            self.roomList = list
+            self.roomList = roomList
+        }
+    }
+
+    private func preGenerateToken() {
+        AppContext.shared.rtcToken = nil
+        NetworkManager.shared.generateToken(
+            channelName: "",
+            uid: "\(UserInfo.userId)",
+            tokenType: .token007,
+            type: .rtc,
+            expire: 24 * 60 * 60
+        ) {[weak self] token in
+            guard let self = self, let rtcToken = token, rtcToken.count > 0 else {
+                return
+            }
+            AppContext.shared.rtcToken = rtcToken
+            self.delegateHandler.preLoadVisibleItems(scrollView: self.collectionView)
+        }
+    }
+}
+// MARK: - UICollectionView Call Back
+extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return roomList.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell: ShowRoomListCell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(ShowRoomListCell.self), for: indexPath) as! ShowRoomListCell
+        let room = roomList[indexPath.item]
+        cell.setBgImge("\(indexPath.item % 5)",
+                       name: room.roomName,
+                       id: room.roomId,
+                       count: room.roomUserCount,
+                       avatarUrl: room.ownerAvatar,
+                       isPrivate: false)
+        cell.ag_addPreloadTap(roomInfo: room, localUid: delegateHandler.localUid) {[weak self] state in
+            if AppContext.shared.rtcToken?.count ?? 0 == 0 {
+                if state == .began {
+                    self?.preGenerateToken()
+                } else if state == .ended {
+                    ToastView.show(text: "Token is not exit, try again!")
+                }
+                return false
+            }
+            
+            return true
+        } completion: { [weak self] in
+            self?.joinRoom(room)
+        }
+
+        return cell
+    }
+}
+
+// MARK: - Creations
+extension ShowRoomListVC {
+    private func createViews(){
+        backgroundView.image = UIImage.show_sceneImage(name: "show_list_Bg")
+        view.addSubview(backgroundView)
+        
+        collectionView.backgroundColor = .clear
+        collectionView.register(ShowRoomListCell.self, forCellWithReuseIdentifier: NSStringFromClass(ShowRoomListCell.self))
+        collectionView.delegate = delegateHandler
+        collectionView.dataSource = self
+        collectionView.refreshControl = self.refreshControl
+        view.addSubview(collectionView)
+        
+        emptyView.isHidden = true
+        collectionView.addSubview(emptyView)
+        
+        createButton.setBackgroundImage(UIImage.show_sceneImage(name: "show_create_add_bg"), for: .normal)
+        createButton.addTarget(self, action: #selector(didClickCreateButton), for: .touchUpInside)
+        view.addSubview(createButton)
+        
+        navigationController?.isNavigationBarHidden = true
+        naviBar.title = "navi_title_show_live".show_localized
+        view.addSubview(naviBar)
+    }
+    
+    func createConstrains() {
+        backgroundView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        collectionView.snp.makeConstraints { make in
+            make.edges.equalTo(UIEdgeInsets(top:  Screen.safeAreaTopHeight() + 54, left: 0, bottom: 0, right: 0))
+        }
+        emptyView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.equalTo(156)
+        }
+        createButton.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.bottom.equalToSuperview().offset(-max(Screen.safeAreaBottomHeight(), 10))
         }
     }
 }
 
+class ShowCollectionLoadingDelegateHandler: AGCollectionLoadingDelegateHandler {
+    var didSelected: ((ShowRoomListModel) -> Void)?
+    
+    open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let item = roomList?[indexPath.row] as? ShowRoomListModel else {return}
+        didSelected?(item)
+    }
+}

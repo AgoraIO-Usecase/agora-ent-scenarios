@@ -2,9 +2,11 @@ package io.agora.scene.voice.ui
 
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentTransaction
 import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
 import io.agora.scene.voice.R
@@ -25,6 +27,8 @@ import io.agora.scene.voice.ui.dialog.*
 import io.agora.scene.voice.ui.dialog.common.CommonFragmentAlertDialog
 import io.agora.scene.voice.ui.dialog.common.CommonFragmentContentDialog
 import io.agora.scene.voice.ui.dialog.common.CommonSheetAlertDialog
+import io.agora.scene.voice.ui.dialog.soundcard.SoundCardSettingDialog
+import io.agora.scene.voice.ui.dialog.soundcard.SoundPresetTypeDialog
 import io.agora.scene.voice.ui.widget.mic.IRoomMicView
 import io.agora.scene.voice.ui.widget.primary.ChatPrimaryMenuView
 import io.agora.scene.voice.ui.widget.top.IRoomLiveTopView
@@ -88,6 +92,14 @@ class RoomObservableViewDelegate constructor(
 
                 override fun onError(code: Int, message: String?) {
                     ToastTools.show(activity, activity.getString(R.string.voice_chatroom_notice_posted_error))
+                }
+            })
+        }
+        roomLivingViewModel.bgmInfoObservable().observe(activity) { response: Resource<VoiceBgmModel> ->
+            parseResource(response, object : OnResourceParseCallback<VoiceBgmModel>() {
+                override fun onSuccess(data: VoiceBgmModel?) {
+                }
+                override fun onError(code: Int, message: String?) {
                 }
             })
         }
@@ -391,7 +403,10 @@ class RoomObservableViewDelegate constructor(
         }
         val isOn = (localUserMicInfo?.member?.micStatus == 1 &&
                 localUserMicInfo?.micStatus == MicStatus.Normal)
-        chatPrimaryMenuView.showMicVisible(localUserIndex() >= 0, isOn)
+        val onStage = localUserIndex() >= 0
+        chatPrimaryMenuView.showMicVisible(onStage, isOn)
+        AgoraRtcEngineController.get().earBackManager()?.setForbidden(!onStage)
+        AgoraRtcEngineController.get().soundCardManager()?.setForbidden(!onStage)
     }
 
     /**
@@ -481,11 +496,15 @@ class RoomObservableViewDelegate constructor(
                 override fun onAGC(isOn: Boolean, isEnable: Boolean) {
                     onAIAGCDialog(isOn)
                 }
-
-                override fun onVoiceChanger(mode: Int, isEnable: Boolean) {
-                    onVoiceChangerDialog(mode)
+                override fun onEarBackSetting() {
+                    onEarBackSettingDialog()
                 }
-
+                override fun onVirtualSoundCardSetting() {
+                    onVirtualSoundCardSettingDialog()
+                }
+                override fun onBGMSetting() {
+                    onBGMSettingDialog()
+                }
                 override fun onBotCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
                     roomLivingViewModel.enableRobot(isChecked)
                 }
@@ -497,13 +516,7 @@ class RoomObservableViewDelegate constructor(
                 override fun onSoundEffect(soundSelectionType: Int, isEnable: Boolean) {
                     onSoundSelectionDialog(soundSelectionType, finishBack)
                 }
-
-                override fun onSpatialAudio(isOpen: Boolean, isEnable: Boolean) {
-                    onSpatialDialog()
-                }
-
             }
-
         roomAudioSettingDialog?.show(activity.supportFragmentManager, "mtAudioSettings")
     }
 
@@ -633,33 +646,52 @@ class RoomObservableViewDelegate constructor(
         dialog.onClickCheckBox = { isOn ->
             AgoraRtcEngineController.get().setAIAGCOn(isOn)
             VoiceBuddyFactory.get().rtcChannelTemp.isAIAGCOn = isOn
-            roomAudioSettingDialog?.apply {
-                audioSettingsInfo.isAIAGCOn = isOn
-                updateAIAGCView()
-            }
+            roomAudioSettingDialog?.audioSettingsInfo?.isAIAGCOn = isOn
+            roomAudioSettingDialog?.updateAIAGCView()
         }
         dialog.show(activity.supportFragmentManager, "mtAIAGC")
     }
-    /**
-     * 变声器弹框
+    /** 耳返设置弹框
      */
-    fun onVoiceChangerDialog(mode: Int) {
-
-    }
-    /**
-     * 空间音频弹框
-     */
-    fun onSpatialDialog() {
-        val spatialAudioSheetDialog = RoomSpatialAudioSheetDialog().apply {
-            arguments = Bundle().apply {
-                putBoolean(RoomSpatialAudioSheetDialog.KEY_SPATIAL_OPEN, false)
-                putBoolean(RoomSpatialAudioSheetDialog.KEY_IS_ENABLED, roomKitBean.isOwner)
-            }
+    fun onEarBackSettingDialog() {
+        if (AgoraRtcEngineController.get().earBackManager()?.params?.isForbidden == true) {
+            ToastTools.showTips(activity, activity.getString(R.string.voice_chatroom_settings_earback_forbidden_toast))
+            return
         }
-
-        spatialAudioSheetDialog.show(activity.supportFragmentManager, "mtSpatialAudio")
+        val dialog = RoomEarBackSettingSheetDialog()
+        dialog.setFragmentManager(activity.supportFragmentManager)
+        dialog.setOnEarBackStateChange {
+            roomAudioSettingDialog?.updateEarBackState()
+        }
+        dialog.show(activity.supportFragmentManager, "mtBGMSetting")
     }
-
+    /** 虚拟声卡设置弹框
+     */
+    fun onVirtualSoundCardSettingDialog() {
+        if (AgoraRtcEngineController.get().soundCardManager()?.isForbidden() == true) {
+            ToastTools.showTips(activity, activity.getString(R.string.voice_settings_sound_card_forbidden_toast))
+            return
+        }
+        val dialog = SoundCardSettingDialog()
+        dialog.onClickSoundCardType = {
+            val preset = SoundPresetTypeDialog()
+            preset.show(activity.supportFragmentManager, SoundPresetTypeDialog.TAG)
+        }
+        dialog.onSoundCardStateChange = {
+            roomAudioSettingDialog?.updateSoundCardState()
+        }
+        dialog.show(activity.supportFragmentManager, SoundCardSettingDialog.TAG)
+    }
+    /** 背景音乐设置弹框
+     */
+    fun onBGMSettingDialog() {
+        if (!roomKitBean.isOwner) {
+            ToastTools.showTips(activity, activity.getString(R.string.voice_chatroom_only_host_bgm))
+            return
+        }
+        val dialog = RoomBGMSettingSheetDialog()
+        dialog.show(activity.supportFragmentManager, "mtBGMSetting")
+    }
     /**
      * 退出房间
      */
@@ -678,6 +710,7 @@ class RoomObservableViewDelegate constructor(
      * 超时退出房间
      */
     fun onTimeUpExitRoom(content: String, finishBack: () -> Unit) {
+        if (activity.isFinishing) { return }
         CommonFragmentContentDialog().contentText(content)
             .setOnClickListener(object : CommonFragmentContentDialog.OnClickBottomListener {
                 override fun onConfirmClick() {
@@ -1057,6 +1090,13 @@ class RoomObservableViewDelegate constructor(
                     }
                 }
             }
+        } else if(attributeMap.containsKey("room_bgm")) {
+            Log.d(TAG, "room bgm info ${attributeMap["room_bgm"]}")
+            val bgmInfo = GsonTools.toBean(attributeMap["room_bgm"], VoiceBgmModel::class.java)
+            val song = bgmInfo?.songName ?: ""
+            val singer = bgmInfo?.singerName ?: ""
+            val isOrigin = bgmInfo?.isOrigin ?: false
+            AgoraRtcEngineController.get().bgmManager().remoteUpdateBGMInfo(song, singer, isOrigin)
         } else {
             // mic
             val micInfoMap = mutableMapOf<String, VoiceMicInfoModel>()
@@ -1115,7 +1155,10 @@ class RoomObservableViewDelegate constructor(
         iRoomMicView.onSeatUpdated(newMicMap)
         val isOn = (localUserMicInfo?.member?.micStatus == 1 &&
                 localUserMicInfo?.micStatus == MicStatus.Normal)
-        chatPrimaryMenuView.showMicVisible(localUserIndex() >= 0, isOn)
+        val onStage = localUserIndex() >= 0
+        chatPrimaryMenuView.showMicVisible(onStage, isOn)
+        AgoraRtcEngineController.get().earBackManager()?.setForbidden(!onStage)
+        AgoraRtcEngineController.get().soundCardManager()?.setForbidden(!onStage)
         if (roomKitBean.isOwner) {
             val handsCheckMap = mutableMapOf<Int, String>()
             newMicMap.forEach { (t, u) ->

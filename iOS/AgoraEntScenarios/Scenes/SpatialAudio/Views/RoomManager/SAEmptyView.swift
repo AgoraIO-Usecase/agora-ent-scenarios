@@ -9,14 +9,15 @@ import UIKit
 import ZSwiftBaseLib
 
 public class SAEmptyView: UIView {
-    var emptyImage = UIImage.sceneImage(name:"empty")
+    var emptyImage = UIImage.sceneImage(name:"sa_img_msg_empty")
 
-    lazy var image: UIImageView = .init(frame: CGRect(x: 90, y: 60, width: self.frame.width - 180, height: (231 / 397.0) * (self.frame.width - 180))).contentMode(.scaleAspectFit).image(self.emptyImage!)
+    lazy var imageView: UIImageView = .init(frame: .zero).contentMode(.scaleAspectFit).image(self.emptyImage!)
 
-    lazy var text: UILabel = .init(frame: CGRect(x: 20, y: self.image.frame.maxY + 10, width: self.frame.width - 40, height: 60)).textAlignment(.center).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x979CBB)).numberOfLines(0)
+    lazy var textLabel: UILabel = .init(frame: .zero).textAlignment(.center).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x979CBB)).numberOfLines(0)
 
     override public init(frame: CGRect) {
         super.init(frame: frame)
+        self.backgroundColor = .clear
     }
 
     convenience init(frame: CGRect, title: String, image: UIImage?) {
@@ -24,12 +25,69 @@ public class SAEmptyView: UIView {
         if image != nil {
             emptyImage = image!
         }
-        addSubViews([self.image, text])
-        text.text = title.localized()
+        addSubview(imageView)
+        textLabel.text = title.spatial_localized()
+        addSubview(textLabel)
+        createConstrains()
     }
 
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func createConstrains() {
+        imageView.snp.makeConstraints { make in
+            make.top.equalToSuperview().priority(999)
+            make.center.equalToSuperview()
+        }
+        textLabel.snp.makeConstraints { make in
+            make.top.equalTo(imageView.snp.bottom)
+            make.left.equalTo(20)
+            make.right.equalTo(-20)
+            make.height.greaterThanOrEqualTo(20)
+            make.bottom.equalToSuperview().priority(999)
+        }
+    }
+}
+
+public class SARoomListEmptyView: UIView {
+    var emptyImage = UIImage.sceneImage(name:"empty")
+
+    lazy var imageView: UIImageView = .init(frame: .zero).contentMode(.scaleAspectFit).image(self.emptyImage!)
+
+    lazy var textLabel: UILabel = .init(frame: .zero).textAlignment(.center).font(.systemFont(ofSize: 14, weight: .regular)).textColor(UIColor(0x979CBB)).numberOfLines(0)
+
+    override public init(frame: CGRect) {
+        super.init(frame: frame)
+        self.backgroundColor = .clear
+    }
+
+    convenience init(frame: CGRect, title: String, image: UIImage?) {
+        self.init(frame: frame)
+        if image != nil {
+            emptyImage = image!
+        }
+        addSubview(imageView)
+        textLabel.text = title.spatial_localized()
+        addSubview(textLabel)
+        createConstrains()
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func createConstrains() {
+        imageView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.centerY.equalToSuperview().multipliedBy(0.3)
+        }
+        textLabel.snp.makeConstraints { make in
+            make.top.equalTo(imageView.snp.bottom)
+            make.left.equalTo(20)
+            make.right.equalTo(-20)
+        }
     }
 }

@@ -41,7 +41,7 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         emptyView = layoutInflater.inflate(R.layout.voice_spatial_no_data_layout, container, false)
         val textView = emptyView?.findViewById<TextView>(R.id.content_item)
-        textView?.text = getString(R.string.voice_empty_invite_hands)
+        textView?.text = getString(R.string.voice_spatial_empty_invite_hands)
         val params = LinearLayoutCompat.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.MATCH_PARENT
@@ -114,7 +114,14 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
                     "invitation mic：$data".logD()
                     if (data != true) return
                     activity?.let {
-                        ToastTools.show(it, getString(R.string.voice_room_invited))
+                        ToastTools.show(it, getString(R.string.voice_spatial_room_invited))
+                    }
+                }
+
+                override fun onError(code: Int, message: String?) {
+                    super.onError(code, message)
+                    activity?.let {
+                        ToastTools.show(it, getString(R.string.voice_spatial_room_invitation_fail))
                     }
                 }
             })

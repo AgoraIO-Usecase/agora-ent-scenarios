@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import io.agora.scene.base.component.BaseFragment
+import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLiveLinkRequestMessageListBinding
 import io.agora.scene.show.service.ShowInteractionInfo
 import io.agora.scene.show.service.ShowInteractionStatus
@@ -13,10 +14,10 @@ import io.agora.scene.show.service.ShowMicSeatApply
 import io.agora.scene.show.service.ShowRoomRequestStatus
 
 class LiveLinkRequestFragment : BaseFragment() {
-    private var mBinding : ShowLiveLinkRequestMessageListBinding? = null
+    private var mBinding: ShowLiveLinkRequestMessageListBinding? = null
     private val binding get() = mBinding!!
-    private val linkRequestViewAdapter : LiveLinkRequestViewAdapter = LiveLinkRequestViewAdapter()
-    private var mListener : Listener? = null
+    private val linkRequestViewAdapter: LiveLinkRequestViewAdapter = LiveLinkRequestViewAdapter()
+    private var mListener: Listener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +63,7 @@ class LiveLinkRequestFragment : BaseFragment() {
         } else if (status == ShowInteractionStatus.onSeat.value) {
             binding.textLinking.isVisible = true
             binding.iBtnStopLink.isVisible = true
-            binding.textLinking.text = "与观众 $userName 连麦中"
+            binding.textLinking.text = getString(R.string.show_link_to, userName)
         }
     }
 
@@ -96,13 +97,15 @@ class LiveLinkRequestFragment : BaseFragment() {
             for (i in 0 until itemCount) {
                 linkRequestViewAdapter.getItem(i)?.let {
                     if (it.userId == seatApply.userId) {
-                        linkRequestViewAdapter.replace(i, ShowMicSeatApply(
-                            it.userId,
-                            it.avatar,
-                            it.userName,
-                            seatApply.status,
-                            it.createAt
-                        ))
+                        linkRequestViewAdapter.replace(
+                            i, ShowMicSeatApply(
+                                it.userId,
+                                it.avatar,
+                                it.userName,
+                                seatApply.status,
+                                it.createAt
+                            )
+                        )
                         linkRequestViewAdapter.notifyItemChanged(i)
                         return
                     }
@@ -111,7 +114,7 @@ class LiveLinkRequestFragment : BaseFragment() {
         }
     }
 
-    fun setListener(listener : Listener) {
+    fun setListener(listener: Listener) {
         mListener = listener
     }
 
@@ -125,7 +128,7 @@ class LiveLinkRequestFragment : BaseFragment() {
         if (status == ShowInteractionStatus.onSeat.value) {
             binding.textLinking.isVisible = true
             binding.iBtnStopLink.isVisible = true
-            binding.textLinking.text = "与观众 $userName 连麦中"
+            binding.textLinking.text = getString(R.string.show_link_to, userName)
         } else if (status == null) {
             binding.iBtnStopLink.isVisible = false
             binding.textLinking.isVisible = false

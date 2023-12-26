@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/bg_app_def_white">
+
+    <LinearLayout
+        android:id="@+id/layoutAgree"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="24dp"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/cvIAgree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:button="@drawable/bg_cb_check_status_def"
+            android:text="@string/app_login_i_agree"
+            android:textColor="@color/def_text_grey_979"
+            android:checked="true"
+            android:textSize="12sp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvUserAgreement"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="@string/app_login_user_agreement"
+            android:textColor="@color/blue_2e"
+            android:textSize="12sp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvAnd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="@string/app_login_agreement_and"
+            android:textColor="@color/def_text_grey_979"
+            android:textSize="12sp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvPrivacyAgreement"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="@string/app_login_privacy_agreement"
+            android:textColor="@color/blue_2e"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/btnLogin"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:paddingHorizontal="15dp"
+        app:layout_constraintBottom_toTopOf="@id/layoutAgree"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/app_def_btn_bg_left" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="@string/app_login_phone_login"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:paddingBottom="12dp"
+            android:background="@drawable/app_def_btn_bg_middle" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/app_def_btn_bg_right" />
+    </LinearLayout>
+<!--    <androidx.appcompat.widget.AppCompatImageView-->
+<!--        android:id="@+id/btnLogin"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginHorizontal="18dp"-->
+<!--        android:layout_marginBottom="15dp"-->
+<!--        android:background="@drawable/app_def_btn_bg"-->
+<!--        android:text=""-->
+<!--        android:textColor="@color/white"-->
+<!--        android:textSize="18sp"-->
+<!--        android:textStyle="bold"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/layoutAgree" />-->
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvAgreementTips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:paddingVertical="10dp"
+        android:paddingHorizontal="20dp"
+        android:layout_marginBottom="12dp"
+        android:visibility="gone"
+        android:background="@drawable/app_bg_login_agreement_tip"
+        android:text="@string/app_agreement_the_user_agreement_and_privacy_policy"
+        app:layout_constraintBottom_toTopOf="@id/btnLogin"/>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vpGuide"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingVertical="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/dotIndicator"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <com.agora.entfulldemo.widget.FadeDotsIndicator
+        android:id="@+id/dotIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/btnLogin"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

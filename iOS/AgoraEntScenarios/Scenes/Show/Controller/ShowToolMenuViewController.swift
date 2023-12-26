@@ -9,7 +9,6 @@ import UIKit
 
 protocol ShowToolMenuViewControllerDelegate: NSObjectProtocol {
     func onClickCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool)
-    func onClickHDButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool)
     func onClickEndPkButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool)
     func onClickMicButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool)
     func onClickMuteMicButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool)
@@ -73,9 +72,6 @@ class ShowToolMenuViewController: UIViewController {
             switch modelType {
             case .camera:
                 self.delegate?.onClickCameraButtonSelected(self, isSelected)
-                break
-            case .HD:
-                self.delegate?.onClickHDButtonSelected(self, isSelected)
                 break
             case .end_pk:
                 self.dismiss(animated: true)

@@ -44,42 +44,33 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         binding = VoiceViewRoomLiveTopBinding.bind(root)
         binding.ivChatroomBack.setOnClickListener(this)
         binding.llChatroomMemberRank.setOnClickListener(this)
-        binding.mtChatroomMembers.setOnClickListener(this)
-        binding.mtChatroomNotice.setOnClickListener(this)
-        binding.mtChatroomAgoraSound.setOnClickListener(this)
-        binding.mtChatroomWatch.setOnClickListener(this)
+        binding.vRoomInfo.setOnClickListener(this)
+        binding.tvRoomNotice.setOnClickListener(this)
+        binding.tvRoomType.setOnClickListener(this)
+        binding.tvClickCount.setOnClickListener(this)
         binding.ivChatroomMore.setOnClickListener(this)
-
-    }
-
-    fun setTitleMaxWidth() {
-        val layoutParams: ViewGroup.LayoutParams = binding.llTitle.layoutParams
-        layoutParams.width = DeviceTools.getDisplaySize().width - 220.dp.toInt()
-        binding.llTitle.layoutParams = layoutParams
+        binding.tvBGM.setOnClickListener(this)
+        binding.ivBGM.setOnClickListener(this)
     }
 
     override fun onChatroomInfo(voiceRoomModel: VoiceRoomModel) {
         this.roomDetailInfo = voiceRoomModel
         binding.apply {
-            mtChatroomOwnerName.text = roomDetailInfo.owner?.nickName
-            mtChatroomName.text = roomDetailInfo.roomName
-            val memberText = roomDetailInfo.memberCount.number2K()
-            mtChatroomMembers.text = memberText
-            val giftText = roomDetailInfo.giftAmount.number2K()
-            mtChatroomGifts.text = giftText
-            val watchText = roomDetailInfo.clickCount.number2K()
-            mtChatroomWatch.text = watchText
+            tvRoomName.text = roomDetailInfo.roomName
+            tvOnLineCount.text = resources.getString(R.string.voice_room_online_count, roomDetailInfo.memberCount)
+            mtChatroomGifts.text = roomDetailInfo.giftAmount.toString()
+            tvClickCount.text = resources.getString(R.string.voice_room_click_count, roomDetailInfo.clickCount)
             // 普通房间显示 最佳音效
             if (roomDetailInfo.roomType == ConfigConstants.RoomType.Common_Chatroom) {
-                mtChatroomAgoraSound.isVisible = true
-                mtChatroomAgoraSound.text = when (roomDetailInfo.soundEffect) {
+                tvRoomType.isVisible = true
+                tvRoomType.text = when (roomDetailInfo.soundEffect) {
                     ConfigConstants.SoundSelection.Karaoke -> root.context.getString(R.string.voice_chatroom_karaoke)
                     ConfigConstants.SoundSelection.Gaming_Buddy -> root.context.getString(R.string.voice_chatroom_gaming_buddy)
                     ConfigConstants.SoundSelection.Professional_Broadcaster -> root.context.getString(R.string.voice_chatroom_professional_broadcaster)
                     else -> root.context.getString(R.string.voice_chatroom_social_chat)
                 }
             } else {
-                mtChatroomAgoraSound.isVisible = false
+                tvRoomType.isVisible = false
             }
 
             // 房主头像
@@ -146,8 +137,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         if (count < 0) return
         if (this::roomDetailInfo.isInitialized) {
             roomDetailInfo.memberCount = count
-            val text = roomDetailInfo.memberCount.number2K()
-            binding.mtChatroomMembers.text = text
+            binding.tvOnLineCount.text = resources.getString(R.string.voice_room_online_count, roomDetailInfo.memberCount)
         }
     }
 
@@ -156,8 +146,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         if (count < 0) return
         if (this::roomDetailInfo.isInitialized) {
             roomDetailInfo.clickCount = count
-            val text = roomDetailInfo.clickCount.number2K()
-            binding.mtChatroomWatch.text = text
+            binding.tvClickCount.text = resources.getString(R.string.voice_room_click_count, roomDetailInfo.clickCount)
         }
     }
 
@@ -171,20 +160,40 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         }
     }
 
+    override fun updateBGMContent(content: String?, isSingerOn: Boolean) {
+        if (content != null) {
+            binding.ivBGM.visibility = View.VISIBLE
+            binding.tvBGM.visibility = View.VISIBLE
+            binding.tvBGM.text = content
+            if (isSingerOn) {
+                binding.ivBGM.setImageResource(R.drawable.voice_icon_room_bgm_on)
+            } else {
+                binding.ivBGM.setImageResource(R.drawable.voice_icon_room_bgm_off)
+            }
+        } else {
+            binding.ivBGM.visibility = View.INVISIBLE
+            binding.tvBGM.visibility = View.INVISIBLE
+            binding.tvBGM.text = ""
+        }
+    }
+
     override fun onClick(v: View?) {
         when (v?.id) {
             // 返回
             binding.ivChatroomBack.id -> onLiveTopClickListener?.onClickBack(v)
             // 公告
-            binding.mtChatroomNotice.id -> onLiveTopClickListener?.onClickNotice(v)
+            binding.tvRoomNotice.id -> onLiveTopClickListener?.onClickNotice(v)
             //音效
-            binding.mtChatroomAgoraSound.id -> onLiveTopClickListener?.onClickSoundSocial(v)
+            binding.tvRoomType.id -> onLiveTopClickListener?.onClickSoundSocial(v)
             // 排行榜
             binding.llChatroomMemberRank.id -> onLiveTopClickListener?.onClickRank(v, 0)
             // 成员列表
-            binding.mtChatroomMembers.id -> onLiveTopClickListener?.onClickRank(v, 1)
+            binding.vRoomInfo.id -> onLiveTopClickListener?.onClickRank(v, 1)
             // 更多
             binding.ivChatroomMore.id -> onLiveTopClickListener?.onClickMore(v)
+            // bgm
+            binding.tvBGM.id -> onLiveTopClickListener?.onClickBGM(v)
+            binding.ivBGM.id -> onLiveTopClickListener?.onClickBGMSinger(v)
         }
     }
 }

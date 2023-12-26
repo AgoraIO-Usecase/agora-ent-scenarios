@@ -15,7 +15,7 @@ public final class VoiceRoomAudiencesViewController: UITableViewController {
     
     var kickClosure: ((VRUser?,VRRoomMic?) -> ())?
 
-    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "No audience yet", image: nil)
+    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 84, width: ScreenWidth, height: 360), title: "voice_no_audience_yet", image: nil)
 
     override public func viewDidLoad() {
         super.viewDidLoad()
@@ -86,9 +86,10 @@ extension VoiceRoomAudiencesViewController {
                 }
                 if index > 0 {
                     changeMic.member = nil
+                    changeMic.status = -1
                     VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(index)":changeMic.kj.JSONString()], completion: { error in
                         if error == nil {
-                            if self.kickClosure != nil  {
+                            if self.kickClosure != nil {
                                 self.kickClosure!(user,changeMic)
                             }
                             self.removeUserFromUserList(user: user)
@@ -99,7 +100,7 @@ extension VoiceRoomAudiencesViewController {
                 } else {
                     self.removeUserFromUserList(user: user)
                     if self.kickClosure != nil  {
-                        self.kickClosure!(user,nil)
+                        self.kickClosure!(user, nil)
                     }
                 }
             }

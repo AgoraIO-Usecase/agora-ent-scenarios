@@ -4,7 +4,7 @@
 //
 
 #import "BaseNavigationController.h"
-#import "BaseViewController.h"
+#import "VLBaseViewController.h"
 
 @interface BaseNavigationController ()
 
@@ -47,7 +47,7 @@
         viewController.hidesBottomBarWhenPushed = NO;
     }
     
-    if (![viewController isKindOfClass:[BaseViewController class]]) {
+    if (![viewController isKindOfClass:[VLBaseViewController class]]) {
         [super pushViewController:viewController animated:animated];
         return;
     }

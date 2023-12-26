@@ -14,4 +14,6 @@ interface IRoomLiveTopView {
     fun onUpdateWatchCount(count: Int){}
 
     fun onUpdateGiftCount(count: Int){}
+
+    fun updateBGMContent(content: String?, isSingerOn: Boolean)
 }

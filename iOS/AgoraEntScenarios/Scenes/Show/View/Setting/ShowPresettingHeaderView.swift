@@ -24,13 +24,6 @@ class ShowPresettingHeaderView: UITableViewHeaderFooterView {
         return label
     }()
     
-    private lazy var iconImgView: UIImageView = {
-        let imgView = UIImageView()
-        imgView.image = UIImage.show_sceneImage(name: "show_preset_douyin")
-        imgView.isHidden = true
-        return imgView
-    }()
-    
     private lazy var bgImgView: UIImageView = {
         let imgView = UIImageView()
         imgView.backgroundColor = .show_preset_bg
@@ -45,12 +38,7 @@ class ShowPresettingHeaderView: UITableViewHeaderFooterView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-//        bgImgView.setRoundingCorners([.topLeft,.topRight], radius: 16)
-    }
-    
+
     
     private func createSubviews(){
         
@@ -68,12 +56,6 @@ class ShowPresettingHeaderView: UITableViewHeaderFooterView {
             make.top.equalTo(35)
         }
         
-        contentView.addSubview(iconImgView)
-        iconImgView.snp.makeConstraints { make in
-            make.centerY.equalTo(titleLabel)
-            make.right.equalTo(-40)
-        }
-        
         contentView.addSubview(descLabel)
         descLabel.snp.makeConstraints { make in
             make.left.equalTo(40)
@@ -83,9 +65,8 @@ class ShowPresettingHeaderView: UITableViewHeaderFooterView {
         }
     }
     
-    func setTitle(_ title: String, desc: String, type: ShowPresetStandardType) {
+    func setTitle(_ title: String, desc: String) {
         titleLabel.text = title
         descLabel.text = desc
-        iconImgView.image = type.image
     }
 }

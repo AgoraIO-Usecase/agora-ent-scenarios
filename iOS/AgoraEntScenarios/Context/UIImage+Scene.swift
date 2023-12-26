@@ -56,7 +56,7 @@ extension UIImage {
                 return image
             }
         }
-        assertionFailure("image path(\(pureName) == nil")
+//        assertionFailure("image path(\(pureName) == nil")
 //        print("image path(\(pureName)) == nil")
         return nil
     }

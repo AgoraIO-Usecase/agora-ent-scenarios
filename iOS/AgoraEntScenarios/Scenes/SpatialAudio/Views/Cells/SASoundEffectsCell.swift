@@ -23,7 +23,7 @@ public class SASoundEffectsCell: UITableViewCell, UICollectionViewDelegate, UICo
 
     lazy var line: UIView = .init(frame: CGRect(x: 20, y: self.effectDesc.frame.maxY + 6, width: self.effectDesc.frame.width, height: 1)).backgroundColor(UIColor(0xF6F6F6))
 
-    lazy var customUsage: UILabel = .init(frame: CGRect(x: 20, y: self.effectDesc.frame.maxY + 10, width: 200, height: 15)).font(.systemFont(ofSize: 11, weight: .regular)).textColor(UIColor(0xD8D8D8)).text(sceneLocalized( "Current Customer Usage"))
+    lazy var customUsage: UILabel = .init(frame: CGRect(x: 20, y: self.effectDesc.frame.maxY + 10, width: 200, height: 15)).font(.systemFont(ofSize: 11, weight: .regular)).textColor(UIColor(0xD8D8D8)).text("spatial_voice_current_customer_usage".spatial_localized())
 
     lazy var flowLayout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
@@ -35,7 +35,7 @@ public class SASoundEffectsCell: UITableViewCell, UICollectionViewDelegate, UICo
 
     lazy var iconList: UICollectionView = .init(frame: CGRect(x: 20, y: self.customUsage.frame.maxY + 5, width: self.effectName.frame.width, height: 20), collectionViewLayout: self.flowLayout).delegate(self).dataSource(self).registerCell(SAIconCell.self, forCellReuseIdentifier: "VRIconCell").showsVerticalScrollIndicator(false).showsHorizontalScrollIndicator(false).isUserInteractionEnabled(false).backgroundColor(.white)
 
-    lazy var chooseSymbol: UIImageView = .init(frame: CGRect(x: self.background.frame.width - 32, y: self.frame.height - 31, width: 32, height: 31)).image(UIImage("dan-check")!).contentMode(.scaleAspectFit)
+    lazy var chooseSymbol: UIImageView = .init(frame: CGRect(x: self.background.frame.width - 32, y: self.frame.height - 31, width: 32, height: 31)).image(UIImage.sceneImage(name: "dan-check", bundleName: "VoiceChatRoomResource")!).contentMode(.scaleAspectFit)
 
     override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -61,7 +61,27 @@ extension SASoundEffectsCell {
     static func items() -> [SARoomMenuBarEntity] {
         var items = [SARoomMenuBarEntity]()
         do {
-            for dic in [["title": sceneLocalized( "Social Chat"), "detail": sceneLocalized( "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat."), "selected": true, "index": 0, "soundType": 1], ["title": sceneLocalized( "Karaoke"), "detail": sceneLocalized( "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful."), "selected": false, "index": 1, "soundType": 2], ["title": sceneLocalized( "Gaming Buddy"), "detail": sceneLocalized( "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. "), "selected": false, "index": 2, "soundType": 3], ["title": sceneLocalized( "Professional Podcaster"), "detail": sceneLocalized( "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. "), "selected": false, "index": 3, "soundType": 4]] {
+            for dic in [["title": "spatial_voice_chatroom_social_chat_introduce".spatial_localized(),
+                         "selected": true,
+                         "index": 0,
+                         "soundType": 1],
+                        ["title": "spatial_voice_karaoke".spatial_localized(),
+                         "detail": "spatial_voice_chatroom_karaoke_introduce".spatial_localized(),
+                         "selected": false,
+                         "index": 1,
+                         "soundType": 2],
+                        ["title": "spatial_voice_gaming_buddy".spatial_localized(),
+                         "detail": "spatial_voice_chatroom_gaming_buddy_introduce".spatial_localized(),
+                         "selected": false,
+                         "index": 2,
+                         "soundType": 3],
+                        ["title": "spatial_voice_professional_podcaster".spatial_localized(),
+                         "detail": "spatial_voice_chatroom_professional_broadcaster_introduce".spatial_localized(),
+                         "selected":
+                            false,
+                         "index": 3,
+                         "soundType": 4]]
+            {
                 let data = try JSONSerialization.data(withJSONObject: dic, options: [])
                 let item = try JSONDecoder().decode(SARoomMenuBarEntity.self, from: data)
                 items.append(item)
@@ -78,7 +98,7 @@ extension SASoundEffectsCell {
 
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "VRIconCell", for: indexPath) as? SAIconCell
-        cell?.imageView.image = UIImage(images[entity?.index ?? 0][indexPath.row])
+        cell?.imageView.image = UIImage.spatial_image(images[entity?.index ?? 0][indexPath.row])
         return cell ?? UICollectionViewCell()
     }
 

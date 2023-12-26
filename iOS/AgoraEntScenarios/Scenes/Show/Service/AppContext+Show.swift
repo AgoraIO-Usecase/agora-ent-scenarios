@@ -12,17 +12,23 @@ let showLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig(sceneName: "Sho
 
 private let kShowRoomListKey = "kShowRoomListKey"
 private let kRtcTokenMapKey = "kRtcTokenMapKey"
+private let kRtcToken = "kRtcToken"
 private let kDebugModeKey = "kDebugModeKey"
 
 extension AppContext {
     static private var _showServiceImpMap: [String: ShowSyncManagerServiceImp] = [String: ShowSyncManagerServiceImp]()
-    
-    static func showServiceImp(_ roomId: String) -> ShowServiceProtocol {
+    static func showServiceImp(_ roomId: String) -> ShowServiceProtocol? {
         let showServiceImp = _showServiceImpMap[roomId]
         guard let showServiceImp = showServiceImp else {
-            let imp = roomId.count == 6 ? ShowSyncManagerServiceImp() : ShowRobotSyncManagerServiceImp()
-            _showServiceImpMap[roomId] = imp
-            return imp
+            var serviceImp: ShowServiceProtocol? = _showServiceImpMap[roomId]
+            if let imp = serviceImp {return imp}
+            if roomId.count == 6 {
+                serviceImp = ShowSyncManagerServiceImp()
+            } else {
+                serviceImp = ShowRobotSyncManagerServiceImp()
+            }
+            _showServiceImpMap[roomId] = serviceImp as? ShowSyncManagerServiceImp
+            return serviceImp!
         }
         return showServiceImp
     }
@@ -45,23 +51,13 @@ extension AppContext {
         }
     }
     
-    public var rtcTokenMap: [String: String]? {
+    public var rtcToken: String? {
         set {
-            self.extDic[kRtcTokenMapKey] = newValue
+            self.extDic[kRtcToken] = newValue
         }
         get {
-            return self.extDic[kRtcTokenMapKey] as? [String: String]
+            return self.extDic[kRtcToken] as? String
         }
     }
-    
-//    @objc public var isDebugMode: Bool{
-//        set{
-//            UserDefaults.standard.set(newValue, forKey: kDebugModeKey)
-//        }
-//        
-//        get {
-//            return UserDefaults.standard.bool(forKey: kDebugModeKey)
-//        }
-//    }
 }
 

@@ -2,15 +2,16 @@ apply from: 'config.gradle'
 buildscript {
     ext.kotlin_version = "1.6.0"
     repositories {
-        maven { url 'https://repo1.maven.org/maven2/' }
-        maven { url 'https://www.jitpack.io' }
         mavenCentral()
         google()
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://www.jitpack.io' }
 
         maven { url 'https://maven.aliyun.com/repository/central' }
         maven { url 'https://maven.aliyun.com/repository/google' }
         maven { url 'https://maven.aliyun.com/repository/jcenter' }
         maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        maven { url 'https://developer.huawei.com/repo/' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.1.2'

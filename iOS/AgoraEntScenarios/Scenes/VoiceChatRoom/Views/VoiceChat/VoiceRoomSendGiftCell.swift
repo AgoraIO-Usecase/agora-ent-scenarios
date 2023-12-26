@@ -41,9 +41,9 @@ public class VoiceRoomSendGiftCell: UICollectionViewCell {
 
     func refresh(item: VoiceRoomGiftEntity?) {
         self.contentView.isHidden = (item == nil)
-        icon.image = UIImage(item?.gift_id ?? "")
+        icon.image = UIImage.voice_image(item?.gift_id ?? "")
         name.text = item?.gift_name
-        displayValue.set(image: UIImage("dollagora"), title: item?.gift_price ?? "100", titlePosition: .right, additionalSpacing: 5, state: .normal)
+        displayValue.set(image: UIImage.sceneImage(name:"dollagora", bundleName: "VoiceChatRoomResource"), title: item?.gift_price ?? "100", titlePosition: .right, additionalSpacing: 5, state: .normal)
         cover.isHidden = !(item?.selected ?? false)
         cover.frame = CGRect(x: 0, y: 5, width: contentView.frame.width, height: contentView.frame.height - 5)
         icon.frame = CGRect(x: contentView.frame.width / 2.0 - 24, y: 16.5, width: 48, height: 48)

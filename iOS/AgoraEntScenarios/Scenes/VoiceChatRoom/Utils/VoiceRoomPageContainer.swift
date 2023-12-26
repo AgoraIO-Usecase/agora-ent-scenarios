@@ -46,11 +46,23 @@ public class VoiceRoomPageContainer: UIView, UIPageViewControllerDataSource, UIP
         pageController.view.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
         pageController.view.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
         pageController.view.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        
+        // 禁用默认的滑动手势
+        for view in pageController.view.subviews {
+            if let subView = view as? UIScrollView {
+                subView.isScrollEnabled = false
+            }
+        }
     }
 
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    // 重写手势识别方法，返回false以禁止滑动手势
+    public override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return false
     }
 }
 

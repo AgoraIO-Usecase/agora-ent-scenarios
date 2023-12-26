@@ -4,12 +4,14 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+
 import io.agora.scene.base.GlideApp;
+import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvItemChooseSongListBinding;
 import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
 /**
  * The holder of Item ChooseSong
@@ -30,7 +32,7 @@ abstract class SongChooseViewAdapter extends BindingSingleAdapter<SongItem, KtvI
         GlideApp.with(binding.coverItemSongList).load(data.imageUrl)
                 .fallback(R.mipmap.ktv_ic_song_default)
                 .error(R.mipmap.ktv_ic_song_default)
-                .transform(new CenterCropRoundCornerTransform(10))
+                .transform(new RoundedCorners(UiUtil.dp2px(10)))
                 .into(binding.coverItemSongList);
         if (data.isChosen) {
             binding.btnItemSongList.setEnabled(false);

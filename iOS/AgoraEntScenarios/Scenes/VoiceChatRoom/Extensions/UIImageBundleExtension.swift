@@ -9,11 +9,13 @@ import Foundation
 import UIKit
 
 public extension UIImage {
-    convenience init?(_ bundleResourceName: String) {
+    
+    static func voice_image(_ named: String) -> UIImage? {
         if #available(iOS 13.0, *) {
-            self.init(named: bundleResourceName, in: Bundle.voiceRoomBundle, with: nil)
+            return self.init(named: named, in: Bundle.voiceRoomBundle, with: nil)
         } else {
-            self.init(named: bundleResourceName, in: Bundle.voiceRoomBundle, compatibleWith: nil)
+            return self.init(named: named, in: Bundle.voiceRoomBundle, compatibleWith: nil)
         }
     }
+
 }

@@ -20,7 +20,7 @@ public class VoiceRoomGiftCell: UITableViewCell {
 
     lazy var giftName: UILabel = .init(frame: CGRect(x: self.avatar.frame.maxX + 6, y: self.userName.frame.maxY, width: self.frame.width / 5.0 * 2 - 12, height: 15)).font(.systemFont(ofSize: 12, weight: .regular)).textColor(.white)
 
-    lazy var giftIcon: UIImageView = .init(frame: CGRect(x: self.frame.width / 5.0 * 3, y: 0, width: self.frame.width / 5.0, height: self.contentView.frame.height)).contentMode(.scaleAspectFit).image(UIImage("heart")!)
+    lazy var giftIcon: UIImageView = .init(frame: CGRect(x: self.frame.width / 5.0 * 3, y: 0, width: self.frame.width / 5.0, height: self.contentView.frame.height)).contentMode(.scaleAspectFit).image(UIImage.sceneImage(name: "heart", bundleName: "VoiceChatRoomResource")!)
 
     lazy var giftNumbers: UILabel = .init(frame: CGRect(x: self.frame.width / 5.0 * 4 + 8, y: 10, width: self.frame.width / 5.0 - 16, height: self.frame.height - 20)).font(.init(name: "RobotoNembersVF", size: 16)).textColor(.white)
 
@@ -55,8 +55,8 @@ public class VoiceRoomGiftCell: UITableViewCell {
         }
         avatar.sd_setImage(with: URL(string: item.portrait ?? "")!, placeholderImage: UIImage(named: "mine_avatar_placeHolder"))
         userName.text = gift?.userName ?? ""
-        giftName.text = "Sent ".localized() + (gift?.gift_name ?? "")
-        giftIcon.image = UIImage("\(gift?.gift_id ?? "")")
+        giftName.text = "voice_sent".voice_localized() + (gift?.gift_name ?? "")
+        giftIcon.image = UIImage.sceneImage(name: "\(gift?.gift_id ?? "")", bundleName: "VoiceChatRoomResource")
         giftNumbers.text = "X \(gift?.gift_count ?? "1")"
     }
 }

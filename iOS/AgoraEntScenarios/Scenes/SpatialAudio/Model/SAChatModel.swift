@@ -17,9 +17,9 @@ import ZSwiftBaseLib
         (self.userName ?? "") + (self.content ?? "")
     }
 
-    lazy var height: CGFloat? = UILabel(frame: CGRect(x: 0, y: 0, width: chatViewWidth - 54, height: 15~)).backgroundColor(.clear).numberOfLines(0).lineBreakMode(.byWordWrapping).attributedText(self.attributeContent).sizeThatFits(CGSize(width: chatViewWidth - 54, height: 9999)).height + 26
+    lazy var height: CGFloat? = UILabel(frame: CGRect(x: 0, y: 0, width: chatViewWidth - 54, height: 15)).backgroundColor(.clear).numberOfLines(0).lineBreakMode(.byWordWrapping).attributedText(self.attributeContent).sizeThatFits(CGSize(width: chatViewWidth - 54, height: 9999)).height + 26
 
-    lazy var width: CGFloat? = UILabel(frame: CGRect(x: 0, y: 0, width: chatViewWidth - 54, height: 15~)).backgroundColor(.clear).numberOfLines(0).lineBreakMode(.byWordWrapping).attributedText(self.attributeContent).sizeThatFits(CGSize(width: chatViewWidth - 54, height: 9999)).width
+    lazy var width: CGFloat? = UILabel(frame: CGRect(x: 0, y: 0, width: chatViewWidth - 54, height: 15)).backgroundColor(.clear).numberOfLines(0).lineBreakMode(.byWordWrapping).attributedText(self.attributeContent).sizeThatFits(CGSize(width: chatViewWidth - 54, height: 9999)).width
 
     lazy var attributeContent: NSAttributedString? = self.renderAttributeText()
 }
@@ -28,7 +28,7 @@ extension SAChatEntity {
     func renderAttributeText() -> NSAttributedString {
         if joined! == false {
             let attachment = NSTextAttachment()
-            attachment.image = UIImage("fangzhu")
+            attachment.image = UIImage.sceneImage(name: "fangzhu", bundleName: "VoiceChatRoomResource")
             attachment.bounds = CGRect(x: 0, y: -1.5, width: 14, height: 14)
             let host = NSMutableAttributedString(attachment: attachment)
             host.append(NSAttributedString(string: " "))
@@ -51,12 +51,12 @@ extension SAChatEntity {
             return text
         } else {
             let attachment = NSTextAttachment()
-            attachment.image = UIImage("shaking_hand")
+            attachment.image = UIImage.sceneImage(name: "shaking_hand", bundleName: "VoiceChatRoomResource")
             attachment.bounds = CGRect(x: 0, y: -4.5, width: 18, height: 18)
             let attributeText = NSMutableAttributedString {
                 AttributedText(self.userName!).foregroundColor(Color(0x8BB3FF)).font(.systemFont(ofSize: 13, weight: .semibold)).lineSpacing(5)
                 Space()
-                AttributedText("Joined".localized()).foregroundColor(self.joined! == false ? Color.white : Color(0xFCF0B3)).font(.systemFont(ofSize: 13, weight: .semibold)).lineSpacing(5)
+                AttributedText("spatial_voice_joined".spatial_localized()).foregroundColor(self.joined! == false ? Color.white : Color(0xFCF0B3)).font(.systemFont(ofSize: 13, weight: .semibold)).lineSpacing(5)
                 Space()
             }
             attributeText.append(NSMutableAttributedString(attachment: attachment))

@@ -64,14 +64,12 @@ extension VoiceRoomViewController {
 
     // 下麦
     func leaveMic(with index: Int) {
-        chatBar.refresh(event: .mic, state: .selected, asCreator: false)
         ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: index) { error, mic in
             if error == nil,let mic = mic {
                 self.rtcView.updateUser(mic)
-                self.rtckit.setClientRole(role: .audience)
                 self.local_index = nil
                 self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: self.isOwner)
-                self.chatBar.refresh(event: .mic, state: .selected, asCreator: self.isOwner)
+                self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: self.isOwner)
             }
         }
         
@@ -84,6 +82,7 @@ extension VoiceRoomViewController {
             if error == nil,let mic = mic {
                 self.chatBar.refresh(event: .mic, state: .selected, asCreator: false)
                 self.rtckit.muteLocalAudioStream(mute: true)
+                self.rtckit.setClientRole(role: .audience)
                 self.rtcView.updateUser(mic)
             } else {
                 self.view.makeToast("\(error?.localizedDescription ?? "")",point: self.toastPoint, title: nil, image: nil, completion: nil)
@@ -99,7 +98,7 @@ extension VoiceRoomViewController {
          */
         if let mic = roomInfo?.mic_info?[index] {
             if mic.status == 2 && isOwner == false {
-                view.makeToast("Banned".localized())
+                view.makeToast("voice_banned".voice_localized())
                 return
             }
         }
@@ -109,6 +108,7 @@ extension VoiceRoomViewController {
                 if mic.member?.micStatus ?? 0 == 1 {
                     self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: false)
                 }
+                self.rtckit.setClientRole(role: .owner)
                 self.rtckit.muteLocalAudioStream(mute: false)
                 self.rtcView.updateUser(mic)
             }
@@ -119,7 +119,7 @@ extension VoiceRoomViewController {
     func changeMic(from: Int, to: Int) {
         if let mic: VRRoomMic = roomInfo?.mic_info?[to] {
             if mic.status == 3 || mic.status == 4 {
-                view.makeToast("Mic Closed".localized())
+                view.makeToast("voice_mic_closed".voice_localized())
                 return
             }
         }
@@ -141,8 +141,8 @@ extension VoiceRoomViewController {
 
 
     func showMuteView(with index: Int) {
-        let isHairScreen = SwiftyFitsize.isFullScreen
-        let muteView = VMMuteView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: isHairScreen ? 264~ : 264~ - 34))
+        let isHairScreen =  Screen.isFullScreen
+        let muteView = VMMuteView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: isHairScreen ? 264 : 264 - 34))
         guard let mic_info = roomInfo?.mic_info?[index] else { return }
         muteView.isOwner = isOwner
         muteView.micInfo = mic_info
@@ -156,7 +156,7 @@ extension VoiceRoomViewController {
                 self?.unmuteLocal(with: index)
             }
         }
-        let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: isHairScreen ? 264~ : 264~ - 34)), custom: muteView)
+        let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: isHairScreen ? 264 : 264 - 34)), custom: muteView)
         presentViewController(vc)
     }
 
@@ -180,7 +180,6 @@ extension VoiceRoomViewController {
             if error == nil,let mic = mic {
                 self.rtcView.updateUser(mic)
                 self.local_index = mic.mic_index
-                self.rtckit.setClientRole(role: .owner)
                 self.chatBar.refresh(event: .handsUp, state: .disable, asCreator: self.isOwner)
                 self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: self.isOwner)
                 self.rtckit.muteLocalAudioStream(mute: mic.status != 0)

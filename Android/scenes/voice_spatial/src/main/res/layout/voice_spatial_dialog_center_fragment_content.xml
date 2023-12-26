@@ -30,7 +30,7 @@
         style="@style/voice_chatroom_confirm_button_text_style"
         android:gravity="center"
         android:layout_marginTop="34dp"
-        android:text="@string/voice_room_confirm"
+        android:text="@string/voice_spatial_room_confirm"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

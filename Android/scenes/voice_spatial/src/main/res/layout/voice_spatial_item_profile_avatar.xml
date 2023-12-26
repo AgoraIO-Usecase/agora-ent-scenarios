@@ -14,7 +14,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
         android:src="@color/voice_main_color_009fff"
-        app:shapeAppearance="@style/voice_seat_roundStyle"
+        app:shapeAppearance="@style/ui_widget_roundStyle"
         android:layout_width="68dp"
         android:layout_height="68dp"/>
 
@@ -25,8 +25,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:0.5"
-        android:src="@drawable/avatar1"
-        app:shapeAppearance="@style/voice_seat_roundStyle"
+        android:src="@mipmap/default_user_avatar"
+        app:shapeAppearance="@style/ui_widget_roundStyle"
         android:layout_width="64dp"
         android:layout_height="64dp"/>
 

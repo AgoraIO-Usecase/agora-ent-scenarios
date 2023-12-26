@@ -18,7 +18,7 @@ public enum SAROLE_TYPE {
     case audience
 }
 
-let sa_giftMap = [["gift_id": "VoiceRoomGift1", "gift_name": sceneLocalized( "Sweet Heart"), "gift_price": "1", "gift_count": "1", "selected": true], ["gift_id": "VoiceRoomGift2", "gift_name": sceneLocalized( "Flower"), "gift_price": "5", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift3", "gift_name": sceneLocalized( "Crystal Box"), "gift_price": "10", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift4", "gift_name": sceneLocalized( "Super Agora"), "gift_price": "20", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift5", "gift_name": sceneLocalized( "Star"), "gift_price": "50", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift6", "gift_name": sceneLocalized( "Lollipop"), "gift_price": "100", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift7", "gift_name": sceneLocalized( "Diamond"), "gift_price": "500", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift8", "gift_name": sceneLocalized( "Crown"), "gift_price": "1000", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift9", "gift_name": sceneLocalized( "Rocket"), "gift_price": "1500", "gift_count": "1", "selected": false]]
+let sa_giftMap = [["gift_id": "VoiceRoomGift1", "gift_name": sceneLocalized( "spatial_voice_sweet_heart"), "gift_price": "1", "gift_count": "1", "selected": true], ["gift_id": "VoiceRoomGift2", "gift_name": sceneLocalized( "spatial_voice_flower"), "gift_price": "5", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift3", "gift_name": sceneLocalized( "spatial_voice_crystal_box"), "gift_price": "10", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift4", "gift_name": sceneLocalized( "spatial_voice_super_agora"), "gift_price": "20", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift5", "gift_name": sceneLocalized( "spatial_voice_star"), "gift_price": "50", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift6", "gift_name": sceneLocalized( "spatial_voice_lollipop"), "gift_price": "100", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift7", "gift_name": sceneLocalized( "spatial_voice_diamond"), "gift_price": "500", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift8", "gift_name": sceneLocalized( "spatial_voice_crown"), "gift_price": "1000", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift9", "gift_name": sceneLocalized( "spatial_voice_rocket"), "gift_price": "1500", "gift_count": "1", "selected": false]]
 
 fileprivate let ownerMic = ["index":0,"status":0,"member":["uid":SAUserInfo.shared.user?.uid ?? "","chat_uid":SAUserInfo.shared.user?.chat_uid ?? "","name":SAUserInfo.shared.user?.name ?? "","portrait":SAUserInfo.shared.user?.portrait ?? "","rtc_uid":SAUserInfo.shared.user?.rtc_uid ?? "","mic_index":0]] as [String : Any]
 
@@ -28,6 +28,8 @@ class SARoomViewController: SABaseViewController {
     override public var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
+    
+    weak var applyListVC: SAApplyUsersViewController?
 
     var headerView: SARoomHeaderView!
    // var rtcView: SANormalRtcView!
@@ -138,9 +140,9 @@ extension SARoomViewController {
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
         let _ = self.rtckit.joinVoicRoomWith(with: "\(channel_id)",token: VLUserCenter.user.agoraRTCToken, rtcUid: Int(rtcUid) ?? 0, type: self.vmType ) == 0
-        rtckit.initSpatialAudio(recvRange: 15)
+        rtckit.initSpatialAudio(recvRange: 20)
         // 收集APM全链路音频
-        rtckit.setAPMOn(isOn: true)
+        rtckit.setAPMOn(isOn: AppContext.shared.isApmOn)
     }
     
     func refreshRoomInfo() {
@@ -181,7 +183,17 @@ extension SARoomViewController {
         headerView.updateHeader(with: info.room)
         guard let mics = roomInfo?.mic_info else { return }
         roomInfo?.room?.member_list = AppContext.saTmpServiceImp().userList
-        onRobotUpdate(robotInfo: info.robotInfo)
+        // robot state
+        if let mic_info = roomInfo?.mic_info,
+           mic_info.isEmpty == false,
+           let robotInfo = roomInfo?.robotInfo {
+            let red_mic: SARoomMic = mic_info[6]
+            let blue_mic: SARoomMic = mic_info[3]
+            red_mic.status = robotInfo.use_robot ? 5 : -2
+            blue_mic.status = robotInfo.use_robot ? 5 : -2
+            self.sRtcView.updateUser(blue_mic)
+            self.sRtcView.updateUser(red_mic)
+        }
         
         AppContext.saTmpServiceImp().mics = mics
         roomInfo?.room?.ranking_list = info.room?.ranking_list
@@ -210,10 +222,8 @@ extension SARoomViewController {
     }
 
     func layoutUI() {
-        SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
-
         let bgImgView = UIImageView()
-        bgImgView.image = UIImage("lbg")
+        bgImgView.image = UIImage.sceneImage(name: "bg-main", bundleName: "VoiceChatRoomResource")
         view.addSubview(bgImgView)
 
         headerView = SARoomHeaderView()
@@ -229,18 +239,18 @@ extension SARoomViewController {
             sRtcView.isHidden = entity.type == 0
             headerView.updateHeader(with: entity)
         }
-        sRtcView.clickBlock = {[weak self] type, tag in
-            self?.didRtcAction(with: type, tag: tag)
+        sRtcView.clickBlock = {[weak self] tag in
+            self?.didRtcAction(with: tag)
         }
 
         bgImgView.snp.makeConstraints { make in
             make.left.right.top.bottom.equalTo(view)
         }
 
-        let isHairScreen = SwiftyFitsize.isFullScreen
+        let isHairScreen =  Screen.isFullScreen
         headerView.snp.makeConstraints { make in
             make.left.top.right.equalTo(view)
-            make.height.equalTo(isHairScreen ? 140~ : 140~ - 25)
+            make.height.equalTo(isHairScreen ? 140 : 140 - 25)
         }
 
         sRtcView.snp.makeConstraints { make in
@@ -263,12 +273,12 @@ extension SARoomViewController {
 
     @objc
     private func onTapDebugButton() {
-        actionView.section(section: 1)
-            .row(row: 1)
+        actionView
             .title(title: "Dump数据类型")
-            .switchCell(iconName: "icons／set／jiqi", title: "APM全链路音频", isOn: true)
+            .switchCell(iconName: "icons／set／jiqi", title: "APM全链路音频", isOn: AppContext.shared.isApmOn)
             .config()
         actionView.didSwitchValueChangeClosure = { [weak self] _, isOn in
+            AppContext.shared.isApmOn = isOn
             self?.rtckit.setAPMOn(isOn: isOn)
         }
         actionView.show()
@@ -304,7 +314,7 @@ extension SARoomViewController {
         }
     }
 
-    func didRtcAction(with type: SABaseUserCellType, tag: Int) {
+    func didRtcAction(with tag: Int) {
         let index: Int = tag - 200
         //TODO: remove as!
         guard let mic: SARoomMic = AppContext.saTmpServiceImp().mics[safe:index] else { return }
@@ -357,7 +367,7 @@ extension SARoomViewController {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if isShowPreSentView {
             UIView.animate(withDuration: 0.5, animations: {
-                self.preView.frame = CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: 450~)
+                self.preView.frame = CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: 450)
             }) { _ in
                 if self.preView == nil {return}
                 self.preView.removeFromSuperview()
@@ -369,7 +379,7 @@ extension SARoomViewController {
         }
     }
 
-    func showNoticeView(with role: ROLE_TYPE) {
+    func showNoticeView(with role: SAROLE_TYPE) {
         let noticeView = SANoticeView(frame: CGRect(x: 0,
                                                     y: 0,
                                                     width: ScreenWidth,
@@ -396,16 +406,16 @@ extension SARoomViewController {
 
     func showActiveAlienView(_ active: Bool) {
         if !isOwner {
-            view.makeToast("Host Bot".localized())
+            view.makeToast("spatial_voice_host_bot".spatial_localized())
             return
         }
         let confirmView = SAConfirmView(frame: CGRect(x: 0,
                                                       y: 0,
-                                                      width: ScreenWidth - 40~,
-                                                      height: 220~),
+                                                      width: ScreenWidth - 40,
+                                                      height: 220),
                                         type: .addbot)
-        var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 40~,
-                                                                   height: 220~))
+        var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 40,
+                                                                   height: 220))
         compent.destination = .center
         let vc = SAAlertViewController(compent: compent, custom: confirmView)
         confirmView.resBlock = { [weak self] flag in
@@ -418,7 +428,7 @@ extension SARoomViewController {
 
     func activeAlien(_ flag: Bool) {
         if isOwner == false {
-            view.makeToast("Host Bot".localized())
+            view.makeToast("spatial_voice_host_bot".spatial_localized())
             return
         }
         guard let mic_blue: SARoomMic = roomInfo?.mic_info?[3] else { return }
@@ -448,10 +458,10 @@ extension SARoomViewController {
             guard let self = self else {return}
             if result {
                 // 如果返回的结果为true 表示上麦成功
-                self.view.makeToast("Notice Posted".localized())
+                self.view.makeToast("spatial_voice_notice_posted".spatial_localized())
                 self.roomInfo?.room?.announcement = str
             } else {
-                self.view.makeToast("Post Failed".localized())
+                self.view.makeToast("spatial_voice_post_failed".spatial_localized())
             }
         }
     }
@@ -489,7 +499,7 @@ extension SARoomViewController {
     func showEndLive() {
         var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 70, height: 190))
         compent.destination = .center
-        let micAlert = SAEndLiveAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 70, height: 190), title: sceneLocalized( "End Live"), content: sceneLocalized( "The room will close after you leave."), cancel: sceneLocalized( "Cancel"), confirm: sceneLocalized( "Confirm")).cornerRadius(16).backgroundColor(.white)
+        let micAlert = SAEndLiveAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 70, height: 190), title: "spatial_voice_end_live".spatial_localized(), content: "spatial_voice_the_room_will_close_after_you_leave.".spatial_localized(), cancel: "spatial_voice_cancel".spatial_localized(), confirm: "spatial_voice_confirm".spatial_localized()).cornerRadius(16).backgroundColor(.white)
         let vc = SAAlertViewController(compent: compent, custom: micAlert)
         micAlert.actionEvents = { [weak self] in
             vc.dismiss(animated: true)
@@ -515,7 +525,10 @@ extension SARoomViewController {
         dismiss(animated: false)
         var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 75, height: 200))
         compent.destination = .center
-        let micAlert = SAApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 75, height: 200), content: "Anchor Invited You On-Stage", cancel: "Decline", confirm: "Accept", position: .center).cornerRadius(16).backgroundColor(.white)
+        let micAlert = SAApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 75, height: 200), content: "spatial_voice_anchor_invited_you_on_stage".spatial_localized(),
+                                    cancel: "spatial_voice_decline".spatial_localized(),
+                                    confirm: "spatial_voice_accept".spatial_localized(),
+                                    position: .center).cornerRadius(16).backgroundColor(.white)
         let vc = SAAlertViewController(compent: compent, custom: micAlert)
         micAlert.actionEvents = { [weak self] in
             if $0 == 30 {
@@ -541,15 +554,15 @@ extension SARoomViewController {
         var detailStr: String = ""
         switch effect {
         case 1:
-            detailStr = "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat.".localized()
+            detailStr = "spatial_voice_chatroom_social_chat_introduce".spatial_localized()
         case 2:
-            detailStr = "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful.".localized()
+            detailStr = "spatial_voice_chatroom_karaoke_introduce".spatial_localized()
         case 3:
-            detailStr = "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. ".localized()
+            detailStr = "spatial_voice_chatroom_gaming_buddy_introduce".spatial_localized()
         default:
-            detailStr = "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. ".localized()
+            detailStr = "spatial_voice_chatroom_professional_broadcaster_introduce".spatial_localized()
         }
-        return textHeight(text: detailStr, fontSize: 13, width: self.view.bounds.size.width - 40~)
+        return textHeight(text: detailStr, fontSize: 13, width: self.view.bounds.size.width - 40)
     }
 }
 
@@ -589,7 +602,7 @@ extension SARoomViewController: SAManagerDelegate {
 //        self.didHeaderAction(with: .back, destroyed: true)
     }
 
-    func reportAlien(with type: SARtcType.ALIEN_TYPE, musicType: SARtcType.VMMUSIC_TYPE) {
+    func reportAlien(with type: SARtcType.ALIEN_TYPE) {
         print("musicPath:\(type.rawValue)")
         sRtcView.updateAlienMic(with: type)
     }

@@ -9,7 +9,7 @@ import UIKit
 import ZSwiftBaseLib
 
 public class VREmptyView: UIView {
-    var emptyImage = UIImage("empty")
+    var emptyImage = UIImage.sceneImage(name: "empty", bundleName: "VoiceChatRoomResource")
 
     lazy var image: UIImageView = .init(frame: CGRect(x: 90, y: 60, width: self.frame.width - 180, height: (231 / 397.0) * (self.frame.width - 180))).contentMode(.scaleAspectFit).image(self.emptyImage!)
 
@@ -17,6 +17,7 @@ public class VREmptyView: UIView {
 
     override public init(frame: CGRect) {
         super.init(frame: frame)
+        self.backgroundColor = .clear
     }
 
     convenience init(frame: CGRect, title: String, image: UIImage?) {
@@ -25,11 +26,24 @@ public class VREmptyView: UIView {
             emptyImage = image!
         }
         addSubViews([self.image, text])
-        text.text = title.localized()
+        text.text = title.voice_localized()
+        createConstrains()
     }
 
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func createConstrains() {
+        image.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.centerY.equalToSuperview().multipliedBy(0.3)
+        }
+        text.snp.makeConstraints { make in
+            make.top.equalTo(image.snp.bottom)
+            make.left.equalTo(20)
+            make.right.equalTo(-20)
+        }
     }
 }

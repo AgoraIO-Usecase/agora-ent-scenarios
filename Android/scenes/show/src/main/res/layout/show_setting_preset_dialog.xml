@@ -52,11 +52,13 @@
             android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/deviceSelector"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
                 android:background="@drawable/show_setting_preset_group_bg"
-                android:padding="20dp">
+                android:padding="20dp"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/showTvTitle"
@@ -213,6 +215,320 @@
 
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/show_setting_preset_group_bg"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/broadcastStrategyTvTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/show_video_quailty"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/broadcastStrategyTvDescription"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/show_video_quailty_tips"
+                    android:textColor="#3C4267"
+                    android:textSize="13sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/broadcastStrategyTvTitle" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/broadcastStrategyItemSmooth"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="15dp"
+                    android:background="@drawable/show_setting_preset_item_bg"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp"
+                    app:layout_constraintTop_toBottomOf="@id/broadcastStrategyTvDescription">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/show_video_quailty_smooth"
+                        android:textColor="#040A25"
+                        android:textSize="14sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/broadcastStrategyItemSmoothDes"
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:drawableStart="@mipmap/show_setting_preset_ic_android"
+                        android:drawablePadding="5dp"
+                        android:gravity="center_vertical"
+                        android:text="流畅优先"
+                        android:textColor="#6D7291"
+                        android:textSize="12sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="5dp"
+                        android:background="@drawable/show_setting_preset_recommend_bg"
+                        android:gravity="center"
+                        android:paddingHorizontal="6dp"
+                        android:text="@string/show_setting_preset_recommend"
+                        android:visibility="gone"
+                        android:textColor="#CE27FB"
+                        android:textSize="12sp"
+                        app:layout_constraintBottom_toBottomOf="@+id/broadcastStrategyItemSmoothDes"
+                        app:layout_constraintStart_toEndOf="@id/broadcastStrategyItemSmoothDes"
+                        app:layout_constraintTop_toTopOf="@id/broadcastStrategyItemSmoothDes" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/broadcastStrategyItemClear"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/show_setting_preset_item_bg"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp"
+                    app:layout_constraintTop_toBottomOf="@id/broadcastStrategyItemSmooth">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/show_video_quailty_clear"
+                        android:textColor="#040A25"
+                        android:textSize="14sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:drawableStart="@mipmap/show_setting_preset_ic_android"
+                        android:drawablePadding="5dp"
+                        android:gravity="center_vertical"
+                        android:text="清晰优先"
+                        android:textColor="#6D7291"
+                        android:textSize="12sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/networkView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/show_setting_preset_group_bg"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/basicTvTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/show_network_quailty"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/basicTvDescription"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/show_network_quailty_tips"
+                    android:textColor="#3C4267"
+                    android:textSize="13sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/basicTvTitle" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/basicChooseItemGoodNetwork"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="15dp"
+                    android:background="@drawable/show_setting_preset_item_bg"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp"
+                    app:layout_constraintTop_toBottomOf="@id/basicTvDescription">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/show_network_quailty_good"
+                        android:textColor="#040A25"
+                        android:textSize="14sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/basicLowDeviceDes"
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:drawableStart="@mipmap/show_setting_preset_ic_android"
+                        android:drawablePadding="5dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/show_network_quailty_good_tag"
+                        android:textColor="#6D7291"
+                        android:textSize="12sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="5dp"
+                        android:background="@drawable/show_setting_preset_recommend_bg"
+                        android:gravity="center"
+                        android:paddingHorizontal="6dp"
+                        android:text="@string/show_setting_preset_recommend"
+                        android:visibility="gone"
+                        android:textColor="#CE27FB"
+                        android:textSize="12sp"
+                        app:layout_constraintBottom_toBottomOf="@+id/basicLowDeviceDes"
+                        app:layout_constraintStart_toEndOf="@id/basicLowDeviceDes"
+                        app:layout_constraintTop_toTopOf="@id/basicLowDeviceDes" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/basicChooseItemNormalNetwork"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/show_setting_preset_item_bg"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp"
+                    app:layout_constraintTop_toBottomOf="@id/basicChooseItemGoodNetwork">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/show_network_quailty_normal"
+                        android:textColor="#040A25"
+                        android:textSize="14sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:drawableStart="@mipmap/show_setting_preset_ic_android"
+                        android:drawablePadding="5dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/show_network_quailty_normal_tag"
+                        android:textColor="#6D7291"
+                        android:textSize="12sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/show_setting_preset_group_bg"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/tvDeviceScore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="5dp"
+                    android:textSize="15dp"
+                    android:textColor="@color/black"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <TextView
+                    android:id="@+id/tvBeautyTips"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/show_beauty_tips"
+                    android:textSize="15dp"
+                    android:textColor="@color/black"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toStartOf="@id/tvDeviceScore"
+                    app:layout_constraintTop_toBottomOf="@id/tvDeviceScore"/>
+
+                <TextView
+                    android:id="@+id/tvBroadcastHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/show_broadcast_header"
+                    android:textSize="15dp"
+                    android:textColor="@color/black"
+                    app:layout_constraintStart_toStartOf="@id/tvBeautyTips"
+                    app:layout_constraintTop_toBottomOf="@id/tvBeautyTips"/>
+
+                <TextView
+                    android:id="@+id/tvBroadcastTips"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/show_broadcast_tips"
+                    android:textSize="15dp"
+                    android:textColor="@color/black"
+                    app:layout_constraintStart_toEndOf="@id/tvBroadcastHeader"
+                    app:layout_constraintTop_toBottomOf="@id/tvBeautyTips"/>
+
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>

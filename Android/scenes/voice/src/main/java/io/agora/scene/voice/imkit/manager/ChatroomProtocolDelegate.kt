@@ -1,6 +1,8 @@
 package io.agora.scene.voice.imkit.manager
 
+import android.os.Build
 import android.text.TextUtils
+import androidx.annotation.RequiresApi
 import io.agora.CallBack
 import io.agora.ValueCallBack
 import io.agora.chat.ChatClient
@@ -13,6 +15,7 @@ import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
 import io.agora.scene.voice.imkit.custorm.CustomMsgType
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
 import io.agora.scene.voice.model.*
+import io.agora.scene.voice.rtckit.AgoraBGMManager
 import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.utils.GsonTools
 import io.agora.voice.common.utils.LogTools.logD
@@ -27,7 +30,7 @@ class ChatroomProtocolDelegate constructor(
     }
 
     private var roomManager: ChatRoomManager = ChatClient.getInstance().chatroomManager()
-    lateinit var ownerBean: VoiceMemberModel
+    private var ownerBean = VoiceMemberModel()
 
     /////////////////////// mic ///////////////////////////
 
@@ -72,7 +75,7 @@ class ChatroomProtocolDelegate constructor(
      */
     fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel, callback: ValueCallBack<VoiceRoomInfo>){
         val keyList: MutableList<String> =
-            mutableListOf("ranking_list", "member_list", "gift_amount", "robot_volume", "use_robot")
+            mutableListOf("ranking_list", "member_list", "gift_amount", "robot_volume", "use_robot", "room_bgm")
         for (i in 0..7) {
             keyList.add("mic_$i")
         }
@@ -88,6 +91,7 @@ class ChatroomProtocolDelegate constructor(
         })
         roomManager.asyncFetchChatroomAttributesFromServer(roomId, keyList,
             object : ValueCallBack<Map<String, String>> {
+                @RequiresApi(Build.VERSION_CODES.N)
                 override fun onSuccess(result: Map<String, String>) {
                     val micInfoList = mutableListOf<VoiceMicInfoModel>()
                     val micMap = mutableMapOf<String,String>()
@@ -139,6 +143,8 @@ class ChatroomProtocolDelegate constructor(
                             }
                         }else if (key=="use_robot"){
                             voiceRoomInfo.roomInfo?.useRobot = value == "1"
+                        } else if (key == "room_bgm") {
+                            voiceRoomInfo.bgmInfo = GsonTools.toBean(value, VoiceBgmModel::class.java)
                         }
                     }
                     ChatroomCacheManager.cacheManager.clearMicInfo()

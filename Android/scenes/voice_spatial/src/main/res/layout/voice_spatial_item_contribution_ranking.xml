@@ -14,11 +14,11 @@
         android:layout_marginBottom="13dp"
         android:background="@drawable/voice_bg_oval_white30"
         android:scaleType="centerCrop"
-        android:src="@drawable/avatar2"
+        android:src="@mipmap/default_user_avatar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:shapeAppearance="@style/voice_seat_roundStyle" />
+        app:shapeAppearance="@style/ui_widget_roundStyle" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivContributionNumber"

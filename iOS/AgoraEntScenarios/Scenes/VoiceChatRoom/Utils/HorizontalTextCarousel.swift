@@ -11,7 +11,7 @@ import ZSwiftBaseLib
 @objc public class HorizontalTextCarousel: UIView {
     
     lazy var voiceIcon: UIImageView = {
-        UIImageView(frame: CGRect(x: 8, y: (self.frame.height-10)/2.0, width: 10, height: 10)).image(UIImage("speaker")!)
+        UIImageView(frame: CGRect(x: 8, y: (self.frame.height-10)/2.0, width: 10, height: 10)).image(UIImage.sceneImage(name: "speaker")!)
     }()
     
     lazy var scroll: UIScrollView = {

@@ -8,6 +8,13 @@
 import UIKit
 
 class ShowPresettingCell: UITableViewCell {
+    
+    public var aSelected: Bool = false {
+        didSet {
+            indicatorView.isHidden = !aSelected
+            whiteBgView.layer.borderWidth = aSelected ? 1 : 0
+        }
+    }
 
     private lazy var bgImgView: UIImageView = {
         let imgView = UIImageView()
@@ -52,24 +59,18 @@ class ShowPresettingCell: UITableViewCell {
     // 苹果标识
     private lazy var appleIconImgView: UIImageView = {
         let imgView = UIImageView()
-//        imgView.isHidden = true
         imgView.image = UIImage.show_sceneImage(name: "show_preset_apple_icon")
         return imgView
     }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        selectionStyle = .none
         createSubviews()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-        indicatorView.isHidden = !selected
-        whiteBgView.layer.borderWidth = selected ? 1 : 0
     }
     
     func createSubviews(){
@@ -85,13 +86,7 @@ class ShowPresettingCell: UITableViewCell {
         whiteBgView.snp.makeConstraints { make in
             make.edges.equalTo(UIEdgeInsets(top: 5, left: 40, bottom: 5, right: 40))
         }
-        
-        contentView.addSubview(indicatorView)
-        indicatorView.snp.makeConstraints { make in
-            make.centerY.equalToSuperview()
-            make.right.equalTo(-54)
-        }
-        
+
         contentView.addSubview(titleLabel)
         titleLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
@@ -108,8 +103,14 @@ class ShowPresettingCell: UITableViewCell {
         descLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.left.equalTo(appleIconImgView.snp.right).offset(8)
+            make.right.equalTo(whiteBgView).offset(-8)
         }
         
+        contentView.addSubview(indicatorView)
+        indicatorView.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.right.equalTo(-54)
+        }
     }
     
     func setTitle(_ title: String, desc: String) {
