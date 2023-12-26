@@ -87,14 +87,16 @@ class JoyBannerView: UIView {
         let itemWidth = self.width - kBannerEdge * 2
         layout.itemSize = CGSize(width: itemWidth, height: self.height)
         layout.minimumLineSpacing = kBannerEdge
-        let collectionView = UICollectionView(frame: self.bounds, collectionViewLayout: layout)
+        let collectionView = UICollectionView(frame: .zero,
+                                              collectionViewLayout: layout)
         collectionView.collectionViewLayout = layout
         collectionView.backgroundColor = .clear
         collectionView.register(JoyBannerViewCell.self, forCellWithReuseIdentifier: NSStringFromClass(JoyBannerViewCell.self))
         collectionView.delegate = self
         collectionView.dataSource = self
-//        collectionView.isPagingEnabled = true
+        collectionView.isPagingEnabled = true
         collectionView.bounces = false
+        collectionView.clipsToBounds = false
         collectionView.showsHorizontalScrollIndicator = false
         return collectionView
     }()
@@ -102,7 +104,6 @@ class JoyBannerView: UIView {
     var bannerList: JoyBannerArray = JoyBannerArray(bannerList: []) {
         didSet {
             listView.reloadData()
-            scrollToCenter()
             startTimer()
         }
     }
@@ -114,7 +115,8 @@ class JoyBannerView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        listView.frame = bounds
+        let frame = CGRect(x: 0, y: 0, width: width - kBannerEdge, height: height)
+        listView.frame = frame
     }
     
     required init?(coder: NSCoder) {
@@ -123,24 +125,21 @@ class JoyBannerView: UIView {
 }
 
 extension JoyBannerView {
-    private func scrollToCenter() {
+    private func scrollToCenterIfNeed() {
         var index = listView.indexPathsForVisibleItems.first?.row ?? 0
-        index = index % bannerList.realCount
-        let offset: CGFloat = (self.listView.width - kBannerEdge) * CGFloat(bannerList.fakeIndex(index: index))
-        let newContentOffset = targetContentOffsetForProposedContentOffset(CGPoint(x: offset, y: 0), withScrollingVelocity: .zero)
-        listView.setContentOffset(newContentOffset, animated: false)
+        guard index == 0 || index == bannerList.count - 1 else {
+            return
+        }
+        index = bannerList.realIndex(index: index)
+        index = bannerList.fakeIndex(index: index)
+        listView.setContentOffset(CGPoint(x: CGFloat(index) * listView.width, y: 0), animated: false)
     }
     
     private func scrollToNext() {
+        scrollToCenterIfNeed()
         var index = listView.indexPathsForVisibleItems.first?.row ?? 0
-        if index == 0 || index == bannerList.count - 1 {
-            scrollToCenter()
-            index = index % bannerList.realCount
-        }
         index += 1
-        let offset: CGFloat = (self.listView.width - kBannerEdge) * CGFloat(index)
-        let newContentOffset = targetContentOffsetForProposedContentOffset(CGPoint(x: offset, y: 0), withScrollingVelocity: .zero)
-        listView.setContentOffset(newContentOffset, animated: true)
+        listView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredHorizontally, animated: true)
     }
     
     private func stopTimer() {
@@ -173,40 +172,20 @@ extension JoyBannerView: UICollectionViewDelegate, UICollectionViewDataSource, U
     }
     
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        let proposedContentOffset = targetContentOffset.pointee
-        
-        // 在这里手动调用 targetContentOffsetForProposedContentOffset 方法
-        let newContentOffset = targetContentOffsetForProposedContentOffset(scrollView.contentOffset, withScrollingVelocity: velocity)
-        targetContentOffset.pointee = newContentOffset
-        
+        if scrollView.isTracking {return}
+        scrollToCenterIfNeed()
         startTimer()
     }
     
     open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        guard let collectionView = scrollView as? UICollectionView else {return}
+        if scrollView.isDragging {return}
+        scrollToCenterIfNeed()
         startTimer()
-        if scrollView.contentOffset.x > -1,
-           scrollView.contentOffset.x + scrollView.width + 1 < scrollView.contentSize.width {
-            return
-        }
-        
-        scrollToCenter()
     }
     
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        if scrollView.isDragging {return}
+        scrollToCenterIfNeed()
         startTimer()
-    }
-    
-    func targetContentOffsetForProposedContentOffset(_ proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
-        var finalOffset = proposedContentOffset
-        if let collectionViewFlowLayout = listView.collectionViewLayout as? UICollectionViewFlowLayout {
-            let pageWidth = collectionViewFlowLayout.itemSize.width + collectionViewFlowLayout.minimumLineSpacing
-            let currentPage = round(proposedContentOffset.x / pageWidth)
-            let xOffset = pageWidth * currentPage
-            
-            finalOffset.x = xOffset
-        }
-        
-        return finalOffset
     }
 }
