@@ -1,26 +1,28 @@
 bash
 #!/bin/bash
 
-check_variable() {
-  variable_name=$1
-  if git diff --cached | grep -q "^+$variable_name="; then
-    echo "ERROR: $variable_name cannot be committed."
-    exit 1
-  fi
-}
+for file in $(find . -name gradle.properties); do
+    diff=$(git diff HEAD $file)
+    
+    if [[ -z $diff ]]; then 
+        exit 0
+    else
+        echo "diff: $diff"
+        echo "Do not commit keys and secrets in gradle.properties!"
+        exit 1
+    fi
+done
 
-check_variable "AGORA_APP_ID"
-check_variable "AGORA_APP_CERTIFICATE"
-check_variable "IM_APP_KEY"
-check_variable "IM_APP_CLIENT_ID"
-check_variable "IM_APP_CLIENT_SECRET"
-check_variable "CLOUD_PLAYER_KEY"
-check_variable "CLOUD_PLAYER_SECRET"
-
-# Check for changes to the KeyCenter file
-if git diff --cached --name-only | grep -q 'KeyCenter.swift'; then
-    echo "Error: Modifying the KeyCenter file is not allowed."
-    exit 1
-fi
+for file in $(find . -name KeyCenter.swift); do
+    diff=$(git diff HEAD $file)
+    
+    if [[ -z $diff ]]; then 
+        exit 0
+    else
+        echo "diff: $diff"
+        echo "Do not commit keys and secrets in KeyCenter.swift!"
+        exit 1
+    fi
+done
 
 exit 0
