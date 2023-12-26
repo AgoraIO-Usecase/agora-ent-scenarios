@@ -80,6 +80,10 @@ class JoyGameListDialog: JoyBaseDialog {
     var gameList: [CloudGameInfo] = [] {
         didSet {
             listView.reloadData()
+            if let game = gameList.first {
+                selectedGame = game
+                self.listView.selectItem(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .centeredHorizontally)
+            }
         }
     }
     private var selectedGame: CloudGameInfo? {
