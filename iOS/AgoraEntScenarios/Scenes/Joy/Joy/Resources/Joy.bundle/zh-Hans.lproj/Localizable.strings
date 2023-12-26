@@ -41,6 +41,7 @@
 "game_send_like_success"="点赞成功";
 "game_send_like_fail"="点赞失败";
 "game_connect_fail"="连接失败";
+"game_start_no_available_cloud_host"="暂无可用云机";
 
 "query_title_exit"="结束游戏";
 "query_subtitle_exit"="是否退出游戏直播?";

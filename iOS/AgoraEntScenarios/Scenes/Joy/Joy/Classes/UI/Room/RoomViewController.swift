@@ -228,7 +228,7 @@ class RoomViewController: UIViewController {
         service.getStartGame(roomId: roomInfo.roomId) {[weak self] err, gameInfo in
             guard let self = self else {return}
             if let _ = err {
-                self.showToastFail()
+                self.showToastFail(text: err?.joyErrorString())
                 return
             }
             
@@ -246,7 +246,7 @@ class RoomViewController: UIViewController {
             if gameId.isEmpty || taskId.isEmpty {
                 CloudBarrageAPI.shared.getGameList { [weak self] err, list in
                     if let _ = err {
-                        self?.showToastFail()
+                        self?.showToastFail(text: err?.joyErrorString())
                         return
                     }
                     let dialog: JoyGameListDialog? = JoyGameListDialog.show()
@@ -265,7 +265,7 @@ class RoomViewController: UIViewController {
                     //restart game
                     CloudBarrageAPI.shared.getGameList { [weak self] err, list in
                         if let _ = err {
-                            self?.showToastFail()
+                            self?.showToastFail(text: err?.joyErrorString())
                             return
                         }
                         
@@ -316,7 +316,7 @@ extension RoomViewController {
         CloudBarrageAPI.shared.startGame(config: startConfig) {[weak self] err, taskId in
             if let _ = err {
                 SVProgressHUD.dismiss()
-                self?.showToastFail()
+                self?.showToastFail(text: err?.joyErrorString())
                 return
             }
             
@@ -361,7 +361,7 @@ extension RoomViewController {
     private func getGameInfo(gameId: String, success: (()-> ())? = nil, fail: ((NSError?)-> ())? = nil) {
         CloudBarrageAPI.shared.getGameInfo(gameId: gameId) {[weak self] err, detail in
             if let _ = err {
-                self?.showToastFail()
+                self?.showToastFail(text: err?.joyErrorString())
                 fail?(err)
                 return
             }
