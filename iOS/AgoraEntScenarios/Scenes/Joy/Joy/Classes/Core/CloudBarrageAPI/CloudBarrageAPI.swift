@@ -363,15 +363,24 @@ extension CloudBarrageAPI {
             }
             joyPrint(" httpRequest request:\n \(request.cURL(pretty: true)) \nresp:\n \(NSString(data: data, encoding: NSUTF8StringEncoding)) ")
             if let dic = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                let result = dic["data"]
+                var result = dic["data"]
                 var code = dic["code"] as? Int ?? 0
-                var msg = dic["msg"] as? String ?? ""
-                if let jsonData = msg.data(using: .utf8),
-                   let msgDic = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any] {
-                    code = msgDic["code"] as? Int ?? 0
-                    msg = msgDic["err_msg"] as? String ?? ""
+                var error: NSError? = nil
+                switch code {
+                case 0:
+                    break
+                default:
+                    error = NSError(domain: "", code: code)
+                    if code == 1300,
+                       let msg = result as? String,
+                       let jsonData = msg.data(using: .utf8),
+                       let msgDic = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any] {
+                        code = msgDic["code"] as? Int ?? 0
+                        let msg = msgDic["err_msg"] as? String ?? ""
+                        error = NSError(domain: msg, code: code)
+                    }
+                    result = nil
                 }
-                let error = code == 0 ? nil : NSError(domain: msg, code: code)
 //                joyPrint("result = \(String(describing: result)), code = \(code)")
                 DispatchQueue.main.async {
                     completion(error, result)
