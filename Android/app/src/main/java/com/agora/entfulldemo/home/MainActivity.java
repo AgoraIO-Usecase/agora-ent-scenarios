@@ -18,14 +18,17 @@ import com.agora.entfulldemo.databinding.AppActivityMainBinding;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.tencent.bugly.crashreport.CrashReport;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.List;
 
 import io.agora.scene.base.BuildConfig;
-import io.agora.scene.base.Constant;
 import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseViewBindingActivity;
+import io.agora.scene.base.event.UserTokenErrorEvent;
 import io.agora.scene.base.manager.PagePilotManager;
-import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.widget.dialog.PermissionLeakDialog;
 
 /**
@@ -33,11 +36,28 @@ import io.agora.scene.widget.dialog.PermissionLeakDialog;
  */
 @Route(path = PagePathConstant.pageMainHome)
 public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding> {
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(@Nullable UserTokenErrorEvent event) {
+        finishAffinity();
+        PagePilotManager.pageWelcomeClear();
+    }
+
     private NavController navController;
     /**
      * 主页接收消息
      */
     private MainViewModel mainViewModel;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
     @Override
     protected AppActivityMainBinding getViewBinding(@NonNull LayoutInflater inflater) {
@@ -51,13 +71,6 @@ public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding
         mainViewModel.setLifecycleOwner(this);
         navController = ActivityKt.findNavController(this, R.id.nav_host_fragment_activity_main);
         BottomNavigationViewKt.setupWithNavController(getBinding().navView, navController);
-        mainViewModel.setISingleCallback((type, data) -> {
-            if (type == Constant.CALLBACK_TYPE_USER_LOGOUT) {
-                UserManager.getInstance().logout();
-                finish();
-                PagePilotManager.pageWelcome();
-            }
-        });
     }
 
     @Override

@@ -8,14 +8,9 @@
 import Foundation
 
 public extension String {
-    func localized() -> String {
+    
+    func voice_localized() -> String {
         return LanguageManager.localValue(key: self)
     }
-}
-
-
-public extension String {
-    func localized_spatial() -> String {
-        return SALanguageManager.localValue(key: self)
-    }
+    
 }

@@ -1,6 +1,7 @@
 package io.agora.scene.voice.viewmodel.repositories
 
 import androidx.lifecycle.LiveData
+import io.agora.scene.voice.model.VoiceBgmModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.VoiceRoomInfo
 import io.agora.scene.voice.model.VoiceRoomModel
@@ -64,6 +65,23 @@ class VoiceRoomLivingRepository : BaseRepository() {
                 voiceServiceProtocol.updateAnnouncement(content, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(Pair(content, result)))
+                    } else {
+                        callBack.onError(error)
+                    }
+                })
+            }
+        }
+        return resource.asLiveData()
+    }
+    /**
+     * 更新房间背景音乐信息
+     */
+    fun updateBGMInfo(info: VoiceBgmModel): LiveData<Resource<VoiceBgmModel>> {
+        val resource = object : NetworkOnlyResource<VoiceBgmModel>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<VoiceBgmModel>>) {
+                voiceServiceProtocol.updateBGMInfo(info, completion = { error ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(info))
                     } else {
                         callBack.onError(error)
                     }

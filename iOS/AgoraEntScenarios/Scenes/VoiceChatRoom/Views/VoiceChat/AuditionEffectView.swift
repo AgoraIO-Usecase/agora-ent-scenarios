@@ -10,8 +10,11 @@ import ZSwiftBaseLib
 import SDWebImage
 import SDWebImageAPNGCoder
 //162 height
+
+private let beforPlayTag = 11
+
 final class AuditionEffectView: UIView {
-    
+        
     private var type: AUDIO_SETTING_TYPE = .AIAEC
     
     private var beforePlaceHolderImage = UIImage()
@@ -27,7 +30,7 @@ final class AuditionEffectView: UIView {
     }()
     
     private lazy var before: UILabel = {
-        UILabel(frame: CGRect(x: 20, y: 28, width: self.whiteContainer.frame.width-40, height: 20)).font(.systemFont(ofSize: 13, weight: .semibold)).textColor(UIColor(0x3C4267)).text("Before".localized())
+        UILabel(frame: CGRect(x: 20, y: 28, width: self.whiteContainer.frame.width-40, height: 20)).font(.systemFont(ofSize: 13, weight: .semibold)).textColor(UIColor(0x3C4267)).text("voice_before".voice_localized())
     }()
     
     private lazy var beforeAnimation: UIImageView = {
@@ -35,7 +38,7 @@ final class AuditionEffectView: UIView {
     }()
     
     private lazy var beforePlay: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.whiteContainer.frame.width-44, y: 27, width: 24, height: 24)).tag(11).addTargetFor(self, action: #selector(playAnimation(sender:)), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: self.whiteContainer.frame.width-44, y: 27, width: 24, height: 24)).tag(beforPlayTag).addTargetFor(self, action: #selector(playAnimation(sender:)), for: .touchUpInside)
     }()
     
     private lazy var beforeSeparaLine: UIView = {
@@ -43,7 +46,7 @@ final class AuditionEffectView: UIView {
     }()
     
     private lazy var after: UILabel = {
-        UILabel(frame: CGRect(x: 20, y: self.before.frame.maxY+45, width: self.whiteContainer.frame.width-40, height: 20)).font(.systemFont(ofSize: 13, weight: .semibold)).textColor(UIColor(0x3C4267)).text("After".localized())
+        UILabel(frame: CGRect(x: 20, y: self.before.frame.maxY+45, width: self.whiteContainer.frame.width-40, height: 20)).font(.systemFont(ofSize: 13, weight: .semibold)).textColor(UIColor(0x3C4267)).text("voice_after".voice_localized())
     }()
     
     private lazy var afterAnimation: UIImageView = {
@@ -85,10 +88,10 @@ final class AuditionEffectView: UIView {
             self.beforeAnimation.image = self.beforePlaceHolderImage
             self.afterAnimation.image = self.afterPlaceHolderImage
             if self.afterPlay.isSelected {
-                self.afterPlay.setImage(UIImage("play2"), for: .normal)
+                self.afterPlay.setImage(UIImage.sceneImage(name: "play2", bundleName: "VoiceChatRoomResource"), for: .normal)
             }
             if self.beforePlay.isSelected {
-                self.beforePlay.setImage(UIImage("play2"), for: .normal)
+                self.beforePlay.setImage(UIImage.sceneImage(name: "play2", bundleName: "VoiceChatRoomResource"), for: .normal)
             }
         }
     }
@@ -97,18 +100,18 @@ final class AuditionEffectView: UIView {
         var text = ""
         switch type {
         case .AIAEC:
-            text = "AIAEC Audition".localized()
-            self.beforePlaceHolderImage = UIImage("AIAECbefore")!
-            self.afterPlaceHolderImage = UIImage("AIAECafter")!
+            text = "voice_AIAEC_audition".voice_localized()
+            self.beforePlaceHolderImage = UIImage.sceneImage(name: "AIAECbefore", bundleName: "VoiceChatRoomResource")!
+            self.afterPlaceHolderImage = UIImage.sceneImage(name: "AIAECafter", bundleName: "VoiceChatRoomResource")!
         case .AGC:
-            text = "AGC Audition".localized()
-            self.beforePlaceHolderImage = UIImage("AGCbefore")!
-            self.afterPlaceHolderImage = UIImage("AGCafter")!
+            text = "voice_AGC_audition".voice_localized()
+            self.beforePlaceHolderImage = UIImage.sceneImage(name: "AGCbefore", bundleName: "VoiceChatRoomResource")!
+            self.afterPlaceHolderImage = UIImage.sceneImage(name: "AGCafter", bundleName: "VoiceChatRoomResource")!
         default:
             text = ""
         }
-        self.afterPlay.setImage(UIImage("play2"), for: .normal)
-        self.beforePlay.setImage(UIImage("play2"), for: .normal)
+        self.afterPlay.setImage(UIImage.sceneImage(name: "play2", bundleName: "VoiceChatRoomResource"), for: .normal)
+        self.beforePlay.setImage(UIImage.sceneImage(name: "play2", bundleName: "VoiceChatRoomResource"), for: .normal)
         self.beforeAnimation.image = self.beforePlaceHolderImage
         self.afterAnimation.image = self.afterPlaceHolderImage
         self.title.text = text
@@ -127,7 +130,8 @@ final class AuditionEffectView: UIView {
             type = "WAV"
             wavName = "AGC"
         }
-        if sender.tag == 11 {
+        
+        if sender.tag == beforPlayTag {
             self.beforePlay.isSelected = !self.beforePlay.isSelected
             if self.beforePlay.isSelected {
                 self.afterPlay.isSelected = !self.beforePlay.isSelected
@@ -143,13 +147,17 @@ final class AuditionEffectView: UIView {
             wavName += "-After"
         }
         guard let path = Bundle.voiceRoomBundle.path(forResource: resourceName, ofType: "png") else { return }
-        guard let wavPath = Bundle.voiceRoomBundle.path(forResource: wavName, ofType: type) else { return }
+
+        let statusStr = sender.tag == beforPlayTag ? "before" : "after"
+        let resourceNameStr = resourceName.contains("AGC") ? "agc" : "aec"
+        let wavPath = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/voice_sample_\(resourceNameStr)_\(statusStr).\(type)"
+
         VoiceRoomRTCManager.getSharedInstance().rtcKit.stopAudioMixing()
-        self.afterPlay.setImage(UIImage("play2"), for: .normal)
-        self.beforePlay.setImage(UIImage("play2"), for: .normal)
+        self.afterPlay.setImage(UIImage.sceneImage(name: "play2"), for: .normal)
+        self.beforePlay.setImage(UIImage.sceneImage(name: "play2"), for: .normal)
         if self.beforePlay.isSelected {
-            self.afterPlay.setImage(UIImage("play2"), for: .normal)
-            self.beforePlay.setImage(UIImage("zanting"), for: .normal)
+            self.afterPlay.setImage(UIImage.sceneImage(name: "play2"), for: .normal)
+            self.beforePlay.setImage(UIImage.sceneImage(name: "zanting"), for: .normal)
             self.afterAnimation.image = self.afterPlaceHolderImage
             self.beforeAnimation.sd_setImage(with: URL(fileURLWithPath: path), placeholderImage: self.beforePlaceHolderImage)
             VoiceRoomRTCManager.getSharedInstance().rtcKit.startAudioMixing(wavPath, loopback: false, cycle: 1)
@@ -157,8 +165,8 @@ final class AuditionEffectView: UIView {
             self.beforeAnimation.image = self.beforePlaceHolderImage
         }
         if self.afterPlay.isSelected {
-            self.beforePlay.setImage(UIImage("play2"), for: .normal)
-            self.afterPlay.setImage(UIImage("zanting"), for: .normal)
+            self.beforePlay.setImage(UIImage.sceneImage(name: "play2"), for: .normal)
+            self.afterPlay.setImage(UIImage.sceneImage(name: "zanting"), for: .normal)
             self.beforeAnimation.image = self.afterPlaceHolderImage
             self.afterAnimation.sd_setImage(with: URL(fileURLWithPath: path), placeholderImage: self.afterPlaceHolderImage)
             VoiceRoomRTCManager.getSharedInstance().rtcKit.startAudioMixing(wavPath, loopback: false, cycle: 1)

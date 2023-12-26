@@ -1,20 +1,22 @@
 package io.agora.scene.voice.rtckit
 
 import android.content.Context
+import android.util.Log
 import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.*
 import io.agora.scene.base.AudioModeration
+import io.agora.scene.base.TokenGenerator
+import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.model.SoundAudioBean
-import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.scene.voice.rtckit.listener.MediaPlayerObserver
 import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
-import io.agora.scene.voice.global.VoiceBuddyFactory
-import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.constant.ConfigConstants
+import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.LogTools.logE
+import io.agora.voice.common.utils.ThreadManager
 
 /**
  * @author create by zhangwei03
@@ -26,7 +28,7 @@ class AgoraRtcEngineController {
         @JvmStatic
         fun get() = InstanceHelper.sSingle
 
-        private const val TAG = "AgoraRtcEngineController"
+        private const val TAG = "ENGINE_CONTROLLER_LOG"
     }
 
     object InstanceHelper {
@@ -34,6 +36,16 @@ class AgoraRtcEngineController {
     }
 
     private var rtcEngine: RtcEngineEx? = null
+
+    private var mLocalUid = 0
+
+    private var mBgmManager: AgoraBGMManager? = null
+
+    private var mEarBackManager: AgoraEarBackManager? = null
+
+    private var mSoundCardManager: AgoraSoundCardManager? = null
+
+    private var mRtmToken = ""
 
     private var micVolumeListener: RtcMicVolumeListener? = null
 
@@ -48,14 +60,48 @@ class AgoraRtcEngineController {
         context: Context, channelId: String, rtcUid: Int, soundEffect: Int, broadcaster: Boolean = false,
         joinCallback: VRValueCallBack<Boolean>
     ) {
-        initRtcEngine(context)
-        this.joinCallback = joinCallback
-        VoiceBuddyFactory.get().rtcChannelTemp.broadcaster = broadcaster
-        checkJoinChannel(channelId, rtcUid, soundEffect, broadcaster)
+        TokenGenerator.generateTokens(
+            channelId,
+            rtcUid.toString(),
+            TokenGenerator.TokenGeneratorType.token006,
+            arrayOf(
+                TokenGenerator.AgoraTokenType.rtm
+            ),
+            { ret ->
+                mRtmToken = ret[TokenGenerator.AgoraTokenType.rtm] ?: ""
 
-        // 语音鉴定
-        AudioModeration.moderationAudio(channelId, rtcUid.toLong(),
-            AudioModeration.AgoraChannelType.broadcast, "voice", {})
+                initRtcEngine(context)
+                this.mLocalUid = rtcUid
+                this.joinCallback = joinCallback
+                VoiceBuddyFactory.get().rtcChannelTemp.broadcaster = broadcaster
+                checkJoinChannel(channelId, rtcUid, soundEffect, broadcaster)
+                // 语音鉴定
+                AudioModeration.moderationAudio(channelId, rtcUid.toLong(),
+                    AudioModeration.AgoraChannelType.broadcast, "voice", {})
+            },{
+                joinCallback?.onError(Constants.ERR_FAILED, "get token error")
+            }
+        )
+    }
+
+    fun bgmManager(): AgoraBGMManager {
+        if (mBgmManager == null) {
+            mBgmManager = AgoraBGMManager(
+                rtcEngine!!,
+                VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(),
+                mLocalUid,
+                mRtmToken
+            )
+        }
+        return mBgmManager!!
+    }
+
+    fun earBackManager(): AgoraEarBackManager? {
+        return mEarBackManager
+    }
+
+    fun soundCardManager(): AgoraSoundCardManager? {
+        return mSoundCardManager
     }
 
     private fun initRtcEngine(context: Context): Boolean {
@@ -113,17 +159,24 @@ class AgoraRtcEngineController {
                         }
                     }
                 }
+
+                override fun onLocalAudioStats(stats: LocalAudioStats?) {
+                    mEarBackManager?.updateDelay(stats?.earMonitorDelay ?: 0)
+                }
             }
             // 加载ai 降噪so
             config.addExtension("agora_ai_noise_suppression_extension")
             config.addExtension("agora_ai_echo_cancellation_extension")
             try {
                 rtcEngine = RtcEngineEx.create(config) as RtcEngineEx?
+                rtcEngine?.setParameters("{\"che.audio.input_sample_rate\" : 48000}")
             } catch (e: Exception) {
                 e.printStackTrace()
                 "voice rtc engine init error:${e.message}".logE(TAG)
                 return false
             }
+            mEarBackManager = AgoraEarBackManager(rtcEngine!!)
+            mSoundCardManager = AgoraSoundCardManager(rtcEngine!!)
             return true
         }
     }
@@ -283,6 +336,10 @@ class AgoraRtcEngineController {
         }
     }
 
+    fun createLocalMediaPlayer(): IMediaPlayer? {
+        return rtcEngine?.createMediaPlayer()
+    }
+
     /**
      * 音效队列
      */
@@ -333,11 +390,20 @@ class AgoraRtcEngineController {
      * 本地mute/unmute
      */
     fun enableLocalAudio(enable: Boolean) {
+        Log.d(TAG, "set local audio enable: $enable")
         rtcEngine?.enableLocalAudio(enable)
+        mEarBackManager?.updateEnableInEarMonitoring()
     }
 
     fun destroy() {
         VoiceBuddyFactory.get().rtcChannelTemp.reset()
+
+        mBgmManager?.release()
+        mBgmManager = null
+
+        mEarBackManager = null
+        mSoundCardManager = null
+
         if (mediaPlayer != null) {
             mediaPlayer?.unRegisterPlayerObserver(firstMediaPlayerObserver)
             mediaPlayer?.destroy()
@@ -379,6 +445,9 @@ class AgoraRtcEngineController {
                 }
                 else -> {}
             }
+        }
+
+        override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
         }
     }
 

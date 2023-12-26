@@ -60,7 +60,7 @@ class ShowBeautyFaceCell: UICollectionViewCell {
         nameLabel.font = .show_R_11
         nameLabel.textColor = .show_beauty_deselect
         nameLabel.numberOfLines = 2
-        nameLabel.text = "美白".show_localized
+        nameLabel.text = "show_beauty_item_beauty_whiten".show_localized
         contentView.addSubview(nameLabel)
         nameLabel.snp.makeConstraints { make in
             make.centerX.equalTo(indicatorImgView)

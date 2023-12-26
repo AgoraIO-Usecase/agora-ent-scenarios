@@ -1,5 +1,6 @@
 package io.agora.scene.show.beauty.sensetime;
 
+import static io.agora.beautyapi.sensetime.SenseTimeBeautyAPIKt.createSenseTimeBeautyAPI;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_ADJUST_CLARITY;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_ADJUST_CONTRAST;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_ADJUST_SATURATION;
@@ -29,189 +30,86 @@ import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_HUAHU
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_NONE;
 
 import android.content.Context;
-import android.graphics.Matrix;
-import android.opengl.GLES11Ext;
-import android.opengl.GLES20;
 
-import com.sensetime.effects.STRenderer;
-import com.sensetime.effects.utils.FileUtils;
-import com.sensetime.stmobile.STCommonNative;
-import com.sensetime.stmobile.params.STEffectBeautyType;
+import androidx.annotation.NonNull;
+
+import com.softsugar.stmobile.STMobileEffectNative;
+import com.softsugar.stmobile.params.STEffectBeautyType;
 
 import java.io.File;
-import java.nio.ByteBuffer;
 
-import io.agora.base.TextureBufferHelper;
-import io.agora.base.VideoFrame;
-import io.agora.base.internal.video.EglBase;
-import io.agora.base.internal.video.YuvHelper;
-import io.agora.scene.show.ShowLogger;
+import io.agora.beautyapi.sensetime.CameraConfig;
+import io.agora.beautyapi.sensetime.CaptureMode;
+import io.agora.beautyapi.sensetime.Config;
+import io.agora.beautyapi.sensetime.IEventCallback;
+import io.agora.beautyapi.sensetime.STHandlers;
+import io.agora.beautyapi.sensetime.SenseTimeBeautyAPI;
+import io.agora.rtc2.RtcEngine;
 import io.agora.scene.show.beauty.BeautyCache;
 import io.agora.scene.show.beauty.IBeautyProcessor;
 
 public class BeautySenseTimeImpl extends IBeautyProcessor {
 
     private final Context mContext;
-    private STRenderer mSTRenderer;
-
-
-    private TextureBufferHelper textureBufferHelper;
-
-    private boolean isFrontCamera = true;
-    private EglBase.Context mEglBaseContext;
-    private ByteBuffer mNV21Buffer;
-    private byte[] mNV21ByteArray;
-
     private volatile boolean sdkIsInit = false;
     private volatile boolean isReleased = false;
-    private volatile boolean shouldMirror = false;
 
+    @Override
+    public void initialize(@NonNull RtcEngine rtcEngine, @NonNull CaptureMode captureMode, boolean statsEnable, @NonNull IEventCallback eventCallback) {
+        getSenseTimeBeautyAPI().initialize(new Config(
+                mContext,
+                rtcEngine,
+                new STHandlers(SenseTimeBeautySDK.getMobileEffectNative(), SenseTimeBeautySDK.getHumanActionNative()),
+                eventCallback,
+                captureMode,
+                1000,
+                statsEnable,
+                new CameraConfig()));
+    }
+
+    private volatile SenseTimeBeautyAPI innerSenseTimeApi;
+
+    @NonNull
+    @Override
+    public synchronized SenseTimeBeautyAPI getSenseTimeBeautyAPI() {
+        if (innerSenseTimeApi == null) {
+            innerSenseTimeApi = createSenseTimeBeautyAPI();
+        }
+        return innerSenseTimeApi;
+    }
 
     public BeautySenseTimeImpl(Context context) {
         mContext = context.getApplicationContext();
+        if (!sdkIsInit) {
+            SenseTimeBeautySDK.initBeautySDK(mContext);
+            SenseTimeBeautySDK.initMobileEffect(context);
+            sdkIsInit = true;
+            restore();
+        }
+    }
+
+    @Override
+    public boolean setBeautyEnable(boolean beautyEnable) {
+        super.setBeautyEnable(beautyEnable);
+        if (SenseTimeBeautySDK.isLicenseCheckSuccess()) {
+            getSenseTimeBeautyAPI().enable(beautyEnable);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void release() {
         super.release();
-        isReleased = true;
-        if (textureBufferHelper != null) {
-            textureBufferHelper.invoke(() -> {
-                unInitST();
-                return null;
-            });
-            try {
-                textureBufferHelper.dispose();
-            } catch (Exception e) {
-                ShowLogger.e("IBeautyProcessor", e, "");
-            }
-            textureBufferHelper = null;
+        if (innerSenseTimeApi != null) {
+            innerSenseTimeApi.release();
+            innerSenseTimeApi = null;
         }
-        sdkIsInit = false;
-        mEglBaseContext = null;
-    }
-
-    private void initST() {
         if (sdkIsInit) {
-            return;
+            SenseTimeBeautySDK.unInitMobileEffect();
+            sdkIsInit = false;
         }
-        mSTRenderer = new STRenderer(mContext);
-        sdkIsInit = true;
-        restore();
-    }
-
-    private void unInitST() {
-        if (!sdkIsInit) {
-            return;
-        }
-        mSTRenderer.release();
-        sdkIsInit = false;
-    }
-
-    @Override
-    public boolean onCaptureVideoFrame(int type,VideoFrame videoFrame) {
-        if (!isEnable() || isReleased) {
-            shouldMirror = videoFrame.getSourceType() == VideoFrame.SourceType.kFrontCamera;
-            return true;
-        }
-        shouldMirror = false;
-        VideoFrame.Buffer buffer = videoFrame.getBuffer();
-        // 获取NV21数据
-        VideoFrame.I420Buffer i420Buffer = buffer.toI420();
-        if (i420Buffer == null) {
-            return false;
-        }
-        int nv21Size = (buffer.getWidth() * buffer.getHeight() * 3 + 1) / 2;
-        if (mNV21Buffer == null || mNV21Buffer.capacity() != nv21Size) {
-            mNV21Buffer = ByteBuffer.allocateDirect(nv21Size);
-            mNV21ByteArray = new byte[nv21Size];
-        }
-        mNV21Buffer.clear();
-        mNV21Buffer.position(0);
-
-        YuvHelper.I420ToNV12(i420Buffer.getDataY(), i420Buffer.getStrideY(),
-                i420Buffer.getDataV(), i420Buffer.getStrideV(),
-                i420Buffer.getDataU(), i420Buffer.getStrideV(),
-                mNV21Buffer,
-                buffer.getWidth(), buffer.getHeight());
-        mNV21Buffer.position(0);
-        mNV21Buffer.get(mNV21ByteArray);
-        i420Buffer.release();
-
-        int texture = -1;
-        Matrix transformMatrix = new Matrix();
-        if (buffer instanceof VideoFrame.TextureBuffer) {
-            // 使用双输入处理
-            VideoFrame.TextureBuffer textureBuffer = (VideoFrame.TextureBuffer) buffer;
-
-            if (textureBufferHelper == null) {
-                mEglBaseContext = textureBuffer.getEglBaseContext();
-                textureBufferHelper = TextureBufferHelper.create("BeautyProcessor", mEglBaseContext);
-                textureBufferHelper.invoke(() -> {
-                    initST();
-                    return null;
-                });
-            } else if (mEglBaseContext == null) {
-                textureBufferHelper.invoke(() -> {
-                    unInitST();
-                    return null;
-                });
-                try {
-                    textureBufferHelper.dispose();
-                } catch (Exception e) {
-                    ShowLogger.e("IBeautyProcessor", e, "");
-                }
-                textureBufferHelper = null;
-                return false;
-            }
-
-            texture = textureBufferHelper.invoke(() ->
-                    mSTRenderer.preProcess(buffer.getWidth(), buffer.getHeight(), videoFrame.getRotation(),
-                            mNV21ByteArray, STCommonNative.ST_PIX_FMT_NV21,
-                            textureBuffer.getTextureId(),
-                            textureBuffer.getType() == VideoFrame.TextureBuffer.Type.RGB ? GLES20.GL_TEXTURE_2D : GLES11Ext.GL_TEXTURE_EXTERNAL_OES));
-            transformMatrix = textureBuffer.getTransformMatrix();
-        }
-        else {
-            // 使用单输入处理
-            if (textureBufferHelper == null) {
-                mEglBaseContext = null;
-                textureBufferHelper = TextureBufferHelper.create("BeautyProcessor", mEglBaseContext);
-                textureBufferHelper.invoke(() -> {
-                    initST();
-                    return null;
-                });
-            }
-            texture = textureBufferHelper.invoke(() ->
-                    mSTRenderer.preProcess(buffer.getWidth(), buffer.getHeight(), videoFrame.getRotation(), mNV21ByteArray, STCommonNative.ST_PIX_FMT_NV21));
-            transformMatrix = new Matrix();
-        }
-
-        boolean isFront = videoFrame.getSourceType() == VideoFrame.SourceType.kFrontCamera;
-        if (isFrontCamera != isFront) {
-            isFrontCamera = isFront;
-            return false;
-        }
-
-        if (texture < 0) {
-            return false;
-        }
-
-        if (isReleased) {
-            return false;
-        }
-        VideoFrame.TextureBuffer newBuffer = textureBufferHelper.wrapTextureBuffer(
-                buffer.getWidth(),
-                buffer.getHeight(),
-                VideoFrame.TextureBuffer.Type.RGB,
-                texture, transformMatrix);
-        videoFrame.replaceBuffer(newBuffer, videoFrame.getRotation(), videoFrame.getTimestampNs());
-        return true;
-    }
-
-    @Override
-    public boolean getMirrorApplied() {
-        return shouldMirror;
+        isReleased = true;
     }
 
     @Override
@@ -219,32 +117,35 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         if (!sdkIsInit || isReleased) {
             return;
         }
+        getSenseTimeBeautyAPI().runOnProcessThread(() -> {
+            STMobileEffectNative effectNative = SenseTimeBeautySDK.getMobileEffectNative();
+            effectNative.setBeautyMode(STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH, STEffectBeautyType.SMOOTH2_MODE);
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_SMOOTH));
+            effectNative.setBeautyMode(STEffectBeautyType.EFFECT_BEAUTY_BASE_WHITTEN, STEffectBeautyType.WHITENING3_MODE);
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_BASE_WHITTEN, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_WHITEN));
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_BASE_REDDEN, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_REDDEN));
 
-        mSTRenderer.setBeautyMode(STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH, STEffectBeautyType.SMOOTH2_MODE);
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_SMOOTH));
-        mSTRenderer.setBeautyMode(STEffectBeautyType.EFFECT_BEAUTY_BASE_WHITTEN, STEffectBeautyType.WHITENING3_MODE);
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_BASE_WHITTEN, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_WHITEN));
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_BASE_REDDEN, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_REDDEN));
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_THIN_FACE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_OVERALL));
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_SHRINK_CHEEKBONE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_CHEEKBONE));
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_SHRINK_JAWBONE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_JAWBONE));
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_RESHAPE_ENLARGE_EYE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_EYE));
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_WHITE_TEETH, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_TEETH));
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_HAIRLINE_HEIGHT, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_FOREHEAD));
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_NARROW_NOSE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_NOSE));
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_MOUTH_SIZE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_MOUTH));
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_CHIN_LENGTH, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_CHIN));
 
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_THIN_FACE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_OVERALL));
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_SHRINK_CHEEKBONE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_CHEEKBONE));
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_SHRINK_JAWBONE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_JAWBONE));
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_RESHAPE_ENLARGE_EYE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_EYE));
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_WHITE_TEETH, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_TEETH));
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_HAIRLINE_HEIGHT, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_FOREHEAD));
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_NARROW_NOSE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_NOSE));
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_MOUTH_SIZE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_MOUTH));
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_CHIN_LENGTH, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_CHIN));
-
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_BRIGHT_EYE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_BRIGHT_EYE));
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_REMOVE_DARK_CIRCLES, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_REMOVE_DARK_CIRCLES));
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_REMOVE_NASOLABIAL_FOLDS, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_REMOVE_NASOLABIAL_FOLDS));
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_BRIGHT_EYE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_BRIGHT_EYE));
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_REMOVE_DARK_CIRCLES, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_REMOVE_DARK_CIRCLES));
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_REMOVE_NASOLABIAL_FOLDS, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_REMOVE_NASOLABIAL_FOLDS));
 
 
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_TONE_CLEAR, BeautyCache.INSTANCE.getItemValue(ITEM_ID_ADJUST_CLARITY));
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_TONE_SHARPEN, BeautyCache.INSTANCE.getItemValue(ITEM_ID_ADJUST_SHARPEN));
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_TONE_SATURATION, BeautyCache.INSTANCE.getItemValue(ITEM_ID_ADJUST_SATURATION));
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_TONE_CONTRAST, BeautyCache.INSTANCE.getItemValue(ITEM_ID_ADJUST_CONTRAST));
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_TONE_CLEAR, BeautyCache.INSTANCE.getItemValue(ITEM_ID_ADJUST_CLARITY));
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_TONE_SHARPEN, BeautyCache.INSTANCE.getItemValue(ITEM_ID_ADJUST_SHARPEN));
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_TONE_SATURATION, BeautyCache.INSTANCE.getItemValue(ITEM_ID_ADJUST_SATURATION));
+            effectNative.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_TONE_CONTRAST, BeautyCache.INSTANCE.getItemValue(ITEM_ID_ADJUST_CONTRAST));
+
+        });
 
     }
 
@@ -253,13 +154,15 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         if (!sdkIsInit || isReleased) {
             return;
         }
-        if (itemId == ITEM_ID_FILTER_NONE) {
-            mSTRenderer.setFilterStyle("", "", "");
-        } else if (itemId == ITEM_ID_FILTER_CREAM) {
-            setFilterItem("filter_portrait" + File.separator + "filter_style_babypink_1.5.0_v2_origin_20221130_20230228.model", intensity);
-        } else if (itemId == ITEM_ID_FILTER_MAKALONG) {
-            setFilterItem("filter_portrait" + File.separator + "filter_style_ol_1.5.0_v2_origin_20221130_20230228.model", intensity);
-        }
+        getSenseTimeBeautyAPI().runOnProcessThread(() -> {
+            if (itemId == ITEM_ID_FILTER_NONE) {
+                SenseTimeBeautySDK.setFilter(mContext, "", 0);
+            } else if (itemId == ITEM_ID_FILTER_CREAM) {
+                SenseTimeBeautySDK.setFilter(mContext, "filter_portrait" + File.separator + "filter_style_babypink.model", intensity);
+            } else if (itemId == ITEM_ID_FILTER_MAKALONG) {
+                SenseTimeBeautySDK.setFilter(mContext, "filter_portrait" + File.separator + "filter_style_ol.model", intensity);
+            }
+        });
     }
 
 
@@ -268,13 +171,15 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         if (!sdkIsInit || isReleased) {
             return;
         }
-        if (itemId == ITEM_ID_EFFECT_YUANQI) {
-            setStyleItem("style_lightly" + File.separator + "qise.zip", intensity);
-        } else if (itemId == ITEM_ID_EFFECT_CWEI) {
-            setStyleItem("style_lightly" + File.separator + "wanneng.zip", intensity);
-        } else if (itemId == ITEM_ID_EFFECT_NONE) {
-            mSTRenderer.cleanStyle();
-        }
+        getSenseTimeBeautyAPI().runOnProcessThread(() -> {
+            if (itemId == ITEM_ID_EFFECT_YUANQI) {
+                SenseTimeBeautySDK.setStyle(mContext, "style_lightly" + File.separator + "qise.zip", intensity);
+            } else if (itemId == ITEM_ID_EFFECT_CWEI) {
+                SenseTimeBeautySDK.setStyle(mContext, "style_lightly" + File.separator + "wanneng.zip", intensity);
+            } else if (itemId == ITEM_ID_EFFECT_NONE) {
+                SenseTimeBeautySDK.setStyle(mContext, "", 0);
+            }
+        });
     }
 
     @Override
@@ -282,58 +187,13 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         if (!sdkIsInit || isReleased) {
             return;
         }
-
-        if (itemId == ITEM_ID_STICKER_NONE) {
-            mSTRenderer.removeStickers();
-        } else if (itemId == ITEM_ID_STICKER_HUAHUA) {
-            setStickerItem("sticker_face_shape" + File.separator + "lianxingface.zip");
-        }
-    }
-
-
-    private void setStyleItem(String stylePath, float strength) {
-        String[] split = stylePath.split(File.separator);
-        String className = split[0];
-        String fileName = split[1];
-        String path = FileUtils.getFilePath(mContext, className + File.separator + fileName);
-        FileUtils.copyFileIfNeed(mContext, fileName, className);
-        mSTRenderer.setStyle(path, strength, strength);
-    }
-
-    private void setFilterItem(String filterPath, float strength) {
-        String[] split = filterPath.split(File.separator);
-        String className = split[0];
-        String fileName = split[1];
-        String filterName = split[1].split("_")[2].split("\\.")[0];
-        String path = FileUtils.getFilePath(mContext, className + File.separator + fileName);
-        FileUtils.copyFileIfNeed(mContext, fileName, className);
-        mSTRenderer.setFilterStyle(className, filterName, path);
-        mSTRenderer.setFilterStrength(strength);
-    }
-
-    private void setStickerItem(String path) {
-        String[] split = path.split(File.separator);
-        String className = split[0];
-        String fileName = split[1];
-        String _path = FileUtils.getFilePath(mContext, className + File.separator + fileName);
-        FileUtils.copyFileIfNeed(mContext, fileName, className);
-        if (mSTRenderer != null) {
-            mSTRenderer.changeSticker(_path);
-        }
-    }
-
-    private void setMakeUpItem(int type, String typePath, float strength) {
-        if (typePath != null) {
-            String[] split = typePath.split(File.separator);
-            String className = split[0];
-            String fileName = split[1];
-            String _path = FileUtils.getFilePath(mContext, className + File.separator + fileName);
-            FileUtils.copyFileIfNeed(mContext, fileName, className);
-            mSTRenderer.setMakeupForType(type, _path);
-            mSTRenderer.setMakeupStrength(type, strength);
-        } else {
-            mSTRenderer.removeMakeupByType(type);
-        }
+        getSenseTimeBeautyAPI().runOnProcessThread(() -> {
+            if (itemId == ITEM_ID_STICKER_NONE) {
+                SenseTimeBeautySDK.setSticker(mContext, "");
+            } else if (itemId == ITEM_ID_STICKER_HUAHUA) {
+                SenseTimeBeautySDK.setSticker(mContext, "sticker_face_shape" + File.separator + "ShangBanLe.zip");
+            }
+        });
     }
 
 

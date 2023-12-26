@@ -2,12 +2,9 @@ package io.agora.scene.base.manager;
 
 import android.text.TextUtils;
 
-import org.greenrobot.eventbus.EventBus;
-
 import io.agora.scene.base.Constant;
 import io.agora.scene.base.api.ApiManager;
 import io.agora.scene.base.api.model.User;
-import io.agora.scene.base.event.UserInfoChangeEvent;
 import io.agora.scene.base.utils.GsonUtil;
 import io.agora.scene.base.utils.SPUtil;
 
@@ -32,10 +29,15 @@ public final class UserManager {
     public void saveUserInfo(User user) {
         mUser = user;
         writeUserInfoToPrefs(false);
-        EventBus.getDefault().post(new UserInfoChangeEvent());
     }
 
     public void logout() {
+        SPUtil.putBoolean(Constant.IS_AGREE, false);
+        writeUserInfoToPrefs(true);
+    }
+
+    public void logoff() {
+        SPUtil.putBoolean(Constant.IS_AGREE, false);
         writeUserInfoToPrefs(true);
     }
 

@@ -7,12 +7,10 @@
 
 import Foundation
 
-//#if DEBUG
-//
-//#else
-//public extension String {
-//    func localized() -> String {
-//        return sceneLocalized(self)
-//    }
-//}
-//#endif
+public extension String {
+    
+    func spatial_localized() -> String {
+        return SALanguageManager.localValue(key: self)
+    }
+    
+}

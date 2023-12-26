@@ -9,25 +9,29 @@ import UIKit
 import ZSwiftBaseLib
 import AgoraRtcKit
 
-@objcMembers final class AboutAgoraEntertainmentViewController: VRBaseViewController {
+@objcMembers final class AboutAgoraEntertainmentViewController: VLBaseViewController {
     
-    var infos = [["contents":[["title": NSLocalizedString("ContactCustomerService", comment: ""),
+    var infos = [["contents":[["title": NSLocalizedString("app_about_customer_service", comment: ""),
                                "detail": "400-632-6626"],
-                              ["title": NSLocalizedString("OfficialWebsiteAddress", comment: ""),
+                              ["title": NSLocalizedString("app_about_official_website", comment: ""),
                                "detail":"https://www.shengwang.cn"]],
                   "sectionName": ""],
-                 ["contents": [["title": NSLocalizedString("语聊房", comment: ""), "detail":"YL-2.1.0"],
-                               ["title": NSLocalizedString("语聊房-空间音频模式", comment: ""), "detail":"YLKJ-2.1.0"],
-                               ["title": NSLocalizedString("在线K歌", comment: ""),"detail":"KTV-2.3.0"],
-                               ["title": NSLocalizedString("秀场直播", comment: ""), "detail":"ZB-2.4.0"]],
-                  "sectionName": NSLocalizedString("SceneVersion", comment: "")]]
+                 ["contents": [["title": NSLocalizedString("app_voice_chat", comment: ""), "detail":"YL-3.1.0"],
+                               ["title": NSLocalizedString("app_about_chat_room_spatial", comment: ""), "detail":"YLKJ-3.1.0"],
+                               ["title": NSLocalizedString("app_about_karaoke", comment: ""),"detail":"KTV-3.3.0"],
+                               ["title": NSLocalizedString("app_about_hiSong", comment: ""),"detail":"QC-3.4.0"],
+                               ["title": NSLocalizedString("app_about_continuesinging", comment: ""),"detail":"JC-3.5.0"],
+                               ["title": NSLocalizedString("app_about_show", comment: ""), "detail":"ZB-3.2.0"],
+                               ["title": NSLocalizedString("app_about_1v1", comment: ""), "detail":"SMF-3.6.0"],
+                               ["title": NSLocalizedString("app_about_live_to_1v1", comment: ""), "detail":"XCSMF-3.7.0"]],
+                  "sectionName": NSLocalizedString("app_about_scene_version", comment: "")]]
     
     let tableHeader = AboutAgoraHeader(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 220),
-                                       name: NSLocalizedString("AgoraEntertainment", comment: ""),
-                                       versionText: NSLocalizedString("Version", comment: "")+": "+"20230530-"+UIDevice.current.appVersion+"-\(AgoraRtcEngineKit.getSdkVersion())")
+                                       name: NSLocalizedString("app_about_name", comment: ""),
+                                       versionText: NSLocalizedString("app_about_version", comment: "")+": "+"20231230-"+UIDevice.current.appVersion+"-\(AgoraRtcEngineKit.getSdkVersion())")
     
     lazy var infoList: UITableView = {
-        UITableView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: ScreenHeight-ZNavgationHeight), style: .plain)
+        UITableView(frame: .zero, style: .grouped)
             .registerCell(ContactInfoCell.self, forCellReuseIdentifier: "ContactInfoCell")
             .registerCell(UITableViewCell.self, forCellReuseIdentifier: "SceneVersionCell")
             .delegate(self)
@@ -36,6 +40,9 @@ import AgoraRtcKit
             .tableHeaderView(tableHeader)
             .backgroundColor(.white)
             .separatorStyle(.none)
+            .estimatedSectionFooterHeight(0)
+            .estimatedSectionHeaderHeight(0)
+            .estimatedRowHeight(0)
     }()
     
     lazy var debugModeButton: UIButton = {
@@ -43,7 +50,7 @@ import AgoraRtcKit
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .blue
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        button.setTitle("Debug Mode is On", for: .normal)
+        button.setTitle(NSLocalizedString("app_debug_open", comment: ""), for: .normal)
         button.addTargetFor(self, action: #selector(onClickCloseDebugMode(_:)), for: .touchUpInside)
         return button
     }()
@@ -51,19 +58,24 @@ import AgoraRtcKit
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        view.backgroundColor = .white
+        setNaviTitleName(NSLocalizedString("app_about_app", comment: ""))
+        setBackBtn()
+        hiddenBackgroundImage()
+        
         tableHeader.delegate = self
-        self.view.addSubview(self.infoList)
-        self.view.bringSubviewToFront(navigation)
-        self.navigation.title.text = NSLocalizedString("AboutAgoraEntertainment", comment: "")
+        view.addSubview(infoList)
+        infoList.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0)
         
         debugModeButton.isHidden = !AppContext.shared.isDebugMode
-        self.view.addSubview(debugModeButton)
-        self.createConstrains()
+        view.addSubview(debugModeButton)
+        createConstrains()
     }
     
     private func createConstrains() {
         infoList.snp.makeConstraints { make in
-            make.left.top.right.bottom.equalToSuperview()
+            make.left.right.bottom.equalToSuperview()
+            make.top.equalToSuperview().offset(ZNavgationHeight)
         }
         debugModeButton.snp.makeConstraints { make in
             make.left.bottom.right.equalToSuperview()
@@ -72,12 +84,12 @@ import AgoraRtcKit
     }
     
     @objc func onClickCloseDebugMode(_ sender: UIButton) {
-        let alert = UIAlertController(title: "确定退出Debug模式么？", message: "退出debug模式后，设置页面将恢复成正常的设置页面哦~", preferredStyle: .alert)
-        let submit = UIAlertAction(title: "确定", style: .default, handler: { action in
+        let alert = UIAlertController(title: NSLocalizedString("app_about_app", comment: "app_exit_debug"), message: NSLocalizedString("app_exit_debug_tip", comment: ""), preferredStyle: .alert)
+        let submit = UIAlertAction(title: NSLocalizedString("confirm", comment: ""), style: .default, handler: { action in
             AppContext.shared.isDebugMode = false
             self.debugModeButton.isHidden = true
         })
-        let cancel = UIAlertAction(title: "取消", style: .default)
+        let cancel = UIAlertAction(title: NSLocalizedString("cancel", comment: ""), style: .default)
         alert.addAction(submit)
         alert.addAction(cancel)
         present(alert, animated: true)
@@ -95,21 +107,24 @@ extension AboutAgoraEntertainmentViewController: AboutAgoraHeaderDelegate {
 extension AboutAgoraEntertainmentViewController: UITableViewDelegate,UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if let name = self.infos[safe: section]?["sectionName"] as? String,name == NSLocalizedString("SceneVersion", comment: "") {
+        if let name = self.infos[safe: section]?["sectionName"] as? String,name == NSLocalizedString("app_about_scene_version", comment: "") {
             return 44
         }
         return 0
     }
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        0.1
+    }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 1 {
-            return 54
+            return 64
         }
         return 72
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        if let name = self.infos[safe: section]?["sectionName"] as? String,name == NSLocalizedString("SceneVersion", comment: "") {
+        if let name = self.infos[safe: section]?["sectionName"] as? String,name == NSLocalizedString("app_about_scene_version", comment: "") {
             return UIView {
                 UIView(frame: CGRect(x: 0, y: 0, width: self.infoList.frame.width, height: 44)).backgroundColor(.white)
                 UILabel(frame: CGRect(x: 20, y: 12, width: self.infoList.frame.width-40, height: 20)).font(.systemFont(ofSize: 13, weight: .regular)).textColor(UIColor(0x6C7192)).text(name)

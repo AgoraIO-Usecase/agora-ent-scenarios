@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        />
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="90dp"
+        android:layout_marginBottom="47dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        app:cardCornerRadius="20dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivRoomCover"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:scaleType="fitXY"
+            android:src="@drawable/pure1v1_cover_gradient"
+            />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="90dp"
+        android:layout_marginBottom="47dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:elevation="5dp"
+        >
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivLivingBG"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/pure1v1_room_item_living"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivLiving"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:layout_constraintStart_toStartOf="@+id/ivLivingBG"
+            app:layout_constraintEnd_toEndOf="@+id/ivLivingBG"
+            app:layout_constraintTop_toTopOf="@+id/ivLivingBG"
+            app:layout_constraintBottom_toBottomOf="@+id/ivLivingBG"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivConnectBG"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/pure1v1_room_item_call_bg"
+            app:layout_constraintStart_toStartOf="@+id/ivConnect"
+            app:layout_constraintEnd_toEndOf="@+id/ivConnect"
+            app:layout_constraintTop_toTopOf="@+id/ivConnect"
+            app:layout_constraintBottom_toBottomOf="@+id/ivConnect"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivConnect"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="24dp"
+            android:src="@drawable/pure1v1_room_item_call"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvLocalInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:textColor="@color/white"
+            android:textSize="14dp"
+            android:text="@string/pure1v1_room_list_local_info"
+            app:layout_constraintStart_toStartOf="@+id/ivLocalAvatar"
+            app:layout_constraintBottom_toTopOf="@+id/ivLocalAvatar"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvLocalName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/white"
+            android:textSize="20dp"
+            android:text="@string/pure1v1_room_list_title"
+            app:layout_constraintStart_toEndOf="@+id/ivLocalAvatar"
+            app:layout_constraintTop_toTopOf="@+id/ivLocalAvatar"
+            app:layout_constraintBottom_toBottomOf="@+id/ivLocalAvatar"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivLocalAvatar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginBottom="20dp"
+            android:src="@drawable/pure1v1_room_item_icon_sample"
+            app:layout_constraintStart_toStartOf="@id/tvRemoteInfo"
+            app:layout_constraintBottom_toTopOf="@+id/tvRemoteInfo"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRemoteInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:textColor="@color/white"
+            android:textSize="14dp"
+            android:text="@string/pure1v1_room_list_remote_info"
+            app:layout_constraintStart_toStartOf="@+id/ivRemoteAvatar"
+            app:layout_constraintBottom_toTopOf="@+id/ivRemoteAvatar"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRemoteName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/white"
+            android:textSize="20dp"
+            android:text="@string/pure1v1_room_list_title"
+            app:layout_constraintStart_toEndOf="@+id/ivRemoteAvatar"
+            app:layout_constraintTop_toTopOf="@+id/ivRemoteAvatar"
+            app:layout_constraintBottom_toBottomOf="@+id/ivRemoteAvatar"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivRemoteAvatar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/pure1v1_room_item_icon_sample"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/ivConnect"
+            app:layout_constraintBottom_toBottomOf="@+id/ivConnect"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

@@ -30,14 +30,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="@string/voice_chatroom_welcome"
+        android:text="@string/voice_spatial_welcome"
         android:textColor="@color/voice_dark_grey_color_040925"
         android:textSize="@dimen/voice_sp_16"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivTitle"
-        tools:text="@string/voice_chatroom_welcome" />
+        tools:text="@string/voice_spatial_welcome" />
 
     <ImageView
         android:id="@+id/iv1"
@@ -54,7 +54,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="6dp"
         android:layout_marginEnd="20dp"
-        android:text="@string/voice_chatroom_welcome_tip1"
+        android:text="@string/voice_spatial_welcome_tip1"
         android:textColor="#3C4267"
         android:textSize="14sp"
         app:layout_constraintStart_toEndOf="@+id/iv1"
@@ -75,7 +75,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="6dp"
         android:layout_marginEnd="20dp"
-        android:text="@string/voice_chatroom_welcome_tip2"
+        android:text="@string/voice_spatial_welcome_tip2"
         android:textColor="#3C4267"
         android:textSize="14sp"
         app:layout_constraintStart_toEndOf="@+id/iv2"
@@ -100,7 +100,7 @@
         android:layout_width="0dp"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="20dp"
-        android:text="@string/voice_chatroom_welcome_gotit"
+        android:text="@string/voice_spatial_welcome_gotit"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

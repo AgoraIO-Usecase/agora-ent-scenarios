@@ -19,7 +19,7 @@ class VoiceRoomDebugOptionsDialog: BaseSheetDialog<VoiceSpatialDialogDebugOption
     override fun getViewBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
-    ): VoiceSpatialDialogDebugOptionsBinding? {
+    ): VoiceSpatialDialogDebugOptionsBinding {
         return VoiceSpatialDialogDebugOptionsBinding.inflate(inflater, container, false)
     }
 
@@ -27,6 +27,9 @@ class VoiceRoomDebugOptionsDialog: BaseSheetDialog<VoiceSpatialDialogDebugOption
         super.onViewCreated(view, savedInstanceState)
         binding?.accbAPM?.setOnCheckedChangeListener { _, b ->
             AgoraRtcEngineController.get().setApmOn(b)
+        }
+        binding?.cbTimeLimit?.setOnCheckedChangeListener { _, b ->
+            // TODO: 打开/关闭房间时间限制
         }
     }
 }

@@ -8,7 +8,7 @@
 #import "KTVDebugManager.h"
 #import "KTVDebugViewController.h"
 #import "KTVDebugInfo.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import AgoraRtcKit;
 
 @implementation KTVDebugManager

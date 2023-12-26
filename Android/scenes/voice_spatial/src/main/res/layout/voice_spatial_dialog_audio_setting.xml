@@ -34,7 +34,7 @@
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/mtBottomSheetTitle"
             style="@style/voice_bottom_sheet_title_style"
-            android:text="@string/voice_chatroom_audio_settings"
+            android:text="@string/voice_spatial_audio_settings"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
@@ -53,7 +53,7 @@
             android:id="@+id/mtBotSettingsTitle"
             style="@style/voice_bottom_sheet_subtitle_style"
             android:layout_width="wrap_content"
-            android:text="@string/voice_chatroom_bot_settings"
+            android:text="@string/voice_spatial_bot_settings"
             android:drawablePadding="5dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle" />
@@ -65,7 +65,7 @@
             android:textColor="@color/voice_color_979cbb"
             android:gravity="center_vertical"
             android:textSize="@dimen/voice_sp_11"
-            android:text="@string/voice_chatroom_settings_host_only"
+            android:text="@string/voice_spatial_settings_host_only"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/mtBotSettingsTitle"
             app:layout_constraintBottom_toBottomOf="@+id/mtBotSettingsTitle"/>
@@ -84,7 +84,7 @@
             android:id="@+id/mtAgoraBot"
             style="@style/voice_bottom_sheet_text_style"
             android:layout_marginStart="52dp"
-            android:text="@string/voice_chatroom_agora_bot"
+            android:text="@string/voice_spatial_agora_bot"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mtBotSettingsTitle" />
 
@@ -128,7 +128,7 @@
             style="@style/voice_bottom_sheet_text_style"
             android:layout_marginStart="52dp"
             android:layout_marginTop="1dp"
-            android:text="@string/voice_chatroom_bot_volume"
+            android:text="@string/voice_spatial_bot_volume"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mtAgoraBot" />
 
@@ -136,7 +136,7 @@
             android:id="@+id/pbAgoraBotVolume"
             style="@style/voice_bottom_sheet_progress"
             android:layout_gravity="center_vertical"
-            android:contentDescription="@string/voice_chatroom_bot_volume"
+            android:contentDescription="@string/voice_spatial_bot_volume"
             android:thumb="@drawable/voice_icon_progress_thumb20"
             app:layout_constraintBottom_toBottomOf="@+id/mtAgoraBotVolume"
             app:layout_constraintEnd_toStartOf="@+id/mtAgoraBotVolumeValue"
@@ -169,7 +169,7 @@
             android:layout_width="wrap_content"
             android:drawableEnd="@drawable/voice_icon_room_setting_new_tag"
             android:drawablePadding="5dp"
-            android:text="@string/voice_chatroom_spatial_audio"
+            android:text="@string/voice_spatial_audio"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mtAgoraBotVolume" />
 
@@ -191,7 +191,7 @@
             android:layout_marginTop="1dp"
             android:layout_marginBottom="15dp"
             android:layout_marginStart="52dp"
-            android:text="@string/voice_chatroom_spatial_audio"
+            android:text="@string/voice_spatial_audio"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mtAgoraChatroomEQTitle" />
@@ -203,6 +203,6 @@
             app:layout_constraintBottom_toBottomOf="@+id/mtSpatialAudio"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/mtSpatialAudio"
-            tools:text="@string/voice_chatroom_off" />
+            tools:text="@string/voice_spatial_off" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

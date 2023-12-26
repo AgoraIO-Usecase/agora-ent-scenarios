@@ -59,6 +59,8 @@ class ShowReceivePKView: UIView {
         let label = UILabel()
         label.textColor = .show_Ellipse7
         label.font = .show_R_16
+        label.numberOfLines = 0
+        label.textAlignment = .center
         return label
     }()
     
@@ -121,7 +123,7 @@ class ShowReceivePKView: UIView {
         
         bgView.addSubview(titleLabel)
         titleLabel.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
+            make.leading.trailing.equalToSuperview().inset(15)
             make.bottom.equalTo(-105)
         }
         

@@ -17,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) UIView *videoView; //显示视频
 @property (nonatomic, strong) UIButton *joinChorusBtn;
 
+@property (nonatomic, assign) NSInteger volume;
+
 @end
 
 NS_ASSUME_NONNULL_END

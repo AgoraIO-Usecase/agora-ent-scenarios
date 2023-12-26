@@ -33,4 +33,9 @@ public class UrlConstants {
     // 用户点击行为数据上报
     public static final String REQUEST_REPORT_ACTION = BASE_REQUEST_LOGIN_BY_TOKEN + "/report/action";
 
+    // 上报日志
+    public static final String REQUEST_UPLOAD_LOG = BASE_REQUEST_LOGIN_BY_TOKEN + "/upload/log";
+
+    // 使用反馈上报
+    public static final String REQUEST_FEEDBACK_UPLOAD = BASE_REQUEST_LOGIN_BY_TOKEN + "/feedback/upload";
 }

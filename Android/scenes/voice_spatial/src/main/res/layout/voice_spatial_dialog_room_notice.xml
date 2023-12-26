@@ -28,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="@string/voice_chatroom_notice"
+        android:text="@string/voice_spatial_notice"
         android:textColor="@color/voice_dark_grey_color_040925"
         android:textSize="@dimen/voice_sp_16"
         android:textStyle="bold"
@@ -43,7 +43,7 @@
         android:layout_marginEnd="16dp"
         android:paddingHorizontal="18dp"
         android:paddingVertical="8dp"
-        android:text="@string/voice_chatroom_notice_post"
+        android:text="@string/voice_spatial_notice_post"
         android:textSize="@dimen/voice_sp_14"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/mtTitle"
@@ -56,7 +56,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:padding="10dp"
-        android:text="@string/voice_room_cancel"
+        android:text="@string/voice_spatial_room_cancel"
         android:textColor="@color/voice_dark_grey_color_6c7192"
         android:textSize="@dimen/voice_sp_14"
         android:visibility="invisible"
@@ -81,7 +81,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mtTitle"
-        tools:text="@string/voice_voice_voice_chatroom_first_enter_room_notice_tips" />
+        tools:text="@string/voice_spatial_first_enter_room_notice_tips" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout"
@@ -107,7 +107,7 @@
             android:layout_marginStart="18dp"
             android:layout_marginEnd="5dp"
             android:background="@color/voice_transparent"
-            android:hint="@string/voice_chatroom_notice_edit_hint"
+            android:hint="@string/voice_spatial_notice_edit_hint"
             android:textColorHint="@color/voice_dark_grey_color_979cbb"
             android:gravity="top"
             android:lines="5"
@@ -153,7 +153,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="18dp"
-        android:text="@string/voice_chatroom_edit"
+        android:text="@string/voice_spatial_edit"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

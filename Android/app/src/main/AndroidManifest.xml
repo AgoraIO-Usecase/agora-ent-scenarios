@@ -17,6 +17,18 @@
         android:name="android.permission.FOREGROUND_SERVICE"
         tools:node="remove" />
 
+    <!-- android 13 细化权限   -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <!--适配Android R包可见性 开始-->
+    <queries package="${applicationId}">
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE"/>
+        </intent>
+
+        <package android:name="com.huawei.multimedia.audioengine" />
+    </queries>
+
     <application
         android:name="io.agora.scene.base.component.AgoraApplication"
         android:allowBackup="false"
@@ -26,6 +38,7 @@
         android:roundIcon="@mipmap/app_ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/app_Theme.AgoraKTV"
+        android:extractNativeLibs="true"
         tools:replace="android:allowBackup"
         android:requestLegacyExternalStorage="true">
 
@@ -43,15 +56,22 @@
         <activity
             android:name="com.agora.entfulldemo.home.MainActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.agora.entfulldemo.login.ui.PhoneLoginRegisterActivity"
+            android:name="com.agora.entfulldemo.login.LoginActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name="com.agora.entfulldemo.webview.WebViewActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name="com.agora.entfulldemo.home.mine.AboutUsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.agora.entfulldemo.home.mine.MineAccountActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.agora.entfulldemo.home.mine.FeedbackActivity"
             android:screenOrientation="portrait" />
 
         <meta-data

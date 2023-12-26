@@ -12,7 +12,7 @@ class VoiceToolboxRequestApi {
     }
 
     private var BASE_URL = ""
-    private val generateToken = "/v1/token/generate"
+    private val generateToken = "/v2/token/generate"
     private val createImRoom = "/v1/webdemo/im/chat/create"
 
     fun setBaseUrl(baseUrl: String) {

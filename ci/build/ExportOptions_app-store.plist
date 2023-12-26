@@ -16,6 +16,8 @@
 		<string>apiexample_all_dis</string>
 		<key>io.agora.chatroom</key>
 		<string>apiexample_all_dis</string>
+		<key>io.agora.AgoraVoice</key>
+		<string>apiexample_all_dis</string>
 	</dict>
 	<key>signingCertificate</key>
 	<string>9FD7EB5E52172F5DC47F0D873407C08B48C3320F</string>

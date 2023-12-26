@@ -7,7 +7,7 @@
 #import "VLHotSpotBtn.h"
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import YYCategories;
 
 @interface VLPopOnLineTypeView ()
@@ -39,7 +39,7 @@
     [self addSubview:backBtn];
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = @"上麦";
+    titleLabel.text = KTVLocalizedString(@"ktv_onMic");
     titleLabel.font = VLUIFontMake(16);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -48,10 +48,8 @@
     CGFloat margin = VLREALVALUE_WIDTH(20);
     CGFloat itemW = (SCREEN_WIDTH-3*margin)/2.0;
     
-//    QMUIButton *audioBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"KTV_onLineType_audionIcon"]
-//                                                            title:KTVLocalizedString(@"音频上麦")];
     UIButton *audioBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [audioBtn setTitle:KTVLocalizedString(@"音频上麦") forState:UIControlStateNormal];
+    [audioBtn setTitle:KTVLocalizedString(@"ktv_audio_onmic") forState:UIControlStateNormal];
     [audioBtn setImage:[UIImage sceneImageWithName:@"KTV_onLineType_audionIcon"] forState:UIControlStateNormal];
     audioBtn.frame = CGRectMake(margin, titleLabel.bottom+26, itemW, VLREALVALUE_WIDTH(72));
 //    audioBtn.imagePosition = QMUIButtonImagePositionLeft;
@@ -63,7 +61,7 @@
     audioBtn.layer.masksToBounds = YES;
     audioBtn.tag = 0;
     self.audioBtn = audioBtn;
-//    self.audioBtn.adjustsButtonWhenHighlighted = NO;
+
     self.audioBtn.layer.borderWidth = 1.5f;
     self.audioSelImgView.hidden = YES;
     [audioBtn addTarget:self action:@selector(typeBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
@@ -75,10 +73,8 @@
     self.audioSelImgView.hidden = YES;
     [self addSubview:self.audioSelImgView];
     
-//    QMUIButton *videoBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"KTV_onLineType_videoIcon"]
-//                                                            title:KTVLocalizedString(@"视频上麦")];
     UIButton *videoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [audioBtn setTitle:KTVLocalizedString(@"视频上麦") forState:UIControlStateNormal];
+    [audioBtn setTitle:KTVLocalizedString(@"ktv_video_onmic") forState:UIControlStateNormal];
     [audioBtn setImage:[UIImage sceneImageWithName:@"KTV_onLineType_videoIcon"] forState:UIControlStateNormal];
     videoBtn.frame = CGRectMake(audioBtn.right+margin, audioBtn.top, itemW, VLREALVALUE_WIDTH(72));
 //    videoBtn.imagePosition = QMUIButtonImagePositionLeft;

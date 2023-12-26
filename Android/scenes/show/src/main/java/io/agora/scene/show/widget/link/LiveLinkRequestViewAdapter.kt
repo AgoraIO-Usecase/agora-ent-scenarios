@@ -2,15 +2,17 @@ package io.agora.scene.show.widget.link
 
 import android.view.View
 import androidx.core.view.isVisible
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.base.utils.dp
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLiveLinkRequestMessageBinding
 import io.agora.scene.show.service.ShowMicSeatApply
 import io.agora.scene.show.service.ShowRoomRequestStatus
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
-import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
 
 /**
  * 连麦-连麦申请列表适配器
@@ -28,7 +30,7 @@ class LiveLinkRequestViewAdapter: BindingSingleAdapter<ShowMicSeatApply, ShowLiv
         GlideApp.with(binding.coverUserIcon).load(seatApply.avatar)
             .fallback(R.mipmap.show_default_icon)
             .error(R.mipmap.show_default_icon)
-            .transform(CenterCropRoundCornerTransform(10))
+            .apply(RequestOptions.circleCropTransform())
             .into(binding.coverUserIcon);
         if (isRoomOwner) {
             binding.userNum.isVisible = false

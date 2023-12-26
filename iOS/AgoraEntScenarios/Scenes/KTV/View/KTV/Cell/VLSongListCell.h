@@ -5,8 +5,7 @@
 
 #import <UIKit/UIKit.h>
 #import "VLHotSpotBtn.h"
-#import "VLRoomSelSongModel.h"
-
+#import "AgoraEntScenarios-Swift.h"
 NS_ASSUME_NONNULL_BEGIN
 @interface VLSongListCell : UITableViewCell
 

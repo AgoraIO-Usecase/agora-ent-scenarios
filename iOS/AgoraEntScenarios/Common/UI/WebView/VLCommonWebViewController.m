@@ -6,6 +6,8 @@
 #import "VLCommonWebViewController.h"
 #import <WebKit/WebKit.h>
 #import "VLMacroDefine.h"
+#import "AESMacro.h"
+
 @import Masonry;
 
 #pragma mark - KVO KEY
@@ -19,9 +21,16 @@ NSString *const USBaseWebViewController_KVO_Title = @"title";
 @property(nonatomic,strong) UIColor *progressViewColor;
 @property(nonatomic,assign) CGFloat progressViewHeight;
 @property(nonatomic,strong) WKWebView *webView;
+@property(nonatomic,strong) UIButton *systemWebButton;
+@property(nonatomic,strong) UIView *lineView;
 @end
 
 @implementation VLCommonWebViewController
+
+- (void)setIsShowSystemWebButton:(BOOL)isShowSystemWebButton {
+    _isShowSystemWebButton = isShowSystemWebButton;
+    self.systemWebButton.hidden = !isShowSystemWebButton;
+}
 
 - (instancetype)init {
     if (self = [super init]) {
@@ -34,19 +43,14 @@ NSString *const USBaseWebViewController_KVO_Title = @"title";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self setBackgroundImage:@"home_bg_image"];
-    [self setBackBtn];
     [self config];
     [self setupViews];
 }
 
 - (void)config {
+    [self hiddenBackgroundImage];
+    [self setBackBtn];
     self.view.backgroundColor = [UIColor whiteColor];
-    if (@available(iOS 11.0,*)) {
-        self.webView.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-    }else {
-        self.automaticallyAdjustsScrollViewInsets = YES;
-    }
 }
 
 - (void)injectMethod:(NSString *)method {
@@ -66,8 +70,22 @@ NSString *const USBaseWebViewController_KVO_Title = @"title";
         make.bottom.mas_equalTo(-kSafeAreaBottomHeight);
         make.left.right.mas_equalTo(self.view);
     }];
-    [self.navigationController.navigationBar addSubview:self.progressView];
-    [self.navigationController.navigationBar bringSubviewToFront:self.progressView];
+    
+    [self.view addSubview:self.lineView];
+    [self.lineView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [self.lineView.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:kTopNavHeight].active = YES;
+    [self.lineView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+    [self.lineView.heightAnchor constraintEqualToConstant:0.5].active = YES;
+    
+    [self.view addSubview:self.systemWebButton];
+    [self.systemWebButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-16].active = YES;
+    [self.systemWebButton.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:kStatusBarHeight + 10].active = YES;
+    
+    [self.view addSubview:self.progressView];
+    [self.progressView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [self.progressView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+    [self.progressView.heightAnchor constraintEqualToConstant:self.progressViewHeight].active = YES;
+    [self.progressView.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:kTopNavHeight].active = YES;
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -96,13 +114,13 @@ NSString *const USBaseWebViewController_KVO_Title = @"title";
     }
 }
 
-#pragma mark - Public Methods
-
-- (void)configNavigationBar:(UINavigationBar *)navigationBar {
-    [super configNavigationBar:navigationBar];
-}
-- (BOOL)preferredNavigationBarHidden {
-    return NO;
+- (void)systemButtonClickEvent {
+    if (self.isShowSystemWebButton == NO) {
+        return;
+    }
+    if ([[UIApplication sharedApplication] canOpenURL:self.webView.URL]) {
+        [[UIApplication sharedApplication] openURL:self.webView.URL options:@{} completionHandler:nil];
+    }
 }
 
 #pragma mark - KVO
@@ -128,7 +146,6 @@ NSString *const USBaseWebViewController_KVO_Title = @"title";
 //            NSNumber *new = (NSNumber *)change[@"new"];
 //            _popButton.customView.hidden = !new.boolValue;
         }else if ([keyPath isEqualToString:USBaseWebViewController_KVO_Title]) {
-//            self.navigationItem.title = _webView.title;
             [self setNaviTitleName:_webView.title];
         }
     }
@@ -160,23 +177,40 @@ NSString *const USBaseWebViewController_KVO_Title = @"title";
 
 - (CGFloat)progressViewHeight {
     if (!_progressViewHeight) {
-        _progressViewHeight = 8.0;
+        _progressViewHeight = 2.0;
     }
     return _progressViewHeight;
 }
 
 - (UIProgressView *)progressView {
     if (!_progressView) {
-        CGFloat height = CGRectGetHeight(self.navigationController.navigationBar.frame)- self.progressViewHeight;
-        CGFloat width = CGRectGetWidth([UIScreen mainScreen].bounds);
-        // y值差度待查
-        CGRect frame = CGRectMake(0, height + 4, width, self.progressViewHeight);
-        _progressView = [[UIProgressView alloc] initWithFrame:frame];
+        _progressView = [[UIProgressView alloc] init];
         _progressView.progressTintColor = self.progressViewColor;
         _progressView.trackTintColor = [UIColor clearColor];
+        _progressView.translatesAutoresizingMaskIntoConstraints = NO;
     }
     return _progressView;
 }
+
+- (UIButton *)systemWebButton {
+    if (_systemWebButton == nil) {
+        _systemWebButton = [[UIButton alloc] init];
+        [_systemWebButton setImage:[UIImage imageNamed:@"system_web_icon"] forState:(UIControlStateNormal)];
+        _systemWebButton.translatesAutoresizingMaskIntoConstraints = NO;
+        _systemWebButton.hidden = YES;
+        [_systemWebButton addTarget:self action:@selector(systemButtonClickEvent) forControlEvents:(UIControlEventTouchUpInside)];
+    }
+    return _systemWebButton;
+}
+- (UIView *)lineView {
+    if (_lineView == nil) {
+        _lineView = [[UIView alloc] init];
+        _lineView.backgroundColor = [UIColorMakeWithHex(@"#CCCCCC") colorWithAlphaComponent:0.8];
+        _lineView.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+    return _lineView;
+}
+
 
 - (void)dealloc {
     [_webView removeObserver:self forKeyPath:USBaseWebViewController_KVO_EstimatedProgress];

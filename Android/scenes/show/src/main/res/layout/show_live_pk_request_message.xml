@@ -32,10 +32,11 @@
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_item_request"
         android:background="@drawable/show_pk_or_link_btn_bg"
-        android:layout_width="56dp"
+        android:layout_width="65dp"
         android:layout_height="28dp"
         android:layout_marginEnd="25dp"
         android:text="@string/show_application"
+        android:gravity="center"
         android:textColor="@android:color/white"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@id/cover_boardcaster_icon"
