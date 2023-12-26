@@ -11,7 +11,7 @@ class URLStatics {
 
         //开发服：https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/discover-dev/index.html
         //正式服：https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/discover/index.html
-        const val findBannerURL = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/discover-dev/index.html"
+        const val findBannerURL = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/discover/index.html"
         const val findKtvSearchURL = "https://www.shengwang.cn/ktv_feedback/"
         const val findScenarioKtvURL = "https://www.shengwang.cn/solution/online-karaoke/"
         const val findDocKtvURL = "https://doc.shengwang.cn/doc/online-ktv/android/overview/introduction"
