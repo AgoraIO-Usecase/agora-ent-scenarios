@@ -391,6 +391,8 @@ extension RoomViewController {
         alertController.addAction(action2)
         alertController.addAction(action1)
         present(alertController, animated: true, completion: nil)
+        
+        JoyGameListDialog.hiddenAnimation()
     }
     
     @objc func onMoreAction() {
