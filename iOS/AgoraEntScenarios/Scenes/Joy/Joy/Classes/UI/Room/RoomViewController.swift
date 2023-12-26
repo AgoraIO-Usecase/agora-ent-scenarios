@@ -419,6 +419,7 @@ extension RoomViewController {
         }
         alertController.addAction(action)
         present(alertController, animated: true, completion: nil)
+        JoyGameListDialog.hiddenAnimation()
     }
 }
 
