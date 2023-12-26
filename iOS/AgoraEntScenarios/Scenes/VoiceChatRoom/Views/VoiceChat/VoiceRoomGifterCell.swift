@@ -16,7 +16,7 @@ public class VoiceRoomGifterCell: UITableViewCell {
         didSet {
             DispatchQueue.main.async {
                 self.rankIndex.setTitle("\(self.index + 1)", for: .normal)
-                self.rankIndex.setBackgroundImage(UIImage("top\(self.index + 1)"), for: .normal)
+                self.rankIndex.setBackgroundImage(UIImage.sceneImage(name: "top\(self.index + 1)", bundleName: "VoiceChatRoomResource"), for: .normal)
             }
         }
     }

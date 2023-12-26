@@ -15,12 +15,12 @@
 #import "VLURLPathConfig.h"
 #import "VLFontUtils.h"
 #import "VLToast.h"
-#import "VLAPIRequest.h"
+//#import "VLAPIRequest.h"
 #import "VLGlobalHelper.h"
 #import "MenuUtils.h"
 #import <Photos/Photos.h>
 #import "AgoraEntScenarios-Swift.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import Masonry;
 @import LEEAlert;
 
@@ -41,7 +41,6 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setBackgroundImage:@"home_bg_image"];
-    [self setNaviTitleName:AGLocalizedString(@"声网")];
     [self setUpUI];
 }
 
@@ -55,12 +54,18 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self loadRequestUserInfoRequest];
+    [self.mineView refreshTableView];
 }
 
 #pragma mark - VLMineViewDelegate
 
 - (void)mineViewDidCick:(VLMineViewClickType)type {
     switch (type) {
+        case VLMineViewClickTypeMyAccount: {
+            VLMineAccountViewController *vc = [[VLMineAccountViewController alloc] init];
+            [self.navigationController pushViewController:vc animated:YES];
+        }
+            break;
         case VLMineViewClickTypeUserProtocol:
             [self pushWebView:kURLPathH5UserAgreement];
             break;
@@ -88,23 +93,22 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         case VLMineViewClickTypeAboutUS:
             [self about];
             break;
-        case VLMineViewClickTypeLogout:
-            [self loadLogoutUserRequest];
-            break;
-        case VLMineViewClickTypeDestroyAccount:
-            [self loadDestoryUserRequest];
-            break;
         case VLMineViewClickTypeDebug:
             [self closeOffDebugMode];
+            break;
+        case VLMineViewClickTypSubmitFeedback:
+        {
+            VLFeedbackViewController *feedbackVC = [[VLFeedbackViewController alloc] init];
+            [self.navigationController pushViewController:feedbackVC animated:YES];
+        }
+            break;
         default:
             break;
     }
 }
 
 - (void)mineViewDidCickUser:(VLMineViewUserClickType)type {
-    if (type == VLMineViewUserClickTypeNickName) {
-        [self showUpdateNickNameAlert];
-    } else if (type == VLMineViewUserClickTypeAvatar) {
+    if (type == VLMineViewUserClickTypeAvatar) {
         [self showUploadPicAlter];
     }
 }
@@ -117,72 +121,8 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 
 - (void)about {
     AboutAgoraEntertainmentViewController *VC = [[AboutAgoraEntertainmentViewController alloc] init];
-    VC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:VC animated:YES];
 }
-
-- (void)userLogout {
-    [[VLUserCenter center] logout];
-//    [[VLGlobalHelper app] configRootViewController];
-    [UIApplication.sharedApplication.delegate.window configRootViewController];
-}
-
-- (void)showUpdateNickNameAlert {
-
-//    VL(weakSelf);
-    __block UITextField *TF = nil;
-
-    [LEEAlert alert].config
-    .LeeTitle(AGLocalizedString(@"修改昵称"))
-    .LeeAddTextField(^(UITextField *textField) {
-        textField.placeholder = AGLocalizedString(@"请输入昵称");
-        textField.textColor = UIColorBlack;
-        textField.clearButtonMode=UITextFieldViewModeWhileEditing;
-        textField.font = UIFontMake(15);
-        if (VLUserCenter.user.name.length > 0) {
-            textField.text = VLUserCenter.user.name;
-        }
-        [textField becomeFirstResponder];
-        TF = textField; //赋值
-    })
-    .LeeAddAction(^(LEEAction *action) {
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"Cancel");
-        action.titleColor = UIColorMakeWithHex(@"#000000");
-        action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.font = UIFontBoldMake(16);
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.clickBlock = ^{
-            
-        };
-    })
-    .LeeAddAction(^(LEEAction *action) {
-        VL(weakSelf);
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"Confirm");
-        action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
-        action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.font = UIFontBoldMake(16);
-        action.clickBlock = ^{
-            [weakSelf loadUpdateNickNameRequest:TF.text];
-        };
-    })
-    .leeShouldActionClickClose(^(NSInteger index){
-        // 是否可以关闭回调, 当即将关闭时会被调用 根据返回值决定是否执行关闭处理
-        // 这里演示了与输入框非空校验结合的例子
-        BOOL result = ![TF.text isEqualToString:@""];
-        result = index == 1 ? result : YES;
-        return result;
-    })
-    .LeeShow();
-}
-
 
 - (BOOL)getLibraryAccess {
     return [NSUserDefaults.standardUserDefaults boolForKey:@"LibraryAccess"];
@@ -193,15 +133,15 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 }
 
 - (void)showAlert {
-    UIAlertController *vc = [UIAlertController alertControllerWithTitle:AGLocalizedString(@"声动互娱”想访问您的相册")
-                                                                message:AGLocalizedString(@"声网需要您开启相册访问功能，读取照片上传头像")
+    UIAlertController *vc = [UIAlertController alertControllerWithTitle:AGLocalizedString(@"app_need_request_photo")
+                                                                message:AGLocalizedString(@"app_need_request_photo and upload avatar")
                                                          preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action1 = [UIAlertAction actionWithTitle:AGLocalizedString(@"不允许")
+    UIAlertAction *action1 = [UIAlertAction actionWithTitle:AGLocalizedString(@"not_allowed")
                                                       style:UIAlertActionStyleDefault
                                                     handler:^(UIAlertAction * _Nonnull action) {
         [self setLibraryAccess:NO];
     }];
-    UIAlertAction *action2 = [UIAlertAction actionWithTitle:AGLocalizedString(@"好")
+    UIAlertAction *action2 = [UIAlertAction actionWithTitle:AGLocalizedString(@"requset_ok")
                                                       style:UIAlertActionStyleDefault
                                                     handler:^(UIAlertAction * _Nonnull action) {
         [self setLibraryAccess:YES];
@@ -219,28 +159,28 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     [LEEAlert actionsheet].config
     .LeeAddAction(^(LEEAction * _Nonnull action) {
         action.type = LEEActionTypeDefault;
-        action.title = AGLocalizedString(@"上传头像");
+        action.title = AGLocalizedString(@"app_upload_avatar");
         action.height = 20;
         action.titleColor = [UIColor whiteColor];
         action.font = VLUIFontMake(14);
     })
     .LeeAddAction(^(LEEAction * _Nonnull action) {
         action.type = LEEActionTypeDefault;
-        action.title = AGLocalizedString(@"拍照上传");
+        action.title = AGLocalizedString(@"take_photo_and_upload");
         action.clickBlock = ^{
             [weakself requestAuthorizationForCamera];
         };
     })
     .LeeAddAction(^(LEEAction * _Nonnull action) {
         action.type = LEEActionTypeDefault;
-        action.title = AGLocalizedString(@"本地相册上传");
+        action.title = AGLocalizedString(@"local_upload");
         action.clickBlock = ^{
             [weakself requestAuthorizationForPhotoLibrary];
         };
     })
     .LeeAddAction(^(LEEAction * _Nonnull action) {
         action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"取消");
+        action.title = AGLocalizedString(@"cancel");
         action.clickBlock = ^{
         };
     })
@@ -285,11 +225,11 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 
 - (void)presentviewcontrollerWithSourceType:(UIImagePickerControllerSourceType)sourceType {
     if (sourceType == UIImagePickerControllerSourceTypePhotoLibrary && ![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
-        [VLToast toast:AGLocalizedString(@"相册不可用")];
+        [VLToast toast:AGLocalizedString(@"comm_permission_leak_sdcard_title")];
         return ;
     }
     if (sourceType == UIImagePickerControllerSourceTypeCamera && ![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        [VLToast toast:AGLocalizedString(@"相机不可用")];
+        [VLToast toast:AGLocalizedString(@"comm_permission_leak_camera_title")];
         return ;
     }
     UIImagePickerController *controller = [[UIImagePickerController alloc]init];
@@ -333,162 +273,74 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 /// 获取用户信息
 - (void)loadRequestUserInfoRequest {
     NSDictionary *param = @{@"userNo":VLUserCenter.user.userNo ?: @""};
-    [VLAPIRequest getRequestURL:kURLPathGetUserInfo parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-        if (response.code == 0) {
-//            VLLoginModel *userInfo = [VLLoginModel vj_modelWithDictionary:response.data];
+//    [VLAPIRequest getRequestURL:kURLPathGetUserInfo parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
+//        if (response.code == 0) {
+////            VLLoginModel *userInfo = [VLLoginModel vj_modelWithDictionary:response.data];
+//        }
+//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
+//
+//    }];
+    
+    VLGetUserInfoNetworkModel *model = [VLGetUserInfoNetworkModel new];
+    model.userNo = VLUserCenter.user.userNo ?: @"";
+    [model requestWithCompletion:^(NSError * _Nullable error, id _Nullable data) {
+        VLResponseData *response = data;
+        if (response.code && response.code.integerValue == 0) {
+            NSLog(@"获取成功");
+            [[VLUserCenter center] storeUserInfo:VLUserCenter.user];
+            [self.mineView refreseUserInfo:VLUserCenter.user];
+        }else{
+            [VLToast toast:response.message];
         }
-    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-        
     }];
 }
 
 - (void)loadUpdateUserIconRequest:(NSString *)iconUrl image:(UIImage *)image{
-    NSDictionary *param = @{
-        @"userNo" : VLUserCenter.user.userNo ?: @"",
-        @"headUrl" : iconUrl ?: @""
-    };
+//    NSDictionary *param = @{
+//        @"userNo" : VLUserCenter.user.userNo ?: @"",
+//        @"headUrl" : iconUrl ?: @""
+//    };
     
-    [VLAPIRequest postRequestURL:kURLPathUploadUserInfo parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-        if (response.code == 0) {
-            [VLToast toast:AGLocalizedString(@"修改成功")];
+//    [VLAPIRequest postRequestURL:kURLPathUploadUserInfo parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
+//        if (response.code == 0) {
+//            [VLToast toast:AGLocalizedString(@"app_edit_success")];
+//            [self.mineView refreseAvatar:image];
+//            VLUserCenter.user.headUrl = iconUrl;
+//            [[VLUserCenter center] storeUserInfo:VLUserCenter.user];
+//        }else{
+//            [VLToast toast:response.message];
+//        }
+//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
+//    }];
+    
+    VLUploadUserInfoNetworkModel *model = [VLUploadUserInfoNetworkModel new];
+    model.userNo = VLUserCenter.user.userNo ?: @"";
+    model.headUrl = iconUrl ?: @"";
+    [model requestWithCompletion:^(NSError * _Nullable error, id _Nullable data) {
+        VLResponseData *response = data;
+        if (response.code && response.code.integerValue == 0) {
+            [VLToast toast:AGLocalizedString(@"app_edit_success")];
             [self.mineView refreseAvatar:image];
             VLUserCenter.user.headUrl = iconUrl;
             [[VLUserCenter center] storeUserInfo:VLUserCenter.user];
         }else{
             [VLToast toast:response.message];
         }
-    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
     }];
-}
-
-
-- (void)loadUpdateNickNameRequest:(NSString *)nickName {
-    NSDictionary *param = @{
-        @"userNo" : VLUserCenter.user.userNo ?: @"",
-        @"name" : nickName ?: @""
-    };
-    [VLAPIRequest postRequestURL:kURLPathUploadUserInfo parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-        if (response.code == 0) {
-            [VLToast toast:AGLocalizedString(@"修改成功")];
-            [self.mineView refreseNickName:nickName];
-            VLUserCenter.user.name = nickName;
-            [[VLUserCenter center] storeUserInfo:VLUserCenter.user];
-        }else{
-            [VLToast toast:response.message];
-        }
-    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-    }];
-}
-
-// 注销账号
-- (void)loadDestoryUserRequest {
-    
-    [LEEAlert alert].config
-    .LeeAddTitle(^(UILabel *label) {
-        label.text = AGLocalizedString(@"确定注销账号？");
-        label.textColor = UIColorMakeWithHex(@"#040925");
-        label.font = UIFontBoldMake(16);
-    })
-    .LeeContent(AGLocalizedString(@"注销账号后，您将暂时无法使用该账号体验我们的服务，真的要注销吗？"))
-    .LeeAddAction(^(LEEAction *action) {
-        VL(weakSelf);
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"注销");
-        action.titleColor = UIColorMakeWithHex(@"#000000");
-        action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.font = UIFontBoldMake(16);
-        action.clickBlock = ^{
-            NSDictionary *param = @{@"userNo":VLUserCenter.user.userNo ?: @""};
-            [VLAPIRequest getRequestURL:kURLPathDestroyUser parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-                if (response.code == 0) {
-                    [weakSelf userLogout];
-                }
-            } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-            }];
-        };
-    })
-    .LeeAddAction(^(LEEAction *action) {
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"取消");
-        action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
-        action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.font = UIFontBoldMake(16);
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.borderColor = UIColorMakeWithHex(@"#2753FF");
-        action.clickBlock = ^{
-            // 取消点击事件Block
-        };
-    })
-    .LeeShow();
-}
-
-// 退出登录
-- (void)loadLogoutUserRequest {
-    [LEEAlert alert].config
-    .LeeAddTitle(^(UILabel *label) {
-        label.text = AGLocalizedString(@"确定退出登录?");
-        label.textColor = UIColorMakeWithHex(@"#040925");
-        label.font = UIFontBoldMake(16);
-    })
-    .LeeContent(AGLocalizedString(@"退出登陆后，我们还会继续保留您的账户数据，记得再来体验哦～"))
-    .LeeAddAction(^(LEEAction *action) {
-        VL(weakSelf);
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"退出");
-        action.titleColor = UIColorMakeWithHex(@"#000000");
-        action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.font = UIFontBoldMake(16);
-        action.clickBlock = ^{
-            [weakSelf userLogout];
-            return;
-//            NSDictionary *param = @{@"userNo" : VLUserCenter.user.userNo ?: @""};
-//            [VLAPIRequest getRequestURL:kURLPathLogout parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-//                if (response.code == 0) {
-//                    [self userLogout];
-//                }
-//            } failure:^(NSError * _Nullable error) {
-//            }];
-        };
-    })
-    .LeeAddAction(^(LEEAction *action) {
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"取消");
-        action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
-        action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.font = UIFontBoldMake(16);
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.borderColor = UIColorMakeWithHex(@"#2753FF");
-        action.clickBlock = ^{
-            // 取消点击事件Block
-        };
-    })
-    .LeeShow();
 }
 
 - (void)closeOffDebugMode {
     [LEEAlert alert].config
     .LeeAddTitle(^(UILabel *label) {
-        label.text = AGLocalizedString(@"确定退出Debug模式么？");
+        label.text = AGLocalizedString(@"app_exit_debug");
         label.textColor = UIColorMakeWithHex(@"#040925");
         label.font = UIFontBoldMake(16);
     })
-    .LeeContent(AGLocalizedString(@"退出debug模式后，设置页面将恢复成正常的设置页面哦~"))
+    .LeeContent(AGLocalizedString(@"app_exit_debug_tip"))
     .LeeAddAction(^(LEEAction *action) {
         VL(weakSelf);
         action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"确定");
+        action.title = AGLocalizedString(@"confirm");
         action.titleColor = UIColorMakeWithHex(@"#000000");
         action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
         action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -503,7 +355,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     })
     .LeeAddAction(^(LEEAction *action) {
         action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"取消");
+        action.title = AGLocalizedString(@"cancel");
         action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
         action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
         action.cornerRadius = 20;
@@ -530,13 +382,8 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
             [VLToast toast:response.message];
         }
     } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
+        [VLToast toast:error.localizedDescription];
     }];
-}
-
-// 连续点击事件
-- (void)didTapedVersionLabel {
-    [AppContext shared].isDebugMode = YES;
-    [self.mineView refreshTableView];
 }
 
 #pragma mark - Public Methods

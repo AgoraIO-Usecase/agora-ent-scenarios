@@ -1,5 +1,6 @@
 package io.agora.scene.voice.spatial.ui.dialog
 
+import android.content.DialogInterface
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.TypedValue
@@ -25,8 +26,8 @@ import io.agora.voice.common.utils.DeviceTools
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ResourcesTools
 
-class ChatroomHandsDialog : BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>() {
-    private val titles = intArrayOf(R.string.voice_room_raised_hands_title, R.string.voice_room_invite_hands_title)
+class ChatroomHandsDialog constructor(): BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>() {
+    private val titles = intArrayOf(R.string.voice_spatial_room_raised_hands_title, R.string.voice_spatial_room_invite_hands_title)
     private val fragments: MutableList<Fragment> = mutableListOf()
     private var title: MaterialTextView? = null
     private var index = 0
@@ -41,6 +42,14 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>()
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceSpatialRoomHandLayoutBinding {
         return VoiceSpatialRoomHandLayoutBinding.inflate(inflater, container, false)
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        val activity = activity?:return
+        if (activity is DialogInterface.OnDismissListener){
+            activity.onDismiss(dialog)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -77,7 +86,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>()
                         setTypeface(null, Typeface.BOLD)
                         val content =
                             getString(titles[index]) + getString(
-                                R.string.voice_room_tab_layout_count,
+                                R.string.voice_spatial_room_tab_layout_count,
                                 mCount.toString()
                             )
                         text = content
@@ -131,7 +140,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>()
                             mCount = count
                             activity?.let {
                                 val content = requireActivity().getString(titles[index]) + getString(
-                                    R.string.voice_room_tab_layout_count,
+                                    R.string.voice_spatial_room_tab_layout_count,
                                     mCount.toString()
                                 )
                                 "getItemCount content1: $content".logD(TAG)
@@ -145,7 +154,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>()
                                 mCount -= 1
                                 activity?.let {
                                     val content = requireActivity().getString(titles[index]) + getString(
-                                        R.string.voice_room_tab_layout_count,
+                                        R.string.voice_spatial_room_tab_layout_count,
                                         mCount.toString()
                                     )
                                     "getItemCount content1: $content".logD(TAG)
@@ -163,7 +172,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>()
                             mCount = count
                             if (activity != null) {
                                 val content = requireActivity().resources.getString(titles[index]) + getString(
-                                    R.string.voice_room_tab_layout_count,
+                                    R.string.voice_spatial_room_tab_layout_count,
                                     mCount.toString()
                                 )
                                 "getItemCount content2: $content".logD(TAG)
@@ -221,11 +230,5 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>()
 
         // 同意上麦
         fun onAcceptMicSeatApply(voiceMicInfoModel: VoiceMicInfoModel) {}
-    }
-
-    companion object {
-        @JvmStatic
-        val newInstance: ChatroomHandsDialog
-            get() = ChatroomHandsDialog()
     }
 }

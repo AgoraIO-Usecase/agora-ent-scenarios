@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ui_widget_roundStyle">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <declare-styleable name="ui_widget_encryption_input_style">
+        <attr name="ui_widget_strokeWidth" format="dimension" />
+        <attr name="ui_widget_checkedColor" format="color" />
+        <attr name="ui_widget_defaultColor" format="color" />
+        <attr name="ui_widget_textLength" format="integer" />
+        <attr name="ui_widget_backColor" format="color" />
+        <attr name="ui_widget_textColor" format="color" />
+        <attr name="ui_widget_circle" format="dimension" />
+        <attr name="ui_widget_round" format="dimension" />
+        <attr name="ui_widget_textSize" format="dimension" />
+        <attr name="ui_widget_isPwd" format="boolean" />
+        <attr name="ui_widget_waitInputColor" format="color" />
+        <attr name="ui_widget_isWaitInput" format="boolean" />
+    </declare-styleable>
+</resources>

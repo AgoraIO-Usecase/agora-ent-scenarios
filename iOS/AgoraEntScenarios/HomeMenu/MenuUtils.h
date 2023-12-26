@@ -10,6 +10,6 @@
 
 #import "AgoraEntScenarios-Swift.h"
 
-#define AGLocalizedString(s) ([s toSceneLocalization])
+#define AGLocalizedString(s) (NSLocalizedString(s, nil))
 
 #endif /* MenuUtils_h */

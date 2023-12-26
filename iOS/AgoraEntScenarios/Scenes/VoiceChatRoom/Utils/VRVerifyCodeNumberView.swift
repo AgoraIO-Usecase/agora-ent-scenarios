@@ -10,7 +10,7 @@ import ZSwiftBaseLib
 
 class VRVerifyCodeNumberView: UIView {
     /// 光标颜色
-    var cursorColor = UIColor(0x009FFF)
+    var cursorColor = UIColor.black
 
     lazy var numLabel: UILabel = .init(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)).textAlignment(.center).font(.systemFont(ofSize: 18)).textColor(.darkText)
 
@@ -64,7 +64,7 @@ class VRVerifyCodeNumberView: UIView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        let path = UIBezierPath(rect: CGRect(x: frame.size.width * 0.5, y: frame.size.height * 0.1, width: 1, height: frame.size.height * 0.7))
+        let path = UIBezierPath(rect: CGRect(x: frame.size.width * 0.5, y: frame.size.height * 0.25, width: 1, height: frame.size.height * 0.5))
         cursor.path = path.cgPath
     }
 

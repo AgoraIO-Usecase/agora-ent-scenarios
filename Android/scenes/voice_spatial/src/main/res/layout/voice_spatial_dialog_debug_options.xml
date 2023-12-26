@@ -61,4 +61,54 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mtAPM" />
 
+    <LinearLayout
+        android:id="@+id/llTimeLimit"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginStart="20dp"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mtAPM">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvTimeLimit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:textColor="@color/voice_color_3c4267"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:text="20min体验"
+         />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvTimeLimitInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/grey_97"
+        android:textSize="11sp"
+        android:text="关闭后所有房间可不限时体验"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mtAPM" />
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cbTimeLimit"
+        android:layout_width="45dp"
+        android:layout_height="28dp"
+        style="@style/voice_bottom_sheet_checkbox"
+        android:checked="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/llTimeLimit"
+        app:layout_constraintBottom_toBottomOf="@+id/llTimeLimit" />
+
+    <com.google.android.material.divider.MaterialDivider
+        style="@style/voice_bottom_sheet_divider_style"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llTimeLimit" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

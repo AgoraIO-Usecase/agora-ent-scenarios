@@ -3,5 +3,5 @@
     android:id="@+id/video_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/show_pk_bg">
+    android:background="@mipmap/show_room_default_bg">
 </FrameLayout>

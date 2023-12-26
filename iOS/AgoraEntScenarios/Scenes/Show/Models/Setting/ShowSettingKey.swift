@@ -14,7 +14,7 @@ enum ShowAgoraSRType: String, CaseIterable {
     case x1_5 = "x1.5"
     case x2 = "x2"
     
-    var typeValue: ShowAgoraKitManager.SRType {
+    var typeValue: SRType {
         switch self {
         case .x1:
             return .x1
@@ -71,14 +71,11 @@ enum ShowAgoraCodeCType: String, CaseIterable {
 }
 
 enum ShowAgoraVideoDimensions: String, CaseIterable {
-    
-    case _240x360 = "240x360"
     case _360x640 = "360x640"
     case _480x856 = "480x856"
     case _540x960 = "540x960"
     case _720x1280 = "720x1280"
-//    case _1080x1920 = "1080x1920"
-     
+    case _1080x1920 = "1080x1920"
     var sizeValue: CGSize {
         let arr: [String] = rawValue.split(separator: "x").compactMap{"\($0)"}
         guard let first = arr.first, let width = Float(first), let last = arr.last, let height = Float(last) else {
@@ -86,43 +83,9 @@ enum ShowAgoraVideoDimensions: String, CaseIterable {
         }
         return CGSize(width: CGFloat(width), height: CGFloat(height))
     }
-}
-
-enum ShowAgoraCaptureVideoDimensions: Int, CaseIterable {
     
-    case _1080P = 1080
-    case _720P = 720
-    case _540P = 540
-    case _480P = 480
-    case _360P = 360
-    case _270P = 270
-     
-    var sizeValue: CGSize {
-        if rawValue == 480 {
-            return CGSize(width: 480, height: 854)
-        }
-        return CGSize(width: CGFloat(rawValue), height: CGFloat(rawValue) * 1280.0 / 720.0)
-    }
-    
-    var valueTitle: String {
-        return "\(rawValue)P"
-    }
-    
-    var levelTitle: String {
-        switch self {
-        case ._1080P:
-            return "极清"
-        case ._720P:
-            return "超清"
-        case ._540P:
-            return "高清"
-        case ._480P:
-            return "标清"
-        case ._360P:
-            return "流畅"
-        case ._270P:
-            return "低清"
-        }
+    static func values() -> [CGSize] {
+        return ShowAgoraVideoDimensions.allCases.map({$0.sizeValue})
     }
 }
 
@@ -139,6 +102,7 @@ enum ShowSettingKey: String, CaseIterable {
         case segment
         case slider
         case label
+        case custom
     }
     
     case lowlightEnhance        // 暗光增强
@@ -154,9 +118,8 @@ enum ShowSettingKey: String, CaseIterable {
     case videoBitRate           // 视频码率
     case earmonitoring          // 耳返
     case recordingSignalVolume  // 人声音量
-    case musincVolume           // 音乐音量
+    case musicVolume           // 音乐音量
     case audioBitRate           // 音频码率
-    case captureVideoSize       // 采集分辨率
     
     var title: String {
         switch self {
@@ -169,7 +132,7 @@ enum ShowSettingKey: String, CaseIterable {
         case .beauty:
             return "show_advance_setting_beauty_title".show_localized
         case .PVC:
-            return "show_advance_setting_PVC_title".show_localized
+            return "PVC"
         case .SR:
             return "show_advance_setting_SR_title".show_localized
         case .BFrame:
@@ -186,12 +149,10 @@ enum ShowSettingKey: String, CaseIterable {
             return "show_advance_setting_earmonitoring_title".show_localized
         case .recordingSignalVolume:
             return "show_advance_setting_recordingVolume_title".show_localized
-        case .musincVolume:
+        case .musicVolume:
             return "show_advance_setting_musicVolume_title".show_localized
         case .audioBitRate:
             return "show_advance_setting_audio_bitRate_title".show_localized
-        case .captureVideoSize:
-            return ""
         }
     }
     
@@ -207,9 +168,9 @@ enum ShowSettingKey: String, CaseIterable {
         case .beauty:
             return .aSwitch
         case .PVC:
-            return .aSwitch
+            return .custom
         case .SR:
-            return .aSwitch
+            return .custom
         case .BFrame:
             return .aSwitch
         case .videoEncodeSize:
@@ -219,16 +180,14 @@ enum ShowSettingKey: String, CaseIterable {
         case .H265:
             return .aSwitch
         case .videoBitRate:
-            return .slider
+            return .custom
         case .earmonitoring:
             return .aSwitch
         case .recordingSignalVolume:
             return .slider
-        case .musincVolume:
+        case .musicVolume:
             return .slider
         case .audioBitRate:
-            return .label
-        case .captureVideoSize:
             return .label
         }
     }
@@ -248,26 +207,14 @@ enum ShowSettingKey: String, CaseIterable {
             return "show_advance_setting_SR_tips".show_localized
         case .H265:
             return "show_advance_setting_H265_tips".show_localized
+        case .videoBitRate:
+            return "show_advance_setting_bitRate_tips".show_localized
         case .videoEncodeSize:
             return "show_advance_setting_videoEncodeSize_tips".show_localized
         case .FPS:
             return "show_advance_setting_fps_tips".show_localized
         default:
             return ""
-        }
-    }
-    
-    // slider的取值区间
-    var sliderValueScope: (Float, Float) {
-        switch self {
-        case .videoBitRate:
-            return (200, 4000)
-        case .recordingSignalVolume:
-            return (0, 100)
-        case .musincVolume:
-            return (0, 100)
-        default:
-            return (0,0)
         }
     }
     
@@ -285,8 +232,6 @@ enum ShowSettingKey: String, CaseIterable {
             ]
         case .audioBitRate:
             return ["2","3","5"]
-        case .captureVideoSize:
-            return ShowAgoraCaptureVideoDimensions.allCases.map({ "\($0.rawValue)P" })
         default:
             return []
         }

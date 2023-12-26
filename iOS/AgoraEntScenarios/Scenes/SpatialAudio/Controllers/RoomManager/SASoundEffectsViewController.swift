@@ -17,16 +17,16 @@
 //
 //    var type = 0
 //
-//    lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage("roomList")!)
+//    lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage.sceneImage(name: "roomList")!)
 //
 //    lazy var effects: SASoundEffectsList = .init(frame: CGRect(x: 0, y: ZNavgationHeight, width: ScreenWidth, height: ScreenHeight - CGFloat(ZBottombarHeight) - CGFloat(ZTabbarHeight)), style: .plain).separatorStyle(.none).tableFooterView(UIView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 120))).backgroundColor(.clear)
 //
-//    lazy var done: UIImageView = .init(frame: CGRect(x: 0, y: ScreenHeight - CGFloat(ZBottombarHeight) - 70, width: ScreenWidth, height: 92)).image(UIImage("blur")!).isUserInteractionEnabled(true)
+//    lazy var done: UIImageView = .init(frame: CGRect(x: 0, y: ScreenHeight - CGFloat(ZBottombarHeight) - 70, width: ScreenWidth, height: 92)).image(UIImage.sceneImage(name: "blur")!).isUserInteractionEnabled(true)
 //
 //    lazy var createContainer: UIView = .init(frame: CGRect(x: 30, y: 15, width: ScreenWidth - 60, height: 50)).backgroundColor(.white)
 //
 //    lazy var toLive: UIButton = {
-//        UIButton(type: .custom).frame(CGRect(x: 30, y: 15, width: ScreenWidth - 60, height: 50)).title(sceneLocalized("Go Live"), .normal).font(.systemFont(ofSize: 16, weight: .semibold)).setGradient([UIColor(red: 0.13, green: 0.608, blue: 1, alpha: 1), UIColor(red: 0.204, green: 0.366, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)]).cornerRadius(25).addTargetFor(self, action: #selector(SASoundEffectsViewController.goLive), for: .touchUpInside)
+//        UIButton(type: .custom).frame(CGRect(x: 30, y: 15, width: ScreenWidth - 60, height: 50)).title(sceneLocalized("spatial_voice_go_live"), .normal).font(.systemFont(ofSize: 16, weight: .semibold)).setGradient([UIColor(red: 0.13, green: 0.608, blue: 1, alpha: 1), UIColor(red: 0.204, green: 0.366, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)]).cornerRadius(25).addTargetFor(self, action: #selector(SASoundEffectsViewController.goLive), for: .touchUpInside)
 //    }()
 //    
 //    override public func viewDidLoad() {
@@ -35,7 +35,7 @@
 //        view.addSubViews([background, effects, done])
 //        done.addSubViews([createContainer, toLive])
 //        view.bringSubviewToFront(navigation)
-//        navigation.title.text = sceneLocalized("Sound Selection")
+//        navigation.title.text = sceneLocalized("spatial_voice_sound_selection")
 //        createContainer.layer.cornerRadius = 25
 //        createContainer.layer.shadowRadius = 8
 //        createContainer.layer.shadowOffset = CGSize(width: 0, height: 4)

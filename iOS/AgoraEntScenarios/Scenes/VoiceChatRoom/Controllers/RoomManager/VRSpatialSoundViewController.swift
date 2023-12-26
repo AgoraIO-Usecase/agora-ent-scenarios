@@ -4,21 +4,22 @@
 //
 //  Created by 朱继超 on 2022/9/14.
 //
-
+/*
 import UIKit
 import ZSwiftBaseLib
-
+let sa_page_size = 15
 public class VRSpatialSoundViewController: UIViewController {
     public var didSelected: ((VRRoomEntity) -> Void)?
 
     public var totalCountClosure: ((Int) -> Void)?
 
-    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "No Chat Room yet", image: nil)
+    lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "voice_no_chat_room_yet", image: nil)
 
     lazy var roomList: VRRoomListView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), style: .plain)
 
     override public func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .white
         view.addSubViews([empty, roomList])
         // Do any additional setup after loading the view.
         roomListEvent()
@@ -39,7 +40,7 @@ extension VRSpatialSoundViewController {
     }
 
     @objc private func fetchRooms(cursor: String) {
-        VoiceRoomBusinessRequest.shared.sendGETRequest(api: .fetchRoomList(cursor: cursor, pageSize: page_size, type: 1), params: [:], classType: VRRoomsEntity.self) { rooms, error in
+        VoiceRoomBusinessRequest.shared.sendGETRequest(api: .fetchRoomList(cursor: cursor, pageSize: sa_page_size, type: 1), params: [:], classType: VRRoomsEntity.self) { rooms, error in
             self.roomList.refreshControl?.endRefreshing()
             if error == nil {
                 guard let total = rooms?.total else { return }
@@ -77,3 +78,4 @@ extension VRSpatialSoundViewController {
         }
     }
 }
+*/

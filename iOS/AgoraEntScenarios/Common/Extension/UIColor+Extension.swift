@@ -42,6 +42,10 @@ public extension UIColor {
         )
     }
     
+    convenience init(hex value: Int32, alpha: CGFloat = 1.0) {
+        self.init(red: CGFloat((value >> 16) & 0xff) / 255.0, green: CGFloat((value >> 8) & 0xff) / 255.0, blue: CGFloat(value & 0xff) / 255.0, alpha: alpha)
+    }
+    
     var randomColor: UIColor {
         UIColor(red: CGFloat(arc4random() % 256) / 255.0,
                 green: CGFloat(arc4random() % 256) / 255.0,

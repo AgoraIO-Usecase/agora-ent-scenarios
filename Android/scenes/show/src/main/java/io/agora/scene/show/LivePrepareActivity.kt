@@ -15,11 +15,15 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import io.agora.beautyapi.sensetime.*
 import io.agora.rtc2.Constants
+import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
-import io.agora.rtc2.video.VideoCanvas
+import io.agora.rtc2.video.SegmentationProperty
+import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
+import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
@@ -59,11 +63,12 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             binding.root.setPaddingRelative(inset.left, 0, inset.right, inset.bottom)
             WindowInsetsCompat.CONSUMED
         }
-        binding.ivRoomCover.setImageResource(getThumbnailIcon(mThumbnailId))
         binding.tvRoomId.text = getString(R.string.show_room_id, mRoomId)
         binding.etRoomName.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                mInputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    mInputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
+                }
                 return@setOnEditorActionListener true
             }
             return@setOnEditorActionListener false
@@ -95,12 +100,33 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 showPresetDialog()
             }
         }
+
         toggleVideoRun = Runnable {
+            mBeautyProcessor.initialize(
+                rtcEngine = mRtcEngine,
+                captureMode = CaptureMode.Agora,
+                statsEnable = true,
+                eventCallback = object : IEventCallback {
+                    override fun onBeautyStats(stats: BeautyStats) {
+                    }
+                }
+            )
+            // 低端机 或 无证书则关闭美颜
+            if (mRtcEngine.queryDeviceScore() >= 75) {
+                mBeautyProcessor.setBeautyEnable(true)
+            } else {
+                mBeautyProcessor.setBeautyEnable(false)
+            }
+            binding.flVideoContainer.post {
+                mBeautyProcessor.getSenseTimeBeautyAPI().setupLocalVideo(SurfaceView(this).apply {
+                    binding.flVideoContainer.addView(this)
+                }, Constants.RENDER_MODE_HIDDEN)
+            }
             mBeautyProcessor.reset()
             initRtcEngine()
-            showPresetDialog()
         }
         requestCameraPermission(true)
+        showPresetDialog()
     }
 
     private var toggleVideoRun: Runnable? = null
@@ -112,13 +138,15 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     }
 
     override fun getPermissions() {
-        if (toggleVideoRun != null) {
-            toggleVideoRun?.run()
-            toggleVideoRun = null
-        }
+        Thread {
+            if (toggleVideoRun != null) {
+                toggleVideoRun?.run()
+                toggleVideoRun = null
+            }
+        }.start()
     }
 
-    private fun showPresetDialog() = PresetDialog(this).show()
+    private fun showPresetDialog() = PresetDialog(this, mRtcEngine.queryDeviceScore(), RtcConnection(mRoomId, UserManager.getInstance().user.id.toInt())).show()
     private fun showDebugModeDialog() = DebugSettingDialog(this).show()
 
     override fun onResume() {
@@ -134,13 +162,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     }
 
     private fun initRtcEngine() {
-        val videoCanvas = VideoCanvas(SurfaceView(this).apply {
-            binding.flVideoContainer.addView(this)
-        })
-        videoCanvas.mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
-        mRtcEngine.setupLocalVideo(
-            videoCanvas
-        )
         val cacheQualityResolution = PictureQualityDialog.getCacheQualityResolution()
         mRtcEngine.setCameraCapturerConfiguration(
             CameraCapturerConfiguration(
@@ -151,7 +172,10 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 )
             )
         )
-        mRtcEngine.startPreview()
+        // reset virtual background config
+        RtcEngineInstance.virtualBackgroundSource.backgroundSourceType = 0
+        RtcEngineInstance.rtcEngine.enableVirtualBackground(false, VirtualBackgroundSource(), SegmentationProperty())
+//        mRtcEngine.startPreview()
     }
 
     private fun showPictureQualityDialog() {
@@ -208,17 +232,10 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     }
 
 
-    private fun getRandomRoomId() = (Random(TimeUtils.currentTimeMillis()).nextInt(10000) + 100000).toString()
+    private fun getRandomRoomId() =
+        (Random(TimeUtils.currentTimeMillis()).nextInt(10000) + 100000).toString()
 
-    private fun getRandomThumbnailId() = Random(TimeUtils.currentTimeMillis()).nextInt(0, 3).toString()
-
-    @DrawableRes
-    private fun getThumbnailIcon(thumbnailId: String) = when (thumbnailId) {
-        "0" -> R.mipmap.show_room_cover_0
-        "1" -> R.mipmap.show_room_cover_1
-        "2" -> R.mipmap.show_room_cover_2
-        "3" -> R.mipmap.show_room_cover_3
-        else -> R.mipmap.show_room_cover_0
-    }
+    private fun getRandomThumbnailId() =
+        Random(TimeUtils.currentTimeMillis()).nextInt(0, 3).toString()
 
 }

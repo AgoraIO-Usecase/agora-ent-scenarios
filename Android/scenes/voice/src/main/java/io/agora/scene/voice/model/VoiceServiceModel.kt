@@ -66,6 +66,12 @@ data class VoiceRoomModel constructor(
     @Transient var announcement: String = "",
 ) : BaseRoomBean
 
+data class VoiceBgmModel constructor(
+    var songName: String = "",
+    var singerName: String = "",
+    var isOrigin: Boolean = false,
+) : BaseRoomBean
+
 /**
  * 麦位数据
  */
@@ -92,7 +98,8 @@ data class VoiceRoomApply constructor(
  */
 data class VoiceRoomInfo constructor(
     var roomInfo: VoiceRoomModel? = null,
-    var micInfo: List<VoiceMicInfoModel>? = null
+    var micInfo: List<VoiceMicInfoModel>? = null,
+    var bgmInfo: VoiceBgmModel? = null
 ) : BaseRoomBean
 
 /**

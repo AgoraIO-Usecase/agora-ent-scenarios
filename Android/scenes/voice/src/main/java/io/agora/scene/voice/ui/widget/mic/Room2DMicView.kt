@@ -1,8 +1,12 @@
 package io.agora.scene.voice.ui.widget.mic
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.DecelerateInterpolator
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -23,6 +27,8 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
 
     private lateinit var mBinding: VoiceViewRoom2dMicBinding
 
+    private val animatorSet = AnimatorSet()
+
     constructor(context: Context) : this(context, null)
 
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -38,13 +44,13 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
     private fun init(context: Context) {
         val root = View.inflate(context, R.layout.voice_view_room_2d_mic, this)
         mBinding = VoiceViewRoom2dMicBinding.bind(root)
+        addAnimation()
     }
 
     override fun binding(micInfo: VoiceMicInfoModel) {
         mBinding.apply {
             if (micInfo.micStatus == MicStatus.BotActivated || micInfo.micStatus == MicStatus.BotInactive) { // 机器人
-
-                ivMicInnerIcon.isVisible = false
+                ivMicTag.isVisible = false
                 ivMicInfo.setBackgroundResource(R.drawable.voice_bg_oval_white)
                 val botDrawable = ResourcesTools.getDrawableId(context, micInfo.member?.portrait ?: "")
                 ImageTools.loadImage(ivMicInfo, botDrawable)
@@ -52,40 +58,38 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                 mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(
                     R.drawable.voice_icon_room_mic_robot_tag, 0, 0, 0
                 )
-                ivMicTag.isVisible = micInfo.micStatus == MicStatus.BotActivated
                 mtMicRotActive.isGone = micInfo.micStatus == MicStatus.BotActivated
                 ivMicBotFloat.isGone = micInfo.micStatus == MicStatus.BotActivated
             } else {
                 if (micInfo.member == null) { // 没人
-                    ivMicInnerIcon.isVisible = true
-                    ivMicInfo.setImageResource(0)
-                    mtMicUsername.text = micInfo.micIndex.toString()
+                    vWave1.isVisible = false
+                    vWave2.isVisible = false
+                    mtMicUsername.text = resources.getString(R.string.voice_room_mic_number, micInfo.micIndex + 1)
                     mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
                     when (micInfo.micStatus) {
                         MicStatus.ForceMute -> {
-                            ivMicTag.isVisible = false
-                            ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_mute)
+                            ivMicTag.isVisible = true
+                            ivMicInfo.setImageResource(R.drawable.voice_ic_mic_empty)
                         }
                         MicStatus.Lock -> {
-                            ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_close)
+                            ivMicInfo.setImageResource(R.drawable.voice_ic_mic_close)
                             ivMicTag.isVisible = false
                         }
                         MicStatus.LockForceMute -> {
-                            ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_close)
+                            ivMicInfo.setImageResource(R.drawable.voice_ic_mic_close)
                             ivMicTag.isVisible = true
-                            ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
                         }
                         else -> {
                             ivMicTag.isVisible = false
-                            ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_add)
+                            ivMicInfo.setImageResource(R.drawable.voice_ic_mic_empty)
                         }
                     }
                 } else { // 有人
-                    ivMicTag.isVisible = true
-                    ivMicInnerIcon.isVisible = false
+                    vWave1.isVisible = true
+                    vWave2.isVisible = true
                     ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
                     mtMicUsername.text = micInfo.member?.nickName ?: ""
-                    if (micInfo.ownerTag) {
+                    if (micInfo.micIndex == 0) {
                         mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(
                             R.drawable.voice_icon_room_mic_owner_tag, 0, 0, 0
                         )
@@ -95,50 +99,60 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                     when (micInfo.micStatus) {
                         MicStatus.Mute,
                         MicStatus.ForceMute -> {
-                            ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
+                            ivMicTag.isVisible = true
                         }
                         else -> {
-                            if (micInfo.member?.micStatus == 0){
-                                ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
-                            }else{
-                                ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open0)
-                            }
+                            ivMicTag.isVisible = micInfo.member?.micStatus == 0
                         }
                     }
                 }
             }
             if (micInfo.micStatus == MicStatus.Normal || micInfo.micStatus == MicStatus.BotActivated) {
-                // 用户音量
                 when (micInfo.audioVolumeType) {
-                    ConfigConstants.VolumeType.Volume_None -> {
-                        ivMicTag.isVisible = true
-                        if (micInfo.member?.micStatus == 1){
-                            ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open0)
-                        }else{
-                            ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
+                    ConfigConstants.VolumeType.Volume_Low,
+                    ConfigConstants.VolumeType.Volume_Medium,
+                    ConfigConstants.VolumeType.Volume_High,
+                    ConfigConstants.VolumeType.Volume_Max -> {
+                        if (!animatorSet.isRunning) {
+                            animatorSet.start()
                         }
                     }
-                    ConfigConstants.VolumeType.Volume_Low -> {
-                        ivMicTag.isVisible = true
-                        ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open1)
-                    }
-                    ConfigConstants.VolumeType.Volume_Medium -> {
-                        ivMicTag.isVisible = true
-                        ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open2)
-                    }
-                    ConfigConstants.VolumeType.Volume_High -> {
-                        ivMicTag.isVisible = true
-                        ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open3)
-                    }
-                    ConfigConstants.VolumeType.Volume_Max -> {
-                        ivMicTag.isVisible = true
-                        ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open4)
-                    }
                     else -> {
-
+                        if (animatorSet.isRunning) {
+                            animatorSet.end()
+                        }
                     }
+                }
+            } else if (micInfo.micStatus == MicStatus.BotInactive) {
+                if (animatorSet.isRunning) {
+                    animatorSet.end()
                 }
             }
         }
+    }
+
+    private fun addAnimation() {
+        val animator1 = ObjectAnimator.ofPropertyValuesHolder(
+            mBinding.vWave1,
+            PropertyValuesHolder.ofFloat("scaleX", 1f, 1.1f, 1f),
+            PropertyValuesHolder.ofFloat("scaleY", 1f, 1.1f, 1f),
+            PropertyValuesHolder.ofFloat("alpha", 1f, 0.5f, 0.3f)
+        )
+        animator1.repeatCount = ObjectAnimator.INFINITE
+        animator1.repeatMode = ObjectAnimator.RESTART
+        animator1.interpolator = DecelerateInterpolator()
+        animator1.duration = 1400
+
+        val animator2 = ObjectAnimator.ofPropertyValuesHolder(
+            mBinding.vWave2,
+            PropertyValuesHolder.ofFloat("scaleX", 1f, 1.4f),
+            PropertyValuesHolder.ofFloat("scaleY", 1f, 1.4f),
+            PropertyValuesHolder.ofFloat("alpha", 0.6f, 0.3f, 0f)
+        )
+        animator2.repeatCount = ObjectAnimator.INFINITE
+        animator2.repeatMode = ObjectAnimator.RESTART
+        animator2.interpolator = DecelerateInterpolator()
+        animator2.duration = 1400
+        animatorSet.playTogether(animator1, animator2)
     }
 }

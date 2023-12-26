@@ -16,10 +16,10 @@ enum ShowPKInviteStatus: CaseIterable {
     
     var title: String {
         switch self {
-        case .invite: return "邀请".show_localized
-        case .waitting: return "邀请中".show_localized
+        case .invite: return "show_application".show_localized
+        case .waitting: return "show_application_waitting".show_localized
         case .interacting: return "Interacting".show_localized
-        case .refused: return "已拒绝".show_localized
+        case .refused: return "show_reject_onseat".show_localized
         }
     }
     var titleColor: UIColor? {
@@ -151,7 +151,7 @@ class ShowPKInviteViewCell: ShowInviteCell {
             return
         }
 
-        AppContext.showServiceImp(roomId!).createPKInvitation(room: invitation) {[weak self] error in
+        AppContext.showServiceImp(roomId!)?.createPKInvitation(room: invitation) {[weak self] error in
             if let err = error {
                 ToastView.show(text: err.localizedDescription)
                 return
@@ -178,13 +178,13 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
             switch model.status {
             case .accepted:
                 statusButton.isUserInteractionEnabled = false
-                statusButton.setTitle("已上麦".show_localized, for: .normal)
+                statusButton.setTitle("show_is_onseat".show_localized, for: .normal)
                 statusButton.setTitleColor(.black, for: .normal)
                 statusButton.setBackgroundImage(nil, for: .normal)
                 
             case .waitting:
                 statusButton.isUserInteractionEnabled = true
-                statusButton.setTitle("同意".show_localized, for: .normal)
+                statusButton.setTitle("show_onseat_agree".show_localized, for: .normal)
                 statusButton.setBackgroundImage(UIImage.show_sceneImage(name: "show_invite_btn_bg"), for: .normal)
                 statusButton.setTitleColor(.white, for: .normal)
                 
@@ -201,12 +201,12 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
             switch model.status {
             case .waitting:
                 statusButton.isUserInteractionEnabled = false
-                statusButton.setTitle("等待中".show_localized, for: .normal)
+                statusButton.setTitle("show_is_waitting".show_localized, for: .normal)
                 statusButton.setBackgroundImage(nil, for: .normal)
                 statusButton.setTitleColor(.black, for: .normal)
                 
             default:
-                statusButton.setTitle("邀请".show_localized, for: .normal)
+                statusButton.setTitle("show_application".show_localized, for: .normal)
                 statusButton.setBackgroundImage(UIImage.show_sceneImage(name: "show_invite_btn_bg"), for: .normal)
                 statusButton.setTitleColor(.white, for: .normal)
                 statusButton.isUserInteractionEnabled = true
@@ -246,11 +246,11 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
     fileprivate override func onTapStatusButton(sender: UIButton) {
         super.onTapStatusButton(sender: sender)
         if let model = seatApplyModel, sender.tag == 1 {
-            AppContext.showServiceImp(roomId!).acceptMicSeatApply(apply: model) {[weak self] _ in
+            AppContext.showServiceImp(roomId!)?.acceptMicSeatApply(apply: model) {[weak self] _ in
                 self?.refreshDataClosure?()
             }
         } else if let model = seatInvitationModel {
-            AppContext.showServiceImp(roomId!).createMicSeatInvitation(user: model) {[weak self] error in
+            AppContext.showServiceImp(roomId!)?.createMicSeatInvitation(user: model) {[weak self] error in
                 if let err = error {
                     ToastView.show(text: err.localizedDescription)
                     return

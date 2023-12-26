@@ -44,7 +44,6 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
         mBinding.apply {
             if (micInfo.micStatus == MicStatus.BotActivated || micInfo.micStatus == MicStatus.BotInactive) { // 机器人
 
-                ivMicInnerIcon.isVisible = false
                 ivMicInfo.setBackgroundResource(R.drawable.voice_bg_oval_white)
                 val botDrawable = ResourcesTools.getDrawableId(context, micInfo.member?.portrait ?: "")
                 ImageTools.loadImage(ivMicInfo, botDrawable)
@@ -57,32 +56,31 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                 ivMicBotFloat.isGone = micInfo.micStatus == MicStatus.BotActivated
             } else {
                 if (micInfo.member == null) { // 没人
-                    ivMicInnerIcon.isVisible = true
-                    ivMicInfo.setImageResource(0)
+                    ivMicInfo.setImageResource(R.drawable.voice_ic_mic_empty)
                     mtMicUsername.text = micInfo.micIndex.toString()
                     mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
                     when (micInfo.micStatus) {
                         MicStatus.ForceMute -> {
-                            ivMicTag.isVisible = false
-                            ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_mute)
+                            ivMicTag.isVisible = true
+                            ivMicTag.setImageResource(R.drawable.voice_ic_mic_mute_tag)
+                            ivMicInfo.setImageResource(R.drawable.voice_ic_mic_empty)
                         }
                         MicStatus.Lock -> {
-                            ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_close)
                             ivMicTag.isVisible = false
+                            ivMicInfo.setImageResource(R.drawable.voice_ic_mic_close)
                         }
                         MicStatus.LockForceMute -> {
-                            ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_close)
                             ivMicTag.isVisible = true
-                            ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
+                            ivMicTag.setImageResource(R.drawable.voice_ic_mic_mute_tag)
+                            ivMicInfo.setImageResource(R.drawable.voice_ic_mic_close)
                         }
                         else -> {
                             ivMicTag.isVisible = false
-                            ivMicInnerIcon.setImageResource(R.drawable.voice_icon_room_mic_add)
+                            ivMicInfo.setImageResource(R.drawable.voice_ic_mic_empty)
                         }
                     }
                 } else { // 有人
                     ivMicTag.isVisible = true
-                    ivMicInnerIcon.isVisible = false
                     ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
                     mtMicUsername.text = micInfo.member?.nickName ?: ""
                     if (micInfo.ownerTag) {
@@ -95,13 +93,13 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                     when (micInfo.micStatus) {
                         MicStatus.Mute,
                         MicStatus.ForceMute -> {
-                            ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
+                            ivMicTag.setImageResource(R.drawable.voice_ic_mic_mute_tag)
                         }
                         else -> {
                             if (micInfo.member?.micStatus == MicStatus.Normal) {
                                 ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open0)
                             } else {
-                                ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
+                                ivMicTag.setImageResource(R.drawable.voice_ic_mic_mute_tag)
                             }
                         }
                     }

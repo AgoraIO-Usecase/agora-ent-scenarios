@@ -1,0 +1,146 @@
+//
+//  VLSRKindsView.m
+//  VoiceOnLine
+//
+
+#import "VLSRKindsView.h"
+#import "VLSRKindsCell.h"
+#import "AESMacro.h"
+@import Masonry;
+
+@interface VLSRKindsView() <UICollectionViewDataSource,UICollectionViewDelegate>
+
+@property (nonatomic, strong) UICollectionView *collectionView;
+@property (nonatomic, strong) VLSRKindsModel *currentModel;
+@property (nonatomic, assign) long selectedOne;
+
+@end
+
+@implementation VLSRKindsView
+
+- (instancetype)init {
+    if (self = [super init]) {
+        [self initSubViews];
+        [self addSubViewConstraints];
+        _selectedOne = 0;
+    }
+    return self;
+}
+
+- (void)initSubViews {
+    [self addSubview:self.collectionView];
+}
+
+- (void)addSubViewConstraints {
+    [self.collectionView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.mas_equalTo(self);
+        make.height.mas_equalTo(50);
+    }];
+}
+
+- (void)setList:(NSArray<VLSRKindsModel *> *)list {
+    _list = list;
+    [self.collectionView reloadData];
+}
+
+#pragma mark - UITableViewDelegate,UITableViewDataSource
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+    return _list.count;
+}
+
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    VLSRKindsCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"VLSRKindsCell" forIndexPath:indexPath];
+    cell.model = _list[indexPath.row];
+    if(indexPath.item == _selectedOne) {
+        [cell setSelected:YES];
+    }
+    else {
+        [cell setSelected:NO];
+    }
+    return  cell;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    VLSRKindsModel *model = _list[indexPath.row];
+    if (model == self.currentModel) {
+        return;
+    }
+    
+    _selectedOne = indexPath.row;
+    
+    for(int i=0; i<[_list count]; i++) {
+        VLSRKindsModel *model = _list[i];
+        model.selected = NO;
+    }
+    self.currentModel.selected = NO;
+    
+    model.selected = YES;
+    self.currentModel = model;
+    [collectionView reloadData];
+    
+    if ([self.delegate respondsToSelector:@selector(kindsViewDidClickIndex:)]) {
+        [self.delegate kindsViewDidClickIndex:indexPath.row];
+    }
+}
+
+- (UICollectionView *)collectionView {
+    if (!_collectionView) {
+        UICollectionViewFlowLayout *flowLayOut = [[UICollectionViewFlowLayout alloc]init];
+        flowLayOut.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+        flowLayOut.itemSize = CGSizeMake(75, 50);
+        flowLayOut.minimumInteritemSpacing = 12;
+//        flowLayOut.minimumLineSpacing = 12;
+        
+        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:flowLayOut];
+        _collectionView.dataSource = self;
+        _collectionView.delegate = self;
+        _collectionView.showsHorizontalScrollIndicator = false;
+        _collectionView.showsVerticalScrollIndicator = false;
+        _collectionView.backgroundColor = UIColorClear;
+        _collectionView.contentInset = UIEdgeInsetsMake(0, 20, 0, 20);
+        if (@available(iOS 11, *)) {
+            _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+        }
+        [_collectionView registerClass:[VLSRKindsCell class] forCellWithReuseIdentifier:@"VLSRKindsCell"];
+    }
+    return _collectionView;
+}
+
+@end
+
+@implementation VLSRKindsModel
+
++ (NSArray<VLSRKindsModel *> *)kinds {
+    NSArray *titlesArray = @[
+        SRLocalizedString(@"SR_room_original"),
+        SRLocalizedString(@"SR"),
+        SRLocalizedString(@"SR_room_concert"),
+        SRLocalizedString(@"SR_room_recording studio"),
+        SRLocalizedString(@"SR_room_gramophone"),
+        SRLocalizedString(@"SR_room_spacious"),
+        SRLocalizedString(@"SR_room_ethereal"),
+        SRLocalizedString(@"SR_room_pop"),
+        SRLocalizedString(@"R&B")];
+    NSArray *imagesArray = @[@"SR_console_setting1",
+                             @"SR_console_setting2",
+                             @"SR_console_setting3",
+                             @"SR_console_setting4",
+                             @"SR_console_setting1",
+                             @"SR_console_setting2",
+                             @"SR_console_setting3",
+                             @"SR_console_setting4",
+                             @"SR_console_setting1"];
+    NSMutableArray *array = [NSMutableArray array];
+    for (int i = 0; i <titlesArray.count ; i++) {
+        VLSRKindsModel *model = [[VLSRKindsModel alloc] init];
+        model.title = titlesArray[i];
+        model.imageName = imagesArray[i];
+        if(i == 0) {
+            model.selected = YES;
+        }
+        [array addObject:model];
+    }
+    return array;
+}
+
+@end

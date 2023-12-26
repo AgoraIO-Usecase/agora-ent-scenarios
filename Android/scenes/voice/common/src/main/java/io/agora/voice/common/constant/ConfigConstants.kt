@@ -10,9 +10,6 @@ object ConfigConstants {
     // 不可点击透明度
     const val DISABLE_ALPHA = 0.2f
 
-    // 默认头像
-    const val DefaultAvatar = "avatar1"
-
     // 默认音量
     const val RotDefaultVolume = 50
     //--------房间类型 start--------

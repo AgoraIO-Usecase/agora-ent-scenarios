@@ -206,6 +206,11 @@ interface VoiceServiceProtocol {
     fun updateAnnouncement(content: String, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
+     * 更新房间背景音乐信息
+     */
+    fun updateBGMInfo(info: VoiceBgmModel, completion: (error: Int) -> Unit)
+
+    /**
      * 是否启用机器人
      * @param enable true 启动机器人，false 关闭机器人
      */

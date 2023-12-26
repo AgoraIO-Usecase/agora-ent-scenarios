@@ -1,6 +1,6 @@
 //
-//  SwiftyFitsize.swift
-//  SwiftyFitsize
+//   Screen.swift
+//   Screen
 //
 //  Created by LinXunFeng on 2018/10/17.
 //  Copyright © 2018 siyu. All rights reserved.
@@ -21,8 +21,8 @@ import UIKit
 //
 //fileprivate let ScreenW = UIScreen.main.bounds.width
 //
-//@objc public final class SwiftyFitsize: NSObject {
-//    static let shared = SwiftyFitsize()
+//@objc public final class  Screen: NSObject {
+//    static let shared =  Screen()
 //
 //    static var isFullScreen: Bool {
 //        if #available(iOS 11, *) {
@@ -40,8 +40,8 @@ import UIKit
 //
 //    override private init() {}
 //
-//    @objc public class func sharedSwiftyFitsize() -> SwiftyFitsize {
-//        return SwiftyFitsize.shared
+//    @objc public class func shared Screen() ->  Screen {
+//        return  Screen.shared
 //    }
 //
 //    /// 默认参照宽度
@@ -58,8 +58,8 @@ import UIKit
 //        width: CGFloat,
 //        iPadFitMultiple: CGFloat
 //    ) {
-//        SwiftyFitsize.shared.referenceW = width
-//        SwiftyFitsize.shared.iPadFitMultiple =
+//         Screen.shared.referenceW = width
+//         Screen.shared.iPadFitMultiple =
 //            (iPadFitMultiple > 1 || iPadFitMultiple < 0) ? 1 : iPadFitMultiple
 //    }
 //
@@ -72,7 +72,7 @@ import UIKit
 //        case .flexible:
 //            return ScreenW / referenceW * value *
 //                (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiom.pad
-//                    ? SwiftyFitsize.shared.iPadFitMultiple : 1)
+//                    ?  Screen.shared.iPadFitMultiple : 1)
 //        case .force: return ScreenW / referenceW * value
 //        }
 //    }
@@ -89,7 +89,7 @@ import UIKit
 //    }
 //}
 //
-//// MARK: - SwiftyFitsize
+//// MARK: -  Screen
 //
 ///*
 // * ~ : 当设备为iPad时，适配后的 value 会再乘上 iPadFitMultiple
@@ -100,7 +100,7 @@ import UIKit
 //
 //postfix operator ~
 //public postfix func ~ (value: CGFloat) -> CGFloat {
-//    return SwiftyFitsize.shared.fitNumberSize(value, fitType: .flexible)
+//    return  Screen.shared.fitNumberSize(value, fitType: .flexible)
 //}
 //
 //public postfix func ~ (font: UIFont) -> UIFont {
@@ -151,7 +151,7 @@ import UIKit
 //
 //postfix operator ≈
 //public postfix func ≈ (value: CGFloat) -> CGFloat {
-//    return SwiftyFitsize.shared.fitNumberSize(value, fitType: .force)
+//    return  Screen.shared.fitNumberSize(value, fitType: .force)
 //}
 //
 //public postfix func ≈ (font: UIFont) -> UIFont {
@@ -205,7 +205,7 @@ import UIKit
 //        get { return SwiftyFitType.none.rawValue }
 //        set {
 //            guard let type = SwiftyFitType(rawValue: newValue) else { return }
-//            constant = SwiftyFitsize.shared.fitNumberSize(constant, fitType: type)
+//            constant =  Screen.shared.fitNumberSize(constant, fitType: type)
 //        }
 //    }
 //}
@@ -216,7 +216,7 @@ import UIKit
 //        set {
 //            guard let type = SwiftyFitType(rawValue: newValue) else { return }
 //            guard let xfont = font else { return }
-//            font = SwiftyFitsize.shared.fitFontSize(xfont, type: type)
+//            font =  Screen.shared.fitFontSize(xfont, type: type)
 //        }
 //    }
 //}
@@ -227,7 +227,7 @@ import UIKit
 //        set {
 //            guard let type = SwiftyFitType(rawValue: newValue) else { return }
 //            guard let xfont = font else { return }
-//            font = SwiftyFitsize.shared.fitFontSize(xfont, type: type)
+//            font =  Screen.shared.fitFontSize(xfont, type: type)
 //        }
 //    }
 //}
@@ -238,7 +238,7 @@ import UIKit
 //        set {
 //            guard let type = SwiftyFitType(rawValue: newValue) else { return }
 //            guard let xfont = font else { return }
-//            font = SwiftyFitsize.shared.fitFontSize(xfont, type: type)
+//            font =  Screen.shared.fitFontSize(xfont, type: type)
 //        }
 //    }
 //}
@@ -249,7 +249,7 @@ import UIKit
 //        set {
 //            guard let type = SwiftyFitType(rawValue: newValue) else { return }
 //            guard let xfont = titleLabel?.font else { return }
-//            titleLabel?.font = SwiftyFitsize.shared.fitFontSize(xfont, type: type)
+//            titleLabel?.font =  Screen.shared.fitFontSize(xfont, type: type)
 //        }
 //    }
 //}
@@ -261,7 +261,7 @@ import UIKit
 //    @objc var sfz: UIFont { return self≈ }
 //}
 //
-//public extension SwiftyFitsize {
+//public extension  Screen {
 //    @objc func sf_int(_ value: Int) -> CGFloat {
 //        return value~
 //    }

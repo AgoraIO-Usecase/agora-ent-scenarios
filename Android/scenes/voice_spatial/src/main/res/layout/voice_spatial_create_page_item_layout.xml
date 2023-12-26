@@ -32,7 +32,7 @@
             android:layout_marginBottom="5dp"
             android:maxLines="2"
             android:maxHeight="44dp"
-            android:text="@string/voice_room_create_chat_room"
+            android:text="@string/voice_spatial_room_create_chat_room"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
@@ -46,7 +46,7 @@
             android:maxHeight="36dp"
             android:maxLines="3"
             android:lineSpacingMultiplier="1.4"
-            android:text="@string/voice_room_create_chat_room_desc"
+            android:text="@string/voice_spatial_room_create_chat_room_desc"
             android:layout_marginBottom="12dp"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"

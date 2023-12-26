@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -30,6 +31,13 @@ import kotlin.jvm.internal.Intrinsics;
 public final class CommonTitleView extends ConstraintLayout {
     private ViewCommonTitleBinding binding;
 
+    public ImageView getLeftIcon() {
+        return binding.ivBackIcon;
+    }
+
+    public ImageView getRightIcon() {
+        return binding.ivRightIcon;
+    }
     private final void initView(AttributeSet attrs, int defStyleAttr) {
         Context var10000 = this.getContext();
         Intrinsics.checkNotNullExpressionValue(var10000, "context");
@@ -45,16 +53,6 @@ public final class CommonTitleView extends ConstraintLayout {
             var12.setVisibility(View.VISIBLE);
         }
 
-        this.binding.ivBackIcon.setOnClickListener((View.OnClickListener) (new View.OnClickListener() {
-            public final void onClick(View it) {
-                Context var10000 = CommonTitleView.this.getContext();
-                if (var10000 == null) {
-                    throw new NullPointerException("null cannot be cast to non-null type android.app.Activity");
-                } else {
-                    ((Activity) var10000).finish();
-                }
-            }
-        }));
         boolean isHideLeftImage = typedArray.getBoolean(R.styleable.titleView_ctv_hideLeftImage, false);
         if (isHideLeftImage) {
             var12 = this.binding.ivBackIcon;

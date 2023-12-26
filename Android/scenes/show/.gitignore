@@ -1,6 +1,6 @@
 *.aar
 *.so
-src/main/assets/resource
+src/main/assets/beauty_sensetime
 \build
 
 src/main/assets/filter_portrait

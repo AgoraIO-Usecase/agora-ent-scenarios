@@ -24,7 +24,7 @@ enum class ShowInteractionStatus(val value: Int) {
 }
 
 // 房间详情信息
-data class ShowRoomDetailModel(
+data class ShowRoomDetailModel constructor(
     val roomId: String,
     val roomName: String,
     val roomUserCount: Int,
@@ -69,14 +69,6 @@ data class ShowRoomDetailModel(
         )
     }
 
-    fun getThumbnailIcon() = when (thumbnailId) {
-        "0" -> R.mipmap.show_room_cover_0
-        "1" -> R.mipmap.show_room_cover_1
-        "2" -> R.mipmap.show_room_cover_2
-        "3" -> R.mipmap.show_room_cover_3
-        else -> R.mipmap.show_room_cover_0
-    }
-
     fun isRobotRoom() = roomId.length > 6
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -111,7 +103,7 @@ data class ShowRoomDetailModel(
 }
 
 //用户信息
-data class ShowUser(
+data class ShowUser constructor(
     val userId: String,
     val avatar: String,
     val userName: String,
@@ -119,7 +111,7 @@ data class ShowUser(
 )
 
 // 聊天消息
-data class ShowMessage(
+data class ShowMessage constructor(
     val userId: String,
     val userName: String,
     val message: String,
@@ -127,7 +119,7 @@ data class ShowMessage(
 )
 
 // 连麦申请
-data class ShowMicSeatApply(
+data class ShowMicSeatApply constructor(
     val userId: String,
     val avatar: String,
     val userName: String,
@@ -136,7 +128,7 @@ data class ShowMicSeatApply(
 )
 
 // 连麦邀请
-data class ShowMicSeatInvitation(
+data class ShowMicSeatInvitation constructor(
     val userId: String,
     val avatar: String,
     val userName: String,
@@ -144,7 +136,7 @@ data class ShowMicSeatInvitation(
 )
 
 // PK邀请
-data class ShowPKInvitation(
+data class ShowPKInvitation constructor(
     val userId: String,
     var userName: String,
     val roomId: String,
@@ -158,7 +150,7 @@ data class ShowPKInvitation(
 )
 
 //连麦/Pk模型
-data class ShowInteractionInfo(
+data class ShowInteractionInfo constructor(
     val userId: String,
     val userName: String,
     val roomId: String,

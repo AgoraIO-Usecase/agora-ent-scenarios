@@ -11,9 +11,9 @@ import ZSwiftBaseLib
 public final class VRRoomMenuBar: UIView {
     var selectClosure: ((IndexPath) -> Void)?
 
-    static let menusMap = [["title": LanguageManager.localValue(key: "All"), "detail": "", "selected": true, "soundType": ""], ["title": LanguageManager.localValue(key: "Standard"), "detail": "", "selected": false, "soundType": ""], ["title": LanguageManager.localValue(key: "Spatial Audio"), "detail": "", "selected": false, "soundType": ""]]
+    static let menusMap = [["title": LanguageManager.localValue(key: "voice_app_all"), "detail": "", "selected": true, "soundType": ""], ["title": LanguageManager.localValue(key: "voice_standard"), "detail": "", "selected": false, "soundType": ""], ["title": LanguageManager.localValue(key: "voice_spatial_audio"), "detail": "", "selected": false, "soundType": ""]]
 
-    static let menusMap1 = [["title": LanguageManager.localValue(key: "Chat Room"), "detail": "", "selected": false, "soundType": 0], ["title": LanguageManager.localValue(key: "Spatial Audio Mode Room"), "detail": "", "selected": false, "soundType": 0]]
+    static let menusMap1 = [["title": LanguageManager.localValue(key: "voice_chat_room"), "detail": "", "selected": false, "soundType": 0], ["title": LanguageManager.localValue(key: "voice_spatial_audio_mode_room"), "detail": "", "selected": false, "soundType": 0]]
 
     private var indicatorImage = UIImage()
 

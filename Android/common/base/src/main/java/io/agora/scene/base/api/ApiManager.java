@@ -10,6 +10,8 @@ import com.google.gson.GsonBuilder;
 import com.moczul.ok2curl.CurlInterceptor;
 
 import java.io.File;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import io.agora.scene.base.BuildConfig;
@@ -18,6 +20,7 @@ import io.agora.scene.base.api.base.BaseResponse;
 import io.agora.scene.base.api.common.NetConstants;
 import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.bean.CommonBean;
+import io.agora.scene.base.bean.FeedbackUploadResBean;
 import io.agora.scene.base.manager.UserManager;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -29,6 +32,7 @@ import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.http.Query;
 
 public class ApiManager {
     private Gson mGson;
@@ -66,7 +70,9 @@ public class ApiManager {
                 .readTimeout(TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(TIMEOUT, TimeUnit.SECONDS);
         if (BuildConfig.DEBUG) {
-            httpClientBuilder.addInterceptor(new CurlInterceptor(s -> Log.d("CurlInterceptor", s)));
+            httpClientBuilder.addInterceptor(new CurlInterceptor(s -> {
+                Log.d("CurlInterceptor", s);
+            }));
         }
         httpClient = httpClientBuilder.build();
 
@@ -178,7 +184,31 @@ public class ApiManager {
 
     }
 
+    public Observable<BaseResponse<CommonBean>> requestUploadLog(File file) {
+        RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+        MultipartBody.Part partFile = MultipartBody.Part.createFormData("file", file.getName(), fileBody);
+        return apiManagerService.requestUploadLog(partFile).flatMap(it -> Observable.just(it));
+    }
+
+    public Observable<BaseResponse<FeedbackUploadResBean>> requestFeedbackUpload(Map<String,String> screenshotURLs,
+                                                                                 String[] tags, String description, String logURL) {
+        ArrayMap<String, Object> params = new ArrayMap();
+        params.put("screenshotURLs", screenshotURLs);
+        params.put("tags", tags);
+        params.put("description", description);
+        params.put("logURL", logURL);
+        return apiManagerService.requestFeedbackUpload(getRequestBody1(params)).flatMap(it -> Observable.just(it));
+
+    }
+
     private RequestBody getRequestBody(ArrayMap<String, String> params) {
+        return RequestBody.create(
+                MediaType.parse("application/json;charset=UTF-8"),
+                GsonUtils.Companion.getGson().toJson(params)
+        );
+    }
+
+    private RequestBody getRequestBody1(ArrayMap<String, Object> params) {
         return RequestBody.create(
                 MediaType.parse("application/json;charset=UTF-8"),
                 GsonUtils.Companion.getGson().toJson(params)
