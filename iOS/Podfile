@@ -93,6 +93,10 @@ target 'AgoraEntScenarios' do
 end
 
 post_install do |installer|
+  
+  # 拷贝 pre-commit 文件到 .git/hooks/ 目录下
+  system("cp -f #{File.expand_path('..', Dir.pwd)}/.github/hooks/pre-commit #{File.expand_path('..', Dir.pwd)}/.git/hooks/")
+  
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
@@ -114,3 +118,5 @@ post_install do |installer|
 end
 
 system("./libs/setup_podspec.sh")
+
+
