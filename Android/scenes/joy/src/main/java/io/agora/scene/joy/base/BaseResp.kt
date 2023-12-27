@@ -23,6 +23,10 @@ data class JoyApiResult<T> constructor(
     @Expose
     @SerializedName("tip")
     var tip: String? = null,
+    @Expose
+    @SerializedName("errMsg")
+    var errMsg: String? = null,
+
     var dataState: DataState? = null
 ) {
     val isSucceed: Boolean
@@ -31,7 +35,7 @@ data class JoyApiResult<T> constructor(
     val errorMessage: ErrorMessage?
         get() {
             try {
-                return GsonUtils.gson.fromJson(msg, ErrorMessage::class.java)
+                return GsonUtils.gson.fromJson(errMsg, ErrorMessage::class.java)
             } catch (e: Exception) {
                 return null
             }

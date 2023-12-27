@@ -9,6 +9,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Rect
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
@@ -46,6 +47,7 @@ import io.agora.scene.base.api.model.User
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.joy.R
 import io.agora.scene.joy.RtcEngineInstance
 import io.agora.scene.joy.base.DataState
@@ -150,6 +152,9 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     }
 
     private lateinit var mRootInset: Insets
+
+    // 关闭按钮屏幕位置
+    private lateinit var mCloseRect: Rect
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
@@ -304,6 +309,17 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             null
         }
 
+        binding.root.post {
+            val exitClose = binding.ivClose
+            val location = IntArray(2)
+            exitClose.getLocationOnScreen(location)
+            val exitCloseLeft = location[0]
+            val exitCloseTop = location[1]
+            val exitCloseRight = exitCloseLeft + exitClose.width
+            val exitCloseBottom = exitCloseTop + exitClose.height
+            mCloseRect = Rect(exitCloseLeft, exitCloseTop, exitCloseRight, exitCloseBottom)
+            Log.d("Joy_JoyChooseGameDialog", "$exitCloseLeft,$exitCloseTop,$exitCloseRight,$exitCloseBottom")
+        }
     }
 
     private fun setControllerView(view: ImageView, isClick: Boolean) {
@@ -797,9 +813,20 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                         val assistantUid = 1000000000 + (mUser.id).toInt()
                         mJoyViewModel.startGame(mRoomInfo.roomId, it.gameId ?: "", assistantUid)
                     }
+                    mTouchEventCompletion = { x, y ->
+                        checkCloseByEvent(x, y)
+                    }
                 }
             }
             mGameChooseGameDialog?.show(supportFragmentManager, "chooseGameDialog")
+        }
+    }
+
+    private fun checkCloseByEvent(x: Int, y: Int) {
+        if (::mCloseRect.isInitialized) {
+            if (x >= mCloseRect.left && x <= mCloseRect.right && y >= mCloseRect.top && y <= mCloseRect.bottom) {
+                showEndRoomDialog()
+            }
         }
     }
 
