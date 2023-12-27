@@ -314,9 +314,9 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         super.onDestroy()
         mVpFragments[mCurrLoadPosition]?.stopLoadPage(false)
         mCallApi.removeListener(callApiListener)
-        mShowTo1v1Manger.destroy()
         mRtcVideoLoaderApi.cleanCache()
         VideoLoader.release()
+        mShowTo1v1Manger.destroy()
     }
 
 
