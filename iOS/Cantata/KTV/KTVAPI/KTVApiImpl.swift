@@ -150,13 +150,13 @@ private func agoraPrint(_ message: String) {
             mcc?.register(self)
             // ------------------ 初始化音乐播放器实例 ------------------
             mediaPlayer = mcc?.createMusicPlayer(delegate: self)
-            mediaPlayer?.adjustPlayoutVolume(50)
-            mediaPlayer?.adjustPublishSignalVolume(50)
+            mediaPlayer?.adjustPlayoutVolume(70)
+            mediaPlayer?.adjustPublishSignalVolume(70)
         } else {
             mediaPlayer = apiConfig?.engine?.createMediaPlayer(with: self)
             // 音量最佳实践调整
-            mediaPlayer?.adjustPlayoutVolume(50)
-            mediaPlayer?.adjustPublishSignalVolume(50)
+            mediaPlayer?.adjustPlayoutVolume(70)
+            mediaPlayer?.adjustPublishSignalVolume(70)
         }
         
         initTimer()
@@ -192,13 +192,13 @@ private func agoraPrint(_ message: String) {
             mcc?.register(self)
             // ------------------ 初始化音乐播放器实例 ------------------
             mediaPlayer = mcc?.createMusicPlayer(delegate: self)
-            mediaPlayer?.adjustPlayoutVolume(50)
-            mediaPlayer?.adjustPublishSignalVolume(50)
+            mediaPlayer?.adjustPlayoutVolume(70)
+            mediaPlayer?.adjustPublishSignalVolume(70)
         } else {
             mediaPlayer = apiConfig?.engine?.createMediaPlayer(with: self)
             // 音量最佳实践调整
-            mediaPlayer?.adjustPlayoutVolume(50)
-            mediaPlayer?.adjustPublishSignalVolume(50)
+            mediaPlayer?.adjustPlayoutVolume(70)
+            mediaPlayer?.adjustPublishSignalVolume(70)
         }
         
         initTimer()

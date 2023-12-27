@@ -9,6 +9,7 @@ import UIKit
 import ZSwiftBaseLib
 import AgoraRtcKit
 import AgoraCommon
+import SnapKit
 @objcMembers final class AboutAgoraEntertainmentViewController: VRBaseViewController {
     
     var infos = [["contents":[["title": NSLocalizedString("app_about_customer_service", comment: ""),

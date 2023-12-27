@@ -32,9 +32,9 @@ def all_pods
   pod 'JXCategoryView', '1.6.1'
   
   # 火山美颜
-  pod 'BytedEffect', :path => 'bytedEffect.podspec'
+ # pod 'BytedEffect', :path => 'bytedEffect.podspec'
   # 商汤美颜
-  pod 'SenseLib', :path => 'sense.podspec'
+ # pod 'SenseLib', :path => 'sense.podspec'
   pod 'Cantata', :path => 'Cantata.podspec'
   pod 'AgoraCommon', :path => 'AgoraCommon.podspec'
   pod 'AgoraSyncManager', '~> 2.1.3'
@@ -45,7 +45,7 @@ def all_pods
 # pod 'AgoraRtcEngine_Special_iOS', '4.0.0.133'
   pod 'AgoraRtcEngine_Special_iOS', '4.1.1.23'
 
-  pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/ThirdParty/VideoLoaderAPI/VideoLoaderAPI.podspec'
+#  pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/ThirdParty/VideoLoaderAPI/VideoLoaderAPI.podspec'
 
   #ThirdParty
   pod 'HWWeakTimer', '1.0'
