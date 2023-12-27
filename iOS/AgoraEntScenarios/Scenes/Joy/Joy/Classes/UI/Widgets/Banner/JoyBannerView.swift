@@ -104,6 +104,7 @@ class JoyBannerView: UIView {
     var bannerList: JoyBannerArray = JoyBannerArray(bannerList: []) {
         didSet {
             listView.reloadData()
+            scrollToCenterIfNeed()
             startTimer()
         }
     }
