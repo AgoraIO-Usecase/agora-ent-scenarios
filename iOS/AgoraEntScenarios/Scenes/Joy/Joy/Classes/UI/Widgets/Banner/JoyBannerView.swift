@@ -143,7 +143,7 @@ extension JoyBannerView {
         guard index < bannerList.count, index >= 0 else {
             return
         }
-        listView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredHorizontally, animated: true)
+        listView.setContentOffset(CGPoint(x: CGFloat(index) * listView.width, y: 0), animated: true)
     }
     
     private func stopTimer() {
