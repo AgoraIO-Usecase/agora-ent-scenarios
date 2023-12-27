@@ -57,7 +57,7 @@ open class JoyBannerArray: NSObject {
 class JoyBannerViewCell: UICollectionViewCell {
     let bannerView: UIImageView = {
         let view = UIImageView()
-        view.contentMode = .scaleAspectFit
+        view.contentMode = .scaleAspectFill
         view.backgroundColor = .joy_room_info_cover
         return view
     }()
