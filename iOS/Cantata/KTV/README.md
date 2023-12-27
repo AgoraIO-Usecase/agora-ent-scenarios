@@ -1,10 +1,10 @@
-# 在线K歌房
+# 大合唱
 
 > 本文档主要介绍如何快速跑通 <mark>在线K歌房</mark> 示例工程
 >
 > Demo 效果:
 > 
-> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ktvRoom_1.png" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ktvRoom_2.png" width="300" height="640">
+> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/hdc_readme_ios_4.jpg" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/hdc_readme_ios_3.jpg" width="300" height="640">
 ---
 
 ## 1. 环境准备
@@ -47,6 +47,13 @@
   AppId：声网 appid
   Certificate：声网 Certificate
   ```
+
+  >   
+  > - 云端合流服务配置（CloudPlayer）
+  > 
+  >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/CloudPlayer.png)
+  > 
+  
 - 项目的第三方库使用 pod 集成，需要在 agora-ent-scenarios/iOS 目录下执行 pod install ,然后再开始体验项目
 - 在 agora-ent-scenarios/iOS 目录下，找到 AgoraEntScenarios.xcworkspace 文件
 - 用 Xcode 运行 .xcworkspace 文件 即可开始您的体验
@@ -98,9 +105,9 @@
 >
 > #### K歌房场景化API
 >
-> ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_api_ios.png)
+> ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/hdc_readme_ios_2.jpg)
 >
-大合唱场景化 API 是一个帮助您快速集成声网 大合唱能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**KTVApiDelegate**](KTVApi/KTVApi.swift) 来定义协议，通过 [**KTVApiImp**](KTVApi/KTVApiImp.swift) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网K歌房能力
+大合唱场景化 API 是一个帮助您快速集成声网 大合唱能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**KTVApi**](KTVAPI/KTVApi.swift) 来定义协议，通过 [**KTVApiImp**](KTVAPI/KTVApiImpl.swift) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网大合唱能力
 >
 > * 拉取歌单
 >
@@ -187,7 +194,7 @@
 >    * 7、LeadSinger -》SoloSinger 最后一个合唱者退出合唱时，主唱由领唱切换成独唱
 >    * 8、LeadSinger -》Audience 以领唱的身份结束歌曲时
 >    */
->   func switchSingerRole(
+>   func switchSingerRole2(
 >     newRole: KTVSingRole,
 >     onSwitchRoleState:@escaping ISwitchRoleStateListener
 >   )
@@ -250,7 +257,7 @@
 >
 > #### 业务服务器交互模块
 >
-> ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_service_ios.png)
+> ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/hdc_readme_ios_1.jpg)
 >
 > 场景内和业务服务器的交互主要是场景内基本交互请求和响应，例如房间的变化、用户的变化、麦位的变化、已点歌曲列表的变化，通过 [**KTVServiceProtocol**](Service/KTVServiceProtocol.swift) 来定义协议，通过 [**KTVSyncManagerServiceImp**](Service/KTVSyncManagerServiceImp.swift) 来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
 >
@@ -282,7 +289,7 @@
 > * 音效、美声
 >   声网最佳音效
 >
->    实现参考  [**CantataMainViewController.**](ViewController/CantataMainViewController..m) 里的 **showSettingView** 实现
+>    实现参考  [**CantataMainViewController**](ViewController/CantataMainViewController.swift) 里的 **showSettingView** 实现
 >
 ---
 
@@ -292,13 +299,13 @@
 
 **<span style="font-size: larger; color: red;">需要联系销售给 APPID 开通 K 歌权限</span>**
 
-### K歌房中的歌曲资源使用的是哪家？是否可以自己选择供应商？
+### 大合唱中的歌曲资源使用的是哪家？是否可以自己选择供应商？
 
-> K歌房的歌曲资源使用的是Agora内容中心服务，暂不支持自行切换供应商，详情请查看 [版权音乐 - 在线 K 歌房 - 文档中心 - 声网Agora](https://docs.agora.io/cn/online-ktv/API%20Reference/ios_ng/API/toc_drm.html)
+> 大合唱的歌曲资源使用的是Agora内容中心服务，暂不支持自行切换供应商，详情请查看 [版权音乐 - 在线 K 歌房 - 文档中心 - 声网Agora](https://docs.agora.io/cn/online-ktv/API%20Reference/ios_ng/API/toc_drm.html)
 
 ### 想体验更多场景
 
-> 详情请查看 [声动互娱](../../../../README.md)
+> 详情请查看 [声动互娱](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/main/README.md)
 
 ### 集成遇到困难，该如何联系声网获取协助
 
