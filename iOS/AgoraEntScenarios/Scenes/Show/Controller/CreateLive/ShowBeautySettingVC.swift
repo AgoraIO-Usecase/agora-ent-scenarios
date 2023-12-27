@@ -46,7 +46,12 @@ class ShowBeautySettingVC: UIViewController {
         }
         return true
     }).map({ $0.title })
-    private let vcs = ShowBeautyFaceVCType.allCases.map({ ShowBeautyFaceVC(type: $0) })
+    private let vcs = ShowBeautyFaceVCType.allCases.filter({
+        if BeautyModel.beautyType == .byte {
+            return $0 != .adjust
+        }
+        return true
+    }).map({ ShowBeautyFaceVC(type: $0) })
     
     // 背景
     private lazy var bgView: UIView = {
