@@ -363,7 +363,7 @@ extension CloudBarrageAPI {
                 joyError("Error: \(error?.localizedDescription ?? "Unknown error")")
                 return
             }
-            joyPrint(" httpRequest request:\n \(request.cURL(pretty: true)) \nresp:\n \(NSString(data: data, encoding: NSUTF8StringEncoding)) ")
+            joyPrint(" httpRequest request:\n \(request.cURL(pretty: true)) \nresp:\n \(NSString(data: data, encoding: NSUTF8StringEncoding) ?? "") ")
             if let dic = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
                 var result = dic["data"]
                 var code = dic["code"] as? Int ?? 0
@@ -374,14 +374,13 @@ extension CloudBarrageAPI {
                 default:
                     error = NSError(domain: "", code: code)
                     if code == 1300,
-                       let msg = result as? String,
+                       let msg = dic["errMsg"] as? String,
                        let jsonData = msg.data(using: .utf8),
                        let msgDic = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any] {
                         code = msgDic["code"] as? Int ?? 0
                         let msg = msgDic["err_msg"] as? String ?? ""
                         error = NSError(domain: msg, code: code)
                     }
-                    result = nil
                 }
 //                joyPrint("result = \(String(describing: result)), code = \(code)")
                 DispatchQueue.main.async {
