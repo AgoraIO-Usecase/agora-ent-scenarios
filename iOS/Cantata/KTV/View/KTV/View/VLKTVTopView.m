@@ -47,7 +47,7 @@
     [self addSubview:closeBtn];
     
     UIButton *moreButton = [[UIButton alloc] init];
-    [moreButton setImage:[UIImage sceneImageWithName:@"icon_live_more" bundleName:@"VoiceChatRoomResource"] forState:(UIControlStateNormal)];
+    [moreButton setImage:[UIImage sceneImageWithName:@"icon_live_more" bundleName:@"DHCResource"] forState:(UIControlStateNormal)];
     [moreButton addTarget:self action:@selector(moreBtnEvent:) forControlEvents:(UIControlEventTouchUpInside)];
     [self addSubview:moreButton];
     moreButton.translatesAutoresizingMaskIntoConstraints = NO;
