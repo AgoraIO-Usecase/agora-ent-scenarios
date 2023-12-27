@@ -128,9 +128,9 @@ class JoyBannerView: UIView {
 extension JoyBannerView {
     private func scrollToCenterIfNeed() {
         var index = listView.indexPathsForVisibleItems.first?.row ?? 0
-        guard index == 0 || index == bannerList.count - 1 else {
-            return
-        }
+//        guard index == 0 || index == bannerList.count - 1 else {
+//            return
+//        }
         index = bannerList.realIndex(index: index)
         index = bannerList.fakeIndex(index: index)
         listView.setContentOffset(CGPoint(x: CGFloat(index) * listView.width, y: 0), animated: false)
