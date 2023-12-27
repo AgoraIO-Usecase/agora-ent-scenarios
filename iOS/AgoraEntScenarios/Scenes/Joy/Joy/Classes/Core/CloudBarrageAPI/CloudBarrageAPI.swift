@@ -134,6 +134,7 @@ extension CloudBarrageAPI {
             return
         }
         
+        createDataStream()
         let interfaceName = "cloud-bullet-game/games/start"
         postRequest(interface: interfaceName, params: params) { err, result  in
             let taskId = result?["task_id"] as? String
@@ -278,6 +279,7 @@ extension CloudBarrageAPI {
         let ret = engine.sendStreamMessage(streamId, data: data)
         if ret == 0 { return }
         joyWarn("sendStreamMessage fail! ret:\(ret), streamId: \(streamId)")
+        streamId = 0
     }
 }
 
