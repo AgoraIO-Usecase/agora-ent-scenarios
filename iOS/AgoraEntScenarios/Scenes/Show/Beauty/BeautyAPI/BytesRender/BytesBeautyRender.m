@@ -66,6 +66,12 @@
     if ([self getDeviceOrientation] != BEF_AI_CLOCKWISE_ROTATE_0) {
         pixelBuffer = [self.imageUtils rotateCVPixelBuffer:pixelBuffer rotation:BEF_AI_CLOCKWISE_ROTATE_0];
     }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    if ([EAGLContext currentContext] != self.effectManager.glContext) {
+        [EAGLContext setCurrentContext:self.effectManager.glContext];
+    }
+#pragma clang diagnostic pop
     id<BEGLTexture> texture = [self.imageUtils transforCVPixelBufferToTexture:pixelBuffer];
     int ret = [self.effectManager processTexture:texture.texture
                                    outputTexture:texture.texture

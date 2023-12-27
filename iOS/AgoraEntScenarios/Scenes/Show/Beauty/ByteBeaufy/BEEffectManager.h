@@ -68,6 +68,7 @@ typedef NS_ENUM(NSInteger, BEEffectPart) {
 @property (nonatomic, strong) NSString *resourcePath;
 @property (atomic, weak) dispatch_queue_t renderQueue;
 @property (nonatomic, assign, readonly) BOOL isSuccessLicense;
+@property (nonatomic, strong)EAGLContext *glContext;
 
 
 //   {zh} / @brief 构造函数     {en} /@brief constructor

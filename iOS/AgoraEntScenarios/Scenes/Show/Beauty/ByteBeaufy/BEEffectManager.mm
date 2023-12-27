@@ -54,7 +54,7 @@ static const bool USE_PIPELINE = YES;
     bef_ai_face_mask_info       *_faceMaskInfo;
     bef_ai_mouth_mask_info      *_mouthMaskInfo;
     bef_ai_teeth_mask_info      *_teethMaskInfo;
-    EAGLContext                 *_glContext;
+//    EAGLContext                 *_glContext;
     
 #if BE_LOAD_RESOURCE_TIMEOUT
     NSMutableSet<NSString *>    *_existResourcePathes;
@@ -102,10 +102,11 @@ static const bool USE_PIPELINE = YES;
     _glContext = [EAGLContext currentContext];  // 运行在主线程，使用的是self.glView.context
     if (_glContext == nil) {
         NSLog(@"initTask is not run in thread with glContext!!!");
-        _glContext = [BEGLUtils createContextWithDefaultAPI:kEAGLRenderingAPIOpenGLES2];
+        _glContext = [BEGLUtils createContextWithDefaultAPI:kEAGLRenderingAPIOpenGLES3];
     }
     if ([EAGLContext currentContext] != _glContext) {
         [EAGLContext setCurrentContext: _glContext];
+        return [self initTask];
     }
     int ret = 0;
     ret = bef_effect_ai_create(&_handle);
@@ -773,8 +774,7 @@ static const bool USE_PIPELINE = YES;
 }
 
 - (bef_ai_render_api_type)renderAPI {
-    EAGLContext *context = [EAGLContext currentContext];
-    EAGLRenderingAPI api = context.API;
+    EAGLRenderingAPI api = _glContext.API;
     if (api == kEAGLRenderingAPIOpenGLES2) {
         return bef_ai_render_api_gles20;
     }
