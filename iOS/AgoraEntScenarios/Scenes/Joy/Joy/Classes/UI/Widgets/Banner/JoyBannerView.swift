@@ -140,6 +140,9 @@ extension JoyBannerView {
         scrollToCenterIfNeed()
         var index = listView.indexPathsForVisibleItems.first?.row ?? 0
         index += 1
+        guard index < bannerList.count, index >= 0 else {
+            return
+        }
         listView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredHorizontally, animated: true)
     }
     
