@@ -35,7 +35,9 @@
 
 - 联系销售给  AppID  开通 K 歌权限 </mark>(如果您没有销售人员的联系方式可通过智能客服联系销售人员 [Agora 支持](https://agora-ticket.agora.io/)
 
-  - 注: 拉取榜单、歌单、歌词等功能是需要开通权限的
+    ```json
+  注: 拉取榜单、歌单、歌词等功能是需要开通权限的
+  ```
 
 - 在项目的 agora-ent-scenarios/iOS/AgoraEntScenarios/ 目录下会有一个 KeyCenter.swift 文件，需要在 KeyCenter.swift 里填写需要的声网 App ID 和 App 证书
 
@@ -55,12 +57,12 @@
 
 ### 3.1 概述
 
-> **在线K歌房**项目是声网在线 K 歌房场景的开源代码，开发者可以获取并添加到您的 APP 工程里，本源码会伴随声动互娱 Demo 同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
+> **大合唱**项目是声网大合唱场景的开源代码，开发者可以获取并添加到您的 APP 工程里，本源码会伴随声动互娱 Demo 同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
 
 ### 3.2 项目文件结构简介
 
 ```
-├── Scenes
+├── Cantata
 │   ├── KTV
 │   │   └────FileDownloadCache #歌词下载工具类文件
 │   │   └────Debug            #KTV Debug工具类
@@ -72,7 +74,7 @@
 │   │       ├── KTVServiceProtocol.h #KTV里面用到的service接口
 │   │       └── KTVSyncManagerServiceImp.swift #KTV里面用到的service实现
 │   │   └────ViewController          #KTV里面用到的控制器
-│   │       ├── VLKTVViewController.m #KTV主控制器
+│   │       ├── CantataMainViewController.swift #KTV主控制器
 │   │   └────KTVAPI          #KTV里面KTVAPI
 │   │       ├── KTVApiDelegate.swift #KTVAPI的声明
 │   │       └── KTVApiImpl.swift #KTVAPI的实现
@@ -90,7 +92,7 @@
 
 > 在线K歌房场景目前已涵盖以下功能，您可以参考注释按需从代码中调用
 >
-> 场景功能代码根目录 **AgoraEntScenarios/AgoraEntScenarios/scenes/KTV**
+> 场景功能代码根目录 **AgoraEntScenarios/AgoraEntScenarios/iOS/Cantata**
 >
 > ---
 >
@@ -98,7 +100,7 @@
 >
 > ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_api_ios.png)
 >
-> K 歌房场景化 API 是一个帮助您快速集成声网 K 歌房能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**KTVApiDelegate**](KTVApi/KTVApiDelegate.swift) 来定义协议，通过 [**KTVApiImp**](KTVApi/KTVApiImp.kt) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网K歌房能力
+大合唱场景化 API 是一个帮助您快速集成声网 大合唱能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**KTVApiDelegate**](KTVApi/KTVApi.swift) 来定义协议，通过 [**KTVApiImp**](KTVApi/KTVApiImp.swift) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网K歌房能力
 >
 > * 拉取歌单
 >
@@ -250,13 +252,13 @@
 >
 > ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_service_ios.png)
 >
-> 场景内和业务服务器的交互主要是场景内基本交互请求和响应，例如房间的变化、用户的变化、麦位的变化、已点歌曲列表的变化，通过 [**KTVServiceProtocol**](service/KTVServiceProtocol.h) 来定义协议，通过 [**KTVSyncManagerServiceImp**](service/KTVSyncManagerServiceImp.swift) 来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
+> 场景内和业务服务器的交互主要是场景内基本交互请求和响应，例如房间的变化、用户的变化、麦位的变化、已点歌曲列表的变化，通过 [**KTVServiceProtocol**](Service/KTVServiceProtocol.swift) 来定义协议，通过 [**KTVSyncManagerServiceImp**](Service/KTVSyncManagerServiceImp.swift) 来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
 >
 > - 房间管理
 >
 >   包含了房间的创建和房间列表的获取
 >
->   相关代码请参考：[**KTVServiceModel**](service/KTVServiceModel.h)，分别依赖 [**KTVServiceProtocol**](service/KTVServiceProtocol.kt) 的下列方法去交互
+>   相关代码请参考：[**KTVServiceModel**](Service/KTVServiceModel.swift)，分别依赖 [**KTVServiceProtocol**](Service/KTVServiceProtocol.swift) 的下列方法去交互
 >
 >   ```Swift
 >   - (void)getRoomListWithPage:(NSUInteger)page
@@ -273,12 +275,6 @@
 >
 >   包含上麦、下麦、开关麦、开关摄像头等状态的同步
 >
-> - 歌曲管理
->
->   点歌、已点歌曲删除、已点歌曲置顶、切歌等状态的同步
->
->   歌曲列表菜单：请参考  [**VLPopSongList**]((View/KTV/KTVSongGallery/VLPopSongList.m))
->
 > 
 >
 > #### 其他功能
@@ -286,32 +282,31 @@
 > * 音效、美声
 >   声网最佳音效
 >
->    实现参考  [**VLKTVViewContolller**](viewController/VLKTVViewController.m) 里的 **effectItemClickAction** 实现
+>    实现参考  [**CantataMainViewController.**](ViewController/CantataMainViewController..m) 里的 **showSettingView** 实现
 >
->   声网最佳美声
->
->    实现参考  [**VLKTVViewContolller**](viewController/VLKTVViewController.m) 里的 **onVLChooseBelcantoView** 实现
-
 ---
 
 ## 4. FAQ
 
-### 如何获取声网 APPID
-
-> 声网 APPID 申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
-
 ### 程序运行后，歌曲列表为空
 
-> 需要联系销售给 APPID 开通 K 歌权限
+**<span style="font-size: larger; color: red;">需要联系销售给 APPID 开通 K 歌权限</span>**
 
 ### K歌房中的歌曲资源使用的是哪家？是否可以自己选择供应商？
 
 > K歌房的歌曲资源使用的是Agora内容中心服务，暂不支持自行切换供应商，详情请查看 [版权音乐 - 在线 K 歌房 - 文档中心 - 声网Agora](https://docs.agora.io/cn/online-ktv/API%20Reference/ios_ng/API/toc_drm.html)
+
+### 想体验更多场景
+
+> 详情请查看 [声动互娱](../../../../README.md)
 
 ### 集成遇到困难，该如何联系声网获取协助
 
 > 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
 >
 > 方案2：发送邮件给 [support@agora.io](mailto:support@agora.io) 咨询
-
+>
+> 方案3：扫码加入我们的微信交流群提问
+>
+> <img src="https://download.agora.io/demo/release/SDHY_QA.jpg" width="360" height="360">
 ---
