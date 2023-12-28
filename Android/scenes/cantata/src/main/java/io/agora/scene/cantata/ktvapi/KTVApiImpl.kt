@@ -38,8 +38,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     // 音频最佳实践
     var remoteVolume: Int = 30 // 远端音频
-    var mpkPlayoutVolume: Int = 50
-    var mpkPublishVolume: Int = 50
+    var mpkPlayoutVolume: Int = 70
+    var mpkPublishVolume: Int = 70
 
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
     private lateinit var mRtcEngine: RtcEngineEx
@@ -200,9 +200,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         // TopN
         mRtcEngine.setParameters("{\"rtc.use_audio4\": true}")
-        if (ktvApiConfig.type == KTVType.Cantata) {
-            mRtcEngine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
-        }
     }
 
     override fun addEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {
@@ -857,6 +854,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         singChannelMediaOptions.autoSubscribeAudio = true
         singChannelMediaOptions.publishMicrophoneTrack = true
         singChannelMediaOptions.clientRoleType = CLIENT_ROLE_BROADCASTER
+        singChannelMediaOptions.parameters = "{\"che.audio.max_mixed_participants\": 8}"
         if (newRole == KTVSingRole.LeadSinger) {
             // 主唱不参加TopN
             singChannelMediaOptions.isAudioFilterable = false

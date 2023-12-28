@@ -48,7 +48,7 @@ ext {
             gson              : 'com.google.code.gson:gson:2.9.0',
             autosize          : 'com.github.JessYanCoding:AndroidAutoSize:v1.2.1',
 
-            rtc               : 'io.agora.rtc:agora-special-full:4.1.1.18',
+            rtc               : 'io.agora.rtc:agora-special-full:4.1.1.23',
             rtm               : 'com.github.agorabuilder:rtm-sdk:1.4.10',
             syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.2.6',
             lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.1.1-beta.8',
@@ -64,10 +64,13 @@ ext {
             svga_player        : 'com.github.yyued:SVGAPlayer-Android:2.6.1',
             agora_chat         : 'io.agora.rtc:chat-sdk:1.1.0',
             ok2curl            : 'com.github.mrmike:ok2curl:0.8.0',
+
+            // other
+            audiokit           : 'com.huawei.multimedia:audiokit:1.0.1'
     ]
     android = [
             compileSdkVersion: 31,
-            minSdkVersion    : 21,
+            minSdkVersion    : 24,
             targetSdkVersion : 30,
     ]
 }
