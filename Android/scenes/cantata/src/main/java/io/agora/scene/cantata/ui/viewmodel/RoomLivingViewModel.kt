@@ -921,7 +921,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         mMusicSetting = MusicSettingBean(
             false,
             100,
-            70,
+            50,
             0,
             object : MusicSettingCallback {
                 override fun onEarChanged(isEar: Boolean) {
@@ -1362,9 +1362,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 // 重置settings
                 mRetryTimes = 0
                 mMusicSetting?.setVolMic(100)
-                mMusicSetting?.setVolMusic(70)
-                mKtvApi.getMediaPlayer().adjustPlayoutVolume(70)
-                mKtvApi.getMediaPlayer().adjustPublishSignalVolume(70)
+                mMusicSetting?.setVolMusic(50)
+                mKtvApi.getMediaPlayer().adjustPlayoutVolume(50)
+                mKtvApi.getMediaPlayer().adjustPublishSignalVolume(50)
                 mPlayerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING)
             }
 

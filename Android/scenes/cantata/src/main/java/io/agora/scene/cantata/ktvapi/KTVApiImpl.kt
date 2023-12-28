@@ -38,8 +38,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     // 音频最佳实践
     var remoteVolume: Int = 30 // 远端音频
-    var mpkPlayoutVolume: Int = 70
-    var mpkPublishVolume: Int = 70
+    var mpkPlayoutVolume: Int = 50
+    var mpkPublishVolume: Int = 50
 
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
     private lateinit var mRtcEngine: RtcEngineEx

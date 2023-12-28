@@ -78,7 +78,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         if (VersionUtils.getVersion("io.agora.scene.cantata.BuildConfig").isNotEmpty()) {
             adapter.appInfo = AppInfo(
                 this.getString(R.string.app_name),
-                "20231030-" + VersionUtils.getVersion("io.agora.scene.cantata.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
+                "20231230-" + VersionUtils.getVersion("io.agora.scene.cantata.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
