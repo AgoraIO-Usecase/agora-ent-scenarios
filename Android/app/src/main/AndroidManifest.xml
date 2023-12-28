@@ -17,6 +17,11 @@
         android:name="android.permission.FOREGROUND_SERVICE"
         tools:node="remove" />
 
+    <!--适配Android R包可见性 开始-->
+    <queries package="${applicationId}">
+        <package android:name="com.huawei.multimedia.audioengine" />
+    </queries>
+
     <application
         android:name="io.agora.scene.base.component.AgoraApplication"
         android:allowBackup="false"
@@ -26,6 +31,7 @@
         android:roundIcon="@mipmap/app_ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/app_Theme.AgoraKTV"
+        android:extractNativeLibs="true"
         tools:replace="android:allowBackup"
         android:requestLegacyExternalStorage="true">
 
