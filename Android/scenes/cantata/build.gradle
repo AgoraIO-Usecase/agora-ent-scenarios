@@ -34,5 +34,6 @@ dependencies {
 
     // agora
     implementation 'io.agora:authentication:1.6.1'
-
+    // huawei
+    implementation rootProject.ext.deps.audiokit
 }

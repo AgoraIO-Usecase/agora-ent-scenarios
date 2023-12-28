@@ -7,13 +7,7 @@ import androidx.lifecycle.ViewModel
 import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.musiccontentcenter.Music
-import io.agora.rtc2.ChannelMediaOptions
-import io.agora.rtc2.Constants
-import io.agora.rtc2.IRtcEngineEventHandler
-import io.agora.rtc2.RtcConnection
-import io.agora.rtc2.RtcEngine
-import io.agora.rtc2.RtcEngineConfig
-import io.agora.rtc2.RtcEngineEx
+import io.agora.rtc2.*
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.ContentInspectModule
 import io.agora.scene.base.AudioModeration
@@ -25,34 +19,8 @@ import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.cantata.R
-import io.agora.scene.cantata.ktvapi.GiantChorusConfiguration
-import io.agora.scene.cantata.ktvapi.IKTVApiEventHandler
-import io.agora.scene.cantata.ktvapi.ILrcView
-import io.agora.scene.cantata.ktvapi.IMusicLoadStateListener
-import io.agora.scene.cantata.ktvapi.ISwitchRoleStateListener
-import io.agora.scene.cantata.ktvapi.KTVApiConfig
-import io.agora.scene.cantata.ktvapi.KTVApiImpl
-import io.agora.scene.cantata.ktvapi.KTVLoadMusicConfiguration
-import io.agora.scene.cantata.ktvapi.KTVLoadMusicMode
-import io.agora.scene.cantata.ktvapi.KTVLoadSongFailReason
-import io.agora.scene.cantata.ktvapi.KTVMusicType
-import io.agora.scene.cantata.ktvapi.KTVSingRole
-import io.agora.scene.cantata.ktvapi.KTVType
-import io.agora.scene.cantata.ktvapi.MusicLoadStatus
-import io.agora.scene.cantata.ktvapi.SwitchRoleFailReason
-import io.agora.scene.cantata.ktvapi.createKTVApi
-import io.agora.scene.cantata.service.CantataServiceProtocol
-import io.agora.scene.cantata.service.ChooseSongInputModel
-import io.agora.scene.cantata.service.JoinRoomOutputModel
-import io.agora.scene.cantata.service.MakeSongTopInputModel
-import io.agora.scene.cantata.service.OnSeatInputModel
-import io.agora.scene.cantata.service.OutSeatInputModel
-import io.agora.scene.cantata.service.RemoveSongInputModel
-import io.agora.scene.cantata.service.RoomListModel
-import io.agora.scene.cantata.service.RoomSeatModel
-import io.agora.scene.cantata.service.RoomSelSongModel
-import io.agora.scene.cantata.service.ScoringAlgoControlModel
-import io.agora.scene.cantata.service.UserModel
+import io.agora.scene.cantata.ktvapi.*
+import io.agora.scene.cantata.service.*
 import io.agora.scene.cantata.ui.dialog.CantataDebugSettingBean
 import io.agora.scene.cantata.ui.dialog.CantataDebugSettingsDialog
 import io.agora.scene.cantata.ui.dialog.MusicSettingBean
@@ -948,6 +916,96 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         if (TextUtils.isEmpty(BuildConfig.AGORA_APP_ID)) {
             throw NullPointerException("please check \"strings_config.xml\"")
         }
+
+        // ------------------ 初始化音乐播放设置面版 ------------------
+        mMusicSetting = MusicSettingBean(
+            false,
+            100,
+            70,
+            0,
+            object : MusicSettingCallback {
+                override fun onEarChanged(isEar: Boolean) {
+                    val isMuted: Int =
+                        if (mSeatLocalLiveData.value != null) mSeatLocalLiveData.value!!.isAudioMuted else return
+                    if (isMuted == 1) {
+                        mIsOpnEar = isEar
+                        return
+                    }
+                    mRtcEngine?.enableInEarMonitoring(isEar, Constants.EAR_MONITORING_FILTER_NONE)
+                }
+
+                override fun onMicVolChanged(vol: Int) {
+                    setMicVolume(vol)
+                }
+
+                override fun onMusicVolChanged(vol: Int) {
+                    setMusicVolume(vol)
+                }
+
+                override fun onEffectChanged(effect: Int) {
+                    setAudioEffectPreset(getEffectIndex(effect))
+                }
+
+                override fun onBeautifierPresetChanged(effect: Int) {
+                    mRtcEngine?.let { rtcEngine ->
+                        when (effect) {
+                            0 -> {
+                                rtcEngine.setVoiceBeautifierParameters(Constants.VOICE_BEAUTIFIER_OFF, 0, 0)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 2)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 1)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1)
+                            }
+
+                            1 -> {
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 2)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 1)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1)
+                            }
+
+                            2 -> {
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 1)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1)
+                            }
+
+                            3 -> {
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2)
+                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1)
+                            }
+
+                            4 -> rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1)
+                            else -> {}
+                        }
+                    }
+                }
+
+                override fun setAudioEffectParameters(param1: Int, param2: Int) {
+                    mRtcEngine?.let { rtcEngine ->
+                        if (param1 == 0) {
+                            rtcEngine.setAudioEffectParameters(Constants.VOICE_CONVERSION_OFF, param1, param2)
+                        } else {
+                            rtcEngine.setAudioEffectParameters(Constants.PITCH_CORRECTION, param1, param2)
+                        }
+                    }
+                }
+
+                override fun onToneChanged(newToneValue: Int) {
+                    mKtvApi.getMediaPlayer().setAudioPitch(newToneValue)
+                }
+
+                override fun onRemoteVolumeChanged(volume: Int) {
+                    val ktvApiImpl: KTVApiImpl = mKtvApi as KTVApiImpl
+                    ktvApiImpl.remoteVolume = volume
+                    mRtcEngine?.adjustPlaybackSignalVolume(volume)
+                }
+
+                override fun onEarBackVolumeChanged(volume: Int) {
+                    mRtcEngine?.setInEarMonitoringVolume(volume)
+                }
+            })
+
         if (mRtcEngine != null) return
         // ------------------ 初始化RTC ------------------
         val config = RtcEngineConfig()
@@ -1115,94 +1173,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             null,
             null
         )
-        // ------------------ 初始化音乐播放设置面版 ------------------
-        mMusicSetting = MusicSettingBean(
-            false,
-            100,
-            50,
-            0,
-            object : MusicSettingCallback {
-                override fun onEarChanged(isEar: Boolean) {
-                    val isMuted: Int =
-                        if (mSeatLocalLiveData.value != null) mSeatLocalLiveData.value!!.isAudioMuted else return
-                    if (isMuted == 1) {
-                        mIsOpnEar = isEar
-                        return
-                    }
-                    mRtcEngine?.enableInEarMonitoring(isEar, Constants.EAR_MONITORING_FILTER_NONE)
-                }
-
-                override fun onMicVolChanged(vol: Int) {
-                    setMicVolume(vol)
-                }
-
-                override fun onMusicVolChanged(vol: Int) {
-                    setMusicVolume(vol)
-                }
-
-                override fun onEffectChanged(effect: Int) {
-                    setAudioEffectPreset(getEffectIndex(effect))
-                }
-
-                override fun onBeautifierPresetChanged(effect: Int) {
-                    mRtcEngine?.let { rtcEngine ->
-                        when (effect) {
-                            0 -> {
-                                rtcEngine.setVoiceBeautifierParameters(Constants.VOICE_BEAUTIFIER_OFF, 0, 0)
-                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 2)
-                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 1)
-                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2)
-                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1)
-                            }
-
-                            1 -> {
-                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 2)
-                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 1)
-                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2)
-                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1)
-                            }
-
-                            2 -> {
-                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 1)
-                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2)
-                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1)
-                            }
-
-                            3 -> {
-                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2)
-                                rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1)
-                            }
-
-                            4 -> rtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1)
-                            else -> {}
-                        }
-                    }
-                }
-
-                override fun setAudioEffectParameters(param1: Int, param2: Int) {
-                    mRtcEngine?.let { rtcEngine ->
-                        if (param1 == 0) {
-                            rtcEngine.setAudioEffectParameters(Constants.VOICE_CONVERSION_OFF, param1, param2)
-                        } else {
-                            rtcEngine.setAudioEffectParameters(Constants.PITCH_CORRECTION, param1, param2)
-                        }
-                    }
-                }
-
-                override fun onToneChanged(newToneValue: Int) {
-                    mKtvApi.getMediaPlayer().setAudioPitch(newToneValue)
-                }
-
-                override fun onRemoteVolumeChanged(volume: Int) {
-                    val ktvApiImpl: KTVApiImpl = mKtvApi as KTVApiImpl
-                    ktvApiImpl.remoteVolume = volume
-                    mRtcEngine?.adjustPlaybackSignalVolume(volume)
-                }
-
-                override fun onEarBackVolumeChanged(volume: Int) {
-                    mRtcEngine?.setInEarMonitoringVolume(volume)
-                }
-            })
 
         // -------------------  debug 模式设置
 
@@ -1210,7 +1180,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             override fun onAudioDumpEnable(enable: Boolean) {
                 if (enable) {
                     mRtcEngine?.setParameters("{\"rtc.debug.enable\": true}")
-                    mRtcEngine?.setParameters("{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}");
+                    mRtcEngine?.setParameters("{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}")
                 } else {
                     mRtcEngine?.setParameters("{\"rtc.debug.enable\": false}")
                 }
@@ -1392,9 +1362,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 // 重置settings
                 mRetryTimes = 0
                 mMusicSetting?.setVolMic(100)
-                mMusicSetting?.setVolMusic(50)
-                mKtvApi.getMediaPlayer().adjustPlayoutVolume(50)
-                mKtvApi.getMediaPlayer().adjustPublishSignalVolume(50)
+                mMusicSetting?.setVolMusic(70)
+                mKtvApi.getMediaPlayer().adjustPlayoutVolume(70)
+                mKtvApi.getMediaPlayer().adjustPublishSignalVolume(70)
                 mPlayerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING)
             }
 
@@ -1480,6 +1450,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
      * 演唱者唱完一句更新麦位中 score 数据
      */
     fun updateSeatScoreStatus(score: Int, cumulativeScore: Int) {
+        mKtvApi.setSingingScore(score)
         mCantataServiceProtocol.updateSeatScoreStatus(cumulativeScore) { e ->
             if (e == null) {
                 // success
