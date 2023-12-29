@@ -11,7 +11,6 @@
 @interface BytesBeautyRender ()
 
 @property (nonatomic, strong) NSMutableArray *bytesNodes;
-@property (nonatomic, weak) BEPixelBufferGLTexture *outTexture;
 
 @end
 
@@ -52,8 +51,6 @@
     [_effectManager destroyTask];
     _effectManager = nil;
     _imageUtils = nil;
-    [self.outTexture destroy];
-    self.outTexture = nil;
 #endif
 }
 
@@ -69,24 +66,23 @@
     if ([self getDeviceOrientation] != BEF_AI_CLOCKWISE_ROTATE_0) {
         pixelBuffer = [self.imageUtils rotateCVPixelBuffer:pixelBuffer rotation:BEF_AI_CLOCKWISE_ROTATE_0];
     }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    if ([EAGLContext currentContext] != self.effectManager.glContext) {
+        [EAGLContext setCurrentContext:self.effectManager.glContext];
+    }
+#pragma clang diagnostic pop
     id<BEGLTexture> texture = [self.imageUtils transforCVPixelBufferToTexture:pixelBuffer];
-    BEPixelBufferGLTexture *outTexture = nil;
-
-    outTexture = [self.imageUtils getOutputPixelBufferGLTextureWithWidth:texture.width
-                                                                  height:texture.height
-                                                                  format:pixelBufferInfo.format
-                                                            withPipeline:self.effectManager.usePipeline];
-    self.outTexture = outTexture;
     int ret = [self.effectManager processTexture:texture.texture
-                                   outputTexture:outTexture.texture
+                                   outputTexture:texture.texture
                                            width:pixelBufferInfo.width
                                           height:pixelBufferInfo.height
                                           rotate:[self getDeviceOrientation]
                                        timeStamp:timeStamp];
     if (ret != BEF_RESULT_SUC) {
-        outTexture = texture;
+        return pixelBuffer;
     }
-    return [(BEPixelBufferGLTexture *)outTexture pixelBuffer];
+    return [(BEPixelBufferGLTexture *)texture pixelBuffer];
 #else
     return pixelBuffer;
 #endif
@@ -139,7 +135,7 @@
 - (void)setBeautyPreset {
 #if __has_include(BytesMoudle)
     [self.effectManager updateComposerNodeIntensity:@"/beauty_IOS_lite" key:@"whiten" intensity:0.2];
-    [self.effectManager updateComposerNodeIntensity:@"/beauty_IOS_lite" key:@"smooth" intensity:0.3];
+    [self.effectManager updateComposerNodeIntensity:@"/beauty_IOS_lite" key:@"smooth" intensity:0.5];
     [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Overall" intensity:0.15];
     [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Zoom_Cheekbone" intensity:0.3];
     [self.effectManager updateComposerNodeIntensity:@"/reshape_lite" key:@"Internal_Deform_Eye" intensity:0.15];

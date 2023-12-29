@@ -92,10 +92,10 @@ class BeautyModel: BeautyBaseModel {
     
     static func createAdjustData() -> [BeautyModel] {
         switch beautyType {
-        case .byte: return []
+        case .byte: return createBytesAdjustData()
         case .sense: return createSenseAdjustData()
-        case .fu: return []
-        case .agora: return []
+        case .fu: return createFUAdjustData()
+        case .agora: return createAgoraAdjustData()
         }
     }
     

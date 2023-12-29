@@ -18,7 +18,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = ""
         model.key = "103"
-        model.value = 0.55
+        model.value = 0.75
         model.name = "show_beauty_item_beauty_smooth".show_localized
         model.icon = "meiyan_icon_mopi"
         model.isSelected = true
@@ -27,7 +27,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = ""
         model.key = "101"
-        model.value = 0.2
+        model.value = 0.75
         model.name = "show_beauty_item_beauty_whiten".show_localized
         model.icon = "meiyan_icon_meibai"
         dataArray.append(model)
@@ -35,7 +35,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = ""
         model.key = "201"
-        model.value = 0.4
+        model.value = 0.3
         model.name = "show_beauty_item_beauty_overall".show_localized
         model.icon = "meiyan_icon_shoulian"
         dataArray.append(model)
@@ -43,7 +43,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = ""
         model.key = "318"
-        model.value = 0
+        model.value = 0.3
         model.name = "show_beauty_item_beauty_cheekbone".show_localized
         model.icon = "meiyan_icon_shouquangu"
         dataArray.append(model)
@@ -51,7 +51,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = ""
         model.key = "202"
-        model.value = 0.3
+        model.value = 0
         model.name = "show_beauty_item_beauty_eye".show_localized
         model.icon = "meiyan_icon_dayan"
         dataArray.append(model)
@@ -107,6 +107,31 @@ extension BeautyModel {
         model.icon = "meiyan_icon_meiya"
         dataArray.append(model)
         
+        model = BeautyModel()
+        model.path = ""
+        model.key = "314"
+        model.value = 0
+        model.name = "show_beauty_item_beauty_liangyan".show_localized
+        model.icon = "meiyan_icon_liangyan"
+        dataArray.append(model)
+        
+        model = BeautyModel()
+        model.path = ""
+        model.key = "316"
+        model.value = 0
+        model.name = "show_beauty_item_beauty_qufalingwen".show_localized
+        model.icon = "meiyan_icon_qufalingwen"
+        dataArray.append(model)
+        
+        model = BeautyModel()
+        model.path = ""
+        model.key = "315"
+        model.value = 0
+        model.name = "show_beauty_item_beauty_heiyanquan".show_localized
+        model.icon = "meiyan_icon_heiyanquan"
+        dataArray.append(model)
+        
+        
         return dataArray
     }
     
@@ -119,19 +144,19 @@ extension BeautyModel {
         dataArray.append(model)
         
         model = BeautyModel()
-        model.path = "qise.zip"
+        model.path = "hunxue.zip"
         model.key = "Makeup_ALL"
-        model.value = 0.5
-        model.name = "show_beauty_item_effect_cwei".show_localized
-        model.icon = "meiyan_fgz_cwei"
+        model.value = 0.8
+        model.name = "show_beauty_item_effect_hunxue".show_localized
+        model.icon = "meiyan_hunxue"
         dataArray.append(model)
         
         model = BeautyModel()
         model.key = "Makeup_ALL"
-        model.path = "wanneng.zip"
-        model.value = 0.5
-        model.name = "show_beauty_item_effect_yuanqi".show_localized
-        model.icon = "meiyan_fgz_yuanqi"
+        model.path = "oumei.zip"
+        model.value = 0.8
+        model.name = "show_beauty_item_effect_oumei".show_localized
+        model.icon = "meiyan_oumei"
         dataArray.append(model)
         
         return dataArray
@@ -147,9 +172,9 @@ extension BeautyModel {
         dataArray.append(model)
         
         model = BeautyModel()
-        model.path = "lianxingface.zip"
-        model.name = "show_beauty_item_sticker_huahua".show_localized
-        model.icon = "meiyan_lj_naiyou"
+        model.path = "ShangBanLe.zip"
+        model.name = "show_beauty_item_sticker_shangbanle".show_localized
+        model.icon = "ShangBanLe"
         dataArray.append(model)
         
         return dataArray
@@ -185,7 +210,7 @@ extension BeautyModel {
         model.icon = "show_beauty_ic_adjust_sharp"
         model.path = ""
         model.key = "603"
-        model.value = 0.5
+        model.value = 0
         dataArray.append(model)
         
         model = BeautyModel()
@@ -193,7 +218,7 @@ extension BeautyModel {
         model.icon = "show_beauty_ic_adjust_clear"
         model.path = ""
         model.key = "604"
-        model.value = 1.0
+        model.value = 0
         dataArray.append(model)
      
         return dataArray

@@ -1,9 +1,6 @@
-//
 //  BEEffectManager.h
-//  BytedEffectSDK
-//
-//  Created by qun on 2021/5/17.
-//
+// EffectsARSDK
+
 
 #ifndef BEEffectManager_h
 #define BEEffectManager_h
@@ -71,6 +68,7 @@ typedef NS_ENUM(NSInteger, BEEffectPart) {
 @property (nonatomic, strong) NSString *resourcePath;
 @property (atomic, weak) dispatch_queue_t renderQueue;
 @property (nonatomic, assign, readonly) BOOL isSuccessLicense;
+@property (nonatomic, strong)EAGLContext *glContext;
 
 
 //   {zh} / @brief 构造函数     {en} /@brief constructor
@@ -95,10 +93,10 @@ typedef NS_ENUM(NSInteger, BEEffectPart) {
 
 //   {zh} / @brief 销毁 SDK     {en} /@brief SDK destruction
 - (bef_effect_result_t)destroyTask;
-#endif
+
 //   {zh} / @brief 设置licenseProvider     {en} /@Briefly set licenseProvider
 //   {zh} / @param licenseProvider 传入一个licenseProvider的实现用于license的获取     {en} /@param licenseProvider is a BELicenseProvider implementation to provide the path of license,
-
+#endif
 
 //   {zh} / @brief 设置滤镜路径     {en} /@Briefly set filter path
 //   {zh} / @details 相对 FilterResource.bundle/Filter 路径，为 null 时关闭滤镜     {en} /@details Relative to FilterResource .bundle/Filter path, close filter when null
@@ -155,7 +153,6 @@ typedef NS_ENUM(NSInteger, BEEffectPart) {
 //   {zh} / @param intensity 强度 0-1     {en} /@param intensity 0-1
 - (void)updateComposerNodeIntensity:(NSString *)node key:(NSString *)key intensity:(float)intensity;
 
-#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 // {zh} / @brief 处理触摸事件 {en} Handle touch events briefly
 // {zh} / @param eventCode 触摸事件类型 {en} /@param eventCode touch event type
 // {zh} / @param x 触摸位置 {en} @Param x touch position
@@ -164,6 +161,7 @@ typedef NS_ENUM(NSInteger, BEEffectPart) {
 // {zh} / @param majorRadius 触摸范围 {en} @param majorRadius touch range
 // {zh} / @param pointerId 触摸点 id {en} /@param pointerId touch point id
 // {zh} / @param pointerCount 触摸点数量 {en} @param pointerCount number of touch points
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 - (BOOL)processTouchEvent:(bef_ai_touch_event_code)eventCode x:(float)x y:(float)y force:(float)force majorRadius:(float)majorRadius pointerId:(int)pointerId pointerCount:(int)pointerCount;
 
 // {zh} / @brief 处理手势事件 {en} Handle gesture events briefly
@@ -193,6 +191,7 @@ typedef NS_ENUM(NSInteger, BEEffectPart) {
 //   {zh} / @brief 获取特效 SDK 中的人脸 mask 结果     {en} /@Brief Get the face mask results in the special effects SDK
 - (bef_ai_face_mask_info *)getFaceMaskInfo;
 #endif
+
 //   {zh} / @brief 是否开启并行渲染     {en} /@Brief whether to turn on parallel rendering
 //   {zh} / @details 特效 SDK 内部工作分为两部分，算法检测和特效渲染，当开启并行渲染之后，     {en} /@Details The internal work of the special effects SDK is divided into two parts, algorithm detection and special effects rendering. When parallel rendering is turned on,
 //   {zh} / 算法检测和特效渲染将在不同线程执行，以充分利用多多线程进行加速，     {en} /Algorithm detection and effects rendering will be performed on different threads to make full use of multi-threads for acceleration,
@@ -228,7 +227,9 @@ typedef NS_ENUM(NSInteger, BEEffectPart) {
 //   {zh} / @details 传入一个固定名字的纹理给到 SDK，传入 BEBuffer，SDK 会将其解析成纹理     {en} /@details pass a texture with a fixed name to the SDK, pass BEBuffer, and the SDK will parse it into a texture
 //   {zh} / @param key 纹理名称     {en} /@param key texture name
 //   {zh} / @param buffer BEBuffer, 仅支持 RGBA 格式     {en} /@param buffer BEBuffer, only supports RGBA format
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 - (BOOL)setRenderCacheTexture:(NSString *)key buffer:(BEBuffer *)buffer;
+#endif
 
 - (void)loadResource:(int)timeout;
 
@@ -248,12 +249,6 @@ typedef NS_ENUM(NSInteger, BEEffectPart) {
 // {zh} / @brief 开启或关闭强制人脸检测 {en} /@brief Enable or disable forced face detection
 // {zh} /detection YES 开启人脸检测 NO关闭人脸检测 {en} /detection YES on face detection NO off face detection
 - (void)forcedFaceDetection:(BOOL)detection;
-
-// change default settings
-+ (void)setUse3buffer:(bool)use;
-+ (void)setUsePipeline:(bool)use;
-+ (bool)use3buffer;
-+ (bool)usePipeline;
 
 @end
 

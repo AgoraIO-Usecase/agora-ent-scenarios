@@ -81,7 +81,6 @@ class ShowBeautyFaceVC: UIViewController {
         adjustData = BeautyModel.createAdjustData()
         filterData = BeautyModel.createFilterData()
         stickerData = BeautyModel.createStickerData()
-        backgroundData = BeautyModel.createBackgroundData()
     }
     
     private func setBeautyHandler(value: CGFloat, isReset: Bool) {
@@ -91,7 +90,7 @@ class ShowBeautyFaceVC: UIViewController {
         switch type {
         case .beauty, .adjust:
             if isReset {
-                BeautyManager.shareManager.reset(datas: dataArray)
+                BeautyManager.shareManager.reset(datas: dataArray, type: type)
                 return
             }
             BeautyManager.shareManager.setBeauty(path: model.path,

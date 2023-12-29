@@ -17,7 +17,7 @@
 }
 
 - (nonnull CVPixelBufferRef)onCapture:(nonnull CVPixelBufferRef)pixelBuffer {
-    return nil;
+    return pixelBuffer;
 }
 
 - (void)setBeautyPreset {
