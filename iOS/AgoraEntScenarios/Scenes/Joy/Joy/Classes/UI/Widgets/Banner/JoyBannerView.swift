@@ -127,20 +127,22 @@ class JoyBannerView: UIView {
 
 extension JoyBannerView {
     private func scrollToCenterIfNeed() {
+        if listView.isDragging || listView.isDecelerating { return }
         var index = listView.indexPathsForVisibleItems.first?.row ?? 0
-//        guard index == 0 || index == bannerList.count - 1 else {
-//            return
-//        }
+        guard index == 0 || index >= bannerList.count - 1 else {
+            return
+        }
         index = bannerList.realIndex(index: index)
         index = bannerList.fakeIndex(index: index)
         listView.setContentOffset(CGPoint(x: CGFloat(index) * listView.width, y: 0), animated: false)
     }
     
     private func scrollToNext() {
-        scrollToCenterIfNeed()
         var index = listView.indexPathsForVisibleItems.first?.row ?? 0
         index += 1
-        guard index < bannerList.count, index >= 0 else {
+        guard index < bannerList.count else {
+            scrollToCenterIfNeed()
+            startTimer()
             return
         }
         listView.setContentOffset(CGPoint(x: CGFloat(index) * listView.width, y: 0), animated: true)
@@ -175,8 +177,8 @@ extension JoyBannerView: UICollectionViewDelegate, UICollectionViewDataSource, U
         stopTimer()
     }
     
-    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        if scrollView.isTracking {return}
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if decelerate {return}
         scrollToCenterIfNeed()
         startTimer()
     }
