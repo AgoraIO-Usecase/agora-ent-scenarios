@@ -6,7 +6,7 @@
 #import "BaseViewController.h"
 #import "VLMacroDefine.h"
 #import "VLHotSpotBtn.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 @interface BaseViewController ()
 

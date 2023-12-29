@@ -50,7 +50,11 @@ private func agoraPrint(_ message: String) {
         skipBtn.isHidden = true
         downloadManager.delegate = self
     }
-
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     @objc public func getAvgScore() -> Int {
         return totalLines > 0 ? totalScore / totalLines : 0
     }

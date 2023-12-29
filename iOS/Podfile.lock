@@ -16,11 +16,42 @@ PODS:
     - AFNetworking/NSURLSession
   - Agora-Scene-Utils (1.1.0)
   - Agora_Chat_iOS (1.0.8)
-  - AgoraLyricsScore (1.1.1-beta-3)
-  - AgoraRtm_iOS (1.5.1)
-  - AgoraSyncManager (2.0.8):
+  - AgoraCommon (0.1.0):
+    - AFNetworking
+    - AgoraRtcEngine_Special_iOS
+    - AgoraSyncManager
+    - Bugly
+    - Masonry
     - SocketRocket
+    - SVProgressHUD
+    - SwiftyBeaver
+    - YYCategories
+    - YYModel
+    - ZSwiftBaseLib
+  - AgoraLyricsScore (1.1.1-beta-3)
+  - AgoraRtcEngine_Special_iOS (4.1.1.23)
+  - AgoraSyncManager (2.1.3):
+    - SocketRocket
+  - AUIKitCore/UI (0.5.1):
+    - AgoraLyricsScore
+    - MJRefresh
+    - ScoreEffectUI
+    - SDWebImage (~> 4.4.8)
+    - SwiftTheme
+    - SwiftyBeaver (~> 1.9.5)
+    - YYModel
   - Bugly (2.5.93)
+  - Cantata (0.1.0):
+    - AgoraCommon
+    - AgoraLyricsScore
+    - AgoraRtcEngine_Special_iOS
+    - AUIKitCore/UI
+    - JXCategoryView
+    - LSTPopView
+    - MJRefresh
+    - ScoreEffectUI
+    - SDWebImage
+    - Zip
   - HWWeakTimer (1.0)
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
@@ -32,18 +63,16 @@ PODS:
     - LSTTimer
   - LSTTimer (0.2.10)
   - Masonry (1.1.0)
-  - MJRefresh (3.7.5)
+  - MJRefresh (3.7.6)
   - Protobuf (3.22.1)
   - ScoreEffectUI (1.0.1)
-  - sdk (1.0)
   - SDWebImage (4.4.8):
     - SDWebImage/Core (= 4.4.8)
   - SDWebImage/Core (4.4.8)
   - SDWebImageAPNGCoder (0.1.1):
     - SDWebImage/Core (~> 4.2)
-  - SenseLib (1.0)
   - SnapKit (5.6.0)
-  - SocketRocket (0.6.0)
+  - SocketRocket (0.7.0)
   - SSZipArchive (2.4.3)
   - SVGAPlayer (2.5.7):
     - SVGAPlayer/Core (= 2.5.7)
@@ -54,6 +83,7 @@ PODS:
   - SVGAPlayer/ProtoFiles (2.5.7):
     - Protobuf (~> 3.4)
   - SVProgressHUD (2.2.5)
+  - SwiftTheme (0.6.4)
   - SwiftyBeaver (1.9.5)
   - YYCategories (1.0.4):
     - YYCategories/no-arc (= 1.0.4)
@@ -66,10 +96,13 @@ DEPENDENCIES:
   - AFNetworking (= 4.0.1)
   - Agora-Scene-Utils (= 1.1.0)
   - Agora_Chat_iOS (= 1.0.8)
+  - AgoraCommon (from `AgoraCommon.podspec`)
   - AgoraLyricsScore (= 1.1.1-beta-3)
-  - AgoraRtm_iOS (= 1.5.1)
-  - AgoraSyncManager (~> 2.0.8)
+  - AgoraRtcEngine_Special_iOS (= 4.1.1.23)
+  - AgoraSyncManager (~> 2.1.3)
+  - AUIKitCore/UI (= 0.5.1)
   - Bugly (= 2.5.93)
+  - Cantata (from `Cantata.podspec`)
   - HWWeakTimer (= 1.0)
   - JXCategoryView (= 1.6.1)
   - KakaJSON
@@ -79,12 +112,10 @@ DEPENDENCIES:
   - MJRefresh
   - Protobuf (= 3.22.1)
   - ScoreEffectUI (= 1.0.1)
-  - sdk (from `sdk.podspec`)
-  - SDWebImage (~> 4.2)
+  - SDWebImage
   - SDWebImageAPNGCoder
-  - SenseLib (from `sense.podspec`)
   - SnapKit
-  - SocketRocket (= 0.6.0)
+  - SocketRocket (= 0.7.0)
   - SVGAPlayer
   - SVProgressHUD (= 2.2.5)
   - SwiftyBeaver (= 1.9.5)
@@ -94,12 +125,14 @@ DEPENDENCIES:
   - ZSwiftBaseLib (= 0.1.6.1)
 
 SPEC REPOS:
+  https://gitee.com/fanpeng11/auikit-test-specs.git:
+    - AUIKitCore
   https://github.com/CocoaPods/Specs.git:
     - AFNetworking
     - Agora-Scene-Utils
     - Agora_Chat_iOS
     - AgoraLyricsScore
-    - AgoraRtm_iOS
+    - AgoraRtcEngine_Special_iOS
     - AgoraSyncManager
     - Bugly
     - HWWeakTimer
@@ -119,6 +152,7 @@ SPEC REPOS:
     - SSZipArchive
     - SVGAPlayer
     - SVProgressHUD
+    - SwiftTheme
     - SwiftyBeaver
     - YYCategories
     - YYModel
@@ -126,19 +160,22 @@ SPEC REPOS:
     - ZSwiftBaseLib
 
 EXTERNAL SOURCES:
-  sdk:
-    :path: sdk.podspec
-  SenseLib:
-    :path: sense.podspec
+  AgoraCommon:
+    :path: AgoraCommon.podspec
+  Cantata:
+    :path: Cantata.podspec
 
 SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
   Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
+  AgoraCommon: 4e2924be57c1bd1d4d642d40263814aafc986dfe
   AgoraLyricsScore: 7e25860ccecd3c6ed73f2b503f1d73d8849079e1
-  AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
-  AgoraSyncManager: 33b8ecf2cd80550f156612d6175a0b0ed1d48497
+  AgoraRtcEngine_Special_iOS: 6a3f7814058f819b374cec3037cbbf7c4de519a5
+  AgoraSyncManager: 0dd02cc7dfdfd714098f74e441db65bdeef60b67
+  AUIKitCore: bce481ef3884319f26ed0155b0af123d8e19ddf8
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
+  Cantata: 9eb743ea3a269937c201ea039debac5e7b7fbfd7
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
@@ -146,24 +183,23 @@ SPEC CHECKSUMS:
   LSTPopView: 9379f00f6ce7d1fc620b50ab00ed3ef97b2d4d52
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
-  MJRefresh: fdf5e979eb406a0341468932d1dfc8b7f9fce961
+  MJRefresh: 2fe7fb43a5167ceda20bb7e63f130c04fd1814a5
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
   ScoreEffectUI: 1a3bbd83b17cfef1c16a3a4eede2854f89c9eb10
-  sdk: e3479e54702dcafc8c3e74a1baa05d7c2c8f753d
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
-  SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
-  SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
+  SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
+  SwiftTheme: 007cbaf1f9e171caf6448a4657533e54c682b285
   SwiftyBeaver: 84069991dd5dca07d7069100985badaca7f0ce82
   YYCategories: 6bcd4314c6661a561410dce4a793379ebd306abd
   YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 3b44a1062c6fb05ab066d492f4fb350c26b646ed
+PODFILE CHECKSUM: 22256a29efbe57f22f864cd3ea992dd9fb2bcb3e
 
 COCOAPODS: 1.12.1

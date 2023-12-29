@@ -6,7 +6,7 @@
 //
 
 #import "VLKTVRemoteVolumeView.h"
-#import "KTVMacro.h"
+@import AgoraCommon;
 @import Masonry;
 
 @interface VLKTVRemoteVolumeView() <UITextFieldDelegate>

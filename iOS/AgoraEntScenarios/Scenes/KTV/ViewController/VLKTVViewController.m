@@ -15,9 +15,6 @@
 #import "VLKTVSettingView.h"
 //model
 #import "VLSongItmModel.h"
-#import "VLRoomListModel.h"
-#import "VLRoomSeatModel.h"
-#import "VLRoomSelSongModel.h"
 #import "VLKTVSelBgModel.h"
 #import "UIViewController+VL.h"
 #import "VLPopScoreView.h"
@@ -29,7 +26,6 @@
 #import "VLKTVMVView.h"
 #import "UIView+VL.h"
 #import "AppContext+KTV.h"
-#import "KTVMacro.h"
 #import "LSTPopView+KTVModal.h"
 #import "HWWeakTimer.h"
 #import "VLAlert.h"
@@ -39,7 +35,7 @@
 @import AgoraLyricsScore;
 @import YYCategories;
 @import SDWebImage;
-
+@import AgoraCommon;
 
 NSInteger ktvApiStreamId = -1;
 NSInteger ktvStreamId = -1;
@@ -212,12 +208,12 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 - (void)subscribeServiceEvent {
     VL(weakSelf);
     [[AppContext ktvServiceImp] unsubscribeAll];
-    [[AppContext ktvServiceImp] subscribeUserListCountChangedWithBlock:^(NSUInteger count) {
+    [[AppContext ktvServiceImp] subscribeUserListCountChangedWith:^(NSUInteger count) {
         //TODO
         [weakSelf setRoomUsersCount:count];
     }];
     
-    [[AppContext ktvServiceImp] subscribeSeatListChangedWithBlock:^(KTVSubscribe status, VLRoomSeatModel* seatModel) {
+    [[AppContext ktvServiceImp] subscribeSeatListChangedWith:^(KTVSubscribe status, VLRoomSeatModel* seatModel) {
         [AgoraEntAuthorizedManager checkMediaAuthorizedWithParent:self completion:^(BOOL granted) {
             if (!granted) { return; }
             VLRoomSeatModel* model = [self getUserSeatInfoWithIndex:seatModel.seatIndex];
@@ -228,13 +224,13 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
             
             if (status == KTVSubscribeCreated || status == KTVSubscribeUpdated) {
                 //上麦消息 / 是否打开视频 / 是否静音
-                [model resetWithInfo:seatModel];
+                [model resetWith:seatModel];
                 [weakSelf setSeatsArray:weakSelf.seatsArray];
             } else if (status == KTVSubscribeDeleted) {
                 // 下麦消息
                 
                 // 下麦重置占位模型
-                [model resetWithInfo:nil];
+                [model resetWith:nil];
                 [weakSelf setSeatsArray:weakSelf.seatsArray];
             }
             
@@ -246,7 +242,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         }];
     }];
     
-    [[AppContext ktvServiceImp] subscribeRoomStatusChangedWithBlock:^(KTVSubscribe status, VLRoomListModel * roomInfo) {
+    [[AppContext ktvServiceImp] subscribeRoomStatusChangedWith:^(KTVSubscribe status, VLRoomListModel * roomInfo) {
         if (KTVSubscribeUpdated == status) {
             //切换背景
             
@@ -259,7 +255,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
             //房主关闭房间
             if ([roomInfo.creatorNo isEqualToString:VLUserCenter.user.id]) {
                 NSString *mes = @"连接超时，房间已解散";
-                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:KTVLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
+                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:KTVLocalizedString(@"ktv_confirm") completion:^(bool flag, NSString * _Nullable text) {
                     [[VLKTVAlert shared]dismiss];
                     [weakSelf leaveRoom];
                 }];
@@ -271,7 +267,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     }];
     
     //callback if choose song list did changed
-    [[AppContext ktvServiceImp] subscribeChooseSongChangedWithBlock:^(KTVSubscribe status, VLRoomSelSongModel * songInfo, NSArray<VLRoomSelSongModel*>* songArray) {
+    [[AppContext ktvServiceImp] subscribeChooseSongChangedWith:^(KTVSubscribe status, VLRoomSelSongModel * songInfo, NSArray<VLRoomSelSongModel*>* songArray) {
         // update in-ear monitoring
         [weakSelf _checkInEarMonitoring];
         
@@ -291,7 +287,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         }
     }];
     
-    [[AppContext ktvServiceImp] subscribeNetworkStatusChangedWithBlock:^(KTVServiceNetworkStatus status) {
+    [[AppContext ktvServiceImp] subscribeNetworkStatusChangedWith:^(KTVServiceNetworkStatus status) {
         if (status != KTVServiceNetworkStatusOpen) {
 //            [VLToast toast:[NSString stringWithFormat:@"network changed: %ld", status]];
             return;
@@ -299,11 +295,10 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         [weakSelf subscribeServiceEvent];
         [weakSelf _fetchServiceAllData];
     }];
-    
-    [[AppContext ktvServiceImp] subscribeRoomWillExpire:^{
+    [[AppContext ktvServiceImp] subscribeRoomWillExpireWith:^{
         bool isOwner = [weakSelf.roomModel.creatorNo isEqualToString:VLUserCenter.user.id];
         NSString *mes = isOwner ? @"您已体验超过20分钟，当前房间已过期，请退出重新创建房间" : @"当前房间已过期,请退出";
-        [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:KTVLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
+        [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:KTVLocalizedString(@"ktv_confirm") completion:^(bool flag, NSString * _Nullable text) {
             [[VLKTVAlert shared]dismiss];
             [weakSelf leaveRoom];
         }];
@@ -378,7 +373,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 //用户弹框离开房间
 - (void)popForceLeaveRoom {
     VL(weakSelf);
-    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:KTVLocalizedString(@"房主已解散房间,请确认离开房间") buttonTitle:KTVLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
+    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:KTVLocalizedString(@"room_has_close") buttonTitle:KTVLocalizedString(@"confirm") completion:^(bool flag, NSString * _Nullable text) {
         for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLOnLineListVC class]]) {
 //                [weakSelf destroyMediaPlayer];
@@ -502,6 +497,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                       uid:VLUserCenter.user.id
                                                 tokenType:TokenGeneratorTypeToken006
                                                      type:AgoraTokenTypeRtc
+                                                   expire:1500
                                                   success:^(NSString * token) {
         KTVLogInfo(@"tokenPrivilegeWillExpire rtc renewToken: %@", token);
         [self.RTCkit renewToken:token];
@@ -512,6 +508,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                       uid:VLUserCenter.user.id
                                                 tokenType:TokenGeneratorTypeToken006
                                                      type:AgoraTokenTypeRtm
+                                                   expire:1500
                                                   success:^(NSString * token) {
         KTVLogInfo(@"tokenPrivilegeWillExpire rtm renewToken: %@", token);
         //TODO(chenpan): mcc missing
@@ -596,7 +593,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     KTVOnSeatInputModel* inputModel = [KTVOnSeatInputModel new];
     inputModel.seatIndex = index;
 //    VL(weakSelf);
-    [[AppContext ktvServiceImp] enterSeatWithInput:inputModel
+    [[AppContext ktvServiceImp] enterSeatWith:inputModel
                                         completion:completion];
     [self _checkEnterSeatAudioAuthorized];
 }
@@ -624,7 +621,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     inputModel.userName = seatModel.name;
     inputModel.userHeadUrl = seatModel.headUrl;
     inputModel.seatIndex = seatModel.seatIndex;
-    [[AppContext ktvServiceImp] leaveSeatWithInput:inputModel
+    [[AppContext ktvServiceImp] leaveSeatWith:inputModel
                                         completion:completion];
 }
 
@@ -646,7 +643,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if (model.status == VLSongPlayStatusPlaying) {
         return;
     }
-    [[AppContext ktvServiceImp] markSongDidPlayWithInput:model
+    [[AppContext ktvServiceImp] markSongDidPlayWith:model
                                               completion:^(NSError * error) {
     }];
 }
@@ -748,13 +745,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             KTVJoinChorusInputModel* inputModel = [KTVJoinChorusInputModel new];
             inputModel.isChorus = YES;
             inputModel.songNo = selSongModel.songNo;
-            [[AppContext ktvServiceImp] joinChorusWithInput:inputModel
+            [[AppContext ktvServiceImp] joinChorusWith:inputModel
                                                  completion:^(NSError * error) {
             }];
             [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
             
             //开麦
-            [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:NO
+            [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWith:NO
                                                                 completion:^(NSError * error) {
             }];
         }];
@@ -795,7 +792,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             KTVRemoveSongInputModel* inputModel = [KTVRemoveSongInputModel new];
             inputModel.songNo = removed.songNo;
             inputModel.objectId = removed.objectId;
-            [[AppContext ktvServiceImp] removeSongWithInput:inputModel
+            [[AppContext ktvServiceImp] removeSongWith:inputModel
                                                  completion:^(NSError * error) {
                 if (error) {
                     KTVLogInfo(@"deleteSongEvent fail: %@ %ld", removed.songName, error.code);
@@ -904,28 +901,28 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                            config:config];
     
     NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
-    KTVApiConfig* apiConfig = [[KTVApiConfig alloc] initWithAppId:[[AppContext shared] appId]
-                                                         rtmToken:VLUserCenter.user.agoraRTMToken
-                                                           engine:self.RTCkit
-                                                      channelName:self.roomModel.roomNo
-                                                         localUid:[VLUserCenter.user.id integerValue]
-                                                        chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:exChannelToken
-                                                             type:KTVTypeNormal
-                                                        maxCacheSize:10
-    ];
-    self.ktvApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
-    [self.ktvApi renewInnerDataStreamId];
-    KTVLrcControl* lrcControl = [[KTVLrcControl alloc] initWithLrcView:self.MVView.karaokeView];
-    [self.ktvApi setLrcViewWithView:lrcControl];
-    self.lrcControl = lrcControl;
-    self.lrcControl.delegate = self;
-    VL(weakSelf);
-    lrcControl.skipCallBack = ^(NSInteger time, BOOL flag) {
-        NSInteger seekTime = flag ? [weakSelf.ktvApi getMediaPlayer].getDuration - 800 : time;
-        [weakSelf.ktvApi seekSingWithTime:seekTime];
-    };
-    [self.ktvApi setMicStatusWithIsOnMicOpen:!self.isNowMicMuted];
-    [self.ktvApi addEventHandlerWithKtvApiEventHandler:self];
+//    KTVApiConfig* apiConfig = [[KTVApiConfig alloc] initWithAppId:[[AppContext shared] appId]
+//                                                         rtmToken:VLUserCenter.user.agoraRTMToken
+//                                                           engine:self.RTCkit
+//                                                      channelName:self.roomModel.roomNo
+//                                                         localUid:[VLUserCenter.user.id integerValue]
+//                                                        chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:exChannelToken
+//                                                             type:KTVTypeNormal
+//                                                        maxCacheSize:10
+//    ];
+//    self.ktvApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
+//    [self.ktvApi renewInnerDataStreamId];
+//    KTVLrcControl* lrcControl = [[KTVLrcControl alloc] initWithLrcView:self.MVView.karaokeView];
+//    [self.ktvApi setLrcViewWithView:lrcControl];
+//    self.lrcControl = lrcControl;
+//    self.lrcControl.delegate = self;
+//    VL(weakSelf);
+//    lrcControl.skipCallBack = ^(NSInteger time, BOOL flag) {
+//        NSInteger seekTime = flag ? [weakSelf.ktvApi getMediaPlayer].getDuration - 800 : time;
+//        [weakSelf.ktvApi seekSingWithTime:seekTime];
+//    };
+//    [self.ktvApi setMicStatusWithIsOnMicOpen:!self.isNowMicMuted];
+//    [self.ktvApi addEventHandlerWithKtvApiEventHandler:self];
 //    VL(weakSelf);
     KTVLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
     int ret =
@@ -976,7 +973,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [option setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     [option setAutoSubscribeAudio:YES];
     [option setAutoSubscribeVideo:YES];
-    [option setPublishMediaPlayerId:[[self.ktvApi getMediaPlayer] getMediaPlayerId]];
+  //  [option setPublishMediaPlayerId:[[self.ktvApi getMediaPlayer] getMediaPlayerId]];
     [option setEnableAudioRecordingOrPlayout:YES];
     return option;
 }
@@ -1002,7 +999,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)didLrcViewDragedToPos:(NSInteger)pos score:(NSInteger)score totalScore:(NSInteger)totalScore{
-    [self.ktvApi.getMediaPlayer seekToPosition:pos];
+   // [self.ktvApi.getMediaPlayer seekToPosition:pos];
     [self.MVView.gradeView setScoreWithCumulativeScore:score totalScore:totalScore];
 }
 
@@ -1053,7 +1050,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self stopPlaySong];
     self.isNowMicMuted = true;
     [self.MVView.gradeView reset];
-    [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:YES
+    [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWith:YES
                                                         completion:^(NSError * error) {
     }];
 }
@@ -1061,9 +1058,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 #pragma mark -- VLKTVTopViewDelegate
 - (void)onVLKTVTopView:(VLKTVTopView *)view closeBtnTapped:(id)sender {
     VL(weakSelf);
-    NSString *title = VLUserCenter.user.ifMaster ? KTVLocalizedString(@"解散房间") : KTVLocalizedString(@"退出房间");
-    NSString *message = VLUserCenter.user.ifMaster ? KTVLocalizedString(@"确定解散该房间吗？") : KTVLocalizedString(@"确定退出该房间吗？");
-    NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"取消"),KTVLocalizedString(@"确定"), nil];
+    NSString *title = VLUserCenter.user.ifMaster ? KTVLocalizedString(@"ktv_disband_room") : KTVLocalizedString(@"ktv_exit_room");
+    NSString *message = VLUserCenter.user.ifMaster ? KTVLocalizedString(@"ktv_confirm_disband_room") : KTVLocalizedString(@"ktv_confirm_exit_room");
+    NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"ktv_cancel"),KTVLocalizedString(@"ktv_confirm"), nil];
     [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
         if(flag == YES){
             [weakSelf leaveRoom];
@@ -1118,7 +1115,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 [AgoraEntAuthorizedManager checkAudioAuthorizedWithParent:self completion:nil];
             }
             self.isNowMicMuted = !self.isNowMicMuted;
-            [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
+            [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWith:self.isNowMicMuted
                                                                 completion:^(NSError * error) {
             }];
             break;
@@ -1127,7 +1124,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 [AgoraEntAuthorizedManager checkCameraAuthorizedWithParent:self completion:nil];
             }
             self.isNowCameraMuted = !self.isNowCameraMuted;
-            [[AppContext ktvServiceImp] updateSeatVideoMuteStatusWithMuted:self.isNowCameraMuted
+            [[AppContext ktvServiceImp] updateSeatVideoMuteStatusWith:self.isNowCameraMuted
                                                                 completion:^(NSError * error) {
             }];
             break;
@@ -1190,7 +1187,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     inputModel.mvIndex = index;
 //    inputModel.userNo = VLUserCenter.user.id;
     VL(weakSelf);
-    [[AppContext ktvServiceImp] changeMVCoverWithParams:inputModel
+    [[AppContext ktvServiceImp] changeMVCoverWith:inputModel
                                              completion:^(NSError * error) {
         if (error != nil) {
             [VLToast toast:error.description];
@@ -1263,9 +1260,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         
         VL(weakSelf);
 
-        NSString *title = KTVLocalizedString(@"切换歌曲");
-        NSString *message = KTVLocalizedString(@"切换下一首歌歌曲？");
-        NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"取消"),KTVLocalizedString(@"确定"), nil];
+        NSString *title = KTVLocalizedString(@"ktv_change_song");
+        NSString *message = KTVLocalizedString(@"ktv_change_next_song");
+        NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"ktv_cancel"),KTVLocalizedString(@"ktv_confirm"), nil];
         [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
             if(flag == YES){
                 if (weakSelf.selSongsArray.count >= 1) {
@@ -1285,7 +1282,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)onKTVMView:(VLKTVMVView *)view lrcViewDidScrolled:(NSInteger)position {
-    [[self.ktvApi getMediaPlayer] seekToPosition:position];
+   // [[self.ktvApi getMediaPlayer] seekToPosition:position];
 }
 
 - (void)reloadMusic{
@@ -1328,7 +1325,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         // 调整当前播放的媒体资源的音调
         // 按半音音阶调整本地播放的音乐文件的音调，默认值为 0，即不调整音调。取值范围为 [-12,12]，每相邻两个值的音高距离相差半音。取值的绝对值越大，音调升高或降低得越多
         NSInteger value = setting.toneValue * 2 - 12;
-        [[self.ktvApi getMediaPlayer] setAudioPitch:value];
+     //   [[self.ktvApi getMediaPlayer] setAudioPitch:value];
     } else if (type == VLKTVValueDidChangedTypeSound) { // 音量
         // 调节音频采集信号音量、取值范围为 [0,400]
         // 0、静音 100、默认原始音量 400、原始音量的4倍、自带溢出保护
@@ -1650,11 +1647,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     // 调节本地播放音量 取值范围为 [0,100]
     // 0、无声。 100、（默认）媒体文件的原始播放音量
 //    [self.ktvApi adjustPlayoutVolume:playoutVolume];
-    [[self.ktvApi getMediaPlayer] adjustPlayoutVolume:playoutVolume];
+   // [[self.ktvApi getMediaPlayer] adjustPlayoutVolume:playoutVolume];
     
     // 调节远端用户听到的音量 取值范围[0、400]
     // 100: （默认）媒体文件的原始音量。400: 原始音量的四倍（自带溢出保护）
-    [[self.ktvApi getMediaPlayer] adjustPublishSignalVolume:playoutVolume];
+   // [[self.ktvApi getMediaPlayer] adjustPublishSignalVolume:playoutVolume];
     
     //update ui
     [self.settingView setAccValue: (float)playoutVolume / 100.0];
@@ -1698,7 +1695,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)setTrackMode:(KTVPlayerTrackMode)trackMode {
     KTVLogInfo(@"setTrackMode: %ld", trackMode);
     _trackMode = trackMode;
-    [[self.ktvApi getMediaPlayer] selectAudioTrack:self.trackMode == KTVPlayerTrackModeOrigin ? 0 : 1];
+   // [[self.ktvApi getMediaPlayer] selectAudioTrack:self.trackMode == KTVPlayerTrackModeOrigin ? 0 : 1];
     
     [self.MVView setOriginBtnState: trackMode == KTVPlayerTrackModeOrigin ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc];
 }
