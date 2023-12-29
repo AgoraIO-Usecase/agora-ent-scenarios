@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycleView"
@@ -15,7 +15,8 @@
         android:paddingVertical="8dp"
         android:orientation="horizontal"
         android:paddingHorizontal="12dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="1"
         tools:background="@drawable/show_bottom_dark_dialog_bg"
         tools:listitem="@layout/show_widget_beauty_dialog_item" />
 

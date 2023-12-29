@@ -2,7 +2,6 @@ package io.agora.scene.show
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.res.AssetManager
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
@@ -25,12 +24,13 @@ import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
 import io.agora.scene.show.debugSettings.DebugSettingDialog
 import io.agora.scene.show.service.ShowServiceProtocol
-import io.agora.scene.show.widget.BeautyDialog
 import io.agora.scene.show.widget.PictureQualityDialog
 import io.agora.scene.show.widget.PresetDialog
+import io.agora.scene.show.widget.beauty.MultiBeautyDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 import kotlin.random.Random
@@ -43,7 +43,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
     private val mThumbnailId by lazy { getRandomThumbnailId() }
     private val mRoomId by lazy { getRandomRoomId() }
-    private val mBeautyProcessor by lazy { RtcEngineInstance.beautyProcessor }
 
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
 
@@ -100,33 +99,13 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 showPresetDialog()
             }
         }
-        mBeautyProcessor.initialize(
-            rtcEngine = mRtcEngine,
-            captureMode = CaptureMode.Agora,
-            statsEnable = true,
-            eventCallback = object : IEventCallback {
-                override fun onBeautyStats(stats: BeautyStats) {
-                }
-            }
-        )
-        var licenseExists = false
-        try { // 美颜license是否存在
-            this.assets.open("license/SenseME.lic").use { inputStream ->
-                licenseExists = true
-            }
-        } catch (_: Exception) {}
         // 低端机 或 无证书则关闭美颜
-        if (mRtcEngine.queryDeviceScore() >= 75 && licenseExists) {
-            mBeautyProcessor.setBeautyEnable(true)
-        } else {
-            mBeautyProcessor.setBeautyEnable(false)
-        }
-        mBeautyProcessor.getSenseTimeBeautyAPI().setupLocalVideo(SurfaceView(this).apply {
+        BeautyManager.initialize(this, mRtcEngine)
+        BeautyManager.setupLocalVideo(SurfaceView(this).apply {
             binding.flVideoContainer.addView(this)
         }, Constants.RENDER_MODE_HIDDEN)
 
         toggleVideoRun = Runnable {
-            mBeautyProcessor.reset()
             initRtcEngine()
             //getDeviceScoreAndUpdateVideoProfile()
             showPresetDialog()
@@ -149,7 +128,12 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         }
     }
 
-    private fun showPresetDialog() = PresetDialog(this, mRtcEngine.queryDeviceScore(), RtcConnection(mRoomId, UserManager.getInstance().user.id.toInt())).show()
+    private fun showPresetDialog() = PresetDialog(
+        this,
+        mRtcEngine.queryDeviceScore(),
+        RtcConnection(mRoomId, UserManager.getInstance().user.id.toInt())
+    ).show()
+
     private fun showDebugModeDialog() = DebugSettingDialog(this).show()
 
     override fun onResume() {
@@ -161,6 +145,14 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         super.onPause()
         if (!isFinishToLiveDetail) {
             mRtcEngine.stopPreview()
+        }
+    }
+
+    override fun finish() {
+        super.finish()
+        if (!isFinishToLiveDetail) {
+            RtcEngineInstance.resetVirtualBackground()
+            BeautyManager.destroy()
         }
     }
 
@@ -196,8 +188,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     }
 
     private fun showBeautyDialog() {
-        BeautyDialog(this).apply {
-            setBeautyProcessor(mBeautyProcessor)
+        MultiBeautyDialog(this).apply {
             show()
         }
     }

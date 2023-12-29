@@ -6,7 +6,6 @@ import android.opengl.GLES20;
 
 import io.agora.base.internal.video.GlRectDrawer;
 import io.agora.base.internal.video.RendererCommon;
-import io.agora.beautyapi.sensetime.utils.utils.GlUtil;
 
 public class GLFrameBuffer {
 
@@ -114,9 +113,9 @@ public class GLFrameBuffer {
         float[] matrix = RendererCommon.convertMatrixFromAndroidGraphicsMatrix(transform);
 
         if(textureType == GLES11Ext.GL_TEXTURE_EXTERNAL_OES){
-            drawer.drawOes(textureId, matrix, mWidth, mHeight, 0, 0, mWidth, mHeight);
+            drawer.drawOes(textureId, 0, matrix, mWidth, mHeight, 0, 0, mWidth, mHeight);
         }else{
-            drawer.drawRgb(textureId, matrix, mWidth, mHeight, 0, 0, mWidth, mHeight);
+            drawer.drawRgb(textureId, 0, matrix, mWidth, mHeight, 0, 0, mWidth, mHeight);
         }
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
         GLES20.glFinish();
