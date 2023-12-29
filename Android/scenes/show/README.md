@@ -61,7 +61,7 @@ if(!isShowEmpty){
   **商汤美颜配置**
   美颜资源请联系商汤科技商务获取。
   
-  ![xxx](image/SamplePicture5.png)
+  <img src="image/SamplePicture7.png" alt="xxx" width="800" />
   
   > - 将STMobileJNI-release.aar放在**scenes/show/aars/beauty_sensetime/STMobileJNI**目录下
   > 
@@ -79,6 +79,8 @@ if(!isShowEmpty){
   **相芯美颜配置**
   美颜资源请联系相芯商务获取。
 
+  <img src="image/SamplePicture8.png" alt="xxx" width="800" />
+
   > - 将相芯证书authpack.java放在**scenes/show/src/main/java/io/agora/scene/show/beauty**目录下
   > 
   > - 将SDK里的资源文件复制到**scenes/show/src/main/assets/beauty_faceunity** 目录下。这个项目用到的资源文件列举如下：
@@ -88,6 +90,8 @@ if(!isShowEmpty){
 
   **火山美颜配置**
   美颜资源请联系火山商务获取。
+  
+  <img src="image/SamplePicture9.png" alt="xxx" width="800" />
   
   > - 将effectAAR-release.aar放在**scenes/show/aars/beauty_bytedance/EffectAAR**目录下
   >
@@ -119,7 +123,9 @@ if(!isShowEmpty){
 >
 >   美颜是通过注册视频帧观测器，在视频观测器的 onCaptureVideoFrame 回调中通过商汤美颜SDK处理视频帧数据并替换实现美颜功能。
 >   
->   商汤美颜功能的详细封装请参考：[BeautySenseTimeImpl](src/main/java/io/agora/scene/show/beauty/sensetime/BeautySenseTimeImpl.java) 的实现。
+>   商汤美颜功能的详细封装请参考：[SenseTimeBeautyAPIImpl](src/main/java/io/agora/beautyapi/sensetime/SenseTimeBeautyAPIImpl.kt) 的实现。
+>   相芯美颜功能的详细封装请参考：[FaceUnityBeautyAPIImpl](src/main/java/io/agora/beautyapi/faceunity/FaceUnityBeautyAPIImpl.kt) 的实现。
+>   火山美颜功能的详细封装请参考：[ByteDanceBeautyAPIImpl](src/main/java/io/agora/beautyapi/bytedance/ByteDanceBeautyAPIImpl.kt) 的实现。
 >   
 >   ``` 
 >    @Override
@@ -146,5 +152,4 @@ if(!isShowEmpty){
 示例项目遵守 MIT 许可证。
 
 ---
-
 
