@@ -48,6 +48,10 @@ final class AboutAgoraHeader: UIView {
         self.addSubViews([self.icon,self.appName,self.version])
         self.appName.text = name
         self.version.text = versionText
+        self.icon.layer.cornerRadius = 10
+        self.icon.layer.masksToBounds = true
+        self.icon.layer.borderColor = UIColor.systemGray6.cgColor
+        self.icon.layer.borderWidth = 1
     }
     
     required init?(coder: NSCoder) {

@@ -4,7 +4,7 @@
 //
 
 #import "BaseViewController.h"
-#import "KTVServiceProtocol.h"
+#import "AgoraEntScenarios-Swift.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
