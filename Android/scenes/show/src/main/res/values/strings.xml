@@ -62,7 +62,7 @@
     <string name="show_beauty_item_beauty_chin">下巴</string>
     <string name="show_beauty_item_beauty_jawbone">下颌骨</string>
     <string name="show_beauty_item_beauty_forehead">额头</string>
-    <string name="show_beauty_item_beauty_mouth">嘴型</string>
+    <string name="show_beauty_item_beauty_mouth">嘴形</string>
     <string name="show_beauty_item_beauty_teeth">美牙</string>
     <string name="show_beauty_group_filter">滤镜</string>
     <string name="show_beauty_group_effect">风格妆</string>
@@ -84,6 +84,8 @@
     <string name="show_beauty_item_sticker_biti">鼻涕</string>
     <string name="show_beauty_item_sticker_zhounian">周年狂欢</string>
     <string name="show_beauty_item_sticker_huahua">花花</string>
+    <string name="show_beauty_item_sticker_520">520</string>
+    <string name="show_beauty_item_sticker_shangbanle">上班了</string>
     <string name="show_beauty_item_sticker_wochaotian">我超甜</string>
     <string name="show_statistic_bitrate">码率: %s kbps</string>
     <string name="show_statistic_up_bitrate">发送码率: %s kbps</string>
@@ -228,8 +230,8 @@
     <string name="show_beauty_item_adjust_clarity">清晰度</string>
     <string name="show_beauty_item_beauty_redden">红润</string>
     <string name="show_beauty_item_beauty_bright_eye">亮眼</string>
-    <string name="show_beauty_item_beauty_remove_dark_circles">祛黑眼圈</string>
-    <string name="show_beauty_item_beauty_remove_nasolabial_folds">祛法令纹</string>
+    <string name="show_beauty_item_beauty_remove_dark_circles">去黑眼圈</string>
+    <string name="show_beauty_item_beauty_remove_nasolabial_folds">去法令纹</string>
     <string name="show_beauty_group_virtual_bg">背景</string>
     <string name="show_beauty_green_screen">绿幕</string>
     <string name="show_beauty_strength">强度</string>
@@ -254,6 +256,27 @@
     <string name="show_video_quailty_tips">针对不同目标观众端的画质适配策略</string>
     <string name="show_audience_sr_tips">低端机不建议打开，后台已默认关闭超分</string>
     <string name="show_broadcaster_bad_exit">检测到上次直播异常退出，请重新创建直播间开播</string>
+    <string name="show_multi_beauty_bytedance">火山引擎</string>
+    <string name="show_multi_beauty_sensetime">商汤</string>
+    <string name="show_multi_beauty_faceunity">相芯</string>
+    <string name="show_multi_beauty_agora">声网</string>
+    <string name="show_multi_beauty_factory">美颜厂家</string>
+    <string name="show_beauty_license_senesetime">商汤美颜检测无license</string>
+    <string name="show_beauty_license_faceunity">相芯美颜检测无license</string>
+    <string name="show_beauty_license_bytedance">火山美颜检测无license</string>
+    <string name="show_beauty_item_effect_qise">气色</string>
+    <string name="show_beauty_item_effect_wanneng">万能</string>
+    <string name="show_beauty_item_effect_dousha">豆沙</string>
+    <string name="show_beauty_item_effect_naicha">奶茶</string>
+    <string name="show_beauty_item_sticker_sdlu">麋鹿</string>
+    <string name="show_beauty_item_beauty_face_three">五官立体</string>
+    <string name="show_beauty_item_beauty_teeth2">白牙</string>
+    <string name="show_beauty_item_effect_oumei">欧美</string>
+    <string name="show_beauty_item_effect_hunxue">混血</string>
+    <string name="show_beauty_item_effect_diadiatu">嗲嗲兔</string>
+    <string name="show_beauty_item_beauty_fajixian">发际线</string>
+    <string name="show_beauty_item_beauty_white_teeth">白牙</string>
+    <string name="show_beauty_item_sticker_zhaocaimao">招财猫</string>
 
     <string-array name="show_encoder">
         <item>硬编码</item>

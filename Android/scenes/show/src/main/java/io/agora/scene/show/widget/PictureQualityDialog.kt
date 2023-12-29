@@ -33,12 +33,12 @@ class PictureQualityDialog(context: Context) : BottomDarkDialog(context) {
         public annotation class QualityIndex
 
         private val QualityItemList = arrayListOf(
-            QualityItem(QUALITY_INDEX_1080P, R.string.show_picture_quality_1080p, Size(1080, 1920)),
-            QualityItem(QUALITY_INDEX_720P, R.string.show_picture_quality_720p, Size(720, 1280)),
-            QualityItem(QUALITY_INDEX_540P, R.string.show_picture_quality_540p, Size(540, 960)),
-            QualityItem(QUALITY_INDEX_360P, R.string.show_picture_quality_360p, Size(360, 640)),
-            QualityItem(QUALITY_INDEX_270P, R.string.show_picture_quality_270p, Size(270, 480)),
-            QualityItem(QUALITY_INDEX_180P, R.string.show_picture_quality_180p, Size(180, 320)),
+            QualityItem(QUALITY_INDEX_1080P, R.string.show_picture_quality_1080p, Size(1920, 1080 )),
+            QualityItem(QUALITY_INDEX_720P, R.string.show_picture_quality_720p, Size(1280, 720 )),
+            QualityItem(QUALITY_INDEX_540P, R.string.show_picture_quality_540p, Size(960, 540 )),
+            QualityItem(QUALITY_INDEX_360P, R.string.show_picture_quality_360p, Size(640, 360 )),
+            QualityItem(QUALITY_INDEX_270P, R.string.show_picture_quality_270p, Size(480, 270 )),
+            QualityItem(QUALITY_INDEX_180P, R.string.show_picture_quality_180p, Size(320, 180 )),
         )
 
         private var cacheSelectedIndex = QUALITY_INDEX_720P

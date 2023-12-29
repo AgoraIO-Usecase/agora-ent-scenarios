@@ -4,7 +4,7 @@
     <item android:state_activated="true">
 
         <shape android:shape="rectangle">
-            <stroke android:width="1dp" android:color="#7A59FB"/>
+            <stroke android:width="@dimen/show_beauty_item_padding_background" android:color="#7A59FB"/>
             <corners android:radius="99dp"/>
         </shape>
     </item>
@@ -12,7 +12,7 @@
     <item>
 
         <shape android:shape="rectangle">
-            <stroke android:width="1dp" android:color="@color/white_8_percent"/>
+            <stroke android:width="@dimen/show_beauty_item_padding_background" android:color="@color/white_8_percent"/>
             <corners android:radius="99dp"/>
         </shape>
     </item>

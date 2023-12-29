@@ -9,3 +9,4 @@ src/main/assets/makeup_*
 src/main/assets/models
 src/main/assets/sticker_face_shape
 src/main/assets/style_lightly
+/src/main/java/io/agora/scene/show/beauty/authpack.java
