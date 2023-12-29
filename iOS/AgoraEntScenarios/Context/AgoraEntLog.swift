@@ -32,7 +32,7 @@ import SwiftyBeaver
         file.logFileURL = URL(fileURLWithPath: "\(logDir)/agora_ent_\(config.sceneName)_ios_\(dateString)_log.txt")
         
         // use custom format and set console output to short time, log level & message
-        console.format = "[Agora][$L][\(config.sceneName)][$X]$Dyyyy-MM-DD HH:mm:ss.SSS$d $M"
+        console.format = "$Dyyyy-MM-DD HH:mm:ss.SSS[Agora][$L][\(config.sceneName)][$X]$d $M"
         file.format = console.format
         file.logFileMaxSize = config.logFileMaxSize
         file.logFileAmount = 4

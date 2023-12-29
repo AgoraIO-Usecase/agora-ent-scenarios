@@ -6,9 +6,6 @@
 #import "VLOnLineListVC.h"
 #import "VLHomeOnLineListView.h"
 #import "VLKTVViewController.h"
-//#import "AgoraRtm.h"
-#import "VLRoomListModel.h"
-#import "VLRoomSeatModel.h"
 
 #import "VLPopScoreView.h"
 #import "VLLoginViewController.h"
@@ -19,7 +16,7 @@
 #import "VLURLPathConfig.h"
 #import "VLToast.h"
 #import "AppContext+KTV.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 #import "VLAlert.h"
 
 @interface VLOnLineListVC ()<VLHomeOnLineListViewDelegate/*,AgoraRtmDelegate*/,VLPopScoreViewDelegate>
@@ -49,7 +46,7 @@
 
 - (void)commonUI {
     [self setBackgroundImage:@"online_list_BgIcon"];
-    [self setNaviTitleName:KTVLocalizedString(@"在线K歌房")];
+    [self setNaviTitleName:KTVLocalizedString(@"ktv_online_ktv")];
     if ([VLUserCenter center].isLogin) {
         [self setBackBtn];
     }
@@ -100,9 +97,9 @@
     if (![self checkIsLogin]) return;
      
     if (listModel.isPrivate) {
-        NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"取消"),KTVLocalizedString(@"确认"), nil];
+        NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"ktv_cancel"),KTVLocalizedString(@"ktv_confirm"), nil];
         VL(weakSelf);
-        [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:KTVLocalizedString(@"输入密码") message:@"" placeHolder:KTVLocalizedString(@"请输入房间密码") type:ALERTYPETEXTFIELD buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
+        [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:KTVLocalizedString(@"ktv_input_pwd") message:@"" placeHolder:KTVLocalizedString(@"ktv_pls_input_pwd") type:ALERTYPETEXTFIELD buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
             [weakSelf joinInRoomWithModel:listModel withInPutText:text];
             [[VLAlert shared] dismiss];
         }];
@@ -123,8 +120,7 @@
     inputModel.password = inputText;
 
     VL(weakSelf);
-    [[AppContext ktvServiceImp] joinRoomWithInput:inputModel
-                                       completion:^(NSError * error, KTVJoinRoomOutputModel * outputModel) {
+    [[AppContext ktvServiceImp] joinRoomWith:inputModel completion:^(NSError * _Nullable error, KTVJoinRoomOutputModel * _Nullable outputModel) {
         if (error != nil) {
             [VLToast toast:error.description];
             return;
@@ -136,6 +132,7 @@
         ktvVC.seatsArray = outputModel.seatsArray;
         [weakSelf.navigationController pushViewController:ktvVC animated:YES];
     }];
+
 }
 
 //- (NSArray *)configureSeatsWithArray:(NSArray *)seatsArray songArray:(NSArray *)songArray {

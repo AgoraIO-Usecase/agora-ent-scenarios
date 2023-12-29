@@ -7,7 +7,7 @@
 #import <WebKit/WebKit.h>
 #import "VLLocalWebViewController.h"
 #import "VLMacroDefine.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 
 @interface VLDiscoveryViewController ()<WKNavigationDelegate>
 

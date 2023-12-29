@@ -5,14 +5,12 @@
 
 #import "VLMicSeatList.h"
 #import "VLMicSeatCell.h"
-#import "VLRoomSeatModel.h"
-#import "VLRoomSelSongModel.h"
 #import "VLMacroDefine.h"
 #import "VLUserCenter.h"
-#import "KTVMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 @import YYCategories;
 @import SDWebImage;
-
+@import AgoraCommon;
 @interface VLMicSeatList ()<UICollectionViewDataSource,UICollectionViewDelegate>
 
 @property(nonatomic, weak) id <VLMicSeatListDelegate>delegate;
@@ -104,7 +102,7 @@
         cell.nickNameLabel.textColor = UIColorMakeWithHex(@"#AEABD0");
         cell.avatarImgView.layer.borderColor = UIColorClear.CGColor;
     }
-    cell.roomerLabel.text = KTVLocalizedString(@"房主");
+    cell.roomerLabel.text = KTVLocalizedString(@"ktv_room_owner");
     if (seatModel.headUrl.length > 0) {
         [cell.avatarImgView sd_setImageWithURL:[NSURL URLWithString:seatModel.headUrl]];
     }else{

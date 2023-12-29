@@ -8,7 +8,7 @@
 #import "VLHomeItemModel.h"
 #import "VLMacroDefine.h"
 #import "MenuUtils.h"
-#import "KTVMacro.h"
+#import "AESMacro.h"
 @import YYCategories;
 
 @interface VLHomeView ()<UICollectionViewDelegate,UICollectionViewDataSource>
@@ -84,29 +84,35 @@
     if (!_itemsArray) {
         _itemsArray = @[
             @{
-                @"bgImgStr":@"home_talk_bg",
-                @"iconImgStr":@"home_talk_icon",
-                @"titleStr":AGLocalizedString(@"ChatRoom"),
+                @"bgImgStr":@"dhc_bg",
+                @"iconImgStr":@"",
+                @"titleStr":NSLocalizedString(@"", nil),
                 @"subTitleStr":@""
             },
-            @{
-                @"bgImgStr":@"spatial_bg",
-                @"iconImgStr":@"home_talk_icon",
-                @"titleStr":AGLocalizedString(@"语聊房"),
-                @"subTitleStr":AGLocalizedString(@"-空间音频模式")
-            },
-            @{
-                @"bgImgStr":@"home_KTV_bg",
-                @"iconImgStr":@"home_KTV_icon",
-                @"titleStr":AGLocalizedString(@"在线K歌房"),
-                @"subTitleStr":@""
-            },
-            @{
-                @"bgImgStr":@"home_live_bg",
-                @"iconImgStr":@"home_live_icon",
-                @"titleStr":AGLocalizedString(@"秀场直播"),
-                @"subTitleStr":@""
-            },
+//            @{
+//                @"bgImgStr":@"home_talk_bg",
+//                @"iconImgStr":@"home_talk_icon",
+//                @"titleStr":NSLocalizedString(@"app_voice_chat", nil),
+//                @"subTitleStr":@""
+//            },
+//            @{
+//                @"bgImgStr":@"spatial_bg",
+//                @"iconImgStr":@"home_talk_icon",
+//                @"titleStr":NSLocalizedString(@"app_voice_chat_spatial", nil),
+//                @"subTitleStr":NSLocalizedString(@"app_voice_chat_spatialTip", nil)
+//            },
+//            @{
+//                @"bgImgStr":@"home_KTV_bg",
+//                @"iconImgStr":@"home_KTV_icon",
+//                @"titleStr":NSLocalizedString(@"app_about_karaoke", nil),
+//                @"subTitleStr":@""
+//            },
+//            @{
+//                @"bgImgStr":@"home_live_bg",
+//                @"iconImgStr":@"home_live_icon",
+//                @"titleStr":NSLocalizedString(@"app_show_live", nil),
+//                @"subTitleStr":@""
+//            },
         ];
     }
     return _itemsArray;
