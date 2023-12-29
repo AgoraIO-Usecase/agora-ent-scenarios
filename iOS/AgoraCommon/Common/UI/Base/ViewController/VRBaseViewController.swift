@@ -34,7 +34,7 @@ open class VRBaseViewController: UIViewController {
     public func setupNavigationAttributes() {
         navigation.title.isHidden = !showTitle
         navigation.title.textColor = titleColor
-      //  navigation.back.setImage(UIImage.voice_image(backImageName), for: .normal)
+        navigation.back.setImage(UIImage(named: "back"), for: .normal)
         navigation.backgroundColor = navBackgroundColor
     }
     

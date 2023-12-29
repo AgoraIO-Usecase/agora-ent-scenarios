@@ -47,7 +47,7 @@ UICollectionViewDataSource
         [self initSubViews];
         [self addSubViewConstraints];
         self.soundSlider.value = 1.0;
-        self.accSlider.value = 0.7;
+        self.accSlider.value = 0.5;
         self.remoteSlider.value = 0.3;
         self.setting.remoteVolume = 30;
         self.setting.imMode = 0;
@@ -377,7 +377,7 @@ UICollectionViewDataSource
     self.mvOn = NO;
     self.toneValue = 0;
     self.soundValue = 100;
-    self.accValue = 70;
+    self.accValue = 50;
     self.remoteValue = 30;
     self.kindIndex = kKindUnSelectedIdentifier;
     self.imMode = 0;

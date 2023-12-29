@@ -145,7 +145,7 @@ class CantataMainViewController: BaseViewController{
     private var testBtn: UIButton!
     private var isDumpAble:Bool = false
     private var timeManager: TimerManager = TimerManager()
-    private var playoutVolume: Int = 70 {
+    private var playoutVolume: Int = 50 {
         didSet {
             self.ktvApi.getMusicPlayer()?.adjustPlayoutVolume(Int32(playoutVolume))
             self.ktvApi.getMusicPlayer()?.adjustPublishSignalVolume(Int32(playoutVolume))

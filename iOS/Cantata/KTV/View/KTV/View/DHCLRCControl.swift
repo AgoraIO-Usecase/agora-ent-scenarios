@@ -196,6 +196,7 @@ class DHCLRCControl: UIView {
             pauseBtn.isHidden = true
             nextBtn.isHidden = true
             originBtn.isHidden = true
+            originBtn.isSelected = false
             effectBtn.isHidden = true
             joinChorusBtn.isHidden = false
             joinChorusBtn.isSelected = true

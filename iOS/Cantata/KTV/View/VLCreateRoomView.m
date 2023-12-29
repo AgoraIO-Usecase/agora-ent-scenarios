@@ -60,14 +60,14 @@
     [randomBtn setImage:[UIImage sceneImageWithName:@"online_create_randomIcon"] forState:UIControlStateNormal];
 //    randomBtn.imagePosition = QMUIButtonImagePositionLeft;
     randomBtn.spacingBetweenImageAndTitle = 3;
-    randomBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
+    randomBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
     [randomBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
     randomBtn.titleLabel.font = UIFontMake(14.0);
 //    randomBtn.adjustsButtonWhenHighlighted = NO;
     [randomBtn addTarget:self action:@selector(randomBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:randomBtn];
     [randomBtn sizeToFit];
-    randomBtn.frame = CGRectMake(SCREEN_WIDTH - randomBtn.width - 50, roomTitleLabel.top, randomBtn.width, 20);
+    randomBtn.frame = CGRectMake(SCREEN_WIDTH - randomBtn.width - 50, roomTitleLabel.top, randomBtn.width + 20, 20);
     
     UIView *inputBgView = [[UIView alloc] initWithFrame:CGRectMake(30, roomTitleLabel.bottom+15, SCREEN_WIDTH-60, 48)];
     inputBgView.layer.cornerRadius = 24;
@@ -93,9 +93,9 @@
     UIButton *publicBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [publicBtn setTitle:KTVLocalizedString(@"ktv_open") forState:UIControlStateNormal];
     [publicBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
-    publicBtn.frame = CGRectMake(secretLabel.left-3, secretLabel.bottom+13, 58, 24);
+    publicBtn.frame = CGRectMake(secretLabel.left-3, secretLabel.bottom+13, 70, 24);
     publicBtn.spacingBetweenImageAndTitle = 3;
-    publicBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
+    publicBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
     [publicBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
     publicBtn.titleLabel.font = UIFontMake(14.0);
     [publicBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
@@ -105,14 +105,14 @@
     self.publicBtn = publicBtn;
     [publicBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:publicBtn];
-    [publicBtn sizeToFit];
+   // [publicBtn sizeToFit];
     
     UIButton *screatBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [screatBtn setTitle:KTVLocalizedString(@"ktv_encryption") forState:UIControlStateNormal];
     [screatBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
-    screatBtn.frame = CGRectMake(publicBtn.right+40, publicBtn.top, 58, 24);
+    screatBtn.frame = CGRectMake(publicBtn.right+40, publicBtn.top, 70, 24);
     screatBtn.spacingBetweenImageAndTitle = 3;
-    screatBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
+    screatBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
     [screatBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
     screatBtn.titleLabel.font = UIFontMake(14.0);
     [screatBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
@@ -121,7 +121,7 @@
     self.screatBtn = screatBtn;
     [screatBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:screatBtn];
-    [screatBtn sizeToFit];
+ //   [screatBtn sizeToFit];
     
     
     self.screatView = [[UIView alloc]initWithFrame:CGRectMake(40, publicBtn.bottom+15, SCREEN_WIDTH-80, 48+12+17)];
