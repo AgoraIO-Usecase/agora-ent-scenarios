@@ -46,6 +46,11 @@
   ```json
   注: 拉取榜单、歌单、歌词等功能是需要开通权限的
   ```
+- <mark>联系销售给 AppID 开通 Top N 权限</mark>(如果您没有销售人员的联系方式可通过智能客服联系销售人员 [Agora 支持](https://agora-ticket.agora.io/))
+
+  ```json
+  注: 演唱者互相之间听到对方的演唱歌声需要开启 topN 策略
+  ```
 
 - 在项目的 [**gradle.properties**](../../gradle.properties) 里填写需要的声网 App ID 和 App 证书
 
