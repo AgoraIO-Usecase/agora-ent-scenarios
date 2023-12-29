@@ -1,22 +1,18 @@
-# 在线K歌房
+# 大合唱
+# 50-100人大合唱
 
-> 本文档主要介绍如何快速跑通 <mark>在线K歌房</mark> 示例工程
+> 本文档主要介绍如何快速跑通 <mark>大合唱</mark> 示例工程
 >
 > Demo 效果:
 > 
-> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ktvRoom_1.png" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ktvRoom_2.png" width="300" height="640">
+> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/hdc_readme_ios_4.jpg" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/hdc_readme_ios_3.jpg" width="300" height="640">
 ---
-
 ## 1. 环境准备
-
 - <mark>最低兼容 iOS 13.0.0 </mark> 
 - Xcode 13.0.0 及以上版本。
 - iPhone 6 及以上的手机设备(系统需要 iOS 13.0.0 及以上)。
-
 ---
-
 ## 2. 运行示例
-
 - 获取声网 App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
   
   > - 点击创建应用
@@ -30,21 +26,23 @@
   > - 得到 App ID 与 App 证书
   >
   >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
-
 - 获取 App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
-
 - 联系销售给  AppID  开通 K 歌权限 </mark>(如果您没有销售人员的联系方式可通过智能客服联系销售人员 [Agora 支持](https://agora-ticket.agora.io/)
-
-  - 注: 拉取榜单、歌单、歌词等功能是需要开通权限的
+    ```json
+  注: 拉取榜单、歌单、歌词等功能是需要开通权限的
+```
 
 - 在项目的 agora-ent-scenarios/iOS/AgoraEntScenarios/ 目录下会有一个 KeyCenter.swift 文件，需要在 KeyCenter.swift 里填写需要的声网 App ID 和 App 证书
-
   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_keys_ios.png)
-
+  
   ```texag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0
   AppId：声网 appid
   Certificate：声网 Certificate
   ```
+  
+  > - 云端合流服务配置（CloudPlayer）
+  >   
+  >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/CloudPlayer.png)
 - 项目的第三方库使用 pod 集成，需要在 agora-ent-scenarios/iOS 目录下执行 pod install ,然后再开始体验项目
 - 在 agora-ent-scenarios/iOS 目录下，找到 AgoraEntScenarios.xcworkspace 文件
 - 用 Xcode 运行 .xcworkspace 文件 即可开始您的体验
@@ -55,12 +53,12 @@
 
 ### 3.1 概述
 
-> **在线K歌房**项目是声网在线 K 歌房场景的开源代码，开发者可以获取并添加到您的 APP 工程里，本源码会伴随声动互娱 Demo 同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
+> **大合唱**项目是声网大合唱场景的开源代码，开发者可以获取并添加到您的 APP 工程里，本源码会伴随声动互娱 Demo 同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
 
 ### 3.2 项目文件结构简介
 
 ```
-├── Scenes
+├── Cantata
 │   ├── KTV
 │   │   └────FileDownloadCache #歌词下载工具类文件
 │   │   └────Debug            #KTV Debug工具类
@@ -72,7 +70,7 @@
 │   │       ├── KTVServiceProtocol.h #KTV里面用到的service接口
 │   │       └── KTVSyncManagerServiceImp.swift #KTV里面用到的service实现
 │   │   └────ViewController          #KTV里面用到的控制器
-│   │       ├── VLKTVViewController.m #KTV主控制器
+│   │       ├── CantataMainViewController.swift #KTV主控制器
 │   │   └────KTVAPI          #KTV里面KTVAPI
 │   │       ├── KTVApiDelegate.swift #KTVAPI的声明
 │   │       └── KTVApiImpl.swift #KTVAPI的实现
@@ -89,28 +87,28 @@
 ### 3.3 功能介绍
 
 > 在线K歌房场景目前已涵盖以下功能，您可以参考注释按需从代码中调用
->
-> 场景功能代码根目录 **AgoraEntScenarios/AgoraEntScenarios/scenes/KTV**
->
+> 
+> 场景功能代码根目录 **AgoraEntScenarios/AgoraEntScenarios/iOS/Cantata**
+> 
 > ---
->
+> 
 > #### K歌房场景化API
->
-> ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_api_ios.png)
->
-> K 歌房场景化 API 是一个帮助您快速集成声网 K 歌房能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**KTVApiDelegate**](KTVApi/KTVApiDelegate.swift) 来定义协议，通过 [**KTVApiImp**](KTVApi/KTVApiImp.kt) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网K歌房能力
->
+> 
+> ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/hdc_readme_ios_2.jpg)
+
+大合唱场景化 API 是一个帮助您快速集成声网 大合唱能力的模块, 使用这个模块, 您可以非常便捷的获取歌单信息、加载歌曲、切换演唱角色、控制音乐播放, 通过 [**KTVApi**](KTVAPI/KTVApi.swift) 来定义协议，通过 [**KTVApiImp**](KTVAPI/KTVApiImpl.swift) 来实现, 您可以直接将这两个文件拷贝到您的项目中使用, 快速集成声网大合唱能力
+
 > * 拉取歌单
->
+>   
 >   包含了榜单、歌单、搜索歌曲的功能
->
+>   
 >   ~~~swift
 >   /**
 >     * 获取歌曲榜单
 >     * Parameter completion: 榜单列表回调
 >     */
 >    func fetchMusicCharts(completion:@escaping MusicChartCallBacks)
->    
+>   
 >    /**
 >    * 根据歌曲榜单类型搜索歌单
 >    *  Parameters:
@@ -125,7 +123,7 @@
 >                     pageSize: Int,
 >                     jsonOption: String,
 >                     completion:@escaping MusicResultCallBacks)
->    
+>   
 >    /**
 >    * 根据关键字搜索歌曲
 >    *  Parameters:
@@ -140,11 +138,10 @@
 >                     jsonOption: String,
 >                    completion: @escaping MusicResultCallBacks)
 >   ~~~
->
 > * 加载歌曲
->
+>   
 >   通过这个接口, 您可以完成音乐和歌词的加载, 加载歌曲的进度、状态会通过回调通知您
->
+>   
 >   ~~~swift
 >   /**
 >    * 异步加载歌曲，同时只能为一首歌loadSong，loadSong结果会通过回调通知业务层
@@ -164,11 +161,11 @@
 >                config: KTVSongConfiguration, 
 >                mode: KTVLoadMusicMode, 
 >                onMusicLoadStateListener: >IMusicLoadStateListener)
->
+>   ~~~
 > * 切换角色
->
+>   
 >   通过这个接口, 您可以完成演唱过程中不同角色的切换, 切换角色的结果会通过回调通知您
->
+>   
 >   ~~~swift
 >   /**
 >    * 异步切换演唱身份，结果会通过回调通知业务层
@@ -185,40 +182,38 @@
 >    * 7、LeadSinger -》SoloSinger 最后一个合唱者退出合唱时，主唱由领唱切换成独唱
 >    * 8、LeadSinger -》Audience 以领唱的身份结束歌曲时
 >    */
->   func switchSingerRole(
+>   func switchSingerRole2(
 >     newRole: KTVSingRole,
 >     onSwitchRoleState:@escaping ISwitchRoleStateListener
 >   )
 >   ~~~
->
 > * 控制歌曲
->
+>   
 >   ~~~swift
 >   /**
 >   * 开始播放
 >   */
 >   func startSing(songCode: Int, startPos: Int)
->
+>   
 >   /**
 >   * 恢复播放
 >   */
 >   func resumeSing()
->
+>   
 >   /**
 >   * 暂停播放
 >   */
 >   func pauseSing()
->
+>   
 >   /**
 >   * 调整进度
 >   */
 >   func seekSing(time: Int)
 >   ~~~
->
 > * 与歌词组件配合使用
->
+>   
 >   支持您传入您自定义的歌词组件与 KTVApi 模块配合使用, 您需要让您的歌词组件继承 **ILrcView** 类并实现以下三个接口, KTVApi 模块回通过下列三个回调将演唱 pitch、歌曲播放进度、歌词url 发送给您的歌词组件
->
+>   
 >   ~~~swift
 >   @objc public protocol KTVLrcViewDelegate: NSObjectProtocol {
 >       /**
@@ -243,75 +238,64 @@
 >    */
 >   func setLrcView(view: KTVLrcViewDelegate)
 >   ~~~
->
 > 
->
 > #### 业务服务器交互模块
->
-> ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/img_ktv_service_ios.png)
->
-> 场景内和业务服务器的交互主要是场景内基本交互请求和响应，例如房间的变化、用户的变化、麦位的变化、已点歌曲列表的变化，通过 [**KTVServiceProtocol**](service/KTVServiceProtocol.h) 来定义协议，通过 [**KTVSyncManagerServiceImp**](service/KTVSyncManagerServiceImp.swift) 来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
->
+> 
+> ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/hdc_readme_ios_1.jpg)
+> 
+> 场景内和业务服务器的交互主要是场景内基本交互请求和响应，例如房间的变化、用户的变化、麦位的变化、已点歌曲列表的变化，通过 [**KTVServiceProtocol**](Service/KTVServiceProtocol.swift) 来定义协议，通过 [**KTVSyncManagerServiceImp**](Service/KTVSyncManagerServiceImp.swift) 来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
+> 
 > - 房间管理
->
+>   
 >   包含了房间的创建和房间列表的获取
->
->   相关代码请参考：[**KTVServiceModel**](service/KTVServiceModel.h)，分别依赖 [**KTVServiceProtocol**](service/KTVServiceProtocol.kt) 的下列方法去交互
->
+>   
+>   相关代码请参考：[**KTVServiceModel**](Service/KTVServiceModel.swift)，分别依赖 [**KTVServiceProtocol**](Service/KTVServiceProtocol.swift) 的下列方法去交互
+>   
 >   ```Swift
 >   - (void)getRoomListWithPage:(NSUInteger)page
 >                 completion:(void(^)(NSError* _Nullable, NSArray<VLRoomListModel*>* _Nullable))completion;
->
+>   
 >   - (void)createRoomWithInput:(KTVCreateRoomInputModel*)inputModel
 >                 completion:(void (^)(NSError*_Nullable, KTVCreateRoomOutputModel*_Nullable))completion;
->
+>   
 >   - (void)joinRoomWithInput:(KTVJoinRoomInputModel*)inputModel
 >               completion:(void (^)(NSError* _Nullable, KTVJoinRoomOutputModel*_Nullable))completion;
 >   ```
->
 > - 麦位管理
->
+>   
 >   包含上麦、下麦、开关麦、开关摄像头等状态的同步
->
-> - 歌曲管理
->
->   点歌、已点歌曲删除、已点歌曲置顶、切歌等状态的同步
->
->   歌曲列表菜单：请参考  [**VLPopSongList**]((View/KTV/KTVSongGallery/VLPopSongList.m))
->
 > 
->
 > #### 其他功能
->
+> 
 > * 音效、美声
 >   声网最佳音效
->
->    实现参考  [**VLKTVViewContolller**](viewController/VLKTVViewController.m) 里的 **effectItemClickAction** 实现
->
->   声网最佳美声
->
->    实现参考  [**VLKTVViewContolller**](viewController/VLKTVViewController.m) 里的 **onVLChooseBelcantoView** 实现
+>   
+>   实现参考  [**CantataMainViewController**](ViewController/CantataMainViewController.swift) 里的 **showSettingView** 实现
 
 ---
 
 ## 4. FAQ
 
-### 如何获取声网 APPID
-
-> 声网 APPID 申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
-
 ### 程序运行后，歌曲列表为空
 
-> 需要联系销售给 APPID 开通 K 歌权限
+**<span style="font-size: larger; color: red;">需要联系销售给 APPID 开通 K 歌权限</span>**
 
-### K歌房中的歌曲资源使用的是哪家？是否可以自己选择供应商？
+### 大合唱中的歌曲资源使用的是哪家？是否可以自己选择供应商？
 
-> K歌房的歌曲资源使用的是Agora内容中心服务，暂不支持自行切换供应商，详情请查看 [版权音乐 - 在线 K 歌房 - 文档中心 - 声网Agora](https://docs.agora.io/cn/online-ktv/API%20Reference/ios_ng/API/toc_drm.html)
+> 大合唱的歌曲资源使用的是Agora内容中心服务，暂不支持自行切换供应商，详情请查看 [版权音乐 - 在线 K 歌房 - 文档中心 - 声网Agora](https://docs.agora.io/cn/online-ktv/API%20Reference/ios_ng/API/toc_drm.html)
+
+### 想体验更多场景
+
+> 详情请查看 [声动互娱](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/main/README.md)
 
 ### 集成遇到困难，该如何联系声网获取协助
 
 > 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
->
+> 
 > 方案2：发送邮件给 [support@agora.io](mailto:support@agora.io) 咨询
+> 
+> 方案3：扫码加入我们的微信交流群提问
+> 
+> <img src="https://download.agora.io/demo/release/SDHY_QA.jpg" width="360" height="360">
 
 ---
