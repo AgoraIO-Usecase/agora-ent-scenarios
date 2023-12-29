@@ -41,6 +41,12 @@
 * 运行秀场转1v1私密房项目，请参考以下流程
     * [Android](Android/scenes/showTo1v1)
     * [iOS](iOS/AgoraEntScenarios/Scenes/ShowTo1v1)
+ 
+## 1.3 体验 APP 下载地址
+
+| iOS                                                          | Android                                                      |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| ![](https://web-cdn.agora.io/shengwang/images/%E5%A3%B0%E5%8A%A8%E4%BA%92%E5%A8%B1ios-demo.png) | ![](https://web-cdn.agora.io/shengwang/images/%E5%A3%B0%E5%8A%A8%E4%BA%92%E5%A8%B1demo.png) |
 
 # 2. FAQ
 
