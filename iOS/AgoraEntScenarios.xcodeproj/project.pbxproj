@@ -583,10 +583,10 @@
 		E724354F2AF37A35007172FC /* BEGLUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = E72435202AF34D83007172FC /* BEGLUtils.m */; };
 		E72435502AF37A3A007172FC /* BEImageUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = E72435212AF34D83007172FC /* BEImageUtils.m */; };
 		E751D85D29F11723001354CA /* AUiMoreDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E751D85C29F11723001354CA /* AUiMoreDialog.swift */; };
+		E75B48992B2C331D005E925A /* AgoraBeautyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75B48982B2C331D005E925A /* AgoraBeautyManager.swift */; };
 		E76F80192AF34B6900CCB9D6 /* FUBeautyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76F80152AF34B6900CCB9D6 /* FUBeautyManager.swift */; };
 		E76F801A2AF34B6900CCB9D6 /* FUManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E76F80182AF34B6900CCB9D6 /* FUManager.m */; };
 		E7883ACD2AFDCE44003CCF44 /* BeautyModel+Agora.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7883ACC2AFDCE44003CCF44 /* BeautyModel+Agora.swift */; };
-		E7883ACF2AFDD48C003CCF44 /* AgoraBeautyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7883ACE2AFDD48C003CCF44 /* AgoraBeautyManager.swift */; };
 		E7883AD72AFDD9F3003CCF44 /* AgoraBeautyRender.m in Sources */ = {isa = PBXBuildFile; fileRef = E7883AD62AFDD9F3003CCF44 /* AgoraBeautyRender.m */; };
 		E7C147682AF8C1840092C7F1 /* BeautyModel+Sense.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C147672AF8C1840092C7F1 /* BeautyModel+Sense.swift */; };
 		E7C1476A2AF8C19A0092C7F1 /* BeautyModel+FU.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C147692AF8C19A0092C7F1 /* BeautyModel+FU.swift */; };
@@ -1349,11 +1349,11 @@
 		E724353A2AF354B9007172FC /* VideoProcessingManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoProcessingManager.h; sourceTree = "<group>"; };
 		E724353B2AF354B9007172FC /* EffectsProcess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectsProcess.h; sourceTree = "<group>"; };
 		E751D85C29F11723001354CA /* AUiMoreDialog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUiMoreDialog.swift; sourceTree = "<group>"; };
+		E75B48982B2C331D005E925A /* AgoraBeautyManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraBeautyManager.swift; sourceTree = "<group>"; };
 		E76F80152AF34B6900CCB9D6 /* FUBeautyManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FUBeautyManager.swift; sourceTree = "<group>"; };
 		E76F80172AF34B6900CCB9D6 /* FUManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FUManager.h; sourceTree = "<group>"; };
 		E76F80182AF34B6900CCB9D6 /* FUManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FUManager.m; sourceTree = "<group>"; };
 		E7883ACC2AFDCE44003CCF44 /* BeautyModel+Agora.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BeautyModel+Agora.swift"; sourceTree = "<group>"; };
-		E7883ACE2AFDD48C003CCF44 /* AgoraBeautyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgoraBeautyManager.swift; sourceTree = "<group>"; };
 		E7883AD52AFDD9F3003CCF44 /* AgoraBeautyRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AgoraBeautyRender.h; sourceTree = "<group>"; };
 		E7883AD62AFDD9F3003CCF44 /* AgoraBeautyRender.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AgoraBeautyRender.m; sourceTree = "<group>"; };
 		E7C147672AF8C1840092C7F1 /* BeautyModel+Sense.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BeautyModel+Sense.swift"; sourceTree = "<group>"; };
@@ -1769,7 +1769,7 @@
 				E3735C842A5E7E75004737EF /* SenseBeautyManager.swift */,
 				E76F80162AF34B6900CCB9D6 /* FUBeauty */,
 				E76F80152AF34B6900CCB9D6 /* FUBeautyManager.swift */,
-				E7883ACE2AFDD48C003CCF44 /* AgoraBeautyManager.swift */,
+				E75B48982B2C331D005E925A /* AgoraBeautyManager.swift */,
 				E3735C6E2A5E7E75004737EF /* Util */,
 			);
 			path = Beauty;
@@ -3309,24 +3309,24 @@
 		E724350C2AF34D83007172FC /* ByteBeaufy */ = {
 			isa = PBXGroup;
 			children = (
+				E72435132AF34D83007172FC /* BELicenseHelper.h */,
 				E724350E2AF34D83007172FC /* BELicenseHelper.mm */,
 				E724350F2AF34D83007172FC /* BEOpenGLRenderHelper.m */,
 				E72435102AF34D83007172FC /* Core.h */,
+				E724351F2AF34D83007172FC /* BEEffectManager.h */,
 				E72435112AF34D83007172FC /* BEEffectManager.mm */,
-				E72435122AF34D83007172FC /* BEGLTexture.h */,
-				E72435132AF34D83007172FC /* BELicenseHelper.h */,
 				E72435142AF34D83007172FC /* Config.h */,
 				E72435152AF34D83007172FC /* BETimeRecoder.m */,
 				E72435162AF34D83007172FC /* macro.h */,
 				E72435172AF34D83007172FC /* BEEffectResourceHelper.m */,
-				E72435182AF34D83007172FC /* BEImageUtils.h */,
 				E72435192AF34D83007172FC /* BEGLUtils.h */,
 				E724351B2AF34D83007172FC /* BEOpenGLRenderHelper.h */,
+				E72435122AF34D83007172FC /* BEGLTexture.h */,
 				E724351C2AF34D83007172FC /* BEGLTexture.m */,
 				E724351D2AF34D83007172FC /* BEHttpRequestProvider.h */,
 				E724351E2AF34D83007172FC /* BEHttpRequestProvider.mm */,
-				E724351F2AF34D83007172FC /* BEEffectManager.h */,
 				E72435202AF34D83007172FC /* BEGLUtils.m */,
+				E72435182AF34D83007172FC /* BEImageUtils.h */,
 				E72435212AF34D83007172FC /* BEImageUtils.m */,
 				E72435222AF34D83007172FC /* BEEffectResourceHelper.h */,
 				E72435232AF34D83007172FC /* BETimeRecoder.h */,
@@ -3974,7 +3974,6 @@
 				DD619BA129E3E262008F63E4 /* VoiceRoomRTCManager.swift in Sources */,
 				DD619BFC29E3E262008F63E4 /* VRCreateRoomInputView.swift in Sources */,
 				DD619AAE29E3E247008F63E4 /* SARoomPresentView.swift in Sources */,
-				E7883ACF2AFDD48C003CCF44 /* AgoraBeautyManager.swift in Sources */,
 				DD619BD029E3E262008F63E4 /* VoiceRoomEndLiveAlert.swift in Sources */,
 				DD619BBC29E3E262008F63E4 /* VRRoomsViewController.swift in Sources */,
 				DD3610A629B70CDC00CE7984 /* ShowBeautyFaceCell.swift in Sources */,
@@ -4028,6 +4027,7 @@
 				DD1603442963CAFD00182A04 /* AgoraEntLog.swift in Sources */,
 				DD619BB129E3E262008F63E4 /* VoiceRoomViewController+Mic.swift in Sources */,
 				DD0292D6295BF0DC00485225 /* VLBadNetWorkView.m in Sources */,
+				E75B48992B2C331D005E925A /* AgoraBeautyManager.swift in Sources */,
 				DD619BEA29E3E262008F63E4 /* PopTip+Transitions.swift in Sources */,
 				DD619BBB29E3E262008F63E4 /* VRAllRoomsViewController.swift in Sources */,
 				DD619AD129E3E247008F63E4 /* SASwitchTableViewCell.swift in Sources */,
@@ -4355,7 +4355,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -4376,7 +4376,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.2.1;
+				MARKETING_VERSION = 3.2.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -4404,8 +4404,6 @@
 					"\"AgoraContentInspectExtension\"",
 					"-framework",
 					"\"AgoraDav1d\"",
-					"-framework",
-					"\"AgoraDrmLoaderExtension\"",
 					"-framework",
 					"\"AgoraFaceDetectionExtension\"",
 					"-framework",
@@ -4523,8 +4521,6 @@
 					"-framework",
 					"\"Zip\"",
 					"-framework",
-					"\"effect-sdk\"",
-					"-framework",
 					"\"video_dec\"",
 					"-framework",
 					"\"video_enc\"",
@@ -4538,8 +4534,6 @@
 					"\"AgoraClearVisionExtension\"",
 					"-weak_framework",
 					"\"AgoraContentInspectExtension\"",
-					"-weak_framework",
-					"\"AgoraDrmLoaderExtension\"",
 					"-weak_framework",
 					"\"AgoraFaceDetectionExtension\"",
 					"-weak_framework",
@@ -4583,7 +4577,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -4604,7 +4598,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.2.1;
+				MARKETING_VERSION = 3.2.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -4632,8 +4626,6 @@
 					"\"AgoraContentInspectExtension\"",
 					"-framework",
 					"\"AgoraDav1d\"",
-					"-framework",
-					"\"AgoraDrmLoaderExtension\"",
 					"-framework",
 					"\"AgoraFaceDetectionExtension\"",
 					"-framework",
@@ -4751,8 +4743,6 @@
 					"-framework",
 					"\"Zip\"",
 					"-framework",
-					"\"effect-sdk\"",
-					"-framework",
 					"\"video_dec\"",
 					"-framework",
 					"\"video_enc\"",
@@ -4766,8 +4756,6 @@
 					"\"AgoraClearVisionExtension\"",
 					"-weak_framework",
 					"\"AgoraContentInspectExtension\"",
-					"-weak_framework",
-					"\"AgoraDrmLoaderExtension\"",
 					"-weak_framework",
 					"\"AgoraFaceDetectionExtension\"",
 					"-weak_framework",

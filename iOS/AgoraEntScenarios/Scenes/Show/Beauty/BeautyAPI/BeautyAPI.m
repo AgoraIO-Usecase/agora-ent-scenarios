@@ -6,6 +6,7 @@
 //
 
 #import "BeautyAPI.h"
+#import <AVFoundation/AVFoundation.h>
 
 static NSString *const beautyAPIVersion = @"1.0.4";
 
@@ -34,6 +35,13 @@ static NSString *const beautyAPIVersion = @"1.0.4";
 
 @implementation BeautyAPI
 
+- (instancetype)init {
+    if (self == [super init]) {
+        _isFrontCamera = YES;
+    }
+    return self;
+}
+
 - (NSMutableArray *)statsArray {
     if (_statsArray == nil) {
         _statsArray = [NSMutableArray new];
@@ -50,7 +58,6 @@ static NSString *const beautyAPIVersion = @"1.0.4";
     }
     [LogUtil log:[NSString stringWithFormat:@"RTC Version == %@", [AgoraRtcEngineKit getSdkVersion]]];
     [LogUtil log:[NSString stringWithFormat:@"BeautyAPI Version == %@", [self getVersion]]];
-    _isFrontCamera = YES;
     self.config = config;
     if (self.config.statsDuration <= 0) {
         self.config.statsDuration = 1;
@@ -91,10 +98,11 @@ static NSString *const beautyAPIVersion = @"1.0.4";
 
 - (int)switchCamera {
     _isFrontCamera = !_isFrontCamera;
-    [self setupMirror];
     NSDictionary *dict = @{ @"cameraPosition": @(_isFrontCamera) };
     [self rtcReportWithEvent:@"cameraPosition" label:dict];
-    return [self.config.rtcEngine switchCamera];
+    int res = [self.config.rtcEngine switchCamera];
+    [self setupMirror];
+    return res;
 }
 
 - (AgoraVideoMirrorMode)setupMirror {
@@ -108,7 +116,7 @@ static NSString *const beautyAPIVersion = @"1.0.4";
             mode = AgoraVideoMirrorModeEnabled;
         }
     }
-    [self.config.rtcEngine setParameters:[NSString stringWithFormat:@"{\"rtc.camera_capture_mirror_mode\":%d}", mode == AgoraVideoMirrorModeEnabled ? 1 : 0]];
+    [self.config.rtcEngine setLocalRenderMode:self.renderMode mirror:mode];
     [LogUtil log:[NSString stringWithFormat:@"AgoraVideoMirrorMode == %ld isFrontCamera == %d", mode, self.isFrontCamera]];
     return mode;
 }
@@ -273,8 +281,8 @@ static NSString *const beautyAPIVersion = @"1.0.4";
 
 - (BOOL)getMirrorApplied{
     if (self.isFrontCamera) {
-        return self.config.cameraConfig.frontMirror == MirrorMode_REMOTE_ONLY || self.config.cameraConfig.frontMirror == MirrorMode_LOCAL_REMOTE;
-    }
+            return self.config.cameraConfig.frontMirror == MirrorMode_REMOTE_ONLY || self.config.cameraConfig.frontMirror == MirrorMode_LOCAL_REMOTE;
+        }
     return self.config.cameraConfig.backMirror == MirrorMode_REMOTE_ONLY || self.config.cameraConfig.backMirror == MirrorMode_LOCAL_REMOTE;
 }
 

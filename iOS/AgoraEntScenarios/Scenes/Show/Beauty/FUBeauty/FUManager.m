@@ -46,19 +46,19 @@ static FUManager *shareManager = NULL;
 
 - (void)setupInit {
 #if __has_include(<FURenderKit/FURenderKit.h>)
-        NSString *controllerPath = [[NSBundle mainBundle] pathForResource:@"controller_cpp" ofType:@"bundle"];
-        NSString *controllerConfigPath = [[NSBundle mainBundle] pathForResource:@"controller_config" ofType:@"bundle"];
-        FUSetupConfig *setupConfig = [[FUSetupConfig alloc] init];
-        setupConfig.authPack = FUAuthPackMake(g_auth_package, sizeof(g_auth_package));
-        setupConfig.controllerPath = controllerPath;
-        setupConfig.controllerConfigPath = controllerConfigPath;
-        _isSuccessLicense = sizeof(g_auth_package) > 0;
-        // 初始化 FURenderKit
-        [FURenderKit setupWithSetupConfig:setupConfig];
-        
-        [FURenderKit setLogLevel:FU_LOG_LEVEL_ERROR];
-        
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
+            NSString *controllerPath = [[NSBundle mainBundle] pathForResource:@"controller_cpp" ofType:@"bundle"];
+            NSString *controllerConfigPath = [[NSBundle mainBundle] pathForResource:@"controller_config" ofType:@"bundle"];
+            FUSetupConfig *setupConfig = [[FUSetupConfig alloc] init];
+            setupConfig.authPack = FUAuthPackMake(g_auth_package, sizeof(g_auth_package));
+            setupConfig.controllerPath = controllerPath;
+            setupConfig.controllerConfigPath = controllerConfigPath;
+            self->_isSuccessLicense = sizeof(g_auth_package) > 0;
+            // 初始化 FURenderKit
+            [FURenderKit setupWithSetupConfig:setupConfig];
+            
+            [FURenderKit setLogLevel:FU_LOG_LEVEL_ERROR];
+            
             // 加载人脸 AI 模型
             NSString *faceAIPath = [[NSBundle mainBundle] pathForResource:@"ai_face_processor" ofType:@"bundle"];
             [FUAIKit loadAIModeWithAIType:FUAITYPE_FACEPROCESSOR dataPath:faceAIPath];
@@ -79,18 +79,16 @@ static FUManager *shareManager = NULL;
             
             // 设置小脸检测
             [FUAIKit shareKit].faceProcessorDetectSmallFace = [FURenderKit devicePerformanceLevel] == FUDevicePerformanceLevelHigh;
+            
+            [FUAIKit shareKit].maxTrackFaces = 4;
         });
-        
-        [FUAIKit shareKit].maxTrackFaces = 4;
 #endif
 }
 
 - (void)destoryItems {
 #if __has_include(<FURenderKit/FURenderKit.h>)
-    [FURenderKit shareRenderKit].beauty = nil;
-    [FURenderKit shareRenderKit].bodyBeauty = nil;
-    [FURenderKit shareRenderKit].makeup = nil;
-    [[FURenderKit shareRenderKit].stickerContainer removeAllSticks];
+    [FURenderKit clear];
+    [FURenderKit destroy];
     self.currentSticker = nil;
 #endif
 }
@@ -205,6 +203,9 @@ static FUManager *shareManager = NULL;
         [self.delegate faceUnityManagerCheckAI];
     }
 #if __has_include(<FURenderKit/FURenderKit.h>)
+    if ([FURenderKit shareRenderKit].beauty == nil) {
+        return frame;
+    }
     FURenderInput *input = [[FURenderInput alloc] init];
     input.pixelBuffer = frame;
     //默认图片内部的人脸始终是朝上，旋转屏幕也无需修改该属性。

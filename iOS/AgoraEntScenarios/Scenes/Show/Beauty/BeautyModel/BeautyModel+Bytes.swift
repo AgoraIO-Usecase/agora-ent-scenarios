@@ -18,7 +18,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = "/beauty_IOS_lite"
         model.key = "smooth"
-        model.value = 0.3
+        model.value = 0.65
         model.name = "show_beauty_item_beauty_smooth".show_localized
         model.icon = "meiyan_icon_mopi"
         model.isSelected = true
@@ -35,7 +35,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Overall"
-        model.value = 0.15
+        model.value = 0.3
         model.enableNegative = true
         model.name = "show_beauty_item_beauty_overall".show_localized
         model.icon = "meiyan_icon_shoulian"
@@ -53,7 +53,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Eye"
-        model.value = 0.15
+        model.value = 0
         model.enableNegative = true
         model.name = "show_beauty_item_beauty_eye".show_localized
         model.icon = "meiyan_icon_dayan"
@@ -62,7 +62,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Nose"
-        model.value = 0.15
+        model.value = 0
         model.enableNegative = true
         model.name = "show_beauty_item_beauty_nose".show_localized
         model.icon = "meiyan_icon_shoubi"
@@ -71,7 +71,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Chin"
-        model.value = 0.46
+        model.value = 0
         model.name = "show_beauty_item_beauty_chin".show_localized
         model.icon = "meiyan_icon_xiaba"
         model.enableNegative = true
@@ -80,7 +80,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Zoom_Jawbone"
-        model.value = 0.46
+        model.value = 0
         model.enableNegative = true
         model.name = "show_beauty_item_beauty_jawbone".show_localized
         model.icon = "meiyan_icon_xiahegu"
@@ -89,8 +89,8 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Forehead"
-        model.value = 0.4
-        model.name = "show_beauty_item_beauty_forehead".show_localized
+        model.value = 0
+        model.name = "show_beauty_item_beauty_hairline".show_localized
         model.icon = "meiyan_icon_etou"
         model.enableNegative = true
         dataArray.append(model)
@@ -98,7 +98,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_ZoomMouth"
-        model.value = 0.16
+        model.value = 0
         model.name = "show_beauty_item_beauty_mouth".show_localized
         model.icon = "meiyan_icon_zuixing"
         model.enableNegative = true
@@ -107,10 +107,35 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = "/beauty_4Items"
         model.key = "BEF_BEAUTY_WHITEN_TEETH"
-        model.value = 0.2
+        model.value = 0
         model.name = "show_beauty_item_beauty_teeth".show_localized
         model.icon = "meiyan_icon_meiya"
         dataArray.append(model)
+        
+        model = BeautyModel()
+        model.path = "/beauty_4Items"
+        model.key = "BEF_BEAUTY_BRIGHTEN_EYE"
+        model.value = 0
+        model.name = "show_beauty_item_beauty_liangyan".show_localized
+        model.icon = "meiyan_icon_liangyan"
+        dataArray.append(model)
+        
+        model = BeautyModel()
+        model.path = "/beauty_4Items"
+        model.key = "BEF_BEAUTY_SMILES_FOLDS"
+        model.value = 0
+        model.name = "show_beauty_item_beauty_qufalingwen".show_localized
+        model.icon = "meiyan_icon_qufalingwen"
+        dataArray.append(model)
+        
+        model = BeautyModel()
+        model.path = "/beauty_4Items"
+        model.key = "BEF_BEAUTY_REMOVE_POUCH"
+        model.value = 0
+        model.name = "show_beauty_item_beauty_heiyanquan".show_localized
+        model.icon = "meiyan_icon_heiyanquan"
+        dataArray.append(model)
+        
         return dataArray
     }
     
@@ -123,33 +148,17 @@ extension BeautyModel {
         dataArray.append(model)
         
         model = BeautyModel()
-        model.path = "/style_makeup/baixi"
-        model.key = "Makeup_ALL"
-        model.value = 0.6
-        model.name = "show_beauty_item_effect_baixi".show_localized
-        model.icon = "meiyan_fgz_baixi"
-        dataArray.append(model)
-        
-        model = BeautyModel()
-        model.path = "/style_makeup/tianmei"
-        model.key = "Makeup_ALL"
-        model.value = 0.6
-        model.name = "show_beauty_item_effect_tianmei".show_localized
-        model.icon = "meiyan_fgz_tianmei"
-        dataArray.append(model)
-        
-        model = BeautyModel()
         model.path = "/style_makeup/cwei"
         model.key = "Makeup_ALL"
-        model.value = 0.6
-        model.name = "show_beauty_item_effect_cwei".show_localized
+        model.value = 0.8
+        model.name = "show_beauty_item_effect_C".show_localized
         model.icon = "meiyan_fgz_cwei"
         dataArray.append(model)
         
         model = BeautyModel()
         model.path = "/style_makeup/yuanqi"
         model.key = "Makeup_ALL"
-        model.value = 0.6
+        model.value = 0.8
         model.name = "show_beauty_item_effect_yuanqi".show_localized
         model.icon = "meiyan_fgz_yuanqi"
         dataArray.append(model)
@@ -249,15 +258,36 @@ extension BeautyModel {
         dataArray.append(model)
         
         model = BeautyModel()
-        model.path = "matting_bg"
-        model.name = "show_beauty_item_sticker_matting".show_localized
-        model.icon = "meiyan_lj_naiyou"
+        model.path = "stickers_zhaocaimao"
+        model.name = "show_beauty_item_sticker_zhaocaimao".show_localized
+        model.icon = "meiyan_sticker_zhaocaimao"
+        dataArray.append(model)
+        
+        return dataArray
+    }
+    static func createBytesAdjustData() -> [BeautyModel] {
+        var dataArray = [BeautyModel]()
+        
+        var model = BeautyModel()
+        model.name = "show_beauty_item_none".show_localized
+        model.icon = "show_beauty_none"
+        model.isSelected = true
         dataArray.append(model)
         
         model = BeautyModel()
-        model.path = "background_blur"
-        model.name = "show_beauty_item_sticker_background".show_localized
-        model.icon = "meiyan_lj_makalong"
+        model.name = "show_beauty_item_adjust_sharpen".show_localized
+        model.icon = "show_beauty_ic_adjust_sharp"
+        model.path = "/beauty_IOS_lite"
+        model.key = "sharp"
+        model.value = 0
+        dataArray.append(model)
+        
+        model = BeautyModel()
+        model.name = "show_beauty_item_adjust_clarity".show_localized
+        model.icon = "show_beauty_ic_adjust_clear"
+        model.path = "/beauty_IOS_lite"
+        model.key = "clear"
+        model.value = 0
         dataArray.append(model)
         
         return dataArray

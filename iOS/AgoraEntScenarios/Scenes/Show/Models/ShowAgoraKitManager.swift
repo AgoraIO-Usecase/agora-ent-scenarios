@@ -400,6 +400,8 @@ class ShowAgoraKitManager: NSObject {
 //        setupContentInspectConfig(false)
         engine.stopPreview()
         engine.setVideoFrameDelegate(nil)
+        engine.enableVirtualBackground(false, backData: nil, segData: nil)
+        ShowAgoraKitManager.isOpenGreen = false
     }
     
     func leaveChannelEx(roomId: String, channelId: String) {
