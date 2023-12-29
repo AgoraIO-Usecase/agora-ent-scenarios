@@ -17,6 +17,7 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.BaseViewBindingActivity
+import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLiveDetailActivityBinding
 import io.agora.scene.show.service.ROOM_AVAILABLE_DURATION
 import io.agora.scene.show.service.ShowRoomDetailModel
@@ -266,8 +267,9 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
         VideoSetting.resetBroadcastSetting()
         VideoSetting.resetAudienceSetting()
         TokenGenerator.expireSecond = -1
-        RtcEngineInstance.beautyProcessor.reset()
         RtcEngineInstance.cleanCache()
+        RtcEngineInstance.resetVirtualBackground()
+        BeautyManager.destroy()
         super.finish()
     }
 }

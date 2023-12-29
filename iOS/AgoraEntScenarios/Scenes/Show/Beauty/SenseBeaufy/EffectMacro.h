@@ -22,7 +22,7 @@ typedef enum : NSUInteger {
     EFDetectConfigModeItsMe,
 } EFDetectConfigMode;
 
-#define EFFECTS_LOG 0
+#define EFFECTS_LOG 1
 #ifdef DEBUG
 #if EFFECTS_LOG
 #define EFFECTSLog(format , ...) NSLog((format) , ##__VA_ARGS__);
