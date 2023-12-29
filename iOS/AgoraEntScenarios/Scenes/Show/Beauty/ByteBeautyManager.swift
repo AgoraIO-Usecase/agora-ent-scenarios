@@ -8,11 +8,10 @@
 import UIKit
 
 class ByteBeautyManager {
+    public lazy var render = BytesBeautyRender()
     
-    public let render = BytesBeautyRender()
-    
-    private var processor: BEFrameProcessor {
-        return render.frameProcessor
+    private var processor: BEEffectManager {
+        return render.effectManager
     }
     
     private var beautyNodes = ["/beauty_IOS_lite", "/reshape_lite", "/beauty_4Items"] {
@@ -37,6 +36,10 @@ class ByteBeautyManager {
     
     var isEnableBeauty: Bool = true
     
+    var isSuccessLicense: Bool {
+        processor.isSuccessLicense
+    }
+    
     func setBeauty(path: String?, key: String?, value: CGFloat) {
         guard let path = path, let key = key else { return }
         if !path.isEmpty, !beautyNodes.contains(path) {
@@ -44,7 +47,7 @@ class ByteBeautyManager {
         }
         processor.updateComposerNodeIntensity(path,
                                               key: key,
-                                              intensity: value)
+                                              intensity: Float(value))
     }
     
     func setStyle(path: String?, key: String?, value: CGFloat) {
@@ -57,7 +60,7 @@ class ByteBeautyManager {
         }
         processor.updateComposerNodeIntensity(path,
                                               key: key,
-                                              intensity: value)
+                                              intensity: Float(value))
         stylePath = path
     }
     
@@ -109,22 +112,8 @@ class ByteBeautyManager {
         })
     }
     
-    func processFrame(pixelBuffer: CVPixelBuffer?) -> CVPixelBuffer? {
-        if !isEnableBeauty { return pixelBuffer }
-        guard let pixel = pixelBuffer else { return nil }
-        let result = processor.process(pixel,
-                                       timeStamp: Date().timeIntervalSince1970)
-        return result?.pixelBuffer
-    }
-    
     func destroy() {
+        render.destroy()
         ByteBeautyManager._sharedManager = nil
-        reset(datas: ShowBeautyFaceVC.beautyData)
-        resetStyle(datas: ShowBeautyFaceVC.styleData)
-        resetSticker(datas: ShowBeautyFaceVC.stickerData)
-        resetFilter(datas: ShowBeautyFaceVC.filterData)
-        ShowBeautyFaceVC.backgroundData.forEach({
-            $0.isSelected = $0.path == nil
-        })
     }
 }

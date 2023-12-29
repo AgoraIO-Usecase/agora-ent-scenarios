@@ -32,9 +32,11 @@ def all_pods
   pod 'JXCategoryView', '1.6.1'
 
   # 火山美颜
-  pod 'BytedEffect', :path => 'bytedEffect.podspec'
+  pod 'bytedEffect', :path => 'bytedEffect.podspec'
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
+  # 相芯美颜
+  pod 'fuLib', :path => 'fu.podspec'
   
   pod 'AgoraSyncManager', '2.1.1'
 
@@ -98,7 +100,7 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
       shell_script_path = "Pods/Target Support Files/#{target.name}/#{target.name}-frameworks.sh"
       if File::exists?(shell_script_path)
         shell_script_input_lines = File.readlines(shell_script_path)

@@ -7,9 +7,11 @@
 
 #define FURenderMoudle <FURenderKit/FURenderKit.h>
 
-#import <Foundation/Foundation.h>
-#if __has_include("FUManager.h") && __has_include(<FURenderKit/FURenderKit.h>)
+#import <UIKit/UIKit.h>
+#if __has_include("FUManager.h")
 #import "FUManager.h"
+#endif
+#if __has_include(<FURenderKit/FURenderKit.h>)
 #import <FURenderKit/FURenderKit.h>
 #endif
 
@@ -22,6 +24,22 @@ NS_ASSUME_NONNULL_BEGIN
 #if __has_include("FUManager.h")
 @property (nonatomic, strong) FUManager *fuManager;
 #endif
+
+- (void)setBeautyWithPath: (NSString *)path key: (NSString *)key value: (float)value;
+
+- (void)setStyleWithPath: (NSString *)path key: (NSString *)key value: (float)value;
+
+- (void)setAnimojiWithPath:(NSString *)path;
+
+- (void)setStickerWithPath: (NSString *)path;
+
+- (void)reset;
+
+- (void)resetStyle;
+
+- (void)resetSticker;
+
+- (void)destroy;
 
 @end
 

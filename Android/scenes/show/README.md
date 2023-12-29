@@ -58,22 +58,47 @@ if(!isShowEmpty){
 
 - <mark>4. </mark> 美颜配置
   
+  **商汤美颜配置**
   美颜资源请联系商汤科技商务获取。
   
   ![xxx](image/SamplePicture5.png)
   
-  > - 将STMobileJNI-release.aar放在**scenes/show/aars/STMobileJNI**目录下
+  > - 将STMobileJNI-release.aar放在**scenes/show/aars/beauty_sensetime/STMobileJNI**目录下
   > 
-  > - 将SenseArSourceManager-release.aar放在**scenes/show/aars/SenseArSourceManager**目录下
+  > - 将SenseArSourceManager-release.aar放在**scenes/show/aars/beauty_sensetime/SenseArSourceManager**目录下
   > 
-  > - HardwareBuffer-release.aar放在**scenes/show/aars/HardwareBuffer**目录下
+  > - HardwareBuffer-release.aar放在**scenes/show/aars/beauty_sensetime/HardwareBuffer**目录下
   > 
-  > - 将SDK里的资源文件复制到**scenes/show/src/main/assets** 目录下。这个项目用到的资源文件列举如下：
+  > - 将SDK里的资源文件复制到**scenes/show/src/main/assets/beauty_sensetime** 目录下。这个项目用到的资源文件列举如下：
   >   
   >   - license/SenseME.lic : 证书资源
   >   - models/*.model : AI等训练模型资源
   >   - sticker_face_shape/lianxingface.zip : 贴纸资源
   >   - style_lightly/*.zip : 风格妆资源
+
+  **相芯美颜配置**
+  美颜资源请联系相芯商务获取。
+
+  > - 将相芯证书authpack.java放在**scenes/show/src/main/java/io/agora/scene/show/beauty**目录下
+  > 
+  > - 将SDK里的资源文件复制到**scenes/show/src/main/assets/beauty_faceunity** 目录下。这个项目用到的资源文件列举如下：
+  >
+  >   - makeup : 风格妆资源
+  >   - sticker : 贴纸资源
+
+  **火山美颜配置**
+  美颜资源请联系火山商务获取。
+  
+  > - 将effectAAR-release.aar放在**scenes/show/aars/beauty_bytedance/EffectAAR**目录下
+  >
+  > - 将SDK里的资源文件复制到**scenes/show/src/main/assets/beauty_bytedance** 目录下。这个项目用到的资源文件列举如下：
+  >
+  >   - LicenseBag.bundle : 证书资源
+  >   - ModelResource.bundle : AI等训练模型资源
+  >   - StickerResource.bundle : 贴纸资源
+  >   - ComposeMakeup.bundle : 风格妆资源
+  > 
+  > - 修改**scenes/show/src/main/java/io/agora/scene/show/beauty/ByteDanceBeautySDK.kt**中LICENSE_NAME为证书文件名
 
 - <mark>5. </mark> 用 Android Studio 运行项目即可开始您的体验
 
