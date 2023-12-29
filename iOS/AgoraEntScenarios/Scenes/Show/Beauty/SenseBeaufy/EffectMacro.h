@@ -17,6 +17,10 @@ typedef NS_ENUM(NSUInteger, EffectsType){
     EffectsTypeVideo,
 };
 
+typedef enum : NSUInteger {
+    EFDetectConfigModeOther = 0,
+    EFDetectConfigModeItsMe,
+} EFDetectConfigMode;
 
 #define EFFECTS_LOG 0
 #ifdef DEBUG
@@ -27,6 +31,12 @@ typedef NS_ENUM(NSUInteger, EffectsType){
 #endif
 #else
 #define EFFECTSLog(format , ...)
+#endif
+
+#ifdef DEBUG
+#if EFFECTS_LOG
+#define NSLog(format , ...) NSLog((format) , ##__VA_ARGS__);
+#endif
 #endif
 
 #if EFFECTS_LOG
