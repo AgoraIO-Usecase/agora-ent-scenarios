@@ -107,6 +107,8 @@ android {
             storePassword "965606"
             keyAlias "agora"
             keyPassword "965606"
+            v1SigningEnabled true
+            v2SigningEnabled true
         }
     }
 

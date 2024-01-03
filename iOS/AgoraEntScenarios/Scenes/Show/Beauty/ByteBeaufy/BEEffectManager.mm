@@ -204,8 +204,10 @@ static bool USE_3_BUFFER = NO;
     
     CHECK_RET_AND_RETURN_RESULT(bef_effect_ai_set_intensity, status, ;)
 }
+#endif
 
 - (void)setStickerPath:(NSString *)path {
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     if (![self be_empty:path]) {
         path = [self.provider stickerPath:path];
     }
@@ -214,16 +216,20 @@ static bool USE_3_BUFFER = NO;
     status = bef_effect_ai_set_effect(_handle, [path UTF8String]);
     
     CHECK_RET_AND_RETURN_RESULT(bef_effect_ai_set_effect, status, ;)
+#endif
 }
 
 - (void)setStickerAbsolutePath:(NSString*)path
 {
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     bef_effect_result_t status = BEF_RESULT_SUC;
     status = bef_effect_ai_set_effect(_handle, [path UTF8String]);
 
     CHECK_RET_AND_RETURN_RESULT(bef_effect_ai_set_effect, status, ;)
+#endif
 }
 
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 - (void)setAvatarPath:(NSString*) path {
     bef_effect_result_t status = BEF_RESULT_SUC;
     status = bef_effect_ai_set_effect(_handle, [path UTF8String]);
@@ -235,12 +241,15 @@ static bool USE_3_BUFFER = NO;
 - (void)releaseEffectManager {
     bef_effect_ai_destroy(_handle);
 }
-
+#endif
 - (void)updateComposerNodes:(NSArray<NSString *> *)nodes {
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     [self updateComposerNodes:nodes withTags:nil];
+#endif
 }
 
 - (void)updateComposerNodes:(NSArray<NSString *> *)nodes withTags:(NSArray<NSString *> *)tags {
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     if (tags != nil && nodes.count != tags.count) {
         NSLog(@"bef_effect_ai_composer_set_nodes error: count of tags must equal to nodes");
         return;
@@ -334,6 +343,7 @@ static bool USE_3_BUFFER = NO;
 }
 
 - (void)appendComposerNodes:(NSArray<NSString *> *)nodes withTags:(NSArray<NSString *> *)tags {
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     if (tags != nil && nodes.count != tags.count) {
         NSLog(@"bef_effect_ai_composer_set_nodes error: count of tags must equal to nodes");
         return;
@@ -428,6 +438,7 @@ static bool USE_3_BUFFER = NO;
 }
 
 - (void)removeComposerNodes:(NSArray<NSString *> *)nodes {
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 #if BE_LOAD_RESOURCE_TIMEOUT
     for (NSString *node in nodes) {
         [_existResourcePathes removeObject:node];
@@ -476,10 +487,11 @@ static bool USE_3_BUFFER = NO;
         free(nodesPath[i]);
     }
     free(nodesPath);
+#endif
 }
 
 - (void)updateComposerNodeIntensity:(NSString *)node key:(NSString *)key intensity:(float)intensity {
-    
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     if ([self.resourcePath isEqualToString:@"sticker"]) {
         node = [self.provider stickerPath:node];
     }
@@ -491,6 +503,7 @@ static bool USE_3_BUFFER = NO;
     CHECK_RET_AND_RETURN_RESULT(bef_effect_ai_composer_update_node, result, ;)
 }
 
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 - (NSArray<NSString *> *)availableFeatures {
     //Dynamic lookup feature availability
     int feature_len = 60;
