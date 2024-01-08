@@ -15,7 +15,7 @@ object ScenesConstructor {
     private const val ktvSingBattleClazz = "io.agora.scene.ktv.singbattle.create.RoomListActivity"
 
     // ktv-大合唱
-    private const val ktvCantataClazz = ""
+    private const val ktvCantataClazz = "io.agora.scene.cantata.ui.activity.RoomListActivity"
 
     // ktv-接唱
     private const val ktvSingRelayClazz = "io.agora.scene.ktv.singrelay.create.RoomListActivity"
@@ -80,7 +80,7 @@ object ScenesConstructor {
                         name = context.getString(R.string.app_home_scene_ktv_cantata),
                         tip = context.getString(R.string.app_home_scene_ktv_cantata_tips),
                         background = R.drawable.bg_scene_ktv_cantata,
-                        active = false
+                        active = true
                     )
                 )
                 return subScenes
