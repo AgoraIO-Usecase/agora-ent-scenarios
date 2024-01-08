@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_dialog_more"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/create_room_top_radius"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:paddingBottom="20dp">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvTips"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        app:cardBackgroundColor="#1AFA396A"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:src="@mipmap/ic_tip_error" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvNotice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:padding="8dp"
+            android:text="@string/cantata_create_room_tips"
+            android:textColor="#303553"
+            android:textSize="12sp" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btnRandom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="20dp"
+        android:drawableStart="@mipmap/ic_random"
+        android:drawablePadding="3dp"
+        android:text="@string/cantata_random"
+        android:textColor="#3C4267"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cvTips" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="@string/cantata_room_title"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/btnRandom" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutRoomName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:background="@android:color/transparent"
+        android:paddingVertical="8dp"
+        app:boxBackgroundMode="none"
+        app:boxStrokeColor="@android:color/transparent"
+        app:hintEnabled="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnRandom">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etRoomName"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/create_room_et_selector"
+            android:gravity="start|center"
+            android:hint="@string/cantata_room_name_hint"
+            android:imeOptions="actionDone"
+            android:maxLength="15"
+            android:maxLines="1"
+            android:padding="12dp"
+            android:singleLine="true"
+            android:textColor="#040925"
+            android:textColorHint="#979CBB"
+            android:textSize="15sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnRandom" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/cantata_room_pwd"
+        android:textColor="#3C4267"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutRoomName" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cbPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="4dp"
+        android:background="@android:color/transparent"
+        android:button="@drawable/cb_def_selector"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@+id/tvPassword"
+        app:layout_constraintStart_toEndOf="@+id/tvPassword"
+        app:layout_constraintTop_toTopOf="@+id/tvPassword" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvPWDTips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:text="@string/cantata_please_input_4_pwd"
+        android:textColor="#FA396A"
+        android:textSize="12dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/tvPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvPassword" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:background="@android:color/transparent"
+        android:paddingVertical="8dp"
+        app:boxBackgroundMode="none"
+        android:layout_marginTop="25dp"
+        app:boxStrokeColor="@android:color/transparent"
+        app:hintEnabled="false"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintEnd_toEndOf="@+id/layoutRoomName"
+        app:layout_constraintStart_toStartOf="@id/layoutRoomName"
+        app:layout_constraintTop_toBottomOf="@id/tvPassword">
+
+        <io.agora.scene.widget.RoomEncryptionInputView
+            android:id="@+id/etCode"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_centerInParent="true"
+            android:inputType="number"
+            android:textCursorDrawable="@drawable/bg_edit_cursor"
+            android:visibility="visible"
+            android:paddingVertical="0dp"
+            android:background="@android:color/transparent"
+            app:ui_widget_backColor="#F5F8FF"
+            app:ui_widget_checkedColor="#156EF3"
+            app:ui_widget_defaultColor="@color/white"
+            app:ui_widget_isPwd="false"
+            app:ui_widget_isWaitInput="true"
+            app:ui_widget_round="8dp"
+            app:ui_widget_textColor="#040925"
+            app:ui_widget_textLength="4"
+            app:ui_widget_textSize="16sp"
+            app:ui_widget_waitInputColor="#4E5969" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnCreateRoom"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/create_room_btn_blue"
+        android:gravity="center"
+        android:text="@string/cantata_create_room"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutPassword" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
