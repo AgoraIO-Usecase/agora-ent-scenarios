@@ -1,13 +1,11 @@
 package io.agora.scene.ktv.singrelay.debugSettings;
 
-import io.agora.scene.ktv.singrelay.widget.MusicSettingDialog;
-
 public class KTVDebugSettingBean {
     private final KTVDebugSettingsDialog.Callback mCallback;
 
     private boolean isAudioDumpEnabled = false;
 
-    private int mScoringLevel = 10; // According to Karaoke.getScoreLevel
+    private int mScoringLevel = 15; // According to Karaoke.getScoreLevel
     private int mScoringOffset = 0;
 
     public KTVDebugSettingBean(KTVDebugSettingsDialog.Callback mCallback) {
