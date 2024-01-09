@@ -5393,11 +5393,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YS397FG5PA;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5;
+				DEVELOPMENT_TEAM = JDPG69R49Z;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5419,7 +5417,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.0.0;
+				MARKETING_VERSION = 3.1.100;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
@@ -5431,25 +5429,11 @@
 					"-framework",
 					"\"Accelerate\"",
 					"-framework",
-					"\"AgoraAiEchoCancellationExtension\"",
-					"-framework",
 					"\"AgoraAiNoiseSuppressionExtension\"",
-					"-framework",
-					"\"AgoraAudioBeautyExtension\"",
 					"-framework",
 					"\"AgoraChat\"",
 					"-framework",
-					"\"AgoraClearVisionExtension\"",
-					"-framework",
-					"\"AgoraContentInspectExtension\"",
-					"-framework",
-					"\"AgoraDav1d\"",
-					"-framework",
-					"\"AgoraFaceDetectionExtension\"",
-					"-framework",
 					"\"AgoraLyricsScore\"",
-					"-framework",
-					"\"AgoraReplayKitExtension\"",
 					"-framework",
 					"\"AgoraRtcKit\"",
 					"-framework",
@@ -5457,17 +5441,7 @@
 					"-framework",
 					"\"AgoraSoundTouch\"",
 					"-framework",
-					"\"AgoraSpatialAudioExtension\"",
-					"-framework",
 					"\"AgoraSyncManager\"",
-					"-framework",
-					"\"AgoraVideoDecoderExtension\"",
-					"-framework",
-					"\"AgoraVideoEncoderExtension\"",
-					"-framework",
-					"\"AgoraVideoQualityAnalyzerExtension\"",
-					"-framework",
-					"\"AgoraVideoSegmentationExtension\"",
 					"-framework",
 					"\"Agora_Scene_Utils\"",
 					"-framework",
@@ -5567,33 +5541,7 @@
 					"-framework",
 					"\"Zip\"",
 					"-framework",
-					"\"video_dec\"",
-					"-framework",
-					"\"video_enc\"",
-					"-weak_framework",
-					"\"AgoraAiEchoCancellationExtension\"",
-					"-weak_framework",
 					"\"AgoraAiNoiseSuppressionExtension\"",
-					"-weak_framework",
-					"\"AgoraAudioBeautyExtension\"",
-					"-weak_framework",
-					"\"AgoraClearVisionExtension\"",
-					"-weak_framework",
-					"\"AgoraContentInspectExtension\"",
-					"-weak_framework",
-					"\"AgoraFaceDetectionExtension\"",
-					"-weak_framework",
-					"\"AgoraReplayKitExtension\"",
-					"-weak_framework",
-					"\"AgoraSpatialAudioExtension\"",
-					"-weak_framework",
-					"\"AgoraVideoDecoderExtension\"",
-					"-weak_framework",
-					"\"AgoraVideoEncoderExtension\"",
-					"-weak_framework",
-					"\"AgoraVideoQualityAnalyzerExtension\"",
-					"-weak_framework",
-					"\"AgoraVideoSegmentationExtension\"",
 					"-weak_framework",
 					"\"CoreML\"",
 					"-weak_framework",
@@ -5603,10 +5551,9 @@
 					"-weak_framework",
 					"\"Photos\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.RTCLiveDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = wildcard;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AgoraEntScenarios/AgoraEntScenarios-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -5623,11 +5570,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YS397FG5PA;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5;
+				DEVELOPMENT_TEAM = JDPG69R49Z;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5649,7 +5594,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.0.0;
+				MARKETING_VERSION = 3.1.100;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
@@ -5661,25 +5606,11 @@
 					"-framework",
 					"\"Accelerate\"",
 					"-framework",
-					"\"AgoraAiEchoCancellationExtension\"",
-					"-framework",
 					"\"AgoraAiNoiseSuppressionExtension\"",
-					"-framework",
-					"\"AgoraAudioBeautyExtension\"",
 					"-framework",
 					"\"AgoraChat\"",
 					"-framework",
-					"\"AgoraClearVisionExtension\"",
-					"-framework",
-					"\"AgoraContentInspectExtension\"",
-					"-framework",
-					"\"AgoraDav1d\"",
-					"-framework",
-					"\"AgoraFaceDetectionExtension\"",
-					"-framework",
 					"\"AgoraLyricsScore\"",
-					"-framework",
-					"\"AgoraReplayKitExtension\"",
 					"-framework",
 					"\"AgoraRtcKit\"",
 					"-framework",
@@ -5687,17 +5618,7 @@
 					"-framework",
 					"\"AgoraSoundTouch\"",
 					"-framework",
-					"\"AgoraSpatialAudioExtension\"",
-					"-framework",
 					"\"AgoraSyncManager\"",
-					"-framework",
-					"\"AgoraVideoDecoderExtension\"",
-					"-framework",
-					"\"AgoraVideoEncoderExtension\"",
-					"-framework",
-					"\"AgoraVideoQualityAnalyzerExtension\"",
-					"-framework",
-					"\"AgoraVideoSegmentationExtension\"",
 					"-framework",
 					"\"Agora_Scene_Utils\"",
 					"-framework",
@@ -5797,33 +5718,7 @@
 					"-framework",
 					"\"Zip\"",
 					"-framework",
-					"\"video_dec\"",
-					"-framework",
-					"\"video_enc\"",
-					"-weak_framework",
-					"\"AgoraAiEchoCancellationExtension\"",
-					"-weak_framework",
 					"\"AgoraAiNoiseSuppressionExtension\"",
-					"-weak_framework",
-					"\"AgoraAudioBeautyExtension\"",
-					"-weak_framework",
-					"\"AgoraClearVisionExtension\"",
-					"-weak_framework",
-					"\"AgoraContentInspectExtension\"",
-					"-weak_framework",
-					"\"AgoraFaceDetectionExtension\"",
-					"-weak_framework",
-					"\"AgoraReplayKitExtension\"",
-					"-weak_framework",
-					"\"AgoraSpatialAudioExtension\"",
-					"-weak_framework",
-					"\"AgoraVideoDecoderExtension\"",
-					"-weak_framework",
-					"\"AgoraVideoEncoderExtension\"",
-					"-weak_framework",
-					"\"AgoraVideoQualityAnalyzerExtension\"",
-					"-weak_framework",
-					"\"AgoraVideoSegmentationExtension\"",
 					"-weak_framework",
 					"\"CoreML\"",
 					"-weak_framework",
@@ -5833,10 +5728,9 @@
 					"-weak_framework",
 					"\"Photos\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.RTCLiveDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = wildcard;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AgoraEntScenarios/AgoraEntScenarios-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;

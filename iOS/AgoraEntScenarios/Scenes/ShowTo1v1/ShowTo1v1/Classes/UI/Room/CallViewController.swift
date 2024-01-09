@@ -170,9 +170,9 @@ extension CallViewController {
                 let connection = AgoraRtcConnection()
                 connection.channelId = channelId
                 connection.localUid = uid
-                callApi?.setupContentInspectExConfig(rtcEngine: rtcEngine!,
-                                                   enable: true,
-                                                   connection: connection)
+//                callApi?.setupContentInspectExConfig(rtcEngine: rtcEngine!,
+//                                                   enable: true,
+//                                                   connection: connection)
                 callApi?.moderationAudio(appId: showTo1v1AppId!,
                                          channelName: channelId,
                                          user: userInfo)

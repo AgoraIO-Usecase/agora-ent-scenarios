@@ -143,7 +143,7 @@ class BroadcasterViewController: BaseRoomViewController {
                 guard let self = self, let rtcEngine = self.rtcEngine else {return}
 //                self.callApi?.setupContentInspectConfig(rtcEngine: rtcEngine, enable: true, uid: "\(uid)", channelId: channelId)
 //                self.callApi?.moderationAudio(appId: showTo1v1AppId!, channelName: channelId, user: self.currentUser!)
-                self.callApi?.setupContentInspectConfig(rtcEngine: rtcEngine, enable: true, uid: "\(uid)", channelId: channelId)
+            //    self.callApi?.setupContentInspectConfig(rtcEngine: rtcEngine, enable: true, uid: "\(uid)", channelId: channelId)
                 self.callApi?.moderationAudio(appId: showTo1v1AppId!, channelName: channelId, user: self.currentUser!)
             })
             
