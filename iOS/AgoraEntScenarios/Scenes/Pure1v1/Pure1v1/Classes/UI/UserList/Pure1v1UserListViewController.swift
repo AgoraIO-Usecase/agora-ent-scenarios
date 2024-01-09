@@ -337,7 +337,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             let connection = AgoraRtcConnection()
             connection.channelId = "\(connectedChannelId ?? "")"
             connection.localUid = UInt(userInfo?.userId ?? "") ?? 0
-            setupContentInspectConfig(true, connection: connection)
+        //    setupContentInspectConfig(true, connection: connection)
             moderationAudio(channelName: connection.channelId)
             break
         case .prepared:
@@ -418,27 +418,27 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
 }
 
 extension Pure1v1UserListViewController {
-    private func setupContentInspectConfig(_ enable: Bool, connection: AgoraRtcConnection) {
-        let config = AgoraContentInspectConfig()
-        let dic: [String: String] = [
-            "id": "\(connection.localUid)",
-            "sceneName": "Pure1v1",
-            "userNo": "\(connection.localUid)"
-        ]
-        
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
-            pure1v1Error("setupContentInspectConfig fail")
-            return
-        }
-        let jsonStr = String(data: jsonData, encoding: .utf8)
-        config.extraInfo = jsonStr
-        let module = AgoraContentInspectModule()
-        module.interval = 30
-//        module.type = .imageModeration
-//        config.modules = [module]
-//        let ret = rtcEngine.enableContentInspectEx(enable, config: config, connection: connection)
-//        pure1v1Print("setupContentInspectConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret)")
-    }
+//    private func setupContentInspectConfig(_ enable: Bool, connection: AgoraRtcConnection) {
+//        let config = AgoraContentInspectConfig()
+//        let dic: [String: String] = [
+//            "id": "\(connection.localUid)",
+//            "sceneName": "Pure1v1",
+//            "userNo": "\(connection.localUid)"
+//        ]
+//        
+//        guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
+//            pure1v1Error("setupContentInspectConfig fail")
+//            return
+//        }
+//        let jsonStr = String(data: jsonData, encoding: .utf8)
+//        config.extraInfo = jsonStr
+//        let module = AgoraContentInspectModule()
+//        module.interval = 30
+////        module.type = .imageModeration
+////        config.modules = [module]
+////        let ret = rtcEngine.enableContentInspectEx(enable, config: config, connection: connection)
+////        pure1v1Print("setupContentInspectConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret)")
+//    }
     
     /// 语音审核
     private func moderationAudio(channelName: String) {

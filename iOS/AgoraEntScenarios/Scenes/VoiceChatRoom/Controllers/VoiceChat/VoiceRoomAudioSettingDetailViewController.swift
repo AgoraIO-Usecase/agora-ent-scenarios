@@ -46,6 +46,9 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
             tableView.reloadData()
         }
     }
+    
+    public var aed_state: AED_STATE = .off
+    public var aspt_state: ASPT_STATE = .off
 
     var soundEffect: Int = 1 {
         didSet {
@@ -75,6 +78,8 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
     }
 
     var selBlock: ((AINS_STATE) -> Void)?
+    var aedBlock: ((AED_STATE) -> Void)?
+    var asptBlock: ((ASPT_STATE) -> Void)?
     var soundBlock: ((Int) -> Void)?
     var turnAIAECBlock:((Bool) ->Void)?
     var turnAGCBlock:((Bool) ->Void)?
@@ -238,7 +243,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
             }
 
         case .Noise:
-            if indexPath.row > 1 && indexPath.row < 7 {
+            if indexPath.row > 1 && indexPath.row < 7 && indexPath.section != 0 {
                 return 74
             } else {
                 return 54
@@ -284,7 +289,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
         else {
             switch section {
             case 0:
-                return 1
+                return ains_state != .off ? 3 : 1
             case 1:
                 return 1
             default:
@@ -521,15 +526,35 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
         else {
              if indexPath.section == 0 {
                  let cell: VMANISSetTableViewCell = tableView.dequeueReusableCell(withIdentifier: sIdentifier) as! VMANISSetTableViewCell
-                 cell.ains_state = ains_state
-                 cell.selectionStyle = .none
-                 cell.isTouchAble = isTouchAble
-                 cell.selBlock = { [weak self] state in
-                     self?.ains_state = state
-                     guard let block = self?.selBlock else { return }
-                     block(state)
+                 if indexPath.row == 0 {
+                     cell.ains_state = ains_state
+                     cell.selectionStyle = .none
+                     cell.isTouchAble = isTouchAble
+                     cell.selBlock = { [weak self] state in
+                         self?.ains_state = state
+                         guard let block = self?.selBlock else { return }
+                         block(state)
+                     }
+                     cell.selectionStyle = .none
+                 } else if indexPath.row == 1 {
+                     cell.cellType = .music
+                     cell.aed_state = aed_state
+                     cell.selectionStyle = .none
+                     cell.aedBlock = {  [weak self] state in
+                         self?.aed_state = state
+                         guard let block = self?.aedBlock else { return }
+                         block(state)
+                     }
+                 } else if indexPath.row == 2 {
+                     cell.cellType = .voice
+                     cell.aspt_state = aspt_state
+                     cell.selectionStyle = .none
+                     cell.asptBlock = {  [weak self] state in
+                         self?.aspt_state = state
+                         guard let block = self?.asptBlock else { return }
+                         block(state)
+                     }
                  }
-                 cell.selectionStyle = .none
                  return cell
              } else if indexPath.section == 1 {
                  let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: tIdentifier)!

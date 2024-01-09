@@ -118,6 +118,9 @@
     [self.listContainerView.leftAnchor constraintEqualToAnchor:self.view.leftAnchor].active = YES;
     [self.listContainerView.rightAnchor constraintEqualToAnchor:self.view.rightAnchor].active = YES;
     [self.listContainerView.topAnchor constraintEqualToAnchor:self.naviView.bottomAnchor].active = YES;
+    
+    self.myCategoryView.defaultSelectedIndex = 2;
+    self.myCategoryView.userInteractionEnabled = false;
 }
 
 // 返回列表的数量

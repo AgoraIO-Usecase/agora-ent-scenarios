@@ -232,6 +232,12 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                     cell.contentLabel.text = "voice_Medium".voice_localized()
                 case .off:
                     cell.contentLabel.text = "voice_off".voice_localized()
+                case .aiHigh:
+                    cell.contentLabel.text = "AI强"
+                case .aiMid:
+                    cell.contentLabel.text = "AI弱"
+                case .custom:
+                    cell.contentLabel.text = "自定义"
                 }
                 
                 
@@ -370,6 +376,12 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                     cell.contentLabel.text = "voice_Medium".voice_localized()
                 case .off:
                     cell.contentLabel.text = "voice_off".voice_localized()
+                case .aiHigh:
+                    cell.contentLabel.text = "AI强"
+                case .aiMid:
+                    cell.contentLabel.text = "AI弱"
+                case .custom:
+                    cell.contentLabel.text = "自定义"
                 }
             }
             return cell

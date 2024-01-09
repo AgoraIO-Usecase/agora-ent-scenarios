@@ -977,29 +977,29 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark - rtc utils
-- (void)setupContentInspectConfig {
-    AgoraContentInspectConfig* config = [AgoraContentInspectConfig new];
-    NSDictionary* dic = @{
-        @"userNo": [VLUserCenter user].id ? : @"unknown",
-        @"sceneName": @"RS"
-    };
-    NSData* jsonData = [NSJSONSerialization dataWithJSONObject:dic options:0 error:nil];
-    NSString* jsonStr = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    config.extraInfo = jsonStr;
-    AgoraContentInspectModule* module = [AgoraContentInspectModule new];
-    module.interval = 30;
-    module.type = AgoraContentInspectTypeModeration;
-    config.modules = @[module];
-    [self.RTCkit enableContentInspect:YES config:config];
-    
-    //添加音频鉴黄接口
-    [[NetworkManager shared] voiceIdentifyWithChannelName:self.roomModel.roomNo
-                                              channelType:1
-                                                sceneType:SceneTypeKtv
-                                                  success:^(NSString * msg) {
-        SBGLogInfo(@"voiceIdentify success: %@", msg);
-    }];
-}
+//- (void)setupContentInspectConfig {
+//    AgoraContentInspectConfig* config = [AgoraContentInspectConfig new];
+//    NSDictionary* dic = @{
+//        @"userNo": [VLUserCenter user].id ? : @"unknown",
+//        @"sceneName": @"RS"
+//    };
+//    NSData* jsonData = [NSJSONSerialization dataWithJSONObject:dic options:0 error:nil];
+//    NSString* jsonStr = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+//    config.extraInfo = jsonStr;
+//    AgoraContentInspectModule* module = [AgoraContentInspectModule new];
+//    module.interval = 30;
+//    module.type = AgoraContentInspectTypeModeration;
+//    config.modules = @[module];
+//    [self.RTCkit enableContentInspect:YES config:config];
+//    
+//    //添加音频鉴黄接口
+//    [[NetworkManager shared] voiceIdentifyWithChannelName:self.roomModel.roomNo
+//                                              channelType:1
+//                                                sceneType:SceneTypeKtv
+//                                                  success:^(NSString * msg) {
+//        SBGLogInfo(@"voiceIdentify success: %@", msg);
+//    }];
+//}
 
 - (void)joinRTCChannel {
     self.RTCkit = [AgoraRtcEngineKit sharedEngineWithAppId:[AppContext.shared appId] delegate:self];
@@ -1024,7 +1024,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.RTCkit enableVideo];
     [self.RTCkit enableAudio];
     
-    [self setupContentInspectConfig];
+ //   [self setupContentInspectConfig];
     
     VLSBGRoomSeatModel* myseat = [self.seatsArray objectAtIndex:0];
     
