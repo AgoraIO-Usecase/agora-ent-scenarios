@@ -101,27 +101,27 @@ class ShowAgoraKitManager: NSObject {
          return config
     }
     
-    private func setupContentInspectConfig(_ enable: Bool, connection: AgoraRtcConnection) {
-        let config = AgoraContentInspectConfig()
-        let dic: [String: String] = [
-            "id": VLUserCenter.user.id,
-            "sceneName": "show",
-            "userNo": VLUserCenter.user.userNo
-        ]
-        
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
-            showLogger.error("setupContentInspectConfig fail")
-            return
-        }
-        let jsonStr = String(data: jsonData, encoding: .utf8)
-        config.extraInfo = jsonStr
-        let module = AgoraContentInspectModule()
-        module.interval = 30
-//        module.type = .imageModeration
-//        config.modules = [module]
-//        let ret = engine?.enableContentInspectEx(enable, config: config, connection: connection)
-//        showLogger.info("setupContentInspectConfig: \(ret ?? -1)")
-    }
+//    private func setupContentInspectConfig(_ enable: Bool, connection: AgoraRtcConnection) {
+//        let config = AgoraContentInspectConfig()
+//        let dic: [String: String] = [
+//            "id": VLUserCenter.user.id,
+//            "sceneName": "show",
+//            "userNo": VLUserCenter.user.userNo
+//        ]
+//        
+//        guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
+//            showLogger.error("setupContentInspectConfig fail")
+//            return
+//        }
+//        let jsonStr = String(data: jsonData, encoding: .utf8)
+//        config.extraInfo = jsonStr
+//        let module = AgoraContentInspectModule()
+//        module.interval = 30
+////        module.type = .imageModeration
+////        config.modules = [module]
+////        let ret = engine?.enableContentInspectEx(enable, config: config, connection: connection)
+////        showLogger.info("setupContentInspectConfig: \(ret ?? -1)")
+//    }
     
     /// 语音审核
     private func moderationAudio(channelName: String, role: AgoraClientRole) {
@@ -191,7 +191,7 @@ class ShowAgoraKitManager: NSObject {
                                mediaOptions: mediaOptions) {[weak self] channelName, uid, elapsed in
             let cost = Int(-date.timeIntervalSinceNow * 1000)
             showLogger.info("join room[\(channelName)] ex success uid: \(uid) cost \(cost) ms", context: kShowLogBaseContext)
-            self?.setupContentInspectConfig(true, connection: connection)
+       //     self?.setupContentInspectConfig(true, connection: connection)
 //            self?.moderationAudio(channelName: targetChannelId, role: role)
             self?.applySimulcastStream(connection: connection)
         }
@@ -276,17 +276,17 @@ class ShowAgoraKitManager: NSObject {
             assert(true, "rtc engine not initlized")
             return
         }
-        let source = AgoraVirtualBackgroundSource()
-        source.backgroundSourceType = .blur
-        source.blurDegree = .high
-        var seg: AgoraSegmentationProperty?
-        if ShowAgoraKitManager.isOpenGreen {
-            seg = AgoraSegmentationProperty()
-            seg?.modelType = .agoraGreen
-            seg?.greenCapacity = greenCapacity
-        }
-        let ret = engine.enableVirtualBackground(isOn, backData: source, segData: seg)
-        showLogger.info("isOn = \(isOn), enableVirtualBackground ret = \(ret)")
+       // let source = AgoraVirtualBackgroundSource()
+//        source.backgroundSourceType = .blur
+//        source.blurDegree = .high
+//        var seg: AgoraSegmentationProperty?
+//        if ShowAgoraKitManager.isOpenGreen {
+//            seg = AgoraSegmentationProperty()
+//            seg?.modelType = .agoraGreen
+//            seg?.greenCapacity = greenCapacity
+//        }
+//        let ret = engine.enableVirtualBackground(isOn, backData: source, segData: seg)
+//        showLogger.info("isOn = \(isOn), enableVirtualBackground ret = \(ret)")
     }
     
     /// 设置虚拟背景
@@ -294,20 +294,20 @@ class ShowAgoraKitManager: NSObject {
         guard let bundlePath = Bundle.main.path(forResource: "showResource", ofType: "bundle"),
               let bundle = Bundle(path: bundlePath) else { return }
         let imgPath = bundle.path(forResource: imagePath, ofType: "jpg")
-        let source = AgoraVirtualBackgroundSource()
-        source.backgroundSourceType = .img
-        source.source = imgPath
-        var seg: AgoraSegmentationProperty?
-        if ShowAgoraKitManager.isOpenGreen {
-            seg = AgoraSegmentationProperty()
-            seg?.modelType = .agoraGreen
-            seg?.greenCapacity = greenCapacity
-        }
+//        let source = AgoraVirtualBackgroundSource()
+//        source.backgroundSourceType = .img
+//        source.source = imgPath
+//        var seg: AgoraSegmentationProperty?
+//        if ShowAgoraKitManager.isOpenGreen {
+//            seg = AgoraSegmentationProperty()
+//            seg?.modelType = .agoraGreen
+//            seg?.greenCapacity = greenCapacity
+//        }
         guard let engine = engine else {
             assert(true, "rtc engine not initlized")
             return
         }
-        engine.enableVirtualBackground(isOn, backData: source, segData: seg)
+//        engine.enableVirtualBackground(isOn, backData: source, segData: seg)
     }
     
     func updateChannelEx(channelId: String, options: AgoraRtcChannelMediaOptions) {

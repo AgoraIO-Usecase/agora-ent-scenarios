@@ -63,6 +63,19 @@ class HomeContentViewController: UIViewController {
         collectionView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        
+        let msgLabel = UILabel()
+        msgLabel.text = "本Demo仅限客户项目测试"
+        msgLabel.textColor = .red
+        msgLabel.textAlignment = .center
+        msgLabel.font = UIFont.systemFont(ofSize: 20)
+        view.addSubview(msgLabel)
+        
+        msgLabel.translatesAutoresizingMaskIntoConstraints = false
+        msgLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        msgLabel.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        msgLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        msgLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
 }
 
@@ -109,9 +122,9 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
             navigationController?.pushViewController(vc, animated: true)
             
         case .spatial_voice:
-            let vc = SARoomsViewController(user: VLUserCenter.user)
-            navigationController?.pushViewController(vc, animated: true)
-            
+//            let vc = SARoomsViewController(user: VLUserCenter.user)
+//            navigationController?.pushViewController(vc, animated: true)
+            break
         case .show:
             let vc = ShowRoomListVC()
             navigationController?.pushViewController(vc, animated: true)
