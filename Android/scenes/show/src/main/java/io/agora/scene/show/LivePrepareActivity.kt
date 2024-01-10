@@ -11,11 +11,9 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import io.agora.beautyapi.sensetime.*
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
@@ -26,12 +24,13 @@ import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
 import io.agora.scene.show.debugSettings.DebugSettingDialog
 import io.agora.scene.show.service.ShowServiceProtocol
-import io.agora.scene.show.widget.BeautyDialog
 import io.agora.scene.show.widget.PictureQualityDialog
 import io.agora.scene.show.widget.PresetDialog
+import io.agora.scene.show.widget.beauty.MultiBeautyDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 import kotlin.random.Random
@@ -44,7 +43,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
     private val mThumbnailId by lazy { getRandomThumbnailId() }
     private val mRoomId by lazy { getRandomRoomId() }
-    private val mBeautyProcessor by lazy { RtcEngineInstance.beautyProcessor }
 
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
 
@@ -101,28 +99,14 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             }
         }
 
+        // 低端机 或 无证书则关闭美颜
+        BeautyManager.initialize(this, mRtcEngine)
+        BeautyManager.setupLocalVideo(SurfaceView(this).apply {
+            binding.flVideoContainer.addView(this)
+        }, Constants.RENDER_MODE_HIDDEN)
+
+
         toggleVideoRun = Runnable {
-            mBeautyProcessor.initialize(
-                rtcEngine = mRtcEngine,
-                captureMode = CaptureMode.Agora,
-                statsEnable = true,
-                eventCallback = object : IEventCallback {
-                    override fun onBeautyStats(stats: BeautyStats) {
-                    }
-                }
-            )
-            // 低端机 或 无证书则关闭美颜
-            if (mRtcEngine.queryDeviceScore() >= 75) {
-                mBeautyProcessor.setBeautyEnable(true)
-            } else {
-                mBeautyProcessor.setBeautyEnable(false)
-            }
-            binding.flVideoContainer.post {
-                mBeautyProcessor.getSenseTimeBeautyAPI().setupLocalVideo(SurfaceView(this).apply {
-                    binding.flVideoContainer.addView(this)
-                }, Constants.RENDER_MODE_HIDDEN)
-            }
-            mBeautyProcessor.reset()
             initRtcEngine()
         }
         requestCameraPermission(true)
@@ -161,6 +145,14 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         }
     }
 
+    override fun finish() {
+        super.finish()
+        if (!isFinishToLiveDetail) {
+            RtcEngineInstance.resetVirtualBackground()
+            BeautyManager.destroy()
+        }
+    }
+
     private fun initRtcEngine() {
         val cacheQualityResolution = PictureQualityDialog.getCacheQualityResolution()
         mRtcEngine.setCameraCapturerConfiguration(
@@ -196,8 +188,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     }
 
     private fun showBeautyDialog() {
-        BeautyDialog(this).apply {
-            setBeautyProcessor(mBeautyProcessor)
+        MultiBeautyDialog(this).apply {
             show()
         }
     }
