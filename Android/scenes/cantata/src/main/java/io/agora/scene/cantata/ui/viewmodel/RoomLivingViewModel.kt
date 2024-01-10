@@ -1194,6 +1194,10 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 mRtcEngine?.setParameters(parameters)
             }
         })
+
+        // 音效默认为大合唱音效
+        mMusicSetting?.effect = 1
+//        setAudioEffectPreset(Constants.ROOM_ACOUSTICS_CHORUS)
     }
 
     private fun setAudioEffectPreset(effect: Int) {
