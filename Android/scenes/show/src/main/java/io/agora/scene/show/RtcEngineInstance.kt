@@ -5,11 +5,10 @@ import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
 import io.agora.rtc2.video.CameraCapturerConfiguration
+import io.agora.rtc2.video.SegmentationProperty
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.show.beauty.IBeautyProcessor
-import io.agora.scene.show.beauty.sensetime.BeautySenseTimeImpl
 import io.agora.scene.show.debugSettings.DebugSettingModel
 import io.agora.scene.show.videoLoaderAPI.VideoLoader
 import java.util.concurrent.Executors
@@ -22,21 +21,13 @@ object RtcEngineInstance {
     val virtualBackgroundSource = VirtualBackgroundSource().apply {
         backgroundSourceType = VirtualBackgroundSource.BACKGROUND_COLOR
     }
+    val virtualBackgroundSegmentation = SegmentationProperty()
     val videoCaptureConfiguration = CameraCapturerConfiguration(CameraCapturerConfiguration.CaptureFormat()).apply {
         followEncodeDimensionRatio = false
     }
     val debugSettingModel = DebugSettingModel().apply { }
 
     private val workingExecutor = Executors.newSingleThreadExecutor()
-
-    private var innerBeautyProcessor: IBeautyProcessor? = null
-    val beautyProcessor: IBeautyProcessor
-        get() {
-            if (innerBeautyProcessor == null) {
-                innerBeautyProcessor = BeautySenseTimeImpl(AgoraApplication.the())
-            }
-            return innerBeautyProcessor!!
-        }
 
     // 万能通用 token ,进入房间列表默认获取万能 token
     private var generalToken: String = ""
@@ -74,16 +65,23 @@ object RtcEngineInstance {
         VideoLoader.getImplInstance(rtcEngine).cleanCache()
     }
 
+    fun resetVirtualBackground() {
+        virtualBackgroundSegmentation.modelType = SegmentationProperty.SEG_MODEL_AI
+        virtualBackgroundSegmentation.greenCapacity = 0.5f
+        virtualBackgroundSource.backgroundSourceType =
+            VirtualBackgroundSource.BACKGROUND_COLOR
+        innerRtcEngine?.enableVirtualBackground(
+            false,
+            virtualBackgroundSource,
+            virtualBackgroundSegmentation
+        )
+    }
 
     fun destroy() {
         VideoLoader.release()
         innerRtcEngine?.let {
             workingExecutor.execute { RtcEngineEx.destroy() }
             innerRtcEngine = null
-        }
-        innerBeautyProcessor?.let { processor ->
-            processor.release()
-            innerBeautyProcessor = null
         }
         debugSettingModel.apply {
             pvcEnabled = true
