@@ -6,37 +6,21 @@
 #if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 #import <effect-sdk/bef_effect_ai_license_wrapper.h>
 #import <effect-sdk/bef_effect_ai_api.h>
-#import <effect-sdk/bef_effect_ai_error_code_format.h>
 #endif
 #import "BEHttpRequestProvider.h"
 #import <vector>
 #import <iostream>
-#import "Core.h"
-
-#define CHECK_LICENSE_RET(MSG, ret) \
-if (ret != 0 && ret != -11 && ret != 1) {\
-    const char *msg = bef_effect_ai_error_code_get(ret);\
-    if (msg != NULL) {\
-        NSLog(@"%s error: %d, %s", #MSG, ret, msg);\
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"kBESdkErrorNotification"\
-                                                    object:nil\
-                                                userInfo:@{@"data": [NSString stringWithCString:msg encoding:NSUTF8StringEncoding]}];\
-    } else {\
-        NSLog(@"%s error: %d", #MSG, ret);\
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"kBESdkErrorNotification"\
-                                                    object:nil\
-                                                    userInfo:@{@"data": [NSString stringWithFormat:@"%s error: %d", #MSG, ret]}];\
-    }\
-}
+#import "BundleUtil.h"
+#import "Config.h"
 
 using namespace std;
 
 static NSString *OFFLIN_LICENSE_PATH = @"LicenseBag";
 static NSString *OFFLIN_BUNDLE = @"bundle";
 static NSString *LICENSE_URL = @"https://cv.iccvlog.com/cv_tob/v1/api/sdk/tob_license/getlicense";
-static NSString *KEY = @"jiaoyang_test";
-static NSString *SECRET = @"04273924-9a77-11eb-94da-0c42a1b32a30";
-static LICENSE_MODE_ENUM LICENSE_MODE = ONLINE_LICENSE;
+static NSString *KEY = @"cv_test_online1";
+static NSString *SECRET = @"e479f002-4018-11eb-a1e0-b8599f494dc4";
+static LICENSE_MODE_ENUM LICENSE_MODE = OFFLINE_LICENSE;
 BOOL overSeasVersion = NO;
 
 @interface BELicenseHelper() {
@@ -53,19 +37,7 @@ BOOL overSeasVersion = NO;
 
 static BELicenseHelper* _instance = nil;
 
-+ (void)online_or_offline_model{
-    NSUserDefaults *def = [NSUserDefaults standardUserDefaults];
-    if ([[def objectForKey:@"online_model_key"] isEqualToString:@"ONLINE_LICENSE"]) {
-        LICENSE_MODE = ONLINE_LICENSE;
-    }
-    else if ([[def objectForKey:@"online_model_key"] isEqualToString:@"OFFLINE_LICENSE"]) {
-        LICENSE_MODE = OFFLINE_LICENSE;
-    }
-    else {
-        [def setObject:@"ONLINE_LICENSE" forKey:@"online_model_key"];
-    }
-    [def synchronize];
-}
+
 +(instancetype) shareInstance
 {
     static dispatch_once_t onceToken ;
@@ -117,16 +89,16 @@ static BELicenseHelper* _instance = nil;
         {
             _licenseProvider->setParam("mode", "OFFLINE");
             NSString *licenseName = [NSString stringWithFormat:@"/%s", LICENSE_NAME];
-            NSString* licensePath = [[NSBundle mainBundle] pathForResource:OFFLIN_LICENSE_PATH ofType:OFFLIN_BUNDLE];
+            NSBundle *bundle = [BundleUtil bundleWithBundleName:@"ByteEffectLib" podName:@"bytedEffect"];
+            NSString* licensePath = [bundle pathForResource:OFFLIN_LICENSE_PATH ofType:OFFLIN_BUNDLE];
             licensePath = [licensePath stringByAppendingString:licenseName];
             _licenseProvider->setParam("licensePath", [licensePath UTF8String]);
         }
-
-        _licenseFilePath = _licenseProvider->getParam("licensePath");
         _requestProvider = new BEHttpRequestProvider;
         _licenseProvider->registerHttpProvider(_requestProvider);
     }
 #endif
+
     return self;
 }
 
@@ -184,30 +156,9 @@ static BELicenseHelper* _instance = nil;
 }
 
 #if __has_include(<effect-sdk/bef_effect_ai_api.h>)
-- (const char *)licensePath: (bef_ai_license_function_type) type {
-    int ret = 0;
-    if([[NSFileManager defaultManager] fileExistsAtPath:[[NSString alloc] initWithCString:_licenseFilePath.c_str() encoding:NSUTF8StringEncoding]]){
-        ret = bef_effect_ai_check_license_function(type, _licenseFilePath.c_str(), _licenseMode == ONLINE_LICENSE);
-        if (ret == 0)
-            return _licenseFilePath.c_str();
-    }
-    //not ONLINE_LICENSE does not need to be updated
-    if (_licenseMode != ONLINE_LICENSE)
-        return _licenseFilePath.c_str();
-
-    if (strcmp(self.updateLicensePath, "") == 0)
-        return "";
-
-    ret = bef_effect_ai_check_license_function(type, _licenseFilePath.c_str(), _licenseMode == ONLINE_LICENSE);
-    CHECK_LICENSE_RET(bef_effect_ai_check_license_function, ret)
-    
-    return _licenseFilePath.c_str();
-}
-#endif
 - (const char *)licensePath {
     _errorCode = 0;
     _errorMsg = @"";
-#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     std::map<std::string, std::string> params;
     _licenseProvider->getLicenseWithParams(params, false, [](const char* retmsg, int retSize, EffectsSDK::ErrorInfo error, void* userdata){
         BELicenseHelper* pThis = CFBridgingRelease(userdata);
@@ -220,15 +171,13 @@ static BELicenseHelper* _instance = nil;
 
     _licenseFilePath = _licenseProvider->getParam("licensePath");
     return _licenseFilePath.c_str();
-#else
-    return nil;
-#endif
 }
+#endif
 
+#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
 - (const char *)updateLicensePath {
     _errorCode = 0;
     _errorMsg = @"";
-#if __has_include(<effect-sdk/bef_effect_ai_api.h>)
     std::map<std::string, std::string> params;
     _licenseProvider->updateLicenseWithParams(params, false, [](const char* retmsg, int retSize, EffectsSDK::ErrorInfo error, void* userdata){
         BELicenseHelper* pThis = CFBridgingRelease(userdata);
@@ -241,10 +190,8 @@ static BELicenseHelper* _instance = nil;
     
     _licenseFilePath = _licenseProvider->getParam("licensePath");
     return _licenseFilePath.c_str();
-#else
-    return nil;
-#endif
 }
+#endif
 
 - (LICENSE_MODE_ENUM) licenseMode{
     return _licenseMode;
@@ -268,7 +215,15 @@ static BELicenseHelper* _instance = nil;
 
 - (bool)checkLicenseOK:(const char *) filePath {
 #if __has_include(<effect-sdk/bef_effect_ai_api.h>)
-    bef_effect_result_t ret = bef_effect_ai_check_license_function(BEF_EFFECT, _licenseFilePath.c_str(), _licenseMode == ONLINE_LICENSE);
+    bef_effect_handle_t effectHandle = 0;
+    int ret = bef_effect_ai_create(&effectHandle);
+    // this property will be held by a singleton, and only got once,
+    // so it is necessary to set use_builtin_sensor at the first time
+    bef_effect_ai_use_builtin_sensor(effectHandle, YES);
+
+    ret = bef_effect_ai_check_online_license(effectHandle, filePath);
+    bef_effect_ai_destroy(effectHandle);
+    
     if (ret != 0 && ret != -11 && ret != 1)
     {
         return false;
