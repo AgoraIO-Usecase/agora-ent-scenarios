@@ -24,6 +24,9 @@
 #import "BeautyAPI.h"
 #import "BytesBeautyRender.h"
 #import "SenseBeautyRender.h"
+#import "FUBeautyRender.h"
+#import "AgoraBeautyRender.h"
+
 #import "AttributedTextView.h"
 #import "VLCommonWebViewController.h"
 #import "VLPopImageVerifyView.h"

@@ -103,6 +103,7 @@
 - (void)removeStickerId:(int)stickerId {
 #if __has_include("st_mobile_common.h")
     [self.effectsProcess removeSticker:stickerId];
+    self.stickerId = 0;
 #endif
 }
 

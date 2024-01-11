@@ -210,10 +210,10 @@ static bool USE_CACHE_PIXEL_BUFFER = true;
 
 - (id<BEGLTexture>)transforCVPixelBufferToTexture:(CVPixelBufferRef)pixelBuffer {
     BEPixelBufferInfo *info = [self getCVPixelBufferInfo:pixelBuffer];
-//    if (info.format != BE_BGRA) {
-//        pixelBuffer = [self transforCVPixelBufferToCVPixelBuffer:pixelBuffer outputFormat:BE_BGRA];
-////        NSLog(@"this method only supports BRGA format CVPixelBuffer, convert it to BGRA CVPixelBuffer internal");
-//    }
+    if (info.format != BE_BGRA) {
+        pixelBuffer = [self transforCVPixelBufferToCVPixelBuffer:pixelBuffer outputFormat:BE_BGRA];
+//        NSLog(@"this method only supports BRGA format CVPixelBuffer, convert it to BGRA CVPixelBuffer internal");
+    }
     
     if (_useCacheTexture) {
         _textureIndex = (_textureIndex + 1) % TEXTURE_CACHE_NUM;
