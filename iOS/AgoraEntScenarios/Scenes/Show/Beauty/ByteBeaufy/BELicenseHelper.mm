@@ -91,6 +91,16 @@ static BELicenseHelper* _instance = nil;
             NSString *licenseName = [NSString stringWithFormat:@"/%s", LICENSE_NAME];
             NSBundle *bundle = [BundleUtil bundleWithBundleName:@"ByteEffectLib" podName:@"bytedEffect"];
             NSString* licensePath = [bundle pathForResource:OFFLIN_LICENSE_PATH ofType:OFFLIN_BUNDLE];
+            NSString *bundleIdentifier = [[NSBundle mainBundle]bundleIdentifier];
+            if (![licenseName containsString:bundleIdentifier]) {
+                NSArray *licenseArray = [[NSFileManager defaultManager]contentsOfDirectoryAtPath:licensePath error:nil];
+                for (NSString *license in licenseArray) {
+                    if ([license containsString:bundleIdentifier]) {
+                        licenseName = [NSString stringWithFormat:@"/%@", license];
+                        break;
+                    }
+                }
+            }
             licensePath = [licensePath stringByAppendingString:licenseName];
             _licenseProvider->setParam("licensePath", [licensePath UTF8String]);
         }
