@@ -163,4 +163,5 @@
     <string name="ktv_relay_debug_settings_set">设置</string>
     <string name="ktv_relay_debug_settings_audio_dump">音频Dump</string>
     <string name="ktv_relay_try">已尝试三次，请手动切歌</string>
+    <string name="ktv_relay_loading_music">%1s歌曲准备中…</string>
 </resources>

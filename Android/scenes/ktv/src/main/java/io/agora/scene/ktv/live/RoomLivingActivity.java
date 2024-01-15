@@ -4,18 +4,19 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,7 +24,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.card.MaterialCardView;
 
@@ -42,7 +42,6 @@ import io.agora.scene.base.component.OnButtonClickListener;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.LiveDataUtils;
 import io.agora.scene.ktv.KTVLogger;
-import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvActivityRoomLivingBinding;
 import io.agora.scene.ktv.databinding.KtvItemRoomSpeakerBinding;
@@ -68,6 +67,7 @@ import io.agora.scene.widget.basic.BindingViewHolder;
 import io.agora.scene.widget.dialog.CommonDialog;
 import io.agora.scene.widget.dialog.PermissionLeakDialog;
 import io.agora.scene.widget.dialog.TopFunctionDialog;
+import io.agora.scene.widget.toast.CustomToast;
 import io.agora.scene.widget.utils.UiUtils;
 
 /**
@@ -404,7 +404,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
             if (!hasHighlighter && roomLivingViewModel.isRoomOwner() && chorusNowNum >= 0 && !roomLivingViewModel.mSetting.getHighLighterUid().equals("") || (chorusNowNum == 0 && !roomLivingViewModel.mSetting.getHighLighterUid().equals(""))) {
                 // 人声突出者退出合唱
-                ToastUtils.showToast(R.string.ktv_highlight_disable);
+                CustomToast.show(R.string.ktv_highlight_disable, Toast.LENGTH_SHORT);
                 getBinding().lrcControlView.setHighLightPersonHeadUrl("");
                 roomLivingViewModel.mSetting.setHighLighterUid("");
             }
@@ -459,12 +459,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 RoomSeatModel seatModel = mRoomSpeakerAdapter.getItem(i);
                 if (seatModel != null && Integer.parseInt(seatModel.getRtcUid()) == volumeModel.getUid()) {
                     BindingViewHolder<KtvItemRoomSpeakerBinding> holder = (BindingViewHolder<KtvItemRoomSpeakerBinding>) getBinding().rvUserMember.findViewHolderForAdapterPosition(i);
-                   if (holder == null) return;
-                   if (volumeModel.getVolume() == 0 || seatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()) {
-                       holder.binding.vMicWave.endWave();
-                   } else {
-                       holder.binding.vMicWave.startWave();
-                   }
+                    if (holder == null) return;
+                    if (volumeModel.getVolume() == 0 || seatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()) {
+                        holder.binding.vMicWave.endWave();
+                    } else {
+                        holder.binding.vMicWave.startWave();
+                    }
                 }
             }
         });
@@ -533,6 +533,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.onSelfJoinedChorus();
             } else if (status == RoomLivingViewModel.JoinChorusStatus.ON_JOIN_FAILED) {
                 getBinding().lrcControlView.onSelfJoinedChorusFailed();
+                int yOfChorusBtn = getBinding().lrcControlView.getYOfChorusBtn();
+                CustomToast.showByPosition(R.string.ktv_join_chorus_failed, Gravity.TOP, yOfChorusBtn, Toast.LENGTH_SHORT);
             } else if (status == RoomLivingViewModel.JoinChorusStatus.ON_LEAVE_CHORUS) {
                 getBinding().cbMic.setChecked(false);
                 getBinding().lrcControlView.onSelfLeavedChorus();
@@ -576,6 +578,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         });
         roomLivingViewModel.networkStatusLiveData.observe(this, netWorkStatus ->
                 setNetWorkStatus(netWorkStatus.txQuality, netWorkStatus.rxQuality));
+        roomLivingViewModel.loadMusicProgressLiveData.observe(this, percent -> {
+            getBinding().lrcControlView.onMusicLoadProgress(percent);
+        });
     }
 
 
@@ -873,7 +878,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     private void showChangeMusicDialog() {
         if (UiUtils.isFastClick(2000)) {
-            ToastUtils.showToast(R.string.ktv_too_fast);
+            CustomToast.show(R.string.ktv_too_fast, Toast.LENGTH_SHORT);
             return;
         }
         if (changeMusicDialog == null) {

@@ -17,6 +17,7 @@ import static io.agora.scene.ktv.ktvapi.KTVApiKt.createKTVApi;
 
 import android.text.TextUtils;
 import android.view.SurfaceView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -52,7 +53,6 @@ import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.event.NetWorkEvent;
 import io.agora.scene.base.manager.UserManager;
-import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.KTVLogger;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.debugSettings.KTVDebugSettingBean;
@@ -87,6 +87,7 @@ import io.agora.scene.ktv.service.ScoringAlgoControlModel;
 import io.agora.scene.ktv.service.ScoringAverageModel;
 import io.agora.scene.ktv.widget.MusicSettingBean;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
+import io.agora.scene.widget.toast.CustomToast;
 
 public class RoomLivingViewModel extends ViewModel {
 
@@ -146,6 +147,9 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     final MutableLiveData<PlayerMusicStatus> playerMusicStatusLiveData = new MutableLiveData<>();
+
+    // 加载音乐进度
+    final MutableLiveData<Integer> loadMusicProgressLiveData = new MutableLiveData<>();
 
     enum JoinChorusStatus {
         ON_IDLE,
@@ -337,7 +341,9 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.exitRoom() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
+                if (e.getMessage() != null) {
+                    CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                }
             }
             return null;
         });
@@ -501,7 +507,9 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.haveSeat() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
+                if (e.getMessage() != null) {
+                    CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                }
             }
             return null;
         });
@@ -549,7 +557,9 @@ public class RoomLivingViewModel extends ViewModel {
                     } else {
                         // failure
                         KTVLogger.e(TAG, "RoomLivingViewModel.leaveSeat() failed: " + e.getMessage());
-                        ToastUtils.showToast(e.getMessage());
+                        if (e.getMessage() != null) {
+                            CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                        }
                     }
                     return null;
                 });
@@ -574,7 +584,9 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.toggleSelfVideo() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
+                if (e.getMessage() != null) {
+                    CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                }
             }
             return null;
         });
@@ -593,7 +605,9 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.toggleMic() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
+                if (e.getMessage() != null) {
+                    CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                }
             }
             return null;
         });
@@ -663,7 +677,9 @@ public class RoomLivingViewModel extends ViewModel {
                 // failed
                 if (e != null) {
                     KTVLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed: " + e.getMessage());
-                    ToastUtils.showToast(e.getMessage());
+                    if (e.getMessage() != null) {
+                        CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                    }
                 }
             }
             return null;
@@ -680,7 +696,9 @@ public class RoomLivingViewModel extends ViewModel {
                 // failed
                 if (e != null) {
                     KTVLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed: " + e.getMessage());
-                    ToastUtils.showToast(e.getMessage());
+                    if (e.getMessage() != null) {
+                        CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                    }
                 }
             }
             return null;
@@ -770,8 +788,8 @@ public class RoomLivingViewModel extends ViewModel {
                             }
                             liveData.postValue(songs);
                         } else {
-                            if (e != null) {
-                                ToastUtils.showToast(e.getMessage());
+                            if (e != null && e.getMessage() != null) {
+                                CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
                             }
                         }
                         return null;
@@ -829,8 +847,8 @@ public class RoomLivingViewModel extends ViewModel {
                             }
                             liveData.postValue(songs);
                         } else {
-                            if (e != null) {
-                                ToastUtils.showToast(e.getMessage());
+                            if (e != null && e.getMessage() != null) {
+                                CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
                             }
                         }
                         return null;
@@ -861,7 +879,9 @@ public class RoomLivingViewModel extends ViewModel {
                     } else {
                         // failure
                         KTVLogger.e(TAG, "RoomLivingViewModel.chooseSong() failed: " + e.getMessage());
-                        ToastUtils.showToast(e.getMessage());
+                        if (e.getMessage() != null) {
+                            CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                        }
                         liveData.postValue(false);
                     }
                     return null;
@@ -884,7 +904,9 @@ public class RoomLivingViewModel extends ViewModel {
                     } else {
                         // failure
                         KTVLogger.e(TAG, "RoomLivingViewModel.deleteSong() failed: " + e.getMessage());
-                        ToastUtils.showToast(e.getMessage());
+                        if (e.getMessage() != null) {
+                            CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                        }
                     }
                     return null;
                 }
@@ -905,7 +927,9 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.topUpSong() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
+                if (e.getMessage() != null) {
+                    CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                }
             }
             return null;
         });
@@ -918,7 +942,6 @@ public class RoomLivingViewModel extends ViewModel {
         KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus() called");
         if (mRtcEngine.getConnectionState() != getValue(CONNECTION_STATE_CONNECTED)) {
             joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED);
-            ToastUtils.showToast(R.string.ktv_join_chorus_failed);
             return;
         }
 
@@ -940,7 +963,6 @@ public class RoomLivingViewModel extends ViewModel {
                     innerJoinChorus(musicModel.getSongNo());
                 } else {
                     joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED);
-                    ToastUtils.showToast(err.getMessage());
                 }
                 return null;
             });
@@ -955,11 +977,11 @@ public class RoomLivingViewModel extends ViewModel {
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
                 KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
+                loadMusicProgressLiveData.postValue(percent);
             }
 
             @Override
             public void onMusicLoadFail(long songCode, @NonNull KTVLoadSongFailReason reason) {
-                ToastUtils.showToastLong(R.string.ktv_join_chorus_failed);
                 joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED);
             }
 
@@ -968,7 +990,6 @@ public class RoomLivingViewModel extends ViewModel {
                 ktvApiProtocol.switchSingerRole(KTVSingRole.CoSinger, new ISwitchRoleStateListener() {
                     @Override
                     public void onSwitchRoleFail(@NonNull SwitchRoleFailReason reason) {
-                        ToastUtils.showToastLong(R.string.ktv_join_chorus_failed);
                         joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED);
                     }
 
@@ -987,13 +1008,14 @@ public class RoomLivingViewModel extends ViewModel {
                                 } else {
                                     // failure
                                     KTVLogger.e(TAG, "RoomLivingViewModel.joinChorus() failed: " + e.getMessage());
-                                    ToastUtils.showToast(e.getMessage());
+                                    if (e.getMessage() != null) {
+                                        CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                                    }
                                 }
                                 return null;
                             });
 
                         } else {
-                            ToastUtils.showToastLong(R.string.ktv_join_chorus_failed);
                             ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null);
                             joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED);
                         }
@@ -1021,7 +1043,9 @@ public class RoomLivingViewModel extends ViewModel {
                 } else {
                     // failure
                     KTVLogger.e(TAG, "RoomLivingViewModel.leaveChorus() failed: " + e.getMessage());
-                    ToastUtils.showToast(e.getMessage());
+                    if (e.getMessage() != null) {
+                        CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                    }
                 }
                 return null;
             });
@@ -1061,7 +1085,9 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failed
                 KTVLogger.e(TAG, "RoomLivingViewModel.changeMusic() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
+                if (e.getMessage() != null) {
+                    CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                }
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_END);
             }
             return null;
@@ -1294,7 +1320,7 @@ public class RoomLivingViewModel extends ViewModel {
             public void onContentInspectResult(int result) {
                 super.onContentInspectResult(result);
                 if (result > 1) {
-                    ToastUtils.showToast(R.string.ktv_content);
+                    CustomToast.show(R.string.ktv_content, Toast.LENGTH_SHORT);
                 }
             }
 
@@ -1383,7 +1409,7 @@ public class RoomLivingViewModel extends ViewModel {
                     //mSoundCardSettingBean.setHasEarPhone(true);
                 } else {
                     if (songPlayingLiveData.getValue() != null && mSetting.isEar()) {
-                        ToastUtils.showToast(R.string.ktv_ear_phone_tip);
+                        CustomToast.show(R.string.ktv_ear_phone_tip, Toast.LENGTH_SHORT);
                         mSetting.setEar(false);
                         if (mRtcEngine != null) {
                             mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
@@ -1688,9 +1714,9 @@ public class RoomLivingViewModel extends ViewModel {
 
         // 标记歌曲为播放中
         ktvServiceProtocol.makeSongDidPlay(music, e -> {
-            if (e != null) {
+            if (e != null && e.getMessage() != null) {
                 // failure
-                ToastUtils.showToast(e.getMessage());
+                CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
             }
             return null;
         });
@@ -1701,13 +1727,14 @@ public class RoomLivingViewModel extends ViewModel {
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
                 KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
+                loadMusicProgressLiveData.postValue(percent);
             }
 
             @Override
             public void onMusicLoadSuccess(long songCode, @NonNull String lyricUrl) {
                 // 当前已被切歌
                 if (songPlayingLiveData.getValue() == null) {
-                    ToastUtils.showToastLong(R.string.ktv_load_failed_no_song);
+                    CustomToast.show(R.string.ktv_load_failed_no_song, Toast.LENGTH_LONG);
                     return;
                 }
 
@@ -1725,7 +1752,7 @@ public class RoomLivingViewModel extends ViewModel {
             public void onMusicLoadFail(long songCode, @NonNull KTVLoadSongFailReason reason) {
                 // 当前已被切歌
                 if (songPlayingLiveData.getValue() == null) {
-                    ToastUtils.showToastLong(R.string.ktv_load_failed_no_song);
+                    CustomToast.show(R.string.ktv_load_failed_no_song, Toast.LENGTH_LONG);
                     return;
                 }
 
@@ -1742,17 +1769,17 @@ public class RoomLivingViewModel extends ViewModel {
                     noLrcLiveData.postValue(true);
                 } else if (reason == KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL) {
                     // 歌曲加载失败 ，重试3次
-                    ToastUtils.showToastLong(R.string.ktv_load_failed);
+                    CustomToast.show(R.string.ktv_load_failed, Toast.LENGTH_LONG);
                     retryTimes = retryTimes + 1;
                     if (retryTimes < 3) {
                         loadMusic(config, songCode);
                     } else {
                         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                        ToastUtils.showToastLong(R.string.ktv_try);
+                        CustomToast.show(R.string.ktv_try, Toast.LENGTH_LONG);
                     }
                 } else if (reason == KTVLoadSongFailReason.CANCELED) {
                     // 当前已被切歌
-                    ToastUtils.showToastLong(R.string.ktv_load_failed_another_song);
+                    CustomToast.show(R.string.ktv_load_failed_another_song, Toast.LENGTH_LONG);
                 }
             }
         });

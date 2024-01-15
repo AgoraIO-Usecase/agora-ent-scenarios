@@ -15,6 +15,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,7 +35,6 @@ import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnButtonClickListener;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.ktv.singrelay.KTVLogger;
-import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.singrelay.R;
 import io.agora.scene.ktv.singrelay.databinding.KtvRelayActivityRoomLivingBinding;
 import io.agora.scene.ktv.singrelay.databinding.KtvRelayItemRoomSpeakerBinding;
@@ -54,6 +54,7 @@ import io.agora.scene.widget.basic.BindingViewHolder;
 import io.agora.scene.widget.dialog.CommonDialog;
 import io.agora.scene.widget.dialog.PermissionLeakDialog;
 import io.agora.scene.widget.dialog.TopFunctionDialog;
+import io.agora.scene.widget.toast.CustomToast;
 import io.agora.scene.widget.utils.UiUtils;
 
 /**
@@ -114,14 +115,14 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
                         if (roomLivingViewModel.isRoomOwner()) {
                             if (!item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                                 if (roomLivingViewModel.singRelayGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
-                                    ToastUtils.showToast(R.string.ktv_relay_gaming_seat_tip1);
+                                    CustomToast.show(R.string.ktv_relay_gaming_seat_tip1, Toast.LENGTH_SHORT);
                                     return;
                                 }
                                 showUserLeaveSeatMenuDialog(item);
                             }
                         } else if (item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                             if (roomLivingViewModel.singRelayGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
-                                ToastUtils.showToast(R.string.ktv_relay_gaming_seat_tip2);
+                                CustomToast.show(R.string.ktv_relay_gaming_seat_tip2, Toast.LENGTH_SHORT);
                                 return;
                             }
                             showUserLeaveSeatMenuDialog(item);
@@ -131,7 +132,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
                         RoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
                         if (seatLocal == null || seatLocal.getSeatIndex() < 0) {
                             if (roomLivingViewModel.singRelayGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
-                                ToastUtils.showToast(R.string.ktv_relay_gaming_seat_tip3);
+                                CustomToast.show(R.string.ktv_relay_gaming_seat_tip3, Toast.LENGTH_SHORT);
                                 return;
                             }
                             toggleAudioRun = () -> {
@@ -217,11 +218,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
         getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
         getBinding().lrcControlView.post(() -> {
             // TODO workaround 先强制申请权限， 避免首次安装无声
-            if(roomLivingViewModel.isRoomOwner()){
+            if (roomLivingViewModel.isRoomOwner()) {
                 toggleAudioRun = () -> roomLivingViewModel.init();
                 requestRecordPermission();
-            }
-            else{
+            } else {
                 roomLivingViewModel.init();
             }
             roomLivingViewModel.setLrcView(getBinding().lrcControlView);
@@ -520,6 +520,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
         });
         roomLivingViewModel.networkStatusLiveData.observe(this, netWorkStatus ->
                 setNetWorkStatus(netWorkStatus.txQuality, netWorkStatus.rxQuality));
+        roomLivingViewModel.loadMusicProgressLiveData.observe(this, percent -> {
+            getBinding().lrcControlView.onMusicLoadProgress(percent);
+        });
     }
 
 
@@ -677,7 +680,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
 
     private void showMusicSettingDialog() {
         //if (musicSettingDialog == null) {
-            musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting, roomLivingViewModel.playerMusicStatusLiveData.getValue() == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE);
+        musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting, roomLivingViewModel.playerMusicStatusLiveData.getValue() == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE);
         //}
         musicSettingDialog.show(getSupportFragmentManager(), MusicSettingDialog.TAG);
     }
@@ -686,7 +689,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
 
     private void showChangeMusicDialog() {
         if (UiUtils.isFastClick(2000)) {
-            ToastUtils.showToast(R.string.ktv_relay_too_fast);
+            CustomToast.show(R.string.ktv_relay_too_fast, Toast.LENGTH_SHORT);
             return;
         }
         if (changeMusicDialog == null) {
