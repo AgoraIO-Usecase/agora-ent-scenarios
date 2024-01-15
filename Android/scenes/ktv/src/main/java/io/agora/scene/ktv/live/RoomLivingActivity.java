@@ -413,11 +413,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 roomLivingViewModel.resetAudioPreset();
             }
 
-            if (roomLivingViewModel.isRoomOwner() && chorusNowNum > 0) {
-                getBinding().lrcControlView.showHighLightButton(true);
-            } else if (roomLivingViewModel.isRoomOwner() && chorusNowNum == 0) {
-                getBinding().lrcControlView.showHighLightButton(false);
-            }
+            // TODO: 2024/1/15 隐藏人声突出入口
+//            if (roomLivingViewModel.isRoomOwner() && chorusNowNum > 0) {
+//                getBinding().lrcControlView.showHighLightButton(true);
+//            } else if (roomLivingViewModel.isRoomOwner() && chorusNowNum == 0) {
+//                getBinding().lrcControlView.showHighLightButton(false);
+//            }
 
             if (roomLivingViewModel.chorusNum == 0 && chorusNowNum > 0) {
                 // 有人加入合唱
