@@ -3,6 +3,7 @@ package io.agora.scene.pure1v1.ui
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">声动互娱</string>
+    <string name="app_name">声动互娱-秀场体验版</string>
 
     <string name="app_agreement_page_title">个人信息保护指引</string>
     <string name="app_agreement_protection_tip1">声动互娱软件是一款用于向声网客户展示产品使用效果的测试产品，仅用于测试产品的功能、性能和可用性，而非提供给大众使用的正式产品。</string>
@@ -36,6 +36,7 @@
     <string name="app_home_scene_ktv">在线K歌房</string>
     <string name="app_home_scene_voice">语聊房</string>
     <string name="app_home_scene_live">直播</string>
+    <string name="app_home_scene_live_merge">直播社交</string>
     <string name="app_home_scene_ktv_solo_chorus">独唱&amp;合唱</string>
     <string name="app_home_scene_ktv_solo_chorus_tips">超低延迟真合唱</string>
     <string name="app_home_scene_ktv_sing_battle">抢唱</string>

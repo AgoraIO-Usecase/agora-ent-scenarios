@@ -3,7 +3,7 @@ ext {
 }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_SHOW_1V1 = "3.7.0"
+final def VERSION_SCENE_SHOW_1V1 = "4.2.0"
 
 android {
     defaultConfig {

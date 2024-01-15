@@ -6,7 +6,6 @@ import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,6 +16,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -56,6 +56,8 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
     private val permissionHelp = PermissionHelp(this)
 
+    private var mCallDetailFragment: Fragment? = null
+
     override fun getViewBinding(inflater: LayoutInflater): Pure1v1RoomListActivityBinding {
        return Pure1v1RoomListActivityBinding.inflate(inflater)
     }
@@ -67,6 +69,13 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        val callDetailFragment = CallDetailFragment()
+        fragmentTransaction.add(R.id.flCallContainer, callDetailFragment, "CallDetailFragment").hide(callDetailFragment).commit()
+        mCallDetailFragment = callDetailFragment
+
         setOnApplyWindowInsetsListener()
         setupView()
 
@@ -74,7 +83,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         CallServiceManager.instance.sceneService?.enterRoom { e ->
             fetchRoomList()
         }
-        CallServiceManager.instance.startupCallApiIfNeed()
         CallServiceManager.instance.callApi?.addListener(this)
     }
 
@@ -86,6 +94,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             WindowInsetsCompat.CONSUMED
         }
     }
+
     override fun onBackPressed() {
         CallServiceManager.instance.cleanUp()
         super.onBackPressed()
@@ -162,7 +171,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         permissionHelp.checkCameraAndMicPerms({
             showCallSendDialog(user)
             CallServiceManager.instance.startupCallApiIfNeed()
-            CallServiceManager.instance.callApi?.call(user.getRoomId(), user.userId.toInt()) { error ->
+            CallServiceManager.instance.callApi?.call(user.userId.toInt()) { error ->
                 if (error != null) {
                     finishCallDialog()
                 }
@@ -175,11 +184,14 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
     private fun connectCallDetail() {
         binding.flCallContainer.visibility = View.VISIBLE
-        val fragmentManager = supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        val callDetailFragment = CallDetailFragment()
-        fragmentTransaction.add(R.id.flCallContainer, callDetailFragment, "CallDetailFragment")
-        fragmentTransaction.commit()
+
+        mCallDetailFragment?.let {
+            val fragmentTransaction = supportFragmentManager.beginTransaction()
+            fragmentTransaction.show(it).commit()
+            (mCallDetailFragment as CallDetailFragment).start()
+            (mCallDetailFragment as CallDetailFragment).updateTime()
+        }
+
         // 开启鉴黄鉴暴
         val channelId = CallServiceManager.instance.remoteUser?.getRoomId() ?: ""
         val localUid = CallServiceManager.instance.localUser?.userId?.toInt() ?: 0
@@ -207,9 +219,8 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
     override fun onCallStateChanged(
         state: CallStateType,
-        stateReason: CallReason,
+        stateReason: CallStateReason,
         eventReason: String,
-        elapsed: Long,
         eventInfo: Map<String, Any>
     ) {
         val currentUid = CallServiceManager.instance.localUser?.userId ?: ""
@@ -236,29 +247,15 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                         user = UserInfo(userMap)
                     }
                     if (user.userId.isEmpty()) { return } // 检验数据是否有效
-                    var acceptCallToken: String? = null
-                    var accepted = false
-                    CallServiceManager.instance.fetchAcceptCallToken(fromRoomId) { rtcToken ->
-                        acceptCallToken = rtcToken
-                        if (accepted && rtcToken != null) {
-                            CallServiceManager.instance.callApi?.accept(fromRoomId, fromUserId, rtcToken) {
-                            }
-                        }
-                        if (rtcToken == null) {
-                            Toast.makeText(this@RoomListActivity, "Fetch RTC token failed", Toast.LENGTH_SHORT).show()
-                        }
-                    }
                     CallServiceManager.instance.remoteUser = user
                     val dialog = CallReceiveDialog(this, user)
                     dialog.setListener(object : CallReceiveDialog.CallReceiveDialogListener {
                         override fun onReceiveViewDidClickAccept() { // 点击接通
                             // 获取多媒体权限
                             permissionHelp.checkCameraAndMicPerms({
-                                accepted = true
-                                val rtcToken = acceptCallToken
+                                val rtcToken = CallServiceManager.instance.mPrepareConfig?.rtcToken
                                 if (rtcToken != null) {
-                                    CallServiceManager.instance.callApi?.accept(fromRoomId, fromUserId, rtcToken) {
-                                    }
+                                    CallServiceManager.instance.callApi?.accept(fromUserId) {}
                                 }
                             }, {
                                 PermissionLeakDialog(this@RoomListActivity).show("", { getPermissions() }
@@ -290,16 +287,16 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             }
             CallStateType.Prepared -> {
                 when(stateReason) {
-                    CallReason.RemoteHangup -> {
+                    CallStateReason.RemoteHangup -> {
                         Toast.makeText(this, getText(R.string.pure1v1_call_toast_hangup), Toast.LENGTH_SHORT).show()
                     }
-                    CallReason.LocalRejected -> {
+                    CallStateReason.LocalRejected -> {
                         Toast.makeText(this, getText(R.string.pure1v1_call_local_rejected), Toast.LENGTH_SHORT).show()
                     }
-                    CallReason.RemoteRejected -> {
+                    CallStateReason.RemoteRejected -> {
                         Toast.makeText(this, getText(R.string.pure1v1_call_toast_rejected), Toast.LENGTH_SHORT).show()
                     }
-                    CallReason.CallingTimeout -> {
+                    CallStateReason.CallingTimeout -> {
                         Toast.makeText(this, getText(R.string.pure1v1_call_toast_no_answer), Toast.LENGTH_SHORT).show()
                     }
                     else -> {}
@@ -322,12 +319,12 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         }
     }
 
-    override fun callDebugInfo(message: String) {
-        Pure1v1Logger.d(tag, message)
-    }
-
-    override fun callDebugWarning(message: String) {
-        Pure1v1Logger.w(tag, message)
+    override fun callDebugInfo(message: String, logLevel: CallLogLevel) {
+        when (logLevel) {
+            CallLogLevel.Normal -> Pure1v1Logger.d(tag, message)
+            CallLogLevel.Warning -> Pure1v1Logger.w(tag, message)
+            CallLogLevel.Error -> Pure1v1Logger.e(tag, message)
+        }
     }
 
     private fun setupContentInspectConfig(enable: Boolean, connection: RtcConnection) {

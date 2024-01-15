@@ -4,7 +4,7 @@ ext {
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 apply plugin: 'org.jetbrains.kotlin.android'
 
-final def VERSION_SCENE_PRIVATE1V1 = "3.6.0"
+final def VERSION_SCENE_PRIVATE1V1 = "4.2.0"
 android {
     defaultConfig {
         if(private1v1_is_modular){

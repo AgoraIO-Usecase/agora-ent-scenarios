@@ -22,7 +22,7 @@ class ShowTo1v1ServiceImpl constructor(
 
     companion object {
         private const val TAG = "Show1v1_LOG"
-        private const val kSceneId = "scene_Livetoprivate_4.0.0"
+        private const val kSceneId = "scene_Livetoprivate_4.2.0"
         private const val SYNC_SCENE_ROOM_USER_COLLECTION = "userCollection"
     }
 

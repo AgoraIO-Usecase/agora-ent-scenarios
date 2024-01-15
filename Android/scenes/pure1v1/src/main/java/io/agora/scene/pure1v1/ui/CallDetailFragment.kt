@@ -14,10 +14,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.scene.pure1v1.R
-import io.agora.scene.pure1v1.callAPI.CallEvent
-import io.agora.scene.pure1v1.callAPI.CallReason
-import io.agora.scene.pure1v1.callAPI.CallStateType
-import io.agora.scene.pure1v1.callAPI.ICallApiListener
+import io.agora.scene.pure1v1.callAPI.*
 import io.agora.scene.pure1v1.databinding.Pure1v1CallDetailFragmentBinding
 import io.agora.scene.pure1v1.service.CallServiceManager
 import io.agora.scene.widget.dialog.TopFunctionDialog
@@ -29,7 +26,7 @@ class CallDetailFragment : Fragment(), ICallApiListener {
 
     private val tag = "CallDetailActivity_LOG"
 
-    private val startTime = System.currentTimeMillis()
+    private var startTime = System.currentTimeMillis()
     private var timerHandler: Handler? = null
     private var dashboard: DashboardFragment? = null
     private var rtcEventHandler: IRtcEngineEventHandler? = null
@@ -46,7 +43,8 @@ class CallDetailFragment : Fragment(), ICallApiListener {
         setupRTCListener()
 
         timerHandler = Handler(Looper.getMainLooper())
-        updateTime()
+
+        CallServiceManager.instance.startupCallApiIfNeed()
     }
 
     private fun setupRTCListener() {
@@ -58,11 +56,15 @@ class CallDetailFragment : Fragment(), ICallApiListener {
                 }
             }
         }
-        CallServiceManager.instance.callApi?.addRTCListener(handler)
+        CallServiceManager.instance.rtcEngine?.addHandler(handler)
         rtcEventHandler = handler
     }
 
-    private fun updateTime() {
+    fun start() {
+        startTime = System.currentTimeMillis()
+    }
+
+    fun updateTime() {
         val millis = System.currentTimeMillis() - startTime
         if (millis > (20 * 60 * 1000)) {
             onHangup()
@@ -79,16 +81,15 @@ class CallDetailFragment : Fragment(), ICallApiListener {
     }
 
     private fun setupView() {
+
+        CallServiceManager.instance.localCanvas = binding.vDragWindow2.canvasContainer
+        CallServiceManager.instance.remoteCanvas = binding.vDragWindow1.canvasContainer
+
         binding.vDragWindow1.setSmallType(false)
         binding.vDragWindow2.setSmallType(true)
-        CallServiceManager.instance.remoteCanvas?.let { canvas ->
-            binding.vDragWindow1.canvasContainer.addView(canvas)
-        }
+
         CallServiceManager.instance.remoteUser?.let { userInfo ->
             binding.vDragWindow1.setUserName(userInfo.userName)
-        }
-        CallServiceManager.instance.localCanvas?.let { canvas ->
-            binding.vDragWindow2.canvasContainer.addView(canvas)
         }
         CallServiceManager.instance.localUser?.let { userInfo ->
             binding.vDragWindow2.setUserName(userInfo.userName)
@@ -186,15 +187,15 @@ class CallDetailFragment : Fragment(), ICallApiListener {
             CallServiceManager.instance.callApi?.hangup(userInfo.userId.toInt()) {
             }
         }
-        binding.vDragWindow1.canvasContainer.removeAllViews()
-        binding.vDragWindow2.canvasContainer.removeAllViews()
+//        binding.vDragWindow1.canvasContainer.removeAllViews()
+//        binding.vDragWindow2.canvasContainer.removeAllViews()
         timerHandler?.removeCallbacksAndMessages(null)
-        timerHandler = null
+        //timerHandler = null
         if (isAdded && !parentFragmentManager.isDestroyed) {
             val fragment = parentFragmentManager.findFragmentByTag("CallDetailFragment")
             fragment?.let {
                 val transaction = parentFragmentManager.beginTransaction()
-                transaction.remove(it)
+                transaction.hide(it)
                 transaction.commit()
             }
         }
@@ -202,16 +203,14 @@ class CallDetailFragment : Fragment(), ICallApiListener {
 
     override fun onCallStateChanged(
         state: CallStateType,
-        stateReason: CallReason,
+        stateReason: CallStateReason,
         eventReason: String,
-        elapsed: Long,
         eventInfo: Map<String, Any>
     ) {
     }
 
-    override fun onCallEventChanged(event: CallEvent, elapsed: Long) {
+    override fun onCallEventChanged(event: CallEvent) {
         when(event) {
-            CallEvent.LocalLeave,
             CallEvent.RemoteLeave -> {
                 onHangup()
             }

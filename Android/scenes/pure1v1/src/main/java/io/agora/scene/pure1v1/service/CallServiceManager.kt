@@ -3,6 +3,7 @@ package io.agora.scene.pure1v1.service
 import android.content.Context
 import android.util.Log
 import android.view.TextureView
+import android.view.ViewGroup
 import io.agora.rtc2.*
 import io.agora.rtm.RtmClient
 import io.agora.scene.base.BuildConfig
@@ -31,18 +32,18 @@ class CallServiceManager {
 
     var connectedChannelId: String? = null
 
-    var localCanvas: TextureView? = null
+    var mPrepareConfig: PrepareConfig? = null
 
-    var remoteCanvas: TextureView? = null
+    var localCanvas: ViewGroup? = null
 
-    private var tokenConfig: CallTokenConfig? = null
+    var remoteCanvas: ViewGroup? = null
     // 接通使用的rtc token
     private var acceptToken: String? = null
 
     private var mContext: Context? = null
 
     fun setup(context: Context) {
-        tokenConfig = CallTokenConfig()
+        mPrepareConfig = PrepareConfig()
         mContext = context
         // 获取用户信息
         val user = UserInfo()
@@ -54,14 +55,11 @@ class CallServiceManager {
         sceneService = Pure1v1ServiceImp(user)
         // 初始化call api
         callApi = CallApiImpl(context)
-        // 创建canvas
-        localCanvas = TextureView(context)
-        remoteCanvas = TextureView(context)
     }
 
     fun cleanUp() {
         rtcEngine = null
-        tokenConfig = null
+        mPrepareConfig = null
         localUser = null
         remoteUser = null
         mContext = null
@@ -80,13 +78,13 @@ class CallServiceManager {
 
     fun startupCallApiIfNeed() {
         val user = localUser ?: return
-        val tokenConfig = tokenConfig ?: return
-        if (tokenConfig.rtcToken.isNotEmpty() && tokenConfig.rtmToken.isNotEmpty()) {
+        val prepareConfig = mPrepareConfig ?: return
+        if (prepareConfig.rtcToken.isNotEmpty() && prepareConfig.rtmToken.isNotEmpty()) {
             return
         }
-        tokenConfig.roomId = user.getRoomId()
+        prepareConfig.roomId = user.getRoomId()
         TokenGenerator.generateTokens(
-            tokenConfig.roomId,
+            "",
             user.userId,
             TokenGenerator.TokenGeneratorType.token007,
             arrayOf(
@@ -98,9 +96,9 @@ class CallServiceManager {
                 if (rtcToken == null || rtmToken == null) {
                     return@generateTokens
                 }
-                tokenConfig.rtcToken = rtcToken
-                tokenConfig.rtmToken = rtmToken
-                initialize(tokenConfig)
+                prepareConfig.rtcToken = rtcToken
+                prepareConfig.rtmToken = rtmToken
+                initialize(prepareConfig)
             })
     }
 
@@ -132,7 +130,7 @@ class CallServiceManager {
         acceptToken = null
     }
 
-    private fun initialize(tokenConfig: CallTokenConfig) {
+    private fun initialize(prepareConfig: PrepareConfig) {
         val api = callApi ?: return
         val user = localUser ?: return
         val localView = localCanvas ?: return
@@ -142,20 +140,15 @@ class CallServiceManager {
         val config = CallConfig(
             BuildConfig.AGORA_APP_ID,
             user.userId.toInt(),
-            user.toMap(),
             engine,
-            null,
-            CallMode.Pure1v1,
-            CallRole.CALLER,
-            localView,
-            remoteView,
-            false
+            null
         )
-        api.initialize(config, tokenConfig) {
-            val prepareConfig = PrepareConfig.calleeConfig()
-            api.prepareForCall(prepareConfig) { err ->
-            }
-        }
+        api.initialize(config)
+        prepareConfig.localView = localView
+        prepareConfig.remoteView = remoteView
+        prepareConfig.autoAccept = false
+        prepareConfig.autoJoinRTC = false
+        api.prepareForCall(prepareConfig) { }
     }
 
     private fun createRtcEngine(): RtcEngineEx {

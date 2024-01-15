@@ -37,7 +37,7 @@ class DashboardFragment : Fragment() {
 
     override fun onDestroy() {
         handler?.let {
-            CallServiceManager.instance.callApi?.removeRTCListener(it)
+            CallServiceManager.instance.rtcEngine?.removeHandler(it)
             handler = null
         }
         super.onDestroy()
@@ -109,7 +109,7 @@ class DashboardFragment : Fragment() {
                 }
             }
         }
-        CallServiceManager.instance.callApi?.addRTCListener(rtcListener)
+        CallServiceManager.instance.rtcEngine?.addHandler(rtcListener)
         handler = rtcListener
     }
 
