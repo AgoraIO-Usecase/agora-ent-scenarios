@@ -19,7 +19,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -49,6 +48,7 @@ import io.agora.karaoke_view.v11.ScoringView;
 import io.agora.karaoke_view.v11.model.LyricsLineModel;
 import io.agora.karaoke_view.v11.model.LyricsModel;
 import io.agora.scene.base.utils.DownloadUtils;
+import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.base.utils.ZipUtils;
 import io.agora.scene.ktv.singbattle.KTVLogger;
 import io.agora.scene.ktv.singbattle.R;
@@ -57,7 +57,6 @@ import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleLayoutLrcPrepareBi
 import io.agora.scene.ktv.singbattle.live.ILrcView;
 import io.agora.scene.ktv.singbattle.service.RoomSelSongModel;
 import io.agora.scene.widget.basic.OutlineSpan;
-import io.agora.scene.widget.toast.CustomToast;
 import io.agora.scene.widget.utils.UiUtils;
 
 /**
@@ -102,7 +101,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     private OnKaraokeEventListener mOnKaraokeActionListener;
 
     private boolean isOnSeat = false;
-
     public void onSeat(boolean isOnSeat) {
         this.isOnSeat = isOnSeat;
     }
@@ -230,18 +228,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
         mBinding.clActive.setBackgroundResource(backgroundResId);
-        mPrepareBinding.tvContent.setText(String.format(getResources().getString(R.string.ktv_singbattle_loading_music), "0%"));
-        mPrepareBinding.pbLoadingMusic.setProgress(0);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
 
         changeViewByRole();
-    }
-
-    public void onMusicLoadProgress(int percent) {
-        mPrepareBinding.tvContent.setText(String.format(getResources().getString(R.string.ktv_singbattle_loading_music),
-                percent + "%"));
-        mPrepareBinding.pbLoadingMusic.setProgress(percent);
     }
 
     private RoomSelSongModel songPlaying;
@@ -307,7 +297,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     private boolean isPrepareSong = true;
-
     public void onGameBattlePrepareStatus() {
         if (mBinding == null) return;
         isPrepareSong = true;
@@ -320,7 +309,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.lineScore.setVisibility(View.GONE);
         mBinding.ilActive.tvMusicName2.setVisibility(View.VISIBLE);
 
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) findViewById(R.id.lyricsView).getLayoutParams();
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams)findViewById(R.id.lyricsView).getLayoutParams();
         params.topToBottom = R.id.tvMusicName2;
         params.bottomToTop = R.id.singBattle;
         findViewById(R.id.lyricsView).requestLayout();
@@ -351,7 +340,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.tvMusicName2.setVisibility(View.GONE);
         mBinding.ilActive.singBattle.setVisibility(View.GONE);
 
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) findViewById(R.id.lyricsView).getLayoutParams();
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams)findViewById(R.id.lyricsView).getLayoutParams();
         params.topToBottom = R.id.scoringView;
         params.bottomToTop = R.id.bgd_control_layout_lrc;
         findViewById(R.id.lyricsView).requestLayout();
@@ -671,7 +660,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                                 }
 
                                 if (TextUtils.isEmpty(xmlPath)) {
-                                    CustomToast.show("The xml file not exist!", Toast.LENGTH_SHORT);
+                                    ToastUtils.showToast("The xml file not exist!");
                                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
                                     mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
                                     return;
@@ -681,7 +670,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                                 LyricsModel lyricsModel = KaraokeView.parseLyricsData(xmlFile);
 
                                 if (lyricsModel == null) {
-                                    CustomToast.show("Unexpected content from " + xmlPath, Toast.LENGTH_SHORT);
+                                    ToastUtils.showToast("Unexpected content from " + xmlPath);
                                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
                                     mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
                                     return;
@@ -698,16 +687,14 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                             public void onError(Exception e) {
                                 mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
                                 mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
-                                if (e.getMessage() != null) {
-                                    CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
-                                }
+                                ToastUtils.showToast(e.getMessage());
                             }
                         });
             } else {
                 LyricsModel lyricsModel = KaraokeView.parseLyricsData(file);
 
                 if (lyricsModel == null) {
-                    CustomToast.show("Unexpected content from " + file, Toast.LENGTH_SHORT);
+                    ToastUtils.showToast("Unexpected content from " + file);
                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
                     mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
                     return;
@@ -721,9 +708,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                 }
             }
         }, exception -> {
-            if (exception.getMessage()!=null){
-                CustomToast.show(exception.getMessage(),Toast.LENGTH_SHORT);
-            }
+            ToastUtils.showToast(exception.getMessage());
             mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
             mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
         });
@@ -736,14 +721,15 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     private int totalScore = 0;
-
     private void dealWithBattleSong(LyricsModel lyricsModel) {
         AtomicInteger lineCount = new AtomicInteger();
-        lyricsModel.lines.forEach(line -> {
-            if (line.getStartTime() >= highStartTime && line.getEndTime() <= highEndTime) {
-                lineCount.getAndIncrement();
-            }
-        });
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            lyricsModel.lines.forEach(line -> {
+                if (line.getStartTime() >= highStartTime && line.getEndTime() <= highEndTime) {
+                    lineCount.getAndIncrement();
+                }
+            });
+        }
         totalScore = lineCount.get() * 100;
         Log.d("hugo", "totalScore: " + totalScore);
     }

@@ -26,6 +26,7 @@ class KTVSyncManagerServiceImp(
 ) : KTVServiceProtocol {
     private val TAG = "KTV_Service_LOG"
     companion object{
+        @JvmStatic
         val kSceneId = "scene_singrelay_4.3.0"
     }
     private val kCollectionIdChooseSong = "choose_song"
@@ -1401,7 +1402,7 @@ class KTVSyncManagerServiceImp(
 
     // --------------------- Song Battle Game operation ---------------------
     private fun innerAddSingRelayGameInfo(info: SingRelayGameModel,
-                                           completion: (error: Exception?) -> Unit) {
+                                          completion: (error: Exception?) -> Unit) {
         mSceneReference?.collection(kCollectionSingRelayGameInfo)
             ?.add(info, object : DataItemCallback {
                 override fun onSuccess(result: IObject) {
@@ -1419,8 +1420,8 @@ class KTVSyncManagerServiceImp(
     }
 
     private fun innerUpdateSingRelayGameInfo(objectId: String,
-                                              info: SingRelayGameModel,
-                                              completion: (error: Exception?) -> Unit) {
+                                             info: SingRelayGameModel,
+                                             completion: (error: Exception?) -> Unit) {
         mSceneReference?.collection(kCollectionSingRelayGameInfo)
             ?.update(objectId, info, object : Callback {
                 override fun onSuccess() {

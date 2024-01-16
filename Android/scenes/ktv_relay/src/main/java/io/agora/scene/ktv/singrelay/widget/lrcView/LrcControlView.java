@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -44,6 +43,7 @@ import io.agora.karaoke_view.v11.ScoringView;
 import io.agora.karaoke_view.v11.model.LyricsLineModel;
 import io.agora.karaoke_view.v11.model.LyricsModel;
 import io.agora.scene.base.utils.DownloadUtils;
+import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.base.utils.ZipUtils;
 import io.agora.scene.ktv.singrelay.KTVLogger;
 import io.agora.scene.ktv.singrelay.R;
@@ -52,7 +52,6 @@ import io.agora.scene.ktv.singrelay.databinding.KtvRelayLayoutLrcPrepareBinding;
 import io.agora.scene.ktv.singrelay.ktvapi.ILrcView;
 import io.agora.scene.ktv.singrelay.service.RoomSelSongModel;
 import io.agora.scene.widget.basic.OutlineSpan;
-import io.agora.scene.widget.toast.CustomToast;
 import io.agora.scene.widget.utils.UiUtils;
 
 /**
@@ -67,13 +66,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     protected int mCumulativeScoreInPercentage;
     protected int mCumulativeSingedLines;
-
     public int getCumulativeScoreInPercentage() {
         return mCumulativeScoreInPercentage;
     }
 
     protected int mCumulativeSingedParts;
-
     public int getCumulativeSingedParts() {
         if (isMineOwner) mCumulativeSingedParts++;
         return mCumulativeSingedParts;
@@ -105,7 +102,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     private OnKaraokeEventListener mOnKaraokeActionListener;
 
     private boolean isOnSeat = false;
-
     public void onSeat(boolean isOnSeat) {
         this.isOnSeat = isOnSeat;
     }
@@ -170,7 +166,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             @Override
             public void onLineFinished(KaraokeView view, LyricsLineModel line, int score, int cumulativeScore, int index, int total) {
                 if (mRole == Role.Singer && mOnKaraokeActionListener != null) {
-                    mCumulativeSingedLines++;
+                    mCumulativeSingedLines ++;
                     mOnKaraokeActionListener.onLineFinished(line, score, cumulativeScore, index, total);
                 }
             }
@@ -230,18 +226,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
         mBinding.clActive.setBackgroundResource(backgroundResId);
-        mPrepareBinding.tvContent.setText(String.format(getResources().getString(R.string.ktv_relay_loading_music), "0%"));
-        mPrepareBinding.pbLoadingMusic.setProgress(0);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
         mBinding.ilActive.singRelay.setVisibility(View.GONE);
 
         changeViewByRole();
-    }
-
-    public void onMusicLoadProgress(int percent) {
-        mPrepareBinding.tvContent.setText(String.format(getResources().getString(R.string.ktv_relay_loading_music), percent + "%"));
-        mPrepareBinding.pbLoadingMusic.setProgress(percent);
     }
 
     private RoomSelSongModel songPlaying;
@@ -674,7 +663,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                                 }
 
                                 if (TextUtils.isEmpty(xmlPath)) {
-                                    CustomToast.show("The xml file not exist!", Toast.LENGTH_SHORT);
+                                    ToastUtils.showToast("The xml file not exist!");
                                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
                                     mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
                                     return;
@@ -684,7 +673,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                                 LyricsModel lyricsModel = KaraokeView.parseLyricsData(xmlFile);
 
                                 if (lyricsModel == null) {
-                                    CustomToast.show("Unexpected content from " + xmlPath, Toast.LENGTH_SHORT);
+                                    ToastUtils.showToast("Unexpected content from " + xmlPath);
                                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
                                     mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
                                     return;
@@ -700,16 +689,14 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                             public void onError(Exception e) {
                                 mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
                                 mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
-                                if (e.getMessage() != null) {
-                                    CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
-                                }
+                                ToastUtils.showToast(e.getMessage());
                             }
                         });
             } else {
                 LyricsModel lyricsModel = KaraokeView.parseLyricsData(file);
 
                 if (lyricsModel == null) {
-                    CustomToast.show("Unexpected content from " + file, Toast.LENGTH_SHORT);
+                    ToastUtils.showToast("Unexpected content from " + file);
                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
                     mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
                     return;
@@ -722,9 +709,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                 }
             }
         }, exception -> {
-            if (exception.getMessage() != null) {
-                CustomToast.show(exception.getMessage(), Toast.LENGTH_SHORT);
-            }
+            ToastUtils.showToast(exception.getMessage());
             mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
             mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
         });

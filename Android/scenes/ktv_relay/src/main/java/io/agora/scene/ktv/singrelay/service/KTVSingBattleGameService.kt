@@ -21,6 +21,7 @@ object KTVSingRelayGameService {
     }
 
     fun graspSong(
+        sceneId: String,
         roomId: String,
         userId: String,
         userName: String,
@@ -31,7 +32,7 @@ object KTVSingRelayGameService {
     ) {
         scope.launch(Dispatchers.Main) {
             try {
-                success.invoke(graspSong(roomId, userId, userName, songCode, headUrl))
+                success.invoke(graspSong(sceneId, roomId, userId, userName, songCode, headUrl))
             } catch (e: Exception) {
                 failure?.invoke(e)
             }
@@ -57,6 +58,7 @@ object KTVSingRelayGameService {
 
 
     private suspend fun graspSong(
+        sceneId: String,
         roomId: String,
         userId: String,
         userName: String,
@@ -66,7 +68,7 @@ object KTVSingRelayGameService {
 
         val postBody = JSONObject()
         postBody.put("appId", BuildConfig.AGORA_APP_ID)
-        postBody.put("sceneId", KTVSyncManagerServiceImp.kSceneId)
+        postBody.put("sceneId", sceneId)
         postBody.put("roomId", roomId)
         postBody.put("userName", userName)
         postBody.put("userId", userId)
