@@ -677,6 +677,9 @@
 		E3C7726A2AE7B0E6008D17B7 /* VRCreateRoomPresentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C772692AE7B0E6008D17B7 /* VRCreateRoomPresentView.swift */; };
 		E3C7EF2C2AE66BC70023B069 /* VRRoomHomeListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C7EF2B2AE66BC70023B069 /* VRRoomHomeListCell.swift */; };
 		E3C7EF2E2AE66F1F0023B069 /* VRRoomHomeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C7EF2D2AE66F1F0023B069 /* VRRoomHomeListView.swift */; };
+		E3E77BE02B5678D80090381C /* UIImage+SBG.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3E77BDF2B5678D80090381C /* UIImage+SBG.swift */; };
+		E3E77BE22B567A8E0090381C /* UIImage+KTV.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3E77BE12B567A8E0090381C /* UIImage+KTV.swift */; };
+		E3E77BE42B567CCE0090381C /* UIImage+SR.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3E77BE32B567CCE0090381C /* UIImage+SR.swift */; };
 		E3FE65382B21C76D001D6BF9 /* VLSRDebugView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3FE65362B21C76D001D6BF9 /* VLSRDebugView.m */; };
 		E3FE653B2B21CE33001D6BF9 /* VLSBGDebugView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3FE65392B21CE33001D6BF9 /* VLSBGDebugView.m */; };
 		E7054B3D2AEB97FB00AFD93C /* home_launch_logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E7054B3B2AEB97FA00AFD93C /* home_launch_logo@2x.png */; };
@@ -1654,6 +1657,9 @@
 		E3C772692AE7B0E6008D17B7 /* VRCreateRoomPresentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRCreateRoomPresentView.swift; sourceTree = "<group>"; };
 		E3C7EF2B2AE66BC70023B069 /* VRRoomHomeListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VRRoomHomeListCell.swift; sourceTree = "<group>"; };
 		E3C7EF2D2AE66F1F0023B069 /* VRRoomHomeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VRRoomHomeListView.swift; sourceTree = "<group>"; };
+		E3E77BDF2B5678D80090381C /* UIImage+SBG.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+SBG.swift"; sourceTree = "<group>"; };
+		E3E77BE12B567A8E0090381C /* UIImage+KTV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+KTV.swift"; sourceTree = "<group>"; };
+		E3E77BE32B567CCE0090381C /* UIImage+SR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+SR.swift"; sourceTree = "<group>"; };
 		E3FE65362B21C76D001D6BF9 /* VLSRDebugView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSRDebugView.m; sourceTree = "<group>"; };
 		E3FE65372B21C76D001D6BF9 /* VLSRDebugView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSRDebugView.h; sourceTree = "<group>"; };
 		E3FE65392B21CE33001D6BF9 /* VLSBGDebugView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGDebugView.m; sourceTree = "<group>"; };
@@ -3377,6 +3383,7 @@
 				E301BCBA2AF4CAFF0089A79C /* KTVHeadSetUtil.swift */,
 				E301BCBB2AF4CAFF0089A79C /* KTVLog.swift */,
 				E301BCBC2AF4CAFF0089A79C /* HeadSetManager.h */,
+				E3E77BE12B567A8E0090381C /* UIImage+KTV.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -3622,6 +3629,7 @@
 			isa = PBXGroup;
 			children = (
 				E301BDBA2AF4E06F0089A79C /* SRLog.swift */,
+				E3E77BE32B567CCE0090381C /* UIImage+SR.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -3866,6 +3874,7 @@
 			isa = PBXGroup;
 			children = (
 				E301BF792AF8E8E90089A79C /* SBGLog.swift */,
+				E3E77BDF2B5678D80090381C /* UIImage+SBG.swift */,
 				E301BF7A2AF8E8E90089A79C /* SBGMacro.h */,
 			);
 			path = Utils;
@@ -4667,6 +4676,7 @@
 				E732CE002B4D2AF8004D6FB9 /* FUManager.m in Sources */,
 				DDA199E728FFE579009D3E61 /* VLFontUtils.m in Sources */,
 				E71685102ADF7AEF00C2915C /* VLSelectTagView.swift in Sources */,
+				E3E77BE42B567CCE0090381C /* UIImage+SR.swift in Sources */,
 				DD36109029B70CDC00CE7984 /* ShowCreateLiveVC.swift in Sources */,
 				DD8417C829090C520026B624 /* TemplateSceneCreateController.swift in Sources */,
 				E732CE0B2B4D2AF8004D6FB9 /* BEImageUtils.m in Sources */,
@@ -5069,6 +5079,7 @@
 				E71685212AE22D8300C2915C /* VLDiscoverCell.swift in Sources */,
 				E3FE653B2B21CE33001D6BF9 /* VLSBGDebugView.m in Sources */,
 				DD619AE329E3E247008F63E4 /* SAEmptyView.swift in Sources */,
+				E3E77BE02B5678D80090381C /* UIImage+SBG.swift in Sources */,
 				E301BE742AF4E06F0089A79C /* VLSRSettingView.m in Sources */,
 				DD9EBFC92AD5512300B4551F /* VREQOperationAlert.swift in Sources */,
 				E301BD582AF4CAFF0089A79C /* KTVHeadSetUtil.swift in Sources */,
@@ -5164,6 +5175,7 @@
 				DD619AD229E3E247008F63E4 /* SASoundSelTableViewCell.swift in Sources */,
 				DDA199E628FFE579009D3E61 /* UIButton+Font.m in Sources */,
 				DD36105929B70CDC00CE7984 /* NSString+Show.swift in Sources */,
+				E3E77BE22B567A8E0090381C /* UIImage+KTV.swift in Sources */,
 				E301BD7F2AF4CB000089A79C /* VLKTVKindsCell.m in Sources */,
 				E301BE652AF4E06F0089A79C /* LSTPopView+SRModal.m in Sources */,
 				E301C0402AF8E8E90089A79C /* SBGDebugManager.m in Sources */,
