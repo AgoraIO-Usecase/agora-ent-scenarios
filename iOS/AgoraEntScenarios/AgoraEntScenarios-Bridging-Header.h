@@ -31,6 +31,7 @@
 #import "VLPopImageVerifyView.h"
 #import "VLAPIRequest.h"
 #import "VLAlert.h"
+#import "VLToast.h"
 #import "VLUploadImageResModel.h"
 
 #import "VLMainTabBarController.h"

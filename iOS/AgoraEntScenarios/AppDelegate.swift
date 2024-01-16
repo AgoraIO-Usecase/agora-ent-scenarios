@@ -6,11 +6,9 @@
 //
 
 import UIKit
-
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         configKeyCenterData()
@@ -34,6 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     @objc func didTokenExpired() {
+        VLToast.toast(NSLocalizedString("app_expire", comment: ""))
         window?.configRootViewController()
     }
 }

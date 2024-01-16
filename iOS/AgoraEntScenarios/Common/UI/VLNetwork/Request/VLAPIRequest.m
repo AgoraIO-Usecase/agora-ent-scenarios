@@ -350,12 +350,10 @@ static AFHTTPSessionManager *_sessionManager;
 
 #pragma mark - 处理token失效后切换登录界面
 + (void)setLoginVC {
-    [VLToast toast:AGLocalizedString(@"app_expire")];
     // TODO: goto login page
     [[VLUserCenter center] logout];
     NSNotification *notification = [NSNotification notificationWithName:@"AGORAENTTOKENEXPIRED" object:nil];
     [[NSNotificationCenter defaultCenter] postNotification:notification];
-   // [[UIApplication sharedApplication].delegate.window configRootViewController];
 }
 
 // 请求进度
