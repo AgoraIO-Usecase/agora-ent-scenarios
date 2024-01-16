@@ -6,7 +6,6 @@
 #import "VLMineViewController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 //#import "AppDelegate+Config.h"
-#import "UIWindow+Router.h"
 #import "VLCommonWebViewController.h"
 #import "VLMineView.h"
 #import "VLUploadImageResModel.h"
@@ -40,7 +39,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self setBackgroundImage:@"home_bg_image"];
+    [self setBackgroundImage:@"home_bg_image" bundleName:nil];
     [self setUpUI];
 }
 
