@@ -17,12 +17,14 @@ public class EffectVoiceBean {
 
     private int id;
     private @DrawableRes int resId;
+    private int audioEffect;
     private String title;
 
     private boolean select;
 
-    public EffectVoiceBean(int id, int resId, String title) {
+    public EffectVoiceBean(int id,int audioEffect, int resId, String title) {
         this.id = id;
+        this.audioEffect = audioEffect;
         this.resId = resId;
         this.title = title;
     }
@@ -34,6 +36,14 @@ public class EffectVoiceBean {
     public EffectVoiceBean setId(int id) {
         this.id = id;
         return this;
+    }
+
+    public void setAudioEffect(int audioEffect) {
+        this.audioEffect = audioEffect;
+    }
+
+    public int getAudioEffect() {
+        return audioEffect;
     }
 
     public int getResId() {

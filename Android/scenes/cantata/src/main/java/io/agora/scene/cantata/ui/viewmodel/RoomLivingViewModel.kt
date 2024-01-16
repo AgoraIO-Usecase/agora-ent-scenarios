@@ -55,6 +55,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
     companion object {
         private const val TAG = "Cantata_Scene_Log"
+        private const val DEFAULT_AUDIO_EFFECT = Constants.ROOM_ACOUSTICS_CHORUS
     }
 
     private val mCantataServiceProtocol = CantataServiceProtocol.getImplInstance()
@@ -940,6 +941,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
         // ------------------ 初始化音乐播放设置面版 ------------------
         mMusicSetting = MusicSettingBean(
+            DEFAULT_AUDIO_EFFECT,
             false,
             100,
             50,
@@ -963,8 +965,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     setMusicVolume(vol)
                 }
 
-                override fun onEffectChanged(effect: Int) {
-                    setAudioEffectPreset(getEffectIndex(effect))
+                override fun onEffectChanged(audioEffect: Int) {
+                    setAudioEffectPreset(audioEffect)
                 }
 
                 override fun onBeautifierPresetChanged(effect: Int) {
@@ -1216,9 +1218,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             }
         })
 
-        // 音效默认为大合唱音效
-        mMusicSetting?.effect = 1
-//        setAudioEffectPreset(Constants.ROOM_ACOUSTICS_CHORUS)
+        mMusicSetting?.audioEffect?.let {
+            setAudioEffectPreset(it)
+        }
     }
 
     private fun setAudioEffectPreset(effect: Int) {
@@ -1226,24 +1228,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
     // ======================= settings =======================
-    // ------------------ 音效调整 ------------------
-    private fun getEffectIndex(index: Int): Int {
-        when (index) {
-            0 -> return Constants.AUDIO_EFFECT_OFF
-            1 -> return Constants.ROOM_ACOUSTICS_CHORUS
-            2 -> return Constants.ROOM_ACOUSTICS_KTV
-            3 -> return Constants.ROOM_ACOUSTICS_VOCAL_CONCERT
-            4 -> return Constants.ROOM_ACOUSTICS_STUDIO
-            5 -> return Constants.ROOM_ACOUSTICS_PHONOGRAPH
-            6 -> return Constants.ROOM_ACOUSTICS_SPACIAL
-            7 -> return Constants.ROOM_ACOUSTICS_ETHEREAL
-            8 -> return Constants.STYLE_TRANSFORMATION_POPULAR
-            9 -> return Constants.STYLE_TRANSFORMATION_RNB
-        }
-        // 原声
-        return Constants.AUDIO_EFFECT_OFF
-    }
-
     // ------------------ 音量调整 ------------------
     private var micVolume = 100
     private var micOldVolume = 100

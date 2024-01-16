@@ -92,6 +92,8 @@ import io.agora.scene.widget.toast.CustomToast;
 public class RoomLivingViewModel extends ViewModel {
 
     private final String TAG = "KTV_Scene_LOG";
+    // 默认音效
+    private final int DEFAULT_AUDIO_EFFECT = ROOM_ACOUSTICS_KTV;
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();
     private final KTVApi ktvApiProtocol = createKTVApi();
 
@@ -1126,7 +1128,7 @@ public class RoomLivingViewModel extends ViewModel {
             }
         });
 
-        mSetting = new MusicSettingBean(false, 100, 50, 0, new MusicSettingDialog.Callback() {
+        mSetting = new MusicSettingBean(DEFAULT_AUDIO_EFFECT,false, 100, 50, 0, new MusicSettingDialog.Callback() {
             @Override
             public void onEarChanged(boolean isEar) {
                 if (seatLocalLiveData.getValue() == null) return;
@@ -1151,8 +1153,8 @@ public class RoomLivingViewModel extends ViewModel {
             }
 
             @Override
-            public void onEffectChanged(int effect) {
-                setAudioEffectPreset(getEffectIndex(effect));
+            public void onEffectChanged(int audioEffect) {
+                setAudioEffectPreset(audioEffect);
             }
 
             @Override
@@ -1351,7 +1353,7 @@ public class RoomLivingViewModel extends ViewModel {
                             KTVLogger.d(TAG, "You are highlighter, " + "uid: " + uid);
                             isHighlightSinger = true;
                             mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF);
-                            mSetting.updateEffect(AUDIO_EFFECT_OFF);
+                            mSetting.updateAudioEffect(AUDIO_EFFECT_OFF);
                             audioPreset = AUDIO_EFFECT_OFF;
                             syncAudioPreset(audioPreset);
                         } else {
@@ -1367,27 +1369,27 @@ public class RoomLivingViewModel extends ViewModel {
                             KTVLogger.d(TAG, "You are not highlighter, " + "highlighter preset: " + preset);
                             if (preset == AUDIO_EFFECT_OFF) {
                                 audioPreset = AUDIO_EFFECT_OFF_HARMONY;
-                                mSetting.updateEffect(0);
+                                mSetting.updateAudioEffect(AUDIO_EFFECT_OFF);
                                 mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF_HARMONY);
                             } else if (preset == ROOM_ACOUSTICS_KTV) {
                                 audioPreset = ROOM_ACOUSTICS_KTV_HARMONY;
-                                mSetting.updateEffect(1);
+                                mSetting.updateAudioEffect(ROOM_ACOUSTICS_KTV);
                                 mRtcEngine.setAudioEffectPreset(ROOM_ACOUSTICS_KTV_HARMONY);
                             } else if (preset == ROOM_ACOUSTICS_VOCAL_CONCERT) {
                                 audioPreset = ROOM_ACOUSTICS_VOCAL_CONCERT_HARMONY;
-                                mSetting.updateEffect(2);
+                                mSetting.updateAudioEffect(ROOM_ACOUSTICS_VOCAL_CONCERT);
                                 mRtcEngine.setAudioEffectPreset(ROOM_ACOUSTICS_VOCAL_CONCERT_HARMONY);
                             } else if (preset == ROOM_ACOUSTICS_PHONOGRAPH) {
                                 audioPreset = ROOM_ACOUSTICS_PHONOGRAPH_HARMONY;
-                                mSetting.updateEffect(4);
+                                mSetting.updateAudioEffect(ROOM_ACOUSTICS_PHONOGRAPH);
                                 mRtcEngine.setAudioEffectPreset(ROOM_ACOUSTICS_PHONOGRAPH_HARMONY);
                             } else if (preset == ROOM_ACOUSTICS_STUDIO) {
                                 audioPreset = ROOM_ACOUSTICS_STUDIO_HARMONY;
-                                mSetting.updateEffect(3);
+                                mSetting.updateAudioEffect(ROOM_ACOUSTICS_STUDIO);
                                 mRtcEngine.setAudioEffectPreset(ROOM_ACOUSTICS_STUDIO_HARMONY);
                             } else {
                                 audioPreset = AUDIO_EFFECT_OFF_HARMONY;
-                                mSetting.updateEffect(0);
+                                mSetting.updateAudioEffect(AUDIO_EFFECT_OFF);
                                 mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF_HARMONY);
                             }
                         }
@@ -1547,59 +1549,26 @@ public class RoomLivingViewModel extends ViewModel {
             cfg.ordered = false;
             streamId = mRtcEngine.createDataStream(cfg);
         }
+
+//        setAudioEffectPreset(getEffectIndex(mSetting.getEffect()));
     }
 
-    private int audioPreset = 0;
+    private int audioPreset = DEFAULT_AUDIO_EFFECT;
 
-    private void setAudioEffectPreset(int effect) {
-        KTVLogger.d(TAG, "setAudioEffectPreset: " + effect);
+    private void setAudioEffectPreset(int audioEffect) {
+        KTVLogger.d(TAG, "setAudioEffectPreset: " + audioEffect);
         if (mRtcEngine == null) {
             return;
         }
-        mRtcEngine.setAudioEffectPreset(effect);
-        audioPreset = effect;
+        mRtcEngine.setAudioEffectPreset(audioEffect);
+        this.audioPreset = audioEffect;
 
         if (isHighlightSinger) {
-            syncAudioPreset(effect);
+            syncAudioPreset(audioEffect);
         }
     }
 
     // ======================= settings =======================
-    // ------------------ 音效调整 ------------------
-    private int getEffectIndex(int index) {
-        switch (index) {
-            // 原声
-            case 0:
-                return Constants.AUDIO_EFFECT_OFF;
-            // KTV
-            case 1:
-                return Constants.ROOM_ACOUSTICS_KTV;
-            // 演唱会
-            case 2:
-                return Constants.ROOM_ACOUSTICS_VOCAL_CONCERT;
-            // 录音棚
-            case 3:
-                return Constants.ROOM_ACOUSTICS_STUDIO;
-            // 留声机
-            case 4:
-                return Constants.ROOM_ACOUSTICS_PHONOGRAPH;
-            // 空旷
-            case 5:
-                return Constants.ROOM_ACOUSTICS_SPACIAL;
-            // 空灵
-            case 6:
-                return Constants.ROOM_ACOUSTICS_ETHEREAL;
-            // 流行
-            case 7:
-                return Constants.STYLE_TRANSFORMATION_POPULAR;
-            // R&B
-            case 8:
-                return Constants.STYLE_TRANSFORMATION_RNB;
-        }
-        // 原声
-        return Constants.AUDIO_EFFECT_OFF;
-    }
-
     // ------------------ 音量调整 ------------------
     private int micOldVolume = 100;
 
@@ -1673,10 +1642,10 @@ public class RoomLivingViewModel extends ViewModel {
 
         // 清空音效
         if (mRtcEngine != null) {
-            mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF);
+            mRtcEngine.setAudioEffectPreset(DEFAULT_AUDIO_EFFECT);
         }
-        mSetting.updateEffect(AUDIO_EFFECT_OFF);
-        this.audioPreset = AUDIO_EFFECT_OFF;
+        mSetting.updateAudioEffect(DEFAULT_AUDIO_EFFECT);
+        this.audioPreset = DEFAULT_AUDIO_EFFECT;
         isHighlightSinger = false;
 
         // 重置耳返
@@ -1855,7 +1824,7 @@ public class RoomLivingViewModel extends ViewModel {
             // 突出房主自己
             isHighlightSinger = true;
             mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF);
-            mSetting.updateEffect(AUDIO_EFFECT_OFF);
+            mSetting.updateAudioEffect(AUDIO_EFFECT_OFF);
             audioPreset = AUDIO_EFFECT_OFF;
             syncAudioPreset(audioPreset);
             KTVLogger.d(TAG, "Your are highlighter, " + "uid: " + uid);
@@ -1901,7 +1870,7 @@ public class RoomLivingViewModel extends ViewModel {
     public void resetAudioPreset() {
         KTVLogger.d(TAG, "resetAudioPreset: " + audioPreset);
         if (mRtcEngine == null || mSetting == null) return;
-        mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF);
-        mSetting.updateEffect(AUDIO_EFFECT_OFF);
+        mRtcEngine.setAudioEffectPreset(DEFAULT_AUDIO_EFFECT);
+        mSetting.updateAudioEffect(DEFAULT_AUDIO_EFFECT);
     }
 }

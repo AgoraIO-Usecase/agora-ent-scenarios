@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
@@ -22,7 +20,6 @@ import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnItemClickListener;
-import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.bean.EffectVoiceBean;
 import io.agora.scene.ktv.databinding.KtvDialogMusicSettingBinding;
@@ -34,6 +31,7 @@ import io.agora.scene.ktv.widget.soundcard.SoundTypeFragment;
 import io.agora.scene.ktv.live.holder.EffectVoiceHolder;
 import io.agora.scene.widget.DividerDecoration;
 import kotlin.Unit;
+
 /**
  * 控制台
  */
@@ -44,7 +42,7 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
     private Boolean isPause = false;
     private BaseRecyclerViewAdapter<KtvItemEffectvoiceBinding, EffectVoiceBean, EffectVoiceHolder> adapter;
 
-    public MusicSettingDialog(MusicSettingBean mSetting,SoundCardSettingBean mSoundCardSetting, boolean isPause) {
+    public MusicSettingDialog(MusicSettingBean mSetting, SoundCardSettingBean mSoundCardSetting, boolean isPause) {
         this.mSetting = mSetting;
         this.mSoundCardSetting = mSoundCardSetting;
         this.isPause = isPause;
@@ -101,7 +99,6 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         mBinding.sbVol2.setProgress(this.mSetting.getVolMusic());
 
         mBinding.changeToneView.setProgress(getCurrentPitch(mSetting.getToneValue()));
-        setSoundMode();
         mBinding.btnToneDownDialogSetting.setOnClickListener(v -> tuningTone(false));
         mBinding.btnToneUpDialogSetting.setOnClickListener(v -> tuningTone(true));
 
@@ -207,56 +204,30 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
             }
         });
 
+        String[] stringArray = getResources().getStringArray(R.array.ktv_audioPreset);
         List<EffectVoiceBean> list = new ArrayList<>();
-        list.add(new EffectVoiceBean(0, R.mipmap.bg_sound_mode_1, "原声"));
-        list.add(new EffectVoiceBean(1, R.mipmap.bg_sound_mode_2, "KTV"));
-        list.add(new EffectVoiceBean(2, R.mipmap.bg_sound_mode_3, "演唱会"));
-        list.add(new EffectVoiceBean(3, R.mipmap.bg_sound_mode_4, "录音棚"));
-        list.add(new EffectVoiceBean(4, R.mipmap.bg_sound_mode_1, "留声机"));
-        list.add(new EffectVoiceBean(5, R.mipmap.bg_sound_mode_2, "空旷"));
-        list.add(new EffectVoiceBean(6, R.mipmap.bg_sound_mode_3, "空灵"));
-        list.add(new EffectVoiceBean(7, R.mipmap.bg_sound_mode_4, "流行"));
-        list.add(new EffectVoiceBean(8, R.mipmap.bg_sound_mode_1, "R&B"));
+        for (int i = 0; i < stringArray.length; i++) {
+            int drawable;
+            if (i % 4 == 0) {
+                drawable = R.mipmap.bg_sound_mode_4;
+            } else if (i % 3 == 0) {
+                drawable = R.mipmap.bg_sound_mode_3;
+            } else if (i % 2 == 0) {
+                drawable = R.mipmap.bg_sound_mode_2;
+            } else {
+                drawable = R.mipmap.bg_sound_mode_1;
+            }
+            int audioEffect = mSetting.getEffectIndex(i);
+            list.add(new EffectVoiceBean(i, audioEffect, drawable, stringArray[i]));
+        }
         for (EffectVoiceBean item : list) {
-            item.setSelect(mSetting.getEffect() == item.getId());
+            item.setSelect(mSetting.getAudioEffect() == item.getAudioEffect());
         }
 
         adapter = new BaseRecyclerViewAdapter<>(list, this, EffectVoiceHolder.class);
 
         mBinding.rvVoiceEffectList.setAdapter(adapter);
         mBinding.rvVoiceEffectList.addItemDecoration(new DividerDecoration(10, 20, 0));
-    }
-
-    private void setSoundMode() {
-        int margin = UiUtil.dp2px(10);
-        String[] stringArray = getResources().getStringArray(R.array.ktv_audioPreset);
-        for (int i = 0; i < stringArray.length; i++) {
-            RadioButton radioButton = (RadioButton) getLayoutInflater().inflate(R.layout.btn_sound_mode, null);
-            radioButton.setText(stringArray[i]);
-            if (i % 4 == 0) {
-                radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode4);
-            } else if (i % 3 == 0) {
-                radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode3);
-            } else if (i % 2 == 0) {
-                radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode2);
-            } else {
-                radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode1);
-            }
-            mBinding.radioGroup.addView(radioButton);
-            ((LinearLayout.LayoutParams) radioButton.getLayoutParams()).setMargins(margin, 0, 0, 0);
-            if (0 == i) {
-                radioButton.setChecked(true);
-            } else if (i == stringArray.length - 1) {
-                ((LinearLayout.LayoutParams) radioButton.getLayoutParams()).setMargins(margin, 0, margin, 0);
-            }
-            int finalI = i;
-            radioButton.setOnCheckedChangeListener((compoundButton, b) -> {
-                if (b) {
-                    mSetting.setEffect(finalI);
-                }
-            });
-        }
-        ((RadioButton) mBinding.radioGroup.getChildAt(mSetting.getEffect())).setChecked(true);
     }
 
     private void showEarBackPage(View v) {
@@ -267,7 +238,7 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         ft.commit();
     }
 
-    private void showSoundCardPage(View v){
+    private void showSoundCardPage(View v) {
         mBinding.getRoot().removeAllViews();
         SoundCardFragment soundCardFragment = new SoundCardFragment(mSoundCardSetting);
         soundCardFragment.setOnClickSoundCardType(() -> {
@@ -375,7 +346,7 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
             adapter.dataList.get(i).setSelect(i == position);
             adapter.notifyItemChanged(i);
         }
-        mSetting.setEffect(data.getId());
+        mSetting.setAudioEffect(data.getAudioEffect());
     }
 
     public interface Callback {
@@ -385,7 +356,7 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
 
         void onMusicVolChanged(int vol);
 
-        void onEffectChanged(int effect);
+        void onEffectChanged(int audioEffect);
 
         void onBeautifierPresetChanged(int effect);
 

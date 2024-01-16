@@ -1,11 +1,13 @@
 package io.agora.scene.ktv.widget;
 
+import io.agora.rtc2.Constants;
+
 public class MusicSettingBean {
     private final MusicSettingDialog.Callback mCallback;
     private EarPhoneCallback mEarPhoneCallback;
     private int volMic;
     private int volMusic;
-    private int effect;
+    private int audioPreset;
     private int beautifier = 0;
     private int toneValue;
     private int audioEffectParams1 = 0;
@@ -32,8 +34,9 @@ public class MusicSettingBean {
     private boolean aiaecOpen = false;
     private int mAIAECStrength = 0;
 
-
-    public MusicSettingBean(boolean isEar, int volMic, int volMusic, int toneValue, MusicSettingDialog.Callback mCallback) {
+    public MusicSettingBean(int audioEffect, boolean isEar, int volMic, int volMusic, int toneValue,
+                            MusicSettingDialog.Callback mCallback) {
+        this.audioPreset = audioEffect;
         this.isEar = isEar;
         this.volMic = volMic;
         this.volMusic = volMusic;
@@ -76,18 +79,18 @@ public class MusicSettingBean {
         this.mCallback.onMusicVolChanged(volMusic);
     }
 
-    public int getEffect() {
-        return effect;
+    public int getAudioEffect() {
+        return audioPreset;
     }
 
-    public void setEffect(int effect) {
-        if (this.effect == effect) return;
-        this.effect = effect;
-        this.mCallback.onEffectChanged(effect);
+    public void setAudioEffect(int audioEffect) {
+        if (this.audioPreset == audioEffect) return;
+        this.audioPreset = audioEffect;
+        this.mCallback.onEffectChanged(audioEffect);
     }
 
-    public void updateEffect(int effect) {
-        this.effect = effect;
+    public void updateAudioEffect(int audioEffect) {
+        this.audioPreset = audioEffect;
     }
 
     public int getBeautifier() {
@@ -122,28 +125,36 @@ public class MusicSettingBean {
         this.mCallback.onToneChanged(newToneValue);
     }
 
-    public int getRemoteVolume() { return remoteVolume; }
+    public int getRemoteVolume() {
+        return remoteVolume;
+    }
 
     public void setRemoteVolume(int newValue) {
         this.remoteVolume = newValue;
         this.mCallback.onRemoteVolumeChanged(newValue);
     }
 
-    public boolean getProfessionalMode() { return professionalMode; }
+    public boolean getProfessionalMode() {
+        return professionalMode;
+    }
 
     public void setProfessionalMode(boolean mode) {
         this.professionalMode = mode;
         this.mCallback.onProfessionalModeChanged(mode);
     }
 
-    public int getAECLevel() { return aecLevel; }
+    public int getAECLevel() {
+        return aecLevel;
+    }
 
     public void setAECLevel(int level) {
         this.aecLevel = level;
         this.mCallback.onAECLevelChanged(level);
     }
 
-    public boolean getLowLatencyMode() { return lowLatencyMode; }
+    public boolean getLowLatencyMode() {
+        return lowLatencyMode;
+    }
 
     public void setLowLatencyMode(boolean mode) {
         this.lowLatencyMode = mode;
@@ -153,6 +164,7 @@ public class MusicSettingBean {
     public int getEarBackVolume() {
         return earBackVolume;
     }
+
     public void setEarBackVolume(int volume) {
         this.earBackVolume = volume;
         this.mCallback.onEarBackVolumeChanged(volume);
@@ -199,6 +211,7 @@ public class MusicSettingBean {
 
     public interface EarPhoneCallback {
         void onHasEarPhoneChanged(boolean hasEarPhone);
+
         void onEarMonitorDelay(int earsBackDelay);
     }
 
@@ -220,10 +233,46 @@ public class MusicSettingBean {
         this.mCallback.onAIAECChanged(open);
     }
 
-    public int getAIAECStrength() { return mAIAECStrength; }
+    public int getAIAECStrength() {
+        return mAIAECStrength;
+    }
 
     public void setAIAECStrength(int strength) {
         this.mAIAECStrength = strength;
         this.mCallback.onAIAECStrengthSelect(strength);
+    }
+
+    public int getEffectIndex(int index) {
+        switch (index) {
+            // KTV
+            case 0:
+                return Constants.ROOM_ACOUSTICS_KTV;
+            // 原声
+            case 1:
+                return Constants.AUDIO_EFFECT_OFF;
+            // 演唱会
+            case 2:
+                return Constants.ROOM_ACOUSTICS_VOCAL_CONCERT;
+            // 录音棚
+            case 3:
+                return Constants.ROOM_ACOUSTICS_STUDIO;
+            // 留声机
+            case 4:
+                return Constants.ROOM_ACOUSTICS_PHONOGRAPH;
+            // 空旷
+            case 5:
+                return Constants.ROOM_ACOUSTICS_SPACIAL;
+            // 空灵
+            case 6:
+                return Constants.ROOM_ACOUSTICS_ETHEREAL;
+            // 流行
+            case 7:
+                return Constants.STYLE_TRANSFORMATION_POPULAR;
+            // R&B
+            case 8:
+                return Constants.STYLE_TRANSFORMATION_RNB;
+        }
+        // 默认 ktv
+        return Constants.ROOM_ACOUSTICS_KTV;
     }
 }
