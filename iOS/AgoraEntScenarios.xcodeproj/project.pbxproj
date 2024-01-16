@@ -1823,8 +1823,8 @@
 		A851C5E22AEF602000071F88 /* Network */ = {
 			isa = PBXGroup;
 			children = (
-				A851C5E32AEF602000071F88 /* AUIError.swift */,
 				A851C5E42AEF602000071F88 /* AUINetworking.swift */,
+				A851C5E32AEF602000071F88 /* AUIError.swift */,
 				A851C5E52AEF602000071F88 /* AUINetworkModel.swift */,
 				A851C5E62AEF602000071F88 /* AgoraEntCommonLogger.swift */,
 				A851C5E72AEF602000071F88 /* NetworkManagerModel.swift */,
