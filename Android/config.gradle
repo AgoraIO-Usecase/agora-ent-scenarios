@@ -69,7 +69,10 @@ ext {
             picturecompress    : 'io.github.lucksiege:compress:v3.11.1',
 
             // other
-            audiokit           : 'com.huawei.multimedia:audiokit:1.0.1'
+            audiokit           : 'com.huawei.multimedia:audiokit:1.0.1',
+
+            protobuf_java      : 'com.google.protobuf:protobuf-java:3.19.3',
+            protobuf_java_util : 'com.google.protobuf:protobuf-java-util:3.19.3'
     ]
     android = [
             compileSdkVersion: 31,
