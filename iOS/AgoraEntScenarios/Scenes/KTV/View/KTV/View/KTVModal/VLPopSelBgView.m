@@ -138,13 +138,13 @@
     [self.contentView addSubview:self.picImgView];
     
     self.selIcon = [[UIImageView alloc]initWithFrame:CGRectMake(self.width-18, self.height-17, 18, 17)];
-    self.selIcon.image = [UIImage sceneImageWithName:@"ktv_selbg_icon"];
+    self.selIcon.image = [UIImage sceneImageWithName:@"ktv_selbg_icon" bundleName:@"KtvResource"];
     [self.contentView addSubview:self.selIcon];
 }
 
 - (void)setSelBgModel:(VLKTVSelBgModel *)selBgModel {
     _selBgModel = selBgModel;
-    self.picImgView.image = [UIImage sceneImageWithName:selBgModel.imageName];
+    self.picImgView.image = [UIImage sceneImageWithName:selBgModel.imageName bundleName:@"KtvResource"];
     self.selIcon.hidden = !selBgModel.isSelect;
 }
 

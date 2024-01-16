@@ -28,7 +28,7 @@
     [self addSubview:introduceLabel];
 
     UIImageView *emptyImgView = [[UIImageView alloc]init];
-    emptyImgView.image = [UIImage sceneImageWithName:@"online_empty_placeHolder"];
+    emptyImgView.image = [UIImage sceneImageWithName:@"online_empty_placeHolder" bundleName:@"sbgResource"];
     [self addSubview:emptyImgView];
     
     [emptyImgView mas_makeConstraints:^(MASConstraintMaker *make) {

@@ -17,6 +17,15 @@ import Bugly
     @objc var imageCahe = [String: AnyObject]()
     @objc var localizedCache = [String: String]()
     @objc var sceneConfig: VLSceneConfigsModel?
+    private var _appId: String = ""
+    private var _certificate: String = ""
+    private var _imAppKey: String = ""
+    private var _imClientId: String = ""
+    private var _imClientSecret: String = ""
+    private var _cloudPlayerKey: String = ""
+    private var _cloudPlayerSecret: String = ""
+    private var _hostUrl: String = ""
+    private var _baseServerUrl: String = ""
     
     @objc var isAgreeLicense: Bool = false {
         didSet {
@@ -61,13 +70,86 @@ import Bugly
     // MARK: user
 
     // MARK: App Config
-
-    @objc func appId() -> String {
-        return KeyCenter.AppId
+    
+    @objc public var appId: String {
+        get {
+            return _appId
+        }
+        set {
+            _appId = newValue
+        }
     }
-
-    @objc func appHostUrl() -> String {
-        return KeyCenter.HostUrl
+    
+    @objc public var certificate: String {
+        get {
+            return _certificate
+        }
+        set {
+            _certificate = newValue
+        }
+    }
+    
+    @objc public var imAppKey: String {
+        get {
+            return _imAppKey
+        }
+        set {
+            _imAppKey = newValue
+        }
+    }
+    
+    @objc public var imClientId: String {
+        get {
+            return _imClientId
+        }
+        set {
+            _imClientId = newValue
+        }
+    }
+    
+    @objc public var imClientSecret: String {
+        get {
+            return _imClientSecret
+        }
+        set {
+            _imClientSecret = newValue
+        }
+    }
+    
+    @objc public var cloudPlayerKey: String {
+        get {
+            return _cloudPlayerKey
+        }
+        set {
+            _cloudPlayerKey = newValue
+        }
+    }
+    
+    @objc public var cloudPlayerSecret: String {
+        get {
+            return _cloudPlayerSecret
+        }
+        set {
+            _cloudPlayerSecret = newValue
+        }
+    }
+    
+    @objc public var hostUrl: String {
+        get {
+            return _hostUrl
+        }
+        set {
+            _hostUrl = newValue
+        }
+    }
+    
+    @objc public var baseServerUrl: String {
+        get {
+            return _baseServerUrl
+        }
+        set {
+            _baseServerUrl = newValue
+        }
     }
     
     @objc func appRTCToken() -> String {

@@ -40,21 +40,21 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
 
 - (void)setupView {
     self.audioBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(12, (self.height-38)*0.5, 38, 38)];
-    [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_mute"] forState:UIControlStateNormal];
-    [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_unmute"] forState:UIControlStateSelected];
+    [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_mute" bundleName:@"sbgResource"] forState:UIControlStateNormal];
+    [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_unmute" bundleName:@"sbgResource"] forState:UIControlStateSelected];
     self.audioBtn.tag = VLSBGBottomBtnClickTypeAudio;
     [self.audioBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.audioBtn];
     
     self.videoBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(self.audioBtn.right+8, (self.height-38)*0.5, 38, 38)];
-    [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_cam_mute"] forState:UIControlStateNormal];
-    [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_cam_unmute"] forState:UIControlStateSelected];
+    [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_cam_mute" bundleName:@"sbgResource"] forState:UIControlStateNormal];
+    [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_cam_unmute" bundleName:@"sbgResource"] forState:UIControlStateSelected];
     self.videoBtn.tag = VLSBGBottomBtnClickTypeVideo;
     [self.videoBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.videoBtn];
     
     VLHotSpotBtn *moreBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(self.videoBtn.right+15, (self.height-24)*0.5, 24, 24)];
-    [moreBtn setImage:[UIImage sceneImageWithName:@"ktv_moreItem_icon"] forState:UIControlStateNormal];
+    [moreBtn setImage:[UIImage sceneImageWithName:@"ktv_moreItem_icon" bundleName:@"sbgResource"] forState:UIControlStateNormal];
     moreBtn.tag = VLSBGBottomBtnClickTypeMore;
     [moreBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:moreBtn];
@@ -62,14 +62,14 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
    // moreBtn.alpha = 0;
     
     VLHotSpotBtn *dianGeBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(self.width-20-70, (self.height-32)*0.5, 70, 32)];
-    [dianGeBtn setImage:[UIImage sceneImageWithName:@"ktv_diange_icon"] forState:UIControlStateNormal];
+    [dianGeBtn setImage:[UIImage sceneImageWithName:@"ktv_diange_icon" bundleName:@"sbgResource"] forState:UIControlStateNormal];
     [dianGeBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     dianGeBtn.tag = VLSBGBottomBtnClickTypeChoose;
     [self addSubview:dianGeBtn];
     dianGeBtn.hidden = true;
     
     VLHotSpotBtn *voiceShowBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(moreBtn.right + 14 , (self.height-24)*0.5, 24, 24)];
-    [voiceShowBtn setImage:[UIImage sceneImageWithName:@"ktv_moreItem_icon"] forState:UIControlStateNormal];
+    [voiceShowBtn setImage:[UIImage sceneImageWithName:@"ktv_moreItem_icon" bundleName:@"sbgResource"] forState:UIControlStateNormal];
     [voiceShowBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     voiceShowBtn.tag = VLSBGBottomBtnClickTypeShowVoice;
     [self addSubview:voiceShowBtn];

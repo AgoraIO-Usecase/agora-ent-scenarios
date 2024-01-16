@@ -39,7 +39,7 @@
 - (void)setModel:(VLSBGKindsModel *)model {
     _model = model;
     _cLabel.text = _model.title;
-    _cImageView.image = [UIImage sceneImageWithName:_model.imageName];
+    _cImageView.image = [UIImage sceneImageWithName:_model.imageName bundleName:@"sbgResource"];
     if (_model.selected) {
         self.contentView.layer.borderColor = [UIColor blueColor].CGColor;
     } else {

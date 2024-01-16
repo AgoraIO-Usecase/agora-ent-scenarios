@@ -71,7 +71,7 @@
 - (void)setSongItemModel:(VLSRSongItmModel *)songItemModel {
     _songItemModel = songItemModel;
     [self.picImgView sd_setImageWithURL:[NSURL URLWithString:songItemModel.imageUrl]
-                       placeholderImage:[UIImage sceneImageWithName:@"default_avatar"]];
+                       placeholderImage:[UIImage sceneImageWithName:@"default_avatar" bundleName:@"SRResource"]];
     self.nameLabel.text = songItemModel.songName;
     self.singerLabel.text = songItemModel.singer;
     

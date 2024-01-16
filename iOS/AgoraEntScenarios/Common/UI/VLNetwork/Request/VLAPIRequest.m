@@ -5,7 +5,6 @@
 
 #import "VLAPIRequest.h"
 //#import "AppDelegate+Config.h"
-#import "UIWindow+Router.h"
 #import "VLMacroDefine.h"
 #import "VLToast.h"
 #import "VLUserCenter.h"
@@ -354,7 +353,9 @@ static AFHTTPSessionManager *_sessionManager;
     [VLToast toast:AGLocalizedString(@"app_expire")];
     // TODO: goto login page
     [[VLUserCenter center] logout];
-    [[UIApplication sharedApplication].delegate.window configRootViewController];
+    NSNotification *notification = [NSNotification notificationWithName:@"AGORAENTTOKENEXPIRED" object:nil];
+    [[NSNotificationCenter defaultCenter] postNotification:notification];
+   // [[UIApplication sharedApplication].delegate.window configRootViewController];
 }
 
 // 请求进度

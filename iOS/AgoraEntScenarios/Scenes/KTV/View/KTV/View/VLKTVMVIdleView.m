@@ -25,7 +25,7 @@
 
 - (void)setupView {
     UIImageView *bgImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height)];
-    bgImageView.image = [UIImage sceneImageWithName:@"bg-lyric"];
+    bgImageView.image = [UIImage sceneImageWithName:@"bg-lyric" bundleName:@"KtvResource"];
     [self addSubview:bgImageView];
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectZero];

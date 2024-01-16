@@ -2,7 +2,6 @@
 //  Use this file to import your target's public headers that you would like to expose to Swift.
 //
 
-#import "UIWindow+Router.h"
 #import "VLUserCenter.h"
 #import "VLBaseModel.h"
 #import "VLLoginModel.h"
@@ -33,5 +32,7 @@
 #import "VLAPIRequest.h"
 #import "VLAlert.h"
 #import "VLUploadImageResModel.h"
-#import "UIWindow+Router.h"
+
+#import "VLMainTabBarController.h"
+#import "BaseNavigationController.h"
 
