@@ -105,7 +105,7 @@
     if (seatModel.headUrl.length > 0) {
         [cell.avatarImgView sd_setImageWithURL:[NSURL URLWithString:seatModel.headUrl]];
     }else{
-        cell.avatarImgView.image = [UIImage sceneImageWithName:@"ktv_emptySeat_icon"];
+        cell.avatarImgView.image = [UIImage sr_sceneImageWithName:@"ktv_emptySeat_icon" ];
     }
     
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"MICOWNERINDEX"]){
