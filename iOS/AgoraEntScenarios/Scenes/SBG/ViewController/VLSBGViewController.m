@@ -136,7 +136,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
     [self subscribeServiceEvent];
     
     // setup view
-    [self setBackgroundImage:@"bg-main"];
+    [self setBackgroundImage:@"bg-main" bundleName:@"sbgResource"];
     
 //    UIView *bgView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
 //    bgView.backgroundColor = UIColorMakeWithRGBA(0, 0, 0, 0.6);
@@ -258,7 +258,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
                     return;
                 }
                 NSString *mes = SBGLocalizedString(@"sbg_game_isOn");
-                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SBGLocalizedString(@"sbg_confirm") completion:^(bool flag, NSString * _Nullable text) {
+                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sbg_sceneImageWithName:@"empty"] message:mes buttonTitle:SBGLocalizedString(@"sbg_confirm") completion:^(bool flag, NSString * _Nullable text) {
                     [[VLKTVAlert shared]dismiss];
                     [weakSelf leaveRoom];
                 }];
@@ -327,7 +327,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
             //房主关闭房间
             if ([roomInfo.creatorNo isEqualToString:VLUserCenter.user.id]) {
                 NSString *mes = @"sbg_room_exit";
-                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SBGLocalizedString(@"sbg_confirm") completion:^(bool flag, NSString * _Nullable text) {
+                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sbg_sceneImageWithName:@"empty"] message:mes buttonTitle:SBGLocalizedString(@"sbg_confirm") completion:^(bool flag, NSString * _Nullable text) {
                     [[VLKTVAlert shared]dismiss];
                     [weakSelf leaveRoom];
                 }];
@@ -382,7 +382,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
     [[AppContext sbgServiceImp] subscribeRoomWillExpire:^{
         bool isOwner = [weakSelf.roomModel.creatorNo isEqualToString:VLUserCenter.user.id];
         NSString *mes = isOwner ? SBGLocalizedString(@"sbg_room_timeout") : SBGLocalizedString(@"sbg_room_offline");
-        [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SBGLocalizedString(@"sbg_confirm") completion:^(bool flag, NSString * _Nullable text) {
+        [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sbg_sceneImageWithName:@"empty"] message:mes buttonTitle:SBGLocalizedString(@"sbg_confirm") completion:^(bool flag, NSString * _Nullable text) {
             [[VLKTVAlert shared]dismiss];
             [weakSelf leaveRoom];
         }];
@@ -556,7 +556,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
 //用户弹框离开房间
 - (void)popForceLeaveRoom {
     VL(weakSelf);
-    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:SBGLocalizedString(@"sbg_owner_leave") buttonTitle:SBGLocalizedString(@"sbg_confirm") completion:^(bool flag, NSString * _Nullable text) {
+    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sbg_sceneImageWithName:@"empty"] message:SBGLocalizedString(@"sbg_owner_leave") buttonTitle:SBGLocalizedString(@"sbg_confirm") completion:^(bool flag, NSString * _Nullable text) {
         for (VLBaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLSBGOnLineListVC class]]) {
 //                [weakSelf destroyMediaPlayer];
@@ -1400,6 +1400,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
         [[VLAlert shared] dismiss];
     }];
+}
+
+- (void)onVLSBGTopView:(VLSBGTopView *)view moreBtnTapped:(id)sender{
+    AUiMoreDialog* dialog = [[AUiMoreDialog alloc] initWithFrame:self.view.bounds];
+    [self.view addSubview:dialog];
+    [dialog show];
 }
 
 #pragma mark - VLPopMoreSelViewDelegate
