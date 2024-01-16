@@ -111,7 +111,7 @@
   //  VL(weakSelf);
     VLHomeOnLineListCCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:[VLHomeOnLineListCCell className] forIndexPath:indexPath];
     cell.listModel = self.roomListModeArray[indexPath.row];
-    cell.bgImgView.image = [UIImage sceneImageWithName:[NSString stringWithFormat:@"create_bg_%li" ,indexPath.row % 5]];
+    cell.bgImgView.image = [UIImage ktv_sceneImageWithName:[NSString stringWithFormat:@"create_bg_%li" ,indexPath.row % 5]  ];
     return cell;
 }
 
@@ -173,9 +173,9 @@ static const int INTERVAL = 1000; // 时间间隔为1秒
         
         _createBtn = [UIButton buttonWithType:UIButtonTypeCustom];
        // [_createBtn setTitle:KTVLocalizedString(@"ktv_create_room") forState:UIControlStateNormal];
-       // [_createBtn setImage:[UIImage sceneImageWithName:@"add"] forState:UIControlStateNormal];
+       // [_createBtn setImage:[UIImage ktv_sceneImageWithName:@"add"] forState:UIControlStateNormal];
         _createBtn.accessibilityIdentifier = @"ktv_create_button_id";
-        [_createBtn setBackgroundImage:[UIImage sceneImageWithName:@"create_room"] forState:UIControlStateNormal];
+        [_createBtn setBackgroundImage:[UIImage ktv_sceneImageWithName:@"create_room" ] forState:UIControlStateNormal];
 
         _createBtn.frame = CGRectMake((SCREEN_WIDTH-148)*0.5, SCREEN_HEIGHT-34-kSafeAreaBottomHeight-56-kTopNavHeight, 148, 56);
        // _createBtn.layer.cornerRadius = 23;

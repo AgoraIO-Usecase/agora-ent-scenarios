@@ -195,7 +195,7 @@ UICollectionViewDataSource
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     EffectCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"EffectCollectionViewCell" forIndexPath:indexPath];
-    cell.bgImageView.image = [UIImage sceneImageWithName:self.effectImgs[indexPath.item % 4]];
+    cell.bgImageView.image = [UIImage ktv_sceneImageWithName:self.effectImgs[indexPath.item % 4] ];
     cell.titleLabel.text = self.titles[indexPath.item];
     cell.layer.cornerRadius = 5;
     cell.layer.masksToBounds = true;
