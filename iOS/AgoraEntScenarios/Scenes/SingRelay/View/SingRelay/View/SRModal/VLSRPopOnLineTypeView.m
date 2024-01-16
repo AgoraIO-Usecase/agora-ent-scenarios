@@ -34,7 +34,7 @@
 - (void)setupView {
     
     VLHotSpotBtn *backBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(20, 20, 20, 20)];
-    [backBtn setImage:[UIImage sceneImageWithName:@"ktv_back_whiteIcon"] forState:UIControlStateNormal];
+    [backBtn setImage:[UIImage sr_sceneImageWithName:@"ktv_back_whiteIcon" ] forState:UIControlStateNormal];
     [backBtn addTarget:self action:@selector(backBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:backBtn];
     
@@ -49,7 +49,7 @@
     CGFloat itemW = (SCREEN_WIDTH-3*margin)/2.0;
     UIButton *audioBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [audioBtn setTitle:SRLocalizedString(@"sr_audio_onmic") forState:UIControlStateNormal];
-    [audioBtn setImage:[UIImage sceneImageWithName:@"KTV_onLineType_audionIcon"] forState:UIControlStateNormal];
+    [audioBtn setImage:[UIImage sr_sceneImageWithName:@"KTV_onLineType_audionIcon" ] forState:UIControlStateNormal];
     audioBtn.frame = CGRectMake(margin, titleLabel.bottom+26, itemW, VLREALVALUE_WIDTH(72));
     audioBtn.spacingBetweenImageAndTitle = 16;
     audioBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
@@ -66,13 +66,13 @@
     [self addSubview:audioBtn];
     
     self.audioSelImgView = [[UIImageView alloc]initWithFrame:CGRectMake(self.audioBtn.right-18, self.audioBtn.bottom-17, 18, 17)];
-    self.audioSelImgView.image = [UIImage sceneImageWithName:@"ktv_selbg_icon"];
+    self.audioSelImgView.image = [UIImage sr_sceneImageWithName:@"ktv_selbg_icon" ];
     self.audioSelImgView.hidden = YES;
     [self addSubview:self.audioSelImgView];
 
     UIButton *videoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [audioBtn setTitle:SRLocalizedString(@"sr_video_onmic") forState:UIControlStateNormal];
-    [audioBtn setImage:[UIImage sceneImageWithName:@"KTV_onLineType_videoIcon"] forState:UIControlStateNormal];
+    [audioBtn setImage:[UIImage sr_sceneImageWithName:@"KTV_onLineType_videoIcon" ] forState:UIControlStateNormal];
     videoBtn.frame = CGRectMake(audioBtn.right+margin, audioBtn.top, itemW, VLREALVALUE_WIDTH(72));
     videoBtn.spacingBetweenImageAndTitle = 16;
     videoBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
@@ -88,7 +88,7 @@
     [self addSubview:videoBtn];
     
     self.videoSelImgView = [[UIImageView alloc]initWithFrame:CGRectMake(self.videoBtn.right-18, self.videoBtn.bottom-17, 18, 17)];
-    self.videoSelImgView.image = [UIImage sceneImageWithName:@"ktv_selbg_icon"];
+    self.videoSelImgView.image = [UIImage sr_sceneImageWithName:@"ktv_selbg_icon" ];
     self.videoSelImgView.hidden = YES;
     [self addSubview:self.videoSelImgView];
 }

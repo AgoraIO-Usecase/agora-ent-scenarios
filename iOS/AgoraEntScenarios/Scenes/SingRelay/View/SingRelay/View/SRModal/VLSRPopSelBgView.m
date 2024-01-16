@@ -138,13 +138,13 @@
     [self.contentView addSubview:self.picImgView];
     
     self.selIcon = [[UIImageView alloc]initWithFrame:CGRectMake(self.width-18, self.height-17, 18, 17)];
-    self.selIcon.image = [UIImage sceneImageWithName:@"SR_selbg_icon"];
+    self.selIcon.image = [UIImage sr_sceneImageWithName:@"SR_selbg_icon" ];
     [self.contentView addSubview:self.selIcon];
 }
 
 - (void)setSelBgModel:(VLSRSelBgModel *)selBgModel {
     _selBgModel = selBgModel;
-    self.picImgView.image = [UIImage sceneImageWithName:selBgModel.imageName];
+    self.picImgView.image = [UIImage sr_sceneImageWithName:selBgModel.imageName ];
     self.selIcon.hidden = !selBgModel.isSelect;
 }
 
