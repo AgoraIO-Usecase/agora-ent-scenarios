@@ -34,19 +34,19 @@
     [self addSubview:backView];
     
     UIImageView *logoImgView = [[UIImageView alloc]initWithFrame:CGRectMake(20, 10, 34, 34)];
-    logoImgView.image = [UIImage sceneImageWithName:@""];
+    logoImgView.image = [UIImage sr_sceneImageWithName:@"" ];
     logoImgView.layer.cornerRadius = 17;
     logoImgView.layer.masksToBounds = true;
     [self addSubview:logoImgView];
     self.logoImgView = logoImgView;
     
     VLHotSpotBtn *closeBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(UIScreen.mainScreen.bounds.size.width-27-20, 10 + 7, 20, 20)];
-    [closeBtn setImage:[UIImage sceneImageWithName:@"close_room"] forState:UIControlStateNormal];
+    [closeBtn setImage:[UIImage sr_sceneImageWithName:@"close_room" ] forState:UIControlStateNormal];
     [closeBtn addTarget:self action:@selector(closeBtnEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:closeBtn];
     
     UIButton *moreButton = [[UIButton alloc] init];
-    [moreButton setImage:[UIImage sceneImageWithName:@"icon_live_more"] forState:(UIControlStateNormal)];
+    [moreButton setImage:[UIImage sr_sceneImageWithName:@"icon_live_more" ] forState:(UIControlStateNormal)];
     [moreButton addTarget:self action:@selector(moreBtnEvent:) forControlEvents:(UIControlEventTouchUpInside)];
     [self addSubview:moreButton];
     moreButton.translatesAutoresizingMaskIntoConstraints = NO;
@@ -68,7 +68,7 @@
     self.networkStatusBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     self.networkStatusBtn.frame = CGRectMake(110 + 5, 30, 70, 12);
     [self.networkStatusBtn setTitle:SRLocalizedString(@"sr_net_status_good") forState:UIControlStateNormal];
-    [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
+    [self.networkStatusBtn setImage:[UIImage sr_sceneImageWithName:@"ktv_network_wellIcon" ] forState:UIControlStateNormal];
     self.networkStatusBtn.spacingBetweenImageAndTitle = 0;
     self.networkStatusBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
     [self.networkStatusBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -107,19 +107,19 @@
 - (void)setNetworkQuality:(int)quality
 {
     if(quality == 0) {
-        [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
+        [self.networkStatusBtn setImage:[UIImage sr_sceneImageWithName:@"ktv_network_wellIcon" ] forState:UIControlStateNormal];
         [self.networkStatusBtn setTitle:SRLocalizedString(@"sr_net_status_good") forState:UIControlStateNormal];
     }
     else if (quality == 1) {
-        [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_okIcon"] forState:UIControlStateNormal];
+        [self.networkStatusBtn setImage:[UIImage sr_sceneImageWithName:@"ktv_network_okIcon" ] forState:UIControlStateNormal];
         [self.networkStatusBtn setTitle:SRLocalizedString(@"sr_net_status_m") forState:UIControlStateNormal];
     }
     else if(quality == 2) {
-        [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_badIcon"] forState:UIControlStateNormal];
+        [self.networkStatusBtn setImage:[UIImage sr_sceneImageWithName:@"ktv_network_badIcon" ] forState:UIControlStateNormal];
         [self.networkStatusBtn setTitle:SRLocalizedString(@"sr_net_status_low") forState:UIControlStateNormal];
     }
     else {
-        [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
+        [self.networkStatusBtn setImage:[UIImage sr_sceneImageWithName:@"ktv_network_wellIcon" ] forState:UIControlStateNormal];
         [self.networkStatusBtn setTitle:SRLocalizedString(@"sr_net_status_good") forState:UIControlStateNormal];
     }
 }

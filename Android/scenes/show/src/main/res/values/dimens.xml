@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="show_beauty_item_padding">8dp</dimen>
+    <dimen name="show_beauty_item_padding_background">1dp</dimen>
+</resources>
