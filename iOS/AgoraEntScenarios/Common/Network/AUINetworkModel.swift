@@ -26,7 +26,7 @@ public enum AUINetworkMethod: Int {
 @objcMembers
 open class AUINetworkModel: NSObject {
     public var uniqueId: String = UUID().uuidString
-    public var host: String = KeyCenter.HostUrl
+    public var host: String = AppContext.shared.hostUrl
     public var interfaceName: String?
     public var method: AUINetworkMethod = .post
     
@@ -71,11 +71,7 @@ open class AUINetworkModel: NSObject {
     
     func tokenExpired() {
         VLUserCenter.shared().logout()
-        DispatchQueue.main.async {
-            if let window = UIApplication.shared.delegate?.window {
-                window?.configRootViewController()
-            }
-        }
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "AGORAENTTOKENEXPIRED") , object: nil)
     }
     
     public func createBasicAuth(key: String, password: String) -> String {
