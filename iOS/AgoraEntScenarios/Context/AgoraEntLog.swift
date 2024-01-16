@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftyBeaver
-
 @objc class AgoraEntLogConfig: NSObject {
     var sceneName: String = ""
     var logFileMaxSize: Int = (2 * 1024 * 1024)
@@ -27,7 +26,10 @@ import SwiftyBeaver
         let console = ConsoleDestination()
          // log to Xcode Console
         let file = FileDestination()  // log to default swiftybeaver.log file
-        let dateString = NSDate().string(withFormat: "yyyy-MM-dd", timeZone: nil, locale: nil) ?? ""
+       // let dateString = NSDate().string(withFormat: "yyyy-MM-dd", timeZone: nil, locale: nil) ?? ""
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let dateString = dateFormatter.string(from: Date())
         let logDir = logsDir()
         file.logFileURL = URL(fileURLWithPath: "\(logDir)/agora_ent_\(config.sceneName)_ios_\(dateString)_log.log")
         

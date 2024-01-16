@@ -47,7 +47,7 @@
     self.beforeValue = 0;
     self.rotateValue = 0;
     VLHotSpotBtn *backBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(20, 20, 20, 20)];
-    [backBtn setImage:[UIImage sceneImageWithName:@"ktv_back_whiteIcon"] forState:UIControlStateNormal];
+    [backBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_back_whiteIcon" ] forState:UIControlStateNormal];
     [backBtn addTarget:self action:@selector(backBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:backBtn];
     
@@ -88,12 +88,12 @@
     [self addSubview:bgView];
     
     UIImageView *circleImgView = [[UIImageView alloc]initWithFrame:CGRectMake(55, 55, 110, 110)];
-    circleImgView.image = [UIImage sceneImageWithName:@"ktv_circle_bgIcon"];
+    circleImgView.image = [UIImage ktv_sceneImageWithName:@"ktv_circle_bgIcon" ];
     circleImgView.userInteractionEnabled = YES;
     [bgView addSubview:circleImgView];
     
     self.rotateImgView = [[UIImageView alloc]initWithFrame:CGRectMake(62.5, 62.5, 95, 95)];
-    self.rotateImgView.image = [UIImage sceneImageWithName:@"ktv_soundEffert_icon"];
+    self.rotateImgView.image = [UIImage ktv_sceneImageWithName:@"ktv_soundEffert_icon" ];
     self.rotateImgView.userInteractionEnabled = YES;
 //    UITapGestureRecognizer *tapGes = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapGesEvent:)];
 //    [self.rotateImgView addGestureRecognizer:tapGes];
