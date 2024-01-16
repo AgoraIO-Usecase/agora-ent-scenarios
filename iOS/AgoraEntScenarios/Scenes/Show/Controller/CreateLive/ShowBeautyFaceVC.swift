@@ -10,7 +10,7 @@ import JXCategoryView
 
 class ShowBeautyFaceVC: UIViewController {
     
-    var selectedItemClosure: ((_ min: Float, _ max: Float, _ value: CGFloat, _ isHiddenSldier: Bool, _ isShowSegSwitch: Bool) -> Void)?
+    var selectedItemClosure: ((_ value: CGFloat, _ isHiddenSldier: Bool, _ isShowSegSwitch: Bool) -> Void)?
     
     var defalutSelectIndex = 0
        
@@ -33,17 +33,20 @@ class ShowBeautyFaceVC: UIViewController {
     static var adjustData = BeautyModel.createAdjustData()
     static var filterData = BeautyModel.createFilterData()
     static var stickerData = BeautyModel.createStickerData()
+    static var animojData = BeautyModel.createAnimojiData()
     static var backgroundData = BeautyModel.createBackgroundData()
      
     private lazy var dataArray: [BeautyModel] = {
+        var tempArray: [BeautyModel] = []
         switch type {
-        case .beauty: return ShowBeautyFaceVC.beautyData
-        case .style: return ShowBeautyFaceVC.styleData
-        case .adjust: return ShowBeautyFaceVC.adjustData
-//        case .filter: return ShowBeautyFaceVC.filterData
-        case .sticker: return ShowBeautyFaceVC.stickerData
-        case .background: return ShowBeautyFaceVC.backgroundData
+        case .beauty: tempArray = ShowBeautyFaceVC.beautyData
+        case .style: tempArray = ShowBeautyFaceVC.styleData
+        case .adjust: tempArray = ShowBeautyFaceVC.adjustData
+        case .sticker: tempArray = ShowBeautyFaceVC.stickerData
+        case .animoj: return ShowBeautyFaceVC.animojData
+        case .background: tempArray = ShowBeautyFaceVC.backgroundData
         }
+        return tempArray
     }()
     
     private var type: ShowBeautyFaceVCType = .beauty
@@ -78,30 +81,22 @@ class ShowBeautyFaceVC: UIViewController {
         adjustData = BeautyModel.createAdjustData()
         filterData = BeautyModel.createFilterData()
         stickerData = BeautyModel.createStickerData()
-        backgroundData = BeautyModel.createBackgroundData()
     }
     
     private func setBeautyHandler(value: CGFloat, isReset: Bool) {
+        guard !dataArray.isEmpty else { return }
         let model = dataArray[defalutSelectIndex]
         model.value = value
         switch type {
         case .beauty, .adjust:
             if isReset {
-                BeautyManager.shareManager.reset(datas: dataArray)
+                BeautyManager.shareManager.reset(datas: dataArray, type: type)
                 return
             }
             BeautyManager.shareManager.setBeauty(path: model.path,
                                                      key: model.key,
                                                      value: model.value)
-            
-//        case .filter:
-//            if isReset {
-//                BeautyManager.shareManager.resetFilter(datas: dataArray)
-//                return
-//            }
-//            BeautyManager.shareManager.setFilter(path: model.path,
-//                                                     value: model.value)
-            
+                        
         case .style:
             if isReset {
                 BeautyManager.shareManager.resetStyle(datas: dataArray)
@@ -113,6 +108,9 @@ class ShowBeautyFaceVC: UIViewController {
             
         case .sticker:
             BeautyManager.shareManager.setSticker(path: model.path)
+            
+        case .animoj:
+            BeautyManager.shareManager.setAnimoji(path: model.path)
             
         case .background:
             if model.path == nil {
@@ -169,7 +167,7 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         let model = dataArray[indexPath.item]
         cell.setupModel(model: model)
         if model.isSelected {
-            selectedItemClosure?(model.min, model.max, model.value, model.key == nil, type == .background && indexPath.item > 0)
+            selectedItemClosure?(model.value, model.key == nil, type == .background && indexPath.item > 0)
             defalutSelectIndex = indexPath.item
         }
         return cell
@@ -189,10 +187,24 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         collectionView.reloadItems(at: [IndexPath(item: indexPath.item, section: 0)])
         
         if type == .sticker {
-            selectedItemClosure?(model.min, model.max, 0 , true, false)
+            selectedItemClosure?(0, true, false)
             return
         }
-        selectedItemClosure?(model.min, model.max, model.value, model.path == nil, type == .background && model.value > 0)
+        selectedItemClosure?(model.value, model.path == nil, type == .background && model.value > 0)
+    }
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        switch type {
+        case .beauty:
+            let model = dataArray[indexPath.item]
+            let nsString = (model.name ?? "") as NSString
+            let attributes = [NSAttributedString.Key.font: UIFont.show_R_11]
+            let size = nsString.size(withAttributes: attributes as [NSAttributedString.Key : Any])
+            let w = size.width < 52 ? 52 : size.width
+            return CGSize(width: w, height: 70)
+
+        default:
+            return CGSize(width: 52, height: 70)
+        }
     }
 }
 

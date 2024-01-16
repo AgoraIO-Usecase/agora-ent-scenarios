@@ -30,6 +30,9 @@ dependencies {
     if (isProjectLibrary(':scenes:ktv_singbattle')) {
         runtimeOnly project(':scenes:ktv_singbattle')
     }
+    if (isProjectLibrary(':scenes:cantata')) {
+        runtimeOnly project(':scenes:cantata')
+    }
     if (isProjectLibrary(':scenes:voice')) {
         runtimeOnly project(':scenes:voice')
     }

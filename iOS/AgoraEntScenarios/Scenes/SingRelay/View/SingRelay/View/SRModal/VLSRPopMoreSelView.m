@@ -57,7 +57,7 @@
         [self addSubview:itemBgView];
     
         UIButton *itemBtn = [[UIButton alloc]initWithFrame:CGRectMake(leftMargin+(itemWH+middleMargin)*i+11, itemY+12, btnItemWH, btnItemWH)];
-        [itemBtn setImage:[UIImage sceneImageWithName:itemsArray[i]] forState:UIControlStateNormal];
+        [itemBtn setImage:[UIImage sr_sceneImageWithName:itemsArray[i] ] forState:UIControlStateNormal];
         itemBtn.tag = i;
         [itemBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:itemBtn];

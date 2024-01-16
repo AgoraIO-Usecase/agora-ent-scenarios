@@ -32,9 +32,11 @@ def all_pods
   pod 'JXCategoryView', '1.6.1'
 
   # 火山美颜
-#  pod 'BytedEffect', :path => 'bytedEffect.podspec'
+  pod 'bytedEffect', :path => 'bytedEffect.podspec'
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
+  # 相芯美颜
+ # pod 'fuLib', :path => 'fu.podspec'
 
   pod 'AgoraSyncManager', '~> 2.1.6'
 
@@ -46,7 +48,8 @@ def all_pods
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
   pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
   pod 'ShowTo1v1', :path => 'AgoraEntScenarios/Scenes/ShowTo1v1'
-
+#  pod 'Cantata', :path => 'AgoraEntScenarios/Scenes/Cantata'
+  pod 'AgoraCommon', :path => 'AgoraEntScenarios'
   #ThirdParty
 #  pod 'HWWeakTimer', '1.0'
   pod 'LSTPopView', '0.3.10'

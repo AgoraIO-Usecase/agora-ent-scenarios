@@ -24,7 +24,7 @@ typedef NS_ENUM(NSInteger, VLNavigationBarStatus) {
 
 - (void)configNavigationBar:(UINavigationBar *)navigationBar;
 
-- (void)setBackgroundImage:(NSString *)imageName;
+- (void)setBackgroundImage:(NSString *)imageName bundleName:(NSString *)name;
 
 - (void)hiddenBackgroundImage;
 

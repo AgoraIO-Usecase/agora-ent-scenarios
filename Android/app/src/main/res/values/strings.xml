@@ -144,6 +144,8 @@
     <string name="app_about_karaoke">在线K歌</string>
     <string name="app_about_show">秀场直播</string>
     <string name="app_about_singbattle">嗨歌抢唱</string>
+    <string name="app_about_sing_relay">抢麦接唱</string>
+    <string name="app_about_cantata">大合唱</string>
     <string name="app_about_pure1v1">1v1私密房</string>
     <string name="app_about_showTo1v1">秀场转1v1私密房</string>
     <string name="app_about_customer_service">联系客服</string>

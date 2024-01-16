@@ -39,7 +39,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor colorWithHexString:@"#F5F8FF"];
-    [self setBackgroundImage:@"home_bg_image"];
+    [self setBackgroundImage:@"home_bg_image" bundleName:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -74,9 +74,9 @@
 }
 
 //背景图
-- (void)setBackgroundImage:(NSString *)imageName {
+- (void)setBackgroundImage:(NSString *)imageName bundleName:(NSString *)name{
     [self.view addSubview:self.backGroundImgView];
-    self.backGroundImgView.image = UIImageMake(imageName) ? : [UIImage sceneImageWithName:imageName];
+    self.backGroundImgView.image = UIImageMake(imageName) ? : [UIImage sceneImageWithName:imageName bundleName:name];
 }
 
 - (void)hiddenBackgroundImage {

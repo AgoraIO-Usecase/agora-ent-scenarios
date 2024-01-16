@@ -246,7 +246,7 @@ public class GlUtil {
     }
 
     public static EGLContext getCurrGLContext(){
-        EGL10 egl = (EGL10)EGLContext.getEGL();
+        EGL10 egl = (EGL10) EGLContext.getEGL();
         if (egl != null && !Objects.equals(egl.eglGetCurrentContext(), EGL10.EGL_NO_CONTEXT)) {
             return egl.eglGetCurrentContext();
         }

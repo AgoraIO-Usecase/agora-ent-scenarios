@@ -18,6 +18,7 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLiveDetailActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.utils.RunnableWithDenied
@@ -254,10 +255,9 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
         VideoSetting.resetBroadcastSetting()
         VideoSetting.resetAudienceSetting()
         TokenGenerator.expireSecond = -1
-        if (!mScrollable) {
-            RtcEngineInstance.beautyProcessor.reset()
-        }
         RtcEngineInstance.cleanCache()
+        RtcEngineInstance.resetVirtualBackground()
+        BeautyManager.destroy()
         super.finish()
     }
 }

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="16dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivSingerNum"
+        android:layout_width="36dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/cantata_rank_one"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvSingerNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toBottomOf="@id/ivSingerNum"
+        app:layout_constraintEnd_toEndOf="@id/ivSingerNum"
+        app:layout_constraintStart_toStartOf="@id/ivSingerNum"
+        app:layout_constraintTop_toTopOf="@id/ivSingerNum"
+        tools:text="1" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivSingerAvatar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginVertical="8dp"
+        app:shapeAppearance="@style/ui_widget_roundStyle"
+        app:layout_constraintStart_toEndOf="@id/ivSingerNum"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="8dp"
+        android:src="@mipmap/portrait01"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horizontal50"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintGuide_percent="0.5"
+        android:orientation="horizontal"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvSingerName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/ivSingerAvatar"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        tools:text="xuanxuan"
+        android:lines="1"
+        android:drawablePadding="4dp"
+        android:drawableStart="@drawable/cantata_main_singer_ic"
+        app:layout_constraintBottom_toTopOf="@+id/horizontal50"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvSingerScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/ivSingerAvatar"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/white_50_percent"
+        android:textSize="12sp"
+        tools:text="当前分数 6,122 分"
+        app:layout_constraintTop_toBottomOf="@+id/horizontal50"/>
+
+    <ImageButton
+        android:id="@+id/btnKicking"
+        android:background="@null"
+        android:src="@drawable/cantata_icon_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

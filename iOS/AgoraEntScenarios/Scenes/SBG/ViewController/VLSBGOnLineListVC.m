@@ -47,7 +47,7 @@
 }
 
 - (void)commonUI {
-    [self setBackgroundImage:@"online_list_BgIcon"];
+    [self setBackgroundImage:@"online_list_BgIcon" bundleName:@"sbgResource"];
     [self setNaviTitleName:SBGLocalizedString(@"sbg_name")];
     if ([VLUserCenter center].isLogin) {
         [self setBackBtn];

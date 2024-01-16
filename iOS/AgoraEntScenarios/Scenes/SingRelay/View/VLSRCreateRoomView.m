@@ -43,6 +43,7 @@
 - (void)setupView {
     VL(weakSelf);
     self.addRoomModel.isPrivate = NO;
+    
     NSString *text = SRLocalizedString(@"sr_create_tips");
     UIFont *font = UIFontMake(12);
     CGSize constraintSize = CGSizeMake(self.width - 78, CGFLOAT_MAX);
@@ -60,7 +61,7 @@
     [self addSubview:self.warningView];
     
     UIImageView *warImgView = [[UIImageView alloc]initWithFrame:CGRectMake(10, 6, 16, 16)];
-    warImgView.image = [UIImage sceneImageWithName:@"zhuyi"];
+    warImgView.image = [UIImage sr_sceneImageWithName:@"zhuyi" ];
     warImgView.contentMode = UIViewContentModeScaleAspectFit;
     [self.warningView addSubview:warImgView];
     
@@ -81,7 +82,7 @@
 
     UIButton *randomBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [randomBtn setTitle:SRLocalizedString(@"sr_random") forState:UIControlStateNormal];
-    [randomBtn setImage:[UIImage sceneImageWithName:@"online_create_randomIcon"] forState:UIControlStateNormal];
+    [randomBtn setImage:[UIImage sr_sceneImageWithName:@"online_create_randomIcon" ] forState:UIControlStateNormal];
     randomBtn.spacingBetweenImageAndTitle = 3;
     randomBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [randomBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
@@ -116,8 +117,8 @@
     [self addSubview:secretLabel];
     
     self.enBtn = [[UIButton alloc]initWithFrame:CGRectMake(secretLabel.right + 8, inputBgView.bottom+VLREALVALUE_WIDTH(24), 32, 20)];
-    [self.enBtn setBackgroundImage:[UIImage sceneImageWithName:@"guan"] forState:UIControlStateNormal];
-    [self.enBtn setBackgroundImage:[UIImage sceneImageWithName:@"open"] forState:UIControlStateSelected];
+    [self.enBtn setBackgroundImage:[UIImage sr_sceneImageWithName:@"guan" ] forState:UIControlStateNormal];
+    [self.enBtn setBackgroundImage:[UIImage sr_sceneImageWithName:@"open" ] forState:UIControlStateSelected];
     [self.enBtn addTarget:self action:@selector(enChange:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.enBtn];
     
@@ -144,7 +145,7 @@
     self.codeView = pwdView;
 
     UIButton *createBtn = [[UIButton alloc] init];
-    [createBtn setBackgroundImage:[UIImage sceneImageWithName:@"createRoomBtn"] forState:UIControlStateNormal];
+    [createBtn setBackgroundImage:[UIImage sr_sceneImageWithName:@"createRoomBtn" ] forState:UIControlStateNormal];
     createBtn.accessibilityIdentifier = @"ktv_create_room_button_id";
     createBtn.titleLabel.font = UIFontBoldMake(16.0);
     createBtn.adjustsImageWhenHighlighted = NO;
@@ -166,7 +167,7 @@
     [self createRandomNumber];
     self.inputTF.text = self.addRoomModel.name;
     NSString* iconName = [NSString stringWithFormat:@"icon_room_cover%@.jpg",self.addRoomModel.icon];
-    self.iconImgView.image = [UIImage sceneImageWithName: iconName];
+    self.iconImgView.image = [UIImage sr_sceneImageWithName: iconName ];
 }
 
 -(void)enChange:(UIButton *)btn {

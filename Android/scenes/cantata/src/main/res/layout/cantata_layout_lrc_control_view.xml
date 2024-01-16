@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/cantata_mv_bg"
+    tools:theme="@style/Theme.MaterialComponents.Light">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clActive"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:visibility="visible">
+
+        <!-- prepare -->
+        <include
+            layout="@layout/cantata_layout_lrc_prepare"
+            tools:visibility="gone" />
+
+        <include
+            android:id="@+id/ilActive"
+            layout="@layout/cantata_layout_lrc_active"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tvMusicName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:drawableStart="@mipmap/ic_music_name"
+            android:gravity="start|center_vertical"
+            android:textColor="@android:color/white"
+            android:textSize="13sp"
+            android:ellipsize="end"
+            app:layout_constraintEnd_toStartOf="@+id/tvCumulativeScore"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="花海" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvCoNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:textColor="@color/white_80_percent"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@id/tvMusicName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvMusicName"
+            tools:text="128人合唱中" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvCumulativeScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:textColor="@color/white_80_percent"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@id/tvMusicName"
+            app:layout_constraintEnd_toStartOf="@id/tvCoNumber"
+            app:layout_constraintTop_toTopOf="@id/tvMusicName"
+            tools:text="1523总分" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <include
+        android:id="@+id/ilIdle"
+        layout="@layout/cantata_layout_lrc_idle"
+        android:visibility="visible"
+        tools:visibility="gone" />
+</FrameLayout>

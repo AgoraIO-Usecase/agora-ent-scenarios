@@ -11,6 +11,10 @@ dependencyResolutionManagement {
         maven { url 'https://maven.aliyun.com/repository/jcenter' }
         maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
         maven { url 'https://developer.huawei.com/repo/' }
+        maven {
+            url 'http://maven.faceunity.com/repository/maven-public/'
+            allowInsecureProtocol = true
+        }
     }
 }
 
@@ -34,6 +38,11 @@ include ':scenes:ktv_singbattle'
  */
 include ':scenes:ktv_relay'
 
+/**
+ * 大合唱
+ */
+include ':scenes:cantata'
+
 /*
  * 语聊房
  */
@@ -50,9 +59,10 @@ include ':scenes:voice_spatial:common'
  * 秀场直播
  */
 include ':scenes:show'
-include ':scenes:show:aars:SenseArSourceManager'
-include ':scenes:show:aars:STMobileJNI'
-include ':scenes:show:aars:HardwareBuffer'
+include ':scenes:show:aars:beauty_sensetime:SenseArSourceManager'
+include ':scenes:show:aars:beauty_sensetime:STMobileJNI'
+include ':scenes:show:aars:beauty_sensetime:HardwareBuffer'
+include ':scenes:show:aars:beauty_bytedance:EffectAAR'
 
 /*
  * 1V1私密房

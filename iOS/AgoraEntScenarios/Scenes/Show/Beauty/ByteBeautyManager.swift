@@ -36,6 +36,10 @@ class ByteBeautyManager {
     
     var isEnableBeauty: Bool = true
     
+    var isSuccessLicense: Bool {
+        processor.isSuccessLicense
+    }
+    
     func setBeauty(path: String?, key: String?, value: CGFloat) {
         guard let path = path, let key = key else { return }
         if !path.isEmpty, !beautyNodes.contains(path) {

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:background="@drawable/show_beauty_multi_option_bg"
+        android:orientation="vertical">
+
+
+        <RadioGroup
+            android:id="@+id/rgBeauty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checkedButton="@id/rbSenseTime"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <RadioButton
+                android:id="@+id/rbByteDance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableEnd="@drawable/show_beauty_multi_option_check"
+                android:drawablePadding="8dp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="7dp"
+                android:text="@string/show_multi_beauty_bytedance"
+                android:textColor="@color/show_beauty_multi_option_text"
+                android:textSize="14sp" />
+
+            <RadioButton
+                android:id="@+id/rbSenseTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableEnd="@drawable/show_beauty_multi_option_check"
+                android:drawablePadding="8dp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="7dp"
+                android:text="@string/show_multi_beauty_sensetime"
+                android:textColor="@color/show_beauty_multi_option_text"
+                android:textSize="14sp" />
+
+            <RadioButton
+                android:id="@+id/rbFaceUnity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableEnd="@drawable/show_beauty_multi_option_check"
+                android:drawablePadding="8dp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="7dp"
+                android:text="@string/show_multi_beauty_faceunity"
+                android:textColor="@color/show_beauty_multi_option_text"
+                android:textSize="14sp" />
+
+            <RadioButton
+                android:id="@+id/rbAgora"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableEnd="@drawable/show_beauty_multi_option_check"
+                android:drawablePadding="8dp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="7dp"
+                android:text="@string/show_multi_beauty_agora"
+                android:textColor="@color/show_beauty_multi_option_text"
+                android:textSize="14sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/white_60_percent" />
+
+        </RadioGroup>
+
+
+        <CheckedTextView
+            android:id="@+id/ctvBeauty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/show_beauty_multi_option_arraw"
+            android:drawablePadding="8dp"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="7dp"
+            android:text="@string/show_multi_beauty_factory"
+            android:textColor="@color/white_20_percent"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+
+    <FrameLayout
+        android:id="@+id/controllerContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="200dp" />
+
+</LinearLayout>

@@ -40,6 +40,7 @@ import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLiveDetailFragmentBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
 import io.agora.scene.show.databinding.ShowLivingEndDialogBinding
@@ -58,11 +59,11 @@ import io.agora.scene.show.videoLoaderAPI.OnPageScrollEventHandler
 import io.agora.scene.show.videoLoaderAPI.VideoLoader
 import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
 import io.agora.scene.show.widget.AdvanceSettingDialog
-import io.agora.scene.show.widget.BeautyDialog
 import io.agora.scene.show.widget.MusicEffectDialog
 import io.agora.scene.show.widget.PictureQualityDialog
 import io.agora.scene.show.widget.SettingDialog
 import io.agora.scene.show.widget.TextInputDialog
+import io.agora.scene.show.widget.beauty.MultiBeautyDialog
 import io.agora.scene.show.widget.link.LiveLinkAudienceSettingsDialog
 import io.agora.scene.show.widget.link.LiveLinkDialog
 import io.agora.scene.show.widget.link.OnLinkDialogActionListener
@@ -111,7 +112,6 @@ class LiveDetailFragment : Fragment() {
     private val mPKSettingsDialog by lazy { LivePKSettingsDialog(requireContext()) }
     private val mLinkDialog by lazy { LiveLinkDialog() }
     private val mPKDialog by lazy { LivePKDialog() }
-    private val mBeautyProcessor by lazy { RtcEngineInstance.beautyProcessor }
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
     private val mRtcVideoLoaderApi by lazy { VideoLoader.getImplInstance(mRtcEngine) }
     private fun showDebugModeDialog() = DebugSettingDialog(requireContext()).show()
@@ -616,7 +616,7 @@ class LiveDetailFragment : Fragment() {
             topBinding.tvQuickStartTime.text = getString(R.string.show_statistic_quick_start_time, "--")
         } else {
             // TODO
-            topBinding.tvQuickStartTime.text = getString(R.string.show_statistic_quick_start_time, quickStartTime)
+            topBinding.tvQuickStartTime.text = getString(R.string.show_statistic_quick_start_time, quickStartTime.toString())
         }
         // 机型等级
         topBinding.tvStatisticDeviceGrade.isVisible = true
@@ -820,8 +820,7 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun showBeautyDialog() {
-        BeautyDialog(requireContext()).apply {
-            setBeautyProcessor(mBeautyProcessor)
+        MultiBeautyDialog(requireContext()).apply {
             show()
         }
     }
@@ -1745,12 +1744,11 @@ class LiveDetailFragment : Fragment() {
             }
         }
 
-        val local = LocalVideoCanvasWrap(
+        LocalVideoCanvasWrap(
             container.lifecycleOwner,
             videoView, container.renderMode, container.uid
         )
-        local.mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
-        mRtcEngine.setupLocalVideo(local)
+        BeautyManager.setupLocalVideo(videoView, container.renderMode)
     }
 
     private fun updateVideoSetting(isPkMode:Boolean) {
@@ -1921,6 +1919,7 @@ class LiveDetailFragment : Fragment() {
                             // 有权限
                             mRtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, rtcConnection)
                             val context = activity ?: return@toggleSelfVideo
+                            BeautyManager.initialize(context, mRtcEngine)
                             setupLocalVideo(
                                 VideoLoader.VideoCanvasContainer(
                                     context,

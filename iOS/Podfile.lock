@@ -16,12 +16,19 @@ PODS:
     - AFNetworking/NSURLSession
   - Agora-Scene-Utils (1.1.0)
   - Agora_Chat_iOS (1.0.8)
+  - AgoraCommon (0.0.1):
+    - Bugly
+    - KakaJSON
+    - SwiftyBeaver
+    - YYCategories
+    - YYModel
   - AgoraLyricsScore (1.1.2)
   - AgoraRtcEngine_Special_iOS (4.1.1.23)
   - AgoraRtm_iOS (2.1.7)
   - AgoraSyncManager (2.1.6):
     - SocketRocket
   - Bugly (2.5.93)
+  - bytedEffect (4.6.0)
   - CallAPI (0.3.0):
     - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS (= 2.1.7)
@@ -108,10 +115,12 @@ DEPENDENCIES:
   - AFNetworking (= 4.0.1)
   - Agora-Scene-Utils (= 1.1.0)
   - Agora_Chat_iOS (= 1.0.8)
+  - AgoraCommon (from `AgoraEntScenarios`)
   - AgoraLyricsScore (= 1.1.2)
   - AgoraRtcEngine_Special_iOS (= 4.1.1.23)
   - AgoraSyncManager (~> 2.1.6)
   - Bugly (= 2.5.93)
+  - bytedEffect (from `bytedEffect.podspec`)
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
   - HXPhotoPicker/Lite
   - JXCategoryView (= 1.6.1)
@@ -173,6 +182,10 @@ SPEC REPOS:
     - ZSwiftBaseLib
 
 EXTERNAL SOURCES:
+  AgoraCommon:
+    :path: AgoraEntScenarios
+  bytedEffect:
+    :path: bytedEffect.podspec
   CallAPI:
     :path: AgoraEntScenarios/Common/API/CallAPI
   Pure1v1:
@@ -188,11 +201,13 @@ SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
   Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
+  AgoraCommon: fb3d3d979c7342259c67e06eb24be93e46273ec9
   AgoraLyricsScore: 0c3e6b701dfe036ba26ba208fc65c3b65ecaeb06
   AgoraRtcEngine_Special_iOS: 6a3f7814058f819b374cec3037cbbf7c4de519a5
   AgoraRtm_iOS: cd26cf8a377a79934864d37e184866dbd1430eaf
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
+  bytedEffect: 3d51767425dcaa67d2d6162c402225764d3c2156
   CallAPI: eefee9fec496ca51cd1432e17551d0c43d75cd17
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   HXPhotoPicker: 2368393b187ce01fb0c8bb2ad8b02436fae913ab
@@ -222,6 +237,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: cc42ac9d0cfae40cf0214343e4465a77b5df0963
+PODFILE CHECKSUM: 52b96a5ecf35fa805c4468acaa308cd1077cf879
 
 COCOAPODS: 1.12.1

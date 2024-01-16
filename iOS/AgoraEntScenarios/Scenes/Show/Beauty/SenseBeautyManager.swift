@@ -28,7 +28,7 @@ class SenseBeautyManager: NSObject {
             _sharedManager = nil
         }
     }
-    private var isSuccessLicense: Bool = false {
+    private(set) var isSuccessLicense: Bool = false {
         didSet {
             guard isSuccessLicense, !datas.isEmpty else { return }
             datas.forEach({
@@ -127,15 +127,8 @@ class SenseBeautyManager: NSObject {
     }
     
     func destroy() {
+        render.destroy()
         SenseBeautyManager._sharedManager = nil
         datas.removeAll()
-        reset(datas: ShowBeautyFaceVC.beautyData)
-        reset(datas: ShowBeautyFaceVC.adjustData)
-        resetStyle(datas: ShowBeautyFaceVC.styleData)
-        resetSticker(datas: ShowBeautyFaceVC.stickerData)
-        resetFilter(datas: ShowBeautyFaceVC.filterData)
-        ShowBeautyFaceVC.backgroundData.forEach({
-            $0.isSelected = $0.path == nil
-        })
     }
 }

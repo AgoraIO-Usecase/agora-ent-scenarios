@@ -36,6 +36,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val kFullAppID = "io.agora.AgoraVoice"
     private val kSingRelayAppID = "io.agora.singrelay"
     private val kSingBattleRoomAppID = "io.agora.singbattle"
+    private val kCantataAppID = "io.agora.cantata"
     private val kShowRoomAppID = "io.agora.test.entfull"
 
     private var counts = 0
@@ -62,6 +63,8 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             setupShowRoomAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kSingRelayAppID) {
             setupSingRelayAppInfo()
+        } else if (BuildConfig.APPLICATION_ID == kCantataAppID) {
+            setupCantataAppInfo()
         } else {
             setupFullAppInfo()
         }
@@ -136,6 +139,20 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         )
     }
 
+    // 设置大合唱App的信息
+    private fun setupCantataAppInfo() {
+        adapter.scenes = mutableListOf<SceneInfo>()
+        if (VersionUtils.getVersion("io.agora.scene.cantata.BuildConfig").isNotEmpty()) {
+            adapter.appInfo = AppInfo(
+                this.getString(R.string.app_about_cantata),
+                "20231230-" + VersionUtils.getVersion("io.agora.scene.cantata.BuildConfig") + "-" + RtcEngine
+                    .getSdkVersion(),
+                servicePhone,
+                webSite
+            )
+        }
+    }
+
     // 设置综合App的信息
     private fun setupFullAppInfo() {
         val scenes = mutableListOf<SceneInfo>()
@@ -174,8 +191,16 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         if (VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig").isNotEmpty()) {
             scenes.add(
                 SceneInfo(
-                    this.getString(R.string.app_sing_relay),
+                    this.getString(R.string.app_about_sing_relay),
                     "JC-" + VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig")
+                )
+            )
+        }
+        if (VersionUtils.getVersion("io.agora.scene.cantata.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_cantata),
+                    "DHC-" + VersionUtils.getVersion("io.agora.scene.cantata.BuildConfig")
                 )
             )
         }

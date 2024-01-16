@@ -38,7 +38,7 @@
     self.itemsModelArray = [VLSRBelcantoModel vj_modelArrayWithJson:self.itemsArray];
     
     VLHotSpotBtn *backBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(20, 20, 20, 20)];
-    [backBtn setImage:[UIImage sceneImageWithName:@"ktv_back_whiteIcon"] forState:UIControlStateNormal];
+    [backBtn setImage:[UIImage sr_sceneImageWithName:@"ktv_back_whiteIcon" ] forState:UIControlStateNormal];
     [backBtn addTarget:self action:@selector(backBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:backBtn];
     
@@ -167,7 +167,7 @@
 
 - (void)setSelBelcantoModel:(VLSRBelcantoModel *)selBelcantoModel {
     _selBelcantoModel = selBelcantoModel;
-    self.iconImgView.image = [UIImage sceneImageWithName:selBelcantoModel.imageName];
+    self.iconImgView.image = [UIImage sr_sceneImageWithName:selBelcantoModel.imageName ];
     self.titleLabel.text = selBelcantoModel.titleStr;
     if (selBelcantoModel.ifSelect){
         self.bgView.layer.borderWidth = 1.5f;

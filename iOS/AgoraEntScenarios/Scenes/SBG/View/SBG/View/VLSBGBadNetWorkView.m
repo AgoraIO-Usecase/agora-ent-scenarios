@@ -26,7 +26,7 @@
 
 - (void)setupView {
     UIImageView *iconImgView = [[UIImageView alloc]initWithFrame:CGRectMake((self.width-227)*0.5, 20, 227, 124)];
-    iconImgView.image = [UIImage sceneImageWithName:@"ktv_badNet_icon"];
+    iconImgView.image = [UIImage sbg_sceneImageWithName:@"ktv_badNet_icon"];
     [self addSubview:iconImgView];
     
     UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake((self.width-180)*0.5, iconImgView.bottom+5, 180, 20)];

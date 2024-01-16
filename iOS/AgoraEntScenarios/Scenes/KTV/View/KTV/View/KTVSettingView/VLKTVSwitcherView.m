@@ -69,7 +69,7 @@
 -(UIImageView *)rightIcon {
     if(!_rightIcon){
         _rightIcon = [[UIImageView alloc]init];
-        _rightIcon.image = [UIImage sceneImageWithName:@"ktv_arrow_right"];
+        _rightIcon.image = [UIImage ktv_sceneImageWithName:@"ktv_arrow_right" ];
     }
     return _rightIcon;
 }

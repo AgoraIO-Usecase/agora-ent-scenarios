@@ -172,8 +172,8 @@
     if (!_songNumBtn) {
         _songNumBtn = [[UIButton alloc]initWithFrame:CGRectMake(self.width - 140, 16, 120, 48)];
      //   _songNumBtn.contentMode = UIViewContentModeScaleAspectFit;
-        [_songNumBtn setBackgroundImage:[UIImage sceneImageWithName:@"sbg-btn-start-disabled"] forState:UIControlStateSelected];
-        [_songNumBtn setBackgroundImage:[UIImage sceneImageWithName:@"sbg-btn-start"] forState:UIControlStateNormal];
+        [_songNumBtn setBackgroundImage:[UIImage sbg_sceneImageWithName:@"sbg-btn-start-disabled"] forState:UIControlStateSelected];
+        [_songNumBtn setBackgroundImage:[UIImage sbg_sceneImageWithName:@"sbg-btn-start"] forState:UIControlStateNormal];
         [_songNumBtn addTarget:self action:@selector(startSbg) forControlEvents:UIControlEventTouchUpInside];
         _songNumBtn.selected = true;
     }

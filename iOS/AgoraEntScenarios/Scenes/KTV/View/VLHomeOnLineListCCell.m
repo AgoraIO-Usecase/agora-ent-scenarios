@@ -43,7 +43,7 @@
     [self.bgImgView addSubview:self.iconImgView];
     
     self.lockImgView = [[UIImageView alloc]initWithFrame:CGRectMake(self.width - 26, 10, 16, 16)];
-    self.lockImgView.image = [UIImage sceneImageWithName:@"suo"];
+    self.lockImgView.image = [UIImage ktv_sceneImageWithName:@"suo" ];
     [self.bgImgView addSubview:self.lockImgView];
     
     self.titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(10, self.iconImgView.bottom+VLREALVALUE_WIDTH(10), self.width-20, 40)];
@@ -56,7 +56,7 @@
     [self.bgImgView addSubview:self.titleLabel];
 
     self.onListIconView = [[UIImageView alloc]initWithFrame:CGRectMake(self.width - 55, self.height-16-11, 11, 11)];
-    self.onListIconView.image = [UIImage sceneImageWithName:@"online_list_countIcon"];
+    self.onListIconView.image = [UIImage ktv_sceneImageWithName:@"online_list_countIcon"  ];
     [self.contentView addSubview:self.onListIconView];
     
     self.countLabel = [[UILabel alloc]initWithFrame:CGRectMake(self.onListIconView.right+2, self.onListIconView.centerY-7, 40, 14)];

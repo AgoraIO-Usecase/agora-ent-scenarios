@@ -34,7 +34,7 @@
 - (void)setupView {
     
     VLHotSpotBtn *backBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(20, 20, 20, 20)];
-    [backBtn setImage:[UIImage sceneImageWithName:@"ktv_back_whiteIcon"] forState:UIControlStateNormal];
+    [backBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_back_whiteIcon" ] forState:UIControlStateNormal];
     [backBtn addTarget:self action:@selector(backBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:backBtn];
     
@@ -50,7 +50,7 @@
     
     UIButton *audioBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [audioBtn setTitle:KTVLocalizedString(@"ktv_audio_onmic") forState:UIControlStateNormal];
-    [audioBtn setImage:[UIImage sceneImageWithName:@"KTV_onLineType_audionIcon"] forState:UIControlStateNormal];
+    [audioBtn setImage:[UIImage ktv_sceneImageWithName:@"KTV_onLineType_audionIcon" ] forState:UIControlStateNormal];
     audioBtn.frame = CGRectMake(margin, titleLabel.bottom+26, itemW, VLREALVALUE_WIDTH(72));
 //    audioBtn.imagePosition = QMUIButtonImagePositionLeft;
     audioBtn.spacingBetweenImageAndTitle = 16;
@@ -69,13 +69,13 @@
     [self addSubview:audioBtn];
     
     self.audioSelImgView = [[UIImageView alloc]initWithFrame:CGRectMake(self.audioBtn.right-18, self.audioBtn.bottom-17, 18, 17)];
-    self.audioSelImgView.image = [UIImage sceneImageWithName:@"ktv_selbg_icon"];
+    self.audioSelImgView.image = [UIImage ktv_sceneImageWithName:@"ktv_selbg_icon" ];
     self.audioSelImgView.hidden = YES;
     [self addSubview:self.audioSelImgView];
     
     UIButton *videoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [audioBtn setTitle:KTVLocalizedString(@"ktv_video_onmic") forState:UIControlStateNormal];
-    [audioBtn setImage:[UIImage sceneImageWithName:@"KTV_onLineType_videoIcon"] forState:UIControlStateNormal];
+    [audioBtn setImage:[UIImage ktv_sceneImageWithName:@"KTV_onLineType_videoIcon" ] forState:UIControlStateNormal];
     videoBtn.frame = CGRectMake(audioBtn.right+margin, audioBtn.top, itemW, VLREALVALUE_WIDTH(72));
 //    videoBtn.imagePosition = QMUIButtonImagePositionLeft;
     videoBtn.spacingBetweenImageAndTitle = 16;
@@ -93,7 +93,7 @@
     [self addSubview:videoBtn];
     
     self.videoSelImgView = [[UIImageView alloc]initWithFrame:CGRectMake(self.videoBtn.right-18, self.videoBtn.bottom-17, 18, 17)];
-    self.videoSelImgView.image = [UIImage sceneImageWithName:@"ktv_selbg_icon"];
+    self.videoSelImgView.image = [UIImage ktv_sceneImageWithName:@"ktv_selbg_icon" ];
     self.videoSelImgView.hidden = YES;
     [self addSubview:self.videoSelImgView];
 }

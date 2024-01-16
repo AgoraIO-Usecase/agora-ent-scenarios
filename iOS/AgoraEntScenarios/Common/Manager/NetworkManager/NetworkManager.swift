@@ -80,7 +80,7 @@ class NetworkManager:NSObject {
     @objc static let shared = NetworkManager()
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
     private var baseServerUrl: String {
-        return KeyCenter.baseServerUrl ?? ""
+        return AppContext.shared.baseServerUrl
     }
     
     /// get tokens
@@ -565,7 +565,7 @@ extension NetworkManager {
         })
         */
         
-        let model = NMReportDeviceInfoNetworkModel(sceneId: sceneName, userNo: VLUserCenter.user.userNo, appId: KeyCenter.AppId)
+        let model = NMReportDeviceInfoNetworkModel(sceneId: sceneName, userNo: VLUserCenter.user.userNo, appId: AppContext.shared.appId)
         model.request { error, data in
 
         }
@@ -584,7 +584,7 @@ extension NetworkManager {
 //            print(error)
 //        })
         
-        let model = NMReportUserBehaviorNetworkModel(sceneId: sceneName, userNo: VLUserCenter.user.userNo, appId: KeyCenter.AppId)
+        let model = NMReportUserBehaviorNetworkModel(sceneId: sceneName, userNo: VLUserCenter.user.userNo, appId: AppContext.shared.appId)
         model.request { error, data in
 
         }
@@ -607,7 +607,7 @@ extension NetworkManager {
             "headUrl":headUrl
         ]
         
-        guard let baseUrl = KeyCenter.baseServerUrl else {return}
+        let baseUrl = AppContext.shared.baseServerUrl
         
         NetworkTools().request("\(baseUrl)/v1/ktv/song/grab", method: .post, parameters: params) {[weak self] result in
             switch result{
@@ -634,7 +634,7 @@ extension NetworkManager {
             "src": "postman"
         ]
         
-        guard let baseUrl = KeyCenter.baseServerUrl else {return}
+        let baseUrl = AppContext.shared.baseServerUrl
         
         NetworkTools().request("\(baseUrl)/v1/ktv/song/grab/query".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "", method: .get, parameters: params) { result in
             switch result {

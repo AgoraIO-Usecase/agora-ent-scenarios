@@ -39,7 +39,7 @@ open class VLCommonNetworkModel: AUINetworkModel {
     public var userId: String?
     public override init() {
         super.init()
-        host = KeyCenter.HostUrl
+        host = AppContext.shared.hostUrl
     }
     
     func getToken() -> String {
@@ -56,7 +56,7 @@ open class VLCommonNetworkModel: AUINetworkModel {
         headers["Content-Type"] = "application/json"
         headers["appProject"] = "agora_ent_demo"
         headers["appOs"] = "iOS"
-        headers["versionName"] = UIApplication.shared.appVersion ?? ""
+        headers["versionName"] = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
         return headers
     }
     

@@ -110,7 +110,7 @@
     if (seatModel.headUrl.length > 0) {
         [cell.avatarImgView sd_setImageWithURL:[NSURL URLWithString:seatModel.headUrl]];
     }else{
-        cell.avatarImgView.image = [UIImage sceneImageWithName:@"ktv_emptySeat_icon"];
+        cell.avatarImgView.image = [UIImage sbg_sceneImageWithName:@"ktv_emptySeat_icon"];
     }
     cell.singingBtn.hidden = !seatModel.isOwner;
     

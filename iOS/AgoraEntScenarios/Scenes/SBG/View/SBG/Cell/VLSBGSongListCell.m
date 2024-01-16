@@ -26,7 +26,7 @@
     [self addSubview:self.picImgView];
     self.picImgView.layer.cornerRadius = 10;
     self.picImgView.layer.masksToBounds = YES;
-    self.picImgView.image = [UIImage sceneImageWithName:@"online_temp_icon"];
+    self.picImgView.image = [UIImage sbg_sceneImageWithName:@"online_temp_icon"];
     
     self.numberLabel = [[UILabel alloc]init];
     self.numberLabel.textColor = UIColorMakeWithHex(@"#979CBB");
@@ -56,7 +56,7 @@
     
     
     self.deleteBtn = [[VLHotSpotBtn alloc]init];
-    [self.deleteBtn setImage:[UIImage sceneImageWithName:@"ktv_delete_icon"] forState:UIControlStateNormal];
+    [self.deleteBtn setImage:[UIImage sbg_sceneImageWithName:@"ktv_delete_icon"] forState:UIControlStateNormal];
     [self.deleteBtn setBackgroundColor:UIColorMakeWithRGBA(4, 9, 37, 0.35)];
     self.deleteBtn.layer.cornerRadius = 18;
     self.deleteBtn.layer.masksToBounds = YES;
@@ -64,7 +64,7 @@
     [self addSubview:self.deleteBtn];
     
     self.sortBtn = [[VLHotSpotBtn alloc]init];
-    [self.sortBtn setImage:[UIImage sceneImageWithName:@"ktv_sort_icon"] forState:UIControlStateNormal];
+    [self.sortBtn setImage:[UIImage sbg_sceneImageWithName:@"ktv_sort_icon"] forState:UIControlStateNormal];
     [self.sortBtn setBackgroundColor:UIColorMakeWithRGBA(4, 9, 37, 0.35)];
     self.sortBtn.layer.cornerRadius = 18;
     self.sortBtn.layer.masksToBounds = YES;
@@ -73,7 +73,7 @@
     
     self.singingBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.singingBtn setTitle:SBGLocalizedString(@"sbg_room_sing1") forState:UIControlStateNormal];
-    [self.singingBtn setImage:[UIImage sceneImageWithName:@"ktv_singing_icon"] forState:UIControlStateNormal];
+    [self.singingBtn setImage:[UIImage sbg_sceneImageWithName:@"ktv_singing_icon"] forState:UIControlStateNormal];
     self.singingBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
 //    self.singingBtn.imagePosition = QMUIButtonImagePositionLeft;
     self.singingBtn.spacingBetweenImageAndTitle = 4;
@@ -129,7 +129,7 @@
 //    }
 
     [self.picImgView sd_setImageWithURL:[NSURL URLWithString:selSongModel.imageUrl]
-                       placeholderImage:[UIImage sceneImageWithName:@"default_avatar"]];
+                       placeholderImage:[UIImage sbg_sceneImageWithName:@"default_avatar"]];
 }
 
 

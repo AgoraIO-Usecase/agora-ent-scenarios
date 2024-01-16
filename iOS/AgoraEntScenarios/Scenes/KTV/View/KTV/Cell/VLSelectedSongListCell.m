@@ -72,7 +72,7 @@
 - (void)setSongItemModel:(VLSongItmModel *)songItemModel {
     _songItemModel = songItemModel;
     [self.picImgView sd_setImageWithURL:[NSURL URLWithString:songItemModel.imageUrl]
-                       placeholderImage:[UIImage sceneImageWithName:@"default_avatar"]];
+                       placeholderImage:[UIImage ktv_sceneImageWithName:@"default_avatar" ]];
     self.nameLabel.text = songItemModel.songName;
     self.singerLabel.text = songItemModel.singer;
     

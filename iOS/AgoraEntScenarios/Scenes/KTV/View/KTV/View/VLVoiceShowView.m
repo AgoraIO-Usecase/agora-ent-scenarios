@@ -75,7 +75,7 @@
         [self addSubview:imgView];
         
         UIImageView *coverImgView = [[UIImageView alloc]initWithFrame:CGRectMake(ix, iy, width, imgHeight)];
-        coverImgView.image = [UIImage sceneImageWithName:@"ktv_selIcon"];
+        coverImgView.image = [UIImage ktv_sceneImageWithName:@"ktv_selIcon" ];
         coverImgView.tag = 300 + i;
         coverImgView.hidden = i != realIndex;
         if(i == realIndex){

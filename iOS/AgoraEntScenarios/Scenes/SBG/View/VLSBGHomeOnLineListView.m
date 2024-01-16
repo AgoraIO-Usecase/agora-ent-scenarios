@@ -115,7 +115,7 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
   //  VL(weakSelf);
     VLSBGHomeOnLineListCCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:[VLSBGHomeOnLineListCCell className] forIndexPath:indexPath];
-    cell.bgImgView.image = [UIImage sceneImageWithName:[NSString stringWithFormat:@"create_bg_%li" ,indexPath.row % 5]];
+    cell.bgImgView.image = [UIImage sbg_sceneImageWithName:[NSString stringWithFormat:@"create_bg_%li" ,indexPath.row % 5]];
     cell.listModel = self.roomListModeArray[indexPath.row];
     return cell;
 }
@@ -177,7 +177,7 @@ static const int INTERVAL = 1000; // 时间间隔为1秒
     if (!_createBtn) {
         _createBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _createBtn.accessibilityIdentifier = @"ktv_create_button_id";
-        [_createBtn setBackgroundImage:[UIImage sceneImageWithName:@"create_room"] forState:UIControlStateNormal];
+        [_createBtn setBackgroundImage:[UIImage sbg_sceneImageWithName:@"create_room"] forState:UIControlStateNormal];
         
         _createBtn.frame = CGRectMake((SCREEN_WIDTH-148)*0.5, SCREEN_HEIGHT-34-kSafeAreaBottomHeight-56-kTopNavHeight, 148, 56);
         _createBtn.imageView.contentMode = UIViewContentModeScaleAspectFit;

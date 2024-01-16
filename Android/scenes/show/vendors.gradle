@@ -1,7 +1,8 @@
 apply plugin: 'de.undercouch.download'
 
 task downloadVendorLibs {
-    def destFile = new File(buildDir, 'vendors.zip')
+    // 商汤美颜库
+    def destFile = new File(buildDir, 'vendor_sensetime_9.3.1.zip')
     download {
         src 'https://download.agora.io/demo/release/vendor_sensetime_9.3.1.zip'
         dest destFile
@@ -22,14 +23,31 @@ task downloadVendorLibs {
     println "STMobileJNI path= $STMobileJNI.parentFile.absolutePath"
     copy {
         from HardwareBuffer
-        into 'aars/HardwareBuffer'
+        into 'aars/beauty_sensetime/HardwareBuffer'
     }
     copy {
         from SenseArSourceManager
-        into 'aars/SenseArSourceManager'
+        into 'aars/beauty_sensetime/SenseArSourceManager'
     }
     copy {
         from STMobileJNI
-        into 'aars/STMobileJNI'
+        into 'aars/beauty_sensetime/STMobileJNI'
+    }
+
+    // 火山美颜库
+    destFile = new File(buildDir, 'vendor_bytedance_4.6.0.zip')
+    download {
+        src 'https://download.agora.io/demo/release/vendor_bytedance_4.6.0.zip'
+        dest destFile
+        overwrite false
+    }
+    fileTree = zipTree(destFile)
+    def EffectAAR = fileTree.getFiles().find {
+        it.name.contains("effectAAR")
+    }
+    println "EffectAAR path= $EffectAAR.absolutePath"
+    copy {
+        from EffectAAR
+        into 'aars/beauty_bytedance/EffectAAR'
     }
 }

@@ -45,7 +45,7 @@
 }
 
 - (void)commonUI {
-    [self setBackgroundImage:@"online_list_BgIcon"];
+    [self setBackgroundImage:@"online_list_BgIcon" bundleName:@"KtvResource"];
     [self setNaviTitleName:KTVLocalizedString(@"ktv_online_ktv")];
     if ([VLUserCenter center].isLogin) {
         [self setBackBtn];

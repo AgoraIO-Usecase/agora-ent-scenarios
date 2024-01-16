@@ -56,7 +56,7 @@
     [self addSubview:itemBgView];
 
     UIButton *itemBtn = [[UIButton alloc]initWithFrame:CGRectMake((self.bounds.size.width - itemWH)/2.0+11, itemY+12, btnItemWH, btnItemWH)];
-    [itemBtn setImage:[UIImage sceneImageWithName:itemsArray[0]] forState:UIControlStateNormal];
+    [itemBtn setImage:[UIImage ktv_sceneImageWithName:itemsArray[0] ] forState:UIControlStateNormal];
     itemBtn.tag = 0;
     [itemBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:itemBtn];
@@ -78,7 +78,7 @@
 //        [self addSubview:itemBgView];
 //
 //        UIButton *itemBtn = [[UIButton alloc]initWithFrame:CGRectMake(leftMargin+(itemWH+middleMargin)*i+11, itemY+12, btnItemWH, btnItemWH)];
-//        [itemBtn setImage:[UIImage sceneImageWithName:itemsArray[i]] forState:UIControlStateNormal];
+//        [itemBtn setImage:[UIImage ktv_sceneImageWithName:itemsArray[i]] forState:UIControlStateNormal];
 //        itemBtn.tag = i;
 //        [itemBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
 //        [self addSubview:itemBtn];

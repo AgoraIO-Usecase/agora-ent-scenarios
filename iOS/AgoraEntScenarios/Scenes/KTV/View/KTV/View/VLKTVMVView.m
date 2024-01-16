@@ -105,7 +105,7 @@
 
 - (void)setupView {
     self.bgImgView = [[UIImageView alloc]initWithFrame:self.bounds];
-    self.bgImgView.image = [UIImage sceneImageWithName:@"bg-lyric"];
+    self.bgImgView.image = [UIImage ktv_sceneImageWithName:@"bg-lyric" ];
 //    self.bgImgView.layer.cornerRadius = 10;
 //    self.bgImgView.layer.masksToBounds = YES;
     [self addSubview:self.bgImgView];
@@ -137,7 +137,7 @@
     self.retryButton.hidden = YES;
     
     UIImageView *currentPlayImgView = [[UIImageView alloc]initWithFrame:CGRectMake(9, 2, 39, 39)];
-    currentPlayImgView.image = [UIImage sceneImageWithName:@"ktv_currentPlay_icon"];
+    currentPlayImgView.image = [UIImage ktv_sceneImageWithName:@"ktv_currentPlay_icon" ];
     [self.contentView addSubview:currentPlayImgView];
 
     self.musicTitleLabel.frame = CGRectMake(currentPlayImgView.right+2, currentPlayImgView.centerY-9, 120, 18);
@@ -193,8 +193,8 @@
     [self addSubview:self.idleView];
     
     self.joinChorusBtn = [[UIButton alloc]initWithFrame:CGRectMake(self.width / 2.0 - 56, 10, 112, 34)];
-    [self.joinChorusBtn setBackgroundImage:[UIImage sceneImageWithName:@"ic_join_chorus"] forState:UIControlStateNormal];
-    [self.joinChorusBtn setBackgroundImage:[UIImage sceneImageWithName:@"ic_join_chorus_loading"] forState:UIControlStateSelected];
+    [self.joinChorusBtn setBackgroundImage:[UIImage ktv_sceneImageWithName:@"ic_join_chorus" ] forState:UIControlStateNormal];
+    [self.joinChorusBtn setBackgroundImage:[UIImage ktv_sceneImageWithName:@"ic_join_chorus_loading" ] forState:UIControlStateSelected];
     _joinChorusBtn.layer.cornerRadius = 17;
     _joinChorusBtn.layer.masksToBounds = true;
     [self.joinChorusBtn addTarget:self action:@selector(joinChorus:) forControlEvents:UIControlEventTouchUpInside];
@@ -204,7 +204,7 @@
     [self.leaveChorusBtn setTitle:KTVLocalizedString(@"ktv_leave_chorus") forState:UIControlStateNormal];
     [self.leaveChorusBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [self.leaveChorusBtn setFont:UIFontMake(10.0)];
-    [self.leaveChorusBtn setImage:[UIImage sceneImageWithName:@"Union"] forState:UIControlStateNormal];
+    [self.leaveChorusBtn setImage:[UIImage ktv_sceneImageWithName:@"Union" ] forState:UIControlStateNormal];
     [self.leaveChorusBtn addTarget:self action:@selector(leaveChorus) forControlEvents:UIControlEventTouchUpInside];
     [self updateBtnLayout:self.leaveChorusBtn];
     [self.BotView addSubview:self.leaveChorusBtn];
@@ -226,7 +226,7 @@
     [_perShowView addSubview:perLabel];
     
     _iconView = [[UIImageView alloc]initWithFrame:CGRectMake(57, 2, 20, 20)];
-    _iconView.image = [UIImage sceneImageWithName:@"ktv_showVoice"];
+    _iconView.image = [UIImage ktv_sceneImageWithName:@"ktv_showVoice" ];
     [_perShowView addSubview:_iconView];
     _perShowView.hidden = true;
     
@@ -341,7 +341,7 @@
 }
 
 - (void)changeBgViewByModel:(VLKTVSelBgModel *)selBgModel {
-    self.bgImgView.image = [UIImage sceneImageWithName:selBgModel.imageName];
+    self.bgImgView.image = [UIImage ktv_sceneImageWithName:selBgModel.imageName ];
 }
 
 /***
@@ -558,7 +558,7 @@
 
 -(void)setPerViewAvatar:(NSString *)url {
     if([url isEqualToString:@""]){
-        _iconView.image = [UIImage sceneImageWithName:@"ktv_showVoice"];
+        _iconView.image = [UIImage ktv_sceneImageWithName:@"ktv_showVoice" ];
     } else {
         [_iconView sd_setImageWithURL:[NSURL URLWithString:url]];
     }
@@ -571,17 +571,17 @@
         case VLKTVMVViewActionTypeSingOrigin:
             _trackBtn.selected = YES;
             [_trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateSelected];
-            [self.trackBtn setImage:[UIImage sceneImageWithName:@"original"] forState:UIControlStateSelected];
+            [self.trackBtn setImage:[UIImage ktv_sceneImageWithName:@"original" ] forState:UIControlStateSelected];
             break;
         case VLKTVMVViewActionTypeSingLead:
             _trackBtn.selected = NO;
             [_trackBtn setTitle:KTVLocalizedString(@"ktv_lead_sing") forState:UIControlStateNormal];
-            [self.trackBtn setImage:[UIImage sceneImageWithName:@"original"] forState:UIControlStateNormal];
+            [self.trackBtn setImage:[UIImage ktv_sceneImageWithName:@"original" ] forState:UIControlStateNormal];
             break;
         case VLKTVMVViewActionTypeSingAcc:
             _trackBtn.selected = NO;
             [_trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateNormal];
-            [self.trackBtn setImage:[UIImage sceneImageWithName:@"acc"] forState:UIControlStateNormal];
+            [self.trackBtn setImage:[UIImage ktv_sceneImageWithName:@"acc" ] forState:UIControlStateNormal];
             break;
         default:
             break;
@@ -666,8 +666,8 @@
         self.pauseBtn.titleLabel.font = UIFontMake(10.0);
         [self.pauseBtn setTitle:KTVLocalizedString(@"ktv_room_player_play") forState:UIControlStateNormal];
         [self.pauseBtn setTitle:KTVLocalizedString(@"ktv_room_player_pause") forState:UIControlStateSelected];
-        [_pauseBtn setImage:[UIImage sceneImageWithName:@"ktv_pause_icon"] forState:UIControlStateSelected];
-        [_pauseBtn setImage:[UIImage sceneImageWithName:@"ktv_pause_resumeicon"] forState:UIControlStateNormal];
+        [_pauseBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_pause_icon" ] forState:UIControlStateSelected];
+        [_pauseBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_pause_resumeicon" ] forState:UIControlStateNormal];
         _pauseBtn.selected = NO;
         [_pauseBtn addTarget:self action:@selector(playClick:) forControlEvents:UIControlEventTouchUpInside];
     }
@@ -677,7 +677,7 @@
 - (VLHotSpotBtn *)nextButton {
     if (!_nextButton) {
         _nextButton = [[VLHotSpotBtn alloc] init];
-        [_nextButton setImage:[UIImage sceneImageWithName:@"ktv_playNext_icon"] forState:UIControlStateNormal];
+        [_nextButton setImage:[UIImage ktv_sceneImageWithName:@"ktv_playNext_icon" ] forState:UIControlStateNormal];
         [self.nextButton setTitle:KTVLocalizedString(@"ktv_room_change_song") forState:UIControlStateNormal];
         [self.nextButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.nextButton.titleLabel.font = UIFontMake(10.0);
@@ -694,8 +694,8 @@
         self.trackBtn.titleLabel.font = UIFontMake(10.0);
         [self.trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateNormal];
         [self.trackBtn setTitle:KTVLocalizedString(@"ktv_lead_sing") forState:UIControlStateSelected];
-        [_trackBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_acc"] forState:UIControlStateSelected];
-        [_trackBtn setImage:[UIImage sceneImageWithName:@"ktv_mic_origin"] forState:UIControlStateNormal];
+        [_trackBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_mic_acc" ] forState:UIControlStateSelected];
+        [_trackBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_mic_origin" ] forState:UIControlStateNormal];
         _trackBtn.selected = NO;
         [_trackBtn addTarget:self action:@selector(originClick:) forControlEvents:UIControlEventTouchUpInside];
     }
@@ -705,7 +705,7 @@
 - (VLHotSpotBtn *)settingBtn {
     if (!_settingBtn) {
         _settingBtn = [[VLHotSpotBtn alloc] init];
-        [_settingBtn setImage:[UIImage sceneImageWithName:@"ktv_subtitle_icon"] forState:UIControlStateNormal];
+        [_settingBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_subtitle_icon" ] forState:UIControlStateNormal];
         _settingBtn.accessibilityIdentifier = @"ktv_room_setting_button_id";
         [self.settingBtn setTitle:KTVLocalizedString(@"ktv_room_player_tweak") forState:UIControlStateNormal];
         [self.settingBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];

@@ -2,7 +2,7 @@ ext { ktv_is_modular = false }
 apply from: 'vendors.gradle'
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_SHOW = "3.2.1"
+final def VERSION_SCENE_SHOW = "3.2.2"
 
 android {
     defaultConfig {
@@ -18,9 +18,12 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(path: ":scenes:show:aars:SenseArSourceManager")
-    implementation project(path: ":scenes:show:aars:STMobileJNI")
-    implementation project(path: ":scenes:show:aars:HardwareBuffer")
+    implementation project(path: ":scenes:show:aars:beauty_sensetime:SenseArSourceManager")
+    implementation project(path: ":scenes:show:aars:beauty_sensetime:STMobileJNI")
+    implementation project(path: ":scenes:show:aars:beauty_sensetime:HardwareBuffer")
+    implementation project(path: ":scenes:show:aars:beauty_bytedance:EffectAAR")
+    implementation 'com.faceunity:core:8.7.0'
+    implementation 'com.faceunity:model:8.7.0'
 
     implementation project(":common:base")
     implementation project(':common:ui-widget')
