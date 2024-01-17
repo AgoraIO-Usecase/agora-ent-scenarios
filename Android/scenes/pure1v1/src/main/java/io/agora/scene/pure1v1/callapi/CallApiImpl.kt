@@ -1048,14 +1048,14 @@ class CallApiImpl constructor(
             Log.d(TAG, "[CallApi]$message");
         } else {
             delegates.forEach { listener ->
-                listener.callDebugInfo(message, logLevel)
+                listener.callDebugInfo("[CallApi]$message", logLevel)
             }
         }
     }
 
     private fun callWarningPrint(message: String) {
         delegates.forEach { listener ->
-            listener.callDebugInfo(message, CallLogLevel.Warning)
+            listener.callDebugInfo("[CallApi]$message", CallLogLevel.Warning)
         }
         callPrint("[Warning]$message")
     }
