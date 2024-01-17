@@ -7,7 +7,7 @@
 
 import UIKit
 import AgoraSyncManager
-
+import AgoraCommon
 class SyncUtil: NSObject {
     private static var manager: AgoraSyncManager?
     override private init() {}

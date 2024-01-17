@@ -7,12 +7,9 @@
 
 #ifndef SBGMacro_h
 #define SBGMacro_h
-
+@import AgoraCommon;
 @import YYCategories;
 #import "AgoraEntScenarios-Swift.h"
-#import "QMUICommonDefines.h"
-#import "VLDeviceUtils.h"
-#import "QMUIHelper.h"
 
 
 // 基础颜色

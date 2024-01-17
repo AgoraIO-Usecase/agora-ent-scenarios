@@ -5,6 +5,7 @@
 
 #import "VLSRTonesView.h"
 #import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 @import Masonry;
 
 @interface VLSRTonesView()

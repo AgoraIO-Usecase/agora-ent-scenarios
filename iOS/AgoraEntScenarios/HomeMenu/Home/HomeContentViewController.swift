@@ -9,7 +9,7 @@ import UIKit
 import JXCategoryView
 import Pure1v1;
 import ShowTo1v1;
-
+import AgoraCommon
 @objc
 class HomeContentViewController: UIViewController {
     @objc var changeToNavigationBarAlpha: ((CGFloat) -> Void)?

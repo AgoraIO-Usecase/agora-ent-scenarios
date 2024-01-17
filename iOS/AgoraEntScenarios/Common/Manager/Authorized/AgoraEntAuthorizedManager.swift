@@ -8,7 +8,7 @@
 import Foundation
 import AVFoundation
 import UIKit
-
+import AgoraCommon
 @objc public enum checkAuthType: Int {
     case all
     case audio

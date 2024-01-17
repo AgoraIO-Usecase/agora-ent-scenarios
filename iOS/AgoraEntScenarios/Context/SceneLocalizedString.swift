@@ -8,11 +8,11 @@
 import Foundation
 
 extension NSString {
-    @objc func toSceneLocalization() -> NSString {
+    @objc public func toSceneLocalization() -> NSString {
         return sceneLocalized(self as String, bundleName: nil) as NSString
     }
     
-    @objc func toSceneLocalization(_ bundleName: String) -> NSString {
+    @objc public func toSceneLocalization(_ bundleName: String) -> NSString {
         return sceneLocalized(self as String, bundleName: bundleName) as NSString
     }
 }
@@ -22,7 +22,7 @@ extension NSString {
 ///   - string: <#string description#>
 ///   - bundleName: <#bundleName description#>
 /// - Returns: <#description#>
-func sceneLocalized(_ string: String, bundleName: String? = nil) -> String {
+public func sceneLocalized(_ string: String, bundleName: String? = nil) -> String {
     //TODO: remove localize string of root menu from ktv resource
     if AppContext.shared.sceneLocalizeBundleName == nil {
         AppContext.shared.sceneLocalizeBundleName = "KtvResource"

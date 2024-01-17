@@ -24,7 +24,7 @@ struct TemplateScene {
         var avatar: String = .init(format: "portrait%02d", Int.random(in: 1...14))
         var userId: String = UserInfo.userId
         //    var status: PKApplyInfoStatus? = .end
-        var timestamp: String = "".timeStamp16
+        var timestamp: String = ""
         var isEnableVideo: Bool? = false
         var isEnableAudio: Bool? = false
         var objectId: String?

@@ -3,9 +3,8 @@
 //  VoiceOnLine
 //
 
-#import "VLBaseView.h"
 @class VLSRSettingModel;
-
+@import AgoraCommon;
 typedef enum : NSUInteger {
     VLSRValueDidChangedTypeEar = 0,      // 耳返
     VLSRValueDidChangedTypeMV,           // MV

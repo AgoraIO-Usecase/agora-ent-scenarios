@@ -9,7 +9,7 @@ import Foundation
 import YYCategories
 import SVProgressHUD
 import AgoraSyncManager
-
+import AgoraCommon
 private let sSceneId = "scene_singbattle_4.0.0"
 
 /// 座位信息

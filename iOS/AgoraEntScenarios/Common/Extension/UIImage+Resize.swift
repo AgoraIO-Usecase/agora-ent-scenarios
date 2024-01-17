@@ -3,7 +3,7 @@ import UIKit
 
 extension UIImage {
     // 图片压缩
-    func resetSizeOfImageData(maxSize: NSInteger) -> Data? {
+    public func resetSizeOfImageData(maxSize: NSInteger) -> Data? {
         let sourceImage = self
         //先判断当前质量是否满足要求，不满足再进行压缩
         var finalImageData = sourceImage.jpegData(compressionQuality: 1.0)
