@@ -56,10 +56,17 @@ class CallDetailFragment : Fragment(), ICallApiListener {
                 binding.tvRoomTitle.text = userInfo.userName
                 binding.tvRoomNum.text = userInfo.userId
             }
+            CallServiceManager.instance.remoteUser?.let { userInfo ->
+                binding.vDragWindow1.setUserName(userInfo.userName)
+            }
+            CallServiceManager.instance.localUser?.let { userInfo ->
+                binding.vDragWindow2.setUserName(userInfo.userName)
+            }
         }
     }
 
     fun updateTime() {
+        if (!isAdded || parentFragmentManager.isDestroyed) return
         val millis = System.currentTimeMillis() - startTime
         if (millis > (20 * 60 * 1000)) {
             onHangup()
@@ -87,12 +94,6 @@ class CallDetailFragment : Fragment(), ICallApiListener {
         binding.vDragWindow1.setSmallType(false)
         binding.vDragWindow2.setSmallType(true)
 
-        CallServiceManager.instance.remoteUser?.let { userInfo ->
-            binding.vDragWindow1.setUserName(userInfo.userName)
-        }
-        CallServiceManager.instance.localUser?.let { userInfo ->
-            binding.vDragWindow2.setUserName(userInfo.userName)
-        }
         binding.vDragWindow2.setOnViewClick {
             exchangeDragWindow()
         }

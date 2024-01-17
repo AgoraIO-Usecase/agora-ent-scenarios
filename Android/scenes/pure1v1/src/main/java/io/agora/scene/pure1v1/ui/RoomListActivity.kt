@@ -16,8 +16,10 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.RtcConnection
@@ -53,6 +55,8 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     private var callState = CallStateType.Idle
 
     private var callDialog: CallDialog? = null
+
+    private var callSendDialog: CallSendDialog? = null
 
     private val permissionHelp = PermissionHelp(this)
 
@@ -125,10 +129,12 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 }
                 return@getUserList
             }
-            if (msg != null) {
-                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, getText(R.string.pure1v1_room_list_refresh), Toast.LENGTH_SHORT).show()
+            if (!binding.flCallContainer.isVisible) {
+                if (msg != null) {
+                    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, getText(R.string.pure1v1_room_list_refresh), Toast.LENGTH_SHORT).show()
+                }
             }
             dataList = list.filter { it.userId != CallServiceManager.instance.localUser?.userId}
             adapter?.refresh(dataList)
@@ -203,19 +209,35 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
 
     private fun showCallSendDialog(user: UserInfo) {
-        if (callDialog != null) { return }
-        val dialog = CallSendDialog(this, user)
-        dialog.setListener(object : CallSendDialog.CallSendDialogListener {
+        if (callSendDialog != null) { return }
+//        val dialog = CallSendDialog(this, user)
+//        dialog.setListener(object : CallSendDialog.CallSendDialogListener {
+//            override fun onSendViewDidClickHangup() {
+//                CallServiceManager.instance.callApi?.cancelCall {
+//                }
+//            }
+//        })
+//        dialog.show(supportFragmentManager, "CallSendDialog")
+//        callSendDialog = dialog
+
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        callSendDialog = CallSendDialog(this, user)
+        callSendDialog!!.setListener(object : CallSendDialog.CallSendDialogListener {
             override fun onSendViewDidClickHangup() {
                 CallServiceManager.instance.callApi?.cancelCall {
                 }
             }
         })
-        dialog.show()
-        callDialog = dialog
+        fragmentTransaction.add(R.id.flSendFragment, callSendDialog!!, "CallSendFragment").show(
+            callSendDialog!!
+        ).commit()
     }
 
     private fun finishCallDialog() {
+        callSendDialog?.hangUp()
+        callSendDialog = null
+
         callDialog?.dismiss()
         callDialog = null
     }
@@ -282,12 +304,13 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     val user = dataList.firstOrNull { it.userId == toUserId.toString() } ?: return
                     CallServiceManager.instance.remoteUser = user
                     showCallSendDialog(user)
-                    CallServiceManager.instance.playCallShow("https://download.agora.io/demo/test/agora_test_video_13_music.mp4")
+                    CallServiceManager.instance.playCallShow("https://download.agora.io/demo/release/agora_test_video_21_music.mp4")
                 }
                 //CallServiceManager.instance.rtcEngine?.startAudioMixing("https://download.agora.io/demo/test/1v1_bgm1.wav", true, -1, 0)
                 CallServiceManager.instance.playCallMusic("https://download.agora.io/demo/test/1v1_bgm1.wav")
             }
             CallStateType.Connecting -> {
+                callSendDialog?.updateCallState(CallDialogState.Connecting)
                 callDialog?.updateCallState(CallDialogState.Connecting)
                 CallServiceManager.instance.stopCallShow()
                 CallServiceManager.instance.stopCallMusic()
@@ -300,6 +323,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 finishCallDialog()
                 CallServiceManager.instance.stopCallShow()
                 CallServiceManager.instance.stopCallMusic()
+                binding.smartRefreshLayout.autoRefresh()
                 //CallServiceManager.instance.rtcEngine?.stopAudioMixing()
             }
             CallStateType.Prepared -> {
@@ -385,9 +409,14 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         })
         binding.viewPager2.offscreenPageLimit = 1
         binding.viewPager2.adapter = adapter
+
         binding.titleView.setLeftClick {
             CallServiceManager.instance.cleanUp()
             finish()
+        }
+
+        binding.titleView.setRightIconClick {
+            binding.smartRefreshLayout.autoRefresh()
         }
 
         binding.smartRefreshLayout.setEnableLoadMore(false)

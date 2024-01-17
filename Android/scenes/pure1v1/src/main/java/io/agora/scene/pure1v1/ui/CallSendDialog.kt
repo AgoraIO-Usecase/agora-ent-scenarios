@@ -4,9 +4,13 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
+import android.view.SurfaceView
+import android.view.View
+import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
 import android.view.animation.AnimationUtils
+import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.scene.pure1v1.CallServiceManager
@@ -17,25 +21,26 @@ import io.agora.scene.pure1v1.service.UserInfo
 class CallSendDialog(
     private val context: Context,
     private val userInfo: UserInfo
-) : CallDialog(context, userInfo) {
+) : Fragment() {
 
     interface CallSendDialogListener {
         // 点击了挂断的回调
         fun onSendViewDidClickHangup()
     }
 
-    private val binding = Pure1v1CallSendDialogBinding.inflate(LayoutInflater.from(context))
+    private lateinit var binding: Pure1v1CallSendDialogBinding
 
     private var listener: CallSendDialogListener? = null
 
     private var callState = CallDialogState.None
 
-    init {
-        setContentView(binding.root)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = Pure1v1CallSendDialogBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.ivHangup.setOnClickListener(DebouncedOnClickListener {
             onClickHangup()
@@ -48,17 +53,33 @@ class CallSendDialog(
         val anim = AnimationUtils.loadAnimation(context, R.anim.pure1v1_slide_from_bottom)
         binding.clContent.startAnimation(anim)
 
-        CallServiceManager.instance.renderCallShow(binding.tvShow)
+
+        val showView = SurfaceView(context)
+        binding.tvShow.removeAllViews()
+        binding.tvShow.addView(showView)
+        CallServiceManager.instance.renderCallShow(showView)
     }
 
     fun setListener(l: CallSendDialogListener) {
         listener = l
     }
 
-    override fun updateCallState(state: CallDialogState) {
+    fun updateCallState(state: CallDialogState) {
         if (callState != state) {
             callState = state
             textAnimation()
+        }
+    }
+
+    fun hangUp() {
+        if (isAdded && !parentFragmentManager.isDestroyed) {
+            val fragment = parentFragmentManager.findFragmentByTag("CallSendFragment")
+            fragment?.let {
+                binding.tvShow.removeAllViews()
+                val transaction = parentFragmentManager.beginTransaction()
+                transaction.hide(it)
+                transaction.commit()
+            }
         }
     }
 
@@ -93,7 +114,7 @@ class CallSendDialog(
             }
             override fun onAnimationEnd(animation: Animation?) {
                 listener?.onSendViewDidClickHangup()
-                dismiss()
+                hangUp()
             }
             override fun onAnimationRepeat(animation: Animation?) {
             }

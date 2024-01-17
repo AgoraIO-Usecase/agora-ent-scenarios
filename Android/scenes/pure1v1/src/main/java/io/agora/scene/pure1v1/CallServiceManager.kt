@@ -152,14 +152,21 @@ class CallServiceManager {
     }
 
     fun stopCallShow() {
-        val ret = mMediaPlayer?.stop()
+        val player = mMediaPlayer ?: return
+        val canvas = VideoCanvas(null)
+        canvas.renderMode = RENDER_MODE_HIDDEN
+        canvas.sourceType = VIDEO_SOURCE_MEDIA_PLAYER
+        canvas.mediaPlayerId = player.mediaPlayerId
+        rtcEngine?.setupLocalVideo(canvas)
+
+        val ret = player.stop()
         Log.d("hugo", "$ret")
     }
 
     fun renderCallShow(view: View) {
         val player = mMediaPlayer ?: return
         val canvas = VideoCanvas(view)
-        canvas.renderMode = RENDER_MODE_FIT
+        canvas.renderMode = RENDER_MODE_HIDDEN
         canvas.sourceType = VIDEO_SOURCE_MEDIA_PLAYER
         canvas.mediaPlayerId = player.mediaPlayerId
         rtcEngine?.setupLocalVideo(canvas)
