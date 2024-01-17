@@ -142,7 +142,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     private void initListener() {
         mBinding.ilActive.switchOriginal.setOnClickListener(this);
-        mBinding.ilActive.ivMusicMenu.setOnClickListener(this);
         mBinding.ilActive.ivMusicStart.setOnClickListener(this);
         mBinding.ilActive.ivChangeSong.setOnClickListener(this);
         mBinding.ilActive.ivSkipPostludeSkip.setOnClickListener(this);
@@ -195,7 +194,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.switchOriginal.setChecked(false); // reset ui icon for mAudioTrackMode
         mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
         mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_original);
-        mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
         mBinding.ilActive.ivJoinChorusBtn.setVisibility(View.INVISIBLE);
         mBinding.ilActive.ivLeaveChorus.setVisibility(View.VISIBLE);
         mBinding.ilActive.ivJoinChorusLoading.setVisibility(INVISIBLE);
@@ -217,7 +215,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         this.mRole = Role.Listener;
         mBinding.ilActive.ivMusicStart.setVisibility(View.GONE);
         mBinding.ilActive.switchOriginal.setVisibility(View.INVISIBLE);
-        mBinding.ilActive.ivMusicMenu.setVisibility(View.INVISIBLE);
         mBinding.ilActive.ivJoinChorusBtn.setVisibility(View.VISIBLE);
         mBinding.ilActive.ivLeaveChorus.setVisibility(View.INVISIBLE);
     }
@@ -280,7 +277,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mBinding.ilActive.lyricsView.enableDragging(false);
             mBinding.ilActive.ivMusicStart.setVisibility(View.VISIBLE);
             mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
-            mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivSkipPostlude.setVisibility(View.INVISIBLE);
             mBinding.ilActive.switchOriginal.setChecked(false); // reset ui icon for mAudioTrackMode
@@ -300,12 +296,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivMusicStart.setVisibility(View.VISIBLE);
             mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
-            mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivSkipPostlude.setVisibility(View.INVISIBLE);
             if (this.mRole == Role.Listener) {
                 mBinding.ilActive.ivMusicStart.setVisibility(View.GONE);
                 mBinding.ilActive.switchOriginal.setVisibility(View.INVISIBLE);
-                mBinding.ilActive.ivMusicMenu.setVisibility(View.INVISIBLE);
                 mBinding.ilActive.ivSkipPostlude.setVisibility(View.INVISIBLE);
                 mBinding.ilActive.ivSkipPrelude.setVisibility(View.INVISIBLE);
             }
@@ -580,8 +574,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                     mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
                 }
             }
-        } else if (v == mBinding.ilActive.ivMusicMenu) {
-            mOnKaraokeActionListener.onMenuClick();
         } else if (v == mBinding.ilActive.ivMusicStart) {
             mOnKaraokeActionListener.onPlayClick();
         } else if (v == mBinding.ilActive.ivChangeSong) {
@@ -766,9 +758,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     public interface OnKaraokeEventListener {
         default void onSwitchOriginalClick(int aimStatus, boolean isMainSinger) { // 0: origin 1: acc 2: daochang
-        }
-
-        default void onMenuClick() {
         }
 
         default void onPlayClick() {

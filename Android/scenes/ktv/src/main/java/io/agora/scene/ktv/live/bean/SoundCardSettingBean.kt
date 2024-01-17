@@ -1,6 +1,7 @@
-package io.agora.scene.ktv.widget.soundcard
+package io.agora.scene.ktv.live.bean
 
 import android.util.Log
+import io.agora.scene.ktv.live.fragmentdialog.AgoraPresetSound
 
 class SoundCardSettingBean constructor(private var parameterCallback: ((preset: Int, gain: Float, gender: Int, effect: Int) -> Unit)) {
 
@@ -11,7 +12,7 @@ class SoundCardSettingBean constructor(private var parameterCallback: ((preset: 
     private var gender: Int = -1
     private var effect: Int = -1
 
-    private var mEarPhoneCallback: EarPhoneCallback? = null
+    var mEarPhoneCallback: EarPhoneCallback? = null
 
     fun setEarPhoneCallback(earPhoneCallback: EarPhoneCallback) {
         mEarPhoneCallback = earPhoneCallback
@@ -77,8 +78,4 @@ class SoundCardSettingBean constructor(private var parameterCallback: ((preset: 
     private fun setSoundCardParameters() {
         parameterCallback.invoke(presetValue, gainValue, gender, effect)
     }
-}
-
-interface EarPhoneCallback {
-    fun onHasEarPhoneChanged(hasEarPhone: Boolean)
 }

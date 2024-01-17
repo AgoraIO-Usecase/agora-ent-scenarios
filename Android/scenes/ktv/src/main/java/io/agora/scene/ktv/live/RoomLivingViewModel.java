@@ -72,8 +72,10 @@ import io.agora.scene.ktv.ktvapi.KTVSingRole;
 import io.agora.scene.ktv.ktvapi.KTVType;
 import io.agora.scene.ktv.ktvapi.MusicLoadStatus;
 import io.agora.scene.ktv.ktvapi.SwitchRoleFailReason;
+import io.agora.scene.ktv.live.bean.MusicSettingBean;
+import io.agora.scene.ktv.live.fragmentdialog.MusicSettingCallback;
 import io.agora.scene.ktv.service.VolumeModel;
-import io.agora.scene.ktv.widget.soundcard.SoundCardSettingBean;
+import io.agora.scene.ktv.live.bean.SoundCardSettingBean;
 import io.agora.scene.ktv.service.ChooseSongInputModel;
 import io.agora.scene.ktv.service.JoinRoomOutputModel;
 import io.agora.scene.ktv.service.KTVServiceProtocol;
@@ -85,8 +87,6 @@ import io.agora.scene.ktv.service.RoomSeatModel;
 import io.agora.scene.ktv.service.RoomSelSongModel;
 import io.agora.scene.ktv.service.ScoringAlgoControlModel;
 import io.agora.scene.ktv.service.ScoringAverageModel;
-import io.agora.scene.ktv.widget.MusicSettingBean;
-import io.agora.scene.ktv.widget.MusicSettingDialog;
 import io.agora.scene.widget.toast.CustomToast;
 
 public class RoomLivingViewModel extends ViewModel {
@@ -617,11 +617,11 @@ public class RoomLivingViewModel extends ViewModel {
 
     private void updateVolumeStatus(boolean isUnMute) {
         ktvApiProtocol.muteMic(!isUnMute);
-        if (!isUnMute && mSetting.isEar()) {
+        if (!isUnMute && mSetting.getMEarBackEnable()) {
             if (mRtcEngine != null) {
                 mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
             }
-        } else if (isUnMute && mSetting.isEar()) {
+        } else if (isUnMute && mSetting.getMEarBackEnable()) {
             if (mRtcEngine != null) {
                 mRtcEngine.enableInEarMonitoring(true, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
             }
@@ -1057,7 +1057,7 @@ public class RoomLivingViewModel extends ViewModel {
         }
 
         // 重置耳返
-        mSetting.setEar(false);
+        mSetting.setMEarBackEnable(false);
         if (mRtcEngine != null) {
             mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
         }
@@ -1128,17 +1128,36 @@ public class RoomLivingViewModel extends ViewModel {
             }
         });
 
-        mSetting = new MusicSettingBean(DEFAULT_AUDIO_EFFECT,false, 100, 50, 0, new MusicSettingDialog.Callback() {
+        mSetting = new MusicSettingBean(new MusicSettingCallback() {
             @Override
-            public void onEarChanged(boolean isEar) {
+            public void onEarChanged(boolean earBackEnable) {
+                KTVLogger.d(TAG, "onEarChanged: " + earBackEnable);
                 if (seatLocalLiveData.getValue() == null) return;
                 int isMuted = seatLocalLiveData.getValue().isAudioMuted();
                 if (isMuted == 1) {
-                    isOpnEar = isEar;
+                    isOpnEar = earBackEnable;
                     return;
                 }
                 if (mRtcEngine != null) {
-                    mRtcEngine.enableInEarMonitoring(isEar, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+                    mRtcEngine.enableInEarMonitoring(earBackEnable, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+                }
+            }
+
+            @Override
+            public void onEarBackVolumeChanged(int volume) {
+                KTVLogger.d(TAG, "onEarBackVolumeChanged: " + volume);
+                mRtcEngine.setInEarMonitoringVolume(volume);
+            }
+
+            @Override
+            public void onEarBackModeChanged(int mode) {
+                KTVLogger.d(TAG, "onEarBackModeChanged: " + mode);
+                if (mode == 1) {
+                    // OpenSL
+                    mRtcEngine.setParameters("{\"che.audio.opensl.mode\": 0}");
+                } else if (mode == 2) {
+                    // Oboe
+                    mRtcEngine.setParameters("{\"che.audio.oboe.enable\": true}");
                 }
             }
 
@@ -1148,60 +1167,73 @@ public class RoomLivingViewModel extends ViewModel {
             }
 
             @Override
-            public void onMusicVolChanged(int vol) {
+            public void onAccVolChanged(int vol) {
                 setMusicVolume(vol);
             }
 
             @Override
-            public void onEffectChanged(int audioEffect) {
-                setAudioEffectPreset(audioEffect);
-            }
-
-            @Override
-            public void onBeautifierPresetChanged(int effect) {
-                if (mRtcEngine != null) {
-                    switch (effect) {
-                        case 0:
-                            mRtcEngine.setVoiceBeautifierParameters(Constants.VOICE_BEAUTIFIER_OFF, 0, 0);
-                        case 1:
-                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 2);
-                        case 2:
-                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 1);
-                        case 3:
-                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2);
-                        case 4:
-                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1);
-                    }
-                }
-            }
-
-            @Override
-            public void setAudioEffectParameters(int param1, int param2) {
-                if (mRtcEngine != null) {
-                    if (param1 == 0) {
-                        mRtcEngine.setAudioEffectParameters(Constants.VOICE_CONVERSION_OFF, param1, param2);
-                    } else {
-                        mRtcEngine.setAudioEffectParameters(Constants.PITCH_CORRECTION, param1, param2);
-                    }
-                }
-            }
-
-            @Override
-            public void onToneChanged(int newToneValue) {
-                ktvApiProtocol.getMediaPlayer().setAudioPitch(newToneValue);
-            }
-
-            @Override
-            public void onRemoteVolumeChanged(int volume) {
+            public void onRemoteVolChanged(int volume) {
                 KTVApiImpl ktvApiImpl = (KTVApiImpl) ktvApiProtocol;
                 ktvApiImpl.setRemoteVolume(volume);
                 mRtcEngine.adjustPlaybackSignalVolume(volume);
+            }
+
+
+            @Override
+            public void onAudioEffectChanged(int audioEffect) {
+                setAudioEffectPreset(audioEffect);
+            }
+
+//            @Override
+//            public void onBeautifierPresetChanged(int effect) {
+//                if (mRtcEngine != null) {
+//                    switch (effect) {
+//                        case 0:
+//                            mRtcEngine.setVoiceBeautifierParameters(Constants.VOICE_BEAUTIFIER_OFF, 0, 0);
+//                        case 1:
+//                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 2);
+//                        case 2:
+//                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 1);
+//                        case 3:
+//                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2);
+//                        case 4:
+//                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1);
+//                    }
+//                }
+//            }
+
+//            @Override
+//            public void setAudioEffectParameters(int param1, int param2) {
+//                if (mRtcEngine != null) {
+//                    if (param1 == 0) {
+//                        mRtcEngine.setAudioEffectParameters(Constants.VOICE_CONVERSION_OFF, param1, param2);
+//                    } else {
+//                        mRtcEngine.setAudioEffectParameters(Constants.PITCH_CORRECTION, param1, param2);
+//                    }
+//                }
+//            }
+
+//            @Override
+//            public void onToneChanged(int newToneValue) {
+//                ktvApiProtocol.getMediaPlayer().setAudioPitch(newToneValue);
+//            }
+
+
+            // TODO: 2024/1/17 打分难度
+            @Override
+            public void onScoringDifficultyChanged(int difficulty) {
+                KTVLogger.d(TAG, "onScoringDifficultyChanged: " + difficulty);
             }
 
             @Override
             public void onProfessionalModeChanged(boolean enable) {
                 KTVLogger.d(TAG, "onProfessionalModeChanged: " + enable);
                 ktvApiProtocol.enableProfessionalStreamerMode(enable);
+            }
+
+            @Override
+            public void onMultiPathChanged(boolean enable) {
+                KTVLogger.d(TAG, "onMultiPathChanged: " + enable);
             }
 
             @Override
@@ -1226,23 +1258,6 @@ public class RoomLivingViewModel extends ViewModel {
                 }
             }
 
-            @Override
-            public void onEarBackVolumeChanged(int volume) {
-                KTVLogger.d(TAG, "onEarBackVolumeChanged: " + volume);
-                mRtcEngine.setInEarMonitoringVolume(volume);
-            }
-
-            @Override
-            public void onEarBackModeChanged(int mode) {
-                KTVLogger.d(TAG, "onEarBackModeChanged: " + mode);
-                if (mode == 1) {
-                    // OpenSL
-                    mRtcEngine.setParameters("{\"che.audio.opensl.mode\": 0}");
-                } else if (mode == 2) {
-                    // Oboe
-                    mRtcEngine.setParameters("{\"che.audio.oboe.enable\": true}");
-                }
-            }
 
             @Override
             public void onAINSModeChanged(int mode) {
@@ -1276,6 +1291,7 @@ public class RoomLivingViewModel extends ViewModel {
 
             @Override
             public void onAIAECChanged(boolean enable) {
+                KTVLogger.d(TAG, "onAIAECChanged: " + enable);
                 if (enable) {
                     mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\": 1}");
                 } else {
@@ -1407,17 +1423,17 @@ public class RoomLivingViewModel extends ViewModel {
                 KTVLogger.d(TAG, "onAudioRouteChanged, routing:" + routing);
                 if (mSetting == null) return;
                 if (routing == 0 || routing == 2 || routing == 5 || routing == 6) {
-                    mSetting.setHasEarPhone(true);
+                    mSetting.setMHasEarPhone(true);
                     //mSoundCardSettingBean.setHasEarPhone(true);
                 } else {
-                    if (songPlayingLiveData.getValue() != null && mSetting.isEar()) {
+                    if (songPlayingLiveData.getValue() != null && mSetting.getMEarBackEnable()) {
                         CustomToast.show(R.string.ktv_ear_phone_tip, Toast.LENGTH_SHORT);
-                        mSetting.setEar(false);
+                        mSetting.setMEarBackEnable(false);
                         if (mRtcEngine != null) {
                             mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
                         }
                     }
-                    mSetting.setHasEarPhone(false);
+                    mSetting.setMEarBackEnable(false);
                     //mSoundCardSettingBean.setHasEarPhone(false);
                 }
             }
@@ -1426,7 +1442,7 @@ public class RoomLivingViewModel extends ViewModel {
             public void onLocalAudioStats(LocalAudioStats stats) {
                 super.onLocalAudioStats(stats);
                 if (mSetting == null) return;
-                mSetting.setEarBackDelay(stats.earMonitorDelay);
+                mSetting.setMEarBackDelay(stats.earMonitorDelay);
             }
 
             @Override
@@ -1649,7 +1665,7 @@ public class RoomLivingViewModel extends ViewModel {
         isHighlightSinger = false;
 
         // 重置耳返
-        mSetting.setEar(false);
+        mSetting.setMEarBackEnable(false);
         if (mRtcEngine != null) {
             mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
         }
@@ -1709,8 +1725,8 @@ public class RoomLivingViewModel extends ViewModel {
 
                 // 重置settings
                 retryTimes = 0;
-                mSetting.setVolMic(100);
-                mSetting.setVolMusic(50);
+                mSetting.setMMicVolume(MusicSettingBean.DEFAULT_MIC_VOL);
+                mSetting.setMAccVolume(50);
                 ktvApiProtocol.getMediaPlayer().adjustPlayoutVolume(50);
                 ktvApiProtocol.getMediaPlayer().adjustPublishSignalVolume(50);
 
@@ -1729,8 +1745,8 @@ public class RoomLivingViewModel extends ViewModel {
                 if (reason == KTVLoadSongFailReason.NO_LYRIC_URL) {
                     // 未获取到歌词 正常播放
                     retryTimes = 0;
-                    mSetting.setVolMic(100);
-                    mSetting.setVolMusic(50);
+                    mSetting.setMMicVolume(MusicSettingBean.DEFAULT_MIC_VOL);
+                    mSetting.setMAccVolume(50);
                     ktvApiProtocol.getMediaPlayer().adjustPlayoutVolume(50);
                     ktvApiProtocol.getMediaPlayer().adjustPublishSignalVolume(50);
 
