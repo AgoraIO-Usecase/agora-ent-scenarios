@@ -7,9 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
+import io.agora.rtc2.RtcConnection
 import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.databinding.Pure1v1DashboardFragmentBinding
-import io.agora.scene.pure1v1.service.CallServiceManager
+import io.agora.scene.pure1v1.CallServiceManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.GlobalScope.coroutineContext
 
@@ -18,6 +19,8 @@ class DashboardFragment : Fragment() {
     private lateinit var binding: Pure1v1DashboardFragmentBinding
 
     private var handler: IRtcEngineEventHandler? = null
+
+    private var connection: RtcConnection? = null
 
     private var isBoardVisible = false
 
@@ -37,7 +40,7 @@ class DashboardFragment : Fragment() {
 
     override fun onDestroy() {
         handler?.let {
-            CallServiceManager.instance.rtcEngine?.removeHandler(it)
+            CallServiceManager.instance.rtcEngine?.removeHandlerEx(it, connection)
             handler = null
         }
         super.onDestroy()
@@ -51,12 +54,6 @@ class DashboardFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setupRTCListener()
-    }
-
     fun updateVisible(b: Boolean) {
         isBoardVisible = b
         if (b) {
@@ -64,7 +61,7 @@ class DashboardFragment : Fragment() {
         }
     }
 
-    private fun setupRTCListener() {
+    fun setupRTCListener(channelId: String, localUid: Int) {
         val rtcListener = object: IRtcEngineEventHandler() {
             override fun onRtcStats(stats: RtcStats?) {
                 stats?.let {
@@ -109,8 +106,9 @@ class DashboardFragment : Fragment() {
                 }
             }
         }
-        CallServiceManager.instance.rtcEngine?.addHandler(rtcListener)
+        connection = RtcConnection(channelId, localUid)
         handler = rtcListener
+        CallServiceManager.instance.rtcEngine?.addHandlerEx(rtcListener, connection)
     }
 
     private var debounceJob: Job? = null

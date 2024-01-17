@@ -1,4 +1,4 @@
-package io.agora.scene.pure1v1.callAPI
+package io.agora.scene.pure1v1.callapi
 
 import android.view.ViewGroup
 import io.agora.rtc2.RtcEngineEx
@@ -16,14 +16,15 @@ open class CallConfig(
 ){}
 
 open class PrepareConfig(
-    var roomId: String = "",                // 频道名(主叫需要设置为1v1的频道，被叫可设置为自己的广播频道)
-    var rtcToken: String = "",              // rtc token，需要使用万能token，token创建的时候channel name为空字符串
-    var rtmToken: String = "",              // rtm token
-    var localView: ViewGroup? = null,       // 显示本地流的画布
-    var remoteView: ViewGroup? = null,      // 显示远端流的画布
-    var autoAccept: Boolean = true,         // 被叫收到呼叫后是否自动接受，true: CallApi内部会自动调用accept，false: 外部收到calling状态时需要手动accept/reject
-    var autoJoinRTC: Boolean = false,       // 是否自动登录RTC
-    var callTimeoutMillisecond: Long = 15000L    // 呼叫超时时间，单位毫秒，如果传0内部将不做超时逻辑
+    var roomId: String = "",                      // 频道名(主叫需要设置为1v1的频道，被叫可设置为自己的广播频道)
+    var rtcToken: String = "",                    // rtc token，需要使用万能token，token创建的时候channel name为空字符串
+    var rtmToken: String = "",                    // rtm token
+    var localView: ViewGroup? = null,             // 显示本地流的画布
+    var remoteView: ViewGroup? = null,            // 显示远端流的画布
+    var autoAccept: Boolean = true,               // 被叫收到呼叫后是否自动接受，true: CallApi内部会自动调用accept，false: 外部收到calling状态时需要手动accept/reject
+    var autoJoinRTC: Boolean = false,             // 是否自动登录RTC
+    var callTimeoutMillisecond: Long = 15000L,    // 呼叫超时时间，单位毫秒，如果传0内部将不做超时逻辑
+    var userExtension: Map<String, Any>? = null   // [可选]用户扩展字段，收到对端消息而改变状态(例如calling/connecting)时可以通过kFromUserExtension字段获取
 ) {}
 
 enum class CallStateReason(val value: Int) {

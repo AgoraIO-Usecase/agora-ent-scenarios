@@ -1,4 +1,4 @@
-package io.agora.scene.pure1v1.callAPI
+package io.agora.scene.pure1v1.callapi
 
 import android.os.Handler
 import android.os.Looper
@@ -6,7 +6,7 @@ import android.util.Log
 import com.google.gson.Gson
 import io.agora.rtm.*
 import io.agora.rtm.RtmConstants.RtmChannelType
-import io.agora.scene.pure1v1.callAPI.extension.getCostMilliseconds
+import io.agora.scene.pure1v1.callapi.extension.getCostMilliseconds
 import org.json.JSONObject
 
 /// 回执的消息队列对象
@@ -234,7 +234,7 @@ class CallMessageManager(
      * @param message: 发送的消息字典
      * @param completion: <#completion description#>
      */
-    fun sendMessage(userId: String, fromUserId: String, message: Map<String, Any>, completion: ((AGError?)-> Unit)?) {
+    fun sendMessage(userId: String, message: Map<String, Any>, completion: ((AGError?)-> Unit)?) {
         if (userId.isEmpty() || userId == "0") {
             val errorStr = "sendMessage fail, invalid userId[$userId]"
             callMessagePrint(errorStr)
@@ -245,8 +245,8 @@ class CallMessageManager(
         messageId %= Int.MAX_VALUE
         val map = message.toMutableMap()
         map[kMessageId] = messageId
-        map[kReceiptsRoomIdKey] = fromUserId
-        require(fromUserId.isNotEmpty()) { "kReceiptsRoomIdKey is empty" }
+//        map[kReceiptsRoomIdKey] = fromUserId
+//        require(fromUserId.isNotEmpty()) { "kReceiptsRoomIdKey is empty" }
         _sendMessage(userId, map, completion)
     }
 

@@ -70,7 +70,7 @@ AGORA_APP_CERTIFICATE=（从声网console获取）
   - 场景的房间管理类，在内部对创建用户、移除用户、获取用户列表[Pure1v1ServiceImp](src/main/java/io/agora/scene/pure1v1/service/Pure1v1ServiceImp.kt)
 - 1v1私密房业务 -- 拨打、接通、拒接、挂断：
   - 业务创建与准备：程序在这里进行1v1私密房之前的准备，以接收和响应其他客户端的呼叫 [CallServiceManager](src/main/java/io/agora/scene/pure1v1/service/CallServiceManager.kt)
-  - 业务核心代码：程序在这里处理1v1私密房场景的核心逻辑，开发者可以复用这里的逻辑接入自己的业务 [callAPI](src/main/java/io/agora/scene/pure1v1/callAPI)
+  - 业务核心代码：程序在这里处理1v1私密房场景的核心逻辑，开发者可以复用这里的逻辑接入自己的业务 [callAPI](src/main/java/io/agora/scene/pure1v1/callapi)
 - Activities：
   - 用户列表: 用户可以在这个界面查询到其他在线用户，并进行呼叫和被叫 [RoomListActivity](src/main/java/io/agora/scene/pure1v1/ui/RoomListActivity.kt)
   - 通话界面：1v1私密房成功接通，会跳转到这里进行双向音视频互通[CallDetailActivity](src/main/java/io/agora/scene/pure1v1/ui/CallDetailActivity.kt)

@@ -29,11 +29,11 @@ import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.pure1v1.Pure1v1Logger
 import io.agora.scene.pure1v1.R
-import io.agora.scene.pure1v1.callAPI.*
+import io.agora.scene.pure1v1.callapi.*
 import io.agora.scene.pure1v1.databinding.Pure1v1RoomListActivityBinding
 import io.agora.scene.pure1v1.databinding.Pure1v1RoomListItemLayoutBinding
-import io.agora.scene.pure1v1.service.CallServiceManager
-import io.agora.scene.pure1v1.service.PermissionHelp
+import io.agora.scene.pure1v1.CallServiceManager
+import io.agora.scene.pure1v1.utils.PermissionHelp
 import io.agora.scene.pure1v1.service.UserInfo
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.BlurTransformation
@@ -81,7 +81,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
         CallServiceManager.instance.setup(this)
         CallServiceManager.instance.sceneService?.enterRoom { e ->
-            fetchRoomList()
+            binding.smartRefreshLayout.autoRefresh()
         }
         CallServiceManager.instance.callApi?.addListener(this)
     }
@@ -125,7 +125,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 }
                 return@getUserList
             }
-            if (msg != null ) {
+            if (msg != null) {
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(this, getText(R.string.pure1v1_room_list_refresh), Toast.LENGTH_SHORT).show()
@@ -140,6 +140,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 )
             }
             mayShowGuideView()
+            binding.smartRefreshLayout.finishRefresh()
         }
     }
 
@@ -185,16 +186,18 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     private fun connectCallDetail() {
         binding.flCallContainer.visibility = View.VISIBLE
 
+        val channelId =  CallServiceManager.instance.connectedChannelId ?: ""
+        val localUid = CallServiceManager.instance.localUser?.userId?.toInt() ?: 0
+
         mCallDetailFragment?.let {
             val fragmentTransaction = supportFragmentManager.beginTransaction()
             fragmentTransaction.show(it).commit()
             (mCallDetailFragment as CallDetailFragment).start()
             (mCallDetailFragment as CallDetailFragment).updateTime()
+            (mCallDetailFragment as CallDetailFragment).initDashBoard(channelId, localUid)
         }
 
         // 开启鉴黄鉴暴
-        val channelId = CallServiceManager.instance.remoteUser?.getRoomId() ?: ""
-        val localUid = CallServiceManager.instance.localUser?.userId?.toInt() ?: 0
         setupContentInspectConfig(true, RtcConnection(channelId, localUid))
         moderationAudio()
     }
@@ -243,8 +246,13 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     CallServiceManager.instance.connectedChannelId = fromRoomId
                     var user = dataList.firstOrNull { it.userId == fromUserId.toString() }
                     if (user == null) {
-                        val userMap = eventInfo[CallApiImpl.kFromUserExtension] as Map<String, Any>
-                        user = UserInfo(userMap)
+                        val userMap = eventInfo[CallApiImpl.kFromUserExtension] as JSONObject
+                        user = UserInfo()
+                        user.userId = userMap.getString("userId")
+                        user.userName = userMap.getString("userName")
+                        user.avatar = userMap.getString("avatar")
+                        user.createdAt = userMap.getLong("createdAt")
+                        user.objectId = userMap.getString("objectId")
                     }
                     if (user.userId.isEmpty()) { return } // 检验数据是否有效
                     CallServiceManager.instance.remoteUser = user
@@ -274,16 +282,25 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     val user = dataList.firstOrNull { it.userId == toUserId.toString() } ?: return
                     CallServiceManager.instance.remoteUser = user
                     showCallSendDialog(user)
+                    CallServiceManager.instance.playCallShow("https://download.agora.io/demo/test/agora_test_video_13_music.mp4")
                 }
+                //CallServiceManager.instance.rtcEngine?.startAudioMixing("https://download.agora.io/demo/test/1v1_bgm1.wav", true, -1, 0)
+                CallServiceManager.instance.playCallMusic("https://download.agora.io/demo/test/1v1_bgm1.wav")
             }
             CallStateType.Connecting -> {
                 callDialog?.updateCallState(CallDialogState.Connecting)
+                CallServiceManager.instance.stopCallShow()
+                CallServiceManager.instance.stopCallMusic()
+                //CallServiceManager.instance.rtcEngine?.stopAudioMixing()
             }
             CallStateType.Connected -> {
                 if (CallServiceManager.instance.remoteUser == null) { return }
                 // 进入通话页面
                 connectCallDetail()
                 finishCallDialog()
+                CallServiceManager.instance.stopCallShow()
+                CallServiceManager.instance.stopCallMusic()
+                //CallServiceManager.instance.rtcEngine?.stopAudioMixing()
             }
             CallStateType.Prepared -> {
                 when(stateReason) {
@@ -306,6 +323,9 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 CallServiceManager.instance.resetAcceptCallToken()
                 finishCallDialog()
                 binding.flCallContainer.visibility = View.INVISIBLE
+                CallServiceManager.instance.stopCallShow()
+                CallServiceManager.instance.stopCallMusic()
+                //CallServiceManager.instance.rtcEngine?.stopAudioMixing()
             }
             CallStateType.Failed -> {
                 Toast.makeText(this, eventReason, Toast.LENGTH_SHORT).show()
@@ -313,6 +333,9 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 CallServiceManager.instance.connectedChannelId = null
                 CallServiceManager.instance.resetAcceptCallToken()
                 finishCallDialog()
+                CallServiceManager.instance.stopCallShow()
+                CallServiceManager.instance.stopCallMusic()
+                //CallServiceManager.instance.rtcEngine?.stopAudioMixing()
             }
             else -> {
             }
@@ -348,7 +371,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
     /// 语音审核
     private fun moderationAudio() {
-        val channelName = CallServiceManager.instance.connectedChannelId ?: return
+        val channelName =  CallServiceManager.instance.connectedChannelId ?: return
         val uid = CallServiceManager.instance.localUser?.userId?.toLong() ?: 0
         AudioModeration.moderationAudio(channelName, uid, AudioModeration.AgoraChannelType.broadcast, "Pure1v1")
     }
@@ -366,7 +389,10 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             CallServiceManager.instance.cleanUp()
             finish()
         }
-        binding.titleView.setRightIconClick {
+
+        binding.smartRefreshLayout.setEnableLoadMore(false)
+        binding.smartRefreshLayout.setEnableRefresh(true)
+        binding.smartRefreshLayout.setOnRefreshListener {
             fetchRoomList()
         }
     }

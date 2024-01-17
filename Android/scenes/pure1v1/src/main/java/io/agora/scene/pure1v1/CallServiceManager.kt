@@ -1,15 +1,23 @@
-package io.agora.scene.pure1v1.service
+package io.agora.scene.pure1v1
 
 import android.content.Context
 import android.util.Log
-import android.view.TextureView
+import android.view.View
 import android.view.ViewGroup
+import io.agora.mediaplayer.IMediaPlayer
+import io.agora.mediaplayer.IMediaPlayerObserver
+import io.agora.mediaplayer.data.PlayerUpdatedInfo
+import io.agora.mediaplayer.data.SrcInfo
 import io.agora.rtc2.*
+import io.agora.rtc2.Constants.*
+import io.agora.rtc2.video.VideoCanvas
 import io.agora.rtm.RtmClient
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.pure1v1.callAPI.*
+import io.agora.scene.pure1v1.callapi.*
+import io.agora.scene.pure1v1.service.Pure1v1ServiceImp
+import io.agora.scene.pure1v1.service.UserInfo
 
 class CallServiceManager {
     companion object {
@@ -42,6 +50,10 @@ class CallServiceManager {
 
     private var mContext: Context? = null
 
+    private var mMediaPlayer: IMediaPlayer? = null
+
+    private var mMediaPlayer2: IMediaPlayer? = null
+
     fun setup(context: Context) {
         mPrepareConfig = PrepareConfig()
         mContext = context
@@ -66,8 +78,11 @@ class CallServiceManager {
         localCanvas = null
         remoteCanvas = null
         callApi?.deinitialize {
+            mMediaPlayer?.destroy()
+            mMediaPlayer = null
+            mMediaPlayer2?.destroy()
+            mMediaPlayer2 = null
             RtcEngine.destroy()
-
             RtmClient.release()
         }
         callApi = null
@@ -130,6 +145,36 @@ class CallServiceManager {
         acceptToken = null
     }
 
+    fun playCallShow(url: String) {
+        val ret = mMediaPlayer?.open(url, 0)
+        mMediaPlayer?.adjustPlayoutVolume(0)
+        Log.d("hugo", "$ret")
+    }
+
+    fun stopCallShow() {
+        val ret = mMediaPlayer?.stop()
+        Log.d("hugo", "$ret")
+    }
+
+    fun renderCallShow(view: View) {
+        val player = mMediaPlayer ?: return
+        val canvas = VideoCanvas(view)
+        canvas.renderMode = RENDER_MODE_FIT
+        canvas.sourceType = VIDEO_SOURCE_MEDIA_PLAYER
+        canvas.mediaPlayerId = player.mediaPlayerId
+        rtcEngine?.setupLocalVideo(canvas)
+    }
+
+    fun playCallMusic(url: String) {
+        val ret = mMediaPlayer2?.open(url, 0)
+        Log.d("hugo", "$ret")
+    }
+
+    fun stopCallMusic() {
+        val ret = mMediaPlayer2?.stop()
+        Log.d("hugo", "$ret")
+    }
+
     private fun initialize(prepareConfig: PrepareConfig) {
         val api = callApi ?: return
         val user = localUser ?: return
@@ -148,7 +193,93 @@ class CallServiceManager {
         prepareConfig.remoteView = remoteView
         prepareConfig.autoAccept = false
         prepareConfig.autoJoinRTC = false
+        prepareConfig.userExtension = user.toMap()
         api.prepareForCall(prepareConfig) { }
+
+        // 初始化mpk，用于播放来电秀视频
+        mMediaPlayer = engine.createMediaPlayer()
+        mMediaPlayer?.registerPlayerObserver(object : IMediaPlayerObserver {
+            override fun onPlayerStateChanged(
+                state: io.agora.mediaplayer.Constants.MediaPlayerState?,
+                error: io.agora.mediaplayer.Constants.MediaPlayerError?
+            ) {
+                Log.d("hugo", "onPlayerStateChanged: $state, error: $error")
+                if (state == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED) {
+                    mMediaPlayer?.setLoopCount(-1)
+                    mMediaPlayer?.play()
+                }
+            }
+
+            override fun onPositionChanged(positionMs: Long, timestampMs: Long) {}
+
+            override fun onPlayerEvent(
+                eventCode: io.agora.mediaplayer.Constants.MediaPlayerEvent?,
+                elapsedTime: Long,
+                message: String?
+            ) {}
+
+            override fun onMetaData(
+                type: io.agora.mediaplayer.Constants.MediaPlayerMetadataType?,
+                data: ByteArray?
+            ) {}
+
+            override fun onPlayBufferUpdated(playCachedBuffer: Long) {}
+
+            override fun onPreloadEvent(
+                src: String?,
+                event: io.agora.mediaplayer.Constants.MediaPlayerPreloadEvent?
+            ) {}
+
+            override fun onAgoraCDNTokenWillExpire() {}
+
+            override fun onPlayerSrcInfoChanged(from: SrcInfo?, to: SrcInfo?) {}
+
+            override fun onPlayerInfoUpdated(info: PlayerUpdatedInfo?) {}
+
+            override fun onAudioVolumeIndication(volume: Int) {}
+        })
+
+        mMediaPlayer2 = engine.createMediaPlayer()
+        mMediaPlayer2?.registerPlayerObserver(object : IMediaPlayerObserver {
+            override fun onPlayerStateChanged(
+                state: io.agora.mediaplayer.Constants.MediaPlayerState?,
+                error: io.agora.mediaplayer.Constants.MediaPlayerError?
+            ) {
+                Log.d("hugo", "onPlayerStateChanged: $state, error: $error")
+                if (state == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED) {
+                    mMediaPlayer2?.setLoopCount(-1)
+                    mMediaPlayer2?.play()
+                }
+            }
+
+            override fun onPositionChanged(positionMs: Long, timestampMs: Long) {}
+
+            override fun onPlayerEvent(
+                eventCode: io.agora.mediaplayer.Constants.MediaPlayerEvent?,
+                elapsedTime: Long,
+                message: String?
+            ) {}
+
+            override fun onMetaData(
+                type: io.agora.mediaplayer.Constants.MediaPlayerMetadataType?,
+                data: ByteArray?
+            ) {}
+
+            override fun onPlayBufferUpdated(playCachedBuffer: Long) {}
+
+            override fun onPreloadEvent(
+                src: String?,
+                event: io.agora.mediaplayer.Constants.MediaPlayerPreloadEvent?
+            ) {}
+
+            override fun onAgoraCDNTokenWillExpire() {}
+
+            override fun onPlayerSrcInfoChanged(from: SrcInfo?, to: SrcInfo?) {}
+
+            override fun onPlayerInfoUpdated(info: PlayerUpdatedInfo?) {}
+
+            override fun onAudioVolumeIndication(volume: Int) {}
+        })
     }
 
     private fun createRtcEngine(): RtcEngineEx {

@@ -14,9 +14,9 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.scene.pure1v1.R
-import io.agora.scene.pure1v1.callAPI.*
+import io.agora.scene.pure1v1.callapi.*
 import io.agora.scene.pure1v1.databinding.Pure1v1CallDetailFragmentBinding
-import io.agora.scene.pure1v1.service.CallServiceManager
+import io.agora.scene.pure1v1.CallServiceManager
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import java.util.concurrent.TimeUnit
 
@@ -29,7 +29,6 @@ class CallDetailFragment : Fragment(), ICallApiListener {
     private var startTime = System.currentTimeMillis()
     private var timerHandler: Handler? = null
     private var dashboard: DashboardFragment? = null
-    private var rtcEventHandler: IRtcEngineEventHandler? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = Pure1v1CallDetailFragmentBinding.inflate(inflater, container, false)
@@ -40,28 +39,24 @@ class CallDetailFragment : Fragment(), ICallApiListener {
         super.onViewCreated(view, savedInstanceState)
         setupView()
         CallServiceManager.instance.callApi?.addListener(this)
-        setupRTCListener()
 
         timerHandler = Handler(Looper.getMainLooper())
 
         CallServiceManager.instance.startupCallApiIfNeed()
     }
 
-    private fun setupRTCListener() {
-        val handler = object: IRtcEngineEventHandler() {
-            override fun onContentInspectResult(result: Int) {
-                Log.d(tag, "onContentInspectResult = $result")
-                if (result > 1) {
-                    Toast.makeText(context, getText(R.string.pure1v1_call_content_inspect), Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-        CallServiceManager.instance.rtcEngine?.addHandler(handler)
-        rtcEventHandler = handler
-    }
-
     fun start() {
         startTime = System.currentTimeMillis()
+
+        view?.post {
+            CallServiceManager.instance.remoteUser?.let { userInfo ->
+                Glide.with(this)
+                    .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
+                    .into(binding.ivUserAvatar)
+                binding.tvRoomTitle.text = userInfo.userName
+                binding.tvRoomNum.text = userInfo.userId
+            }
+        }
     }
 
     fun updateTime() {
@@ -80,8 +75,12 @@ class CallDetailFragment : Fragment(), ICallApiListener {
         }, 1000)
     }
 
-    private fun setupView() {
+    fun initDashBoard(channelId: String, localUid: Int) {
+        dashboard?.setupRTCListener(channelId, localUid)
+    }
 
+    private fun setupView() {
+        // 将试图容器设置进manager
         CallServiceManager.instance.localCanvas = binding.vDragWindow2.canvasContainer
         CallServiceManager.instance.remoteCanvas = binding.vDragWindow1.canvasContainer
 
@@ -112,13 +111,6 @@ class CallDetailFragment : Fragment(), ICallApiListener {
             binding.ivClose.visibility = View.INVISIBLE
             binding.flDashboard.visibility = View.INVISIBLE
             dashboard?.updateVisible(false)
-        }
-        CallServiceManager.instance.remoteUser?.let { userInfo ->
-            Glide.with(this)
-                .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
-                .into(binding.ivUserAvatar)
-            binding.tvRoomTitle.text = userInfo.userName
-            binding.tvRoomNum.text = userInfo.userId
         }
         val fragment = DashboardFragment()
         val fragmentTransaction = parentFragmentManager.beginTransaction()
@@ -187,10 +179,7 @@ class CallDetailFragment : Fragment(), ICallApiListener {
             CallServiceManager.instance.callApi?.hangup(userInfo.userId.toInt()) {
             }
         }
-//        binding.vDragWindow1.canvasContainer.removeAllViews()
-//        binding.vDragWindow2.canvasContainer.removeAllViews()
         timerHandler?.removeCallbacksAndMessages(null)
-        //timerHandler = null
         if (isAdded && !parentFragmentManager.isDestroyed) {
             val fragment = parentFragmentManager.findFragmentByTag("CallDetailFragment")
             fragment?.let {

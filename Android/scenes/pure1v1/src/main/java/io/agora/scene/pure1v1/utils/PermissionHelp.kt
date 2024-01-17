@@ -1,5 +1,4 @@
-package io.agora.scene.pure1v1.service
-
+package io.agora.scene.pure1v1.utils
 
 import android.Manifest
 import android.content.Context

@@ -24,20 +24,15 @@ import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.showTo1v1.CallRole
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
-import io.agora.scene.showTo1v1.callAPI.CallApiImpl
-import io.agora.scene.showTo1v1.callAPI.CallReason
-import io.agora.scene.showTo1v1.callAPI.CallRole
-import io.agora.scene.showTo1v1.callAPI.CallStateType
-import io.agora.scene.showTo1v1.callAPI.ICallApi
-import io.agora.scene.showTo1v1.callAPI.ICallApiListener
+import io.agora.scene.showTo1v1.callAPI.*
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListActivityBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import io.agora.scene.showTo1v1.ui.dialog.CallDialog
-import io.agora.scene.showTo1v1.ui.dialog.CallDialogState
 import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
 import io.agora.scene.showTo1v1.ui.fragment.RoomListFragment
 import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
@@ -58,7 +53,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     }
 
     private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
-    private val mCallApi by lazy { ICallApi.getImplInstance() }
     private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
     private val mRtcEngine by lazy { mShowTo1v1Manger.mRtcEngine }
 
@@ -92,6 +86,9 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 fetchRoomList()
             }
         }
+        mShowTo1v1Manger.initCallAPi()
+
+        //RoomDetailActivity.launchBackGround(this)
     }
 
     private fun setOnApplyWindowInsetsListener() {
@@ -147,7 +144,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         }
         binding.btnCreateRoom.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                mCallApi.removeListener(callApiListener)
+                mShowTo1v1Manger.mCallApi.removeListener(callApiListener)
                 mShowTo1v1Manger.deInitialize()
                 RoomCreateActivity.launch(this@RoomListActivity)
             }
@@ -313,7 +310,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     override fun onDestroy() {
         super.onDestroy()
         mVpFragments[mCurrLoadPosition]?.stopLoadPage(false)
-        mCallApi.removeListener(callApiListener)
+        mShowTo1v1Manger.mCallApi.removeListener(callApiListener)
         mRtcVideoLoaderApi.cleanCache()
         VideoLoader.release()
         mShowTo1v1Manger.destroy()
@@ -343,18 +340,18 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         mRoomInfo = roomInfo
         if (needCall) {
             toggleSelfVideo(true) {
-                mShowTo1v1Manger.reInitCallApi(CallRole.CALLER, roomInfo.roomId, callback = {
-                    mCallApi.addListener(callApiListener)
-                    mCallApi.call(roomInfo.roomId, roomInfo.getIntUserId(), completion = {
+                mShowTo1v1Manger.prepareCall(CallRole.CALLER, roomInfo.roomId, callback = {
+                    mShowTo1v1Manger.mCallApi.addListener(callApiListener)
+                    mShowTo1v1Manger.mCallApi.call(roomInfo.getIntUserId(), completion = {
                         if (it != null) {
-                            mCallApi.removeListener(callApiListener)
+                            mShowTo1v1Manger.mCallApi.removeListener(callApiListener)
                             mShowTo1v1Manger.deInitialize()
                         }
                     })
                 })
             }
         } else {
-            mCallApi.removeListener(callApiListener)
+            mShowTo1v1Manger.mCallApi.removeListener(callApiListener)
             RoomDetailActivity.launch(this, false, roomInfo)
         }
     }
@@ -373,7 +370,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         val dialog = CallSendDialog(this, user)
         dialog.setListener(object : CallSendDialog.CallSendDialogListener {
             override fun onSendViewDidClickHangup() {
-                mCallApi.cancelCall(null)
+                mShowTo1v1Manger.mCallApi.cancelCall(null)
             }
         })
         dialog.show()
@@ -389,9 +386,8 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
         override fun onCallStateChanged(
             state: CallStateType,
-            stateReason: CallReason,
+            stateReason: CallStateReason,
             eventReason: String,
-            elapsed: Long,
             eventInfo: Map<String, Any>
         ) {
             val publisher = eventInfo[CallApiImpl.kPublisher] ?: mShowTo1v1Manger.mCurrentUser.userId
@@ -400,7 +396,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             Log.d(TAG, "RooList state:${state.name},stateReason:${stateReason.name},eventReason:${eventReason}")
             when (state) {
                 CallStateType.Prepared -> {
-                    if (stateReason == CallReason.CallingTimeout || stateReason == CallReason.RemoteRejected) {
+                    if (stateReason == CallStateReason.CallingTimeout || stateReason == CallStateReason.RemoteRejected) {
                         mShowTo1v1Manger.mRemoteUser = null
                         ToastUtils.showToast(getString(R.string.show_to1v1_no_answer))
                         mCallDialog?.let {
@@ -429,18 +425,19 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     }
                 }
 
-                CallStateType.Connecting ->{
-                    if (stateReason==CallReason.LocalAccepted||stateReason==CallReason.RemoteAccepted){
+                CallStateType.Connecting -> {
+                    if (stateReason == CallStateReason.LocalAccepted || stateReason == CallStateReason.RemoteAccepted) {
                         Log.d(TAG,"call Connecting LocalAccepted or RemoteAccepted")
                     }
                 }
+
                 CallStateType.Connected -> {
                     mCallDialog?.let {
                         if (it.isShowing) it.dismiss()
                         mCallDialog = null
                     }
                     mRoomInfo?.let { roomInfo ->
-                        mCallApi.removeListener(this)
+                        mShowTo1v1Manger.mCallApi.removeListener(this)
                         RoomDetailActivity.launch(this@RoomListActivity, true, roomInfo)
                     }
                 }
@@ -453,6 +450,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     mShowTo1v1Manger.mRemoteUser = null
                     ToastUtils.showToast(eventReason)
                 }
+                else -> {}
             }
         }
 

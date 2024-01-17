@@ -1,4 +1,4 @@
-package io.agora.scene.pure1v1.callAPI
+package io.agora.scene.pure1v1.callapi
 
 import android.content.Context
 import android.os.Handler
@@ -11,7 +11,7 @@ import io.agora.rtc2.*
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.rtm.*
 import io.agora.scene.pure1v1.BuildConfig
-import io.agora.scene.pure1v1.callAPI.extension.cloneConfig
+import io.agora.scene.pure1v1.callapi.extension.cloneConfig
 import org.json.JSONObject
 import java.util.*
 
@@ -160,13 +160,17 @@ class CallApiImpl constructor(
     }
 
     private fun _messageDic(action: CallAction): Map<String, Any> {
-        return mapOf<String, Any>(
+        val map = mutableMapOf<String, Any>(
             kMessageAction to action.value,
             kMessageVersion to kCurrentMessageVersion,
             kMessageTs to _getTimeInMs(),
             kFromUserId to (config?.userId ?: 0),
             kCallId to connectInfo.callId
         )
+        prepareConfig?.userExtension?.let {
+            map[kFromUserExtension] = it
+        }
+        return map
     }
 
     private fun _callMessageDic(remoteUserId: Int, fromRoomId: String): Map<String, Any> {
@@ -252,7 +256,6 @@ class CallApiImpl constructor(
 
     private fun _prepareForCall(prepareConfig: PrepareConfig, completion: ((AGError?) -> Unit)?) {
         val cfg = config
-        val rtmClient = config?.rtmClient
         if (cfg == null) {
             val reason = "config is Empty"
             callWarningPrint(reason)
@@ -630,30 +633,15 @@ class CallApiImpl constructor(
             else -> {}
         }
     }
-    private fun _reject(remoteUserId: Int, reason: String?, rejectByInternal: Boolean = false, completion: ((AGError?, Map<String, Any>) -> Unit)? = null) {
-        val fromUserId = config?.userId
-        if (fromUserId == null) {
-            completion?.invoke(AGError("reject fail! current userId or roomId is empty", -1), emptyMap())
-            callWarningPrint("reject fail! current userId or roomId is empty")
-            return
-        }
-        val message = _rejectMessageDic(reason, rejectByInternal)
-        messageManager?.sendMessage(remoteUserId.toString(), fromUserId.toString(), message) { error ->
-            completion?.invoke(error, message)
-        }
+
+    private fun _reject(remoteUserId: Int, message: Map<String, Any>, completion: ((AGError?) -> Unit)? = null) {
+        messageManager?.sendMessage(remoteUserId.toString(), message, completion)
     }
 
-    private fun _hangup(remoteUserId: String, completion: ((AGError?, Map<String, Any>) -> Unit)? = null) {
-        val fromUserId = config?.userId ?: run {
-            completion?.invoke(AGError("reject fail! current roomId is empty", -1), emptyMap())
-            callWarningPrint("reject fail! current roomId is empty")
-            return
-        }
-        val message = _messageDic(CallAction.Hangup)
-        messageManager?.sendMessage(remoteUserId, fromUserId.toString(), message) { err ->
-            completion?.invoke(err, message)
-        }
+    private fun _hangup(remoteUserId: Int, message: Map<String, Any>? = null, completion: ((AGError?) -> Unit)? = null) {
+        messageManager?.sendMessage(remoteUserId.toString(), message ?: _messageDic(CallAction.Hangup), completion)
     }
+
     //收到呼叫消息
     private fun _onCall(message: Map<String, Any>) {
         val fromRoomId = message[kFromRoomId] as String
@@ -670,7 +658,8 @@ class CallApiImpl constructor(
             }
             CallStateType.Calling, CallStateType.Connecting, CallStateType.Connected -> {
                 if ((connectInfo.callingUserId ?: 0) != fromUserId) {
-                    _reject(fromUserId, kRejectReasonCallBusy, true)
+                    val message = _rejectMessageDic(kRejectReasonCallBusy, rejectByInternal = true)
+                    _reject(fromUserId, message)
                     return
                 }
                 if (state == CallStateType.Calling) {
@@ -684,12 +673,7 @@ class CallApiImpl constructor(
 
         connectInfo.set(fromUserId, fromRoomId, callId)
         if (enableNotify) {
-            val eventInfo = mapOf<String, Any>(
-                kFromRoomId to fromRoomId,
-                kFromUserId to fromUserId,
-                kRemoteUserId to (config?.userId ?: 0)
-            )
-            _updateAndNotifyState(CallStateType.Calling, CallStateReason.None, eventInfo = eventInfo)
+            _updateAndNotifyState(CallStateType.Calling, CallStateReason.None, eventInfo = message)
             _notifyEvent(CallEvent.OnCalling)
         }
         if(calleeJoinRTCPolicy == CalleeJoinRTCPolicy.Calling) {
@@ -732,7 +716,7 @@ class CallApiImpl constructor(
             return
         }
         if (state == CallStateType.Calling) {
-            _updateAndNotifyState(CallStateType.Connecting, CallStateReason.RemoteAccepted)
+            _updateAndNotifyState(CallStateType.Connecting, CallStateReason.RemoteAccepted, eventInfo = message)
         }
         _notifyEvent(CallEvent.RemoteAccepted)
     }
@@ -745,7 +729,7 @@ class CallApiImpl constructor(
             callWarningPrint("onHangup fail: callId missmatch")
             return
         }
-        _updateAndNotifyState(CallStateType.Prepared, CallStateReason.RemoteHangup)
+        _updateAndNotifyState(CallStateType.Prepared, CallStateReason.RemoteHangup, eventInfo = message)
         _notifyEvent(CallEvent.RemoteHangup)
     }
 
@@ -775,7 +759,7 @@ class CallApiImpl constructor(
             }
             CallStateType.Connecting, CallStateType.Connected -> {
                 val callingUserId = connectInfo.callingUserId ?: 0
-                _hangup(callingUserId.toString()) { err, message ->
+                _hangup(callingUserId) { err ->
                     _deinitialize()
                     completion.invoke()
                 }
@@ -850,7 +834,7 @@ class CallApiImpl constructor(
         _reportMethod("call", "remoteUserId=$remoteUserId")
 
         val message = _callMessageDic(remoteUserId, fromRoomId)
-        messageManager?.sendMessage(remoteUserId.toString(), fromUserId.toString(), message) { err ->
+        messageManager?.sendMessage(remoteUserId.toString(), message) { err ->
             completion?.invoke(err)
             if (err != null) {
                 //_updateAndNotifyState(CallStateType.Prepared, CallReason.MessageFailed, err.msg)
@@ -875,10 +859,10 @@ class CallApiImpl constructor(
             return
         }
         val message = _messageDic(CallAction.CancelCall)
-        messageManager?.sendMessage(userId.toString(), fromUserId.toString(), message) { err ->
+        messageManager?.sendMessage(userId.toString(), message) { err ->
             completion?.invoke(err)
         }
-        _updateAndNotifyState(CallStateType.Prepared, CallStateReason.LocalCancel)
+        _updateAndNotifyState(CallStateType.Prepared, CallStateReason.LocalCancel, eventInfo = message)
         _notifyEvent(CallEvent.LocalCancel)
     }
     //接受
@@ -905,7 +889,7 @@ class CallApiImpl constructor(
         }
         //先查询presence里是不是正在呼叫的被叫是自己，如果是则不再发送消息
         val message = _messageDic(CallAction.Accept)
-        messageManager?.sendMessage(remoteUserId.toString(), fromUserId.toString(), message) { err ->
+        messageManager?.sendMessage(remoteUserId.toString(), message) { err ->
             completion?.invoke(err)
             if (err != null) {
                 _notifyEvent(CallEvent.MessageFailed, "accept fail: ${err.code}")
@@ -924,26 +908,28 @@ class CallApiImpl constructor(
     //拒绝
     override fun reject(remoteUserId: Int, reason: String?, completion: ((AGError?) -> Unit)?) {
         _reportMethod("reject", "remoteUserId=$remoteUserId&reason=$reason")
-        _reject(remoteUserId, reason) { error, _ ->
+        val message = _rejectMessageDic(reason, rejectByInternal = false)
+        _reject(remoteUserId, message) { error ->
             completion?.invoke(error)
             if (error != null) {
                 _notifyEvent(CallEvent.MessageFailed, "reject fail: ${error.code}")
             }
         }
-        _updateAndNotifyState(CallStateType.Prepared, CallStateReason.LocalRejected)
+        _updateAndNotifyState(CallStateType.Prepared, CallStateReason.LocalRejected, eventInfo = message)
         _notifyEvent(CallEvent.LocalRejected)
     }
 
     //挂断
     override fun hangup(remoteUserId: Int, completion: ((AGError?) -> Unit)?) {
         _reportMethod("hangup", "remoteUserId=$remoteUserId")
-        _hangup(remoteUserId.toString()) { error, _ ->
+        val message = _messageDic(CallAction.Hangup)
+        _hangup(remoteUserId, message = message) { error ->
             completion?.invoke(error)
             if (error != null) {
                 _notifyEvent(CallEvent.MessageFailed, "hangup fail: ${error.code}")
             }
         }
-        _updateAndNotifyState(CallStateType.Prepared, CallStateReason.LocalHangup)
+        _updateAndNotifyState(CallStateType.Prepared, CallStateReason.LocalHangup, eventInfo = message)
         _notifyEvent(CallEvent.LocalHangup)
     }
 //    override fun addRTCListener(listener: IRtcEngineEventHandler) {

@@ -9,6 +9,7 @@ import android.view.animation.Animation.AnimationListener
 import android.view.animation.AnimationUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import io.agora.scene.pure1v1.CallServiceManager
 import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.databinding.Pure1v1CallSendDialogBinding
 import io.agora.scene.pure1v1.service.UserInfo
@@ -46,6 +47,8 @@ class CallSendDialog(
 
         val anim = AnimationUtils.loadAnimation(context, R.anim.pure1v1_slide_from_bottom)
         binding.clContent.startAnimation(anim)
+
+        CallServiceManager.instance.renderCallShow(binding.tvShow)
     }
 
     fun setListener(l: CallSendDialogListener) {
