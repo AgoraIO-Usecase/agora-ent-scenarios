@@ -148,6 +148,14 @@ class ShowTo1v1ServiceImpl constructor(
         roomSubscribeListener.add(listener)
     }
 
+    override fun reset() {
+        if (syncUtilsInited) {
+            Sync.Instance().destroy()
+            syncUtilsInited = false
+            roomMap.clear()
+        }
+    }
+
     override fun createRoom(roomName: String, completion: (error: Exception?, roomInfo: ShowTo1v1RoomInfo?) -> Unit) {
         initScene {
             val roomId = (Random(System.currentTimeMillis()).nextInt(100000) + 1000000).toString()

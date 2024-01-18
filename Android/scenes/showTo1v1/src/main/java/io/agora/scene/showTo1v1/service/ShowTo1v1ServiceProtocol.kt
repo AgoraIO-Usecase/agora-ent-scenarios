@@ -61,5 +61,6 @@ interface ShowTo1v1ServiceProtocol {
     // 订阅回调
     fun subscribeListener(listener: ShowTo1v1ServiceListenerProtocol)
 
-
+    // 释放资源
+    fun reset()
 }

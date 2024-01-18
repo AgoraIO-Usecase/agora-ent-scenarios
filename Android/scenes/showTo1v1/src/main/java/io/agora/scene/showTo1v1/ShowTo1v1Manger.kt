@@ -117,12 +117,14 @@ class ShowTo1v1Manger constructor() {
      * @param ownerRoomId 呼叫/被叫房间 id
      */
     fun prepareCall(role: CallRole, ownerRoomId: String, callback: () -> Unit) {
+        initCallAPi()
         if (role == CallRole.CALLER) {
             mPrepareConfig.roomId = mCurrentUser.get1v1ChannelId()
         } else {
             isCallApiInit = false
             mPrepareConfig.roomId = ownerRoomId
         }
+        mPrepareConfig.userExtension = mCurrentUser.toMap()
         mPrepareConfig.autoAccept = true
         checkCallTokenConfig { renewToken ->
             if (renewToken) {

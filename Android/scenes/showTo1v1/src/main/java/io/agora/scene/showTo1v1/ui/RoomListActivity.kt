@@ -103,7 +103,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     override fun onResume() {
         super.onResume()
-
     }
 
     override fun onPause() {
@@ -116,6 +115,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     override fun onRestart() {
         mVpFragments[mCurrLoadPosition]?.onResumePage()
+        fetchRoomList()
         super.onRestart()
     }
 
@@ -314,6 +314,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         mRtcVideoLoaderApi.cleanCache()
         VideoLoader.release()
         mShowTo1v1Manger.destroy()
+        mService.reset()
     }
 
 
@@ -404,6 +405,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                             mCallDialog = null
                         }
                     }
+                    fetchRoomList()
                 }
 
                 CallStateType.Calling -> {

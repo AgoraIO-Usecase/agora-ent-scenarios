@@ -88,6 +88,7 @@ class CallServiceManager {
         callApi = null
         sceneService?.leaveRoom {
         }
+        sceneService?.reset()
         sceneService = null
     }
 

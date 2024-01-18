@@ -24,6 +24,14 @@ class Pure1v1ServiceImp(
 
     private var userList: List<UserInfo> = emptyList()
 
+    fun reset() {
+        if (syncUtilsInited) {
+            Instance().destroy()
+            syncUtilsInited = false
+            sceneRefs.clear()
+        }
+    }
+
     // MARK: - Public
     fun getUserList(completion: (String?, List<UserInfo>) -> Unit) {
         initScene {

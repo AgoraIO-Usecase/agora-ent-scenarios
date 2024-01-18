@@ -103,7 +103,7 @@ class CallApiImpl constructor(
                     }
                     // 开启定时器，如果超时无响应，调用no response
                     connectInfo.scheduledTimer({
-                        cancelCall {  }
+                        _cancelCall {  }
                         _updateAndNotifyState(CallStateType.Prepared, CallStateReason.CallingTimeout)
                         _notifyEvent(CallEvent.CallingTimeout)
                     }, timeout)
@@ -634,6 +634,22 @@ class CallApiImpl constructor(
         }
     }
 
+    private fun _cancelCall(message: Map<String, Any>? = null, completion: ((AGError?) -> Unit)? = null) {
+        val userId = connectInfo.callingUserId
+        if (userId == null) {
+            completion?.invoke(AGError("cancelCall fail! callingRoomId is empty", -1))
+            callWarningPrint("cancelCall fail! callingRoomId is empty")
+            return
+        }
+        val msg = message ?: _messageDic(CallAction.CancelCall)
+        messageManager?.sendMessage(userId.toString(), msg) { err ->
+            completion?.invoke(err)
+            if (err != null) {
+                _notifyEvent(CallEvent.MessageFailed, "cancel call fail: ${err.code}")
+            }
+        }
+    }
+
     private fun _reject(remoteUserId: Int, message: Map<String, Any>, completion: ((AGError?) -> Unit)? = null) {
         messageManager?.sendMessage(remoteUserId.toString(), message, completion)
     }
@@ -851,20 +867,12 @@ class CallApiImpl constructor(
 
     override fun cancelCall(completion: ((AGError?) -> Unit)?) {
         _reportMethod("cancelCall")
-        val userId = connectInfo.callingUserId
-        val fromUserId = config?.userId
-        if (userId == null || fromUserId == null) {
-            completion?.invoke(AGError("cancelCall fail! callingRoomId is empty", -1))
-            callWarningPrint("cancelCall fail! callingRoomId is empty")
-            return
-        }
         val message = _messageDic(CallAction.CancelCall)
-        messageManager?.sendMessage(userId.toString(), message) { err ->
-            completion?.invoke(err)
-        }
+        _cancelCall(message, completion)
         _updateAndNotifyState(CallStateType.Prepared, CallStateReason.LocalCancel, eventInfo = message)
         _notifyEvent(CallEvent.LocalCancel)
     }
+
     //接受
     override fun accept(remoteUserId: Int, completion: ((AGError?) -> Unit)?) {
         _reportMethod("accept", "remoteUserId=$remoteUserId")

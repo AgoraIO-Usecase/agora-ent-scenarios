@@ -545,6 +545,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     override fun onDestroy() {
         super.onDestroy()
+        // 取消 Glide 异步任务
+        Glide.with(this).pauseRequests()
     }
 
     override fun onBackPressed() {
@@ -831,9 +833,14 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     if (mShowTo1v1Manger.mCurrentUser.userId == toUserId.toString()) {
                         // 收到大哥拨打电话
                         mShowTo1v1Manger.mConnectedChannelId = fromRoomId
-                        (eventInfo[CallApiImpl.kFromUserExtension] as? Map<String, Any>)?.let {
-                            mShowTo1v1Manger.mRemoteUser = ShowTo1v1UserInfo(it)
-                        }
+                        val userMap = eventInfo[CallApiImpl.kFromUserExtension] as JSONObject
+                        mShowTo1v1Manger.mRemoteUser = ShowTo1v1UserInfo(
+                            userMap.getString("userId"),
+                            userMap.getString("userName"),
+                            userMap.getString("avatar"),
+                            userMap.getString("objectId"),
+                            userMap.getLong("createdAt")
+                        )
                     } else if (mShowTo1v1Manger.mCurrentUser.userId == fromUserId.toString()) {
                         // 大哥拨打电话
                         mShowTo1v1Manger.mConnectedChannelId = fromRoomId
