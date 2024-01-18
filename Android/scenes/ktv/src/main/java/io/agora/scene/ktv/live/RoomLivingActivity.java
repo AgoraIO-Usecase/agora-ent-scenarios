@@ -573,6 +573,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         roomLivingViewModel.loadMusicProgressLiveData.observe(this, percent -> {
             getBinding().lrcControlView.onMusicLoadProgress(percent);
         });
+        roomLivingViewModel.scoringAlgoLiveData.observe(this, difficulty -> {
+            getBinding().lrcControlView.getKaraokeView().setScoringLevel(difficulty);
+        });
     }
 
 
@@ -845,7 +848,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     private void showMusicSettingDialog() {
         musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting,
                 roomLivingViewModel.mSoundCardSettingBean,
-                !roomLivingViewModel.isPlaying());
+                getBinding().lrcControlView.getRole() == LrcControlView.Role.Listener,
+                roomLivingViewModel.songPlayingLiveData.getValue());
         musicSettingDialog.show(getSupportFragmentManager(), MusicSettingDialog.TAG);
     }
 

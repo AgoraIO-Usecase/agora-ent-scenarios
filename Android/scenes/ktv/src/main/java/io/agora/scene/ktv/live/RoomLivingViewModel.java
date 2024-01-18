@@ -184,6 +184,9 @@ public class RoomLivingViewModel extends ViewModel {
 
     final MutableLiveData<ScoringAlgoControlModel> scoringAlgoControlLiveData = new MutableLiveData<>();
 
+    // 打分难度
+    final MutableLiveData<Integer> scoringAlgoLiveData = new MutableLiveData<>();
+
     /**
      * Rtc引擎
      */
@@ -1124,6 +1127,9 @@ public class RoomLivingViewModel extends ViewModel {
      */
     public void setLrcView(ILrcView view) {
         ktvApiProtocol.setLrcView(view);
+        if (mSetting != null) {
+            ktvApiProtocol.enableProfessionalStreamerMode(mSetting.getMProfessionalModeEnable());
+        }
     }
 
     // ======================= Player/RTC/MPK相关 =======================
@@ -1246,6 +1252,7 @@ public class RoomLivingViewModel extends ViewModel {
             @Override
             public void onScoringDifficultyChanged(int difficulty) {
                 KTVLogger.d(TAG, "onScoringDifficultyChanged: " + difficulty);
+                scoringAlgoLiveData.postValue(difficulty);
             }
 
             @Override
@@ -1603,8 +1610,6 @@ public class RoomLivingViewModel extends ViewModel {
             cfg.ordered = false;
             streamId = mRtcEngine.createDataStream(cfg);
         }
-
-//        setAudioEffectPreset(getEffectIndex(mSetting.getEffect()));
     }
 
     private int audioPreset = DEFAULT_AUDIO_EFFECT;

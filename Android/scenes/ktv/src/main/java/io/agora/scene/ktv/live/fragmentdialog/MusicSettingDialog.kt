@@ -4,14 +4,14 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.divider.MaterialDividerItemDecoration
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.base.component.BaseRecyclerViewAdapter.BaseViewHolder
@@ -28,13 +28,16 @@ import io.agora.scene.ktv.live.bean.EffectVoiceBean
 import io.agora.scene.ktv.live.bean.MusicSettingBean
 import io.agora.scene.ktv.live.bean.ScoringDifficultyMode
 import io.agora.scene.ktv.live.bean.SoundCardSettingBean
+import io.agora.scene.ktv.service.RoomSelSongModel
 import io.agora.scene.widget.doOnProgressChanged
 import io.agora.scene.widget.toast.CustomToast
+
 
 class MusicSettingDialog constructor(
     var mSetting: MusicSettingBean,
     var mSoundCardSetting: SoundCardSettingBean,
-    var isPause: Boolean
+    var isListener: Boolean, // 是否是观众
+    var currentSong: RoomSelSongModel?, // 当前歌曲
 ) :
     BaseBottomSheetDialogFragment<KtvDialogMusicSettingBinding>() {
 
@@ -140,6 +143,7 @@ class MusicSettingDialog constructor(
         }
 
         // 远端音量
+        mBinding.sbRemoteVol.progress = mSetting.mRemoteVolume
         mBinding.btRemoteVolDown.setOnClickListener { v -> tuningRemoteVolume(false) }
         mBinding.btRemoteVolUp.setOnClickListener { v -> tuningRemoteVolume(true) }
         mBinding.sbRemoteVol.doOnProgressChanged { seekBar, progress, fromUser ->
@@ -147,16 +151,17 @@ class MusicSettingDialog constructor(
                 mSetting.mRemoteVolume = progress
             }
         }
-        if (isPause) {
-            mBinding.sbRemoteVol.isEnabled = false
-            mBinding.btRemoteVolDown.isEnabled = false
-            mBinding.btRemoteVolUp.isEnabled = false
-            mBinding.sbRemoteVol.progress = 100
+
+        if (isListener) {
+            enableDisableView(mBinding.layoutAccVol, false)
+            mBinding.layoutAccVol.alpha = 0.3f
+            enableDisableView(mBinding.layoutAccVol, false)
+            mBinding.layoutRemoteVol.alpha = 0.3f
         } else {
-            mBinding.sbRemoteVol.isEnabled = true
-            mBinding.btRemoteVolDown.isEnabled = true
-            mBinding.btRemoteVolUp.isEnabled = true
-            mBinding.sbRemoteVol.progress = mSetting.mRemoteVolume
+            enableDisableView(mBinding.layoutAccVol, true)
+            mBinding.layoutAccVol.alpha = 1.0f
+            enableDisableView(mBinding.layoutRemoteVol, true)
+            mBinding.layoutRemoteVol.alpha = 1.0f
         }
 
         // 音效
@@ -174,6 +179,14 @@ class MusicSettingDialog constructor(
                 R.id.tvScoringDifficultyHigh -> mSetting.mScoringDifficultyMode = ScoringDifficultyMode.High
                 else -> mSetting.mScoringDifficultyMode = ScoringDifficultyMode.Recommend
             }
+        }
+
+        if (currentSong == null) {
+            enableDisableView(mBinding.layoutVoiceScoringDifficulty, false)
+            mBinding.layoutVoiceScoringDifficulty.alpha = 0.3f
+        } else {
+            enableDisableView(mBinding.layoutVoiceScoringDifficulty, true)
+            mBinding.layoutVoiceScoringDifficulty.alpha = 1.0f
         }
 
         // 专业模式
@@ -253,6 +266,12 @@ class MusicSettingDialog constructor(
         }
         mBinding.groupAIAECStrength.isVisible = mSetting.mAIAECEnable
         mBinding.AIAECInput.setText(mSetting.mAIAECStrength.toString())
+    }
+
+    private fun enableDisableView(viewGroup: ViewGroup, enable: Boolean) {
+        for (idx in 0 until viewGroup.childCount) {
+            viewGroup.getChildAt(idx).isEnabled = enable
+        }
     }
 
     /**
@@ -380,27 +399,25 @@ class MusicSettingDialog constructor(
 
         mBinding.rvVoiceEffectList.adapter = mVoiceEffectAdapter
         val context = context ?: return
-        val itemDecoration = object : MaterialDividerItemDecoration(context, HORIZONTAL) {
+        val itemDecoration = object : DividerItemDecoration(context, HORIZONTAL) {
             override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
                 val itemCount = state.itemCount
                 when (parent.getChildAdapterPosition(view)) {
                     0 -> { // first
-                        outRect.left = 10.dp.toInt() + dividerThickness
-                        outRect.right = dividerThickness
+                        outRect.left = 20.dp.toInt()
+                        outRect.right = 10.dp.toInt()
                     }
 
                     itemCount - 1 -> { // last
-                        outRect.right = 10.dp.toInt() + dividerThickness
+                        outRect.right = 20.dp.toInt()
                     }
 
                     else -> {
-                        outRect.right = dividerThickness
+                        outRect.right = 10.dp.toInt()
                     }
                 }
             }
         }
-        itemDecoration.dividerThickness = 10.dp.toInt()
-        itemDecoration.dividerColor = ResourcesCompat.getColor(resources, android.R.color.transparent, null)
         mBinding.rvVoiceEffectList.addItemDecoration(itemDecoration)
     }
 }
