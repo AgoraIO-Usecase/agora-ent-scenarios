@@ -15,6 +15,8 @@ import static io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE.getValue;
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION;
 import static io.agora.scene.ktv.ktvapi.KTVApiKt.createKTVApi;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.view.SurfaceView;
 import android.widget.Toast;
@@ -92,6 +94,19 @@ import io.agora.scene.widget.toast.CustomToast;
 public class RoomLivingViewModel extends ViewModel {
 
     private final String TAG = "KTV_Scene_LOG";
+    private Handler mainHandler;
+
+    private void runOnMainThread(Runnable runnable) {
+        if (mainHandler == null) {
+            mainHandler = new Handler(Looper.getMainLooper());
+        }
+        if (Thread.currentThread() == mainHandler.getLooper().getThread()) {
+            runnable.run();
+        } else {
+            mainHandler.post(runnable);
+        }
+    }
+
     // 默认音效
     private final int DEFAULT_AUDIO_EFFECT = ROOM_ACOUSTICS_KTV;
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();
@@ -214,6 +229,10 @@ public class RoomLivingViewModel extends ViewModel {
 
     public boolean isRoomOwner() {
         return roomInfoLiveData.getValue().getCreatorNo().equals(UserManager.getInstance().getUser().id.toString());
+    }
+
+    public boolean isPlaying(){
+        return playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING;
     }
 
     public void init() {
@@ -974,6 +993,10 @@ public class RoomLivingViewModel extends ViewModel {
         }
     }
 
+    /**
+     * 加入合唱
+     * @param songCode
+     */
     private void innerJoinChorus(String songCode) {
         ktvApiProtocol.loadMusic(Long.parseLong(songCode), new KTVLoadMusicConfiguration(songCode, false, Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_MUSIC_ONLY), new IMusicLoadStateListener() {
             @Override
@@ -1491,9 +1514,24 @@ public class RoomLivingViewModel extends ViewModel {
                                                        break;
                                                    case PLAYER_STATE_PLAYING:
                                                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                                                       // 若身份是主唱和伴唱，在演唱时，人声音量、伴泰音量保持原先设置，远端音量自动切为30
+                                                       runOnMainThread(() -> {
+                                                           if (mSetting!=null) mSetting.setMRemoteVolume(MusicSettingBean.DEFAULT_REMOTE_SINGER_VOL);
+                                                       });
                                                        break;
                                                    case PLAYER_STATE_PAUSED:
                                                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
+                                                       // 若身份是主唱和伴唱，演唱暂停/切歌，人声音量、伴奏音量保持原先设置，远端音量自动转为100
+                                                       runOnMainThread(() -> {
+                                                           if (mSetting!=null) mSetting.setMRemoteVolume(MusicSettingBean.DEFAULT_REMOTE_VOL);
+                                                       });
+                                                       break;
+                                                   case PLAYER_STATE_STOPPED:
+                                                       playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_STOP);
+                                                       // 若身份是主唱和伴唱，演唱暂停/切歌，人声音量、伴奏音量保持原先设置，远端音量自动转为100
+                                                       runOnMainThread(() -> {
+                                                           if (mSetting!=null) mSetting.setMRemoteVolume(MusicSettingBean.DEFAULT_REMOTE_VOL);
+                                                       });
                                                        break;
                                                    case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
                                                        if (isLocal) {
@@ -1725,11 +1763,6 @@ public class RoomLivingViewModel extends ViewModel {
 
                 // 重置settings
                 retryTimes = 0;
-                mSetting.setMMicVolume(MusicSettingBean.DEFAULT_MIC_VOL);
-                mSetting.setMAccVolume(50);
-                ktvApiProtocol.getMediaPlayer().adjustPlayoutVolume(50);
-                ktvApiProtocol.getMediaPlayer().adjustPublishSignalVolume(50);
-
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
             }
 
@@ -1745,11 +1778,6 @@ public class RoomLivingViewModel extends ViewModel {
                 if (reason == KTVLoadSongFailReason.NO_LYRIC_URL) {
                     // 未获取到歌词 正常播放
                     retryTimes = 0;
-                    mSetting.setMMicVolume(MusicSettingBean.DEFAULT_MIC_VOL);
-                    mSetting.setMAccVolume(50);
-                    ktvApiProtocol.getMediaPlayer().adjustPlayoutVolume(50);
-                    ktvApiProtocol.getMediaPlayer().adjustPublishSignalVolume(50);
-
                     playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                     noLrcLiveData.postValue(true);
                 } else if (reason == KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL) {

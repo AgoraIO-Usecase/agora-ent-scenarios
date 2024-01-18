@@ -23,14 +23,14 @@ data class RoomListModel(
     val roomPeopleNum: Int = 0,
 ) {}
 
-data class RoomSeatModel(
+data class RoomSeatModel constructor(
     val isMaster: Boolean,// 是否是房主
     val headUrl: String,// 头像
     val userNo: String,// 座位上用户no
     val rtcUid: String,// 座位上用户id，与rtc的userId一致
     val name: String,// 座位上用户昵称
     val seatIndex: Int,// 座位编号
-    val chorusSongCode: String = "",// 是否合唱
+    val chorusSongCode: String = "",// 是否合唱, RoomSelSongModel.songCode + RoomSelSongModel.createAt
     val isAudioMuted: Int,// 是否静音
     val isVideoMuted: Int,// 是否开启视频
 ) : java.io.Serializable {

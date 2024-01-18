@@ -1,14 +1,13 @@
 package io.agora.scene.ktv.live.fragmentdialog
 
-import android.content.Context
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.AdapterView
 import android.widget.FrameLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -30,6 +29,7 @@ import io.agora.scene.ktv.live.bean.MusicSettingBean
 import io.agora.scene.ktv.live.bean.ScoringDifficultyMode
 import io.agora.scene.ktv.live.bean.SoundCardSettingBean
 import io.agora.scene.widget.doOnProgressChanged
+import io.agora.scene.widget.toast.CustomToast
 
 class MusicSettingDialog constructor(
     var mSetting: MusicSettingBean,
@@ -54,16 +54,54 @@ class MusicSettingDialog constructor(
                 (it as BottomSheetDialog).findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
             bottomSheet?.let {
                 val behavior: BottomSheetBehavior<*> = BottomSheetBehavior.from(bottomSheet)
-                behavior.state = BottomSheetBehavior.STATE_EXPANDED
-                behavior.skipCollapsed = true
+//                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+//                behavior.skipCollapsed = true
                 behavior.isHideable = false
-                behavior.setDraggable(false)
+//                behavior.setDraggable(false)
             }
         }
     }
 
+    //防止多次回调
+    private var lastKeyBoard = false
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        dialog?.window?.let { window ->
+            // 获取根布局可见区域的高度
+            val initialWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
+            view.viewTreeObserver.addOnGlobalLayoutListener {
+                val tempWindow = dialog?.window ?: return@addOnGlobalLayoutListener
+                val currentWindowHeight =
+                    Rect().apply { tempWindow.decorView.getWindowVisibleDisplayFrame(this) }.height()
+                // 判断键盘高度来确定键盘的显示状态
+                if (currentWindowHeight < initialWindowHeight) {
+                    if (lastKeyBoard) return@addOnGlobalLayoutListener
+                    lastKeyBoard = true
+                    val length = mBinding.AIAECInput.text?.length ?: 0
+                    mBinding.AIAECInput.setSelection(length)
+
+                    // 软键盘可见
+                    Log.d("zhangw", "current: $currentWindowHeight, initial: $initialWindowHeight, show: true")
+                } else {
+                    if (!lastKeyBoard) return@addOnGlobalLayoutListener
+                    lastKeyBoard = false
+                    // 软键盘已收起
+                    Log.d("zhangw", "current: $currentWindowHeight, initial: $initialWindowHeight, show: false")
+                    mBinding.AIAECInput.clearFocus()
+                    val AIAECStrength = mBinding.AIAECInput.text.toString().toIntOrNull() ?: 0
+                    if (IntRange(0, 4).contains(AIAECStrength)) {
+                        if (mSetting.mAIAECStrength != AIAECStrength) {
+                            mSetting.mAIAECStrength = AIAECStrength
+                        }
+                    } else {
+                        mBinding.AIAECInput.setText(mSetting.mAIAECStrength.toString())
+                        CustomToast.show(R.string.ktv_AIAEC_input_hint)
+                    }
+                }
+            }
+        }
+
         mBinding.ivBackIcon.setOnClickListener { view -> (requireActivity() as RoomLivingActivity).closeMenuDialog() }
         // 耳返
         if (mSetting.mEarBackEnable) {
@@ -144,6 +182,12 @@ class MusicSettingDialog constructor(
         }
         mBinding.cbStartProfessionalMode.isChecked = mSetting.mProfessionalModeEnable
 
+        // Multi Path
+        mBinding.cbMultipath.setOnCheckedChangeListener { buttonView, isChecked ->
+            mSetting.mMultiPathEnable = isChecked
+        }
+        mBinding.cbMultipath.isChecked = mSetting.mMultiPathEnable
+
         // 音质
         when (mSetting.mAecLevel) {
             AECLevel.High -> mBinding.rgVoiceMode.check(R.id.tvVoiceHigh)
@@ -192,25 +236,23 @@ class MusicSettingDialog constructor(
 
         // AIAEC 开关
         mBinding.cbAIAECSwitcher.setOnCheckedChangeListener { buttonView, isChecked ->
-            mBinding.aiaecSelector.isEnabled = isChecked
+            mBinding.groupAIAECStrength.isVisible = isChecked
             mSetting.mAIAECEnable = isChecked
             mSetting.mAIAECStrength = mSetting.mAIAECStrength
         }
         mBinding.cbAIAECSwitcher.isChecked = mSetting.mAIAECEnable
 
         // AIAEC 强度选择
-        mBinding.aiaecSelector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
-                if (mSetting.mAIAECStrength != position) {
-                    mSetting.mAIAECStrength = position
-                }
-            }
+        mBinding.AIAECInput.doAfterTextChanged {
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
-        mBinding.aiaecSelector.setSelection(mSetting.mAIAECStrength)
-        mBinding.aiaecSelector.isEnabled = mSetting.mAIAECEnable
-
+        mBinding.AIAECInput.setOnTouchListener { v, event ->
+            mBinding.AIAECInput.requestFocus()
+            showKeyboard(mBinding.AIAECInput)
+            true
+        }
+        mBinding.groupAIAECStrength.isVisible = mSetting.mAIAECEnable
+        mBinding.AIAECInput.setText(mSetting.mAIAECStrength.toString())
     }
 
     /**

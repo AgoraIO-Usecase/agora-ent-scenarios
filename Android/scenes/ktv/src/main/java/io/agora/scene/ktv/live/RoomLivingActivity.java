@@ -46,6 +46,7 @@ import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvActivityRoomLivingBinding;
 import io.agora.scene.ktv.databinding.KtvItemRoomSpeakerBinding;
 import io.agora.scene.ktv.debugSettings.KTVDebugSettingsDialog;
+import io.agora.scene.ktv.live.bean.MusicSettingBean;
 import io.agora.scene.ktv.live.fragmentdialog.MusicSettingDialog;
 import io.agora.scene.ktv.live.listener.LrcActionListenerImpl;
 import io.agora.scene.ktv.live.listener.SongActionListenerImpl;
@@ -700,6 +701,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         if (voiceHighlightDialog != null) {
             voiceHighlightDialog.reset();
         }
+        if (musicSettingDialog != null) {
+            musicSettingDialog.dismiss();
+            musicSettingDialog = null;
+        }
 
         getBinding().lrcControlView.setMusic(music);
         if (UserManager.getInstance().getUser().id.toString().equals(music.getUserNo())) {
@@ -840,7 +845,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     private void showMusicSettingDialog() {
         musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting,
                 roomLivingViewModel.mSoundCardSettingBean,
-                roomLivingViewModel.playerMusicStatusLiveData.getValue() == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE);
+                !roomLivingViewModel.isPlaying());
         musicSettingDialog.show(getSupportFragmentManager(), MusicSettingDialog.TAG);
     }
 

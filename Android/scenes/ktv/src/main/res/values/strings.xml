@@ -130,8 +130,9 @@
     <string name="ktv_voice_AINS_medium">中</string>
     <string name="ktv_voice_AINS_high">高</string>
     <string name="ktv_low_latency">低延迟模式</string>
-    <string name="ktv_AIAEC_switcher">AIAEC 开关（beta）</string>
-    <string name="ktv_AIAEC_strength">AIAEC 强度选择（beta）</string>
+    <string name="ktv_AIAEC_switcher">AIAEC 开关</string>
+    <string name="ktv_AIAEC_strength">AIAEC 强度选择</string>
+    <string name="ktv_AIAEC_input_hint">请输入0～4的正整数</string>
     <string name="ktv_seat_num">%s号麦</string>
 
     <!--    Content Description-->
