@@ -1,11 +1,17 @@
 package io.agora.scene.ktv.live.fragmentdialog
 
+import android.content.Context
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
+import android.widget.FrameLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
@@ -39,21 +45,26 @@ class MusicSettingDialog constructor(
     private var mVoiceEffectAdapter: BaseRecyclerViewAdapter<KtvItemEffectvoiceBinding, EffectVoiceBean, EffectVoiceHolder>? =
         null
 
+    override fun onStart() {
+        super.onStart()
+        dialog?.let {
+            it.setCancelable(false)
+            it.setCanceledOnTouchOutside(false)
+            val bottomSheet =
+                (it as BottomSheetDialog).findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+            bottomSheet?.let {
+                val behavior: BottomSheetBehavior<*> = BottomSheetBehavior.from(bottomSheet)
+                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                behavior.skipCollapsed = true
+                behavior.isHideable = false
+                behavior.setDraggable(false)
+            }
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mBinding.ivBackIcon.setOnClickListener { view -> (requireActivity() as RoomLivingActivity).closeMenuDialog() }
-
-        if (isPause) {
-            mBinding.sbRemoteVol.isEnabled = false
-            mBinding.btRemoteVolDown.isEnabled = false
-            mBinding.btRemoteVolUp.isEnabled = false
-            mBinding.sbRemoteVol.progress = 100
-        } else {
-            mBinding.sbRemoteVol.isEnabled = true
-            mBinding.btRemoteVolDown.setEnabled(true)
-            mBinding.btRemoteVolUp.setEnabled(true)
-            mBinding.sbRemoteVol.progress = mSetting.mRemoteVolume
-        }
         // 耳返
         if (mSetting.mEarBackEnable) {
             mBinding.switchEar.text = getString(R.string.ktv_open)
@@ -71,6 +82,7 @@ class MusicSettingDialog constructor(
         mBinding.switchSoundCard.setOnClickListener { v: View -> this.showSoundCardPage(v) }
 
         // 人声音量
+        mBinding.sbMicVol.progress = mSetting.mMicVolume
         mBinding.btMicVolDown.setOnClickListener { v -> tuningMicVolume(false) }
         mBinding.btnMicVolUp.setOnClickListener { v -> tuningMicVolume(true) }
         mBinding.sbMicVol.doOnProgressChanged { seekBar, progress, fromUser ->
@@ -80,6 +92,7 @@ class MusicSettingDialog constructor(
         }
 
         // 伴奏音量
+        mBinding.sbAccVol.progress = mSetting.mAccVolume
         mBinding.btAccVolDown.setOnClickListener { v -> tuningMusicVolume(false) }
         mBinding.btAccVolUp.setOnClickListener { v -> tuningMusicVolume(true) }
         mBinding.sbAccVol.doOnProgressChanged { seekBar, progress, fromUser ->
@@ -95,6 +108,17 @@ class MusicSettingDialog constructor(
             if (fromUser) {
                 mSetting.mRemoteVolume = progress
             }
+        }
+        if (isPause) {
+            mBinding.sbRemoteVol.isEnabled = false
+            mBinding.btRemoteVolDown.isEnabled = false
+            mBinding.btRemoteVolUp.isEnabled = false
+            mBinding.sbRemoteVol.progress = 100
+        } else {
+            mBinding.sbRemoteVol.isEnabled = true
+            mBinding.btRemoteVolDown.isEnabled = true
+            mBinding.btRemoteVolUp.isEnabled = true
+            mBinding.sbRemoteVol.progress = mSetting.mRemoteVolume
         }
 
         // 音效
@@ -125,7 +149,6 @@ class MusicSettingDialog constructor(
             AECLevel.High -> mBinding.rgVoiceMode.check(R.id.tvVoiceHigh)
             else -> mBinding.rgVoiceMode.check(R.id.tvVoiceStandard)
         }
-
         mBinding.rgVoiceMode.setOnCheckedChangeListener { group, checkedId ->
             when (checkedId) {
                 R.id.tvVoiceStandard -> mSetting.mAecLevel = AECLevel.Standard
@@ -289,14 +312,7 @@ class MusicSettingDialog constructor(
                 R.mipmap.bg_sound_mode_1
             }
             val audioEffect = mSetting.getEffectIndex(i)
-            list.add(
-                EffectVoiceBean(
-                    i,
-                    audioEffect,
-                    drawable,
-                    stringArray[i]
-                )
-            )
+            list.add(EffectVoiceBean(i, audioEffect, drawable, stringArray[i]))
         }
         for (item in list) {
             item.isSelect = (mSetting.mAudioEffect == item.audioEffect)
@@ -304,8 +320,7 @@ class MusicSettingDialog constructor(
 
         mVoiceEffectAdapter =
             BaseRecyclerViewAdapter(
-                list,
-                object : OnItemClickListener<EffectVoiceBean> {
+                list, object : OnItemClickListener<EffectVoiceBean> {
                     override fun onItemClick(data: EffectVoiceBean, view: View?, position: Int, viewType: Long) {
                         super.onItemClick(data, view, position, viewType)
                         Log.d(TAG, "onItemClick audio effect  $position")
@@ -322,14 +337,29 @@ class MusicSettingDialog constructor(
             )
 
         mBinding.rvVoiceEffectList.adapter = mVoiceEffectAdapter
-        context?.let { context ->
-            mBinding.rvVoiceEffectList.addItemDecoration(
-                MaterialDividerItemDecoration(context, MaterialDividerItemDecoration.HORIZONTAL).apply {
-                    dividerThickness = 10.dp.toInt()
-                    dividerColor = ResourcesCompat.getColor(resources, android.R.color.transparent, null)
-                })
-        }
+        val context = context ?: return
+        val itemDecoration = object : MaterialDividerItemDecoration(context, HORIZONTAL) {
+            override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+                val itemCount = state.itemCount
+                when (parent.getChildAdapterPosition(view)) {
+                    0 -> { // first
+                        outRect.left = 10.dp.toInt() + dividerThickness
+                        outRect.right = dividerThickness
+                    }
 
+                    itemCount - 1 -> { // last
+                        outRect.right = 10.dp.toInt() + dividerThickness
+                    }
+
+                    else -> {
+                        outRect.right = dividerThickness
+                    }
+                }
+            }
+        }
+        itemDecoration.dividerThickness = 10.dp.toInt()
+        itemDecoration.dividerColor = ResourcesCompat.getColor(resources, android.R.color.transparent, null)
+        mBinding.rvVoiceEffectList.addItemDecoration(itemDecoration)
     }
 }
 
