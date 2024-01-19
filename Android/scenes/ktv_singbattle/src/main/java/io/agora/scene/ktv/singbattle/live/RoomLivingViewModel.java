@@ -53,6 +53,7 @@ import io.agora.scene.ktv.singbattle.service.ChooseSongInputModel;
 import io.agora.scene.ktv.singbattle.service.JoinRoomOutputModel;
 import io.agora.scene.ktv.singbattle.service.KTVServiceProtocol;
 import io.agora.scene.ktv.singbattle.service.KTVSingBattleGameService;
+import io.agora.scene.ktv.singbattle.service.KTVSyncManagerServiceImp;
 import io.agora.scene.ktv.singbattle.service.MakeSongTopInputModel;
 import io.agora.scene.ktv.singbattle.service.OnSeatInputModel;
 import io.agora.scene.ktv.singbattle.service.OutSeatInputModel;
@@ -1341,7 +1342,7 @@ public class RoomLivingViewModel extends ViewModel {
     public void graspSong() {
         KTVLogger.d(TAG, "RoomLivingViewModel.graspSong() called");
         KTVSingBattleGameService.INSTANCE.graspSong(
-                "scene_singbattle_3.4.0",
+                KTVSyncManagerServiceImp.kSceneId,
                 roomInfoLiveData.getValue().getRoomNo(),
                 UserManager.getInstance().getUser().id.toString(),
                 UserManager.getInstance().getUser().name,
@@ -1366,7 +1367,7 @@ public class RoomLivingViewModel extends ViewModel {
         KTVLogger.d(TAG, "RoomLivingViewModel.onGraspFinish() called");
         if (songPlayingLiveData.getValue() == null) return;
         KTVSingBattleGameService.INSTANCE.getWinnerInfo(
-                "scene_singbattle_3.4.0",
+                KTVSyncManagerServiceImp.kSceneId,
                 roomInfoLiveData.getValue().getRoomNo(),
                 songPlayingLiveData.getValue().getSongNo(),
                 (userId, userName) -> {
@@ -1508,13 +1509,16 @@ public class RoomLivingViewModel extends ViewModel {
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
 
         boolean isOwnSong;
+        String jsonOption;
         if (music.getWinnerNo().equals("")) {
             isOwnSong = Objects.equals(music.getUserNo(), UserManager.getInstance().getUser().id.toString());
+            jsonOption = "{\"format\":{\"highPart\":0}}";
         } else {
             isOwnSong = Objects.equals(music.getWinnerNo(), UserManager.getInstance().getUser().id.toString());
+            // 抢到演唱权后，演唱的片段选择带buffer的，原片段前+5s，后+3S。对于歌词，仍然只展示不带buffer的歌词
+            jsonOption = "{\"format\":{\"highPartIndex\":0}}";
         }
 
-        String jsonOption = "{\"format\":{\"highPart\":0}}";
         long songCode = Long.parseLong(music.getSongNo());
         int mainSingerUid = Integer.parseInt(music.getUserNo());
         Long newSongCode = ktvApiProtocol.getMusicContentCenter().getInternalSongCode(songCode, jsonOption);
@@ -1708,32 +1712,28 @@ public class RoomLivingViewModel extends ViewModel {
 
     public List<RankItem> getRankList() {
         List<RankItem> rankItemList = new ArrayList<>();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            AtomicInteger i = new AtomicInteger();
-            rankMap.forEach((uid, model) -> {
-                RankItem item = new RankItem();
-                item.rank = i.get();
-                item.userName = model.getUserName();
-                item.songNum = model.getSongNum();
-                item.score = model.getScore();
-                item.poster = model.getPoster();
-                rankItemList.add(item);
-                i.getAndIncrement();
-            });
-        }
+        AtomicInteger i = new AtomicInteger();
+        rankMap.forEach((uid, model) -> {
+            RankItem item = new RankItem();
+            item.rank = i.get();
+            item.userName = model.getUserName();
+            item.songNum = model.getSongNum();
+            item.score = model.getScore();
+            item.poster = model.getPoster();
+            rankItemList.add(item);
+            i.getAndIncrement();
+        });
         sort(rankItemList);
         return rankItemList;
     }
 
     public void sort(List<RankItem> list) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            list.sort((o1, o2) -> {
-                if (o1.score != o2.score) {
-                    return o2.score - o1.score; //score大的在前面
-                } else {
-                    return o2.songNum - o1.songNum; //score相同 songNum大的在前面
-                }
-            });
-        }
+        list.sort((o1, o2) -> {
+            if (o1.score != o2.score) {
+                return o2.score - o1.score; //score大的在前面
+            } else {
+                return o2.songNum - o1.songNum; //score相同 songNum大的在前面
+            }
+        });
     }
 }
