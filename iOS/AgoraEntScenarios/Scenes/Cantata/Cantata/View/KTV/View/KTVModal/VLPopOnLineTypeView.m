@@ -4,7 +4,6 @@
 //
 
 #import "VLPopOnLineTypeView.h"
-//#import "Cantata/Cantata-Swift.h"
 @import YYCategories;
 @import AgoraCommon;
 

@@ -4,7 +4,6 @@
 //
 
 #import "VLListEmptyView.h"
-#import "Cantata/Cantata-Swift.h"
 @import AgoraCommon;
 @import Masonry;
 @implementation VLListEmptyView

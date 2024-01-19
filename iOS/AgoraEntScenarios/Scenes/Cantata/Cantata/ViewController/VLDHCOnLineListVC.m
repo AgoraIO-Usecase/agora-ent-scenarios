@@ -8,7 +8,6 @@
 #import "VLCreateRoomViewController.h"
 #import "LSTPopView.h"
 #import "AppContext+DHCKTV.h"
-#import "Cantata/Cantata-Swift.h"
 @import AgoraCommon;
 
 @interface VLDHCOnLineListVC ()<VLHomeOnLineListViewDelegate>

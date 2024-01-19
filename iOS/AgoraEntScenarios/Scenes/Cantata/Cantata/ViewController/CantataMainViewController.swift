@@ -1072,9 +1072,9 @@ extension CantataMainViewController {
             
             guard let self = self else {return}
             //遍历导航的所有子控制器
-
+            let rootVC = CantataPlugin.getCantataRootViewController()
             for vc in self.navigationController?.children ?? [] {
-                if String(describing: type(of: vc)) == "VLDHCOnLineListVC" {
+                if type(of: vc) == type(of: rootVC) {
                     self.navigationController?.popToViewController(vc, animated: true)
                     break
                 }
@@ -1089,11 +1089,10 @@ extension CantataMainViewController {
                                          message: "room_has_close".toSceneLocalization() as String,
                                          buttonTitle: "confirm".toSceneLocalization() as String) { [weak self] (flag, text) in
             guard let weakSelf = self else { return }
-            
+            let rootVC = CantataPlugin.getCantataRootViewController()
             for vc in weakSelf.navigationController?.children ?? [] {
-                print("subVC:\(String(describing: type(of: vc)))")
-                if String(describing: type(of: vc)) == "VLDHCOnLineListVC" {
-                    weakSelf.navigationController?.popToViewController(vc, animated: true)
+                if type(of: vc) == type(of: rootVC) {
+                    self?.navigationController?.popToViewController(vc, animated: true)
                     break
                 }
             }
