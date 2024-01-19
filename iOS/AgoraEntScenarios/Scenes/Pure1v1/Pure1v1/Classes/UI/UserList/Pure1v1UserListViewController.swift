@@ -9,12 +9,22 @@ import UIKit
 import YYCategories
 import CallAPI
 import AgoraRtcKit
+import AVFoundation
 
 
 
 private let kShowGuideAlreadyKey = "already_show_guide"
 class Pure1v1UserListViewController: UIViewController {
     var userInfo: Pure1v1UserInfo?
+    
+    private lazy var player: AgoraRtcMediaPlayerProtocol? = {
+        let player = rtcEngine.createMediaPlayer(with: self)
+        player?.mute(true)
+        player?.setLoopCount(-1)
+        player?.adjustPlayoutVolume(0)
+        player?.setRenderMode(.hidden)
+        return player
+    }()
     
     private var calleeTokenConfig: Pure1v1CalleeTokenConfig = Pure1v1CalleeTokenConfig()
     
@@ -252,9 +262,9 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 }
                 if let user = user {
                     callDialog?.hiddenAnimation()
+                    stopRing()
                     let dialog = Pure1v1CalleeDialog.show(user: user)
                     assert(dialog != nil, "dialog = nil")
-                    
                     self.calleeTokenConfig = Pure1v1CalleeTokenConfig(callerRoomId: fromRoomId)
                     NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
                                                          appCertificate: pure1V1AppCertificate!,
@@ -294,6 +304,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                     
                     callDialog = dialog
                     callVC.targetUser = user
+                    startRing()
                 } else {
                     pure1v1Print("callee user not found1")
                 }
@@ -310,6 +321,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                     }
                     callDialog = dialog
                     callVC.targetUser = user
+                    startDail()
                 } else {
                     pure1v1Print("caller user not found1")
                 }
@@ -326,6 +338,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
 //            AUIToast.show(text: "通话开始\(eventInfo[kDebugInfo] as? String ?? "")", postion: .bottom)
 //            AUIAlertManager.hiddenView()
             callDialog?.hiddenAnimation()
+            hangUp()
             guard let uid = connectedUserId else {
                 assert(false, "user not fount")
                 return
@@ -358,6 +371,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             connectedChannelId = nil
             callDialog?.hiddenAnimation()
             callVC.dismiss(animated: false)
+            hangUp()
             break
         case .failed:
             AUIToast.show(text: eventReason)
@@ -366,6 +380,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             connectedChannelId = nil
             callDialog?.hiddenAnimation()
             callVC.dismiss(animated: false)
+            hangUp()
             if stateReason == .rtmLost {
                 AUIToast.show(text: "call_toast_disconnect".pure1v1Localization())
                 _setupCallApi()
@@ -460,3 +475,54 @@ extension Pure1v1UserListViewController {
         }
     }
 }
+
+extension Pure1v1UserListViewController {
+    
+    // 开始拨打
+    private func startDail(){
+        startRing()
+        startVideoPlayer()
+    }
+    
+    // 挂断
+    private func hangUp(){
+        stopRing()
+        stopVideoPlayer()
+    }
+    
+    // 响铃
+    private func startRing(){
+        let ret = rtcEngine.startAudioMixing("https://download.agora.io/demo/test/1v1_bgm1.wav", loopback: false, cycle: -1)
+        pure1v1Print(" startAudioMixing ret = \(ret)")
+    }
+    
+    // 停止响铃
+    private func stopRing(){
+        rtcEngine.stopAudioMixing()
+    }
+    
+    // 播放视频
+    private func startVideoPlayer(){
+        let musicPath = "https://download.agora.io/demo/release/agora_test_video_21_music.mp4"
+        let source = AgoraMediaSource()
+        source.url = musicPath
+        if let callDialog = callDialog as? Pure1v1CallerDialog {
+            player?.setView(callDialog.videoView)
+            player?.open(with: source)
+        }
+    }
+    
+    // 停止视频
+    func stopVideoPlayer(){
+        player?.stop()
+    }
+}
+
+extension Pure1v1UserListViewController: AgoraRtcMediaPlayerDelegate {
+    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+        if state == .openCompleted {
+            playerKit.play()
+        }
+    }
+}
+
