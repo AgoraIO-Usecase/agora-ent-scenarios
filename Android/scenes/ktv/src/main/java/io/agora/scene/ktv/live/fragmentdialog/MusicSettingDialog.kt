@@ -52,14 +52,15 @@ class MusicSettingDialog constructor(
         dialog?.let {
             it.setCancelable(false)
             it.setCanceledOnTouchOutside(false)
+            val h = (0.7 * resources.displayMetrics.heightPixels).toInt()
             val bottomSheet =
                 (it as BottomSheetDialog).findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
-            bottomSheet?.let {
-                val behavior: BottomSheetBehavior<*> = BottomSheetBehavior.from(bottomSheet)
-//                behavior.state = BottomSheetBehavior.STATE_EXPANDED
-//                behavior.skipCollapsed = true
+            bottomSheet?.let { rootLayout ->
+                rootLayout.layoutParams.width = -1
+                rootLayout.layoutParams.height = h
+                val behavior: BottomSheetBehavior<*> = BottomSheetBehavior.from(rootLayout)
                 behavior.isHideable = false
-//                behavior.setDraggable(false)
+                behavior.peekHeight = h
             }
         }
     }
