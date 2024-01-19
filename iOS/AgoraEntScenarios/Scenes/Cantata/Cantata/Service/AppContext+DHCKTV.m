@@ -6,7 +6,6 @@
 //
 
 #import "AppContext+DHCKTV.h"
-
 NSString* dServiceImpKey = @"dServiceImpKey";
 NSString* dAgoraKTVAPIKey = @"dAgoraKTVAPIKey";
 @implementation AppContext (DHCKTV)
@@ -29,8 +28,7 @@ NSString* dAgoraKTVAPIKey = @"dAgoraKTVAPIKey";
 + (id<KTVServiceProtocol>)dhcServiceImp {
     id<KTVServiceProtocol> ktvServiceImp = [[AppContext shared].extDic valueForKey:dServiceImpKey];
     if (ktvServiceImp == nil) {
-//        ktvServiceImp = [KTVServiceImp new];
-        ktvServiceImp = [KTVSyncManagerServiceImp new];
+        ktvServiceImp = [DHCSyncManagerServiceImp new];
         [[AppContext shared].extDic setValue:ktvServiceImp forKey:dServiceImpKey];
     }
     

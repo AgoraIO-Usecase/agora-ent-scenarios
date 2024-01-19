@@ -11,7 +11,7 @@ import AgoraRtcKit
 import LSTPopView
 import AUIKitCore
 import ZSwiftBaseLib
-class CantataMainViewController: VLBaseViewController{
+class CantataMainViewController: UIViewController{
 
     private var RtcKit: AgoraRtcEngineKit!
     private var ScreenWidth: CGFloat = UIScreen.main.bounds.width
@@ -544,7 +544,9 @@ extension CantataMainViewController {
                 //加入频道成功。更新自己的分数
                 let scoreModel = weakSelf.scoreMap[VLUserCenter.user.id ?? ""]
                 weakSelf.lrcControlView.setScore(with: scoreModel?.score ?? 0)
-                weakSelf.chorusMicView.isHidden = false
+                DispatchQueue.main.async {
+                    weakSelf.chorusMicView.isHidden = false
+                }
                 // 开麦
 //                AppContext.dhcServiceImp().updateSeatAudioMuteStatus(with: false) { error in
 //                    // completion block

@@ -54,7 +54,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     return swiftParams
 }
 
-@objc public class KTVSyncManagerServiceImp: NSObject, KTVServiceProtocol {
+@objc public class DHCSyncManagerServiceImp: NSObject, KTVServiceProtocol {
 
     private var roomList: [VLRoomListModel]?
     private var userList: [VLLoginModel] = .init()
@@ -722,7 +722,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
 
 
 //MARK: room operation
-extension KTVSyncManagerServiceImp {
+extension DHCSyncManagerServiceImp {
     private func _leaveRoom(completion: @escaping (Error?) -> Void) {
         guard let channelName = roomNo else {
             agoraAssert("channelName = nil")
@@ -761,7 +761,7 @@ extension KTVSyncManagerServiceImp {
 }
 
 // MARK: User operation
-extension KTVSyncManagerServiceImp {
+extension DHCSyncManagerServiceImp {
     private func _addUserIfNeed() {
 //        _subscribeOnlineUsers {}
         _getUserInfo { error, userList in
@@ -947,7 +947,7 @@ extension KTVSyncManagerServiceImp {
 
 // MARK: Seat operation
 
-extension KTVSyncManagerServiceImp {
+extension DHCSyncManagerServiceImp {
     private func _markSeatChoursStatus(songCode: String, completion: @escaping (Error?)->()) {
         guard let seatInfo = self.seatMap
             .filter({ $0.value.userNo == VLUserCenter.user.id })
@@ -1272,7 +1272,7 @@ extension KTVSyncManagerServiceImp {
 
 // MARK: Choose song operation
 
-extension KTVSyncManagerServiceImp {
+extension DHCSyncManagerServiceImp {
     private func _sortChooseSongList() {
         songList = songList.sorted(by: { model1, model2 in
             if model1.status == .playing{

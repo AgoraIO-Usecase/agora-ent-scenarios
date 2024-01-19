@@ -6,6 +6,7 @@
 
 @import AgoraRtcKit;
 @import UIKit;
+@import AgoraCommon;
 NS_ASSUME_NONNULL_BEGIN
 
 @class KTVApiImpl;

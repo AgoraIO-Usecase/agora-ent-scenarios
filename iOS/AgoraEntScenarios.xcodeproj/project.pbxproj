@@ -444,7 +444,6 @@
 		E301BD782AF4CAFF0089A79C /* LSTPopView+KTVModal.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BCF92AF4CAFF0089A79C /* LSTPopView+KTVModal.m */; };
 		E301BD792AF4CAFF0089A79C /* VLAudienceIndicator.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BCFA2AF4CAFF0089A79C /* VLAudienceIndicator.m */; };
 		E301BD7A2AF4CAFF0089A79C /* VLListEmptyView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BCFB2AF4CAFF0089A79C /* VLListEmptyView.m */; };
-		E301BD7B2AF4CAFF0089A79C /* KTVCreateRoomPresentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BCFC2AF4CAFF0089A79C /* KTVCreateRoomPresentView.swift */; };
 		E301BD7C2AF4CAFF0089A79C /* VLKTVSettingView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BD022AF4CAFF0089A79C /* VLKTVSettingView.m */; };
 		E301BD7D2AF4CB000089A79C /* VLKTVTonesView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BD042AF4CAFF0089A79C /* VLKTVTonesView.m */; };
 		E301BD7E2AF4CB000089A79C /* VLKTVSwitcherView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BD072AF4CAFF0089A79C /* VLKTVSwitcherView.m */; };
@@ -1237,7 +1236,6 @@
 		E301BCF92AF4CAFF0089A79C /* LSTPopView+KTVModal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "LSTPopView+KTVModal.m"; sourceTree = "<group>"; };
 		E301BCFA2AF4CAFF0089A79C /* VLAudienceIndicator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAudienceIndicator.m; sourceTree = "<group>"; };
 		E301BCFB2AF4CAFF0089A79C /* VLListEmptyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLListEmptyView.m; sourceTree = "<group>"; };
-		E301BCFC2AF4CAFF0089A79C /* KTVCreateRoomPresentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVCreateRoomPresentView.swift; sourceTree = "<group>"; };
 		E301BCFD2AF4CAFF0089A79C /* VLKTVTopView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVTopView.h; sourceTree = "<group>"; };
 		E301BCFE2AF4CAFF0089A79C /* VLDebugView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLDebugView.h; sourceTree = "<group>"; };
 		E301BD002AF4CAFF0089A79C /* VLKTVSliderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVSliderView.h; sourceTree = "<group>"; };
@@ -3296,7 +3294,6 @@
 				E301BCED2AF4CAFF0089A79C /* KTVModal */,
 				E301BCFA2AF4CAFF0089A79C /* VLAudienceIndicator.m */,
 				E301BCFB2AF4CAFF0089A79C /* VLListEmptyView.m */,
-				E301BCFC2AF4CAFF0089A79C /* KTVCreateRoomPresentView.swift */,
 				E301BCFD2AF4CAFF0089A79C /* VLKTVTopView.h */,
 				E301BCFE2AF4CAFF0089A79C /* VLDebugView.h */,
 				E301BCFF2AF4CAFF0089A79C /* KTVSettingView */,
@@ -4405,7 +4402,6 @@
 				DDA199EF28FFE579009D3E61 /* VLBaseTableView.m in Sources */,
 				E301BD672AF4CAFF0089A79C /* VLPopSongList.m in Sources */,
 				DD619AC529E3E247008F63E4 /* SAGifterCell.swift in Sources */,
-				E301BD7B2AF4CAFF0089A79C /* KTVCreateRoomPresentView.swift in Sources */,
 				E34B45F52AE922950082D334 /* SRRoomHomeListView.swift in Sources */,
 				E301BE7A2AF4E06F0089A79C /* SRSkipView.swift in Sources */,
 				DD619A6929E3E247008F63E4 /* SwiftyFitSizeSA.swift in Sources */,

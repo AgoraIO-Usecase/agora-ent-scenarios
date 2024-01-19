@@ -8,6 +8,7 @@
 #import "VLCreateRoomViewController.h"
 #import "LSTPopView.h"
 #import "AppContext+DHCKTV.h"
+@import AgoraCommon;
 @interface VLDHCOnLineListVC ()<VLHomeOnLineListViewDelegate>
 
 @property (nonatomic, strong) VLHomeOnLineListView *listView;
@@ -83,7 +84,22 @@
     //if (![self checkIsLogin]) return;
     
     VLCreateRoomViewController *createRoomVC = [[VLCreateRoomViewController alloc]init];
-    [self.navigationController pushViewController:createRoomVC animated:YES];
+    createRoomVC.createRoomBlock = ^(CGFloat height) {
+        [[KTVCreateRoomPresentView shared] update:height];
+    };
+    
+    kWeakSelf(self);
+    createRoomVC.createRoomVCBlock = ^(UIViewController *vc) {
+        [[KTVCreateRoomPresentView shared] dismiss];
+        
+        [weakself.navigationController pushViewController:vc animated:true];
+    };
+    KTVCreateRoomPresentView *presentView = [KTVCreateRoomPresentView shared];
+
+    [presentView showViewWith:CGRectMake(0, SCREEN_HEIGHT - 343, SCREEN_WIDTH, 343) vc:createRoomVC];
+
+    [self.view addSubview:presentView];
+    
 
 }
 

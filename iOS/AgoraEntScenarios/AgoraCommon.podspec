@@ -72,6 +72,7 @@ TODO: Add long description of the pod here.
                     'Common/Extension/UIButton+EntLayout.*',
                     'Common/UI/ToastView/AUiMoreDialog.*',
                     'Common/UI/Base/View/AttributedTextView.*',
+                    'Common/UI/Base/View/KTVCreateRoomPresentView.swift',
                     'Common/Manager/NetworkManager/NetworkManager.swift'
                     ]
                     
