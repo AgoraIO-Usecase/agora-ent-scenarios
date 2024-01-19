@@ -1264,6 +1264,7 @@ public class RoomLivingViewModel extends ViewModel {
             @Override
             public void onMultiPathChanged(boolean enable) {
                 KTVLogger.d(TAG, "onMultiPathChanged: " + enable);
+                ktvApiProtocol.enableMulitpathing(enable);
             }
 
             @Override

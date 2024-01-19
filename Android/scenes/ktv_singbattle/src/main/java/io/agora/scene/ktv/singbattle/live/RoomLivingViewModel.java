@@ -2,7 +2,7 @@ package io.agora.scene.ktv.singbattle.live;
 
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION;
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPERVISE;
-import static io.agora.scene.ktv.singbattle.live.KTVApiKt.createKTVApi;
+import static io.agora.scene.ktv.singbattle.ktvapi.KTVApiKt.createKTVApi;
 
 import android.os.Build;
 import android.text.TextUtils;
@@ -19,7 +19,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -48,6 +47,7 @@ import io.agora.scene.ktv.singbattle.KTVLogger;
 import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.debugSettings.KTVDebugSettingBean;
 import io.agora.scene.ktv.singbattle.debugSettings.KTVDebugSettingsDialog;
+import io.agora.scene.ktv.singbattle.ktvapi.*;
 import io.agora.scene.ktv.singbattle.service.ChangeMVCoverInputModel;
 import io.agora.scene.ktv.singbattle.service.ChooseSongInputModel;
 import io.agora.scene.ktv.singbattle.service.JoinRoomOutputModel;
