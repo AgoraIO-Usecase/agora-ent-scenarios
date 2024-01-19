@@ -23,7 +23,7 @@ class KeyCenter: NSObject {
      进入声网控制台(https://console.shengwang.cn/)，创建一个项目，进入项目配置页，即可看到APP ID。
      */
     
-    static let AppId: String = ""
+    static let AppId: String = <#Your AppId#>
   
     /**
      Certificate.
@@ -38,7 +38,7 @@ class KeyCenter: NSObject {
      注意：如果项目没有开启证书鉴权，这个字段留空。
      */
 
-    static let Certificate: String? = ""
+    static let Certificate: String? = <#Your Certificate#>
 
     /**
      Token.
@@ -94,8 +94,8 @@ class KeyCenter: NSObject {
     
     static var IMClientSecret: String? = ""
   
-    static let CloudPlayerKey: String? = ""
-    static let CloudPlayerSecret: String? = ""
+    static let CloudPlayerKey: String? = nil
+    static let CloudPlayerSecret: String? = nil
 
     static var baseServerUrl: String? = "https://service.shengwang.cn/toolbox"
     static var onlineBaseServerUrl: String? = baseServerUrl

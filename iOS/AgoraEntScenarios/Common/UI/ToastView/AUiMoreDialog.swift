@@ -19,7 +19,7 @@ import UIKit
     
     public lazy var reportButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage.sceneImage(name: "report_icon", bundleName: "CommonResource"), for: .normal)
+        button.setImage(UIImage.common_sceneImage(name: "report_icon"), for: .normal)
         button.setTitle(commonSceneLocalized("report"), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         button.setTitleColor(.gray, for: .normal)

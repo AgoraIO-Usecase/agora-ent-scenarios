@@ -9,7 +9,7 @@
 
 
 @interface VLHomeOnLineListCCell : UICollectionViewCell
-
+@property (nonatomic, strong) UIImageView *bgImgView;
 @property (nonatomic, strong) VLRoomListModel *listModel;
 
 -(void)handleClick;

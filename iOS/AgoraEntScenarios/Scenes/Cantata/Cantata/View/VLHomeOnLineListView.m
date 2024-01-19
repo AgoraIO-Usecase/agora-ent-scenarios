@@ -112,6 +112,7 @@
   //  VL(weakSelf);
     VLHomeOnLineListCCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:[VLHomeOnLineListCCell className] forIndexPath:indexPath];
     cell.listModel = self.roomListModeArray[indexPath.row];
+    cell.bgImgView.image = [UIImage dhc_sceneImageWith:[NSString stringWithFormat:@"create_bg_%li" ,indexPath.row % 5]  ];
     return cell;
 }
 
@@ -174,19 +175,18 @@ static const int INTERVAL = 1000; // 时间间隔为1秒
 //        _createBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_list_addIcon"]
 //                                                      title:KTVLocalizedString(@"创建房间")];
         _createBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_createBtn setTitle:KTVLocalizedString(@"ktv_create_room") forState:UIControlStateNormal];
-        [_createBtn setImage:[UIImage sceneImageWithName:@"online_list_addIcon"] forState:UIControlStateNormal];
-        _createBtn.frame = CGRectMake((SCREEN_WIDTH-195)*0.5, SCREEN_HEIGHT-34-kSafeAreaBottomHeight-48-kTopNavHeight, 195, 48);
-        _createBtn.layer.cornerRadius = 24;
-        _createBtn.layer.masksToBounds = YES;
+//        [_createBtn setTitle:KTVLocalizedString(@"ktv_create_room") forState:UIControlStateNormal];
+        [_createBtn setImage:[UIImage dhc_sceneImageWith:@"create_room"] forState:UIControlStateNormal];
+        _createBtn.frame = CGRectMake((SCREEN_WIDTH-148)*0.5, SCREEN_HEIGHT-34-kSafeAreaBottomHeight-56-kTopNavHeight, 148, 56);
+        _createBtn.imageView.contentMode = UIViewContentModeScaleAspectFit;
 //        _createBtn.imagePosition = QMUIButtonImagePositionLeft;
         _createBtn.spacingBetweenImageAndTitle = 7;
         _createBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
         [_createBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
-        _createBtn.titleLabel.font = UIFontBoldMake(16.0);
+        _createBtn.titleLabel.font = UIFontBoldMake(18.0);
 //        _createBtn.adjustsButtonWhenHighlighted = NO;
         [_createBtn addTarget:self action:@selector(createBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
-        _createBtn.backgroundColor = UIColorMakeWithHex(@"#2753FF");
+      //  _createBtn.backgroundColor = UIColorMakeWithHex(@"#2753FF");
     }
     return _createBtn;
 }

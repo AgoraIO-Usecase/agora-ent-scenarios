@@ -344,6 +344,7 @@ class DHCLRCControl: UIView {
             delegate.didGameEventChanged(with: .resultNext)
         }
         addSubview(resultView)
+        resultView.isHidden = true
 
         loadingView = AUIKaraokeLoadingView(frame: CGRectMake(0, 30, self.bounds.width, 110))
         addSubview(loadingView)

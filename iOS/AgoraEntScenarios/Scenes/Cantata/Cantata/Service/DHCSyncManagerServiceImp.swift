@@ -212,7 +212,8 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         roomInfo.roomPeopleNum = "0"
         roomInfo.icon = inputModel.icon
         roomInfo.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
-        roomInfo.creatorAvatar = inputModel.creatorAvatar
+        roomInfo.creatorName = VLUserCenter.user.name
+        roomInfo.creatorAvatar = VLUserCenter.user.headUrl
 
         let params = mapConvert(model: roomInfo)
 

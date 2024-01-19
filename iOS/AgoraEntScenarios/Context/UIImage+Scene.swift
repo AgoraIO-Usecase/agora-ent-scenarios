@@ -12,6 +12,10 @@ extension UIImage {
     @objc public static func sceneImage(name: String) -> UIImage? {
         return sceneImage(name: name, bundleName: nil)
     }
+    
+    static func common_sceneImage(name: String) -> UIImage? {
+        return sceneImage(name: name, bundleName: "CommonResource")
+    }
 
     @objc public static func sceneImage(name: String, bundleName: String?) -> UIImage? {
         guard let bundleName = bundleName ?? AppContext.shared.sceneImageBundleName else {

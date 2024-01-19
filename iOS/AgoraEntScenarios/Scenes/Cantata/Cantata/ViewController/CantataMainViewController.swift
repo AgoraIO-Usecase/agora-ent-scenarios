@@ -1074,7 +1074,7 @@ extension CantataMainViewController {
             //遍历导航的所有子控制器
 
             for vc in self.navigationController?.children ?? [] {
-                if String(describing: type(of: vc)) == "DHCVLOnLineListVC" {
+                if String(describing: type(of: vc)) == "VLDHCOnLineListVC" {
                     self.navigationController?.popToViewController(vc, animated: true)
                     break
                 }
@@ -1092,7 +1092,7 @@ extension CantataMainViewController {
             
             for vc in weakSelf.navigationController?.children ?? [] {
                 print("subVC:\(String(describing: type(of: vc)))")
-                if String(describing: type(of: vc)) == "DHCVLOnLineListVC" {
+                if String(describing: type(of: vc)) == "VLDHCOnLineListVC" {
                     weakSelf.navigationController?.popToViewController(vc, animated: true)
                     break
                 }

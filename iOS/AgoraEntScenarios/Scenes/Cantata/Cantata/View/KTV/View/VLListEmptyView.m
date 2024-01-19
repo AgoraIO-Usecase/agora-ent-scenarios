@@ -6,6 +6,7 @@
 #import "VLListEmptyView.h"
 #import "Cantata/Cantata-Swift.h"
 @import AgoraCommon;
+@import Masonry;
 @implementation VLListEmptyView
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -17,7 +18,7 @@
 }
 
 - (void)setupView {
-    UILabel *introduceLabel = [[UILabel alloc]initWithFrame:CGRectMake(30, 0, SCREEN_WIDTH-60, 90)];
+    UILabel *introduceLabel = [[UILabel alloc]init];
     NSString *introduceStr = [@"ktv_create_tips1" toSceneLocalizationWith:@"DHCResource"];
     introduceLabel.attributedText = [self attributedString:introduceStr fontSize:14 lineSpace:4 wordSpace:0];
     introduceLabel.textAlignment = NSTextAlignmentCenter;
@@ -26,9 +27,20 @@
     introduceLabel.font = UIFontMake(14);
     [self addSubview:introduceLabel];
     
-    UIImageView *emptyImgView = [[UIImageView alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-255)*0.5, introduceLabel.bottom+VLREALVALUE_WIDTH(30), 255, 202)];
+    UIImageView *emptyImgView = [[UIImageView alloc]init];
     emptyImgView.image = [UIImage sceneImageWithName:@"online_empty_placeHolder"];
     [self addSubview:emptyImgView];
+    
+    [emptyImgView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerX.equalTo(self);
+        make.centerY.equalTo(self);
+    }];
+    
+    [introduceLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(emptyImgView.mas_bottom);
+        make.left.equalTo(self).offset(20);
+        make.right.equalTo(self).offset(-20);
+    }];
 }
 
 

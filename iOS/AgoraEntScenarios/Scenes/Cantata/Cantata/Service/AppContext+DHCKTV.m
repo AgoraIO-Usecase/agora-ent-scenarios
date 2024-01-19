@@ -6,14 +6,14 @@
 //
 
 #import "AppContext+DHCKTV.h"
-NSString* dServiceImpKey = @"dServiceImpKey";
-NSString* dAgoraKTVAPIKey = @"dAgoraKTVAPIKey";
+NSString* dServiceImpKey = @"dhcServiceImpKey";
+NSString* dAgoraKTVAPIKey = @"dhcAPIKey";
 @implementation AppContext (DHCKTV)
 
 #pragma mark mcc
 + (void)setupDhcConfig {
-    [AppContext shared].sceneImageBundleName = @"KtvResource";
-    [AppContext shared].sceneLocalizeBundleName = @"KtvResource";
+    [AppContext shared].sceneImageBundleName = @"DHCResource";
+    [AppContext shared].sceneLocalizeBundleName = @"DHCResource";
 }
 
 - (void)setDhcAPI:(KTVApiImpl *)dhcAPI {

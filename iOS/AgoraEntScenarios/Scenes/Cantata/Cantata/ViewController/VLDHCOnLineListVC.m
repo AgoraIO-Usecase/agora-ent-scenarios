@@ -8,7 +8,9 @@
 #import "VLCreateRoomViewController.h"
 #import "LSTPopView.h"
 #import "AppContext+DHCKTV.h"
+#import "Cantata/Cantata-Swift.h"
 @import AgoraCommon;
+
 @interface VLDHCOnLineListVC ()<VLHomeOnLineListViewDelegate>
 
 @property (nonatomic, strong) VLHomeOnLineListView *listView;
@@ -129,7 +131,7 @@
     inputModel.roomNo = listModel.roomNo;
 //    inputModel.userNo = VLUserCenter.user.id;
     inputModel.password = inputText;
-
+    
     VL(weakSelf);
     [[AppContext dhcServiceImp] joinRoomWith:inputModel completion:^(NSError * _Nullable error, KTVJoinRoomOutputModel * _Nullable outputModel) {
         if (error != nil) {
