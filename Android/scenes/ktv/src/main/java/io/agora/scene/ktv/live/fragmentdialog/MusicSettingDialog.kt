@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
-import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -34,15 +33,15 @@ import io.agora.scene.widget.toast.CustomToast
 
 
 class MusicSettingDialog constructor(
-    var mSetting: MusicSettingBean,
-    var mSoundCardSetting: SoundCardSettingBean,
-    var isListener: Boolean, // 是否是观众
-    var currentSong: RoomSelSongModel?, // 当前歌曲
+    private var mSetting: MusicSettingBean,
+    private var mSoundCardSetting: SoundCardSettingBean,
+    private var isListener: Boolean, // 是否是观众
+    private var currentSong: RoomSelSongModel?, // 当前歌曲
 ) :
     BaseBottomSheetDialogFragment<KtvDialogMusicSettingBinding>() {
 
     companion object {
-        const val TAG = "KtvMusicProfileDialog"
+        const val TAG = "KtvMusicSettingDialog"
     }
 
     private var mVoiceEffectAdapter: BaseRecyclerViewAdapter<KtvItemEffectvoiceBinding, EffectVoiceBean, EffectVoiceHolder>? =
@@ -94,9 +93,7 @@ class MusicSettingDialog constructor(
                     mBinding.AIAECInput.clearFocus()
                     val AIAECStrength = mBinding.AIAECInput.text.toString().toIntOrNull() ?: 0
                     if (IntRange(0, 4).contains(AIAECStrength)) {
-                        if (mSetting.mAIAECStrength != AIAECStrength) {
-                            mSetting.mAIAECStrength = AIAECStrength
-                        }
+                        mSetting.mAIAECStrength = AIAECStrength
                     } else {
                         mBinding.AIAECInput.setText(mSetting.mAIAECStrength.toString())
                         CustomToast.show(R.string.ktv_AIAEC_input_hint)
@@ -255,10 +252,7 @@ class MusicSettingDialog constructor(
         }
         mBinding.cbAIAECSwitcher.isChecked = mSetting.mAIAECEnable
 
-        // AIAEC 强度选择
-        mBinding.AIAECInput.doAfterTextChanged {
-
-        }
+        // AIAEC 强度输入 0～4
         mBinding.AIAECInput.setOnTouchListener { v, event ->
             mBinding.AIAECInput.requestFocus()
             showKeyboard(mBinding.AIAECInput)
@@ -509,4 +503,3 @@ interface MusicSettingCallback {
      */
     fun onAIAECStrengthSelect(strength: Int)
 }
-

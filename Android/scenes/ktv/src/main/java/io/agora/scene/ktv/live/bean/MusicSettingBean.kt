@@ -1,8 +1,8 @@
 package io.agora.scene.ktv.live.bean
 
 import io.agora.rtc2.Constants
+import io.agora.scene.ktv.live.fragmentdialog.EarPhoneCallback
 import io.agora.scene.ktv.live.fragmentdialog.MusicSettingCallback
-
 
 /**
  * 音质 0(16K),1(24K),2(48K)
@@ -22,9 +22,22 @@ enum class AINSMode(val value: Int) {
     High(2),
 }
 
-interface EarPhoneCallback {
-    fun onHasEarPhoneChanged(hasEarPhone: Boolean)
-    fun onEarMonitorDelay(earsBackDelay: Int)
+/**
+ * 耳返模式，0(自动), 1(强制OpenSL), 2(强制Oboe)
+ */
+enum class EarBackMode(val value: Int) {
+    Auto(0),
+    OpenSL(1),
+    Oboe(2),
+}
+
+/**
+ * 打分难度，低难度0，推荐难度15，高难度30
+ */
+enum class ScoringDifficultyMode(val value: Int) {
+    Low(0),
+    Recommend(15),
+    High(30),
 }
 
 /**
@@ -46,15 +59,13 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
     }
 
     var mEarPhoneCallback: EarPhoneCallback? = null
-        set(newValue) {
-            field = newValue
-        }
 
     /**
      * 耳返开关
      */
     var mEarBackEnable: Boolean = false
         set(newValue) {
+            if (field == newValue) return
             field = newValue
             mSettingCallback.onEarChanged(newValue)
         }
@@ -64,6 +75,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
      */
     var mEarBackMode = EarBackMode.Auto
         set(newValue) {
+            if (field == newValue) return
             field = newValue
             mSettingCallback.onEarBackModeChanged(newValue.value)
         }
@@ -73,6 +85,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
      */
     var mEarBackVolume = DEFAULT_EAR_BACK_VOL
         set(newValue) {
+            if (field == newValue) return
             field = newValue
             mSettingCallback.onEarBackVolumeChanged(newValue)
         }
@@ -82,6 +95,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
      */
     var mHasEarPhone = false
         set(newValue) {
+            if (field == newValue) return
             field = newValue
             mEarPhoneCallback?.onHasEarPhoneChanged(newValue)
         }
@@ -91,6 +105,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
      */
     var mEarBackDelay = 0
         set(newValue) {
+            if (field == newValue) return
             field = newValue
             mEarPhoneCallback?.onEarMonitorDelay(newValue)
         }
@@ -103,6 +118,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
      */
     var mMicVolume = DEFAULT_MIC_VOL
         set(newValue) {
+            if (field == newValue) return
             field = newValue
             mSettingCallback.onMicVolChanged(newValue)
         }
@@ -115,6 +131,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
      */
     var mAccVolume = DEFAULT_ACC_VOL
         set(newValue) {
+            if (field == newValue) return
             field = newValue
             mSettingCallback.onAccVolChanged(newValue)
         }
@@ -127,6 +144,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
      */
     var mRemoteVolume = DEFAULT_REMOTE_VOL
         set(newValue) {
+            if (field == newValue) return
             field = newValue
             mSettingCallback.onRemoteVolChanged(newValue)
         }
@@ -161,6 +179,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
      */
     var mProfessionalModeEnable = false
         set(newValue) {
+            if (field == newValue) return
             field = newValue
             mSettingCallback.onProfessionalModeChanged(newValue)
         }
@@ -170,6 +189,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
      */
     var mMultiPathEnable = true
         set(newValue) {
+            if (field == newValue) return
             field = newValue
             mSettingCallback.onMultiPathChanged(newValue)
         }
@@ -179,6 +199,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
      */
     var mAecLevel = AECLevel.Standard
         set(newValue) {
+            if (field == newValue) return
             field = newValue
             mSettingCallback.onAECLevelChanged(newValue.value)
         }
@@ -188,6 +209,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
      */
     var mAinsMode = AINSMode.Close
         set(newValue) {
+            if (field == newValue) return
             field = newValue
             mSettingCallback.onAINSModeChanged(newValue.value)
         }
@@ -197,6 +219,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
      */
     var mLowLatencyMode = true
         set(newValue) {
+            if (field == newValue) return
             field = newValue
             mSettingCallback.onLowLatencyModeChanged(newValue)
         }
@@ -205,9 +228,6 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
      *  人声突出
      */
     var mHighLighterUid = ""
-        set(newValue) {
-            field = newValue
-        }
 
     /**
      * AIAEC 开关
@@ -243,22 +263,3 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         return Constants.ROOM_ACOUSTICS_KTV
     }
 }
-
-/**
- * 耳返模式，0(自动), 1(强制OpenSL), 2(强制Oboe)
- */
-enum class EarBackMode(val value: Int) {
-    Auto(0),
-    OpenSL(1),
-    Oboe(2),
-}
-
-/**
- * 打分难度，低难度0，推荐难度15，高难度30
- */
-enum class ScoringDifficultyMode(val value: Int) {
-    Low(0),
-    Recommend(15),
-    High(30),
-}
-

@@ -12,7 +12,6 @@ import io.agora.scene.ktv.R
 import io.agora.scene.ktv.databinding.KtvDialogEarbackSettingBinding
 import io.agora.scene.ktv.live.RoomLivingActivity
 import io.agora.scene.ktv.live.bean.EarBackMode
-import io.agora.scene.ktv.live.bean.EarPhoneCallback
 import io.agora.scene.ktv.live.bean.MusicSettingBean
 import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.doOnProgressChanged
@@ -177,4 +176,9 @@ class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
         }
         switchEarModeDialog?.show()
     }
+}
+
+interface EarPhoneCallback {
+    fun onHasEarPhoneChanged(hasEarPhone: Boolean)
+    fun onEarMonitorDelay(earsBackDelay: Int)
 }

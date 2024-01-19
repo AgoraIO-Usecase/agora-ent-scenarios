@@ -12,15 +12,6 @@ class SoundCardSettingBean constructor(private var parameterCallback: ((preset: 
     private var gender: Int = -1
     private var effect: Int = -1
 
-    var mEarPhoneCallback: EarPhoneCallback? = null
-
-    fun setEarPhoneCallback(earPhoneCallback: EarPhoneCallback) {
-        mEarPhoneCallback = earPhoneCallback
-    }
-
-    fun setHasEarPhone(hasEarPhone: Boolean) {
-        mEarPhoneCallback?.onHasEarPhoneChanged(hasEarPhone)
-    }
 
     private val tag: String = "SoundCardSettingBean"
 
