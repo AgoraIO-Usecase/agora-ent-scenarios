@@ -43,16 +43,13 @@ class CallSendDialog(
         super.onViewCreated(view, savedInstanceState)
 
         binding.ivHangup.setOnClickListener(DebouncedOnClickListener {
-            onClickHangup()
+            listener?.onSendViewDidClickHangup()
+            hangUp()
         })
         binding.tvUserName.text = userInfo.userName
         Glide.with(context)
             .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
             .into(binding.ivUserAvatar)
-
-        val anim = AnimationUtils.loadAnimation(context, R.anim.pure1v1_slide_from_bottom)
-        binding.clContent.startAnimation(anim)
-
 
         val showView = SurfaceView(context)
         binding.tvShow.removeAllViews()
@@ -105,20 +102,5 @@ class CallSendDialog(
             textCount = 0
             binding.tvDot.text = ""
         }
-    }
-
-    private fun onClickHangup() {
-        val anim = AnimationUtils.loadAnimation(context, R.anim.pure1v1_slide_to_bottom)
-        anim.setAnimationListener(object: AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {
-            }
-            override fun onAnimationEnd(animation: Animation?) {
-                listener?.onSendViewDidClickHangup()
-                hangUp()
-            }
-            override fun onAnimationRepeat(animation: Animation?) {
-            }
-        })
-        binding.clContent.startAnimation(anim)
     }
 }
