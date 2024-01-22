@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AgoraCommon
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?

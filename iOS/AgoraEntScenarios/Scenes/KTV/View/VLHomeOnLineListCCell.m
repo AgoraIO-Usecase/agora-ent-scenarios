@@ -4,11 +4,9 @@
 //
 
 #import "VLHomeOnLineListCCell.h"
-#import "VLMacroDefine.h"
-#import "VLFontUtils.h"
-#import "AESMacro.h"
 #import <SDWebImage/UIImageView+WebCache.h>
-
+#import "AgoraEntScenarios-Swift.h"
+@import AgoraCommon;
 @interface VLHomeOnLineListCCell()
 
 @property (nonatomic, strong) UIImageView *iconImgView;

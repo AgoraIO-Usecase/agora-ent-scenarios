@@ -8,7 +8,7 @@
 import AgoraChat
 import Foundation
 import KakaJSON
-
+import AgoraCommon
 public let VoiceRoomGift = "chatroom_gift"
 public let VoiceRoomPraise = "chatroom_praise" // like 点赞
 public let VoiceRoomInviteSite = "chatroom_inviteSiteNotify"

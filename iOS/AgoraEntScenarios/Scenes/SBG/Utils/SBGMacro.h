@@ -7,12 +7,9 @@
 
 #ifndef SBGMacro_h
 #define SBGMacro_h
-
+@import AgoraCommon;
 @import YYCategories;
 #import "AgoraEntScenarios-Swift.h"
-#import "QMUICommonDefines.h"
-#import "VLDeviceUtils.h"
-#import "QMUIHelper.h"
 
 
 // 基础颜色
@@ -34,7 +31,7 @@
 /// tabBar相关frame
 //#define TabBarHeight (IS_IPAD ? (IS_NOTCHED_SCREEN ? 65 : (IOS_VESBGION >= 12.0 ? 50 : 49)) : (IS_LANDSCAPE ? PreferredValueForVisualDevice(49, 32) : 49) + SafeAreaInsetsConstantForDeviceWithNotch.bottom)
 
-#define SBGLocalizedString(s) ([s toSceneLocalization:@"sbgResource"])
+#define SBGLocalizedString(s) ([s toSceneLocalizationWith:@"sbgResource"])
 
 #define SBGLogInfo(format, ...)  ([SBGLog infoWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"SBG"])
 #define SBGLogError(format, ...)  ([SBGLog errorWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"SBG"])

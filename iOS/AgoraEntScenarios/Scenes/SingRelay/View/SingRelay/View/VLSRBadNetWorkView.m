@@ -4,9 +4,9 @@
 //
 
 #import "VLSRBadNetWorkView.h"
-#import "AESMacro.h"
 #import "LSTPopView+SRModal.h"
-
+#import "AgoraEntScenarios-Swift.h"
+@import AgoraCommon;
 @interface VLSRBadNetWorkView ()
 
 @property(nonatomic, weak) id <VLSRBadNetWorkViewDelegate>delegate;

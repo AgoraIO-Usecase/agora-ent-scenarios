@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AgoraCommon
 extension UIImage {
     @objc static func sr_sceneImage(name: String) -> UIImage? {
         return sceneImage(name: name, bundleName: "SRResource")

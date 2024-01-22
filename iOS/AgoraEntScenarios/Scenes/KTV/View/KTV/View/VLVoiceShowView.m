@@ -6,8 +6,8 @@
 //
 
 #import "VLVoiceShowView.h"
-#import "AESMacro.h"
 #import <SDWebImage/UIImageView+WebCache.h>
+#import "AgoraEntScenarios-Swift.h"
 @interface VLVoiceShowView()
 @property(nonatomic, weak) id <VLVoiceShowViewDelegate>delegate;
 @property (nonatomic,strong) UILabel *selLabel;

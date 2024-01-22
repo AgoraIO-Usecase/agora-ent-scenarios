@@ -4,10 +4,7 @@
 //
 
 #import "VLSRHomeOnLineListCCell.h"
-#import "VLHotSpotBtn.h"
-#import "VLMacroDefine.h"
-#import "VLFontUtils.h"
-#import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 #import <SDWebImage/UIImageView+WebCache.h>
 @import Masonry;
 

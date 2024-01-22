@@ -9,7 +9,7 @@ import SVProgressHUD
 import UIKit
 import ZSwiftBaseLib
 import AgoraChat
-
+import AgoraCommon
 let bottomSafeHeight = safeAreaExist ? 33 : 0
 let page_size = 15
 

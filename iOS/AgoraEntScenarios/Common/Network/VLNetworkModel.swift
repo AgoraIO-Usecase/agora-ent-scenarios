@@ -26,10 +26,10 @@ open class VLResponseData: NSObject, Convertible {
 @objcMembers
 open class VLSceneConfigsModel: NSObject,Convertible {
     
-    var chat: Int = 0
-    var ktv: Int = 0
-    var show: Int = 0
-    var showpk: Int = 0
+    public var chat: Int = 0
+    public var ktv: Int = 0
+    public var show: Int = 0
+    public var showpk: Int = 0
     
     override public required init() {}
 }

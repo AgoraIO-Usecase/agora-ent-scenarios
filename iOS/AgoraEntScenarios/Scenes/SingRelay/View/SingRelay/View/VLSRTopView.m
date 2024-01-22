@@ -4,9 +4,8 @@
 //
 
 #import "VLSRTopView.h"
-#import "VLHotSpotBtn.h"
-#import "AESMacro.h"
 #import <SDWebImage/UIImageView+WebCache.h>
+#import "AgoraEntScenarios-Swift.h"
 @interface VLSRTopView ()
 
 @property(nonatomic, weak) id <VLSRTopViewDelegate>delegate;
@@ -34,7 +33,7 @@
     [self addSubview:backView];
     
     UIImageView *logoImgView = [[UIImageView alloc]initWithFrame:CGRectMake(20, 10, 34, 34)];
-    logoImgView.image = [UIImage sr_sceneImageWithName:@"" ];
+    logoImgView.image = [UIImage sr_sceneImageWithName:@""];
     logoImgView.layer.cornerRadius = 17;
     logoImgView.layer.masksToBounds = true;
     [self addSubview:logoImgView];

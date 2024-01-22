@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 import SwiftyBeaver
-
+import AgoraCommon
 @objc class SBGLog: NSObject {
     fileprivate static let log: SwiftyBeaver.Type = {
         let config = AgoraEntLogConfig(sceneName: "SBG")
