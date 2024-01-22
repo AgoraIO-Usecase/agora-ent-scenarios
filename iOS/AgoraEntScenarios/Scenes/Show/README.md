@@ -30,7 +30,7 @@
   >   
   >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
   >   
-  > - 秒切机器人服务配置（CloudPlayer）
+  > - 秒切机器人服务配置（CloudPlayer），请联系销售人员为您的 appid 添加权限(如果您没有销售人员的联系方式可通过智能客服联系销售人员 [Agora 支持](https://agora-ticket.agora.io/))
   > 
   >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/CloudPlayer.png)
   > 
