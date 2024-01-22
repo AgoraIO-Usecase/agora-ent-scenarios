@@ -120,10 +120,9 @@ extension BaseRoomViewController: ShowToolMenuViewControllerDelegate {
 }
 
 extension BaseRoomViewController: CallApiListenerProtocol {
-    func onCallStateChanged(with state: CallStateType,
-                            stateReason: CallReason,
+    func onCallStateChanged(with state: CallStateType, 
+                            stateReason: CallStateReason,
                             eventReason: String,
-                            elapsed: Int,
                             eventInfo: [String : Any]) {
     }
 }

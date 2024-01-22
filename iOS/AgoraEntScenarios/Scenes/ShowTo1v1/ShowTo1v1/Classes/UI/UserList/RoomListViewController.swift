@@ -24,16 +24,6 @@ private let randomRoomName = [
     "show_create_room_name10".showTo1v1Localization(),
 ]
 
-extension CallTokenConfig {
-    func tokenIsEmpty() -> Bool {
-        if rtcToken.count > 0, rtmToken.count > 0 {
-            return false
-        }
-        
-        return true
-    }
-}
-
 private let kShowGuideAlreadyKey = "already_show_guide_show1v1"
 class RoomListViewController: UIViewController {
     var userInfo: ShowTo1v1UserInfo?
@@ -42,7 +32,8 @@ class RoomListViewController: UIViewController {
     private weak var callDialog: ShowTo1v1Dialog?
     private var connectedUserId: UInt?
     private weak var createRoomDialog: CreateRoomDialog?
-    private let tokenConfig: CallTokenConfig = CallTokenConfig()
+    private var rtcToken = ""
+    private var rtmToken = ""
     private lazy var rtcEngine: AgoraRtcEngineKit = _createRtcEngine()
     private var callState: CallStateType = .idle
     private lazy var callVC: CallViewController = CallViewController()
@@ -179,8 +170,8 @@ extension RoomListViewController {
                 completion?(false)
                 return
             }
-            self.tokenConfig.rtcToken = rtcToken
-            self.tokenConfig.rtmToken = rtmToken
+            self.rtcToken = rtcToken
+            self.rtmToken = rtmToken
             self.listView.roomList.forEach { info in
                 info.token = rtcToken
             }
@@ -209,59 +200,61 @@ extension RoomListViewController {
     }
     
     private func _reinitCallerAPI(completion: @escaping ((Error?)->())) {
-        tokenConfig.roomId = userInfo!.get1V1ChannelId()
+        guard let roomId = userInfo?.get1V1ChannelId() else { return  }
         callApi.deinitialize {
         }
         callVC.callApi = callApi
         
         let config = CallConfig()
-        config.role = .caller  // Pure 1v1 can only be set as the caller
-        config.mode = .showTo1v1
         config.appId = showTo1v1AppId!
         config.userId = userInfo!.getUIntUserId()
         config.rtcEngine = rtcEngine
-        config.localView = callVC.localCanvasView.canvasView
-        config.remoteView = callVC.remoteCanvasView.canvasView
-        if let userExtension = userInfo?.yy_modelToJSONObject() as? [String: Any] {
-            config.userExtension = userExtension
-        }
         
         callApi.addListener(listener: self)
-        callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
-            if let err = error {
-                showTo1v1Error("_reinitCallerAPI initialize api fail: \(err.localizedDescription)")
-            }
-            completion(error)
+        callApi.initialize(config: config)
+        
+        let prepareConfig = PrepareConfig()
+        prepareConfig.rtcToken = rtcToken
+        prepareConfig.rtmToken = rtmToken
+        prepareConfig.roomId = roomId
+        prepareConfig.localView =  callVC.localCanvasView.canvasView
+        prepareConfig.remoteView = callVC.remoteCanvasView.canvasView
+        prepareConfig.autoAccept = false  // 如果期望收到呼叫自动接通，则需要设置为true
+        prepareConfig.autoJoinRTC = false  // 如果期望立即加入自己的RTC呼叫频道，则需要设置为true
+        callApi.prepareForCall(prepareConfig: prepareConfig) { err in
+            // 成功即可以开始进行呼叫
         }
     }
     
     private func _reinitCalleeAPI(room: ShowTo1v1RoomInfo, completion: @escaping ((Error?)->())) {
-        tokenConfig.roomId = room.roomId
         callApi.deinitialize {
         }
         callVC.callApi = callApi
         
         let config = CallConfig()
-        config.role = .callee  // Pure 1v1 can only be set as the caller
-        config.mode = .showTo1v1
         config.appId = showTo1v1AppId!
         config.userId = userInfo!.getUIntUserId()
         config.rtcEngine = rtcEngine
-        config.localView = callVC.localCanvasView.canvasView
-        config.remoteView = callVC.remoteCanvasView.canvasView
         
-        callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
-            if let err = error {
-                showTo1v1Error("_reinitCalleeAPI initialize api fail: \(err.localizedDescription)")
-            }
-            completion(error)
-        }
+        callApi.initialize(config: config)
         callApi.addListener(listener: self)
         
         //reset callVC
         callVC.callApi = callApi
         callVC.roomInfo = room
         callVC.rtcEngine = rtcEngine
+        
+        let prepareConfig = PrepareConfig()
+        prepareConfig.rtcToken = rtcToken
+        prepareConfig.rtmToken = rtmToken
+        prepareConfig.roomId = room.roomId
+        prepareConfig.localView =  callVC.localCanvasView.canvasView
+        prepareConfig.remoteView = callVC.remoteCanvasView.canvasView
+        prepareConfig.autoAccept = false  // 如果期望收到呼叫自动接通，则需要设置为true
+        prepareConfig.autoJoinRTC = false  // 如果期望立即加入自己的RTC呼叫频道，则需要设置为true
+        callApi.prepareForCall(prepareConfig: prepareConfig) { err in
+            // 成功即可以开始进行呼叫
+        }
     }
     
     private func _createRtcEngine() ->AgoraRtcEngineKit {
@@ -279,7 +272,7 @@ extension RoomListViewController {
     
     private func _call(room: ShowTo1v1RoomInfo) {
         if room.uid == userInfo?.uid {return}
-        if self.tokenConfig.tokenIsEmpty() {
+        guard rtcToken.count > 0, rtmToken.count > 0 else {
             renewTokens { success in
                 self._call(room: room)
             }
@@ -289,7 +282,7 @@ extension RoomListViewController {
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
         
-        callApi.call(roomId: room.roomId, remoteUserId: room.getUIntUserId()) { err in
+        callApi.call(remoteUserId: room.getUIntUserId()) { err in
         }
         
         //reset callVC
@@ -314,7 +307,7 @@ extension RoomListViewController {
             let roomList = list
             let oldList = self.listView.roomList
             roomList.forEach { info in
-                info.token = self.tokenConfig.rtcToken
+                info.token = self.rtcToken
             }
             self.listView.roomList = roomList
             self._showGuideIfNeed()
@@ -406,7 +399,7 @@ extension RoomListViewController {
         vc.currentUser = self.userInfo
         vc.roomInfo = roomInfo
         vc.rtcEngine = self.rtcEngine
-        vc.broadcasterToken = self.tokenConfig.rtcToken
+        vc.broadcasterToken = self.rtcToken
         vc.onBackClosure = {[weak self] in
             self?.service.subscribeListener(listener: nil)
             self?.service.leaveRoom(roomInfo: roomInfo, completion: { err in
@@ -432,17 +425,16 @@ extension RoomListViewController {
 }
 
 extension RoomListViewController: CallApiListenerProtocol {
-    func onCallStateChanged(with state: CallStateType,
-                            stateReason: CallReason,
+    func onCallStateChanged(with state: CallStateType, 
+                            stateReason: CallStateReason,
                             eventReason: String,
-                            elapsed: Int,
                             eventInfo: [String : Any]) {
         let currentUid = userInfo?.uid ?? ""
         let publisher = eventInfo[kPublisher] as? String ?? currentUid
         guard publisher == currentUid else {
             return
         }
-        showTo1v1Print("onCallStateChanged state: \(state.rawValue), stateReason: \(stateReason.rawValue), eventReason: \(eventReason), elapsed: \(elapsed) ms, eventInfo: \(eventInfo) publisher: \(publisher) / \(currentUid)")
+        showTo1v1Print("onCallStateChanged state: \(state.rawValue), stateReason: \(stateReason.rawValue), eventReason: \(eventReason), eventInfo: \(eventInfo) publisher: \(publisher) / \(currentUid)")
         
         self.callState = state
         
@@ -572,12 +564,12 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
             }
             
             //renew callapi
-            self.callApi.renewToken(with: self.tokenConfig)
+            self.callApi.renewToken(with: self.rtcToken, rtmToken: self.rtmToken)
             
             //renew videoloader
             VideoLoaderApiImpl.shared.getConnectionMap().forEach { (channelId, connection) in
                 let mediaOptions = AgoraRtcChannelMediaOptions()
-                mediaOptions.token = self.tokenConfig.rtcToken
+                mediaOptions.token = self.rtcToken
                 let ret = self.rtcEngine.updateChannelEx(with: mediaOptions, connection: connection)
                 showTo1v1Print("renew token tokenPrivilegeWillExpire: \(channelId) \(ret)")
             }

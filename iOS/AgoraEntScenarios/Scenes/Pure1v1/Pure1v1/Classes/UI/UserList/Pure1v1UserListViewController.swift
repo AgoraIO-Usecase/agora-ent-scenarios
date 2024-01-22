@@ -27,8 +27,8 @@ class Pure1v1UserListViewController: UIViewController {
     }()
     
     private var calleeTokenConfig: Pure1v1CalleeTokenConfig = Pure1v1CalleeTokenConfig()
-    
-    private let tokenConfig: CallTokenConfig = CallTokenConfig()
+    private var rtcToken: String = ""
+    private var rtmToken: String = ""
     private lazy var rtcEngine = _createRtcEngine()
     private var callState: CallStateType = .idle
     private var connectedUserId: UInt?
@@ -86,15 +86,15 @@ class Pure1v1UserListViewController: UIViewController {
             return
         }
         
-        if tokenConfig.rtcToken.count > 0, tokenConfig.rtmToken.count > 0 {
-            _initCallAPI(tokenConfig: self.tokenConfig)
+        if rtcToken.count > 0, rtmToken.count > 0 {
+            _initCallAPI()
             return
         }
         
-        tokenConfig.roomId = userInfo.getRoomId()
+        let roomId = userInfo.getRoomId()
         NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
                                              appCertificate: pure1V1AppCertificate!,
-                                             channelName: tokenConfig.roomId,
+                                             channelName: roomId,
                                              uid: userInfo.userId,
                                              tokenGeneratorType: .token007,
                                              tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
@@ -103,10 +103,9 @@ class Pure1v1UserListViewController: UIViewController {
                   let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
                 return
             }
-            self.tokenConfig.rtcToken = rtcToken
-            self.tokenConfig.rtmToken = rtmToken
-            
-            self._initCallAPI(tokenConfig: self.tokenConfig)
+            self.rtcToken = rtcToken
+            self.rtmToken = rtmToken
+            self._initCallAPI()
         }
     }
     
@@ -120,33 +119,29 @@ class Pure1v1UserListViewController: UIViewController {
 }
 
 extension Pure1v1UserListViewController {
-    private func _initCallAPI(tokenConfig: CallTokenConfig) {
+    private func _initCallAPI() {
         pure1v1Print("_initCallAPI")
         let config = CallConfig()
-        config.role = .caller  // Pure 1v1 can only be set as the caller
-        config.mode = .pure1v1
         config.appId = pure1V1AppId!
         config.userId = UInt(userInfo?.userId ?? "")!
-        config.autoAccept = false
         config.rtcEngine = rtcEngine
-        config.localView = callVC.localCanvasView.canvasView
-        config.remoteView = callVC.remoteCanvasView.canvasView
-        if let userExtension = userInfo?.yy_modelToJSONObject() as? [String: Any] {
-            config.userExtension = userExtension
-        }
+        config.rtmClient = nil
         callApi.deinitialize {
         }
-        callApi.initialize(config: config, token: tokenConfig) {[weak self] error in
-            guard let self = self else {return}
-            if let error = error {
-                AUIToast.show(text: error.localizedDescription)
-                return
-            }
-            // Requires active call to prepareForCall
-            let prepareConfig = PrepareConfig.calleeConfig()
-            self.callApi.prepareForCall(prepareConfig: prepareConfig) { err in
-            }
+        callApi.initialize(config: config)
+        
+        let prepareConfig = PrepareConfig()
+        prepareConfig.rtcToken = ""
+        prepareConfig.rtmToken = ""
+        prepareConfig.roomId = userInfo?.getRoomId() ?? ""
+        prepareConfig.localView = callVC.localCanvasView.canvasView
+        prepareConfig.remoteView = callVC.remoteCanvasView.canvasView
+        prepareConfig.autoAccept = false  // 如果期望收到呼叫自动接通，则需要设置为true
+        prepareConfig.autoJoinRTC = false  // 如果期望立即加入自己的RTC呼叫频道，则需要设置为true
+        callApi.prepareForCall(prepareConfig: prepareConfig) { err in
+            // 成功即可以开始进行呼叫
         }
+        
         callApi.addListener(listener: self)
         
         callVC.callApi = callApi
@@ -179,7 +174,7 @@ extension Pure1v1UserListViewController {
         }
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
-        callApi.call(roomId: user.getRoomId(), remoteUserId: remoteUserId) { err in
+        callApi.call(remoteUserId: remoteUserId) { err in
         }
     }
 }
@@ -222,16 +217,15 @@ extension Pure1v1UserListViewController {
 
 extension Pure1v1UserListViewController: CallApiListenerProtocol {
     func onCallStateChanged(with state: CallStateType,
-                            stateReason: CallReason,
+                            stateReason: CallStateReason,
                             eventReason: String,
-                            elapsed: Int,
                             eventInfo: [String : Any]) {
         let currentUid = userInfo?.userId ?? ""
         let publisher = eventInfo[kPublisher] as? String ?? currentUid
         guard publisher == currentUid else {
             return
         }
-        pure1v1Print("onCallStateChanged state: \(state.rawValue), stateReason: \(stateReason.rawValue), eventReason: \(eventReason), elapsed: \(elapsed) ms, eventInfo: \(eventInfo) publisher: \(publisher) / \(currentUid)")
+        pure1v1Print("onCallStateChanged state: \(state.rawValue), stateReason: \(stateReason.rawValue), eventReason: \(eventReason), eventInfo: \(eventInfo) publisher: \(publisher) / \(currentUid)")
         
         self.callState = state
         
@@ -283,7 +277,8 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                         self.calleeTokenConfig.callerToken =  tokens[AgoraTokenType.rtc.rawValue]!
                         
                         guard self.calleeTokenConfig.isValide(roomId: fromRoomId) else {return}
-                        self.callApi.accept(roomId: fromRoomId, remoteUserId: fromUserId, rtcToken: self.calleeTokenConfig.callerToken ?? "") { err in
+                        self.callApi.accept(remoteUserId: fromUserId) { err in
+                            
                         }
                     }
                     
@@ -293,7 +288,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
                         self.calleeTokenConfig.isAccept = true
                         guard self.calleeTokenConfig.isValide(roomId: fromRoomId) else {return}
-                        self.callApi.accept(roomId: fromRoomId, remoteUserId: fromUserId, rtcToken: self.calleeTokenConfig.callerToken ?? "") { err in
+                        self.callApi.accept(remoteUserId: fromUserId) { err in
                         }
                     }
                     
@@ -398,7 +393,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
         //renew token, include caller token(current room)
         NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
                                              appCertificate: pure1V1AppCertificate!,
-                                             channelName: tokenConfig.roomId,
+                                             channelName: userInfo.roomId,
                                              uid: userInfo.userId,
                                              tokenGeneratorType: .token007,
                                              tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
@@ -407,9 +402,9 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                   let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
                 return
             }
-            self.tokenConfig.rtcToken = rtcToken
-            self.tokenConfig.rtmToken = rtmToken
-            self.callApi.renewToken(with: self.tokenConfig)
+            self.rtcToken = rtcToken
+            self.rtmToken = rtmToken
+            self.callApi.renewToken(with: rtcToken, rtmToken: rtmToken)
         }
             
         //renew other caller room(current user is callee)
@@ -425,10 +420,14 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue] else {
                     return
                 }
-                
-                self.callApi.renewRemoteCallerChannelToken(roomId: channelName, token: rtcToken)
+                // TODO: FANPENG
+//                self.callApi.renewRemoteCallerChannelToken(roomId: channelName, token: rtcToken)
             }
         }
+    }
+    
+    func onCallEventChanged(with event: CallEvent) {
+        
     }
 }
 

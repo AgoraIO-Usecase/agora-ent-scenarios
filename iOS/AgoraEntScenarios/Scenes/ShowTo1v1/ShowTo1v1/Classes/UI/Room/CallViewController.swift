@@ -120,8 +120,8 @@ class CallViewController: BaseRoomViewController {
     }
     
     @objc private func _hangupAction() {
-        callApi?.hangup(userId: UInt(targetUser?.uid ?? "") ?? 0) { err in
-        }
+        callApi?.hangup(remoteUserId: UInt(targetUser?.uid ?? "") ?? 0, completion: { err in
+        })
         guard navigationController?.viewControllers.contains(self) ?? false else {return}
         navigationController?.popViewController(animated: false)
     }
@@ -141,11 +141,11 @@ extension CallViewController: AgoraRtcEngineDelegate {
 }
 
 extension CallViewController {
+    
     override func onCallStateChanged(with state: CallStateType,
-                            stateReason: CallReason,
-                            eventReason: String,
-                            elapsed: Int,
-                            eventInfo: [String : Any]) {
+                                     stateReason: CallStateReason,
+                                     eventReason: String,
+                                     eventInfo: [String : Any]) {
         let publisher = eventInfo[kPublisher] as? String ?? currentUser?.uid
         guard publisher == currentUser?.uid else {
             return

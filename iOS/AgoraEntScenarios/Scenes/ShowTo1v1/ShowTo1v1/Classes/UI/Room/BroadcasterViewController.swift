@@ -230,9 +230,8 @@ class BroadcasterViewController: BaseRoomViewController {
         if actionType == .call {
             AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
             AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
-            
-            callApi?.call(roomId: roomInfo!.roomId, remoteUserId: roomInfo!.getUIntUserId()) { err in
-            }
+            callApi?.call(remoteUserId: roomInfo!.getUIntUserId(), completion: { err in
+            })
             return
         }
         super.onClick(actionType: actionType)
@@ -240,11 +239,10 @@ class BroadcasterViewController: BaseRoomViewController {
 }
 
 extension BroadcasterViewController {
-    override func onCallStateChanged(with state: CallStateType,
-                            stateReason: CallReason,
-                            eventReason: String,
-                            elapsed: Int,
-                            eventInfo: [String : Any]) {
+    override func onCallStateChanged(with state: CallStateType, 
+                                     stateReason: CallStateReason,
+                                     eventReason: String,
+                                     eventInfo: [String : Any]) {
         let publisher = eventInfo[kPublisher] as? String ?? currentUser?.uid
         guard publisher == currentUser?.uid else {return}
         
