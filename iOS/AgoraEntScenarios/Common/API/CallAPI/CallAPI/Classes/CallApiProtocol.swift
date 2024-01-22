@@ -62,7 +62,7 @@ import AgoraRtmKit
     case rtmSetupSuccessed = 7          //设置RTM成功
     case messageFailed = 8              //消息发送失败
     case stateMismatch = 9              //状态流转异常
-    case preparedRoomIdChanged = 10     //prepared了另一个roomId导致
+    case preparedRoomIdChanged = 10     //prepared了另一个roomId
     case remoteUserRecvCall = 99        //主叫呼叫成功
     case localRejected = 100            //本地用户拒绝
     case remoteRejected = 101           //远端用户拒绝
@@ -105,7 +105,7 @@ import AgoraRtmKit
     ///   - state: 状态类型
     ///   - stateReason: 状态变更的原因
     ///   - eventReason: 事件类型描述
-    ///   - eventInfo: 扩展信息，不同事件类型参数不同，其中key为“publisher”为状态变更者id，空则表示是自己的状态变更
+    ///   - eventInfo: 扩展信息，不同事件类型参数不同
     func onCallStateChanged(with state: CallStateType,
                             stateReason: CallStateReason,
                             eventReason: String,
@@ -135,7 +135,7 @@ import AgoraRtmKit
     /// 释放缓存
     func deinitialize(completion: @escaping (()->()))
     
-    /// 更新自己的rtc/rtm的token
+    /// 更新自己rtc/rtm的token
     /// - Parameter config: <#config description#>
     func renewToken(with rtcToken: String, rtmToken: String)
     
@@ -153,34 +153,35 @@ import AgoraRtmKit
     /// - Parameter listener: <#listener description#>
     func removeListener(listener: CallApiListenerProtocol)
     
-    /// 发起通话，主叫调用，通过prepareForCall设置的RTC频道号和远端用户建立RTC通话连接
+    /// 发起呼叫邀请，主叫调用，通过prepareForCall设置的RTC频道号和远端用户建立RTC通话连接
     /// - Parameters:
     ///   - remoteUserId: 呼叫的用户id
     ///   - completion: <#completion description#>
     func call(remoteUserId: UInt, completion: ((NSError?)->())?)
     
-    /// 取消正在发起的通话，主叫调用
+    /// 取消正在发起的呼叫邀请，主叫调用
     /// - Parameter completion: <#completion description#>
     func cancelCall(completion: ((NSError?)->())?)
     
-    /// 接受通话，被叫调用
+    /// 接受呼叫邀请，被叫调用
     /// - Parameters:
-    ///   - remoteUserId: 呼叫的用户id
+    ///   - remoteUserId: 接受的用户id
     ///   - completion: <#completion description#>
     func accept(remoteUserId: UInt, completion: ((NSError?)->())?)
     
-    /// 拒绝通话，被叫调用
+    /// 拒绝呼叫邀请，被叫调用
     /// - Parameters:
-    ///   - remoteUserId: 呼叫的用户id
+    ///   - remoteUserId: 拒绝的用户id
     ///   - reason: 拒绝原因
     ///   - completion: <#completion description#>
     func reject(remoteUserId: UInt, reason: String?, completion: ((NSError?)->())?)
     
-    /// 结束通话，主叫和被叫均可调用
+    /// 挂断通话，主叫和被叫均可调用
     /// - Parameters:
-    ///   - userId: 用户id
+    ///   - userId: 挂断的用户id
+    ///   - reason: 挂断原因
     ///   - completion: <#completion description#>
-    func hangup(remoteUserId: UInt, completion: ((NSError?)->())?)
+    func hangup(remoteUserId: UInt, reason: String?, completion: ((NSError?)->())?)
     
     /// 获取当前通话的callId，callId为当次通话过程中唯一标识，通过该标识声网后台服务可以查询到当前通话的关键节点耗时和状态变迁的时间节点
     /// - Returns: callId，非呼叫到通话之外的消息为空

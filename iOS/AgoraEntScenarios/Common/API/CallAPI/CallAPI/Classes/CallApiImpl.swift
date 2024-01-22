@@ -30,6 +30,9 @@ public let kPublisher = "publisher"    //状态触发的用户uid，目前可以
 public let kRejectReason = "rejectReason"
 public let kRejectReasonCallBusy = "The user is currently busy"
 
+
+public let kHangupReason = "hangupReason"
+
 //是否内部拒绝，收到内部拒绝目前标记为对端call busy
 public let kRejectByInternal = "rejectByInternal"
 
@@ -202,6 +205,12 @@ extension CallApiImpl {
         message[kRejectByInternal] = rejectByInternal ? 1 : 0
         return message
     }
+    
+    private func _hangupMessageDic(reason: String?) -> [String: Any] {
+        var message: [String: Any] = _messageDic(action: .hangup)
+        message[kHangupReason] = reason
+        return message
+    }
 }
 
 //MARK: private method
@@ -214,7 +223,13 @@ extension CallApiImpl {
     
     private func checkConnectedSuccess(reason: CallStateReason) {
         guard connectInfo.isRetrieveFirstFrame, state == .connecting else {return}
-        //因为被叫提前加频道并订阅流和推流，导致双端收到视频首帧可能会比被叫点accept(变成connecting)比更早，所以需要检查是否变成了connecting，两者都满足才是conneced
+        /*
+         1.因为被叫提前加频道并订阅流和推流，导致双端收到视频首帧可能会比被叫点accept(变成connecting)比更早
+         2.由于匹配1v1时双端都会收到onCall，此时A发起accept，B收到了onAccept+A首帧，会导致B未接受即进入了connected状态
+         因此:
+         变成connecting: 需要同时检查是否变成了“远端已接受” + “本地已接受(或已发起呼叫)”
+         变成connected: 需要同时检查是否是"connecting状态" + “收到首帧”
+         */
         _changeToConnectedState(reason: reason)
     }
     
@@ -447,6 +462,12 @@ extension CallApiImpl {
         return false
     }
     
+    private func _isCallingUser(message: [String: Any]) -> Bool {
+        guard let fromUserId = message[kFromUserId] as? UInt,
+              fromUserId == connectInfo.callingUserId else { return false }
+        return true
+    }
+    
     private func _joinRTCWithMediaOptions(roomId: String,
                                           role: AgoraClientRole,
                                           subscribeType: CallAutoSubscribeType,
@@ -611,7 +632,7 @@ extension CallApiImpl {
     
     private func _reportMethod(event: String, label: String = "") {
         let msgId = "scenarioAPI"
-        callPrint("_reportMethod event: \(event)")
+        callPrint("_reportMethod event: \(event) label: \(label)")
         var subEvent = event
         if let range = event.range(of: "(") {
             subEvent = String(event[..<range.lowerBound])
@@ -765,8 +786,8 @@ extension CallApiImpl {
     
     //收到取消呼叫消息
     fileprivate func _onCancel(message: [String: Any]) {
-        //如果不是接收的正在接听的用户的呼叫
-        guard let fromUserId = message[kFromUserId] as? UInt, connectInfo.callingUserId == fromUserId else { return }
+        //如果不是来自的正在呼叫的用户的操作，不处理
+        guard _isCallingUser(message: message) else { return }
         
         _updateAndNotifyState(state: .prepared, stateReason: .remoteCancel, eventInfo: message)
         _notifyEvent(event: .remoteCancel)
@@ -774,7 +795,7 @@ extension CallApiImpl {
     
     //收到拒绝消息
     fileprivate func _onReject(message: [String: Any]) {
-        guard let fromUserId = message[kFromUserId] as? UInt, fromUserId == connectInfo.callingUserId else { return }
+        guard _isCallingUser(message: message) else { return }
         var stateReason: CallStateReason =  .remoteRejected
         var callEvent: CallEvent =  .remoteRejected
         if let rejectByInternal = message[kRejectByInternal] as? Int, rejectByInternal == 1 {
@@ -787,12 +808,12 @@ extension CallApiImpl {
     
     //收到接受消息
     fileprivate func _onAccept(message: [String: Any]) {
-        guard state == .calling else {
-            return
-        }
+        //需要是calling状态，并且来自呼叫的用户的请求
+        guard state == .calling, _isCallingUser(message: message) else { return }
 //        let elapsed = _getTimeInMs() - (connectInfo.callTs ?? 0)
         //TODO: 如果已经connected
-        if state == .calling {
+        //并且是isLocalAccepted（发起呼叫或者已经accept过了），否则认为本地没有同意
+        if connectInfo.isLocalAccepted {
             _updateAndNotifyState(state: .connecting, stateReason: .remoteAccepted, eventInfo: message)
         }
         _notifyEvent(event: .remoteAccepted)
@@ -800,10 +821,8 @@ extension CallApiImpl {
     
     //收到挂断消息
     fileprivate func _onHangup(message: [String: Any]) {
-        guard let fromUserId = message[kFromUserId] as? UInt,
-              fromUserId == connectInfo.callingUserId,
-              let callId = message[kCallId] as? String else { return }
-        guard callId == connectInfo.callId else {
+        guard _isCallingUser(message: message) else { return }
+        guard let callId = message[kCallId] as? String, callId == connectInfo.callId else {
             callWarningPrint("onHangup fail: callId missmatch")
             return
         }
@@ -914,7 +933,7 @@ extension CallApiImpl: CallApiProtocol {
         }
         
         //发送呼叫消息
-        connectInfo.set(userId: remoteUserId, roomId: fromRoomId, callId: UUID().uuidString)
+        connectInfo.set(userId: remoteUserId, roomId: fromRoomId, callId: UUID().uuidString, isLocalAccepted: true)
         //ensure that the report log contains a call
         _reportMethod(event: "\(#function)", label: "remoteUserId=\(remoteUserId)")
         
@@ -963,16 +982,17 @@ extension CallApiImpl: CallApiProtocol {
             return
         }
         
+        connectInfo.set(userId: remoteUserId, roomId: roomId, isLocalAccepted: true)
+        
         let message: [String: Any] = _messageDic(action: .accept)
         messageManager?.sendMessage(userId: "\(remoteUserId)", message: message) { err in
             completion?(err)
             guard let error = err else { return }
             self._notifyEvent(event: .messageFailed, eventReason: "accept fail: \(error.code)")
         }
+        
         _updateAndNotifyState(state: .connecting, stateReason: .localAccepted, eventInfo: message)
         _notifyEvent(event: .localAccepted)
-        
-        connectInfo.set(userId: remoteUserId, roomId: roomId)
         
         if calleeJoinRTCPolicy == .accepted {
             _joinRTCAsBroadcaster(roomId: roomId)
@@ -993,9 +1013,9 @@ extension CallApiImpl: CallApiProtocol {
     }
     
     //挂断
-    public func hangup(remoteUserId: UInt, completion: ((NSError?) -> ())?) {
+    public func hangup(remoteUserId: UInt, reason: String?, completion: ((NSError?) -> ())?) {
         _reportMethod(event: "\(#function)", label: "remoteUserId=\(remoteUserId)")
-        let message = _messageDic(action: .hangup)
+        let message = _hangupMessageDic(reason: reason)
         _hangup(remoteUserId: remoteUserId, message: message) { err in
             completion?(err)
             guard let error = err else { return }
