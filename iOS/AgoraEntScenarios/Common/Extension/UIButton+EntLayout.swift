@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - title insert
 extension UIButton {
-    @objc var spacingBetweenImageAndTitle: CGFloat {
+    @objc public var spacingBetweenImageAndTitle: CGFloat {
         set {
 //            self.set
             self.setInsets(contentPadding: UIEdgeInsets.zero, imageTitlePadding: newValue)
@@ -150,51 +150,15 @@ extension UIButton {
             contentEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: spacing / 2)
         }
     }
-    /// Image position in counterclockwise direction🔄
-//    @objc enum ImgPosition: Int { case top, left, bottom, right }
 
-    /// Reset the position of image and title (default spacing is 0)
-//    @objc func adjustImageTitlePosition(_ position: ImgPosition, spacing: CGFloat = 0 ) {
-//         self.sizeToFit()
-//         
-//         let imageWidth = self.imageView?.image?.size.width
-//         let imageHeight = self.imageView?.image?.size.height
-//         
-//         let labelWidth = self.titleLabel?.frame.size.width
-//         let labelHeight = self.titleLabel?.frame.size.height
-//         
-//         switch position {
-//         case .top:
-//             imageEdgeInsets = UIEdgeInsets(top: -labelHeight! - spacing / 2, left: 0, bottom: 0, right: -labelWidth!)
-//             titleEdgeInsets = UIEdgeInsets(top: 0, left: -imageWidth!, bottom: -imageHeight! - spacing / 2, right: 0)
-//             self.titleLabel?.frame = CGRect(x: 0, y: 0, width: labelWidth!, height: labelWidth!)
-//             self.imageView?.frame = CGRect(x: 0, y: 0, width: imageWidth!, height: imageWidth!)
-//             break
-//             
-//         case .left:
-//             imageEdgeInsets = UIEdgeInsets(top: 0, left: -spacing / 2, bottom: 0, right: 0)
-//             titleEdgeInsets = UIEdgeInsets(top: 0, left: spacing * 1.5, bottom: 0, right: 0)
-//             break
-//             
-//         case .bottom:
-//             imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: -labelHeight! - spacing / 2, right: -labelWidth!)
-//             titleEdgeInsets = UIEdgeInsets(top: -imageHeight! - spacing / 2, left: -imageWidth!, bottom: 0, right: 0)
-//             break
-//             
-//         case .right:
-//             imageEdgeInsets = UIEdgeInsets(top: 0, left: labelWidth! + spacing / 2, bottom: 0, right: -labelWidth! - spacing / 2)
-//             titleEdgeInsets = UIEdgeInsets(top: 0, left: -imageWidth! - spacing / 2, bottom: 0, right: imageWidth! + spacing / 2)
-//             break
-//         }
-//     }
 }
 
 extension UIButton {
     /// 逆时针方向🔄
-    enum ImgPosition { case top, left, bottom, right }
+    public enum ImgPosition { case top, left, bottom, right }
     
     /// 重置图片image与标题title位置(默认间距为0)
-    func adjustImageTitlePosition(_ position: ImgPosition, spacing: CGFloat = 0 ) {
+    public func adjustImageTitlePosition(_ position: ImgPosition, spacing: CGFloat = 0 ) {
         self.sizeToFit()
         
         let imageWidth = self.imageView?.image?.size.width

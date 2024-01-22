@@ -12,10 +12,10 @@ public class SAVerifyCodeView: UIView {
     var beginEdit: (() -> Void)?
 
     /// 输入值改变
-    var textValueChange: ((_ text: String) -> Void)?
+    public var textValueChange: ((_ text: String) -> Void)?
 
     /// 输入完成
-    var inputFinish: ((_ text: String) -> Void)?
+    public var inputFinish: ((_ text: String) -> Void)?
 
     /// 验证码输入框个数
     var inputTextNum: Int = 4
