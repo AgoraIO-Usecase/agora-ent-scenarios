@@ -157,7 +157,7 @@
     <string name="cantata_too_fast">操作太频繁</string>
     <string name="cantata_lrc_failed">歌词加载失败</string>
     <string name="cantata_retry">点击重试</string>
-    <string name="cantata_join_chorus_failed">加入合唱失败</string>
+    <string name="cantata_join_chorus_failed">加入合唱失败, 请3s后重试</string>
 
     <string name="cantata_user_online">%s在线</string>
     <string name="cantata_singing_user">正在合唱用户(%d)</string>
@@ -184,4 +184,5 @@
     <string name="cantata_debug_settings_private_param">私有参数</string>
     <string name="cantata_debug_settings_set">设置</string>
     <string name="cantata_debug_settings_audio_dump">音频Dump</string>
+    <string name="cantata_loading_music">%1s歌曲准备中…</string>
 </resources>

@@ -24,7 +24,7 @@ class CantataSyncManagerServiceImp constructor(
     private val errorHandler: ((Exception?) -> Unit)?
 ) : CantataServiceProtocol {
     private val TAG = "KTV_Service_LOG"
-    private val kSceneId = "scene_ktv_3.8.0"
+    private val kSceneId = "scene_cantata_4.3.0"
     private val kCollectionIdChooseSong = "choose_song"
     private val kCollectionIdSeatInfo = "seat_info"
     private val kCollectionIdUser = "userCollection"

@@ -3,9 +3,6 @@ package io.agora.scene.cantata.ui.dialog
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
-import android.widget.CompoundButton
-import android.widget.LinearLayout
-import android.widget.RadioButton
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.core.view.ViewCompat
@@ -16,7 +13,6 @@ import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.base.component.BaseRecyclerViewAdapter.BaseViewHolder
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.component.OnItemClickListener
-import io.agora.scene.base.utils.UiUtil
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataDialogMusicSettingBinding
 import io.agora.scene.cantata.databinding.CantataItemEffectvoiceBinding
@@ -74,7 +70,6 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
         mBinding.sbVol1.progress = mSetting.getVolMic()
         mBinding.sbVol2.progress = mSetting.getVolMusic()
         mBinding.changeToneView.progress = getCurrentPitch(mSetting.getToneValue())
-        setSoundMode()
         mBinding.btnToneDownDialogSetting.setOnClickListener { v: View? -> tuningTone(false) }
         mBinding.btnToneUpDialogSetting.setOnClickListener { v: View? -> tuningTone(true) }
         if (isPause) {
@@ -152,21 +147,24 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
             override fun onStopTrackingTouch(seekBar: SeekBar) {}
         })
 
+        val stringArray = resources.getStringArray(R.array.cantata_audioPreset)
         val list: MutableList<EffectVoiceBean> = ArrayList()
-        list.add(EffectVoiceBean(0, R.mipmap.bg_sound_mode_1, "原声"))
-        list.add(EffectVoiceBean(1, R.mipmap.bg_sound_mode_2, "大合唱"))
-        list.add(EffectVoiceBean(2, R.mipmap.bg_sound_mode_3, "KTV"))
-        list.add(EffectVoiceBean(3, R.mipmap.bg_sound_mode_4, "演唱会"))
-        list.add(EffectVoiceBean(4, R.mipmap.bg_sound_mode_1, "录音棚"))
-        list.add(EffectVoiceBean(5, R.mipmap.bg_sound_mode_2, "留声机"))
-        list.add(EffectVoiceBean(6, R.mipmap.bg_sound_mode_3, "空旷"))
-        list.add(EffectVoiceBean(7, R.mipmap.bg_sound_mode_4, "空灵"))
-        list.add(EffectVoiceBean(8, R.mipmap.bg_sound_mode_1, "流行"))
-        list.add(EffectVoiceBean(9, R.mipmap.bg_sound_mode_2, "R&B"))
-        for (item in list) {
-            item.setSelect(mSetting.effect == item.id)
+        for (i in stringArray.indices) {
+            val drawable: Int = if (i % 4 == 0) {
+                R.mipmap.bg_sound_mode_4
+            } else if (i % 3 == 0) {
+                R.mipmap.bg_sound_mode_3
+            } else if (i % 2 == 0) {
+                R.mipmap.bg_sound_mode_2
+            } else {
+                R.mipmap.bg_sound_mode_1
+            }
+            val audioEffect: Int = mSetting.getEffectIndex(i)
+            list.add(EffectVoiceBean(i, audioEffect, drawable, stringArray[i]))
         }
-
+        for (item in list) {
+            item.setSelect(mSetting.audioEffect == item.audioEffect)
+        }
         mEffectAdapter = BaseRecyclerViewAdapter(
             list, object : OnItemClickListener<EffectVoiceBean> {
 
@@ -179,7 +177,7 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
                         }
                     }
 
-                    mSetting.effect = data.id
+                    mSetting.setAudioEffectPreset(data.audioEffect)
                 }
             },
             EffectVoiceHolder::class.java
@@ -199,37 +197,6 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
                 mSetting.remoteVolume = 30
             }
         }
-    }
-
-    private fun setSoundMode() {
-        val margin = UiUtil.dp2px(10)
-        val stringArray = resources.getStringArray(R.array.cantata_audioPreset)
-        for (i in stringArray.indices) {
-            val radioButton = layoutInflater.inflate(R.layout.cantata_btn_sound_mode, null) as RadioButton
-            radioButton.text = stringArray[i]
-            if (i % 4 == 0) {
-                radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode4)
-            } else if (i % 4 == 1) {
-                radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode3)
-            } else if (i % 4 == 2) {
-                radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode2)
-            } else {
-                radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode1)
-            }
-            mBinding.radioGroup.addView(radioButton)
-            (radioButton.layoutParams as LinearLayout.LayoutParams).setMargins(margin, 0, 0, 0)
-            if (0 == i) {
-                radioButton.isChecked = true
-            } else if (i == stringArray.size - 1) {
-                (radioButton.layoutParams as LinearLayout.LayoutParams).setMargins(margin, 0, margin, 0)
-            }
-            radioButton.setOnCheckedChangeListener { compoundButton: CompoundButton?, b: Boolean ->
-                if (b) {
-                    mSetting.effect = i
-                }
-            }
-        }
-        (mBinding.radioGroup.getChildAt(mSetting.effect) as? RadioButton)?.isChecked = true
     }
 
     private fun showEarBackPage(v: View) {

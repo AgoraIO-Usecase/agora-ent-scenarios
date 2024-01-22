@@ -62,6 +62,7 @@ import io.agora.scene.ktv.singrelay.live.song.SongModel;
 import io.agora.scene.ktv.singrelay.service.JoinRoomOutputModel;
 import io.agora.scene.ktv.singrelay.service.KTVServiceProtocol;
 import io.agora.scene.ktv.singrelay.service.KTVSingRelayGameService;
+import io.agora.scene.ktv.singrelay.service.KTVSyncManagerServiceImp;
 import io.agora.scene.ktv.singrelay.service.OnSeatInputModel;
 import io.agora.scene.ktv.singrelay.service.OutSeatInputModel;
 import io.agora.scene.ktv.singrelay.service.RankModel;
@@ -882,66 +883,66 @@ public class RoomLivingViewModel extends ViewModel {
         );
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
-               @Override
-               public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, @NonNull io.agora.mediaplayer.Constants.MediaPlayerError error, boolean isLocal) {
-                   switch (state) {
-                       case PLAYER_STATE_OPEN_COMPLETED:
-                           playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());
-                           break;
-                       case PLAYER_STATE_PAUSED:
-                           playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
-                           break;
-                       case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
-                           if (isLocal) {
-                               playerMusicPlayCompleteLiveData.postValue(true);
-                               playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
-                           }
-                           break;
-                       default:
-                   }
-               }
+                                           @Override
+                                           public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, @NonNull io.agora.mediaplayer.Constants.MediaPlayerError error, boolean isLocal) {
+                                               switch (state) {
+                                                   case PLAYER_STATE_OPEN_COMPLETED:
+                                                       playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());
+                                                       break;
+                                                   case PLAYER_STATE_PAUSED:
+                                                       playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
+                                                       break;
+                                                   case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
+                                                       if (isLocal) {
+                                                           playerMusicPlayCompleteLiveData.postValue(true);
+                                                           playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
+                                                       }
+                                                       break;
+                                                   default:
+                                               }
+                                           }
 
-               @Override
-               public void onMusicPlayerPositionChanged(long position_ms, long timestamp_ms) {
-                   super.onMusicPlayerPositionChanged(position_ms, timestamp_ms);
-                   Log.d("hugo", "onMusicPlayerPositionChanged: " + position_ms);
-                   if (!hasRecievedFirstPosition && isOnSeat) {
-                       hasRecievedFirstPosition = true;
-                       playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_BATTLE);
-                   }
-                   for (int i = 0; i < relayList.size() - 1; i++) {
-                       if (Math.abs(position_ms - relayList.get(i)) < 500) {
-                           // 下一段
-                           // workaround：防止因为mpk position回调时间不准造成的段时间内重复上报段落切换事件的bug
-                           if (System.currentTimeMillis() - mLastPostSongPartChangeStatusTime < 5000) break;
-                           GraspModel graspModel = new GraspModel();
-                           graspModel.status = GraspStatus.IDLE;
-                           if (graspStatusMutableLiveData.getValue() != null) {
-                               graspModel.userId = graspStatusMutableLiveData.getValue().userId;
-                               graspModel.userName = graspStatusMutableLiveData.getValue().userName;
-                               graspModel.headUrl = graspStatusMutableLiveData.getValue().headUrl;
-                               graspModel.partNum = graspStatusMutableLiveData.getValue().partNum;
-                           }
-                           mLastPostSongPartChangeStatusTime = System.currentTimeMillis();
-                           partNum = i + 2;
-                           graspStatusMutableLiveData.postValue(graspModel);
-                           break;
-                       } else if ((position_ms - relayList.get(i)) > -3000 && (position_ms - relayList.get(i) < -2000)) {
-                           // 提前3s下一段提示
-                           GraspModel graspModel = new GraspModel();
-                           graspModel.status = GraspStatus.Mention;
-                           if (graspStatusMutableLiveData.getValue() != null) {
-                               graspModel.userId = graspStatusMutableLiveData.getValue().userId;
-                               graspModel.userName = graspStatusMutableLiveData.getValue().userName;
-                               graspModel.headUrl = graspStatusMutableLiveData.getValue().headUrl;
-                               graspModel.partNum = graspStatusMutableLiveData.getValue().partNum;
-                           }
-                           graspStatusMutableLiveData.postValue(graspModel);
-                           break;
-                       }
-                   }
-               }
-           }
+                                           @Override
+                                           public void onMusicPlayerPositionChanged(long position_ms, long timestamp_ms) {
+                                               super.onMusicPlayerPositionChanged(position_ms, timestamp_ms);
+                                               Log.d("hugo", "onMusicPlayerPositionChanged: " + position_ms);
+                                               if (!hasRecievedFirstPosition && isOnSeat) {
+                                                   hasRecievedFirstPosition = true;
+                                                   playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_BATTLE);
+                                               }
+                                               for (int i = 0; i < relayList.size() - 1; i++) {
+                                                   if (Math.abs(position_ms - relayList.get(i)) < 500) {
+                                                       // 下一段
+                                                       // workaround：防止因为mpk position回调时间不准造成的段时间内重复上报段落切换事件的bug
+                                                       if (System.currentTimeMillis() - mLastPostSongPartChangeStatusTime < 5000) break;
+                                                       GraspModel graspModel = new GraspModel();
+                                                       graspModel.status = GraspStatus.IDLE;
+                                                       if (graspStatusMutableLiveData.getValue() != null) {
+                                                           graspModel.userId = graspStatusMutableLiveData.getValue().userId;
+                                                           graspModel.userName = graspStatusMutableLiveData.getValue().userName;
+                                                           graspModel.headUrl = graspStatusMutableLiveData.getValue().headUrl;
+                                                           graspModel.partNum = graspStatusMutableLiveData.getValue().partNum;
+                                                       }
+                                                       mLastPostSongPartChangeStatusTime = System.currentTimeMillis();
+                                                       partNum = i + 2;
+                                                       graspStatusMutableLiveData.postValue(graspModel);
+                                                       break;
+                                                   } else if ((position_ms - relayList.get(i)) > -3000 && (position_ms - relayList.get(i) < -2000)) {
+                                                       // 提前3s下一段提示
+                                                       GraspModel graspModel = new GraspModel();
+                                                       graspModel.status = GraspStatus.Mention;
+                                                       if (graspStatusMutableLiveData.getValue() != null) {
+                                                           graspModel.userId = graspStatusMutableLiveData.getValue().userId;
+                                                           graspModel.userName = graspStatusMutableLiveData.getValue().userName;
+                                                           graspModel.headUrl = graspStatusMutableLiveData.getValue().headUrl;
+                                                           graspModel.partNum = graspStatusMutableLiveData.getValue().partNum;
+                                                       }
+                                                       graspStatusMutableLiveData.postValue(graspModel);
+                                                       break;
+                                                   }
+                                               }
+                                           }
+                                       }
         );
 
         ktvApiProtocol.getMediaPlayer().setPlayerOption("play_pos_change_callback", 500);
@@ -1185,7 +1186,7 @@ public class RoomLivingViewModel extends ViewModel {
         KTVLogger.d(TAG, "RoomLivingViewModel.graspSong() called");
         if (roomInfoLiveData.getValue() == null || songPlayingLiveData.getValue() == null) return;
         KTVSingRelayGameService.INSTANCE.graspSong(
-                "scene_singrelay_3.5.0",
+                KTVSyncManagerServiceImp.getKSceneId(),
                 roomInfoLiveData.getValue().getRoomNo(),
                 UserManager.getInstance().getUser().id.toString(),
                 UserManager.getInstance().getUser().name,

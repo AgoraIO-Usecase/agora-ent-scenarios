@@ -2,7 +2,9 @@ package io.agora.scene.cantata.ui.dialog
 
 import androidx.annotation.DrawableRes
 
-class EffectVoiceBean constructor(var id: Int, @field:DrawableRes var resId: Int, var title: String) {
+class EffectVoiceBean constructor(
+    var id: Int, var audioEffect: Int, @field:DrawableRes var resId: Int, var title: String
+) {
     var isSelect = false
         private set
 
@@ -13,6 +15,11 @@ class EffectVoiceBean constructor(var id: Int, @field:DrawableRes var resId: Int
 
     fun setResId(resId: Int): EffectVoiceBean {
         this.resId = resId
+        return this
+    }
+
+    fun setAudioEffect(audioEffect: Int):EffectVoiceBean{
+        this.audioEffect = audioEffect
         return this
     }
 
