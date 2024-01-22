@@ -8,7 +8,7 @@
 #import "KTVDebugViewController.h"
 #import "KTVDebugInfo.h"
 #import "KTVDebugManager.h"
-#import "AESMacro.h"
+@import AgoraCommon;
 @import AgoraRtcKit;
 
 @interface KTVDebugViewController () <UITableViewDelegate, UITableViewDataSource>

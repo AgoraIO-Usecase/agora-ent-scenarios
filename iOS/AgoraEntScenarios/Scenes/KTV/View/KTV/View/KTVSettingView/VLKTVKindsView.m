@@ -5,7 +5,7 @@
 
 #import "VLKTVKindsView.h"
 #import "VLKTVKindsCell.h"
-#import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 @import Masonry;
 
 @interface VLKTVKindsView() <UICollectionViewDataSource,UICollectionViewDelegate>

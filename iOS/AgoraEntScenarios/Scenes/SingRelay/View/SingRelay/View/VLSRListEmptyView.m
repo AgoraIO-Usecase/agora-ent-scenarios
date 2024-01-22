@@ -4,9 +4,9 @@
 //
 
 #import "VLSRListEmptyView.h"
-#import "VLMacroDefine.h"
-#import "AESMacro.h"
 #import <Masonry/Masonry.h>
+#import "AgoraEntScenarios-Swift.h"
+@import AgoraCommon;
 @implementation VLSRListEmptyView
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -25,7 +25,7 @@
     introduceLabel.textAlignment = NSTextAlignmentCenter;
     introduceLabel.numberOfLines = 0;
     introduceLabel.textColor = UIColorMakeWithHex(@"#3C4267");
-    introduceLabel.font = UIFontMake(14);
+    introduceLabel.font = [UIFont systemFontOfSize:14];
     [self addSubview:introduceLabel];
     
     UIImageView *emptyImgView = [[UIImageView alloc]init];

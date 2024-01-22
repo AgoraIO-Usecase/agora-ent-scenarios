@@ -9,7 +9,7 @@ import Foundation
 import KakaJSON
 import AgoraSyncManager
 import ZSwiftBaseLib
-
+import AgoraCommon
 
 private func agoraAssert(_ message: String) {
     agoraAssert(false, message)

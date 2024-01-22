@@ -4,9 +4,9 @@
 //
 
 #import "VLListEmptyView.h"
-#import "VLMacroDefine.h"
-#import "AESMacro.h"
 #import <Masonry/Masonry.h>
+#import "AgoraEntScenarios-Swift.h"
+@import AgoraCommon;
 @implementation VLListEmptyView
 
 - (instancetype)initWithFrame:(CGRect)frame {

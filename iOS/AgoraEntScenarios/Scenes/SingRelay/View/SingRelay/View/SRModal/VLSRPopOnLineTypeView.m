@@ -4,10 +4,7 @@
 //
 
 #import "VLSRPopOnLineTypeView.h"
-#import "VLHotSpotBtn.h"
-#import "VLFontUtils.h"
-#import "VLMacroDefine.h"
-#import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 @import YYCategories;
 
 @interface VLSRPopOnLineTypeView ()
@@ -40,7 +37,7 @@
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
     titleLabel.text = SRLocalizedString(@"sr_onMi");
-    titleLabel.font = VLUIFontMake(16);
+    titleLabel.font = [UIFont systemFontOfSize:16];
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:titleLabel];

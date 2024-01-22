@@ -16,25 +16,19 @@
 #import "VLSRSelBgModel.h"
 #import "UIViewController+VL.h"
 #import "VLSRPopScoreView.h"
-#import "VLUserCenter.h"
-#import "VLMacroDefine.h"
 #import "VLGlobalHelper.h"
 #import "VLURLPathConfig.h"
-#import "VLToast.h"
 #import "UIView+VL.h"
 #import "AppContext+SR.h"
-#import "AESMacro.h"
 #import "LSTPopView+SRModal.h"
 //#import "HWWeakTimer.h"
-#import "VLAlert.h"
-#import "VLKTVAlert.h"
 #import "SRDebugManager.h"
 #import "SRDebugInfo.h"
 @import AgoraRtcKit;
 @import AgoraLyricsScore;
 @import YYCategories;
 @import SDWebImage;
-
+@import AgoraCommon;
 
 NSInteger srApiStreamId = -1;
 NSInteger srStreamId = -1;

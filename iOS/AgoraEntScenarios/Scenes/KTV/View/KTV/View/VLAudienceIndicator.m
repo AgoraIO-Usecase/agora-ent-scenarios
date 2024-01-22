@@ -4,7 +4,7 @@
 //
 
 #import "VLAudienceIndicator.h"
-#import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 @import YYCategories;
 
 @interface VLAudienceIndicator ()

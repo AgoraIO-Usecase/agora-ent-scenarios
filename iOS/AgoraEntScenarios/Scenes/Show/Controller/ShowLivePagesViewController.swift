@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 import VideoLoaderAPI
-
+import AgoraCommon
 private let kPagesVCTag = "UI"
 class ShowLivePagesViewController: ViewController {
     private lazy var delegateHandler = {

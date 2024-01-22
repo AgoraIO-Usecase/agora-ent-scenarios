@@ -5,9 +5,9 @@
 
 #import "VLSBGPopScoreView.h"
 #import "UIView+VL.h"
-#import "VLFontUtils.h"
-#import "VLMacroDefine.h"
 #import "SBGMacro.h"
+#import "AgoraEntScenarios-Swift.h"
+@import AgoraCommon;
 @import Masonry;
 
 @interface VLSBGPopScoreView ()
@@ -123,7 +123,7 @@
     if (!_scoreLabel) {
         _scoreLabel = [[UILabel alloc] init];
         _scoreLabel.text = SBGLocalizedString(@"99");
-        _scoreLabel.font = VLUIFontMake(30);
+        _scoreLabel.font = [UIFont systemFontOfSize:30];
         _scoreLabel.textColor = [UIColor whiteColor];
     }
     return _scoreLabel;
@@ -133,7 +133,7 @@
     if (!_scoreTitleLabel) {
         _scoreTitleLabel = [[UILabel alloc] init];
         _scoreTitleLabel.text = SBGLocalizedString(@"sbg_your_score");
-        _scoreTitleLabel.font = VLUIFontMake(14);
+        _scoreTitleLabel.font = [UIFont systemFontOfSize:14];
         _scoreTitleLabel.textColor = [UIColor whiteColor];
     }
     return _scoreTitleLabel;

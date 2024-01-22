@@ -7,7 +7,7 @@
 
 import UIKit
 
-class JSONObject {
+public class JSONObject {
     /// 字典转模型
     static func toModel<T: Codable>(_ type: T.Type, value: Any?) -> T? {
         guard let value = value else { return nil }
@@ -23,7 +23,7 @@ class JSONObject {
     }
 
     /// JSON字符串转模型
-    static func toModel<T: Codable>(_ type: T.Type, value: String?) -> T? {
+    public static func toModel<T: Codable>(_ type: T.Type, value: String?) -> T? {
         guard let value = value else { return nil }
         return toModel(type, value: value)
     }
@@ -37,19 +37,19 @@ class JSONObject {
     }
 
     /// 模型转JSON字符串
-    static func toJson<T: Codable>(_ model: T) -> [String: Any] {
+    public static func toJson<T: Codable>(_ model: T) -> [String: Any] {
         let jsonString = toJsonString(model) ?? ""
         return toDictionary(jsonString: jsonString)
     }
 
     /// 模型转JSON数组字符串
-    static func toJsonArray<T: Codable>(_ model: T) -> [[String: Any]]? {
+    public static func toJsonArray<T: Codable>(_ model: T) -> [[String: Any]]? {
         let jsonString = toJsonString(model) ?? ""
         return toArray(jsonString: jsonString)
     }
 
     /// 模型转JSON字符串
-    static func toJsonString<T: Codable>(_ model: T) -> String? {
+    public static func toJsonString<T: Codable>(_ model: T) -> String? {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
         guard let data = try? encoder.encode(model) else { return nil }
@@ -64,7 +64,7 @@ class JSONObject {
     }
     
     /// 模型转Data
-    static func toData<T: Codable>(_ model: T) -> Data? {
+    public static func toData<T: Codable>(_ model: T) -> Data? {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
         guard let data = try? encoder.encode(model) else { return nil }
@@ -90,7 +90,7 @@ class JSONObject {
     }
 
     /// 字典转JSON字符串
-    static func toJsonString(dict: [String: Any]?) -> String? {
+    public static func toJsonString(dict: [String: Any]?) -> String? {
         guard let dict = dict else { return nil }
         if !JSONSerialization.isValidJSONObject(dict) {
             print("字符串格式错误！")
@@ -102,7 +102,7 @@ class JSONObject {
     }
 
     /// 字典数组转JSON字符串
-    static func toJsonString(array: [[String: Any]?]?) -> String? {
+    public static func toJsonString(array: [[String: Any]?]?) -> String? {
         guard let array = array else { return nil }
         var jsonString = "["
         var i = 0
@@ -127,11 +127,11 @@ class JSONObject {
 }
 
 extension String {
-    func toArray() -> [[String: Any]]? {
+    public func toArray() -> [[String: Any]]? {
         JSONObject.toArray(jsonString: self)
     }
 
-    func toDictionary() -> [String: String] {
+    public func toDictionary() -> [String: String] {
         JSONObject.toDictionary(jsonStr: self)
     }
 }

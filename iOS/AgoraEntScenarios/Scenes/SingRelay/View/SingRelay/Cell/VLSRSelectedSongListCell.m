@@ -5,9 +5,9 @@
 
 #import "VLSRSelectedSongListCell.h"
 #import "VLSRSongItmModel.h"
-#import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 @import SDWebImage;
-
+@import AgoraCommon;
 @implementation VLSRSelectedSongListCell
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {

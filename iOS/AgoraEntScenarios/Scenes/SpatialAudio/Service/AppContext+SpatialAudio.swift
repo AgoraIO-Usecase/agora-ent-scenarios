@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import AgoraCommon
 let saLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "SpatialAudio"))
 extension AppContext {
     static private var _saServiceImp: SpatialAudioServiceProtocol?

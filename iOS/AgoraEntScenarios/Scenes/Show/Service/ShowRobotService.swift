@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import AgoraCommon
 class ShowRobotService {
     
     static let shared = ShowRobotService()

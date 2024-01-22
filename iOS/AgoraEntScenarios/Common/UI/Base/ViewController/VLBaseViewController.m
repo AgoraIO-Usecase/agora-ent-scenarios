@@ -7,7 +7,7 @@
 #import "VLMacroDefine.h"
 #import "VLHotSpotBtn.h"
 #import "AESMacro.h"
-
+#import "AgoraCommon/AgoraCommon-Swift.h"
 @interface VLBaseViewController ()
 
 @property (nonatomic, strong) UIImageView *backGroundImgView;

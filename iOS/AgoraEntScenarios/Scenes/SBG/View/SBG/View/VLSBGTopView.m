@@ -5,10 +5,10 @@
 
 #import "VLSBGTopView.h"
 #import "VLSBGRoomListModel.h"
-#import "VLHotSpotBtn.h"
+#import "AgoraEntScenarios-Swift.h"
 #import "SBGMacro.h"
 #import <SDWebImage/UIImageView+WebCache.h>
-
+@import AgoraCommon;
 @interface VLSBGTopView ()
 
 @property(nonatomic, weak) id <VLSBGTopViewDelegate>delegate;

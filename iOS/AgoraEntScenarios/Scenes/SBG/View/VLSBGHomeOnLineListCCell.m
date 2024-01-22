@@ -5,13 +5,11 @@
 
 #import "VLSBGHomeOnLineListCCell.h"
 #import "VLSBGRoomListModel.h"
-#import "VLHotSpotBtn.h"
-#import "VLMacroDefine.h"
-#import "VLFontUtils.h"
-#import "SBGMacro.h"
 #import <SDWebImage/UIImageView+WebCache.h>
+#import "AgoraEntScenarios-Swift.h"
+#import "SBGMacro.h"
 @import Masonry;
-
+@import AgoraCommon;
 @interface VLSBGHomeOnLineListCCell()
 
 @property (nonatomic, strong) UIImageView *iconImgView;

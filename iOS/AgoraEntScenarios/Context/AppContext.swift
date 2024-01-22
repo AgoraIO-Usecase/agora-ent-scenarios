@@ -8,15 +8,15 @@
 import Foundation
 import Bugly
 
-@objc class AppContext: NSObject {
-    @objc static let shared: AppContext = .init()
-    @objc var sceneLocalizeBundleName: String?
-    @objc var sceneImageBundleName: String?
-    @objc var extDic: NSMutableDictionary = NSMutableDictionary()
-    @objc var isDebugMode = false
+@objc public class AppContext: NSObject {
+    @objc public static let shared: AppContext = .init()
+    @objc public var sceneLocalizeBundleName: String?
+    @objc public var sceneImageBundleName: String?
+    @objc public var extDic: NSMutableDictionary = NSMutableDictionary()
+    @objc public var isDebugMode = false
     @objc var imageCahe = [String: AnyObject]()
-    @objc var localizedCache = [String: String]()
-    @objc var sceneConfig: VLSceneConfigsModel?
+    @objc public var localizedCache = [String: String]()
+    @objc public var sceneConfig: VLSceneConfigsModel?
     private var _appId: String = ""
     private var _certificate: String = ""
     private var _imAppKey: String = ""

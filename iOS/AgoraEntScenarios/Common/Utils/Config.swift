@@ -27,17 +27,17 @@ let SYNC_MANAGER_AGORA_CLUB_USERS = "agoraClubUsers"
 /// 消息信息
 let SYNC_SCENE_ROOM_MESSAGE_INFO = "messageInfo"
 /// 房间内用户列表
-let SYNC_SCENE_ROOM_USER_COLLECTION = "userCollection"
+public let SYNC_SCENE_ROOM_USER_COLLECTION = "userCollection"
 /// 商品信息
 let SYNC_SCENE_SHOPPING_INFO = "shoppingInfo"
 
 let APP_SCENARIO: Int = 100
 let SERVICE_TYPE: Int = 12
 
-let chatViewWidth = ScreenWidth * (287 / 375.0)
+let chatViewWidth = UIScreen.main.bounds.size.width * (287 / 375.0)
 
-enum UserInfo {
-    static var userId: String {
+public enum UserInfo {
+    public static var userId: String {
         return VLUserCenter.user.id
 
 //        let id = UserDefaults.standard.integer(forKey: "UserId")

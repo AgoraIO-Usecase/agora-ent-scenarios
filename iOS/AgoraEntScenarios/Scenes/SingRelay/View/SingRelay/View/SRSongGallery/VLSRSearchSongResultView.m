@@ -7,11 +7,7 @@
 #import "VLSRSelectedSongListCell.h"
 #import "VLSRSongItmModel.h"
 #import "VLURLPathConfig.h"
-#import "VLFontUtils.h"
-#import "VLMacroDefine.h"
-#import "VLUserCenter.h"
 #import "AppContext+SR.h"
-#import "AESMacro.h"
 #import "NSString+Helper.h"
 @import MJRefresh;
 
@@ -135,7 +131,7 @@ UITableViewDelegate
 //    _cLabel.textColor = [UIColor whiteColor];
 //
     self.emptyLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 60, SCREEN_WIDTH, 30)];
-    self.emptyLabel.font = VLUIFontMake(13);
+    self.emptyLabel.font = [UIFont systemFontOfSize:13];
     self.emptyLabel.textColor = [UIColor colorWithHexString:@"#979CBB"];
     self.emptyLabel.text = SRLocalizedString(@"SR_empty_search");
     self.emptyLabel.textAlignment = NSTextAlignmentCenter;

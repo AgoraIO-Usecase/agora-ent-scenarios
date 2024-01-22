@@ -8,7 +8,7 @@
 import SVProgressHUD
 import UIKit
 import ZSwiftBaseLib
-
+import AgoraCommon
 public class SAApplyUsersViewController: UITableViewController {
     
     private var apply: SAApplyEntity?

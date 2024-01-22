@@ -6,8 +6,7 @@
 #import "VLPopSongList.h"
 #import "VLSelectedSongList.h"
 #import "VLSongList.h"
-#import "VLHotSpotBtn.h"
-#import "AESMacro.h"
+@import AgoraCommon;
 
 @interface VLPopSongList ()<VLSelectedSongListDelegate,VLSongListDelegate>
 

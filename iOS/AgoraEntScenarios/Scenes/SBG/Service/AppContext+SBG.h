@@ -7,7 +7,8 @@
 
 #import "AgoraEntScenarios-Swift.h"
 #import "SBGServiceProtocol.h"
-@import AgoraRtcKit;
+
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface AppContext (SBG)

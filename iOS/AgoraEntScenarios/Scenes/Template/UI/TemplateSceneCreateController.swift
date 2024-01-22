@@ -7,7 +7,7 @@
 
 import Foundation
 import UIKit
-
+import AgoraCommon
 @objc class TemplateSceneCreateController: UIViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nil, bundle: nil)

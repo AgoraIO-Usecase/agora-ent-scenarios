@@ -7,13 +7,13 @@
 
 import UIKit
 import AgoraSyncManager
-
-class SyncUtil: NSObject {
+import AgoraCommon
+public class SyncUtil: NSObject {
     private static var manager: AgoraSyncManager?
     override private init() {}
     private static var sceneRefs: [String: SceneReference] = .init()
 
-    static func initSyncManager(sceneId: String, complete: @escaping SuccessBlockVoid) {
+    public static func initSyncManager(sceneId: String, complete: @escaping SuccessBlockVoid) {
 //        let config = AgoraSyncManager.RtmConfig(appId: KeyCenter.AppId,
 //                                                channelName: sceneId)
 //        manager = AgoraSyncManager(config: config, complete: { code in
@@ -23,7 +23,7 @@ class SyncUtil: NSObject {
 //                print("SyncManager init error")
 //            }
 //        })
-        let config = AgoraSyncManager.RethinkConfig(appId: KeyCenter.AppId,
+        let config = AgoraSyncManager.RethinkConfig(appId: AppContext.shared.appId,
                                                     channelName: sceneId)
 //        ToastView.showWait(text: "join Scene...", view: nil)
         manager = AgoraSyncManager(config: config, complete: { code in
@@ -38,7 +38,7 @@ class SyncUtil: NSObject {
         })
     }
 
-    class func joinScene(id: String,
+    public class func joinScene(id: String,
                          userId: String,
                          isOwner: Bool,
                          property: [String: Any]?,
@@ -77,24 +77,24 @@ class SyncUtil: NSObject {
         }
     }
 
-    class func scene(id: String) -> SceneReference? {
+    public class func scene(id: String) -> SceneReference? {
         sceneRefs[id]
     }
 
-    class func fetchAll(success: SuccessBlock? = nil, fail: FailBlock? = nil) {
+    public class func fetchAll(success: SuccessBlock? = nil, fail: FailBlock? = nil) {
         manager?.getScenes(success: success, fail: fail)
     }
 
-    class func leaveScene(id: String) {
+    public class func leaveScene(id: String) {
         manager?.leaveScene(roomId: id)
         sceneRefs.removeValue(forKey: id)
     }
     
-    class func subscribeConnectState(state: @escaping ConnectBlockState) {
+    public class func subscribeConnectState(state: @escaping ConnectBlockState) {
         manager?.subscribeConnectState(state: state)
     }
     
-    class func reset() {
+    public class func reset() {
         manager = nil
         sceneRefs.forEach({ $0.value.unsubscribe(key: $0.key) })
         sceneRefs.removeAll()
@@ -102,14 +102,14 @@ class SyncUtil: NSObject {
 }
 
 
-class SyncUtilsWrapper {
+public class SyncUtilsWrapper {
     static var syncUtilsInited: Bool = false
     static private var subscribeConnectStateMap: [String: (SocketConnectState, Bool)->Void] = [:]
     static private var joinSceneQueue: [()->()] = []
     static private var timer: Timer?
     static private var currentState: SocketConnectState = .connecting
     
-    class func initScene(uniqueId: String,
+    public class func initScene(uniqueId: String,
                          sceneId: String,
                          statusSubscribeCallback: @escaping (SocketConnectState, Bool)->Void) {
         subscribeConnectStateMap[uniqueId] = statusSubscribeCallback
@@ -167,7 +167,7 @@ class SyncUtilsWrapper {
     #endif
     }
     
-    class func joinSceneByQueue(id: String,
+    public class func joinSceneByQueue(id: String,
                                 userId: String,
                                 isOwner: Bool,
                                 property: [String: Any]?,
@@ -209,11 +209,11 @@ class SyncUtilsWrapper {
         _dequeueJoinScene()
     }
     
-    class func cleanScene(uniqueId: String) {
+    public class func cleanScene(uniqueId: String) {
         subscribeConnectStateMap.removeValue(forKey: uniqueId)
     }
     
-    class func cleanScene() {
+    public class func cleanScene() {
         syncUtilsInited = false
         currentState = .connecting
         subscribeConnectStateMap.removeAll()

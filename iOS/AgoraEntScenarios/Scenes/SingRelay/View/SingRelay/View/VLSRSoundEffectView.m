@@ -5,11 +5,11 @@
 
 #import "VLSRSoundEffectView.h"
 //#import "ZQTCustomSwitch.h"
-#import "VLHotSpotBtn.h"
-#import "AESMacro.h"
+//#import "AESMacro.h"
 #import "LSTPopView+SRModal.h"
-@import YYCategories;
-//@import ChameleonFramework;
+#import "AgoraEntScenarios-Swift.h"
+//@import YYCategories;
+@import AgoraCommon;
 
 @interface VLSRSoundEffectView ()
 

@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import AgoraCommon
 private let ShowPresettingCellID = "ShowPresettingCellID"
 private let ShowPresettingHeaderViewID = "ShowPresettingHeaderViewID"
 class ShowNetStateSelectViewController: UIViewController {

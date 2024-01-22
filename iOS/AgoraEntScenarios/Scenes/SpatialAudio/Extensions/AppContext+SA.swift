@@ -6,7 +6,7 @@
 //
 
 private let kIsApmOn = "kIsApmOn"
-
+import AgoraCommon
 extension AppContext {
     
     var isApmOn: Bool {

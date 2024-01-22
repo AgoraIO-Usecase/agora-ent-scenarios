@@ -5,10 +5,9 @@
 
 #import "VLSBGPopSelBgView.h"
 #import "VLSBGSelBgModel.h"
-#import "VLFontUtils.h"
-#import "VLMacroDefine.h"
 #import "SBGMacro.h"
-
+#import "AgoraEntScenarios-Swift.h"
+@import AgoraCommon;
 @interface VLSBGPopSelBgView ()<UICollectionViewDataSource,UICollectionViewDelegate>
 
 @property(nonatomic, weak) id <VLSBGPopSelBgViewDelegate>delegate;
@@ -34,7 +33,7 @@
 
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
     titleLabel.text = SBGLocalizedString(@"MV");
-    titleLabel.font = VLUIFontMake(16);
+    titleLabel.font = [UIFont systemFontOfSize:16];
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:titleLabel];

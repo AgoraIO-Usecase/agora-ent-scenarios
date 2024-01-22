@@ -4,10 +4,8 @@
 //
 
 #import "VLSRSwitcherView.h"
-#import "VLFontUtils.h"
 @import Masonry;
-#import "AESMacro.h"
-
+@import AgoraCommon;
 @interface VLSRSwitcherView()
 
 @property (nonatomic, strong) UISwitch *switcher;
@@ -72,7 +70,7 @@
 - (UILabel *)subLabel {
     if (!_subLabel) {
         _subLabel = [[UILabel alloc] init];
-        _subLabel.font = VLUIFontMake(12);
+        _subLabel.font = [UIFont systemFontOfSize:12];
         _subLabel.textColor = UIColorMakeWithHex(@"#6C7192");
     }
     return _subLabel;

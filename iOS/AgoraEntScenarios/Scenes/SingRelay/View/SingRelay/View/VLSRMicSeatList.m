@@ -5,9 +5,7 @@
 
 #import "VLSRMicSeatList.h"
 #import "VLSRMicSeatCell.h"
-#import "VLMacroDefine.h"
-#import "VLUserCenter.h"
-#import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 @import YYCategories;
 @import SDWebImage;
 

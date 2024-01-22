@@ -8,7 +8,7 @@
 import Foundation
 import YYCategories
 import SVProgressHUD
-
+import AgoraCommon
 private let rSceneId = "scene_singrelay_4.0.0"
 
 /// 座位信息

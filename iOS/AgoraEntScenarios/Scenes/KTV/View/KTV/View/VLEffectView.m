@@ -6,7 +6,8 @@
 //
 
 #import "VLEffectView.h"
-#import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
+
 @interface VLEffectView()
 @property(nonatomic, weak) id <VLEffectViewDelegate>delegate;
 @property (nonatomic,strong) UIButton *selBtn;

@@ -5,7 +5,7 @@
 
 #import <UIKit/UIKit.h>
 #import <AgoraRtcKit/AgoraRtcKit.h>
-
+@import AgoraCommon;
 typedef enum : NSUInteger {
     VLRoomSeatDropTypeSelfly = 0,//自己下麦
     VLRoomSeatDropTypeForceByRoomer //被房主强制下麦

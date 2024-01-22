@@ -5,9 +5,9 @@
 
 #import "VLSRKindsView.h"
 #import "VLSRKindsCell.h"
-#import "AESMacro.h"
-@import Masonry;
 
+@import Masonry;
+@import AgoraCommon;
 @interface VLSRKindsView() <UICollectionViewDataSource,UICollectionViewDelegate>
 
 @property (nonatomic, strong) UICollectionView *collectionView;

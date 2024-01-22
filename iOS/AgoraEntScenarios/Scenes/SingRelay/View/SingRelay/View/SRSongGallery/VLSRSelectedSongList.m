@@ -10,7 +10,7 @@
 #import "VLSRSongItmModel.h"
 #import "VLHotSpotBtn.h"
 #import "AESMacro.h"
-
+#import "AgoraEntScenarios-Swift.h"
 #define BASICVCINDEX 100
 
 @interface VLSRSelectedSongList ()<

@@ -8,6 +8,7 @@
 #import "VLVoicePerShowView.h"
 #import "AESMacro.h"
 #import "VLMacroDefine.h"
+@import AgoraCommon;
 @interface VLVoicePerShowView()
 @property(nonatomic, weak) id <VLVoicePerShowViewDelegate>delegate;
 @property (nonatomic,strong) UISwitch *voiceSwitch;

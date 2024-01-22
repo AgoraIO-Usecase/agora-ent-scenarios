@@ -6,7 +6,7 @@
 //
 
 private let kvrIsApmOn = "kvrIsApmOn"
-
+import AgoraCommon
 extension AppContext {
     
     var isVRApmOn: Bool {

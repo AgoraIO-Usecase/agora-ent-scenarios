@@ -9,7 +9,6 @@
 #import "VLSBGSearchSongResultView.h"
 #import "VLSBGRoomListModel.h"
 #import "VLSBGSongItmModel.h"
-#import "VLHotSpotBtn.h"
 #import "SBGMacro.h"
 
 #define BASICVCINDEX 100

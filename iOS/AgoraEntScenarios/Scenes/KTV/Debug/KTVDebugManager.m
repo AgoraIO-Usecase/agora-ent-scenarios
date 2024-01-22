@@ -8,9 +8,9 @@
 #import "KTVDebugManager.h"
 #import "KTVDebugViewController.h"
 #import "KTVDebugInfo.h"
-#import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 @import AgoraRtcKit;
-
+@import AgoraCommon;
 @implementation KTVDebugManager
 //[AgoraRtcEngineKit sharedEngineWithAppId:[AppContext.shared appId] delegate:self]
 + (UIGestureRecognizer*)createStartGesture {

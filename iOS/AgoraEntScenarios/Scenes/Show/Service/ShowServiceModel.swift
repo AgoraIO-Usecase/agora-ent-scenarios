@@ -7,7 +7,7 @@
 
 import Foundation
 import VideoLoaderAPI
-
+import AgoraCommon
 @objc enum ShowRoomStatus: Int {
     /// 直播中
     case activity = 0

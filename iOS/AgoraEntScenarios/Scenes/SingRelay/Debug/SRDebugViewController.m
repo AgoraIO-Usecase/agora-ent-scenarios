@@ -8,7 +8,7 @@
 #import "SRDebugViewController.h"
 #import "SRDebugInfo.h"
 #import "SRDebugManager.h"
-#import "AESMacro.h"
+#import "SBGMacro.h"
 @import AgoraRtcKit;
 
 @interface SRDebugViewController () <UITableViewDelegate, UITableViewDataSource>

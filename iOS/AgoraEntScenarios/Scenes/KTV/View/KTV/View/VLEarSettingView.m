@@ -8,11 +8,9 @@
 #import "VLEarSettingView.h"
 #import "VLKTVSliderView.h"
 #import <Masonry/Masonry.h>
-#import "AESMacro.h"
-#import "VLMacroDefine.h"
 #import "HeadSetManager.h"
 #import "VLToast.h"
-
+#import "AgoraEntScenarios-Swift.h"
 @interface VLEarSettingView()<VLKTVSliderViewDelegate>
 @property (nonatomic,strong) UILabel *titleLabel;
 @property (nonatomic,strong) UILabel *earLabel;

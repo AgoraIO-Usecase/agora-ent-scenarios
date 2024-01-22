@@ -9,7 +9,7 @@ import UIKit
 import AgoraRtcKit
 import VideoLoaderAPI
 import CallAPI
-
+import AgoraCommon
 
 class CallAgoraExProxy: CallApiProxy, AgoraRtcEngineDelegate {
 }

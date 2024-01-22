@@ -10,17 +10,17 @@ import UIKit
 @objc public class AUiMoreDialog: UIView {
     private lazy var contentView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(hex: "#000000", alpha: 0.85)
+        view.backgroundColor = UIColor.init(red: 0, green: 0, blue: 0, alpha: 0.85)
         view.layer.cornerRadius = 15
         view.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         view.frame = CGRect(origin: .zero, size: CGSize(width: self.frame.size.width, height: 152))
         return view
     }()
     
-    private lazy var reportButton: UIButton = {
+    public lazy var reportButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage.sceneImage(name: "report_icon", bundleName: "VoiceChatRoomResource"), for: .normal)
-        button.setTitle("voice_report".voice_localized(), for: .normal)
+        button.setImage(UIImage.common_sceneImage(name: "report_icon"), for: .normal)
+        button.setTitle(commonSceneLocalized("report"), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         button.setTitleColor(.gray, for: .normal)
         button.contentHorizontalAlignment = .center;
@@ -63,7 +63,7 @@ import UIKit
         }
     }
     
-    @objc func show() {
+    @objc public func show() {
         contentView.bottom = 0
         UIView.animate(withDuration: 0.3, delay: 0) {
             self.contentView.top = 0
@@ -78,10 +78,11 @@ import UIKit
         }
     }
     
-    @objc private func onAction(_ sender: UIButton) {
+    @objc public func onAction(_ sender: UIButton) {
         //TODO: mock success
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.2) {
-            ToastView.show(text: "voice_report_success".voice_localized())
+            // cp todo
+            ToastView.show(text: commonSceneLocalized("report_success"))
         }
     }
 }

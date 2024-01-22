@@ -10,7 +10,7 @@ import YYCategories
 import CallAPI
 import AgoraRtcKit
 import VideoLoaderAPI
-
+import AgoraCommon
 private let randomRoomName = [
     "show_create_room_name1".showTo1v1Localization(),
     "show_create_room_name2".showTo1v1Localization(),

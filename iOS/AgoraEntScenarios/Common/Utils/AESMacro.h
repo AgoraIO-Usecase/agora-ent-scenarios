@@ -9,7 +9,6 @@
 #define AESMacro_h
 
 @import YYCategories;
-#import "AgoraEntScenarios-Swift.h"
 #import "QMUICommonDefines.h"
 #import "VLDeviceUtils.h"
 #import "QMUIHelper.h"
@@ -26,6 +25,7 @@
 #define UIColorGreen                [UIColor greenColor]
 #define UIColorBlue                 [UIColor blueColor]
 #define UIColorYellow               [UIColor yellowColor]
+#define VLUIFontMake(s)             ([UIFont systemFontOfSize:s])
 
 
 /// toolBar相关frame
@@ -35,7 +35,7 @@
 //#define TabBarHeight (IS_IPAD ? (IS_NOTCHED_SCREEN ? 65 : (IOS_VERSION >= 12.0 ? 50 : 49)) : (IS_LANDSCAPE ? PreferredValueForVisualDevice(49, 32) : 49) + SafeAreaInsetsConstantForDeviceWithNotch.bottom)
 
 #define KTVLocalizedString(s) ([s toSceneLocalization])
-#define SRLocalizedString(s) ([s toSceneLocalization:@"SRResource"])
+#define SRLocalizedString(s) ([s toSceneLocalizationWith:@"SRResource"])
 #define SRLogInfo(format, ...)  ([SRLog infoWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"SingRelay"])
 #define SRLogError(format, ...)  ([SRLog errorWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"SingRelay"])
 #define KTVLogInfo(format, ...)  ([KTVLog infoWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"KTV"])

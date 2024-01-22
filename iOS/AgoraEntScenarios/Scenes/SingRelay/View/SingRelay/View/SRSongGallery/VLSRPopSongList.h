@@ -7,6 +7,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 @class VLSRPopSongList;
+@import AgoraCommon;
 @protocol VLSRPopSongListDelegate <NSObject>
 
 @optional

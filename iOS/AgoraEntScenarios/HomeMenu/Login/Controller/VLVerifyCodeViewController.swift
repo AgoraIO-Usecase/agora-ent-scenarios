@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import AgoraCommon
 class VLVerifyCodeViewController: VLBaseViewController {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()

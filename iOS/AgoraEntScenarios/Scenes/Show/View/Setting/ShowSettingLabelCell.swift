@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import AgoraCommon
 class ShowSettingLabelCell: ShowSettingBaseCell {
     private var cellDidSelectedAction: (()->())?
     

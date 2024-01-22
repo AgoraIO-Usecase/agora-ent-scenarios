@@ -7,7 +7,7 @@
 
 import UIKit
 import AgoraRtcKit
-
+import AgoraCommon
 class SA3DRtcView: UIView {
     private var collectionView: UICollectionView!
     private let vIdentifier = "3D"

@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *agoraRTCToken;
 @property (nonatomic, readonly) UInt32 agoraPlayerRTCUid;
 @property (nonatomic, copy) NSString *agoraPlayerRTCToken;
+@property (nonatomic, copy) NSString *audienceChannelToken;
 
 //for sync manager
 @property (nonatomic, copy, nullable) NSString* objectId;

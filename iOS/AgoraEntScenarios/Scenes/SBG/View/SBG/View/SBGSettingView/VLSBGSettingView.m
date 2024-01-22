@@ -9,7 +9,6 @@
 #import "VLSBGSliderView.h"
 #import "VLSBGKindsView.h"
 #import "VLSBGRemoteVolumeView.h"
-#import "VLFontUtils.h"
 #import "SBGMacro.h"
 @import Masonry;
 
@@ -146,7 +145,7 @@ VLSBGRemoteVolumeViewDelegate
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] init];
         _titleLabel.text = SBGLocalizedString(@"sbg_music_menu_dialog_title");
-        _titleLabel.font = VLUIFontMake(16);
+        _titleLabel.font = [UIFont systemFontOfSize:16];
         _titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     }
     return _titleLabel;

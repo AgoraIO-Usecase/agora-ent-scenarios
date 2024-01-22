@@ -11,10 +11,8 @@
 #import <sys/utsname.h>
 #import <CommonCrypto/CommonCryptor.h>
 #import <CommonCrypto/CommonDigest.h> // Need to import for CC_MD5 access
-#import "VLFontUtils.h"
-#import "AESMacro.h"
 @import UIKit;
-
+@import AgoraCommon;
 //空字符串
 #define     LocalStr_None           @""
 static const char encodingTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -342,7 +340,7 @@ static const char encodingTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopq
 
 + (NSMutableAttributedString*)changeLabelWithText:(NSString*)needText {
     NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:needText];
-    UIFont *font = VLUIFontMediumMake(24);
+    UIFont *font = [UIFont systemFontOfSize:24];
     [attrString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0,needText.length-1)];
     [attrString addAttribute:NSFontAttributeName value:UIFontMake(12) range:NSMakeRange(needText.length-1,1)];
     return attrString;

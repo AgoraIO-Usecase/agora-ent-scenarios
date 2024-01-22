@@ -8,7 +8,7 @@
 import Foundation
 import AVFoundation
 import UIKit
-
+import AgoraCommon
 @objc public enum checkAuthType: Int {
     case all
     case audio
@@ -17,14 +17,14 @@ import UIKit
 
 open class AgoraEntAuthorizedManager: NSObject {
     @objc class func showAudioAuthorizedFail(parent: UIViewController) {
-        showAuthorizedFail(parent: parent, message: "麦克风权限未设置,请设置麦克风权限")
+        showAuthorizedFail(parent: parent, message: commonSceneLocalized("authorized_microphone_fail"))
     }
     
     @objc class func showCameraAuthorizedFail(parent: UIViewController) {
-        showAuthorizedFail(parent: parent, message: "摄像头权限未设置,请设置摄像头权限")
+        showAuthorizedFail(parent: parent, message: commonSceneLocalized("authorized_camera_fail"))
     }
     
-    @objc class func checkMediaAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
+    @objc public class func checkMediaAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
         var isPermission: Bool = true
         let group = DispatchGroup()
         group.enter()
@@ -77,7 +77,7 @@ open class AgoraEntAuthorizedManager: NSObject {
         }
     }
     
-    @objc class func checkAudioAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
+    @objc public class func checkAudioAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
         requestAudioSession { granted in
             if !granted {
                 showAudioAuthorizedFail(parent: parent)
@@ -86,7 +86,7 @@ open class AgoraEntAuthorizedManager: NSObject {
         }
     }
     
-    @objc class func checkCameraAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
+    @objc public class func checkCameraAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
         requestCapture { granted in
             if !granted {
                 showCameraAuthorizedFail(parent: parent)
@@ -96,14 +96,14 @@ open class AgoraEntAuthorizedManager: NSObject {
     }
     
     @objc class func showAuthorizedFail(parent: UIViewController, message: String) {
-        let vc = UIAlertController(title: "提示".toSceneLocalization() as String,
+        let vc = UIAlertController(title: commonSceneLocalized("authorized_title") as String,
                                    message: message,
                                    preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "确定".toSceneLocalization() as String,
+        let okAction = UIAlertAction(title: commonSceneLocalized("authorized_ok") as String,
                                      style: .default) { action in
             UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
         }
-        let cancelAction = UIAlertAction(title: "取消".toSceneLocalization() as String,
+        let cancelAction = UIAlertAction(title: commonSceneLocalized("authorized_cancel") as String,
                                          style: .cancel)
         vc.addAction(cancelAction)
         vc.addAction(okAction)

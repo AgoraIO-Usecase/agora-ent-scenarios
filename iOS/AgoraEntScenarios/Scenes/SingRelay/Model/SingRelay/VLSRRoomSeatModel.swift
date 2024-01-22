@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import AgoraCommon
 
+@objcMembers
 class VLSRRoomSeatModel: VLBaseModel {
     /// 是否是房主
     @objc var isMaster: Bool = false

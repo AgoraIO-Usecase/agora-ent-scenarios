@@ -9,12 +9,14 @@ import Foundation
 import AgoraCommon
 extension UIWindow {
     func configRootViewController() {
-        if VLUserCenter.shared().isLogin() {
-            self.rootViewController = VLMainTabBarController()
-        } else {
-            let rootVC = VLLoginController()
-            let nav = BaseNavigationController(rootViewController: rootVC)
-            self.rootViewController = nav
+        DispatchQueue.main.async {
+            if VLUserCenter.shared().isLogin() {
+                self.rootViewController = VLMainTabBarController()
+            } else {
+                let rootVC = VLLoginController()
+                let nav = BaseNavigationController(rootViewController: rootVC)
+                self.rootViewController = nav
+            }
         }
     }
 }

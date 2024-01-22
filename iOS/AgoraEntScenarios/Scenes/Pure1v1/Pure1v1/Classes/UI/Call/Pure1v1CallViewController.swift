@@ -8,7 +8,7 @@
 import Foundation
 import CallAPI
 import AgoraRtcKit
-
+import AgoraCommon
 class Pure1v1CallViewController: UIViewController {
     var callApi: CallApiProtocol? {
         didSet {

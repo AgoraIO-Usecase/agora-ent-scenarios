@@ -7,14 +7,10 @@
 #import "VLSelectedSongListCell.h"
 #import "VLSongItmModel.h"
 #import "VLURLPathConfig.h"
-#import "VLFontUtils.h"
-#import "VLMacroDefine.h"
-#import "VLUserCenter.h"
 #import "AppContext+KTV.h"
-#import "AESMacro.h"
 #import "NSString+Helper.h"
 @import MJRefresh;
-
+@import AgoraCommon;
 @interface VLSearchSongResultView()<
 UITableViewDataSource,
 UITableViewDelegate
@@ -135,7 +131,7 @@ UITableViewDelegate
 //    _cLabel.textColor = [UIColor whiteColor];
 //
     self.emptyLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 60, SCREEN_WIDTH, 30)];
-    self.emptyLabel.font = VLUIFontMake(13);
+    self.emptyLabel.font = [UIFont systemFontOfSize:13];
     self.emptyLabel.textColor = [UIColor colorWithHexString:@"#979CBB"];
     self.emptyLabel.text = KTVLocalizedString(@"ktv_empty_search");
     self.emptyLabel.textAlignment = NSTextAlignmentCenter;
