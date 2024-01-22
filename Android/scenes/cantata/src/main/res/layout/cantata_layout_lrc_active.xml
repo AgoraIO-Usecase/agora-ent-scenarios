@@ -142,32 +142,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/ivMusicStart" />
 
-    <ImageView
-        android:id="@+id/ivJoinChorusBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="10dp"
-        android:src="@drawable/cantata_join_chorus"
-        android:visibility="invisible"
-        tools:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <ImageView
-        android:id="@+id/ivJoinChorusLoading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="10dp"
-        android:src="@drawable/cantata_join_chorus_loading"
-        android:clickable="false"
-        android:visibility="invisible"
-        app:layout_constraintTop_toTopOf="@id/ivJoinChorusBtn"
-        app:layout_constraintEnd_toEndOf="@id/ivJoinChorusBtn"
-        app:layout_constraintStart_toStartOf="@id/ivJoinChorusBtn" />
-
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/ivSkipPrelude"
         android:layout_width="80dp"
@@ -299,5 +273,31 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="24dp" />
+
+    <ImageView
+        android:id="@+id/ivJoinChorusBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/cantata_join_chorus"
+        android:visibility="invisible"
+        tools:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/ivJoinChorusLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/cantata_join_chorus_loading"
+        android:clickable="false"
+        android:visibility="invisible"
+        app:layout_constraintTop_toTopOf="@id/ivJoinChorusBtn"
+        app:layout_constraintEnd_toEndOf="@id/ivJoinChorusBtn"
+        app:layout_constraintStart_toStartOf="@id/ivJoinChorusBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

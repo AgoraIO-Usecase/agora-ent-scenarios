@@ -18,7 +18,7 @@
         android:clipChildren="false"
         >
 
-        <io.agora.scene.ktv.live.holder.MicSeatWaveView
+        <io.agora.scene.ktv.widget.MicSeatWaveView
             android:id="@+id/vMicWave"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

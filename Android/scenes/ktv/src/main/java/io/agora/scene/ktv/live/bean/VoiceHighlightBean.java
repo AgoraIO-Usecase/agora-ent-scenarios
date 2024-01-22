@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.widget.voiceHighlight;
+package io.agora.scene.ktv.live.bean;
 
 import io.agora.scene.ktv.service.RoomSeatModel;
 

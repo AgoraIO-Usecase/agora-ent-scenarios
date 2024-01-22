@@ -1,22 +1,26 @@
 package io.agora.scene.cantata.ui.dialog
 
+import io.agora.rtc2.Constants
+
 interface EarPhoneCallback {
     fun onHasEarPhoneChanged(hasEarPhone: Boolean)
     fun onEarMonitorDelay(earsBackDelay: Int)
 }
 
 class MusicSettingBean constructor(
+    var audioEffect: Int,
     private var isEar: Boolean,
     private var volMic: Int,
     private var volMusic: Int,
     private var toneValue: Int,
     private var mCallback: MusicSettingCallback
 ) {
-    var effect = 0
-        set(effect) {
-            field = effect
-            mCallback.onEffectChanged(effect)
-        }
+
+    fun setAudioEffectPreset(audioEffect: Int) {
+        this.audioEffect = audioEffect
+        mCallback.onEffectChanged(audioEffect)
+    }
+
     var beautifier = 0
         set(beautifier) {
             field = beautifier
@@ -98,4 +102,24 @@ class MusicSettingBean constructor(
         set(value) {
             field = value
         }
+
+
+    // ------------------ 音效调整 ------------------
+    fun getEffectIndex(index: Int): Int {
+        when (index) {
+            // 大合唱
+            0 -> return Constants.ROOM_ACOUSTICS_CHORUS
+            1 -> return Constants.AUDIO_EFFECT_OFF
+            2 -> return Constants.ROOM_ACOUSTICS_KTV
+            3 -> return Constants.ROOM_ACOUSTICS_VOCAL_CONCERT
+            4 -> return Constants.ROOM_ACOUSTICS_STUDIO
+            5 -> return Constants.ROOM_ACOUSTICS_PHONOGRAPH
+            6 -> return Constants.ROOM_ACOUSTICS_SPACIAL
+            7 -> return Constants.ROOM_ACOUSTICS_ETHEREAL
+            8 -> return Constants.STYLE_TRANSFORMATION_POPULAR
+            9 -> return Constants.STYLE_TRANSFORMATION_RNB
+        }
+        // 大合唱
+        return Constants.ROOM_ACOUSTICS_CHORUS
+    }
 }

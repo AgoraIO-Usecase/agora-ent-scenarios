@@ -1,6 +1,7 @@
 package io.agora.scene.cantata.ui.viewmodel
 
 import android.text.TextUtils
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,7 +17,6 @@ import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.event.NetWorkEvent
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.ktvapi.*
@@ -26,6 +26,7 @@ import io.agora.scene.cantata.ui.dialog.CantataDebugSettingsDialog
 import io.agora.scene.cantata.ui.dialog.MusicSettingBean
 import io.agora.scene.cantata.ui.dialog.MusicSettingCallback
 import io.agora.scene.cantata.ui.widget.rankList.RankItem
+import io.agora.scene.widget.toast.CustomToast
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -54,6 +55,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
     companion object {
         private const val TAG = "Cantata_Scene_Log"
+        private const val DEFAULT_AUDIO_EFFECT = Constants.ROOM_ACOUSTICS_CHORUS
     }
 
     private val mCantataServiceProtocol = CantataServiceProtocol.getImplInstance()
@@ -96,6 +98,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     var mStreamId = 0
 
     val mPlayerMusicStatusLiveData = MutableLiveData<PlayerMusicStatus>()
+
+    // 加载音乐进度
+    val loadMusicProgressLiveData = MutableLiveData<Int>()
 
     val mJoinChorusStatusLiveData = MutableLiveData<JoinChorusStatus>()
     val mNoLrcLiveData = MutableLiveData<Boolean>()
@@ -266,7 +271,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             } else {
                 // failure
                 CantataLogger.e(TAG, "RoomLivingViewModel.exitRoom() failed:${e.message} ")
-                ToastUtils.showToast(e.message)
+                e.message?.let {
+                    CustomToast.show(it)
+                }
             }
         }
     }
@@ -342,7 +349,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 //mSeatListLiveData.value = value
                 if (roomSeat.userNo == UserManager.getInstance().user.id.toString()) {
                     if (!leaveSeatBySelf) {
-                        ToastUtils.showToast(R.string.cantata_kick_off)
+                        CustomToast.show(R.string.cantata_kick_off)
                     } else {
                         leaveSeatBySelf = false
                     }
@@ -395,7 +402,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             } else {
                 // failure
                 CantataLogger.e(TAG, "RoomLivingViewModel.haveSeat() failed: " + e.message)
-                ToastUtils.showToast(e.message)
+                e.message?.let {
+                    CustomToast.show(it)
+                }
             }
         }
     }
@@ -433,7 +442,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             } else {
                 // failure
                 CantataLogger.e(TAG, "RoomLivingViewModel.leaveSeat() failed: " + e.message)
-                ToastUtils.showToast(e.message)
+                e.message?.let {
+                    CustomToast.show(it)
+                }
             }
         }
     }
@@ -451,7 +462,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             } else {
                 // failure
                 CantataLogger.e(TAG, "RoomLivingViewModel.toggleMic() failed:${e.message}")
-                ToastUtils.showToast(e.message)
+                e.message?.let {
+                    CustomToast.show(it)
+                }
             }
         }
     }
@@ -513,9 +526,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 mSeatListLiveData.postValue(mSeatListLiveData.value)
             } else {
                 // failed
-                if (e != null) {
-                    CantataLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed:${e.message}")
-                    ToastUtils.showToast(e.message)
+                CantataLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed:${e?.message}")
+                e?.message?.let {
+                    CustomToast.show(it)
                 }
             }
         }
@@ -550,9 +563,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 }
             } else {
                 // failed
-                if (e != null) {
-                    CantataLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed:${e.message}")
-                    ToastUtils.showToast(e.message)
+                CantataLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed:${e?.message}")
+                e?.message?.let {
+                    CustomToast.show(it)
                 }
             }
         }
@@ -567,9 +580,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 mSongsOrderedLiveData.postValue(data)
             } else {
                 // failed
-                if (e != null) {
-                    CantataLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed:${e.message}")
-                    ToastUtils.showToast(e.message)
+                CantataLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed:${e?.message}")
+                e?.message?.let {
+                    CustomToast.show(it)
                 }
             }
         }
@@ -653,8 +666,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     }
                     liveData.postValue(songs)
                 } else {
-                    e?.let {
-                        ToastUtils.showToast(e.message)
+                    e?.message?.let {
+                        CustomToast.show(it)
                     }
                 }
             }
@@ -707,8 +720,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     }
                     liveData.postValue(songs)
                 } else {
-                    e?.let {
-                        ToastUtils.showToast(it.message)
+                    e?.message?.let {
+                        CustomToast.show(it)
                     }
                 }
             }
@@ -738,7 +751,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             } else {
                 // failure
                 CantataLogger.e(TAG, "RoomLivingViewModel.chooseSong() failed:${e.message}")
-                ToastUtils.showToast(e.message)
+                e.message?.let {
+                    CustomToast.show(it)
+                }
                 liveData.postValue(false)
             }
         }
@@ -758,7 +773,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             } else {
                 // failure
                 CantataLogger.e(TAG, "RoomLivingViewModel.deleteSong() failed:${e.message}")
-                ToastUtils.showToast(e.message)
+                e?.message?.let {
+                    CustomToast.show(it)
+                }
             }
         }
     }
@@ -775,7 +792,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             } else {
                 // failure
                 CantataLogger.e(TAG, "RoomLivingViewModel.topUpSong() failed:${e.message}")
-                ToastUtils.showToast(e.message)
+                e.message?.let {
+                    CustomToast.show(it)
+                }
             }
         }
     }
@@ -816,17 +835,18 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     CantataLogger.d(
                         TAG, "onMusicLoadProgress, songCode: $songCode percent: $percent lyricUrl: $lyricUrl"
                     )
+                    loadMusicProgressLiveData.postValue(percent)
                 }
 
                 override fun onMusicLoadFail(songCode: Long, reason: KTVLoadSongFailReason) {
-                    ToastUtils.showToastLong(R.string.cantata_join_chorus_failed)
+                    CustomToast.show(R.string.cantata_join_chorus_failed, Toast.LENGTH_LONG)
                     mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
                 }
 
                 override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
                     mKtvApi.switchSingerRole2(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
                         override fun onSwitchRoleFail(reason: SwitchRoleFailReason) {
-                            ToastUtils.showToastLong(R.string.cantata_join_chorus_failed)
+                            CustomToast.show(R.string.cantata_join_chorus_failed, Toast.LENGTH_LONG)
                             mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
                         }
 
@@ -843,7 +863,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                                         mAudioTrackMode = KTVPlayerTrackMode.Acc
                                         mIsOnSeat = true
                                     } else {
-                                        ToastUtils.showToastLong(R.string.cantata_join_chorus_failed)
+                                        CustomToast.show(R.string.cantata_join_chorus_failed, Toast.LENGTH_LONG)
                                         mKtvApi.switchSingerRole2(KTVSingRole.Audience, null)
                                         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
                                     }
@@ -893,7 +913,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             } else {
                 // failed
                 CantataLogger.e(TAG, "RoomLivingViewModel.changeMusic() failed:${e.message}")
-                ToastUtils.showToast(e.message)
+                e.message?.let {
+                    CustomToast.show(it)
+                }
                 mPlayerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_END)
             }
         }
@@ -919,6 +941,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
         // ------------------ 初始化音乐播放设置面版 ------------------
         mMusicSetting = MusicSettingBean(
+            DEFAULT_AUDIO_EFFECT,
             false,
             100,
             50,
@@ -942,8 +965,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     setMusicVolume(vol)
                 }
 
-                override fun onEffectChanged(effect: Int) {
-                    setAudioEffectPreset(getEffectIndex(effect))
+                override fun onEffectChanged(audioEffect: Int) {
+                    setAudioEffectPreset(audioEffect)
                 }
 
                 override fun onBeautifierPresetChanged(effect: Int) {
@@ -1022,7 +1045,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             override fun onContentInspectResult(result: Int) {
                 super.onContentInspectResult(result)
                 if (result > 1) {
-                    ToastUtils.showToast(R.string.cantata_content)
+                    CustomToast.show(R.string.cantata_content)
                 }
             }
 
@@ -1132,7 +1155,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     override fun onContentInspectResult(result: Int) {
                         super.onContentInspectResult(result)
                         if (result > 1) {
-                            ToastUtils.showToast(R.string.cantata_content)
+                            CustomToast.show(R.string.cantata_content)
                         }
                     }
 
@@ -1194,6 +1217,10 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 mRtcEngine?.setParameters(parameters)
             }
         })
+
+        mMusicSetting?.audioEffect?.let {
+            setAudioEffectPreset(it)
+        }
     }
 
     private fun setAudioEffectPreset(effect: Int) {
@@ -1201,24 +1228,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
     // ======================= settings =======================
-    // ------------------ 音效调整 ------------------
-    private fun getEffectIndex(index: Int): Int {
-        when (index) {
-            0 -> return Constants.AUDIO_EFFECT_OFF
-            1 -> return Constants.ROOM_ACOUSTICS_CHORUS
-            2 -> return Constants.ROOM_ACOUSTICS_KTV
-            3 -> return Constants.ROOM_ACOUSTICS_VOCAL_CONCERT
-            4 -> return Constants.ROOM_ACOUSTICS_STUDIO
-            5 -> return Constants.ROOM_ACOUSTICS_PHONOGRAPH
-            6 -> return Constants.ROOM_ACOUSTICS_SPACIAL
-            7 -> return Constants.ROOM_ACOUSTICS_ETHEREAL
-            8 -> return Constants.STYLE_TRANSFORMATION_POPULAR
-            9 -> return Constants.STYLE_TRANSFORMATION_RNB
-        }
-        // 原声
-        return Constants.AUDIO_EFFECT_OFF
-    }
-
     // ------------------ 音量调整 ------------------
     private var micVolume = 100
     private var micOldVolume = 100
@@ -1329,8 +1338,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
         // 标记歌曲为播放中
         mCantataServiceProtocol.makeSongDidPlay(music) { e: java.lang.Exception? ->
-            e?.let { // failure
-                ToastUtils.showToast(it.message)
+            e?.message?.let { // failure
+                CustomToast.show(it)
             }
         }
     }
@@ -1345,12 +1354,13 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 lyricUrl: String?
             ) {
                 CantataLogger.d(TAG, "onMusicLoadProgress, songCode: $songCode percent: $percent lyricUrl: $lyricUrl")
+                loadMusicProgressLiveData.postValue(percent)
             }
 
             override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
                 // 当前已被切歌
                 if (mSongPlayingLiveData.value == null) {
-                    ToastUtils.showToastLong(R.string.cantata_load_failed_no_song)
+                    CustomToast.show(R.string.cantata_load_failed_no_song, Toast.LENGTH_LONG)
                     return
                 }
 
@@ -1371,7 +1381,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             override fun onMusicLoadFail(songCode: Long, reason: KTVLoadSongFailReason) {
                 // 当前已被切歌
                 if (mSongPlayingLiveData.value == null) {
-                    ToastUtils.showToastLong(R.string.cantata_load_failed_no_song)
+                    CustomToast.show(R.string.cantata_load_failed_no_song, Toast.LENGTH_LONG)
                     return
                 }
                 CantataLogger.e(TAG, "onMusicLoadFail， reason: $reason")
@@ -1386,17 +1396,17 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     mNoLrcLiveData.postValue(true)
                 } else if (reason == KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL) {
                     // 歌曲加载失败 ，重试3次
-                    ToastUtils.showToastLong(R.string.cantata_load_failed)
+                    CustomToast.show(R.string.cantata_load_failed, Toast.LENGTH_LONG)
                     mRetryTimes += 1
                     if (mRetryTimes < 3) {
                         loadMusic(config, songCode, isOwnSong)
                     } else {
                         mPlayerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING)
-                        ToastUtils.showToastLong(R.string.cantata_try)
+                        CustomToast.show(R.string.cantata_try, Toast.LENGTH_LONG)
                     }
                 } else if (reason == KTVLoadSongFailReason.CANCELED) {
                     // 当前已被切歌
-                    ToastUtils.showToastLong(R.string.cantata_load_failed_another_song)
+                    CustomToast.show(R.string.cantata_load_failed_another_song, Toast.LENGTH_LONG)
                 }
             }
         })
@@ -1459,7 +1469,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             } else {
                 // failure
                 CantataLogger.e(TAG, "RoomLivingViewModel.updateSeatScoreStatus() failed:${e.message}")
-                ToastUtils.showToast(e.message)
+                e.message?.let {
+                    CustomToast.show(it)
+                }
             }
         }
     }

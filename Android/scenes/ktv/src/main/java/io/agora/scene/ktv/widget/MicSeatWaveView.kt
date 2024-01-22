@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.live.holder
+package io.agora.scene.ktv.widget
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator

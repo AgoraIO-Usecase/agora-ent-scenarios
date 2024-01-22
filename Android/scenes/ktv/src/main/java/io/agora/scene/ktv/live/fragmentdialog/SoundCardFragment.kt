@@ -1,13 +1,6 @@
-package io.agora.scene.ktv.widget.soundcard
+package io.agora.scene.ktv.live.fragmentdialog
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Rect
-import android.media.AudioManager
-import android.os.Build
-import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -20,6 +13,7 @@ import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.ktv.R
 import io.agora.scene.ktv.databinding.KtvDialogSoundCardBinding
 import io.agora.scene.ktv.live.RoomLivingActivity
+import io.agora.scene.ktv.live.bean.SoundCardSettingBean
 
 class SoundCardFragment constructor(private val soundCardSetting: SoundCardSettingBean) :
     BaseViewBindingFragment<KtvDialogSoundCardBinding>() {
@@ -177,4 +171,6 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
             }
         }
     }
+
+
 }

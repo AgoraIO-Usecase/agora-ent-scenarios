@@ -25,15 +25,15 @@
     </string-array>
 
     <string-array name="ktv_audioPreset">
-        <item>原声</item>
         <item>KTV</item>
+        <item>原声</item>
         <item>演唱会</item>
         <item>录音棚</item>
         <item>留声机</item>
         <item>空旷</item>
         <item>空灵</item>
         <item>流行</item>
-        <item>RnB</item>
+        <item>R&amp;B</item>
     </string-array>
 
     <string-array name="ktv_aec">

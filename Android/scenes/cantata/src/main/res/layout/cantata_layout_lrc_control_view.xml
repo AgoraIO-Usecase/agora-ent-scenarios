@@ -13,16 +13,16 @@
         android:layout_height="match_parent"
         tools:visibility="visible">
 
-        <!-- prepare -->
-        <include
-            layout="@layout/cantata_layout_lrc_prepare"
-            tools:visibility="gone" />
-
         <include
             android:id="@+id/ilActive"
             layout="@layout/cantata_layout_lrc_active"
             android:visibility="gone"
             tools:visibility="visible" />
+
+        <!-- prepare -->
+        <include
+            layout="@layout/cantata_layout_lrc_prepare"
+            tools:visibility="gone" />
 
         <TextView
             android:id="@+id/tvMusicName"

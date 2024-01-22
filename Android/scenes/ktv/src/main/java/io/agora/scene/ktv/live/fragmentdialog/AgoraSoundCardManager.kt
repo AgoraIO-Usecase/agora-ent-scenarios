@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.widget.soundcard
+package io.agora.scene.ktv.live.fragmentdialog
 
 import androidx.annotation.DrawableRes
 

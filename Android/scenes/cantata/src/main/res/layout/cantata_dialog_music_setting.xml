@@ -316,20 +316,6 @@
         tools:itemCount="9"
         tools:listitem="@layout/cantata_item_mv"/>
 
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:overScrollMode="never"
-        android:visibility="gone"
-        android:scrollbars="none">
-
-        <RadioGroup
-            android:id="@+id/radioGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" />
-    </HorizontalScrollView>
-
     <View
         android:layout_width="0dp"
         android:layout_height="20dp" />

@@ -26,13 +26,13 @@ public class ToastUtils {
         runOnMainThread(() -> Toast.makeText(AgoraApplication.the(), str, Toast.LENGTH_LONG).show());
     }
 
-    private static void runOnMainThread(Runnable runnable){
-        if(mainHandler == null){
+    private static void runOnMainThread(Runnable runnable) {
+        if (mainHandler == null) {
             mainHandler = new Handler(Looper.getMainLooper());
         }
-        if(Thread.currentThread() == mainHandler.getLooper().getThread()){
+        if (Thread.currentThread() == mainHandler.getLooper().getThread()) {
             runnable.run();
-        }else{
+        } else {
             mainHandler.post(runnable);
         }
     }
