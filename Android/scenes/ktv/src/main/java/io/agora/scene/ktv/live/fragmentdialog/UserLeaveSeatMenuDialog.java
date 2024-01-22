@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.widget;
+package io.agora.scene.ktv.live.fragmentdialog;
 
 import android.content.Context;
 import android.view.Gravity;
@@ -13,20 +13,19 @@ import com.bumptech.glide.Glide;
 import io.agora.scene.base.component.BaseDialog;
 import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.ktv.R;
-import io.agora.scene.ktv.databinding.KtvDialogUserSeatMenuBinding;
 
 /**
  * 房间用户菜单
  */
-public class UserLeaveSeatMenuDialog extends BaseDialog<KtvDialogUserSeatMenuBinding> {
+public class UserLeaveSeatMenuDialog extends BaseDialog<io.agora.scene.ktv.databinding.KtvDialogUserSeatMenuBinding> {
     public UserLeaveSeatMenuDialog(@NonNull Context context) {
         super(context);
     }
 
     @NonNull
     @Override
-    protected KtvDialogUserSeatMenuBinding getViewBinding(@NonNull LayoutInflater layoutInflater) {
-        return KtvDialogUserSeatMenuBinding.inflate(layoutInflater);
+    protected io.agora.scene.ktv.databinding.KtvDialogUserSeatMenuBinding getViewBinding(@NonNull LayoutInflater layoutInflater) {
+        return io.agora.scene.ktv.databinding.KtvDialogUserSeatMenuBinding.inflate(layoutInflater);
     }
 
     public void setAgoraMember(String name, String headUrl) {

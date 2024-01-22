@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.widget.soundcard
+package io.agora.scene.ktv.live.fragmentdialog
 
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +11,7 @@ import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.ktv.R
 import io.agora.scene.ktv.databinding.KtvDialogSoundTypeBinding
 import io.agora.scene.ktv.live.RoomLivingActivity
+import io.agora.scene.ktv.live.bean.SoundCardSettingBean
 
 class SoundTypeFragment constructor(private val soundCardSetting: SoundCardSettingBean) :
     BaseViewBindingFragment<KtvDialogSoundTypeBinding>() {
@@ -90,42 +91,42 @@ class SoundTypeFragment constructor(private val soundCardSetting: SoundCardSetti
             )
         )
     }
-}
 
-private class SoundPresetsAdapter(
-    private var list: List<PresetSoundModel>,
-    private var selectedIndex: Int,
-    private var onDidSelectIndex: ((Int) -> Unit)? = null
-) : RecyclerView.Adapter<SoundPresetsAdapter.ViewHolder>() {
+    private class SoundPresetsAdapter(
+        private var list: List<PresetSoundModel>,
+        private var selectedIndex: Int,
+        private var onDidSelectIndex: ((Int) -> Unit)? = null
+    ) : RecyclerView.Adapter<SoundPresetsAdapter.ViewHolder>() {
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val ivAvatar: ImageView = itemView.findViewById(R.id.ivAvatar)
-        val tvPresetName: TextView = itemView.findViewById(R.id.tvPresetName)
-        val tvPresetInfo: TextView = itemView.findViewById(R.id.tvPresetInfo)
-        val checkBox: ImageView = itemView.findViewById(R.id.ivCheckBox)
-        val borderView: View = itemView.findViewById(R.id.cvCornerRatio)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.ktv_dialog_sound_type_layout, parent, false)
-        return ViewHolder(view)
-    }
-
-    // 将数据绑定到视图项
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val data = list[position]
-        holder.tvPresetName.text = data.name
-        holder.tvPresetInfo.text = data.tips
-        holder.checkBox.visibility = if (selectedIndex == position) View.VISIBLE else View.INVISIBLE
-        holder.borderView.visibility = if (selectedIndex == position) View.VISIBLE else View.INVISIBLE
-        holder.ivAvatar.setImageResource(data.resId)
-        holder.itemView.setOnClickListener {
-            selectedIndex = position
-            onDidSelectIndex?.invoke(position)
+        class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val ivAvatar: ImageView = itemView.findViewById(R.id.ivAvatar)
+            val tvPresetName: TextView = itemView.findViewById(R.id.tvPresetName)
+            val tvPresetInfo: TextView = itemView.findViewById(R.id.tvPresetInfo)
+            val checkBox: ImageView = itemView.findViewById(R.id.ivCheckBox)
+            val borderView: View = itemView.findViewById(R.id.cvCornerRatio)
         }
-    }
 
-    override fun getItemCount(): Int {
-        return list.size
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.ktv_dialog_sound_type_layout, parent, false)
+            return ViewHolder(view)
+        }
+
+        // 将数据绑定到视图项
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val data = list[position]
+            holder.tvPresetName.text = data.name
+            holder.tvPresetInfo.text = data.tips
+            holder.checkBox.visibility = if (selectedIndex == position) View.VISIBLE else View.INVISIBLE
+            holder.borderView.visibility = if (selectedIndex == position) View.VISIBLE else View.INVISIBLE
+            holder.ivAvatar.setImageResource(data.resId)
+            holder.itemView.setOnClickListener {
+                selectedIndex = position
+                onDidSelectIndex?.invoke(position)
+            }
+        }
+
+        override fun getItemCount(): Int {
+            return list.size
+        }
     }
 }

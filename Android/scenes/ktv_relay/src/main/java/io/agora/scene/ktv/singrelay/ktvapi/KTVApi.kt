@@ -91,6 +91,12 @@ enum class MusicLoadStatus(val value: Int) {
     INPROGRESS(2),
 }
 
+enum class AudioTrackMode(val value: Int) {
+    YUAN_CHANG(0),
+    BAN_ZOU(1),
+    DAO_CHANG(2),
+}
+
 /**
  * 歌词组件接口，您setLrcView传入的歌词组件需要继承此接口类，并实现以下三个方法
  */
@@ -278,11 +284,6 @@ interface KTVApi {
      * 清空内部变量/缓存，取消在initWithRtcEngine时的监听，以及取消网络请求等
      */
     fun release()
-
-    /**
-     * 开启关闭专业模式
-     */
-    fun enableProfessionalStreamerMode(enable: Boolean)
 
     /**
      * 收到 IKTVApiEventHandler.onTokenPrivilegeWillExpire 回调时需要主动调用方法更新Token
@@ -504,4 +505,19 @@ interface KTVApi {
      * 获取mcc实例
      */
     fun getMusicContentCenter() : IAgoraMusicContentCenter
+
+    /**
+     * 切换音轨, 原唱/伴奏/导唱
+     */
+    fun switchAudioTrack(mode: AudioTrackMode)
+
+    /**
+     * 开启关闭专业模式
+     */
+    fun enableProfessionalStreamerMode(enable: Boolean)
+
+    /**
+     * 开启 Multipathing, 默认开
+     */
+    fun enableMulitpathing(enable: Boolean)
 }

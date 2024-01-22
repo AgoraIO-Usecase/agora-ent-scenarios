@@ -16,7 +16,6 @@ import io.agora.karaoke_view.v11.KaraokeView
 import io.agora.karaoke_view.v11.LyricsView
 import io.agora.karaoke_view.v11.model.LyricsLineModel
 import io.agora.scene.base.utils.DownloadUtils
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.base.utils.ZipUtils
 import io.agora.scene.base.utils.ZipUtils.UnZipCallback
 import io.agora.scene.cantata.R
@@ -26,6 +25,7 @@ import io.agora.scene.cantata.ktvapi.ILrcView
 import io.agora.scene.cantata.service.RoomSeatModel
 import io.agora.scene.cantata.service.RoomSelSongModel
 import io.agora.scene.cantata.ui.widget.OnClickJackingListener
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.UiUtils
 import java.io.File
 import java.text.DecimalFormat
@@ -37,11 +37,11 @@ import java.text.NumberFormat
 class LrcControlView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
     FrameLayout(context, attrs, defStyleAttr), ILrcView, OnClickJackingListener {
 
-    private companion object{
+    private companion object {
         private const val TAG = "LrcControlView"
     }
 
-    private val  mScoreFormat: NumberFormat by lazy {
+    private val mScoreFormat: NumberFormat by lazy {
         DecimalFormat("#,###")
     }
 
@@ -130,6 +130,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         mBinding.ilActive.ivJoinChorusBtn.visibility = INVISIBLE
         mBinding.ilActive.ivLeaveChorus.visibility = VISIBLE
         mBinding.ilActive.ivJoinChorusLoading.visibility = INVISIBLE
+        mPrepareBinding.statusPrepareViewLrc.visibility = GONE
         if (isMineOwner) {
             mBinding.ilActive.ivChangeSong.visibility = VISIBLE
         }
@@ -138,6 +139,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
     fun onSelfJoinedChorusFailed() {
         mBinding.ilActive.ivJoinChorusBtn.visibility = VISIBLE
         mBinding.ilActive.ivJoinChorusLoading.visibility = INVISIBLE
+        mPrepareBinding.statusPrepareViewLrc.visibility = GONE
     }
 
     fun onSelfLeavedChorus() {
@@ -156,9 +158,16 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         mBinding.ilIdle.root.visibility = GONE
         mBinding.clActive.visibility = VISIBLE
         mBinding.clActive.setBackgroundResource(backgroundResId)
+        mPrepareBinding.tvContent.text = String.format(resources.getString(R.string.cantata_loading_music), "0%")
+        mPrepareBinding.pbLoadingMusic.progress = 0
         mPrepareBinding.statusPrepareViewLrc.visibility = VISIBLE
         mBinding.ilActive.root.visibility = GONE
         changeViewByRole()
+    }
+
+    fun onMusicLoadProgress(percent: Int) {
+        mPrepareBinding.tvContent.text = String.format(resources.getString(R.string.cantata_loading_music), "$percent%")
+        mPrepareBinding.pbLoadingMusic.progress = percent
     }
 
     private var songPlaying: RoomSelSongModel? = null
@@ -285,11 +294,14 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
             mBinding.ilActive.ivSkipPostlude.visibility = INVISIBLE
         } else if (v == mBinding.ilActive.ivJoinChorusBtn) {
             if (UiUtils.isFastClick(2000)) {
-                ToastUtils.showToast(R.string.cantata_too_fast)
+                CustomToast.show(R.string.cantata_too_fast)
                 return
             }
             mOnKaraokeActionListener?.onJoinChorus()
             mBinding.ilActive.ivJoinChorusLoading.visibility = VISIBLE
+            mPrepareBinding.tvContent.text = String.format(resources.getString(R.string.cantata_loading_music), "0%")
+            mPrepareBinding.pbLoadingMusic.progress = 0
+            mPrepareBinding.statusPrepareViewLrc.visibility = VISIBLE
             if (isMineOwner) {
                 mBinding.ilActive.ivChangeSong.visibility = INVISIBLE
             }
@@ -357,7 +369,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
                                 }
                             }
                             if (TextUtils.isEmpty(xmlPath)) {
-                                ToastUtils.showToast("The xml file not exist!")
+                                CustomToast.show("The xml file not exist!")
                                 mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
                                 mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
                                 return
@@ -365,7 +377,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
                             val xmlFile = File(xmlPath)
                             val lyricsModel = KaraokeView.parseLyricsData(xmlFile)
                             if (lyricsModel == null) {
-                                ToastUtils.showToast("Unexpected content from $xmlPath")
+                                CustomToast.show("Unexpected content from $xmlPath")
                                 mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
                                 mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
                                 return
@@ -379,13 +391,16 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
                         override fun onError(e: Exception) {
                             mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
                             mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
-                            ToastUtils.showToast(e.message)
+                            e.message?.let {
+                                CustomToast.show(it)
+                            }
+
                         }
                     })
             } else {
                 val lyricsModel = KaraokeView.parseLyricsData(file)
                 if (lyricsModel == null) {
-                    ToastUtils.showToast("Unexpected content from $file")
+                    CustomToast.show("Unexpected content from $file")
                     mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
                     mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
                     return@download
@@ -397,7 +412,9 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
                 }
             }
         }) { exception: Exception ->
-            ToastUtils.showToast(exception.message)
+            exception.message?.let {
+                CustomToast.show(it)
+            }
             mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
             mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
         }
@@ -415,10 +432,10 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         mBinding.tvCoNumber.text = resources.getString(R.string.cantata_on_chorus_user, (list.size + 1))
     }
 
-    fun updateAllSeatScore( list: List<RoomSeatModel>){
-        if (mRole == Role.Listener){ // 观众计算总分
+    fun updateAllSeatScore(list: List<RoomSeatModel>) {
+        if (mRole == Role.Listener) { // 观众计算总分
             var totalScore = 0
-            list.forEach {  roomSeat ->
+            list.forEach { roomSeat ->
                 if (roomSeat.score >= 0) {
                     totalScore += roomSeat.score
                 }
@@ -427,6 +444,16 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
             mBinding.tvCumulativeScore.text = resources.getString(R.string.cantata_score_formatter, formattedScore)
         }
     }
+
+    private var mInitialYOfChorus = 0f
+
+    val getYOfChorusBtn: Int
+        get() {
+            if (mInitialYOfChorus == 0f) {
+                mInitialYOfChorus = mBinding.ilActive.ivJoinChorusBtn.y
+            }
+            return mInitialYOfChorus.toInt()
+        }
 
     interface OnKaraokeEventListener {
         fun onSwitchOriginalClick() {}
