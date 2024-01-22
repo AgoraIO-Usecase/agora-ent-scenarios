@@ -91,17 +91,9 @@ class Pure1v1UserListViewController: UIViewController {
         }
         
         let roomId = userInfo.getRoomId()
-        NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
-                                             appCertificate: pure1V1AppCertificate!,
-                                             channelName: "",
-                                             uid: userInfo.userId,
-                                             tokenGeneratorType: .token007,
-                                             tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
+        _generateTokens {[weak self] rtcToken, rtmToken in
             guard let self = self else {return}
-            guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue],
-                  let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
-                return
-            }
+            guard let rtcToken = rtcToken, let rtmToken = rtmToken else { return }
             self.rtcToken = rtcToken
             self.rtmToken = rtmToken
             self._initCallAPI(rtcToken: rtcToken, rtmToken: rtmToken)
@@ -211,6 +203,24 @@ extension Pure1v1UserListViewController {
                 self.naviBar.style = userList.count > 0 ? .light : .dark
                 AUIToast.show(text: "user_list_refresh_tips".pure1v1Localization())
             }
+        }
+    }
+    
+    private func _generateTokens(completion: @escaping (String?, String?) -> ()) {
+        NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
+                                             appCertificate: pure1V1AppCertificate!,
+                                             channelName: "",
+                                             uid: userInfo?.userId ?? "",
+                                             tokenGeneratorType: .token007,
+                                             tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
+            guard let self = self else {return}
+            guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue],
+                  let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
+                completion(nil, nil)
+                return
+            }
+            
+            completion(rtcToken, rtmToken)
         }
     }
 }
@@ -365,39 +375,12 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
         pure1v1Warn("tokenPrivilegeWillExpire")
         guard let userInfo = userInfo else {return}
         
-        //renew token, include caller token(current room)
-        NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
-                                             appCertificate: pure1V1AppCertificate!,
-                                             channelName: userInfo.roomId,
-                                             uid: userInfo.userId,
-                                             tokenGeneratorType: .token007,
-                                             tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
+        _generateTokens {[weak self] rtcToken, rtmToken in
             guard let self = self else {return}
-            guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue],
-                  let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
-                return
-            }
+            guard let rtcToken = rtcToken, let rtmToken = rtmToken else { return }
             self.rtcToken = rtcToken
             self.rtmToken = rtmToken
             self.callApi.renewToken(with: rtcToken, rtmToken: rtmToken)
-        }
-            
-        //renew other caller room(current user is callee)
-        if let channelName = connectedChannelId {
-            //calling token
-            NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
-                                                 appCertificate: pure1V1AppCertificate!,
-                                                 channelName: channelName,
-                                                 uid: userInfo.userId,
-                                                 tokenGeneratorType: .token007,
-                                                 tokenTypes: [.rtc]) {[weak self] tokens in
-                guard let self = self else {return}
-                guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue] else {
-                    return
-                }
-                // TODO: FANPENG
-//                self.callApi.renewRemoteCallerChannelToken(roomId: channelName, token: rtcToken)
-            }
         }
     }
     
