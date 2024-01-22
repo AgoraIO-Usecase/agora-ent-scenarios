@@ -8,7 +8,7 @@
 import UIKit
 import CallAPI
 import AgoraRtcKit
-
+import AgoraCommon
 let kNormalIconSize = CGSize(width: 32, height: 32)
 class BaseRoomViewController: UIViewController {
     var onBackClosure: (()->())?

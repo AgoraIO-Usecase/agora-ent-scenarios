@@ -4,7 +4,7 @@
 //
 
 #import "VLKTVMVIdleView.h"
-#import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 
 @interface VLKTVMVIdleView ()
 

@@ -18,7 +18,7 @@
 //#import "AEACategoryView.h"
 //#import "AEAListContainerView.h"
 @import YYModel;
-
+@import AgoraCommon;
 #import "VideoProcessingManager.h"
 #import "BeautyAPI.h"
 #import "BytesBeautyRender.h"
@@ -33,7 +33,5 @@
 #import "VLAlert.h"
 #import "VLToast.h"
 #import "VLUploadImageResModel.h"
-
 #import "VLMainTabBarController.h"
 #import "BaseNavigationController.h"
-
