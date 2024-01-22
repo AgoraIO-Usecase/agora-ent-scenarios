@@ -12,6 +12,7 @@
 
 @end
 
+@import AgoraCommon;
 @interface VLSRAudioEffectPicker : UIView
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLSRAudioEffectPickerDelegate>)delegate;

@@ -8,14 +8,9 @@
 
 #import "VLKTVMVIdleView.h"
 //#import "HWWeakTimer.h"
-#import "VLHotSpotBtn.h"
-#import "VLUserCenter.h"
-#import "VLFontUtils.h"
-#import "VLMacroDefine.h"
-#import "AESMacro.h"
 @import Masonry;
 @import SDWebImage;
-
+@import AgoraCommon;
 @interface VLKTVMVView () <VLKTVMVIdleViewDelegate, KaraokeDelegate>
 
 @property(nonatomic, weak) id <VLKTVMVViewDelegate>delegate;
@@ -718,7 +713,7 @@
 - (UILabel *)scoreLabel {
     if (!_scoreLabel) {
         _scoreLabel = [[UILabel alloc] init];
-        _scoreLabel.font = VLUIFontMake(15);
+        _scoreLabel.font = [UIFont systemFontOfSize:15];
         _scoreLabel.textColor = [UIColor whiteColor];
         _scoreLabel.text = KTVLocalizedString(@"0");
     }
@@ -728,7 +723,7 @@
 - (UILabel *)scoreUnitLabel {
     if (!_scoreUnitLabel) {
         _scoreUnitLabel = [[UILabel alloc] init];
-        _scoreUnitLabel.font = VLUIFontMake(10);
+        _scoreUnitLabel.font = [UIFont systemFontOfSize:10];
         _scoreUnitLabel.textColor = [UIColor whiteColor];
         _scoreUnitLabel.text = KTVLocalizedString(@"ktv_score_formatter");
     }

@@ -6,6 +6,7 @@
 #import "VLSelectedSongListCell.h"
 #import "VLSongItmModel.h"
 #import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 @import SDWebImage;
 
 @implementation VLSelectedSongListCell

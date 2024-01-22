@@ -8,7 +8,7 @@
 import KakaJSON
 import UIKit
 import ZSwiftBaseLib
-
+import AgoraCommon
 public class SAGiftersViewController: UITableViewController {
     private var room_id = ""
 
