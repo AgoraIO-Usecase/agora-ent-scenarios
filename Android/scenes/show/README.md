@@ -30,26 +30,16 @@
      
      ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
    
-   - 秒切机器人`CloudPlayer`服务配置
+   - 秒切机器人`CloudPlayer`服务配置，请联系销售人员为您的 appid 添加权限(如果您没有销售人员的联系方式可通过智能客服联系销售人员 [Agora 支持](https://agora-ticket.agora.io/))
+  
+     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/config_cloud_player_android.png)
      ```json
      如果不填写CloudPlayer配置，机器人房间将无法出图
      ```
-  
-     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/config_cloud_player_android.png)
 
   获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docportal.shengwang.cn/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
-### 2.2 在 [**settings.gradle**](../../settings.gradle) 内取消对秀场直播 include 的注释
-
-~~~
-if(!isShowEmpty){
-    include ':scenes:show'
-    include ':scenes:show:aars:SenseArSourceManager'
-    include ':scenes:show:aars:STMobileJNI'
-}
-~~~
-
-### 2.3 在项目的[**gradle.properties**](../../gradle.properties)里填写需要的声网 App ID 和 App证书
+### 2.2 在项目的[**gradle.properties**](../../gradle.properties)里填写需要的声网 App ID 和 App证书
 
   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/config_app_id_android.jpg)  
   
@@ -60,15 +50,12 @@ if(!isShowEmpty){
   CLOUD_PLAYER_SECRET：声网RESTful API secret
   ```
 
-### 2.4 配置美颜功能
+### 2.3 配置美颜功能
   
 **美颜资源请联系"商汤科技"商务获取。**
 
 1. 添加资源：
-
-   - 将STMobileJNI-release.aar放在**scenes/show/aars/STMobileJNI**目录下
-   - 将SenseArSourceManager-release.aar放在**scenes/show/aars/SenseArSourceManager**目录下
-   - 将SDK里的资源文件复制到**scenes/show/src/main/assets** 目录下。这个项目用到的资源文件列举如下：
+   - 将资源文件复制到**scenes/show/src/main/assets/beauty_sensetime** 目录下。这个项目用到的资源文件列举如下：
      - models/*.model : AI等训练模型资源
      - sticker_face_shape/lianxingface.zip : 贴纸资源
      - style_lightly/*.zip : 风格妆资源
@@ -77,15 +64,12 @@ if(!isShowEmpty){
    ```
 
 2. 添加license：
-
-   - 将SDK里的证书文件复制到**scenes/show/src/main/assets/license/SenseME.lic**路径下  
+   - 将证书文件复制到**scenes/show/src/main/assets/beauty_sensetime/license/SenseME.lic**路径下  
    ```json
    如果不添加美颜证书无法体验美颜效果
    ```
 
-![美颜资源示例](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/beauty_resources_android.png)
-
-### 2.5 用 Android Studio 运行项目即可开始您的体验
+### 2.4 用 Android Studio 运行项目即可开始您的体验
 
 ---
 ## 3 项目介绍
