@@ -205,10 +205,11 @@ interface ICallApi {
 
     /**
      * 结束通话，主叫和被叫均可调用
-     * @param remoteUserId 用户id
+     * @param remoteUserId 挂断的用户id
+     * @param reason 挂断原因
      * @param completion
      */
-    fun hangup(remoteUserId: Int, completion: ((AGError?) -> Unit)?)
+    fun hangup(remoteUserId: Int, reason: String?, completion: ((AGError?) -> Unit)?)
 
     /**
      * 获取当前通话的callId，callId为当次通话过程中唯一标识，通过该标识声网后台服务可以查询到当前通话的关键节点耗时和状态变迁的时间节点

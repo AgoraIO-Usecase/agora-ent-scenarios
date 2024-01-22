@@ -546,7 +546,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     override fun onDestroy() {
         super.onDestroy()
         // 取消 Glide 异步任务
-        Glide.with(this).pauseRequests()
+        //Glide.with(this).pauseRequests()
     }
 
     override fun onBackPressed() {
@@ -737,9 +737,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     private fun onHangup() {
         mShowTo1v1Manger.mRemoteUser?.let {
             if (isRoomOwner) {
-                mShowTo1v1Manger.mCallApi.hangup(it.getIntUserId(), null)
+                mShowTo1v1Manger.mCallApi.hangup(it.getIntUserId(), reason = "hangup by user", null)
             } else {
-                mShowTo1v1Manger.mCallApi.hangup(mRoomInfo.getIntUserId(), null)
+                mShowTo1v1Manger.mCallApi.hangup(mRoomInfo.getIntUserId(), reason = "hangup by user", null)
             }
         }
     }

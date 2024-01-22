@@ -1,25 +1,22 @@
 package io.agora.scene.pure1v1.ui
 
 import android.Manifest
-import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
-import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.RtcConnection
@@ -41,6 +38,7 @@ import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.BlurTransformation
 import org.json.JSONException
 import org.json.JSONObject
+import kotlin.random.Random
 
 class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>(), ICallApiListener {
 
@@ -106,17 +104,11 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
     override fun onRestart() {
         super.onRestart()
-        fetchRoomLiving()
+        binding.smartRefreshLayout.autoRefresh()
     }
 
     private fun fetchRoomList() {
-        animateLoadingIcon()
-        binding.titleView.rightIcon.isEnabled = false
         CallServiceManager.instance.sceneService?.getUserList { msg, list ->
-            binding.titleView.postDelayed({
-                binding.titleView.rightIcon.isEnabled = true
-                rotateAnimator?.cancel()
-            },1000)
             // 用户是否在线
             val living = list.any { it.userId == CallServiceManager.instance.localUser?.userId }
             if (!living) {
@@ -138,26 +130,12 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             }
             dataList = list.filter { it.userId != CallServiceManager.instance.localUser?.userId}
             adapter?.refresh(dataList)
-            if (dataList.size > 1) {
-                // 设置无限轮播中间位置
-                binding.viewPager2.setCurrentItem(
-                    ((Int.MAX_VALUE / 2) / (dataList.size)) * dataList.size,
-                    false
-                )
+            if (dataList.isNotEmpty()) {
+                // 刷新后直接定位到首个
+                binding.viewPager2.setCurrentItem(0, false)
             }
             mayShowGuideView()
             binding.smartRefreshLayout.finishRefresh()
-        }
-    }
-
-    private fun fetchRoomLiving() {
-        CallServiceManager.instance.sceneService?.getUserList { msg, list ->
-            val living = list.any { it.userId == CallServiceManager.instance.localUser?.userId }
-            if (!living) {
-                CallServiceManager.instance.sceneService?.enterRoom { e ->
-                    fetchRoomList()
-                }
-            }
         }
     }
 
@@ -210,16 +188,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
     private fun showCallSendDialog(user: UserInfo) {
         if (callSendDialog != null) { return }
-//        val dialog = CallSendDialog(this, user)
-//        dialog.setListener(object : CallSendDialog.CallSendDialogListener {
-//            override fun onSendViewDidClickHangup() {
-//                CallServiceManager.instance.callApi?.cancelCall {
-//                }
-//            }
-//        })
-//        dialog.show(supportFragmentManager, "CallSendDialog")
-//        callSendDialog = dialog
-
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
         callSendDialog = CallSendDialog(this, user)
@@ -304,27 +272,32 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     val user = dataList.firstOrNull { it.userId == toUserId.toString() } ?: return
                     CallServiceManager.instance.remoteUser = user
                     showCallSendDialog(user)
-                    CallServiceManager.instance.playCallShow("https://download.agora.io/demo/release/agora_test_video_21_music.mp4")
+                    // 主叫播放来点秀
+                    CallServiceManager.instance.playCallShow(CallServiceManager.urls[Random.nextInt(CallServiceManager.urls.size)])
                 }
-                //CallServiceManager.instance.rtcEngine?.startAudioMixing("https://download.agora.io/demo/test/1v1_bgm1.wav", true, -1, 0)
-                CallServiceManager.instance.playCallMusic("https://download.agora.io/demo/test/1v1_bgm1.wav")
+                // 主、被叫播放来点音乐
+                // TODO bug CallServiceManager.instance.rtcEngine?.startAudioMixing(CallServiceManager.callMusic, true, -1, 0)
+                CallServiceManager.instance.playCallMusic(CallServiceManager.callMusic)
             }
             CallStateType.Connecting -> {
                 callSendDialog?.updateCallState(CallDialogState.Connecting)
                 callDialog?.updateCallState(CallDialogState.Connecting)
+
+                // 停止来点秀视频和铃声
                 CallServiceManager.instance.stopCallShow()
+                // TODO bug CallServiceManager.instance.rtcEngine?.stopAudioMixing()
                 CallServiceManager.instance.stopCallMusic()
-                //CallServiceManager.instance.rtcEngine?.stopAudioMixing()
             }
             CallStateType.Connected -> {
                 if (CallServiceManager.instance.remoteUser == null) { return }
                 // 进入通话页面
                 connectCallDetail()
                 finishCallDialog()
+
+                // 停止来点秀视频和铃声
                 CallServiceManager.instance.stopCallShow()
                 CallServiceManager.instance.stopCallMusic()
-                binding.smartRefreshLayout.autoRefresh()
-                //CallServiceManager.instance.rtcEngine?.stopAudioMixing()
+                // TODO bug CallServiceManager.instance.rtcEngine?.stopAudioMixing()
             }
             CallStateType.Prepared -> {
                 when(stateReason) {
@@ -347,9 +320,14 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 CallServiceManager.instance.resetAcceptCallToken()
                 finishCallDialog()
                 binding.flCallContainer.visibility = View.INVISIBLE
+
+                // 停止来点秀视频和铃声
                 CallServiceManager.instance.stopCallShow()
                 CallServiceManager.instance.stopCallMusic()
-                //CallServiceManager.instance.rtcEngine?.stopAudioMixing()
+                // TODO bug CallServiceManager.instance.rtcEngine?.stopAudioMixing()
+
+                // 自动刷新列表
+                binding.smartRefreshLayout.autoRefresh()
             }
             CallStateType.Failed -> {
                 Toast.makeText(this, eventReason, Toast.LENGTH_SHORT).show()
@@ -357,9 +335,14 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 CallServiceManager.instance.connectedChannelId = null
                 CallServiceManager.instance.resetAcceptCallToken()
                 finishCallDialog()
+
+                // 停止来点秀视频和铃声
                 CallServiceManager.instance.stopCallShow()
                 CallServiceManager.instance.stopCallMusic()
-                //CallServiceManager.instance.rtcEngine?.stopAudioMixing()
+                // TODO bug CallServiceManager.instance.rtcEngine?.stopAudioMixing()
+
+                // 自动刷新列表
+                binding.smartRefreshLayout.autoRefresh()
             }
             else -> {
             }
@@ -415,32 +398,10 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             finish()
         }
 
-        binding.titleView.setRightIconClick {
-            binding.smartRefreshLayout.autoRefresh()
-        }
-
         binding.smartRefreshLayout.setEnableLoadMore(false)
         binding.smartRefreshLayout.setEnableRefresh(true)
         binding.smartRefreshLayout.setOnRefreshListener {
             fetchRoomList()
-        }
-    }
-
-    private fun createRotateAnimator(): ObjectAnimator {
-        return ObjectAnimator.ofFloat(binding.titleView.rightIcon, View.ROTATION, 0f, 360f).apply {
-            duration = 1200
-            interpolator = LinearInterpolator()
-            repeatCount = ValueAnimator.INFINITE
-        }
-    }
-
-    private var rotateAnimator: Animator? = null
-
-    private fun animateLoadingIcon() {
-        if (rotateAnimator?.isRunning == true) return // 判断动画是否正在运行
-        rotateAnimator?.cancel() // 停止之前的动画
-        rotateAnimator = createRotateAnimator().apply {
-            start()
         }
     }
 
@@ -508,7 +469,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         }
 
         override fun getItemCount(): Int {
-            return if (dataList.size <= 1) dataList.size else Int.MAX_VALUE
+            return dataList.size
         }
 
         fun refresh(list: List<UserInfo>){

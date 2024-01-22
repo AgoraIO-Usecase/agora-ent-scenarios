@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.IMediaPlayerObserver
+import io.agora.mediaplayer.data.MediaPlayerSource
 import io.agora.mediaplayer.data.PlayerUpdatedInfo
 import io.agora.mediaplayer.data.SrcInfo
 import io.agora.rtc2.*
@@ -24,9 +25,17 @@ class CallServiceManager {
         val instance: CallServiceManager by lazy {
             CallServiceManager()
         }
+
+        val urls = arrayOf(
+            "https://download.agora.io/demo/test/calling_show_1.mp4",
+            "https://download.agora.io/demo/test/calling_show_2.mp4",
+            "https://download.agora.io/demo/test/calling_show_3.mp4"
+        )
+
+        const val callMusic = "https://download.agora.io/demo/test/1v1_bgm1.wav"
     }
 
-    private val TAG = "CallServiceManager_LOG"
+    private val tag = "CallServiceManager_LOG"
 
     var rtcEngine: RtcEngineEx? = null
 
@@ -147,9 +156,14 @@ class CallServiceManager {
     }
 
     fun playCallShow(url: String) {
-        val ret = mMediaPlayer?.open(url, 0)
+        val ret = mMediaPlayer?.openWithMediaSource(MediaPlayerSource().apply {
+            setUrl(url)
+            isAutoPlay = true
+            isEnableCache = true
+        })
+        mMediaPlayer?.setLoopCount(-1)
         mMediaPlayer?.adjustPlayoutVolume(0)
-        Log.d("hugo", "$ret")
+        Log.d(tag, "playCallShow: $ret")
     }
 
     fun stopCallShow() {
@@ -161,7 +175,7 @@ class CallServiceManager {
         rtcEngine?.setupLocalVideo(canvas)
 
         val ret = player.stop()
-        Log.d("hugo", "$ret")
+        Log.d(tag, "stopCallShow：$ret")
     }
 
     fun renderCallShow(view: View) {
@@ -174,13 +188,18 @@ class CallServiceManager {
     }
 
     fun playCallMusic(url: String) {
-        val ret = mMediaPlayer2?.open(url, 0)
-        Log.d("hugo", "$ret")
+        val ret = mMediaPlayer2?.openWithMediaSource(MediaPlayerSource().apply {
+            setUrl(url)
+            isAutoPlay = true
+            isEnableCache = true
+        })
+        mMediaPlayer2?.setLoopCount(-1)
+        Log.d(tag, "playCallMusic：$ret")
     }
 
     fun stopCallMusic() {
         val ret = mMediaPlayer2?.stop()
-        Log.d("hugo", "$ret")
+        Log.d(tag, "stopCallMusic：$ret")
     }
 
     private fun initialize(prepareConfig: PrepareConfig) {
@@ -206,88 +225,8 @@ class CallServiceManager {
 
         // 初始化mpk，用于播放来电秀视频
         mMediaPlayer = engine.createMediaPlayer()
-        mMediaPlayer?.registerPlayerObserver(object : IMediaPlayerObserver {
-            override fun onPlayerStateChanged(
-                state: io.agora.mediaplayer.Constants.MediaPlayerState?,
-                error: io.agora.mediaplayer.Constants.MediaPlayerError?
-            ) {
-                Log.d("hugo", "onPlayerStateChanged: $state, error: $error")
-                if (state == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED) {
-                    mMediaPlayer?.setLoopCount(-1)
-                    mMediaPlayer?.play()
-                }
-            }
-
-            override fun onPositionChanged(positionMs: Long, timestampMs: Long) {}
-
-            override fun onPlayerEvent(
-                eventCode: io.agora.mediaplayer.Constants.MediaPlayerEvent?,
-                elapsedTime: Long,
-                message: String?
-            ) {}
-
-            override fun onMetaData(
-                type: io.agora.mediaplayer.Constants.MediaPlayerMetadataType?,
-                data: ByteArray?
-            ) {}
-
-            override fun onPlayBufferUpdated(playCachedBuffer: Long) {}
-
-            override fun onPreloadEvent(
-                src: String?,
-                event: io.agora.mediaplayer.Constants.MediaPlayerPreloadEvent?
-            ) {}
-
-            override fun onAgoraCDNTokenWillExpire() {}
-
-            override fun onPlayerSrcInfoChanged(from: SrcInfo?, to: SrcInfo?) {}
-
-            override fun onPlayerInfoUpdated(info: PlayerUpdatedInfo?) {}
-
-            override fun onAudioVolumeIndication(volume: Int) {}
-        })
-
+        // 初始化mpk2，用于播放来电铃声
         mMediaPlayer2 = engine.createMediaPlayer()
-        mMediaPlayer2?.registerPlayerObserver(object : IMediaPlayerObserver {
-            override fun onPlayerStateChanged(
-                state: io.agora.mediaplayer.Constants.MediaPlayerState?,
-                error: io.agora.mediaplayer.Constants.MediaPlayerError?
-            ) {
-                Log.d("hugo", "onPlayerStateChanged: $state, error: $error")
-                if (state == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED) {
-                    mMediaPlayer2?.setLoopCount(-1)
-                    mMediaPlayer2?.play()
-                }
-            }
-
-            override fun onPositionChanged(positionMs: Long, timestampMs: Long) {}
-
-            override fun onPlayerEvent(
-                eventCode: io.agora.mediaplayer.Constants.MediaPlayerEvent?,
-                elapsedTime: Long,
-                message: String?
-            ) {}
-
-            override fun onMetaData(
-                type: io.agora.mediaplayer.Constants.MediaPlayerMetadataType?,
-                data: ByteArray?
-            ) {}
-
-            override fun onPlayBufferUpdated(playCachedBuffer: Long) {}
-
-            override fun onPreloadEvent(
-                src: String?,
-                event: io.agora.mediaplayer.Constants.MediaPlayerPreloadEvent?
-            ) {}
-
-            override fun onAgoraCDNTokenWillExpire() {}
-
-            override fun onPlayerSrcInfoChanged(from: SrcInfo?, to: SrcInfo?) {}
-
-            override fun onPlayerInfoUpdated(info: PlayerUpdatedInfo?) {}
-
-            override fun onAudioVolumeIndication(volume: Int) {}
-        })
     }
 
     private fun createRtcEngine(): RtcEngineEx {
@@ -299,7 +238,7 @@ class CallServiceManager {
         config.mEventHandler = object : IRtcEngineEventHandler() {
             override fun onError(err: Int) {
                 super.onError(err)
-                Log.e(TAG, "IRtcEngineEventHandler onError:$err")
+                Log.e(tag, "IRtcEngineEventHandler onError:$err")
             }
         }
         config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING
@@ -308,7 +247,7 @@ class CallServiceManager {
             rtcEngine = RtcEngine.create(config) as RtcEngineEx
         } catch (e: Exception) {
             e.printStackTrace()
-            Log.e(TAG, "RtcEngine.create() called error: $e")
+            Log.e(tag, "RtcEngine.create() called error: $e")
         }
         return rtcEngine ?: throw RuntimeException("RtcEngine create failed!")
     }

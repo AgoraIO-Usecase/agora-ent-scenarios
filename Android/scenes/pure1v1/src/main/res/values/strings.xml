@@ -37,4 +37,6 @@
     <string name="pure1v1_dashboard_receive_resolution">接收分辨率: %s</string>
     <string name="pure1v1_dashboard_receive_fps">接收帧率: %s fps</string>
     <string name="pure1v1_dashboard_down_loss_package">下行丢包率: %s ％</string>
+    <string name="pure1v1_dashboard_other">其他</string>
+    <string name="pure1v1_dashboard_channel_name">频道名: %s</string>
 </resources>

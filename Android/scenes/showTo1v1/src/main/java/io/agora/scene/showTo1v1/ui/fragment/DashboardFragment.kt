@@ -351,5 +351,11 @@ class DashboardFragment : Fragment() {
         }
         if (binding.tvStatisticDownNet.text.isEmpty()) binding.tvStatisticDownNet.text =
             getString(R.string.show_to1v1_dashboard_down_net_speech, "--")
+
+        // 频道名
+        mMainRtcConnection.let {
+            binding.tvChannelName.text = getString(R.string.show_to1v1_dashboard_channel_name, it.channelId)
+        }
+        if (binding.tvChannelName.text.isEmpty()) binding.tvChannelName.text = getString(R.string.show_to1v1_dashboard_channel_name, "--")
     }
 }

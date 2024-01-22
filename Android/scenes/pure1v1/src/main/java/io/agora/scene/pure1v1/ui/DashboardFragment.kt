@@ -156,5 +156,11 @@ class DashboardFragment : Fragment() {
         // 下行网络
         downlinkNetworkInfo?.bandwidth_estimation_bps?.let { binding.tvStatisticDownNet.text = getString(R.string.pure1v1_dashboard_down_net_speech, (it / 8192).toString()) }
         if (binding.tvStatisticDownNet.text.isEmpty()) binding.tvStatisticDownNet.text = getString(R.string.pure1v1_dashboard_down_net_speech, "--")
+
+        // 频道名
+        connection?.let {
+            binding.tvChannelName.text = getString(R.string.pure1v1_dashboard_channel_name, it.channelId)
+        }
+        if (binding.tvChannelName.text.isEmpty()) binding.tvChannelName.text = getString(R.string.pure1v1_dashboard_channel_name, "--")
     }
 }

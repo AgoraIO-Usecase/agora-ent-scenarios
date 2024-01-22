@@ -1,17 +1,11 @@
 package io.agora.scene.showTo1v1.ui
 
-import android.animation.Animator
-import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
-import android.content.Intent
 import android.os.Bundle
-import android.os.Looper
 import android.util.Log
 import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
-import android.view.animation.LinearInterpolator
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -19,7 +13,6 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import io.agora.rtm.RtmClient
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
@@ -83,7 +76,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         setOnApplyWindowInsetsListener()
         mShowTo1v1Manger.renewTokens {
             if (it) {
-                fetchRoomList()
+                binding.smartRefreshLayout.autoRefresh()
             }
         }
         mShowTo1v1Manger.initCallAPi()
@@ -115,7 +108,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     override fun onRestart() {
         mVpFragments[mCurrLoadPosition]?.onResumePage()
-        fetchRoomList()
+        binding.smartRefreshLayout.autoRefresh()
         super.onRestart()
     }
 
@@ -135,13 +128,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
         binding.titleView.setLeftClick { finish() }
-        binding.titleView.setRightIconClick {
-            mShowTo1v1Manger.renewTokens {
-                if (it) {
-                    fetchRoomList()
-                }
-            }
-        }
         binding.btnCreateRoom.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
                 mShowTo1v1Manger.mCallApi.removeListener(callApiListener)
@@ -150,6 +136,16 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             }
         })
         initOrUpdateViewPage()
+
+        binding.smartRefreshLayout.setEnableLoadMore(false)
+        binding.smartRefreshLayout.setEnableRefresh(true)
+        binding.smartRefreshLayout.setOnRefreshListener {
+            mShowTo1v1Manger.renewTokens {
+                if (it) {
+                    fetchRoomList()
+                }
+            }
+        }
     }
 
     private fun initOrUpdateViewPage() {
@@ -214,7 +210,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             // 设置vp当前页面外的页面数
             binding.viewPager2.offscreenPageLimit = 1
             val fragmentAdapter = object : FragmentStateAdapter(this) {
-                override fun getItemCount() = if (mRoomInfoList.size <= 1) mRoomInfoList.size else Int.MAX_VALUE
+                override fun getItemCount() = mRoomInfoList.size
 
                 override fun createFragment(position: Int): Fragment {
                     val roomInfo = mRoomInfoList[position % mRoomInfoList.size]
@@ -252,7 +248,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             }
             binding.viewPager2.adapter = fragmentAdapter
             binding.viewPager2.registerOnPageChangeCallback(onPageScrollEventHandler as OnPageChangeCallback)
-            binding.viewPager2.setCurrentItem(Int.MAX_VALUE / 2, false)
+            binding.viewPager2.setCurrentItem(0, false)
             mCurrLoadPosition = binding.viewPager2.currentItem
 //        } else {
 //            binding.viewPager2.adapter?.let {
@@ -267,9 +263,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     }
 
     private fun fetchRoomList() {
-        animateLoadingIcon()
-        binding.titleView.rightIcon.isEnabled = false
-
         mService.getRoomList(completion = { error, roomList ->
             mRoomInfoList.clear()
             mRoomInfoList.addAll(roomList)
@@ -277,11 +270,11 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             resetViewpage()
             initOrUpdateViewPage()
             ToastUtils.showToast(R.string.show_to1v1_room_list_refreshed)
-            binding.root.postDelayed({
-                binding.titleView.rightIcon.isEnabled = true
-                rotateAnimator?.cancel()
-            }, 500)
             mayShowGuideView()
+            if (roomList.isNotEmpty()) {
+                binding.viewPager2.setCurrentItem(0, false)
+            }
+            binding.smartRefreshLayout.finishRefresh()
         })
     }
 
@@ -456,23 +449,5 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             }
         }
 
-    }
-
-    private fun createRotateAnimator(): ObjectAnimator {
-        return ObjectAnimator.ofFloat(binding.titleView.rightIcon, View.ROTATION, 0f, 360f).apply {
-            duration = 1200
-            interpolator = LinearInterpolator()
-            repeatCount = ValueAnimator.INFINITE
-        }
-    }
-
-    private var rotateAnimator: Animator? = null
-
-    private fun animateLoadingIcon() {
-        if (rotateAnimator?.isRunning == true) return // 判断动画是否正在运行
-        rotateAnimator?.cancel() // 停止之前的动画
-        rotateAnimator = createRotateAnimator().apply {
-            start()
-        }
     }
 }

@@ -31,7 +31,8 @@ dependencies {
 
     kapt rootProject.ext.deps.glide_compiler
     implementation rootProject.ext.deps.glide
-
+    implementation rootProject.ext.deps.layout_kernel
+    implementation rootProject.ext.deps.header_classics
     implementation rootProject.ext.deps.annotation
     implementation rootProject.ext.deps.appcompat
     implementation rootProject.ext.deps.lifecycle

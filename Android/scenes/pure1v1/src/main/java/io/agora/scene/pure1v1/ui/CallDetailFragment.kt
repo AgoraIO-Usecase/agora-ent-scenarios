@@ -177,7 +177,7 @@ class CallDetailFragment : Fragment(), ICallApiListener {
 
     private fun onHangup() {
         CallServiceManager.instance.remoteUser?.let { userInfo ->
-            CallServiceManager.instance.callApi?.hangup(userInfo.userId.toInt()) {
+            CallServiceManager.instance.callApi?.hangup(userInfo.userId.toInt(), reason = "hangup by user") {
             }
         }
         timerHandler?.removeCallbacksAndMessages(null)
