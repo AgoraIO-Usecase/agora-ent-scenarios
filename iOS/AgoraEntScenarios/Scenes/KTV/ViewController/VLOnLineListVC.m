@@ -18,7 +18,7 @@
 #import "AESMacro.h"
 #import "VLAlert.h"
 #import "AgoraEntScenarios-Swift.h"
-
+@import AgoraCommon;
 @interface VLOnLineListVC ()<VLHomeOnLineListViewDelegate/*,AgoraRtmDelegate*/,VLPopScoreViewDelegate>
 
 @property (nonatomic, strong) VLHomeOnLineListView *listView;

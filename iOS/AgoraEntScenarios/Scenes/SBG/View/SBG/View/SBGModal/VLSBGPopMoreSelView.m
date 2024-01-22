@@ -4,8 +4,6 @@
 //
 
 #import "VLSBGPopMoreSelView.h"
-#import "VLFontUtils.h"
-#import "VLMacroDefine.h"
 #import "AgoraEntScenarios-Swift.h"
 #import "SBGMacro.h"
 @import Masonry;
@@ -31,7 +29,7 @@
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
     titleLabel.text = SBGLocalizedString(@"sbg_more_actions");
-    titleLabel.font = VLUIFontMake(16);
+    titleLabel.font = [UIFont systemFontOfSize:16];
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:titleLabel];

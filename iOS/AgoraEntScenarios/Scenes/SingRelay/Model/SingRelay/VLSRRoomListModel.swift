@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import AgoraCommon
 class VLSRRoomListModel: VLBaseModel {
     
     //@property (nonatomic, copy) NSString *id;

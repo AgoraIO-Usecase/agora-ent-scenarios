@@ -7,7 +7,7 @@
 
 import Foundation
 import AgoraRtcKit
-
+import AgoraCommon
 private let kEncodeWidth = "kEncodeWidth"
 private let kEncodeHeight = "kEncodeHeight"
 private let kEncodeFPS = "kEncodeFPS"
