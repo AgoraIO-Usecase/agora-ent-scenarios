@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import AgoraCommon
 @objc enum VLSRSongPlayStatus: Int {
     case idle = 0 //未播放
     case playing = 2 //正在播放

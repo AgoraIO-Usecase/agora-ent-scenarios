@@ -6,9 +6,8 @@
 //
 
 #import "VLDebugView.h"
-#import "AESMacro.h"
-#import "VLMacroDefine.h"
 #import "KTVDebugInfo.h"
+@import AgoraCommon;
 @interface VLDebugView()
 @property(nonatomic, weak) id <VLDebugViewDelegate>delegate;
 @property (nonatomic,strong) UISwitch *dumpSwitch;

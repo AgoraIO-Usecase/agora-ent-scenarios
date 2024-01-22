@@ -4,8 +4,7 @@
 //
 
 #import "VLSRSearchEmptyView.h"
-#import "VLMacroDefine.h"
-#import "AESMacro.h"
+@import AgoraCommon;
 @import YYCategories;
 
 @implementation VLSRSearchEmptyView

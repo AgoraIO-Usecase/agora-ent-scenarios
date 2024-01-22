@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import AgoraCommon
 let kShowLogBaseContext = "AgoraKit"
 let showLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig(sceneName: "Show"))
 
@@ -42,7 +42,7 @@ extension AppContext {
         SyncUtilsWrapper.cleanScene()
     }
     
-    public var showRoomList: [ShowRoomListModel]? {
+    var showRoomList: [ShowRoomListModel]? {
         set {
             self.extDic[kShowRoomListKey] = newValue
         }

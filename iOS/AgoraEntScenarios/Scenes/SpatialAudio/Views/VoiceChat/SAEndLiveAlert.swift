@@ -7,7 +7,7 @@
 
 import UIKit
 import ZSwiftBaseLib
-
+import AgoraCommon
 public final class SAEndLiveAlert: UIView {
     /// 30 is cancel,other is confirm
     @objc public var actionEvents: ((Int) -> Void)?

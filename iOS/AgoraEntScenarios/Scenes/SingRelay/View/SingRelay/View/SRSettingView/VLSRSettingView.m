@@ -9,10 +9,7 @@
 #import "VLSRSliderView.h"
 #import "VLSRKindsView.h"
 #import "VLSRRemoteVolumeView.h"
-#import "VLFontUtils.h"
-#import "AESMacro.h"
 @import Masonry;
-
 @interface VLSRSettingView() <
 VLSRSwitcherViewDelegate,
 VLSRSliderViewDelegate,
@@ -154,7 +151,7 @@ VLSRRemoteVolumeViewDelegate
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] init];
         _titleLabel.text = SRLocalizedString(@"sr_music_menu_dialog_title");
-        _titleLabel.font = VLUIFontMake(16);
+        _titleLabel.font = [UIFont systemFontOfSize:16];
         _titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     }
     return _titleLabel;

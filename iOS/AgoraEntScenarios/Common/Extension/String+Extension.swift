@@ -70,7 +70,7 @@ extension String {
         return predicate.evaluate(with: str)
     }
 
-    func timeFormat(secounds: TimeInterval,
+    public func timeFormat(secounds: TimeInterval,
                     h: String = ":",
                     m: String = ":",
                     s: String = "",
@@ -133,33 +133,33 @@ extension String {
     /**
      *  临时文件路径
      */
-    static func tempFilePath() -> String {
+    public static func tempFilePath() -> String {
         return NSHomeDirectory().appending("/tmp").appending("/MusicTemp.mp3")
     }
 
     /**
      *  缓存文件夹路径
      */
-    static func cacheFolderPath() -> String {
+    public static func cacheFolderPath() -> String {
         return NSHomeDirectory().appending("/Library").appending("/MusicCaches")
     }
 
     /**
      *  获取网址中的文件名
      */
-    var fileName: String {
+    public var fileName: String {
         components(separatedBy: "/").last ?? ""
     }
 }
 
 extension String {
     // 判断字符串中的字符类型
-    enum CharacterType {
+    public enum CharacterType {
         case chinese
         case english
     }
     // 计算指定类型的字符数
-    func countOfCharacters(for type: CharacterType) -> Int {
+    public func countOfCharacters(for type: CharacterType) -> Int {
         var count = 0
         for scalar in unicodeScalars {
             switch type {
