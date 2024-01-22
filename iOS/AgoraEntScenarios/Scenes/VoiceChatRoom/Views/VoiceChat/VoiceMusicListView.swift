@@ -7,7 +7,7 @@
 
 import UIKit
 import AgoraRtcKit
-
+import AgoraCommon
 enum VoiceMusicPlayStatus {
     case pause
     case download

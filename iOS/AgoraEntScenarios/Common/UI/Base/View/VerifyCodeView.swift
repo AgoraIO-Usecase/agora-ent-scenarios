@@ -9,19 +9,19 @@ import UIKit
 import ZSwiftBaseLib
 
 public class VerifyCodeView: UIView {
-    @objc var beginEdit: (() -> Void)?
+    @objc public var beginEdit: (() -> Void)?
 
     /// 输入值改变
-    @objc var textValueChange: ((_ text: String) -> Void)?
+    @objc public var textValueChange: ((_ text: String) -> Void)?
 
     /// 输入完成
-    @objc var inputFinish: ((_ text: String) -> Void)?
+    @objc public var inputFinish: ((_ text: String) -> Void)?
 
     /// 验证码输入框个数
     @objc var inputTextNum: Int = 4
 
     /// 输入框
-    @objc lazy var textFiled: VRVerifyCodeTextView = {
+    @objc public lazy var textFiled: VRVerifyCodeTextView = {
         let textFiled = VRVerifyCodeTextView(frame: CGRect(x: self.padding, y: 0, width: self.frame.width - 2 * self.padding, height: self.frame.height)).backgroundColor(.clear).textColor(.clear).delegate(self)
        // textFiled.tintColor = .darkText
         textFiled.keyboardType = .decimalPad
@@ -31,7 +31,7 @@ public class VerifyCodeView: UIView {
     }()
 
     /// 验证码数量
-    @objc var codeViews: [VRVerifyCodeNumberView] = []
+    @objc public var codeViews: [VRVerifyCodeNumberView] = []
 
     /// 验证码输入框距离两边的边距
     @objc var padding: CGFloat = 15
@@ -42,11 +42,11 @@ public class VerifyCodeView: UIView {
     /// 是否在输入中
     @objc var isInput = true
 
-    override init(frame: CGRect) {
+    @objc public override init(frame: CGRect) {
         super.init(frame: frame)
     }
 
-    @objc convenience init(frame: CGRect, codeNumbers: Int, space: CGFloat, padding: CGFloat) {
+    @objc public convenience init(frame: CGRect, codeNumbers: Int, space: CGFloat, padding: CGFloat) {
         self.init(frame: frame)
         spacing = space
         self.padding = padding
