@@ -131,8 +131,8 @@ extension Pure1v1UserListViewController {
         callApi.initialize(config: config)
         
         let prepareConfig = PrepareConfig()
-        prepareConfig.rtcToken = ""
-        prepareConfig.rtmToken = ""
+        prepareConfig.rtcToken = self.rtcToken
+        prepareConfig.rtmToken = self.rtmToken
         prepareConfig.roomId = userInfo?.getRoomId() ?? ""
         prepareConfig.localView = callVC.localCanvasView.canvasView
         prepareConfig.remoteView = callVC.remoteCanvasView.canvasView
