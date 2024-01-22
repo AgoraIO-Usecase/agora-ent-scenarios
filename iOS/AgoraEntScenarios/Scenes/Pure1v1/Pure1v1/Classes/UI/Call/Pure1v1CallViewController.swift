@@ -14,8 +14,24 @@ class Pure1v1CallViewController: UIViewController {
         didSet {
             oldValue?.removeListener(listener: self)
             callApi?.addListener(listener: self)
-//            oldValue?.removeRTCListener?(listener: self.realTimeView)
-//            callApi?.addRTCListener?(listener: self.realTimeView)
+            let connection = AgoraRtcConnection()
+            connection.channelId = ""
+            rtcEngine?.addDelegateEx(self.realTimeView, connection: connection)
+        }
+    }
+    var rtcChannelName: String? {
+        didSet {
+            let localUid = Int(currentUser?.userId ?? "") ?? 0
+            if let oldValue = oldValue {
+                let connection = AgoraRtcConnection(channelId: oldValue, localUid: localUid)
+                connection.channelId = oldValue
+                rtcEngine?.removeDelegateEx(self.realTimeView, connection: connection)
+            }
+            
+            if let rtcChannelName = rtcChannelName {
+                let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: localUid)
+                rtcEngine?.addDelegateEx(self.realTimeView, connection: connection)
+            }
         }
     }
     var rtcEngine: AgoraRtcEngineKit?

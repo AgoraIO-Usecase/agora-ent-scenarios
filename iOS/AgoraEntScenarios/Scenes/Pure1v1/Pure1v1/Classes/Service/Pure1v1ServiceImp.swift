@@ -134,8 +134,8 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
     }
     
     func enterRoom(completion: @escaping (NSError?) -> Void) {
-        //比较通过roomid，一个人可能会有不同的roomid，但是create scene通过uid，保证不同roomId会被覆盖，保证一个用户不会展示多个
-        guard let user = self.user, !userList.contains(where: { $0.getRoomId() == user.getRoomId() }) else {
+        //create scene通过uid，保证一个用户不会展示多个
+        guard let user = self.user, !userList.contains(where: { $0.userId == user.userId }) else {
             completion(nil)
             return
         }

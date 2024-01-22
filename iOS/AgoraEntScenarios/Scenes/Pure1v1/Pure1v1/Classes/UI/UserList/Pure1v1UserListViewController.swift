@@ -16,6 +16,7 @@ import AVFoundation
 private let kShowGuideAlreadyKey = "already_show_guide"
 class Pure1v1UserListViewController: UIViewController {
     var userInfo: Pure1v1UserInfo?
+    private let prepareConfig = PrepareConfig()
     
     private lazy var player: AgoraRtcMediaPlayerProtocol? = {
         let player = rtcEngine.createMediaPlayer(with: self)
@@ -90,7 +91,6 @@ class Pure1v1UserListViewController: UIViewController {
             return
         }
         
-        let roomId = userInfo.getRoomId()
         _generateTokens {[weak self] rtcToken, rtmToken in
             guard let self = self else {return}
             guard let rtcToken = rtcToken, let rtmToken = rtmToken else { return }
@@ -121,10 +121,9 @@ extension Pure1v1UserListViewController {
         }
         callApi.initialize(config: config)
         
-        let prepareConfig = PrepareConfig()
         prepareConfig.rtcToken = rtcToken
         prepareConfig.rtmToken = rtmToken
-        prepareConfig.roomId = userInfo?.getRoomId() ?? ""
+        prepareConfig.roomId = userInfo?.getRoomId() ?? NSString.withUUID()
         prepareConfig.localView = callVC.localCanvasView.canvasView
         prepareConfig.remoteView = callVC.remoteCanvasView.canvasView
         prepareConfig.autoAccept = false  // 如果期望收到呼叫自动接通，则需要设置为true
@@ -254,6 +253,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 }
                 return
             }
+            
             // 触发状态的用户是自己才处理
             if currentUid == "\(toUserId)" {
                 connectedUserId = fromUserId
@@ -323,6 +323,8 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 assert(false, "user not fount")
                 return
             }
+            
+            callVC.rtcChannelName = connectedChannelId
             callVC.dismiss(animated: false)
             present(callVC, animated: false)
             
@@ -346,6 +348,8 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             default:
                 break
             }
+            
+            callVC.rtcChannelName = nil
 //            AUIAlertManager.hiddenView()
             connectedUserId = nil
             connectedChannelId = nil
@@ -385,7 +389,14 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
     }
     
     func onCallEventChanged(with event: CallEvent) {
-        
+        switch event {
+        case .localHangup, .remoteLeave:
+            prepareConfig.roomId = userInfo?.getRoomId() ?? NSString.withUUID()
+            callApi.prepareForCall(prepareConfig: prepareConfig) { _ in
+            }
+        default:
+            break
+        }
     }
 }
 

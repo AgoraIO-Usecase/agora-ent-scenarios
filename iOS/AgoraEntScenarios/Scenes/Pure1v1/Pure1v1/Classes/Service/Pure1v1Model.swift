@@ -18,7 +18,7 @@ public class Pure1v1UserInfo: NSObject {
     var objectId: String = ""
     
     func getRoomId() ->String {
-        return "\(userId)_\(createdAt)"
+        return "\(userId)_\(Int64(Date().timeIntervalSince1970 * 1000))"
     }
     
     func bgImage() ->UIImage? {
