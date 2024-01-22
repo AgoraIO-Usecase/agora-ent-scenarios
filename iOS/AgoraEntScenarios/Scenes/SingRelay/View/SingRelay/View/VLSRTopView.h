@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+
 @interface VLSRTopView : UIView
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLSRTopViewDelegate>)delegate;

@@ -7,7 +7,7 @@
 
 import UIKit
 import ZSwiftBaseLib
-
+import AgoraCommon
 public enum SAApplyAlertPosition: Int {
     case center, bottom
 }

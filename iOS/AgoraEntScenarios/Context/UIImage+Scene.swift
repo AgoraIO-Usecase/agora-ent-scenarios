@@ -9,11 +9,15 @@ import Foundation
 import UIKit
 
 extension UIImage {
-    @objc static func sceneImage(name: String) -> UIImage? {
+    @objc public static func sceneImage(name: String) -> UIImage? {
         return sceneImage(name: name, bundleName: nil)
     }
+    
+    static func common_sceneImage(name: String) -> UIImage? {
+        return sceneImage(name: name, bundleName: "CommonResource")
+    }
 
-    @objc static func sceneImage(name: String, bundleName: String?) -> UIImage? {
+    @objc public static func sceneImage(name: String, bundleName: String?) -> UIImage? {
         guard let bundleName = bundleName ?? AppContext.shared.sceneImageBundleName else {
             assertionFailure("sceneImageBundleName == nil")
             return nil
