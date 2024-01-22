@@ -33,6 +33,9 @@ class CallConnectInfo {
     //呼叫中的远端用户
     var callingUserId: UInt?
     
+    /// 本地是否已经同意
+    var isLocalAccepted: Bool = false
+    
     //呼叫开始的时间
     private(set) var callTs: Int? {
         didSet {
@@ -57,11 +60,16 @@ class CallConnectInfo {
         callId = ""
         isRetrieveFirstFrame = false
         startRetrieveFirstFrame = nil
+        isLocalAccepted = false
     }
     
-    func set(userId: UInt, roomId: String, callId: String? = nil) {
+    func set(userId: UInt, 
+             roomId: String, 
+             callId: String? = nil,
+             isLocalAccepted: Bool = false) {
         self.callingUserId = userId
         self.callingRoomId = roomId
+        self.isLocalAccepted = isLocalAccepted
         if let callId = callId {
             self.callId = callId
         }

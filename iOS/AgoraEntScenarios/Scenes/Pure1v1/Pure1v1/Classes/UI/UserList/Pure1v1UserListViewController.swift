@@ -48,6 +48,9 @@ class Pure1v1UserListViewController: UIViewController {
             guard let user = user else {return}
             self?._call(user: user)
         }
+        listView.refreshBeginClousure = { [weak self] in
+            self?._refreshAction()
+        }
         return listView
     }()
     
@@ -66,7 +69,6 @@ class Pure1v1UserListViewController: UIViewController {
         naviBar.backButton.addTarget(self, action: #selector(_backAction), for: .touchUpInside)
         naviBar.refreshButton.addTarget(self, action: #selector(_refreshAction), for: .touchUpInside)
         naviBar.refreshButton.isHidden = true
-        naviBar.refreshButton.isHidden = false
         _refreshAction()
         
         callVC.currentUser = userInfo
@@ -181,17 +183,15 @@ extension Pure1v1UserListViewController {
     }
     
     @objc func _refreshAction() {
-        guard naviBar.refreshAnimationEnable() else {return}
-        naviBar.startRefreshAnimation()
         service.enterRoom {[weak self] error in
             if let error = error {
-                self?.naviBar.stopRefreshAnimation()
+                self?.listView.endRefreshing()
                 AUIToast.show(text: error.localizedDescription)
                 return
             }
             self?.service.getUserList { list, error in
                 guard let self = self else {return}
-                self.naviBar.stopRefreshAnimation()
+                self.listView.endRefreshing()
                 if let error = error {
                     AUIToast.show(text: error.localizedDescription)
                     return
@@ -444,6 +444,15 @@ extension Pure1v1UserListViewController {
     }
 }
 
+
+private let VideoResources = [
+    "https://download.agora.io/demo/test/calling_show_1.mp4",
+    "https://download.agora.io/demo/test/calling_show_2.mp4",
+    "https://download.agora.io/demo/test/calling_show_3.mp4",
+]
+
+private let RingURL = "https://download.agora.io/demo/test/1v1_bgm1.wav"
+
 extension Pure1v1UserListViewController {
     
     // 开始拨打
@@ -460,7 +469,7 @@ extension Pure1v1UserListViewController {
     
     // 响铃
     private func startRing(){
-        let ret = rtcEngine.startAudioMixing("https://download.agora.io/demo/test/1v1_bgm1.wav", loopback: false, cycle: -1)
+        let ret = rtcEngine.startAudioMixing(RingURL, loopback: false, cycle: -1)
         pure1v1Print(" startAudioMixing ret = \(ret)")
     }
     
@@ -469,9 +478,13 @@ extension Pure1v1UserListViewController {
         rtcEngine.stopAudioMixing()
     }
     
+    private func randomVideoURL() -> String {
+        VideoResources[VideoResources.count % 3]
+    }
+    
     // 播放视频
     private func startVideoPlayer(){
-        let musicPath = "https://download.agora.io/demo/release/agora_test_video_21_music.mp4"
+        let musicPath = randomVideoURL()
         let source = AgoraMediaSource()
         source.url = musicPath
         if let callDialog = callDialog as? Pure1v1CallerDialog {
