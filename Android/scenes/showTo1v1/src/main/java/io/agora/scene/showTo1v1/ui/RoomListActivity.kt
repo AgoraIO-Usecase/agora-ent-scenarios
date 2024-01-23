@@ -32,6 +32,7 @@ import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
 import io.agora.scene.showTo1v1.videoLoaderAPI.AGSlicingType
 import io.agora.scene.showTo1v1.videoLoaderAPI.OnPageScrollEventHandler
 import io.agora.scene.showTo1v1.videoLoaderAPI.VideoLoader
+import io.agora.scene.widget.CustomRefreshLayoutHeader
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 
@@ -137,6 +138,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         })
         initOrUpdateViewPage()
 
+        binding.smartRefreshLayout.setRefreshHeader(CustomRefreshLayoutHeader(this).apply { setInitialStatus() })
         binding.smartRefreshLayout.setEnableLoadMore(false)
         binding.smartRefreshLayout.setEnableRefresh(true)
         binding.smartRefreshLayout.setOnRefreshListener {
@@ -250,15 +252,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             binding.viewPager2.registerOnPageChangeCallback(onPageScrollEventHandler as OnPageChangeCallback)
             binding.viewPager2.setCurrentItem(0, false)
             mCurrLoadPosition = binding.viewPager2.currentItem
-//        } else {
-//            binding.viewPager2.adapter?.let {
-//                it.notifyDataSetChanged()
-//                binding.viewPager2.setCurrentItem(Int.MAX_VALUE / 2, false)
-//                mCurrLoadPosition = binding.viewPager2.currentItem
-//                binding.viewPager2.postDelayed({
-//                    mVpFragments[mCurrLoadPosition]?.onResetPage()
-//                }, 500)
-//            }
         }
     }
 

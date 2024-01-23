@@ -29,7 +29,7 @@ class CallServiceManager {
         val urls = arrayOf(
             "https://download.agora.io/demo/test/calling_show_1.mp4",
             "https://download.agora.io/demo/test/calling_show_2.mp4",
-            "https://download.agora.io/demo/test/calling_show_3.mp4"
+            "https://download.agora.io/demo/test/calling_show_4.mp4"
         )
 
         const val callMusic = "https://download.agora.io/demo/test/1v1_bgm1.wav"

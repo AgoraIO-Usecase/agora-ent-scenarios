@@ -34,6 +34,7 @@ import io.agora.scene.pure1v1.databinding.Pure1v1RoomListItemLayoutBinding
 import io.agora.scene.pure1v1.CallServiceManager
 import io.agora.scene.pure1v1.utils.PermissionHelp
 import io.agora.scene.pure1v1.service.UserInfo
+import io.agora.scene.widget.CustomRefreshLayoutHeader
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.BlurTransformation
 import org.json.JSONException
@@ -65,6 +66,10 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
 
     override fun onDestroy() {
+        adapter = null
+        callDialog = null
+        mCallDetailFragment = null
+        callSendDialog = null
         CallServiceManager.instance.cleanUp()
         super.onDestroy()
     }
@@ -72,11 +77,18 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val fragmentManager = supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
         val callDetailFragment = CallDetailFragment()
-        fragmentTransaction.add(R.id.flCallContainer, callDetailFragment, "CallDetailFragment").hide(callDetailFragment).commit()
+        supportFragmentManager.beginTransaction().add(R.id.flCallContainer, callDetailFragment, "CallDetailFragment").hide(callDetailFragment).commit()
         mCallDetailFragment = callDetailFragment
+
+        val callSendFragment = CallSendDialog(this)
+        callSendFragment.setListener(object : CallSendDialog.CallSendDialogListener {
+            override fun onSendViewDidClickHangup() {
+                CallServiceManager.instance.callApi?.cancelCall {}
+            }
+        })
+        supportFragmentManager.beginTransaction().add(R.id.flSendFragment, callSendFragment, "CallSendFragment").hide(callSendFragment).commit()
+        callSendDialog = callSendFragment
 
         setOnApplyWindowInsetsListener()
         setupView()
@@ -107,7 +119,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         binding.smartRefreshLayout.autoRefresh()
     }
 
-    private fun fetchRoomList() {
+    private fun fetchRoomList(isAutoRefresh: Boolean) {
         CallServiceManager.instance.sceneService?.getUserList { msg, list ->
             // 用户是否在线
             val living = list.any { it.userId == CallServiceManager.instance.localUser?.userId }
@@ -116,7 +128,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     if (e != null) {
                         Toast.makeText(this, getText(R.string.pure1v1_room_list_local_offline), Toast.LENGTH_SHORT).show()
                     } else {
-                        fetchRoomList()
+                        fetchRoomList(false)
                     }
                 }
                 return@getUserList
@@ -135,7 +147,10 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 binding.viewPager2.setCurrentItem(0, false)
             }
             mayShowGuideView()
-            binding.smartRefreshLayout.finishRefresh()
+
+            if (isAutoRefresh) {
+                binding.smartRefreshLayout.finishRefresh()
+            }
         }
     }
 
@@ -174,8 +189,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         val localUid = CallServiceManager.instance.localUser?.userId?.toInt() ?: 0
 
         mCallDetailFragment?.let {
-            val fragmentTransaction = supportFragmentManager.beginTransaction()
-            fragmentTransaction.show(it).commit()
+            supportFragmentManager.beginTransaction().show(it).commit()
             (mCallDetailFragment as CallDetailFragment).start()
             (mCallDetailFragment as CallDetailFragment).updateTime()
             (mCallDetailFragment as CallDetailFragment).initDashBoard(channelId, localUid)
@@ -187,24 +201,14 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
 
     private fun showCallSendDialog(user: UserInfo) {
-        if (callSendDialog != null) { return }
-        val fragmentManager = supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        callSendDialog = CallSendDialog(this, user)
-        callSendDialog!!.setListener(object : CallSendDialog.CallSendDialogListener {
-            override fun onSendViewDidClickHangup() {
-                CallServiceManager.instance.callApi?.cancelCall {
-                }
-            }
-        })
-        fragmentTransaction.add(R.id.flSendFragment, callSendDialog!!, "CallSendFragment").show(
-            callSendDialog!!
-        ).commit()
+        callSendDialog?.let {
+            it.initView(user)
+            supportFragmentManager.beginTransaction().show(it).commit()
+        }
     }
 
     private fun finishCallDialog() {
         callSendDialog?.hangUp()
-        callSendDialog = null
 
         callDialog?.dismiss()
         callDialog = null
@@ -327,7 +331,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 // TODO bug CallServiceManager.instance.rtcEngine?.stopAudioMixing()
 
                 // 自动刷新列表
-                binding.smartRefreshLayout.autoRefresh()
+                fetchRoomList(false)
             }
             CallStateType.Failed -> {
                 Toast.makeText(this, eventReason, Toast.LENGTH_SHORT).show()
@@ -342,7 +346,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 // TODO bug CallServiceManager.instance.rtcEngine?.stopAudioMixing()
 
                 // 自动刷新列表
-                binding.smartRefreshLayout.autoRefresh()
+                fetchRoomList(false)
             }
             else -> {
             }
@@ -398,10 +402,11 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             finish()
         }
 
+        binding.smartRefreshLayout.setRefreshHeader(CustomRefreshLayoutHeader(this).apply { setInitialStatus() })
         binding.smartRefreshLayout.setEnableLoadMore(false)
         binding.smartRefreshLayout.setEnableRefresh(true)
         binding.smartRefreshLayout.setOnRefreshListener {
-            fetchRoomList()
+            fetchRoomList(true)
         }
     }
 
@@ -444,12 +449,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             val resourceId = context.resources.getIdentifier(resourceName, "drawable", context.packageName)
             val drawable = ContextCompat.getDrawable(context, resourceId)
             Glide.with(context).load(drawable).into(holder.binding.ivRoomCover)
-            Glide.with(context)
-                .load(drawable).apply(
-                    GlideOptions.bitmapTransform(
-                        BlurTransformation(context)
-                    ))
-                .into(holder.binding.ivBackground)
             Glide.with(context)
                 .asGif()
                 .load(R.drawable.pure1v1_wave_living)

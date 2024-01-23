@@ -3,6 +3,7 @@ package io.agora.scene.pure1v1.ui
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.SurfaceView
 import android.view.View
@@ -19,8 +20,7 @@ import io.agora.scene.pure1v1.databinding.Pure1v1CallSendDialogBinding
 import io.agora.scene.pure1v1.service.UserInfo
 
 class CallSendDialog(
-    private val context: Context,
-    private val userInfo: UserInfo
+    private val context: Context
 ) : Fragment() {
 
     interface CallSendDialogListener {
@@ -34,6 +34,8 @@ class CallSendDialog(
 
     private var callState = CallDialogState.None
 
+    private val showView = SurfaceView(context)
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = Pure1v1CallSendDialogBinding.inflate(inflater, container, false)
         return binding.root
@@ -46,15 +48,22 @@ class CallSendDialog(
             listener?.onSendViewDidClickHangup()
             hangUp()
         })
-        binding.tvUserName.text = userInfo.userName
-        Glide.with(context)
-            .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
-            .into(binding.ivUserAvatar)
+//        val showView = SurfaceView(context)
+    }
 
-        val showView = SurfaceView(context)
-        binding.tvShow.removeAllViews()
-        binding.tvShow.addView(showView)
-        CallServiceManager.instance.renderCallShow(showView)
+    fun initView(userInfo: UserInfo) {
+        binding.root.post {
+            CallServiceManager.instance.renderCallShow(showView)
+            binding.tvShow.removeAllViews()
+            binding.tvShow.addView(showView)
+
+            binding.tvUserName.text = userInfo.userName
+            Glide.with(context)
+                .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
+                .into(binding.ivUserAvatar)
+
+            updateCallState(CallDialogState.Calling)
+        }
     }
 
     fun setListener(l: CallSendDialogListener) {
@@ -70,6 +79,7 @@ class CallSendDialog(
 
     fun hangUp() {
         if (isAdded && !parentFragmentManager.isDestroyed) {
+            callState = CallDialogState.None
             val fragment = parentFragmentManager.findFragmentByTag("CallSendFragment")
             fragment?.let {
                 binding.tvShow.removeAllViews()
@@ -83,6 +93,7 @@ class CallSendDialog(
     private var textCount: Int = 0
     private fun textAnimation() {
         if (callState == CallDialogState.Calling) {
+            Log.d("hugo", "textAnimation: ${binding.tvDot.text}")
             when (textCount) {
                 0 -> {binding.tvDot.text = ""}
                 1 -> {binding.tvDot.text = "."}
