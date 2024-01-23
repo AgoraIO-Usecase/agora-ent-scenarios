@@ -32,7 +32,6 @@ import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
 import io.agora.scene.showTo1v1.videoLoaderAPI.AGSlicingType
 import io.agora.scene.showTo1v1.videoLoaderAPI.OnPageScrollEventHandler
 import io.agora.scene.showTo1v1.videoLoaderAPI.VideoLoader
-import io.agora.scene.widget.CustomRefreshLayoutHeader
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 
@@ -138,7 +137,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         })
         initOrUpdateViewPage()
 
-        binding.smartRefreshLayout.setRefreshHeader(CustomRefreshLayoutHeader(this).apply { setInitialStatus() })
         binding.smartRefreshLayout.setEnableLoadMore(false)
         binding.smartRefreshLayout.setEnableRefresh(true)
         binding.smartRefreshLayout.setOnRefreshListener {

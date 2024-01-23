@@ -214,7 +214,6 @@ class CallServiceManager {
         api.initialize(config)
         prepareConfig.localView = localView
         prepareConfig.remoteView = remoteView
-        prepareConfig.autoAccept = false
         prepareConfig.autoJoinRTC = false
         prepareConfig.userExtension = user.toMap()
         api.prepareForCall(prepareConfig) { }

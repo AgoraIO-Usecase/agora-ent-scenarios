@@ -37,7 +37,6 @@ import io.agora.scene.pure1v1.ui.base.CallDialogState
 import io.agora.scene.pure1v1.ui.calling.CallReceiveDialog
 import io.agora.scene.pure1v1.ui.calling.CallSendDialog
 import io.agora.scene.pure1v1.ui.living.CallDetailFragment
-import io.agora.scene.widget.CustomRefreshLayoutHeader
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import org.json.JSONException
 import org.json.JSONObject
@@ -135,7 +134,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     if (e != null) {
                         Toast.makeText(this, getText(R.string.pure1v1_room_list_local_offline), Toast.LENGTH_SHORT).show()
                     } else {
-                        fetchRoomList(false)
+                        fetchRoomList(isAutoRefresh)
                     }
                 }
                 return@getUserList
@@ -158,6 +157,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             if (isAutoRefresh) {
                 binding.smartRefreshLayout.finishRefresh()
             }
+            isFirstEnterScene = false
         }
     }
 
@@ -221,6 +221,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         callDialog = null
     }
 
+    private var isFirstEnterScene = true
     override fun onCallStateChanged(
         state: CallStateType,
         stateReason: CallStateReason,
@@ -261,16 +262,10 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     val dialog = CallReceiveDialog(this, user)
                     dialog.setListener(object : CallReceiveDialog.CallReceiveDialogListener {
                         override fun onReceiveViewDidClickAccept() { // 点击接通
-                            // 获取多媒体权限
-                            permissionHelp.checkCameraAndMicPerms({
-                                val rtcToken = CallServiceManager.instance.mPrepareConfig?.rtcToken
-                                if (rtcToken != null) {
-                                    CallServiceManager.instance.callApi?.accept(fromUserId) {}
-                                }
-                            }, {
-                                PermissionLeakDialog(this@RoomListActivity).show("", { getPermissions() }
-                                ) { launchAppSetting(Manifest.permission.CAMERA) }
-                            }, false)
+                            val rtcToken = CallServiceManager.instance.mPrepareConfig?.rtcToken
+                            if (rtcToken != null) {
+                                CallServiceManager.instance.callApi?.accept(fromUserId) {}
+                            }
                         }
                         override fun onReceiveViewDidClickReject() {
                             CallServiceManager.instance.callApi?.reject(fromUserId, "reject by user") {
@@ -279,6 +274,11 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     })
                     dialog.show()
                     callDialog = dialog
+
+                    // 获取多媒体权限
+                    permissionHelp.checkCameraAndMicPerms({}, {
+                        PermissionLeakDialog(this@RoomListActivity).show("", { getPermissions() }) { launchAppSetting(Manifest.permission.CAMERA) }
+                    }, false)
                 } else if (currentUid == fromUserId.toString()) {
                     CallServiceManager.instance.connectedChannelId = fromRoomId
                     val user = dataList.firstOrNull { it.userId == toUserId.toString() } ?: return
@@ -339,7 +339,9 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 // TODO bug CallServiceManager.instance.rtcEngine?.stopAudioMixing()
 
                 // 自动刷新列表
-                fetchRoomList(false)
+                if (!isFirstEnterScene) {
+                    fetchRoomList(false)
+                }
             }
             CallStateType.Failed -> {
                 Toast.makeText(this, eventReason, Toast.LENGTH_SHORT).show()
@@ -410,7 +412,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             finish()
         }
 
-        binding.smartRefreshLayout.setRefreshHeader(CustomRefreshLayoutHeader(this).apply { setInitialStatus() })
         binding.smartRefreshLayout.setEnableLoadMore(false)
         binding.smartRefreshLayout.setEnableRefresh(true)
         binding.smartRefreshLayout.setOnRefreshListener {

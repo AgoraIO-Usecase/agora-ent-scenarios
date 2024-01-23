@@ -125,7 +125,6 @@ class ShowTo1v1Manger constructor() {
             mPrepareConfig.roomId = ownerRoomId
         }
         mPrepareConfig.userExtension = mCurrentUser.toMap()
-        mPrepareConfig.autoAccept = true
         checkCallTokenConfig { renewToken ->
             if (renewToken) {
                 mCallApi.prepareForCall(mPrepareConfig) {

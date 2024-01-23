@@ -841,6 +841,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                             userMap.getString("objectId"),
                             userMap.getLong("createdAt")
                         )
+                        mShowTo1v1Manger.mCallApi.accept(fromUserId) {}
                     } else if (mShowTo1v1Manger.mCurrentUser.userId == fromUserId.toString()) {
                         // 大哥拨打电话
                         mShowTo1v1Manger.mConnectedChannelId = fromRoomId

@@ -21,7 +21,6 @@ open class PrepareConfig(
     var rtmToken: String = "",                    // rtm token
     var localView: ViewGroup? = null,             // 显示本地流的画布
     var remoteView: ViewGroup? = null,            // 显示远端流的画布
-    var autoAccept: Boolean = true,               // 被叫收到呼叫后是否自动接受，true: CallApi内部会自动调用accept，false: 外部收到calling状态时需要手动accept/reject
     var autoJoinRTC: Boolean = false,             // 是否自动登录RTC
     var callTimeoutMillisecond: Long = 15000L,    // 呼叫超时时间，单位毫秒，如果传0内部将不做超时逻辑
     var userExtension: Map<String, Any>? = null   // [可选]用户扩展字段，收到对端消息而改变状态(例如calling/connecting)时可以通过kFromUserExtension字段获取
@@ -60,7 +59,7 @@ enum class CallEvent(val value: Int) {
     MessageFailed(8),               // 消息发送失败
     StateMismatch(9),               // 状态流转异常
     PreparedRoomIdChanged(10),      // prepared了另一个roomId导致
-    RemoteUserRecvCall(99),         //主叫呼叫成功
+    RemoteUserRecvCall(99),         // 主叫呼叫成功
     LocalRejected(100),             // 本地用户拒绝
     RemoteRejected(101),            // 远端用户拒绝
     OnCalling(102),                 // 变成呼叫中
@@ -78,7 +77,8 @@ enum class CallEvent(val value: Int) {
     CancelByCallerRecall(114),      // 同样的主叫呼叫不同频道导致取消
     RtmLost(115),                   // rtm超时断连
     RtcOccurError(116),             // rtc出现错误
-    RemoteCallBusy(117)             // 远端用户忙
+    RemoteCallBusy(117),            // 远端用户忙
+    StartCaptureFail(118)           // 开启采集失败
 }
 
 /**
