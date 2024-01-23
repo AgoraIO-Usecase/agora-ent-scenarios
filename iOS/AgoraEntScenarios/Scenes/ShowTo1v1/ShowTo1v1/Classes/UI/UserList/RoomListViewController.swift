@@ -27,7 +27,7 @@ private let randomRoomName = [
 private let kShowGuideAlreadyKey = "already_show_guide_show1v1"
 class RoomListViewController: UIViewController {
     var userInfo: ShowTo1v1UserInfo?
-    
+    private let prepareConfig = PrepareConfig()
     private weak var preJoinRoom: ShowTo1v1RoomInfo?
     private weak var callDialog: ShowTo1v1Dialog?
     private var connectedUserId: UInt?
@@ -159,7 +159,7 @@ extension RoomListViewController {
         debugInfo("renewTokens")
         NetworkManager.shared.generateTokens(appId: showTo1v1AppId!,
                                              appCertificate: showTo1v1AppCertificate!,
-                                             channelName: ""/*tokenConfig.roomId*/,
+                                             channelName: "",
                                              uid: userInfo.uid,
                                              tokenGeneratorType: .token007,
                                              tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
@@ -186,8 +186,10 @@ extension RoomListViewController {
             return
         }
         
+        callApi.addListener(listener: self)
         renewTokens {[weak self] flag in
-            self?._reinitCallerAPI(completion: { err in
+            guard flag else { return }
+            self?._initCallAPI(completion: { err in
             })
         }
         
@@ -199,7 +201,7 @@ extension RoomListViewController {
         callVC.rtcEngine = rtcEngine
     }
     
-    private func _reinitCallerAPI(completion: @escaping ((Error?)->())) {
+    private func _initCallAPI(completion: @escaping ((Error?)->())) {
         guard let roomId = userInfo?.get1V1ChannelId() else { return  }
         callApi.deinitialize {
         }
@@ -210,10 +212,8 @@ extension RoomListViewController {
         config.userId = userInfo!.getUIntUserId()
         config.rtcEngine = rtcEngine
         
-        callApi.addListener(listener: self)
         callApi.initialize(config: config)
         
-        let prepareConfig = PrepareConfig()
         prepareConfig.rtcToken = rtcToken
         prepareConfig.rtmToken = rtmToken
         prepareConfig.roomId = roomId
@@ -221,37 +221,8 @@ extension RoomListViewController {
         prepareConfig.remoteView = callVC.remoteCanvasView.canvasView
         prepareConfig.autoAccept = false  // 如果期望收到呼叫自动接通，则需要设置为true
         prepareConfig.autoJoinRTC = false  // 如果期望立即加入自己的RTC呼叫频道，则需要设置为true
-        callApi.prepareForCall(prepareConfig: prepareConfig) { err in
-            // 成功即可以开始进行呼叫
-        }
-    }
-    
-    private func _reinitCalleeAPI(room: ShowTo1v1RoomInfo, completion: @escaping ((Error?)->())) {
-        callApi.deinitialize {
-        }
-        callVC.callApi = callApi
+        prepareConfig.userExtension = userInfo?.yy_modelToJSONObject() as? [String: Any]
         
-        let config = CallConfig()
-        config.appId = showTo1v1AppId!
-        config.userId = userInfo!.getUIntUserId()
-        config.rtcEngine = rtcEngine
-        
-        callApi.initialize(config: config)
-        callApi.addListener(listener: self)
-        
-        //reset callVC
-        callVC.callApi = callApi
-        callVC.roomInfo = room
-        callVC.rtcEngine = rtcEngine
-        
-        let prepareConfig = PrepareConfig()
-        prepareConfig.rtcToken = rtcToken
-        prepareConfig.rtmToken = rtmToken
-        prepareConfig.roomId = room.roomId
-        prepareConfig.localView =  callVC.localCanvasView.canvasView
-        prepareConfig.remoteView = callVC.remoteCanvasView.canvasView
-        prepareConfig.autoAccept = false  // 如果期望收到呼叫自动接通，则需要设置为true
-        prepareConfig.autoJoinRTC = false  // 如果期望立即加入自己的RTC呼叫频道，则需要设置为true
         callApi.prepareForCall(prepareConfig: prepareConfig) { err in
             // 成功即可以开始进行呼叫
         }
@@ -320,7 +291,8 @@ extension RoomListViewController {
                 VideoLoaderApiImpl.shared.addRTCListener(anchorId: info.roomId, listener: self)
             }
             
-            self.rtcEngine(self.rtcEngine, tokenPrivilegeWillExpire: "")
+            //TODO: 过期
+            //self.rtcEngine(self.rtcEngine, tokenPrivilegeWillExpire: "")
             
             AUIToast.show(text: "room_list_refresh_tips".showTo1v1Localization())
         }
@@ -380,20 +352,11 @@ extension RoomListViewController {
     }
     
     private func _showBroadcasterVC(roomInfo: ShowTo1v1RoomInfo) {
-        let isBroadcaster = roomInfo.uid == userInfo?.uid
-        if isBroadcaster {
-            self._reinitCalleeAPI(room: roomInfo) {[weak self] err in
-                if let _ = err {
-                    //失败默认重试一次
-                    self?.renewTokens(completion: { success in
-                        guard success else {return}
-                        self?._reinitCalleeAPI(room: roomInfo, completion: { err in
-                        })
-                    })
-                }
-            }
+        prepareConfig.autoAccept = true
+        callApi.prepareForCall(prepareConfig: prepareConfig) { _ in
         }
         
+        let isBroadcaster = roomInfo.uid == userInfo?.uid
         let vc = BroadcasterViewController()
         vc.callApi = self.callApi
         vc.currentUser = self.userInfo
@@ -405,19 +368,6 @@ extension RoomListViewController {
             self?.service.leaveRoom(roomInfo: roomInfo, completion: { err in
             })
             self?.preJoinRoom = nil
-            //主播回到列表页面要从callee变成caller
-            if isBroadcaster {
-                self?._reinitCallerAPI { err in
-                    if let _ = err {
-                        //失败默认重试一次
-                        self?.renewTokens(completion: { success in
-                            guard success else {return}
-                            self?._reinitCalleeAPI(room: roomInfo, completion: { err in
-                            })
-                        })
-                    }
-                }
-            }
         }
         service.subscribeListener(listener: vc)
         self.navigationController?.pushViewController(vc, animated: false)
@@ -430,11 +380,7 @@ extension RoomListViewController: CallApiListenerProtocol {
                             eventReason: String,
                             eventInfo: [String : Any]) {
         let currentUid = userInfo?.uid ?? ""
-        let publisher = eventInfo[kPublisher] as? String ?? currentUid
-        guard publisher == currentUid else {
-            return
-        }
-        showTo1v1Print("onCallStateChanged state: \(state.rawValue), stateReason: \(stateReason.rawValue), eventReason: \(eventReason), eventInfo: \(eventInfo) publisher: \(publisher) / \(currentUid)")
+        showTo1v1Print("onCallStateChanged state: \(state.rawValue), stateReason: \(stateReason.rawValue), eventReason: \(eventReason), eventInfo: \(eventInfo)")
         
         self.callState = state
         
@@ -449,12 +395,19 @@ extension RoomListViewController: CallApiListenerProtocol {
             let toUserId = eventInfo[kRemoteUserId] as? UInt ?? 0
             showTo1v1Print("calling: fromUserId: \(fromUserId) fromRoomId: \(fromRoomId) currentId: \(currentUid) toUserId: \(toUserId)")
             if let connectedUserId = connectedUserId, connectedUserId != fromUserId {
+                //如果已经不在直播页面了，不应该能呼叫
                 callApi.reject(remoteUserId: fromUserId, reason: "already calling") { err in
                 }
                 return
             }
             // 触发状态的用户是自己才处理
             if currentUid == "\(toUserId)" {
+                guard navigationController?.visibleViewController is BroadcasterViewController else {
+                    //不在直播页面，不能呼叫
+                    callApi.reject(remoteUserId: fromUserId, reason: "not in broadcaster view") { _ in
+                    }
+                    return
+                }
                 connectedUserId = fromUserId
                 
                 //被叫不一定在userList能查到，需要从callapi里读取发送用户的user extension
@@ -499,21 +452,18 @@ extension RoomListViewController: CallApiListenerProtocol {
             connectedUserId = nil
             switch stateReason {
             case .remoteHangup:
-                callVC.dismiss(animated: false)
+                if navigationController?.visibleViewController == callVC {
+                    navigationController?.popViewController(animated: false)
+                }
                 AUIToast.show(text: "call_toast_hangup".showTo1v1Localization())
             case .remoteRejected:
                 AUIToast.show(text: "call_user_busy_tips".showTo1v1Localization())
             case .rtmLost:
-                callVC.dismiss(animated: false)
-                AUIToast.show(text: "call_toast_disconnect".showTo1v1Localization())
-                if let vc = navigationController?.visibleViewController as? BroadcasterViewController,
-                   let roomInfo = vc.roomInfo,
-                   roomInfo.uid == userInfo?.uid {
-                    _reinitCalleeAPI(room: roomInfo) { err in
-                    }
-                    return
+                if navigationController?.visibleViewController == callVC {
+                    navigationController?.popViewController(animated: false)
                 }
-                _reinitCallerAPI { err in
+                AUIToast.show(text: "call_toast_disconnect".showTo1v1Localization())
+                _initCallAPI { err in
                 }
             default:
                 break
@@ -524,11 +474,24 @@ extension RoomListViewController: CallApiListenerProtocol {
         }
     }
     
-    func callDebugInfo(message: String) {
-        showTo1v1Print(message, context: "CallApi")
+    func onCallEventChanged(with event: CallEvent) {
+        switch event {
+        case .localHangup, .remoteLeave:
+            prepareConfig.autoAccept = false
+            prepareConfig.roomId = userInfo?.get1V1ChannelId() ?? NSString.withUUID()
+            callApi.prepareForCall(prepareConfig: prepareConfig) { _ in
+            }
+        default:
+            break
+        }
     }
-    func callDebugWarning(message: String) {
-        showTo1v1Print(message, context: "CallApi")
+    
+    func callDebugInfo(message: String, logLevel: CallLogLevel) {
+        if logLevel == .normal {
+            showTo1v1Print(message, context: "CallApi")
+        } else {
+            showTo1v1Print(message, context: "CallApi")
+        }
     }
 }
 

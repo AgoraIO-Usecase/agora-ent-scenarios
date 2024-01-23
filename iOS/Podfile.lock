@@ -25,7 +25,7 @@ PODS:
   - bytedEffect (4.6.0)
   - CallAPI (0.3.0):
     - AgoraRtcEngine_Special_iOS
-    - AgoraRtm_iOS
+    - AgoraRtm_iOS (= 2.1.8)
   - FLAnimatedImage (1.0.17)
   - fuLib (1.0):
     - FURenderKit
@@ -205,7 +205,7 @@ SPEC CHECKSUMS:
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   bytedEffect: 3d51767425dcaa67d2d6162c402225764d3c2156
-  CallAPI: c64732a1f0ed7a8fdf4e7b9f6ce67ca0dfc99795
+  CallAPI: 172aa6ba58bb73dae9e2a088ba0dcfc4d06e9263
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   fuLib: 43b6990d34caa47e0f12a61db57fe9bd2372f584
   FURenderKit: c7aaea4e5e536206d8d98fcc2d96ff5af0f3f9d3
@@ -238,4 +238,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 66af48b68d3b3aaf8cfad117133e60a015c6b74c
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.12.1

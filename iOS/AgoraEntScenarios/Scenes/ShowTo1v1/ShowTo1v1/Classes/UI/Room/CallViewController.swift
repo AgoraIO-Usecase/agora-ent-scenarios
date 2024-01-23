@@ -146,11 +146,6 @@ extension CallViewController {
                                      stateReason: CallStateReason,
                                      eventReason: String,
                                      eventInfo: [String : Any]) {
-        let publisher = eventInfo[kPublisher] as? String ?? currentUser?.uid
-        guard publisher == currentUser?.uid else {
-            return
-        }
-        
         switch state {
         case .connected:
             var channelId: String?

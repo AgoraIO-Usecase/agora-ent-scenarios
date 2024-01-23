@@ -230,11 +230,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                             eventReason: String,
                             eventInfo: [String : Any]) {
         let currentUid = userInfo?.userId ?? ""
-        let publisher = eventInfo[kPublisher] as? String ?? currentUid
-        guard publisher == currentUid else {
-            return
-        }
-        pure1v1Print("onCallStateChanged state: \(state.rawValue), stateReason: \(stateReason.rawValue), eventReason: \(eventReason), eventInfo: \(eventInfo) publisher: \(publisher) / \(currentUid)")
+        pure1v1Print("onCallStateChanged state: \(state.rawValue), stateReason: \(stateReason.rawValue), eventReason: \(eventReason), eventInfo: \(eventInfo)")
         
         self.callState = state
         
@@ -396,6 +392,15 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             }
         default:
             break
+        }
+    }
+    
+    
+    func callDebugInfo(message: String, logLevel: CallLogLevel) {
+        if logLevel == .normal {
+            pure1v1Print(message, context: "CallApi")
+        } else {
+            pure1v1Warn(message, context: "CallApi")
         }
     }
 }
