@@ -180,11 +180,11 @@ class MusicSettingDialog constructor(
         }
 
         if (currentSong == null) {
-            enableDisableView(mBinding.layoutVoiceScoringDifficulty, false)
-            mBinding.layoutVoiceScoringDifficulty.alpha = 0.3f
-        } else {
             enableDisableView(mBinding.layoutVoiceScoringDifficulty, true)
             mBinding.layoutVoiceScoringDifficulty.alpha = 1.0f
+        } else {
+            enableDisableView(mBinding.layoutVoiceScoringDifficulty, false)
+            mBinding.layoutVoiceScoringDifficulty.alpha = 0.3f
         }
 
         // 专业模式
