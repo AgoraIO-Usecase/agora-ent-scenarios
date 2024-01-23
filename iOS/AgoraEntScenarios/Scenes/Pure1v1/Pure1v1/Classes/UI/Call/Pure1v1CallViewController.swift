@@ -31,6 +31,7 @@ class Pure1v1CallViewController: UIViewController {
             if let rtcChannelName = rtcChannelName {
                 let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: localUid)
                 rtcEngine?.addDelegateEx(self.realTimeView, connection: connection)
+                self.realTimeView.roomId = rtcChannelName
             }
         }
     }

@@ -54,6 +54,13 @@ class Pure1v1UserListViewController: UIViewController {
         return listView
     }()
     
+    private lazy var bgImgView: UIImageView = {
+        let imgView = UIImageView()
+        imgView.image = UIImage.scene1v1Image(name: "roomList")
+        imgView.frame = self.view.bounds
+        return imgView
+    }()
+    
     private weak var callDialog: Pure1v1Dialog?
     
     deinit {
@@ -63,6 +70,7 @@ class Pure1v1UserListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        view.addSubview(bgImgView)
         view.addSubview(noDataView)
         view.addSubview(listView)
         view.addSubview(naviBar)
@@ -198,6 +206,7 @@ extension Pure1v1UserListViewController {
                 }
                 let userList = list.filter({$0.userId != self.userInfo?.userId})
                 self.listView.userList = userList
+                self.noDataView.isHidden = userList.count > 0
                 self._showGuideIfNeed()
                 self.naviBar.style = userList.count > 0 ? .light : .dark
                 AUIToast.show(text: "user_list_refresh_tips".pure1v1Localization())
@@ -453,7 +462,7 @@ extension Pure1v1UserListViewController {
 private let VideoResources = [
     "https://download.agora.io/demo/test/calling_show_1.mp4",
     "https://download.agora.io/demo/test/calling_show_2.mp4",
-    "https://download.agora.io/demo/test/calling_show_3.mp4",
+    "https://download.agora.io/demo/test/calling_show_4.mp4",
 ]
 
 private let RingURL = "https://download.agora.io/demo/test/1v1_bgm1.wav"
@@ -484,13 +493,15 @@ extension Pure1v1UserListViewController {
     }
     
     private func randomVideoURL() -> String {
-        VideoResources[VideoResources.count % 3]
+        VideoResources[Int(arc4random()) % 3]
     }
     
     // 播放视频
     private func startVideoPlayer(){
         let musicPath = randomVideoURL()
         let source = AgoraMediaSource()
+        source.autoPlay = true
+        source.enableCache = true
         source.url = musicPath
         if let callDialog = callDialog as? Pure1v1CallerDialog {
             player?.setView(callDialog.videoView)

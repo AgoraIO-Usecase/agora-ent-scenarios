@@ -70,8 +70,7 @@ class Pure1v1UserCell: UICollectionViewCell {
     var callClosure: ((Pure1v1UserInfo?)->())?
     var userInfo: Pure1v1UserInfo? {
         didSet {
-            bgImageView.image = userInfo?.bgImage()
-            contentImageView.image = bgImageView.image
+            contentImageView.image = userInfo?.bgImage()
             remoteUserView.setInfo(title: "user_list_cell_remote_user".pure1v1Localization(),
                                    avatarUrl: userInfo?.avatar ?? "",
                                    avatarName: userInfo?.userName ?? "")
@@ -122,12 +121,8 @@ class Pure1v1UserCell: UICollectionViewCell {
     private lazy var bgImageView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFill
+        view.image = UIImage.scene1v1Image(name: "roomList")
         return view
-    }()
-    private lazy var blurView: UIVisualEffectView = {
-        let blurEffect = UIBlurEffect(style: .extraLight);
-        let visualEffectView = UIVisualEffectView(effect: blurEffect)
-        return visualEffectView
     }()
     
     // 内容容器
@@ -161,7 +156,6 @@ class Pure1v1UserCell: UICollectionViewCell {
     private func _loadSubview() {
         clipsToBounds = true
         contentView.addSubview(bgImageView)
-        bgImageView.addSubview(blurView)
         contentView.addSubview(contentImageView)
         contentImageView.layer.addSublayer(gradientLayer)
         contentImageView.layer.addSublayer(liveGradientLayer)
@@ -174,7 +168,6 @@ class Pure1v1UserCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         bgImageView.frame = contentView.bounds
-        blurView.frame = bgImageView.bounds
         let top = UIDevice.current.aui_SafeDistanceTop + 51
         let bottom = 47.0
         contentImageView.frame = CGRect(x: 15, y: top, width: self.aui_width - 30, height: self.aui_height - bottom - top)

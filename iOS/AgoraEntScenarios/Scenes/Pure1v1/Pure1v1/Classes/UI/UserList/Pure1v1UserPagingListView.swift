@@ -46,6 +46,7 @@ class Pure1v1UserPagingListView: UIView {
         collectionView.showsVerticalScrollIndicator = false
         collectionView.contentInsetAdjustmentBehavior = .never
         collectionView.refreshControl = refreshControl
+        collectionView.contentInset = UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
         addSubview(collectionView)
         
         return collectionView
@@ -120,7 +121,10 @@ extension Pure1v1UserPagingListView {
     }
     
     private func scroll(to index: Int) {
-        collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredVertically, animated: false)
+        let count = collectionView.numberOfItems(inSection: 0)
+        if count > index {
+            collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredVertically, animated: false)
+        }
     }
 }
 

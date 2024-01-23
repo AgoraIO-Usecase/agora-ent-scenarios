@@ -63,11 +63,19 @@ class ShowCycleRoomArray: AGRoomArray {
 }
 
 class RoomPagingListView: UIView {
+    var isLoop = false
+    var refreshBeginClousure: (()->())?
+    private lazy var refreshControl: UIRefreshControl = {
+        let ctrl = UIRefreshControl()
+        ctrl.addTarget(self, action: #selector(refreshControlValueChanged(_ :)), for: .valueChanged)
+        return ctrl
+    }()
+    
+    
     var callClosure: ((ShowTo1v1RoomInfo?)->())?
     var tapClosure: ((ShowTo1v1RoomInfo?)->())?
     var roomList: [ShowTo1v1RoomInfo] = [] {
         didSet {
-            self.isHidden = roomList.count == 0 ? true : false
             delegateHandler.roomList = ShowCycleRoomArray(roomList: roomList)
             reloadData()
         }
@@ -101,6 +109,8 @@ class RoomPagingListView: UIView {
         collectionView.isPagingEnabled = true
         collectionView.showsVerticalScrollIndicator = false
         collectionView.contentInsetAdjustmentBehavior = .never
+        collectionView.refreshControl = refreshControl
+        collectionView.contentInset = UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
         addSubview(collectionView)
         
         return collectionView
@@ -131,6 +141,14 @@ class RoomPagingListView: UIView {
         }
         showTo1v1Print("reloadCurrentItem: \(indexPath.row)")
         collectionView.delegate?.collectionView?(collectionView, willDisplay: cell, forItemAt: indexPath)
+    }
+    
+    @objc private func refreshControlValueChanged(_ refrshControl: UIRefreshControl) {
+        self.refreshBeginClousure?()
+    }
+    
+    func endRefreshing(){
+        refreshControl.endRefreshing()
     }
 }
 

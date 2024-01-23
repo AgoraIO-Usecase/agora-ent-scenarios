@@ -79,7 +79,17 @@ class RoomListViewController: UIViewController {
                 }
             })
         }
+        listView.refreshBeginClousure = { [weak self] in
+            self?._refreshAction()
+        }
         return listView
+    }()
+    
+    private lazy var bgImgView: UIImageView = {
+        let imgView = UIImageView()
+        imgView.image = UIImage.sceneImage(name: "roomList")
+        imgView.frame = self.view.bounds
+        return imgView
     }()
     
     private lazy var createButton: UIButton = {
@@ -118,6 +128,7 @@ class RoomListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        view.addSubview(bgImgView)
         view.addSubview(noDataView)
         view.addSubview(listView)
         view.addSubview(naviBar)
@@ -125,7 +136,7 @@ class RoomListViewController: UIViewController {
         naviBar.backButton.addTarget(self, action: #selector(_backAction), for: .touchUpInside)
         naviBar.refreshButton.addTarget(self, action: #selector(_refreshAction), for: .touchUpInside)
         naviBar.refreshButton.isHidden = true
-        naviBar.refreshButton.isHidden = false
+//        naviBar.refreshButton.isHidden = false
         _refreshAction()
         
         callVC.currentUser = userInfo
@@ -271,16 +282,16 @@ extension RoomListViewController {
     }
     
     @objc func _refreshAction() {
-        naviBar.startRefreshAnimation()
         service.getRoomList {[weak self] list in
             guard let self = self else {return}
-            self.naviBar.stopRefreshAnimation()
+            self.listView.endRefreshing()
             let roomList = list
             let oldList = self.listView.roomList
             roomList.forEach { info in
                 info.token = self.rtcToken
             }
             self.listView.roomList = roomList
+            noDataView.isHidden = roomList.count > 0
             self._showGuideIfNeed()
             self.naviBar.style = roomList.count > 0 ? .light : .dark
             VideoLoaderApiImpl.shared.cleanCache()
