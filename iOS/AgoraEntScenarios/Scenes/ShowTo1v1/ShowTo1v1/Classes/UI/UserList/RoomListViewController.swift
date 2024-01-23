@@ -219,7 +219,7 @@ extension RoomListViewController {
         prepareConfig.roomId = roomId
         prepareConfig.localView =  callVC.localCanvasView.canvasView
         prepareConfig.remoteView = callVC.remoteCanvasView.canvasView
-        prepareConfig.autoAccept = false  // 如果期望收到呼叫自动接通，则需要设置为true
+        prepareConfig.autoAccept = true  // 如果期望收到呼叫自动接通，则需要设置为true
         prepareConfig.autoJoinRTC = false  // 如果期望立即加入自己的RTC呼叫频道，则需要设置为true
         prepareConfig.userExtension = userInfo?.yy_modelToJSONObject() as? [String: Any]
         
@@ -352,10 +352,6 @@ extension RoomListViewController {
     }
     
     private func _showBroadcasterVC(roomInfo: ShowTo1v1RoomInfo) {
-        prepareConfig.autoAccept = true
-        callApi.prepareForCall(prepareConfig: prepareConfig) { _ in
-        }
-        
         let isBroadcaster = roomInfo.uid == userInfo?.uid
         let vc = BroadcasterViewController()
         vc.callApi = self.callApi
@@ -395,15 +391,16 @@ extension RoomListViewController: CallApiListenerProtocol {
             let toUserId = eventInfo[kRemoteUserId] as? UInt ?? 0
             showTo1v1Print("calling: fromUserId: \(fromUserId) fromRoomId: \(fromRoomId) currentId: \(currentUid) toUserId: \(toUserId)")
             if let connectedUserId = connectedUserId, connectedUserId != fromUserId {
-                //如果已经不在直播页面了，不应该能呼叫
+                //如果已经通话页面了，不应该能呼叫
                 callApi.reject(remoteUserId: fromUserId, reason: "already calling") { err in
                 }
                 return
             }
-            // 触发状态的用户是自己才处理
+            
             if currentUid == "\(toUserId)" {
+                //被叫
                 guard navigationController?.visibleViewController is BroadcasterViewController else {
-                    //不在直播页面，不能呼叫
+                    //被叫不在直播页面，不能呼叫
                     callApi.reject(remoteUserId: fromUserId, reason: "not in broadcaster view") { _ in
                     }
                     return
@@ -425,6 +422,7 @@ extension RoomListViewController: CallApiListenerProtocol {
                     showTo1v1Print("callee user not found1")
                 }
             } else if currentUid == "\(fromUserId)" {
+                //主叫
                 connectedUserId = toUserId
                 //主叫userlist一定会有，因为需要点击
                 if let user = listView.roomList.first {$0.uid == "\(toUserId)"} {
@@ -477,7 +475,6 @@ extension RoomListViewController: CallApiListenerProtocol {
     func onCallEventChanged(with event: CallEvent) {
         switch event {
         case .localHangup, .remoteLeave:
-            prepareConfig.autoAccept = false
             prepareConfig.roomId = userInfo?.get1V1ChannelId() ?? NSString.withUUID()
             callApi.prepareForCall(prepareConfig: prepareConfig) { _ in
             }
