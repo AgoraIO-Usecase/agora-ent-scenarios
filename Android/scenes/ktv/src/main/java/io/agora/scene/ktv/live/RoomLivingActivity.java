@@ -400,9 +400,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 roomLivingViewModel.mSetting.setMHighLighterUid("");
             }
 
-            if (!hasHighlighter) {
-                roomLivingViewModel.resetAudioPreset();
-            }
+//            if (!hasHighlighter) {
+//                roomLivingViewModel.resetAudioPreset();
+//            }
 
             // TODO: 2024/1/15 隐藏人声突出入口
 //            if (roomLivingViewModel.isRoomOwner() && chorusNowNum > 0) {
