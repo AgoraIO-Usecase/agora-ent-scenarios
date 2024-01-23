@@ -1,14 +1,10 @@
 package io.agora.scene.pure1v1
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import io.agora.mediaplayer.IMediaPlayer
-import io.agora.mediaplayer.IMediaPlayerObserver
 import io.agora.mediaplayer.data.MediaPlayerSource
-import io.agora.mediaplayer.data.PlayerUpdatedInfo
-import io.agora.mediaplayer.data.SrcInfo
 import io.agora.rtc2.*
 import io.agora.rtc2.Constants.*
 import io.agora.rtc2.video.VideoCanvas
@@ -163,7 +159,7 @@ class CallServiceManager {
         })
         mMediaPlayer?.setLoopCount(-1)
         mMediaPlayer?.adjustPlayoutVolume(0)
-        Log.d(tag, "playCallShow: $ret")
+        Pure1v1Logger.d(tag, "playCallShow: $ret")
     }
 
     fun stopCallShow() {
@@ -175,7 +171,7 @@ class CallServiceManager {
         rtcEngine?.setupLocalVideo(canvas)
 
         val ret = player.stop()
-        Log.d(tag, "stopCallShow：$ret")
+        Pure1v1Logger.d(tag, "stopCallShow：$ret")
     }
 
     fun renderCallShow(view: View) {
@@ -194,12 +190,12 @@ class CallServiceManager {
             isEnableCache = true
         })
         mMediaPlayer2?.setLoopCount(-1)
-        Log.d(tag, "playCallMusic：$ret")
+        Pure1v1Logger.d(tag, "playCallMusic：$ret")
     }
 
     fun stopCallMusic() {
         val ret = mMediaPlayer2?.stop()
-        Log.d(tag, "stopCallMusic：$ret")
+        Pure1v1Logger.d(tag, "stopCallMusic：$ret")
     }
 
     private fun initialize(prepareConfig: PrepareConfig) {
@@ -238,7 +234,7 @@ class CallServiceManager {
         config.mEventHandler = object : IRtcEngineEventHandler() {
             override fun onError(err: Int) {
                 super.onError(err)
-                Log.e(tag, "IRtcEngineEventHandler onError:$err")
+                Pure1v1Logger.e(tag, "IRtcEngineEventHandler onError:$err")
             }
         }
         config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING
@@ -247,7 +243,7 @@ class CallServiceManager {
             rtcEngine = RtcEngine.create(config) as RtcEngineEx
         } catch (e: Exception) {
             e.printStackTrace()
-            Log.e(tag, "RtcEngine.create() called error: $e")
+            Pure1v1Logger.e(tag, "RtcEngine.create() called error: $e")
         }
         return rtcEngine ?: throw RuntimeException("RtcEngine create failed!")
     }

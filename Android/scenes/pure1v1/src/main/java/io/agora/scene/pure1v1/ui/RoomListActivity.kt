@@ -14,7 +14,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -22,7 +21,6 @@ import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.scene.base.AudioModeration
-import io.agora.scene.base.GlideOptions
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
@@ -34,13 +32,20 @@ import io.agora.scene.pure1v1.databinding.Pure1v1RoomListItemLayoutBinding
 import io.agora.scene.pure1v1.CallServiceManager
 import io.agora.scene.pure1v1.utils.PermissionHelp
 import io.agora.scene.pure1v1.service.UserInfo
+import io.agora.scene.pure1v1.ui.base.CallDialog
+import io.agora.scene.pure1v1.ui.base.CallDialogState
+import io.agora.scene.pure1v1.ui.calling.CallReceiveDialog
+import io.agora.scene.pure1v1.ui.calling.CallSendDialog
+import io.agora.scene.pure1v1.ui.living.CallDetailFragment
 import io.agora.scene.widget.CustomRefreshLayoutHeader
 import io.agora.scene.widget.dialog.PermissionLeakDialog
-import io.agora.scene.widget.utils.BlurTransformation
 import org.json.JSONException
 import org.json.JSONObject
 import kotlin.random.Random
 
+/*
+ * 1v1 房间列表 activity
+ */
 class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>(), ICallApiListener {
 
     private val tag = "RoomListActivity_LOG"
@@ -95,13 +100,15 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
         CallServiceManager.instance.setup(this)
         CallServiceManager.instance.sceneService?.enterRoom { e ->
-            binding.smartRefreshLayout.autoRefresh()
+            if (e == null) {
+                binding.smartRefreshLayout.autoRefresh()
+            }
         }
         CallServiceManager.instance.callApi?.addListener(this)
     }
 
     private fun setOnApplyWindowInsetsListener() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v: View, insets: WindowInsetsCompat ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _: View, insets: WindowInsetsCompat ->
             val inset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             binding.root.setPaddingRelative(0, 0, 0, inset.bottom)
             binding.titleView.setPaddingRelative(0, inset.top, 0, 0)
@@ -232,6 +239,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 val remoteUser = CallServiceManager.instance.remoteUser
                 if (remoteUser != null && remoteUser.userId != fromUserId.toString())  {
                     CallServiceManager.instance.callApi?.reject(fromUserId, "already calling") { err ->
+                        Pure1v1Logger.d(tag, "callApi reject failed: $err")
                     }
                     return
                 }
@@ -493,9 +501,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         }
     }
 
-    private class UserItemViewHolder(
-        val binding: Pure1v1RoomListItemLayoutBinding,
-        itemView: View) : RecyclerView.ViewHolder(itemView) {
-        }
+    private class UserItemViewHolder(val binding: Pure1v1RoomListItemLayoutBinding, itemView: View) : RecyclerView.ViewHolder(itemView)
 }
 

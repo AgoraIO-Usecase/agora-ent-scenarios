@@ -1,25 +1,24 @@
-package io.agora.scene.pure1v1.ui
+package io.agora.scene.pure1v1.ui.living
 
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout.LayoutParams
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import io.agora.rtc2.IRtcEngineEventHandler
-import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.callapi.*
 import io.agora.scene.pure1v1.databinding.Pure1v1CallDetailFragmentBinding
 import io.agora.scene.pure1v1.CallServiceManager
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import java.util.concurrent.TimeUnit
 
+/*
+ * 1v1 互动中页面
+ */
 class CallDetailFragment : Fragment(), ICallApiListener {
 
     private lateinit var binding: Pure1v1CallDetailFragmentBinding

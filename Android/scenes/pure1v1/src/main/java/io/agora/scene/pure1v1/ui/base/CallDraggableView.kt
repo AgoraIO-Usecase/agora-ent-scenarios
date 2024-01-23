@@ -1,4 +1,4 @@
-package io.agora.scene.pure1v1.ui
+package io.agora.scene.pure1v1.ui.base
 
 import android.content.Context
 import android.util.AttributeSet
@@ -8,7 +8,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.databinding.Pure1v1DraggableViewBinding
 
 class CallDraggableView @JvmOverloads constructor(

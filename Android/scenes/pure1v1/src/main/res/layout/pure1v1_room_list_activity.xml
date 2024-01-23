@@ -42,7 +42,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
-    <io.agora.scene.pure1v1.ui.RoomListGuideView
+    <io.agora.scene.pure1v1.ui.base.RoomListGuideView
         android:id="@+id/vGuidance"
         android:visibility="gone"
         android:layout_width="match_parent"

@@ -1,4 +1,4 @@
-package io.agora.scene.pure1v1.ui
+package io.agora.scene.pure1v1.ui.living
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -14,6 +14,9 @@ import io.agora.scene.pure1v1.CallServiceManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.GlobalScope.coroutineContext
 
+/*
+ * 1v1 互动中数据面板
+ */
 class DashboardFragment : Fragment() {
 
     private lateinit var binding: Pure1v1DashboardFragmentBinding

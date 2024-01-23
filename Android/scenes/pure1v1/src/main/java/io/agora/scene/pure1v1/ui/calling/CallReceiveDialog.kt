@@ -1,9 +1,8 @@
-package io.agora.scene.pure1v1.ui
+package io.agora.scene.pure1v1.ui.calling
 
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
@@ -15,7 +14,13 @@ import com.bumptech.glide.request.RequestOptions
 import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.databinding.Pure1v1CallReceiveDialogBinding
 import io.agora.scene.pure1v1.service.UserInfo
+import io.agora.scene.pure1v1.ui.base.CallDialog
+import io.agora.scene.pure1v1.ui.base.CallDialogState
+import io.agora.scene.pure1v1.ui.base.DebouncedOnClickListener
 
+/*
+ * 1v1 呼叫接受对话框
+ */
 class CallReceiveDialog(
     private val context: Context,
     private val userInfo: UserInfo

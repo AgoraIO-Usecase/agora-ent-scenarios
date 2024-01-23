@@ -1,4 +1,4 @@
-package io.agora.scene.pure1v1.ui
+package io.agora.scene.pure1v1.ui.living
 
 import android.app.Dialog
 import android.content.Context
@@ -7,8 +7,10 @@ import android.view.LayoutInflater
 import android.view.animation.AnimationUtils
 import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.databinding.Pure1v1CallDetailSettingDialogBinding
-import io.agora.scene.pure1v1.databinding.Pure1v1CallSendDialogBinding
 
+/*
+ * 1v1 互动中设置页面
+ */
 class CallDetailSettingDialog(
     private val context: Context,
 ) : Dialog(context, R.style.Pure1v1Theme_Dialog_Bottom) {

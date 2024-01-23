@@ -1,4 +1,4 @@
-package io.agora.scene.pure1v1.ui
+package io.agora.scene.pure1v1.ui.calling
 
 import android.content.Context
 import android.os.Bundle
@@ -8,17 +8,18 @@ import android.view.LayoutInflater
 import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.Animation.AnimationListener
-import android.view.animation.AnimationUtils
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.scene.pure1v1.CallServiceManager
-import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.databinding.Pure1v1CallSendDialogBinding
 import io.agora.scene.pure1v1.service.UserInfo
+import io.agora.scene.pure1v1.ui.base.CallDialogState
+import io.agora.scene.pure1v1.ui.base.DebouncedOnClickListener
 
+/*
+ * 1v1 拨打页面
+ */
 class CallSendDialog(
     private val context: Context
 ) : Fragment() {

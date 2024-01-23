@@ -1,4 +1,4 @@
-package io.agora.scene.pure1v1.ui
+package io.agora.scene.pure1v1.ui.base
 
 import android.content.Context
 import android.util.AttributeSet
