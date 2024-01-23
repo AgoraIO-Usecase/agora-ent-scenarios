@@ -285,6 +285,7 @@ class MusicSettingDialog constructor(
      */
     private fun showSoundCardPage(v: View) {
         mBinding.root.removeAllViews()
+        mBinding.root.setBackgroundResource(R.drawable.ktv_rect_white_top_r20)
         val soundCardFragment = SoundCardFragment(mSoundCardSetting)
         soundCardFragment.onClickSoundCardType = {
             showSoundTypeSelectPage()
