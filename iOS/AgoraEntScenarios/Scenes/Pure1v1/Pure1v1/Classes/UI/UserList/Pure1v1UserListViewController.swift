@@ -488,6 +488,7 @@ extension Pure1v1UserListViewController {
     // 停止响铃
     private func stopRing(){
         rtcEngine.stopAudioMixing()
+        _refreshAction()
     }
     
     private func randomVideoURL() -> String {

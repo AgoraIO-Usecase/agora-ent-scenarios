@@ -149,6 +149,7 @@ class RoomListViewController: UIViewController {
         super.viewWillAppear(animated)
 //        videoLoaderApi.cleanCache()
         listView.reloadCurrentItem()
+        _refreshAction()
     }
     
     private func _showGuideIfNeed() {

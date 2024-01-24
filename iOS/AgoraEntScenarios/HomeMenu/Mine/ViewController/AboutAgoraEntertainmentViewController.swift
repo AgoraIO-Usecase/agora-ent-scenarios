@@ -30,7 +30,7 @@ import AgoraRtcKit
     
     let tableHeader = AboutAgoraHeader(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 220),
                                        name: NSLocalizedString("app_about_name", comment: ""),
-                                       versionText: NSLocalizedString("app_about_version", comment: "")+": "+"20231230-"+UIDevice.current.appVersion+"-\(AgoraRtcEngineKit.getSdkVersion())")
+                                       versionText: NSLocalizedString("app_about_version", comment: "")+": "+"20230229-"+UIDevice.current.appVersion+"-\(AgoraRtcEngineKit.getSdkVersion())")
     
     lazy var infoList: UITableView = {
         UITableView(frame: .zero, style: .grouped)
