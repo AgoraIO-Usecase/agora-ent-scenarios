@@ -32,9 +32,9 @@ enum NaviBarStyle: Int {
     func titleColor() -> UIColor {
         switch self {
         case .dark:
-            return .white
-        default:
             return .black
+        default:
+            return .white
         }
     }
 }

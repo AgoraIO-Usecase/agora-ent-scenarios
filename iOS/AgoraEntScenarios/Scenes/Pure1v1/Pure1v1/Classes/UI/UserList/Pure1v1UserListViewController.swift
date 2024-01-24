@@ -207,7 +207,6 @@ extension Pure1v1UserListViewController {
                 self.listView.userList = userList
                 self.noDataView.isHidden = userList.count > 0
                 self._showGuideIfNeed()
-                self.naviBar.style = userList.count > 0 ? .light : .dark
                 AUIToast.show(text: "user_list_refresh_tips".pure1v1Localization())
             }
         }
