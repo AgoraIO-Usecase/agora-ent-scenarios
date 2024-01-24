@@ -896,6 +896,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         binding.flAssistantContainer.removeAllViews()
         binding.flVideoContainer.isVisible = false
         binding.flAssistantContainer.isVisible = false
+        mGameChooseGameDialog?.let { dialog ->
+            dialog.dismiss()
+            mGameChooseGameDialog = null
+        }
     }
 
     private fun sendMouseMessage(event: MotionEvent, value: Int) {
