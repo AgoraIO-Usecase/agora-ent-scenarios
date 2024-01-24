@@ -3,7 +3,7 @@ apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
 android {
     defaultConfig {
-        applicationId "io.agora.AgoraVoice"
+        applicationId "io.agora.joy"
         ndk.abiFilters 'arm64-v8a', 'armeabi-v7a' //, 'x86', 'x86-64'
     }
 
@@ -41,6 +41,9 @@ dependencies {
     }
     if (isProjectLibrary(':scenes:showTo1v1')) {
         runtimeOnly project(':scenes:showTo1v1')
+    }
+    if (isProjectLibrary(':scenes:joy')) {
+        runtimeOnly project(':scenes:joy')
     }
 
     //glide 图片加载
