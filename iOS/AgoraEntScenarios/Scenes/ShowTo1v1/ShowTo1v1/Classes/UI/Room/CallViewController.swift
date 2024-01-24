@@ -18,6 +18,22 @@ class CallViewController: BaseRoomViewController {
     }
     var currentUser: ShowTo1v1UserInfo?
     
+    var rtcChannelName: String? {
+        didSet {
+            let localUid = Int(currentUser?.getUIntUserId() ?? 0)
+            if let oldValue = oldValue {
+                let connection = AgoraRtcConnection(channelId: oldValue, localUid: localUid)
+                connection.channelId = oldValue
+                rtcEngine?.removeDelegateEx(self.realTimeView, connection: connection)
+            }
+            
+            if let rtcChannelName = rtcChannelName {
+                let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: localUid)
+                rtcEngine?.addDelegateEx(self.realTimeView, connection: connection)
+                self.realTimeView.roomId = rtcChannelName
+            }
+        }
+    }
     private lazy var moveViewModel: MoveGestureViewModel = MoveGestureViewModel()
     private lazy var hangupButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -141,7 +157,6 @@ extension CallViewController: AgoraRtcEngineDelegate {
 }
 
 extension CallViewController {
-    
     override func onCallStateChanged(with state: CallStateType,
                                      stateReason: CallStateReason,
                                      eventReason: String,

@@ -24,7 +24,6 @@ import AgoraRtmKit
     public var rtmToken: String = ""                    //rtm token
     public var localView: UIView!                       //显示本地流的画布
     public var remoteView: UIView!                      //显示远端流的画布
-    public var autoAccept: Bool = true                  //被叫收到呼叫后是否自动接受，true: CallApi内部会自动调用accept，false: 外部收到calling状态时需要手动accept/reject
     public var autoJoinRTC: Bool = false                //是否在不呼叫的情况下提前加入自己的RTC频道，该设置可以加快呼叫的出图速度
     public var callTimeoutMillisecond: UInt64 = 15000   //呼叫超时时间，单位豪秒，0表示内部不处理超时
     public var userExtension: [String: Any]?            //[可选]用户扩展字段，收到对端消息而改变状态(例如calling/connecting)时可以通过kFromUserExtension字段获取
@@ -82,6 +81,7 @@ import AgoraRtmKit
     case rtmLost = 115                  //rtm超时断连
     case rtcOccurError = 116            //rtc出现错误
     case remoteCallBusy = 117           //远端用户忙
+    case startCaptureFail = 118         //开启采集失败
 }
 
 @objc public enum CallStateType: UInt {

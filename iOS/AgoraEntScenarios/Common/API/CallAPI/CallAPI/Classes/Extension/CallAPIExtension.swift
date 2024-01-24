@@ -15,7 +15,7 @@ extension PrepareConfig {
         config.rtmToken = rtmToken
         config.localView = localView
         config.remoteView = remoteView
-        config.autoAccept = autoAccept
+//        config.autoAccept = autoAccept
         config.autoJoinRTC = autoJoinRTC
         config.callTimeoutMillisecond = callTimeoutMillisecond
         config.userExtension = userExtension

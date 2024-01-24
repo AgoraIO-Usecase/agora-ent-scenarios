@@ -14,9 +14,6 @@ class Pure1v1CallViewController: UIViewController {
         didSet {
             oldValue?.removeListener(listener: self)
             callApi?.addListener(listener: self)
-            let connection = AgoraRtcConnection()
-            connection.channelId = ""
-            rtcEngine?.addDelegateEx(self.realTimeView, connection: connection)
         }
     }
     var rtcChannelName: String? {

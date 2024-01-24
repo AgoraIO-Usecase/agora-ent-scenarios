@@ -17,9 +17,7 @@ class BaseRoomViewController: UIViewController {
     var callApi: CallApiImpl? {
         didSet {
             oldValue?.removeListener(listener: self)
-            oldValue?.removeRTCListener(listener: self.realTimeView)
             callApi?.addListener(listener: self)
-            callApi?.addRTCListener(listener: self.realTimeView)
         }
     }
     private(set) lazy var roomInfoView: RoomInfoView = RoomInfoView()

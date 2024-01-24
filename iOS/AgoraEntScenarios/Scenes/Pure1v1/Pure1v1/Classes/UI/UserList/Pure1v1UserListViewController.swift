@@ -136,7 +136,6 @@ extension Pure1v1UserListViewController {
         prepareConfig.roomId = userInfo?.getRoomId() ?? NSString.withUUID()
         prepareConfig.localView = callVC.localCanvasView.canvasView
         prepareConfig.remoteView = callVC.remoteCanvasView.canvasView
-        prepareConfig.autoAccept = false  // 如果期望收到呼叫自动接通，则需要设置为true
         prepareConfig.autoJoinRTC = false  // 如果期望立即加入自己的RTC呼叫频道，则需要设置为true
         prepareConfig.userExtension = userInfo?.yy_modelToJSONObject() as? [String: Any]
         callApi.prepareForCall(prepareConfig: prepareConfig) { err in

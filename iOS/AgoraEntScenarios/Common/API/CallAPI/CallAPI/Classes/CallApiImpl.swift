@@ -407,7 +407,11 @@ extension CallApiImpl {
 //        engine.setVideoFrameDelegate(self)
         engine.setDefaultAudioRouteToSpeakerphone(true)
         engine.setupLocalVideo(canvas)
-        engine.startPreview()
+        let ret = engine.startPreview()
+        
+        if ret != 0 {
+            _notifyEvent(event: .startCaptureFail, eventReason: "code = \(ret)")
+        }
     }
     
     private func _notifyRTCState(err: NSError?) {
@@ -746,7 +750,7 @@ extension CallApiImpl {
         let callId = message[kCallId] as? String ?? ""
         
         var enableNotify: Bool = true
-        var autoAccept = prepareConfig?.autoAccept ?? false
+        var autoAccept = false//prepareConfig?.autoAccept ?? false
         switch state {
         case .prepared:
             break
@@ -822,10 +826,7 @@ extension CallApiImpl {
     //收到挂断消息
     fileprivate func _onHangup(message: [String: Any]) {
         guard _isCallingUser(message: message) else { return }
-        guard let callId = message[kCallId] as? String, callId == connectInfo.callId else {
-            callWarningPrint("onHangup fail: callId missmatch")
-            return
-        }
+
         _updateAndNotifyState(state: .prepared, stateReason: .remoteHangup, eventInfo: message)
         _notifyEvent(event: .remoteHangup)
     }
@@ -1025,12 +1026,12 @@ extension CallApiImpl: CallApiProtocol {
         _notifyEvent(event: .localHangup)
     }
     
-    public func addRTCListener(listener: AgoraRtcEngineDelegate) {
+    private func addRTCListener(listener: AgoraRtcEngineDelegate) {
         _reportMethod(event: "\(#function)")
         rtcProxy.addListener(listener)
     }
     
-    public func removeRTCListener(listener: AgoraRtcEngineDelegate) {
+    private func removeRTCListener(listener: AgoraRtcEngineDelegate) {
         _reportMethod(event: "\(#function)")
         rtcProxy.removeListener(listener)
     }
@@ -1160,7 +1161,7 @@ extension CallApiImpl {
 //        debugApiPrint("[CallApi]\(message)")
 //        #else
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
-        let timeString = ""//formatter.string(from: Date())
+        let timeString = formatter.string(from: Date())
         for element in delegates.allObjects {
             (element as? CallApiListenerProtocol)?.callDebugInfo?(message: "\(timeString) \(message)", logLevel: logLevel)
         }

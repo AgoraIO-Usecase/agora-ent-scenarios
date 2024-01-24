@@ -31,6 +31,7 @@ class RoomListViewController: UIViewController {
     private weak var preJoinRoom: ShowTo1v1RoomInfo?
     private weak var callDialog: ShowTo1v1Dialog?
     private var connectedUserId: UInt?
+    private var connectedChannelId: String?
     private weak var createRoomDialog: CreateRoomDialog?
     private var rtcToken = ""
     private var rtmToken = ""
@@ -230,7 +231,6 @@ extension RoomListViewController {
         prepareConfig.roomId = roomId
         prepareConfig.localView =  callVC.localCanvasView.canvasView
         prepareConfig.remoteView = callVC.remoteCanvasView.canvasView
-        prepareConfig.autoAccept = true  // 如果期望收到呼叫自动接通，则需要设置为true
         prepareConfig.autoJoinRTC = false  // 如果期望立即加入自己的RTC呼叫频道，则需要设置为true
         prepareConfig.userExtension = userInfo?.yy_modelToJSONObject() as? [String: Any]
         
@@ -393,7 +393,8 @@ extension RoomListViewController: CallApiListenerProtocol {
         
         switch state {
             case .calling:
-            if navigationController?.visibleViewController == callVC {
+            //已经在通话页面，不允许呼叫
+            if navigationController?.visibleViewController is CallViewController {
                 return
             }
             
@@ -418,6 +419,9 @@ extension RoomListViewController: CallApiListenerProtocol {
                 }
                 connectedUserId = fromUserId
                 
+                callApi.accept(remoteUserId: fromUserId, completion: { err in
+                })
+                
                 //被叫不一定在userList能查到，需要从callapi里读取发送用户的user extension
                 var user: ShowTo1v1UserInfo? = listView.roomList.first {$0.uid == "\(fromUserId)"}
                 if let userDic = (eventInfo[kFromUserExtension] as? [String: Any]) {
@@ -432,6 +436,7 @@ extension RoomListViewController: CallApiListenerProtocol {
                 } else {
                     showTo1v1Print("callee user not found1")
                 }
+                connectedChannelId = fromRoomId
             } else if currentUid == "\(fromUserId)" {
                 //主叫
                 connectedUserId = toUserId
@@ -451,9 +456,10 @@ extension RoomListViewController: CallApiListenerProtocol {
             break
         case .connected:
             callDialog?.hiddenAnimation()
-            if navigationController?.visibleViewController == callVC {
+            if navigationController?.visibleViewController is CallViewController {
                 return
             }
+            callVC.rtcChannelName = connectedChannelId
             navigationController?.pushViewController(callVC, animated: false)
             break
         case .prepared, .failed:
@@ -461,14 +467,14 @@ extension RoomListViewController: CallApiListenerProtocol {
             connectedUserId = nil
             switch stateReason {
             case .remoteHangup:
-                if navigationController?.visibleViewController == callVC {
+                if navigationController?.visibleViewController is CallViewController {
                     navigationController?.popViewController(animated: false)
                 }
                 AUIToast.show(text: "call_toast_hangup".showTo1v1Localization())
             case .remoteRejected:
                 AUIToast.show(text: "call_user_busy_tips".showTo1v1Localization())
             case .rtmLost:
-                if navigationController?.visibleViewController == callVC {
+                if navigationController?.visibleViewController is CallViewController {
                     navigationController?.popViewController(animated: false)
                 }
                 AUIToast.show(text: "call_toast_disconnect".showTo1v1Localization())
