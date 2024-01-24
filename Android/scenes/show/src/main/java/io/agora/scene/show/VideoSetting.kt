@@ -10,6 +10,9 @@ import io.agora.scene.base.utils.GsonUtil
 import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
 
+/*
+ * 高清设置模块
+ */
 object VideoSetting {
 
     enum class BitRate constructor(val value: Int) {

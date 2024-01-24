@@ -1,4 +1,4 @@
-package io.agora.scene.show.videoLoaderAPI
+package io.agora.videoloaderapi
 
 import android.os.Handler
 import android.os.Looper

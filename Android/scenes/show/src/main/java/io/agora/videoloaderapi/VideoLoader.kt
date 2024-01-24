@@ -1,4 +1,4 @@
-package io.agora.scene.show.videoLoaderAPI
+package io.agora.videoloaderapi
 
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner

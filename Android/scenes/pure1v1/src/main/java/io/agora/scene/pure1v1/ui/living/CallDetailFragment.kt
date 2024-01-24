@@ -10,7 +10,10 @@ import android.widget.FrameLayout.LayoutParams
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import io.agora.scene.pure1v1.callapi.*
+import io.agora.scene.pure1v1.callapi.CallEvent
+import io.agora.scene.pure1v1.callapi.CallStateReason
+import io.agora.scene.pure1v1.callapi.CallStateType
+import io.agora.scene.pure1v1.callapi.ICallApiListener
 import io.agora.scene.pure1v1.databinding.Pure1v1CallDetailFragmentBinding
 import io.agora.scene.pure1v1.CallServiceManager
 import io.agora.scene.widget.dialog.TopFunctionDialog

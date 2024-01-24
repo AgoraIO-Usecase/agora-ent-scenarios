@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import io.agora.callapi.*
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.scene.base.AudioModeration
@@ -26,10 +27,10 @@ import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.pure1v1.Pure1v1Logger
 import io.agora.scene.pure1v1.R
-import io.agora.scene.pure1v1.callapi.*
 import io.agora.scene.pure1v1.databinding.Pure1v1RoomListActivityBinding
 import io.agora.scene.pure1v1.databinding.Pure1v1RoomListItemLayoutBinding
 import io.agora.scene.pure1v1.CallServiceManager
+import io.agora.scene.pure1v1.callapi.*
 import io.agora.scene.pure1v1.utils.PermissionHelp
 import io.agora.scene.pure1v1.service.UserInfo
 import io.agora.scene.pure1v1.ui.base.CallDialog
@@ -45,7 +46,8 @@ import kotlin.random.Random
 /*
  * 1v1 房间列表 activity
  */
-class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>(), ICallApiListener {
+class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>(),
+    ICallApiListener {
 
     private val tag = "RoomListActivity_LOG"
 
@@ -177,10 +179,17 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     private fun call(user: UserInfo) {
         permissionHelp.checkCameraAndMicPerms({
             showCallSendDialog(user)
+            // 主叫播放来点秀
+            CallServiceManager.instance.playCallShow(CallServiceManager.urls[Random.nextInt(CallServiceManager.urls.size)])
+            CallServiceManager.instance.playCallMusic(CallServiceManager.callMusic)
+            // 准备工作
             CallServiceManager.instance.startupCallApiIfNeed()
+            // 拨打
             CallServiceManager.instance.callApi?.call(user.userId.toInt()) { error ->
                 if (error != null) {
                     finishCallDialog()
+                    CallServiceManager.instance.stopCallShow()
+                    CallServiceManager.instance.stopCallMusic()
                 }
             }
         }, {
@@ -222,6 +231,8 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
 
     private var isFirstEnterScene = true
+
+    // 监听 callapi 内的状态变化驱动业务行为
     override fun onCallStateChanged(
         state: CallStateType,
         stateReason: CallStateReason,
@@ -279,17 +290,15 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     permissionHelp.checkCameraAndMicPerms({}, {
                         PermissionLeakDialog(this@RoomListActivity).show("", { getPermissions() }) { launchAppSetting(Manifest.permission.CAMERA) }
                     }, false)
+
+                    // 被叫播放来点音乐
+                    // TODO bug CallServiceManager.instance.rtcEngine?.startAudioMixing(CallServiceManager.callMusic, true, -1, 0)
+                    CallServiceManager.instance.playCallMusic(CallServiceManager.callMusic)
                 } else if (currentUid == fromUserId.toString()) {
                     CallServiceManager.instance.connectedChannelId = fromRoomId
                     val user = dataList.firstOrNull { it.userId == toUserId.toString() } ?: return
                     CallServiceManager.instance.remoteUser = user
-                    showCallSendDialog(user)
-                    // 主叫播放来点秀
-                    CallServiceManager.instance.playCallShow(CallServiceManager.urls[Random.nextInt(CallServiceManager.urls.size)])
                 }
-                // 主、被叫播放来点音乐
-                // TODO bug CallServiceManager.instance.rtcEngine?.startAudioMixing(CallServiceManager.callMusic, true, -1, 0)
-                CallServiceManager.instance.playCallMusic(CallServiceManager.callMusic)
             }
             CallStateType.Connecting -> {
                 callSendDialog?.updateCallState(CallDialogState.Connecting)

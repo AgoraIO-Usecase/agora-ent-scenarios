@@ -35,6 +35,9 @@ import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 import kotlin.random.Random
 
+/*
+ * 主播开播前预览页面 activity
+ */
 @RequiresApi(Build.VERSION_CODES.M)
 class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBinding>() {
 

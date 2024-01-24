@@ -1,7 +1,7 @@
-package io.agora.scene.showTo1v1.callAPI.extension
+package io.agora.scene.showTo1v1.callapi.extension
 
-import io.agora.scene.showTo1v1.callAPI.CallConfig
-import io.agora.scene.showTo1v1.callAPI.PrepareConfig
+import io.agora.scene.showTo1v1.callapi.CallConfig
+import io.agora.scene.showTo1v1.callapi.PrepareConfig
 
 
 fun Long.getCostMilliseconds(): Long {

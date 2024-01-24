@@ -1,4 +1,4 @@
-package io.agora.scene.showTo1v1.callAPI
+package io.agora.scene.showTo1v1.callapi
 
 import android.os.Handler
 import android.os.Looper

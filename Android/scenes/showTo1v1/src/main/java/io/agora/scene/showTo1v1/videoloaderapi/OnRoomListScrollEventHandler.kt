@@ -1,4 +1,4 @@
-package io.agora.scene.show.videoLoaderAPI
+package io.agora.scene.showTo1v1.videoloaderapi
 
 import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager

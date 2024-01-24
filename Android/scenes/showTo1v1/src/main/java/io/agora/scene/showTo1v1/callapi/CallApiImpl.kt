@@ -1,4 +1,4 @@
-package io.agora.scene.showTo1v1.callAPI
+package io.agora.scene.showTo1v1.callapi
 
 import android.content.Context
 import android.os.Handler
@@ -11,7 +11,7 @@ import io.agora.rtc2.*
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.rtm.*
 import io.agora.scene.showTo1v1.BuildConfig
-import io.agora.scene.showTo1v1.callAPI.extension.cloneConfig
+import io.agora.scene.showTo1v1.callapi.extension.cloneConfig
 import org.json.JSONObject
 import java.util.*
 
@@ -106,7 +106,10 @@ class CallApiImpl constructor(
                     // 开启定时器，如果超时无响应，调用no response
                     connectInfo.scheduledTimer({
                         _cancelCall {  }
-                        _updateAndNotifyState(CallStateType.Prepared, CallStateReason.CallingTimeout)
+                        _updateAndNotifyState(
+                            CallStateType.Prepared,
+                            CallStateReason.CallingTimeout
+                        )
                         _notifyEvent(CallEvent.CallingTimeout)
                     }, timeout)
                 }
@@ -304,7 +307,9 @@ class CallApiImpl constructor(
 
         //join rtc if need
         if (prepareConfig.autoJoinRTC) {
-            _joinRTCWithMediaOptions(prepareConfig.roomId, Constants.CLIENT_ROLE_AUDIENCE, CallAutoSubscribeType.Video) { err ->
+            _joinRTCWithMediaOptions(prepareConfig.roomId, Constants.CLIENT_ROLE_AUDIENCE,
+                CallAutoSubscribeType.Video
+            ) { err ->
                 callWarningPrint("prepareForCall[$tag] joinRTC completion: ${err?.msg ?: "success"}")
                 _notifyEvent(if (err == null) CallEvent.JoinRTCSuccessed else CallEvent.JoinRTCFailed)
             }
@@ -477,7 +482,9 @@ class CallApiImpl constructor(
     }
 
     private fun _joinRTCAsBroadcaster(roomId: String) {
-        _joinRTCWithMediaOptions(roomId, Constants.CLIENT_ROLE_BROADCASTER, CallAutoSubscribeType.Video) { error ->
+        _joinRTCWithMediaOptions(roomId, Constants.CLIENT_ROLE_BROADCASTER,
+            CallAutoSubscribeType.Video
+        ) { error ->
             _notifyRTCState(error)
         }
         setupCanvas()
@@ -735,7 +742,7 @@ class CallApiImpl constructor(
 
     private fun _onReject(message: Map<String, Any>) {
         if (!_isCallingUser(message)) return
-        var stateReason: CallStateReason =  CallStateReason.RemoteRejected
+        var stateReason: CallStateReason = CallStateReason.RemoteRejected
         var callEvent: CallEvent = CallEvent.RemoteRejected
         val rejectByInternal = message[kRejectByInternal]
         if (rejectByInternal == 1) {
@@ -752,7 +759,9 @@ class CallApiImpl constructor(
         if (!_isCallingUser(message) || state != CallStateType.Calling) return
         //并且是isLocalAccepted（发起呼叫或者已经accept过了），否则认为本地没有同意
         if (connectInfo.isLocalAccepted) {
-            _updateAndNotifyState(CallStateType.Connecting, CallStateReason.RemoteAccepted, eventInfo = message)
+            _updateAndNotifyState(
+                CallStateType.Connecting,
+                CallStateReason.RemoteAccepted, eventInfo = message)
         }
         _notifyEvent(CallEvent.RemoteAccepted)
     }

@@ -3,6 +3,10 @@ package io.agora.scene.pure1v1
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import io.agora.scene.pure1v1.callapi.CallApiImpl
+import io.agora.scene.pure1v1.callapi.CallConfig
+import io.agora.scene.pure1v1.callapi.ICallApi
+import io.agora.scene.pure1v1.callapi.PrepareConfig
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.data.MediaPlayerSource
 import io.agora.rtc2.*
@@ -12,10 +16,12 @@ import io.agora.rtm.RtmClient
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.pure1v1.callapi.*
 import io.agora.scene.pure1v1.service.Pure1v1ServiceImp
 import io.agora.scene.pure1v1.service.UserInfo
 
+/*
+ * 业务逻辑管理模块
+ */
 class CallServiceManager {
     companion object {
         val instance: CallServiceManager by lazy {

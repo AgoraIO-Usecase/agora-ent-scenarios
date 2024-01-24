@@ -10,7 +10,7 @@ import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.show.debugSettings.DebugSettingModel
-import io.agora.scene.show.videoLoaderAPI.VideoLoader
+import io.agora.videoloaderapi.VideoLoader
 import java.util.concurrent.Executors
 
 object RtcEngineInstance {

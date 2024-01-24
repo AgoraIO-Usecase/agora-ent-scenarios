@@ -55,8 +55,8 @@ import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowRoomRequestStatus
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.service.ShowUser
-import io.agora.scene.show.videoLoaderAPI.OnPageScrollEventHandler
-import io.agora.scene.show.videoLoaderAPI.VideoLoader
+import io.agora.videoloaderapi.OnPageScrollEventHandler
+import io.agora.videoloaderapi.VideoLoader
 import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
 import io.agora.scene.show.widget.AdvanceSettingDialog
 import io.agora.scene.show.widget.MusicEffectDialog
@@ -80,7 +80,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone
 
-
+/*
+ * 直播间内页面
+ */
 class LiveDetailFragment : Fragment() {
     private val TAG = this.toString()
 

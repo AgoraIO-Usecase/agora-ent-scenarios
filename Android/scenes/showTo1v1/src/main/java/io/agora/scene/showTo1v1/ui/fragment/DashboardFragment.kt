@@ -1,7 +1,6 @@
 package io.agora.scene.showTo1v1.ui.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.util.Size
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,7 +12,7 @@ import io.agora.rtc2.RtcConnection
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
-import io.agora.scene.showTo1v1.callAPI.CallStateType
+import io.agora.scene.showTo1v1.callapi.CallStateType
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1DashboardFragmentBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 

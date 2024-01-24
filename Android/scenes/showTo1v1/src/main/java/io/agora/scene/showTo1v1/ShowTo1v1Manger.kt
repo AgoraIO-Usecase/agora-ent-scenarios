@@ -2,7 +2,6 @@ package io.agora.scene.showTo1v1
 
 import android.util.Log
 import android.view.TextureView
-import android.view.ViewGroup
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
@@ -15,9 +14,9 @@ import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
-import io.agora.scene.showTo1v1.callAPI.CallApiImpl
-import io.agora.scene.showTo1v1.callAPI.CallConfig
-import io.agora.scene.showTo1v1.callAPI.PrepareConfig
+import io.agora.scene.showTo1v1.callapi.CallApiImpl
+import io.agora.scene.showTo1v1.callapi.CallConfig
+import io.agora.scene.showTo1v1.callapi.PrepareConfig
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -27,6 +26,9 @@ enum class CallRole(val value: Int) {
     CALLER(1)
 }
 
+/*
+ * 业务逻辑管理模块
+ */
 class ShowTo1v1Manger constructor() {
 
     val videoEncoderConfiguration = VideoEncoderConfiguration().apply {

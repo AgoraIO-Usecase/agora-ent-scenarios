@@ -1,4 +1,4 @@
-package io.agora.scene.showTo1v1.callAPI
+package io.agora.scene.showTo1v1.callapi
 
 data class CallReportInfo(
     var msgId: String,

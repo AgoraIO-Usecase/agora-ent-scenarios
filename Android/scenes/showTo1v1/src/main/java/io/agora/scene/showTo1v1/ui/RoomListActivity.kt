@@ -13,6 +13,10 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+import io.agora.scene.showTo1v1.callapi.CallApiImpl
+import io.agora.scene.showTo1v1.callapi.CallStateReason
+import io.agora.scene.showTo1v1.callapi.CallStateType
+import io.agora.scene.showTo1v1.callapi.ICallApiListener
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
@@ -20,7 +24,6 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.showTo1v1.CallRole
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
-import io.agora.scene.showTo1v1.callAPI.*
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListActivityBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
@@ -29,12 +32,15 @@ import io.agora.scene.showTo1v1.ui.dialog.CallDialog
 import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
 import io.agora.scene.showTo1v1.ui.fragment.RoomListFragment
 import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
-import io.agora.scene.showTo1v1.videoLoaderAPI.AGSlicingType
-import io.agora.scene.showTo1v1.videoLoaderAPI.OnPageScrollEventHandler
-import io.agora.scene.showTo1v1.videoLoaderAPI.VideoLoader
+import io.agora.scene.showTo1v1.videoloaderapi.AGSlicingType
+import io.agora.scene.showTo1v1.videoloaderapi.OnPageScrollEventHandler
+import io.agora.scene.showTo1v1.videoloaderapi.VideoLoader
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 
+/*
+ * 秀场直播房间列表 activity
+ */
 class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBinding>(),
     RoomListFragment.OnFragmentListener {
 

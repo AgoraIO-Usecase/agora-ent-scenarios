@@ -1,4 +1,4 @@
-package io.agora.scene.showTo1v1.videoLoaderAPI
+package io.agora.scene.showTo1v1.videoloaderapi
 
 import android.content.Context
 import android.os.Handler
