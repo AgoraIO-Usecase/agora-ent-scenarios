@@ -77,7 +77,7 @@ class Pure1v1UserPagingListView: UIView {
         refreshControl.endRefreshing()
     }
 }
-
+/*
 private let kPageCacheHalfCount = 5000
 extension Pure1v1UserPagingListView {
     fileprivate func fakeCellCount() -> Int {
@@ -127,16 +127,17 @@ extension Pure1v1UserPagingListView {
         }
     }
 }
+*/
 
 extension Pure1v1UserPagingListView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return fakeCellCount()
+        return userList.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(Pure1v1UserCell.self), for: indexPath) as! Pure1v1UserCell
         
-        let user = userList[realCellIndex(with: indexPath.row)]
+        let user = userList[indexPath.row]
         cell.userInfo = user
         cell.localUserInfo = localUserInfo
         cell.callClosure = { [weak self] user in
@@ -145,7 +146,7 @@ extension Pure1v1UserPagingListView: UICollectionViewDataSource, UICollectionVie
 //        pure1v1Print("load user: \(user.userName) \(realCellIndex(with: indexPath.row)) / \(indexPath.row)")
         return cell
     }
-    
+    /*
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let currentIndex = Int(scrollView.contentOffset.y / scrollView.height)
         if currentIndex > 0, currentIndex < fakeCellCount() - 1 {return}
@@ -155,4 +156,5 @@ extension Pure1v1UserPagingListView: UICollectionViewDataSource, UICollectionVie
 
         scroll(to: toIndex)
     }
+     */
  }

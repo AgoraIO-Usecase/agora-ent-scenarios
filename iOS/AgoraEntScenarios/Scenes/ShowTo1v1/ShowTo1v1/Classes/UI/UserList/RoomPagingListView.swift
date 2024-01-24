@@ -11,7 +11,7 @@ import VideoLoaderAPI
 
 class CollectionViewDelegateProxy: CallApiProxy, UICollectionViewDelegate {}
 
-
+/*
 class ShowCycleRoomArray: AGRoomArray {
     private var halfCount: Int = 9999999
     fileprivate func fakeCellCount() -> Int {
@@ -61,6 +61,7 @@ class ShowCycleRoomArray: AGRoomArray {
         return fakeCellCount()
     }
 }
+ */
 
 class RoomPagingListView: UIView {
     var isLoop = false
@@ -76,14 +77,14 @@ class RoomPagingListView: UIView {
     var tapClosure: ((ShowTo1v1RoomInfo?)->())?
     var roomList: [ShowTo1v1RoomInfo] = [] {
         didSet {
-            delegateHandler.roomList = ShowCycleRoomArray(roomList: roomList)
+            delegateHandler.roomList = AGRoomArray(roomList: roomList)
             reloadData()
         }
     }
     private var localUserInfo: ShowTo1v1UserInfo!
     
-    private lazy var delegateHandler: ShowLivePagesSlicingDelegateHandler = {
-        let handler = ShowLivePagesSlicingDelegateHandler(localUid: self.localUserInfo.getUIntUserId() ?? 0, needPrejoin: true)
+    private lazy var delegateHandler: AGCollectionSlicingDelegateHandler = {
+        let handler = AGCollectionSlicingDelegateHandler(localUid: self.localUserInfo.getUIntUserId() ?? 0, needPrejoin: true)
         handler.videoSlicingType = .visible
         handler.audioSlicingType = .never
         handler.onRequireRenderVideo = { [weak self] (info, cell, indexPath) in
@@ -110,7 +111,7 @@ class RoomPagingListView: UIView {
         collectionView.showsVerticalScrollIndicator = false
         collectionView.contentInsetAdjustmentBehavior = .never
         collectionView.refreshControl = refreshControl
-        collectionView.contentInset = UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
+        collectionView.contentInset = UIEdgeInsets(top: 30, left: 0, bottom: 0, right: 0)
         addSubview(collectionView)
         
         return collectionView
@@ -175,6 +176,7 @@ extension RoomPagingListView: UICollectionViewDataSource {
  }
 
 
+/*
 class ShowLivePagesSlicingDelegateHandler: AGCollectionSlicingDelegateHandler {
     private func scroll(to index: Int) {
         guard let collectionView = scrollView as? UICollectionView else {return}
@@ -195,3 +197,5 @@ class ShowLivePagesSlicingDelegateHandler: AGCollectionSlicingDelegateHandler {
         }
     }
 }
+ */
+
