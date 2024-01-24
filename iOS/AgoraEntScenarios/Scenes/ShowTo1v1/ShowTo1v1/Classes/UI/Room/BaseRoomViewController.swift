@@ -71,6 +71,8 @@ class BaseRoomViewController: UIViewController {
         remoteCanvasView.frame = view.bounds
         
         bottomBar.frame = CGRect(x: 0, y: view.aui_height - UIDevice.current.aui_SafeDistanceBottom - 50, width: view.aui_width, height: 40)
+        
+        realTimeView.roomId = roomInfo?.roomId ?? ""
     }
     
     override func viewDidAppear(_ animated: Bool) {
