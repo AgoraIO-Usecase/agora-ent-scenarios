@@ -167,7 +167,14 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         if (mRoomLivingViewModel.isRoomOwner()) {
             scheduledThreadPool.execute {
                 ApiManager.getInstance()
-                    .fetchStartCloud(mRoomLivingViewModel.mRoomInfoLiveData.value!!.roomNo, 20232023)
+                    .fetchStartCloud(mRoomLivingViewModel.mRoomInfoLiveData.value!!.roomNo, completion = {
+                        it?.let { error ->
+                            mMainHandler.post {
+                                mRoomLivingViewModel.release()
+                                showStartCloudErrorDialog(error.message ?: "")
+                            }
+                        }
+                    })
             }
             mMainHandler.sendEmptyMessageDelayed(ROOM_NO_SONGS_WHAT, ROOM_NO_SONGS_TIMEOUT)
 
@@ -674,5 +681,19 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             mChooseSongDialog?.show(supportFragmentManager, "ChooseSongDialog")
         }
         binding.root.post { showChooseSongDialogTag = false }
+    }
+
+    private fun showStartCloudErrorDialog(message:String) {
+        val dialog = CantataCommonDialog(this).apply {
+            setDescText(message)
+            setDialogBtnText("", getString(R.string.cantata_confirm))
+            onButtonClickListener = object : OnButtonClickListener {
+                override fun onLeftButtonClick() {}
+                override fun onRightButtonClick() {
+                    mRoomLivingViewModel.exitRoom()
+                }
+            }
+        }
+        dialog.show()
     }
 }

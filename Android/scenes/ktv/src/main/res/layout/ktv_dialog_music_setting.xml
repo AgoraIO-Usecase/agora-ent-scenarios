@@ -617,6 +617,7 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="1dp"
                 android:paddingVertical="12dp"
+                android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@id/layoutANIS">
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -645,6 +646,7 @@
                 android:layout_height="1dp"
                 android:layout_marginHorizontal="20dp"
                 app:dividerColor="@color/white_20_percent"
+                android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@id/layoutLowLatency" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -653,7 +655,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="1dp"
-                app:layout_constraintTop_toBottomOf="@id/layoutLowLatency">
+                app:layout_constraintTop_toBottomOf="@id/layoutANIS">
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvAIAECSwitcher"
