@@ -180,10 +180,10 @@ class MusicSettingDialog constructor(
         }
 
         if (currentSong == null) {
-            enableDisableView(mBinding.layoutVoiceScoringDifficulty, true)
+            enableDisableView(mBinding.rgVoiceScoringDifficulty, true)
             mBinding.layoutVoiceScoringDifficulty.alpha = 1.0f
         } else {
-            enableDisableView(mBinding.layoutVoiceScoringDifficulty, false)
+            enableDisableView(mBinding.rgVoiceScoringDifficulty, false)
             mBinding.layoutVoiceScoringDifficulty.alpha = 0.3f
         }
 
