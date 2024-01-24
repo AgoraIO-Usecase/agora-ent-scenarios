@@ -293,7 +293,6 @@ extension RoomListViewController {
             self.listView.roomList = roomList
             noDataView.isHidden = roomList.count > 0
             self._showGuideIfNeed()
-            self.naviBar.style = roomList.count > 0 ? .light : .dark
             VideoLoaderApiImpl.shared.cleanCache()
             oldList.forEach { info in
                 VideoLoaderApiImpl.shared.removeRTCListener(anchorId: info.roomId, listener: self)
