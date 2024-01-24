@@ -56,7 +56,7 @@
         android:gravity="center"
         android:backgroundTint="@android:color/transparent"
         android:textColor="@color/white"
-        android:src="@drawable/cantata_img_room_list_create"
+        android:src="@drawable/btn_img_room_list_create"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

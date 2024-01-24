@@ -144,7 +144,7 @@
         android:button="@null"
         android:checked="false"
         android:enabled="false"
-        android:background="@drawable/cantata_cb_mic_status"
+        android:background="@drawable/ktv_cb_mic_status"
         android:padding="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
