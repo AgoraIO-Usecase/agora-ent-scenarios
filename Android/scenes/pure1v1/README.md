@@ -28,6 +28,9 @@
     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_2.jpg)
 
   - 在项目的功能配置中启用"实时消息 RTM"功能
+     ```json
+     注: 如果没有启动"实时消息 RTM"功能, 将无法体验项目完整功能
+     ```
 
     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_7.jpg)
 
