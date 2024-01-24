@@ -14,6 +14,7 @@
 
 @import Pure1v1;
 @import ShowTo1v1;
+@import Joy;
 
 @interface VLHomeViewController ()<VLHomeViewDelegate>
 
@@ -52,57 +53,67 @@
 
 - (void)itemClickAction:(int)tagValue {
 
-    NSArray* sceneNames = @[@"ChatRoom", @"SpatialAudioChatRoom", @"KTV", @"LiveShow", @"", @"Pure1v1", @"ShowTo1v1"];
-    [[NetworkManager shared] reportSceneClickWithSceneName:sceneNames[tagValue]];
-    [[NetworkManager shared] reportDeviceInfoWithSceneName:sceneNames[tagValue]];
-    [[NetworkManager shared] reportUserBehaviorWithSceneName:sceneNames[tagValue]];
-    switch (tagValue) {
-        case 0: {
-            VRRoomsViewController *vc = [[VRRoomsViewController alloc] initWithUser:VLUserCenter.user];
-            vc.hidesBottomBarWhenPushed = YES;
-            [self.navigationController pushViewController:vc animated:YES];
-        }
-            break;
-        case 2: {
-            VLOnLineListVC *vc = [[VLOnLineListVC alloc]init];
-            [self.navigationController pushViewController:vc animated:YES];
-        } break;
-        case 3: {
-            ShowRoomListVC *vc = [ShowRoomListVC new];
-            [self.navigationController pushViewController:vc animated:YES];
-        } break;
-        case 1: {
-            SARoomsViewController *roomVc = [[SARoomsViewController alloc] initWithUser:VLUserCenter.user];
-            roomVc.hidesBottomBarWhenPushed = YES;
-            [self.navigationController pushViewController:roomVc animated:YES];
-        } break;
-        case 4: {
-            VLSBGOnLineListVC *listVC = [[VLSBGOnLineListVC alloc]init];
-            [self.navigationController pushViewController:listVC animated:YES];
-        } break;
-        case 5: {
-            Pure1v1UserInfo* userInfo = [Pure1v1UserInfo new];
-            userInfo.userId = VLUserCenter.user.id;
+//    NSArray* sceneNames = @[@"ChatRoom", @"SpatialAudioChatRoom", @"KTV", @"LiveShow", @"", @"Pure1v1", @"ShowTo1v1", @"Joy"];
+//    [[NetworkManager shared] reportSceneClickWithSceneName:sceneNames[tagValue]];
+//    [[NetworkManager shared] reportDeviceInfoWithSceneName:sceneNames[tagValue]];
+//    [[NetworkManager shared] reportUserBehaviorWithSceneName:sceneNames[tagValue]];
+//    switch (tagValue) {
+//        case 0: {
+//            VRRoomsViewController *vc = [[VRRoomsViewController alloc] initWithUser:VLUserCenter.user];
+//            vc.hidesBottomBarWhenPushed = YES;
+//            [self.navigationController pushViewController:vc animated:YES];
+//        }
+//            break;
+//        case 2: {
+//            VLOnLineListVC *vc = [[VLOnLineListVC alloc]init];
+//            [self.navigationController pushViewController:vc animated:YES];
+//        } break;
+//        case 3: {
+//            ShowRoomListVC *vc = [ShowRoomListVC new];
+//            [self.navigationController pushViewController:vc animated:YES];
+//        } break;
+//        case 1: {
+//            SARoomsViewController *roomVc = [[SARoomsViewController alloc] initWithUser:VLUserCenter.user];
+//            roomVc.hidesBottomBarWhenPushed = YES;
+//            [self.navigationController pushViewController:roomVc animated:YES];
+//        } break;
+//        case 4: {
+//            VLSBGOnLineListVC *listVC = [[VLSBGOnLineListVC alloc]init];
+//            [self.navigationController pushViewController:listVC animated:YES];
+//        } break;
+//        case 5: {
+//            Pure1v1UserInfo* userInfo = [Pure1v1UserInfo new];
+//            userInfo.userId = VLUserCenter.user.id;
+//            userInfo.userName = VLUserCenter.user.name;
+//            userInfo.avatar = VLUserCenter.user.headUrl;
+//            [Pure1v1Context showSceneWithViewController:self
+//                                                  appId:KeyCenter.AppId
+//                                         appCertificate:KeyCenter.Certificate
+//                                               userInfo:userInfo];
+//        } break;
+//        case 6: {
+//            ShowTo1v1UserInfo* userInfo = [ShowTo1v1UserInfo new];
+//            userInfo.userId = VLUserCenter.user.id;
+//            userInfo.userName = VLUserCenter.user.name;
+//            userInfo.avatar = VLUserCenter.user.headUrl;
+//            [ShowTo1v1Context showSceneWithViewController:self
+//                                                  appId:KeyCenter.AppId
+//                                         appCertificate:KeyCenter.Certificate
+//                                               userInfo:userInfo];
+//        } break;
+//        case 7: {
+            JoyUserInfo* userInfo = [JoyUserInfo new];
+            userInfo.userId = [VLUserCenter.user.id unsignedIntegerValue];
             userInfo.userName = VLUserCenter.user.name;
             userInfo.avatar = VLUserCenter.user.headUrl;
-            [Pure1v1Context showSceneWithViewController:self
+            [JoyContext showSceneWithViewController:self
                                                   appId:KeyCenter.AppId
                                          appCertificate:KeyCenter.Certificate
                                                userInfo:userInfo];
-        } break;
-        case 6: {
-            ShowTo1v1UserInfo* userInfo = [ShowTo1v1UserInfo new];
-            userInfo.userId = VLUserCenter.user.id;
-            userInfo.userName = VLUserCenter.user.name;
-            userInfo.avatar = VLUserCenter.user.headUrl;
-            [ShowTo1v1Context showSceneWithViewController:self
-                                                  appId:KeyCenter.AppId
-                                         appCertificate:KeyCenter.Certificate
-                                               userInfo:userInfo];
-        } break;
-        default:
-            break;
-    }
+//        } break;
+//        default:
+//            break;
+//    }
 }
 
 @end

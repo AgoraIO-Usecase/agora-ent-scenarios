@@ -22,13 +22,21 @@ PODS:
   - AgoraSyncManager (2.1.2):
     - SocketRocket
   - Bugly (2.5.93)
-  - BytedEffect (4.3.0):
-    - SSZipArchive
   - CallAPI (0.1.0):
     - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS (= 2.1.4)
   - FLAnimatedImage (1.0.17)
   - HWWeakTimer (1.0)
+  - Joy (0.1.0):
+    - AgoraRtcEngine_Special_iOS
+    - AgoraSyncManager
+    - SDWebImage
+    - SnapKit
+    - SVProgressHUD
+    - SwiftProtobuf (= 1.24.0)
+    - SwiftyBeaver
+    - YYCategories
+    - YYModel
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
   - LEEAlert (1.6.4)
@@ -39,7 +47,7 @@ PODS:
     - LSTTimer
   - LSTTimer (0.2.10)
   - Masonry (1.1.0)
-  - MJRefresh (3.7.5)
+  - MJRefresh (3.7.6)
   - Protobuf (3.22.1)
   - Pure1v1 (0.1.0):
     - AgoraSyncManager
@@ -60,7 +68,6 @@ PODS:
     - SDWebImage/Core
   - SDWebImageAPNGCoder (0.1.1):
     - SDWebImage/Core (~> 4.2)
-  - SenseLib (1.0)
   - ShowTo1v1 (0.1.0):
     - AgoraSyncManager
     - CallAPI
@@ -84,6 +91,7 @@ PODS:
   - SVGAPlayer/ProtoFiles (2.5.7):
     - Protobuf (~> 3.4)
   - SVProgressHUD (2.2.5)
+  - SwiftProtobuf (1.24.0)
   - SwiftyBeaver (1.9.5)
   - VideoLoaderAPI (0.1.0):
     - AgoraRtcEngine_Special_iOS
@@ -102,9 +110,9 @@ DEPENDENCIES:
   - AgoraRtcEngine_Special_iOS (= 4.1.1.17)
   - AgoraSyncManager (= 2.1.2)
   - Bugly (= 2.5.93)
-  - BytedEffect (from `bytedEffect.podspec`)
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
   - HWWeakTimer (= 1.0)
+  - Joy (from `AgoraEntScenarios/Scenes/Joy`)
   - JXCategoryView (= 1.6.1)
   - KakaJSON
   - LEEAlert (= 1.6.4)
@@ -116,7 +124,6 @@ DEPENDENCIES:
   - ScoreEffectUI (= 1.0.2)
   - SDWebImage (= 4.4.8)
   - SDWebImageAPNGCoder
-  - SenseLib (from `sense.podspec`)
   - ShowTo1v1 (from `AgoraEntScenarios/Scenes/ShowTo1v1`)
   - SnapKit
   - SocketRocket (= 0.7.0)
@@ -157,6 +164,7 @@ SPEC REPOS:
     - SSZipArchive
     - SVGAPlayer
     - SVProgressHUD
+    - SwiftProtobuf
     - SwiftyBeaver
     - YYCategories
     - YYModel
@@ -164,14 +172,12 @@ SPEC REPOS:
     - ZSwiftBaseLib
 
 EXTERNAL SOURCES:
-  BytedEffect:
-    :path: bytedEffect.podspec
   CallAPI:
     :path: AgoraEntScenarios/Common/API/CallAPI
+  Joy:
+    :path: AgoraEntScenarios/Scenes/Joy
   Pure1v1:
     :path: AgoraEntScenarios/Scenes/Pure1v1
-  SenseLib:
-    :path: sense.podspec
   ShowTo1v1:
     :path: AgoraEntScenarios/Scenes/ShowTo1v1
   VideoLoaderAPI:
@@ -186,29 +192,29 @@ SPEC CHECKSUMS:
   AgoraRtm_iOS: 11b767ee81a7202dcf09e045cd2d359b5abbc965
   AgoraSyncManager: 4e2f2e64db24dd0839e12a64b475c7e094347dd2
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
-  BytedEffect: 74b0bd8150ff1ab9c443d210a7ff7eb49ad3da44
   CallAPI: f40f9694c310b613f20958fabdbe69f8bc1d6ca5
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
+  Joy: 3deda8672a197f760ba6c840c8c20657a5278df3
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
   LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb
   LSTPopView: 9379f00f6ce7d1fc620b50ab00ed3ef97b2d4d52
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
-  MJRefresh: fdf5e979eb406a0341468932d1dfc8b7f9fce961
+  MJRefresh: 2fe7fb43a5167ceda20bb7e63f130c04fd1814a5
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
   Pure1v1: a29e30be7dfe87afdda85cfd5b8845e719c29d3f
   ScoreEffectUI: bf1195b4d41a73d43c236450b5d7f958989844aa
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
-  SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
   ShowTo1v1: 4da6561d6f12576ce61d05add891595d18bc08d0
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
+  SwiftProtobuf: bcfd2bc231cf9ae552cdc7c4e877bd3b41fe57b1
   SwiftyBeaver: 84069991dd5dca07d7069100985badaca7f0ce82
   VideoLoaderAPI: d50ad8f8767ddaad5328c4cf64dd9c5d8ee32d3e
   YYCategories: 6bcd4314c6661a561410dce4a793379ebd306abd
@@ -216,6 +222,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 848a3a0da2e115f5e0f6c34ba26f5877bbd061ba
+PODFILE CHECKSUM: 883fcc578668cf6ae5dc9b21757b300622e1ec6e
 
 COCOAPODS: 1.12.1
