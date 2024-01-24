@@ -435,7 +435,6 @@ extension RoomListViewController: CallApiListenerProtocol {
                 } else {
                     showTo1v1Print("callee user not found1")
                 }
-                connectedChannelId = fromRoomId
             } else if currentUid == "\(fromUserId)" {
                 //主叫
                 connectedUserId = toUserId
@@ -452,6 +451,7 @@ extension RoomListViewController: CallApiListenerProtocol {
                     showTo1v1Print("caller user not found1")
                 }
             }
+            connectedChannelId = fromRoomId
             break
         case .connected:
             callDialog?.hiddenAnimation()
