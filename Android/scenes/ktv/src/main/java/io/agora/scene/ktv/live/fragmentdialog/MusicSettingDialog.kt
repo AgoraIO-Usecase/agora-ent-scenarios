@@ -180,11 +180,11 @@ class MusicSettingDialog constructor(
         }
 
         if (currentSong == null) {
-            enableDisableView(mBinding.layoutVoiceScoringDifficulty, false)
-            mBinding.layoutVoiceScoringDifficulty.alpha = 0.3f
-        } else {
             enableDisableView(mBinding.layoutVoiceScoringDifficulty, true)
             mBinding.layoutVoiceScoringDifficulty.alpha = 1.0f
+        } else {
+            enableDisableView(mBinding.layoutVoiceScoringDifficulty, false)
+            mBinding.layoutVoiceScoringDifficulty.alpha = 0.3f
         }
 
         // 专业模式
@@ -285,6 +285,7 @@ class MusicSettingDialog constructor(
      */
     private fun showSoundCardPage(v: View) {
         mBinding.root.removeAllViews()
+        mBinding.root.setBackgroundResource(R.drawable.ktv_rect_white_top_r20)
         val soundCardFragment = SoundCardFragment(mSoundCardSetting)
         soundCardFragment.onClickSoundCardType = {
             showSoundTypeSelectPage()

@@ -1701,11 +1701,11 @@ public class RoomLivingViewModel extends ViewModel {
         ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null);
 
         // 清空音效
-        if (mRtcEngine != null) {
-            mRtcEngine.setAudioEffectPreset(DEFAULT_AUDIO_EFFECT);
-        }
-        mSetting.updateAudioEffect(DEFAULT_AUDIO_EFFECT);
-        this.audioPreset = DEFAULT_AUDIO_EFFECT;
+//        if (mRtcEngine != null) {
+//            mRtcEngine.setAudioEffectPreset(DEFAULT_AUDIO_EFFECT);
+//        }
+//        mSetting.updateAudioEffect(DEFAULT_AUDIO_EFFECT);
+//        this.audioPreset = DEFAULT_AUDIO_EFFECT;
         isHighlightSinger = false;
 
         // 重置耳返
