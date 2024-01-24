@@ -23,6 +23,9 @@ import io.agora.scene.ktv.live.bean.MusicSettingBean;
 import io.agora.scene.ktv.live.bean.VoiceHighlightBean;
 import io.agora.scene.widget.DividerDecoration;
 
+/**
+ * 人声突出
+ */
 public class VoiceHighlightDialog extends BaseBottomSheetDialogFragment<KtvDialogVoiceHighlightBinding> implements OnItemClickListener<VoiceHighlightBean> {
 
     public static final String TAG = "VoiceHighlightDialog";

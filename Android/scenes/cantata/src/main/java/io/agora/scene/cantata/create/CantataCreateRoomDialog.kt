@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.create
+package io.agora.scene.cantata.create
 
 import android.app.Dialog
 import android.content.Context
@@ -15,19 +15,19 @@ import androidx.lifecycle.ViewModelProvider
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.ktv.R
-import io.agora.scene.ktv.databinding.KtvDialogCreateRoomBinding
-import io.agora.scene.ktv.live.RoomLivingActivity
-import io.agora.scene.ktv.service.CreateRoomOutputModel
-import io.agora.scene.ktv.service.JoinRoomOutputModel
+import io.agora.scene.cantata.databinding.CantataDialogCreateRoomBinding
+import io.agora.scene.cantata.R
+import io.agora.scene.cantata.service.CreateRoomOutputModel
+import io.agora.scene.cantata.service.JoinRoomOutputModel
+import io.agora.scene.cantata.live.RoomLivingActivity
 import java.util.*
 
 /**
  * 创建房间弹框
  */
-class CreateRoomDialog constructor(
+class CantataCreateRoomDialog constructor(
     private val context: Context,
-) : BaseBottomSheetDialogFragment<KtvDialogCreateRoomBinding>() {
+) : BaseBottomSheetDialogFragment<CantataDialogCreateRoomBinding>() {
 
     private lateinit var roomCreateViewModel: RoomCreateViewModel
 
@@ -42,9 +42,9 @@ class CreateRoomDialog constructor(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        roomCreateViewModel = ViewModelProvider(this)[io.agora.scene.ktv.create.RoomCreateViewModel::class.java]
+        roomCreateViewModel = ViewModelProvider(this)[RoomCreateViewModel::class.java]
         // 用户提示颜色
-        val spannableString = SpannableString(getString(R.string.ktv_create_room_tips))
+        val spannableString = SpannableString(getString(R.string.cantata_create_room_tips))
         spannableString.setSpan(
             ForegroundColorSpan(Color.parseColor("#FA396A")),
             77,
@@ -117,20 +117,20 @@ class CreateRoomDialog constructor(
 
     private fun randomName() {
         mBinding.etRoomName.setText(
-            resources.getStringArray(R.array.ktv_roomName)[Random().nextInt(21)]
+            resources.getStringArray(R.array.cantata_roomName)[Random().nextInt(21)]
         )
     }
 
     private fun createRoom() {
         val roomName = mBinding.etRoomName.text.toString()
         if (TextUtils.isEmpty(roomName)) {
-            ToastUtils.showToast(R.string.ktv_please_input_room_name)
+            ToastUtils.showToast(R.string.cantata_please_input_room_name)
             return
         }
         val isPrivate = mBinding.cbPassword.isChecked
         val password = mBinding.etCode.text.toString()
         if (isPrivate && password.length < 4) {
-            ToastUtils.showToast(getString(R.string.ktv_please_input_4_pwd))
+            ToastUtils.showToast(getString(R.string.cantata_please_input_4_pwd))
             return
         }
         val userNo = UserManager.getInstance().user.id.toString()

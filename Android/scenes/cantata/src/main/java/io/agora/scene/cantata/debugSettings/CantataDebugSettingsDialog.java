@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.debugSettings;
+package io.agora.scene.cantata.debugSettings;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -12,18 +12,18 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
-import io.agora.scene.ktv.databinding.KtvDialogDebugOptionsBinding;
+import io.agora.scene.cantata.databinding.CantataDialogDebugOptionsBinding;
 
 /**
  * debug 控制台
  */
-public class KTVDebugSettingsDialog extends BaseBottomSheetDialogFragment<KtvDialogDebugOptionsBinding> {
+public class CantataDebugSettingsDialog extends BaseBottomSheetDialogFragment<CantataDialogDebugOptionsBinding> {
     public static final String TAG = "KTVDebugSettingsDialog";
-    private final KTVDebugSettingBean mSetting;
+    private final CantataDebugSettingBean mSetting;
     private final String channelName;
     private final String sdkBuildNum;
 
-    public KTVDebugSettingsDialog(KTVDebugSettingBean mSetting, String channelName, String sdkBuildNum) {
+    public CantataDebugSettingsDialog(CantataDebugSettingBean mSetting, String channelName, String sdkBuildNum) {
         this.mSetting = mSetting;
         this.channelName = channelName;
         this.sdkBuildNum = sdkBuildNum;
@@ -86,7 +86,7 @@ public class KTVDebugSettingsDialog extends BaseBottomSheetDialogFragment<KtvDia
         mBinding.btSetParams.setOnClickListener(v -> {
             String key = mBinding.etParms.getText().toString();
             String value = mBinding.etParmsNum.getText().toString();
-            String parameters = "{\"" + key + "\":" + value + "}";
+            String parameters = "{\"" + key + "\":" + value;
             mSetting.setParameters(parameters);
         });
 
