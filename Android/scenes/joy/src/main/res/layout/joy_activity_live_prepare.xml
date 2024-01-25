@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/tvTitleContent"/>
 
-    <io.agora.scene.joy.ui.widget.FadeDotsIndicator
+    <io.agora.scene.joy.widget.FadeDotsIndicator
         android:id="@+id/dotIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -1,7 +1,7 @@
 package io.agora.scene.joy.service
 
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.joy.utils.JoyLogger
+import io.agora.scene.joy.JoyLogger
 import io.agora.syncmanager.rtm.Sync
 
 interface JoyServiceListenerProtocol {

@@ -5,7 +5,6 @@ import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.joy.utils.JoyLogger
 import java.util.concurrent.Executors
 
 object RtcEngineInstance {

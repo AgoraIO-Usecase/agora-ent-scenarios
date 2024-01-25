@@ -19,7 +19,7 @@
         android:networkSecurityConfig="@xml/security_config" android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true" android:theme="@style/def_theme">
 
-        <activity android:name="io.agora.scene.joy.ui.RoomListActivity" android:exported="true"
+        <activity android:name="io.agora.scene.joy.create.RoomListActivity" android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,10 +28,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="io.agora.scene.joy.ui.LivePrepareActivity" android:exported="false"
+        <activity android:name="io.agora.scene.joy.create.LivePrepareActivity" android:exported="false"
             android:keepScreenOn="true" android:screenOrientation="portrait" />
 
-        <activity android:name="io.agora.scene.joy.ui.RoomLivingActivity" android:exported="false"
+        <activity android:name="io.agora.scene.joy.live.RoomLivingActivity" android:exported="false"
             android:keepScreenOn="true" android:screenOrientation="portrait" />
     </application>
 </manifest>
