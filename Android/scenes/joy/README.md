@@ -3,8 +3,8 @@
 > 本文档主要介绍如何快速跑通 <mark>弹幕游戏</mark> 示例工程
 >
 > Demo 效果:
-> 
-> <img src="image/SamplePicture1.png"  width="300" /> <img src="image/SamplePicture2.png"  width="300" /> <img src="image/SamplePicture3.png"  width="300" />
+>
+> <img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/images/joy/screenshot/android/SamplePicture1.png" width="300" /> <img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/images/joy/screenshot/android/SamplePicture2.png" width="300" /> <img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/images/joy/screenshot/android/SamplePicture3.png" width="300" />
 
 ---
 
