@@ -153,7 +153,7 @@ class MusicSettingDialog constructor(
         if (isListener) {
             enableDisableView(mBinding.layoutAccVol, false)
             mBinding.layoutAccVol.alpha = 0.3f
-            enableDisableView(mBinding.layoutAccVol, false)
+            enableDisableView(mBinding.layoutRemoteVol, false)
             mBinding.layoutRemoteVol.alpha = 0.3f
         } else {
             enableDisableView(mBinding.layoutAccVol, true)
