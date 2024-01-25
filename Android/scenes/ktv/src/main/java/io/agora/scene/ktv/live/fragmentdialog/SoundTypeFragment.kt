@@ -13,6 +13,9 @@ import io.agora.scene.ktv.databinding.KtvDialogSoundTypeBinding
 import io.agora.scene.ktv.live.RoomLivingActivity
 import io.agora.scene.ktv.live.bean.SoundCardSettingBean
 
+/**
+ * 预设音效
+ */
 class SoundTypeFragment constructor(private val soundCardSetting: SoundCardSettingBean) :
     BaseViewBindingFragment<KtvDialogSoundTypeBinding>() {
 

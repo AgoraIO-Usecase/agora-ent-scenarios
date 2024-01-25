@@ -12,6 +12,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import io.agora.scene.ktv.R
 import io.agora.scene.ktv.databinding.KtvLayoutMicWaveBinding
 
+/**
+ * 座位音纹
+ */
 class MicSeatWaveView : ConstraintLayout {
 
     private val animatorSet = AnimatorSet()

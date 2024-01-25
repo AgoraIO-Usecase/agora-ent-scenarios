@@ -7,6 +7,9 @@ import io.agora.karaoke_view.v11.model.LyricsModel;
 import io.agora.scene.ktv.live.RoomLivingViewModel;
 import io.agora.scene.ktv.widget.lrcView.LrcControlView;
 
+/**
+ * 调音台 listener
+ */
 public class LrcActionListenerImpl implements LrcControlView.OnKaraokeEventListener {
 
     private final Context mContext;

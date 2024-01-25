@@ -1,5 +1,8 @@
 package io.agora.scene.ktv.debugSettings;
 
+/**
+ * debug setting bean
+ */
 public class KTVDebugSettingBean {
     private final KTVDebugSettingsDialog.Callback mCallback;
 
