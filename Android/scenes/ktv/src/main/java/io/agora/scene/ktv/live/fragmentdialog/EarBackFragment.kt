@@ -16,6 +16,9 @@ import io.agora.scene.ktv.live.bean.MusicSettingBean
 import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.doOnProgressChanged
 
+/**
+ * 耳返设置
+ */
 class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
     BaseBindingFragment<KtvDialogEarbackSettingBinding?>() {
 

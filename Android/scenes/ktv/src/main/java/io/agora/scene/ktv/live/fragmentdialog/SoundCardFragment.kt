@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
+import androidx.annotation.DrawableRes
 import androidx.core.view.isVisible
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.ktv.R
@@ -15,6 +16,9 @@ import io.agora.scene.ktv.databinding.KtvDialogSoundCardBinding
 import io.agora.scene.ktv.live.RoomLivingActivity
 import io.agora.scene.ktv.live.bean.SoundCardSettingBean
 
+/**
+ * 虚拟声卡
+ */
 class SoundCardFragment constructor(private val soundCardSetting: SoundCardSettingBean) :
     BaseViewBindingFragment<KtvDialogSoundCardBinding>() {
 
@@ -173,4 +177,34 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
     }
 
 
+}
+
+data class PresetSoundModel constructor(
+    val type: AgoraPresetSound,
+    val name: String,
+    val tips: String,
+    @DrawableRes val resId: Int
+) {
+    override fun toString(): String {
+        return name
+    }
+}
+
+enum class AgoraPresetSound constructor(
+    val presetValue: Int,
+    val gainValue: Float,
+    val gender: Int,
+    val effect: Int,
+) {
+    Close(-1,-1f,-1,-1),
+    Sound1001(4,1f,0,0),
+    Sound1002(4,1f,0,1),
+    Sound1003(4,1f,1,0),
+    Sound1004(4,1f,1,1),
+    Sound2001(4,1f,0,2),
+    Sound2002(4,1f,1,2),
+    Sound2003(4,1f,0,3),
+    Sound2004(4,1f,1,3),
+    Sound2005(4,1f,0,4),
+    Sound2006(4,1f,1,4)
 }

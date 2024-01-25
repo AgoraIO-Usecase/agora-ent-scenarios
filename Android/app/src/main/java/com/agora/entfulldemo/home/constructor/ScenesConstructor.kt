@@ -15,7 +15,7 @@ object ScenesConstructor {
     private const val ktvSingBattleClazz = "io.agora.scene.ktv.singbattle.create.RoomListActivity"
 
     // ktv-大合唱
-    private const val ktvCantataClazz = "io.agora.scene.cantata.ui.activity.RoomListActivity"
+    private const val ktvCantataClazz = "io.agora.scene.cantata.create.RoomListActivity"
 
     // ktv-接唱
     private const val ktvSingRelayClazz = "io.agora.scene.ktv.singrelay.create.RoomListActivity"

@@ -5,12 +5,12 @@
     <application>
 
         <activity
-            android:name="io.agora.scene.cantata.ui.activity.RoomListActivity"
+            android:name="io.agora.scene.cantata.create.RoomListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/def_material_theme"/>
 
         <activity
-            android:name="io.agora.scene.cantata.ui.activity.RoomLivingActivity"
+            android:name="io.agora.scene.cantata.live.RoomLivingActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
     </application>

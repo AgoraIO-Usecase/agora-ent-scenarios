@@ -14,7 +14,7 @@
         android:layout_width="225dp"
         android:layout_height="124dp"
         android:layout_marginTop="20dp"
-        android:background="@mipmap/bg_dialog"
+        android:background="@drawable/bg_ktv_dialog"
         android:paddingHorizontal="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
