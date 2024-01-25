@@ -2,6 +2,9 @@ package io.agora.scene.show
 
 import io.agora.scene.base.EntLogger
 
+/*
+ * 场景日志模块
+ */
 object ShowLogger {
 
     private val entLogger = EntLogger(EntLogger.Config("ShowLive"))

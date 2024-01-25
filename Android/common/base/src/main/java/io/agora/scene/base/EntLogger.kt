@@ -23,7 +23,7 @@ class EntLogger(private val config: Config) {
     data class Config(
         val sceneName: String,
         val fileSize: Int = 2 * 1024 * 1024, // 2M，单位Byte
-        val fileName: String = "agora_ent_${sceneName}_Android_${SimpleDateFormat("yyyy-MM-DD", Locale.US).format(Date())}_log".lowercase()
+        val fileName: String = "agora_ent_${sceneName}_Android_${SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())}_log".lowercase()
     )
 
     private val dataFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.US)

@@ -14,15 +14,21 @@ import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
-import io.agora.scene.showTo1v1.callAPI.CallConfig
-import io.agora.scene.showTo1v1.callAPI.CallMode
-import io.agora.scene.showTo1v1.callAPI.CallRole
-import io.agora.scene.showTo1v1.callAPI.CallTokenConfig
-import io.agora.scene.showTo1v1.callAPI.ICallApi
+import io.agora.scene.showTo1v1.callapi.CallApiImpl
+import io.agora.scene.showTo1v1.callapi.CallConfig
+import io.agora.scene.showTo1v1.callapi.PrepareConfig
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+enum class CallRole(val value: Int) {
+    CALLEE(0),
+    CALLER(1)
+}
+
+/*
+ * 业务逻辑管理模块
+ */
 class ShowTo1v1Manger constructor() {
 
     val videoEncoderConfiguration = VideoEncoderConfiguration().apply {
@@ -50,7 +56,7 @@ class ShowTo1v1Manger constructor() {
 
     private val workingExecutor = Executors.newSingleThreadExecutor()
 
-    val mCallApi by lazy { ICallApi.getImplInstance() }
+    val mCallApi by lazy { CallApiImpl(AgoraApplication.the()) }
 
     // 远端用户
     var mRemoteUser: ShowTo1v1UserInfo? = null
@@ -74,68 +80,57 @@ class ShowTo1v1Manger constructor() {
             return innerCurrentUser!!
         }
 
-    private var innerCallTokenConfig: CallTokenConfig? = null
+    private var innerPrepareConfig: PrepareConfig? = null
 
     // 1v1 tokenConfig
-    val mCallTokenConfig: CallTokenConfig
+    val mPrepareConfig: PrepareConfig
         get() {
-            if (innerCallTokenConfig == null) {
-                innerCallTokenConfig = CallTokenConfig()
+            if (innerPrepareConfig == null) {
+                innerPrepareConfig = PrepareConfig()
             }
-            return innerCallTokenConfig!!
+            return innerPrepareConfig!!
         }
-
-    private var innerLocalVideoView: TextureView? = null
 
     val mLocalVideoView: TextureView
         get() {
-            if (innerLocalVideoView == null) {
-                innerLocalVideoView = TextureView(AgoraApplication.the())
-            }
-            return innerLocalVideoView!!
+            return mCallApi.tempLocalCanvasView
         }
-
-    private var innerRemoteVideoView: TextureView? = null
 
     val mRemoteVideoView: TextureView
         get() {
-            if (innerRemoteVideoView == null) {
-                innerRemoteVideoView = TextureView(AgoraApplication.the())
-            }
-            return innerRemoteVideoView!!
+            return mCallApi.tempRemoteCanvasView
         }
 
     @Volatile
     private var isCallApiInit = false
 
+    fun initCallAPi() {
+        val config = CallConfig(
+            appId = BuildConfig.AGORA_APP_ID,
+            userId = mCurrentUser.getIntUserId(),
+            rtcEngine = mRtcEngine,
+            null
+        )
+        mCallApi.initialize(config)
+    }
+
     /**
      * @param role 呼叫/被叫
      * @param ownerRoomId 呼叫/被叫房间 id
      */
-    fun reInitCallApi(role: CallRole, ownerRoomId: String, callback: () -> Unit) {
+    fun prepareCall(role: CallRole, ownerRoomId: String, callback: () -> Unit) {
+        initCallAPi()
         if (role == CallRole.CALLER) {
-            mCallTokenConfig.roomId = mCurrentUser.get1v1ChannelId()
+            mPrepareConfig.roomId = mCurrentUser.get1v1ChannelId()
         } else {
             isCallApiInit = false
-            mCallTokenConfig.roomId = ownerRoomId
+            mPrepareConfig.roomId = ownerRoomId
         }
+        mPrepareConfig.userExtension = mCurrentUser.toMap()
         checkCallTokenConfig { renewToken ->
-            val config = CallConfig(
-                appId = BuildConfig.AGORA_APP_ID,
-                userId = mCurrentUser.getIntUserId(),
-                userExtension = mCurrentUser.toMap(),
-                rtcEngine = mRtcEngine,
-                mode = CallMode.ShowTo1v1,
-                role = role,
-                localView = mLocalVideoView,
-                remoteView = mRemoteVideoView,
-                autoAccept = true
-            )
-            if (isCallApiInit && !renewToken) {
-                callback.invoke()
-            } else {
-                mCallApi.deinitialize {
-                    mCallApi.initialize(config, mCallTokenConfig) {
+            if (renewToken) {
+                mCallApi.prepareForCall(mPrepareConfig) {
+                    if (it == null) {
                         isCallApiInit = true
                         callback.invoke()
                     }
@@ -168,10 +163,10 @@ class ShowTo1v1Manger constructor() {
                     callback.invoke(false)
                     return@generateTokens
                 }
-                mCallTokenConfig.rtcToken = rtcToken
-                mCallTokenConfig.rtmToken = rtmToken
+                mPrepareConfig.rtcToken = rtcToken
+                mPrepareConfig.rtmToken = rtmToken
                 setupGeneralToken(rtcToken)
-                mCallApi.renewToken(mCallTokenConfig)
+                mCallApi.renewToken(rtcToken, rtmToken)
                 callback.invoke(true)
             },
             failure = {
@@ -182,8 +177,8 @@ class ShowTo1v1Manger constructor() {
 
     // call api tokenConfig
     private fun checkCallTokenConfig(callback: (Boolean) -> Unit) {
-        if (mCallTokenConfig.rtcToken.isNotEmpty() && mCallTokenConfig.rtmToken.isNotEmpty()) {
-            callback.invoke(false)
+        if (mPrepareConfig.rtcToken.isNotEmpty() && mPrepareConfig.rtmToken.isNotEmpty()) {
+            callback.invoke(true)
             return
         }
         renewTokens {
@@ -227,9 +222,7 @@ class ShowTo1v1Manger constructor() {
         isCallApiInit = false
         mCallApi.deinitialize {}
         innerCurrentUser = null
-        innerCallTokenConfig = null
-        innerLocalVideoView = null
-        innerRemoteVideoView = null
+        innerPrepareConfig = null
         innerRtcEngine?.let {
             workingExecutor.execute { RtcEngine.destroy() }
             innerRtcEngine = null

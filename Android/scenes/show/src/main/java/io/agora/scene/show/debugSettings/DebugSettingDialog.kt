@@ -16,6 +16,9 @@ import io.agora.scene.show.ShowLogger
 import io.agora.scene.show.databinding.ShowWidgetDebugSettingDialogBinding
 import io.agora.scene.show.widget.BottomFullDialog
 
+/*
+ * Debug 模式下主播的设置页面
+ */
 class DebugSettingDialog constructor(context: Context) : BottomFullDialog(context) {
     private val TAG = "DebugSettings"
     private val mBinding by lazy {
