@@ -138,8 +138,6 @@ class CallViewController: BaseRoomViewController {
     @objc private func _hangupAction() {
         callApi?.hangup(remoteUserId: UInt(targetUser?.uid ?? "") ?? 0, reason: nil, completion: { err in
         })
-        guard navigationController?.viewControllers.contains(self) ?? false else {return}
-        navigationController?.popViewController(animated: false)
     }
 }
 
@@ -188,6 +186,9 @@ extension CallViewController {
                                          user: userInfo)
             }
             break
+        case .prepared:
+            guard navigationController?.viewControllers.contains(self) ?? false else {return}
+            navigationController?.popViewController(animated: false)
         default:
             break
         }

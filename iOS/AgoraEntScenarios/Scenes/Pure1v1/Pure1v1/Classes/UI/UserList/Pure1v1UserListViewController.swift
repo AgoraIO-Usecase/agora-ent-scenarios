@@ -79,10 +79,13 @@ class Pure1v1UserListViewController: UIViewController {
         naviBar.refreshButton.isHidden = true
         _refreshAction()
         
-        callVC.currentUser = userInfo
         listView.localUserInfo = userInfo
         
         _setupCallApi()
+        
+        callVC.currentUser = userInfo
+        callVC.callApi = callApi
+        callVC.rtcEngine = rtcEngine
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -143,9 +146,6 @@ extension Pure1v1UserListViewController {
         }
         
         callApi.addListener(listener: self)
-        
-        callVC.callApi = callApi
-        callVC.rtcEngine = rtcEngine
     }
     
     private func _createRtcEngine() ->AgoraRtcEngineKit {
@@ -229,6 +229,12 @@ extension Pure1v1UserListViewController {
             completion(rtcToken, rtmToken)
         }
     }
+    
+    private func _updateCallChannel() {
+        prepareConfig.roomId = userInfo?.getRoomId() ?? NSString.withUUID()
+        callApi.prepareForCall(prepareConfig: prepareConfig) { _ in
+        }
+    }
 }
 
 extension Pure1v1UserListViewController: CallApiListenerProtocol {
@@ -243,7 +249,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
         
         switch state {
         case .calling:
-            if presentedViewController == callVC {
+            if presentedViewController is Pure1v1CallViewController {
                 return
             }
             
@@ -318,8 +324,6 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             }
             break
         case .connected:
-//            AUIToast.show(text: "通话开始\(eventInfo[kDebugInfo] as? String ?? "")", postion: .bottom)
-//            AUIAlertManager.hiddenView()
             callDialog?.hiddenAnimation()
             hangUp()
             guard let uid = connectedUserId else {
@@ -340,7 +344,10 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             break
         case .prepared:
             switch stateReason {
+            case .localHangup:
+                _updateCallChannel()
             case .remoteHangup:
+                _updateCallChannel()
                 AUIToast.show(text: "call_toast_hangup".pure1v1Localization())
             case .remoteRejected:
                 AUIToast.show(text: "call_toast_reject".pure1v1Localization())
@@ -390,18 +397,6 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             self.callApi.renewToken(with: rtcToken, rtmToken: rtmToken)
         }
     }
-    
-    func onCallEventChanged(with event: CallEvent) {
-        switch event {
-        case .localHangup, .remoteLeave:
-            prepareConfig.roomId = userInfo?.getRoomId() ?? NSString.withUUID()
-            callApi.prepareForCall(prepareConfig: prepareConfig) { _ in
-            }
-        default:
-            break
-        }
-    }
-    
     
     func callDebugInfo(message: String, logLevel: CallLogLevel) {
         if logLevel == .normal {
@@ -521,4 +516,3 @@ extension Pure1v1UserListViewController: AgoraRtcMediaPlayerDelegate {
         }
     }
 }
-

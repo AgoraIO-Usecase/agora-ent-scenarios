@@ -140,9 +140,11 @@ class RoomListViewController: UIViewController {
 //        naviBar.refreshButton.isHidden = false
         _refreshAction()
         
-        callVC.currentUser = userInfo
         
         _setupAPI()
+        callVC.callApi = callApi
+        callVC.currentUser = userInfo
+        callVC.rtcEngine = rtcEngine
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -211,14 +213,12 @@ extension RoomListViewController {
         VideoLoaderApiImpl.shared.setup(config: config)
         VideoLoaderApiImpl.shared.addListener(listener: self)
         
-        callVC.rtcEngine = rtcEngine
     }
     
     private func _initCallAPI(completion: @escaping ((Error?)->())) {
         guard let roomId = userInfo?.get1V1ChannelId() else { return  }
         callApi.deinitialize {
         }
-        callVC.callApi = callApi
         
         let config = CallConfig()
         config.appId = showTo1v1AppId!
@@ -268,10 +268,7 @@ extension RoomListViewController {
         callApi.call(remoteUserId: room.getUIntUserId()) { err in
         }
         
-        //reset callVC
-        callVC.callApi = callApi
         callVC.roomInfo = room
-        callVC.rtcEngine = rtcEngine
     }
 }
 
@@ -379,6 +376,12 @@ extension RoomListViewController {
         service.subscribeListener(listener: vc)
         self.navigationController?.pushViewController(vc, animated: false)
     }
+    
+    private func _updateCallChannel() {
+        prepareConfig.roomId = userInfo?.get1V1ChannelId() ?? NSString.withUUID()
+        callApi.prepareForCall(prepareConfig: prepareConfig) { _ in
+        }
+    }
 }
 
 extension RoomListViewController: CallApiListenerProtocol {
@@ -394,9 +397,9 @@ extension RoomListViewController: CallApiListenerProtocol {
         switch state {
             case .calling:
             //已经在通话页面，不允许呼叫
-            if navigationController?.visibleViewController is CallViewController {
-                return
-            }
+//            if navigationController?.visibleViewController is CallViewController {
+//                return
+//            }
             
             let fromUserId = eventInfo[kFromUserId] as? UInt ?? 0
             let fromRoomId = eventInfo[kFromRoomId] as? String ?? ""
@@ -466,17 +469,14 @@ extension RoomListViewController: CallApiListenerProtocol {
             callDialog?.hiddenAnimation()
             connectedUserId = nil
             switch stateReason {
+            case .localCancel, .remoteHangup:
+                _updateCallChannel()
             case .remoteHangup:
-                if navigationController?.visibleViewController is CallViewController {
-                    navigationController?.popViewController(animated: false)
-                }
+                _updateCallChannel()
                 AUIToast.show(text: "call_toast_hangup".showTo1v1Localization())
             case .remoteRejected:
                 AUIToast.show(text: "call_user_busy_tips".showTo1v1Localization())
             case .rtmLost:
-                if navigationController?.visibleViewController is CallViewController {
-                    navigationController?.popViewController(animated: false)
-                }
                 AUIToast.show(text: "call_toast_disconnect".showTo1v1Localization())
                 _initCallAPI { err in
                 }
@@ -484,17 +484,6 @@ extension RoomListViewController: CallApiListenerProtocol {
                 break
             }
             break
-        default:
-            break
-        }
-    }
-    
-    func onCallEventChanged(with event: CallEvent) {
-        switch event {
-        case .localHangup, .remoteLeave:
-            prepareConfig.roomId = userInfo?.get1V1ChannelId() ?? NSString.withUUID()
-            callApi.prepareForCall(prepareConfig: prepareConfig) { _ in
-            }
         default:
             break
         }

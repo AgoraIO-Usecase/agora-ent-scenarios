@@ -1160,8 +1160,8 @@ extension CallApiImpl {
 //        #if DEBUG
 //        debugApiPrint("[CallApi]\(message)")
 //        #else
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
-        let timeString = formatter.string(from: Date())
+//        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+        let timeString = ""//formatter.string(from: Date())
         for element in delegates.allObjects {
             (element as? CallApiListenerProtocol)?.callDebugInfo?(message: "\(timeString) \(message)", logLevel: logLevel)
         }
