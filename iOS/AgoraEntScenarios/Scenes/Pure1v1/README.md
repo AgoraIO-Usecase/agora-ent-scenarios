@@ -103,16 +103,13 @@
 ### 3.3 功能介绍
 
 1v1私密房场景目前已涵盖以下功能
-- 1v1呼叫场景化API
-  1v1呼叫API是声网为了帮助您快速实现1v1呼叫视频通话能力的模块，使用这个模块您可以非常便捷的实现呼叫、挂断等功能，相关代码请参考: [CallApi](https://github.com/AgoraIO-Community/CallAPI)
 
 - 场景内用户管理
   包含场景内用户的加入和退出，用户列表的获取等，相关协议请参考: [Pure1v1ServiceProtocol.swift](Pure1v1/Classes/Service/Pure1v1ServiceProtocol.swift)， 相关协议的实现请参考[Pure1v1ServiceImp.swift](Pure1v1/Classes/Service/Pure1v1ServiceImp.swift)
 
 ### 3.4 场景化 API
 
-- 声动互娱-1v1 私密房项目内使用了 1v1 呼叫连麦场景化 API (简称 CallAPI)来实现 1v1 场景下秒接通、秒出图的能力, 对应代码文件: [CallAPI](../../Common/API/CallAPI/CallAPI)
-- 如果您想进一步了解 CallAPI, 可以参考 [CallAPI Demo](https://github.com/AgoraIO-Community/CallAPI)
+- 声动互娱-1v1 私密房项目内使用了 1v1 呼叫连麦场景化 API (简称 CallAPI)来实现 1v1 场景下秒接通、秒出图的能力, 对应代码文件: [CallAPI](../../Common/API/CallAPI/CallAPI)如果您想进一步了解 CallAPI, 可以参考 [CallAPI Demo](https://github.com/AgoraIO-Community/CallAPI)
 
 ## 4.集成遇到困难，该如何联系声网获取协助
 
