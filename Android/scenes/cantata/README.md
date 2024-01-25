@@ -301,7 +301,8 @@
 >
 >   包含了房间的创建和房间列表的获取
 >
->   相关代码请参考：[**RoomCreateViewModel**](src/main/java/io/agora/scene/cantata/ui/viewmodel/RoomCreateViewModel.kt)，分别依赖 [**KTVServiceProtocol**](src/main/java/io/agora/scene/cantata/service/KTVServiceProtocol.kt) 的下列方法去交互
+>   相关代码请参考：[**RoomCreateViewModel**](src/main/java/io/agora/scene/cantata/create/RoomCreateViewModel.kt)，分别依赖 
+    > [**KTVServiceProtocol**](src/main/java/io/agora/scene/cantata/service/CantataServiceProtocol.kt) 的下列方法去交互
 >
 >   ```kotlin
 >   fun getRoomList(completion: (error: Exception?, list: List<RoomListModel>?) -> Unit)
@@ -323,7 +324,8 @@
 >
 >   点歌、已点歌曲删除、已点歌曲置顶、切歌等状态的同步
 >
->   歌曲列表菜单：请参考 [**RoomLivingActivity#showChooseSongDialog**]((src/main/java/io/agora/scene/cantata/ui/videomodel/RoomLivingViewModel.kt))
+>   歌曲列表菜单：请参考 [**RoomLivingActivity#showChooseSongDialog**](
+    > (src/main/java/io/agora/scene/cantata/live/RoomLivingViewModel.kt))
 >
 >   
 >
@@ -333,7 +335,7 @@
 >
 >   声网最佳美声
 >
->    实现参考 [**MusicSettingDialog#Callback**](src/main/java/io/agora/scene/cantata/ui/dialog/MusicSettingDialog.kt)里的**onEffectChanged**实现
+>    实现参考 [**MusicSettingDialog#Callback**](src/main/java/io/agora/scene/cantata/live/fragmentdialog/MusicSettingDialog.kt)里的**onEffectChanged**实现
 
 ---
 

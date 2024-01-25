@@ -28,7 +28,7 @@
                 android:id="@+id/ivBackground"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@mipmap/ktv_img_room_item_bg_0"
+                android:src="@drawable/img_room_item_cover_0"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

@@ -41,7 +41,7 @@
             android:id="@+id/switchEar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableRight="@drawable/cantata_ic_arrow_right"
+            android:drawableRight="@drawable/ic_arrow_right"
             android:drawablePadding="5dp"
             android:text="关闭"
             android:textColor="@color/def_text_grey_6c7" />

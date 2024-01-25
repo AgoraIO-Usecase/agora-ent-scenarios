@@ -3,6 +3,9 @@ package io.agora.scene.ktv.live.bean
 import android.util.Log
 import io.agora.scene.ktv.live.fragmentdialog.AgoraPresetSound
 
+/**
+ * 虚拟声卡设置
+ */
 class SoundCardSettingBean constructor(private var parameterCallback: ((preset: Int, gain: Float, gender: Int, effect: Int) -> Unit)) {
 
     private var presetSound: AgoraPresetSound = AgoraPresetSound.Close
