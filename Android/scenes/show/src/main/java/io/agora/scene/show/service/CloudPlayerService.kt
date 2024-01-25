@@ -119,7 +119,7 @@ class CloudPlayerService {
                 .put(
                     "basicAuth",
                     Base64.encodeToString(
-                        "${io.agora.scene.show.BuildConfig.CLOUD_PLAYER_KEY}:${io.agora.scene.show.BuildConfig.CLOUD_PLAYER_SECRET}".toByteArray(Charsets.UTF_8),
+                        "${io.agora.scene.show.BuildConfig.RESTFUL_API_KEY}:${io.agora.scene.show.BuildConfig.RESTFUL_API_SECRET}".toByteArray(Charsets.UTF_8),
                         Base64.NO_WRAP
                     )
                 )
