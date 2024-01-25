@@ -8,7 +8,7 @@ import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
-import io.agora.scene.joy.utils.JoyLogger
+import io.agora.scene.joy.JoyLogger
 import io.agora.syncmanager.rtm.IObject
 import io.agora.syncmanager.rtm.RethinkConfig
 import io.agora.syncmanager.rtm.Scene

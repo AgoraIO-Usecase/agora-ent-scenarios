@@ -239,7 +239,7 @@
             app:layout_constraintBottom_toBottomOf="@id/tvInput"
             app:layout_constraintEnd_toStartOf="@id/ivGift" />
 
-        <io.agora.scene.joy.ui.widget.like.LikeLayout
+        <io.agora.scene.joy.widget.like.LikeLayout
             android:id="@+id/likeView"
             android:layout_width="66dp"
             android:layout_height="wrap_content"
@@ -258,7 +258,7 @@
 
 
 
-    <io.agora.scene.joy.ui.widget.NonInterceptingRecyclerView
+    <io.agora.scene.joy.widget.NonInterceptingRecyclerView
         android:id="@+id/rvMessage"
         android:layout_width="match_parent"
         android:layout_height="220dp"
