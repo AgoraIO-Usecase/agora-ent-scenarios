@@ -16,32 +16,30 @@
 
 ## 2. 运行示例
 
-- 进入声网控制台获取 APP ID 和 APP 证书 [控制台入口](https://console.shengwang.cn/overview)
-  
-  > - 点击创建应用
-  >   
-  >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_1.jpg)
-  > 
-  > - 选择项目基础配置, 鉴权机制需要选择**安全模式**
-  >   
-  >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_2.jpg)
-  > 
-  > - 得到App ID与App 证书
-  >   
-  >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_3.jpg)
-  >   
-  > - 秒切机器人服务配置（CloudPlayer）
-  >
-  >   - ```注: 请联系声网技术支持为您的 APPID 开通 rte-cloudplayer 权限, 开通权限后才能启动默认的机器人房间推流```
-  >
-  >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_4.jpg)
-  >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_5.jpg)
-  >   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/cloud_player_key_ios.jpg)
-  > 
+- 2.1 进入声网控制台获取 APP ID 和 APP 证书 [控制台入口](https://console.shengwang.cn/overview)
 
-- 获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
+  - 点击创建项目
 
-- 在项目的[KeyCenter.swift](../../KeyCenter.swift)里填写需要的声网 App ID 和 App证书
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_1.jpg)
+
+  - 选择项目基础配置, 鉴权机制需要选择**安全模式**
+
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_2.jpg)
+
+  - 拿到项目 APP ID 与 APP 证书
+
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_3.jpg)
+
+  - 秒切机器人服务配置（CloudPlayer）
+      ```json
+      注: 请联系声网技术支持为您的 APPID 开通 rte-cloudplayer 权限, 开通权限后才能启动默认的机器人房间推流
+      ```
+    
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_4.jpg)
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_5.jpg)
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/cloud_player_key_ios.jpg)
+
+- 2.2 在项目的[KeyCenter.swift](../../KeyCenter.swift)里填写需要的声网 App ID 和 App证书
   
   ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/KeyCenter.png)
   
@@ -52,8 +50,12 @@
 
 
 
-- 美颜配置
-  
+- 2.3 美颜配置
+   ```json
+  注: 项目使用的美颜资源需要向第三方美颜提供商获取, 没有美颜资源仅影响直播过程中的美颜效果, 不会影响 Demo 的运行
+  ```
+ 
+ **商汤美颜配置**
   美颜资源请联系商汤科技商务获取。
   
   1.
@@ -142,7 +144,7 @@
 
 > 声动互娱-秀场直播项目内使用了
 > 
-> - 美颜场景化 API (简称 BeautyAPI)来实现多第三方美颜快速接入,如果您想进一步了解 BeautyAPI, 可以参考 [BeautyAPI Demo](https://github.com/AgoraIO-Community/BeautyAPI)
+> - 美颜场景化 API (简称 BeautyAPI)来实现多第三方美颜快速接入, 对应代码文件: [BeautyAPI](Beauty/BeautyAPI),如果您想进一步了解 BeautyAPI, 可以参考 [BeautyAPI Demo](https://github.com/AgoraIO-Community/BeautyAPI)
 > 
 >  - 秒开秒切场景化 API (简称 VideoLoaderAPI)来实现观众看播视频秒出图、秒切换直播间的能力, 对应代码文件: [VideoLoaderAPI](../../Common/API/VideoLoaderAPI/VideoLoaderAPI), 如果您想进一步了解 VideoLoaderAPI, 可以参考 [VideoLoaderAPI Demo](https://github.com/AgoraIO-Community/VideoLoaderAPI)
 > 

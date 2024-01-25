@@ -117,11 +117,8 @@
 
 ## 4.集成遇到困难，该如何联系声网获取协助
 
-> 方案1：可以从智能客服获取帮助或联系销售人员 [Agora 支持](https://agora-ticket.agora.io/) 
-> 
-> 方案2：发送邮件给[support@agora.io](mailto:support@agora.io)咨询
->
-> 方案3：加入微信群提问
->
-> ![](https://download.agora.io/demo/release/SDHY_QA.jpg)
----
+- 集成遇到困难，该如何联系声网获取协助
+  - 方案1：可以从智能客服获取帮助或联系技术支持人员 [声网支持](https://ticket.shengwang.cn/form?type_id=&sdk_product=&sdk_platform=&sdk_version=&current=0&project_id=&call_id=&channel_name=)
+  - 方案2：加入微信群提问
+  
+    ![](https://download.agora.io/demo/release/SDHY_QA.jpg)
