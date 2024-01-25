@@ -3,7 +3,7 @@ ext {
 }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_SHOW_1V1 = "3.7.0"
+final def VERSION_SCENE_SHOW_1V1 = "4.2.0"
 
 android {
     defaultConfig {
@@ -31,7 +31,8 @@ dependencies {
 
     kapt rootProject.ext.deps.glide_compiler
     implementation rootProject.ext.deps.glide
-
+    implementation rootProject.ext.deps.layout_kernel
+    implementation rootProject.ext.deps.header_classics
     implementation rootProject.ext.deps.annotation
     implementation rootProject.ext.deps.appcompat
     implementation rootProject.ext.deps.lifecycle

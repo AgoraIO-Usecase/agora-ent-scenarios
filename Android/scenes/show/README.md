@@ -4,71 +4,64 @@
 >
 > Demo 效果:
 >
-> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/showRoom_1.png" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/showRoom_2.png" width="300" height="640">
+> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/showRoom_3.jpg" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/showRoom_4.jpg" width="300" height="640">
 ---
 
 ## 1.环境准备
 
 - 最低兼容 Android 7.0（SDK API Level 24）
-- Android Studio 4.0及以上版本。
-- Android 7.0 及以上的手机设备。
+- Android Studio 4.0及以上版本
+- Android 7.0 及以上的手机设备
 
 ---
 
-## 2.运行示例
+## 2. 运行示例
 
-- <mark>1. </mark> 获取声网App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docportal.shengwang.cn/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
-> - 点击创建应用
-    >
-    >   ![xxx](image/SamplePicture2.png)
->
-> - 选择你要创建的应用类型
-    >
-    >   ![xxx](image/SamplePicture3.png)
->
-> - 得到App ID与App 证书
-    >
-    >   ![xxx](image/SamplePicture4.png)
->
-> - 秒切机器人服务配置（CloudPlayer）
-    >
-    >   ![xxx](image/SamplePicture6.png)
+- 2.1 进入声网控制台获取 APP ID 和 APP 证书 [控制台入口](https://console.shengwang.cn/overview)
 
-  获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docportal.shengwang.cn/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
+  - 点击创建项目
 
-- <mark>2. </mark>在 [**settings.gradle**](../../settings.gradle) 内取消对秀场直播 include 的注释
-~~~
-include ':scenes:show'
-include ':scenes:show:aars:beauty_sensetime:SenseArSourceManager'
-include ':scenes:show:aars:beauty_sensetime:STMobileJNI'
-include ':scenes:show:aars:beauty_sensetime:HardwareBuffer'
-include ':scenes:show:aars:beauty_bytedance:EffectAAR'
-~~~
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_1.jpg)
 
-- <mark>3. </mark> 在项目的[**gradle.properties**](../../gradle.properties)里填写需要的声网 App ID 和 App证书  
-  ![xxx](image/SamplePicture1.png)
+  - 选择项目基础配置, 鉴权机制需要选择**安全模式**
+
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_2.jpg)
+
+  - 拿到项目 APP ID 与 APP 证书
+
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_3.jpg)
+
+  - 秒切机器人服务配置（CloudPlayer）
+      ```json
+      注: 请联系声网技术支持为您的 APPID 开通 rte-cloudplayer 权限, 开通权限后才能启动默认的机器人房间推流
+      ```
+    
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_4.jpg)
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_5.jpg)
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_6.jpg)
+    
+
+- 2.2 在项目的 [**gradle.properties**](../../gradle.properties) 里填写需要的声网 APP ID 和 APP 证书、RESTFUL KEY 和 SECRET
+    ![xxx](image/SamplePicture1.png)
 
   ```texag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0ag-0-1gpap96h0ag-1-1gpap96h0
-  AGORA_APP_ID：声网appid  
-  AGORA_APP_CERTIFICATE：声网Certificate 
-  CLOUD_PLAYER_KEY：声网RESTful API key
-  CLOUD_PLAYER_SECRET：声网RESTful API secret
+  AGORA_APP_ID：声网 APP ID
+  AGORA_APP_CERTIFICATE：声网 APP 证书
+  RESTFUL_API_KEY：声网RESTful API key
+  RESTFUL_API_SECRET：声网RESTful API secret
   ```
 
-- <mark>4. </mark> 美颜配置
+- 2.3 美颜配置
+  ```json
+  注: 项目使用的美颜资源需要向第三方美颜提供商获取, 没有美颜资源仅影响直播过程中的美颜效果, 不会影响 Demo 的运行
+  ```
 
   **商汤美颜配置**
   美颜资源请联系商汤科技商务获取。
 
-  <img src="image/SamplePicture7.png" alt="xxx" width="800" />
+  ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/beauty_1.jpg)
 
-  > - 将STMobileJNI-release.aar放在**scenes/show/aars/beauty_sensetime/STMobileJNI**目录下
-  >
-  > - 将SenseArSourceManager-release.aar放在**scenes/show/aars/beauty_sensetime/SenseArSourceManager**目录下
-  >
-  > - HardwareBuffer-release.aar放在**scenes/show/aars/beauty_sensetime/HardwareBuffer**目录下
-  >
-  > - 将SDK里的资源文件复制到**scenes/show/src/main/assets/beauty_sensetime** 目录下。这个项目用到的资源文件列举如下：
+  > - 将资源文件复制到 **scenes/show/src/main/assets/beauty_sensetime** 目录下。这个项目用到的资源文件列举如下：
   >
   >   - license/SenseME.lic : 证书资源
   >   - models/*.model : AI等训练模型资源
@@ -78,85 +71,71 @@ include ':scenes:show:aars:beauty_bytedance:EffectAAR'
   **相芯美颜配置**
   美颜资源请联系相芯商务获取。
 
-  <img src="image/SamplePicture8.png" alt="xxx" width="800" />
+  ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/beauty_2.jpg)
 
-  > - 将相芯证书authpack.java放在**scenes/show/src/main/java/io/agora/scene/show/beauty**目录下
+  > - 将相芯证书 authpack.java 放在 **scenes/show/src/main/java/io/agora/scene/show/beauty** 目录下
   >
-  > - 将SDK里的资源文件复制到**scenes/show/src/main/assets/beauty_faceunity** 目录下。这个项目用到的资源文件列举如下：
-      >
-      >   - makeup : 风格妆资源
+  > - 将资源文件复制到 **scenes/show/src/main/assets/beauty_faceunity** 目录下。这个项目用到的资源文件列举如下：
+  >
+  >   - makeup : 风格妆资源
   >   - sticker : 贴纸资源
 
   **火山美颜配置**
   美颜资源请联系火山商务获取。
 
-  <img src="image/SamplePicture9.png" alt="xxx" width="800" />
+  ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/beauty_3.jpg)
 
-  > - 将effectAAR-release.aar放在**scenes/show/aars/beauty_bytedance/EffectAAR**目录下
-  >
-  > - 将SDK里的资源文件复制到**scenes/show/src/main/assets/beauty_bytedance** 目录下。这个项目用到的资源文件列举如下：
+  > - 将资源文件复制到 **scenes/show/src/main/assets/beauty_bytedance** 目录下。这个项目用到的资源文件列举如下：
   >
   >   - LicenseBag.bundle : 证书资源
   >   - ModelResource.bundle : AI等训练模型资源
   >   - StickerResource.bundle : 贴纸资源
   >   - ComposeMakeup.bundle : 风格妆资源
   >
-  > - 修改**scenes/show/src/main/java/io/agora/scene/show/beauty/ByteDanceBeautySDK.kt**中LICENSE_NAME为证书文件名
+  > - 修改 **scenes/show/src/main/java/io/agora/scene/show/beauty/ByteDanceBeautySDK.kt** 中 LICENSE_NAME 为证书文件名
 
-- <mark>5. </mark> 用 Android Studio 运行项目即可开始您的体验
+- 2.4 运行项目即可开始您的体验
 
 ---
 ## 3.项目介绍
-- <mark>1. 概述</mark>
-> 秀场直播项目是声网秀场直播场景的开源代码，开发者可以获取并添加到您的APP工程里，本源码会伴随声动互娱Demo同步更新，为了获取更多新的功能和更佳的体验，强烈推荐您下载最新代码集成。
-- <mark>2. 功能介绍</mark>
+### 3.1 概述
+> 秀场直播项目是声网秀场直播场景的开源代码，开发者可以获取并添加到您的 APP 工程里，本源码会伴随声动互娱 Demo 同步更新，为了获取更多新的功能和更佳的体验，强烈推荐您下载最新代码集成。
+### 3.2 功能介绍
 > 秀场直播场景目前已涵盖以下功能
 > - PK 和连麦
     >
     >   相关代码请参考：[LiveDetailFragment](src/main/java/io/agora/scene/show/LiveDetailFragment.kt) 中的 updatePKingMode() 和 updateLinkingMode() 的实现。
->
 > - 秒切
     >
     >   相关代码请参考：[LiveDetailActivity](src/main/java/io/agora/scene/show/LiveDetailActivity.kt) 中的 OnPageChangeCallback 的实现。
 > - 美颜
-    >
-    >   美颜是通过注册视频帧观测器，在视频观测器的 onCaptureVideoFrame 回调中通过商汤美颜SDK处理视频帧数据并替换实现美颜功能。
-    >
-    >   商汤美颜功能的详细封装请参考：[SenseTimeBeautyAPIImpl](src/main/java/io/agora/beautyapi/sensetime/SenseTimeBeautyAPIImpl.kt) 的实现。
-    >   相芯美颜功能的详细封装请参考：[FaceUnityBeautyAPIImpl](src/main/java/io/agora/beautyapi/faceunity/FaceUnityBeautyAPIImpl.kt) 的实现。
-    >   火山美颜功能的详细封装请参考：[ByteDanceBeautyAPIImpl](src/main/java/io/agora/beautyapi/bytedance/ByteDanceBeautyAPIImpl.kt) 的实现。
-    >
-    >   ``` 
+>
+>   美颜是通过注册视频帧观测器，在视频观测器的 onCaptureVideoFrame 回调中通过商汤美颜SDK处理视频帧数据并替换实现美颜功能。
+>
+>   商汤美颜功能的详细封装请参考：[SenseTimeBeautyAPIImpl](src/main/java/io/agora/beautyapi/sensetime/SenseTimeBeautyAPIImpl.kt) 的实现。
+>   相芯美颜功能的详细封装请参考：[FaceUnityBeautyAPIImpl](src/main/java/io/agora/beautyapi/faceunity/FaceUnityBeautyAPIImpl.kt) 的实现。
+>   火山美颜功能的详细封装请参考：[ByteDanceBeautyAPIImpl](src/main/java/io/agora/beautyapi/bytedance/ByteDanceBeautyAPIImpl.kt) 的实现。
+>
+>   ``` 
 >    @Override
 >    public boolean onCaptureVideoFrame(VideoFrame videoFrame) {
 >        ...
 >      videoFrame.replaceBuffer(newBuffer, videoFrame.getRotation(), videoFrame.getTimestampNs());
 >    }
 >   ```
-> - 虚拟背景和虚化背景
-    >
-    >   相关代码参考：[MultiBeautyDialog](src/main//java//io//agora//scene//show//widget//beauty//MultiBeautyDialog.kt) 中 controllerView.pageList 部分。
+### 3.3 场景化 API
+
+声动互娱-秀场直播项目内使用了
+* 美颜场景化 API (简称 BeautyAPI)来实现多第三方美颜快速接入, 对应代码文件: [BeautyAPI](src/main/java/io/agora/beautyapi), 如果您想进一步了解 BeautyAPI, 可以参考 [BeautyAPI Demo](https://github.com/AgoraIO-Community/BeautyAPI)
+* 秒开秒切场景化 API (简称 VideoLoaderAPI)来实现观众看播视频秒出图、秒切换直播间的能力, 对应代码文件: [VideoLoaderAPI](src/main/java/io/agora/videoloaderapi), 如果您想进一步了解 VideoLoaderAPI, 可以参考 [VideoLoaderAPI Demo](https://github.com/AgoraIO-Community/VideoLoaderAPI)
 
   
-## 4.FAQ
+## 4. FAQ
 
-### 想体验更多场景
-
-> 详情请查看 [声动互娱](../../../README.md)
-
-### 集成遇到困难，该如何联系声网获取协助
-  - 方案1：可以从智能客服获取帮助或联系销售人员[Agora 支持](https://agora-ticket.agora.io/) ；
-  - 方案2：发送邮件给 [support@agora.io](mailto:support@agora.io) 咨询
-  - 方案3：加入微信群提问
+- 集成遇到困难，该如何联系声网获取协助
+  - 方案1：可以从智能客服获取帮助或联系技术支持人员 [声网支持](https://ticket.shengwang.cn/form?type_id=&sdk_product=&sdk_platform=&sdk_version=&current=0&project_id=&call_id=&channel_name=)
+  - 方案2：加入微信群提问
   
-    ![xxx](https://download.agora.io/demo/release/SDHY_QA.jpg)
-
----
-
-## 代码许可
-
-示例项目遵守 MIT 许可证。
-
----
+    ![](https://download.agora.io/demo/release/SDHY_QA.jpg)
 
 

@@ -10,6 +10,9 @@ import io.agora.scene.base.utils.GsonUtil
 import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
 
+/*
+ * 高清设置模块
+ */
 object VideoSetting {
 
     enum class BitRate constructor(val value: Int) {
@@ -500,6 +503,9 @@ object VideoSetting {
         if (currAudienceDeviceLevel != DeviceLevel.Low) {
             setCurrAudienceEnhanceSwitch(true)
             updateAudioSetting(SR = SuperResolution.SR_AUTO)
+        } else {
+            setCurrAudienceEnhanceSwitch(false)
+            updateAudioSetting(SR = SuperResolution.SR_NONE)
         }
     }
 

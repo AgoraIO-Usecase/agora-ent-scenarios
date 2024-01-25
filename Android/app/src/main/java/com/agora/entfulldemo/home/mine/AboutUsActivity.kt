@@ -1,5 +1,6 @@
 package com.agora.entfulldemo.home.mine
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -43,7 +44,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val debugModeOpenTime: Long = 2000
     private var beginTime: Long = 0
 
-    private val adapter = AboutUsAdapter()
+    private val adapter = AboutUsAdapter(this)
 
     override fun getViewBinding(inflater: LayoutInflater): AppActivityAboutUsBinding {
         return AppActivityAboutUsBinding.inflate(inflater)
@@ -121,7 +122,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         if (VersionUtils.getVersion("io.agora.scene.show.BuildConfig").isNotEmpty()) {
             adapter.appInfo = AppInfo(
                 this.getString(R.string.app_about_show),
-                "20230915-" + VersionUtils.getVersion("io.agora.scene.show.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
+                "20230229-" + VersionUtils.getVersion("io.agora.scene.show.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
@@ -329,7 +330,9 @@ private data class SceneInfo(
     val version: String
 )
 
-private class AboutUsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+private class AboutUsAdapter(
+    val context: Context
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val VIEW_TYPE_APP_INFO = 0
 
@@ -359,8 +362,8 @@ private class AboutUsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>()
         if (holder.itemViewType == VIEW_TYPE_APP_INFO) {
             val current = holder as AppInfoViewHolder
             appInfo?.let {
-                current.binding.tvAppName.text = it.name
-                current.binding.tvVersion.text = it.version
+//                current.binding.tvAppName.text = it.name
+                current.binding.tvVersion.text = context.getString(R.string.app_mine_current_version, it.version)
                 current.binding.tvServiceNumber.text = it.servicePhone
                 current.binding.tvHomeWebSite.text = it.webSite
             }
