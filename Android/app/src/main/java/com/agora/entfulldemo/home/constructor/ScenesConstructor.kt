@@ -71,7 +71,7 @@ object ScenesConstructor {
 //            ),
             ScenesModel(
                 AgoraScenes.Joy,
-                "io.agora.scene.joy.ui.RoomListActivity",
+                "io.agora.scene.joy.create.RoomListActivity",
                 context.getString(R.string.app_joy_room),
                 R.mipmap.bg_btn_home7,
                 R.mipmap.bg_btn_home_showto1v1,

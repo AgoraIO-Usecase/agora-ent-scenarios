@@ -5,19 +5,19 @@
     <application>
 
         <activity
-            android:name="io.agora.scene.joy.ui.RoomListActivity"
+            android:name="io.agora.scene.joy.create.RoomListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/joy_def_material_theme" />
 
         <activity
-            android:name="io.agora.scene.joy.ui.LivePrepareActivity"
+            android:name="io.agora.scene.joy.create.LivePrepareActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:keepScreenOn="true"
             android:theme="@style/joy_def_material_theme" />
 
         <activity
-            android:name="io.agora.scene.joy.ui.RoomLivingActivity"
+            android:name="io.agora.scene.joy.live.RoomLivingActivity"
             android:exported="false"
             android:keepScreenOn="true"
             android:configChanges="orientation|screenSize"
