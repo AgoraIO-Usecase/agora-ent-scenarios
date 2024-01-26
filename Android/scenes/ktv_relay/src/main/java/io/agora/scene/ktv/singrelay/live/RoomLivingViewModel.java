@@ -43,6 +43,7 @@ import io.agora.scene.ktv.singrelay.KTVLogger;
 import io.agora.scene.ktv.singrelay.R;
 import io.agora.scene.ktv.singrelay.debugSettings.KTVDebugSettingBean;
 import io.agora.scene.ktv.singrelay.debugSettings.KTVDebugSettingsDialog;
+import io.agora.scene.ktv.singrelay.ktvapi.AudioTrackMode;
 import io.agora.scene.ktv.singrelay.ktvapi.IKTVApiEventHandler;
 import io.agora.scene.ktv.singrelay.ktvapi.ILrcView;
 import io.agora.scene.ktv.singrelay.ktvapi.IMusicLoadStateListener;
@@ -1273,19 +1274,15 @@ public class RoomLivingViewModel extends ViewModel {
     protected KTVPlayerTrackMode mAudioTrackMode = KTVPlayerTrackMode.Acc;
     public void musicToggleOriginal() {
         if (mAudioTrackMode == KTVPlayerTrackMode.Origin) {
-            if (isRoomOwner()) {
-                ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(1, 1);
-            } else {
-                ktvApiProtocol.getMediaPlayer().selectAudioTrack(1);
-            }
+            ktvApiProtocol.switchAudioTrack(AudioTrackMode.BAN_ZOU);
             mAudioTrackMode = KTVPlayerTrackMode.Acc;
         } else {
             if (isRoomOwner()) {
                 // 主唱（房主）开导唱
-                ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(0, 1);
+                ktvApiProtocol.switchAudioTrack(AudioTrackMode.DAO_CHANG);
             } else {
                 // 其他游戏者开原唱
-                ktvApiProtocol.getMediaPlayer().selectAudioTrack(0);
+                ktvApiProtocol.switchAudioTrack(AudioTrackMode.YUAN_CHANG);
             }
             mAudioTrackMode = KTVPlayerTrackMode.Origin;
         }
