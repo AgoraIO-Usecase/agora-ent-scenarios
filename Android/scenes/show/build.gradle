@@ -2,7 +2,7 @@ ext { ktv_is_modular = false }
 apply from: 'vendors.gradle'
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_SHOW = "3.2.2"
+final def VERSION_SCENE_SHOW = "4.2.0"
 
 android {
     defaultConfig {
@@ -11,8 +11,8 @@ android {
         }
 
         buildConfigField "String", "VERSION", "\"${VERSION_SCENE_SHOW}\""
-        buildConfigField "String", "CLOUD_PLAYER_KEY", "\"${CLOUD_PLAYER_KEY}\""
-        buildConfigField "String", "CLOUD_PLAYER_SECRET", "\"${CLOUD_PLAYER_SECRET}\""
+        buildConfigField "String", "RESTFUL_API_KEY", "\"${RESTFUL_API_KEY}\""
+        buildConfigField "String", "RESTFUL_API_SECRET", "\"${RESTFUL_API_SECRET}\""
     }
 }
 

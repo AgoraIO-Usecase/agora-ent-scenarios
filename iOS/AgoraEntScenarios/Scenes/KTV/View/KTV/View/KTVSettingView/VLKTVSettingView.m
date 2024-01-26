@@ -9,11 +9,10 @@
 #import "VLKTVSliderView.h"
 #import "VLKTVKindsView.h"
 #import "VLKTVRemoteVolumeView.h"
-#import "VLFontUtils.h"
-#import "AESMacro.h"
 #import "EffectCollectionViewCell.h"
+#import "AgoraEntScenarios-Swift.h"
 @import Masonry;
-
+@import AgoraCommon;
 @interface VLKTVSettingView() <
 VLKTVSwitcherViewDelegate,
 VLKTVSliderViewDelegate,
@@ -195,7 +194,7 @@ UICollectionViewDataSource
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     EffectCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"EffectCollectionViewCell" forIndexPath:indexPath];
-    cell.bgImageView.image = [UIImage sceneImageWithName:self.effectImgs[indexPath.item % 4]];
+    cell.bgImageView.image = [UIImage ktv_sceneImageWithName:self.effectImgs[indexPath.item % 4] ];
     cell.titleLabel.text = self.titles[indexPath.item];
     cell.layer.cornerRadius = 5;
     cell.layer.masksToBounds = true;
@@ -260,7 +259,7 @@ UICollectionViewDataSource
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] init];
         _titleLabel.text = KTVLocalizedString(@"ktv_music_menu_dialog_title");
-        _titleLabel.font = VLUIFontMake(16);
+        _titleLabel.font = [UIFont systemFontOfSize:16];
         _titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     }
     return _titleLabel;

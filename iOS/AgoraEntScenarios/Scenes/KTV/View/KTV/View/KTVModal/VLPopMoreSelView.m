@@ -4,10 +4,7 @@
 //
 
 #import "VLPopMoreSelView.h"
-#import "VLFontUtils.h"
-#import "VLMacroDefine.h"
 #import "AgoraEntScenarios-Swift.h"
-#import "AESMacro.h"
 @import Masonry;
 
 @interface VLPopMoreSelView ()
@@ -31,7 +28,7 @@
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
     titleLabel.text = KTVLocalizedString(@"ktv_more_actions");
-    titleLabel.font = VLUIFontMake(16);
+    titleLabel.font = [UIFont systemFontOfSize:16];
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:titleLabel];
@@ -56,7 +53,7 @@
     [self addSubview:itemBgView];
 
     UIButton *itemBtn = [[UIButton alloc]initWithFrame:CGRectMake((self.bounds.size.width - itemWH)/2.0+11, itemY+12, btnItemWH, btnItemWH)];
-    [itemBtn setImage:[UIImage sceneImageWithName:itemsArray[0]] forState:UIControlStateNormal];
+    [itemBtn setImage:[UIImage ktv_sceneImageWithName:itemsArray[0] ] forState:UIControlStateNormal];
     itemBtn.tag = 0;
     [itemBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:itemBtn];
@@ -78,7 +75,7 @@
 //        [self addSubview:itemBgView];
 //
 //        UIButton *itemBtn = [[UIButton alloc]initWithFrame:CGRectMake(leftMargin+(itemWH+middleMargin)*i+11, itemY+12, btnItemWH, btnItemWH)];
-//        [itemBtn setImage:[UIImage sceneImageWithName:itemsArray[i]] forState:UIControlStateNormal];
+//        [itemBtn setImage:[UIImage ktv_sceneImageWithName:itemsArray[i]] forState:UIControlStateNormal];
 //        itemBtn.tag = i;
 //        [itemBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
 //        [self addSubview:itemBtn];

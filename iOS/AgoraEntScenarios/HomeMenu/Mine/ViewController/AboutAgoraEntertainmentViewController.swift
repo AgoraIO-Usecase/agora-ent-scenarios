@@ -8,7 +8,7 @@
 import UIKit
 import ZSwiftBaseLib
 import AgoraRtcKit
-
+import AgoraCommon
 @objcMembers final class AboutAgoraEntertainmentViewController: VLBaseViewController {
     
     var infos = [

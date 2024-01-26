@@ -4,10 +4,8 @@
 //
 
 #import "VLKTVKindsCell.h"
-#import "VLFontUtils.h"
 #import "AgoraEntScenarios-Swift.h"
 @import Masonry;
-
 @interface VLKTVKindsCell()
 
 @property (nonatomic, strong) UIImageView *cImageView;
@@ -39,7 +37,7 @@
 - (void)setModel:(VLKTVKindsModel *)model {
     _model = model;
     _cLabel.text = _model.title;
-    _cImageView.image = [UIImage sceneImageWithName:_model.imageName];
+    _cImageView.image = [UIImage ktv_sceneImageWithName:_model.imageName ];
     if (_model.selected) {
         self.contentView.layer.borderColor = [UIColor blueColor].CGColor;
     } else {
@@ -51,7 +49,7 @@
 - (UILabel *)cLabel {
     if (!_cLabel) {
         _cLabel = [[UILabel alloc] init];
-        _cLabel.font = VLUIFontMake(13);
+        _cLabel.font = [UIFont systemFontOfSize:13];
         _cLabel.textColor = [UIColor whiteColor];
     }
     return _cLabel;

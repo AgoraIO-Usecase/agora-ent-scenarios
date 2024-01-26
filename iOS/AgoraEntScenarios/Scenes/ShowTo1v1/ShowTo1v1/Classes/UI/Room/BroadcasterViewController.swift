@@ -9,7 +9,7 @@ import UIKit
 import AgoraRtcKit
 import VideoLoaderAPI
 import CallAPI
-
+import AgoraCommon
 
 class BroadcasterViewController: BaseRoomViewController {
     var currentUser: ShowTo1v1UserInfo?

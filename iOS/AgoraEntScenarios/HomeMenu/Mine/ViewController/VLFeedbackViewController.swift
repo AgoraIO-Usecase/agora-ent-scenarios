@@ -6,7 +6,7 @@
 //
 
 import UIKit
-//import HXPhotoPicker
+import AgoraCommon
 
 @objc
 class VLFeedbackViewController: VLBaseViewController {

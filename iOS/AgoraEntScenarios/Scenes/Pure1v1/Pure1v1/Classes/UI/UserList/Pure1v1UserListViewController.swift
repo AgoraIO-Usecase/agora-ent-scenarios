@@ -9,8 +9,7 @@ import UIKit
 import YYCategories
 import CallAPI
 import AgoraRtcKit
-import AVFoundation
-
+import AgoraCommon
 
 
 private let kShowGuideAlreadyKey = "already_show_guide"

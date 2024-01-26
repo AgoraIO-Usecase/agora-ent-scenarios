@@ -2,6 +2,9 @@ package io.agora.scene.pure1v1
 
 import io.agora.scene.base.EntLogger
 
+/*
+ * 场景日志模块
+ */
 object Pure1v1Logger {
 
     private val entLogger = EntLogger(EntLogger.Config("Pure1v1"))

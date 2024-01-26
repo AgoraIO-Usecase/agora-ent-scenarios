@@ -14,7 +14,7 @@ public let kAppOSValue = "iOS"
 public let kAppVersion = "versionName"
 
 @objc
-class NetworkManager:NSObject {
+public class NetworkManager:NSObject {
     @objc public enum TokenGeneratorType: Int {
         case token006 = 0
         case token007 = 1
@@ -31,7 +31,7 @@ class NetworkManager:NSObject {
         case POST
     }
     
-    @objc enum SceneType: Int {
+    @objc public enum SceneType: Int {
         case show = 0
         case voice = 1
         case ktv = 2
@@ -54,8 +54,8 @@ class NetworkManager:NSObject {
 
     var gameToken: String = ""
 
-    typealias SuccessClosure = ([String: Any]) -> Void
-    typealias FailClosure = (String) -> Void
+    public typealias SuccessClosure = ([String: Any]) -> Void
+    public typealias FailClosure = (String) -> Void
 
     private var sessionConfig: URLSessionConfiguration = {
         let config = URLSessionConfiguration.default
@@ -77,10 +77,10 @@ class NetworkManager:NSObject {
         return config
     }()
 
-    @objc static let shared = NetworkManager()
+    @objc public static let shared = NetworkManager()
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
     private var baseServerUrl: String {
-        return KeyCenter.baseServerUrl ?? ""
+        return AppContext.shared.baseServerUrl
     }
     
     /// get tokens
@@ -89,7 +89,7 @@ class NetworkManager:NSObject {
     ///   - uid: <#uid description#>
     ///   - tokenGeneratorType: token types
     ///   - tokenTypes: [token type :  token string]
-    func generateTokens(channelName: String,
+    public func generateTokens(channelName: String,
                         uid: String,
                         tokenGeneratorType: TokenGeneratorType,
                         tokenTypes: [AgoraTokenType],
@@ -172,7 +172,7 @@ class NetworkManager:NSObject {
     ///   - type: 0: 同时处理用户注册/返回用户token和创建聊天室 1: 只处理用户注册/返回用户token 2: 只处理创建聊天室
 
     ///   - success: success description {roomid, uid}
-    func generateIMConfig(type: Int,
+    public func generateIMConfig(type: Int,
                           channelName: String,
                           nickName: String,
                           chatId: String?,
@@ -266,7 +266,7 @@ class NetworkManager:NSObject {
         
     }
     
-    @objc func voiceIdentify(channelName: String,
+    @objc public func voiceIdentify(channelName: String,
                              channelType: Int,
                              sceneType: SceneType,
                              success: @escaping (String?) -> Void) {
@@ -317,7 +317,7 @@ class NetworkManager:NSObject {
         return payload
     }
     
-    func startCloudPlayer(channelName: String,
+    public func startCloudPlayer(channelName: String,
                           uid: String,
                           robotUid: UInt,
                           streamUrl: String,
@@ -360,7 +360,7 @@ class NetworkManager:NSObject {
         }
     }
     
-    func cloudPlayerHeartbeat(channelName: String,
+    public func cloudPlayerHeartbeat(channelName: String,
                               uid: String,
                               success: @escaping (String?) -> Void) {
         /*
@@ -398,7 +398,7 @@ class NetworkManager:NSObject {
         }
     }
 
-    func postRequest(urlString: String, params: [String: Any]?, success: SuccessClosure?, failure: FailClosure?) {
+    public func postRequest(urlString: String, params: [String: Any]?, success: SuccessClosure?, failure: FailClosure?) {
         DispatchQueue.global().async {
             self.request(urlString: urlString, params: params, method: .POST, success: success, failure: failure)
         }
@@ -565,7 +565,7 @@ extension NetworkManager {
         })
         */
         
-        let model = NMReportDeviceInfoNetworkModel(sceneId: sceneName, userNo: VLUserCenter.user.userNo, appId: KeyCenter.AppId)
+        let model = NMReportDeviceInfoNetworkModel(sceneId: sceneName, userNo: VLUserCenter.user.userNo, appId: AppContext.shared.appId)
         model.request { error, data in
 
         }
@@ -584,7 +584,7 @@ extension NetworkManager {
 //            print(error)
 //        })
         
-        let model = NMReportUserBehaviorNetworkModel(sceneId: sceneName, userNo: VLUserCenter.user.userNo, appId: KeyCenter.AppId)
+        let model = NMReportUserBehaviorNetworkModel(sceneId: sceneName, userNo: VLUserCenter.user.userNo, appId: AppContext.shared.appId)
         model.request { error, data in
 
         }
@@ -594,7 +594,7 @@ extension NetworkManager {
 // sbg and sr
 extension NetworkManager {
     //发起抢唱
-    @objc func startSongGrab(_ appid: String, sceneId: String, roomId: String, headUrl: String, userId: String, userName: String, songCode: String, success: @escaping (Bool) -> Void) {
+    @objc public func startSongGrab(_ appid: String, sceneId: String, roomId: String, headUrl: String, userId: String, userName: String, songCode: String, success: @escaping (Bool) -> Void) {
         let params = [
             "appId": appid,
             "sceneId": sceneId,
@@ -607,7 +607,7 @@ extension NetworkManager {
             "headUrl":headUrl
         ]
         
-        guard let baseUrl = KeyCenter.baseServerUrl else {return}
+        let baseUrl = AppContext.shared.baseServerUrl
         
         NetworkTools().request("\(baseUrl)/v1/ktv/song/grab", method: .post, parameters: params) {[weak self] result in
             switch result{
@@ -625,7 +625,7 @@ extension NetworkManager {
     }
     
     //抢唱结果查询
-    @objc func songGrabQuery(_ appid: String, sceneId: String, roomId: String, songCode: String, src: String, success: @escaping (String?, String?,Bool) -> Void) {
+    @objc public func songGrabQuery(_ appid: String, sceneId: String, roomId: String, songCode: String, src: String, success: @escaping (String?, String?,Bool) -> Void) {
         let params = [
             "appId": appid,
             "sceneId": sceneId,
@@ -634,7 +634,7 @@ extension NetworkManager {
             "src": "postman"
         ]
         
-        guard let baseUrl = KeyCenter.baseServerUrl else {return}
+        let baseUrl = AppContext.shared.baseServerUrl
         
         NetworkTools().request("\(baseUrl)/v1/ktv/song/grab/query".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "", method: .get, parameters: params) { result in
             switch result {

@@ -6,8 +6,8 @@
 //
 
 #import "VLVoiceShowView.h"
-#import "AESMacro.h"
 #import <SDWebImage/UIImageView+WebCache.h>
+#import "AgoraEntScenarios-Swift.h"
 @interface VLVoiceShowView()
 @property(nonatomic, weak) id <VLVoiceShowViewDelegate>delegate;
 @property (nonatomic,strong) UILabel *selLabel;
@@ -75,7 +75,7 @@
         [self addSubview:imgView];
         
         UIImageView *coverImgView = [[UIImageView alloc]initWithFrame:CGRectMake(ix, iy, width, imgHeight)];
-        coverImgView.image = [UIImage sceneImageWithName:@"ktv_selIcon"];
+        coverImgView.image = [UIImage ktv_sceneImageWithName:@"ktv_selIcon" ];
         coverImgView.tag = 300 + i;
         coverImgView.hidden = i != realIndex;
         if(i == realIndex){

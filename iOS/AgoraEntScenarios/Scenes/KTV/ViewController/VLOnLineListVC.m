@@ -18,7 +18,7 @@
 #import "AESMacro.h"
 #import "VLAlert.h"
 #import "AgoraEntScenarios-Swift.h"
-
+@import AgoraCommon;
 @interface VLOnLineListVC ()<VLHomeOnLineListViewDelegate/*,AgoraRtmDelegate*/,VLPopScoreViewDelegate>
 
 @property (nonatomic, strong) VLHomeOnLineListView *listView;
@@ -45,7 +45,7 @@
 }
 
 - (void)commonUI {
-    [self setBackgroundImage:@"online_list_BgIcon"];
+    [self setBackgroundImage:@"online_list_BgIcon" bundleName:@"KtvResource"];
     [self setNaviTitleName:KTVLocalizedString(@"ktv_online_ktv")];
     if ([VLUserCenter center].isLogin) {
         [self setBackBtn];

@@ -16,25 +16,19 @@
 #import "VLSRSelBgModel.h"
 #import "UIViewController+VL.h"
 #import "VLSRPopScoreView.h"
-#import "VLUserCenter.h"
-#import "VLMacroDefine.h"
 #import "VLGlobalHelper.h"
 #import "VLURLPathConfig.h"
-#import "VLToast.h"
 #import "UIView+VL.h"
 #import "AppContext+SR.h"
-#import "AESMacro.h"
 #import "LSTPopView+SRModal.h"
 //#import "HWWeakTimer.h"
-#import "VLAlert.h"
-#import "VLKTVAlert.h"
 #import "SRDebugManager.h"
 #import "SRDebugInfo.h"
 @import AgoraRtcKit;
 @import AgoraLyricsScore;
 @import YYCategories;
 @import SDWebImage;
-
+@import AgoraCommon;
 
 NSInteger srApiStreamId = -1;
 NSInteger srStreamId = -1;
@@ -131,7 +125,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [self subscribeServiceEvent];
     
     // setup view
-    [self setBackgroundImage:@"sr_main_back"];
+    [self setBackgroundImage:@"sr_main_back" bundleName:@"SRResource"];
     //头部视图
     VLSRTopView *topView = [[VLSRTopView alloc]initWithFrame:CGRectMake(0, kStatusBarHeight, SCREEN_WIDTH, 60) withDelegate:self];
     [self.view addSubview:topView];
@@ -255,7 +249,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
                     return;
                 }
                 NSString *mes = SRLocalizedString(@"sr_game_isOn");
-                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SRLocalizedString(@"sr_confirm") completion:^(bool flag, NSString * _Nullable text) {
+                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sr_sceneImageWithName:@"empty" ] message:mes buttonTitle:SRLocalizedString(@"sr_confirm") completion:^(bool flag, NSString * _Nullable text) {
                     [[VLKTVAlert shared]dismiss];
                     [weakSelf leaveRoom];
                 }];
@@ -327,7 +321,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
             //房主关闭房间
             if ([roomInfo.creatorNo isEqualToString:VLUserCenter.user.id]) {
                 NSString *mes = SRLocalizedString(@"sr_room_exit");
-                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SRLocalizedString(@"sr_confirm") completion:^(bool flag, NSString * _Nullable text) {
+                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sr_sceneImageWithName:@"empty" ] message:mes buttonTitle:SRLocalizedString(@"sr_confirm") completion:^(bool flag, NSString * _Nullable text) {
                     [[VLKTVAlert shared]dismiss];
                     [weakSelf leaveRoom];
                 }];
@@ -396,7 +390,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [[AppContext srServiceImp] subscribeRoomWillExpireWith:^{
         bool isOwner = [weakSelf.roomModel.creatorNo isEqualToString:VLUserCenter.user.id];
         NSString *mes = isOwner ? SRLocalizedString(@"sr_room_timeout") : SRLocalizedString(@"sr_room_offline");
-        [[VLKTVAlert shared] showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"]  message:mes buttonTitle:SRLocalizedString(@"sr_confirm") completion:^(bool flag, NSString * _Nullable text) {
+        [[VLKTVAlert shared] showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sr_sceneImageWithName:@"empty" ]  message:mes buttonTitle:SRLocalizedString(@"sr_confirm") completion:^(bool flag, NSString * _Nullable text) {
             [[VLKTVAlert shared]dismiss];
             [weakSelf leaveRoom];
         }];
@@ -511,7 +505,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 //用户弹框离开房间
 - (void)popForceLeaveRoom {
     VL(weakSelf);
-    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:SRLocalizedString(@"room_has_close") buttonTitle:SRLocalizedString(@"confirm") completion:^(bool flag, NSString * _Nullable text) {
+    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sr_sceneImageWithName:@"empty" ] message:SRLocalizedString(@"room_has_close") buttonTitle:SRLocalizedString(@"confirm") completion:^(bool flag, NSString * _Nullable text) {
         for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLSROnLineListVC class]]) {
 //                [weakSelf destroyMediaPlayer];

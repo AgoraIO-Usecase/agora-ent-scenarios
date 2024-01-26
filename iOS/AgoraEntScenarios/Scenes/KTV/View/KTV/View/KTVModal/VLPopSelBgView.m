@@ -5,10 +5,8 @@
 
 #import "VLPopSelBgView.h"
 #import "VLKTVSelBgModel.h"
-#import "VLFontUtils.h"
-#import "VLMacroDefine.h"
-#import "AESMacro.h"
-
+#import "AgoraEntScenarios-Swift.h"
+@import AgoraCommon;
 @interface VLPopSelBgView ()<UICollectionViewDataSource,UICollectionViewDelegate>
 
 @property(nonatomic, weak) id <VLPopSelBgViewDelegate>delegate;
@@ -34,7 +32,7 @@
 
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
     titleLabel.text = KTVLocalizedString(@"MV");
-    titleLabel.font = VLUIFontMake(16);
+    titleLabel.font = [UIFont systemFontOfSize:16];
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:titleLabel];
@@ -138,13 +136,13 @@
     [self.contentView addSubview:self.picImgView];
     
     self.selIcon = [[UIImageView alloc]initWithFrame:CGRectMake(self.width-18, self.height-17, 18, 17)];
-    self.selIcon.image = [UIImage sceneImageWithName:@"ktv_selbg_icon"];
+    self.selIcon.image = [UIImage ktv_sceneImageWithName:@"ktv_selbg_icon" ];
     [self.contentView addSubview:self.selIcon];
 }
 
 - (void)setSelBgModel:(VLKTVSelBgModel *)selBgModel {
     _selBgModel = selBgModel;
-    self.picImgView.image = [UIImage sceneImageWithName:selBgModel.imageName];
+    self.picImgView.image = [UIImage ktv_sceneImageWithName:selBgModel.imageName ];
     self.selIcon.hidden = !selBgModel.isSelect;
 }
 

@@ -6,8 +6,7 @@
 //
 
 #import "VLSRDebugView.h"
-#import "AESMacro.h"
-#import "VLMacroDefine.h"
+@import AgoraCommon;
 @interface VLSRDebugView()
 @property(nonatomic, weak) id <VLSRDebugViewDelegate>delegate;
 @property (nonatomic,strong) UISwitch *dumpSwitch;

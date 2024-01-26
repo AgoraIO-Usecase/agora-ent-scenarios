@@ -4,10 +4,7 @@
 //
 
 #import "VLKTVItemBaseView.h"
-#import "VLFontUtils.h"
-#import "AESMacro.h"
 @import Masonry;
-
 @interface VLKTVItemBaseView()
 
 @end
@@ -41,7 +38,7 @@
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] init];
         _titleLabel.text = @"";
-        _titleLabel.font = VLUIFontMake(12);
+        _titleLabel.font = [UIFont systemFontOfSize:12];
         _titleLabel.textColor = UIColorMakeWithHex(@"#979CBB");
     }
     return _titleLabel;

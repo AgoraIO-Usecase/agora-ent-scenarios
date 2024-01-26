@@ -8,11 +8,9 @@
 #import "VLEarSettingView.h"
 #import "VLKTVSliderView.h"
 #import <Masonry/Masonry.h>
-#import "AESMacro.h"
-#import "VLMacroDefine.h"
 #import "HeadSetManager.h"
 #import "VLToast.h"
-
+#import "AgoraEntScenarios-Swift.h"
 @interface VLEarSettingView()<VLKTVSliderViewDelegate>
 @property (nonatomic,strong) UILabel *titleLabel;
 @property (nonatomic,strong) UILabel *earLabel;
@@ -90,8 +88,8 @@
     _earWarningBtn.imageView.contentMode = UIViewContentModeScaleAspectFit;
     [_earWarningBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     [_earWarningBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
-    [_earWarningBtn setImage:[UIImage sceneImageWithName:@"ktv_add_circle"] forState:UIControlStateNormal];
-    [_earWarningBtn setImage:[UIImage sceneImageWithName:@"ktv_add_circle_in"] forState:UIControlStateSelected];
+    [_earWarningBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_add_circle" ] forState:UIControlStateNormal];
+    [_earWarningBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_add_circle_in" ] forState:UIControlStateSelected];
     _earWarningBtn.selected = [self.headeSet hasHeadset];
 
     // 创建一个 NSMutableAttributedString 对象
@@ -99,7 +97,7 @@
 
     // 添加图片到富文本中
     NSTextAttachment *textAttachment = [[NSTextAttachment alloc] init];
-    textAttachment.image = [UIImage sceneImageWithName:@"ktv_add_circle_in"];
+    textAttachment.image = [UIImage ktv_sceneImageWithName:@"ktv_add_circle_in" ];
     textAttachment.bounds = CGRectMake(0, -3, 15, 15); // 调整图片位置和大小，向上偏移3个像素
     NSAttributedString *imageString = [NSAttributedString attributedStringWithAttachment:textAttachment];
     [attributedText insertAttributedString:imageString atIndex:0]; // 将图片插入到富文本的开头

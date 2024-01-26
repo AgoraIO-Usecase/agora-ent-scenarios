@@ -6,7 +6,8 @@
 //
 
 #import "VLEffectView.h"
-#import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
+
 @interface VLEffectView()
 @property(nonatomic, weak) id <VLEffectViewDelegate>delegate;
 @property (nonatomic,strong) UIButton *selBtn;
@@ -47,7 +48,7 @@
         UIButton *btn = [[UIButton alloc]init];
         [btn setTitle:effects[i] forState:UIControlStateNormal];
         [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [btn setBackgroundImage:[UIImage sceneImageWithName:imgs[i % 4]] forState:UIControlStateNormal];
+        [btn setBackgroundImage:[UIImage ktv_sceneImageWithName:imgs[i % 4] ] forState:UIControlStateNormal];
         [btn setTag:200 + i];
         [btn addTarget:self action:@selector(click:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:btn];

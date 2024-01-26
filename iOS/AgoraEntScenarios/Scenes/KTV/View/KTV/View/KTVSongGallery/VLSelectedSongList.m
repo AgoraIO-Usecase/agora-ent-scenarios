@@ -10,6 +10,7 @@
 #import "VLSongItmModel.h"
 #import "VLHotSpotBtn.h"
 #import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 
 #define BASICVCINDEX 100
 
@@ -66,7 +67,7 @@ UITextFieldDelegate
     [self addSubview:bgView];
     
     UIImageView *searchIcon = [[UIImageView alloc]initWithFrame:CGRectMake(15, 11, 18, 18)];
-    searchIcon.image = [UIImage sceneImageWithName:@"ktv_search_icon"];
+    searchIcon.image = [UIImage ktv_sceneImageWithName:@"ktv_search_icon" ];
     [bgView addSubview:searchIcon];
     
     self.searchTF = [[UITextField alloc] initWithFrame:CGRectMake(searchIcon.right+8, 5, self.width-40-15-18-6-15, 30)];
@@ -88,11 +89,11 @@ UITextFieldDelegate
     VLHotSpotBtn *clearButton = [self.searchTF valueForKey:@"_clearButton"];
     //frame必须设置 否则 点击删除键后 clearButton 会变小（系统默认是19*19）
     clearButton.frame = CGRectMake(0, 0, 20, 20);
-    [clearButton setImage:[UIImage sceneImageWithName:@"ktv_search_clearIcon"]
+    [clearButton setImage:[UIImage ktv_sceneImageWithName:@"ktv_search_clearIcon" ]
                  forState:UIControlStateNormal];
-    [clearButton setImage:[UIImage sceneImageWithName:@"ktv_search_clearIcon"]
+    [clearButton setImage:[UIImage ktv_sceneImageWithName:@"ktv_search_clearIcon" ]
                  forState:UIControlStateHighlighted];
-    [clearButton setImage:[UIImage sceneImageWithName:@"ktv_search_clearIcon"]
+    [clearButton setImage:[UIImage ktv_sceneImageWithName:@"ktv_search_clearIcon" ]
                  forState:UIControlStateSelected];
     
     //取消

@@ -4,7 +4,7 @@
 //
 
 #import "VLBaseView.h"
-
+@import AgoraCommon;
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLKTVItemBaseView : VLBaseView
