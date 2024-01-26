@@ -18,6 +18,22 @@ class CallViewController: BaseRoomViewController {
     }
     var currentUser: ShowTo1v1UserInfo?
     
+    var rtcChannelName: String? {
+        didSet {
+            let localUid = Int(currentUser?.getUIntUserId() ?? 0)
+            if let oldValue = oldValue {
+                let connection = AgoraRtcConnection(channelId: oldValue, localUid: localUid)
+                connection.channelId = oldValue
+                rtcEngine?.removeDelegateEx(self.realTimeView, connection: connection)
+            }
+            
+            if let rtcChannelName = rtcChannelName {
+                let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: localUid)
+                rtcEngine?.addDelegateEx(self.realTimeView, connection: connection)
+                self.realTimeView.roomId = rtcChannelName
+            }
+        }
+    }
     private lazy var moveViewModel: MoveGestureViewModel = MoveGestureViewModel()
     private lazy var hangupButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -120,10 +136,8 @@ class CallViewController: BaseRoomViewController {
     }
     
     @objc private func _hangupAction() {
-        callApi?.hangup(userId: UInt(targetUser?.uid ?? "") ?? 0) { err in
-        }
-        guard navigationController?.viewControllers.contains(self) ?? false else {return}
-        navigationController?.popViewController(animated: false)
+        callApi?.hangup(remoteUserId: UInt(targetUser?.uid ?? "") ?? 0, reason: nil, completion: { err in
+        })
     }
 }
 
@@ -142,15 +156,9 @@ extension CallViewController: AgoraRtcEngineDelegate {
 
 extension CallViewController {
     override func onCallStateChanged(with state: CallStateType,
-                            stateReason: CallReason,
-                            eventReason: String,
-                            elapsed: Int,
-                            eventInfo: [String : Any]) {
-        let publisher = eventInfo[kPublisher] as? String ?? currentUser?.uid
-        guard publisher == currentUser?.uid else {
-            return
-        }
-        
+                                     stateReason: CallStateReason,
+                                     eventReason: String,
+                                     eventInfo: [String : Any]) {
         switch state {
         case .connected:
             var channelId: String?
@@ -178,6 +186,9 @@ extension CallViewController {
                                          user: userInfo)
             }
             break
+        case .prepared:
+            guard navigationController?.viewControllers.contains(self) ?? false else {return}
+            navigationController?.popViewController(animated: false)
         default:
             break
         }

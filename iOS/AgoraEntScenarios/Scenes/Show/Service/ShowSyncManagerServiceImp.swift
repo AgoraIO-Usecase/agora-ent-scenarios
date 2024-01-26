@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import AgoraSyncManager
 import AgoraCommon
-private let kSceneId = "scene_show_4.0.0"
+private let kSceneId = "scene_show_4.2.0"
 
 private let SYNC_MANAGER_MESSAGE_COLLECTION = "show_message_collection"
 private let SYNC_MANAGER_SEAT_APPLY_COLLECTION = "show_seat_apply_collection"
