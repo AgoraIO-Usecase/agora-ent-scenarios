@@ -140,11 +140,36 @@ class CallProxy: IRtcEngineEventHandler() {
         }
     }
 
+    override fun onFirstLocalVideoFramePublished(source: Constants.VideoSourceType?, elapsed: Int) {
+        super.onFirstLocalVideoFramePublished(source, elapsed)
+        runOnUiThread {
+            listeners.forEach { listener ->
+                listener.onFirstLocalVideoFramePublished(source, elapsed)
+            }
+        }
+    }
+
     private fun runOnUiThread(runnable: Runnable) {
         if (Thread.currentThread() == Looper.getMainLooper().thread) {
             runnable.run()
         } else {
             mHandler.post(runnable)
         }
+    }
+}
+
+
+class CallLocalFirstFrameProxy(
+    private val handler : IRtcEngineEventHandler? = null
+): IRtcEngineEventHandler() {
+
+    override fun onFirstLocalVideoFrame(
+        source: Constants.VideoSourceType?,
+        width: Int,
+        height: Int,
+        elapsed: Int
+    ) {
+        super.onFirstLocalVideoFrame(source, width, height, elapsed)
+        handler?.onFirstLocalVideoFrame(source, width, height, elapsed)
     }
 }

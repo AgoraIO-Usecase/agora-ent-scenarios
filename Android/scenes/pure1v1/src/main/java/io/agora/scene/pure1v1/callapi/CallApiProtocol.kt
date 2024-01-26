@@ -26,6 +26,27 @@ open class PrepareConfig(
     var userExtension: Map<String, Any>? = null   // [可选]用户扩展字段，收到对端消息而改变状态(例如calling/connecting)时可以通过kFromUserExtension字段获取
 ) {}
 
+/**
+ * 呼叫状态类型
+ */
+enum class CallStateType(val value: Int) {
+    Idle(0),            // 空闲
+    Prepared(1),        // 创建1v1环境完成
+    Calling(2),         // 呼叫中
+    Connecting(3),      // 连接中
+    Connected(4),       // 通话中
+    Failed(10);         // 出现错误
+
+    companion object {
+        fun fromValue(value: Int): CallStateType {
+            return values().find { it.value == value } ?: Idle
+        }
+    }
+}
+
+/*
+ * 呼叫状态变迁原因
+ */
 enum class CallStateReason(val value: Int) {
     None(0),
     JoinRTCFailed(1),           // 加入RTC失败
@@ -47,18 +68,21 @@ enum class CallStateReason(val value: Int) {
     RemoteCallBusy(17)          // 远端用户忙
 }
 
+/*
+ * 呼叫事件
+ */
 enum class CallEvent(val value: Int) {
     None(0),
     Deinitialize(1),                // 调用了deinitialize
-    MissingReceipts(2),             // 没有收到消息回执
+    //MissingReceipts(2),             // 没有收到消息回执[已废弃]
     CallingTimeout(3),              // 呼叫超时
-    JoinRTCFailed(4),               // 加入RTC失败
+    //JoinRTCFailed(4),               // 加入RTC失败[已废弃，请使用onCallErrorOccur(state: rtcOccurError)]
     JoinRTCSuccessed(5),            // 加入RTC成功
-    RtmSetupFailed(6),              // 设置RTM失败
+    //RtmSetupFailed(6),                  // 设置RTM失败[已废弃，请使用onCallErrorOccur(state: rtmSetupFail)]
     RtmSetupSuccessed(7),           // 设置RTM成功
-    MessageFailed(8),               // 消息发送失败
+    //MessageFailed(8),                   // 消息发送失败[已废弃，请使用onCallErrorOccur(state: sendMessageFail)]
     StateMismatch(9),               // 状态流转异常
-    PreparedRoomIdChanged(10),      // prepared了另一个roomId导致
+    //PreparedRoomIdChanged(10),      // prepared了另一个roomId导致[已废弃]
     RemoteUserRecvCall(99),         // 主叫呼叫成功
     LocalRejected(100),             // 本地用户拒绝
     RemoteRejected(101),            // 远端用户拒绝
@@ -74,35 +98,44 @@ enum class CallEvent(val value: Int) {
     LocalJoin(111),                 // 本地用户加入RTC频道
     LocalLeave(112),                // 本地用户离开RTC频道
     RecvRemoteFirstFrame(113),      // 收到远端首帧
-    CancelByCallerRecall(114),      // 同样的主叫呼叫不同频道导致取消
+    //CancelByCallerRecall(114),      // 同样的主叫呼叫不同频道导致取消[已废弃]
     RtmLost(115),                   // rtm超时断连
-    RtcOccurError(116),             // rtc出现错误
+    //RtcOccurError(116),             // rtc出现错误[已废弃，请使用onCallErrorOccur(state: rtcOccurError)]
     RemoteCallBusy(117),            // 远端用户忙
-    StartCaptureFail(118)           // 开启采集失败
+    //StartCaptureFail(118),          // 开启采集失败[已废弃，请使用onCallErrorOccur(state: startCaptureFail)]
+    CaptureFirstLocalVideoFrame(119),       //采集到首帧视频帧
+    PublishFirstLocalVideoFrame(120)        //推送首帧视频帧成功
 }
 
-/**
- * 呼叫状态类型
+/*
+ * 呼叫错误事件
  */
-enum class CallStateType(val value: Int) {
-    Idle(0),            // 空闲
-    Prepared(1),        // 创建1v1环境完成
-    Calling(2),         // 呼叫中
-    Connecting(3),      // 连接中
-    Connected(4),       // 通话中
-    Failed(10);         // 出现错误
-
-    companion object {
-        fun fromValue(value: Int): CallStateType {
-            return values().find { it.value == value } ?: Idle
-        }
-    }
+enum class CallErrorEvent(val value: Int) {
+    NormalError(0),         // 通用错误
+    RtcOccurError(100),     // rtc出现错误
+    StartCaptureFail(110),  // rtc开启采集失败
+    RtmSetupFail(200),      // rtm初始化失败
+    SendMessageFail(210)    // 消息发送失败
 }
+
+/*
+ * 呼叫错误事件的错误码类型
+ */
+enum class CallErrorCodeType(val value: Int) {
+    Normal(0),   // 业务类型的错误，暂无
+    Rtc(1),      // rtc的错误，使用AgoraErrorCode
+    Rtm(2)       // rtm的错误，使用AgoraRtmErrorCode
+}
+
+/*
+ * 日志等级
+ */
 enum class CallLogLevel(val value: Int) {
     Normal(0),
     Warning(1),
     Error(2),
 }
+
 interface ICallApiListener {
     /**
      * 状态响应回调
@@ -122,7 +155,20 @@ interface ICallApiListener {
      */
     fun onCallEventChanged(event: CallEvent) {}
 
-    /** token快要过期了(需要外部获取新token调用renewToken更新)
+    /**
+     * 内部详细事件变更回调
+     * @param errorEvent: 错误事件
+     * @param errorType: 错误类型
+     * @param errorCode: 错误码
+     * @param message: 错误信息
+     */
+    fun onCallError(errorEvent: CallErrorEvent,
+                    errorType: CallErrorCodeType,
+                    errorCode: Int,
+                    message: String?) {}
+
+    /**
+     * token快要过期了(需要外部获取新token调用renewToken更新)
      */
     fun tokenPrivilegeWillExpire() {}
 

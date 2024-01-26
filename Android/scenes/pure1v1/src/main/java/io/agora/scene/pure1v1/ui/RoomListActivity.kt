@@ -198,6 +198,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
 
     private fun connectCallDetail() {
+        Pure1v1Logger.d(tag, "local pic debug log 4")
         binding.flCallContainer.visibility = View.VISIBLE
 
         val channelId =  CallServiceManager.instance.connectedChannelId ?: ""
@@ -272,8 +273,10 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     val dialog = CallReceiveDialog(this, user)
                     dialog.setListener(object : CallReceiveDialog.CallReceiveDialogListener {
                         override fun onReceiveViewDidClickAccept() { // 点击接通
+                            Pure1v1Logger.d(tag, "local pic debug log 1")
                             val rtcToken = CallServiceManager.instance.mPrepareConfig?.rtcToken
                             if (rtcToken != null) {
+                                Pure1v1Logger.d(tag, "local pic debug log 2")
                                 CallServiceManager.instance.callApi?.accept(fromUserId) {}
                             }
                         }
@@ -309,6 +312,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 CallServiceManager.instance.stopCallMusic()
             }
             CallStateType.Connected -> {
+                Pure1v1Logger.d(tag, "local pic debug log 3")
                 if (CallServiceManager.instance.remoteUser == null) { return }
                 // 进入通话页面
                 connectCallDetail()
