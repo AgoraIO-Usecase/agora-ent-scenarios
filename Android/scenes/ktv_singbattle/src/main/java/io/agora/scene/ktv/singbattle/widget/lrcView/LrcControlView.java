@@ -7,13 +7,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.CountDownTimer;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -38,6 +38,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -678,8 +679,8 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
                                 if (mKaraokeView != null) {
                                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
-                                    dealWithBattleSong(lyricsModel);
-                                    mKaraokeView.setLyricsData(lyricsModel);
+                                    LyricsModel cutLyricsModel = dealWithBattleSong(lyricsModel);
+                                    mKaraokeView.setLyricsData(cutLyricsModel);
                                 }
                             }
 
@@ -703,8 +704,8 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                 if (mKaraokeView != null) {
                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
                     mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.INVISIBLE);
-                    dealWithBattleSong(lyricsModel);
-                    mKaraokeView.setLyricsData(lyricsModel);
+                    LyricsModel cutLyricsModel = dealWithBattleSong(lyricsModel);
+                    mKaraokeView.setLyricsData(cutLyricsModel);
                 }
             }
         }, exception -> {
@@ -721,17 +722,29 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     private int totalScore = 0;
-    private void dealWithBattleSong(LyricsModel lyricsModel) {
-        AtomicInteger lineCount = new AtomicInteger();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            lyricsModel.lines.forEach(line -> {
-                if (line.getStartTime() >= highStartTime && line.getEndTime() <= highEndTime) {
-                    lineCount.getAndIncrement();
-                }
-            });
+
+    private LyricsModel dealWithBattleSong(LyricsModel lyricsModel) {
+        List<LyricsCutter.Line> cutterLines = new ArrayList<>();
+        for (int i = 0; i < lyricsModel.lines.size(); i++) {
+            LyricsLineModel lyricsLine = lyricsModel.lines.get(i);
+            long durationOfCurrentLine = lyricsLine.getEndTime() - lyricsLine.getStartTime();
+            cutterLines.add(new LyricsCutter.Line(lyricsLine.getStartTime(), durationOfCurrentLine));
         }
+        Pair<Integer, Integer> res = LyricsCutter.handleFixTime((int) highStartTime, (int) highEndTime, cutterLines);
+        if (res != null) {
+            highStartTime = res.first;
+            highEndTime = res.second;
+        }
+        LyricsModel cutLyricsModel = LyricsCutter.cut(lyricsModel, (int) highStartTime, (int) highEndTime);
+        AtomicInteger lineCount = new AtomicInteger();
+        cutLyricsModel.lines.forEach(line -> {
+            if (line.getStartTime() >= highStartTime && line.getEndTime() <= highEndTime) {
+                lineCount.getAndIncrement();
+            }
+        });
         totalScore = lineCount.get() * 100;
         Log.d("hugo", "totalScore: " + totalScore);
+        return cutLyricsModel;
     }
 
     public void onReceiveSingleLineScore(int score, int index, int cumulativeScore, int total) {
