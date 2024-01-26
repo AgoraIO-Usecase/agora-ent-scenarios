@@ -33,13 +33,13 @@
 
     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_3.jpg)
 
-  - 云游戏服务配置（CloudPlayer）
+  - <mark>云游戏服务配置（CloudPlayer）<mark>
       ```json
       注: 请联系声网技术支持为您的 APPID 开通云主机权限, 开通权限后才能启动云游戏到房间推流
       ```
     
 
-- 2.2 在项目的 [**gradle.properties**](../../gradle.properties) 里填写需要的声网 APP ID 和 APP 证书、RESTFUL KEY 和 SECRET
+- 2.2 在项目的 [**gradle.properties**](../../gradle.properties) 里填写需要的声网 APP ID 和 APP 证书
     ```
      AGORA_APP_ID：声网 APP ID
      AGORA_APP_CERTIFICATE：声网 APP 证书
@@ -89,7 +89,7 @@
 ├── gradle.properties  #项目的基础账号配置(appid、app证书)
 └── settings.gradle
 ```
->   ```
+
   
 ## 3. FAQ
 
