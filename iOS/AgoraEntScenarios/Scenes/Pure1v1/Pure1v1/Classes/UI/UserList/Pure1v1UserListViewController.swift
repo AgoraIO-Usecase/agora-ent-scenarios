@@ -174,7 +174,10 @@ extension Pure1v1UserListViewController {
         }
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
-        callApi.call(remoteUserId: remoteUserId) { err in
+        callApi.call(remoteUserId: remoteUserId) {[weak self] err in
+            guard let err = err else {return}
+            self?.callApi.cancelCall(completion: { err in
+            })
         }
     }
 }

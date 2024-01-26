@@ -264,7 +264,10 @@ extension RoomListViewController {
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
         
-        callApi.call(remoteUserId: room.getUIntUserId()) { err in
+        callApi.call(remoteUserId: room.getUIntUserId()) {[weak self] err in
+            guard let err = err else {return}
+            self?.callApi.cancelCall(completion: { err in
+            })
         }
         
         callVC.roomInfo = room
