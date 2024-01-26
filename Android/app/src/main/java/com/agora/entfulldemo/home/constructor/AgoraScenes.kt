@@ -7,5 +7,6 @@ enum class AgoraScenes {
     SpatialAudioChatRoom,
     SingBattleGame,
     OneToOne,
-    ShowTo1v1
+    ShowTo1v1,
+    Joy,
 }

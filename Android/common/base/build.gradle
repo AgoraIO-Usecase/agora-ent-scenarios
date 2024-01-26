@@ -64,6 +64,7 @@ dependencies {
     api rootProject.ext.deps.okhttp
     api rootProject.ext.deps.okhttp_logger
     api rootProject.ext.deps.retrofit2
+    api rootProject.ext.deps.retrofit2_gson
     api rootProject.ext.deps.retrofit2_adapter
     api rootProject.ext.deps.gson
     implementation rootProject.ext.deps.autosize
