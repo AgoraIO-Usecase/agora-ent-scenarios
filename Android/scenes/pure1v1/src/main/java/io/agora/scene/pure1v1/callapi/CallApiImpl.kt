@@ -11,6 +11,7 @@ import io.agora.rtc2.*
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.rtm.*
 import io.agora.scene.pure1v1.BuildConfig
+import io.agora.scene.pure1v1.Pure1v1Logger
 import io.agora.scene.pure1v1.callapi.extension.cloneConfig
 import org.json.JSONObject
 import java.util.*
@@ -217,6 +218,7 @@ class CallApiImpl constructor(
     }
 
     private fun _changeToConnectedState(reason: CallStateReason) {
+        Pure1v1Logger.d("tag", "local pic debug log 14.0 $reason")
         val eventInfo = mapOf(
             kFromRoomId to (connectInfo.callingRoomId ?: ""),
             kFromRoomId to (connectInfo.callingRoomId ?: ""),
@@ -224,6 +226,7 @@ class CallApiImpl constructor(
             kRemoteUserId to (config?.userId ?: 0),
             kCostTimeMap to connectInfo.callCostMap
         )
+        Pure1v1Logger.d("tag", "local pic debug log 14")
         _updateAndNotifyState(CallStateType.Connected, reason, eventInfo = eventInfo)
 //        _notifyEvent(event: CallReason.RecvRemoteFirstFrame, elapsed: elapsed)
     }
@@ -251,6 +254,7 @@ class CallApiImpl constructor(
         delegates.forEach { listener ->
             listener.onCallEventChanged(event)
         }
+        Pure1v1Logger.d("tag", "local pic debug log 11")
         when (event) {
             CallEvent.RemoteUserRecvCall -> _reportCostEvent(CallConnectCostType.RemoteUserRecvCall)
             CallEvent.RemoteJoin -> _reportCostEvent(CallConnectCostType.RemoteUserJoinChannel)
@@ -260,7 +264,9 @@ class CallApiImpl constructor(
                 checkConnectedSuccess(CallStateReason.RemoteAccepted)
             }
             CallEvent.LocalAccepted -> {
+                Pure1v1Logger.d("tag", "local pic debug log 12")
                 _reportCostEvent(CallConnectCostType.AcceptCall)
+                Pure1v1Logger.d("tag", "local pic debug log 13")
                 checkConnectedSuccess(CallStateReason.LocalAccepted)
             }
             CallEvent.RecvRemoteFirstFrame -> {
@@ -916,9 +922,12 @@ class CallApiImpl constructor(
             return
         }
 
+        Pure1v1Logger.d("tag", "local pic debug log 5")
         // accept内默认启动一次采集+推流
         rtcConnection?.let {
+            Pure1v1Logger.d("tag", "local pic debug log 6")
             config?.rtcEngine?.startPreview()
+            Pure1v1Logger.d("tag", "local pic debug log 7")
             val mediaOptions = ChannelMediaOptions()
             mediaOptions.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
             mediaOptions.publishCameraTrack = true
@@ -929,6 +938,7 @@ class CallApiImpl constructor(
         connectInfo.set(userId = remoteUserId, roomId = roomId, isLocalAccepted = true)
 
         //先查询presence里是不是正在呼叫的被叫是自己，如果是则不再发送消息
+        Pure1v1Logger.d("tag", "local pic debug log 8")
         val message = _messageDic(CallAction.Accept)
         messageManager?.sendMessage(remoteUserId.toString(), message) { err ->
             completion?.invoke(err)
@@ -936,7 +946,9 @@ class CallApiImpl constructor(
                 _notifyEvent(CallEvent.MessageFailed, "accept fail: ${err.code}")
             }
         }
+        Pure1v1Logger.d("tag", "local pic debug log 9")
         _updateAndNotifyState(CallStateType.Connecting, CallStateReason.LocalAccepted, eventInfo = message)
+        Pure1v1Logger.d("tag", "local pic debug log 10")
         _notifyEvent(CallEvent.LocalAccepted)
 
         if (calleeJoinRTCPolicy == CalleeJoinRTCPolicy.Accepted) {

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -304,7 +305,11 @@ class RoomListActivity : AppCompatActivity() {
                             MotionEvent.ACTION_UP -> {
                                 if (RtcEngineInstance.generalToken() != "") {
                                     super.onTouch(v, event)
+                                    v.findViewById<ImageView>(R.id.ivClickBackground).alpha = 0.05F
                                     mOnGotoRoom?.invoke(position, data)
+                                    Handler().postDelayed({
+                                        v.findViewById<ImageView>(R.id.ivClickBackground).alpha = 0F
+                                    }, 1000)
                                 }
                             }
                         }
