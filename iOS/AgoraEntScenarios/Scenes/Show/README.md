@@ -54,10 +54,9 @@
    ```json
   注: 项目使用的美颜资源需要向第三方美颜提供商获取, 没有美颜资源仅影响直播过程中的美颜效果, 不会影响 Demo 的运行
   ```
-- **商汤美颜配置**
-  美颜资源请联系商汤科技商务获取。
-  
-  1.
+
+商汤
+  1. 
   > - 新建一个文件夹命名为SenseLib放在Podfile的同级目录下，并将商汤SDK里的资源文件复制到SenseLib 目录下。如图：
   > 
   >  ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/SenseLibSource.png)
@@ -76,6 +75,52 @@
   > - 注意事项：
   > 
   >   **申请商汤美颜的bundleId一定要和工程的bundleId保持一致，否则美颜是无效的**
+  > 
+  
+  相芯
+  
+  1. 
+  > - 新建一个文件夹命名为FULib放在Podfile的同级目录下，并将相芯SDK里的资源文件复制到FULib 目录下。如图：
+  > 
+  >  ![xxx](./README_Resources/fu_resources.jpg)
+  >  
+  >  <mark> 注意：以上只包含基础美颜功能。</mark>  
+  >  如果需要贴纸或者风格效果，需要联系相芯获取，同样将资源放到FULib/Resources路径下即可。如图：
+  > 
+  >  ![xxx](./README_Resources/fu_sticker.jpg)
+  >  
+  2.
+  >
+  > - 将申请到的相芯的license文件命名为“authpack.h”并拖入FULib路径下 如图：
+  > 
+  >   ![xxx](./README_Resources/fu_license.jpg)
+  >   
+  > - 注意事项：
+  > 
+  >   **申请相芯美颜的bundleId一定要和工程的bundleId保持一致，否则美颜是无效的**
+  > 
+  
+  火山/字节
+  
+  1. 
+  > - 新建一个文件夹命名为ByteEffectLib放在Podfile的同级目录下，并将火山SDK里的资源文件复制到ByteEffectLib 目录下。如图：
+  > 
+  >  ![xxx](./README_Resources/bytes_effect_sdk.jpg)
+  >  
+  >  <mark> 注意：以上只包含基础美颜功能。</mark>  
+  >  如果需要贴纸或者风格效果，需要联系相芯获取，同样将资源放到ByteEffectLib/Resources路径下即可。如图：
+  > 
+  >  ![xxx](./README_Resources/bytes_resource.jpg)
+  >  
+  2.
+  >
+  > - 将申请到的火山的license文件“LicenseBag.bundle”拖入ByteEffectLib/Resources路径下,并修改Config.h文件中的LICENSE_NAME 如图：
+  > 
+  >   ![xxx](./README_Resources/bytes_license.jpg)
+  >   
+  > - 注意事项：
+  > 
+  >   **申请火山美颜的bundleId一定要和工程的bundleId保持一致，否则美颜是无效的**
   > 
 
 - 更新pod
