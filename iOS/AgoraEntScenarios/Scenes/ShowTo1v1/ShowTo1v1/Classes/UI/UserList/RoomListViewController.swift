@@ -471,7 +471,7 @@ extension RoomListViewController: CallApiListenerProtocol {
             callDialog?.hiddenAnimation()
             connectedUserId = nil
             switch stateReason {
-            case .localCancel, .remoteHangup:
+            case .localHangup:
                 _updateCallChannel()
             case .remoteHangup:
                 _updateCallChannel()
