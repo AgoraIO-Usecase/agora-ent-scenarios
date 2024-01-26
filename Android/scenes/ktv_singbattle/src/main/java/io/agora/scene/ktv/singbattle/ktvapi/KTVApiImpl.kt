@@ -547,6 +547,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         this.songCode = songCode
         this.songIdentifier = config.songIdentifier
         this.mainSingerUid = config.mainSingerUid
+        this.songCutter = config.songCutter
         mLastReceivedPlayPosTime = null
         mReceivedPlayPosition = 0
 
@@ -653,6 +654,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         }
     }
 
+    private var songCutter = false
     override fun loadMusic(
         url: String,
         config: KTVLoadMusicConfiguration
@@ -661,6 +663,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         this.songIdentifier = config.songIdentifier
         this.songUrl = url
         this.mainSingerUid = config.mainSingerUid
+        this.songCutter = config.songCutter
 
         if (config.autoPlay) {
             // 主唱自动播放歌曲
@@ -677,6 +680,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         this.songUrl = url1
         this.songUrl2 = url2
         this.mainSingerUid = config.mainSingerUid
+        this.songCutter = config.songCutter
 
         if (config.autoPlay) {
             // 主唱自动播放歌曲
@@ -1473,7 +1477,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         val highStartTime = JSONObject(highPart[0].toString())
         val time = highStartTime.getLong("highStartTime")
         val endTime = highStartTime.getLong("highEndTime")
+        val preludeDuration = highStartTime.getLong("preludeDuration")
         this.highStartTime = time
+        if (songCutter) {
+            this.highStartTime -= preludeDuration
+        }
         lrcView?.onHighPartTime(time, endTime)
     }
 
