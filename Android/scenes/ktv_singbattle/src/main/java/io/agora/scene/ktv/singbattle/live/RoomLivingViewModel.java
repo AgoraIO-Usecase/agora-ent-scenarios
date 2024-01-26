@@ -1113,7 +1113,7 @@ public class RoomLivingViewModel extends ViewModel {
                                                    case PLAYER_STATE_PLAYING:
                                                        //playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                                                        if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getWinnerNo().equals("") && isLocal) {
-                                                           ktvApiProtocol.getMediaPlayer().selectAudioTrack(0);
+                                                           ktvApiProtocol.switchAudioTrack(AudioTrackMode.YUAN_CHANG);
                                                            //SyncStartSing();
                                                        }
                                                        break;
@@ -1453,10 +1453,10 @@ public class RoomLivingViewModel extends ViewModel {
     protected KTVPlayerTrackMode mAudioTrackMode = KTVPlayerTrackMode.Acc;
     public void musicToggleOriginal() {
         if (mAudioTrackMode == KTVPlayerTrackMode.Origin) {
-            ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(1, 1);
+            ktvApiProtocol.switchAudioTrack(AudioTrackMode.BAN_ZOU);
             mAudioTrackMode = KTVPlayerTrackMode.Acc;
         } else {
-            ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(0, 0);
+            ktvApiProtocol.switchAudioTrack(AudioTrackMode.YUAN_CHANG);
             mAudioTrackMode = KTVPlayerTrackMode.Origin;
         }
     }

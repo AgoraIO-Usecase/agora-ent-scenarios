@@ -549,28 +549,28 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             if (mRole == Role.Singer) {
                 if (mAudioTrack == AudioTrack.Acc) {
                     mAudioTrack = AudioTrack.DaoChang;
-                    mOnKaraokeActionListener.onSwitchOriginalClick(2, true);
+                    mOnKaraokeActionListener.onSwitchOriginalClick(AudioTrack.DaoChang);
                     mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ktv_ic_daochang);
                     mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_daochang);
                 } else if (mAudioTrack == AudioTrack.DaoChang) {
                     mAudioTrack = AudioTrack.Origin;
-                    mOnKaraokeActionListener.onSwitchOriginalClick(0, true);
+                    mOnKaraokeActionListener.onSwitchOriginalClick(AudioTrack.Origin);
                     mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_on);
                     mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_original);
                 } else {
                     mAudioTrack = AudioTrack.Acc;
-                    mOnKaraokeActionListener.onSwitchOriginalClick(1, true);
+                    mOnKaraokeActionListener.onSwitchOriginalClick(AudioTrack.Acc);
                     mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
                 }
             } else if (mRole == Role.CoSinger) {
                 if (mAudioTrack == AudioTrack.Acc) {
                     mAudioTrack = AudioTrack.Origin;
-                    mOnKaraokeActionListener.onSwitchOriginalClick(0, false);
+                    mOnKaraokeActionListener.onSwitchOriginalClick(AudioTrack.Origin);
                     mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_on);
                     mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_original);
                 } else {
                     mAudioTrack = AudioTrack.Acc;
-                    mOnKaraokeActionListener.onSwitchOriginalClick(1, false);
+                    mOnKaraokeActionListener.onSwitchOriginalClick(AudioTrack.Acc);
                     mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
                 }
             }
@@ -757,7 +757,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     public interface OnKaraokeEventListener {
-        default void onSwitchOriginalClick(int aimStatus, boolean isMainSinger) { // 0: origin 1: acc 2: daochang
+        default void onSwitchOriginalClick(AudioTrack audioTrack) { // 0: origin 1: acc 2: daochang
         }
 
         default void onPlayClick() {
