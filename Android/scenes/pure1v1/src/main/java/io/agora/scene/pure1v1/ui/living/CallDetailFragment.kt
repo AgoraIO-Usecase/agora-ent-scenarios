@@ -16,6 +16,7 @@ import io.agora.scene.pure1v1.callapi.CallStateType
 import io.agora.scene.pure1v1.callapi.ICallApiListener
 import io.agora.scene.pure1v1.databinding.Pure1v1CallDetailFragmentBinding
 import io.agora.scene.pure1v1.CallServiceManager
+import io.agora.scene.pure1v1.Pure1v1Logger
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import java.util.concurrent.TimeUnit
 
@@ -35,6 +36,11 @@ class CallDetailFragment : Fragment(), ICallApiListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = Pure1v1CallDetailFragmentBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        Pure1v1Logger.d(tag, "local pic debug onHiddenChanged: $hidden")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
