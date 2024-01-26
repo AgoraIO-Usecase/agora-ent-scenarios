@@ -248,7 +248,8 @@ data class KTVLoadMusicConfiguration(
     val songIdentifier: String,
     val autoPlay: Boolean = false,
     val mainSingerUid: Int,
-    val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
+    val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC,
+    val songCutter: Boolean
 )
 
 /**
