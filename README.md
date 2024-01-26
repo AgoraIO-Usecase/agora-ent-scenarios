@@ -24,7 +24,9 @@
 * 秀场转1v1私密房
     * [Android](Android/scenes/showTo1v1)
     * [iOS](iOS/AgoraEntScenarios/Scenes/ShowTo1v1)
-
+* 弹幕玩法
+    * [Android](Android/scenes/joy)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/Joy)
 >
 > Demo 效果:
 >
