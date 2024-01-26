@@ -11,12 +11,23 @@ class Pure1v1UserPagingListView: UIView {
     var callClosure: ((Pure1v1UserInfo?)->())?
     var userList: [Pure1v1UserInfo] = [] {
         didSet {
-            self.isHidden = userList.count == 0 ? true : false
+//            self.isHidden = userList.count == 0 ? true : false
             reloadData()
         }
     }
     
     var localUserInfo: Pure1v1UserInfo?
+    
+    var isLoop = false
+    
+    var refreshBeginClousure: (()->())?
+    
+    private lazy var refreshControl: UIRefreshControl = {
+        let ctrl = UIRefreshControl()
+        ctrl.addTarget(self, action: #selector(refreshControlValueChanged(_ :)), for: .valueChanged)
+        return ctrl
+    }()
+    
     
     private lazy var collectionView: UICollectionView = {
         // 列表
@@ -34,6 +45,8 @@ class Pure1v1UserPagingListView: UIView {
         collectionView.isPagingEnabled = true
         collectionView.showsVerticalScrollIndicator = false
         collectionView.contentInsetAdjustmentBehavior = .never
+        collectionView.refreshControl = refreshControl
+        collectionView.contentInset = UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
         addSubview(collectionView)
         
         return collectionView
@@ -55,11 +68,22 @@ class Pure1v1UserPagingListView: UIView {
     func reloadData() {
         collectionView.reloadData()
     }
+    
+    @objc private func refreshControlValueChanged(_ refrshControl: UIRefreshControl) {
+        self.refreshBeginClousure?()
+    }
+    
+    func endRefreshing(){
+        refreshControl.endRefreshing()
+    }
 }
-
+/*
 private let kPageCacheHalfCount = 5000
 extension Pure1v1UserPagingListView {
     fileprivate func fakeCellCount() -> Int {
+        if !isLoop {
+            return userList.count
+        }
         guard userList.count > 1 else {
             return userList.count
         }
@@ -67,6 +91,9 @@ extension Pure1v1UserPagingListView {
     }
     
     fileprivate func realCellIndex(with fakeIndex: Int) -> Int {
+        if !isLoop {
+            return fakeIndex
+        }
         if fakeCellCount() < 3 {
             return fakeIndex
         }
@@ -80,6 +107,9 @@ extension Pure1v1UserPagingListView {
     }
     
     fileprivate func fakeCellIndex(with realIndex: Int) -> Int {
+        if !isLoop {
+            return realIndex
+        }
         if fakeCellCount() < 3 {
             return realIndex
         }
@@ -91,19 +121,23 @@ extension Pure1v1UserPagingListView {
     }
     
     private func scroll(to index: Int) {
-        collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredVertically, animated: false)
+        let count = collectionView.numberOfItems(inSection: 0)
+        if count > index {
+            collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredVertically, animated: false)
+        }
     }
 }
+*/
 
 extension Pure1v1UserPagingListView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return fakeCellCount()
+        return userList.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(Pure1v1UserCell.self), for: indexPath) as! Pure1v1UserCell
         
-        let user = userList[realCellIndex(with: indexPath.row)]
+        let user = userList[indexPath.row]
         cell.userInfo = user
         cell.localUserInfo = localUserInfo
         cell.callClosure = { [weak self] user in
@@ -112,7 +146,7 @@ extension Pure1v1UserPagingListView: UICollectionViewDataSource, UICollectionVie
 //        pure1v1Print("load user: \(user.userName) \(realCellIndex(with: indexPath.row)) / \(indexPath.row)")
         return cell
     }
-    
+    /*
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let currentIndex = Int(scrollView.contentOffset.y / scrollView.height)
         if currentIndex > 0, currentIndex < fakeCellCount() - 1 {return}
@@ -122,4 +156,5 @@ extension Pure1v1UserPagingListView: UICollectionViewDataSource, UICollectionVie
 
         scroll(to: toIndex)
     }
+     */
  }

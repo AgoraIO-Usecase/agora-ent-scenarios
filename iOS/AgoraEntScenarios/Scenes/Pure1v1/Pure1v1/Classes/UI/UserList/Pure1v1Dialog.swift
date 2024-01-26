@@ -127,6 +127,30 @@ private let kDialogTag = 1112234567
 
 //主叫弹窗
 class Pure1v1CallerDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
+    
+    private (set) var videoView = UIView()
+    
+    private lazy var tipsLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.textColor = .white
+        label.font = UIFont.systemFont(ofSize: 10)
+        label.backgroundColor = .black.withAlphaComponent(0.3)
+        label.clipsToBounds = true
+        
+        let textAttr = NSAttributedString(string: "call_usage_tips".pure1v1Localization())
+        let attach = NSTextAttachment()
+        attach.image = UIImage.scene1v1Image(name: "icon_notice")
+        let imageSize = CGSize(width: 14, height: 14)
+        attach.bounds = CGRect(origin: CGPoint(x: 0, y: (label.font.capHeight - imageSize.height).rounded() / 2), size: imageSize)
+        let imgAttr = NSAttributedString(attachment: attach)
+        let attr = NSMutableAttributedString()
+        attr.append(imgAttr)
+        attr.append(textAttr)
+        label.attributedText = attr
+        return label
+    }()
+    
     var cancelClosure: (()->())?
     var stateTitle: String? = "call_state_caller_waitting".pure1v1Localization() {
         didSet {
@@ -170,14 +194,14 @@ class Pure1v1CallerDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
     
     private lazy var userNameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
+        label.textColor = .white
         label.font = UIFont.systemFont(ofSize: 22)
         return label
     }()
     
     private lazy var stateLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
+        label.textColor = .white
         label.font = UIFont.systemFont(ofSize: 14)
         return label
     }()
@@ -193,16 +217,18 @@ class Pure1v1CallerDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
         addSubview(bgImageView)
         bgImageView.addSubview(bgMaskView)
         super._loadSubView()
+        contentView.addSubview(videoView)
         dialogView.addSubview(avatarView)
         dialogView.addSubview(userNameLabel)
         dialogView.addSubview(stateLabel)
         dialogView.addSubview(cancelButton)
+        dialogView.addSubview(tipsLabel)
         
         loadingBinder = Pure1v1TextLoadingBinder(delegate: self)
     }
     
     override func contentSize() -> CGSize {
-        return CGSize(width: self.aui_width, height: 357)
+        return CGSize(width: self.aui_width, height: self.aui_height)
     }
     
     override func layoutSubviews() {
@@ -211,7 +237,7 @@ class Pure1v1CallerDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
         bgMaskView.frame = bgImageView.bounds
         
         avatarView.aui_size = CGSize(width: 72, height: 72)
-        avatarView.centerY = contentView.aui_top
+        avatarView.aui_top = contentView.aui_top + 60
         avatarView.centerX = aui_width / 2
         avatarView.layer.cornerRadius = avatarView.aui_width / 2
         avatarView.layer.borderWidth = 5
@@ -226,7 +252,15 @@ class Pure1v1CallerDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
         
         cancelButton.aui_size = CGSize(width: 70, height: 70)
         cancelButton.centerX = aui_width / 2
-        cancelButton.aui_top = stateLabel.aui_bottom + 62
+        cancelButton.aui_bottom = aui_bottom - 105
+        
+        tipsLabel.sizeToFit()
+        tipsLabel.aui_size = CGSize(width: tipsLabel.aui_width + 20, height: tipsLabel.aui_height + 20)
+        tipsLabel.layer.cornerRadius = tipsLabel.aui_height / 2
+        tipsLabel.aui_centerX = aui_width / 2
+        tipsLabel.aui_bottom = aui_bottom - 30
+        
+        videoView.frame = bounds
     }
     
     override func showAnimation() {

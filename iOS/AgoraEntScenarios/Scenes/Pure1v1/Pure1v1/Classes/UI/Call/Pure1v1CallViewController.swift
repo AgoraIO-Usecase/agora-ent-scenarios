@@ -14,8 +14,22 @@ class Pure1v1CallViewController: UIViewController {
         didSet {
             oldValue?.removeListener(listener: self)
             callApi?.addListener(listener: self)
-            oldValue?.removeRTCListener?(listener: self.realTimeView)
-            callApi?.addRTCListener?(listener: self.realTimeView)
+        }
+    }
+    var rtcChannelName: String? {
+        didSet {
+            let localUid = Int(currentUser?.userId ?? "") ?? 0
+            if let oldValue = oldValue {
+                let connection = AgoraRtcConnection(channelId: oldValue, localUid: localUid)
+                connection.channelId = oldValue
+                rtcEngine?.removeDelegateEx(self.realTimeView, connection: connection)
+            }
+            
+            if let rtcChannelName = rtcChannelName {
+                let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: localUid)
+                rtcEngine?.addDelegateEx(self.realTimeView, connection: connection)
+                self.realTimeView.roomId = rtcChannelName
+            }
         }
     }
     var rtcEngine: AgoraRtcEngineKit?
@@ -172,7 +186,7 @@ class Pure1v1CallViewController: UIViewController {
     }
     
     @objc private func _hangupAction() {
-        callApi?.hangup(userId: UInt(targetUser?.userId ?? "") ?? 0, completion: { err in
+        callApi?.hangup(remoteUserId: UInt(targetUser?.userId ?? "") ?? 0, reason: nil, completion: { err in
         })
         dismiss(animated: false)
     }
@@ -204,14 +218,15 @@ extension Pure1v1CallViewController: ShowToolMenuViewControllerDelegate {
 }
 
 extension Pure1v1CallViewController: CallApiListenerProtocol {
-    func onCallStateChanged(with state: CallStateType,
-                            stateReason: CallReason,
+    
+    func onCallStateChanged(with state: CallStateType, 
+                            stateReason: CallStateReason,
                             eventReason: String,
-                            elapsed: Int,
                             eventInfo: [String : Any]) {
+        
     }
     
-    func onCallEventChanged(with event: CallEvent, elapsed: Int) {
+    func onCallEventChanged(with event: CallEvent) {
         pure1v1Print("onCallEventChanged: \(event.rawValue)")
         switch event {
         case .localLeave, .remoteLeave:
@@ -221,11 +236,15 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
         }
     }
     
-    func callDebugInfo(message: String) {
-        pure1v1Print(message, context: "CallApi")
-    }
-    func callDebugWarning(message: String) {
-        pure1v1Warn(message, context: "CallApi")
+    func callDebugInfo(message: String, logLevel: CallLogLevel) {
+        switch logLevel {
+        case .normal:
+            pure1v1Print(message, context: "CallApi")
+        case .warning:
+            pure1v1Warn(message, context: "CallApi")
+        case .error:
+            pure1v1Error(message, context: "CallApi")
+        }
     }
 }
 

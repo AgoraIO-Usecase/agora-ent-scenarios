@@ -17,9 +17,7 @@ class BaseRoomViewController: UIViewController {
     var callApi: CallApiImpl? {
         didSet {
             oldValue?.removeListener(listener: self)
-            oldValue?.removeRTCListener(listener: self.realTimeView)
             callApi?.addListener(listener: self)
-            callApi?.addRTCListener(listener: self.realTimeView)
         }
     }
     private(set) lazy var roomInfoView: RoomInfoView = RoomInfoView()
@@ -73,6 +71,8 @@ class BaseRoomViewController: UIViewController {
         remoteCanvasView.frame = view.bounds
         
         bottomBar.frame = CGRect(x: 0, y: view.aui_height - UIDevice.current.aui_SafeDistanceBottom - 50, width: view.aui_width, height: 40)
+        
+        realTimeView.roomId = roomInfo?.roomId ?? ""
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -120,10 +120,9 @@ extension BaseRoomViewController: ShowToolMenuViewControllerDelegate {
 }
 
 extension BaseRoomViewController: CallApiListenerProtocol {
-    func onCallStateChanged(with state: CallStateType,
-                            stateReason: CallReason,
+    func onCallStateChanged(with state: CallStateType, 
+                            stateReason: CallStateReason,
                             eventReason: String,
-                            elapsed: Int,
                             eventInfo: [String : Any]) {
     }
 }

@@ -51,3 +51,6 @@
 "show_advance_setting_FPS_title" = "编码帧率";
 "show_statistic_loss_package" = "丢包率";
 "show_statistic_down_net_speech" = "下行网络";
+
+"show_statistic_other_title" = "其他";
+"show_statistic_roomId" = "频道名";
