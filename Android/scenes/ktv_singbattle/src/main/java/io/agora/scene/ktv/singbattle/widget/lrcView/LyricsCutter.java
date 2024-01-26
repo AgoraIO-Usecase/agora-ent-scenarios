@@ -108,8 +108,12 @@ public class LyricsCutter {
 
         model.lines = lines;
 //        model.setPreludeEndPosition(0);
-        LyricsLineModel lastLine = lines.get(lines.size() - 1);
-        model.duration = lines.isEmpty() ? 0 : lastLine.getEndTime() - lastLine.getStartTime();
+        if (lines.isEmpty()) {
+            model.duration = 0;
+        } else {
+            LyricsLineModel lastLine = lines.get(lines.size() - 1);
+            model.duration = lastLine.getEndTime() - lastLine.getStartTime();
+        }
 
         return model;
     }
