@@ -43,10 +43,6 @@ let kMessageId: String = "messageId"     //发送的消息id
 //}
 
 protocol CallMessageDelegate: NSObjectProtocol, AgoraRtmClientDelegate {
-    /// 回执没有收到
-    /// - Parameter message: <#message description#>
-    func onMissReceipts(message: [String: Any])
-    
     func onConnectionFail()
     
     func debugInfo(message: String, logLevel: Int)

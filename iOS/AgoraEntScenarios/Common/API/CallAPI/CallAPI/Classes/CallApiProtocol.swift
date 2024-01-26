@@ -29,6 +29,17 @@ import AgoraRtmKit
     public var userExtension: [String: Any]?            //[可选]用户扩展字段，收到对端消息而改变状态(例如calling/connecting)时可以通过kFromUserExtension字段获取
 }
 
+/// 呼叫状态
+@objc public enum CallStateType: UInt {
+    case idle = 0            //未知
+    case prepared = 1        //空闲
+    case calling = 2         //呼叫中
+    case connecting = 3      //连接中
+    case connected = 4       //通话中
+    case failed = 10         //出现错误
+}
+
+/// 呼叫状态变迁原因
 @objc public enum CallStateReason: UInt {
     case none = 0
     case joinRTCFailed = 1         //加入RTC失败
@@ -50,49 +61,62 @@ import AgoraRtmKit
     case remoteCallBusy = 17       //远端用户忙
 }
 
+/// 呼叫事件
 @objc public enum CallEvent: UInt {
     case none = 0
-    case deinitialize = 1               //调用了deinitialize
-    case missingReceipts = 2            //没有收到消息回执
-    case callingTimeout = 3             //呼叫超时
-    case joinRTCFailed = 4              //加入RTC失败
-    case joinRTCSuccessed = 5           //加入RTC成功
-    case rtmSetupFailed = 6             //设置RTM失败
-    case rtmSetupSuccessed = 7          //设置RTM成功
-    case messageFailed = 8              //消息发送失败
-    case stateMismatch = 9              //状态流转异常
-    case preparedRoomIdChanged = 10     //prepared了另一个roomId
-    case remoteUserRecvCall = 99        //主叫呼叫成功
-    case localRejected = 100            //本地用户拒绝
-    case remoteRejected = 101           //远端用户拒绝
-    case onCalling = 102                //变成呼叫中
-    case remoteAccepted = 103           //远端用户接收
-    case localAccepted = 104            //本地用户接收
-    case localHangup = 105              //本地用户挂断
-    case remoteHangup = 106             //远端用户挂断
-    case remoteJoin = 107               //远端用户加入RTC频道
-    case remoteLeave = 108              //远端用户离开RTC频道
-    case localCancel = 109              //本地用户取消呼叫
-    case remoteCancel = 110             //远端用户取消呼叫
-    case localJoin = 111                //本地用户加入RTC频道
-    case localLeave = 112               //本地用户离开RTC频道
-    case recvRemoteFirstFrame = 113     //收到远端首帧
-    case cancelByCallerRecall = 114     //同样的主叫呼叫不同频道导致取消
-    case rtmLost = 115                  //rtm超时断连
-    case rtcOccurError = 116            //rtc出现错误
-    case remoteCallBusy = 117           //远端用户忙
-    case startCaptureFail = 118         //开启采集失败
+    case deinitialize = 1                         //调用了deinitialize
+//    case missingReceipts = 2                      //没有收到消息回执[已废弃]
+    case callingTimeout = 3                       //呼叫超时
+//    case joinRTCFailed = 4                        //加入RTC失败[已废弃，请使用onCallErrorOccur(state: rtcOccurError)]
+    case joinRTCSuccessed = 5                     //加入RTC成功
+//    case rtmSetupFailed = 6                       //设置RTM失败[已废弃，请使用onCallErrorOccur(state: rtmSetupFail)]
+    case rtmSetupSuccessed = 7                    //设置RTM成功
+//    case messageFailed = 8                        //消息发送失败[已废弃，请使用onCallErrorOccur(state: sendMessageFail)]
+    case stateMismatch = 9                        //状态流转异常
+//    case preparedRoomIdChanged = 10               //prepared了另一个roomId[已废弃]
+    case remoteUserRecvCall = 99                  //主叫呼叫成功
+    case localRejected = 100                      //本地用户拒绝
+    case remoteRejected = 101                     //远端用户拒绝
+    case onCalling = 102                          //变成呼叫中
+    case remoteAccepted = 103                     //远端用户接收
+    case localAccepted = 104                      //本地用户接收
+    case localHangup = 105                        //本地用户挂断
+    case remoteHangup = 106                       //远端用户挂断
+    case remoteJoin = 107                         //远端用户加入RTC频道
+    case remoteLeave = 108                        //远端用户离开RTC频道
+    case localCancel = 109                        //本地用户取消呼叫
+    case remoteCancel = 110                       //远端用户取消呼叫
+    case localJoin = 111                          //本地用户加入RTC频道
+    case localLeave = 112                         //本地用户离开RTC频道
+    case recvRemoteFirstFrame = 113               //收到远端首帧
+//    case cancelByCallerRecall = 114               //同样的主叫呼叫不同频道导致取消[已废弃]
+    case rtmLost = 115                            //rtm超时断连
+//    case rtcOccurError = 116                      //rtc出现错误[已废弃，请使用onCallErrorOccur(state: rtcOccurError)]
+    case remoteCallBusy = 117                     //远端用户忙
+//    case startCaptureFail = 118                   //开启采集失败[已废弃，请使用onCallErrorOccur(state: startCaptureFail)]
+    case captureFirstLocalVideoFrame = 119        //采集到首帧视频帧
+    case publishFirstLocalVideoFrame = 120        //推送首帧视频帧成功
 }
 
-@objc public enum CallStateType: UInt {
-    case idle = 0            //未知
-    case prepared = 1        //空闲
-    case calling = 2         //呼叫中
-    case connecting = 3      //连接中
-    case connected = 4       //通话中
-    case failed = 10         //出现错误
+
+/// 呼叫错误事件
+@objc public enum CallErrorEvent: UInt {
+    case normalError = 0              //通用错误
+    case rtcOccurError = 100          //rtc出现错误
+    case startCaptureFail = 110       //rtc开启采集失败
+    case rtmSetupFail = 200           //rtm初始化失败
+    case sendMessageFail = 210        //消息发送失败
 }
 
+/// 呼叫错误事件的错误码类型
+@objc public enum CallErrorCodeType: UInt {
+    case normal = 0   //业务类型的错误，暂无
+    case rtc          //rtc的错误，使用AgoraErrorCode
+    case rtm          //rtm的错误，使用AgoraRtmErrorCode
+}
+
+
+/// 日志等级
 @objc public enum CallLogLevel: Int {
     case normal = 0
     case warning = 1
@@ -115,6 +139,17 @@ import AgoraRtmKit
     /// - Parameters:
     ///   - event: 事件
     @objc optional func onCallEventChanged(with event: CallEvent)
+    
+    /// 发生错误的回调
+    /// - Parameters:
+    ///   - errorEvent: 错误事件
+    ///   - errorType: 错误码类型
+    ///   - errorCode: 错误码
+    ///   - message: 错误信息
+    @objc optional func onCallError(with errorEvent: CallErrorEvent,
+                                    errorType: CallErrorCodeType,
+                                    errorCode: Int,
+                                    message: String?)
     
     /// token即将要过期(需要外部获取新token调用renewToken更新)
     @objc optional func tokenPrivilegeWillExpire()

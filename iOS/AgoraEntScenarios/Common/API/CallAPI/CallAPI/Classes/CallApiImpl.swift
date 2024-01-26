@@ -63,6 +63,7 @@ let calleeJoinRTCPolicy: CalleeJoinRTCPolicy = .calling
 public class CallApiImpl: NSObject {
     private let delegates:NSHashTable<AnyObject> = NSHashTable<AnyObject>.weakObjects()
     private let rtcProxy: CallAgoraExProxy = CallAgoraExProxy()
+    private lazy var localFrameProxy: CallLocalFirstFrameProxy = CallLocalFirstFrameProxy(delegate: self)
     private var config: CallConfig?
     private var prepareConfig: PrepareConfig? = nil
     private var messageManager: CallMessageManager? {
@@ -267,6 +268,33 @@ extension CallApiImpl {
         }
     }
     
+    private func _notifySendMessageErrorEvent(error: NSError, reason: String?) {
+        _notifyErrorEvent(with: .sendMessageFail,
+                          errorType: .rtm,
+                          errorCode: error.code,
+                          message: "\(reason ?? "")\(error.localizedDescription)")
+    }
+    
+    private func _notifyRtcOccurErrorEvent(errorCode: Int, message: String? = nil) {
+        _notifyErrorEvent(with: .rtcOccurError,
+                          errorType: .rtc,
+                          errorCode: errorCode,
+                          message: message)
+    }
+    
+    private func _notifyErrorEvent(with errorEvent: CallErrorEvent,
+                                   errorType: CallErrorCodeType,
+                                   errorCode: Int,
+                                   message: String?) {
+        callPrint("call change[\(connectInfo.callId)] errorEvent: '\(errorEvent.rawValue)', errorType: '\(errorType.rawValue)', errorCode: '\(errorCode)', message: '\(message ?? "")'")
+        for element in delegates.allObjects {
+            (element as? CallApiListenerProtocol)?.onCallError?(with: errorEvent,
+                                                                errorType: errorType,
+                                                                errorCode: errorCode,
+                                                                message: message)
+        }
+    }
+    
     private func _notifyEvent(event: CallEvent, eventReason: String? = nil) {
         callPrint("call change[\(connectInfo.callId)] event: \(event.rawValue) reason: '\(eventReason ?? "")'")
         if let config = config {
@@ -349,9 +377,14 @@ extension CallApiImpl {
         if prepareConfig.autoJoinRTC {
             _joinRTCWithMediaOptions(roomId: prepareConfig.roomId,
                                      role: .audience,
-                                     subscribeType: .video) { err in
+                                     subscribeType: .video) {[weak self] err in
+                guard let self = self else { return }
                 self.callWarningPrint("prepareForCall[\(tag)] joinRTC completion: \(err?.localizedDescription ?? "success")")
-                self._notifyEvent(event: err == nil ? .joinRTCSuccessed : .joinRTCFailed)
+                if let err = err {
+                    self._notifyRtcOccurErrorEvent(errorCode: err.code, message: err.localizedDescription)
+                } else {
+                    self._notifyEvent(event: .joinRTCSuccessed)
+                }
             }
         } else {
             _leaveRTC()
@@ -367,7 +400,14 @@ extension CallApiImpl {
                 guard let self = self else { return }
                 self.isPreparing = false
                 self.callWarningPrint("prepareForCall[\(tag)] rtmInitialize completion: \(err?.localizedDescription ?? "success")")
-                self._notifyEvent(event: err == nil ? .rtmSetupSuccessed : .rtmSetupFailed)
+                if let err = err {
+                    self._notifyErrorEvent(with: .rtmSetupFail,
+                                           errorType: .rtm,
+                                           errorCode: err.code,
+                                           message: err.localizedDescription)
+                } else {
+                    self._notifyEvent(event: .rtmSetupSuccessed)
+                }
                 completion?(err)
             }
         } else {
@@ -401,26 +441,20 @@ extension CallApiImpl {
             callWarningPrint("_setupLocalVideo fail: engine is empty")
             return
         }
+        config?.rtcEngine.addDelegate(self.localFrameProxy)
+        
         canvas.view = canvasView
         canvas.uid = uid
         canvas.mirrorMode = .auto
-//        engine.setVideoFrameDelegate(self)
         engine.setDefaultAudioRouteToSpeakerphone(true)
         engine.setupLocalVideo(canvas)
         let ret = engine.startPreview()
         
         if ret != 0 {
-            _notifyEvent(event: .startCaptureFail, eventReason: "code = \(ret)")
-        }
-    }
-    
-    private func _notifyRTCState(err: NSError?) {
-        if let err = err {
-            let errReason = err.localizedDescription
-            self._updateAndNotifyState(state: .failed, stateReason:.joinRTCFailed, eventReason: errReason)
-            self._notifyEvent(event: .joinRTCFailed)
-        } else {
-            self._notifyEvent(event: .joinRTCSuccessed)
+            _notifyErrorEvent(with: .startCaptureFail,
+                              errorType: .rtc,
+                              errorCode: Int(ret),
+                              message: nil)
         }
     }
     
@@ -498,10 +532,12 @@ extension CallApiImpl {
         _joinRTCWithMediaOptions(roomId: roomId, 
                                  role: .broadcaster,
                                  subscribeType: .video) {[weak self] error in
-            self?._notifyRTCState(err: error)
-            guard let _ = error else {return}
-//            self?.cancelCall(completion: { err in
-//            })
+            guard let self = self else {return}
+            if let err = error {
+                self._notifyRtcOccurErrorEvent(errorCode: err.code, message: err.localizedDescription)
+            } else {
+                self._notifyEvent(event: .joinRTCSuccessed)
+            }
         }
         setupCanvas()
     }
@@ -515,9 +551,7 @@ extension CallApiImpl {
             completion(NSError(domain: "config is Empty", code: -1))
             return
         }
-        let connection = AgoraRtcConnection()
-        connection.channelId = roomId
-        connection.localUid = config.userId
+        let connection = AgoraRtcConnection(channelId: roomId, localUid: Int(config.userId))
         let mediaOptions = AgoraRtcChannelMediaOptions()
         mediaOptions.publishCameraTrack = false
         mediaOptions.publishMicrophoneTrack = false
@@ -540,7 +574,7 @@ extension CallApiImpl {
         }
         
         if ret != 0 {
-            _notifyEvent(event: .rtcOccurError, eventReason: "join rtc fail: \(ret)!")
+            _notifyRtcOccurErrorEvent(errorCode: Int(ret))
         }
     }
     
@@ -712,7 +746,7 @@ extension CallApiImpl {
         messageManager?.sendMessage(userId: "\(userId)", message: message) { err in
             completion?(err)
             guard let error = err else { return }
-            self._notifyEvent(event: .messageFailed, eventReason: "cancel call fail: \(error.code)")
+            self._notifySendMessageErrorEvent(error: error, reason: "cancelCall fail: ")
         }
     }
     
@@ -944,7 +978,7 @@ extension CallApiImpl: CallApiProtocol {
             completion?(err)
             if let error = err {
 //                self._updateAndNotifyState(state: .prepared, stateReason: .messageFailed, eventReason: error.localizedDescription)
-                self._notifyEvent(event: .messageFailed, eventReason: "call fail: \(error.code)")
+                self._notifySendMessageErrorEvent(error: error, reason: "call fail: ")
             } else {
                 self._notifyEvent(event: .remoteUserRecvCall)
             }
@@ -971,7 +1005,6 @@ extension CallApiImpl: CallApiProtocol {
         guard let roomId = connectInfo.callingRoomId else {
             let errReason = "accept fail! current userId or roomId is empty"
             completion?(NSError(domain: errReason, code: -1))
-            _notifyEvent(event: .messageFailed, eventReason: errReason)
             return
         }
         
@@ -989,7 +1022,7 @@ extension CallApiImpl: CallApiProtocol {
         messageManager?.sendMessage(userId: "\(remoteUserId)", message: message) { err in
             completion?(err)
             guard let error = err else { return }
-            self._notifyEvent(event: .messageFailed, eventReason: "accept fail: \(error.code)")
+            self._notifySendMessageErrorEvent(error: error, reason: "accept fail: ")
         }
         
         _updateAndNotifyState(state: .connecting, stateReason: .localAccepted, eventInfo: message)
@@ -1004,10 +1037,10 @@ extension CallApiImpl: CallApiProtocol {
     public func reject(remoteUserId: UInt, reason: String?, completion: ((NSError?) -> ())?) {
         _reportMethod(event: "\(#function)", label: "remoteUserId=\(remoteUserId)&reason=\(reason ?? "")")
         let message = _rejectMessageDic(reason: reason, rejectByInternal: false)
-        _reject(remoteUserId: remoteUserId, message: message) { err in
+        _reject(remoteUserId: remoteUserId, message: message) {[weak self] err in
             completion?(err)
-            guard let error = err else { return }
-            self._notifyEvent(event: .messageFailed, eventReason: "reject fail: \(error.code)")
+            guard let self = self, let error = err else { return }
+            self._notifySendMessageErrorEvent(error: error, reason: "reject fail: ")
         }
         _updateAndNotifyState(state: .prepared, stateReason: .localRejected, eventInfo: message)
         _notifyEvent(event: .localRejected)
@@ -1017,10 +1050,10 @@ extension CallApiImpl: CallApiProtocol {
     public func hangup(remoteUserId: UInt, reason: String?, completion: ((NSError?) -> ())?) {
         _reportMethod(event: "\(#function)", label: "remoteUserId=\(remoteUserId)")
         let message = _hangupMessageDic(reason: reason)
-        _hangup(remoteUserId: remoteUserId, message: message) { err in
+        _hangup(remoteUserId: remoteUserId, message: message) {[weak self] err in
             completion?(err)
-            guard let error = err else { return }
-            self._notifyEvent(event: .messageFailed, eventReason: "hangup fail: \(error.code)")
+            guard let self = self, let error = err else { return }
+            self._notifySendMessageErrorEvent(error: error, reason: "hangup fail: ")
         }
         _updateAndNotifyState(state: .prepared, stateReason: .localHangup, eventInfo: message)
         _notifyEvent(event: .localHangup)
@@ -1070,11 +1103,6 @@ extension CallApiImpl: CallMessageDelegate {
     
     func debugInfo(message: String, logLevel: Int) {
         callPrint(message)
-    }
-    
-    func onMissReceipts(message: [String : Any]) {
-        callWarningPrint("onMissReceipts: \(message)")
-        _notifyEvent(event: .missingReceipts)
     }
 }
 
@@ -1126,7 +1154,7 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
 //        callWarningPrint("didOccurError: \(errorCode.rawValue)")
 //        joinRtcCompletion?(NSError(domain: "join RTC fail", code: errorCode.rawValue))
 //        joinRtcCompletion = nil
-        _notifyEvent(event: .rtcOccurError, eventReason: "didOccurError: \(errorCode.rawValue)")
+        _notifyRtcOccurErrorEvent(errorCode: errorCode.rawValue)
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit,
@@ -1144,6 +1172,17 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
             }
         }
     }
+    
+    public func rtcEngine(_ engine: AgoraRtcEngineKit,
+                          firstLocalVideoFramePublishedWithElapsed elapsed: Int,
+                          sourceType: AgoraVideoSourceType) {
+        _notifyEvent(event: .publishFirstLocalVideoFrame, eventReason: "elapsed: \(elapsed)ms")
+    }
+    
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, firstLocalVideoFrameWith size: CGSize, elapsed: Int, sourceType: AgoraVideoSourceType) {
+        _notifyEvent(event: .captureFirstLocalVideoFrame, eventReason: "elapsed: \(elapsed)ms")
+        config?.rtcEngine.removeDelegate(self.localFrameProxy)
+    }
 }
 
 let formatter = DateFormatter()
@@ -1160,8 +1199,8 @@ extension CallApiImpl {
 //        #if DEBUG
 //        debugApiPrint("[CallApi]\(message)")
 //        #else
-//        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
-        let timeString = ""//formatter.string(from: Date())
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+        let timeString = formatter.string(from: Date())
         for element in delegates.allObjects {
             (element as? CallApiListenerProtocol)?.callDebugInfo?(message: "\(timeString) \(message)", logLevel: logLevel)
         }

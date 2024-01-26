@@ -133,6 +133,7 @@ extension Pure1v1UserListViewController {
         callApi.deinitialize {
         }
         callApi.initialize(config: config)
+        callApi.addListener(listener: self)
         
         prepareConfig.rtcToken = rtcToken
         prepareConfig.rtmToken = rtmToken
@@ -145,7 +146,6 @@ extension Pure1v1UserListViewController {
             // 成功即可以开始进行呼叫
         }
         
-        callApi.addListener(listener: self)
     }
     
     private func _createRtcEngine() ->AgoraRtcEngineKit {

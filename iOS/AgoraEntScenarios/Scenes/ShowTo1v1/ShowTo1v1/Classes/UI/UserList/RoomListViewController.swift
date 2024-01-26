@@ -201,7 +201,6 @@ extension RoomListViewController {
             return
         }
         
-        callApi.addListener(listener: self)
         renewTokens {[weak self] flag in
             guard flag else { return }
             self?._initCallAPI(completion: { err in
@@ -212,7 +211,6 @@ extension RoomListViewController {
         config.rtcEngine = rtcEngine
         VideoLoaderApiImpl.shared.setup(config: config)
         VideoLoaderApiImpl.shared.addListener(listener: self)
-        
     }
     
     private func _initCallAPI(completion: @escaping ((Error?)->())) {
@@ -226,6 +224,7 @@ extension RoomListViewController {
         config.rtcEngine = rtcEngine
         
         callApi.initialize(config: config)
+        callApi.addListener(listener: self)
         
         prepareConfig.rtcToken = rtcToken
         prepareConfig.rtmToken = rtmToken
