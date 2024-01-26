@@ -59,6 +59,7 @@ import io.agora.scene.ktv.KTVLogger;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.debugSettings.KTVDebugSettingBean;
 import io.agora.scene.ktv.debugSettings.KTVDebugSettingsDialog;
+import io.agora.scene.ktv.ktvapi.AudioTrackMode;
 import io.agora.scene.ktv.ktvapi.IKTVApiEventHandler;
 import io.agora.scene.ktv.ktvapi.ILrcView;
 import io.agora.scene.ktv.ktvapi.IMusicLoadStateListener;
@@ -89,6 +90,7 @@ import io.agora.scene.ktv.service.RoomSeatModel;
 import io.agora.scene.ktv.service.RoomSelSongModel;
 import io.agora.scene.ktv.service.ScoringAlgoControlModel;
 import io.agora.scene.ktv.service.ScoringAverageModel;
+import io.agora.scene.ktv.widget.lrcView.LrcControlView;
 import io.agora.scene.widget.toast.CustomToast;
 
 public class RoomLivingViewModel extends ViewModel {
@@ -1652,21 +1654,18 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     // ------------------ 原唱/伴奏 ------------------
-    public void musicToggleOriginal(int aimStatus, boolean isMainSinger) {
-        KTVLogger.d("musicToggleOriginal called, ", "aim: " + aimStatus);
-        if (!isMainSinger) {
-            ktvApiProtocol.getMediaPlayer().selectAudioTrack(aimStatus);
-            return;
-        }
-        if (aimStatus == 0) {
-            // 原唱
-            ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(0, 0);
-        } else if (aimStatus == 1) {
-            // 伴奏
-            ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(1, 1);
+    public void musicToggleOriginal(LrcControlView.AudioTrack audioTrack) {
+        KTVLogger.d("musicToggleOriginal called, ", "aim: " + audioTrack);
+        ktvApiProtocol.switchAudioTrack(getAudioTrackMode(audioTrack));
+    }
+
+    private AudioTrackMode getAudioTrackMode(LrcControlView.AudioTrack audioTrack) {
+        if (audioTrack == LrcControlView.AudioTrack.Acc) {
+            return AudioTrackMode.BAN_ZOU;
+        } else if (audioTrack == LrcControlView.AudioTrack.DaoChang) {
+            return AudioTrackMode.DAO_CHANG;
         } else {
-            // 导唱
-            ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(0, 1);
+            return AudioTrackMode.YUAN_CHANG;
         }
     }
 
