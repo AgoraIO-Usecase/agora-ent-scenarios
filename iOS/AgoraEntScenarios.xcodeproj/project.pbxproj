@@ -5646,7 +5646,7 @@
 					"\"Photos\"",
 					"-ld64",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.entfull;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.test.entfull;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = wildcard;
@@ -5877,7 +5877,7 @@
 					"\"Photos\"",
 					"-ld64",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.test.entfull;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = wildcard;
