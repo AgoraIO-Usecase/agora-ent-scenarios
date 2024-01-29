@@ -13,17 +13,15 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import io.agora.scene.showTo1v1.callapi.CallApiImpl
-import io.agora.scene.showTo1v1.callapi.CallStateReason
-import io.agora.scene.showTo1v1.callapi.CallStateType
-import io.agora.scene.showTo1v1.callapi.ICallApiListener
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.showTo1v1.CallRole
 import io.agora.scene.showTo1v1.R
+import io.agora.scene.showTo1v1.ShowTo1v1Logger
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
+import io.agora.scene.showTo1v1.callapi.*
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListActivityBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
@@ -373,6 +371,16 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         override fun tokenPrivilegeWillExpire() {
             super.tokenPrivilegeWillExpire()
             mShowTo1v1Manger.renewTokens {}
+        }
+
+        override fun onCallError(
+            errorEvent: CallErrorEvent,
+            errorType: CallErrorCodeType,
+            errorCode: Int,
+            message: String?
+        ) {
+            super.onCallError(errorEvent, errorType, errorCode, message)
+            ShowTo1v1Logger.d(TAG, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
         }
 
         override fun onCallStateChanged(

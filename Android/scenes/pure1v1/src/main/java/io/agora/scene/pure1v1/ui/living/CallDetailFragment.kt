@@ -10,13 +10,10 @@ import android.widget.FrameLayout.LayoutParams
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import io.agora.scene.pure1v1.callapi.CallEvent
-import io.agora.scene.pure1v1.callapi.CallStateReason
-import io.agora.scene.pure1v1.callapi.CallStateType
-import io.agora.scene.pure1v1.callapi.ICallApiListener
 import io.agora.scene.pure1v1.databinding.Pure1v1CallDetailFragmentBinding
 import io.agora.scene.pure1v1.CallServiceManager
 import io.agora.scene.pure1v1.Pure1v1Logger
+import io.agora.scene.pure1v1.callapi.*
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import java.util.concurrent.TimeUnit
 
@@ -50,7 +47,7 @@ class CallDetailFragment : Fragment(), ICallApiListener {
 
         timerHandler = Handler(Looper.getMainLooper())
 
-        CallServiceManager.instance.startupCallApiIfNeed()
+        CallServiceManager.instance.prepareForCall {  }
     }
 
     fun start() {
@@ -214,5 +211,15 @@ class CallDetailFragment : Fragment(), ICallApiListener {
             }
             else -> {}
         }
+    }
+
+    override fun onCallError(
+        errorEvent: CallErrorEvent,
+        errorType: CallErrorCodeType,
+        errorCode: Int,
+        message: String?
+    ) {
+        super.onCallError(errorEvent, errorType, errorCode, message)
+        Pure1v1Logger.d(tag, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
     }
 }
