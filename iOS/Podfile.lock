@@ -26,7 +26,6 @@ PODS:
     - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS (= 2.1.4)
   - FLAnimatedImage (1.0.17)
-  - HWWeakTimer (1.0)
   - Joy (0.1.0):
     - AgoraRtcEngine_Special_iOS
     - AgoraSyncManager
@@ -111,7 +110,6 @@ DEPENDENCIES:
   - AgoraSyncManager (= 2.1.2)
   - Bugly (= 2.5.93)
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
-  - HWWeakTimer (= 1.0)
   - Joy (from `AgoraEntScenarios/Scenes/Joy`)
   - JXCategoryView (= 1.6.1)
   - KakaJSON
@@ -147,7 +145,6 @@ SPEC REPOS:
     - AgoraSyncManager
     - Bugly
     - FLAnimatedImage
-    - HWWeakTimer
     - JXCategoryView
     - KakaJSON
     - LEEAlert
@@ -194,7 +191,6 @@ SPEC CHECKSUMS:
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   CallAPI: f40f9694c310b613f20958fabdbe69f8bc1d6ca5
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
-  HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   Joy: 3deda8672a197f760ba6c840c8c20657a5278df3
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
@@ -222,6 +218,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 883fcc578668cf6ae5dc9b21757b300622e1ec6e
+PODFILE CHECKSUM: eef7ecee0c52e8089bdcfbefa11c9e93728ebbde
 
 COCOAPODS: 1.12.1
