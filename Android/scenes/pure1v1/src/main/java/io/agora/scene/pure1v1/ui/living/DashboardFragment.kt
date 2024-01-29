@@ -112,6 +112,7 @@ class DashboardFragment : Fragment() {
         connection = RtcConnection(channelId, localUid)
         handler = rtcListener
         CallServiceManager.instance.rtcEngine?.addHandlerEx(rtcListener, connection)
+        refreshDashboard()
     }
 
     private var debounceJob: Job? = null

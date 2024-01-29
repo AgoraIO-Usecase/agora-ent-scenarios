@@ -52,8 +52,9 @@ open class ShowTo1v1UserInfo constructor(
         return userId.toIntOrNull() ?: 0
     }
 
+    // 只在prepare阶段使用，因为是用了万能token，每次需要不同的channelId以保证安全性
     fun get1v1ChannelId(): String {
-        return "1v1_${userId}_${createdAt}"
+        return "1v1_${userId}_${System.currentTimeMillis()}"
     }
 
     fun bgImage(): String {

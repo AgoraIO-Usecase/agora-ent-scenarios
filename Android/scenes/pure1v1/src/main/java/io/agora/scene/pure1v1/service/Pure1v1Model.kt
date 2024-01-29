@@ -43,6 +43,11 @@ class UserInfo(
         return "${userId}_${createdAt}"
     }
 
+    // 只在prepare阶段使用，因为是用了万能token，每次需要不同的channelId以保证安全性
+    fun getCallChannelId(): String {
+        return "${userId}_${System.currentTimeMillis()}"
+    }
+
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
         parcel.readString() ?: "",

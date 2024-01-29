@@ -56,8 +56,12 @@ class CallServiceManager {
     var localCanvas: ViewGroup? = null
 
     var remoteCanvas: ViewGroup? = null
-    // 接通使用的rtc token
-    private var acceptToken: String? = null
+
+    // rtc 频道万能 token
+    var rtcToken: String = ""
+
+    // rtm token
+    var rtmToken: String = ""
 
     private var mContext: Context? = null
 
@@ -74,10 +78,26 @@ class CallServiceManager {
         user.userName = UserManager.getInstance().user.name
         user.avatar = UserManager.getInstance().user.headUrl
         localUser = user
+        // 创建 rtc引擎实例
+        val engine = createRtcEngine()
+        rtcEngine = engine
+        // 初始化mpk，用于播放来电秀视频
+        mMediaPlayer = engine.createMediaPlayer()
+        // 初始化mpk2，用于播放来电铃声
+        mMediaPlayer2 = engine.createMediaPlayer()
         // 初始化场景service
         sceneService = Pure1v1ServiceImp(user)
-        // 初始化call api
-        callApi = CallApiImpl(context)
+        // 创建并初始化CallAPI
+        val callApi = CallApiImpl(context)
+        this.callApi = callApi
+        callApi.initialize(CallConfig(
+            BuildConfig.AGORA_APP_ID,
+            user.userId.toInt(),
+            engine,
+            null
+        ))
+        // 获取万能Token
+        fetchToken {}
     }
 
     fun cleanUp() {
@@ -103,13 +123,11 @@ class CallServiceManager {
         sceneService = null
     }
 
-    fun startupCallApiIfNeed() {
+    /*
+     * 获取万能Token并初始化CallAPI
+     */
+    private fun fetchToken(success: () -> Unit) {
         val user = localUser ?: return
-        val prepareConfig = mPrepareConfig ?: return
-        if (prepareConfig.rtcToken.isNotEmpty() && prepareConfig.rtmToken.isNotEmpty()) {
-            return
-        }
-        prepareConfig.roomId = user.getRoomId()
         TokenGenerator.generateTokens(
             "",
             user.userId,
@@ -123,38 +141,50 @@ class CallServiceManager {
                 if (rtcToken == null || rtmToken == null) {
                     return@generateTokens
                 }
-                prepareConfig.rtcToken = rtcToken
-                prepareConfig.rtmToken = rtmToken
-                initialize(prepareConfig)
+                this.rtcToken = rtcToken
+                this.rtmToken = rtmToken
+                success.invoke()
+            }, {
+                Pure1v1Logger.e(tag, "generateTokens failed: $it")
             })
     }
 
-    fun fetchAcceptCallToken(fromRoomId: String, complete: ((String?) -> Unit)?) {
-        val user = localUser ?: run {
-            complete?.invoke(null)
-            return
-        }
-        val token = acceptToken
-        if (token != null) {
-            complete?.invoke(token)
-        } else {
-            TokenGenerator.generateTokens(
-                fromRoomId, user.userId,
-                TokenGenerator.TokenGeneratorType.token007,
-                arrayOf(TokenGenerator.AgoraTokenType.rtc), { ret ->
-                    val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc]
-                    if (rtcToken != null) {
-                        acceptToken = rtcToken
-                        complete?.invoke(rtcToken)
-                    } else {
-                        complete?.invoke(null)
-                    }
-                })
-        }
-    }
+    fun prepareForCall(success: () -> Unit) {
+        val api = callApi ?: return
+        val user = localUser ?: return
+        val localView = localCanvas ?: return
+        val remoteView = remoteCanvas ?: return
+        val prepareConfig = mPrepareConfig ?: return
 
-    fun resetAcceptCallToken() {
-        acceptToken = null
+        if (rtcToken == "" || rtmToken == "") {
+            fetchToken {
+                prepareConfig.roomId = user.getCallChannelId()
+                prepareConfig.rtcToken = rtcToken
+                prepareConfig.rtmToken = rtmToken
+                prepareConfig.localView = localView
+                prepareConfig.remoteView = remoteView
+                prepareConfig.autoJoinRTC = false
+                prepareConfig.userExtension = user.toMap()
+                api.prepareForCall(prepareConfig) {
+                    if (it == null) {
+                        success.invoke()
+                    }
+                }
+            }
+        } else {
+            prepareConfig.roomId = user.getCallChannelId()
+            prepareConfig.rtcToken = rtcToken
+            prepareConfig.rtmToken = rtmToken
+            prepareConfig.localView = localView
+            prepareConfig.remoteView = remoteView
+            prepareConfig.autoJoinRTC = false
+            prepareConfig.userExtension = user.toMap()
+            api.prepareForCall(prepareConfig) {
+                if (it == null) {
+                    success.invoke()
+                }
+            }
+        }
     }
 
     fun playCallShow(url: String) {
@@ -202,32 +232,6 @@ class CallServiceManager {
     fun stopCallMusic() {
         val ret = mMediaPlayer2?.stop()
         Pure1v1Logger.d(tag, "stopCallMusic：$ret")
-    }
-
-    private fun initialize(prepareConfig: PrepareConfig) {
-        val api = callApi ?: return
-        val user = localUser ?: return
-        val localView = localCanvas ?: return
-        val remoteView = remoteCanvas ?: return
-        val engine = createRtcEngine()
-        rtcEngine = engine
-        val config = CallConfig(
-            BuildConfig.AGORA_APP_ID,
-            user.userId.toInt(),
-            engine,
-            null
-        )
-        api.initialize(config)
-        prepareConfig.localView = localView
-        prepareConfig.remoteView = remoteView
-        prepareConfig.autoJoinRTC = false
-        prepareConfig.userExtension = user.toMap()
-        api.prepareForCall(prepareConfig) { }
-
-        // 初始化mpk，用于播放来电秀视频
-        mMediaPlayer = engine.createMediaPlayer()
-        // 初始化mpk2，用于播放来电铃声
-        mMediaPlayer2 = engine.createMediaPlayer()
     }
 
     private fun createRtcEngine(): RtcEngineEx {
