@@ -324,10 +324,7 @@
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="4dp"
                         android:text="@string/ktv_voice_scoring_difficulty_low"
-                        android:textColor="@drawable/ktv_ear_back_mode_status"
-                        app:layout_constraintBottom_toBottomOf="@+id/tvModeOboe"
-                        app:layout_constraintEnd_toStartOf="@+id/tvModeOboe"
-                        app:layout_constraintTop_toTopOf="@+id/tvModeOboe" />
+                        android:textColor="@drawable/ktv_ear_back_mode_status" />
 
                     <RadioButton
                         android:id="@+id/tvScoringDifficultyRecommend"
@@ -340,10 +337,7 @@
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="4dp"
                         android:text="@string/ktv_voice_scoring_difficulty_recommend"
-                        android:textColor="@drawable/ktv_ear_back_mode_status"
-                        app:layout_constraintBottom_toBottomOf="@+id/tvModeOboe"
-                        app:layout_constraintEnd_toStartOf="@+id/tvModeOboe"
-                        app:layout_constraintTop_toTopOf="@+id/tvModeOboe" />
+                        android:textColor="@drawable/ktv_ear_back_mode_status" />
 
                     <RadioButton
                         android:id="@+id/tvScoringDifficultyHigh"
@@ -356,10 +350,7 @@
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="4dp"
                         android:text="@string/ktv_voice_scoring_difficulty_high"
-                        android:textColor="@drawable/ktv_ear_back_mode_status"
-                        app:layout_constraintBottom_toBottomOf="@+id/tvMode"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/tvMode" />
+                        android:textColor="@drawable/ktv_ear_back_mode_status" />
                 </RadioGroup>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -490,10 +481,7 @@
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="4dp"
                         android:text="@string/ktv_voice_quality_standard"
-                        android:textColor="@drawable/ktv_ear_back_mode_status"
-                        app:layout_constraintBottom_toBottomOf="@+id/tvModeOboe"
-                        app:layout_constraintEnd_toStartOf="@+id/tvModeOboe"
-                        app:layout_constraintTop_toTopOf="@+id/tvModeOboe" />
+                        android:textColor="@drawable/ktv_ear_back_mode_status" />
 
                     <RadioButton
                         android:id="@+id/tvVoiceHigh"
@@ -506,10 +494,7 @@
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="4dp"
                         android:text="@string/ktv_voice_quality_high"
-                        android:textColor="@drawable/ktv_ear_back_mode_status"
-                        app:layout_constraintBottom_toBottomOf="@+id/tvModeOboe"
-                        app:layout_constraintEnd_toStartOf="@+id/tvModeOboe"
-                        app:layout_constraintTop_toTopOf="@+id/tvModeOboe" />
+                        android:textColor="@drawable/ktv_ear_back_mode_status" />
                 </RadioGroup>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -563,10 +548,7 @@
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="4dp"
                         android:text="@string/ktv_close"
-                        android:textColor="@drawable/ktv_ear_back_mode_status"
-                        app:layout_constraintBottom_toBottomOf="@+id/tvModeOboe"
-                        app:layout_constraintEnd_toStartOf="@+id/tvModeOboe"
-                        app:layout_constraintTop_toTopOf="@+id/tvModeOboe" />
+                        android:textColor="@drawable/ktv_ear_back_mode_status" />
 
                     <RadioButton
                         android:id="@+id/tvAINSMiddle"
@@ -579,10 +561,7 @@
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="4dp"
                         android:text="@string/ktv_voice_AINS_medium"
-                        android:textColor="@drawable/ktv_ear_back_mode_status"
-                        app:layout_constraintBottom_toBottomOf="@+id/tvModeOboe"
-                        app:layout_constraintEnd_toStartOf="@+id/tvModeOboe"
-                        app:layout_constraintTop_toTopOf="@+id/tvModeOboe" />
+                        android:textColor="@drawable/ktv_ear_back_mode_status" />
 
                     <RadioButton
                         android:id="@+id/tvAINSHigh"
@@ -595,10 +574,7 @@
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="4dp"
                         android:text="@string/ktv_voice_AINS_high"
-                        android:textColor="@drawable/ktv_ear_back_mode_status"
-                        app:layout_constraintBottom_toBottomOf="@+id/tvMode"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/tvMode" />
+                        android:textColor="@drawable/ktv_ear_back_mode_status" />
                 </RadioGroup>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -645,8 +621,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginHorizontal="20dp"
-                app:dividerColor="@color/white_20_percent"
                 android:visibility="gone"
+                app:dividerColor="@color/white_20_percent"
                 app:layout_constraintTop_toBottomOf="@id/layoutLowLatency" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -705,8 +681,8 @@
                     android:id="@+id/layoutAIAECInput"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingVertical="8dp"
                     android:background="@android:color/transparent"
+                    android:paddingVertical="8dp"
                     app:boxBackgroundMode="none"
                     app:boxStrokeColor="@android:color/transparent"
                     app:hintEnabled="false"
@@ -720,9 +696,9 @@
                         android:background="@drawable/ktv_aiaec_input_radius"
                         android:gravity="center"
                         android:imeOptions="actionDone"
+                        android:inputType="number"
                         android:maxLength="1"
                         android:maxLines="1"
-                        android:inputType="number"
                         android:singleLine="true"
                         android:text="1"
                         android:textColor="@color/white"
@@ -741,9 +717,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     app:dividerColor="@color/white_20_percent"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/layoutAIAECInput"
-                    app:layout_goneMarginTop="8dp"
-                    app:layout_constraintBottom_toBottomOf="parent" />
+                    app:layout_goneMarginTop="8dp" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
