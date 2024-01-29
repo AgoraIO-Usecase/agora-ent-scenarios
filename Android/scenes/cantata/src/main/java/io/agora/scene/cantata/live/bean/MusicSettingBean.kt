@@ -5,104 +5,118 @@ import io.agora.scene.cantata.live.fragmentdialog.EarPhoneCallback
 import io.agora.scene.cantata.live.fragmentdialog.MusicSettingCallback
 
 /**
+ * 耳返模式，0(自动), 1(强制OpenSL), 2(强制Oboe)
+ */
+enum class EarBackMode(val value: Int) {
+    Auto(0),
+    OpenSL(1),
+    Oboe(2),
+}
+
+/**
  * 控制台设置
  */
 class MusicSettingBean constructor(
-    var audioEffect: Int,
-    private var isEar: Boolean,
-    private var volMic: Int,
-    private var volMusic: Int,
-    private var toneValue: Int,
-    private var mCallback: MusicSettingCallback
+
+    private var mSettingCallback: MusicSettingCallback
 ) {
 
-    fun setAudioEffectPreset(audioEffect: Int) {
-        this.audioEffect = audioEffect
-        mCallback.onEffectChanged(audioEffect)
+    companion object {
+        const val DEFAULT_MIC_VOL = 100 // 默认人声音量100
+        const val DEFAULT_ACC_VOL = 50 // 默认伴奏音量50
+        const val DEFAULT_REMOTE_VOL = 30 // 默认远端音量 30
     }
-
-    var beautifier = 0
-        set(beautifier) {
-            field = beautifier
-            mCallback.onBeautifierPresetChanged(beautifier)
-        }
-    var audioEffectParams1 = 0
-    var audioEffectParams2 = 0
-    var remoteVolume = 30
-        set(newValue) {
-            field = newValue
-            mCallback.onRemoteVolumeChanged(newValue)
-        }
-
-    val callback: MusicSettingCallback
-        get() = mCallback
-
-    fun isEar(): Boolean {
-        return isEar
-    }
-
-    fun setEar(ear: Boolean) {
-        isEar = ear
-        mCallback.onEarChanged(ear)
-    }
-
-    fun getVolMic(): Int {
-        return volMic
-    }
-
-    fun setVolMic(volMic: Int) {
-        this.volMic = volMic
-        mCallback.onMicVolChanged(volMic)
-    }
-
-    fun getVolMusic(): Int {
-        return volMusic
-    }
-
-    fun setVolMusic(volMusic: Int) {
-        this.volMusic = volMusic
-        mCallback.onMusicVolChanged(volMusic)
-    }
-
-    fun setAudioEffectParameters(params1: Int, params2: Int) {
-        audioEffectParams1 = params1
-        audioEffectParams2 = params2
-        mCallback.setAudioEffectParameters(params1, params2)
-    }
-
-    fun getToneValue(): Int {
-        return toneValue
-    }
-
-    fun setToneValue(newToneValue: Int) {
-        toneValue = newToneValue
-        mCallback.onToneChanged(newToneValue)
-    }
-
-    var earBackVolume = 100 // 耳返音量
-        set(value) {
-            field = value
-            mCallback.onEarBackVolumeChanged(value)
-        }
-
-    var earBackMode = 0 // 耳返模式：0(自动), 1(强制OpenSL), 2(强制Oboe)
-
-    var hasEarPhone = false // 是否有耳机
-        set(hasEarPhone) {
-            field = hasEarPhone
-            mEarPhoneCallback?.onHasEarPhoneChanged(hasEarPhone)
-        }
-
-    var earBackDelay = 0 // 耳返延迟
-        set(value) {
-            field = value
-        }
 
     var mEarPhoneCallback: EarPhoneCallback? = null
-        set(value) {
-            field = value
+
+    /**
+     * 耳返开关
+     */
+    var mEarBackEnable: Boolean = false
+        set(newValue) {
+            if (field == newValue) return
+            field = newValue
+            mSettingCallback.onEarChanged(newValue)
         }
 
+    /**
+     * 耳返音量
+     */
+    var mEarBackVolume = 100
+        set(newValue) {
+            if (field == newValue) return
+            field = newValue
+            mSettingCallback.onEarBackVolumeChanged(newValue)
+        }
+
+    /**
+     * 耳返模式：0(自动), 1(强制OpenSL), 2(强制Oboe)
+     */
+    var mEarBackMode = EarBackMode.Auto
+        set(newValue) {
+            if (field == newValue) return
+            field = newValue
+            mSettingCallback.onEarBackModeChanged(newValue.value)
+        }
+
+    /**
+     * 是否有耳机
+     */
+    var mHasEarPhone = false
+        set(newValue) {
+            if (field == newValue) return
+            field = newValue
+            mEarPhoneCallback?.onHasEarPhoneChanged(newValue)
+        }
+
+    /**
+     * 耳返延迟
+     */
+    var mEarBackDelay = 0
+        set(newValue) {
+            if (field == newValue) return
+            field = newValue
+            mEarPhoneCallback?.onEarMonitorDelay(newValue)
+        }
+
+    /**
+     * 人声音量
+     */
+    var mMicVolume = DEFAULT_MIC_VOL
+        set(newValue) {
+            if (field == newValue) return
+            field = newValue
+            mSettingCallback.onMicVolChanged(newValue)
+        }
+
+    /**
+     * 伴奏音量
+     */
+    var mAccVolume = DEFAULT_ACC_VOL
+        set(newValue) {
+            if (field == newValue) return
+            field = newValue
+            mSettingCallback.onAccVolChanged(newValue)
+        }
+
+    /**
+     *  远端音量
+     */
+    var mRemoteVolume = DEFAULT_REMOTE_VOL
+        set(newValue) {
+            field = newValue
+            mSettingCallback.onRemoteVolumeChanged(newValue)
+        }
+
+    /**
+     * 音效, 默认 大合唱
+     */
+    var mAudioEffect: Int = Constants.ROOM_ACOUSTICS_CHORUS
+        set(newValue) {
+            if (field == newValue) return
+            field = newValue
+            mSettingCallback.onAudioEffectChanged(newValue)
+        }
 
     // ------------------ 音效调整 ------------------
     fun getEffectIndex(index: Int): Int {

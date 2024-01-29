@@ -13,7 +13,7 @@
         android:scaleType="centerCrop"
         app:strokeColor="@null"
         app:shapeAppearance="@style/cantata_cornerTinyStyle"
-        tools:src="@drawable/cantata_music_background1" />
+        tools:src="@mipmap/bg_sound_mode_1" />
 
     <TextView
         android:id="@+id/tvTitle"

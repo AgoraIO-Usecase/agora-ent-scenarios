@@ -52,7 +52,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
          *若身份为麦上主播（没有加入合唱但在麦上），人声音量、伴奏音量、远端音量均保持原先设置
          */
         const val DEFAULT_MIC_VOL = 100 // 默认人声音量100
-        const val DEFAULT_ACC_VOL = 50 // 默认伴奏音量500
+        const val DEFAULT_ACC_VOL = 50 // 默认伴奏音量50
         const val DEFAULT_REMOTE_SINGER_VOL = 30  // 主唱/伴唱，演唱时默认远端音量30
         const val DEFAULT_REMOTE_VOL = 100  // 主唱/伴唱，非演唱时默认远端音量100
         const val DEFAULT_EAR_BACK_VOL = 100  // 默认耳返音量
