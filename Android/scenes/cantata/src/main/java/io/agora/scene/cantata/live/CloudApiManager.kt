@@ -3,8 +3,10 @@ package io.agora.scene.cantata.live
 import com.moczul.ok2curl.CurlInterceptor
 import com.moczul.ok2curl.logger.Logger
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.CantataLogger
+import io.agora.scene.cantata.R
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Request.*
@@ -79,7 +81,7 @@ class CloudApiManager private constructor() {
         val token = fetchCloudToken()
         tokenName = token.ifEmpty {
             CantataLogger.e(TAG, "云端合流uid 请求报错 token is null")
-            completion.invoke(Exception("云端合流服务开启失败，请重新创建房间"))
+            completion.invoke(Exception(getString(R.string.cantata_start_cloud_error)))
             return
         }
         var taskId = ""
@@ -138,10 +140,10 @@ class CloudApiManager private constructor() {
                 completion.invoke(null)
                 ToastUtils.showToastLong("云端合流服务开启成功")
             } else {
-                completion.invoke(Exception("云端合流服务开启失败，请重新创建房间"))
+                completion.invoke(Exception(getString(R.string.cantata_start_cloud_error)))
             }
         } catch (e: Exception) {
-            completion.invoke(Exception("云端合流服务开启失败，请重新创建房间"))
+            completion.invoke(Exception(getString(R.string.cantata_start_cloud_error)))
             CantataLogger.e(TAG, "云端合流uid 请求报错 " + e.message)
         }
         if (taskId.isNotEmpty()) {
@@ -198,4 +200,8 @@ class CloudApiManager private constructor() {
             // 创建 authorization header
             return "Basic $base64Credentials"
         }
+
+    private fun getString(resId:Int):String{
+        return AgoraApplication.the().getString(resId)
+    }
 }

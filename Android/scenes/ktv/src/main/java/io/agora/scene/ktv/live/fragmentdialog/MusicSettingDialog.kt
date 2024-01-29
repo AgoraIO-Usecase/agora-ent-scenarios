@@ -316,9 +316,7 @@ class MusicSettingDialog constructor(
         }
         if (newVocalVolume > 100) newVocalVolume = 100
         if (newVocalVolume < 0) newVocalVolume = 0
-        if (newVocalVolume != this.mSetting.mMicVolume) {
-            this.mSetting.mMicVolume = newVocalVolume
-        }
+        this.mSetting.mMicVolume = newVocalVolume
         mBinding.sbMicVol.progress = newVocalVolume
     }
 
@@ -332,9 +330,7 @@ class MusicSettingDialog constructor(
         }
         if (newMusicVolume > 100) newMusicVolume = 100
         if (newMusicVolume < 0) newMusicVolume = 0
-        if (newMusicVolume != this.mSetting.mAccVolume) {
-            this.mSetting.mAccVolume = newMusicVolume
-        }
+        this.mSetting.mAccVolume = newMusicVolume
         mBinding.sbAccVol.progress = newMusicVolume
     }
 
@@ -348,9 +344,7 @@ class MusicSettingDialog constructor(
         }
         if (newRemoteVolume > 100) newRemoteVolume = 100
         if (newRemoteVolume < 0) newRemoteVolume = 0
-        if (newRemoteVolume != this.mSetting.mRemoteVolume) {
-            this.mSetting.mRemoteVolume = newRemoteVolume
-        }
+        this.mSetting.mRemoteVolume = newRemoteVolume
         mBinding.sbRemoteVol.progress = newRemoteVolume
     }
 

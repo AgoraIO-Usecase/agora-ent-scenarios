@@ -141,9 +141,7 @@ class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
         }
         if (earBackVolume > 100) earBackVolume = 100
         if (earBackVolume < 0) earBackVolume = 0
-        if (earBackVolume != mSetting.mEarBackVolume) {
-            mSetting.mEarBackVolume = earBackVolume
-        }
+        mSetting.mEarBackVolume = earBackVolume
         binding?.apply {
             sbEarBack.progress = earBackVolume
         }

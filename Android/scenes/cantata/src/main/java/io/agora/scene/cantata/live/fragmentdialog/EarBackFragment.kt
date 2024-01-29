@@ -6,15 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.RadioGroup
-import android.widget.SeekBar
-import android.widget.SeekBar.OnSeekBarChangeListener
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataDialogEarbackSettingBinding
 import io.agora.scene.cantata.live.RoomLivingActivity
+import io.agora.scene.cantata.live.bean.EarBackMode
 import io.agora.scene.cantata.live.bean.MusicSettingBean
 import io.agora.scene.widget.dialog.CommonDialog
+import io.agora.scene.widget.doOnProgressChanged
 
 /**
  * 耳返设置
@@ -41,107 +41,98 @@ class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
         }
     }
 
-    override fun getViewBinding(layoutInflater: LayoutInflater, viewGroup: ViewGroup?): CantataDialogEarbackSettingBinding {
+    override fun getViewBinding(
+        layoutInflater: LayoutInflater,
+        viewGroup: ViewGroup?
+    ): CantataDialogEarbackSettingBinding {
         return CantataDialogEarbackSettingBinding.inflate(layoutInflater)
     }
 
+    override fun initView() {
+        super.initView()
+        binding?.apply {
+            if (mSetting.mEarBackEnable) {
+                vSettingMark.visibility = View.INVISIBLE
+                vPingMark.visibility = View.INVISIBLE
+            } else {
+                vSettingMark.visibility = View.VISIBLE
+                vPingMark.visibility = View.VISIBLE
+                vSettingMark.setOnClickListener { v: View? -> }
+            }
+            btEarBackDown.setOnClickListener { v: View? -> tuningEarVolume(false) }
+            btEarBackUp.setOnClickListener { v: View? -> tuningEarVolume(true) }
+            sbEarBack.progress = mSetting.mEarBackVolume
+            sbEarBack.doOnProgressChanged { seekBar, progress, fromUser ->
+                if (fromUser) {
+                    mSetting.mEarBackVolume
+                }
+            }
+            when (mSetting.mEarBackMode) {
+                EarBackMode.Auto -> rgMode.check(R.id.tvModeAuto)
+                EarBackMode.OpenSL -> rgMode.check(R.id.tvModeOpenSL)
+                else -> rgMode.check(R.id.tvModeOboe)
+            }
+            rgMode.setOnCheckedChangeListener { group: RadioGroup?, checkedId: Int ->
+                when (checkedId) {
+                    R.id.tvModeAuto -> mSetting.mEarBackMode = EarBackMode.Auto
+                    R.id.tvModeOpenSL -> showSwitchEarModeDialog(EarBackMode.OpenSL)
+                    else -> showSwitchEarModeDialog(EarBackMode.Oboe)
+                }
+            }
+            ivBackIcon.setOnClickListener { view: View? -> (requireActivity() as RoomLivingActivity).closeMusicSettingsDialog() }
+        }
 
-    override fun initListener() {
-        super.initListener()
-        updateEarPhoneStatus(mSetting.hasEarPhone)
-        if (mSetting.isEar()) {
-            binding.vSettingMark.visibility = View.INVISIBLE
-            binding.vPingMark.visibility = View.INVISIBLE
-        } else {
-            binding.vSettingMark.visibility = View.VISIBLE
-            binding.vPingMark.visibility = View.VISIBLE
-            binding.vSettingMark.setOnClickListener { v: View? -> }
-        }
-        binding.btEarBackDown.setOnClickListener { v: View? -> tuningEarVolume(false) }
-        binding.btEarBackUp.setOnClickListener { v: View? -> tuningEarVolume(true) }
-        binding.sbEarBack.progress = mSetting.earBackVolume
-        binding.sbEarBack.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                mSetting.earBackVolume = progress
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar) {}
-        })
-        when (mSetting.earBackMode) {
-            0 -> {
-                binding.rgMode.check(R.id.tvModeAuto)
-            }
-            1 -> {
-                binding.rgMode.check(R.id.tvModeOpenSL)
-            }
-            else -> {
-                binding.rgMode.check(R.id.tvModeOboe)
-            }
-        }
-        binding.rgMode.setOnCheckedChangeListener { group: RadioGroup?, checkedId: Int ->
-            when (checkedId) {
-                R.id.tvModeAuto -> {
-                    mSetting.earBackMode = 0
-                }
-                R.id.tvModeOpenSL -> {
-                    showSwitchEarModeDialog(1)
-                }
-                else -> {
-                    showSwitchEarModeDialog(2)
-                }
-            }
-        }
-        updateEarPhoneDelay(mSetting.earBackDelay)
-        binding.ivBackIcon.setOnClickListener { view: View? -> (requireActivity() as RoomLivingActivity).closeMusicSettingsDialog() }
+        updateEarPhoneStatus(mSetting.mHasEarPhone)
+        updateEarPhoneDelay(mSetting.mEarBackDelay)
     }
 
     private fun updateEarPhoneStatus(hasEarPhone: Boolean) {
-        if (hasEarPhone) {
-            // 检测到耳机
-            binding.cbSwitch.isEnabled = true
-            binding.cbSwitch.isChecked = mSetting.isEar()
-            binding.cbSwitch.setOnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-                mSetting.setEar(isChecked)
-                if (isChecked) {
-                    binding.vSettingMark.visibility = View.INVISIBLE
-                    binding.vPingMark.visibility = View.INVISIBLE
-                } else {
-                    binding.vSettingMark.visibility = View.VISIBLE
-                    binding.vPingMark.visibility = View.VISIBLE
-                    binding.vSettingMark.setOnClickListener { v: View? -> }
+        binding?.apply {
+            if (hasEarPhone) {
+                // 检测到耳机
+                cbSwitch.isEnabled = true
+                cbSwitch.isChecked = mSetting.mEarBackEnable
+                cbSwitch.setOnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
+                    mSetting.mEarBackEnable = isChecked
+                    if (isChecked) {
+                        vSettingMark.visibility = View.INVISIBLE
+                        vPingMark.visibility = View.INVISIBLE
+                    } else {
+                        vSettingMark.visibility = View.VISIBLE
+                        vPingMark.visibility = View.VISIBLE
+                        vSettingMark.setOnClickListener { v: View? -> }
+                    }
                 }
+                tvTips.visibility = View.VISIBLE
+                tvTipsNoEarPhone.visibility = View.INVISIBLE
+            } else {
+                // 未检测到耳机
+                cbSwitch.isEnabled = false
+                mSetting.mEarBackEnable = false
+                cbSwitch.isChecked = false
+                tvTips.visibility = View.INVISIBLE
+                tvTipsNoEarPhone.visibility = View.VISIBLE
             }
-            binding.tvTips.visibility = View.VISIBLE
-            binding.tvTipsNoEarPhone.visibility = View.INVISIBLE
-        } else {
-            // 未检测到耳机
-            binding.cbSwitch.isEnabled = false
-            mSetting.setEar(false)
-            binding.cbSwitch.isChecked = false
-            binding.tvTips.visibility = View.INVISIBLE
-            binding.tvTipsNoEarPhone.visibility = View.VISIBLE
         }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun updateEarPhoneDelay(earPhoneDelay: Int) {
-        binding.pbPing.progress = earPhoneDelay
-        binding.tvPing.text = earPhoneDelay.toString() + "ms"
-        if (earPhoneDelay <= 50) {
-            binding.pbPing.progressDrawable =
-                binding.root.resources.getDrawable(R.drawable.cantata_ear_ping_progress_good)
-        } else if (earPhoneDelay <= 100) {
-            binding.pbPing.progressDrawable =
-                binding.root.resources.getDrawable(R.drawable.cantata_ear_ping_progress)
-        } else {
-            binding.pbPing.progressDrawable =
-                binding.root.resources.getDrawable(R.drawable.cantata_ear_ping_progress_bad)
+        binding?.apply {
+            pbPing.progress = earPhoneDelay
+            tvPing.text = "${earPhoneDelay}ms"
+            if (earPhoneDelay <= 50) {
+                pbPing.progressDrawable = root.resources.getDrawable(R.drawable.cantata_ear_ping_progress_good)
+            } else if (earPhoneDelay <= 100) {
+                pbPing.progressDrawable = root.resources.getDrawable(R.drawable.cantata_ear_ping_progress)
+            } else {
+                pbPing.progressDrawable = root.resources.getDrawable(R.drawable.cantata_ear_ping_progress_bad)
+            }
         }
     }
 
     private fun tuningEarVolume(volumeUp: Boolean) {
-        var earBackVolume = mSetting.earBackVolume
+        var earBackVolume = mSetting.mEarBackVolume
         if (volumeUp) {
             earBackVolume += 1
         } else {
@@ -149,21 +140,19 @@ class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
         }
         if (earBackVolume > 100) earBackVolume = 100
         if (earBackVolume < 0) earBackVolume = 0
-        if (earBackVolume != mSetting.earBackVolume) {
-            mSetting.earBackVolume = earBackVolume
-        }
+        mSetting.mEarBackVolume = earBackVolume
         binding.sbEarBack.progress = earBackVolume
     }
 
-    private fun showSwitchEarModeDialog(mode: Int) {
-        val cxt = context?:return
+    private fun showSwitchEarModeDialog(mode: EarBackMode) {
+        val cxt = context ?: return
         if (switchEarModeDialog == null) {
             switchEarModeDialog = CommonDialog(cxt).apply {
-                setDialogTitle("提示")
-                if (mode == 1) {
-                    setDescText("切换后将强制使用OpenSL模式，\n确认？")
-                } else if (mode == 2) {
-                    setDescText("切换后将强制使用Oboe模式，\n确认？")
+                setDialogTitle(getString(R.string.cantata_notice))
+                if (mode == EarBackMode.OpenSL) {
+                    setDescText(getString(R.string.cantata_ear_back_opensl))
+                } else if (mode == EarBackMode.Oboe) {
+                    setDescText(getString(R.string.cantata_ear_back_oboe))
                 }
                 setDialogBtnText(
                     getString(R.string.cantata_cancel),
@@ -171,21 +160,18 @@ class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
                 )
                 onButtonClickListener = object : OnButtonClickListener {
                     override fun onLeftButtonClick() {
-                        when (mSetting.earBackMode) {
-                            0 -> {
-                                this@EarBackFragment.binding.rgMode.check(R.id.tvModeAuto)
-                            }
-                            1 -> {
-                                this@EarBackFragment.binding.rgMode.check(R.id.tvModeOpenSL)
-                            }
-                            else -> {
-                                this@EarBackFragment.binding.rgMode.check(R.id.tvModeOboe)
+                        this@EarBackFragment.binding?.apply {
+                            when (mSetting.mEarBackMode) {
+                                EarBackMode.Auto -> rgMode.check(R.id.tvModeAuto)
+                                EarBackMode.OpenSL -> rgMode.check(R.id.tvModeOpenSL)
+                                else -> rgMode.check(R.id.tvModeOboe)
                             }
                         }
+
                     }
 
                     override fun onRightButtonClick() {
-                        mSetting.earBackMode = mode
+                        mSetting.mEarBackMode = mode
                     }
                 }
             }
