@@ -1128,8 +1128,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                         }
                     }
 
-                    override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray) {
-                        mKtvApi.setAudienceStreamMessage(uid, streamId, data)
+                    override fun onAudioMetadataReceived(uid: Int, data: ByteArray?) {
+                        mKtvApi.setAudienceAudioMetadataReceived(uid, data)
                     }
                 }
             )
