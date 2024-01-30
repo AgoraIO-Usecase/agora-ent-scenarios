@@ -157,7 +157,24 @@
     <string name="cantata_too_fast">操作太频繁</string>
     <string name="cantata_lrc_failed">歌词加载失败</string>
     <string name="cantata_retry">点击重试</string>
-    <string name="cantata_join_chorus_failed">加入合唱失败, 请3s后重试</string>
+    <string name="cantata_join_chorus_failed">加入合唱失败</string>
+
+    <string name="cantata_earback_title">耳返</string>
+    <string name="cantata_earback_mode">耳返模式</string>
+    <string name="cantata_earback_switch">耳返开关</string>
+    <string name="cantata_earback_setting">耳返设置</string>
+    <string name="cantata_earback_volume">耳返音量</string>
+    <string name="cantata_earback_auto">自动</string>
+    <string name="cantata_earback_oboe">强制Oboe</string>
+    <string name="cantata_earback_opensl">强制OpenSL</string>
+    <string name="cantata_earback_opensl_tips">切换后将强制使用OpenSL模式，\n确认？</string>
+    <string name="cantata_earback_oboe_tips">切换后将强制使用Oboe模式，\n确认？</string>
+    <string name="cantata_earback_tips1">开启耳返可实时听到自己的声音，唱歌的时候及时调整</string>
+    <string name="cantata_earback_tips2">因为延时和体验问题，在耳返里听到的声音是没有音效的（包括虚拟声卡、场景塑造（KTV、演唱会））</string>
+    <string name="cantata_earback_no_micphone">使用耳返必须插入耳机，当前未检测到耳机</string>
+    <string name="cantata_earback_delay">耳返延时</string>
+    <string name="cantata_earback_delay_test">请对着耳麦说话，测试实时耳返延时</string>
+    <string name="cantat_earback_close_tip">耳返已关闭，请插入耳机重新开启</string>
 
     <string name="cantata_user_online">%s在线</string>
     <string name="cantata_singing_user">正在合唱用户(%d)</string>

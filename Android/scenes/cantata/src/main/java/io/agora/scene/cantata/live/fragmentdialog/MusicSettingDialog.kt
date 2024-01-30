@@ -128,7 +128,7 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
      */
     private fun showEarBackPage(v: View) {
         mBinding.root.removeAllViews()
-        val earBackFragment: BaseViewBindingFragment<*> = EarBackFragment(mSetting)
+        val earBackFragment = EarBackFragment(mSetting)
         val ft = childFragmentManager.beginTransaction()
         ft.add(mBinding.root.id, earBackFragment, EarBackFragment.TAG)
         ft.commit()

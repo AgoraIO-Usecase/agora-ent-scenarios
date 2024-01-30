@@ -1015,9 +1015,18 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
             override fun onAudioRouteChanged(routing: Int) {
                 super.onAudioRouteChanged(routing)
-                CantataLogger.d(TAG, "onAudioRouteChanged, routing:$routing");
-                mMusicSetting?.let {
-                    it.mHasEarPhone = routing == 0 || routing == 2 || routing == 5 || routing == 6
+                CantataLogger.d(TAG, "onAudioRouteChanged, routing:$routing")
+                mMusicSetting?.let { setting->
+                    // 0\2\5 earPhone
+                    if (routing == 0 || routing == 2 || routing == 5 || routing == 6) {
+                        setting.mHasEarPhone = true
+                    } else {
+                        if (mSongPlayingLiveData.value != null && setting.mEarBackEnable) {
+                            CustomToast.show(R.string.cantat_earback_close_tip, Toast.LENGTH_SHORT)
+                            setting.mEarBackEnable = false
+                        }
+                        setting.mHasEarPhone = false
+                    }
                 }
             }
         }

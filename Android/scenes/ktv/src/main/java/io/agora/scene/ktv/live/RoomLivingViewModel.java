@@ -1457,17 +1457,12 @@ public class RoomLivingViewModel extends ViewModel {
                 if (mSetting == null) return;
                 if (routing == 0 || routing == 2 || routing == 5 || routing == 6) {
                     mSetting.setMHasEarPhone(true);
-                    //mSoundCardSettingBean.setHasEarPhone(true);
                 } else {
                     if (songPlayingLiveData.getValue() != null && mSetting.getMEarBackEnable()) {
-                        CustomToast.show(R.string.ktv_ear_phone_tip, Toast.LENGTH_SHORT);
+                        CustomToast.show(R.string.ktv_earphone_close_tip, Toast.LENGTH_SHORT);
                         mSetting.setMEarBackEnable(false);
-                        if (mRtcEngine != null) {
-                            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
-                        }
                     }
-                    mSetting.setMEarBackEnable(false);
-                    //mSoundCardSettingBean.setHasEarPhone(false);
+                    mSetting.setMHasEarPhone(false);
                 }
             }
 
