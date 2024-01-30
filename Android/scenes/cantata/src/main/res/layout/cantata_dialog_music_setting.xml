@@ -106,7 +106,7 @@
             android:contentDescription="@string/cantata_music_menu_dialog_vol1"
             android:max="100"
             android:progress="20"
-            android:progressDrawable="@drawable/bg_seekbar_progress"
+            android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
             android:thumb="@mipmap/ic_seekbar_btn" />
 
         <ImageButton
@@ -155,7 +155,7 @@
             android:contentDescription="@string/cantata_music_menu_dialog_vol2"
             android:max="100"
             android:progress="20"
-            android:progressDrawable="@drawable/bg_seekbar_progress"
+            android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
             android:thumb="@mipmap/ic_seekbar_btn" />
 
         <ImageButton
@@ -204,7 +204,7 @@
             android:max="100"
             android:progress="40"
             android:layout_weight="1"
-            android:progressDrawable="@drawable/bg_seekbar_progress"
+            android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
             android:thumb="@mipmap/ic_seekbar_btn" />
 
         <ImageButton
