@@ -7,7 +7,7 @@
 #import "VLSBGSelBgModel.h"
 
 #import "VLSBGMVIdleView.h"
-#import "HWWeakTimer.h"
+//#import "HWWeakTimer.h"
 #import "VLHotSpotBtn.h"
 #import "VLUserCenter.h"
 #import "VLFontUtils.h"
