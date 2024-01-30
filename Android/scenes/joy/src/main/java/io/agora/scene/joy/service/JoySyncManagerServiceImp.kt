@@ -83,11 +83,13 @@ class JoySyncManagerServiceImp constructor(
         Sync.Instance().init(RethinkConfig(BuildConfig.AGORA_APP_ID, kSceneId),
             object : Sync.Callback {
                 override fun onSuccess() {
+                    JoyLogger.d(TAG, "sync init success")
                     syncInitialized = true
                     runOnMainThread { complete.invoke() }
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
+                    JoyLogger.e(TAG, "sync init onFail $exception")
                     syncInitialized = false
                     errorHandler.invoke(exception)
                 }
@@ -134,6 +136,7 @@ class JoySyncManagerServiceImp constructor(
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
+                    JoyLogger.d(TAG, "getRoomList onFail $exception")
                     runOnMainThread { completion.invoke(emptyList()) }
                 }
             })
@@ -152,6 +155,7 @@ class JoySyncManagerServiceImp constructor(
                     }
 
                     override fun onFail(exception: SyncManagerException?) {
+                        JoyLogger.d(TAG, "updateRoom onFail $exception")
                         runOnMainThread {
                             completion.invoke(exception)
                         }
@@ -177,7 +181,7 @@ class JoySyncManagerServiceImp constructor(
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
-                    JoyLogger.d(TAG, "getStartGame onFail roomId:$roomId ${exception?.message}")
+                    JoyLogger.d(TAG, "getStartGame onFail roomId:$roomId $exception")
                 }
             })
         }
@@ -195,7 +199,7 @@ class JoySyncManagerServiceImp constructor(
                     }
 
                     override fun onFail(exception: SyncManagerException?) {
-                        JoyLogger.e(TAG, "updateStartGame onFail roomId:$roomId ${exception?.message}")
+                        JoyLogger.e(TAG, "updateStartGame onFail roomId:$roomId $exception")
                         completion.invoke(exception)
                     }
 
@@ -233,7 +237,7 @@ class JoySyncManagerServiceImp constructor(
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
-                    JoyLogger.e(TAG, "createRoom onFail ${exception?.toString()}")
+                    JoyLogger.e(TAG, "createRoom onFail $exception")
                     runOnMainThread { completion.invoke(exception, null) }
                 }
             })
@@ -267,7 +271,7 @@ class JoySyncManagerServiceImp constructor(
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
-                    JoyLogger.e(TAG, "joinRoom onFail ${exception?.message}")
+                    JoyLogger.e(TAG, "joinRoom onFail $exception")
                     runOnMainThread { completion.invoke(exception ?: java.lang.Exception("joinRoom onFail")) }
                 }
             })
@@ -299,7 +303,7 @@ class JoySyncManagerServiceImp constructor(
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
-                    JoyLogger.e(TAG, "leaveRoom onFail ${exception?.message}")
+                    JoyLogger.e(TAG, "leaveRoom onFail $exception")
                     runOnMainThread { completion.invoke(exception) }
                 }
             })
@@ -326,7 +330,7 @@ class JoySyncManagerServiceImp constructor(
             }
 
             override fun onFail(exception: SyncManagerException?) {
-                JoyLogger.e(TAG, "sendChatMessage onFail roomId:$roomId ${exception?.message}")
+                JoyLogger.e(TAG, "sendChatMessage onFail roomId:$roomId $exception")
                 completion.invoke(exception)
             }
 
@@ -375,7 +379,7 @@ class JoySyncManagerServiceImp constructor(
             }
 
             override fun onFail(exception: SyncManagerException?) {
-                JoyLogger.d(TAG, "getUserList onFail roomId:$roomNo ${exception?.message}")
+                JoyLogger.d(TAG, "getUserList onFail roomId:$roomNo $exception")
             }
         })
     }
@@ -402,7 +406,7 @@ class JoySyncManagerServiceImp constructor(
             }
 
             override fun onFail(exception: SyncManagerException?) {
-                JoyLogger.e(TAG, "innerAddUserInfo onFail roomId:$roomId ${exception?.message}")
+                JoyLogger.e(TAG, "innerAddUserInfo onFail roomId:$roomId $exception")
                 completion.invoke(null, exception)
             }
 
@@ -420,7 +424,7 @@ class JoySyncManagerServiceImp constructor(
             }
 
             override fun onFail(exception: SyncManagerException?) {
-                JoyLogger.e(TAG, "innerRemoveUserInfo onFail  ${exception?.message}")
+                JoyLogger.e(TAG, "innerRemoveUserInfo onFail  $exception")
                 completion.invoke(exception)
             }
         })
