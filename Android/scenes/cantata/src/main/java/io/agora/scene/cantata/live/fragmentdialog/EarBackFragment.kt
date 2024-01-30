@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.RadioGroup
-import io.agora.scene.base.component.BaseViewBindingFragment
+import io.agora.scene.base.component.BaseBindingFragment
 import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataDialogEarbackSettingBinding
@@ -20,14 +20,13 @@ import io.agora.scene.widget.doOnProgressChanged
  * 耳返设置
  */
 class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
-    BaseViewBindingFragment<CantataDialogEarbackSettingBinding>() {
+    BaseBindingFragment<CantataDialogEarbackSettingBinding?>() {
 
     companion object {
         const val TAG = "EarBackFragment"
     }
 
     private var switchEarModeDialog: CommonDialog? = null
-
 
     init {
         mSetting.mEarPhoneCallback = object : EarPhoneCallback {
@@ -41,38 +40,38 @@ class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
         }
     }
 
-    override fun getViewBinding(
-        layoutInflater: LayoutInflater,
-        viewGroup: ViewGroup?
-    ): CantataDialogEarbackSettingBinding {
-        return CantataDialogEarbackSettingBinding.inflate(layoutInflater)
+    override fun getViewBinding(layoutInflater: LayoutInflater, viewGroup: ViewGroup?): CantataDialogEarbackSettingBinding {
+        return  CantataDialogEarbackSettingBinding.inflate(layoutInflater,viewGroup,false)
     }
 
     override fun initView() {
         super.initView()
         binding?.apply {
             if (mSetting.mEarBackEnable) {
-                vSettingMark.visibility = View.INVISIBLE
-                vPingMark.visibility = View.INVISIBLE
+                enableDisableView(layoutEarBackVol,true)
+                layoutEarBackVol.alpha = 1.0f
             } else {
-                vSettingMark.visibility = View.VISIBLE
-                vPingMark.visibility = View.VISIBLE
-                vSettingMark.setOnClickListener { v: View? -> }
+                enableDisableView(layoutEarBackVol,false)
+                layoutEarBackVol.alpha = 0.3f
             }
+            //隐藏耳返模式
+            layoutEarBackMode.visibility = View.INVISIBLE
+            //隐藏耳返延时
+            cvEarBackdelay.visibility = View.INVISIBLE
             btEarBackDown.setOnClickListener { v: View? -> tuningEarVolume(false) }
             btEarBackUp.setOnClickListener { v: View? -> tuningEarVolume(true) }
             sbEarBack.progress = mSetting.mEarBackVolume
             sbEarBack.doOnProgressChanged { seekBar, progress, fromUser ->
                 if (fromUser) {
-                    mSetting.mEarBackVolume
+                    mSetting.mEarBackVolume = progress
                 }
             }
             when (mSetting.mEarBackMode) {
-                EarBackMode.Auto -> rgMode.check(R.id.tvModeAuto)
-                EarBackMode.OpenSL -> rgMode.check(R.id.tvModeOpenSL)
-                else -> rgMode.check(R.id.tvModeOboe)
+                EarBackMode.Auto -> rgEarBackMode.check(R.id.tvModeAuto)
+                EarBackMode.OpenSL -> rgEarBackMode.check(R.id.tvModeOpenSL)
+                else -> rgEarBackMode.check(R.id.tvModeOboe)
             }
-            rgMode.setOnCheckedChangeListener { group: RadioGroup?, checkedId: Int ->
+            rgEarBackMode.setOnCheckedChangeListener { group: RadioGroup?, checkedId: Int ->
                 when (checkedId) {
                     R.id.tvModeAuto -> mSetting.mEarBackMode = EarBackMode.Auto
                     R.id.tvModeOpenSL -> showSwitchEarModeDialog(EarBackMode.OpenSL)
@@ -81,9 +80,14 @@ class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
             }
             ivBackIcon.setOnClickListener { view: View? -> (requireActivity() as RoomLivingActivity).closeMusicSettingsDialog() }
         }
-
         updateEarPhoneStatus(mSetting.mHasEarPhone)
         updateEarPhoneDelay(mSetting.mEarBackDelay)
+    }
+
+    private fun enableDisableView(viewGroup: ViewGroup, enable: Boolean) {
+        for (idx in 0 until viewGroup.childCount) {
+            viewGroup.getChildAt(idx).isEnabled = enable
+        }
     }
 
     private fun updateEarPhoneStatus(hasEarPhone: Boolean) {
@@ -91,26 +95,29 @@ class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
             if (hasEarPhone) {
                 // 检测到耳机
                 cbSwitch.isEnabled = true
+                cbSwitch.alpha = 1.0f
                 cbSwitch.isChecked = mSetting.mEarBackEnable
                 cbSwitch.setOnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
                     mSetting.mEarBackEnable = isChecked
                     if (isChecked) {
-                        vSettingMark.visibility = View.INVISIBLE
-                        vPingMark.visibility = View.INVISIBLE
+                        enableDisableView(layoutEarBackVol,true)
+                        layoutEarBackVol.alpha = 1.0f
                     } else {
-                        vSettingMark.visibility = View.VISIBLE
-                        vPingMark.visibility = View.VISIBLE
-                        vSettingMark.setOnClickListener { v: View? -> }
+                        enableDisableView(layoutEarBackVol,false)
+                        layoutEarBackVol.alpha = 0.3f
                     }
                 }
-                tvTips.visibility = View.VISIBLE
-                tvTipsNoEarPhone.visibility = View.INVISIBLE
+                tvTips1.visibility = View.VISIBLE
+                tvTips2.visibility = View.VISIBLE
+                tvTipsNoEarPhone.visibility = View.GONE
             } else {
                 // 未检测到耳机
                 cbSwitch.isEnabled = false
+                cbSwitch.alpha = 0.3f
                 mSetting.mEarBackEnable = false
                 cbSwitch.isChecked = false
-                tvTips.visibility = View.INVISIBLE
+                tvTips1.visibility = View.GONE
+                tvTips2.visibility = View.GONE
                 tvTipsNoEarPhone.visibility = View.VISIBLE
             }
         }
@@ -141,33 +148,31 @@ class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
         if (earBackVolume > 100) earBackVolume = 100
         if (earBackVolume < 0) earBackVolume = 0
         mSetting.mEarBackVolume = earBackVolume
-        binding.sbEarBack.progress = earBackVolume
+        binding?.apply {
+            sbEarBack.progress = earBackVolume
+        }
     }
 
     private fun showSwitchEarModeDialog(mode: EarBackMode) {
-        val cxt = context ?: return
+        val context = context ?: return
         if (switchEarModeDialog == null) {
-            switchEarModeDialog = CommonDialog(cxt).apply {
+            switchEarModeDialog = CommonDialog(context).apply {
                 setDialogTitle(getString(R.string.cantata_notice))
                 if (mode == EarBackMode.OpenSL) {
-                    setDescText(getString(R.string.cantata_ear_back_opensl))
+                    setDescText(getString(R.string.cantata_earback_opensl_tips))
                 } else if (mode == EarBackMode.Oboe) {
-                    setDescText(getString(R.string.cantata_ear_back_oboe))
+                    setDescText(getString(R.string.cantata_earback_oboe_tips))
                 }
-                setDialogBtnText(
-                    getString(R.string.cantata_cancel),
-                    getString(R.string.cantata_confirm)
-                )
+                setDialogBtnText(getString(R.string.cantata_cancel), getString(R.string.cantata_confirm))
                 onButtonClickListener = object : OnButtonClickListener {
                     override fun onLeftButtonClick() {
                         this@EarBackFragment.binding?.apply {
                             when (mSetting.mEarBackMode) {
-                                EarBackMode.Auto -> rgMode.check(R.id.tvModeAuto)
-                                EarBackMode.OpenSL -> rgMode.check(R.id.tvModeOpenSL)
-                                else -> rgMode.check(R.id.tvModeOboe)
+                                EarBackMode.Auto -> rgEarBackMode.check(R.id.tvModeAuto)
+                                EarBackMode.OpenSL -> rgEarBackMode.check(R.id.tvModeOpenSL)
+                                else -> rgEarBackMode.check(R.id.tvModeOboe)
                             }
                         }
-
                     }
 
                     override fun onRightButtonClick() {
@@ -175,15 +180,11 @@ class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
                     }
                 }
             }
-
         }
         switchEarModeDialog?.show()
     }
 }
 
-/**
- * 耳返设置 callback
- */
 interface EarPhoneCallback {
     fun onHasEarPhoneChanged(hasEarPhone: Boolean)
     fun onEarMonitorDelay(earsBackDelay: Int)
