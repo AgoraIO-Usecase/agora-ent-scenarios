@@ -25,18 +25,18 @@ import io.agora.scene.base.utils.LiveDataUtils
 import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataActivityRoomLivingBinding
+import io.agora.scene.cantata.debugSettings.CantataDebugSettingsDialog
+import io.agora.scene.cantata.live.fragmentdialog.ChorusSingerDialog
+import io.agora.scene.cantata.live.fragmentdialog.MusicSettingDialog
+import io.agora.scene.cantata.live.listener.LrcActionListenerImpl
+import io.agora.scene.cantata.live.listener.SongActionListenerImpl
 import io.agora.scene.cantata.service.JoinRoomOutputModel
 import io.agora.scene.cantata.service.RoomSeatModel
 import io.agora.scene.cantata.service.RoomSelSongModel
 import io.agora.scene.cantata.service.ScoringAlgoControlModel
 import io.agora.scene.cantata.widget.CantataCommonDialog
-import io.agora.scene.cantata.debugSettings.CantataDebugSettingsDialog
-import io.agora.scene.cantata.live.fragmentdialog.ChorusSingerDialog
-import io.agora.scene.cantata.live.fragmentdialog.MusicSettingDialog
-import io.agora.scene.cantata.live.listener.LrcActionListenerImpl
 import io.agora.scene.cantata.widget.OnClickJackingListener
 import io.agora.scene.cantata.widget.lrcView.LrcControlView
-import io.agora.scene.cantata.live.listener.SongActionListenerImpl
 import io.agora.scene.cantata.widget.song.SongDialog
 import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
@@ -424,6 +424,8 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             mMainHandler.removeMessages(ROOM_NO_SONGS_WHAT)
         }
         CantataLogger.d(TAG, "onMusicChanged called")
+        hideMusicSettingDialog()
+
         //mRoomLivingViewModel.resetMusicStatus()
         binding.lrcControlView.setMusic(music)
         if (UserManager.getInstance().user.id.toString() == music.userNo) {
@@ -584,9 +586,16 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
     }
 
+    private fun hideMusicSettingDialog() {
+        musicSettingDialog?.let {
+            it.dismiss()
+            musicSettingDialog = null
+        }
+    }
+
     fun closeMusicSettingsDialog() {
         setDarkStatusIcon(isBlackDarkStatus)
-        musicSettingDialog?.dismiss()
+        hideMusicSettingDialog()
     }
 
     // 切歌

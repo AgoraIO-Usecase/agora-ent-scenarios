@@ -704,10 +704,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         if (voiceHighlightDialog != null) {
             voiceHighlightDialog.reset();
         }
-        if (musicSettingDialog != null) {
-            musicSettingDialog.dismiss();
-            musicSettingDialog = null;
-        }
+        hideMusicSettingDialog();
 
         getBinding().lrcControlView.setMusic(music);
         if (UserManager.getInstance().getUser().id.toString().equals(music.getUserNo())) {
@@ -718,14 +715,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         roomLivingViewModel.resetMusicStatus();
         roomLivingViewModel.musicStartPlay(music);
         mRoomSpeakerAdapter.notifyDataSetChanged();
-    }
-
-
-    public void closeMenuDialog() {
-        setDarkStatusIcon(isBlackDarkStatus());
-        if (musicSettingDialog != null) {
-            musicSettingDialog.dismiss();
-        }
     }
 
     private LinkedHashMap<Integer, String> filterSongTypeMap(LinkedHashMap<Integer, String> typeMap) {
@@ -853,9 +842,16 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         musicSettingDialog.show(getSupportFragmentManager(), MusicSettingDialog.TAG);
     }
 
+    private void hideMusicSettingDialog() {
+        if (musicSettingDialog != null) {
+            musicSettingDialog.dismiss();
+        }
+        musicSettingDialog = null;
+    }
+
     public void closeMusicSettingsDialog() {
         setDarkStatusIcon(isBlackDarkStatus());
-        musicSettingDialog.dismiss();
+        hideMusicSettingDialog();
     }
 
     private CommonDialog changeMusicDialog;
