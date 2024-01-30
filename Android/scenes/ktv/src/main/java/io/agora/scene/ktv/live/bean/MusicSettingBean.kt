@@ -65,7 +65,6 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
      */
     var mEarBackEnable: Boolean = false
         set(newValue) {
-            if (field == newValue) return
             field = newValue
             mSettingCallback.onEarChanged(newValue)
         }
@@ -95,7 +94,6 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
      */
     var mHasEarPhone = false
         set(newValue) {
-            if (field == newValue) return
             field = newValue
             mEarPhoneCallback?.onHasEarPhoneChanged(newValue)
         }
