@@ -168,7 +168,7 @@
             android:contentDescription="@string/cantata_earback_volume"
             android:max="100"
             android:progress="100"
-            android:progressDrawable="@drawable/cantata_bg_seekbar_progress"
+            android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
             android:thumb="@mipmap/ic_seekbar_btn" />
 
         <ImageButton

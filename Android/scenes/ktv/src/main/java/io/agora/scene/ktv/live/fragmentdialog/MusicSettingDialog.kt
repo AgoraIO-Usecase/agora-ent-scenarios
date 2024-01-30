@@ -103,7 +103,7 @@ class MusicSettingDialog constructor(
             }
         }
 
-        mBinding.ivBackIcon.setOnClickListener { view -> (requireActivity() as RoomLivingActivity).closeMenuDialog() }
+        mBinding.ivBackIcon.setOnClickListener { view -> (requireActivity() as RoomLivingActivity).closeMusicSettingsDialog() }
         // 耳返
         if (mSetting.mEarBackEnable) {
             mBinding.switchEar.text = getString(R.string.ktv_open)

@@ -1309,7 +1309,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         // 标记歌曲为播放中
         mCantataServiceProtocol.makeSongDidPlay(music) { e: java.lang.Exception? ->
             e?.message?.let { // failure
-                CustomToast.show(it)
+                CantataLogger.d(TAG, it)
             }
         }
     }
