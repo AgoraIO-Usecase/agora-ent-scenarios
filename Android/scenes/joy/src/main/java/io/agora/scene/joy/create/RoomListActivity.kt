@@ -55,7 +55,7 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
             TokenGenerator.TokenGeneratorType.token007,
             TokenGenerator.AgoraTokenType.rtc,
             success = {
-                JoyLogger.d(TAG, "generateToken success：$it， uid：$localUId")
+                JoyLogger.d(TAG, "generateToken success uid：$localUId")
                 RtcEngineInstance.setupGeneralToken(it)
                 success.invoke()
             },
