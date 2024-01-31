@@ -177,20 +177,25 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
     private fun call(user: UserInfo) {
         permissionHelp.checkCameraAndMicPerms({
-            showCallSendDialog(user)
-            // 主叫播放来点秀
-            CallServiceManager.instance.playCallShow(CallServiceManager.urls[Random.nextInt(CallServiceManager.urls.size)])
-            CallServiceManager.instance.playCallMusic(CallServiceManager.callMusic)
             // 准备工作
-            CallServiceManager.instance.startupCallApiIfNeed()
-            // 拨打
-            CallServiceManager.instance.callApi?.call(user.userId.toInt()) { error ->
-                if (error != null) {
-                    finishCallDialog()
-                    CallServiceManager.instance.stopCallShow()
-                    CallServiceManager.instance.stopCallMusic()
+            CallServiceManager.instance.prepareForCall {
+                // 拨打
+                CallServiceManager.instance.callApi?.call(user.userId.toInt()) { error ->
+                    if (error != null) {
+                        finishCallDialog()
+                        CallServiceManager.instance.stopCallShow()
+                        CallServiceManager.instance.stopCallMusic()
+                    }
                 }
             }
+//            // 拨打
+//            CallServiceManager.instance.callApi?.call(user.userId.toInt()) { error ->
+//                if (error != null) {
+//                    finishCallDialog()
+//                    CallServiceManager.instance.stopCallShow()
+//                    CallServiceManager.instance.stopCallMusic()
+//                }
+//            }
         }, {
             PermissionLeakDialog(this).show("", { getPermissions() }
             ) { launchAppSetting(Manifest.permission.CAMERA) }
@@ -231,6 +236,16 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
 
     private var isFirstEnterScene = true
+
+    override fun onCallError(
+        errorEvent: CallErrorEvent,
+        errorType: CallErrorCodeType,
+        errorCode: Int,
+        message: String?
+    ) {
+        super.onCallError(errorEvent, errorType, errorCode, message)
+        Pure1v1Logger.d(tag, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
+    }
 
     // 监听 callapi 内的状态变化驱动业务行为
     override fun onCallStateChanged(
@@ -274,8 +289,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     dialog.setListener(object : CallReceiveDialog.CallReceiveDialogListener {
                         override fun onReceiveViewDidClickAccept() { // 点击接通
                             Pure1v1Logger.d(tag, "local pic debug log 1")
-                            val rtcToken = CallServiceManager.instance.mPrepareConfig?.rtcToken
-                            if (rtcToken != null) {
+                            if (CallServiceManager.instance.rtcToken != "") {
                                 Pure1v1Logger.d(tag, "local pic debug log 2")
                                 CallServiceManager.instance.callApi?.accept(fromUserId) {}
                             }
@@ -300,6 +314,11 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     CallServiceManager.instance.connectedChannelId = fromRoomId
                     val user = dataList.firstOrNull { it.userId == toUserId.toString() } ?: return
                     CallServiceManager.instance.remoteUser = user
+
+                    // 主叫显示来电秀UI
+                    CallServiceManager.instance.playCallShow(CallServiceManager.urls[Random.nextInt(CallServiceManager.urls.size)])
+                    CallServiceManager.instance.playCallMusic(CallServiceManager.callMusic)
+                    showCallSendDialog(user)
                 }
             }
             CallStateType.Connecting -> {
@@ -324,7 +343,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 // TODO bug CallServiceManager.instance.rtcEngine?.stopAudioMixing()
             }
             CallStateType.Prepared -> {
-                when(stateReason) {
+                when (stateReason) {
                     CallStateReason.RemoteHangup -> {
                         Toast.makeText(this, getText(R.string.pure1v1_call_toast_hangup), Toast.LENGTH_SHORT).show()
                     }
@@ -341,7 +360,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 }
                 CallServiceManager.instance.remoteUser = null
                 CallServiceManager.instance.connectedChannelId = null
-                CallServiceManager.instance.resetAcceptCallToken()
                 finishCallDialog()
                 binding.flCallContainer.visibility = View.INVISIBLE
 
@@ -359,7 +377,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 Toast.makeText(this, eventReason, Toast.LENGTH_SHORT).show()
                 CallServiceManager.instance.remoteUser = null
                 CallServiceManager.instance.connectedChannelId = null
-                CallServiceManager.instance.resetAcceptCallToken()
                 finishCallDialog()
 
                 // 停止来点秀视频和铃声

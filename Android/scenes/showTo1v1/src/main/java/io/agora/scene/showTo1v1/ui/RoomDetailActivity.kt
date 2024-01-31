@@ -299,7 +299,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         }
         val drawable = ContextCompat.getDrawable(this, resourceId)
         Glide.with(this).load(drawable).into(binding.ivRoomCover)
-        val fragment = DashboardFragment.newInstance(mRoomInfo)
+        val fragment = DashboardFragment.newInstance(mRoomInfo, mShowTo1v1Manger.mConnectedChannelId)
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         fragmentTransaction.add(binding.flDashboard.id, fragment)
         fragmentTransaction.commit()
@@ -780,6 +780,16 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
         }
 
+        override fun onCallError(
+            errorEvent: CallErrorEvent,
+            errorType: CallErrorCodeType,
+            errorCode: Int,
+            message: String?
+        ) {
+            super.onCallError(errorEvent, errorType, errorCode, message)
+            ShowTo1v1Logger.d(TAG, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
+        }
+
         override fun onCallStateChanged(
             state: CallStateType,
             stateReason: CallStateReason,
@@ -795,13 +805,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     when (stateReason) {
                         CallStateReason.RemoteHangup -> {
                             ToastUtils.showToast(R.string.show_to1v1_end_linking_tips)
-                            // 关闭鉴黄鉴暴
-                            mShowTo1v1Manger.mRemoteUser?.let {
-                                val channelId = it.get1v1ChannelId()
-                                val localUid = mShowTo1v1Manger.mCurrentUser.userId.toInt()
-                                enableContentInspectEx(false, RtcConnection(channelId, localUid))
-                            }
-
                             if (mCallConnected && !isRoomOwner) {
                                 onBackPressed()
                             }
@@ -862,13 +865,14 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 CallStateType.Connected -> {
                     finishCallDialog()
                     // 开启鉴黄鉴暴
-                    val channelId = mShowTo1v1Manger.mRemoteUser?.get1v1ChannelId() ?: ""
+                    val channelId = mShowTo1v1Manger.mConnectedChannelId ?: ""
                     val localUid = mShowTo1v1Manger.mCurrentUser.userId.toInt()
+
+                    // 视频鉴定
                     enableContentInspectEx(true, RtcConnection(channelId, localUid))
-                    val channelName = mShowTo1v1Manger.mConnectedChannelId ?: return
-                    val uid = mShowTo1v1Manger.mCurrentUser.userId.toLong()
+                    // 语音鉴定
                     AudioModeration.moderationAudio(
-                        channelName, uid, AudioModeration.AgoraChannelType.broadcast,
+                        channelId, localUid.toLong(), AudioModeration.AgoraChannelType.broadcast,
                         "ShowTo1v1"
                     )
                 }
@@ -919,6 +923,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
 
             CallStateType.Connected -> {
+                mShowTo1v1Manger.mConnectedChannelId?.let {
+                    mDashboardFragment?.renewCallChannel(it)
+                }
                 mTimeLinkAt = TimeUtils.currentTimeMillis()
                 if (exchanged) {
                     binding.vDragBigWindow.setSmallType(true)
