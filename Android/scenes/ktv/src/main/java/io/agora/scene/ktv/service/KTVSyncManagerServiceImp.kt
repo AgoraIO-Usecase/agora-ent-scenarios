@@ -604,7 +604,7 @@ class KTVSyncManagerServiceImp(
             return
         }
         if (targetSong.status == RoomSelSongModel.STATUS_PLAYING) {
-            completion.invoke(RuntimeException("The song is playing now!"))
+            completion.invoke(null)
             return
         }
 
