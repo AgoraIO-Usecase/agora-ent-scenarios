@@ -136,7 +136,6 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
         window.decorView.keepScreenOn = true
         setOnApplyWindowInsetsListener(binding.superLayout)
-        mRoomLivingViewModel.setLrcView(binding.lrcControlView)
 
         binding.lrcControlView.mRole = LrcControlView.Role.Listener
         binding.lrcControlView.post {
@@ -144,9 +143,11 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             if (mRoomLivingViewModel.isRoomOwner()) {
                 toggleSelfAudio(true, callback = {
                     mRoomLivingViewModel.initViewModel()
+                    mRoomLivingViewModel.setLrcView(binding.lrcControlView)
                 })
             } else {
                 mRoomLivingViewModel.initViewModel()
+                mRoomLivingViewModel.setLrcView(binding.lrcControlView)
             }
         }
         mRoomLivingViewModel.mRoomInfoLiveData.value?.apply {
