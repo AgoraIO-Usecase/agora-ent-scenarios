@@ -325,24 +325,28 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
     }
 
     // ------------------ ILrcView ------------------
-    override fun onUpdatePitch(pitch: Float) {
-        karaokeView?.setPitch(pitch)
+    override fun onUpdatePitch(pitch: Float?) {
+        pitch?.let {
+            karaokeView?.setPitch(it)
+        }
     }
 
-    override fun onUpdateProgress(progress: Long) {
-        karaokeView?.apply {
-            if (lyricsData == null) return
-            if (mRole == Role.Singer) {
-                if (progress >= lyricsData.startOfVerse - 2000) {
-                    mBinding.ilActive.ivSkipPrelude.visibility = INVISIBLE
+    override fun onUpdateProgress(progress: Long?) {
+        progress?.let {
+            karaokeView?.apply {
+                if (lyricsData == null) return
+                if (mRole == Role.Singer) {
+                    if (it >= lyricsData.startOfVerse - 2000) {
+                        mBinding.ilActive.ivSkipPrelude.visibility = INVISIBLE
+                    }
+                    if (it >= lyricsData.duration) {
+                        mBinding.ilActive.ivSkipPostlude.visibility = VISIBLE
+                    } else {
+                        mBinding.ilActive.ivSkipPostlude.visibility = INVISIBLE
+                    }
                 }
-                if (progress >= lyricsData.duration) {
-                    mBinding.ilActive.ivSkipPostlude.visibility = VISIBLE
-                } else {
-                    mBinding.ilActive.ivSkipPostlude.visibility = INVISIBLE
-                }
+                setProgress(it)
             }
-            setProgress(progress)
         }
     }
 
