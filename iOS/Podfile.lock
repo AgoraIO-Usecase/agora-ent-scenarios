@@ -25,7 +25,6 @@ PODS:
   - CallAPI (0.1.0):
     - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS (= 2.1.4)
-  - FLAnimatedImage (1.0.17)
   - Joy (0.1.0):
     - AgoraRtcEngine_Special_iOS
     - AgoraSyncManager
@@ -48,36 +47,12 @@ PODS:
   - Masonry (1.1.0)
   - MJRefresh (3.7.6)
   - Protobuf (3.22.1)
-  - Pure1v1 (0.1.0):
-    - AgoraSyncManager
-    - CallAPI
-    - FLAnimatedImage
-    - SDWebImage
-    - SDWebImage/GIF
-    - SnapKit
-    - SwiftyBeaver
-    - YYCategories
-    - YYModel
   - ScoreEffectUI (1.0.2)
   - SDWebImage (4.4.8):
     - SDWebImage/Core (= 4.4.8)
   - SDWebImage/Core (4.4.8)
-  - SDWebImage/GIF (4.4.8):
-    - FLAnimatedImage (~> 1.0)
-    - SDWebImage/Core
   - SDWebImageAPNGCoder (0.1.1):
     - SDWebImage/Core (~> 4.2)
-  - ShowTo1v1 (0.1.0):
-    - AgoraSyncManager
-    - CallAPI
-    - FLAnimatedImage
-    - SDWebImage
-    - SDWebImage/GIF
-    - SnapKit
-    - SwiftyBeaver
-    - VideoLoaderAPI
-    - YYCategories
-    - YYModel
   - SnapKit (5.6.0)
   - SocketRocket (0.7.0)
   - SSZipArchive (2.4.3)
@@ -118,11 +93,9 @@ DEPENDENCIES:
   - Masonry (= 1.1.0)
   - MJRefresh
   - Protobuf (= 3.22.1)
-  - Pure1v1 (from `AgoraEntScenarios/Scenes/Pure1v1`)
   - ScoreEffectUI (= 1.0.2)
   - SDWebImage (= 4.4.8)
   - SDWebImageAPNGCoder
-  - ShowTo1v1 (from `AgoraEntScenarios/Scenes/ShowTo1v1`)
   - SnapKit
   - SocketRocket (= 0.7.0)
   - SVGAPlayer
@@ -144,7 +117,6 @@ SPEC REPOS:
     - AgoraRtm_iOS
     - AgoraSyncManager
     - Bugly
-    - FLAnimatedImage
     - JXCategoryView
     - KakaJSON
     - LEEAlert
@@ -173,10 +145,6 @@ EXTERNAL SOURCES:
     :path: AgoraEntScenarios/Common/API/CallAPI
   Joy:
     :path: AgoraEntScenarios/Scenes/Joy
-  Pure1v1:
-    :path: AgoraEntScenarios/Scenes/Pure1v1
-  ShowTo1v1:
-    :path: AgoraEntScenarios/Scenes/ShowTo1v1
   VideoLoaderAPI:
     :path: AgoraEntScenarios/Common/API/VideoLoaderAPI
 
@@ -190,7 +158,6 @@ SPEC CHECKSUMS:
   AgoraSyncManager: 4e2f2e64db24dd0839e12a64b475c7e094347dd2
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   CallAPI: f40f9694c310b613f20958fabdbe69f8bc1d6ca5
-  FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   Joy: 3deda8672a197f760ba6c840c8c20657a5278df3
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
@@ -200,11 +167,9 @@ SPEC CHECKSUMS:
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MJRefresh: 2fe7fb43a5167ceda20bb7e63f130c04fd1814a5
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
-  Pure1v1: a29e30be7dfe87afdda85cfd5b8845e719c29d3f
   ScoreEffectUI: bf1195b4d41a73d43c236450b5d7f958989844aa
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
-  ShowTo1v1: 4da6561d6f12576ce61d05add891595d18bc08d0
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
@@ -218,6 +183,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: eef7ecee0c52e8089bdcfbefa11c9e93728ebbde
+PODFILE CHECKSUM: 2f802ae56a54521a8465e57553cff251eb769963
 
 COCOAPODS: 1.12.1

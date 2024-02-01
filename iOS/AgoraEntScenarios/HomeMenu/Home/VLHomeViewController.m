@@ -12,8 +12,8 @@
 #import "VLToast.h"
 #import "VLSBGOnLineListVC.h"
 
-@import Pure1v1;
-@import ShowTo1v1;
+//@import Pure1v1;
+//@import ShowTo1v1;
 @import Joy;
 
 @interface VLHomeViewController ()<VLHomeViewDelegate>

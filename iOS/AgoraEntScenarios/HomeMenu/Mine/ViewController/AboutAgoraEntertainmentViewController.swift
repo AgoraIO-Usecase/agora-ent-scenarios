@@ -16,17 +16,20 @@ import AgoraRtcKit
                               ["title": NSLocalizedString("app_about_official_website", comment: ""),
                                "detail":"https://www.shengwang.cn"]],
                   "sectionName": ""],
-                 ["contents": [["title": NSLocalizedString("app_voice_chat", comment: ""), "detail":"YL-2.1.0"],
-                               ["title": NSLocalizedString("app_about_chat_room_spatial", comment: ""), "detail":"YLKJ-2.1.0"],
-                               ["title": NSLocalizedString("app_about_karaoke", comment: ""),"detail":"KTV-2.3.0"],
-                               ["title": NSLocalizedString("app_about_show", comment: ""), "detail":"ZB-2.4.0"],
-                               ["title": NSLocalizedString("app_about_1v1", comment: ""), "detail":"1V1-3.6.0"],
-                               ["title": NSLocalizedString("app_about_live_to_1v1", comment: ""), "detail":"LiveTo1V1-3.7.0"]],
+                 ["contents": [
+//                    ["title": NSLocalizedString("app_voice_chat", comment: ""), "detail":"YL-2.1.0"],
+//                    ["title": NSLocalizedString("app_about_chat_room_spatial", comment: ""), "detail":"YLKJ-2.1.0"],
+//                    ["title": NSLocalizedString("app_about_karaoke", comment: ""),"detail":"KTV-2.3.0"],
+//                    ["title": NSLocalizedString("app_about_show", comment: ""), "detail":"ZB-2.4.0"],
+//                    ["title": NSLocalizedString("app_about_1v1", comment: ""), "detail":"1V1-3.6.0"],
+//                    ["title": NSLocalizedString("app_about_live_to_1v1", comment: ""), "detail":"LiveTo1V1-3.7.0"]
+                    ["title": NSLocalizedString("app_about_live_to_joy", comment: ""), "detail":"Joy-4.10.0"]
+                              ],
                   "sectionName": NSLocalizedString("app_mine_current_version", comment: "")]]
     
     let tableHeader = AboutAgoraHeader(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 220),
                                        name: NSLocalizedString("app_about_name", comment: ""),
-                                       versionText: NSLocalizedString("app_about_version", comment: "")+": "+"20230928-"+UIDevice.current.appVersion+"-\(AgoraRtcEngineKit.getSdkVersion())")
+                                       versionText: NSLocalizedString("app_about_version", comment: "")+": "+"20240201-"+UIDevice.current.appVersion+"-\(AgoraRtcEngineKit.getSdkVersion())")
     
     lazy var infoList: UITableView = {
         UITableView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: ScreenHeight-ZNavgationHeight), style: .plain)

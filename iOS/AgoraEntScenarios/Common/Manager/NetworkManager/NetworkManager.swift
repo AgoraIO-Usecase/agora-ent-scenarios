@@ -451,7 +451,7 @@ extension NetworkManager {
                       "src": src,
                       "ts": ts,
                       "sign": "src=\(src)&ts=\(ts)".md5Encrypt] as [String: Any]
-        let url = "https://report-ad.agoralab.co/v1/report"
+        let url = "https://report-ad.shengwang.cn/v1/report"
         NetworkManager.shared.postRequest(urlString: url,
                                           params: params,
                                           success: { response in
