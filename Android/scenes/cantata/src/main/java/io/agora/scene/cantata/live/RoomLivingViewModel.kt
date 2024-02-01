@@ -1039,6 +1039,10 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         mRtcEngine?.loadExtensionProvider("agora_drm_loader")
 
         // ------------------ 场景化api初始化 ------------------
+        KTVApi.debugMode = AgoraApplication.the().isDebugModeOpen
+        if (AgoraApplication.the().isDebugModeOpen) {
+            KTVApi.mccDomain = "api-test.agora.io"
+        }
         mKtvApi = createKTVGiantChorusApi(
             KTVGiantChorusApiConfig(
                 BuildConfig.AGORA_APP_ID,
