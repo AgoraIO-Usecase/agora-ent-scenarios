@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,18 +29,17 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 
-import java.io.File;
-import java.util.List;
-
 import io.agora.karaoke_view.v11.KaraokeEvent;
 import io.agora.karaoke_view.v11.KaraokeView;
 import io.agora.karaoke_view.v11.LyricsView;
 import io.agora.karaoke_view.v11.ScoringView;
+import io.agora.karaoke_view.v11.constants.DownloadError;
+import io.agora.karaoke_view.v11.downloader.LyricsFileDownloader;
+import io.agora.karaoke_view.v11.downloader.LyricsFileDownloaderCallback;
 import io.agora.karaoke_view.v11.model.LyricsLineModel;
 import io.agora.karaoke_view.v11.model.LyricsModel;
 import io.agora.scene.base.GlideApp;
-import io.agora.scene.base.utils.DownloadUtils;
-import io.agora.scene.base.utils.ZipUtils;
+import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
@@ -655,76 +653,37 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     private void downloadAndSetLrcData() {
-        DownloadUtils.getInstance().download(getContext(), lrcUrl, file -> {
-            if (file.getName().endsWith(".zip")) {
-                ZipUtils.unzipOnlyPlainXmlFilesAsync(file.getAbsolutePath(),
-                        file.getAbsolutePath().replace(".zip", ""),
-                        new ZipUtils.UnZipCallback() {
-                            @Override
-                            public void onFileUnZipped(List<String> unZipFilePaths) {
-                                String xmlPath = "";
-                                for (String path : unZipFilePaths) {
-                                    if (path.endsWith(".xml")) {
-                                        xmlPath = path;
-                                        break;
-                                    }
-                                }
+        Context context = AgoraApplication.the();
+        LyricsFileDownloader.getInstance(context).setLyricsFileDownloaderCallback(new LyricsFileDownloaderCallback() {
+            @Override
+            public void onLyricsFileDownloadProgress(int requestId, float progress) {
 
-                                if (TextUtils.isEmpty(xmlPath)) {
-                                    CustomToast.show("The xml file not exist!", Toast.LENGTH_SHORT);
-                                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
-                                    mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
-                                    return;
-                                }
+            }
 
-                                File xmlFile = new File(xmlPath);
-                                LyricsModel lyricsModel = KaraokeView.parseLyricsData(xmlFile);
-
-                                if (lyricsModel == null) {
-                                    CustomToast.show("Unexpected content from " + xmlPath, Toast.LENGTH_SHORT);
-                                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
-                                    mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
-                                    return;
-                                }
-
-                                if (mKaraokeView != null) {
-                                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
-                                    mKaraokeView.setLyricsData(lyricsModel);
-                                }
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-                                mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
-                                mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
-                                if (e.getMessage()!=null){
-                                    CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
-                                }
-                            }
-                        });
-            } else {
-                LyricsModel lyricsModel = KaraokeView.parseLyricsData(file);
-
-                if (lyricsModel == null) {
-                    CustomToast.show("Unexpected content from " + file, Toast.LENGTH_SHORT);
+            @Override
+            public void onLyricsFileDownloadCompleted(int requestId, byte[] fileData, DownloadError error) {
+                if (error == null) {
+                    LyricsModel lyricsModel = KaraokeView.parseLyricsData(fileData);
+                    if (lyricsModel == null) {
+                        CustomToast.show("Unexpected parseLyricsData", Toast.LENGTH_SHORT);
+                        mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
+                        mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
+                        return;
+                    }
+                    if (mKaraokeView != null) {
+                        mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
+                        mKaraokeView.setLyricsData(lyricsModel);
+                    }
+                } else {
+                    if (error.getMessage() != null) {
+                        CustomToast.show(error.getMessage(), Toast.LENGTH_SHORT);
+                    }
                     mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
                     mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
-                    return;
-                }
-
-                if (mKaraokeView != null) {
-                    mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
-                    mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.INVISIBLE);
-                    mKaraokeView.setLyricsData(lyricsModel);
                 }
             }
-        }, exception -> {
-            if (exception.getMessage() != null) {
-                CustomToast.show(exception.getMessage(), Toast.LENGTH_SHORT);
-            }
-            mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
-            mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
         });
+        LyricsFileDownloader.getInstance(context).download(lrcUrl);
     }
 
     public void onNoLrc() {
