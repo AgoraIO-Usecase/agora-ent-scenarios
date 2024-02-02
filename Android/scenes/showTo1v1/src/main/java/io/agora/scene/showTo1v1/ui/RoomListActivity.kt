@@ -264,7 +264,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             updateListView()
             resetViewpage()
             initOrUpdateViewPage()
-            ToastUtils.showToast(R.string.show_to1v1_room_list_refreshed)
+            //ToastUtils.showToast(R.string.show_to1v1_room_list_refreshed)
             mayShowGuideView()
             if (roomList.isNotEmpty()) {
                 binding.viewPager2.setCurrentItem(0, false)
