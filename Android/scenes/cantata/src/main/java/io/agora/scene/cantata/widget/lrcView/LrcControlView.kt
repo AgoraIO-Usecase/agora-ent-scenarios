@@ -14,10 +14,11 @@ import androidx.palette.graphics.Palette
 import io.agora.karaoke_view.v11.KaraokeEvent
 import io.agora.karaoke_view.v11.KaraokeView
 import io.agora.karaoke_view.v11.LyricsView
+import io.agora.karaoke_view.v11.constants.DownloadError
+import io.agora.karaoke_view.v11.downloader.LyricsFileDownloader
+import io.agora.karaoke_view.v11.downloader.LyricsFileDownloaderCallback
 import io.agora.karaoke_view.v11.model.LyricsLineModel
-import io.agora.scene.base.utils.DownloadUtils
-import io.agora.scene.base.utils.ZipUtils
-import io.agora.scene.base.utils.ZipUtils.UnZipCallback
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataLayoutLrcControlViewBinding
 import io.agora.scene.cantata.databinding.CantataLayoutLrcPrepareBinding
@@ -27,7 +28,6 @@ import io.agora.scene.cantata.service.RoomSelSongModel
 import io.agora.scene.cantata.widget.OnClickJackingListener
 import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.UiUtils
-import java.io.File
 import java.text.DecimalFormat
 import java.text.NumberFormat
 
@@ -359,69 +359,34 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
     }
 
     private fun downloadAndSetLrcData() {
-        DownloadUtils.getInstance().download(context, lrcUrl, { file: File ->
-            if (file.name.endsWith(".zip")) {
-                ZipUtils.unzipOnlyPlainXmlFilesAsync(file.absolutePath,
-                    file.absolutePath.replace(".zip", ""),
-                    object : UnZipCallback {
-                        override fun onFileUnZipped(unZipFilePaths: List<String>) {
-                            var xmlPath = ""
-                            for (path in unZipFilePaths) {
-                                if (path.endsWith(".xml")) {
-                                    xmlPath = path
-                                    break
-                                }
-                            }
-                            if (TextUtils.isEmpty(xmlPath)) {
-                                CustomToast.show("The xml file not exist!")
-                                mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
-                                mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
-                                return
-                            }
-                            val xmlFile = File(xmlPath)
-                            val lyricsModel = KaraokeView.parseLyricsData(xmlFile)
-                            if (lyricsModel == null) {
-                                CustomToast.show("Unexpected content from $xmlPath")
-                                mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
-                                mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
-                                return
-                            }
-                            if (karaokeView != null) {
-                                mBinding.ilActive.downloadLrcFailedView.visibility = INVISIBLE
-                                karaokeView?.lyricsData = lyricsModel
-                            }
-                        }
+        val context: Context = AgoraApplication.the()
+        LyricsFileDownloader.getInstance(context)
+            .setLyricsFileDownloaderCallback(object : LyricsFileDownloaderCallback {
+                override fun onLyricsFileDownloadProgress(requestId: Int, progress: Float) {}
 
-                        override fun onError(e: Exception) {
+                override fun onLyricsFileDownloadCompleted(requestId: Int, fileData: ByteArray, error: DownloadError?) {
+                    if (error == null) {
+                        val lyricsModel = KaraokeView.parseLyricsData(fileData)
+                        if (lyricsModel == null) {
+                            CustomToast.show("Unexpected parseLyricsData")
                             mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
                             mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
-                            e.message?.let {
-                                CustomToast.show(it)
-                            }
-
+                            return
                         }
-                    })
-            } else {
-                val lyricsModel = KaraokeView.parseLyricsData(file)
-                if (lyricsModel == null) {
-                    CustomToast.show("Unexpected content from $file")
-                    mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
-                    mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
-                    return@download
+                        karaokeView?.let {
+                            mBinding.ilActive.downloadLrcFailedView.visibility = INVISIBLE
+                            karaokeView?.lyricsData = lyricsModel
+                        }
+                    } else {
+                        mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
+                        mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
+                        error.message?.let {
+                            CustomToast.show(it)
+                        }
+                    }
                 }
-                karaokeView?.let {
-                    mBinding.ilActive.downloadLrcFailedView.visibility = INVISIBLE
-                    mBinding.ilActive.downloadLrcFailedBtn.visibility = INVISIBLE
-                    it.lyricsData = lyricsModel
-                }
-            }
-        }) { exception: Exception ->
-            exception.message?.let {
-                CustomToast.show(it)
-            }
-            mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
-            mBinding.ilActive.downloadLrcFailedBtn.visibility = VISIBLE
-        }
+            })
+        LyricsFileDownloader.getInstance(context).download(lrcUrl)
     }
 
     fun onNoLrc() {
