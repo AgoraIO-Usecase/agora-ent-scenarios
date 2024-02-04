@@ -10,8 +10,8 @@
 #import "MenuUtils.h"
 #import "AESMacro.h"
 @import YYCategories;
-@import Pure1v1;
-@import ShowTo1v1;
+//@import Pure1v1;
+//@import ShowTo1v1;
 @import Joy;
 
 @interface VLHomeView ()<UICollectionViewDelegate,UICollectionViewDataSource>
