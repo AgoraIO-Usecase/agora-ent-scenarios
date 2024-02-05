@@ -909,6 +909,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     startCallAnimator()
                 }
                 binding.layoutNumCount.isVisible = true
+                binding.ivClose.isVisible = true
                 binding.groupHangup.isVisible = false
                 binding.layoutCallingTop.isVisible = false
                 binding.layoutRoomTop.isVisible = true
@@ -957,6 +958,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
                 binding.layoutRoomTop.isVisible = false
                 binding.layoutNumCount.isVisible = false
+                binding.ivClose.isVisible = false
                 binding.groupHangup.isVisible = true
 
                 if (isRoomOwner) {
