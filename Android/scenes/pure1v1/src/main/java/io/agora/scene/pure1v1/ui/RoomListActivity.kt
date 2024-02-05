@@ -180,6 +180,8 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     private fun call(user: UserInfo) {
         if (callState == CallStateType.Failed) {
             CallServiceManager.instance.reInit()
+        } else if (callState == CallStateType.Calling || callState == CallStateType.Connecting || callState == CallStateType.Connected) {
+            return
         }
         permissionHelp.checkCameraAndMicPerms({
             // 准备工作
