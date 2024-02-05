@@ -76,6 +76,16 @@ class Pure1v1UserPagingListView: UIView {
     func endRefreshing(){
         refreshControl.endRefreshing()
     }
+    
+    func autoRefreshing(){
+        if !refreshControl.isRefreshing {
+            collectionView.setContentOffset(CGPoint(x: 0, y: -refreshControl.aui_height), animated: true)
+            refreshControl.beginRefreshing()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.refreshControl.sendActions(for: .valueChanged)
+            }
+        }
+    }
 }
 /*
 private let kPageCacheHalfCount = 5000

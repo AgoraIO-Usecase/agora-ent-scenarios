@@ -87,7 +87,7 @@ class ShowRoomListVC: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        fetchRoomList()
+        autoRefreshing()
     }
     
     @objc private func didClickCreateButton(){
@@ -139,6 +139,16 @@ class ShowRoomListVC: UIViewController {
                 return
             }
             self.roomList = roomList
+        }
+    }
+    
+   private func autoRefreshing(){
+        if !refreshControl.isRefreshing {
+            collectionView.setContentOffset(CGPoint(x: 0, y: -refreshControl.frame.size.height), animated: true)
+            refreshControl.beginRefreshing()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.refreshControl.sendActions(for: .valueChanged)
+            }
         }
     }
 

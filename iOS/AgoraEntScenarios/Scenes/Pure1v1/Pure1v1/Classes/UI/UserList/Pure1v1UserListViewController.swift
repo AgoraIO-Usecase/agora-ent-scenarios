@@ -76,7 +76,6 @@ class Pure1v1UserListViewController: UIViewController {
         naviBar.backButton.addTarget(self, action: #selector(_backAction), for: .touchUpInside)
         naviBar.refreshButton.addTarget(self, action: #selector(_refreshAction), for: .touchUpInside)
         naviBar.refreshButton.isHidden = true
-        _refreshAction()
         
         listView.localUserInfo = userInfo
         
@@ -89,7 +88,7 @@ class Pure1v1UserListViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        listView.reloadData()
+        _autoRefrshAction()
     }
     
     private func _setupCallApi() {
@@ -191,6 +190,10 @@ extension Pure1v1UserListViewController {
         self.navigationController?.popViewController(animated: true)
     }
     
+    func _autoRefrshAction(){
+        self.listView.autoRefreshing()
+    }
+    
     @objc func _refreshAction() {
         service.enterRoom {[weak self] error in
             if let error = error {
@@ -209,7 +212,9 @@ extension Pure1v1UserListViewController {
                 self.listView.userList = userList
                 self.noDataView.isHidden = userList.count > 0
                 self._showGuideIfNeed()
-                AUIToast.show(text: "user_list_refresh_tips".pure1v1Localization())
+                if error != nil {
+                    AUIToast.show(text: error!.description)
+                }
             }
         }
     }
@@ -277,7 +282,6 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 }
                 if let user = user {
                     callDialog?.hiddenAnimation()
-                    stopRing()
                     let dialog = Pure1v1CalleeDialog.show(user: user)
                     assert(dialog != nil, "dialog = nil")
                     dialog?.acceptClosure = { [weak self] in
@@ -485,7 +489,7 @@ extension Pure1v1UserListViewController {
     // 停止响铃
     private func stopRing(){
         rtcEngine.stopAudioMixing()
-        _refreshAction()
+        _autoRefrshAction()
     }
     
     private func randomVideoURL() -> String {
