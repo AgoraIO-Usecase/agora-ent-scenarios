@@ -138,7 +138,7 @@ class RoomListViewController: UIViewController {
         naviBar.refreshButton.addTarget(self, action: #selector(_refreshAction), for: .touchUpInside)
         naviBar.refreshButton.isHidden = true
 //        naviBar.refreshButton.isHidden = false
-        _refreshAction()
+//        _refreshAction()
         
         
         _setupAPI()
@@ -151,7 +151,11 @@ class RoomListViewController: UIViewController {
         super.viewWillAppear(animated)
 //        videoLoaderApi.cleanCache()
         listView.reloadCurrentItem()
-        _refreshAction()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        _autoRefreshAction()
     }
     
     private func _showGuideIfNeed() {
@@ -281,6 +285,10 @@ extension RoomListViewController {
         self.navigationController?.popViewController(animated: true)
     }
     
+    func _autoRefreshAction(){
+        self.listView.autoRefreshing()
+    }
+    
     @objc func _refreshAction() {
         service.getRoomList {[weak self] list in
             guard let self = self else {return}
@@ -304,7 +312,7 @@ extension RoomListViewController {
             //TODO: 过期
             //self.rtcEngine(self.rtcEngine, tokenPrivilegeWillExpire: "")
             
-            AUIToast.show(text: "room_list_refresh_tips".showTo1v1Localization())
+//            AUIToast.show(text: "room_list_refresh_tips".showTo1v1Localization())
         }
     }
     
