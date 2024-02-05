@@ -178,6 +178,9 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
 
     private fun call(user: UserInfo) {
+        if (callState == CallStateType.Failed) {
+            CallServiceManager.instance.reInit()
+        }
         permissionHelp.checkCameraAndMicPerms({
             // 准备工作
             CallServiceManager.instance.prepareForCall {
@@ -190,14 +193,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     }
                 }
             }
-//            // 拨打
-//            CallServiceManager.instance.callApi?.call(user.userId.toInt()) { error ->
-//                if (error != null) {
-//                    finishCallDialog()
-//                    CallServiceManager.instance.stopCallShow()
-//                    CallServiceManager.instance.stopCallMusic()
-//                }
-//            }
         }, {
             PermissionLeakDialog(this).show("", { getPermissions() }
             ) { launchAppSetting(Manifest.permission.CAMERA) }
