@@ -123,6 +123,16 @@ class CallServiceManager {
         sceneService = null
     }
 
+    fun reInit() {
+        val uid = localUser?.userId ?: return
+        callApi?.initialize(CallConfig(
+            BuildConfig.AGORA_APP_ID,
+            uid.toInt(),
+            rtcEngine,
+            null
+        ))
+    }
+
     /*
      * 获取万能Token并初始化CallAPI
      */
