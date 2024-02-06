@@ -31,12 +31,14 @@ private func agoraPrint(_ message: String) {
     private var startTime: Int = 0
     private var endTime: Int = 0
     private var currentLoadLrcPath: String?
-    private var downloadManager: AgoraDownLoadManager = AgoraDownLoadManager()
+  //  private var downloadManager: AgoraDownLoadManager = AgoraDownLoadManager()
+    private let lrcDownload: LyricsFileDownloader = LyricsFileDownloader()
     @objc init(lrcView: KaraokeView) {
         self.lrcView = lrcView
         super.init()
         lrcView.delegate = self
-        downloadManager.delegate = self
+       // downloadManager.delegate = self
+        lrcDownload.delegate = self
     }
 
     @objc public func getAvgScore() -> Int {
@@ -98,69 +100,85 @@ extension SBGLrcControl: KTVLrcViewDelegate {
 
     func onDownloadLrcData(url: String) {
         //开始歌词下载
-        startDownloadLrc(with: url) {[weak self] url in
-            guard let self = self, let url = url else {return}
-            self.resetLrcData(with: url)
-        }
+//        startDownloadLrc(with: url) {[weak self] url in
+//            guard let self = self, let url = url else {return}
+//            self.resetLrcData(with: url)
+//        }
+        let _ = self.lrcDownload.download(urlString: url)
     }
         
-    func startDownloadLrc(with url: String, callBack: @escaping LyricCallback) {
-        var path: String? = nil
-        downloadManager.downloadLrcFile(urlString: url) { lrcurl in
-            defer {
-                callBack(path)
-            }
-            guard let lrcurl = lrcurl else {
-                agoraPrint("downloadLrcFile fail, lrcurl is nil")
-                return
-            }
-
-            let curSong = URL(string: url)?.lastPathComponent.components(separatedBy: ".").first
-            let loadSong = URL(string: lrcurl)?.lastPathComponent.components(separatedBy: ".").first
-            guard curSong == loadSong else {
-                agoraPrint("downloadLrcFile fail, missmatch, cur:\(curSong ?? "") load:\(loadSong ?? "")")
-                return
-            }
-            path = lrcurl
-        } failure: {
-            callBack(nil)
-            agoraPrint("歌词解析失败")
-        }
-    }
-        
-    func resetLrcData(with url: String) {
-        guard currentLoadLrcPath != url else {
-            return
-        }
-        let musicUrl = URL(fileURLWithPath: url)
-        guard let data = try? Data(contentsOf: musicUrl),
-              let model = KaraokeView.parseLyricData(data: data) else {
-            return
-        }
-        currentLoadLrcPath = url
-        lyricModel = model
-        let lines = model.lines.map({
-            LyricsCutter.Line(beginTime: $0.beginTime, duration: $0.duration)
-        })
-        
-        if let res = LyricsCutter.handleFixTime(startTime: self.startTime, endTime: self.endTime, lines: lines) {
-            self.startTime = res.0
-            self.endTime = res.1
-        }
-        lyricModel = LyricsCutter.cut(model:model, startTime: self.startTime, endTime: self.endTime)
-        totalCount = model.lines.count
-        totalLines = 0
-        totalScore = 0
-        lrcView?.setLyricData(data: model)
-    }
+//    func startDownloadLrc(with url: String, callBack: @escaping LyricCallback) {
+//        var path: String? = nil
+//        downloadManager.downloadLrcFile(urlString: url) { lrcurl in
+//            defer {
+//                callBack(path)
+//            }
+//            guard let lrcurl = lrcurl else {
+//                agoraPrint("downloadLrcFile fail, lrcurl is nil")
+//                return
+//            }
+//
+//            let curSong = URL(string: url)?.lastPathComponent.components(separatedBy: ".").first
+//            let loadSong = URL(string: lrcurl)?.lastPathComponent.components(separatedBy: ".").first
+//            guard curSong == loadSong else {
+//                agoraPrint("downloadLrcFile fail, missmatch, cur:\(curSong ?? "") load:\(loadSong ?? "")")
+//                return
+//            }
+//            path = lrcurl
+//        } failure: {
+//            callBack(nil)
+//            agoraPrint("歌词解析失败")
+//        }
+//    }
+//        
+//    func resetLrcData(with url: String) {
+//        guard currentLoadLrcPath != url else {
+//            return
+//        }
+//        let musicUrl = URL(fileURLWithPath: url)
+//        guard let data = try? Data(contentsOf: musicUrl),
+//              let model = KaraokeView.parseLyricData(data: data) else {
+//            return
+//        }
+//        currentLoadLrcPath = url
+//        lyricModel = model
+//        let lines = model.lines.map({
+//            LyricsCutter.Line(beginTime: $0.beginTime, duration: $0.duration)
+//        })
+//        
+//        if let res = LyricsCutter.handleFixTime(startTime: self.startTime, endTime: self.endTime, lines: lines) {
+//            self.startTime = res.0
+//            self.endTime = res.1
+//        }
+//        lyricModel = LyricsCutter.cut(model:model, startTime: self.startTime, endTime: self.endTime)
+//        totalCount = model.lines.count
+//        totalLines = 0
+//        totalScore = 0
+//        lrcView?.setLyricData(data: model)
+//    }
 }
 
-extension SBGLrcControl: AgoraLrcDownloadDelegate {
-    func downloadLrcFinished(url: String) {
-        agoraPrint("download lrc finished \(url)")
+extension SBGLrcControl: LyricsFileDownloaderDelegate {
+    func onLyricsFileDownloadProgress(requestId: Int, progress: Float) {
+        print("lrc pro:\(progress)")
     }
     
-    func downloadLrcError(url: String, error: Error?) {
-        agoraPrint("download lrc fail \(url): \(String(describing: error))")
+    func onLyricsFileDownloadCompleted(requestId: Int, fileData: Data?, error: AgoraLyricsScore.DownloadError?) {
+        if let data = fileData, let model = KaraokeView.parseLyricData(data: data) {
+            lyricModel = model
+            let lines = model.lines.map({
+                LyricsCutter.Line(beginTime: $0.beginTime, duration: $0.duration)
+            })
+    
+            if let res = LyricsCutter.handleFixTime(startTime: self.startTime, endTime: self.endTime, lines: lines) {
+                self.startTime = res.0
+                self.endTime = res.1
+            }
+            lyricModel = LyricsCutter.cut(model:model, startTime: self.startTime, endTime: self.endTime)
+            totalCount = model.lines.count
+            totalLines = 0
+            totalScore = 0
+            lrcView?.setLyricData(data: model)
+        }
     }
 }

@@ -97,7 +97,7 @@
         imageNamed = @"ktv_score_C";
     }
     VLLog(@"Using as score view %@", imageNamed);
-    _scoreImgView.image = [UIImage sceneImageWithName:imageNamed];
+    _scoreImgView.image = [UIImage dhc_sceneImageWith:imageNamed];
 }
 
 - (void)dismiss {
@@ -118,7 +118,7 @@
 - (UILabel *)scoreLabel {
     if (!_scoreLabel) {
         _scoreLabel = [[UILabel alloc] init];
-        _scoreLabel.text = KTVLocalizedString(@"99");
+        _scoreLabel.text = DHCLocalizedString(@"99");
         _scoreLabel.font = VLUIFontMake(30);
         _scoreLabel.textColor = [UIColor whiteColor];
     }
@@ -128,7 +128,7 @@
 - (UILabel *)scoreTitleLabel {
     if (!_scoreTitleLabel) {
         _scoreTitleLabel = [[UILabel alloc] init];
-        _scoreTitleLabel.text = KTVLocalizedString(@"ktv_score");
+        _scoreTitleLabel.text = DHCLocalizedString(@"ktv_score");
         _scoreTitleLabel.font = VLUIFontMake(14);
         _scoreTitleLabel.textColor = [UIColor whiteColor];
     }
@@ -138,7 +138,7 @@
 - (UIImageView *)starImageView {
     if (!_starImageView) {
         _starImageView = [[UIImageView alloc] init];
-        _starImageView.image = [UIImage sceneImageWithName:@"ktv_score_star"];
+        _starImageView.image = [UIImage dhc_sceneImageWith:@"ktv_score_star"];
     }
     return _starImageView;
 }
@@ -146,7 +146,7 @@
 - (UIImageView *)scoreImgView {
     if (!_scoreImgView) {
         _scoreImgView = [[UIImageView alloc] init];
-        _scoreImgView.image = [UIImage sceneImageWithName:@"ktv_score_S"];
+        _scoreImgView.image = [UIImage dhc_sceneImageWith:@"ktv_score_S"];
     }
     return _scoreImgView;
 }
@@ -154,7 +154,7 @@
 - (UIImageView *)circleLightImageView {
     if (!_circleLightImageView) {
         _circleLightImageView = [[UIImageView alloc] init];
-        _circleLightImageView.image = [UIImage sceneImageWithName:@"ktv_score_topPart"];
+        _circleLightImageView.image = [UIImage dhc_sceneImageWith:@"ktv_score_topPart"];
     }
     return _circleLightImageView;
 }
@@ -162,7 +162,7 @@
 - (UIImageView *)circleImageView {
     if (!_circleImageView) {
         _circleImageView = [[UIImageView alloc] init];
-        _circleImageView.image = [UIImage sceneImageWithName:@"ktv_score_bottomPart"];
+        _circleImageView.image = [UIImage dhc_sceneImageWith:@"ktv_score_bottomPart"];
     }
     return _circleImageView;
 }
@@ -173,7 +173,7 @@
         _confirmButton.layer.cornerRadius = 20;
         _confirmButton.layer.masksToBounds = YES;
         [_confirmButton setBackgroundColor:UIColorMakeWithHex(@"#345DFF")];
-        [_confirmButton setTitle:KTVLocalizedString(@"ktv_ok") forState:UIControlStateNormal];
+        [_confirmButton setTitle:DHCLocalizedString(@"ktv_ok") forState:UIControlStateNormal];
         _confirmButton.titleLabel.font = UIFontBoldMake(16);
         [_confirmButton setTitleColor:UIColorWhite forState:UIControlStateNormal];
         [_confirmButton addTarget:self action:@selector(click) forControlEvents:UIControlEventTouchUpInside];

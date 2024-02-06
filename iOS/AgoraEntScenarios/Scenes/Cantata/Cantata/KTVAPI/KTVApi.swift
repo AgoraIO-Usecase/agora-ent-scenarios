@@ -65,16 +65,14 @@ import AgoraRtcKit
 
 /// 加入合唱失败原因
 @objc public enum KTVJoinChorusFailReason: Int {
-    case musicPreloadFail  //歌曲预加载失败
     case musicOpenFail     //歌曲打开失败
     case joinChannelFail   //加入ex频道失败
-    case musicPreloadFailAndJoinChannelFail
 }
 
 @objc public enum KTVType: Int {
     case normal
     case singbattle
-    case cantata
+    case singRelay
 }
 
 @objc public protocol IMusicLoadStateListener: NSObjectProtocol {
@@ -103,7 +101,6 @@ import AgoraRtcKit
     ///   - reason: 错误原因
     func onMusicLoadFail(songCode: Int, reason: KTVLoadSongFailReason)
 }
-
 
 @objc public protocol KTVLrcViewDelegate: NSObjectProtocol {
     func onUpdatePitch(pitch: Float)
@@ -144,6 +141,57 @@ import AgoraRtcKit
     func onChorusChannelAudioVolumeIndication(
         speakers: [AgoraRtcAudioVolumeInfo],
         totalVolume: Int)
+    
+    //MPK时间回调 只给房主用 仅适合接唱
+    func onMusicPlayerProgressChanged(with progress: Int)
+}
+
+@objc open class GiantChorusConfiguration: NSObject {
+    var appId: String
+    var rtmToken: String
+    weak var engine: AgoraRtcEngineKit?
+    var channelName: String
+    var localUid: Int = 0
+    var chorusChannelName: String
+    var chorusChannelToken: String
+    var maxCacheSize: Int = 10
+    var musicType: loadMusicType = .mcc
+    var audienceChannelToken: String = ""
+    var musicStreamUid: Int = 0
+    var musicChannelToken: String = ""
+    var topN: Int = 0
+    var isDebugMode: Bool = false
+    @objc public
+    init(appId: String,
+         rtmToken: String,
+         engine: AgoraRtcEngineKit,
+         localUid: Int,
+         audienceChannelName: String,
+         audienceChannelToken: String,
+         chorusChannelName: String,
+         chorusChannelToken: String,
+         musicStreamUid: Int,
+         musicChannelToken: String,
+         maxCacheSize: Int,
+         musicType: loadMusicType,
+         topN: Int,
+         isDebugMode: Bool
+    ) {
+        self.appId = appId
+        self.rtmToken = rtmToken
+        self.engine = engine
+        self.channelName = audienceChannelName
+        self.localUid = localUid
+        self.chorusChannelName = chorusChannelName
+        self.chorusChannelToken = chorusChannelToken
+        self.maxCacheSize = maxCacheSize
+        self.musicType = musicType
+        self.audienceChannelToken = audienceChannelToken
+        self.musicStreamUid = musicStreamUid
+        self.musicChannelToken = musicChannelToken
+        self.topN = topN
+        self.isDebugMode = isDebugMode
+    }
 }
 
 @objc open class KTVApiConfig: NSObject{
@@ -167,8 +215,8 @@ import AgoraRtcKit
          chorusChannelName: String,
          chorusChannelToken: String,
          type: KTVType,
-         maxCacheSize: Int,
          musicType: loadMusicType,
+         maxCacheSize: Int,
          isDebugMode: Bool
     ) {
         self.appId = appId
@@ -182,42 +230,20 @@ import AgoraRtcKit
         self.maxCacheSize = maxCacheSize
         self.musicType = musicType
         self.isDebugMode = isDebugMode
-        super.init()
     }
     
-    required public init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-@objc open class GiantChorusConfiguration: NSObject {
-    let audienceChannelToken: String
-    let musicStreamUid: Int
-    let musicChannelToken: String
-    let topN: Int
     
-    init(audienceChannelToken: String, musicStreamUid: Int, musicChannelToken: String, topN: Int = 0) {
-        self.audienceChannelToken = audienceChannelToken
-        self.musicStreamUid = musicStreamUid
-        self.musicChannelToken = musicChannelToken
-        self.topN = topN
-        super.init()
-    }
-    
-    required public init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 }
 
 /// 歌曲加载配置信息
 @objcMembers open class KTVSongConfiguration: NSObject {
     public var songIdentifier: String = ""
-    public var autoPlay: Bool = false   //是否加载完成自动播放
     public var mainSingerUid: Int = 0     //主唱uid
     public var mode: KTVLoadMusicMode = .loadMusicAndLrc
     
     func printObjectContent() -> String {
         var content = ""
+        
         let mirror = Mirror(reflecting: self)
         for child in mirror.children {
             if let propertyName = child.label {
@@ -243,10 +269,9 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
 
 @objc public protocol KTVApiDelegate: NSObjectProtocol {
     
-    /// 初始化
-    /// - Parameter config: <#config description#>
-    init(config: KTVApiConfig, giantConfig: GiantChorusConfiguration?)
+    @objc optional func createKtvApi(config: KTVApiConfig) //小合唱必选
     
+    @objc optional func createKTVGiantChorusApi(config: GiantChorusConfiguration) //大合唱必选
     
     /// 订阅KTVApi事件
     /// - Parameter ktvApiEventHandler: <#ktvApiEventHandler description#>
@@ -327,12 +352,6 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     ///   - onSwitchRoleState: <#onSwitchRoleState description#>
     func switchSingerRole(newRole: KTVSingRole, onSwitchRoleState:@escaping ISwitchRoleStateListener)
     
-    /// 切换角色
-    /// - Parameters:
-    ///   - newRole: <#newRole description#>
-    ///   - stateCallBack: <#onSwitchRoleState description#>
-    func switchSingerRole2(newRole: KTVSingRole, stateCallBack:@escaping ISwitchRoleStateListener)
-    
     
     /// 播放
     /// - Parameter startPos: <#startPos description#>
@@ -373,8 +392,8 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     
     /// 设置当前mic开关状态目前关麦调用
     /// 目前关麦调用 adjustRecordSignalVolume(0) 后 onAudioVolumeIndication 仍然会执行， ktvApi需要增加一个变量判断当前是否关麦， 如果关麦把设置给歌词组件的pitch改为0
-    /// - Parameter isOnMicOpen: <#isOnMicOpen description#>
-    func setMicStatus(isOnMicOpen: Bool)
+    /// - Parameter muteStatus: mute mic status
+    func muteMic(muteStatus: Bool)
     
     func getMusicPlayer() -> AgoraRtcMediaPlayerProtocol?
     
@@ -389,12 +408,6 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
      创建dataStreamID
      */
     func renewInnerDataStreamId()
-    
-    /**
-     * 初始化内部变量/缓存数据，并注册相应的监听，必须在其他KTVApi调用前调用initialize初始化KTVApi
-     * @param config 初始化KTVApi的配置
-     */
-    //func initCantata(with config: KTVApiConfig, giantChorusConfig: GiantChorusConfiguration)
     
     
   /**
@@ -425,6 +438,12 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
    */
   func switchPlaySrc(url: String, syncPts: Bool)
     
-  @objc func setAudienceStreamMessage(dict: [String: Any])
+  /**
+   * 取消歌曲下载，会打断加载歌曲的进程并移除歌曲缓存
+   * @param songCode 歌曲唯一编码
+   */
       
+   func removeMusic(songCode: Int)
+    
+   @objc func didAudioMetadataReceived( uid: UInt, metadata: Data)
 }

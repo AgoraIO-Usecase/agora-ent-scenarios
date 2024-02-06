@@ -791,11 +791,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.singRole = role;
     
     KTVSongConfiguration *songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = NO;
     songConfig.mode = role == KTVSingRoleAudience ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc;
     songConfig.mainSingerUid = [model.userNo integerValue];
     //songCode需要特殊转换一下
-    NSString *jsonStr = @"{\"format\":{\"highPart\":0}}";
+    NSString *jsonStr;
+    if([model.winnerNo isEqualToString:VLUserCenter.user.id]){
+        jsonStr = @"{\"format\":{\"highPartIndex\":0}}";
+    } else {
+        jsonStr = @"{\"format\":{\"highPart\":0}}";
+    }
+
     NSInteger songcode = [self.SBGApi.getMusicContentCenter getInternalSongCode: [model.songNo integerValue] jsonOption:jsonStr];
     songConfig.songIdentifier = [NSString stringWithFormat:@"%li", songcode];
     VL(weakSelf);
@@ -1058,10 +1063,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                         chorusChannelName:@""
                                                         chorusChannelToken:@""
                                                                     type:KTVTypeSingbattle
+                                                       musicType:loadMusicTypeMcc
                                                             maxCacheSize:10
-                                                                musicType:loadMusicTypeMcc
                                                                 isDebugMode:false];
-    self.SBGApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
+    self.SBGApi = [[KTVApiImpl alloc] init];
+    [self.SBGApi createKtvApiWithConfig:apiConfig];
     [self.SBGApi renewInnerDataStreamId];
     [self.SBGApi setLrcViewWithView:self.statusView.lrcView];
     [self.SBGApi muteMicWithMuteStatus:self.isNowMicMuted];
@@ -1616,7 +1622,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)reloadMusic{
     VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = YES;
     songConfig.mode = KTVLoadMusicModeLoadLrcOnly;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;

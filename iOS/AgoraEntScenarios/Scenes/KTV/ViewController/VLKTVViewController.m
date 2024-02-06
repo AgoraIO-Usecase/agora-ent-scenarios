@@ -525,7 +525,13 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
                                                       withDelegate:self];
     
     self.settingView = (VLKTVSettingView*)popView.currCustomView;
-    [self.settingView setIspause:self.isPause];
+    BOOL flag = self.selSongsArray.count > 0;
+    if (flag == false) {
+        [self.settingView setIspause:true];
+    } else {
+        [self.settingView setIspause:self.isPause];
+    }
+    [self.settingView setChorusStatus: flag];
 }
 
 - (void)showScoreViewWithScore:(NSInteger)score {
@@ -836,8 +842,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)stopPlaySong {
     self.isPause = false;
     self.isHighlightSinger = false;
-    [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
+   // [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
    // self.MVView.joinCoSi ngerState = KTVJoinCoSingerStateWaitingForJoin;
+    [self.MVView setOriginBtnState: VLKTVMVViewActionTypeSingAcc];
     [self.MVView setMvState:[self isRoomOwner] ? VLKTVMVViewStateOwnerAudience : VLKTVMVViewStateAudience];
     [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
                            onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
@@ -854,11 +861,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.selectedVoiceShowIndex = -1;
     self.selectUserNo = @"";
     self.currentSelectEffect = 0;
-    [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
+  //  [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
     
-    if([self isRoomOwner]){
-        [self.MVView setPerViewAvatar:@""];
-    }
+//    if([self isRoomOwner]){
+//        [self.MVView setPerViewAvatar:@""];
+//    }
     
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     [self.MVView setMvState: VLKTVMVViewStateMusicLoading];
@@ -872,7 +879,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
     KTVSingRole role = [self getUserSingRole];
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = (role == KTVSingRoleAudience || role == KTVSingRoleCoSinger) ? NO : YES ;
+  //  songConfig.autoPlay = (role == KTVSingRoleAudience || role == KTVSingRoleCoSinger) ? NO : YES ;
     songConfig.mode = (role == KTVSingRoleAudience || role == KTVSingRoleCoSinger) ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
@@ -885,24 +892,29 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(role == KTVSingRoleCoSinger){
             weakSelf.singRole = KTVSingRoleCoSinger;
         }
-        [weakSelf setMVViewStateWith:model];
+        
         if(role == KTVSingRoleCoSinger){
             [weakSelf.ktvApi startSingWithSongCode:songCode startPos:0];
         }
+        
+        [weakSelf.ktvApi switchSingerRoleWithNewRole:role
+                               onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+            if(state != KTVSwitchRoleStateSuccess && role != KTVSingRoleAudience) {
+                //TODO(chenpan): error toast and retry?
+                KTVLogError(@"switchSingerRole error: %ld", reason);
+                return;
+            } else {
+                if(role == KTVSingRoleSoloSinger || role == KTVSingRoleLeadSinger){
+                    [weakSelf.ktvApi startSingWithSongCode:songCode startPos:0];
+                }
+                [weakSelf setMVViewStateWith:model];
+            }
+        }];
     };
     
     [self.lrcControl resetShowOnce];
     [self.ktvApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
 
-    [weakSelf.ktvApi switchSingerRoleWithNewRole:role
-                           onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-        if(state != KTVSwitchRoleStateSuccess) {
-            //TODO(chenpan): error toast and retry?
-            KTVLogError(@"switchSingerRole error: %ld", reason);
-            return;
-        }
-    }];
-    
 }
 
 - (void)enterSeatWithIndex:(NSInteger)index completion:(void(^)(NSError*))completion {
@@ -978,7 +990,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)joinChorus {
 
     [self.MVView setMvState:VLKTVMVViewStateJoinChorus];
-
+    self.isJoinChorus = true;
     if([self getOnMicUserCount] == 8 && !_isOnMicSeat){
         [VLToast toast:KTVLocalizedString(@"ktv_mic_full")];
         return;
@@ -993,6 +1005,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if (![self getJoinChorusEnable]) {
         KTVLogInfo(@"getJoinChorusEnable false");
         [self.MVView setMvState: [self isRoomOwner] ? VLKTVMVViewStateOwnerAudience : VLKTVMVViewStateAudience];
+        [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
         return;
     }
     
@@ -1004,7 +1017,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             if (seat.rtcUid == 0) {
                 VL(weakSelf);
                 KTVLogError(@"before enterSeat error");
-                self.isJoinChorus = true;
+                
                 [self enterSeatWithIndex:i completion:^(NSError *error) {
                     if(error){
                         KTVLogError(@"enterSeat error:%@", error.description);
@@ -1028,6 +1041,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self _joinChorus];
 }
 
+-(void)joinChorusFailedAndUIUpadte {
+    
+}
+
 - (void)_joinChorus {
     
     [self.MVView.incentiveView reset];
@@ -1035,7 +1052,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     KTVSingRole role = KTVSingRoleCoSinger;
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = NO;
     songConfig.mode = KTVLoadMusicModeLoadMusicOnly;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
@@ -1044,7 +1060,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
         if (!isSuccess) {
             weakSelf.isJoinChorus = false;
-            [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
+           [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
             return;
         }
         
@@ -1145,7 +1161,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
         [self sendVoiceShowEffect];
     }
-    [self.MVView setPerViewAvatar:model.headUrl];
+ //   [self.MVView setPerViewAvatar:model.headUrl];
 }
 
 //设置人声突出
@@ -1255,11 +1271,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                          localUid:[VLUserCenter.user.id integerValue]
                                                         chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:exChannelToken
                                                              type: KTVTypeNormal
-                                                        maxCacheSize:10
                                                         musicType:loadMusicTypeMcc
+                                                        maxCacheSize:10
                                                         isDebugMode: (AppContext.shared.isDebugMode) ? true : false
     ];
-    self.ktvApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
+    self.ktvApi = [[KTVApiImpl alloc] init];
+    [self.ktvApi createKtvApiWithConfig:apiConfig];
     [self.ktvApi renewInnerDataStreamId];
     KTVLrcControl* lrcControl = [[KTVLrcControl alloc] initWithLrcView:self.MVView.karaokeView];
     [self.ktvApi setLrcViewWithView:lrcControl];
@@ -1274,6 +1291,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi addEventHandlerWithKtvApiEventHandler:self];
     
     [self.RTCkit setParameters:@"{\"che.audio.ains_mode\": -1}"];
+    
+    [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousticsKTV];
     
 //    VL(weakSelf);
     KTVLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
@@ -1394,11 +1413,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)didLeaveChours {
     //退出合唱
     
-    if([self isRoomOwner] && self.singRole == KTVSingRoleCoSinger && self.selectUserNo == VLUserCenter.user.id){
-        [VLToast toast:KTVLocalizedString(@"ktv_per_lose")];
-        self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
-        [self.MVView setPerViewAvatar:@""];
-    }
+//    if([self isRoomOwner] && self.singRole == KTVSingRoleCoSinger && self.selectUserNo == VLUserCenter.user.id){
+//        [VLToast toast:KTVLocalizedString(@"ktv_per_lose")];
+//        self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
+//        [self.MVView setPerViewAvatar:@""];
+//    }
     
     [[AppContext ktvServiceImp] coSingerLeaveChorusWithCompletion:^(NSError * error) {
     }];
@@ -1407,11 +1426,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.MVView.gradeView reset];
     [self.MVView.incentiveView reset];
     [self.MVView setOriginBtnState: VLKTVMVViewActionTypeSingAcc];
-    if(self.isHighlightSinger){
-        [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
-        [self sendStreamMessageWithDict:@{@"cmd": @"cancelVoiceHighlight"} success:nil];
-        self.isHighlightSinger = false;
-    }
+//    if(self.isHighlightSinger){
+//        [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
+//        [self sendStreamMessageWithDict:@{@"cmd": @"cancelVoiceHighlight"} success:nil];
+//        self.isHighlightSinger = false;
+//    }
     [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:YES
                                                         completion:^(NSError * error) {
     }];
@@ -1473,7 +1492,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     switch (typeValue) {
         case VLKTVBottomBtnClickTypeMore:  //更多
 //            [self popSelMVBgView];
-            [self popSelMoreView];
+//            [self popSelMoreView];
+            [self showSettingView];
             break;
         case VLKTVBottomBtnClickTypeJoinChorus:
             [self popUpChooseSongView:YES];
@@ -1671,7 +1691,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
     KTVSingRole role = [self getUserSingRole];
-    songConfig.autoPlay = (role == KTVSingRoleAudience || role == KTVSingRoleCoSinger) ? NO : YES ;
     songConfig.mode = KTVLoadMusicModeLoadLrcOnly;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
@@ -1727,6 +1746,28 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.RTCkit setAudioEffectPreset:preset];
     } else if (type == VLKTVValueDidChangedTypeRemoteValue) {
         [self.RTCkit adjustPlaybackSignalVolume:setting.remoteVolume];
+    } else if (type == VLKTVValueDidChangedTypeLrc) {//歌词等级
+        LRCLEVEL level = LRCLEVELMID;
+        if(setting.lrcLevel == 0){
+            level = LRCLEVELOW;
+        } else if(setting.lrcLevel == 1){
+            level = LRCLEVELMID;
+        } else if(setting.lrcLevel == 2){
+            level = LRCLEVELHIGH;
+        }
+        [self.MVView setLrcLevelWith:level];
+    } else if (type == VLKTVValueDidChangedTypeVqs) {//音质
+        [self didVolQualityGradeChangedWithIndex:setting.vqs];
+    } else if (type == VLKTVValueDidChangedTypeAns) {//降噪
+        [self didAIAECGradeChangedWithIndex:setting.ans];
+    } else if (type == VLKTVValueDidChangedTypeaiaec) {//AIAEC
+        [self didAECStateChange:setting.enableAec];
+    } else if (type == VLKTVValueDidChangedTypebro) {//专业主播
+        [self voicePerItemSelectedAction:setting.isPerBro];
+    } else if (type == VLKTVValueDidChangedTypeAecLevel){
+        [self didAECLevelSetWith:setting.aecLevel];
+    } else if (type == VLKTVValueDidChangedTypeenableMultipath){
+        [self.ktvApi enableMutipathWithEnable:setting.enableMultipath];
     }
 }
 
@@ -1815,8 +1856,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)settingViewEffectChoosed:(NSInteger)effectIndex {
     self.selectedEffectIndex = effectIndex;
-    NSArray *effects = @[@(AgoraAudioEffectPresetOff),
-                         @(AgoraAudioEffectPresetRoomAcousticsKTV),
+    NSArray *effects = @[@(AgoraAudioEffectPresetRoomAcousticsKTV),
+                         @(AgoraAudioEffectPresetOff),
                          @(AgoraAudioEffectPresetRoomAcousVocalConcer),
                          @(AgoraAudioEffectPresetRoomAcousStudio),
                          @(AgoraAudioEffectPresetRoomAcousPhonograph),
@@ -1826,9 +1867,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                          @(AgoraAudioEffectPresetStyleTransformationRnb)];
   self.currentSelectEffect = [effects[effectIndex] integerValue];
   [self.RTCkit setAudioEffectPreset: [effects[effectIndex] integerValue]];
-  if(self.isHighlightSinger){
-     [self sendVoiceShowEffect];
-  }
+//  if(self.isHighlightSinger){
+//     [self sendVoiceShowEffect];
+//  }
 }
 
 - (AgoraAudioEffectPreset)audioEffectPreset:(NSInteger)index {
@@ -1962,9 +2003,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
--(void)didAECLevelSetWith:(int)level{
+-(void)didAECLevelSetWith:(NSInteger)level{
     self.aecLevel = level;
-    [self.RTCkit setParameters:[NSString stringWithFormat:@"{\"che.audio.aiaec.postprocessing_strategy\":%i}", level]];
+    [self.RTCkit setParameters:[NSString stringWithFormat:@"{\"che.audio.aiaec.postprocessing_strategy\":%li}", (long)level]];
 }
 
 #pragma mark --
@@ -2173,51 +2214,51 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
     
     //如果退出合唱的人的userNo不存在了说明他退出人生突出了
-    if((![self.selectUserNo isEqualToString:@""] && self.selectUserNo != nil) && self.selectedVoiceShowIndex != -2){
-        //看下麦位上有没有这个人 如果没有就说明它下麦了
-        BOOL flag = false;
-        for(int i = 0;i<seatsArray.count;i++){
-           if([seatsArray[i].userNo isEqualToString:self.selectUserNo] && [seatsArray[i].chorusSongCode isEqualToString:@""] && ![self.selectUserNo isEqualToString:seatsArray.firstObject.userNo]){//退出合唱了
-               flag = true;
-               break;
-           }
-        }
-        if(flag == true && [self isRoomOwner]){// 已下麦
-            [VLToast toast:KTVLocalizedString(@"ktv_per_lose")];
-            self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
-            [self.MVView setPerViewAvatar:@""];
-        }
-        
-        BOOL offline = false;
-        for(int i = 0;i<seatsArray.count;i++){
-           if([seatsArray[i].userNo isEqualToString:self.selectUserNo]){//直接下麦了
-               offline = true;
-               break;
-           }
-        }
-        if(offline == false && [self isRoomOwner]){// 已下麦
-            [VLToast toast:KTVLocalizedString(@"ktv_per_lose")];
-            self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
-            [self.MVView setPerViewAvatar:@""];
-        }
-        
-        if([self.selectUserNo isEqualToString:seatsArray.firstObject.userNo] && ([self getChorusNumWithSeatArray:seatsArray] < 1 || (self.singRole == KTVSingRoleAudience && [self isRoomOwner]))){
-            [VLToast toast:KTVLocalizedString(@"ktv_per_lose")];
-            self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
-            [self.MVView setPerViewAvatar:@""];
-        }
-    }
+//    if((![self.selectUserNo isEqualToString:@""] && self.selectUserNo != nil) && self.selectedVoiceShowIndex != -2){
+//        //看下麦位上有没有这个人 如果没有就说明它下麦了
+//        BOOL flag = false;
+//        for(int i = 0;i<seatsArray.count;i++){
+//           if([seatsArray[i].userNo isEqualToString:self.selectUserNo] && [seatsArray[i].chorusSongCode isEqualToString:@""] && ![self.selectUserNo isEqualToString:seatsArray.firstObject.userNo]){//退出合唱了
+//               flag = true;
+//               break;
+//           }
+//        }
+//        if(flag == true && [self isRoomOwner]){// 已下麦
+//            [VLToast toast:KTVLocalizedString(@"ktv_per_lose")];
+//            self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
+//            [self.MVView setPerViewAvatar:@""];
+//        }
+//        
+//        BOOL offline = false;
+//        for(int i = 0;i<seatsArray.count;i++){
+//           if([seatsArray[i].userNo isEqualToString:self.selectUserNo]){//直接下麦了
+//               offline = true;
+//               break;
+//           }
+//        }
+//        if(offline == false && [self isRoomOwner]){// 已下麦
+//            [VLToast toast:KTVLocalizedString(@"ktv_per_lose")];
+//            self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
+//            [self.MVView setPerViewAvatar:@""];
+//        }
+//        
+//        if([self.selectUserNo isEqualToString:seatsArray.firstObject.userNo] && ([self getChorusNumWithSeatArray:seatsArray] < 1 || (self.singRole == KTVSingRoleAudience && [self isRoomOwner]))){
+//            [VLToast toast:KTVLocalizedString(@"ktv_per_lose")];
+//            self.selectedVoiceShowIndex = -2;//-2表示人声突出实效 但是还在播放当前歌曲
+//            [self.MVView setPerViewAvatar:@""];
+//        }
+//    }
     
-    if([self isRoomOwner]){
-        [self.MVView setPerViewHidden:[self getChorusSingerArrayWithSeatArray:_seatsArray].count < 2];
-        if(self.selSongsArray.count == 0 || (self.voiceShowHasSeted == true && self.selectedVoiceShowIndex == -2) ){
-            [self.MVView setPerViewAvatar:@""];
-        }
-    }
+//    if([self isRoomOwner]){
+//        [self.MVView setPerViewHidden:[self getChorusSingerArrayWithSeatArray:_seatsArray].count < 2];
+//        if(self.selSongsArray.count == 0 || (self.voiceShowHasSeted == true && self.selectedVoiceShowIndex == -2) ){
+//            [self.MVView setPerViewAvatar:@""];
+//        }
+//    }
     
-    if([self getChorusSingerArrayWithSeatArray:_seatsArray].count < 2){
-        [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
-    }
+//    if([self getChorusSingerArrayWithSeatArray:_seatsArray].count < 2){
+//        [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
+//    }
     
     self.roomPersonView.roomSeatsArray = self.seatsArray;
     [self.roomPersonView updateSingBtnWithChoosedSongArray:_selSongsArray];
@@ -2361,12 +2402,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         self.chooseSongView.selSongsArray = _selSongsArray; //刷新已点歌曲UI
     }
     
-    if([self isRoomOwner]){
-        [self.MVView setPerViewHidden:[self getChorusSingerArrayWithSeatArray:_seatsArray].count < 2];
-        if(self.selSongsArray.count == 0){
-            [self.MVView setPerViewAvatar:@""];
-        }
-    }
+//    if([self isRoomOwner]){
+//        [self.MVView setPerViewHidden:[self getChorusSingerArrayWithSeatArray:_seatsArray].count < 2];
+//        if(self.selSongsArray.count == 0){
+//            [self.MVView setPerViewAvatar:@""];
+//        }
+//    }
     
     [self.roomPersonView updateSingBtnWithChoosedSongArray:_selSongsArray];
     VLRoomSelSongModel* originalTopSong = [oldSongsArray firstObject];
@@ -2498,7 +2539,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if (status == AgoraMusicContentCenterPreloadStatusOK){
         }
         
-        if(self.singRole == KTVSingRoleSoloSinger || self.singRole == KTVSingRoleLeadSinger){
+        VLRoomSelSongModel *topSong = self.selSongsArray.firstObject;
+        
+        if(self.singRole == KTVSingRoleSoloSinger || self.singRole == KTVSingRoleLeadSinger || self.isJoinChorus == true || [topSong.userNo isEqualToString:VLUserCenter.user.id]){
             self.MVView.loadingProgress = percent;
         }
     });

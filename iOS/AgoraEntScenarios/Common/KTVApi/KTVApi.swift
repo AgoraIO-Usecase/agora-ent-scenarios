@@ -65,16 +65,13 @@ import AgoraRtcKit
 
 /// 加入合唱失败原因
 @objc public enum KTVJoinChorusFailReason: Int {
-    case musicPreloadFail  //歌曲预加载失败
     case musicOpenFail     //歌曲打开失败
     case joinChannelFail   //加入ex频道失败
-    case musicPreloadFailAndJoinChannelFail
 }
 
 @objc public enum KTVType: Int {
     case normal
     case singbattle
-    case cantata
     case singRelay
 }
 
@@ -104,17 +101,6 @@ import AgoraRtcKit
     ///   - reason: 错误原因
     func onMusicLoadFail(songCode: Int, reason: KTVLoadSongFailReason)
 }
-
-
-//public protocol KTVJoinChorusStateListener: NSObjectProtocol {
-//
-//    /// 加入合唱成功
-//    func onJoinChorusSuccess()
-//
-//    /// 加入合唱失败
-//    /// - Parameter reason: 失败原因
-//    func onJoinChorusFail(reason: KTVJoinChorusFailReason)
-//}
 
 @objc public protocol KTVLrcViewDelegate: NSObjectProtocol {
     func onUpdatePitch(pitch: Float)
@@ -160,6 +146,54 @@ import AgoraRtcKit
     func onMusicPlayerProgressChanged(with progress: Int)
 }
 
+@objc open class GiantChorusConfiguration: NSObject {
+    var appId: String
+    var rtmToken: String
+    weak var engine: AgoraRtcEngineKit?
+    var channelName: String
+    var localUid: Int = 0
+    var chorusChannelName: String
+    var chorusChannelToken: String
+    var maxCacheSize: Int = 10
+    var musicType: loadMusicType = .mcc
+    var audienceChannelToken: String = ""
+    var musicStreamUid: Int = 0
+    var musicChannelToken: String = ""
+    var topN: Int = 0
+    var isDebugMode: Bool = false
+    @objc public
+    init(appId: String,
+         rtmToken: String,
+         engine: AgoraRtcEngineKit,
+         localUid: Int,
+         audienceChannelName: String,
+         audienceChannelToken: String,
+         chorusChannelName: String,
+         chorusChannelToken: String,
+         musicStreamUid: Int,
+         musicChannelToken: String,
+         maxCacheSize: Int,
+         musicType: loadMusicType,
+         topN: Int,
+         isDebugMode: Bool
+    ) {
+        self.appId = appId
+        self.rtmToken = rtmToken
+        self.engine = engine
+        self.channelName = audienceChannelName
+        self.localUid = localUid
+        self.chorusChannelName = chorusChannelName
+        self.chorusChannelToken = chorusChannelToken
+        self.maxCacheSize = maxCacheSize
+        self.musicType = musicType
+        self.audienceChannelToken = audienceChannelToken
+        self.musicStreamUid = musicStreamUid
+        self.musicChannelToken = musicChannelToken
+        self.topN = topN
+        self.isDebugMode = isDebugMode
+    }
+}
+
 @objc open class KTVApiConfig: NSObject{
     var appId: String
     var rtmToken: String
@@ -181,8 +215,8 @@ import AgoraRtcKit
          chorusChannelName: String,
          chorusChannelToken: String,
          type: KTVType,
-         maxCacheSize: Int,
          musicType: loadMusicType,
+         maxCacheSize: Int,
          isDebugMode: Bool
     ) {
         self.appId = appId
@@ -197,12 +231,13 @@ import AgoraRtcKit
         self.musicType = musicType
         self.isDebugMode = isDebugMode
     }
+    
+    
 }
 
 /// 歌曲加载配置信息
 @objcMembers open class KTVSongConfiguration: NSObject {
     public var songIdentifier: String = ""
-    public var autoPlay: Bool = false   //是否加载完成自动播放
     public var mainSingerUid: Int = 0     //主唱uid
     public var mode: KTVLoadMusicMode = .loadMusicAndLrc
     
@@ -234,10 +269,9 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
 
 @objc public protocol KTVApiDelegate: NSObjectProtocol {
     
-    /// 初始化
-    /// - Parameter config: <#config description#>
-    init(config: KTVApiConfig)
+    @objc optional func createKtvApi(config: KTVApiConfig) //小合唱必选
     
+    @objc optional func createKTVGiantChorusApi(config: GiantChorusConfiguration) //大合唱必选
     
     /// 订阅KTVApi事件
     /// - Parameter ktvApiEventHandler: <#ktvApiEventHandler description#>
@@ -410,4 +444,6 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
    */
       
    func removeMusic(songCode: Int)
+    
+   @objc func didAudioMetadataReceived( uid: UInt, metadata: Data)
 }
