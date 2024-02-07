@@ -667,7 +667,8 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                     }
                     if (mKaraokeView != null) {
                         mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
-                        mKaraokeView.setLyricsData(lyricsModel);
+                        LyricsModel cutLyricsModel = dealWithBattleSong(lyricsModel);
+                        mKaraokeView.setLyricsData(cutLyricsModel);
                     }
                 } else {
                     if (error.getMessage() != null) {

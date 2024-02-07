@@ -1083,12 +1083,6 @@ public class RoomLivingViewModel extends ViewModel {
             ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null);
             joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS);
         }
-
-        // 重置耳返
-        mSetting.setMEarBackEnable(false);
-        if (mRtcEngine != null) {
-            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
-        }
     }
 
     /**
@@ -1696,19 +1690,7 @@ public class RoomLivingViewModel extends ViewModel {
         joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_IDLE);
         ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null);
 
-        // 清空音效
-//        if (mRtcEngine != null) {
-//            mRtcEngine.setAudioEffectPreset(DEFAULT_AUDIO_EFFECT);
-//        }
-//        mSetting.updateAudioEffect(DEFAULT_AUDIO_EFFECT);
-//        this.audioPreset = DEFAULT_AUDIO_EFFECT;
         isHighlightSinger = false;
-
-        // 重置耳返
-        mSetting.setMEarBackEnable(false);
-        if (mRtcEngine != null) {
-            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
-        }
     }
 
     // ------------------ 歌曲开始播放 ------------------
