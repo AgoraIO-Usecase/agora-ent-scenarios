@@ -1697,10 +1697,6 @@ public class RoomLivingViewModel extends ViewModel {
         ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null);
 
         isHighlightSinger = false;
-
-        if (mRtcEngine != null) {
-            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
-        }
     }
 
     // ------------------ 歌曲开始播放 ------------------
