@@ -1696,16 +1696,8 @@ public class RoomLivingViewModel extends ViewModel {
         joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_IDLE);
         ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null);
 
-        // 清空音效
-//        if (mRtcEngine != null) {
-//            mRtcEngine.setAudioEffectPreset(DEFAULT_AUDIO_EFFECT);
-//        }
-//        mSetting.updateAudioEffect(DEFAULT_AUDIO_EFFECT);
-//        this.audioPreset = DEFAULT_AUDIO_EFFECT;
         isHighlightSinger = false;
 
-        // 重置耳返
-        mSetting.setMEarBackEnable(false);
         if (mRtcEngine != null) {
             mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
         }
