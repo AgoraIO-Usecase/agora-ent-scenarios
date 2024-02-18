@@ -24,7 +24,8 @@ import AgoraCommon
 //                               ["title": NSLocalizedString("app_about_show", comment: ""), "detail":"ZB-3.2.0"],
 //                               ["title": NSLocalizedString("app_about_1v1", comment: ""), "detail":"SMF-3.6.0"],
 //                               ["title": NSLocalizedString("app_about_live_to_1v1", comment: ""), "detail":"XCSMF-3.7.0"]],
-                  "sectionName": NSLocalizedString("app_about_scene_version", comment: "")]]
+                //  "sectionName": NSLocalizedString("app_about_scene_version", comment: "")]
+    ]]
     
     let tableHeader = AboutAgoraHeader(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 220),
                                        name: NSLocalizedString("app_about_name", comment: ""),

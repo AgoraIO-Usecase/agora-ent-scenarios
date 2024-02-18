@@ -240,7 +240,7 @@ import AgoraRtcKit
     public var songIdentifier: String = ""
     public var mainSingerUid: Int = 0     //主唱uid
     public var mode: KTVLoadMusicMode = .loadMusicAndLrc
-    
+    public var songCutter: Bool = false
     func printObjectContent() -> String {
         var content = ""
         

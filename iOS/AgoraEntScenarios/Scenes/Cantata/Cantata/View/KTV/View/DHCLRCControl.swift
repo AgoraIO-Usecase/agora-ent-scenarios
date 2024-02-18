@@ -283,7 +283,9 @@ class DHCLRCControl: UIView {
         lrcView = KaraokeView(frame: CGRectMake(0, 30, self.bounds.width, bounds.size.height - 30 - 50 - 340), loggers: [FileLogger()])
         lrcView.scoringEnabled = false
         lrcView.lyricsView.inactiveLineTextColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
+        lrcView.lyricsView.inactiveLineFontSize = UIFont.systemFont(ofSize: 13)
         lrcView.lyricsView.activeLinePlayedTextColor = UIColor(hexString: "#EEFF25")!
+        lrcView.lyricsView.activeLineUpcomingFontSize = UIFont.systemFont(ofSize: 20)
         lrcView.lyricsView.lyricLineSpacing = 6
         lrcView.lyricsView.draggable = false
         lrcView.delegate = self

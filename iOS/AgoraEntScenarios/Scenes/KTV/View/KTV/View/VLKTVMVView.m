@@ -159,7 +159,9 @@
     _karaokeView.scoringView.topSpaces = 5;
    // _karaokeView.lyricsView.textSelectedColor = [UIColor colorWithHexString:@"#33FFFFFF"];
     _karaokeView.lyricsView.inactiveLineTextColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.5];
+    _karaokeView.lyricsView.inactiveLineFontSize = [UIFont systemFontOfSize:13];
     _karaokeView.lyricsView.activeLinePlayedTextColor = [UIColor colorWithHexString:@"#FF8AB4"];
+    _karaokeView.lyricsView.activeLineUpcomingFontSize = [UIFont systemFontOfSize:20];
     _karaokeView.lyricsView.lyricLineSpacing = 6;
    // _karaokeView.scoringView.showDebugView = true;
     [self.contentView addSubview:_karaokeView];
@@ -256,11 +258,11 @@
 
 -(void)setLrcLevelWith:(LRCLEVEL)level{
     if(level == LRCLEVELOW) {
-        [self.karaokeView setScoreLevelWithLevel:3];
+        [self.karaokeView setScoreLevelWithLevel:10];
     } else if(level == LRCLEVELMID) {
         [self.karaokeView setScoreLevelWithLevel:15];
     } else if(level == LRCLEVELHIGH) {
-        [self.karaokeView setScoreLevelWithLevel:35];
+        [self.karaokeView setScoreLevelWithLevel:25];
     }
 }
 

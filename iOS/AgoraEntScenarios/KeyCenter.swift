@@ -23,7 +23,7 @@ class KeyCenter: NSObject {
      进入声网控制台(https://console.shengwang.cn/)，创建一个项目，进入项目配置页，即可看到APP ID。
      */
     
-    static let AppId: String = <#Your AppId#>
+    static let AppId: String = <#Your APPId#>
   
     /**
      Certificate.

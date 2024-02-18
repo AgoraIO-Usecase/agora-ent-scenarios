@@ -49,7 +49,7 @@ private func agoraPrint(_ message: String) {
         lrcView?.reset()
         currentLoadLrcPath = nil
     }
-
+    
 }
 
 extension SBGLrcControl: KaraokeDelegate {

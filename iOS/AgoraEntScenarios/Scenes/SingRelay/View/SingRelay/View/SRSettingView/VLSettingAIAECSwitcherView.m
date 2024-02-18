@@ -33,6 +33,7 @@
     [self addSubview:self.nameLabel];
     [self addSubview:self.subLabel];
     self.subLabel.hidden = true;
+    self.aecValue = 0;
     self.tf = [UITextField new];
     self.tf.keyboardType = UIKeyboardTypeNumberPad;
     self.tf.layer.cornerRadius = 5;
@@ -96,6 +97,7 @@
 }
 
 -(void)setAecValue:(NSInteger)aecValue {
+    _aecValue = aecValue;
     self.tf.text = [NSString stringWithFormat:@"%ld", aecValue];
 }
 
@@ -122,12 +124,27 @@
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
-    self.level = [string integerValue];
-    self.tf.text = string;
+    NSInteger level = [string integerValue];
+    self.tf.text = @"0";
     [self endEditing:true];
+    if (string.length == 0) {
+        return true;
+    }
+    
+    if (level < 0 || level > 4) {
+        self.tf.text = [NSString stringWithFormat:@"%li", (long)_aecValue];
+        [VLToast toast:KTVLocalizedString(@"ktv_aiaec_rule")];
+        self.level = _aecValue;
+        return true;
+    }
+    
+    self.level = level;
+    self.tf.text = string;
+    
     if ([self.delegate respondsToSelector:@selector(aecSwitcherView:level:)]) {
         [self.delegate aecSwitcherView:self level:self.level];
     }
+    
     return true;
 }
 

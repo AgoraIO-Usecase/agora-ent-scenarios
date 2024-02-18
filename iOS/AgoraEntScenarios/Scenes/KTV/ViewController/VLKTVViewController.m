@@ -308,6 +308,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
                 // 下麦重置占位模型
                 [model resetWithSeatInfo:nil];
                 [weakSelf setSeatsArray:weakSelf.seatsArray];
+                
             }
             
             VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
@@ -351,6 +352,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
             }
             //清除合唱者总分
             weakSelf.coSingerDegree = 0;
+            [LSTPopView removeAllPopView];
         } else {
             VLRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
             //add new song

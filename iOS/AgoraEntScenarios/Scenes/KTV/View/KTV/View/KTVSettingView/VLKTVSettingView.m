@@ -106,8 +106,8 @@ UICollectionViewDataSource
     self.accSlider.alpha = status ? 1 : 0.6;
     self.remoteSlider.userInteractionEnabled = status;
     self.remoteSlider.alpha = status ? 1 : 0.6;
-    self.lrcSegmentView.userInteractionEnabled = status;
-    self.lrcSegmentView.alpha = status ? 1 : 0.6;
+    self.lrcSegmentView.userInteractionEnabled = !status;
+    self.lrcSegmentView.alpha = status ? 0.6 : 1;
 }
 
 - (void)initSubViews {

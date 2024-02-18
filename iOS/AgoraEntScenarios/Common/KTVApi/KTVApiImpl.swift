@@ -96,6 +96,7 @@ fileprivate enum KTVSongMode: Int {
     private var isWearingHeadPhones: Bool = false
     private var enableProfessional: Bool = false
     private var isPublishAudio: Bool = false
+    private var preludeDuration: Int64 = 0
     private lazy var apiDelegateHandler = KTVApiRTCDelegateHandler(with: self)
     deinit {
         mcc?.register(nil)
@@ -1108,12 +1109,17 @@ extension KTVApiImpl {
             if self.singerRole == .audience && !recvFromDataStream {
                 
             } else {
+                var curTime:Int64 = Int64(current) + Int64(self.startHighTime)
+                if songConfig?.songCutter == true {
+                    curTime = curTime - preludeDuration > 0 ? curTime - preludeDuration : curTime
+                }
                 if self.singerRole != .audience {
                     current = Date().milListamp - self.lastReceivedPosition + Double(self.localPosition)
+                    
                     if self.singerRole == .leadSinger || self.singerRole == .soloSinger {
                         var time: LrcTime = LrcTime()
                         time.forward = true
-                        time.ts = Int64(current) + Int64(self.startHighTime)
+                        time.ts = curTime
                         time.songID = songIdentifier
                         time.type = .lrcTime
                         //大合唱的uid是musicuid
@@ -1121,7 +1127,7 @@ extension KTVApiImpl {
                         sendMetaMsg(with: time)
                     }
                 }
-                self.setProgress(with: Int(current) + Int(self.startHighTime))
+                self.setProgress(with: Int(curTime))
             }
             
             self.oldPitch = self.pitch
@@ -1387,6 +1393,9 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
                 let highPart = format["highPart"] as! [[String: Any]]
                 let highStartTime = highPart[0]["highStartTime"] as! Int
                 let highEndTime = highPart[0]["highEndTime"] as! Int
+                if highPart[0].keys.contains("preludeDuration") {
+                    self.preludeDuration = highPart[0]["preludeDuration"] as! Int64
+                }
                 let time = highStartTime
                 startHighTime = time
                 self.lrcControl?.onHighPartTime(highStartTime: highStartTime, highEndTime: highEndTime)

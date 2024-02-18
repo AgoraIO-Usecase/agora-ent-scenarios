@@ -797,8 +797,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     NSString *jsonStr;
     if([model.winnerNo isEqualToString:VLUserCenter.user.id]){
         jsonStr = @"{\"format\":{\"highPartIndex\":0}}";
+        songConfig.songCutter = true;
     } else {
         jsonStr = @"{\"format\":{\"highPart\":0}}";
+        songConfig.songCutter = false;
     }
 
     NSInteger songcode = [self.SBGApi.getMusicContentCenter getInternalSongCode: [model.songNo integerValue] jsonOption:jsonStr];
