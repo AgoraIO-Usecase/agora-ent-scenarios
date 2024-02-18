@@ -5,13 +5,15 @@
 >
 > Demo 效果:
 >
-> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ent_home_scenes.jpg" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ent_home_explore.jpg" width="300" height="640">
+> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/ktv_430_0_ios.jpg" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/ktv_430_1_ios.jpg" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/ktv_430_2_ios.jpg" width="300" height="640">
+<img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/ktv_430_3_ios.jpg" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/ktv_430_4_ios.jpg" width="300" height="640">
+
 
 ## 1. 环境准备
 
 - <mark>最低兼容 iOS 13.0.0 </mark> 
-- Xcode 13.0.0 及以上版本。
-- iPhone 6 及以上的手机设备(系统需要 iOS 13.0.0 及以上)。
+- Xcode 14.0.0 及以上版本。
+- iPhone 7 及以上的手机设备(系统需要 iOS 13.0.0 及以上)。
 
 ---
 
@@ -60,19 +62,19 @@
 
 ### 3.2 功能介绍
 
-在线K歌房目前已涵盖以下功能，您可以参考注释按需从代码中调用：
-1.在线K歌房
-[在线K歌场景代码](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/tree/feat/scene/ktv_4.3.0/iOS/AgoraEntScenarios/Scenes/KTV)
-2.嗨歌抢唱
-[嗨歌抢唱场景代码](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/tree/feat/scene/ktv_4.3.0/iOS/AgoraEntScenarios/Scenes/SBG)
-3.抢麦接唱
-[抢麦接唱场景代码](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/tree/feat/scene/ktv_4.3.0/iOS/AgoraEntScenarios/Scenes/SingRelay)
-4.大合唱
-[大合唱场景代码](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/tree/feat/scene/ktv_4.3.0/iOS/AgoraEntScenarios/Scenes/Cantata)
+在线K歌房目前已涵盖以下功能，您可以参考注释按需从代码中调用：<br>
+1.在线K歌房<br>
+[在线K歌场景代码](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/tree/feat/scene/ktv_4.3.0/iOS/AgoraEntScenarios/Scenes/KTV)<br>
+2.嗨歌抢唱<br>
+[嗨歌抢唱场景代码](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/tree/feat/scene/ktv_4.3.0/iOS/AgoraEntScenarios/Scenes/SBG)<br>
+3.抢麦接唱<br>
+[抢麦接唱场景代码](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/tree/feat/scene/ktv_4.3.0/iOS/AgoraEntScenarios/Scenes/SingRelay)<br>
+4.大合唱<br>
+[大合唱场景代码](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/tree/feat/scene/ktv_4.3.0/iOS/AgoraEntScenarios/Scenes/Cantata)<br>
 
 ### 3.3 场景化 API
 
-在线K歌房 项目内使用了 ktvApi来实现 K歌房全场景能力, 对应代码文件: [ktvApi](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/tree/feat/scene/ktv_4.3.0/iOS/AgoraEntScenarios/Common/KTVApi), 如果您想进一步了解 ktvApi, 可以参考 [ktvAPI Demo](https://github.com/AgoraIO-Community/ktvAPI)
+在线K歌房 项目内使用了 ktvApi来实现 K歌房全场景能力, 对应代码文件: [KTVApi](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/tree/feat/scene/ktv_4.3.0/iOS/AgoraEntScenarios/Common/KTVApi), 如果您想进一步了解 KTVApi, 可以参考 [KTVAPI Demo](https://github.com/AgoraIO-Community/ktvAPI)
 
 ## 4. FAQ
 
