@@ -5,7 +5,7 @@
 
 #import "VLAudioEffectPicker.h"
 #import "VLBelcantoModel.h"
-#import "LSTPopView+KTVModal.h"
+#import "LSTPopView+DHCModal.h"
 
 @interface VLAudioEffectPicker ()<UICollectionViewDataSource,UICollectionViewDelegate>
 
@@ -35,12 +35,12 @@
     self.itemsModelArray = [VLBelcantoModel vj_modelArrayWithJson:self.itemsArray];
     
     VLHotSpotBtn *backBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(20, 20, 20, 20)];
-    [backBtn setImage:[UIImage sceneImageWithName:@"ktv_back_whiteIcon"] forState:UIControlStateNormal];
+    [backBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_back_whiteIcon"] forState:UIControlStateNormal];
     [backBtn addTarget:self action:@selector(backBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:backBtn];
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = KTVLocalizedString(@"ktv_beauty_voice");
+    titleLabel.text = DHCLocalizedString(@"ktv_beauty_voice");
     titleLabel.font = VLUIFontMake(16);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -76,7 +76,7 @@
         return;
     }
     
-    [[LSTPopView getPopViewWithCustomView:self] dismiss];
+    [[LSTPopView getDHCPopViewWithCustomView:self] dismiss];
 }
 
 #pragma mark - UITableViewDelegate,UITableViewDataSource
@@ -120,11 +120,11 @@
 - (NSArray *)itemsArray {
     if (!_itemsArray) {
         _itemsArray = @[
-        @{@"imageName":@"ktv_belcanto_defaultNo",@"titleStr":KTVLocalizedString(@"ktv_def_nothing"),@"ifSelect":@(false)},
-        @{@"imageName":@"ktv_belcanto_bigRoomMale",@"titleStr":KTVLocalizedString(@"ktv_room_big_man"), @"ifSelect":@(false)},
-        @{@"imageName":@"ktv_belcanto_smallRoomMale",@"titleStr":KTVLocalizedString(@"ktv_room_small_man"), @"ifSelect":@(false)},
-        @{@"imageName":@"ktv_belcanto_bigRoomFemale",@"titleStr":KTVLocalizedString(@"ktv_room_big_woman"), @"ifSelect":@(false)},
-        @{@"imageName":@"ktv_belcanto_smallRoomFemale",@"titleStr":KTVLocalizedString(@"ktv_room_small_woman"), @"ifSelect":@(false)}];
+        @{@"imageName":@"ktv_belcanto_defaultNo",@"titleStr":DHCLocalizedString(@"ktv_def_nothing"),@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_belcanto_bigRoomMale",@"titleStr":DHCLocalizedString(@"ktv_room_big_man"), @"ifSelect":@(false)},
+        @{@"imageName":@"ktv_belcanto_smallRoomMale",@"titleStr":DHCLocalizedString(@"ktv_room_small_man"), @"ifSelect":@(false)},
+        @{@"imageName":@"ktv_belcanto_bigRoomFemale",@"titleStr":DHCLocalizedString(@"ktv_room_big_woman"), @"ifSelect":@(false)},
+        @{@"imageName":@"ktv_belcanto_smallRoomFemale",@"titleStr":DHCLocalizedString(@"ktv_room_small_woman"), @"ifSelect":@(false)}];
     }
     return _itemsArray;
 }
@@ -164,7 +164,7 @@
 
 - (void)setSelBelcantoModel:(VLBelcantoModel *)selBelcantoModel {
     _selBelcantoModel = selBelcantoModel;
-    self.iconImgView.image = [UIImage sceneImageWithName:selBelcantoModel.imageName];
+    self.iconImgView.image = [UIImage dhc_sceneImageWith:selBelcantoModel.imageName];
     self.titleLabel.text = selBelcantoModel.titleStr;
     if (selBelcantoModel.ifSelect){
         self.bgView.layer.borderWidth = 1.5f;

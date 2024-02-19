@@ -6,7 +6,7 @@
 #import "VLBadNetWorkView.h"
 #import "AESMacro.h"
 #import "LSTPopView+KTVModal.h"
-
+#import "AgoraEntScenarios-Swift.h"
 @interface VLBadNetWorkView ()
 
 @property(nonatomic, weak) id <VLBadNetWorkViewDelegate>delegate;

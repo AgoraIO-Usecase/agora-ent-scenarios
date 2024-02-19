@@ -93,9 +93,10 @@ class KeyCenter: NSObject {
      */
     
     static var IMClientSecret: String? = ""
-  
-    static let CloudPlayerKey: String? = nil
-    static let CloudPlayerSecret: String? = nil
+    // cantata cloud server key, cantata only!!!
+    static let RestfulApiKey: String? = nil
+    //cantata cloud server secret, cantata only!!!
+    static let RestfulApiSecret: String? = nil
 
     static var baseServerUrl: String? = "https://service.shengwang.cn/toolbox"
     static var onlineBaseServerUrl: String? = baseServerUrl
