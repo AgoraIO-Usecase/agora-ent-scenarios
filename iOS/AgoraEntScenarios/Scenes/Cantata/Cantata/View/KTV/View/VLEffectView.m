@@ -36,7 +36,7 @@
 
 -(void)layoutUI {
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = KTVLocalizedString(@"ktv_voice_effect");
+    titleLabel.text = DHCLocalizedString(@"ktv_voice_effect");
     titleLabel.font = UIFontMake(18);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -48,7 +48,7 @@
         UIButton *btn = [[UIButton alloc]init];
         [btn setTitle:effects[i] forState:UIControlStateNormal];
         [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [btn setBackgroundImage:[UIImage sceneImageWithName:imgs[i % 4]] forState:UIControlStateNormal];
+        [btn setBackgroundImage:[UIImage dhc_sceneImageWith:imgs[i % 4]] forState:UIControlStateNormal];
         [btn setTag:200 + i];
         [btn addTarget:self action:@selector(click:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:btn];

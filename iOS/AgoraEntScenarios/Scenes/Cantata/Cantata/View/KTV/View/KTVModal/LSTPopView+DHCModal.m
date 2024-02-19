@@ -5,14 +5,14 @@
 //  Created by wushengtao on 2022/11/10.
 //
 
-#import "LSTPopView+KTVModal.h"
+#import "LSTPopView+DHCModal.h"
 #import "VLEffectView.h"
 #import "VLEarSettingView.h"
 @implementation LSTPopView (DHCModal)
 
 #pragma mark private method
 //公共弹窗视图设置
-+ (LSTPopView*)_createKTVPopContainerWithContentView:(UIView*)contentView
++ (LSTPopView*)_createDHCPopContainerWithContentView:(UIView*)contentView
                                       withParentView:(UIView*)parentView {
     LSTPopView *popView = [LSTPopView initWithCustomView:contentView
                                               parentView:parentView
@@ -33,7 +33,7 @@
 
 #pragma mark public method
 
-+ (LSTPopView*)getPopViewWithCustomView:(UIView*)customView {
++ (LSTPopView*)getDHCPopViewWithCustomView:(UIView*)customView {
     UIView* superView = customView.superview;
     while (superView != nil) {
         if ([superView isKindOfClass:[LSTPopView class]]) {
@@ -46,7 +46,7 @@
     return nil;
 }
 
-+ (LSTPopView*)popSelMVBgViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCSelMVBgViewWithParentView:(UIView*)parentView
                                     bgModel:(VLKTVSelBgModel*)bgModel
                                withDelegate:(id<VLPopSelBgViewDelegate>)delegate {
     CGFloat popViewH = (SCREEN_WIDTH - 60) / 3.0 * 0.75 * 3 + 100 + kSafeAreaBottomHeight;
@@ -54,7 +54,7 @@
                                                             withDelegate:delegate];
     changeBgView.selBgModel = bgModel;
     
-    LSTPopView* popView = [self _createKTVPopContainerWithContentView:changeBgView
+    LSTPopView* popView = [self _createDHCPopContainerWithContentView:changeBgView
                                                        withParentView:parentView];
     [popView pop];
     
@@ -62,13 +62,13 @@
 }
 
 //弹出更多
-+ (LSTPopView*)popSelMoreViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCSelMoreViewWithParentView:(UIView*)parentView
                                withDelegate:(id<VLPopMoreSelViewDelegate>)delegate {
     CGFloat popViewH = 190 + kSafeAreaBottomHeight;
     VLPopMoreSelView *moreView = [[VLPopMoreSelView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
                                                             withDelegate:delegate];
     
-    LSTPopView* popView = [self _createKTVPopContainerWithContentView:moreView
+    LSTPopView* popView = [self _createDHCPopContainerWithContentView:moreView
                                                        withParentView:parentView];
     [popView pop];
     
@@ -76,7 +76,7 @@
 }
 
 //弹出下麦视图
-+ (LSTPopView*)popDropLineViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCDropLineViewWithParentView:(UIView*)parentView
                                withSeatModel:(VLRoomSeatModel *)seatModel
                                withDelegate:(id)delegate {
     CGFloat popViewH = 212 + kSafeAreaBottomHeight + 32;
@@ -84,7 +84,7 @@
                                                                withDelegate:delegate];
     dropLineView.seatModel = seatModel;
     
-    LSTPopView* popView = [self _createKTVPopContainerWithContentView:dropLineView
+    LSTPopView* popView = [self _createDHCPopContainerWithContentView:dropLineView
                                                        withParentView:parentView];
     [popView pop];
     
@@ -93,14 +93,14 @@
 
 
 //弹出美声视图
-+ (LSTPopView*)popBelcantoViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCBelcantoViewWithParentView:(UIView*)parentView
                            withBelcantoModel:(VLBelcantoModel *)belcantoModel
                                 withDelegate:(id<VLAudioEffectPickerDelegate>)delegate {
     CGFloat popViewH = 175 + kSafeAreaBottomHeight;
     VLAudioEffectPicker *belcantoView = [[VLAudioEffectPicker alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
                                                                         withDelegate:delegate];
     belcantoView.selBelcantoModel = belcantoModel;
-    LSTPopView* popView = [self _createKTVPopContainerWithContentView:belcantoView
+    LSTPopView* popView = [self _createDHCPopContainerWithContentView:belcantoView
                                                        withParentView:parentView];
     [popView pop];
     
@@ -130,14 +130,14 @@
 //}
 
 //弹出音效
-+ (LSTPopView*)popSetSoundEffectViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCSetSoundEffectViewWithParentView:(UIView*)parentView
                                          soundView:(VLEffectView*)soundView
                                       withDelegate:(id<VLEffectViewDelegate>)delegate {
     CGFloat popViewH = 88+17+270+kSafeAreaBottomHeight;                                                                                     
     VLEffectView* EffectView = [[VLEffectView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
                                                                                             withDelegate:delegate];
     
-    LSTPopView* popView = [self _createKTVPopContainerWithContentView:EffectView
+    LSTPopView* popView = [self _createDHCPopContainerWithContentView:EffectView
                                                        withParentView:parentView];
     [popView pop];
     
@@ -145,7 +145,7 @@
 }
 
 //网络差视图
-+ (LSTPopView*)popBadNetWrokTipViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCBadNetWrokTipViewWithParentView:(UIView*)parentView
                                      withDelegate:(id<VLBadNetWorkViewDelegate>)delegate {
     CGFloat popViewH = 276;
     VLBadNetWorkView* badNetView = [[VLBadNetWorkView alloc]initWithFrame:CGRectMake(40, 0, SCREEN_WIDTH - 80, popViewH)
@@ -167,7 +167,7 @@
 }
 
 //控制台
-+ (LSTPopView*)popSettingViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCSettingViewWithParentView:(UIView*)parentView
                                settingView:(nullable DHCVLKTVSettingView*)settingView
                                withDelegate:(id)delegate {
     VLKTVSettingView* _settingView = settingView ? settingView : [[DHCVLKTVSettingView alloc] initWithSetting:nil];
@@ -177,7 +177,7 @@
   //  [_settingView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
     _settingView.delegate = delegate;
     
-    LSTPopView* popView = [self _createKTVPopContainerWithContentView:_settingView
+    LSTPopView* popView = [self _createDHCPopContainerWithContentView:_settingView
                                                        withParentView:parentView];
     popView.isAvoidKeyboard = NO;
     [popView pop];
@@ -186,14 +186,14 @@
 }
 
 //弹出耳返视图
-+ (LSTPopView*)popEarSettingViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCEarSettingViewWithParentView:(UIView*)parentView
                                    isEarOn:(BOOL)isEarOn
                                            vol:(CGFloat)vol
                                   withDelegate:(id<VLEarSettingViewViewDelegate>)delegate {
     CGFloat popViewH = 88+17+270+kSafeAreaBottomHeight;
     VLEarSettingView *earView = [[VLEarSettingView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) isEarOn:isEarOn vol:vol withDelegate:delegate];
     
-    LSTPopView* popView = [self _createKTVPopContainerWithContentView:earView
+    LSTPopView* popView = [self _createDHCPopContainerWithContentView:earView
                                                        withParentView:parentView];
     [popView pop];
     
@@ -201,13 +201,13 @@
 }
 
 //弹出DebugView
-+ (LSTPopView*)popDebugViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCDebugViewWithParentView:(UIView*)parentView
                                    isDebugMode:(BOOL)isDebugMode
                              withDelegate:(id<DHCDebugViewDelegate>)delegate {
     CGFloat popViewH = 480;
     DHCDebugView *debugView = [[DHCDebugView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) isDumpMode:isDebugMode withDelegate:delegate];
     
-    LSTPopView* popView = [self _createKTVPopContainerWithContentView:debugView
+    LSTPopView* popView = [self _createDHCPopContainerWithContentView:debugView
                                                        withParentView:parentView];
     [popView pop];
     

@@ -60,7 +60,7 @@ class KTVSkipView: UIView {
     }
         
     func setSkipType(_ type: SkipType) {
-        let title = type == .prelude ? "跳过前奏" : "跳过尾奏"
+        let title = type == .prelude ? "ktv_skip_prelude".toSceneLocalization() as String : "ktv_skip_end".toSceneLocalization() as String
         DispatchQueue.main.async {
             self.skipBtn.setTitle(title, for: .normal)
         }
