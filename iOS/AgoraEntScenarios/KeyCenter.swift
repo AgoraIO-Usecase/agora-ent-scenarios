@@ -23,7 +23,7 @@ class KeyCenter: NSObject {
      进入声网控制台(https://console.shengwang.cn/)，创建一个项目，进入项目配置页，即可看到APP ID。
      */
     
-    static let AppId: String = <#Your APPId#>
+    static let AppId: String = <#Your AppId#>
   
     /**
      Certificate.
@@ -93,8 +93,9 @@ class KeyCenter: NSObject {
      */
     
     static var IMClientSecret: String? = ""
-  
+    // cantata cloud server key, cantata only!!!
     static let RestfulApiKey: String? = nil
+    //cantata cloud server secret, cantata only!!!
     static let RestfulApiSecret: String? = nil
 
     static var baseServerUrl: String? = "https://service.shengwang.cn/toolbox"
