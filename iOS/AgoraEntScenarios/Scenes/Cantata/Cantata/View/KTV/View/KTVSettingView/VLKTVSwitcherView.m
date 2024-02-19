@@ -66,7 +66,7 @@
 
 - (void)setOn:(BOOL)on {
     _on = on;
-    self.subLabel.text = _on ? @"开启" : @"关闭";
+    self.subLabel.text = _on ? @"ktv_open_soundCard".toSceneLocalization : @"ktv_close_aec".toSceneLocalization;
 }
 
 - (UILabel *)subLabel {
@@ -81,7 +81,7 @@
 -(UIImageView *)rightIcon {
     if(!_rightIcon){
         _rightIcon = [[UIImageView alloc]init];
-        _rightIcon.image = [UIImage sceneImageWithName:@"ktv_arrow_right"];
+        _rightIcon.image = [UIImage dhc_sceneImageWith:@"ktv_arrow_right"];
     }
     return _rightIcon;
 }

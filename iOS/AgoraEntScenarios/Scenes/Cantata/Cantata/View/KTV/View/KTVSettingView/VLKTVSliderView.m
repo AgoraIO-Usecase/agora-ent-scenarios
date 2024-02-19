@@ -102,8 +102,8 @@
 - (UISlider *)sliderView {
     if (!_sliderView) {
         _sliderView = [[UISlider alloc]init];
-        [_sliderView setThumbImage:[UIImage sceneImageWithName:@"icon_ktv_slider"] forState:UIControlStateNormal];
-        [_sliderView setThumbImage:[UIImage sceneImageWithName:@"icon_ktv_slider"] forState:UIControlStateHighlighted];
+        [_sliderView setThumbImage:[UIImage dhc_sceneImageWith:@"icon_ktv_slider"] forState:UIControlStateNormal];
+        [_sliderView setThumbImage:[UIImage dhc_sceneImageWith:@"icon_ktv_slider"] forState:UIControlStateHighlighted];
         _sliderView.maximumValue = self.max;
         _sliderView.minimumValue = self.min;
         [_sliderView addTarget:self action:@selector(sliderValurChanged:) forControlEvents:UIControlEventValueChanged];
@@ -114,7 +114,7 @@
 - (UIButton *)addButton {
     if (!_addButton) {
         _addButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_addButton setImage:[UIImage sceneImageWithName:@"icon_ktv_add"] forState:UIControlStateNormal];
+        [_addButton setImage:[UIImage dhc_sceneImageWith:@"icon_ktv_add"] forState:UIControlStateNormal];
         [_addButton addTarget:self action:@selector(buttonClcik:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _addButton;
@@ -123,7 +123,7 @@
 - (UIButton *)reduceButton {
     if (!_reduceButton) {
         _reduceButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_reduceButton setImage:[UIImage sceneImageWithName:@"icon_ktv_reduce"] forState:UIControlStateNormal];
+        [_reduceButton setImage:[UIImage dhc_sceneImageWith:@"icon_ktv_reduce"] forState:UIControlStateNormal];
         [_reduceButton addTarget:self action:@selector(buttonClcik:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _reduceButton;

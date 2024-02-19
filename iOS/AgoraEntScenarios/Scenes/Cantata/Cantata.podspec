@@ -53,7 +53,7 @@ TODO: Add long description of the pod here.
     'Cantata/**/CantataPlugin.h',
     'Cantata/**/VLKTVTopView.h',
     'Cantata/**/VLKTVSelBgModel.h',
-    'Cantata/**/LSTPopView+KTVModal.h',
+    'Cantata/**/LSTPopView+DHCModal.h',
     "Cantata/**/VLPopMoreSelView.h",
     "Cantata/**/VLPopSelBgView.h",
     "Cantata/**/VLDropOnLineView.h",
@@ -83,5 +83,6 @@ TODO: Add long description of the pod here.
   s.dependency 'SVProgressHUD'
   s.dependency 'ZSwiftBaseLib'
   s.dependency 'Masonry'
+  s.dependency 'SwiftProtobuf'
 end
 

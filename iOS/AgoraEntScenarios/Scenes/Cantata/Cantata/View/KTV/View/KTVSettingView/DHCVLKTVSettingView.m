@@ -51,8 +51,8 @@ UICollectionViewDataSource
         self.setting.remoteVolume = 30;
         self.setting.imMode = 0;
         self.cellWidth = (CGRectGetWidth([UIScreen mainScreen].bounds) - 48) / 4.0;
-        self.titles = @[@"原声",@"大合唱", @"KTV",@"演唱会", @"录音棚", @"留声机", @"空旷", @"空灵", @"流行",@"R&B"];
-        self.effectImgs = @[@"ktv_console_setting1",@"ktv_console_setting2",@"ktv_console_setting3",@"ktv_console_setting4"];
+        self.titles = @[@"ktv_cantata".toSceneLocalization,@"ktv_effect_off".toSceneLocalization, @"KTV".toSceneLocalization,@"ktv_effect_concert".toSceneLocalization, @"ktv_effect_studio".toSceneLocalization, @"ktv_effect_phonograph".toSceneLocalization, @"ktv_effect_spatial".toSceneLocalization, @"ktv_effect_ethereal".toSceneLocalization, @"ktv_effect_pop".toSceneLocalization,@"R&B"];
+        self.effectImgs = @[@"ktv_console_setting2",@"ktv_console_setting1",@"ktv_console_setting3",@"ktv_console_setting4"];
     }
     return self;
 }
@@ -178,7 +178,7 @@ UICollectionViewDataSource
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     EffectCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"EffectCollectionViewCell" forIndexPath:indexPath];
-    cell.bgImageView.image = [UIImage sceneImageWithName:self.effectImgs[indexPath.item % 4]];
+    cell.bgImageView.image = [UIImage dhc_sceneImageWith:self.effectImgs[indexPath.item % 4]];
     cell.titleLabel.text = self.titles[indexPath.item];
     cell.layer.cornerRadius = 5;
     cell.layer.masksToBounds = true;
@@ -242,7 +242,7 @@ UICollectionViewDataSource
 - (UILabel *)titleLabel {
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] init];
-        _titleLabel.text = KTVLocalizedString(@"控制台");
+        _titleLabel.text = DHCLocalizedString(@"ktv_music_menu_dialog_title");
         _titleLabel.font = VLUIFontMake(16);
         _titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     }
@@ -252,9 +252,9 @@ UICollectionViewDataSource
 - (VLKTVSwitcherView *)soundSwitcher {
     if (!_soundSwitcher) {
         _soundSwitcher = [[VLKTVSwitcherView alloc] init];
-        _soundSwitcher.titleLabel.text = KTVLocalizedString(@"耳返设置");
+        _soundSwitcher.titleLabel.text = DHCLocalizedString(@"ktv_ear_setting");
         [_soundSwitcher.swich setHidden: true];
-        _soundSwitcher.subText = KTVLocalizedString(@"请插入耳机使用耳返功能");
+        _soundSwitcher.subText = DHCLocalizedString(@"ktv_please_use_headset");
         _soundSwitcher.delegate = self;
     }
     return _soundSwitcher;
@@ -263,7 +263,7 @@ UICollectionViewDataSource
 - (VLKTVSwitcherView *)imSwitcher {
     if (!_imSwitcher) {
         _imSwitcher = [[VLKTVSwitcherView alloc] init];
-        _imSwitcher.titleLabel.text = KTVLocalizedString(@"沉浸模式");
+        _imSwitcher.titleLabel.text = DHCLocalizedString(@"ktv_sleep_type");
         [_imSwitcher.subLabel setHidden: true];
         _imSwitcher.delegate = self;
     }
@@ -274,7 +274,7 @@ UICollectionViewDataSource
 - (VLKTVTonesView *)tonesView {
     if (!_tonesView) {
         _tonesView = [[VLKTVTonesView alloc] initWithMaxLevel:12 currentLevel:6];
-        _tonesView.titleLabel.text = KTVLocalizedString(@"升降调");
+        _tonesView.titleLabel.text = DHCLocalizedString(@"升降调");
         _tonesView.delegate = self;
     }
     return _tonesView;
@@ -283,7 +283,7 @@ UICollectionViewDataSource
 - (VLKTVSliderView *)soundSlider {
     if (!_soundSlider) {
         _soundSlider = [[VLKTVSliderView alloc] initWithMax:1 min:0];
-        _soundSlider.titleLabel.text = KTVLocalizedString(@"人声音量");
+        _soundSlider.titleLabel.text = DHCLocalizedString(@"ktv_music_menu_dialog_vol1");
         _soundSlider.delegate = self;
     }
     return _soundSlider;
@@ -293,7 +293,7 @@ UICollectionViewDataSource
     if (!_accSlider) {
         _accSlider = [[VLKTVSliderView alloc] initWithMax:1 min:0];
         _accSlider.accessibilityIdentifier = @"ktv_room_setting_acc_slider_id";
-        _accSlider.titleLabel.text = KTVLocalizedString(@"伴奏音量");
+        _accSlider.titleLabel.text = DHCLocalizedString(@"ktv_music_menu_dialog_vol2");
         _accSlider.delegate = self;
     }
     return _accSlider;
@@ -302,7 +302,7 @@ UICollectionViewDataSource
 - (VLKTVSliderView *)remoteSlider {
     if (!_remoteSlider) {
         _remoteSlider = [[VLKTVSliderView alloc] initWithMax:1 min:0];
-        _remoteSlider.titleLabel.text = KTVLocalizedString(@"远端音量");
+        _remoteSlider.titleLabel.text = DHCLocalizedString(@"ktv_music_menu_dialog_remote_volume");
         _remoteSlider.delegate = self;
     }
     return _remoteSlider;
@@ -326,7 +326,7 @@ UICollectionViewDataSource
 //- (VLKTVRemoteVolumeView*)remoteVolumeView {
 //    if (!_remoteVolumeView) {
 //        _remoteVolumeView = [[VLKTVRemoteVolumeView alloc] initWithMin:0 withMax:100 withCurrent:40];
-//        _remoteVolumeView.titleLabel.text = KTVLocalizedString(@"RemoteVolume");
+//        _remoteVolumeView.titleLabel.text = DHCLocalizedString(@"RemoteVolume");
 //        _remoteVolumeView.delegate = self;
 //        _setting.remoteVolume = 40;
 //    }

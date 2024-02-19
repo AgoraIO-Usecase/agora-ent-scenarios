@@ -89,7 +89,7 @@
     if (seatModel.name.length > 0) {
         cell.nickNameLabel.text = seatModel.name;
     }else{
-        cell.nickNameLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"%d号麦"), (int)indexPath.row + 1];
+        cell.nickNameLabel.text = [NSString stringWithFormat:DHCLocalizedString(@"%d号麦"), (int)indexPath.row + 1];
     }
     if (seatModel.isMaster) {
         cell.avatarImgView.layer.borderWidth = 2.0;
@@ -101,11 +101,11 @@
         cell.nickNameLabel.textColor = UIColorMakeWithHex(@"#AEABD0");
         cell.avatarImgView.layer.borderColor = UIColorClear.CGColor;
     }
-    cell.roomerLabel.text = KTVLocalizedString(@"ktv_room_owner");
+    cell.roomerLabel.text = DHCLocalizedString(@"ktv_room_owner");
     if (seatModel.headUrl.length > 0) {
         [cell.avatarImgView sd_setImageWithURL:[NSURL URLWithString:seatModel.headUrl]];
     }else{
-        cell.avatarImgView.image = [UIImage sceneImageWithName:@"ktv_emptySeat_icon"];
+        cell.avatarImgView.image = [UIImage dhc_sceneImageWith:@"ktv_emptySeat_icon"];
     }
     cell.singingBtn.hidden = !seatModel.isOwner;
     

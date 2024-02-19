@@ -28,12 +28,12 @@
 - (void)setupView {
     
     UIImageView *requestImgView = [[UIImageView alloc]initWithFrame:CGRectMake((self.width-345)*0.5, 0, 345, 16)];
-    requestImgView.image = [UIImage sceneImageWithName:@"ktv_request_onlineIcon"];
+    requestImgView.image = [UIImage dhc_sceneImageWith:@"ktv_request_onlineIcon"];
     requestImgView.userInteractionEnabled = YES;
     [self addSubview:requestImgView];
     
     UILabel *tipsLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-300)*0.5, requestImgView.bottom+20, 300, 20)];
-    tipsLabel.text = KTVLocalizedString(@"ktv_room_before_speaker");
+    tipsLabel.text = DHCLocalizedString(@"ktv_room_before_speaker");
     tipsLabel.textAlignment = NSTextAlignmentCenter;
     tipsLabel.textColor = UIColorMakeWithHex(@"#C6C4DE");
     tipsLabel.font = UIFontMake(14);

@@ -32,17 +32,17 @@
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBtn];
     
     UIButton* cleanDumpBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [cleanDumpBtn setTitle:@"清除dump" forState:UIControlStateNormal];
+    [cleanDumpBtn setTitle:@"ktv_clear_dump".toSceneLocalization forState:UIControlStateNormal];
     [cleanDumpBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     [cleanDumpBtn addTarget:self action:@selector(onClickClearDump) forControlEvents:(UIControlEventTouchUpInside)];
     
     UIButton* cleanBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [cleanBtn setTitle:@"清除log" forState:UIControlStateNormal];
+    [cleanBtn setTitle:@"ktv_clear_log".toSceneLocalization forState:UIControlStateNormal];
     [cleanBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     [cleanBtn addTarget:self action:@selector(onClickClearLog) forControlEvents:(UIControlEventTouchUpInside)];
     
     UIButton* exportBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [exportBtn setTitle:@"导出log" forState:UIControlStateNormal];
+    [exportBtn setTitle:@"ktv_export_log".toSceneLocalization forState:UIControlStateNormal];
     [exportBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     [exportBtn addTarget:self action:@selector(onClickExport) forControlEvents:(UIControlEventTouchUpInside)];
     self.navigationItem.rightBarButtonItems = @[

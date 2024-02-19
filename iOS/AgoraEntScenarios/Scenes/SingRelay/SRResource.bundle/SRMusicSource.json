@@ -5,15 +5,7 @@
         "songNo": "6625526604232820",
         "singer": "林俊杰",
         "imageUrl": "https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/661208.jpg",
-        "playCounts": [55000, 97000, 150000, 190000, 243000]
-    },
-    {
-        "isChorus": false,
-        "songName": "凄美地",
-        "songNo": "6625526611288130",
-        "singer": "郭顶",
-        "imageUrl": "https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/126936.jpg",
-        "playCounts": [44000, 89000, 132000, 192000, 244000]
+        "playCounts": [55606, 97357, 150592, 190350, 243041]
     },
     {
         "isChorus": false,
@@ -21,14 +13,6 @@
         "songNo": "6654550232746660",
         "singer": "阿桑",
         "imageUrl": "https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/961853.jpg",
-        "playCounts": [57000, 76000, 130000, 148000, 210000]
+        "playCounts": [57291, 76635, 130940, 148464, 210536]
     },
-    {
-        "isChorus": false,
-        "songName": "起风了",
-        "songNo": "6625526603305730",
-        "singer": "买辣椒也用券",
-        "imageUrl": "https://accpic.sd-rtn.com/pic/release/jpg/3/640_640/385062.jpg",
-        "playCounts": [63000, 109000, 154000, 194000, 274000]
-    }
 ]

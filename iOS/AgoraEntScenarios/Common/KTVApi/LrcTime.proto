@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+enum MsgType {
+  UNKNOWN_TYPE = 0;
+  LRC_TIME = 1001;
+}
+
+message LrcTime {
+  MsgType type = 1;
+  bool forward = 2;
+  int64 ts = 3;
+  string songId = 4;
+  int32 uid = 5;
+}

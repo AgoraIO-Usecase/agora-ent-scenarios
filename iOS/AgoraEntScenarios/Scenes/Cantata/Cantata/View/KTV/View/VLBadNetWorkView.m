@@ -5,7 +5,7 @@
 
 #import "VLBadNetWorkView.h"
 #import "AESMacro.h"
-#import "LSTPopView+KTVModal.h"
+#import "LSTPopView+DHCModal.h"
 
 @interface VLBadNetWorkView ()
 
@@ -26,11 +26,11 @@
 
 - (void)setupView {
     UIImageView *iconImgView = [[UIImageView alloc]initWithFrame:CGRectMake((self.width-227)*0.5, 20, 227, 124)];
-    iconImgView.image = [UIImage sceneImageWithName:@"ktv_badNet_icon"];
+    iconImgView.image = [UIImage dhc_sceneImageWith:@"ktv_badNet_icon"];
     [self addSubview:iconImgView];
     
     UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake((self.width-180)*0.5, iconImgView.bottom+5, 180, 20)];
-    lab.text = KTVLocalizedString(@"ktv_net_status_low");
+    lab.text = DHCLocalizedString(@"ktv_net_status_low");
     lab.font = UIFontMake(14);
     lab.textAlignment = NSTextAlignmentCenter;
     lab.textColor = UIColorMakeWithHex(@"#3C4267");
@@ -41,7 +41,7 @@
     knowBtn.layer.masksToBounds = YES;
     [knowBtn addTarget:self action:@selector(knowBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [knowBtn setBackgroundColor:UIColorMakeWithHex(@"#345DFF")];
-    [knowBtn setTitle:KTVLocalizedString(@"ktv_iknow") forState:UIControlStateNormal];
+    [knowBtn setTitle:DHCLocalizedString(@"ktv_iknow") forState:UIControlStateNormal];
     [knowBtn setTitleColor:UIColorWhite forState:UIControlStateNormal];
     knowBtn.titleLabel.font = UIFontBoldMake(16);
     [self addSubview:knowBtn];
@@ -54,7 +54,7 @@
         return;
     }
     
-    [[LSTPopView getPopViewWithCustomView:self] dismiss];
+    [[LSTPopView getDHCPopViewWithCustomView:self] dismiss];
 }
 
 @end

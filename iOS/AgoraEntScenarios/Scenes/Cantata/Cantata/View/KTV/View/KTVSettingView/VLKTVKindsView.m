@@ -112,15 +112,15 @@
 
 + (NSArray<VLKTVKindsModel *> *)kinds {
     NSArray *titlesArray = @[
-        KTVLocalizedString(@"ktv_room_original"),
-        KTVLocalizedString(@"KTV"),
-        KTVLocalizedString(@"ktv_room_concert"),
-        KTVLocalizedString(@"ktv_room_recording studio"),
-        KTVLocalizedString(@"ktv_room_gramophone"),
-        KTVLocalizedString(@"ktv_room_spacious"),
-        KTVLocalizedString(@"ktv_room_ethereal"),
-        KTVLocalizedString(@"ktv_room_pop"),
-        KTVLocalizedString(@"R&B")];
+        DHCLocalizedString(@"ktv_room_original"),
+        DHCLocalizedString(@"KTV"),
+        DHCLocalizedString(@"ktv_room_concert"),
+        DHCLocalizedString(@"ktv_room_recording studio"),
+        DHCLocalizedString(@"ktv_room_gramophone"),
+        DHCLocalizedString(@"ktv_room_spacious"),
+        DHCLocalizedString(@"ktv_room_ethereal"),
+        DHCLocalizedString(@"ktv_room_pop"),
+        DHCLocalizedString(@"R&B")];
     NSArray *imagesArray = @[@"ktv_console_setting1",
                              @"ktv_console_setting2",
                              @"ktv_console_setting3",

@@ -34,7 +34,7 @@
         
         self.canCelBtn = [[UIButton alloc]init];
         self.canCelBtn.titleLabel.font = [UIFont systemFontOfSize:13];
-        [self.canCelBtn setImage:[UIImage sceneImageWithName:@"x"] forState:UIControlStateNormal];
+        [self.canCelBtn setImage:[UIImage dhc_sceneImageWith:@"x"] forState:UIControlStateNormal];
         self.canCelBtn.tag = 201;
         [self.canCelBtn addTarget:self action:@selector(skip:) forControlEvents:UIControlEventTouchUpInside];
         [self.canCelBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];

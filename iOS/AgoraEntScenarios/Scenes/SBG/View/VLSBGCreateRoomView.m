@@ -256,7 +256,6 @@
             SBGLocalizedString(@"sbg_create_room_title19"),
             SBGLocalizedString(@"sbg_create_room_title20"),
             SBGLocalizedString(@"sbg_create_room_title21"),
-            SBGLocalizedString(@"sbg_create_room_title22"),
         ];
     }
     return _titlesArray;

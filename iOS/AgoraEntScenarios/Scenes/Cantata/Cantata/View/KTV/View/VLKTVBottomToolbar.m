@@ -34,28 +34,28 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
 
 - (void)setupView {
     self.audioBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(25, (self.height-24)*0.5, 24, 24)];
-    [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateNormal];
-    [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateSelected];
+    [self.audioBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_audio_icon"] forState:UIControlStateNormal];
+    [self.audioBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_audio_icon"] forState:UIControlStateSelected];
     self.audioBtn.tag = VLKTVBottomBtnClickTypeAudio;
     [self.audioBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.audioBtn];
     
     self.videoBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(self.audioBtn.right+15, (self.height-24)*0.5, 24, 24)];
-    [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
-    [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_muteIcon"] forState:UIControlStateSelected];
+    [self.videoBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
+    [self.videoBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_video_muteIcon"] forState:UIControlStateSelected];
     self.videoBtn.tag = VLKTVBottomBtnClickTypeVideo;
     [self.videoBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.videoBtn];
     
     VLHotSpotBtn *moreBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(self.videoBtn.right+15, (self.height-24)*0.5, 24, 24)];
-    [moreBtn setImage:[UIImage sceneImageWithName:@"ktv_moreItem_icon"] forState:UIControlStateNormal];
+    [moreBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_moreItem_icon"] forState:UIControlStateNormal];
     moreBtn.tag = VLKTVBottomBtnClickTypeMore;
     [moreBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:moreBtn];
    // moreBtn.alpha = 0;
     
     VLHotSpotBtn *dianGeBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(self.width-20-70, (self.height-32)*0.5, 70, 32)];
-    [dianGeBtn setImage:[UIImage sceneImageWithName:@"ktv_diange_icon"] forState:UIControlStateNormal];
+    [dianGeBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_diange_icon"] forState:UIControlStateNormal];
     [dianGeBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     dianGeBtn.tag = VLKTVBottomBtnClickTypeChoose;
     [self addSubview:dianGeBtn];
@@ -68,16 +68,16 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
             self.isVideoMuted = info.isVideoMuted;
 
             if (!info.isAudioMuted) {
-                [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateNormal];
+                [self.audioBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_audio_icon"] forState:UIControlStateNormal];
             }
             else{
-                [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_self_muteIcon"] forState:UIControlStateNormal];
+                [self.audioBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_self_muteIcon"] forState:UIControlStateNormal];
             }
             if (!info.isVideoMuted) {
-                [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_icon"] forState:UIControlStateNormal];
+                [self.videoBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_video_icon"] forState:UIControlStateNormal];
             }
             else{
-                [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
+                [self.videoBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
             }
 //            if (self.delegate && [self.delegate respondsToSelector:@selector(bottomSetAudioMute:)]) {
 //                [self.delegate bottomSetAudioMute:info.isSelfMuted];
@@ -113,10 +113,10 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
 //            }
 //
 //            if (weakSelf.isSelfMuted == 0){
-//                [weakSelf.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateNormal];
+//                [weakSelf.audioBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_audio_icon"] forState:UIControlStateNormal];
 //            }
 //            else{
-//                [weakSelf.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_self_muteIcon"] forState:UIControlStateNormal];
+//                [weakSelf.audioBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_self_muteIcon"] forState:UIControlStateNormal];
 //            }
 //        }];
 //    }else if (sender.tag == VLKTVBottomBtnClickTypeVideo){
@@ -139,10 +139,10 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
 //                [weakSelf.delegate bottomVideoBtnAction:self.isVideoMuted];
 //            }
 //            if (weakSelf.isVideoMuted == 1) {
-//                [weakSelf.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_icon"] forState:UIControlStateNormal];
+//                [weakSelf.videoBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_video_icon"] forState:UIControlStateNormal];
 //            }
 //            else{
-//                [weakSelf.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
+//                [weakSelf.videoBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
 //            }
 //        }];
 //    }else{
@@ -162,10 +162,10 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
 {
     self.isSelfMuted = audioMuted;
     if (!audioMuted) {
-        [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateNormal];
+        [self.audioBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_audio_icon"] forState:UIControlStateNormal];
     }
     else{
-        [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_self_muteIcon"] forState:UIControlStateNormal];
+        [self.audioBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_self_muteIcon"] forState:UIControlStateNormal];
     }
 }
 
@@ -173,10 +173,10 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
 {
     self.isVideoMuted = videoMuted;
     if (!videoMuted) {
-        [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_icon"] forState:UIControlStateNormal];
+        [self.videoBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_video_icon"] forState:UIControlStateNormal];
     }
     else{
-        [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
+        [self.videoBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
     }
 }
 
@@ -184,8 +184,8 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
 {
     self.isSelfMuted = NO;
     self.isVideoMuted = YES;
-    [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateNormal];
-    [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
+    [self.audioBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_audio_icon"] forState:UIControlStateNormal];
+    [self.videoBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
 }
 
 @end

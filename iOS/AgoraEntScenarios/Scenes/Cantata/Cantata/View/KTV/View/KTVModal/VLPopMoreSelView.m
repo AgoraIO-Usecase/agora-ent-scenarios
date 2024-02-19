@@ -26,7 +26,7 @@
 - (void)setupView {
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = KTVLocalizedString(@"ktv_more_actions");
+    titleLabel.text = DHCLocalizedString(@"ktv_more_actions");
     titleLabel.font = VLUIFontMake(16);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -43,9 +43,9 @@
    // NSArray *itemsArray = @[@"ktv_more_belcantoIcon",@"ktv_more_soundIcon",@"ktv_more_mvIcon"];
     NSArray *itemsArray = @[@"ktv_more_soundIcon",@"ktv_more_mvIcon"];
     NSArray *titlesArray = @[
-       // KTVLocalizedString(@"美声"),
-        KTVLocalizedString(@"ktv_voice_effect"),
-        KTVLocalizedString(@"MV")];
+       // DHCLocalizedString(@"美声"),
+        DHCLocalizedString(@"ktv_voice_effect"),
+        DHCLocalizedString(@"MV")];
     for (int i=0; i<itemsArray.count; i++) {
         UIView *itemBgView = [[UIView alloc]initWithFrame:CGRectMake(leftMargin+(itemWH+middleMargin)*i, itemY, itemWH, itemWH)];
         itemBgView.layer.cornerRadius = itemWH*0.5;
@@ -54,7 +54,7 @@
         [self addSubview:itemBgView];
     
         UIButton *itemBtn = [[UIButton alloc]initWithFrame:CGRectMake(leftMargin+(itemWH+middleMargin)*i+11, itemY+12, btnItemWH, btnItemWH)];
-        [itemBtn setImage:[UIImage sceneImageWithName:itemsArray[i]] forState:UIControlStateNormal];
+        [itemBtn setImage:[UIImage dhc_sceneImageWith:itemsArray[i]] forState:UIControlStateNormal];
         itemBtn.tag = i;
         [itemBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:itemBtn];

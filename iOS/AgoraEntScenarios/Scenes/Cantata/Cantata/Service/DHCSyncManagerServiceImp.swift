@@ -10,7 +10,7 @@ import YYCategories
 import SVProgressHUD
 import AgoraCommon
 
-private let kSceneId = "scene_ktv_3.8.0"
+private let kSceneId = "scene_cantata_4.3.0"
 
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"

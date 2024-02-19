@@ -716,7 +716,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = NO;
     songConfig.mode = (role == KTVSingRoleAudience) ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
@@ -858,7 +857,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
     KTVSingRole role = KTVSingRoleCoSinger;
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = NO;
     songConfig.mode = KTVLoadMusicModeLoadMusicOnly;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
@@ -1045,24 +1043,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                            config:config];
     
     NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
-    KTVApiConfig *apiConfig = [[KTVApiConfig alloc] initWithAppId:[[AppContext shared] appId]
-                                                        rtmToken:VLUserCenter.user.agoraRTMToken
-                                                        engine:self.RTCkit
-                                                        channelName:self.roomModel.roomNo
-                                                        localUid:[VLUserCenter.user.id integerValue]
-                                                        chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo]
-                                                        chorusChannelToken:@""
-                                                        type:KTVTypeSingRelay
-                                                        maxCacheSize:10
-                                                        musicType:loadMusicTypeMcc
-                                                        isDebugMode:false];
+    KTVApiConfig *apiConfig = [[KTVApiConfig alloc]initWithAppId:[[AppContext shared] appId] rtmToken:VLUserCenter.user.agoraRTMToken engine:self.RTCkit channelName:self.roomModel.roomNo localUid:[VLUserCenter.user.id integerValue] chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:@"" type:KTVTypeSingRelay musicType:loadMusicTypeMcc maxCacheSize:10 isDebugMode:false];
     
-    self.SRApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
+    self.SRApi = [[KTVApiImpl alloc] init];
+    [self.SRApi createKtvApiWithConfig:apiConfig];
     [self.SRApi renewInnerDataStreamId];
-//    SRLrcControl* lrcControl = [[SRLrcControl alloc] initWithLrcView:self.MVView.karaokeView];
-//    [self.SRApi setLrcViewWithView:lrcControl];
-//    self.lrcControl = lrcControl;
-//    self.lrcControl.delegate = self;
     [self.SRApi setLrcViewWithView:self.statusView.lrcView];
     [self.SRApi muteMicWithMuteStatus:self.isNowMicMuted];
     [self.SRApi addEventHandlerWithKtvApiEventHandler:self];
@@ -1745,7 +1730,6 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
 - (void)reloadMusic{
     VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = YES;
     songConfig.mode = KTVLoadMusicModeLoadLrcOnly;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;

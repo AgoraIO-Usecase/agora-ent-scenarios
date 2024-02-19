@@ -34,19 +34,19 @@
     [self addSubview:backView];
     
     UIImageView *logoImgView = [[UIImageView alloc]initWithFrame:CGRectMake(20, 10, 34, 34)];
-    logoImgView.image = [UIImage sceneImageWithName:@""];
+    logoImgView.image = [UIImage dhc_sceneImageWith:@""];
     logoImgView.layer.cornerRadius = 17;
     logoImgView.layer.masksToBounds = true;
     [self addSubview:logoImgView];
     self.logoImgView = logoImgView;
     
     VLHotSpotBtn *closeBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(SCREEN_WIDTH-27-20, logoImgView.top + 7, 20, 20)];
-    [closeBtn setImage:[UIImage sceneImageWithName:@"dhc_close" bundleName:@"DHCResource"] forState:UIControlStateNormal];
+    [closeBtn setImage:[UIImage dhc_sceneImageWith:@"dhc_close"] forState:UIControlStateNormal];
     [closeBtn addTarget:self action:@selector(closeBtnEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:closeBtn];
     
     UIButton *moreButton = [[UIButton alloc] init];
-    [moreButton setImage:[UIImage sceneImageWithName:@"icon_live_more" bundleName:@"DHCResource"] forState:(UIControlStateNormal)];
+    [moreButton setImage:[UIImage dhc_sceneImageWith:@"icon_live_more"] forState:(UIControlStateNormal)];
     [moreButton addTarget:self action:@selector(moreBtnEvent:) forControlEvents:(UIControlEventTouchUpInside)];
     [self addSubview:moreButton];
     moreButton.translatesAutoresizingMaskIntoConstraints = NO;
@@ -59,9 +59,6 @@
     self.titleLabel.textColor = UIColorWhite;
     [self addSubview:self.titleLabel];
     
-//    self.networkStatusBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"]
-//                                                             title:KTVLocalizedString(@"本机网络好")];
-    
     self.countLabel = [[UILabel alloc]initWithFrame:CGRectMake(logoImgView.right + 5, 30, 60, 12)];
     self.countLabel.font = UIFontMake(12);
     self.countLabel.textAlignment = NSTextAlignmentRight;
@@ -70,8 +67,8 @@
     
     self.networkStatusBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     self.networkStatusBtn.frame = CGRectMake(self.countLabel.right + 5, 30, 70, 12);
-    [self.networkStatusBtn setTitle:KTVLocalizedString(@"ktv_net_status_good") forState:UIControlStateNormal];
-    [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
+    [self.networkStatusBtn setTitle:DHCLocalizedString(@"ktv_net_status_good") forState:UIControlStateNormal];
+    [self.networkStatusBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
   //  self.networkStatusBtn.imagePosition = QMUIButtonImagePositionLeft;
     self.networkStatusBtn.spacingBetweenImageAndTitle = 0;
     self.networkStatusBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
@@ -112,20 +109,20 @@
 - (void)setNetworkQuality:(int)quality
 {
     if(quality == 0) {
-        [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
-        [self.networkStatusBtn setTitle:KTVLocalizedString(@"ktv_net_status_good") forState:UIControlStateNormal];
+        [self.networkStatusBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
+        [self.networkStatusBtn setTitle:DHCLocalizedString(@"ktv_net_status_good") forState:UIControlStateNormal];
     }
     else if (quality == 1) {
-        [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_okIcon"] forState:UIControlStateNormal];
-        [self.networkStatusBtn setTitle:KTVLocalizedString(@"ktv_net_status_m") forState:UIControlStateNormal];
+        [self.networkStatusBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_network_okIcon"] forState:UIControlStateNormal];
+        [self.networkStatusBtn setTitle:DHCLocalizedString(@"ktv_net_status_m") forState:UIControlStateNormal];
     }
     else if(quality == 2) {
-        [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_badIcon"] forState:UIControlStateNormal];
-        [self.networkStatusBtn setTitle:KTVLocalizedString(@"ktv_net_status_low") forState:UIControlStateNormal];
+        [self.networkStatusBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_network_badIcon"] forState:UIControlStateNormal];
+        [self.networkStatusBtn setTitle:DHCLocalizedString(@"ktv_net_status_low") forState:UIControlStateNormal];
     }
     else {
-        [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
-        [self.networkStatusBtn setTitle:KTVLocalizedString(@"ktv_net_status_good") forState:UIControlStateNormal];
+        [self.networkStatusBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
+        [self.networkStatusBtn setTitle:DHCLocalizedString(@"ktv_net_status_good") forState:UIControlStateNormal];
     }
 }
 

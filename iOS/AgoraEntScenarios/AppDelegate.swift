@@ -27,8 +27,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppContext.shared.imAppKey = KeyCenter.IMAppKey ?? ""
         AppContext.shared.imClientId = KeyCenter.IMClientId ?? ""
         AppContext.shared.imClientSecret = KeyCenter.IMClientSecret ?? ""
-        AppContext.shared.cloudPlayerKey = KeyCenter.CloudPlayerKey ?? ""
-        AppContext.shared.cloudPlayerSecret = KeyCenter.CloudPlayerSecret ?? ""
+        AppContext.shared.cloudPlayerKey = KeyCenter.RestfulApiKey ?? ""
+        AppContext.shared.cloudPlayerSecret = KeyCenter.RestfulApiSecret ?? ""
         AppContext.shared.baseServerUrl = KeyCenter.baseServerUrl ?? ""
     }
     

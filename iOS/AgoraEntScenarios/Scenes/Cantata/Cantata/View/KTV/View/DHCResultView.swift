@@ -15,7 +15,7 @@ class DHCResultView: UIView {
     private let ScreenWidth: CGFloat = UIScreen.main.bounds.size.width
     private lazy var resultTitleLabel: UILabel = { //本轮评分
         let label = UILabel()
-        label.text = "本轮总分"
+        label.text = "ktv_total_score".toSceneLocalization() as String
         label.textAlignment = .center
         label.textColor = .white
         return label
@@ -51,7 +51,7 @@ class DHCResultView: UIView {
     
     private lazy var nextBtn: UIButton = { //下一首歌提示
         let btn = UIButton()
-        btn.setTitle("下一首 10S", for: .normal)
+        btn.setTitle("\("ktv_next_song".toSceneLocalization() as String) 10S", for: .normal)
         if let image = UIImage.sceneImage(name: "next", bundleName: "DHCResource") {
             let resizedImage = image.resizableImage(withCapInsets: UIEdgeInsets.zero, resizingMode: .stretch)
             btn.setBackgroundImage(resizedImage, for: .normal)
@@ -133,7 +133,7 @@ class DHCResultView: UIView {
             nextLabel.text = "\(musicStr)"
         }
         nextBtn.isHidden = !isRoomOwner
-        nextBtn.setTitle("下一首 10S", for: .normal)
+        nextBtn.setTitle("\("ktv_next_song".toSceneLocalization() as String) 10S", for: .normal)
         if isRoomOwner {
             // 开始倒计时
             countdownTimer = CountdownTimer()
@@ -141,7 +141,7 @@ class DHCResultView: UIView {
                 // 更新UI，显示剩余时间
                 print("Time remaining: \(timeRemaining) seconds")
                 DispatchQueue.main.async {
-                    self.nextBtn.setTitle("下一首 \(Int(timeRemaining))S", for: .normal)
+                    self.nextBtn.setTitle("\("ktv_next_song".toSceneLocalization() as String) \(Int(timeRemaining))S", for: .normal)
                 }
             }) {
                 // 倒计时结束处理

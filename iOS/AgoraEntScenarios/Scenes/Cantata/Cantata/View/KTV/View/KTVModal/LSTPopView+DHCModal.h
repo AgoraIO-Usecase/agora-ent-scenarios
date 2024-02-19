@@ -17,60 +17,60 @@
 #import "DHCDebugView.h"
 NS_ASSUME_NONNULL_BEGIN
 
-@interface LSTPopView (KTVModal)
+@interface LSTPopView (DHCModal)
 
-+ (LSTPopView*)getPopViewWithCustomView:(UIView*)customView;
++ (LSTPopView*)getDHCPopViewWithCustomView:(UIView*)customView;
 
 //更换MV背景
-+ (LSTPopView*)popSelMVBgViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCSelMVBgViewWithParentView:(UIView*)parentView
                                     bgModel:(VLKTVSelBgModel*)bgModel
                                withDelegate:(id<VLPopSelBgViewDelegate>)delegate;
 
 //弹出更多
-+ (LSTPopView*)popSelMoreViewWithParentView: (UIView*)parentView
++ (LSTPopView*)popDHCSelMoreViewWithParentView: (UIView*)parentView
                                withDelegate:(id<VLPopMoreSelViewDelegate>)delegate;
 
 
 //弹出下麦视图
-+ (LSTPopView*)popDropLineViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCDropLineViewWithParentView:(UIView*)parentView
                                withSeatModel:(VLRoomSeatModel *)seatModel
                                 withDelegate:(id)delegate;
 
 //弹出美声视图
-+ (LSTPopView*)popBelcantoViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCBelcantoViewWithParentView:(UIView*)parentView
                            withBelcantoModel:(VLBelcantoModel *)belcantoModel
                                 withDelegate:(id<VLAudioEffectPickerDelegate>)delegate;
 
 //弹出点歌视图
-+ (LSTPopView*)popUpChooseSongViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCUpChooseSongViewWithParentView:(UIView*)parentView
                                         isChorus:(BOOL)isChorus
                                  chooseSongArray: (NSArray*)chooseSongArray
                                       withRoomNo:(NSString*)roomNo
                                     withDelegate:(id)delegate;
 
 //弹出音效
-+ (LSTPopView*)popSetSoundEffectViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCSetSoundEffectViewWithParentView:(UIView*)parentView
                                          soundView:(VLEffectView*)soundView
                                       withDelegate:(id<VLEffectViewDelegate>)delegate;
 
 //网络差视图
-+ (LSTPopView*)popBadNetWrokTipViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCBadNetWrokTipViewWithParentView:(UIView*)parentView
                                      withDelegate:(id<VLBadNetWorkViewDelegate>)delegate;
 
 
 //控制台
-+ (LSTPopView*)popSettingViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCSettingViewWithParentView:(UIView*)parentView
                                settingView:(nullable DHCVLKTVSettingView*)settingView
                                withDelegate:(id)delegate;
 
 //弹出耳返视图
-+ (LSTPopView*)popEarSettingViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCEarSettingViewWithParentView:(UIView*)parentView
                                    isEarOn:(BOOL)isEarOn
                                            vol:(CGFloat)vol
                                   withDelegate:(id<VLEarSettingViewViewDelegate>)delegate;
 
 //弹出DebugView
-+ (LSTPopView*)popDebugViewWithParentView:(UIView*)parentView
++ (LSTPopView*)popDHCDebugViewWithParentView:(UIView*)parentView
                                    isDebugMode:(BOOL)isDebugMode
                                   withDelegate:(id<DHCDebugViewDelegate>)delegate;
 

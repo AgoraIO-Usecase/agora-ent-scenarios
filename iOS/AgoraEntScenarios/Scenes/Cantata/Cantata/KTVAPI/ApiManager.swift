@@ -3,7 +3,9 @@ import AgoraCommon
 class ApiManager {
     static let shared = ApiManager()
     
-    private let domain = "https://api.sd-rtn.com"
+   // private let domain = "https://api.sd-rtn.com"
+    private let domain: String = "http://218.205.37.50:16000"
+    private let testIp: String = "218.205.37.50"
     
     private let TAG = "ApiManager"
     
@@ -18,12 +20,13 @@ class ApiManager {
         return URLSession(configuration: configuration)
     }()
     
-    func fetchCloudToken() -> String {
-        var token = ""
+    func fetchCloudToken() -> String? {
+        var token: String? = nil
         
         do {
             let acquireOjb = try JSONSerialization.data(withJSONObject: [
                 "instanceId": "\(Int(Date().milListamp))",
+                "testIp": testIp,
             ])
 
             let url = getTokenUrl(domain: domain, appId: AppContext.shared.appId)
@@ -39,7 +42,8 @@ class ApiManager {
             let task = session.dataTask(with: request) { (data, response, error) in
                 if let error = error {
                     print("getToken error: \(error.localizedDescription)")
-                    VLToast.toast("云端合流服务开启失败，请重新创建房间")
+                    token = nil
+                    VLToast.toast("ktv_merge_failed_and create".toSceneLocalization() as String)
                 } else if let data = data {
                     do {
                         guard let responseDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any], let tokenName = responseDict["tokenName"] as? String else {
@@ -49,7 +53,8 @@ class ApiManager {
                         token = tokenName
                     } catch {
                         print("getToken error: \(error.localizedDescription)")
-                        VLToast.toast("云端合流服务开启失败，请重新创建房间")
+                        VLToast.toast("ktv_merge_failed_and create".toSceneLocalization() as String)
+                        token = nil
                     }
                 }
                 
@@ -61,20 +66,22 @@ class ApiManager {
             
         } catch {
             print("getToken error: \(error.localizedDescription)")
-            VLToast.toast("云端合流服务开启失败，请重新创建房间")
+            VLToast.toast("ktv_merge_failed_and create")
+            token = nil
         }
         
         return token
     }
     
-    func fetchStartCloud(mainChannel: String, cloudRtcUid: Int) {
+    func fetchStartCloud(mainChannel: String, cloudRtcUid: Int, completion: @escaping ((Bool)->Void)) {
         let token = fetchCloudToken()
         
-        if token.isEmpty {
+        if token == nil {
             print("云端合流uid 请求报错 token is null")
+            completion(false)
             return
         } else {
-            tokenName = token
+            tokenName = token!
         }
         
         do {
@@ -98,14 +105,14 @@ class ApiManager {
             ]
             
             let dataStreamObj: [String: Any] = [
-                "source": ["dataStream": true],
+                "source": ["audioMetaData": true],
                 "sink": [:]
             ]
             
             let outputsObj: [String: Any] = [
                 "audioOption": audioOptionObj,
                 "rtc": outputRetObj,
-                "dataStreamOption": dataStreamObj
+                "metaDataOption": dataStreamObj
             ]
             
             let transcoderObj: [String: Any] = [
@@ -138,18 +145,22 @@ class ApiManager {
             let task = session.dataTask(with: request) { (data, response, error) in
                 if let error = error {
                     print("云端合流uid 请求报错: \(error.localizedDescription)")
-                    VLToast.toast("云端合流服务开启失败，请重新创建房间")
+                    completion(false)
+                    VLToast.toast("ktv_merge_failed_and create".toSceneLocalization() as String)
                 } else if let data = data {
                     do {
                         guard let responseDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any], let taskId = responseDict["taskId"] as? String else {
+                            completion(false)
                             return
                         }
                         
                         self.taskId = taskId
-                        VLToast.toast("云端合流服务开启成功")
+                        completion(true)
+                        VLToast.toast("ktv_merge_success".toSceneLocalization() as String)
                     } catch {
                         print("云端合流uid 请求报错: \(error.localizedDescription)")
-                        VLToast.toast("云端合流服务开启失败，请重新创建房间")
+                        completion(false)
+                        VLToast.toast("ktv_merge_failed_and create".toSceneLocalization() as String)
                     }
                 }
                 
@@ -161,7 +172,8 @@ class ApiManager {
             
         } catch {
             print("云端合流uid 请求报错: \(error.localizedDescription)")
-            VLToast.toast("云端合流服务开启失败，请重新创建房间")
+            completion(false)
+            VLToast.toast("ktv_merge_failed_and create".toSceneLocalization() as String)
         }
     }
     

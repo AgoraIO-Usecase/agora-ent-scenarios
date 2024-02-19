@@ -38,8 +38,9 @@
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] init];
         _titleLabel.text = @"";
-        _titleLabel.font = [UIFont systemFontOfSize:12];
-        _titleLabel.textColor = UIColorMakeWithHex(@"#979CBB");
+        _titleLabel.font = [UIFont systemFontOfSize:15];
+        _titleLabel.textColor = [UIColor whiteColor];
+       // _titleLabel.textColor = UIColorMakeWithHex(@"#979CBB");
     }
     return _titleLabel;
 }

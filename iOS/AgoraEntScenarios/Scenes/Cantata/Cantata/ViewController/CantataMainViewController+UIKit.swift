@@ -7,7 +7,7 @@
 
 import Foundation
 import AUIKitCore
-
+import AgoraCommon
 private let kChartIds = [3, 4, 2, 6]
 let kListPageCount: Int = 10
 extension CantataMainViewController: AUIJukeBoxViewDelegate {
@@ -70,12 +70,12 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
         AUIAlertView.theme_defaultAlert()
             .isShowCloseButton(isShow: false)
             .title(title: aui_localized("switchToNextSong"))
-            .rightButton(title: "确认")
+            .rightButton(title: "ktv_confirm".toSceneLocalization() as String)
             .rightButtonTapClosure(onTap: {[weak self] text in
                 guard let self = self else { return }
                 self.onRemoveSong(view: view, index: index)
             })
-            .leftButton(title: "取消")
+            .leftButton(title: "ktv_cancel".toSceneLocalization() as String)
             .show()
     }
     

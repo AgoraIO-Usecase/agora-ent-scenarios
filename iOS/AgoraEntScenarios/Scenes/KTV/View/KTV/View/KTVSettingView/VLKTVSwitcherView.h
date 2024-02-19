@@ -4,6 +4,7 @@
 //
 
 #import "VLKTVItemBaseView.h"
+
 @class VLKTVSwitcherView;
 
 NS_ASSUME_NONNULL_BEGIN

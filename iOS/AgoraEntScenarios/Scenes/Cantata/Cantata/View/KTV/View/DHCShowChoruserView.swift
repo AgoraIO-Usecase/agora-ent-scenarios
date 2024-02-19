@@ -37,7 +37,7 @@ class DHCShowChoruserView: UIViewController {
         view.addSubview(tableView)
         tableView.backgroundColor = .clear
         
-        countLabel.text = "正在合唱用户(\(dataSource.count))"
+        countLabel.text = "\("ktv_cur_chorus".toSceneLocalization() as String)(\(dataSource.count))"
     }
     
 }
