@@ -125,6 +125,7 @@ class CallServiceManager {
 
     fun reInit() {
         val uid = localUser?.userId ?: return
+        callApi?.deinitialize {}
         callApi?.initialize(CallConfig(
             BuildConfig.AGORA_APP_ID,
             uid.toInt(),
