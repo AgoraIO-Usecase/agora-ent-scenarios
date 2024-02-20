@@ -33,6 +33,8 @@ android {
 
         buildConfigField "String", "RESTFUL_API_KEY", "\"${RESTFUL_API_KEY}\""
         buildConfigField "String", "RESTFUL_API_SECRET", "\"${RESTFUL_API_SECRET}\""
+
+        buildConfigField "String", "ROOM_MANAGER_SERVER_HOST", "\"${ROOM_MANAGER_SERVER_HOST}\""
     }
 
     buildTypes {

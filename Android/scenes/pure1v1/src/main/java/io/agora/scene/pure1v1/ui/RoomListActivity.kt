@@ -100,10 +100,13 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         setOnApplyWindowInsetsListener()
         setupView()
 
-        CallServiceManager.instance.setup(this)
-        CallServiceManager.instance.sceneService?.enterRoom { e ->
-            if (e == null) {
-                binding.smartRefreshLayout.autoRefresh()
+        CallServiceManager.instance.setup(this) {
+            if (it) {
+                CallServiceManager.instance.sceneService?.enterRoom { e ->
+                    if (e == null) {
+                        binding.smartRefreshLayout.autoRefresh()
+                    }
+                }
             }
         }
         CallServiceManager.instance.callApi?.addListener(this)

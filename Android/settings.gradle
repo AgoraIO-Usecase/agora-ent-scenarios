@@ -55,21 +55,22 @@ include ':common:ui-widget'
 //include ':scenes:voice_spatial'
 //include ':scenes:voice_spatial:common'
 
-/*
- * 秀场直播
- */
-include ':scenes:show'
-include ':scenes:show:aars:beauty_sensetime:SenseArSourceManager'
-include ':scenes:show:aars:beauty_sensetime:STMobileJNI'
-include ':scenes:show:aars:beauty_sensetime:HardwareBuffer'
-include ':scenes:show:aars:beauty_bytedance:EffectAAR'
+///*
+// * 秀场直播
+// */
+//include ':scenes:show'
+//include ':scenes:show:aars:beauty_sensetime:SenseArSourceManager'
+//include ':scenes:show:aars:beauty_sensetime:STMobileJNI'
+//include ':scenes:show:aars:beauty_sensetime:HardwareBuffer'
+//include ':scenes:show:aars:beauty_bytedance:EffectAAR'
 
 /*
  * 1V1私密房
  */
+include ':RTMSyncManager'
 include ':scenes:pure1v1'
 
-/**
- * 秀场转1V1私密房
- */
-include ':scenes:showTo1v1'
+///**
+// * 秀场转1V1私密房
+// */
+//include ':scenes:showTo1v1'
