@@ -522,7 +522,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 agoraAssert("reject invitation not found")
                 return
             }
-            user.status = .rejected
+            user.status = .idle
             self._updateUserInfo(user: user, completion: completion)
         }
     }
@@ -1062,8 +1062,8 @@ extension ShowSyncManagerServiceImp {
     
     private func _updateInteractionStatus(with status: ShowInteractionStatus) {
         guard let channelName = roomId,
-              let roomInfo = roomList?.filter({ $0.roomId == self.getRoomId() }).first,
-              roomInfo.ownerId == VLUserCenter.user.id
+              let roomInfo = roomList?.filter({ $0.roomId == self.getRoomId() }).first
+//              roomInfo.ownerId == VLUserCenter.user.id
         else {
 //            agoraPrint("updateUserCount channelName = nil")
 //            userListCountDidChanged?(UInt(count))
