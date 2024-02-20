@@ -243,10 +243,8 @@ class ShowLivePagesSlicingDelegateHandler: AGCollectionSlicingDelegateHandler {
               vc.room?.ownerId != UserInfo.userId else {
             return
         }
-
         super.collectionView(collectionView, willDisplay: cell, forItemAt: indexPath)
         vc.loadingType = .joinedWithVideo
-        currentVC = vc
     }
     
     override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -262,6 +260,16 @@ class ShowLivePagesSlicingDelegateHandler: AGCollectionSlicingDelegateHandler {
     override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         super.scrollViewDidEndDecelerating(scrollView)
         let currentIndex = Int(scrollView.contentOffset.y / scrollView.height)
+        
+        let cell = (scrollView as? UICollectionView)?.cellForItem(at: IndexPath(row: currentIndex, section: 0))
+        if let vc = cell?.contentView.viewWithTag(kShowLiveRoomViewTag)?.next as? ShowLiveViewController,
+              vc.room?.ownerId != UserInfo.userId {
+            if (currentVC != vc) {
+                ShowAgoraKitManager.shared.setupAudienceProfile()
+                currentVC = vc
+            }
+        }
+        
         if currentIndex > 0, currentIndex < (roomList?.count() ?? 0) - 1 {return}
         let toIndex = currentIndex
         if let cycleArray = roomList as? ShowCycleRoomArray {
