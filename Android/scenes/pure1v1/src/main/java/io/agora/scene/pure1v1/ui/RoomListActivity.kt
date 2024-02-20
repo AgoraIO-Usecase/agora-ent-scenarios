@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -38,6 +39,7 @@ import io.agora.scene.pure1v1.ui.calling.CallReceiveDialog
 import io.agora.scene.pure1v1.ui.calling.CallSendDialog
 import io.agora.scene.pure1v1.ui.living.CallDetailFragment
 import io.agora.scene.widget.dialog.PermissionLeakDialog
+import io.agora.scene.widget.utils.StatusBarUtil
 import org.json.JSONException
 import org.json.JSONObject
 import kotlin.random.Random
@@ -144,7 +146,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 if (msg != null) {
                     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(this, getText(R.string.pure1v1_room_list_refresh), Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(this, getText(R.string.pure1v1_room_list_refresh), Toast.LENGTH_SHORT).show()
                 }
             }
             dataList = list.filter { it.userId != CallServiceManager.instance.localUser?.userId}
@@ -176,6 +178,11 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
 
     private fun call(user: UserInfo) {
+        if (callState == CallStateType.Failed) {
+            CallServiceManager.instance.reInit()
+        } else if (callState == CallStateType.Calling || callState == CallStateType.Connecting || callState == CallStateType.Connected) {
+            return
+        }
         permissionHelp.checkCameraAndMicPerms({
             // 准备工作
             CallServiceManager.instance.prepareForCall {
@@ -188,14 +195,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     }
                 }
             }
-//            // 拨打
-//            CallServiceManager.instance.callApi?.call(user.userId.toInt()) { error ->
-//                if (error != null) {
-//                    finishCallDialog()
-//                    CallServiceManager.instance.stopCallShow()
-//                    CallServiceManager.instance.stopCallMusic()
-//                }
-//            }
         }, {
             PermissionLeakDialog(this).show("", { getPermissions() }
             ) { launchAppSetting(Manifest.permission.CAMERA) }
@@ -370,7 +369,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
                 // 自动刷新列表
                 if (!isFirstEnterScene) {
-                    fetchRoomList(false)
+                    binding.smartRefreshLayout.autoRefresh()
                 }
             }
             CallStateType.Failed -> {
@@ -385,7 +384,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 // TODO bug CallServiceManager.instance.rtcEngine?.stopAudioMixing()
 
                 // 自动刷新列表
-                fetchRoomList(false)
+                binding.smartRefreshLayout.autoRefresh()
             }
             else -> {
             }

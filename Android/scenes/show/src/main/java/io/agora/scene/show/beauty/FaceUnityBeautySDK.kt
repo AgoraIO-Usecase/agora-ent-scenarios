@@ -52,7 +52,7 @@ object FaceUnityBeautySDK {
                         BUNDLE_AI_HUMAN,
                         FUAITypeEnum.FUAITYPE_HUMAN_PROCESSOR
                     )
-
+                    beautyConfig.reset()
                 }
             }
 
