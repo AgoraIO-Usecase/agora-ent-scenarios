@@ -154,6 +154,11 @@ class CallServiceManager {
         }
         sceneService?.reset()
         sceneService = null
+
+        rtmClient?.logout(object : ResultCallback<Void> {
+            override fun onSuccess(responseInfo: Void?) {}
+            override fun onFailure(errorInfo: ErrorInfo?) {}
+        })
         RtmClient.release()
     }
 

@@ -11,6 +11,7 @@ import io.agora.rtmsyncmanager.model.AUIRoomContext
 import io.agora.rtmsyncmanager.model.AUIUserInfo
 import io.agora.rtmsyncmanager.service.IAUIUserService
 import io.agora.rtmsyncmanager.service.arbiter.AUIArbiter
+import io.agora.rtmsyncmanager.service.collection.AUICollectionException
 import io.agora.rtmsyncmanager.service.collection.AUIMapCollection
 import io.agora.rtmsyncmanager.service.collection.IAUICollection
 import io.agora.rtmsyncmanager.service.imp.AUIUserServiceImpl
@@ -214,7 +215,12 @@ class Scene constructor(
         //每个collection都清空，让所有人收到onMsgRecvEmpty
         rtmManager.cleanBatchMetadata(channelName = channelName, lockName = "", remoteKeys = removeKeys, fetchImmediately = true) {
         }
-        roomCollection.cleanMetaData {  }
+        rtmManager.cleanBatchMetadata(
+            channelName = channelName,
+            remoteKeys = listOf(kRoomInfoKey),
+            fetchImmediately = true,
+            completion = { _ -> }
+        )
         getArbiter().destroy()
     }
 

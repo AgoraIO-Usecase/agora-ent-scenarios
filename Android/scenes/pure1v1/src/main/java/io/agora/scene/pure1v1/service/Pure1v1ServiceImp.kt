@@ -159,6 +159,7 @@ class Pure1v1ServiceImp(
         val u = user ?: return
         val scene = syncManager.getScene(u.getRoomId())
         scene.unbindRespDelegate(this)
+        scene.leave()
         scene.delete()
         roomManager.destroyRoom(BuildConfig.AGORA_APP_ID, kSceneId, u.getRoomId()) { e ->
 
