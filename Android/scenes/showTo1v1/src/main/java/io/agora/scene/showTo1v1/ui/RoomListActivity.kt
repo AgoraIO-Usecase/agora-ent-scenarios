@@ -147,6 +147,8 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             mShowTo1v1Manger.renewTokens {
                 if (it) {
                     fetchRoomList()
+                } else {
+                    binding.smartRefreshLayout.finishRefresh()
                 }
             }
         }
@@ -330,13 +332,18 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         if (needCall) {
             toggleSelfVideo(true) {
                 mShowTo1v1Manger.prepareCall(CallRole.CALLER, roomInfo.roomId, callback = {
-                    mShowTo1v1Manger.mCallApi.addListener(callApiListener)
-                    mShowTo1v1Manger.mCallApi.call(roomInfo.getIntUserId(), completion = {
-                        if (it != null) {
-                            mShowTo1v1Manger.mCallApi.removeListener(callApiListener)
-                            mShowTo1v1Manger.deInitialize()
-                        }
-                    })
+                    if (it) {
+                        mShowTo1v1Manger.mCallApi.addListener(callApiListener)
+                        mShowTo1v1Manger.mCallApi.call(roomInfo.getIntUserId(), completion = {
+                            if (it != null) {
+                                mShowTo1v1Manger.mCallApi.removeListener(callApiListener)
+                                mShowTo1v1Manger.deInitialize()
+                            }
+                        })
+                    } else {
+                        // Failed 状态需要释放资源重新init
+                        mShowTo1v1Manger.deInitialize()
+                    }
                 })
             }
         } else {
