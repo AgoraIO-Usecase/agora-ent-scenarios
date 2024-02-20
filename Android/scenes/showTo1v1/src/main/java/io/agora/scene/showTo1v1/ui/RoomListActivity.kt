@@ -147,6 +147,8 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             mShowTo1v1Manger.renewTokens {
                 if (it) {
                     fetchRoomList()
+                } else {
+                    binding.smartRefreshLayout.finishRefresh()
                 }
             }
         }
@@ -264,7 +266,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             updateListView()
             resetViewpage()
             initOrUpdateViewPage()
-            ToastUtils.showToast(R.string.show_to1v1_room_list_refreshed)
+            //ToastUtils.showToast(R.string.show_to1v1_room_list_refreshed)
             mayShowGuideView()
             if (roomList.isNotEmpty()) {
                 binding.viewPager2.setCurrentItem(0, false)
@@ -330,13 +332,18 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         if (needCall) {
             toggleSelfVideo(true) {
                 mShowTo1v1Manger.prepareCall(CallRole.CALLER, roomInfo.roomId, callback = {
-                    mShowTo1v1Manger.mCallApi.addListener(callApiListener)
-                    mShowTo1v1Manger.mCallApi.call(roomInfo.getIntUserId(), completion = {
-                        if (it != null) {
-                            mShowTo1v1Manger.mCallApi.removeListener(callApiListener)
-                            mShowTo1v1Manger.deInitialize()
-                        }
-                    })
+                    if (it) {
+                        mShowTo1v1Manger.mCallApi.addListener(callApiListener)
+                        mShowTo1v1Manger.mCallApi.call(roomInfo.getIntUserId(), completion = {
+                            if (it != null) {
+                                mShowTo1v1Manger.mCallApi.removeListener(callApiListener)
+                                mShowTo1v1Manger.deInitialize()
+                            }
+                        })
+                    } else {
+                        // Failed 状态需要释放资源重新init
+                        mShowTo1v1Manger.deInitialize()
+                    }
                 })
             }
         } else {

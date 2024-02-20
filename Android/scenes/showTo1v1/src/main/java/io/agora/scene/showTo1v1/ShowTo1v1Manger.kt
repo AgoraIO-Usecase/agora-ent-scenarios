@@ -118,7 +118,7 @@ class ShowTo1v1Manger constructor() {
      * @param role 呼叫/被叫
      * @param ownerRoomId 呼叫/被叫房间 id
      */
-    fun prepareCall(role: CallRole, ownerRoomId: String, callback: () -> Unit) {
+    fun prepareCall(role: CallRole, ownerRoomId: String, callback: (success: Boolean) -> Unit) {
         initCallAPi()
         if (role == CallRole.CALLER) {
             mPrepareConfig.roomId = mCurrentUser.get1v1ChannelId()
@@ -132,7 +132,9 @@ class ShowTo1v1Manger constructor() {
                 mCallApi.prepareForCall(mPrepareConfig) {
                     if (it == null) {
                         isCallApiInit = true
-                        callback.invoke()
+                        callback.invoke(true)
+                    } else {
+                        callback.invoke(false)
                     }
                 }
             }
@@ -182,7 +184,7 @@ class ShowTo1v1Manger constructor() {
             return
         }
         renewTokens {
-            callback.invoke(true)
+            callback.invoke(it)
         }
     }
 

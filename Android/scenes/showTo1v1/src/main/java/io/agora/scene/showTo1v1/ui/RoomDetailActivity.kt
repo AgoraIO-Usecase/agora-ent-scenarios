@@ -256,13 +256,18 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 Log.d(TAG, "click call privately")
                 toggleSelfVideo(true) {
                     mShowTo1v1Manger.prepareCall(CallRole.CALLER, mRoomInfo.roomId, callback = {
-                        mShowTo1v1Manger.mCallApi.addListener(callApiListener)
-                        mShowTo1v1Manger.mCallApi.call(mRoomInfo.getIntUserId(), completion = {
-                            if (it != null) {
-                                mShowTo1v1Manger.mCallApi.removeListener(callApiListener)
-                                mShowTo1v1Manger.deInitialize()
-                            }
-                        })
+                        if (it) {
+                            mShowTo1v1Manger.mCallApi.addListener(callApiListener)
+                            mShowTo1v1Manger.mCallApi.call(mRoomInfo.getIntUserId(), completion = {
+                                if (it != null) {
+                                    mShowTo1v1Manger.mCallApi.removeListener(callApiListener)
+                                    mShowTo1v1Manger.deInitialize()
+                                }
+                            })
+                        } else {
+                            // Failed 状态需要释放资源重新init
+                            mShowTo1v1Manger.deInitialize()
+                        }
                     })
                 }
                 toggleSelfAudio(true) {}
@@ -909,6 +914,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     startCallAnimator()
                 }
                 binding.layoutNumCount.isVisible = true
+                binding.ivClose.isVisible = true
                 binding.groupHangup.isVisible = false
                 binding.layoutCallingTop.isVisible = false
                 binding.layoutRoomTop.isVisible = true
@@ -957,6 +963,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
                 binding.layoutRoomTop.isVisible = false
                 binding.layoutNumCount.isVisible = false
+                binding.ivClose.isVisible = false
                 binding.groupHangup.isVisible = true
 
                 if (isRoomOwner) {

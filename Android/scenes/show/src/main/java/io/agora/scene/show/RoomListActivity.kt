@@ -78,6 +78,11 @@ class RoomListActivity : AppCompatActivity() {
         })
     }
 
+    override fun onRestart() {
+        super.onRestart()
+        mBinding.smartRefreshLayout.autoRefresh()
+    }
+
     private fun initView() {
         onRoomListScrollEventHandler = object: OnRoomListScrollEventHandler(mRtcEngine, UserManager.getInstance().user.id.toInt()) {}
         mBinding.titleView.setLeftClick { finish() }
