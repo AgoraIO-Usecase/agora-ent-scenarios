@@ -84,7 +84,7 @@ class CantataSyncManagerServiceImp constructor(
 
     override fun reset() {
         if (syncUtilsInited) {
-            Instance().destroy()
+            Sync.Instance().destroy()
             syncUtilsInited = false
 
             objIdOfRoomNo.clear()
@@ -178,7 +178,8 @@ class CantataSyncManagerServiceImp constructor(
         inputModel: JoinRoomInputModel,
         completion: (error: Exception?, out: JoinRoomOutputModel?) -> Unit
     ) {
-        if (isJoined) {
+        // fix FT-1055
+        if (isJoined && currRoomNo.isNotEmpty()) {
             completion.invoke(RuntimeException("The room $currRoomNo has been joined!"), null)
             return
         }
