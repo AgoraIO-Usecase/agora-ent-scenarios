@@ -54,6 +54,15 @@ class ShowRoomListCell: UICollectionViewCell {
         return numberLabel
     }()
     
+    private lazy var coverLayer: CALayer = {
+        let layer = CALayer()
+        layer.backgroundColor = UIColor(hex: "#000000", alpha: 0.05).cgColor
+        layer.isHidden = true
+        layer.masksToBounds = true
+        layer.cornerRadius = 16
+        return layer
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         createSubviews()
@@ -117,5 +126,15 @@ class ShowRoomListCell: UICollectionViewCell {
         contentView.addSubview(numberLabel)
         numberLabel.centerYAnchor.constraint(equalTo: idLablel.centerYAnchor).isActive = true
         numberLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor).isActive = true
+        
+        contentView.layer.addSublayer(coverLayer)
+        coverLayer.frame = contentView.bounds
+    }
+    
+    func showCoverView(){
+        coverLayer.isHidden = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.coverLayer.isHidden = true
+        }
     }
 }
