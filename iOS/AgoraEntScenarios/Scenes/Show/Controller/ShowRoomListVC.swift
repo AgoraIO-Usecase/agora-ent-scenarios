@@ -197,6 +197,7 @@ extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFl
             return true
         } completion: { [weak self] in
             self?.joinRoom(room)
+            cell.showCoverView()
         }
 
         return cell
