@@ -602,7 +602,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                         
                     }
                     ShowAgoraKitManager.shared.updateMediaOptionsEx(channelId: invitation.fromRoomId, publishCamera: false, publishMic: false)
-                    ShowAgoraKitManager.shared.leaveChannelEx(roomId: invitation.fromRoomId, channelId: self.roomId)
+                    ShowAgoraKitManager.shared.leaveChannelEx(roomId: self.roomId, channelId: invitation.fromRoomId)
                     break
                 }
             }
