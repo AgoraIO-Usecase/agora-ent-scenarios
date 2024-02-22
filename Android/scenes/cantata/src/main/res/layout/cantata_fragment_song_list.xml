@@ -65,7 +65,7 @@
     </LinearLayout>
 
     <!--通过NestedScrollableHost解决ViewPager2嵌套ViewPager2的滑动冲突-->
-    <io.agora.scene.cantata.ui.widget.NestedScrollableHost
+    <io.agora.scene.cantata.widget.NestedScrollableHost
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -76,7 +76,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-    </io.agora.scene.cantata.ui.widget.NestedScrollableHost>
+    </io.agora.scene.cantata.widget.NestedScrollableHost>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerSearchResult"

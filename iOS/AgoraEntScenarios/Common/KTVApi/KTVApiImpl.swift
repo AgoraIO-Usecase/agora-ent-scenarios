@@ -202,7 +202,6 @@ extension KTVApiImpl {
 //            // 主唱自动播放歌曲
 //            if self.singerRole != .leadSinger {
 //                switchSingerRole(newRole: .soloSinger) { state, failRes in
-//
 //                }
 //            }
 //            startSing(url: url1, startPos: 0)
@@ -241,7 +240,6 @@ extension KTVApiImpl {
 //            // 主唱自动播放歌曲
 //            if singerRole != .leadSinger {
 //                switchSingerRole(newRole: .soloSinger) { _, _ in
-//
 //                }
 //            }
 //            startSing(url: url, startPos: 0)
@@ -753,7 +751,6 @@ extension KTVApiImpl {
 //                    // 主唱自动播放歌曲
 //                    if self.singerRole != .leadSinger {
 //                        self.switchSingerRole(newRole: .soloSinger) { _, _ in
-//
 //                        }
 //                    }
 //                    self.startSing(songCode: self.songCode, startPos: 0)
@@ -794,7 +791,6 @@ extension KTVApiImpl {
 //                                // 主唱自动播放歌曲
 //                                if self.singerRole != .leadSinger {
 //                                    self.switchSingerRole(newRole: .soloSinger) { _, _ in
-//
 //                                    }
 //                                }
 //                                self.startSing(songCode: self.songCode, startPos: 0)
@@ -806,7 +802,6 @@ extension KTVApiImpl {
 //                            // 主唱自动播放歌曲
 //                            if self.singerRole != .leadSinger {
 //                                self.switchSingerRole(newRole: .soloSinger) { _, _ in
-//
 //                                }
 //                            }
 //                            self.startSing(songCode: self.songCode, startPos: 0)

@@ -15,8 +15,11 @@ import static io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE.getValue;
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION;
 import static io.agora.scene.ktv.ktvapi.KTVApiKt.createKTVApi;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.view.SurfaceView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -52,11 +55,11 @@ import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.event.NetWorkEvent;
 import io.agora.scene.base.manager.UserManager;
-import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.KTVLogger;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.debugSettings.KTVDebugSettingBean;
 import io.agora.scene.ktv.debugSettings.KTVDebugSettingsDialog;
+import io.agora.scene.ktv.ktvapi.AudioTrackMode;
 import io.agora.scene.ktv.ktvapi.IKTVApiEventHandler;
 import io.agora.scene.ktv.ktvapi.ILrcView;
 import io.agora.scene.ktv.ktvapi.IMusicLoadStateListener;
@@ -65,15 +68,17 @@ import io.agora.scene.ktv.ktvapi.KTVApi;
 import io.agora.scene.ktv.ktvapi.KTVApiConfig;
 import io.agora.scene.ktv.ktvapi.KTVApiImpl;
 import io.agora.scene.ktv.ktvapi.KTVLoadMusicConfiguration;
+import io.agora.scene.ktv.ktvapi.KTVLoadMusicFailReason;
 import io.agora.scene.ktv.ktvapi.KTVLoadMusicMode;
-import io.agora.scene.ktv.ktvapi.KTVLoadSongFailReason;
 import io.agora.scene.ktv.ktvapi.KTVMusicType;
 import io.agora.scene.ktv.ktvapi.KTVSingRole;
 import io.agora.scene.ktv.ktvapi.KTVType;
 import io.agora.scene.ktv.ktvapi.MusicLoadStatus;
 import io.agora.scene.ktv.ktvapi.SwitchRoleFailReason;
+import io.agora.scene.ktv.live.bean.MusicSettingBean;
+import io.agora.scene.ktv.live.fragmentdialog.MusicSettingCallback;
 import io.agora.scene.ktv.service.VolumeModel;
-import io.agora.scene.ktv.widget.soundcard.SoundCardSettingBean;
+import io.agora.scene.ktv.live.bean.SoundCardSettingBean;
 import io.agora.scene.ktv.service.ChooseSongInputModel;
 import io.agora.scene.ktv.service.JoinRoomOutputModel;
 import io.agora.scene.ktv.service.KTVServiceProtocol;
@@ -85,14 +90,29 @@ import io.agora.scene.ktv.service.RoomSeatModel;
 import io.agora.scene.ktv.service.RoomSelSongModel;
 import io.agora.scene.ktv.service.ScoringAlgoControlModel;
 import io.agora.scene.ktv.service.ScoringAverageModel;
-import io.agora.scene.ktv.widget.MusicSettingBean;
-import io.agora.scene.ktv.widget.MusicSettingDialog;
+import io.agora.scene.ktv.widget.lrcView.LrcControlView;
+import io.agora.scene.widget.toast.CustomToast;
 
 public class RoomLivingViewModel extends ViewModel {
 
     private final String TAG = "KTV_Scene_LOG";
+    private Handler mainHandler;
+
+    private void runOnMainThread(Runnable runnable) {
+        if (mainHandler == null) {
+            mainHandler = new Handler(Looper.getMainLooper());
+        }
+        if (Thread.currentThread() == mainHandler.getLooper().getThread()) {
+            runnable.run();
+        } else {
+            mainHandler.post(runnable);
+        }
+    }
+
+    // 默认音效
+    private final int DEFAULT_AUDIO_EFFECT = ROOM_ACOUSTICS_KTV;
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();
-    private final KTVApi ktvApiProtocol = createKTVApi();
+    private KTVApi ktvApiProtocol;
 
     // loading dialog
     private final MutableLiveData<Boolean> _loadingDialogVisible = new MutableLiveData<>(false);
@@ -147,6 +167,9 @@ public class RoomLivingViewModel extends ViewModel {
 
     final MutableLiveData<PlayerMusicStatus> playerMusicStatusLiveData = new MutableLiveData<>();
 
+    // 加载音乐进度
+    final MutableLiveData<Integer> loadMusicProgressLiveData = new MutableLiveData<>();
+
     enum JoinChorusStatus {
         ON_IDLE,
         ON_JOIN_CHORUS,
@@ -162,6 +185,9 @@ public class RoomLivingViewModel extends ViewModel {
     final MutableLiveData<NetWorkEvent> networkStatusLiveData = new MutableLiveData<>();
 
     final MutableLiveData<ScoringAlgoControlModel> scoringAlgoControlLiveData = new MutableLiveData<>();
+
+    // 打分难度
+    final MutableLiveData<Integer> scoringAlgoLiveData = new MutableLiveData<>();
 
     /**
      * Rtc引擎
@@ -208,6 +234,10 @@ public class RoomLivingViewModel extends ViewModel {
 
     public boolean isRoomOwner() {
         return roomInfoLiveData.getValue().getCreatorNo().equals(UserManager.getInstance().getUser().id.toString());
+    }
+
+    public boolean isPlaying(){
+        return playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING;
     }
 
     public void init() {
@@ -337,7 +367,9 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.exitRoom() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
+                if (e.getMessage() != null) {
+                    CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                }
             }
             return null;
         });
@@ -501,7 +533,9 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.haveSeat() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
+                if (e.getMessage() != null) {
+                    CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                }
             }
             return null;
         });
@@ -549,7 +583,9 @@ public class RoomLivingViewModel extends ViewModel {
                     } else {
                         // failure
                         KTVLogger.e(TAG, "RoomLivingViewModel.leaveSeat() failed: " + e.getMessage());
-                        ToastUtils.showToast(e.getMessage());
+                        if (e.getMessage() != null) {
+                            CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                        }
                     }
                     return null;
                 });
@@ -574,7 +610,9 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.toggleSelfVideo() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
+                if (e.getMessage() != null) {
+                    CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                }
             }
             return null;
         });
@@ -593,7 +631,9 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.toggleMic() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
+                if (e.getMessage() != null) {
+                    CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                }
             }
             return null;
         });
@@ -601,11 +641,11 @@ public class RoomLivingViewModel extends ViewModel {
 
     private void updateVolumeStatus(boolean isUnMute) {
         ktvApiProtocol.muteMic(!isUnMute);
-        if (!isUnMute && mSetting.isEar()) {
+        if (!isUnMute && mSetting.getMEarBackEnable()) {
             if (mRtcEngine != null) {
                 mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
             }
-        } else if (isUnMute && mSetting.isEar()) {
+        } else if (isUnMute && mSetting.getMEarBackEnable()) {
             if (mRtcEngine != null) {
                 mRtcEngine.enableInEarMonitoring(true, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
             }
@@ -663,7 +703,9 @@ public class RoomLivingViewModel extends ViewModel {
                 // failed
                 if (e != null) {
                     KTVLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed: " + e.getMessage());
-                    ToastUtils.showToast(e.getMessage());
+                    if (e.getMessage() != null) {
+                        CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                    }
                 }
             }
             return null;
@@ -680,7 +722,9 @@ public class RoomLivingViewModel extends ViewModel {
                 // failed
                 if (e != null) {
                     KTVLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed: " + e.getMessage());
-                    ToastUtils.showToast(e.getMessage());
+                    if (e.getMessage() != null) {
+                        CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                    }
                 }
             }
             return null;
@@ -770,8 +814,8 @@ public class RoomLivingViewModel extends ViewModel {
                             }
                             liveData.postValue(songs);
                         } else {
-                            if (e != null) {
-                                ToastUtils.showToast(e.getMessage());
+                            if (e != null && e.getMessage() != null) {
+                                CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
                             }
                         }
                         return null;
@@ -829,8 +873,8 @@ public class RoomLivingViewModel extends ViewModel {
                             }
                             liveData.postValue(songs);
                         } else {
-                            if (e != null) {
-                                ToastUtils.showToast(e.getMessage());
+                            if (e != null && e.getMessage() != null) {
+                                CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
                             }
                         }
                         return null;
@@ -861,7 +905,9 @@ public class RoomLivingViewModel extends ViewModel {
                     } else {
                         // failure
                         KTVLogger.e(TAG, "RoomLivingViewModel.chooseSong() failed: " + e.getMessage());
-                        ToastUtils.showToast(e.getMessage());
+                        if (e.getMessage() != null) {
+                            CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                        }
                         liveData.postValue(false);
                     }
                     return null;
@@ -884,7 +930,9 @@ public class RoomLivingViewModel extends ViewModel {
                     } else {
                         // failure
                         KTVLogger.e(TAG, "RoomLivingViewModel.deleteSong() failed: " + e.getMessage());
-                        ToastUtils.showToast(e.getMessage());
+                        if (e.getMessage() != null) {
+                            CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                        }
                     }
                     return null;
                 }
@@ -905,7 +953,9 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.topUpSong() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
+                if (e.getMessage() != null) {
+                    CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                }
             }
             return null;
         });
@@ -918,7 +968,6 @@ public class RoomLivingViewModel extends ViewModel {
         KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus() called");
         if (mRtcEngine.getConnectionState() != getValue(CONNECTION_STATE_CONNECTED)) {
             joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED);
-            ToastUtils.showToast(R.string.ktv_join_chorus_failed);
             return;
         }
 
@@ -940,7 +989,6 @@ public class RoomLivingViewModel extends ViewModel {
                     innerJoinChorus(musicModel.getSongNo());
                 } else {
                     joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED);
-                    ToastUtils.showToast(err.getMessage());
                 }
                 return null;
             });
@@ -950,16 +998,20 @@ public class RoomLivingViewModel extends ViewModel {
         }
     }
 
+    /**
+     * 加入合唱
+     * @param songCode
+     */
     private void innerJoinChorus(String songCode) {
-        ktvApiProtocol.loadMusic(Long.parseLong(songCode), new KTVLoadMusicConfiguration(songCode, false, Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_MUSIC_ONLY), new IMusicLoadStateListener() {
+        ktvApiProtocol.loadMusic(Long.parseLong(songCode), new KTVLoadMusicConfiguration(songCode, Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_MUSIC_ONLY), new IMusicLoadStateListener() {
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
                 KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
+                loadMusicProgressLiveData.postValue(percent);
             }
 
             @Override
-            public void onMusicLoadFail(long songCode, @NonNull KTVLoadSongFailReason reason) {
-                ToastUtils.showToastLong(R.string.ktv_join_chorus_failed);
+            public void onMusicLoadFail(long songCode, @NonNull KTVLoadMusicFailReason reason) {
                 joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED);
             }
 
@@ -968,7 +1020,6 @@ public class RoomLivingViewModel extends ViewModel {
                 ktvApiProtocol.switchSingerRole(KTVSingRole.CoSinger, new ISwitchRoleStateListener() {
                     @Override
                     public void onSwitchRoleFail(@NonNull SwitchRoleFailReason reason) {
-                        ToastUtils.showToastLong(R.string.ktv_join_chorus_failed);
                         joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED);
                     }
 
@@ -987,13 +1038,14 @@ public class RoomLivingViewModel extends ViewModel {
                                 } else {
                                     // failure
                                     KTVLogger.e(TAG, "RoomLivingViewModel.joinChorus() failed: " + e.getMessage());
-                                    ToastUtils.showToast(e.getMessage());
+                                    if (e.getMessage() != null) {
+                                        CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                                    }
                                 }
                                 return null;
                             });
 
                         } else {
-                            ToastUtils.showToastLong(R.string.ktv_join_chorus_failed);
                             ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null);
                             joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED);
                         }
@@ -1021,19 +1073,15 @@ public class RoomLivingViewModel extends ViewModel {
                 } else {
                     // failure
                     KTVLogger.e(TAG, "RoomLivingViewModel.leaveChorus() failed: " + e.getMessage());
-                    ToastUtils.showToast(e.getMessage());
+                    if (e.getMessage() != null) {
+                        CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                    }
                 }
                 return null;
             });
         } else {
             ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null);
             joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS);
-        }
-
-        // 重置耳返
-        mSetting.setEar(false);
-        if (mRtcEngine != null) {
-            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
         }
     }
 
@@ -1061,7 +1109,9 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failed
                 KTVLogger.e(TAG, "RoomLivingViewModel.changeMusic() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
+                if (e.getMessage() != null) {
+                    CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
+                }
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_END);
             }
             return null;
@@ -1073,6 +1123,9 @@ public class RoomLivingViewModel extends ViewModel {
      */
     public void setLrcView(ILrcView view) {
         ktvApiProtocol.setLrcView(view);
+        if (mSetting != null) {
+            ktvApiProtocol.enableProfessionalStreamerMode(mSetting.getMProfessionalModeEnable());
+        }
     }
 
     // ======================= Player/RTC/MPK相关 =======================
@@ -1100,17 +1153,36 @@ public class RoomLivingViewModel extends ViewModel {
             }
         });
 
-        mSetting = new MusicSettingBean(false, 100, 50, 0, new MusicSettingDialog.Callback() {
+        mSetting = new MusicSettingBean(new MusicSettingCallback() {
             @Override
-            public void onEarChanged(boolean isEar) {
+            public void onEarChanged(boolean earBackEnable) {
+                KTVLogger.d(TAG, "onEarChanged: " + earBackEnable);
                 if (seatLocalLiveData.getValue() == null) return;
                 int isMuted = seatLocalLiveData.getValue().isAudioMuted();
                 if (isMuted == 1) {
-                    isOpnEar = isEar;
+                    isOpnEar = earBackEnable;
                     return;
                 }
                 if (mRtcEngine != null) {
-                    mRtcEngine.enableInEarMonitoring(isEar, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+                    mRtcEngine.enableInEarMonitoring(earBackEnable, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+                }
+            }
+
+            @Override
+            public void onEarBackVolumeChanged(int volume) {
+                KTVLogger.d(TAG, "onEarBackVolumeChanged: " + volume);
+                mRtcEngine.setInEarMonitoringVolume(volume);
+            }
+
+            @Override
+            public void onEarBackModeChanged(int mode) {
+                KTVLogger.d(TAG, "onEarBackModeChanged: " + mode);
+                if (mode == 1) {
+                    // OpenSL
+                    mRtcEngine.setParameters("{\"che.audio.opensl.mode\": 0}");
+                } else if (mode == 2) {
+                    // Oboe
+                    mRtcEngine.setParameters("{\"che.audio.oboe.enable\": true}");
                 }
             }
 
@@ -1120,60 +1192,74 @@ public class RoomLivingViewModel extends ViewModel {
             }
 
             @Override
-            public void onMusicVolChanged(int vol) {
+            public void onAccVolChanged(int vol) {
                 setMusicVolume(vol);
             }
 
             @Override
-            public void onEffectChanged(int effect) {
-                setAudioEffectPreset(getEffectIndex(effect));
-            }
-
-            @Override
-            public void onBeautifierPresetChanged(int effect) {
-                if (mRtcEngine != null) {
-                    switch (effect) {
-                        case 0:
-                            mRtcEngine.setVoiceBeautifierParameters(Constants.VOICE_BEAUTIFIER_OFF, 0, 0);
-                        case 1:
-                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 2);
-                        case 2:
-                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 1);
-                        case 3:
-                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2);
-                        case 4:
-                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1);
-                    }
-                }
-            }
-
-            @Override
-            public void setAudioEffectParameters(int param1, int param2) {
-                if (mRtcEngine != null) {
-                    if (param1 == 0) {
-                        mRtcEngine.setAudioEffectParameters(Constants.VOICE_CONVERSION_OFF, param1, param2);
-                    } else {
-                        mRtcEngine.setAudioEffectParameters(Constants.PITCH_CORRECTION, param1, param2);
-                    }
-                }
-            }
-
-            @Override
-            public void onToneChanged(int newToneValue) {
-                ktvApiProtocol.getMediaPlayer().setAudioPitch(newToneValue);
-            }
-
-            @Override
-            public void onRemoteVolumeChanged(int volume) {
-                KTVApiImpl ktvApiImpl = (KTVApiImpl) ktvApiProtocol;
-                ktvApiImpl.setRemoteVolume(volume);
+            public void onRemoteVolChanged(int volume) {
+                KTVApi.Companion.setRemoteVolume(volume);
                 mRtcEngine.adjustPlaybackSignalVolume(volume);
+            }
+
+
+            @Override
+            public void onAudioEffectChanged(int audioEffect) {
+                setAudioEffectPreset(audioEffect);
+            }
+
+//            @Override
+//            public void onBeautifierPresetChanged(int effect) {
+//                if (mRtcEngine != null) {
+//                    switch (effect) {
+//                        case 0:
+//                            mRtcEngine.setVoiceBeautifierParameters(Constants.VOICE_BEAUTIFIER_OFF, 0, 0);
+//                        case 1:
+//                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 2);
+//                        case 2:
+//                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 1);
+//                        case 3:
+//                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2);
+//                        case 4:
+//                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1);
+//                    }
+//                }
+//            }
+
+//            @Override
+//            public void setAudioEffectParameters(int param1, int param2) {
+//                if (mRtcEngine != null) {
+//                    if (param1 == 0) {
+//                        mRtcEngine.setAudioEffectParameters(Constants.VOICE_CONVERSION_OFF, param1, param2);
+//                    } else {
+//                        mRtcEngine.setAudioEffectParameters(Constants.PITCH_CORRECTION, param1, param2);
+//                    }
+//                }
+//            }
+
+//            @Override
+//            public void onToneChanged(int newToneValue) {
+//                ktvApiProtocol.getMediaPlayer().setAudioPitch(newToneValue);
+//            }
+
+
+            // TODO: 2024/1/17 打分难度
+            @Override
+            public void onScoringDifficultyChanged(int difficulty) {
+                KTVLogger.d(TAG, "onScoringDifficultyChanged: " + difficulty);
+                scoringAlgoLiveData.postValue(difficulty);
             }
 
             @Override
             public void onProfessionalModeChanged(boolean enable) {
                 KTVLogger.d(TAG, "onProfessionalModeChanged: " + enable);
                 ktvApiProtocol.enableProfessionalStreamerMode(enable);
+            }
+
+            @Override
+            public void onMultiPathChanged(boolean enable) {
+                KTVLogger.d(TAG, "onMultiPathChanged: " + enable);
+                ktvApiProtocol.enableMulitpathing(enable);
             }
 
             @Override
@@ -1198,23 +1284,6 @@ public class RoomLivingViewModel extends ViewModel {
                 }
             }
 
-            @Override
-            public void onEarBackVolumeChanged(int volume) {
-                KTVLogger.d(TAG, "onEarBackVolumeChanged: " + volume);
-                mRtcEngine.setInEarMonitoringVolume(volume);
-            }
-
-            @Override
-            public void onEarBackModeChanged(int mode) {
-                KTVLogger.d(TAG, "onEarBackModeChanged: " + mode);
-                if (mode == 1) {
-                    // OpenSL
-                    mRtcEngine.setParameters("{\"che.audio.opensl.mode\": 0}");
-                } else if (mode == 2) {
-                    // Oboe
-                    mRtcEngine.setParameters("{\"che.audio.oboe.enable\": true}");
-                }
-            }
 
             @Override
             public void onAINSModeChanged(int mode) {
@@ -1248,6 +1317,7 @@ public class RoomLivingViewModel extends ViewModel {
 
             @Override
             public void onAIAECChanged(boolean enable) {
+                KTVLogger.d(TAG, "onAIAECChanged: " + enable);
                 if (enable) {
                     mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\": 1}");
                 } else {
@@ -1294,7 +1364,7 @@ public class RoomLivingViewModel extends ViewModel {
             public void onContentInspectResult(int result) {
                 super.onContentInspectResult(result);
                 if (result > 1) {
-                    ToastUtils.showToast(R.string.ktv_content);
+                    CustomToast.show(R.string.ktv_content, Toast.LENGTH_SHORT);
                 }
             }
 
@@ -1325,7 +1395,7 @@ public class RoomLivingViewModel extends ViewModel {
                             KTVLogger.d(TAG, "You are highlighter, " + "uid: " + uid);
                             isHighlightSinger = true;
                             mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF);
-                            mSetting.updateEffect(AUDIO_EFFECT_OFF);
+                            mSetting.updateAudioEffect(AUDIO_EFFECT_OFF);
                             audioPreset = AUDIO_EFFECT_OFF;
                             syncAudioPreset(audioPreset);
                         } else {
@@ -1341,27 +1411,27 @@ public class RoomLivingViewModel extends ViewModel {
                             KTVLogger.d(TAG, "You are not highlighter, " + "highlighter preset: " + preset);
                             if (preset == AUDIO_EFFECT_OFF) {
                                 audioPreset = AUDIO_EFFECT_OFF_HARMONY;
-                                mSetting.updateEffect(0);
+                                mSetting.updateAudioEffect(AUDIO_EFFECT_OFF);
                                 mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF_HARMONY);
                             } else if (preset == ROOM_ACOUSTICS_KTV) {
                                 audioPreset = ROOM_ACOUSTICS_KTV_HARMONY;
-                                mSetting.updateEffect(1);
+                                mSetting.updateAudioEffect(ROOM_ACOUSTICS_KTV);
                                 mRtcEngine.setAudioEffectPreset(ROOM_ACOUSTICS_KTV_HARMONY);
                             } else if (preset == ROOM_ACOUSTICS_VOCAL_CONCERT) {
                                 audioPreset = ROOM_ACOUSTICS_VOCAL_CONCERT_HARMONY;
-                                mSetting.updateEffect(2);
+                                mSetting.updateAudioEffect(ROOM_ACOUSTICS_VOCAL_CONCERT);
                                 mRtcEngine.setAudioEffectPreset(ROOM_ACOUSTICS_VOCAL_CONCERT_HARMONY);
                             } else if (preset == ROOM_ACOUSTICS_PHONOGRAPH) {
                                 audioPreset = ROOM_ACOUSTICS_PHONOGRAPH_HARMONY;
-                                mSetting.updateEffect(4);
+                                mSetting.updateAudioEffect(ROOM_ACOUSTICS_PHONOGRAPH);
                                 mRtcEngine.setAudioEffectPreset(ROOM_ACOUSTICS_PHONOGRAPH_HARMONY);
                             } else if (preset == ROOM_ACOUSTICS_STUDIO) {
                                 audioPreset = ROOM_ACOUSTICS_STUDIO_HARMONY;
-                                mSetting.updateEffect(3);
+                                mSetting.updateAudioEffect(ROOM_ACOUSTICS_STUDIO);
                                 mRtcEngine.setAudioEffectPreset(ROOM_ACOUSTICS_STUDIO_HARMONY);
                             } else {
                                 audioPreset = AUDIO_EFFECT_OFF_HARMONY;
-                                mSetting.updateEffect(0);
+                                mSetting.updateAudioEffect(AUDIO_EFFECT_OFF);
                                 mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF_HARMONY);
                             }
                         }
@@ -1379,18 +1449,13 @@ public class RoomLivingViewModel extends ViewModel {
                 KTVLogger.d(TAG, "onAudioRouteChanged, routing:" + routing);
                 if (mSetting == null) return;
                 if (routing == 0 || routing == 2 || routing == 5 || routing == 6) {
-                    mSetting.setHasEarPhone(true);
-                    //mSoundCardSettingBean.setHasEarPhone(true);
+                    mSetting.setMHasEarPhone(true);
                 } else {
-                    if (songPlayingLiveData.getValue() != null && mSetting.isEar()) {
-                        ToastUtils.showToast(R.string.ktv_ear_phone_tip);
-                        mSetting.setEar(false);
-                        if (mRtcEngine != null) {
-                            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
-                        }
+                    if (songPlayingLiveData.getValue() != null && mSetting.getMEarBackEnable()) {
+                        CustomToast.show(R.string.ktv_earphone_close_tip, Toast.LENGTH_SHORT);
+                        mSetting.setMEarBackEnable(false);
                     }
-                    mSetting.setHasEarPhone(false);
-                    //mSoundCardSettingBean.setHasEarPhone(false);
+                    mSetting.setMHasEarPhone(false);
                 }
             }
 
@@ -1398,7 +1463,7 @@ public class RoomLivingViewModel extends ViewModel {
             public void onLocalAudioStats(LocalAudioStats stats) {
                 super.onLocalAudioStats(stats);
                 if (mSetting == null) return;
-                mSetting.setEarBackDelay(stats.earMonitorDelay);
+                mSetting.setMEarBackDelay(stats.earMonitorDelay);
             }
 
             @Override
@@ -1425,8 +1490,11 @@ public class RoomLivingViewModel extends ViewModel {
         mRtcEngine.setParameters("{\"che.audio.input_sample_rate\" : 48000}");
 
         // ------------------ 场景化api初始化 ------------------
-        ((KTVApiImpl) ktvApiProtocol).setDebugMode(AgoraApplication.the().isDebugModeOpen());
-        ktvApiProtocol.initialize(new KTVApiConfig(
+        KTVApi.Companion.setDebugMode(AgoraApplication.the().isDebugModeOpen());
+        if (AgoraApplication.the().isDebugModeOpen()) {
+            KTVApi.Companion.setMccDomain("api-test.agora.io");
+        }
+        ktvApiProtocol = createKTVApi(new KTVApiConfig(
                 BuildConfig.AGORA_APP_ID,
                 roomInfoLiveData.getValue().getAgoraRTMToken(),
                 mRtcEngine,
@@ -1447,9 +1515,24 @@ public class RoomLivingViewModel extends ViewModel {
                                                        break;
                                                    case PLAYER_STATE_PLAYING:
                                                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                                                       // 若身份是主唱和伴唱，在演唱时，人声音量、伴泰音量保持原先设置，远端音量自动切为30
+                                                       runOnMainThread(() -> {
+                                                           if (mSetting!=null) mSetting.setMRemoteVolume(MusicSettingBean.DEFAULT_REMOTE_SINGER_VOL);
+                                                       });
                                                        break;
                                                    case PLAYER_STATE_PAUSED:
                                                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
+                                                       // 若身份是主唱和伴唱，演唱暂停/切歌，人声音量、伴奏音量保持原先设置，远端音量自动转为100
+                                                       runOnMainThread(() -> {
+                                                           if (mSetting!=null) mSetting.setMRemoteVolume(MusicSettingBean.DEFAULT_REMOTE_VOL);
+                                                       });
+                                                       break;
+                                                   case PLAYER_STATE_STOPPED:
+                                                       playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_STOP);
+                                                       // 若身份是主唱和伴唱，演唱暂停/切歌，人声音量、伴奏音量保持原先设置，远端音量自动转为100
+                                                       runOnMainThread(() -> {
+                                                           if (mSetting!=null) mSetting.setMRemoteVolume(MusicSettingBean.DEFAULT_REMOTE_VOL);
+                                                       });
                                                        break;
                                                    case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
                                                        if (isLocal) {
@@ -1523,57 +1606,22 @@ public class RoomLivingViewModel extends ViewModel {
         }
     }
 
-    private int audioPreset = 0;
+    private int audioPreset = DEFAULT_AUDIO_EFFECT;
 
-    private void setAudioEffectPreset(int effect) {
-        KTVLogger.d(TAG, "setAudioEffectPreset: " + effect);
+    private void setAudioEffectPreset(int audioEffect) {
+        KTVLogger.d(TAG, "setAudioEffectPreset: " + audioEffect);
         if (mRtcEngine == null) {
             return;
         }
-        mRtcEngine.setAudioEffectPreset(effect);
-        audioPreset = effect;
+        mRtcEngine.setAudioEffectPreset(audioEffect);
+        this.audioPreset = audioEffect;
 
         if (isHighlightSinger) {
-            syncAudioPreset(effect);
+            syncAudioPreset(audioEffect);
         }
     }
 
     // ======================= settings =======================
-    // ------------------ 音效调整 ------------------
-    private int getEffectIndex(int index) {
-        switch (index) {
-            // 原声
-            case 0:
-                return Constants.AUDIO_EFFECT_OFF;
-            // KTV
-            case 1:
-                return Constants.ROOM_ACOUSTICS_KTV;
-            // 演唱会
-            case 2:
-                return Constants.ROOM_ACOUSTICS_VOCAL_CONCERT;
-            // 录音棚
-            case 3:
-                return Constants.ROOM_ACOUSTICS_STUDIO;
-            // 留声机
-            case 4:
-                return Constants.ROOM_ACOUSTICS_PHONOGRAPH;
-            // 空旷
-            case 5:
-                return Constants.ROOM_ACOUSTICS_SPACIAL;
-            // 空灵
-            case 6:
-                return Constants.ROOM_ACOUSTICS_ETHEREAL;
-            // 流行
-            case 7:
-                return Constants.STYLE_TRANSFORMATION_POPULAR;
-            // R&B
-            case 8:
-                return Constants.STYLE_TRANSFORMATION_RNB;
-        }
-        // 原声
-        return Constants.AUDIO_EFFECT_OFF;
-    }
-
     // ------------------ 音量调整 ------------------
     private int micOldVolume = 100;
 
@@ -1597,21 +1645,18 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     // ------------------ 原唱/伴奏 ------------------
-    public void musicToggleOriginal(int aimStatus, boolean isMainSinger) {
-        KTVLogger.d("musicToggleOriginal called, ", "aim: " + aimStatus);
-        if (!isMainSinger) {
-            ktvApiProtocol.getMediaPlayer().selectAudioTrack(aimStatus);
-            return;
-        }
-        if (aimStatus == 0) {
-            // 原唱
-            ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(0, 0);
-        } else if (aimStatus == 1) {
-            // 伴奏
-            ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(1, 1);
+    public void musicToggleOriginal(LrcControlView.AudioTrack audioTrack) {
+        KTVLogger.d("musicToggleOriginal called, ", "aim: " + audioTrack);
+        ktvApiProtocol.switchAudioTrack(getAudioTrackMode(audioTrack));
+    }
+
+    private AudioTrackMode getAudioTrackMode(LrcControlView.AudioTrack audioTrack) {
+        if (audioTrack == LrcControlView.AudioTrack.Acc) {
+            return AudioTrackMode.BAN_ZOU;
+        } else if (audioTrack == LrcControlView.AudioTrack.DaoChang) {
+            return AudioTrackMode.DAO_CHANG;
         } else {
-            // 导唱
-            ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(0, 1);
+            return AudioTrackMode.YUAN_CHANG;
         }
     }
 
@@ -1645,19 +1690,7 @@ public class RoomLivingViewModel extends ViewModel {
         joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_IDLE);
         ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null);
 
-        // 清空音效
-        if (mRtcEngine != null) {
-            mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF);
-        }
-        mSetting.updateEffect(AUDIO_EFFECT_OFF);
-        this.audioPreset = AUDIO_EFFECT_OFF;
         isHighlightSinger = false;
-
-        // 重置耳返
-        mSetting.setEar(false);
-        if (mRtcEngine != null) {
-            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
-        }
     }
 
     // ------------------ 歌曲开始播放 ------------------
@@ -1673,86 +1706,82 @@ public class RoomLivingViewModel extends ViewModel {
         int mainSingerUid = Integer.parseInt(music.getUserNo());
         if (isOwnSong) {
             // 主唱加载歌曲
-            loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), true, mainSingerUid, KTVLoadMusicMode.LOAD_MUSIC_AND_LRC), songCode);
+            loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid, KTVLoadMusicMode.LOAD_MUSIC_AND_LRC), songCode, true);
         } else {
             if (seatLocalLiveData.getValue() != null && seatLocalLiveData.getValue().getChorusSongCode().equals(music.getSongNo() + music.getCreateAt())) {
                 // 合唱者
-                loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), false, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY), songCode);
+                loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY), songCode, false);
                 // 加入合唱
                 innerJoinChorus(music.getSongNo());
             } else {
                 // 观众
-                loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), false, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY), songCode);
+                loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY), songCode, false);
             }
         }
 
         // 标记歌曲为播放中
         ktvServiceProtocol.makeSongDidPlay(music, e -> {
-            if (e != null) {
+            if (e != null && e.getMessage() != null) {
                 // failure
-                ToastUtils.showToast(e.getMessage());
+                CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
             }
             return null;
         });
     }
 
-    private void loadMusic(KTVLoadMusicConfiguration config, Long songCode) {
+    private void loadMusic(KTVLoadMusicConfiguration config, Long songCode, Boolean isOwnSong) {
         ktvApiProtocol.loadMusic(songCode, config, new IMusicLoadStateListener() {
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
                 KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
+                loadMusicProgressLiveData.postValue(percent);
             }
 
             @Override
             public void onMusicLoadSuccess(long songCode, @NonNull String lyricUrl) {
                 // 当前已被切歌
                 if (songPlayingLiveData.getValue() == null) {
-                    ToastUtils.showToastLong(R.string.ktv_load_failed_no_song);
+                    CustomToast.show(R.string.ktv_load_failed_no_song, Toast.LENGTH_LONG);
                     return;
+                }
+
+                if (isOwnSong) {
+                    ktvApiProtocol.switchSingerRole(KTVSingRole.SoloSinger, null);
+                    ktvApiProtocol.startSing(songCode, 0);
                 }
 
                 // 重置settings
                 retryTimes = 0;
-                mSetting.setVolMic(100);
-                mSetting.setVolMusic(50);
-                ktvApiProtocol.getMediaPlayer().adjustPlayoutVolume(50);
-                ktvApiProtocol.getMediaPlayer().adjustPublishSignalVolume(50);
-
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
             }
 
             @Override
-            public void onMusicLoadFail(long songCode, @NonNull KTVLoadSongFailReason reason) {
+            public void onMusicLoadFail(long songCode, @NonNull KTVLoadMusicFailReason reason) {
                 // 当前已被切歌
                 if (songPlayingLiveData.getValue() == null) {
-                    ToastUtils.showToastLong(R.string.ktv_load_failed_no_song);
+                    CustomToast.show(R.string.ktv_load_failed_no_song, Toast.LENGTH_LONG);
                     return;
                 }
 
                 KTVLogger.e(TAG, "onMusicLoadFail， reason: " + reason);
-                if (reason == KTVLoadSongFailReason.NO_LYRIC_URL) {
+                if (reason == KTVLoadMusicFailReason.NO_LYRIC_URL) {
                     // 未获取到歌词 正常播放
                     retryTimes = 0;
-                    mSetting.setVolMic(100);
-                    mSetting.setVolMusic(50);
-                    ktvApiProtocol.getMediaPlayer().adjustPlayoutVolume(50);
-                    ktvApiProtocol.getMediaPlayer().adjustPublishSignalVolume(50);
-
                     playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                     noLrcLiveData.postValue(true);
-                } else if (reason == KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL) {
+                } else if (reason == KTVLoadMusicFailReason.MUSIC_PRELOAD_FAIL) {
                     // 歌曲加载失败 ，重试3次
-                    ToastUtils.showToastLong(R.string.ktv_load_failed);
+                    CustomToast.show(R.string.ktv_load_failed, Toast.LENGTH_LONG);
                     retryTimes = retryTimes + 1;
                     if (retryTimes < 3) {
-                        loadMusic(config, songCode);
+                        loadMusic(config, songCode, isOwnSong);
                     } else {
                         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                        ToastUtils.showToastLong(R.string.ktv_try);
+                        CustomToast.show(R.string.ktv_try, Toast.LENGTH_LONG);
                     }
-                } else if (reason == KTVLoadSongFailReason.CANCELED) {
+                } else if (reason == KTVLoadMusicFailReason.CANCELED) {
                     // 当前已被切歌
-                    ToastUtils.showToastLong(R.string.ktv_load_failed_another_song);
+                    CustomToast.show(R.string.ktv_load_failed_another_song, Toast.LENGTH_LONG);
                 }
             }
         });
@@ -1761,7 +1790,8 @@ public class RoomLivingViewModel extends ViewModel {
     // ------------------ 重新获取歌词url ------------------
     public void reGetLrcUrl() {
         if (songPlayingLiveData.getValue() == null) return;
-        loadMusic(new KTVLoadMusicConfiguration(songPlayingLiveData.getValue().getSongNo(), true, Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_LRC_ONLY), Long.parseLong(songPlayingLiveData.getValue().getSongNo()));
+        boolean isOwnSong = Objects.equals(songPlayingLiveData.getValue().getUserNo(), UserManager.getInstance().getUser().id.toString());
+        loadMusic(new KTVLoadMusicConfiguration(songPlayingLiveData.getValue().getSongNo(), Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_LRC_ONLY), Long.parseLong(songPlayingLiveData.getValue().getSongNo()), isOwnSong);
     }
 
     // ------------------ 歌曲seek ------------------
@@ -1828,7 +1858,7 @@ public class RoomLivingViewModel extends ViewModel {
             // 突出房主自己
             isHighlightSinger = true;
             mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF);
-            mSetting.updateEffect(AUDIO_EFFECT_OFF);
+            mSetting.updateAudioEffect(AUDIO_EFFECT_OFF);
             audioPreset = AUDIO_EFFECT_OFF;
             syncAudioPreset(audioPreset);
             KTVLogger.d(TAG, "Your are highlighter, " + "uid: " + uid);
@@ -1874,7 +1904,7 @@ public class RoomLivingViewModel extends ViewModel {
     public void resetAudioPreset() {
         KTVLogger.d(TAG, "resetAudioPreset: " + audioPreset);
         if (mRtcEngine == null || mSetting == null) return;
-        mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF);
-        mSetting.updateEffect(AUDIO_EFFECT_OFF);
+        mRtcEngine.setAudioEffectPreset(DEFAULT_AUDIO_EFFECT);
+        mSetting.updateAudioEffect(DEFAULT_AUDIO_EFFECT);
     }
 }

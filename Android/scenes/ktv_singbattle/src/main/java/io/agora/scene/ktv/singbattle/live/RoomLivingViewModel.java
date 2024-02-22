@@ -2,9 +2,8 @@ package io.agora.scene.ktv.singbattle.live;
 
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION;
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPERVISE;
-import static io.agora.scene.ktv.singbattle.live.KTVApiKt.createKTVApi;
+import static io.agora.scene.ktv.singbattle.ktvapi.KTVApiKt.createKTVApi;
 
-import android.os.Build;
 import android.text.TextUtils;
 import android.view.SurfaceView;
 
@@ -19,7 +18,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -48,11 +46,13 @@ import io.agora.scene.ktv.singbattle.KTVLogger;
 import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.debugSettings.KTVDebugSettingBean;
 import io.agora.scene.ktv.singbattle.debugSettings.KTVDebugSettingsDialog;
+import io.agora.scene.ktv.singbattle.ktvapi.*;
 import io.agora.scene.ktv.singbattle.service.ChangeMVCoverInputModel;
 import io.agora.scene.ktv.singbattle.service.ChooseSongInputModel;
 import io.agora.scene.ktv.singbattle.service.JoinRoomOutputModel;
 import io.agora.scene.ktv.singbattle.service.KTVServiceProtocol;
 import io.agora.scene.ktv.singbattle.service.KTVSingBattleGameService;
+import io.agora.scene.ktv.singbattle.service.KTVSyncManagerServiceImp;
 import io.agora.scene.ktv.singbattle.service.MakeSongTopInputModel;
 import io.agora.scene.ktv.singbattle.service.OnSeatInputModel;
 import io.agora.scene.ktv.singbattle.service.OutSeatInputModel;
@@ -71,7 +71,7 @@ public class RoomLivingViewModel extends ViewModel {
 
     private final String TAG = "KTV_Scene_LOG";
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();
-    private final KTVApi ktvApiProtocol = createKTVApi();
+    private KTVApi ktvApiProtocol;
 
     // loading dialog
     private final MutableLiveData<Boolean> _loadingDialogVisible = new MutableLiveData<>(false);
@@ -1091,8 +1091,11 @@ public class RoomLivingViewModel extends ViewModel {
 
 
         // ------------------ 场景化api初始化 ------------------
-        ((KTVApiImpl) ktvApiProtocol).setDebugMode(AgoraApplication.the().isDebugModeOpen());
-        ktvApiProtocol.initialize(new KTVApiConfig(
+        KTVApi.Companion.setDebugMode(AgoraApplication.the().isDebugModeOpen());
+        if (AgoraApplication.the().isDebugModeOpen()) {
+            KTVApi.Companion.setMccDomain("api-test.agora.io");
+        }
+        ktvApiProtocol = createKTVApi(new KTVApiConfig(
                 BuildConfig.AGORA_APP_ID,
                 roomInfoLiveData.getValue().getAgoraRTMToken(),
                 mRtcEngine,
@@ -1103,32 +1106,32 @@ public class RoomLivingViewModel extends ViewModel {
         );
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
-               @Override
-               public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, io.agora.mediaplayer.Constants.MediaPlayerError error,  boolean isLocal) {
-                   switch (state) {
-                       case PLAYER_STATE_OPEN_COMPLETED:
-                           playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());
-                           break;
-                       case PLAYER_STATE_PLAYING:
-                           //playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                           if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getWinnerNo().equals("") && isLocal) {
-                               ktvApiProtocol.getMediaPlayer().selectAudioTrack(0);
-                               //SyncStartSing();
-                           }
-                           break;
-                       case PLAYER_STATE_PAUSED:
-                           playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
-                           break;
-                       case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
-                           if (isLocal) {
-                               playerMusicPlayCompleteLiveData.postValue(new ScoringAverageModel(true, 0));
-                               playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
-                           }
-                           break;
-                       default:
-                   }
-               }
-           }
+                                           @Override
+                                           public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, io.agora.mediaplayer.Constants.MediaPlayerError error,  boolean isLocal) {
+                                               switch (state) {
+                                                   case PLAYER_STATE_OPEN_COMPLETED:
+                                                       playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());
+                                                       break;
+                                                   case PLAYER_STATE_PLAYING:
+                                                       //playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                                                       if (songPlayingLiveData.getValue() != null && songPlayingLiveData.getValue().getWinnerNo().equals("") && isLocal) {
+                                                           ktvApiProtocol.switchAudioTrack(AudioTrackMode.YUAN_CHANG);
+                                                           //SyncStartSing();
+                                                       }
+                                                       break;
+                                                   case PLAYER_STATE_PAUSED:
+                                                       playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
+                                                       break;
+                                                   case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
+                                                       if (isLocal) {
+                                                           playerMusicPlayCompleteLiveData.postValue(new ScoringAverageModel(true, 0));
+                                                           playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
+                                                       }
+                                                       break;
+                                                   default:
+                                               }
+                                           }
+                                       }
         );
 
         if (isRoomOwner()) {
@@ -1257,8 +1260,7 @@ public class RoomLivingViewModel extends ViewModel {
 
             @Override
             public void onRemoteVolumeChanged(int volume) {
-                KTVApiImpl ktvApiImpl = (KTVApiImpl) ktvApiProtocol;
-                ktvApiImpl.setRemoteVolume(volume);
+                KTVApi.Companion.setRemoteVolume(volume);
                 mRtcEngine.adjustPlaybackSignalVolume(volume);
             }
         });
@@ -1341,7 +1343,7 @@ public class RoomLivingViewModel extends ViewModel {
     public void graspSong() {
         KTVLogger.d(TAG, "RoomLivingViewModel.graspSong() called");
         KTVSingBattleGameService.INSTANCE.graspSong(
-                "scene_singbattle_3.4.0",
+                KTVSyncManagerServiceImp.kSceneId,
                 roomInfoLiveData.getValue().getRoomNo(),
                 UserManager.getInstance().getUser().id.toString(),
                 UserManager.getInstance().getUser().name,
@@ -1366,7 +1368,7 @@ public class RoomLivingViewModel extends ViewModel {
         KTVLogger.d(TAG, "RoomLivingViewModel.onGraspFinish() called");
         if (songPlayingLiveData.getValue() == null) return;
         KTVSingBattleGameService.INSTANCE.getWinnerInfo(
-                "scene_singbattle_3.4.0",
+                KTVSyncManagerServiceImp.kSceneId,
                 roomInfoLiveData.getValue().getRoomNo(),
                 songPlayingLiveData.getValue().getSongNo(),
                 (userId, userName) -> {
@@ -1452,10 +1454,10 @@ public class RoomLivingViewModel extends ViewModel {
     protected KTVPlayerTrackMode mAudioTrackMode = KTVPlayerTrackMode.Acc;
     public void musicToggleOriginal() {
         if (mAudioTrackMode == KTVPlayerTrackMode.Origin) {
-            ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(1, 1);
+            ktvApiProtocol.switchAudioTrack(AudioTrackMode.BAN_ZOU);
             mAudioTrackMode = KTVPlayerTrackMode.Acc;
         } else {
-            ktvApiProtocol.getMediaPlayer().selectMultiAudioTrack(0, 0);
+            ktvApiProtocol.switchAudioTrack(AudioTrackMode.YUAN_CHANG);
             mAudioTrackMode = KTVPlayerTrackMode.Origin;
         }
     }
@@ -1500,6 +1502,8 @@ public class RoomLivingViewModel extends ViewModel {
         }
     }
 
+
+    private Boolean songCutter;
     // ------------------ 歌曲开始播放 ------------------
     private int retryTimes = 0;
     public void musicStartPlay(@NonNull RoomSelSongModel music) {
@@ -1508,22 +1512,29 @@ public class RoomLivingViewModel extends ViewModel {
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
 
         boolean isOwnSong;
+        String jsonOption;
         if (music.getWinnerNo().equals("")) {
             isOwnSong = Objects.equals(music.getUserNo(), UserManager.getInstance().getUser().id.toString());
+            jsonOption = "{\"format\":{\"highPart\":0}}";
+            songCutter = false;
         } else {
             isOwnSong = Objects.equals(music.getWinnerNo(), UserManager.getInstance().getUser().id.toString());
+            // 抢到演唱权后，演唱的片段选择带buffer的，原片段前+5s，后+3S。对于歌词，仍然只展示不带buffer的歌词
+            jsonOption = "{\"format\":{\"highPartIndex\":0}}";
+            songCutter = true;
         }
 
-        String jsonOption = "{\"format\":{\"highPart\":0}}";
         long songCode = Long.parseLong(music.getSongNo());
         int mainSingerUid = Integer.parseInt(music.getUserNo());
         Long newSongCode = ktvApiProtocol.getMusicContentCenter().getInternalSongCode(songCode, jsonOption);
         if (isOwnSong) {
             // 主唱加载歌曲
-            loadMusic(new KTVLoadMusicConfiguration(newSongCode.toString(), false, mainSingerUid, KTVLoadMusicMode.LOAD_MUSIC_AND_LRC), newSongCode, isOwnSong);
+            loadMusic(new KTVLoadMusicConfiguration(newSongCode.toString(), mainSingerUid,
+                    KTVLoadMusicMode.LOAD_MUSIC_AND_LRC, songCutter), newSongCode, isOwnSong);
         } else {
             // 观众
-            loadMusic(new KTVLoadMusicConfiguration(newSongCode.toString(), false, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY), newSongCode, isOwnSong);
+            loadMusic(new KTVLoadMusicConfiguration(newSongCode.toString(), mainSingerUid,
+                    KTVLoadMusicMode.LOAD_LRC_ONLY, songCutter), newSongCode, isOwnSong);
         }
     }
 
@@ -1573,14 +1584,14 @@ public class RoomLivingViewModel extends ViewModel {
             }
 
             @Override
-            public void onMusicLoadFail(long songCode, @NonNull KTVLoadSongFailReason reason) {
+            public void onMusicLoadFail(long songCode, @NonNull KTVLoadMusicFailReason reason) {
                 // 当前已被切歌
                 if (songPlayingLiveData.getValue() == null) {
                     return;
                 }
 
                 KTVLogger.e(TAG, "onMusicLoadFail， reason: " + reason);
-                if (reason == KTVLoadSongFailReason.NO_LYRIC_URL) {
+                if (reason == KTVLoadMusicFailReason.NO_LYRIC_URL) {
                     // 未获取到歌词 正常播放
                     retryTimes = 0;
                     mSetting.setVolMic(100);
@@ -1590,7 +1601,7 @@ public class RoomLivingViewModel extends ViewModel {
 
                     playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                     noLrcLiveData.postValue(true);
-                } else if (reason == KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL) {
+                } else if (reason == KTVLoadMusicFailReason.MUSIC_PRELOAD_FAIL) {
                     // 歌曲加载失败 ，重试3次
                     retryTimes = retryTimes + 1;
                     if (retryTimes < 3) {
@@ -1613,7 +1624,8 @@ public class RoomLivingViewModel extends ViewModel {
         } else {
             isOwnSong = Objects.equals(songPlayingLiveData.getValue().getWinnerNo(), UserManager.getInstance().getUser().id.toString());
         }
-        loadMusic(new KTVLoadMusicConfiguration(songPlayingLiveData.getValue().getSongNo(), false, Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_LRC_ONLY), Long.parseLong(songPlayingLiveData.getValue().getSongNo()), isOwnSong);
+        loadMusic(new KTVLoadMusicConfiguration(songPlayingLiveData.getValue().getSongNo(),
+                Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_LRC_ONLY, songCutter), Long.parseLong(songPlayingLiveData.getValue().getSongNo()), isOwnSong);
     }
 
     // ------------------ 歌曲seek ------------------
@@ -1708,32 +1720,28 @@ public class RoomLivingViewModel extends ViewModel {
 
     public List<RankItem> getRankList() {
         List<RankItem> rankItemList = new ArrayList<>();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            AtomicInteger i = new AtomicInteger();
-            rankMap.forEach((uid, model) -> {
-                RankItem item = new RankItem();
-                item.rank = i.get();
-                item.userName = model.getUserName();
-                item.songNum = model.getSongNum();
-                item.score = model.getScore();
-                item.poster = model.getPoster();
-                rankItemList.add(item);
-                i.getAndIncrement();
-            });
-        }
+        AtomicInteger i = new AtomicInteger();
+        rankMap.forEach((uid, model) -> {
+            RankItem item = new RankItem();
+            item.rank = i.get();
+            item.userName = model.getUserName();
+            item.songNum = model.getSongNum();
+            item.score = model.getScore();
+            item.poster = model.getPoster();
+            rankItemList.add(item);
+            i.getAndIncrement();
+        });
         sort(rankItemList);
         return rankItemList;
     }
 
     public void sort(List<RankItem> list) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            list.sort((o1, o2) -> {
-                if (o1.score != o2.score) {
-                    return o2.score - o1.score; //score大的在前面
-                } else {
-                    return o2.songNum - o1.songNum; //score相同 songNum大的在前面
-                }
-            });
-        }
+        list.sort((o1, o2) -> {
+            if (o1.score != o2.score) {
+                return o2.score - o1.score; //score大的在前面
+            } else {
+                return o2.songNum - o1.songNum; //score相同 songNum大的在前面
+            }
+        });
     }
 }
