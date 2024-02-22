@@ -10,7 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.os.CountDownTimer;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Pair;
@@ -19,7 +18,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -38,7 +36,6 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -313,7 +310,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.lineScore.setVisibility(View.GONE);
         mBinding.ilActive.tvMusicName2.setVisibility(View.VISIBLE);
 
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams)findViewById(R.id.lyricsView).getLayoutParams();
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) findViewById(R.id.lyricsView).getLayoutParams();
         params.topToBottom = R.id.tvMusicName2;
         params.bottomToTop = R.id.singBattle;
         findViewById(R.id.lyricsView).requestLayout();
@@ -344,7 +341,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.tvMusicName2.setVisibility(View.GONE);
         mBinding.ilActive.singBattle.setVisibility(View.GONE);
 
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams)findViewById(R.id.lyricsView).getLayoutParams();
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) findViewById(R.id.lyricsView).getLayoutParams();
         params.topToBottom = R.id.scoringView;
         params.bottomToTop = R.id.bgd_control_layout_lrc;
         findViewById(R.id.lyricsView).requestLayout();
@@ -632,8 +629,8 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     private String lrcUrl;
-    private long highStartTime;
-    private long highEndTime;
+    private int highStartTime;
+    private int highEndTime;
 
     @Override
     public void onDownloadLrcData(String url) {
@@ -643,8 +640,8 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     @Override
     public void onHighPartTime(long highStartTime, long highEndTime) {
-        this.highStartTime = highStartTime;
-        this.highEndTime = highEndTime;
+        this.highStartTime = (int) highStartTime;
+        this.highEndTime = (int) highEndTime;
     }
 
     private void downloadAndSetLrcData() {
@@ -668,6 +665,8 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                     if (mKaraokeView != null) {
                         mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
                         LyricsModel cutLyricsModel = dealWithBattleSong(lyricsModel);
+                        Log.d("zhangww",
+                                cutLyricsModel.title + " line:" + cutLyricsModel.lines.size() + " duration:" + cutLyricsModel.duration);
                         mKaraokeView.setLyricsData(cutLyricsModel);
                     }
                 } else {

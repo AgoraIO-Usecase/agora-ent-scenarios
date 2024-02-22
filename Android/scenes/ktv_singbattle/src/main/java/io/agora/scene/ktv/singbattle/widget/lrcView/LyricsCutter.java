@@ -19,7 +19,7 @@ public class LyricsCutter {
 
         public Line(long beginTime, long duration) {
             this.beginTime = (int) beginTime;
-            this.duration =  (int) duration;
+            this.duration = (int) duration;
         }
 
         public int getBeginTime() {
@@ -52,7 +52,19 @@ public class LyricsCutter {
             return null;
         }
 
-        // 跨过第一个或最后一个
+        // 跨过第一个
+        if (start < firstLine.getBeginTime() && end < firstLine.getEndTime()) {
+            start = firstLine.getBeginTime();
+            end = firstLine.getEndTime();
+            return new Pair<>(start, end);
+        }
+        // 跨过最后一个
+        if (start > lastLine.getBeginTime() && end > lastLine.getEndTime()) {
+            start = lastLine.getBeginTime();
+            end = lastLine.getEndTime();
+            return new Pair<>(start, end);
+        }
+
         if (start < firstLine.getBeginTime()) {
             start = firstLine.getBeginTime();
         }
@@ -107,12 +119,11 @@ public class LyricsCutter {
         }
 
         model.lines = lines;
-//        model.setPreludeEndPosition(0);
         if (lines.isEmpty()) {
             model.duration = 0;
         } else {
             LyricsLineModel lastLine = lines.get(lines.size() - 1);
-            model.duration = lastLine.getEndTime() - lastLine.getStartTime();
+            model.duration = lastLine.getEndTime()/* - lastLine.getStartTime()*/;
         }
 
         return model;
