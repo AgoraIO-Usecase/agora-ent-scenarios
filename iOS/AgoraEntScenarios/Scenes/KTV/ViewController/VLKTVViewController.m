@@ -852,10 +852,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                            onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
     }];
     // 歌曲播完关闭耳返状态
-    if(self.isEarOn){
-        self.isEarOn = false;
-        [self.RTCkit enableInEarMonitoring:_isEarOn includeAudioFilters:AgoraEarMonitoringFilterNone];
-    }
+//    if(self.isEarOn){
+//        self.isEarOn = false;
+//        [self.RTCkit enableInEarMonitoring:_isEarOn includeAudioFilters:AgoraEarMonitoringFilterNone];
+//    }
 }
 
 - (void)loadAndPlaySong{

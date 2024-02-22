@@ -1267,6 +1267,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)didLrcProgressChanged:(NSInteger)progress{
+    if(self.currentIndex == 1 && progress > 60000){
+        return;
+    }
     [self handleProgress:progress];
 }
 
@@ -1318,6 +1321,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 -(void)performBusinessLogicWithIndex:(NSInteger)index pro:(NSInteger)pro {
     // 在这里处理对应的业务逻辑，使用传入的index
+    NSLog(@"sbg index:%li___%li", index, pro);
     if (index > 0 && [self.chooseArray[index - 1] isEqualToNumber:@(NO)]) {
         self.chooseArray[index - 1] = @(YES);
         self.currentIndex = index + 1;
@@ -2011,6 +2015,7 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
         if(![self isRoomOwner]){
             [self reNewAllData];
         }
+        self.currentIndex = 1;
         self.statusView.state = [self isRoomOwner] ? SRStateOwnerOrderMusic : SRStateAudienceWating;
     } else if(gameModel.status == SingRelayStatusStarted){
         /**
@@ -2222,6 +2227,9 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
     BOOL oldValue = _isNowMicMuted;
     _isNowMicMuted = isNowMicMuted;
     [self.SRApi muteMicWithMuteStatus:isNowMicMuted];
+    if(self.isEarOn){
+        [self.RTCkit enableInEarMonitoring:!isNowMicMuted includeAudioFilters:AgoraEarMonitoringFilterNone];
+    }
     if([self isRoomOwner]){
         [self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
     } else {
@@ -2374,7 +2382,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
                         self.gameModel.status = SingRelayStatusEnded;
                         self.gameModel.rank = [self convertScoreArrayToRank];
                         [[AppContext srServiceImp] innerUpdateSingRelayInfo:self.gameModel completion:^(NSError * error) {
-                                        
+                              
                         }];
                     }
 //                    if([self.currentUserNo isEqualToString: VLUserCenter.user.id]){

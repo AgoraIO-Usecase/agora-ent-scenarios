@@ -202,7 +202,7 @@ extension KTVApiImpl {
 //            // 主唱自动播放歌曲
 //            if self.singerRole != .leadSinger {
 //                switchSingerRole(newRole: .soloSinger) { state, failRes in
-//                    
+//
 //                }
 //            }
 //            startSing(url: url1, startPos: 0)
@@ -241,7 +241,7 @@ extension KTVApiImpl {
 //            // 主唱自动播放歌曲
 //            if singerRole != .leadSinger {
 //                switchSingerRole(newRole: .soloSinger) { _, _ in
-//                    
+//
 //                }
 //            }
 //            startSing(url: url, startPos: 0)
@@ -333,12 +333,14 @@ extension KTVApiImpl {
         sendCustomMessage(with: "switchSingerRole", label: "oldRole:\(oldRole.rawValue), newRole: \(newRole.rawValue)")
         agoraPrint("switchSingerRole oldRole:\(oldRole.rawValue), newRole: \(newRole.rawValue)")
         
-        if ((oldRole == .leadSinger || oldRole == .soloSinger) && (newRole == .coSinger || newRole == .audience) && isNowMicMuted) {
-            apiConfig?.engine?.muteLocalAudioStream(true)
-            apiConfig?.engine?.adjustRecordingSignalVolume(100)
-        } else if ((oldRole == .audience || oldRole == .coSinger) && (newRole == .leadSinger || newRole == .soloSinger) && isNowMicMuted) {
-            apiConfig?.engine?.adjustRecordingSignalVolume(0)
-            apiConfig?.engine?.muteLocalAudioStream(false)
+        if (apiConfig?.type != .singRelay) {
+            if ((oldRole == .leadSinger || oldRole == .soloSinger) && (newRole == .coSinger || newRole == .audience) && isNowMicMuted) {
+                    apiConfig?.engine?.muteLocalAudioStream(true)
+                    apiConfig?.engine?.adjustRecordingSignalVolume(100)
+            } else if ((oldRole == .audience || oldRole == .coSinger) && (newRole == .leadSinger || newRole == .soloSinger) && isNowMicMuted) {
+                        apiConfig?.engine?.adjustRecordingSignalVolume(0)
+                        apiConfig?.engine?.muteLocalAudioStream(false)
+            }
         }
         
         self.switchSingerRole(oldRole: oldRole, newRole: newRole, token: apiConfig?.chorusChannelToken ?? "", stateCallBack: onSwitchRoleState)
@@ -389,8 +391,16 @@ extension KTVApiImpl {
     @objc public func muteMic(muteStatus: Bool) {
         sendCustomMessage(with: "setMicStatus", label: "\(muteStatus)")
         self.isNowMicMuted = muteStatus
-        if self.singerRole == .leadSinger || self.singerRole == .soloSinger {
-            apiConfig?.engine?.adjustRecordingSignalVolume(muteStatus ? 0 : 100)
+        if (apiConfig?.type != .singRelay) {
+            if self.singerRole == .leadSinger || self.singerRole == .soloSinger {
+                apiConfig?.engine?.adjustRecordingSignalVolume(muteStatus ? 0 : 100)
+            } else {
+                let channelMediaOptions = AgoraRtcChannelMediaOptions()
+                channelMediaOptions.publishMicrophoneTrack = !muteStatus
+                channelMediaOptions.clientRoleType = .broadcaster
+                apiConfig?.engine?.updateChannel(with: channelMediaOptions)
+                apiConfig?.engine?.muteLocalAudioStream(muteStatus)
+            }
         } else {
             apiConfig?.engine?.muteLocalAudioStream(muteStatus)
         }
@@ -743,7 +753,7 @@ extension KTVApiImpl {
 //                    // 主唱自动播放歌曲
 //                    if self.singerRole != .leadSinger {
 //                        self.switchSingerRole(newRole: .soloSinger) { _, _ in
-//                            
+//
 //                        }
 //                    }
 //                    self.startSing(songCode: self.songCode, startPos: 0)
@@ -784,7 +794,7 @@ extension KTVApiImpl {
 //                                // 主唱自动播放歌曲
 //                                if self.singerRole != .leadSinger {
 //                                    self.switchSingerRole(newRole: .soloSinger) { _, _ in
-//                                        
+//
 //                                    }
 //                                }
 //                                self.startSing(songCode: self.songCode, startPos: 0)
@@ -796,7 +806,7 @@ extension KTVApiImpl {
 //                            // 主唱自动播放歌曲
 //                            if self.singerRole != .leadSinger {
 //                                self.switchSingerRole(newRole: .soloSinger) { _, _ in
-//                                    
+//
 //                                }
 //                            }
 //                            self.startSing(songCode: self.songCode, startPos: 0)
