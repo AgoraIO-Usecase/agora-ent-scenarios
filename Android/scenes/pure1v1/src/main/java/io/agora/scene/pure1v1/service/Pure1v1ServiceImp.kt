@@ -7,6 +7,7 @@ import android.util.Log
 import io.agora.auikit.service.http.CommonResp
 import io.agora.rtm.*
 import io.agora.rtmsyncmanager.ISceneResponse
+import io.agora.rtmsyncmanager.Scene
 import io.agora.rtmsyncmanager.SyncManager
 import io.agora.rtmsyncmanager.model.AUICommonConfig
 import io.agora.rtmsyncmanager.model.AUIRoomContext
@@ -39,13 +40,14 @@ class Pure1v1ServiceImp(
 
     private val tag = "1v1_Service_LOG"
     private val kSceneId = "scene_1v1PrivateVideo_4.2.1"
+    private val kRoomId = "pure"
     @Volatile
     private var syncUtilsInited = false
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
 
     private val syncManager: SyncManager
 
-    private val roomManager = AUIRoomManager()
+    private val scene: Scene
 
     private var userList = emptyList<AUIRoomInfo>()
 
@@ -64,6 +66,7 @@ class Pure1v1ServiceImp(
         commonConfig.host = BuildConfig.TOOLBOX_SERVER_HOST
         AUIRoomContext.shared().setCommonConfig(commonConfig)
         syncManager = SyncManager(context, rtmClient, commonConfig)
+        scene = syncManager.getScene(kRoomId)
     }
 
     fun reset() {
@@ -76,25 +79,20 @@ class Pure1v1ServiceImp(
      * 拉取房间列表
      */
     fun getUserList(completion: (String?, List<UserInfo>) -> Unit) {
-        roomManager.getRoomInfoList(BuildConfig.AGORA_APP_ID, kSceneId, System.currentTimeMillis(), 20) { error, list ->
-            if (error != null) {
-                runOnMainThread { completion.invoke(null, ArrayList<UserInfo>().toList()) }
+        val ret = ArrayList<UserInfo>()
+        scene.userSnapshotList?.let {
+            it.forEach { info ->
+                ret.add(UserInfo(
+                    userId = info!!.userId,
+                    userName = info.userName,
+                    avatar = info.userAvatar,
+                    createdAt = 0
+                ))
             }
-            if (list != null) {
-                val ret = ArrayList<UserInfo>()
-                list.forEach {
-                    ret.add(UserInfo(
-                        userId = it.owner!!.userId,
-                        userName = it.owner!!.userName,
-                        avatar = it.owner!!.userAvatar,
-                        createdAt = it.createTime
-                    ))
-                }
-                //按照创建时间顺序排序
-                ret.sortBy { it.createdAt }
-                runOnMainThread { completion.invoke(null, ret.toList()) }
-            }
+            //按照创建时间顺序排序
+            ret.sortBy { it.createdAt }
         }
+        runOnMainThread { completion.invoke(null, ret.toList()) }
     }
 
     /*
@@ -108,46 +106,21 @@ class Pure1v1ServiceImp(
             completion(null)
             return
         }
-        Pure1v1Logger.d(tag, "createUser start")
-        val roomInfo = AUIRoomInfo()
-        roomInfo.roomId = u.getRoomId()
-        roomInfo.roomName = u.getCallChannelId()
-        val owner = AUIUserThumbnailInfo()
-        owner.userId = u.userId
-        owner.userName = u.userName
-        owner.userAvatar = u.avatar
-        roomInfo.owner = owner
-        roomInfo.thumbnail = u.avatar
-        roomInfo.createTime = TimeUtils.currentTimeMillis()
-        roomManager.createRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomInfo) { e, info ->
-            if (info != null) {
-                val temp = mutableListOf<AUIRoomInfo>()
-                temp.add(roomInfo)
-                temp.addAll(userList)
-                userList = temp
 
-                val scene = syncManager.getScene(roomInfo.roomId)
-                scene.bindRespDelegate(this)
-                scene.create(null) { er ->
-                    if (er != null) {
-                        Log.d(tag, "enter scene fail: ${er.message}")
-                        completion.invoke(Error(er.message))
-                        return@create
-                    }
-                    scene.enter { payload, e ->
-                        if (e != null) {
-                            Log.d(tag, "enter scene fail: ${e.message}")
-                            completion.invoke(Error(e.message))
-                        } else {
-                            completion.invoke(null)
-                        }
-                    }
-                }
-
-                completion.invoke(null)
+        scene.bindRespDelegate(this)
+        scene.create(null) { er ->
+            if (er != null) {
+                Log.d(tag, "enter scene fail: ${er.message}")
+                completion.invoke(Error(er.message))
+                return@create
             }
-            if (e != null) {
-                completion.invoke(java.lang.Error(e.message))
+            scene.enter { payload, e ->
+                if (e != null) {
+                    Log.d(tag, "enter scene fail: ${e.message}")
+                    completion.invoke(Error(e.message))
+                } else {
+                    completion.invoke(null)
+                }
             }
         }
     }
@@ -156,14 +129,9 @@ class Pure1v1ServiceImp(
      * 离开房间
      */
     fun leaveRoom(completion: (Error?) -> Unit) {
-        val u = user ?: return
-        val scene = syncManager.getScene(u.getRoomId())
         scene.unbindRespDelegate(this)
         scene.leave()
         scene.delete()
-        roomManager.destroyRoom(BuildConfig.AGORA_APP_ID, kSceneId, u.getRoomId()) { e ->
-
-        }
     }
 
     // --------------------- inner ---------------------
@@ -176,24 +144,7 @@ class Pure1v1ServiceImp(
         }
     }
 
-    private fun createRtmClient(): RtmClient {
-        val commonConfig = AUIRoomContext.shared().requireCommonConfig()
-        val userInfo = AUIRoomContext.shared().currentUserInfo
-        val rtmConfig = RtmConfig.Builder(commonConfig.appId, userInfo.userId).apply {
-            presenceTimeout(60)
-        }.build()
-        if (rtmConfig.appId.isEmpty()) {
-            assert(false) { "userId is empty" }
-        }
-        if (rtmConfig.userId.isEmpty()) {
-            assert(false) { "appId is empty, please check 'AUIRoomContext.shared.commonConfig.appId'" }
-        }
-        return RtmClient.create(rtmConfig)
-    }
-
     override fun onSceneDestroy(roomId: String) {
         leaveRoom {}
-        roomManager.destroyRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomId) {
-        }
     }
 }
