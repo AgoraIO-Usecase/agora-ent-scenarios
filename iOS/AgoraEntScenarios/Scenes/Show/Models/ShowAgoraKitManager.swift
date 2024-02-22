@@ -394,6 +394,11 @@ class ShowAgoraKitManager: NSObject {
         ShowAgoraKitManager.isOpenGreen = false
     }
     
+    
+    /// 离开频道
+    /// - Parameters:
+    ///   - roomId: 业务房间id（pk填写所在的业务房间，其他填写和channelId一致）
+    ///   - channelId: 需要离开的频道id
     func leaveChannelEx(roomId: String, channelId: String) {
         if let connection = broadcasterConnection, connection.channelId == channelId {
             engine?.leaveChannelEx(connection)
