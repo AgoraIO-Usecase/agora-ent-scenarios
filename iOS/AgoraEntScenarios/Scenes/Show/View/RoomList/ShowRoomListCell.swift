@@ -131,10 +131,21 @@ class ShowRoomListCell: UICollectionViewCell {
         coverLayer.frame = contentView.bounds
     }
     
+    private func disableAnimationTask(_ task:(()->())) {
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        task()
+        CATransaction.commit()
+    }
+    
     func showCoverView(){
-        coverLayer.isHidden = false
+        disableAnimationTask {
+            self.coverLayer.isHidden = false
+        }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.coverLayer.isHidden = true
+            self.disableAnimationTask {
+                self.coverLayer.isHidden = true
+            }
         }
     }
 }
