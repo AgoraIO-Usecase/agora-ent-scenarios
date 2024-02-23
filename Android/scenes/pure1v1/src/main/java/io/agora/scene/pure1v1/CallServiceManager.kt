@@ -67,6 +67,8 @@ class CallServiceManager {
     // rtm token
     var rtmToken: String = ""
 
+    var onUserChanged: (() -> Unit)? = null
+
     private var mContext: Context? = null
 
     private var mMediaPlayer: IMediaPlayer? = null
@@ -106,7 +108,9 @@ class CallServiceManager {
         // 初始化mpk2，用于播放来电铃声
         mMediaPlayer2 = engine.createMediaPlayer()
         // 初始化场景service
-        sceneService = Pure1v1ServiceImp(context, rtmClient!!, user)
+        sceneService = Pure1v1ServiceImp(context, rtmClient!!, user) {
+            onUserChanged?.invoke()
+        }
         // 创建并初始化CallAPI
         val callApi = CallApiImpl(context)
         this.callApi = callApi

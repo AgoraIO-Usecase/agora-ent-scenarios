@@ -110,6 +110,9 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             }
         }
         CallServiceManager.instance.callApi?.addListener(this)
+        CallServiceManager.instance.onUserChanged = {
+            fetchRoomList(false)
+        }
     }
 
     private fun setOnApplyWindowInsetsListener() {

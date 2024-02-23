@@ -42,11 +42,11 @@ class Scene constructor(
         }
 
         override fun onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {
-            Log.d("hugo", "onRoomUserSnapshot, roomId:$roomId, userInfo:$userInfo")
+            Log.d("hugo", "onRoomUserEnter, roomId:$roomId, userInfo:$userInfo")
         }
 
         override fun onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
-            Log.d("hugo", "onRoomUserSnapshot, roomId:$roomId, userInfo:$userInfo")
+            Log.d("hugo", "onRoomUserLeave, roomId:$roomId, userInfo:$userInfo")
             if (AUIRoomContext.shared().isRoomOwner(roomId, userInfo.userId)) else {
                 cleanUserInfo(userInfo.userId)
                 return
@@ -111,6 +111,18 @@ class Scene constructor(
 
     fun unbindRespDelegate(handler: ISceneResponse) {
         respHandlers.unSubscribeEvent(handler)
+    }
+
+    fun pig(completion: (Map<String, Any>?, AUIRtmException?)->Unit) {
+        rtmManager.subscribeError(errorRespObserver)
+        rtmManager.subscribeLock(channelName, rtmManager.kRTM_Referee_LockName, lockRespObserver)
+        rtmManager.subscribe(channelName) { error ->
+            error?.let {
+                runOnUiThread { completion.invoke(null, error) }
+                return@subscribe
+            }
+            subscribeSuccess = true
+        }
     }
 
     fun create(payload: Map<String, Any>?, completion: (AUIRtmException?)->Unit) {

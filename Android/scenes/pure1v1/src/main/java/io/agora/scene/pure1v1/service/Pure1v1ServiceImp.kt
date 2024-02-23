@@ -9,10 +9,8 @@ import io.agora.rtm.*
 import io.agora.rtmsyncmanager.ISceneResponse
 import io.agora.rtmsyncmanager.Scene
 import io.agora.rtmsyncmanager.SyncManager
-import io.agora.rtmsyncmanager.model.AUICommonConfig
-import io.agora.rtmsyncmanager.model.AUIRoomContext
-import io.agora.rtmsyncmanager.model.AUIRoomInfo
-import io.agora.rtmsyncmanager.model.AUIUserThumbnailInfo
+import io.agora.rtmsyncmanager.model.*
+import io.agora.rtmsyncmanager.service.IAUIUserService
 import io.agora.rtmsyncmanager.service.http.HttpManager
 import io.agora.rtmsyncmanager.service.http.token.TokenGenerateReq
 import io.agora.rtmsyncmanager.service.http.token.TokenGenerateResp
@@ -35,8 +33,9 @@ import retrofit2.Response
 class Pure1v1ServiceImp(
     private val context: Context,
     private val rtmClient: RtmClient,
-    private var user: UserInfo? = null
-) : ISceneResponse {
+    private var user: UserInfo? = null,
+    private var onUserChanged: () -> Unit
+) : ISceneResponse, IAUIUserService.AUIUserRespObserver {
 
     private val tag = "1v1_Service_LOG"
     private val kSceneId = "scene_1v1PrivateVideo_4.2.1"
@@ -67,6 +66,8 @@ class Pure1v1ServiceImp(
         AUIRoomContext.shared().setCommonConfig(commonConfig)
         syncManager = SyncManager(context, rtmClient, commonConfig)
         scene = syncManager.getScene(kRoomId)
+
+        scene.userService.registerRespObserver(this)
     }
 
     fun reset() {
@@ -108,21 +109,29 @@ class Pure1v1ServiceImp(
         }
 
         scene.bindRespDelegate(this)
-        scene.create(null) { er ->
-            if (er != null) {
-                Log.d(tag, "enter scene fail: ${er.message}")
-                completion.invoke(Error(er.message))
-                return@create
-            }
-            scene.enter { payload, e ->
-                if (e != null) {
-                    Log.d(tag, "enter scene fail: ${e.message}")
-                    completion.invoke(Error(e.message))
-                } else {
-                    completion.invoke(null)
-                }
+        scene.pig { payload, e ->
+            if (e != null) {
+                Log.d(tag, "enter scene fail: ${e.message}")
+                completion.invoke(Error(e.message))
+            } else {
+                completion.invoke(null)
             }
         }
+//        scene.create(null) { er ->
+//            if (er != null) {
+//                Log.d(tag, "enter scene fail: ${er.message}")
+//                completion.invoke(Error(er.message))
+//                return@create
+//            }
+//            scene.enter { payload, e ->
+//                if (e != null) {
+//                    Log.d(tag, "enter scene fail: ${e.message}")
+//                    completion.invoke(Error(e.message))
+//                } else {
+//                    completion.invoke(null)
+//                }
+//            }
+//        }
     }
 
     /*
@@ -144,7 +153,24 @@ class Pure1v1ServiceImp(
         }
     }
 
+    // ------- ISceneResponse ---------
     override fun onSceneDestroy(roomId: String) {
-        leaveRoom {}
+        //leaveRoom {}
+    }
+
+    // -------- IAUIUserService.AUIUserRespObserver ----------
+//    override fun onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {
+//        Log.d("hugo", "onRoomUserEnter, roomId:$roomId, userInfo:$userInfo")
+//        onUserChanged.invoke()
+//    }
+
+    override fun onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
+        Log.d("hugo", "onRoomUserLeave, roomId:$roomId, userInfo:$userInfo")
+        onUserChanged.invoke()
+    }
+
+    override fun onRoomUserUpdate(roomId: String, userInfo: AUIUserInfo) {
+        super.onRoomUserUpdate(roomId, userInfo)
+        onUserChanged.invoke()
     }
 }

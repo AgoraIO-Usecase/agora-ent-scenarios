@@ -626,6 +626,7 @@ class CallApiImpl constructor(
         val cost = _getCost()
         connectInfo.callCostMap[type.value] = cost
         _reportEvent(type.value, cost.toInt())
+        Log.d("saof", "${type.value} : $cost")
     }
 
     private fun _reportMethod(event: String, label: String = "") {
