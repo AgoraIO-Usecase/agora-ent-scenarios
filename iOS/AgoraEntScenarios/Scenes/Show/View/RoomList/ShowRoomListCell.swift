@@ -73,6 +73,7 @@ class ShowRoomListCell: UICollectionViewCell {
     }
     
     func setBgImge(_ img: String, name: String?, id: String?, count: Int, avatarUrl: String?, isPrivate: Bool) {
+        self.coverLayer.isHidden = true
         imageView.image = UIImage.show_sceneImage(name: "show_room_bg_\(img)")
         nameLabel.text = name
         idLablel.text = "ID: \(id ?? "0")"
@@ -141,11 +142,6 @@ class ShowRoomListCell: UICollectionViewCell {
     func showCoverView(){
         disableAnimationTask {
             self.coverLayer.isHidden = false
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.disableAnimationTask {
-                self.coverLayer.isHidden = true
-            }
         }
     }
 }
