@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentTransaction
 import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
 import io.agora.scene.voice.R
@@ -474,6 +473,8 @@ class RoomObservableViewDelegate constructor(
                     botVolume = voiceRoomModel.robotVolume,
                     soundSelection = roomKitBean.soundEffect,
                     AINSMode = VoiceBuddyFactory.get().rtcChannelTemp.AINSMode,
+                    AINSMusicMode = VoiceBuddyFactory.get().rtcChannelTemp.AINSMusicMode,
+                    AINSMicMode = VoiceBuddyFactory.get().rtcChannelTemp.AINSMicMode,
                     isAIAECOn = VoiceBuddyFactory.get().rtcChannelTemp.isAIAECOn,
                     isAIAGCOn = VoiceBuddyFactory.get().rtcChannelTemp.isAIAGCOn,
                     spatialOpen = false
@@ -485,8 +486,8 @@ class RoomObservableViewDelegate constructor(
         roomAudioSettingDialog?.audioSettingsListener =
             object : RoomAudioSettingsSheetDialog.OnClickAudioSettingsListener {
 
-                override fun onAINS(mode: Int, isEnable: Boolean) {
-                    onAINSDialog(mode)
+                override fun onAINS(mode: Int, musicMode: Int, micMode: Int, isEnable: Boolean) {
+                    onAINSDialog(mode, musicMode, micMode)
                 }
 
                 override fun onAIAEC(isOn: Boolean, isEnable: Boolean) {
@@ -557,10 +558,12 @@ class RoomObservableViewDelegate constructor(
     /**
      * AI降噪弹框
      */
-    fun onAINSDialog(ainsMode: Int) {
+    fun onAINSDialog(ainsMode: Int,musicMode: Int, micMode: Int) {
         val ainsDialog = RoomAINSSheetDialog().apply {
             arguments = Bundle().apply {
                 putInt(RoomAINSSheetDialog.KEY_AINS_MODE, ainsMode)
+                putInt(RoomAINSSheetDialog.KEY_AINS_MUSIC_MODE, musicMode)
+                putInt(RoomAINSSheetDialog.KEY_AINS_MIC_MODE, micMode)
                 putBoolean(RoomAINSSheetDialog.KEY_IS_ENABLE, roomKitBean.isOwner)
             }
         }
@@ -585,7 +588,7 @@ class RoomObservableViewDelegate constructor(
                 ainsDialog.updateAnisSoundsAdapter(position, true)
                 RoomSoundAudioConstructor.AINSSoundMap[ainsSoundBean.soundType]?.let { soundAudioBean ->
                     val audioUrl =
-                        if (ainsSoundBean.soundMode == ConfigConstants.AINSMode.AINS_High) soundAudioBean.audioUrlHigh else soundAudioBean.audioUrl
+                        if (ainsSoundBean.soundMode == ConfigConstants.AINSMode.AINS_Tradition_Strong) soundAudioBean.audioUrlHigh else soundAudioBean.audioUrl
                     // 试听降噪音效
                     AgoraRtcEngineController.get()
                         .playMusic(soundAudioBean.soundId, audioUrl, soundAudioBean.speakerType)

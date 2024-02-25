@@ -17,10 +17,10 @@ class RoomAINSModeViewHolder(binding: VoiceSpatialItemRoomAgoraAinsBinding) :
         data?.let {
             mBinding.mtNoiseSuppressionName.text = it.anisName
             mBinding.mtChatroomHigh.setOnClickListener { view ->
-                onItemChildClick(ConfigConstants.AINSMode.AINS_High, view)
+                onItemChildClick(ConfigConstants.AINSMode.AINS_Tradition_Strong, view)
             }
             mBinding.mtChatroomMedium.setOnClickListener { view ->
-                onItemChildClick(ConfigConstants.AINSMode.AINS_Medium, view)
+                onItemChildClick(ConfigConstants.AINSMode.AINS_Tradition_Weakness, view)
             }
             mBinding.mtChatroomOff.setOnClickListener { view ->
                 onItemChildClick(ConfigConstants.AINSMode.AINS_Off, view)
@@ -29,12 +29,12 @@ class RoomAINSModeViewHolder(binding: VoiceSpatialItemRoomAgoraAinsBinding) :
 //            mBinding.mtChatroomMedium.tag = AINSModeType.Medium
 //            mBinding.mtChatroomOff.tag = AINSModeType.Off
             when (it.anisMode) {
-                ConfigConstants.AINSMode.AINS_High -> {
+                ConfigConstants.AINSMode.AINS_Tradition_Strong -> {
                     setViewHighlight(mBinding.mtChatroomHigh)
                     resetViewDefault(mBinding.mtChatroomMedium)
                     resetViewDefault(mBinding.mtChatroomOff)
                 }
-                ConfigConstants.AINSMode.AINS_Medium -> {
+                ConfigConstants.AINSMode.AINS_Tradition_Weakness -> {
                     setViewHighlight(mBinding.mtChatroomMedium)
                     resetViewDefault(mBinding.mtChatroomHigh)
                     resetViewDefault(mBinding.mtChatroomOff)
@@ -65,7 +65,7 @@ class RoomAINSSoundsViewHolder(binding: VoiceSpatialItemRoomAinsAuditionBinding)
         data?.let {
             mBinding.mtChatroomAinsName.text = it.soundName
             mBinding.mtChatroomAins.setOnClickListener { view ->
-                onItemChildClick(ConfigConstants.AINSMode.AINS_High, view)
+                onItemChildClick(ConfigConstants.AINSMode.AINS_Tradition_Strong, view)
             }
             mBinding.mtChatroomAinsNone.setOnClickListener { view ->
                 onItemChildClick(ConfigConstants.AINSMode.AINS_Off, view)
@@ -78,7 +78,7 @@ class RoomAINSSoundsViewHolder(binding: VoiceSpatialItemRoomAinsAuditionBinding)
                 mBinding.mtChatroomAinsSubName.isVisible = true
             }
             when (it.soundMode) {
-                ConfigConstants.AINSMode.AINS_High -> {
+                ConfigConstants.AINSMode.AINS_Tradition_Strong -> {
                     setViewHighlight(mBinding.mtChatroomAins)
                     resetViewDefault(mBinding.mtChatroomAinsNone)
                 }

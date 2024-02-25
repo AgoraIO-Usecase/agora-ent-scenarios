@@ -7,11 +7,13 @@ object ConfigConstants {
 
     // 可点击透明度
     const val ENABLE_ALPHA = 1.0f
+
     // 不可点击透明度
     const val DISABLE_ALPHA = 0.2f
 
     // 默认音量
     const val RotDefaultVolume = 50
+
     //--------房间类型 start--------
     object RoomType {
         const val Common_Chatroom = 0
@@ -37,9 +39,12 @@ object ConfigConstants {
 
     //--------AI 降噪模式 start--------
     object AINSMode {
-        const val AINS_High = 0
-        const val AINS_Medium = 1
-        const val AINS_Off = 2
+        const val AINS_Tradition_Strong = 5 // 传统强
+        const val AINS_Tradition_Weakness = 4 //传统弱
+        const val AINS_AI_Strong = 3 // AI 强
+        const val AINS_AI_Weakness = 2  // AI 弱
+        const val AINS_Custom = 1  // 自定义
+        const val AINS_Off = 0  // 关闭
         const val AINS_Unknown = -1
     }
     //--------AI 降噪模式 end--------

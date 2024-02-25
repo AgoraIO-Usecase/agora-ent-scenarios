@@ -1,4 +1,4 @@
-package io.agora.scene.voice.ui.ainoise
+package io.agora.scene.voice.ui.adapter.viewholder
 
 import android.text.TextUtils
 import androidx.core.view.isVisible
@@ -10,40 +10,52 @@ import io.agora.scene.voice.R
 import io.agora.scene.voice.model.AINSModeBean
 import io.agora.scene.voice.model.AINSSoundsBean
 import io.agora.scene.voice.databinding.*
+import io.agora.scene.voice.model.AINSType
 
 class RoomAINSModeViewHolder(binding: VoiceItemRoomAgoraAinsBinding) :
     BaseRecyclerViewAdapter.BaseViewHolder<VoiceItemRoomAgoraAinsBinding, AINSModeBean>(binding) {
     override fun binding(data: AINSModeBean?, selectedIndex: Int) {
         data?.let {
+            if (it.type == AINSType.AINS_Default) {
+                mBinding.mtTraditionalStrong.isVisible = true
+                mBinding.mtTraditionalWeakness.isVisible = true
+            } else {
+                mBinding.mtTraditionalStrong.isVisible = false
+                mBinding.mtTraditionalWeakness.isVisible = false
+            }
             mBinding.mtNoiseSuppressionName.text = it.anisName
-            mBinding.mtChatroomHigh.setOnClickListener { view ->
-                onItemChildClick(ConfigConstants.AINSMode.AINS_High, view)
+            mBinding.mtTraditionalStrong.setOnClickListener { view ->
+                onItemChildClick(ConfigConstants.AINSMode.AINS_Tradition_Strong, view)
             }
-            mBinding.mtChatroomMedium.setOnClickListener { view ->
-                onItemChildClick(ConfigConstants.AINSMode.AINS_Medium, view)
+            mBinding.mtTraditionalWeakness.setOnClickListener { view ->
+                onItemChildClick(ConfigConstants.AINSMode.AINS_Tradition_Weakness, view)
             }
-            mBinding.mtChatroomOff.setOnClickListener { view ->
+            mBinding.mtAiStrong.setOnClickListener { view ->
+                onItemChildClick(ConfigConstants.AINSMode.AINS_AI_Strong, view)
+            }
+            mBinding.mtAiWeakness.setOnClickListener { view ->
+                onItemChildClick(ConfigConstants.AINSMode.AINS_AI_Weakness, view)
+            }
+            mBinding.mtSettingCustom.setOnClickListener { view ->
+                onItemChildClick(ConfigConstants.AINSMode.AINS_Custom, view)
+            }
+            mBinding.mtSettingOff.setOnClickListener { view ->
                 onItemChildClick(ConfigConstants.AINSMode.AINS_Off, view)
             }
-//            mBinding.mtChatroomHigh.tag = AINSModeType.High
-//            mBinding.mtChatroomMedium.tag = AINSModeType.Medium
-//            mBinding.mtChatroomOff.tag = AINSModeType.Off
+
+            resetViewDefault(mBinding.mtTraditionalStrong)
+            resetViewDefault(mBinding.mtTraditionalWeakness)
+            resetViewDefault(mBinding.mtAiStrong)
+            resetViewDefault(mBinding.mtAiWeakness)
+            resetViewDefault(mBinding.mtSettingCustom)
+            resetViewDefault(mBinding.mtSettingOff)
             when (it.anisMode) {
-                ConfigConstants.AINSMode.AINS_High -> {
-                    setViewHighlight(mBinding.mtChatroomHigh)
-                    resetViewDefault(mBinding.mtChatroomMedium)
-                    resetViewDefault(mBinding.mtChatroomOff)
-                }
-                ConfigConstants.AINSMode.AINS_Medium -> {
-                    setViewHighlight(mBinding.mtChatroomMedium)
-                    resetViewDefault(mBinding.mtChatroomHigh)
-                    resetViewDefault(mBinding.mtChatroomOff)
-                }
-                ConfigConstants.AINSMode.AINS_Off -> {
-                    setViewHighlight(mBinding.mtChatroomOff)
-                    resetViewDefault(mBinding.mtChatroomHigh)
-                    resetViewDefault(mBinding.mtChatroomMedium)
-                }
+                ConfigConstants.AINSMode.AINS_Tradition_Strong -> setViewHighlight(mBinding.mtTraditionalStrong)
+                ConfigConstants.AINSMode.AINS_Tradition_Weakness -> setViewHighlight(mBinding.mtTraditionalWeakness)
+                ConfigConstants.AINSMode.AINS_AI_Strong -> setViewHighlight(mBinding.mtAiStrong)
+                ConfigConstants.AINSMode.AINS_AI_Weakness -> setViewHighlight(mBinding.mtAiWeakness)
+                ConfigConstants.AINSMode.AINS_Custom -> setViewHighlight(mBinding.mtSettingCustom)
+                ConfigConstants.AINSMode.AINS_Off -> setViewHighlight(mBinding.mtSettingOff)
             }
         }
     }
@@ -65,7 +77,7 @@ class RoomAINSSoundsViewHolder(binding: VoiceItemRoomAinsAuditionBinding) :
         data?.let {
             mBinding.mtChatroomAinsName.text = it.soundName
             mBinding.mtChatroomAins.setOnClickListener { view ->
-                onItemChildClick(ConfigConstants.AINSMode.AINS_High, view)
+                onItemChildClick(ConfigConstants.AINSMode.AINS_Tradition_Strong, view)
             }
             mBinding.mtChatroomAinsNone.setOnClickListener { view ->
                 onItemChildClick(ConfigConstants.AINSMode.AINS_Off, view)
@@ -78,14 +90,16 @@ class RoomAINSSoundsViewHolder(binding: VoiceItemRoomAinsAuditionBinding) :
                 mBinding.mtChatroomAinsSubName.isVisible = true
             }
             when (it.soundMode) {
-                ConfigConstants.AINSMode.AINS_High -> {
+                ConfigConstants.AINSMode.AINS_Tradition_Strong -> {
                     setViewHighlight(mBinding.mtChatroomAins)
                     resetViewDefault(mBinding.mtChatroomAinsNone)
                 }
+
                 ConfigConstants.AINSMode.AINS_Off -> {
                     setViewHighlight(mBinding.mtChatroomAinsNone)
                     resetViewDefault(mBinding.mtChatroomAins)
                 }
+
                 else -> {
                     resetViewDefault(mBinding.mtChatroomAinsNone)
                     resetViewDefault(mBinding.mtChatroomAins)

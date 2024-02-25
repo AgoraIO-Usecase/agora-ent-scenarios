@@ -20,8 +20,8 @@ object RoomAudioSettingsConstructor {
 
     fun getAINSName(context: Context, ainsMode: Int): String {
         return when (ainsMode) {
-            ConfigConstants.AINSMode.AINS_High -> context.getString(R.string.voice_spatial_high)
-            ConfigConstants.AINSMode.AINS_Medium -> context.getString(R.string.voice_spatial_medium)
+            ConfigConstants.AINSMode.AINS_Tradition_Strong -> context.getString(R.string.voice_spatial_high)
+            ConfigConstants.AINSMode.AINS_Tradition_Weakness -> context.getString(R.string.voice_spatial_medium)
             else -> {
                 context.getString(R.string.voice_spatial_off)
             }

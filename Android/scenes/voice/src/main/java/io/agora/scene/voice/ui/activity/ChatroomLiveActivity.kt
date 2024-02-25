@@ -35,7 +35,8 @@ import io.agora.scene.voice.service.VoiceRoomSubscribeDelegate
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.RoomGiftViewDelegate
 import io.agora.scene.voice.ui.RoomObservableViewDelegate
-import io.agora.scene.voice.ui.dialog.VoiceRoomDebugOptionsDialog
+import io.agora.scene.voice.ui.debugSettings.VoiceDebugSettingBean
+import io.agora.scene.voice.ui.debugSettings.VoiceRoomDebugOptionsDialog
 import io.agora.scene.voice.ui.widget.barrage.ChatroomMessagesView
 import io.agora.scene.voice.ui.widget.primary.MenuItemClickListener
 import io.agora.scene.voice.ui.widget.top.OnLiveTopClickListener
@@ -47,6 +48,7 @@ import io.agora.voice.common.net.OnResourceParseCallback
 import io.agora.voice.common.net.Resource
 import io.agora.voice.common.ui.IParserSource
 import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
+import io.agora.voice.common.utils.FastClickTools
 import io.agora.voice.common.utils.GsonTools
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.LogTools.logE
@@ -632,8 +634,61 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
             binding.btnDebug.isVisible = false
         }
         binding.btnDebug.setOnClickListener {
-            VoiceRoomDebugOptionsDialog().show(supportFragmentManager, "mtDebug")
+            if (FastClickTools.isFastClick(it)) return@setOnClickListener
+            showDebugDialog()
         }
+    }
+
+    private fun showDebugDialog(){
+        val debugSettingBean  = VoiceDebugSettingBean(object :VoiceRoomDebugOptionsDialog.OnDebugSettingCallback{
+            override fun onNsEnable(newValue: Int) {
+
+            }
+
+            override fun onAinsToLoadFlag(newValue: Int) {
+            }
+
+            override fun onNsngAlgRoute(newValue: Int) {
+            }
+
+            override fun onNsngPredefAgg(newValue: Int) {
+            }
+
+            override fun onNsngMapInMaskMin(newValue: Int) {
+            }
+
+            override fun onNsngMapOutMaskMin(newValue: Int) {
+            }
+
+            override fun onStatNsLowerBound(newValue: Int) {
+            }
+
+            override fun onNsngFinalMaskLowerBound(newValue: Int) {
+            }
+
+            override fun onStatNsEnhFactor(newValue: Int) {
+            }
+
+            override fun onStatNsFastNsSpeechTrigThreshold(newValue: Int) {
+            }
+
+            override fun onAedEnable(newValue: Int) {
+            }
+
+            override fun onNsngMusicProbThr(newValue: Int) {
+            }
+
+            override fun onStatNsMusicModeBackoffDB(newValue: Int) {
+            }
+
+            override fun onAinsMusicModeBackoffDB(newValue: Int) {
+            }
+
+            override fun onAinsSpeechProtectThreshold(newValue: Int) {
+            }
+
+        })
+        VoiceRoomDebugOptionsDialog(debugSettingBean).show(supportFragmentManager, "mtDebug")
     }
 
     override fun onBackPressed() {

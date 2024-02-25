@@ -48,7 +48,7 @@ data class RoomAudioSettingsBean constructor(
     var botOpen: Boolean = false,
     var botVolume: Int = ConfigConstants.RotDefaultVolume,
     var soundSelection: Int = ConfigConstants.SoundSelection.Social_Chat,
-    var AINSMode: Int = ConfigConstants.AINSMode.AINS_Medium,
+    var AINSMode: Int = ConfigConstants.AINSMode.AINS_Tradition_Weakness,
     var spatialOpen: Boolean = false,
     var isAIAECOn: Boolean = false,
     var isAIAGCOn: Boolean = false,
@@ -60,7 +60,7 @@ data class RoomAudioSettingsBean constructor(
  */
 data class AINSModeBean constructor(
     val anisName: String = "",
-    var anisMode: Int = ConfigConstants.AINSMode.AINS_Medium // 默认
+    var anisMode: Int = ConfigConstants.AINSMode.AINS_Tradition_Weakness // 默认
 ) : BaseRoomBean
 
 /**

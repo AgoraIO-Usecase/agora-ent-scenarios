@@ -24,12 +24,16 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
 
     private val mTabs by lazy {
         mutableListOf(
-            HomeScenesType.Full,
-            HomeScenesType.KTV,
+//            HomeScenesType.Full,
+//            HomeScenesType.KTV,
             HomeScenesType.Voice,
-            HomeScenesType.Live
+//            HomeScenesType.Live
         )
     }
+
+    // Notice:构建场景,全场景tab 居左对齐；独立场景标题居中
+    private val mSingleScene: Boolean
+        get() = mTabs.size == 1
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AppFragmentHomeIndexBinding {
         return AppFragmentHomeIndexBinding.inflate(inflater)
@@ -109,6 +113,16 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
         })
         binding.viewPagerLayout.currentItem = 0
         binding.tabLayout.selectTab(binding.tabLayout.getTabAt(0))
+
+        val layoutParams = binding.tabLayout.layoutParams
+        if (mSingleScene) {
+            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+            binding.tabLayout.tabGravity = TabLayout.GRAVITY_CENTER
+        } else {
+            layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
+            binding.tabLayout.tabGravity = TabLayout.GRAVITY_START
+        }
+        binding.tabLayout.layoutParams = layoutParams
     }
 }
 

@@ -175,9 +175,20 @@ class AgoraRtcEngineController {
                 "voice rtc engine init error:${e.message}".logE(TAG)
                 return false
             }
+            setInitNoiseParameters()
             mEarBackManager = AgoraEarBackManager(rtcEngine!!)
             mSoundCardManager = AgoraSoundCardManager(rtcEngine!!)
             return true
+        }
+    }
+
+    private fun setInitNoiseParameters(){
+        rtcEngine?.apply {
+            setParameters("{\"che.audio.sf.enabled\":true}")
+            setParameters("{\"che.audio.sf.nsEnable\":1}")
+            setParameters("{\"che.audio.sf.nlpEnable\":1}")
+            setParameters("{\"che.audio.ans.enable\":false}")
+            setParameters("{\"che.audio.aec.nlpEnable\":false}")
         }
     }
 
@@ -266,7 +277,7 @@ class AgoraRtcEngineController {
                     setParameters("{\"che.audio.nsng.enhfactorstastical\":200}")
                 }
             }
-            ConfigConstants.AINSMode.AINS_High -> {
+            ConfigConstants.AINSMode.AINS_Tradition_Strong -> {
                 rtcEngine?.apply {
                     setParameters("{\"che.audio.ains_mode\":2}")
                     setParameters("{\"che.audio.nsng.lowerBound\":10}")
@@ -287,6 +298,13 @@ class AgoraRtcEngineController {
                 }
             }
         }
+    }
+
+    /**
+     * NS
+     */
+    fun deDefalutNoise(anisMode: Int){
+
     }
 
     /**

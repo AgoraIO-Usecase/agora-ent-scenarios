@@ -20,8 +20,11 @@ object RoomAudioSettingsConstructor {
 
     fun getAINSName(context: Context, ainsMode: Int): String {
         return when (ainsMode) {
-            ConfigConstants.AINSMode.AINS_High -> context.getString(R.string.voice_chatroom_high)
-            ConfigConstants.AINSMode.AINS_Medium -> context.getString(R.string.voice_chatroom_medium)
+            ConfigConstants.AINSMode.AINS_Tradition_Strong -> context.getString(R.string.voice_chatroom_setting_traditional_strong)
+            ConfigConstants.AINSMode.AINS_Tradition_Weakness -> context.getString(R.string.voice_chatroom_setting_traditional_weakness)
+            ConfigConstants.AINSMode.AINS_AI_Strong -> context.getString(R.string.voice_chatroom_setting_ai_strong)
+            ConfigConstants.AINSMode.AINS_AI_Weakness -> context.getString(R.string.voice_chatroom_setting_ai_weakness)
+            ConfigConstants.AINSMode.AINS_Custom -> context.getString(R.string.voice_chatroom_setting_custom)
             else -> {
                 context.getString(R.string.voice_chatroom_off)
             }
