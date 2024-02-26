@@ -12,6 +12,7 @@ import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.model.SoundAudioBean
 import io.agora.scene.voice.rtckit.listener.MediaPlayerObserver
 import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
+import io.agora.scene.voice.ui.debugSettings.VoiceDebugSettingModel
 import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.voice.common.utils.LogTools.logD
@@ -78,7 +79,7 @@ class AgoraRtcEngineController {
                 // 语音鉴定
                 AudioModeration.moderationAudio(channelId, rtcUid.toLong(),
                     AudioModeration.AgoraChannelType.broadcast, "voice", {})
-            },{
+            }, {
                 joinCallback?.onError(Constants.ERR_FAILED, "get token error")
             }
         )
@@ -126,7 +127,11 @@ class AgoraRtcEngineController {
                     "voice rtc onJoinChannelSuccess channel:$channel,uid:$uid".logD(TAG)
                     rtcEngine?.setEnableSpeakerphone(true)
                     // 默认开启降噪
-                    deNoise(VoiceBuddyFactory.get().rtcChannelTemp.AINSMode)
+                    ThreadManager.getInstance().runOnMainThread {
+                        deDefaultNoise(VoiceBuddyFactory.get().rtcChannelTemp.AINSMode)
+                        deMusicNoise(VoiceBuddyFactory.get().rtcChannelTemp.AINSMusicMode)
+                        deMicNoise(VoiceBuddyFactory.get().rtcChannelTemp.AINSMicMode)
+                    }
                     joinCallback?.onSuccess(true)
                 }
 
@@ -182,7 +187,7 @@ class AgoraRtcEngineController {
         }
     }
 
-    private fun setInitNoiseParameters(){
+    private fun setInitNoiseParameters() {
         rtcEngine?.apply {
             setParameters("{\"che.audio.sf.enabled\":true}")
             setParameters("{\"che.audio.sf.nsEnable\":1}")
@@ -207,9 +212,11 @@ class AgoraRtcEngineController {
                     setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY)
                     setAudioScenario(Constants.AUDIO_SCENARIO_GAME_STREAMING)
                 }
+
                 ConfigConstants.SoundSelection.Gaming_Buddy -> { // 游戏陪玩
                     setChannelProfile(Constants.CHANNEL_PROFILE_COMMUNICATION)
                 }
+
                 else -> { //专业主播
                     setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY)
                     setAudioScenario(Constants.AUDIO_SCENARIO_GAME_STREAMING)
@@ -234,8 +241,8 @@ class AgoraRtcEngineController {
             joinCallback?.onError(status ?: IRtcEngineEventHandler.ErrorCode.ERR_FAILED, "")
             return false
         }
-        if (isBroadcaster){
-            mediaPlayer =  rtcEngine?.createMediaPlayer()?.apply {
+        if (isBroadcaster) {
+            mediaPlayer = rtcEngine?.createMediaPlayer()?.apply {
                 registerPlayerObserver(firstMediaPlayerObserver)
             }?.also {
                 val options = ChannelMediaOptions()
@@ -277,7 +284,8 @@ class AgoraRtcEngineController {
                     setParameters("{\"che.audio.nsng.enhfactorstastical\":200}")
                 }
             }
-            ConfigConstants.AINSMode.AINS_Tradition_Strong -> {
+
+            ConfigConstants.AINSMode.AINS_High -> {
                 rtcEngine?.apply {
                     setParameters("{\"che.audio.ains_mode\":2}")
                     setParameters("{\"che.audio.nsng.lowerBound\":10}")
@@ -287,6 +295,7 @@ class AgoraRtcEngineController {
                     setParameters("{\"che.audio.nsng.enhfactorstastical\":200}")
                 }
             }
+
             else -> {
                 rtcEngine?.apply {
                     setParameters("{\"che.audio.ains_mode\":2}")
@@ -303,8 +312,225 @@ class AgoraRtcEngineController {
     /**
      * NS
      */
-    fun deDefalutNoise(anisMode: Int){
+    fun deDefaultNoise(anisMode: Int) {
+        when (anisMode) {
+            ConfigConstants.AINSMode.AINS_Off -> { // NS off
+                rtcEngine?.apply {
+                    setParameters("{\"che.audio.sf.nsEnable\":0}")
+                }
+            }
 
+            ConfigConstants.AINSMode.AINS_Tradition_Weakness -> { // 传统NS soft模式
+                rtcEngine?.apply {
+                    setParameters("{\"che.audio.sf.nsEnable\":1}")
+                    setParameters("{\"che.audio.sf.nsngAlgRoute\":10}")
+                    setParameters("{\"che.audio.sf.nsngPredefAgg\":10}")
+                    setParameters("{\"che.audio.sf.statNsFastNsSpeechTrigThreshold\":0}")
+                }
+            }
+
+            ConfigConstants.AINSMode.AINS_Tradition_Strong -> { // 传统NS aggressive模式
+                rtcEngine?.apply {
+                    setParameters("{\"che.audio.sf.nsEnable\":1}")
+                    setParameters("{\"che.audio.sf.nsngAlgRoute\":10}")
+                    setParameters("{\"che.audio.sf.nsngPredefAgg\":11}")
+                    setParameters("{\"che.audio.sf.statNsFastNsSpeechTrigThreshold\":50}")
+                }
+            }
+
+            ConfigConstants.AINSMode.AINS_AI_Weakness -> { // AINS soft模式
+                rtcEngine?.apply {
+                    setParameters("{\"che.audio.sf.nsEnable\":1}")
+                    setParameters("{\"che.audio.sf.ainsToLoadFlag\":1}")
+                    setParameters("{\"che.audio.sf.nsngAlgRoute\":12}")
+                    setParameters("{\"che.audio.sf.nsngPredefAgg\":10}")
+                }
+            }
+
+            ConfigConstants.AINSMode.AINS_AI_Strong -> { // AINS aggressive模式
+                rtcEngine?.apply {
+                    setParameters("{\"che.audio.sf.nsEnable\":1}")
+                    setParameters("{\"che.audio.sf.ainsToLoadFlag\":1}")
+                    setParameters("{\"che.audio.sf.nsngAlgRoute\":12}")
+                    setParameters("{\"che.audio.sf.nsngPredefAgg\":11}")
+                }
+            }
+
+            ConfigConstants.AINSMode.AINS_Custom -> { // 自定义
+                rtcEngine?.apply {
+                    setParameters("{\"che.audio.sf.nsEnable\":${VoiceDebugSettingModel.nsEnable}}")
+                    setParameters("{\"che.audio.sf.ainsToLoadFlag\":${VoiceDebugSettingModel.ainsToLoadFlag}}")
+                    setParameters("{\"che.audio.sf.nsngAlgRoute\":${VoiceDebugSettingModel.nsngAlgRoute}}")
+                    setParameters("{\"che.audio.sf.nsngPredefAgg\":${VoiceDebugSettingModel.nsngPredefAgg}}")
+                    setParameters("{\"che.audio.sf.nsngMapInMaskMin\":${VoiceDebugSettingModel.nsngMapInMaskMin}}")
+                    setParameters("{\"che.audio.sf.nsngMapOutMaskMin\":${VoiceDebugSettingModel.nsngMapOutMaskMin}}")
+                    setParameters("{\"che.audio.sf.statNsLowerBound\":${VoiceDebugSettingModel.statNsLowerBound}}")
+                    setParameters("{\"che.audio.sf.nsngFinalMaskLowerBound\":${VoiceDebugSettingModel.nsngFinalMaskLowerBound}}")
+                    setParameters("{\"che.audio.sf.statNsEnhFactor\":${VoiceDebugSettingModel.statNsEnhFactor}}")
+                    setParameters("{\"che.audio.sf.statNsFastNsSpeechTrigThreshold\":${VoiceDebugSettingModel.statNsFastNsSpeechTrigThreshold}}")
+                }
+            }
+        }
+    }
+
+    /**
+     * 音乐保护
+     */
+    fun deMusicNoise(anisMode: Int) {
+        when (anisMode) {
+            ConfigConstants.AINSMode.AINS_Off -> { // 音乐保护 off
+                rtcEngine?.apply {
+                    setParameters("{\"che.audio.aed.enable\":0}")
+                }
+            }
+
+            ConfigConstants.AINSMode.AINS_AI_Weakness -> { // 音乐保护弱
+                rtcEngine?.apply {
+                    setParameters("{\"che.audio.aed.enable\":1}")
+                    setParameters("{\"che.audio.sf.nsngMusicProbThr\":85}")
+                    setParameters("{\"che.audio.sf.ainsMusicModeBackoffDB\":270}")
+                    setParameters("{\"che.audio.sf.statNsMusicModeBackoffDB\":200}")
+                }
+            }
+
+            ConfigConstants.AINSMode.AINS_AI_Strong -> { // 音乐保护强
+                rtcEngine?.apply {
+                    setParameters("{\"che.audio.aed.enable\":1}")
+                    setParameters("{\"che.audio.sf.nsngMusicProbThr\":60}")
+                    setParameters("{\"che.audio.sf.ainsMusicModeBackoffDB\":270}")
+                    setParameters("{\"che.audio.sf.statNsMusicModeBackoffDB\":200}")
+                }
+            }
+
+            ConfigConstants.AINSMode.AINS_Custom -> { // 自定义
+                rtcEngine?.apply {
+                    setParameters("{\"che.audio.aed.enable\":${VoiceDebugSettingModel.aedEnable}}")
+                    setParameters("{\"che.audio.sf.nsngMusicProbThr\":${VoiceDebugSettingModel.nsngMusicProbThr}}")
+                    setParameters("{\"che.audio.sf.ainsMusicModeBackoffDB\":${VoiceDebugSettingModel.ainsMusicModeBackoffDB}}")
+                    setParameters("{\"che.audio.sf.statNsMusicModeBackoffDB\":${VoiceDebugSettingModel.statNsMusicModeBackoffDB}}")
+                }
+            }
+        }
+    }
+
+    /**
+     * 人声保护
+     */
+    fun deMicNoise(anisMode: Int) {
+        when (anisMode) {
+            ConfigConstants.AINSMode.AINS_Off -> { // 人声保护 off
+                rtcEngine?.apply {
+                    setParameters("{\"che.audio.sf.ainsSpeechProtectThreshold\":100}")
+                }
+            }
+
+            ConfigConstants.AINSMode.AINS_AI_Weakness -> { // 人声保护弱
+                rtcEngine?.apply {
+                    setParameters("{\"che.audio.sf.ainsSpeechProtectThreshold\":85}")
+                }
+            }
+
+            ConfigConstants.AINSMode.AINS_AI_Strong -> { // 人声保护强
+                rtcEngine?.apply {
+                    setParameters("{\"che.audio.sf.ainsSpeechProtectThreshold\":50}")
+                }
+            }
+
+            ConfigConstants.AINSMode.AINS_Custom -> { // 自定义
+                rtcEngine?.apply {
+                    setParameters("{\"che.audio.sf.ainsSpeechProtectThreshold\":${VoiceDebugSettingModel.ainsSpeechProtectThreshold}}")
+                }
+            }
+        }
+    }
+
+    fun updateNsEnable() {
+        rtcEngine?.apply {
+            setParameters("{\"che.audio.sf.nsEnable\":${VoiceDebugSettingModel.nsEnable}}")
+        }
+    }
+
+    fun updateAinsToLoadFlag() {
+        rtcEngine?.apply {
+            setParameters("{\"che.audio.sf.ainsToLoadFlag\":${VoiceDebugSettingModel.ainsToLoadFlag}}")
+        }
+    }
+
+    fun updateNsngAlgRoute() {
+        rtcEngine?.apply {
+            setParameters("{\"che.audio.sf.nsngAlgRoute\":${VoiceDebugSettingModel.nsngAlgRoute}}")
+        }
+    }
+
+    fun updateNsngPredefAgg() {
+        rtcEngine?.apply {
+            setParameters("{\"che.audio.sf.nsngPredefAgg\":${VoiceDebugSettingModel.nsngPredefAgg}}")
+        }
+    }
+
+    fun updateNsngMapInMaskMin() {
+        rtcEngine?.apply {
+            setParameters("{\"che.audio.sf.nsngMapInMaskMin\":${VoiceDebugSettingModel.nsngMapInMaskMin}}")
+        }
+    }
+
+    fun updateNsngMapOutMaskMin() {
+        rtcEngine?.apply {
+            setParameters("{\"che.audio.sf.nsngMapOutMaskMin\":${VoiceDebugSettingModel.nsngMapOutMaskMin}}")
+        }
+    }
+
+    fun updateStatNsLowerBound() {
+        rtcEngine?.apply {
+            setParameters("{\"che.audio.sf.statNsLowerBound\":${VoiceDebugSettingModel.statNsLowerBound}}")
+        }
+    }
+
+    fun updateNsngFinalMaskLowerBound() {
+        rtcEngine?.apply {
+            setParameters("{\"che.audio.sf.nsngFinalMaskLowerBound\":${VoiceDebugSettingModel.nsngFinalMaskLowerBound}}")
+        }
+    }
+
+    fun updateStatNsEnhFactor() {
+        rtcEngine?.apply {
+            setParameters("{\"che.audio.sf.statNsEnhFactor\":${VoiceDebugSettingModel.statNsEnhFactor}}")
+        }
+    }
+
+    fun updateStatNsFastNsSpeechTrigThreshold() {
+        rtcEngine?.apply {
+            setParameters("{\"che.audio.sf.statNsFastNsSpeechTrigThreshold\":${VoiceDebugSettingModel.statNsFastNsSpeechTrigThreshold}}")
+        }
+    }
+
+    fun updateAedEnable(){
+        rtcEngine?.apply {
+            setParameters("{\"che.audio.aed.enable\":${VoiceDebugSettingModel.aedEnable}}")
+        }
+    }
+
+    fun updateNsngMusicProbThr(){
+        rtcEngine?.apply {
+            setParameters("{\"che.audio.sf.nsngMusicProbThr\":${VoiceDebugSettingModel.nsngMusicProbThr}}")
+        }
+    }
+
+    fun updateAinsMusicModeBackoffDB(){
+        rtcEngine?.apply {
+            setParameters("{\"che.audio.sf.ainsMusicModeBackoffDB\":${VoiceDebugSettingModel.ainsMusicModeBackoffDB}}")
+        }
+    }
+    fun updateStatNsMusicModeBackoffDB(){
+        rtcEngine?.apply {
+            setParameters("{\"che.audio.sf.statNsMusicModeBackoffDB\":${VoiceDebugSettingModel.statNsMusicModeBackoffDB}}")
+        }
+    }
+
+    fun updateAinsSpeechProtectThreshold(){
+        rtcEngine?.apply {
+            setParameters("{\"che.audio.sf.ainsSpeechProtectThreshold\":${VoiceDebugSettingModel.ainsSpeechProtectThreshold}}")
+        }
     }
 
     /**
@@ -348,7 +574,8 @@ class AgoraRtcEngineController {
                         "\"max_size_bytes\":\"120000000\"," +
                         "\"uuid\":\"123456789\"," +
                         "\"duration\":\"1200000\"}" +
-                        "}")
+                        "}"
+            )
         } else {
             rtcEngine?.setParameters("{\"rtc.debug.enable\": false}")
         }
@@ -436,7 +663,7 @@ class AgoraRtcEngineController {
 
     private var soundSpeakerType = ConfigConstants.BotSpeaker.BotBlue
 
-    private var mediaPlayer:IMediaPlayer?=null
+    private var mediaPlayer: IMediaPlayer? = null
 
     private val firstMediaPlayerObserver = object : MediaPlayerObserver() {
         override fun onPlayerStateChanged(state: MediaPlayerState?, error: MediaPlayerError?) {
@@ -446,6 +673,7 @@ class AgoraRtcEngineController {
                 MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                     mediaPlayer?.play()
                 }
+
                 MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
                     // 结束播放回调--->> 播放下一个，取队列第一个播放
                     ThreadManager.getInstance().runOnMainThread {
@@ -455,12 +683,14 @@ class AgoraRtcEngineController {
                         }
                     }
                 }
+
                 MediaPlayerState.PLAYER_STATE_PLAYING -> {
                     // 开始播放回调--->>
                     ThreadManager.getInstance().runOnMainThread {
                         micVolumeListener?.onBotVolume(soundSpeakerType, false)
                     }
                 }
+
                 else -> {}
             }
         }

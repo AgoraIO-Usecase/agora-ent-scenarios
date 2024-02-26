@@ -332,7 +332,7 @@ object RoomSoundAudioConstructor {
      */
     val anisIntroduceAudioMap: Map<Int, List<SoundAudioBean>> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         mutableMapOf(
-            ConfigConstants.AINSMode.AINS_Tradition_Strong to
+            ConfigConstants.AINSMode.AINS_High to
                     mutableListOf(
                         SoundAudioBean(
                             ConfigConstants.BotSpeaker.BotRed,
@@ -370,7 +370,7 @@ object RoomSoundAudioConstructor {
                             getANISIntroduceUrl("/CN/Share/07-07-R-CN.wav")
                         )
                     ),
-            ConfigConstants.AINSMode.AINS_Tradition_Weakness to
+            ConfigConstants.AINSMode.AINS_Medium to
                     mutableListOf(
                         SoundAudioBean(
                             ConfigConstants.BotSpeaker.BotRed,
@@ -460,99 +460,99 @@ object RoomSoundAudioConstructor {
                 ConfigConstants.BotSpeaker.BotBlue,
                 AINSSoundId + 1,
                 getAINSSoundUrl(AINS_TVSound, "/08-01-B", ConfigConstants.AINSMode.AINS_Off),
-                getAINSSoundUrl(AINS_TVSound, "/08-01-B", ConfigConstants.AINSMode.AINS_Tradition_Strong),
-                getAINSSoundUrl(AINS_TVSound, "/08-01-B", ConfigConstants.AINSMode.AINS_Tradition_Weakness)
+                getAINSSoundUrl(AINS_TVSound, "/08-01-B", ConfigConstants.AINSMode.AINS_High),
+                getAINSSoundUrl(AINS_TVSound, "/08-01-B", ConfigConstants.AINSMode.AINS_Medium)
             ),
             ConfigConstants.AINSSoundType.AINS_KitchenSound to SoundAudioBean(
                 ConfigConstants.BotSpeaker.BotBlue,
                 AINSSoundId + 2,
                 getAINSSoundUrl(AINS_KitchenSound, "/09-01-B", ConfigConstants.AINSMode.AINS_Off),
-                getAINSSoundUrl(AINS_KitchenSound, "/09-01-B", ConfigConstants.AINSMode.AINS_Tradition_Strong),
-                getAINSSoundUrl(AINS_KitchenSound, "/09-01-B", ConfigConstants.AINSMode.AINS_Tradition_Weakness)
+                getAINSSoundUrl(AINS_KitchenSound, "/09-01-B", ConfigConstants.AINSMode.AINS_High),
+                getAINSSoundUrl(AINS_KitchenSound, "/09-01-B", ConfigConstants.AINSMode.AINS_Medium)
             ),
             ConfigConstants.AINSSoundType.AINS_StreetSound to SoundAudioBean(
                 ConfigConstants.BotSpeaker.BotBlue,
                 AINSSoundId + 3,
                 getAINSSoundUrl(AINS_StreetSound, "/10-01-B", ConfigConstants.AINSMode.AINS_Off),
-                getAINSSoundUrl(AINS_StreetSound, "/10-01-B", ConfigConstants.AINSMode.AINS_Tradition_Strong),
-                getAINSSoundUrl(AINS_StreetSound, "/10-01-B", ConfigConstants.AINSMode.AINS_Tradition_Weakness)
+                getAINSSoundUrl(AINS_StreetSound, "/10-01-B", ConfigConstants.AINSMode.AINS_High),
+                getAINSSoundUrl(AINS_StreetSound, "/10-01-B", ConfigConstants.AINSMode.AINS_Medium)
             ),
             ConfigConstants.AINSSoundType.AINS_MachineSound to SoundAudioBean(
                 ConfigConstants.BotSpeaker.BotBlue,
                 AINSSoundId + 4,
                 getAINSSoundUrl(AINS_MachineSound, "/11-01-B", ConfigConstants.AINSMode.AINS_Off),
-                getAINSSoundUrl(AINS_MachineSound, "/11-01-B", ConfigConstants.AINSMode.AINS_Tradition_Strong),
-                getAINSSoundUrl(AINS_MachineSound, "/11-01-B", ConfigConstants.AINSMode.AINS_Tradition_Weakness)
+                getAINSSoundUrl(AINS_MachineSound, "/11-01-B", ConfigConstants.AINSMode.AINS_High),
+                getAINSSoundUrl(AINS_MachineSound, "/11-01-B", ConfigConstants.AINSMode.AINS_Medium)
             ),
             ConfigConstants.AINSSoundType.AINS_OfficeSound to SoundAudioBean(
                 ConfigConstants.BotSpeaker.BotBlue,
                 AINSSoundId + 5,
                 getAINSSoundUrl(AINS_OfficeSound, "/12-01-B", ConfigConstants.AINSMode.AINS_Off),
-                getAINSSoundUrl(AINS_OfficeSound, "/12-01-B", ConfigConstants.AINSMode.AINS_Tradition_Strong),
-                getAINSSoundUrl(AINS_OfficeSound, "/12-01-B", ConfigConstants.AINSMode.AINS_Tradition_Weakness)
+                getAINSSoundUrl(AINS_OfficeSound, "/12-01-B", ConfigConstants.AINSMode.AINS_High),
+                getAINSSoundUrl(AINS_OfficeSound, "/12-01-B", ConfigConstants.AINSMode.AINS_Medium)
             ),
             ConfigConstants.AINSSoundType.AINS_HomeSound to SoundAudioBean(
                 ConfigConstants.BotSpeaker.BotBlue,
                 AINSSoundId + 6,
                 getAINSSoundUrl(AINS_HomeSound, "/13-01-B", ConfigConstants.AINSMode.AINS_Off),
-                getAINSSoundUrl(AINS_HomeSound, "/13-01-B", ConfigConstants.AINSMode.AINS_Tradition_Strong),
-                getAINSSoundUrl(AINS_HomeSound, "/13-01-B", ConfigConstants.AINSMode.AINS_Tradition_Weakness)
+                getAINSSoundUrl(AINS_HomeSound, "/13-01-B", ConfigConstants.AINSMode.AINS_High),
+                getAINSSoundUrl(AINS_HomeSound, "/13-01-B", ConfigConstants.AINSMode.AINS_Medium)
             ),
             ConfigConstants.AINSSoundType.AINS_ConstructionSound to SoundAudioBean(
                 ConfigConstants.BotSpeaker.BotBlue,
                 AINSSoundId + 7,
                 getAINSSoundUrl(AINS_ConstructionSound, "/14-01-B", ConfigConstants.AINSMode.AINS_Off),
-                getAINSSoundUrl(AINS_ConstructionSound, "/14-01-B", ConfigConstants.AINSMode.AINS_Tradition_Strong),
-                getAINSSoundUrl(AINS_ConstructionSound, "/14-01-B", ConfigConstants.AINSMode.AINS_Tradition_Weakness)
+                getAINSSoundUrl(AINS_ConstructionSound, "/14-01-B", ConfigConstants.AINSMode.AINS_High),
+                getAINSSoundUrl(AINS_ConstructionSound, "/14-01-B", ConfigConstants.AINSMode.AINS_Medium)
             ),
             ConfigConstants.AINSSoundType.AINS_AlertSound to SoundAudioBean(
                 ConfigConstants.BotSpeaker.BotBlue,
                 AINSSoundId + 8,
                 getAINSSoundUrl(AINS_AlertSound, "/15-01-B", ConfigConstants.AINSMode.AINS_Off),
-                getAINSSoundUrl(AINS_AlertSound, "/15-01-B", ConfigConstants.AINSMode.AINS_Tradition_Strong),
-                getAINSSoundUrl(AINS_AlertSound, "/15-01-B", ConfigConstants.AINSMode.AINS_Tradition_Weakness)
+                getAINSSoundUrl(AINS_AlertSound, "/15-01-B", ConfigConstants.AINSMode.AINS_High),
+                getAINSSoundUrl(AINS_AlertSound, "/15-01-B", ConfigConstants.AINSMode.AINS_Medium)
             ),
             ConfigConstants.AINSSoundType.AINS_ApplauseSound to SoundAudioBean(
                 ConfigConstants.BotSpeaker.BotBlue,
                 AINSSoundId + 9,
                 getAINSSoundUrl(AINS_ApplauseSound, "/16-01-B", ConfigConstants.AINSMode.AINS_Off),
-                getAINSSoundUrl(AINS_ApplauseSound, "/16-01-B", ConfigConstants.AINSMode.AINS_Tradition_Strong),
-                getAINSSoundUrl(AINS_ApplauseSound, "/16-01-B", ConfigConstants.AINSMode.AINS_Tradition_Weakness)
+                getAINSSoundUrl(AINS_ApplauseSound, "/16-01-B", ConfigConstants.AINSMode.AINS_High),
+                getAINSSoundUrl(AINS_ApplauseSound, "/16-01-B", ConfigConstants.AINSMode.AINS_Medium)
             ),
             ConfigConstants.AINSSoundType.AINS_WindSound to SoundAudioBean(
                 ConfigConstants.BotSpeaker.BotBlue,
                 AINSSoundId + 10,
                 getAINSSoundUrl(AINS_WindSound, "/17-01-B", ConfigConstants.AINSMode.AINS_Off),
-                getAINSSoundUrl(AINS_WindSound, "/17-01-B", ConfigConstants.AINSMode.AINS_Tradition_Strong),
-                getAINSSoundUrl(AINS_WindSound, "/17-01-B", ConfigConstants.AINSMode.AINS_Tradition_Weakness)
+                getAINSSoundUrl(AINS_WindSound, "/17-01-B", ConfigConstants.AINSMode.AINS_High),
+                getAINSSoundUrl(AINS_WindSound, "/17-01-B", ConfigConstants.AINSMode.AINS_Medium)
             ),
             ConfigConstants.AINSSoundType.AINS_MicPopFilterSound to SoundAudioBean(
                 ConfigConstants.BotSpeaker.BotBlue,
                 AINSSoundId + 11,
                 getAINSSoundUrl(AINS_MicPopFilterSound, "/18-01-B", ConfigConstants.AINSMode.AINS_Off),
-                getAINSSoundUrl(AINS_MicPopFilterSound, "/18-01-B", ConfigConstants.AINSMode.AINS_Tradition_Strong),
-                getAINSSoundUrl(AINS_MicPopFilterSound, "/18-01-B", ConfigConstants.AINSMode.AINS_Tradition_Weakness)
+                getAINSSoundUrl(AINS_MicPopFilterSound, "/18-01-B", ConfigConstants.AINSMode.AINS_High),
+                getAINSSoundUrl(AINS_MicPopFilterSound, "/18-01-B", ConfigConstants.AINSMode.AINS_Medium)
             ),
             ConfigConstants.AINSSoundType.AINS_AudioFeedback to SoundAudioBean(
                 ConfigConstants.BotSpeaker.BotBlue,
                 AINSSoundId + 12,
                 getAINSSoundUrl(AINS_AudioFeedback, "/19-01-B", ConfigConstants.AINSMode.AINS_Off),
-                getAINSSoundUrl(AINS_AudioFeedback, "/19-01-B", ConfigConstants.AINSMode.AINS_Tradition_Strong),
-                getAINSSoundUrl(AINS_AudioFeedback, "/19-01-B", ConfigConstants.AINSMode.AINS_Tradition_Weakness)
+                getAINSSoundUrl(AINS_AudioFeedback, "/19-01-B", ConfigConstants.AINSMode.AINS_High),
+                getAINSSoundUrl(AINS_AudioFeedback, "/19-01-B", ConfigConstants.AINSMode.AINS_Medium)
             ),
             ConfigConstants.AINSSoundType.AINS_MicrophoneFingerRub to SoundAudioBean(
                 ConfigConstants.BotSpeaker.BotBlue,
                 AINSSoundId + 13,
                 getAINSSoundUrl(AINS_MicrophoneFingerRub, "/20-01-B", ConfigConstants.AINSMode.AINS_Off),
-                getAINSSoundUrl(AINS_MicrophoneFingerRub, "/20-01-B", ConfigConstants.AINSMode.AINS_Tradition_Strong),
-                getAINSSoundUrl(AINS_MicrophoneFingerRub, "/20-01-B", ConfigConstants.AINSMode.AINS_Tradition_Weakness)
+                getAINSSoundUrl(AINS_MicrophoneFingerRub, "/20-01-B", ConfigConstants.AINSMode.AINS_High),
+                getAINSSoundUrl(AINS_MicrophoneFingerRub, "/20-01-B", ConfigConstants.AINSMode.AINS_Medium)
             ),
             ConfigConstants.AINSSoundType.AINS_MicrophoneScreenTap to SoundAudioBean(
                 ConfigConstants.BotSpeaker.BotBlue,
                 AINSSoundId + 14,
                 getAINSSoundUrl(AINS_MicrophoneScreenTap, "/21-01-B", ConfigConstants.AINSMode.AINS_Off),
-                getAINSSoundUrl(AINS_MicrophoneScreenTap, "/21-01-B", ConfigConstants.AINSMode.AINS_Tradition_Strong),
-                getAINSSoundUrl(AINS_MicrophoneScreenTap, "/21-01-B", ConfigConstants.AINSMode.AINS_Tradition_Weakness)
+                getAINSSoundUrl(AINS_MicrophoneScreenTap, "/21-01-B", ConfigConstants.AINSMode.AINS_High),
+                getAINSSoundUrl(AINS_MicrophoneScreenTap, "/21-01-B", ConfigConstants.AINSMode.AINS_Medium)
             ),
         )
     }
@@ -589,13 +589,13 @@ object RoomSoundAudioConstructor {
         val local = if (ResourcesTools.getIsZh()) CN else EN
 
         val audioPathP = when (ainsMode) {
-            ConfigConstants.AINSMode.AINS_Tradition_Strong -> "$audioPathPrefix/$local/High"
-            ConfigConstants.AINSMode.AINS_Tradition_Weakness -> "$audioPathPrefix/$local/Medium"
+            ConfigConstants.AINSMode.AINS_High -> "$audioPathPrefix/$local/High"
+            ConfigConstants.AINSMode.AINS_Medium -> "$audioPathPrefix/$local/Medium"
             else -> "$audioPathPrefix/$local/None"
         }
         val ainsPath = when (ainsMode) {
-            ConfigConstants.AINSMode.AINS_Tradition_Strong -> "High.wav"
-            ConfigConstants.AINSMode.AINS_Tradition_Weakness -> "Medium.wav"
+            ConfigConstants.AINSMode.AINS_High -> "High.wav"
+            ConfigConstants.AINSMode.AINS_Medium -> "Medium.wav"
             else -> "None.wav"
         }
         //AI噪⾳ 08AINSTVSound/CN/High/08-01-B-CN-High.wav  1./08AINSTVSound 2.CN 3.high 4.08-01-B 5.CN 6.High

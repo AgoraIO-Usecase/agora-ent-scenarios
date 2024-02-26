@@ -39,13 +39,16 @@ object ConfigConstants {
 
     //--------AI 降噪模式 start--------
     object AINSMode {
-        const val AINS_Tradition_Strong = 5 // 传统强
-        const val AINS_Tradition_Weakness = 4 //传统弱
-        const val AINS_AI_Strong = 3 // AI 强
-        const val AINS_AI_Weakness = 2  // AI 弱
-        const val AINS_Custom = 1  // 自定义
-        const val AINS_Off = 0  // 关闭
+        const val AINS_High = 0 //
+        const val AINS_Medium = 1 //
+        const val AINS_Off = 2  // 关闭
         const val AINS_Unknown = -1
+
+        const val AINS_Tradition_Strong = 5 // 传统强
+        const val AINS_Tradition_Weakness = 6 // 传统弱
+        const val AINS_AI_Strong = 7 // 传统弱
+        const val AINS_AI_Weakness = 8  // AI 弱
+        const val AINS_Custom = 9  // 自定义
     }
     //--------AI 降噪模式 end--------
 

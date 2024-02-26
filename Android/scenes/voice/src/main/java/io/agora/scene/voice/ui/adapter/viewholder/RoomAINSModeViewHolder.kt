@@ -77,7 +77,7 @@ class RoomAINSSoundsViewHolder(binding: VoiceItemRoomAinsAuditionBinding) :
         data?.let {
             mBinding.mtChatroomAinsName.text = it.soundName
             mBinding.mtChatroomAins.setOnClickListener { view ->
-                onItemChildClick(ConfigConstants.AINSMode.AINS_Tradition_Strong, view)
+                onItemChildClick(ConfigConstants.AINSMode.AINS_High, view)
             }
             mBinding.mtChatroomAinsNone.setOnClickListener { view ->
                 onItemChildClick(ConfigConstants.AINSMode.AINS_Off, view)
@@ -90,7 +90,7 @@ class RoomAINSSoundsViewHolder(binding: VoiceItemRoomAinsAuditionBinding) :
                 mBinding.mtChatroomAinsSubName.isVisible = true
             }
             when (it.soundMode) {
-                ConfigConstants.AINSMode.AINS_Tradition_Strong -> {
+                ConfigConstants.AINSMode.AINS_High -> {
                     setViewHighlight(mBinding.mtChatroomAins)
                     resetViewDefault(mBinding.mtChatroomAinsNone)
                 }

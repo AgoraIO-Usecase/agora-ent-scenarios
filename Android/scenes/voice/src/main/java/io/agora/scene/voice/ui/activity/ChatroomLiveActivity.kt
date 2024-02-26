@@ -35,7 +35,8 @@ import io.agora.scene.voice.service.VoiceRoomSubscribeDelegate
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.RoomGiftViewDelegate
 import io.agora.scene.voice.ui.RoomObservableViewDelegate
-import io.agora.scene.voice.ui.debugSettings.VoiceDebugSettingBean
+import io.agora.scene.voice.ui.debugSettings.OnDebugSettingCallback
+import io.agora.scene.voice.ui.debugSettings.VoiceDebugSettingModel
 import io.agora.scene.voice.ui.debugSettings.VoiceRoomDebugOptionsDialog
 import io.agora.scene.voice.ui.widget.barrage.ChatroomMessagesView
 import io.agora.scene.voice.ui.widget.primary.MenuItemClickListener
@@ -125,7 +126,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
 
 //        binding.messageView.refreshSelectLast()
         if (roomKitBean.isOwner) {
-            toggleAudioRun =  Runnable {
+            toggleAudioRun = Runnable {
                 "onPermissionGrant initSdkJoin".logD(TAG)
                 roomLivingViewModel.initSdkJoin(roomKitBean)
             }
@@ -137,7 +138,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
 
     private var toggleAudioRun: Runnable? = null
 
-    fun toggleSelfAudio(isOpen: Boolean, callback : () -> Unit) {
+    fun toggleSelfAudio(isOpen: Boolean, callback: () -> Unit) {
         if (isOpen) {
             toggleAudioRun = Runnable {
                 callback.invoke()
@@ -534,12 +535,15 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                             leaveRoom()
                         })
                     }
+
                     R.id.voice_extend_item_mic -> {
                         roomObservableDelegate.onClickBottomMic()
                     }
+
                     R.id.voice_extend_item_hand_up -> {
                         roomObservableDelegate.onClickBottomHandUp()
                     }
+
                     R.id.voice_extend_item_gift -> {
                         giftViewDelegate.showGiftDialog(object : OnMsgCallBack() {
                             override fun onSuccess(message: ChatMessageData?) {
@@ -639,56 +643,114 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
         }
     }
 
-    private fun showDebugDialog(){
-        val debugSettingBean  = VoiceDebugSettingBean(object :VoiceRoomDebugOptionsDialog.OnDebugSettingCallback{
+    private fun showDebugDialog() {
+        VoiceDebugSettingModel.callback = object : OnDebugSettingCallback {
             override fun onNsEnable(newValue: Int) {
-
+                // 自定义
+                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                    AgoraRtcEngineController.get().updateNsEnable()
+                }
             }
 
             override fun onAinsToLoadFlag(newValue: Int) {
+                // 自定义
+                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                    AgoraRtcEngineController.get().updateAinsToLoadFlag()
+                }
             }
 
             override fun onNsngAlgRoute(newValue: Int) {
+                // 自定义
+                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                    AgoraRtcEngineController.get().updateNsngAlgRoute()
+                }
             }
 
             override fun onNsngPredefAgg(newValue: Int) {
+                // 自定义
+                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                    AgoraRtcEngineController.get().updateNsngPredefAgg()
+                }
             }
 
             override fun onNsngMapInMaskMin(newValue: Int) {
+                // 自定义
+                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                    AgoraRtcEngineController.get().updateNsngMapInMaskMin()
+                }
             }
 
             override fun onNsngMapOutMaskMin(newValue: Int) {
+                // 自定义
+                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                    AgoraRtcEngineController.get().updateNsngMapOutMaskMin()
+                }
             }
 
             override fun onStatNsLowerBound(newValue: Int) {
+                // 自定义
+                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                    AgoraRtcEngineController.get().updateStatNsLowerBound()
+                }
             }
 
             override fun onNsngFinalMaskLowerBound(newValue: Int) {
+                // 自定义
+                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                    AgoraRtcEngineController.get().updateNsngFinalMaskLowerBound()
+                }
             }
 
             override fun onStatNsEnhFactor(newValue: Int) {
+                // 自定义
+                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                    AgoraRtcEngineController.get().updateStatNsEnhFactor()
+                }
             }
 
             override fun onStatNsFastNsSpeechTrigThreshold(newValue: Int) {
+                // 自定义
+                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                    AgoraRtcEngineController.get().updateStatNsFastNsSpeechTrigThreshold()
+                }
             }
 
             override fun onAedEnable(newValue: Int) {
+                // 自定义
+                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMusicMode == ConfigConstants.AINSMode.AINS_Custom) {
+                    AgoraRtcEngineController.get().updateAedEnable()
+                }
             }
 
             override fun onNsngMusicProbThr(newValue: Int) {
+                // 自定义
+                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMusicMode == ConfigConstants.AINSMode.AINS_Custom) {
+                    AgoraRtcEngineController.get().updateNsngMusicProbThr()
+                }
             }
 
             override fun onStatNsMusicModeBackoffDB(newValue: Int) {
+                // 自定义
+                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMusicMode == ConfigConstants.AINSMode.AINS_Custom) {
+                    AgoraRtcEngineController.get().updateStatNsMusicModeBackoffDB()
+                }
             }
 
             override fun onAinsMusicModeBackoffDB(newValue: Int) {
+                // 自定义
+                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMusicMode == ConfigConstants.AINSMode.AINS_Custom) {
+                    AgoraRtcEngineController.get().updateAinsMusicModeBackoffDB()
+                }
             }
 
             override fun onAinsSpeechProtectThreshold(newValue: Int) {
+                // 自定义
+                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMicMode == ConfigConstants.AINSMode.AINS_Custom) {
+                    AgoraRtcEngineController.get().updateAinsSpeechProtectThreshold()
+                }
             }
-
-        })
-        VoiceRoomDebugOptionsDialog(debugSettingBean).show(supportFragmentManager, "mtDebug")
+        }
+        VoiceRoomDebugOptionsDialog().show(supportFragmentManager, "mtDebug")
     }
 
     override fun onBackPressed() {

@@ -568,12 +568,25 @@ class RoomObservableViewDelegate constructor(
             }
         }
         ainsDialog.anisModeCallback = {
-            VoiceBuddyFactory.get().rtcChannelTemp.AINSMode = it.anisMode
-            AgoraRtcEngineController.get().deNoise(it.anisMode)
-            roomAudioSettingDialog?.apply {
-                audioSettingsInfo.AINSMode = it.anisMode
-                updateAINSView()
+            when(it.type){
+                AINSType.AINS_Default ->{
+                    VoiceBuddyFactory.get().rtcChannelTemp.AINSMode = it.anisMode
+                    AgoraRtcEngineController.get().deDefaultNoise(it.anisMode)
+                    roomAudioSettingDialog?.apply {
+                        audioSettingsInfo.AINSMode = it.anisMode
+                        updateAINSView()
+                    }
+                }
+                AINSType.AINS_Music ->{
+                    VoiceBuddyFactory.get().rtcChannelTemp.AINSMusicMode = it.anisMode
+                    AgoraRtcEngineController.get().deMusicNoise(it.anisMode)
+                }
+                AINSType.AINS_Mic ->{
+                    VoiceBuddyFactory.get().rtcChannelTemp.AINSMicMode = it.anisMode
+                    AgoraRtcEngineController.get().deMicNoise(it.anisMode)
+                }
             }
+
             if (roomKitBean.isOwner && voiceRoomModel.useRobot && VoiceBuddyFactory.get().rtcChannelTemp.firstSwitchAnis) {
                 VoiceBuddyFactory.get().rtcChannelTemp.firstSwitchAnis = false
                 RoomSoundAudioConstructor.anisIntroduceAudioMap[it.anisMode]?.let { soundAudioList ->
@@ -588,7 +601,7 @@ class RoomObservableViewDelegate constructor(
                 ainsDialog.updateAnisSoundsAdapter(position, true)
                 RoomSoundAudioConstructor.AINSSoundMap[ainsSoundBean.soundType]?.let { soundAudioBean ->
                     val audioUrl =
-                        if (ainsSoundBean.soundMode == ConfigConstants.AINSMode.AINS_Tradition_Strong) soundAudioBean.audioUrlHigh else soundAudioBean.audioUrl
+                        if (ainsSoundBean.soundMode == ConfigConstants.AINSMode.AINS_High) soundAudioBean.audioUrlHigh else soundAudioBean.audioUrl
                     // 试听降噪音效
                     AgoraRtcEngineController.get()
                         .playMusic(soundAudioBean.soundId, audioUrl, soundAudioBean.speakerType)

@@ -343,7 +343,7 @@ class AgoraRtcEngineController {
                     setParameters("{\"che.audio.nsng.enhfactorstastical\":200}")
                 }
             }
-            ConfigConstants.AINSMode.AINS_Tradition_Strong -> {
+            ConfigConstants.AINSMode.AINS_High -> {
                 rtcEngine?.apply {
                     setParameters("{\"che.audio.ains_mode\":2}")
                     setParameters("{\"che.audio.nsng.lowerBound\":10}")

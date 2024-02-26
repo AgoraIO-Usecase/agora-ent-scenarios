@@ -70,7 +70,7 @@ enum class AINSType {
 data class AINSModeBean constructor(
     val type: AINSType = AINSType.AINS_Default,
     val anisName: String = "",
-    var anisMode: Int = ConfigConstants.AINSMode.AINS_Tradition_Weakness // 默认
+    var anisMode: Int = ConfigConstants.AINSMode.AINS_Medium // 默认
 ) : BaseRoomBean {
 
     override fun equals(other: Any?): Boolean {

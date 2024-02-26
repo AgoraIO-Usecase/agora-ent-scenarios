@@ -22,10 +22,10 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtTraditionalStrong"
         style="@style/voice_bottom_sheet_frame_text_style"
-        android:layout_marginEnd="6dp"
+        android:layout_marginEnd="4dp"
         android:background="@drawable/voice_bg_rect_radius4_grey"
         android:minWidth="38dp"
-        android:text="@string/voice_chatroom_setting_traditional_weakness"
+        android:text="@string/voice_chatroom_setting_traditional_strong"
         android:textColor="@color/voice_dark_grey_color_979cbb"
         app:layout_constraintBottom_toBottomOf="@+id/mtSettingOff"
         app:layout_constraintEnd_toStartOf="@+id/mtTraditionalWeakness"
@@ -35,7 +35,7 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtTraditionalWeakness"
         style="@style/voice_bottom_sheet_frame_text_style"
-        android:layout_marginEnd="6dp"
+        android:layout_marginEnd="4dp"
         android:background="@drawable/voice_bg_rect_radius4_grey"
         android:minWidth="38dp"
         android:text="@string/voice_chatroom_setting_traditional_weakness"
@@ -48,10 +48,10 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtAiStrong"
         style="@style/voice_bottom_sheet_frame_text_style"
-        android:layout_marginEnd="6dp"
+        android:layout_marginEnd="4dp"
         android:background="@drawable/voice_bg_rect_radius4_grey"
         android:minWidth="38dp"
-        android:text="@string/voice_chatroom_setting_ai_weakness"
+        android:text="@string/voice_chatroom_setting_ai_strong"
         android:textColor="@color/voice_dark_grey_color_979cbb"
         app:layout_constraintBottom_toBottomOf="@+id/mtSettingOff"
         app:layout_constraintEnd_toStartOf="@+id/mtAiWeakness"
@@ -61,7 +61,7 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtAiWeakness"
         style="@style/voice_bottom_sheet_frame_text_style"
-        android:layout_marginEnd="6dp"
+        android:layout_marginEnd="4dp"
         android:background="@drawable/voice_bg_rect_radius4_grey"
         android:minWidth="38dp"
         android:text="@string/voice_chatroom_setting_ai_weakness"
@@ -74,7 +74,7 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtSettingCustom"
         style="@style/voice_bottom_sheet_frame_text_style"
-        android:layout_marginEnd="6dp"
+        android:layout_marginEnd="4dp"
         android:minWidth="38dp"
         android:text="@string/voice_chatroom_setting_custom"
         app:layout_constraintBottom_toBottomOf="@+id/mtSettingOff"
