@@ -429,11 +429,11 @@ extension Pure1v1UserListViewController {
         let jsonStr = String(data: jsonData, encoding: .utf8)
         config.extraInfo = jsonStr
         let module = AgoraContentInspectModule()
-        module.interval = 30
-//        module.type = .imageModeration
-//        config.modules = [module]
-//        let ret = rtcEngine.enableContentInspectEx(enable, config: config, connection: connection)
-//        pure1v1Print("setupContentInspectConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret)")
+        module.interval = 60
+        module.type = .imageModeration
+        config.modules = [module]
+        let ret = rtcEngine.enableContentInspectEx(enable, config: config, connection: connection)
+        pure1v1Print("setupContentInspectConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret)")
     }
     
     /// 语音审核

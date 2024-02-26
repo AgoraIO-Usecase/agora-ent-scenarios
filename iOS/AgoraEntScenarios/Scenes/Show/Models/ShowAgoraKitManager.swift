@@ -116,11 +116,11 @@ class ShowAgoraKitManager: NSObject {
         let jsonStr = String(data: jsonData, encoding: .utf8)
         config.extraInfo = jsonStr
         let module = AgoraContentInspectModule()
-        module.interval = 30
-//        module.type = .imageModeration
-//        config.modules = [module]
-//        let ret = engine?.enableContentInspectEx(enable, config: config, connection: connection)
-//        showLogger.info("setupContentInspectConfig: \(ret ?? -1)")
+        module.interval = 60
+        module.type = .imageModeration
+        config.modules = [module]
+        let ret = engine?.enableContentInspectEx(enable, config: config, connection: connection)
+        showLogger.info("setupContentInspectConfig: \(ret ?? -1)")
     }
     
     /// 语音审核
