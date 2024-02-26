@@ -84,6 +84,12 @@ class ShowRoomListVC: UIViewController {
         checkDevice()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // cell恢复隐藏coverlayer
+        collectionView.reloadData()
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
