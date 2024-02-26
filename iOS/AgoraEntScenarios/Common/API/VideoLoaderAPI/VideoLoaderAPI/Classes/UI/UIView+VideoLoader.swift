@@ -7,7 +7,7 @@
 
 import Foundation
 
-private var ag_tapRoomId: String = ""
+private var ag_gestureId: String = ""
  
 struct APIRuntimeKey {
     static let handler = UnsafeRawPointer.init(bitPattern: "api_handler".hashValue)!
@@ -87,12 +87,15 @@ extension UIView {
     
     @objc func onGesture(_ ges: UIGestureRecognizer) {
         guard let roomInfo = ag_eventHandler?.roomInfo, let localUid = ag_eventHandler?.localUid else {return}
+        let unmanaged = Unmanaged.passUnretained(ges)
+        let gestureId = "\(unmanaged.toOpaque())"
+        
         //只允许一个item被预加载到
-        guard ag_tapRoomId.count == 0 || ag_tapRoomId == roomInfo.channelName() else { return }
+        guard ag_gestureId.count == 0 || ag_gestureId == gestureId else { return }
         
         switch ges.state {
         case .began:
-            ag_tapRoomId = roomInfo.channelName()
+            ag_gestureId = gestureId
             self.ag_touchTL = NSValue(cgPoint: convert(CGPoint.zero, to: api_getWinwdow()))
             debugLoaderPrint("[UI]onGesture began")
             guard ag_eventHandler?.enableProcess?(.began) ?? true else {
@@ -106,7 +109,8 @@ extension UIView {
                                                             tagId: roomInfo.channelName())
             }
         case .cancelled, .ended:
-            ag_tapRoomId = ""
+            if ag_gestureId.isEmpty {return}
+            ag_gestureId = ""
             let point = ges.location(in: self)
             let currentTl = convert(CGPoint.zero, to:api_getWinwdow())
             
@@ -117,6 +121,9 @@ extension UIView {
                     return
                 }
                 ag_eventHandler?.completion?()
+                
+                //上报耗时开始
+                VideoLoaderApiImpl.shared.startMediaRenderingTracing(anchorId: roomInfo.channelName())
                 return
             }
             debugLoaderPrint("[UI]onGesture cancel")
@@ -126,9 +133,6 @@ extension UIView {
                                                             anchorInfo: anchorInfo,
                                                             tagId: roomInfo.channelName())
             }
-            
-            //上报耗时开始
-            VideoLoaderApiImpl.shared.startMediaRenderingTracing(anchorId: roomInfo.channelName())
         default:
             break
         }
