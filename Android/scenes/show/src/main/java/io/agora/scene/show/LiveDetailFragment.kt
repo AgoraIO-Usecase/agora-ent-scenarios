@@ -1564,7 +1564,7 @@ class LiveDetailFragment : Fragment() {
             jsonObject.put("userNo", UserManager.getInstance().user.userNo)
             contentInspectConfig.extraInfo = jsonObject.toString()
             val module = ContentInspectModule()
-            module.interval = 10
+            module.interval = 60
             module.type = CONTENT_INSPECT_TYPE_IMAGE_MODERATION
             contentInspectConfig.modules = arrayOf( module)
             contentInspectConfig.moduleCount = 1

@@ -730,7 +730,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             jsonObject.put("userNo", UserManager.getInstance().user.userNo)
             contentInspectConfig.extraInfo = jsonObject.toString()
             val module = ContentInspectConfig.ContentInspectModule()
-            module.interval = 30
+            module.interval = 60
             module.type = ContentInspectConfig.CONTENT_INSPECT_TYPE_IMAGE_MODERATION
             contentInspectConfig.modules = arrayOf(module)
             contentInspectConfig.moduleCount = 1
