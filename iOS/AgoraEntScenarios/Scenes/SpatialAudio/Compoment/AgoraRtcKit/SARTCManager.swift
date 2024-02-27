@@ -114,7 +114,7 @@ public struct SARtcType {
      * @param state MPK当前的状态
      * @param error MPK当前的错误码
      */
-    @objc optional func didMPKChangedTo(_ playerKit: AgoraRtcMediaPlayerProtocol, state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) -> Void // MPK 状态回调
+    @objc optional func didMPKChangedTo(_ playerKit: AgoraRtcMediaPlayerProtocol, state: AgoraMediaPlayerState, error: AgoraMediaPlayerReason) -> Void // MPK 状态回调
 }
 
 // MARK: - VMManagerDelegate
@@ -306,8 +306,8 @@ public let kMPK_RTC_UID_SA: UInt = 1
                                     position: [NSNumber],
                                     forward: [NSNumber]?) {
         let positionInfo = AgoraRemoteVoicePositionInfo()
-        positionInfo.position = position
-        positionInfo.forward = forward
+//        positionInfo.position = position
+//        positionInfo.forward = forward
         localSpatial?.updatePlayerPositionInfo(playerId,
                                                positionInfo: positionInfo)
     }
@@ -316,18 +316,18 @@ public let kMPK_RTC_UID_SA: UInt = 1
                               axisForward: [NSNumber],
                               axisRight: [NSNumber],
                               axisUp: [NSNumber]) {
-        localSpatial?.updateSelfPosition(position,
-                                         axisForward: axisForward,
-                                         axisRight: axisRight,
-                                         axisUp: axisUp)
+//        localSpatial?.updateSelfPosition(position,
+//                                         axisForward: axisForward,
+//                                         axisRight: axisRight,
+//                                         axisUp: axisUp)
     }
     
     func updateRemoteSpetialPostion(uid: String?,
                                     position: [NSNumber],
                                     forward: [NSNumber]?) {
         let positionInfo = AgoraRemoteVoicePositionInfo()
-        positionInfo.position = position
-        positionInfo.forward = forward
+//        positionInfo.position = position
+//        positionInfo.forward = forward
         let uid = UInt(uid ?? "0") ?? 0
         localSpatial?.updateRemotePosition(uid, positionInfo: positionInfo)
     }
@@ -741,6 +741,7 @@ extension SARTCManager: AgoraRtcMediaPlayerDelegate {
     }
 
     // mpk didChangedTo
+    /*
     public func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
         if state == .playing {
         } else if state == .openCompleted {
@@ -766,4 +767,5 @@ extension SARTCManager: AgoraRtcMediaPlayerDelegate {
             self.playerDelegate?.didMPKChangedTo?(playerKit, state: state, error: error)
         }
     }
+     */
 }

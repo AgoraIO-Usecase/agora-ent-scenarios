@@ -2289,7 +2289,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
 }
 
 #pragma mark SBGApiEventHandlerDelegate
-- (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error isLocal:(BOOL)isLocal {
+- (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerReason)error isLocal:(BOOL)isLocal {
     dispatch_async(dispatch_get_main_queue(), ^{
         if(state == AgoraMediaPlayerStatePlaying) {
 //            if(isLocal) {
@@ -2366,19 +2366,19 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
 
 - (void)onMusicLoadProgressWithSongCode:(NSInteger)songCode
                                 percent:(NSInteger)percent
-                                 status:(AgoraMusicContentCenterPreloadStatus)status
+                                 status:(AgoraMusicContentCenterPreloadState)status
                                     msg:(NSString *)msg
                                lyricUrl:(NSString *)lyricUrl {
     SBGLogInfo(@"load: %li, %li", status, percent);
     dispatch_async_on_main_queue(^{
-        if(status == AgoraMusicContentCenterPreloadStatusError){
+        if(status == AgoraMusicContentCenterPreloadStateError){
             [VLToast toast:SBGLocalizedString(@"sbg_load_failed_and_change")];
            // [self.MVView setBotViewHidden:false];
            // self.MVView.loadingType = VLSBGMVViewStateIdle;
             return;
         }
         
-        if (status == AgoraMusicContentCenterPreloadStatusOK){
+        if (status == AgoraMusicContentCenterPreloadStateOK){
           //  self.MVView.loadingType = VLSBGMVViewStateIdle;
         }
       //  self.MVView.loadingProgress = percent;

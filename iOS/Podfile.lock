@@ -17,9 +17,9 @@ PODS:
   - Agora-Scene-Utils (1.1.0)
   - Agora_Chat_iOS (1.0.8)
   - AgoraLyricsScore (1.1.2)
-  - AgoraRtcEngine_Special_iOS (4.1.1.23)
+  - AgoraRtcEngine_Special_iOS (1.0)
   - AgoraRtm_iOS (2.1.7)
-  - AgoraSyncManager (2.1.5):
+  - AgoraSyncManager (2.1.6):
     - SocketRocket
   - Bugly (2.5.93)
   - CallAPI (0.3.0):
@@ -70,7 +70,6 @@ PODS:
     - SDWebImage/Core
   - SDWebImageAPNGCoder (0.1.1):
     - SDWebImage/Core (~> 4.2)
-  - SenseLib (1.0)
   - ShowTo1v1 (0.1.0):
     - AgoraSyncManager
     - CallAPI
@@ -102,15 +101,15 @@ PODS:
   - YYCategories/no-arc (1.0.4)
   - YYModel (1.0.4)
   - Zip (2.1.2)
-  - ZSwiftBaseLib (0.1.6.1)
+  - ZSwiftBaseLib (0.1.6.2)
 
 DEPENDENCIES:
   - AFNetworking (= 4.0.1)
   - Agora-Scene-Utils (= 1.1.0)
   - Agora_Chat_iOS (= 1.0.8)
   - AgoraLyricsScore (= 1.1.2)
-  - AgoraRtcEngine_Special_iOS (= 4.1.1.23)
-  - AgoraSyncManager (~> 2.1.5)
+  - AgoraRtcEngine_Special_iOS (from `AgoraRtcEngine_iOS.podspec`)
+  - AgoraSyncManager (~> 2.1.6)
   - Bugly (= 2.5.93)
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
   - HXPhotoPicker/Lite
@@ -125,7 +124,6 @@ DEPENDENCIES:
   - ScoreEffectUI (= 1.0.2)
   - SDWebImage (= 4.4.8)
   - SDWebImageAPNGCoder
-  - SenseLib (from `sense.podspec`)
   - ShowTo1v1 (from `AgoraEntScenarios/Scenes/ShowTo1v1`)
   - SnapKit
   - SocketRocket (= 0.7.0)
@@ -136,7 +134,7 @@ DEPENDENCIES:
   - YYCategories (= 1.0.4)
   - YYModel (= 1.0.4)
   - Zip
-  - ZSwiftBaseLib (= 0.1.6.1)
+  - ZSwiftBaseLib (= 0.1.6.2)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -144,7 +142,6 @@ SPEC REPOS:
     - Agora-Scene-Utils
     - Agora_Chat_iOS
     - AgoraLyricsScore
-    - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS
     - AgoraSyncManager
     - Bugly
@@ -173,12 +170,12 @@ SPEC REPOS:
     - ZSwiftBaseLib
 
 EXTERNAL SOURCES:
+  AgoraRtcEngine_Special_iOS:
+    :path: AgoraRtcEngine_iOS.podspec
   CallAPI:
     :path: AgoraEntScenarios/Common/API/CallAPI
   Pure1v1:
     :path: AgoraEntScenarios/Scenes/Pure1v1
-  SenseLib:
-    :path: sense.podspec
   ShowTo1v1:
     :path: AgoraEntScenarios/Scenes/ShowTo1v1
   VideoLoaderAPI:
@@ -189,9 +186,9 @@ SPEC CHECKSUMS:
   Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraLyricsScore: 0c3e6b701dfe036ba26ba208fc65c3b65ecaeb06
-  AgoraRtcEngine_Special_iOS: 6a3f7814058f819b374cec3037cbbf7c4de519a5
+  AgoraRtcEngine_Special_iOS: 320a47010a3ca4564c51a8b9ebd47a3368803017
   AgoraRtm_iOS: cd26cf8a377a79934864d37e184866dbd1430eaf
-  AgoraSyncManager: 82b14a5a2c5467654e945a8f3b4dc64684b2caa2
+  AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   CallAPI: eefee9fec496ca51cd1432e17551d0c43d75cd17
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
@@ -208,7 +205,6 @@ SPEC CHECKSUMS:
   ScoreEffectUI: bf1195b4d41a73d43c236450b5d7f958989844aa
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
-  SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
   ShowTo1v1: 4da6561d6f12576ce61d05add891595d18bc08d0
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
@@ -220,8 +216,8 @@ SPEC CHECKSUMS:
   YYCategories: 6bcd4314c6661a561410dce4a793379ebd306abd
   YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
-  ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
+  ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: 1cef4769fb52a8ccd71abf6a3e3a1c00c0a0193b
+PODFILE CHECKSUM: 25f8363257564ce120ed1b8ccd2371bdcaf9e100
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.14.3
