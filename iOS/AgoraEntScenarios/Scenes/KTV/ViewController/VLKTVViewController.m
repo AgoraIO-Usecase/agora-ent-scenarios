@@ -738,41 +738,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             self.isHighlightSinger = false;
         }
         
-    } else if([dict[@"cmd"] isEqualToString:@"sendVoiceHighlight"]) {
-        if(self.singRole == KTVSingRoleAudience){
-            return;
-        };
-
-        NSInteger audioEffectPreset = [dict[@"preset"] integerValue];
-        switch (audioEffectPreset) {
-            case AgoraAudioEffectPresetOff:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOffHarmony];
-                NSLog(@"effect:Off");
-                break;
-            case AgoraAudioEffectPresetRoomAcousticsKTV:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousticsKTVHarmony];
-                NSLog(@"effect:KTV");
-                break;
-            case AgoraAudioEffectPresetRoomAcousVocalConcer:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousVocalConcerHarmony];
-                NSLog(@"effect:Concer");
-                break;
-            case AgoraAudioEffectPresetRoomAcousStudio:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousStudioHarmony];
-                NSLog(@"effect:Studio");
-                break;
-            case AgoraAudioEffectPresetRoomAcousPhonograph:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousPhonographHarmony];
-                NSLog(@"effect:graph");
-                break;
-            default:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOffHarmony];
-                NSLog(@"effect:Off");
-                break;
-        }
-    } else if([dict[@"cmd"] isEqualToString:@"cancelVoiceHighlight"]) {
-        //人生突出实效
-        [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
     }
 }
 
@@ -2430,7 +2395,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark KTVApiEventHandlerDelegate
-- (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error isLocal:(BOOL)isLocal {
+- (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerReason)error isLocal:(BOOL)isLocal {
     dispatch_async(dispatch_get_main_queue(), ^{
         if(state == AgoraMediaPlayerStatePlaying) {
             //显示跳过前奏
@@ -2480,13 +2445,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)onMusicLoadProgressWithSongCode:(NSInteger)songCode
                                 percent:(NSInteger)percent
-                                 status:(AgoraMusicContentCenterPreloadStatus)status
+                                 status:(AgoraMusicContentCenterPreloadState)status
                                     msg:(NSString *)msg
                                lyricUrl:(NSString *)lyricUrl {
     KTVLogInfo(@"load: %li, %li", status, percent);
     dispatch_async_on_main_queue(^{
         
-        if(status == AgoraMusicContentCenterPreloadStatusError){
+        if(status == AgoraMusicContentCenterPreloadStateError){
             [VLToast toast:KTVLocalizedString(@"ktv_load_failed_and_change")];
             if(self.loadMusicCallBack) {
                 self.loadMusicCallBack(NO, songCode);
@@ -2495,7 +2460,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
         
-        if (status == AgoraMusicContentCenterPreloadStatusOK){
+        if (status == AgoraMusicContentCenterPreloadStateOK){
         }
         
         if(self.singRole == KTVSingRoleSoloSinger || self.singRole == KTVSingRoleLeadSinger){

@@ -304,7 +304,7 @@ extension KTVApiImpl: KTVApiDelegate {
                      page: Int,
                      pageSize: Int,
                      jsonOption: String,
-                     completion:@escaping (String, AgoraMusicContentCenterStatusCode, AgoraMusicCollection) -> Void) {
+                     completion:@escaping (String, AgoraMusicContentCenterStateReason, AgoraMusicCollection) -> Void) {
         agoraPrint("searchMusic with musicChartId: \(musicChartId)")
         sendCustomMessage(with: "searchMusic", label: "musicChartId:\(musicChartId), page:\(page), pageSize:\(pageSize), jsonOption:\(jsonOption)")
         let requestId = mcc!.getMusicCollection(musicChartId: musicChartId, page: page, pageSize: pageSize, jsonOption: jsonOption)
@@ -315,7 +315,7 @@ extension KTVApiImpl: KTVApiDelegate {
                      page: Int,
                      pageSize: Int,
                      jsonOption: String,
-                     completion: @escaping (String, AgoraMusicContentCenterStatusCode, AgoraMusicCollection) -> Void) {
+                     completion: @escaping (String, AgoraMusicContentCenterStateReason, AgoraMusicCollection) -> Void) {
         agoraPrint("searchMusic with keyword: \(keyword)")
         sendCustomMessage(with: "searchMusic", label: "keyword:\(keyword), page:\(page), pageSize:\(pageSize), jsonOption:\(jsonOption)")
         let requestId = mcc!.searchMusic(keyWord: keyword, page: page, pageSize: pageSize, jsonOption: jsonOption)
@@ -1208,7 +1208,7 @@ extension KTVApiImpl {
         return localNtpTime
     }
 
-    private func syncPlayState(state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+    private func syncPlayState(state: AgoraMediaPlayerState, error: AgoraMediaPlayerReason) {
         let dict: [String: Any] = ["cmd": "PlayerState", "userId": apiConfig?.localUid as Any, "state": state.rawValue, "error": "\(error.rawValue)"]
         sendStreamMessageWithDict(dict, success: nil)
     }
@@ -1275,7 +1275,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
        
    }
     
-    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, reason error: AgoraMediaPlayerReason) {
         agoraPrint("agoraRtcMediaPlayer didChangedToState: \(state.rawValue) \(self.songCode)")
         if isRelease {return}
         if state == .openCompleted {
@@ -1322,7 +1322,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
 //主要是MCC的回调
 extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
     
-    func onSongSimpleInfoResult(_ requestId: String, songCode: Int, simpleInfo: String?, errorCode: AgoraMusicContentCenterStatusCode) {
+    func onSongSimpleInfoResult(_ requestId: String, songCode: Int, simpleInfo: String?, reason errorCode: AgoraMusicContentCenterStateReason) {
         if let jsonData = simpleInfo?.data(using: .utf8) {
             do {
                 let jsonMsg = try JSONSerialization.jsonObject(with: jsonData, options: []) as! [String: Any]
@@ -1344,7 +1344,7 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
         }
     }
 
-    func onMusicChartsResult(_ requestId: String, result: [AgoraMusicChartInfo], errorCode: AgoraMusicContentCenterStatusCode) {
+    func onMusicChartsResult(_ requestId: String, result: [AgoraMusicChartInfo], reason errorCode: AgoraMusicContentCenterStateReason) {
         guard let callback = musicChartDict[requestId] else {return}
         callback(requestId, errorCode, result)
         musicChartDict.removeValue(forKey: requestId)
@@ -1355,7 +1355,7 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
         }
     }
     
-    func onMusicCollectionResult(_ requestId: String, result: AgoraMusicCollection, errorCode: AgoraMusicContentCenterStatusCode) {
+    func onMusicCollectionResult(_ requestId: String, result: AgoraMusicCollection, reason errorCode: AgoraMusicContentCenterStateReason) {
         guard let callback = musicSearchDict[requestId] else {return}
         callback(requestId, errorCode, result)
         musicSearchDict.removeValue(forKey: requestId)
@@ -1366,7 +1366,7 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
         }
     }
     
-    func onLyricResult(_ requestId: String, songCode: Int, lyricUrl: String?, errorCode: AgoraMusicContentCenterStatusCode) {
+    func onLyricResult(_ requestId: String, songCode: Int, lyricUrl: String?, reason errorCode: AgoraMusicContentCenterStateReason) {
         guard let lrcUrl = lyricUrl else {return}
         let callback = self.lyricCallbacks[requestId]
         guard let lyricCallback = callback else { return }
@@ -1383,7 +1383,7 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
         lyricCallback(lrcUrl)
     }
     
-    func onPreLoadEvent(_ requestId: String, songCode: Int, percent: Int, lyricUrl: String?, status: AgoraMusicContentCenterPreloadStatus, errorCode: AgoraMusicContentCenterStatusCode) {
+    func onPreLoadEvent(_ requestId: String, songCode: Int, percent: Int, lyricUrl: String?, state status: AgoraMusicContentCenterPreloadState, reason errorCode: AgoraMusicContentCenterStateReason) {
         if let listener = self.loadMusicListeners.object(forKey: "\(songCode)" as NSString) as? IMusicLoadStateListener {
             listener.onMusicLoadProgress(songCode: songCode, percent: percent, status: status, msg: String(errorCode.rawValue), lyricUrl: lyricUrl)
         }
@@ -1482,7 +1482,7 @@ extension KTVApiImpl: KTVApiRTCDelegate {
     
     func didRTCAudioRouteChanged(routing: AgoraAudioOutputRouting) {
         print("Route changed:\(routing)")
-        let headPhones: [AgoraAudioOutputRouting] = [.headset, .headsetBluetooth, .headsetNoMic]
+        let headPhones: [AgoraAudioOutputRouting] = [.headset, .bluetoothDeviceHfp,.bluetoothDeviceA2dp, .headsetNoMic]
         let wearHeadPhone: Bool = headPhones.contains(routing)
         if wearHeadPhone == self.isWearingHeadPhones {
             return

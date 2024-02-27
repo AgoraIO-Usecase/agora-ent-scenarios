@@ -546,7 +546,7 @@ extension SA3DRtcView: SAMusicPlayerDelegate {
         }
     }
     
-    func didMPKChangedTo(_ playerKit: AgoraRtcMediaPlayerProtocol, state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+    func didMPKChangedTo(_ playerKit: AgoraRtcMediaPlayerProtocol, state: AgoraMediaPlayerState, error: AgoraMediaPlayerReason) {
         if state == .playing && isPlaying == false {
             updateCenterUserPosition()
             setupMeidaPlayerSpatial()

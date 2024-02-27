@@ -120,7 +120,7 @@ public enum INEAR_MODE: Int {
      * @param state MPK当前的状态
      * @param error MPK当前的错误码
      */
-    @objc optional func didMPKChangedTo(state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) -> Void // MPK 状态回调
+    @objc optional func didMPKChangedTo(state: AgoraMediaPlayerState, error: AgoraMediaPlayerReason) -> Void // MPK 状态回调
 }
 
 // MARK: - VMManagerDelegate
@@ -169,7 +169,7 @@ public enum INEAR_MODE: Int {
      * @param progress 进度
      * @param status 状态
      */
-    @objc optional func downloadBackgroundMusicStatus(songCode: Int, progress: Int, status: AgoraMusicContentCenterPreloadStatus)
+    @objc optional func downloadBackgroundMusicStatus(songCode: Int, progress: Int, status: AgoraMusicContentCenterPreloadState)
 }
 
 public let kMPK_RTC_UID: UInt = 1
@@ -203,7 +203,7 @@ public let kMPK_RTC_UID: UInt = 1
     @objc public weak var playerDelegate: VMMusicPlayerDelegate?
     
     var stopMixingClosure: (() -> ())?
-    var downloadBackgroundMusicStatusClosure: ((_ songCode: Int, _ progress: Int, _ status: AgoraMusicContentCenterPreloadStatus) -> Void)?
+    var downloadBackgroundMusicStatusClosure: ((_ songCode: Int, _ progress: Int, _ status: AgoraMusicContentCenterPreloadState) -> Void)?
     var backgroundMusicPlayingStatusClosure: ((_ state: AgoraMediaPlayerState) -> Void)?
 
     // 单例
@@ -996,7 +996,7 @@ extension VoiceRoomRTCManager: AgoraRtcMediaPlayerDelegate {
     }
 
     // mpk didChangedTo
-    public func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+    public func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, reason error: AgoraMediaPlayerReason) {
         if delegate != nil {
             playerDelegate?.didMPKChangedTo?(state: state, error: error)
         }
@@ -1008,11 +1008,11 @@ extension VoiceRoomRTCManager: AgoraRtcMediaPlayerDelegate {
 }
 
 extension VoiceRoomRTCManager: AgoraMusicContentCenterEventDelegate {
-    public func onMusicChartsResult(_ requestId: String, result: [AgoraMusicChartInfo], errorCode: AgoraMusicContentCenterStatusCode) {
+    public func onMusicChartsResult(_ requestId: String, result: [AgoraMusicChartInfo], reason errorCode: AgoraMusicContentCenterStateReason) {
         print("songCode == \(result)")
     }
     
-    public func onMusicCollectionResult(_ requestId: String, result: AgoraMusicCollection, errorCode: AgoraMusicContentCenterStatusCode) {
+    public func onMusicCollectionResult(_ requestId: String, result: AgoraMusicCollection, reason errorCode: AgoraMusicContentCenterStateReason) {
         guard let callback = onMusicChartsIdCache[requestId] else { return }
         backgroundMusics = result.musicList
         DispatchQueue.main.async(execute: {
@@ -1020,15 +1020,15 @@ extension VoiceRoomRTCManager: AgoraMusicContentCenterEventDelegate {
         })
     }
     
-    public func onLyricResult(_ requestId: String, songCode: Int, lyricUrl: String?, errorCode: AgoraMusicContentCenterStatusCode) {
+    public func onLyricResult(_ requestId: String, songCode: Int, lyricUrl: String?, reason errorCode: AgoraMusicContentCenterStateReason) {
         print("songCode == \(songCode)")
     }
     
-    public func onSongSimpleInfoResult(_ requestId: String, songCode: Int, simpleInfo: String?, errorCode: AgoraMusicContentCenterStatusCode) {
+    public func onSongSimpleInfoResult(_ requestId: String, songCode: Int, simpleInfo: String?, reason errorCode: AgoraMusicContentCenterStateReason) {
         print("songCode == \(songCode)")
     }
     
-    public func onPreLoadEvent(_ requestId: String, songCode: Int, percent: Int, lyricUrl: String?, status: AgoraMusicContentCenterPreloadStatus, errorCode: AgoraMusicContentCenterStatusCode) {
+    public func onPreLoadEvent(_ requestId: String, songCode: Int, percent: Int, lyricUrl: String?, state status: AgoraMusicContentCenterPreloadState, reason errorCode: AgoraMusicContentCenterStateReason) {
         delegate?.downloadBackgroundMusicStatus?(songCode: songCode, progress: percent, status: status)
         downloadBackgroundMusicStatusClosure?(songCode, percent, status)
         if status == .OK, lastSongCode == songCode {

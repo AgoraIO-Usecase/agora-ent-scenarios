@@ -111,7 +111,7 @@ UITableViewDelegate
                                                   page:self.page
                                               pageSize:5
                                             jsonOption:extra
-                                            completion:^(NSString * requestId, AgoraMusicContentCenterStatusCode status, AgoraMusicCollection * result) {
+                                            completion:^(NSString * requestId, AgoraMusicContentCenterStateReason status, AgoraMusicCollection * result) {
         NSMutableArray* songArray = [NSMutableArray array];
         [result.musicList enumerateObjectsUsingBlock:^(AgoraMusic * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             VLSongItmModel* model = [VLSongItmModel new];
