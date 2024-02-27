@@ -39,7 +39,16 @@ class BeautyManager: NSObject {
     
     var isEnableBeauty: Bool = true {
         didSet {
-            beautyAPI.enable(isEnableBeauty)
+            switch BeautyModel.beautyType {
+            case .agora:
+                if isEnableBeauty == false {
+                    AgoraBeautyManager.shareManager.setBeauty(path: nil, key: nil, value: 0)
+                }else{
+                    AgoraBeautyManager.shareManager.setBeauty(path: nil, key: "init", value: 0)
+                }
+            default:
+                beautyAPI.enable(isEnableBeauty)
+            }
         }
     }
     
