@@ -173,7 +173,7 @@ abstract class IKTVApiEventHandler {
      * @param isLocal 本地还是主唱端的 Player 信息
      */
     open fun onMusicPlayerStateChanged(
-        state: Constants.MediaPlayerState, error: Constants.MediaPlayerError, isLocal: Boolean
+        state: Constants.MediaPlayerState, error: Constants.MediaPlayerReason, isLocal: Boolean
     ) {
     }
 
