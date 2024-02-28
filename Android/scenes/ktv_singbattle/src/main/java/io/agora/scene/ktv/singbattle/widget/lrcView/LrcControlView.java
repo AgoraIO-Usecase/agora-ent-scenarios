@@ -665,7 +665,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                     if (mKaraokeView != null) {
                         mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
                         LyricsModel cutLyricsModel = dealWithBattleSong(lyricsModel);
-                        Log.d("zhangww",
+                        Log.d("zhangwei",
                                 cutLyricsModel.title + " line:" + cutLyricsModel.lines.size() + " duration:" + cutLyricsModel.duration);
                         mKaraokeView.setLyricsData(cutLyricsModel);
                     }
@@ -696,11 +696,13 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             long durationOfCurrentLine = lyricsLine.getEndTime() - lyricsLine.getStartTime();
             cutterLines.add(new LyricsCutter.Line(lyricsLine.getStartTime(), durationOfCurrentLine));
         }
+        Log.d("alien","handleFixTime1 highStartTime " + highStartTime +songPlaying);
         Pair<Integer, Integer> res = LyricsCutter.handleFixTime((int) highStartTime, (int) highEndTime, cutterLines);
         if (res != null) {
             highStartTime = res.first;
             highEndTime = res.second;
         }
+        Log.d("alien","handleFixTime2 highStartTime " + highStartTime);
         LyricsModel cutLyricsModel = LyricsCutter.cut(lyricsModel, (int) highStartTime, (int) highEndTime);
         AtomicInteger lineCount = new AtomicInteger();
         cutLyricsModel.lines.forEach(line -> {

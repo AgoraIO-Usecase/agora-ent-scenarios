@@ -2,7 +2,6 @@ package io.agora.scene.cantata.widget.lrcView
 
 import android.content.Context
 import android.graphics.BitmapFactory
-import android.text.TextUtils
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
@@ -19,6 +18,7 @@ import io.agora.karaoke_view.v11.downloader.LyricsFileDownloader
 import io.agora.karaoke_view.v11.downloader.LyricsFileDownloaderCallback
 import io.agora.karaoke_view.v11.model.LyricsLineModel
 import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.cantata.BuildConfig
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataLayoutLrcControlViewBinding
 import io.agora.scene.cantata.databinding.CantataLayoutLrcPrepareBinding
@@ -156,12 +156,12 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
     fun onPrepareStatus(isMineOwner: Boolean) {
         this.isMineOwner = isMineOwner
         mBinding.ilIdle.root.visibility = GONE
+        mBinding.ilActive.root.visibility = GONE
         mBinding.clActive.visibility = VISIBLE
         mBinding.clActive.setBackgroundResource(backgroundResId)
         mPrepareBinding.tvContent.text = String.format(resources.getString(R.string.cantata_loading_music), "0%")
         mPrepareBinding.pbLoadingMusic.progress = 0
         mPrepareBinding.statusPrepareViewLrc.visibility = VISIBLE
-        mBinding.ilActive.root.visibility = GONE
         changeViewByRole()
     }
 
@@ -186,7 +186,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         mBinding.ilActive.downloadLrcFailedView.visibility = INVISIBLE
         mBinding.ilActive.downloadLrcFailedBtn.visibility = INVISIBLE
         if (mRole == Role.Singer) {
-            mBinding.ilActive.lyricsView.enableDragging(false)
+            mBinding.ilActive.lyricsView.enableDragging(BuildConfig.DEBUG)
             mBinding.ilActive.ivMusicStart.visibility = VISIBLE
             mBinding.ilActive.switchOriginal.visibility = VISIBLE
             mBinding.ilActive.ivMusicMenu.visibility = VISIBLE
@@ -233,6 +233,11 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         mBinding.clActive.visibility = GONE
         mBinding.clActive.setBackgroundResource(backgroundResId)
         mPrepareBinding.statusPrepareViewLrc.visibility = GONE
+        mBinding.ilActive.root.visibility = GONE
+    }
+
+    fun onLrcResetStatus() {
+        lyricsView.reset()
         mBinding.ilActive.root.visibility = GONE
     }
 

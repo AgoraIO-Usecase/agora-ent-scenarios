@@ -416,7 +416,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/ktv_voice_multipath_tips"
                     android:textColor="@color/def_text_grey_979"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvMultipath" />
@@ -454,9 +454,22 @@
                     android:text="@string/ktv_voice_quality"
                     android:textColor="@color/white"
                     android:textSize="15sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/tvVoiceQualityTips"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvVoiceQualityTips"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toStartOf="@+id/rgVoiceMode"
+                    android:text="@string/ktv_voice_quality_tips"
+                    android:textColor="@color/def_text_grey_979"
+                    android:textSize="12sp"
+                    android:layout_marginEnd="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvVoiceQuality" />
 
                 <RadioGroup
                     android:id="@+id/rgVoiceMode"

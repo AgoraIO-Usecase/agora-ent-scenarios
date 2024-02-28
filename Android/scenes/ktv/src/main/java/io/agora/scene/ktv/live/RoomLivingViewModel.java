@@ -1265,6 +1265,7 @@ public class RoomLivingViewModel extends ViewModel {
             @Override
             public void onAECLevelChanged(int level) {
                 KTVLogger.d(TAG, "onAECLevelChanged: " + level);
+                // aiaec关闭的情况下音质选项才能生效
                 if (level == 0) {
                     mRtcEngine.setParameters("{\"che.audio.aec.split_srate_for_48k\": 16000}");
                 } else if (level == 1) {
@@ -1515,9 +1516,13 @@ public class RoomLivingViewModel extends ViewModel {
                                                        break;
                                                    case PLAYER_STATE_PLAYING:
                                                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                                                       // 若身份是主唱和伴唱，在演唱时，人声音量、伴泰音量保持原先设置，远端音量自动切为30
                                                        runOnMainThread(() -> {
-                                                           if (mSetting!=null) mSetting.setMRemoteVolume(MusicSettingBean.DEFAULT_REMOTE_SINGER_VOL);
+                                                           if (mSetting != null) {
+                                                               // 若身份是主唱和伴唱，在演唱时，人声音量、伴泰音量保持原先设置，远端音量自动切为30
+                                                               mSetting.setMRemoteVolume(MusicSettingBean.DEFAULT_REMOTE_SINGER_VOL);
+                                                               //主唱/合唱 开始唱歌: 默认关闭 aiaec
+                                                               mSetting.setMAIAECEnable(false);
+                                                           }
                                                        });
                                                        break;
                                                    case PLAYER_STATE_PAUSED:
@@ -1529,9 +1534,15 @@ public class RoomLivingViewModel extends ViewModel {
                                                        break;
                                                    case PLAYER_STATE_STOPPED:
                                                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_STOP);
-                                                       // 若身份是主唱和伴唱，演唱暂停/切歌，人声音量、伴奏音量保持原先设置，远端音量自动转为100
+
                                                        runOnMainThread(() -> {
-                                                           if (mSetting!=null) mSetting.setMRemoteVolume(MusicSettingBean.DEFAULT_REMOTE_VOL);
+                                                           if (mSetting != null) {
+                                                               // 若身份是主唱和伴唱，演唱暂停/切歌，人声音量、伴奏音量保持原先设置，远端音量自动转为100
+                                                               mSetting.setMRemoteVolume(MusicSettingBean.DEFAULT_REMOTE_VOL);
+                                                               // 主唱/合唱 歌曲结束/退出合唱: 默认开启 aiaec, 强度为1
+                                                               mSetting.setMAIAECEnable(true);
+                                                               mSetting.setMAIAECStrength(MusicSettingBean.DEFAULT_AIAEC_STRENGTH);
+                                                           }
                                                        });
                                                        break;
                                                    case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:

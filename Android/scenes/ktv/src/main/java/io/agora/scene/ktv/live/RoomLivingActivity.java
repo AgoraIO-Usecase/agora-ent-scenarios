@@ -486,6 +486,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             if (roomLivingViewModel.isRoomOwner()) {
                 getBinding().lrcControlView.showHighLightButton(false);
                 getBinding().lrcControlView.setHighLightPersonHeadUrl("");
+            }
+            if (roomLivingViewModel.mSetting != null) {
                 roomLivingViewModel.mSetting.setMHighLighterUid("");
             }
         });

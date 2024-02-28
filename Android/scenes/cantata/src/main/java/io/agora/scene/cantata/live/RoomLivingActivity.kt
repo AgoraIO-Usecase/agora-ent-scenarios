@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.util.Log
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -331,6 +332,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             }
         }
         mRoomLivingViewModel.mPlayerMusicStatusLiveData.observe(this) { status: PlayerMusicStatus ->
+            Log.d("alienzh","mPlayerMusicStatusLiveData $status")
             if (status == PlayerMusicStatus.ON_PREPARE) {
                 binding.lrcControlView.onPrepareStatus(mRoomLivingViewModel.isRoomOwner())
             } else if (status == PlayerMusicStatus.ON_PLAYING) {
@@ -338,7 +340,8 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             } else if (status == PlayerMusicStatus.ON_PAUSE) {
                 binding.lrcControlView.onPauseStatus()
             } else if (status == PlayerMusicStatus.ON_LRC_RESET) {
-                binding.lrcControlView.lyricsView.reset()
+//                binding.lrcControlView.lyricsView.reset()
+                binding.lrcControlView.onLrcResetStatus()
 //                if (binding.lrcControlView.role == LrcControlView.Role.Singer) {
 //                    mRoomLivingViewModel.changeMusic()
 //                }
@@ -435,7 +438,6 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             binding.lrcControlView.role = LrcControlView.Role.Listener
         }
         mRoomLivingViewModel.musicStartPlay(music)
-        binding.rankListView.isVisible = false
 
         if (music.userNo == UserManager.getInstance().user.id.toString()) {
             binding.lrcControlView.postDelayed({

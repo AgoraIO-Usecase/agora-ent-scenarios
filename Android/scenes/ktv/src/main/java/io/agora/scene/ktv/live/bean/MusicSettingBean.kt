@@ -56,6 +56,8 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         const val DEFAULT_REMOTE_SINGER_VOL = 30  // 主唱/伴唱，演唱时默认远端音量30
         const val DEFAULT_REMOTE_VOL = 100  // 主唱/伴唱，非演唱时默认远端音量100
         const val DEFAULT_EAR_BACK_VOL = 100  // 默认耳返音量
+
+        const val DEFAULT_AIAEC_STRENGTH = 1  // 默认aiaec, 强度为1
     }
 
     var mEarPhoneCallback: EarPhoneCallback? = null
@@ -230,7 +232,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
     /**
      * AIAEC 开关
      */
-    var mAIAECEnable = false
+    var mAIAECEnable = true
         set(newValue) {
             field = newValue
             mSettingCallback.onAIAECChanged(newValue)
@@ -239,7 +241,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
     /**
      * AIAEC 强度
      */
-    var mAIAECStrength: Int = 0
+    var mAIAECStrength: Int = DEFAULT_AIAEC_STRENGTH
         set(newValue) {
             field = newValue
             mSettingCallback.onAIAECStrengthSelect(newValue)

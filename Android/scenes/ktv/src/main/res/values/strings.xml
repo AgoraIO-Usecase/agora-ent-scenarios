@@ -124,6 +124,7 @@
     <string name="ktv_voice_quality">音质</string>
     <string name="ktv_voice_quality_standard">标准音质</string>
     <string name="ktv_voice_quality_high">高音质</string>
+    <string name="ktv_voice_quality_tips">aiaec关闭的情况下音质选项才能生效</string>
     <string name="ktv_voice_AINS">降低背景噪音</string>
     <string name="ktv_close">关闭</string>
     <string name="ktv_open">开启</string>

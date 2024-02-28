@@ -249,7 +249,6 @@ class MusicSettingDialog constructor(
         mBinding.cbAIAECSwitcher.setOnCheckedChangeListener { buttonView, isChecked ->
             mBinding.groupAIAECStrength.isVisible = isChecked
             mSetting.mAIAECEnable = isChecked
-            mSetting.mAIAECStrength = mSetting.mAIAECStrength
         }
         mBinding.cbAIAECSwitcher.isChecked = mSetting.mAIAECEnable
 
