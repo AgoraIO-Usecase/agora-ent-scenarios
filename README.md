@@ -12,29 +12,19 @@
 * 1v1私密房
 * 秀场转1v1私密房
 
+**本分支是秀场直播独立版分支, 只包括以下场景**
+* 秀场直播
+* 1v1私密房
+* 秀场转1v1私密房
+
 >
 > Demo 效果:
 >
 > <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ent_home_scenes.jpg" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ent_home_explore.jpg" width="300" height="640">
 ## 1.2 运行示例
-* 运行 K 歌房项目，请参考以下流程
-    * [Android](Android/scenes/ktv)
-    * [iOS](iOS/AgoraEntScenarios/Scenes/KTV)
-* 运行语聊房项目，请参考以下流程
-    * [Android](Android/scenes/voice)
-    * [iOS](iOS/AgoraEntScenarios/Scenes/VoiceChatRoom)
-* 运行空间音频语聊房项目，请参考以下流程
-    * [Android](Android/scenes/voice_spatial)
-    * [iOS](iOS/AgoraEntScenarios/Scenes/SpatialAudio)
 * 运行秀场直播项目，请参考以下流程
     * [Android](Android/scenes/show)
     * [iOS](iOS/AgoraEntScenarios/Scenes/Show)
-* 运行嗨歌抢唱项目，请参考以下流程
-    * [Android](Android/scenes/ktv_singbattle)
-    * [iOS](iOS/AgoraEntScenarios/Scenes/SBG)
-* 运行抢麦接唱项目，请参考以下流程
-    * [Android](Android/scenes/ktv_relay)
-    * [iOS](iOS/AgoraEntScenarios/Scenes/SingRelay) 
 * 运行1v1私密房项目，请参考以下流程
     * [Android](Android/scenes/pure1v1)
     * [iOS](iOS/AgoraEntScenarios/Scenes/Pure1v1)
@@ -46,7 +36,7 @@
 
 | iOS                                                          | Android                                                      |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| ![](https://web-cdn.agora.io/shengwang/images/%E5%A3%B0%E5%8A%A8%E4%BA%92%E5%A8%B1ios-demo.png) | ![](https://web-cdn.agora.io/shengwang/images/%E5%A3%B0%E5%8A%A8%E4%BA%92%E5%A8%B1demo.png) |
+| [Testflight](https://testflight.apple.com/join/p7do9PBJ) | [Pgyer](https://www.pgyer.com/ase3) |
 
 # 2. FAQ
 
