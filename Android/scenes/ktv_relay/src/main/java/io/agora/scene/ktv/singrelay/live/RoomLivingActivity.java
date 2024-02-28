@@ -457,7 +457,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
                 getBinding().lrcControlView.onPauseStatus();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_LRC_RESET) {
                 getBinding().lrcControlView.getLyricsView().reset();
-                getBinding().lrcControlView.getLyricsView().reset();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHANGING_START) {
                 getBinding().lrcControlView.setEnabled(false);
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHANGING_END) {
