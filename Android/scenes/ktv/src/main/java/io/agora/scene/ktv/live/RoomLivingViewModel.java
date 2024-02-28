@@ -1,15 +1,10 @@
 package io.agora.scene.ktv.live;
 
 import static io.agora.rtc2.Constants.AUDIO_EFFECT_OFF;
-import static io.agora.rtc2.Constants.AUDIO_EFFECT_OFF_HARMONY;
 import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_KTV;
-import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_KTV_HARMONY;
 import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_PHONOGRAPH;
-import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_PHONOGRAPH_HARMONY;
 import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_STUDIO;
-import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_STUDIO_HARMONY;
 import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_VOCAL_CONCERT;
-import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_VOCAL_CONCERT_HARMONY;
 import static io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE.CONNECTION_STATE_CONNECTED;
 import static io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE.getValue;
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION;
@@ -1332,41 +1327,6 @@ public class RoomLivingViewModel extends ViewModel {
                             KTVLogger.d(TAG, "You are not highlighter, " + "uid: " + uid);
                             isHighlightSinger = false;
                         }
-                    } else if (jsonMsg.getString("cmd").equals("sendVoiceHighlight")) {
-                        int preset = jsonMsg.getInt("preset");
-                        KTVLogger.d(TAG, "onStreamMessage sendVoiceHighlight, " + "highlighter preset: " + preset);
-                        if (seatLocalLiveData.getValue() != null && songPlayingLiveData.getValue() != null &&
-                                (seatLocalLiveData.getValue().getChorusSongCode().equals(songPlayingLiveData.getValue().getSongNo() + songPlayingLiveData.getValue().getCreateAt()) ||
-                                        songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().id.toString()))) {
-                            KTVLogger.d(TAG, "You are not highlighter, " + "highlighter preset: " + preset);
-                            if (preset == AUDIO_EFFECT_OFF) {
-                                audioPreset = AUDIO_EFFECT_OFF_HARMONY;
-                                mSetting.updateEffect(0);
-                                mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF_HARMONY);
-                            } else if (preset == ROOM_ACOUSTICS_KTV) {
-                                audioPreset = ROOM_ACOUSTICS_KTV_HARMONY;
-                                mSetting.updateEffect(1);
-                                mRtcEngine.setAudioEffectPreset(ROOM_ACOUSTICS_KTV_HARMONY);
-                            } else if (preset == ROOM_ACOUSTICS_VOCAL_CONCERT) {
-                                audioPreset = ROOM_ACOUSTICS_VOCAL_CONCERT_HARMONY;
-                                mSetting.updateEffect(2);
-                                mRtcEngine.setAudioEffectPreset(ROOM_ACOUSTICS_VOCAL_CONCERT_HARMONY);
-                            } else if (preset == ROOM_ACOUSTICS_PHONOGRAPH) {
-                                audioPreset = ROOM_ACOUSTICS_PHONOGRAPH_HARMONY;
-                                mSetting.updateEffect(4);
-                                mRtcEngine.setAudioEffectPreset(ROOM_ACOUSTICS_PHONOGRAPH_HARMONY);
-                            } else if (preset == ROOM_ACOUSTICS_STUDIO) {
-                                audioPreset = ROOM_ACOUSTICS_STUDIO_HARMONY;
-                                mSetting.updateEffect(3);
-                                mRtcEngine.setAudioEffectPreset(ROOM_ACOUSTICS_STUDIO_HARMONY);
-                            } else {
-                                audioPreset = AUDIO_EFFECT_OFF_HARMONY;
-                                mSetting.updateEffect(0);
-                                mRtcEngine.setAudioEffectPreset(AUDIO_EFFECT_OFF_HARMONY);
-                            }
-                        }
-                    } else if (jsonMsg.getString("cmd").equals("cancelVoiceHighlight")) {
-                        resetAudioPreset();
                     }
                 } catch (JSONException exp) {
                     KTVLogger.e(TAG, "onStreamMessage:" + exp);
@@ -1440,7 +1400,7 @@ public class RoomLivingViewModel extends ViewModel {
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
                                            @Override
-                                           public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, io.agora.mediaplayer.Constants.MediaPlayerError error, boolean isLocal) {
+                                           public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, io.agora.mediaplayer.Constants.MediaPlayerReason error, boolean isLocal) {
                                                switch (state) {
                                                    case PLAYER_STATE_OPEN_COMPLETED:
                                                        playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());

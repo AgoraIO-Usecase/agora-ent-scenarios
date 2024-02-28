@@ -6,12 +6,13 @@ import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.IMediaPlayerObserver
+import io.agora.mediaplayer.data.CacheStatistics
+import io.agora.mediaplayer.data.PlayerPlaybackStats
 import io.agora.mediaplayer.data.PlayerUpdatedInfo
 import io.agora.mediaplayer.data.SrcInfo
 import io.agora.musiccontentcenter.*
 import io.agora.rtc2.*
 import io.agora.rtc2.Constants.*
-import io.agora.rtc2.internal.Logging
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.concurrent.*
@@ -118,11 +119,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     private fun ktvApiLog(msg: String) {
-        Logging.i(tag, msg)
+        //Logging.i(tag, msg)
     }
 
     private fun ktvApiLogError(msg: String) {
-        Logging.e(tag, msg)
+        //Logging.e(tag, msg)
     }
 
     override fun initialize(
@@ -835,12 +836,12 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     private fun syncPlayState(
         state: MediaPlayerState,
-        error: Constants.MediaPlayerError
+        error: Constants.MediaPlayerReason
     ) {
         val msg: MutableMap<String?, Any?> = HashMap()
         msg["cmd"] = "PlayerState"
         msg["state"] = MediaPlayerState.getValue(state)
-        msg["error"] = Constants.MediaPlayerError.getValue(error)
+        msg["error"] = Constants.MediaPlayerReason.getValue(error)
         val jsonMsg = JSONObject(msg)
         sendStreamMessageWithJsonObject(jsonMsg) {}
     }
@@ -1201,7 +1202,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 }
                 ktvApiEventHandlerList.forEach { it.onMusicPlayerStateChanged(
                     MediaPlayerState.getStateByValue(state),
-                    Constants.MediaPlayerError.getErrorByValue(error),
+                    Constants.MediaPlayerReason.getErrorByValue(error),
                     false
                 ) }
             } else if (jsonMsg.getString("cmd") == "setVoicePitch") {
@@ -1365,7 +1366,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private var duration: Long = 0
     override fun onPlayerStateChanged(
         state: MediaPlayerState?,
-        error: Constants.MediaPlayerError?
+        error: Constants.MediaPlayerReason?
     ) {
         val mediaPlayerState = state ?: return
         val mediaPlayerError = error ?: return
@@ -1443,16 +1444,12 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun onMetaData(type: Constants.MediaPlayerMetadataType?, data: ByteArray?) {}
-
     override fun onPlayBufferUpdated(playCachedBuffer: Long) {}
-
     override fun onPreloadEvent(src: String?, event: Constants.MediaPlayerPreloadEvent?) {}
-
     override fun onAgoraCDNTokenWillExpire() {}
-
     override fun onPlayerSrcInfoChanged(from: SrcInfo?, to: SrcInfo?) {}
-
     override fun onPlayerInfoUpdated(info: PlayerUpdatedInfo?) {}
-
+    override fun onPlayerCacheStats(stats: CacheStatistics?) {}
+    override fun onPlayerPlaybackStats(stats: PlayerPlaybackStats?) {}
     override fun onAudioVolumeIndication(volume: Int) {}
 }
