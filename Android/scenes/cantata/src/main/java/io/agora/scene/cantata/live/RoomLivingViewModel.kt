@@ -1262,6 +1262,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
     // ------------------ 歌曲开始播放 ------------------
     fun musicStartPlay(music: RoomSelSongModel) {
+        mRoundRankListLiveData.postValue(false)
         CantataLogger.d(TAG, "RoomLivingViewModel.musicStartPlay() called")
         if (music.userNo == null) return
         mPlayerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE)
