@@ -244,10 +244,10 @@ class KTVApiImpl(
 
         // mutipath
         enableMultipathing = true
-        mRtcEngine.setParameters("{\"rtc.enableMultipath\": true}")
+        //mRtcEngine.setParameters("{\"rtc.enableMultipath\": true}")
         mRtcEngine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
-        mRtcEngine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
-        mRtcEngine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
+        //mRtcEngine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
+        //mRtcEngine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
     }
 
     override fun addEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {
@@ -335,17 +335,18 @@ class KTVApiImpl(
     override fun enableMulitpathing(enable: Boolean) {
         reportCallScenarioApi("enableMulitpathing", JSONObject().put("enable", enable))
         this.enableMultipathing = enable
-        mRtcEngine.setParameters("{\"rtc.enableMultipath\": $enable}")
-        if (enable) {
-            mRtcEngine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
-            mRtcEngine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
-            mRtcEngine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
-        }
+//        mRtcEngine.setParameters("{\"rtc.enableMultipath\": $enable}")
+//        if (enable) {
+//            mRtcEngine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
+//            mRtcEngine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
+//            mRtcEngine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
+//        }
 
         if (singerRole == KTVSingRole.LeadSinger || singerRole == KTVSingRole.CoSinger) {
             subChorusConnection?.let {
                 mRtcEngine.updateChannelMediaOptionsEx(ChannelMediaOptions().apply {
-                    parameters = "{\"rtc.enableMultipath\": $enable, \"rtc.path_scheduling_strategy\": 0}"
+                    parameters =
+                        "{\"rtc.enableMultipath\": $enable, \"rtc.path_scheduling_strategy\": 0, \"rtc.remote_path_scheduling_strategy\": 0}"
                 }, subChorusConnection)
             }
         }
@@ -993,7 +994,8 @@ class KTVApiImpl(
             newRole != KTVSingRole.LeadSinger
         channelMediaOption.clientRoleType = CLIENT_ROLE_BROADCASTER
         if (enableMultipathing) {
-            channelMediaOption.parameters = "{\"rtc.path_scheduling_strategy\":0, \"rtc.enableMultipath\": true}"
+            channelMediaOption.parameters =
+                "{\"rtc.path_scheduling_strategy\":0, \"rtc.enableMultipath\": true, \"rtc.remote_path_scheduling_strategy\": 0}"
         }
 
         val rtcConnection = RtcConnection()
