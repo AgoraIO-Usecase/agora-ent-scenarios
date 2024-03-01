@@ -1,8 +1,10 @@
 package io.agora.scene.showTo1v1
 
-import io.agora.rtc2.Constants
 import io.agora.scene.base.EntLogger
 
+/*
+ * 场景日志模块
+ */
 object ShowTo1v1Logger {
 
     private val entLogger = EntLogger(EntLogger.Config("ShowTo1v1"))

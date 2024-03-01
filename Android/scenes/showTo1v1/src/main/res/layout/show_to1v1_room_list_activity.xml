@@ -12,19 +12,33 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewPager2"
+    <com.scwang.smart.refresh.layout.SmartRefreshLayout
+        android:id="@+id/smart_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:overScrollMode="never"
-        app:layout_scrollEffect="none" />
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_view">
+
+        <com.scwang.smart.refresh.header.ClassicsHeader
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:overScrollMode="never"
+            app:layout_scrollEffect="none" />
+
+    </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 
     <io.agora.scene.widget.CommonTitleView
         android:id="@+id/title_view"
         style="@style/title_view"
         app:ctv_centerText="@string/show_to1v1_name"
-        app:ctv_rightImageSrc="@drawable/show_to1v1_room_list_refresh"
         tools:ignore="MissingConstraints" />
 
     <io.agora.scene.showTo1v1.ui.view.RoomListGuideView

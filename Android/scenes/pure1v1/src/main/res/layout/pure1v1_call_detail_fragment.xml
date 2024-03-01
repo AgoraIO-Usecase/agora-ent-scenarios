@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/black"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.CallDetailFragment">
+    tools:context=".ui.living.CallDetailFragment">
 
     <FrameLayout
         android:id="@+id/vDragContent"
@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         >
 
-        <io.agora.scene.pure1v1.ui.CallDraggableView
+        <io.agora.scene.pure1v1.ui.base.CallDraggableView
             android:id="@+id/vDragWindow1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -22,7 +22,7 @@
             android:layout_marginEnd="0dp"
             />
 
-        <io.agora.scene.pure1v1.ui.CallDraggableView
+        <io.agora.scene.pure1v1.ui.base.CallDraggableView
             android:id="@+id/vDragWindow2"
             android:layout_gravity="right"
             android:background="@drawable/pure1v1_draggable_view_radius"
