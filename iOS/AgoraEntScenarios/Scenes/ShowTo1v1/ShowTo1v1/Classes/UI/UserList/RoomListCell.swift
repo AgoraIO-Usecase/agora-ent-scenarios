@@ -102,8 +102,7 @@ class RoomListCell: UICollectionViewCell {
     var tapClosure: ((ShowTo1v1RoomInfo?)->())?
     var roomInfo: ShowTo1v1RoomInfo? {
         didSet {
-            bgImageView.image = roomInfo?.bgImage()
-            contentImageView.image = bgImageView.image
+            contentImageView.image = roomInfo?.bgImage()
             
             remoteUserView.setInfo(title: "user_list_cell_remote_user".showTo1v1Localization(),
                                    avatarUrl: roomInfo?.avatar ?? "",
@@ -140,14 +139,15 @@ class RoomListCell: UICollectionViewCell {
     private lazy var bgImageView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFill
+        view.image = UIImage.sceneImage(name: "roomList")
         return view
     }()
     
-    private lazy var blurView: UIVisualEffectView = {
-        let blurEffect = UIBlurEffect(style: .extraLight);
-        let visualEffectView = UIVisualEffectView(effect: blurEffect)
-        return visualEffectView
-    }()
+//    private lazy var blurView: UIVisualEffectView = {
+//        let blurEffect = UIBlurEffect(style: .extraLight);
+//        let visualEffectView = UIVisualEffectView(effect: blurEffect)
+//        return visualEffectView
+//    }()
     
     lazy var canvasView: ThumnbnailCanvasView = {
         let view = ThumnbnailCanvasView()
@@ -189,7 +189,7 @@ class RoomListCell: UICollectionViewCell {
     private func _loadSubview() {
         clipsToBounds = true
         contentView.addSubview(bgImageView)
-        bgImageView.addSubview(blurView)
+//        bgImageView.addSubview(blurView)
         contentView.addSubview(contentImageView)
         contentImageView.layer.addSublayer(gradientLayer)
         contentImageView.addSubview(liveTagView)
@@ -202,7 +202,7 @@ class RoomListCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         bgImageView.frame = contentView.bounds
-        blurView.frame = bgImageView.bounds
+//        blurView.frame = bgImageView.bounds
         let top = UIDevice.current.aui_SafeDistanceTop + 51
         let bottom = 82.0
         contentImageView.frame = CGRect(x: 15, y: top, width: self.aui_width - 30, height: self.aui_height - bottom - top)

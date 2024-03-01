@@ -65,7 +65,7 @@
 "app_voice_chat_spatialTip"="—空间音频模式";
 
 "app_about_app"="关于声动互娱";
-"app_about_name"="声动互娱";
+"app_about_name"="声动互娱-直播社交版";
 "app_about_version"="版本号";
 "app_about_scene_version"="场景版本号";
 "app_about_chat_room"="语聊房";
@@ -164,7 +164,7 @@
 "home_category_title_all" = "全部玩法";
 "home_category_title_ktv" = "在线K歌房";
 "home_category_title_voiceChat" = "语聊房";
-"home_category_title_live" = "直播";
+"home_category_title_live" = "直播社交";
 "home_content_item_ktv_title_solo" = "独唱&合唱";
 "home_content_item_ktv_desc_solo" = "超低延迟真合唱";
 "home_content_item_ktv_title_snatchsinging" = "抢唱";

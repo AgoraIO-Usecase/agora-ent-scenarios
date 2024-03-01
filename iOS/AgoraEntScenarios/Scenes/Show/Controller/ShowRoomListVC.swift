@@ -84,10 +84,16 @@ class ShowRoomListVC: UIViewController {
         checkDevice()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // cell恢复隐藏coverlayer
+        collectionView.reloadData()
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        fetchRoomList()
+        autoRefreshing()
     }
     
     @objc private func didClickCreateButton(){
@@ -141,6 +147,16 @@ class ShowRoomListVC: UIViewController {
             self.roomList = roomList
         }
     }
+    
+   private func autoRefreshing(){
+        if !refreshControl.isRefreshing {
+            collectionView.setContentOffset(CGPoint(x: 0, y: -refreshControl.frame.size.height), animated: true)
+            refreshControl.beginRefreshing()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.refreshControl.sendActions(for: .valueChanged)
+            }
+        }
+    }
 
     private func preGenerateToken() {
         AppContext.shared.rtcToken = nil
@@ -187,6 +203,7 @@ extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFl
             return true
         } completion: { [weak self] in
             self?.joinRoom(room)
+            cell.showCoverView()
         }
 
         return cell

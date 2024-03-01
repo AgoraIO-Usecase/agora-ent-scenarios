@@ -11,7 +11,7 @@
     <string name="pure1v1_call_receive_accept">立即接受</string>
     <string name="pure1v1_call_receive_reject">拒绝</string>
     <string name="pure1v1_call_dialog_info">本产品仅用于功能体验，单次直播时长不超过20mins</string>
-    <string name="pure1v1_call_waiting_acceptance">等待对方接受…</string>
+    <string name="pure1v1_call_waiting_acceptance">等待对方接受</string>
     <string name="pure1v1_call_connecting">连接中…</string>
     <string name="pure1v1_call_toast_hangup">对方结束连线</string>
     <string name="pure1v1_call_local_rejected">已拒绝</string>
@@ -37,4 +37,6 @@
     <string name="pure1v1_dashboard_receive_resolution">接收分辨率: %s</string>
     <string name="pure1v1_dashboard_receive_fps">接收帧率: %s fps</string>
     <string name="pure1v1_dashboard_down_loss_package">下行丢包率: %s ％</string>
+    <string name="pure1v1_dashboard_other">其他</string>
+    <string name="pure1v1_dashboard_channel_name">频道名: %s</string>
 </resources>

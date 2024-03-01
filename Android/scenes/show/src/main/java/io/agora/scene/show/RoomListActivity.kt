@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -21,12 +22,15 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
-import io.agora.scene.show.videoLoaderAPI.OnLiveRoomItemTouchEventHandler
-import io.agora.scene.show.videoLoaderAPI.OnRoomListScrollEventHandler
-import io.agora.scene.show.videoLoaderAPI.VideoLoader
+import io.agora.videoloaderapi.OnLiveRoomItemTouchEventHandler
+import io.agora.videoloaderapi.OnRoomListScrollEventHandler
+import io.agora.videoloaderapi.VideoLoader
 import io.agora.scene.show.widget.PresetAudienceDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 
+/*
+ * 房间列表 activity
+ */
 class RoomListActivity : AppCompatActivity() {
 
     private val mBinding by lazy { ShowRoomListActivityBinding.inflate(LayoutInflater.from(this)) }
@@ -72,6 +76,11 @@ class RoomListActivity : AppCompatActivity() {
             ShowServiceProtocol.ROOM_AVAILABLE_DURATION = show * 1000L
             ShowServiceProtocol.PK_AVAILABLE_DURATION = pk * 1000L
         })
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        mBinding.smartRefreshLayout.autoRefresh()
     }
 
     private fun initView() {
@@ -301,7 +310,11 @@ class RoomListActivity : AppCompatActivity() {
                             MotionEvent.ACTION_UP -> {
                                 if (RtcEngineInstance.generalToken() != "") {
                                     super.onTouch(v, event)
+                                    v.findViewById<ImageView>(R.id.ivClickBackground).alpha = 0.05F
                                     mOnGotoRoom?.invoke(position, data)
+                                    Handler().postDelayed({
+                                        v.findViewById<ImageView>(R.id.ivClickBackground).alpha = 0F
+                                    }, 1000)
                                 }
                             }
                         }

@@ -116,11 +116,11 @@ class ShowAgoraKitManager: NSObject {
         let jsonStr = String(data: jsonData, encoding: .utf8)
         config.extraInfo = jsonStr
         let module = AgoraContentInspectModule()
-        module.interval = 30
-//        module.type = .imageModeration
-//        config.modules = [module]
-//        let ret = engine?.enableContentInspectEx(enable, config: config, connection: connection)
-//        showLogger.info("setupContentInspectConfig: \(ret ?? -1)")
+        module.interval = 60
+        module.type = .imageModeration
+        config.modules = [module]
+        let ret = engine?.enableContentInspectEx(enable, config: config, connection: connection)
+        showLogger.info("setupContentInspectConfig: \(ret ?? -1)")
     }
     
     /// 语音审核
@@ -394,6 +394,11 @@ class ShowAgoraKitManager: NSObject {
         ShowAgoraKitManager.isOpenGreen = false
     }
     
+    
+    /// 离开频道
+    /// - Parameters:
+    ///   - roomId: 业务房间id（pk填写所在的业务房间，其他填写和channelId一致）
+    ///   - channelId: 需要离开的频道id
     func leaveChannelEx(roomId: String, channelId: String) {
         if let connection = broadcasterConnection, connection.channelId == channelId {
             engine?.leaveChannelEx(connection)

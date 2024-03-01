@@ -17,7 +17,6 @@ import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
 import io.agora.scene.base.GlideApp
-import io.agora.scene.base.GlideOptions
 import io.agora.scene.base.component.BaseBindingFragment
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.showTo1v1.R
@@ -26,9 +25,8 @@ import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListFragmentBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.ui.RoomListActivity
 import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
-import io.agora.scene.showTo1v1.videoLoaderAPI.OnPageScrollEventHandler
-import io.agora.scene.showTo1v1.videoLoaderAPI.VideoLoader
-import io.agora.scene.widget.utils.BlurTransformation
+import io.agora.scene.showTo1v1.videoloaderapi.OnPageScrollEventHandler
+import io.agora.scene.showTo1v1.videoloaderapi.VideoLoader
 
 class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>() {
 
@@ -104,9 +102,6 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
             }
             val drawable = ContextCompat.getDrawable(context, resourceId)
             Glide.with(this).load(drawable).into(binding.ivRoomCover)
-            Glide.with(this)
-                .load(drawable).apply(GlideOptions.bitmapTransform(BlurTransformation(context)))
-                .into(binding.ivBackground)
             GlideApp.with(this)
                 .load(mRoomInfo.avatar)
                 .error(io.agora.scene.widget.R.mipmap.default_user_avatar)

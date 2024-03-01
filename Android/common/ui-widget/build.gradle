@@ -37,5 +37,7 @@ dependencies {
     implementation rootProject.ext.deps.constraintlayout
     implementation project(':common:base')
     implementation rootProject.ext.deps.glide
+    implementation rootProject.ext.deps.layout_kernel
+    implementation rootProject.ext.deps.header_classics
 
 }
