@@ -40,12 +40,7 @@ class ShowRealTimeDataView: UIView {
     
     private var audioOnly: Bool = false
     
-//    var statsInfo: ShowStatisticsInfo? {
-//        didSet{
-//            leftInfoLabel.text = statsInfo?.description(audioOnly: audioOnly).0
-//            rightInfoLabel.text = statsInfo?.description(audioOnly: audioOnly).1
-//        }
-//    }
+    var roomId = ""
     
     var receiveStatsInfo: ShowStatisticsInfo? {
         didSet{
@@ -59,14 +54,24 @@ class ShowRealTimeDataView: UIView {
         }
     }
     
+    private func otherInfo() -> (String,String) {
+        let otherTitle = "show_statistic_other_title".showTo1v1Localization()
+        let roomIdStr = "\("show_statistic_roomId".showTo1v1Localization()): \(roomId)"
+        let leftStr =   ["\n\(otherTitle)", roomIdStr].joined(separator: "\n\n")
+        let rightStr =  ["\n ",             " "].joined(separator: "\n\n")
+        return (leftStr, rightStr)
+    }
+    
     func cleanRemoteDescription(){
         receiveStatsInfo = ShowStatisticsInfo(type: .remote(ShowStatisticsInfo.RemoteInfo()))
         let localLeftStr = sendStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
         let localRightStr = sendStatsInfo?.description(audioOnly: audioOnly).1 ?? ""
         let remoteLeftStr = receiveStatsInfo?.cleanRemoteDescription().0 ?? ""
         let remoteRightStr = receiveStatsInfo?.cleanRemoteDescription().1 ?? ""
-        leftInfoLabel.text = [localLeftStr, remoteLeftStr].joined(separator: "\n\n")
-        rightInfoLabel.text = [localRightStr, remoteRightStr].joined(separator: "\n\n")
+        let otherLeftStr = otherInfo().0
+        let otherRightStr = otherInfo().1
+        leftInfoLabel.text = [localLeftStr, remoteLeftStr, otherLeftStr].joined(separator: "\n\n")
+        rightInfoLabel.text = [localRightStr, remoteRightStr, otherRightStr].joined(separator: "\n\n")
     }
     
     func cleanLocalDescription(){
@@ -75,8 +80,10 @@ class ShowRealTimeDataView: UIView {
         let localRightStr = sendStatsInfo?.cleanLocalDescription().1 ?? ""
         let remoteLeftStr = receiveStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
         let remoteRightStr = receiveStatsInfo?.description(audioOnly: audioOnly).1 ?? ""
-        leftInfoLabel.text = [localLeftStr, remoteLeftStr].joined(separator: "\n\n")
-        rightInfoLabel.text = [localRightStr, remoteRightStr].joined(separator: "\n\n")
+        let otherLeftStr = otherInfo().0
+        let otherRightStr = otherInfo().1
+        leftInfoLabel.text = [localLeftStr, remoteLeftStr, otherLeftStr].joined(separator: "\n\n")
+        rightInfoLabel.text = [localRightStr, remoteRightStr, otherRightStr].joined(separator: "\n\n")
     }
     
     private func updateStatistisInfo(){
@@ -84,8 +91,10 @@ class ShowRealTimeDataView: UIView {
         let localRightStr = sendStatsInfo?.description(audioOnly: audioOnly).1 ?? ""
         let remoteLeftStr = receiveStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
         let remoteRightStr = receiveStatsInfo?.description(audioOnly: audioOnly).1 ?? ""
-        leftInfoLabel.text = [localLeftStr, remoteLeftStr].joined(separator: "\n\n")
-        rightInfoLabel.text = [localRightStr, remoteRightStr].joined(separator: "\n\n")
+        let otherLeftStr = otherInfo().0
+        let otherRightStr = otherInfo().1
+        leftInfoLabel.text = [localLeftStr, remoteLeftStr, otherLeftStr].joined(separator: "\n\n")
+        rightInfoLabel.text = [localRightStr, remoteRightStr, otherRightStr].joined(separator: "\n\n")
     }
     
     init(audioOnly: Bool = false, isLocal: Bool) {

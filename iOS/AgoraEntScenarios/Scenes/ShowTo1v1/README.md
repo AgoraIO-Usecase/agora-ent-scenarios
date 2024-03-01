@@ -4,7 +4,7 @@
 > 
 > Demo 效果:
 > 
-> <img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/showto1v1_ios_guide1.jpg" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/showto1v1_ios_guide2.jpg" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/showto1v1_ios_guide3.jpg" width="300" height="640">
+> <img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/android/liveto1v1/sample_roomlist.png" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/android/liveto1v1/sample_show_live.png" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/android/liveto1v1/sample_show_call.png" width="300" height="640">
 ---
 
 ## 1. 环境准备
@@ -16,30 +16,26 @@
 
 ## 2. 运行示例
 
-- 获取声网App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docportal.shengwang.cn/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
-  
-  > - 点击创建应用
-  >   
-  >   ![](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_1.jpg)
-  > 
-  > - 选择你要创建的应用类型
-  >   
-  >   ![](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_2.jpg)
-  > 
+- 进入声网控制台获取 APP ID 和 APP 证书 [控制台入口](https://console.shengwang.cn/overview)
 
-- 获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docportal.shengwang.cn/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
-  
-  > 在声网控制台的项目管理页面，找到你的项目，点击配置。
-  > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/1641871111769.png)
-  > 点击主要证书下面的复制图标，即可获取项目的 App 证书。
-  > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/1637637672988.png)
+  - 点击创建项目
 
-- 开启RTM
-  > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/rtm_config1.jpg)
-  > 
-  > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/rtm_config2.jpg)
-  > 
-  > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/rtm_config3.jpg)
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_1.jpg)
+
+  - 选择项目基础配置, 鉴权机制需要选择**安全模式**
+
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_2.jpg)
+
+  - 在项目的功能配置中启用"实时消息 RTM"功能
+     ```json
+     注: 如果没有启动"实时消息 RTM"功能, 将无法体验项目完整功能
+     ```
+
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_7.jpg)
+
+  - 拿到项目 APP ID 与 APP 证书
+
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_3.jpg)
 
 - 在项目的[KeyCenter.swift](../../KeyCenter.swift)里填写需要的声网 App ID 和 App证书
   
@@ -107,21 +103,22 @@
 ### 3.3 功能介绍
 
 秀场转1v1私密房场景目前已涵盖以下功能
-- 1v1呼叫场景化API
-  1v1呼叫API是声网为了帮助您快速实现1v1呼叫视频通话能力的模块，使用这个模块您可以非常便捷的实现呼叫、挂断等功能，相关代码请参考: [CallApi](https://github.com/AgoraIO-Community/CallAPI)
-
 - 场景内用户管理
   包含场景内用户的加入和退出，用户列表的获取等，相关协议请参考: [ShowTo1v1ServiceProtocol.swift](ShowTo1v1/Classes/Service/ShowTo1v1ServiceProtocol.swift)， 相关协议的实现请参考[ShowTo1v1ServiceImp.swift](Pure1v1/Classes/Service/ShowTo1v1ServiceImp.swift)
 
+### 3.4 场景化 API
 
+声动互娱-1v1 私密房项目内使用了 
+* 1v1 呼叫连麦场景化 API (简称 CallAPI)来实现 1v1 场景下秒接通、秒出图的能力, 对应代码文件: [CallAPI](../../Common/API/VideoLoaderAPI/VideoLoaderAPI), 如果您想进一步了解 CallAPI, 可以参考 [CallAPI Demo](https://github.com/AgoraIO-Community/CallAPI)
+* 秒开秒切场景化 API (简称 VideoLoaderAPI)来实现观众看播视频秒出图、秒切换直播间的能力, 对应代码文件: [VideoLoaderAPI](../../Common/API/VideoLoaderAPI/VideoLoaderAPI), 如果您想进一步了解 VideoLoaderAPI, 可以参考 [VideoLoaderAPI Demo](https://github.com/AgoraIO-Community/VideoLoaderAPI)
+
+
+---
 
 ## 4.集成遇到困难，该如何联系声网获取协助
 
-> 方案1：可以从智能客服获取帮助或联系销售人员 [Agora 支持](https://agora-ticket.agora.io/) 
-> 
-> 方案2：发送邮件给[support@agora.io](mailto:support@agora.io)咨询
->
-> 方案3：加入微信群提问
->
-> ![](https://download.agora.io/demo/release/SDHY_QA.jpg)
----
+- 集成遇到困难，该如何联系声网获取协助
+  - 方案1：可以从智能客服获取帮助或联系技术支持人员 [声网支持](https://ticket.shengwang.cn/form?type_id=&sdk_product=&sdk_platform=&sdk_version=&current=0&project_id=&call_id=&channel_name=)
+  - 方案2：加入微信群提问
+  
+    ![](https://download.agora.io/demo/release/SDHY_QA.jpg)

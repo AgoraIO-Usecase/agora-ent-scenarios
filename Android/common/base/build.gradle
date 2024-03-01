@@ -31,8 +31,8 @@ android {
         buildConfigField "String", "AGORA_APP_ID", "\"${AGORA_APP_ID}\""
         buildConfigField "String", "AGORA_APP_CERTIFICATE", "\"${AGORA_APP_CERTIFICATE}\""
 
-        buildConfigField "String", "CLOUD_PLAYER_KEY", "\"${CLOUD_PLAYER_KEY}\""
-        buildConfigField "String", "CLOUD_PLAYER_SECRET", "\"${CLOUD_PLAYER_SECRET}\""
+        buildConfigField "String", "RESTFUL_API_KEY", "\"${RESTFUL_API_KEY}\""
+        buildConfigField "String", "RESTFUL_API_SECRET", "\"${RESTFUL_API_SECRET}\""
     }
 
     buildTypes {

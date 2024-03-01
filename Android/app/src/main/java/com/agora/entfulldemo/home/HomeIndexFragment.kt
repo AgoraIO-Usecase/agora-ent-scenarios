@@ -16,7 +16,7 @@ import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppFragmentHomeIndexBinding
 import com.agora.entfulldemo.home.constructor.HomeScenesType
 import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
+import com.google.android.material.tabs.TabLayout.*
 import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.base.component.BaseViewBindingFragment
 
@@ -24,12 +24,15 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
 
     private val mTabs by lazy {
         mutableListOf(
-            HomeScenesType.Full,
-            HomeScenesType.KTV,
-            HomeScenesType.Voice,
+            //HomeScenesType.Full,
+            //HomeScenesType.KTV,
+            //HomeScenesType.Voice,
             HomeScenesType.Live
         )
     }
+
+    private val mSingleScene: Boolean
+        get() = mTabs.size == 1
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AppFragmentHomeIndexBinding {
         return AppFragmentHomeIndexBinding.inflate(inflater)
@@ -58,7 +61,7 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
             when (mTabs[position]) {
                 HomeScenesType.KTV -> tvTabTitle.text = act.getString(R.string.app_home_scene_ktv)
                 HomeScenesType.Voice -> tvTabTitle.text = act.getString(R.string.app_home_scene_voice)
-                HomeScenesType.Live -> tvTabTitle.text = act.getString(R.string.app_home_scene_live)
+                HomeScenesType.Live -> tvTabTitle.text = if (mSingleScene) act.getString(R.string.app_home_scene_live_merge) else act.getString(R.string.app_home_scene_live)
                 else -> tvTabTitle.text = act.getString(R.string.app_home_full_scene)
             }
         }.attach()
@@ -109,6 +112,16 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
         })
         binding.viewPagerLayout.currentItem = 0
         binding.tabLayout.selectTab(binding.tabLayout.getTabAt(0))
+
+        val layoutParams = binding.tabLayout.layoutParams
+        if (mSingleScene) {
+            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+            binding.tabLayout.tabGravity = GRAVITY_CENTER
+        } else {
+            layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
+            binding.tabLayout.tabGravity = GRAVITY_START
+        }
+        binding.tabLayout.layoutParams = layoutParams
     }
 }
 

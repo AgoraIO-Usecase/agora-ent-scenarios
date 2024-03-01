@@ -10,13 +10,14 @@
         android:id="@+id/ivBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@mipmap/bg_app_def_white"
         android:scaleType="fitXY" />
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginHorizontal="15dp"
-        android:layout_marginTop="90dp"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="82dp"
         app:cardCornerRadius="20dp"
         app:cardElevation="0dp">
@@ -40,7 +41,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginHorizontal="15dp"
-        android:layout_marginTop="90dp"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="82dp"
         android:elevation="5dp">
 

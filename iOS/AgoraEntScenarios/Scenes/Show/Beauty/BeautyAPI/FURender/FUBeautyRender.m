@@ -230,6 +230,21 @@
     dispatch_async(referQueue, ^{
         NSString *faceAIPath = [[NSBundle mainBundle] pathForResource:@"face_beautification" ofType:@"bundle"];
         FUBeauty *beauty = [[FUBeauty alloc] initWithPath:faceAIPath name:@"FUBeauty"];
+        beauty.blurLevel = 0.65 * 6.0;
+        beauty.colorLevel = 0.75;
+        beauty.faceThreed = 0;
+        beauty.cheekThinning = 0.3;
+        beauty.intensityCheekbones = 0.3;
+        beauty.eyeEnlarging = 0;
+        beauty.intensityNose = 0;
+        beauty.intensityChin = 0;
+        beauty.intensityLowerJaw = 0;
+        beauty.intensityForehead = 0;
+        beauty.intensityMouth = 0;
+        beauty.toothWhiten = 0;
+        beauty.eyeBright = 0;
+        beauty.removeNasolabialFoldsStrength = 0;
+        beauty.removePouchStrength = 0;
         [FURenderKit shareRenderKit].beauty = beauty;
     });
 #endif

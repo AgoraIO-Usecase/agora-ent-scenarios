@@ -69,3 +69,6 @@
 "show_create_room_name8"="疯狂星期几";
 "show_create_room_name9"="小黄鸭";
 "show_create_room_name10"="西二旗老板娘";
+
+"show_statistic_other_title" = "其他";
+"show_statistic_roomId" = "频道名";

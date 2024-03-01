@@ -27,7 +27,7 @@ public class ShowTo1v1UserInfo: NSObject {
     }
     
     func get1V1ChannelId() ->String {
-        return "1v1_\(uid)_\(createdAt)"
+        return "1v1_\(uid)_\(Int64(Date().timeIntervalSince1970 * 1000))"
     }
     
     func bgImage() ->UIImage? {

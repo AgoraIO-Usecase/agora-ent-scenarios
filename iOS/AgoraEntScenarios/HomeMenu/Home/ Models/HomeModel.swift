@@ -50,20 +50,20 @@ class HomeModel: NSObject {
     
     static func createData() -> [HomeModel] {
         var dataArray = [HomeModel]()
-        let homeModel = HomeModel()
-        homeModel.title = NSLocalizedString("home_category_title_all", comment: "")
-        homeModel.vc = HomeContentViewController(type: .all)
-        dataArray.append(homeModel)
-        
-        let ktvModel = HomeModel()
-        ktvModel.title = NSLocalizedString("home_category_title_ktv", comment: "")
-        ktvModel.vc = HomeContentViewController(type: .ktv)
-        dataArray.append(ktvModel)
-        
-        let voiceModel = HomeModel()
-        voiceModel.title = NSLocalizedString("home_category_title_voiceChat", comment: "")
-        voiceModel.vc = HomeContentViewController(type: .voice_chat)
-        dataArray.append(voiceModel)
+//        let homeModel = HomeModel()
+//        homeModel.title = NSLocalizedString("home_category_title_all", comment: "")
+//        homeModel.vc = HomeContentViewController(type: .all)
+//        dataArray.append(homeModel)
+//        
+//        let ktvModel = HomeModel()
+//        ktvModel.title = NSLocalizedString("home_category_title_ktv", comment: "")
+//        ktvModel.vc = HomeContentViewController(type: .ktv)
+//        dataArray.append(ktvModel)
+//        
+//        let voiceModel = HomeModel()
+//        voiceModel.title = NSLocalizedString("home_category_title_voiceChat", comment: "")
+//        voiceModel.vc = HomeContentViewController(type: .voice_chat)
+//        dataArray.append(voiceModel)
         
         let liveModel = HomeModel()
         liveModel.title = NSLocalizedString("home_category_title_live", comment: "")

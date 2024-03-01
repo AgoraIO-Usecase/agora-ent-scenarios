@@ -42,6 +42,15 @@ extension AppContext {
         SyncUtilsWrapper.cleanScene()
     }
     
+    static func unloadShowServiceImpExcludeRoomList() {
+        _showServiceImpMap.forEach { (key, value) in
+            if key.count > 0 {
+                _showServiceImpMap.removeValue(forKey: key)
+            }
+        }
+        SyncUtilsWrapper.cleanScene()
+    }
+    
     var showRoomList: [ShowRoomListModel]? {
         set {
             self.extDic[kShowRoomListKey] = newValue

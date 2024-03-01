@@ -4,7 +4,7 @@ ext {
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 apply plugin: 'org.jetbrains.kotlin.android'
 
-final def VERSION_SCENE_PRIVATE1V1 = "3.6.0"
+final def VERSION_SCENE_PRIVATE1V1 = "4.2.0"
 android {
     defaultConfig {
         if(private1v1_is_modular){
@@ -49,7 +49,8 @@ dependencies {
 
     kapt rootProject.ext.deps.glide_compiler
     implementation rootProject.ext.deps.glide
-
+    implementation rootProject.ext.deps.layout_kernel
+    implementation rootProject.ext.deps.header_classics
     implementation rootProject.ext.deps.annotation
     implementation rootProject.ext.deps.appcompat
     implementation rootProject.ext.deps.lifecycle
@@ -62,4 +63,5 @@ dependencies {
 
     implementation rootProject.ext.deps.gson
     implementation rootProject.ext.deps.syncManager
+
 }
