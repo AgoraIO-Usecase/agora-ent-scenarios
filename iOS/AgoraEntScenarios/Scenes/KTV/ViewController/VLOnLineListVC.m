@@ -49,7 +49,7 @@
 
 - (void)commonUI {
     [self setBackgroundImage:@"online_list_BgIcon"];
-    [self setNaviTitleName:KTVLocalizedString(@"在线K歌房")];
+    [self setNaviTitleName:KTVLocalizedString(@"ktv_scene_name")];
     if ([VLUserCenter center].isLogin) {
         [self setBackBtn];
     }

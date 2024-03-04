@@ -4320,11 +4320,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = FRCN2HWL92;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "声动互娱-K歌";
+				INFOPLIST_KEY_CFBundleDisplayName = "声动互娱-音符天地";
 				INFOPLIST_KEY_NSCameraUsageDescription = "声网需要您开启相机功能，用于视频通话";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "声网需要您开启麦克风功能，用于视频通话";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "声网需要您开启相册功能，用于头像更新";
@@ -4341,7 +4341,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.3.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.ktv;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hong.exa;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -4362,11 +4362,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = FRCN2HWL92;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "声动互娱-K歌";
+				INFOPLIST_KEY_CFBundleDisplayName = "声动互娱-音符天地";
 				INFOPLIST_KEY_NSCameraUsageDescription = "声网需要您开启相机功能，用于视频通话";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "声网需要您开启麦克风功能，用于视频通话";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "声网需要您开启相册功能，用于头像更新";
@@ -4383,7 +4383,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.3.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.ktv;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hong.exa;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;

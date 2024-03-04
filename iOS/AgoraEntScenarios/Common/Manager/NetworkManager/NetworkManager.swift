@@ -65,7 +65,7 @@ class NetworkManager:NSObject {
 
     @objc static let shared = NetworkManager()
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
-    private let baseServerUrl: String = "https://toolbox.bj2.agoralab.co/v1/"
+    private let baseServerUrl: String = "https://service.shengwang.cn/toolbox/v1/"
     
     private func basicAuth(key: String, password: String) -> String {
         let loginString = String(format: "%@:%@", key, password)
@@ -434,7 +434,7 @@ extension NetworkManager {
                       "ts": ts,
                       "sign": "src=\(src)&ts=\(ts)".md5Encrypt] as [String: Any]
 //        ToastView.showWait(text: "loading...", view: nil)
-        let url = "https://report-ad.agoralab.co/v1/report"
+        let url = "https://report-ad.shengwang.cn/v1/report"
         NetworkManager.shared.postRequest(urlString: url,
                                           params: params,
                                           success: { response in

@@ -6,5 +6,5 @@
   
 */
 
-CFBundleDisplayName = "声动互娱-K歌";
-NSMicrophoneUsageDescription = "当你进行K歌时，声动互娱-K歌想要申请麦克风访问";
+CFBundleDisplayName = "声动互娱-音符天地";
+NSMicrophoneUsageDescription = "当你进行K歌时，声动互娱-音符天地想要申请麦克风访问";

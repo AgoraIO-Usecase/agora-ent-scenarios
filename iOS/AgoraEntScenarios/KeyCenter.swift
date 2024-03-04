@@ -54,7 +54,7 @@ class KeyCenter: NSObject {
 
     static var Token: String? = nil
     
-    static var HostUrl: String = "https://gateway-fulldemo-staging.agoralab.co"
+    static var HostUrl: String = "https://gateway-fulldemo.shengwang.cn"
     
     static var IMAppKey: String? = ""
     static var IMClientId: String? = ""
@@ -63,7 +63,7 @@ class KeyCenter: NSObject {
     static let CloudPlayerKey: String? = nil
     static let CloudPlayerSecret: String? = nil
 
-    static var baseServerUrl: String? = "https://toolbox.bj2.agoralab.co/v1/"
+    static var baseServerUrl: String? = "https://service.shengwang.cn/toolbox/v1/"
     static var onlineBaseServerUrl: String? = baseServerUrl
 
 }

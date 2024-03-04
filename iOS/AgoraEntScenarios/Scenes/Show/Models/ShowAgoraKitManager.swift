@@ -145,7 +145,7 @@ class ShowAgoraKitManager: NSObject {
                                      "traceId": NSString.withUUID().md5(),
                                      "src": "iOS",
                                      "payload": JSONObject.toJsonString(dict: userInfo) ?? ""]
-        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/moderation/audio",
+        NetworkManager.shared.postRequest(urlString: "https://service.shengwang.cn/toolbox/v1/moderation/audio",
                                           params: parasm) { response in
             showLogger.info("response === \(response)")
         } failure: { errr in

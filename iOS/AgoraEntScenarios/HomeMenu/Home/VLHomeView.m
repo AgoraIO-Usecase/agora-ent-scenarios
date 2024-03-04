@@ -98,7 +98,7 @@
             @{
                 @"bgImgStr":@"home_KTV_bg",
                 @"iconImgStr":@"home_KTV_icon",
-                @"titleStr":AGLocalizedString(@"在线K歌房"),
+                @"titleStr":AGLocalizedString(@"ktv_scene_name"),
                 @"subTitleStr":@""
             },
 //            @{

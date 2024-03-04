@@ -47,9 +47,11 @@
 
 - (UILabel *)titleLabel {
     if (!_titleLabel) {
-        _titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(22, VLREALVALUE_WIDTH(25), self.width-44, 30)];
+        _titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(22, VLREALVALUE_WIDTH(25), self.width-44, 60)];
         _titleLabel.font = [UIFont fontWithName:@"PingFangSC" size:22];
         _titleLabel.font = [UIFont systemFontOfSize:18 weight:UIFontWeightSemibold];
+        _titleLabel.numberOfLines = 0;
+        _titleLabel.textAlignment = NSTextAlignmentLeft;
         _titleLabel.textColor = UIColorMakeWithHex(@"#FFFFFF");
     }
     return _titleLabel;
