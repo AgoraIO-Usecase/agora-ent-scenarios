@@ -25,9 +25,9 @@ object VoiceDebugSettingModel {
     const val CHE_AUDIO_AED_ENABLE = "che.audio.aed.enable" // value取值范围0/1, default 1
     const val CHE_AUDIO_SF_NSNGMUSICPROBTHR = "che.audio.sf.nsngMusicProbThr" // value取值范围[0,100], default 85
     const val CHE_AUDIO_SF_STATNSMUSICMODEBACKOFFDB =
-        "che.audio.sf.statNsMusicModeBackoffDB" // value取值[0-100], default 200
+        "che.audio.sf.statNsMusicModeBackoffDB" // value取值[0-1000], default 200
     const val CHE_AUDIO_SF_AINSMUSICMODEBACKOFFDB =
-        "che.audio.sf.ainsMusicModeBackoffDB" // value取值[0-100], default 270
+        "che.audio.sf.ainsMusicModeBackoffDB" // value取值[0-1000], default 270
 
     // 人声保护
     const val CHE_AUDIO_SF_AINSSPEECHPROTECTTHRESHOLD =
