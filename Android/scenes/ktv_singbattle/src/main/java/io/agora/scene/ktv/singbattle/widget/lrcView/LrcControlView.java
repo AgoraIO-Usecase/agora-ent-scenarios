@@ -59,6 +59,7 @@ import io.agora.scene.ktv.singbattle.ktvapi.ILrcView;
 import io.agora.scene.ktv.singbattle.service.RoomSelSongModel;
 import io.agora.scene.widget.basic.OutlineSpan;
 import io.agora.scene.widget.utils.UiUtils;
+import kotlin.jvm.Volatile;
 
 /**
  * 歌词控制View
@@ -629,8 +630,13 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     private String lrcUrl;
+    @Volatile
     private int highStartTime;
+    @Volatile
     private int highEndTime;
+
+    @Volatile
+    private LyricsModel mLyricsModel = null;
 
     @Override
     public void onDownloadLrcData(String url) {
@@ -642,6 +648,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     public void onHighPartTime(long highStartTime, long highEndTime) {
         this.highStartTime = (int) highStartTime;
         this.highEndTime = (int) highEndTime;
+        if (mLyricsModel != null) {
+            // 歌词先下载成功了
+            LyricsModel cutLyricsModel = dealWithBattleSong(mLyricsModel);
+            mKaraokeView.setLyricsData(cutLyricsModel);
+        }
     }
 
     private void downloadAndSetLrcData() {
@@ -664,10 +675,12 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                     }
                     if (mKaraokeView != null) {
                         mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
-                        LyricsModel cutLyricsModel = dealWithBattleSong(lyricsModel);
-                        Log.d("zhangwei",
-                                cutLyricsModel.title + " line:" + cutLyricsModel.lines.size() + " duration:" + cutLyricsModel.duration);
-                        mKaraokeView.setLyricsData(cutLyricsModel);
+                        if (highStartTime!=0){ // onHighPartTime 回调了
+                            LyricsModel cutLyricsModel = dealWithBattleSong(lyricsModel);
+                            mKaraokeView.setLyricsData(cutLyricsModel);
+                        }else {
+                            mLyricsModel = lyricsModel;
+                        }
                     }
                 } else {
                     if (error.getMessage() != null) {
@@ -712,6 +725,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         });
         totalScore = lineCount.get() * 100;
         Log.d("hugo", "totalScore: " + totalScore);
+        highStartTime = 0;
+        highEndTime = 0;
+        mLyricsModel = null;
         return cutLyricsModel;
     }
 
