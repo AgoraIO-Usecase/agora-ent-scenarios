@@ -2,7 +2,6 @@ package io.agora.scene.ktv.singbattle.ktvapi
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
@@ -602,18 +601,7 @@ class KTVApiImpl(
                 } else {
                     // 加载歌词成功
                     ktvApiLog("loadMusic success")
-                    if (this.ktvApiConfig.type == KTVType.SingBattle) {
-                        // 抢唱需要等待副歌片段起始/终止时间回调后再加载歌词
-                        if (highSongCode == songCode) {  // onSongSimpleInfoResult 已经回调了，可以加载歌词
-                            lrcView?.onDownloadLrcData(lyricUrl)
-                            this.highLyricUrl = ""
-                        } else {
-                            this.highLyricUrl = lyricUrl
-                        }
-                        Log.d("alienzh","loadLyric ${config.mode} highSongCode:$highSongCode, songCode:$songCode")
-                    }else{
-                        lrcView?.onDownloadLrcData(lyricUrl)
-                    }
+                    lrcView?.onDownloadLrcData(lyricUrl)
                     musicLoadStateListener.onMusicLoadSuccess(song, lyricUrl)
                 }
             }
@@ -647,18 +635,7 @@ class KTVApiImpl(
                         } else {
                             // 加载歌词成功
                             ktvApiLog("loadMusic success")
-                            if (this.ktvApiConfig.type == KTVType.SingBattle) {
-                                // 抢唱需要等待副歌片段起始/终止时间回调后再加载歌词
-                                if (highSongCode == songCode) {// onSongSimpleInfoResult 已经回调了，可以加载歌词
-                                    lrcView?.onDownloadLrcData(lyricUrl)
-                                    this.highLyricUrl = ""
-                                } else {
-                                    this.highLyricUrl = lyricUrl
-                                }
-                                Log.d("alienzh","loadLyric ${config.mode} highSongCode:$highSongCode, songCode:$songCode")
-                            }else{
-                                lrcView?.onDownloadLrcData(lyricUrl)
-                            }
+                            lrcView?.onDownloadLrcData(lyricUrl)
                             musicLoadStateListener.onMusicLoadProgress(song, 100, MusicLoadStatus.COMPLETED, msg, lrcUrl)
                             musicLoadStateListener.onMusicLoadSuccess(song, lyricUrl)
                         }
@@ -1460,8 +1437,6 @@ class KTVApiImpl(
     }
 
     private var highStartTime = 0L
-    private var highSongCode = 0L
-    private var highLyricUrl = ""
     override fun onSongSimpleInfoResult(
         requestId: String?,
         songCode: Long,
@@ -1480,15 +1455,7 @@ class KTVApiImpl(
         if (songCutter) {
             this.highStartTime -= preludeDuration
         }
-        Log.d("alienzh","onSongSimpleInfoResult highStartTime:${this.highStartTime} songCode:$songCode")
-        highSongCode = songCode
         lrcView?.onHighPartTime(time, endTime)
-        if (this.ktvApiConfig.type == KTVType.SingBattle) {
-            // 等待副歌片段起始/终止时间回调后再加载歌词
-            if (this.songCode == songCode && highLyricUrl.isNotEmpty()) {
-                lrcView?.onDownloadLrcData(highLyricUrl)
-            }
-        }
     }
 
     // ------------------------ AgoraRtcMediaPlayerDelegate ------------------------
