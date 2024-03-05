@@ -898,31 +898,32 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (BOOL)removeSelSongWithSongNo:(NSInteger)songNo sync:(BOOL)sync {
-    __block VLSBGRoomSelSongModel* removed;
-    BOOL isTopSong = [self.selSongsArray.firstObject.songNo integerValue] == songNo;
+    __block VLSBGRoomSelSongModel *removed = nil;
+    
+    BOOL isTopSong = [self.selSongsArray count] > 0 && [self.selSongsArray.firstObject.songNo integerValue] == songNo;
     
     if (isTopSong) {
         [self stopPlaySong];
     }
     
-    NSMutableArray<VLSBGRoomSelSongModel*> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLSBGRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-        if([evaluatedObject.songNo integerValue] == songNo) {
+    NSMutableArray<VLSBGRoomSelSongModel *> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLSBGRoomSelSongModel *evaluatedObject, NSDictionary *bindings) {
+        if ([evaluatedObject.songNo integerValue] == songNo) {
             removed = evaluatedObject;
             return NO;
         }
         return YES;
     }]]];
     
-    if(removed != nil) {
-        //did remove
+    if (removed != nil) {
+        // Did remove
         self.selSongsArray = updatedList;
 
-        if(sync) {
-            SBGRemoveSongInputModel* inputModel = [SBGRemoveSongInputModel new];
+        if (sync) {
+            SBGRemoveSongInputModel *inputModel = [SBGRemoveSongInputModel new];
             inputModel.songNo = removed.songNo;
             inputModel.objectId = removed.objectId;
-            [[AppContext sbgServiceImp] removeSongWithInput:inputModel
-                                                 completion:^(NSError * error) {
+            
+            [[AppContext sbgServiceImp] removeSongWithInput:inputModel completion:^(NSError *error) {
                 if (error) {
                     SBGLogInfo(@"deleteSongEvent fail: %@ %ld", removed.songName, error.code);
                 }
@@ -934,6 +935,44 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return NO;
     }
 }
+
+//- (BOOL)removeSelSongWithSongNo:(NSInteger)songNo sync:(BOOL)sync {
+//    __block VLSBGRoomSelSongModel* removed;
+//    BOOL isTopSong = [self.selSongsArray.firstObject.songNo integerValue] == songNo;
+//    
+//    if (isTopSong) {
+//        [self stopPlaySong];
+//    }
+//    
+//    NSMutableArray<VLSBGRoomSelSongModel*> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLSBGRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+//        if([evaluatedObject.songNo integerValue] == songNo) {
+//            removed = evaluatedObject;
+//            return NO;
+//        }
+//        return YES;
+//    }]]];
+//    
+//    if(removed != nil) {
+//        //did remove
+//        self.selSongsArray = updatedList;
+//
+//        if(sync) {
+//            SBGRemoveSongInputModel* inputModel = [SBGRemoveSongInputModel new];
+//            inputModel.songNo = removed.songNo;
+//            inputModel.objectId = removed.objectId;
+//            [[AppContext sbgServiceImp] removeSongWithInput:inputModel
+//                                                 completion:^(NSError * error) {
+//                if (error) {
+//                    SBGLogInfo(@"deleteSongEvent fail: %@ %ld", removed.songName, error.code);
+//                }
+//            }];
+//        }
+//        
+//        return YES;
+//    } else {
+//        return NO;
+//    }
+//}
 
 //- (void)replaceSelSongWithInfo:(VLRoomSelSongModel*)songInfo {
 //    self.selSongsArray = [SBGSyncManagerServiceImp sortChooseSongWithSongList:self.selSongsArray];
@@ -1067,7 +1106,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                                     type:KTVTypeSingbattle
                                                        musicType:loadMusicTypeMcc
                                                             maxCacheSize:10
-                                                                isDebugMode:false];
+                                                                mccDomain:nil];
     self.SBGApi = [[KTVApiImpl alloc] init];
     [self.SBGApi createKtvApiWithConfig:apiConfig];
     [self.SBGApi renewInnerDataStreamId];
@@ -1287,7 +1326,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)startSBGGrap {
     VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
     kWeakSelf(self);
-    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singbattle_3.4.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
+    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singbattle_4.3.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
         if(flag){
             //抢唱成功
             NSLog(@"抢唱成功");
@@ -1320,7 +1359,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return;
     }
     kWeakSelf(self);
-    [[NetworkManager shared] songGrabQuery:[AppContext.shared appId] sceneId:@"scene_singbattle_3.4.0" roomId:_roomModel.roomNo songCode:model.songNo src:@"postman" success:^(NSString *userId,NSString *userName, BOOL flag) {
+    [[NetworkManager shared] songGrabQuery:[AppContext.shared appId] sceneId:@"scene_singbattle_4.3.0" roomId:_roomModel.roomNo songCode:model.songNo src:@"postman" success:^(NSString *userId,NSString *userName, BOOL flag) {
         if(flag){
             return;
         }

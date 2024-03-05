@@ -160,7 +160,7 @@ import AgoraRtcKit
     var musicStreamUid: Int = 0
     var musicChannelToken: String = ""
     var topN: Int = 0
-    var isDebugMode: Bool = false
+    var mccDomain: String?
     @objc public
     init(appId: String,
          rtmToken: String,
@@ -175,7 +175,7 @@ import AgoraRtcKit
          maxCacheSize: Int,
          musicType: loadMusicType,
          topN: Int,
-         isDebugMode: Bool
+         mccDomain: String?
     ) {
         self.appId = appId
         self.rtmToken = rtmToken
@@ -190,7 +190,7 @@ import AgoraRtcKit
         self.musicStreamUid = musicStreamUid
         self.musicChannelToken = musicChannelToken
         self.topN = topN
-        self.isDebugMode = isDebugMode
+        self.mccDomain = mccDomain
     }
 }
 
@@ -205,7 +205,7 @@ import AgoraRtcKit
     var type: KTVType = .normal
     var maxCacheSize: Int = 10
     var musicType: loadMusicType = .mcc
-    var isDebugMode: Bool = false
+    var mccDomain: String?
     @objc public
     init(appId: String,
          rtmToken: String,
@@ -217,7 +217,7 @@ import AgoraRtcKit
          type: KTVType,
          musicType: loadMusicType,
          maxCacheSize: Int,
-         isDebugMode: Bool
+         mccDomain: String?
     ) {
         self.appId = appId
         self.rtmToken = rtmToken
@@ -229,7 +229,7 @@ import AgoraRtcKit
         self.type = type
         self.maxCacheSize = maxCacheSize
         self.musicType = musicType
-        self.isDebugMode = isDebugMode
+        self.mccDomain = mccDomain
     }
     
     

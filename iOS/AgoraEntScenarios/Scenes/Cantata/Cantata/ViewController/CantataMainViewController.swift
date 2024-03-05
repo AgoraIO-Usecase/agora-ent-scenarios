@@ -27,9 +27,9 @@ class CantataMainViewController: UIViewController{
                 }
                 
                 updateSongView(with: usefullSongs)
-                if usefullSongs.count == 0 {
-                    return
-                }
+//                if usefullSongs.count == 0 {
+//                    return
+//                }
                 
                 if usefullSongs.count == 0 {
                     controlView.controlState = .noSong
@@ -286,7 +286,11 @@ extension CantataMainViewController {
          */
         
         view.backgroundColor = .white
-        AUIThemeManager.shared.switchTheme(themeName: "Light")
+        if let bundlePath = Bundle.main.path(forResource: "Cantata", ofType: "bundle")
+        {
+            AUIThemeManager.shared.addThemeFolderPath(path: URL(fileURLWithPath: bundlePath) )
+           // AUIThemeManager.shared.switchTheme(themeName: "Cantata")
+        }
         
         let bgView = UIImageView(frame: self.view.bounds)
         bgView.image = UIImage.sceneImage(name: "dhc_main_bg", bundleName: "DHCResource")
@@ -340,7 +344,7 @@ extension CantataMainViewController {
         view.addSubview(botView)
         
         jukeBoxView.aui_size = CGSize(width: ScreenWidth, height: 562)
-        jukeBoxView.backgroundColor = .white
+//        jukeBoxView.backgroundColor = Color(hexString: "#152164")
         
         jukeBoxView.uiDelegate = self
     }
@@ -395,7 +399,7 @@ extension CantataMainViewController {
 //        let apiConfig = KTVApiConfig(appId: AppContext.shared.appId, rtmToken: VLUserCenter.user.agoraRTMToken, engine: RtcKit, channelName: "\(roomNo)_ad", localUid: Int(VLUserCenter.user.id) ?? 0, chorusChannelName: "\(roomNo)", chorusChannelToken: rtcToken, type: .cantata, maxCacheSize: 10, musicType: .mcc, isDebugMode: false)
 //        let giantConfig = GiantChorusConfiguration(audienceChannelToken: VLUserCenter.user.audienceChannelToken, musicStreamUid: 2023, musicChannelToken: exChannelToken, topN: 6)
 //        self.ktvApi = KTVApiImpl(config: apiConfig, giantConfig: giantConfig)
-        let giantConfig = GiantChorusConfiguration(appId: AppContext.shared.appId, rtmToken: VLUserCenter.user.agoraRTMToken, engine: RtcKit, localUid: Int(VLUserCenter.user.id) ?? 0, audienceChannelName: "\(roomNo)_ad", audienceChannelToken: VLUserCenter.user.audienceChannelToken, chorusChannelName: "\(roomNo)", chorusChannelToken: rtcToken ?? "", musicStreamUid: 2023, musicChannelToken: exChannelToken, maxCacheSize: 10, musicType: .mcc , topN: 6, isDebugMode: false)
+        let giantConfig = GiantChorusConfiguration(appId: AppContext.shared.appId, rtmToken: VLUserCenter.user.agoraRTMToken, engine: RtcKit, localUid: Int(VLUserCenter.user.id) ?? 0, audienceChannelName: "\(roomNo)_ad", audienceChannelToken: VLUserCenter.user.audienceChannelToken, chorusChannelName: "\(roomNo)", chorusChannelToken: rtcToken ?? "", musicStreamUid: 2023, musicChannelToken: exChannelToken, maxCacheSize: 10, musicType: .mcc , topN: 6, mccDomain: AppContext.shared.isDebugMode ? "api-test.agora.io" : nil)
         self.ktvApi = KTVGiantChorusApiImpl()
         self.ktvApi.createKTVGiantChorusApi(config: giantConfig)
         self.ktvApi.renewInnerDataStreamId()
@@ -746,7 +750,7 @@ extension CantataMainViewController {
     private func leaveRtcChannel() {
         self.ktvApi.removeEventHandler(ktvApiEventHandler: self)
         self.ktvApi.cleanCache()
-        self.ktvApi = nil
+       // self.RtcKit.removeDelegateEx(nil, connection: <#T##AgoraRtcConnection#>)
         self.loadMusicCallBack = nil
         RtcKit.leaveChannel()
     }
@@ -915,6 +919,7 @@ extension CantataMainViewController {
                         self.cosingerDegree = 0
                         self.lrcControlView.setScore(with: 0)
                     }
+                    
                 }
                 
                 if status == .updated && self.singerRole == .audience {//
@@ -941,11 +946,18 @@ extension CantataMainViewController {
                 if let topSong = self.selSongArray?.first {
                     if currentSeat != nil {
                         DispatchQueue.main.async {
-                            self.lrcControlView.controlState = self.isRoomOwner == true ? .ownerChorusSing : .chorusSing
+                            if currentSeat?.userNo != topSong.userNo {
+                                self.lrcControlView.controlState = self.isRoomOwner == true ? .ownerChorusSing : .chorusSing
+                            }
                         }
                     } else {
                         DispatchQueue.main.async {
-                            self.lrcControlView.controlState = self.isRoomOwner ? .ownerChorus : .joinChorus
+                            if VLUserCenter.user.id != topSong.userNo {
+                                self.lrcControlView.controlState = self.isRoomOwner ? .ownerChorus : .joinChorus
+                            }
+                            if seatsArray.count == 0 {
+                                self.lrcControlView.controlState = .noSong
+                            }
                         }
                     }
                 }
@@ -1626,7 +1638,6 @@ extension CantataMainViewController: DHCLrcControlDelegate {
                 if let scoreModel: ScoreModel = scoreMap[VLUserCenter.user.id ?? ""] {
                     let score = scoreModel.score
                     realScore = score + lineScore
-                    print("test:\(VLUserCenter.user.id), \(realScore)")
                 }
             }
         }

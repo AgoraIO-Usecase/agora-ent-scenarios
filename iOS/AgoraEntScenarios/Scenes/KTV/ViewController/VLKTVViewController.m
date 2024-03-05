@@ -152,7 +152,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     self.typeValue = 4;
     self.isDelay = true;
     self.checkType = checkAuthTypeAll;
-
     [self subscribeServiceEvent];
     
     // setup view
@@ -533,6 +532,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     } else {
         [self.settingView setIspause:self.isPause];
     }
+    [self.settingView setAEC:self.aecState level:self.aecLevel];
     [self.settingView setChorusStatus: flag];
 }
 
@@ -851,6 +851,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
                            onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
     }];
+    self.aecLevel = 1;
+    self.aecState = true;
     // 歌曲播完关闭耳返状态
 //    if(self.isEarOn){
 //        self.isEarOn = false;
@@ -908,6 +910,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             } else {
                 if(role == KTVSingRoleSoloSinger || role == KTVSingRoleLeadSinger){
                     [weakSelf.ktvApi startSingWithSongCode:songCode startPos:0];
+                    weakSelf.aecLevel = 0;
+                    weakSelf.aecState = false;
                 }
                 [weakSelf setMVViewStateWith:model];
             }
@@ -1097,6 +1101,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:NO
                                                                 completion:^(NSError * error) {
             }];
+            weakSelf.aecLevel = 0;
+            weakSelf.aecState = false;
         }];
     };
     KTVLogInfo(@"before songCode:%li", [model.songNo integerValue]);
@@ -1255,8 +1261,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                          orientationMode:AgoraVideoOutputOrientationModeFixedLandscape
                                               mirrorMode:AgoraVideoMirrorModeAuto];
     [self.RTCkit setVideoEncoderConfiguration:encoderConfiguration];
-    
-    
+    self.aecLevel = 1;
+    self.aecState = true;
     [self.RTCkit setEnableSpeakerphone:YES];
     
     AgoraDataStreamConfig *config = [AgoraDataStreamConfig new];
@@ -1275,7 +1281,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                              type: KTVTypeNormal
                                                         musicType:loadMusicTypeMcc
                                                         maxCacheSize:10
-                                                        isDebugMode: (AppContext.shared.isDebugMode) ? true : false
+                                                        mccDomain: AppContext.shared.isDebugMode ? @"api-test.agora.io" : nil
     ];
     self.ktvApi = [[KTVApiImpl alloc] init];
     [self.ktvApi createKtvApiWithConfig:apiConfig];

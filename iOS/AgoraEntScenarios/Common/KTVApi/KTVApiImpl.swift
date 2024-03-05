@@ -51,6 +51,7 @@ fileprivate enum KTVSongMode: Int {
     private var startHighTime: Int = 0
     private var isRelease: Bool = false
     private var songUrl2: String = ""
+    private var enableMultipathing = true
     private var playerState: AgoraMediaPlayerState = .idle {
         didSet {
             agoraPrint("playerState did changed: \(oldValue.rawValue)->\(playerState.rawValue)")
@@ -117,9 +118,8 @@ fileprivate enum KTVSongMode: Int {
             contentCenterConfiguration.token = config.rtmToken
             contentCenterConfiguration.rtcEngine = config.engine
             contentCenterConfiguration.maxCacheSize = UInt(config.maxCacheSize)
-            if config.isDebugMode {
-                //如果这一块报错为contentCenterConfiguration没有mccDomain这个属性 说明该版本不支持这个 可以注释掉这行代码。完全不影响
-                contentCenterConfiguration.mccDomain = "api-test.agora.io"
+            if let domain = config.mccDomain {
+                contentCenterConfiguration.mccDomain = domain
             }
             mcc = AgoraMusicContentCenter.sharedContentCenter(config: contentCenterConfiguration)
             mcc?.register(self)
@@ -160,10 +160,11 @@ fileprivate enum KTVSongMode: Int {
         }
         
         //4.3.0 add
-        engine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
-        engine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
+        enableMultipathing = true
+//        engine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
+//        engine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
         engine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
-        engine.setParameters("{\"rtc.enableMultipath\": true}")
+       // engine.setParameters("{\"rtc.enableMultipath\": true}")
         
     }
     
@@ -400,7 +401,7 @@ extension KTVApiImpl {
                 apiConfig?.engine?.muteLocalAudioStream(muteStatus)
             }
         } else {
-            apiConfig?.engine?.muteLocalAudioStream(muteStatus)
+            apiConfig?.engine?.adjustRecordingSignalVolume(muteStatus ? 0 : 100)
         }
     }
     
@@ -415,17 +416,18 @@ extension KTVApiImpl {
     @objc public func enableMutipath(enable: Bool) {
         sendCustomMessage(with: "enableMutipath", label: "enable:\(enable)")
         agoraPrint("enableMutipath:\(enable)")
-        apiConfig?.engine?.setParameters("{\"rtc.enableMultipath\": \(enable)}")
-        if enable {
-            apiConfig?.engine?.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
-            apiConfig?.engine?.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
-            apiConfig?.engine?.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
-        }
+        enableMultipathing = enable
+//        apiConfig?.engine?.setParameters("{\"rtc.enableMultipath\": \(enable)}")
+//        if enable {
+//            apiConfig?.engine?.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
+//            apiConfig?.engine?.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
+//            apiConfig?.engine?.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
+//        }
         
-        if singerRole == .soloSinger || singerRole == .leadSinger {
+        if singerRole == .coSinger || singerRole == .leadSinger {
             if let subChorusConnection = subChorusConnection {
                 let mediaOption = AgoraRtcChannelMediaOptions()
-                mediaOption.parameters = "{\"rtc.enableMultipath\": \(enable), \"rtc.path_scheduling_strategy\": 0}"
+                mediaOption.parameters = "{\"rtc.enableMultipath\": \(enable), \"rtc.path_scheduling_strategy\": 0, \"rtc.remote_path_scheduling_strategy\": 0}"
                 apiConfig?.engine?.updateChannelEx(with: mediaOption, connection: subChorusConnection)
             }
         }
@@ -652,6 +654,9 @@ extension KTVApiImpl {
         mediaOption.enableAudioRecordingOrPlayout = role != .leadSinger
         mediaOption.clientRoleType = .broadcaster
         mediaOption.parameters = "{\"rtc.use_audio4\": true}"
+        if enableMultipathing {
+            mediaOption.parameters = "{\"rtc.enableMultipath\": true, \"rtc.path_scheduling_strategy\": 0, \"rtc.remote_path_scheduling_strategy\": 0}"
+        }
 
         let rtcConnection = AgoraRtcConnection()
         rtcConnection.channelId = apiConfig?.chorusChannelName ?? ""

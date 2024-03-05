@@ -1043,7 +1043,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                            config:config];
     
     NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
-    KTVApiConfig *apiConfig = [[KTVApiConfig alloc]initWithAppId:[[AppContext shared] appId] rtmToken:VLUserCenter.user.agoraRTMToken engine:self.RTCkit channelName:self.roomModel.roomNo localUid:[VLUserCenter.user.id integerValue] chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:@"" type:KTVTypeSingRelay musicType:loadMusicTypeMcc maxCacheSize:10 isDebugMode:false];
+    KTVApiConfig *apiConfig = [[KTVApiConfig alloc]initWithAppId:[[AppContext shared] appId] rtmToken:VLUserCenter.user.agoraRTMToken engine:self.RTCkit channelName:self.roomModel.roomNo localUid:[VLUserCenter.user.id integerValue] chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:@"" type:KTVTypeSingRelay musicType:loadMusicTypeMcc maxCacheSize:10 mccDomain:nil];
     
     self.SRApi = [[KTVApiImpl alloc] init];
     [self.SRApi createKtvApiWithConfig:apiConfig];
@@ -1321,7 +1321,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 -(void)performBusinessLogicWithIndex:(NSInteger)index pro:(NSInteger)pro {
     // 在这里处理对应的业务逻辑，使用传入的index
-    NSLog(@"sbg index:%li___%li", index, pro);
     if (index > 0 && [self.chooseArray[index - 1] isEqualToNumber:@(NO)]) {
         self.chooseArray[index - 1] = @(YES);
         self.currentIndex = index + 1;
@@ -1521,7 +1520,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)startSBGGrapWith:(int)index {
     VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
     kWeakSelf(self);
-    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"sing_battle_game_info" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
+    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singrelay_4.3.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
         if(flag){
             //抢唱成功
             NSLog(@"抢唱成功");

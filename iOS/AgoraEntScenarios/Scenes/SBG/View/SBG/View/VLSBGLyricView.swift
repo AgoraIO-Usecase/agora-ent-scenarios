@@ -378,6 +378,7 @@ extension VLSBGLyricView: KTVLrcViewDelegate {
     func onHighPartTime(highStartTime: Int, highEndTime: Int) {
         self.highEndTime = highEndTime
         self.highStartTime = highStartTime
+        print("start time: \(highStartTime), end time:\(highEndTime)")
         //如果model为空 说明顺序对的就不用管，如果model不为空 表示歌词先到，需要处理
         guard let lyricModel = self.lyricModel else {return}
         DispatchQueue.main.async {

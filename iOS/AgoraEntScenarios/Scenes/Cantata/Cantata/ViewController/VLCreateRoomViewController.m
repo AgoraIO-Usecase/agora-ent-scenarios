@@ -14,6 +14,7 @@
 @property (nonatomic, strong) AgoraRtcEngineKit *RTCkit;
 @property (nonatomic, strong) DHCVLCreateRoomView *createView;
 @property (nonatomic, assign) BOOL isRoomPrivate;
+@property (nonatomic, assign) BOOL isCreating;
 @end
 
 @implementation VLCreateRoomViewController
@@ -30,6 +31,11 @@
 }
 
 - (void)createBtnAction:(VLAddRoomModel *)roomModel {  //房主创建
+    self.createView.createBtn.userInteractionEnabled = NO;
+    if (_isCreating) {
+        return;
+    }
+    self.isCreating = true;
     if (roomModel.isPrivate && roomModel.password.length != 4) {
         return;
     }
@@ -44,10 +50,10 @@
     intputModel.creatorAvatar = VLUserCenter.user.headUrl;
 //    intputModel.userNo = VLUserCenter.user.id;
     VL(weakSelf);
-    self.createView.createBtn.userInteractionEnabled = NO;
     [[AppContext dhcServiceImp] createRoomWith:intputModel
                                          completion:^(NSError * error, KTVCreateRoomOutputModel * outputModel) {
         self.createView.createBtn.userInteractionEnabled = YES;
+        self.isCreating = false;
         [SVProgressHUD dismiss];
         if (error != nil) {
             [VLToast toast:error.description];

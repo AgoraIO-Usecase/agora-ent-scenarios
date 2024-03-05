@@ -287,7 +287,7 @@ class DHCLRCControl: UIView {
         lrcView.lyricsView.activeLinePlayedTextColor = UIColor(hexString: "#EEFF25")!
         lrcView.lyricsView.activeLineUpcomingFontSize = UIFont.systemFont(ofSize: 20)
         lrcView.lyricsView.lyricLineSpacing = 6
-        lrcView.lyricsView.draggable = true
+        lrcView.lyricsView.draggable = false
         lrcView.delegate = self
         addSubview(lrcView!)
         lrcView.isHidden = true
@@ -307,7 +307,7 @@ class DHCLRCControl: UIView {
         pauseBtn = UIButton(frame: CGRect(x: 20, y: self.bounds.maxY - 50, width: 34, height: 40))
         pauseBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         pauseBtn.setVerticalLayoutWithCenterAlignment(title: "ktv_room_player_play".toSceneLocalization() as String, image: UIImage.sceneImage(name: "ktv_pause_resumeicon", bundleName: "DHCResource")!, spacing: 0, for: .selected)
-        pauseBtn.setVerticalLayoutWithCenterAlignment(title: "ktv_room_player_play".toSceneLocalization() as String, image: UIImage.sceneImage(name: "ktv_pause_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
+        pauseBtn.setVerticalLayoutWithCenterAlignment(title: "ktv_room_player_pause".toSceneLocalization() as String, image: UIImage.sceneImage(name: "ktv_pause_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         pauseBtn.addTarget(self, action: #selector(pause), for: .touchUpInside)
         addSubview(pauseBtn)
         pauseBtn.isHidden = true
@@ -457,6 +457,7 @@ class DHCLRCControl: UIView {
             } else {
                 self?.loadingView.isHidden = false
                 self?.loadingView.setProgress(progress)
+                self?.noSongLabel.isHidden = true
             }
         }
     }
