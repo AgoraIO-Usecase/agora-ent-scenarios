@@ -45,8 +45,7 @@ class RoomAINSSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceDialog
     private val anisSoundsList = mutableListOf<AINSSoundsBean>()
 
     private val anisMode by lazy {
-        arguments?.getInt(KEY_AINS_MODE, ConfigConstants.AINSMode.AINS_Tradition_Weakness)
-            ?: ConfigConstants.AINSMode.AINS_Tradition_Weakness
+        arguments?.getInt(KEY_AINS_MODE, ConfigConstants.AINSMode.AINS_Tradition_Weakness) ?: ConfigConstants.AINSMode.AINS_Tradition_Weakness
     }
 
     private val anisMusicMode by lazy {
@@ -94,8 +93,6 @@ class RoomAINSSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceDialog
         }
     }
 
-    private var lastAIMusic = anisMusicMode
-    private var lastAIMic = anisMicMode
 
     private fun initAdapter(recyclerView: RecyclerView) {
         val anisModeHeaderAdapter = BaseRecyclerViewAdapter(
@@ -138,13 +135,13 @@ class RoomAINSSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceDialog
 
                                 if (dataList.find { it.type == AINSType.AINS_Music } == null) {
                                     dataList.add(
-                                        RoomAINSConstructor.buildAIBean(view.context, AINSType.AINS_Music, lastAIMusic)
+                                        RoomAINSConstructor.buildAIBean(view.context, AINSType.AINS_Music, anisMusicMode)
                                     )
                                     needAdd = true
                                 }
                                 if (dataList.find { it.type == AINSType.AINS_Mic } == null) {
                                     dataList.add(
-                                        RoomAINSConstructor.buildAIBean(view.context, AINSType.AINS_Mic, lastAIMic)
+                                        RoomAINSConstructor.buildAIBean(view.context, AINSType.AINS_Mic, anisMicMode)
                                     )
                                     needAdd = true
                                 }

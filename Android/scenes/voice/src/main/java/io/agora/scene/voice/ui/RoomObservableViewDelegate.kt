@@ -579,10 +579,16 @@ class RoomObservableViewDelegate constructor(
                 }
                 AINSType.AINS_Music ->{
                     VoiceBuddyFactory.get().rtcChannelTemp.AINSMusicMode = it.anisMode
+                    roomAudioSettingDialog?.apply {
+                        audioSettingsInfo.AINSMusicMode = it.anisMode
+                    }
                     AgoraRtcEngineController.get().deMusicNoise(it.anisMode)
                 }
                 AINSType.AINS_Mic ->{
                     VoiceBuddyFactory.get().rtcChannelTemp.AINSMicMode = it.anisMode
+                    roomAudioSettingDialog?.apply {
+                        audioSettingsInfo.AINSMicMode = it.anisMode
+                    }
                     AgoraRtcEngineController.get().deMicNoise(it.anisMode)
                 }
             }
