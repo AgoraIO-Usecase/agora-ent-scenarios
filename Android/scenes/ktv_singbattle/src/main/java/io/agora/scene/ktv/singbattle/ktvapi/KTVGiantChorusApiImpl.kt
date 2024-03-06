@@ -197,12 +197,14 @@ class KTVGiantChorusApiImpl(
             0)
     }
 
+    // 日志输出
     private fun ktvApiLog(msg: String) {
-        Logging.i(tag, msg)
+        Logging.i(KTVApiImpl.tag, "[GiantChorus] $msg")
     }
 
+    // 日志输出
     private fun ktvApiLogError(msg: String) {
-        Logging.e(tag, msg)
+        Logging.e(KTVApiImpl.tag, "[GiantChorus] $msg")
     }
 
     override fun renewInnerDataStreamId() {
@@ -240,15 +242,15 @@ class KTVGiantChorusApiImpl(
         // Android Only
         mRtcEngine.setParameters("{\"che.audio.enable_estimated_device_delay\":false}")
 
-        // TopN
+        // TopN + SendAudioMetadata
         mRtcEngine.setParameters("{\"rtc.use_audio4\": true}")
 
         // mutipath
-        enableMultipathing = true
-        mRtcEngine.setParameters("{\"rtc.enableMultipath\": true}")
+        enableMultipathing = false
+        //mRtcEngine.setParameters("{\"rtc.enableMultipath\": true}")
         mRtcEngine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
-        mRtcEngine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
-        mRtcEngine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
+        //mRtcEngine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
+        //mRtcEngine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
     }
 
     override fun addEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {
@@ -336,17 +338,17 @@ class KTVGiantChorusApiImpl(
     override fun enableMulitpathing(enable: Boolean) {
         reportCallScenarioApi("enableMulitpathing", JSONObject().put("enable", enable))
         this.enableMultipathing = enable
-        mRtcEngine.setParameters("{\"rtc.enableMultipath\": $enable}")
-        if (enable) {
-            mRtcEngine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
-            mRtcEngine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
-            mRtcEngine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
-        }
+//        mRtcEngine.setParameters("{\"rtc.enableMultipath\": $enable}")
+//        if (enable) {
+//            mRtcEngine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
+//            mRtcEngine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
+//            mRtcEngine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
+//        }
 
         if (singerRole == KTVSingRole.LeadSinger || singerRole == KTVSingRole.CoSinger) {
             subChorusConnection?.let {
                 mRtcEngine.updateChannelMediaOptionsEx(ChannelMediaOptions().apply {
-                    parameters = "{\"rtc.enableMultipath\": $enable, \"rtc.path_scheduling_strategy\": 0}"
+                    parameters = "{\"rtc.enableMultipath\": $enable, \"rtc.path_scheduling_strategy\": 0, \"rtc.remote_path_scheduling_strategy\": 0}"
                 }, subChorusConnection)
             }
         }
@@ -753,6 +755,9 @@ class KTVGiantChorusApiImpl(
         mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
     }
 
+    private val subScribeSingerMap = mutableMapOf<Int, Int>() // <uid, ntpE2eDelay>
+    private val singerList = mutableListOf<Int>() // <uid>
+    private var mainSingerDelay = 0
     private fun joinChorus(newRole: KTVSingRole) {
         ktvApiLog("joinChorus: $newRole")
         val singChannelMediaOptions = ChannelMediaOptions()
@@ -763,10 +768,11 @@ class KTVGiantChorusApiImpl(
         if (newRole == KTVSingRole.LeadSinger) {
             // 主唱不参加TopN
             singChannelMediaOptions.isAudioFilterable = false
-            mRtcEngine.setParameters("{\"che.audio.filter_streams\":${giantChorusApiConfig.topN}}")
+            mRtcEngine.setParameters("{\"che.audio.filter_streams\":${KTVApi.routeSelectionConfig.streamNum}}")
         } else {
-            mRtcEngine.setParameters("{\"che.audio.filter_streams\":${giantChorusApiConfig.topN - 1}}")
+            mRtcEngine.setParameters("{\"che.audio.filter_streams\":${KTVApi.routeSelectionConfig.streamNum - 1}}")
         }
+
         // 加入演唱频道
         mRtcEngine.joinChannelEx(giantChorusApiConfig.chorusChannelToken, singChannelRtcConnection, singChannelMediaOptions, object :
             IRtcEngineEventHandler() {
@@ -825,8 +831,65 @@ class KTVGiantChorusApiImpl(
                     isPublishAudio = false
                 }
             }
+
+            // 延迟选路策略
+            override fun onUserJoined(uid: Int, elapsed: Int) {
+                super.onUserJoined(uid, elapsed)
+                if (uid != giantChorusApiConfig.musicStreamUid && subScribeSingerMap.size < 8) {
+                    mRtcEngine.muteRemoteAudioStreamEx(uid, false, singChannelRtcConnection)
+                    if (uid != mainSingerUid) {
+                        subScribeSingerMap[uid] = 0
+                    }
+                } else if (uid != giantChorusApiConfig.musicStreamUid && subScribeSingerMap.size == 8) {
+                    mRtcEngine.muteRemoteAudioStreamEx(uid, true, singChannelRtcConnection)
+                }
+                if (uid != giantChorusApiConfig.musicStreamUid && uid != mainSingerUid) {
+                    singerList.add(uid)
+                }
+            }
+
+            override fun onUserOffline(uid: Int, reason: Int) {
+                super.onUserOffline(uid, reason)
+                subScribeSingerMap.remove(uid)
+                singerList.remove(uid)
+            }
+
+            override fun onLeaveChannel(stats: RtcStats?) {
+                super.onLeaveChannel(stats)
+                subScribeSingerMap.clear()
+                singerList.clear()
+            }
+
+            override fun onRemoteAudioStats(stats: RemoteAudioStats?) {
+                super.onRemoteAudioStats(stats)
+                stats ?: return
+                if (KTVApi.routeSelectionConfig.type == GiantChorusRouteSelectionType.RANDOM || KTVApi.routeSelectionConfig.type == GiantChorusRouteSelectionType.TOP_N) return
+                val uid = stats.uid
+                if (uid == mainSingerUid) {
+                    mainSingerDelay = stats.e2eDelay
+                }
+//                if (uid == mainSingerUid && stats.e2eDelay > 300) {
+//                    //ToastUtils.showToast("主唱 $mainSingerUid 延迟超过300ms，目前延迟：${stats.ntpE2eDelay}")
+//                }
+//                if (subScribeSingerMap.any { it.key == uid } && stats.e2eDelay > 300) {
+//                    //ToastUtils.showToast("当前订阅用户 $uid 延迟超过300ms，目前延迟：${stats.ntpE2eDelay}")
+//                }
+                if (uid != mainSingerUid && uid != giantChorusApiConfig.musicStreamUid && subScribeSingerMap.containsKey(uid)) {
+                    subScribeSingerMap[uid] = stats.e2eDelay
+                }
+            }
         })
         mRtcEngine.setParameters("{\"rtc.use_audio4\": true}")
+        // 选路策略处理
+        if (KTVApi.routeSelectionConfig.type == GiantChorusRouteSelectionType.TOP_N || KTVApi.routeSelectionConfig.type == GiantChorusRouteSelectionType.BY_DELAY_AND_TOP_N) {
+            if (newRole == KTVSingRole.LeadSinger) {
+                mRtcEngine.setParameters("{\"che.audio.filter_streams\":${KTVApi.routeSelectionConfig.streamNum}}")
+            } else {
+                mRtcEngine.setParameters("{\"che.audio.filter_streams\":${KTVApi.routeSelectionConfig.streamNum - 1}}")
+            }
+        } else {
+            mRtcEngine.setParameters("{\"che.audio.filter_streams\": 0}")
+        }
         mRtcEngine.enableAudioVolumeIndicationEx(50, 10, true, singChannelRtcConnection)
 
         when (newRole) {
@@ -1060,6 +1123,86 @@ class KTVGiantChorusApiImpl(
         mSyncCloudConvergenceStatusFuture = null
         if (scheduledThreadPool is ScheduledThreadPoolExecutor) {
             scheduledThreadPool.remove(mSyncCloudConvergenceStatusTask)
+        }
+    }
+
+    // ------------------ 延迟选路 ------------------
+    private var mStopProcessDelay = true
+
+    private val mProcessDelayTask = Runnable {
+        if (!mStopProcessDelay && singerRole != KTVSingRole.Audience) {
+            val n = if (singerRole == KTVSingRole.LeadSinger) KTVApi.routeSelectionConfig.streamNum else KTVApi.routeSelectionConfig.streamNum -1
+            val sortedEntries = subScribeSingerMap.entries.sortedBy { it.value }
+            val other = sortedEntries.drop(3)
+            val drop = mutableListOf<Int>()
+            if (n > 3) {
+                other.drop(n - 3).forEach { (uid, _) ->
+                    drop.add(uid)
+                    mRtcEngine.muteRemoteAudioStreamEx(uid, true, singChannelRtcConnection)
+                    subScribeSingerMap.remove(uid)
+                }
+            }
+            ktvApiLog("选路重新订阅, drop:$drop")
+
+            val filteredList = singerList.filter { !subScribeSingerMap.containsKey(it) }
+            val filteredList2 = filteredList.filter { !drop.contains(it) }
+            val shuffledList = filteredList2.shuffled()
+            if (subScribeSingerMap.size < 8) {
+                val randomSingers = shuffledList.take(8 - subScribeSingerMap.size)
+                ktvApiLog("选路重新订阅, newSingers:$randomSingers")
+                for (singer in randomSingers) {
+                    subScribeSingerMap[singer] = 0
+                    mRtcEngine.muteRemoteAudioStreamEx(singer, false, singChannelRtcConnection)
+                }
+            }
+            ktvApiLog("选路重新订阅, newSubScribeSingerMap:$subScribeSingerMap")
+        }
+    }
+
+    private val mProcessSubscribeTask = Runnable {
+        if (!mStopProcessDelay && singerRole != KTVSingRole.Audience) {
+            val n = if (singerRole == KTVSingRole.LeadSinger) KTVApi.routeSelectionConfig.streamNum else KTVApi.routeSelectionConfig.streamNum -1
+            val sortedEntries = subScribeSingerMap.entries.sortedBy { it.value }
+            val mustToHave = sortedEntries.take(3)
+            mustToHave.forEach { (uid, _) ->
+                mRtcEngine.adjustUserPlaybackSignalVolumeEx(uid, 100, singChannelRtcConnection)
+            }
+            val other = sortedEntries.drop(3)
+            if (n > 3) {
+                other.take(n - 3).forEach { (uid, delay) ->
+                    if (delay > 300) {
+                        mRtcEngine.adjustUserPlaybackSignalVolumeEx(uid, 0, singChannelRtcConnection)
+                    } else {
+                        mRtcEngine.adjustUserPlaybackSignalVolumeEx(uid, 100, singChannelRtcConnection)
+                    }
+                }
+                other.drop(n - 3).forEach { (uid, _) ->
+                    mRtcEngine.adjustUserPlaybackSignalVolumeEx(uid, 0, singChannelRtcConnection)
+                }
+            }
+
+            ktvApiLog("选路排序+调整播放音量, mustToHave:$mustToHave, other:$other")
+        }
+    }
+
+    private var mProcessDelayFuture :ScheduledFuture<*>? = null
+    private var mProcessSubscribeFuture :ScheduledFuture<*>? = null
+    private fun startProcessDelay() {
+        if (KTVApi.routeSelectionConfig.type == GiantChorusRouteSelectionType.TOP_N || KTVApi.routeSelectionConfig.type == GiantChorusRouteSelectionType.RANDOM) return
+        mStopProcessDelay = false
+        mProcessDelayFuture = scheduledThreadPool.scheduleAtFixedRate(mProcessDelayTask, 10000, 20000, TimeUnit.MILLISECONDS)
+        mProcessSubscribeFuture = scheduledThreadPool.scheduleAtFixedRate(mProcessSubscribeTask,15000,20000, TimeUnit.MILLISECONDS)
+    }
+
+    private fun stopProcessDelay() {
+        mStopProcessDelay = true
+
+        mProcessDelayFuture?.cancel(true)
+        mProcessSubscribeFuture?.cancel(true)
+        mProcessDelayFuture = null
+        if (scheduledThreadPool is ScheduledThreadPoolExecutor) {
+            scheduledThreadPool.remove(mProcessDelayTask)
+            scheduledThreadPool.remove(mProcessSubscribeTask)
         }
     }
 
@@ -1346,6 +1489,7 @@ class KTVGiantChorusApiImpl(
                 ) {
                     mPlayer.play()
                 }
+                startProcessDelay()
             }
             MediaPlayerState.PLAYER_STATE_PLAYING -> {
                 mRtcEngine.adjustPlaybackSignalVolume(KTVApi.remoteVolume)
@@ -1356,6 +1500,7 @@ class KTVGiantChorusApiImpl(
             MediaPlayerState.PLAYER_STATE_STOPPED -> {
                 mRtcEngine.adjustPlaybackSignalVolume(100)
                 duration = 0
+                stopProcessDelay()
             }
             else -> {}
         }

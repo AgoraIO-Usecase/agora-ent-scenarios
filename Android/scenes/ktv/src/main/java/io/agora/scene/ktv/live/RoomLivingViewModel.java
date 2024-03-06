@@ -1003,7 +1003,9 @@ public class RoomLivingViewModel extends ViewModel {
      * @param songCode
      */
     private void innerJoinChorus(String songCode) {
-        ktvApiProtocol.loadMusic(Long.parseLong(songCode), new KTVLoadMusicConfiguration(songCode, Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_MUSIC_ONLY), new IMusicLoadStateListener() {
+        ktvApiProtocol.loadMusic(Long.parseLong(songCode), new KTVLoadMusicConfiguration(songCode,
+                        Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_MUSIC_ONLY, false),
+                new IMusicLoadStateListener() {
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
                 KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
@@ -1717,16 +1719,19 @@ public class RoomLivingViewModel extends ViewModel {
         int mainSingerUid = Integer.parseInt(music.getUserNo());
         if (isOwnSong) {
             // 主唱加载歌曲
-            loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid, KTVLoadMusicMode.LOAD_MUSIC_AND_LRC), songCode, true);
+            loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid,
+                    KTVLoadMusicMode.LOAD_MUSIC_AND_LRC,false), songCode, true);
         } else {
             if (seatLocalLiveData.getValue() != null && seatLocalLiveData.getValue().getChorusSongCode().equals(music.getSongNo() + music.getCreateAt())) {
                 // 合唱者
-                loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY), songCode, false);
+                loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid,
+                        KTVLoadMusicMode.LOAD_LRC_ONLY,false), songCode, false);
                 // 加入合唱
                 innerJoinChorus(music.getSongNo());
             } else {
                 // 观众
-                loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY), songCode, false);
+                loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid,
+                        KTVLoadMusicMode.LOAD_LRC_ONLY,false), songCode, false);
             }
         }
 
@@ -1802,7 +1807,9 @@ public class RoomLivingViewModel extends ViewModel {
     public void reGetLrcUrl() {
         if (songPlayingLiveData.getValue() == null) return;
         boolean isOwnSong = Objects.equals(songPlayingLiveData.getValue().getUserNo(), UserManager.getInstance().getUser().id.toString());
-        loadMusic(new KTVLoadMusicConfiguration(songPlayingLiveData.getValue().getSongNo(), Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_LRC_ONLY), Long.parseLong(songPlayingLiveData.getValue().getSongNo()), isOwnSong);
+        loadMusic(new KTVLoadMusicConfiguration(songPlayingLiveData.getValue().getSongNo(),
+                Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_LRC_ONLY,false),
+                Long.parseLong(songPlayingLiveData.getValue().getSongNo()), isOwnSong);
     }
 
     // ------------------ 歌曲seek ------------------

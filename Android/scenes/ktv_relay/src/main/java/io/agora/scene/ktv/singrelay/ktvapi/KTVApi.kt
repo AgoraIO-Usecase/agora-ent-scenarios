@@ -53,7 +53,8 @@ enum class KTVSingRole(val value: Int) {
 enum class KTVLoadMusicFailReason(val value: Int) {
     NO_LYRIC_URL(0),
     MUSIC_PRELOAD_FAIL(1),
-    CANCELED(2)
+    CANCELED(2),
+    GET_SIMPLE_INFO_FAIL(3)
 }
 
 /**
@@ -113,6 +114,30 @@ enum class AudioTrackMode(val value: Int) {
     BAN_ZOU(1),
     DAO_CHANG(2),
 }
+
+/**
+ * 大合唱中演唱者互相收听对方音频流的选路策略
+ * @param RANDOM 随机选取几条流
+ * @param BY_DELAY 根据延迟选择最低的几条流
+ * @param TOP_N 根据音强选流
+ * @param BY_DELAY_AND_TOP_N 同时开始延迟选路和音强选流
+ */
+enum class GiantChorusRouteSelectionType(val value: Int) {
+    RANDOM(0),
+    BY_DELAY(1),
+    TOP_N(2),
+    BY_DELAY_AND_TOP_N(3)
+}
+
+/**
+ * 大合唱中演唱者互相收听对方音频流的选路配置
+ * @param type 选路策略
+ * @param streamNum 最大选取的流个数（推荐6）
+ */
+data class GiantChorusRouteSelectionConfig constructor(
+    val type: GiantChorusRouteSelectionType,
+    val streamNum: Int
+)
 
 /**
  * 歌词组件接口，您setLrcView传入的歌词组件需要继承此接口类，并实现以下几个方法
@@ -277,7 +302,7 @@ data class KTVApiConfig constructor(
  * @param musicStreamToken 音乐流token
  * @param maxCacheSize 最大缓存歌曲数
  * @param musicType 音乐类型
- * @param topN 演唱之间互相能听到的最大数量
+ * @param routeSelectionConfig 选路配置
  */
 data class KTVGiantChorusApiConfig constructor(
     val appId: String,
@@ -291,8 +316,7 @@ data class KTVGiantChorusApiConfig constructor(
     val musicStreamUid: Int,
     val musicStreamToken: String,
     val maxCacheSize: Int = 10,
-    val musicType: KTVMusicType = KTVMusicType.SONG_CODE,
-    val topN: Int = 0
+    val musicType: KTVMusicType = KTVMusicType.SONG_CODE
 )
 
 /**
@@ -300,11 +324,13 @@ data class KTVGiantChorusApiConfig constructor(
  * @param songIdentifier 歌曲 id，通常由业务方给每首歌设置一个不同的SongId用于区分
  * @param mainSingerUid 主唱的 Uid，如果是伴唱，伴唱需要根据这个信息 mute 主频道主唱的声音
  * @param mode 歌曲加载的模式，默认为音乐和歌词均加载
+ * @param needPrelude 播放切片歌曲情况下，是否播放
  */
 data class KTVLoadMusicConfiguration(
     val songIdentifier: String,
     val mainSingerUid: Int,
-    val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
+    val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC,
+    val needPrelude: Boolean = false
 )
 
 /**
@@ -336,6 +362,8 @@ interface KTVApi {
         var debugMode = false
         // 内部测试使用，无需关注
         var mccDomain = ""
+        // 大合唱的选路策略
+        var routeSelectionConfig = GiantChorusRouteSelectionConfig(GiantChorusRouteSelectionType.BY_DELAY, 6)
     }
 
     /**
