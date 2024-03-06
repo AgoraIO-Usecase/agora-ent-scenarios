@@ -150,7 +150,6 @@ fileprivate enum KTVSongMode: Int {
         engine.setParameters("{\"che.audio.neteq.prebuffer_max_delay\": 600}")
         engine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
         engine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
-        engine.setParameters("{\"che.audio.direct.uplink_process\": false}")
         engine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
         engine.setParameters("{\"che.audio.ans.noise_gate\": 20}")
@@ -417,13 +416,6 @@ extension KTVApiImpl {
         sendCustomMessage(with: "enableMutipath", label: "enable:\(enable)")
         agoraPrint("enableMutipath:\(enable)")
         enableMultipathing = enable
-//        apiConfig?.engine?.setParameters("{\"rtc.enableMultipath\": \(enable)}")
-//        if enable {
-//            apiConfig?.engine?.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
-//            apiConfig?.engine?.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
-//            apiConfig?.engine?.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
-//        }
-        
         if singerRole == .coSinger || singerRole == .leadSinger {
             if let subChorusConnection = subChorusConnection {
                 let mediaOption = AgoraRtcChannelMediaOptions()

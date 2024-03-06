@@ -146,6 +146,25 @@ import AgoraRtcKit
     func onMusicPlayerProgressChanged(with progress: Int)
 }
 
+// 大合唱中演唱者互相收听对方音频流的选路策略
+enum GiantChorusRouteSelectionType: Int {
+    case random = 0 // 随机选取几条流
+    case byDelay = 1 // 根据延迟选择最低的几条流
+    case topN = 2 // 根据音强选流
+    case byDelayAndTopN = 3 // 同时开始延迟选路和音强选流
+}
+
+// 大合唱中演唱者互相收听对方音频流的选路配置
+@objc public class GiantChorusRouteSelectionConfig: NSObject {
+    let type: GiantChorusRouteSelectionType // 选路策略
+    let streamNum: Int // 最大选取的流个数（推荐6）
+
+    init(type: GiantChorusRouteSelectionType, streamNum: Int) {
+        self.type = type
+        self.streamNum = streamNum
+    }
+}
+
 @objc open class GiantChorusConfiguration: NSObject {
     var appId: String
     var rtmToken: String
@@ -159,7 +178,7 @@ import AgoraRtcKit
     var audienceChannelToken: String = ""
     var musicStreamUid: Int = 0
     var musicChannelToken: String = ""
-    var topN: Int = 0
+    var routeSelectionConfig: GiantChorusRouteSelectionConfig = GiantChorusRouteSelectionConfig(type: .byDelay, streamNum: 6)
     var mccDomain: String?
     @objc public
     init(appId: String,
@@ -174,7 +193,7 @@ import AgoraRtcKit
          musicChannelToken: String,
          maxCacheSize: Int,
          musicType: loadMusicType,
-         topN: Int,
+         routeSelectionConfig: GiantChorusRouteSelectionConfig,
          mccDomain: String?
     ) {
         self.appId = appId
@@ -189,7 +208,7 @@ import AgoraRtcKit
         self.audienceChannelToken = audienceChannelToken
         self.musicStreamUid = musicStreamUid
         self.musicChannelToken = musicChannelToken
-        self.topN = topN
+        self.routeSelectionConfig = routeSelectionConfig
         self.mccDomain = mccDomain
     }
 }
