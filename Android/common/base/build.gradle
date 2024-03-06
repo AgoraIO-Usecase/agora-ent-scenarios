@@ -79,6 +79,6 @@ dependencies {
     implementation rootProject.ext.deps.coroutines_android
 
 
-    api rootProject.ext.deps.rtc
+//    api rootProject.ext.deps.rtc
     api rootProject.ext.deps.ok2curl
 }

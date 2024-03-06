@@ -59,6 +59,7 @@ import io.agora.videoloaderapi.OnPageScrollEventHandler
 import io.agora.videoloaderapi.VideoLoader
 import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
 import io.agora.scene.show.widget.AdvanceSettingDialog
+import io.agora.scene.show.widget.AiPhotographerDialog
 import io.agora.scene.show.widget.MusicEffectDialog
 import io.agora.scene.show.widget.PictureQualityDialog
 import io.agora.scene.show.widget.SettingDialog
@@ -109,6 +110,7 @@ class LiveDetailFragment : Fragment() {
     private var mMessageAdapter: BindingSingleAdapter<ShowMessage, ShowLiveDetailMessageItemBinding>? =
         null
     private val mMusicEffectDialog by lazy { MusicEffectDialog(requireContext()) }
+    private val mAiPhotographerDialog by lazy { AiPhotographerDialog(requireContext()) }
     private val mSettingDialog by lazy { SettingDialog(requireContext()) }
     private val mLinkSettingDialog by lazy { LiveLinkAudienceSettingsDialog(requireContext()) }
     private val mPKSettingsDialog by lazy { LivePKSettingsDialog(requireContext()) }
@@ -380,6 +382,9 @@ class LiveDetailFragment : Fragment() {
         bottomLayout.ivBeauty.setOnClickListener {
             showBeautyDialog()
         }
+        bottomLayout.ivAiPhotographer.setOnClickListener {
+            showAiPhotographerDialog()
+        }
         bottomLayout.ivMusic.setOnClickListener {
             showMusicEffectDialog()
         }
@@ -447,6 +452,7 @@ class LiveDetailFragment : Fragment() {
             bottomLayout.ivSetting.isVisible = true
             bottomLayout.ivMusic.isVisible = true
             bottomLayout.ivBeauty.isVisible = true
+            bottomLayout.ivAiPhotographer.isVisible = true
 
             if (isPKing()) {
                 // PK状态
@@ -490,6 +496,7 @@ class LiveDetailFragment : Fragment() {
                 // PK是房主和房主的事，和观众无关，观众只能看，同时无法再连麦
                 bottomLayout.ivMusic.isVisible = false
                 bottomLayout.ivBeauty.isVisible = false
+                bottomLayout.ivAiPhotographer.isVisible = false
                 bottomLayout.flLinking.isVisible = false
             } else if (isLinking()) {
                 // 连麦状态
@@ -497,6 +504,7 @@ class LiveDetailFragment : Fragment() {
                     // 连麦中的一方
                     bottomLayout.ivMusic.isVisible = false
                     bottomLayout.ivBeauty.isVisible = false
+                    bottomLayout.ivAiPhotographer.isVisible = false
 
                     bottomLayout.flLinking.isVisible = true
                     bottomLayout.ivLinking.imageTintList = null
@@ -504,6 +512,7 @@ class LiveDetailFragment : Fragment() {
                     // 只是观看者，不参与连麦
                     bottomLayout.ivMusic.isVisible = false
                     bottomLayout.ivBeauty.isVisible = false
+                    bottomLayout.ivAiPhotographer.isVisible = false
                     bottomLayout.flLinking.isVisible = false
                 }
             } else {
@@ -511,6 +520,7 @@ class LiveDetailFragment : Fragment() {
                 // 普通观众，只有发起连麦申请的按钮
                 bottomLayout.ivMusic.isVisible = false
                 bottomLayout.ivBeauty.isVisible = false
+                bottomLayout.ivAiPhotographer.isVisible = false
 
                 bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList =
@@ -825,6 +835,28 @@ class LiveDetailFragment : Fragment() {
         MultiBeautyDialog(requireContext()).apply {
             show()
         }
+    }
+
+    /**
+     * AI 摄影师
+     */
+    private fun showAiPhotographerDialog() {
+       mAiPhotographerDialog.onItemSelectedListener = {  mAiPhotographerDialog,itemId->
+           when(itemId){
+               AiPhotographerDialog.ITEM_ID_AI_PHOTOGRAPHER_NONE->{
+                   stopAiPhotographer()
+               }
+               AiPhotographerDialog.ITEM_ID_AI_AVATAR -> {}
+               AiPhotographerDialog.ITEM_ID_AI_LIGHTING_AD -> {}
+               AiPhotographerDialog.ITEM_ID_AI_EDGE_LIGHT -> {}
+               AiPhotographerDialog.ITEM_ID_AI_AURORA -> {}
+               AiPhotographerDialog.ITEM_ID_AI_SHADOW -> {}
+               AiPhotographerDialog.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG -> {}
+               AiPhotographerDialog.ITEM_ID_AI_LIGHTING_3D -> {}
+               AiPhotographerDialog.ITEM_ID_AI_RHYTHM -> {}
+           }
+       }
+        mAiPhotographerDialog.show()
     }
 
     private fun showEndRoomDialog() {
@@ -2249,7 +2281,7 @@ class LiveDetailFragment : Fragment() {
                     }
                 }
 
-                override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
+                override fun onPositionChanged(position_ms: Long) {
 
                 }
 
@@ -2323,5 +2355,10 @@ class LiveDetailFragment : Fragment() {
     private fun adjustAudioMixingVolume(volume: Int) {
         mMediaPlayer?.adjustPlayoutVolume(volume)
         mMediaPlayer?.adjustPublishSignalVolume(volume)
+    }
+
+    // 停止 ai 摄影师
+    private fun stopAiPhotographer(){
+
     }
 }

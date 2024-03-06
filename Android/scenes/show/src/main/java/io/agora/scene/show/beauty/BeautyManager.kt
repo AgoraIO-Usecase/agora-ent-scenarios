@@ -93,9 +93,10 @@ object BeautyManager {
                     VideoCanvas(
                         view,
                         renderMode,
-                        Constants.VIDEO_MIRROR_MODE_DISABLED,
                         0
-                    )
+                    ).apply {
+                        mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
+                    }
                 )
             }
         }
@@ -167,9 +168,10 @@ object BeautyManager {
                                     VideoCanvas(
                                         it,
                                         renderMode,
-                                        Constants.VIDEO_MIRROR_MODE_AUTO,
                                         0
-                                    )
+                                    ).apply {
+                                        mirrorMode = Constants.VIDEO_MIRROR_MODE_AUTO
+                                    }
                                 )
                             }
                             setupLocalVideoCountDownLatch.countDown()
@@ -209,9 +211,10 @@ object BeautyManager {
                                     VideoCanvas(
                                         it,
                                         renderMode,
-                                        Constants.VIDEO_MIRROR_MODE_AUTO,
                                         0
-                                    )
+                                    ).apply {
+                                        mirrorMode = Constants.VIDEO_MIRROR_MODE_AUTO
+                                    }
                                 )
                             }
                             setupLocalVideoCountDownLatch.countDown()
@@ -260,9 +263,10 @@ object BeautyManager {
                                     VideoCanvas(
                                         it,
                                         renderMode,
-                                        Constants.VIDEO_MIRROR_MODE_AUTO,
                                         0
-                                    )
+                                    ).apply {
+                                        mirrorMode = Constants.VIDEO_MIRROR_MODE_AUTO
+                                    }
                                 )
                             }
                             setupLocalVideoCountDownLatch.countDown()
@@ -279,9 +283,10 @@ object BeautyManager {
                                 VideoCanvas(
                                     it,
                                     renderMode,
-                                    Constants.VIDEO_MIRROR_MODE_DISABLED,
                                     0
-                                )
+                                ).apply {
+                                    mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
+                                }
                             )
                         }
                         setupLocalVideoCountDownLatch.countDown()
