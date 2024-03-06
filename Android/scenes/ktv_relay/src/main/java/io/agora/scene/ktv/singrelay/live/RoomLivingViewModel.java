@@ -1348,10 +1348,12 @@ public class RoomLivingViewModel extends ViewModel {
         int mainSingerUid = Integer.parseInt(music.getUserNo());
         if (isOnSeat()) {
             // 麦上玩家加载音乐
-            loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid, KTVLoadMusicMode.LOAD_MUSIC_AND_LRC), songCode);
+            loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid,
+                    KTVLoadMusicMode.LOAD_MUSIC_AND_LRC,false), songCode);
         } else {
             // 观众
-            loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY), songCode);
+            loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY,false
+                    ), songCode);
         }
     }
 
@@ -1434,7 +1436,14 @@ public class RoomLivingViewModel extends ViewModel {
     // ------------------ 重新获取歌词url ------------------
     public void reGetLrcUrl() {
         if (songPlayingLiveData.getValue() == null || songPlayingLiveData.getValue().getUserNo() == null) return;
-        loadMusic(new KTVLoadMusicConfiguration(songPlayingLiveData.getValue().getSongNo(), Integer.parseInt(songPlayingLiveData.getValue().getUserNo()), KTVLoadMusicMode.LOAD_LRC_ONLY), Long.parseLong(songPlayingLiveData.getValue().getSongNo()));
+        String songIdentifier = songPlayingLiveData.getValue().getSongNo();
+        try {
+            int mainSingerUid = Integer.parseInt(songPlayingLiveData.getValue().getUserNo());
+            long songCode = Long.parseLong(songPlayingLiveData.getValue().getSongNo());
+            loadMusic(new KTVLoadMusicConfiguration(songIdentifier, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY, false), songCode);
+        } catch (RuntimeException e) {
+            KTVLogger.d(TAG, "RoomLivingViewModel.reGetLrcUrl() error:" + e);
+        }
     }
 
     // ------------------ 歌曲seek ------------------
