@@ -1383,7 +1383,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             loadMusic(
                 KTVLoadMusicConfiguration(
                     it.songNo,
-                    it.userNo!!.toInt(),
+                    it.userNo?.toIntOrNull() ?: 0,
                     KTVLoadMusicMode.LOAD_LRC_ONLY
                 ), it.songNo.toLong(), isOwnSong
             )
