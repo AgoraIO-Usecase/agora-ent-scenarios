@@ -69,7 +69,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     private var mCallDetailFragment: Fragment? = null
 
     override fun getViewBinding(inflater: LayoutInflater): Pure1v1RoomListActivityBinding {
-       return Pure1v1RoomListActivityBinding.inflate(inflater)
+        return Pure1v1RoomListActivityBinding.inflate(inflater)
     }
 
     override fun onDestroy() {
@@ -100,13 +100,19 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         setOnApplyWindowInsetsListener()
         setupView()
 
-        CallServiceManager.instance.setup(this)
-        CallServiceManager.instance.sceneService?.enterRoom { e ->
-            if (e == null) {
-                binding.smartRefreshLayout.autoRefresh()
+        CallServiceManager.instance.setup(this) {
+            if (it) {
+                CallServiceManager.instance.sceneService?.enterRoom { e ->
+                    if (e == null) {
+                        binding.smartRefreshLayout.autoRefresh()
+                    }
+                }
             }
         }
         CallServiceManager.instance.callApi?.addListener(this)
+        CallServiceManager.instance.onUserChanged = {
+            fetchRoomList(false)
+        }
     }
 
     private fun setOnApplyWindowInsetsListener() {
@@ -408,7 +414,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             jsonObject.put("userNo", UserManager.getInstance().user.userNo)
             contentInspectConfig.extraInfo = jsonObject.toString()
             val module = ContentInspectConfig.ContentInspectModule()
-            module.interval = 60
+            module.interval = 30
             module.type = ContentInspectConfig.CONTENT_INSPECT_TYPE_IMAGE_MODERATION
             contentInspectConfig.modules = arrayOf(module)
             contentInspectConfig.moduleCount = 1
