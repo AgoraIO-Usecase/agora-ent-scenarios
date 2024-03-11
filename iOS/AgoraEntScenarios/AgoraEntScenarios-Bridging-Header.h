@@ -25,6 +25,8 @@
 #import "SenseBeautyRender.h"
 #import "FUBeautyRender.h"
 #import "AgoraBeautyRender.h"
+#import "STDynmicResourceConfig.h"
+#import "BEDynmicResourceConfig.h"
 
 #import "AttributedTextView.h"
 #import "VLCommonWebViewController.h"

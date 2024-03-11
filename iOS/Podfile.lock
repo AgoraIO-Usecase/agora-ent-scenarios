@@ -26,10 +26,13 @@ PODS:
     - YYModel
     - ZSwiftBaseLib
   - AgoraLyricsScore (1.1.2)
-  - AgoraRtcEngine_Special_iOS (4.1.1.24)
+  - AgoraRtcEngine_Special_iOS (4.1.1.26)
   - AgoraRtm_iOS (2.1.8)
   - AgoraSyncManager (2.1.6):
     - SocketRocket
+  - AGResourceManager (0.1.0):
+    - AFNetworking
+    - Zip
   - AUIKitCore/UI (0.5.3):
     - AgoraLyricsScore
     - MJRefresh
@@ -60,7 +63,7 @@ PODS:
   - FLAnimatedImage (1.0.17)
   - fuLib (1.0):
     - FURenderKit
-  - FURenderKit (8.9.0)
+  - FURenderKit (8.9.2)
   - HXPhotoPicker/Camera/Lite (4.1.5):
     - HXPhotoPicker/Core
   - HXPhotoPicker/Core (4.1.5)
@@ -148,8 +151,9 @@ DEPENDENCIES:
   - Agora_Chat_iOS (= 1.0.8)
   - AgoraCommon (from `AgoraEntScenarios`)
   - AgoraLyricsScore (= 1.1.2)
-  - AgoraRtcEngine_Special_iOS (= 4.1.1.24)
+  - AgoraRtcEngine_Special_iOS (= 4.1.1.26)
   - AgoraSyncManager (~> 2.1.6)
+  - AGResourceManager (from `AgoraEntScenarios/Common/API/AGResourceManager`)
   - Bugly (= 2.5.93)
   - bytedEffect (from `bytedEffect.podspec`)
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
@@ -220,6 +224,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   AgoraCommon:
     :path: AgoraEntScenarios
+  AGResourceManager:
+    :path: AgoraEntScenarios/Common/API/AGResourceManager
   bytedEffect:
     :path: bytedEffect.podspec
   CallAPI:
@@ -243,9 +249,10 @@ SPEC CHECKSUMS:
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraCommon: 05700d9fe1f8986461007521e174f260b69eb376
   AgoraLyricsScore: 0c3e6b701dfe036ba26ba208fc65c3b65ecaeb06
-  AgoraRtcEngine_Special_iOS: d20a440b759565cde7640d68c4d22f1412a6df5f
+  AgoraRtcEngine_Special_iOS: 62ac62b0caddac27ab3c2e26ed7a2e5d9c7739a5
   AgoraRtm_iOS: 9fb76b5f71900d012aaed6c033e235d6fd201ed9
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
+  AGResourceManager: 0a7bdde28f8d5505e1dea358ecaac315b88af1ca
   AUIKitCore: fc5df86f26781fe6b76b4ced98f94da3872cf815
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   bytedEffect: 3d51767425dcaa67d2d6162c402225764d3c2156
@@ -253,7 +260,7 @@ SPEC CHECKSUMS:
   Cantata: 1a210fcfeb32f93659c199c33ec34b52a56de380
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   fuLib: 43b6990d34caa47e0f12a61db57fe9bd2372f584
-  FURenderKit: c7aaea4e5e536206d8d98fcc2d96ff5af0f3f9d3
+  FURenderKit: c5dad5d2f8da656d1c6f91910cf8a34905342380
   HXPhotoPicker: a7f554cf87888724394c19870c13544ac7b65245
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
@@ -282,6 +289,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: ad73ce2553eac112bf9575ef1888cd6e00bc687f
+PODFILE CHECKSUM: b5c37b6bac47c3091984d40d7e41205150409439
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.12.1

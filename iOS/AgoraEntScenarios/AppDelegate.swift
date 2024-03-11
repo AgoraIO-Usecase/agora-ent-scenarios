@@ -7,6 +7,8 @@
 
 import UIKit
 import AgoraCommon
+import AGResourceManager
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
@@ -30,6 +32,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppContext.shared.cloudPlayerKey = KeyCenter.CloudPlayerKey ?? ""
         AppContext.shared.cloudPlayerSecret = KeyCenter.CloudPlayerSecret ?? ""
         AppContext.shared.baseServerUrl = KeyCenter.baseServerUrl ?? ""
+        
+        //TODO(wst): test code
+        let url = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/resource/manifest/manifestList"
+        AGResourceManager.shared.downloadManifestList(url: url) { _ in
+        } completionHandler: { _, _ in
+        }
+
     }
     
     @objc func didTokenExpired() {

@@ -6,6 +6,7 @@
 //
 
 #import "SenseBeautyRender.h"
+#import "STDynmicResourceConfig.h"
 
 @interface SenseBeautyRender ()
 
@@ -57,7 +58,10 @@
 
 #if __has_include(Sensetime)
 - (void)checkSensetimeLicense {
-    NSString *licensePath = [[NSBundle mainBundle] pathForResource:@"SENSEME" ofType:@"lic"];
+    NSString *licensePath = [STDynmicResourceConfig shareInstance].licFilePath;
+    if (![[NSFileManager defaultManager] fileExistsAtPath:licensePath]) {
+        licensePath = [[NSBundle mainBundle] pathForResource:@"SENSEME" ofType:@"lic"];
+    }
     self.isSuccessLicense = [EffectsProcess authorizeWithLicensePath:licensePath];
     __weak SenseBeautyRender *weakSelf = self;
     self.timer = [NSTimer timerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {

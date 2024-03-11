@@ -9,6 +9,8 @@ import UIKit
 import AgoraRtcKit
 import SVProgressHUD
 import AgoraCommon
+import AGResourceManager
+
 class ShowCreateLiveVC: UIViewController {
 
     private var createView: ShowCreateLiveView!
@@ -75,6 +77,35 @@ class ShowCreateLiveVC: UIViewController {
         beautyVC.dismissed = { [weak self] in
             self?.createView.hideBottomViews = false
         }
+        
+        //TODO(wst): test code
+        let manager = AGResourceManager.shared
+        
+        //setup senseme path
+        guard let stLicResource = manager.getResource(uri: "beauty1/SenseLib_lic"),
+              manager.getStatus(resource: stLicResource) == .downloaded,
+              let stResource = manager.getResource(uri: "beauty1/SenseLib"),
+              manager.getStatus(resource: stResource) == .downloaded else {
+            ToastView.show(text: "beauty resource not downloading")
+            return
+        }
+        let stLicPath = manager.getFolderPath(resource: stLicResource) + "/SENSEME.lic"
+        let stResourcePath = manager.getFolderPath(resource: stResource) + "/SenseLib"
+        STDynmicResourceConfig.shareInstance().licFilePath = stLicPath
+        STDynmicResourceConfig.shareInstance().resourceFolderPath = stResourcePath
+        
+        //setup byte effect path
+        guard let beLicResource = manager.getResource(uri: "beauty1/ByteEffectLib_lic"),
+              manager.getStatus(resource: beLicResource) == .downloaded,
+              let beResource = manager.getResource(uri: "beauty1/ByteEffectLib"),
+              manager.getStatus(resource: beResource) == .downloaded else {
+            ToastView.show(text: "beauty resource not downloading")
+            return
+        }
+        let beLicPath = manager.getFolderPath(resource: beLicResource) + "/LicenseBag.bundle/Agora_test_20240111_20240411_io.agora.test.entfull_4.5.0_1111.licbag"
+        let beResourcePath = manager.getFolderPath(resource: beResource) + "/ByteEffectLib"
+        BEDynmicResourceConfig.shareInstance().licFilePath = beLicPath
+        BEDynmicResourceConfig.shareInstance().resourceFolderPath = beResourcePath
         
         // 创建默认美颜效果
         ShowBeautyFaceVC.beautyData.forEach({

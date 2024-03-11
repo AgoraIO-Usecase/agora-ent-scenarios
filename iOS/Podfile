@@ -44,6 +44,7 @@ def all_pods
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
   pod 'AgoraRtcEngine_Special_iOS', '4.1.1.26'
 
+  pod 'AGResourceManager', :path => 'AgoraEntScenarios/Common/API/AGResourceManager'
   pod 'CallAPI', :path => 'AgoraEntScenarios/Common/API/CallAPI'
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
   pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
