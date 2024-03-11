@@ -290,6 +290,14 @@ class ShowLiveViewController: UIViewController {
             self._subscribeServiceEvent()
             AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self)
         }
+//        loadScene()
+    }
+    
+    func loadScene(){
+        guard let path = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).first else {
+            return
+        }
+        ShowAgoraKitManager.shared.loadScene(scenePath: "\(path)/assets/AREffect")
     }
     
     override func viewDidAppear(_ animated: Bool) {
