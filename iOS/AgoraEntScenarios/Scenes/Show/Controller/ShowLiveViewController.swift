@@ -106,6 +106,38 @@ class ShowLiveViewController: UIViewController {
     }()
     
     private lazy var beautyVC = ShowBeautySettingVC()
+    private lazy var aiCameraMenuVC = {
+        let aiCameraVC =  ShowAICameraMenuViewController()
+        aiCameraVC.onSelectedItem = { [weak self] item in
+            guard let item = item else { return }
+            switch item.id {
+            case .avatar:
+                ShowAgoraKitManager.shared.showBackgroudEffective()
+                break
+            case .rhythm_faceLock_L:
+                ShowAgoraKitManager.shared.swithRhythm(mode: .faceLock_L)
+            case .rhythm_heart:
+                ShowAgoraKitManager.shared.swithRhythm(mode: .heart)
+            case .rhythm_portrait:
+                ShowAgoraKitManager.shared.swithRhythm(mode: .portrait)
+            default:
+                break
+            }
+        }
+        aiCameraVC.onDeSelectedItem = { [weak self] item in
+            guard let item = item else { return }
+            switch item.id {
+            case .avatar:
+                break
+            case .rhythm_faceLock_L, .rhythm_heart, .rhythm_portrait:
+                ShowAgoraKitManager.shared.enableRhythm(false)
+            default:
+                break
+            }
+        }
+        return aiCameraVC
+    }()
+    
     private lazy var realTimeView: ShowRealTimeDataView = {
         let realTimeView = ShowRealTimeDataView(isLocal: role == .broadcaster)
         view.addSubview(realTimeView)
@@ -950,6 +982,10 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     
     func onClickBeautyButton() {
         present(beautyVC, animated: true)
+    }
+    
+    func onClickAICameraButton() {
+        present(aiCameraMenuVC, animated: true)
     }
     
     func onClickMusicButton() {

@@ -1,4 +1,5 @@
 source 'https://github.com/CocoaPods/Specs.git'
+source 'https://gitee.com/fanpeng11/auikit-test-specs.git'
 
 platform :ios, '13.0'
 inhibit_all_warnings!
@@ -42,7 +43,9 @@ def all_pods
 
 #  pod 'AgoraRtcEngine_Special_iOS', :path => 'AgoraRtcEngine_iOS.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
-  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.26'
+  pod 'AgoraRtcEngine_Special_iOS', '4.2.6.6'
+  
+  pod 'Test_metaSDK'
 
   pod 'CallAPI', :path => 'AgoraEntScenarios/Common/API/CallAPI'
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'

@@ -37,6 +37,9 @@ class ShowAgoraKitManager: NSObject {
     
     private var broadcasterConnection: AgoraRtcConnection?
     
+    var sceneView: UIView?
+    var metakit: MetaKitEngine?
+    
 //    var exposureRangeX: Int?
 //    var exposureRangeY: Int?
 //    var matrixCoefficientsExt: Int?
@@ -75,6 +78,8 @@ class ShowAgoraKitManager: NSObject {
         config.rtcEngine = engine
         loader.setup(config: config)
         
+        registerMetaPlugin()
+        
         showLogger.info("load AgoraRtcEngineKit, sdk version: \(AgoraRtcEngineKit.getSdkVersion())", context: kShowLogBaseContext)
     }
     
@@ -98,6 +103,7 @@ class ShowAgoraKitManager: NSObject {
          config.appId = KeyCenter.AppId
          config.channelProfile = .liveBroadcasting
          config.areaCode = .global
+        config.eventDelegate = self
          return config
     }
     
