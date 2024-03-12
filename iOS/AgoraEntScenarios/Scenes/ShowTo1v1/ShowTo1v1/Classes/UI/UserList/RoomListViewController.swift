@@ -38,6 +38,7 @@ class RoomListViewController: UIViewController {
     private lazy var rtcEngine: AgoraRtcEngineKit = _createRtcEngine()
     private var callState: CallStateType = .idle
     private lazy var callVC: CallViewController = CallViewController()
+    private var rtmManager: CallRtmManager?
     private let callApi = CallApiImpl()
     private lazy var naviBar = NaviBar(frame: CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop, width: self.view.aui_width, height: 44))
     private lazy var service: ShowTo1v1ServiceProtocol = ShowTo1v1ServiceImp(appId: showTo1v1AppId!, user: userInfo)
@@ -206,9 +207,19 @@ extension RoomListViewController {
         }
         
         renewTokens {[weak self] flag in
+            guard let self = self else {return}
             guard flag else { return }
-            self?._initCallAPI(completion: { err in
-            })
+            let userId = self.userInfo?.getUIntUserId() ?? 0
+            let rtmManager = CallRtmManager(appId: showTo1v1AppId!,
+                                            userId: "\(userId)",
+                                            rtmClient: nil)
+            rtmManager.delegate = self
+            self.rtmManager = rtmManager
+            rtmManager.login(rtmToken: self.rtmToken) {[weak self] error in
+                if let error = error { return }
+                self?._initCallAPI(completion: { err in
+                })
+            }
         }
         
         let config = VideoLoaderConfig()
@@ -219,6 +230,9 @@ extension RoomListViewController {
     
     private func _initCallAPI(completion: @escaping ((Error?)->())) {
         guard let roomId = userInfo?.get1V1ChannelId() else { return  }
+        
+        let signalClient = CallRtmSignalClient(rtmClient: self.rtmManager!.getRtmClient())
+        
         callApi.deinitialize {
         }
         
@@ -226,12 +240,13 @@ extension RoomListViewController {
         config.appId = showTo1v1AppId!
         config.userId = userInfo!.getUIntUserId()
         config.rtcEngine = rtcEngine
+        config.signalClient = signalClient
         
         callApi.initialize(config: config)
         callApi.addListener(listener: self)
         
         prepareConfig.rtcToken = rtcToken
-        prepareConfig.rtmToken = rtmToken
+//        prepareConfig.rtmToken = rtmToken
         prepareConfig.roomId = roomId
         prepareConfig.localView =  callVC.localCanvasView.canvasView
         prepareConfig.remoteView = callVC.remoteCanvasView.canvasView
@@ -282,6 +297,10 @@ extension RoomListViewController {
     @objc func _backAction() {
         callApi.deinitialize {
         }
+        rtcEngine.leaveChannel()
+        AgoraRtcEngineKit.destroy()
+        rtmManager?.logout()
+        VideoLoaderApiImpl.shared.cleanCache()
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -486,10 +505,6 @@ extension RoomListViewController: CallApiListenerProtocol {
                 AUIToast.show(text: "call_toast_hangup".showTo1v1Localization())
             case .remoteRejected:
                 AUIToast.show(text: "call_user_busy_tips".showTo1v1Localization())
-            case .rtmLost:
-                AUIToast.show(text: "call_toast_disconnect".showTo1v1Localization())
-                _initCallAPI { err in
-                }
             default:
                 break
             }
@@ -540,8 +555,8 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
             }
             
             //renew callapi
-            self.callApi.renewToken(with: self.rtcToken, rtmToken: self.rtmToken)
-            
+            self.callApi.renewToken(with: self.rtcToken)
+            self.rtmManager?.renewToken(rtmToken: self.rtmToken)
             //renew videoloader
             VideoLoaderApiImpl.shared.getConnectionMap().forEach { (channelId, connection) in
                 let mediaOptions = AgoraRtcChannelMediaOptions()
@@ -549,6 +564,28 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
                 let ret = self.rtcEngine.updateChannelEx(with: mediaOptions, connection: connection)
                 showTo1v1Print("renew token tokenPrivilegeWillExpire: \(channelId) \(ret)")
             }
+        }
+    }
+}
+
+extension RoomListViewController: ICallRtmManagerListener {
+    func onConnected() {
+        
+    }
+    
+    func onDisconnected() {
+        
+    }
+    
+    func onConnectionLost() {
+        AUIToast.show(text: "call_toast_disconnect".showTo1v1Localization())
+        _initCallAPI { err in
+        }
+    }
+    
+    func onTokenPrivilegeWillExpire(channelName: String) {
+        self.renewTokens { _ in
+            
         }
     }
 }

@@ -7,25 +7,23 @@
 
 import Foundation
 import AgoraRtcKit
-import AgoraRtmKit
 
 /// 初始化配置信息
 @objc public class CallConfig: NSObject {
-    public var appId: String = ""               //声网App Id
-    public var userId: UInt = 0                 //用户id
-    public var rtcEngine: AgoraRtcEngineKit!    //rtc engine实例
-    public var rtmClient: AgoraRtmClientKit?    //[可选]rtm client实例，如果设置则需要负责rtmClient的login和logout，需要使用appId和userId创建
+    public var appId: String = ""                          //声网App Id
+    public var userId: UInt = 0                            //用户id
+    public var rtcEngine: AgoraRtcEngineKit!               //rtc engine实例
+    public var signalClient: ISignalClient!                //信令通道对象实例
 }
 
 //TODO: 如何不设置万能token
 @objc public class PrepareConfig: NSObject {
-    public var roomId: String = ""                      //自己的RTC频道名，用于呼叫对端用户时让对端用户进入加入这个RTC频道
+    public var roomId: String = ""                      //自己的Rtc频道名，用于呼叫对端用户时让对端用户加入这个RTC频道
     public var rtcToken: String = ""                    //rtc token，需要使用万能token，token创建的时候channel name为空字符串
-    public var rtmToken: String = ""                    //rtm token
     public var localView: UIView!                       //显示本地流的画布
     public var remoteView: UIView!                      //显示远端流的画布
     public var autoJoinRTC: Bool = false                //是否在不呼叫的情况下提前加入自己的RTC频道，该设置可以加快呼叫的出图速度
-    public var callTimeoutMillisecond: UInt64 = 15000   //呼叫超时时间，单位豪秒，0表示内部不处理超时
+    public var callTimeoutMillisecond: UInt64 = 15000   //呼叫超时时间，单位毫秒，0表示内部不处理超时
     public var userExtension: [String: Any]?            //[可选]用户扩展字段，收到对端消息而改变状态(例如calling/connecting)时可以通过kFromUserExtension字段获取
 }
 
@@ -43,8 +41,8 @@ import AgoraRtmKit
 @objc public enum CallStateReason: UInt {
     case none = 0
     case joinRTCFailed = 1         //加入RTC失败
-    case rtmSetupFailed = 2        //设置RTM失败
-    case rtmSetupSuccessed = 3     //设置RTM成功
+//    case rtmSetupFailed = 2        //设置RTM失败[2.0.0已废弃, prepareForCall失败reason变更为none]
+//    case rtmSetupSuccessed = 3     //设置RTM成功[2.0.0已废弃，信令成功通过ISignalClient自行维护]
     case messageFailed = 4         //消息发送失败
     case localRejected = 5         //本地用户拒绝
     case remoteRejected = 6        //远端用户拒绝
@@ -57,7 +55,7 @@ import AgoraRtmKit
     case recvRemoteFirstFrame = 13 //收到远端首帧
     case callingTimeout = 14       //呼叫超时
     case cancelByCallerRecall = 15 //同样的主叫呼叫不同频道导致取消
-    case rtmLost = 16              //rtm超时断连
+//    case rtmLost = 16              //rtm超时断连[2.0.0废弃，请从信令管理中实现中处理相关的异常]
     case remoteCallBusy = 17       //远端用户忙
 }
 
@@ -70,7 +68,7 @@ import AgoraRtmKit
 //    case joinRTCFailed = 4                        //加入RTC失败[已废弃，请使用onCallErrorOccur(state: rtcOccurError)]
     case joinRTCSuccessed = 5                     //加入RTC成功
 //    case rtmSetupFailed = 6                       //设置RTM失败[已废弃，请使用onCallErrorOccur(state: rtmSetupFail)]
-    case rtmSetupSuccessed = 7                    //设置RTM成功
+//    case rtmSetupSuccessed = 7                    //设置RTM成功[2.0.0已废弃，Rtm是否成功请通过CallRtmMessageManager的login显式调用]
 //    case messageFailed = 8                        //消息发送失败[已废弃，请使用onCallErrorOccur(state: sendMessageFail)]
     case stateMismatch = 9                        //状态流转异常
 //    case preparedRoomIdChanged = 10               //prepared了另一个roomId[已废弃]
@@ -83,14 +81,14 @@ import AgoraRtmKit
     case localHangup = 105                        //本地用户挂断
     case remoteHangup = 106                       //远端用户挂断
     case remoteJoin = 107                         //远端用户加入RTC频道
-    case remoteLeave = 108                        //远端用户离开RTC频道
+    case remoteLeave = 108                        //远端用户离开RTC频道(eventReason请参考AgoraUserOfflineReason)
     case localCancel = 109                        //本地用户取消呼叫
     case remoteCancel = 110                       //远端用户取消呼叫
     case localJoin = 111                          //本地用户加入RTC频道
     case localLeave = 112                         //本地用户离开RTC频道
     case recvRemoteFirstFrame = 113               //收到远端首帧
 //    case cancelByCallerRecall = 114               //同样的主叫呼叫不同频道导致取消[已废弃]
-    case rtmLost = 115                            //rtm超时断连
+//    case rtmLost = 115                            //rtm超时断连[2.0.0废弃，请从信令管理中实现中处理相关的异常]
 //    case rtcOccurError = 116                      //rtc出现错误[已废弃，请使用onCallErrorOccur(state: rtcOccurError)]
     case remoteCallBusy = 117                     //远端用户忙
 //    case startCaptureFail = 118                   //开启采集失败[已废弃，请使用onCallErrorOccur(state: startCaptureFail)]
@@ -98,13 +96,12 @@ import AgoraRtmKit
     case publishFirstLocalVideoFrame = 120        //推送首帧视频帧成功
 }
 
-
 /// 呼叫错误事件
 @objc public enum CallErrorEvent: UInt {
     case normalError = 0              //通用错误
     case rtcOccurError = 100          //rtc出现错误
     case startCaptureFail = 110       //rtc开启采集失败
-    case rtmSetupFail = 200           //rtm初始化失败
+//    case rtmSetupFail = 200           //rtm初始化失败[已废弃，改为messageManager自己手动初始化]
     case sendMessageFail = 210        //消息发送失败
 }
 
@@ -112,9 +109,8 @@ import AgoraRtmKit
 @objc public enum CallErrorCodeType: UInt {
     case normal = 0   //业务类型的错误，暂无
     case rtc          //rtc的错误，使用AgoraErrorCode
-    case rtm          //rtm的错误，使用AgoraRtmErrorCode
+    case message      //消息的错误，使用如果使用CallRtmMessageManager则是AgoraRtmErrorCode，自定义信道则是对应信道的error code
 }
-
 
 /// 日志等级
 @objc public enum CallLogLevel: Int {
@@ -122,6 +118,8 @@ import AgoraRtmKit
     case warning = 1
     case error = 2
 }
+
+
 
 @objc public protocol CallApiListenerProtocol: NSObjectProtocol {
     /// 状态响应回调
@@ -138,7 +136,8 @@ import AgoraRtmKit
     /// 内部详细事件变更回调
     /// - Parameters:
     ///   - event: 事件
-    @objc optional func onCallEventChanged(with event: CallEvent)
+    ///   - eventReason: 事件原因，默认nil，根据不同event表示不同的含义
+    @objc optional func onCallEventChanged(with event: CallEvent, eventReason: String?)
     
     /// 发生错误的回调
     /// - Parameters:
@@ -150,6 +149,35 @@ import AgoraRtmKit
                                     errorType: CallErrorCodeType,
                                     errorCode: Int,
                                     message: String?)
+    
+    /// 通话开始的回调
+    /// - Parameters:
+    ///   - roomId: 通话的频道id
+    ///   - callerUserId: 发起呼叫的用户id
+    ///   - currentUserId: 自己的id
+    ///   - timestamp: 通话开始的时间戳，和19700101的差值，单位ms
+    @objc optional func onCallConnected(roomId: String,
+                                        callUserId: UInt,
+                                        currentUserId: UInt,
+                                        timestamp: UInt64)
+    
+    /// 通话结束的回调
+    /// - Parameters:
+    ///   - roomId: 通话的频道id
+    ///   - hangupUserId: 挂断的用户id
+    ///   - currentUserId: 自己的用户id
+    ///   - timestamp: 通话结束的时间戳，和19700101的差值，单位ms
+    ///   - duration: 通话时长，单位ms
+    @objc optional func onCallDisconnected(roomId: String,
+                                           hangupUserId: UInt,
+                                           currentUserId: UInt,
+                                           timestamp: UInt64,
+                                           duration: UInt64)
+    
+    /// 当收到呼叫时判断是否可以加入Rtc
+    /// - Parameter eventInfo: 收到呼叫时的扩展信息
+    /// - Returns: true: 可以加入 false: 不可以加入
+    @objc optional func canJoinRtcOnCalling(eventInfo: [String: Any]) -> Bool
     
     /// token即将要过期(需要外部获取新token调用renewToken更新)
     @objc optional func tokenPrivilegeWillExpire()
@@ -170,9 +198,9 @@ import AgoraRtmKit
     /// 释放缓存
     func deinitialize(completion: @escaping (()->()))
     
-    /// 更新自己rtc/rtm的token
+    /// 更新rtc token
     /// - Parameter config: <#config description#>
-    func renewToken(with rtcToken: String, rtmToken: String)
+    func renewToken(with rtcToken: String)
     
     /// 准备通话环境，需要调用成功才可以进行呼叫，如需要更换通话的RTC 频道号可以重复调用，确保调用时必须是非通话状态(非calling、connecting、connected)才可调用成功
     /// - Parameters:

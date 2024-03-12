@@ -29,6 +29,7 @@ class Pure1v1UserListViewController: UIViewController {
     private var rtcToken: String = ""
     private var rtmToken: String = ""
     private lazy var rtcEngine = _createRtcEngine()
+    private var rtmManager: CallRtmManager?
     private var callState: CallStateType = .idle
     private var connectedUserId: UInt?
     private var connectedChannelId: String?
@@ -102,12 +103,24 @@ class Pure1v1UserListViewController: UIViewController {
             return
         }
         
+        //获取token
         _generateTokens {[weak self] rtcToken, rtmToken in
             guard let self = self else {return}
             guard let rtcToken = rtcToken, let rtmToken = rtmToken else { return }
             self.rtcToken = rtcToken
             self.rtmToken = rtmToken
-            self._initCallAPI(rtcToken: rtcToken, rtmToken: rtmToken)
+            
+            //初始化rtm manager并login
+            let userId = self.userInfo?.userId ?? ""
+            let rtmManager = CallRtmManager(appId: pure1V1AppId!,
+                                            userId: userId,
+                                            rtmClient: nil)
+            rtmManager.delegate = self
+            self.rtmManager = rtmManager
+            rtmManager.login(rtmToken: rtmToken) {[weak self] error in
+                if let error = error { return }
+                self?._initCallAPI(rtcToken: rtcToken, rtmToken: rtmToken)
+            }
         }
     }
     
@@ -123,18 +136,21 @@ class Pure1v1UserListViewController: UIViewController {
 extension Pure1v1UserListViewController {
     private func _initCallAPI(rtcToken: String, rtmToken: String) {
         pure1v1Print("_initCallAPI")
+        
+        let signalClient = CallRtmSignalClient(rtmClient: self.rtmManager!.getRtmClient())
+        
         let config = CallConfig()
         config.appId = pure1V1AppId!
         config.userId = UInt(userInfo?.userId ?? "")!
         config.rtcEngine = rtcEngine
-        config.rtmClient = nil
+        config.signalClient = signalClient
         callApi.deinitialize {
         }
         callApi.initialize(config: config)
         callApi.addListener(listener: self)
         
         prepareConfig.rtcToken = rtcToken
-        prepareConfig.rtmToken = rtmToken
+//        prepareConfig.rtmToken = rtmToken
         prepareConfig.roomId = userInfo?.getRoomId() ?? NSString.withUUID()
         prepareConfig.localView = callVC.localCanvasView.canvasView
         prepareConfig.remoteView = callVC.remoteCanvasView.canvasView
@@ -143,7 +159,6 @@ extension Pure1v1UserListViewController {
         callApi.prepareForCall(prepareConfig: prepareConfig) { err in
             // 成功即可以开始进行呼叫
         }
-        
     }
     
     private func _createRtcEngine() ->AgoraRtcEngineKit {
@@ -187,6 +202,9 @@ extension Pure1v1UserListViewController {
         }
         service.leaveRoom { err in
         }
+        
+        AgoraRtcEngineKit.destroy()
+        rtmManager?.logout()
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -381,10 +399,6 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             callDialog?.hiddenAnimation()
             callVC.dismiss(animated: false)
             hangUp()
-            if stateReason == .rtmLost {
-                AUIToast.show(text: "call_toast_disconnect".pure1v1Localization())
-                _setupCallApi()
-            }
             break
         default:
             break
@@ -400,7 +414,8 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             guard let rtcToken = rtcToken, let rtmToken = rtmToken else { return }
             self.rtcToken = rtcToken
             self.rtmToken = rtmToken
-            self.callApi.renewToken(with: rtcToken, rtmToken: rtmToken)
+            self.callApi.renewToken(with: rtcToken)
+            self.rtmManager?.renewToken(rtmToken: rtmToken)
         }
     }
     
@@ -521,4 +536,25 @@ extension Pure1v1UserListViewController: AgoraRtcMediaPlayerDelegate {
             playerKit.play()
         }
     }
+}
+
+extension Pure1v1UserListViewController: ICallRtmManagerListener {
+    func onConnected() {
+        
+    }
+    
+    func onDisconnected() {
+        
+    }
+    
+    func onConnectionLost() {
+        AUIToast.show(text: "call_toast_disconnect".pure1v1Localization())
+        _setupCallApi()
+    }
+    
+    func onTokenPrivilegeWillExpire(channelName: String) {
+        
+    }
+    
+    
 }

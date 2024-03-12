@@ -45,6 +45,9 @@ PODS:
   - bytedEffect (4.6.0)
   - CallAPI (0.3.0):
     - AgoraRtcEngine_Special_iOS
+    - CallAPI/All (= 0.3.0)
+  - CallAPI/All (0.3.0):
+    - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS (= 2.1.8)
   - Cantata (0.1.0):
     - AgoraCommon
@@ -256,7 +259,7 @@ SPEC CHECKSUMS:
   AUIKitCore: fc5df86f26781fe6b76b4ced98f94da3872cf815
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   bytedEffect: 3d51767425dcaa67d2d6162c402225764d3c2156
-  CallAPI: 172aa6ba58bb73dae9e2a088ba0dcfc4d06e9263
+  CallAPI: d1ef70d21ee5f479eebb32f41dfed32040464dda
   Cantata: 1a210fcfeb32f93659c199c33ec34b52a56de380
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   fuLib: 43b6990d34caa47e0f12a61db57fe9bd2372f584
