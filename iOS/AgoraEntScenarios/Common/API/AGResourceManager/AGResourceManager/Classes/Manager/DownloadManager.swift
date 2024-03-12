@@ -133,6 +133,13 @@ extension DownloadManager: IAGDownloadManager {
                               completionHandler: @escaping (NSError?) -> Void) {
         let fm = FileManager.default
         
+        //如果是文件夹，文件夹存在且zip不存在，暂时用来表示该md5文件解压正确且完成了
+        if calculateTotalSize(destinationPath) > 0 {
+            completionHandler(nil)
+            return
+        }
+        
+        //再检查是不是文件，是文件先查是不是存在
         if !fm.fileExists(atPath: destinationPath) {
             completionHandler(ResourceError.resourceNotFoundError(url: destinationPath))
             return
