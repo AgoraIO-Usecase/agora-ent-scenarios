@@ -17,9 +17,9 @@ extension AGResourceManager {
             switch type {
             case .sense:
                 //setup senseme path
-                guard let stLicResource = manager.getResource(uri: "beauty1/SenseLib_lic"),
+                guard let stLicResource = manager.getResource(uri: "beauty/SenseLib_lic"),
                       manager.getStatus(resource: stLicResource) == .downloaded,
-                      let stResource = manager.getResource(uri: "beauty1/SenseLib"),
+                      let stResource = manager.getResource(uri: "beauty/SenseLib"),
                       manager.getStatus(resource: stResource) == .downloaded else {
                     AGResourceManager.autoDownload()
                     ToastView.show(text: loadingToastStr)
@@ -31,9 +31,9 @@ extension AGResourceManager {
                 STDynmicResourceConfig.shareInstance().resourceFolderPath = stResourcePath
             case .byte:
                 //setup byte effect path
-                guard let beLicResource = manager.getResource(uri: "beauty1/ByteEffectLib_lic"),
+                guard let beLicResource = manager.getResource(uri: "beauty/ByteEffectLib_lic"),
                       manager.getStatus(resource: beLicResource) == .downloaded,
-                      let beResource = manager.getResource(uri: "beauty1/ByteEffectLib"),
+                      let beResource = manager.getResource(uri: "beauty/ByteEffectLib"),
                       manager.getStatus(resource: beResource) == .downloaded else {
                     AGResourceManager.autoDownload()
                     ToastView.show(text: loadingToastStr)
@@ -45,9 +45,9 @@ extension AGResourceManager {
                 BEDynmicResourceConfig.shareInstance().resourceFolderPath = beResourcePath
             case .fu:
                 //setup fu effect path
-                guard let fuLicResource = manager.getResource(uri: "beauty2/FULib_lic"),
+                guard let fuLicResource = manager.getResource(uri: "beauty/FULib_lic"),
                       manager.getStatus(resource: fuLicResource) == .downloaded,
-                      let fuResource = manager.getResource(uri: "beauty2/FULib"),
+                      let fuResource = manager.getResource(uri: "beauty/FULib"),
                       manager.getStatus(resource: fuResource) == .downloaded else {
                     AGResourceManager.autoDownload()
                     ToastView.show(text: loadingToastStr)
