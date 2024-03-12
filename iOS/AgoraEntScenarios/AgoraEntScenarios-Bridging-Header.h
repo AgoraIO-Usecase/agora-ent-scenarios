@@ -27,6 +27,7 @@
 #import "AgoraBeautyRender.h"
 #import "STDynmicResourceConfig.h"
 #import "BEDynmicResourceConfig.h"
+#import "FUDynmicResourceConfig.h"
 
 #import "AttributedTextView.h"
 #import "VLCommonWebViewController.h"

@@ -18,6 +18,10 @@
 		AB4746E72A5E82AB00E68FBA /* ShowRobotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */; };
 		ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */; };
 		ABE4B37A2A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */; };
+		DD1F53592B9FF0C0009E4287 /* AGResourceManager+Ent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1F53582B9FF0C0009E4287 /* AGResourceManager+Ent.swift */; };
+		DD1F535B2B9FF183009E4287 /* AGResourceManager+Beauty.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1F535A2B9FF183009E4287 /* AGResourceManager+Beauty.swift */; };
+		DD1F535F2B9FF7C1009E4287 /* FUDynmicResourceConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = DD1F535E2B9FF7C1009E4287 /* FUDynmicResourceConfig.m */; };
+		DD1F53652BA01D9F009E4287 /* fu_authpack_reader.c in Sources */ = {isa = PBXBuildFile; fileRef = DD1F53642BA01D9F009E4287 /* fu_authpack_reader.c */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
 		DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */; };
 		DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DD2A43D028FFCEE7004CEDCF /* Main.storyboard */; };
@@ -747,6 +751,12 @@
 		ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingBitrateCell.swift; sourceTree = "<group>"; };
 		ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNetStateSelectViewController.swift; sourceTree = "<group>"; };
 		CDE991620D7140A1BF78AFF2 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD1F53582B9FF0C0009E4287 /* AGResourceManager+Ent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AGResourceManager+Ent.swift"; sourceTree = "<group>"; };
+		DD1F535A2B9FF183009E4287 /* AGResourceManager+Beauty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AGResourceManager+Beauty.swift"; sourceTree = "<group>"; };
+		DD1F535D2B9FF7C1009E4287 /* FUDynmicResourceConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FUDynmicResourceConfig.h; sourceTree = "<group>"; };
+		DD1F535E2B9FF7C1009E4287 /* FUDynmicResourceConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FUDynmicResourceConfig.m; sourceTree = "<group>"; };
+		DD1F53632BA01D9F009E4287 /* fu_authpack_reader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fu_authpack_reader.h; sourceTree = "<group>"; };
+		DD1F53642BA01D9F009E4287 /* fu_authpack_reader.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = fu_authpack_reader.c; sourceTree = "<group>"; };
 		DD220BC1295B340A00F57F30 /* MenuUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuUtils.h; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -1749,6 +1759,25 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		DD1F53572B9FF0AC009E4287 /* ResourceManager */ = {
+			isa = PBXGroup;
+			children = (
+				DD1F53582B9FF0C0009E4287 /* AGResourceManager+Ent.swift */,
+			);
+			path = ResourceManager;
+			sourceTree = "<group>";
+		};
+		DD1F535C2B9FF7AF009E4287 /* DynamicSetting */ = {
+			isa = PBXGroup;
+			children = (
+				DD1F535D2B9FF7C1009E4287 /* FUDynmicResourceConfig.h */,
+				DD1F535E2B9FF7C1009E4287 /* FUDynmicResourceConfig.m */,
+				DD1F53632BA01D9F009E4287 /* fu_authpack_reader.h */,
+				DD1F53642BA01D9F009E4287 /* fu_authpack_reader.c */,
+			);
+			path = DynamicSetting;
+			sourceTree = "<group>";
+		};
 		DD2A43BE28FFCEE7004CEDCF = {
 			isa = PBXGroup;
 			children = (
@@ -1837,6 +1866,7 @@
 				DD360FB429B70CDC00CE7984 /* ShowThrottle.swift */,
 				DD360FB529B70CDC00CE7984 /* UIImage+Show.swift */,
 				DD360FB629B70CDC00CE7984 /* UIView+Show.swift */,
+				DD1F535A2B9FF183009E4287 /* AGResourceManager+Beauty.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -3138,6 +3168,7 @@
 		DDA1994D28FFE579009D3E61 /* Manager */ = {
 			isa = PBXGroup;
 			children = (
+				DD1F53572B9FF0AC009E4287 /* ResourceManager */,
 				DD6199CA29E3D36D008F63E4 /* Authorized */,
 				DDA1994E28FFE579009D3E61 /* NetworkManager */,
 				DDA1995328FFE579009D3E61 /* VLDefine */,
@@ -4063,6 +4094,7 @@
 		E732CDB92B4D2AF7004D6FB9 /* FUBeauty */ = {
 			isa = PBXGroup;
 			children = (
+				DD1F535C2B9FF7AF009E4287 /* DynamicSetting */,
 				E732CDBA2B4D2AF7004D6FB9 /* FUManager.h */,
 				E732CDBB2B4D2AF7004D6FB9 /* FUManager.m */,
 			);
@@ -4467,6 +4499,7 @@
 				DD9EBFCB2AD5512300B4551F /* PopTip.swift in Sources */,
 				E301C00D2AF8E8E90089A79C /* VLSBGCreateRoomView.m in Sources */,
 				DDA199F928FFE579009D3E61 /* NSDictionary+dictToModel.m in Sources */,
+				DD1F535F2B9FF7C1009E4287 /* FUDynmicResourceConfig.m in Sources */,
 				DDA19A0428FFE579009D3E61 /* CALayer+JKBorderColor.m in Sources */,
 				DD9EBF942AD5512300B4551F /* PresentedViewType.swift in Sources */,
 				E301C01E2AF8E8E90089A79C /* VLSBGTonesView.m in Sources */,
@@ -4511,6 +4544,7 @@
 				E301BD792AF4CAFF0089A79C /* VLAudienceIndicator.m in Sources */,
 				DD619A9429E3E247008F63E4 /* SARoomViewController.swift in Sources */,
 				DD619ACF29E3E247008F63E4 /* SAAudienceCell.swift in Sources */,
+				DD1F535B2B9FF183009E4287 /* AGResourceManager+Beauty.swift in Sources */,
 				DD9EBFF92AD5512400B4551F /* AgoraChatRoomBaseRtcUserView.swift in Sources */,
 				DD84178629090C520026B624 /* VLMineView.m in Sources */,
 				DD619A7229E3E247008F63E4 /* SAPresentationSegue.swift in Sources */,
@@ -4546,6 +4580,7 @@
 				E301BD592AF4CAFF0089A79C /* KTVLog.swift in Sources */,
 				DD3610BF29B70CDC00CE7984 /* ShowSettingActionSheetCell.swift in Sources */,
 				E301C03B2AF8E8E90089A79C /* SBGSyncManagerServiceImp.swift in Sources */,
+				DD1F53592B9FF0C0009E4287 /* AGResourceManager+Ent.swift in Sources */,
 				E732CE0A2B4D2AF8004D6FB9 /* BEGLUtils.m in Sources */,
 				E732CE142B4D2AF8004D6FB9 /* EffectsAnimal.m in Sources */,
 				DD619A9B29E3E247008F63E4 /* SAAudioSettingDetailViewController.swift in Sources */,
@@ -4874,6 +4909,7 @@
 				E301C01F2AF8E8E90089A79C /* VLSBGSliderView.m in Sources */,
 				E301BE692AF4E06F0089A79C /* VLSRPopMoreSelView.m in Sources */,
 				DD619A7029E3E247008F63E4 /* SAPresentationAnimation.swift in Sources */,
+				DD1F53652BA01D9F009E4287 /* fu_authpack_reader.c in Sources */,
 				DD9EBF902AD5512300B4551F /* FlipHorizontalAnimation.swift in Sources */,
 				DD9EBFC72AD5512300B4551F /* VoiceRoomSendGiftCell.swift in Sources */,
 				DD619AD129E3E247008F63E4 /* SASwitchTableViewCell.swift in Sources */,

@@ -8,6 +8,8 @@
 import UIKit
 import VideoLoaderAPI
 import AgoraCommon
+import AGResourceManager
+
 class ShowRoomListVC: UIViewController {
     let backgroundView = UIImageView()
     
@@ -97,6 +99,8 @@ class ShowRoomListVC: UIViewController {
     }
     
     @objc private func didClickCreateButton(){
+        guard AGResourceManager.checkAndSetupBeautyPath([.sense]) else { return }
+        
         let preVC = ShowCreateLiveVC()
         let preNC = UINavigationController(rootViewController: preVC)
         preNC.navigationBar.setBackgroundImage(UIImage(), for: .default)

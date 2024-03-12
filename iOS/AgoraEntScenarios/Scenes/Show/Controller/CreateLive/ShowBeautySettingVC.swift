@@ -7,6 +7,7 @@
 
 import UIKit
 import JXCategoryView
+import AGResourceManager
 
 enum ShowBeautyFaceVCType: CaseIterable {
     case beauty
@@ -149,6 +150,8 @@ class ShowBeautySettingVC: UIViewController {
         let view = ShowBeautyVenderView()
         view.onSelectedBeautyVenderClosure = { [weak self] type in
             guard let self = self else { return }
+            guard AGResourceManager.checkAndSetupBeautyPath([type]) else { return }
+            
             self.beautyVenderButton.setTitle(type.title, for: .normal)
             BeautyManager.shareManager.destroy(isAll: false)
             BeautyModel.beautyType = type
