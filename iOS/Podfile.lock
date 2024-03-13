@@ -97,11 +97,15 @@ PODS:
     - AgoraSyncManager
     - CallAPI
     - FLAnimatedImage
+    - RTMSyncManager
     - SDWebImage
     - SDWebImage/GIF
     - SnapKit
     - SwiftyBeaver
     - YYCategories
+    - YYModel
+  - RTMSyncManager (0.1.0):
+    - AgoraRtm_iOS (= 2.1.8)
     - YYModel
   - ScoreEffectUI (1.0.2)
   - SDWebImage (4.4.8):
@@ -171,6 +175,7 @@ DEPENDENCIES:
   - MJRefresh
   - Protobuf (= 3.22.1)
   - Pure1v1 (from `AgoraEntScenarios/Scenes/Pure1v1`)
+  - RTMSyncManager (from `AgoraEntScenarios/Common/API/RTMSyncManager`)
   - ScoreEffectUI (= 1.0.2)
   - SDWebImage (= 4.4.8)
   - SDWebImageAPNGCoder
@@ -239,6 +244,8 @@ EXTERNAL SOURCES:
     :path: fu.podspec
   Pure1v1:
     :path: AgoraEntScenarios/Scenes/Pure1v1
+  RTMSyncManager:
+    :path: AgoraEntScenarios/Common/API/RTMSyncManager
   SenseLib:
     :path: sense.podspec
   ShowTo1v1:
@@ -273,7 +280,8 @@ SPEC CHECKSUMS:
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MJRefresh: 2fe7fb43a5167ceda20bb7e63f130c04fd1814a5
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
-  Pure1v1: 870f5b4e89f7d7bc0abceb89cffac6c43f821ba2
+  Pure1v1: bd4333cb46e59a2e1f9415c5c8629a19c70431d2
+  RTMSyncManager: 115983b6a9c18da877d3849a836fbc989ca0fc35
   ScoreEffectUI: bf1195b4d41a73d43c236450b5d7f958989844aa
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
@@ -292,6 +300,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: b5c37b6bac47c3091984d40d7e41205150409439
+PODFILE CHECKSUM: ff798ea5a964424c3860c9a3a8116f4b5699e9d9
 
 COCOAPODS: 1.12.1
