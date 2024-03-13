@@ -7,6 +7,7 @@
 
 import UIKit
 import JXCategoryView
+import AgoraCommon
 
 class ShowBeautyFaceVC: UIViewController {
     
@@ -64,6 +65,9 @@ class ShowBeautyFaceVC: UIViewController {
         super.viewDidLoad()
         setUpUI()
         configDefaultSelect()
+        if type == .background {
+            addObserver()
+        }
     }
     
     func changeValueHandler(value: CGFloat) {
@@ -121,15 +125,35 @@ class ShowBeautyFaceVC: UIViewController {
                                                                     isOn: false)
             } else if model.path == "xuhua" {
                 ShowAgoraKitManager.isBlur = true
+                trySetOffAICameraVirtualBg360()
                 ShowAgoraKitManager.shared.enableVirtualBackground(isOn: true,
                                                                    greenCapacity: Float(value))
                 
             } else {
                 ShowAgoraKitManager.isBlur = false
+                trySetOffAICameraVirtualBg360()
                 ShowAgoraKitManager.shared.seVirtualtBackgoundImage(imagePath: model.key,
                                                                     isOn: true,
                                                                     greenCapacity: Float(value))
             }
+        }
+    }
+    
+    func trySetOffAICameraVirtualBg360(){
+        if ShowAgoraKitManager.shared.enableVirtualBg360 {
+            ShowAgoraKitManager.shared.setupBackground360(enabled: false)
+            ToastView.show(text: "show_disable_virturalBg360_toast".show_localized)
+            NotificationCenter.default.post(name: ShowAgoraKitManager.disableVirtualBg360NotificaitonName, object: nil)
+        }
+    }
+    
+    private func addObserver(){
+        NotificationCenter.default.addObserver(forName: ShowAgoraKitManager.disableVirtualBgNotificaitonName, object: nil, queue: nil) { [weak self]_ in
+            guard let self = self else {return}
+            self.dataArray.forEach { item in
+                item.isSelected = false
+            }
+            self.collectionView.reloadData()
         }
     }
     

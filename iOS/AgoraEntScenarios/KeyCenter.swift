@@ -23,7 +23,7 @@ class KeyCenter: NSObject {
      进入声网控制台(https://console.shengwang.cn/)，创建一个项目，进入项目配置页，即可看到APP ID。
      */
     
-    static let AppId: String = "72d8d5c7b38445e5bb26f1f270ee4649"
+    static let AppId: String = <#AppId#>
     /**
      Certificate.
      Agora provides App certificate to generate Token. You can deploy and generate a token on your server,
@@ -65,7 +65,7 @@ class KeyCenter: NSObject {
      详见获取环信即时通讯IM的信息(http://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#%E8%8E%B7%E5%8F%96%E7%8E%AF%E4%BF%A1%E5%8D%B3%E6%97%B6%E9%80%9A%E8%AE%AF-im-%E7%9A%84%E4%BF%A1%E6%81%AF)。
      */
     
-    static var IMAppKey: String? = "81399972#1019272"
+    static var IMAppKey: String? = ""
     
     /**
      EaseMob Client ID.

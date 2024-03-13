@@ -10,6 +10,9 @@ import AgoraRtcKit
 import SwiftUI
 import VideoLoaderAPI
 import AgoraCommon
+import AGResourceManager
+import SDWebImage
+
 protocol ShowLiveViewControllerDelegate: NSObjectProtocol {
     func currentUserIsOnSeat()
     func currentUserIsOffSeat()
@@ -104,38 +107,10 @@ class ShowLiveViewController: UIViewController {
         view.delegate = self
         return view
     }()
-    
+        
     private lazy var beautyVC = ShowBeautySettingVC()
     private lazy var aiCameraMenuVC = {
-        let aiCameraVC =  ShowAICameraMenuViewController()
-        aiCameraVC.onSelectedItem = { [weak self] item in
-            guard let item = item else { return }
-            switch item.id {
-            case .avatar:
-                ShowAgoraKitManager.shared.showBackgroudEffective()
-                break
-            case .rhythm_faceLock_L:
-                ShowAgoraKitManager.shared.swithRhythm(mode: .faceLock_L)
-            case .rhythm_heart:
-                ShowAgoraKitManager.shared.swithRhythm(mode: .heart)
-            case .rhythm_portrait:
-                ShowAgoraKitManager.shared.swithRhythm(mode: .portrait)
-            default:
-                break
-            }
-        }
-        aiCameraVC.onDeSelectedItem = { [weak self] item in
-            guard let item = item else { return }
-            switch item.id {
-            case .avatar:
-                break
-            case .rhythm_faceLock_L, .rhythm_heart, .rhythm_portrait:
-                ShowAgoraKitManager.shared.enableRhythm(false)
-            default:
-                break
-            }
-        }
-        return aiCameraVC
+        ShowAICameraMenuViewController()
     }()
     
     private lazy var realTimeView: ShowRealTimeDataView = {
@@ -290,14 +265,6 @@ class ShowLiveViewController: UIViewController {
             self._subscribeServiceEvent()
             AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self)
         }
-//        loadScene()
-    }
-    
-    func loadScene(){
-        guard let path = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).first else {
-            return
-        }
-        ShowAgoraKitManager.shared.loadScene(scenePath: "\(path)/assets/AREffect")
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -326,6 +293,7 @@ class ShowLiveViewController: UIViewController {
     }
     
     func leaveRoom(){
+        aiCameraMenuVC.currentItem = nil
         ShowAgoraKitManager.shared.removeRtcDelegate(delegate: self, roomId: roomId)
         ShowAgoraKitManager.shared.cleanCapture()
         ShowBeautyFaceVC.resetData()

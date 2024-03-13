@@ -11,6 +11,7 @@ import UIKit
 import YYCategories
 import VideoLoaderAPI
 import AgoraCommon
+
 class ShowAgoraKitManager: NSObject {
     private static var _sharedManager: ShowAgoraKitManager?
     static var shared: ShowAgoraKitManager {
@@ -28,6 +29,9 @@ class ShowAgoraKitManager: NSObject {
     // 是否开启绿幕功能
     static var isOpenGreen: Bool = false
     static var isBlur: Bool = false
+
+    static let disableVirtualBgNotificaitonName = NSNotification.Name("disabelVirtualBgNotificaitonName")
+    static let disableVirtualBg360NotificaitonName = NSNotification.Name("disableVirtualBg360NotificaitonName")
     
     public let rtcParam = ShowRTCParams()
     public var deviceLevel: DeviceLevel = .medium
@@ -35,10 +39,15 @@ class ShowAgoraKitManager: NSObject {
     public var netCondition: NetCondition = .good
     public var performanceMode: PerformanceMode = .smooth
     
+    public var scenePath: String?
+    
     private var broadcasterConnection: AgoraRtcConnection?
     
     var sceneView: UIView?
     var metakit: MetaKitEngine?
+    var enableVirtualBg = false
+    
+    var enableVirtualBg360 = false 
     
 //    var exposureRangeX: Int?
 //    var exposureRangeY: Int?
@@ -90,6 +99,7 @@ class ShowAgoraKitManager: NSObject {
     }
     // 退出已加入的频道和子频道
     func leaveAllRoom() {
+        unloadScene()
         VideoLoaderApiImpl.shared.cleanCache()
         if let p = player {
             engine?.destroyMediaPlayer(p)
@@ -293,6 +303,7 @@ class ShowAgoraKitManager: NSObject {
         }
         let ret = engine.enableVirtualBackground(isOn, backData: source, segData: seg)
         showLogger.info("isOn = \(isOn), enableVirtualBackground ret = \(ret)")
+        enableVirtualBg = isOn
     }
     
     /// 设置虚拟背景
@@ -314,6 +325,7 @@ class ShowAgoraKitManager: NSObject {
             return
         }
         engine.enableVirtualBackground(isOn, backData: source, segData: seg)
+        enableVirtualBg = isOn
     }
     
     func updateChannelEx(channelId: String, options: AgoraRtcChannelMediaOptions) {

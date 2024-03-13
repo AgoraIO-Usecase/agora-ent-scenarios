@@ -14,15 +14,19 @@ enum AICameraMenuItemState: Int {
 }
 
 enum AICameraMenuItemID {
-    case rhythm_heart // 律动
-    case rhythm_portrait // 律动
-    case rhythm_front_back // 效果描述：焦距平缓但不均匀地变大再变小。
-    case rhythm_up_down  // 效果描述：镜头首先向上移动，然后再向下移动。
-    case rhythm_left_right // 效果描述：镜头首先向左移动，然后再向右移动。
+//    case rhythm_heart // 律动
+//    case rhythm_front_back // 效果描述：焦距平缓但不均匀地变大再变小。
+//    case rhythm_up_down  // 效果描述：镜头首先向上移动，然后再向下移动。
+//    case rhythm_left_right // 效果描述：镜头首先向左移动，然后再向右移动。
+//    case rhythm_faceLock_P// 效果描述：脸部被锁定在固定点位（视频画面中上部 2/5 处）
     case rhythm_faceLock_L // 效果描述：脸部被锁定在视频中间。
-    case rhythm_faceLock_P// 效果描述：脸部被锁定在固定点位（视频画面中上部 2/5 处）
-    case avatar //
-
+    case rhythm_portrait // AI律动
+    case face_border_light // 人像边缘光
+    case ad_light // 广告灯
+    case ai_3d_light // ai3D打光
+    case ai_3d_light_virtual_bg // 3D打光+虚拟背景
+    case polar_light // 极光
+    
 }
 
 class AICameraMenuItem: NSObject {
@@ -34,22 +38,21 @@ class AICameraMenuItem: NSObject {
     var icon: String {
         get{
             switch id {
-            case .rhythm_heart:
-                "show_aicamera_avatar"
+
             case .rhythm_portrait:
-                "show_aicamera_avatar"
-            case .rhythm_front_back:
-                "show_aicamera_avatar"
-            case .rhythm_up_down:
-                "show_aicamera_avatar"
-            case .rhythm_left_right:
-                "show_aicamera_avatar"
+                "show_aicamera_rhythm_portrait"
             case .rhythm_faceLock_L:
-                "show_aicamera_avatar"
-            case .rhythm_faceLock_P:
-                "show_aicamera_avatar"
-            case .avatar:
-                "show_aicamera_avatar"
+                "show_aicamera_rhythm_faceLock_L"
+            case .face_border_light:
+                "show_aicamera_face_border_light"
+            case .ad_light:
+                "show_aicamera_ad_light"
+            case .ai_3d_light:
+                "show_aicamera_ai_3d_light"
+            case .ai_3d_light_virtual_bg:
+                "show_aicamera_3d_light_virtual_bg"
+            case .polar_light:
+                "show_aicamera_polar_light"
             }
         }
     }
@@ -57,21 +60,19 @@ class AICameraMenuItem: NSObject {
     var state: AICameraMenuItemState {
         get{
             switch id {
-            case .rhythm_heart:
-                return .done
             case .rhythm_portrait:
-                return .done
-            case .rhythm_front_back:
-                return .done
-            case .rhythm_up_down:
-                return .done
-            case .rhythm_left_right:
                 return .done
             case .rhythm_faceLock_L:
                 return .done
-            case .rhythm_faceLock_P:
-                return .done
-            case .avatar:
+            case .face_border_light:
+                return _state
+            case .ad_light:
+                return _state
+            case .ai_3d_light:
+                return _state
+            case .ai_3d_light_virtual_bg:
+                return _state
+            case .polar_light:
                 return _state
             }
         }
@@ -161,7 +162,7 @@ class ShowAICameraMenuCell: UICollectionViewCell {
         // 图片
         contentView.addSubview(iconImgView)
         iconImgView.snp.makeConstraints { make in
-            make.left.bottom.equalToSuperview()
+            make.center.equalToSuperview()
             make.width.height.equalTo(48)
         }
         

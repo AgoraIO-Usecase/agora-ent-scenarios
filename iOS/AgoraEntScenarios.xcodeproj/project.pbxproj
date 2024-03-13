@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		A80CC5EE2B999BDB000A3851 /* ShowAICameraMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80CC5ED2B999BDB000A3851 /* ShowAICameraMenuViewController.swift */; };
 		A80CC5F02B99A09C000A3851 /* ShowAICameraMenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80CC5EF2B99A09C000A3851 /* ShowAICameraMenuCell.swift */; };
-		A84FFAEC2B9F04D5003A6800 /* scenePath.bundle in Resources */ = {isa = PBXBuildFile; fileRef = A84FFAEB2B9F04D5003A6800 /* scenePath.bundle */; };
 		A851C5DD2AEF5F8400071F88 /* ShowDebug2TFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A851C5D82AEF5F8400071F88 /* ShowDebug2TFModel.swift */; };
 		A851C5DE2AEF5F8400071F88 /* ShowDebugAgoraKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A851C5D92AEF5F8400071F88 /* ShowDebugAgoraKitManager.swift */; };
 		A851C5DF2AEF5F8400071F88 /* ShowDebugSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A851C5DA2AEF5F8400071F88 /* ShowDebugSettingVC.swift */; };
@@ -752,7 +751,6 @@
 		63316DE582D577BACD7A4240 /* Pods-AgoraEntScenarios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.debug.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.debug.xcconfig"; sourceTree = "<group>"; };
 		A80CC5ED2B999BDB000A3851 /* ShowAICameraMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowAICameraMenuViewController.swift; sourceTree = "<group>"; };
 		A80CC5EF2B99A09C000A3851 /* ShowAICameraMenuCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowAICameraMenuCell.swift; sourceTree = "<group>"; };
-		A84FFAEB2B9F04D5003A6800 /* scenePath.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = scenePath.bundle; sourceTree = "<group>"; };
 		A851C5D82AEF5F8400071F88 /* ShowDebug2TFModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebug2TFModel.swift; sourceTree = "<group>"; };
 		A851C5D92AEF5F8400071F88 /* ShowDebugAgoraKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebugAgoraKitManager.swift; sourceTree = "<group>"; };
 		A851C5DA2AEF5F8400071F88 /* ShowDebugSettingVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebugSettingVC.swift; sourceTree = "<group>"; };
@@ -1836,7 +1834,6 @@
 			isa = PBXGroup;
 			children = (
 				A838B7352B9578750062355A /* Meta */,
-				A84FFAEB2B9F04D5003A6800 /* scenePath.bundle */,
 				A851C5D72AEF5F8400071F88 /* Debug */,
 				DD360FAD29B70CDC00CE7984 /* showResource.bundle */,
 				DD360FAE29B70CDC00CE7984 /* Utils */,
@@ -4264,7 +4261,6 @@
 				DD9EBFA22AD5512300B4551F /* VoiceChatRoomResource.bundle in Resources */,
 				DD8417C929090C520026B624 /* Template.bundle in Resources */,
 				DD619A6729E3E247008F63E4 /* SpatialAudioResource.bundle in Resources */,
-				A84FFAEC2B9F04D5003A6800 /* scenePath.bundle in Resources */,
 				E7054B422AEB987300AFD93C /* home_launch_text@2x.png in Resources */,
 				E301BDAA2AF4CB000089A79C /* KtvResource.bundle in Resources */,
 				E7054B3D2AEB97FB00AFD93C /* home_launch_logo@2x.png in Resources */,
