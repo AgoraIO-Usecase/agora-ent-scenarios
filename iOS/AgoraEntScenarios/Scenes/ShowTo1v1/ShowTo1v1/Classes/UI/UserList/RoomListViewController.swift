@@ -12,6 +12,7 @@ import AgoraRtcKit
 import VideoLoaderAPI
 import AgoraCommon
 import AgoraRtmKit
+import AudioScenarioApi
 
 private let randomRoomName = [
     "show_create_room_name1".showTo1v1Localization(),
@@ -59,6 +60,7 @@ class RoomListViewController: UIViewController {
     private var rtmManager: CallRtmManager?
     private var callState: CallStateType = .idle
     private let callApi = CallApiImpl()
+    private lazy var audioApi: AudioScenarioApi = AudioScenarioApi(rtcEngine: rtcEngine)
     
     private var roomList: [ShowTo1v1RoomInfo] = [] {
         didSet {
@@ -472,6 +474,7 @@ extension RoomListViewController {
     }
     
     private func _showBroadcasterVC(roomInfo: ShowTo1v1RoomInfo) {
+        audioApi.setAudioScenario(sceneType: .Show, audioScenarioType: .Show_Host)
         let isBroadcaster = roomInfo.uid == userInfo?.uid
         let vc = BroadcasterViewController()
         vc.callApi = self.callApi
@@ -526,6 +529,7 @@ extension RoomListViewController: CallApiListenerProtocol {
             
             if currentUid == "\(toUserId)" {
                 //被叫
+                audioApi.setAudioScenario(sceneType: .Chat, audioScenarioType: .Chat_Callee)
                 guard navigationController?.visibleViewController is BroadcasterViewController else {
                     //被叫不在直播页面，不能呼叫
                     callApi.reject(remoteUserId: fromUserId, reason: "not in broadcaster view") { _ in
@@ -553,6 +557,7 @@ extension RoomListViewController: CallApiListenerProtocol {
                 }
             } else if currentUid == "\(fromUserId)" {
                 //主叫
+                audioApi.setAudioScenario(sceneType: .Chat, audioScenarioType: .Chat_Caller)
                 connectedUserId = toUserId
                 //主叫userlist一定会有，因为需要点击
                 if let user = listView.roomList.first {$0.uid == "\(toUserId)"} {

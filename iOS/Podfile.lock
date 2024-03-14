@@ -97,6 +97,7 @@ PODS:
   - Pure1v1 (0.1.0):
     - AgoraCommon
     - AgoraSyncManager
+    - AudioScenarioApi
     - CallAPI
     - FLAnimatedImage
     - RTMSyncManager
@@ -122,6 +123,7 @@ PODS:
   - ShowTo1v1 (0.1.0):
     - AgoraCommon
     - AgoraSyncManager
+    - AudioScenarioApi
     - CallAPI
     - FLAnimatedImage
     - RTMSyncManager
@@ -287,13 +289,13 @@ SPEC CHECKSUMS:
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MJRefresh: 2fe7fb43a5167ceda20bb7e63f130c04fd1814a5
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
-  Pure1v1: bd4333cb46e59a2e1f9415c5c8629a19c70431d2
+  Pure1v1: 0cdb8bc0c2a9df9396332ec5abd0130b2b04033a
   RTMSyncManager: 115983b6a9c18da877d3849a836fbc989ca0fc35
   ScoreEffectUI: bf1195b4d41a73d43c236450b5d7f958989844aa
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
   SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
-  ShowTo1v1: 89e8204e1577b4b5a4fab942bae51ab0dbd339a5
+  ShowTo1v1: 85ff20a59e59fa04faaf1571712ecc0885fef8d7
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
@@ -309,4 +311,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 7258e3fa42e0671df7f4dcf622e5c60001d2e32b
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.14.3
