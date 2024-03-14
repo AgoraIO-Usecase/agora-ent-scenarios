@@ -89,34 +89,32 @@ class RoomListViewController: UIViewController {
         }
         listView.tapClosure = { [weak self] roomInfo in
             guard let roomInfo = roomInfo, let self = self else {return}
-            var success1: Bool = false
-            var success2: Bool = false
+            
             let date = Date()
             self.preJoinRoom = roomInfo
-            
-            self.renewTokens { success in
-                success1 = success
-                showTo1v1Print("[token]join broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
-                if success1, success2 {
-                    self._showBroadcasterVC(roomInfo: roomInfo)
-                }
-            }
-            
-            self.service?.joinRoom(roomInfo: roomInfo, completion: {[weak self] err in
+            self._setupAPIConfig {[weak self] error in
                 guard let self = self else {return}
-                success2 = err == nil ? true : false
-                if let error = err {
-                    if self.preJoinRoom?.roomId == roomInfo.roomId {
-                        self.navigationController?.popToViewController(self, animated: false)
-                        AUIToast.show(text: error.localizedDescription)
-                    }
+                if let error = error {
+                    AUIToast.show(text: error.localizedDescription)
+                    showTo1v1Error("tapClosure fail! setupApi error: \(error.localizedDescription)")
                     return
                 }
-                showTo1v1Print("[create scene]join broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
-                if success1, success2 {
+                
+                showTo1v1Print("[setupApi]join broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
+                self.service?.joinRoom(roomInfo: roomInfo, completion: {[weak self] err in
+                    guard let self = self else {return}
+                    if let error = err {
+                        if self.preJoinRoom?.roomId == roomInfo.roomId {
+                            self.navigationController?.popToViewController(self, animated: false)
+                            AUIToast.show(text: error.localizedDescription)
+                            showTo1v1Error("tapClosure fail! joinRoom error: \(error.localizedDescription)")
+                        }
+                        return
+                    }
+                    showTo1v1Print("[create scene]join broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
                     self._showBroadcasterVC(roomInfo: roomInfo)
-                }
-            })
+                })
+            }
         }
         listView.refreshBeginClousure = { [weak self] in
             self?._refreshAction()
@@ -232,6 +230,10 @@ extension RoomListViewController {
     }
     
     private func renewTokens(completion: ((Bool)->Void)?) {
+        if setupStatus.contains(.token), rtcToken.count > 0, rtmToken.count > 0 {
+            completion?(true)
+            return
+        }
         guard let userInfo = userInfo else {
             assert(false, "userInfo == nil")
             debugError("renewTokens fail,userInfo == nil")
@@ -261,6 +263,7 @@ extension RoomListViewController {
     
     private func _setupRtm(completion: @escaping (NSError?) -> Void) {
         if setupStatus.contains(.rtm) {
+            showTo1v1Error("_setupRtm fail! rtm already setup")
             completion(nil)
             return
         }
@@ -269,6 +272,8 @@ extension RoomListViewController {
             var error: NSError? = nil
             if let err = err {
                 error = NSError(domain: err.reason, code: err.errorCode.rawValue)
+                showTo1v1Error("_setupRtm fail! rtm login fail: \(err.localizedDescription)")
+                return
             }
             completion(error)
         }
@@ -392,14 +397,17 @@ extension RoomListViewController {
     }
     
     @objc func _refreshAction() {
+        let date = Date()
         _setupAPIConfig {[weak self] err in
             guard let self = self else {return}
             if let err = err {
                 self.listView.endRefreshing()
                 return
             }
+            showTo1v1Print("refresh setup api cost: \(Int64(-date.timeIntervalSinceNow * 1000))ms")
             self.service?.getRoomList {[weak self] list in
                 guard let self = self else {return}
+                showTo1v1Print("refresh get room list cost: \(Int64(-date.timeIntervalSinceNow * 1000))ms")
                 self.listView.endRefreshing()
                 let oldList = self.roomList
                 self.roomList = list
@@ -412,7 +420,6 @@ extension RoomListViewController {
                 }
             }
         }
-        
     }
     
     @objc private func _createAction() {
@@ -427,43 +434,35 @@ extension RoomListViewController {
             self.preJoinRoom = nil
             self.createRoomDialog?.isUserInteractionEnabled = false
             self.createRoomDialog?.isLoading = true
-            var success1: Bool = false
-            var createRoomInfo: ShowTo1v1RoomInfo? = nil
+            
             let date = Date()
-            let group = DispatchGroup()
-            group.enter()
-            self.renewTokens { success in
-                success1 = success
-                showTo1v1Print("[token]create broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
-                group.leave()
-            }
-            group.enter()
-            self.service?.createRoom(roomName: roomName) {[weak self] roomInfo, error in
-                defer {
-                    group.leave()
-                }
-                guard let self = self else {return}
+            self._setupAPIConfig {[weak self] error in
+                guard let self = self else { return }
+                showTo1v1Print("[setupApi]create broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
                 if let error = error {
-                    AUIToast.show(text: error.localizedDescription)
+                    showTo1v1Error("createAction fail! setupAPIConfig error: \(error.localizedDescription)")
                     return
                 }
-                showTo1v1Print("[create scene]create broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
-                createRoomInfo = roomInfo
-            }
-            group.notify(queue: DispatchQueue.main) {[weak self] in
-                self?.createRoomDialog?.isUserInteractionEnabled = true
-                self?.createRoomDialog?.isLoading = false
-                CreateRoomDialog.hidden()
-                guard let roomInfo = createRoomInfo else {return}
-                guard success1 else {
-                    self?.service?.leaveRoom(roomInfo: roomInfo, completion: { err in
-                    })
-                    return
+                self.service?.createRoom(roomName: roomName) {[weak self] roomInfo, error in
+                    guard let self = self else {return}
+                    
+                    self.createRoomDialog?.isLoading = false
+                    self.createRoomDialog?.isUserInteractionEnabled = true
+                    CreateRoomDialog.hidden()
+                    
+                    if let error = error {
+                        AUIToast.show(text: error.localizedDescription)
+                        showTo1v1Error("createAction fail! createRoom error: \(error.localizedDescription)")
+                        return
+                    }
+                    showTo1v1Print("[create scene]create broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
+                    guard let roomInfo = roomInfo else {
+                        showTo1v1Error("createAction fail! roomInfo == nil")
+                        return
+                    }
+                    self._showBroadcasterVC(roomInfo: roomInfo)
                 }
-                self?._showBroadcasterVC(roomInfo: roomInfo)
             }
-            
-            
         }, randomClosure: {
             let roomNameIdx = Int(arc4random()) % randomRoomName.count
             let roomName = randomRoomName[roomNameIdx]
@@ -629,6 +628,7 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
             assert(false, "userInfo == nil")
             return
         }
+        self.setupStatus.remove(.token)
         showTo1v1Print("tokenPrivilegeWillExpire")
         renewTokens {[weak self, weak engine] success in
             guard let self = self, let engine = engine else {return}
@@ -653,14 +653,15 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
 
 extension RoomListViewController: ICallRtmManagerListener {
     func onConnected() {
-        
+        showTo1v1Warn("onConnected")
     }
     
     func onDisconnected() {
-        
+        showTo1v1Warn("onDisconnected")
     }
     
     func onConnectionLost() {
+        showTo1v1Warn("onConnectionLost")
         AUIToast.show(text: "call_toast_disconnect".showTo1v1Localization())
         self.setupStatus.remove(.rtm)
         _setupRtm { _ in
@@ -668,6 +669,7 @@ extension RoomListViewController: ICallRtmManagerListener {
     }
     
     func onTokenPrivilegeWillExpire(channelName: String) {
+        showTo1v1Warn("onTokenPrivilegeWillExpire")
         self.rtcEngine(rtcEngine, tokenPrivilegeWillExpire: "")
     }
 }

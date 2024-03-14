@@ -35,7 +35,7 @@ PODS:
     - Zip
   - AudioScenarioApi (0.1.0):
     - AgoraRtcEngine_Special_iOS
-  - AUIKitCore/UI (0.5.3):
+  - AUIKitCore/UI (1.0.0):
     - AgoraLyricsScore
     - MJRefresh
     - ScoreEffectUI
@@ -69,18 +69,18 @@ PODS:
   - fuLib (1.0):
     - FURenderKit
   - FURenderKit (8.9.2)
-  - HXPhotoPicker/Camera/Lite (4.1.5):
+  - HXPhotoPicker/Camera/Lite (4.1.7):
     - HXPhotoPicker/Core
-  - HXPhotoPicker/Core (4.1.5)
-  - HXPhotoPicker/Editor/Lite (4.1.5):
+  - HXPhotoPicker/Core (4.1.7)
+  - HXPhotoPicker/Editor/Lite (4.1.7):
     - HXPhotoPicker/EditorView/Lite
-  - HXPhotoPicker/EditorView/Lite (4.1.5):
+  - HXPhotoPicker/EditorView/Lite (4.1.7):
     - HXPhotoPicker/Core
-  - HXPhotoPicker/Lite (4.1.5):
+  - HXPhotoPicker/Lite (4.1.7):
     - HXPhotoPicker/Camera/Lite
     - HXPhotoPicker/Editor/Lite
     - HXPhotoPicker/Picker/Lite
-  - HXPhotoPicker/Picker/Lite (4.1.5):
+  - HXPhotoPicker/Picker/Lite (4.1.7):
     - HXPhotoPicker/Core
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
@@ -132,7 +132,7 @@ PODS:
     - VideoLoaderAPI
     - YYCategories
     - YYModel
-  - SnapKit (5.6.0)
+  - SnapKit (5.7.1)
   - SocketRocket (0.7.0)
   - SSZipArchive (2.4.3)
   - SVGAPlayer (2.5.7):
@@ -270,7 +270,7 @@ SPEC CHECKSUMS:
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
   AGResourceManager: 0a7bdde28f8d5505e1dea358ecaac315b88af1ca
   AudioScenarioApi: 9dd859e4de75140b5086725f493315d47d935e14
-  AUIKitCore: fc5df86f26781fe6b76b4ced98f94da3872cf815
+  AUIKitCore: 9f0208a71efcc93830f80d411eae5df6ec0e7a42
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   bytedEffect: 3d51767425dcaa67d2d6162c402225764d3c2156
   CallAPI: d1ef70d21ee5f479eebb32f41dfed32040464dda
@@ -278,7 +278,7 @@ SPEC CHECKSUMS:
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   fuLib: 43b6990d34caa47e0f12a61db57fe9bd2372f584
   FURenderKit: c5dad5d2f8da656d1c6f91910cf8a34905342380
-  HXPhotoPicker: a7f554cf87888724394c19870c13544ac7b65245
+  HXPhotoPicker: 541da99aa88b8eb0b6222ddfe37cacbd06d73300
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
   LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb
@@ -294,7 +294,7 @@ SPEC CHECKSUMS:
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
   SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
   ShowTo1v1: 89e8204e1577b4b5a4fab942bae51ab0dbd339a5
-  SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
+  SnapKit: d612e99e678a2d3b95bf60b0705ed0a35c03484a
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
