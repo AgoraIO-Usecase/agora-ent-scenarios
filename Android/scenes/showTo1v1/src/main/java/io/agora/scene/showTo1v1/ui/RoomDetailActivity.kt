@@ -495,8 +495,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
             }
 
-            override fun onUserListDidChanged(userList: List<ShowTo1v1UserInfo>) {
-                binding.tvNumCount.text = userList.size.number2K()
+            override fun onUserListDidChanged(userNum: Int) {
+                binding.tvNumCount.text = userNum.number2K()
             }
 
             override fun onRoomDidDestroy(roomInfo: ShowTo1v1RoomInfo) {

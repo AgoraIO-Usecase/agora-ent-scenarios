@@ -7,10 +7,8 @@ import android.util.Log
 import io.agora.rtm.*
 import io.agora.rtmsyncmanager.ISceneResponse
 import io.agora.rtmsyncmanager.SyncManager
-import io.agora.rtmsyncmanager.model.AUICommonConfig
-import io.agora.rtmsyncmanager.model.AUIRoomContext
-import io.agora.rtmsyncmanager.model.AUIRoomInfo
-import io.agora.rtmsyncmanager.model.AUIUserThumbnailInfo
+import io.agora.rtmsyncmanager.model.*
+import io.agora.rtmsyncmanager.service.IAUIUserService
 import io.agora.rtmsyncmanager.service.http.HttpManager
 import io.agora.rtmsyncmanager.service.room.AUIRoomManager
 import io.agora.rtmsyncmanager.utils.AUILogger
@@ -31,7 +29,7 @@ class ShowTo1v1ServiceImpl constructor(
     context: Context,
     private val rtmClient: RtmClient,
     private val user: ShowTo1v1UserInfo,
-) : ShowTo1v1ServiceProtocol, ISceneResponse {
+) : ShowTo1v1ServiceProtocol, ISceneResponse, IAUIUserService.AUIUserRespObserver {
 
     companion object {
         private const val TAG = "Show1v1_LOG"
@@ -51,6 +49,10 @@ class ShowTo1v1ServiceImpl constructor(
     private val roomManager = AUIRoomManager()
 
     private var roomList = emptyList<AUIRoomInfo>()
+
+    private var userList: List<AUIUserInfo> = emptyList()
+
+    private var listener: ShowTo1v1ServiceListenerProtocol? = null
 
     init {
         HttpManager.setBaseURL(BuildConfig.ROOM_MANAGER_SERVER_HOST)
@@ -132,6 +134,7 @@ class ShowTo1v1ServiceImpl constructor(
                 completion.invoke(null)
             }
         }
+        scene.userService.registerRespObserver(this)
     }
 
     override fun leaveRoom(roomInfo: ShowTo1v1RoomInfo, completion: (error: Exception?) -> Unit) {
@@ -176,7 +179,7 @@ class ShowTo1v1ServiceImpl constructor(
     }
 
     override fun subscribeListener(listener: ShowTo1v1ServiceListenerProtocol) {
-        //TODO("Not yet implemented")
+        this.listener = listener
     }
 
     // --------------------- inner ---------------------
@@ -192,5 +195,27 @@ class ShowTo1v1ServiceImpl constructor(
     override fun onSceneDestroy(roomId: String) {
         roomManager.destroyRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomId) {
         }
+    }
+
+    // -------- IAUIUserService.AUIUserRespObserver ----------
+    override fun onRoomUserSnapshot(roomId: String, userList: MutableList<AUIUserInfo>?) {
+        userList?.let {
+            this.userList = it
+        }
+    }
+
+    override fun onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {
+        ShowTo1v1Logger.d(TAG, "onRoomUserEnter, roomId:$roomId, userInfo:$userInfo")
+        listener?.onUserListDidChanged(userList.size)
+    }
+
+    override fun onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
+        ShowTo1v1Logger.d(TAG, "onRoomUserLeave, roomId:$roomId, userInfo:$userInfo")
+        listener?.onUserListDidChanged(userList.size)
+    }
+
+    override fun onRoomUserUpdate(roomId: String, userInfo: AUIUserInfo) {
+        super.onRoomUserUpdate(roomId, userInfo)
+        listener?.onUserListDidChanged(userList.size)
     }
 }

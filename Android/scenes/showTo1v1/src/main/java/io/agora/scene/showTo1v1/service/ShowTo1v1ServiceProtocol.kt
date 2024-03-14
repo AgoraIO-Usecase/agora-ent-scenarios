@@ -27,7 +27,7 @@ interface ShowTo1v1ServiceListenerProtocol {
     fun onNetworkStatusChanged(status: ShowTo1v1ServiceNetworkStatus)
 
     // 用户变化
-    fun onUserListDidChanged(userList: List<ShowTo1v1UserInfo>)
+    fun onUserListDidChanged(userNum: Int)
 
     // 房间销毁
     fun onRoomDidDestroy(roomInfo: ShowTo1v1RoomInfo)
