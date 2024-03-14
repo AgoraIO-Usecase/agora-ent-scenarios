@@ -20,15 +20,6 @@ extension ShowAgoraKitManager {
     
     func initializeMeta(){
         engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit",extension: "metakit", key:"initialize", value:"{}")
-        enableAIVirtualBackground()
-    }
-    
-    private func enableAIVirtualBackground(){
-        let bg_src = AgoraVirtualBackgroundSource()
-        bg_src.backgroundSourceType = .none
-        let seg_prop = AgoraSegmentationProperty()
-        seg_prop.modelType = .agoraAi
-        engine?.enableVirtualBackground(true, backData: bg_src, segData: seg_prop)
     }
     
     //3. 等待插件注册完成后加载资源
@@ -148,6 +139,7 @@ extension ShowAgoraKitManager {
         let light_info = String(data: light_data!, encoding: String.Encoding.utf8)
         
         // 根据 JSON 配置添加人像边缘火焰效果
+        enableAIVirtualBackground()
         engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit",extension: "metakit",key: "setEffectVideo",value: light_info!)
     }
     
@@ -181,6 +173,15 @@ extension ShowAgoraKitManager {
 }
 
 extension ShowAgoraKitManager {
+    
+    private func enableAIVirtualBackground(){
+        let bg_src = AgoraVirtualBackgroundSource()
+        bg_src.backgroundSourceType = .none
+        let seg_prop = AgoraSegmentationProperty()
+        seg_prop.modelType = .agoraAi
+        engine?.enableVirtualBackground(true, backData: bg_src, segData: seg_prop)
+    }
+    
     // 开关特效
     func setupBackground360(enabled:Bool) {
         var bg_dict : [String : Any] = ["mode": "off"]
