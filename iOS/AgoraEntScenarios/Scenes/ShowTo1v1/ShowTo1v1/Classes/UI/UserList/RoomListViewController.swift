@@ -401,6 +401,7 @@ extension RoomListViewController {
         _setupAPIConfig {[weak self] err in
             guard let self = self else {return}
             if let err = err {
+                showTo1v1Print("refresh _setupAPIConfig fail: \(err.localizedDescription)")
                 self.listView.endRefreshing()
                 return
             }
