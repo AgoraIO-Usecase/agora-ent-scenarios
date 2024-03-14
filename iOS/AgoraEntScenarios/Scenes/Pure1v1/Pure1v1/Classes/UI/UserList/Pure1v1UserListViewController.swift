@@ -647,6 +647,8 @@ extension Pure1v1UserListViewController: ICallRtmManagerListener {
         AUIToast.show(text: "call_toast_disconnect".pure1v1Localization())
         self.setupStatus.remove(.rtm)
         //掉线了，需要重新enter，否则对端看不到
+        self.service?.leaveRoom(completion: { _ in
+        })
         _autoRefrshAction()
     }
     
