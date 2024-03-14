@@ -89,10 +89,17 @@ class AICameraMenuItem: NSObject {
 
 class ShowAICameraMenuCell: UICollectionViewCell {
     
+    private var rotateAnimation: CABasicAnimation?
+    
     private var downloadState: AICameraMenuItemState = .normal {
         didSet{
             downloadButton.isSelected = downloadState == .loading
             downloadButton.isHidden = downloadState == .done
+//            if downloadState == .loading {
+//                startRotationAnimation()
+//            }else{
+//                stopAnimation()
+//            }
         }
     }
     
@@ -162,7 +169,8 @@ class ShowAICameraMenuCell: UICollectionViewCell {
         // 图片
         contentView.addSubview(iconImgView)
         iconImgView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
+            make.centerX.equalToSuperview()
+            make.bottom.equalToSuperview()
             make.width.height.equalTo(48)
         }
         
@@ -177,6 +185,7 @@ class ShowAICameraMenuCell: UICollectionViewCell {
         downloadButton.snp.makeConstraints { make in
             make.centerX.equalTo(iconImgView.snp.right)
             make.centerY.equalTo(iconImgView.snp.top)
+            make.width.height.equalTo(16)
         }
     }
     
@@ -185,5 +194,29 @@ class ShowAICameraMenuCell: UICollectionViewCell {
     @objc func didClickDownloadButton() {
         if downloadState == .loading {return}
         onClickDownloadButton?(self.downloadState)
+    }
+    
+    private func startRotationAnimation() {
+        // 创建动画对象
+        rotateAnimation = CABasicAnimation(keyPath: "transform.rotation")
+        
+        // 设置动画属性
+        rotateAnimation?.fromValue = 0
+        rotateAnimation?.toValue = CGFloat.pi * 2
+        rotateAnimation?.duration = 2.0 // 旋转一圈的时间
+        rotateAnimation?.repeatCount = .infinity // 无限循环
+        
+        // 添加动画到按钮的图层上
+        downloadButton.imageView?.layer.add(rotateAnimation!, forKey: "rotationAnimation")
+    }
+    
+    private func stopAnimation() {
+        // 移除动画
+        downloadButton.imageView?.layer.removeAnimation(forKey: "rotationAnimation")
+        
+        // 恢复图层原始状态
+        if let presentationLayer = downloadButton.imageView?.layer.presentation() {
+            downloadButton.imageView?.layer.transform = presentationLayer.transform
+        }
     }
 }
