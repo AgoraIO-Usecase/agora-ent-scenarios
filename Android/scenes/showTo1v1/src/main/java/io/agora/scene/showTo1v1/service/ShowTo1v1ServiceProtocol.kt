@@ -38,21 +38,6 @@ interface ShowTo1v1ServiceListenerProtocol {
 
 interface ShowTo1v1ServiceProtocol {
 
-    companion object {
-
-        private val instance by lazy {
-            ShowTo1v1ServiceImpl(ShowTo1v1Manger.getImpl().mCurrentUser) {
-                if (it.message != "action error") {
-                    ToastUtils.showToast(it.message)
-                }
-            }
-        }
-
-        fun getImplInstance(): ShowTo1v1ServiceProtocol {
-            return instance
-        }
-    }
-
     // 创建房间
     fun createRoom(roomName: String, completion: (error: Exception?, roomInfo: ShowTo1v1RoomInfo?) -> Unit)
 

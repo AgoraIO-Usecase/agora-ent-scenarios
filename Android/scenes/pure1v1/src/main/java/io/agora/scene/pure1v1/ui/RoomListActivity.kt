@@ -252,6 +252,10 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         Pure1v1Logger.d(tag, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
     }
 
+    override fun canJoinRtcOnCalling(eventInfo: Map<String, Any>): Boolean {
+        return true
+    }
+
     // 监听 callapi 内的状态变化驱动业务行为
     override fun onCallStateChanged(
         state: CallStateType,

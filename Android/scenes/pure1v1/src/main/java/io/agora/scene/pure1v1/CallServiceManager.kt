@@ -20,6 +20,7 @@ import io.agora.rtm.RtmConfig
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.pure1v1.callapi.signalClient.createRtmSignalClient
 import io.agora.scene.pure1v1.service.Pure1v1ServiceImp
 import io.agora.scene.pure1v1.service.UserInfo
 
@@ -119,7 +120,7 @@ class CallServiceManager {
             BuildConfig.AGORA_APP_ID,
             user.userId.toInt(),
             engine,
-            rtmClient
+            createRtmSignalClient(rtmClient!!)
         ))
 
         // 获取万能Token
@@ -172,7 +173,7 @@ class CallServiceManager {
             BuildConfig.AGORA_APP_ID,
             uid.toInt(),
             rtcEngine,
-            null
+            createRtmSignalClient(rtmClient!!)
         ))
     }
 

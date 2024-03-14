@@ -95,9 +95,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     private var mDashboardFragment: DashboardFragment? = null
 
-    private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
     private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
     private val mRtcEngine by lazy { mShowTo1v1Manger.mRtcEngine }
+    private val mService by lazy { mShowTo1v1Manger.mService }
 
     private val mRoomInfo: ShowTo1v1RoomInfo by lazy {
         (intent.getParcelableExtra(EXTRA_ROOM_DETAIL_INFO) as? ShowTo1v1RoomInfo)!!
@@ -482,7 +482,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     //================== Service Operation ===============
     private fun initServiceWithJoinRoom() {
-        mService.joinRoom(mRoomInfo, completion = { error ->
+        mService?.joinRoom(mRoomInfo, completion = { error ->
             if (error == null) { // success
 
             } else { //failed
@@ -490,7 +490,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 onBackPressed()
             }
         })
-        mService.subscribeListener(object : ShowTo1v1ServiceListenerProtocol {
+        mService?.subscribeListener(object : ShowTo1v1ServiceListenerProtocol {
             override fun onNetworkStatusChanged(status: ShowTo1v1ServiceNetworkStatus) {
 
             }
@@ -581,7 +581,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     }
 
     private fun destroy() {
-        mService.leaveRoom(mRoomInfo, completion = {})
+        mService?.leaveRoom(mRoomInfo, completion = {})
         if (isRoomOwner) {
             mRtcEngine.leaveChannelEx(mMainRtcConnection)
             mRtcEngine.stopPreview()
@@ -769,8 +769,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
         }
 
-        override fun onCallEventChanged(event: CallEvent) {
-            super.onCallEventChanged(event)
+        override fun onCallEventChanged(event: CallEvent, eventReason: String?) {
+            super.onCallEventChanged(event, eventReason)
             when (event) {
                 CallEvent.LocalLeave -> {
                     onHangup()
@@ -793,6 +793,10 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         ) {
             super.onCallError(errorEvent, errorType, errorCode, message)
             ShowTo1v1Logger.d(TAG, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
+        }
+
+        override fun canJoinRtcOnCalling(eventInfo: Map<String, Any>): Boolean {
+            return true
         }
 
         override fun onCallStateChanged(
