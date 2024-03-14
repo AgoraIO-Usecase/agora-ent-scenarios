@@ -11,6 +11,8 @@ import CallAPI
 import AgoraRtcKit
 import VideoLoaderAPI
 import AgoraCommon
+import AgoraRtmKit
+
 private let randomRoomName = [
     "show_create_room_name1".showTo1v1Localization(),
     "show_create_room_name2".showTo1v1Localization(),
@@ -24,24 +26,57 @@ private let randomRoomName = [
     "show_create_room_name10".showTo1v1Localization(),
 ]
 
+//当前api设置的状态
+struct ShowTo1v1APISetupStatus: OptionSet {
+    let rawValue: Int
+    
+    static let idle = ShowTo1v1APISetupStatus(rawValue: 1 << 0)
+    static let token = ShowTo1v1APISetupStatus(rawValue: 1 << 1)
+    static let rtm = ShowTo1v1APISetupStatus(rawValue: 1 << 2)
+    static let syncService = ShowTo1v1APISetupStatus(rawValue: 1 << 3)
+    static let api = ShowTo1v1APISetupStatus(rawValue: 1 << 4)
+}
+
 private let kShowGuideAlreadyKey = "already_show_guide_show1v1"
 class RoomListViewController: UIViewController {
     var userInfo: ShowTo1v1UserInfo?
     private let prepareConfig = PrepareConfig()
+    private var setupStatus: ShowTo1v1APISetupStatus = .idle
+    
     private weak var preJoinRoom: ShowTo1v1RoomInfo?
-    private weak var callDialog: ShowTo1v1Dialog?
     private var connectedUserId: UInt?
     private var connectedChannelId: String?
-    private weak var createRoomDialog: CreateRoomDialog?
-    private var rtcToken = ""
+    private var rtcToken = "" {
+        didSet {
+            //refresh room info token
+            let list = roomList
+            self.roomList = list
+        }
+    }
     private var rtmToken = ""
     private lazy var rtcEngine: AgoraRtcEngineKit = _createRtcEngine()
-    private var callState: CallStateType = .idle
-    private lazy var callVC: CallViewController = CallViewController()
+    private lazy var rtmClient: AgoraRtmClientKit = createRtmClient(appId: showTo1v1AppId!, userId: userInfo!.uid)
     private var rtmManager: CallRtmManager?
+    private var callState: CallStateType = .idle
     private let callApi = CallApiImpl()
+    
+    private var roomList: [ShowTo1v1RoomInfo] = [] {
+        didSet {
+            roomList.forEach { info in
+                info.token = self.rtcToken
+            }
+            self.listView.roomList = roomList
+            noDataView.isHidden = roomList.count > 0
+            self._showGuideIfNeed()
+        }
+    }
+    
+    //UI
+    private weak var callDialog: ShowTo1v1Dialog?
+    private weak var createRoomDialog: CreateRoomDialog?
+    private lazy var callVC: CallViewController = CallViewController()
     private lazy var naviBar = NaviBar(frame: CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop, width: self.view.aui_width, height: 44))
-    private lazy var service: ShowTo1v1ServiceProtocol = ShowTo1v1ServiceImp(appId: showTo1v1AppId!, user: userInfo)
+    private var service: ShowTo1v1ServiceProtocol?
     private lazy var noDataView: RoomNoDataView = {
         let view = RoomNoDataView(frame: self.view.bounds)
         return view
@@ -56,17 +91,18 @@ class RoomListViewController: UIViewController {
             guard let roomInfo = roomInfo, let self = self else {return}
             var success1: Bool = false
             var success2: Bool = false
-            
+            let date = Date()
             self.preJoinRoom = roomInfo
             
             self.renewTokens { success in
                 success1 = success
+                showTo1v1Print("[token]join broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
                 if success1, success2 {
                     self._showBroadcasterVC(roomInfo: roomInfo)
                 }
             }
             
-            self.service.joinRoom(roomInfo: roomInfo, completion: {[weak self] err in
+            self.service?.joinRoom(roomInfo: roomInfo, completion: {[weak self] err in
                 guard let self = self else {return}
                 success2 = err == nil ? true : false
                 if let error = err {
@@ -76,6 +112,7 @@ class RoomListViewController: UIViewController {
                     }
                     return
                 }
+                showTo1v1Print("[create scene]join broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
                 if success1, success2 {
                     self._showBroadcasterVC(roomInfo: roomInfo)
                 }
@@ -169,6 +206,31 @@ class RoomListViewController: UIViewController {
 }
 
 extension RoomListViewController {
+    private func _setupAPIConfig(completion: @escaping (NSError?) -> Void) {
+        renewTokens {[weak self] success in
+            guard let self = self else { return }
+            guard success else {
+                completion(NSError(domain: "generate token fail", code: -1))
+                return
+            }
+            self.setupStatus = [self.setupStatus, .token]
+            self._setupRtm(completion: {[weak self] err in
+                guard let self = self else { return }
+                if let err = err {
+                    completion(err)
+                    return
+                }
+                self.setupStatus = [self.setupStatus, .rtm]
+                self._setupService()
+                self.setupStatus = [self.setupStatus, .syncService]
+                self._setupAPI()
+                self.setupStatus = [self.setupStatus, .api]
+                
+                completion(nil)
+            })
+        }
+    }
+    
     private func renewTokens(completion: ((Bool)->Void)?) {
         guard let userInfo = userInfo else {
             assert(false, "userInfo == nil")
@@ -192,35 +254,57 @@ extension RoomListViewController {
             }
             self.rtcToken = rtcToken
             self.rtmToken = rtmToken
-            self.listView.roomList.forEach { info in
-                info.token = rtcToken
-            }
-            self.listView.roomList = self.listView.roomList
             self.debugInfo("renewTokens success")
             completion?(true)
         }
     }
-    private func _setupAPI() {
-        guard let userInfo = userInfo else {
-            assert(false, "userInfo == nil")
+    
+    private func _setupRtm(completion: @escaping (NSError?) -> Void) {
+        if setupStatus.contains(.rtm) {
+            completion(nil)
             return
         }
         
-        renewTokens {[weak self] flag in
-            guard let self = self else {return}
-            guard flag else { return }
-            let userId = self.userInfo?.getUIntUserId() ?? 0
-            let rtmManager = CallRtmManager(appId: showTo1v1AppId!,
-                                            userId: "\(userId)",
-                                            rtmClient: nil)
-            rtmManager.delegate = self
-            self.rtmManager = rtmManager
-            rtmManager.login(rtmToken: self.rtmToken) {[weak self] error in
-                if let error = error { return }
-                self?._initCallAPI(completion: { err in
-                })
+        rtmClient.login(self.rtmToken) { resp, err in
+            var error: NSError? = nil
+            if let err = err {
+                error = NSError(domain: err.reason, code: err.errorCode.rawValue)
             }
+            completion(error)
         }
+    }
+    
+    private func _setupService() {
+        guard setupStatus.contains(.rtm), let userInfo = userInfo else {
+            showTo1v1Error("_setupService fail! rtm not initizlized or userInfo == nil")
+            return
+        }
+        if setupStatus.contains(.syncService) {
+            showTo1v1Warn("_setupService fail! service already setup")
+            return
+        }
+        let service = ShowTo1v1ServiceImp(appId: showTo1v1AppId!, user: userInfo, rtmClient: rtmClient)
+        self.service = service
+    }
+    
+    private func _setupAPI() {
+        guard setupStatus.contains(.rtm), let userInfo = userInfo else {
+            showTo1v1Error("_setupAPI fail! rtm not initizlized or userInfo == nil")
+            return
+        }
+        if setupStatus.contains(.api) {
+            showTo1v1Warn("_setupAPI fail! service already setup")
+            return
+        }
+        
+        let userId = self.userInfo?.getUIntUserId() ?? 0
+        let rtmManager = CallRtmManager(appId: showTo1v1AppId!,
+                                        userId: "\(userId)",
+                                        rtmClient: rtmClient)
+        rtmManager.delegate = self
+        self.rtmManager = rtmManager
+        _initCallAPI(completion: { err in
+        })
         
         let config = VideoLoaderConfig()
         config.rtcEngine = rtcEngine
@@ -229,8 +313,6 @@ extension RoomListViewController {
     }
     
     private func _initCallAPI(completion: @escaping ((Error?)->())) {
-        guard let roomId = userInfo?.get1V1ChannelId() else { return  }
-        
         let signalClient = CallRtmSignalClient(rtmClient: self.rtmManager!.getRtmClient())
         
         callApi.deinitialize {
@@ -247,7 +329,7 @@ extension RoomListViewController {
         
         prepareConfig.rtcToken = rtcToken
 //        prepareConfig.rtmToken = rtmToken
-        prepareConfig.roomId = roomId
+        prepareConfig.roomId = NSString.withUUID()
         prepareConfig.localView =  callVC.localCanvasView.canvasView
         prepareConfig.remoteView = callVC.remoteCanvasView.canvasView
         prepareConfig.autoJoinRTC = false  // 如果期望立即加入自己的RTC呼叫频道，则需要设置为true
@@ -273,10 +355,10 @@ extension RoomListViewController {
     
     private func _call(room: ShowTo1v1RoomInfo) {
         if room.uid == userInfo?.uid {return}
-        guard rtcToken.count > 0, rtmToken.count > 0 else {
-            renewTokens { success in
-                self._call(room: room)
+        if callState == .idle || callState == .failed {
+            _setupAPIConfig { _ in
             }
+            AUIToast.show(text: "call_not_init".showTo1v1Localization())
             return
         }
         
@@ -299,7 +381,8 @@ extension RoomListViewController {
         }
         rtcEngine.leaveChannel()
         AgoraRtcEngineKit.destroy()
-        rtmManager?.logout()
+        rtmClient.logout()
+        rtmClient.destroy()
         VideoLoaderApiImpl.shared.cleanCache()
         self.navigationController?.popViewController(animated: true)
     }
@@ -309,30 +392,27 @@ extension RoomListViewController {
     }
     
     @objc func _refreshAction() {
-        service.getRoomList {[weak self] list in
+        _setupAPIConfig {[weak self] err in
             guard let self = self else {return}
-            self.listView.endRefreshing()
-            let roomList = list
-            let oldList = self.listView.roomList
-            roomList.forEach { info in
-                info.token = self.rtcToken
+            if let err = err {
+                self.listView.endRefreshing()
+                return
             }
-            self.listView.roomList = roomList
-            noDataView.isHidden = roomList.count > 0
-            self._showGuideIfNeed()
-            VideoLoaderApiImpl.shared.cleanCache()
-            oldList.forEach { info in
-                VideoLoaderApiImpl.shared.removeRTCListener(anchorId: info.roomId, listener: self)
+            self.service?.getRoomList {[weak self] list in
+                guard let self = self else {return}
+                self.listView.endRefreshing()
+                let oldList = self.roomList
+                self.roomList = list
+                VideoLoaderApiImpl.shared.cleanCache()
+                oldList.forEach { info in
+                    VideoLoaderApiImpl.shared.removeRTCListener(anchorId: info.roomId, listener: self)
+                }
+                roomList.forEach { info in
+                    VideoLoaderApiImpl.shared.addRTCListener(anchorId: info.roomId, listener: self)
+                }
             }
-            roomList.forEach { info in
-                VideoLoaderApiImpl.shared.addRTCListener(anchorId: info.roomId, listener: self)
-            }
-            
-            //TODO: 过期
-            //self.rtcEngine(self.rtcEngine, tokenPrivilegeWillExpire: "")
-            
-//            AUIToast.show(text: "room_list_refresh_tips".showTo1v1Localization())
         }
+        
     }
     
     @objc private func _createAction() {
@@ -349,14 +429,16 @@ extension RoomListViewController {
             self.createRoomDialog?.isLoading = true
             var success1: Bool = false
             var createRoomInfo: ShowTo1v1RoomInfo? = nil
+            let date = Date()
             let group = DispatchGroup()
             group.enter()
             self.renewTokens { success in
                 success1 = success
+                showTo1v1Print("[token]create broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
                 group.leave()
             }
             group.enter()
-            self.service.createRoom(roomName: roomName) {[weak self] roomInfo, error in
+            self.service?.createRoom(roomName: roomName) {[weak self] roomInfo, error in
                 defer {
                     group.leave()
                 }
@@ -365,6 +447,7 @@ extension RoomListViewController {
                     AUIToast.show(text: error.localizedDescription)
                     return
                 }
+                showTo1v1Print("[create scene]create broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
                 createRoomInfo = roomInfo
             }
             group.notify(queue: DispatchQueue.main) {[weak self] in
@@ -373,7 +456,7 @@ extension RoomListViewController {
                 CreateRoomDialog.hidden()
                 guard let roomInfo = createRoomInfo else {return}
                 guard success1 else {
-                    self?.service.leaveRoom(roomInfo: roomInfo, completion: { err in
+                    self?.service?.leaveRoom(roomInfo: roomInfo, completion: { err in
                     })
                     return
                 }
@@ -397,17 +480,17 @@ extension RoomListViewController {
         vc.rtcEngine = self.rtcEngine
         vc.broadcasterToken = self.rtcToken
         vc.onBackClosure = {[weak self] in
-            self?.service.subscribeListener(listener: nil)
-            self?.service.leaveRoom(roomInfo: roomInfo, completion: { err in
+            self?.service?.subscribeListener(listener: nil)
+            self?.service?.leaveRoom(roomInfo: roomInfo, completion: { err in
             })
             self?.preJoinRoom = nil
         }
-        service.subscribeListener(listener: vc)
+        service?.subscribeListener(listener: vc)
         self.navigationController?.pushViewController(vc, animated: false)
     }
     
     private func _updateCallChannel() {
-        prepareConfig.roomId = userInfo?.get1V1ChannelId() ?? NSString.withUUID()
+        prepareConfig.roomId = NSString.withUUID()
         callApi.prepareForCall(prepareConfig: prepareConfig) { _ in
         }
     }
@@ -556,7 +639,7 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
             
             //renew callapi
             self.callApi.renewToken(with: self.rtcToken)
-            self.rtmManager?.renewToken(rtmToken: self.rtmToken)
+            self.rtmClient.renewToken(self.rtmToken)
             //renew videoloader
             VideoLoaderApiImpl.shared.getConnectionMap().forEach { (channelId, connection) in
                 let mediaOptions = AgoraRtcChannelMediaOptions()
@@ -579,13 +662,12 @@ extension RoomListViewController: ICallRtmManagerListener {
     
     func onConnectionLost() {
         AUIToast.show(text: "call_toast_disconnect".showTo1v1Localization())
-        _initCallAPI { err in
+        self.setupStatus.remove(.rtm)
+        _setupRtm { _ in
         }
     }
     
     func onTokenPrivilegeWillExpire(channelName: String) {
-        self.renewTokens { _ in
-            
-        }
+        self.rtcEngine(rtcEngine, tokenPrivilegeWillExpire: "")
     }
 }

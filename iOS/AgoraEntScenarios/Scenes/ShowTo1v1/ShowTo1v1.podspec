@@ -55,4 +55,5 @@ TODO: Add long description of the pod here.
   s.dependency 'SDWebImage/GIF'
   s.dependency 'FLAnimatedImage'
   s.dependency 'AgoraCommon'
+  s.dependency 'RTMSyncManager'
 end

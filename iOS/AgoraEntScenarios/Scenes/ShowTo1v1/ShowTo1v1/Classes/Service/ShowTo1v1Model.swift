@@ -7,6 +7,7 @@
 
 import Foundation
 import VideoLoaderAPI
+import RTMSyncManager
 
 @objcMembers
 public class ShowTo1v1UserInfo: NSObject {
@@ -14,20 +15,15 @@ public class ShowTo1v1UserInfo: NSObject {
     public var userName: String = ""
     public var avatar: String = ""
     
-    public var createdAt: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
-    
-    var objectId: String = ""
-    
-    static func modelCustomPropertyMapper() -> [String : Any]? {
-        return ["uid": "userId"]
+    convenience init(userInfo: AUIUserInfo) {
+        self.init()
+        self.uid = userInfo.userId
+        self.userName = userInfo.userName
+        self.avatar = userInfo.userAvatar
     }
     
     func getUIntUserId() -> UInt {
         return UInt(uid) ?? 0
-    }
-    
-    func get1V1ChannelId() ->String {
-        return "1v1_\(uid)_\(Int64(Date().timeIntervalSince1970 * 1000))"
     }
     
     func bgImage() ->UIImage? {
@@ -37,11 +33,43 @@ public class ShowTo1v1UserInfo: NSObject {
     }
 }
 
+private let kCreateAtKey = "createdAt"
+
 @objcMembers
 public class ShowTo1v1RoomInfo: ShowTo1v1UserInfo {
     public var roomId: String = ""
     public var roomName: String = ""
     public var token: String = ""
+    public var createdAt: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
+    
+    convenience init(roomInfo: AUIRoomInfo) {
+        self.init()
+        self.roomId = roomInfo.roomId
+        self.roomName = roomInfo.roomName
+        if let owner = roomInfo.owner {
+            self.uid = owner.userId
+            self.avatar = owner.userAvatar
+            self.userName = owner.userName
+        } else {
+            assert(false)
+        }
+        if let createTime = roomInfo.customPayload[kCreateAtKey] as? Int64 {
+            self.createdAt = createTime
+        }
+    }
+    
+    func convertAUIRoomInfo()  -> AUIRoomInfo {
+        let roomInfo = AUIRoomInfo()
+        roomInfo.roomId = self.roomId
+        roomInfo.roomName = self.roomName
+        let owner = AUIUserThumbnailInfo()
+        owner.userId = uid
+        owner.userName = userName
+        owner.userAvatar = avatar
+        roomInfo.owner = owner
+        roomInfo.customPayload = [kCreateAtKey: createdAt]
+        return roomInfo
+    }
 }
 
 extension ShowTo1v1RoomInfo: IVideoLoaderRoomInfo {

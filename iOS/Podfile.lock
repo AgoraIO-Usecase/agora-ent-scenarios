@@ -122,6 +122,7 @@ PODS:
     - AgoraSyncManager
     - CallAPI
     - FLAnimatedImage
+    - RTMSyncManager
     - SDWebImage
     - SDWebImage/GIF
     - SnapKit
@@ -286,7 +287,7 @@ SPEC CHECKSUMS:
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
   SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
-  ShowTo1v1: 89a4f5f84dd2ea3b7a8516c889b2b4638690e253
+  ShowTo1v1: 89e8204e1577b4b5a4fab942bae51ab0dbd339a5
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef

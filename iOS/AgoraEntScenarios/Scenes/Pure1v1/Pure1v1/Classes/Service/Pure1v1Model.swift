@@ -13,7 +13,6 @@ public class Pure1v1UserInfo: NSObject {
     public var userId: String = "" 
     public var userName: String = ""
     public var avatar: String = ""
-//    public var roomId: String = ""
     
     convenience init(userInfo: AUIUserInfo) {
         self.init()
@@ -21,8 +20,6 @@ public class Pure1v1UserInfo: NSObject {
         self.userName = userInfo.userName
         self.avatar = userInfo.userAvatar
     }
-    
-    var objectId: String = ""
     
     func getRoomId() ->String {
         return "\(userId))"
