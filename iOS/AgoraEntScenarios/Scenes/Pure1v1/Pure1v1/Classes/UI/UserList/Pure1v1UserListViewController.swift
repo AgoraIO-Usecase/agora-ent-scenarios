@@ -177,6 +177,7 @@ extension Pure1v1UserListViewController {
             return
         }
         
+        rtmClient.logout()
         rtmClient.login(self.rtmToken) { resp, err in
             var error: NSError? = nil
             if let err = err {

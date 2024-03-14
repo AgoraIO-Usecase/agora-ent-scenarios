@@ -267,7 +267,7 @@ extension RoomListViewController {
             completion(nil)
             return
         }
-        
+        rtmClient.logout()
         rtmClient.login(self.rtmToken) { resp, err in
             var error: NSError? = nil
             if let err = err {
@@ -441,6 +441,9 @@ extension RoomListViewController {
                 showTo1v1Print("[setupApi]create broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
                 if let error = error {
                     showTo1v1Error("createAction fail! setupAPIConfig error: \(error.localizedDescription)")
+                    self.createRoomDialog?.isLoading = false
+                    self.createRoomDialog?.isUserInteractionEnabled = true
+                    CreateRoomDialog.hidden()
                     return
                 }
                 self.service?.createRoom(roomName: roomName) {[weak self] roomInfo, error in
