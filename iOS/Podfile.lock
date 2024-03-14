@@ -33,6 +33,8 @@ PODS:
   - AGResourceManager (0.1.0):
     - AFNetworking
     - Zip
+  - AudioScenarioApi (0.1.0):
+    - AgoraRtcEngine_Special_iOS
   - AUIKitCore/UI (0.5.3):
     - AgoraLyricsScore
     - MJRefresh
@@ -162,6 +164,7 @@ DEPENDENCIES:
   - AgoraRtcEngine_Special_iOS (= 4.1.1.26)
   - AgoraSyncManager (~> 2.1.6)
   - AGResourceManager (from `AgoraEntScenarios/Common/API/AGResourceManager`)
+  - AudioScenarioApi (from `AgoraEntScenarios/Common/API/AudioScenarioApi`)
   - Bugly (= 2.5.93)
   - bytedEffect (from `bytedEffect.podspec`)
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
@@ -235,6 +238,8 @@ EXTERNAL SOURCES:
     :path: AgoraEntScenarios
   AGResourceManager:
     :path: AgoraEntScenarios/Common/API/AGResourceManager
+  AudioScenarioApi:
+    :path: AgoraEntScenarios/Common/API/AudioScenarioApi
   bytedEffect:
     :path: bytedEffect.podspec
   CallAPI:
@@ -264,6 +269,7 @@ SPEC CHECKSUMS:
   AgoraRtm_iOS: 9fb76b5f71900d012aaed6c033e235d6fd201ed9
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
   AGResourceManager: 0a7bdde28f8d5505e1dea358ecaac315b88af1ca
+  AudioScenarioApi: 9dd859e4de75140b5086725f493315d47d935e14
   AUIKitCore: fc5df86f26781fe6b76b4ced98f94da3872cf815
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   bytedEffect: 3d51767425dcaa67d2d6162c402225764d3c2156
@@ -301,6 +307,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: ff798ea5a964424c3860c9a3a8116f4b5699e9d9
+PODFILE CHECKSUM: 7258e3fa42e0671df7f4dcf622e5c60001d2e32b
 
 COCOAPODS: 1.12.1
