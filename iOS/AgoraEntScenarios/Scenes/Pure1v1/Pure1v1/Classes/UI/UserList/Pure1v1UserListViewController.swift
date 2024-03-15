@@ -180,6 +180,7 @@ extension Pure1v1UserListViewController {
             return
         }
         
+        rtmClient.logout()
         rtmClient.login(self.rtmToken) { resp, err in
             var error: NSError? = nil
             if let err = err {
@@ -321,8 +322,9 @@ extension Pure1v1UserListViewController {
     
     @objc func _refreshAction() {
         let date = Date()
-        _setupAPIConfig {[weak self] err in
-            if let error = err {
+        _setupAPIConfig {[weak self] error in
+            if let error = error {
+                pure1v1Error("refresh _setupAPIConfig fail: \(error.localizedDescription)")
                 self?.listView.endRefreshing()
                 AUIToast.show(text: error.localizedDescription)
                 return
@@ -330,6 +332,7 @@ extension Pure1v1UserListViewController {
             pure1v1Print("refresh setupAPI cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
             self?.service?.enterRoom {[weak self] error in
                 if let error = error {
+                    pure1v1Error("refresh enterRoom fail: \(error.localizedDescription)")
                     self?.listView.endRefreshing()
                     AUIToast.show(text: error.localizedDescription)
                     return
@@ -339,6 +342,7 @@ extension Pure1v1UserListViewController {
                     guard let self = self else {return}
                     self.listView.endRefreshing()
                     if let error = error {
+                        pure1v1Error("refresh getUserList fail: \(error.localizedDescription)")
                         AUIToast.show(text: error.localizedDescription)
                         return
                     }
@@ -636,21 +640,25 @@ extension Pure1v1UserListViewController: AgoraRtcMediaPlayerDelegate {
 //MARK: ICallRtmManagerListener
 extension Pure1v1UserListViewController: ICallRtmManagerListener {
     func onConnected() {
-        
+        pure1v1Print("onConnected")
     }
     
     func onDisconnected() {
-        
+        pure1v1Print("onDisconnected")
     }
     
     func onConnectionLost() {
+        pure1v1Print("onConnectionLost")
         AUIToast.show(text: "call_toast_disconnect".pure1v1Localization())
         self.setupStatus.remove(.rtm)
-        _setupRtm { _ in
-        }
+        //掉线了，需要重新enter，否则对端看不到
+        self.service?.leaveRoom(completion: { _ in
+        })
+        _autoRefrshAction()
     }
     
     func onTokenPrivilegeWillExpire(channelName: String) {
+        pure1v1Print("onTokenPrivilegeWillExpire")
         self.tokenPrivilegeWillExpire()
     }
 }

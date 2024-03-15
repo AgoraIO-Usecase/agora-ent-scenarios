@@ -80,27 +80,41 @@ public class AGResourceManager: NSObject {
                                           destinationPath: targetTempFilePath,
                                           progressHandler: progressHandler) {[weak self] localUrl, err in
             guard let self = self else { return }
+            
+            func readManifestList(filePath: String) -> [AGResource]? {
+                let jsonStr: String = (try? String(contentsOfFile: filePath)) ?? ""
+                let jsonArray: [[String: Any]] = (decodeToJsonObj(jsonStr) as? [[String: Any]]) ?? []
+                let fileList: [AGResource]? = decodeModelArray(jsonArray)
+                if let fileList = fileList {
+                    for manifest in fileList {
+                        self.downloadManifest(manifest: manifest) { _ in
+                            
+                        } completionHandler: { _, err in
+                            //error handler
+                        }
+                    }
+                }
+                return fileList
+            }
+            
             if let err = err {
-                completionHandler(nil, err)
+                aui_warn("downloadManifestList fail, err: \(err.localizedDescription)")
+                //如果失败，读取本地缓存
+                if let list: [AGResource] = readManifestList(filePath: targetFilePath) {
+                    aui_warn("downloadManifestList unsuccess, use cache")
+                    self.manifestFileList = list
+                    completionHandler(self.manifestFileList, nil)
+                } else {
+                    completionHandler(nil, err)
+                }
                 return
             }
             
             try? FileManager.default.removeItem(atPath: targetFilePath)
             try? FileManager.default.moveItem(atPath: targetTempFilePath, toPath: targetFilePath)
 
-            let jsonStr: String = (try? String(contentsOfFile: targetFilePath)) ?? ""
-            let jsonArray: [[String: Any]] = (decodeToJsonObj(jsonStr) as? [[String: Any]]) ?? []
-            let fileList: [AGResource] = decodeModelArray(jsonArray) ?? []
-            self.manifestFileList = fileList
-            for manifest in fileList {
-                self.downloadManifest(manifest: manifest) { _ in
-                    
-                } completionHandler: { _, err in
-                    //error handler
-                }
-
-            }
-            completionHandler(fileList,  nil)
+            self.manifestFileList = readManifestList(filePath: targetFilePath) ?? []
+            completionHandler(self.manifestFileList,  nil)
         }
     }
     
@@ -124,20 +138,34 @@ public class AGResourceManager: NSObject {
                                           destinationPath: destinationPath,
                                           progressHandler: progressHandler) {[weak self] localUrl, err in
             guard let self = self else { return }
+            
+            func readManifest(filePath: String) -> AGManifest? {
+                let jsonStr: String = (try? String(contentsOfFile: filePath)) ?? ""
+                let jsonObj: [String: Any] = (decodeToJsonObj(jsonStr) as? [String: Any]) ?? [:]
+                guard let manifest: AGManifest = decodeModel(jsonObj) else { return nil }
+                self.manifestMap[uri] = manifest
+                return manifest
+            }
+            
             if let err = err {
-                completionHandler(nil, err)
+                aui_warn("downloadManifest fail, err: \(err.localizedDescription)")
+                if let manifest: AGManifest = readManifest(filePath: destinationPath) {
+                    aui_warn("downloadManifest unsuccess, use cache")
+                    completionHandler(manifest, nil)
+                } else {
+                    completionHandler(nil, err)
+                }
                 return
             }
             
             guard let localUrl = localUrl else {
-                completionHandler(nil, nil)
+                aui_warn("downloadManifest success, url not found, use cache")
+                let manifest: AGManifest? = readManifest(filePath: destinationPath)
+                completionHandler(manifest, nil)
                 return
             }
             
-            let jsonStr: String = (try? String(contentsOfFile: localUrl.path)) ?? ""
-            let jsonObj: [String: Any] = (decodeToJsonObj(jsonStr) as? [String: Any]) ?? [:]
-            if let manifest: AGManifest = decodeModel(jsonObj) {
-                self.manifestMap[uri] = manifest
+            if let manifest: AGManifest = readManifest(filePath: localUrl.path) {
                 for resource in manifest.files {
                     if resource.autodownload == false {
                         self.checkResourceInvalid(resource: resource)
