@@ -8,6 +8,17 @@
 import Foundation
 import CommonCrypto
 
+private func asyncToMainThread(closure: @escaping (() -> Void)) {
+    if Thread.isMainThread {
+        closure()
+        return
+    }
+    
+    DispatchQueue.main.async {
+        closure()
+    }
+}
+
 class URLSessionDownloader: NSObject {
     private(set) var task: URLSessionDataTask
     private(set) var temporaryPath: String
@@ -66,12 +77,15 @@ class URLSessionDownloader: NSObject {
     }
     
     func markCompletion(error: Error?) {
-        if let error = error {
-            aui_error("download fail: \(error.localizedDescription)")
-            completionHandler?(nil, error)
-        } else {
-            completionHandler?(URL(fileURLWithPath: temporaryPath), nil)
+        asyncToMainThread {
+            if let error = error {
+                aui_error("download fail: \(error.localizedDescription)")
+                self.completionHandler?(nil, error)
+            } else {
+                self.completionHandler?(URL(fileURLWithPath: self.temporaryPath), nil)
+            }
         }
+        
     }
 }
 
