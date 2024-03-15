@@ -39,6 +39,8 @@ class ShowAICameraMenuViewController: UIViewController {
         }
     }
     
+    private var observer: NSObjectProtocol?
+
     private let dataArray  = [
         AICameraMenuItem(id: .rhythm_portrait),
         AICameraMenuItem(id: .face_border_light),
@@ -60,7 +62,7 @@ class ShowAICameraMenuViewController: UIViewController {
         let layout = UICollectionViewFlowLayout()
         let marginLeft: CGFloat = 20
         let interSpacing: CGFloat = 15
-        let countFowRow: CGFloat = 4
+        let countFowRow: CGFloat = 5
         let cellWidth: CGFloat = (Screen.width - marginLeft * 2  - (countFowRow - 1) * interSpacing) / countFowRow - 2
         layout.minimumInteritemSpacing = interSpacing
         layout.minimumLineSpacing = lineSpacing
@@ -76,6 +78,7 @@ class ShowAICameraMenuViewController: UIViewController {
     
     deinit {
         currentItem = nil
+        removeObserver()
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
@@ -121,6 +124,12 @@ class ShowAICameraMenuViewController: UIViewController {
                 item.isSelected = false
                 self?.collectionView.reloadData()
             }
+        }
+    }
+    
+    private func removeObserver() {
+        if let observer = observer {
+            NotificationCenter.default.removeObserver(observer)
         }
     }
     

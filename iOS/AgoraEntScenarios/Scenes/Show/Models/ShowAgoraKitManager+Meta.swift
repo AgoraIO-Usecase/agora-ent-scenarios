@@ -77,15 +77,12 @@ extension ShowAgoraKitManager {
     }
     
     func destroyScene(){
-        DispatchQueue.main.async {
-            self.sceneView?.removeFromSuperview()
-            self.sceneView = nil;
-            self.metakit?.removeSceneView(self.sceneView)
-        }
+        self.sceneView?.removeFromSuperview()
+        self.sceneView = nil;
+        self.metakit?.removeSceneView(self.sceneView)
         engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", extension: "metakit",key:"destroy", value:"{}")
         self.metakit = nil
     }
- 
 }
 
 extension ShowAgoraKitManager: AgoraMediaFilterEventDelegate {
@@ -304,7 +301,7 @@ extension ShowAgoraKitManager {
             return
         }
         AGResourceManager.shared.downloadResource(resource: file) { progress in
-            showLogger.info(" progress = \(progress)")
+//            showLogger.info(" progress = \(progress)")
         } completionHandler: {[weak self] path, error in
             DispatchQueue.main.async { [weak self] in
                 if let _ = path {

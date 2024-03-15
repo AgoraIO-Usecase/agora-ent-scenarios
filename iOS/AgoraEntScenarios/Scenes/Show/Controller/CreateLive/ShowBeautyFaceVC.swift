@@ -14,6 +14,8 @@ class ShowBeautyFaceVC: UIViewController {
     var selectedItemClosure: ((_ value: CGFloat, _ isHiddenSldier: Bool, _ isShowSegSwitch: Bool) -> Void)?
     
     var defalutSelectIndex = 0
+    
+    private var observer: NSObjectProtocol?
        
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -51,6 +53,10 @@ class ShowBeautyFaceVC: UIViewController {
     }()
     
     private var type: ShowBeautyFaceVCType = .beauty
+    
+    deinit{
+        removeObserver()
+    }
     
     init(type: ShowBeautyFaceVCType) {
         super.init(nibName: nil, bundle: nil)
@@ -148,12 +154,18 @@ class ShowBeautyFaceVC: UIViewController {
     }
     
     private func addObserver(){
-        NotificationCenter.default.addObserver(forName: ShowAgoraKitManager.disableVirtualBgNotificaitonName, object: nil, queue: nil) { [weak self]_ in
+        observer = NotificationCenter.default.addObserver(forName: ShowAgoraKitManager.disableVirtualBgNotificaitonName, object: nil, queue: nil) { [weak self]_ in
             guard let self = self else {return}
             self.dataArray.forEach { item in
                 item.isSelected = false
             }
             self.collectionView.reloadData()
+        }
+    }
+    
+    private func removeObserver() {
+        if let observer = observer {
+            NotificationCenter.default.removeObserver(observer)
         }
     }
     
