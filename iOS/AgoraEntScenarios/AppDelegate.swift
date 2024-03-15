@@ -33,6 +33,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppContext.shared.cloudPlayerSecret = KeyCenter.CloudPlayerSecret ?? ""
         AppContext.shared.baseServerUrl = KeyCenter.baseServerUrl ?? ""
         
+        
+        AGResourceManagerContext.shared.displayLogClosure = { text in
+            agoraEnt_info(text, tag: "ResourceManager")
+        }
         AGResourceManager.autoDownload()
     }
     

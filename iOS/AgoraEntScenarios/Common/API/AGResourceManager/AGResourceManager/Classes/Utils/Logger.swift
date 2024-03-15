@@ -12,6 +12,10 @@ let formatter = DateFormatter()
 func aui_info(_ message: String, tag: String = logTag) {
     formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
     let timeString = formatter.string(from: Date())
+    if let closure = AGResourceManagerContext.shared.displayLogClosure {
+        closure(message)
+        return
+    }
     print("\(timeString)[\(tag)] \(message)")
 }
 
