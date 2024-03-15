@@ -15,6 +15,8 @@ struct ShowPanelData {
 
 class ShowDataPanelPresenter {
     
+    private var isH265 = false
+    
     private var channelStats = AgoraChannelStats()
     private var localVideoStats = AgoraRtcLocalVideoStats()
     private var localAudioStats = AgoraRtcLocalAudioStats()
@@ -104,6 +106,8 @@ class ShowDataPanelPresenter {
         
         let fps = "show_advance_setting_FPS_title".show_localized+": \(localVideoStats.sentFrameRate) fps"
         let vSendLoss = "show_statistic_up_loss_package".show_localized+": \(localVideoStats.txPacketLossRate) %"
+        
+        isH265 = localVideoStats.codecType == .H265
                 
         let leftInfo =  [sendTitle, videoSize, videoSend,   uplink ].joined(separator: "\n") + "\n"
         let rightInfo = ["   ",     fps,       vSendLoss,   " " ].joined(separator: "\n") + "\n"
@@ -138,7 +142,8 @@ class ShowDataPanelPresenter {
         let startup = audience ? "\(callTs) ms" : "--"
         let startupStr = "show_statistic_startup_time".show_localized + ": " + startup
         // h265 switch
-        let h265 = send ? onStr : "--"
+        let sendH265Value = isH265 ? onStr : offStr
+        let h265 = send ? sendH265Value : "--"
         let h265Str = "H265" + ": " + h265
         // super resolution switch
         let sr = audience ? (params.sr ? onStr : offStr) : "--"

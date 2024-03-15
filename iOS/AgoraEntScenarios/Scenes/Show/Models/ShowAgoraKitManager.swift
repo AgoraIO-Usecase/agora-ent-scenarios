@@ -11,6 +11,8 @@ import UIKit
 import YYCategories
 import VideoLoaderAPI
 import AgoraCommon
+import AudioScenarioApi
+
 class ShowAgoraKitManager: NSObject {
     private static var _sharedManager: ShowAgoraKitManager?
     static var shared: ShowAgoraKitManager {
@@ -36,6 +38,13 @@ class ShowAgoraKitManager: NSObject {
     public var performanceMode: PerformanceMode = .smooth
     
     private var broadcasterConnection: AgoraRtcConnection?
+    
+    private lazy var audioApi: AudioScenarioApi? = {
+        if let engine = engine {
+            return AudioScenarioApi(rtcEngine: engine)
+        }
+        return nil
+    }()
     
 //    var exposureRangeX: Int?
 //    var exposureRangeY: Int?
@@ -174,7 +183,9 @@ class ShowAgoraKitManager: NSObject {
         mediaOptions.autoSubscribeAudio = true
         mediaOptions.autoSubscribeVideo = true
         mediaOptions.clientRoleType = .broadcaster
-
+        
+        audioApi?.setAudioScenario(sceneType: .Show, audioScenarioType: .Show_Host)
+        
         updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
 
         let connection = AgoraRtcConnection()
@@ -329,6 +340,10 @@ class ShowAgoraKitManager: NSObject {
         guard let uid = UInt(uid ?? "") else {
             showLogger.error("switchRole fatel")
             return
+        }
+        
+        if role == .broadcaster {
+            audioApi?.setAudioScenario(sceneType: .Show, audioScenarioType: .Show_InteractiveAudience)
         }
         
         options.clientRoleType = role

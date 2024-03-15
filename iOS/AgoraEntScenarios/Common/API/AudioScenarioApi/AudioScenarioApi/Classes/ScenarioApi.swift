@@ -14,7 +14,7 @@ import AgoraRtcKit
  * @param ChatRoom 语聊房
  * @param Show 秀场
  */
-enum SceneType: Int {
+public enum SceneType: Int {
     case Chat = 0
     case Show = 1
 }
@@ -26,7 +26,7 @@ enum SceneType: Int {
  * @param Show_Host 秀场主播
  * @param Show_InteractiveAudience 秀场连麦观众
  */
-enum AudioScenarioType: Int {
+public enum AudioScenarioType: Int {
     case Chat_Caller = 0
     case Chat_Callee = 1
     case Show_Host = 2
@@ -316,20 +316,20 @@ enum FECType: Int {
     case Single = 1
 }
 
-class AudioScenarioApi: NSObject {
+public class AudioScenarioApi: NSObject {
     static let tag = "KTV_API_LOG"
     static let version = "x_iOS_0.1.0"
     
     private var rtcEngine: AgoraRtcEngineKit
     private var audioScenarioType: AudioScenarioType?
     
-    init(rtcEngine: AgoraRtcEngineKit) {
+   public init(rtcEngine: AgoraRtcEngineKit) {
         self.rtcEngine = rtcEngine
         super.init()
         rtcEngine.addDelegate(self)
     }
     
-    func setAudioScenario(sceneType: SceneType, audioScenarioType: AudioScenarioType) {
+    public func setAudioScenario(sceneType: SceneType, audioScenarioType: AudioScenarioType) {
         reportCallScenarioApi(event: "setAudioScenario", params: ["sceneType": sceneType, "audioScenarioType": audioScenarioType])
         self.audioScenarioType = audioScenarioType
         switch sceneType {
@@ -363,7 +363,7 @@ class AudioScenarioApi: NSObject {
 
 extension AudioScenarioApi: AgoraRtcEngineDelegate {
 
-    func rtcEngine(_ engine: AgoraRtcEngineKit, didAudioRouteChanged routing: AgoraAudioOutputRouting) {
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, didAudioRouteChanged routing: AgoraAudioOutputRouting) {
         guard let type = audioScenarioType else {return}
         switch routing {
         case  .headset, .headsetNoMic, .usb:
