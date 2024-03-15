@@ -92,7 +92,7 @@ PODS:
     - LSTTimer
   - LSTTimer (0.2.10)
   - Masonry (1.1.0)
-  - MJRefresh (3.7.6)
+  - MJRefresh (3.7.7)
   - Protobuf (3.22.1)
   - Pure1v1 (0.1.0):
     - AgoraCommon
@@ -285,7 +285,7 @@ SPEC CHECKSUMS:
   LSTPopView: 9379f00f6ce7d1fc620b50ab00ed3ef97b2d4d52
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
-  MJRefresh: 2fe7fb43a5167ceda20bb7e63f130c04fd1814a5
+  MJRefresh: d1bdca269d250edd1a3bafb4f003a7bd957f2a0f
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
   Pure1v1: bd4333cb46e59a2e1f9415c5c8629a19c70431d2
   RTMSyncManager: 115983b6a9c18da877d3849a836fbc989ca0fc35
