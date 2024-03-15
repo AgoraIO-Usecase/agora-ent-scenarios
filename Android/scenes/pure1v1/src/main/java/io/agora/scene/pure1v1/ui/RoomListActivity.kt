@@ -30,6 +30,9 @@ import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.databinding.Pure1v1RoomListActivityBinding
 import io.agora.scene.pure1v1.databinding.Pure1v1RoomListItemLayoutBinding
 import io.agora.scene.pure1v1.CallServiceManager
+import io.agora.scene.pure1v1.audio.AudioScenarioApi
+import io.agora.scene.pure1v1.audio.AudioScenarioType
+import io.agora.scene.pure1v1.audio.SceneType
 import io.agora.scene.pure1v1.callapi.*
 import io.agora.scene.pure1v1.utils.PermissionHelp
 import io.agora.scene.pure1v1.service.UserInfo
@@ -67,6 +70,8 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     private val permissionHelp = PermissionHelp(this)
 
     private var mCallDetailFragment: Fragment? = null
+
+    private val scenarioApi by lazy { AudioScenarioApi(CallServiceManager.instance.rtcEngine!!) }
 
     override fun getViewBinding(inflater: LayoutInflater): Pure1v1RoomListActivityBinding {
         return Pure1v1RoomListActivityBinding.inflate(inflater)
@@ -350,6 +355,17 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 CallServiceManager.instance.stopCallShow()
                 CallServiceManager.instance.stopCallMusic()
                 // TODO bug CallServiceManager.instance.rtcEngine?.stopAudioMixing()
+
+                // 设置音频最佳实践
+                val toUserId = eventInfo[CallApiImpl.kRemoteUserId] as? Int ?: 0
+                val fromUserId = eventInfo[CallApiImpl.kFromUserId] as? Int ?: 0
+                if (currentUid == toUserId.toString()) {
+                    // 被叫
+                    scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
+                } else if (currentUid == fromUserId.toString()) {
+                    // 主叫
+                    scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Caller)
+                }
             }
             CallStateType.Prepared -> {
                 when (stateReason) {

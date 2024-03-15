@@ -3,7 +3,6 @@ package io.agora.scene.showTo1v1
 import android.content.Context
 import android.util.Log
 import android.view.TextureView
-import android.widget.Toast
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
@@ -12,7 +11,6 @@ import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.rtm.RtmClient
-import io.agora.rtm.RtmConfig
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.AgoraApplication
@@ -271,6 +269,11 @@ class ShowTo1v1Manger constructor() {
         mCallApi.deinitialize {}
         innerCurrentUser = null
         innerPrepareConfig = null
+        rtmManager?.let {
+            it.logout()
+            RtmClient.release()
+            rtmManager = null
+        }
         innerRtcEngine?.let {
             workingExecutor.execute { RtcEngine.destroy() }
             innerRtcEngine = null
