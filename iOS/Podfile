@@ -1,5 +1,4 @@
 source 'https://github.com/CocoaPods/Specs.git'
-source 'https://gitee.com/fanpeng11/auikit-test-specs.git'
 
 platform :ios, '13.0'
 inhibit_all_warnings!

@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
    spec.name          = "Test_metaSDK"
-   spec.version       = "1.2"
+   spec.version       = "1.0.0"
    spec.summary       = "Agora iOS video SDK"
    spec.description   = "iOS library for agora A/V communication, broadcasting and data channel service."
    spec.homepage      = "https://docs.agora.io/en/Agora%20Platform/downloads"
