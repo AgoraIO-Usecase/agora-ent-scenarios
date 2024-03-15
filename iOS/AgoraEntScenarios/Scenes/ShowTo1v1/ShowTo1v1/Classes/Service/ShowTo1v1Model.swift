@@ -22,6 +22,10 @@ public class ShowTo1v1UserInfo: NSObject {
         self.avatar = userInfo.userAvatar
     }
     
+    static func modelCustomPropertyMapper() -> [String : Any]? {
+        return ["uid": "userId"]
+    }
+    
     func getUIntUserId() -> UInt {
         return UInt(uid) ?? 0
     }
