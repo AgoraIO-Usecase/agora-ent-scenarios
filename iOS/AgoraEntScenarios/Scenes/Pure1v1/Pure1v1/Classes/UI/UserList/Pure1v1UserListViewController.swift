@@ -11,6 +11,7 @@ import CallAPI
 import AgoraRtcKit
 import AgoraCommon
 import AgoraRtmKit
+import AudioScenarioApi
 
 //当前api设置的状态
 struct Pure1v1APISetupStatus: OptionSet {
@@ -28,6 +29,8 @@ class Pure1v1UserListViewController: UIViewController {
     var userInfo: Pure1v1UserInfo?
     private let prepareConfig = PrepareConfig()
     private var setupStatus: Pure1v1APISetupStatus = .idle
+    
+    private lazy var audioApi: AudioScenarioApi = AudioScenarioApi(rtcEngine: rtcEngine)
     
     private lazy var player: AgoraRtcMediaPlayerProtocol? = {
         let player = rtcEngine.createMediaPlayer(with: self)
@@ -383,6 +386,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             
             // 触发状态的用户是自己才处理
             if currentUid == "\(toUserId)" {
+                audioApi.setAudioScenario(sceneType: .Chat, audioScenarioType: .Chat_Callee)
                 connectedUserId = fromUserId
                 connectedChannelId = fromRoomId
                 
@@ -416,6 +420,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 }
                 
             } else if currentUid == "\(fromUserId)" {
+                audioApi.setAudioScenario(sceneType: .Chat, audioScenarioType: .Chat_Caller)
                 connectedUserId = toUserId
                 connectedChannelId = fromRoomId
                 //主叫userlist一定会有，因为需要点击
