@@ -67,11 +67,11 @@ static NSString *BUNDLE = @"bundle";
 - (NSString *)stickerPath:(NSString *)stickerName {
     if (!_stickerPrefix) {
         NSString* resourceFolderPath = [BEDynmicResourceConfig shareInstance].resourceFolderPath;
-        _composerPrefix = [NSString stringWithFormat:@"%@/Resource/%@.%@/stickers/",
+        _stickerPrefix = [NSString stringWithFormat:@"%@/Resource/%@.%@/stickers/",
                            resourceFolderPath,
                            STICKER_PATH,
                            BUNDLE];
-        if (![[NSFileManager defaultManager] fileExistsAtPath:_composerPrefix]) {
+        if (![[NSFileManager defaultManager] fileExistsAtPath:_stickerPrefix]) {
             NSBundle *bundle = [BundleUtil bundleWithBundleName:@"ByteEffectLib" podName:@"bytedEffect"];
             _stickerPrefix = [[bundle pathForResource:STICKER_PATH ofType:BUNDLE] stringByAppendingString:@"/stickers/"];
         }
