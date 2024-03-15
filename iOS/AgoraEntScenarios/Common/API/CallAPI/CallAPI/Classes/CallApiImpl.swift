@@ -36,6 +36,9 @@ public let kHangupReason = "hangupReason"
 //是否内部拒绝，收到内部拒绝目前标记为对端call busy
 public let kRejectByInternal = "rejectByInternal"
 
+//是否内部取消呼叫，收到内部取消呼叫目前标记为对端 remote calling timeout
+public let kCancelCallByInternal = "cancelCallByInternal"
+
 public let kCostTimeMap = "costTimeMap"    //呼叫时的耗时信息，会在connected时抛出分步耗时
 
 enum CallAutoSubscribeType: Int {
@@ -101,8 +104,8 @@ public class CallApiImpl: NSObject {
                 connectInfo.timer = Timer.scheduledTimer(withTimeInterval: timeooutInterval,
                                                          repeats: false,
                                                          block: {[weak self] timer in
-                    self?._cancelCall(completion: { err in
-                    })
+                    self?._cancelCall(cancelCallByInternal: true) { _ in
+                    }
                     self?._updateAndNotifyState(state: .prepared, stateReason: .callingTimeout)
                     self?._notifyEvent(event: .callingTimeout)
                 })
@@ -192,6 +195,12 @@ extension CallApiImpl {
         var message: [String: Any] = _messageDic(action: .call)
         message[kRemoteUserId] = remoteUserId
         message[kFromRoomId] = fromRoomId
+        return message
+    }
+    
+    private func _cancelCallMessageDic(cancelCallByInternal: Bool) -> [String: Any] {
+        var message: [String: Any] = _messageDic(action: .cancelCall)
+        message[kCancelCallByInternal] = cancelCallByInternal ? 1 : 0
         return message
     }
     
@@ -830,13 +839,15 @@ extension CallApiImpl {
     }
     
     //取消呼叫
-    private func _cancelCall(message: [String: Any]? = nil, completion: ((NSError?) -> ())?) {
+    private func _cancelCall(message: [String: Any]? = nil,
+                             cancelCallByInternal: Bool = false,
+                             completion: ((NSError?) -> ())?) {
         guard let userId = connectInfo.callingUserId else {
             completion?(NSError(domain: "cancelCall fail! callingUserId is empty", code: -1))
             callWarningPrint("cancelCall fail! callingUserId is empty")
             return
         }
-        let message: [String: Any] = message ?? _messageDic(action: .cancelCall)
+        let message: [String: Any] = message ?? _cancelCallMessageDic(cancelCallByInternal: cancelCallByInternal)
         _sendMessage(userId: "\(userId)", message: message) { err in
             completion?(err)
             guard let error = err else { return }
@@ -925,9 +936,14 @@ extension CallApiImpl {
     fileprivate func _onCancel(message: [String: Any]) {
         //如果不是来自的正在呼叫的用户的操作，不处理
         guard _isCallingUser(message: message) else { return }
-        
-        _updateAndNotifyState(state: .prepared, stateReason: .remoteCancel, eventInfo: message)
-        _notifyEvent(event: .remoteCancel)
+        var stateReason: CallStateReason =  .remoteCancel
+        var callEvent: CallEvent =  .remoteCancel
+        if let cancelCallByInternal = message[kCancelCallByInternal] as? Int, cancelCallByInternal == 1 {
+            stateReason = .remoteCallingTimeout
+            callEvent = .remoteCallingTimeout
+        }
+        _updateAndNotifyState(state: .prepared, stateReason: stateReason, eventInfo: message)
+        _notifyEvent(event: callEvent)
     }
     
     //收到拒绝消息
@@ -1092,7 +1108,7 @@ extension CallApiImpl: CallApiProtocol {
     //取消呼叫
     public func cancelCall(completion: ((NSError?) -> ())?) {
         _reportMethod(event: "\(#function)")
-        let message: [String: Any] = _messageDic(action: .cancelCall)
+        let message: [String: Any] = _cancelCallMessageDic(cancelCallByInternal: false)
         _cancelCall(message: message, completion: completion)
         _updateAndNotifyState(state: .prepared, stateReason: .localCancel, eventInfo: message)
         _notifyEvent(event: .localCancel)

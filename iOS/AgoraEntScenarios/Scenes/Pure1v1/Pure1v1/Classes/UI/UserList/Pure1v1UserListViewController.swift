@@ -466,7 +466,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             case .remoteHangup:
                 _updateCallChannel()
                 AUIToast.show(text: "call_toast_hangup".pure1v1Localization())
-            case .remoteRejected:
+            case .remoteRejected, .remoteCallBusy:
                 AUIToast.show(text: "call_toast_reject".pure1v1Localization())
 //            case .callingTimeout:
 //                AUIToast.show(text: "无应答")
