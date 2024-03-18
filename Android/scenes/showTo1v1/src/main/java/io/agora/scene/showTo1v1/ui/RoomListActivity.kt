@@ -49,9 +49,9 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         private const val POSITION_NONE = -1
     }
 
-    private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
     private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
     private val mRtcEngine by lazy { mShowTo1v1Manger.mRtcEngine }
+    private val mService by lazy { mShowTo1v1Manger.mService }
 
     private var mRoomInfoList = mutableListOf<ShowTo1v1RoomInfo>()
     private val mRtcVideoLoaderApi by lazy { VideoLoader.getImplInstance(mRtcEngine) }
@@ -80,11 +80,10 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         setOnApplyWindowInsetsListener()
         mShowTo1v1Manger.renewTokens {
             if (it) {
+                mShowTo1v1Manger.setup(this)
                 binding.smartRefreshLayout.autoRefresh()
             }
         }
-        mShowTo1v1Manger.initCallAPi()
-
         //RoomDetailActivity.launchBackGround(this)
     }
 
@@ -260,7 +259,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     }
 
     private fun fetchRoomList() {
-        mService.getRoomList(completion = { error, roomList ->
+        mService?.getRoomList(completion = { error, roomList ->
             mRoomInfoList.clear()
             mRoomInfoList.addAll(roomList)
             updateListView()
@@ -304,7 +303,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         mRtcVideoLoaderApi.cleanCache()
         VideoLoader.release()
         mShowTo1v1Manger.destroy()
-        mService.reset()
+        mService?.reset()
     }
 
 
@@ -388,6 +387,10 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         ) {
             super.onCallError(errorEvent, errorType, errorCode, message)
             ShowTo1v1Logger.d(TAG, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
+        }
+
+        override fun canJoinRtcOnCalling(eventInfo: Map<String, Any>): Boolean {
+            return true
         }
 
         override fun onCallStateChanged(

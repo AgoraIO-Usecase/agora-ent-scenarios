@@ -1,6 +1,7 @@
 package io.agora.scene.pure1v1
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import io.agora.scene.pure1v1.callapi.CallApiImpl
@@ -12,10 +13,14 @@ import io.agora.mediaplayer.data.MediaPlayerSource
 import io.agora.rtc2.*
 import io.agora.rtc2.Constants.*
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.rtm.ErrorInfo
+import io.agora.rtm.ResultCallback
 import io.agora.rtm.RtmClient
+import io.agora.rtm.RtmConfig
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.pure1v1.callapi.signalClient.createRtmSignalClient
 import io.agora.scene.pure1v1.service.Pure1v1ServiceImp
 import io.agora.scene.pure1v1.service.UserInfo
 
@@ -63,13 +68,31 @@ class CallServiceManager {
     // rtm token
     var rtmToken: String = ""
 
+    var onUserChanged: (() -> Unit)? = null
+
     private var mContext: Context? = null
 
     private var mMediaPlayer: IMediaPlayer? = null
 
     private var mMediaPlayer2: IMediaPlayer? = null
 
-    fun setup(context: Context) {
+    private var rtmClient: RtmClient? = null
+
+    private fun _createRtmClient(): RtmClient {
+        val rtmConfig = RtmConfig.Builder(BuildConfig.AGORA_APP_ID, UserManager.getInstance().user.id.toString()).build()
+        if (rtmConfig.userId.isEmpty()) {
+            Log.d(tag, "userId is empty")
+        }
+        if (rtmConfig.appId.isEmpty()) {
+            Log.d(tag, "appId is empty")
+        }
+        return RtmClient.create(rtmConfig)
+    }
+
+    fun setup(context: Context, completion: (success: Boolean)-> Unit) {
+
+        rtmClient = _createRtmClient()
+
         mPrepareConfig = PrepareConfig()
         mContext = context
         // 获取用户信息
@@ -86,18 +109,33 @@ class CallServiceManager {
         // 初始化mpk2，用于播放来电铃声
         mMediaPlayer2 = engine.createMediaPlayer()
         // 初始化场景service
-        sceneService = Pure1v1ServiceImp(user)
+        sceneService = Pure1v1ServiceImp(context, rtmClient!!, user) {
+            onUserChanged?.invoke()
+        }
         // 创建并初始化CallAPI
         val callApi = CallApiImpl(context)
         this.callApi = callApi
+
         callApi.initialize(CallConfig(
             BuildConfig.AGORA_APP_ID,
             user.userId.toInt(),
             engine,
-            null
+            createRtmSignalClient(rtmClient!!)
         ))
+
         // 获取万能Token
-        fetchToken {}
+        fetchToken {
+            // 外部创建需要自行管理login
+            rtmClient?.login(rtmToken, object: ResultCallback<Void?> {
+                override fun onSuccess(p0: Void?) {
+                    completion.invoke(true)
+                }
+                override fun onFailure(p0: ErrorInfo?) {
+                    Log.e(tag, "login error = ${p0.toString()}")
+                    completion.invoke(false)
+                }
+            })
+        }
     }
 
     fun cleanUp() {
@@ -114,23 +152,28 @@ class CallServiceManager {
             mMediaPlayer2?.destroy()
             mMediaPlayer2 = null
             RtcEngine.destroy()
-            RtmClient.release()
+//            RtmClient.release()
         }
         callApi = null
         sceneService?.leaveRoom {
         }
         sceneService?.reset()
         sceneService = null
+
+        rtmClient?.logout(object : ResultCallback<Void> {
+            override fun onSuccess(responseInfo: Void?) {}
+            override fun onFailure(errorInfo: ErrorInfo?) {}
+        })
+        RtmClient.release()
     }
 
     fun reInit() {
         val uid = localUser?.userId ?: return
-        callApi?.deinitialize {}
         callApi?.initialize(CallConfig(
             BuildConfig.AGORA_APP_ID,
             uid.toInt(),
             rtcEngine,
-            null
+            createRtmSignalClient(rtmClient!!)
         ))
     }
 

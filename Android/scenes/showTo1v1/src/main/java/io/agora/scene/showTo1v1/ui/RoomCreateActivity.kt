@@ -35,9 +35,9 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
         }
     }
 
-    private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
     private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
     private val mRtcEngine by lazy { mShowTo1v1Manger.mRtcEngine }
+    private val mService by lazy { mShowTo1v1Manger.mService }
 
     private val mTextureView by lazy { TextureView(this) }
 
@@ -102,7 +102,7 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
                 return@setOnClickListener
             }
             enableCrateRoomButton(false)
-            mService.createRoom(roomName, completion = { error, roomInfo ->
+            mService?.createRoom(roomName, completion = { error, roomInfo ->
                 if (error == null && roomInfo != null) { // success
                     isFinishToLiveDetail = true
                     RoomDetailActivity.launch(this, false, roomInfo)
