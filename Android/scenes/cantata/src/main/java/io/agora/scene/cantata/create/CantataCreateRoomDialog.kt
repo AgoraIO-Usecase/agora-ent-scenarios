@@ -136,7 +136,16 @@ class CantataCreateRoomDialog constructor(
         val userNo = UserManager.getInstance().user.id.toString()
         val numPrivate = if (isPrivate) 1 else 0
         showLoadingView()
-        roomCreateViewModel.createRoom(numPrivate, roomName, password, userNo, "1")
+        val delayType = if (mBinding.rbtDelay.isChecked) {
+            1
+        } else {
+            if (mBinding.rbtTopN.isChecked) {
+                2
+            } else {
+                3
+            }
+        }
+        roomCreateViewModel.createRoom(numPrivate, roomName, password, userNo, "1", delayType)
     }
 
     private fun showLoadingView() {
