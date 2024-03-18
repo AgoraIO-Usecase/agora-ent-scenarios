@@ -100,6 +100,49 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:text="选流模式"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutRoomName" />
+
+    <RadioGroup
+        android:id="@+id/groupType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="30dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/layoutRoomName">
+
+        <RadioButton
+            android:id="@+id/rbtDelay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="默认" />
+
+        <RadioButton
+            android:id="@+id/rbtTopN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="齐声" />
+
+        <RadioButton
+            android:id="@+id/rbtMix"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="混合" />
+    </RadioGroup>
+
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -108,7 +151,7 @@
         android:text="@string/cantata_room_pwd"
         android:textColor="#3C4267"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layoutRoomName" />
+        app:layout_constraintTop_toBottomOf="@+id/groupType" />
 
     <androidx.appcompat.widget.AppCompatCheckBox
         android:id="@+id/cbPassword"
