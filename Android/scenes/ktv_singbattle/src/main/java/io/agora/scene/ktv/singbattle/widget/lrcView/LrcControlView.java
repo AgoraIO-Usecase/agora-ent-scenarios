@@ -66,6 +66,8 @@ import kotlin.jvm.Volatile;
  */
 public class LrcControlView extends FrameLayout implements View.OnClickListener, ILrcView {
 
+    private final String tag = "LrcControlView";
+
     protected KtvSingbattleLayoutLrcControlViewBinding mBinding;
     protected KtvSingbattleLayoutLrcPrepareBinding mPrepareBinding;
 
@@ -675,7 +677,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                     }
                     if (mKaraokeView != null) {
                         mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
-                        if (highStartTime!=0){ // onHighPartTime 回调了
+                        if (highStartTime != 0){ // onHighPartTime 回调了
                             LyricsModel cutLyricsModel = dealWithBattleSong(lyricsModel);
                             mKaraokeView.setLyricsData(cutLyricsModel);
                         }else {
@@ -703,19 +705,20 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     private int totalScore = 0;
 
     private LyricsModel dealWithBattleSong(LyricsModel lyricsModel) {
+        KTVLogger.d(tag, "dealWithBattleSong");
         List<LyricsCutter.Line> cutterLines = new ArrayList<>();
         for (int i = 0; i < lyricsModel.lines.size(); i++) {
             LyricsLineModel lyricsLine = lyricsModel.lines.get(i);
             long durationOfCurrentLine = lyricsLine.getEndTime() - lyricsLine.getStartTime();
             cutterLines.add(new LyricsCutter.Line(lyricsLine.getStartTime(), durationOfCurrentLine));
         }
-        Log.d("alien","handleFixTime1 highStartTime " + highStartTime +songPlaying);
+        KTVLogger.d(tag,"handleFixTime1 highStartTime " + highStartTime +songPlaying);
         Pair<Integer, Integer> res = LyricsCutter.handleFixTime((int) highStartTime, (int) highEndTime, cutterLines);
         if (res != null) {
             highStartTime = res.first;
             highEndTime = res.second;
         }
-        Log.d("alien","handleFixTime2 highStartTime " + highStartTime);
+        KTVLogger.d(tag,"handleFixTime2 highStartTime " + highStartTime);
         LyricsModel cutLyricsModel = LyricsCutter.cut(lyricsModel, (int) highStartTime, (int) highEndTime);
         AtomicInteger lineCount = new AtomicInteger();
         cutLyricsModel.lines.forEach(line -> {
@@ -724,7 +727,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             }
         });
         totalScore = lineCount.get() * 100;
-        Log.d("hugo", "totalScore: " + totalScore);
+        KTVLogger.d(tag, "totalScore: " + totalScore);
         highStartTime = 0;
         highEndTime = 0;
         mLyricsModel = null;

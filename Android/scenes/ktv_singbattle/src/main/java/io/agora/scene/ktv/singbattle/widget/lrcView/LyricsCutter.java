@@ -7,6 +7,7 @@ import java.util.List;
 
 import io.agora.karaoke_view.v11.model.LyricsLineModel;
 import io.agora.karaoke_view.v11.model.LyricsModel;
+import io.agora.scene.ktv.singbattle.KTVLogger;
 
 /**
  * 歌曲裁剪
@@ -34,6 +35,8 @@ public class LyricsCutter {
             return beginTime + duration;
         }
     }
+
+    private static String tag = "LyricsCutter";
 
     // 处理时间副歌片段时间（对齐句子）
     public static Pair<Integer, Integer> handleFixTime(int startTime, int endTime, List<Line> lines) {
@@ -102,6 +105,7 @@ public class LyricsCutter {
 
     // 裁剪副歌片段
     public static LyricsModel cut(LyricsModel model, int startTime, int endTime) {
+        KTVLogger.d(tag, "cut, startTime:" + startTime + "endTime:" + endTime);
         List<LyricsLineModel> lines = new ArrayList<>();
         boolean flag = false;
 
