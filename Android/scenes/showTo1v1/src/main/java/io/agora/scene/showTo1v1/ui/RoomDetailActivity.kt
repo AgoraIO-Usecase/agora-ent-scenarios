@@ -859,12 +859,13 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         // 收到大哥拨打电话
                         mShowTo1v1Manger.mConnectedChannelId = fromRoomId
                         val userMap = eventInfo[CallApiImpl.kFromUserExtension] as JSONObject
+
                         mShowTo1v1Manger.mRemoteUser = ShowTo1v1UserInfo(
                             userMap.getString("userId"),
                             userMap.getString("userName"),
                             userMap.getString("avatar"),
-                            userMap.getString("objectId"),
-                            userMap.getLong("createdAt")
+                            userMap.optString("objectId", ""),
+                            userMap.optLong("createdAt", 0L)
                         )
                         mShowTo1v1Manger.mCallApi.accept(fromUserId) {}
                     } else if (mShowTo1v1Manger.mCurrentUser.userId == fromUserId.toString()) {

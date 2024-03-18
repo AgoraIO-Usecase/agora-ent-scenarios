@@ -38,7 +38,7 @@ class ShowTo1v1ServiceImpl constructor(
     }
 
     private val tag = "1v1_Service_LOG"
-    private val kSceneId = "scene_Livetoprivate_4.2.1"
+    private val kSceneId = "scene_Livetoprivate_421"
     @Volatile
     private var syncUtilsInited = false
 
