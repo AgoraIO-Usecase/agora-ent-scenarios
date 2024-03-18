@@ -2335,12 +2335,19 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //    [self.RTCkit enableLocalAudio:isOnMicSeat];
 //    [self.RTCkit muteLocalAudioStream:!isOnMicSeat];
     
-    VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
-    self.isNowMicMuted = info.isAudioMuted;
-    self.isNowCameraMuted = info.isVideoMuted;
-    
     self.bottomView.hidden = !_isOnMicSeat;
     self.requestOnLineView.hidden = !self.bottomView.hidden;
+    
+    VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
+    if(onMicSeatStatusDidChanged){
+        if(info == nil){
+            self.isNowMicMuted = true;
+            self.isNowCameraMuted = true;
+        } else {
+            self.isNowMicMuted = info.isAudioMuted;
+            self.isNowCameraMuted = info.isVideoMuted;
+        }
+    }
 }
 
 - (void)setIsNowMicMuted:(BOOL)isNowMicMuted {
