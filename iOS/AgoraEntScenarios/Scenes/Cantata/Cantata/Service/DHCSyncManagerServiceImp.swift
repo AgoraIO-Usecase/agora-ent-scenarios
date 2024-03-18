@@ -213,7 +213,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         roomInfo.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
         roomInfo.creatorName = VLUserCenter.user.name
         roomInfo.creatorAvatar = VLUserCenter.user.headUrl
-
+        roomInfo.streamMode = inputModel.streamMode
         let params = mapConvert(model: roomInfo)
 
         _showLoadingIfNeed()
@@ -389,6 +389,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                         let output = KTVJoinRoomOutputModel()
                         output.creatorNo = userId
                         output.seatsArray = seatArray
+                        output.streamMode = inputModel.streamMode
                         completion(nil, output)
                     }
                     self._addUserIfNeed()

@@ -99,6 +99,9 @@ fileprivate enum KTVSongMode: Int {
     private var isPublishAudio: Bool = false
     private var preludeDuration: Int64 = 0
     private lazy var apiDelegateHandler = KTVApiRTCDelegateHandler(with: self)
+    
+    private var totalSize: Int = 0
+    
     deinit {
         mcc?.register(nil)
         agoraPrint("deinit KTVApiImpl")
@@ -164,7 +167,7 @@ fileprivate enum KTVSongMode: Int {
 //        engine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
         engine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
        // engine.setParameters("{\"rtc.enableMultipath\": true}")
-        
+        engine.setParameters("{\"rtc.log_external_input\":true}")
     }
     
     func renewInnerDataStreamId() {
@@ -429,7 +432,7 @@ extension KTVApiImpl {
         #if DEBUG
             print(message)
         #else
-            apiConfig?.engine?.writeLog(.info, content: message)
+            apiConfig?.engine?.writeLog(.info, content: "ktv_info:\(message)")
         #endif
     }
     
@@ -437,7 +440,7 @@ extension KTVApiImpl {
         #if DEBUG
             print(message)
         #else
-            apiConfig?.engine?.writeLog(.error, content: message)
+            apiConfig?.engine?.writeLog(.error, content: "ktv_err:\(message)")
         #endif
     }
 }
@@ -755,7 +758,7 @@ extension KTVApiImpl {
             }
         } else {
             loadMusicListeners.setObject(onMusicLoadStateListener, forKey: "\(self.songCode)" as NSString)
-            onMusicLoadStateListener.onMusicLoadProgress(songCode: self.songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
+         //   onMusicLoadStateListener.onMusicLoadProgress(songCode: self.songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
             // TODO: 只有未缓存时才显示进度条
             if mcc?.isPreloaded(songCode: songCode) != 0 {
                 onMusicLoadStateListener.onMusicLoadProgress(songCode: self.songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
@@ -1277,11 +1280,14 @@ extension KTVApiImpl {
 
     private func sendStreamMessageWithDict(_ dict: [String: Any], success: ((_ success: Bool) -> Void)?) {
         let messageData = compactDictionaryToData(dict as [String: Any])
+        let sizeInBits = (messageData ?? Data()).count * 8
+        totalSize += sizeInBits
         let code = apiConfig?.engine?.sendStreamMessage(dataStreamId, data: messageData ?? Data())
         if code == 0 && success != nil { success!(true) }
         if code != 0 {
             agoraPrint("sendStreamMessage fail: \(String(describing: code))")
         }
+        print("totalSize:\(totalSize)")
     }
 
     private func syncPlayState(_ state: AgoraMediaPlayerState) {

@@ -17,6 +17,7 @@ class CantataMainViewController: UIViewController{
     private var ScreenWidth: CGFloat = UIScreen.main.bounds.width
     private var ScreenHeight: CGFloat = UIScreen.main.bounds.height
     @objc public var roomModel: VLRoomListModel?
+    @objc public var streamMode: Int = 0
     @objc public var selSongArray: [VLRoomSelSongModel]? {
         didSet {
             if let newSongs = self.selSongArray, let controlView = lrcControlView, let chorusView = chorusMicView {
@@ -164,7 +165,7 @@ class CantataMainViewController: UIViewController{
     public override func viewDidLoad() {
         super.viewDidLoad()
         layoutUI()
-        
+        self.streamMode = roomModel?.streamMode ?? 1
         isRoomOwner = VLUserCenter.user.ifMaster
         if isRoomOwner == true {
             self.timeManager.startTimer(withTarget: self, andSelector: #selector(giveupRoom))
@@ -396,10 +397,17 @@ extension CantataMainViewController {
         let exChannelToken = VLUserCenter.user.agoraPlayerRTCToken
         let rtcToken = VLUserCenter.user.agoraRTCToken
         guard let roomNo = roomModel?.roomNo else {return}
-//        let apiConfig = KTVApiConfig(appId: AppContext.shared.appId, rtmToken: VLUserCenter.user.agoraRTMToken, engine: RtcKit, channelName: "\(roomNo)_ad", localUid: Int(VLUserCenter.user.id) ?? 0, chorusChannelName: "\(roomNo)", chorusChannelToken: rtcToken, type: .cantata, maxCacheSize: 10, musicType: .mcc, isDebugMode: false)
-//        let giantConfig = GiantChorusConfiguration(audienceChannelToken: VLUserCenter.user.audienceChannelToken, musicStreamUid: 2023, musicChannelToken: exChannelToken, topN: 6)
-//        self.ktvApi = KTVApiImpl(config: apiConfig, giantConfig: giantConfig)
-        let giantConfig = GiantChorusConfiguration(appId: AppContext.shared.appId, rtmToken: VLUserCenter.user.agoraRTMToken, engine: RtcKit, localUid: Int(VLUserCenter.user.id) ?? 0, audienceChannelName: "\(roomNo)_ad", audienceChannelToken: VLUserCenter.user.audienceChannelToken, chorusChannelName: "\(roomNo)", chorusChannelToken: rtcToken ?? "", musicStreamUid: 2023, musicChannelToken: exChannelToken, maxCacheSize: 10, musicType: .mcc , routeSelectionConfig: GiantChorusRouteSelectionConfig(type: .byDelay, streamNum: 6), mccDomain: AppContext.shared.isDebugMode ? "api-test.agora.io" : nil)
+        
+        var type: GiantChorusRouteSelectionType = .byDelay
+        if streamMode == 1 {
+            type = .byDelay
+        } else if streamMode == 2 {
+            type = .topN
+        } else {
+            type = .byDelayAndTopN
+        }
+        
+        let giantConfig = GiantChorusConfiguration(appId: AppContext.shared.appId, rtmToken: VLUserCenter.user.agoraRTMToken, engine: RtcKit, localUid: Int(VLUserCenter.user.id) ?? 0, audienceChannelName: "\(roomNo)_ad", audienceChannelToken: VLUserCenter.user.audienceChannelToken, chorusChannelName: "\(roomNo)", chorusChannelToken: rtcToken ?? "", musicStreamUid: 2023, musicChannelToken: exChannelToken, maxCacheSize: 10, musicType: .mcc , routeSelectionConfig: GiantChorusRouteSelectionConfig(type: type, streamNum: 6), mccDomain: AppContext.shared.isDebugMode ? "api-test.agora.io" : nil)
         self.ktvApi = KTVGiantChorusApiImpl()
         self.ktvApi.createKTVGiantChorusApi(config: giantConfig)
         self.ktvApi.renewInnerDataStreamId()
@@ -837,6 +845,7 @@ extension CantataMainViewController {
 
         AppContext.dhcServiceImp().subscribeSeatListChanged {[weak self] status, seatModel in
             guard let self = self, let userNo = seatModel.userNo else {return}
+            if self.isNetWorkBad {return}
 //            AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self) { granted in
 //                guard granted else { return }
                 var preSongCode = String()
