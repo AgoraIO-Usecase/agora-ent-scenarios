@@ -32,10 +32,11 @@ class RoomCreateViewModel constructor(application: Application) : AndroidViewMod
     fun createRoom(
         isPrivate: Int,
         name: String, password: String,
-        userNo: String, icon: String
+        userNo: String, icon: String,
+        delayType: Int
     ) {
         ktvServiceProtocol.createRoom(
-            CreateRoomInputModel(icon, isPrivate, name, password, userNo)
+            CreateRoomInputModel(icon, isPrivate, name, password, userNo, delayType)
         ) { e: Exception?, createRoomOutputModel: CreateRoomOutputModel? ->
             if (e == null && createRoomOutputModel != null) {
                 // success

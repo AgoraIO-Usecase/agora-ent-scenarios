@@ -244,7 +244,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                             roomInfo.agoraRTCToken,
                             roomInfo.agoraChorusToken,
                             roomInfo.agoraMusicToken,
-                            roomInfo.createdAt
+                            roomInfo.createdAt,
+                            roomInfo.steamMode
                         )
                     )
                 }
@@ -1059,6 +1060,14 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 KTVMusicType.SONG_CODE
             )
         )
+
+        when (mRoomInfoLiveData.value!!.steamMode) {
+            0 -> KTVApi.routeSelectionConfig = GiantChorusRouteSelectionConfig(GiantChorusRouteSelectionType.RANDOM, 6)
+            1 -> KTVApi.routeSelectionConfig = GiantChorusRouteSelectionConfig(GiantChorusRouteSelectionType.BY_DELAY, 6)
+            2 -> KTVApi.routeSelectionConfig = GiantChorusRouteSelectionConfig(GiantChorusRouteSelectionType.TOP_N, 6)
+            3 -> KTVApi.routeSelectionConfig = GiantChorusRouteSelectionConfig(GiantChorusRouteSelectionType.BY_DELAY_AND_TOP_N, 6)
+        }
+        CantataLogger.d("hugohugo", "GiantChorusRouteSelectionConfig: ${KTVApi.routeSelectionConfig}")
 
         mKtvApi.addEventHandler(object : IKTVApiEventHandler() {
             override fun onMusicPlayerStateChanged(state: MediaPlayerState, error: MediaPlayerError, isLocal: Boolean) {

@@ -29,6 +29,8 @@ data class RoomListModel constructor(
      * 房间内人数
      */
     val roomPeopleNum: Int = 0,
+
+    val streamMode: Int = 0
 )
 
 data class RoomSeatModel constructor(
@@ -66,6 +68,7 @@ data class CreateRoomInputModel constructor(
     val name: String,
     val password: String,
     val userNo: String,
+    val delayType: Int
 )
 
 data class CreateRoomOutputModel constructor(
@@ -95,7 +98,8 @@ data class JoinRoomOutputModel constructor(
     val agoraRTCToken: String,
     val agoraChorusToken: String,
     val agoraMusicToken: String,
-    val createdAt: String
+    val createdAt: String,
+    val steamMode: Int
 ) : Serializable
 
 

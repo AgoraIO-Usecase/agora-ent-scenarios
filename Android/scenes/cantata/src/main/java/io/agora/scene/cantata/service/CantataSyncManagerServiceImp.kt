@@ -145,6 +145,7 @@ class CantataSyncManagerServiceImp constructor(
                 creatorName = mUser.name,
                 creatorAvatar = mUser.headUrl,
                 bgOption = "0",
+                streamMode = inputModel.delayType
             )
             val scene = Scene()
             scene.id = roomListModel.roomNo
@@ -251,7 +252,8 @@ class CantataSyncManagerServiceImp constructor(
                                                         rtcToken,
                                                         chorusToken,
                                                         musicToken,
-                                                        cacheRoom.createdAt
+                                                        cacheRoom.createdAt,
+                                                        cacheRoom.streamMode
                                                     )
                                                     runOnMainThread {
                                                         completion.invoke(null, kTVJoinRoomOutputModel)
@@ -392,7 +394,8 @@ class CantataSyncManagerServiceImp constructor(
                         roomInfo.creatorAvatar,
                         roomInfo.createdAt,
                         inputModel.mvIndex.toString(),
-                        roomInfo.roomPeopleNum
+                        roomInfo.roomPeopleNum,
+                        roomInfo.streamMode
                     )
                 )
             ),
@@ -957,7 +960,8 @@ class CantataSyncManagerServiceImp constructor(
                         roomInfo.creatorAvatar,
                         roomInfo.createdAt,
                         roomInfo.bgOption,
-                        count
+                        count,
+                        roomInfo.streamMode
                     )
                 )
             ),
