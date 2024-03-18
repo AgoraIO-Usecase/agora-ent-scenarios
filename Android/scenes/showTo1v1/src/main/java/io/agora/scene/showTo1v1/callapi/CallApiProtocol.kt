@@ -2,7 +2,7 @@ package io.agora.scene.showTo1v1.callapi
 
 import android.view.ViewGroup
 import io.agora.rtc2.RtcEngineEx
-import io.agora.rtm.RtmClient
+import io.agora.scene.showTo1v1.callapi.signalClient.ISignalClient
 
 open class CallConfig(
     //声网App Id
@@ -11,12 +11,12 @@ open class CallConfig(
     var userId: Int = 0,
     //rtc engine实例
     var rtcEngine: RtcEngineEx? = null,
-    //[可选]rtm client实例，如果设置则需要负责rtmClient的login和logout，需要使用appId和userId创建
-    var rtmClient: RtmClient? = null,
+    //ISignalClient实例
+    var signalClient: ISignalClient
 ){}
 
 open class PrepareConfig(
-    var roomId: String = "",                      // 频道名(主叫需要设置为1v1的频道，被叫可设置为自己的广播频道)
+    var roomId: String = "",                      // 自己的Rtc频道名，用于呼叫对端用户时让对端用户进入加入这个RTC频道
     var rtcToken: String = "",                    // rtc token，需要使用万能token，token创建的时候channel name为空字符串
     var rtmToken: String = "",                    // rtm token
     var localView: ViewGroup? = null,             // 显示本地流的画布
@@ -92,7 +92,7 @@ enum class CallEvent(val value: Int) {
     LocalHangup(105),               // 本地用户挂断
     RemoteHangup(106),              // 远端用户挂断
     RemoteJoin(107),                // 远端用户加入RTC频道
-    RemoteLeave(108),               // 远端用户离开RTC频道
+    RemoteLeave(108),               // 远端用户离开RTC频道, RTC频道(eventReason请参考AgoraUserOfflineReason)
     LocalCancel(109),               // 本地用户取消呼叫
     RemoteCancel(110),              // 远端用户取消呼叫
     LocalJoin(111),                 // 本地用户加入RTC频道
@@ -114,8 +114,8 @@ enum class CallErrorEvent(val value: Int) {
     NormalError(0),         // 通用错误
     RtcOccurError(100),     // rtc出现错误
     StartCaptureFail(110),  // rtc开启采集失败
-    RtmSetupFail(200),      // rtm初始化失败
-    SendMessageFail(210)    // 消息发送失败
+    // RtmSetupFail(200),      // rtm初始化失败[已废弃，改为messageManager自己手动初始化]
+    SendMessageFail(210)    // 消息的错误，使用如果使用CallRtmMessageManager则是AgoraRtmErrorCode，自定义信道则是对应信道的error code
 }
 
 /*
@@ -124,7 +124,7 @@ enum class CallErrorEvent(val value: Int) {
 enum class CallErrorCodeType(val value: Int) {
     Normal(0),   // 业务类型的错误，暂无
     Rtc(1),      // rtc的错误，使用AgoraErrorCode
-    Rtm(2)       // rtm的错误，使用AgoraRtmErrorCode
+    Message(2)       // rtm的错误，使用AgoraRtmErrorCode
 }
 
 /*
@@ -152,8 +152,9 @@ interface ICallApiListener {
     /**
      * 内部详细事件变更回调
      * @param event: 事件
+     * @param eventReason: 事件原因，默认null，根据不同event表示不同的含义
      */
-    fun onCallEventChanged(event: CallEvent) {}
+    fun onCallEventChanged(event: CallEvent, eventReason: String?) {}
 
     /**
      * 内部详细事件变更回调
@@ -163,9 +164,42 @@ interface ICallApiListener {
      * @param message: 错误信息
      */
     fun onCallError(errorEvent: CallErrorEvent,
-                    errorType: CallErrorCodeType,
-                    errorCode: Int,
-                    message: String?) {}
+                         errorType: CallErrorCodeType,
+                         errorCode: Int,
+                         message: String?) {}
+
+    /**
+     * 通话开始的回调
+     * @param roomId: 通话的频道id
+     * @param callerUserId: 发起呼叫的用户id
+     * @param currentUserId: 自己的id
+     * @param timestamp: 通话开始的时间戳，和19700101的差值，单位ms
+     */
+    fun onCallConnected(roomId: String,
+                    callUserId: Int,
+                    currentUserId: Int,
+                    timestamp: Long) {}
+
+    /**
+     * 通话结束的回调
+     * @param roomId: 通话的频道id
+     * @param hangupUserId: 挂断的用户id
+     * @param currentUserId: 自己的id
+     * @param timestamp: 通话开始的时间戳，和19700101的差值，单位ms
+     * @param duration: 通话时长，单位ms
+     */
+    fun onCallDisconnected(roomId: String,
+                        hangupUserId: Int,
+                        currentUserId: Int,
+                        timestamp: Long,
+                        duration: Long) {}
+
+    /**
+     * 当呼叫时判断是否可以加入Rtc
+     * @param eventInfo 收到呼叫时的扩展信息
+     * @return true: 可以加入 false: 不可以加入
+     */
+    fun canJoinRtcOnCalling(eventInfo: Map<String, Any>) : Boolean?
 
     /**
      * token快要过期了(需要外部获取新token调用renewToken更新)
@@ -200,7 +234,7 @@ interface ICallApi {
     /**
      * 更新自己的rtc/rtm的token
      */
-    fun renewToken(rtcToken: String, rtmToken: String)
+    fun renewToken(rtcToken: String)
 
     /**
      * 准备通话环境，需要调用成功才可以进行呼叫，如需要更换通话的RTC 频道号可以重复调用，确保调用时必须是非通话状态(非calling、connecting、connected)才可调用成功

@@ -64,6 +64,7 @@ include ':scenes:show:aars:beauty_sensetime:STMobileJNI'
 include ':scenes:show:aars:beauty_sensetime:HardwareBuffer'
 include ':scenes:show:aars:beauty_bytedance:EffectAAR'
 
+include ':RTMSyncManager'
 /*
  * 1V1私密房
  */

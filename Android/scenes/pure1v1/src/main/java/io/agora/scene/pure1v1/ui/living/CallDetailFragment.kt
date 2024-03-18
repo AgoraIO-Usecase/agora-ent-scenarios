@@ -204,7 +204,7 @@ class CallDetailFragment : Fragment(), ICallApiListener {
     ) {
     }
 
-    override fun onCallEventChanged(event: CallEvent) {
+    override fun onCallEventChanged(event: CallEvent, eventReason: String?) {
         when(event) {
             CallEvent.RemoteLeave -> {
                 onHangup()
@@ -221,5 +221,9 @@ class CallDetailFragment : Fragment(), ICallApiListener {
     ) {
         super.onCallError(errorEvent, errorType, errorCode, message)
         Pure1v1Logger.d(tag, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
+    }
+
+    override fun canJoinRtcOnCalling(eventInfo: Map<String, Any>): Boolean {
+        return true
     }
 }

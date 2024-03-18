@@ -40,6 +40,9 @@ import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.show.audio.AudioScenarioApi
+import io.agora.scene.show.audio.AudioScenarioType
+import io.agora.scene.show.audio.SceneType
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLiveDetailFragmentBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
@@ -131,6 +134,8 @@ class LiveDetailFragment : Fragment() {
     private var isPageLoaded = false
 
     private var localVideoCanvas: LocalVideoCanvasWrap? = null
+
+    private val scenarioApi by lazy { AudioScenarioApi(mRtcEngine) }
 
     private val timerRoomEndRun = Runnable {
         destroy(false) // 房间到了限制时间
@@ -1550,6 +1555,11 @@ class LiveDetailFragment : Fragment() {
             })
             (activity as LiveDetailActivity).toggleSelfAudio(isRoomOwner || isMeLinking(), callback = {
                 // nothing
+                if (isRoomOwner) {
+                    scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
+                } else if (isMeLinking()) {
+                    scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_InteractiveAudience)
+                }
             })
         }
     }
@@ -1936,6 +1946,7 @@ class LiveDetailFragment : Fragment() {
                     })
                     (activity as LiveDetailActivity).toggleSelfAudio(true, callback = {
                         // nothing
+                        scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_InteractiveAudience)
                     })
                 }
             } else {
