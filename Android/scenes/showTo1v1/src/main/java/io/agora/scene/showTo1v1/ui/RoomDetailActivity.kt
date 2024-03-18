@@ -38,6 +38,9 @@ import io.agora.scene.showTo1v1.CallRole
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
+import io.agora.scene.showTo1v1.audio.AudioScenarioApi
+import io.agora.scene.showTo1v1.audio.AudioScenarioType
+import io.agora.scene.showTo1v1.audio.SceneType
 import io.agora.scene.showTo1v1.callapi.*
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1CallDetailActivityBinding
 import io.agora.scene.showTo1v1.service.ROOM_AVAILABLE_DURATION
@@ -95,9 +98,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     private var mDashboardFragment: DashboardFragment? = null
 
-    private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
     private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
     private val mRtcEngine by lazy { mShowTo1v1Manger.mRtcEngine }
+    private val mService by lazy { mShowTo1v1Manger.mService }
 
     private val mRoomInfo: ShowTo1v1RoomInfo by lazy {
         (intent.getParcelableExtra(EXTRA_ROOM_DETAIL_INFO) as? ShowTo1v1RoomInfo)!!
@@ -108,6 +111,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     }
 
     private val isRoomOwner by lazy { mRoomInfo.userId == UserManager.getInstance().user.id.toString() }
+
+    private val scenarioApi by lazy { AudioScenarioApi(mRtcEngine) }
 
     private val mMainRtcConnection by lazy {
         RtcConnection(
@@ -415,7 +420,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
         }
         toggleSelfAudio(isRoomOwner) {
-
+            scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
         }
     }
 
@@ -482,7 +487,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     //================== Service Operation ===============
     private fun initServiceWithJoinRoom() {
-        mService.joinRoom(mRoomInfo, completion = { error ->
+        mService?.joinRoom(mRoomInfo, completion = { error ->
             if (error == null) { // success
 
             } else { //failed
@@ -490,13 +495,13 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 onBackPressed()
             }
         })
-        mService.subscribeListener(object : ShowTo1v1ServiceListenerProtocol {
+        mService?.subscribeListener(object : ShowTo1v1ServiceListenerProtocol {
             override fun onNetworkStatusChanged(status: ShowTo1v1ServiceNetworkStatus) {
 
             }
 
-            override fun onUserListDidChanged(userList: List<ShowTo1v1UserInfo>) {
-                binding.tvNumCount.text = userList.size.number2K()
+            override fun onUserListDidChanged(userNum: Int) {
+                binding.tvNumCount.text = userNum.number2K()
             }
 
             override fun onRoomDidDestroy(roomInfo: ShowTo1v1RoomInfo) {
@@ -581,7 +586,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     }
 
     private fun destroy() {
-        mService.leaveRoom(mRoomInfo, completion = {})
+        mService?.leaveRoom(mRoomInfo, completion = {})
         if (isRoomOwner) {
             mRtcEngine.leaveChannelEx(mMainRtcConnection)
             mRtcEngine.stopPreview()
@@ -769,8 +774,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
         }
 
-        override fun onCallEventChanged(event: CallEvent) {
-            super.onCallEventChanged(event)
+        override fun onCallEventChanged(event: CallEvent, eventReason: String?) {
+            super.onCallEventChanged(event, eventReason)
             when (event) {
                 CallEvent.LocalLeave -> {
                     onHangup()
@@ -793,6 +798,10 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         ) {
             super.onCallError(errorEvent, errorType, errorCode, message)
             ShowTo1v1Logger.d(TAG, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
+        }
+
+        override fun canJoinRtcOnCalling(eventInfo: Map<String, Any>): Boolean {
+            return true
         }
 
         override fun onCallStateChanged(
@@ -827,6 +836,11 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     finishCallDialog()
                     mShowTo1v1Manger.mRemoteUser = null
                     mShowTo1v1Manger.mConnectedChannelId = null
+
+                    if (isRoomOwner) {
+                        // 通话结束， 恢复音频配置
+                        scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
+                    }
                 }
 
                 CallStateType.Calling -> {
@@ -845,12 +859,13 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         // 收到大哥拨打电话
                         mShowTo1v1Manger.mConnectedChannelId = fromRoomId
                         val userMap = eventInfo[CallApiImpl.kFromUserExtension] as JSONObject
+
                         mShowTo1v1Manger.mRemoteUser = ShowTo1v1UserInfo(
                             userMap.getString("userId"),
                             userMap.getString("userName"),
                             userMap.getString("avatar"),
-                            userMap.getString("objectId"),
-                            userMap.getLong("createdAt")
+                            userMap.optString("objectId", ""),
+                            userMap.optLong("createdAt", 0L)
                         )
                         mShowTo1v1Manger.mCallApi.accept(fromUserId) {}
                     } else if (mShowTo1v1Manger.mCurrentUser.userId == fromUserId.toString()) {
@@ -880,6 +895,17 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         channelId, localUid.toLong(), AudioModeration.AgoraChannelType.broadcast,
                         "ShowTo1v1"
                     )
+
+                    // 设置音频最佳实践
+                    val toUserId = eventInfo[CallApiImpl.kRemoteUserId] as? Int ?: 0
+                    val fromUserId = eventInfo[CallApiImpl.kFromUserId] as? Int ?: 0
+                    if (mShowTo1v1Manger.mCurrentUser.userId == toUserId.toString()) {
+                        // 被叫
+                        scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
+                    } else if (mShowTo1v1Manger.mCurrentUser.userId == fromUserId.toString()) {
+                        // 主叫
+                        scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Caller)
+                    }
                 }
 
                 CallStateType.Failed -> {
