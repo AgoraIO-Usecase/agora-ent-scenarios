@@ -599,9 +599,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         CantataLogger.d(TAG, "RoomLivingViewModel.getSongTypes() called")
         val liveData = MutableLiveData<LinkedHashMap<Int, String>>()
         mKtvApi.fetchMusicCharts { requestId, status, list ->
-            CantataLogger.d(TAG, "RoomLivingViewModel.getSongTypes() return")
+            CantataLogger.d(TAG, "RoomLivingViewModel.getSongTypes() return, requestId:$requestId, status:$status")
             val types = LinkedHashMap<Int, String>()
-            // 重新排序 ----> 按照（嗨唱推荐、抖音热歌、热门新歌、KTV必唱）这个顺序进行怕苦
+            // 重新排序 ----> 按照（嗨唱推荐、抖音热歌、热门新歌、KTV必唱）这个顺序进行排序
             list?.let { resultList ->
                 for (i in 0..3) {
                     for (musicChartInfo in resultList) {
@@ -617,6 +617,16 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                         types[musicChartInfo.type] = musicChartInfo.name
                     }
                 }
+            }
+            // 因为榜单基本是固化的，防止拉取列表失败，直接写入配置
+            if (list == null || list.isEmpty()) {
+                types[3] = "嗨唱推荐"
+                types[4] = "抖音热歌"
+                types[2] = "新歌榜"
+                types[6] = "KTV必唱"
+                types[0] = "项目热歌榜单"
+                types[1] = "声网热歌榜"
+                types[5] = "古风热歌"
             }
             liveData.postValue(types)
         }

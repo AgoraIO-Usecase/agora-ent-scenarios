@@ -763,6 +763,16 @@ public class RoomLivingViewModel extends ViewModel {
                     types.put(musicChartInfo.type, musicChartInfo.name);
                 }
             }
+            // 因为榜单基本是固化的，防止拉取列表失败，直接写入配置
+            if (list.length == 0) {
+                types.put(3, "嗨唱推荐");
+                types.put(4, "抖音热歌");
+                types.put(2, "新歌榜");
+                types.put(6, "KTV必唱");
+                types.put(0, "项目热歌榜单");
+                types.put(1, "声网热歌榜");
+                types.put(5, "古风热歌");
+            }
             liveData.postValue(types);
             return null;
         });
