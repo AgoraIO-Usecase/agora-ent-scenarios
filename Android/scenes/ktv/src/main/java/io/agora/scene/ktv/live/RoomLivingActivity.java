@@ -308,7 +308,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         });
         getBinding().iBtnChooseSong.setOnClickListener(v -> showChooseSongDialog());
         getBinding().btnMenu.setOnClickListener(v -> showMusicSettingDialog());
-        //getBinding().btnVocal.setOnClickListener(this::showVoiceHighlightDialog);
         getBinding().btnOK.setOnClickListener(view -> getBinding().groupResult.setVisibility(View.GONE));
         LrcActionListenerImpl lrcActionListenerImpl = new LrcActionListenerImpl(this, roomLivingViewModel, getBinding().lrcControlView) {
 
@@ -321,7 +320,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             @Override
             public void onVocalHighlightClick() {
                 super.onVocalHighlightClick();
-                showVoiceHighlightDialog();
+                //showVoiceHighlightDialog();
             }
         };
         getBinding().lrcControlView.setOnLrcClickListener(lrcActionListenerImpl);
@@ -785,55 +784,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     private void showMoreDialog(View view) {
         if (showMusicProfileDialog) return;
         showMusicProfileDialog = true;
-    }
-
-    private boolean showVoiceHighlightDialogTag = false;
-
-    private void showVoiceHighlightDialog() {
-        if (showVoiceHighlightDialogTag) {
-            return;
-        }
-        showVoiceHighlightDialogTag = true;
-
-        if (voiceHighlightDialog == null) {
-            voiceHighlightDialog = new VoiceHighlightDialog(new VoiceHighlightDialog.OnVoiceHighlightDialogListener() {
-                @Override
-                public void onUserListLoad() {
-                    List<VoiceHighlightBean> list = new ArrayList<>();
-                    if (roomLivingViewModel.seatListLiveData.getValue() == null || roomLivingViewModel.songPlayingLiveData.getValue() == null)
-                        return;
-                    AtomicBoolean hasChorus = new AtomicBoolean(false);
-                    roomLivingViewModel.seatListLiveData.getValue().forEach(seat -> {
-                        if (seat.getChorusSongCode().equals(roomLivingViewModel.songPlayingLiveData.getValue().getSongNo() + roomLivingViewModel.songPlayingLiveData.getValue().getCreateAt())) {
-                            VoiceHighlightBean bean = new VoiceHighlightBean();
-                            bean.user = seat;
-                            list.add(bean);
-                            hasChorus.set(true);
-                        } else if (seat.getUserNo().equals(roomLivingViewModel.songPlayingLiveData.getValue().getUserNo())) {
-                            VoiceHighlightBean bean = new VoiceHighlightBean();
-                            bean.user = seat;
-                            list.add(bean);
-                        }
-                    });
-                    if (!hasChorus.get()) return;
-                    voiceHighlightDialog.setUserList(list);
-                }
-
-                @Override
-                public void onUserItemChosen(VoiceHighlightBean user) {
-                    roomLivingViewModel.syncVoiceHighlightResult(user.user.getRtcUid(), user.user.getChorusSongCode());
-                    getBinding().lrcControlView.setHighLightPersonHeadUrl(user.user.getHeadUrl());
-                }
-            }, roomLivingViewModel.mSetting);
-        }
-
-        if (!voiceHighlightDialog.isAdded()) {
-            voiceHighlightDialog.show(getSupportFragmentManager(), VoiceHighlightDialog.TAG);
-        }
-
-        getBinding().getRoot().post(() -> {
-            showVoiceHighlightDialogTag = false;
-        });
     }
 
     private void showMusicSettingDialog() {
