@@ -196,6 +196,11 @@ extension DownloadManager: IAGDownloadManager {
         }
     }
     
+    public func cancelDownloadFile(withURL url: URL) {
+        guard let downloader = downloaderMap[url] else {return}
+        downloaderMap[url] = nil
+    }
+    
     public func startDownloadFile(withURL url: URL,
                                   md5: String?,
                                   destinationPath: String,

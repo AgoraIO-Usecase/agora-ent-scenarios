@@ -8,9 +8,9 @@ import Foundation
 
 public class ShowDownlodingProgressView: UIView {
     
-    public func setProgress(_ progress: Int) {
+    public func setProgress(_ title: String, _ progress: Int) {
         let loadingStr = "show_beauty_resource_downloading".show_localized
-        percentLabel.text = "\(loadingStr) \(progress)%"
+        percentLabel.text = "\(title)\(loadingStr) \(progress)%"
         progressBar.progress = CGFloat(progress) / 100.0
     }
 

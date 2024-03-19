@@ -18,27 +18,30 @@ private let kLoadingViewTag = 11223344
 
 
 
-func updateDownloadProgress(progress: Double) {
+func updateDownloadProgress(title: String, progress: Double) {
     DispatchQueue.main.async {
         guard let view = UIApplication.topMostViewController?.view else {
             return
         }
         var progressView = view.viewWithTag(kLoadingViewTag) as? ShowDownlodingProgressView
         if progressView == nil {
-            let frame = CGRect(x: (view.frame.width - 300) / 2, y: (view.frame.height - 60) / 2, width: 300, height: 60)
+            let size = CGSize(width: 280, height: 60)
+            let frame = CGRect(x: (view.frame.width - size.width) / 2, 
+                               y: (view.frame.height - size.height) / 2,
+                               width: size.width,
+                               height: size.height)
             let _progressView = ShowDownlodingProgressView(frame: frame)
             _progressView.tag = kLoadingViewTag
             view.addSubview(_progressView)
             progressView = _progressView
         }
-        progressView?.setProgress(Int(progress * 100))
+        progressView?.setProgress(title, Int(progress * 100))
     }
 }
 
 func markProgressCompletion(err: NSError?) {
     if let err = err {
         ToastView.show(text: err.localizedDescription)
-        return
     }
     guard let view = UIApplication.topMostViewController?.view else {
         return
@@ -99,61 +102,89 @@ private func setupFuResource() -> Bool {
 }
 
 extension AGResourceManager {
-    
-    static func checkAndSetupBeautyPath(_ types: [BeautyFactoryType],
-                                        completion: ((NSError?) -> Void)?) {
-        let loadingToastStr = "show_beauty_resource_downloading".show_localized
-        for type in types {
-            switch type {
-            case .sense:
-                //setup senseme path
-                guard setupStResource() else {
-                    AGResourceManager.autoDownload(uris: [kSenseLicUri, kSenseUri]) { progress in
-                        updateDownloadProgress(progress: progress)
-                    } completion: {  err in
-                        setupStResource()
-                        markProgressCompletion(err: err)
-                        completion?(err)
-                    }
-
-                    ToastView.show(text: loadingToastStr)
-                    return
-                }
-                
-                completion?(nil)
-            case .byte:
-                //setup byte effect path
-                guard setupBeResource() else {
-                    AGResourceManager.autoDownload(uris: [kByteLicUri, kByteUri]) { progress in
-                        updateDownloadProgress(progress: progress)
-                    } completion: { err in
-                        setupBeResource()
-                        markProgressCompletion(err: err)
-                        completion?(err)
-                    }
-                    ToastView.show(text: loadingToastStr)
-                    return
-                }
-                
-                completion?(nil)
-            case .fu:
-                //setup fu effect path
-                guard setupFuResource() else {
-                    AGResourceManager.autoDownload(uris: [kFuLicUri, kFuUri]) { progress in
-                        updateDownloadProgress(progress: progress)
-                    } completion: {  err in
-                        setupFuResource()
-                        markProgressCompletion(err: err)
-                        completion?(err)
-                    }
-                    ToastView.show(text: loadingToastStr)
-                    return
-                }
-                
-                completion?(nil)
-            default:
-                completion?(nil)
-            }
+    static func isBeautyDownloading() -> Bool {
+        guard let view = UIApplication.topMostViewController?.view,
+              view.viewWithTag(kLoadingViewTag) == nil else {
+            return true
         }
+        
+        return false
+    }
+    
+    static func cancelBeautyResource() {
+        let manager = AGResourceManager.shared
+        if let res = manager.getResource(uri: kSenseUri) {
+            manager.cancelDownloadResource(resource: res)
+        }
+        
+        if let res = manager.getResource(uri: kSenseLicUri) {
+            manager.cancelDownloadResource(resource: res)
+        }
+        
+        if let res = manager.getResource(uri: kByteUri) {
+            manager.cancelDownloadResource(resource: res)
+        }
+        
+        if let res = manager.getResource(uri: kByteLicUri) {
+            manager.cancelDownloadResource(resource: res)
+        }
+        
+        if let res = manager.getResource(uri: kFuLicUri) {
+            manager.cancelDownloadResource(resource: res)
+        }
+        
+        if let res = manager.getResource(uri: kFuUri) {
+            manager.cancelDownloadResource(resource: res)
+        }
+    }
+    
+    static func checkAndSetupBeautyPath(completion: ((NSError?) -> Void)?) {
+        if isBeautyDownloading() {
+            completion?(NSError(domain: "download already", code: -1))
+            return
+        }
+        
+        guard setupStResource() else {
+            let type = BeautyFactoryType.sense
+            updateDownloadProgress(title: type.title, progress: 0)
+            AGResourceManager.autoDownload(uris: [kSenseLicUri, kSenseUri]) { progress in
+                updateDownloadProgress(title: type.title, progress: progress)
+            } completion: {  err in
+                setupStResource()
+                markProgressCompletion(err: err)
+                checkAndSetupBeautyPath(completion: completion)
+            }
+            return
+        }
+        
+        //setup byte effect path
+        guard setupBeResource() else {
+            let type = BeautyFactoryType.byte
+            updateDownloadProgress(title: type.title, progress: 0)
+            AGResourceManager.autoDownload(uris: [kByteLicUri, kByteUri]) { progress in
+                updateDownloadProgress(title: type.title, progress: progress)
+            } completion: { err in
+                setupBeResource()
+                markProgressCompletion(err: err)
+                checkAndSetupBeautyPath(completion: completion)
+            }
+            return
+        }
+        
+        //setup fu effect path
+        guard setupFuResource() else {
+            let type = BeautyFactoryType.fu
+            updateDownloadProgress(title: type.title, progress: 0)
+            AGResourceManager.autoDownload(uris: [kFuLicUri, kFuUri]) { progress in
+                updateDownloadProgress(title: type.title, progress: progress)
+            } completion: {  err in
+                setupFuResource()
+                markProgressCompletion(err: err)
+                checkAndSetupBeautyPath(completion: completion)
+            }
+            return
+        }
+        
+        completion?(nil)
     }
 }

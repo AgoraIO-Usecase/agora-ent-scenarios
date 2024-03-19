@@ -99,14 +99,11 @@ class ShowRoomListVC: UIViewController {
     }
     
     @objc private func didClickCreateButton(){
-        AGResourceManager.checkAndSetupBeautyPath([.sense]) {[weak self] err in
-            guard let self = self, err == nil else {return}
-            let preVC = ShowCreateLiveVC()
-            let preNC = UINavigationController(rootViewController: preVC)
-            preNC.navigationBar.setBackgroundImage(UIImage(), for: .default)
-            preNC.modalPresentationStyle = .fullScreen
-            present(preNC, animated: true)
-        }
+        let preVC = ShowCreateLiveVC()
+        let preNC = UINavigationController(rootViewController: preVC)
+        preNC.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        preNC.modalPresentationStyle = .fullScreen
+        present(preNC, animated: true)
     }
     
     @objc private func refreshControlValueChanged() {

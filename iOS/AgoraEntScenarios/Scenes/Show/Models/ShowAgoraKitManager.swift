@@ -439,7 +439,9 @@ class ShowAgoraKitManager: NSObject {
         completion?()
     }
     
-    func setupLocalVideo(uid: UInt, canvasView: UIView?) {
+    func setupLocalVideo(uid: UInt = 0, 
+                         mirrorMode: AgoraVideoMirrorMode = .disabled,
+                         canvasView: UIView?) {
         guard let engine = engine else {
             assert(true, "rtc engine not initlized")
             return
@@ -447,7 +449,7 @@ class ShowAgoraKitManager: NSObject {
         let canvas = AgoraRtcVideoCanvas()
         canvas.view = canvasView
         canvas.uid = uid
-        canvas.mirrorMode = .disabled
+        canvas.mirrorMode = mirrorMode
         engine.setupLocalVideo(canvas)
         engine.startPreview()
         engine.setDefaultAudioRouteToSpeakerphone(true)

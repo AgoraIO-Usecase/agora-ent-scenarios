@@ -254,6 +254,12 @@ public class AGResourceManager: NSObject {
         }
     }
     
+    public func cancelDownloadResource(resource: AGResource) {
+        guard let url = URL(string: resource.url) else {
+            return
+        }
+        downloadManager.cancelDownload(forURL: url)
+    }
     
     /// 下载资源
     /// - Parameters:
@@ -285,7 +291,7 @@ public class AGResourceManager: NSObject {
                 completionHandler(nil, err)
                 return
             }
-            
+            progressHandler(1)
             guard let path = localUrl?.path else {
                 completionHandler(nil, nil)
                 return
