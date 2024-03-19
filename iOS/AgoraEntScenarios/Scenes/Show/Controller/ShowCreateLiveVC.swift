@@ -9,7 +9,6 @@ import UIKit
 import AgoraRtcKit
 import SVProgressHUD
 import AgoraCommon
-import AGResourceManager
 
 class ShowCreateLiveVC: UIViewController {
 
@@ -80,7 +79,8 @@ class ShowCreateLiveVC: UIViewController {
             assert(false, "rtc engine == nil")
         }
         
-        AGResourceManager.checkAndSetupBeautyPath() { err in
+        self.checkAndSetupBeautyPath() {[weak self] err in
+            guard let self = self else {return}
             if let _ = err {return}
             
             BeautyManager.shareManager.initBeautyRender()
@@ -112,7 +112,7 @@ class ShowCreateLiveVC: UIViewController {
         BeautyManager.shareManager.destroy()
         ShowAgoraKitManager.shared.cleanCapture()
         ShowBeautyFaceVC.resetData()
-        AGResourceManager.cancelBeautyResource()
+        cancelBeautyResource()
         dismiss(animated: true)
     }
 }
@@ -120,23 +120,23 @@ class ShowCreateLiveVC: UIViewController {
 extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     
     func onClickSettingBtnAction() {
-        if AGResourceManager.isBeautyDownloading() { return }
+        if isBeautyDownloading() { return }
         showPreset()
     }
     
     func onClickCameraBtnAction() {
-        if AGResourceManager.isBeautyDownloading() { return }
+        if isBeautyDownloading() { return }
         ShowAgoraKitManager.shared.switchCamera()
     }
     
     func onClickBeautyBtnAction() {
-        if AGResourceManager.isBeautyDownloading() { return }
+        if isBeautyDownloading() { return }
         createView.hideBottomViews = true
         present(beautyVC, animated: true)
     }
     
     func onClickStartBtnAction() {
-        if AGResourceManager.isBeautyDownloading() { return }
+        if isBeautyDownloading() { return }
         guard let roomName = createView.roomName, roomName.count > 0 else {
             ToastView.show(text: "create_room_name_can_not_empty".show_localized)
             return

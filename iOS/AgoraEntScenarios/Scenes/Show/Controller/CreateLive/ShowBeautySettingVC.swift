@@ -7,7 +7,6 @@
 
 import UIKit
 import JXCategoryView
-import AGResourceManager
 
 enum ShowBeautyFaceVCType: CaseIterable {
     case beauty

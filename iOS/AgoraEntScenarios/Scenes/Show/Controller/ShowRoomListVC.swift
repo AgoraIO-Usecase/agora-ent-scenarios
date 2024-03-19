@@ -8,7 +8,6 @@
 import UIKit
 import VideoLoaderAPI
 import AgoraCommon
-import AGResourceManager
 
 class ShowRoomListVC: UIViewController {
     let backgroundView = UIImageView()
