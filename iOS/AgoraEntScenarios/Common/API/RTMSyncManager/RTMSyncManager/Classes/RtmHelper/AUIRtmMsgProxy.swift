@@ -302,7 +302,7 @@ extension AUIRtmMsgProxy: AgoraRtmClientDelegate {
     }
     
     public func rtmKit(_ rtmKit: AgoraRtmClientKit, didReceiveLockEvent event: AgoraRtmLockEvent) {
-        aui_info("didReceiveLockEvent[\(event.channelName)]: type: \(event.eventType.rawValue) \(event.lockDetailList.count)")
+        aui_info("didReceiveLockEvent[\(event.channelName)]: type: \(event.eventType.rawValue) count: \(event.lockDetailList.count)")
         
         var addLockDetails: [AgoraRtmLockDetail] = []
         var removeLockDetails: [AgoraRtmLockDetail] = []
