@@ -2209,11 +2209,22 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 //    [self.RTCkit enableLocalAudio:isOnMicSeat];
 //    [self.RTCkit muteLocalAudioStream:!isOnMicSeat];
     
-    VLSRRoomSeatModel* info = [self getCurrentUserSeatInfo];
-    self.isNowMicMuted = info.isAudioMuted;
-    self.isNowCameraMuted = info.isVideoMuted;
+//    VLSRRoomSeatModel* info = [self getCurrentUserSeatInfo];
+//    self.isNowMicMuted = info.isAudioMuted;
+//    self.isNowCameraMuted = info.isVideoMuted;
+//    
+//    self.bottomView.hidden = !_isOnMicSeat;
     
-    self.bottomView.hidden = !_isOnMicSeat;
+    VLSRRoomSeatModel* info = [self getCurrentUserSeatInfo];
+    if(onMicSeatStatusDidChanged){
+        if(info == nil){
+            self.isNowMicMuted = true;
+            self.isNowCameraMuted = true;
+        } else {
+            self.isNowMicMuted = info.isAudioMuted;
+            self.isNowCameraMuted = info.isVideoMuted;
+        }
+    }
     
     self.requestOnLineView.hidden = !self.bottomView.hidden;
     
