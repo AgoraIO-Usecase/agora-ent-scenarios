@@ -149,20 +149,26 @@ extension DownloadManager: IAGDownloadManager {
         
         //如果是文件夹，文件夹存在且zip不存在，暂时用来表示该md5文件解压正确且完成了
         if calculateTotalSize(destinationPath) > 0 {
-            completionHandler(nil)
+            asyncToMainThread {
+                completionHandler(nil)
+            }
             return
         }
         
         //再检查是不是文件，是文件先查是不是存在
         if !fm.fileExists(atPath: destinationPath) {
-            completionHandler(ResourceError.resourceNotFoundError(url: destinationPath))
+            asyncToMainThread {
+                completionHandler(ResourceError.resourceNotFoundError(url: destinationPath))
+            }
             return
         }
         
         //文件存在，检查md5
         guard let md5 = md5 else {
             aui_info("startDownload completion, file exist & without md5")
-            completionHandler(nil)
+            asyncToMainThread {
+                completionHandler(nil)
+            }
             return
         }
         let queue = DispatchQueue.global(qos: .background)
@@ -171,7 +177,7 @@ extension DownloadManager: IAGDownloadManager {
             aui_info("check md5: '\(tempFileMD5)'-'\(md5)' \(destinationPath)")
             if md5 == tempFileMD5 {
                 //md5一致，直接完成
-                DispatchQueue.main.async {
+                asyncToMainThread {
                     completionHandler(nil)
                 }
                 return
@@ -184,7 +190,7 @@ extension DownloadManager: IAGDownloadManager {
 //                aui_error("remove exist file fail: \(destinationPath)")
 //            }
             
-            DispatchQueue.main.async {
+            asyncToMainThread {
                 completionHandler(ResourceError.md5MismatchError(msg: destinationPath))
             }
         }
@@ -312,7 +318,10 @@ extension DownloadManager: IAGDownloadManager {
                 try? FileManager.default.moveItem(atPath: tempFolderPath, toPath: destinationFolderPath)
                 //解压完成移除zip文件
                 try? FileManager.default.removeItem(atPath: destinationZipPath)
-                completionHandler(URL(string: destinationFolderPath), nil)
+                
+                asyncToMainThread {
+                    completionHandler(URL(string: destinationFolderPath), nil)
+                }
             }
         }
     }
@@ -360,20 +369,20 @@ extension DownloadManager {
                     }
                     
                     // 文件处理完成，返回成功结果
-                    DispatchQueue.main.async {
+                    asyncToMainThread {
                         completion(nil)
                     }
                 } else {
                     try fileManager.removeItem(atPath: tempFilePath)
                     // MD5 不匹配，返回错误结果
-                    DispatchQueue.main.async {
+                    asyncToMainThread {
                         completion(ResourceError.md5MismatchError(msg: targetFilePath))
                     }
                 }
             } catch {
                 try? fileManager.removeItem(atPath: tempFilePath)
                 // 文件处理过程中出现错误，返回错误结果
-                DispatchQueue.main.async {
+                asyncToMainThread {
                     completion(error)
                 }
             }
