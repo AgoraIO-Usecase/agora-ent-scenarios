@@ -99,7 +99,9 @@ func calculateMD5(forFileAt url: URL) -> String? {
     }
 }
 
-func unzipFile(atPath path: String, toDestination destination: String) {
+func unzipFile(atPath path: String, 
+               toDestination destination: String,
+               progress: ((Double) -> Void)?) {
     do {
         let date = Date()
         let url = URL(fileURLWithPath: path)
@@ -107,8 +109,9 @@ func unzipFile(atPath path: String, toDestination destination: String) {
                           destination: URL(fileURLWithPath: destination),
                           overwrite: true,
                           password: nil,
-                          progress:  { progress in
-            aui_debug("unzip progress: \(progress) file: \(path)")
+                          progress:  { percent in
+            aui_debug("unzip progress: \(percent) file: \(path)")
+            progress?(percent)
         })
         aui_benchmark("file: \(url.relativePath) unzip success", cost: -date.timeIntervalSinceNow)
         aui_info("unzip success folderPath: \(destination)")

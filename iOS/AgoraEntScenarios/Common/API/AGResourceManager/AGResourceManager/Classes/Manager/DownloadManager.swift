@@ -302,10 +302,12 @@ extension DownloadManager: IAGDownloadManager {
             return
         }
         
+        //TODO: 进度暂时按照下载80%，解压20%分配
         startDownloadFile(withURL: url,
                           md5: md5,
-                          destinationPath: destinationZipPath,
-                          progressHandler: progressHandler) { url, err in
+                          destinationPath: destinationZipPath) { percent in
+            progressHandler(percent * 0.8)
+        } completionHandler: { url, err in
             if let err = err {
                 completionHandler(nil, err)
                 return
@@ -319,7 +321,10 @@ extension DownloadManager: IAGDownloadManager {
                 let tempFolderPath = "\(destinationFolderPath)_temp"
                 try? FileManager.default.removeItem(atPath: tempFolderPath)
                 try? FileManager.default.moveItem(atPath: destinationFolderPath, toPath: tempFolderPath)
-                unzipFile(atPath: destinationZipPath, toDestination: tempFolderPath)
+                unzipFile(atPath: destinationZipPath,
+                          toDestination: tempFolderPath) { percent in
+                    progressHandler(percent * 0.2 + 0.8)
+                }
                 try? FileManager.default.moveItem(atPath: tempFolderPath, toPath: destinationFolderPath)
                 //解压完成移除zip文件
                 try? FileManager.default.removeItem(atPath: destinationZipPath)
