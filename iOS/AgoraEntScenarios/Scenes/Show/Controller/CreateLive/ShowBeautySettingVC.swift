@@ -149,19 +149,21 @@ class ShowBeautySettingVC: UIViewController {
     private lazy var beautyVenderView: ShowBeautyVenderView = {
         let view = ShowBeautyVenderView()
         view.onSelectedBeautyVenderClosure = { [weak self] type in
-            guard let self = self else { return }
-            guard AGResourceManager.checkAndSetupBeautyPath([type]) else { return }
+            AGResourceManager.checkAndSetupBeautyPath([type]) { err in
+                guard let self = self, err == nil else { return }
+                self.beautyVenderButton.setTitle(type.title, for: .normal)
+                BeautyManager.shareManager.destroy(isAll: false)
+                BeautyModel.beautyType = type
+                ShowBeautyFaceVC.resetData()
+                BeautyManager.shareManager.updateBeautyRedner()
+                self.vcs = self.createBeautyVC()
+                self.segmentedView.titles = self.titles
+                self.segmentedView.reloadData()
+                self.segmentedView.selectItem(at: 0)
+                self.onClickBeautyVenderButton(sender: self.beautyVenderButton)
+            }
             
-            self.beautyVenderButton.setTitle(type.title, for: .normal)
-            BeautyManager.shareManager.destroy(isAll: false)
-            BeautyModel.beautyType = type
-            ShowBeautyFaceVC.resetData()
-            BeautyManager.shareManager.updateBeautyRedner()
-            self.vcs = self.createBeautyVC()
-            self.segmentedView.titles = self.titles
-            self.segmentedView.reloadData()
-            self.segmentedView.selectItem(at: 0)
-            self.onClickBeautyVenderButton(sender: self.beautyVenderButton)
+            
         }
         view.translatesAutoresizingMaskIntoConstraints = false
         return view

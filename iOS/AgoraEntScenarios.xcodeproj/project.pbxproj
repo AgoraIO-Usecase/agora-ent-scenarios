@@ -108,6 +108,8 @@
 		DD3610CB29B70CDC00CE7984 /* ShowServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36105729B70CDC00CE7984 /* ShowServiceProtocol.swift */; };
 		DD3610CD29B70F3300CE7984 /* VLMineSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3610CC29B70F3300CE7984 /* VLMineSwitchCell.swift */; };
 		DD3610D029B70F3800CE7984 /* VLMineCellModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD3610CF29B70F3800CE7984 /* VLMineCellModel.m */; };
+		DD38AE632BA92CDD00C418F4 /* LRCLodingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD38AE612BA92CDC00C418F4 /* LRCLodingProgressView.swift */; };
+		DD38AE642BA92CDD00C418F4 /* GradientProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD38AE622BA92CDC00C418F4 /* GradientProgressBar.swift */; };
 		DD614F5F2AD4FA620059F109 /* AUiAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD614F5B2AD4FA620059F109 /* AUiAlertView.swift */; };
 		DD614F612AD4FA620059F109 /* AlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD614F5D2AD4FA620059F109 /* AlertManager.swift */; };
 		DD619A6429E3E247008F63E4 /* SARequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199CF29E3E246008F63E4 /* SARequest.swift */; };
@@ -848,6 +850,8 @@
 		DD3610CC29B70F3300CE7984 /* VLMineSwitchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VLMineSwitchCell.swift; sourceTree = "<group>"; };
 		DD3610CE29B70F3800CE7984 /* VLMineCellModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLMineCellModel.h; sourceTree = "<group>"; };
 		DD3610CF29B70F3800CE7984 /* VLMineCellModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLMineCellModel.m; sourceTree = "<group>"; };
+		DD38AE612BA92CDC00C418F4 /* LRCLodingProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LRCLodingProgressView.swift; sourceTree = "<group>"; };
+		DD38AE622BA92CDC00C418F4 /* GradientProgressBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradientProgressBar.swift; sourceTree = "<group>"; };
 		DD614F5B2AD4FA620059F109 /* AUiAlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUiAlertView.swift; sourceTree = "<group>"; };
 		DD614F5D2AD4FA620059F109 /* AlertManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertManager.swift; sourceTree = "<group>"; };
 		DD6199CF29E3E246008F63E4 /* SARequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SARequest.swift; sourceTree = "<group>"; };
@@ -1978,6 +1982,7 @@
 		DD36102129B70CDC00CE7984 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				DD38AE602BA92CDC00C418F4 /* Progress */,
 				DD36102229B70CDC00CE7984 /* Music */,
 				DD36102629B70CDC00CE7984 /* Alert */,
 				DD36102929B70CDC00CE7984 /* CreateLive */,
@@ -2107,6 +2112,15 @@
 				AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */,
 			);
 			path = Service;
+			sourceTree = "<group>";
+		};
+		DD38AE602BA92CDC00C418F4 /* Progress */ = {
+			isa = PBXGroup;
+			children = (
+				DD38AE612BA92CDC00C418F4 /* LRCLodingProgressView.swift */,
+				DD38AE622BA92CDC00C418F4 /* GradientProgressBar.swift */,
+			);
+			path = Progress;
 			sourceTree = "<group>";
 		};
 		DD614F5A2AD4FA620059F109 /* ToastView */ = {
@@ -4482,6 +4496,7 @@
 				E732CE082B4D2AF8004D6FB9 /* BEGLTexture.m in Sources */,
 				E301BE6C2AF4E06F0089A79C /* VLSRStatusView.swift in Sources */,
 				E301BD712AF4CAFF0089A79C /* VLAudioEffectPicker.m in Sources */,
+				DD38AE642BA92CDD00C418F4 /* GradientProgressBar.swift in Sources */,
 				DD619AB029E3E247008F63E4 /* SAGiftView.swift in Sources */,
 				E301C01C2AF8E8E90089A79C /* VLSBGSwitcherView.m in Sources */,
 				DD619AC629E3E247008F63E4 /* SABaseRtcUserView.swift in Sources */,
@@ -5007,6 +5022,7 @@
 				DD619A9C29E3E247008F63E4 /* SAGiftersViewController.swift in Sources */,
 				E301C0172AF8E8E90089A79C /* VLSBGDropOnLineView.m in Sources */,
 				E301BE702AF4E06F0089A79C /* VLSRSliderView.m in Sources */,
+				DD38AE632BA92CDD00C418F4 /* LRCLodingProgressView.swift in Sources */,
 				DD619ABA29E3E247008F63E4 /* SAAudioSettingView.swift in Sources */,
 				DD36109329B70CDC00CE7984 /* ShowLiveViewController.swift in Sources */,
 				E301BD6B2AF4CAFF0089A79C /* VLSearchSongResultView.m in Sources */,
@@ -5301,7 +5317,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.2.0;
+				MARKETING_VERSION = 4.2.1;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
@@ -5532,7 +5548,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.2.0;
+				MARKETING_VERSION = 4.2.1;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
