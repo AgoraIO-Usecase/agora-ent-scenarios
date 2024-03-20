@@ -269,7 +269,7 @@ extension AUIScene: AUIArbiterDelegate {
         if error.code == AgoraRtmErrorCode.lockNotExist.rawValue {
             _cleanScene()
             _notifyError(error: error)
-            self.onMsgRecvEmpty(channelName: channelName)
+//            self.onMsgRecvEmpty(channelName: channelName)
         }
     }
 }
