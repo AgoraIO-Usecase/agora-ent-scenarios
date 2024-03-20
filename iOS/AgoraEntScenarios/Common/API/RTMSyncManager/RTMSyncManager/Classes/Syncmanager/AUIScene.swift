@@ -72,7 +72,7 @@ public class AUIScene: NSObject {
     
     //TODO: 是否需要像UIKit一样传入一个房间信息对象，还是这个对象业务上自己创建map collection来写入
     public func create(payload: [String: Any]?, completion:@escaping (NSError?)->()) {
-        aui_error("create with channelName: \(channelName), with payload \(payload ?? [:])", tag: kSceneTag)
+        aui_info("create with channelName: \(channelName), with payload \(payload ?? [:])", tag: kSceneTag)
         
         guard rtmManager.isLogin else {
             aui_error("create fail! not login", tag: kSceneTag)
@@ -102,7 +102,7 @@ public class AUIScene: NSObject {
     }
     
     public func enter(completion:@escaping ([String: Any]?, NSError?)->()) {
-        aui_error("enter with channelName: \(channelName)", tag: kSceneTag)
+        aui_info("enter with channelName: \(channelName)", tag: kSceneTag)
         guard rtmManager.isLogin else {
             aui_error("enter fail! not login", tag: kSceneTag)
             completion(nil, NSError.auiError("enter fail! not login"))
