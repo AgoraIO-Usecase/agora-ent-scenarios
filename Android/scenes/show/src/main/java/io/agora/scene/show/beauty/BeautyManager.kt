@@ -77,7 +77,7 @@ object BeautyManager {
         this.context = context.applicationContext as Application
         this.rtcEngine = rtcEngine
         this.beautyType = BeautyType.SenseTime
-        this.enable = rtcEngine.queryDeviceScore() >= 75
+        this.enable = rtcEngine.queryDeviceScore() >= 75 // 低端机关闭美颜
         rtcEngine.registerVideoFrameObserver(MultiBeautyVideoObserver())
     }
 

@@ -14,16 +14,22 @@ import android.view.inputmethod.InputMethodManager
 import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.SegmentationProperty
+import io.agora.rtc2.video.VideoCanvas
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
+//import io.agora.scene.base.utils.DownloadUtils
+//import io.agora.scene.base.utils.DownloadUtils.FileDownloadCallback
+//import io.agora.scene.base.utils.FileZip
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.base.utils.resourceManager.DownloadUtils
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
 import io.agora.scene.show.debugSettings.DebugSettingDialog
@@ -33,6 +39,10 @@ import io.agora.scene.show.widget.PresetDialog
 import io.agora.scene.show.widget.beauty.MultiBeautyDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
+import kotlinx.coroutines.*
+import java.io.File
+import java.lang.Exception
+import java.lang.Runnable
 import kotlin.random.Random
 
 /*
@@ -102,18 +112,76 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             }
         }
 
-        // 低端机 或 无证书则关闭美颜
-        BeautyManager.initialize(this, mRtcEngine)
-        BeautyManager.setupLocalVideo(SurfaceView(this).apply {
-            binding.flVideoContainer.addView(this)
-        }, Constants.RENDER_MODE_HIDDEN)
+        // 下载资源过程中不允许点击其余的按钮
+        binding.tvSetting.isEnabled = false
+        binding.tvBeauty.isEnabled = false
+        binding.tvRotate.isEnabled = false
+        binding.btnStartLive.isEnabled = false
+        binding.ivClose.isEnabled = false
 
+        mRtcEngine.setupLocalVideo(VideoCanvas(SurfaceView(this@LivePrepareActivity).apply {
+            binding.flVideoContainer.addView(this)
+        }))
+
+        val urls = mapOf(
+            Pair("商汤", "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/beauty/sensetime/beauty_sensetime.zip"),
+            Pair("相芯", "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/beauty/faceunity/beauty_faceunity.zip"),
+            Pair("火山引擎", "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/beauty/bytedance/beauty_bytedance.zip")
+        )
+        val path = this@LivePrepareActivity.getExternalFilesDir(null)?.absolutePath + "/assets"
+
+        GlobalScope.launch(Dispatchers.IO) {
+            urls.forEach { url ->
+                async(Dispatchers.Main) {
+                    ShowLogger.d("hugo", "Processing $url")
+                    binding.statusPrepareViewLrc.isVisible = true
+                    binding.pbLoading.progress = 0
+                    binding.tvContent.text =
+                        String.format(resources.getString(R.string.show_beauty_loading), url.key, "0%")
+                }
+                // 调用processFile处理文件
+                DownloadUtils.instance.processFile(this@LivePrepareActivity, url.value, path, object : DownloadUtils.FileDownloadCallback {
+                    override fun onProgress(file: File, progress: Int) {
+                        // 更新UI，显示下载进度
+                        binding.pbLoading.progress = progress
+                        binding.tvContent.text = String.format(resources.getString(R.string.show_beauty_loading), url.key, "$progress%")
+                    }
+
+                    override fun onSuccess(file: File) {
+                        // 下载成功，可以更新UI
+                        ShowLogger.d("hugo", "下载成功: ${url.key}")
+                    }
+
+                    override fun onFailed(exception: Exception) {
+                        // 下载失败，更新UI显示错误信息
+                        ShowLogger.e("hugo", exception, "ZipUncompress failed: ${exception.message}")
+                    }
+                })
+            }
+            withContext(Dispatchers.Main) {
+                binding.statusPrepareViewLrc.isVisible = false
+                binding.tvSetting.isEnabled = true
+                binding.tvBeauty.isEnabled = true
+                binding.tvRotate.isEnabled = true
+                binding.btnStartLive.isEnabled = true
+                binding.ivClose.isEnabled = true
+
+                BeautyManager.initialize(this@LivePrepareActivity, mRtcEngine)
+                BeautyManager.setupLocalVideo(SurfaceView(this@LivePrepareActivity).apply {
+                    binding.flVideoContainer.addView(this)
+                }, Constants.RENDER_MODE_HIDDEN)
+            }
+        }
 
         toggleVideoRun = Runnable {
             initRtcEngine()
         }
         requestCameraPermission(true)
         showPresetDialog()
+    }
+
+    override fun onBackPressed() {
+        //super.onBackPressed()
     }
 
     private var toggleVideoRun: Runnable? = null

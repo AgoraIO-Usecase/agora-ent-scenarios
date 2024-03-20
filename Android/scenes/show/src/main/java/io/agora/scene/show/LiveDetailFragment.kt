@@ -638,7 +638,9 @@ class LiveDetailFragment : Fragment() {
         // H265开关
         topBinding.tvStatisticH265.isVisible = true
         if (isRoomOwner) {
-            topBinding.tvStatisticH265.text = getString(R.string.show_statistic_h265, getString(R.string.show_setting_opened))
+            codecType?.let {
+                topBinding.tvStatisticH265.text = getString(R.string.show_statistic_h265, if (it == 3) getString(R.string.show_setting_opened) else getString(R.string.show_setting_closed))
+            }
         } else {
             topBinding.tvStatisticH265.text = getString(R.string.show_statistic_h265, "--")
         }

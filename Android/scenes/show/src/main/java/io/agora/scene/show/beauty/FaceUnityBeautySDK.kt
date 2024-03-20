@@ -252,13 +252,14 @@ object FaceUnityBeautySDK {
             }
 
         // 贴纸
-        var sticker: String? = null
+        var sticker: StickerItem? = null
             set(value) {
                 field = value
                 runOnBeautyThread {
                     fuRenderKit.propContainer.removeAllProp()
-                    if (!TextUtils.isEmpty(value)) {
-                        val prop = Sticker(FUBundleData("$resourceBase/$sticker"))
+                    if (value != null) {
+                        val path = value.context.getExternalFilesDir(null)?.absolutePath + "/assets/$resourceBase/${value.path}"
+                        val prop = Sticker(FUBundleData(path))
                         fuRenderKit.propContainer.addProp(prop)
                     }
                 }
@@ -272,9 +273,10 @@ object FaceUnityBeautySDK {
                     if (value == null) {
                         fuRenderKit.makeup = null
                     } else {
+                        val path = value.context.getExternalFilesDir(null)?.absolutePath + "/assets/$resourceBase/${value.path}"
                         val makeup =
                             SimpleMakeup(FUBundleData("graphics" + File.separator + "face_makeup.bundle"))
-                        makeup.setCombinedConfig(FUBundleData("$resourceBase/${value.path}"))
+                        makeup.setCombinedConfig(FUBundleData(path))
                         makeup.makeupIntensity = value.intensity.toDouble()
                         fuRenderKit.makeup = makeup
                     }
@@ -312,9 +314,13 @@ object FaceUnityBeautySDK {
     }
 
     data class MakeUpItem(
+        val context: Context,
         val path: String,
         val intensity: Float
     )
 
-
+    data class StickerItem(
+        val context: Context,
+        val path: String
+    )
 }

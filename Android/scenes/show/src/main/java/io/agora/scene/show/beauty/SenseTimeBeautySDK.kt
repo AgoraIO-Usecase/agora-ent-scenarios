@@ -9,7 +9,6 @@ import com.softsugar.stmobile.STMobileEffectParams
 import com.softsugar.stmobile.STMobileHumanActionNative
 import com.softsugar.stmobile.params.STEffectBeautyType
 import io.agora.beautyapi.sensetime.SenseTimeBeautyAPI
-import io.agora.scene.show.utils.FileUtils
 
 object SenseTimeBeautySDK {
     private const val TAG = "SenseTimeBeautySDK"
@@ -88,17 +87,14 @@ object SenseTimeBeautySDK {
     }
 
     private fun checkLicense(context: Context): Boolean {
-        val license = FileUtils.getAssetsString(
-            context,
-            "$resourcePath/license/SenseME.lic"
-        )
+        val license = context.getExternalFilesDir(null)?.absolutePath + "/assets/$resourcePath/license/SenseME.lic"
+
         if(TextUtils.isEmpty(license)){
             return false
         }
-        val activeCode = STMobileAuthentificationNative.generateActiveCodeFromBuffer(
+        val activeCode = STMobileAuthentificationNative.generateActiveCode(
             context,
-            license,
-            license.length
+            license
         )
         Log.d(TAG, "SenseTime >> checkLicense successfully! activeCode=$activeCode")
         return true
@@ -109,8 +105,10 @@ object SenseTimeBeautySDK {
             return
         }
         _humanActionNative = STMobileHumanActionNative()
-        val assets = context.assets
-        val result = _humanActionNative?.createInstanceFromAssetFile("$resourcePath/$MODEL_106", humanActionCreateConfig, assets)
+        //val assets = context.assets
+        val path = context.getExternalFilesDir(null)?.absolutePath + "/assets/$resourcePath/$MODEL_106"
+
+        val result = _humanActionNative?.createInstance(path, humanActionCreateConfig)
         Log.d(TAG, "SenseTime >> STMobileHumanActionNative create result : $result")
 
         if (result != 0) {
@@ -430,11 +428,11 @@ object SenseTimeBeautySDK {
                         )
                     } else {
                         if(shouldReset){
-                            val assets = value.context.assets
-                            _mobileEffectNative?.setBeautyFromAssetsFile(
+                            //val assets = value.context.assets
+                            val path = value.context.getExternalFilesDir(null)?.absolutePath + "/assets/$resourcePath"
+                            _mobileEffectNative?.setBeauty(
                                 STEffectBeautyType.EFFECT_BEAUTY_MAKEUP_ALL,
-                                "$resourcePath/${value.path}",
-                                assets
+                                "$path/${value.path}",
                             )
                         }
                         _mobileEffectNative?.setBeautyStrength(
@@ -456,9 +454,9 @@ object SenseTimeBeautySDK {
                             stickerPackageId = 0
                         }
                     } else {
-                        stickerPackageId = _mobileEffectNative?.changePackageFromAssetsFile(
-                            "$resourcePath/${value.path}",
-                            value.context.assets
+                        val path = value.context.getExternalFilesDir(null)?.absolutePath + "/assets/$resourcePath/${value.path}"
+                        stickerPackageId = _mobileEffectNative?.changePackage(
+                            path
                         ) ?: 0
                     }
                 }

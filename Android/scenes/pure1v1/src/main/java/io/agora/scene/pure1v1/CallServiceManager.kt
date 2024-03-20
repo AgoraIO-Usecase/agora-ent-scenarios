@@ -12,7 +12,9 @@ import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.data.MediaPlayerSource
 import io.agora.rtc2.*
 import io.agora.rtc2.Constants.*
+import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtm.ErrorInfo
 import io.agora.rtm.ResultCallback
 import io.agora.rtm.RtmClient
@@ -300,10 +302,29 @@ class CallServiceManager {
                 Pure1v1Logger.e(tag, "IRtcEngineEventHandler onError:$err")
             }
         }
-        config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING
-        config.mAudioScenario = Constants.AUDIO_SCENARIO_GAME_STREAMING
+        config.mChannelProfile = CHANNEL_PROFILE_LIVE_BROADCASTING
+        config.mAudioScenario = AUDIO_SCENARIO_GAME_STREAMING
         try {
             rtcEngine = RtcEngine.create(config) as RtcEngineEx
+
+            // 设置视频最佳配置
+            rtcEngine.setCameraCapturerConfiguration(CameraCapturerConfiguration(
+                CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_FRONT,
+                CameraCapturerConfiguration.CaptureFormat(720, 1280, 24)
+            ).apply {
+                followEncodeDimensionRatio = true
+            })
+            rtcEngine.setVideoEncoderConfiguration(
+                VideoEncoderConfiguration().apply {
+                    dimensions = VideoEncoderConfiguration.VideoDimensions(720, 1280)
+                    frameRate = 24
+                    degradationPrefer = VideoEncoderConfiguration.DEGRADATION_PREFERENCE.MAINTAIN_BALANCED
+                }
+            )
+            rtcEngine.setParameters("\"che.video.videoCodecIndex\": 2")
+            rtcEngine.enableInstantMediaRendering()
+            rtcEngine.setParameters("{\"rtc.video.quickIntraHighFec\": true}")
+            rtcEngine.setParameters("{\"rtc.network.e2e_cc_mode\": 3}")
         } catch (e: Exception) {
             e.printStackTrace()
             Pure1v1Logger.e(tag, "RtcEngine.create() called error: $e")

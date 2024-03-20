@@ -507,7 +507,7 @@ class CallApiImpl constructor(
         val videoCanvas = VideoCanvas(tempLocalCanvasView)
         videoCanvas.setupMode = VideoCanvas.VIEW_SETUP_MODE_ADD
         videoCanvas.renderMode = VideoCanvas.RENDER_MODE_HIDDEN
-        videoCanvas.mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
+        videoCanvas.mirrorMode = Constants.VIDEO_MIRROR_MODE_AUTO
         engine.setDefaultAudioRoutetoSpeakerphone(true)
         engine.setupLocalVideo(videoCanvas)
         val ret = engine.startPreview()
@@ -683,7 +683,6 @@ class CallApiImpl constructor(
             return
         }
         _removeLocalVideo()
-        config?.rtcEngine?.stopCameraCapture(Constants.VideoSourceType.VIDEO_SOURCE_CAMERA_PRIMARY)
         config?.rtcEngine?.stopPreview()
         val ret = config?.rtcEngine?.leaveChannelEx(connection)
         callPrint("leave RTC channel[${ret ?: -1}]")

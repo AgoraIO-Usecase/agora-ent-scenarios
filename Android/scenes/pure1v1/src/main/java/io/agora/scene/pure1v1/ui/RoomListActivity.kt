@@ -21,6 +21,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.ContentInspectConfig
+import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
@@ -227,8 +228,8 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         }
 
         // 开启鉴黄鉴暴
-        setupContentInspectConfig(true, RtcConnection(channelId, localUid))
-        moderationAudio()
+        //setupContentInspectConfig(true, RtcConnection(channelId, localUid))
+        //moderationAudio()
     }
 
     private fun showCallSendDialog(user: UserInfo) {
@@ -334,6 +335,17 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     CallServiceManager.instance.playCallMusic(CallServiceManager.callMusic)
                     showCallSendDialog(user)
                 }
+
+                // 设置视频最佳实践
+                CallServiceManager.instance.rtcEngine?.setVideoEncoderConfigurationEx(
+                    VideoEncoderConfiguration().apply {
+                        dimensions = VideoEncoderConfiguration.VideoDimensions(720, 1280)
+                        frameRate = 24
+                        degradationPrefer = VideoEncoderConfiguration.DEGRADATION_PREFERENCE.MAINTAIN_BALANCED
+                    },
+                    RtcConnection(CallServiceManager.instance.connectedChannelId, currentUid.toInt())
+                )
+                CallServiceManager.instance.rtcEngine?.setParameters("\"che.video.videoCodecIndex\": 2")
             }
             CallStateType.Connecting -> {
                 callSendDialog?.updateCallState(CallDialogState.Connecting)

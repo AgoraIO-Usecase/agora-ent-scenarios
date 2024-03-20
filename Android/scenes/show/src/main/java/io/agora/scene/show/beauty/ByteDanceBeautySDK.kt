@@ -37,46 +37,28 @@ object ByteDanceBeautySDK {
         assetsPath = "beauty_bytedance"
 
         // copy license
-        licensePath = "$storagePath/beauty_bytedance/LicenseBag.bundle/$LICENSE_NAME"
-        FileUtils.copyAssets(context, "$assetsPath/LicenseBag.bundle/$LICENSE_NAME", licensePath)
+        licensePath = "$storagePath/assets/beauty_bytedance/LicenseBag.bundle/$LICENSE_NAME"
         if (!File(licensePath).exists()) {
             return false
         }
 
         // copy models
-        modelsPath = "$storagePath/beauty_bytedance/ModelResource.bundle"
-        FileUtils.copyAssets(context, "$assetsPath/ModelResource.bundle", modelsPath)
+        modelsPath = "$storagePath/assets/beauty_bytedance/ModelResource.bundle"
 
         // copy beauty node
         beautyNodePath =
-            "$storagePath/beauty_bytedance/ComposeMakeup.bundle/ComposeMakeup/beauty_Android_lite"
-        FileUtils.copyAssets(
-            context,
-            "$assetsPath/ComposeMakeup.bundle/ComposeMakeup/beauty_Android_lite",
-            beautyNodePath
-        )
+            "$storagePath/assets/beauty_bytedance/ComposeMakeup.bundle/ComposeMakeup/beauty_Android_lite"
 
         // copy beauty 4items node
         beauty4ItemsNodePath =
-            "$storagePath/beauty_bytedance/ComposeMakeup.bundle/ComposeMakeup/beauty_4Items"
-        FileUtils.copyAssets(
-            context,
-            "$assetsPath/ComposeMakeup.bundle/ComposeMakeup/beauty_4Items",
-            beauty4ItemsNodePath
-        )
+            "$storagePath/assets/beauty_bytedance/ComposeMakeup.bundle/ComposeMakeup/beauty_4Items"
 
         // copy resharp node
         reSharpNodePath =
-            "$storagePath/beauty_bytedance/ComposeMakeup.bundle/ComposeMakeup/reshape_lite"
-        FileUtils.copyAssets(
-            context,
-            "$assetsPath/ComposeMakeup.bundle/ComposeMakeup/reshape_lite",
-            reSharpNodePath
-        )
+            "$storagePath/assets/beauty_bytedance/ComposeMakeup.bundle/ComposeMakeup/reshape_lite"
 
         // copy stickers
-        stickerPath = "$storagePath/beauty_bytedance/StickerResource.bundle/stickers"
-        FileUtils.copyAssets(context, "$assetsPath/StickerResource.bundle/stickers", stickerPath)
+        stickerPath = "$storagePath/assets/beauty_bytedance/StickerResource.bundle/stickers"
 
         return true
     }
@@ -402,19 +384,14 @@ object ByteDanceBeautySDK {
                     if (oMakeUp != null) {
                         runOnBeautyThread {
                             val oNodePath =
-                                "$storagePath/beauty_bytedance/ComposeMakeup.bundle/ComposeMakeup/style_makeup/${oMakeUp.style}"
+                                "$storagePath/assets/beauty_bytedance/ComposeMakeup.bundle/ComposeMakeup/style_makeup/${oMakeUp.style}"
                             renderManager.removeComposerNodes(arrayOf(oNodePath))
                         }
                     }
 
                     if (value != null) {
                         val nodePath =
-                            "$storagePath/beauty_bytedance/ComposeMakeup.bundle/ComposeMakeup/style_makeup/${value.style}"
-                        FileUtils.copyAssets(
-                            value.context,
-                            "$assetsPath/ComposeMakeup.bundle/ComposeMakeup/style_makeup/${value.style}",
-                            nodePath
-                        )
+                            "$storagePath/assets/beauty_bytedance/ComposeMakeup.bundle/ComposeMakeup/style_makeup/${value.style}"
                         runOnBeautyThread {
                             renderManager.appendComposerNodes(arrayOf(nodePath))
                             renderManager.loadResourceWithTimeout(-1)
@@ -424,7 +401,7 @@ object ByteDanceBeautySDK {
 
                 if (value != null) {
                     val nodePath =
-                        "$storagePath/beauty_bytedance/ComposeMakeup.bundle/ComposeMakeup/style_makeup/${value.style}"
+                        "$storagePath/assets/beauty_bytedance/ComposeMakeup.bundle/ComposeMakeup/style_makeup/${value.style}"
                     runOnBeautyThread {
                         renderManager.updateComposerNodes(
                             nodePath,
