@@ -44,7 +44,7 @@ public func agoraEnt_error(_ text: String, tag: String = "AgoraEntCommon") {
         let file = FileDestination()  // log to default swiftybeaver.log file
         let dateString = _dateFormat()
         let logDir = logsDir()
-        file.logFileURL = URL(fileURLWithPath: "\(logDir)/AgoraEntCommon_ios_\(dateString)_log.txt")
+        file.logFileURL = URL(fileURLWithPath: "\(logDir)/AgoraEntCommon_ios_\(dateString)_log.log")
         
         // use custom format and set console output to short time, log level & message
         console.format = "[AgoraEntCommon][$L][$X]$Dyyyy-MM-dd HH:mm:ss.SSS$d $M"

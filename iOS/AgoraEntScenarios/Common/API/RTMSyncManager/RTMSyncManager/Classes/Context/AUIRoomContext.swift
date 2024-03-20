@@ -18,6 +18,7 @@ public class AUIRoomContext: NSObject {
             currentUserInfo.userAvatar = userInfo.userAvatar
         }
     }
+    public var displayLogClosure: ((String) -> Void)?
     
 //    public var rtmToken: String = ""
     public var roomOwnerMap: [String: String] = [:]

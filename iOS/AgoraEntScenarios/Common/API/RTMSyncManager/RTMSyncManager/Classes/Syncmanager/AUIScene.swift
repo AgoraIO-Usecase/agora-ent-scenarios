@@ -112,7 +112,11 @@ public class AUIScene: NSObject {
         let date = Date()
         subscribeDate = date
         self.enterRoomCompletion = { payload, err in
-            aui_info("[Benchmark]enterRoomCompletion: \(Int64(-date.timeIntervalSinceNow * 1000)) ms", tag: kSceneTag)
+            if let err = err {
+                aui_error("enterRoomCompletion fail: \(err.localizedDescription)", tag: kSceneTag)
+            } else {
+                aui_info("[Benchmark]enterRoomCompletion: \(Int64(-date.timeIntervalSinceNow * 1000)) ms", tag: kSceneTag)
+            }
             completion(payload, err)
         }
         
