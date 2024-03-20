@@ -996,6 +996,11 @@ extension CallApiImpl: CallApiProtocol {
         }
         
         self.config = config.cloneConfig()
+        
+        //API 开启音视频首帧加速渲染
+        if let rtcEngine = config.rtcEngine {
+            optimize1v1Video(engine: rtcEngine)
+        }
     }
     
     public func deinitialize(completion: @escaping (()->())) {
