@@ -904,7 +904,7 @@ extension CallApiImpl {
             }
             if state == .calling {
                 enableNotify = false
-            } else {
+            } else { 
                 autoAccept = true
             }
         }
