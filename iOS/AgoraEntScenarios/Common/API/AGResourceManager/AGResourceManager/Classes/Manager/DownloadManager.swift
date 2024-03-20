@@ -91,7 +91,8 @@ class URLSessionDownloader: NSObject {
 
 public class DownloadManager: NSObject {
     private var session: URLSession?
-    var downloaderMap: [URL: URLSessionDownloader] = [:]
+    private var downloaderMap: [URL: URLSessionDownloader] = [:]
+    private var unzipOpMap: [URL: UnzipManager] = [:]
     
     override init() {
         super.init()
@@ -307,13 +308,16 @@ extension DownloadManager: IAGDownloadManager {
                           md5: md5,
                           destinationPath: destinationZipPath) { percent in
             progressHandler(percent * 0.8)
-        } completionHandler: { url, err in
+        } completionHandler: {[weak self] localUrl, err in
+            guard let self = self else { return }
             if let err = err {
                 completionHandler(nil, err)
                 return
             }
             
-            let queue = DispatchQueue.global(qos: .background)
+            let manager = UnzipManager()
+            self.unzipOpMap[url] = manager
+            let queue = DispatchQueue.global(qos: .default)
             queue.async {
                 //先清理目标目录内容
                 cleanDirectory(atPath: destinationFolderPath)
@@ -321,16 +325,25 @@ extension DownloadManager: IAGDownloadManager {
                 let tempFolderPath = "\(destinationFolderPath)_temp"
                 try? FileManager.default.removeItem(atPath: tempFolderPath)
                 try? FileManager.default.moveItem(atPath: destinationFolderPath, toPath: tempFolderPath)
-                unzipFile(atPath: destinationZipPath,
-                          toDestination: tempFolderPath) { percent in
+                
+                let date = Date()
+                let ret = manager.unzipFile(zipFilePath: destinationZipPath,
+                                  destination: tempFolderPath) { percent in
+                    aui_debug("unzip progress: \(percent) file: \(destinationFolderPath)")
                     progressHandler(percent * 0.2 + 0.8)
                 }
-                try? FileManager.default.moveItem(atPath: tempFolderPath, toPath: destinationFolderPath)
-                //解压完成移除zip文件
-                try? FileManager.default.removeItem(atPath: destinationZipPath)
                 
+                aui_benchmark("file: \(destinationFolderPath) unzip completion", cost: -date.timeIntervalSinceNow)
+                aui_info("unzip comletion[\(ret)] folderPath: \(destinationFolderPath)")
+                let err = ret ? nil : NSError(domain: "unzip fail", code: -1)
+                if ret {
+                    try? FileManager.default.moveItem(atPath: tempFolderPath, toPath: destinationFolderPath)
+                    //解压完成移除zip文件
+                    try? FileManager.default.removeItem(atPath: destinationZipPath)
+                }
                 asyncToMainThread {
-                    completionHandler(URL(string: destinationFolderPath), nil)
+                    self.unzipOpMap.removeValue(forKey: url)
+                    completionHandler(URL(string: destinationFolderPath), err)
                 }
             }
         }
@@ -340,6 +353,11 @@ extension DownloadManager: IAGDownloadManager {
         if let downloader = downloaderMap[url] {
             downloader.cancelTask()
             downloaderMap.removeValue(forKey: url)
+        }
+        
+        if let unzipOp = unzipOpMap[url] {
+            unzipOp.cancelUnzip()
+            unzipOpMap.removeValue(forKey: url)
         }
     }
     public func isDownloading(forUrl url: URL) -> Bool {

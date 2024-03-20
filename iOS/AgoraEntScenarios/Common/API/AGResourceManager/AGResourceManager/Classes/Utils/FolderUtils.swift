@@ -7,7 +7,6 @@
 
 import Foundation
 import CryptoKit
-import Zip
 
 func getResourceCachePath(relativePath: String) -> String? {
     if let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first {
@@ -96,27 +95,6 @@ func calculateMD5(forFileAt url: URL) -> String? {
     } catch {
         print("Error while calculating MD5: \(error.localizedDescription)")
         return nil
-    }
-}
-
-func unzipFile(atPath path: String, 
-               toDestination destination: String,
-               progress: ((Double) -> Void)?) {
-    do {
-        let date = Date()
-        let url = URL(fileURLWithPath: path)
-        try Zip.unzipFile(url, 
-                          destination: URL(fileURLWithPath: destination),
-                          overwrite: true,
-                          password: nil,
-                          progress:  { percent in
-            aui_debug("unzip progress: \(percent) file: \(path)")
-            progress?(percent)
-        })
-        aui_benchmark("file: \(url.relativePath) unzip success", cost: -date.timeIntervalSinceNow)
-        aui_info("unzip success folderPath: \(destination)")
-    } catch {
-        aui_error("unzip fail: \(error.localizedDescription) folderPath:\(destination)")
     }
 }
 

@@ -259,6 +259,9 @@ public class AGResourceManager: NSObject {
             return
         }
         downloadManager.cancelDownload(forURL: url)
+        if resourceStatusMap[resource.url] == .downloading {
+            resourceStatusMap[resource.url] = .needDownload
+        }
     }
     
     /// 下载资源
