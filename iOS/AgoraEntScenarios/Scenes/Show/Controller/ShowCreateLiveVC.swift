@@ -18,7 +18,7 @@ class ShowCreateLiveVC: UIViewController {
     private lazy var beautyVC = ShowBeautySettingVC()
     
     deinit {
-        showLogger.info("deinit-- ShowCreateLiveVC")
+        showLogger().info("deinit-- ShowCreateLiveVC")
     }
     
     override func viewDidLoad() {

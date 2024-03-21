@@ -7,13 +7,18 @@
 
 import Foundation
 import AgoraCommon
+import SwiftyBeaver
+
 let kShowLogBaseContext = "AgoraKit"
-let showLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig(sceneName: "Show"))
 
 private let kShowRoomListKey = "kShowRoomListKey"
 private let kRtcTokenMapKey = "kRtcTokenMapKey"
 private let kRtcToken = "kRtcToken"
 private let kDebugModeKey = "kDebugModeKey"
+
+func showLogger() -> SwiftyBeaver.Type {
+    AgoraEntLog.getSceneLogger(with: "Show")
+}
 
 extension AppContext {
     static private var _showServiceImpMap: [String: ShowSyncManagerServiceImp] = [String: ShowSyncManagerServiceImp]()
