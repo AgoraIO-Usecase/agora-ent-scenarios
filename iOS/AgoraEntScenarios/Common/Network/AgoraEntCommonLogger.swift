@@ -22,6 +22,10 @@ public func agoraEnt_warn(_ text: String, tag: String = "AgoraEntCommon") {
 public func agoraEnt_error(_ text: String, tag: String = "AgoraEntCommon") {
     commonLogger().error(text, context: tag)
 }
+
+public func agoraEnt_default_info(_ text: String, tag: String = "AgoraEntCommon") {
+    AgoraEntLog.currentLogger(with: "Common").info(text, context: tag)
+}
 /*
 @objc class AgoraEntCommonLogConfig: NSObject {
     var logFileMaxSize: Int = (2 * 1024 * 1024)
