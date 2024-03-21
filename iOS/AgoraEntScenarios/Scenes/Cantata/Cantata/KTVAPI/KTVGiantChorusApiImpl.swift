@@ -119,6 +119,12 @@ fileprivate enum KTVSongMode: Int {
     private var subScribeSingerMap = [Int: Int]() // <uid, ntpE2eDelay>
     private var singerList = [Int]() // <uid>
     private var mainSingerDelay = 0
+    
+    private let tag = "KTV_API_LOG"
+    private let messageId = "agora:scenarioAPI"
+    private let version = "1_iOS_4.3.0"
+    private let lyricSyncVersion = 2
+    
     deinit {
         mcc?.register(nil)
         agoraPrint("deinit KTVApiImpl")
@@ -190,6 +196,10 @@ fileprivate enum KTVSongMode: Int {
         engine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
         engine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
         engine.setParameters("{\"rtc.enableMultipath\": true}")
+        
+        // 数据上报
+         engine.setParameters("{\"rtc.direct_send_custom_event\": true}")
+        // engine.setParameters("{\"rtc.qos_for_test_purpose\": true}")
     }
     
     func renewInnerDataStreamId() {
@@ -1547,7 +1557,7 @@ extension KTVGiantChorusApiImpl {
     }
     
     private func sendCustomMessage(with event: String, label: String) {
-        apiConfig?.engine?.sendCustomReportMessage("scenarioAPI", category: "ktv_ios_3.3.0", event: event, label: label, value: 0)
+        apiConfig?.engine?.sendCustomReportMessage(messageId, category: version, event: event, label: label, value: 0)
     }
 
     private func sendStreamMessageWithDict(_ dict: [String: Any], success: ((_ success: Bool) -> Void)?) {

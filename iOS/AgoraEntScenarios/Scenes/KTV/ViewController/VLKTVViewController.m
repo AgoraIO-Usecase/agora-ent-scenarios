@@ -1226,7 +1226,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     //use game streaming in so mode, chrous profile in chrous mode
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
-    [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
+    [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQualityStereo];
     [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     if(AppContext.shared.isDebugMode){
         [self.RTCkit setParameters: @"{\"che.audio.neteq.dump_level\": 1}"];

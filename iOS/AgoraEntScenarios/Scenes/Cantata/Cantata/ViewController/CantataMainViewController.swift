@@ -352,7 +352,7 @@ extension CantataMainViewController {
     
     private func loadRtc() {
         RtcKit = AgoraRtcEngineKit.sharedEngine(withAppId: AppContext.shared.appId, delegate: self)
-        RtcKit.setAudioProfile(.musicHighQuality)
+        RtcKit.setAudioProfile(.musicHighQualityStereo)
         RtcKit.setAudioScenario(.gameStreaming)
         RtcKit.setChannelProfile(.liveBroadcasting)
         RtcKit.enableAudio()
