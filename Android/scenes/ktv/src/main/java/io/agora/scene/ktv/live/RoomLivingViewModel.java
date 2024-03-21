@@ -1494,7 +1494,7 @@ public class RoomLivingViewModel extends ViewModel {
         mRtcEngine.enableVideo();
         mRtcEngine.enableLocalVideo(false);
         mRtcEngine.enableAudio();
-        mRtcEngine.setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, Constants.AUDIO_SCENARIO_GAME_STREAMING);
+        mRtcEngine.setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO, Constants.AUDIO_SCENARIO_GAME_STREAMING);
         mRtcEngine.enableAudioVolumeIndication(50, 10, true);
         mRtcEngine.setClientRole(isOnSeat ? Constants.CLIENT_ROLE_BROADCASTER : Constants.CLIENT_ROLE_AUDIENCE);
         mRtcEngine.setAudioEffectPreset(ROOM_ACOUSTICS_KTV);
