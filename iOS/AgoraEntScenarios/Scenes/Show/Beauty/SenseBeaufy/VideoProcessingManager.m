@@ -64,7 +64,11 @@
 }
 
 - (void)setStickerWithPath: (NSString *)stickerPath callBack:(void (^)(int))callback {
-    NSString *path = [[NSBundle mainBundle] pathForResource:stickerPath ofType:nil];
+    NSString* resourceFolderPath = [STDynmicResourceConfig shareInstance].resourceFolderPath;
+    NSString* path = [NSString stringWithFormat:@"%@/sticker_face_shape/%@", resourceFolderPath, stickerPath];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+         path = [[NSBundle mainBundle] pathForResource:stickerPath ofType:nil];
+    }
 #if __has_include("st_mobile_common.h")
     [self.effectsProcess addStickerWithPath:path callBack:^(st_result_t state, int sticker, uint64_t action) {
         if (callback) {
@@ -90,7 +94,13 @@
     if (self.stickerId) {
         [self removeStickerId:self.stickerId];
     }
-    NSString *path = [[NSBundle mainBundle] pathForResource:stylePath ofType:nil];
+    
+    NSString* resourceFolderPath = [STDynmicResourceConfig shareInstance].resourceFolderPath;
+    NSString* path = [NSString stringWithFormat:@"%@/style_lightly/%@", resourceFolderPath, stylePath];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        path = [[NSBundle mainBundle] pathForResource:stylePath ofType:nil];
+    }
+    
     __weak VideoProcessingManager *weakself = self;
     [self.effectsProcess addStickerWithPath:path callBack:^(st_result_t state, int sticker, uint64_t action) {
         weakself.stickerId = sticker;
