@@ -1122,7 +1122,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             enableLocalVideo(false)
             enableAudio()
             setAudioProfile(
-                Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY,
+                Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO,
                 Constants.AUDIO_SCENARIO_GAME_STREAMING
             )
             setClientRole(if (mIsOnSeat) Constants.CLIENT_ROLE_BROADCASTER else Constants.CLIENT_ROLE_AUDIENCE)
