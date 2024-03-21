@@ -238,7 +238,7 @@ extension CallApiImpl {
         }
         
         //如果一个协议都没有实现，使用默认值
-        if emptyCount == delegates.count {
+        if emptyCount == delegates.allObjects.count {
             callPrint("join rtc strategy callback not found, use default")
             return true
         }
