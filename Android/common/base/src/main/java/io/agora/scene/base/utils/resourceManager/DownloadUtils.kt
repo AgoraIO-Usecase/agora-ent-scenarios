@@ -8,6 +8,7 @@ import okhttp3.Request
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -26,58 +27,60 @@ class DownloadUtils private constructor() {
         val instance: DownloadUtils by lazy { DownloadUtils() }
     }
 
-    suspend fun download(context: Context, url: String, callback: FileDownloadCallback) = withContext(Dispatchers.IO) {
-        val folder = context.getExternalFilesDir(CACHE_FOLDER) ?: return@withContext
-        val file = File(folder, url.substringAfterLast("/"))
-        if (file.exists()) {
-            withContext(Dispatchers.Main) {
-                callback.onSuccess(file)
-            }
-            return@withContext
-        }
-        val request = Request.Builder().url(url).build()
-        val response = okHttpClient.newCall(request).execute()
-        response.body?.let { responseBody ->
-            val total = responseBody.contentLength()
-            var sum = 0L
-            withContext(Dispatchers.Main) {
-                callback.onProgress(file, 0)
-            }
-            file.outputStream().use { fos ->
-                try {
-                    responseBody.source().use { source ->
-                        val buffer = ByteArray(2048)
-                        var bytesRead: Int
-                        while (true) {
-                            bytesRead = source.read(buffer)
-                            if (bytesRead > 0) { // 检查是否有数据需要写入
-                                fos.write(buffer, 0, bytesRead)
-                                sum += bytesRead
-                                val progress = (sum * 100 / total).toInt()
-                                withContext(Dispatchers.Main) {
-                                    callback.onProgress(file, progress)
+    suspend fun download(context: Context, url: String, callback: FileDownloadCallback) {
+        withContext(Dispatchers.IO) {
+            val folder = context.getExternalFilesDir(CACHE_FOLDER) ?: return@withContext
+            val file = File(folder, url.substringAfterLast("/"))
+            var downloadedBytes = 0L
+
+            val rangeHeaderValue = "bytes=${file.length()}-"
+            Log.d(TAG, "rangeHeaderValue: $rangeHeaderValue")
+
+            val request = Request.Builder().url(url).header("Range", rangeHeaderValue).build()
+            val response = okHttpClient.newCall(request).execute()
+            response.body?.let { responseBody ->
+                val total = responseBody.contentLength()
+                Log.d(TAG, "${file.name} download total: $total")
+
+                // 支持断点重传
+                FileOutputStream(file, true).use { fos ->
+                    try {
+                        responseBody.source().use { source ->
+                            val buffer = ByteArray(2048)
+                            var bytesRead: Int
+                            while (true) {
+                                bytesRead = source.read(buffer)
+                                if (bytesRead > 0) {
+                                    fos.write(buffer, 0, bytesRead) // 追加写入文件末尾
+                                    downloadedBytes += bytesRead
+
+                                    val progress = ((downloadedBytes * 100) / total).toInt()
+                                    withContext(Dispatchers.Main) {
+                                        Log.d(TAG, "${file.name} download progress: $progress")
+                                        callback.onProgress(file, progress)
+                                    }
+                                } else {
+                                    break
                                 }
-                            } else {
-                                break
+                            }
+                            fos.flush()
+                            Log.d(TAG, "${file.name} download completed")
+                            withContext(Dispatchers.Main) {
+                                callback.onSuccess(file)
                             }
                         }
-                        fos.flush()
-                        Log.d(TAG, "${file.name} download completed")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to download file", e)
                         withContext(Dispatchers.Main) {
-                            callback.onSuccess(file)
+                            callback.onFailed(e)
                         }
                     }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to download file", e)
-                    withContext(Dispatchers.Main) {
-                        callback.onFailed(e)
-                    }
                 }
-            }
-        } ?: run {
-            Log.e(TAG, "Response body is null for $url")
-            withContext(Dispatchers.Main) {
-                callback.onFailed(Exception("Response body is null"))
+            } ?: run {
+                Log.e(TAG, "Response body is null for $url")
+                withContext(Dispatchers.Main) {
+                    callback.onFailed(Exception("Response body is null"))
+                }
             }
         }
     }

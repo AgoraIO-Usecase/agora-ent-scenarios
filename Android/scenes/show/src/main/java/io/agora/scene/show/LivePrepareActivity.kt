@@ -50,7 +50,7 @@ import kotlin.random.Random
  */
 @RequiresApi(Build.VERSION_CODES.M)
 class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBinding>() {
-
+    private val tag = "LivePrepareActivity"
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
     private val mInputMethodManager by lazy { getSystemService(InputMethodManager::class.java) }
 
@@ -60,6 +60,14 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
 
     private var isFinishToLiveDetail = false
+
+    // 美颜资源下载协程
+    private var resourceDownloadJob: Job? = null
+    private val resourceUrls = mapOf(
+        Pair("商汤", "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/beauty/sensetime/beauty_sensetime.zip"),
+        Pair("相芯", "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/beauty/faceunity/beauty_faceunity.zip"),
+        Pair("火山引擎", "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/beauty/bytedance/beauty_bytedance.zip")
+    )
 
     override fun getViewBinding(inflater: LayoutInflater): ShowLivePrepareActivityBinding {
         return ShowLivePrepareActivityBinding.inflate(inflater)
@@ -85,6 +93,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             return@setOnEditorActionListener false
         }
         binding.ivClose.setOnClickListener {
+            resourceDownloadJob?.cancel()
             finish()
         }
 
@@ -111,36 +120,29 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 showPresetDialog()
             }
         }
-
         // 下载资源过程中不允许点击其余的按钮
         binding.tvSetting.isEnabled = false
         binding.tvBeauty.isEnabled = false
         binding.tvRotate.isEnabled = false
         binding.btnStartLive.isEnabled = false
-        binding.ivClose.isEnabled = false
 
         mRtcEngine.setupLocalVideo(VideoCanvas(SurfaceView(this@LivePrepareActivity).apply {
             binding.flVideoContainer.addView(this)
         }))
 
-        val urls = mapOf(
-            Pair("商汤", "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/beauty/sensetime/beauty_sensetime.zip"),
-            Pair("相芯", "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/beauty/faceunity/beauty_faceunity.zip"),
-            Pair("火山引擎", "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/beauty/bytedance/beauty_bytedance.zip")
-        )
-        val path = this@LivePrepareActivity.getExternalFilesDir(null)?.absolutePath + "/assets"
-
-        GlobalScope.launch(Dispatchers.IO) {
-            urls.forEach { url ->
+        // 下载美颜资源
+        val resourcePath = this.getExternalFilesDir(null)?.absolutePath + "/assets"
+        resourceDownloadJob = GlobalScope.launch(Dispatchers.IO) {
+            resourceUrls.forEach { url ->
                 async(Dispatchers.Main) {
-                    ShowLogger.d("hugo", "Processing $url")
+                    ShowLogger.d(tag, "Processing $url")
                     binding.statusPrepareViewLrc.isVisible = true
                     binding.pbLoading.progress = 0
                     binding.tvContent.text =
                         String.format(resources.getString(R.string.show_beauty_loading), url.key, "0%")
                 }
                 // 调用processFile处理文件
-                DownloadUtils.instance.processFile(this@LivePrepareActivity, url.value, path, object : DownloadUtils.FileDownloadCallback {
+                DownloadUtils.instance.processFile(this@LivePrepareActivity, url.value, resourcePath, object : DownloadUtils.FileDownloadCallback {
                     override fun onProgress(file: File, progress: Int) {
                         // 更新UI，显示下载进度
                         binding.pbLoading.progress = progress
@@ -149,22 +151,23 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
                     override fun onSuccess(file: File) {
                         // 下载成功，可以更新UI
-                        ShowLogger.d("hugo", "下载成功: ${url.key}")
+                        ShowLogger.d(tag, "download success: ${url.key}")
                     }
 
                     override fun onFailed(exception: Exception) {
                         // 下载失败，更新UI显示错误信息
-                        ShowLogger.e("hugo", exception, "ZipUncompress failed: ${exception.message}")
+                        ShowLogger.e(tag, exception, "download failed: ${exception.message}")
                     }
                 })
             }
+
+            // 下载成功后初始化美颜场景化API
             withContext(Dispatchers.Main) {
                 binding.statusPrepareViewLrc.isVisible = false
                 binding.tvSetting.isEnabled = true
                 binding.tvBeauty.isEnabled = true
                 binding.tvRotate.isEnabled = true
                 binding.btnStartLive.isEnabled = true
-                binding.ivClose.isEnabled = true
 
                 BeautyManager.initialize(this@LivePrepareActivity, mRtcEngine)
                 BeautyManager.setupLocalVideo(SurfaceView(this@LivePrepareActivity).apply {
