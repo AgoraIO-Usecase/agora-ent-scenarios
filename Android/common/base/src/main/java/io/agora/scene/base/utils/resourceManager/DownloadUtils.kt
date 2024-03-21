@@ -33,7 +33,21 @@ class DownloadUtils private constructor() {
             val file = File(folder, url.substringAfterLast("/"))
             var downloadedBytes = 0L
 
-            val rangeHeaderValue = "bytes=${file.length()}-"
+            val trimmedFilename = if (file.name.endsWith(".zip")) {
+                file.name.substring(0, file.name.length - 4)
+            } else {
+                file.name
+            }
+
+            if (File(folder, trimmedFilename).isDirectory && File(folder, trimmedFilename).exists()) {
+                return@withContext
+            }
+
+            if (file.exists()) {
+                downloadedBytes = file.length()
+            }
+
+            val rangeHeaderValue = "bytes=$downloadedBytes-"
             Log.d(TAG, "rangeHeaderValue: $rangeHeaderValue")
 
             val request = Request.Builder().url(url).header("Range", rangeHeaderValue).build()
@@ -42,37 +56,43 @@ class DownloadUtils private constructor() {
                 val total = responseBody.contentLength()
                 Log.d(TAG, "${file.name} download total: $total")
 
-                // 支持断点重传
-                FileOutputStream(file, true).use { fos ->
-                    try {
-                        responseBody.source().use { source ->
-                            val buffer = ByteArray(2048)
-                            var bytesRead: Int
-                            while (true) {
-                                bytesRead = source.read(buffer)
-                                if (bytesRead > 0) {
-                                    fos.write(buffer, 0, bytesRead) // 追加写入文件末尾
-                                    downloadedBytes += bytesRead
+                if (downloadedBytes >= total) {
+                    withContext(Dispatchers.Main) {
+                        callback.onSuccess(file)
+                    }
+                } else {
+                    // 支持断点重传
+                    FileOutputStream(file, true).use { fos ->
+                        try {
+                            responseBody.source().use { source ->
+                                val buffer = ByteArray(2048)
+                                var bytesRead: Int
+                                while (true) {
+                                    bytesRead = source.read(buffer)
+                                    if (bytesRead > 0) {
+                                        fos.write(buffer, 0, bytesRead) // 追加写入文件末尾
+                                        downloadedBytes += bytesRead
 
-                                    val progress = ((downloadedBytes * 100) / total).toInt()
-                                    withContext(Dispatchers.Main) {
-                                        Log.d(TAG, "${file.name} download progress: $progress")
-                                        callback.onProgress(file, progress)
+                                        val progress = ((downloadedBytes * 100) / total).toInt()
+                                        withContext(Dispatchers.Main) {
+                                            Log.d(TAG, "${file.name} download progress: $progress")
+                                            callback.onProgress(file, progress)
+                                        }
+                                    } else {
+                                        break
                                     }
-                                } else {
-                                    break
+                                }
+                                fos.flush()
+                                Log.d(TAG, "${file.name} download completed")
+                                withContext(Dispatchers.Main) {
+                                    callback.onSuccess(file)
                                 }
                             }
-                            fos.flush()
-                            Log.d(TAG, "${file.name} download completed")
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Failed to download file", e)
                             withContext(Dispatchers.Main) {
-                                callback.onSuccess(file)
+                                callback.onFailed(e)
                             }
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Failed to download file", e)
-                        withContext(Dispatchers.Main) {
-                            callback.onFailed(e)
                         }
                     }
                 }

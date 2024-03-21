@@ -393,6 +393,9 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     CallStateReason.CallingTimeout -> {
                         Toast.makeText(this, getText(R.string.pure1v1_call_toast_no_answer), Toast.LENGTH_SHORT).show()
                     }
+                    CallStateReason.RemoteCallBusy -> {
+                        Toast.makeText(this, getText(R.string.pure1v1_call_toast_remote_busy), Toast.LENGTH_SHORT).show()
+                    }
                     else -> {}
                 }
                 CallServiceManager.instance.remoteUser = null

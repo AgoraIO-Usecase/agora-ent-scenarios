@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -837,6 +838,12 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         CallStateReason.RemoteRejected -> {
                             if (!isRoomOwner) {
                                 ToastUtils.showToast(getString(R.string.show_to1v1_no_answer))
+                            }
+                        }
+
+                        CallStateReason.RemoteCallBusy -> {
+                            if (!isRoomOwner) {
+                                ToastUtils.showToast(getString(R.string.show_to1v1_call_toast_remote_busy))
                             }
                         }
 

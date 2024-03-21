@@ -17,6 +17,7 @@
     <string name="pure1v1_call_local_rejected">已拒绝</string>
     <string name="pure1v1_call_toast_rejected">对方已拒绝</string>
     <string name="pure1v1_call_toast_no_answer">无应答</string>
+    <string name="pure1v1_call_toast_remote_busy">对方正忙</string>
     <string name="pure1v1_call_content_inspect">监测到当前内容存在违规行为</string>
     <string name="pure1v1_dashboard_item">实时数据</string>
     <!--    dashboard-->
