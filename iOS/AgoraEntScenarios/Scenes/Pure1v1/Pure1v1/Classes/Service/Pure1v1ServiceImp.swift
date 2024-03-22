@@ -58,6 +58,9 @@ class Pure1v1ServiceImp: NSObject {
         self.appId = appId
         self.user = user
         self.rtmClient = rtmClient
+        AUIRoomContext.shared.displayLogClosure = { msg in
+            pure1v1Print(msg, context: "RTMSyncManager")
+        }
         super.init()
     }
 }

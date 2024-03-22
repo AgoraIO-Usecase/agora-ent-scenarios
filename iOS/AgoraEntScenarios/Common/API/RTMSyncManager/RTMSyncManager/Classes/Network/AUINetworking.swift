@@ -103,7 +103,7 @@ open class SyncNetworking: NSObject {
                 return
             }
             
-            aui_error("request success url = \(urlRequest.cURL()) message = \(String(data: data, encoding: .utf8) ?? "nil")", tag: "AUINetworking")
+            aui_info("request success url = \(urlRequest.cURL()) message = \(String(data: data, encoding: .utf8) ?? "nil")", tag: "AUINetworking")
             DispatchQueue.main.async {
                 completion?(nil, obj)
             }

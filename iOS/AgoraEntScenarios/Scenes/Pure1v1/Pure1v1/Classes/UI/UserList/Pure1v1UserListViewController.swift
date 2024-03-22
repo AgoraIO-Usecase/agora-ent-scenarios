@@ -243,7 +243,7 @@ extension Pure1v1UserListViewController {
         
         prepareConfig.rtcToken = rtcToken
 //        prepareConfig.rtmToken = rtmToken
-        prepareConfig.roomId = userInfo?.getRoomId() ?? NSString.withUUID()
+        prepareConfig.roomId = NSString.withUUID()
         prepareConfig.localView = callVC.localCanvasView.canvasView
         prepareConfig.remoteView = callVC.remoteCanvasView.canvasView
         prepareConfig.autoJoinRTC = false  // 如果期望立即加入自己的RTC呼叫频道，则需要设置为true
@@ -288,7 +288,7 @@ extension Pure1v1UserListViewController {
     }
     
     private func _updateCallChannel() {
-        prepareConfig.roomId = userInfo?.getRoomId() ?? NSString.withUUID()
+        prepareConfig.roomId = NSString.withUUID()
         callApi.prepareForCall(prepareConfig: prepareConfig) { _ in
         }
     }
@@ -383,7 +383,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 }
                 return
             }
-            
+            update1v1VideoEncoder(engine: rtcEngine, roomId: fromRoomId, userId: Int(currentUid) ?? 0)
             // 触发状态的用户是自己才处理
             if currentUid == "\(toUserId)" {
                 audioApi.setAudioScenario(sceneType: .Chat, audioScenarioType: .Chat_Callee)

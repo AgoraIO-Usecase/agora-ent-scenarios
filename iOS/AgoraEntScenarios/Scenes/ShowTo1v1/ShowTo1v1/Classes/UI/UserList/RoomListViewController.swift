@@ -530,6 +530,7 @@ extension RoomListViewController: CallApiListenerProtocol {
                 return
             }
             
+            update1v1VideoEncoder(engine: rtcEngine, roomId: fromRoomId, userId: Int(currentUid) ?? 0)
             if currentUid == "\(toUserId)" {
                 //被叫
                 audioApi.setAudioScenario(sceneType: .Chat, audioScenarioType: .Chat_Callee)

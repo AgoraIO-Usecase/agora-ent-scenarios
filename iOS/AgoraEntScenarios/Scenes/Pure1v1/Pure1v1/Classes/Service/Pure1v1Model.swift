@@ -21,10 +21,6 @@ public class Pure1v1UserInfo: NSObject {
         self.avatar = userInfo.userAvatar
     }
     
-    func getRoomId() ->String {
-        return "\(userId))"
-    }
-    
     func bgImage() ->UIImage? {
         let uid = UInt(userId) ?? 0
         let image = UIImage.scene1v1Image(name: "user_bg\(uid % 9 + 1)")

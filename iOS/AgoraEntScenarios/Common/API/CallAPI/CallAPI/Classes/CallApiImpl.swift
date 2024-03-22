@@ -8,7 +8,7 @@
 import Foundation
 import AgoraRtcKit
 
-let kReportCategory = "2_iOS_1.0.0"
+let kReportCategory = "2_iOS_2.0.0"
 
 let kMessageId: String = "messageId"     //发送的消息id
 
@@ -81,11 +81,6 @@ public class CallApiImpl: NSObject {
     
     //通话信息
     private var connectInfo = CallConnectInfo()
-    //上报信息
-    private var reportInfoList: [CallReportInfo] = []
-    
-    /// 是否加入频道
-    var isChannelJoined: Bool = false
     
     private let tempRemoteCanvasView: UIView = UIView()
     
@@ -243,7 +238,7 @@ extension CallApiImpl {
         }
         
         //如果一个协议都没有实现，使用默认值
-        if emptyCount == delegates.count {
+        if emptyCount == delegates.allObjects.count {
             callPrint("join rtc strategy callback not found, use default")
             return true
         }
@@ -739,18 +734,6 @@ extension CallApiImpl {
         _setupRemoteVideo(uid: callingUserId, canvasView: tempRemoteCanvasView)
     }
     
-    /// 发送report message
-    private func _flushReport() {
-        reportInfoList.forEach { info in
-            self._sendCustomReportMessage(msgId: info.msgId,
-                                          category: info.category,
-                                          event: info.event,
-                                          label: info.label,
-                                          value: info.value)
-        }
-        reportInfoList.removeAll()
-    }
-    
     private func _reportCostEvent(type: CallConnectCostType) {
         let cost = _getCost()
         connectInfo.callCostMap[type.rawValue] = cost
@@ -758,7 +741,7 @@ extension CallApiImpl {
     }
     
     private func _reportMethod(event: String, label: String = "") {
-        let msgId = "scenarioAPI"
+        let msgId = "agora:scenarioAPI"
         callPrint("_reportMethod event: \(event) label: \(label)")
         var subEvent = event
         if let range = event.range(of: "(") {
@@ -768,30 +751,15 @@ extension CallApiImpl {
         if !label.isEmpty {
             labelValue = "\(label)&\(labelValue)"
         }
-        if isChannelJoined {
-            _sendCustomReportMessage(msgId: msgId, category: kReportCategory, event: subEvent, label: labelValue, value: 0)
-            return
-        }
         
-        let info = CallReportInfo(msgId: msgId, category: kReportCategory, event: subEvent, label: labelValue, value: 0)
-        reportInfoList.append(info)
-        reportInfoList = reportInfoList.suffix(10)
-//        callPrint("sendCustomReportMessage not join channel cache it! event: \(subEvent) label: \(labelValue)")
+        _sendCustomReportMessage(msgId: msgId, category: kReportCategory, event: subEvent, label: labelValue, value: 0)
     }
     
     private func _reportEvent(key: String, value: Int) {
         guard let config = config else { return }
         let msgId = "uid=\(config.userId)&roomId=\(connectInfo.callingRoomId ?? "")"
         let label = "callId=\(connectInfo.callId)&ts=\(_getTimeInMs())"
-        if isChannelJoined {
-            _sendCustomReportMessage(msgId: msgId, category: kReportCategory, event: key, label: label, value: value)
-            return
-        }
-        
-        let info = CallReportInfo(msgId: msgId, category: kReportCategory, event: key, label: label, value: value)
-        reportInfoList.append(info)
-        reportInfoList = reportInfoList.suffix(10)
-//        callPrint("sendCustomReportMessage not join channel cache it! msgId:\(msgId) category:\(kReportCategory) event: \(key) label:\(connectInfo.callId) value:\(value)")
+        _sendCustomReportMessage(msgId: msgId, category: kReportCategory, event: key, label: label, value: value)
     }
     
     private func _sendCustomReportMessage(msgId: String,
@@ -799,11 +767,12 @@ extension CallApiImpl {
                                           event: String,
                                           label: String,
                                           value: Int) {
-        guard let config = config, isChannelJoined, let rtcConnection = rtcConnection else { return }
-        let _ = config.rtcEngine.sendCustomReportMessageEx(msgId, category: category, event: event, label: label, value: value, connection: rtcConnection)
-        #if DEBUG
-//        callPrint("sendCustomReportMessage[\(ret)] msgId:\(msgId) event:\(event) label:\(label) value: \(value)")
-        #endif
+        guard let config = config else { return }
+        let _ = config.rtcEngine.sendCustomReportMessage(msgId,
+                                                         category: category,
+                                                         event: event,
+                                                         label: label,
+                                                         value: value)
     }
     
     private func _sendMessage(userId: String, 
@@ -904,7 +873,7 @@ extension CallApiImpl {
             }
             if state == .calling {
                 enableNotify = false
-            } else {
+            } else { 
                 autoAccept = true
             }
         }
@@ -989,13 +958,23 @@ extension CallApiImpl: CallApiProtocol {
     }
     
     public func initialize(config: CallConfig) {
-        _reportMethod(event: "\(#function)", label: "appId=\(config.appId)&userId=\(config.userId)")
+        defer {
+            _reportMethod(event: "\(#function)", label: "appId=\(config.appId)&userId=\(config.userId)")
+        }
         if state != .idle {
             callWarningPrint("must invoke 'deinitialize' to clean state")
             return
         }
         
         self.config = config.cloneConfig()
+        
+        //API 开启音视频首帧加速渲染
+        if let rtcEngine = config.rtcEngine {
+            //日志上报优化
+//            rtcEngine.setParameters("{\"rtc.qos_for_test_purpose\": true}")
+            rtcEngine.setParameters("{\"rtc.direct_send_custom_event\": true}")
+            optimize1v1Video(engine: rtcEngine)
+        }
     }
     
     public func deinitialize(completion: @escaping (()->())) {
@@ -1247,7 +1226,6 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didLeaveChannelWith stats: AgoraChannelStats) {
         callPrint("didLeaveChannelWith")
-        isChannelJoined = false
         /*
          由于leave rtc到didLeaveChannelWith是异步的
          这里rtcConnection = nil会导致leave之后马上join，didLeaveChannelWith会在join之后错误的置空了rtc connection
@@ -1259,9 +1237,6 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
         callPrint("join RTC channel, didJoinChannel: \(uid), channel: \(channel) elapsed: \(elapsed)")
         guard uid == config?.userId ?? 0 else { return }
-        isChannelJoined = true
-        //TODO: 因为频道外上报需要指定固定频道id(即sdk根据id自己缓存了n条记录)，换了id和后续加入的频道id不一致上传会失败
-        _flushReport()
         joinRtcCompletion?(nil)
         joinRtcCompletion = nil
         _notifyEvent(event: .localJoin)

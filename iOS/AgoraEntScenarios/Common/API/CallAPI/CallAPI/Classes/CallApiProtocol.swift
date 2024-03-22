@@ -68,7 +68,7 @@ import AgoraRtcKit
     case remoteCallingTimeout = 4                 //远端呼叫超时
     case joinRTCSuccessed = 5                     //加入RTC成功
 //    case rtmSetupFailed = 6                       //设置RTM失败[已废弃，请使用onCallErrorOccur(state: rtmSetupFail)]
-//    case rtmSetupSuccessed = 7                    //设置RTM成功[2.0.0已废弃，Rtm是否成功请通过CallRtmMessageManager的login显式调用]
+//    case rtmSetupSuccessed = 7                    //设置RTM成功[2.0.0已废弃，Rtm是否成功请通过CallRtmSignalClient的login显式调用]
 //    case messageFailed = 8                        //消息发送失败[已废弃，请使用onCallErrorOccur(state: sendMessageFail)]
     case stateMismatch = 9                        //状态流转异常
     case remoteUserRecvCall = 99                  //主叫呼叫成功
@@ -99,7 +99,7 @@ import AgoraRtcKit
     case normalError = 0              //通用错误
     case rtcOccurError = 100          //rtc出现错误
     case startCaptureFail = 110       //rtc开启采集失败
-//    case rtmSetupFail = 200           //rtm初始化失败[已废弃，改为messageManager自己手动初始化]
+//    case rtmSetupFail = 200           //rtm初始化失败[已废弃，改为signalClient自己手动初始化]
     case sendMessageFail = 210        //消息发送失败
 }
 
@@ -107,7 +107,7 @@ import AgoraRtcKit
 @objc public enum CallErrorCodeType: UInt {
     case normal = 0   //业务类型的错误，暂无
     case rtc          //rtc的错误，使用AgoraErrorCode
-    case message      //消息的错误，使用如果使用CallRtmMessageManager则是AgoraRtmErrorCode，自定义信道则是对应信道的error code
+    case message      //消息的错误，使用如果使用CallRtmSignalClient则是AgoraRtmErrorCode，自定义信道则是对应信道的error code
 }
 
 /// 日志等级
