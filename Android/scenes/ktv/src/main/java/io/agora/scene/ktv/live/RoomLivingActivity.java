@@ -227,12 +227,15 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         getBinding().lrcControlView.post(() -> {
             // TODO workaround 先强制申请权限， 避免首次安装无声
             if (roomLivingViewModel.isRoomOwner()) {
-                toggleAudioRun = () -> roomLivingViewModel.init();
+                toggleAudioRun = () -> {
+                    roomLivingViewModel.init();
+                    roomLivingViewModel.setLrcView(getBinding().lrcControlView);
+                };
                 requestRecordPermission();
             } else {
                 roomLivingViewModel.init();
+                roomLivingViewModel.setLrcView(getBinding().lrcControlView);
             }
-            roomLivingViewModel.setLrcView(getBinding().lrcControlView);
         });
         getBinding().tvRoomName.setText(roomLivingViewModel.roomInfoLiveData.getValue().getRoomName());
         GlideApp.with(getBinding().getRoot())
@@ -371,7 +374,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 return;
             }
             int chorusNowNum = 0;
-            boolean hasHighlighter = false;
             for (RoomSeatModel seatModel : seatModels) {
                 RoomSeatModel oSeatModel = mRoomSpeakerAdapter.getItem(seatModel.getSeatIndex());
                 if (oSeatModel == null || oSeatModel.isAudioMuted() != seatModel.isAudioMuted() || oSeatModel.isVideoMuted() != seatModel.isVideoMuted() || !oSeatModel.getChorusSongCode().equals(seatModel.getChorusSongCode())) {
@@ -382,33 +384,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 if (roomLivingViewModel.songPlayingLiveData.getValue() != null && seatModel.getChorusSongCode().equals(roomLivingViewModel.songPlayingLiveData.getValue().getSongNo() + roomLivingViewModel.songPlayingLiveData.getValue().getCreateAt())) {
                     chorusNowNum++;
                 }
-
-                if (roomLivingViewModel.mSetting.getMHighLighterUid().equals(seatModel.getRtcUid()) && !seatModel.getChorusSongCode().equals("")) {
-                    hasHighlighter = true;
-                }
-
-                if (roomLivingViewModel.mSetting.getMHighLighterUid().equals(seatModel.getRtcUid()) && roomLivingViewModel.songPlayingLiveData.getValue() != null && roomLivingViewModel.songPlayingLiveData.getValue().getUserNo().equals(seatModel.getRtcUid())) {
-                    hasHighlighter = true;
-                }
             }
-
-            if (!hasHighlighter && roomLivingViewModel.isRoomOwner() && chorusNowNum >= 0 && !roomLivingViewModel.mSetting.getMHighLighterUid().equals("") || (chorusNowNum == 0 && !roomLivingViewModel.mSetting.getMHighLighterUid().equals(""))) {
-                // 人声突出者退出合唱
-                CustomToast.show(R.string.ktv_highlight_disable, Toast.LENGTH_SHORT);
-                getBinding().lrcControlView.setHighLightPersonHeadUrl("");
-                roomLivingViewModel.mSetting.setMHighLighterUid("");
-            }
-
-//            if (!hasHighlighter) {
-//                roomLivingViewModel.resetAudioPreset();
-//            }
-
-            // TODO: 2024/1/15 隐藏人声突出入口
-//            if (roomLivingViewModel.isRoomOwner() && chorusNowNum > 0) {
-//                getBinding().lrcControlView.showHighLightButton(true);
-//            } else if (roomLivingViewModel.isRoomOwner() && chorusNowNum == 0) {
-//                getBinding().lrcControlView.showHighLightButton(false);
-//            }
 
             if (roomLivingViewModel.chorusNum == 0 && chorusNowNum > 0) {
                 // 有人加入合唱

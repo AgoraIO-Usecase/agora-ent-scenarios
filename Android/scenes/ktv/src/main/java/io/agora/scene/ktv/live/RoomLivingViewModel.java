@@ -1671,7 +1671,12 @@ public class RoomLivingViewModel extends ViewModel {
                 }
 
                 if (isOwnSong) {
-                    ktvApiProtocol.switchSingerRole(KTVSingRole.SoloSinger, null);
+                    // 需要判断此时是否有合唱者，如果有需要切换成LeaderSinger身份
+                    if (chorusNum == 0) {
+                        ktvApiProtocol.switchSingerRole(KTVSingRole.SoloSinger, null);
+                    } else if (chorusNum > 0) {
+                        ktvApiProtocol.switchSingerRole(KTVSingRole.LeadSinger, null);
+                    }
                     ktvApiProtocol.startSing(songCode, 0);
                 }
 
