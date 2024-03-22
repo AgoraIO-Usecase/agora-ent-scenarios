@@ -15,6 +15,8 @@ protocol ShowLiveViewControllerDelegate: NSObjectProtocol {
     func currentUserIsOffSeat()
     
     func interactionDidChange(roomInfo: ShowRoomListModel)
+    
+    func willLeaveRoom(roomId: String)
 }
 
 class ShowLiveViewController: UIViewController {
@@ -239,10 +241,10 @@ class ShowLiveViewController: UIViewController {
     private var serviceImp: ShowServiceProtocol?
     
     deinit {
-        let roomId = room?.roomId ?? ""
-        leaveRoom()
-        AppContext.unloadShowServiceImp(roomId)
-        VideoLoaderApiImpl.shared.removeListener(listener: self)
+//        let roomId = room?.roomId ?? ""
+//        leaveRoom()
+//        AppContext.unloadShowServiceImp(roomId)
+//        VideoLoaderApiImpl.shared.removeListener(listener: self)
         showLogger().info("deinit-- ShowLiveViewController \(roomId)")
     }
     
@@ -299,6 +301,9 @@ class ShowLiveViewController: UIViewController {
         if role == .broadcaster {
             BeautyManager.shareManager.destroy()
         }
+        
+        AppContext.unloadShowServiceImp(roomId)
+        VideoLoaderApiImpl.shared.removeListener(listener: self)
     }
     
     private func joinChannel() {
@@ -307,13 +312,13 @@ class ShowLiveViewController: UIViewController {
             return
         }
         currentChannelId = channelId
-        ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: channelId)
         ShowAgoraKitManager.shared.joinChannelEx(currentChannelId: channelId,
                                                  targetChannelId: channelId,
                                                  ownerId: uid,
                                                  options: self.channelOptions,
                                                  role: role) {
         }
+        ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: channelId)
         ShowAgoraKitManager.shared.setupLocalVideo(uid: uid, canvasView: self.liveView.canvasView.localView)
         liveView.canvasView.setLocalUserInfo(name: room?.ownerName ?? "", img: room?.ownerAvatar ?? "")
         self.muteLocalVideo = false
@@ -910,11 +915,14 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onClickCloseButton() {
         if role == .broadcaster {
             showAlert(message: "show_alert_live_end_title".show_localized) {[weak self] in
-                self?.leaveRoom()
-                self?.dismiss(animated: true)
+//                self?.leaveRoom()
+                guard let self = self else {return}
+                self.delegate?.willLeaveRoom(roomId: self.roomId)
+                self.dismiss(animated: true)
             }
         }else {
             updateLoadingType(playState: .idle)
+            self.delegate?.willLeaveRoom(roomId: self.roomId)
             dismiss(animated: true)
         }
     }
@@ -1006,8 +1014,10 @@ extension ShowLiveViewController {
 extension ShowLiveViewController {
     private func showError(title: String, errMsg: String) {
         showAlert(title: title, message: errMsg) { [weak self] in
-            self?.leaveRoom()
-            self?.dismiss(animated: true)
+//            self?.leaveRoom()
+            guard let self = self else {return}
+            self.delegate?.willLeaveRoom(roomId: self.roomId)
+            self.dismiss(animated: true)
         }
     }
 }
