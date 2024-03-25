@@ -260,6 +260,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     private fun fetchRoomList() {
         mService?.getRoomList(completion = { error, roomList ->
+            ShowTo1v1Logger.d(TAG, "getRoomList error:$error, roomList:$roomList")
             mRoomInfoList.clear()
             mRoomInfoList.addAll(roomList)
             updateListView()
