@@ -77,7 +77,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, strong) VLBelcantoModel *selBelcantoModel;
 @property (nonatomic, strong) VLKTVMVIdleView *noBodyOnLineView; // mv空页面
 @property (nonatomic, strong) VLKTVTopView *topView;
-@property (nonatomic, strong) VLKTVSettingView *settingView;
+@property (nonatomic, weak) VLKTVSettingView *settingView;
 @property (nonatomic, strong) VLMicSeatList *roomPersonView; //房间麦位视图
 @property (nonatomic, strong) VLAudienceIndicator *requestOnLineView;//空位上麦
 @property (nonatomic, strong) VLPopSongList *chooseSongView; //点歌视图
