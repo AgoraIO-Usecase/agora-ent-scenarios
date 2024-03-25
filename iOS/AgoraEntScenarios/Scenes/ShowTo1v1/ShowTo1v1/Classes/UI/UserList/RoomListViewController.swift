@@ -13,6 +13,7 @@ import VideoLoaderAPI
 import AgoraCommon
 import AgoraRtmKit
 import AudioScenarioApi
+import SVProgressHUD
 
 private let randomRoomName = [
     "show_create_room_name1".showTo1v1Localization(),
@@ -103,8 +104,10 @@ class RoomListViewController: UIViewController {
                 }
                 
                 showTo1v1Print("[setupApi]join broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
+                SVProgressHUD.show()
                 self.service?.joinRoom(roomInfo: roomInfo, completion: {[weak self] err in
                     guard let self = self else {return}
+                    SVProgressHUD.dismiss()
                     if let error = err {
                         if self.preJoinRoom?.roomId == roomInfo.roomId {
                             self.navigationController?.popToViewController(self, animated: false)

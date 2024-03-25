@@ -123,6 +123,10 @@ public class AUIScene: NSObject {
         if self.ownerId.isEmpty {
             roomCollection.getMetaData {[weak self] err, metadata in
                 guard let self = self else {return}
+                if let err = err {
+                    self._notifyError(error: err)
+                    return
+                }
                 guard let map = metadata as? [String: Any],
                       let ownerId = map[kRoomInfoRoomOwnerId] as? String else {
 //                    self.ownerId = "owner unknown"
@@ -163,6 +167,7 @@ public class AUIScene: NSObject {
         aui_info("leave", tag: kSceneTag)
         getArbiter().release()
         cleanSDK()
+        AUIRoomContext.shared.clean(channelName: channelName)
     }
     
     /// 销毁scene，清理所有缓存（包括rtm的所有metadata）
@@ -170,8 +175,8 @@ public class AUIScene: NSObject {
         aui_info("delete", tag: kSceneTag)
         cleanScene()
         getArbiter().destroy()
-        AUIRoomContext.shared.clean(channelName: channelName)
         cleanSDK()
+        AUIRoomContext.shared.clean(channelName: channelName)
     }
     
     /// 获取一个collection，例如let collection: AUIMapCollection = scene.getCollection("musicList")
@@ -272,9 +277,9 @@ extension AUIScene: AUIArbiterDelegate {
         //如果锁不存在，也认为是房间被销毁的一种
         if error.code == AgoraRtmErrorCode.lockNotExist.rawValue {
             _cleanScene()
-            _notifyError(error: error)
 //            self.onMsgRecvEmpty(channelName: channelName)
         }
+        _notifyError(error: error)
     }
 }
 
