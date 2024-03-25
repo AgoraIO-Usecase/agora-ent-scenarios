@@ -40,4 +40,6 @@
     <string name="pure1v1_dashboard_down_loss_package">下行丢包率: %s ％</string>
     <string name="pure1v1_dashboard_other">其他</string>
     <string name="pure1v1_dashboard_channel_name">频道名: %s</string>
+    <string name="pure1v1_debug">开发者设置</string>
+    <string name="pure1v1_audio_dump">音频 Dump</string>
 </resources>

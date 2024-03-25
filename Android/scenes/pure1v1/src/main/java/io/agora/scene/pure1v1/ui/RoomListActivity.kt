@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -23,27 +22,28 @@ import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.scene.base.AudioModeration
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
+import io.agora.scene.pure1v1.CallServiceManager
 import io.agora.scene.pure1v1.Pure1v1Logger
 import io.agora.scene.pure1v1.R
-import io.agora.scene.pure1v1.databinding.Pure1v1RoomListActivityBinding
-import io.agora.scene.pure1v1.databinding.Pure1v1RoomListItemLayoutBinding
-import io.agora.scene.pure1v1.CallServiceManager
 import io.agora.scene.pure1v1.audio.AudioScenarioApi
 import io.agora.scene.pure1v1.audio.AudioScenarioType
 import io.agora.scene.pure1v1.audio.SceneType
 import io.agora.scene.pure1v1.callapi.*
-import io.agora.scene.pure1v1.utils.PermissionHelp
+import io.agora.scene.pure1v1.databinding.Pure1v1RoomListActivityBinding
+import io.agora.scene.pure1v1.databinding.Pure1v1RoomListItemLayoutBinding
 import io.agora.scene.pure1v1.service.UserInfo
 import io.agora.scene.pure1v1.ui.base.CallDialog
 import io.agora.scene.pure1v1.ui.base.CallDialogState
 import io.agora.scene.pure1v1.ui.calling.CallReceiveDialog
 import io.agora.scene.pure1v1.ui.calling.CallSendDialog
+import io.agora.scene.pure1v1.ui.debug.DebugSettingsDialog
 import io.agora.scene.pure1v1.ui.living.CallDetailFragment
+import io.agora.scene.pure1v1.utils.PermissionHelp
 import io.agora.scene.widget.dialog.PermissionLeakDialog
-import io.agora.scene.widget.utils.StatusBarUtil
 import org.json.JSONException
 import org.json.JSONObject
 import kotlin.random.Random
@@ -67,6 +67,8 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     private var callDialog: CallDialog? = null
 
     private var callSendDialog: CallSendDialog? = null
+
+    private var debugSettingsDialog: DebugSettingsDialog? = null
 
     private val permissionHelp = PermissionHelp(this)
 
@@ -228,8 +230,8 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         }
 
         // 开启鉴黄鉴暴
-        //setupContentInspectConfig(true, RtcConnection(channelId, localUid))
-        //moderationAudio()
+        setupContentInspectConfig(true, RtcConnection(channelId, localUid))
+        moderationAudio()
     }
 
     private fun showCallSendDialog(user: UserInfo) {
@@ -485,6 +487,34 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         binding.smartRefreshLayout.setEnableRefresh(true)
         binding.smartRefreshLayout.setOnRefreshListener {
             fetchRoomList(true)
+        }
+        binding.btnDebug.setOnClickListener {
+            showDebugSettingsDialog()
+        }
+        binding.btnDebug.isVisible = AgoraApplication.the().isDebugModeOpen
+    }
+
+    private fun showDebugSettingsDialog() {
+        if (debugSettingsDialog == null) {
+            val dialog = DebugSettingsDialog(this)
+            dialog.setListener(object : DebugSettingsDialog.DebugSettingsListener {
+                override fun onAudioDumpEnable(enable: Boolean) {
+                    Pure1v1Logger.d(tag, "onAudioDumpEnable: $enable")
+                    if (enable) {
+                        CallServiceManager.instance.rtcEngine?.setParameters("{\"rtc.debug.enable\": true}")
+                        CallServiceManager.instance.rtcEngine?.setParameters("{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}")
+                    } else {
+                        CallServiceManager.instance.rtcEngine?.setParameters("{\"rtc.debug.enable\": false}")
+                    }
+                }
+            })
+            debugSettingsDialog = dialog
+        }
+
+        debugSettingsDialog?.let {
+            if (!it.isShowing) {
+                it.show()
+            }
         }
     }
 
