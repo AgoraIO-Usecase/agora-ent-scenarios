@@ -54,8 +54,7 @@ import kotlin.random.Random
 /*
  * 1v1 房间列表 activity
  */
-class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>(),
-    ICallApiListener {
+class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>(), ICallApiListener {
 
     private val tag = "RoomListActivity_LOG"
 
@@ -78,6 +77,8 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     private var mCallDetailFragment: Fragment? = null
 
     private val scenarioApi by lazy { AudioScenarioApi(CallServiceManager.instance.rtcEngine!!) }
+
+    private var isFirstEnterScene = true
 
     override fun getViewBinding(inflater: LayoutInflater): Pure1v1RoomListActivityBinding {
         return Pure1v1RoomListActivityBinding.inflate(inflater)
@@ -115,7 +116,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             if (it) {
                 CallServiceManager.instance.sceneService?.enterRoom { e ->
                     if (e == null) {
-                        binding.smartRefreshLayout.autoRefresh()
+                        fetchRoomList(false)
                     } else {
                         Pure1v1Logger.e(tag, "enter room failed: ${e.message}")
                         Toast.makeText(this, getText(R.string.pure1v1_room_list_local_offline), Toast.LENGTH_SHORT).show()
@@ -172,7 +173,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     //Toast.makeText(this, getText(R.string.pure1v1_room_list_refresh), Toast.LENGTH_SHORT).show()
                 }
             }
-            dataList = list.filter { it.userId != UserManager.getInstance().user.id.toString() && it.userId != ""}
+            dataList = list.filter { it.userId != UserManager.getInstance().user.id.toString() && it.userName != ""}
             adapter?.refresh(dataList)
             if (dataList.isNotEmpty()) {
                 // 刷新后直接定位到首个
@@ -257,8 +258,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         callDialog = null
     }
 
-    private var isFirstEnterScene = true
-
+    // ----------------------- ICallApiListener -----------------------
     override fun onCallError(
         errorEvent: CallErrorEvent,
         errorType: CallErrorCodeType,
