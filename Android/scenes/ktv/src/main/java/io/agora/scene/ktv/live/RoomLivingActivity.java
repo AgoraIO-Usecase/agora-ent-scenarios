@@ -59,7 +59,6 @@ import io.agora.scene.ktv.widget.lrcView.LrcControlView;
 import io.agora.scene.ktv.live.fragmentdialog.UserLeaveSeatMenuDialog;
 import io.agora.scene.ktv.widget.song.SongDialog;
 import io.agora.scene.ktv.live.bean.VoiceHighlightBean;
-import io.agora.scene.ktv.live.fragmentdialog.VoiceHighlightDialog;
 import io.agora.scene.widget.DividerDecoration;
 import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
@@ -76,7 +75,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     private static final String EXTRA_ROOM_INFO = "roomInfo";
 
     private RoomLivingViewModel roomLivingViewModel;
-    private VoiceHighlightDialog voiceHighlightDialog;
     private MusicSettingDialog musicSettingDialog;
     private BindingSingleAdapter<RoomSeatModel, KtvItemRoomSpeakerBinding> mRoomSpeakerAdapter;
     private KtvCommonDialog creatorExitDialog;
@@ -678,9 +676,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     @SuppressLint("NotifyDataSetChanged")
     private void onMusicChanged(@NonNull RoomSelSongModel music) {
-        if (voiceHighlightDialog != null) {
-            voiceHighlightDialog.reset();
-        }
         hideMusicSettingDialog();
 
         getBinding().lrcControlView.setMusic(music);
@@ -763,11 +758,15 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     }
 
     private void showMusicSettingDialog() {
-        musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting,
-                roomLivingViewModel.mSoundCardSettingBean,
-                getBinding().lrcControlView.getRole() == LrcControlView.Role.Listener,
-                roomLivingViewModel.songPlayingLiveData.getValue());
-        musicSettingDialog.show(getSupportFragmentManager(), MusicSettingDialog.TAG);
+        if (musicSettingDialog == null) {
+            musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting,
+                    roomLivingViewModel.mSoundCardSettingBean,
+                    getBinding().lrcControlView.getRole() == LrcControlView.Role.Listener,
+                    roomLivingViewModel.songPlayingLiveData.getValue());
+        }
+        if (!musicSettingDialog.isAdded()) {
+            musicSettingDialog.show(getSupportFragmentManager(), MusicSettingDialog.TAG);
+        }
     }
 
     private void hideMusicSettingDialog() {
