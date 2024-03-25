@@ -116,16 +116,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
     }
     
     func leaveRoom(roomInfo: ShowTo1v1RoomInfo, completion: @escaping (Error?) -> Void) {
-        let scene = self.syncManager.getScene(channelName: roomInfo.roomId)
-        scene.unbindRespDelegate(delegate: self)
-        scene.userService.unbindRespDelegate(delegate: self)
-        if roomInfo.uid == user.uid {
-            scene.delete()
-            roomManager.destroyRoom(roomId: roomInfo.roomId) { _ in
-            }
-        } else {
-            scene.leave()
-        }
+        _leaveRoom(roomId: roomInfo.roomId, isRoomOwner: roomInfo.uid == user.uid)
         completion(nil)
     }
     
@@ -136,13 +127,25 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
 
 //MARK: room
 extension ShowTo1v1ServiceImp: AUISceneRespDelegate {
+    private func _leaveRoom(roomId: String, isRoomOwner: Bool) {
+        let scene = self.syncManager.getScene(channelName: roomId)
+        scene.unbindRespDelegate(delegate: self)
+        scene.userService.unbindRespDelegate(delegate: self)
+        if isRoomOwner {
+            scene.delete()
+            roomManager.destroyRoom(roomId: roomId) { _ in
+            }
+        } else {
+            scene.leave()
+        }
+    }
     func onSceneDestroy(roomId: String) {
         showTo1v1Print("onSceneDestroy: \(roomId)")
         guard let model = self.roomList.filter({ $0.roomId == roomId }).first else {
             return
         }
-        leaveRoom(roomInfo: model) { _ in
-        }
+        
+        _leaveRoom(roomId: roomId, isRoomOwner: true)
         self.listener?.onRoomDidDestroy(roomInfo: model)
     }
 }
