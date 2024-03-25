@@ -183,6 +183,21 @@ class RoomListViewController: UIViewController {
         callVC.callApi = callApi
         callVC.currentUser = userInfo
         callVC.rtcEngine = rtcEngine
+        
+        
+        if AppContext.shared.isDebugMode {
+            //如果开启了debug模式
+            let debugBtn = UIButton(frame: CGRect(x: 20, y: view.height - 100, width: 80, height: 80))
+            debugBtn.backgroundColor = .blue
+            debugBtn.layer.cornerRadius = 40;
+            debugBtn.layer.masksToBounds = true;
+            debugBtn.setTitleColor(.white, for: .normal)
+            debugBtn.setTitle("Debug", for: .normal)
+            debugBtn.addTarget(self, action: #selector(onDebugAction), for: .touchUpInside)
+            view.addSubview(debugBtn)
+            
+            AppContext.shared.resetDebugConfig(engine: rtcEngine)
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -202,6 +217,12 @@ class RoomListViewController: UIViewController {
         let guideView = RoomListGuideView(frame: self.view.bounds)
         self.view.addSubview(guideView)
         UserDefaults.standard.set(true, forKey: kShowGuideAlreadyKey)
+    }
+    
+    
+    @objc func onDebugAction() {
+        let vc = DebugSettingViewController(engine: rtcEngine)
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
 
