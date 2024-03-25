@@ -5,7 +5,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import io.agora.rtm.*
-import io.agora.rtmsyncmanager.ISceneResponse
 import io.agora.rtmsyncmanager.Scene
 import io.agora.rtmsyncmanager.SyncManager
 import io.agora.rtmsyncmanager.model.*
@@ -14,6 +13,7 @@ import io.agora.rtmsyncmanager.service.http.HttpManager
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.pure1v1.Pure1v1Logger
 
 /*
  * service 模块
@@ -135,12 +135,12 @@ class Pure1v1ServiceImp(
     }
 
     override fun onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {
-        Log.d("hugo", "onRoomUserEnter, roomId:$roomId, userInfo:$userInfo")
+        Pure1v1Logger.d(tag, "onRoomUserEnter, roomId:$roomId, userInfo:$userInfo")
         onUserChanged.invoke()
     }
 
     override fun onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
-        Log.d("hugo", "onRoomUserLeave, roomId:$roomId, userInfo:$userInfo")
+        Pure1v1Logger.d(tag, "onRoomUserLeave, roomId:$roomId, userInfo:$userInfo")
         onUserChanged.invoke()
     }
 

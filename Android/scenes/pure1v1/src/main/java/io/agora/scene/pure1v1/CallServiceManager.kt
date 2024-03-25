@@ -1,7 +1,6 @@
 package io.agora.scene.pure1v1
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import io.agora.scene.pure1v1.callapi.CallApiImpl
@@ -83,16 +82,16 @@ class CallServiceManager {
     private fun _createRtmClient(): RtmClient {
         val rtmConfig = RtmConfig.Builder(BuildConfig.AGORA_APP_ID, UserManager.getInstance().user.id.toString()).build()
         if (rtmConfig.userId.isEmpty()) {
-            Log.d(tag, "userId is empty")
+            Pure1v1Logger.d(tag, "userId is empty")
         }
         if (rtmConfig.appId.isEmpty()) {
-            Log.d(tag, "appId is empty")
+            Pure1v1Logger.d(tag, "appId is empty")
         }
         return RtmClient.create(rtmConfig)
     }
 
     fun setup(context: Context, completion: (success: Boolean)-> Unit) {
-
+        Pure1v1Logger.d(tag, "setup")
         rtmClient = _createRtmClient()
 
         mPrepareConfig = PrepareConfig()
@@ -126,17 +125,22 @@ class CallServiceManager {
         ))
 
         // 获取万能Token
-        fetchToken {
+        fetchToken { success ->
             // 外部创建需要自行管理login
-            rtmClient?.login(rtmToken, object: ResultCallback<Void?> {
-                override fun onSuccess(p0: Void?) {
-                    completion.invoke(true)
-                }
-                override fun onFailure(p0: ErrorInfo?) {
-                    Log.e(tag, "login error = ${p0.toString()}")
-                    completion.invoke(false)
-                }
-            })
+            if (success) {
+                rtmClient?.login(rtmToken, object: ResultCallback<Void?> {
+                    override fun onSuccess(p0: Void?) {
+                        Pure1v1Logger.d(tag, "login rtm success")
+                        completion.invoke(true)
+                    }
+                    override fun onFailure(p0: ErrorInfo?) {
+                        Pure1v1Logger.e(tag, "login error = ${p0.toString()}")
+                        completion.invoke(false)
+                    }
+                })
+            } else {
+                completion.invoke(false)
+            }
         }
     }
 
@@ -154,7 +158,6 @@ class CallServiceManager {
             mMediaPlayer2?.destroy()
             mMediaPlayer2 = null
             RtcEngine.destroy()
-//            RtmClient.release()
         }
         callApi = null
         sceneService?.leaveRoom {
@@ -182,8 +185,9 @@ class CallServiceManager {
     /*
      * 获取万能Token并初始化CallAPI
      */
-    private fun fetchToken(success: () -> Unit) {
+    private fun fetchToken(completion: (success: Boolean) -> Unit) {
         val user = localUser ?: return
+        Pure1v1Logger.d(tag, "generateTokens")
         TokenGenerator.generateTokens(
             "",
             user.userId,
@@ -199,9 +203,11 @@ class CallServiceManager {
                 }
                 this.rtcToken = rtcToken
                 this.rtmToken = rtmToken
-                success.invoke()
+                Pure1v1Logger.d(tag, "generateTokens success")
+                completion.invoke(true)
             }, {
                 Pure1v1Logger.e(tag, "generateTokens failed: $it")
+                completion.invoke(false)
             })
     }
 

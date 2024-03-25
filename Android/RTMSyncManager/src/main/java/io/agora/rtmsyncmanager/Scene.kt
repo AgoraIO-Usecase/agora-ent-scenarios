@@ -36,7 +36,7 @@ class Scene constructor(
 
     private var collectionMap = mutableMapOf<String, IAUICollection>()
 
-    public val userService = AUIUserServiceImpl(channelName, rtmManager).apply {
+    val userService = AUIUserServiceImpl(channelName, rtmManager).apply {
         registerRespObserver(object: IAUIUserService.AUIUserRespObserver {
             override fun onRoomUserSnapshot(roomId: String, userList: List<AUIUserInfo?>?) {
                 userSnapshotList = userList

@@ -15,7 +15,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.RtcConnection
@@ -113,8 +116,13 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 CallServiceManager.instance.sceneService?.enterRoom { e ->
                     if (e == null) {
                         binding.smartRefreshLayout.autoRefresh()
+                    } else {
+                        Pure1v1Logger.e(tag, "enter room failed: ${e.message}")
+                        Toast.makeText(this, getText(R.string.pure1v1_room_list_local_offline), Toast.LENGTH_SHORT).show()
                     }
                 }
+            } else {
+                Toast.makeText(this, getText(R.string.pure1v1_room_list_local_offline), Toast.LENGTH_SHORT).show()
             }
         }
         CallServiceManager.instance.callApi?.addListener(this)
@@ -145,17 +153,18 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     private fun fetchRoomList(isAutoRefresh: Boolean) {
         CallServiceManager.instance.sceneService?.getUserList { msg, list ->
             // 用户是否在线
-            val living = list.any { it.userId == CallServiceManager.instance.localUser?.userId }
-            if (!living) {
-                CallServiceManager.instance.sceneService?.enterRoom { e ->
-                    if (e != null) {
-                        Toast.makeText(this, getText(R.string.pure1v1_room_list_local_offline), Toast.LENGTH_SHORT).show()
-                    } else {
-                        fetchRoomList(isAutoRefresh)
-                    }
-                }
-                return@getUserList
-            }
+//            val living = list.any { it.userId == CallServiceManager.instance.localUser?.userId }
+//            if (!living) {
+//                CallServiceManager.instance.sceneService?.enterRoom { e ->
+//                    if (e != null) {
+//                        Pure1v1Logger.e(tag, "enter room failed: ${e.message}")
+//                        Toast.makeText(this, getText(R.string.pure1v1_room_list_local_offline), Toast.LENGTH_SHORT).show()
+//                    } else {
+//                        fetchRoomList(isAutoRefresh)
+//                    }
+//                }
+//                return@getUserList
+//            }
             if (!binding.flCallContainer.isVisible) {
                 if (msg != null) {
                     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
@@ -163,7 +172,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     //Toast.makeText(this, getText(R.string.pure1v1_room_list_refresh), Toast.LENGTH_SHORT).show()
                 }
             }
-            dataList = list.filter { it.userId != CallServiceManager.instance.localUser?.userId}
+            dataList = list.filter { it.userId != UserManager.getInstance().user.id.toString() && it.userId != ""}
             adapter?.refresh(dataList)
             if (dataList.isNotEmpty()) {
                 // 刷新后直接定位到首个
@@ -546,6 +555,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
         override fun onBindViewHolder(holder: UserItemViewHolder, position: Int) {
             val userInfo = dataList[position % dataList.size]
+            Log.d("hugo", "onBindViewHolder, position:$position userInfo$userInfo")
             holder.binding.ivConnect.setOnClickListener {
                 val currentTime = System.currentTimeMillis()
                 if (currentTime - lastClickTime >= clickInterval) {
@@ -580,8 +590,11 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         }
 
         fun refresh(list: List<UserInfo>){
+            // 使用 DiffUtil 计算差异
+            val diffResult = DiffUtil.calculateDiff(DiffCallback(dataList, list))
             dataList = list
-            notifyDataSetChanged()
+            // 通知 Adapter 应用差异
+            diffResult.dispatchUpdatesTo(this)
         }
 
         fun setItemActionHandler(handler: UserItemActionHandler){
@@ -598,6 +611,21 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             animator.repeatMode = ObjectAnimator.REVERSE
             animator.duration = 1600
             animator.start()
+        }
+    }
+
+    // 创建一个 Callback 类来计算两个数据列表之间的差异
+    class DiffCallback(private val oldList: List<UserInfo>, private val newList: List<UserInfo>) : DiffUtil.Callback() {
+        override fun getOldListSize(): Int = oldList.size
+
+        override fun getNewListSize(): Int = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].userId == newList[newItemPosition].userId
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition] == newList[newItemPosition]
         }
     }
 
