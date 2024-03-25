@@ -12,7 +12,7 @@ static std::vector<jobject> m_viewRefList;
 extern "C" {
 #endif
 
-JNIEXPORT jlong JNICALL Java_io_agora_api_example_utils_MetaEngineHandler_getTextureViewHandler
+JNIEXPORT jlong JNICALL Java_io_agora_scene_show_photographer_MetaEngineHandler_getTextureViewHandler
   (JNIEnv *env, jobject obj, jobject view)
 {
     jobject viewRef = env->NewGlobalRef(view);
@@ -21,7 +21,7 @@ JNIEXPORT jlong JNICALL Java_io_agora_api_example_utils_MetaEngineHandler_getTex
     return handler;
 }
 
-JNIEXPORT jlong JNICALL Java_io_agora_api_example_utils_MetaEngineHandler_getContextHandler
+JNIEXPORT jlong JNICALL Java_io_agora_scene_show_photographer_MetaEngineHandler_getContextHandler
         (JNIEnv *env, jobject obj, jobject context)
 {
     m_contextRef = env->NewGlobalRef(context);
@@ -29,7 +29,7 @@ JNIEXPORT jlong JNICALL Java_io_agora_api_example_utils_MetaEngineHandler_getCon
     return handler;
 }
 
-JNIEXPORT void JNICALL Java_io_agora_api_example_utils_MetaEngineHandler_destroyHandles
+JNIEXPORT void JNICALL Java_io_agora_scene_show_photographer_MetaEngineHandler_destroyHandles
         (JNIEnv *env, jobject obj)
 {
     if (m_contextRef) {

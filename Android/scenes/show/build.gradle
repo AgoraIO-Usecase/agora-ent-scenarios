@@ -14,6 +14,9 @@ android {
         buildConfigField "String", "RESTFUL_API_KEY", "\"${RESTFUL_API_KEY}\""
         buildConfigField "String", "RESTFUL_API_SECRET", "\"${RESTFUL_API_SECRET}\""
     }
+    externalNativeBuild {
+        cmake { path "src/main/cpp/CMakeLists.txt" }
+    }
 }
 
 dependencies {

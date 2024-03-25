@@ -1,5 +1,7 @@
 package io.agora.scene.show
 
+import io.agora.rtc2.Constants
+import io.agora.rtc2.IMediaExtensionObserver
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
@@ -10,6 +12,7 @@ import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.show.debugSettings.DebugSettingModel
+import io.agora.scene.show.photographer.MetaEngineHandler
 import io.agora.videoloaderapi.VideoLoader
 import java.util.concurrent.Executors
 
@@ -38,6 +41,8 @@ object RtcEngineInstance {
 
     fun generalToken(): String = generalToken
 
+    val mMetaEngineHandler = MetaEngineHandler()
+
     private var innerRtcEngine: RtcEngineEx? = null
     val rtcEngine: RtcEngineEx
         get() {
@@ -54,7 +59,32 @@ object RtcEngineInstance {
                         )
                     }
                 }
+                // 添加 MetaKit 插件
+                config.addExtension("agora_metakit_extension")
+                // 创建插件的事件回调接口类，注册 onEvent 等插件事件回调
+                config.mExtensionObserver = object : IMediaExtensionObserver {
+
+                    override fun onEvent(provider: String, ext: String, key: String, msg: String) {
+                        mMetaEngineHandler.onEvent(provider, ext, key, msg)
+                    }
+
+                    override fun onStarted(provider: String, extension: String) {
+                        mMetaEngineHandler.onStart(provider, extension)
+                    }
+
+                    override fun onStopped(provider: String, extension: String) {
+                        mMetaEngineHandler.onStop(provider, extension)
+                    }
+
+                    override fun onError(provider: String, ext: String, key: Int, msg: String) {
+                        mMetaEngineHandler.onError(provider, ext, key, msg)
+                    }
+                }
                 innerRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
+                    mMetaEngineHandler.initializeRtc(this)
+                    setParameters("{\"rtc.video.seg_before_exts\":true}")
+                    mMetaEngineHandler.enableSegmentation()
+                    enableExtension("agora_video_filters_metakit", "metakit", true, Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE)
                     enableVideo()
                 }
             }
@@ -76,6 +106,9 @@ object RtcEngineInstance {
             virtualBackgroundSegmentation
         )
     }
+
+    // 虚拟背景是否开启
+    var isVirtualBackgroundEnable: Boolean = false
 
     fun destroy() {
         VideoLoader.release()

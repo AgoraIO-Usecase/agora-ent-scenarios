@@ -6,13 +6,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-JNIEXPORT jlong JNICALL Java_io_agora_api_example_utils_MetaEngineHandler_getTextureViewHandler
+JNIEXPORT jlong JNICALL Java_io_agora_scene_show_photographer_MetaEngineHandler_getTextureViewHandler
         (JNIEnv *, jobject, jobject);
 
-JNIEXPORT jlong JNICALL Java_io_agora_api_example_utils_MetaEngineHandler_getContextHandler
+JNIEXPORT jlong JNICALL Java_io_agora_scene_show_photographer_MetaEngineHandler_getContextHandler
         (JNIEnv *, jobject, jobject);
 
-JNIEXPORT void JNICALL Java_io_agora_api_example_utils_MetaEngineHandler_destroyHandles
+JNIEXPORT void JNICALL Java_io_agora_scene_show_photographer_AiPhotographerManager_destroyHandles
         (JNIEnv *, jobject);
 
 #ifdef __cplusplus

@@ -53,7 +53,7 @@ android {
 }
 
 dependencies {
-    api fileTree(dir: 'libs', include: ['*.jar'])
+    api fileTree(dir: 'libs', include: ['*.jar','*.aar'])
     implementation rootProject.ext.deps.appcompat
     api rootProject.ext.deps.multidex
     implementation rootProject.ext.deps.annotation

@@ -5,6 +5,11 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="ui_widget_corner2Style">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">2dp</item>
+    </style>
+
     <declare-styleable name="ui_widget_encryption_input_style">
         <attr name="ui_widget_strokeWidth" format="dimension" />
         <attr name="ui_widget_checkedColor" format="color" />
