@@ -95,11 +95,11 @@ class ShowAICameraMenuCell: UICollectionViewCell {
         didSet{
             downloadButton.isSelected = downloadState == .loading
             downloadButton.isHidden = downloadState == .done
-//            if downloadState == .loading {
-//                startRotationAnimation()
-//            }else{
-//                stopAnimation()
-//            }
+            if downloadState == .loading {
+                startRotationAnimation()
+            }else{
+                stopAnimation()
+            }
         }
     }
     
@@ -215,8 +215,8 @@ class ShowAICameraMenuCell: UICollectionViewCell {
         downloadButton.imageView?.layer.removeAnimation(forKey: "rotationAnimation")
         
         // 恢复图层原始状态
-        if let presentationLayer = downloadButton.imageView?.layer.presentation() {
-            downloadButton.imageView?.layer.transform = presentationLayer.transform
-        }
+//        if let presentationLayer = downloadButton.imageView?.layer.presentation() {
+//            downloadButton.imageView?.layer.transform = presentationLayer.transform
+//        }
     }
 }

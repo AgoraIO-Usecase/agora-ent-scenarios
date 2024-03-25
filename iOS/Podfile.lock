@@ -80,6 +80,9 @@ PODS:
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
   - LEEAlert (1.6.4)
+  - LookinServer/Core (1.2.7)
+  - LookinServer/Swift (1.2.7):
+    - LookinServer/Core
   - LSTPopView (0.3.10):
     - LSTPopView/Code (= 0.3.10)
     - LSTTimer
@@ -164,6 +167,7 @@ DEPENDENCIES:
   - JXCategoryView (= 1.6.1)
   - KakaJSON
   - LEEAlert (= 1.6.4)
+  - LookinServer/Swift
   - LSTPopView (= 0.3.10)
   - Masonry (= 1.1.0)
   - MJRefresh
@@ -203,6 +207,7 @@ SPEC REPOS:
     - JXCategoryView
     - KakaJSON
     - LEEAlert
+    - LookinServer
     - LSTPopView
     - LSTTimer
     - Masonry
@@ -268,6 +273,7 @@ SPEC CHECKSUMS:
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
   LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb
+  LookinServer: 36f1a0ad280de34b9794cf8825867fcc2dd93e75
   LSTPopView: 9379f00f6ce7d1fc620b50ab00ed3ef97b2d4d52
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
@@ -293,6 +299,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: 559cc9cdbf9abe0ca8a354a2c35e0b64a1744bf5
+PODFILE CHECKSUM: f5a73e10ce98c7005361579c2977d4f8e0827af5
 
 COCOAPODS: 1.14.3

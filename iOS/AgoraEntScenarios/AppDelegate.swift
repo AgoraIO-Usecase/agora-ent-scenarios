@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(didTokenExpired), name: NSNotification.Name(rawValue: "AGORAENTTOKENEXPIRED"), object: nil)
         
         window?.configRootViewController()
-        downloadManifestList()
+        ShowAgoraKitManager.downloadManifestList()
         return true
     }
 
@@ -37,14 +37,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     @objc func didTokenExpired() {
         VLToast.toast(NSLocalizedString("app_expire", comment: ""))
         window?.configRootViewController()
-    }
-    
-    func downloadManifestList() {
-        let url = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/resource/manifest/manifestList"
-        AGResourceManager.shared.downloadManifestList(url: url) { _ in
-        } completionHandler: { fileList, err in
-            
-        }
     }
 
 }

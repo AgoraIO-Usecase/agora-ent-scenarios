@@ -275,6 +275,9 @@ extension ShowAgoraKitManager {
         }
         guard let file = baseResourceFile else {
             completion?("resource not found ", effectImageIsLoaded)
+            ShowAgoraKitManager.downloadManifestList {
+                self.downloadBaseEffectResources(completion: completion)
+            }
             return
         }
         AGResourceManager.shared.downloadResource(resource: file) { progress in
@@ -298,6 +301,9 @@ extension ShowAgoraKitManager {
         }
         guard let file = effectBgImageFile else {
             completion?("resource not found ", baseResourceIsLoaded)
+            ShowAgoraKitManager.downloadManifestList {
+                self.downloadEffectBgImage(completion: completion)
+            }
             return
         }
         AGResourceManager.shared.downloadResource(resource: file) { progress in
@@ -321,6 +327,14 @@ extension ShowAgoraKitManager {
             guard let file = baseResourceFile else {return}
             let path = AGResourceManager.shared.getFolderPath(resource: file)
             loadScene(scenePath: path)
+        }
+    }
+    
+    static func downloadManifestList(completion:(()->())? = nil) {
+        let url = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/resource/manifest/manifestList"
+        AGResourceManager.shared.downloadManifestList(url: url) { _ in
+        } completionHandler: { fileList, err in
+            completion?()
         }
     }
     
