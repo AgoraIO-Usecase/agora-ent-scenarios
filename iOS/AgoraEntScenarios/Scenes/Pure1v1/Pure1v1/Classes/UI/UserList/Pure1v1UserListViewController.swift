@@ -149,7 +149,7 @@ extension Pure1v1UserListViewController {
             completion(rtcToken, rtmToken)
             return
         }
-        
+        let date = Date()
         NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
                                              appCertificate: pure1V1AppCertificate!,
                                              channelName: "",
@@ -157,6 +157,7 @@ extension Pure1v1UserListViewController {
                                              tokenGeneratorType: .token007,
                                              tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
             guard let self = self else {return}
+            pure1v1Print("generateTokens cost: \(-Int(date.timeIntervalSinceNow * 1000))ms")
             guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue],
                   let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
                 completion(nil, nil)
@@ -199,8 +200,10 @@ extension Pure1v1UserListViewController {
             return
         }
         
+        let date = Date()
         rtmClient.logout()
         rtmClient.login(self.rtmToken) { resp, err in
+            pure1v1Print("rtm login cost: \(-Int(date.timeIntervalSinceNow * 1000))ms")
             var error: NSError? = nil
             if let err = err {
                 error = NSError(domain: err.reason, code: err.errorCode.rawValue)
