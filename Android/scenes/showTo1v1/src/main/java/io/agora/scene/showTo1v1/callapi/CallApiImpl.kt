@@ -7,11 +7,12 @@ import android.util.Log
 import android.view.TextureView
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import com.google.gson.Gson
 import io.agora.rtc2.*
 import io.agora.rtc2.video.VideoCanvas
-import io.agora.rtm.*
 import io.agora.scene.showTo1v1.BuildConfig
 import io.agora.scene.showTo1v1.callapi.extension.cloneConfig
+import io.agora.scene.showTo1v1.callapi.signalClient.ISignalClientListener
 import org.json.JSONObject
 import java.util.*
 
@@ -34,19 +35,18 @@ enum class CallAction(val value: Int) {
 }
 
 /*
- * 被叫呼叫中加入RTC的策略
+ * 被叫呼叫中加入RTC的时机
  */
-enum class CalleeJoinRTCPolicy(val value: Int) {
-    Calling(0),      //在接到呼叫时即加入频道并推送音视频流，被叫时费用较高但出图更快
-    Accepted(1)      //在点击接受后才加入频道并推送音视频流，被叫时费用较低但出图较慢
+enum class CalleeJoinRTCTiming(val value: Int) {
+    Calling(0),      //在收到呼叫时即加入频道并推送视频流，被叫时费用较高但出图更快
+    Accepted(1)      //在收到呼叫后，主动发起接受后才加入频道并推送视频流，被叫时费用较低但出图较慢
 }
 
 class CallApiImpl constructor(
     context: Context
-): ICallApi, RtmEventListener, CallMessageListener, IRtcEngineEventHandler() {
+): ICallApi, ISignalClientListener, IRtcEngineEventHandler() {
 
     companion object {
-        val calleeJoinRTCPolicy = CalleeJoinRTCPolicy.Calling
         const val kReportCategory = "2_Android_1.0.0"
         const val kPublisher = "publisher"
         const val kCostTimeMap = "costTimeMap"    //呼叫时的耗时信息，会在connected时抛出分步耗时
@@ -62,6 +62,8 @@ class CallApiImpl constructor(
         const val kRejectByInternal = "rejectByInternal"
 
         const val kHangupReason = "hangupReason"
+        // 发送的消息id
+        private const val kMessageId = "messageId"
     }
 
     private val kCallTimeoutInterval: Long = 15000
@@ -74,21 +76,19 @@ class CallApiImpl constructor(
     private val TAG = "CallApiImpl_LOG"
     private val delegates = mutableListOf<ICallApiListener>()
     private val rtcProxy = CallProxy()
-    private val localFrameProxy: CallLocalFirstFrameProxy by lazy { CallLocalFirstFrameProxy(this) }
+    private val localFrameProxy = CallLocalFirstFrameProxy(this)
     private var config: CallConfig? = null
     private var prepareConfig: PrepareConfig? = null
-    private var messageManager: CallMessageManager? = null
-        set(value) {
-            val oldValue = field
-            field = value
-            oldValue?.deinitialize()
-        }
     private var connectInfo = CallConnectInfo()
     private var reportInfoList = listOf<CallReportInfo>()
     private var isChannelJoined = false
+    // 消息id
+    private var messageId: Int = 0
 
     var tempRemoteCanvasView = TextureView(context)
     var tempLocalCanvasView = TextureView(context)
+    // 默认的加入rtc时机
+    private var defaultCalleeJoinRTCTiming = CalleeJoinRTCTiming.Calling
 
     /// 当前状态
     private var state: CallStateType = CallStateType.Idle
@@ -128,9 +128,7 @@ class CallApiImpl constructor(
                 CallStateType.Idle, CallStateType.Failed -> {
                     _leaveRTC()
                     connectInfo.clean()
-                    config = null
                     isPreparing = false
-                    messageManager = null
                 }
                 else -> {}
             }
@@ -196,6 +194,67 @@ class CallApiImpl constructor(
         return message
     }
 
+    private fun getNtpTimeInMs(): Long {
+        val currentNtpTime = config?.rtcEngine?.ntpWallTimeInMs ?: 0L
+        return if (currentNtpTime != 0L) {
+            currentNtpTime
+        } else {
+            Log.e(TAG, "getNtpTimeInMs ntpWallTimeInMs is zero!!!!!!!!!!")
+            System.currentTimeMillis()
+        }
+    }
+
+    private fun _canJoinRtcOnCalling(eventInfo: Map<String, Any>): Boolean {
+        var emptyCount = 0
+        delegates.forEach {
+            val isEnable: Boolean? = it.canJoinRtcOnCalling(eventInfo)
+            if (isEnable != null) {
+                if (isEnable) {
+                    return true
+                }
+            } else {
+                emptyCount += 1
+            }
+        }
+
+        // 如果一个协议都没有实现，使用默认值
+        if (emptyCount == delegates.size) {
+            callPrint("join rtc strategy callback not found, use default")
+            return true
+        }
+
+        return false
+    }
+
+    private fun _notifyCallConnected() {
+        val config = config ?: return
+        val ntpTime = getNtpTimeInMs()
+        connectInfo.callConnectedTs = ntpTime
+        val callUserId = (if (connectInfo.callingRoomId == prepareConfig?.roomId) config.userId else connectInfo.callingUserId) ?: 0
+        delegates.forEach { listener ->
+            listener.onCallConnected(
+                roomId = connectInfo.callingRoomId ?: "",
+                callUserId = callUserId,
+                currentUserId = config.userId,
+                timestamp = ntpTime
+            )
+        }
+    }
+
+    private fun _notifyCallDisconnected(hangupUserId: Int) {
+        val config = config ?: return
+        val ntpTime = getNtpTimeInMs()
+        delegates.forEach { listener ->
+            listener.onCallDisconnected(
+                roomId = connectInfo.callingRoomId ?: "",
+                hangupUserId = hangupUserId,
+                currentUserId = config.userId,
+                timestamp = ntpTime,
+                duration = ntpTime - connectInfo.callConnectedTs
+            )
+        }
+    }
+
     private fun _notifyTokenPrivilegeWillExpire() {
         delegates.forEach { listener ->
             listener.tokenPrivilegeWillExpire()
@@ -231,6 +290,24 @@ class CallApiImpl constructor(
                                       eventReason: String = "",
                                       eventInfo: Map<String, Any> = emptyMap()) {
         callPrint("call change[${connectInfo.callId}] state: $state, stateReason: '$stateReason', eventReason: $eventReason")
+
+        val oldState = this.state
+        //check connected/disconnected
+        if (state == CallStateType.Connected && oldState == CallStateType.Connecting) {
+            _notifyCallConnected()
+        } else if (state == CallStateType.Prepared && oldState == CallStateType.Connected) {
+            when (stateReason) {
+                //正常只会触发.remoteCancel, .remoteHangup，剩余的做兜底
+                CallStateReason.RemoteCancel, CallStateReason.RemoteHangup, CallStateReason.RemoteRejected, CallStateReason.RemoteCallBusy -> {
+                    _notifyCallDisconnected(connectInfo.callingUserId ?: 0)
+                }
+                else -> {
+                    //.localHangup 或 bad case
+                    _notifyCallDisconnected(config?.userId ?: 0)
+                }
+            }
+        }
+
         this.state = state
         delegates.forEach {
             it.onCallStateChanged(state, stateReason, eventReason, eventInfo)
@@ -240,7 +317,7 @@ class CallApiImpl constructor(
     private fun _notifySendMessageErrorEvent(error: AGError, reason: String?) {
         _notifyErrorEvent(
             CallErrorEvent.SendMessageFail,
-            errorType = CallErrorCodeType.Rtm,
+            errorType = CallErrorCodeType.Message,
             errorCode = error.code,
             message = "${reason ?: ""}${error.msg}"
         )
@@ -266,17 +343,20 @@ class CallApiImpl constructor(
         }
     }
 
-    private fun _notifyEvent(event: CallEvent, eventReason: String? = null) {
-        callPrint("call change[${connectInfo.callId}] event: ${event.value} reason: '$eventReason'")
+    private fun _notifyEvent(event: CallEvent, reasonCode: String? = null, reasonString: String? = null) {
+        callPrint("call change[${connectInfo.callId}] event: ${event.value} reason: '$reasonCode' reasonString: '$reasonString'")
         config?.let { config ->
             var reason = ""
-            if (eventReason != null) {
-                reason = "&reason=$eventReason"
+            if (reasonCode != null) {
+                reason += "&reason=$reasonCode"
+            }
+            if (reasonString != null) {
+                reason += "&reasonString=$reasonString"
             }
             _reportEvent("event=${event.value}&userId=${config.userId}&state=${state.name}$reason", 0)
         } ?: callWarningPrint("_notifyEvent config == null")
         delegates.forEach { listener ->
-            listener.onCallEventChanged(event)
+            listener.onCallEventChanged(event, reasonCode)
         }
         when (event) {
             CallEvent.RemoteUserRecvCall -> _reportCostEvent(CallConnectCostType.RemoteUserRecvCall)
@@ -348,19 +428,10 @@ class CallApiImpl constructor(
         //login rtm if need
         if (enableLoginRtm) {
             isPreparing = true
-            val messageManager = CallMessageManager(cfg, this)
-            this.messageManager = messageManager
-
-            messageManager.initialize(prepareConfig) { err ->
-                isPreparing = false
-                callWarningPrint("prepareForCall[$tag] rtmInitialize completion: ${err?.msg ?: "success"})")
-                if (err != null) {
-                    _notifyErrorEvent(CallErrorEvent.RtmSetupFail, CallErrorCodeType.Rtm, err.code, err.msg)
-                } else {
-                    _notifyEvent(CallEvent.RtmSetupSuccessed)
-                }
-                completion?.invoke(err)
-            }
+            config?.signalClient?.addListener(this)
+            isPreparing = false
+            _notifyEvent(CallEvent.RtmSetupSuccessed)
+            completion?.invoke(null)
         } else {
             completion?.invoke(null)
         }
@@ -424,24 +495,33 @@ class CallApiImpl constructor(
         callPrint("_setupRemoteVideo ret: $ret, channelId: ${connection.channelId}, uid: $uid")
     }
 
-    private fun _setupLocalVideo(uid: Int, view: TextureView) {
+    private fun _setupLocalVideo() {
         val engine = config?.rtcEngine ?: run {
             callWarningPrint("_setupLocalVideo fail: engine is empty")
             return
         }
         config?.rtcEngine?.addHandler(localFrameProxy)
 
-        val videoCanvas = VideoCanvas(view)
-        videoCanvas.uid = uid
+        val videoCanvas = VideoCanvas(tempLocalCanvasView)
+        videoCanvas.setupMode = VideoCanvas.VIEW_SETUP_MODE_ADD
         videoCanvas.renderMode = VideoCanvas.RENDER_MODE_HIDDEN
-        videoCanvas.mirrorMode = Constants.VIDEO_MIRROR_MODE_AUTO
-
+        videoCanvas.mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
         engine.setDefaultAudioRoutetoSpeakerphone(true)
         engine.setupLocalVideo(videoCanvas)
         val ret = engine.startPreview()
         if (ret != 0) {
             _notifyErrorEvent(CallErrorEvent.StartCaptureFail, CallErrorCodeType.Rtc, ret, null)
         }
+    }
+
+    private fun _removeLocalVideo() {
+        val engine = config?.rtcEngine ?: run {
+            callWarningPrint("_setupLocalVideo fail: engine is empty")
+            return
+        }
+        val canvas = VideoCanvas(tempLocalCanvasView)
+        canvas.setupMode = VideoCanvas.VIEW_SETUP_MODE_REMOVE
+        engine.setupLocalVideo(canvas)
     }
 
     /// 判断当前加入的RTC频道和传入的房间id是否一致
@@ -600,6 +680,8 @@ class CallApiImpl constructor(
             callWarningPrint("leave RTC channel failed, not joined the channel")
             return
         }
+        _removeLocalVideo()
+        config?.rtcEngine?.stopCameraCapture(Constants.VideoSourceType.VIDEO_SOURCE_CAMERA_PRIMARY)
         config?.rtcEngine?.stopPreview()
         val ret = config?.rtcEngine?.leaveChannelEx(connection)
         callPrint("leave RTC channel[${ret ?: -1}]")
@@ -607,8 +689,7 @@ class CallApiImpl constructor(
     }
 
     private fun setupCanvas() {
-        val config = config ?: return
-        _setupLocalVideo(config.userId, tempLocalCanvasView)
+        _setupLocalVideo()
         val callingUserId = connectInfo.callingUserId ?: run {
             callWarningPrint("join rtc fail: callingUserId == nil")
             return
@@ -680,6 +761,19 @@ class CallApiImpl constructor(
         }
     }
 
+    private fun _sendMessage(
+        userId: String,
+        message: Map<String, Any>,
+        completion: ((AGError?) -> Unit)?
+    ) {
+        messageId += 1
+        messageId %= Int.MAX_VALUE
+        val map = message.toMutableMap()
+        map[kMessageId] = messageId
+        val jsonString = Gson().toJson(map).toString()
+        config?.signalClient?.sendMessage(userId, jsonString, completion)
+    }
+
     //MARK: on Message
     private fun _processRespEvent(reason: CallAction, message: Map<String, Any>) {
         when (reason) {
@@ -700,7 +794,7 @@ class CallApiImpl constructor(
             return
         }
         val msg = message ?: _messageDic(CallAction.CancelCall)
-        messageManager?.sendMessage(userId.toString(), msg) { err ->
+        _sendMessage(userId.toString(), msg) { err ->
             completion?.invoke(err)
             if (err != null) {
                 _notifySendMessageErrorEvent(err, "cancel call fail: ")
@@ -709,11 +803,11 @@ class CallApiImpl constructor(
     }
 
     private fun _reject(remoteUserId: Int, message: Map<String, Any>, completion: ((AGError?) -> Unit)? = null) {
-        messageManager?.sendMessage(remoteUserId.toString(), message, completion)
+        _sendMessage(remoteUserId.toString(), message, completion)
     }
 
     private fun _hangup(remoteUserId: Int, message: Map<String, Any>? = null, completion: ((AGError?) -> Unit)? = null) {
-        messageManager?.sendMessage(remoteUserId.toString(), message ?: _messageDic(CallAction.Hangup), completion)
+        _sendMessage(remoteUserId.toString(), message ?: _messageDic(CallAction.Hangup), completion)
     }
 
     //收到呼叫消息
@@ -746,11 +840,13 @@ class CallApiImpl constructor(
         }
 
         connectInfo.set(fromUserId, fromRoomId, callId)
+        defaultCalleeJoinRTCTiming = if (_canJoinRtcOnCalling(eventInfo = message)) CalleeJoinRTCTiming.Calling else CalleeJoinRTCTiming.Accepted
         if (enableNotify) {
             _updateAndNotifyState(CallStateType.Calling, CallStateReason.None, eventInfo = message)
             _notifyEvent(CallEvent.OnCalling)
         }
-        if(calleeJoinRTCPolicy == CalleeJoinRTCPolicy.Calling) {
+        callPrint("[calling]defaultCalleeJoinRTCTiming: ${defaultCalleeJoinRTCTiming.value}")
+        if(defaultCalleeJoinRTCTiming == CalleeJoinRTCTiming.Calling) {
             _joinRTCAsBroadcaster(fromRoomId)
         }
 
@@ -794,7 +890,7 @@ class CallApiImpl constructor(
 
     private fun _onHangup(message: Map<String, Any>) {
         if (!_isCallingUser(message)) return
-
+        
         _updateAndNotifyState(CallStateType.Prepared, CallStateReason.RemoteHangup, eventInfo = message)
         _notifyEvent(CallEvent.RemoteHangup)
     }
@@ -837,17 +933,15 @@ class CallApiImpl constructor(
         }
     }
 
-    override fun renewToken(rtcToken: String, rtmToken: String) {
-        _reportMethod("renewToken", "&rtcToken=${rtcToken}&rtmToken=${rtmToken}")
+    override fun renewToken(rtcToken: String) {
+        _reportMethod("renewToken", "&rtcToken=${rtcToken}")
         val roomId = prepareConfig?.roomId
         if (roomId == null) {
             callWarningPrint("renewToken failed, roomid missmatch")
             return
         }
         prepareConfig?.rtcToken = rtcToken
-        prepareConfig?.rtmToken = rtmToken
         callPrint("renewToken with roomId[$roomId]")
-        messageManager?.renewToken(rtcToken, rtmToken)
         val connection = rtcConnection ?: return
         val options = ChannelMediaOptions()
         options.token = rtcToken
@@ -857,7 +951,7 @@ class CallApiImpl constructor(
 
     override fun onFirstLocalVideoFramePublished(source: Constants.VideoSourceType?, elapsed: Int) {
         super.onFirstLocalVideoFramePublished(source, elapsed)
-        _notifyEvent(event = CallEvent.PublishFirstLocalVideoFrame, eventReason = "elapsed: ${elapsed}ms")
+        _notifyEvent(event = CallEvent.PublishFirstLocalVideoFrame, reasonString = "elapsed: ${elapsed}ms")
     }
 
     override fun onFirstLocalVideoFrame(
@@ -867,7 +961,7 @@ class CallApiImpl constructor(
         elapsed: Int
     ) {
         super.onFirstLocalVideoFrame(source, width, height, elapsed)
-        _notifyEvent(event = CallEvent.CaptureFirstLocalVideoFrame, eventReason = "elapsed: ${elapsed}ms")
+        _notifyEvent(event = CallEvent.CaptureFirstLocalVideoFrame, reasonString = "elapsed: ${elapsed}ms")
         config?.rtcEngine?.removeHandler(localFrameProxy)
     }
 
@@ -916,7 +1010,7 @@ class CallApiImpl constructor(
         _reportMethod("call", "remoteUserId=$remoteUserId")
 
         val message = _callMessageDic(remoteUserId, fromRoomId)
-        messageManager?.sendMessage(remoteUserId.toString(), message) { err ->
+        _sendMessage(remoteUserId.toString(), message) { err ->
             completion?.invoke(err)
             if (err != null) {
                 //_updateAndNotifyState(CallStateType.Prepared, CallReason.MessageFailed, err.msg)
@@ -953,7 +1047,7 @@ class CallApiImpl constructor(
         if (state == CallStateType.Calling) else {
             val errReason = "accept fail! current state is $state not calling"
             completion?.invoke(AGError(errReason, -1))
-            _notifyEvent(CallEvent.StateMismatch, errReason)
+            _notifyEvent(CallEvent.StateMismatch, reasonString = errReason)
             return
         }
 
@@ -971,18 +1065,19 @@ class CallApiImpl constructor(
 
         //先查询presence里是不是正在呼叫的被叫是自己，如果是则不再发送消息
         val message = _messageDic(CallAction.Accept)
-        messageManager?.sendMessage(remoteUserId.toString(), message) { err ->
+        _sendMessage(remoteUserId.toString(), message) { err ->
             completion?.invoke(err)
             if (err != null) {
                 _notifySendMessageErrorEvent(err, "accept fail: ")
             }
         }
-        _updateAndNotifyState(CallStateType.Connecting, CallStateReason.LocalAccepted, eventInfo = message)
-        _notifyEvent(CallEvent.LocalAccepted)
 
-        if (calleeJoinRTCPolicy == CalleeJoinRTCPolicy.Accepted) {
+        callPrint("[calling]defaultCalleeJoinRTCTiming: ${defaultCalleeJoinRTCTiming.value}")
+        if (defaultCalleeJoinRTCTiming == CalleeJoinRTCTiming.Accepted) {
             _joinRTCAsBroadcaster(roomId)
         }
+        _updateAndNotifyState(CallStateType.Connecting, CallStateReason.LocalAccepted, eventInfo = message)
+        _notifyEvent(CallEvent.LocalAccepted)
     }
 
     //拒绝
@@ -1025,34 +1120,31 @@ class CallApiImpl constructor(
     override fun onTokenPrivilegeWillExpire(channelName: String?) {
         _notifyTokenPrivilegeWillExpire()
     }
-    override fun onConnectionFail() {
-        _updateAndNotifyState(CallStateType.Failed, CallStateReason.RtmLost)
-        _notifyEvent(CallEvent.RtmLost)
-    }
-    override fun onMessageEvent(event: MessageEvent?) {
-        val message = event?.message?.data as? ByteArray ?: return
-        val jsonString = String(message, Charsets.UTF_8)
-        val map = jsonStringToMap(jsonString)
-        val messageAction = map[kMessageAction] as? Int ?: 0
-        val msgTs = map[kMessageTs] as? Long
-        val userId = map[kFromUserId] as? Int
-        val messageVersion = map[kMessageVersion] as? String
+//    override fun onConnectionFail() {
+//        _updateAndNotifyState(CallStateType.Failed, CallStateReason.RtmLost)
+//        _notifyEvent(CallEvent.RtmLost)
+//    }
+
+    override fun onMessageReceive(message: String) {
+        val messageDic = jsonStringToMap(message)
+        val messageAction = messageDic[kMessageAction] as? Int ?: 0
+        val msgTs = messageDic[kMessageTs] as? Long
+        val userId = messageDic[kFromUserId] as? Int
+        val messageVersion = messageDic[kMessageVersion] as? String
         if (messageVersion == null || msgTs == null || userId == null) {
-            callWarningPrint("fail to parse message: $jsonString")
+            callWarningPrint("fail to parse message: $message")
             return
         }
         //TODO: compatible other message version
         if (kCurrentMessageVersion != messageVersion)  { return }
-        callPrint("on event message: $jsonString")
-        _processRespEvent(CallAction.fromValue(messageAction), map)
+        callPrint("on event message: $message")
+        _processRespEvent(CallAction.fromValue(messageAction), messageDic)
     }
+
     override fun debugInfo(message: String, logLevel: Int) {
         callPrint(message)
     }
-    override fun onPresenceEvent(event: PresenceEvent?) {}
-    override fun onTopicEvent(event: TopicEvent?) {}
-    override fun onLockEvent(event: LockEvent?) {}
-    override fun onStorageEvent(event: StorageEvent?) {}
+
     // IRtcEngineEventHandler
     override fun onConnectionStateChanged(state: Int, reason: Int) {
         callPrint("connectionChangedTo state: $state reason: $reason")
@@ -1063,9 +1155,9 @@ class CallApiImpl constructor(
         _notifyEvent(CallEvent.RemoteJoin)
     }
     override fun onUserOffline(uid: Int, reason: Int) {
-        callPrint("didOfflineOfUid: $uid")
+        callPrint("didOfflineOfUid: $uid， reason: $reason")
         if (connectInfo.callingUserId != uid) { return }
-        _notifyEvent(CallEvent.RemoteLeave)
+        _notifyEvent(CallEvent.RemoteLeave, reasonCode = "$reason")
     }
     override fun onLeaveChannel(stats: RtcStats?) {
         callPrint("didLeaveChannel: $stats")

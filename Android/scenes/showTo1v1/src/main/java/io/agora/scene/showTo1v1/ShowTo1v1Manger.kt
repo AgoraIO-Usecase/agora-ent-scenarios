@@ -1,5 +1,6 @@
 package io.agora.scene.showTo1v1
 
+import android.content.Context
 import android.util.Log
 import android.view.TextureView
 import io.agora.rtc2.IRtcEngineEventHandler
@@ -9,6 +10,7 @@ import io.agora.rtc2.RtcEngineEx
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
+import io.agora.rtm.RtmClient
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.AgoraApplication
@@ -17,7 +19,12 @@ import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.showTo1v1.callapi.CallApiImpl
 import io.agora.scene.showTo1v1.callapi.CallConfig
 import io.agora.scene.showTo1v1.callapi.PrepareConfig
+import io.agora.scene.showTo1v1.callapi.signalClient.createRtmSignalClient
+import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceImpl
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
+import io.agora.scene.showTo1v1.signalClient.CallRtmManager
+import io.agora.scene.showTo1v1.signalClient.ICallRtmManagerListener
+import io.agora.scene.showTo1v1.signalClient.createRtmManager
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -66,6 +73,10 @@ class ShowTo1v1Manger constructor() {
 
     private var innerCurrentUser: ShowTo1v1UserInfo? = null
 
+    private var rtmManager: CallRtmManager? = null
+
+    var mService: ShowTo1v1ServiceImpl? = null
+
     // 本地用户
     val mCurrentUser: ShowTo1v1UserInfo
         get() {
@@ -104,12 +115,45 @@ class ShowTo1v1Manger constructor() {
     @Volatile
     private var isCallApiInit = false
 
-    fun initCallAPi() {
+    fun setup(context: Context) {
+        // 使用RtmManager管理RTM
+        rtmManager = createRtmManager(BuildConfig.AGORA_APP_ID, mCurrentUser.getIntUserId())
+        // 监听 rtm manager 事件
+        rtmManager?.addListener(object : ICallRtmManagerListener {
+            override fun onConnected() {
+
+            }
+
+            override fun onDisconnected() {
+
+            }
+
+            override fun onConnectionLost() {
+                // 表示rtm超时断连了，需要重新登录，这里模拟了3s重新登录
+            }
+
+            override fun onTokenPrivilegeWillExpire(channelName: String) {
+                // 重新获取token
+                renewTokens {  }
+            }
+        })
+        // rtm login
+        rtmManager?.login(mPrepareConfig.rtmToken) {
+            if (it == null) {
+                // login 成功后初始化 call api
+                initCallAPi()
+            }
+        }
+
+        mService = ShowTo1v1ServiceImpl(context, rtmManager!!.getRtmClient(), mCurrentUser)
+    }
+
+    private fun initCallAPi() {
         val config = CallConfig(
             appId = BuildConfig.AGORA_APP_ID,
             userId = mCurrentUser.getIntUserId(),
             rtcEngine = mRtcEngine,
-            null
+            createRtmSignalClient(rtmManager!!.getRtmClient())
         )
         mCallApi.initialize(config)
     }
@@ -168,7 +212,7 @@ class ShowTo1v1Manger constructor() {
                 mPrepareConfig.rtcToken = rtcToken
                 mPrepareConfig.rtmToken = rtmToken
                 setupGeneralToken(rtcToken)
-                mCallApi.renewToken(rtcToken, rtmToken)
+                mCallApi.renewToken(rtcToken)
                 callback.invoke(true)
             },
             failure = {
@@ -225,6 +269,11 @@ class ShowTo1v1Manger constructor() {
         mCallApi.deinitialize {}
         innerCurrentUser = null
         innerPrepareConfig = null
+        rtmManager?.let {
+            it.logout()
+            RtmClient.release()
+            rtmManager = null
+        }
         innerRtcEngine?.let {
             workingExecutor.execute { RtcEngine.destroy() }
             innerRtcEngine = null

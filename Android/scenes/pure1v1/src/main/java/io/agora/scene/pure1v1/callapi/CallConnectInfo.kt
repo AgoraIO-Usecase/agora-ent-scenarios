@@ -28,6 +28,9 @@ class CallConnectInfo {
     // 呼叫中的远端用户
     var callingUserId: Int? = null
 
+    //通话开始的时间
+    var callConnectedTs: Long = 0
+
     /// 本地是否已经同意
     var isLocalAccepted: Boolean = false
 
@@ -72,6 +75,7 @@ class CallConnectInfo {
         isRetrieveFirstFrame = false
         startRetrieveFirstFrame = null
         isLocalAccepted = false
+        callConnectedTs = 0
     }
 
     fun set(userId: Int, roomId: String, callId: String? = null, isLocalAccepted: Boolean = false) {
