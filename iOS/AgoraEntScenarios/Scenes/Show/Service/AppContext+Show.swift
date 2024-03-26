@@ -20,6 +20,24 @@ func showLogger() -> SwiftyBeaver.Type {
     AgoraEntLog.getSceneLogger(with: "Show")
 }
 
+func showPrint(_ message: String, context: String? = nil) {
+    agoraDoMainThreadTask {
+        showLogger().info(message, context: context)
+    }
+}
+
+func showWarn(_ message: String, context: String? = nil) {
+    agoraDoMainThreadTask {
+        showLogger().warning(message, context: context)
+    }
+}
+
+func showError(_ message: String, context: String? = nil) {
+    agoraDoMainThreadTask {
+        showLogger().error(message, context: context)
+    }
+}
+
 extension AppContext {
     static private var _showServiceImpMap: [String: ShowSyncManagerServiceImp] = [String: ShowSyncManagerServiceImp]()
     static func showServiceImp(_ roomId: String) -> ShowServiceProtocol? {
