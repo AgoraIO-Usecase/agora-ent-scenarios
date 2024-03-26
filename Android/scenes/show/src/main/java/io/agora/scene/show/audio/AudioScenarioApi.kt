@@ -372,7 +372,7 @@ class AudioScenarioApi(rtcEngine: RtcEngine): IRtcEngineEventHandler() {
         a2dp: Boolean?
     ) {
         // 开启并行架构
-        rtcEngine.setParameters("{\"che.audio.sf.enabled: $sf\"}")
+        rtcEngine.setParameters("{\"che.audio.sf.enabled\": $sf}")
         rtcEngine.setParameters("{\"che.audio.input_sample_rate\":48000}")
 
         ains?.let {

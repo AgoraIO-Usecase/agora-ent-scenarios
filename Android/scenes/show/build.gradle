@@ -13,6 +13,7 @@ android {
         buildConfigField "String", "VERSION", "\"${VERSION_SCENE_SHOW}\""
         buildConfigField "String", "RESTFUL_API_KEY", "\"${RESTFUL_API_KEY}\""
         buildConfigField "String", "RESTFUL_API_SECRET", "\"${RESTFUL_API_SECRET}\""
+        buildConfigField "String", "BEAUTY_RESOURCE", "\"${BEAUTY_RESOURCE}\""
     }
 }
 

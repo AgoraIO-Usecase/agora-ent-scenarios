@@ -674,6 +674,9 @@ class LiveDetailFragment : Fragment() {
         } else {
             topBinding.tvStatisticSVC.text = getString(R.string.show_statistic_svc, "--")
         }
+
+        // 本地uid
+        topBinding.tvLocalUid.text = getString(R.string.show_local_uid, "${UserManager.getInstance().user.id}")
     }
 
     private fun refreshViewDetailLayout(status: Int) {

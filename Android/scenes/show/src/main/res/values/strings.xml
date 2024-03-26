@@ -111,6 +111,7 @@
     <string name="show_statistic_h265">H265开关：%s</string>
     <string name="show_statistic_pvc">pvc开关：%s</string>
     <string name="show_statistic_low_stream">小流开关：%s</string>
+    <string name="show_local_uid">本端用户ID：%s</string>
     <string name="show_statistic_svc">svc开关：%s</string>
     <string name="show_music_effect_beauty_voice_zhongxin">中性</string>
     <string name="show_music_effect_beauty_voice_wenzhong">稳重</string>
