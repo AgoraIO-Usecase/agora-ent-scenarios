@@ -234,7 +234,7 @@ class ShowAgoraKitManager: NSObject {
     
     //MARK: public method
     func addRtcDelegate(delegate: AgoraRtcEngineDelegate, roomId: String) {
-        showLogger().info("addRtcDelegate[\(roomId)]")
+        showPrint("addRtcDelegate[\(roomId)]")
         let localUid = Int(VLUserCenter.user.id)!
         let connection = AgoraRtcConnection(channelId: roomId, localUid: localUid)
         engine?.addDelegateEx(delegate, connection: connection)
@@ -242,7 +242,7 @@ class ShowAgoraKitManager: NSObject {
     }
     
     func removeRtcDelegate(delegate: AgoraRtcEngineDelegate, roomId: String) {
-        showLogger().info("removeRtcDelegate[\(roomId)]")
+        showPrint("removeRtcDelegate[\(roomId)]")
         let localUid = Int(VLUserCenter.user.id)!
         let connection = AgoraRtcConnection(channelId: roomId, localUid: localUid)
         engine?.removeDelegateEx(delegate, connection: connection)
