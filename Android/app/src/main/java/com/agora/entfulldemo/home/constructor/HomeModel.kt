@@ -6,7 +6,8 @@ enum class HomeScenesType {
     Full, // 全场景
     KTV, // ktv
     Voice, // 语聊房
-    Live // 直播
+    Live, // 直播
+    Game, // 弹幕玩法
 }
 
 enum class HomeSubScenes {
@@ -20,6 +21,7 @@ enum class HomeSubScenes {
     Live_Pure1v1, // 直播-纯 1v1 私密房
     Live_MultiPlayer, // 直播-多人团战
     Live_Show1v1, // 直播秀场转 1v1 私密房
+    Game_Joy, // 弹幕玩法
 }
 
 /**

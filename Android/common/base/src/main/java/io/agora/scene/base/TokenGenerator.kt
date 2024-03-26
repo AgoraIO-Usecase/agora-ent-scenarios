@@ -74,7 +74,7 @@ object TokenGenerator {
         }
     }
 
-    private suspend fun fetchToken(
+    suspend fun fetchToken(
         channelName: String, uid: String, genType: TokenGeneratorType, tokenType: AgoraTokenType
     ) = withContext(Dispatchers.IO) {
 
