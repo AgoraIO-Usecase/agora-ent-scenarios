@@ -160,16 +160,12 @@ extension CallViewController {
                                      eventReason: String,
                                      eventInfo: [String : Any]) {
         switch state {
+        case .connecting:
+            self.rtcChannelName
         case .connected:
-            var channelId: String?
+            var channelId: String? = rtcChannelName
             if roomInfo?.uid == currentUser?.uid {
-                //房主找对端
-                channelId = targetUser?.get1V1ChannelId()
-                
                 ConnectedToastView.show(user: targetUser!, canvasView: self.view)
-            } else {
-                //观众找自己
-                channelId = currentUser?.get1V1ChannelId()
             }
             //鉴权
             if let channelId = channelId,
@@ -194,8 +190,8 @@ extension CallViewController {
         }
     }
     
-    func onCallEventChanged(with event: CallEvent, elapsed: Int) {
-        showTo1v1Print("onCallEventChanged: \(event.rawValue)")
+    func onCallEventChanged(with event: CallEvent, eventReason: String?) {
+        showTo1v1Print("onCallEventChanged: \(event.rawValue) eventReason: '\(eventReason ?? "")'")
         switch event {
         case .localLeave, .remoteLeave:
             _hangupAction()

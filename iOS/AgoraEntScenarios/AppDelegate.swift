@@ -7,6 +7,8 @@
 
 import UIKit
 import AgoraCommon
+import AGResourceManager
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
@@ -30,6 +32,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppContext.shared.cloudPlayerKey = KeyCenter.CloudPlayerKey ?? ""
         AppContext.shared.cloudPlayerSecret = KeyCenter.CloudPlayerSecret ?? ""
         AppContext.shared.baseServerUrl = KeyCenter.baseServerUrl ?? ""
+        
+        
+        AGResourceManagerContext.shared.displayLogClosure = { text in
+            asyncToMainThread {
+                agoraEnt_default_info(text, tag: "ResourceManager")
+            }
+        }
+        AGResourceManager.autoDownload()
     }
     
     @objc func didTokenExpired() {

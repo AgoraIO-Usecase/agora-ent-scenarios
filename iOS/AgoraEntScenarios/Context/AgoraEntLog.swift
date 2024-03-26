@@ -19,6 +19,29 @@ import SwiftyBeaver
 }
 
 @objc public class AgoraEntLog: NSObject {
+    
+    private static var currentLogKey = ""
+    
+    public static func currentLogger(with defaultKey: String) -> SwiftyBeaver.Type {
+        if currentLogKey.isEmpty {
+            return getSceneLogger(with: defaultKey)
+        }
+        
+        let logger = SwiftyBeaver.self
+        return logger
+    }
+    
+    public static func getSceneLogger(with key: String) -> SwiftyBeaver.Type {
+        let logger = SwiftyBeaver.self
+        if key == currentLogKey {
+            return logger
+        }
+        logger.removeAllDestinations()
+        createLog(config: AgoraEntLogConfig.init(sceneName: key))
+        currentLogKey = key
+        return logger
+    }
+    
     public static func createLog(config: AgoraEntLogConfig) -> SwiftyBeaver.Type {
         let log = SwiftyBeaver.self
         

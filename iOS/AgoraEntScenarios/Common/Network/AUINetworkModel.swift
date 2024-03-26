@@ -70,8 +70,10 @@ open class AUINetworkModel: NSObject {
     }
     
     func tokenExpired() {
-        VLUserCenter.shared().logout()
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "AGORAENTTOKENEXPIRED") , object: nil)
+        DispatchQueue.main.async {
+            VLUserCenter.shared().logout()
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "AGORAENTTOKENEXPIRED") , object: nil)
+        }
     }
     
     public func createBasicAuth(key: String, password: String) -> String {

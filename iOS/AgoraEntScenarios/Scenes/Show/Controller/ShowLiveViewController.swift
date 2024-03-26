@@ -15,6 +15,8 @@ protocol ShowLiveViewControllerDelegate: NSObjectProtocol {
     func currentUserIsOffSeat()
     
     func interactionDidChange(roomInfo: ShowRoomListModel)
+    
+    func willLeaveRoom(roomId: String)
 }
 
 class ShowLiveViewController: UIViewController {
@@ -239,11 +241,11 @@ class ShowLiveViewController: UIViewController {
     private var serviceImp: ShowServiceProtocol?
     
     deinit {
-        let roomId = room?.roomId ?? ""
-        leaveRoom()
-        AppContext.unloadShowServiceImp(roomId)
-        VideoLoaderApiImpl.shared.removeListener(listener: self)
-        showLogger.info("deinit-- ShowLiveViewController \(roomId)")
+//        let roomId = room?.roomId ?? ""
+//        leaveRoom()
+//        AppContext.unloadShowServiceImp(roomId)
+//        VideoLoaderApiImpl.shared.removeListener(listener: self)
+        showLogger().info("deinit-- ShowLiveViewController \(roomId)")
     }
     
     override func viewDidLoad() {
@@ -299,6 +301,9 @@ class ShowLiveViewController: UIViewController {
         if role == .broadcaster {
             BeautyManager.shareManager.destroy()
         }
+        
+        AppContext.unloadShowServiceImp(roomId)
+        VideoLoaderApiImpl.shared.removeListener(listener: self)
     }
     
     private func joinChannel() {
@@ -307,13 +312,13 @@ class ShowLiveViewController: UIViewController {
             return
         }
         currentChannelId = channelId
-        ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: channelId)
         ShowAgoraKitManager.shared.joinChannelEx(currentChannelId: channelId,
                                                  targetChannelId: channelId,
                                                  ownerId: uid,
                                                  options: self.channelOptions,
                                                  role: role) {
         }
+        ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: channelId)
         ShowAgoraKitManager.shared.setupLocalVideo(uid: uid, canvasView: self.liveView.canvasView.localView)
         liveView.canvasView.setLocalUserInfo(name: room?.ownerName ?? "", img: room?.ownerAvatar ?? "")
         self.muteLocalVideo = false
@@ -354,7 +359,7 @@ extension ShowLiveViewController {
                 guard let self = self else {return}
                 guard self.room?.roomId == room.roomId else { return }
                 if let err = error {
-                    showLogger.info("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
+                    showLogger().info("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
                     if err.code == -1 {
                         self.onRoomExpired()
                     }
@@ -456,7 +461,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onUserLeftRoom(user: ShowUser) {
         if user.userId == room?.ownerId {
-            showLogger.info(" finishAlertVC onUserLeftRoom : roomid = \(roomId)")
+            showLogger().info(" finishAlertVC onUserLeftRoom : roomid = \(roomId)")
             onRoomExpired()
         }
     }
@@ -587,7 +592,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                                                      ownerId: uid,
                                                      options: self.channelOptions,
                                                      role: .audience) {
-                showLogger.info("\(self.roomId) updateLoadingType _onStartInteraction---------- \(self.roomId)")
+                showLogger().info("\(self.roomId) updateLoadingType _onStartInteraction---------- \(self.roomId)")
                 ShowAgoraKitManager.shared.updateMediaOptionsEx(channelId: invitation.fromRoomId, publishCamera: true, publishMic: false)
             }
             ShowReceivePKAlertVC.present(name: invitation.fromName) { result in
@@ -764,22 +769,22 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
 extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
-        showLogger.warning("rtcEngine warningCode == \(warningCode.rawValue)")
+        showLogger().warning("rtcEngine warningCode == \(warningCode.rawValue)")
     }
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
-        showLogger.warning("rtcEngine errorCode == \(errorCode.rawValue)")
+        showLogger().warning("rtcEngine errorCode == \(errorCode.rawValue)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
-        showLogger.info("rtcEngine didJoinChannel \(channel) with uid \(uid) elapsed \(elapsed)ms")
+        showLogger().info("rtcEngine didJoinChannel \(channel) with uid \(uid) elapsed \(elapsed)ms")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-        showLogger.info("rtcEngine didJoinedOfUid \(uid) channelId: \(roomId)", context: kShowLogBaseContext)
+        showLogger().info("rtcEngine didJoinedOfUid \(uid) channelId: \(roomId)", context: kShowLogBaseContext)
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
-        showLogger.info("rtcEngine didOfflineOfUid === \(uid)")
+        showLogger().info("rtcEngine didOfflineOfUid === \(uid)")
         if let interaction = self.currentInteraction {
             let isRoomOwner: Bool = role == .broadcaster
             let isInteractionLeave: Bool = interaction.userId == "\(uid)"
@@ -809,7 +814,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, localVideoStats stats: AgoraRtcLocalVideoStats, sourceType: AgoraVideoSourceType) {
         panelPresenter.updateLocalVideoStats(stats)
         throttleRefreshRealTimeInfo()
-//        showLogger.info("localVideoStats  width = \(stats.encodedFrameWidth), height = \(stats.encodedFrameHeight)")
+//        showLogger().info("localVideoStats  width = \(stats.encodedFrameWidth), height = \(stats.encodedFrameHeight)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
@@ -848,18 +853,18 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, contentInspectResult result: AgoraContentInspectResult) {
-        showLogger.warning("contentInspectResult: \(result.rawValue)")
+        showLogger().warning("contentInspectResult: \(result.rawValue)")
         guard result != .neutral else { return }
         ToastView.show(text: "监测到当前内容存在违规行为")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, firstLocalVideoFramePublishedWithElapsed elapsed: Int, sourceType: AgoraVideoSourceType) {
-        showLogger.info("firstLocalVideoFramePublishedWithElapsed: \(elapsed)ms \(sourceType.rawValue)",
+        showLogger().info("firstLocalVideoFramePublishedWithElapsed: \(elapsed)ms \(sourceType.rawValue)",
                         context: kShowLogBaseContext)
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, tokenPrivilegeWillExpire token: String) {
-        showLogger.warning("tokenPrivilegeWillExpire: \(roomId)",
+        showLogger().warning("tokenPrivilegeWillExpire: \(roomId)",
                            context: kShowLogBaseContext)
         if let channelId = currentChannelId {
             ShowAgoraKitManager.shared.renewToken(channelId: channelId)
@@ -910,11 +915,14 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onClickCloseButton() {
         if role == .broadcaster {
             showAlert(message: "show_alert_live_end_title".show_localized) {[weak self] in
-                self?.leaveRoom()
-                self?.dismiss(animated: true)
+//                self?.leaveRoom()
+                guard let self = self else {return}
+                self.delegate?.willLeaveRoom(roomId: self.roomId)
+                self.dismiss(animated: true)
             }
         }else {
             updateLoadingType(playState: .idle)
+            self.delegate?.willLeaveRoom(roomId: self.roomId)
             dismiss(animated: true)
         }
     }
@@ -1006,8 +1014,10 @@ extension ShowLiveViewController {
 extension ShowLiveViewController {
     private func showError(title: String, errMsg: String) {
         showAlert(title: title, message: errMsg) { [weak self] in
-            self?.leaveRoom()
-            self?.dismiss(animated: true)
+//            self?.leaveRoom()
+            guard let self = self else {return}
+            self.delegate?.willLeaveRoom(roomId: self.roomId)
+            self.dismiss(animated: true)
         }
     }
 }

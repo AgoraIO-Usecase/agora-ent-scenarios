@@ -33,6 +33,9 @@ class CallConnectInfo {
     //呼叫中的远端用户
     var callingUserId: UInt?
     
+    //通话开始的时间
+    var callConnectedTs: UInt64 = 0
+    
     /// 本地是否已经同意
     var isLocalAccepted: Bool = false
     
@@ -61,6 +64,7 @@ class CallConnectInfo {
         isRetrieveFirstFrame = false
         startRetrieveFirstFrame = nil
         isLocalAccepted = false
+        callConnectedTs = 0
     }
     
     func set(userId: UInt, 

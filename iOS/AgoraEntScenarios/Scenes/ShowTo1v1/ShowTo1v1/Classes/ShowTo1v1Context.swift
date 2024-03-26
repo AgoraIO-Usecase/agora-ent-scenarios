@@ -1,17 +1,20 @@
 import SwiftyBeaver
+import AgoraCommon
 
-let pure1v1Logger: SwiftyBeaver.Type = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "ShowTo1v1"))
+private func showTo1v1Logger() -> SwiftyBeaver.Type{
+    AgoraEntLog.getSceneLogger(with: "ShowTo1v1")
+}
 
 func showTo1v1Print(_ message: String, context: String = "ShowTo1v1") {
-    pure1v1Logger.info(message, context: context)
+    showTo1v1Logger().info(message, context: context)
 }
 
 func showTo1v1Warn(_ message: String, context: String = "ShowTo1v1") {
-    pure1v1Logger.warning(message, context: context)
+    showTo1v1Logger().warning(message, context: context)
 }
 
 func showTo1v1Error(_ message: String, context: String = "ShowTo1v1") {
-    pure1v1Logger.error(message, context: context)
+    showTo1v1Logger().error(message, context: context)
 }
 
 @objcMembers
