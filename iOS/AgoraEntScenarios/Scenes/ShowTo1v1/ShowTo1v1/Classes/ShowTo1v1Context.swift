@@ -6,15 +6,21 @@ private func showTo1v1Logger() -> SwiftyBeaver.Type{
 }
 
 func showTo1v1Print(_ message: String, context: String = "ShowTo1v1") {
-    showTo1v1Logger().info(message, context: context)
+    agoraDoMainThreadTask {
+        showTo1v1Logger().info(message, context: context)
+    }
 }
 
 func showTo1v1Warn(_ message: String, context: String = "ShowTo1v1") {
-    showTo1v1Logger().warning(message, context: context)
+    agoraDoMainThreadTask {
+        showTo1v1Logger().warning(message, context: context)
+    }
 }
 
 func showTo1v1Error(_ message: String, context: String = "ShowTo1v1") {
-    showTo1v1Logger().error(message, context: context)
+    agoraDoMainThreadTask {
+        showTo1v1Logger().error(message, context: context)
+    }
 }
 
 @objcMembers

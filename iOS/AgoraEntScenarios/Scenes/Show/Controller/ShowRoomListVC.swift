@@ -53,20 +53,20 @@ class ShowRoomListVC: UIViewController {
     deinit {
         AppContext.unloadShowServiceImp()
         ShowAgoraKitManager.shared.destoryEngine()
-        showLogger().info("deinit-- ShowRoomListVC")
+        showPrint("deinit-- ShowRoomListVC")
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        showLogger().info("init-- ShowRoomListVC")
+        showPrint("init-- ShowRoomListVC")
         VideoLoaderApiImpl.shared.printClosure = { msg in
-            showLogger().info(msg, context: "VideoLoaderApi")
+            showPrint(msg, context: "VideoLoaderApi")
         }
         VideoLoaderApiImpl.shared.warningClosure = { msg in
-            showLogger().warning(msg, context: "VideoLoaderApi")
+            showWarn(msg, context: "VideoLoaderApi")
         }
         VideoLoaderApiImpl.shared.errorClosure = { msg in
-            showLogger().error(msg, context: "VideoLoaderApi")
+            showError(msg, context: "VideoLoaderApi")
         }
     }
     
@@ -142,7 +142,7 @@ class ShowRoomListVC: UIViewController {
             self?.refreshControl.endRefreshing()
             guard let self = self, let roomList = roomList else {return}
             if let error = error {
-                showLogger().error(error.localizedDescription)
+                showError(error.localizedDescription)
                 return
             }
             self.roomList = roomList

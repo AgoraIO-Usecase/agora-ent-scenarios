@@ -6,15 +6,21 @@ private func pure1v1Logger() -> SwiftyBeaver.Type {
 }
 
 func pure1v1Print(_ message: String, context: String? = nil) {
-    pure1v1Logger().info(message, context: context)
+    agoraDoMainThreadTask {
+        pure1v1Logger().info(message, context: context)
+    }
 }
 
 func pure1v1Warn(_ message: String, context: String? = nil) {
-    pure1v1Logger().warning(message, context: context)
+    agoraDoMainThreadTask {
+        pure1v1Logger().warning(message, context: context)
+    }
 }
 
 func pure1v1Error(_ message: String, context: String? = nil) {
-    pure1v1Logger().error(message, context: context)
+    agoraDoMainThreadTask {
+        pure1v1Logger().error(message, context: context)        
+    }
 }
 
 var pure1V1AppId: String?

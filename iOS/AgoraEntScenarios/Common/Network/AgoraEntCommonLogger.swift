@@ -12,19 +12,27 @@ func commonLogger() -> SwiftyBeaver.Type {
     AgoraEntLog.getSceneLogger(with: "Common")
 }
 public func agoraEnt_info(_ text: String, tag: String = "AgoraEntCommon") {
-    commonLogger().info(text, context: tag)
+    agoraDoMainThreadTask {
+        commonLogger().info(text, context: tag)
+    }
 }
 
 public func agoraEnt_warn(_ text: String, tag: String = "AgoraEntCommon") {
-    commonLogger().warning(text, context: tag)
+    agoraDoMainThreadTask {
+        commonLogger().warning(text, context: tag)
+    }
 }
 
 public func agoraEnt_error(_ text: String, tag: String = "AgoraEntCommon") {
-    commonLogger().error(text, context: tag)
+    agoraDoMainThreadTask {
+        commonLogger().error(text, context: tag)
+    }
 }
 
 public func agoraEnt_default_info(_ text: String, tag: String = "AgoraEntCommon") {
-    AgoraEntLog.currentLogger(with: "Common").info(text, context: tag)
+    agoraDoMainThreadTask {
+        AgoraEntLog.currentLogger(with: "Common").info(text, context: tag)
+    }
 }
 /*
 @objc class AgoraEntCommonLogConfig: NSObject {
