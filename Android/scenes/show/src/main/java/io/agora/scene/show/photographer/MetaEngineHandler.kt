@@ -261,6 +261,7 @@ class MetaEngineHandler : AGExtensionHandler {
             "agora_video_filters_metakit",
             "metakit", "unloadScene", "{}"
         )
+        isMetaInit = false
         Log.d(TAG, "setExtensionProperty unloadScene exit")
     }
 
@@ -272,6 +273,7 @@ class MetaEngineHandler : AGExtensionHandler {
             "agora_video_filters_metakit",
             "metakit", "destroy", "{}"
         )
+        isMetaInit = false
         mRunningState = IMetaRunningState.idle
     }
 

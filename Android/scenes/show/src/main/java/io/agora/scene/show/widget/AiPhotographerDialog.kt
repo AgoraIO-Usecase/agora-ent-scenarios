@@ -6,11 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.google.gson.reflect.TypeToken
+import io.agora.scene.base.GlideApp
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.base.utils.dp
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowAiPhotographerItemBinding
@@ -74,7 +76,12 @@ class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(cont
             override fun onBindViewHolder(holder: BindingViewHolder<ShowAiPhotographerItemBinding>, position: Int) {
                 val item = getItem(position) ?: return
                 holder.binding.ivOverlay.isActivated = position == mAiSelectedIndex
-                holder.binding.ivIcon.setImageResource(item.icon)
+                holder.binding.ivIcon.apply {
+                    GlideApp.with(this)
+                        .load(item.icon)
+                        .transform(RoundedCorners(2.dp.toInt()))
+                        .into(this)
+                }
                 when (item.status) {
                     DownloadStatus.Downloaded -> {
                         holder.binding.ivDownload.visibility = View.INVISIBLE
@@ -95,7 +102,7 @@ class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(cont
                     gotoDownload(item.itemId)
                 }
                 holder.binding.root.setOnClickListener {
-//                    if (item.status != DownloadStatus.Downloaded) return@setOnClickListener
+                    if (item.status != DownloadStatus.Downloaded) return@setOnClickListener
                     if (mAiSelectedIndex == holder.adapterPosition) {
                         val oSelectedIndex = mAiSelectedIndex
                         mAiSelectedIndex = -1
@@ -269,7 +276,7 @@ class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(cont
                 AgoraApplication.the().getExternalFilesDir("assets").toString()
             }
         }
-        // TODO: 切换 json 中地址 
+        // TODO: 切换 json 中地址
         val url = if (manifestModel.uri == "DefaultPackage") {
             "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/ai/AREffect.zip"
         } else {

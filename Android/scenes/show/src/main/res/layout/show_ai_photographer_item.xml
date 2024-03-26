@@ -5,14 +5,13 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <com.google.android.material.imageview.ShapeableImageView
+    <ImageView
         android:id="@+id/ivIcon"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:src="@mipmap/show_ai_edge_light"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
-        app:shapeAppearance="@style/ui_widget_corner2Style"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -30,7 +29,7 @@
         android:id="@+id/ivDownload"
         android:layout_width="16dp"
         android:layout_height="16dp"
-        android:background="@mipmap/show_ai_assets_download"
+        android:src="@mipmap/show_ai_assets_download"
         app:layout_constraintEnd_toEndOf="@+id/ivIcon"
         android:layout_marginEnd="-4dp"
         android:layout_marginTop="-4dp"
