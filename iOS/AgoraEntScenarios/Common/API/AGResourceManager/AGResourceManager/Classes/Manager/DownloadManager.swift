@@ -8,7 +8,7 @@
 import Foundation
 import CommonCrypto
 
-private func asyncToMainThread(closure: @escaping (() -> Void)) {
+public func asyncToMainThread(closure: @escaping (() -> Void)) {
     if Thread.isMainThread {
         closure()
         return

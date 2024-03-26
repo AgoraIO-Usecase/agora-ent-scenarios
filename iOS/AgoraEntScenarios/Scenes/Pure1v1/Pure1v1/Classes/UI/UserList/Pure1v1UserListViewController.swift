@@ -115,11 +115,30 @@ class Pure1v1UserListViewController: UIViewController {
         callVC.currentUser = userInfo
         callVC.callApi = callApi
         callVC.rtcEngine = rtcEngine
+        
+        if AppContext.shared.isDebugMode {
+            //如果开启了debug模式
+            let debugBtn = UIButton(frame: CGRect(x: 20, y: view.height - 100, width: 80, height: 80))
+            debugBtn.backgroundColor = .blue
+            debugBtn.layer.cornerRadius = 40;
+            debugBtn.layer.masksToBounds = true;
+            debugBtn.setTitleColor(.white, for: .normal)
+            debugBtn.setTitle("Debug", for: .normal)
+            debugBtn.addTarget(self, action: #selector(onDebugAction), for: .touchUpInside)
+            view.addSubview(debugBtn)
+            
+            AppContext.shared.resetDebugConfig(engine: rtcEngine)
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         _autoRefrshAction()
+    }
+    
+    @objc func onDebugAction() {
+        let vc = DebugSettingViewController(engine: rtcEngine)
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
 
@@ -130,7 +149,7 @@ extension Pure1v1UserListViewController {
             completion(rtcToken, rtmToken)
             return
         }
-        
+        let date = Date()
         NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
                                              appCertificate: pure1V1AppCertificate!,
                                              channelName: "",
@@ -138,6 +157,7 @@ extension Pure1v1UserListViewController {
                                              tokenGeneratorType: .token007,
                                              tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
             guard let self = self else {return}
+            pure1v1Print("generateTokens cost: \(-Int(date.timeIntervalSinceNow * 1000))ms")
             guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue],
                   let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
                 completion(nil, nil)
@@ -180,8 +200,10 @@ extension Pure1v1UserListViewController {
             return
         }
         
+        let date = Date()
         rtmClient.logout()
         rtmClient.login(self.rtmToken) { resp, err in
+            pure1v1Print("rtm login cost: \(-Int(date.timeIntervalSinceNow * 1000))ms")
             var error: NSError? = nil
             if let err = err {
                 error = NSError(domain: err.reason, code: err.errorCode.rawValue)

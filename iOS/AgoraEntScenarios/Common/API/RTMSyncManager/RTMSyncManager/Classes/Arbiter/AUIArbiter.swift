@@ -49,7 +49,7 @@ import AgoraRtmKit
         }
     }
     
-    /// 释放锁
+    /// 销毁锁
     public func destroy() {
         rtmManager.removeLock(channelName: channelName, lockName: kRTM_Referee_LockName) {[weak self] err in
             self?.notifyError(error: err)
@@ -79,6 +79,7 @@ import AgoraRtmKit
 extension AUIArbiter {
     private func notifyError(error: NSError?) {
         guard let error = error else { return }
+        aui_info("notifyError: \(error.localizedDescription)", tag: "AUIArbiter")
         arbiterDelegates.allObjects.forEach { delegate in
             delegate.onError(channelName: channelName, error: error)
         }

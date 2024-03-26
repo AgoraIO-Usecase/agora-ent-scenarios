@@ -73,3 +73,7 @@
 
 "show_statistic_other_title" = "其他";
 "show_statistic_roomId" = "频道名";
+
+"audio_dump" = "音频Dump";
+"audio_dump_open" = "开启";
+"audio_dump_close" = "关闭";

@@ -135,6 +135,15 @@ extension ShowLivePagesViewController {
 }
 
 extension ShowLivePagesViewController: ShowLiveViewControllerDelegate {
+    func willLeaveRoom(roomId: String) {
+        guard let parentVC = self.delegateHandler.parentVC else {return}
+        for vc in parentVC.children {
+            if let vc = vc as? ShowLiveViewController {
+                vc.leaveRoom()
+            }
+        }
+    }
+    
     func interactionDidChange(roomInfo: ShowRoomListModel) {
         //连麦中一方有自己则不走api
         if roomInfo.anchorInfoList.count == 2,

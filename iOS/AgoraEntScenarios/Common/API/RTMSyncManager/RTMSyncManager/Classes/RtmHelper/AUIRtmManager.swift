@@ -642,10 +642,17 @@ extension AUIRtmManager {
     public func setLock(channelName: String, 
                         lockName: String,
                         completion:@escaping((NSError?)->())) {
-        rtmClient.getLock()?.setLock(channelName: channelName,
-                                     channelType: rtmChannelType,
-                                     lockName: lockName, 
-                                     ttl: 10) { resp, errorInfo in
+        guard let lock = rtmClient.getLock() else {
+            DispatchQueue.main.async {
+                completion(AUICommonError.rtmError(-1).toNSError())
+            }
+            return
+        }
+        aui_info("setLock[\(channelName)][\(lockName)] start")
+        lock.setLock(channelName: channelName,
+                     channelType: rtmChannelType,
+                     lockName: lockName,
+                     ttl: 10) { resp, errorInfo in
             aui_info("setLock[\(channelName)][\(lockName)]: \(errorInfo?.errorCode.rawValue ?? 0)")
             completion(errorInfo?.toNSError())
         }
@@ -653,10 +660,17 @@ extension AUIRtmManager {
     public func acquireLock(channelName: String, 
                             lockName: String,
                             completion:@escaping((NSError?)->())) {
-        rtmClient.getLock()?.acquireLock(channelName: channelName,
-                                         channelType: rtmChannelType,
-                                         lockName: lockName,
-                                         retry: true) { resp, errorInfo in
+        guard let lock = rtmClient.getLock() else {
+            DispatchQueue.main.async {
+                completion(AUICommonError.rtmError(-1).toNSError())
+            }
+            return
+        }
+        aui_info("acquireLock[\(channelName)][\(lockName)] start")
+        lock.acquireLock(channelName: channelName,
+                         channelType: rtmChannelType,
+                         lockName: lockName,
+                         retry: true) { resp, errorInfo in
             aui_info("acquireLock[\(channelName)][\(lockName)]: \(errorInfo?.errorCode.rawValue ?? 0)")
             completion(errorInfo?.toNSError())
         }
@@ -665,10 +679,17 @@ extension AUIRtmManager {
     public func releaseLock(channelName: String, 
                             lockName: String,
                             completion:@escaping((NSError?)->())) {
-        rtmClient.getLock()?.releaseLock(channelName: channelName,
-                                         channelType: rtmChannelType,
-                                         lockName: lockName,
-                                         completion: { resp, errorInfo in
+        guard let lock = rtmClient.getLock() else {
+            DispatchQueue.main.async {
+                completion(AUICommonError.rtmError(-1).toNSError())
+            }
+            return
+        }
+        aui_info("releaseLock[\(channelName)][\(lockName)] start")
+        lock.releaseLock(channelName: channelName,
+                         channelType: rtmChannelType,
+                         lockName: lockName,
+                         completion: { resp, errorInfo in
             aui_info("releaseLock[\(channelName)][\(lockName)]: \(errorInfo?.reason ?? "")")
             completion(errorInfo?.toNSError())
         })
@@ -677,10 +698,17 @@ extension AUIRtmManager {
     public func removeLock(channelName: String, 
                            lockName: String,
                            completion:@escaping((NSError?)->())) {
-        rtmClient.getLock()?.removeLock(channelName: channelName,
-                                        channelType: rtmChannelType,
-                                        lockName: lockName,
-                                        completion: { resp, errorInfo in
+        guard let lock = rtmClient.getLock() else {
+            DispatchQueue.main.async {
+                completion(AUICommonError.rtmError(-1).toNSError())
+            }
+            return
+        }
+        aui_info("removeLock[\(channelName)][\(lockName)] start")
+        lock.removeLock(channelName: channelName,
+                        channelType: rtmChannelType,
+                        lockName: lockName,
+                        completion: { resp, errorInfo in
             aui_info("removeLock[\(channelName)][\(lockName)]: \(errorInfo?.reason ?? "")")
             completion(errorInfo?.toNSError())
         })

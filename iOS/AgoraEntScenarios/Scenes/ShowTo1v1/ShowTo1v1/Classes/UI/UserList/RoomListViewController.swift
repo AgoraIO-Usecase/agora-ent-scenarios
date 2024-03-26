@@ -13,6 +13,7 @@ import VideoLoaderAPI
 import AgoraCommon
 import AgoraRtmKit
 import AudioScenarioApi
+import SVProgressHUD
 
 private let randomRoomName = [
     "show_create_room_name1".showTo1v1Localization(),
@@ -103,8 +104,10 @@ class RoomListViewController: UIViewController {
                 }
                 
                 showTo1v1Print("[setupApi]join broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
+                SVProgressHUD.show()
                 self.service?.joinRoom(roomInfo: roomInfo, completion: {[weak self] err in
                     guard let self = self else {return}
+                    SVProgressHUD.dismiss()
                     if let error = err {
                         if self.preJoinRoom?.roomId == roomInfo.roomId {
                             self.navigationController?.popToViewController(self, animated: false)
@@ -183,6 +186,21 @@ class RoomListViewController: UIViewController {
         callVC.callApi = callApi
         callVC.currentUser = userInfo
         callVC.rtcEngine = rtcEngine
+        
+        
+        if AppContext.shared.isDebugMode {
+            //如果开启了debug模式
+            let debugBtn = UIButton(frame: CGRect(x: 20, y: view.height - 100, width: 80, height: 80))
+            debugBtn.backgroundColor = .blue
+            debugBtn.layer.cornerRadius = 40;
+            debugBtn.layer.masksToBounds = true;
+            debugBtn.setTitleColor(.white, for: .normal)
+            debugBtn.setTitle("Debug", for: .normal)
+            debugBtn.addTarget(self, action: #selector(onDebugAction), for: .touchUpInside)
+            view.addSubview(debugBtn)
+            
+            AppContext.shared.resetDebugConfig(engine: rtcEngine)
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -202,6 +220,12 @@ class RoomListViewController: UIViewController {
         let guideView = RoomListGuideView(frame: self.view.bounds)
         self.view.addSubview(guideView)
         UserDefaults.standard.set(true, forKey: kShowGuideAlreadyKey)
+    }
+    
+    
+    @objc func onDebugAction() {
+        let vc = DebugSettingViewController(engine: rtcEngine)
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
 
@@ -415,11 +439,17 @@ extension RoomListViewController {
                 let oldList = self.roomList
                 self.roomList = list
                 VideoLoaderApiImpl.shared.cleanCache()
+                
+                let uid = Int(userInfo?.uid ?? "") ?? 0
                 oldList.forEach { info in
-                    VideoLoaderApiImpl.shared.removeRTCListener(anchorId: info.roomId, listener: self)
+                    let connection = AgoraRtcConnection(channelId: info.roomId, localUid: uid)
+                    self.rtcEngine.removeDelegateEx(self, connection: connection)
+//                    VideoLoaderApiImpl.shared.removeRTCListener(anchorId: info.roomId, listener: self)
                 }
                 roomList.forEach { info in
-                    VideoLoaderApiImpl.shared.addRTCListener(anchorId: info.roomId, listener: self)
+                    let connection = AgoraRtcConnection(channelId: info.roomId, localUid: uid)
+                    self.rtcEngine.addDelegateEx(self, connection: connection)
+//                    VideoLoaderApiImpl.shared.addRTCListener(anchorId: info.roomId, listener: self)
                 }
             }
         }

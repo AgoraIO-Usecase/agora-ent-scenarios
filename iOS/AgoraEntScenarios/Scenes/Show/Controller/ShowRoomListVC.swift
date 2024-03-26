@@ -202,6 +202,8 @@ extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFl
             }
             
             return true
+        } onRequireRenderVideo: { _ in
+            return nil
         } completion: { [weak self] in
             self?.joinRoom(room)
             cell.showCoverView()
