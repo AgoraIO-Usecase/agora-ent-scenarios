@@ -32,9 +32,9 @@ protocol Pure1v1ServiceProtocol: NSObjectProtocol {
     /// - Parameter completion: 完成回调
     func getUserList(completion: @escaping ([Pure1v1UserInfo], NSError?) -> Void)
     
-    /// 订阅网络状态变化
-    /// - Parameter changedBlock: 变化回调
-    func subscribeNetworkStatusChanged(with changedBlock: @escaping (Pure1v1ServiceNetworkStatus) -> Void)
+    /// 订阅用户列表变化
+    /// - Parameter changedBlock: <#changedBlock description#>
+    func subscribeUserListChanged(with changedBlock: (([Pure1v1UserInfo]) -> Void)?)
     
     /// 取消全部订阅
     func unsubscribeAll()

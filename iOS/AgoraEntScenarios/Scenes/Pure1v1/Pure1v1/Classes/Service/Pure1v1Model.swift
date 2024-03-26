@@ -6,19 +6,19 @@
 //
 
 import Foundation
+import RTMSyncManager
 
 @objcMembers
 public class Pure1v1UserInfo: NSObject {
     public var userId: String = "" 
     public var userName: String = ""
     public var avatar: String = ""
-    public var roomId: String = ""
-    public var createdAt: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
     
-    var objectId: String = ""
-    
-    func getRoomId() ->String {
-        return "\(userId)_\(Int64(Date().timeIntervalSince1970 * 1000))"
+    convenience init(userInfo: AUIUserInfo) {
+        self.init()
+        self.userId = userInfo.userId
+        self.userName = userInfo.userName
+        self.avatar = userInfo.userAvatar
     }
     
     func bgImage() ->UIImage? {

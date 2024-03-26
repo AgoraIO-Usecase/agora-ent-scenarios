@@ -8,6 +8,7 @@
 import UIKit
 import VideoLoaderAPI
 import AgoraCommon
+
 class ShowRoomListVC: UIViewController {
     let backgroundView = UIImageView()
     
@@ -52,20 +53,20 @@ class ShowRoomListVC: UIViewController {
     deinit {
         AppContext.unloadShowServiceImp()
         ShowAgoraKitManager.shared.destoryEngine()
-        showLogger.info("deinit-- ShowRoomListVC")
+        showLogger().info("deinit-- ShowRoomListVC")
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        showLogger.info("init-- ShowRoomListVC")
+        showLogger().info("init-- ShowRoomListVC")
         VideoLoaderApiImpl.shared.printClosure = { msg in
-            showLogger.info(msg, context: "VideoLoaderApi")
+            showLogger().info(msg, context: "VideoLoaderApi")
         }
         VideoLoaderApiImpl.shared.warningClosure = { msg in
-            showLogger.warning(msg, context: "VideoLoaderApi")
+            showLogger().warning(msg, context: "VideoLoaderApi")
         }
         VideoLoaderApiImpl.shared.errorClosure = { msg in
-            showLogger.error(msg, context: "VideoLoaderApi")
+            showLogger().error(msg, context: "VideoLoaderApi")
         }
     }
     
@@ -141,7 +142,7 @@ class ShowRoomListVC: UIViewController {
             self?.refreshControl.endRefreshing()
             guard let self = self, let roomList = roomList else {return}
             if let error = error {
-                showLogger.error(error.localizedDescription)
+                showLogger().error(error.localizedDescription)
                 return
             }
             self.roomList = roomList
@@ -201,6 +202,8 @@ extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFl
             }
             
             return true
+        } onRequireRenderVideo: { _ in
+            return nil
         } completion: { [weak self] in
             self?.joinRoom(room)
             cell.showCoverView()
