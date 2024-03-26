@@ -144,7 +144,7 @@ class BroadcasterViewController: BaseRoomViewController {
             })
             
             _setupCanvas(view: remoteCanvasView)
-            
+            //主播的直播数据面板
             rtcEngine?.addDelegate(self.realTimeView)
             
             bottomBar.buttonTypes = [.more]
@@ -159,8 +159,10 @@ class BroadcasterViewController: BaseRoomViewController {
             container.container = remoteCanvasView
             container.uid = roomInfo.getUIntUserId()
             VideoLoaderApiImpl.shared.renderVideo(anchorInfo: room, container: container)
-            
-            VideoLoaderApiImpl.shared.addRTCListener(anchorId: room.channelName, listener: self.realTimeView)
+            //观众的直播数据面板
+            let connection = AgoraRtcConnection(channelId: roomInfo.roomId, localUid: Int(uid))
+            rtcEngine?.addDelegateEx(self.realTimeView, connection: connection)
+//            VideoLoaderApiImpl.shared.addRTCListener(anchorId: room.channelName, listener: self.realTimeView)
             
             bottomBar.buttonTypes = [.call, .more]
         }
@@ -170,10 +172,12 @@ class BroadcasterViewController: BaseRoomViewController {
         guard let currentUser = currentUser, let roomInfo = roomInfo, let uid = UInt(currentUser.uid) else {return}
         if currentUser.uid == roomInfo.uid {
             rtcEngine?.leaveChannel()
-            
             rtcEngine?.removeDelegate(self.realTimeView)
         } else {
-            VideoLoaderApiImpl.shared.removeRTCListener(anchorId: roomInfo.channelName(), listener: self.realTimeView)
+            //观众不需要离开频道，交给场景化api处理
+            let connection = AgoraRtcConnection(channelId: roomInfo.roomId, localUid: Int(uid))
+            rtcEngine?.removeDelegateEx(self.realTimeView, connection: connection)
+//            VideoLoaderApiImpl.shared.removeRTCListener(anchorId: roomInfo.channelName(), listener: self.realTimeView)
         }
     }
     

@@ -7,6 +7,7 @@
 
 #import "FUBeautyRender.h"
 #import "BundleUtil.h"
+#import "FUDynmicResourceConfig.h"
 
 @interface FUBeautyRender ()
 
@@ -135,8 +136,13 @@
 #if __has_include(FURenderMoudle)
     FUMakeup *makeup = [FURenderKit shareRenderKit].makeup;
     if (makeup == nil || self.makeupKey != key) {
-        NSBundle *bundle = [BundleUtil bundleWithBundleName:@"FURenderKit" podName:@"fuLib"];
-        NSString *stylePath = [bundle pathForResource:key ofType:@"bundle"];
+        NSString* folderPath = [FUDynmicResourceConfig shareInstance].resourceFolderPath;
+        NSString *stylePath = [NSString stringWithFormat:@"%@/Resources/%@.bundle", folderPath, key];
+        if (![[NSFileManager defaultManager] fileExistsAtPath:stylePath]) {
+            NSBundle *bundle = [BundleUtil bundleWithBundleName:@"FURenderKit" podName:@"fuLib"];
+            stylePath = [bundle pathForResource:key ofType:@"bundle"];
+        }
+        
         makeup = [[FUMakeup alloc] initWithPath:stylePath name:@"makeup"];
         makeup.isMakeupOn = YES;
         dispatch_queue_t referQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
@@ -157,8 +163,14 @@
         [[FURenderKit shareRenderKit].stickerContainer removeSticker:self.currentSticker completion:nil];
         self.currentSticker = nil;
     }
-    NSBundle *bundle = [BundleUtil bundleWithBundleName:@"FURenderKit" podName:@"fuLib"];
-    NSString *makeupPath = [bundle pathForResource:[NSString stringWithFormat:@"Animoji/%@",path] ofType:@"bundle"];
+    
+    NSString* folderPath = [FUDynmicResourceConfig shareInstance].resourceFolderPath;
+    NSString *makeupPath = [NSString stringWithFormat:@"%@/Resources/Animoji/%@.bundle", folderPath, path];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:makeupPath]) {
+        NSBundle *bundle = [BundleUtil bundleWithBundleName:@"FURenderKit" podName:@"fuLib"];
+        makeupPath = [bundle pathForResource:[NSString stringWithFormat:@"Animoji/%@",path] ofType:@"bundle"];
+    }
+    
     FUAnimoji *animoji = [[FUAnimoji alloc] initWithPath:makeupPath name:@"animoji"];
     if (self.currentAnimoji) {
         [[FURenderKit shareRenderKit].stickerContainer replaceSticker:self.currentAnimoji withSticker:animoji completion:^{
@@ -173,8 +185,12 @@
 }
 
 - (void)setStickerWithPath:(NSString *)path {
-    NSBundle *bundle = [BundleUtil bundleWithBundleName:@"FURenderKit" podName:@"fuLib"];
-    NSString *stickerPath = [bundle pathForResource:[NSString stringWithFormat:@"sticker/%@", path] ofType:@"bundle"];
+    NSString* folderPath = [FUDynmicResourceConfig shareInstance].resourceFolderPath;
+    NSString *stickerPath = [NSString stringWithFormat:@"%@/Resources/sticker/%@.bundle", folderPath, path];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:stickerPath]) {
+        NSBundle *bundle = [BundleUtil bundleWithBundleName:@"FURenderKit" podName:@"fuLib"];
+        stickerPath = [bundle pathForResource:[NSString stringWithFormat:@"sticker/%@", path] ofType:@"bundle"];
+    }
 #if __has_include(FURenderMoudle)
     if (stickerPath == nil && self.currentSticker == nil) {
         return;
