@@ -11,7 +11,12 @@ extension AGResourceManager {
     static func autoDownload(uris: [String]? = nil, 
                              progress: ((Double)-> Void)? = nil,
                              completion: ((NSError?)-> Void)? = nil) {
-        let url = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/resource/manifest/manifestList"
+        let url = KeyCenter.dynamicResourceUrl
+        if url.isEmpty {
+            completion?(NSError(domain: "dynamicResourceUrl is empty", code: -1))
+            return
+        }
+        
         AGResourceManager.shared.downloadManifestList(url: url) { _ in
         } completionHandler: { _, err in
             if let err = err {

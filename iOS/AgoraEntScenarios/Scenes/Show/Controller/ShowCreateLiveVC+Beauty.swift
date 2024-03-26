@@ -104,6 +104,10 @@ extension ShowCreateLiveVC {
     }
     
     func checkAndSetupBeautyPath(completion: ((NSError?) -> Void)?) {
+        if KeyCenter.dynamicResourceUrl.isEmpty {
+            completion?(nil)
+            return
+        }
         if isBeautyDownloading() {
             completion?(NSError(domain: "download already", code: -1))
             return
