@@ -94,6 +94,7 @@ class AGResourceManager(private val context: Context) {
         )
     }
 
+    // 下载并解压单个资源文件
     suspend fun downloadAndUnZipResource(
         resource: AGResource,
         progressHandler: (Int) -> Unit,
@@ -153,18 +154,6 @@ class AGResourceManager(private val context: Context) {
     fun getStatus(resource: AGResource): AGResourceStatus {
         // 实现资源状态查询逻辑
         return AGResourceStatus.INVALID
-    }
-
-    // 解码JSON数组为资源列表
-    private fun decodeModelArray(jsonStr: String): List<AGResource>? {
-        // 实现JSON解析逻辑
-        return null
-    }
-
-    // 解码JSON对象为清单模型
-    private fun decodeModel(jsonStr: String): AGManifest? {
-        // 实现JSON解析逻辑
-        return null
     }
 
     // 获取缓存路径

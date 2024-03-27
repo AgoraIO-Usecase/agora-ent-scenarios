@@ -1735,7 +1735,7 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-    private fun setupLocalVideo(container: VideoLoader.VideoCanvasContainer) {
+    private fun setupLocalVideo(container: VideoLoader.VideoCanvasContainer, needBeauty: Boolean = true) {
         localVideoCanvas?.let {
             if (it.lifecycleOwner == container.lifecycleOwner && it.renderMode == container.renderMode && it.uid == container.uid) {
                 val videoView = it.view
@@ -1761,11 +1761,16 @@ class LiveDetailFragment : Fragment() {
             }
         }
 
-        LocalVideoCanvasWrap(
+        val local = LocalVideoCanvasWrap(
             container.lifecycleOwner,
             videoView, container.renderMode, container.uid
         )
-        BeautyManager.setupLocalVideo(videoView, container.renderMode)
+        if (needBeauty) {
+            BeautyManager.setupLocalVideo(videoView, container.renderMode)
+        } else {
+            local.mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
+            mRtcEngine.setupLocalVideo(local)
+        }
     }
 
     private fun updateVideoSetting(isPkMode:Boolean) {
@@ -1936,13 +1941,13 @@ class LiveDetailFragment : Fragment() {
                             // 有权限
                             mRtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, rtcConnection)
                             val context = activity ?: return@toggleSelfVideo
-                            BeautyManager.initialize(context, mRtcEngine)
                             setupLocalVideo(
                                 VideoLoader.VideoCanvasContainer(
                                     context,
                                     mBinding.videoLinkingAudienceLayout.videoContainer,
                                     0
-                                )
+                                ),
+                                needBeauty = false
                             )
                         } else {
                             // 没有权限

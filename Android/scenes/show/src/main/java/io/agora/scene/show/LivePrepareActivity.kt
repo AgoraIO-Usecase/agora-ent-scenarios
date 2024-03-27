@@ -309,6 +309,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                         } else {
                             // 下载失败，更新UI显示错误信息
                             ShowLogger.e(tag, e, "download failed: ${e.message}")
+                            return@downloadAndUnZipResource
                         }
                     }
                 )
