@@ -205,8 +205,9 @@ class ShowLiveViewController: UIViewController {
                 
                 room?.interactionAnchorInfoList.removeAll()
             }
+            var needUpdateInteraction = false
             if let info = currentInteraction {
-                _onStartInteraction(interaction: info)
+                needUpdateInteraction = true
                 
                 if let uid = UInt(info.userId) {
                     let anchorInfo = AnchorInfo()
@@ -218,7 +219,13 @@ class ShowLiveViewController: UIViewController {
                 }
             }
             
-            delegate?.interactionDidChange(roomInfo: room!)
+            if let room = room {
+                delegate?.interactionDidChange(roomInfo: room)
+            }
+            if needUpdateInteraction, let info = currentInteraction {
+                //interactionDidChange里更新pk才会加入频道，保证加入频道之后才添加delegate（在_onStartInteraction里实现）
+                _onStartInteraction(interaction: info)
+            }
         }
     }
     
