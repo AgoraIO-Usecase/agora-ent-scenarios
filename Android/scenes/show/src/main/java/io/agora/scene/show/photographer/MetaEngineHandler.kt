@@ -312,6 +312,7 @@ class MetaEngineHandler : AGExtensionHandler {
         aiPhotographerType: Int = AiPhotographerType.ITEM_ID_AI_PHOTOGRAPHER_NONE
     ) {
         if (enable) {
+            enableSegmentation()
             val effect3DId: Int = when (aiPhotographerType) {
                 AiPhotographerType.ITEM_ID_AI_EDGE_LIGHT -> SpecialEffectType.SETypeFlame
                 AiPhotographerType.ITEM_ID_AI_LIGHTING_AD -> SpecialEffectType.SETypeAdvLight
