@@ -143,6 +143,12 @@ class BroadcasterViewController: BaseRoomViewController {
                 self.callApi?.moderationAudio(appId: showTo1v1AppId!, channelName: channelId, user: self.currentUser!)
             })
             
+            
+            let config = AgoraVideoEncoderConfiguration()
+            config.dimensions = CGSize(width: 720, height: 1280)
+            config.frameRate = .fps24
+            rtcEngine?.setVideoEncoderConfiguration(config)
+            
             _setupCanvas(view: remoteCanvasView)
             //主播的直播数据面板
             rtcEngine?.addDelegate(self.realTimeView)
