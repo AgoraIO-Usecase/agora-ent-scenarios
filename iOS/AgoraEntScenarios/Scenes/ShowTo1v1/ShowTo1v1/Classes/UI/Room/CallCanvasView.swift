@@ -42,6 +42,7 @@ class CallCanvasView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        backgroundColor = UIColor(hexString: "#0038ff")?.withAlphaComponent(0.7)
         addSubview(leaveIconView)
         addSubview(leaveTipsLabel)
         addSubview(canvasView)

@@ -44,7 +44,6 @@ class CallViewController: BaseRoomViewController {
     
     private(set) lazy var localCanvasView: CallCanvasView = {
         let view = CallCanvasView(frame: CGRect(origin: .zero, size: CGSize(width: 109, height: 163)))
-        view.backgroundColor = UIColor(hexString: "#0038ff")?.withAlphaComponent(0.7)
         view.tapClosure = {[weak self] in
             guard let self = self else {return}
             self.switchCanvasAction(canvasView: self.localCanvasView)
@@ -153,15 +152,12 @@ extension CallViewController {
         menu.selectedMap = selectedMap
         guard let rtcChannelName = rtcChannelName, let uid = Int(currentUser?.uid ?? "") else {return}
         let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: uid)
-        let mediaOptions = AgoraRtcChannelMediaOptions()
         if selected {
             rtcEngine?.stopPreview()
-            mediaOptions.publishCameraTrack = false
         } else {
             rtcEngine?.startPreview()
-            mediaOptions.publishCameraTrack = true
         }
-        rtcEngine?.updateChannelEx(with: mediaOptions, connection: connection)
+        rtcEngine?.muteLocalVideoStreamEx(selected, connection: connection)
     }
     
     public override func onClickMicButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
@@ -169,9 +165,7 @@ extension CallViewController {
         menu.selectedMap = selectedMap
         guard let rtcChannelName = rtcChannelName, let uid = Int(currentUser?.uid ?? "") else {return}
         let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: uid)
-        let mediaOptions = AgoraRtcChannelMediaOptions()
-        mediaOptions.publishMicrophoneTrack = selected == false ? true : false
-        rtcEngine?.updateChannelEx(with: mediaOptions, connection: connection)
+        rtcEngine?.muteLocalAudioStreamEx(selected, connection: connection)
     }
 }
 
@@ -185,6 +179,14 @@ extension CallViewController: AgoraRtcEngineDelegate {
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         showTo1v1Warn("didJoinedOfUid: \(uid) elapsed: \(elapsed)")
+    }
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, didAudioMuted muted: Bool, byUid uid: UInt) {
+        showTo1v1Print("didAudioMuted[\(uid)] \(muted)")
+    }
+    
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, didVideoMuted muted: Bool, byUid uid: UInt) {
+        showTo1v1Print("didVideoMuted[\(uid)] \(muted)")
+        self.remoteCanvasView.canvasView.isHidden = muted
     }
 }
 

@@ -23,11 +23,13 @@ class Pure1v1CallViewController: UIViewController {
                 let connection = AgoraRtcConnection(channelId: oldValue, localUid: localUid)
                 connection.channelId = oldValue
                 rtcEngine?.removeDelegateEx(self.realTimeView, connection: connection)
+                rtcEngine?.removeDelegateEx(self, connection: connection)
             }
             
             if let rtcChannelName = rtcChannelName {
                 let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: localUid)
                 rtcEngine?.addDelegateEx(self.realTimeView, connection: connection)
+                rtcEngine?.addDelegateEx(self, connection: connection)
                 self.realTimeView.roomId = rtcChannelName
             }
         }
@@ -69,7 +71,6 @@ class Pure1v1CallViewController: UIViewController {
     }()
     lazy var localCanvasView: Pure1v1CanvasView = {
         let view = Pure1v1CanvasView(frame: .zero)
-        view.backgroundColor = UIColor(hexString: "#0038ff")?.withAlphaComponent(0.7)
         view.tapClosure = {[weak self] in
             guard let self = self else {return}
             self._switchCanvasAction(canvasView: self.localCanvasView)
@@ -215,15 +216,12 @@ extension Pure1v1CallViewController: ShowToolMenuViewControllerDelegate {
         menu.selectedMap = selectedMap
         guard let rtcChannelName = rtcChannelName, let uid = Int(currentUser?.userId ?? "") else {return}
         let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: uid)
-        let mediaOptions = AgoraRtcChannelMediaOptions()
         if selected {
             rtcEngine?.stopPreview()
-            mediaOptions.publishCameraTrack = false
         } else {
             rtcEngine?.startPreview()
-            mediaOptions.publishCameraTrack = true
         }
-        rtcEngine?.updateChannelEx(with: mediaOptions, connection: connection)
+        rtcEngine?.muteLocalVideoStreamEx(selected, connection: connection)
     }
     
     func onClickMicButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
@@ -231,9 +229,7 @@ extension Pure1v1CallViewController: ShowToolMenuViewControllerDelegate {
         menu.selectedMap = selectedMap
         guard let rtcChannelName = rtcChannelName, let uid = Int(currentUser?.userId ?? "") else {return}
         let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: uid)
-        let mediaOptions = AgoraRtcChannelMediaOptions()
-        mediaOptions.publishMicrophoneTrack = selected == false ? true : false
-        rtcEngine?.updateChannelEx(with: mediaOptions, connection: connection)
+        rtcEngine?.muteLocalAudioStreamEx(selected, connection: connection)
     }
     
     func onClickRealTimeDataButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
@@ -276,3 +272,14 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
     }
 }
 
+
+extension Pure1v1CallViewController: AgoraRtcEngineDelegate {
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, didAudioMuted muted: Bool, byUid uid: UInt) {
+        pure1v1Print("didAudioMuted[\(uid)] \(muted)")
+    }
+    
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, didVideoMuted muted: Bool, byUid uid: UInt) {
+        pure1v1Print("didVideoMuted[\(uid)] \(muted)")
+        self.remoteCanvasView.canvasView.isHidden = muted
+    }
+}
