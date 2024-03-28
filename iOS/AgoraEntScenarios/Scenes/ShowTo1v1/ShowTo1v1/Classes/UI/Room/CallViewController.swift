@@ -135,9 +135,43 @@ class CallViewController: BaseRoomViewController {
         _updateCanvas()
     }
     
+    override func menuTypes() -> [ShowToolMenuType] {
+        return [.camera, .mic, .real_time_data]
+    }
+    
     @objc private func _hangupAction() {
         callApi?.hangup(remoteUserId: UInt(targetUser?.uid ?? "") ?? 0, reason: nil, completion: { err in
         })
+        
+        selectedMap.removeAll()
+    }
+}
+
+extension CallViewController {
+    public override func onClickCameraButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
+        self.selectedMap[.camera] = selected
+        menu.selectedMap = selectedMap
+        guard let rtcChannelName = rtcChannelName, let uid = Int(currentUser?.uid ?? "") else {return}
+        let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: uid)
+        let mediaOptions = AgoraRtcChannelMediaOptions()
+        if selected {
+            rtcEngine?.stopPreview()
+            mediaOptions.publishCameraTrack = false
+        } else {
+            rtcEngine?.startPreview()
+            mediaOptions.publishCameraTrack = true
+        }
+        rtcEngine?.updateChannelEx(with: mediaOptions, connection: connection)
+    }
+    
+    public override func onClickMicButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
+        self.selectedMap[.mic] = selected
+        menu.selectedMap = selectedMap
+        guard let rtcChannelName = rtcChannelName, let uid = Int(currentUser?.uid ?? "") else {return}
+        let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: uid)
+        let mediaOptions = AgoraRtcChannelMediaOptions()
+        mediaOptions.publishMicrophoneTrack = selected == false ? true : false
+        rtcEngine?.updateChannelEx(with: mediaOptions, connection: connection)
     }
 }
 

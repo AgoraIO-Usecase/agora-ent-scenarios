@@ -31,6 +31,10 @@
 "create_room_name_empty_tips"="房间名称不能为空";
 "call_usage_tips"=" 本产品仅用于功能体验，单次直播时长不超过20mins";
 "call_toast_hangup"="对方结束连线";
+"setting_video_on" = "摄像头开";
+"setting_mic_on" = "麦克风开";
+"setting_video_off" = "摄像头关";
+"setting_mic_off" = "麦克风关";
 "setting_statistic" = "实时数据";
 "call_user_busy_tips"="我很快回来，一会再连线我把";
 "call_content_inspect_warning"="监测到当前内容存在违规行为";

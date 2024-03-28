@@ -47,6 +47,7 @@ class Pure1v1CallViewController: UIViewController {
             _resetCanvas()
         }
     }
+    private lazy var selectedMap: [ShowToolMenuType: Bool] = [:]
     private lazy var moveViewModel: MoveGestureViewModel = MoveGestureViewModel()
     private lazy var roomInfoView: Pure1v1RoomInfoView = Pure1v1RoomInfoView()
     lazy var moreBtn: UIButton = {
@@ -188,6 +189,7 @@ class Pure1v1CallViewController: UIViewController {
     @objc private func _hangupAction() {
         callApi?.hangup(remoteUserId: UInt(targetUser?.userId ?? "") ?? 0, reason: nil, completion: { err in
         })
+        selectedMap.removeAll()
         dismiss(animated: false)
     }
     
@@ -200,14 +202,40 @@ class Pure1v1CallViewController: UIViewController {
 
 extension Pure1v1CallViewController: Pure1v1RoomBottomBarDelegate {
     func onClickSettingButton() {
-        let settingMenuVC = ShowToolMenuViewController()
-        settingMenuVC.type = ShowMenuType.idle_audience
+        let settingMenuVC = ShowToolMenuViewController(menuTypes: [.camera, .mic, .real_time_data])
+        settingMenuVC.selectedMap = selectedMap
         settingMenuVC.delegate = self
         present(settingMenuVC, animated: true)
     }
 }
 
 extension Pure1v1CallViewController: ShowToolMenuViewControllerDelegate {
+    func onClickCameraButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
+        self.selectedMap[.camera] = selected
+        menu.selectedMap = selectedMap
+        guard let rtcChannelName = rtcChannelName, let uid = Int(currentUser?.userId ?? "") else {return}
+        let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: uid)
+        let mediaOptions = AgoraRtcChannelMediaOptions()
+        if selected {
+            rtcEngine?.stopPreview()
+            mediaOptions.publishCameraTrack = false
+        } else {
+            rtcEngine?.startPreview()
+            mediaOptions.publishCameraTrack = true
+        }
+        rtcEngine?.updateChannelEx(with: mediaOptions, connection: connection)
+    }
+    
+    func onClickMicButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
+        self.selectedMap[.mic] = selected
+        menu.selectedMap = selectedMap
+        guard let rtcChannelName = rtcChannelName, let uid = Int(currentUser?.userId ?? "") else {return}
+        let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: uid)
+        let mediaOptions = AgoraRtcChannelMediaOptions()
+        mediaOptions.publishMicrophoneTrack = selected == false ? true : false
+        rtcEngine?.updateChannelEx(with: mediaOptions, connection: connection)
+    }
+    
     func onClickRealTimeDataButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
         view.addSubview(realTimeView)
         realTimeView.snp.makeConstraints { make in

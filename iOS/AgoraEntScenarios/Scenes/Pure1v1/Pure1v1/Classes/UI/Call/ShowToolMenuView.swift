@@ -8,17 +8,38 @@
 import UIKit
 
 enum ShowToolMenuType: CaseIterable {
+    case camera
+    case mic
     case real_time_data
     
     var imageName: String {
         switch self {
+        case .camera: return "show_camera"
+        case .mic: return "show_mic"
         case .real_time_data: return "show_realtime"
+        }
+    }
+    
+    var selectedImageName: String? {
+        switch self {
+        case .camera: return "show_camera_off"
+        case .mic: return "show_mic_off"
+        default: return nil
         }
     }
     
     var title: String {
         switch self {
+        case .camera: return "setting_video_on".pure1v1Localization()
+        case .mic: return "setting_mic_on".pure1v1Localization()
         case .real_time_data: return "setting_statistic".pure1v1Localization()
+        }
+    }
+    var selectedTitle: String? {
+        switch self {
+        case .camera: return "setting_video_off".pure1v1Localization()
+        case .mic: return "setting_mic_off".pure1v1Localization()
+        default: return title
         }
     }
 }
@@ -31,19 +52,9 @@ class ShowToolMenuModel {
     var isSelected: Bool = false
 }
 
-enum ShowMenuType {
-    /// 未pk观众
-    case idle_audience
-    /// 未pk主播
-    case idle_broadcaster
-    /// PK中
-    case pking
-    /// 管理麦位
-    case managerMic
-}
-
 class ShowToolMenuView: UIView {
     private var dataArray:[ShowToolMenuModel] = []
+    private var menuTypes: [ShowToolMenuType]
     var title: String? {
         didSet {
             collectionView.reloadData()
@@ -52,6 +63,7 @@ class ShowToolMenuView: UIView {
     var onTapItemClosure: ((ShowToolMenuType, Bool) -> Void)?
     var selectedMap: [ShowToolMenuType: Bool]? {
         didSet {
+            updateToolType(type: menuTypes)
             collectionView.reloadData()
         }
     }
@@ -74,28 +86,11 @@ class ShowToolMenuView: UIView {
         return view
     }()
     
-    var type: ShowMenuType = .idle_audience {
-        didSet {
-            
-//            switch type {
-//            case .idle_broadcaster:
-//                updateToolType(type: [.switch_camera, .camera, .mic, .real_time_data, .setting])
-//            case .pking:
-//                updateToolType(type: [.switch_camera, .camera, .mute_mic, .end_pk])
-//            case .managerMic:
-//                updateToolType(type: [.mute_mic, .end_pk])
-//            case .idle_audience:
-                updateToolType(type: [.real_time_data])
-//            }
-        }
-    }
-    
-    init(type: ShowMenuType) {
+    required init(menuTypes: [ShowToolMenuType]) {
+        self.menuTypes = menuTypes
         super.init(frame: .zero)
         setupUI()
-        defer {
-            self.type = type
-        }
+        updateToolType(type: menuTypes)
     }
     
     required init?(coder: NSCoder) {
@@ -107,7 +102,7 @@ class ShowToolMenuView: UIView {
         type.forEach({
             let model = ShowToolMenuModel()
             model.imageName = $0.imageName
-            model.selectedImageName = $0.imageName
+            model.selectedImageName = $0.selectedImageName ?? ""
             model.title = $0.title
             model.type = $0
             model.isSelected = selectedMap?[$0] ?? false
@@ -162,7 +157,7 @@ extension ShowToolMenuView: UICollectionViewDelegate, UICollectionViewDataSource
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        CGSize(width: collectionView.aui_width, height: (type == .idle_audience || type == .idle_broadcaster) ? 0 : 50)
+        CGSize(width: collectionView.aui_width, height: 50)
     }
 }
 
@@ -212,7 +207,7 @@ class LiveToolViewCell: UICollectionViewCell {
         iconButton.setImage(UIImage.scene1v1Image(name: model.imageName), for: .normal)
         iconButton.setImage(UIImage.scene1v1Image(name: model.selectedImageName), for: .selected)
         iconButton.isSelected = model.isSelected
-        titleLabel.text = model.isSelected ? model.type.title : model.type.title
+        titleLabel.text = model.isSelected ? model.type.selectedTitle : model.type.title
     }
     
     @discardableResult

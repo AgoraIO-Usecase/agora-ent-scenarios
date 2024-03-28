@@ -20,6 +20,8 @@ class BaseRoomViewController: UIViewController {
             callApi?.addListener(listener: self)
         }
     }
+    
+    lazy var selectedMap: [ShowToolMenuType: Bool] = [:]
     private(set) lazy var roomInfoView: RoomInfoView = RoomInfoView()
     private(set) lazy var canvasContainerView = UIView()
     private(set) lazy var remoteCanvasView: CallCanvasView = {
@@ -87,6 +89,10 @@ class BaseRoomViewController: UIViewController {
     func switchCanvasAction(canvasView: CallCanvasView) {
     }
     
+    func menuTypes() -> [ShowToolMenuType] {
+        return [.real_time_data]
+    }
+    
     @objc func onMoreAction() {
         let dialog = AUiMoreDialog(frame: view.bounds)
         view.addSubview(dialog)
@@ -97,8 +103,8 @@ class BaseRoomViewController: UIViewController {
 extension BaseRoomViewController: RoomBottomBarDelegate {
     public func onClick(actionType: RoomBottomBarType) {
         if actionType == .more {
-            let settingMenuVC = ShowToolMenuViewController()
-            settingMenuVC.type = ShowMenuType.idle_audience
+            let settingMenuVC = ShowToolMenuViewController(menuTypes: menuTypes())
+            settingMenuVC.selectedMap = selectedMap
             settingMenuVC.delegate = self
             present(settingMenuVC, animated: true)
         }
@@ -112,6 +118,12 @@ extension BaseRoomViewController: ShowToolMenuViewControllerDelegate {
             make.centerX.equalToSuperview()
             make.top.equalTo(UIDevice.current.aui_SafeDistanceTop + 50)
         }
+    }
+    
+    func onClickCameraButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
+    }
+    
+    func onClickMicButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
     }
     
     func onClickRealTimeDataButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
