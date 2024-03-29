@@ -12,8 +12,10 @@ import io.agora.beautyapi.bytedance.EventCallback
 import io.agora.beautyapi.bytedance.createByteDanceBeautyAPI
 import io.agora.beautyapi.faceunity.FaceUnityBeautyAPI
 import io.agora.beautyapi.faceunity.createFaceUnityBeautyAPI
+import io.agora.beautyapi.sensetime.BeautyStats
 import io.agora.beautyapi.sensetime.CaptureMode
 import io.agora.beautyapi.sensetime.Config
+import io.agora.beautyapi.sensetime.IEventCallback
 import io.agora.beautyapi.sensetime.STHandlers
 import io.agora.beautyapi.sensetime.SenseTimeBeautyAPI
 import io.agora.beautyapi.sensetime.createSenseTimeBeautyAPI
@@ -76,9 +78,8 @@ object BeautyManager {
     fun initialize(context: Context, rtcEngine: RtcEngine) {
         this.context = context.applicationContext as Application
         this.rtcEngine = rtcEngine
-        this.beautyType = BeautyType.Agora
-//        this.enable = rtcEngine.queryDeviceScore() >= 75
-        this.enable = false
+        this.beautyType = BeautyType.SenseTime
+        this.enable = rtcEngine.queryDeviceScore() >= 75
         rtcEngine.registerVideoFrameObserver(MultiBeautyVideoObserver())
     }
 
@@ -140,11 +141,29 @@ object BeautyManager {
                             Config(
                                 ctx,
                                 rtc,
-                                STHandlers(
-                                    SenseTimeBeautySDK.mobileEffectNative,
-                                    SenseTimeBeautySDK.humanActionNative
-                                ),
-                                captureMode = CaptureMode.Custom
+//                                STHandlers(
+//                                    SenseTimeBeautySDK.mobileEffectNative,
+//                                    SenseTimeBeautySDK.humanActionNative
+//                                ),
+                                captureMode = CaptureMode.Custom,
+                                eventCallback = object :IEventCallback{
+                                    override fun onBeautyStats(stats: BeautyStats) {
+                                    }
+
+                                    override fun onEffectInitialized(): STHandlers {
+                                        SenseTimeBeautySDK.initMobileEffect(ctx)
+                                        SenseTimeBeautySDK.beautyConfig.resume()
+                                        return STHandlers(
+                                            SenseTimeBeautySDK.mobileEffectNative,
+                                            SenseTimeBeautySDK.humanActionNative
+                                        )
+                                    }
+
+                                    override fun onEffectDestroyed() {
+                                        SenseTimeBeautySDK.unInitMobileEffect()
+                                    }
+
+                                }
                             )
                         )
                         senseTimeBeautyAPI.enable(enable)

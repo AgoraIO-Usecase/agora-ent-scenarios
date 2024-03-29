@@ -11,15 +11,15 @@ object ByteDanceBeautySDK {
 
     private const val TAG = "ByteDanceBeautySDK"
 
-    private val LICENSE_NAME = "Agora_test_20240111_20240411_io.agora.test.entfull_4.5.0_1111.licbag"
+    private val LICENSE_NAME = "Agora_test_20231116_20240116_io.agora.test.entfull_4.5.0_893.licbag"
     private var storagePath = ""
     private var assetsPath = ""
     private var licensePath = ""
     private var modelsPath = ""
-    private var beautyNodePath = ""
-    private var beauty4ItemsNodePath = ""
-    private var reSharpNodePath = ""
-    private var stickerPath = ""
+    var beautyNodePath = ""
+    var beauty4ItemsNodePath = ""
+    var reSharpNodePath = ""
+    var stickerPath = ""
 
     private val nodesLoaded = mutableListOf<String>()
 
@@ -104,7 +104,6 @@ object ByteDanceBeautySDK {
     fun unInitEffect() {
         beautyAPI = null
         nodesLoaded.clear()
-        beautyConfig.reset()
         renderManager.release()
     }
 
@@ -137,8 +136,8 @@ object ByteDanceBeautySDK {
         return true
     }
 
-    internal fun setBeautyAPI(beautyAPI: ByteDanceBeautyAPI) {
-        this.beautyAPI = beautyAPI
+    internal fun setBeautyAPI(beautyAPI: ByteDanceBeautyAPI?) {
+        ByteDanceBeautySDK.beautyAPI = beautyAPI
     }
 
     private fun runOnBeautyThread(run: () -> Unit) {
@@ -393,9 +392,6 @@ object ByteDanceBeautySDK {
         // 美妆
         var makeUp: MakeUpItem? = null
             set(value) {
-                if (field == value) {
-                    return
-                }
                 val oMakeUp = field
                 field = value
                 if (oMakeUp?.style != value?.style) {
@@ -444,9 +440,6 @@ object ByteDanceBeautySDK {
         // 贴纸
         var sticker: String? = null
             set(value) {
-                if (field == value) {
-                    return
-                }
                 field = value
                 runOnBeautyThread {
                     if (value != null) {

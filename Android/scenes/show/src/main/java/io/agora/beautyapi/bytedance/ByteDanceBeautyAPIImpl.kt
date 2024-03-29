@@ -34,6 +34,7 @@ import io.agora.base.TextureBufferHelper
 import io.agora.base.VideoFrame
 import io.agora.base.VideoFrame.I420Buffer
 import io.agora.base.VideoFrame.TextureBuffer
+import io.agora.base.internal.video.EglBase.Context
 import io.agora.base.internal.video.RendererCommon
 import io.agora.base.internal.video.YuvHelper
 import io.agora.beautyapi.bytedance.utils.AgoraImageHelper
@@ -57,12 +58,12 @@ class ByteDanceBeautyAPIImpl : ByteDanceBeautyAPI, IVideoFrameObserver {
 
 
     private var textureBufferHelper: TextureBufferHelper? = null
+    private var textureBufferHelperShareContext: Context? = null
     private var imageUtils: ImageUtil? = null
     private var agoraImageHelper: AgoraImageHelper? = null
     private var nv21ByteBuffer: ByteBuffer? = null
     private var config: Config? = null
     private var enable: Boolean = false
-    @Volatile
     private var isReleased: Boolean = false
     private var captureMirror = true
     private var renderMirror = true
@@ -85,13 +86,13 @@ class ByteDanceBeautyAPIImpl : ByteDanceBeautyAPI, IVideoFrameObserver {
             return ErrorCode.ERROR_HAS_INITIALIZED.value
         }
         this.config = config
+        this.cameraConfig = config.cameraConfig
         if (config.captureMode == CaptureMode.Agora) {
             config.rtcEngine.registerVideoFrameObserver(this)
         }
         statsHelper = StatsHelper(config.statsDuration) {
             this.config?.eventCallback?.onBeautyStats?.invoke(it)
         }
-        LogUtils.setLogFilePath(config.context.getExternalFilesDir("")?.absolutePath ?: "")
         LogUtils.i(TAG, "initialize >> config = $config")
         LogUtils.i(TAG, "initialize >> beauty api version=$VERSION, beauty sdk version=${RenderManager.getSDKVersion()}")
         config.rtcEngine.sendCustomReportMessage(reportId, reportCategory, "initialize", "$config", 0)
@@ -296,6 +297,14 @@ class ByteDanceBeautyAPIImpl : ByteDanceBeautyAPI, IVideoFrameObserver {
         LogUtils.i(TAG, "release")
         isReleased = true
         workerThreadExecutor.shutdown()
+        disposeTextureBufferHelper()
+        statsHelper?.reset()
+        statsHelper = null
+        pendingProcessRunList.clear()
+        return ErrorCode.ERROR_OK.value
+    }
+
+    private fun disposeTextureBufferHelper() {
         textureBufferHelper?.let {
             textureBufferHelper = null
             it.handler.removeCallbacksAndMessages(null)
@@ -309,10 +318,7 @@ class ByteDanceBeautyAPIImpl : ByteDanceBeautyAPI, IVideoFrameObserver {
             }
             it.dispose()
         }
-        statsHelper?.reset()
-        statsHelper = null
-        pendingProcessRunList.clear()
-        return ErrorCode.ERROR_OK.value
+        textureBufferHelperShareContext = null
     }
 
     private fun processBeauty(videoFrame: VideoFrame): Boolean {
@@ -356,7 +362,7 @@ class ByteDanceBeautyAPIImpl : ByteDanceBeautyAPI, IVideoFrameObserver {
         if (captureMirror != cMirror || renderMirror != rMirror) {
             LogUtils.w(TAG, "processBeauty >> enable=$enable, captureMirror=$captureMirror->$cMirror, renderMirror=$renderMirror->$rMirror")
             captureMirror = cMirror
-            if(renderMirror != rMirror && !isReleased){
+            if(renderMirror != rMirror){
                 renderMirror = rMirror
                 config?.rtcEngine?.setLocalRenderMode(
                     localVideoRenderMode,
@@ -378,6 +384,7 @@ class ByteDanceBeautyAPIImpl : ByteDanceBeautyAPI, IVideoFrameObserver {
             return true
         }
 
+        val shareContext = (videoFrame.buffer as? TextureBuffer)?.eglBaseContext ?: EglBaseProvider.instance().rootEglBase.eglBaseContext
         if (textureBufferHelper == null) {
             textureBufferHelper = TextureBufferHelper.create(
                 "ByteDanceRender",
@@ -395,7 +402,11 @@ class ByteDanceBeautyAPIImpl : ByteDanceBeautyAPI, IVideoFrameObserver {
                     }
                 }
             }
+            textureBufferHelperShareContext = shareContext
             LogUtils.i(TAG, "processBeauty >> create texture buffer, beautyMode=$beautyMode")
+        } else if(textureBufferHelperShareContext != shareContext){
+            disposeTextureBufferHelper()
+            return false
         }
 
         val startTime = System.currentTimeMillis()

@@ -52,7 +52,7 @@ object FaceUnityBeautySDK {
                         BUNDLE_AI_HUMAN,
                         FUAITypeEnum.FUAITYPE_HUMAN_PROCESSOR
                     )
-                    beautyConfig.reset()
+
                 }
             }
 
@@ -60,6 +60,7 @@ object FaceUnityBeautySDK {
                 Log.e(TAG, "FURenderManager onFail -- code=$errCode, msg=$errMsg")
             }
         })
+        beautyConfig.resume()
         return true
     }
 
@@ -78,8 +79,7 @@ object FaceUnityBeautySDK {
     }
 
     internal fun setBeautyAPI(beautyAPI: FaceUnityBeautyAPI) {
-        this.beautyAPI = beautyAPI
-        beautyConfig.resume()
+        FaceUnityBeautySDK.beautyAPI = beautyAPI
     }
 
     private fun runOnBeautyThread(run: () -> Unit) {
@@ -92,8 +92,15 @@ object FaceUnityBeautySDK {
         private val fuRenderKit = FURenderKit.getInstance()
 
         // 美颜配置
-        private val faceBeauty =
-            FaceBeauty(FUBundleData("graphics" + File.separator + "face_beautification.bundle"))
+        private val faceBeauty : FaceBeauty
+            get() {
+                val beauty = fuRenderKit.faceBeauty ?: FaceBeauty(FUBundleData("graphics" + File.separator + "face_beautification.bundle"))
+                if(fuRenderKit.faceBeauty == null){
+                    fuRenderKit.faceBeauty = beauty
+                }
+                return beauty
+            }
+
 
         // 资源基础路径
         private val resourceBase = "beauty_faceunity"
@@ -254,6 +261,9 @@ object FaceUnityBeautySDK {
         // 贴纸
         var sticker: String? = null
             set(value) {
+                if(field == value){
+                    return
+                }
                 field = value
                 runOnBeautyThread {
                     fuRenderKit.propContainer.removeAllProp()

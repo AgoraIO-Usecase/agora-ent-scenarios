@@ -33,12 +33,12 @@ import android.view.SurfaceView
 import android.view.TextureView
 import android.view.View
 import com.softsugar.stmobile.STCommonNative
-import com.softsugar.stmobile.params.STEffectBeautyType
 import io.agora.base.TextureBufferHelper
 import io.agora.base.VideoFrame
 import io.agora.base.VideoFrame.I420Buffer
 import io.agora.base.VideoFrame.SourceType
 import io.agora.base.VideoFrame.TextureBuffer
+import io.agora.base.internal.video.EglBase.Context
 import io.agora.base.internal.video.RendererCommon
 import io.agora.base.internal.video.YuvConverter
 import io.agora.base.internal.video.YuvHelper
@@ -63,11 +63,11 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
     private var beautyMode = 0 // 0: 自动根据buffer类型切换，1：固定使用OES纹理，2：固定使用i420
 
     private var textureBufferHelper: TextureBufferHelper? = null
+    private var textureBufferHelperShareContext: Context? = null
     private var nv21ByteBuffer: ByteBuffer? = null
     private var config: Config? = null
     private var enable: Boolean = false
     private var enableChange: Boolean = false
-    @Volatile
     private var isReleased: Boolean = false
     private var captureMirror = true
     private var renderMirror = false
@@ -96,6 +96,7 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
             return ErrorCode.ERROR_HAS_INITIALIZED.value
         }
         this.config = config
+        this.cameraConfig = config.cameraConfig
         if (config.captureMode == CaptureMode.Agora) {
             config.rtcEngine.registerVideoFrameObserver(this)
         }
@@ -103,7 +104,6 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
             this.config?.eventCallback?.onBeautyStats(it)
         }
         cameraConfig = CameraConfig(config.cameraConfig.frontMirror, config.cameraConfig.backMirror)
-        LogUtils.setLogFilePath(config.context.getExternalFilesDir("")?.absolutePath ?: "")
         LogUtils.i(TAG, "initialize >> config = $config")
         LogUtils.i(TAG, "initialize >> beauty api version=$VERSION, beauty sdk version=${STCommonNative.getVersion()}")
         // config.rtcEngine.setParameters("{\"rtc.qos_for_test_purpose\":101}") // 实时上报
@@ -175,128 +175,6 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
         return ErrorCode.ERROR_FRAME_SKIPPED.value
     }
 
-    override fun setBeautyPreset(preset: BeautyPreset): Int {
-        val effectNative = config?.stHandlers?.effectNative
-        if(effectNative == null){
-            LogUtils.e(TAG, "setBeautyPreset >> The beauty api has not been initialized!")
-            return ErrorCode.ERROR_HAS_NOT_INITIALIZED.value
-        }
-        if (isReleased) {
-            LogUtils.e(TAG, "setBeautyPreset >> The beauty api has been released!")
-            return ErrorCode.ERROR_HAS_RELEASED.value
-        }
-        LogUtils.i(TAG, "setBeautyPreset >> preset = $preset")
-        config?.rtcEngine?.sendCustomReportMessage(reportId, reportCategory, "enable", "preset=$preset", 0)
-
-        val enable = preset == BeautyPreset.DEFAULT
-        workerThreadExecutor.submit {
-            // 锐化
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_TONE_SHARPEN,
-                if(enable) 0.5f else 0.0f
-            )
-            // 清晰度
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_TONE_CLEAR,
-                if(enable) 1.0f else 0.0f
-            )
-            // 磨皮
-            effectNative.setBeautyMode(
-                STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH,
-                STEffectBeautyType.SMOOTH2_MODE
-            )
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH,
-                if(enable) 0.55f else 0.0f
-            )
-            // 美白
-            effectNative.setBeautyMode(
-                STEffectBeautyType.EFFECT_BEAUTY_BASE_WHITTEN,
-                STEffectBeautyType.WHITENING3_MODE
-            )
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_BASE_WHITTEN,
-                if(enable) 0.2f else 0.0f
-            )
-            // 瘦脸
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_THIN_FACE,
-                if(enable) 0.4f else 0.0f
-            )
-            // 大眼
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_RESHAPE_ENLARGE_EYE,
-                if(enable) 0.3f else 0.0f
-            )
-            // 红润
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_BASE_REDDEN,
-                if(enable) 0.0f else 0.0f
-            )
-            // 瘦颧骨
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_SHRINK_CHEEKBONE,
-                if(enable) 0.0f else 0.0f
-            )
-            // 下颌骨
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_SHRINK_JAWBONE,
-                if(enable) 0.0f else 0.0f
-            )
-            // 美牙
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_WHITE_TEETH,
-                if(enable) 0.0f else 0.0f
-            )
-            // 额头
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_HAIRLINE_HEIGHT,
-                if(enable) 0.0f else 0.0f
-            )
-            // 瘦鼻
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_NARROW_NOSE,
-                if(enable) 0.0f  else 0.0f
-            )
-            // 嘴形
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_MOUTH_SIZE,
-                if(enable) 0.0f else 0.0f
-            )
-            // 下巴
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_CHIN_LENGTH,
-                if(enable) 0.0f else 0.0f
-            )
-            // 亮眼
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_BRIGHT_EYE,
-                if(enable) 0.0f else 0.0f
-            )
-            // 祛黑眼圈
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_REMOVE_DARK_CIRCLES,
-                if(enable) 0.0f else 0.0f
-            )
-            // 祛法令纹
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_REMOVE_NASOLABIAL_FOLDS,
-                if(enable) 0.0f else 0.0f
-            )
-            // 饱和度
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_TONE_SATURATION,
-                if(enable) 0.0f else 0.0f
-            )
-            // 对比度
-            effectNative.setBeautyStrength(
-                STEffectBeautyType.EFFECT_BEAUTY_TONE_CONTRAST,
-                if(enable) 0.0f else 0.0f
-            )
-        }
-        return ErrorCode.ERROR_OK.value
-    }
-
     override fun runOnProcessThread(run: () -> Unit) {
         if (config == null) {
             LogUtils.e(TAG, "runOnProcessThread >> The beauty api has not been initialized!")
@@ -349,19 +227,26 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
         LogUtils.i(TAG, "release")
         isReleased = true
         workerThreadExecutor.shutdown()
+        disposeTextureBufferHelper()
+        statsHelper?.reset()
+        statsHelper = null
+        pendingProcessRunList.clear()
+        return ErrorCode.ERROR_OK.value
+    }
+
+    private fun disposeTextureBufferHelper() {
         textureBufferHelper?.let {
             textureBufferHelper = null
             it.handler.removeCallbacksAndMessages(null)
             it.invoke {
                 beautyProcessor?.release()
+                beautyProcessor = null
+                config?.eventCallback?.onEffectDestroyed()
                 null
             }
             it.dispose()
         }
-        statsHelper?.reset()
-        statsHelper = null
-        pendingProcessRunList.clear()
-        return ErrorCode.ERROR_OK.value
+        textureBufferHelperShareContext = null
     }
 
     private fun processBeauty(videoFrame: VideoFrame): Boolean {
@@ -406,7 +291,7 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
         if (captureMirror != cMirror || renderMirror != rMirror) {
             LogUtils.w(TAG, "processBeauty >> enable=$enable, captureMirror=$captureMirror->$cMirror, renderMirror=$renderMirror->$rMirror")
             captureMirror = cMirror
-            if(renderMirror != rMirror && !isReleased){
+            if(renderMirror != rMirror){
                 renderMirror = rMirror
                 config?.rtcEngine?.setLocalRenderMode(
                     localVideoRenderMode,
@@ -437,6 +322,7 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
             return true
         }
 
+        val shareContext = (videoFrame.buffer as? TextureBuffer)?.eglBaseContext ?: EglBaseProvider.instance().rootEglBase.eglBaseContext
         if (textureBufferHelper == null) {
             textureBufferHelper = TextureBufferHelper.create(
                 "STRender",
@@ -451,7 +337,11 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
                     }
                 }
             }
+            textureBufferHelperShareContext = shareContext
             LogUtils.i(TAG, "processBeauty >> create texture buffer, beautyMode=$beautyMode")
+        } else if(textureBufferHelperShareContext != shareContext){
+            disposeTextureBufferHelper()
+            return false
         }
 
         val startTime = System.currentTimeMillis()
@@ -498,11 +388,12 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
     }
 
     private fun mayCreateBeautyProcess(){
-        val stHandlers = config?.stHandlers ?: return
 
         if(beautyProcessor == null){
             beautyProcessor = createBeautyProcessor().apply {
-                initialize(stHandlers.effectNative, stHandlers.humanActionNative)
+                config?.eventCallback?.onEffectInitialized()?.let {
+                    initialize(it.effectNative, it.humanActionNative)
+                }
             }
         }
     }
