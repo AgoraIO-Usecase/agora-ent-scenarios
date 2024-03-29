@@ -160,6 +160,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         self.config = config
 //        config.rtcEngine?.setParameters("{\"rtc.qos_for_test_purpose\": true}")
         config.rtcEngine?.setParameters("{\"rtc.direct_send_custom_event\": true}")
+        config.rtcEngine?.setParameters("{\"rtc.log_external_input\": true}")
         _reportMethod(event: "\(#function)")
         cleanCache()
 //        config.rtcEngine?.setParameters("{\"rtc.log_filter\":65535}")
@@ -295,6 +296,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         videoCanvas.uid = container.uid
         videoCanvas.view = container.container
         videoCanvas.renderMode = .hidden
+        videoCanvas.mirrorMode = container.mirrorMode
         videoCanvas.setupMode = container.setupMode
         let ret = engine.setupRemoteVideoEx(videoCanvas, connection: connection)
         debugLoaderPrint("renderVideo[\(connection.channelId)] ret = \(ret), uid:\(anchorInfo.uid)")
@@ -359,19 +361,19 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         return realState
     }
     
-    func addRTCListener(anchorId: String, listener: AgoraRtcEngineDelegate) {
+    public func addRTCListener(anchorId: String, listener: AgoraRtcEngineDelegate) {
         let rtcProxy = _getProxy(anchorId: anchorId)
         debugLoaderPrint("[VideoLoaderProfiler] addRTCListener: \(anchorId)")
         rtcProxy.addListener(listener)
     }
     
-    func removeRTCListener(anchorId: String, listener: AgoraRtcEngineDelegate) {
+    public func removeRTCListener(anchorId: String, listener: AgoraRtcEngineDelegate) {
         let rtcProxy = _getProxy(anchorId: anchorId)
         debugLoaderPrint("[VideoLoaderProfiler] removeRTCListener: \(anchorId)")
         rtcProxy.removeListener(listener)
     }
     
-    func getRTCListener(anchorId: String) -> AgoraRtcEngineDelegate? {
+    public func getRTCListener(anchorId: String) -> AgoraRtcEngineDelegate? {
         return rtcProxys[anchorId]
     }
 }
