@@ -141,8 +141,6 @@ class CallViewController: BaseRoomViewController {
     @objc private func _hangupAction() {
         callApi?.hangup(remoteUserId: UInt(targetUser?.uid ?? "") ?? 0, reason: nil, completion: { err in
         })
-        
-        selectedMap.removeAll()
     }
 }
 
@@ -199,6 +197,8 @@ extension CallViewController {
         case .connecting:
             self.rtcChannelName
         case .connected:
+            selectedMap.removeAll()
+            self.remoteCanvasView.canvasView.isHidden = false
             var channelId: String? = rtcChannelName
             if roomInfo?.uid == currentUser?.uid {
                 ConnectedToastView.show(user: targetUser!, canvasView: self.view)

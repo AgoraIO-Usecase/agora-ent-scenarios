@@ -190,7 +190,6 @@ class Pure1v1CallViewController: UIViewController {
     @objc private func _hangupAction() {
         callApi?.hangup(remoteUserId: UInt(targetUser?.userId ?? "") ?? 0, reason: nil, completion: { err in
         })
-        selectedMap.removeAll()
         dismiss(animated: false)
     }
     
@@ -247,7 +246,10 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
                             stateReason: CallStateReason,
                             eventReason: String,
                             eventInfo: [String : Any]) {
-        
+        if state == .connected {
+            selectedMap.removeAll()
+            self.remoteCanvasView.canvasView.isHidden = false
+        }
     }
     
     func onCallEventChanged(with event: CallEvent, eventReason: String?) {
