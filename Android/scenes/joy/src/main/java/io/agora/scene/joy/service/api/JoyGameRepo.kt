@@ -4,7 +4,7 @@ import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
-import io.agora.scene.joy.RtcEngineInstance
+import io.agora.scene.joy.JoyServiceManager
 import io.agora.scene.joy.service.base.BaseRepository
 import io.agora.scene.joy.service.base.JoyJsonModel
 import io.agora.scene.joy.service.base.StateLiveData
@@ -25,7 +25,7 @@ class JoyGameRepo constructor(private val service: JoyApiService) : BaseReposito
         get() = BuildConfig.AGORA_APP_ID
 
     private val mBasicAuth: String
-        get() = String.format("agora token=%s", RtcEngineInstance.generalToken())
+        get() = String.format("agora token=%s", JoyServiceManager.mPrepareConfig.rtcToken)
 
     private val mSrc: String
         get() = "Android"

@@ -44,11 +44,11 @@ data class JoyApiResult<T> constructor(
 
 data class ErrorMessage constructor(
     @Expose
-    @SerializedName("code")
+    @SerializedName("err_no")
     var code: Int? = null,
     @Expose
-    @SerializedName("err")
-    var err: String? = null,
+    @SerializedName("logid")
+    var logid: String? = null,
     @Expose
     @SerializedName("err_msg")
     var errMsg: String? = null,

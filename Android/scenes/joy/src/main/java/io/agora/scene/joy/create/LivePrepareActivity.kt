@@ -25,7 +25,7 @@ import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.joy.R
-import io.agora.scene.joy.RtcEngineInstance
+import io.agora.scene.joy.JoyServiceManager
 import io.agora.scene.joy.service.base.DataState
 import io.agora.scene.joy.databinding.JoyActivityLivePrepareBinding
 import io.agora.scene.joy.databinding.JoyItemGameBannerLayoutBinding
@@ -55,7 +55,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
     }
 
     private val mJoyService by lazy { JoyServiceProtocol.getImplInstance() }
-    private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
+    private val mRtcEngine by lazy { JoyServiceManager.rtcEngine }
 
     private lateinit var mRoomNameArray: Array<String>
     private val mRandom = Random()

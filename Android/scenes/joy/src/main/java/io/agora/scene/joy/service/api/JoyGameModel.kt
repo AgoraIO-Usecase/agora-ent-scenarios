@@ -143,7 +143,18 @@ data class JoyGameListResult constructor(
     var vendorGameId: String? = null,
 ) : JoyJsonModel
 
+data class JoyAction constructor(
+    @Expose
+    @SerializedName("command")
+    var command: List<String>? = null,
+    var icon: String? = null,
+    var index: Int = 0,
+)
+
 data class JoyGameDetailResult constructor(
+    @Expose
+    @SerializedName("actions")
+    var actions: List<JoyAction>? = null,
     @Expose
     @SerializedName("feature")
     var feature: JoyFeatureEntity? = null,

@@ -7,21 +7,18 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.GlideApp
-import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.BaseViewBindingActivity
-import io.agora.scene.base.manager.UserManager
-import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.joy.JoyLogger
 import io.agora.scene.joy.R
-import io.agora.scene.joy.RtcEngineInstance
+import io.agora.scene.joy.JoyServiceManager
 import io.agora.scene.joy.databinding.JoyActivityRoomListBinding
 import io.agora.scene.joy.databinding.JoyItemRoomList4Binding
-import io.agora.scene.joy.service.JoyRoomInfo
 import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.joy.live.RoomLivingActivity
 import io.agora.scene.widget.utils.UiUtils
@@ -43,27 +40,10 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setOnApplyWindowInsetsListener(binding.root)
-        //获取万能token
-        fetchUniversalToken({
-        })
-    }
-
-    // 获取万能token
-    private fun fetchUniversalToken(success: () -> Unit, error: ((Exception?) -> Unit)? = null) {
-        val localUId = UserManager.getInstance().user.id
-        TokenGenerator.generateToken("", localUId.toString(),
-            TokenGenerator.TokenGeneratorType.token007,
-            TokenGenerator.AgoraTokenType.rtc,
-            success = {
-                JoyLogger.d(TAG, "generateToken success uid：$localUId")
-                RtcEngineInstance.setupGeneralToken(it)
-                success.invoke()
-            },
-            failure = {
-                JoyLogger.e(TAG, "generateToken failure：${it?.message}")
-                ToastUtils.showToast(it?.message ?: "generate token failure")
-                error?.invoke(it)
-            })
+        JoyServiceManager.renewTokens {
+            JoyServiceManager.initRtm()
+            binding.smartRefreshLayout.autoRefresh()
+        }
     }
 
     override fun initView(savedInstanceState: Bundle?) {
@@ -78,17 +58,19 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
         binding.smartRefreshLayout.setEnableLoadMore(false)
         binding.smartRefreshLayout.setEnableRefresh(true)
         binding.smartRefreshLayout.setOnRefreshListener {
-            mJoyService.getRoomList {
-                updateList(it)
+            JoyServiceManager.renewTokens {
+                mJoyService.getRoomList {
+                    updateList(it)
+                }
             }
         }
-        binding.smartRefreshLayout.autoRefresh()
+
         binding.btnCreateRoom.setOnClickListener {
             LivePrepareActivity.launch(this)
         }
     }
 
-    private fun updateList(data: List<JoyRoomInfo>) {
+    private fun updateList(data: List<AUIRoomInfo>) {
         binding.tvTips1.isVisible = data.isEmpty()
         binding.ivBgMobile.isVisible = data.isEmpty()
         binding.rvRooms.isVisible = data.isNotEmpty()
@@ -105,14 +87,13 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
 
     override fun onDestroy() {
         super.onDestroy()
-        RtcEngineInstance.destroy()
-        RtcEngineInstance.setupGeneralToken("")
+        JoyServiceManager.destroy()
     }
 
     private class RoomListAdapter constructor(
-        private var mList: List<JoyRoomInfo>,
+        private var mList: List<AUIRoomInfo>,
         private val mContext: Context,
-        private val mOnGotoRoom: ((position: Int, info: JoyRoomInfo) -> Unit)? = null
+        private val mOnGotoRoom: ((position: Int, info: AUIRoomInfo) -> Unit)? = null
     ) : RecyclerView.Adapter<RoomListAdapter.ViewHolder?>() {
 
         @DrawableRes
@@ -126,7 +107,7 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
 
         inner class ViewHolder(val binding: JoyItemRoomList4Binding) : RecyclerView.ViewHolder(binding.root)
 
-        fun setDataList(list: List<JoyRoomInfo>) {
+        fun setDataList(list: List<AUIRoomInfo>) {
             mList = list
             notifyDataSetChanged()
         }
@@ -138,19 +119,20 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
-            val data: JoyRoomInfo = mList[position]
+            val data: AUIRoomInfo = mList[position]
             holder.binding.tvRoomName.text = data.roomName
-            holder.binding.tvUserCount.text = mContext.getString(R.string.joy_user_count, data.roomUserCount)
+            holder.binding.tvUserCount.text = mContext.getString(R.string.joy_user_count, data.memberCount)
             holder.binding.tvRoomId.text = mContext.getString(R.string.joy_room_id, data.roomId)
-            holder.binding.tvGameTag.isVisible = data.badgeTitle.isNotEmpty()
-            holder.binding.tvGameTag.text = data.badgeTitle
-            holder.binding.ivCover.setImageResource(getThumbnailIcon(data.thumbnailId))
+            val badgeTitle = data.customPayload["badgeTitle"] as String?
+            holder.binding.tvGameTag.isGone = badgeTitle.isNullOrEmpty()
+            holder.binding.tvGameTag.text = badgeTitle ?: ""
+            holder.binding.ivCover.setImageResource(getThumbnailIcon(data.thumbnail))
             holder.itemView.setOnClickListener {
                 if (UiUtils.isFastClick()) return@setOnClickListener
                 mOnGotoRoom?.invoke(position, data)
             }
             GlideApp.with(holder.binding.ivAvatar)
-                .load(data.ownerAvatar)
+                .load(data.owner?.userAvatar ?: "")
                 .error(R.mipmap.default_user_avatar)
                 .apply(RequestOptions.circleCropTransform())
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)

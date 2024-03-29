@@ -231,29 +231,31 @@
         android:gravity="bottom"
         app:layout_constraintBottom_toBottomOf="@id/tvInput">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivDeployTroops"
+        <LinearLayout
+            android:id="@+id/layoutBottomAction"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/joy_icon_deploy_troops"
-            app:layout_constraintBottom_toBottomOf="@id/tvInput"
-            app:layout_constraintEnd_toStartOf="@id/ivGift" />
+            android:orientation="horizontal"
+            android:gravity="bottom">
+
+<!--            <androidx.appcompat.widget.AppCompatImageView-->
+<!--                android:id="@+id/ivDeployTroops"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:src="@drawable/joy_icon_deploy_troops" />-->
+        </LinearLayout>
 
         <io.agora.scene.joy.widget.like.LikeLayout
             android:id="@+id/likeView"
             android:layout_width="66dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@id/tvInput"
-            app:layout_constraintEnd_toStartOf="@+id/ivGift" />
+            android:layout_height="wrap_content" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivGift"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/joy_icon_gift"
-            android:layout_marginEnd="12dp"
-            app:layout_constraintBottom_toBottomOf="@id/tvInput"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:layout_marginEnd="12dp" />
     </LinearLayout>
 
 

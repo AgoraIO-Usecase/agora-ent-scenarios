@@ -41,6 +41,7 @@ protobuf {
 dependencies {
     implementation project(":common:base")
     implementation project(':common:ui-widget')
+    implementation project(':RTMSyncManager')
 
     implementation rootProject.ext.deps.lyricsView
     implementation rootProject.ext.deps.annotation
@@ -55,7 +56,8 @@ dependencies {
     implementation rootProject.ext.deps.lifecycle
     implementation rootProject.ext.deps.fragment_ktx
 
-    implementation rootProject.ext.deps.syncManager
+//    implementation rootProject.ext.deps.syncManager
+    implementation rootProject.ext.deps.rtm
 
     implementation 'com.google.protobuf:protobuf-java:3.19.3'
     implementation 'com.google.protobuf:protobuf-java-util:3.19.3'

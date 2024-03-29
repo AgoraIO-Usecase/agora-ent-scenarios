@@ -3,32 +3,23 @@ package io.agora.scene.joy.service
 import io.agora.scene.base.manager.UserManager
 import java.io.Serializable
 
-data class JoyUserInfo constructor(
-    var userId: Int = 0,
-    var userName: String = "",
-    var avatar: String = "",
-    var createdAt: Long = System.currentTimeMillis(),
-
-    var objectId: String = ""
-)
-
-data class JoyRoomInfo constructor(
-    var roomId: String = "",//房间号
-    var roomName: String = "", //房间名
-    var roomUserCount: Int = 0,//房间内人数
-    var thumbnailId: String?,  //缩略图id
-    var ownerId: Int = 0, // 房主 userid(rtc uid)
-    var ownerAvatar: String?, // 房主头像
-    var ownerName: String?, // 房主名
-    var badgeTitle: String = "",//胖可争霸/羊羊抗狼
-    var createdAt: Long = System.currentTimeMillis(),
-
-    var objectId: String = ""
-) : Serializable {
-
-    val mIsOwner: Boolean
-        get() = ownerId.toLong() == UserManager.getInstance().user.id
-}
+//data class JoyRoomInfo constructor(
+//    var roomId: String = "",//房间号
+//    var roomName: String = "", //房间名
+//    var roomUserCount: Int = 0,//房间内人数
+//    var thumbnailId: String?,  //缩略图id
+//    var ownerId: Int = 0, // 房主 userid(rtc uid)
+//    var ownerAvatar: String?, // 房主头像
+//    var ownerName: String?, // 房主名
+//    var badgeTitle: String = "",//胖可争霸/羊羊抗狼
+//    var createdAt: Long = System.currentTimeMillis(),
+//
+//    var objectId: String = ""
+//) : Serializable {
+//
+//    val mIsOwner: Boolean
+//        get() = ownerId.toLong() == UserManager.getInstance().user.id
+//}
 
 data class JoyStartGameInfo constructor(
     var gameId: String = "", //游戏 id

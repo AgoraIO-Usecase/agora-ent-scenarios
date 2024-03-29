@@ -1,19 +1,25 @@
 package io.agora.scene.joy.service
 
+import io.agora.rtmsyncmanager.model.AUIRoomInfo
+import io.agora.rtmsyncmanager.model.AUIUserInfo
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.joy.JoyLogger
-import io.agora.syncmanager.rtm.Sync
+
+data class PrepareConfig constructor(
+    var rtcToken: String = "",   // rtc token，需要使用万能token，token创建的时候channel name为空字符串
+    var rtmToken: String = "",   // rtm token
+)
 
 interface JoyServiceListenerProtocol {
     /**
      *  网络状况变化
      */
-    fun onNetworkStatusChanged(status: Sync.ConnectionState)
+//    fun onNetworkStatusChanged(status: Sync.ConnectionState)
 
     /**
      * 用户变化
      */
-    fun onUserListDidChanged(userList: List<JoyUserInfo>)
+    fun onUserListDidChanged(userList: List<AUIUserInfo>)
 
     /**
      * 接收到新消息
@@ -28,12 +34,12 @@ interface JoyServiceListenerProtocol {
     /**
      * 房间信息变化
      */
-    fun onRoomDidChanged(roomInfo: JoyRoomInfo)
+    fun onRoomDidChanged(roomInfo: AUIRoomInfo)
 
     /**
      * 房间销毁
      */
-    fun onRoomDidDestroy(roomInfo: JoyRoomInfo, abnormal: Boolean = false)
+    fun onRoomDidDestroy(roomInfo: AUIRoomInfo, abnormal: Boolean = false)
 }
 
 interface JoyServiceProtocol {
@@ -57,12 +63,12 @@ interface JoyServiceProtocol {
     /**
      * 获取房间列表
      */
-    fun getRoomList(completion: (list: List<JoyRoomInfo>) -> Unit)
+    fun getRoomList(completion: (list: List<AUIRoomInfo>) -> Unit)
 
     /**
      * 修改房间信息
      */
-    fun updateRoom(roomInfo: JoyRoomInfo, completion: (error: Exception?) -> Unit)
+    fun updateRoom(roomInfo: AUIRoomInfo, completion: (error: Exception?) -> Unit)
 
     /**
      * 获取正在进行的游戏信息
@@ -77,17 +83,17 @@ interface JoyServiceProtocol {
     /**
      * 创建房间
      */
-    fun createRoom(roomName: String, completion: (error: Exception?, out: JoyRoomInfo?) -> Unit)
+    fun createRoom(roomName: String, completion: (error: Exception?, out: AUIRoomInfo?) -> Unit)
 
     /**
      * 加入房间
      */
-    fun joinRoom(roomInfo: JoyRoomInfo, completion: (error: Exception?) -> Unit)
+    fun joinRoom(roomInfo: AUIRoomInfo, completion: (error: Exception?) -> Unit)
 
     /**
      * 离开房间
      */
-    fun leaveRoom(roomInfo: JoyRoomInfo, completion: (error: Exception?) -> Unit)
+    fun leaveRoom(roomInfo: AUIRoomInfo, completion: (error: Exception?) -> Unit)
 
 
     /**

@@ -5,7 +5,7 @@ import io.agora.scene.joy.service.base.JoyJsonModel
 import retrofit2.http.*
 
 interface JoyApiService {
-    @POST("/toolbox/v1/cloud-bullet-game/games")
+    @POST("/toolbox/v2/cloud-bullet-game/games")
     suspend fun getGames(
         @Body entity: JoyGameEntity
     ): JoyApiResult<JoyGameResult>

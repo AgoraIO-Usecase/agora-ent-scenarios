@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
@@ -33,6 +34,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.DataStreamConfig
@@ -41,38 +43,38 @@ import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.rtmsyncmanager.model.AUIRoomInfo
+import io.agora.rtmsyncmanager.model.AUIUserInfo
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
+import io.agora.scene.joy.JoyLogger
+import io.agora.scene.joy.JoyServiceManager
 import io.agora.scene.joy.R
-import io.agora.scene.joy.RtcEngineInstance
-import io.agora.scene.joy.service.base.DataState
 import io.agora.scene.joy.databinding.JoyActivityLiveDetailBinding
 import io.agora.scene.joy.databinding.JoyItemLiveDetailMessageBinding
-import io.agora.scene.joy.service.api.JoyGameListResult
-import io.agora.scene.joy.service.api.JoyGameRepo
-import io.agora.scene.joy.service.api.JoyGameStatus
-import io.agora.scene.joy.service.JoyMessage
-import io.agora.scene.joy.service.JoyRoomInfo
-import io.agora.scene.joy.service.JoyServiceListenerProtocol
-import io.agora.scene.joy.service.JoyServiceProtocol
-import io.agora.scene.joy.service.JoyStartGameInfo
-import io.agora.scene.joy.service.JoyUserInfo
-import io.agora.scene.joy.widget.KeyboardStatusWatcher
-import io.agora.scene.joy.widget.toast.CustomToast
-import io.agora.scene.joy.JoyLogger
 import io.agora.scene.joy.live.fragmentdialog.JoyChooseGameDialog
 import io.agora.scene.joy.live.fragmentdialog.JoyGameRulesDialog
 import io.agora.scene.joy.live.fragmentdialog.JoyGiftDialog
+import io.agora.scene.joy.service.JoyMessage
+import io.agora.scene.joy.service.JoyServiceListenerProtocol
+import io.agora.scene.joy.service.JoyServiceProtocol
+import io.agora.scene.joy.service.JoyStartGameInfo
+import io.agora.scene.joy.service.api.JoyAction
+import io.agora.scene.joy.service.api.JoyGameListResult
+import io.agora.scene.joy.service.api.JoyGameRepo
+import io.agora.scene.joy.service.api.JoyGameStatus
+import io.agora.scene.joy.service.base.DataState
+import io.agora.scene.joy.widget.KeyboardStatusWatcher
 import io.agora.scene.joy.widget.dp
 import io.agora.scene.joy.widget.navBarHeight
 import io.agora.scene.joy.widget.statusBarHeight
+import io.agora.scene.joy.widget.toast.CustomToast
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
-import io.agora.syncmanager.rtm.Sync
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.Serializable
@@ -86,7 +88,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         private const val TAG = "Joy_RoomLivingActivity"
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
 
-        fun launch(context: Context, roomInfo: JoyRoomInfo, gameList: List<JoyGameListResult>? = null) {
+        fun launch(context: Context, roomInfo: AUIRoomInfo, gameList: List<JoyGameListResult>? = null) {
             val intent = Intent(context, RoomLivingActivity::class.java)
             intent.putExtra(EXTRA_ROOM_DETAIL_INFO, roomInfo)
             context.startActivity(intent)
@@ -101,7 +103,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         ViewModelProvider(this)[JoyViewModel::class.java]
     }
 
-    private val mRoomInfo by lazy { (intent?.getSerializableExtra(EXTRA_ROOM_DETAIL_INFO) as? JoyRoomInfo)!! }
+    private val mRoomInfo by lazy { (intent?.getSerializableExtra(EXTRA_ROOM_DETAIL_INFO) as? AUIRoomInfo)!! }
 
     private val mGameList = mutableListOf<JoyGameListResult>()
 
@@ -116,10 +118,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             mUser.id.toInt()
         )
     }
-    private val mIsRoomOwner by lazy { mRoomInfo.ownerId.toLong() == mUser.id }
+    private val mIsRoomOwner by lazy { mRoomInfo.owner?.userId == mUser.id.toString() }
 
     private val mJoyService by lazy { JoyServiceProtocol.getImplInstance() }
-    private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
+    private val mRtcEngine by lazy { JoyServiceManager.rtcEngine }
 
     private var mStreamId = -1
 
@@ -173,7 +175,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         binding.tvRoomName.text = mRoomInfo.roomName
         binding.tvRoomId.text = mRoomInfo.roomId
         GlideApp.with(this)
-            .load(mRoomInfo.ownerAvatar)
+            .load(mRoomInfo.owner?.userAvatar ?: "")
             .placeholder(R.mipmap.default_user_avatar)
             .error(R.mipmap.default_user_avatar)
             .apply(RequestOptions.circleCropTransform())
@@ -183,7 +185,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         if (mIsRoomOwner) {
             binding.ivGift.isVisible = false
         } else {
-            binding.ivDeployTroops.isVisible = false
+            binding.layoutBottomAction.isVisible = false
         }
 
         // 消息
@@ -254,23 +256,23 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             binding.likeView.addFavor()
             mJoyViewModel.sendLike(mJoyViewModel.mGamId, mRoomInfo.roomId, 1)
         }
-        binding.ivDeployTroops.setOnTouchListener { v, event ->
-            if (!mIsRoomOwner) {
-                return@setOnTouchListener false
-            }
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    setControllerView(binding.ivDeployTroops, false)
-                    sendKeyboardMessage(KeyboardEventType.KEYBOARD_EVENT_KEY_DOWN, 'Z')
-                }
-
-                MotionEvent.ACTION_UP -> {
-                    setControllerView(binding.ivDeployTroops, true)
-                    sendKeyboardMessage(KeyboardEventType.KEYBOARD_EVENT_KEY_UP, 'Z')
-                }
-            }
-            return@setOnTouchListener true
-        }
+//        binding.ivDeployTroops.setOnTouchListener { v, event ->
+//            if (!mIsRoomOwner) {
+//                return@setOnTouchListener false
+//            }
+//            when (event.action) {
+//                MotionEvent.ACTION_DOWN -> {
+//                    setControllerView(binding.ivDeployTroops, false)
+//                    sendKeyboardMessage(KeyboardEventType.KEYBOARD_EVENT_KEY_DOWN, 'Z')
+//                }
+//
+//                MotionEvent.ACTION_UP -> {
+//                    setControllerView(binding.ivDeployTroops, true)
+//                    sendKeyboardMessage(KeyboardEventType.KEYBOARD_EVENT_KEY_UP, 'Z')
+//                }
+//            }
+//            return@setOnTouchListener true
+//        }
         if (mIsRoomOwner) {
             binding.flAssistantContainer.setOnTouchListener { view, event ->
                 if (!mIsRoomOwner) return@setOnTouchListener false
@@ -345,12 +347,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             binding.tvInput.isVisible = true
             binding.likeView.isVisible = true
             binding.ivGift.isVisible = !mIsRoomOwner
-            binding.ivDeployTroops.isVisible = mIsRoomOwner
+            binding.layoutBottomAction.isVisible = mIsRoomOwner
         } else {
             binding.tvInput.isVisible = false
             binding.likeView.isVisible = false
             binding.ivGift.isVisible = false
-            binding.ivDeployTroops.isVisible = false
+            binding.layoutBottomAction.isVisible = false
         }
     }
 
@@ -389,7 +391,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     override fun requestData() {
         super.requestData()
         val roomLeftTime =
-            JoyServiceProtocol.ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt)
+            JoyServiceProtocol.ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createTime)
         if (roomLeftTime > 0) {
             toggleSelfVideo {
                 initRtcEngine()
@@ -399,16 +401,13 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             startTopLayoutTimer()
         } else {
             CustomToast.show(getString(R.string.joy_living_end))
+            destroy()
             finish()
             return
         }
         mJoyService.subscribeListener(object : JoyServiceListenerProtocol {
-            override fun onNetworkStatusChanged(status: Sync.ConnectionState) {
-
-            }
-
-            override fun onUserListDidChanged(userList: List<JoyUserInfo>) {
-                mRoomInfo.roomUserCount = userList.size
+            override fun onUserListDidChanged(userList: List<AUIUserInfo>) {
+                mRoomInfo.memberCount = userList.size
             }
 
             override fun onMessageDidAdded(message: JoyMessage) {
@@ -427,13 +426,13 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 }
             }
 
-            override fun onRoomDidDestroy(roomInfo: JoyRoomInfo, abnormal: Boolean) {
+            override fun onRoomDidDestroy(roomInfo: AUIRoomInfo, abnormal: Boolean) {
                 destroy()
                 showLivingEndLayout(abnormal)
                 JoyLogger.d("showLivingEndLayout", "timer end! abnormal:$abnormal")
             }
 
-            override fun onRoomDidChanged(roomInfo: JoyRoomInfo) {
+            override fun onRoomDidChanged(roomInfo: AUIRoomInfo) {
 
 
             }
@@ -446,10 +445,11 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     showBottomView(true)
                     if (mIsRoomOwner) {
                         showRulesDialog()
-                        mRoomInfo.badgeTitle = mJoyViewModel.mGameDetail?.name ?: ""
+                        mRoomInfo.customPayload["badgeTitle"] = mJoyViewModel.mGameDetail?.name ?: ""
                         mJoyService.updateRoom(mRoomInfo, completion = {
 
                         })
+                        setupActionView(it.data?.actions)
                     }
                 }
             }
@@ -471,7 +471,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     mStartGameInfo = JoyStartGameInfo(
                         gameId = gameSelect.gameId ?: "",
                         taskId = mTaskId,
-                        assistantUid = 1000000000 + mRoomInfo.ownerId,
+                        assistantUid = 1000000000 + mUser.id.toInt(),
                         gameName = gameSelect.name ?: ""
                     )
                     // 获取游戏详情
@@ -558,6 +558,40 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     }
                     showGameChooseDialog()
                 }
+            }
+        }
+    }
+
+    private fun setupActionView(actions: List<JoyAction>?) {
+        binding.layoutBottomAction.removeAllViews()
+        actions?.forEach { action ->
+            val actionImage = ImageView(this)
+            actionImage.tag = action
+            binding.layoutBottomAction.addView(actionImage)
+            GlideApp.with(binding.root)
+                .load(action.icon ?: "")
+                .error(R.drawable.joy_icon_deploy_troops)
+                .apply(RequestOptions.circleCropTransform())
+                .into(actionImage)
+            actionImage.setOnTouchListener { v, event ->
+                if (!mIsRoomOwner) return@setOnTouchListener false
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        setControllerView(actionImage, false)
+                        action.command?.forEach { command ->
+                            sendKeyboardMessage(KeyboardEventType.KEYBOARD_EVENT_KEY_DOWN, command[0])
+                        }
+
+                    }
+
+                    MotionEvent.ACTION_UP -> {
+                        setControllerView(actionImage, true)
+                        action.command?.forEach { command ->
+                            sendKeyboardMessage(KeyboardEventType.KEYBOARD_EVENT_KEY_UP, command[0])
+                        }
+                    }
+                }
+                return@setOnTouchListener true
             }
         }
     }
@@ -678,7 +712,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             mRtcEngine.setupLocalVideo(VideoCanvas(textureView, VideoCanvas.RENDER_MODE_HIDDEN, 0))
         } else {
             mRtcEngine.setupRemoteVideoEx(
-                VideoCanvas(textureView, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.ownerId),
+                VideoCanvas(textureView, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.owner?.userId?.toIntOrNull() ?: 0),
                 mMainRtcConnection
             )
         }
@@ -751,7 +785,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
 
         mRtcEngine.joinChannelEx(
-            RtcEngineInstance.generalToken(),
+            JoyServiceManager.mPrepareConfig.rtcToken,
             mMainRtcConnection,
             channelMediaOptions,
             eventListener
@@ -791,7 +825,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         val dataFormat = SimpleDateFormat("HH:mm:ss").apply { timeZone = TimeZone.getTimeZone("GMT") }
         binding.tvTimer.post(object : Runnable {
             override fun run() {
-                binding.tvTimer.text = dataFormat.format(Date(TimeUtils.currentTimeMillis() - mRoomInfo.createdAt))
+                binding.tvTimer.text = dataFormat.format(Date(TimeUtils.currentTimeMillis() - mRoomInfo.createTime))
                 binding.tvTimer.postDelayed(this, 1000)
                 binding.tvTimer.tag = this
             }
