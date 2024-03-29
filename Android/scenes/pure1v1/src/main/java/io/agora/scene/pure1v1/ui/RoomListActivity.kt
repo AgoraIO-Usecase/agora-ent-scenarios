@@ -96,17 +96,21 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // 准备通话中的Fragment
+        binding.flCallContainer.isVisible = false
         val callDetailFragment = CallDetailFragment()
-        supportFragmentManager.beginTransaction().add(R.id.flCallContainer, callDetailFragment, "CallDetailFragment").hide(callDetailFragment).commit()
+        supportFragmentManager.beginTransaction().add(R.id.flCallContainer, callDetailFragment, "CallDetailFragment").show(callDetailFragment).commit()
         mCallDetailFragment = callDetailFragment
 
+        // 准备来电秀Fragment
+        binding.flSendFragment.isVisible = false
         val callSendFragment = CallSendDialog(this)
         callSendFragment.setListener(object : CallSendDialog.CallSendDialogListener {
             override fun onSendViewDidClickHangup() {
                 CallServiceManager.instance.callApi?.cancelCall {}
             }
         })
-        supportFragmentManager.beginTransaction().add(R.id.flSendFragment, callSendFragment, "CallSendFragment").hide(callSendFragment).commit()
+        supportFragmentManager.beginTransaction().add(R.id.flSendFragment, callSendFragment, "CallSendFragment").show(callSendFragment).commit()
         callSendDialog = callSendFragment
 
         setOnApplyWindowInsetsListener()
@@ -227,13 +231,12 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
     private fun connectCallDetail() {
         Pure1v1Logger.d(tag, "local pic debug log 4")
-        binding.flCallContainer.visibility = View.VISIBLE
+        binding.flCallContainer.isVisible = true
 
         val channelId =  CallServiceManager.instance.connectedChannelId ?: ""
         val localUid = CallServiceManager.instance.localUser?.userId?.toInt() ?: 0
 
         mCallDetailFragment?.let {
-            supportFragmentManager.beginTransaction().show(it).commit()
             (mCallDetailFragment as CallDetailFragment).start()
             (mCallDetailFragment as CallDetailFragment).updateTime()
             (mCallDetailFragment as CallDetailFragment).initDashBoard(channelId, localUid)
@@ -245,13 +248,12 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
 
     private fun showCallSendDialog(user: UserInfo) {
-        callSendDialog?.let {
-            it.initView(user)
-            supportFragmentManager.beginTransaction().show(it).commit()
-        }
+        binding.flSendFragment.isVisible = true
+        callSendDialog?.initView(user)
     }
 
     private fun finishCallDialog() {
+        binding.flSendFragment.isVisible = false
         callSendDialog?.hangUp()
 
         callDialog?.dismiss()
@@ -412,7 +414,8 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 CallServiceManager.instance.remoteUser = null
                 CallServiceManager.instance.connectedChannelId = null
                 finishCallDialog()
-                binding.flCallContainer.visibility = View.INVISIBLE
+                (mCallDetailFragment as CallDetailFragment).reset()
+                binding.flCallContainer.isVisible = false
 
                 // 停止来点秀视频和铃声
                 CallServiceManager.instance.stopCallShow()
@@ -421,7 +424,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
                 // 自动刷新列表
                 if (!isFirstEnterScene) {
-                    binding.smartRefreshLayout.autoRefresh()
+                    fetchRoomList(false)
                 }
             }
             CallStateType.Failed -> {

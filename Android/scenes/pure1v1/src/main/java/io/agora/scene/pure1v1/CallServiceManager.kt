@@ -217,6 +217,7 @@ class CallServiceManager {
             })
     }
 
+    // 准备通话环境
     fun prepareForCall(success: () -> Unit) {
         val api = callApi ?: return
         val user = localUser ?: return
@@ -255,6 +256,7 @@ class CallServiceManager {
         }
     }
 
+    // 播放来电秀
     fun playCallShow(url: String) {
         val ret = mMediaPlayer?.openWithMediaSource(MediaPlayerSource().apply {
             setUrl(url)
@@ -266,6 +268,7 @@ class CallServiceManager {
         Pure1v1Logger.d(tag, "playCallShow: $ret")
     }
 
+    // 停止来电秀
     fun stopCallShow() {
         val player = mMediaPlayer ?: return
         val canvas = VideoCanvas(null)
@@ -278,6 +281,7 @@ class CallServiceManager {
         Pure1v1Logger.d(tag, "stopCallShow：$ret")
     }
 
+    // 渲染来电秀视频
     fun renderCallShow(view: View) {
         val player = mMediaPlayer ?: return
         val canvas = VideoCanvas(view)
@@ -287,6 +291,7 @@ class CallServiceManager {
         rtcEngine?.setupLocalVideo(canvas)
     }
 
+    // 播放来电铃声
     fun playCallMusic(url: String) {
         val ret = mMediaPlayer2?.openWithMediaSource(MediaPlayerSource().apply {
             setUrl(url)
@@ -297,11 +302,38 @@ class CallServiceManager {
         Pure1v1Logger.d(tag, "playCallMusic：$ret")
     }
 
+    // 停止播放来电铃声
     fun stopCallMusic() {
         val ret = mMediaPlayer2?.stop()
         Pure1v1Logger.d(tag, "stopCallMusic：$ret")
     }
 
+    // 切换摄像头开关状态
+    fun switchCamera(cameraOn: Boolean) {
+        val channelId = connectedChannelId ?: return
+        val uid = localUser?.userId ?: return
+        if (cameraOn) {
+            rtcEngine?.startPreview()
+            rtcEngine?.muteLocalVideoStreamEx(false, RtcConnection(channelId, uid.toInt()))
+        } else {
+            rtcEngine?.stopPreview()
+            rtcEngine?.muteLocalVideoStreamEx(true, RtcConnection(channelId, uid.toInt()))
+        }
+    }
+
+    // 切换麦克风开关状态
+    fun switchMic(micOn: Boolean) {
+        val channelId = connectedChannelId ?: return
+        val uid = localUser?.userId ?: return
+        if (micOn) {
+            rtcEngine?.muteLocalAudioStreamEx(false, RtcConnection(channelId, uid.toInt()))
+        } else {
+            rtcEngine?.muteLocalAudioStreamEx(true, RtcConnection(channelId, uid.toInt()))
+        }
+    }
+
+    // -------------------------- inner private --------------------------
+    // 创建 RtcEngine 实例
     private fun createRtcEngine(): RtcEngineEx {
         val context = mContext ?: throw RuntimeException("RtcEngine create failed!")
         var rtcEngine: RtcEngineEx? = null
