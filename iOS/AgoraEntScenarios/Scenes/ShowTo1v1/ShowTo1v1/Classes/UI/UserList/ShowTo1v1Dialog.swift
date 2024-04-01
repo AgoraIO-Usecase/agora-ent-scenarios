@@ -358,7 +358,7 @@ class CallerDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
         didSet {
             avatarView.sd_setImage(with: URL(string: userInfo?.avatar ?? ""))
             userNameLabel.text = userInfo?.userName ?? ""
-            bgImageView.image = userInfo?.bgImage()
+            bgImageView.sd_setImage(with: URL(string: userInfo?.bgImage() ?? ""), placeholderImage: nil)
         }
     }
     

@@ -27,7 +27,7 @@ class BroadcasterViewController: BaseRoomViewController {
                 self?.roomInfoView.stopTime()
                 self?.onBackAction()
             }
-            bgImageView.image = roomInfo?.bgImage()
+            bgImageView.sd_setImage(with: URL(string: roomInfo?.bgImage() ?? ""), placeholderImage: nil)
         }
     }
     var broadcasterToken: String? {

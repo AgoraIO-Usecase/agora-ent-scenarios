@@ -30,11 +30,16 @@ public class ShowTo1v1UserInfo: NSObject {
         return UInt(uid) ?? 0
     }
     
-    func bgImage() ->UIImage? {
+    func bgImage() -> String {
         let uid = getUIntUserId()
-        let image = UIImage.sceneImage(name: "user_bg\(uid % 9 + 1)")
-        return image
+        return "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/images/1v1/user_bg\(uid % 9 + 1).png"
     }
+
+//    func bgImage() ->UIImage? {
+//        let uid = getUIntUserId()
+//        let image = UIImage.sceneImage(name: "user_bg\(uid % 9 + 1)")
+//        return image
+//    }
 }
 
 private let kCreateAtKey = "createdAt"

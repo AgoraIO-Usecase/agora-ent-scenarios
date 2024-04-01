@@ -171,7 +171,7 @@ class Pure1v1CallerDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
         didSet {
             avatarView.sd_setImage(with: URL(string: userInfo?.avatar ?? ""))
             userNameLabel.text = userInfo?.userName ?? ""
-            bgImageView.image = userInfo?.bgImage()
+            bgImageView.sd_setImage(with: URL(string: userInfo?.bgImage() ?? ""), placeholderImage: nil)
         }
     }
     
