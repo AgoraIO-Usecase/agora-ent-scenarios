@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -27,6 +28,10 @@ import io.agora.videoloaderapi.OnRoomListScrollEventHandler
 import io.agora.videoloaderapi.VideoLoader
 import io.agora.scene.show.widget.PresetAudienceDialog
 import io.agora.scene.widget.utils.StatusBarUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /*
  * 房间列表 activity
@@ -36,10 +41,7 @@ class RoomListActivity : AppCompatActivity() {
     private val mBinding by lazy { ShowRoomListActivityBinding.inflate(LayoutInflater.from(this)) }
     private var mAdapter: RoomListAdapter? = null
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
-    private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
-
     private val roomDetailModelList = mutableListOf<ShowRoomDetailModel>()
-
     private var isFirstLoad = true
     private var onRoomListScrollEventHandler: OnRoomListScrollEventHandler? = null
 
@@ -47,9 +49,9 @@ class RoomListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, true)
         setContentView(mBinding.root)
-        //启动机器人
+        // 启动机器人视频房间
         mService.startCloudPlayer()
-        //获取万能token
+        // 获取万能token
         fetchUniversalToken ({
             val roomList = arrayListOf<VideoLoader.RoomInfo>( )
             roomDetailModelList.forEach { room ->
@@ -68,8 +70,10 @@ class RoomListActivity : AppCompatActivity() {
             }
             onRoomListScrollEventHandler?.updateRoomList(roomList)
         })
+        // 初始化UI
         initView()
-        initVideoSettings()
+        // 初始化RtcEngine 并设置给房间列表滑动监听模块 OnRoomListScrollEventHandler
+        initRtc()
 
         SceneAliveTime.fetchShowAliveTime ({ show, pk ->
             ShowLogger.d("RoomListActivity", "fetchShowAliveTime: show: $show, pk: $pk")
@@ -84,7 +88,6 @@ class RoomListActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        onRoomListScrollEventHandler = object: OnRoomListScrollEventHandler(mRtcEngine, UserManager.getInstance().user.id.toInt()) {}
         mBinding.titleView.setLeftClick { finish() }
         mBinding.titleView.setRightIconClick {
             showAudienceSetting()
@@ -117,7 +120,6 @@ class RoomListActivity : AppCompatActivity() {
         })
 
         mBinding.rvRooms.adapter = mAdapter
-        mBinding.rvRooms.addOnScrollListener(onRoomListScrollEventHandler as OnRoomListScrollEventHandler)
 
         mBinding.smartRefreshLayout.setEnableLoadMore(false)
         mBinding.smartRefreshLayout.setEnableRefresh(true)
@@ -154,6 +156,22 @@ class RoomListActivity : AppCompatActivity() {
         }
         mBinding.smartRefreshLayout.autoRefresh()
         mBinding.btnCreateRoom.setOnClickListener { goLivePrepareActivity() }
+    }
+
+    private fun initRtc() {
+        // 使用协程执行耗时初始化操作
+        CoroutineScope(Dispatchers.Main).launch {
+            val rtcEngine = withContext(Dispatchers.IO) {
+                // rtc 初始化耗时
+                RtcEngineInstance.rtcEngine
+            }
+            val handler = object : OnRoomListScrollEventHandler(rtcEngine, UserManager.getInstance().user.id.toInt()) {}
+            mBinding.rvRooms.addOnScrollListener(handler)
+            onRoomListScrollEventHandler = handler
+
+            // 根据设备打分 设置观众端视频最佳实践
+            initVideoSettings()
+        }
     }
 
     private fun updateList(data: List<ShowRoomDetailModel>) {

@@ -329,6 +329,9 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 BeautyManager.setupLocalVideo(SurfaceView(this@LivePrepareActivity).apply {
                     binding.flVideoContainer.addView(this)
                 }, Constants.RENDER_MODE_HIDDEN)
+                view?.let {
+                    binding.flVideoContainer.removeView(it)
+                }
             }
         }
     }
