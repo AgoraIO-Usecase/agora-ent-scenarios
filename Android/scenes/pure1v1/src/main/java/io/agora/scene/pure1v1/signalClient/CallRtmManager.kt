@@ -218,7 +218,7 @@ class CallRtmManager(
     }
 
     private fun callMessagePrint(message: String, logLevel: Int = 0) {
-        val tag = "[MessageManager]"
-        Pure1v1Logger.d(tag, message)
+        val tag = "MessageManager"
+        //Pure1v1Logger.d(tag, message)
     }
 }

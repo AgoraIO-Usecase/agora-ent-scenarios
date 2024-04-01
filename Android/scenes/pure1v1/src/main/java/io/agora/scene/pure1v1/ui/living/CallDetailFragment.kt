@@ -30,7 +30,7 @@ class CallDetailFragment : Fragment(), ICallApiListener {
 
     private lateinit var binding: Pure1v1CallDetailFragmentBinding
 
-    private val tag = "CallDetailActivity_LOG"
+    private val TAG = "CallDetail"
 
     private var startTime = System.currentTimeMillis()
     private var timerHandler: Handler? = null
@@ -51,7 +51,7 @@ class CallDetailFragment : Fragment(), ICallApiListener {
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        Pure1v1Logger.d(tag, "local pic debug onHiddenChanged: $hidden")
+        Pure1v1Logger.d(TAG, "local pic debug onHiddenChanged: $hidden")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -98,7 +98,7 @@ class CallDetailFragment : Fragment(), ICallApiListener {
                     elapsed: Int
                 ) {
                     super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
-                    Log.d(tag, "onRemoteVideoStateChanged: uid:$uid, state:$state, reason:$reason")
+                    Pure1v1Logger.d(TAG, "onRemoteVideoStateChanged: uid:$uid, state:$state, reason:$reason")
                     if (state == Constants.REMOTE_VIDEO_STATE_STOPPED || state == Constants.REMOTE_VIDEO_STATE_FAILED) {
                         // 远端视频停止接收
                         runOnUiThread {
@@ -291,7 +291,7 @@ class CallDetailFragment : Fragment(), ICallApiListener {
         message: String?
     ) {
         super.onCallError(errorEvent, errorType, errorCode, message)
-        Pure1v1Logger.d(tag, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
+        Pure1v1Logger.d(TAG, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
     }
 
     override fun canJoinRtcOnCalling(eventInfo: Map<String, Any>): Boolean {

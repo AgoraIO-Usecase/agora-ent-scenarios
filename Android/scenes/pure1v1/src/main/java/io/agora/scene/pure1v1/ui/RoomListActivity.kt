@@ -76,8 +76,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
     private var mCallDetailFragment: Fragment? = null
 
-    private val scenarioApi by lazy { AudioScenarioApi(CallServiceManager.instance.rtcEngine!!) }
-
     private var isFirstEnterScene = true
 
     override fun getViewBinding(inflater: LayoutInflater): Pure1v1RoomListActivityBinding {
@@ -122,7 +120,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     if (e == null) {
                         fetchRoomList(false)
                     } else {
-                        Pure1v1Logger.e(tag, "enter room failed: ${e.message}")
+                        Pure1v1Logger.e(tag, null, "enter room failed: ${e.message}")
                         Toast.makeText(this, getText(R.string.pure1v1_room_list_local_offline), Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -386,10 +384,10 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 val fromUserId = eventInfo[CallApiImpl.kFromUserId] as? Int ?: 0
                 if (currentUid == toUserId.toString()) {
                     // 被叫
-                    scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
+                    CallServiceManager.instance.scenarioApi?.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
                 } else if (currentUid == fromUserId.toString()) {
                     // 主叫
-                    scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Caller)
+                    CallServiceManager.instance.scenarioApi?.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Caller)
                 }
             }
             CallStateType.Prepared -> {
@@ -447,10 +445,12 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
 
     override fun callDebugInfo(message: String, logLevel: CallLogLevel) {
+        val callTag = "CallAPI"
+        Log.d(callTag, message)
         when (logLevel) {
-            CallLogLevel.Normal -> Pure1v1Logger.d(tag, message)
-            CallLogLevel.Warning -> Pure1v1Logger.w(tag, message)
-            CallLogLevel.Error -> Pure1v1Logger.e(tag, message)
+            CallLogLevel.Normal -> Pure1v1Logger.d(callTag, message)
+            CallLogLevel.Warning -> Pure1v1Logger.w(callTag, message)
+            CallLogLevel.Error -> Pure1v1Logger.e(callTag, null, message)
         }
     }
 

@@ -1561,6 +1561,7 @@ class LiveDetailFragment : Fragment() {
             })
             (activity as LiveDetailActivity).toggleSelfAudio(isRoomOwner || isMeLinking(), callback = {
                 // nothing
+                scenarioApi.initialize()
                 if (isRoomOwner) {
                     scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
                 } else if (isMeLinking()) {

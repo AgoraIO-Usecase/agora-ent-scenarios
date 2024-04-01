@@ -249,6 +249,8 @@ class ShowTo1v1Manger constructor() {
                 val config = RtcEngineConfig()
                 config.mContext = AgoraApplication.the()
                 config.mAppId = BuildConfig.AGORA_APP_ID
+                config.addExtension("agora_ai_echo_cancellation_extension")
+                config.addExtension("agora_ai_noise_suppression_extension")
                 config.mEventHandler = object : IRtcEngineEventHandler() {
                     override fun onError(err: Int) {
                         super.onError(err)

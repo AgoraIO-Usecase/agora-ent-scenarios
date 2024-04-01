@@ -18,11 +18,16 @@ import io.agora.rtm.RtmClient
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.pure1v1.audio.AudioScenarioApi
 import io.agora.scene.pure1v1.callapi.signalClient.createRtmSignalClient
 import io.agora.scene.pure1v1.service.Pure1v1ServiceImp
 import io.agora.scene.pure1v1.service.UserInfo
 import io.agora.scene.pure1v1.signalClient.CallRtmManager
 import io.agora.scene.pure1v1.signalClient.ICallRtmManagerListener
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /*
  * 业务逻辑管理模块
@@ -78,9 +83,9 @@ class CallServiceManager {
 
     private var callRtmManager: CallRtmManager? = null
 
-    fun setup(context: Context, completion: (success: Boolean)-> Unit) {
-        Pure1v1Logger.d(tag, "setup")
+    var scenarioApi: AudioScenarioApi? = null
 
+    fun setup(context: Context, completion: (success: Boolean)-> Unit) {
         // 初始化 rtm manager
         val rtmManager = CallRtmManager(BuildConfig.AGORA_APP_ID, UserManager.getInstance().user.id.toInt())
         callRtmManager = rtmManager
@@ -132,6 +137,11 @@ class CallServiceManager {
             createRtmSignalClient(rtmManager.getRtmClient())
         ))
 
+        // 初始化音频场景化API
+        val scenarioApi = AudioScenarioApi(engine)
+        scenarioApi.initialize()
+        this.scenarioApi = scenarioApi
+
         // 获取万能Token
         fetchToken { success ->
             // 外部创建需要自行管理login
@@ -140,7 +150,7 @@ class CallServiceManager {
                     if (it == null) {
                         completion.invoke(true)
                     } else {
-                        Pure1v1Logger.e(tag, "login error = ${it.msg}")
+                        Pure1v1Logger.e(tag, null,"login error = ${it.msg}")
                         completion.invoke(false)
                     }
                 }
@@ -212,7 +222,7 @@ class CallServiceManager {
                 Pure1v1Logger.d(tag, "generateTokens success")
                 completion.invoke(true)
             }, {
-                Pure1v1Logger.e(tag, "generateTokens failed: $it")
+                Pure1v1Logger.e(tag, null,"generateTokens failed: $it")
                 completion.invoke(false)
             })
     }
@@ -343,11 +353,13 @@ class CallServiceManager {
         config.mEventHandler = object : IRtcEngineEventHandler() {
             override fun onError(err: Int) {
                 super.onError(err)
-                Pure1v1Logger.e(tag, "IRtcEngineEventHandler onError:$err")
+                Pure1v1Logger.e(tag, null, "IRtcEngineEventHandler onError:$err")
             }
         }
         config.mChannelProfile = CHANNEL_PROFILE_LIVE_BROADCASTING
         config.mAudioScenario = AUDIO_SCENARIO_GAME_STREAMING
+        config.addExtension("agora_ai_echo_cancellation_extension")
+        config.addExtension("agora_ai_noise_suppression_extension")
         try {
             rtcEngine = RtcEngine.create(config) as RtcEngineEx
 
@@ -371,7 +383,7 @@ class CallServiceManager {
             rtcEngine.setParameters("{\"rtc.network.e2e_cc_mode\": 3}")
         } catch (e: Exception) {
             e.printStackTrace()
-            Pure1v1Logger.e(tag, "RtcEngine.create() called error: $e")
+            Pure1v1Logger.e(tag, null,"RtcEngine.create() called error: $e")
         }
         return rtcEngine ?: throw RuntimeException("RtcEngine create failed!")
     }

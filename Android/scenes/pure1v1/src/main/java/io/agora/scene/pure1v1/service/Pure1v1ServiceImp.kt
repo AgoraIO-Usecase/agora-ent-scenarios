@@ -14,6 +14,7 @@ import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.pure1v1.Pure1v1Logger
+import okhttp3.internal.wait
 
 /*
  * service 模块
@@ -62,11 +63,13 @@ class Pure1v1ServiceImp(
         scene = syncManager.getScene(kRoomId)
 
         scene.userService.registerRespObserver(this)
+        syncUtilsInited = true
     }
 
     fun reset() {
         if (syncUtilsInited) {
             syncUtilsInited = false
+            syncManager.release()
         }
     }
 
@@ -101,14 +104,16 @@ class Pure1v1ServiceImp(
             completion(null)
             return
         }
-        syncManager.rtmManager.subscribe(kRoomId) { error ->
-            error?.let { e ->
-                Log.d(tag, "enter scene fail: ${e.message}")
-                runOnMainThread { completion.invoke(Error(e.message)) }
-                return@subscribe
+        Handler(Looper.getMainLooper()).postDelayed({
+            syncManager.rtmManager.subscribe(kRoomId) { error ->
+                error?.let { e ->
+                    Log.d(tag, "enter scene fail: ${e.message}")
+                    runOnMainThread { completion.invoke(Error(e.message)) }
+                    return@subscribe
+                }
+                runOnMainThread { completion.invoke(null) }
             }
-            runOnMainThread { completion.invoke(null) }
-        }
+        }, 100)
     }
 
     /*
@@ -135,12 +140,12 @@ class Pure1v1ServiceImp(
     }
 
     override fun onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {
-        Pure1v1Logger.d(tag, "onRoomUserEnter, roomId:$roomId, userInfo:$userInfo")
+        Log.d(tag, "onRoomUserEnter, roomId:$roomId, userInfo:$userInfo")
         onUserChanged.invoke()
     }
 
     override fun onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
-        Pure1v1Logger.d(tag, "onRoomUserLeave, roomId:$roomId, userInfo:$userInfo")
+        Log.d(tag, "onRoomUserLeave, roomId:$roomId, userInfo:$userInfo")
         onUserChanged.invoke()
     }
 
