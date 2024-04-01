@@ -28,6 +28,7 @@ import io.agora.mediaplayer.data.SrcInfo
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
+import io.agora.rtc2.Constants.VIDEO_MIRROR_MODE_DISABLED
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
@@ -638,7 +639,9 @@ class LiveDetailFragment : Fragment() {
         // H265开关
         topBinding.tvStatisticH265.isVisible = true
         if (isRoomOwner) {
-            topBinding.tvStatisticH265.text = getString(R.string.show_statistic_h265, getString(R.string.show_setting_opened))
+            codecType?.let {
+                topBinding.tvStatisticH265.text = getString(R.string.show_statistic_h265, if (it == 3) getString(R.string.show_setting_opened) else getString(R.string.show_setting_closed))
+            }
         } else {
             topBinding.tvStatisticH265.text = getString(R.string.show_statistic_h265, "--")
         }
@@ -672,6 +675,9 @@ class LiveDetailFragment : Fragment() {
         } else {
             topBinding.tvStatisticSVC.text = getString(R.string.show_statistic_svc, "--")
         }
+
+        // 本地uid
+        topBinding.tvLocalUid.text = getString(R.string.show_local_uid, "${UserManager.getInstance().user.id}")
     }
 
     private fun refreshViewDetailLayout(status: Int) {
@@ -1555,6 +1561,7 @@ class LiveDetailFragment : Fragment() {
             })
             (activity as LiveDetailActivity).toggleSelfAudio(isRoomOwner || isMeLinking(), callback = {
                 // nothing
+                scenarioApi.initialize()
                 if (isRoomOwner) {
                     scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
                 } else if (isMeLinking()) {
@@ -1756,7 +1763,7 @@ class LiveDetailFragment : Fragment() {
             }
         }
 
-        LocalVideoCanvasWrap(
+        val local = LocalVideoCanvasWrap(
             container.lifecycleOwner,
             videoView, container.renderMode, container.uid
         )
@@ -1931,14 +1938,13 @@ class LiveDetailFragment : Fragment() {
                             // 有权限
                             mRtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, rtcConnection)
                             val context = activity ?: return@toggleSelfVideo
-                            BeautyManager.initialize(context, mRtcEngine)
-                            setupLocalVideo(
-                                VideoLoader.VideoCanvasContainer(
-                                    context,
-                                    mBinding.videoLinkingAudienceLayout.videoContainer,
-                                    0
-                                )
-                            )
+                            val textureView =  TextureView(context)
+                            mBinding.videoLinkingAudienceLayout.videoContainer.addView(textureView)
+                            mRtcEngine.setupLocalVideo(VideoCanvas(
+                                textureView
+                            ).apply {
+                                mirrorMode = VIDEO_MIRROR_MODE_DISABLED
+                            })
                         } else {
                             // 没有权限
                             mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!)
