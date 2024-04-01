@@ -1,5 +1,7 @@
 package io.agora.scene.show
 
+import AGManifest
+import AGResourceManager
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.os.Build
@@ -14,10 +16,12 @@ import android.view.inputmethod.InputMethodManager
 import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.SegmentationProperty
+import io.agora.rtc2.video.VideoCanvas
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
@@ -33,6 +37,10 @@ import io.agora.scene.show.widget.PresetDialog
 import io.agora.scene.show.widget.beauty.MultiBeautyDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
+import kotlinx.coroutines.*
+import java.io.File
+import java.lang.Exception
+import java.lang.Runnable
 import kotlin.random.Random
 
 /*
@@ -40,7 +48,7 @@ import kotlin.random.Random
  */
 @RequiresApi(Build.VERSION_CODES.M)
 class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBinding>() {
-
+    private val tag = "LivePrepareActivity"
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
     private val mInputMethodManager by lazy { getSystemService(InputMethodManager::class.java) }
 
@@ -50,6 +58,11 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
 
     private var isFinishToLiveDetail = false
+
+    // 美颜资源下载协程
+    private var resourceDownloadJob: Job? = null
+
+    private var view: SurfaceView? = null
 
     override fun getViewBinding(inflater: LayoutInflater): ShowLivePrepareActivityBinding {
         return ShowLivePrepareActivityBinding.inflate(inflater)
@@ -75,6 +88,10 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             return@setOnEditorActionListener false
         }
         binding.ivClose.setOnClickListener {
+            view?.let {
+                binding.flVideoContainer.removeView(it)
+            }
+            resourceDownloadJob?.cancel()
             finish()
         }
 
@@ -102,18 +119,35 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             }
         }
 
-        // 低端机 或 无证书则关闭美颜
-        BeautyManager.initialize(this, mRtcEngine)
-        BeautyManager.setupLocalVideo(SurfaceView(this).apply {
-            binding.flVideoContainer.addView(this)
-        }, Constants.RENDER_MODE_HIDDEN)
+        if (BuildConfig.BEAUTY_RESOURCE.isEmpty()) {
+            binding.statusPrepareViewLrc.isVisible = false
+            // 美颜资源文件已放在assets目录内
+            BeautyManager.initialize(this@LivePrepareActivity, mRtcEngine)
+            BeautyManager.setupLocalVideo(SurfaceView(this@LivePrepareActivity).apply {
+                binding.flVideoContainer.addView(this)
+            }, Constants.RENDER_MODE_HIDDEN)
+        } else {
+            // 设置preview视图
+            mRtcEngine.setupLocalVideo(VideoCanvas(SurfaceView(this@LivePrepareActivity).apply {
+                view = this
+                binding.flVideoContainer.addView(this)
+            }))
 
+            // 下载美颜资源, 下载成功后默认应用商汤美颜
+            downloadBeautyResource()
+        }
 
         toggleVideoRun = Runnable {
             initRtcEngine()
         }
         requestCameraPermission(true)
+
+        // 显示开播前视频配置预设对话框
         showPresetDialog()
+    }
+
+    override fun onBackPressed() {
+        //super.onBackPressed()
     }
 
     private var toggleVideoRun: Runnable? = null
@@ -223,6 +257,83 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 binding.btnStartLive.isEnabled = true
             }
         })
+    }
+
+    // 下载美颜资源, 下载成功后默认应用商汤美颜
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun downloadBeautyResource() {
+        // 下载资源过程中不允许点击其余的按钮
+        binding.tvSetting.isEnabled = false
+        binding.tvBeauty.isEnabled = false
+        binding.tvRotate.isEnabled = false
+        binding.btnStartLive.isEnabled = false
+
+        val beautyResource = AGResourceManager(this)
+        var manifest: AGManifest? = null
+        resourceDownloadJob = GlobalScope.launch(Dispatchers.IO) {
+            // 调用processFile处理文件
+            beautyResource.downloadManifest(
+                url = BuildConfig.BEAUTY_RESOURCE,
+                progressHandler = {
+                    // 下载成功，可以更新UI
+                    ShowLogger.d(tag, "download process: $it")
+                },
+                completionHandler = { agManifest, e ->
+                    if (e == null) {
+                        ShowLogger.d(tag, "download success: $agManifest")
+                        manifest = agManifest
+                    } else {
+                        ShowLogger.d(tag, "download failed: ${e.message}")
+                    }
+                }
+            )
+
+            manifest?.files?.forEach { resource ->
+                async(Dispatchers.Main) {
+                    ShowLogger.d(tag, "Processing ${resource.url}")
+                    binding.statusPrepareViewLrc.isVisible = true
+                    binding.pbLoading.progress = 0
+                    binding.tvContent.text =
+                        String.format(resources.getString(R.string.show_beauty_loading), resource.uri, "0%")
+                }
+                beautyResource.downloadAndUnZipResource(
+                    resource = resource,
+                    progressHandler = {
+                        binding.pbLoading.progress = it
+                        binding.tvContent.text = String.format(resources.getString(R.string.show_beauty_loading), resource.uri, "$it%")
+                    },
+                    completionHandler = { _, e ->
+                        if (e == null) {
+                            // 下载成功，可以更新UI
+                            ShowLogger.d(tag, "download success: ${resource.uri}")
+                        } else {
+                            // 下载失败，更新UI显示错误信息
+                            ShowLogger.e(tag, e, "download failed: ${e.message}")
+                            binding.statusPrepareViewLrc.isVisible = false
+                            ToastUtils.showToastLong(R.string.show_beauty_loading_failed)
+                            resourceDownloadJob?.cancel()
+                        }
+                    }
+                )
+            }
+
+            // 下载成功后初始化美颜场景化API
+            withContext(Dispatchers.Main) {
+                binding.statusPrepareViewLrc.isVisible = false
+                binding.tvSetting.isEnabled = true
+                binding.tvBeauty.isEnabled = true
+                binding.tvRotate.isEnabled = true
+                binding.btnStartLive.isEnabled = true
+
+                BeautyManager.initialize(this@LivePrepareActivity, mRtcEngine)
+                BeautyManager.setupLocalVideo(SurfaceView(this@LivePrepareActivity).apply {
+                    binding.flVideoContainer.addView(this)
+                }, Constants.RENDER_MODE_HIDDEN)
+                view?.let {
+                    binding.flVideoContainer.removeView(it)
+                }
+            }
+        }
     }
 
 

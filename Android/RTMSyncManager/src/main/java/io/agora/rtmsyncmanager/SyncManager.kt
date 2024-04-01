@@ -7,18 +7,23 @@ import io.agora.rtmsyncmanager.model.AUICommonConfig
 import io.agora.rtmsyncmanager.model.AUIRoomContext
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
+import io.agora.rtmsyncmanager.utils.AUILogger.Companion.logger
 
 class SyncManager constructor(
     context: Context,
     rtmClient: RtmClient? = null,
     commonConfig: AUICommonConfig
 ) {
+
+    private val tag = "SyncManager"
+
     var rtmManager: AUIRtmManager
         private set
 
     private var sceneMap = mutableMapOf<String, Scene>()
 
     init {
+        logger().d(tag, "init AUISyncManager")
         AUIRoomContext.shared().setCommonConfig(commonConfig)
         val rtm = rtmClient ?: createRtmClient()
         rtmManager = AUIRtmManager(context, rtm, rtm == rtmClient)
@@ -30,6 +35,10 @@ class SyncManager constructor(
 
     fun logout() {
         rtmManager.logout()
+    }
+
+    fun release() {
+        rtmManager.deInit()
     }
 
     fun getScene(channelName: String): Scene {

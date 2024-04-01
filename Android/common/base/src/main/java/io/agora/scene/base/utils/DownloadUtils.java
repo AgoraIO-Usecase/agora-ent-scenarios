@@ -43,8 +43,8 @@ public class DownloadUtils {
     }
 
     @Nullable
-    public void download(Context context, String url, FileDownloadSuccessCallback callback, FileDownloadFailureCallback error) {
-        File folder = new File(context.getExternalCacheDir(), CACHE_FOLDER);
+    public void download(Context context, String url, FileDownloadCallback callback) {
+        File folder = new File(context.getExternalFilesDir(null), CACHE_FOLDER);
         if (!folder.exists()) {
             folder.mkdir();
         }
@@ -58,14 +58,14 @@ public class DownloadUtils {
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                error.onFailed(e);
+                callback.onFailed(e);
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 ResponseBody body = response.body();
                 if (body == null) {
-                    error.onFailed((Exception) new Throwable("body is empty"));
+                    callback.onFailed((Exception) new Throwable("body is empty"));
                     return;
                 }
 
@@ -83,13 +83,14 @@ public class DownloadUtils {
                         fos.write(buf, 0, len);
                         sum += len;
                         int progress = (int) (sum * 1.0f / total * 100);
+                        callback.onProgress(file, progress);
                         Log.d(TAG, file.getName() + ", progress: " + progress);
                     }
                     fos.flush();
                     Log.d(TAG, file.getName() + " onComplete");
                     callback.onSuccess(file);
                 } catch (Exception e) {
-                    error.onFailed(e);
+                    callback.onFailed(e);
                 } finally {
                     try {
                         if (is != null)
@@ -106,11 +107,9 @@ public class DownloadUtils {
         });
     }
 
-    public interface FileDownloadSuccessCallback {
+    public interface FileDownloadCallback {
+        void onProgress(File file, int progress);
         void onSuccess(File file);
-    }
-
-    public interface FileDownloadFailureCallback {
         void onFailed(Exception exception);
     }
 }

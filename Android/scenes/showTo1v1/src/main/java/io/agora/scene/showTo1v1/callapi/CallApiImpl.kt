@@ -47,7 +47,7 @@ class CallApiImpl constructor(
 ): ICallApi, ISignalClientListener, IRtcEngineEventHandler() {
 
     companion object {
-        const val kReportCategory = "2_Android_1.0.0"
+        const val kReportCategory = "2_Android_2.0.0"
         const val kPublisher = "publisher"
         const val kCostTimeMap = "costTimeMap"    //呼叫时的耗时信息，会在connected时抛出分步耗时
         const val kRemoteUserId = "remoteUserId"
@@ -60,6 +60,8 @@ class CallApiImpl constructor(
         const val kRejectReasonCallBusy = "The user is currently busy"
         //是否内部拒绝，收到内部拒绝目前标记为对端call busy
         const val kRejectByInternal = "rejectByInternal"
+        //是否内部取消呼叫，收到内部取消呼叫目前标记为对端 remote calling timeout
+        const val kCancelCallByInternal = "cancelCallByInternal"
 
         const val kHangupReason = "hangupReason"
         // 发送的消息id
@@ -96,9 +98,9 @@ class CallApiImpl constructor(
             val prevState = field
             field = value
             if (prevState == value) { return }
-            tempRemoteCanvasView.alpha = 0f
             when(value) {
                 CallStateType.Calling -> {
+                    tempRemoteCanvasView.alpha = 0f
                     // 如果prepareConfig?.callTimeoutSeconds == 0，内部不做超时
                     val timeout = prepareConfig?.callTimeoutMillisecond ?: 0L
                     if (timeout <= 0L) {
@@ -106,7 +108,7 @@ class CallApiImpl constructor(
                     }
                     // 开启定时器，如果超时无响应，调用no response
                     connectInfo.scheduledTimer({
-                        _cancelCall {  }
+                        _cancelCall(cancelCallByInternal = true) {  }
                         _updateAndNotifyState(CallStateType.Prepared, CallStateReason.CallingTimeout)
                         _notifyEvent(CallEvent.CallingTimeout)
                     }, timeout)
@@ -178,6 +180,12 @@ class CallApiImpl constructor(
         val message = _messageDic(CallAction.Call).toMutableMap()
         message[kRemoteUserId] = remoteUserId
         message[kFromRoomId] = fromRoomId
+        return message
+    }
+
+    private fun _cancelCallMessageDic(cancelByInternal: Boolean): Map<String, Any> {
+        val message = _messageDic(CallAction.CancelCall).toMutableMap()
+        message[kCancelCallByInternal] = if (cancelByInternal) 1 else 0
         return message
     }
 
@@ -505,7 +513,7 @@ class CallApiImpl constructor(
         val videoCanvas = VideoCanvas(tempLocalCanvasView)
         videoCanvas.setupMode = VideoCanvas.VIEW_SETUP_MODE_ADD
         videoCanvas.renderMode = VideoCanvas.RENDER_MODE_HIDDEN
-        videoCanvas.mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
+        videoCanvas.mirrorMode = Constants.VIDEO_MIRROR_MODE_AUTO
         engine.setDefaultAudioRoutetoSpeakerphone(true)
         engine.setupLocalVideo(videoCanvas)
         val ret = engine.startPreview()
@@ -681,7 +689,6 @@ class CallApiImpl constructor(
             return
         }
         _removeLocalVideo()
-        config?.rtcEngine?.stopCameraCapture(Constants.VideoSourceType.VIDEO_SOURCE_CAMERA_PRIMARY)
         config?.rtcEngine?.stopPreview()
         val ret = config?.rtcEngine?.leaveChannelEx(connection)
         callPrint("leave RTC channel[${ret ?: -1}]")
@@ -710,7 +717,7 @@ class CallApiImpl constructor(
     }
 
     private fun _reportMethod(event: String, label: String = "") {
-        val msgId = "scenarioAPI"
+        val msgId = "agora:scenarioAPI"
         callPrint("_reportMethod event: $event")
         var subEvent = event
         val range = event.indexOf("(")
@@ -786,14 +793,14 @@ class CallApiImpl constructor(
         }
     }
 
-    private fun _cancelCall(message: Map<String, Any>? = null, completion: ((AGError?) -> Unit)? = null) {
+    private fun _cancelCall(message: Map<String, Any>? = null, cancelCallByInternal: Boolean = false, completion: ((AGError?) -> Unit)? = null) {
         val userId = connectInfo.callingUserId
         if (userId == null) {
             completion?.invoke(AGError("cancelCall fail! callingRoomId is empty", -1))
             callWarningPrint("cancelCall fail! callingRoomId is empty")
             return
         }
-        val msg = message ?: _messageDic(CallAction.CancelCall)
+        val msg = message ?: _cancelCallMessageDic(cancelCallByInternal)
         _sendMessage(userId.toString(), msg) { err ->
             completion?.invoke(err)
             if (err != null) {
@@ -860,8 +867,16 @@ class CallApiImpl constructor(
     private fun _onCancel(message: Map<String, Any>) {
         //如果不是来自的正在呼叫的用户的操作，不处理
         if (!_isCallingUser(message)) return
-        _updateAndNotifyState(CallStateType.Prepared, CallStateReason.RemoteCancel, eventInfo = message)
-        _notifyEvent(CallEvent.RemoteCancel)
+
+        var stateReason: CallStateReason = CallStateReason.RemoteCancel
+        var callEvent: CallEvent = CallEvent.RemoteCancel
+        val cancelCallByInternal = message[kCancelCallByInternal] as? Int
+        if (cancelCallByInternal == 1) {
+            stateReason = CallStateReason.RemoteCallingTimeout
+            callEvent = CallEvent.RemoteCallingTimeout
+        }
+        _updateAndNotifyState(state = CallStateType.Prepared, stateReason = stateReason, eventInfo = message)
+        _notifyEvent(event = callEvent)
     }
 
     private fun _onReject(message: Map<String, Any>) {
@@ -890,7 +905,7 @@ class CallApiImpl constructor(
 
     private fun _onHangup(message: Map<String, Any>) {
         if (!_isCallingUser(message)) return
-        
+
         _updateAndNotifyState(CallStateType.Prepared, CallStateReason.RemoteHangup, eventInfo = message)
         _notifyEvent(CallEvent.RemoteHangup)
     }
@@ -908,6 +923,26 @@ class CallApiImpl constructor(
             return
         }
         this.config = config.cloneConfig()
+
+        // 数据上报
+        config.rtcEngine?.setParameters("{\"rtc.direct_send_custom_event\": true}")
+
+        // 写日志
+        config.rtcEngine?.setParameters("{\"rtc.log_external_input\": true}")
+
+        // 视频最佳实践
+        // 3.API 开启音视频首帧加速渲染
+        config.rtcEngine?.enableInstantMediaRendering()
+
+        // 4.私有参数或配置下发开启首帧 FEC
+        config.rtcEngine?.setParameters("{\"rtc.video.quickIntraHighFec\": true}")
+
+        // 5.私有参数或配置下发设置 AUT CC mode
+        config.rtcEngine?.setParameters("{\"rtc.network.e2e_cc_mode\": 3}")  //(4.3.0及以后版本不需要设置此项，默认值已改为3)
+
+        // 6.私有参数或配置下发设置VQC分辨率调节的灵敏度
+        config.rtcEngine?.setParameters("{\"che.video.min_holdtime_auto_resize_zoomin\": 1000}")
+        config.rtcEngine?.setParameters("{\"che.video.min_holdtime_auto_resize_zoomout\": 1000}")
     }
 
     override fun deinitialize(completion: (() -> Unit)) {
@@ -1028,7 +1063,7 @@ class CallApiImpl constructor(
     override fun cancelCall(completion: ((AGError?) -> Unit)?) {
         _reportMethod("cancelCall")
         val message = _messageDic(CallAction.CancelCall)
-        _cancelCall(message, completion)
+        _cancelCall(message, false, completion)
         _updateAndNotifyState(CallStateType.Prepared, CallStateReason.LocalCancel, eventInfo = message)
         _notifyEvent(CallEvent.LocalCancel)
     }
@@ -1220,13 +1255,15 @@ class CallApiImpl constructor(
                 listener.callDebugInfo(message, logLevel)
             }
         }
+        config?.rtcEngine?.writeLog(Constants.LOG_LEVEL_INFO, message)
     }
 
     private fun callWarningPrint(message: String) {
         delegates.forEach { listener ->
             listener.callDebugInfo(message, CallLogLevel.Warning)
         }
-        callPrint("[Warning]$message")
+//        callPrint("[Warning]$message")
+        config?.rtcEngine?.writeLog(Constants.LOG_LEVEL_WARNING, message)
     }
 
     private val mHandler = Handler(Looper.getMainLooper())

@@ -31,7 +31,11 @@ object FaceUnityBeautySDK {
 
     private var beautyAPI: FaceUnityBeautyAPI? = null
 
-    fun initBeauty(context: Context): Boolean {
+    private var useLocalBeautyResource = true
+
+    fun initBeauty(context: Context, useLocalBeautyResource: Boolean): Boolean {
+        this.useLocalBeautyResource = useLocalBeautyResource
+
         val auth = try {
             getAuth()
         } catch (e: Exception) {
@@ -252,13 +256,14 @@ object FaceUnityBeautySDK {
             }
 
         // 贴纸
-        var sticker: String? = null
+        var sticker: StickerItem? = null
             set(value) {
                 field = value
                 runOnBeautyThread {
                     fuRenderKit.propContainer.removeAllProp()
-                    if (!TextUtils.isEmpty(value)) {
-                        val prop = Sticker(FUBundleData("$resourceBase/$sticker"))
+                    if (value != null) {
+                        val path = value.context.getExternalFilesDir(null)?.absolutePath + "/assets/$resourceBase/${value.path}"
+                        val prop = if (useLocalBeautyResource) Sticker(FUBundleData("$resourceBase/${value.path}")) else Sticker(FUBundleData(path))
                         fuRenderKit.propContainer.addProp(prop)
                     }
                 }
@@ -272,9 +277,14 @@ object FaceUnityBeautySDK {
                     if (value == null) {
                         fuRenderKit.makeup = null
                     } else {
+                        val path = value.context.getExternalFilesDir(null)?.absolutePath + "/assets/$resourceBase/${value.path}"
                         val makeup =
                             SimpleMakeup(FUBundleData("graphics" + File.separator + "face_makeup.bundle"))
-                        makeup.setCombinedConfig(FUBundleData("$resourceBase/${value.path}"))
+                        if (useLocalBeautyResource) {
+                            makeup.setCombinedConfig(FUBundleData("$resourceBase/${value.path}"))
+                        } else {
+                            makeup.setCombinedConfig(FUBundleData(path))
+                        }
                         makeup.makeupIntensity = value.intensity.toDouble()
                         fuRenderKit.makeup = makeup
                     }
@@ -312,9 +322,13 @@ object FaceUnityBeautySDK {
     }
 
     data class MakeUpItem(
+        val context: Context,
         val path: String,
         val intensity: Float
     )
 
-
+    data class StickerItem(
+        val context: Context,
+        val path: String
+    )
 }

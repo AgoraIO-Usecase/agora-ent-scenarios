@@ -3,7 +3,6 @@ package io.agora.scene.show.audio
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
-import io.agora.rtc2.internal.Logging
 import org.json.JSONObject
 
 /**
@@ -233,15 +232,24 @@ object RecommendAudioScenarioSetting {
 class AudioScenarioApi(rtcEngine: RtcEngine): IRtcEngineEventHandler() {
 
     companion object {
-        const val tag = "KTV_API_LOG"
-        const val version = "x_android_0.1.0"
+        const val tag = "AUDIO_API_LOG"
+        const val version = "8_android_0.1.0"
     }
 
     private var rtcEngine: RtcEngine
     private var audioScenarioType: AudioScenarioType? = null
+    private var audioRoute: Int? = null
 
     init {
         this.rtcEngine = rtcEngine
+    }
+
+    fun initialize() {
+        // 数据上报
+        rtcEngine.setParameters("{\"rtc.direct_send_custom_event\": true}")
+        // 写日志
+        rtcEngine.setParameters("{\"rtc.log_external_input\": true}")
+        // 注册事件监听
         rtcEngine.addHandler(this)
     }
 
@@ -283,16 +291,25 @@ class AudioScenarioApi(rtcEngine: RtcEngine): IRtcEngineEventHandler() {
                 }
             }
         }
+        setAudioSettings()
     }
 
     // ------------- IRtcEngineEventHandler -------------
     override fun onAudioRouteChanged(routing: Int) {
         super.onAudioRouteChanged(routing)
-        val type = audioScenarioType ?: return
-        when (routing) {
+        scenarioApiLog("onAudioRouteChanged: $routing")
+        this.audioRoute = routing
+        setAudioSettings()
+    }
+
+    // -------------- inner private ---------------
+    private fun setAudioSettings() {
+        audioRoute ?: return
+        audioScenarioType ?: return
+        when (audioRoute) {
             Constants.AUDIO_ROUTE_HEADSET, Constants.AUDIO_ROUTE_HEADSETNOMIC, Constants.AUDIO_ROUTE_USBDEVICE -> {
                 // 耳机
-                when (type) {
+                when (audioScenarioType) {
                     AudioScenarioType.Chat_Caller -> {
                         setAudioSettingsWithConfig(RecommendAudioScenarioSetting.BoyWired)
                     }
@@ -305,11 +322,12 @@ class AudioScenarioApi(rtcEngine: RtcEngine): IRtcEngineEventHandler() {
                     AudioScenarioType.Show_InteractiveAudience -> {
                         setAudioSettingsWithConfig(RecommendAudioScenarioSetting.AudienceWired)
                     }
+                    else -> {}
                 }
             }
             Constants.AUDIO_ROUTE_SPEAKERPHONE -> {
                 // 扬声器
-                when (type) {
+                when (audioScenarioType) {
                     AudioScenarioType.Chat_Caller -> {
                         setAudioSettingsWithConfig(RecommendAudioScenarioSetting.BoySpeaker)
                     }
@@ -322,11 +340,12 @@ class AudioScenarioApi(rtcEngine: RtcEngine): IRtcEngineEventHandler() {
                     AudioScenarioType.Show_InteractiveAudience -> {
                         setAudioSettingsWithConfig(RecommendAudioScenarioSetting.AudienceSpeaker)
                     }
+                    else -> {}
                 }
             }
             Constants.AUDIO_ROUTE_HEADSETBLUETOOTH -> {
                 // 蓝牙耳机
-                when (type) {
+                when (audioScenarioType) {
                     AudioScenarioType.Chat_Caller -> {
                         setAudioSettingsWithConfig(RecommendAudioScenarioSetting.BoyBluetooth)
                     }
@@ -339,13 +358,13 @@ class AudioScenarioApi(rtcEngine: RtcEngine): IRtcEngineEventHandler() {
                     AudioScenarioType.Show_InteractiveAudience -> {
                         setAudioSettingsWithConfig(RecommendAudioScenarioSetting.AudienceBluetooth)
                     }
+                    else -> {}
                 }
             }
             else -> {}
         }
     }
 
-    // -------------- inner private ---------------
     private fun setAudioSettingsWithConfig(
         setting: AudioScenarioSetting
     ) {
@@ -372,7 +391,7 @@ class AudioScenarioApi(rtcEngine: RtcEngine): IRtcEngineEventHandler() {
         a2dp: Boolean?
     ) {
         // 开启并行架构
-        rtcEngine.setParameters("{\"che.audio.sf.enabled: $sf\"}")
+        rtcEngine.setParameters("{\"che.audio.sf.enabled\": $sf}")
         rtcEngine.setParameters("{\"che.audio.input_sample_rate\":48000}")
 
         ains?.let {
@@ -456,7 +475,7 @@ class AudioScenarioApi(rtcEngine: RtcEngine): IRtcEngineEventHandler() {
     private fun reportCallScenarioApi(event: String, params: JSONObject) {
         scenarioApiLog("event: $event, params:$params")
         rtcEngine.sendCustomReportMessage(
-            "scenarioAPI",
+            "agora:scenarioAPI",
             version,
             event,
             params.toString(),
@@ -464,10 +483,10 @@ class AudioScenarioApi(rtcEngine: RtcEngine): IRtcEngineEventHandler() {
     }
 
     private fun scenarioApiLog(msg: String) {
-        Logging.i(tag, msg)
+        rtcEngine.writeLog(Constants.LOG_LEVEL_INFO, "[$tag] $msg")
     }
 
     private fun scenarioApiLogError(msg: String) {
-        Logging.e(tag, msg)
+        rtcEngine.writeLog(Constants.LOG_LEVEL_ERROR, "[$tag] $msg")
     }
 }

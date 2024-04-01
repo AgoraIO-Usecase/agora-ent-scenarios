@@ -176,6 +176,7 @@ class FaceUnityControllerView : BaseControllerView {
                             ?: 0.8f else 0.8f,
                         onValueChanged = { value ->
                             beautyConfig.makeUp = FaceUnityBeautySDK.MakeUpItem(
+                                context,
                                 "makeup/diadiatu.bundle",
                                 value
                             )
@@ -190,6 +191,7 @@ class FaceUnityControllerView : BaseControllerView {
                             ?: 0.8f else 0.8f,
                         onValueChanged = { value ->
                             beautyConfig.makeUp = FaceUnityBeautySDK.MakeUpItem(
+                                context,
                                 "makeup/hunxue.bundle",
                                 value
                             )
@@ -233,9 +235,9 @@ class FaceUnityControllerView : BaseControllerView {
                     ItemInfo(
                         R.string.show_beauty_item_sticker_sdlu,
                         R.mipmap.show_beauty_ic_sticker_elk,
-                        isSelected = beautyConfig.sticker == "sticker/sdlu.bundle",
+                        isSelected = beautyConfig.sticker?.path == "sticker/sdlu.bundle",
                         onValueChanged = { _ ->
-                            beautyConfig.sticker = "sticker/sdlu.bundle"
+                            beautyConfig.sticker = FaceUnityBeautySDK.StickerItem(context, "sticker/sdlu.bundle")
                         }
                     )
                 )
