@@ -31,7 +31,7 @@ data class AGManifest(
 
 // AGResourceManager 类
 class AGResourceManager(private val context: Context) {
-    private val tag = "AGResourceManager"
+    private val tag = "DownloadUtils"
 
     private val manifestFileList = mutableListOf<AGResource>()
     private val manifestList = mutableListOf<AGManifest>()
@@ -102,28 +102,34 @@ class AGResourceManager(private val context: Context) {
     ) {
         val destinationPath = getCachePath(context, "assets") ?: return
         try {
-            // 下载文件
-            DownloadManager.instance.download(
-                url = resource.url,
-                destinationPath = destinationPath,
-                callback = object: DownloadManager.FileDownloadCallback {
-                    override fun onProgress(file: File, progress: Int) {
-                        Log.d(tag, "downloading... $resource progress:$progress")
-                        progressHandler.invoke(progress)
-                    }
-
-                    override fun onSuccess(file: File) {
-                        completionHandler(file, null)
-                    }
-
-                    override fun onFailed(exception: Exception) {
-                        completionHandler.invoke(null, exception)
-                    }
-                }
-            )
-            // 解压文件
             val inputFile = File(destinationPath, resource.url.substringAfterLast("/"))
-            DownloadManager.instance.unzipFile(inputFile.path, destinationPath)
+            Log.d(tag, "downloadAndUnZipResource resource:$resource, inputFile:${inputFile.length()}")
+            // 下载文件
+            if (inputFile.length() != resource.size) {
+                DownloadManager.instance.download(
+                    url = resource.url,
+                    destinationPath = destinationPath,
+                    callback = object: DownloadManager.FileDownloadCallback {
+                        override fun onProgress(file: File, progress: Int) {
+                            // Log.d(tag, "downloading... $resource progress:$progress")
+                            progressHandler.invoke(progress)
+                        }
+
+                        override fun onSuccess(file: File) {
+                            completionHandler(file, null)
+                        }
+
+                        override fun onFailed(exception: Exception) {
+                            completionHandler.invoke(null, exception)
+                        }
+                    }
+                )
+            }
+
+            // 解压文件
+            if (!checkUnzipFolderExists(inputFile.path) && inputFile.length() == resource.size) {
+                DownloadManager.instance.unzipFile(inputFile.path, destinationPath)
+            }
         } catch (e: Exception) {
             // 处理异常
             Log.e(tag, "Error processing file: $e")
@@ -131,6 +137,12 @@ class AGResourceManager(private val context: Context) {
                 completionHandler.invoke(null, e)
             }
         }
+    }
+
+    private fun checkUnzipFolderExists(zipFilePath: String): Boolean {
+        val unzipFolderName = zipFilePath.substringBeforeLast(".zip")
+        val unzipFolder = File(unzipFolderName)
+        return unzipFolder.exists() && unzipFolder.isDirectory
     }
 
     // 根据uri获取清单

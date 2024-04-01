@@ -302,14 +302,16 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                         binding.pbLoading.progress = it
                         binding.tvContent.text = String.format(resources.getString(R.string.show_beauty_loading), resource.uri, "$it%")
                     },
-                    completionHandler = { file, e ->
+                    completionHandler = { _, e ->
                         if (e == null) {
                             // 下载成功，可以更新UI
                             ShowLogger.d(tag, "download success: ${resource.uri}")
                         } else {
                             // 下载失败，更新UI显示错误信息
                             ShowLogger.e(tag, e, "download failed: ${e.message}")
-                            return@downloadAndUnZipResource
+                            binding.statusPrepareViewLrc.isVisible = false
+                            ToastUtils.showToastLong(R.string.show_beauty_loading_failed)
+                            resourceDownloadJob?.cancel()
                         }
                     }
                 )

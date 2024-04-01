@@ -30,16 +30,6 @@ class DownloadManager private constructor() {
             val file = File(destinationPath, url.substringAfterLast("/"))
             var downloadedBytes = 0L
 
-            val trimmedFilename = if (file.name.endsWith(".zip")) {
-                file.name.substring(0, file.name.length - 4)
-            } else {
-                file.name
-            }
-
-            if (File(destinationPath, trimmedFilename).isDirectory && File(destinationPath, trimmedFilename).exists()) {
-                return@withContext
-            }
-
             if (file.exists()) {
                 downloadedBytes = file.length()
             }
@@ -48,16 +38,22 @@ class DownloadManager private constructor() {
             Log.d(TAG, "rangeHeaderValue: $rangeHeaderValue")
 
             val request = Request.Builder().url(url).header("Range", rangeHeaderValue).build()
-            val response = okHttpClient.newCall(request).execute()
-            response.body?.let { responseBody ->
-                val total = responseBody.contentLength()
-                Log.d(TAG, "${file.name} download total: $total")
 
-                if (downloadedBytes >= total) {
-                    withContext(Dispatchers.Main) {
-                        callback.onSuccess(file)
+            try {
+                val response = okHttpClient.newCall(request).execute()
+                response.body?.let { responseBody ->
+                    val total = responseBody.contentLength()
+                    val fileTotal = total + downloadedBytes
+                    Log.d(TAG, "${file.name} download actual total: $total, fileTotal: $fileTotal")
+
+                    if (file.exists() && total == downloadedBytes)  {
+                        Log.d(TAG, "${file.name} already fully downloaded")
+                        withContext(Dispatchers.Main) {
+                            callback.onSuccess(file)
+                        }
+                        return@withContext
                     }
-                } else {
+
                     // 支持断点重传
                     FileOutputStream(file, true).use { fos ->
                         try {
@@ -70,9 +66,9 @@ class DownloadManager private constructor() {
                                         fos.write(buffer, 0, bytesRead) // 追加写入文件末尾
                                         downloadedBytes += bytesRead
 
-                                        val progress = ((downloadedBytes * 100) / total).toInt()
+                                        val progress = ((downloadedBytes * 100) / fileTotal).toInt()
                                         withContext(Dispatchers.Main) {
-                                            Log.d(TAG, "${file.name} download progress: $progress")
+                                            //Log.d(TAG, "${file.name} download progress: $progress")
                                             callback.onProgress(file, progress)
                                         }
                                     } else {
@@ -92,11 +88,16 @@ class DownloadManager private constructor() {
                             }
                         }
                     }
+                } ?: run {
+                    Log.e(TAG, "Response body is null for $url")
+                    withContext(Dispatchers.Main) {
+                        callback.onFailed(Exception("Response body is null"))
+                    }
                 }
-            } ?: run {
-                Log.e(TAG, "Response body is null for $url")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to download file：${e.message}")
                 withContext(Dispatchers.Main) {
-                    callback.onFailed(Exception("Response body is null"))
+                    callback.onFailed(e)
                 }
             }
         }

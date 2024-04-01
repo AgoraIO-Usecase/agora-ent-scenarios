@@ -266,6 +266,7 @@
     <string name="show_beauty_license_faceunity">相芯美颜检测无license</string>
     <string name="show_beauty_license_bytedance">火山美颜检测无license</string>
     <string name="show_beauty_loading">%s美颜资源加载中: %s</string>
+    <string name="show_beauty_loading_failed">美颜资源下载失败，请确认网络正常后退出重进预览页面重启下载</string>
     <string name="show_beauty_item_effect_qise">气色</string>
     <string name="show_beauty_item_effect_wanneng">万能</string>
     <string name="show_beauty_item_effect_dousha">豆沙</string>

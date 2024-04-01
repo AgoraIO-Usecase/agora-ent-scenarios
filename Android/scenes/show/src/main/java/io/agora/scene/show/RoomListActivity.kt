@@ -159,7 +159,6 @@ class RoomListActivity : AppCompatActivity() {
     private fun updateList(data: List<ShowRoomDetailModel>) {
         mBinding.tvTips1.isVisible = data.isEmpty()
         mBinding.ivBgMobile.isVisible = data.isEmpty()
-        mBinding.btnCreateRoom.isVisible = data.isNotEmpty()
         mBinding.rvRooms.isVisible = data.isNotEmpty()
         mAdapter?.setDataList(data)
 

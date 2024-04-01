@@ -28,6 +28,7 @@ import io.agora.mediaplayer.data.SrcInfo
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
+import io.agora.rtc2.Constants.VIDEO_MIRROR_MODE_DISABLED
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
@@ -1735,7 +1736,7 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-    private fun setupLocalVideo(container: VideoLoader.VideoCanvasContainer, needBeauty: Boolean = true) {
+    private fun setupLocalVideo(container: VideoLoader.VideoCanvasContainer) {
         localVideoCanvas?.let {
             if (it.lifecycleOwner == container.lifecycleOwner && it.renderMode == container.renderMode && it.uid == container.uid) {
                 val videoView = it.view
@@ -1765,12 +1766,7 @@ class LiveDetailFragment : Fragment() {
             container.lifecycleOwner,
             videoView, container.renderMode, container.uid
         )
-        if (needBeauty) {
-            BeautyManager.setupLocalVideo(videoView, container.renderMode)
-        } else {
-            local.mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
-            mRtcEngine.setupLocalVideo(local)
-        }
+        BeautyManager.setupLocalVideo(videoView, container.renderMode)
     }
 
     private fun updateVideoSetting(isPkMode:Boolean) {
@@ -1941,14 +1937,13 @@ class LiveDetailFragment : Fragment() {
                             // 有权限
                             mRtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, rtcConnection)
                             val context = activity ?: return@toggleSelfVideo
-                            setupLocalVideo(
-                                VideoLoader.VideoCanvasContainer(
-                                    context,
-                                    mBinding.videoLinkingAudienceLayout.videoContainer,
-                                    0
-                                ),
-                                needBeauty = false
-                            )
+                            val textureView =  TextureView(context)
+                            mBinding.videoLinkingAudienceLayout.videoContainer.addView(textureView)
+                            mRtcEngine.setupLocalVideo(VideoCanvas(
+                                textureView
+                            ).apply {
+                                mirrorMode = VIDEO_MIRROR_MODE_DISABLED
+                            })
                         } else {
                             // 没有权限
                             mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!)
