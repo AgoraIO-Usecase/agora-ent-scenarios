@@ -5,7 +5,7 @@
 //  Created by wushengtao on 2023/8/30.
 //
 
-import Foundation
+import UIKit
 
 //触发时机
 @objc public enum AGVideoSlicingType: Int {

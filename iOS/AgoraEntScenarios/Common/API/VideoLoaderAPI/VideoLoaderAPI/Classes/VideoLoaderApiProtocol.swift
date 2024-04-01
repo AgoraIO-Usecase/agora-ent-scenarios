@@ -17,7 +17,7 @@ import AgoraRtcKit
 }
 
 /// 初始化配置信息
-@objc public class VideoLoaderConfig: NSObject {
+@objcMembers public class VideoLoaderConfig: NSObject {
     public weak var rtcEngine: AgoraRtcEngineKit?    //rtc engine实例
 }
 

@@ -8,6 +8,7 @@
 import Foundation
 import AgoraRtcKit
 
+@objcMembers
 public class VideoLoaderApiImpl: NSObject {
     public static let shared = VideoLoaderApiImpl()
     public var printClosure: ((String)->())?
