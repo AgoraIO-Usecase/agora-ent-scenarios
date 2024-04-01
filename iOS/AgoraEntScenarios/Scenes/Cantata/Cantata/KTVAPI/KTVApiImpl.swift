@@ -968,7 +968,7 @@ extension KTVApiImpl {
         singChannelMediaOptions.autoSubscribeAudio = true
         singChannelMediaOptions.publishMicrophoneTrack = true
         singChannelMediaOptions.clientRoleType = .broadcaster
-        singChannelMediaOptions.parameters = "{\"che.audio.max_mixed_participants\": 8}"
+//        singChannelMediaOptions.parameters = "{\"che.audio.max_mixed_participants\": 8}"
         if newRole == .leadSinger {
             // 主唱不参加TopN
             singChannelMediaOptions.isAudioFilterable = false
@@ -1273,7 +1273,7 @@ extension KTVApiImpl {
 
     @objc public func didKTVAPILocalAudioStats(stats: AgoraRtcLocalAudioStats) {
         if useCustomAudioSource == true {return}
-        audioPlayoutDelay = Int(stats.audioPlayoutDelay)
+//        audioPlayoutDelay = Int(stats.audioPlayoutDelay)
     }
 
 }

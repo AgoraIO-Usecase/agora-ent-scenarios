@@ -7,6 +7,7 @@
 
 import UIKit
 import JXCategoryView
+import AgoraCommon
 
 enum ShowBeautyFaceVCType: CaseIterable {
     case beauty
@@ -309,6 +310,7 @@ class ShowBeautySettingVC: UIViewController {
             ShowAgoraKitManager.isOpenGreen = isOn
             slider.isHidden = !isOn
             sliderLabel.isHidden = slider.isHidden
+            trySetOffAICameraVirtualBg360()
             if ShowAgoraKitManager.isBlur {
                 ShowAgoraKitManager.shared.enableVirtualBackground(isOn: true,
                                                                    greenCapacity: slider.value)
@@ -326,6 +328,14 @@ class ShowBeautySettingVC: UIViewController {
             }
         }else{
             realChange(isOn: sender.isOn)
+        }
+    }
+    
+    @objc func trySetOffAICameraVirtualBg360(){
+        if ShowAgoraKitManager.shared.enableVirtualBg360 {
+            ShowAgoraKitManager.shared.setupBackground360(enabled: false)
+            ToastView.show(text: "show_disable_virturalBg360_toast".show_localized)
+            NotificationCenter.default.post(name: ShowAgoraKitManager.disableVirtualBg360NotificaitonName, object: nil)
         }
     }
     

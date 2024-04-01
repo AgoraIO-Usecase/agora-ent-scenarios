@@ -10,6 +10,9 @@ import AgoraRtcKit
 import SwiftUI
 import VideoLoaderAPI
 import AgoraCommon
+import AGResourceManager
+import SDWebImage
+
 protocol ShowLiveViewControllerDelegate: NSObjectProtocol {
     func currentUserIsOnSeat()
     func currentUserIsOffSeat()
@@ -104,8 +107,12 @@ class ShowLiveViewController: UIViewController {
         view.delegate = self
         return view
     }()
-    
+        
     private lazy var beautyVC = ShowBeautySettingVC()
+    private lazy var aiCameraMenuVC = {
+        ShowAICameraMenuViewController()
+    }()
+    
     private lazy var realTimeView: ShowRealTimeDataView = {
         let realTimeView = ShowRealTimeDataView(isLocal: role == .broadcaster)
         view.addSubview(realTimeView)
@@ -286,6 +293,7 @@ class ShowLiveViewController: UIViewController {
     }
     
     func leaveRoom(){
+        aiCameraMenuVC.currentItem = nil
         ShowAgoraKitManager.shared.removeRtcDelegate(delegate: self, roomId: roomId)
         ShowAgoraKitManager.shared.cleanCapture()
         ShowBeautyFaceVC.resetData()
@@ -950,6 +958,10 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     
     func onClickBeautyButton() {
         present(beautyVC, animated: true)
+    }
+    
+    func onClickAICameraButton() {
+        present(aiCameraMenuVC, animated: true)
     }
     
     func onClickMusicButton() {
