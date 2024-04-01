@@ -1758,7 +1758,7 @@ extension CantataMainViewController: DHCVLKTVSettingViewDelegate, VLEarSettingVi
         self.selectedEffectIndex = effectIndex
         let effects: [AgoraAudioEffectPreset] = [
             .off,
-            .roomAcousticsChorus,
+//            .roomAcousticsChorus,
             .roomAcousticsKTV,
             .roomAcousVocalConcer,
             .roomAcousStudio,

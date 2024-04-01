@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A80CC5EE2B999BDB000A3851 /* ShowAICameraMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80CC5ED2B999BDB000A3851 /* ShowAICameraMenuViewController.swift */; };
+		A80CC5F02B99A09C000A3851 /* ShowAICameraMenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80CC5EF2B99A09C000A3851 /* ShowAICameraMenuCell.swift */; };
 		A851C5DD2AEF5F8400071F88 /* ShowDebug2TFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A851C5D82AEF5F8400071F88 /* ShowDebug2TFModel.swift */; };
 		A851C5DE2AEF5F8400071F88 /* ShowDebugAgoraKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A851C5D92AEF5F8400071F88 /* ShowDebugAgoraKitManager.swift */; };
 		A851C5DF2AEF5F8400071F88 /* ShowDebugSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A851C5DA2AEF5F8400071F88 /* ShowDebugSettingVC.swift */; };
@@ -14,6 +16,7 @@
 		A851C5E12AEF5F8400071F88 /* ShowDebug1TFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A851C5DC2AEF5F8400071F88 /* ShowDebug1TFModel.swift */; };
 		A851C5F22AEF614800071F88 /* UIImageView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A851C5F12AEF614800071F88 /* UIImageView+Extension.swift */; };
 		A897D00E2B1F0BF700D89AC7 /* AppContext+SA.swift in Sources */ = {isa = PBXBuildFile; fileRef = A897D00D2B1F0BF700D89AC7 /* AppContext+SA.swift */; };
+		A8C6602C2B980DF00060E1AD /* ShowAgoraKitManager+Meta.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8C6602B2B980DF00060E1AD /* ShowAgoraKitManager+Meta.swift */; };
 		A8D58BDF2B21E8B0006205BC /* AppContext+VR.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D58BDE2B21E8B0006205BC /* AppContext+VR.swift */; };
 		AB4746E72A5E82AB00E68FBA /* ShowRobotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */; };
 		ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */; };
@@ -643,7 +646,7 @@
 		E3E77BE42B567CCE0090381C /* UIImage+SR.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3E77BE32B567CCE0090381C /* UIImage+SR.swift */; };
 		E3FE65382B21C76D001D6BF9 /* VLSRDebugView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3FE65362B21C76D001D6BF9 /* VLSRDebugView.m */; };
 		E3FE653B2B21CE33001D6BF9 /* VLSBGDebugView.m in Sources */ = {isa = PBXBuildFile; fileRef = E3FE65392B21CE33001D6BF9 /* VLSBGDebugView.m */; };
-		E4EC0885E9F906E074B75F9A /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDE991620D7140A1BF78AFF2 /* Pods_AgoraEntScenarios.framework */; };
+		E4EC0885E9F906E074B75F9A /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDE991620D7140A1BF78AFF2 /* Pods_AgoraEntScenarios.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		E7054B3D2AEB97FB00AFD93C /* home_launch_logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E7054B3B2AEB97FA00AFD93C /* home_launch_logo@2x.png */; };
 		E7054B3E2AEB97FB00AFD93C /* home_launch_logo@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = E7054B3C2AEB97FB00AFD93C /* home_launch_logo@3x.png */; };
 		E7054B422AEB987300AFD93C /* home_launch_text@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E7054B402AEB987300AFD93C /* home_launch_text@2x.png */; };
@@ -730,9 +733,24 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		A838B7402B96F1C50062355A /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		210B0F77C88BC56389E68BDD /* Pods-AgoraEntScenarios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.release.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.release.xcconfig"; sourceTree = "<group>"; };
 		63316DE582D577BACD7A4240 /* Pods-AgoraEntScenarios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.debug.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.debug.xcconfig"; sourceTree = "<group>"; };
+		A80CC5ED2B999BDB000A3851 /* ShowAICameraMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowAICameraMenuViewController.swift; sourceTree = "<group>"; };
+		A80CC5EF2B99A09C000A3851 /* ShowAICameraMenuCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowAICameraMenuCell.swift; sourceTree = "<group>"; };
 		A851C5D82AEF5F8400071F88 /* ShowDebug2TFModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebug2TFModel.swift; sourceTree = "<group>"; };
 		A851C5D92AEF5F8400071F88 /* ShowDebugAgoraKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebugAgoraKitManager.swift; sourceTree = "<group>"; };
 		A851C5DA2AEF5F8400071F88 /* ShowDebugSettingVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebugSettingVC.swift; sourceTree = "<group>"; };
@@ -740,6 +758,7 @@
 		A851C5DC2AEF5F8400071F88 /* ShowDebug1TFModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowDebug1TFModel.swift; sourceTree = "<group>"; };
 		A851C5F12AEF614800071F88 /* UIImageView+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImageView+Extension.swift"; sourceTree = "<group>"; };
 		A897D00D2B1F0BF700D89AC7 /* AppContext+SA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppContext+SA.swift"; sourceTree = "<group>"; };
+		A8C6602B2B980DF00060E1AD /* ShowAgoraKitManager+Meta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShowAgoraKitManager+Meta.swift"; sourceTree = "<group>"; };
 		A8D58BDE2B21E8B0006205BC /* AppContext+VR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppContext+VR.swift"; sourceTree = "<group>"; };
 		AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRobotService.swift; sourceTree = "<group>"; };
 		ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingBitrateCell.swift; sourceTree = "<group>"; };
@@ -1715,6 +1734,13 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		A838B7352B9578750062355A /* Meta */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Meta;
+			sourceTree = "<group>";
+		};
 		A851C5D72AEF5F8400071F88 /* Debug */ = {
 			isa = PBXGroup;
 			children = (
@@ -1807,6 +1833,7 @@
 		DD360FAC29B70CDC00CE7984 /* Show */ = {
 			isa = PBXGroup;
 			children = (
+				A838B7352B9578750062355A /* Meta */,
 				A851C5D72AEF5F8400071F88 /* Debug */,
 				DD360FAD29B70CDC00CE7984 /* showResource.bundle */,
 				DD360FAE29B70CDC00CE7984 /* Utils */,
@@ -1841,6 +1868,7 @@
 				DD360FB829B70CDC00CE7984 /* Music */,
 				DD360FBB29B70CDC00CE7984 /* ShowAgoraKitManager+Setting.swift */,
 				DD360FBC29B70CDC00CE7984 /* ShowAgoraKitManager.swift */,
+				A8C6602B2B980DF00060E1AD /* ShowAgoraKitManager+Meta.swift */,
 				DD360FBD29B70CDC00CE7984 /* ShowChatModel.swift */,
 				DD360FC029B70CDC00CE7984 /* Setting */,
 			);
@@ -1875,6 +1903,7 @@
 				DD36100B29B70CDC00CE7984 /* ShowToolMenuViewController.swift */,
 				DD36100C29B70CDC00CE7984 /* ShowLivePagesViewController.swift */,
 				DD36100D29B70CDC00CE7984 /* ShowLiveViewController.swift */,
+				A80CC5ED2B999BDB000A3851 /* ShowAICameraMenuViewController.swift */,
 				DD36100E29B70CDC00CE7984 /* Setting */,
 			);
 			path = Controller;
@@ -2015,6 +2044,7 @@
 				DD36103A29B70CDC00CE7984 /* ShowRoomChatCell.swift */,
 				DD36103B29B70CDC00CE7984 /* ShowRoomInfoView.swift */,
 				E71685782AEA4A7700C2915C /* ShowThumnbnailCanvasView.swift */,
+				A80CC5EF2B99A09C000A3851 /* ShowAICameraMenuCell.swift */,
 			);
 			path = Live;
 			sourceTree = "<group>";
@@ -4130,6 +4160,7 @@
 				DD2A43C528FFCEE7004CEDCF /* Resources */,
 				0705B034845FDC5EABCAC9B9 /* [CP] Embed Pods Frameworks */,
 				740DE495123AB3331D8C3BC3 /* [CP] Copy Pods Resources */,
+				A838B7402B96F1C50062355A /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -4716,6 +4747,7 @@
 				DD84178729090C520026B624 /* VLMineTCell.m in Sources */,
 				DD619ABF29E3E247008F63E4 /* SAGiftCell.swift in Sources */,
 				DD9EBF9C2AD5512300B4551F /* UIImageBundleExtension.swift in Sources */,
+				A8C6602C2B980DF00060E1AD /* ShowAgoraKitManager+Meta.swift in Sources */,
 				E301C01B2AF8E8E90089A79C /* VLSBGPopScoreView.m in Sources */,
 				E732CE1B2B4D2AF8004D6FB9 /* EffectsCommonObject.m in Sources */,
 				E301BD762AF4CAFF0089A79C /* VLPopSelBgView.m in Sources */,
@@ -4850,6 +4882,7 @@
 				DD9EBFC72AD5512300B4551F /* VoiceRoomSendGiftCell.swift in Sources */,
 				DD619AD129E3E247008F63E4 /* SASwitchTableViewCell.swift in Sources */,
 				E322AB5B2B5531C90099A582 /* UIWindow+Extension.swift in Sources */,
+				A80CC5EE2B999BDB000A3851 /* ShowAICameraMenuViewController.swift in Sources */,
 				E34B46012AEA5CAD0082D334 /* VRSoundCardEffectView.swift in Sources */,
 				E301BD952AF4CB000089A79C /* VLCreateRoomView.m in Sources */,
 				DD3610A529B70CDC00CE7984 /* ShowCreateLiveView.swift in Sources */,
@@ -4867,6 +4900,7 @@
 				DDA199FB28FFE579009D3E61 /* UIColor+JKGradient.m in Sources */,
 				DD9EBFBF2AD5512300B4551F /* VRSoundEffectsViewController.swift in Sources */,
 				E301C02E2AF8E8E90089A79C /* VLSBGSongList.m in Sources */,
+				A80CC5F02B99A09C000A3851 /* ShowAICameraMenuCell.swift in Sources */,
 				E3C7EF2C2AE66BC70023B069 /* VRRoomHomeListCell.swift in Sources */,
 				E301C03C2AF8E8E90089A79C /* SBGServiceModel.m in Sources */,
 				E71685212AE22D8300C2915C /* VLDiscoverCell.swift in Sources */,
@@ -5207,6 +5241,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 63316DE582D577BACD7A4240 /* Pods-AgoraEntScenarios.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
@@ -5260,8 +5295,6 @@
 					"\"AgoraClearVisionExtension\"",
 					"-framework",
 					"\"AgoraContentInspectExtension\"",
-					"-framework",
-					"\"AgoraDav1d\"",
 					"-framework",
 					"\"AgoraFaceDetectionExtension\"",
 					"-framework",
@@ -5423,7 +5456,6 @@
 					"-ld64",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.test.entfull;
-
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = wildcard;
@@ -5439,15 +5471,14 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 210B0F77C88BC56389E68BDD /* Pods-AgoraEntScenarios.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YS397FG5PA;
+				DEVELOPMENT_TEAM = JDPG69R49Z;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5492,8 +5523,6 @@
 					"\"AgoraClearVisionExtension\"",
 					"-framework",
 					"\"AgoraContentInspectExtension\"",
-					"-framework",
-					"\"AgoraDav1d\"",
 					"-framework",
 					"\"AgoraFaceDetectionExtension\"",
 					"-framework",
@@ -5652,12 +5681,10 @@
 					"\"MetalPerformanceShaders\"",
 					"-weak_framework",
 					"\"Photos\"",
-					"-ld64",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.test.entfull;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = wildcard;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AgoraEntScenarios/AgoraEntScenarios-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;

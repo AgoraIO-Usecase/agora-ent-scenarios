@@ -1477,7 +1477,7 @@ extension KTVApiImpl: KTVApiRTCDelegate {
     
     func localAudioStats(stats: AgoraRtcLocalAudioStats) {
         if useCustomAudioSource == true {return}
-        audioPlayoutDelay = Int(stats.audioPlayoutDelay)
+//        audioPlayoutDelay = Int(stats.audioPlayoutDelay)
     }
     
     func didRTCAudioRouteChanged(routing: AgoraAudioOutputRouting) {
