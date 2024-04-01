@@ -140,7 +140,7 @@ class BroadcasterViewController: BaseRoomViewController {
                 showTo1v1Print("broadcaster joinChannel[\(channelId)] success:  \(uid)")
                 guard let self = self, let rtcEngine = self.rtcEngine else {return}
                 self.callApi?.setupContentInspectConfig(rtcEngine: rtcEngine, enable: true, uid: "\(uid)", channelId: channelId)
-                self.callApi?.moderationAudio(appId: showTo1v1AppId!, channelName: channelId, user: self.currentUser!)
+                self.callApi?.moderationAudio(channelName: channelId)
             })
             
             

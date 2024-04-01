@@ -10,6 +10,7 @@ import RTMSyncManager
 import YYModel
 import SwiftyBeaver
 import AgoraRtmKit
+import AgoraCommon
 
 private func mainTreadTask(_ task: (()->())?){
     if Thread.isMainThread {
@@ -24,7 +25,6 @@ private func mainTreadTask(_ task: (()->())?){
 /// 房间内用户列表
 private let kRoomId = "pure421"
 class Pure1v1ServiceImp: NSObject {
-    private var appId: String
     private var user: Pure1v1UserInfo
     private var rtmClient: AgoraRtmClientKit
     private var userDidChangedClosure: (([Pure1v1UserInfo]) -> ())?
@@ -37,13 +37,13 @@ class Pure1v1ServiceImp: NSObject {
     
     private lazy var syncManager: AUISyncManager = {
         let config = AUICommonConfig()
-        config.appId = appId
+        config.appId = AppContext.shared.appId
         let owner = AUIUserThumbnailInfo()
         owner.userId = user.userId
         owner.userName = user.userName
         owner.userAvatar = user.avatar
         config.owner = owner
-        config.host = "https://service-staging.agora.io/room-manager"
+        config.host = "\(AppContext.shared.baseServerUrl)/room-manager"
         let manager = AUISyncManager(rtmClient: nil, commonConfig: config)
         
         return manager
@@ -54,8 +54,7 @@ class Pure1v1ServiceImp: NSObject {
         return service
     }()
     
-    required init(appId: String, user: Pure1v1UserInfo, rtmClient: AgoraRtmClientKit) {
-        self.appId = appId
+    required init(user: Pure1v1UserInfo, rtmClient: AgoraRtmClientKit) {
         self.user = user
         self.rtmClient = rtmClient
         AUIRoomContext.shared.displayLogClosure = { msg in

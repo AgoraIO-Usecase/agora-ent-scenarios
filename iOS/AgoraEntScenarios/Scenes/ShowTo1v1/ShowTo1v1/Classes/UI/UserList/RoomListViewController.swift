@@ -57,7 +57,7 @@ class RoomListViewController: UIViewController {
     }
     private var rtmToken = ""
     private lazy var rtcEngine: AgoraRtcEngineKit = _createRtcEngine()
-    private lazy var rtmClient: AgoraRtmClientKit = createRtmClient(appId: showTo1v1AppId!, userId: userInfo!.uid)
+    private lazy var rtmClient: AgoraRtmClientKit = createRtmClient(appId: AppContext.shared.appId, userId: userInfo!.uid)
     private var rtmManager: CallRtmManager?
     private var callState: CallStateType = .idle
     private let callApi = CallApiImpl()
@@ -267,9 +267,7 @@ extension RoomListViewController {
             return
         }
         debugInfo("renewTokens")
-        NetworkManager.shared.generateTokens(appId: showTo1v1AppId!,
-                                             appCertificate: showTo1v1AppCertificate!,
-                                             channelName: "",
+        NetworkManager.shared.generateTokens(channelName: "",
                                              uid: userInfo.uid,
                                              tokenGeneratorType: .token007,
                                              tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
@@ -314,7 +312,7 @@ extension RoomListViewController {
             showTo1v1Warn("_setupService fail! service already setup")
             return
         }
-        let service = ShowTo1v1ServiceImp(appId: showTo1v1AppId!, user: userInfo, rtmClient: rtmClient)
+        let service = ShowTo1v1ServiceImp(user: userInfo, rtmClient: rtmClient)
         self.service = service
     }
     
@@ -329,7 +327,7 @@ extension RoomListViewController {
         }
         
         let userId = self.userInfo?.getUIntUserId() ?? 0
-        let rtmManager = CallRtmManager(appId: showTo1v1AppId!,
+        let rtmManager = CallRtmManager(appId: AppContext.shared.appId,
                                         userId: "\(userId)",
                                         rtmClient: rtmClient)
         rtmManager.delegate = self
@@ -350,7 +348,7 @@ extension RoomListViewController {
         }
         
         let config = CallConfig()
-        config.appId = showTo1v1AppId!
+        config.appId = AppContext.shared.appId
         config.userId = userInfo!.getUIntUserId()
         config.rtcEngine = rtcEngine
         config.signalClient = signalClient
@@ -373,7 +371,7 @@ extension RoomListViewController {
     
     private func _createRtcEngine() ->AgoraRtcEngineKit {
         let config = AgoraRtcEngineConfig()
-        config.appId = showTo1v1AppId!
+        config.appId = AppContext.shared.appId
         config.channelProfile = .liveBroadcasting
         config.audioScenario = .gameStreaming
         config.areaCode = .global

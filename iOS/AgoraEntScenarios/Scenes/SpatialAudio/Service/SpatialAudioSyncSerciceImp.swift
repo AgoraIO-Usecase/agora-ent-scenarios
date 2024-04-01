@@ -236,7 +236,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
                     }
                 }
                 //添加鉴黄接口
-                NetworkManager.shared.voiceIdentify(channelName: room.channel_id ?? "", channelType: room.sound_effect == 3 ? 0 : 1, sceneType: .voice) { msg in
+                NetworkManager.shared.voiceIdentify(channelName: room.channel_id ?? "", channelType: room.sound_effect == 3 ? 0 : 1, sceneType: "voice_chat") { msg in
                     print("\(msg == nil ? "开启鉴黄成功" : "开启鉴黄失败")")
                 }
             } fail: { error in

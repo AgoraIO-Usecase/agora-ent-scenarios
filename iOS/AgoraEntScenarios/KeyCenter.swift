@@ -97,7 +97,11 @@ class KeyCenter: NSObject {
     static let CloudPlayerKey: String? = nil
     static let CloudPlayerSecret: String? = nil
 
-    static var baseServerUrl: String? = "https://service.shengwang.cn/toolbox"
+    static var baseServerUrl: String? = "https://service.shengwang.cn"
+    static var baseTestServerUrl: String? = "https://service-staging.shengwang.cn"
     static var onlineBaseServerUrl: String? = baseServerUrl
+    
+    static var dynamicResourceUrl: String = ""
+//    static var dynamicResourceUrl: String = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/resource/manifest/manifestList"
 
 }

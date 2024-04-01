@@ -41,11 +41,7 @@ public class ShowTo1v1Context: NSObject {
     }
     
     public static func showScene(viewController: UIViewController,
-                                 appId: String,
-                                 appCertificate: String,
                                  userInfo: ShowTo1v1UserInfo) {
-        showTo1v1AppId = appId
-        showTo1v1AppCertificate = appCertificate
         let vc = RoomListViewController()
         vc.userInfo = userInfo
         viewController.navigationController?.pushViewController(vc, animated: true)

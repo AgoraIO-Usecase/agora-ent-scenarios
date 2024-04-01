@@ -114,7 +114,7 @@ extension VRRoomsViewController {
     private func fetchIMConfig(completion: ((Bool) -> ())? = nil) {
         SVProgressHUD.show()
         self.view.isUserInteractionEnabled = false
-        NetworkManager.shared.generateIMConfig(type: 1, channelName: "", nickName: VLUserCenter.user.name, chatId: "", imUid: VLUserCenter.user.id, password: "12345678", uid:  VLUserCenter.user.id, sceneType: .voice) { [weak self] uid, room_id, token in
+        NetworkManager.shared.generateIMConfig(type: 1, channelName: "", nickName: VLUserCenter.user.name, chatId: "", imUid: VLUserCenter.user.id, password: "12345678", uid:  VLUserCenter.user.id) { [weak self] uid, room_id, token in
             self?.view.isUserInteractionEnabled = true
             VLUserCenter.user.chat_uid = uid ?? ""
             VLUserCenter.user.im_token = token ?? ""

@@ -13,7 +13,7 @@ public class VideoLoaderApiImpl: NSObject {
     public var printClosure: ((String)->())?
     public var warningClosure: ((String)->())?
     public var errorClosure: ((String)->())?
-    private var config: VideoLoaderConfig?
+    var config: VideoLoaderConfig?
     
     private let apiProxy = VideoLoaderApiProxy()
     private var profilerMap: [String: VideoLoaderProfiler] = [:]

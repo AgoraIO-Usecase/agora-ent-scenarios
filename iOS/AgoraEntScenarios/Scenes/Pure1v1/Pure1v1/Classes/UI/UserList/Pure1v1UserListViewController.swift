@@ -44,7 +44,7 @@ class Pure1v1UserListViewController: UIViewController {
     private var rtcToken: String = ""
     private var rtmToken: String = ""
     private lazy var rtcEngine = _createRtcEngine()
-    private lazy var rtmClient: AgoraRtmClientKit = createRtmClient(appId: pure1V1AppId!, userId: userInfo!.userId)
+    private lazy var rtmClient: AgoraRtmClientKit = createRtmClient(appId: AppContext.shared.appId, userId: userInfo!.userId)
     private var rtmManager: CallRtmManager?
     private var callState: CallStateType = .idle
     private var connectedUserId: UInt?
@@ -150,9 +150,7 @@ extension Pure1v1UserListViewController {
             return
         }
         let date = Date()
-        NetworkManager.shared.generateTokens(appId: pure1V1AppId!,
-                                             appCertificate: pure1V1AppCertificate!,
-                                             channelName: "",
+        NetworkManager.shared.generateTokens(channelName: "",
                                              uid: userInfo?.userId ?? "",
                                              tokenGeneratorType: .token007,
                                              tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
@@ -221,7 +219,7 @@ extension Pure1v1UserListViewController {
             pure1v1Warn("_setupService fail! service already setup")
             return
         }
-        let service = Pure1v1ServiceImp(appId: pure1V1AppId!, user: userInfo, rtmClient: rtmClient)
+        let service = Pure1v1ServiceImp(user: userInfo, rtmClient: rtmClient)
         service.subscribeUserListChanged {[weak self] userList in
             self?.userList = userList
         }
@@ -240,7 +238,7 @@ extension Pure1v1UserListViewController {
             
         //初始化rtm manager并login
         let userId = self.userInfo?.userId ?? ""
-        let rtmManager = CallRtmManager(appId: pure1V1AppId!,
+        let rtmManager = CallRtmManager(appId: AppContext.shared.appId,
                                         userId: userId,
                                         rtmClient: rtmClient)
         rtmManager.delegate = self
@@ -254,7 +252,7 @@ extension Pure1v1UserListViewController {
         let signalClient = CallRtmSignalClient(rtmClient: self.rtmManager!.getRtmClient())
         
         let config = CallConfig()
-        config.appId = pure1V1AppId!
+        config.appId = AppContext.shared.appId
         config.userId = UInt(userInfo?.userId ?? "")!
         config.rtcEngine = rtcEngine
         config.signalClient = signalClient
@@ -277,7 +275,7 @@ extension Pure1v1UserListViewController {
     
     private func _createRtcEngine() ->AgoraRtcEngineKit {
         let config = AgoraRtcEngineConfig()
-        config.appId = pure1V1AppId!
+        config.appId = AppContext.shared.appId
         config.channelProfile = .liveBroadcasting
         config.audioScenario = .gameStreaming
         config.areaCode = .global
@@ -345,22 +343,24 @@ extension Pure1v1UserListViewController {
     @objc func _refreshAction() {
         let date = Date()
         _setupAPIConfig {[weak self] error in
+            guard let self = self, let service = self.service else { return }
             if let error = error {
                 pure1v1Error("refresh _setupAPIConfig fail: \(error.localizedDescription)")
-                self?.listView.endRefreshing()
+                self.listView.endRefreshing()
                 AUIToast.show(text: error.localizedDescription)
                 return
             }
             pure1v1Print("refresh setupAPI cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
-            self?.service?.enterRoom {[weak self] error in
+            service.enterRoom {[weak self] error in
+                guard let self = self, let service = self.service else { return }
                 if let error = error {
                     pure1v1Error("refresh enterRoom fail: \(error.localizedDescription)")
-                    self?.listView.endRefreshing()
+                    self.listView.endRefreshing()
                     AUIToast.show(text: error.localizedDescription)
                     return
                 }
                 pure1v1Print("refresh enterRoom cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
-                self?.service?.getUserList { list, error in
+                service.getUserList {[weak self] list, error in
                     guard let self = self else {return}
                     self.listView.endRefreshing()
                     if let error = error {
@@ -572,22 +572,28 @@ extension Pure1v1UserListViewController {
     
     /// 语音审核
     private func moderationAudio(channelName: String) {
-        let userInfo = ["id": userInfo?.userId ?? "",
-                        "sceneName": "Pure1v1",
-                        "userNo": userInfo?.userId ?? "",
-                        "userName": userInfo?.userName ?? ""] as NSDictionary
-        let parasm: [String: Any] = ["appId": pure1V1AppId!,
-                                     "channelName": channelName,
-                                     "channelType": AgoraChannelProfile.liveBroadcasting.rawValue,
-                                     "traceId": NSString.withUUID().md5(),
-                                     "src": "iOS",
-                                     "payload": userInfo.yy_modelToJSONString()]
-        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.shengwang.cn/v1/moderation/audio",
-                                          params: parasm) { response in
-            pure1v1Print("moderationAudio response === \(response)")
-        } failure: { errr in
-            pure1v1Error(errr)
+        NetworkManager.shared.voiceIdentify(channelName: channelName,
+                                            channelType: AgoraChannelProfile.liveBroadcasting.rawValue,
+                                            sceneType: "Pure1v1") { errStr in
+            guard let errStr = errStr else {return}
+            pure1v1Error("moderationAudio fail === \(errStr)")
         }
+//        let userInfo = ["id": userInfo?.userId ?? "",
+//                        "sceneName": "Pure1v1",
+//                        "userNo": userInfo?.userId ?? "",
+//                        "userName": userInfo?.userName ?? ""] as NSDictionary
+//        let parasm: [String: Any] = ["appId": pure1V1AppId!,
+//                                     "channelName": channelName,
+//                                     "channelType": AgoraChannelProfile.liveBroadcasting.rawValue,
+//                                     "traceId": NSString.withUUID().md5(),
+//                                     "src": "iOS",
+//                                     "payload": userInfo.yy_modelToJSONString()]
+//        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.shengwang.cn/v1/moderation/audio",
+//                                          params: parasm) { response in
+//            pure1v1Print("moderationAudio response === \(response)")
+//        } failure: { errr in
+//            pure1v1Error(errr)
+//        }
     }
 }
 

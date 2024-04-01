@@ -25,11 +25,13 @@ class CallViewController: BaseRoomViewController {
                 let connection = AgoraRtcConnection(channelId: oldValue, localUid: localUid)
                 connection.channelId = oldValue
                 rtcEngine?.removeDelegateEx(self.realTimeView, connection: connection)
+                rtcEngine?.removeDelegateEx(self, connection: connection)
             }
             
             if let rtcChannelName = rtcChannelName {
                 let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: localUid)
                 rtcEngine?.addDelegateEx(self.realTimeView, connection: connection)
+                rtcEngine?.addDelegateEx(self, connection: connection)
                 self.realTimeView.roomId = rtcChannelName
             }
         }
@@ -213,9 +215,7 @@ extension CallViewController {
                 callApi?.setupContentInspectExConfig(rtcEngine: rtcEngine!,
                                                    enable: true,
                                                    connection: connection)
-                callApi?.moderationAudio(appId: showTo1v1AppId!,
-                                         channelName: channelId,
-                                         user: userInfo)
+                callApi?.moderationAudio(channelName: channelId)
             }
             break
         case .prepared:
