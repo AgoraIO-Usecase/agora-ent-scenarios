@@ -138,16 +138,14 @@ class ShowTo1v1ServiceImpl constructor(
     }
 
     override fun leaveRoom(roomInfo: ShowTo1v1RoomInfo, completion: (error: Exception?) -> Unit) {
-        val u = user ?: return
         val scene = syncManager.getScene(roomInfo.roomId)
         scene.unbindRespDelegate(this)
         scene.leave()
-        scene.delete()
-
         if (roomInfo.userId == UserManager.getInstance().user.id.toString()) {
             roomManager.destroyRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomInfo.roomId) { e ->
 
             }
+            scene.delete()
         }
     }
 

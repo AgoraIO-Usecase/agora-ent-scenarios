@@ -1,7 +1,6 @@
 package io.agora.scene.pure1v1
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import io.agora.scene.pure1v1.callapi.CallApiImpl
@@ -12,17 +11,23 @@ import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.data.MediaPlayerSource
 import io.agora.rtc2.*
 import io.agora.rtc2.Constants.*
+import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoCanvas
-import io.agora.rtm.ErrorInfo
-import io.agora.rtm.ResultCallback
+import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtm.RtmClient
-import io.agora.rtm.RtmConfig
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.pure1v1.audio.AudioScenarioApi
 import io.agora.scene.pure1v1.callapi.signalClient.createRtmSignalClient
 import io.agora.scene.pure1v1.service.Pure1v1ServiceImp
 import io.agora.scene.pure1v1.service.UserInfo
+import io.agora.scene.pure1v1.signalClient.CallRtmManager
+import io.agora.scene.pure1v1.signalClient.ICallRtmManagerListener
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /*
  * 业务逻辑管理模块
@@ -76,22 +81,31 @@ class CallServiceManager {
 
     private var mMediaPlayer2: IMediaPlayer? = null
 
-    private var rtmClient: RtmClient? = null
+    private var callRtmManager: CallRtmManager? = null
 
-    private fun _createRtmClient(): RtmClient {
-        val rtmConfig = RtmConfig.Builder(BuildConfig.AGORA_APP_ID, UserManager.getInstance().user.id.toString()).build()
-        if (rtmConfig.userId.isEmpty()) {
-            Log.d(tag, "userId is empty")
-        }
-        if (rtmConfig.appId.isEmpty()) {
-            Log.d(tag, "appId is empty")
-        }
-        return RtmClient.create(rtmConfig)
-    }
+    var scenarioApi: AudioScenarioApi? = null
 
     fun setup(context: Context, completion: (success: Boolean)-> Unit) {
+        // 初始化 rtm manager
+        val rtmManager = CallRtmManager(BuildConfig.AGORA_APP_ID, UserManager.getInstance().user.id.toInt())
+        callRtmManager = rtmManager
+        rtmManager.addListener(object : ICallRtmManagerListener {
+            override fun onConnected() {
+                // RTM 已连接
+            }
 
-        rtmClient = _createRtmClient()
+            override fun onDisconnected() {
+                // RTM 已断开
+            }
+
+            override fun onConnectionLost() {
+                // RTM 连接已失去，需要做重连逻辑
+            }
+
+            override fun onTokenPrivilegeWillExpire(channelName: String) {
+                // RTM Token 过期， 需要重新获取 token
+            }
+        })
 
         mPrepareConfig = PrepareConfig()
         mContext = context
@@ -109,32 +123,40 @@ class CallServiceManager {
         // 初始化mpk2，用于播放来电铃声
         mMediaPlayer2 = engine.createMediaPlayer()
         // 初始化场景service
-        sceneService = Pure1v1ServiceImp(context, rtmClient!!, user) {
+        sceneService = Pure1v1ServiceImp(context, rtmManager.getRtmClient(), user) {
             onUserChanged?.invoke()
         }
+
         // 创建并初始化CallAPI
         val callApi = CallApiImpl(context)
         this.callApi = callApi
-
         callApi.initialize(CallConfig(
             BuildConfig.AGORA_APP_ID,
             user.userId.toInt(),
             engine,
-            createRtmSignalClient(rtmClient!!)
+            createRtmSignalClient(rtmManager.getRtmClient())
         ))
 
+        // 初始化音频场景化API
+        val scenarioApi = AudioScenarioApi(engine)
+        scenarioApi.initialize()
+        this.scenarioApi = scenarioApi
+
         // 获取万能Token
-        fetchToken {
+        fetchToken { success ->
             // 外部创建需要自行管理login
-            rtmClient?.login(rtmToken, object: ResultCallback<Void?> {
-                override fun onSuccess(p0: Void?) {
-                    completion.invoke(true)
+            if (success) {
+                rtmManager.login(rtmToken) {
+                    if (it == null) {
+                        completion.invoke(true)
+                    } else {
+                        Pure1v1Logger.e(tag, null,"login error = ${it.msg}")
+                        completion.invoke(false)
+                    }
                 }
-                override fun onFailure(p0: ErrorInfo?) {
-                    Log.e(tag, "login error = ${p0.toString()}")
-                    completion.invoke(false)
-                }
-            })
+            } else {
+                completion.invoke(false)
+            }
         }
     }
 
@@ -152,7 +174,6 @@ class CallServiceManager {
             mMediaPlayer2?.destroy()
             mMediaPlayer2 = null
             RtcEngine.destroy()
-//            RtmClient.release()
         }
         callApi = null
         sceneService?.leaveRoom {
@@ -160,28 +181,29 @@ class CallServiceManager {
         sceneService?.reset()
         sceneService = null
 
-        rtmClient?.logout(object : ResultCallback<Void> {
-            override fun onSuccess(responseInfo: Void?) {}
-            override fun onFailure(errorInfo: ErrorInfo?) {}
-        })
+        callRtmManager?.logout()
+        callRtmManager = null
+
         RtmClient.release()
     }
 
     fun reInit() {
         val uid = localUser?.userId ?: return
+        val manager = callRtmManager ?: return
         callApi?.initialize(CallConfig(
             BuildConfig.AGORA_APP_ID,
             uid.toInt(),
             rtcEngine,
-            createRtmSignalClient(rtmClient!!)
+            createRtmSignalClient(manager.getRtmClient())
         ))
     }
 
     /*
      * 获取万能Token并初始化CallAPI
      */
-    private fun fetchToken(success: () -> Unit) {
+    private fun fetchToken(completion: (success: Boolean) -> Unit) {
         val user = localUser ?: return
+        Pure1v1Logger.d(tag, "generateTokens")
         TokenGenerator.generateTokens(
             "",
             user.userId,
@@ -197,12 +219,15 @@ class CallServiceManager {
                 }
                 this.rtcToken = rtcToken
                 this.rtmToken = rtmToken
-                success.invoke()
+                Pure1v1Logger.d(tag, "generateTokens success")
+                completion.invoke(true)
             }, {
-                Pure1v1Logger.e(tag, "generateTokens failed: $it")
+                Pure1v1Logger.e(tag, null,"generateTokens failed: $it")
+                completion.invoke(false)
             })
     }
 
+    // 准备通话环境
     fun prepareForCall(success: () -> Unit) {
         val api = callApi ?: return
         val user = localUser ?: return
@@ -241,6 +266,7 @@ class CallServiceManager {
         }
     }
 
+    // 播放来电秀
     fun playCallShow(url: String) {
         val ret = mMediaPlayer?.openWithMediaSource(MediaPlayerSource().apply {
             setUrl(url)
@@ -252,6 +278,7 @@ class CallServiceManager {
         Pure1v1Logger.d(tag, "playCallShow: $ret")
     }
 
+    // 停止来电秀
     fun stopCallShow() {
         val player = mMediaPlayer ?: return
         val canvas = VideoCanvas(null)
@@ -264,6 +291,7 @@ class CallServiceManager {
         Pure1v1Logger.d(tag, "stopCallShow：$ret")
     }
 
+    // 渲染来电秀视频
     fun renderCallShow(view: View) {
         val player = mMediaPlayer ?: return
         val canvas = VideoCanvas(view)
@@ -273,6 +301,7 @@ class CallServiceManager {
         rtcEngine?.setupLocalVideo(canvas)
     }
 
+    // 播放来电铃声
     fun playCallMusic(url: String) {
         val ret = mMediaPlayer2?.openWithMediaSource(MediaPlayerSource().apply {
             setUrl(url)
@@ -283,11 +312,38 @@ class CallServiceManager {
         Pure1v1Logger.d(tag, "playCallMusic：$ret")
     }
 
+    // 停止播放来电铃声
     fun stopCallMusic() {
         val ret = mMediaPlayer2?.stop()
         Pure1v1Logger.d(tag, "stopCallMusic：$ret")
     }
 
+    // 切换摄像头开关状态
+    fun switchCamera(cameraOn: Boolean) {
+        val channelId = connectedChannelId ?: return
+        val uid = localUser?.userId ?: return
+        if (cameraOn) {
+            rtcEngine?.startPreview()
+            rtcEngine?.muteLocalVideoStreamEx(false, RtcConnection(channelId, uid.toInt()))
+        } else {
+            rtcEngine?.stopPreview()
+            rtcEngine?.muteLocalVideoStreamEx(true, RtcConnection(channelId, uid.toInt()))
+        }
+    }
+
+    // 切换麦克风开关状态
+    fun switchMic(micOn: Boolean) {
+        val channelId = connectedChannelId ?: return
+        val uid = localUser?.userId ?: return
+        if (micOn) {
+            rtcEngine?.muteLocalAudioStreamEx(false, RtcConnection(channelId, uid.toInt()))
+        } else {
+            rtcEngine?.muteLocalAudioStreamEx(true, RtcConnection(channelId, uid.toInt()))
+        }
+    }
+
+    // -------------------------- inner private --------------------------
+    // 创建 RtcEngine 实例
     private fun createRtcEngine(): RtcEngineEx {
         val context = mContext ?: throw RuntimeException("RtcEngine create failed!")
         var rtcEngine: RtcEngineEx? = null
@@ -297,16 +353,37 @@ class CallServiceManager {
         config.mEventHandler = object : IRtcEngineEventHandler() {
             override fun onError(err: Int) {
                 super.onError(err)
-                Pure1v1Logger.e(tag, "IRtcEngineEventHandler onError:$err")
+                Pure1v1Logger.e(tag, null, "IRtcEngineEventHandler onError:$err")
             }
         }
-        config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING
-        config.mAudioScenario = Constants.AUDIO_SCENARIO_GAME_STREAMING
+        config.mChannelProfile = CHANNEL_PROFILE_LIVE_BROADCASTING
+        config.mAudioScenario = AUDIO_SCENARIO_GAME_STREAMING
+        config.addExtension("agora_ai_echo_cancellation_extension")
+        config.addExtension("agora_ai_noise_suppression_extension")
         try {
             rtcEngine = RtcEngine.create(config) as RtcEngineEx
+
+            // 设置视频最佳配置
+            rtcEngine.setCameraCapturerConfiguration(CameraCapturerConfiguration(
+                CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_FRONT,
+                CameraCapturerConfiguration.CaptureFormat(720, 1280, 24)
+            ).apply {
+                followEncodeDimensionRatio = true
+            })
+            rtcEngine.setVideoEncoderConfiguration(
+                VideoEncoderConfiguration().apply {
+                    dimensions = VideoEncoderConfiguration.VideoDimensions(720, 1280)
+                    frameRate = 24
+                    degradationPrefer = VideoEncoderConfiguration.DEGRADATION_PREFERENCE.MAINTAIN_BALANCED
+                }
+            )
+            rtcEngine.setParameters("\"che.video.videoCodecIndex\": 2")
+            rtcEngine.enableInstantMediaRendering()
+            rtcEngine.setParameters("{\"rtc.video.quickIntraHighFec\": true}")
+            rtcEngine.setParameters("{\"rtc.network.e2e_cc_mode\": 3}")
         } catch (e: Exception) {
             e.printStackTrace()
-            Pure1v1Logger.e(tag, "RtcEngine.create() called error: $e")
+            Pure1v1Logger.e(tag, null,"RtcEngine.create() called error: $e")
         }
         return rtcEngine ?: throw RuntimeException("RtcEngine create failed!")
     }

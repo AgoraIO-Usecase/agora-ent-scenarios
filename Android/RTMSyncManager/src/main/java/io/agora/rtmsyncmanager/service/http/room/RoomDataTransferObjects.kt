@@ -63,6 +63,7 @@ data class RoomListResp(
                 owner = it.payload?.owner
                 thumbnail = it.payload?.thumbnail ?: ""
                 createTime = it.createTime
+                customPayload = it.payload?.customPayload
             })
         }
         return list

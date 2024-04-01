@@ -72,6 +72,7 @@
     <color name="black_60_percent">#99000000</color>
     <color name="black_70_percent">#B3000000</color>
     <color name="black_80_percent">#CC000000</color>
+    <color name="black_85_percent">#D9000000</color>
     <color name="blue">#ff26b5ff</color>
     <color name="green">#00FF00</color>
     <color name="green_and_blue">#6ED9C8</color>
