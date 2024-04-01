@@ -42,7 +42,10 @@ def all_pods
 
 #  pod 'AgoraRtcEngine_Special_iOS', :path => 'AgoraRtcEngine_iOS.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
-  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.26'
+  pod 'AgoraRtcEngine_Special_iOS', '4.2.6.6'
+  
+  pod 'AGResourceManager', :path => 'AGResourceManager.podspec'
+  pod 'Test_metaSDK'
 
   pod 'CallAPI', :path => 'AgoraEntScenarios/Common/API/CallAPI'
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
@@ -79,7 +82,7 @@ def all_pods
   pod 'Agora_Chat_iOS', '1.0.8'
   pod 'SwiftyBeaver', '1.9.5'
   pod 'Protobuf', '3.22.1'
- #  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
+   pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
 
   #bugly
   pod 'Bugly','2.5.93'

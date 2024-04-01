@@ -742,34 +742,34 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(self.singRole == KTVSingRoleAudience){
             return;
         };
-
-        NSInteger audioEffectPreset = [dict[@"preset"] integerValue];
-        switch (audioEffectPreset) {
-            case AgoraAudioEffectPresetOff:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOffHarmony];
-                NSLog(@"effect:Off");
-                break;
-            case AgoraAudioEffectPresetRoomAcousticsKTV:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousticsKTVHarmony];
-                NSLog(@"effect:KTV");
-                break;
-            case AgoraAudioEffectPresetRoomAcousVocalConcer:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousVocalConcerHarmony];
-                NSLog(@"effect:Concer");
-                break;
-            case AgoraAudioEffectPresetRoomAcousStudio:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousStudioHarmony];
-                NSLog(@"effect:Studio");
-                break;
-            case AgoraAudioEffectPresetRoomAcousPhonograph:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousPhonographHarmony];
-                NSLog(@"effect:graph");
-                break;
-            default:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOffHarmony];
-                NSLog(@"effect:Off");
-                break;
-        }
+//
+//        NSInteger audioEffectPreset = [dict[@"preset"] integerValue];
+//        switch (audioEffectPreset) {
+//            case AgoraAudioEffectPresetOff:
+//                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOffHarmony];
+//                NSLog(@"effect:Off");
+//                break;
+//            case AgoraAudioEffectPresetRoomAcousticsKTV:
+//                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousticsKTVHarmony];
+//                NSLog(@"effect:KTV");
+//                break;
+//            case AgoraAudioEffectPresetRoomAcousVocalConcer:
+//                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousVocalConcerHarmony];
+//                NSLog(@"effect:Concer");
+//                break;
+//            case AgoraAudioEffectPresetRoomAcousStudio:
+//                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousStudioHarmony];
+//                NSLog(@"effect:Studio");
+//                break;
+//            case AgoraAudioEffectPresetRoomAcousPhonograph:
+//                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousPhonographHarmony];
+//                NSLog(@"effect:graph");
+//                break;
+//            default:
+//                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOffHarmony];
+//                NSLog(@"effect:Off");
+//                break;
+//        }
     } else if([dict[@"cmd"] isEqualToString:@"cancelVoiceHighlight"]) {
         //人生突出实效
         [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];

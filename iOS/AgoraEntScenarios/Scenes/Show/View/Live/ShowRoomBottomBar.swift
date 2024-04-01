@@ -13,6 +13,7 @@ protocol ShowRoomBottomBarDelegate: NSObjectProtocol {
     func onClickPKButton(_ button: ShowRedDotButton)
     func onClickLinkButton(_ button: ShowRedDotButton)
     func onClickBeautyButton()
+    func onClickAICameraButton()
     func onClickMusicButton()
     func onClickSettingButton()
 }
@@ -83,6 +84,14 @@ class ShowRoomBottomBar: UIView {
         return button
     }()
     
+    // 美颜
+    private lazy var aiCameraButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage.show_sceneImage(name: "show_live_aicamera"), for: .normal)
+        button.addTarget(self, action: #selector(didClickAICameraButton), for: .touchUpInside)
+        return button
+    }()
+    
     // 音乐
     private lazy var musicButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -114,7 +123,7 @@ class ShowRoomBottomBar: UIView {
     
     private func createSubviews(){
         if isBroadcastor {
-            buttonArray = [pkButton, linkButton, beautyButton, musicButton, settingButton]
+            buttonArray = [pkButton, linkButton, beautyButton, aiCameraButton, musicButton, settingButton]
         }else{
             buttonArray = [linkButton,settingButton]
         }
@@ -148,6 +157,10 @@ class ShowRoomBottomBar: UIView {
     
     @objc private func didClickBeautyButton() {
         delegate?.onClickBeautyButton()
+    }
+    
+    @objc private func didClickAICameraButton(){
+        delegate?.onClickAICameraButton()
     }
     
     @objc private func didClickMusicButton() {

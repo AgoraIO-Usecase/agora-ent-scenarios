@@ -7,6 +7,7 @@
 
 import UIKit
 import AgoraCommon
+import AGResourceManager
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
@@ -17,6 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(didTokenExpired), name: NSNotification.Name(rawValue: "AGORAENTTOKENEXPIRED"), object: nil)
         
         window?.configRootViewController()
+        ShowAgoraKitManager.downloadManifestList()
         return true
     }
 
@@ -36,4 +38,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         VLToast.toast(NSLocalizedString("app_expire", comment: ""))
         window?.configRootViewController()
     }
+
 }
