@@ -325,14 +325,14 @@ extension Pure1v1UserListViewController {
     }
     
     @objc func _backAction() {
-        AgoraRtcEngineKit.destroy()
         callApi.deinitialize {
         }
         service?.leaveRoom { err in
         }
         
-        AgoraRtcEngineKit.destroy()
         rtmManager?.logout()
+        rtmClient.destroy()
+        AgoraRtcEngineKit.destroy()
         self.navigationController?.popViewController(animated: true)
     }
     
