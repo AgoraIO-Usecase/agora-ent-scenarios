@@ -3,33 +3,33 @@ package io.agora.rtmsyncmanager.service.http.room
 import io.agora.rtmsyncmanager.service.http.PayloadResp
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 
-data class CreateRoomReq(
+data class CreateRoomReq constructor(
     val appId: String,
     val sceneId: String,
     val roomId: String,
     val payload: AUIRoomInfo
 )
-data class CreateRoomResp(
+data class CreateRoomResp constructor(
     val roomId: String,
     val payload: AUIRoomInfo,
     val createTime: Long,
     val updateTime: Long
 )
-data class RoomUserReq(
+data class RoomUserReq constructor(
     val appId: String,
     val sceneId: String,
     val roomId: String
 )
-data class DestroyRoomResp(
+data class DestroyRoomResp constructor(
     val roomId: String
 )
-data class RoomListReq(
+data class RoomListReq constructor(
     val appId: String,
     val sceneId: String,
     val pageSize: Int,
     val lastCreateTime: Long?
 )
-data class QueryRoomResp(
+data class QueryRoomResp constructor(
     val appId: String,
     val sceneId: String,
     val roomId: String,
@@ -37,18 +37,18 @@ data class QueryRoomResp(
     val createTime: Long,
     val updateTime: Long
 )
-data class UpdateRoomReq(
+data class UpdateRoomReq constructor(
     val appId: String,
     val sceneId: String,
     val roomId: String,
     val payload: AUIRoomInfo
 )
-data class QueryRoomReq(
+data class QueryRoomReq constructor(
     val appId: String,
     val sceneId: String,
     val roomId: String
 )
-data class RoomListResp(
+data class RoomListResp constructor(
     val pageSize: Int,
     val count: Int,
     val list: List<PayloadResp<AUIRoomInfo>>
@@ -59,10 +59,7 @@ data class RoomListResp(
             list.add(AUIRoomInfo().apply {
                 roomId = it.roomId
                 roomName = it.payload?.roomName ?: ""
-                memberCount = it.payload?.memberCount ?: 0
-                owner = it.payload?.owner
-                thumbnail = it.payload?.thumbnail ?: ""
-                createTime = it.createTime
+                roomOwner = it.payload?.roomOwner
                 customPayload = it.payload?.customPayload
             })
         }

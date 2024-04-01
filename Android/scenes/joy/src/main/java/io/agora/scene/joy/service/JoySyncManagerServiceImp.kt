@@ -1,9 +1,11 @@
 package io.agora.scene.joy.service
 
 import android.content.Context
+import android.content.res.Resources
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.util.TypedValue
 import com.google.gson.reflect.TypeToken
 import io.agora.rtmsyncmanager.ISceneResponse
 import io.agora.rtmsyncmanager.SyncManager
@@ -111,7 +113,7 @@ class JoySyncManagerServiceImp constructor(
             }
             if (list != null) {
                 //按照创建时间顺序排序
-                list.sortBy { it.createTime }
+                list.sortBy { it.customPayload[JoyParameters.CREATED_AT] as? Long }
                 runOnMainThread { completion.invoke(list) }
             } else {
                 runOnMainThread { completion.invoke(emptyList()) }
@@ -126,13 +128,14 @@ class JoySyncManagerServiceImp constructor(
         val roomInfo = AUIRoomInfo().apply {
             this.roomId = roomId
             this.roomName = roomName
-            this.owner = AUIUserThumbnailInfo().apply {
+            this.roomOwner = AUIUserThumbnailInfo().apply {
                 userId = mUser.id.toString()
                 userName = mUser.name
                 userAvatar = mUser.headUrl
             }
-            this.thumbnail = getRandomThumbnailId(createdAt)
-            this.createTime = createdAt
+            this.customPayload[JoyParameters.ROOM_USER_COUNT] = 1
+            this.customPayload[JoyParameters.THUMBNAIL_ID] = getRandomThumbnailId(createdAt)
+            this.customPayload[JoyParameters.CREATED_AT] = createdAt
         }
         mRoomManager.createRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomInfo) { e, info ->
             if (info != null) {
@@ -161,6 +164,11 @@ class JoySyncManagerServiceImp constructor(
 
     override fun updateRoom(roomInfo: AUIRoomInfo, completion: (error: Exception?) -> Unit) {
         mRoomManager.updateRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomInfo) { error, roomInfo ->
+            if (error==null){
+                roomInfo?.let {
+                    mRoomMap[it.roomId] = roomInfo
+                }
+            }
             runOnMainThread {
                 completion.invoke(error)
             }
@@ -180,6 +188,14 @@ class JoySyncManagerServiceImp constructor(
             } else {
                 JoyLogger.d(TAG, "enter scene success")
                 mCurrRoomNo = roomInfo.roomId
+                // 重置体验时间事件
+                mMainHandler.removeCallbacks(mTimerRoomEndRun)
+                val createTime = (roomInfo.customPayload[JoyParameters.CREATED_AT] as? Long) ?: 0
+                // 定时删除房间
+                val expireLeftTime =
+                    JoyServiceProtocol.ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - createTime)
+                JoyLogger.d(TAG, "expireLeftTime: $expireLeftTime")
+                mMainHandler.postDelayed(mTimerRoomEndRun, expireLeftTime)
                 runOnMainThread {
                     completion.invoke(null)
                 }
@@ -196,8 +212,10 @@ class JoySyncManagerServiceImp constructor(
         scene.unbindRespDelegate(this)
         mSyncManager.rtmManager.unsubscribeMessage(this)
 
-        if (roomInfo.owner?.userId == mUser.id.toString() ||
-            TimeUtils.currentTimeMillis() - roomInfo.createTime >= JoyServiceProtocol.ROOM_AVAILABLE_DURATION) {
+        val createTime = (roomInfo.customPayload[JoyParameters.CREATED_AT] as? Long) ?: 0
+        if (roomInfo.roomOwner?.userId == mUser.id.toString() ||
+            TimeUtils.currentTimeMillis() - createTime >= JoyServiceProtocol.ROOM_AVAILABLE_DURATION
+        ) {
             // 房主离开
             scene.delete()
             mRoomManager.destroyRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomInfo.roomId) { e ->
@@ -278,6 +296,7 @@ class JoySyncManagerServiceImp constructor(
             if (it == null) {
                 JoyLogger.d(TAG, "sendChatMessage onSuccess roomId:$roomId")
                 runOnMainThread {
+                    mJoyServiceListener?.onMessageDidAdded(joyMessage)
                     completion.invoke(null)
                 }
             } else {
@@ -325,17 +344,35 @@ class JoySyncManagerServiceImp constructor(
         }
     }
 
+    private fun plusRoomUserCount(userCount: Any, roomInfo: AUIRoomInfo) {
+        if (userCount is Int) {
+            roomInfo.customPayload[JoyParameters.ROOM_USER_COUNT] = userCount + 1
+        } else if (userCount is Long) {
+            roomInfo.customPayload[JoyParameters.ROOM_USER_COUNT] = userCount.toInt() + 1
+        }
+    }
+
+    private fun minusRoomUserCount(userCount: Any, roomInfo: AUIRoomInfo) {
+        if (userCount is Int) {
+            roomInfo.customPayload[JoyParameters.ROOM_USER_COUNT] = userCount - 1
+        } else if (userCount is Long) {
+            roomInfo.customPayload[JoyParameters.ROOM_USER_COUNT] = userCount.toInt() - 1
+        }
+    }
+
     override fun onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {
         JoyLogger.d(TAG, "onRoomUserEnter, roomId:$roomId, userInfo:$userInfo")
         mUserList.removeIf { it.userId == userInfo.userId }
         mUserList.add(userInfo)
         mJoyServiceListener?.onUserListDidChanged(mUserList)
         val roomInfo = mRoomMap[roomId] ?: return
-        if (mUser.id.toString() == roomInfo.owner?.userId) {
-            roomInfo.memberCount = roomInfo.memberCount + 1
-            updateRoom(roomInfo, completion = {
+        if (mUser.id.toString() == roomInfo.roomOwner?.userId) {
+            roomInfo.customPayload[JoyParameters.ROOM_USER_COUNT]?.let { userCount->
+                plusRoomUserCount(userCount,roomInfo)
+                updateRoom(roomInfo, completion = {
 
-            })
+                })
+            }
         }
     }
 
@@ -344,11 +381,13 @@ class JoySyncManagerServiceImp constructor(
         mUserList.removeIf { it.userId == userInfo.userId }
         mJoyServiceListener?.onUserListDidChanged(mUserList)
         val roomInfo = mRoomMap[roomId] ?: return
-        if (mUser.id.toString() == roomInfo.owner?.userId) {
-            roomInfo.memberCount = roomInfo.memberCount - 1
-            updateRoom(roomInfo, completion = {
+        if (mUser.id.toString() == roomInfo.roomOwner?.userId) {
+            roomInfo.customPayload[JoyParameters.ROOM_USER_COUNT]?.let { userCount->
+                minusRoomUserCount(userCount,roomInfo)
+                updateRoom(roomInfo, completion = {
 
-            })
+                })
+            }
         }
     }
 
@@ -359,7 +398,7 @@ class JoySyncManagerServiceImp constructor(
         mJoyServiceListener?.onUserListDidChanged(mUserList)
     }
 
-    private fun innerReset(isRoomDestroy: Boolean){
+    private fun innerReset(isRoomDestroy: Boolean) {
         mUserList.clear()
         if (isRoomDestroy) {
             mRoomMap.clear()

@@ -21,6 +21,7 @@ import io.agora.scene.joy.databinding.JoyActivityRoomListBinding
 import io.agora.scene.joy.databinding.JoyItemRoomList4Binding
 import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.joy.live.RoomLivingActivity
+import io.agora.scene.joy.service.JoyParameters
 import io.agora.scene.widget.utils.UiUtils
 
 class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
@@ -118,21 +119,29 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
             )
         }
 
+
         override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
             val data: AUIRoomInfo = mList[position]
             holder.binding.tvRoomName.text = data.roomName
-            holder.binding.tvUserCount.text = mContext.getString(R.string.joy_user_count, data.memberCount)
+            val userCount = data.customPayload[JoyParameters.ROOM_USER_COUNT]
+            if (userCount is Int){
+                holder.binding.tvUserCount.text = mContext.getString(R.string.joy_user_count, userCount.toInt())
+            }else if (userCount is Long){
+                holder.binding.tvUserCount.text = mContext.getString(R.string.joy_user_count, userCount.toInt())
+            }
             holder.binding.tvRoomId.text = mContext.getString(R.string.joy_room_id, data.roomId)
-            val badgeTitle = data.customPayload["badgeTitle"] as String?
+            val badgeTitle = data.customPayload[JoyParameters.BADGE_TITLE] as String?
             holder.binding.tvGameTag.isGone = badgeTitle.isNullOrEmpty()
             holder.binding.tvGameTag.text = badgeTitle ?: ""
-            holder.binding.ivCover.setImageResource(getThumbnailIcon(data.thumbnail))
+            (data.customPayload[JoyParameters.THUMBNAIL_ID] as String?)?.let {thumbnail->
+                holder.binding.ivCover.setImageResource(getThumbnailIcon(thumbnail))
+            }
             holder.itemView.setOnClickListener {
                 if (UiUtils.isFastClick()) return@setOnClickListener
                 mOnGotoRoom?.invoke(position, data)
             }
             GlideApp.with(holder.binding.ivAvatar)
-                .load(data.owner?.userAvatar ?: "")
+                .load(data.roomOwner?.userAvatar ?: "")
                 .error(R.mipmap.default_user_avatar)
                 .apply(RequestOptions.circleCropTransform())
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)

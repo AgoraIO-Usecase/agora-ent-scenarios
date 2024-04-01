@@ -10,12 +10,12 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.util.Size
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.TextureView
@@ -25,6 +25,7 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
@@ -34,7 +35,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.DataStreamConfig
@@ -60,6 +60,7 @@ import io.agora.scene.joy.live.fragmentdialog.JoyChooseGameDialog
 import io.agora.scene.joy.live.fragmentdialog.JoyGameRulesDialog
 import io.agora.scene.joy.live.fragmentdialog.JoyGiftDialog
 import io.agora.scene.joy.service.JoyMessage
+import io.agora.scene.joy.service.JoyParameters
 import io.agora.scene.joy.service.JoyServiceListenerProtocol
 import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.joy.service.JoyStartGameInfo
@@ -118,7 +119,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             mUser.id.toInt()
         )
     }
-    private val mIsRoomOwner by lazy { mRoomInfo.owner?.userId == mUser.id.toString() }
+    private val mIsRoomOwner by lazy { mRoomInfo.roomOwner?.userId == mUser.id.toString() }
 
     private val mJoyService by lazy { JoyServiceProtocol.getImplInstance() }
     private val mRtcEngine by lazy { JoyServiceManager.rtcEngine }
@@ -175,7 +176,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         binding.tvRoomName.text = mRoomInfo.roomName
         binding.tvRoomId.text = mRoomInfo.roomId
         GlideApp.with(this)
-            .load(mRoomInfo.owner?.userAvatar ?: "")
+            .load(mRoomInfo.roomOwner?.userAvatar ?: "")
             .placeholder(R.mipmap.default_user_avatar)
             .error(R.mipmap.default_user_avatar)
             .apply(RequestOptions.circleCropTransform())
@@ -279,12 +280,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> sendMouseMessage(
                         event,
-                        RemoteCtrlMsg.MouseEventType.MOUSE_EVENT_LBUTTON_DOWN.getNumber()
+                        RemoteCtrlMsg.MouseEventType.MOUSE_EVENT_LBUTTON_DOWN.number
                     )
 
                     MotionEvent.ACTION_UP -> sendMouseMessage(
                         event,
-                        RemoteCtrlMsg.MouseEventType.MOUSE_EVENT_LBUTTON_UP.getNumber()
+                        RemoteCtrlMsg.MouseEventType.MOUSE_EVENT_LBUTTON_UP.number
                     )
                 }
                 return@setOnTouchListener true
@@ -390,8 +391,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     override fun requestData() {
         super.requestData()
-        val roomLeftTime =
-            JoyServiceProtocol.ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createTime)
+        val createTime = (mRoomInfo.customPayload[JoyParameters.CREATED_AT] as? Long) ?: 0
+        val roomLeftTime = JoyServiceProtocol.ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - createTime)
         if (roomLeftTime > 0) {
             toggleSelfVideo {
                 initRtcEngine()
@@ -407,7 +408,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
         mJoyService.subscribeListener(object : JoyServiceListenerProtocol {
             override fun onUserListDidChanged(userList: List<AUIUserInfo>) {
-                mRoomInfo.memberCount = userList.size
+                mRoomInfo.customPayload[JoyParameters.ROOM_USER_COUNT] = userList.size
             }
 
             override fun onMessageDidAdded(message: JoyMessage) {
@@ -445,7 +446,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     showBottomView(true)
                     if (mIsRoomOwner) {
                         showRulesDialog()
-                        mRoomInfo.customPayload["badgeTitle"] = mJoyViewModel.mGameDetail?.name ?: ""
+                        mRoomInfo.customPayload[JoyParameters.BADGE_TITLE] = mJoyViewModel.mGameDetail?.name ?: ""
                         mJoyService.updateRoom(mRoomInfo, completion = {
 
                         })
@@ -567,7 +568,13 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         actions?.forEach { action ->
             val actionImage = ImageView(this)
             actionImage.tag = action
-            binding.layoutBottomAction.addView(actionImage)
+            val imageParams = LinearLayout.LayoutParams(
+                36.dp.toInt(),
+                36.dp.toInt()
+            )
+            imageParams.gravity = Gravity.BOTTOM
+            imageParams.setMargins(0, 18, 18, 0)
+            binding.layoutBottomAction.addView(actionImage, imageParams)
             GlideApp.with(binding.root)
                 .load(action.icon ?: "")
                 .error(R.drawable.joy_icon_deploy_troops)
@@ -712,7 +719,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             mRtcEngine.setupLocalVideo(VideoCanvas(textureView, VideoCanvas.RENDER_MODE_HIDDEN, 0))
         } else {
             mRtcEngine.setupRemoteVideoEx(
-                VideoCanvas(textureView, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.owner?.userId?.toIntOrNull() ?: 0),
+                VideoCanvas(textureView, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.roomOwner?.userId?.toIntOrNull() ?: 0),
                 mMainRtcConnection
             )
         }
@@ -825,7 +832,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         val dataFormat = SimpleDateFormat("HH:mm:ss").apply { timeZone = TimeZone.getTimeZone("GMT") }
         binding.tvTimer.post(object : Runnable {
             override fun run() {
-                binding.tvTimer.text = dataFormat.format(Date(TimeUtils.currentTimeMillis() - mRoomInfo.createTime))
+                val createTime = (mRoomInfo.customPayload[JoyParameters.CREATED_AT] as? Long) ?: 0
+                binding.tvTimer.text = dataFormat.format(Date(TimeUtils.currentTimeMillis() - createTime))
                 binding.tvTimer.postDelayed(this, 1000)
                 binding.tvTimer.tag = this
             }

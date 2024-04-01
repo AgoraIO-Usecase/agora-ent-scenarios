@@ -24,10 +24,10 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
 
     private val mTabs by lazy {
         mutableListOf(
-            HomeScenesType.Full,
-            HomeScenesType.KTV,
-            HomeScenesType.Voice,
-            HomeScenesType.Live,
+//            HomeScenesType.Full,
+//            HomeScenesType.KTV,
+//            HomeScenesType.Voice,
+//            HomeScenesType.Live,
             HomeScenesType.Game
         )
     }
