@@ -249,6 +249,11 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
         if state == .connected {
             selectedMap.removeAll()
             self.remoteCanvasView.canvasView.isHidden = false
+            remoteCanvasView.emptyView.isHidden = false
+            localCanvasView.emptyView.isHidden = false
+        } else {
+            remoteCanvasView.emptyView.isHidden = true
+            localCanvasView.emptyView.isHidden = true
         }
     }
     

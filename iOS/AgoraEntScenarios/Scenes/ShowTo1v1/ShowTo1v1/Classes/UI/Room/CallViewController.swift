@@ -195,10 +195,14 @@ extension CallViewController {
                                      stateReason: CallStateReason,
                                      eventReason: String,
                                      eventInfo: [String : Any]) {
+        localCanvasView.emptyView.isHidden = true
+        remoteCanvasView.emptyView.isHidden = true
         switch state {
         case .connecting:
             self.rtcChannelName
         case .connected:
+            localCanvasView.emptyView.isHidden = false
+            remoteCanvasView.emptyView.isHidden = false
             selectedMap.removeAll()
             self.remoteCanvasView.canvasView.isHidden = false
             var channelId: String? = rtcChannelName
