@@ -26,6 +26,7 @@ import io.agora.scene.base.api.model.User
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.GsonUtil
 import io.agora.scene.base.utils.TimeUtils
+import io.agora.scene.joy.ICallConnectionListener
 import io.agora.scene.joy.JoyLogger
 import io.agora.scene.joy.JoyServiceManager
 import kotlin.random.Random
@@ -203,14 +204,27 @@ class JoySyncManagerServiceImp constructor(
         }
         scene.userService.registerRespObserver(this)
         mSyncManager.rtmManager.subscribeMessage(this)
+        JoyServiceManager.registerRespObserver(callConnectionListener)
+    }
+
+    private val callConnectionListener = object :ICallConnectionListener{
+        override fun onConnected() {
+            // nothing
+        }
+
+        override fun onConnectionFailed() {
+            // nothing
+        }
     }
 
     override fun leaveRoom(roomInfo: AUIRoomInfo, completion: (error: Exception?) -> Unit) {
         // 重置体验时间事件
         mMainHandler.removeCallbacks(mTimerRoomEndRun)
         val scene = mSyncManager.getScene(roomInfo.roomId)
+        scene.userService.unRegisterRespObserver(this)
         scene.unbindRespDelegate(this)
         mSyncManager.rtmManager.unsubscribeMessage(this)
+        JoyServiceManager.unregisterRespObserver(callConnectionListener)
 
         val createTime = (roomInfo.customPayload[JoyParameters.CREATED_AT] as? Long) ?: 0
         if (roomInfo.roomOwner?.userId == mUser.id.toString() ||
@@ -257,7 +271,7 @@ class JoySyncManagerServiceImp constructor(
                 return@getMetaData
             }
             try {
-                val out = GsonUtil.instance.fromJson(metadata.toString(), JoyStartGameInfo::class.java)
+                val out = GsonUtil.instance.fromJson(GsonUtil.instance.toJson(metadata), JoyStartGameInfo::class.java)
                 JoyLogger.d(TAG, "getStartGame onSuccess roomId:$roomId $out")
                 runOnMainThread {
                     completion.invoke(null, out)

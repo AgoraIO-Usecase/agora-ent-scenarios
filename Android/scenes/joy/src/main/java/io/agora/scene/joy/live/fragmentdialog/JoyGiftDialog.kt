@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
+import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.joy.R
@@ -96,16 +97,17 @@ private class JoyGiftAdapter constructor(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val data = list[position]
         val context = AgoraApplication.the()
-        var resourceId: Int
-        try {
-            resourceId = context.resources.getIdentifier(
-                "joy_icon_gift${position + 1}", "drawable", context.packageName
-            )
-        } catch (e: Exception) {
-            resourceId = R.drawable.joy_icon_gift1
-        }
 
-        holder.binding.ivGift.setImageResource(resourceId)
+//        var resourceId: Int
+//        try {
+//            resourceId = context.resources.getIdentifier(
+//                "joy_icon_gift${position + 1}", "drawable", context.packageName
+//            )
+//        } catch (e: Exception) {
+//            resourceId = R.drawable.joy_icon_gift1
+//        }
+        GlideApp.with(holder.binding.root).load(data.thumbnail).into(holder.binding.ivGift)
+//        holder.binding.ivGift.setImageResource(resourceId)
         holder.binding.tvGiftName.text = data.name
         if (selectedIndex == position) {
             holder.binding.itemLayout.setBackgroundResource(R.drawable.joy_bg_gift_selected)

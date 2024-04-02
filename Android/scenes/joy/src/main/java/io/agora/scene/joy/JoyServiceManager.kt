@@ -10,6 +10,7 @@ import io.agora.rtm.RtmClient
 import io.agora.rtm.RtmConfig
 import io.agora.rtm.RtmConstants
 import io.agora.rtm.RtmEventListener
+import io.agora.rtmsyncmanager.ISceneResponse
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.model.User
@@ -18,26 +19,13 @@ import io.agora.scene.base.manager.UserManager
 import io.agora.scene.joy.service.PrepareConfig
 import java.util.concurrent.Executors
 
-interface ICallRtmManagerListener {
-    /**
-     * rtm连接成功
-     */
-    fun onConnected()
-
-    /**
-     * rtm连接断开
-     */
-    fun onDisconnected()
-
+interface ICallConnectionListener {
     /**
      * rtm中断，需要重新login
      */
-    fun onConnectionLost()
+    fun onConnectionFailed()
 
-    /**
-     * token即将过期，需要renew token
-     */
-    fun onTokenPrivilegeWillExpire(channelName: String)
+    fun onConnected()
 }
 
 object JoyServiceManager {
@@ -56,7 +44,16 @@ object JoyServiceManager {
     // RTM是否已经登录
     private var mLoginedRtm = false
 
-    private val mRtmListeners = mutableListOf<ICallRtmManagerListener>()
+    private val mCallConnectionListeners = mutableListOf<ICallConnectionListener>()
+
+    fun registerRespObserver(callConnectionListener: ICallConnectionListener) {
+        if (mCallConnectionListeners.contains(callConnectionListener)) return
+        mCallConnectionListeners.add(callConnectionListener)
+    }
+
+    fun unregisterRespObserver(callConnectionListener: ICallConnectionListener) {
+        mCallConnectionListeners.remove(callConnectionListener)
+    }
 
     private var innerRtcEngine: RtcEngineEx? = null
     val rtcEngine: RtcEngineEx
@@ -78,28 +75,25 @@ object JoyServiceManager {
             return innerRtcEngine!!
         }
 
-    private val rtmEventListener = object :RtmEventListener{
+    private val rtmEventListener = object : RtmEventListener {
         override fun onConnectionStateChanged(
             channelName: String?,
             state: RtmConstants.RtmConnectionState?,
             reason: RtmConstants.RtmConnectionChangeReason?
         ) {
             super.onConnectionStateChanged(channelName, state, reason)
-            JoyLogger.d(TAG,"rtm connectionStateChanged, channelName: $channelName, state: $state reason: $reason")
+            JoyLogger.d(TAG, "rtm connectionStateChanged, channelName: $channelName, state: $state reason: $reason")
             channelName ?: return
-            if (reason == RtmConstants.RtmConnectionChangeReason.TOKEN_EXPIRED) {
-                mRtmListeners.forEach { it.onTokenPrivilegeWillExpire(channelName) }
-            } else if (reason == RtmConstants.RtmConnectionChangeReason.LOST) {
+            // 网络丢失，重新登录RTM
+            if (reason == RtmConstants.RtmConnectionChangeReason.LOST) {
                 mConnected = false
-                mRtmListeners.forEach { it.onConnectionLost() }
+                mLoginedRtm = false
+                renewTokens {}
+                mCallConnectionListeners.forEach { it.onConnectionFailed() }
             } else if (state == RtmConstants.RtmConnectionState.CONNECTED) {
                 if (mConnected) return
                 mConnected = true
-                mRtmListeners.forEach { it.onConnected() }
-            } else {
-                if (!mConnected) return
-                mConnected = false
-                mRtmListeners.forEach { it.onDisconnected() }
+                mCallConnectionListeners.forEach { it.onConnected() }
             }
         }
     }
@@ -114,10 +108,10 @@ object JoyServiceManager {
             return innerRtmClient!!
         }
 
-    fun initRtm(){
+    fun initRtm() {
         rtmClient.addEventListener(rtmEventListener)
         rtmClient.setParameters("{\"rtm.msg.tx_timeout\": 3000}")
-        JoyLogger.d(TAG,"init rtm")
+        JoyLogger.d(TAG, "init rtm")
     }
 
     fun loginRtm(rtmToken: String, completion: (error: Exception?, ret: Int) -> Unit) {
@@ -214,7 +208,7 @@ object JoyServiceManager {
                 override fun onFailure(errorInfo: ErrorInfo?) {}
             })
             mConnected = false
-            innerRtmClient =null
+            innerRtmClient = null
         }
         RtmClient.release()
         mPrepareConfig.rtcToken = ""
