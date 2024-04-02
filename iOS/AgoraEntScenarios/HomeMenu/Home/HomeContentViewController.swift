@@ -11,6 +11,7 @@ import Pure1v1;
 import ShowTo1v1;
 import AgoraCommon
 import Cantata
+import Joy
 @objc
 class HomeContentViewController: UIViewController {
     @objc var changeToNavigationBarAlpha: ((CGFloat) -> Void)?
@@ -88,56 +89,62 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
         NetworkManager.shared.reportDeviceInfo(sceneName: model.type.sceneName)
         NetworkManager.shared.reportUserBehavior(sceneName: model.type.sceneName)
         
-        switch model.type {
-        case .solo:
-            let vc = VLOnLineListVC()
-            navigationController?.pushViewController(vc, animated: true)
+        let userInfo = JoyUserInfo()
+        userInfo.userId = UInt(VLUserCenter.user.id) ?? 0
+        userInfo.userName = VLUserCenter.user.name
+        userInfo.avatar = VLUserCenter.user.headUrl
+        JoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: KeyCenter.serviceHost, appCertificate: KeyCenter.Certificate ?? "", userInfo: userInfo)
         
-        case .chorus:
-            let vc = CantataPlugin.getCantataRootViewController()
-            self.navigationController?.pushViewController(vc, animated: true)
-        case .continue_singing:
-            let vc = VLSROnLineListVC()
-            navigationController?.pushViewController(vc, animated: true)
-            
-        case .snatch_singing:
-            let vc = VLSBGOnLineListVC()
-            navigationController?.pushViewController(vc, animated: true)
-        case .voice_chat:
-            let vc = VRRoomsViewController(user: VLUserCenter.user)
-            navigationController?.pushViewController(vc, animated: true)
-            
-        case .spatial_voice:
-            let vc = SARoomsViewController(user: VLUserCenter.user)
-            navigationController?.pushViewController(vc, animated: true)
-            
-        case .show:
-            let vc = ShowRoomListVC()
-            navigationController?.pushViewController(vc, animated: true)
-    
-        case .one_v_one:
-            let userInfo = Pure1v1UserInfo()
-            userInfo.userId = VLUserCenter.user.id
-            userInfo.userName = VLUserCenter.user.name
-            userInfo.avatar = VLUserCenter.user.headUrl
-            Pure1v1Context.showScene(viewController: self,
-                                     appId: KeyCenter.AppId,
-                                     appCertificate: KeyCenter.Certificate ?? "",
-                                     userInfo: userInfo)
-            
-        case .multiple:
-            break
-            
-        case .show_private_one_v_one:
-            let userInfo = ShowTo1v1UserInfo()
-            userInfo.uid = VLUserCenter.user.id
-            userInfo.userName = VLUserCenter.user.name
-            userInfo.avatar = VLUserCenter.user.headUrl
-            ShowTo1v1Context.showScene(viewController: self,
-                                       appId: KeyCenter.AppId,
-                                       appCertificate: KeyCenter.Certificate ?? "",
-                                       userInfo: userInfo)
-        }
+//        switch model.type {
+//        case .solo:
+//            let vc = VLOnLineListVC()
+//            navigationController?.pushViewController(vc, animated: true)
+//        
+//        case .chorus:
+//            let vc = CantataPlugin.getCantataRootViewController()
+//            self.navigationController?.pushViewController(vc, animated: true)
+//        case .continue_singing:
+//            let vc = VLSROnLineListVC()
+//            navigationController?.pushViewController(vc, animated: true)
+//            
+//        case .snatch_singing:
+//            let vc = VLSBGOnLineListVC()
+//            navigationController?.pushViewController(vc, animated: true)
+//        case .voice_chat:
+//            let vc = VRRoomsViewController(user: VLUserCenter.user)
+//            navigationController?.pushViewController(vc, animated: true)
+//            
+//        case .spatial_voice:
+//            let vc = SARoomsViewController(user: VLUserCenter.user)
+//            navigationController?.pushViewController(vc, animated: true)
+//            
+//        case .show:
+//            let vc = ShowRoomListVC()
+//            navigationController?.pushViewController(vc, animated: true)
+//    
+//        case .one_v_one:
+//            let userInfo = Pure1v1UserInfo()
+//            userInfo.userId = VLUserCenter.user.id
+//            userInfo.userName = VLUserCenter.user.name
+//            userInfo.avatar = VLUserCenter.user.headUrl
+//            Pure1v1Context.showScene(viewController: self,
+//                                     appId: KeyCenter.AppId,
+//                                     appCertificate: KeyCenter.Certificate ?? "",
+//                                     userInfo: userInfo)
+//            
+//        case .multiple:
+//            break
+//            
+//        case .show_private_one_v_one:
+//            let userInfo = ShowTo1v1UserInfo()
+//            userInfo.uid = VLUserCenter.user.id
+//            userInfo.userName = VLUserCenter.user.name
+//            userInfo.avatar = VLUserCenter.user.headUrl
+//            ShowTo1v1Context.showScene(viewController: self,
+//                                       appId: KeyCenter.AppId,
+//                                       appCertificate: KeyCenter.Certificate ?? "",
+//                                       userInfo: userInfo)
+//        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
