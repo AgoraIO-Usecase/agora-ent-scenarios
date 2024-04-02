@@ -41,7 +41,10 @@ abstract class SongChooseViewAdapter extends BindingSingleAdapter<SongItem, KtvS
         } else {
             binding.btnItemSongList.setEnabled(true);
             binding.btnItemSongList.setText(R.string.ktv_singbattle_room_choose_song);
-            binding.btnItemSongList.setOnClickListener(v -> onSongChosen(data, position));
+            binding.btnItemSongList.setOnClickListener(v -> {
+                binding.btnItemSongList.setEnabled(false);
+                onSongChosen(data, position);
+            });
             binding.btnItemSongList.setEnabled(data.enable);
         }
     }
