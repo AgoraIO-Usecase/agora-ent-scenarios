@@ -14,6 +14,7 @@ import Foundation
     @objc public var password: String?
     @objc public var soundEffect: String?
     @objc public var creatorAvatar: String?
+    @objc public var streamMode: Int = 1
     //@objc var userNo: String?
 }
 
@@ -28,11 +29,13 @@ public class KTVJoinRoomInputModel: NSObject {
     @objc public var roomNo: String?
     //@objc var userNo: String?
     @objc public var password: String?
+    @objc public var streamMode: Int = 1
 }
 
 public class KTVJoinRoomOutputModel: NSObject {
     @objc public var creatorNo: String?
     @objc public var seatsArray: [VLRoomSeatModel]?
+    @objc public var streamMode: Int = 1
 }
 
 public class KTVChangeMVCoverInputModel: NSObject {

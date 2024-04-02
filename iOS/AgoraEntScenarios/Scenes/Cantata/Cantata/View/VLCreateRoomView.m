@@ -23,6 +23,10 @@
 @property (nonatomic, strong) UILabel *setLabel;
 @property (nonatomic, strong) NSArray *titlesArray;
 @property (nonatomic, strong) VerifyCodeView *codeView;
+@property (nonatomic, strong) UIButton *norBtn;
+@property (nonatomic, strong) UIButton *volBtn;
+@property (nonatomic, strong) UIButton *mixBtn;
+@property (nonatomic, strong) UIButton *selBtn;
 @end
 
 @implementation VLCreateRoomView
@@ -40,6 +44,7 @@
 - (void)setupView {
     VL(weakSelf);
     self.addRoomModel.isPrivate = NO;
+    self.addRoomModel.streamMode = StreamModeNormol;
     NSString *text = @"ktv_create_tips".toSceneLocalization;
     UIFont *font = UIFontMake(12);
     CGSize constraintSize = CGSizeMake(self.width - 78, CGFLOAT_MAX);
@@ -105,20 +110,68 @@
     [inputBgView addSubview:self.inputTF];
     self.inputTF.delegate = self;
     
-    UILabel *secretLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, inputBgView.bottom+VLREALVALUE_WIDTH(24), 100, 20)];
+    UILabel *streamLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, inputBgView.bottom+VLREALVALUE_WIDTH(14), 100, 20)];
+    streamLabel.font = UIFontMake(14);
+    streamLabel.textColor = UIColorMakeWithHex(@"#000000");
+    streamLabel.text = @"ktv_stream_style".toSceneLocalization;
+    [streamLabel sizeToFit];
+    [self addSubview:streamLabel];
+    
+    //默认
+    UIButton *norBtn = [[UIButton alloc]initWithFrame:CGRectMake(20, streamLabel.bottom + VLREALVALUE_WIDTH(10), 60, 20)];
+    norBtn.titleLabel.font = UIFontMake(14.0);
+    [norBtn setTitle:@"ktv_stream_normal".toSceneLocalization forState:UIControlStateNormal];
+    [norBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
+    [norBtn setImage:[UIImage dhc_sceneImageWith:@"check-circle"] forState:UIControlStateNormal];
+    [norBtn setImage:[UIImage dhc_sceneImageWith:@"check-circle-fill"] forState:UIControlStateSelected];
+    // 调整文字和图片的边距，使其左对齐
+    norBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+    norBtn.tag = 100;
+    norBtn.selected = true;
+    [norBtn addTarget:self action:@selector(streamChange:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:norBtn];
+    self.norBtn = norBtn;
+    self.selBtn = norBtn;
+    
+    //齐声
+    UIButton *volBtn = [[UIButton alloc]initWithFrame:CGRectMake(self.bounds.size.width / 2.0 - 30, streamLabel.bottom + VLREALVALUE_WIDTH(10), 60, 20)];
+    volBtn.titleLabel.font = UIFontMake(14.0);
+    [volBtn setTitle:@"ktv_stream_vol".toSceneLocalization forState:UIControlStateNormal];
+    [volBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
+    [volBtn setImage:[UIImage dhc_sceneImageWith:@"check-circle"] forState:UIControlStateNormal];
+    [volBtn setImage:[UIImage dhc_sceneImageWith:@"check-circle-fill"] forState:UIControlStateSelected];
+    [volBtn addTarget:self action:@selector(streamChange:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:volBtn];
+    volBtn.tag = 101;
+    self.volBtn = volBtn;
+    
+    //混合
+    UIButton *mixBtn = [[UIButton alloc]initWithFrame:CGRectMake(UIScreen.mainScreen.bounds.size.width - 100, streamLabel.bottom + VLREALVALUE_WIDTH(10), 60, 20)];
+    [mixBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
+    mixBtn.titleLabel.font = UIFontMake(14.0);
+    [mixBtn setImage:[UIImage dhc_sceneImageWith:@"check-circle"] forState:UIControlStateNormal];
+    [mixBtn setImage:[UIImage dhc_sceneImageWith:@"check-circle-fill"] forState:UIControlStateSelected];
+    mixBtn.contentHorizontalAlignment =UIControlContentHorizontalAlignmentRight;
+    [mixBtn setTitle:@"ktv_stream_mix".toSceneLocalization forState:UIControlStateNormal];
+    [mixBtn addTarget:self action:@selector(streamChange:) forControlEvents:UIControlEventTouchUpInside];
+    mixBtn.tag = 102;
+    [self addSubview:mixBtn];
+    self.mixBtn = mixBtn;
+    
+    UILabel *secretLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, norBtn.bottom+VLREALVALUE_WIDTH(10), 100, 20)];
     secretLabel.font = UIFontMake(14);
     secretLabel.textColor = UIColorMakeWithHex(@"#000000");
     secretLabel.text = @"ktv_room_is_encryption".toSceneLocalization;
     [secretLabel sizeToFit];
     [self addSubview:secretLabel];
     
-    self.enBtn = [[UIButton alloc]initWithFrame:CGRectMake(secretLabel.right + 8, inputBgView.bottom+VLREALVALUE_WIDTH(24), 32, 20)];
+    self.enBtn = [[UIButton alloc]initWithFrame:CGRectMake(secretLabel.right + 8, norBtn.bottom+VLREALVALUE_WIDTH(10), 32, 20)];
     [self.enBtn setBackgroundImage:[UIImage dhc_sceneImageWith:@"guan" ] forState:UIControlStateNormal];
     [self.enBtn setBackgroundImage:[UIImage dhc_sceneImageWith:@"open" ] forState:UIControlStateSelected];
     [self.enBtn addTarget:self action:@selector(enChange:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.enBtn];
     
-    self.setLabel = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 170, inputBgView.bottom+VLREALVALUE_WIDTH(25.5), 150, 17)];
+    self.setLabel = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 170, norBtn.bottom+VLREALVALUE_WIDTH(10), 150, 17)];
     self.setLabel.font = UIFontMake(12);
     self.setLabel.textColor = UIColorMakeWithHex(@"#FA396A");
     self.setLabel.text = @"ktv_please_input_4_pwd".toSceneLocalization;
@@ -234,6 +287,22 @@
     [self endEditing:YES];
     if(self.delegate && [self.delegate respondsToSelector:@selector(didCreateRoomAction:)]){
         [self.delegate didCreateRoomAction:self.addRoomModel.isPrivate ? DHCCreateRoomActionTypeEncrypt : DHCCreateRoomActionTypeNormal];
+    }
+}
+
+-(void)streamChange:(UIButton *)btn{
+    if(self.selBtn == btn){
+        return;
+    }
+    self.selBtn.selected = false;
+    btn.selected = true;
+    self.selBtn = btn;
+    if(btn.tag == 100){
+        self.addRoomModel.streamMode = StreamModeNormol;
+    } else if(btn.tag == 101) {
+        self.addRoomModel.streamMode = StreamModeVol;
+    } else {
+        self.addRoomModel.streamMode = StreamModeMix;
     }
 }
 

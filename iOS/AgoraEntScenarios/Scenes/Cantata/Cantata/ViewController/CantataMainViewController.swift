@@ -17,6 +17,7 @@ class CantataMainViewController: UIViewController{
     private var ScreenWidth: CGFloat = UIScreen.main.bounds.width
     private var ScreenHeight: CGFloat = UIScreen.main.bounds.height
     @objc public var roomModel: VLRoomListModel?
+    @objc public var streamMode: Int = 0
     @objc public var selSongArray: [VLRoomSelSongModel]? {
         didSet {
             if let newSongs = self.selSongArray, let controlView = lrcControlView, let chorusView = chorusMicView {
@@ -25,8 +26,11 @@ class CantataMainViewController: UIViewController{
                 var usefullSongs = newSongs.filter { (model) -> Bool in
                     return model.songNo != nil
                 }
-                if usefullSongs.count == 0 {return}
+                
                 updateSongView(with: usefullSongs)
+//                if usefullSongs.count == 0 {
+//                    return
+//                }
                 
                 if usefullSongs.count == 0 {
                     controlView.controlState = .noSong
@@ -161,7 +165,7 @@ class CantataMainViewController: UIViewController{
     public override func viewDidLoad() {
         super.viewDidLoad()
         layoutUI()
-        
+        self.streamMode = roomModel?.streamMode ?? 1
         isRoomOwner = VLUserCenter.user.ifMaster
         if isRoomOwner == true {
             self.timeManager.startTimer(withTarget: self, andSelector: #selector(giveupRoom))
@@ -283,7 +287,11 @@ extension CantataMainViewController {
          */
         
         view.backgroundColor = .white
-        AUIThemeManager.shared.switchTheme(themeName: "Light")
+        if let bundlePath = Bundle.main.path(forResource: "Cantata", ofType: "bundle")
+        {
+            AUIThemeManager.shared.addThemeFolderPath(path: URL(fileURLWithPath: bundlePath) )
+           // AUIThemeManager.shared.switchTheme(themeName: "Cantata")
+        }
         
         let bgView = UIImageView(frame: self.view.bounds)
         bgView.image = UIImage.sceneImage(name: "dhc_main_bg", bundleName: "DHCResource")
@@ -337,14 +345,14 @@ extension CantataMainViewController {
         view.addSubview(botView)
         
         jukeBoxView.aui_size = CGSize(width: ScreenWidth, height: 562)
-        jukeBoxView.backgroundColor = .white
+//        jukeBoxView.backgroundColor = Color(hexString: "#152164")
         
         jukeBoxView.uiDelegate = self
     }
     
     private func loadRtc() {
         RtcKit = AgoraRtcEngineKit.sharedEngine(withAppId: AppContext.shared.appId, delegate: self)
-        RtcKit.setAudioProfile(.musicHighQuality)
+        RtcKit.setAudioProfile(.musicHighQualityStereo)
         RtcKit.setAudioScenario(.gameStreaming)
         RtcKit.setChannelProfile(.liveBroadcasting)
         RtcKit.enableAudio()
@@ -389,10 +397,17 @@ extension CantataMainViewController {
         let exChannelToken = VLUserCenter.user.agoraPlayerRTCToken
         let rtcToken = VLUserCenter.user.agoraRTCToken
         guard let roomNo = roomModel?.roomNo else {return}
-//        let apiConfig = KTVApiConfig(appId: AppContext.shared.appId, rtmToken: VLUserCenter.user.agoraRTMToken, engine: RtcKit, channelName: "\(roomNo)_ad", localUid: Int(VLUserCenter.user.id) ?? 0, chorusChannelName: "\(roomNo)", chorusChannelToken: rtcToken, type: .cantata, maxCacheSize: 10, musicType: .mcc, isDebugMode: false)
-//        let giantConfig = GiantChorusConfiguration(audienceChannelToken: VLUserCenter.user.audienceChannelToken, musicStreamUid: 2023, musicChannelToken: exChannelToken, topN: 6)
-//        self.ktvApi = KTVApiImpl(config: apiConfig, giantConfig: giantConfig)
-        let giantConfig = GiantChorusConfiguration(appId: AppContext.shared.appId, rtmToken: VLUserCenter.user.agoraRTMToken, engine: RtcKit, localUid: Int(VLUserCenter.user.id) ?? 0, audienceChannelName: "\(roomNo)_ad", audienceChannelToken: VLUserCenter.user.audienceChannelToken, chorusChannelName: "\(roomNo)", chorusChannelToken: rtcToken ?? "", musicStreamUid: 2023, musicChannelToken: exChannelToken, maxCacheSize: 10, musicType: .mcc , topN: 6, isDebugMode: false)
+        
+        var type: GiantChorusRouteSelectionType = .byDelay
+        if streamMode == 1 {
+            type = .byDelay
+        } else if streamMode == 2 {
+            type = .topN
+        } else {
+            type = .byDelayAndTopN
+        }
+        
+        let giantConfig = GiantChorusConfiguration(appId: AppContext.shared.appId, rtmToken: VLUserCenter.user.agoraRTMToken, engine: RtcKit, localUid: Int(VLUserCenter.user.id) ?? 0, audienceChannelName: "\(roomNo)_ad", audienceChannelToken: VLUserCenter.user.audienceChannelToken, chorusChannelName: "\(roomNo)", chorusChannelToken: rtcToken ?? "", musicStreamUid: 2023, musicChannelToken: exChannelToken, maxCacheSize: 10, musicType: .mcc , routeSelectionConfig: GiantChorusRouteSelectionConfig(type: type, streamNum: 6), mccDomain: AppContext.shared.isDebugMode ? "api-test.agora.io" : nil)
         self.ktvApi = KTVGiantChorusApiImpl()
         self.ktvApi.createKTVGiantChorusApi(config: giantConfig)
         self.ktvApi.renewInnerDataStreamId()
@@ -743,7 +758,7 @@ extension CantataMainViewController {
     private func leaveRtcChannel() {
         self.ktvApi.removeEventHandler(ktvApiEventHandler: self)
         self.ktvApi.cleanCache()
-        self.ktvApi = nil
+       // self.RtcKit.removeDelegateEx(nil, connection: <#T##AgoraRtcConnection#>)
         self.loadMusicCallBack = nil
         RtcKit.leaveChannel()
     }
@@ -830,6 +845,7 @@ extension CantataMainViewController {
 
         AppContext.dhcServiceImp().subscribeSeatListChanged {[weak self] status, seatModel in
             guard let self = self, let userNo = seatModel.userNo else {return}
+            if self.isNetWorkBad {return}
 //            AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self) { granted in
 //                guard granted else { return }
                 var preSongCode = String()
@@ -855,9 +871,17 @@ extension CantataMainViewController {
                         //更新麦位数据
                         self.updateModel(withId: seatModel)
                         
+                        //如果身份是合唱 但是seatmodel的score为0 map里面不为0 需要更新seat score
+                        
                         if var scoreModel = self.scoreMap[userNo] {
-                            scoreModel.score = seatModel.score
-                            self.scoreMap.updateValue(scoreModel, forKey: userNo)
+                            if seatModel.score == 0 && scoreModel.score != 0 {
+                                var newModel = seatModel
+                                newModel.score = scoreModel.score
+                                self.updateModel(withId: newModel)
+                            } else {                            
+                                scoreModel.score = seatModel.score
+                                self.scoreMap.updateValue(scoreModel, forKey: userNo)
+                            }
                         }
                         
                         //如果观众的scoreMap没有这个麦位说明他是中途加入的 需要更新scoreMap
@@ -904,6 +928,7 @@ extension CantataMainViewController {
                         self.cosingerDegree = 0
                         self.lrcControlView.setScore(with: 0)
                     }
+                    
                 }
                 
                 if status == .updated && self.singerRole == .audience {//
@@ -926,8 +951,26 @@ extension CantataMainViewController {
                 //上麦主播，下麦观众 更新当前观众即可
                 guard let seatsArray = self.seatsArray else {return}
                 self.lrcControlView.setChoursNum(with: seatsArray.count)
-            }
-     //   }
+            
+                if let topSong = self.selSongArray?.first {
+                    if currentSeat != nil {
+                        DispatchQueue.main.async {
+                            if currentSeat?.userNo != topSong.userNo {
+                                self.lrcControlView.controlState = self.isRoomOwner == true ? .ownerChorusSing : .chorusSing
+                            }
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            if VLUserCenter.user.id != topSong.userNo {
+                                self.lrcControlView.controlState = self.isRoomOwner ? .ownerChorus : .joinChorus
+                            }
+                            if seatsArray.count == 0 {
+                                self.lrcControlView.controlState = .noSong
+                            }
+                        }
+                    }
+                }
+          }
 
         AppContext.dhcServiceImp().subscribeRoomStatusChanged {[weak self] status, roomInfo in
             guard let self = self else {return}
@@ -1107,18 +1150,15 @@ extension CantataMainViewController {
     private func leaveRoom() {
         leaveSeat()
         AppContext.dhcServiceImp().leaveRoom(completion: {[weak self] error in
-            
-            guard let self = self else {return}
-            //遍历导航的所有子控制器
-            let rootVC = CantataPlugin.getCantataRootViewController()
-            for vc in self.navigationController?.children ?? [] {
-                if type(of: vc) == type(of: rootVC) {
-                    self.navigationController?.popToViewController(vc, animated: true)
-                    break
-                }
-            }
-            
         })
+        //遍历导航的所有子控制器
+        let rootVC = CantataPlugin.getCantataRootViewController()
+        for vc in self.navigationController?.children ?? [] {
+            if type(of: vc) == type(of: rootVC) {
+                self.navigationController?.popToViewController(vc, animated: true)
+                break
+            }
+        }
     }
     
     private func popForceLeaveRoom() {
@@ -1523,7 +1563,9 @@ extension CantataMainViewController: AgoraRtcEngineDelegate {
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, audioMetadataReceived uid: UInt, metadata: Data) {
-        ktvApi.didAudioMetadataReceived(uid: uid, metadata: metadata)
+        if ktvApi != nil {
+            ktvApi.didAudioMetadataReceived(uid: uid, metadata: metadata)
+        }
     }
 }
 
@@ -1567,7 +1609,12 @@ extension CantataMainViewController: DHCGameDelegate {
             self.stopPlaySong()
             self.lrcControlView.setScore(with: 0)
             self.removeCurrentSong()
-            self.leaveSeat()
+            guard let seatModel = getCurrentUserMicSeat() else {return}
+            
+            leaveSeat(with: seatModel) { err in
+                
+            }
+           // self.leaveSeat()
         } else if event == .retryLrc {
             //歌词重试
             self.lrcControlView.retryBtn.isHidden = true

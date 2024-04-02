@@ -110,6 +110,11 @@ UICollectionViewDataSource
     self.lrcSegmentView.alpha = status ? 0.6 : 1;
 }
 
+-(void)setAEC:(BOOL)enable level:(NSInteger)level{
+    self.aiAecSwitcherView.on = enable;
+    self.aiAecSwitcherView.aecValue = level;
+}
+
 - (void)initSubViews {
     self.scrollView = [[UIScrollView alloc]init];
     self.scrollView.scrollEnabled = true;
@@ -195,7 +200,7 @@ UICollectionViewDataSource
     [self.vqsSegmentView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.mas_equalTo(self);
         make.top.mas_equalTo(self.netSwitcherView.mas_bottom).offset(0);
-        make.height.mas_equalTo(50);
+        make.height.mas_equalTo(80);
     }];
     
     [self.ansSegmentView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -455,7 +460,7 @@ UICollectionViewDataSource
         _vqsSegmentView.tag = 801;
         _vqsSegmentView.delegate = self;
         _vqsSegmentView.type = SegmentViewTypeVQS;
-        _vqsSegmentView.subText = KTVLocalizedString(@"ktv_per_vol_quality");
+        [_vqsSegmentView setSubText:KTVLocalizedString(@"ktv_per_vol_quality") attrText:KTVLocalizedString(@"ktv_aec_war")];
     }
     return _vqsSegmentView;
 }
@@ -466,7 +471,7 @@ UICollectionViewDataSource
         _ansSegmentView.tag = 802;
         _ansSegmentView.delegate = self;
         _ansSegmentView.type = SegmentViewTypeAns;
-        _ansSegmentView.subText = KTVLocalizedString(@"ktv_per_ans");
+        [_ansSegmentView setSubText:KTVLocalizedString(@"ktv_per_ans") attrText:nil];
     }
     return _ansSegmentView;
 }
@@ -586,9 +591,9 @@ UICollectionViewDataSource
     self.ans = 0;
     self.isDelay = false;
     self.isPerBro = false;
-    self.enableAec = false;
+    self.enableAec = true;
     self.enableMultipath = true;
-    self.aecLevel = 0;
+    self.aecLevel = 1;
     self.kindIndex = kKindUnSelectedIdentifier;
 }
 

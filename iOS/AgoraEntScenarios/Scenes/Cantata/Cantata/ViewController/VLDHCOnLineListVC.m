@@ -97,7 +97,7 @@
     };
     KTVCreateRoomPresentView *presentView = [KTVCreateRoomPresentView shared];
 
-    [presentView showViewWith:CGRectMake(0, SCREEN_HEIGHT - 343, SCREEN_WIDTH, 343) vc:createRoomVC];
+    [presentView showViewWith:CGRectMake(0, SCREEN_HEIGHT - 393, SCREEN_WIDTH, 393) vc:createRoomVC];
 
     [self.view addSubview:presentView];
     
@@ -130,6 +130,7 @@
     inputModel.roomNo = listModel.roomNo;
 //    inputModel.userNo = VLUserCenter.user.id;
     inputModel.password = inputText;
+    inputModel.streamMode = listModel.streamMode;
     
     VL(weakSelf);
     [[AppContext dhcServiceImp] joinRoomWith:inputModel completion:^(NSError * _Nullable error, KTVJoinRoomOutputModel * _Nullable outputModel) {
@@ -139,6 +140,7 @@
         }
         
         listModel.creatorNo = outputModel.creatorNo;
+        listModel.streamMode = outputModel.streamMode;
         UIViewController *VC = [ViewControllerFactory createCustomViewControllerWithTitle:listModel seatsArray:outputModel.seatsArray];
         [weakSelf.navigationController pushViewController:VC animated:YES];
     }];

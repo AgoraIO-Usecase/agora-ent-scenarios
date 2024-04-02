@@ -31,4 +31,5 @@ import AgoraCommon
     @objc public var creatorAvatar: String?
     @objc public var creatorName: String?
     @objc public var objectId: String?
+    @objc public var streamMode: Int = 1
 }

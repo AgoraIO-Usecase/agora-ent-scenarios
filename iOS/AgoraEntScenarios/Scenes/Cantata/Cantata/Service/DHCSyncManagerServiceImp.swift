@@ -71,7 +71,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     private var roomExpiredDidChanged: (() -> Void)?
 
     private var roomNo: String?
-    
+    private var expireTimer: Timer?
     private var room: VLRoomListModel? {
         return self.roomList?.filter({ $0.roomNo == self.roomNo }).first
     }
@@ -114,20 +114,19 @@ private func mapConvert(model: NSObject) ->[String: Any] {
 //        singingScoreDidChanged = nil
         networkDidChanged = nil
         roomExpiredDidChanged = nil
+        expireTimer?.invalidate()
+        expireTimer = nil
     }
     
-    private func _checkRoomExpire() {
-        guard let room = self.room else { return }
+    private func _checkRoomExpire() -> Bool {
+        guard let room = self.room else { return false}
         
         let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
         let expiredDuration = 20 * 60 * 1000
-//        agoraPrint("checkRoomExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
-        guard currentTs - room.createdAt > expiredDuration else { return }
-        
-        guard let callback = self.roomExpiredDidChanged else {
-            return
-        }
-        callback()
+        agoraPrint("checkRoomExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
+        print("checkRoomExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
+        guard currentTs - room.createdAt > expiredDuration else { return  false}
+        return true
     }
 
     private func initScene(completion: @escaping (NSError?) -> Void) {
@@ -214,7 +213,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         roomInfo.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
         roomInfo.creatorName = VLUserCenter.user.name
         roomInfo.creatorAvatar = VLUserCenter.user.headUrl
-
+        roomInfo.streamMode = inputModel.streamMode
         let params = mapConvert(model: roomInfo)
 
         _showLoadingIfNeed()
@@ -390,6 +389,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                         let output = KTVJoinRoomOutputModel()
                         output.creatorNo = userId
                         output.seatsArray = seatArray
+                        output.streamMode = inputModel.streamMode
                         completion(nil, output)
                     }
                     self._addUserIfNeed()
@@ -701,19 +701,33 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     }
     
     public func subscribeRoomWillExpire(with changedBlock: @escaping () -> Void) {
-        roomExpiredDidChanged = changedBlock
-        Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] timer in
+        expireTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
             guard let self = self else { return }
             
-            self._checkRoomExpire()
-            if self.roomExpiredDidChanged == nil {
+            if self.checkAndHandleRoomExpire(changedBlock: changedBlock) {
                 timer.invalidate()
+                self.expireTimer = nil
             }
         }
         
-        DispatchQueue.main.async {
-            self._checkRoomExpire()
+        // 立即执行一次检查到期的方法
+        checkAndHandleRoomExpire(changedBlock: changedBlock)
+    }
+
+    private func checkAndHandleRoomExpire(changedBlock: @escaping () -> Void) -> Bool {
+        guard let room = self.room else { return false }
+        let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
+        let expiredDuration = 20 * 60 * 1000
+        agoraPrint("checkRoomExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
+        
+        if abs(currentTs - room.createdAt) > expiredDuration {
+            expireTimer?.invalidate()
+            expireTimer = nil
+            changedBlock()
+            return true
         }
+        
+        return false
     }
     
     public func unsubscribeAll() {
@@ -1207,7 +1221,7 @@ extension DHCSyncManagerServiceImp {
 
     private func _subscribeSeats(finished: @escaping () -> Void) {
         guard let channelName = roomNo else {
-            assertionFailure("channelName = nil")
+          //  assertionFailure("channelName = nil")
             return
         }
         agoraPrint("imp seat subscribe...")

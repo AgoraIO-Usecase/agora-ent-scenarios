@@ -181,6 +181,7 @@
 "ktv_per_setting" = "配置";
 "ktv_per_style" = "专业模式";
 "ktv_per_vol_quality" = "音质";
+"ktv_aec_war" = "aiaec关闭的情况下音质选项才能生效";
 "ktv_per_ans" = "降低背景噪音";
 "ktv_aiaec_switch" = "AIAEC开关";
 "ktv_aiaec_level" = "AIAEC强度选择";

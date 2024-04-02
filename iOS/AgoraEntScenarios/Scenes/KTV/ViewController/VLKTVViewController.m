@@ -77,7 +77,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, strong) VLBelcantoModel *selBelcantoModel;
 @property (nonatomic, strong) VLKTVMVIdleView *noBodyOnLineView; // mv空页面
 @property (nonatomic, strong) VLKTVTopView *topView;
-@property (nonatomic, strong) VLKTVSettingView *settingView;
+@property (nonatomic, weak) VLKTVSettingView *settingView;
 @property (nonatomic, strong) VLMicSeatList *roomPersonView; //房间麦位视图
 @property (nonatomic, strong) VLAudienceIndicator *requestOnLineView;//空位上麦
 @property (nonatomic, strong) VLPopSongList *chooseSongView; //点歌视图
@@ -152,7 +152,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     self.typeValue = 4;
     self.isDelay = true;
     self.checkType = checkAuthTypeAll;
-
     [self subscribeServiceEvent];
     
     // setup view
@@ -533,6 +532,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     } else {
         [self.settingView setIspause:self.isPause];
     }
+    [self.settingView setAEC:self.aecState level:self.aecLevel];
     [self.settingView setChorusStatus: flag];
 }
 
@@ -851,11 +851,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleAudience
                            onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
     }];
+    self.aecLevel = 1;
+    self.aecState = true;
     // 歌曲播完关闭耳返状态
-    if(self.isEarOn){
-        self.isEarOn = false;
-        [self.RTCkit enableInEarMonitoring:_isEarOn includeAudioFilters:AgoraEarMonitoringFilterNone];
-    }
+//    if(self.isEarOn){
+//        self.isEarOn = false;
+//        [self.RTCkit enableInEarMonitoring:_isEarOn includeAudioFilters:AgoraEarMonitoringFilterNone];
+//    }
 }
 
 - (void)loadAndPlaySong{
@@ -908,6 +910,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             } else {
                 if(role == KTVSingRoleSoloSinger || role == KTVSingRoleLeadSinger){
                     [weakSelf.ktvApi startSingWithSongCode:songCode startPos:0];
+                    weakSelf.aecLevel = 0;
+                    weakSelf.aecState = false;
                 }
                 [weakSelf setMVViewStateWith:model];
             }
@@ -1097,6 +1101,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:NO
                                                                 completion:^(NSError * error) {
             }];
+            weakSelf.aecLevel = 0;
+            weakSelf.aecState = false;
         }];
     };
     KTVLogInfo(@"before songCode:%li", [model.songNo integerValue]);
@@ -1220,7 +1226,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     //use game streaming in so mode, chrous profile in chrous mode
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
-    [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
+    [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQualityStereo];
     [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     if(AppContext.shared.isDebugMode){
         [self.RTCkit setParameters: @"{\"che.audio.neteq.dump_level\": 1}"];
@@ -1255,8 +1261,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                          orientationMode:AgoraVideoOutputOrientationModeFixedLandscape
                                               mirrorMode:AgoraVideoMirrorModeAuto];
     [self.RTCkit setVideoEncoderConfiguration:encoderConfiguration];
-    
-    
+    self.aecLevel = 1;
+    self.aecState = true;
     [self.RTCkit setEnableSpeakerphone:YES];
     
     AgoraDataStreamConfig *config = [AgoraDataStreamConfig new];
@@ -1275,7 +1281,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                              type: KTVTypeNormal
                                                         musicType:loadMusicTypeMcc
                                                         maxCacheSize:10
-                                                        isDebugMode: (AppContext.shared.isDebugMode) ? true : false
+                                                        mccDomain: AppContext.shared.isDebugMode ? @"api-test.agora.io" : nil
     ];
     self.ktvApi = [[KTVApiImpl alloc] init];
     [self.ktvApi createKtvApiWithConfig:apiConfig];
@@ -2329,12 +2335,19 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //    [self.RTCkit enableLocalAudio:isOnMicSeat];
 //    [self.RTCkit muteLocalAudioStream:!isOnMicSeat];
     
-    VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
-    self.isNowMicMuted = info.isAudioMuted;
-    self.isNowCameraMuted = info.isVideoMuted;
-    
     self.bottomView.hidden = !_isOnMicSeat;
     self.requestOnLineView.hidden = !self.bottomView.hidden;
+    
+    VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
+    if(onMicSeatStatusDidChanged){
+        if(info == nil){
+            self.isNowMicMuted = true;
+            self.isNowCameraMuted = true;
+        } else {
+            self.isNowMicMuted = info.isAudioMuted;
+            self.isNowCameraMuted = info.isVideoMuted;
+        }
+    }
 }
 
 - (void)setIsNowMicMuted:(BOOL)isNowMicMuted {
