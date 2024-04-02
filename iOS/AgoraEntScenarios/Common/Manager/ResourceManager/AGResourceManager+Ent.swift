@@ -21,6 +21,7 @@ extension AGResourceManager {
         } completionHandler: { _, err in
             if let err = err {
                 completion?(err)
+                return
             }
             
             var resources: [AGResource] = []

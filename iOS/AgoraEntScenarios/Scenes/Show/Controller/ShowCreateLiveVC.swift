@@ -120,23 +120,23 @@ class ShowCreateLiveVC: UIViewController {
 extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     
     func onClickSettingBtnAction() {
-        if isBeautyDownloading() { return }
+        guard isBeautyDownloaded() else { return }
         showPreset()
     }
     
     func onClickCameraBtnAction() {
-        if isBeautyDownloading() { return }
+        guard isBeautyDownloaded() else { return }
         ShowAgoraKitManager.shared.switchCamera()
     }
     
     func onClickBeautyBtnAction() {
-        if isBeautyDownloading() { return }
+        guard isBeautyDownloaded() else { return }
         createView.hideBottomViews = true
         present(beautyVC, animated: true)
     }
     
     func onClickStartBtnAction() {
-        if isBeautyDownloading() { return }
+        if isBeautyDownloaded() { return }
         guard let roomName = createView.roomName, roomName.count > 0 else {
             ToastView.show(text: "create_room_name_can_not_empty".show_localized)
             return

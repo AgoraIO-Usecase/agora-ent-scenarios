@@ -15,6 +15,7 @@ private let kFuLicUri = "beauty/FULib_lic"
 private let kFuUri = "beauty/FULib"
 
 private let kLoadingViewTag = 11223344
+private let kDownloadingAlreadyErr = -100001
 
 @discardableResult
 private func setupStResource() -> Bool {
@@ -68,11 +69,13 @@ private func setupFuResource() -> Bool {
 }
 
 extension ShowCreateLiveVC {
-    func isBeautyDownloading() -> Bool {
-        guard view.viewWithTag(kLoadingViewTag) == nil else {
+    func isBeautyDownloaded() -> Bool {
+        if setupStResource(), setupBeResource(), setupFuResource() {
             return true
         }
-        
+        checkAndSetupBeautyPath {[weak self] err in
+            self?.markProgressCompletion(err: err)
+        }
         return false
     }
     
@@ -108,8 +111,8 @@ extension ShowCreateLiveVC {
             completion?(nil)
             return
         }
-        if isBeautyDownloading() {
-            completion?(NSError(domain: "download already", code: -1))
+        if let _ = view.viewWithTag(kLoadingViewTag) {
+            completion?(NSError(domain: "download already", code: kDownloadingAlreadyErr))
             return
         }
         
@@ -120,8 +123,9 @@ extension ShowCreateLiveVC {
                 self?.updateDownloadProgress(title: type.title, progress: progress)
             } completion: {[weak self]  err in
                 guard let self = self else {return}
-                setupStResource()
                 self.markProgressCompletion(err: err)
+                if let _ = err { return }
+                setupStResource()
                 self.checkAndSetupBeautyPath(completion: completion)
             }
             return
@@ -135,8 +139,9 @@ extension ShowCreateLiveVC {
                 self?.updateDownloadProgress(title: type.title, progress: progress)
             } completion: {[weak self] err in
                 guard let self = self else {return}
-                setupBeResource()
                 self.markProgressCompletion(err: err)
+                if let _ = err { return }
+                setupBeResource()
                 self.checkAndSetupBeautyPath(completion: completion)
             }
             return
@@ -150,8 +155,9 @@ extension ShowCreateLiveVC {
                 self?.updateDownloadProgress(title: type.title, progress: progress)
             } completion: { [weak self] err in
                 guard let self = self else {return}
-                setupFuResource()
                 self.markProgressCompletion(err: err)
+                if let _ = err { return }
+                setupFuResource()
                 self.checkAndSetupBeautyPath(completion: completion)
             }
             return
@@ -183,6 +189,9 @@ extension ShowCreateLiveVC {
 
     private func markProgressCompletion(err: NSError?) {
         if let err = err {
+            //already downloading
+            if err.code == kDownloadingAlreadyErr { return }
+            
             ToastView.show(text: err.localizedDescription)
         }
         guard let progressView = view.viewWithTag(kLoadingViewTag) else {

@@ -68,7 +68,9 @@ public class AGResourceManager: NSObject {
                                      progressHandler: @escaping (Double) -> Void,
                                      completionHandler: @escaping ([AGResource]?, NSError?) -> Void) {
         guard let url = URL(string: url) else {
-            completionHandler(nil, ResourceError.urlInvalidError(url: url))
+            DispatchQueue.main.async {
+                completionHandler(nil, ResourceError.urlInvalidError(url: url))
+            }
             return
         }
         let destinationPath = getResourceCachePath(relativePath: "manifest")!
@@ -124,7 +126,9 @@ public class AGResourceManager: NSObject {
     ///   - completion: <#completion description#>
     public func downloadAllManifestFiles(fileList: [AGResource]?, completion: @escaping ((NSError?) -> Void)) {
         guard let fileList = fileList else {
-            completion(nil)
+            DispatchQueue.main.async {
+                completion(nil)
+            }
             return
         }
         
@@ -157,7 +161,9 @@ public class AGResourceManager: NSObject {
                                  progressHandler: @escaping (Double) -> Void,
                                  completionHandler: @escaping (AGManifest?, NSError?) -> Void) {
         guard let url = URL(string: manifest.url) else {
-            completionHandler(nil, ResourceError.urlInvalidError(url: manifest.url))
+            DispatchQueue.main.async {
+                completionHandler(nil, ResourceError.urlInvalidError(url: manifest.url))
+            }
             return
         }
         let destinationPath = getPath(manifest: manifest)
@@ -217,8 +223,10 @@ public class AGResourceManager: NSObject {
     public func downloadResources(resources: [AGResource]?,
                                   progress: @escaping ((Double) -> Void),
                                   completion: @escaping ((NSError?) -> Void)) {
-        guard let resources = resources else {
-            completion(nil)
+        guard let resources = resources, resources.count > 0 else {
+            DispatchQueue.main.async {
+                completion(nil)
+            }
             return
         }
         
@@ -273,7 +281,9 @@ public class AGResourceManager: NSObject {
                                  progressHandler: @escaping (Double) -> Void,
                                  completionHandler: @escaping (String?, NSError?) -> Void) {
         guard let url = URL(string: resource.url) else {
-            completionHandler(nil, ResourceError.urlInvalidError(url: resource.url))
+            DispatchQueue.main.async {
+                completionHandler(nil, ResourceError.urlInvalidError(url: resource.url))
+            }
             return
         }
         let destinationFolderPath = getFolderPath(resource: resource)
@@ -371,7 +381,7 @@ public class AGResourceManager: NSObject {
 
 extension AGResourceManager {
     private func notifyProgress(url: URL, progress: Double) {
-        DispatchQueue.main.async {
+        asyncToMainThread {
             self.managerDelegates.allObjects.forEach { delegate in
                 delegate.downloadProgress(url: url, progress: progress)
             }
@@ -379,7 +389,7 @@ extension AGResourceManager {
     }
     
     private func notifyCompletion(url: URL, error: NSError?) {
-        DispatchQueue.main.async {
+        asyncToMainThread {
             self.managerDelegates.allObjects.forEach { delegate in
                 delegate.downloadCompletion(url: url, error: error)
             }
