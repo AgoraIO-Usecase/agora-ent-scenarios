@@ -284,6 +284,9 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                         manifest = agManifest
                     } else {
                         ShowLogger.d(tag, "download failed: ${e.message}")
+                        binding.statusPrepareViewLrc.isVisible = false
+                        ToastUtils.showToastLong(R.string.show_beauty_loading_failed)
+                        resourceDownloadJob?.cancel()
                     }
                 }
             )
