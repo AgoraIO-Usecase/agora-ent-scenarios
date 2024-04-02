@@ -396,6 +396,12 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                             if (it.isShowing) it.dismiss()
                             mCallDialog = null
                         }
+                    } else if (stateReason == CallStateReason.RemoteCallBusy) {
+                        ToastUtils.showToast(getString(R.string.show_to1v1_call_toast_remote_busy))
+                        mCallDialog?.let {
+                            if (it.isShowing) it.dismiss()
+                            mCallDialog = null
+                        }
                     }
                     fetchRoomList()
                 }
