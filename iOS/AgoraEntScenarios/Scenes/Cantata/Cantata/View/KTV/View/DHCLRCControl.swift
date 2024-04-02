@@ -290,6 +290,7 @@ class DHCLRCControl: UIView {
         lrcView.lyricsView.draggable = false
         lrcView.delegate = self
         addSubview(lrcView!)
+        lrcView.isHidden = true
         
         //重试歌词按钮
         retryBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 100, height: 40))
@@ -306,15 +307,17 @@ class DHCLRCControl: UIView {
         pauseBtn = UIButton(frame: CGRect(x: 20, y: self.bounds.maxY - 50, width: 34, height: 40))
         pauseBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         pauseBtn.setVerticalLayoutWithCenterAlignment(title: "ktv_room_player_play".toSceneLocalization() as String, image: UIImage.sceneImage(name: "ktv_pause_resumeicon", bundleName: "DHCResource")!, spacing: 0, for: .selected)
-        pauseBtn.setVerticalLayoutWithCenterAlignment(title: "ktv_room_player_play".toSceneLocalization() as String, image: UIImage.sceneImage(name: "ktv_pause_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
+        pauseBtn.setVerticalLayoutWithCenterAlignment(title: "ktv_room_player_pause".toSceneLocalization() as String, image: UIImage.sceneImage(name: "ktv_pause_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         pauseBtn.addTarget(self, action: #selector(pause), for: .touchUpInside)
         addSubview(pauseBtn)
+        pauseBtn.isHidden = true
         
         nextBtn = UIButton(frame: CGRect(x: 74, y: self.bounds.maxY - 50, width: 34, height: 40))
         nextBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         nextBtn.addTarget(self, action: #selector(nextSong), for: .touchUpInside)
         nextBtn.setVerticalLayoutWithCenterAlignment(title: "ktv_room_change_song".toSceneLocalization() as String, image: UIImage.sceneImage(name: "ktv_playNext_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         addSubview(nextBtn)
+        nextBtn.isHidden = true
         
         originBtn = UIButton(frame: CGRect(x: self.bounds.width - 54, y: self.bounds.maxY - 50, width: 34, height: 40))
         originBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
@@ -322,12 +325,14 @@ class DHCLRCControl: UIView {
         originBtn.setVerticalLayoutWithCenterAlignment(title: "ktv_room_original".toSceneLocalization() as String, image: UIImage.sceneImage(name: "original", bundleName: "DHCResource")!, spacing: 0, for: .selected)
         originBtn.setVerticalLayoutWithCenterAlignment(title: "ktv_room_original".toSceneLocalization() as String, image: UIImage.sceneImage(name: "acc", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         addSubview(originBtn)
+        originBtn.isHidden = true
         
         effectBtn = UIButton(frame: CGRect(x: self.bounds.width - 108, y: self.bounds.maxY - 50, width: 34, height: 40))
         effectBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         effectBtn.addTarget(self, action: #selector(effectChange), for: .touchUpInside)
         effectBtn.setVerticalLayoutWithCenterAlignment(title: "ktv_room_player_tweak".toSceneLocalization() as String, image: UIImage.sceneImage(name: "ktv_subtitle_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         addSubview(effectBtn)
+        effectBtn.isHidden = true
         
         leaveChorusBtn = UIButton(frame: CGRect(x: 20, y: self.bounds.maxY - 50, width: 50, height: 40))
         leaveChorusBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
@@ -341,6 +346,7 @@ class DHCLRCControl: UIView {
         joinChorusBtn.setImage(UIImage.sceneImage(name: "join", bundleName: "DHCResource"), for: .normal)
         joinChorusBtn.setImage(UIImage.sceneImage(name: "ic_join_chorus_loading", bundleName: "DHCResource"), for: .selected)
         addSubview(joinChorusBtn)
+        joinChorusBtn.isHidden = true
         
         resultView = DHCResultView()
         resultView.frame = CGRect(x: 0, y: 0, width: ScreenWidth, height: 600)
@@ -451,6 +457,7 @@ class DHCLRCControl: UIView {
             } else {
                 self?.loadingView.isHidden = false
                 self?.loadingView.setProgress(progress)
+                self?.noSongLabel.isHidden = true
             }
         }
     }

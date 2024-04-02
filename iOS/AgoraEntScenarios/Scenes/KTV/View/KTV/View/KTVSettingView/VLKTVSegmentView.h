@@ -32,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) SegmentViewType type;
 
+-(void)setSubText:(NSString *)subText attrText:(NSString *)attrText;
+
 @end
 
 NS_ASSUME_NONNULL_END
