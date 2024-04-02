@@ -23,8 +23,7 @@ class KeyCenter: NSObject {
      进入声网控制台(https://console.shengwang.cn/)，创建一个项目，进入项目配置页，即可看到APP ID。
      */
     
-    static let AppId: String = <#Your AppId#>
-  
+    static let AppId: String = <#AppId#>
     /**
      Certificate.
      Agora provides App certificate to generate Token. You can deploy and generate a token on your server,
@@ -38,7 +37,7 @@ class KeyCenter: NSObject {
      注意：如果项目没有开启证书鉴权，这个字段留空。
      */
 
-    static let Certificate: String? = <#Your Certificate#>
+    static let Certificate: String? = ""
 
     /**
      Token.
