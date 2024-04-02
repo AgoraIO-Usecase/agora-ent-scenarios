@@ -45,6 +45,9 @@ fileprivate enum KTVSongMode: Int {
     
     private var hasSendPreludeEndPosition: Bool = false
     private var hasSendEndPosition: Bool = false
+    
+    //multipath
+    private var enableMultipathing: Bool = true
    
     private var audioPlayoutDelay: NSInteger = 0
     private var isNowMicMuted: Bool = false
@@ -110,7 +113,17 @@ fileprivate enum KTVSongMode: Int {
     private var mSyncScoreTimer: DispatchSourceTimer?
     private var mStopSyncCloudConvergenceStatus = true
     private var mSyncCloudConvergenceStatusTimer: DispatchSourceTimer?
-
+    private var mStopProcessDelay = true
+    private var processDelayFuture: DispatchSourceTimer?
+    private var processSubscribeFuture: DispatchSourceTimer?
+    private var subScribeSingerMap = [Int: Int]() // <uid, ntpE2eDelay>
+    private var singerList = [Int]() // <uid>
+    private var mainSingerDelay = 0
+    
+    private let tag = "KTV_API_LOG"
+    private let messageId = "agora:scenarioAPI"
+    private let version = "1_iOS_4.3.0"
+    private let lyricSyncVersion = 2
     
     deinit {
         mcc?.register(nil)
@@ -132,9 +145,8 @@ fileprivate enum KTVSongMode: Int {
             contentCenterConfiguration.token = config.rtmToken
             contentCenterConfiguration.rtcEngine = config.engine
             contentCenterConfiguration.maxCacheSize = UInt(config.maxCacheSize)
-            if config.isDebugMode {
-                //如果这一块报错为contentCenterConfiguration没有mccDomain这个属性 说明该版本不支持这个 可以注释掉这行代码。完全不影响
-                contentCenterConfiguration.mccDomain = "api-test.agora.io"
+            if let domain = config.mccDomain {
+                contentCenterConfiguration.mccDomain = domain
             }
             mcc = AgoraMusicContentCenter.sharedContentCenter(config: contentCenterConfiguration)
             mcc?.register(self)
@@ -169,17 +181,25 @@ fileprivate enum KTVSongMode: Int {
         engine.setParameters("{\"che.audio.neteq.prebuffer_max_delay\": 600}")
         engine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
         engine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
-        engine.setParameters("{\"che.audio.direct.uplink_process\": false}")
         engine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
-        engine.setParameters("{\"che.audio.ans.noise_gate\": 20}")
+        engine.setParameters("{\"che.audio.uplink_apm_async_process\": true}")
+                // 标准音质
+        engine.setParameters("{\"che.audio.aec.split_srate_for_48k\": 16000}")
+        engine.setParameters("{\"che.audio.ans.noise_gate\": 20}")//
         engine.setParameters("{\"rtc.use_audio4\": true}")
         
         //4.3.0 add
+        // mutipath
+        enableMultipathing = true
         engine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
         engine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
         engine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
         engine.setParameters("{\"rtc.enableMultipath\": true}")
+        
+        // 数据上报
+         engine.setParameters("{\"rtc.direct_send_custom_event\": true}")
+        // engine.setParameters("{\"rtc.qos_for_test_purpose\": true}")
     }
     
     func renewInnerDataStreamId() {
@@ -310,6 +330,19 @@ extension KTVGiantChorusApiImpl {
         apiConfig = nil
         AgoraMusicContentCenter.destroy()
         self.eventHandlers.removeAllObjects()
+    }
+    
+    @objc public func enableMutipath(enable: Bool) {
+        sendCustomMessage(with: "enableMutipath", label: "enable:\(enable)")
+        agoraPrint("enableMutipath:\(enable)")
+        enableMultipathing = enable
+        if singerRole == .coSinger || singerRole == .leadSinger {
+            if let subChorusConnection = subChorusConnection {
+                let mediaOption = AgoraRtcChannelMediaOptions()
+                mediaOption.parameters = "{\"rtc.enableMultipath\": \(enable), \"rtc.path_scheduling_strategy\": 0, \"rtc.remote_path_scheduling_strategy\": 0}"
+                apiConfig?.engine?.updateChannelEx(with: mediaOption, connection: subChorusConnection)
+            }
+        }
     }
     
     func renewToken(rtmToken: String, chorusChannelRtcToken: String) {
@@ -959,9 +992,9 @@ extension KTVGiantChorusApiImpl {
         if newRole == .leadSinger {
             // 主唱不参加TopN
             singChannelMediaOptions.isAudioFilterable = false
-            apiConfig?.engine?.setParameters("{\"che.audio.filter_streams\":\(apiConfig?.topN ?? 0)}")
+            apiConfig?.engine?.setParameters("{\"che.audio.filter_streams\":\(apiConfig?.routeSelectionConfig.streamNum ?? 0)}")
         } else {
-            apiConfig?.engine?.setParameters("{\"che.audio.filter_streams\":\((apiConfig?.topN ?? 0) - 1)}")
+            apiConfig?.engine?.setParameters("{\"che.audio.filter_streams\":\((apiConfig?.routeSelectionConfig.streamNum ?? 0) - 1)}")
         }
         
         guard let token = apiConfig?.chorusChannelToken, let singConnection = singChannelConnection else {return}
@@ -970,6 +1003,16 @@ extension KTVGiantChorusApiImpl {
         // 加入演唱频道
        let ret = apiConfig?.engine?.joinChannelEx(byToken: token, connection: singConnection, delegate: self, mediaOptions: singChannelMediaOptions)
         apiConfig?.engine?.setParameters("{\"rtc.use_audio4\": true}")
+        if apiConfig?.routeSelectionConfig.type == .topN || apiConfig?.routeSelectionConfig.type == .byDelayAndTopN {
+            if newRole == .leadSinger {
+                apiConfig?.engine?.setParameters("{\"che.audio.filter_streams\":\(apiConfig?.routeSelectionConfig.streamNum)}")
+            } else {
+                apiConfig?.engine?.setParameters("{\"che.audio.filter_streams\":\((apiConfig?.routeSelectionConfig.streamNum ?? 0) - 1)}")
+            }
+        } else {
+            apiConfig?.engine?.setParameters("{\"che.audio.filter_streams\": 0}")
+        }
+        
        let res = apiConfig?.engine?.enableAudioVolumeIndicationEx(50, smooth: 10, reportVad: true, connection: singConnection)
         switch newRole {
             case .leadSinger:
@@ -1102,6 +1145,45 @@ extension KTVGiantChorusApiImpl: AgoraRtcEngineDelegate {
         if time.type == .lrcTime && self.singerRole == .audience {
             self.setProgress(with: Int(time.ts))
        }
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
+        guard let musicId = apiConfig?.musicStreamUid,let mainSingerId = songConfig?.mainSingerUid else {return}
+        if uid != musicId && subScribeSingerMap.count < 8 {
+            apiConfig?.engine?.muteRemoteAudioStreamEx(uid, mute: false, connection: singChannelConnection ?? AgoraRtcConnection())
+            if uid != mainSingerId {
+                subScribeSingerMap[Int(uid)] = 0
+            }
+        } else if uid != musicId && subScribeSingerMap.count == 8 {
+            apiConfig?.engine?.muteRemoteAudioStreamEx(uid, mute: false, connection: singChannelConnection ?? AgoraRtcConnection())
+        }
+        if uid != musicId && uid != mainSingerId {
+            singerList.append(Int(uid))
+        }
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, didLeaveChannelWith stats: AgoraChannelStats) {
+        subScribeSingerMap.removeAll()
+        singerList.removeAll()
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
+        subScribeSingerMap.removeValue(forKey: Int(uid))
+        if let index = singerList.firstIndex(of: Int(uid)) {
+            singerList.remove(at: index)
+        }
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
+        guard let musicId = apiConfig?.musicStreamUid,let mainSingerId = songConfig?.mainSingerUid else {return}
+        if apiConfig?.routeSelectionConfig.type == .random || apiConfig?.routeSelectionConfig.type == .topN { return }
+        let uid = stats.uid
+        if uid == mainSingerId {
+            mainSingerDelay = stats.e2eDelay
+        }
+        if uid != mainSingerId && uid != musicId && subScribeSingerMap[Int(uid)] != nil {
+            subScribeSingerMap[Int(uid)] = stats.e2eDelay
+        }
     }
 }
 
@@ -1475,7 +1557,7 @@ extension KTVGiantChorusApiImpl {
     }
     
     private func sendCustomMessage(with event: String, label: String) {
-        apiConfig?.engine?.sendCustomReportMessage("scenarioAPI", category: "ktv_ios_3.3.0", event: event, label: label, value: 0)
+        apiConfig?.engine?.sendCustomReportMessage(messageId, category: version, event: event, label: label, value: 0)
     }
 
     private func sendStreamMessageWithDict(_ dict: [String: Any], success: ((_ success: Bool) -> Void)?) {
@@ -1547,6 +1629,7 @@ extension KTVGiantChorusApiImpl: AgoraRtcMediaPlayerDelegate {
             if isMainSinger() { //主唱播放，通过同步消息“setLrcTime”通知伴唱play
                 playerKit.play()
             }
+            self.startProcessDelay()
         } else if state == .stopped {
             apiConfig?.engine?.adjustPlaybackSignalVolume(100)
             self.localPlayerPosition = Date().milListamp
@@ -1557,6 +1640,8 @@ extension KTVGiantChorusApiImpl: AgoraRtcMediaPlayerDelegate {
         } else if state == .playing {
             apiConfig?.engine?.adjustPlaybackSignalVolume(Int(remoteVolume))
             self.localPlayerPosition = Date().milListamp - Double(mediaPlayer?.getPosition() ?? 0)
+        } else if state == .stopped {
+            self.stopProcessDelay()
         }
 
         if isMainSinger() {
@@ -1794,6 +1879,107 @@ extension KTVGiantChorusApiImpl {
         mSyncCloudConvergenceStatusTimer = nil
     }
     
+}
+
+extension KTVGiantChorusApiImpl {
+    
+    private func processDelayTask() {
+            if !mStopProcessDelay && singerRole != .audience {
+                let n = singerRole == .leadSinger ? apiConfig?.routeSelectionConfig.streamNum : (apiConfig?.routeSelectionConfig.streamNum ?? 1) - 1
+                let sortedEntries = subScribeSingerMap.sorted(by: { $0.value < $1.value })
+                let other = Array(sortedEntries.dropFirst(3))
+                var drop = [Int]()
+                
+                if n ?? 3 > 3 {
+                    for (uid, _) in other.dropLast(n! - 3) {
+                        drop.append(uid)
+                        apiConfig?.engine?.muteRemoteAudioStreamEx(UInt(uid), mute: true, connection: singChannelConnection ?? AgoraRtcConnection())
+                        subScribeSingerMap.removeValue(forKey: uid)
+                    }
+                }
+                
+                agoraPrint("选路重新订阅, drop:\(drop)")
+                
+                let filteredList = singerList.filter { !subScribeSingerMap.keys.contains($0) }
+                let filteredList2 = filteredList.filter { !drop.contains($0) }
+                let shuffledList = filteredList2.shuffled()
+                
+                if subScribeSingerMap.count < 8 {
+                    let randomSingers = Array(shuffledList.prefix(8 - subScribeSingerMap.count))
+                    agoraPrintError("选路重新订阅, newSingers:\(randomSingers)")
+                    
+                    for singer in randomSingers {
+                        subScribeSingerMap[singer] = 0
+                        apiConfig?.engine?.muteRemoteAudioStreamEx(UInt(singer), mute: false, connection: singChannelConnection ?? AgoraRtcConnection())
+                    }
+                }
+                
+                agoraPrint("选路重新订阅, newSubScribeSingerMap:\(subScribeSingerMap)")
+            }
+        }
+
+        private func processSubscribeTask() {
+            if !mStopProcessDelay && singerRole != .audience {
+                let n = singerRole == .leadSinger ? apiConfig?.routeSelectionConfig.streamNum : (apiConfig?.routeSelectionConfig.streamNum ?? 0) - 1
+                let sortedEntries = subScribeSingerMap.sorted(by: { $0.value < $1.value })
+                let mustToHave = Array(sortedEntries.prefix(3))
+                
+                for (uid, _) in mustToHave {
+                    apiConfig?.engine?.adjustUserPlaybackSignalVolumeEx(UInt(uid), volume: 100, connection: singChannelConnection ?? AgoraRtcConnection())
+                }
+                
+                let other = Array(sortedEntries.dropFirst(3))
+                
+                if n ?? 3 > 3 {
+                    for (uid, delay) in Array(other.prefix(n! - 3)) {
+                        if delay > 300 {
+                            apiConfig?.engine?.adjustUserPlaybackSignalVolumeEx(UInt(uid), volume: 0, connection: singChannelConnection ?? AgoraRtcConnection())
+                        } else {
+                            apiConfig?.engine?.adjustUserPlaybackSignalVolumeEx(UInt(uid), volume: 100, connection: singChannelConnection ?? AgoraRtcConnection())
+                        }
+                    }
+                    
+                    for (uid, _) in Array(other.dropFirst(n! - 3)) {
+                        apiConfig?.engine?.adjustUserPlaybackSignalVolumeEx(UInt(uid), volume: 0, connection: singChannelConnection ?? AgoraRtcConnection())
+                    }
+                }
+                
+                agoraPrint("选路排序+调整播放音量, mustToHave:\(mustToHave), other:\(other)")
+            }
+        }
+    
+    private func startProcessDelay() {
+        guard apiConfig?.routeSelectionConfig.type != .topN && apiConfig?.routeSelectionConfig.type != .random else { return }
+        
+        mStopProcessDelay = false
+        
+        // 创建并配置 processDelayTimer
+        processDelayFuture = DispatchSource.makeTimerSource()
+        processDelayFuture?.schedule(deadline: .now() + .seconds(10), repeating: .seconds(20))
+        processDelayFuture?.setEventHandler { [weak self] in
+            // 执行 mProcessDelayTask
+            self?.processDelayTask()
+        }
+        processDelayFuture?.resume()
+
+        // 创建并配置 processSubscribeTimer
+        processSubscribeFuture = DispatchSource.makeTimerSource()
+        processSubscribeFuture?.schedule(deadline: .now() + .seconds(15), repeating: .seconds(20))
+        processSubscribeFuture?.setEventHandler { [weak self] in
+            // 执行 mProcessSubscribeTask
+            self?.processSubscribeTask()
+        }
+        processSubscribeFuture?.resume()
+    }
+
+    private func stopProcessDelay() {
+        mStopProcessDelay = true
+
+        processDelayFuture?.cancel()
+        processDelayFuture = nil
+        processSubscribeFuture?.cancel()
+        processSubscribeFuture = nil
+    }
 }
 
 

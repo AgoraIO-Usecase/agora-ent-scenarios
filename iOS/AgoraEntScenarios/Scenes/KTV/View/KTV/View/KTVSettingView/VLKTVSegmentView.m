@@ -33,6 +33,7 @@
     [self addSubview:self.subLabel];
     self.subLabel.font = [UIFont systemFontOfSize:15];
     self.subLabel.textColor = [UIColor whiteColor];
+    self.subLabel.numberOfLines = 0;
     [self addSubview:self.segmentControl];
 }
 
@@ -47,6 +48,7 @@
     
     [self.subLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerY.mas_equalTo(self);
+        make.height.mas_equalTo(@(40));
         make.left.mas_equalTo(self.mas_left).offset(20);
     }];
     
@@ -64,8 +66,23 @@
     self.segmentControl.selectedSegmentIndex = selectIndex;
 }
 
--(void)setSubText:(NSString *)subText{
-    self.subLabel.text = subText;
+- (void)setSubText:(NSString *)subText attrText:(NSString *)attrText {
+    if (!attrText || [attrText isEqualToString:@""]) {
+        self.subLabel.text = subText;
+    } else {
+        NSString *fullText = [NSString stringWithFormat:@"%@\n%@", subText, attrText];
+        NSMutableAttributedString *attributedText = [[NSMutableAttributedString alloc] initWithString:fullText];
+
+        // 设置前面文字的样式
+        NSDictionary *firstTextAttributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:15], NSForegroundColorAttributeName: [UIColor whiteColor]};
+        [attributedText setAttributes:firstTextAttributes range:NSMakeRange(0, subText.length + 1)]; // +1 是为了包含换行符
+
+        // 设置后面文字的样式
+        NSDictionary *secondTextAttributes = @{NSFontAttributeName: [UIFont italicSystemFontOfSize:12], NSForegroundColorAttributeName: [UIColor lightGrayColor]};
+        [attributedText setAttributes:secondTextAttributes range:NSMakeRange(subText.length + 1, attrText.length)];
+
+        self.subLabel.attributedText = attributedText;
+    }
 }
 
 - (void)setType:(SegmentViewType)type {

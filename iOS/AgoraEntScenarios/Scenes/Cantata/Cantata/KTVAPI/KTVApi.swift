@@ -146,6 +146,25 @@ import AgoraRtcKit
     func onMusicPlayerProgressChanged(with progress: Int)
 }
 
+// 大合唱中演唱者互相收听对方音频流的选路策略
+enum GiantChorusRouteSelectionType: Int {
+    case random = 0 // 随机选取几条流
+    case byDelay = 1 // 根据延迟选择最低的几条流
+    case topN = 2 // 根据音强选流
+    case byDelayAndTopN = 3 // 同时开始延迟选路和音强选流
+}
+
+// 大合唱中演唱者互相收听对方音频流的选路配置
+@objc public class GiantChorusRouteSelectionConfig: NSObject {
+    let type: GiantChorusRouteSelectionType // 选路策略
+    let streamNum: Int // 最大选取的流个数（推荐6）
+
+    init(type: GiantChorusRouteSelectionType, streamNum: Int) {
+        self.type = type
+        self.streamNum = streamNum
+    }
+}
+
 @objc open class GiantChorusConfiguration: NSObject {
     var appId: String
     var rtmToken: String
@@ -159,8 +178,8 @@ import AgoraRtcKit
     var audienceChannelToken: String = ""
     var musicStreamUid: Int = 0
     var musicChannelToken: String = ""
-    var topN: Int = 0
-    var isDebugMode: Bool = false
+    var routeSelectionConfig: GiantChorusRouteSelectionConfig = GiantChorusRouteSelectionConfig(type: .byDelay, streamNum: 6)
+    var mccDomain: String?
     @objc public
     init(appId: String,
          rtmToken: String,
@@ -174,8 +193,8 @@ import AgoraRtcKit
          musicChannelToken: String,
          maxCacheSize: Int,
          musicType: loadMusicType,
-         topN: Int,
-         isDebugMode: Bool
+         routeSelectionConfig: GiantChorusRouteSelectionConfig,
+         mccDomain: String?
     ) {
         self.appId = appId
         self.rtmToken = rtmToken
@@ -189,8 +208,8 @@ import AgoraRtcKit
         self.audienceChannelToken = audienceChannelToken
         self.musicStreamUid = musicStreamUid
         self.musicChannelToken = musicChannelToken
-        self.topN = topN
-        self.isDebugMode = isDebugMode
+        self.routeSelectionConfig = routeSelectionConfig
+        self.mccDomain = mccDomain
     }
 }
 
@@ -205,7 +224,7 @@ import AgoraRtcKit
     var type: KTVType = .normal
     var maxCacheSize: Int = 10
     var musicType: loadMusicType = .mcc
-    var isDebugMode: Bool = false
+    var mccDomain: String?
     @objc public
     init(appId: String,
          rtmToken: String,
@@ -217,7 +236,7 @@ import AgoraRtcKit
          type: KTVType,
          musicType: loadMusicType,
          maxCacheSize: Int,
-         isDebugMode: Bool
+         mccDomain: String?
     ) {
         self.appId = appId
         self.rtmToken = rtmToken
@@ -229,7 +248,7 @@ import AgoraRtcKit
         self.type = type
         self.maxCacheSize = maxCacheSize
         self.musicType = musicType
-        self.isDebugMode = isDebugMode
+        self.mccDomain = mccDomain
     }
     
     
@@ -240,7 +259,7 @@ import AgoraRtcKit
     public var songIdentifier: String = ""
     public var mainSingerUid: Int = 0     //主唱uid
     public var mode: KTVLoadMusicMode = .loadMusicAndLrc
-    
+    public var songCutter: Bool = false
     func printObjectContent() -> String {
         var content = ""
         
