@@ -968,8 +968,7 @@ class LiveDetailFragment : Fragment() {
                 AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG -> { // 3D 打光+虚拟背景
                     RtcEngineInstance.mMetaEngineHandler.stopAiRhythm()
                     RtcEngineInstance.mMetaEngineHandler.stopEffect3D()
-                    enableAiEffect(AiPhotographerType.ITEM_ID_AI_LIGHTING_3D)
-                    // TODO:  360背景
+                    enableAiEffect(AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG)
                 }
             }
             RtcEngineInstance.mMetaEngineHandler.updateAiPhotographerId(itemId)
@@ -2558,7 +2557,7 @@ class LiveDetailFragment : Fragment() {
             }
 
             override fun onLoadSceneResp() {
-                RtcEngineInstance.mMetaEngineHandler.configEffectTextureVB()
+                RtcEngineInstance.mMetaEngineHandler.requestTextureVB()
             }
 
             override fun onRequestTextureResp() {

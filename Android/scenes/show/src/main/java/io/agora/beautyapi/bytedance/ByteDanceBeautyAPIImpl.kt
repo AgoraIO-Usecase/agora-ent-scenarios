@@ -388,7 +388,7 @@ class ByteDanceBeautyAPIImpl : ByteDanceBeautyAPI, IVideoFrameObserver {
         if (textureBufferHelper == null) {
             textureBufferHelper = TextureBufferHelper.create(
                 "ByteDanceRender",
-                EglBaseProvider.instance().rootEglBase.eglBaseContext
+                shareContext
             )
             textureBufferHelper?.invoke {
                 imageUtils = ImageUtil()

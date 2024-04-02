@@ -52,6 +52,15 @@ object SpecialEffectType {
 }
 
 
+object BackgroundType {
+    const val BGTypePano = 0
+    const val BGType2D = 1
+    const val BGType3D = 2
+    const val BGTypeNull = 3
+}
+;
+
+
 interface OnMetaSceneLoadedListener {
     fun onInitializeFinish()
     fun onUnityLoadFinish()
@@ -91,6 +100,10 @@ class MetaEngineHandler : AGExtensionHandler {
     private val mCurrentAssetPath by lazy {
         AgoraApplication.the().getExternalFilesDir("assets/metaAssets").toString()
     }
+    private val mCurrentMetaFilesPath by lazy {
+        AgoraApplication.the().getExternalFilesDir("assets/metaFiles").toString()
+    }
+
     var mRunningState: Int = IMetaRunningState.idle
 
 //    var mEffectId: Int = SpecialEffectType.SETypeNone
@@ -318,10 +331,14 @@ class MetaEngineHandler : AGExtensionHandler {
                 AiPhotographerType.ITEM_ID_AI_LIGHTING_AD -> SpecialEffectType.SETypeAdvLight
                 AiPhotographerType.ITEM_ID_AI_LIGHTING_3D -> SpecialEffectType.SEType3DLight
                 AiPhotographerType.ITEM_ID_AI_AURORA -> SpecialEffectType.SETypeAurora
+                AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG -> SpecialEffectType.SETypeAurora
                 else -> 0
             }
             if (effect3DId > 0) {
                 configEffectLight(true, effect3DId)
+            }
+            if (aiPhotographerType == AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG) {
+                setMetaBGMode(BackgroundType.BGTypePano)
             }
         } else {
             stopEffect3D()
@@ -335,10 +352,14 @@ class MetaEngineHandler : AGExtensionHandler {
             AiPhotographerType.ITEM_ID_AI_LIGHTING_AD -> SpecialEffectType.SETypeAdvLight
             AiPhotographerType.ITEM_ID_AI_LIGHTING_3D -> SpecialEffectType.SEType3DLight
             AiPhotographerType.ITEM_ID_AI_AURORA -> SpecialEffectType.SETypeAurora
+            AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG -> SpecialEffectType.SETypeAurora
             else -> 0
         }
         if (effect3DId > 0) {
             configEffectLight(false, effect3DId)
+        }
+        if (mLastAiPhotographerId == AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG) {
+            setMetaBGMode(BackgroundType.BGTypeNull)
         }
     }
 
@@ -359,8 +380,7 @@ class MetaEngineHandler : AGExtensionHandler {
         )
     }
 
-    // 3d 灯光+虚拟背景
-    fun configEffectTextureVB() {
+    fun requestTextureVB() {
         Log.d(TAG, "metakitx configEffectTextureVB, mRunningState: $mRunningState")
         if (mRunningState < IMetaRunningState.unityLoaded) return
         val rtcEngine = mRtcEngine ?: return
@@ -390,33 +410,47 @@ class MetaEngineHandler : AGExtensionHandler {
         )
     }
 
-    fun requestTextureAvatar(avatar: String) {
-        Log.d(TAG, "metakitx requestTextureAvatar, mRunningState: $mRunningState")
-        if (mRunningState < IMetaRunningState.unityLoaded) return
+    fun setMetaBGMode(bgMode: Int) {
+        Log.d(TAG, "metakitx setMetaBGMode: $bgMode")
         val rtcEngine = mRtcEngine ?: return
-        val resolutionW: Int = 720
-        val resolutionH: Int = 1080
-        val index = 0
-        val valueObj = JSONObject()
+        var filePath = ""
+        var mode = ""
+        var gyroState = "off"
+        when (bgMode) {
+            BackgroundType.BGTypePano -> {
+                mode = "tex360"
+                filePath = "$mCurrentMetaFilesPath/metaFiles/pano.jpg"
+                gyroState = "on"
+            }
+            BackgroundType.BGTypeNull -> {
+                mode = "off"
+                filePath = ""
+                gyroState = "off"
+            }
+            else -> {}
+        }
+        val picObj = JSONObject()
         try {
-            valueObj.put("index", index)
-            valueObj.put("enable", true)
+            picObj.put("mode", mode)
             val configObj = JSONObject()
-            configObj.put("width", resolutionW)
-            configObj.put("height", resolutionH)
-            val extraObj = JSONObject()
-            extraObj.put("sceneIndex", 0)
-            extraObj.put("avatarMode", 0)
-            extraObj.put("avatar", avatar)
-            extraObj.put("userId", mUser.id.toString())
-            configObj.put("extraInfo", extraObj.toString())
-            valueObj.put("config", configObj)
+            configObj.put("path", filePath)
+            picObj.put("param", configObj)
         } catch (e: JSONException) {
             e.printStackTrace()
         }
         rtcEngine.setExtensionProperty(
             "agora_video_filters_metakit",
-            "metakit", "requestTexture", valueObj.toString()
+            "metakit", "setBGVideo", picObj.toString()
+        )
+        val gyroObj = JSONObject()
+        try {
+            gyroObj.put("state", gyroState)
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+        rtcEngine.setExtensionProperty(
+            "agora_video_filters_metakit",
+            "metakit", "setCameraGyro", gyroObj.toString()
         )
     }
 

@@ -326,7 +326,7 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
         if (textureBufferHelper == null) {
             textureBufferHelper = TextureBufferHelper.create(
                 "STRender",
-                EglBaseProvider.instance().rootEglBase.eglBaseContext
+                shareContext
             )
             textureBufferHelper?.invoke {
                 synchronized(pendingProcessRunList){
