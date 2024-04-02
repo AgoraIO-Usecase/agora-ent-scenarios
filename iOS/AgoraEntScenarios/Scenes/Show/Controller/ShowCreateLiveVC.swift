@@ -136,7 +136,7 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     }
     
     func onClickStartBtnAction() {
-        if isBeautyDownloaded() { return }
+        guard isBeautyDownloaded() else { return }
         guard let roomName = createView.roomName, roomName.count > 0 else {
             ToastView.show(text: "create_room_name_can_not_empty".show_localized)
             return
