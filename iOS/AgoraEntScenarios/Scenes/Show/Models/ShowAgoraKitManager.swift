@@ -39,12 +39,7 @@ class ShowAgoraKitManager: NSObject {
     
     private var broadcasterConnection: AgoraRtcConnection?
     
-    private lazy var audioApi: AudioScenarioApi? = {
-        if let engine = engine {
-            return AudioScenarioApi(rtcEngine: engine)
-        }
-        return nil
-    }()
+    private var audioApi: AudioScenarioApi?
     
 //    var exposureRangeX: Int?
 //    var exposureRangeY: Int?
@@ -61,7 +56,16 @@ class ShowAgoraKitManager: NSObject {
 //        return config
 //    }()
     
-    public var engine: AgoraRtcEngineKit?
+    public var engine: AgoraRtcEngineKit? {
+        didSet {
+            if oldValue != engine {
+                audioApi = nil
+            }
+            if let engine = engine {
+                audioApi = AudioScenarioApi(rtcEngine: engine)
+            }
+        }
+    }
     
     private var player: AgoraRtcMediaPlayerProtocol?
     func mediaPlayer() -> AgoraRtcMediaPlayerProtocol? {
