@@ -132,6 +132,8 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, strong) SoundCardSettingView *soundSettingView;
 @property (nonatomic, strong) LSTPopView *popSoundSettingView;
 @property (nonatomic, strong) HeadSetManager *headeSet;
+
+@property (nonatomic, strong) VLKTVSettingModel *settingModel;
 @end
 
 @implementation VLKTVViewController
@@ -522,6 +524,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 
 - (void)showSettingView {
     LSTPopView* popView = [LSTPopView popSettingViewWithParentView:self.view
+                                                           setting: self.settingModel
                                                        settingView:self.settingView
                                                       withDelegate:self];
     
@@ -1718,6 +1721,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 #pragma mark - VLKTVSettingViewDelegate
 - (void)settingViewSettingChanged:(VLKTVSettingModel *)setting
               valueDidChangedType:(VLKTVValueDidChangedType)type {
+    self.settingModel = setting;
     if (type == VLKTVValueDidChangedTypeEar) { // 耳返设置
         // 用户必须使用有线耳机才能听到耳返效果
         // 1、不在耳返中添加audiofilter
