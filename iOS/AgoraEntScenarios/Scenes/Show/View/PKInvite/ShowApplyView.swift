@@ -93,14 +93,11 @@ class ShowApplyView: UIView {
         imp?.getAllMicSeatApplyList {[weak self] _, list in
             guard let list = list?.filter({ $0.userId != self?.interactionModel?.userId }) else { return }
             let seatUserModel = list.filter({ $0.userId == VLUserCenter.user.id }).first
-            if seatUserModel == nil, autoApply, self?.interactionModel?.userId != VLUserCenter.user.id {
-                self?.revokeutton.setTitle("show_cancel_linking".show_localized, for: .normal)
-                self?.revokeutton.setImage(UIImage.show_sceneImage(name: "show_live_withdraw"),
-                                          for: .normal,
-                                          postion: .right,
-                                          spacing: 5)
-                self?.revokeutton.tag = 0
-                self?.revokeutton.isHidden = false
+            var updateRevokeButton = false
+            if seatUserModel != nil {
+                updateRevokeButton = true
+            } else if seatUserModel == nil, autoApply, self?.interactionModel?.userId != VLUserCenter.user.id {
+                updateRevokeButton = true
                 imp?.createMicSeatApply { error in
                     if let error = error {
                         self?.revokeutton.isHidden = true
@@ -113,6 +110,17 @@ class ShowApplyView: UIView {
                     }
                 }
             }
+            
+            if updateRevokeButton {
+                self?.revokeutton.setTitle("show_cancel_linking".show_localized, for: .normal)
+                self?.revokeutton.setImage(UIImage.show_sceneImage(name: "show_live_withdraw"),
+                                           for: .normal,
+                                           postion: .right,
+                                           spacing: 5)
+                self?.revokeutton.tag = 0
+                self?.revokeutton.isHidden = false
+            }
+            
             self?.setupTipsInfo(count: list.count)
             self?.tableView.dataArray = list
             imp = nil
