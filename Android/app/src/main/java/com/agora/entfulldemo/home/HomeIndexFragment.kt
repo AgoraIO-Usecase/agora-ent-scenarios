@@ -24,10 +24,11 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
 
     private val mTabs by lazy {
         mutableListOf(
-            //HomeScenesType.Full,
-            //HomeScenesType.KTV,
-            //HomeScenesType.Voice,
-            HomeScenesType.Live
+//            HomeScenesType.Full,
+//            HomeScenesType.KTV,
+//            HomeScenesType.Voice,
+//            HomeScenesType.Live,
+            HomeScenesType.Game
         )
     }
 
@@ -62,6 +63,7 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
                 HomeScenesType.KTV -> tvTabTitle.text = act.getString(R.string.app_home_scene_ktv)
                 HomeScenesType.Voice -> tvTabTitle.text = act.getString(R.string.app_home_scene_voice)
                 HomeScenesType.Live -> tvTabTitle.text = if (mSingleScene) act.getString(R.string.app_home_scene_live_merge) else act.getString(R.string.app_home_scene_live)
+                HomeScenesType.Game -> tvTabTitle.text = act.getString(R.string.app_home_scene_game)
                 else -> tvTabTitle.text = act.getString(R.string.app_home_full_scene)
             }
         }.attach()
