@@ -39,6 +39,8 @@ class ShowAgoraKitManager: NSObject {
     
     private var broadcasterConnection: AgoraRtcConnection?
     
+    private var channelIdUidCanvasMap: [String: UInt] = [:]
+    
     private var audioApi: AudioScenarioApi?
     
 //    var exposureRangeX: Int?
@@ -344,7 +346,14 @@ class ShowAgoraKitManager: NSObject {
         engine.updateChannelEx(with: options, connection: connection)
     }
     
+    
     /// 切换连麦角色
+    /// - Parameters:
+    ///   - role: 角色，连麦双方为broadcaster，观众为audience，连麦主播结束连麦也为audience
+    ///   - channelId: 频道号
+    ///   - options: <#options description#>
+    ///   - uid: 连麦窗口的uid
+    ///   - canvasView: 画布，nil表示需要移除
     func switchRole(role: AgoraClientRole,
                     channelId: String,
                     options:AgoraRtcChannelMediaOptions,
@@ -362,14 +371,20 @@ class ShowAgoraKitManager: NSObject {
         options.clientRoleType = role
         options.audienceLatencyLevel = role == .audience ? .lowLatency : .ultraLowLatency
         updateChannelEx(channelId:channelId, options: options)
-        if "\(uid)" == VLUserCenter.user.id {
-            if role == .broadcaster {
-                setupLocalVideo(uid: uid, canvasView: canvasView)
-            } else {
-                cleanCapture()
-            }
-        } else {
+        
+        if role == .audience {
+            //观众先清理本地画面，然后设置远端画面
+            setupLocalVideo(canvasView: nil)
+            cleanCapture()
             setupRemoteVideo(channelId: channelId, uid: uid, canvasView: canvasView)
+        } else {
+            if "\(uid)" == VLUserCenter.user.id {
+                //自己是连麦主播，渲染本地画面
+                setupLocalVideo(canvasView: canvasView)
+            } else {
+                //自己是主播，渲染连麦主播远端画面
+                setupRemoteVideo(channelId: channelId, uid: uid, canvasView: canvasView)
+            }
         }
     }
     
@@ -452,41 +467,40 @@ class ShowAgoraKitManager: NSObject {
         completion?()
     }
     
-    func setupLocalVideo(uid: UInt = 0, 
-                         mirrorMode: AgoraVideoMirrorMode = .disabled,
-                         canvasView: UIView?) {
+    func setupLocalVideo(mirrorMode: AgoraVideoMirrorMode = .disabled,
+                                 canvasView: UIView?) {
         guard let engine = engine else {
             assert(true, "rtc engine not initlized")
             return
         }
         let canvas = AgoraRtcVideoCanvas()
         canvas.view = canvasView
-        canvas.uid = uid
         canvas.mirrorMode = mirrorMode
         engine.setupLocalVideo(canvas)
         engine.startPreview()
         engine.setDefaultAudioRouteToSpeakerphone(true)
         engine.enableLocalAudio(true)
         engine.enableLocalVideo(true)
-        showPrint("setupLocalVideo target uid:\(uid), user uid:\(UserInfo.userId)", context: kShowLogBaseContext)
+        showPrint("setupLocalVideo, user uid:\(UserInfo.userId)", context: kShowLogBaseContext)
     }
     
-    func setupRemoteVideo(channelId: String, uid: UInt, canvasView: UIView?) {
-        if let connection = broadcasterConnection, broadcasterConnection?.channelId == channelId {
+    //连麦用，pk走的VideoloaderAPI
+    private func setupRemoteVideo(channelId: String, uid: UInt, canvasView: UIView?) {
+        let connection = AgoraRtcConnection(channelId: channelId, localUid: Int(VLUserCenter.user.id) ?? 0)
+        if let uid = channelIdUidCanvasMap[channelId] {
             let videoCanvas = AgoraRtcVideoCanvas()
             videoCanvas.uid = uid
-            videoCanvas.view = canvasView
-            videoCanvas.renderMode = .hidden
-            let ret = engine?.setupRemoteVideoEx(videoCanvas, connection: connection)
-            
-            showPrint("setupRemoteVideoEx ret = \(ret ?? -1), uid:\(uid) localuid: \(UserInfo.userId) channelId: \(channelId)", context: kShowLogBaseContext)
-            return
+            let _ = engine?.setupRemoteVideoEx(videoCanvas, connection: connection)
+            channelIdUidCanvasMap.removeValue(forKey: channelId)
         }
-        let anchorInfo = getAnchorInfo(channelId: channelId, uid: uid)
-        let container = VideoCanvasContainer()
-        container.uid = uid
-        container.container = canvasView
-        VideoLoaderApiImpl.shared.renderVideo(anchorInfo: anchorInfo, container: container)
+        let videoCanvas = AgoraRtcVideoCanvas()
+        videoCanvas.uid = uid
+        videoCanvas.view = canvasView
+        let ret = engine?.setupRemoteVideoEx(videoCanvas, connection: connection)
+        if let _ = canvasView {
+            channelIdUidCanvasMap[channelId] = uid
+        }
+        showPrint("setupRemoteVideoEx[\(channelId)] ret = \(ret ?? -1), uid:\(uid)", context: kShowLogBaseContext)
     }
     
     func updateLoadingType(roomId: String, channelId: String, playState: AnchorState) {

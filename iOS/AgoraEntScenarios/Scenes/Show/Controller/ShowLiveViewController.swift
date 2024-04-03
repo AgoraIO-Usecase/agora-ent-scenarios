@@ -326,7 +326,7 @@ class ShowLiveViewController: UIViewController {
                                                  role: role) {
         }
         ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: channelId)
-        ShowAgoraKitManager.shared.setupLocalVideo(uid: uid, canvasView: self.liveView.canvasView.localView)
+        ShowAgoraKitManager.shared.setupLocalVideo(canvasView: self.liveView.canvasView.localView)
         liveView.canvasView.setLocalUserInfo(name: room?.ownerName ?? "", img: room?.ownerAvatar ?? "")
         self.muteLocalVideo = false
         self.muteLocalAudio = false
@@ -759,13 +759,13 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             } else {
                 ShowAgoraKitManager.shared.updateVideoProfileForMode(.single)
             }
-            let uid = role == .broadcaster ? VLUserCenter.user.id : interaction.userId
-            let canvasView = role == .broadcaster ? liveView.canvasView.localView : liveView.canvasView.remoteView
+            
+//            let canvasView = role == .broadcaster ? liveView.canvasView.localView : liveView.canvasView.remoteView
             ShowAgoraKitManager.shared.switchRole(role: role,
-                                                  channelId: room?.roomId ?? "",
+                                                  channelId: roomId,
                                                   options: self.channelOptions,
-                                                  uid: uid,
-                                                  canvasView: canvasView)
+                                                  uid: interaction.userId,
+                                                  canvasView: nil)
             self.delegate?.currentUserIsOffSeat()
         default:
             break
