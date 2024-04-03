@@ -306,7 +306,7 @@ class JoySyncManagerServiceImp constructor(
             message = message,
             createAt = TimeUtils.currentTimeMillis()
         )
-        mSyncManager.rtmManager.publish(roomId, mUser.id.toString(), joyMessage.toString(), completion = {
+        mSyncManager.rtmManager.publish(roomId, "", GsonTools.beanToString(joyMessage)?:"", completion = {
             if (it == null) {
                 JoyLogger.d(TAG, "sendChatMessage onSuccess roomId:$roomId")
                 runOnMainThread {
@@ -358,22 +358,6 @@ class JoySyncManagerServiceImp constructor(
         }
     }
 
-    private fun plusRoomUserCount(userCount: Any, roomInfo: AUIRoomInfo) {
-        if (userCount is Int) {
-            roomInfo.customPayload[JoyParameters.ROOM_USER_COUNT] = userCount + 1
-        } else if (userCount is Long) {
-            roomInfo.customPayload[JoyParameters.ROOM_USER_COUNT] = userCount.toInt() + 1
-        }
-    }
-
-    private fun minusRoomUserCount(userCount: Any, roomInfo: AUIRoomInfo) {
-        if (userCount is Int) {
-            roomInfo.customPayload[JoyParameters.ROOM_USER_COUNT] = userCount - 1
-        } else if (userCount is Long) {
-            roomInfo.customPayload[JoyParameters.ROOM_USER_COUNT] = userCount.toInt() - 1
-        }
-    }
-
     override fun onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {
         JoyLogger.d(TAG, "onRoomUserEnter, roomId:$roomId, userInfo:$userInfo")
         mUserList.removeIf { it.userId == userInfo.userId }
@@ -381,12 +365,10 @@ class JoySyncManagerServiceImp constructor(
         mJoyServiceListener?.onUserListDidChanged(mUserList)
         val roomInfo = mRoomMap[roomId] ?: return
         if (mUser.id.toString() == roomInfo.roomOwner?.userId) {
-            roomInfo.customPayload[JoyParameters.ROOM_USER_COUNT]?.let { userCount->
-                plusRoomUserCount(userCount,roomInfo)
-                updateRoom(roomInfo, completion = {
+            roomInfo.customPayload[JoyParameters.ROOM_USER_COUNT] = mUserList.count()
+            updateRoom(roomInfo, completion = {
 
-                })
-            }
+            })
         }
     }
 
@@ -396,12 +378,10 @@ class JoySyncManagerServiceImp constructor(
         mJoyServiceListener?.onUserListDidChanged(mUserList)
         val roomInfo = mRoomMap[roomId] ?: return
         if (mUser.id.toString() == roomInfo.roomOwner?.userId) {
-            roomInfo.customPayload[JoyParameters.ROOM_USER_COUNT]?.let { userCount->
-                minusRoomUserCount(userCount,roomInfo)
-                updateRoom(roomInfo, completion = {
+            roomInfo.customPayload[JoyParameters.ROOM_USER_COUNT] = mUserList.count()
+            updateRoom(roomInfo, completion = {
 
-                })
-            }
+            })
         }
     }
 
