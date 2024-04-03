@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="joy_widget_roundStyle">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="joy_roundStyle_6">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">6%</item>
+    </style>
+
+    <style name="joy_roundStyle_16">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+
+    <!-- like自定义属性 -->
+    <declare-styleable name="joy_LikeLayout">
+        <attr name="joy_initX" format="dimension" />
+        <attr name="joy_initY" format="dimension" />
+        <attr name="joy_xRand" format="dimension" />
+        <attr name="joy_animLengthRand" format="dimension" />
+        <attr name="joy_xPointFactor" format="dimension" />
+        <attr name="joy_animLength" format="dimension" />
+        <attr name="joy_heart_width" format="dimension" />
+        <attr name="joy_heart_height" format="dimension" />
+        <attr name="joy_bezierFactor" format="integer" />
+        <attr name="joy_anim_duration" format="integer" />
+    </declare-styleable>
+
+    <style name="joy_alert_dialog" parent="Theme.AppCompat.Dialog">
+        <item name="alertDialogStyle">@style/joy_alert_dialog_style</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="enableEdgeToEdge">true</item>
+    </style>
+
+
+    <style name="joy_alert_dialog_style" parent="AlertDialog.AppCompat">
+        <item name="android:layout">@layout/joy_alert_dialog_layout</item>
+    </style>
+</resources>
