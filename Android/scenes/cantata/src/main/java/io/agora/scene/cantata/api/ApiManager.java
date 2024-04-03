@@ -195,7 +195,7 @@ public class ApiManager {
 
     private String getBasicAuth() {
         // 拼接客户 ID 和客户密钥并使用 base64 编码
-        String plainCredentials = BuildConfig.CLOUD_PLAYER_KEY + ":" + BuildConfig.CLOUD_PLAYER_SECRET;
+        String plainCredentials = BuildConfig.RESTFUL_API_KEY + ":" + BuildConfig.RESTFUL_API_SECRET;
         String base64Credentials = null;
         base64Credentials = new String(Base64.getEncoder().encode(plainCredentials.getBytes()));
         // 创建 authorization header

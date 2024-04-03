@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:tabGravity="start"
         app:tabIndicatorHeight="0dp"
-        app:tabMode="fixed"
+        app:tabMode="scrollable"
         app:layout_constraintStart_toStartOf="parent"
         app:tabRippleColor="@android:color/transparent"
         app:tabSelectedTextColor="@color/black"

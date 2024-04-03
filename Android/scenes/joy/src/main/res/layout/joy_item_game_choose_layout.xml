@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="120dp"
+    android:paddingHorizontal="1dp"
+    android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutGame"
+            android:layout_width="82dp"
+            android:layout_height="108dp"
+            android:background="@drawable/joy_bg_item_choose_game"
+            android:padding="2dp">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivGame"
+                android:layout_width="78dp"
+                android:layout_height="78dp"
+                app:shapeAppearance="@style/joy_roundStyle_16"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@mipmap/joy_img_room_item_bg_0" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvGameName"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:gravity="center_horizontal|top"
+                android:paddingTop="4dp"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ivGame"
+                tools:text="胖可争霸" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
