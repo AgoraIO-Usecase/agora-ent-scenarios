@@ -98,10 +98,10 @@ class MetaEngineHandler : AGExtensionHandler {
     }
 
     private val mCurrentAssetPath by lazy {
-        AgoraApplication.the().getExternalFilesDir("assets/metaAssets").toString()
+        AgoraApplication.the().getExternalFilesDir("assets").toString()
     }
     private val mCurrentMetaFilesPath by lazy {
-        AgoraApplication.the().getExternalFilesDir("assets/metaFiles").toString()
+        AgoraApplication.the().getExternalFilesDir("assets").toString()
     }
 
     var mRunningState: Int = IMetaRunningState.idle
@@ -331,7 +331,7 @@ class MetaEngineHandler : AGExtensionHandler {
                 AiPhotographerType.ITEM_ID_AI_LIGHTING_AD -> SpecialEffectType.SETypeAdvLight
                 AiPhotographerType.ITEM_ID_AI_LIGHTING_3D -> SpecialEffectType.SEType3DLight
                 AiPhotographerType.ITEM_ID_AI_AURORA -> SpecialEffectType.SETypeAurora
-                AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG -> SpecialEffectType.SETypeAurora
+                AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG -> SpecialEffectType.SEType3DLight
                 else -> 0
             }
             if (effect3DId > 0) {
@@ -419,7 +419,7 @@ class MetaEngineHandler : AGExtensionHandler {
         when (bgMode) {
             BackgroundType.BGTypePano -> {
                 mode = "tex360"
-                filePath = "$mCurrentMetaFilesPath/metaFiles/pano.jpg"
+                filePath = "$mCurrentMetaFilesPath/pano.jpg"
                 gyroState = "on"
             }
             BackgroundType.BGTypeNull -> {
