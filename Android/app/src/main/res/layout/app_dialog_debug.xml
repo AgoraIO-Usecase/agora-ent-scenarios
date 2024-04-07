@@ -27,8 +27,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
+        android:background="@drawable/app_bg_env_mode_radius"
         android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="5dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTitle">
 
@@ -36,6 +37,11 @@
             android:id="@+id/rbEnvRelease"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/app_bg_env_mode_selector"
+            android:button="@null"
+            android:checked="true"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
             android:text="Release"
             android:textColor="@color/def_text_grey_6c7"
             android:textSize="13sp" />
@@ -44,24 +50,30 @@
             android:id="@+id/rbEnvDev"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/app_bg_env_mode_selector"
+            android:button="@null"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
             android:text="Dev"
             android:textColor="@color/def_text_grey_6c7"
             android:textSize="13sp" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/btnEnvSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:background="@drawable/bg_full_black_28_r8"
-            android:gravity="center"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="5dp"
-            android:text="@string/confirm"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            android:textStyle="normal" />
     </RadioGroup>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btnEnvSwitch"
+        style="@style/def_btn_full"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="4dp"
+        android:text="@string/app_debug_env"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:textStyle="normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/rgSwitchEnv"
+        app:layout_constraintTop_toTopOf="@id/rgSwitchEnv" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvDesc"
@@ -107,10 +119,10 @@
         android:layout_marginStart="10dp"
         android:gravity="center"
         android:paddingHorizontal="24dp"
+        android:text="@string/confirm"
         android:textColor="@color/white"
         android:textSize="14sp"
         android:textStyle="normal"
-        android:text="@string/confirm"
         app:layout_constraintStart_toEndOf="@id/gl50"
         app:layout_constraintTop_toTopOf="@id/btnLeft" />
 </androidx.constraintlayout.widget.ConstraintLayout>
