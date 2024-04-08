@@ -22,11 +22,11 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
+import io.agora.scene.show.widget.PresetAudienceDialog
+import io.agora.scene.widget.utils.StatusBarUtil
 import io.agora.videoloaderapi.OnLiveRoomItemTouchEventHandler
 import io.agora.videoloaderapi.OnRoomListScrollEventHandler
 import io.agora.videoloaderapi.VideoLoader
-import io.agora.scene.show.widget.PresetAudienceDialog
-import io.agora.scene.widget.utils.StatusBarUtil
 
 /*
  * 房间列表 activity

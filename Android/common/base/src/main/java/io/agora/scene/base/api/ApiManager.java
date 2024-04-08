@@ -204,14 +204,14 @@ public class ApiManager {
     private RequestBody getRequestBody(ArrayMap<String, String> params) {
         return RequestBody.create(
                 MediaType.parse("application/json;charset=UTF-8"),
-                GsonUtils.Companion.getGson().toJson(params)
+                GsonUtils.getGson().toJson(params)
         );
     }
 
     private RequestBody getRequestBody1(ArrayMap<String, Object> params) {
         return RequestBody.create(
                 MediaType.parse("application/json;charset=UTF-8"),
-                GsonUtils.Companion.getGson().toJson(params)
+                GsonUtils.getGson().toJson(params)
         );
     }
 }

@@ -58,7 +58,6 @@ object SenseTimeBeautySDK {
     fun initBeautySDK(context: Context): Boolean {
         if (checkLicense(context)) {
             initHumanAction(context)
-            initMobileEffect(context)
             return true
         }
         return false
@@ -66,12 +65,11 @@ object SenseTimeBeautySDK {
 
     fun unInitBeautySDK() {
         beautyAPI = null
-        unInitMobileEffect()
         unInitHumanActionNative()
         beautyConfig.reset()
     }
 
-    private fun initMobileEffect(context: Context) {
+    fun initMobileEffect(context: Context) {
         if (_mobileEffectNative != null) {
             return
         }
@@ -82,9 +80,11 @@ object SenseTimeBeautySDK {
         Log.d(TAG, "SenseTime >> STMobileEffectNative create result : $result")
     }
 
-    private fun unInitMobileEffect() {
-        _mobileEffectNative?.destroyInstance()
-        _mobileEffectNative = null
+    fun unInitMobileEffect() {
+        if(_mobileEffectNative != null){
+            _mobileEffectNative?.destroyInstance()
+            _mobileEffectNative = null
+        }
     }
 
     private fun checkLicense(context: Context): Boolean {
@@ -150,7 +150,7 @@ object SenseTimeBeautySDK {
 
 
     internal fun setBeautyAPI(beautyAPI: SenseTimeBeautyAPI){
-        this.beautyAPI = beautyAPI
+        SenseTimeBeautySDK.beautyAPI = beautyAPI
         beautyConfig.resume()
     }
 

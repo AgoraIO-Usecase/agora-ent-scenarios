@@ -112,6 +112,17 @@
                 tools:visibility="visible"
                 android:background="@drawable/show_live_detail_bottom_btn_bg" />
 
+            <ImageView
+                android:id="@+id/ivAiPhotographer"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:src="@mipmap/show_ai_photographer"
+                android:padding="8dp"
+                android:visibility="gone"
+                android:layout_marginStart="5dp"
+                android:scaleType="fitXY"
+                tools:visibility="visible"
+                android:background="@drawable/show_live_detail_bottom_btn_bg" />
 
             <ImageView
                 android:id="@+id/ivMusic"

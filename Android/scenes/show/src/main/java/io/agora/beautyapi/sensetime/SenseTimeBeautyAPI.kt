@@ -32,7 +32,7 @@ import io.agora.base.VideoFrame
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcEngine
 
-const val VERSION = "1.0.4"
+const val VERSION = "1.0.5"
 
 enum class CaptureMode{
     Agora, // 使用声网内部的祼数据接口进行处理
@@ -47,6 +47,16 @@ interface IEventCallback{
      * @param stats 美颜统计数据
      */
     fun onBeautyStats(stats: BeautyStats)
+
+    /**
+     * effectManager在GL线程里初始化完成后回调
+     */
+    fun onEffectInitialized(): STHandlers
+
+    /**
+     * effectManager在GL线程里销毁完成后回调
+     */
+    fun onEffectDestroyed()
 }
 
 data class BeautyStats(
@@ -73,7 +83,6 @@ data class CameraConfig(
 data class Config(
     val context: Context, // Android Context上下文
     val rtcEngine: RtcEngine, // 声网Rtc引擎
-    val stHandlers: STHandlers, // 美颜SDK处理句柄
     val eventCallback: IEventCallback? = null, // 事件回调
     val captureMode: CaptureMode = CaptureMode.Agora, // 处理模式
     val statsDuration: Long = 1000, // 统计区间
@@ -138,13 +147,6 @@ interface SenseTimeBeautyAPI {
      * @return 见ErrorCode
      */
     fun onFrame(videoFrame: VideoFrame): Int
-
-    /**
-     * 声网提供的美颜最佳默认参数
-     *
-     * @return 见ErrorCode
-     */
-    fun setBeautyPreset(preset: BeautyPreset = BeautyPreset.DEFAULT): Int
 
     /**
      * 更新摄像头配置
