@@ -11,11 +11,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.agora.rtc2.video.SegmentationProperty
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.utils.FileUtils
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.R
 import io.agora.scene.show.RtcEngineInstance
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowWidgetBeautyMultiDialogBinding
 import io.agora.scene.show.databinding.ShowWidgetBeautyMultiDialogVirtualBgBinding
+import io.agora.scene.show.photographer.MetaEngineHandler
 import io.agora.scene.widget.utils.StatusBarUtil
 
 class MultiBeautyDialog : BottomSheetDialog {
@@ -139,6 +141,10 @@ class MultiBeautyDialog : BottomSheetDialog {
                             value = RtcEngineInstance.virtualBackgroundSegmentation.greenCapacity,
                             isSelected = RtcEngineInstance.virtualBackgroundSource.backgroundSourceType == VirtualBackgroundSource.BACKGROUND_BLUR,
                             onValueChanged = { value ->
+                                if (RtcEngineInstance.mMetaEngineHandler.isAiPhotographerEnable) {
+                                    ToastUtils.showToast(R.string.show_beauty_switch_virtual_background_tips)
+                                    RtcEngineInstance.mMetaEngineHandler.resetAiPhotographer()
+                                }
                                 RtcEngineInstance.virtualBackgroundSource.backgroundSourceType =
                                     VirtualBackgroundSource.BACKGROUND_BLUR
                                 RtcEngineInstance.virtualBackgroundSegmentation.greenCapacity =
@@ -156,6 +162,10 @@ class MultiBeautyDialog : BottomSheetDialog {
                             value = RtcEngineInstance.virtualBackgroundSegmentation.greenCapacity,
                             isSelected = RtcEngineInstance.virtualBackgroundSource.backgroundSourceType == VirtualBackgroundSource.BACKGROUND_IMG,
                             onValueChanged = { value ->
+//                                if (RtcEngineInstance.mMetaEngineHandler.isAiPhotographerEnable) {
+//                                    ToastUtils.showToast(R.string.show_beauty_switch_virtual_background_tips)
+//                                    RtcEngineInstance.mMetaEngineHandler.resetAiPhotographer()
+//                                }
                                 RtcEngineInstance.virtualBackgroundSource.backgroundSourceType =
                                     VirtualBackgroundSource.BACKGROUND_IMG
                                 RtcEngineInstance.virtualBackgroundSource.source =
@@ -226,6 +236,10 @@ class MultiBeautyDialog : BottomSheetDialog {
     }
 
     private fun changeVirtualBGMode(modelType: Int) {
+//        if (RtcEngineInstance.mMetaEngineHandler.isAiPhotographerEnable) {
+//            ToastUtils.showToast(R.string.show_beauty_switch_virtual_background_tips)
+//            RtcEngineInstance.mMetaEngineHandler.resetAiPhotographer()
+//        }
         RtcEngineInstance.virtualBackgroundSegmentation.modelType = modelType
         RtcEngineInstance.rtcEngine.enableVirtualBackground(
             true,

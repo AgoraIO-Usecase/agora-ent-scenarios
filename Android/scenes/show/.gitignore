@@ -14,3 +14,5 @@ src/main/assets/beauty_sensetime/sticker_face_shape
 src/main/assets/beauty_sensetime/style_lightly
 /src/main/java/io/agora/scene/show/beauty/authpack.java
 \build
+src/main/assets/metaAssets/DefaultPackage
+/.cxx/
