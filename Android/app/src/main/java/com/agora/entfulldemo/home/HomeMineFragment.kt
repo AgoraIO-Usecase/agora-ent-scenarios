@@ -20,10 +20,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppFragmentHomeMineBinding
 import com.agora.entfulldemo.home.constructor.URLStatics
+import com.agora.entfulldemo.home.mine.EnvDebugClickListener
+import com.agora.entfulldemo.home.mine.EnvDebugDialog
 import com.bumptech.glide.request.RequestOptions
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.Constant
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.component.OnButtonClickListener
@@ -37,6 +40,7 @@ import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.dialog.SelectPhotoFromDialog
 import io.agora.scene.widget.utils.ImageCompressUtil
 import java.io.File
+import kotlin.system.exitProcess
 
 class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
 
@@ -50,7 +54,6 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
     }
 
     private var selectPhotoFromDialog: SelectPhotoFromDialog? = null
-    private var debugModeDialog: CommonDialog? = null
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AppFragmentHomeMineBinding {
         return AppFragmentHomeMineBinding.inflate(inflater)
     }
@@ -274,21 +277,27 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
 
 
     private fun showDebugModeCloseDialog() {
-        if (debugModeDialog == null) {
-            debugModeDialog = CommonDialog(requireContext())
-            debugModeDialog?.setDialogTitle(getString(R.string.app_exit_debug))
-            debugModeDialog?.setDescText(getString(R.string.app_exit_debug_tip))
-            debugModeDialog?.setDialogBtnText(getString(R.string.cancel), getString(R.string.app_exit))
-            debugModeDialog?.onButtonClickListener = object : OnButtonClickListener {
-                override fun onLeftButtonClick() {}
-                override fun onRightButtonClick() {
-                    binding.tvDebugMode.visibility = View.GONE
-                    AgoraApplication.the().enableDebugMode(false)
-                    ToastUtils.showToast(R.string.app_debug_off)
-                }
+        val context = context?:return
+        val envDebugDialog = EnvDebugDialog(context)
+        envDebugDialog.onEnvDebugClickListener = object : EnvDebugClickListener{
+
+            override fun onSwitchEnvClick(envRelease: Boolean) {
+                ServerConfig.envRelease = envRelease
+                binding.root.postDelayed({
+                    activity?.finish()
+                    exitProcess(0)
+                },500)
+            }
+
+            override fun onLeftButtonClick() {}
+
+            override fun onRightButtonClick() {
+                binding.tvDebugMode.visibility = View.GONE
+                AgoraApplication.the().enableDebugMode(false)
+                ToastUtils.showToast(R.string.app_debug_off)
             }
         }
-        debugModeDialog?.show()
+        envDebugDialog.show()
     }
 
     // 昵称限制 10 个字符
