@@ -30,9 +30,15 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
         private const val TAG = "Joy_RoomListActivity"
     }
 
-    private val mJoyService by lazy { JoyServiceProtocol.getImplInstance() }
+    private val mJoyService by lazy { JoyServiceProtocol.serviceProtocol }
 
     private var mJoyListAdapter: RoomListAdapter? = null
+
+    init {
+        // TODO: 如果不重启需要 reset
+//        JoyApiManager.reset()
+//        JoyServiceProtocol.reset()
+    }
 
     override fun getViewBinding(inflater: LayoutInflater): JoyActivityRoomListBinding {
         return JoyActivityRoomListBinding.inflate(inflater)
@@ -41,6 +47,7 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setOnApplyWindowInsetsListener(binding.root)
+
         JoyServiceManager.renewTokens {
             JoyServiceManager.initRtm()
             binding.smartRefreshLayout.autoRefresh()
@@ -124,16 +131,16 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
             val data: AUIRoomInfo = mList[position]
             holder.binding.tvRoomName.text = data.roomName
             val userCount = data.customPayload[JoyParameters.ROOM_USER_COUNT]
-            if (userCount is Int){
+            if (userCount is Int) {
                 holder.binding.tvUserCount.text = mContext.getString(R.string.joy_user_count, userCount.toInt())
-            }else if (userCount is Long){
+            } else if (userCount is Long) {
                 holder.binding.tvUserCount.text = mContext.getString(R.string.joy_user_count, userCount.toInt())
             }
             holder.binding.tvRoomId.text = mContext.getString(R.string.joy_room_id, data.roomId)
             val badgeTitle = data.customPayload[JoyParameters.BADGE_TITLE] as String?
             holder.binding.tvGameTag.isGone = badgeTitle.isNullOrEmpty()
             holder.binding.tvGameTag.text = badgeTitle ?: ""
-            (data.customPayload[JoyParameters.THUMBNAIL_ID] as String?)?.let {thumbnail->
+            (data.customPayload[JoyParameters.THUMBNAIL_ID] as String?)?.let { thumbnail ->
                 holder.binding.ivCover.setImageResource(getThumbnailIcon(thumbnail))
             }
             holder.itemView.setOnClickListener {

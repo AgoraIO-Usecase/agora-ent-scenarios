@@ -54,7 +54,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
         ViewModelProvider(this)[JoyViewModel::class.java]
     }
 
-    private val mJoyService by lazy { JoyServiceProtocol.getImplInstance() }
+    private val mJoyService by lazy { JoyServiceProtocol.serviceProtocol }
     private val mRtcEngine by lazy { JoyServiceManager.rtcEngine }
 
     private lateinit var mRoomNameArray: Array<String>

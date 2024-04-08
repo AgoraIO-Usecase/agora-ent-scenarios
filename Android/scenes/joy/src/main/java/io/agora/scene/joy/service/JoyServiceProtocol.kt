@@ -48,14 +48,21 @@ interface JoyServiceProtocol {
         // time limit
         val ROOM_AVAILABLE_DURATION: Long = 10 * 60 * 1000 // 10min
 
-        private val instance by lazy {
-            // JOyServiceImp()
-            JoySyncManagerServiceImp(AgoraApplication.the()) { error ->
-                error?.message?.let { JoyLogger.e("SyncManager", it) }
-            }
-        }
+        private var innnerProtocol: JoyServiceProtocol? = null
 
-        fun getImplInstance(): JoyServiceProtocol = instance
+        val serviceProtocol: JoyServiceProtocol
+            get() {
+                if (innnerProtocol == null) {
+                    innnerProtocol = JoySyncManagerServiceImp(AgoraApplication.the()) { error ->
+                        error?.message?.let { JoyLogger.e("SyncManager", it) }
+                    }
+                }
+                return innnerProtocol!!
+            }
+
+        fun reset(){
+            innnerProtocol = null
+        }
     }
 
     // ============== 房间相关 ==============
