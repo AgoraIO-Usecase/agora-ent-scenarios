@@ -20,13 +20,14 @@ import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLiveDetailActivityBinding
+import io.agora.scene.show.photographer.IMetaRunningState
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.utils.RunnableWithDenied
+import io.agora.scene.widget.dialog.PermissionLeakDialog
+import io.agora.scene.widget.utils.StatusBarUtil
 import io.agora.videoloaderapi.AGSlicingType
 import io.agora.videoloaderapi.OnPageScrollEventHandler
 import io.agora.videoloaderapi.VideoLoader
-import io.agora.scene.widget.dialog.PermissionLeakDialog
-import io.agora.scene.widget.utils.StatusBarUtil
 
 /*
  * 单直播间滑动控制 activity
@@ -260,6 +261,9 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
         RtcEngineInstance.cleanCache()
         RtcEngineInstance.resetVirtualBackground()
         BeautyManager.destroy()
+        if (RtcEngineInstance.mMetaEngineHandler.mRunningState > IMetaRunningState.idle) {
+            RtcEngineInstance.mMetaEngineHandler.leaveScene()
+        }
         super.finish()
     }
 }

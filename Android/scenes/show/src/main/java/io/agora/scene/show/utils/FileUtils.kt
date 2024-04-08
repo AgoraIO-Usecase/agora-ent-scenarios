@@ -30,6 +30,7 @@ import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.BufferedReader
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
@@ -114,5 +115,20 @@ object FileUtils {
             output?.close()
             input?.close()
         }
+    }
+
+    // 从文件中读取 json
+    fun readJsonFromFile(file: File): String {
+        try {
+            val input = FileInputStream(file)
+            val fileLength = input.available()
+            val buffer = ByteArray(fileLength)
+            val readLength = input.read(buffer)
+            input.close()
+            return String(buffer, charset("utf-8"))
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return "读取错误，请检查文件是否存在"
     }
 }

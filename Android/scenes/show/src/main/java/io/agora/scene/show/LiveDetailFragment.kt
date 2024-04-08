@@ -46,6 +46,8 @@ import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
 import io.agora.scene.show.databinding.ShowLivingEndDialogBinding
 import io.agora.scene.show.debugSettings.DebugAudienceSettingDialog
 import io.agora.scene.show.debugSettings.DebugSettingDialog
+import io.agora.scene.show.photographer.AiPhotographerType
+import io.agora.scene.show.photographer.OnMetaSceneLoadedListener
 import io.agora.scene.show.service.RoomException
 import io.agora.scene.show.service.ShowInteractionInfo
 import io.agora.scene.show.service.ShowInteractionStatus
@@ -55,10 +57,9 @@ import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowRoomRequestStatus
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.service.ShowUser
-import io.agora.videoloaderapi.OnPageScrollEventHandler
-import io.agora.videoloaderapi.VideoLoader
 import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
 import io.agora.scene.show.widget.AdvanceSettingDialog
+import io.agora.scene.show.widget.AiPhotographerDialog
 import io.agora.scene.show.widget.MusicEffectDialog
 import io.agora.scene.show.widget.PictureQualityDialog
 import io.agora.scene.show.widget.SettingDialog
@@ -74,6 +75,8 @@ import io.agora.scene.show.widget.pk.OnPKDialogActionListener
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.videoloaderapi.OnPageScrollEventHandler
+import io.agora.videoloaderapi.VideoLoader
 import org.json.JSONException
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -90,13 +93,14 @@ class LiveDetailFragment : Fragment() {
 
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
 
-        fun newInstance(roomDetail: ShowRoomDetailModel, handler: OnPageScrollEventHandler, position: Int) = LiveDetailFragment().apply {
-            arguments = Bundle().apply {
-                putParcelable(EXTRA_ROOM_DETAIL_INFO, roomDetail)
+        fun newInstance(roomDetail: ShowRoomDetailModel, handler: OnPageScrollEventHandler, position: Int) =
+            LiveDetailFragment().apply {
+                arguments = Bundle().apply {
+                    putParcelable(EXTRA_ROOM_DETAIL_INFO, roomDetail)
+                }
+                mHandler = handler
+                mPosition = position
             }
-            mHandler = handler
-            mPosition = position
-        }
     }
 
     val mRoomInfo by lazy { (arguments?.getParcelable(EXTRA_ROOM_DETAIL_INFO) as? ShowRoomDetailModel)!! }
@@ -109,6 +113,7 @@ class LiveDetailFragment : Fragment() {
     private var mMessageAdapter: BindingSingleAdapter<ShowMessage, ShowLiveDetailMessageItemBinding>? =
         null
     private val mMusicEffectDialog by lazy { MusicEffectDialog(requireContext()) }
+    private val mAiPhotographerDialog by lazy { AiPhotographerDialog(requireContext()) }
     private val mSettingDialog by lazy { SettingDialog(requireContext()) }
     private val mLinkSettingDialog by lazy { LiveLinkAudienceSettingsDialog(requireContext()) }
     private val mPKSettingsDialog by lazy { LivePKSettingsDialog(requireContext()) }
@@ -135,10 +140,15 @@ class LiveDetailFragment : Fragment() {
     private val timerRoomEndRun = Runnable {
         destroy(false) // 房间到了限制时间
         showLivingEndLayout() // 房间到了限制时间
-        ShowLogger.d("showLivingEndLayout","timer end!")
+        ShowLogger.d("showLivingEndLayout", "timer end!")
     }
 
-    private val mMainRtcConnection by lazy { RtcConnection(mRoomInfo.roomId, UserManager.getInstance().user.id.toInt()) }
+    private val mMainRtcConnection by lazy {
+        RtcConnection(
+            mRoomInfo.roomId,
+            UserManager.getInstance().user.id.toInt()
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -206,6 +216,7 @@ class LiveDetailFragment : Fragment() {
             if (roomLeftTime > 0) {
                 mBinding.root.postDelayed(timerRoomEndRun, ShowServiceProtocol.ROOM_AVAILABLE_DURATION)
                 initRtcEngine()
+                initMetaHandler()
                 initServiceWithJoinRoom()
             }
         }
@@ -276,7 +287,7 @@ class LiveDetailFragment : Fragment() {
     }
 
     private var needRender = false
-    fun initAnchorVideoView(info: VideoLoader.AnchorInfo) : VideoLoader.VideoCanvasContainer? {
+    fun initAnchorVideoView(info: VideoLoader.AnchorInfo): VideoLoader.VideoCanvasContainer? {
         // 判断是否此时view还没有创建，即在View创建后第一时间渲染视频
         needRender = activity == null
         activity?.let {
@@ -319,7 +330,8 @@ class LiveDetailFragment : Fragment() {
 
     private fun initLivingEndLayout() {
         val livingEndLayout = mBinding.livingEndLayout
-        livingEndLayout.root.isVisible = ShowServiceProtocol.ROOM_AVAILABLE_DURATION < (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong()) && !isRoomOwner && !mRoomInfo.isRobotRoom()
+        livingEndLayout.root.isVisible =
+            ShowServiceProtocol.ROOM_AVAILABLE_DURATION < (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong()) && !isRoomOwner && !mRoomInfo.isRobotRoom()
         livingEndLayout.tvUserName.text = mRoomInfo.ownerName
         Glide.with(this@LiveDetailFragment)
             .load(mRoomInfo.ownerAvatar)
@@ -379,6 +391,9 @@ class LiveDetailFragment : Fragment() {
         }
         bottomLayout.ivBeauty.setOnClickListener {
             showBeautyDialog()
+        }
+        bottomLayout.ivAiPhotographer.setOnClickListener {
+            showAiPhotographerDialog()
         }
         bottomLayout.ivMusic.setOnClickListener {
             showMusicEffectDialog()
@@ -447,6 +462,7 @@ class LiveDetailFragment : Fragment() {
             bottomLayout.ivSetting.isVisible = true
             bottomLayout.ivMusic.isVisible = true
             bottomLayout.ivBeauty.isVisible = true
+            bottomLayout.ivAiPhotographer.isVisible = true
 
             if (isPKing()) {
                 // PK状态
@@ -490,6 +506,7 @@ class LiveDetailFragment : Fragment() {
                 // PK是房主和房主的事，和观众无关，观众只能看，同时无法再连麦
                 bottomLayout.ivMusic.isVisible = false
                 bottomLayout.ivBeauty.isVisible = false
+                bottomLayout.ivAiPhotographer.isVisible = false
                 bottomLayout.flLinking.isVisible = false
             } else if (isLinking()) {
                 // 连麦状态
@@ -497,6 +514,7 @@ class LiveDetailFragment : Fragment() {
                     // 连麦中的一方
                     bottomLayout.ivMusic.isVisible = false
                     bottomLayout.ivBeauty.isVisible = false
+                    bottomLayout.ivAiPhotographer.isVisible = false
 
                     bottomLayout.flLinking.isVisible = true
                     bottomLayout.ivLinking.imageTintList = null
@@ -504,6 +522,7 @@ class LiveDetailFragment : Fragment() {
                     // 只是观看者，不参与连麦
                     bottomLayout.ivMusic.isVisible = false
                     bottomLayout.ivBeauty.isVisible = false
+                    bottomLayout.ivAiPhotographer.isVisible = false
                     bottomLayout.flLinking.isVisible = false
                 }
             } else {
@@ -511,6 +530,7 @@ class LiveDetailFragment : Fragment() {
                 // 普通观众，只有发起连麦申请的按钮
                 bottomLayout.ivMusic.isVisible = false
                 bottomLayout.ivBeauty.isVisible = false
+                bottomLayout.ivAiPhotographer.isVisible = false
 
                 bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList =
@@ -578,62 +598,106 @@ class LiveDetailFragment : Fragment() {
             return
         }
         // 编码分辨率
-        encodeVideoSize?.let { topBinding.tvEncodeResolution.text = getString(R.string.show_statistic_encode_resolution, "${it.height}x${it.width}") }
-        if (topBinding.tvEncodeResolution.text.isEmpty()) topBinding.tvEncodeResolution.text = getString(R.string.show_statistic_encode_resolution, "--")
+        encodeVideoSize?.let {
+            topBinding.tvEncodeResolution.text =
+                getString(R.string.show_statistic_encode_resolution, "${it.height}x${it.width}")
+        }
+        if (topBinding.tvEncodeResolution.text.isEmpty()) topBinding.tvEncodeResolution.text =
+            getString(R.string.show_statistic_encode_resolution, "--")
         // 接收分辨率
-        receiveVideoSize?.let { topBinding.tvReceiveResolution.text = getString(R.string.show_statistic_receive_resolution, "${it.height}x${it.width}") }
-        if (topBinding.tvReceiveResolution.text.isEmpty()) topBinding.tvReceiveResolution.text = getString(R.string.show_statistic_receive_resolution, "--")
+        receiveVideoSize?.let {
+            topBinding.tvReceiveResolution.text =
+                getString(R.string.show_statistic_receive_resolution, "${it.height}x${it.width}")
+        }
+        if (topBinding.tvReceiveResolution.text.isEmpty()) topBinding.tvReceiveResolution.text =
+            getString(R.string.show_statistic_receive_resolution, "--")
         // 编码帧率
-        encodeFps?.let { topBinding.tvStatisticEncodeFPS.text = getString(R.string.show_statistic_encode_fps, it.toString()) }
-        if (topBinding.tvStatisticEncodeFPS.text.isEmpty()) topBinding.tvStatisticEncodeFPS.text = getString(R.string.show_statistic_encode_fps, "--")
+        encodeFps?.let {
+            topBinding.tvStatisticEncodeFPS.text = getString(R.string.show_statistic_encode_fps, it.toString())
+        }
+        if (topBinding.tvStatisticEncodeFPS.text.isEmpty()) topBinding.tvStatisticEncodeFPS.text =
+            getString(R.string.show_statistic_encode_fps, "--")
         // 接收帧率
-        receiveFPS?.let { topBinding.tvStatisticReceiveFPS.text = getString(R.string.show_statistic_receive_fps, it.toString()) }
-        if (topBinding.tvStatisticReceiveFPS.text.isEmpty()) topBinding.tvStatisticReceiveFPS.text = getString(R.string.show_statistic_receive_fps, "--")
+        receiveFPS?.let {
+            topBinding.tvStatisticReceiveFPS.text = getString(R.string.show_statistic_receive_fps, it.toString())
+        }
+        if (topBinding.tvStatisticReceiveFPS.text.isEmpty()) topBinding.tvStatisticReceiveFPS.text =
+            getString(R.string.show_statistic_receive_fps, "--")
         // 下行延迟
-        downDelay?.let { topBinding.tvStatisticDownDelay.text = getString(R.string.show_statistic_delay, it.toString()) }
-        if (topBinding.tvStatisticDownDelay.text.isEmpty()) topBinding.tvStatisticDownDelay.text = getString(R.string.show_statistic_delay, "--")
+        downDelay?.let {
+            topBinding.tvStatisticDownDelay.text = getString(R.string.show_statistic_delay, it.toString())
+        }
+        if (topBinding.tvStatisticDownDelay.text.isEmpty()) topBinding.tvStatisticDownDelay.text =
+            getString(R.string.show_statistic_delay, "--")
         // 上行丢包率
-        upLossPackage?.let { topBinding.tvStatisticUpLossPackage.text = getString(R.string.show_statistic_up_loss_package, it.toString()) }
-        if (topBinding.tvStatisticUpLossPackage.text.isEmpty()) topBinding.tvStatisticUpLossPackage.text = getString(R.string.show_statistic_up_loss_package, "--")
+        upLossPackage?.let {
+            topBinding.tvStatisticUpLossPackage.text = getString(R.string.show_statistic_up_loss_package, it.toString())
+        }
+        if (topBinding.tvStatisticUpLossPackage.text.isEmpty()) topBinding.tvStatisticUpLossPackage.text =
+            getString(R.string.show_statistic_up_loss_package, "--")
         // 下行丢包率
-        downLossPackage?.let { topBinding.tvStatisticDownLossPackage.text = getString(R.string.show_statistic_down_loss_package, it.toString()) }
-        if (topBinding.tvStatisticDownLossPackage.text.isEmpty()) topBinding.tvStatisticDownLossPackage.text = getString(R.string.show_statistic_down_loss_package, "--")
+        downLossPackage?.let {
+            topBinding.tvStatisticDownLossPackage.text =
+                getString(R.string.show_statistic_down_loss_package, it.toString())
+        }
+        if (topBinding.tvStatisticDownLossPackage.text.isEmpty()) topBinding.tvStatisticDownLossPackage.text =
+            getString(R.string.show_statistic_down_loss_package, "--")
         // 上行码率
-        upBitrate?.let { topBinding.tvStatisticUpBitrate.text = getString(R.string.show_statistic_up_bitrate, it.toString()) }
-        if (topBinding.tvStatisticUpBitrate.text.isEmpty()) topBinding.tvStatisticUpBitrate.text = getString(R.string.show_statistic_up_bitrate, "--")
+        upBitrate?.let {
+            topBinding.tvStatisticUpBitrate.text = getString(R.string.show_statistic_up_bitrate, it.toString())
+        }
+        if (topBinding.tvStatisticUpBitrate.text.isEmpty()) topBinding.tvStatisticUpBitrate.text =
+            getString(R.string.show_statistic_up_bitrate, "--")
         // 下行码率
-        downBitrate?.let { topBinding.tvStatisticDownBitrate.text = getString(R.string.show_statistic_down_bitrate, it.toString()) }
-        if (topBinding.tvStatisticDownBitrate.text.isEmpty()) topBinding.tvStatisticDownBitrate.text = getString(R.string.show_statistic_down_bitrate, "--")
+        downBitrate?.let {
+            topBinding.tvStatisticDownBitrate.text = getString(R.string.show_statistic_down_bitrate, it.toString())
+        }
+        if (topBinding.tvStatisticDownBitrate.text.isEmpty()) topBinding.tvStatisticDownBitrate.text =
+            getString(R.string.show_statistic_down_bitrate, "--")
         // 上行网络
         topBinding.tvStatisticUpNet.isVisible = !isAudioOnlyMode
-        upLinkBps?.let { topBinding.tvStatisticUpNet.text = getString(R.string.show_statistic_up_net_speech, (it / 8192).toString()) }
-        if (topBinding.tvStatisticUpNet.text.isEmpty()) topBinding.tvStatisticUpNet.text = getString(R.string.show_statistic_up_net_speech, "--")
+        upLinkBps?.let {
+            topBinding.tvStatisticUpNet.text = getString(R.string.show_statistic_up_net_speech, (it / 8192).toString())
+        }
+        if (topBinding.tvStatisticUpNet.text.isEmpty()) topBinding.tvStatisticUpNet.text =
+            getString(R.string.show_statistic_up_net_speech, "--")
         // 下行网络
         topBinding.tvStatisticDownNet.isVisible = !isAudioOnlyMode
-        downLinkBps?.let { topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, (it / 8192).toString()) }
-        if (topBinding.tvStatisticDownNet.text.isEmpty()) topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, "--")
+        downLinkBps?.let {
+            topBinding.tvStatisticDownNet.text =
+                getString(R.string.show_statistic_down_net_speech, (it / 8192).toString())
+        }
+        if (topBinding.tvStatisticDownNet.text.isEmpty()) topBinding.tvStatisticDownNet.text =
+            getString(R.string.show_statistic_down_net_speech, "--")
         // 秒开时间
         topBinding.tvQuickStartTime.isVisible = true
         if (isRoomOwner) {
             topBinding.tvQuickStartTime.text = getString(R.string.show_statistic_quick_start_time, "--")
         } else {
             // TODO
-            topBinding.tvQuickStartTime.text = getString(R.string.show_statistic_quick_start_time, quickStartTime.toString())
+            topBinding.tvQuickStartTime.text =
+                getString(R.string.show_statistic_quick_start_time, quickStartTime.toString())
         }
         // 机型等级
         topBinding.tvStatisticDeviceGrade.isVisible = true
         val score = mRtcEngine.queryDeviceScore()
         if (score >= 90) {
-            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_high)) + "（$score）"
+            topBinding.tvStatisticDeviceGrade.text =
+                getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_high)) + "（$score）"
         } else if (score >= 75) {
-            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_medium)) + "（$score）"
+            topBinding.tvStatisticDeviceGrade.text = getString(
+                R.string.show_device_grade,
+                getString(R.string.show_setting_preset_device_medium)
+            ) + "（$score）"
         } else {
-            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_low)) + "（$score）"
+            topBinding.tvStatisticDeviceGrade.text =
+                getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_low)) + "（$score）"
         }
         // H265开关
         topBinding.tvStatisticH265.isVisible = true
         if (isRoomOwner) {
-            topBinding.tvStatisticH265.text = getString(R.string.show_statistic_h265, getString(R.string.show_setting_opened))
+            topBinding.tvStatisticH265.text =
+                getString(R.string.show_statistic_h265, getString(R.string.show_setting_opened))
         } else {
             topBinding.tvStatisticH265.text = getString(R.string.show_statistic_h265, "--")
         }
@@ -642,12 +706,22 @@ class LiveDetailFragment : Fragment() {
         if (isRoomOwner) {
             topBinding.tvStatisticSR.text = getString(R.string.show_statistic_sr, "--")
         } else {
-            topBinding.tvStatisticSR.text = getString(R.string.show_statistic_sr, if (VideoSetting.getCurrAudienceEnhanceSwitch()) getString(R.string.show_setting_opened) else getString(R.string.show_setting_closed))
+            topBinding.tvStatisticSR.text = getString(
+                R.string.show_statistic_sr,
+                if (VideoSetting.getCurrAudienceEnhanceSwitch()) getString(R.string.show_setting_opened) else getString(
+                    R.string.show_setting_closed
+                )
+            )
         }
         // pvc开关
         topBinding.tvStatisticPVC.isVisible = true
         if (isRoomOwner) {
-            topBinding.tvStatisticPVC.text = getString(R.string.show_statistic_pvc, if (VideoSetting.getCurrBroadcastSetting().video.PVC) getString(R.string.show_setting_opened) else getString(R.string.show_setting_closed))
+            topBinding.tvStatisticPVC.text = getString(
+                R.string.show_statistic_pvc,
+                if (VideoSetting.getCurrBroadcastSetting().video.PVC) getString(R.string.show_setting_opened) else getString(
+                    R.string.show_setting_closed
+                )
+            )
         } else {
             topBinding.tvStatisticPVC.text = getString(R.string.show_statistic_pvc, "--")
         }
@@ -655,7 +729,12 @@ class LiveDetailFragment : Fragment() {
         // 小流开关
         topBinding.tvStatisticLowStream.isVisible = true
         if (isRoomOwner) {
-            topBinding.tvStatisticLowStream.text = getString(R.string.show_statistic_low_stream, if (VideoSetting.getCurrLowStreamSetting() == null) getString(R.string.show_setting_closed) else getString(R.string.show_setting_opened))
+            topBinding.tvStatisticLowStream.text = getString(
+                R.string.show_statistic_low_stream,
+                if (VideoSetting.getCurrLowStreamSetting() == null) getString(R.string.show_setting_closed) else getString(
+                    R.string.show_setting_opened
+                )
+            )
         } else {
             topBinding.tvStatisticLowStream.text = getString(R.string.show_statistic_low_stream, "--")
         }
@@ -663,7 +742,12 @@ class LiveDetailFragment : Fragment() {
         // svc开关
         topBinding.tvStatisticSVC.isVisible = true
         if (isRoomOwner) {
-            topBinding.tvStatisticSVC.text = getString(R.string.show_statistic_svc, if (VideoSetting.getCurrLowStreamSetting()?.SVC == true) getString(R.string.show_setting_opened) else getString(R.string.show_setting_closed))
+            topBinding.tvStatisticSVC.text = getString(
+                R.string.show_statistic_svc,
+                if (VideoSetting.getCurrLowStreamSetting()?.SVC == true) getString(R.string.show_setting_opened) else getString(
+                    R.string.show_setting_closed
+                )
+            )
         } else {
             topBinding.tvStatisticSVC.text = getString(R.string.show_statistic_svc, "--")
         }
@@ -682,11 +766,13 @@ class LiveDetailFragment : Fragment() {
                 mBinding.videoPKLayout.root.isVisible = false
                 mBinding.videoLinkingLayout.root.isVisible = true
             }
+
             ShowInteractionStatus.onSeat.value -> {
                 mBinding.videoPKLayout.root.isVisible = false
                 mBinding.videoLinkingLayout.root.isVisible = true
                 mBinding.videoLinkingAudienceLayout.root.isVisible = true
             }
+
             ShowInteractionStatus.pking.value -> {
                 mBinding.videoLinkingLayout.root.isVisible = false
                 mBinding.videoLinkingAudienceLayout.root.isVisible = false
@@ -755,15 +841,16 @@ class LiveDetailFragment : Fragment() {
                     SettingDialog.ITEM_ID_QUALITY -> showPictureQualityDialog(this)
                     SettingDialog.ITEM_ID_VIDEO -> {
                         // 设置弹框设置摄像头，需要同步到PK 弹框中摄像头状态，后续需要统一获取
-                        if (activity is LiveDetailActivity){
+                        if (activity is LiveDetailActivity) {
                             (activity as LiveDetailActivity).toggleSelfVideo(activated, callback = {
                                 enableLocalVideo(activated)
                                 mPKSettingsDialog.resetItemStatus(LivePKSettingsDialog.ITEM_ID_CAMERA, activated)
                             })
                         }
                     }
+
                     SettingDialog.ITEM_ID_MIC -> {
-                        if (activity is LiveDetailActivity){
+                        if (activity is LiveDetailActivity) {
                             (activity as LiveDetailActivity).toggleSelfAudio(activated, callback = {
                                 if (!isRoomOwner) {
                                     mService.muteAudio(mRoomInfo.roomId, !activated, interactionInfo!!.userId)
@@ -777,6 +864,7 @@ class LiveDetailFragment : Fragment() {
                             })
                         }
                     }
+
                     SettingDialog.ITEM_ID_STATISTIC -> changeStatisticVisible()
                     SettingDialog.ITEM_ID_SETTING -> {
                         if (AgoraApplication.the().isDebugModeOpen) {
@@ -827,6 +915,82 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
+    /**
+     * AI 摄影师
+     */
+    private fun showAiPhotographerDialog() {
+        mAiPhotographerDialog.onItemSelectedListener = { mAiPhotographerDialog, itemId ->
+//            if (RtcEngineInstance.isVirtualBackgroundEnable) {
+//                ToastUtils.showToast(R.string.show_beauty_switch_ai_photographer_tips)
+//                RtcEngineInstance.resetVirtualBackground()
+//                RtcEngineInstance.mMetaEngineHandler.enableSegmentation()
+//            }
+            when (itemId) {
+                AiPhotographerType.ITEM_ID_AI_PHOTOGRAPHER_NONE -> {
+                    RtcEngineInstance.mMetaEngineHandler.stopAiRhythm()
+                    RtcEngineInstance.mMetaEngineHandler.stopEffect3D()
+                }
+
+                AiPhotographerType.ITEM_ID_AI_RHYTHM -> { //AI 律动
+                    RtcEngineInstance.mMetaEngineHandler.stopEffect3D()
+                    RtcEngineInstance.mMetaEngineHandler.configAiRhythm(true, AiPhotographerType.ITEM_ID_AI_RHYTHM)
+                }
+
+                AiPhotographerType.ITEM_ID_AI_SHADOW -> { // AI 光影跟随
+                    RtcEngineInstance.mMetaEngineHandler.stopEffect3D()
+                    RtcEngineInstance.mMetaEngineHandler.configAiRhythm(true, AiPhotographerType.ITEM_ID_AI_SHADOW)
+                }
+
+                AiPhotographerType.ITEM_ID_AI_EDGE_LIGHT -> { // 人物边缘光
+                    RtcEngineInstance.mMetaEngineHandler.stopAiRhythm()
+                    RtcEngineInstance.mMetaEngineHandler.stopEffect3D()
+                    enableAiEffect(AiPhotographerType.ITEM_ID_AI_EDGE_LIGHT)
+                }
+
+                AiPhotographerType.ITEM_ID_AI_LIGHTING_AD -> { // 广告灯
+                    RtcEngineInstance.mMetaEngineHandler.stopAiRhythm()
+                    RtcEngineInstance.mMetaEngineHandler.stopEffect3D()
+                    enableAiEffect(AiPhotographerType.ITEM_ID_AI_LIGHTING_AD)
+                }
+
+                AiPhotographerType.ITEM_ID_AI_LIGHTING_3D -> { // AI 3D 打光
+                    RtcEngineInstance.mMetaEngineHandler.stopAiRhythm()
+                    RtcEngineInstance.mMetaEngineHandler.stopEffect3D()
+                    enableAiEffect(AiPhotographerType.ITEM_ID_AI_LIGHTING_3D)
+                }
+
+                AiPhotographerType.ITEM_ID_AI_AURORA -> { // 极光特效
+                    RtcEngineInstance.mMetaEngineHandler.stopAiRhythm()
+                    RtcEngineInstance.mMetaEngineHandler.stopEffect3D()
+                    enableAiEffect(AiPhotographerType.ITEM_ID_AI_AURORA)
+                }
+
+                AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG -> { // 3D 打光+虚拟背景
+                    RtcEngineInstance.mMetaEngineHandler.stopAiRhythm()
+                    RtcEngineInstance.mMetaEngineHandler.stopEffect3D()
+                    enableAiEffect(AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG)
+                }
+            }
+            RtcEngineInstance.mMetaEngineHandler.updateAiPhotographerId(itemId)
+        }
+        mAiPhotographerDialog.show()
+    }
+
+    private var mWaitingAiPhotographerType: Int = AiPhotographerType.ITEM_ID_AI_PHOTOGRAPHER_NONE
+
+    // 灯光特效
+    private fun enableAiEffect(aiPhotographerType: Int) {
+        if (!RtcEngineInstance.mMetaEngineHandler.isMetaInit) {
+            val activity = activity ?: return
+            mWaitingAiPhotographerType = aiPhotographerType
+            RtcEngineInstance.mMetaEngineHandler.initializeMeta(activity)
+        } else {
+            if (RtcEngineInstance.mMetaEngineHandler.isEffectModeAvailable) {
+                RtcEngineInstance.mMetaEngineHandler.configEffect3D(true, aiPhotographerType)
+            }
+        }
+    }
+
     private fun showEndRoomDialog() {
         AlertDialog.Builder(requireContext(), R.style.show_alert_dialog)
             .setTitle(R.string.show_tip)
@@ -848,12 +1012,19 @@ class LiveDetailFragment : Fragment() {
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_NONE -> {
                     stopAudioMixing()
                 }
+
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY -> {
                     startAudioMixing("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/happy.mp3", false, -1)
                 }
+
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_ROMANTIC -> {
-                    startAudioMixing("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/romantic.mp3", false, -1)
+                    startAudioMixing(
+                        "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/romantic.mp3",
+                        false,
+                        -1
+                    )
                 }
+
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY2 -> {
                     startAudioMixing("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/relax.mp3", false, -1)
                 }
@@ -861,15 +1032,19 @@ class LiveDetailFragment : Fragment() {
                 MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_ORIGINAL -> {
                     mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CONVERSION_OFF)
                 }
+
                 MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_SWEET -> {
                     mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CHANGER_SWEET)
                 }
+
                 MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_ZHONGXIN -> {
                     mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CHANGER_NEUTRAL)
                 }
+
                 MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_WENZHONG -> {
                     mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CHANGER_SOLID)
                 }
+
                 MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_MOHUAN -> {
                     mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CHANGER_BASS)
                 }
@@ -877,15 +1052,19 @@ class LiveDetailFragment : Fragment() {
                 MusicEffectDialog.ITEM_ID_MIXING_NONE -> {
                     mRtcEngine.setAudioEffectPreset(Constants.AUDIO_EFFECT_OFF)
                 }
+
                 MusicEffectDialog.ITEM_ID_MIXING_KTV -> {
                     mRtcEngine.setAudioEffectPreset(Constants.ROOM_ACOUSTICS_KTV)
                 }
+
                 MusicEffectDialog.ITEM_ID_MIXING_CONCERT -> {
                     mRtcEngine.setAudioEffectPreset(Constants.ROOM_ACOUSTICS_VOCAL_CONCERT)
                 }
+
                 MusicEffectDialog.ITEM_ID_MIXING_LUYINPEN -> {
                     mRtcEngine.setAudioEffectPreset(Constants.ROOM_ACOUSTICS_STUDIO)
                 }
+
                 MusicEffectDialog.ITEM_ID_MIXING_KONGKUANG -> {
                     mRtcEngine.setAudioEffectPreset(Constants.ROOM_ACOUSTICS_SPACIAL)
                 }
@@ -901,12 +1080,13 @@ class LiveDetailFragment : Fragment() {
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
                     LiveLinkAudienceSettingsDialog.ITEM_ID_MIC -> {
-                        if (activity is LiveDetailActivity){
+                        if (activity is LiveDetailActivity) {
                             (activity as LiveDetailActivity).toggleSelfAudio(activated, callback = {
                                 mService.muteAudio(mRoomInfo.roomId, !activated, interactionInfo!!.userId)
                             })
                         }
                     }
+
                     LiveLinkAudienceSettingsDialog.ITEM_ID_STOP_LINK -> {
                         if (interactionInfo != null) {
                             mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!, {
@@ -975,7 +1155,7 @@ class LiveDetailFragment : Fragment() {
             // 观众撤回连麦申请
             override fun onStopApplyingChosen(dialog: LiveLinkDialog) {
                 updateIdleMode()
-                mService.cancelMicSeatApply(mRoomInfo.roomId){}
+                mService.cancelMicSeatApply(mRoomInfo.roomId) {}
             }
         })
 
@@ -1026,7 +1206,7 @@ class LiveDetailFragment : Fragment() {
         mPKDialog.setPKDialogActionListener(object : OnPKDialogActionListener {
             override fun onRequestMessageRefreshing(dialog: LivePKDialog) {
                 mService.getAllPKUserList({ roomList ->
-                    mService.getAllPKInvitationList(mRoomInfo.roomId,true, { invitationList ->
+                    mService.getAllPKInvitationList(mRoomInfo.roomId, true, { invitationList ->
                         mPKDialog.setOnlineBroadcasterList(
                             interactionInfo,
                             roomList,
@@ -1071,7 +1251,7 @@ class LiveDetailFragment : Fragment() {
                     mPKInvitationCountDownLatch = null
                 }
                 pkStartTime = TimeUtils.currentTimeMillis()
-                mService.acceptPKInvitation(mRoomInfo.roomId){}
+                mService.acceptPKInvitation(mRoomInfo.roomId) {}
                 dialog.dismiss()
             }
             setNegativeButton(R.string.show_setting_cancel) { dialog, _ ->
@@ -1106,7 +1286,7 @@ class LiveDetailFragment : Fragment() {
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
                     LivePKSettingsDialog.ITEM_ID_CAMERA -> {
-                        if (activity is LiveDetailActivity){
+                        if (activity is LiveDetailActivity) {
                             (activity as LiveDetailActivity).toggleSelfVideo(activated, callback = {
                                 enableLocalVideo(activated)
                                 // pk 弹框设置摄像头，需要同步到设置弹框中摄像头状态，后续需要统一获取
@@ -1115,15 +1295,20 @@ class LiveDetailFragment : Fragment() {
                         }
 
                     }
+
                     LivePKSettingsDialog.ITEM_ID_SWITCH_CAMERA -> mRtcEngine.switchCamera()
                     LivePKSettingsDialog.ITEM_ID_MIC -> {
-                        if (activity is LiveDetailActivity){
+                        if (activity is LiveDetailActivity) {
                             (activity as LiveDetailActivity).toggleSelfAudio(activated, callback = {
                                 mService.muteAudio(mRoomInfo.roomId, !activated, mRoomInfo.ownerId)
-                                mRtcEngine.muteLocalAudioStreamEx(!activated, RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()))
+                                mRtcEngine.muteLocalAudioStreamEx(
+                                    !activated,
+                                    RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt())
+                                )
                             })
                         }
                     }
+
                     LivePKSettingsDialog.ITEM_ID_STOP_PK -> {
                         if (interactionInfo != null) {
                             mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!, {
@@ -1183,7 +1368,7 @@ class LiveDetailFragment : Fragment() {
             if (status == ShowServiceProtocol.ShowSubscribeStatus.deleted) {
                 destroy(false) // 房间被房主关闭
                 showLivingEndLayout()// 房间被房主关闭
-                ShowLogger.d("showLivingEndLayout","room delete by owner!")
+                ShowLogger.d("showLivingEndLayout", "room delete by owner!")
             }
         }
         mService.subscribeUser(mRoomInfo.roomId) { status, user ->
@@ -1327,7 +1512,7 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun reFetchPKInvitationList() {
-        mService.getAllPKInvitationList(mRoomInfo.roomId,false, { list ->
+        mService.getAllPKInvitationList(mRoomInfo.roomId, false, { list ->
             list.forEach {
                 if (it.userId == UserManager.getInstance().user.id.toString()
                     && it.status == ShowRoomRequestStatus.waitting.value
@@ -1357,7 +1542,7 @@ class LiveDetailFragment : Fragment() {
             }, {
                 mService.leaveRoom(mRoomInfo.roomId)
             })
-        }else{
+        } else {
             mService.leaveRoom(mRoomInfo.roomId)
         }
     }
@@ -1554,7 +1739,7 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-    private fun enableContentInspectEx(){
+    private fun enableContentInspectEx() {
         // ------------------ 开启鉴黄服务 ------------------
         val contentInspectConfig = ContentInspectConfig()
         try {
@@ -1566,11 +1751,10 @@ class LiveDetailFragment : Fragment() {
             val module = ContentInspectModule()
             module.interval = 60
             module.type = CONTENT_INSPECT_TYPE_IMAGE_MODERATION
-            contentInspectConfig.modules = arrayOf( module)
+            contentInspectConfig.modules = arrayOf(module)
             contentInspectConfig.moduleCount = 1
             mRtcEngine.enableContentInspectEx(true, contentInspectConfig, mMainRtcConnection)
-        }
-        catch (_: JSONException) {
+        } catch (_: JSONException) {
 
         }
     }
@@ -1599,7 +1783,8 @@ class LiveDetailFragment : Fragment() {
                     }
                     // 540P、480P
                     else if ((stats.width == VideoSetting.Resolution.V_540P.height && stats.height == VideoSetting.Resolution.V_540P.width)
-                        || (stats.width == VideoSetting.Resolution.V_480P.height && stats.height == VideoSetting.Resolution.V_480P.width)) {
+                        || (stats.width == VideoSetting.Resolution.V_480P.height && stats.height == VideoSetting.Resolution.V_480P.width)
+                    ) {
                         superResolution = VideoSetting.SuperResolution.SR_1_33
                     }
                     // 360P以及以下
@@ -1629,6 +1814,7 @@ class LiveDetailFragment : Fragment() {
                     superResolution = VideoSetting.SuperResolution.SR_NONE
                 }
             }
+
             VideoSetting.RecommendBroadcastSetting.LowDevicePK, VideoSetting.RecommendBroadcastSetting.MediumDevicePK, VideoSetting.RecommendBroadcastSetting.HighDevicePK -> when (VideoSetting.getCurrAudiencePlaySetting()) {
                 // 画质增强、高端机
                 VideoSetting.AudiencePlaySetting.ENHANCE_HIGH -> {
@@ -1661,7 +1847,12 @@ class LiveDetailFragment : Fragment() {
             mMediaPlayer?.destroy()
 
             if (isPKing()) {
-                mRtcEngine.leaveChannelEx(RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()))
+                mRtcEngine.leaveChannelEx(
+                    RtcConnection(
+                        interactionInfo!!.roomId,
+                        UserManager.getInstance().user.id.toInt()
+                    )
+                )
             }
             mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CONVERSION_OFF)
             mRtcEngine.setAudioEffectPreset(Constants.AUDIO_EFFECT_OFF)
@@ -1678,7 +1869,7 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-    private fun enableLocalVideo(enable: Boolean){
+    private fun enableLocalVideo(enable: Boolean) {
         mRtcEngine.muteLocalVideoStreamEx(!enable, mMainRtcConnection)
         if (enable) {
             mRtcEngine.startPreview()
@@ -1714,7 +1905,12 @@ class LiveDetailFragment : Fragment() {
         }
 
         if (isRoomOwner) {
-            mRtcEngine.joinChannelEx(RtcEngineInstance.generalToken(), mMainRtcConnection, channelMediaOptions, eventListener)
+            mRtcEngine.joinChannelEx(
+                RtcEngineInstance.generalToken(),
+                mMainRtcConnection,
+                channelMediaOptions,
+                eventListener
+            )
         } else {
             mRtcEngine.addHandlerEx(eventListener, mMainRtcConnection)
         }
@@ -1753,7 +1949,7 @@ class LiveDetailFragment : Fragment() {
         BeautyManager.setupLocalVideo(videoView, container.renderMode)
     }
 
-    private fun updateVideoSetting(isPkMode:Boolean) {
+    private fun updateVideoSetting(isPkMode: Boolean) {
         VideoSetting.setIsPkMode(isPkMode)
         if (isRoomOwner || isMeLinking()) {
             VideoSetting.updateBroadcastSetting(
@@ -1787,13 +1983,24 @@ class LiveDetailFragment : Fragment() {
         if (interactionInfo?.interactStatus == ShowInteractionStatus.pking.value) {
             // 退出连麦多频道，主播需要离开对方频道
             if (isRoomOwner) {
-                mRtcEngine.leaveChannelEx(RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()))
+                mRtcEngine.leaveChannelEx(
+                    RtcConnection(
+                        interactionInfo!!.roomId,
+                        UserManager.getInstance().user.id.toInt()
+                    )
+                )
             } else {
                 mHandler.updateRoomInfo(
                     position = mPosition,
-                    VideoLoader.RoomInfo(mRoomInfo.roomId, arrayListOf(
-                        VideoLoader.AnchorInfo(mRoomInfo.roomId, mRoomInfo.ownerId.toInt(), RtcEngineInstance.generalToken())
-                    ))
+                    VideoLoader.RoomInfo(
+                        mRoomInfo.roomId, arrayListOf(
+                            VideoLoader.AnchorInfo(
+                                mRoomInfo.roomId,
+                                mRoomInfo.ownerId.toInt(),
+                                RtcEngineInstance.generalToken()
+                            )
+                        )
+                    )
                 )
             }
         } else if (prepareRkRoomId.isNotEmpty()) {
@@ -1831,7 +2038,7 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-    private fun prepareLinkingMode(){
+    private fun prepareLinkingMode() {
         ShowLogger.d(TAG, "Interaction >> prepareLinkingMode")
 
         val channelMediaOptions = ChannelMediaOptions()
@@ -1978,7 +2185,7 @@ class LiveDetailFragment : Fragment() {
             RtcEngineInstance.generalToken(),
             pkRtcConnection,
             channelMediaOptions,
-            object: IRtcEngineEventHandler() {
+            object : IRtcEngineEventHandler() {
                 override fun onRemoteVideoStats(stats: RemoteVideoStats) {
                     super.onRemoteVideoStats(stats)
                     if (isRoomOwner) {
@@ -2040,7 +2247,7 @@ class LiveDetailFragment : Fragment() {
         if (interactionInfo == null) return
         if (interactionInfo?.interactStatus != ShowInteractionStatus.pking.value) return
         ShowLogger.d(TAG, "Interaction >> updatePKingMode pkRoomId=${interactionInfo!!.roomId}")
-        val eventListener = object: IRtcEngineEventHandler() {
+        val eventListener = object : IRtcEngineEventHandler() {
             override fun onRemoteVideoStats(stats: RemoteVideoStats) {
                 super.onRemoteVideoStats(stats)
                 if (isRoomOwner) {
@@ -2114,7 +2321,7 @@ class LiveDetailFragment : Fragment() {
                 )
             }
             enableLocalAudio(true)
-            if (isRoomOwner){
+            if (isRoomOwner) {
                 // 连麦摄像头默认开启 todo 统一入口获取摄像头状态
                 mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_VIDEO, true)
                 mPKSettingsDialog.resetItemStatus(LivePKSettingsDialog.ITEM_ID_CAMERA, true)
@@ -2165,10 +2372,20 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
             mHandler.updateRoomInfo(
                 position = mPosition,
-                VideoLoader.RoomInfo(mRoomInfo.roomId, arrayListOf(
-                    VideoLoader.AnchorInfo(mRoomInfo.roomId, mRoomInfo.ownerId.toInt(), RtcEngineInstance.generalToken()),
-                    VideoLoader.AnchorInfo(interactionInfo!!.roomId, interactionInfo?.userId!!.toInt(), RtcEngineInstance.generalToken()),
-                ))
+                VideoLoader.RoomInfo(
+                    mRoomInfo.roomId, arrayListOf(
+                        VideoLoader.AnchorInfo(
+                            mRoomInfo.roomId,
+                            mRoomInfo.ownerId.toInt(),
+                            RtcEngineInstance.generalToken()
+                        ),
+                        VideoLoader.AnchorInfo(
+                            interactionInfo!!.roomId,
+                            interactionInfo?.userId!!.toInt(),
+                            RtcEngineInstance.generalToken()
+                        ),
+                    )
+                )
             )
         }
     }
@@ -2242,14 +2459,14 @@ class LiveDetailFragment : Fragment() {
                     state: io.agora.mediaplayer.Constants.MediaPlayerState?,
                     error: io.agora.mediaplayer.Constants.MediaPlayerError?
                 ) {
-                    if(error == io.agora.mediaplayer.Constants.MediaPlayerError.PLAYER_ERROR_NONE){
-                        if(state == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED){
+                    if (error == io.agora.mediaplayer.Constants.MediaPlayerError.PLAYER_ERROR_NONE) {
+                        if (state == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED) {
                             play()
                         }
                     }
                 }
 
-                override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
+                override fun onPositionChanged(position_ms: Long) {
 
                 }
 
@@ -2323,5 +2540,41 @@ class LiveDetailFragment : Fragment() {
     private fun adjustAudioMixingVolume(volume: Int) {
         mMediaPlayer?.adjustPlayoutVolume(volume)
         mMediaPlayer?.adjustPublishSignalVolume(volume)
+    }
+
+    private val mMainHandler by lazy {
+        Handler(Looper.getMainLooper())
+    }
+
+    private fun initMetaHandler() {
+        RtcEngineInstance.mMetaEngineHandler.mOnMetaSceneLoadedListener = object : OnMetaSceneLoadedListener {
+            override fun onInitializeFinish() {
+
+            }
+
+            override fun onUnityLoadFinish() {
+                RtcEngineInstance.mMetaEngineHandler.loadScene()
+            }
+
+            override fun onLoadSceneResp() {
+                RtcEngineInstance.mMetaEngineHandler.requestTextureVB()
+            }
+
+            override fun onRequestTextureResp() {
+                if (mWaitingAiPhotographerType != AiPhotographerType.ITEM_ID_AI_PHOTOGRAPHER_NONE) {
+                    RtcEngineInstance.mMetaEngineHandler.configEffect3D(true, mWaitingAiPhotographerType)
+                }
+            }
+
+            override fun onUnloadSceneResp() {
+                mMainHandler.post {
+                    RtcEngineInstance.mMetaEngineHandler.destroy()
+                }
+            }
+
+            override fun onUninitializeFinish() {
+
+            }
+        }
     }
 }

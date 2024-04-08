@@ -108,7 +108,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             binding.flVideoContainer.addView(this)
         }, Constants.RENDER_MODE_HIDDEN)
 
-
         toggleVideoRun = Runnable {
             initRtcEngine()
         }
@@ -170,6 +169,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         // reset virtual background config
         RtcEngineInstance.virtualBackgroundSource.backgroundSourceType = 0
         RtcEngineInstance.rtcEngine.enableVirtualBackground(false, VirtualBackgroundSource(), SegmentationProperty())
+//        RtcEngineInstance.mMetaEngineHandler.enableSegmentation()
 //        mRtcEngine.startPreview()
     }
 
