@@ -159,8 +159,12 @@
 
     <string name="app_debug_open">Debug模式已打开</string>
     <string name="app_debug_off">Debug模式已关闭</string>
-    <string name="app_debug_env">切换</string>
-    <string name="app_exit_debug">确定退出Debug模式么？</string>
+    <string name="app_debug_switch">切换</string>
+    <string name="app_debug_switch_env">切换服务器</string>
+    <string name="app_release_env">正式环境</string>
+    <string name="app_dev_env">测试环境</string>
+    <string name="app_exit_debug">退出Debug模式</string>
+    <string name="app_exit_debug_title">确定退出Debug模式么？</string>
     <string name="app_exit_debug_tip">退出debug模式后，设置页面将恢复成正常的设置页面哦～</string>
     <string name="app_agree_tip">请同意我们的隐私政策与用户协议</string>
     <string name="app_input_phonenum_tip">请输入正确的手机号</string>

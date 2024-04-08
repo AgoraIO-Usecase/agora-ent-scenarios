@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -18,6 +19,8 @@ import com.agora.entfulldemo.home.constructor.HomeScenesType
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.*
 import com.google.android.material.tabs.TabLayoutMediator
+import io.agora.scene.base.ServerConfig
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingFragment
 
 class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>() {
@@ -50,6 +53,8 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
 
     override fun initView() {
         val act = activity ?: return
+        binding.tvDevEnv.isVisible = !ServerConfig.envRelease
+
         // 创建 Adapter
         val adapter = HomePagerAdapter(requireActivity(), mTabs)
         // 设置 Adapter 给 ViewPager2
