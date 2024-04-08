@@ -22,6 +22,7 @@ import io.agora.rtmsyncmanager.service.rtm.AUIRtmMessageRespObserver
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.GsonUtil
@@ -99,7 +100,7 @@ class JoySyncManagerServiceImp constructor(
                 userName = mUser.name
                 userAvatar = mUser.headUrl
             }
-            host = BuildConfig.TOOLBOX_SERVER_HOST
+            host = ServerConfig.toolBoxUrl
         }
         AUIRoomContext.shared().setCommonConfig(commonConfig)
         mSyncManager = SyncManager(cxt, JoyServiceManager.rtmClient, commonConfig)

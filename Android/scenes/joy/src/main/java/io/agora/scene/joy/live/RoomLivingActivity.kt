@@ -121,7 +121,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     }
     private val mIsRoomOwner by lazy { mRoomInfo.roomOwner?.userId == mUser.id.toString() }
 
-    private val mJoyService by lazy { JoyServiceProtocol.getImplInstance() }
+    private val mJoyService by lazy { JoyServiceProtocol.serviceProtocol }
     private val mRtcEngine by lazy { JoyServiceManager.rtcEngine }
 
     private var mStreamId = -1

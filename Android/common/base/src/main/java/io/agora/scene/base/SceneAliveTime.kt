@@ -33,7 +33,7 @@ object SceneAliveTime {
 
     private suspend fun fetch() = withContext(Dispatchers.IO) {
 
-        val request = Request.Builder().url("${BuildConfig.TOOLBOX_SERVER_HOST}/v1/configs/scene"
+        val request = Request.Builder().url("${ServerConfig.toolBoxUrl}/v1/configs/scene"
         ).addHeader("Content-Type", "application/json").get().build()
         val execute = okHttpClient.newCall(request).execute()
         if (execute.isSuccessful) {

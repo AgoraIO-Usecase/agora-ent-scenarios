@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder
 import com.moczul.ok2curl.CurlInterceptor
 import com.moczul.ok2curl.logger.Logger
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.api.ApiManager
 import io.agora.scene.base.api.common.NetConstants
 import io.agora.scene.base.manager.UserManager
@@ -23,12 +24,10 @@ import java.util.concurrent.TimeUnit
 
 object JoyApiManager {
 
-    private const val baseUrl = BuildConfig.TOOLBOX_SERVER_HOST
-
-    private var token:String = ""
+    private var token: String = ""
 
     internal class AuthorizationInterceptor : Interceptor {
-        private var apiHost: String? = Uri.parse(baseUrl).host
+        private var apiHost: String? = Uri.parse(ServerConfig.toolBoxUrl).host
 
         @Throws(IOException::class)
         override fun intercept(chain: Interceptor.Chain): Response {
@@ -77,22 +76,31 @@ object JoyApiManager {
         builder.build()
     }
 
-    private val mRetrofit by lazy {
+    private var innerRetrofit: Retrofit? = null
 
-        val factory =
-            DynamicModelRuntimeTypeAdapterFactory.of(DynamicModel::class.java)
+    private val mRetrofit: Retrofit
+        get() {
+            if (innerRetrofit == null) {
+                val factory =
+                    DynamicModelRuntimeTypeAdapterFactory.of(DynamicModel::class.java)
 
-        val builder = Retrofit.Builder()
-            .baseUrl("$baseUrl/")
-            .addConverterFactory(
-                GsonConverterFactory.create(
-                    GsonBuilder()
-                        .registerTypeAdapterFactory(factory)
-                        .create()
-                )
-            )
-            .client(mOkHttpClient)
-        builder.build()
+                val builder = Retrofit.Builder()
+                    .baseUrl("${ServerConfig.toolBoxUrl}/")
+                    .addConverterFactory(
+                        GsonConverterFactory.create(
+                            GsonBuilder()
+                                .registerTypeAdapterFactory(factory)
+                                .create()
+                        )
+                    )
+                    .client(mOkHttpClient)
+                innerRetrofit = builder.build()
+            }
+            return innerRetrofit!!
+        }
+
+    fun reset(){
+        innerRetrofit = null
     }
 
     /**
