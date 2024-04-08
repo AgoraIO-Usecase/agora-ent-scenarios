@@ -120,10 +120,10 @@ extension JoyServiceImpl: JoyServiceProtocol {
                     scene.enter { [weak self] payload, err in
                         if let err = err {
                             joyPrint("enter scene fail: \(err.localizedDescription)")
-                            self?.syncManager.rtmManager.subscribeMessage(channelName: roomInfo.roomId, delegate: self!)
                             completion(nil, err)
                             return
                         }
+                        self?.syncManager.rtmManager.subscribeMessage(channelName: roomInfo.roomId, delegate: self!)
                         
                         completion(self?.convertAUIRoomInfo2JoyRoomInfo(with: info ?? roomInfo), nil)
                     }
@@ -150,10 +150,10 @@ extension JoyServiceImpl: JoyServiceProtocol {
             scene?.enter {[weak self] payload, err in
                 if let err = err {
                     joyPrint("enter scene fail: \(err.localizedDescription)")
-                    self?.syncManager.rtmManager.subscribeMessage(channelName: roomInfo.roomId, delegate: self!)
                     completion(err)
                     return
                 }
+                self?.syncManager.rtmManager.subscribeMessage(channelName: roomInfo.roomId, delegate: self!)
                 completion(nil)
             }
         }
@@ -222,8 +222,8 @@ extension JoyServiceImpl: JoyServiceProtocol {
                         info.taskId = taskId
                     }
                     
-                    if let assistantUid = data["assistantUid"] as? UInt {
-                        info.assistantUid = assistantUid
+                    if let assistantUid = data["assistantUid"] as? String {
+                        info.assistantUid = UInt(assistantUid) ?? 0
                     }
                     
                     if let gameName = data["gameName"] as? String {
@@ -309,13 +309,15 @@ extension JoyServiceImpl: JoyServiceProtocol {
             model.message = message
             model.userName = self?.user.userName
             model.createAt = Int64(Date().timeIntervalSince1970 * 1000)
-            model.message = message
             let encoder = JSONEncoder()
             encoder.outputFormatting = .prettyPrinted // 可选，格式化输出
             do {
                 let jsonData = try encoder.encode(model)
                 if let jsonString = String(data: jsonData, encoding: .utf8) {
-                    self?.syncManager.rtmManager.publish(channelName: roomId, message: message) { err in
+                    self?.syncManager.rtmManager.publish(channelName: roomId, message: jsonString) { err in
+                        if err == nil {
+                            self?.listener?.onMessageDidAdded(message: model)
+                        }
                         completion(err)
                     }
                 }
@@ -345,16 +347,13 @@ extension JoyServiceImpl: JoyServiceProtocol {
 
 extension JoyServiceImpl:AUIRtmMessageProxyDelegate {
     func onMessageReceive(publisher: String, message: String) {
-        let decoder = JSONDecoder()
         do {
-            let jsonData = message.data(using: .utf8)!
-            let messageInfo = try decoder.decode(JoyMessage.self, from: jsonData)
-            let model = JoyMessage()
-            model.userId = publisher
-            model.message = message
-            self.listener?.onMessageDidAdded(message: model)
+            if let jsonData = message.data(using: .utf8) {
+                let model = try JSONDecoder().decode(JoyMessage.self, from: jsonData)
+                self.listener?.onMessageDidAdded(message: model)
+            }
         } catch {
-            print("解析 JSON 字符串时出错：\(error)")
+            print("Error decoding JSON: \(error)")
         }
     }
 }
@@ -405,17 +404,20 @@ extension JoyServiceImpl: AUIUserRespDelegate {
     }
     
     func onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {
+        print("user: enter\(userInfo.userName)")
         self.userList.append(convertAUIUserInfo2JoyUserInfo(with: userInfo))
         self.listener?.onUserListDidChanged(userList: self.userList)
     }
     
     func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
+        print("user: leave\(userInfo.userName)")
         let userList = self.userList
         self.userList = userList.filter({ $0.userId != UInt(userInfo.userId)})
         self.listener?.onUserListDidChanged(userList: self.userList)
     }
     
     func onRoomUserUpdate(roomId: String, userInfo: AUIUserInfo) {
+        print("user: update\(userInfo.userName)")
         if let idx = self.userList.firstIndex(where: { $0.userId == UInt(userInfo.userId)}) {
             self.userList[idx] = convertAUIUserInfo2JoyUserInfo(with: userInfo)
             return
@@ -424,7 +426,7 @@ extension JoyServiceImpl: AUIUserRespDelegate {
         self.userList.append(convertAUIUserInfo2JoyUserInfo(with: userInfo))
         self.listener?.onUserListDidChanged(userList: self.userList)
     }
-    
+  
     func onUserAudioMute(userId: String, mute: Bool) {
         
     }

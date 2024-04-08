@@ -8,7 +8,7 @@
 import Foundation
 import AgoraRtcKit
 import YYCategories
-
+import AgoraCommon
 public enum UserGameStatus: String {
     case unknown = "unknown"
     case schedule = "schedule"
@@ -24,7 +24,7 @@ public struct CloudBarrageConfig {
     var appId: String?
     var basicAuth: String?
   //  var host: String? = "https://service.shengwang.cn/toolbox/v2/"
-    var host: String? = "https://service-staging.agora.io/toolbox/v1/"
+    var host: String?
     var engine: AgoraRtcEngineKit?
     var rtmToken: String?
 }
@@ -40,6 +40,7 @@ public class CloudBarrageAPI: NSObject {
     
     public func setup(apiConfig: CloudBarrageConfig) {
         self.apiConfig = apiConfig
+        self.apiConfig?.host = "\(AppContext.shared.baseServerUrl)/v1/"
     }
 }
 
@@ -59,7 +60,7 @@ extension CloudBarrageAPI {
 //            }
 //            completion(err, nil)
 //        }
-        postRequest(interface: interfaceName, host: "https://service-staging.agora.io/toolbox/v2/") { err, result in
+        postRequest(interface: interfaceName, host: "\(AppContext.shared.baseServerUrl)/v2/") { err, result in
             if let result = result?["list"] as? [[String: Any]] {
                 let model: [CloudGameInfo]? = self.decodeModelArray(result)
                 completion(err, model)
@@ -432,7 +433,7 @@ extension CloudBarrageAPI {
                        let msg = dic["errMsg"] as? String,
                        let jsonData = msg.data(using: .utf8),
                        let msgDic = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any] {
-                        code = msgDic["code"] as? Int ?? 0
+                        code = msgDic["err_no"] as? Int ?? 0
                         let msg = msgDic["err_msg"] as? String ?? ""
                         error = NSError(domain: msg, code: code)
                     }

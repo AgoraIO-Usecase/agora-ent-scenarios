@@ -109,6 +109,20 @@ class ShowRoomBottomBar: UIView {
         }
     }
     
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        // 获取当前视图下的子视图
+        let subview = super.hitTest(point, with: event)
+        
+        // 如果子视图存在并且不是自己，则返回子视图
+        if subview != self {
+            return subview
+        }
+        
+        // 否则，将点击事件传递给下层视图
+        return nil
+        
+    }
+    
     @objc private func didClickSendButton() {
         delegate?.onClickSendButton()
     }
