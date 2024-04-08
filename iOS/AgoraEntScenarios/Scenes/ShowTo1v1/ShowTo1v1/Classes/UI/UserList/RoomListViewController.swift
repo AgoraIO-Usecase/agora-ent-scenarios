@@ -48,11 +48,15 @@ class RoomListViewController: UIViewController {
     private weak var preJoinRoom: ShowTo1v1RoomInfo?
     private var connectedUserId: UInt?
     private var connectedChannelId: String?
-    private var rtcToken = "" {
-        didSet {
+    private var rtcToken: String {
+        set {
+            self.prepareConfig.rtcToken = newValue
+            
             //refresh room info token
             let list = roomList
             self.roomList = list
+        } get {
+            return self.prepareConfig.rtcToken
         }
     }
     private var rtmToken = ""
@@ -356,8 +360,6 @@ extension RoomListViewController {
         callApi.initialize(config: config)
         callApi.addListener(listener: self)
         
-        prepareConfig.rtcToken = rtcToken
-//        prepareConfig.rtmToken = rtmToken
         prepareConfig.roomId = NSString.withUUID()
         prepareConfig.localView =  callVC.localCanvasView.canvasView
         prepareConfig.remoteView = callVC.remoteCanvasView.canvasView

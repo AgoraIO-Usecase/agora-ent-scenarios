@@ -41,7 +41,13 @@ class Pure1v1UserListViewController: UIViewController {
         return player
     }()
     
-    private var rtcToken: String = ""
+    private var rtcToken: String {
+        set {
+            self.prepareConfig.rtcToken = newValue
+        } get {
+            return self.prepareConfig.rtcToken
+        }
+    }
     private var rtmToken: String = ""
     private lazy var rtcEngine = _createRtcEngine()
     private lazy var rtmClient: AgoraRtmClientKit = createRtmClient(appId: AppContext.shared.appId, userId: userInfo!.userId)
@@ -161,6 +167,7 @@ extension Pure1v1UserListViewController {
                 completion(nil, nil)
                 return
             }
+            
             self.rtcToken = rtcToken
             self.rtmToken = rtmToken
             completion(rtcToken, rtmToken)
@@ -243,10 +250,10 @@ extension Pure1v1UserListViewController {
                                         rtmClient: rtmClient)
         rtmManager.delegate = self
         self.rtmManager = rtmManager
-        _initCallAPI(rtcToken: self.rtcToken, rtmToken: self.rtmToken)
+        _initCallAPI()
     }
     
-    private func _initCallAPI(rtcToken: String, rtmToken: String) {
+    private func _initCallAPI() {
         pure1v1Print("_initCallAPI")
         
         let signalClient = CallRtmSignalClient(rtmClient: self.rtmManager!.getRtmClient())
@@ -261,8 +268,6 @@ extension Pure1v1UserListViewController {
         callApi.initialize(config: config)
         callApi.addListener(listener: self)
         
-        prepareConfig.rtcToken = rtcToken
-//        prepareConfig.rtmToken = rtmToken
         prepareConfig.roomId = NSString.withUUID()
         prepareConfig.localView = callVC.localCanvasView.canvasView
         prepareConfig.remoteView = callVC.remoteCanvasView.canvasView
