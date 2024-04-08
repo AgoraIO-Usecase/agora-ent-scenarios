@@ -213,6 +213,8 @@ class ShowAgoraKitManager: NSObject {
             self?.applySimulcastStream(connection: connection)
         }
 //        engine.addDelegateEx(<#T##delegate: AgoraRtcEngineDelegate##AgoraRtcEngineDelegate#>, connection: connection)
+        
+        showPrint("_joinChannelEx[\(connection.channelId)] role: \(mediaOptions.clientRoleType.rawValue) \(mediaOptions.publishMicrophoneTrack) \(mediaOptions.publishCameraTrack)")
         engine.updateChannelEx(with: mediaOptions, connection: connection)
         broadcasterConnection = connection
 
@@ -342,71 +344,109 @@ class ShowAgoraKitManager: NSObject {
             showError("updateChannelEx fail: connection is empty")
             return
         }
-        showPrint("updateChannelEx[\(channelId)]: \(options.publishMicrophoneTrack) \(options.publishCameraTrack)")
+        
+        showPrint("updateChannelEx[\(channelId)] role: \(options.clientRoleType.rawValue) \(options.publishMicrophoneTrack) \(options.publishCameraTrack)")
         engine.updateChannelEx(with: options, connection: connection)
     }
     
     
     /// 切换连麦角色
     /// - Parameters:
-    ///   - role: 角色，连麦双方为broadcaster，观众为audience，连麦主播结束连麦也为audience
+    ///   - role: 角色，连麦双方为broadcaster，观众为audience，连麦主播结束连麦也为audience，无需修改则为nil
     ///   - channelId: 频道号
     ///   - options: <#options description#>
     ///   - uid: 连麦窗口的uid
     ///   - canvasView: 画布，nil表示需要移除
-    func switchRole(role: AgoraClientRole,
+    func switchRole(role: AgoraClientRole? = nil,
                     channelId: String,
                     options:AgoraRtcChannelMediaOptions,
-                    uid: String?,
-                    canvasView: UIView?) {
+                    uid: String?) {
         guard let uid = UInt(uid ?? "") else {
             showError("switchRole fatel")
             return
         }
         
+        showPrint("switchRole[\(channelId)], role: \(role?.rawValue ?? -1) localUid:\(UserInfo.userId) uid: \(uid)", context: kShowLogBaseContext)
         if role == .broadcaster {
             audioApi?.setAudioScenario(sceneType: .Show, audioScenarioType: .Show_InteractiveAudience)
         }
         
-        options.clientRoleType = role
-        options.audienceLatencyLevel = role == .audience ? .lowLatency : .ultraLowLatency
+        if let role = role {
+            let roleOptions = AgoraRtcChannelMediaOptions()
+            roleOptions.clientRoleType = role
+            roleOptions.audienceLatencyLevel = role == .audience ? .lowLatency : .ultraLowLatency
+            updateChannelEx(channelId:channelId, options: roleOptions)
+        }
+        
+        //更新外部options
         updateChannelEx(channelId:channelId, options: options)
+        
+//        if role == .audience {
+//            //观众先清理本地画面，然后设置远端画面
+//            setupLocalVideo(canvasView: nil)
+//            cleanCapture()
+//        }
+//        
+//        
+//        if "\(uid)" == VLUserCenter.user.id {
+//            //自己是连麦主播，渲染本地画面
+//            setupLocalVideo(canvasView: canvasView)
+//        } else {
+//            //自己不是连麦主播，渲染连麦主播远端画面
+//            setupRemoteVideo(channelId: channelId, uid: uid, canvasView: canvasView)
+//        }
+    }
+    
+    func updateLiveView(role: AgoraClientRole? = nil,
+                        channelId: String,
+                        uid: String?,
+                        canvasView: UIView?) {
+        guard let uid = UInt(uid ?? "") else {
+            showError("updateLiveView fatel")
+            return
+        }
         
         if role == .audience {
             //观众先清理本地画面，然后设置远端画面
             setupLocalVideo(canvasView: nil)
             cleanCapture()
-            setupRemoteVideo(channelId: channelId, uid: uid, canvasView: canvasView)
+        }
+        
+        
+        if "\(uid)" == VLUserCenter.user.id {
+            //自己是连麦主播，渲染本地画面
+            setupLocalVideo(canvasView: canvasView)
         } else {
-            if "\(uid)" == VLUserCenter.user.id {
-                //自己是连麦主播，渲染本地画面
-                setupLocalVideo(canvasView: canvasView)
-            } else {
-                //自己是主播，渲染连麦主播远端画面
-                setupRemoteVideo(channelId: channelId, uid: uid, canvasView: canvasView)
-            }
+            //自己不是连麦主播，渲染连麦主播远端画面
+            setupRemoteVideo(channelId: channelId, uid: uid, canvasView: canvasView)
         }
     }
     
-    func updateMediaOptions(publishCamera: Bool, channelId: String, canvasView: UIView?) {
+    
+    /// 预加载连麦
+    /// - Parameters:
+    ///   - isOn: <#isOn description#>
+    ///   - channelId: <#channelId description#>
+    func prePublishOnseatVideo(isOn: Bool, channelId: String) {
         let mediaOptions = AgoraRtcChannelMediaOptions()
-        mediaOptions.publishCameraTrack = publishCamera
+        mediaOptions.publishCameraTrack = isOn
         mediaOptions.publishMicrophoneTrack = false
-        switchRole(role: publishCamera ? .broadcaster : .audience,
+        switchRole(role: isOn ? .broadcaster : .audience,
                    channelId: channelId,
                    options: mediaOptions,
-                   uid: VLUserCenter.user.id,
-                   canvasView: canvasView)
+                   uid: VLUserCenter.user.id)
     }
-    func updateMediaOptionsEx(channelId: String, publishCamera: Bool, publishMic: Bool = false) {
+    
+    func preSubscribePKVideo(isOn: Bool, channelId: String) {
         let mediaOptions = AgoraRtcChannelMediaOptions()
-        mediaOptions.publishCameraTrack = publishCamera
-        mediaOptions.publishMicrophoneTrack = publishMic
-        mediaOptions.autoSubscribeAudio = publishMic
-        mediaOptions.autoSubscribeVideo = publishCamera
-        mediaOptions.clientRoleType = publishCamera ? .broadcaster : .audience
+        mediaOptions.publishCameraTrack = isOn
+        mediaOptions.publishMicrophoneTrack = false
+        mediaOptions.autoSubscribeAudio = false
+        mediaOptions.autoSubscribeVideo = isOn
+        mediaOptions.clientRoleType = isOn ? .broadcaster : .audience
         let uid = Int(VLUserCenter.user.id) ?? 0
         let connection = AgoraRtcConnection(channelId: channelId, localUid: uid)
+        showPrint("updateMediaOptionsEx[\(channelId)] role: \(mediaOptions.clientRoleType.rawValue) \(mediaOptions.publishMicrophoneTrack) \(mediaOptions.publishCameraTrack)")
         engine?.updateChannelEx(with: mediaOptions, connection: connection)
     }
     
@@ -468,7 +508,7 @@ class ShowAgoraKitManager: NSObject {
     }
     
     func setupLocalVideo(mirrorMode: AgoraVideoMirrorMode = .disabled,
-                                 canvasView: UIView?) {
+                         canvasView: UIView?) {
         guard let engine = engine else {
             assert(true, "rtc engine not initlized")
             return
@@ -481,15 +521,17 @@ class ShowAgoraKitManager: NSObject {
         engine.setDefaultAudioRouteToSpeakerphone(true)
         engine.enableLocalAudio(true)
         engine.enableLocalVideo(true)
-        showPrint("setupLocalVideo, user uid:\(UserInfo.userId)", context: kShowLogBaseContext)
+        showPrint("setupLocalVideo, user uid:\(UserInfo.userId) view: \(canvasView?.description ?? "")", context: kShowLogBaseContext)
     }
     
     //连麦用，pk走的VideoloaderAPI
     private func setupRemoteVideo(channelId: String, uid: UInt, canvasView: UIView?) {
         let connection = AgoraRtcConnection(channelId: channelId, localUid: Int(VLUserCenter.user.id) ?? 0)
+        //先清理老的view
         if let uid = channelIdUidCanvasMap[channelId] {
             let videoCanvas = AgoraRtcVideoCanvas()
             videoCanvas.uid = uid
+            videoCanvas.view = nil
             let _ = engine?.setupRemoteVideoEx(videoCanvas, connection: connection)
             channelIdUidCanvasMap.removeValue(forKey: channelId)
         }
@@ -500,7 +542,7 @@ class ShowAgoraKitManager: NSObject {
         if let _ = canvasView {
             channelIdUidCanvasMap[channelId] = uid
         }
-        showPrint("setupRemoteVideoEx[\(channelId)] ret = \(ret ?? -1), uid:\(uid)", context: kShowLogBaseContext)
+        showPrint("setupRemoteVideoEx[\(channelId)] ret = \(ret ?? -1), uid:\(uid) view: \(canvasView?.description ?? "")", context: kShowLogBaseContext)
     }
     
     func updateLoadingType(roomId: String, channelId: String, playState: AnchorState) {
@@ -575,6 +617,8 @@ extension ShowAgoraKitManager {
         showPrint("setOffMediaOptionsVideo with roomid = \(roomid)")
         let mediaOptions = AgoraRtcChannelMediaOptions()
         mediaOptions.autoSubscribeVideo = false
+        
+        showPrint("setOffMediaOptionsVideo[\(roomid)] role: \(mediaOptions.clientRoleType.rawValue) \(mediaOptions.publishMicrophoneTrack) \(mediaOptions.publishCameraTrack)")
         engine?.updateChannelEx(with: mediaOptions, connection: connection)
     }
     
@@ -582,6 +626,8 @@ extension ShowAgoraKitManager {
         VideoLoaderApiImpl.shared.getConnectionMap().forEach { _, connention in
             let mediaOptions = AgoraRtcChannelMediaOptions()
             mediaOptions.autoSubscribeAudio = false
+            
+            showPrint("setOffMediaOptionsAudio[\(connention.channelId)] role: \(mediaOptions.clientRoleType.rawValue) \(mediaOptions.publishMicrophoneTrack) \(mediaOptions.publishCameraTrack)")
             engine?.updateChannelEx(with: mediaOptions, connection: connention)
         }
     }

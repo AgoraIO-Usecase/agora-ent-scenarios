@@ -162,6 +162,9 @@ class ShowLiveViewController: UIViewController {
     
     private var currentInteraction: ShowInteractionInfo? {
         didSet {
+            if let currentInteraction = currentInteraction {
+                showPrint("currentInteraction: \(currentInteraction.description)")
+            }
             if self.room?.userId() == self.currentUserId {
                 self.liveView.showThumnbnailCanvasView = false
             }
@@ -481,6 +484,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onMicSeatApplyUpdated(apply: ShowMicSeatApply) {
+        showPrint("onMicSeatApplyUpdated: \(apply.userId)/\(apply.userName ?? "") status: \(apply.status.rawValue)")
         _updateApplyMenu()
         if apply.status == .waitting, role == .broadcaster {
             liveView.bottomBar.linkButton.isShowRedDot = true
@@ -504,20 +508,23 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onMicSeatApplyDeleted(apply: ShowMicSeatApply) {
+        showPrint("onMicSeatApplyDeleted: \(apply.userId)/\(apply.userName ?? "")")
         _updateApplyMenu()
         isSendJointBroadcasting = false
-        if currentUserId != room?.ownerId {
-            ShowAgoraKitManager.shared.updateMediaOptions(publishCamera: false,
-                                                          channelId: room?.roomId ?? "",
-                                                          canvasView: nil)
+        if currentUserId != room?.ownerId, apply.userId == currentUserId {
+            //撤销的是自己才需要关闭预先的推流
+            ShowAgoraKitManager.shared.prePublishOnseatVideo(isOn: false, channelId: roomId)
+            
         }
     }
     
     func onMicSeatApplyAccepted(apply: ShowMicSeatApply) {
+        showPrint("onMicSeatApplyAccepted: \(apply.userId)/\(apply.userName ?? "")")
         _updateApplyMenu()
     }
     
     func onMicSeatApplyRejected(apply: ShowMicSeatApply) {
+        showPrint("onMicSeatApplyRejected: \(apply.userId)/\(apply.userName ?? "")")
         _updateApplyMenu()
     }
     
@@ -526,10 +533,10 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         if invitation.status == .waitting {
             isSendJointBroadcasting = true
             muteLocalVideo = true
-            ShowAgoraKitManager.shared.updateMediaOptions(publishCamera: true,
-                                                          channelId: room?.roomId ?? "",
-                                                          canvasView: liveView.canvasView.remoteView)
-            ShowReceivePKAlertVC.present(name: invitation.userName, style: .mic) { result in
+            //收到连麦邀请，先推流，加速出图
+            ShowAgoraKitManager.shared.prePublishOnseatVideo(isOn: true, channelId: roomId)
+            ShowReceivePKAlertVC.present(name: invitation.userName, style: .mic) {[weak self] result in
+                guard let self = self else {return}
                 switch result {
                 case .accept:
                     ToastView.showWait(text: "show_is_onseat_doing".show_localized)
@@ -550,9 +557,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
 
                 default:
                     self.isSendJointBroadcasting = false
-                    ShowAgoraKitManager.shared.updateMediaOptions(publishCamera: false,
-                                                                  channelId: self.room?.roomId ?? "",
-                                                                  canvasView: nil)
+                    //拒绝邀请，关闭推流
+                    ShowAgoraKitManager.shared.prePublishOnseatVideo(isOn: false, channelId: self.roomId)
                     self.serviceImp?.rejectMicSeatInvitation { error in
                     }
                     break
@@ -600,20 +606,18 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                                                      options: self.channelOptions,
                                                      role: .audience) {
                 showPrint("\(self.roomId) updateLoadingType _onStartInteraction---------- \(self.roomId)")
-                ShowAgoraKitManager.shared.updateMediaOptionsEx(channelId: invitation.fromRoomId, publishCamera: true, publishMic: false)
+                ShowAgoraKitManager.shared.preSubscribePKVideo(isOn: true, channelId: invitation.fromRoomId)
             }
             ShowReceivePKAlertVC.present(name: invitation.fromName) { result in
                 switch result {
                 case .accept:
                     self.serviceImp?.acceptPKInvitation { error in
-                        
                     }
                     break
                 default:
                     self.serviceImp?.rejectPKInvitation { error in
-                        
                     }
-                    ShowAgoraKitManager.shared.updateMediaOptionsEx(channelId: invitation.fromRoomId, publishCamera: false, publishMic: false)
+                    ShowAgoraKitManager.shared.preSubscribePKVideo(isOn: false, channelId: invitation.fromRoomId)
                     ShowAgoraKitManager.shared.leaveChannelEx(roomId: self.roomId, channelId: invitation.fromRoomId)
                     break
                 }
@@ -684,6 +688,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     private func _onStartInteraction(interaction: ShowInteractionInfo) {
+        showPrint("_onStartInteraction: \(interaction.userId) \(interaction.userName ?? "") status: \(interaction.interactStatus.rawValue)")
         switch interaction.interactStatus {
         case .pking:
             view.layer.contents = UIImage.show_sceneImage(name: "show_live_pk_bg")?.cgImage
@@ -705,16 +710,22 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             self.muteLocalAudio = false
             liveView.canvasView.canvasType = .joint_broadcasting
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
+            
+            //TODO: 这个是不是需要真正的角色，放进switchRole里？
             if role == .audience {
                 ShowAgoraKitManager.shared.setPVCon(true)
                 ShowAgoraKitManager.shared.setSuperResolutionOn(false)
             }
-            let toRole: AgoraClientRole = (role == .broadcaster || interaction.userId == VLUserCenter.user.id) ? .broadcaster : .audience
+            //如果是连麦双方为broadcaster，观众不修改，因为观众可能已经申请上麦，申请时已经修改了角色并提前推流
+            let toRole: AgoraClientRole? = (role == .broadcaster || interaction.userId == VLUserCenter.user.id) ? .broadcaster : nil
             ShowAgoraKitManager.shared.switchRole(role: toRole,
                                                   channelId: roomId,
                                                   options: self.channelOptions,
-                                                  uid: interaction.userId,
-                                                  canvasView: liveView.canvasView.remoteView)
+                                                  uid: interaction.userId)
+            ShowAgoraKitManager.shared.updateLiveView(role: toRole, 
+                                                      channelId: roomId,
+                                                      uid: interaction.userId,
+                                                      canvasView: liveView.canvasView.remoteView)
             
             liveView.bottomBar.linkButton.isSelected = true
             liveView.bottomBar.linkButton.isShowRedDot = false
@@ -734,6 +745,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     private func _onStopInteraction(interaction: ShowInteractionInfo) {
+        showPrint("_onStopInteraction: \(interaction.userId) \(interaction.userName ?? "") status: \(interaction.interactStatus.rawValue)")
         switch interaction.interactStatus {
         case .pking:
             view.layer.contents = UIImage.show_sceneImage(name: "show_live_room_bg")?.cgImage
@@ -753,6 +765,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.bottomBar.linkButton.isShowRedDot = false
             liveView.bottomBar.linkButton.isSelected = false
             currentInteraction?.ownerMuteAudio = false
+            //TODO: 这个是不是需要真正的角色，放进switchRole里？
             if role == .audience {
                 ShowAgoraKitManager.shared.setPVCon(false)
                 ShowAgoraKitManager.shared.setSuperResolutionOn(true)
@@ -760,12 +773,16 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 ShowAgoraKitManager.shared.updateVideoProfileForMode(.single)
             }
             
-//            let canvasView = role == .broadcaster ? liveView.canvasView.localView : liveView.canvasView.remoteView
-            ShowAgoraKitManager.shared.switchRole(role: role,
+            //停止连麦需要修改角色的只有连麦主播，其他用户保持原有角色，有可能观众已经申请连麦改变了角色并推流
+            let toRole: AgoraClientRole? = interaction.userId == VLUserCenter.user.id ? .audience : nil
+            ShowAgoraKitManager.shared.switchRole(role: toRole,
                                                   channelId: roomId,
                                                   options: self.channelOptions,
-                                                  uid: interaction.userId,
-                                                  canvasView: nil)
+                                                  uid: interaction.userId)
+            ShowAgoraKitManager.shared.updateLiveView(role: toRole, 
+                                                      channelId: roomId,
+                                                      uid: interaction.userId,
+                                                      canvasView: nil)
             self.delegate?.currentUserIsOffSeat()
         default:
             break
@@ -791,7 +808,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
-        showPrint("rtcEngine didOfflineOfUid === \(uid)")
+        showPrint("rtcEngine didOfflineOfUid === \(uid) reason: \(reason.rawValue)")
         if let interaction = self.currentInteraction {
             let isRoomOwner: Bool = role == .broadcaster
             let isInteractionLeave: Bool = interaction.userId == "\(uid)"
@@ -956,9 +973,9 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
                 AlertManager.show(view: self.applyView, alertPostion: .bottom)
                 guard self.role == .audience else { return }
                 self.isSendJointBroadcasting = true
-                ShowAgoraKitManager.shared.updateMediaOptions(publishCamera: true,
-                                                              channelId: self.room?.roomId ?? "",
-                                                              canvasView: self.liveView.canvasView.remoteView)
+                
+                //点击连麦，预先变成连麦主播并推流
+                ShowAgoraKitManager.shared.prePublishOnseatVideo(isOn: true, channelId: self.roomId)
             }
         }
     }
