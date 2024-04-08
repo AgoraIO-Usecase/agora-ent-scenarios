@@ -21,6 +21,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func configKeyCenterData() {
+        
+        var isDebugMode = false
+        if let index: Int = UserDefaults.standard.object(forKey: "TOOLBOXENV") as? Int {
+            isDebugMode = index == 1
+        } else {
+            isDebugMode = false
+        }
+        
         AppContext.shared.appId = KeyCenter.AppId
         AppContext.shared.certificate = KeyCenter.Certificate ?? ""
         AppContext.shared.hostUrl = KeyCenter.HostUrl
@@ -29,7 +37,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppContext.shared.imClientSecret = KeyCenter.IMClientSecret ?? ""
         AppContext.shared.cloudPlayerKey = KeyCenter.CloudPlayerKey ?? ""
         AppContext.shared.cloudPlayerSecret = KeyCenter.CloudPlayerSecret ?? ""
-        AppContext.shared.baseServerUrl = KeyCenter.baseServerUrl ?? ""
+        AppContext.shared.baseServerUrl = isDebugMode ? (KeyCenter.baseServerUrlDev ?? "") : (KeyCenter.baseServerUrl ?? "")
+        
     }
     
     @objc func didTokenExpired() {

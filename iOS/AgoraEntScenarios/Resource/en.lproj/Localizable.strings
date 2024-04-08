@@ -53,6 +53,7 @@
 "app_logoff"="确认注销";
 "app_not_logoff"="暂不注销";
 "app_debug_mode"="开发者模式";
+"exit_app_debug_mode"="退出开发者模式";
 
 "app_voice_chat"="语聊房";
 "app_show_live"="秀场直播";

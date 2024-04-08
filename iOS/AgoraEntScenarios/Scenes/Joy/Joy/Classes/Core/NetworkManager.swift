@@ -5,7 +5,7 @@
 //  Created by zhaoyongqiang on 2021/11/19.
 //
 import UIKit
-
+import AgoraCommon
 @objc public enum TokenGeneratorType: Int {
     case token006 = 0
     case token007 = 1
@@ -40,7 +40,7 @@ class NetworkManager:NSObject {
     }()
 
     @objc static let shared = NetworkManager()
-    private let baseServerUrl: String = "https://service.shengwang.cn/toolbox/"
+    private let baseServerUrl: String = AppContext.shared.baseServerUrl
     
     private func basicAuth(key: String, password: String) -> String {
         let loginString = String(format: "%@:%@", key, password)

@@ -71,6 +71,7 @@ PODS:
   - HXPhotoPicker/Picker/Lite (4.1.5):
     - HXPhotoPicker/Core
   - Joy (0.1.0):
+    - AgoraCommon
     - AgoraRtcEngine_Special_iOS
     - AgoraSyncManager
     - RTMSyncManager
@@ -259,7 +260,7 @@ SPEC CHECKSUMS:
   Cantata: 1a210fcfeb32f93659c199c33ec34b52a56de380
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   HXPhotoPicker: a7f554cf87888724394c19870c13544ac7b65245
-  Joy: 208f622ffd1bce2cae38ee6f55a46690bb9a63d7
+  Joy: 20168a64bfbd0c6053382991957335eb2d452576
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
   LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb

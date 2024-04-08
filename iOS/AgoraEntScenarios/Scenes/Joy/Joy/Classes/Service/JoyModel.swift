@@ -50,5 +50,19 @@ public class JoyMessage: Codable {
     var message: String?         //消息文本内容
     var createAt: Int64 = 0      //创建时间，与19700101时间比较的毫秒数
     
-    var objectId: String = ""
+   // var objectId: String = ""
+    private enum CodingKeys: String, CodingKey {
+        case userId
+        case userName
+        case message
+        case createAt
+    }
+
+    public convenience init(userId: String, userName: String?, message: String?, createAt: Int) {
+        self.init()
+        self.userId = userId
+        self.userName = userName
+        self.message = message
+        self.createAt = Int64(createAt)
+    }
 }

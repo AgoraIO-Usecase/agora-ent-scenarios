@@ -55,4 +55,5 @@ TODO: Add long description of the pod here.
   s.dependency 'YYCategories'
   s.dependency 'SVProgressHUD'
   s.dependency 'RTMSyncManager'
+  s.dependency 'AgoraCommon'
 end

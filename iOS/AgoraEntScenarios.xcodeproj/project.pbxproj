@@ -635,6 +635,7 @@
 		E36EC8BA2A6680F60089A374 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E36EC8BC2A6680F60089A374 /* Localizable.strings */; };
 		E3735C342A5E4AFF004737EF /* UITextView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */; };
 		E3735CA72A5E8023004737EF /* VRBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CA62A5E8023004737EF /* VRBaseViewController.swift */; };
+		E3BCD4462BC3D61F005F5FEA /* DevViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E3BCD4452BC3D61F005F5FEA /* DevViewController.m */; };
 		E3C7726A2AE7B0E6008D17B7 /* VRCreateRoomPresentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C772692AE7B0E6008D17B7 /* VRCreateRoomPresentView.swift */; };
 		E3C7EF2C2AE66BC70023B069 /* VRRoomHomeListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C7EF2B2AE66BC70023B069 /* VRRoomHomeListCell.swift */; };
 		E3C7EF2E2AE66F1F0023B069 /* VRRoomHomeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C7EF2D2AE66F1F0023B069 /* VRRoomHomeListView.swift */; };
@@ -1561,6 +1562,8 @@
 		E36EC8BD2A6680FB0089A374 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Extension.swift"; sourceTree = "<group>"; };
 		E3735CA62A5E8023004737EF /* VRBaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRBaseViewController.swift; sourceTree = "<group>"; };
+		E3BCD4442BC3D61F005F5FEA /* DevViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DevViewController.h; sourceTree = "<group>"; };
+		E3BCD4452BC3D61F005F5FEA /* DevViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DevViewController.m; sourceTree = "<group>"; };
 		E3C772692AE7B0E6008D17B7 /* VRCreateRoomPresentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRCreateRoomPresentView.swift; sourceTree = "<group>"; };
 		E3C7EF2B2AE66BC70023B069 /* VRRoomHomeListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VRRoomHomeListCell.swift; sourceTree = "<group>"; };
 		E3C7EF2D2AE66F1F0023B069 /* VRRoomHomeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VRRoomHomeListView.swift; sourceTree = "<group>"; };
@@ -2472,6 +2475,8 @@
 				E74F819D2ADD189B009CA280 /* VLMineAccountViewController.swift */,
 				E71685112ADF7C8400C2915C /* VLFeedbackViewController.swift */,
 				E71685152AE10C1500C2915C /* VLFeedbackResultViewController.swift */,
+				E3BCD4442BC3D61F005F5FEA /* DevViewController.h */,
+				E3BCD4452BC3D61F005F5FEA /* DevViewController.m */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -4662,6 +4667,7 @@
 				E36EC8B32A6638440089A374 /* AEAListContainerView.swift in Sources */,
 				DD3610B129B70CDC00CE7984 /* ShowChatInputView.swift in Sources */,
 				DD84178529090C520026B624 /* VLUploadImageResModel.m in Sources */,
+				E3BCD4462BC3D61F005F5FEA /* DevViewController.m in Sources */,
 				DD9EBFD82AD5512300B4551F /* VMSliderTableViewCell.swift in Sources */,
 				E301BD812AF4CB000089A79C /* VLKTVKindsView.m in Sources */,
 				DD619AD029E3E247008F63E4 /* SAANISSetTableViewCell.swift in Sources */,
@@ -5423,7 +5429,6 @@
 					"-ld64",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.test.entfull;
-
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = wildcard;
