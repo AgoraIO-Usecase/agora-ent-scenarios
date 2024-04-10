@@ -171,6 +171,8 @@ class BroadcasterViewController: BaseRoomViewController {
 //            VideoLoaderApiImpl.shared.addRTCListener(anchorId: room.channelName, listener: self.realTimeView)
             
             bottomBar.buttonTypes = [.call, .more]
+            
+            VideoLoaderApiImpl.shared.switchAnchorState(newState: .joinedWithAudioVideo, localUid: UInt(uid), anchorInfo: room, tagId: roomInfo.roomId)
         }
     }
     
@@ -180,10 +182,19 @@ class BroadcasterViewController: BaseRoomViewController {
             rtcEngine?.leaveChannel()
             rtcEngine?.removeDelegate(self.realTimeView)
         } else {
-            //观众不需要离开频道，交给场景化api处理
+            //观众不需要离开频道，交给场景化api处理，需要移除画布并静音
             let connection = AgoraRtcConnection(channelId: roomInfo.roomId, localUid: Int(uid))
             rtcEngine?.removeDelegateEx(self.realTimeView, connection: connection)
 //            VideoLoaderApiImpl.shared.removeRTCListener(anchorId: roomInfo.channelName(), listener: self.realTimeView)
+            
+            let room = roomInfo.anchorInfoList.first!
+            let container = VideoCanvasContainer()
+            container.setupMode = .remove
+            container.container = remoteCanvasView
+            container.uid = roomInfo.getUIntUserId()
+            VideoLoaderApiImpl.shared.renderVideo(anchorInfo: room, container: container)
+            
+            VideoLoaderApiImpl.shared.switchAnchorState(newState: .joinedWithVideo, localUid: UInt(uid), anchorInfo: room, tagId: roomInfo.roomId)
         }
     }
     
