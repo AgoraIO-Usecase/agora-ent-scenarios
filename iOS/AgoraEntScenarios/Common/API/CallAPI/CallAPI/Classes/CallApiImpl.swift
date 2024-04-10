@@ -114,6 +114,7 @@ public class CallApiImpl: NSObject {
             case .connecting:
                 _updateAutoSubscribe(type: .audioVideo)
             case .connected:
+                _updateAutoSubscribe(type: .audioVideo)
                 connectInfo.timer = nil
                 if let remoteView = prepareConfig?.remoteView {
                     tempRemoteCanvasView.frame = remoteView.bounds

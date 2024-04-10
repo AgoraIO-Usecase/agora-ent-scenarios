@@ -35,6 +35,12 @@
 
 "call_content_inspect_warning"="监测到当前内容存在违规行为";
 
+"user_list_user_leave"="Hi，我暂时有事,很快回来";
+
+"setting_video_on" = "摄像头开";
+"setting_mic_on" = "麦克风开";
+"setting_video_off" = "摄像头关";
+"setting_mic_off" = "麦克风关";
 "setting_statistic" = "实时数据";
 "show_statistic_bitrate" = "码率";
 "show_statistic_delay" = "延迟";

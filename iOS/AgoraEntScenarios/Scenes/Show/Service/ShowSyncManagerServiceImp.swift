@@ -64,11 +64,11 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
         return
     }
     
-    showLogger().error(message, context: "Service")
+    showError(message, context: "Service")
 }
 
 private func agoraPrint(_ message: String) {
-    showLogger().info(message, context: "Service")
+    showPrint(message, context: "Service")
 }
 
 class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
@@ -407,22 +407,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     }
     
     func cancelMicSeatApply(completion: @escaping (NSError?) -> Void) {
-        // 房主移除所有accept
-        if room?.ownerId == VLUserCenter.user.id {
-            self.seatApplyList.forEach { apply in
-                if apply.status == .accepted {
-                    _removeMicSeatApply(apply: apply, completion: completion)
-                }
-            }
-            return
-        }
-  
-        guard let apply = self.seatApplyList.filter({ $0.userId == VLUserCenter.user.id }).first else {
-//            agoraAssert("cancel apply not found")
-            return
-        }
-        _removeMicSeatApply(apply: apply, completion: completion)
-        
+        _cancelMicSeatApply(userId: VLUserCenter.user.id, completion: completion)
     }
     
     func acceptMicSeatApply(apply: ShowMicSeatApply, completion: @escaping (NSError?) -> Void) {
@@ -664,7 +649,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         _removeInteraction(interaction: interaction, completion: completion)
         guard interaction.interactStatus == .pking else {
             // seat apply / interation
-            cancelMicSeatApply { error in
+            _cancelMicSeatApply(userId: interaction.userId) { error in
             }
             
             cancelMicSeatInvitation(userId: interaction.userId) { err in
@@ -1262,6 +1247,27 @@ extension ShowSyncManagerServiceImp {
                 completion(error.toNSError())
             })
     }
+    
+    
+    func _cancelMicSeatApply(userId: String?, completion: @escaping (NSError?) -> Void) {
+        let uid = userId ?? VLUserCenter.user.id
+        // 房主移除所有accept
+        if room?.ownerId == uid {
+            self.seatApplyList.forEach { apply in
+                if apply.status == .accepted {
+                    _removeMicSeatApply(apply: apply, completion: completion)
+                }
+            }
+            return
+        }
+  
+        guard let apply = self.seatApplyList.filter({ $0.userId == uid }).first else {
+//            agoraAssert("cancel apply not found")
+            return
+        }
+        _removeMicSeatApply(apply: apply, completion: completion)
+        
+    }
 }
 
 
@@ -1693,7 +1699,7 @@ extension ShowSyncManagerServiceImp {
                     return
                 }
                 self.subscribeDelegate?.onInterationEnded(interaction: _invitation)
-                self.cancelMicSeatApply { _ in }
+//                self.cancelMicSeatApply { _ in }
             }, onSubscribed: {
             }, fail: { error in
                 agoraPrint("imp interaction subscribe fail \(error.message)... \(channelName)")
@@ -1713,7 +1719,7 @@ extension ShowSyncManagerServiceImp {
         let params = interaction.yy_modelToJSONObject() as! [String: Any]
         //add interation immediately to prevent received multi pk invitations at the same time
         interactionList.append(interaction)
-        interactionPaddingIdsSet.insert(interaction.userId ?? "")
+        interactionPaddingIdsSet.insert(interaction.userId)
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_INTERACTION_COLLECTION)

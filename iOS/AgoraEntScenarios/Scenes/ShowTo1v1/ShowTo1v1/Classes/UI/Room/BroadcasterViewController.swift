@@ -27,7 +27,7 @@ class BroadcasterViewController: BaseRoomViewController {
                 self?.roomInfoView.stopTime()
                 self?.onBackAction()
             }
-            bgImageView.image = roomInfo?.bgImage()
+            bgImageView.sd_setImage(with: URL(string: roomInfo?.bgImage() ?? ""), placeholderImage: nil)
         }
     }
     var broadcasterToken: String? {
@@ -140,8 +140,14 @@ class BroadcasterViewController: BaseRoomViewController {
                 showTo1v1Print("broadcaster joinChannel[\(channelId)] success:  \(uid)")
                 guard let self = self, let rtcEngine = self.rtcEngine else {return}
                 self.callApi?.setupContentInspectConfig(rtcEngine: rtcEngine, enable: true, uid: "\(uid)", channelId: channelId)
-                self.callApi?.moderationAudio(appId: showTo1v1AppId!, channelName: channelId, user: self.currentUser!)
+                self.callApi?.moderationAudio(channelName: channelId)
             })
+            
+            
+            let config = AgoraVideoEncoderConfiguration()
+            config.dimensions = CGSize(width: 720, height: 1280)
+            config.frameRate = .fps24
+            rtcEngine?.setVideoEncoderConfiguration(config)
             
             _setupCanvas(view: remoteCanvasView)
             //主播的直播数据面板
@@ -165,6 +171,8 @@ class BroadcasterViewController: BaseRoomViewController {
 //            VideoLoaderApiImpl.shared.addRTCListener(anchorId: room.channelName, listener: self.realTimeView)
             
             bottomBar.buttonTypes = [.call, .more]
+            
+            VideoLoaderApiImpl.shared.switchAnchorState(newState: .joinedWithAudioVideo, localUid: UInt(uid), anchorInfo: room, tagId: roomInfo.roomId)
         }
     }
     
@@ -174,10 +182,19 @@ class BroadcasterViewController: BaseRoomViewController {
             rtcEngine?.leaveChannel()
             rtcEngine?.removeDelegate(self.realTimeView)
         } else {
-            //观众不需要离开频道，交给场景化api处理
+            //观众不需要离开频道，交给场景化api处理，需要移除画布并静音
             let connection = AgoraRtcConnection(channelId: roomInfo.roomId, localUid: Int(uid))
             rtcEngine?.removeDelegateEx(self.realTimeView, connection: connection)
 //            VideoLoaderApiImpl.shared.removeRTCListener(anchorId: roomInfo.channelName(), listener: self.realTimeView)
+            
+            let room = roomInfo.anchorInfoList.first!
+            let container = VideoCanvasContainer()
+            container.setupMode = .remove
+            container.container = remoteCanvasView
+            container.uid = roomInfo.getUIntUserId()
+            VideoLoaderApiImpl.shared.renderVideo(anchorInfo: room, container: container)
+            
+            VideoLoaderApiImpl.shared.switchAnchorState(newState: .joinedWithVideo, localUid: UInt(uid), anchorInfo: room, tagId: roomInfo.roomId)
         }
     }
     

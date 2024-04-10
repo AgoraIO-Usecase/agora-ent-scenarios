@@ -25,11 +25,13 @@ class CallViewController: BaseRoomViewController {
                 let connection = AgoraRtcConnection(channelId: oldValue, localUid: localUid)
                 connection.channelId = oldValue
                 rtcEngine?.removeDelegateEx(self.realTimeView, connection: connection)
+                rtcEngine?.removeDelegateEx(self, connection: connection)
             }
             
             if let rtcChannelName = rtcChannelName {
                 let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: localUid)
                 rtcEngine?.addDelegateEx(self.realTimeView, connection: connection)
+                rtcEngine?.addDelegateEx(self, connection: connection)
                 self.realTimeView.roomId = rtcChannelName
             }
         }
@@ -44,7 +46,6 @@ class CallViewController: BaseRoomViewController {
     
     private(set) lazy var localCanvasView: CallCanvasView = {
         let view = CallCanvasView(frame: CGRect(origin: .zero, size: CGSize(width: 109, height: 163)))
-        view.backgroundColor = UIColor(hexString: "#0038ff")?.withAlphaComponent(0.7)
         view.tapClosure = {[weak self] in
             guard let self = self else {return}
             self.switchCanvasAction(canvasView: self.localCanvasView)
@@ -135,9 +136,36 @@ class CallViewController: BaseRoomViewController {
         _updateCanvas()
     }
     
+    override func menuTypes() -> [ShowToolMenuType] {
+        return [.camera, .mic, .real_time_data]
+    }
+    
     @objc private func _hangupAction() {
         callApi?.hangup(remoteUserId: UInt(targetUser?.uid ?? "") ?? 0, reason: nil, completion: { err in
         })
+    }
+}
+
+extension CallViewController {
+    public override func onClickCameraButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
+        self.selectedMap[.camera] = selected
+        menu.selectedMap = selectedMap
+        guard let rtcChannelName = rtcChannelName, let uid = Int(currentUser?.uid ?? "") else {return}
+        let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: uid)
+        if selected {
+            rtcEngine?.stopPreview()
+        } else {
+            rtcEngine?.startPreview()
+        }
+        rtcEngine?.muteLocalVideoStreamEx(selected, connection: connection)
+    }
+    
+    public override func onClickMicButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
+        self.selectedMap[.mic] = selected
+        menu.selectedMap = selectedMap
+        guard let rtcChannelName = rtcChannelName, let uid = Int(currentUser?.uid ?? "") else {return}
+        let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: uid)
+        rtcEngine?.muteLocalAudioStreamEx(selected, connection: connection)
     }
 }
 
@@ -152,6 +180,14 @@ extension CallViewController: AgoraRtcEngineDelegate {
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         showTo1v1Warn("didJoinedOfUid: \(uid) elapsed: \(elapsed)")
     }
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, didAudioMuted muted: Bool, byUid uid: UInt) {
+        showTo1v1Print("didAudioMuted[\(uid)] \(muted)")
+    }
+    
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, didVideoMuted muted: Bool, byUid uid: UInt) {
+        showTo1v1Print("didVideoMuted[\(uid)] \(muted)")
+        self.remoteCanvasView.canvasView.isHidden = muted
+    }
 }
 
 extension CallViewController {
@@ -159,10 +195,16 @@ extension CallViewController {
                                      stateReason: CallStateReason,
                                      eventReason: String,
                                      eventInfo: [String : Any]) {
+        localCanvasView.emptyView.isHidden = true
+        remoteCanvasView.emptyView.isHidden = true
         switch state {
         case .connecting:
             self.rtcChannelName
         case .connected:
+            localCanvasView.emptyView.isHidden = false
+            remoteCanvasView.emptyView.isHidden = false
+            selectedMap.removeAll()
+            self.remoteCanvasView.canvasView.isHidden = false
             var channelId: String? = rtcChannelName
             if roomInfo?.uid == currentUser?.uid {
                 ConnectedToastView.show(user: targetUser!, canvasView: self.view)
@@ -177,9 +219,7 @@ extension CallViewController {
                 callApi?.setupContentInspectExConfig(rtcEngine: rtcEngine!,
                                                    enable: true,
                                                    connection: connection)
-                callApi?.moderationAudio(appId: showTo1v1AppId!,
-                                         channelName: channelId,
-                                         user: userInfo)
+                callApi?.moderationAudio(channelName: channelId)
             }
             break
         case .prepared:

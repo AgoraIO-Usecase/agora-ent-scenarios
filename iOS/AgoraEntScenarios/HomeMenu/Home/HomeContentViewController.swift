@@ -121,8 +121,6 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
             userInfo.userName = VLUserCenter.user.name
             userInfo.avatar = VLUserCenter.user.headUrl
             Pure1v1Context.showScene(viewController: self,
-                                     appId: KeyCenter.AppId,
-                                     appCertificate: KeyCenter.Certificate ?? "",
                                      userInfo: userInfo)
             
         case .multiple:
@@ -134,8 +132,6 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
             userInfo.userName = VLUserCenter.user.name
             userInfo.avatar = VLUserCenter.user.headUrl
             ShowTo1v1Context.showScene(viewController: self,
-                                       appId: KeyCenter.AppId,
-                                       appCertificate: KeyCenter.Certificate ?? "",
                                        userInfo: userInfo)
         }
     }

@@ -23,11 +23,13 @@ class Pure1v1CallViewController: UIViewController {
                 let connection = AgoraRtcConnection(channelId: oldValue, localUid: localUid)
                 connection.channelId = oldValue
                 rtcEngine?.removeDelegateEx(self.realTimeView, connection: connection)
+                rtcEngine?.removeDelegateEx(self, connection: connection)
             }
             
             if let rtcChannelName = rtcChannelName {
                 let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: localUid)
                 rtcEngine?.addDelegateEx(self.realTimeView, connection: connection)
+                rtcEngine?.addDelegateEx(self, connection: connection)
                 self.realTimeView.roomId = rtcChannelName
             }
         }
@@ -47,6 +49,7 @@ class Pure1v1CallViewController: UIViewController {
             _resetCanvas()
         }
     }
+    private lazy var selectedMap: [ShowToolMenuType: Bool] = [:]
     private lazy var moveViewModel: MoveGestureViewModel = MoveGestureViewModel()
     private lazy var roomInfoView: Pure1v1RoomInfoView = Pure1v1RoomInfoView()
     lazy var moreBtn: UIButton = {
@@ -68,7 +71,6 @@ class Pure1v1CallViewController: UIViewController {
     }()
     lazy var localCanvasView: Pure1v1CanvasView = {
         let view = Pure1v1CanvasView(frame: .zero)
-        view.backgroundColor = UIColor(hexString: "#0038ff")?.withAlphaComponent(0.7)
         view.tapClosure = {[weak self] in
             guard let self = self else {return}
             self._switchCanvasAction(canvasView: self.localCanvasView)
@@ -200,14 +202,35 @@ class Pure1v1CallViewController: UIViewController {
 
 extension Pure1v1CallViewController: Pure1v1RoomBottomBarDelegate {
     func onClickSettingButton() {
-        let settingMenuVC = ShowToolMenuViewController()
-        settingMenuVC.type = ShowMenuType.idle_audience
+        let settingMenuVC = ShowToolMenuViewController(menuTypes: [.camera, .mic, .real_time_data])
+        settingMenuVC.selectedMap = selectedMap
         settingMenuVC.delegate = self
         present(settingMenuVC, animated: true)
     }
 }
 
 extension Pure1v1CallViewController: ShowToolMenuViewControllerDelegate {
+    func onClickCameraButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
+        self.selectedMap[.camera] = selected
+        menu.selectedMap = selectedMap
+        guard let rtcChannelName = rtcChannelName, let uid = Int(currentUser?.userId ?? "") else {return}
+        let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: uid)
+        if selected {
+            rtcEngine?.stopPreview()
+        } else {
+            rtcEngine?.startPreview()
+        }
+        rtcEngine?.muteLocalVideoStreamEx(selected, connection: connection)
+    }
+    
+    func onClickMicButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
+        self.selectedMap[.mic] = selected
+        menu.selectedMap = selectedMap
+        guard let rtcChannelName = rtcChannelName, let uid = Int(currentUser?.userId ?? "") else {return}
+        let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: uid)
+        rtcEngine?.muteLocalAudioStreamEx(selected, connection: connection)
+    }
+    
     func onClickRealTimeDataButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
         view.addSubview(realTimeView)
         realTimeView.snp.makeConstraints { make in
@@ -223,7 +246,15 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
                             stateReason: CallStateReason,
                             eventReason: String,
                             eventInfo: [String : Any]) {
-        
+        if state == .connected {
+            selectedMap.removeAll()
+            self.remoteCanvasView.canvasView.isHidden = false
+            remoteCanvasView.emptyView.isHidden = false
+            localCanvasView.emptyView.isHidden = false
+        } else {
+            remoteCanvasView.emptyView.isHidden = true
+            localCanvasView.emptyView.isHidden = true
+        }
     }
     
     func onCallEventChanged(with event: CallEvent, eventReason: String?) {
@@ -248,3 +279,14 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
     }
 }
 
+
+extension Pure1v1CallViewController: AgoraRtcEngineDelegate {
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, didAudioMuted muted: Bool, byUid uid: UInt) {
+        pure1v1Print("didAudioMuted[\(uid)] \(muted)")
+    }
+    
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, didVideoMuted muted: Bool, byUid uid: UInt) {
+        pure1v1Print("didVideoMuted[\(uid)] \(muted)")
+        self.remoteCanvasView.canvasView.isHidden = muted
+    }
+}
