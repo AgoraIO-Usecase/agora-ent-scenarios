@@ -5,9 +5,10 @@
 //  Created by wushengtao on 2023/9/1.
 //
 
-import Foundation
+import UIKit
 
 //秒开CollectionView delegate handler
+@objcMembers
 open class AGCollectionLoadingDelegateHandler: AGBaseDelegateHandler {
     private weak var scrollView: UIScrollView? {
         didSet {

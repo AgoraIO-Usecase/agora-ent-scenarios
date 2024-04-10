@@ -5,7 +5,7 @@
 //  Created by wushengtao on 2023/8/30.
 //
 
-import Foundation
+import UIKit
 
 //触发时机
 @objc public enum AGVideoSlicingType: Int {
@@ -24,7 +24,7 @@ import Foundation
 open class AGCollectionSlicingDelegateHandler: AGBaseDelegateHandler {
     public var videoSlicingType: AGVideoSlicingType = .visible      //视频展示时机
     public var audioSlicingType: AGAudioSlicingType = .endScroll    //声音展示时机
-    public var onRequireRenderVideo:((AnchorInfo, UICollectionViewCell, IndexPath)->UIView?)? = nil
+    public var onRequireRenderVideo:((AnchorInfo, VideoCanvasContainer, UICollectionViewCell, IndexPath)->UIView?)? = nil
     private var needPrejoin: Bool = true    //是否需要秒切加速(上下未显示但是已经初始化的页面是否走默认join的策略)
     private var prejoinCount: Int = 1
     private var needReloadData: Bool = false
@@ -179,8 +179,8 @@ extension AGCollectionSlicingDelegateHandler {
                                              localUid: localUid,
                                              anchorInfo: anchorInfo,
                                              tagId: room.channelName())
-            let renderView = self.onRequireRenderVideo?(anchorInfo, cell, indexPath)
             let container = VideoCanvasContainer()
+            let renderView = self.onRequireRenderVideo?(anchorInfo, container, cell, indexPath)
             container.uid = anchorInfo.uid
             container.container = renderView
             if state == .idle {

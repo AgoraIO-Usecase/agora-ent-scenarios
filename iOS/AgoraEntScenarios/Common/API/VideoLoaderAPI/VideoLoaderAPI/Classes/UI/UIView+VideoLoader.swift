@@ -5,7 +5,7 @@
 //  Created by wushengtao on 2023/9/7.
 //
 
-import Foundation
+import UIKit
 
 private var ag_gestureId: String = ""
  
@@ -57,11 +57,11 @@ extension UIView {
         }
     }
     
-    public func ag_addPreloadTap(roomInfo: IVideoLoaderRoomInfo,
-                                 localUid: UInt,
-                                 enableProcess: @escaping ((UIGestureRecognizer.State)->Bool),
-                                 onRequireRenderVideo: ((AnchorInfo)->UIView?)?,
-                                 completion: @escaping (()->())) {
+    @objc public func ag_addPreloadTap(roomInfo: IVideoLoaderRoomInfo,
+                                       localUid: UInt,
+                                       enableProcess: @escaping ((UIGestureRecognizer.State)->Bool),
+                                       onRequireRenderVideo: ((AnchorInfo, VideoCanvasContainer)->UIView?)?,
+                                       completion: @escaping (()->())) {
         let eventHandler = VideoLoaderViewEventHandler()
         eventHandler.roomInfo = roomInfo
         eventHandler.localUid = localUid
@@ -109,9 +109,8 @@ extension UIView {
                                                             localUid: localUid,
                                                             anchorInfo: anchorInfo,
                                                             tagId: roomInfo.channelName())
-                
-                if let renderView = self.ag_eventHandler?.onRequireRenderVideo?(anchorInfo) {
-                    let container = VideoCanvasContainer()
+                let container = VideoCanvasContainer()
+                if let renderView = self.ag_eventHandler?.onRequireRenderVideo?(anchorInfo, container) {
                     container.uid = anchorInfo.uid
                     container.container = renderView
                     VideoLoaderApiImpl.shared.renderVideo(anchorInfo: anchorInfo, container: container)
@@ -152,7 +151,7 @@ class VideoLoaderViewEventHandler: NSObject, UIGestureRecognizerDelegate {
     var roomInfo: IVideoLoaderRoomInfo?
     var localUid: UInt = 0
     var enableProcess: ((UIGestureRecognizer.State)->Bool)?
-    var onRequireRenderVideo: ((AnchorInfo)->UIView?)?
+    var onRequireRenderVideo: ((AnchorInfo, VideoCanvasContainer)->UIView?)?
     var completion: (()->())?
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {

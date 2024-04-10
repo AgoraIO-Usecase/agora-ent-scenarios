@@ -72,7 +72,7 @@ class ShowDataPanelPresenter {
         let sendTitle = "show_statistic_receive_title".show_localized
         let videoSize = "show_statistic_receive_resolution".show_localized+": --"
         let videoSend = "show_statistic_bitrate".show_localized+": --"
-        let downlink = "show_statistic_down_net_speech".show_localized+": \(downlink) KB/s"
+        let downlink = "show_statistic_down_net_speech".show_localized+": \(0) KB/s"
 
         let fps = "show_statistic_receive_fps".show_localized+": --"
         let vSendLoss = "show_statistic_down_loss_package".show_localized+": --"
@@ -88,7 +88,7 @@ class ShowDataPanelPresenter {
         let sendTitle = "show_statistic_send_title".show_localized
         let videoSize = "show_statistic_encode_resolution".show_localized+": --"
         let videoSend = "show_statistic_up_bitrate".show_localized+": --"
-        let uplink = "show_statistic_up_net_speech".show_localized+": \(uplink) KB/s"
+        let uplink = "show_statistic_up_net_speech".show_localized+": \(0) KB/s"
         
         let fps = "show_advance_setting_FPS_title".show_localized+": --"
         let vSendLoss = "show_statistic_up_loss_package".show_localized+": --"
