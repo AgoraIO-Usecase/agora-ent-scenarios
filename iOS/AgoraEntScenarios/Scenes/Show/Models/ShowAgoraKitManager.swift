@@ -345,7 +345,7 @@ class ShowAgoraKitManager: NSObject {
             return
         }
         
-        showPrint("updateChannelEx[\(channelId)] role: \(options.clientRoleType.rawValue) \(options.publishMicrophoneTrack) \(options.publishCameraTrack)")
+        showPrint("updateChannelEx[\(channelId)] role: \(options.clientRoleType.rawValue) publishMicrophoneTrack:\(options.publishMicrophoneTrack) publishCameraTrack:\(options.publishCameraTrack)")
         engine.updateChannelEx(with: options, connection: connection)
     }
     
@@ -369,7 +369,7 @@ class ShowAgoraKitManager: NSObject {
         showPrint("switchRole[\(channelId)], role: \(role?.rawValue ?? -1) localUid:\(UserInfo.userId) uid: \(uid)", context: kShowLogBaseContext)
         if role == .broadcaster {
             audioApi?.setAudioScenario(sceneType: .Show, audioScenarioType: .Show_InteractiveAudience)
-        }
+        } 
         
         if let role = role {
             let roleOptions = AgoraRtcChannelMediaOptions()

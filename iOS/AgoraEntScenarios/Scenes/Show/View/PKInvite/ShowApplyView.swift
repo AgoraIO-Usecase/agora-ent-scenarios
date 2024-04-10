@@ -10,6 +10,7 @@ import Agora_Scene_Utils
 import AgoraCommon
 class ShowApplyView: UIView {
     private var roomId: String!
+    private var invokeClosure: (()->())?
     private lazy var titleLabel: AGELabel = {
         let label = AGELabel(colorStyle: .black, fontStyle: .large)
         label.text = "show_apply_onseat".show_localized
@@ -78,8 +79,9 @@ class ShowApplyView: UIView {
         }
     }
     
-    init(roomId: String) {
+    init(roomId: String, invokeClosure:@escaping ()->()) {
         self.roomId = roomId
+        self.invokeClosure = invokeClosure
         super.init(frame: .zero)
         setupUI()
     }
@@ -195,6 +197,7 @@ class ShowApplyView: UIView {
             let index = tableView.dataArray?.firstIndex(where: { ($0 as? ShowMicSeatApply)?.userId == VLUserCenter.user.id }) ?? 0
             tableView.dataArray?.remove(at: index)
             setupTipsInfo(count: dataArray.count)
+            self.invokeClosure?()
         } else if let interactionModel = interactionModel {
             AppContext.showServiceImp(roomId)?.stopInteraction(interaction: interactionModel) { _ in }
             AlertManager.hiddenView()
