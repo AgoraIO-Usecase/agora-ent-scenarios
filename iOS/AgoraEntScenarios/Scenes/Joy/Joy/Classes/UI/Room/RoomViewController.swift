@@ -389,6 +389,7 @@ extension RoomViewController {
                                                 message: message,
                                                 preferredStyle: .alert)
         let action1 = UIAlertAction(title: "query_button_confirm".joyLocalization(), style: .default) {[weak self] action in
+            JoyGameListDialog.hiddenAnimation()
             self?.leaveRoom {
                 self?.navigationController?.popViewController(animated: true)
             }
@@ -399,7 +400,6 @@ extension RoomViewController {
         alertController.addAction(action1)
         present(alertController, animated: true, completion: nil)
         
-        JoyGameListDialog.hiddenAnimation()
     }
     
     @objc func onMoreAction() {
