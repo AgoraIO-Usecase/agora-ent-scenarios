@@ -2,7 +2,7 @@ ext { joy_is_modular = false }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 apply plugin: 'com.google.protobuf'
 
-final def VERSION_SCENE_KTV = "4.10.0"
+final def VERSION_SCENE_KTV = "4.10.1"
 android {
     defaultConfig {
         if(isModular()){
