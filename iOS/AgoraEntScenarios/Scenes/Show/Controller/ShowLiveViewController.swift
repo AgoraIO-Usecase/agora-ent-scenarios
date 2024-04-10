@@ -122,7 +122,6 @@ class ShowLiveViewController: UIViewController {
     private lazy var applyView: ShowApplyView = {
         let applyView = ShowApplyView(roomId: roomId) {[weak self] in
             guard let self = self else {return}
-            self._updateApplyMenu()
             self.isSendJointBroadcasting = false
             ShowAgoraKitManager.shared.prePublishOnseatVideo(isOn: false, channelId: self.roomId)
         }
@@ -359,7 +358,11 @@ class ShowLiveViewController: UIViewController {
 extension ShowLiveViewController {
     private func _updateApplyMenu() {
         if role == .broadcaster {
-            applyAndInviteView.reloadData()
+            //TODO: syncmanager收到消息后直接拉拉不到，需要delay
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
+                self.applyAndInviteView.reloadData()
+            }
+            
             serviceImp?.getAllMicSeatApplyList {[weak self] _, list in
                 guard let list = list?.filterDuplicates({ $0.userId }) else { return }
                 self?.liveView.bottomBar.linkButton.isShowRedDot = list.count > 0
@@ -517,6 +520,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onMicSeatApplyDeleted(apply: ShowMicSeatApply) {
         showPrint("onMicSeatApplyDeleted: \(apply.userId)/\(apply.userName ?? "")")
+        _updateApplyMenu()
     }
     
     func onMicSeatApplyAccepted(apply: ShowMicSeatApply) {
