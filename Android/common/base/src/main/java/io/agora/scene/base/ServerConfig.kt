@@ -20,4 +20,13 @@ object ServerConfig {
                 BuildConfig.TOOLBOX_SERVER_HOST_DEV
             }
         }
+
+    val roomManagerUrl: String
+        get() {
+            return if (envRelease) {
+                BuildConfig.TOOLBOX_SERVER_HOST.replace("toolbox", "room-manager")
+            } else {
+                BuildConfig.TOOLBOX_SERVER_HOST_DEV.replace("toolbox", "room-manager")
+            }
+        }
 }
