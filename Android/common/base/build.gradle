@@ -28,7 +28,6 @@ android {
         buildConfigField "String", "SERVER_HOST", "\"${SERVER_HOST}\""
         buildConfigField "String", "TOOLBOX_SERVER_HOST", "\"${TOOLBOX_SERVER_HOST}\""
         buildConfigField "String", "TOOLBOX_SERVER_HOST_DEV", "\"${TOOLBOX_SERVER_HOST_DEV}\""
-        buildConfigField "String", "ROOM_MANAGER_SERVER_HOST", "\"${ROOM_MANAGER_SERVER_HOST}\""
 
         buildConfigField "String", "AGORA_APP_ID", "\"${AGORA_APP_ID}\""
         buildConfigField "String", "AGORA_APP_CERTIFICATE", "\"${AGORA_APP_CERTIFICATE}\""

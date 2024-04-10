@@ -89,7 +89,7 @@ class JoySyncManagerServiceImp constructor(
         Random(crateAt).nextInt(0, 5).toString()
 
     init {
-        HttpManager.setBaseURL(BuildConfig.ROOM_MANAGER_SERVER_HOST)
+        HttpManager.setBaseURL(ServerConfig.roomManagerUrl)
         AUILogger.initLogger(AUILogger.Config(cxt, "Joy"))
 
         val commonConfig = AUICommonConfig().apply {
