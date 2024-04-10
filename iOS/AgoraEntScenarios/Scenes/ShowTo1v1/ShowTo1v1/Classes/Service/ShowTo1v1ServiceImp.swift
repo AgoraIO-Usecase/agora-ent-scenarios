@@ -9,11 +9,11 @@ import Foundation
 import RTMSyncManager
 import YYModel
 import AgoraRtmKit
+import AgoraCommon
 
 /// 房间内用户列表
 private let kSceneId = "scene_Livetoprivate_421"
 class ShowTo1v1ServiceImp: NSObject {
-    private var appId: String
     private var user: ShowTo1v1UserInfo
     private var rtmClient: AgoraRtmClientKit
     private var roomList: [ShowTo1v1RoomInfo] = []
@@ -28,20 +28,19 @@ class ShowTo1v1ServiceImp: NSObject {
     private lazy var roomManager = AUIRoomManagerImpl(sceneId: kSceneId)
     private lazy var syncManager: AUISyncManager = {
         let config = AUICommonConfig()
-        config.appId = appId
+        config.appId = AppContext.shared.appId
         let owner = AUIUserThumbnailInfo()
         owner.userId = user.uid
         owner.userName = user.userName
         owner.userAvatar = user.avatar
         config.owner = owner
-        config.host = "https://service-staging.agora.io/room-manager"
+        config.host = "\(AppContext.shared.baseServerUrl)/room-manager"
         let manager = AUISyncManager(rtmClient: rtmClient, commonConfig: config)
         
         return manager
     }()
     
-    required init(appId: String, user: ShowTo1v1UserInfo, rtmClient: AgoraRtmClientKit) {
-        self.appId = appId
+    required init(user: ShowTo1v1UserInfo, rtmClient: AgoraRtmClientKit) {
         self.user = user
         self.rtmClient = rtmClient
         AUIRoomContext.shared.displayLogClosure = { msg in

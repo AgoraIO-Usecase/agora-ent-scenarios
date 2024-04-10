@@ -21,10 +21,15 @@ public class Pure1v1UserInfo: NSObject {
         self.avatar = userInfo.userAvatar
     }
     
-    func bgImage() ->UIImage? {
+    func bgImage() -> String {
         let uid = UInt(userId) ?? 0
-        let image = UIImage.scene1v1Image(name: "user_bg\(uid % 9 + 1)")
-        return image
+        return "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/images/1v1/user_bg\(uid % 9 + 1).png"
     }
+    
+//    func bgImage() ->UIImage? {
+//        let uid = UInt(userId) ?? 0
+//        let image = UIImage.scene1v1Image(name: "user_bg\(uid % 9 + 1)")
+//        return image
+//    }
 }
 

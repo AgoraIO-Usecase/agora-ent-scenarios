@@ -70,7 +70,7 @@ class Pure1v1UserCell: UICollectionViewCell {
     var callClosure: ((Pure1v1UserInfo?)->())?
     var userInfo: Pure1v1UserInfo? {
         didSet {
-            contentImageView.image = userInfo?.bgImage()
+            contentImageView.sd_setImage(with: URL(string: userInfo?.bgImage() ?? ""), placeholderImage: nil)
             remoteUserView.setInfo(title: "user_list_cell_remote_user".pure1v1Localization(),
                                    avatarUrl: userInfo?.avatar ?? "",
                                    avatarName: userInfo?.userName ?? "")

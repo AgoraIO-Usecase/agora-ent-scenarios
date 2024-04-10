@@ -41,7 +41,7 @@ TODO: Add long description of the pod here.
   s.subspec 'All' do |ss|
     ss.source_files = 'CallAPI/Classes/**/*'
     
-    ss.dependency 'AgoraRtm_iOS', '2.1.8'
+    ss.dependency 'AgoraRtm_iOS', '~>2.1.8'
   end
   
   s.subspec 'WithoutRTM' do |ss|

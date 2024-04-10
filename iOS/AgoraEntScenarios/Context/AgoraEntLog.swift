@@ -18,6 +18,16 @@ import SwiftyBeaver
     }
 }
 
+public func agoraDoMainThreadTask(_ task: (()->())?) {
+    if Thread.current.isMainThread == false {
+        DispatchQueue.main.async {
+            task?()
+        }
+    }else{
+        task?()
+    }
+}
+
 @objc public class AgoraEntLog: NSObject {
     
     private static var currentLogKey = ""

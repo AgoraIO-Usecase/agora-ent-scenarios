@@ -10,6 +10,7 @@ import RTMSyncManager
 import YYModel
 import SwiftyBeaver
 import AgoraRtmKit
+import AgoraCommon
 
 private func mainTreadTask(_ task: (()->())?){
     if Thread.isMainThread {
@@ -24,7 +25,6 @@ private func mainTreadTask(_ task: (()->())?){
 /// 房间内用户列表
 private let kRoomId = "pure421"
 class Pure1v1ServiceImp: NSObject {
-    private var appId: String
     private var user: Pure1v1UserInfo
     private var rtmClient: AgoraRtmClientKit
     private var userDidChangedClosure: (([Pure1v1UserInfo]) -> ())?
@@ -37,13 +37,13 @@ class Pure1v1ServiceImp: NSObject {
     
     private lazy var syncManager: AUISyncManager = {
         let config = AUICommonConfig()
-        config.appId = appId
+        config.appId = AppContext.shared.appId
         let owner = AUIUserThumbnailInfo()
         owner.userId = user.userId
         owner.userName = user.userName
         owner.userAvatar = user.avatar
         config.owner = owner
-        config.host = "https://service-staging.agora.io/room-manager"
+        config.host = "\(AppContext.shared.baseServerUrl)/room-manager"
         let manager = AUISyncManager(rtmClient: nil, commonConfig: config)
         
         return manager
@@ -54,8 +54,7 @@ class Pure1v1ServiceImp: NSObject {
         return service
     }()
     
-    required init(appId: String, user: Pure1v1UserInfo, rtmClient: AgoraRtmClientKit) {
-        self.appId = appId
+    required init(user: Pure1v1UserInfo, rtmClient: AgoraRtmClientKit) {
         self.user = user
         self.rtmClient = rtmClient
         AUIRoomContext.shared.displayLogClosure = { msg in
@@ -88,12 +87,16 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
         }
         let date = Date()
         userService.bindRespDelegate(delegate: self)
-        syncManager.rtmManager.subscribe(channelName: kRoomId) {[weak self] err in
-            guard let self = self else {return}
-            pure1v1Print("enterRoom subscribe cost: \(-Int(date.timeIntervalSinceNow * 1000)) ms")
-            completion(err)
-            self.isEnterSuccess = err == nil ? true : false
+        //TODO: Rtm 2.1.10及以下会有subscribe无返回的bug，先做workaround，等升级2.1.11后移除delay
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
+            self.syncManager.rtmManager.subscribe(channelName: kRoomId) {[weak self] err in
+                guard let self = self else {return}
+                pure1v1Print("enterRoom subscribe cost: \(-Int(date.timeIntervalSinceNow * 1000)) ms")
+                completion(err)
+                self.isEnterSuccess = err == nil ? true : false
+            }
         }
+        
     }
     
     func leaveRoom(completion: @escaping (NSError?) -> Void) {
