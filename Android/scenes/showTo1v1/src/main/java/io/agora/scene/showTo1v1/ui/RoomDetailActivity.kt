@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -28,6 +29,7 @@ import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
@@ -166,6 +168,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
         val roomLeftTime = ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt)
         if (roomLeftTime > 0) {
+            scenarioApi.initialize()
             initRtcEngine()
             initServiceWithJoinRoom()
 
@@ -458,6 +461,14 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             enableContentInspectEx(true, mMainRtcConnection)
             AudioModeration.moderationAudio(
                 channelName, uid, AudioModeration.AgoraChannelType.broadcast, ContentInspectName
+            )
+            mRtcEngine.setVideoEncoderConfigurationEx(
+                VideoEncoderConfiguration().apply {
+                    dimensions = VideoEncoderConfiguration.VideoDimensions(720, 1280)
+                    frameRate = 24
+                    degradationPrefer = VideoEncoderConfiguration.DEGRADATION_PREFERENCE.MAINTAIN_BALANCED
+                },
+                rtcConnection
             )
         }
     }
@@ -831,6 +842,12 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                             }
                         }
 
+                        CallStateReason.RemoteCallBusy -> {
+                            if (!isRoomOwner) {
+                                ToastUtils.showToast(getString(R.string.show_to1v1_call_toast_remote_busy))
+                            }
+                        }
+
                         else -> {}
                     }
                     finishCallDialog()
@@ -874,6 +891,18 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         mShowTo1v1Manger.mRemoteUser = mRoomInfo
                         onCallSend(mShowTo1v1Manger.mRemoteUser!!)
                     }
+
+
+                    // 设置视频最佳实践
+                    mShowTo1v1Manger.mRtcEngine.setVideoEncoderConfigurationEx(
+                        VideoEncoderConfiguration().apply {
+                            dimensions = VideoEncoderConfiguration.VideoDimensions(720, 1280)
+                            frameRate = 24
+                            degradationPrefer = VideoEncoderConfiguration.DEGRADATION_PREFERENCE.MAINTAIN_BALANCED
+                        },
+                        RtcConnection(mShowTo1v1Manger.mConnectedChannelId, mShowTo1v1Manger.mCurrentUser.userId.toInt())
+                    )
+                    mShowTo1v1Manger.mRtcEngine.setParameters("\"che.video.videoCodecIndex\": 2")
                 }
 
                 CallStateType.Connecting -> {

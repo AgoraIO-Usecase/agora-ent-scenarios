@@ -57,6 +57,10 @@ class UserInfo(
     ) {
     }
 
+    override fun toString(): String {
+        return "userId:$userId, userName:$userName, avatar:$avatar, createdAt:$createdAt"
+    }
+
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(userId)
         parcel.writeString(userName)

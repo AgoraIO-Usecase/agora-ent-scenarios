@@ -276,7 +276,7 @@ class AUIRtmMsgProxy : RtmEventListener {
     }
 
     override fun onLockEvent(event: LockEvent?) {
-        Log.d("rtm_lock_event", "onLockEvent event: $event")
+        Log.d("rtm_lock_event", "onLockEvent event: $event count: ${event?.lockDetailList?.count()}")
         originEventListeners?.onLockEvent(event)
         event ?: return
         val addLockDetails = mutableListOf<LockDetail>()

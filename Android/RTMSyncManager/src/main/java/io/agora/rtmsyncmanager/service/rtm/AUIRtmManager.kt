@@ -27,6 +27,7 @@ class AUIRtmManager constructor(
     @Volatile var isLogin: Boolean = false
 ) {
 
+    val tag = "AUIRtmManager"
     val kRTM_Referee_LockName = "rtm_referee_lock"
     val proxy = AUIRtmMsgProxy()
 
@@ -40,6 +41,7 @@ class AUIRtmManager constructor(
     }
 
     fun deInit(){
+        logger.enableConsoleLog(false)
         cleanReceipts()
         throttlerUpdateMetaDataModel.reset()
         throttlerRemoveMetaDataModel.reset()
@@ -84,15 +86,14 @@ class AUIRtmManager constructor(
         }
         rtmClient.login(token, object : ResultCallback<Void> {
             override fun onSuccess(responseInfo: Void?) {
+                logger.d("AUIRtmManager", "login success")
                 isLogin = true
                 completion.invoke(null)
             }
 
             override fun onFailure(errorInfo: ErrorInfo?) {
-                if (errorInfo?.errorCode == RtmErrorCode.LOGIN_REJECTED) {
-                    isLogin = true
-                    completion.invoke(null)
-                } else {
+                logger.d("AUIRtmManager", "login error: ${errorInfo?.errorReason}")
+                if (errorInfo?.errorCode != RtmErrorCode.OK && errorInfo?.errorCode != RtmErrorCode.DUPLICATE_OPERATION) {
                     completion.invoke(
                         AUIRtmException(
                             RtmErrorCode.getValue(errorInfo?.errorCode),
@@ -100,9 +101,13 @@ class AUIRtmManager constructor(
                             errorInfo?.operation ?: "UnKnow",
                         )
                     )
+                } else {
+                    isLogin = true
+                    completion.invoke(null)
                 }
             }
         })
+        logger.d("AUIRtmManager", "login ...")
     }
 
     fun logout() {
@@ -603,7 +608,13 @@ class AUIRtmManager constructor(
         ttl: Long = 10,
         completion: (AUIRtmException?) -> Unit
     ) {
-        rtmClient.lock.setLock(
+        val lock = rtmClient.lock
+        if (lock == null) {
+            completion.invoke(AUIRtmException(-1, "get lock error", ""))
+            return
+        }
+        logger.d(tag,"setLock[$channelName][$lockName] start")
+        lock.setLock(
             channelName,
             channelType,
             lockName,
@@ -632,7 +643,13 @@ class AUIRtmManager constructor(
         retry: Boolean = true,
         completion: (AUIRtmException?) -> Unit
     ) {
-        rtmClient.lock.acquireLock(
+        val lock = rtmClient.lock
+        if (lock == null) {
+            completion.invoke(AUIRtmException(-1, "get lock error", ""))
+            return
+        }
+        logger.d(tag,"acquireLock[$channelName][$lockName] start")
+        lock.acquireLock(
             channelName,
             channelType,
             lockName,
@@ -660,7 +677,13 @@ class AUIRtmManager constructor(
         lockName: String = kRTM_Referee_LockName,
         completion: (AUIRtmException?) -> Unit
     ) {
-        rtmClient.lock.releaseLock(
+        val lock = rtmClient.lock
+        if (lock == null) {
+            completion.invoke(AUIRtmException(-1, "get lock error", ""))
+            return
+        }
+        logger.d(tag,"releaseLock[$channelName][$lockName] start")
+        lock.releaseLock(
             channelName,
             channelType,
             lockName,
@@ -687,7 +710,13 @@ class AUIRtmManager constructor(
         lockName: String = kRTM_Referee_LockName,
         completion: (AUIRtmException?) -> Unit
     ) {
-        rtmClient.lock.removeLock(
+        val lock = rtmClient.lock
+        if (lock == null) {
+            completion.invoke(AUIRtmException(-1, "get lock error", ""))
+            return
+        }
+        logger.d(tag,"removeLock[$channelName][$lockName] start")
+        lock.removeLock(
             channelName,
             channelType,
             lockName,

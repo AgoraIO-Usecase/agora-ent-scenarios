@@ -3,6 +3,7 @@ package io.agora.scene.pure1v1.ui.living
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,10 +11,15 @@ import android.widget.FrameLayout.LayoutParams
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import io.agora.rtc2.Constants
+import io.agora.rtc2.IRtcEngineEventHandler
+import io.agora.rtc2.RtcConnection
 import io.agora.scene.pure1v1.databinding.Pure1v1CallDetailFragmentBinding
 import io.agora.scene.pure1v1.CallServiceManager
 import io.agora.scene.pure1v1.Pure1v1Logger
+import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.callapi.*
+import io.agora.scene.pure1v1.databinding.Pure1v1RoomComeSoonViewBinding
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import java.util.concurrent.TimeUnit
 
@@ -24,11 +30,19 @@ class CallDetailFragment : Fragment(), ICallApiListener {
 
     private lateinit var binding: Pure1v1CallDetailFragmentBinding
 
-    private val tag = "CallDetailActivity_LOG"
+    private val TAG = "CallDetail"
 
     private var startTime = System.currentTimeMillis()
     private var timerHandler: Handler? = null
     private var dashboard: DashboardFragment? = null
+
+    private var cameraOn = true
+    private var micOn = true
+
+    // 视频流停止播放的view（表示本地关闭摄像头或远端用户关闭摄像头）
+    private lateinit var localComeSoonView: Pure1v1RoomComeSoonViewBinding
+    private lateinit var remoteComeSoonView: Pure1v1RoomComeSoonViewBinding
+    private var settingDialog: CallDetailSettingDialog? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = Pure1v1CallDetailFragmentBinding.inflate(inflater, container, false)
@@ -37,7 +51,7 @@ class CallDetailFragment : Fragment(), ICallApiListener {
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        Pure1v1Logger.d(tag, "local pic debug onHiddenChanged: $hidden")
+        Pure1v1Logger.d(TAG, "local pic debug onHiddenChanged: $hidden")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -52,8 +66,10 @@ class CallDetailFragment : Fragment(), ICallApiListener {
 
     fun start() {
         startTime = System.currentTimeMillis()
+        cameraOn = true
+        micOn = true
 
-        view?.post {
+        runOnUiThread {
             CallServiceManager.instance.remoteUser?.let { userInfo ->
                 Glide.with(this)
                     .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
@@ -63,11 +79,41 @@ class CallDetailFragment : Fragment(), ICallApiListener {
             }
             CallServiceManager.instance.remoteUser?.let { userInfo ->
                 binding.vDragWindow1.setUserName(userInfo.userName)
+                binding.vDragWindow1.removeView(remoteComeSoonView.root)
             }
             CallServiceManager.instance.localUser?.let { userInfo ->
                 binding.vDragWindow2.setUserName(userInfo.userName)
+                binding.vDragWindow2.removeView(localComeSoonView.root)
             }
         }
+
+        // 通话开始后监听视频流状态回调，用于在视频流状态改变时显示对应的UI
+        // 因为 CAllAPI 内使用 joinChannelEx 加入频道此处需要使用 addHandlerEx 注册监听
+        CallServiceManager.instance.rtcEngine?.addHandlerEx(
+            object : IRtcEngineEventHandler() {
+                override fun onRemoteVideoStateChanged(
+                    uid: Int,
+                    state: Int,
+                    reason: Int,
+                    elapsed: Int
+                ) {
+                    super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
+                    Pure1v1Logger.d(TAG, "onRemoteVideoStateChanged: uid:$uid, state:$state, reason:$reason")
+                    if (state == Constants.REMOTE_VIDEO_STATE_STOPPED || state == Constants.REMOTE_VIDEO_STATE_FAILED) {
+                        // 远端视频停止接收
+                        runOnUiThread {
+                            binding.vDragWindow1.addView(remoteComeSoonView.root)
+                        }
+                    } else if (state == Constants.REMOTE_VIDEO_STATE_STARTING || state == Constants.REMOTE_VIDEO_STATE_PLAYING) {
+                        // 远端视频正常播放
+                        runOnUiThread {
+                            binding.vDragWindow1.removeView(remoteComeSoonView.root)
+                        }
+                    }
+                }
+            },
+            RtcConnection(CallServiceManager.instance.connectedChannelId, CallServiceManager.instance.localUser?.userId!!.toInt())
+        )
     }
 
     fun updateTime() {
@@ -91,7 +137,22 @@ class CallDetailFragment : Fragment(), ICallApiListener {
         dashboard?.setupRTCListener(channelId, localUid)
     }
 
+    fun reset() {
+        settingDialog?.dismiss()
+        timerHandler?.removeCallbacksAndMessages(null)
+        runOnUiThread {
+            binding.vDragWindow1.removeView(remoteComeSoonView.root)
+            binding.vDragWindow2.removeView(localComeSoonView.root)
+        }
+    }
+
     private fun setupView() {
+        localComeSoonView = Pure1v1RoomComeSoonViewBinding.inflate(LayoutInflater.from(context))
+        localComeSoonView.layoutVideoEmpty.setBackgroundResource(R.drawable.pure1v1_come_soon_bg)
+        localComeSoonView.tvComeSoon.text = getString(R.string.pure1v1_come_soon_local)
+        remoteComeSoonView = Pure1v1RoomComeSoonViewBinding.inflate(LayoutInflater.from(context))
+        remoteComeSoonView.layoutVideoEmpty.setBackgroundResource(R.color.pure1v1_come_soon_background)
+
         // 将试图容器设置进manager
         CallServiceManager.instance.localCanvas = binding.vDragWindow2.canvasContainer
         CallServiceManager.instance.remoteCanvas = binding.vDragWindow1.canvasContainer
@@ -169,14 +230,30 @@ class CallDetailFragment : Fragment(), ICallApiListener {
 
     private fun onClickSetting() {
         val context = context ?: return
-        val dialog = CallDetailSettingDialog(context)
+        val dialog = CallDetailSettingDialog(context, cameraOn, micOn)
         dialog.setListener(object: CallDetailSettingDialog.CallDetailSettingItemListener {
             override fun onClickDashboard() {
                 binding.flDashboard.visibility = View.VISIBLE
                 binding.ivClose.visibility = View.VISIBLE
                 dashboard?.updateVisible(true)
             }
+
+            override fun onCameraSwitch(isCameraOn: Boolean) {
+                cameraOn = isCameraOn
+                if (cameraOn) {
+                    binding.vDragWindow2.removeView(localComeSoonView.root)
+                } else {
+                    binding.vDragWindow2.addView(localComeSoonView.root)
+                }
+                CallServiceManager.instance.switchCamera(isCameraOn)
+            }
+
+            override fun onMicSwitch(isMicOn: Boolean) {
+                micOn = isMicOn
+                CallServiceManager.instance.switchMic(isMicOn)
+            }
         })
+        settingDialog = dialog
         dialog.show()
     }
 
@@ -186,15 +263,9 @@ class CallDetailFragment : Fragment(), ICallApiListener {
             }
         }
         timerHandler?.removeCallbacksAndMessages(null)
-        if (isAdded && !parentFragmentManager.isDestroyed) {
-            val fragment = parentFragmentManager.findFragmentByTag("CallDetailFragment")
-            fragment?.let {
-                val transaction = parentFragmentManager.beginTransaction()
-                transaction.hide(it)
-                transaction.commit()
-            }
-        }
     }
+
+    // ----------------------- ICallApiListener -----------------------
 
     override fun onCallStateChanged(
         state: CallStateType,
@@ -220,10 +291,20 @@ class CallDetailFragment : Fragment(), ICallApiListener {
         message: String?
     ) {
         super.onCallError(errorEvent, errorType, errorCode, message)
-        Pure1v1Logger.d(tag, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
+        Pure1v1Logger.d(TAG, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
     }
 
     override fun canJoinRtcOnCalling(eventInfo: Map<String, Any>): Boolean {
         return true
+    }
+
+    // ------------------------ inner private --------------------------
+    private val mHandler = Handler(Looper.getMainLooper())
+    private fun runOnUiThread(runnable: Runnable) {
+        if (Thread.currentThread() == Looper.getMainLooper().thread) {
+            runnable.run()
+        } else {
+            mHandler.post(runnable)
+        }
     }
 }

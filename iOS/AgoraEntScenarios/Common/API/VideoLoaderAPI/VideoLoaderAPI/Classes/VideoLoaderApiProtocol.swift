@@ -99,17 +99,4 @@ import AgoraRtcKit
     /// 移除api代理
     /// - Parameter listener: <#listener description#>
     func removeListener(listener: IVideoLoaderApiListener)
-    
-    /// 添加RTC代理
-    /// - Parameter listener: <#listener description#>
-    func addRTCListener(anchorId: String, listener: AgoraRtcEngineDelegate)
-    
-    /// 移除RTC代理
-    /// - Parameter listener: <#listener description#>
-    func removeRTCListener(anchorId: String, listener: AgoraRtcEngineDelegate)
-    
-    /// 获取rtc delegate
-    /// - Parameter anchorId: 对应频道的id
-    /// - Returns: <#description#>
-    func getRTCListener(anchorId: String) -> AgoraRtcEngineDelegate?
 }

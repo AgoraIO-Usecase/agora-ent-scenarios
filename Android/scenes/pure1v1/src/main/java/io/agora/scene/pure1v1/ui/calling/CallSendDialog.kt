@@ -53,18 +53,16 @@ class CallSendDialog(
     }
 
     fun initView(userInfo: UserInfo) {
-        binding.root.post {
-            CallServiceManager.instance.renderCallShow(showView)
-            binding.tvShow.removeAllViews()
-            binding.tvShow.addView(showView)
+        CallServiceManager.instance.renderCallShow(showView)
+        binding.tvShow.removeAllViews()
+        binding.tvShow.addView(showView)
 
-            binding.tvUserName.text = userInfo.userName
-            Glide.with(context)
-                .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
-                .into(binding.ivUserAvatar)
+        binding.tvUserName.text = userInfo.userName
+        Glide.with(context)
+            .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
+            .into(binding.ivUserAvatar)
 
-            updateCallState(CallDialogState.Calling)
-        }
+        updateCallState(CallDialogState.Calling)
     }
 
     fun setListener(l: CallSendDialogListener) {
@@ -84,9 +82,6 @@ class CallSendDialog(
             val fragment = parentFragmentManager.findFragmentByTag("CallSendFragment")
             fragment?.let {
                 binding.tvShow.removeAllViews()
-                val transaction = parentFragmentManager.beginTransaction()
-                transaction.hide(it)
-                transaction.commit()
             }
         }
     }

@@ -65,7 +65,8 @@ enum class CallStateReason(val value: Int) {
     CallingTimeout (14),        // 呼叫超时
     CancelByCallerRecall(15),   // 同样的主叫呼叫不同频道导致取消
     RtmLost(16),                // rtm超时断连
-    RemoteCallBusy(17)          // 远端用户忙
+    RemoteCallBusy(17),         // 远端用户忙
+    RemoteCallingTimeout(18)    //远端呼叫超时
 }
 
 /*
@@ -76,7 +77,7 @@ enum class CallEvent(val value: Int) {
     Deinitialize(1),                // 调用了deinitialize
     //MissingReceipts(2),             // 没有收到消息回执[已废弃]
     CallingTimeout(3),              // 呼叫超时
-    //JoinRTCFailed(4),               // 加入RTC失败[已废弃，请使用onCallErrorOccur(state: rtcOccurError)]
+    RemoteCallingTimeout(4),        // 云端呼叫超时
     JoinRTCSuccessed(5),            // 加入RTC成功
     //RtmSetupFailed(6),                  // 设置RTM失败[已废弃，请使用onCallErrorOccur(state: rtmSetupFail)]
     RtmSetupSuccessed(7),           // 设置RTM成功
@@ -164,9 +165,9 @@ interface ICallApiListener {
      * @param message: 错误信息
      */
     fun onCallError(errorEvent: CallErrorEvent,
-                         errorType: CallErrorCodeType,
-                         errorCode: Int,
-                         message: String?) {}
+                    errorType: CallErrorCodeType,
+                    errorCode: Int,
+                    message: String?) {}
 
     /**
      * 通话开始的回调
@@ -176,9 +177,9 @@ interface ICallApiListener {
      * @param timestamp: 通话开始的时间戳，和19700101的差值，单位ms
      */
     fun onCallConnected(roomId: String,
-                    callUserId: Int,
-                    currentUserId: Int,
-                    timestamp: Long) {}
+                        callUserId: Int,
+                        currentUserId: Int,
+                        timestamp: Long) {}
 
     /**
      * 通话结束的回调
@@ -189,10 +190,10 @@ interface ICallApiListener {
      * @param duration: 通话时长，单位ms
      */
     fun onCallDisconnected(roomId: String,
-                        hangupUserId: Int,
-                        currentUserId: Int,
-                        timestamp: Long,
-                        duration: Long) {}
+                           hangupUserId: Int,
+                           currentUserId: Int,
+                           timestamp: Long,
+                           duration: Long) {}
 
     /**
      * 当呼叫时判断是否可以加入Rtc

@@ -116,6 +116,7 @@ class ShowTo1v1Manger constructor() {
     private var isCallApiInit = false
 
     fun setup(context: Context) {
+        if (rtmManager != null) return
         // 使用RtmManager管理RTM
         rtmManager = createRtmManager(BuildConfig.AGORA_APP_ID, mCurrentUser.getIntUserId())
         // 监听 rtm manager 事件
@@ -249,6 +250,8 @@ class ShowTo1v1Manger constructor() {
                 val config = RtcEngineConfig()
                 config.mContext = AgoraApplication.the()
                 config.mAppId = BuildConfig.AGORA_APP_ID
+                config.addExtension("agora_ai_echo_cancellation_extension")
+                config.addExtension("agora_ai_noise_suppression_extension")
                 config.mEventHandler = object : IRtcEngineEventHandler() {
                     override fun onError(err: Int) {
                         super.onError(err)
@@ -257,6 +260,24 @@ class ShowTo1v1Manger constructor() {
                 }
                 innerRtcEngine = (RtcEngineEx.create(config) as RtcEngineEx).apply {
                     enableVideo()
+                    // 设置视频最佳配置
+                    setCameraCapturerConfiguration(CameraCapturerConfiguration(
+                        CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_FRONT,
+                        CameraCapturerConfiguration.CaptureFormat(720, 1280, 24)
+                    ).apply {
+                        followEncodeDimensionRatio = true
+                    })
+                    setVideoEncoderConfiguration(
+                        VideoEncoderConfiguration().apply {
+                            dimensions = VideoEncoderConfiguration.VideoDimensions(720, 1280)
+                            frameRate = 24
+                            degradationPrefer = VideoEncoderConfiguration.DEGRADATION_PREFERENCE.MAINTAIN_BALANCED
+                        }
+                    )
+                    setParameters("\"che.video.videoCodecIndex\": 2")
+                    enableInstantMediaRendering()
+                    setParameters("{\"rtc.video.quickIntraHighFec\": true}")
+                    setParameters("{\"rtc.network.e2e_cc_mode\": 3}")
                 }
             }
             return innerRtcEngine!!

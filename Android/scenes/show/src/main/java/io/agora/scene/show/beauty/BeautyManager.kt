@@ -21,6 +21,7 @@ import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.video.IVideoFrameObserver
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.scene.show.BuildConfig
 import io.agora.scene.show.R
 import java.lang.ref.WeakReference
 import java.util.concurrent.CountDownLatch
@@ -77,7 +78,7 @@ object BeautyManager {
         this.context = context.applicationContext as Application
         this.rtcEngine = rtcEngine
         this.beautyType = BeautyType.SenseTime
-        this.enable = rtcEngine.queryDeviceScore() >= 75
+        this.enable = rtcEngine.queryDeviceScore() >= 75 // 低端机关闭美颜
         rtcEngine.registerVideoFrameObserver(MultiBeautyVideoObserver())
     }
 
@@ -132,7 +133,7 @@ object BeautyManager {
             val setupLocalVideoCountDownLatch = CountDownLatch(1)
             when (type) {
                 BeautyType.SenseTime -> {
-                    if (SenseTimeBeautySDK.initBeautySDK(ctx)) {
+                    if (SenseTimeBeautySDK.initBeautySDK(ctx, BuildConfig.BEAUTY_RESOURCE.isEmpty())) {
                         val senseTimeBeautyAPI = createSenseTimeBeautyAPI()
                         senseTimeBeautyAPI.initialize(
                             Config(
@@ -178,7 +179,7 @@ object BeautyManager {
                 }
 
                 BeautyType.FaceUnity -> {
-                    if (FaceUnityBeautySDK.initBeauty(ctx)) {
+                    if (FaceUnityBeautySDK.initBeauty(ctx, BuildConfig.BEAUTY_RESOURCE.isEmpty())) {
                         val faceUnityBeautyAPI = createFaceUnityBeautyAPI()
                         faceUnityBeautyAPI.initialize(
                             io.agora.beautyapi.faceunity.Config(
@@ -220,7 +221,7 @@ object BeautyManager {
                 }
 
                 BeautyType.ByteDance -> {
-                    if (ByteDanceBeautySDK.initBeautySDK(ctx)) {
+                    if (ByteDanceBeautySDK.initBeautySDK(ctx, BuildConfig.BEAUTY_RESOURCE.isEmpty())) {
                         val byteDanceBeautyAPI = createByteDanceBeautyAPI()
                         byteDanceBeautyAPI.initialize(
                             io.agora.beautyapi.bytedance.Config(
