@@ -26,6 +26,7 @@ class SyncManager constructor(
         logger().d(tag, "init AUISyncManager")
         AUIRoomContext.shared().setCommonConfig(commonConfig)
         val rtm = rtmClient ?: createRtmClient()
+        rtm.setParameters("{\"rtm.msg.tx_timeout\": 3000}")
         rtmManager = AUIRtmManager(context, rtm, rtm == rtmClient)
     }
 

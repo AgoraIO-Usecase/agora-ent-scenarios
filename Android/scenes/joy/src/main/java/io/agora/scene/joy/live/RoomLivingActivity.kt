@@ -447,9 +447,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     if (mIsRoomOwner) {
                         showRulesDialog()
                         mRoomInfo.customPayload[JoyParameters.BADGE_TITLE] = mJoyViewModel.mGameDetail?.name ?: ""
-                        mJoyService.updateRoom(mRoomInfo, completion = {
-
-                        })
+                        mJoyService.updateRoom(mRoomInfo, completion = {})
                         setupActionView(it.data?.actions)
                     }
                 }
@@ -558,6 +556,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                         mGameList.addAll(this)
                     }
                     showGameChooseDialog()
+                }
+                DataState.STATE_FAILED,
+                DataState.STATE_ERROR -> {
+                    CustomToast.showError(getString(R.string.joy_request_failed))
                 }
             }
         }
@@ -792,7 +794,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
 
         mRtcEngine.joinChannelEx(
-            JoyServiceManager.mPrepareConfig.rtcToken,
+            JoyServiceManager.mTokenConfig.rtcToken,
             mMainRtcConnection,
             channelMediaOptions,
             eventListener

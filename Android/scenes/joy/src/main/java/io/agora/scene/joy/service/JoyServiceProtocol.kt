@@ -3,9 +3,8 @@ package io.agora.scene.joy.service
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.rtmsyncmanager.model.AUIUserInfo
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.joy.JoyLogger
 
-data class PrepareConfig constructor(
+data class TokenConfig constructor(
     var rtcToken: String = "",   // rtc token，需要使用万能token，token创建的时候channel name为空字符串
     var rtmToken: String = "",   // rtm token
 )
@@ -53,14 +52,12 @@ interface JoyServiceProtocol {
         val serviceProtocol: JoyServiceProtocol
             get() {
                 if (innnerProtocol == null) {
-                    innnerProtocol = JoySyncManagerServiceImp(AgoraApplication.the()) { error ->
-                        error?.message?.let { JoyLogger.e("SyncManager", it) }
-                    }
+                    innnerProtocol = JoySyncManagerServiceImp(AgoraApplication.the())
                 }
                 return innnerProtocol!!
             }
 
-        fun reset(){
+        fun reset() {
             innnerProtocol = null
         }
     }
@@ -113,5 +110,5 @@ interface JoyServiceProtocol {
      */
     fun subscribeListener(listener: JoyServiceListenerProtocol)
 
-
+    fun reset()
 }
