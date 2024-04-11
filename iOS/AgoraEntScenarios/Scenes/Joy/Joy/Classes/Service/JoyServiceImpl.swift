@@ -91,7 +91,10 @@ extension JoyServiceImpl: JoyServiceProtocol {
         let roomInfo = AUIRoomInfo()
         roomInfo.roomName = roomName
         roomInfo.roomId = "\(arc4random_uniform(899999) + 100000)"
-        roomInfo.customPayload = ["roomUserCount": 1]
+        roomInfo.customPayload = [
+            "roomUserCount": 1,
+            "createdAt": Int64(Date().timeIntervalSince1970 * 1000)
+        ]
 
         let owner = AUIUserThumbnailInfo()
         owner.userId = String(self.user.userId ?? 0)

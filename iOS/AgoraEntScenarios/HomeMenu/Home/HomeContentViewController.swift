@@ -93,7 +93,7 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
         userInfo.userId = UInt(VLUserCenter.user.id) ?? 0
         userInfo.userName = VLUserCenter.user.name
         userInfo.avatar = VLUserCenter.user.headUrl
-        JoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: KeyCenter.serviceHost, appCertificate: KeyCenter.Certificate ?? "", userInfo: userInfo)
+        JoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: AppContext.shared.roomManagerUrl, appCertificate: KeyCenter.Certificate ?? "", userInfo: userInfo)
         
 //        switch model.type {
 //        case .solo:
