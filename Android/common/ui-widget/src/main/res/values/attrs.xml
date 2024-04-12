@@ -15,4 +15,11 @@
         <attr name="captchaHeight" format="dimension" />
         <attr name="matchDeviation" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="ClearScreenLayout_Layout">
+        <attr name="layout_dragEnable" format="boolean" />
+    </declare-styleable>
+    <declare-styleable name="ClearScreenLayout">
+        <attr name="touch_slop_sensitivity" format="float" />
+    </declare-styleable>
 </resources>

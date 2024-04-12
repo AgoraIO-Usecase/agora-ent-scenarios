@@ -74,6 +74,7 @@ import io.agora.scene.joy.widget.dp
 import io.agora.scene.joy.widget.navBarHeight
 import io.agora.scene.joy.widget.statusBarHeight
 import io.agora.scene.joy.widget.toast.CustomToast
+import io.agora.scene.widget.clearScreen.ClearScreenLayout
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import org.json.JSONException
@@ -257,23 +258,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             binding.likeView.addFavor()
             mJoyViewModel.sendLike(mJoyViewModel.mGamId, mRoomInfo.roomId, 1)
         }
-//        binding.ivDeployTroops.setOnTouchListener { v, event ->
-//            if (!mIsRoomOwner) {
-//                return@setOnTouchListener false
-//            }
-//            when (event.action) {
-//                MotionEvent.ACTION_DOWN -> {
-//                    setControllerView(binding.ivDeployTroops, false)
-//                    sendKeyboardMessage(KeyboardEventType.KEYBOARD_EVENT_KEY_DOWN, 'Z')
-//                }
-//
-//                MotionEvent.ACTION_UP -> {
-//                    setControllerView(binding.ivDeployTroops, true)
-//                    sendKeyboardMessage(KeyboardEventType.KEYBOARD_EVENT_KEY_UP, 'Z')
-//                }
-//            }
-//            return@setOnTouchListener true
-//        }
         if (mIsRoomOwner) {
             binding.flAssistantContainer.setOnTouchListener { view, event ->
                 if (!mIsRoomOwner) return@setOnTouchListener false
@@ -288,12 +272,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                         RemoteCtrlMsg.MouseEventType.MOUSE_EVENT_LBUTTON_UP.number
                     )
                 }
-                return@setOnTouchListener true
-            }
-        } else {
-            binding.root.setOnTouchListener { v, event ->
-                if (mIsRoomOwner) return@setOnTouchListener false
-                showNormalInputLayout()
                 return@setOnTouchListener true
             }
         }
@@ -321,7 +299,31 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             val exitCloseBottom = exitCloseTop + exitClose.height
             mCloseRect = Rect(exitCloseLeft, exitCloseTop, exitCloseRight, exitCloseBottom)
             Log.d("Joy_JoyChooseGameDialog", "$exitCloseLeft,$exitCloseTop,$exitCloseRight,$exitCloseBottom")
+
+            binding.clearScreenLayout.open()
         }
+        binding.clearScreenLayout.addDragListener(object : ClearScreenLayout.DragListener {
+            override fun onDragging(dragView: View, slideOffset: Float) {
+                //正在拖动中
+                dragView.alpha = slideOffset
+                Log.d("clearScreenLayout", "onDragging $slideOffset")
+            }
+
+            override fun onDragToOut(dragView: View) {
+                //当遮罩层被拖出去时
+                Log.d("clearScreenLayout", "onDragToOut $dragView")
+            }
+
+            override fun onDragToIn(dragView: View) {
+                //当遮罩层被拖入时
+                Log.d("clearScreenLayout", "onDragToIn $dragView")
+            }
+
+            override fun onDragStateChanged(newState: Int) {
+                //当拖动状态改变时
+                Log.d("clearScreenLayout", "newState $newState")
+            }
+        })
     }
 
     private fun setControllerView(view: ImageView, isClick: Boolean) {
@@ -557,6 +559,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     }
                     showGameChooseDialog()
                 }
+
                 DataState.STATE_FAILED,
                 DataState.STATE_ERROR -> {
                     CustomToast.showError(getString(R.string.joy_request_failed))
@@ -573,10 +576,13 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             val imageParams = LinearLayout.LayoutParams(
                 36.dp.toInt(),
                 36.dp.toInt()
-            )
-            imageParams.gravity = Gravity.BOTTOM
-            imageParams.setMargins(0, 18, 18, 0)
-            binding.layoutBottomAction.addView(actionImage, imageParams)
+            ).apply {
+                gravity = Gravity.BOTTOM
+            }
+            actionImage.layoutParams = imageParams
+
+            binding.layoutBottomAction.addView(actionImage)
+
             GlideApp.with(binding.root)
                 .load(action.icon ?: "")
                 .error(R.drawable.joy_icon_deploy_troops)
@@ -721,7 +727,11 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             mRtcEngine.setupLocalVideo(VideoCanvas(textureView, VideoCanvas.RENDER_MODE_HIDDEN, 0))
         } else {
             mRtcEngine.setupRemoteVideoEx(
-                VideoCanvas(textureView, VideoCanvas.RENDER_MODE_HIDDEN, mRoomInfo.roomOwner?.userId?.toIntOrNull() ?: 0),
+                VideoCanvas(
+                    textureView,
+                    VideoCanvas.RENDER_MODE_HIDDEN,
+                    mRoomInfo.roomOwner?.userId?.toIntOrNull() ?: 0
+                ),
                 mMainRtcConnection
             )
         }
