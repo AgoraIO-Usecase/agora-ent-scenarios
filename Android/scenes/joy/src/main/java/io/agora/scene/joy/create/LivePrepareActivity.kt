@@ -33,6 +33,7 @@ import io.agora.scene.joy.service.api.JoyGameBanner
 import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.joy.live.JoyViewModel
 import io.agora.scene.joy.live.RoomLivingActivity
+import io.agora.scene.joy.widget.toast.CustomToast
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 import java.util.Random
@@ -188,6 +189,10 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
                         binding.vpGame.currentItem = 1
                         startAutoScroll()
                     }
+                }
+                DataState.STATE_FAILED,
+                DataState.STATE_ERROR -> {
+                    CustomToast.showError(getString(R.string.joy_request_failed))
                 }
             }
         }

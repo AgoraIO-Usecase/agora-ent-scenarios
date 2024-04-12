@@ -22,6 +22,8 @@ import io.agora.scene.joy.databinding.JoyItemRoomList4Binding
 import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.joy.live.RoomLivingActivity
 import io.agora.scene.joy.service.JoyParameters
+import io.agora.scene.joy.service.TokenConfig
+import io.agora.scene.joy.service.api.JoyApiManager
 import io.agora.scene.widget.utils.UiUtils
 
 class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
@@ -35,9 +37,8 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
     private var mJoyListAdapter: RoomListAdapter? = null
 
     init {
-        // TODO: 如果不重启需要 reset
-//        JoyApiManager.reset()
-//        JoyServiceProtocol.reset()
+        JoyApiManager.reset()
+        JoyServiceProtocol.reset()
     }
 
     override fun getViewBinding(inflater: LayoutInflater): JoyActivityRoomListBinding {
@@ -47,10 +48,10 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setOnApplyWindowInsetsListener(binding.root)
-
-        JoyServiceManager.renewTokens {
-            JoyServiceManager.initRtm()
-            binding.smartRefreshLayout.autoRefresh()
+        JoyServiceManager.renewTokens { tokenConfig: TokenConfig?, exception: Exception? ->
+            if (exception == null) {
+                binding.smartRefreshLayout.autoRefresh()
+            }
         }
     }
 
@@ -66,9 +67,11 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
         binding.smartRefreshLayout.setEnableLoadMore(false)
         binding.smartRefreshLayout.setEnableRefresh(true)
         binding.smartRefreshLayout.setOnRefreshListener {
-            JoyServiceManager.renewTokens {
-                mJoyService.getRoomList {
-                    updateList(it)
+            JoyServiceManager.renewTokens { tokenConfig: TokenConfig?, exception: Exception? ->
+                if (exception == null) {
+                    mJoyService.getRoomList { roomList ->
+                        updateList(roomList)
+                    }
                 }
             }
         }
@@ -96,6 +99,7 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
     override fun onDestroy() {
         super.onDestroy()
         JoyServiceManager.destroy()
+        mJoyService.reset()
     }
 
     private class RoomListAdapter constructor(
