@@ -15,6 +15,7 @@ import io.agora.rtmsyncmanager.service.IAUIUserService
 import io.agora.rtmsyncmanager.service.collection.AUIMapCollection
 import io.agora.rtmsyncmanager.service.http.HttpManager
 import io.agora.rtmsyncmanager.service.room.AUIRoomManager
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmAttributeRespObserver
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmMessageRespObserver
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
@@ -37,7 +38,8 @@ import kotlin.random.Random
  */
 class JoySyncManagerServiceImp constructor(
     private val cxt: Context,
-) : JoyServiceProtocol, ISceneResponse, IAUIUserService.AUIUserRespObserver, AUIRtmMessageRespObserver {
+) : JoyServiceProtocol, ISceneResponse, IAUIUserService.AUIUserRespObserver,
+    AUIRtmMessageRespObserver, AUIRtmAttributeRespObserver {
 
     companion object {
         private const val TAG = "Joy_Service_LOG"
@@ -212,6 +214,7 @@ class JoySyncManagerServiceImp constructor(
             }
             scene.userService.registerRespObserver(this)
             mSyncManager.rtmManager.subscribeMessage(this)
+            mSyncManager.rtmManager.subscribeAttribute(roomInfo.roomId, SYNC_SCENE_ROOM_START_GAME_COLLECTION, this)
         }
     }
 
@@ -222,6 +225,7 @@ class JoySyncManagerServiceImp constructor(
         scene.userService.unRegisterRespObserver(this)
         scene.unbindRespDelegate(this)
         mSyncManager.rtmManager.unsubscribeMessage(this)
+        mSyncManager.rtmManager.unsubscribeAttribute(roomInfo.roomName, SYNC_SCENE_ROOM_START_GAME_COLLECTION, this)
 
         val createTime = (roomInfo.customPayload[JoyParameters.CREATED_AT] as? Long) ?: 0
         if (roomInfo.roomOwner?.userId == mUser.id.toString() ||
@@ -302,7 +306,7 @@ class JoySyncManagerServiceImp constructor(
                     runOnMainThread {
                         completion.invoke(Exception(it.message))
                     }
-                }else{
+                } else {
                     runOnMainThread {
                         completion.invoke(null)
                     }
@@ -344,6 +348,23 @@ class JoySyncManagerServiceImp constructor(
         runOnMainThread {
             GsonTools.toBean(message, JoyMessage::class.java)?.let {
                 mJoyServiceListener?.onMessageDidAdded(it)
+            }
+        }
+    }
+
+    override fun onAttributeChanged(channelName: String, key: String, value: Any) {
+        runOnMainThread {
+            if (key == SYNC_SCENE_ROOM_START_GAME_COLLECTION) {
+                val newValue = if (value is ByteArray) {
+                    String(value)
+                } else if (value is String) {
+                    value
+                } else {
+                    ""
+                }
+                GsonTools.toBean(newValue, JoyStartGameInfo::class.java)?.let {
+                    mJoyServiceListener?.onStartGameInfoDidChanged(it)
+                }
             }
         }
     }
