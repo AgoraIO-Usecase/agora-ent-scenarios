@@ -3,6 +3,7 @@ package io.agora.rtmsyncmanager.service.rtm
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import io.agora.rtm.ErrorInfo
 import io.agora.rtm.JoinChannelOptions
 import io.agora.rtm.MetadataItem
@@ -314,6 +315,7 @@ class AUIRtmManager constructor(
         completion: (AUIRtmException?) -> Unit
     ) {
         val storage = rtmClient.storage
+        logger.d("AUIRTM_TAG","cleanMetadata $this, $rtmClient")
         val data = storage.createMetadata()
 
         removeKeys.forEach {
@@ -351,6 +353,7 @@ class AUIRtmManager constructor(
         metadata: Map<String, String>,
         completion: (AUIRtmException?) -> Unit
     ) {
+        logger.d("AUIRTM_TAG","setMetadata $this, $rtmClient")
         val storage = rtmClient.storage ?: return
         val data = storage.createMetadata()
         metadata.forEach { entry ->
@@ -393,6 +396,7 @@ class AUIRtmManager constructor(
         completion: (AUIRtmException?) -> Unit
     ) {
         val storage = rtmClient.storage
+        logger.d("AUIRTM_TAG","updateMetadata $this, $rtmClient")
         val data = storage.createMetadata()
         metadata.forEach { entry ->
             val item = MetadataItem()
@@ -431,6 +435,7 @@ class AUIRtmManager constructor(
         completion: (AUIRtmException?, io.agora.rtm.Metadata?) -> Unit
     ) {
         val storage = rtmClient.storage
+        logger.d("AUIRTM_TAG","getMetadata $this, $rtmClient")
         storage.getChannelMetadata(
             channelName,
             channelType,
@@ -459,6 +464,7 @@ class AUIRtmManager constructor(
         completion: (AUIRtmException?, List<Map<String, String>>?) -> Unit
     ) {
         val presence = rtmClient.presence
+        logger.d("AUIRTM_TAG","whoNow $this, $rtmClient")
         val options = PresenceOptions()
         options.includeUserId = true
         options.includeState = true
@@ -497,6 +503,7 @@ class AUIRtmManager constructor(
         completion: (AUIRtmException?) -> Unit
     ) {
         val presence = rtmClient.presence
+        logger.d("AUIRTM_TAG","setPresenceState $this, $rtmClient")
         val items = ArrayList<StateItem>()
         attr.forEach { entry ->
             val item = StateItem()
