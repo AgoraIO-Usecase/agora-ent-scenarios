@@ -43,7 +43,7 @@ class PictureQualityDialog(context: Context) : BottomDarkDialog(context) {
 
         private var cacheSelectedIndex = QUALITY_INDEX_720P
 
-        fun getCacheQualityResolution() = QualityItemList[cacheSelectedIndex].size
+        fun getCacheQualityResolution(index: Int) = QualityItemList[index].size
     }
 
     private data class QualityItem(@QualityIndex val qualityIndex: Int, @StringRes val name: Int, val size: Size)

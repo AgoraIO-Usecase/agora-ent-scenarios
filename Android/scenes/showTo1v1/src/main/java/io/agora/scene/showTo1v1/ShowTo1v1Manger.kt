@@ -16,6 +16,7 @@ import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
+import io.agora.scene.showTo1v1.audio.AudioScenarioApi
 import io.agora.scene.showTo1v1.callapi.CallApiImpl
 import io.agora.scene.showTo1v1.callapi.CallConfig
 import io.agora.scene.showTo1v1.callapi.PrepareConfig
@@ -38,15 +39,7 @@ enum class CallRole(val value: Int) {
  */
 class ShowTo1v1Manger constructor() {
 
-    val videoEncoderConfiguration = VideoEncoderConfiguration().apply {
-        orientationMode = VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_ADAPTIVE
-    }
-    val virtualBackgroundSource = VirtualBackgroundSource().apply {
-        backgroundSourceType = VirtualBackgroundSource.BACKGROUND_COLOR
-    }
-    val videoCaptureConfiguration = CameraCapturerConfiguration(CameraCapturerConfiguration.CaptureFormat()).apply {
-        followEncodeDimensionRatio = false
-    }
+    val scenarioApi by lazy { AudioScenarioApi(mRtcEngine) }
 
     companion object {
 
@@ -279,6 +272,7 @@ class ShowTo1v1Manger constructor() {
                     setParameters("{\"rtc.video.quickIntraHighFec\": true}")
                     setParameters("{\"rtc.network.e2e_cc_mode\": 3}")
                 }
+                scenarioApi.initialize()
             }
             return innerRtcEngine!!
         }

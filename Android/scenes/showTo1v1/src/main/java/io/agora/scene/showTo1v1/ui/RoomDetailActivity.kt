@@ -114,8 +114,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     private val isRoomOwner by lazy { mRoomInfo.userId == UserManager.getInstance().user.id.toString() }
 
-    private val scenarioApi by lazy { AudioScenarioApi(mRtcEngine) }
-
     private val mMainRtcConnection by lazy {
         RtcConnection(
             mRoomInfo.roomId,
@@ -168,7 +166,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
         val roomLeftTime = ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt)
         if (roomLeftTime > 0) {
-            scenarioApi.initialize()
             initRtcEngine()
             initServiceWithJoinRoom()
 
@@ -423,7 +420,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
         }
         toggleSelfAudio(isRoomOwner) {
-            scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
+            mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
         }
     }
 
@@ -856,7 +853,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
                     if (isRoomOwner) {
                         // 通话结束， 恢复音频配置
-                        scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
+                        mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
                     }
                 }
 
@@ -930,10 +927,10 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     val fromUserId = eventInfo[CallApiImpl.kFromUserId] as? Int ?: 0
                     if (mShowTo1v1Manger.mCurrentUser.userId == toUserId.toString()) {
                         // 被叫
-                        scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
+                        mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
                     } else if (mShowTo1v1Manger.mCurrentUser.userId == fromUserId.toString()) {
                         // 主叫
-                        scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Caller)
+                        mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Caller)
                     }
                 }
 
@@ -1038,12 +1035,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     binding.layoutCallPrivately.isVisible = false
                     stopCallAnimator()
                 }
-//                mainLooper.queue.addIdleHandler {
-//                    Log.d(TAG, "animateConnectedViewOpen -- queueIdle -- 1")
-//                    // workaround
-//                    onShowSettingDialog(false)
-//                    false
-//                }
             }
 
             else -> {}

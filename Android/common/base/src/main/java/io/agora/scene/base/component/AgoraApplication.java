@@ -7,6 +7,8 @@ import androidx.multidex.MultiDexApplication;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import java.io.File;
+
 import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.CommonBaseLogger;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -78,5 +80,9 @@ public class AgoraApplication extends MultiDexApplication {
 
     public boolean isDebugModeOpen() {
         return isDebugModeOpen;
+    }
+
+    public File getExternalFilesDir() {
+        return sInstance.getExternalFilesDir(null);
     }
 }
