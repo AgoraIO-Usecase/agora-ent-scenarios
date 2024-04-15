@@ -50,15 +50,7 @@ import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
 import io.agora.scene.show.databinding.ShowLivingEndDialogBinding
 import io.agora.scene.show.debugSettings.DebugAudienceSettingDialog
 import io.agora.scene.show.debugSettings.DebugSettingDialog
-import io.agora.scene.show.service.RoomException
-import io.agora.scene.show.service.ShowInteractionInfo
-import io.agora.scene.show.service.ShowInteractionStatus
-import io.agora.scene.show.service.ShowMessage
-import io.agora.scene.show.service.ShowMicSeatApply
-import io.agora.scene.show.service.ShowRoomDetailModel
-import io.agora.scene.show.service.ShowRoomRequestStatus
-import io.agora.scene.show.service.ShowServiceProtocol
-import io.agora.scene.show.service.ShowUser
+import io.agora.scene.show.service.*
 import io.agora.videoloaderapi.OnPageScrollEventHandler
 import io.agora.videoloaderapi.VideoLoader
 import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
@@ -1037,7 +1029,7 @@ class LiveDetailFragment : Fragment() {
         mPKDialog.setPKDialogActionListener(object : OnPKDialogActionListener {
             override fun onRequestMessageRefreshing(dialog: LivePKDialog) {
                 mService.getAllPKUserList({ roomList ->
-                    mService.getAllPKInvitationList(mRoomInfo.roomId,true, { invitationList ->
+                    mService.getAllPKInvitationList(mRoomInfo.roomId,true, null, { invitationList ->
                         mPKDialog.setOnlineBroadcasterList(
                             interactionInfo,
                             roomList,
@@ -1054,8 +1046,11 @@ class LiveDetailFragment : Fragment() {
                 }
                 if (isRoomOwner) {
                     val roomDetail = roomItem.convertToShowRoomDetailModel()
+                    prepareRoomInfo = roomDetail
                     preparePKingMode(roomDetail.roomId)
-                    mService.createPKInvitation(mRoomInfo.roomId, roomDetail)
+                    mService.createPKInvitation(mRoomInfo.roomId, roomDetail) {
+                        ToastUtils.showToast("invite message failed!")
+                    }
                 }
             }
 
@@ -1082,13 +1077,20 @@ class LiveDetailFragment : Fragment() {
                     mPKInvitationCountDownLatch = null
                 }
                 pkStartTime = TimeUtils.currentTimeMillis()
-                mService.acceptPKInvitation(mRoomInfo.roomId){}
-                dialog.dismiss()
+                mService.acceptPKInvitation(mRoomInfo.roomId, {
+                    dialog.dismiss()
+                }) {
+                    ToastUtils.showToast("accept message failed!")
+                }
             }
             setNegativeButton(R.string.show_setting_cancel) { dialog, _ ->
                 updateIdleMode()
-                mService.rejectPKInvitation(mRoomInfo.roomId) { }
-                dialog.dismiss()
+                mService.rejectPKInvitation(mRoomInfo.roomId, {
+                    dialog.dismiss()
+                }) {
+                    ToastUtils.showToast("reject message failed!")
+                }
+                isPKCompetition = false
             }
         }.create()
         dialog.show()
@@ -1189,6 +1191,7 @@ class LiveDetailFragment : Fragment() {
         mService.subscribeReConnectEvent(mRoomInfo.roomId) {
             reFetchUserList()
             reFetchPKInvitationList()
+            reFetchInteractionList()
         }
         mService.subscribeCurrRoomEvent(mRoomInfo.roomId) { status, _ ->
             if (status == ShowServiceProtocol.ShowSubscribeStatus.deleted) {
@@ -1283,12 +1286,12 @@ class LiveDetailFragment : Fragment() {
 
         mService.subscribePKInvitationChanged(mRoomInfo.roomId) { status, info ->
             mService.getAllPKUserList({ roomList ->
-                mService.getAllPKInvitationList(mRoomInfo.roomId, true, { invitationList ->
+                mService.getAllPKInvitationList(mRoomInfo.roomId, true, null, { invitationList ->
                     mPKDialog.setOnlineBroadcasterList(interactionInfo, roomList, invitationList)
                 })
             })
             if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && info != null) {
-                if (info.status == ShowRoomRequestStatus.waitting.value && info.userId == UserManager.getInstance().user.id.toString()) {
+                if (info.status == ShowRoomRequestStatus.waitting.value && info.userId == UserManager.getInstance().user.id.toString() && interactionInfo == null) {
                     isPKCompetition = true
                     preparePKingMode(info.fromRoomId)
                     showPKInvitationDialog(info.fromName)
@@ -1338,14 +1341,64 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun reFetchPKInvitationList() {
-        mService.getAllPKInvitationList(mRoomInfo.roomId,false, { list ->
+        ShowLogger.d(TAG, "reFetchPKInvitationList")
+        mService.getAllPKInvitationList(mRoomInfo.roomId,false, null, { list ->
             list.forEach {
                 if (it.userId == UserManager.getInstance().user.id.toString()
-                    && it.status == ShowRoomRequestStatus.waitting.value
+                    && it.status == ShowRoomRequestStatus.waitting.value && interactionInfo == null
                 ) {
+                    ShowLogger.d(TAG, "reconnect pk invitation")
+                    isPKCompetition = true
                     preparePKingMode(it.fromRoomId)
                     showPKInvitationDialog(it.fromName)
                 }
+            }
+        })
+        if (prepareRkRoomId.isNotEmpty() && prepareRoomInfo != null) {
+            ShowLogger.d(TAG, "reFetchPKInvitationList1")
+            mService.getAllPKInvitationList(mRoomInfo.roomId, false, prepareRoomInfo, { list ->
+                list.forEach {
+                    if (it.fromUserId == UserManager.getInstance().user.id.toString() && it.fromRoomId == mRoomInfo.roomId
+                        && it.status == ShowRoomRequestStatus.accepted.value && interactionInfo == null
+                    ) {
+                        ShowLogger.d(TAG, "reconnect pk accepted")
+                        mService.startInteraction(it)
+                    }
+                }
+            }) {}
+        }
+    }
+
+    private fun reFetchInteractionList() {
+        mService.getAllInterationList(mRoomInfo.roomId, { list ->
+            val info = list.getOrNull(0)
+            if (info != null && this.interactionInfo == null) {
+                interactionInfo = info
+                // UI
+                updateVideoSetting(true)
+                refreshBottomLayout()
+                refreshViewDetailLayout(info.interactStatus)
+                mLinkDialog.setOnSeatStatus(info.userName, info.interactStatus)
+                mPKDialog.setPKInvitationItemStatus(info.userName, info.interactStatus)
+                // RTC
+                updateLinkingMode()
+                updatePKingMode()
+                refreshPKTimeCount()
+            }
+
+            if (info == null && this.interactionInfo != null) {
+                // UI
+                refreshViewDetailLayout(ShowInteractionStatus.idle.value)
+                mLinkDialog.setOnSeatStatus("", null)
+                mPKDialog.setPKInvitationItemStatus("", null)
+                // RTC
+                updateIdleMode()
+                isPKCompetition = false
+                interactionInfo = null
+                refreshBottomLayout()
+                refreshPKTimeCount()
+                updateVideoSetting(false)
+                onMeLinkingListener?.onMeLinking(false)
             }
         })
     }
@@ -1402,7 +1455,7 @@ class LiveDetailFragment : Fragment() {
         val eventListener = object : IRtcEngineEventHandler() {
             override fun onUserOffline(uid: Int, reason: Int) {
                 super.onUserOffline(uid, reason)
-                if (interactionInfo != null && interactionInfo!!.userId == uid.toString()) {
+                if (interactionInfo != null && interactionInfo!!.userId == uid.toString() && interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) {
                     mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!)
                 }
             }
@@ -1975,6 +2028,7 @@ class LiveDetailFragment : Fragment() {
     }
 
     private var prepareRkRoomId = ""
+    private var prepareRoomInfo: ShowRoomDetailModel? = null
 
     private fun preparePKingMode(pkRoomId: String) {
         ShowLogger.d(TAG, "Interaction >> preparePKingMode pkRoomId=$pkRoomId")

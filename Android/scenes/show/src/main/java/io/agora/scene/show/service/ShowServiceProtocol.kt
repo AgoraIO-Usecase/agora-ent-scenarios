@@ -167,6 +167,7 @@ interface ShowServiceProtocol {
     fun getAllPKInvitationList(
         roomId: String,
         isFromUser: Boolean,
+        room: ShowRoomDetailModel?,
         success: ((List<ShowPKInvitation>) -> Unit),
         error: ((Exception) -> Unit)? = null
     )
@@ -202,6 +203,9 @@ interface ShowServiceProtocol {
         success: ((List<ShowInteractionInfo>) -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )
+
+    // 开始互动
+    fun startInteraction(info: ShowPKInvitation)
 
     // 订阅互动邀请
     fun subscribeInteractionChanged(roomId: String, onInteractionChanged: (ShowSubscribeStatus, ShowInteractionInfo?) -> Unit)
