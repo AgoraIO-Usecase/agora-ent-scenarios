@@ -94,7 +94,7 @@ class LivePKDialog : BottomSheetDialogFragment() {
     fun setOnlineBroadcasterList(interactionInfo: ShowInteractionInfo?, roomList : List<ShowRoomDetailModel>, invitationList : List<ShowPKInvitation>) {
         val list = ArrayList<LiveRoomConfig>()
         roomList.forEach { roomItem ->
-            val invitation = invitationList.filter { it.userId == roomItem.ownerId }.getOrNull(0)
+            val invitation = invitationList.filter { it.userId == roomItem.ownerId && it.roomId == roomItem.roomId }.getOrNull(0)
             if (invitation != null && invitation.status == ShowRoomRequestStatus.waitting.value) {
                 list.add(LiveRoomConfig(roomItem, true))
             } else {
