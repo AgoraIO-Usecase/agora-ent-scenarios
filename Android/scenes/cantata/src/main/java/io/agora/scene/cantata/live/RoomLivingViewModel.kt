@@ -1040,7 +1040,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             }
         }
         config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING
-        config.mAudioScenario = Constants.AUDIO_SCENARIO_CHORUS
+        config.mAudioScenario = Constants.AUDIO_SCENARIO_GAME_STREAMING
         try {
             mRtcEngine = RtcEngine.create(config) as RtcEngineEx
         } catch (e: java.lang.Exception) {

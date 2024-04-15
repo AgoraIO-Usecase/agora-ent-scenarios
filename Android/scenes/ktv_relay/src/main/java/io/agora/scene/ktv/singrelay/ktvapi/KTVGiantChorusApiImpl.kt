@@ -11,26 +11,26 @@ import io.agora.mediaplayer.data.SrcInfo
 import io.agora.musiccontentcenter.*
 import io.agora.rtc2.*
 import io.agora.rtc2.Constants.*
-import io.agora.rtc2.internal.Logging
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.concurrent.*
 
 class KTVGiantChorusApiImpl(
-   val giantChorusApiConfig: KTVGiantChorusApiConfig
+    val giantChorusApiConfig: KTVGiantChorusApiConfig
 ) : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver, IRtcEngineEventHandler() {
 
     companion object {
         private val scheduledThreadPool: ScheduledExecutorService = Executors.newScheduledThreadPool(5)
-        const val tag = "KTV_API_LOG"
-        const val version = "1_android_4.3.0"
-        const val lyricSyncVersion = 2
+        private const val tag = "KTV_API_LOG_GIANT"
+        private const val version = "1_android_4.3.0"
+        private const val lyricSyncVersion = 2
     }
 
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
     private var mRtcEngine: RtcEngineEx = giantChorusApiConfig.engine as RtcEngineEx
     private lateinit var mMusicCenter: IAgoraMusicContentCenter
     private var mPlayer: IMediaPlayer
+    private val apiReporter: APIReporter = APIReporter(version, mRtcEngine)
 
     private var innerDataStreamId: Int = 0
     private var singChannelRtcConnection: RtcConnection? = null
@@ -93,13 +93,16 @@ class KTVGiantChorusApiImpl(
     // multipath
     private var enableMultipathing = true
 
+    // 歌词信息是否来源于 dataStream
+    private var recvFromDataStream = false
+
     // 开始播放歌词
     private var mStopDisplayLrc = true
     private var displayLrcFuture: ScheduledFuture<*>? = null
     private val displayLrcTask = object : Runnable {
         override fun run() {
             if (!mStopDisplayLrc){
-                if (singerRole == KTVSingRole.Audience) return
+                if (singerRole == KTVSingRole.Audience && !recvFromDataStream) return  // audioMetaData方案观众return
                 val lastReceivedTime = mLastReceivedPlayPosTime ?: return
                 val curTime = System.currentTimeMillis()
                 val offset = curTime - lastReceivedTime
@@ -151,7 +154,7 @@ class KTVGiantChorusApiImpl(
     }
 
     init {
-        reportCallScenarioApi("initialize", JSONObject().put("config", giantChorusApiConfig))
+        apiReporter.reportFuncEvent("initialize", mapOf("config" to giantChorusApiConfig), mapOf())
         this.singChannelRtcConnection = RtcConnection(giantChorusApiConfig.chorusChannelName, giantChorusApiConfig.localUid)
 
         // ------------------ 初始化内容中心 ------------------
@@ -187,28 +190,18 @@ class KTVGiantChorusApiImpl(
         mPlayer.setPlayerOption("play_pos_change_callback", 100)
     }
 
-    // 数据上报
-    private fun reportCallScenarioApi(event: String, params: JSONObject) {
-        mRtcEngine.sendCustomReportMessage(
-            "scenarioAPI",
-            version,
-            event,
-            params.toString(),
-            0)
-    }
-
     // 日志输出
     private fun ktvApiLog(msg: String) {
-        Logging.i(KTVApiImpl.tag, "[GiantChorus] $msg")
+        apiReporter.writeLog("[${tag}] $msg", LOG_LEVEL_INFO)
     }
 
     // 日志输出
     private fun ktvApiLogError(msg: String) {
-        Logging.e(KTVApiImpl.tag, "[GiantChorus] $msg")
+        apiReporter.writeLog("[${tag}] $msg", LOG_LEVEL_ERROR)
     }
 
     override fun renewInnerDataStreamId() {
-        reportCallScenarioApi("renewInnerDataStreamId", JSONObject())
+        apiReporter.reportFuncEvent("renewInnerDataStreamId", mapOf(), mapOf())
 
         val innerCfg = DataStreamConfig()
         innerCfg.syncWithAudio = true
@@ -251,20 +244,23 @@ class KTVGiantChorusApiImpl(
         mRtcEngine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
         //mRtcEngine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
         //mRtcEngine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
+
+        // 数据上报
+        mRtcEngine.setParameters("{\"rtc.direct_send_custom_event\": true}")
     }
 
     override fun addEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {
-        reportCallScenarioApi("addEventHandler", JSONObject())
+        apiReporter.reportFuncEvent("addEventHandler", mapOf("ktvApiEventHandler" to ktvApiEventHandler), mapOf())
         ktvApiEventHandlerList.add(ktvApiEventHandler)
     }
 
     override fun removeEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {
-        reportCallScenarioApi("removeEventHandler", JSONObject())
+        apiReporter.reportFuncEvent("removeEventHandler", mapOf("ktvApiEventHandler" to ktvApiEventHandler), mapOf())
         ktvApiEventHandlerList.remove(ktvApiEventHandler)
     }
 
     override fun release() {
-        reportCallScenarioApi("release", JSONObject())
+        apiReporter.reportFuncEvent("release", mapOf(), mapOf())
         if (isRelease) return
         isRelease = true
         singerRole = KTVSingRole.Audience
@@ -300,7 +296,7 @@ class KTVGiantChorusApiImpl(
     }
 
     override fun enableProfessionalStreamerMode(enable: Boolean) {
-        reportCallScenarioApi("enableProfessionalStreamerMode", JSONObject())
+        apiReporter.reportFuncEvent("enableProfessionalStreamerMode", mapOf("enable" to enable), mapOf())
         this.professionalModeOpen = enable
         processAudioProfessionalProfile()
     }
@@ -336,7 +332,7 @@ class KTVGiantChorusApiImpl(
     }
 
     override fun enableMulitpathing(enable: Boolean) {
-        reportCallScenarioApi("enableMulitpathing", JSONObject().put("enable", enable))
+        apiReporter.reportFuncEvent("enableMulitpathing", mapOf("enable" to enable), mapOf())
         this.enableMultipathing = enable
 //        mRtcEngine.setParameters("{\"rtc.enableMultipath\": $enable}")
 //        if (enable) {
@@ -355,7 +351,7 @@ class KTVGiantChorusApiImpl(
     }
 
     override fun renewToken(rtmToken: String, chorusChannelRtcToken: String) {
-        reportCallScenarioApi("renewToken", JSONObject().put("rtmToken", rtmToken).put("chorusChannelRtcToken", chorusChannelRtcToken))
+        apiReporter.reportFuncEvent("renewToken", mapOf(), mapOf())
         // 更新RtmToken
         mMusicCenter.renewToken(rtmToken)
         // 更新合唱频道RtcToken
@@ -380,7 +376,7 @@ class KTVGiantChorusApiImpl(
         newRole: KTVSingRole,
         switchRoleStateListener: ISwitchRoleStateListener?
     ) {
-        reportCallScenarioApi("switchSingerRole", JSONObject().put("newRole", newRole))
+        apiReporter.reportFuncEvent("switchSingerRole", mapOf("newRole" to newRole), mapOf())
         ktvApiLog("switchSingerRole oldRole: $singerRole, newRole: $newRole")
         val oldRole = singerRole
         if (this.singerRole == KTVSingRole.Audience && newRole == KTVSingRole.LeadSinger) {
@@ -454,7 +450,7 @@ class KTVGiantChorusApiImpl(
     }
 
     override fun fetchMusicCharts(onMusicChartResultListener: (requestId: String?, status: Int, list: Array<out MusicChartInfo>?) -> Unit) {
-        reportCallScenarioApi("fetchMusicCharts", JSONObject())
+        apiReporter.reportFuncEvent("fetchMusicCharts", mapOf(), mapOf())
         val requestId = mMusicCenter.musicCharts
         musicChartsCallbackMap[requestId] = onMusicChartResultListener
     }
@@ -466,7 +462,7 @@ class KTVGiantChorusApiImpl(
         jsonOption: String,
         onMusicCollectionResultListener: (requestId: String?, status: Int, page: Int, pageSize: Int, total: Int, list: Array<out Music>?) -> Unit
     ) {
-        reportCallScenarioApi("searchMusicByMusicChartId", JSONObject())
+        apiReporter.reportFuncEvent("searchMusicByMusicChartId", mapOf(), mapOf())
         val requestId =
             mMusicCenter.getMusicCollectionByMusicChartId(musicChartId, page, pageSize, jsonOption)
         musicCollectionCallbackMap[requestId] = onMusicCollectionResultListener
@@ -479,7 +475,7 @@ class KTVGiantChorusApiImpl(
         jsonOption: String,
         onMusicCollectionResultListener: (requestId: String?, status: Int, page: Int, pageSize: Int, total: Int, list: Array<out Music>?) -> Unit
     ) {
-        reportCallScenarioApi("searchMusicByKeyword", JSONObject())
+        apiReporter.reportFuncEvent("searchMusicByKeyword", mapOf(), mapOf())
         val requestId = mMusicCenter.searchMusic(keyword, page, pageSize, jsonOption)
         musicCollectionCallbackMap[requestId] = onMusicCollectionResultListener
     }
@@ -489,7 +485,7 @@ class KTVGiantChorusApiImpl(
         config: KTVLoadMusicConfiguration,
         musicLoadStateListener: IMusicLoadStateListener
     ) {
-        reportCallScenarioApi("loadMusic", JSONObject().put("songCode", songCode).put("config", config))
+        apiReporter.reportFuncEvent("loadMusic", mapOf("songCode" to songCode, "config" to config), mapOf())
         ktvApiLog("loadMusic called: songCode $songCode")
         // 设置到全局， 连续调用以最新的为准
         this.songCode = songCode
@@ -579,7 +575,7 @@ class KTVGiantChorusApiImpl(
         url: String,
         config: KTVLoadMusicConfiguration
     ) {
-        reportCallScenarioApi("loadMusic", JSONObject().put("url", url).put("config", config))
+        apiReporter.reportFuncEvent("loadMusic", mapOf("url" to url, "config" to config), mapOf())
         ktvApiLog("loadMusic called: songCode $songCode")
         this.songIdentifier = config.songIdentifier
         this.songUrl = url
@@ -587,7 +583,7 @@ class KTVGiantChorusApiImpl(
     }
 
     override fun removeMusic(songCode: Long) {
-        reportCallScenarioApi("removeMusic", JSONObject().put("songCode", songCode))
+        apiReporter.reportFuncEvent("removeMusic", mapOf("songCode" to songCode), mapOf())
         val ret = mMusicCenter.removeCache(songCode)
         if (ret < 0) {
             ktvApiLogError("removeMusic failed, ret: $ret")
@@ -595,7 +591,7 @@ class KTVGiantChorusApiImpl(
     }
 
     override fun load2Music(url1: String, url2: String, config: KTVLoadMusicConfiguration) {
-        ktvApiLog("load2Music called: songUrl url1:$url1,url2:$url2")
+        apiReporter.reportFuncEvent("load2Music", mapOf("url1" to url1, "url2" to url2, "config" to config), mapOf())
         this.songIdentifier = config.songIdentifier
         this.songUrl = url1
         this.songUrl2 = url2
@@ -603,7 +599,7 @@ class KTVGiantChorusApiImpl(
     }
 
     override fun switchPlaySrc(url: String, syncPts: Boolean) {
-        ktvApiLog("switchPlaySrc called: $url")
+        apiReporter.reportFuncEvent("switchPlaySrc", mapOf("url" to url, "syncPts" to syncPts), mapOf())
         if (this.songUrl != url && this.songUrl2 != url) {
             ktvApiLogError("switchPlaySrc failed: canceled")
             return
@@ -614,7 +610,7 @@ class KTVGiantChorusApiImpl(
     }
 
     override fun startSing(songCode: Long, startPos: Long) {
-        reportCallScenarioApi("startSing", JSONObject().put("songCode", songCode).put("startPos", startPos))
+        apiReporter.reportFuncEvent("startSing", mapOf("songCode" to songCode, "startPos" to startPos), mapOf())
         ktvApiLog("playSong called: $singerRole")
         if (singerRole != KTVSingRole.SoloSinger && singerRole != KTVSingRole.LeadSinger) {
             ktvApiLogError("startSing failed: error singerRole")
@@ -635,7 +631,7 @@ class KTVGiantChorusApiImpl(
     }
 
     override fun startSing(url: String, startPos: Long) {
-        reportCallScenarioApi("startSing", JSONObject().put("url", url).put("startPos", startPos))
+        apiReporter.reportFuncEvent("startSing", mapOf("url" to url, "startPos" to startPos), mapOf())
         ktvApiLog("playSong called: $singerRole")
         if (singerRole != KTVSingRole.SoloSinger && singerRole != KTVSingRole.LeadSinger) {
             ktvApiLogError("startSing failed: error singerRole")
@@ -656,32 +652,32 @@ class KTVGiantChorusApiImpl(
     }
 
     override fun resumeSing() {
-        reportCallScenarioApi("resumeSing", JSONObject())
+        apiReporter.reportFuncEvent("resumeSing", mapOf(), mapOf())
         ktvApiLog("resumePlay called")
         mPlayer.resume()
     }
 
     override fun pauseSing() {
-        reportCallScenarioApi("pauseSing", JSONObject())
+        apiReporter.reportFuncEvent("pauseSing", mapOf(), mapOf())
         ktvApiLog("pausePlay called")
         mPlayer.pause()
     }
 
     override fun seekSing(time: Long) {
-        reportCallScenarioApi("seekSing", JSONObject().put("time", time))
+        apiReporter.reportFuncEvent("seekSing", mapOf("time" to time), mapOf())
         ktvApiLog("seek called")
         mPlayer.seek(time)
         syncPlayProgress(time)
     }
 
     override fun setLrcView(view: ILrcView) {
-        reportCallScenarioApi("setLrcView", JSONObject())
+        apiReporter.reportFuncEvent("setLrcView", mapOf(), mapOf())
         ktvApiLog("setLrcView called")
         this.lrcView = view
     }
 
     override fun muteMic(mute: Boolean) {
-        reportCallScenarioApi("muteMic", JSONObject().put("mute", isOnMicOpen))
+        apiReporter.reportFuncEvent("muteMic", mapOf("mute" to mute), mapOf())
         this.isOnMicOpen = !mute
         if (singerRole == KTVSingRole.Audience) return
         val channelMediaOption = ChannelMediaOptions()
@@ -692,7 +688,7 @@ class KTVGiantChorusApiImpl(
     }
 
     override fun setAudioPlayoutDelay(audioPlayoutDelay: Int) {
-        reportCallScenarioApi("setAudioPlayoutDelay", JSONObject().put("audioPlayoutDelay", audioPlayoutDelay))
+        apiReporter.reportFuncEvent("setAudioPlayoutDelay", mapOf("audioPlayoutDelay" to audioPlayoutDelay), mapOf())
         this.audioPlayoutDelay = audioPlayoutDelay
     }
 
@@ -717,7 +713,7 @@ class KTVGiantChorusApiImpl(
     }
 
     override fun switchAudioTrack(mode: AudioTrackMode) {
-        reportCallScenarioApi("switchAudioTrack", JSONObject().put("mode", mode))
+        apiReporter.reportFuncEvent("switchAudioTrack", mapOf("mode" to mode), mapOf())
         when (singerRole) {
             KTVSingRole.LeadSinger, KTVSingRole.SoloSinger -> {
                 when (mode) {
@@ -1259,7 +1255,6 @@ class KTVGiantChorusApiImpl(
     }
 
     // ------------------------ AgoraRtcEvent ------------------------
-    private var recvFromDataStream = false
     private fun dealWithStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
         val jsonMsg: JSONObject
         val messageData = data ?: return
