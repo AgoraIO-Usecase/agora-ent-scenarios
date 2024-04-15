@@ -225,7 +225,7 @@ extension JoyServiceImpl: JoyServiceProtocol {
                         info.taskId = taskId
                     }
                     
-                    if let assistantUid = data["assistantUid"] as? String {
+                    if let assistantUid = data["assistantUid"] as? Int64 {
                         info.assistantUid = UInt(assistantUid) ?? 0
                     }
                     
@@ -365,8 +365,6 @@ extension JoyServiceImpl: AUISceneRespDelegate {
     private func _leaveRoom(roomId: String, isRoomOwner: Bool) {
         joyPrint("_leaveRoom: \(roomId) isRoomOwner:\(isRoomOwner)")
         let scene = self.syncManager.getScene(channelName: roomId)
-        scene.unbindRespDelegate(delegate: self)
-        scene.userService.unbindRespDelegate(delegate: self)
         if isRoomOwner {
             scene.delete()
             roomManager.destroyRoom(roomId: roomId) { _ in
@@ -374,6 +372,8 @@ extension JoyServiceImpl: AUISceneRespDelegate {
         } else {
             scene.leave()
         }
+        scene.unbindRespDelegate(delegate: self)
+        scene.userService.unbindRespDelegate(delegate: self)
     }
     
     func onSceneDestroy(roomId: String) {
@@ -514,11 +514,11 @@ extension JoyServiceImpl{
     
     private func getCurrentScene(with channelName: String) -> AUIScene {
         let scene = self.syncManager.getScene(channelName: channelName)
-        if !sceneBinded {
+         //if !sceneBinded {
             scene.userService.bindRespDelegate(delegate: self)
             scene.bindRespDelegate(delegate: self)
-            sceneBinded = true
-        }
+           // sceneBinded = true
+        //}
         return scene
     }
 
