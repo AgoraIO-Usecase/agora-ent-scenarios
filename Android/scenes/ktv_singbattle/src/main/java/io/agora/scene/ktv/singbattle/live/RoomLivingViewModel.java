@@ -1523,22 +1523,24 @@ public class RoomLivingViewModel extends ViewModel {
 
         boolean isOwnSong;
         String jsonOption;
+        int mainSingerUid;
         if (music.getWinnerNo().equals("")) {
             isOwnSong = Objects.equals(music.getUserNo(), UserManager.getInstance().getUser().id.toString());
             jsonOption = "{\"format\":{\"highPart\":0}}";
             needPrelude = false;
+            mainSingerUid = Integer.parseInt(music.getUserNo());
         } else {
             isOwnSong = Objects.equals(music.getWinnerNo(), UserManager.getInstance().getUser().id.toString());
             // 抢到演唱权后，演唱的片段选择带buffer的，原片段前+5s，后+3S。对于歌词，仍然只展示不带buffer的歌词
             jsonOption = "{\"format\":{\"highPartIndex\":0}}";
             needPrelude = true;
+            mainSingerUid = Integer.parseInt(music.getWinnerNo());
         }
 
         long songCode = Long.parseLong(music.getSongNo());
-        int mainSingerUid = Integer.parseInt(music.getUserNo());
         Long newSongCode = ktvApiProtocol.getMusicContentCenter().getInternalSongCode(songCode, jsonOption);
         if (isOwnSong) {
-            // 主唱加载歌曲l
+            // 主唱加载歌曲
             loadMusic(new KTVLoadMusicConfiguration(newSongCode.toString(), mainSingerUid, KTVLoadMusicMode.LOAD_MUSIC_AND_LRC, needPrelude), newSongCode, isOwnSong);
         } else {
             // 观众
