@@ -17,8 +17,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
-import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.RtcConnection
@@ -32,7 +30,6 @@ import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.pure1v1.CallServiceManager
 import io.agora.scene.pure1v1.Pure1v1Logger
 import io.agora.scene.pure1v1.R
-import io.agora.scene.pure1v1.audio.AudioScenarioApi
 import io.agora.scene.pure1v1.audio.AudioScenarioType
 import io.agora.scene.pure1v1.audio.SceneType
 import io.agora.scene.pure1v1.callapi.*
@@ -78,6 +75,8 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
     private var isFirstEnterScene = true
 
+    private var isOnline = true
+
     override fun getViewBinding(inflater: LayoutInflater): Pure1v1RoomListActivityBinding {
         return Pure1v1RoomListActivityBinding.inflate(inflater)
     }
@@ -118,13 +117,16 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             if (it) {
                 CallServiceManager.instance.sceneService?.enterRoom { e ->
                     if (e == null) {
+                        isOnline = true
                         fetchRoomList(false)
                     } else {
+                        isOnline = false
                         Pure1v1Logger.e(tag, null, "enter room failed: ${e.message}")
                         Toast.makeText(this, getText(R.string.pure1v1_room_list_local_offline), Toast.LENGTH_SHORT).show()
                     }
                 }
             } else {
+                isOnline = false
                 Toast.makeText(this, getText(R.string.pure1v1_room_list_local_offline), Toast.LENGTH_SHORT).show()
             }
         }
@@ -156,18 +158,27 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     private fun fetchRoomList(isAutoRefresh: Boolean) {
         CallServiceManager.instance.sceneService?.getUserList { msg, list ->
             // 用户是否在线
-//            val living = list.any { it.userId == CallServiceManager.instance.localUser?.userId }
-//            if (!living) {
-//                CallServiceManager.instance.sceneService?.enterRoom { e ->
-//                    if (e != null) {
-//                        Pure1v1Logger.e(tag, "enter room failed: ${e.message}")
-//                        Toast.makeText(this, getText(R.string.pure1v1_room_list_local_offline), Toast.LENGTH_SHORT).show()
-//                    } else {
-//                        fetchRoomList(isAutoRefresh)
-//                    }
-//                }
-//                return@getUserList
-//            }
+            if (!isOnline) {
+                CallServiceManager.instance.setup(this) {
+                    if (it) {
+                        CallServiceManager.instance.sceneService?.enterRoom { e ->
+                            if (e == null) {
+                                isOnline = true
+                                fetchRoomList(false)
+                            } else {
+                                isOnline = false
+                                Pure1v1Logger.e(tag, null, "enter room failed: ${e.message}")
+                                Toast.makeText(this, getText(R.string.pure1v1_room_list_local_offline), Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    } else {
+                        isOnline = false
+                        Toast.makeText(this, getText(R.string.pure1v1_room_list_local_offline), Toast.LENGTH_SHORT).show()
+                    }
+                }
+                binding.smartRefreshLayout.finishRefresh()
+                return@getUserList
+            }
             if (!binding.flCallContainer.isVisible) {
                 if (msg != null) {
                     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()

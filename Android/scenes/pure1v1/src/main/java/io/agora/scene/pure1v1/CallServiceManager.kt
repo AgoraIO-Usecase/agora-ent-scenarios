@@ -87,66 +87,68 @@ class CallServiceManager {
 
     fun setup(context: Context, completion: (success: Boolean)-> Unit) {
         // 初始化 rtm manager
-        val rtmManager = CallRtmManager(BuildConfig.AGORA_APP_ID, UserManager.getInstance().user.id.toInt())
-        callRtmManager = rtmManager
-        rtmManager.addListener(object : ICallRtmManagerListener {
-            override fun onConnected() {
-                // RTM 已连接
+        if (callRtmManager == null) {
+            val rtmManager = CallRtmManager(BuildConfig.AGORA_APP_ID, UserManager.getInstance().user.id.toInt())
+            callRtmManager = rtmManager
+            rtmManager.addListener(object : ICallRtmManagerListener {
+                override fun onConnected() {
+                    // RTM 已连接
+                }
+
+                override fun onDisconnected() {
+                    // RTM 已断开
+                }
+
+                override fun onConnectionLost() {
+                    // RTM 连接已失去，需要做重连逻辑
+                }
+
+                override fun onTokenPrivilegeWillExpire(channelName: String) {
+                    // RTM Token 过期， 需要重新获取 token
+                }
+            })
+
+            mPrepareConfig = PrepareConfig()
+            mContext = context
+            // 获取用户信息
+            val user = UserInfo()
+            user.userId = UserManager.getInstance().user.id.toString()
+            user.userName = UserManager.getInstance().user.name
+            user.avatar = UserManager.getInstance().user.headUrl
+            localUser = user
+            // 创建 rtc引擎实例
+            val engine = createRtcEngine()
+            rtcEngine = engine
+            // 初始化mpk，用于播放来电秀视频
+            mMediaPlayer = engine.createMediaPlayer()
+            // 初始化mpk2，用于播放来电铃声
+            mMediaPlayer2 = engine.createMediaPlayer()
+            // 初始化场景service
+            sceneService = Pure1v1ServiceImp(context, rtmManager.getRtmClient(), user) {
+                onUserChanged?.invoke()
             }
 
-            override fun onDisconnected() {
-                // RTM 已断开
-            }
+            // 创建并初始化CallAPI
+            val callApi = CallApiImpl(context)
+            this.callApi = callApi
+            callApi.initialize(CallConfig(
+                BuildConfig.AGORA_APP_ID,
+                user.userId.toInt(),
+                engine,
+                createRtmSignalClient(rtmManager.getRtmClient())
+            ))
 
-            override fun onConnectionLost() {
-                // RTM 连接已失去，需要做重连逻辑
-            }
-
-            override fun onTokenPrivilegeWillExpire(channelName: String) {
-                // RTM Token 过期， 需要重新获取 token
-            }
-        })
-
-        mPrepareConfig = PrepareConfig()
-        mContext = context
-        // 获取用户信息
-        val user = UserInfo()
-        user.userId = UserManager.getInstance().user.id.toString()
-        user.userName = UserManager.getInstance().user.name
-        user.avatar = UserManager.getInstance().user.headUrl
-        localUser = user
-        // 创建 rtc引擎实例
-        val engine = createRtcEngine()
-        rtcEngine = engine
-        // 初始化mpk，用于播放来电秀视频
-        mMediaPlayer = engine.createMediaPlayer()
-        // 初始化mpk2，用于播放来电铃声
-        mMediaPlayer2 = engine.createMediaPlayer()
-        // 初始化场景service
-        sceneService = Pure1v1ServiceImp(context, rtmManager.getRtmClient(), user) {
-            onUserChanged?.invoke()
+            // 初始化音频场景化API
+            val scenarioApi = AudioScenarioApi(engine)
+            scenarioApi.initialize()
+            this.scenarioApi = scenarioApi
         }
-
-        // 创建并初始化CallAPI
-        val callApi = CallApiImpl(context)
-        this.callApi = callApi
-        callApi.initialize(CallConfig(
-            BuildConfig.AGORA_APP_ID,
-            user.userId.toInt(),
-            engine,
-            createRtmSignalClient(rtmManager.getRtmClient())
-        ))
-
-        // 初始化音频场景化API
-        val scenarioApi = AudioScenarioApi(engine)
-        scenarioApi.initialize()
-        this.scenarioApi = scenarioApi
 
         // 获取万能Token
         fetchToken { success ->
             // 外部创建需要自行管理login
             if (success) {
-                rtmManager.login(rtmToken) {
+                callRtmManager?.login(rtmToken) {
                     if (it == null) {
                         completion.invoke(true)
                     } else {

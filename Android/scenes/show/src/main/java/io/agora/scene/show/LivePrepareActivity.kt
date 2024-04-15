@@ -57,6 +57,9 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
 
+    // 设备打分， 通过设备打分接口确定视频最佳配置
+    private val deviceScore by lazy { RtcEngineInstance.rtcEngine.queryDeviceScore() }
+
     private var isFinishToLiveDetail = false
 
     // 美颜资源下载协程
@@ -107,9 +110,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         }
         binding.tvBeauty.setOnClickListener {
             showBeautyDialog()
-        }
-        binding.tvHD.setOnClickListener {
-            showPictureQualityDialog()
         }
         binding.tvSetting.setOnClickListener {
             if (AgoraApplication.the().isDebugModeOpen) {
@@ -167,11 +167,12 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         }.start()
     }
 
-    private fun showPresetDialog() = PresetDialog(this, mRtcEngine.queryDeviceScore(), RtcConnection(mRoomId, UserManager.getInstance().user.id.toInt())).show()
+    private fun showPresetDialog() = PresetDialog(this, deviceScore, RtcConnection(mRoomId, UserManager.getInstance().user.id.toInt())).show()
     private fun showDebugModeDialog() = DebugSettingDialog(this).show()
 
     override fun onResume() {
         super.onResume()
+        // 开启摄像头采集
         mRtcEngine.startPreview()
     }
 
@@ -191,37 +192,32 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     }
 
     private fun initRtcEngine() {
-        val cacheQualityResolution = PictureQualityDialog.getCacheQualityResolution()
+        // 开启摄像头前设置摄像头采集分辨率
+        var frameRate: Int
+        val index = if (deviceScore >= 90) { // 高端机
+            frameRate = 24
+            PictureQualityDialog.QUALITY_INDEX_1080P
+        } else if (deviceScore >= 75) { // 中端机
+            frameRate = 24
+            PictureQualityDialog.QUALITY_INDEX_720P
+        } else { // 低端机
+            frameRate = 15
+            PictureQualityDialog.QUALITY_INDEX_720P
+        }
+
+        val cacheQualityResolution = PictureQualityDialog.getCacheQualityResolution(index)
         mRtcEngine.setCameraCapturerConfiguration(
             CameraCapturerConfiguration(
                 CameraCapturerConfiguration.CaptureFormat(
                     cacheQualityResolution.width,
                     cacheQualityResolution.height,
-                    15
+                    frameRate
                 )
             )
         )
         // reset virtual background config
         RtcEngineInstance.virtualBackgroundSource.backgroundSourceType = 0
         RtcEngineInstance.rtcEngine.enableVirtualBackground(false, VirtualBackgroundSource(), SegmentationProperty())
-//        mRtcEngine.startPreview()
-    }
-
-    private fun showPictureQualityDialog() {
-        PictureQualityDialog(this).apply {
-            setOnQualitySelectListener { _, _, size ->
-                mRtcEngine.setCameraCapturerConfiguration(
-                    CameraCapturerConfiguration(
-                        CameraCapturerConfiguration.CaptureFormat(
-                            size.width,
-                            size.height,
-                            15
-                        )
-                    )
-                )
-            }
-            show()
-        }
     }
 
     private fun showBeautyDialog() {
@@ -236,6 +232,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         ToastUtils.showToast(R.string.show_live_prepare_room_clipboard_copyed)
     }
 
+    // 创建房间并开始直播
     private fun createAndStartLive(roomName: String) {
         if (TextUtils.isEmpty(roomName)) {
             ToastUtils.showToast(R.string.show_live_prepare_room_empty)
@@ -270,6 +267,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
         val beautyResource = AGResourceManager(this)
         var manifest: AGManifest? = null
+        beautyResource.checkResource(BuildConfig.BEAUTY_RESOURCE)
         resourceDownloadJob = GlobalScope.launch(Dispatchers.IO) {
             // 调用processFile处理文件
             beautyResource.downloadManifest(
@@ -297,13 +295,13 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                     binding.statusPrepareViewLrc.isVisible = true
                     binding.pbLoading.progress = 0
                     binding.tvContent.text =
-                        String.format(resources.getString(R.string.show_beauty_loading), resource.uri, "0%")
+                        String.format(resources.getString(R.string.show_beauty_loading), getBeautySDKName(resource.uri), "0%")
                 }
                 beautyResource.downloadAndUnZipResource(
                     resource = resource,
                     progressHandler = {
                         binding.pbLoading.progress = it
-                        binding.tvContent.text = String.format(resources.getString(R.string.show_beauty_loading), resource.uri, "$it%")
+                        binding.tvContent.text = String.format(resources.getString(R.string.show_beauty_loading), getBeautySDKName(resource.uri), "$it%")
                     },
                     completionHandler = { _, e ->
                         if (e == null) {
@@ -346,4 +344,12 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     private fun getRandomThumbnailId() =
         Random(TimeUtils.currentTimeMillis()).nextInt(0, 3).toString()
 
+    private fun getBeautySDKName(uri: String): String {
+        return when (uri) {
+            "beauty_sensetime" -> "商汤"
+            "beauty_faceunity" -> "相芯"
+            "beauty_bytedance" -> "火山引擎"
+            else -> ""
+        }
+    }
 }

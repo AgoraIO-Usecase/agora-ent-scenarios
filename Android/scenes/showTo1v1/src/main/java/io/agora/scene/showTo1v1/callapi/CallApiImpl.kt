@@ -124,6 +124,7 @@ class CallApiImpl constructor(
                     _updateAutoSubscribe(CallAutoSubscribeType.AudioVideo)
                 }
                 CallStateType.Connected -> {
+                    _updateAutoSubscribe(CallAutoSubscribeType.AudioVideo)
                     tempRemoteCanvasView.alpha = 1f
                     connectInfo.scheduledTimer(null)
                 }

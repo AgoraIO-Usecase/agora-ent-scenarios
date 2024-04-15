@@ -69,6 +69,11 @@ class DashboardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        mRtcEngine.addHandlerEx(object :IRtcEngineEventHandler() {
+
+        }, RtcConnection())
+
         mRtcEngine.addHandlerEx(mainRtcListener, mMainRtcConnection)
         if (callChannelId == null) {
             renewCallChannel(mRoomInfo.roomId)
