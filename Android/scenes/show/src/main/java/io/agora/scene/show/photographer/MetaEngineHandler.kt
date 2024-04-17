@@ -352,7 +352,7 @@ class MetaEngineHandler : AGExtensionHandler {
             AiPhotographerType.ITEM_ID_AI_LIGHTING_AD -> SpecialEffectType.SETypeAdvLight
             AiPhotographerType.ITEM_ID_AI_LIGHTING_3D -> SpecialEffectType.SEType3DLight
             AiPhotographerType.ITEM_ID_AI_AURORA -> SpecialEffectType.SETypeAurora
-            AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG -> SpecialEffectType.SETypeAurora
+            AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG -> SpecialEffectType.SEType3DLight
             else -> 0
         }
         if (effect3DId > 0) {
