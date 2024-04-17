@@ -457,5 +457,6 @@ class MetaEngineHandler : AGExtensionHandler {
     fun resetAiPhotographer() {
         stopAiRhythm()
         stopEffect3D()
+        mLastAiPhotographerId = AiPhotographerType.ITEM_ID_AI_PHOTOGRAPHER_NONE
     }
 }
