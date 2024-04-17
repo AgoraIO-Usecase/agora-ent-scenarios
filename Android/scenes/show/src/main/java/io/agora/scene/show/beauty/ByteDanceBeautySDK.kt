@@ -443,7 +443,7 @@ object ByteDanceBeautySDK {
                 field = value
                 runOnBeautyThread {
                     if (value != null) {
-                        renderManager.setSticker("$stickerPath/$value")
+                        renderManager.setSticker("$stickerPath/stickers_$value")
                     } else {
                         renderManager.setSticker(null)
                     }
