@@ -162,10 +162,10 @@ class MultiBeautyDialog : BottomSheetDialog {
                             value = RtcEngineInstance.virtualBackgroundSegmentation.greenCapacity,
                             isSelected = RtcEngineInstance.virtualBackgroundSource.backgroundSourceType == VirtualBackgroundSource.BACKGROUND_IMG,
                             onValueChanged = { value ->
-//                                if (RtcEngineInstance.mMetaEngineHandler.isAiPhotographerEnable) {
-//                                    ToastUtils.showToast(R.string.show_beauty_switch_virtual_background_tips)
-//                                    RtcEngineInstance.mMetaEngineHandler.resetAiPhotographer()
-//                                }
+                                if (RtcEngineInstance.mMetaEngineHandler.isAiPhotographerEnable) {
+                                    ToastUtils.showToast(R.string.show_beauty_switch_virtual_background_tips)
+                                    RtcEngineInstance.mMetaEngineHandler.resetAiPhotographer()
+                                }
                                 RtcEngineInstance.virtualBackgroundSource.backgroundSourceType =
                                     VirtualBackgroundSource.BACKGROUND_IMG
                                 RtcEngineInstance.virtualBackgroundSource.source =

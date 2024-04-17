@@ -2,7 +2,7 @@ ext { ktv_is_modular = false }
 apply from: 'vendors.gradle'
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_SHOW = "4.2.0"
+final def VERSION_SCENE_SHOW = "4.2.100"
 
 android {
     defaultConfig {
@@ -25,6 +25,7 @@ dependencies {
     implementation project(path: ":scenes:show:aars:beauty_sensetime:STMobileJNI")
     implementation project(path: ":scenes:show:aars:beauty_sensetime:HardwareBuffer")
     implementation project(path: ":scenes:show:aars:beauty_bytedance:EffectAAR")
+    implementation project(path: ":scenes:show:aars:metakit")
     implementation 'com.faceunity:core:8.7.0'
     implementation 'com.faceunity:model:8.7.0'
 

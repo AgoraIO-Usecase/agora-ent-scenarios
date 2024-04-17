@@ -103,28 +103,28 @@ class AGResourceManager(private val context: Context) {
         val destinationPath = getCachePath(context, "assets") ?: return
         try {
             val inputFile = File(destinationPath, resource.url.substringAfterLast("/"))
-            Log.d(tag, "downloadAndUnZipResource resource:$resource, inputFile:${inputFile.length()}")
+            Log.d(tag, "downloadAndUnZipResource resource:$resource, inputFile:${inputFile.length()} ${inputFile.path}")
             // 下载文件
-//            if (inputFile.length() != resource.size) {
-//                DownloadManager.instance.download(
-//                    url = resource.url,
-//                    destinationPath = destinationPath,
-//                    callback = object: DownloadManager.FileDownloadCallback {
-//                        override fun onProgress(file: File, progress: Int) {
-//                            // Log.d(tag, "downloading... $resource progress:$progress")
-//                            progressHandler.invoke(progress)
-//                        }
-//
-//                        override fun onSuccess(file: File) {
-//                            completionHandler(file, null)
-//                        }
-//
-//                        override fun onFailed(exception: Exception) {
-//                            completionHandler.invoke(null, exception)
-//                        }
-//                    }
-//                )
-//            }
+            if (!inputFile.exists()) {
+                DownloadManager.instance.download(
+                    url = resource.url,
+                    destinationPath = destinationPath,
+                    callback = object: DownloadManager.FileDownloadCallback {
+                        override fun onProgress(file: File, progress: Int) {
+                            // Log.d(tag, "downloading... $resource progress:$progress")
+                            progressHandler.invoke(progress)
+                        }
+
+                        override fun onSuccess(file: File) {
+                            completionHandler(file, null)
+                        }
+
+                        override fun onFailed(exception: Exception) {
+                            completionHandler.invoke(null, exception)
+                        }
+                    }
+                )
+            }
 
             // 解压文件
             if (!checkUnzipFolderExists(inputFile.path) /*&& inputFile.length() == resource.size*/) {
