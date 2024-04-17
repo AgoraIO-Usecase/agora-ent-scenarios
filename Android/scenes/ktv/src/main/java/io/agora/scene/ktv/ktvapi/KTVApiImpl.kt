@@ -22,7 +22,7 @@ class KTVApiImpl(
     companion object {
         private val scheduledThreadPool: ScheduledExecutorService = Executors.newScheduledThreadPool(5)
         const val tag = "KTV_API_LOG"
-        const val version = "1_android_4.3.0"
+        const val version = "4.3.0"
         const val lyricSyncVersion = 2
     }
 
@@ -30,7 +30,7 @@ class KTVApiImpl(
     private var mRtcEngine: RtcEngineEx = ktvApiConfig.engine as RtcEngineEx
     private lateinit var mMusicCenter: IAgoraMusicContentCenter
     private var mPlayer: IMediaPlayer
-    private val apiReporter: APIReporter = APIReporter(version, mRtcEngine)
+    private val apiReporter: APIReporter = APIReporter(APIType.KTV, version, mRtcEngine)
 
     private var innerDataStreamId: Int = 0
     private var subChorusConnection: RtcConnection? = null
