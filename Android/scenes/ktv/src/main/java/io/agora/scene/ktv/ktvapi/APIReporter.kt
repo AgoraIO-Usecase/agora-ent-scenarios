@@ -6,6 +6,17 @@ import io.agora.rtc2.RtcEngine
 import org.json.JSONObject
 import java.util.HashMap
 
+enum class APIType(val value: Int) {
+    KTV(1),             // K歌
+    CALL(2),            // 呼叫连麦
+    BEAUTY(3),          // 美颜
+    VIDEO_LOADER(4),    // 秒开秒切
+    PK(5),              // 团战
+    VIRTUAL_SPACE(6),   //
+    SCREEN_SPACE(7),    // 屏幕共享
+    AUDIO_SCENARIO(8)   // 音频
+}
+
 enum class ApiEventType(val value: Int) {
     API(0),
     COST(1),
@@ -27,12 +38,14 @@ object ApiCostEvent {
 }
 
 class APIReporter(
-    private val category: String,
+    private val type: APIType,
+    private val version: String,
     private val rtcEngine: RtcEngine
 ) {
     private val tag = "APIReporter"
     private val messageId = "agora:scenarioAPI"
     private val durationEventStartMap = HashMap<String, Long>()
+    private val category = "${type.value}_Android_$version"
 
     init {
         configParameters()
@@ -53,23 +66,24 @@ class APIReporter(
         durationEventStartMap[name] = getCurrentTs()
     }
 
-    fun endDurationEvent(name: String) {
+    fun endDurationEvent(name: String, ext: Map<String, Any>) {
         Log.d(tag, "endDurationEvent: $name")
         val beginTs = durationEventStartMap[name] ?: return
         durationEventStartMap.remove(name)
         val ts = getCurrentTs()
         val cost = (ts - beginTs).toInt()
 
-        innerReportCostEvent(ts, name, cost)
+        innerReportCostEvent(ts, name, cost, ext)
     }
 
     // 上报耗时打点信息
-    fun reportCostEvent(name: String, cost: Int) {
+    fun reportCostEvent(name: String, cost: Int, ext: Map<String, Any>) {
         durationEventStartMap.remove(name)
         innerReportCostEvent(
             ts = getCurrentTs(),
             name = name,
-            cost = cost
+            cost = cost,
+            ext = ext
         )
     }
 
@@ -105,11 +119,11 @@ class APIReporter(
         return System.currentTimeMillis()
     }
 
-    private fun innerReportCostEvent(ts: Long, name: String, cost: Int) {
-        Log.d(tag, "reportCostEvent: $name cost: $cost ms")
+    private fun innerReportCostEvent(ts: Long, name: String, cost: Int, ext: Map<String, Any>) {
+        Log.d(tag, "reportCostEvent: $name cost: $cost ms ext: $ext")
         writeLog("reportCostEvent: $name cost: $cost ms", Constants.LOG_LEVEL_INFO)
         val eventMap = mapOf(ApiEventKey.TYPE to ApiEventType.COST.value, ApiEventKey.DESC to name)
-        val labelMap = mapOf(ApiEventKey.TIMESTAMP to ts)
+        val labelMap = mapOf(ApiEventKey.TIMESTAMP to ts, ApiEventKey.EXT to ext)
         val event = convertToJSONString(eventMap) ?: ""
         val label = convertToJSONString(labelMap) ?: ""
         rtcEngine.sendCustomReportMessage(messageId, category, event, label, cost)

@@ -16,13 +16,13 @@ import org.json.JSONObject
 import java.util.concurrent.*
 
 class KTVGiantChorusApiImpl(
-    val giantChorusApiConfig: KTVGiantChorusApiConfig
+   val giantChorusApiConfig: KTVGiantChorusApiConfig
 ) : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver, IRtcEngineEventHandler() {
 
     companion object {
         private val scheduledThreadPool: ScheduledExecutorService = Executors.newScheduledThreadPool(5)
         private const val tag = "KTV_API_LOG_GIANT"
-        private const val version = "1_android_4.3.0"
+        private const val version = "4.3.0"
         private const val lyricSyncVersion = 2
     }
 
@@ -30,7 +30,7 @@ class KTVGiantChorusApiImpl(
     private var mRtcEngine: RtcEngineEx = giantChorusApiConfig.engine as RtcEngineEx
     private lateinit var mMusicCenter: IAgoraMusicContentCenter
     private var mPlayer: IMediaPlayer
-    private val apiReporter: APIReporter = APIReporter(version, mRtcEngine)
+    private val apiReporter: APIReporter = APIReporter(APIType.KTV, version, mRtcEngine)
 
     private var innerDataStreamId: Int = 0
     private var singChannelRtcConnection: RtcConnection? = null
@@ -192,12 +192,12 @@ class KTVGiantChorusApiImpl(
 
     // 日志输出
     private fun ktvApiLog(msg: String) {
-        apiReporter.writeLog("[${tag}] $msg", LOG_LEVEL_INFO)
+        apiReporter.writeLog("[$tag] $msg", LOG_LEVEL_INFO)
     }
 
     // 日志输出
     private fun ktvApiLogError(msg: String) {
-        apiReporter.writeLog("[${tag}] $msg", LOG_LEVEL_ERROR)
+        apiReporter.writeLog("[$tag] $msg", LOG_LEVEL_ERROR)
     }
 
     override fun renewInnerDataStreamId() {
