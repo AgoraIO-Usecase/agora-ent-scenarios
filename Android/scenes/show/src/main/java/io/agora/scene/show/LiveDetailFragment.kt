@@ -35,6 +35,7 @@ import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_IMAGE_MODERATION
 import io.agora.rtc2.video.ContentInspectConfig.ContentInspectModule
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
@@ -920,11 +921,16 @@ class LiveDetailFragment : Fragment() {
      */
     private fun showAiPhotographerDialog() {
         mAiPhotographerDialog.onItemSelectedListener = { mAiPhotographerDialog, itemId ->
-//            if (RtcEngineInstance.isVirtualBackgroundEnable) {
-//                ToastUtils.showToast(R.string.show_beauty_switch_ai_photographer_tips)
-//                RtcEngineInstance.resetVirtualBackground()
-//                RtcEngineInstance.mMetaEngineHandler.enableSegmentation()
-//            }
+            if (RtcEngineInstance.isVirtualBackgroundEnable && itemId != AiPhotographerType.ITEM_ID_AI_PHOTOGRAPHER_NONE) {
+                ToastUtils.showToast(R.string.show_beauty_switch_ai_photographer_tips)
+                RtcEngineInstance.virtualBackgroundSource.backgroundSourceType =
+                    VirtualBackgroundSource.BACKGROUND_COLOR
+                RtcEngineInstance.rtcEngine.enableVirtualBackground(
+                    false,
+                    RtcEngineInstance.virtualBackgroundSource,
+                    RtcEngineInstance.virtualBackgroundSegmentation
+                )
+            }
             when (itemId) {
                 AiPhotographerType.ITEM_ID_AI_PHOTOGRAPHER_NONE -> {
                     RtcEngineInstance.mMetaEngineHandler.stopAiRhythm()

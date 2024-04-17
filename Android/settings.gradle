@@ -63,6 +63,7 @@ include ':scenes:show:aars:beauty_sensetime:SenseArSourceManager'
 include ':scenes:show:aars:beauty_sensetime:STMobileJNI'
 include ':scenes:show:aars:beauty_sensetime:HardwareBuffer'
 include ':scenes:show:aars:beauty_bytedance:EffectAAR'
+include ':scenes:show:aars:metakit'
 
 /*
  * 1V1私密房

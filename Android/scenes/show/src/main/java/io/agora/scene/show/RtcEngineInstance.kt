@@ -12,6 +12,7 @@ import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.show.debugSettings.DebugSettingModel
+import io.agora.scene.show.photographer.AiPhotographerType
 import io.agora.scene.show.photographer.MetaEngineHandler
 import io.agora.videoloaderapi.VideoLoader
 import java.util.concurrent.Executors
@@ -28,6 +29,13 @@ object RtcEngineInstance {
     val videoCaptureConfiguration = CameraCapturerConfiguration(CameraCapturerConfiguration.CaptureFormat()).apply {
         followEncodeDimensionRatio = false
     }
+
+    // 是否选择了虚拟背景
+    val isVirtualBackgroundEnable: Boolean
+        get() {
+            return virtualBackgroundSource.backgroundSourceType == VirtualBackgroundSource.BACKGROUND_BLUR ||
+                    virtualBackgroundSource.backgroundSourceType == VirtualBackgroundSource.BACKGROUND_IMG
+        }
     val debugSettingModel = DebugSettingModel().apply { }
 
     private val workingExecutor = Executors.newSingleThreadExecutor()
@@ -107,9 +115,6 @@ object RtcEngineInstance {
             virtualBackgroundSegmentation
         )
     }
-
-    // 虚拟背景是否开启
-    var isVirtualBackgroundEnable: Boolean = false
 
     fun destroy() {
         VideoLoader.release()
