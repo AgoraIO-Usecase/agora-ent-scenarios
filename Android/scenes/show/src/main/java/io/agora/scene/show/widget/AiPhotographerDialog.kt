@@ -3,6 +3,7 @@ package io.agora.scene.show.widget
 import AGResource
 import AGResourceManager
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.annotation.DrawableRes
@@ -20,11 +21,15 @@ import io.agora.scene.widget.basic.BindingViewHolder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.internal.wait
 import java.io.File
 
 class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(context) {
+
+    private val TAG = "AiPhotographerDialog"
 
     private val URL_RESOURCE =
         "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/resource/manifest/manifestList"
@@ -124,14 +129,39 @@ class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(cont
                 dividerThickness = 24.dp.toInt()
                 dividerColor = ContextCompat.getColor(context, android.R.color.transparent)
             })
-            scope.launch(Dispatchers.Main) {
-                checkFileDownload()
-                resetAll(mAiPhotographerItemList)
+            checkFileDownload()
+            resetAll(mAiPhotographerItemList)
+        }
+    }
+
+    private fun updateLoading(itemId: Int) {
+        if (itemId == AiPhotographerType.ITEM_ID_AI_EDGE_LIGHT ||
+            itemId == AiPhotographerType.ITEM_ID_AI_LIGHTING_AD ||
+            itemId == AiPhotographerType.ITEM_ID_AI_LIGHTING_3D ||
+            itemId == AiPhotographerType.ITEM_ID_AI_AURORA
+        ) {
+            mAiPhotographerItemList.forEach { item ->
+                when (item.itemId) {
+                    AiPhotographerType.ITEM_ID_AI_EDGE_LIGHT,
+                    AiPhotographerType.ITEM_ID_AI_LIGHTING_AD,
+                    AiPhotographerType.ITEM_ID_AI_LIGHTING_3D,
+                    AiPhotographerType.ITEM_ID_AI_AURORA -> {
+                        item.status = DownloadStatus.Loading
+                    }
+                }
+            }
+        } else if (itemId == AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG) {
+            mAiPhotographerItemList.forEach { item ->
+                when (item.itemId) {
+                    AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG -> {
+                        item.status = DownloadStatus.Loading
+                    }
+                }
             }
         }
     }
 
-    private suspend fun checkFileDownload() = withContext(Dispatchers.IO) {
+    private fun checkFileDownload() {
         val vtBgFile = File(context.getExternalFilesDir("assets"), "pano.jpg")
         val vtBgDownloaded = vtBgFile.exists()
         val file = File(context.getExternalFilesDir("assets"), "DefaultPackage")
@@ -170,71 +200,56 @@ class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(cont
     private val manifestResourceList = mutableListOf<AGResource>()
 
     private fun gotoDownload(itemId: Int) {
-        scope.launch(Dispatchers.Main) {
-            downloadManifestList()
-            manifestResourceList.find { it.uri == "manifest/manifestAREffect" }?.let { agResource ->
-                mAiPhotographerItemList.forEach { item ->
-                    when (item.itemId) {
-                        AiPhotographerType.ITEM_ID_AI_EDGE_LIGHT,
-                        AiPhotographerType.ITEM_ID_AI_LIGHTING_AD,
-                        AiPhotographerType.ITEM_ID_AI_LIGHTING_3D,
-                        AiPhotographerType.ITEM_ID_AI_AURORA -> {
-                            item.status = DownloadStatus.Loading
-                        }
+        // 更新下载状态
+        updateLoading(itemId)
+        mAiPhotographerAdapter.resetAll(mAiPhotographerItemList)
+        scope.launch(Dispatchers.IO) {
+            // 下载资源目录 json
+            Log.d(TAG, "下载资源目录 start")
+            agResourceManager.downloadManifestList(URL_RESOURCE, null, {},
+                completionHandler = { agResourceList, err ->
+                    manifestResourceList.clear()
+                    agResourceList?.let {
+                        manifestResourceList.addAll(it)
                     }
-                }
-                mAiPhotographerAdapter.resetAll(mAiPhotographerItemList)
+                    Log.d(TAG, "下载资源目录 end")
+                })
+            // AI摄影师资源
+            manifestResourceList.find { it.uri == "manifest/manifestAREffect" }?.let { agResource ->
                 downloadManifestFile(agResource)
+            }
+            // 背景图片
+            if (itemId == AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG) {
+                manifestResourceList.find { it.uri == "manifest/manifestAREffectBgImage" }?.let { agResource ->
+                    downloadManifestFile(agResource)
+                }
+            }
+            withContext(Dispatchers.Main) {
                 checkFileDownload()
                 mAiPhotographerAdapter.resetAll(mAiPhotographerItemList)
             }
-            if (itemId == AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG) {
-                manifestResourceList.find { it.uri == "manifest/manifestAREffectBgImage" }?.let { agResource ->
-                    mAiPhotographerItemList.forEach { item ->
-                        when (item.itemId) {
-                            AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG -> {
-                                item.status = DownloadStatus.Loading
-                            }
-                        }
-                    }
-                    mAiPhotographerAdapter.resetAll(mAiPhotographerItemList)
-                    downloadManifestFile(agResource)
-                    checkFileDownload()
-                    mAiPhotographerAdapter.resetAll(mAiPhotographerItemList)
-                }
-            }
         }
-    }
-
-    // 下载资源目录 json
-    private suspend fun downloadManifestList() = withContext(Dispatchers.IO) {
-        agResourceManager.downloadManifestList(URL_RESOURCE, null, progressHandler = {
-            // nothing
-        },
-            completionHandler = { agResourceList, err ->
-                manifestResourceList.clear()
-                agResourceList?.let {
-                    manifestResourceList.addAll(it)
-                }
-            })
     }
 
     private val tempUrl = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/ai/AREffect.zip"
 
     // 下载 AI摄影师资源/虚拟背景图片 json
-    private suspend fun downloadManifestFile(agResource: AGResource) = withContext(Dispatchers.IO) {
+    private suspend fun downloadManifestFile(agResource: AGResource) {
+        Log.d(TAG, "下载 ${agResource.uri} 资源 start")
         var agResourceFirst: AGResource? = null
-        agResourceManager.downloadManifest(agResource.url, progressHandler = {},
+        agResourceManager.downloadManifest(agResource.url, {},
             completionHandler = { aGManifest, err ->
+                Log.d(TAG, "下载 ${agResource.uri} 资源 end")
                 agResourceFirst = aGManifest?.files?.get(0) ?: return@downloadManifest
             })
-        val resource = agResourceFirst ?: return@withContext
+        val resource = agResourceFirst ?: return
         if (resource.uri == "DefaultPackage") {
             resource.url = tempUrl
         }
-        agResourceManager.downloadAndUnZipResource(resource, progressHandler = {},
+        Log.d(TAG, "下载 ${resource.uri} 资源并解压 start")
+        agResourceManager.downloadAndUnZipResource(resource, {},
             completionHandler = { file, exception ->
-
+                Log.d(TAG, "下载 ${resource.uri} 资源并解压 end isSuccess:${file != null && exception == null}")
             })
     }
 }
