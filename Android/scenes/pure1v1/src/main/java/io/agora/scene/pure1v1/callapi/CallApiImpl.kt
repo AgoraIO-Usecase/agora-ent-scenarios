@@ -1257,15 +1257,14 @@ class CallApiImpl constructor(
                 listener.callDebugInfo(message, logLevel)
             }
         }
-        config?.rtcEngine?.writeLog(Constants.LOG_LEVEL_INFO, message)
+        config?.rtcEngine?.writeLog(Constants.LOG_LEVEL_INFO, "[CallAPI]$message")
     }
 
     private fun callWarningPrint(message: String) {
         delegates.forEach { listener ->
             listener.callDebugInfo(message, CallLogLevel.Warning)
         }
-//        callPrint("[Warning]$message")
-        config?.rtcEngine?.writeLog(Constants.LOG_LEVEL_WARNING, message)
+        config?.rtcEngine?.writeLog(Constants.LOG_LEVEL_WARNING, "[CallAPI]$message")
     }
 
     private val mHandler = Handler(Looper.getMainLooper())

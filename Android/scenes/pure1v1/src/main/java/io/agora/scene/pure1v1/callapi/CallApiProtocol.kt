@@ -66,7 +66,7 @@ enum class CallStateReason(val value: Int) {
     CancelByCallerRecall(15),   // 同样的主叫呼叫不同频道导致取消
     RtmLost(16),                // rtm超时断连
     RemoteCallBusy(17),         // 远端用户忙
-    RemoteCallingTimeout(18)    //远端呼叫超时
+    RemoteCallingTimeout(18)    // 远端呼叫超时
 }
 
 /*
