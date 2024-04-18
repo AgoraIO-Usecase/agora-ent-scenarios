@@ -31,6 +31,8 @@ object FaceUnityBeautySDK {
 
     private var beautyAPI: FaceUnityBeautyAPI? = null
 
+    private var authSuccess = false
+
     fun initBeauty(context: Context): Boolean {
         val auth = try {
             getAuth()
@@ -52,7 +54,8 @@ object FaceUnityBeautySDK {
                         BUNDLE_AI_HUMAN,
                         FUAITypeEnum.FUAITYPE_HUMAN_PROCESSOR
                     )
-
+                    authSuccess = true
+                    beautyConfig.resume()
                 }
             }
 
@@ -60,7 +63,6 @@ object FaceUnityBeautySDK {
                 Log.e(TAG, "FURenderManager onFail -- code=$errCode, msg=$errMsg")
             }
         })
-        beautyConfig.resume()
         return true
     }
 
@@ -80,6 +82,7 @@ object FaceUnityBeautySDK {
 
     internal fun setBeautyAPI(beautyAPI: FaceUnityBeautyAPI) {
         FaceUnityBeautySDK.beautyAPI = beautyAPI
+        beautyConfig.resume()
     }
 
     private fun runOnBeautyThread(run: () -> Unit) {
@@ -89,13 +92,16 @@ object FaceUnityBeautySDK {
 
     class BeautyConfig {
 
-        private val fuRenderKit = FURenderKit.getInstance()
+        private val fuRenderKit: FURenderKit
+            get() {
+                return FURenderKit.getInstance()
+            }
 
         // 美颜配置
         private val faceBeauty : FaceBeauty
             get() {
                 val beauty = fuRenderKit.faceBeauty ?: FaceBeauty(FUBundleData("graphics" + File.separator + "face_beautification.bundle"))
-                if(fuRenderKit.faceBeauty == null){
+                if(fuRenderKit.faceBeauty == null && authSuccess){
                     fuRenderKit.faceBeauty = beauty
                 }
                 return beauty
@@ -315,9 +321,25 @@ object FaceUnityBeautySDK {
         }
 
         internal fun resume() {
-            runOnBeautyThread {
-                fuRenderKit.faceBeauty = faceBeauty
-            }
+            smooth = smooth
+            whiten = whiten
+            thinFace = thinFace
+            enlargeEye = enlargeEye
+            redden = redden
+            shrinkCheekbone = shrinkCheekbone
+            shrinkJawbone = shrinkJawbone
+            whiteTeeth = whiteTeeth
+            hairlineHeight = hairlineHeight
+            narrowNose = narrowNose
+            mouthSize = mouthSize
+            chinLength = chinLength
+            brightEye = brightEye
+            darkCircles = darkCircles
+            nasolabialFolds = nasolabialFolds
+            faceThree = faceThree
+
+            makeUp = makeUp
+            sticker = sticker
         }
     }
 

@@ -372,6 +372,7 @@ object BeautyManager {
                 return false
             }
             val frame = videoFrame ?: return false
+            val oIsFront = isFront
             isFront = frame.sourceType == VideoFrame.SourceType.kFrontCamera
 
             when (beautyType) {
@@ -396,7 +397,7 @@ object BeautyManager {
                     }
                 }
 
-                BeautyType.Agora -> return true
+                BeautyType.Agora -> return oIsFront == isFront
             }
         }
 
@@ -421,7 +422,7 @@ object BeautyManager {
                 BeautyType.SenseTime -> senseTimeBeautyAPI?.getMirrorApplied() ?: false
                 BeautyType.FaceUnity -> faceUnityBeautyAPI?.getMirrorApplied() ?: false
                 BeautyType.ByteDance -> byteDanceBeautyAPI?.getMirrorApplied() ?: false
-                BeautyType.Agora -> false
+                BeautyType.Agora -> isFront
             }
         }
 

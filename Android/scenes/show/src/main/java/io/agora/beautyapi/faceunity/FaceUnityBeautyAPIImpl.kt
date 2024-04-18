@@ -442,7 +442,7 @@ class FaceUnityBeautyAPIImpl : FaceUnityBeautyAPI, IVideoFrameObserver {
         if (wrapTextureBufferHelper == null) {
             wrapTextureBufferHelper = TextureBufferHelper.create(
                 "FURenderWrap",
-                textureBufferHelper?.eglBase?.eglBaseContext
+                shareContext
             )
             LogUtils.i(TAG, "processBeauty >> create texture buffer wrap, beautyMode=$beautyMode")
         }

@@ -138,6 +138,7 @@ object ByteDanceBeautySDK {
 
     internal fun setBeautyAPI(beautyAPI: ByteDanceBeautyAPI?) {
         ByteDanceBeautySDK.beautyAPI = beautyAPI
+        beautyConfig.resume()
     }
 
     private fun runOnBeautyThread(run: () -> Unit) {
