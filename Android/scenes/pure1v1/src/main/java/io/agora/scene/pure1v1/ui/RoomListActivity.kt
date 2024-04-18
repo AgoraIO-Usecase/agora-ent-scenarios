@@ -225,10 +225,10 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             CallServiceManager.instance.prepareForCall {
                 // 拨打
                 CallServiceManager.instance.callApi?.call(user.userId.toInt()) { error ->
-                    if (error != null) {
-                        finishCallDialog()
-                        CallServiceManager.instance.stopCallShow()
-                        CallServiceManager.instance.stopCallMusic()
+                    if (error != null && callState == CallStateType.Calling) {
+                        Toast.makeText(this, getString(R.string.pure1v1_call_failed, error.msg), Toast.LENGTH_SHORT).show()
+                        // call 失败立刻挂断
+                        CallServiceManager.instance.callApi?.cancelCall {  }
                     }
                 }
             }
@@ -328,7 +328,13 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                             Pure1v1Logger.d(tag, "local pic debug log 1")
                             if (CallServiceManager.instance.rtcToken != "") {
                                 Pure1v1Logger.d(tag, "local pic debug log 2")
-                                CallServiceManager.instance.callApi?.accept(fromUserId) {}
+                                CallServiceManager.instance.callApi?.accept(fromUserId) {
+                                    if (it != null) {
+                                        Toast.makeText(this@RoomListActivity, getString(R.string.pure1v1_accept_failed, it.msg), Toast.LENGTH_SHORT).show()
+                                        // 如果接受消息出错，则发起拒绝，回到初始状态
+                                        CallServiceManager.instance.callApi?.reject(fromUserId, it.msg) {}
+                                    }
+                                }
                             }
                         }
                         override fun onReceiveViewDidClickReject() {
