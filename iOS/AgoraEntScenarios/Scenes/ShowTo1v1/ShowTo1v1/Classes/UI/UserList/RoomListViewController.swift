@@ -400,6 +400,9 @@ extension RoomListViewController {
             guard let err = err else {return}
             self?.callApi.cancelCall(completion: { err in
             })
+            
+            let msg = "\("call_toast_callfail".showTo1v1Localization()): \(err.localizedDescription)"
+            AUIToast.show(text: msg)
         }
         
         callVC.roomInfo = room
@@ -572,7 +575,12 @@ extension RoomListViewController: CallApiListenerProtocol {
                 }
                 connectedUserId = fromUserId
                 
-                callApi.accept(remoteUserId: fromUserId, completion: { err in
+                callApi.accept(remoteUserId: fromUserId, completion: {[weak self] err in
+                    guard let err = err else {return}
+                    self?.callApi.reject(remoteUserId: fromUserId, reason: "", completion: { _ in
+                    })
+                    let msg = "\("call_toast_acceptfail".showTo1v1Localization()): \(err.localizedDescription)"
+                    AUIToast.show(text: msg)
                 })
                 
                 //被叫不一定在userList能查到，需要从callapi里读取发送用户的user extension

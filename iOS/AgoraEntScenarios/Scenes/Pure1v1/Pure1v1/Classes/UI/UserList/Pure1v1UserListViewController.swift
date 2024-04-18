@@ -309,6 +309,9 @@ extension Pure1v1UserListViewController {
             guard let err = err else {return}
             self?.callApi.cancelCall(completion: { err in
             })
+            
+            let msg = "\("call_toast_callfail".pure1v1Localization()): \(err.localizedDescription)"
+            AUIToast.show(text: msg)
         }
     }
     
@@ -430,7 +433,12 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                         guard let self = self else {return}
                         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
                         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
-                        self.callApi.accept(remoteUserId: fromUserId) { err in
+                        self.callApi.accept(remoteUserId: fromUserId) {[weak self] err in
+                            guard let err = err else { return }
+                            self?.callApi.reject(remoteUserId: fromUserId, reason: "", completion: { _ in
+                            })
+                            let msg = "\("call_toast_acceptfail".pure1v1Localization()): \(err.localizedDescription)"
+                            AUIToast.show(text: msg)
                         }
                     }
                     

@@ -237,7 +237,13 @@ class BroadcasterViewController: BaseRoomViewController {
         if actionType == .call {
             AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
             AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
-            callApi?.call(remoteUserId: roomInfo!.getUIntUserId(), completion: { err in
+            callApi?.call(remoteUserId: roomInfo!.getUIntUserId(), completion: {[weak self] err in
+                guard let err = err else { return }
+                self?.callApi?.cancelCall(completion: { _ in
+                })
+                
+                let msg = "\("call_toast_callfail".showTo1v1Localization()): \(err.localizedDescription)"
+                AUIToast.show(text: msg)
             })
             return
         }

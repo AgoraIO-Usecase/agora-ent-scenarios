@@ -27,6 +27,8 @@
 "call_usage_tips"=" 本产品仅用于功能体验，单次直播时长不超过20mins";
 "call_toast_hangup"="对方结束连线";
 "call_toast_reject"="对方已拒绝";
+"call_toast_callfail"="呼叫失败";
+"call_toast_acceptfail"="接受邀请失败";
 
 "call_toast_disconnect"="连接中断，重连中...";
 
