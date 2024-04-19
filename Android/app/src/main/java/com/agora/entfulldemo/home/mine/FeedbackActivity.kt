@@ -71,8 +71,8 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         private const val rtcSdkPrefix = "agorasdk"
         private const val rtcApiPrefix = "agoraapi"
         private const val rtmSdkPrefix = "agorartmsdk"
-        private const val commonBasePrefix = "CommonBase"
-        private const val commonUIPrefix = "CommonUI"
+        private const val commonBaseMiddle = "commonbase"
+        private const val commonUIMiddle = "commonui"
     }
 
     private val mFeedbackViewModel: FeedbackViewModel by lazy {
@@ -263,8 +263,8 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         val paths = mutableListOf<String>()
         File(logFolder + File.separator + "ent").listFiles()?.forEach { file ->
             if (file.isFile) {
-                if (!file.name.startsWith(commonBasePrefix) &&
-                    !file.name.startsWith(commonUIPrefix)
+                if (!file.name.contains(commonBaseMiddle) &&
+                    !file.name.contains(commonUIMiddle)
                 ) {
                     paths.add(file.path)
                 }
