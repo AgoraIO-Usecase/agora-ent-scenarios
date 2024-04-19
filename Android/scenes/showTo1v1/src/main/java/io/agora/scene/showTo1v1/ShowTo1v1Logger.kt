@@ -15,8 +15,17 @@ object ShowTo1v1Logger {
     }
 
     @JvmStatic
+    fun w(tag: String, message: String, vararg args: Any) {
+        entLogger.w(tag, message, args)
+    }
+
+    @JvmStatic
     fun e(tag: String, throwable: Throwable? = null, message: String = "") {
-        entLogger.e(tag, message)
+        if (throwable != null) {
+            entLogger.e(tag, throwable, message)
+        } else {
+            entLogger.e(tag, message)
+        }
     }
 
 }
