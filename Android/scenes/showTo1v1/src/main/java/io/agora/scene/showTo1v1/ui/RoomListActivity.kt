@@ -23,6 +23,8 @@ import io.agora.scene.showTo1v1.CallRole
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
+import io.agora.scene.showTo1v1.audio.AudioScenarioType
+import io.agora.scene.showTo1v1.audio.SceneType
 import io.agora.scene.showTo1v1.callapi.*
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListActivityBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
@@ -419,9 +421,10 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     // 触发状态的用户是自己才处理
                     if (mShowTo1v1Manger.mCurrentUser.userId == toUserId.toString()) {
                         // 收到大哥拨打电话
-                        // nothing
+                        mShowTo1v1Manger.isCaller = false
                     } else if (mShowTo1v1Manger.mCurrentUser.userId == fromUserId.toString()) {
                         // 大哥拨打电话
+                        mShowTo1v1Manger.isCaller = true
                         mShowTo1v1Manger.mConnectedChannelId = fromRoomId
                         val remoteUser = mRoomInfoList.firstOrNull {
                             it.userId == toUserId.toString()
@@ -454,6 +457,15 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     mRoomInfo?.let { roomInfo ->
                         mShowTo1v1Manger.mCallApi.removeListener(this)
                         RoomDetailActivity.launch(this@RoomListActivity, true, roomInfo)
+                    }
+
+                    // 设置音频最佳实践
+                    if (mShowTo1v1Manger.isCaller) {
+                        // 主叫
+                        mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Caller)
+                    } else {
+                        // 被叫
+                        mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
                     }
                 }
 

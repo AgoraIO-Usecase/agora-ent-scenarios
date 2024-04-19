@@ -10,7 +10,7 @@ open class CallConfig(
     //用户id，通过该用户id来发送信令消息
     var userId: Int = 0,
     //rtc engine实例
-    var rtcEngine: RtcEngineEx? = null,
+    var rtcEngine: RtcEngineEx,
     //ISignalClient实例
     var signalClient: ISignalClient
 ){}
@@ -21,10 +21,17 @@ open class PrepareConfig(
     var rtmToken: String = "",                    // rtm token
     var localView: ViewGroup? = null,             // 显示本地流的画布
     var remoteView: ViewGroup? = null,            // 显示远端流的画布
-    var autoJoinRTC: Boolean = false,             // 是否自动登录RTC
     var callTimeoutMillisecond: Long = 15000L,    // 呼叫超时时间，单位毫秒，如果传0内部将不做超时逻辑
     var userExtension: Map<String, Any>? = null   // [可选]用户扩展字段，收到对端消息而改变状态(例如calling/connecting)时可以通过kFromUserExtension字段获取
 ) {}
+
+/**
+ * 呼叫状态类型
+ */
+enum class CallType(val value: Int) {
+    Video(0),
+    Audio(1)
+}
 
 /**
  * 呼叫状态类型
@@ -59,14 +66,18 @@ enum class CallStateReason(val value: Int) {
     LocalAccepted(8),           // 本地用户接受
     LocalHangup(9),             // 本地用户挂断
     RemoteHangup(10),           // 远端用户挂断
-    LocalCancel(11),            // 本地用户取消呼叫
-    RemoteCancel(12),           // 远端用户取消呼叫
-    RecvRemoteFirstFrame(13),   // 收到远端首帧
+    LocalCancelled(11),            // 本地用户取消呼叫
+    RemoteCancelled(12),           // 远端用户取消呼叫
+    RecvRemoteFirstFrame(13),   // 收到远端首帧(视频呼叫为视频帧首帧，音频呼叫为音频帧首帧)
     CallingTimeout (14),        // 呼叫超时
     CancelByCallerRecall(15),   // 同样的主叫呼叫不同频道导致取消
     RtmLost(16),                // rtm超时断连
     RemoteCallBusy(17),         // 远端用户忙
-    RemoteCallingTimeout(18)    // 远端呼叫超时
+    RemoteCallingTimeout(18),   // 远端呼叫超时
+    LocalVideoCall(30),         // 本地发起视频呼叫
+    LocalAudioCall(31),         // 本地发起音频呼叫
+    RemoteVideoCall(32),        // 远端发起视频呼叫
+    RemoteAudioCall(33),        // 远端发起音频呼叫
 }
 
 /*
@@ -83,21 +94,21 @@ enum class CallEvent(val value: Int) {
     RtmSetupSuccessed(7),           // 设置RTM成功
     //MessageFailed(8),                   // 消息发送失败[已废弃，请使用onCallErrorOccur(state: sendMessageFail)]
     StateMismatch(9),               // 状态流转异常
-    //PreparedRoomIdChanged(10),      // prepared了另一个roomId导致[已废弃]
+    JoinRTCStart(10),               // 本地已经加入Rtc频道，但是还未成功(调用了JoinChannelEx)
     RemoteUserRecvCall(99),         // 主叫呼叫成功
     LocalRejected(100),             // 本地用户拒绝
     RemoteRejected(101),            // 远端用户拒绝
-    OnCalling(102),                 // 变成呼叫中
+    OnCalling(102),                 // 变成呼叫中[2.1.0废弃，请参考localVideoCall/localAudioCall/remoteVideoCall/remoteAudioCall]
     RemoteAccepted(103),            // 远端用户接收
     LocalAccepted(104),             // 本地用户接收
     LocalHangup(105),               // 本地用户挂断
     RemoteHangup(106),              // 远端用户挂断
-    RemoteJoin(107),                // 远端用户加入RTC频道
-    RemoteLeave(108),               // 远端用户离开RTC频道, RTC频道(eventReason请参考AgoraUserOfflineReason)
-    LocalCancel(109),               // 本地用户取消呼叫
-    RemoteCancel(110),              // 远端用户取消呼叫
-    LocalJoin(111),                 // 本地用户加入RTC频道
-    LocalLeave(112),                // 本地用户离开RTC频道
+    RemoteJoined(107),                // 远端用户加入RTC频道
+    RemoteLeft(108),               // 远端用户离开RTC频道, RTC频道(eventReason请参考AgoraUserOfflineReason)
+    LocalCancelled(109),               // 本地用户取消呼叫
+    RemoteCancelled(110),              // 远端用户取消呼叫
+    LocalJoined(111),                 // 本地用户加入RTC频道
+    LocalLeft(112),                // 本地用户离开RTC频道
     RecvRemoteFirstFrame(113),      // 收到远端首帧
     //CancelByCallerRecall(114),      // 同样的主叫呼叫不同频道导致取消[已废弃]
     RtmLost(115),                   // rtm超时断连
@@ -105,7 +116,12 @@ enum class CallEvent(val value: Int) {
     RemoteCallBusy(117),            // 远端用户忙
     //StartCaptureFail(118),          // 开启采集失败[已废弃，请使用onCallErrorOccur(state: startCaptureFail)]
     CaptureFirstLocalVideoFrame(119),       //采集到首帧视频帧
-    PublishFirstLocalVideoFrame(120)        //推送首帧视频帧成功
+    PublishFirstLocalVideoFrame(120),       //推送首帧视频帧成功
+    PublishFirstLocalAudioFrame(130),        //推送首帧音频帧成功[2.1.0开始支持]
+    LocalVideoCall(140),         // 本地发起视频呼叫
+    LocalAudioCall(141),         // 本地发起音频呼叫
+    RemoteVideoCall(142),        // 远端发起视频呼叫
+    RemoteAudioCall(142),        // 远端发起音频呼叫
 }
 
 /*
@@ -165,9 +181,9 @@ interface ICallApiListener {
      * @param message: 错误信息
      */
     fun onCallError(errorEvent: CallErrorEvent,
-                    errorType: CallErrorCodeType,
-                    errorCode: Int,
-                    message: String?) {}
+                         errorType: CallErrorCodeType,
+                         errorCode: Int,
+                         message: String?) {}
 
     /**
      * 通话开始的回调
@@ -177,9 +193,9 @@ interface ICallApiListener {
      * @param timestamp: 通话开始的时间戳，和19700101的差值，单位ms
      */
     fun onCallConnected(roomId: String,
-                        callUserId: Int,
-                        currentUserId: Int,
-                        timestamp: Long) {}
+                    callUserId: Int,
+                    currentUserId: Int,
+                    timestamp: Long) {}
 
     /**
      * 通话结束的回调
@@ -190,10 +206,10 @@ interface ICallApiListener {
      * @param duration: 通话时长，单位ms
      */
     fun onCallDisconnected(roomId: String,
-                           hangupUserId: Int,
-                           currentUserId: Int,
-                           timestamp: Long,
-                           duration: Long) {}
+                        hangupUserId: Int,
+                        currentUserId: Int,
+                        timestamp: Long,
+                        duration: Long) {}
 
     /**
      * 当呼叫时判断是否可以加入Rtc
@@ -257,11 +273,20 @@ interface ICallApi {
     fun removeListener(listener: ICallApiListener)
 
     /**
-     * 发起通话，主叫调用，通过prepareForCall设置的RTC频道号和远端用户建立RTC通话连接
+     * 发起呼叫邀请，主叫调用，通过prepareForCall设置的RTC频道号和远端用户建立RTC通话连接，默认视频呼叫
      * @param remoteUserId 呼叫的用户id
      * @param completion
      */
     fun call(remoteUserId: Int, completion: ((AGError?) -> Unit)?)
+
+    /**
+     * 发起呼叫邀请，主叫调用，通过prepareForCall设置的RTC频道号和远端用户建立RTC通话连接，默认视频呼叫
+     * @param remoteUserId 呼叫的用户id
+     * @param callType 呼叫类型： 0: 视频呼叫， 1: 音频呼叫
+     * @param callExtension 呼叫需要扩展的字段，收到对端消息而改变状态(例如calling/connecting)时可以通过kFromUserExtension字段获取
+     * @param completion
+     */
+    fun call(remoteUserId: Int, callType: CallType, callExtension: Map<String, Any>, completion: ((AGError?) -> Unit)?)
 
     /**
      * 取消正在发起的通话，主叫调用

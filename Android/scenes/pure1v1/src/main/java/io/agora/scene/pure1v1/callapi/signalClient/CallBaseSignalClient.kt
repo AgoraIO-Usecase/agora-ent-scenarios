@@ -1,6 +1,5 @@
 package io.agora.scene.pure1v1.callapi.signalClient
 
-
 open class CallBaseSignalClient {
     val listeners = mutableListOf<ISignalClientListener>()
 

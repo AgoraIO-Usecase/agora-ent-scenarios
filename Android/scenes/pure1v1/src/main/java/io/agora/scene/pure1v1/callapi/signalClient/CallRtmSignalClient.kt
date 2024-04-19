@@ -48,7 +48,6 @@ class CallRtmSignalClient(
         runOnUiThread {
             val message = event?.message?.data as? ByteArray ?: return@runOnUiThread
             val jsonString = String(message, Charsets.UTF_8)
-            callMessagePrint("onMessageEvent: $jsonString")
             listeners.forEach {
                 it.onMessageReceive(jsonString)
             }

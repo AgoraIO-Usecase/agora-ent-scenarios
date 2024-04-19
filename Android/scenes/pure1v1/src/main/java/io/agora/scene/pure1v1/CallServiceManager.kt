@@ -19,15 +19,11 @@ import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.pure1v1.audio.AudioScenarioApi
+import io.agora.scene.pure1v1.callapi.signalClient.CallRtmManager
+import io.agora.scene.pure1v1.callapi.signalClient.ICallRtmManagerListener
 import io.agora.scene.pure1v1.callapi.signalClient.createRtmSignalClient
 import io.agora.scene.pure1v1.service.Pure1v1ServiceImp
 import io.agora.scene.pure1v1.service.UserInfo
-import io.agora.scene.pure1v1.signalClient.CallRtmManager
-import io.agora.scene.pure1v1.signalClient.ICallRtmManagerListener
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /*
  * 业务逻辑管理模块
@@ -58,6 +54,8 @@ class CallServiceManager {
     var localUser: UserInfo? = null
 
     var remoteUser: UserInfo? = null
+
+    var isCaller: Boolean = false
 
     var connectedChannelId: String? = null
 
@@ -195,7 +193,7 @@ class CallServiceManager {
         callApi?.initialize(CallConfig(
             BuildConfig.AGORA_APP_ID,
             uid.toInt(),
-            rtcEngine,
+            rtcEngine!!,
             createRtmSignalClient(manager.getRtmClient())
         ))
     }
@@ -244,7 +242,6 @@ class CallServiceManager {
                 prepareConfig.rtmToken = rtmToken
                 prepareConfig.localView = localView
                 prepareConfig.remoteView = remoteView
-                prepareConfig.autoJoinRTC = false
                 prepareConfig.userExtension = user.toMap()
                 api.prepareForCall(prepareConfig) {
                     if (it == null) {
@@ -258,7 +255,6 @@ class CallServiceManager {
             prepareConfig.rtmToken = rtmToken
             prepareConfig.localView = localView
             prepareConfig.remoteView = remoteView
-            prepareConfig.autoJoinRTC = false
             prepareConfig.userExtension = user.toMap()
             api.prepareForCall(prepareConfig) {
                 if (it == null) {
