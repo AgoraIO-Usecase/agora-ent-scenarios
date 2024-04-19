@@ -68,20 +68,15 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
                 start()
             }
         }
+        private const val rtcSdkPrefix = "agorasdk"
+        private const val rtcApiPrefix = "agoraapi"
+        private const val rtmSdkPrefix = "agorartmsdk"
+        private const val commonBasePrefix = "CommonBase"
+        private const val commonUIPrefix = "CommonUI"
     }
 
     private val mFeedbackViewModel: FeedbackViewModel by lazy {
         ViewModelProvider(this)[FeedbackViewModel::class.java]
-    }
-
-    private val mLogPaths: List<String> by lazy {
-        mutableListOf(
-            logFolder + File.separator + "agorasdk.log",
-            logFolder + File.separator + "agorasdk.1.log",
-            logFolder + File.separator + "agorasdk.2.log",
-            logFolder + File.separator + "agorasdk.3.log",
-            logFolder + File.separator + "agorasdk.4.log",
-        )
     }
 
     private val mFeedbackReasons: MutableList<FeedbackModel> by lazy {
@@ -220,11 +215,18 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         if (uploadLog) {
             val sdkLogZipPath = logFolder + File.separator + "agoraSdkLog.zip"
 
-            ZipUtils.compressFiles(mLogPaths, sdkLogZipPath, object : ZipCallback {
+            val sdkPaths = getAgoraSDKPaths()
+            val scenePaths = getScenePaths()
+            val logPaths = mutableListOf<String>().apply {
+                addAll(sdkPaths)
+                addAll(scenePaths)
+            }
+            ZipUtils.compressFiles(logPaths, sdkLogZipPath, object : ZipCallback {
                 override fun onFileZipped(destinationFilePath: String) {
                     mFeedbackViewModel.requestUploadLog(File(destinationFilePath), completion = { error, url ->
                         if (error == null) { // success
                             mUploadLogUrl = url
+                            Log.d("zhangw","upload log success: $mUploadLogUrl")
                         } else {
                             Log.e("zhangw", "upload log failed:${error.message}")
                         }
@@ -240,6 +242,35 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         } else {
             requestFeedbackApi()
         }
+    }
+
+    private fun getAgoraSDKPaths(): List<String> {
+        val paths = mutableListOf<String>()
+        File(logFolder).listFiles()?.forEach { file ->
+            if (file.isFile) {
+                if (file.name.startsWith(rtcSdkPrefix) ||
+                    file.name.startsWith(rtcApiPrefix) ||
+                    file.name.startsWith(rtmSdkPrefix)
+                ) {
+                    paths.add(file.path)
+                }
+            }
+        }
+        return paths
+    }
+
+    private fun getScenePaths(): List<String> {
+        val paths = mutableListOf<String>()
+        File(logFolder + File.separator + "ent").listFiles()?.forEach { file ->
+            if (file.isFile) {
+                if (!file.name.startsWith(commonBasePrefix) &&
+                    !file.name.startsWith(commonUIPrefix)
+                ) {
+                    paths.add(file.path)
+                }
+            }
+        }
+        return paths
     }
 
     // 3. request feedback api
