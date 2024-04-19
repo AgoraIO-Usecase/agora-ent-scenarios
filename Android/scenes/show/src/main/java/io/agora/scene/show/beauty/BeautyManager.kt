@@ -141,10 +141,6 @@ object BeautyManager {
                             Config(
                                 ctx,
                                 rtc,
-//                                STHandlers(
-//                                    SenseTimeBeautySDK.mobileEffectNative,
-//                                    SenseTimeBeautySDK.humanActionNative
-//                                ),
                                 captureMode = CaptureMode.Custom,
                                 eventCallback = object :IEventCallback{
                                     override fun onBeautyStats(stats: BeautyStats) {
@@ -413,7 +409,12 @@ object BeautyManager {
 
         override fun getVideoFrameProcessMode() = IVideoFrameObserver.PROCESS_MODE_READ_WRITE
 
-        override fun getVideoFormatPreference() = IVideoFrameObserver.VIDEO_PIXEL_DEFAULT
+        override fun getVideoFormatPreference() = when (beautyType) {
+            BeautyType.SenseTime -> IVideoFrameObserver.VIDEO_PIXEL_DEFAULT
+            BeautyType.FaceUnity -> IVideoFrameObserver.VIDEO_PIXEL_DEFAULT
+            BeautyType.ByteDance -> IVideoFrameObserver.VIDEO_PIXEL_DEFAULT
+            BeautyType.Agora -> IVideoFrameObserver.VIDEO_PIXEL_I422
+        }
 
         override fun getRotationApplied() = false
 
