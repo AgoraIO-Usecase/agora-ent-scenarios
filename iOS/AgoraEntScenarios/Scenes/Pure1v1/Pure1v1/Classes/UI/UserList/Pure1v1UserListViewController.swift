@@ -271,7 +271,6 @@ extension Pure1v1UserListViewController {
         prepareConfig.roomId = NSString.withUUID()
         prepareConfig.localView = callVC.localCanvasView.canvasView
         prepareConfig.remoteView = callVC.remoteCanvasView.canvasView
-        prepareConfig.autoJoinRTC = false  // 如果期望立即加入自己的RTC呼叫频道，则需要设置为true
         prepareConfig.userExtension = userInfo?.yy_modelToJSONObject() as? [String: Any]
         callApi.prepareForCall(prepareConfig: prepareConfig) { err in
             // 成功即可以开始进行呼叫
@@ -306,8 +305,9 @@ extension Pure1v1UserListViewController {
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
         callApi.call(remoteUserId: remoteUserId) {[weak self] err in
-            guard let err = err else {return}
-            self?.callApi.cancelCall(completion: { err in
+            guard let self = self else {return}
+            guard let err = err, self.callState == .calling else {return}
+            self.callApi.cancelCall(completion: { err in
             })
             
             let msg = "\("call_toast_callfail".pure1v1Localization()): \(err.localizedDescription)"

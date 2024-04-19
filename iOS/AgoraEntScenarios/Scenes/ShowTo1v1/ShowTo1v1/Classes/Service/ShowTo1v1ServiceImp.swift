@@ -71,7 +71,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
         
         let aui_roomInfo = roomInfo.convertAUIRoomInfo()
         
-        let scene = self.syncManager.getScene(channelName: roomInfo.roomId)
+        let scene = self.syncManager.createScene(channelName: roomInfo.roomId)
         scene.userService.bindRespDelegate(delegate: self)
         scene.bindRespDelegate(delegate: self)
         roomManager.createRoom(room: aui_roomInfo) { err, info in
@@ -100,7 +100,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
     }
     
     func joinRoom(roomInfo:ShowTo1v1RoomInfo, completion: @escaping (Error?) -> Void) {
-        let scene = self.syncManager.getScene(channelName: roomInfo.roomId)
+        let scene = self.syncManager.createScene(channelName: roomInfo.roomId)
         scene.bindRespDelegate(delegate: self)
         scene.userService.bindRespDelegate(delegate: self)
         scene.enter { payload, err in
@@ -127,7 +127,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
 //MARK: room
 extension ShowTo1v1ServiceImp: AUISceneRespDelegate {
     private func _leaveRoom(roomId: String, isRoomOwner: Bool) {
-        let scene = self.syncManager.getScene(channelName: roomId)
+        guard let scene = self.syncManager.getScene(channelName: roomId) else {return}
         scene.unbindRespDelegate(delegate: self)
         scene.userService.unbindRespDelegate(delegate: self)
         if isRoomOwner {

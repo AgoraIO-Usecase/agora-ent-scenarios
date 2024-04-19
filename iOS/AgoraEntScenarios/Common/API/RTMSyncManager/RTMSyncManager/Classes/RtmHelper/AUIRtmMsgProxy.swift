@@ -9,6 +9,7 @@ import Foundation
 //import AgoraRtcKit
 import AgoraRtmKit
 
+private let kAUIRtmMsgProxyKey = "AUIRtmMsgProxy"
 @objc public protocol AUIRtmErrorProxyDelegate: NSObjectProtocol {
     
     /// token过期
@@ -78,6 +79,7 @@ open class AUIRtmMsgProxy: NSObject {
     }
     
     func subscribeAttributes(channelName: String, itemKey: String, delegate: AUIRtmAttributesProxyDelegate) {
+        aui_info("subscribeAttributes[\(channelName)]: \(itemKey) delegate: \(delegate)", tag: kAUIRtmMsgProxyKey)
         let key = "\(channelName)__\(itemKey)"
         if let value = attributesDelegates[key] {
             if !value.contains(delegate) {
@@ -88,6 +90,7 @@ open class AUIRtmMsgProxy: NSObject {
             weakObjects.add(delegate)
             attributesDelegates[key] = weakObjects
         }
+
         let cache = attributesCacheAttr[channelName]
         let item = cache?[itemKey]
         guard let itemData = item?.data(using: .utf8), let itemValue = try? JSONSerialization.jsonObject(with: itemData) else {
@@ -100,6 +103,7 @@ open class AUIRtmMsgProxy: NSObject {
     }
     
     func unsubscribeAttributes(channelName: String, itemKey: String, delegate: AUIRtmAttributesProxyDelegate) {
+        aui_info("unsubscribeAttributes[\(channelName)]: \(itemKey) delegate: \(delegate)", tag: kAUIRtmMsgProxyKey)
         let key = "\(channelName)__\(itemKey)"
         guard let value = attributesDelegates[key] else {
             return
@@ -171,31 +175,32 @@ open class AUIRtmMsgProxy: NSObject {
     }
     
     func processMetaData(channelName: String, data: AgoraRtmMetadata?) {
-        guard let data = data else { return }
+        guard let data = data else {return}
+        let items = data.items ?? []
         
         var cache = self.attributesCacheAttr[channelName] ?? [:]
-        data.getItems().forEach { item in
-//            aui_info("\(item.key): \(item.value)", tag: "AUIRtmMsgProxy")
+        items.forEach { item in
+//            aui_info("\(item.key): \(item.value)", tag: kAUIRtmMsgProxyKey)
             //判断value和缓存里是否一致，这里用string可能会不准，例如不同终端序列化的时候json obj不同kv的位置不一样会造成生成的json string不同
             if cache[item.key] == item.value {
-                aui_info("there are no changes of [\(item.key)] \(item.value)", tag: "AUIRtmMsgProxy")
+                aui_info("processMetaData[\(channelName)] there are no changes of [\(item.key)]", tag: kAUIRtmMsgProxyKey)
                 return
             }
             cache[item.key] = item.value
             guard let itemData = item.value.data(using: .utf8),
                   let itemValue = try? JSONSerialization.jsonObject(with: itemData) else {
-                aui_info("parse itemData fail: \(item.key) \(item.value)", tag: "AUIRtmMsgProxy")
+                aui_info("[\(channelName)]parse itemData fail: \(item.key) \(item.value)", tag: kAUIRtmMsgProxyKey)
                 return
             }
             let delegateKey = "\(channelName)__\(item.key)"
-//            aui_info("itemValue: \(item.value)")
+            aui_info("processMetaData[\(channelName)] did change of [\(item.key)]: \(item.value)")
             guard let value = self.attributesDelegates[delegateKey] else { return }
             for element in value.allObjects {
                 element.onAttributesDidChanged(channelName: channelName, key: item.key, value: itemValue)
             }
         }
         self.attributesCacheAttr[channelName] = cache
-        if data.getItems().count > 0 {
+        if items.count > 0 {
             return
         }
         for element in errorDelegates.allObjects {
@@ -207,7 +212,7 @@ open class AUIRtmMsgProxy: NSObject {
 //MARK: AgoraRtmClientDelegate
 extension AUIRtmMsgProxy: AgoraRtmClientDelegate {
     public func rtmKit(_ rtmKit: AgoraRtmClientKit, tokenPrivilegeWillExpire channel: String?) {
-        aui_info("onTokenPrivilegeWillExpire: \(channel ?? "")", tag: "AUIRtmMsgProxy")
+        aui_info("onTokenPrivilegeWillExpire: \(channel ?? "")", tag: kAUIRtmMsgProxyKey)
         
         for element in errorDelegates.allObjects {
             element.onTokenPrivilegeWillExpire?(channelName: channel)
@@ -218,8 +223,8 @@ extension AUIRtmMsgProxy: AgoraRtmClientDelegate {
                        channel channelName: String,
                        connectionChangedToState state: AgoraRtmClientConnectionState,
                        reason: AgoraRtmClientConnectionChangeReason) {
-        aui_info("connectionStateChanged state: \(state.rawValue) reason: \(reason.rawValue)", tag: "AUIRtmMsgProxy")
-        if errorDelegates.count <= 0 { return }
+        aui_info("connectionStateChanged[\(channelName)] state: \(state.rawValue) reason: \(reason.rawValue) delegate count: \(errorDelegates.allObjects.count)", tag: kAUIRtmMsgProxyKey)
+
         for element in errorDelegates.allObjects {
             element.onConnectionStateChanged?(channelName: channelName,
                                               connectionStateChanged: state,
@@ -238,15 +243,15 @@ extension AUIRtmMsgProxy: AgoraRtmClientDelegate {
             return
         }
         
-        aui_info("didReceiveStorageEvent event: [\(event.target)] channelType: [\(event.channelType.rawValue)] eventType: [\(event.eventType.rawValue)] =======", tag: "AUIRtmMsgProxy")
+        aui_info("didReceiveStorageEvent event: [\(event.target)] channelType: [\(event.channelType.rawValue)] eventType: [\(event.eventType.rawValue)] =======", tag: kAUIRtmMsgProxyKey)
         //key使用channelType__eventType，保证message channel/stream channel, user storage event/channel storage event共存
         let channelName = event.target
         processMetaData(channelName: channelName, data: event.data)
-        aui_info("storage event[\(channelName)] ========", tag: "AUIRtmMsgProxy")
+        aui_info("storage event[\(channelName)] ========", tag: kAUIRtmMsgProxyKey)
     }
     
     public func rtmKit(_ rtmKit: AgoraRtmClientKit, didReceivePresenceEvent event: AgoraRtmPresenceEvent) {
-        aui_info("[\(event.channelName)] didReceivePresenceEvent event: [\(event.type.rawValue)] channel type: [\(event.channelType.rawValue)]] states: \(event.states.count) =======", tag: "AUIRtmMsgProxy")
+        aui_info("[\(event.channelName)] didReceivePresenceEvent event: [\(event.type.rawValue)] channel type: [\(event.channelType.rawValue)]] states: \(event.states.count) =======", tag: kAUIRtmMsgProxyKey)
         
         guard event.channelType == rtmChannelType else {
             return
@@ -254,14 +259,15 @@ extension AUIRtmMsgProxy: AgoraRtmClientDelegate {
         
 //        var map: [[]]
         var map: [String: String] = [:]
-        event.states.forEach { item in
-            map[item.key] = item.value
+        event.states.keys.forEach { key in
+            guard let key = key as? String, let value = event.states[key] as? String else {return}
+            map[key] = value
         }
         let userId = event.publisher ?? ""
-        aui_info("presence userId: \(userId) event_type: \(event.type.rawValue) userInfo: \(map)", tag: "AUIRtmMsgProxy")
+        aui_info("presence userId: \(userId) event_type: \(event.type.rawValue) userInfo: \(map)", tag: kAUIRtmMsgProxyKey)
         if event.type == .remoteJoinChannel {
             if map.count == 0 {
-                aui_warn("join user fail, empty: userId: \(userId) \(map)", tag: "AUIRtmMsgProxy")
+                aui_warn("join user fail, empty: userId: \(userId) \(map)", tag: kAUIRtmMsgProxyKey)
                 return
             }
             
@@ -274,7 +280,7 @@ extension AUIRtmMsgProxy: AgoraRtmClientDelegate {
             }
         } else if event.type == .remoteStateChanged {
             if map.count == 0 {
-                aui_warn("update user fail, empty: userId: \(userId) \(map)", tag: "AUIRtmMsgProxy")
+                aui_warn("update user fail, empty: userId: \(userId) \(map)", tag: kAUIRtmMsgProxyKey)
                 return
             }
             for element in userDelegates.allObjects {
@@ -290,14 +296,14 @@ extension AUIRtmMsgProxy: AgoraRtmClientDelegate {
     }
     
     public func rtmKit(_ rtmKit: AgoraRtmClientKit, didReceiveMessageEvent event: AgoraRtmMessageEvent) {
-        aui_info("[\(event.channelName)] didReceiveMessageEvent  =======", tag: "AUIRtmMsgProxy")
+        aui_info("[\(event.channelName)]didReceiveMessageEvent  =======", tag: kAUIRtmMsgProxyKey)
         
         if let message = event.message.stringData {
             for element in messageDelegates.allObjects {
                 element.onMessageReceive(publisher: event.publisher, message: message)
             }
         } else {
-            aui_warn("recv unknown type message", tag: "AUIRtmMsgProxy")
+            aui_warn("recv unknown type message", tag: kAUIRtmMsgProxyKey)
         }
     }
     

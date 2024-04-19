@@ -9,7 +9,7 @@ import Foundation
 import CallAPI
 import VideoLoaderAPI
 
-class CollectionViewDelegateProxy: CallApiProxy, UICollectionViewDelegate {}
+//class CollectionViewDelegateProxy: CallApiProxy, UICollectionViewDelegate {}
 
 /*
 class ShowCycleRoomArray: AGRoomArray {

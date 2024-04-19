@@ -27,7 +27,7 @@ PODS:
     - ZSwiftBaseLib
   - AgoraLyricsScore (1.1.2)
   - AgoraRtcEngine_Special_iOS (4.1.1.29)
-  - AgoraRtm_iOS (2.1.10)
+  - AgoraRtm (2.2.0)
   - AgoraSyncManager (2.1.6):
     - SocketRocket
   - AGResourceManager (0.1.0):
@@ -45,12 +45,12 @@ PODS:
     - YYModel
   - Bugly (2.5.93)
   - bytedEffect (4.6.0)
-  - CallAPI (0.3.0):
-    - AgoraRtcEngine_Special_iOS
-    - CallAPI/All (= 0.3.0)
-  - CallAPI/All (0.3.0):
-    - AgoraRtcEngine_Special_iOS
-    - AgoraRtm_iOS (~> 2.1.8)
+  - CallAPI (2.0.0):
+    - AgoraRtcEngine_Special_iOS (~> 4.1.1.26)
+    - CallAPI/All (= 2.0.0)
+  - CallAPI/All (2.0.0):
+    - AgoraRtcEngine_Special_iOS (~> 4.1.1.26)
+    - AgoraRtm (~> 2.2.0)
   - Cantata (0.1.0):
     - AgoraCommon
     - AgoraLyricsScore
@@ -92,7 +92,7 @@ PODS:
     - LSTTimer
   - LSTTimer (0.2.10)
   - Masonry (1.1.0)
-  - MJRefresh (3.7.8)
+  - MJRefresh (3.7.9)
   - Protobuf (3.22.1)
   - Pure1v1 (0.1.0):
     - AgoraCommon
@@ -108,7 +108,7 @@ PODS:
     - YYCategories
     - YYModel
   - RTMSyncManager (0.1.0):
-    - AgoraRtm_iOS (~> 2.1.8)
+    - AgoraRtm (~> 2.2.0)
     - YYModel
   - ScoreEffectUI (1.0.2)
   - SDWebImage (4.4.8):
@@ -164,7 +164,7 @@ DEPENDENCIES:
   - AgoraCommon (from `AgoraEntScenarios`)
   - AgoraLyricsScore (= 1.1.2)
   - AgoraRtcEngine_Special_iOS (= 4.1.1.29)
-  - AgoraRtm_iOS (= 2.1.10)
+  - AgoraRtm (= 2.2.0)
   - AgoraSyncManager (~> 2.1.6)
   - AGResourceManager (from `AgoraEntScenarios/Common/API/AGResourceManager`)
   - AudioScenarioApi (from `AgoraEntScenarios/Common/API/AudioScenarioApi`)
@@ -173,7 +173,7 @@ DEPENDENCIES:
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
   - Cantata (from `AgoraEntScenarios/Scenes/Cantata`)
   - fuLib (from `fu.podspec`)
-  - HXPhotoPicker/Lite
+  - HXPhotoPicker/Lite (= 4.1.7)
   - JXCategoryView (= 1.6.1)
   - KakaJSON
   - LEEAlert (= 1.6.4)
@@ -206,7 +206,7 @@ SPEC REPOS:
     - Agora_Chat_iOS
     - AgoraLyricsScore
     - AgoraRtcEngine_Special_iOS
-    - AgoraRtm_iOS
+    - AgoraRtm
     - AgoraSyncManager
     - AUIKitCore
     - Bugly
@@ -269,14 +269,14 @@ SPEC CHECKSUMS:
   AgoraCommon: 05700d9fe1f8986461007521e174f260b69eb376
   AgoraLyricsScore: 0c3e6b701dfe036ba26ba208fc65c3b65ecaeb06
   AgoraRtcEngine_Special_iOS: a8d0405efb20323b93ce77ae3d0573ea80837c31
-  AgoraRtm_iOS: b53a57502a35349aceea890df4416b483ea4153c
+  AgoraRtm: 4813aab832ca612facb29c831339546c71e0b764
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
   AGResourceManager: e6616ad4d9d0461c84d9582ef1118004fa534e5c
   AudioScenarioApi: 9dd859e4de75140b5086725f493315d47d935e14
   AUIKitCore: 9f0208a71efcc93830f80d411eae5df6ec0e7a42
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   bytedEffect: 3d51767425dcaa67d2d6162c402225764d3c2156
-  CallAPI: c8a98d5a9028e61bb940ec220206fbedb5f3744d
+  CallAPI: 24699e8b76540fea8e8c83d99ff90d15b55af703
   Cantata: 1a210fcfeb32f93659c199c33ec34b52a56de380
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   fuLib: 43b6990d34caa47e0f12a61db57fe9bd2372f584
@@ -288,10 +288,10 @@ SPEC CHECKSUMS:
   LSTPopView: 9379f00f6ce7d1fc620b50ab00ed3ef97b2d4d52
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
-  MJRefresh: 4e6e7ba77a6d5fab012426777e32b0a77127c50a
+  MJRefresh: ff9e531227924c84ce459338414550a05d2aea78
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
   Pure1v1: 0cdb8bc0c2a9df9396332ec5abd0130b2b04033a
-  RTMSyncManager: 0969ff11d872642b8d9e8b6ecdc682493a442a8a
+  RTMSyncManager: 110b208a8bf57881decaef0e76891bdf5345ba21
   ScoreEffectUI: bf1195b4d41a73d43c236450b5d7f958989844aa
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
@@ -310,6 +310,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: b94a31675af2102412c867a73e9fb2ae6359deb1
+PODFILE CHECKSUM: c54d0a312cadd0d8cc03a8daa5633eeeece4bffb
 
 COCOAPODS: 1.12.1

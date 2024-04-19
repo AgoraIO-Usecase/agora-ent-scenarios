@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'CallAPI'
-  s.version          = '0.3.0'
+  s.version          = '2.0.0'
   s.summary          = 'A short description of CallAPI.'
 
 # This description is used to generate tags and improve search results.
@@ -41,16 +41,19 @@ TODO: Add long description of the pod here.
   s.subspec 'All' do |ss|
     ss.source_files = 'CallAPI/Classes/**/*'
     
-    ss.dependency 'AgoraRtm_iOS', '~>2.1.8'
+    ss.dependency 'AgoraRtm', '~> 2.2.0'
   end
   
   s.subspec 'WithoutRTM' do |ss|
     ss.source_files = [
     'CallAPI/Classes/*.swift',
     'CallAPI/Classes/Extension/*',
-    'CallAPI/Classes/Proxy/*',
+    'CallAPI/Classes/Scenarios/*',
+    'CallAPI/Classes/Report/*',
+    'CallAPI/Classes/SignalClient/ISignalClient.swift',
+    'CallAPI/Classes/SignalClient/CallBaseSignalClient.swift',
     ]
   end
   
-  s.dependency 'AgoraRtcEngine_Special_iOS'
+  s.dependency 'AgoraRtcEngine_Special_iOS', '~> 4.1.1.26'
 end

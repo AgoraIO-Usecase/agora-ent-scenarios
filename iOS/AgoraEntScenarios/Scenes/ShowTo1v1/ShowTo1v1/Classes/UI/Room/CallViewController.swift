@@ -233,7 +233,7 @@ extension CallViewController {
     func onCallEventChanged(with event: CallEvent, eventReason: String?) {
         showTo1v1Print("onCallEventChanged: \(event.rawValue) eventReason: '\(eventReason ?? "")'")
         switch event {
-        case .localLeave, .remoteLeave:
+        case .localLeft, .remoteLeft:
             _hangupAction()
         default:
             break

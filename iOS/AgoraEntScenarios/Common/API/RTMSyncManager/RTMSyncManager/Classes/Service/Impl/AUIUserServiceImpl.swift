@@ -15,7 +15,7 @@ import YYModel
     private let rtmManager: AUIRtmManager!
     
     deinit {
-        aui_info("deinit AUIUserServiceImpl", tag: "AUIUserServiceImpl")
+        aui_info("deinit AUIUserServiceImpl[\(channelName)]", tag: "AUIUserServiceImpl")
         rtmManager.unsubscribeUser(channelName: channelName, delegate: self)
     }
     
@@ -23,8 +23,8 @@ import YYModel
         self.rtmManager = rtmManager
         self.channelName = channelName
         super.init()
+        aui_info("init AUIUserServiceImpl[\(channelName)]", tag: "AUIUserServiceImpl")
         self.rtmManager.subscribeUser(channelName: channelName, delegate: self)
-        aui_info("init AUIUserServiceImpl", tag: "AUIUserServiceImpl")
     }
 }
 
@@ -32,14 +32,14 @@ import YYModel
 extension AUIUserServiceImpl: AUIRtmUserProxyDelegate {
     public func onCurrentUserJoined(channelName: String) {
         guard channelName == self.channelName else {return}
-        aui_info("onCurrentUserJoined", tag: "AUIUserServiceImpl")
+        aui_info("onCurrentUserJoined[\(channelName)]", tag: "AUIUserServiceImpl")
         _setupUserAttr(roomId: channelName) { error in
             //TODO: retry if fail
         }
     }
     
     public func onUserDidUpdated(channelName: String, userId: String, userInfo: [String : Any]) {
-        aui_info("onUserDidUpdated: \(userId)", tag: "AUIUserServiceImpl")
+        aui_info("onUserDidUpdated[\(channelName)]: \(userId)", tag: "AUIUserServiceImpl")
         let user = AUIUserInfo.yy_model(withJSON: userInfo)!
         user.userId = userId
         if let oldUser = self.userList.first(where: {$0.userId == userId}) {
@@ -72,7 +72,7 @@ extension AUIUserServiceImpl: AUIRtmUserProxyDelegate {
     }
     
     public func onUserSnapshotRecv(channelName: String, userId: String, userList: [[String : Any]]) {
-        aui_info("onUserSnapshotRecv: \(userId)", tag: "AUIUserServiceImpl")
+        aui_info("onUserSnapshotRecv[\(channelName)]: \(userId)", tag: "AUIUserServiceImpl")
         guard let users = NSArray.yy_modelArray(with: AUIUserInfo.self, json: userList) as? [AUIUserInfo] else {
             assert(false, "onUserSnapshotRecv recv fail")
             return
@@ -85,7 +85,7 @@ extension AUIUserServiceImpl: AUIRtmUserProxyDelegate {
     }
     
     public func onUserDidJoined(channelName: String, userId: String, userInfo: [String : Any]) {
-        aui_info("onUserDidJoined: \(userId)", tag: "AUIUserServiceImpl")
+        aui_info("onUserDidJoined[\(channelName)]: \(userId)", tag: "AUIUserServiceImpl")
         let user = AUIUserInfo.yy_model(withJSON: userInfo)!
         user.userId = userId
         self.userList.append(user)
@@ -96,7 +96,7 @@ extension AUIUserServiceImpl: AUIRtmUserProxyDelegate {
     }
     
     public func onUserDidLeaved(channelName: String, userId: String, userInfo: [String : Any]) {
-        aui_info("onUserDidLeaved: \(userId)", tag: "AUIUserServiceImpl")
+        aui_info("onUserDidLeaved[\(channelName)]: \(userId)", tag: "AUIUserServiceImpl")
         let user = userList.filter({$0.userId == userId}).first ?? AUIUserInfo.yy_model(withJSON: userInfo)!
         self.userList = userList.filter({$0.userId != userId})
         self.respDelegates.allObjects.forEach { obj in
@@ -106,7 +106,7 @@ extension AUIUserServiceImpl: AUIRtmUserProxyDelegate {
     }
     
     public func onUserBeKicked(channelName: String, userId: String, userInfo: [String : Any]) {
-        aui_info("onUserBeKicked: \(userId)", tag: "AUIUserServiceImpl")
+        aui_info("onUserBeKicked[\(channelName)]: \(userId)", tag: "AUIUserServiceImpl")
         let user = userList.filter({$0.userId == userId}).first ?? AUIUserInfo.yy_model(withJSON: userInfo)!
         self.userList = userList.filter({$0.userId != userId})
         self.respDelegates.allObjects.forEach { obj in
@@ -127,17 +127,17 @@ extension AUIUserServiceImpl: AUIUserServiceDelegate {
     }
     
     public func bindRespDelegate(delegate: AUIUserRespDelegate) {
-        aui_info("bindRespDelegate \(delegate)", tag: "AUIUserServiceImpl")
+        aui_info("bindRespDelegate[\(channelName)] \(delegate)", tag: "AUIUserServiceImpl")
         respDelegates.add(delegate)
     }
     
     public func unbindRespDelegate(delegate: AUIUserRespDelegate) {
-        aui_info("unbindRespDelegate \(delegate)", tag: "AUIUserServiceImpl")
+        aui_info("unbindRespDelegate[\(channelName)] \(delegate)", tag: "AUIUserServiceImpl")
         respDelegates.remove(delegate)
     }
     
     public func getUserInfoList(roomId: String, userIdList: [String], callback:@escaping AUIUserListCallback) {
-        aui_info("getUserInfoList", tag: "AUIUserServiceImpl")
+        aui_info("getUserInfoList[\(channelName)]", tag: "AUIUserServiceImpl")
         self.rtmManager.whoNow(channelName: roomId) { error, userList in
             if let error = error {
                 callback(error as NSError, nil)
@@ -159,7 +159,7 @@ extension AUIUserServiceImpl: AUIUserServiceDelegate {
 //    }
     
     public func muteUserAudio(isMute: Bool, callback: @escaping AUICallback) {
-        aui_info("muteUserAudio: \(isMute)", tag: "AUIUserServiceImpl")
+        aui_info("muteUserAudio[\(channelName)]: \(isMute)", tag: "AUIUserServiceImpl")
         let currentUserId = getRoomContext().currentUserInfo.userId
         let currentUser = userList.first(where: {$0.userId == currentUserId})
         currentUser?.muteAudio = isMute
@@ -183,7 +183,7 @@ extension AUIUserServiceImpl: AUIUserServiceDelegate {
     }
     
     public func muteUserVideo(isMute: Bool, callback: @escaping AUICallback) {
-        aui_info("muteUserVideo: \(isMute)", tag: "AUIUserServiceImpl")
+        aui_info("muteUserVideo[\(channelName)]: \(isMute)", tag: "AUIUserServiceImpl")
         let currentUserId = getRoomContext().currentUserInfo.userId
         let currentUser = userList.first(where: {$0.userId == currentUserId})
         currentUser?.muteVideo = isMute
@@ -227,13 +227,13 @@ extension AUIUserServiceImpl {
         userInfo.userAvatar = AUIRoomContext.shared.currentUserInfo.userAvatar
         
         let userAttr = userInfo.yy_modelToJSONObject() as? [String: Any] ?? [:]
-        aui_info("_setupUserAttr: \(roomId) : \(userAttr)", tag: "AUIUserServiceImpl")
+        aui_info("_setupUserAttr[\(roomId)] : \(userAttr)", tag: "AUIUserServiceImpl")
         self.rtmManager.setPresenceState(channelName: roomId, attr: userAttr) { error in
             defer {
                 completion?(error)
             }
             if let error = error {
-                aui_info("_setupUserAttr: \(roomId) fail: \(error.localizedDescription)", tag: "AUIUserServiceImpl")
+                aui_info("_setupUserAttr[\(roomId)] fail: \(error.localizedDescription)", tag: "AUIUserServiceImpl")
                 //TODO: retry
                 return
             }

@@ -51,7 +51,7 @@ public typealias AUICollectionAttributesDidChangedClosure = (String, String, AUI
     
     init(channelName: String, observeKey: String, rtmManager: AUIRtmManager) 
     
-    /// 添加新的节点
+    /// 订阅即将添加新的节点的事件
     /// - Parameter callback: <#callback description#>
     @objc optional func subscribeWillAdd(callback: AUICollectionAddClosure?)
     
