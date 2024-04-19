@@ -278,7 +278,7 @@
     <string name="show_beauty_item_beauty_white_teeth">白牙</string>
     <string name="show_beauty_item_sticker_zhaocaimao">招财猫</string>
 
-    <string name="show_beauty_switch_ai_photographer_tips">为了给您呈现最明显的功能效果，在切换到AI摄影师某个镜头特效时默认帮你关闭虚拟背景能力，开发者可自行兼容集成使用”</string>
+    <string name="show_beauty_switch_ai_photographer_tips">为了给您呈现最明显的功能效果，在切换到AI摄影师某个镜头特效时默认帮你关闭虚拟背景能力，开发者可自行兼容集成使用</string>
     <string name="show_beauty_switch_virtual_background_tips">为了给您呈现最明显的功能效果，在切换到虚拟背景时默认帮你关闭AI摄影师特效，开发者可自行兼容集成使用</string>
 
     <string-array name="show_encoder">
