@@ -23,7 +23,7 @@ class EntLogger constructor(private val config: Config) {
 
     data class Config constructor(
         val sceneName: String, // 场景名
-        val fileSize: Long = 10 * 1024, // 1M，单位Byte
+        val fileSize: Long = 1 * 1024 * 1024, // 1M，单位Byte
         val fileName: String = "agora_ent_${sceneName}_log".lowercase(), // 文件名
         val maxFileCount: Int = MAX_FILE_COUNT, // 该场景最大文件数
     )
