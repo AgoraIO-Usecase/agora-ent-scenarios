@@ -10,13 +10,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -40,7 +38,6 @@ import io.agora.scene.showTo1v1.CallRole
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
-import io.agora.scene.showTo1v1.audio.AudioScenarioApi
 import io.agora.scene.showTo1v1.audio.AudioScenarioType
 import io.agora.scene.showTo1v1.audio.SceneType
 import io.agora.scene.showTo1v1.callapi.*
@@ -49,7 +46,6 @@ import io.agora.scene.showTo1v1.service.ROOM_AVAILABLE_DURATION
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceListenerProtocol
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceNetworkStatus
-import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import io.agora.scene.showTo1v1.ui.dialog.CallDetailSettingDialog
 import io.agora.scene.showTo1v1.ui.dialog.CallDialog
@@ -220,7 +216,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
         binding.ivClose.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG, "click close end!")
+                ShowTo1v1Logger.d(TAG, "click close button!")
                 onBackPressed()
             }
         })
@@ -233,13 +229,11 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
         binding.ivSetting.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG, "click setting")
                 onShowSettingDialog()
             }
         })
         binding.ivDashboardClose.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG, "click dashboard close")
                 binding.ivDashboardClose.visibility = View.INVISIBLE
                 binding.flDashboard.visibility = View.INVISIBLE
                 mDashboardFragment?.updateVisible(false)
@@ -248,7 +242,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
         binding.ivHangup.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG, "click hangup")
+                ShowTo1v1Logger.d(TAG, "click hangup")
                 if (mCallConnected) {
                     onBackPressed()
                 } else {
@@ -258,7 +252,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         })
         binding.layoutCallPrivately.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG, "click call privately")
+                ShowTo1v1Logger.d(TAG, "click call privately")
                 toggleSelfVideo(true) {
                     mShowTo1v1Manger.prepareCall(CallRole.CALLER, mRoomInfo.roomId, callback = {
                         if (it) {
@@ -281,14 +275,14 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
         binding.includeConnectedView.root.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG, "click close connection view")
+                ShowTo1v1Logger.d(TAG, "click close connection view")
                 mainHandler.removeCallbacks(connectedViewCloseRun)
                 animateConnectedViewClose()
             }
 
         })
         binding.vDragSmallWindow.setOnViewClick {
-            Log.d(TAG, "click switch video")
+            ShowTo1v1Logger.d(TAG, "click switch video")
             exchangeDragWindow()
         }
         binding.layoutCall.isVisible = false
@@ -305,7 +299,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             resourceId = resources.getIdentifier(mRoomInfo.bgImage(), "drawable", packageName)
         } catch (e: Exception) {
             resourceId = R.drawable.show_to1v1_user_bg1
-            Log.e(TAG, "getResources ${e.message}")
+            ShowTo1v1Logger.e(TAG, e,"getResources error!")
         }
         val drawable = ContextCompat.getDrawable(this, resourceId)
         Glide.with(this).load(drawable).into(binding.ivRoomCover)
@@ -575,7 +569,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         if (isGoingFinish) return
         isGoingFinish = true
         stopCallAnimator()
-        Log.d(TAG, "RoomDetail onBackPressed")
         mRtcEngine.removeHandlerEx(mainRtcListener, mMainRtcConnection)
         mainHandler.removeCallbacks(timerRoomRun)
         mainHandler.removeCallbacks(connectedViewCloseRun)
@@ -748,7 +741,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             contentInspectConfig.modules = arrayOf(module)
             contentInspectConfig.moduleCount = 1
             val ret = mRtcEngine.enableContentInspectEx(enable, contentInspectConfig, connection)
-            Log.d(TAG, "enableContentInspectEx $ret")
+            ShowTo1v1Logger.d(TAG, "enableContentInspectEx $ret")
         } catch (_: JSONException) {
         }
     }
@@ -805,7 +798,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             message: String?
         ) {
             super.onCallError(errorEvent, errorType, errorCode, message)
-            ShowTo1v1Logger.d(TAG, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
+            ShowTo1v1Logger.e(TAG, Exception(message),"onCallError: errorEvent$errorEvent, errorType:$errorType,errorCode:$errorCode")
         }
 
         override fun canJoinRtcOnCalling(eventInfo: Map<String, Any>): Boolean {
@@ -820,7 +813,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         ) {
             val publisher = eventInfo[CallApiImpl.kPublisher] ?: mShowTo1v1Manger.mCurrentUser.userId
             if (publisher != mShowTo1v1Manger.mCurrentUser.userId) return
-            Log.d(TAG, "RoomDetail state:${state.name},stateReason:${stateReason.name},eventReason:${eventReason}")
+            ShowTo1v1Logger.d(TAG, "RoomDetail onCallStateChanged state:${state.name},stateReason:${stateReason.name},eventReason:${eventReason}")
             updateCallState(state)
             when (state) {
                 CallStateType.Prepared -> {
@@ -904,7 +897,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
                 CallStateType.Connecting -> {
                     if (stateReason == CallStateReason.LocalAccepted || stateReason == CallStateReason.RemoteAccepted) {
-                        Log.d(TAG, "call Connecting LocalAccepted or RemoteAccepted")
+                        ShowTo1v1Logger.d(TAG, "call Connecting LocalAccepted or RemoteAccepted")
                     }
                 }
 
@@ -1004,7 +997,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         .into(binding.ivCallingAvatar)
                 }
                 if (mShowTo1v1Manger.mRemoteUser == null) {
-                    Log.d(TAG, "Connected but remoteUser is null")
+                    ShowTo1v1Logger.e(TAG, Exception("Connected but remoteUser is null"))
                 }
                 mShowTo1v1Manger.mCurrentUser.let {
                     binding.vDragSmallWindow.setUserName(it.userName)
