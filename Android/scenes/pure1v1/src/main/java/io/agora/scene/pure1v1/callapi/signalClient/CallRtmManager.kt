@@ -1,7 +1,7 @@
-package io.agora.scene.pure1v1.signalClient
+package io.agora.scene.pure1v1.callapi.signalClient
 
+import android.util.Log
 import io.agora.rtm.*
-import io.agora.scene.pure1v1.Pure1v1Logger
 import io.agora.scene.pure1v1.callapi.AGError
 
 interface ICallRtmManagerListener {
@@ -65,7 +65,7 @@ class CallRtmManager(
     /**
      * 获取内部RTM实例
      */
-    fun getRtmClient(): RtmClient = rtmClient
+    fun getRtmClient() : RtmClient = rtmClient
 
     /**
      * 登陆RTM
@@ -142,7 +142,6 @@ class CallRtmManager(
             override fun onSuccess(responseInfo: Void?) {
                 callMessagePrint("rtm renewToken")
             }
-
             override fun onFailure(errorInfo: ErrorInfo?) {
             }
         })
@@ -176,8 +175,7 @@ class CallRtmManager(
     // ------------------ inner private ------------------
 
     private fun createRtmClient(): RtmClient {
-        // 超时时间 30s
-        val rtmConfig = RtmConfig.Builder(appId, userId.toString()).presenceTimeout(30).build()
+        val rtmConfig = RtmConfig.Builder(appId, userId.toString()).build()
         if (rtmConfig.userId.isEmpty()) {
             callMessagePrint("userId is empty", 2)
         }
@@ -219,7 +217,7 @@ class CallRtmManager(
     }
 
     private fun callMessagePrint(message: String, logLevel: Int = 0) {
-        val tag = "MessageManager"
-        //Pure1v1Logger.d(tag, message)
+        val tag = "[MessageManager]"
+        Log.d(tag, message)
     }
 }

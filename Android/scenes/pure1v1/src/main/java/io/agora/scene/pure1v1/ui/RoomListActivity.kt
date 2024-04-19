@@ -301,6 +301,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 val fromRoomId = eventInfo[CallApiImpl.kFromRoomId] as? String ?: ""
                 val toUserId = eventInfo[CallApiImpl.kRemoteUserId] as? Int ?: 0
                 val remoteUser = CallServiceManager.instance.remoteUser
+                Log.d("shsh", "toUserId=$toUserId, fromUserId=$fromUserId, currentUid=$currentUid eventInfo=$eventInfo")
                 if (remoteUser != null && remoteUser.userId != fromUserId.toString())  {
                     CallServiceManager.instance.callApi?.reject(fromUserId, "already calling") { err ->
                         Pure1v1Logger.d(tag, "callApi reject failed: $err")
@@ -309,6 +310,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 }
                 // 触发状态的用户是自己才处理
                 if (currentUid == toUserId.toString()) {
+                    CallServiceManager.instance.isCaller = false
                     CallServiceManager.instance.connectedChannelId = fromRoomId
                     var user = dataList.firstOrNull { it.userId == fromUserId.toString() }
                     if (user == null) {
@@ -354,6 +356,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     // TODO bug CallServiceManager.instance.rtcEngine?.startAudioMixing(CallServiceManager.callMusic, true, -1, 0)
                     CallServiceManager.instance.playCallMusic(CallServiceManager.callMusic)
                 } else if (currentUid == fromUserId.toString()) {
+                    CallServiceManager.instance.isCaller = true
                     CallServiceManager.instance.connectedChannelId = fromRoomId
                     val user = dataList.firstOrNull { it.userId == toUserId.toString() } ?: return
                     CallServiceManager.instance.remoteUser = user
@@ -399,12 +402,13 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 // 设置音频最佳实践
                 val toUserId = eventInfo[CallApiImpl.kRemoteUserId] as? Int ?: 0
                 val fromUserId = eventInfo[CallApiImpl.kFromUserId] as? Int ?: 0
-                if (currentUid == toUserId.toString()) {
-                    // 被叫
-                    CallServiceManager.instance.scenarioApi?.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
-                } else if (currentUid == fromUserId.toString()) {
+                Log.d("shsh", "toUserId=$toUserId, fromUserId=$fromUserId, currentUid=$currentUid eventInfo=$eventInfo")
+                if (CallServiceManager.instance.isCaller) {
                     // 主叫
                     CallServiceManager.instance.scenarioApi?.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Caller)
+                } else {
+                    // 被叫
+                    CallServiceManager.instance.scenarioApi?.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
                 }
             }
             CallStateType.Prepared -> {

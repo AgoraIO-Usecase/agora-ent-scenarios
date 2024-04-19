@@ -70,6 +70,8 @@ class ShowTo1v1Manger constructor() {
 
     var mService: ShowTo1v1ServiceImpl? = null
 
+    var isCaller = false
+
     // 本地用户
     val mCurrentUser: ShowTo1v1UserInfo
         get() {

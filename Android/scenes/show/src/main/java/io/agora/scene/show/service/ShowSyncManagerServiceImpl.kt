@@ -1220,6 +1220,19 @@ class ShowSyncManagerServiceImpl constructor(
                 }
             }
         )
+        Sync.Instance().subscribeLog(object: Sync.LogCallback {
+            override fun onLogInfo(message: String) {
+                ShowLogger.d("service", message)
+            }
+
+            override fun onLogWarning(message: String) {
+                //ShowLogger.w("service", message)
+            }
+
+            override fun onLogError(message: String) {
+                ShowLogger.e("service", null, message)
+            }
+        })
         Sync.Instance().subscribeConnectState {
             ShowLogger.d(TAG, "subscribeConnectState state=$it")
             ToastUtils.showToast("websocket connect state: $it")
