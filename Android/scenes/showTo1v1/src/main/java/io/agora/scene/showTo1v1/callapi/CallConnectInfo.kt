@@ -7,6 +7,8 @@ enum class CallConnectCostType(val value: String) {
     RemoteUserRecvCall("remoteUserRecvCall"),       //主叫呼叫成功，收到呼叫成功表示已经送达对端(被叫)
     AcceptCall("acceptCall"),                       //主叫收到被叫接受呼叫(onAccept)/被叫点击接受(accept)
     LocalUserJoinChannel("localUserJoinChannel"),   //本地用户加入频道
+    LocalFirstFrameDidCapture("localFirstFrameDidCapture"), //本地视频首帧被采集到(仅限视频呼叫)
+    LocalFirstFrameDidPublish("localFirstFrameDidPublish"), //本地用户推送首帧（音频或者视频）成功
     RemoteUserJoinChannel("remoteUserJoinChannel"), //远端用户加入频道
     RecvFirstFrame("recvFirstFrame")                //收到对端首帧
 }
@@ -18,6 +20,9 @@ class CallConnectInfo {
 
     // 是否获取到对端视频首帧
     var isRetrieveFirstFrame: Boolean = false
+
+    // 呼叫类型
+    var callType: CallType = CallType.Video
 
     // 呼叫的session id
     var callId: String = ""
@@ -78,7 +83,10 @@ class CallConnectInfo {
         callConnectedTs = 0
     }
 
-    fun set(userId: Int, roomId: String, callId: String? = null, isLocalAccepted: Boolean = false) {
+    fun set(callType: CallType? = null, userId: Int, roomId: String, callId: String? = null, isLocalAccepted: Boolean = false) {
+        if (callType != null) {
+            this.callType = callType
+        }
         this.callingUserId = userId
         this.callingRoomId = roomId
         this.isLocalAccepted = isLocalAccepted

@@ -414,7 +414,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
         }
         toggleSelfAudio(isRoomOwner) {
-            mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
+            if (isRoomOwner) {
+                mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
+            }
         }
     }
 
@@ -778,11 +780,11 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         override fun onCallEventChanged(event: CallEvent, eventReason: String?) {
             super.onCallEventChanged(event, eventReason)
             when (event) {
-                CallEvent.LocalLeave -> {
+                CallEvent.LocalLeft -> {
                     onHangup()
                 }
 
-                CallEvent.RemoteLeave -> {
+                CallEvent.RemoteLeft -> {
                     // 主叫方离线，挂断
                     onHangup()
                 }
@@ -864,6 +866,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     // 触发状态的用户是自己才处理
                     if (mShowTo1v1Manger.mCurrentUser.userId == toUserId.toString()) {
                         // 收到大哥拨打电话
+                        mShowTo1v1Manger.isCaller = false
                         mShowTo1v1Manger.mConnectedChannelId = fromRoomId
                         val userMap = eventInfo[CallApiImpl.kFromUserExtension] as JSONObject
 
@@ -877,6 +880,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         mShowTo1v1Manger.mCallApi.accept(fromUserId) {}
                     } else if (mShowTo1v1Manger.mCurrentUser.userId == fromUserId.toString()) {
                         // 大哥拨打电话
+                        mShowTo1v1Manger.isCaller = true
                         mShowTo1v1Manger.mConnectedChannelId = fromRoomId
                         mShowTo1v1Manger.mRemoteUser = mRoomInfo
                         onCallSend(mShowTo1v1Manger.mRemoteUser!!)
@@ -916,14 +920,12 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     )
 
                     // 设置音频最佳实践
-                    val toUserId = eventInfo[CallApiImpl.kRemoteUserId] as? Int ?: 0
-                    val fromUserId = eventInfo[CallApiImpl.kFromUserId] as? Int ?: 0
-                    if (mShowTo1v1Manger.mCurrentUser.userId == toUserId.toString()) {
-                        // 被叫
-                        mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
-                    } else if (mShowTo1v1Manger.mCurrentUser.userId == fromUserId.toString()) {
+                    if (mShowTo1v1Manger.isCaller) {
                         // 主叫
                         mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Caller)
+                    } else {
+                        // 被叫
+                        mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
                     }
                 }
 
@@ -949,7 +951,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             CallStateType.Idle,
             CallStateType.Failed -> {
                 mTimeLinkAt = 0
-
+                mShowTo1v1Manger.mRtcEngine.enableLocalAudio(true)
+                mShowTo1v1Manger.mRtcEngine.enableLocalVideo(true)
                 publishMedia(true)
                 setupVideoView(true)
 

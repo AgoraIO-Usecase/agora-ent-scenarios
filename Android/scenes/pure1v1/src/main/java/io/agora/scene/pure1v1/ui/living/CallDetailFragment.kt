@@ -277,7 +277,7 @@ class CallDetailFragment : Fragment(), ICallApiListener {
 
     override fun onCallEventChanged(event: CallEvent, eventReason: String?) {
         when(event) {
-            CallEvent.RemoteLeave -> {
+            CallEvent.RemoteLeft -> {
                 onHangup()
             }
             else -> {}
