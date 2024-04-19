@@ -26,7 +26,6 @@ import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.scene.showTo1v1.callapi.*
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListActivityBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
-import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import io.agora.scene.showTo1v1.ui.dialog.CallDialog
 import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
@@ -243,7 +242,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     private fun fetchRoomList() {
         mService?.getRoomList(completion = { error, roomList ->
-            ShowTo1v1Logger.d(TAG, "getRoomList error:$error, roomList:$roomList")
             mRoomInfoList.clear()
             mRoomInfoList.addAll(roomList)
             updateListView()
@@ -358,6 +356,14 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     private val callApiListener = object : ICallApiListener {
 
+        override fun callDebugInfo(message: String, logLevel: CallLogLevel) {
+            super.callDebugInfo(message, logLevel)
+            when (logLevel) {
+                CallLogLevel.Normal, CallLogLevel.Warning -> ShowTo1v1Logger.d(RoomDetailActivity.TAG, "callDebugInfo $message")
+                CallLogLevel.Error -> ShowTo1v1Logger.e(RoomDetailActivity.TAG, null, "callDebugInfo $message")
+            }
+        }
+
         override fun tokenPrivilegeWillExpire() {
             super.tokenPrivilegeWillExpire()
             mShowTo1v1Manger.renewTokens {}
@@ -370,7 +376,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             message: String?
         ) {
             super.onCallError(errorEvent, errorType, errorCode, message)
-            ShowTo1v1Logger.d(TAG, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
+            ShowTo1v1Logger.e(TAG, Exception(message),"onCallError: errorEvent$errorEvent, errorType:$errorType,errorCode:$errorCode")
         }
 
         override fun canJoinRtcOnCalling(eventInfo: Map<String, Any>): Boolean {
@@ -386,7 +392,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             val publisher = eventInfo[CallApiImpl.kPublisher] ?: mShowTo1v1Manger.mCurrentUser.userId
             if (publisher != mShowTo1v1Manger.mCurrentUser.userId) return
             mCallState = state
-            Log.d(TAG, "RooList state:${state.name},stateReason:${stateReason.name},eventReason:${eventReason}")
+            ShowTo1v1Logger.d(TAG, "RooList onCallStateChanged state:${state.name},stateReason:${stateReason.name},eventReason:${eventReason}")
             when (state) {
                 CallStateType.Prepared -> {
                     if (stateReason == CallStateReason.CallingTimeout || stateReason == CallStateReason.RemoteRejected) {

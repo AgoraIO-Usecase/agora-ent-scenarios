@@ -3,7 +3,6 @@ package io.agora.scene.showTo1v1.service
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import io.agora.rtm.*
 import io.agora.rtmsyncmanager.ISceneResponse
 import io.agora.rtmsyncmanager.SyncManager
@@ -37,7 +36,6 @@ class ShowTo1v1ServiceImpl constructor(
         private const val SYNC_SCENE_ROOM_USER_COLLECTION = "userCollection"
     }
 
-    private val tag = "1v1_Service_LOG"
     private val kSceneId = "scene_Livetoprivate_421"
     @Volatile
     private var syncUtilsInited = false
@@ -81,7 +79,7 @@ class ShowTo1v1ServiceImpl constructor(
         roomName: String,
         completion: (error: Exception?, roomInfo: ShowTo1v1RoomInfo?) -> Unit
     ) {
-        ShowTo1v1Logger.d(tag, "createUser start")
+        ShowTo1v1Logger.d(TAG, "createRoom start, roomName:$roomName")
         val roomInfo = AUIRoomInfo()
         roomInfo.roomId = (Random(System.currentTimeMillis()).nextInt(100000) + 1000000).toString()
         roomInfo.roomName = roomName
@@ -102,9 +100,11 @@ class ShowTo1v1ServiceImpl constructor(
                 val scene = syncManager.getScene(roomInfo.roomId)
                 scene.create(null) { er ->
                     if (er != null) {
-                        Log.d(tag, "enter scene fail: ${er.message}")
+                        ShowTo1v1Logger.e(TAG, er,"createRoom-->create scene fail，roomId:${roomInfo.roomId}")
                         completion.invoke(Exception(er.message), null)
                         return@create
+                    }else{
+                        ShowTo1v1Logger.d(TAG,"createRoom-->create scene success，roomId:${roomInfo.roomId}")
                     }
                 }
 
@@ -118,19 +118,22 @@ class ShowTo1v1ServiceImpl constructor(
                 ))
             }
             if (e != null) {
+                ShowTo1v1Logger.e(TAG, e,"createRoom failed，roomId:${roomInfo.roomId}")
                 completion.invoke(Exception(e.message), null)
             }
         }
     }
 
     override fun joinRoom(roomInfo: ShowTo1v1RoomInfo, completion: (error: Exception?) -> Unit) {
+        ShowTo1v1Logger.d(TAG, "joinRoom start，roomId:${roomInfo.roomId}")
         val scene = syncManager.getScene(roomInfo.roomId)
         scene.bindRespDelegate(this)
         scene.enter { _, e ->
             if (e != null) {
-                Log.d(tag, "enter scene fail: ${e.message}")
+                ShowTo1v1Logger.e(TAG, e,"joinRoom failed，roomId:${roomInfo.roomId}")
                 completion.invoke(Exception(e.message))
             } else {
+                ShowTo1v1Logger.d(TAG, "joinRoom end，roomId:${roomInfo.roomId}")
                 completion.invoke(null)
             }
         }
@@ -138,14 +141,30 @@ class ShowTo1v1ServiceImpl constructor(
     }
 
     override fun leaveRoom(roomInfo: ShowTo1v1RoomInfo, completion: (error: Exception?) -> Unit) {
+        ShowTo1v1Logger.d(TAG, "leaveRoom start ${roomInfo.roomId}")
         val scene = syncManager.getScene(roomInfo.roomId)
         scene.unbindRespDelegate(this)
         scene.leave()
         if (roomInfo.userId == UserManager.getInstance().user.id.toString()) {
             roomManager.destroyRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomInfo.roomId) { e ->
-
+                if (e!=null){
+                    ShowTo1v1Logger.e(TAG,e, "leaveRoom-->destroyRoom ${roomInfo.roomId} failed")
+                    runOnMainThread {
+                        completion.invoke(Exception(e.message))
+                    }
+                }else{
+                    ShowTo1v1Logger.d(TAG, "broadcast leaveRoom end ${roomInfo.roomId}")
+                    runOnMainThread {
+                        completion.invoke(null)
+                    }
+                }
             }
             scene.delete()
+        }else{
+            ShowTo1v1Logger.d(TAG, "audience leaveRoom end ${roomInfo.roomId}")
+            runOnMainThread {
+                completion.invoke(null)
+            }
         }
     }
 
@@ -153,8 +172,10 @@ class ShowTo1v1ServiceImpl constructor(
      * 拉取房间列表
      */
     override fun getRoomList(completion: (error: Exception?, roomList: List<ShowTo1v1RoomInfo>) -> Unit) {
+        ShowTo1v1Logger.d(TAG, "getRoomList start")
         roomManager.getRoomInfoList(BuildConfig.AGORA_APP_ID, kSceneId, System.currentTimeMillis(), 20) { error, list ->
             if (error != null) {
+                ShowTo1v1Logger.e(TAG, error, "getRoomList failed")
                 runOnMainThread { completion.invoke(null, ArrayList<ShowTo1v1RoomInfo>().toList()) }
             }
             if (list != null) {
@@ -171,6 +192,7 @@ class ShowTo1v1ServiceImpl constructor(
                 }
                 //按照创建时间顺序排序
                 ret.sortBy { it.createdAt }
+                ShowTo1v1Logger.d(TAG, "getRoomList end, roomCount:${ret.size}")
                 runOnMainThread { completion.invoke(null, ret.toList()) }
             }
         }
@@ -192,6 +214,11 @@ class ShowTo1v1ServiceImpl constructor(
 
     override fun onSceneDestroy(roomId: String) {
         roomManager.destroyRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomId) {
+            if (it!=null){
+                ShowTo1v1Logger.e(TAG, it,"destroyRoom failed，roomId:$roomId")
+            }else{
+                ShowTo1v1Logger.d(TAG, "destroyRoom, roomId:$roomId")
+            }
         }
     }
 
