@@ -65,6 +65,7 @@ import io.agora.scene.joy.service.JoyServiceListenerProtocol
 import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.joy.service.JoyStartGameInfo
 import io.agora.scene.joy.service.api.JoyAction
+import io.agora.scene.joy.service.api.JoyApiService
 import io.agora.scene.joy.service.api.JoyGameListResult
 import io.agora.scene.joy.service.api.JoyGameRepo
 import io.agora.scene.joy.service.api.JoyGameStatus
@@ -432,16 +433,14 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             override fun onRoomDidDestroy(roomInfo: AUIRoomInfo, abnormal: Boolean) {
                 destroy()
                 showLivingEndLayout(abnormal)
-                JoyLogger.d("showLivingEndLayout", "timer end! abnormal:$abnormal")
             }
 
             override fun onRoomDidChanged(roomInfo: AUIRoomInfo) {
-
-
             }
         })
 
         mJoyViewModel.mGameDetailLiveData.observe(this) {
+            JoyLogger.d(JoyApiService.TAG, "GameDetail：$it")
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
                     binding.tvRules.isVisible = true
@@ -453,9 +452,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                         setupActionView(it.data?.actions)
                     }
                 }
+
+                else -> {}
             }
         }
         mJoyViewModel.mStartGameLiveData.observe(this) {
+            JoyLogger.d(JoyApiService.TAG, "StartGame：$it")
             when (it.dataState) {
                 DataState.STATE_LOADING -> {
                     showLoadingView()
@@ -498,12 +500,16 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             }
         }
         mJoyViewModel.mStopGameLiveData.observe(this) {
+            JoyLogger.d(JoyApiService.TAG, "StopGame：$it")
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
                 }
+
+                else -> {}
             }
         }
         mJoyViewModel.mSendGiftLiveData.observe(this) {
+            JoyLogger.d(JoyApiService.TAG, "SendGift：$it")
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
                     CustomToast.showTips(getString(R.string.joy_send_gift_success))
@@ -513,9 +519,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 DataState.STATE_ERROR -> {
                     CustomToast.showError(getString(R.string.joy_send_gift_failed))
                 }
+
+                else -> {}
             }
         }
         mJoyViewModel.mSendCommentLiveData.observe(this) {
+            JoyLogger.d(JoyApiService.TAG, "SendComment：$it")
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
                     CustomToast.showTips(getString(R.string.joy_send_message_success))
@@ -525,17 +534,23 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 DataState.STATE_ERROR -> {
                     CustomToast.showError(getString(R.string.joy_instruction_error))
                 }
+
+                else -> {}
             }
         }
         mJoyViewModel.mSendLikeLiveData.observe(this) {
+            JoyLogger.d(JoyApiService.TAG, "SendLike：$it")
             when (it.dataState) {
                 DataState.STATE_FAILED,
                 DataState.STATE_ERROR -> {
                     CustomToast.showError(getString(R.string.joy_request_failed))
                 }
+
+                else -> {}
             }
         }
         mJoyViewModel.mGameStatusLiveData.observe(this) {
+            JoyLogger.d(JoyApiService.TAG, "getGameStatus：$it")
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
                     if (it.data?.status == JoyGameStatus.started.name) {
@@ -548,9 +563,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                         }
                     }
                 }
+
+                else -> {}
             }
         }
         mJoyViewModel.mGameListLiveData.observe(this) {
+            JoyLogger.d(JoyApiService.TAG, "getGames：$it")
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
                     it.data?.list?.apply {
@@ -564,6 +582,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 DataState.STATE_ERROR -> {
                     CustomToast.showError(getString(R.string.joy_request_failed))
                 }
+
+                else -> {}
             }
         }
     }
@@ -666,7 +686,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
             override fun onError(err: Int) {
                 super.onError(err)
-                JoyLogger.e(TAG, "rtc onError:$err ${RtcEngine.getErrorDescription(err)} ")
+                JoyLogger.e(TAG, null, "rtc onError:$err ${RtcEngine.getErrorDescription(err)} ")
             }
         }
 
@@ -996,7 +1016,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             .addMsges(rctrlMsg)
             .build()
         mRtcEngine.sendStreamMessageEx(mStreamId, rctrlMsges.toByteArray(), mMainRtcConnection)
-        Log.i(TAG, "sendKeyboardMessage:$eventType,key:$key")
+        JoyLogger.d(TAG, "sendKeyboardMessage:$eventType,key:$key")
     }
 
 

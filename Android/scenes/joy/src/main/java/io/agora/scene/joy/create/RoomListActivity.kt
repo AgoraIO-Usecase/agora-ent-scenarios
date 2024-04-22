@@ -48,11 +48,11 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setOnApplyWindowInsetsListener(binding.root)
-        JoyServiceManager.renewTokens { tokenConfig: TokenConfig?, exception: Exception? ->
-            if (exception == null) {
-                binding.smartRefreshLayout.autoRefresh()
-            }
-        }
+//        JoyServiceManager.renewTokens { tokenConfig: TokenConfig?, exception: Exception? ->
+//            if (exception == null) {
+//                binding.smartRefreshLayout.autoRefresh()
+//            }
+//        }
     }
 
     override fun initView(savedInstanceState: Bundle?) {
@@ -66,6 +66,7 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
 
         binding.smartRefreshLayout.setEnableLoadMore(false)
         binding.smartRefreshLayout.setEnableRefresh(true)
+
         binding.smartRefreshLayout.setOnRefreshListener {
             JoyServiceManager.renewTokens { tokenConfig: TokenConfig?, exception: Exception? ->
                 if (exception == null) {
@@ -75,6 +76,7 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
                 }
             }
         }
+        binding.smartRefreshLayout.autoRefresh()
 
         binding.btnCreateRoom.setOnClickListener {
             LivePrepareActivity.launch(this)
