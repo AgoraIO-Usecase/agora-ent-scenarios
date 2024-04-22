@@ -409,12 +409,7 @@ object BeautyManager {
 
         override fun getVideoFrameProcessMode() = IVideoFrameObserver.PROCESS_MODE_READ_WRITE
 
-        override fun getVideoFormatPreference() = when (beautyType) {
-            BeautyType.SenseTime -> IVideoFrameObserver.VIDEO_PIXEL_DEFAULT
-            BeautyType.FaceUnity -> IVideoFrameObserver.VIDEO_PIXEL_DEFAULT
-            BeautyType.ByteDance -> IVideoFrameObserver.VIDEO_PIXEL_DEFAULT
-            BeautyType.Agora -> IVideoFrameObserver.VIDEO_PIXEL_I422
-        }
+        override fun getVideoFormatPreference() = IVideoFrameObserver.VIDEO_PIXEL_DEFAULT
 
         override fun getRotationApplied() = false
 
