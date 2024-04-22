@@ -708,14 +708,6 @@ extension RoomListViewController: ICallRtmManagerListener {
         showTo1v1Warn("onDisconnected")
     }
     
-    func onConnectionLost() {
-        showTo1v1Warn("onConnectionLost")
-        AUIToast.show(text: "call_toast_disconnect".showTo1v1Localization())
-        self.setupStatus.remove(.rtm)
-        _setupRtm { _ in
-        }
-    }
-    
     func onTokenPrivilegeWillExpire(channelName: String) {
         showTo1v1Warn("onTokenPrivilegeWillExpire")
         self.rtcEngine(rtcEngine, tokenPrivilegeWillExpire: "")

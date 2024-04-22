@@ -688,16 +688,6 @@ extension Pure1v1UserListViewController: ICallRtmManagerListener {
         pure1v1Print("onDisconnected")
     }
     
-    func onConnectionLost() {
-        pure1v1Print("onConnectionLost")
-        AUIToast.show(text: "call_toast_disconnect".pure1v1Localization())
-        self.setupStatus.remove(.rtm)
-        //掉线了，需要重新enter，否则对端看不到
-        self.service?.leaveRoom(completion: { _ in
-        })
-        _autoRefrshAction()
-    }
-    
     func onTokenPrivilegeWillExpire(channelName: String) {
         pure1v1Print("onTokenPrivilegeWillExpire")
         self.tokenPrivilegeWillExpire()

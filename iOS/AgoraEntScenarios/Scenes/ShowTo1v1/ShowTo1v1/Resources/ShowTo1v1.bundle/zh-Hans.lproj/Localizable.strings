@@ -46,8 +46,6 @@
 "report_room" = "举报";
 "report_room_success" = "举报成功";
 
-"call_toast_disconnect"="连接中断，重连中...";
-
 "show_statistic_bitrate" = "码率";
 "show_statistic_delay" = "延迟";
 "show_statistic_receive_title" = "接收";

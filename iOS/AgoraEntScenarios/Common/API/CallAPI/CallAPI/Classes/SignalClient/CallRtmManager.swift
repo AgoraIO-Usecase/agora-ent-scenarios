@@ -8,8 +8,9 @@
 import Foundation
 import AgoraRtmKit
 
-private func createRtmClient(appId: String, userId: String) -> AgoraRtmClientKit {
+public func createRtmClient(appId: String, userId: String) -> AgoraRtmClientKit {
     let rtmConfig = AgoraRtmClientConfig(appId: appId, userId: userId)
+    rtmConfig.presenceTimeout = 30
     var rtmClient: AgoraRtmClientKit? = nil
     do {
         rtmClient = try AgoraRtmClientKit(rtmConfig, delegate: nil)

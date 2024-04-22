@@ -30,8 +30,6 @@
 "call_toast_callfail"="呼叫失败";
 "call_toast_acceptfail"="接受邀请失败";
 
-"call_toast_disconnect"="连接中断，重连中...";
-
 "report_room" = "举报";
 "report_room_success" = "举报成功";
 
