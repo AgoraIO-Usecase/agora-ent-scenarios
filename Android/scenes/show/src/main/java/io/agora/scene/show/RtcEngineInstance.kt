@@ -90,6 +90,7 @@ object RtcEngineInstance {
                 }
                 innerRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
                     mMetaEngineHandler.initializeRtc(this)
+                    setParameters("{\"rtc.enable_camera_capture_yuv\":true}")
                     setParameters("{\"rtc.video.seg_before_exts\":true}")
                     // 背景分割需要在 startPreview 之后调用
 //                    mMetaEngineHandler.enableSegmentation()
