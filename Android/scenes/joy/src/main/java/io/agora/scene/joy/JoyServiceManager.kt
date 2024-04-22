@@ -12,7 +12,7 @@ import java.util.concurrent.Executors
 
 object JoyServiceManager {
 
-    private const val TAG = "JoyServiceManager"
+     const val TAG = "JoyServiceManager"
 
     private val mWorkingExecutor = Executors.newSingleThreadExecutor()
 
@@ -59,6 +59,7 @@ object JoyServiceManager {
                 callback.invoke(mTokenConfig, null)
             },
             failure = {
+                JoyLogger.e(TAG, it, "generateTokens failed")
                 callback.invoke(null, it)
             })
     }
