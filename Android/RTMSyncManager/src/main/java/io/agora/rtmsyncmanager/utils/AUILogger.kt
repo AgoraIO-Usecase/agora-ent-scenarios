@@ -9,7 +9,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AUILogger(private val config: Config) {
+class AUILogger constructor(private val config: Config) {
 
     companion object {
 
@@ -45,7 +45,7 @@ class AUILogger(private val config: Config) {
     }
 
 
-    data class Config(
+    data class Config constructor(
         val context: Context,
         val rootTag: String,
         val logFileSize: Int = 2 * 1024 * 1024, // 2M，单位Byte

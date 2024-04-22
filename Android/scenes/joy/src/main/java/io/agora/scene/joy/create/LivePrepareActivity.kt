@@ -24,6 +24,7 @@ import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.joy.JoyLogger
 import io.agora.scene.joy.R
 import io.agora.scene.joy.JoyServiceManager
 import io.agora.scene.joy.service.base.DataState
@@ -33,6 +34,7 @@ import io.agora.scene.joy.service.api.JoyGameBanner
 import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.joy.live.JoyViewModel
 import io.agora.scene.joy.live.RoomLivingActivity
+import io.agora.scene.joy.service.api.JoyApiService
 import io.agora.scene.joy.widget.toast.CustomToast
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
@@ -172,6 +174,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
         super.requestData()
         mJoyViewModel.getGameConfig()
         mJoyViewModel.mGameConfigLiveData.observe(this) {
+            JoyLogger.d(JoyApiService.TAG,"gameConfig：$it")
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
                     val list = it.data?.bannerList
@@ -190,10 +193,13 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
                         startAutoScroll()
                     }
                 }
+
                 DataState.STATE_FAILED,
                 DataState.STATE_ERROR -> {
                     CustomToast.showError(getString(R.string.joy_request_failed))
                 }
+
+                else -> {}
             }
         }
     }
@@ -258,13 +264,13 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
 
     override fun onResume() {
         super.onResume()
-        Log.d(TAG,"onResume")
+        Log.d(TAG, "onResume")
         mRtcEngine.startPreview()
     }
 
     override fun onPause() {
         super.onPause()
-        Log.d(TAG,"onPause")
+        Log.d(TAG, "onPause")
         if (mIsFinishToLiveDetail) {
             mRtcEngine.stopPreview()
         }
@@ -272,7 +278,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
 
     override fun onStop() {
         super.onStop()
-        Log.d(TAG,"onStop")
+        Log.d(TAG, "onStop")
     }
 
     override fun onBackPressed() {
@@ -283,7 +289,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
     override fun onDestroy() {
         binding.vpGame.unregisterOnPageChangeCallback(onPageCallback)
         super.onDestroy()
-        Log.d(TAG,"onDestroy")
+        Log.d(TAG, "onDestroy")
     }
 
 
