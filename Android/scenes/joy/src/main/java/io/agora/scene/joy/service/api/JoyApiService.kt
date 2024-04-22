@@ -5,6 +5,10 @@ import io.agora.scene.joy.service.base.JoyJsonModel
 import retrofit2.http.*
 
 interface JoyApiService {
+    companion object {
+        const val TAG = "JoyApiService"
+    }
+
     @POST("/toolbox/v2/cloud-bullet-game/games")
     suspend fun getGames(
         @Body entity: JoyGameEntity
