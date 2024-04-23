@@ -256,7 +256,7 @@ public class RoomLivingViewModel extends ViewModel {
         }
 
         if (mRtcEngine != null) {
-            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NONE);
             mRtcEngine.leaveChannel();
             RtcEngineEx.destroy();
             mRtcEngine = null;
@@ -641,11 +641,11 @@ public class RoomLivingViewModel extends ViewModel {
         ktvApiProtocol.muteMic(!isUnMute);
         if (!isUnMute && mSetting.getMEarBackEnable()) {
             if (mRtcEngine != null) {
-                mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+                mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NONE);
             }
         } else if (isUnMute && mSetting.getMEarBackEnable()) {
             if (mRtcEngine != null) {
-                mRtcEngine.enableInEarMonitoring(true, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+                mRtcEngine.enableInEarMonitoring(true, Constants.EAR_MONITORING_FILTER_NONE);
             }
         }
 
@@ -1173,7 +1173,7 @@ public class RoomLivingViewModel extends ViewModel {
                     return;
                 }
                 if (mRtcEngine != null) {
-                    mRtcEngine.enableInEarMonitoring(earBackEnable, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+                    mRtcEngine.enableInEarMonitoring(earBackEnable, Constants.EAR_MONITORING_FILTER_NONE);
                 }
             }
 
