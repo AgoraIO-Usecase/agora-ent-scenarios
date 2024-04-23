@@ -65,13 +65,13 @@ UICollectionViewDataSource
         [self configData:setting];
         [self initSubViews];
         [self addSubViewConstraints];
-        self.soundSlider.value = 1.0;
-        self.accSlider.value = 0.5;
-        self.remoteSlider.value = 0.3;
-        self.setting.remoteVolume = 30;
-        self.lrcLevel = 1;
-        self.vqs = 0;
-        self.ans = 0;
+//        self.soundSlider.value = 1.0;
+//        self.accSlider.value = 0.5;
+//        self.remoteSlider.value = 0.3;
+//        self.setting.remoteVolume = 30;
+//        self.lrcLevel = 1;
+//        self.vqs = 0;
+//        self.ans = 0;
         self.cellWidth = (CGRectGetWidth([UIScreen mainScreen].bounds) - 48) / 4.0;
         self.titles = @[ @"KTV", KTVLocalizedString(@"ktv_effect_off"),KTVLocalizedString(@"ktv_effect_concert"), KTVLocalizedString(@"ktv_effect_studio"), KTVLocalizedString(@"ktv_effect_phonograph"), KTVLocalizedString(@"ktv_effect_spatial"), KTVLocalizedString(@"ktv_effect_ethereal"), KTVLocalizedString(@"ktv_effect_pop"),@"R&B"];
         self.effectImgs = @[@"ktv_console_setting3",@"ktv_console_setting4",@"ktv_console_setting2",@"ktv_console_setting1"];
@@ -82,15 +82,15 @@ UICollectionViewDataSource
 - (void)configData:(VLKTVSettingModel *)setting {
     if (!setting) {
         _setting = [[VLKTVSettingModel alloc] init];
-        [self.setting setDefaultProperties];
+        [self setDefaultSetting];
     } else {
         _setting = setting;
     }
     self.soundCardSwitcher.on = self.setting.soundCardOn;
     self.soundSwitcher.on = self.setting.soundOn;
-    self.soundSlider.value = self.setting.soundValue;
-    self.accSlider.value = self.setting.accValue;
-    self.remoteSlider.value = self.setting.remoteValue;
+    self.soundSlider.value = self.setting.soundValue / 100.0;
+    self.accSlider.value = self.setting.accValue / 100.0;
+    self.remoteSlider.value = self.setting.remoteVolume / 100.0;
     self.lrcSegmentView.selectIndex = self.setting.lrcLevel;
     self.vqsSegmentView.selectIndex = self.setting.vqs;
     self.ansSegmentView.selectIndex = self.setting.ans;
@@ -99,6 +99,23 @@ UICollectionViewDataSource
     self.aiAecSwitcherView.on = self.setting.enableAec;
     self.aiAecSwitcherView.aecValue = self.setting.aecLevel;
     self.netSwitcherView.on = self.setting.enableMultipath;
+}
+
+-(void)setDefaultSetting{
+    self.setting.soundOn = NO;
+    self.setting.mvOn = NO;
+    self.setting.toneValue = 0;
+    self.setting.soundValue = 100;
+    self.setting.accValue = 50;
+    self.setting.remoteVolume = 30;
+    self.setting.lrcLevel = 1;
+    self.setting.vqs = 0;
+    self.setting.ans = 0;
+    self.setting.isDelay = false;
+    self.setting.isPerBro = false;
+    self.setting.enableAec = true;
+    self.setting.enableMultipath = true;
+    self.setting.aecLevel = 1;
 }
 
 -(void)setChorusStatus:(BOOL)status{
@@ -294,8 +311,8 @@ UICollectionViewDataSource
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     self.setting.selectEffect = indexPath.item;
     [self.collectionView reloadData];
-    if([self.delegate respondsToSelector:@selector(settingViewEffectChoosed:)]){
-        [self.delegate settingViewEffectChoosed:indexPath.item];
+    if([self.delegate respondsToSelector:@selector(settingViewSettingChanged:effectChoosed:)]){
+        [self.delegate settingViewSettingChanged:self.setting effectChoosed:indexPath.item];
     }
 }
 
@@ -579,22 +596,22 @@ UICollectionViewDataSource
 
 @implementation VLKTVSettingModel
 
-- (void)setDefaultProperties {
-    self.soundOn = NO;
-    self.mvOn = NO;
-    self.toneValue = 0;
-    self.soundValue = 0.0;
-    self.accValue = 0.0;
-    self.remoteValue = 0.0;
-    self.lrcLevel = 1;
-    self.vqs = 0;
-    self.ans = 0;
-    self.isDelay = false;
-    self.isPerBro = false;
-    self.enableAec = true;
-    self.enableMultipath = true;
-    self.aecLevel = 1;
-    self.kindIndex = kKindUnSelectedIdentifier;
-}
+//- (void)setDefaultProperties {
+//    self.soundOn = NO;
+//    self.mvOn = NO;
+//    self.toneValue = 0;
+//    self.soundValue = 0.0;
+//    self.accValue = 0.0;
+//    self.remoteValue = 0.0;
+//    self.lrcLevel = 1;
+//    self.vqs = 0;
+//    self.ans = 0;
+//    self.isDelay = false;
+//    self.isPerBro = false;
+//    self.enableAec = true;
+//    self.enableMultipath = true;
+//    self.aecLevel = 1;
+//    self.kindIndex = kKindUnSelectedIdentifier;
+//}
 
 @end

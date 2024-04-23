@@ -798,6 +798,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if([model.winnerNo isEqualToString:VLUserCenter.user.id]){
         jsonStr = @"{\"format\":{\"highPartIndex\":0}}";
         songConfig.songCutter = true;
+        songConfig.mainSingerUid = [model.winnerNo integerValue];
     } else {
         jsonStr = @"{\"format\":{\"highPart\":0}}";
         songConfig.songCutter = false;

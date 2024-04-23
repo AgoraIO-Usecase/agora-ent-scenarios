@@ -885,7 +885,8 @@ extension CantataMainViewController {
                         }
                         
                         //如果观众的scoreMap没有这个麦位说明他是中途加入的 需要更新scoreMap
-                        if !scoreMap.keys.contains(userNo) && userNo.count > 0 && self.singerRole == .audience {
+                      //  if !scoreMap.keys.contains(userNo) && userNo.count > 0 && self.singerRole == .audience {
+                        if !scoreMap.keys.contains(userNo) && userNo.count > 0 {
                             let scoreModel = ScoreModel(name: seatModel.name ?? "", score: 0, headUrl: seatModel.headUrl ?? "")
                             self.scoreMap.updateValue(scoreModel, forKey: userNo)
                         }
@@ -970,6 +971,21 @@ extension CantataMainViewController {
                         }
                     }
                 }
+            
+            //just test
+            do {
+                // 将字典转换为 JSON 数据
+                print("before------")
+                for i in scoreMap {
+                    
+                    let model = i.value
+                    print("scoreMap:\(model.name)----\(model.score)")
+                }
+                print("------end")
+            } catch {
+                print("Error converting dictionary to JSON string: \(error)")
+            }
+            
           }
 
         AppContext.dhcServiceImp().subscribeRoomStatusChanged {[weak self] status, roomInfo in

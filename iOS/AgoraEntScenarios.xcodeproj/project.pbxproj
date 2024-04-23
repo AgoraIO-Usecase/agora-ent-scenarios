@@ -643,6 +643,7 @@
 		E3C7726A2AE7B0E6008D17B7 /* VRCreateRoomPresentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C772692AE7B0E6008D17B7 /* VRCreateRoomPresentView.swift */; };
 		E3C7EF2C2AE66BC70023B069 /* VRRoomHomeListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C7EF2B2AE66BC70023B069 /* VRRoomHomeListCell.swift */; };
 		E3C7EF2E2AE66F1F0023B069 /* VRRoomHomeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C7EF2D2AE66F1F0023B069 /* VRRoomHomeListView.swift */; };
+		E3D5E67A2BCE801F00F8A9DA /* APIReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D5E6792BCE801E00F8A9DA /* APIReporter.swift */; };
 		E3DF5DFE2B635DBA00F24E5B /* LrcTime.proto in Sources */ = {isa = PBXBuildFile; fileRef = E3DF5DFC2B635DBA00F24E5B /* LrcTime.proto */; };
 		E3DF5DFF2B635DBA00F24E5B /* LrcTime.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3DF5DFD2B635DBA00F24E5B /* LrcTime.pb.swift */; };
 		E3E77BE02B5678D80090381C /* UIImage+SBG.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3E77BDF2B5678D80090381C /* UIImage+SBG.swift */; };
@@ -1580,6 +1581,7 @@
 		E3C772692AE7B0E6008D17B7 /* VRCreateRoomPresentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRCreateRoomPresentView.swift; sourceTree = "<group>"; };
 		E3C7EF2B2AE66BC70023B069 /* VRRoomHomeListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VRRoomHomeListCell.swift; sourceTree = "<group>"; };
 		E3C7EF2D2AE66F1F0023B069 /* VRRoomHomeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VRRoomHomeListView.swift; sourceTree = "<group>"; };
+		E3D5E6792BCE801E00F8A9DA /* APIReporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIReporter.swift; sourceTree = "<group>"; };
 		E3DF5DFC2B635DBA00F24E5B /* LrcTime.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.protobuf; path = LrcTime.proto; sourceTree = "<group>"; };
 		E3DF5DFD2B635DBA00F24E5B /* LrcTime.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LrcTime.pb.swift; sourceTree = "<group>"; };
 		E3E77BDF2B5678D80090381C /* UIImage+SBG.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+SBG.swift"; sourceTree = "<group>"; };
@@ -3203,6 +3205,7 @@
 		E301BBD22AF4C8470089A79C /* KTVApi */ = {
 			isa = PBXGroup;
 			children = (
+				E3D5E6792BCE801E00F8A9DA /* APIReporter.swift */,
 				E3808CA92B72039300AA659E /* KTVApi.swift */,
 				E3808CA82B72039300AA659E /* KTVApiImpl.swift */,
 				E3DF5DFD2B635DBA00F24E5B /* LrcTime.pb.swift */,
@@ -4380,6 +4383,7 @@
 				DD619ACE29E3E247008F63E4 /* SAUserView.swift in Sources */,
 				DD619C0429E3E81D008F63E4 /* AboutAgoraEntertainmentViewController.swift in Sources */,
 				DD9EC0042AD5512400B4551F /* VRCreateRoomView.swift in Sources */,
+				E3D5E67A2BCE801F00F8A9DA /* APIReporter.swift in Sources */,
 				DD9EBFED2AD5512400B4551F /* VMANISSetTableViewCell.swift in Sources */,
 				E34B460C2AEA90E30082D334 /* VRSoundEffectViewController.swift in Sources */,
 				E301BE822AF4E06F0089A79C /* VLSRSearchEmptyView.m in Sources */,

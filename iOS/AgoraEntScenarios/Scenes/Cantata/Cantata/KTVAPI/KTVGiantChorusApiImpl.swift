@@ -122,8 +122,10 @@ fileprivate enum KTVSongMode: Int {
     
     private let tag = "KTV_API_LOG"
     private let messageId = "agora:scenarioAPI"
-    private let version = "1_iOS_4.3.0"
+    private let version = "4.3.0"
     private let lyricSyncVersion = 2
+    
+    private var apiRepoter: APIReporter?
     
     deinit {
         mcc?.register(nil)
@@ -160,6 +162,8 @@ fileprivate enum KTVSongMode: Int {
             mediaPlayer?.adjustPlayoutVolume(50)
             mediaPlayer?.adjustPublishSignalVolume(50)
         }
+        
+        apiRepoter = APIReporter(type: .ktv, version: version, engine: apiConfig?.engine ?? AgoraRtcEngineKit())
         
         initTimer()
         mediaPlayer?.setPlayerOption("play_pos_change_callback", value: 100)
@@ -207,8 +211,8 @@ fileprivate enum KTVSongMode: Int {
         dataStreamConfig.ordered = false
         dataStreamConfig.syncWithAudio = true
         self.apiConfig?.engine?.createDataStreamEx(&dataStreamId, config: dataStreamConfig, connection: singChannelConnection ?? AgoraRtcConnection())
-        
-        sendCustomMessage(with: "renewInnerDataStreamId", label: "")
+
+        sendCustomMessage(with: "renewInnerDataStreamId", dict: [:])
         agoraPrint("renewInnerDataStreamId")
     }
 }
@@ -216,12 +220,50 @@ fileprivate enum KTVSongMode: Int {
 //MARK: KTVApiDelegate
 extension KTVGiantChorusApiImpl {
     
+    func objectContent(of object: Any) -> [String: Any] {
+        var content = [String: Any]()
+        
+        let mirror = Mirror(reflecting: object)
+        for child in mirror.children {
+            if let propertyName = child.label {
+                if let convertibleValue = convertToJSONSerializable(child.value) {
+                    content[propertyName] = convertibleValue
+                }
+            }
+        }
+        
+        return content
+    }
+
+    func convertToJSONSerializable(_ value: Any) -> Any? {
+        switch value {
+        case let value as String:
+            return value
+        case let value as Int:
+            return value
+        case let value as Double:
+            return value
+        case let value as Bool:
+            return value
+        case let value as Int?:
+            return value
+        case let value as Double?:
+            return value
+        case let value as Bool?:
+            return value
+        case let value as String?:
+            return value
+        default:
+            return nil
+        }
+    }
+    
     func getMusicContentCenter() -> AgoraMusicContentCenter? {
         return mcc
     }
     
     func setLrcView(view: KTVLrcViewDelegate) {
-        sendCustomMessage(with: "renewInnerDataStreamId", label: "view:\(view.description)")
+        sendCustomMessage(with: "renewInnerDataStreamId", dict: [:])
         lrcControl = view
     }
     
@@ -260,7 +302,7 @@ extension KTVGiantChorusApiImpl {
     }
 
     func loadMusic(songCode: Int, config: KTVSongConfiguration, onMusicLoadStateListener: IMusicLoadStateListener) {
-        sendCustomMessage(with: "loadMusic", label: "config:\(config.printObjectContent())")
+        sendCustomMessage(with: "loadMusicWithSongCode:\(songCode)", dict: objectContent(of: config))
         agoraPrint("loadMusic songCode:\(songCode) ")
         self.songMode = .songCode
         self.songCode = songCode
@@ -269,7 +311,7 @@ extension KTVGiantChorusApiImpl {
     }
     
     func loadMusic(config: KTVSongConfiguration, url: String) {
-        sendCustomMessage(with: "loadMusic", label: "config:\(config.printObjectContent()), url:\(url)")
+        sendCustomMessage(with: "loadMusicWithUrl:\(url)", dict: objectContent(of: config))
         agoraPrint("loadMusic url:\(url)")
         self.songMode = .songUrl
         self.songUrl = url
@@ -286,12 +328,11 @@ extension KTVGiantChorusApiImpl {
     }
     
     func getMusicPlayer() -> AgoraRtcMediaPlayerProtocol? {
-        sendCustomMessage(with: "getMusicPlayer", label: "")
         return mediaPlayer
     }
 
     func addEventHandler(ktvApiEventHandler: KTVApiEventHandlerDelegate) {
-        sendCustomMessage(with: "addEventHandler", label: "")
+        sendCustomMessage(with: "addEventHandler", dict: [:])
         agoraPrint("addEventHandler")
         if eventHandlers.contains(ktvApiEventHandler) {
             return
@@ -300,13 +341,13 @@ extension KTVGiantChorusApiImpl {
     }
 
     func removeEventHandler(ktvApiEventHandler: KTVApiEventHandlerDelegate) {
-        sendCustomMessage(with: "removeEventHandler", label: "")
+        sendCustomMessage(with: "removeEventHandler", dict: [:])
         agoraPrint("removeEventHandler")
         eventHandlers.remove(ktvApiEventHandler)
     }
 
     func cleanCache() {
-        sendCustomMessage(with: "cleanCache", label: "")
+        sendCustomMessage(with: "cleanCache", dict: [:])
         isRelease = true
         mediaPlayer?.stop()
         freeTimer()
@@ -333,7 +374,7 @@ extension KTVGiantChorusApiImpl {
     }
     
     @objc public func enableMutipath(enable: Bool) {
-        sendCustomMessage(with: "enableMutipath", label: "enable:\(enable)")
+        sendCustomMessage(with: "enableMutipath", dict: ["enable":enable])
         agoraPrint("enableMutipath:\(enable)")
         enableMultipathing = enable
         if singerRole == .coSinger || singerRole == .leadSinger {
@@ -346,7 +387,11 @@ extension KTVGiantChorusApiImpl {
     }
     
     func renewToken(rtmToken: String, chorusChannelRtcToken: String) {
-        sendCustomMessage(with: "renewToken", label: "rtmToken:\(rtmToken), chorusChannelRtcToken:\(chorusChannelRtcToken)")
+        let dict: [String: Any] = [
+                    "rtmToken":rtmToken,
+                    "chorusChannelRtcToken":chorusChannelRtcToken
+        ]
+        sendCustomMessage(with: "renewToken", dict: dict)
         agoraPrint("renewToken rtmToken:\(rtmToken) chorusChannelRtcToken:\(chorusChannelRtcToken)")
             // 更新RtmToken
         mcc?.renewToken(rtmToken)
@@ -359,7 +404,7 @@ extension KTVGiantChorusApiImpl {
         }
 
     func fetchMusicCharts(completion: @escaping MusicChartCallBacks) {
-        sendCustomMessage(with: "fetchMusicCharts", label: "")
+        sendCustomMessage(with: "fetchMusicCharts", dict: [:])
         agoraPrint("fetchMusicCharts")
         let requestId = mcc!.getMusicCharts()
         musicChartDict[requestId] = completion
@@ -371,7 +416,13 @@ extension KTVGiantChorusApiImpl {
                      jsonOption: String,
                      completion:@escaping (String, AgoraMusicContentCenterStatusCode, AgoraMusicCollection) -> Void) {
         agoraPrint("searchMusic with musicChartId: \(musicChartId)")
-        sendCustomMessage(with: "searchMusic", label: "musicChartId:\(musicChartId), page:\(page), pageSize:\(pageSize), jsonOption:\(jsonOption)")
+        let dict: [String: Any] = [
+                    "musicChartId":musicChartId,
+                    "page": page,
+                    "pageSize": pageSize,
+                    "jsonOption": jsonOption
+        ]
+        sendCustomMessage(with: "searchMusic", dict: dict)
         let requestId = mcc!.getMusicCollection(musicChartId: musicChartId, page: page, pageSize: pageSize, jsonOption: jsonOption)
         musicSearchDict[requestId] = completion
     }
@@ -382,7 +433,13 @@ extension KTVGiantChorusApiImpl {
                      jsonOption: String,
                      completion: @escaping (String, AgoraMusicContentCenterStatusCode, AgoraMusicCollection) -> Void) {
         agoraPrint("searchMusic with keyword: \(keyword)")
-        sendCustomMessage(with: "searchMusic", label: "keyword:\(keyword), page:\(page), pageSize:\(pageSize), jsonOption:\(jsonOption)")
+        let dict: [String: Any] = [
+                    "keyword": keyword,
+                    "page": page,
+                    "pageSize": pageSize,
+                    "jsonOption": jsonOption
+        ]
+        sendCustomMessage(with: "searchMusic", dict: dict)
         let requestId = mcc!.searchMusic(keyWord: keyword, page: page, pageSize: pageSize, jsonOption: jsonOption)
         musicSearchDict[requestId] = completion
     }
@@ -396,7 +453,7 @@ extension KTVGiantChorusApiImpl {
      * 恢复播放
      */
     @objc public func resumeSing() {
-        sendCustomMessage(with: "resumeSing", label: "")
+        sendCustomMessage(with: "resumeSing", dict: [:])
         agoraPrint("resumeSing")
         if mediaPlayer?.getPlayerState() == .paused {
             mediaPlayer?.resume()
@@ -410,7 +467,7 @@ extension KTVGiantChorusApiImpl {
      * 暂停播放
      */
     @objc public func pauseSing() {
-        sendCustomMessage(with: "pauseSing", label: "")
+        sendCustomMessage(with: "pauseSing", dict: [:])
         agoraPrint("pauseSing")
         mediaPlayer?.pause()
     }
@@ -419,7 +476,7 @@ extension KTVGiantChorusApiImpl {
      * 调整进度
      */
     @objc public func seekSing(time: NSInteger) {
-        sendCustomMessage(with: "seekSing", label: "")
+        sendCustomMessage(with: "seekSing", dict: ["time":time])
         agoraPrint("seekSing")
         mediaPlayer?.seek(toPosition: time)
     }
@@ -435,7 +492,7 @@ extension KTVGiantChorusApiImpl {
      * 设置当前mic开关状态
      */
     @objc public func muteMic(muteStatus: Bool) {
-        sendCustomMessage(with: "setMicStatus", label: "\(muteStatus)")
+        sendCustomMessage(with: "setMicStatus", dict: ["muteStatus":muteStatus])
         agoraPrint("setMicStatus status:\(muteStatus)")
         self.isNowMicMuted = muteStatus
         if self.singerRole == .leadSinger || self.singerRole == .soloSinger {
@@ -446,7 +503,7 @@ extension KTVGiantChorusApiImpl {
     }
     
     @objc public func removeMusic(songCode: Int) {
-        sendCustomMessage(with: "removeMusic", label: "songCode:\(songCode)")
+        sendCustomMessage(with: "removeMusic", dict: ["songCode": songCode])
         agoraPrint("removeMusic:\(songCode)")
         let ret: Int = mcc?.removeCache(songCode: songCode) ?? 0
         if ret < 0 {
@@ -455,19 +512,11 @@ extension KTVGiantChorusApiImpl {
     }
 
     private func agoraPrint(_ message: String) {
-        #if DEBUG
-            print(message)
-        #else
-            apiConfig?.engine?.writeLog(.info, content: message)
-        #endif
+        apiRepoter?.writeLog(content: message, level: .info)
     }
     
     private func agoraPrintError(_ message: String) {
-        #if DEBUG
-            print(message)
-        #else
-            apiConfig?.engine?.writeLog(.error, content: message)
-        #endif
+        apiRepoter?.writeLog(content: message, level: .error)
     }
 
 }
@@ -908,7 +957,11 @@ extension KTVGiantChorusApiImpl {
     }
 
     func startSing(songCode: Int, startPos: Int) {
-        sendCustomMessage(with: "startSing", label: "songCode:\(songCode), startPos: \(startPos)")
+        let dict: [String: Any] = [
+            "songCode": songCode,
+            "startPos": startPos
+        ]
+        sendCustomMessage(with: "startSing", dict: dict)
         let role = singerRole
         agoraPrint("startSing role: \(role.rawValue)")
         if self.songCode != songCode {
@@ -923,7 +976,11 @@ extension KTVGiantChorusApiImpl {
     }
     
     func startSing(url: String, startPos: Int) {
-        sendCustomMessage(with: "startSing", label: "url:\(url), startPos: \(startPos)")
+        let dict: [String: Any] = [
+            "url": url,
+            "startPos": startPos
+        ]
+        sendCustomMessage(with: "startSing", dict: dict)
         let role = singerRole
         agoraPrint("startSing role: \(role.rawValue)")
         if self.songUrl != songUrl {
@@ -940,7 +997,7 @@ extension KTVGiantChorusApiImpl {
      */
     @objc public func stopSing() {
         agoraPrint("stopSing")
-        sendCustomMessage(with: "stopSing", label: "")
+        sendCustomMessage(with: "stopSing", dict: [:])
         let mediaOption = AgoraRtcChannelMediaOptions()
       //  mediaOption.autoSubscribeAudio = true
       //  mediaOption.autoSubscribeVideo = true
@@ -1556,8 +1613,13 @@ extension KTVGiantChorusApiImpl {
         sendStreamMessageWithDict(dict, success: nil)
     }
     
-    private func sendCustomMessage(with event: String, label: String) {
-        apiConfig?.engine?.sendCustomReportMessage(messageId, category: version, event: event, label: label, value: 0)
+//    private func sendCustomMessage(with event: String, label: String) {
+//        apiConfig?.engine?.sendCustomReportMessage(messageId, category: version, event: event, label: label, value: 0)
+//        apiRepoter?.reportFuncEvent(name: event, value: <#T##[String : Any]#>, ext: <#T##[String : Any]#>)
+//    }
+    
+    private func sendCustomMessage(with event: String, dict: [String: Any]) {
+        apiRepoter?.reportFuncEvent(name: event, value: dict, ext: [:])
     }
 
     private func sendStreamMessageWithDict(_ dict: [String: Any], success: ((_ success: Bool) -> Void)?) {
