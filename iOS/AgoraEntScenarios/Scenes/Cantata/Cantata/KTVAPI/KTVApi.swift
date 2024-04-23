@@ -260,22 +260,6 @@ enum GiantChorusRouteSelectionType: Int {
     public var mainSingerUid: Int = 0     //主唱uid
     public var mode: KTVLoadMusicMode = .loadMusicAndLrc
     public var songCutter: Bool = false
-    func printObjectContent() -> String {
-        var content = ""
-        
-        let mirror = Mirror(reflecting: self)
-        for child in mirror.children {
-            if let propertyName = child.label {
-                if let propertyValue = child.value as? CustomStringConvertible {
-                    content += "\(propertyName): \(propertyValue)\n"
-                } else {
-                    content += "\(propertyName): \(child.value)\n"
-                }
-            }
-        }
-        
-        return content
-   }
 }
 
 

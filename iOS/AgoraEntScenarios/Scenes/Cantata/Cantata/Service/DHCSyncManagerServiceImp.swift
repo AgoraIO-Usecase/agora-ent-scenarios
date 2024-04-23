@@ -759,6 +759,8 @@ extension DHCSyncManagerServiceImp {
         _unsubscribeAll()
         SyncUtil.leaveScene(id: channelName)
         roomNo = nil
+        expireTimer?.invalidate()
+        expireTimer = nil
         completion(nil)
     }
 

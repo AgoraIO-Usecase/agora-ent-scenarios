@@ -27,7 +27,7 @@ typedef enum : NSUInteger {
 
 @protocol VLKTVSettingViewDelegate <NSObject>
 - (void)settingViewSettingChanged:(VLKTVSettingModel *)setting valueDidChangedType:(VLKTVValueDidChangedType)type;
-- (void)settingViewEffectChoosed:(NSInteger)effectIndex;
+- (void)settingViewSettingChanged:(VLKTVSettingModel *)setting effectChoosed:(NSInteger)effectIndex;
 @end
 
 @interface VLKTVSettingView : VLBaseView

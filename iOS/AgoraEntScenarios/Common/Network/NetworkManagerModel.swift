@@ -186,7 +186,7 @@ open class NMStartCloudPlayerNetworkModel: NMCommonNetworkModel {
     var src: String? = "iOS"
     
     lazy var basicAuth: String? = {
-        createBasicAuth(key: AppContext.shared.cloudPlayerKey , password: AppContext.shared.cloudPlayerSecret)
+        createBasicAuth(key: AppContext.shared.RestfulApiKey , password: AppContext.shared.RestfulApiSecret)
     }()
     
     var channelName: String?
