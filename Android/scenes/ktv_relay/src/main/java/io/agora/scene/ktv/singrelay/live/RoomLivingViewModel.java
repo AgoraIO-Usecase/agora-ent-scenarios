@@ -235,7 +235,7 @@ public class RoomLivingViewModel extends ViewModel {
         }
 
         if (mRtcEngine != null) {
-            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NONE);
             mRtcEngine.leaveChannel();
             RtcEngineEx.destroy();
             mRtcEngine = null;
@@ -589,11 +589,11 @@ public class RoomLivingViewModel extends ViewModel {
         // 调整耳返
         if (!isUnMute && mSetting.isEar()) {
             if (mRtcEngine != null) {
-                mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+                mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NONE);
             }
         } else if (isUnMute && mSetting.isEar()) {
             if (mRtcEngine != null) {
-                mRtcEngine.enableInEarMonitoring(true, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+                mRtcEngine.enableInEarMonitoring(true, Constants.EAR_MONITORING_FILTER_NONE);
             }
         }
 
@@ -1021,7 +1021,7 @@ public class RoomLivingViewModel extends ViewModel {
                     return;
                 }
                 if (mRtcEngine != null) {
-                    mRtcEngine.enableInEarMonitoring(isEar, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+                    mRtcEngine.enableInEarMonitoring(isEar, Constants.EAR_MONITORING_FILTER_NONE);
                 }
             }
 
@@ -1330,7 +1330,7 @@ public class RoomLivingViewModel extends ViewModel {
         // 重置耳返
         mSetting.setEar(false);
         if (mRtcEngine != null) {
-            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NOISE_SUPPRESSION);
+            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NONE);
         }
 
         graspStatusMutableLiveData.postValue(null);
