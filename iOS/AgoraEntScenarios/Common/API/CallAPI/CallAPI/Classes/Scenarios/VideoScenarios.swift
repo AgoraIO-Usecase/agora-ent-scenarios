@@ -16,6 +16,7 @@ public func update1v1VideoEncoder(engine: AgoraRtcEngineKit, roomId: String, use
     config.degradationPreference = .balanced
     let connection = AgoraRtcConnection(channelId: roomId, localUid: userId)
     engine.setVideoEncoderConfigurationEx(config, connection: connection)
+    engine.setParameters("\"che.video.videoCodecIndex\": 2")
 }
 
 public func optimize1v1Video(engine: AgoraRtcEngineKit) {

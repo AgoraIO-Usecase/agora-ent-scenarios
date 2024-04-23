@@ -45,10 +45,10 @@ PODS:
     - YYModel
   - Bugly (2.5.93)
   - bytedEffect (4.6.0)
-  - CallAPI (2.0.0):
+  - CallAPI (2.1.0):
     - AgoraRtcEngine_Special_iOS (~> 4.1.1.26)
-    - CallAPI/All (= 2.0.0)
-  - CallAPI/All (2.0.0):
+    - CallAPI/All (= 2.1.0)
+  - CallAPI/All (2.1.0):
     - AgoraRtcEngine_Special_iOS (~> 4.1.1.26)
     - AgoraRtm (~> 2.2.0)
   - Cantata (0.1.0):
@@ -276,7 +276,7 @@ SPEC CHECKSUMS:
   AUIKitCore: 9f0208a71efcc93830f80d411eae5df6ec0e7a42
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   bytedEffect: 3d51767425dcaa67d2d6162c402225764d3c2156
-  CallAPI: 24699e8b76540fea8e8c83d99ff90d15b55af703
+  CallAPI: 488dd168950494c0cfbad7d94af63851b127cda5
   Cantata: 1a210fcfeb32f93659c199c33ec34b52a56de380
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   fuLib: 43b6990d34caa47e0f12a61db57fe9bd2372f584
@@ -312,4 +312,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: c54d0a312cadd0d8cc03a8daa5633eeeece4bffb
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.15.2
