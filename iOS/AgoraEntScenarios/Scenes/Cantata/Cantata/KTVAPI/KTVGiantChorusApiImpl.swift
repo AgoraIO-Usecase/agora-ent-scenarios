@@ -122,7 +122,7 @@ fileprivate enum KTVSongMode: Int {
     
     private let tag = "KTV_API_LOG"
     private let messageId = "agora:scenarioAPI"
-    private let version = "1_iOS_4.3.0"
+    private let version = "4.3.0"
     private let lyricSyncVersion = 2
     
     private var apiRepoter: APIReporter?
