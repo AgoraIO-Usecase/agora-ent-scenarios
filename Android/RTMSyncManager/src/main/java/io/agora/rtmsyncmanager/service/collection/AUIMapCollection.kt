@@ -13,10 +13,12 @@ class AUIMapCollection(
 ) : AUIBaseCollection(channelName, observeKey, rtmManager) {
 
     private var currentMap: Map<String, Any> = mutableMapOf()
-        set(value) {
-            field = value
-            attributesDidChangedClosure?.invoke(channelName, observeKey, AUIAttributesModel(value))
-        }
+
+    private fun updateCurrentListAndNotify(map: Map<String, Any>, needNotify: Boolean) {
+        if (!needNotify) return
+        currentMap = map
+        attributesDidChangedClosure?.invoke(channelName, observeKey, AUIAttributesModel(map))
+    }
 
     override fun getMetaData(callback: ((error: AUICollectionException?, value: Any?) -> Unit)?) {
         rtmManager.getMetadata(
@@ -26,7 +28,7 @@ class AUIMapCollection(
                     callback?.invoke(AUICollectionException.ErrorCode.unknown.toException(), null)
                     return@getMetadata
                 }
-                val data = metaData?.metadataItems?.find { it.key == observeKey }
+                val data = metaData?.items?.find { it.key == observeKey }
                 if (data == null) {
                     callback?.invoke(null, null)
                     return@getMetadata
@@ -293,6 +295,7 @@ class AUIMapCollection(
                 callback?.invoke(null)
             }
         }
+        updateCurrentListAndNotify(map, true)
     }
 
     private fun rtmMergeMetaData(
@@ -335,6 +338,7 @@ class AUIMapCollection(
                 callback?.invoke(null)
             }
         }
+        updateCurrentListAndNotify(map, true)
     }
 
     private fun rtmCalculateMetaData(
@@ -392,6 +396,7 @@ class AUIMapCollection(
                 callback?.invoke(null)
             }
         }
+        updateCurrentListAndNotify(map, true)
     }
 
     private fun rtmCleanMetaData(callback: ((error: AUICollectionException?) -> Unit)?) {
@@ -417,7 +422,7 @@ class AUIMapCollection(
             object : TypeToken<Map<String, Any>>() {}.type
         ) ?: return
 
-        currentMap = map
+        updateCurrentListAndNotify(map, !isArbiter())
     }
 
     override fun onMessageReceive(publisherId: String, message: String) {

@@ -376,7 +376,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     },
                     RtcConnection(CallServiceManager.instance.connectedChannelId, currentUid.toInt())
                 )
-                CallServiceManager.instance.rtcEngine?.setParameters("\"che.video.videoCodecIndex\": 2")
+                CallServiceManager.instance.rtcEngine?.setParameters("{\"che.video.videoCodecIndex\": 2}")
             }
             CallStateType.Connecting -> {
                 callSendDialog?.updateCallState(CallDialogState.Connecting)

@@ -3,6 +3,7 @@ package io.agora.rtmsyncmanager.service.rtm
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import io.agora.rtm.ErrorInfo
 import io.agora.rtm.JoinChannelOptions
 import io.agora.rtm.MetadataItem
@@ -14,12 +15,15 @@ import io.agora.rtm.RtmClient
 import io.agora.rtm.RtmConstants
 import io.agora.rtm.RtmConstants.RtmChannelType
 import io.agora.rtm.RtmConstants.RtmErrorCode
-import io.agora.rtm.StateItem
 import io.agora.rtm.StreamChannel
 import io.agora.rtm.SubscribeOptions
 import io.agora.rtm.WhoNowResult
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.ArrayList
+import kotlin.concurrent.scheduleAtFixedRate
 
 class AUIRtmManager constructor(
     context: Context,
@@ -27,7 +31,6 @@ class AUIRtmManager constructor(
     @Volatile var isLogin: Boolean = false
 ) {
 
-    val tag = "AUIRtmManager"
     val kRTM_Referee_LockName = "rtm_referee_lock"
     val proxy = AUIRtmMsgProxy()
 
@@ -41,7 +44,6 @@ class AUIRtmManager constructor(
     }
 
     fun deInit(){
-        logger.enableConsoleLog(false)
         cleanReceipts()
         throttlerUpdateMetaDataModel.reset()
         throttlerRemoveMetaDataModel.reset()
@@ -84,16 +86,18 @@ class AUIRtmManager constructor(
             completion.invoke(null)
             return
         }
+        Log.d("ShowSyncManagerServiceImpl111", "response success -> rtm login")
         rtmClient.login(token, object : ResultCallback<Void> {
             override fun onSuccess(responseInfo: Void?) {
-                logger.d("AUIRtmManager", "login success")
                 isLogin = true
                 completion.invoke(null)
             }
 
             override fun onFailure(errorInfo: ErrorInfo?) {
-                logger.d("AUIRtmManager", "login error: ${errorInfo?.errorReason}")
-                if (errorInfo?.errorCode != RtmErrorCode.OK && errorInfo?.errorCode != RtmErrorCode.DUPLICATE_OPERATION) {
+                if (errorInfo?.errorCode == RtmErrorCode.LOGIN_REJECTED) {
+                    isLogin = true
+                    completion.invoke(null)
+                } else {
                     completion.invoke(
                         AUIRtmException(
                             RtmErrorCode.getValue(errorInfo?.errorCode),
@@ -101,13 +105,9 @@ class AUIRtmManager constructor(
                             errorInfo?.operation ?: "UnKnow",
                         )
                     )
-                } else {
-                    isLogin = true
-                    completion.invoke(null)
                 }
             }
         })
-        logger.d("AUIRtmManager", "login ...")
     }
 
     fun logout() {
@@ -121,6 +121,20 @@ class AUIRtmManager constructor(
             }
         })
         isLogin = false
+    }
+
+    fun sendMessage(channelName: String, message: String, success: (() -> Unit)?, error: ((Exception) -> Unit)?) {
+        val options = PublishOptions()
+        options.setChannelType(RtmChannelType.MESSAGE)
+        rtmClient.publish(channelName, message.toByteArray(), options, object : ResultCallback<Void> {
+            override fun onSuccess(p0: Void?) {
+                success?.invoke()
+            }
+            override fun onFailure(errorInfo: ErrorInfo) {
+                val msg = errorInfo.errorReason
+                error?.invoke(java.lang.Exception(msg))
+            }
+        })
     }
 
     fun subscribeAttribute(channelName: String, itemKey: String, handler: AUIRtmAttributeRespObserver) {
@@ -147,12 +161,64 @@ class AUIRtmManager constructor(
         proxy.unRegisterUserRespObserver(delegate)
     }
 
+    val subscribechannelMap = ConcurrentHashMap<String, Long>()
+
+    private val unSubscribeInterval: Int = 2500
+
+    private var unsubscribeDateMap: MutableMap<String, Date> = mutableMapOf()
+        set(value) {
+            field = value
+            if (value.isEmpty()) {
+                autoCleanUnSubscribeChannelTimer?.cancel()
+                autoCleanUnSubscribeChannelTimer = null
+            } else {
+                if (autoCleanUnSubscribeChannelTimer == null) {
+                    autoCleanUnSubscribeChannelTimer = Timer()
+                    autoCleanUnSubscribeChannelTimer?.scheduleAtFixedRate(0, 500) {
+                        autoCleanUnSubscribe()
+                    }
+                }
+            }
+        }
+
+    private var channelsToSubscribe: MutableSet<String> = mutableSetOf()
+    private var autoCleanUnSubscribeChannelTimer: Timer? = null
+
+    private fun autoCleanUnSubscribe() {
+        unsubscribeDateMap.forEach { (channelName, date) ->
+            val elapsedTimeMillis = -date.time + Date().time
+            if (elapsedTimeMillis >= unSubscribeInterval) {
+                unSubscribe(channelName)
+            }
+        }
+    }
+
     fun subscribe(
         channelName: String,
         channelType: RtmChannelType = RtmChannelType.MESSAGE,
         token: String? = null,
         completion: (AUIRtmException?) -> Unit
     ) {
+//        val nowTime = System.currentTimeMillis()
+//
+//        subscribechannelMap.forEach {
+//            if (it.key != channelName && nowTime - it.value > 5000) {
+//                innerUnSubscribe(it.key)
+//            }
+//        }
+//        if (subscribechannelMap.containsKey(channelName)) {
+//            logger.d("MessageChannel", "$channelName has already subscribed")
+//            completion.invoke(null)
+//            return
+//        }
+//        unsubscribeDateMap.remove(channelName)
+//        if (channelsToSubscribe.contains(channelName)) {
+//            logger.d("MessageChannel", "$channelName has already subscribed")
+//            completion.invoke(null)
+//            return
+//        }
+
+
         when (channelType) {
             RtmChannelType.MESSAGE -> {
                 val option = SubscribeOptions()
@@ -165,6 +231,8 @@ class AUIRtmManager constructor(
                 rtmClient.subscribe(channelName, option, object : ResultCallback<Void> {
                     override fun onSuccess(responseInfo: Void?) {
                         logger.d("MessageChannel", "subscribe RtmChannelType.MESSAGE  onSuccess")
+                        //subscribechannelMap[channelName] = System.currentTimeMillis()
+                        //channelsToSubscribe.add(channelName)
                         completion.invoke(null)
                     }
 
@@ -174,6 +242,7 @@ class AUIRtmManager constructor(
                                 "MessageChannel",
                                 "subscribe RtmChannelType.MESSAGE onFailure $errorInfo"
                             )
+                            //subscribechannelMap.remove(channelName)
                             completion.invoke(
                                 AUIRtmException(
                                     RtmErrorCode.getValue(errorInfo.errorCode),
@@ -253,19 +322,20 @@ class AUIRtmManager constructor(
         channelType: RtmChannelType = RtmConstants.RtmChannelType.MESSAGE
     ) {
         proxy.cleanCache(channelName)
+        logger.d("MessageChannel", "unSubscribe ...$channelName")
         when (channelType) {
             RtmChannelType.MESSAGE -> {
                 rtmClient.unsubscribe(channelName, object : ResultCallback<Void> {
                     override fun onSuccess(responseInfo: Void?) {
                         AUILogger.logger().i(
-                            "AUIRtmManager",
+                            "MessageChannel",
                             "rtmClient unsubscribe $channelName channel success."
                         )
                     }
 
                     override fun onFailure(errorInfo: ErrorInfo?) {
                         AUILogger.logger().e(
-                            "AUIRtmManager",
+                            "MessageChannel",
                             "rtmClient unsubscribe $channelName channel failed -- $errorInfo"
                         )
                     }
@@ -288,7 +358,11 @@ class AUIRtmManager constructor(
 
             else -> {}
         }
+//
+//        unsubscribeDateMap.remove(channelName)
+//        channelsToSubscribe.remove(channelName)
     }
+
 
     fun fetchMetaDataSnapshot(channelName: String, completion: (AUIRtmException?) -> Unit){
         getMetadata(channelName){ error, metadata ->
@@ -297,7 +371,7 @@ class AUIRtmManager constructor(
         }
     }
 
-    public fun cleanAllMedadata(channelName: String, lockName: String, completion: (AUIRtmException?) -> Unit) {
+    fun cleanAllMedadata(channelName: String, lockName: String, completion: (AUIRtmException?) -> Unit) {
         val removeKeys = proxy.keys(channelName) ?: emptyList()
         cleanMetadata(
             channelName = channelName,
@@ -315,13 +389,12 @@ class AUIRtmManager constructor(
         completion: (AUIRtmException?) -> Unit
     ) {
         val storage = rtmClient.storage
-        val data = storage.createMetadata()
-
-        removeKeys.forEach {
-            val item = MetadataItem()
-            item.key = it
-            data.setMetadataItem(item)
+        val data = io.agora.rtm.Metadata()
+        val item = kotlin.collections.ArrayList<MetadataItem>()
+        removeKeys.forEach { it ->
+            item.add(MetadataItem(it, null, -1))
         }
+        data.items = item
 
         val options = MetadataOptions()
         options.recordTs = true
@@ -353,13 +426,12 @@ class AUIRtmManager constructor(
         completion: (AUIRtmException?) -> Unit
     ) {
         val storage = rtmClient.storage ?: return
-        val data = storage.createMetadata()
+        val data = io.agora.rtm.Metadata()
+        val item = kotlin.collections.ArrayList<MetadataItem>()
         metadata.forEach { entry ->
-            val item = MetadataItem()
-            item.key = entry.key
-            item.value = entry.value
-            data.setMetadataItem(item)
+            item.add(MetadataItem(entry.key, entry.value, -1))
         }
+        data.items = item
 
         val options = MetadataOptions(true, true)
         storage.setChannelMetadata(
@@ -394,13 +466,12 @@ class AUIRtmManager constructor(
         completion: (AUIRtmException?) -> Unit
     ) {
         val storage = rtmClient.storage
-        val data = storage.createMetadata()
+        val data = io.agora.rtm.Metadata()
+        val item = kotlin.collections.ArrayList<MetadataItem>()
         metadata.forEach { entry ->
-            val item = MetadataItem()
-            item.key = entry.key
-            item.value = entry.value
-            data.setMetadataItem(item)
+            item.add(MetadataItem(entry.key, entry.value, -1))
         }
+        data.items = item
         val options = MetadataOptions()
         storage.updateChannelMetadata(
             channelName,
@@ -498,12 +569,9 @@ class AUIRtmManager constructor(
         completion: (AUIRtmException?) -> Unit
     ) {
         val presence = rtmClient.presence
-        val items = ArrayList<StateItem>()
+        val items = mutableMapOf<String, String>()
         attr.forEach { entry ->
-            val item = StateItem()
-            item.key = entry.key
-            item.value = entry.value.toString()
-            items.add(item)
+            items[entry.key] = entry.value.toString()
         }
         logger.d(
             "PresenceState",
@@ -608,13 +676,7 @@ class AUIRtmManager constructor(
         ttl: Long = 10,
         completion: (AUIRtmException?) -> Unit
     ) {
-        val lock = rtmClient.lock
-        if (lock == null) {
-            completion.invoke(AUIRtmException(-1, "get lock error", ""))
-            return
-        }
-        logger.d(tag,"setLock[$channelName][$lockName] start")
-        lock.setLock(
+        rtmClient.lock.setLock(
             channelName,
             channelType,
             lockName,
@@ -643,13 +705,7 @@ class AUIRtmManager constructor(
         retry: Boolean = true,
         completion: (AUIRtmException?) -> Unit
     ) {
-        val lock = rtmClient.lock
-        if (lock == null) {
-            completion.invoke(AUIRtmException(-1, "get lock error", ""))
-            return
-        }
-        logger.d(tag,"acquireLock[$channelName][$lockName] start")
-        lock.acquireLock(
+        rtmClient.lock.acquireLock(
             channelName,
             channelType,
             lockName,
@@ -677,13 +733,7 @@ class AUIRtmManager constructor(
         lockName: String = kRTM_Referee_LockName,
         completion: (AUIRtmException?) -> Unit
     ) {
-        val lock = rtmClient.lock
-        if (lock == null) {
-            completion.invoke(AUIRtmException(-1, "get lock error", ""))
-            return
-        }
-        logger.d(tag,"releaseLock[$channelName][$lockName] start")
-        lock.releaseLock(
+        rtmClient.lock.releaseLock(
             channelName,
             channelType,
             lockName,
@@ -710,13 +760,7 @@ class AUIRtmManager constructor(
         lockName: String = kRTM_Referee_LockName,
         completion: (AUIRtmException?) -> Unit
     ) {
-        val lock = rtmClient.lock
-        if (lock == null) {
-            completion.invoke(AUIRtmException(-1, "get lock error", ""))
-            return
-        }
-        logger.d(tag,"removeLock[$channelName][$lockName] start")
-        lock.removeLock(
+        rtmClient.lock.removeLock(
             channelName,
             channelType,
             lockName,
@@ -777,7 +821,7 @@ class AUIRtmManager constructor(
         userId: String,
         message: String,
         uniqueId: String,
-        timeout: Long = 1000,
+        timeout: Long = 10000,
         completion: (AUIRtmException?) -> Unit
     ) {
         publish(channelName, userId, message) { error ->
@@ -865,71 +909,72 @@ class AUIRtmManager constructor(
         })
     }
 
-    fun removeUserMetadata(userId: String) {
-        val storage = rtmClient.storage
-        val data = storage.createMetadata()
-        val options = MetadataOptions()
-        options.recordTs = true
-        options.recordUserId = true
-        storage.removeUserMetadata(userId, data, options, object : ResultCallback<Void> {
-            override fun onSuccess(responseInfo: Void?) {
-
-            }
-
-            override fun onFailure(errorInfo: ErrorInfo?) {
-
-            }
-        })
-    }
-
-    fun setUserMetadata(userId: String, metadata: Map<String, String>) {
-        val storage = rtmClient.storage
-        val data = storage.createMetadata()
-        val options = MetadataOptions()
-        options.recordTs = true
-        options.recordUserId = true
-        metadata.forEach { entry ->
-            val item = MetadataItem()
-            item.key = entry.key
-            item.value = entry.value
-            data.setMetadataItem(item)
-        }
-
-        storage.setUserMetadata(userId, data, options, object : ResultCallback<Void> {
-            override fun onSuccess(responseInfo: Void?) {
-
-            }
-
-            override fun onFailure(errorInfo: ErrorInfo?) {
-
-            }
-        })
-
-    }
-
-    fun updateUserMetadata(userId: String, metadata: Map<String, String>) {
-        val storage = rtmClient.storage
-        val data = storage.createMetadata()
-        val options = MetadataOptions()
-        options.recordTs = true
-        options.recordUserId = true
-        metadata.forEach { entry ->
-            val item = MetadataItem()
-            item.key = entry.key
-            item.value = entry.value
-            data.setMetadataItem(item)
-        }
-
-        storage.updateUserMetadata(userId, data, options, object : ResultCallback<Void> {
-            override fun onSuccess(responseInfo: Void?) {
-
-            }
-
-            override fun onFailure(errorInfo: ErrorInfo?) {
-
-            }
-        })
-    }
+    // TODO
+//    fun removeUserMetadata(userId: String) {
+//        val storage = rtmClient.storage
+//        val data = storage.createMetadata()
+//        val options = MetadataOptions()
+//        options.recordTs = true
+//        options.recordUserId = true
+//        storage.removeUserMetadata(userId, data, options, object : ResultCallback<Void> {
+//            override fun onSuccess(responseInfo: Void?) {
+//
+//            }
+//
+//            override fun onFailure(errorInfo: ErrorInfo?) {
+//
+//            }
+//        })
+//    }
+//
+//    fun setUserMetadata(userId: String, metadata: Map<String, String>) {
+//        val storage = rtmClient.storage
+//        val data = storage.createMetadata()
+//        val options = MetadataOptions()
+//        options.recordTs = true
+//        options.recordUserId = true
+//        metadata.forEach { entry ->
+//            val item = MetadataItem()
+//            item.key = entry.key
+//            item.value = entry.value
+//            data.setMetadataItem(item)
+//        }
+//
+//        storage.setUserMetadata(userId, data, options, object : ResultCallback<Void> {
+//            override fun onSuccess(responseInfo: Void?) {
+//
+//            }
+//
+//            override fun onFailure(errorInfo: ErrorInfo?) {
+//
+//            }
+//        })
+//
+//    }
+//
+//    fun updateUserMetadata(userId: String, metadata: Map<String, String>) {
+//        val storage = rtmClient.storage
+//        val data = storage.createMetadata()
+//        val options = MetadataOptions()
+//        options.recordTs = true
+//        options.recordUserId = true
+//        metadata.forEach { entry ->
+//            val item = MetadataItem()
+//            item.key = entry.key
+//            item.value = entry.value
+//            data.setMetadataItem(item)
+//        }
+//
+//        storage.updateUserMetadata(userId, data, options, object : ResultCallback<Void> {
+//            override fun onSuccess(responseInfo: Void?) {
+//
+//            }
+//
+//            override fun onFailure(errorInfo: ErrorInfo?) {
+//
+//            }
+//        })
+//    }
 
     fun getUserMetadata(userId: String) {
         val storage = rtmClient.storage

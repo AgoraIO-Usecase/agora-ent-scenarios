@@ -1,5 +1,6 @@
 package io.agora.rtmsyncmanager.service.collection
 
+import android.util.Log
 import com.google.gson.reflect.TypeToken
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
@@ -13,10 +14,12 @@ class AUIListCollection(
 ) : AUIBaseCollection(channelName, observeKey, rtmManager) {
 
     private var currentList = listOf<Map<String, Any>>()
-        set(value) {
-            field = value
-            attributesDidChangedClosure?.invoke(channelName, observeKey, AUIAttributesModel(value))
-        }
+
+    private fun updateCurrentListAndNotify(list: List<Map<String, Any>>, needNotify: Boolean) {
+        if (!needNotify) return
+        currentList = list
+        attributesDidChangedClosure?.invoke(channelName, observeKey, AUIAttributesModel(list))
+    }
 
     override fun getMetaData(callback: ((error: AUICollectionException?, value: Any?) -> Unit)?) {
         rtmManager.getMetadata(
@@ -26,7 +29,7 @@ class AUIListCollection(
                     callback?.invoke(AUICollectionException.ErrorCode.unknown.toException("rtm getMetadata error: $error"), null)
                     return@getMetadata
                 }
-                val data = metaData?.metadataItems?.find { it.key == observeKey }
+                val data = metaData?.items?.find { it.key == observeKey }
                 if (data == null) {
                     callback?.invoke(null, null)
                     return@getMetadata
@@ -56,7 +59,7 @@ class AUIListCollection(
         callback: ((error: AUICollectionException?) -> Unit)?
     ) {
         if (isArbiter()) {
-            rtmSetMetaData(localUid(), valueCmd, value, filter, callback)
+            rtmUpdateMetaData(localUid(), valueCmd, value, filter, callback)
             return
         }
 
@@ -373,9 +376,10 @@ class AUIListCollection(
                 callback?.invoke(null)
             }
         }
+        updateCurrentListAndNotify(list, true)
     }
 
-    private fun rtmSetMetaData(
+    private fun rtmUpdateMetaData(
         publisherId: String,
         valueCmd: String?,
         value: Map<String, Any>,
@@ -431,6 +435,7 @@ class AUIListCollection(
                 callback?.invoke(null)
             }
         }
+        updateCurrentListAndNotify(list, true)
     }
 
     private fun rtmMergeMetaData(
@@ -485,6 +490,7 @@ class AUIListCollection(
                 callback?.invoke(null)
             }
         }
+        updateCurrentListAndNotify(list, true)
     }
 
     private fun rtmRemoveMetaData(
@@ -539,6 +545,7 @@ class AUIListCollection(
                 callback?.invoke(null)
             }
         }
+        updateCurrentListAndNotify(list, true)
     }
 
     private fun rtmCalculateMetaData(
@@ -567,7 +574,6 @@ class AUIListCollection(
                 callback?.invoke(error)
                 return
             }
-
             val calcItem = AUICollectionUtils.calculateMap(
                 item,
                 key,
@@ -575,6 +581,7 @@ class AUIListCollection(
                 value.min,
                 value.max
             )
+            Log.d("hiut", "AUICollectionUtils.calculateMap calcItem:$calcItem")
             if (calcItem == null) {
                 callback?.invoke(
                     AUICollectionException.ErrorCode.calculateMapFail.toException()
@@ -608,6 +615,7 @@ class AUIListCollection(
                 callback?.invoke(null)
             }
         }
+        updateCurrentListAndNotify(list, true)
     }
 
     private fun rtmCleanMetaData(callback: ((error: AUICollectionException?) -> Unit)?) {
@@ -630,7 +638,8 @@ class AUIListCollection(
             strValue,
             object : TypeToken<List<Map<String, Any>>>() {}.type
         ) ?: return
-        currentList = list
+        //如果是仲裁者，不更新，因为本地已经修改了，否则这里收到的消息可能是老的数据，例如update1->update2->resp1->resp2，那么resp1的数据比update2要老，会造成ui上短暂的回滚
+        updateCurrentListAndNotify(list, !isArbiter())
     }
 
     override fun onMessageReceive(publisherId: String, message: String) {
@@ -645,6 +654,7 @@ class AUIListCollection(
         }
 
         if (messageModel.messageType == AUICollectionMessageTypeReceipt) {
+            Log.d("huit", "message:$message")
             // receipt message from arbiter
             val collectionError = GsonTools.toBean(
                 GsonTools.beanToString(messageModel.payload?.data),
@@ -704,7 +714,7 @@ class AUIListCollection(
                             sendReceipt(publisherId, uniqueId, it)
                         }
                     } else {
-                        rtmSetMetaData(publisherId, valueCmd, data, filter) {
+                        rtmUpdateMetaData(publisherId, valueCmd, data, filter) {
                             sendReceipt(publisherId, uniqueId, it)
                         }
                     }

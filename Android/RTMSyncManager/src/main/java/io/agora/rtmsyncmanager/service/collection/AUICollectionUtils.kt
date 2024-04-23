@@ -1,5 +1,6 @@
 package io.agora.rtmsyncmanager.service.collection
 
+import android.util.Log
 import org.json.JSONObject
 
 object AUICollectionUtils {
@@ -85,6 +86,7 @@ object AUICollectionUtils {
         min: Int,
         max: Int
     ): Map<String, Any>? {
+        Log.d("hiut", "calculateMap origMap:$origMap key:$key, value:$value, min::$min, max:$max")
         val retMap = HashMap(origMap)
         if(key.size > 1){
             val curKey = key.firstOrNull() ?: ""
@@ -102,7 +104,8 @@ object AUICollectionUtils {
             return retMap
         }
         val curKey = key.firstOrNull() ?: return null
-        val subValue = retMap[curKey] as? Long ?: return null
+        Log.d("hiut", "subValue: ${retMap[curKey]}")
+        val subValue = retMap[curKey] as Long
         val curValue = subValue + value
         if(curValue < min || curValue > max){
             return null
