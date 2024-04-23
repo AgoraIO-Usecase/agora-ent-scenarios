@@ -1,6 +1,6 @@
 package io.agora.rtmsyncmanager.service.room
 
-import io.agora.rtmsyncmanager.service.http.CommonResp
+import io.agora.auikit.service.http.CommonResp
 import io.agora.rtmsyncmanager.service.http.HttpManager
 import io.agora.rtmsyncmanager.service.http.Utils
 import io.agora.rtmsyncmanager.model.AUIRoomContext
@@ -145,13 +145,19 @@ class AUIRoomManager {
             })
     }
 
-    fun updateRoom(
+    fun updateRoomInfo(
         appId: String,
         sceneId: String,
         roomInfo: AUIRoomInfo,
         callback: AUIRoomCallback?
     ) {
-        roomInterface.updateRoomInfo(UpdateRoomReq(appId, sceneId, roomInfo.roomId, roomInfo))
+        val roomId = roomInfo.roomId
+        roomInterface.updateRoomInfo(UpdateRoomReq(
+            appId,
+            sceneId,
+            roomId,
+            roomInfo
+        ))
             .enqueue(object : retrofit2.Callback<CommonResp<String>> {
                 override fun onResponse(
                     call: Call<CommonResp<String>>,

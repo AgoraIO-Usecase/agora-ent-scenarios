@@ -4,7 +4,6 @@ import io.agora.rtmsyncmanager.ISceneResponse
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmLockRespObserver
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
-import io.agora.rtmsyncmanager.utils.AUILogger.Companion.logger
 import io.agora.rtmsyncmanager.utils.ObservableHelper
 import okhttp3.internal.notify
 
@@ -13,8 +12,6 @@ class AUIArbiter(
     private val rtmManager: AUIRtmManager,
     private val currentUserId: String
 ) {
-
-    private val tag = "AUIArbiter"
 
     private var lockOwnerId = ""
         set(value) {
@@ -64,7 +61,7 @@ class AUIArbiter(
             notifyError(error)
         }
     }
-    // 销毁锁
+
     fun destroy(){
         rtmManager.removeLock(channelName){ error ->
             notifyError(error)
@@ -88,8 +85,9 @@ class AUIArbiter(
     fun lockOwnerId() = lockOwnerId
 
     private fun notifyError(error: AUIRtmException?) {
-        if (error == null) { return }
-        logger().d(tag, "notifyError: ${error.message}")
+        if (error == null) {
+            return
+        }
         arbiterHandlers.notifyEventHandlers { handler ->
             handler.onError(channelName, error)
         }

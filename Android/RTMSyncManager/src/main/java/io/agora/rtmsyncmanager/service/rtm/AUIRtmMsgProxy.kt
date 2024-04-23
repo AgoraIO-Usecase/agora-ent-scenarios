@@ -48,7 +48,7 @@ interface AUIRtmLockRespObserver {
 }
 
 class AUIRtmMsgProxy : RtmEventListener {
-
+    private val tag = "AUIRtmMsgProxy"
     var originEventListeners: RtmEventListener? = null
     private val attributeRespObservers: MutableMap<String, ArrayList<AUIRtmAttributeRespObserver>> =
         mutableMapOf()
@@ -62,6 +62,7 @@ class AUIRtmMsgProxy : RtmEventListener {
 
     fun cleanCache(channelName: String) {
         msgCacheAttr.remove(channelName)
+        Log.d(tag, "cleanCache channelName$channelName, msgCacheAttr=$msgCacheAttr")
     }
 
     fun keys(channelName: String): List<String>? {
@@ -83,6 +84,7 @@ class AUIRtmMsgProxy : RtmEventListener {
         observer: AUIRtmAttributeRespObserver
     ) {
         val key = "${channelName}__${itemKey}"
+        Log.d(tag, "registerAttributeRespObserver: $key")
         val observers = attributeRespObservers[key] ?: ArrayList()
         observers.add(observer)
         attributeRespObservers[key] = observers
@@ -94,6 +96,7 @@ class AUIRtmMsgProxy : RtmEventListener {
         observer: AUIRtmAttributeRespObserver
     ) {
         val key = "${channelName}__${itemKey}"
+        Log.d(tag, "unRegisterAttributeRespObserver: $key")
         val observers = attributeRespObservers[key] ?: return
         observers.remove(observer)
     }
@@ -159,8 +162,8 @@ class AUIRtmMsgProxy : RtmEventListener {
 
     fun processMetaData(channelName: String, metadata: Metadata?) {
         metadata ?: return
-        val items = metadata.metadataItems
-        if (metadata.metadataItems.isEmpty()) {
+        val items = metadata.items
+        if (metadata.items.isEmpty()) {
             if (isMetaEmpty) {
                 return
             }
@@ -173,7 +176,7 @@ class AUIRtmMsgProxy : RtmEventListener {
         isMetaEmpty = false
 
         val cache = msgCacheAttr[channelName] ?: mutableMapOf()
-        metadata.metadataItems.forEach { item ->
+        metadata.items.forEach { item ->
             if (cache[item.key] == item.value) {
                 return@forEach
             }
@@ -276,7 +279,7 @@ class AUIRtmMsgProxy : RtmEventListener {
     }
 
     override fun onLockEvent(event: LockEvent?) {
-        Log.d("rtm_lock_event", "onLockEvent event: $event count: ${event?.lockDetailList?.count()}")
+        Log.d("rtm_lock_event", "onLockEvent event: $event")
         originEventListeners?.onLockEvent(event)
         event ?: return
         val addLockDetails = mutableListOf<LockDetail>()

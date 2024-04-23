@@ -269,7 +269,7 @@ class ShowTo1v1Manger constructor() {
                             degradationPrefer = VideoEncoderConfiguration.DEGRADATION_PREFERENCE.MAINTAIN_BALANCED
                         }
                     )
-                    setParameters("\"che.video.videoCodecIndex\": 2")
+                    setParameters("{\"che.video.videoCodecIndex\": 2}")
                     enableInstantMediaRendering()
                     setParameters("{\"rtc.video.quickIntraHighFec\": true}")
                     setParameters("{\"rtc.network.e2e_cc_mode\": 3}")
