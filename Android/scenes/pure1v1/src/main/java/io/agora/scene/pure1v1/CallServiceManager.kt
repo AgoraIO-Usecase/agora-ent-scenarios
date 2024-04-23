@@ -375,7 +375,7 @@ class CallServiceManager {
                     degradationPrefer = VideoEncoderConfiguration.DEGRADATION_PREFERENCE.MAINTAIN_BALANCED
                 }
             )
-            rtcEngine.setParameters("\"che.video.videoCodecIndex\": 2")
+            rtcEngine.setParameters("{\"che.video.videoCodecIndex\": 2}")
             rtcEngine.enableInstantMediaRendering()
             rtcEngine.setParameters("{\"rtc.video.quickIntraHighFec\": true}")
             rtcEngine.setParameters("{\"rtc.network.e2e_cc_mode\": 3}")

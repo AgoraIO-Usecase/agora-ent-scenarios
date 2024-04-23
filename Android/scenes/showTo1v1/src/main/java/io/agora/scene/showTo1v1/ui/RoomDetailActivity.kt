@@ -896,7 +896,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         },
                         RtcConnection(mShowTo1v1Manger.mConnectedChannelId, mShowTo1v1Manger.mCurrentUser.userId.toInt())
                     )
-                    mShowTo1v1Manger.mRtcEngine.setParameters("\"che.video.videoCodecIndex\": 2")
+                    mShowTo1v1Manger.mRtcEngine.setParameters("{\"che.video.videoCodecIndex\": 2}")
                 }
 
                 CallStateType.Connecting -> {
