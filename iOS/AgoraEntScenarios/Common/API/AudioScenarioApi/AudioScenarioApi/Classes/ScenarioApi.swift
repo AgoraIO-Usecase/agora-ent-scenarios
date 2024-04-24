@@ -46,12 +46,10 @@ public enum SoundCardType {
     
     var gainValue: Float {
         switch self {
-        case .magnetic:
-            return 1.0
-        case .pleasant:
-            return 1.0
+        case .magnetic, .pleasant:
+            return 100.0
         case .close:
-            return -1.0
+            return -100.0
         }
     }
     
@@ -346,6 +344,8 @@ public class AudioScenarioApi: NSObject {
             case .Chat_Caller:
                 rtcEngine.setAudioProfile(.default)
                 rtcEngine.setAudioScenario(.meeting)
+                //大哥默认关闭虚拟声卡
+                enableVirtualSoundCard(soundCardType: .close)
             case .Chat_Callee:
                 rtcEngine.setAudioProfile(.musicHighQualityStereo)
                 rtcEngine.setAudioScenario(.meeting)
@@ -359,9 +359,13 @@ public class AudioScenarioApi: NSObject {
                 rtcEngine.setAudioProfile(.musicHighQualityStereo)
                 rtcEngine.setAudioScenario(.gameStreaming)
                 rtcEngine.setParameters("{\"che.audio.custom_payload_type\": 78}")
+                //主播默认关闭虚拟声卡
+                enableVirtualSoundCard(soundCardType: .close)
             case .Show_InteractiveAudience:
                 rtcEngine.setAudioProfile(.default)
                 rtcEngine.setAudioScenario(.meeting)
+                //连麦观众默认关闭虚拟声卡
+                enableVirtualSoundCard(soundCardType: .close)
             default:
                 scenarioApiLogError(msg: "not supported")
             }
