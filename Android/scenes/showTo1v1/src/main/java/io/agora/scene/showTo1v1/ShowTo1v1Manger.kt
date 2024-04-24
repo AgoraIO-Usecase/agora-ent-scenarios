@@ -9,7 +9,6 @@ import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoEncoderConfiguration
-import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.rtm.RtmClient
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
@@ -20,12 +19,12 @@ import io.agora.scene.showTo1v1.audio.AudioScenarioApi
 import io.agora.scene.showTo1v1.callapi.CallApiImpl
 import io.agora.scene.showTo1v1.callapi.CallConfig
 import io.agora.scene.showTo1v1.callapi.PrepareConfig
+import io.agora.scene.showTo1v1.callapi.signalClient.CallRtmManager
+import io.agora.scene.showTo1v1.callapi.signalClient.ICallRtmManagerListener
+import io.agora.scene.showTo1v1.callapi.signalClient.createRtmManager
 import io.agora.scene.showTo1v1.callapi.signalClient.createRtmSignalClient
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceImpl
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
-import io.agora.scene.showTo1v1.signalClient.CallRtmManager
-import io.agora.scene.showTo1v1.signalClient.ICallRtmManagerListener
-import io.agora.scene.showTo1v1.signalClient.createRtmManager
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
