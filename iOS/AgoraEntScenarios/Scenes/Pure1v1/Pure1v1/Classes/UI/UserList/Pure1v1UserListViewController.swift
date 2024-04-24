@@ -351,13 +351,14 @@ extension Pure1v1UserListViewController {
     @objc func _refreshAction() {
         let date = Date()
         _setupAPIConfig {[weak self] error in
-            guard let self = self, let service = self.service else { return }
+            guard let self = self else { return }
             if let error = error {
                 pure1v1Error("refresh _setupAPIConfig fail: \(error.localizedDescription)")
                 self.listView.endRefreshing()
                 AUIToast.show(text: error.localizedDescription)
                 return
             }
+            guard let service = self.service else { return }
             pure1v1Print("refresh setupAPI cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
             service.enterRoom {[weak self] error in
                 guard let self = self, let service = self.service else { return }
