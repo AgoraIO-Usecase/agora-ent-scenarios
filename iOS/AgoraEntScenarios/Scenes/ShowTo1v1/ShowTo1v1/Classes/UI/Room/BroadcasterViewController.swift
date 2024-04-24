@@ -200,6 +200,10 @@ class BroadcasterViewController: BaseRoomViewController {
     
     private func _publishMedia(_ publish: Bool) {
         guard let currentUser = currentUser, let roomInfo = roomInfo, let uid = UInt(currentUser.uid) else {return}
+        if publish {
+            rtcEngine?.enableLocalVideo(true)
+            rtcEngine?.enableLocalAudio(true)
+        }
         if currentUser.uid == roomInfo.uid {
             let mediaOptions = AgoraRtcChannelMediaOptions()
             mediaOptions.publishCameraTrack = publish
