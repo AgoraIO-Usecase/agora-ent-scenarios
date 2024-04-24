@@ -18,6 +18,7 @@ extension AgoraRtmPresenceEvent {
                 guard let key = item.key as? String, let value = item.value as? String else {return}
                 userMap[key] = value
             }
+            aui_info("presence snapshotList user: \(user.userId) \(userMap)", tag: "AUIRtmManager")
             userList.append(userMap)
         }
         
@@ -33,9 +34,9 @@ extension AgoraRtmWhoNowResponse {
             userMap["userId"] = user.userId
             user.states.forEach { item in
                 guard let key = item.key as? String, let value = item.value as? String else {return}
-                aui_info("presence whoNow user: \(user.userId) \(key): \(value)", tag: "AUIRtmManager")
                 userMap[key] = value
             }
+            aui_info("presence whoNow user: \(user.userId) \(userMap)", tag: "AUIRtmManager")
             userList.append(userMap)
         }
         

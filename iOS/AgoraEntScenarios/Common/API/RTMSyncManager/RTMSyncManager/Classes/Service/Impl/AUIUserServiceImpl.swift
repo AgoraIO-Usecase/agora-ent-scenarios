@@ -25,6 +25,10 @@ import YYModel
         super.init()
         aui_info("init AUIUserServiceImpl[\(channelName)]", tag: "AUIUserServiceImpl")
         self.rtmManager.subscribeUser(channelName: channelName, delegate: self)
+        //rtm2.2 支持预设置，在subscribe成功之后会更新
+        _setupUserAttr(roomId: channelName) { _ in
+            //TODO: retry
+        }
     }
 }
 
@@ -33,9 +37,6 @@ extension AUIUserServiceImpl: AUIRtmUserProxyDelegate {
     public func onCurrentUserJoined(channelName: String) {
         guard channelName == self.channelName else {return}
         aui_info("onCurrentUserJoined[\(channelName)]", tag: "AUIUserServiceImpl")
-        _setupUserAttr(roomId: channelName) { error in
-            //TODO: retry if fail
-        }
     }
     
     public func onUserDidUpdated(channelName: String, userId: String, userInfo: [String : Any]) {
