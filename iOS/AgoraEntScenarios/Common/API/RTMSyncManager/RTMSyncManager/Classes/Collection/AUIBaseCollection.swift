@@ -167,6 +167,6 @@ extension AUIBaseCollection: AUIRtmMessageProxyDelegate {
         }
     }
     
-    public func onMessageReceive(publisher: String, message: String) {
+    public func onMessageReceive(publisher: String, channelName: String, message: String) {
     }
 }

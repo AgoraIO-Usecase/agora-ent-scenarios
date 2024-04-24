@@ -32,9 +32,15 @@ public class AUIScene: NSObject {
     private var respDelegates: NSHashTable<AUISceneRespDelegate> = NSHashTable<AUISceneRespDelegate>.weakObjects()
     private var roomPayload: [String: Any]?
     private var subscribeDate: Date?
-    private var lockRetrived: Bool = false {
+    private var lockOwnerRetrived: Bool = false {
         didSet {
-            aui_info("set lockRetrived = \(lockRetrived)", tag: kSceneTag)
+            aui_info("set lockOwnerRetrived = \(lockOwnerRetrived)", tag: kSceneTag)
+            checkRoomValid()
+        }
+    }
+    private var lockOwnerAcquireSuccess: Bool = false {
+        didSet {
+            aui_info("set lockOwnerAcquireSuccess = \(lockOwnerAcquireSuccess)", tag: kSceneTag)
             checkRoomValid()
         }
     }
@@ -95,7 +101,7 @@ public class AUIScene: NSObject {
         let date = Date()
         roomCollection.initMetaData(channelName: channelName,
                                     metadata: roomInfo) { err in
-            aui_benchmark("rtm setMetaData", cost: -date.timeIntervalSinceNow, tag: kSceneTag)
+            aui_benchmark("rtm initMetaData", cost: -date.timeIntervalSinceNow, tag: kSceneTag)
             if let err = err {
                 completion(err)
                 return
@@ -150,7 +156,11 @@ public class AUIScene: NSObject {
             }
         }
 //        getArbiter().create()
-        getArbiter().acquire()
+        getArbiter().acquire {[weak self] err in
+            //fail 走onError(channelName: String, error: NSError)，这里不处理
+            if let err = err {return}
+            self?.lockOwnerAcquireSuccess = true
+        }
         rtmManager.subscribeError(channelName: channelName, delegate: self)
         getArbiter().subscribeEvent(delegate: self)
         rtmManager.subscribe(channelName: channelName) {[weak self] error in
@@ -219,16 +229,17 @@ extension AUIScene {
         return arbiter
     }
     
-    //如果subscribe成功、锁也获取到、用户列表也获取到，可以检查是否是脏房间并且清理
+    //如果subscribe成功、锁也获取到，并且锁主获取到锁成功(acquire的callback成功收到)、用户列表也获取到，可以检查是否是脏房间并且清理
     private func checkRoomValid() {
-        aui_info("checkRoomValid[\(channelName)] subscribeSuccess: \(subscribeSuccess), lockRetrived: \(lockRetrived), ownerId: \(ownerId)", tag: kSceneTag)
-        guard subscribeSuccess, lockRetrived, !ownerId.isEmpty else { return }
+        aui_info("checkRoomValid[\(channelName)] subscribeSuccess: \(subscribeSuccess), lockOwnerRetrived: \(lockOwnerRetrived), ownerId: \(ownerId) isArbiter: \(getArbiter().isArbiter()), lockOwnerAcquireSuccess: \(lockOwnerAcquireSuccess), userSnapshotList count: \(userSnapshotList?.count ?? 0)", tag: kSceneTag)
+        guard subscribeSuccess, lockOwnerRetrived, !ownerId.isEmpty else { return }
+        //如果是锁主，需要判断有没有acquire成功回调，回调后有本地对比，没有成功回调前setmetadata会失败-12008
+        if getArbiter().isArbiter(), lockOwnerAcquireSuccess == false {return}
         if let completion = self.enterRoomCompletion {
             completion(roomPayload, nil)
             self.enterRoomCompletion = nil
         }
         
-        aui_info("checkRoomValid[\(channelName)] userSnapshotList count: \(userSnapshotList?.count ?? 0)", tag: kSceneTag)
         guard let userList = userSnapshotList else { return }
         guard let _ = userList.filter({ AUIRoomContext.shared.isRoomOwner(channelName: channelName, userId: $0.userId)}).first else {
             //room owner not found, clean room
@@ -273,9 +284,9 @@ extension AUIScene {
 //MARK: AUIRtmLockProxyDelegate
 extension AUIScene: AUIArbiterDelegate {
     public func onArbiterDidChange(channelName: String, arbiterId: String) {
-        aui_benchmark("onArbiterDidChange[\(channelName)]", cost: -(subscribeDate?.timeIntervalSinceNow ?? 0), tag: kSceneTag)
+        aui_benchmark("onArbiterDidChange[\(channelName)] arbiterId: \(arbiterId)", cost: -(subscribeDate?.timeIntervalSinceNow ?? 0), tag: kSceneTag)
         if arbiterId.isEmpty {return}
-        self.lockRetrived = true
+        self.lockOwnerRetrived = true
     }
     
     public func onError(channelName: String, error: NSError) {

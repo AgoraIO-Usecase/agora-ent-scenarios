@@ -10,6 +10,7 @@ import AgoraRtmKit
 
 public class AUISyncManager: NSObject {
     public var sceneMap: [String: AUIScene] = [:]
+    private var _rtmClientByInternal: AgoraRtmClientKit?
     public private(set) var rtmManager: AUIRtmManager
     deinit {
         aui_info("deinit AUISyncManager")
@@ -19,6 +20,9 @@ public class AUISyncManager: NSObject {
         aui_info("init AUISyncManager")
         AUIRoomContext.shared.commonConfig = commonConfig
         let _rtmClient = rtmClient ?? AUISyncManager.createRtmClient()
+        if _rtmClient != rtmClient {
+            _rtmClientByInternal = _rtmClient
+        }
         self.rtmManager = AUIRtmManager(rtmClient: _rtmClient,
                                         rtmChannelType: .message,
                                         isExternalLogin: _rtmClient == rtmClient)
@@ -31,6 +35,15 @@ public class AUISyncManager: NSObject {
     
     public func logout() {
         rtmManager.logout()
+        if let rtmClient = _rtmClientByInternal {
+            rtmClient.logout()
+        }
+    }
+    
+    public func destroy() {
+        if let rtmClient = _rtmClientByInternal {
+            rtmClient.destroy()
+        }
     }
     
     public func renew(token: String) {

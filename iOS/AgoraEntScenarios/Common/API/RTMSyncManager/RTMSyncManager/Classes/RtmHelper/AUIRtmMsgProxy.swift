@@ -35,7 +35,7 @@ private let kAUIRtmMsgProxyKey = "AUIRtmMsgProxy"
 }
 
 @objc public protocol AUIRtmMessageProxyDelegate: NSObjectProtocol {
-    func onMessageReceive(publisher: String, message: String)
+    func onMessageReceive(publisher: String, channelName: String, message: String)
 }
 
 @objc public protocol AUIRtmUserProxyDelegate: NSObjectProtocol {
@@ -298,12 +298,17 @@ extension AUIRtmMsgProxy: AgoraRtmClientDelegate {
     public func rtmKit(_ rtmKit: AgoraRtmClientKit, didReceiveMessageEvent event: AgoraRtmMessageEvent) {
         aui_info("[\(event.channelName)]didReceiveMessageEvent  =======", tag: kAUIRtmMsgProxyKey)
         
-        if let message = event.message.stringData {
-            for element in messageDelegates.allObjects {
-                element.onMessageReceive(publisher: event.publisher, message: message)
-            }
+        var message: String = ""
+        if let msg = event.message.stringData {
+            message = msg
+        } else if let data = event.message.rawData, let msg = String(data: data, encoding: .utf8) {
+            message = msg
         } else {
             aui_warn("recv unknown type message", tag: kAUIRtmMsgProxyKey)
+        }
+        
+        for element in messageDelegates.allObjects {
+            element.onMessageReceive(publisher: event.publisher, channelName: event.channelName, message: message)
         }
     }
     

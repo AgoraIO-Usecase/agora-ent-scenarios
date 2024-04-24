@@ -43,30 +43,34 @@ import AgoraRtmKit
     }
     
     /// 创建锁
-    public func create() {
+    public func create(completion: ((NSError?)-> ())? = nil) {
         rtmManager.setLock(channelName: channelName, lockName: kRTM_Referee_LockName) {[weak self] err in
             self?.notifyError(error: err)
+            completion?(err)
         }
     }
     
     /// 销毁锁
-    public func destroy() {
+    public func destroy(completion: ((NSError?)-> ())? = nil) {
         rtmManager.removeLock(channelName: channelName, lockName: kRTM_Referee_LockName) {[weak self] err in
             self?.notifyError(error: err)
+            completion?(err)
         }
     }
     
     /// 获取锁
-    public func acquire() {
+    public func acquire(completion: ((NSError?)-> ())? = nil) {
         rtmManager.acquireLock(channelName: channelName, lockName: kRTM_Referee_LockName) {[weak self] err in
             self?.notifyError(error: err)
+            completion?(err)
         }
     }
     
     /// 释放锁
-    public func release() {
+    public func release(completion: ((NSError?)-> ())? = nil) {
         rtmManager.releaseLock(channelName: channelName, lockName: kRTM_Referee_LockName) {[weak self] err in
             self?.notifyError(error: err)
+            completion?(err)
         }
     }
     
