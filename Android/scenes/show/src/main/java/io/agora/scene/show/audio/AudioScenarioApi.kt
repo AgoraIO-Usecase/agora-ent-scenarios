@@ -36,14 +36,14 @@ enum class AudioScenarioType(val value: Int) {
  * @param Close 关
  */
 enum class SoundCardType constructor(
-    val gainValue: Float,
+    val gainValue: Int,
     val presetValue: Int,
     val gender: Int,
     val effect: Int,
 ) {
-    Magnetic(gainValue = 1.0f, presetValue = 4, gender = 0, effect = 0),
-    Pleasant(gainValue = 1.0f, presetValue = 4, gender = 0, effect = 1),
-    Close(gainValue = -1.0f, presetValue = -1, gender = -1, effect = -1)
+    Magnetic(gainValue = 100, presetValue = 4, gender = 0, effect = 0),
+    Pleasant(gainValue = 100, presetValue = 4, gender = 0, effect = 1),
+    Close(gainValue = -100, presetValue = -1, gender = -1, effect = -1)
 }
 
 /**
