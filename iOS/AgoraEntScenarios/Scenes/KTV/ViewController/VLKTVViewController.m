@@ -1783,6 +1783,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
+- (void)settingViewSettingChanged:(VLKTVSettingModel *)setting effectChoosed:(NSInteger)effectIndex{
+    [self settingViewEffectChoosed: effectIndex];
+}
+
 -(void)showEarSettingView {
     [LSTPopView popEarSettingViewWithParentView:self.view isEarOn:_isEarOn vol:self.earValue withDelegate:self];
 }
