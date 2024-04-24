@@ -175,7 +175,7 @@ class CallRtmManager(
     // ------------------ inner private ------------------
 
     private fun createRtmClient(): RtmClient {
-        val rtmConfig = RtmConfig.Builder(appId, userId.toString()).build()
+        val rtmConfig = RtmConfig.Builder(appId, userId.toString()).presenceTimeout(30).build()
         if (rtmConfig.userId.isEmpty()) {
             callMessagePrint("userId is empty", 2)
         }
