@@ -319,8 +319,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                         user.userId = userMap.getString("userId")
                         user.userName = userMap.getString("userName")
                         user.avatar = userMap.getString("avatar")
-                        user.createdAt = userMap.getLong("createdAt")
-                        user.objectId = userMap.getString("objectId")
                     }
                     if (user.userId.isEmpty()) { return } // 检验数据是否有效
                     CallServiceManager.instance.remoteUser = user
