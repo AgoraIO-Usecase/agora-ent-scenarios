@@ -91,4 +91,24 @@ public func agoraDoMainThreadTask(_ task: (()->())?) {
         
         return logDir
     }
+    
+    @objc public static func allLogsUrls() -> [URL] {
+        let dir = cacheDir()
+        var urls = [URL(fileURLWithPath: logsDir())]
+        
+        let dirUrl = URL(fileURLWithPath: dir)
+        guard let directoryContents = try? FileManager.default.contentsOfDirectory(at: dirUrl, includingPropertiesForKeys: nil, options: []) else {
+            return urls
+        }
+        //查找dir里所有文件名包含'agoraapi'、'agorartmsdk'、'agorasdk'的三类文件
+        for fileURL in directoryContents {
+            // 过滤出文件名包含'agoraapi'、'agorartmsdk'、'agorasdk'的文件
+            let fileName = fileURL.lastPathComponent.lowercased()
+            if fileName.contains("agoraapi") || fileName.contains("agorartmsdk") || fileName.contains("agorasdk") {
+                urls.append(fileURL)
+            }
+        }
+        
+        return urls
+    }
 }
