@@ -418,6 +418,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
             }
         }
+        if (!isRoomOwner) {
+            mRtcEngine.adjustUserPlaybackSignalVolumeEx(mRoomInfo.userId.toInt(), 100, mMainRtcConnection)
+        }
     }
 
     private fun joinChannel() {
