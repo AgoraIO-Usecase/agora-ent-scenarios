@@ -1,7 +1,6 @@
 package io.agora.scene.showTo1v1.videoloaderapi
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -10,53 +9,52 @@ import io.agora.rtc2.RtcEngineEx
 
 /**
  * 直播间item触摸事件
- * @param context 直播间item处在的上下文
  * @param mRtcEngine RtcEngineEx对象
  * @param roomInfo 房间信息
  * @param localUid 观众uid
  */
 abstract class OnLiveRoomItemTouchEventHandler constructor(
-    private val context: Context,
     private val mRtcEngine: RtcEngineEx,
     private val roomInfo: VideoLoader.RoomInfo,
     private val localUid: Int
 ): View.OnTouchListener {
-    private val tag = "OnTouchEventHandler"
-    private val videoSwitcher by lazy { VideoLoader.getImplInstance(mRtcEngine) }
-    private val CLICK_INTERNAL = 500L
+    private val tag = "[VideoLoader]Touch"
+    private val videoLoader by lazy { VideoLoader.getImplInstance(mRtcEngine) }
+    private val clickInternal = 500L
     private var lastClickTime = 0L
 
     // View.OnTouchListener
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         // 处理频繁点击事件
-        if (System.currentTimeMillis() - lastClickTime <= CLICK_INTERNAL) return true
+        if (System.currentTimeMillis() - lastClickTime <= clickInternal) return true
         val motionEvent = event ?: return true
         when (motionEvent.action) {
             MotionEvent.ACTION_DOWN -> {
-                Log.d(tag, "click down")
+                VideoLoader.videoLoaderApiLog(tag, "click down, roomInfo:${roomInfo}")
                 roomInfo.anchorList.forEach { anchorInfo->
                     // 加入频道并将远端音量调为0
-                    videoSwitcher.switchAnchorState(AnchorState.JOINED, anchorInfo, localUid, null)
-                    mRtcEngine.adjustUserPlaybackSignalVolumeEx(anchorInfo.anchorUid, 0, RtcConnection(anchorInfo.channelId, localUid))
+                    videoLoader.switchAnchorState(AnchorState.JOINED_WITHOUT_AUDIO, anchorInfo, localUid)
                     // 触发视频渲染最佳时机
                     onRequireRenderVideo(anchorInfo)?.let { canvas ->
-                        videoSwitcher.renderVideo(anchorInfo, localUid, canvas)
+                        videoLoader.renderVideo(anchorInfo, localUid, canvas)
                     }
                 }
             }
             MotionEvent.ACTION_CANCEL -> {
-                Log.d(tag, "click cancel")
+                VideoLoader.videoLoaderApiLog(tag, "click cancel, roomInfo:${roomInfo}")
                 roomInfo.anchorList.forEach {
-                    videoSwitcher.switchAnchorState(AnchorState.IDLE, it, localUid, null)
+                    videoLoader.switchAnchorState(AnchorState.IDLE, it, localUid)
                 }
             }
             MotionEvent.ACTION_UP -> {
-                Log.d(tag, "click up join channel, roomInfo:${roomInfo}")
+                VideoLoader.videoLoaderApiLog(tag, "click up, roomInfo:${roomInfo}")
                 lastClickTime = System.currentTimeMillis()
-                roomInfo.anchorList.forEach { anchorInfo->
+                roomInfo.anchorList.forEach { anchorInfo ->
+                    videoLoader.switchAnchorState(AnchorState.JOINED, anchorInfo, localUid)
                     // 打点
                     mRtcEngine.startMediaRenderingTracingEx(RtcConnection(anchorInfo.channelId, localUid))
+                    (videoLoader as VideoLoaderImpl).getProfiler(anchorInfo.channelId).perceivedStartTime = System.currentTimeMillis()
                 }
             }
         }

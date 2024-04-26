@@ -6,6 +6,7 @@ import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -141,11 +142,10 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     private fun initOrUpdateViewPage() {
         onPageScrollEventHandler = object : OnPageScrollEventHandler(
-            this,
             mRtcEngine,
             UserManager.getInstance().user.id.toInt(),
             true,
-            AGSlicingType.VISIABLE
+            AGSlicingType.VISIBLE
         ) {
             override fun onPageScrollStateChanged(state: Int) {
                 when (state) {
@@ -317,10 +317,15 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 mShowTo1v1Manger.prepareCall(CallRole.CALLER, roomInfo.roomId, callback = {
                     if (it) {
                         mShowTo1v1Manger.mCallApi.addListener(callApiListener)
-                        mShowTo1v1Manger.mCallApi.call(roomInfo.getIntUserId(), completion = {
-                            if (it != null) {
-                                mShowTo1v1Manger.mCallApi.removeListener(callApiListener)
-                                mShowTo1v1Manger.deInitialize()
+                        mShowTo1v1Manger.mCallApi.call(roomInfo.getIntUserId(), completion = { error ->
+                            if (error != null && mCallState == CallStateType.Calling) {
+                                Toast.makeText(this, getString(R.string.show_to1v1_call_failed), Toast.LENGTH_SHORT).show()
+                                // call 失败立刻挂断
+                                mShowTo1v1Manger.mCallApi.cancelCall {  }
+                                mCallDialog?.let {
+                                    if (it.isShowing) it.dismiss()
+                                    mCallDialog = null
+                                }
                             }
                         })
                     } else {
