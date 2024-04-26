@@ -41,8 +41,8 @@ enum class SoundCardType constructor(
     val gender: Int,
     val effect: Int,
 ) {
-    Magnetic(gainValue = 100, presetValue = 4, gender = 0, effect = 0),
-    Pleasant(gainValue = 100, presetValue = 4, gender = 0, effect = 1),
+    Magnetic(gainValue = 200, presetValue = 4, gender = 0, effect = 0),
+    Pleasant(gainValue = 200, presetValue = 4, gender = 0, effect = 1),
     Close(gainValue = -100, presetValue = -1, gender = -1, effect = -1)
 }
 
