@@ -1270,8 +1270,8 @@ extension CallApiImpl: AgoraRtcEngineDelegate {
 
 extension CallApiImpl {
     func callPrint(_ message: String, _ logLevel: CallLogLevel = .normal) {
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
-        let timeString = formatter.string(from: Date())
+//        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+        let timeString = ""//formatter.string(from: Date())
         for element in delegates.allObjects {
             element.callDebugInfo?(message: "\(timeString) \(message)", logLevel: logLevel)
         }
