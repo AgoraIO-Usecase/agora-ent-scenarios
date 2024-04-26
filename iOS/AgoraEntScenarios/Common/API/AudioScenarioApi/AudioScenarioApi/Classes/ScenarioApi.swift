@@ -47,7 +47,7 @@ public enum SoundCardType {
     var gainValue: Float {
         switch self {
         case .magnetic, .pleasant:
-            return 100.0
+            return 200.0
         case .close:
             return -100.0
         }
