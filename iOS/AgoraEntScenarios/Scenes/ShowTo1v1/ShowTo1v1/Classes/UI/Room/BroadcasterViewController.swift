@@ -246,7 +246,7 @@ class BroadcasterViewController: BaseRoomViewController {
                 self?.callApi?.cancelCall(completion: { _ in
                 })
                 
-                let msg = "\("call_toast_callfail".showTo1v1Localization()): \(err.localizedDescription)"
+                let msg = "\("call_toast_callfail".showTo1v1Localization()): \(err.code)"
                 AUIToast.show(text: msg)
             })
             return

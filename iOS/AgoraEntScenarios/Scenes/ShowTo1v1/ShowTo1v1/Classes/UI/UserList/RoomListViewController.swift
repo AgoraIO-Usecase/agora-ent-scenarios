@@ -401,7 +401,7 @@ extension RoomListViewController {
             self.callApi.cancelCall(completion: { err in
             })
             
-            let msg = "\("call_toast_callfail".showTo1v1Localization()): \(err.localizedDescription)"
+            let msg = "\("call_toast_callfail".showTo1v1Localization()): \(err.code)"
             AUIToast.show(text: msg)
         }
         
@@ -579,7 +579,7 @@ extension RoomListViewController: CallApiListenerProtocol {
                     guard let err = err else {return}
                     self?.callApi.reject(remoteUserId: fromUserId, reason: "", completion: { _ in
                     })
-                    let msg = "\("call_toast_acceptfail".showTo1v1Localization()): \(err.localizedDescription)"
+                    let msg = "\("call_toast_acceptfail".showTo1v1Localization()): \(err.code)"
                     AUIToast.show(text: msg)
                 })
                 
