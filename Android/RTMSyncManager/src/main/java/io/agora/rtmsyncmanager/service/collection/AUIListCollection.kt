@@ -574,21 +574,34 @@ class AUIListCollection(
                 callback?.invoke(error)
                 return
             }
-            val calcItem = AUICollectionUtils.calculateMap(
+            var tempMap: Map<String, Any>? = null
+            try {
+                tempMap = AUICollectionUtils.calculateMap(
+                    item,
+                    key,
+                    value.value,
+                    value.min,
+                    value.max,
+                )
+            } catch (e: AUICollectionException) {
+                callback?.invoke(e)
+                return
+            }
+            AUICollectionUtils.calculateMap(
                 item,
                 key,
                 value.value,
                 value.min,
-                value.max
+                value.max,
             )
-            Log.d("hiut", "AUICollectionUtils.calculateMap calcItem:$calcItem")
-            if (calcItem == null) {
+            Log.d("ListCollection", "AUICollectionUtils.calculateMap calcItem:$tempMap")
+            if (tempMap == null) {
                 callback?.invoke(
                     AUICollectionException.ErrorCode.calculateMapFail.toException()
                 )
                 return
             }
-            list[itemIdx] = calcItem
+            list[itemIdx] = tempMap
         }
 
         val retList =
@@ -674,6 +687,14 @@ class AUIListCollection(
             if (code == 0) {
                 // success
                 rtmManager.markReceiptFinished(uniqueId, null)
+            } else if (fromValue(code) != null) {
+                rtmManager.markReceiptFinished(
+                    uniqueId, AUIRtmException(
+                        code,
+                        fromValue(code)!!.message,
+                        "receipt message from arbiter"
+                    )
+                )
             } else {
                 // failure
                 rtmManager.markReceiptFinished(

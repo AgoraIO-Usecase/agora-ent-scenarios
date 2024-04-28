@@ -53,9 +53,7 @@ class SyncManager constructor(
     private fun createRtmClient(): RtmClient {
         val commonConfig = AUIRoomContext.shared().requireCommonConfig()
         val userInfo = AUIRoomContext.shared().currentUserInfo
-        val rtmConfig = RtmConfig.Builder(commonConfig.appId, userInfo.userId).apply {
-            presenceTimeout(60)
-        }.build()
+        val rtmConfig = RtmConfig.Builder(commonConfig.appId, userInfo.userId).build()
         if (rtmConfig.appId.isEmpty()) {
             assert(false) { "userId is empty" }
         }

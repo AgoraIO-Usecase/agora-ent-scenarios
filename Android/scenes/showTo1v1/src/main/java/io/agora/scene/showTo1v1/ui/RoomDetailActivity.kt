@@ -7,6 +7,7 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,10 +16,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
+import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.ChannelMediaOptions
@@ -55,6 +59,10 @@ import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import io.agora.scene.widget.utils.StatusBarUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 import java.math.RoundingMode
@@ -148,6 +156,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     private var mTimeLinkAt: Long = 0
 
+    // 用于取消协程的 Job 对象
+    private var imageLoadingJob: Job? = null
+
     // 秀场 textureView
 //    private val mShowTextureView by lazy { SurfaceView(this) }
     override fun getViewBinding(inflater: LayoutInflater): ShowTo1v1CallDetailActivityBinding {
@@ -207,9 +218,13 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         }
         binding.vDragSmallWindow.canvasContainerAddView(mShowTo1v1Manger.mLocalVideoView)
 
-        Glide.with(this)
-            .load(mRoomInfo.avatar).apply(RequestOptions.circleCropTransform())
-            .into(binding.ivUserAvatar)
+        imageLoadingJob = lifecycleScope.launch {
+            // 在 IO 线程中加载图片
+            val bitmap = loadImageInBackground(mRoomInfo.avatar)
+            // 切换到主线程更新 UI
+            binding.ivUserAvatar.setImageBitmap(bitmap)
+        }
+
         binding.tvRoomName.text = mRoomInfo.roomName
         binding.tvNickname.text = mRoomInfo.userName
         binding.tvRoomNum.text = mRoomInfo.roomId
@@ -257,10 +272,15 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     mShowTo1v1Manger.prepareCall(CallRole.CALLER, mRoomInfo.roomId, callback = {
                         if (it) {
                             mShowTo1v1Manger.mCallApi.addListener(callApiListener)
-                            mShowTo1v1Manger.mCallApi.call(mRoomInfo.getIntUserId(), completion = {
-                                if (it != null) {
-                                    mShowTo1v1Manger.mCallApi.removeListener(callApiListener)
-                                    mShowTo1v1Manger.deInitialize()
+                            mShowTo1v1Manger.mCallApi.call(mRoomInfo.getIntUserId(), completion = { error ->
+                                if (error != null && mCallState == CallStateType.Calling) {
+                                    ToastUtils.showToast(getString(R.string.show_to1v1_call_failed, error.code.toString()))
+                                    // call 失败立刻挂断
+                                    mShowTo1v1Manger.mCallApi.cancelCall {  }
+                                    mCallDialog?.let {
+                                        if (it.isShowing) it.dismiss()
+                                        mCallDialog = null
+                                    }
                                 }
                             })
                         } else {
@@ -312,6 +332,23 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         binding.flDashboard.visibility = View.VISIBLE
         binding.ivDashboardClose.visibility = View.VISIBLE
         mDashboardFragment?.updateVisible(true)
+    }
+
+    // 在后台线程中加载图片
+    private suspend fun loadImageInBackground(url: String): Bitmap? {
+        return withContext(Dispatchers.IO) {
+            try {
+                Glide.with(this@RoomDetailActivity)
+                    .asBitmap()
+                    .load(url)
+                    .apply(RequestOptions.circleCropTransform())
+                    .submit()
+                    .get() // 等待加载完成并获取 Bitmap
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
     }
 
     private fun onCallSend(user: ShowTo1v1UserInfo) {
@@ -498,7 +535,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             if (error == null) { // success
 
             } else { //failed
-                ToastUtils.showToast(getString(R.string.show_to1v1_end_tips))
+                ToastUtils.showToast(getString(R.string.show_to1v1_enter_room_failed, error.message))
                 onBackPressed()
             }
         })
@@ -565,8 +602,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     override fun onDestroy() {
         super.onDestroy()
-        // 取消 Glide 异步任务
-        //Glide.with(this).pauseRequests()
+        imageLoadingJob?.cancel()
     }
 
     override fun onBackPressed() {
@@ -789,6 +825,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
                 CallEvent.RemoteLeft -> {
                     // 主叫方离线，挂断
+                    ToastUtils.showToast(getString(R.string.show_to1v1_end_linking_tips2))
                     onHangup()
                 }
 

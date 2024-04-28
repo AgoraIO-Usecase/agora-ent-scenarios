@@ -1,6 +1,6 @@
 package io.agora.rtmsyncmanager.service.http.room
 
-import io.agora.auikit.service.http.PayloadResp
+import io.agora.rtmsyncmanager.service.http.PayloadResp
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 
 data class CreateRoomReq(
