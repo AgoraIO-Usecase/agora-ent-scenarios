@@ -5241,7 +5241,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.2.0;
+				MARKETING_VERSION = 4.10.1;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
@@ -5426,7 +5426,7 @@
 					"\"Photos\"",
 					"-ld64",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.test.entfull;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.joy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -5469,7 +5469,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.2.0;
+				MARKETING_VERSION = 4.10.1;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
@@ -5654,7 +5654,7 @@
 					"\"Photos\"",
 					"-ld64",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.test.entfull;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.joy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;

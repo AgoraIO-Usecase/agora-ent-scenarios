@@ -97,7 +97,9 @@ class KeyCenter: NSObject {
     static let CloudPlayerKey: String? = nil
     static let CloudPlayerSecret: String? = nil
 
+    static var baseServerUrlDev: String? = "https://service-staging.shengwang.cn/toolbox"
     static var baseServerUrl: String? = "https://service.shengwang.cn/toolbox"
+    static var joyHostDev: String = "https://service-staging.shengwang.cn/toolbox"
+    static var joyHost: String = "https://service.shengwang.cn/toolbox"
     static var onlineBaseServerUrl: String? = baseServerUrl
-
 }
