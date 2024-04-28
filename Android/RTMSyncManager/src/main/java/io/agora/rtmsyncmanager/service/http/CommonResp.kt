@@ -1,4 +1,4 @@
-package io.agora.auikit.service.http
+package io.agora.rtmsyncmanager.service.http
 
 data class CommonResp<Data>(
     val code: Int = 0,

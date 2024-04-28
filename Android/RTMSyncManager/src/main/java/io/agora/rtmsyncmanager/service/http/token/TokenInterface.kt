@@ -1,6 +1,6 @@
 package io.agora.rtmsyncmanager.service.http.token
 
-import io.agora.auikit.service.http.CommonResp
+import io.agora.rtmsyncmanager.service.http.CommonResp
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST

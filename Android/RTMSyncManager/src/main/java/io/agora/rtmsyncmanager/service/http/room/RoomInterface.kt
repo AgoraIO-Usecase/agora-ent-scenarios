@@ -1,6 +1,6 @@
 package io.agora.rtmsyncmanager.service.http.room
 
-import io.agora.auikit.service.http.CommonResp
+import io.agora.rtmsyncmanager.service.http.CommonResp
 import io.agora.rtmsyncmanager.service.http.room.*
 import retrofit2.Call
 import retrofit2.http.Body

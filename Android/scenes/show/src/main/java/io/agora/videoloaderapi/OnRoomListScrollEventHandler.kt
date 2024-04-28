@@ -14,7 +14,7 @@ abstract class OnRoomListScrollEventHandler constructor(
     private val mRtcEngine: RtcEngineEx,
     private val localUid: Int
 ): RecyclerView.OnScrollListener() {
-    private val tag = "OnRoomListScrollEventHandler"
+    private val tag = "[VideoLoader]Scroll0"
     private val roomList = ArrayList<VideoLoader.RoomInfo>()
 
     fun updateRoomList(list: ArrayList<VideoLoader.RoomInfo>) {
@@ -29,7 +29,7 @@ abstract class OnRoomListScrollEventHandler constructor(
             val layoutManager = recyclerView.layoutManager as LinearLayoutManager
             val firstVisibleItem = layoutManager.findFirstVisibleItemPosition() // 第一个可见 item
             val lastVisibleItem = layoutManager.findLastVisibleItemPosition()  // 最后一个可见 item
-            Log.d(tag, "firstVisible $firstVisibleItem, lastVisible $lastVisibleItem")
+            Log.d("RoomListActivity", "firstVisible $firstVisibleItem, lastVisible $lastVisibleItem")
             val firstPreloadPosition = if (firstVisibleItem - 7 < 0) 0 else firstVisibleItem - 7
             val lastPreloadPosition = if (firstPreloadPosition + 19 >= roomList.size)
                 roomList.size - 1 else firstPreloadPosition + 19

@@ -134,6 +134,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     mShowTo1v1Manger.setup(this)
                     fetchRoomList()
                 } else {
+                    ToastUtils.showToast(getString(R.string.show_to1v1_room_list_refreshed, "fetch token failed!"))
                     binding.smartRefreshLayout.finishRefresh()
                 }
             }
@@ -244,12 +245,15 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     private fun fetchRoomList() {
         mService?.getRoomList(completion = { error, roomList ->
+            if (error != null) {
+                ToastUtils.showToast(getString(R.string.show_to1v1_room_list_refreshed, error.message))
+            }
             mRoomInfoList.clear()
             mRoomInfoList.addAll(roomList)
             updateListView()
             resetViewpage()
             initOrUpdateViewPage()
-            //ToastUtils.showToast(R.string.show_to1v1_room_list_refreshed)
+
             mayShowGuideView()
             if (roomList.isNotEmpty()) {
                 binding.viewPager2.setCurrentItem(0, false)
@@ -319,7 +323,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                         mShowTo1v1Manger.mCallApi.addListener(callApiListener)
                         mShowTo1v1Manger.mCallApi.call(roomInfo.getIntUserId(), completion = { error ->
                             if (error != null && mCallState == CallStateType.Calling) {
-                                Toast.makeText(this, getString(R.string.show_to1v1_call_failed), Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, getString(R.string.show_to1v1_call_failed, error.code.toString()), Toast.LENGTH_SHORT).show()
                                 // call 失败立刻挂断
                                 mShowTo1v1Manger.mCallApi.cancelCall {  }
                                 mCallDialog?.let {

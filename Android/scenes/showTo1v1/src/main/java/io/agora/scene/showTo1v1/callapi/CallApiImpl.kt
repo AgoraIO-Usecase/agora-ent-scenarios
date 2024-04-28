@@ -1235,12 +1235,16 @@ class CallApiImpl constructor(
     override fun onUserJoined(uid: Int, elapsed: Int) {
         callPrint("didJoinedOfUid: $uid elapsed: $elapsed")
         if (connectInfo.callingUserId == uid) else return
-        _notifyEvent(CallEvent.RemoteJoined)
+        runOnUiThread {
+            _notifyEvent(CallEvent.RemoteJoined)
+        }
     }
     override fun onUserOffline(uid: Int, reason: Int) {
         callPrint("didOfflineOfUid: $uid， reason: $reason")
         if (connectInfo.callingUserId != uid) { return }
-        _notifyEvent(CallEvent.RemoteLeft, reasonCode = "$reason")
+        runOnUiThread {
+            _notifyEvent(CallEvent.RemoteLeft, reasonCode = "$reason")
+        }
     }
     override fun onLeaveChannel(stats: RtcStats?) {
         callPrint("didLeaveChannel: $stats")
@@ -1250,7 +1254,9 @@ class CallApiImpl constructor(
          这里rtcConnection = nil会导致leave之后马上join，didLeaveChannelWith会在join之后错误的置空了rtc connection
          */
         //rtcConnection = null
-        _notifyEvent(CallEvent.LocalLeft)
+        runOnUiThread {
+            _notifyEvent(CallEvent.LocalLeft)
+        }
     }
 
     override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
@@ -1265,7 +1271,9 @@ class CallApiImpl constructor(
     }
 
     override fun onError(err: Int) {
-        _notifyRtcOccurErrorEvent(err)
+        runOnUiThread {
+            _notifyRtcOccurErrorEvent(err)
+        }
     }
 
     override fun onRemoteVideoStateChanged(uid: Int, state: Int, reason: Int, elapsed: Int) {

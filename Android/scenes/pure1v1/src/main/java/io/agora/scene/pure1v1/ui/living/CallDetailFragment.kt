@@ -14,6 +14,7 @@ import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.pure1v1.databinding.Pure1v1CallDetailFragmentBinding
 import io.agora.scene.pure1v1.CallServiceManager
 import io.agora.scene.pure1v1.Pure1v1Logger
@@ -278,6 +279,7 @@ class CallDetailFragment : Fragment(), ICallApiListener {
     override fun onCallEventChanged(event: CallEvent, eventReason: String?) {
         when(event) {
             CallEvent.RemoteLeft -> {
+                ToastUtils.showToast(getString(R.string.pure1v1_call_toast_hangup2))
                 onHangup()
             }
             else -> {}
