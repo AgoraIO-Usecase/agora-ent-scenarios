@@ -19,6 +19,7 @@ import io.agora.rtmsyncmanager.service.imp.AUIUserServiceImpl
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmErrorRespObserver
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
+import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.ObservableHelper
 
 class Scene constructor(
@@ -26,7 +27,7 @@ class Scene constructor(
     private var rtmManager: AUIRtmManager
 ) {
 
-    val tag = "AUIScene"
+    private val tag = "AUIScene"
 
     private val kRoomInfoKey = "scene_room_info"
     private val kRoomInfoRoomId = "room_id"
@@ -60,12 +61,18 @@ class Scene constructor(
         }
     }
 
-    private var enterRoomCompletion: ((Map<String, Any>?, Exception?)-> Unit)? = null
+    private var enterRoomCompletion: ((Map<String, Any>?, AUIRtmException?)-> Unit)? = null
     private var respHandlers = ObservableHelper<ISceneResponse>()
     private var roomPayload: Map<String, Any>? = null
 
     private var subscribeDate: Long? = null
-    private var lockRetrived = false
+    private var lockOwnerRetrived = false
+        set(value) {
+            field = value
+            checkRoomValid()
+        }
+
+    private var lockOwnerAcquireSuccess = false
         set(value) {
             field = value
             checkRoomValid()
@@ -133,7 +140,7 @@ class Scene constructor(
         subscribeDate = System.currentTimeMillis()
         enterRoomCompletion = { payload, err ->
             Log.d(tag, "[Benchmark]enterRoomCompletion: ${System.currentTimeMillis() - (subscribeDate ?: 0)}ms")
-            runOnUiThread { completion(payload, null) }
+            runOnUiThread { completion(payload, err) }
         }
         if (ownerId.isEmpty()) {
             roomCollection.getMetaData { err, metadata ->
@@ -156,13 +163,18 @@ class Scene constructor(
                 this.ownerId = ownerId
             }
         }
-        getArbiter().acquire()
+        getArbiter().acquire {
+            if (it == null) {
+                //fail 走onError(channelName: String, error: NSError)，这里不处理
+                lockOwnerAcquireSuccess = true
+            }
+        }
         rtmManager.subscribeError(errorRespObserver)
         getArbiter().subscribeEvent(arbiterObserver)
         rtmManager.subscribe(channelName) { error ->
             if (error != null && error.code != RtmErrorCode.getValue(RtmErrorCode.DUPLICATE_OPERATION)) {
                 runOnUiThread {
-                    enterRoomCompletion?.invoke(null, Exception(error.message))
+                    enterRoomCompletion?.invoke(null, error)
                     enterRoomCompletion = null
                 }
                 return@subscribe
@@ -173,16 +185,19 @@ class Scene constructor(
 
     /// 离开scene
     fun leave() {
+        AUILogger.logger().d(tag,"leave")
         getArbiter().release()
         cleanSDK()
+        AUIRoomContext.shared().cleanRoom(channelName)
     }
 
     /// 销毁scene，清理所有缓存（包括rtm的所有metadata）
     fun delete() {
+        AUILogger.logger().d(tag,"delete")
         cleanScene()
         getArbiter().destroy()
-        AUIRoomContext.shared().cleanRoom(channelName)
         cleanSDK()
+        AUIRoomContext.shared().cleanRoom(channelName)
     }
 
     /// 获取一个collection，例如let collection: AUIMapCollection = scene.getCollection("musicList")
@@ -197,6 +212,14 @@ class Scene constructor(
         collectionMap[key] = scene
         return scene
     }
+
+    private fun notifyError(error: AUIRtmException) {
+        AUILogger.logger().e(tag,"join fail: ${error.message}")
+        if (enterRoomCompletion != null) {
+            enterRoomCompletion?.invoke(null, error)
+            enterRoomCompletion = null
+        }
+    }
     private fun getArbiter(): AUIArbiter {
         val a = AUIRoomContext.shared().roomArbiterMap[channelName]
         if (a != null) {
@@ -206,9 +229,11 @@ class Scene constructor(
         AUIRoomContext.shared().roomArbiterMap[channelName] = arbiter
         return arbiter
     }
-    //如果subscribe成功、锁也获取到、用户列表也获取到，可以检查是否是脏房间并且清理
+    // 如果subscribe成功、锁也获取到，并且锁主获取到锁成功(acquire的callback成功收到)、用户列表也获取到，可以检查是否是脏房间并且清理
     private fun checkRoomValid() {
-        if (subscribeSuccess && lockRetrived && ownerId.isNotEmpty()) else { return }
+        if (subscribeSuccess && lockOwnerRetrived && ownerId.isNotEmpty()) else { return }
+        //如果是锁主，需要判断有没有acquire成功回调，回调后有本地对比，没有成功回调前setmetadata会失败-12008
+        if (getArbiter().isArbiter() && !lockOwnerAcquireSuccess) return
         if (enterRoomCompletion != null) {
             enterRoomCompletion?.invoke(roomPayload, null)
             enterRoomCompletion = null
@@ -229,10 +254,15 @@ class Scene constructor(
         if (!getArbiter().isArbiter()) {
             return
         }
+        _cleanScene()
+    }
+
+    private fun _cleanScene() {
+        AUILogger.logger().d(tag, "_cleanScene")
         //每个collection都清空，让所有人收到onMsgRecvEmpty
-        rtmManager.cleanAllMedadata(channelName = channelName, lockName = "") {
+        rtmManager.cleanAllMetadata(channelName = channelName, lockName = "") {
         }
-        roomCollection.cleanMetaData {  }
+        //roomCollection.cleanMetaData {  }
         getArbiter().destroy()
     }
 
@@ -275,14 +305,15 @@ class Scene constructor(
     private val arbiterObserver = object: AUIArbiterCallback {
         override fun onArbiterDidChange(channelName: String, arbiterId: String) {
             if (arbiterId.isEmpty()) {return}
-            lockRetrived = true
+            lockOwnerRetrived = true
         }
 
         override fun onError(channelName: String, error: AUIRtmException) {
             //如果锁不存在，也认为是房间被销毁的一种
             if (error.code == RtmErrorCode.getValue(RtmErrorCode.LOCK_NOT_EXIST)) {
-                cleanScene()
+                _cleanScene()
             }
+            notifyError(error)
         }
     }
 

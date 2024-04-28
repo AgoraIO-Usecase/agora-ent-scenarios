@@ -7,7 +7,7 @@
     <string name="show_to1v1_random">随机</string>
     <string name="show_to1v1_room_name_hint">填写房间名称，吸引更多观众</string>
     <string name="show_to1v1_room_name_empty_tips">请输入房间名</string>
-    <string name="show_to1v1_room_list_refreshed">列表已刷新</string>
+    <string name="show_to1v1_room_list_refreshed">网络不佳，直播间列表获取失败，建议重试，错误：%s</string>
     <string name="show_to1v1_create_room_tips">本产品仅用于功能体验，单次直播时长不超过20mins</string>
     <string name="show_to1v1_create">创建</string>
     <string name="show_to1v1_creating">创建中…</string>
@@ -18,7 +18,9 @@
     <string name="show_to1v1_call_dialog_info">本产品仅用于功能体验，单次直播时长不超过20mins</string>
     <string name="show_to1v1_dashboard_item">实时数据</string>
     <string name="show_to1v1_end_linking_tips">对方结束连线</string>
+    <string name="show_to1v1_end_linking_tips2">对方已离开，连线自动结束</string>
     <string name="show_to1v1_end_tips">直播结束</string>
+    <string name="show_to1v1_enter_room_failed">网络不佳，进入直播间失败，建议重试，错误：%s</string>
     <string name="show_to1v1_no_answer">我很快回来，一会再连线我吧</string>
     <string name="show_to1v1_auto_connected">呼入，已自动接听…</string>
     <string name="show_to1v1_come_soon1">Hi，我暂时有事，很快回来…</string>
@@ -46,7 +48,7 @@
     <string name="show_to1v1_dashboard_down_loss_package">下行丢包率: %s ％</string>
     <string name="show_to1v1_dashboard_other">其他</string>
     <string name="show_to1v1_dashboard_channel_name">频道名: %s</string>
-    <string name="show_to1v1_call_failed">呼叫失败：%s</string>
+    <string name="show_to1v1_call_failed">网络不佳，呼叫失败，错误码：%s</string>
 
     <string-array name="show_to1v1_room_name">
         <item>小可爱是我呀</item>

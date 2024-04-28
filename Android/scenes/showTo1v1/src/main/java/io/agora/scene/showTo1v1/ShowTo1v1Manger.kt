@@ -189,6 +189,10 @@ class ShowTo1v1Manger constructor() {
     }
 
     fun renewTokens(callback: ((Boolean)) -> Unit) {
+        if (generalToken() != "") {
+            callback.invoke(true)
+            return
+        }
         TokenGenerator.generateTokens(
             "", // 万能 token
             UserManager.getInstance().user.id.toString(),
@@ -279,6 +283,7 @@ class ShowTo1v1Manger constructor() {
         }
 
     fun destroy() {
+        mGeneralToken = ""
         mRemoteUser = null
         mConnectedChannelId = null
         isCallApiInit = false

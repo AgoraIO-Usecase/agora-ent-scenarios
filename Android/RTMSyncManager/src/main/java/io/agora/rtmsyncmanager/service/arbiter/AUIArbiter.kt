@@ -13,6 +13,8 @@ class AUIArbiter(
     private val currentUserId: String
 ) {
 
+    private val tag = "AUIArbiter"
+
     private var lockOwnerId = ""
         set(value) {
             field = value
@@ -56,27 +58,31 @@ class AUIArbiter(
         arbiterHandlers.unSubscribeEvent(handler)
     }
 
-    fun create(){
-        rtmManager.setLock(channelName){ error ->
+    fun create(completion: ((AUIRtmException?) -> Unit)? = null) {
+        rtmManager.setLock(channelName) { error ->
             notifyError(error)
+            completion?.invoke(error)
         }
     }
 
-    fun destroy(){
-        rtmManager.removeLock(channelName){ error ->
+    fun destroy(completion: ((AUIRtmException?) -> Unit)? = null) {
+        rtmManager.removeLock(channelName) { error ->
             notifyError(error)
+            completion?.invoke(error)
         }
     }
 
-    fun acquire() {
-        rtmManager.acquireLock(channelName){ error ->
+    fun acquire(completion: ((AUIRtmException?) -> Unit)? = null) {
+        rtmManager.acquireLock(channelName) { error ->
             notifyError(error)
+            completion?.invoke(error)
         }
     }
 
-    fun release() {
+    fun release(completion: ((AUIRtmException?) -> Unit)? = null) {
         rtmManager.releaseLock(channelName){ error ->
             notifyError(error)
+            completion?.invoke(error)
         }
     }
 

@@ -363,21 +363,27 @@ class AUIMapCollection(
             return
         }
 
-        val map = AUICollectionUtils.calculateMap(
-            currMap,
-            key,
-            value.value,
-            value.min,
-            value.max
-        ) ?: mutableMapOf()
+        var tempMap: Map<String, Any>? = null
+        try {
+            tempMap = AUICollectionUtils.calculateMap(
+                currMap,
+                key,
+                value.value,
+                value.min,
+                value.max,
+            )
+        } catch (e: AUICollectionException) {
+            callback?.invoke(e)
+            return
+        }
         val retMap =
             attributesWillSetClosure?.invoke(
                 channelName,
                 observeKey,
                 valueCmd,
-                AUIAttributesModel(map)
+                AUIAttributesModel(tempMap)
             )?.getMap()
-                ?: map
+                ?: tempMap
         val data = GsonTools.beanToString(retMap)
         if (data == null) {
             callback?.invoke(AUICollectionException.ErrorCode.encodeToJsonStringFail.toException())
@@ -396,7 +402,7 @@ class AUIMapCollection(
                 callback?.invoke(null)
             }
         }
-        updateCurrentListAndNotify(map, true)
+        updateCurrentListAndNotify(tempMap, true)
     }
 
     private fun rtmCleanMetaData(callback: ((error: AUICollectionException?) -> Unit)?) {

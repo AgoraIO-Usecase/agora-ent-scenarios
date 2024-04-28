@@ -176,7 +176,7 @@ class ShowTo1v1ServiceImpl constructor(
         roomManager.getRoomInfoList(BuildConfig.AGORA_APP_ID, kSceneId, System.currentTimeMillis(), 20) { error, list ->
             if (error != null) {
                 ShowTo1v1Logger.e(TAG, error, "getRoomList failed")
-                runOnMainThread { completion.invoke(null, ArrayList<ShowTo1v1RoomInfo>().toList()) }
+                runOnMainThread { completion.invoke(error, ArrayList<ShowTo1v1RoomInfo>().toList()) }
             }
             if (list != null) {
                 val ret = ArrayList<ShowTo1v1RoomInfo>()

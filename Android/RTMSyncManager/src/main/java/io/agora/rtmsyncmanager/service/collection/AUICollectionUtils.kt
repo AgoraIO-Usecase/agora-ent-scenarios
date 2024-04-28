@@ -79,38 +79,40 @@ object AUICollectionUtils {
     }
 
 
-    fun calculateMap(
-        origMap: Map<String, Any>,
-        key: List<String>,
-        value: Int,
-        min: Int,
-        max: Int
-    ): Map<String, Any>? {
-        Log.d("hiut", "calculateMap origMap:$origMap key:$key, value:$value, min::$min, max:$max")
-        val retMap = HashMap(origMap)
-        if(key.size > 1){
+    @Throws(AUICollectionException::class)
+    fun calculateMap(origMap: Map<String, Any>,
+                     key: List<String>,
+                     value: Int,
+                     min: Int,
+                     max: Int): Map<String, Any> {
+        val _origMap = origMap.toMutableMap()
+        if (key.size > 1) {
             val curKey = key.firstOrNull() ?: ""
             val subKey = key.subList(1, key.size)
 
-            val subValue = retMap[curKey] as? Map<String, Any> ?: return null
-            val newMap = calculateMap(
-                subValue,
-                subKey,
-                value,
-                min,
-                max
-            ) ?: return null
-            retMap[curKey] = newMap
-            return retMap
+            val subValue = _origMap[curKey] as? MutableMap<String, Any>
+                ?: throw AUICollectionException.ErrorCode.calculateMapFail.toException()
+
+            val newMap: Map<String, Any> = try {
+                calculateMap(subValue, subKey, value, min, max)
+            } catch (e: AUICollectionException) {
+                throw e
+            }
+
+            _origMap[curKey] = newMap
+            return _origMap
         }
-        val curKey = key.firstOrNull() ?: return null
-        Log.d("hiut", "subValue: ${retMap[curKey]}")
-        val subValue = retMap[curKey] as Long
+
+        val curKey = key.firstOrNull() ?: return emptyMap()
+        val subValue = _origMap[curKey] as? Long
+            ?: throw AUICollectionException.ErrorCode.calculateMapFail.toException()
+
         val curValue = subValue + value
-        if(curValue < min || curValue > max){
-            return null
+        if (curValue > max || curValue < min) {
+            throw AUICollectionException.ErrorCode.calculateMapOutOfRange.toException()
         }
-        retMap[curKey] = curValue
-        return retMap
+
+        _origMap[curKey] = curValue
+        return _origMap
     }
 }
