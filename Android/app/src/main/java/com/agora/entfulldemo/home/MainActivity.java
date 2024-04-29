@@ -1,7 +1,9 @@
 package com.agora.entfulldemo.home;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
@@ -18,7 +20,6 @@ import com.agora.entfulldemo.databinding.AppActivityMainBinding;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.tencent.bugly.crashreport.CrashReport;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -37,6 +38,16 @@ import io.agora.scene.widget.dialog.PermissionLeakDialog;
 @Route(path = PagePathConstant.pageMainHome)
 public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding> {
 
+    private static final String KEY_CODE = "key_code";
+    public static final int PARAMS_EXIT = 100;
+
+    public static void startActivity(Activity activity, int code){
+        Intent intent = new Intent(activity, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra(KEY_CODE, code);
+        activity.startActivity(intent);
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(@Nullable UserTokenErrorEvent event) {
         finishAffinity();
@@ -52,6 +63,19 @@ public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
+        if (intent != null){
+            int code = intent.getIntExtra(KEY_CODE,-1);
+            if (code==PARAMS_EXIT){
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        android.os.Process.killProcess(android.os.Process.myPid());
+                        System.exit(0);
+                    }
+                }, 500);
+            }
+        }
     }
 
     @Override

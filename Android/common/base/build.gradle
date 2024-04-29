@@ -27,6 +27,7 @@ android {
 
         buildConfigField "String", "SERVER_HOST", "\"${SERVER_HOST}\""
         buildConfigField "String", "TOOLBOX_SERVER_HOST", "\"${TOOLBOX_SERVER_HOST}\""
+        buildConfigField "String", "TOOLBOX_SERVER_HOST_DEV", "\"${TOOLBOX_SERVER_HOST_DEV}\""
 
         buildConfigField "String", "AGORA_APP_ID", "\"${AGORA_APP_ID}\""
         buildConfigField "String", "AGORA_APP_CERTIFICATE", "\"${AGORA_APP_CERTIFICATE}\""
@@ -68,6 +69,7 @@ dependencies {
     api rootProject.ext.deps.okhttp_logger
     api rootProject.ext.deps.retrofit2
     api rootProject.ext.deps.retrofit2_adapter
+    api rootProject.ext.deps.retrofit2_gson
     api rootProject.ext.deps.gson
     implementation rootProject.ext.deps.autosize
 
