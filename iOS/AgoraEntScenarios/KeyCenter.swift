@@ -22,9 +22,8 @@ class KeyCenter: NSObject {
      则应使用不同的 App ID。如果应用程序需要相互通信，则应使用同一个App ID。
      进入声网控制台(https://console.shengwang.cn/)，创建一个项目，进入项目配置页，即可看到APP ID。
      */
-    
     static let AppId: String = <#Your AppId#>
-  
+    
     /**
      Certificate.
      Agora provides App certificate to generate Token. You can deploy and generate a token on your server,
@@ -39,7 +38,7 @@ class KeyCenter: NSObject {
      */
 
     static let Certificate: String? = <#Your Certificate#>
-
+    
     /**
      Token.
      Agora provides Temporary Access Token to join the spatial channel with APP ID which enable App Certificate.
@@ -97,9 +96,9 @@ class KeyCenter: NSObject {
     static let CloudPlayerKey: String? = nil
     static let CloudPlayerSecret: String? = nil
 
-    static var baseServerUrlDev: String? = "https://service-staging.shengwang.cn/toolbox"
-    static var baseServerUrl: String? = "https://service.shengwang.cn/toolbox"
-    static var joyHostDev: String = "https://service-staging.shengwang.cn/toolbox"
-    static var joyHost: String = "https://service.shengwang.cn/toolbox"
+    static var baseServerUrlDev: String? = "https://service-staging.agora.io/toolbox/"
+    static var baseServerUrl: String? = "https://service.shengwang.cn/toolbox/"
+    static var joyHostDev: String = "https://service-staging.agora.io/room-manager"
+    static var joyHost: String = "https://service.shengwang.cn/room-manager"
     static var onlineBaseServerUrl: String? = baseServerUrl
 }

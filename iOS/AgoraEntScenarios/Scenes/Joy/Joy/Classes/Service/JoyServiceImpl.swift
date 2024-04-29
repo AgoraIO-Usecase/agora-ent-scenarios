@@ -225,8 +225,10 @@ extension JoyServiceImpl: JoyServiceProtocol {
                         info.taskId = taskId
                     }
                     
-                    if let assistantUid = data["assistantUid"] as? Int64 {
-                        info.assistantUid = UInt(assistantUid) ?? 0
+                    if let assistantUid = data["assistantUid"] as? UInt {
+                        info.assistantUid = assistantUid
+                    } else if let assistantUidStr = data["assistantUid"] as? String, let assistantUid = UInt(assistantUidStr) {
+                        info.assistantUid = assistantUid
                     }
                     
                     if let gameName = data["gameName"] as? String {
