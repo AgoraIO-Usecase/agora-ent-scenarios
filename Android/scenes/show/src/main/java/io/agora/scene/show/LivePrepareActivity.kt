@@ -118,6 +118,8 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 showPresetDialog()
             }
         }
+        binding.tvContent.text =
+            String.format(resources.getString(R.string.show_beauty_loading), "", "0%")
 
         if (BuildConfig.BEAUTY_RESOURCE.isEmpty()) {
             binding.statusPrepareViewLrc.isVisible = false

@@ -27,6 +27,7 @@ import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
+import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.pure1v1.CallServiceManager
 import io.agora.scene.pure1v1.Pure1v1Logger
 import io.agora.scene.pure1v1.R
@@ -152,6 +153,16 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
     override fun onRestart() {
         super.onRestart()
+        Log.d("hugo", "onRestart")
+        // 如果在房间列表页面锁屏停留超过20h，需要重新获取token
+        if (CallServiceManager.instance.rtcToken != "" && TimeUtils.currentTimeMillis() - CallServiceManager.instance.lastTokenFetchTime >= CallServiceManager.instance.tokenExpireTime) {
+            Log.d("hugo", "token need renew!")
+            CallServiceManager.instance.rtcToken = ""
+            CallServiceManager.instance.rtmToken = ""
+            CallServiceManager.instance.fetchToken {
+                CallServiceManager.instance.renewRtmToken()
+            }
+        }
         binding.smartRefreshLayout.autoRefresh()
     }
 
