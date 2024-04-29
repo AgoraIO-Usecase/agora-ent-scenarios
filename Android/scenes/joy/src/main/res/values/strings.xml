@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources translatable="false">
+    <string name="joy_gameplay">弹幕玩法</string>
+    <string name="joy_play_empty_room">欢迎来到声网弹幕玩法方案\n目前暂无房间</string>
+    <string name="joy_live_prepare_tip">本产品仅用于功能体验，单次直播时长不超过10mins</string>
+    <string name="joy_living">直播中</string>
+    <string name="joy_room_id">ID: %s</string>
+    <string name="joy_user_count">%d人</string>
+    <string name="joy_broadcaster_bad_exit">检测到上次直播异常退出，请重新创建直播间开播</string>
+    <string name="joy_room_name_empty_tips">请输入房间名</string>
+    <string name="joy_live_prepare_room_name_hint">请输入房间名称</string>
+    <string name="joy_start_living">开始直播</string>
+    <string name="joy_choose_game">选择弹幕玩法</string>
+    <string name="joy_tips_for_launching_anchors">主播开播须知</string>
+    <string name="joy_rules_of_play">玩法规则</string>
+    <string name="joy_anchor_not_open_gameplay">主播尚未开启玩法\n请耐心等待</string>
+    <string name="joy_gift">礼物</string>
+    <string name="joy_send_message">发送弹幕</string>
+    <string name="joy_send">发送</string>
+    <string name="joy_living_host_end_title">结束游戏</string>
+    <string name="joy_living_user_end_title">结束玩法</string>
+    <string name="joy_living_host_end_content">是否退出游戏直播？</string>
+    <string name="joy_living_user_end_content">是否退出直播？</string>
+    <string name="joy_living_timeout_title">游戏超时自动退出</string>
+    <string name="joy_living_host_timeout">重新体验游戏请返回创建房间</string>
+    <string name="joy_living_abnormal_title">主播端异常</string>
+    <string name="joy_living_user_timeout">重新体验游戏请返回进入房间</string>
+    <string name="joy_send_message_success">指令发送成功</string>
+    <string name="joy_join_the_camp_first">请先加入阵营</string>
+    <string name="joy_send_gift_success">发送礼物成功</string>
+    <string name="joy_living_end">游戏直播结束</string>
+    <string name="joy_join_room_error">加入房间失败，请重试</string>
+    <string name="joy_get_start_game_error">获取进行中的游戏失败</string>
+    <string name="joy_automatic_exit_of_gameplay_exception">玩法异常自动退出</string>
+    <string name="joy_request_failed">请求失败</string>
+    <string name="joy_instruction_error">玩法指令错误</string>
+    <string name="joy_send_gift_failed">送礼失败</string>
+    <string name="joy_request_no_cloud_host">暂无可用云机</string>
+
+    <string-array name="joy_gift_array">
+        <item>爱心</item>
+        <item>鲜花</item>
+        <item>兔子</item>
+        <item>薯条</item>
+        <item>钻石</item>
+        <item>火箭</item>
+    </string-array>
+
+    <string-array name="joy_roomName_array">
+        <item>和你一起看月亮</item>
+        <item>治愈</item>
+        <item>一锤定音</item>
+        <item>有酒吗</item>
+        <item>早安序曲</item>
+        <item>风情万种的歌房</item>
+        <item>近在远方</item>
+        <item>风中诗</item>
+        <item>那年风月</item>
+        <item>三万余年</item>
+        <item>七十二街</item>
+        <item>情怀如诗</item>
+        <item>简遇而安</item>
+        <item>十里笙歌</item>
+        <item>回风舞雪</item>
+        <item>梦初醒处</item>
+        <item>别来无恙</item>
+        <item>三里清风</item>
+        <item>烟雨万重</item>
+        <item>水洗晴空</item>
+        <item>轻风淡月</item>
+    </string-array>
+</resources>

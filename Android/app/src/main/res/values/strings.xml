@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">声动互娱-直播社交版</string>
+    <string name="app_name">声动互娱-小玩法</string>
 
     <string name="app_agreement_page_title">个人信息保护指引</string>
     <string name="app_agreement_protection_tip1">声动互娱软件是一款用于向声网客户展示产品使用效果的测试产品，仅用于测试产品的功能、性能和可用性，而非提供给大众使用的正式产品。</string>
@@ -36,6 +36,7 @@
     <string name="app_home_scene_ktv">在线K歌房</string>
     <string name="app_home_scene_voice">语聊房</string>
     <string name="app_home_scene_live">直播</string>
+    <string name="app_home_scene_game">弹幕玩法</string>
     <string name="app_home_scene_live_merge">直播社交</string>
     <string name="app_home_scene_ktv_solo_chorus">独唱&amp;合唱</string>
     <string name="app_home_scene_ktv_solo_chorus_tips">超低延迟真合唱</string>
@@ -57,6 +58,7 @@
     <string name="app_home_scene_live_multiplayer_tips">敬请期待</string>
     <string name="app_home_scene_live_show1v1">秀场转1v1\n私密房</string>
     <string name="app_home_scene_live_show1v1_tips">秒转场&amp;秒接通</string>
+    <string name="app_home_scene_game_joy_tips">直播互动新玩法</string>
 
     <string name="app_title_home">玩法</string>
     <string name="app_title_find">发现</string>
@@ -149,6 +151,7 @@
     <string name="app_about_cantata">大合唱</string>
     <string name="app_about_pure1v1">1v1私密房</string>
     <string name="app_about_showTo1v1">秀场转1v1私密房</string>
+    <string name="app_about_joy">声动互娱-小玩法</string>
     <string name="app_about_customer_service">联系客服</string>
     <string name="app_about_official_website">官网地址</string>
     <string name="app_about_phone_cancel">取消</string>
@@ -156,7 +159,12 @@
 
     <string name="app_debug_open">Debug模式已打开</string>
     <string name="app_debug_off">Debug模式已关闭</string>
-    <string name="app_exit_debug">确定退出Debug模式么？</string>
+    <string name="app_debug_switch">切换</string>
+    <string name="app_debug_switch_env">切换服务器</string>
+    <string name="app_release_env">正式环境</string>
+    <string name="app_dev_env">测试环境</string>
+    <string name="app_exit_debug">退出Debug模式</string>
+    <string name="app_exit_debug_title">确定退出Debug模式么？</string>
     <string name="app_exit_debug_tip">退出debug模式后，设置页面将恢复成正常的设置页面哦～</string>
     <string name="app_agree_tip">请同意我们的隐私政策与用户协议</string>
     <string name="app_input_phonenum_tip">请输入正确的手机号</string>
