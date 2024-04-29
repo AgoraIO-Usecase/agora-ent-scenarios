@@ -9,9 +9,11 @@ import io.agora.rtc2.video.SegmentationProperty
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.show.debugSettings.DebugSettingModel
 import io.agora.videoloaderapi.VideoLoader
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 object RtcEngineInstance {
 
@@ -31,12 +33,21 @@ object RtcEngineInstance {
 
     // 万能通用 token ,进入房间列表默认获取万能 token
     private var generalToken: String = ""
+    private var lastTokenFetchTime: Long = 0L
+
+    const val tokenExpireTime = 20 * 60 * 60 * 1000 // 20h
 
     fun setupGeneralToken(generalToken: String) {
         this.generalToken = generalToken
+        if (generalToken != "") {
+            this.lastTokenFetchTime = TimeUtils.currentTimeMillis()
+        } else {
+            this.lastTokenFetchTime = 0L
+        }
     }
 
     fun generalToken(): String = generalToken
+    fun lastTokenFetchTime(): Long = lastTokenFetchTime
 
     private var innerRtcEngine: RtcEngineEx? = null
     val rtcEngine: RtcEngineEx

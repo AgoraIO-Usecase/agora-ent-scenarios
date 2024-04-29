@@ -160,7 +160,7 @@ class ShowTo1v1ServiceImpl constructor(
                 }
             }
             scene.delete()
-        }else{
+        } else {
             ShowTo1v1Logger.d(TAG, "audience leaveRoom end ${roomInfo.roomId}")
             runOnMainThread {
                 completion.invoke(null)
@@ -173,22 +173,34 @@ class ShowTo1v1ServiceImpl constructor(
      */
     override fun getRoomList(completion: (error: Exception?, roomList: List<ShowTo1v1RoomInfo>) -> Unit) {
         ShowTo1v1Logger.d(TAG, "getRoomList start")
-        roomManager.getRoomInfoList(BuildConfig.AGORA_APP_ID, kSceneId, System.currentTimeMillis(), 20) { error, list ->
+        roomManager.getRoomInfoList(BuildConfig.AGORA_APP_ID, kSceneId, System.currentTimeMillis(), 20) { error, list, ts ->
             if (error != null) {
                 ShowTo1v1Logger.e(TAG, error, "getRoomList failed")
                 runOnMainThread { completion.invoke(error, ArrayList<ShowTo1v1RoomInfo>().toList()) }
             }
-            if (list != null) {
+            if (list != null && ts != null) {
                 val ret = ArrayList<ShowTo1v1RoomInfo>()
                 list.forEach {
-                    ret.add(ShowTo1v1RoomInfo(
-                        roomId = it.roomId,
-                        roomName = it.roomName,
-                        userId = it.owner!!.userId,
-                        userName = it.owner!!.userName,
-                        avatar = it.owner!!.userAvatar,
-                        createdAt = it.createTime
-                    ))
+                    val aliveTime = ts - it.createTime
+                    ShowTo1v1Logger.d(TAG, "room alive time: $aliveTime, roomId: ${it.roomId}")
+                    if (aliveTime < ROOM_AVAILABLE_DURATION) {
+                        ret.add(ShowTo1v1RoomInfo(
+                            roomId = it.roomId,
+                            roomName = it.roomName,
+                            userId = it.owner!!.userId,
+                            userName = it.owner!!.userName,
+                            avatar = it.owner!!.userAvatar,
+                            createdAt = it.createTime
+                        ))
+                    } else {
+                        roomManager.destroyRoom(BuildConfig.AGORA_APP_ID, kSceneId, it.roomId) { e ->
+                            if (e != null) {
+                                ShowTo1v1Logger.e(TAG,e, "destroyRoom ${it.roomId} failed")
+                            } else {
+                                ShowTo1v1Logger.d(TAG, "broadcast leaveRoom end ${it.roomId}")
+                            }
+                        }
+                    }
                 }
                 //按照创建时间顺序排序
                 ret.sortBy { it.createdAt }
