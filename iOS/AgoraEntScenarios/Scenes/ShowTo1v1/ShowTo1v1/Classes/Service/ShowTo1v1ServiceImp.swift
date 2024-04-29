@@ -52,11 +52,11 @@ class ShowTo1v1ServiceImp: NSObject {
 }
 
 extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
-    func getRoomList(completion: @escaping ([ShowTo1v1RoomInfo]) -> Void) {
+    func getRoomList(completion: @escaping (NSError?, [ShowTo1v1RoomInfo]?) -> Void) {
         roomManager.getRoomInfoList(lastCreateTime: 0, pageSize: 50) {[weak self] err, list in
             let showRoomList = list?.map({ ShowTo1v1RoomInfo(roomInfo: $0) }) ?? []
             self?.roomList = showRoomList
-            completion(showRoomList)
+            completion(err, showRoomList)
         }
     }
     

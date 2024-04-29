@@ -112,10 +112,10 @@ class RoomListViewController: UIViewController {
                 self.service?.joinRoom(roomInfo: roomInfo, completion: {[weak self] err in
                     guard let self = self else {return}
                     SVProgressHUD.dismiss()
-                    if let error = err {
+                    if let error = err as? NSError {
                         if self.preJoinRoom?.roomId == roomInfo.roomId {
                             self.navigationController?.popToViewController(self, animated: false)
-                            AUIToast.show(text: error.localizedDescription)
+                            AUIToast.show(text: "\("call_enter_room_fail".showTo1v1Localization())\(error.code)")
                             showTo1v1Error("tapClosure fail! joinRoom error: \(error.localizedDescription)")
                         }
                         return
@@ -401,7 +401,7 @@ extension RoomListViewController {
             self.callApi.cancelCall(completion: { err in
             })
             
-            let msg = "\("call_toast_callfail".showTo1v1Localization()): \(err.code)"
+            let msg = "\("call_toast_callfail".showTo1v1Localization())\(err.code)"
             AUIToast.show(text: msg)
         }
         
@@ -432,15 +432,20 @@ extension RoomListViewController {
             if let err = err {
                 showTo1v1Print("refresh _setupAPIConfig fail: \(err.localizedDescription)")
                 self.listView.endRefreshing()
+                AUIToast.show(text: "\("room_list_get_fail".showTo1v1Localization())\(err.code)")
                 return
             }
             showTo1v1Print("refresh setup api cost: \(Int64(-date.timeIntervalSinceNow * 1000))ms")
-            self.service?.getRoomList {[weak self] list in
+            self.service?.getRoomList {[weak self] err, list in
                 guard let self = self else {return}
-                showTo1v1Print("refresh get room list cost: \(Int64(-date.timeIntervalSinceNow * 1000))ms")
                 self.listView.endRefreshing()
+                showTo1v1Print("refresh get room list cost: \(Int64(-date.timeIntervalSinceNow * 1000))ms")
+                if let err = err {
+                    AUIToast.show(text: "\("room_list_get_fail".showTo1v1Localization())\(err.code)")
+                    return
+                }
                 let oldList = self.roomList
-                self.roomList = list
+                self.roomList = list ?? []
                 VideoLoaderApiImpl.shared.cleanCache()
                 
                 let uid = Int(userInfo?.uid ?? "") ?? 0
@@ -634,7 +639,7 @@ extension RoomListViewController: CallApiListenerProtocol {
                 _updateCallChannel()
                 AUIToast.show(text: "call_toast_hangup".showTo1v1Localization())
             case .remoteRejected, .remoteCallBusy:
-                AUIToast.show(text: "call_user_busy_tips".showTo1v1Localization())
+                AUIToast.show(text: "call_toast_busy".showTo1v1Localization())
             default:
                 break
             }

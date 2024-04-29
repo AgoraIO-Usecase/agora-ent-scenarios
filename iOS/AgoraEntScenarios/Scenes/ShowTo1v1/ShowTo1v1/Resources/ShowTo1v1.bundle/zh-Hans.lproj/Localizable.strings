@@ -42,6 +42,14 @@
 "call_connected_toast_tips"="呼入，已自动接听...";
 "user_list_cell_local_user"="本人信息";
 "user_list_cell_remote_user"="对端信息";
+"call_toast_callfail"="网络不佳, 呼叫失败, 错误码：";
+"call_toast_acceptfail"=" 网络不佳，接受邀请失败，错误码：";
+"call_toast_busy"="呼叫失败, 对方正忙";
+"call_toast_remote_fail"="对方已离开, 连线自动结束";
+"call_toast_remote_leave"="对方离开, 连线自动结束";
+"call_enter_room_fail"="网络不佳，进入直播间失败，建议重试，错误：";
+
+"room_list_get_fail"="网络不佳, 直播间列表刷新失败, 建议重试, 错误:";
 
 "report_room" = "举报";
 "report_room_success" = "举报成功";
@@ -61,8 +69,6 @@
 "show_advance_setting_FPS_title" = "编码帧率";
 "show_statistic_loss_package" = "丢包率";
 "show_statistic_down_net_speech" = "下行网络";
-"call_toast_callfail"="网络不佳，操作失败";
-"call_toast_acceptfail"="网络不佳，操作失败";
 
 "show_create_room_name1"="小可爱是我呀";
 "show_create_room_name2"="我是你的小可爱";

@@ -135,11 +135,12 @@ class Pure1v1UserListViewController: UIViewController {
             
             AppContext.shared.resetDebugConfig(engine: rtcEngine)
         }
+        _autoRefrshAction()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        _autoRefrshAction()
+//        _autoRefrshAction()
     }
     
     @objc func onDebugAction() {
@@ -355,7 +356,7 @@ extension Pure1v1UserListViewController {
             if let error = error {
                 pure1v1Error("refresh _setupAPIConfig fail: \(error.localizedDescription)")
                 self.listView.endRefreshing()
-                AUIToast.show(text: error.localizedDescription)
+                AUIToast.show(text: "\("user_list_get_fail".pure1v1Localization())\(error.code)")
                 return
             }
             guard let service = self.service else { return }
@@ -365,7 +366,7 @@ extension Pure1v1UserListViewController {
                 if let error = error {
                     pure1v1Error("refresh enterRoom fail: \(error.localizedDescription)")
                     self.listView.endRefreshing()
-                    AUIToast.show(text: error.localizedDescription)
+                    AUIToast.show(text: "\("user_list_get_fail".pure1v1Localization())\(error.code)")
                     return
                 }
                 pure1v1Print("refresh enterRoom cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
@@ -374,14 +375,11 @@ extension Pure1v1UserListViewController {
                     self.listView.endRefreshing()
                     if let error = error {
                         pure1v1Error("refresh getUserList fail: \(error.localizedDescription)")
-                        AUIToast.show(text: error.localizedDescription)
+                        AUIToast.show(text: "\("user_list_get_fail".pure1v1Localization())\(error.code)")
                         return
                     }
                     pure1v1Print("refresh getUserList cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
                     self.userList = list
-                    if error != nil {
-                        AUIToast.show(text: error!.description)
-                    }
                 }
             }
         }
@@ -507,8 +505,10 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             case .remoteHangup:
                 _updateCallChannel()
                 AUIToast.show(text: "call_toast_hangup".pure1v1Localization())
-            case .remoteRejected, .remoteCallBusy:
+            case .remoteRejected:
                 AUIToast.show(text: "call_toast_reject".pure1v1Localization())
+            case .remoteCallBusy:
+                AUIToast.show(text: "call_toast_busy".pure1v1Localization())
 //            case .callingTimeout:
 //                AUIToast.show(text: "无应答")
 //            case .localCancel, .remoteCancel:
