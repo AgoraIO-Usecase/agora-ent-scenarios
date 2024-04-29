@@ -18,6 +18,7 @@ import io.agora.rtm.RtmClient
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.pure1v1.audio.AudioScenarioApi
 import io.agora.scene.pure1v1.callapi.signalClient.CallRtmManager
 import io.agora.scene.pure1v1.callapi.signalClient.ICallRtmManagerListener
@@ -45,6 +46,8 @@ class CallServiceManager {
 
     private val tag = "CallServiceManager_LOG"
 
+    val tokenExpireTime = 20 * 60 * 60 * 1000 // 20h
+
     var rtcEngine: RtcEngineEx? = null
 
     var callApi: ICallApi? = null
@@ -70,6 +73,8 @@ class CallServiceManager {
 
     // rtm token
     var rtmToken: String = ""
+
+    var lastTokenFetchTime: Long = 0L
 
     var onUserChanged: (() -> Unit)? = null
 
@@ -201,7 +206,7 @@ class CallServiceManager {
     /*
      * 获取万能Token并初始化CallAPI
      */
-    private fun fetchToken(completion: (success: Boolean) -> Unit) {
+    fun fetchToken(completion: (success: Boolean) -> Unit) {
         val user = localUser ?: return
         Pure1v1Logger.d(tag, "generateTokens")
         TokenGenerator.generateTokens(
@@ -219,12 +224,19 @@ class CallServiceManager {
                 }
                 this.rtcToken = rtcToken
                 this.rtmToken = rtmToken
+                this.lastTokenFetchTime = TimeUtils.currentTimeMillis()
                 Pure1v1Logger.d(tag, "generateTokens success")
                 completion.invoke(true)
             }, {
                 Pure1v1Logger.e(tag, null,"generateTokens failed: $it")
                 completion.invoke(false)
             })
+    }
+
+    fun renewRtmToken() {
+        if (rtmToken != "") {
+            callRtmManager?.renewToken(rtmToken)
+        }
     }
 
     // 准备通话环境

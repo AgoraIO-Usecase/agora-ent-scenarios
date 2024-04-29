@@ -103,11 +103,12 @@ class AUIRoomManager {
                     response: Response<CommonResp<RoomListResp>>
                 ) {
                     val roomList = response.body()?.data?.getRoomList()
+                    val ts = response.body()?.ts
                     if (roomList != null) {
                         AUIRoomContext.shared().resetRoomMap(roomList)
-                        callback?.onResult(null, roomList)
+                        callback?.onResult(null, roomList, ts)
                     } else {
-                        callback?.onResult(Utils.errorFromResponse(response), null)
+                        callback?.onResult(Utils.errorFromResponse(response), null, ts)
                     }
                 }
 
@@ -116,7 +117,7 @@ class AUIRoomManager {
                         AUIException(
                             -1,
                             t.message
-                        ), null
+                        ), null, null
                     )
                 }
             })

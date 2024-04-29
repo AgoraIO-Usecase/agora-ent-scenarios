@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -19,6 +18,7 @@ import io.agora.scene.base.GlideApp
 import io.agora.scene.base.SceneAliveTime
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
@@ -84,6 +84,13 @@ class RoomListActivity : AppCompatActivity() {
 
     override fun onRestart() {
         super.onRestart()
+        ShowLogger.d("RoomListActivity", "onRestart")
+        // 如果在房间列表页面锁屏停留超过20h，需要重新获取token
+        if (RtcEngineInstance.generalToken() != "" && TimeUtils.currentTimeMillis() - RtcEngineInstance.lastTokenFetchTime() >= RtcEngineInstance.tokenExpireTime) {
+            ShowLogger.d("RoomListActivity", "token need renew!")
+            RtcEngineInstance.setupGeneralToken("")
+            fetchUniversalToken({})
+        }
         mBinding.smartRefreshLayout.autoRefresh()
     }
 
