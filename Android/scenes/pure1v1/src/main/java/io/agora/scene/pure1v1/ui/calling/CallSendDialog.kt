@@ -49,15 +49,17 @@ class CallSendDialog(
             listener?.onSendViewDidClickHangup()
             hangUp()
         })
-//        val showView = SurfaceView(context)
     }
 
     fun initView(userInfo: UserInfo) {
-        CallServiceManager.instance.renderCallShow(showView)
+        binding.root.post {
+            CallServiceManager.instance.renderCallShow(showView)
+        }
+
         binding.tvShow.removeAllViews()
         binding.tvShow.addView(showView)
-
         binding.tvUserName.text = userInfo.userName
+
         Glide.with(context)
             .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
             .into(binding.ivUserAvatar)

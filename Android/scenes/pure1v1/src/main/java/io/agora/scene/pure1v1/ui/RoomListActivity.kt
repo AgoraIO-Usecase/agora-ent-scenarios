@@ -153,10 +153,8 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
     override fun onRestart() {
         super.onRestart()
-        Log.d("hugo", "onRestart")
         // 如果在房间列表页面锁屏停留超过20h，需要重新获取token
         if (CallServiceManager.instance.rtcToken != "" && TimeUtils.currentTimeMillis() - CallServiceManager.instance.lastTokenFetchTime >= CallServiceManager.instance.tokenExpireTime) {
-            Log.d("hugo", "token need renew!")
             CallServiceManager.instance.rtcToken = ""
             CallServiceManager.instance.rtmToken = ""
             CallServiceManager.instance.fetchToken {
@@ -371,9 +369,9 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     CallServiceManager.instance.remoteUser = user
 
                     // 主叫显示来电秀UI
+                    showCallSendDialog(user)
                     CallServiceManager.instance.playCallShow(CallServiceManager.urls[Random.nextInt(CallServiceManager.urls.size)])
                     CallServiceManager.instance.playCallMusic(CallServiceManager.callMusic)
-                    showCallSendDialog(user)
                 }
 
                 // 设置视频最佳实践
@@ -588,7 +586,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
         override fun onBindViewHolder(holder: UserItemViewHolder, position: Int) {
             val userInfo = dataList[position % dataList.size]
-            Log.d("hugo", "onBindViewHolder, position:$position userInfo$userInfo")
             holder.binding.ivConnect.setOnClickListener {
                 val currentTime = System.currentTimeMillis()
                 if (currentTime - lastClickTime >= clickInterval) {
@@ -596,8 +593,14 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     lastClickTime = currentTime
                 }
             }
-            val resourceName = "pure1v1_user_bg${userInfo.userId.toInt() % 9 + 1}"
-            val resourceId = context.resources.getIdentifier(resourceName, "drawable", context.packageName)
+
+            var resourceId: Int
+            try {
+                val resourceName = "pure1v1_user_bg${userInfo.userId.toInt() % 9 + 1}"
+                resourceId = context.resources.getIdentifier(resourceName, "drawable", context.packageName)
+            } catch (e: Exception) {
+                resourceId = R.drawable.pure1v1_user_bg1
+            }
             val drawable = ContextCompat.getDrawable(context, resourceId)
             Glide.with(context).load(drawable).into(holder.binding.ivRoomCover)
             Glide.with(context)
