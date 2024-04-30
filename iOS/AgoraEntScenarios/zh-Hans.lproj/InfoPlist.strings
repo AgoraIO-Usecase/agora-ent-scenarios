@@ -6,5 +6,5 @@
   
 */
 
-CFBundleDisplayName = "声动互娱-直播社交版";
+CFBundleDisplayName = "声动互娱-弹幕玩法版";
 NSMicrophoneUsageDescription = "当您进行音频实时互动时，声动互娱想要申请麦克风能访问";
