@@ -51,4 +51,5 @@
     <string name="pure1v1_audio_dump">音频 Dump</string>
     <string name="pure1v1_call_failed">网络不佳，呼叫失败，错误码：%s</string>
     <string name="pure1v1_accept_failed">网络不佳，接受邀请失败，错误码：%s</string>
+    <string name="pure1v1_room_list_refreshed">网络不佳，用户列表刷新失败，建议重试，错误：%s</string>
 </resources>

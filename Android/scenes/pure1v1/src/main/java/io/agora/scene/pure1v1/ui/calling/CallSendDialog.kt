@@ -16,6 +16,7 @@ import io.agora.scene.pure1v1.databinding.Pure1v1CallSendDialogBinding
 import io.agora.scene.pure1v1.service.UserInfo
 import io.agora.scene.pure1v1.ui.base.CallDialogState
 import io.agora.scene.pure1v1.ui.base.DebouncedOnClickListener
+import kotlin.random.Random
 
 /*
  * 1v1 拨打页面
@@ -52,7 +53,10 @@ class CallSendDialog(
     }
 
     fun initView(userInfo: UserInfo) {
+        // 主叫播放来电秀
         binding.root.post {
+            CallServiceManager.instance.playCallShow(CallServiceManager.urls[Random.nextInt(CallServiceManager.urls.size)])
+            CallServiceManager.instance.playCallMusic(CallServiceManager.callMusic)
             CallServiceManager.instance.renderCallShow(showView)
         }
 
