@@ -11,6 +11,7 @@ import io.agora.rtmsyncmanager.model.*
 import io.agora.rtmsyncmanager.service.IAUIUserService
 import io.agora.rtmsyncmanager.service.http.HttpManager
 import io.agora.rtmsyncmanager.utils.AUILogger
+import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.pure1v1.Pure1v1Logger
@@ -77,20 +78,24 @@ class Pure1v1ServiceImp(
      * 拉取房间列表
      */
     fun getUserList(completion: (String?, List<UserInfo>) -> Unit) {
-        val ret = ArrayList<UserInfo>()
-        userSnapshotList?.let {
-            it.forEach { info ->
-                ret.add(UserInfo(
-                    userId = info!!.userId,
-                    userName = info.userName,
-                    avatar = info.userAvatar,
-                    createdAt = 0
-                ))
+        syncManager.rtmManager.whoNow(kRoomId) { e, list ->
+            if (e != null) {
+                runOnMainThread { completion(e.message, listOf()) }
+            } else {
+                val ret = ArrayList<UserInfo>()
+                list?.forEach { userMap ->
+                    GsonTools.toBean(GsonTools.beanToString(userMap), AUIUserInfo::class.java)?.let {
+                        ret.add(UserInfo(
+                            userId = it.userId,
+                            userName = it.userName,
+                            avatar = it.userAvatar,
+                            createdAt = 0
+                        ))
+                    }
+                }
+                runOnMainThread { completion.invoke(null, ret.toList()) }
             }
-            //按照创建时间顺序排序
-            ret.sortBy { it.createdAt }
         }
-        runOnMainThread { completion.invoke(null, ret.toList()) }
     }
 
     /*
