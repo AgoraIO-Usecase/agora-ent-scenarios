@@ -39,6 +39,31 @@ struct ShowTo1v1APISetupStatus: OptionSet {
     static let api = ShowTo1v1APISetupStatus(rawValue: 1 << 4)
 }
 
+
+class TokenObject {
+    var rtmToken: String = ""
+    var rtcToken: String = ""
+    var updateTime: Date
+    
+    init(rtmToken: String, rtcToken: String) {
+        self.rtmToken = rtmToken
+        self.rtcToken = rtcToken
+        self.updateTime = Date()
+    }
+    
+    func isValid() -> Bool {
+        return rtmToken.count > 0 && rtcToken.count > 0
+    }
+    
+    func checkExpired() {
+        if Int64(-updateTime.timeIntervalSinceNow * 1000) < 20 * 60 * 60 {
+            return
+        }
+        rtmToken = ""
+        rtcToken = ""
+    }
+}
+
 private let kShowGuideAlreadyKey = "already_show_guide_show1v1"
 class RoomListViewController: UIViewController {
     var userInfo: ShowTo1v1UserInfo?
@@ -48,18 +73,30 @@ class RoomListViewController: UIViewController {
     private weak var preJoinRoom: ShowTo1v1RoomInfo?
     private var connectedUserId: UInt?
     private var connectedChannelId: String?
-    private var rtcToken: String {
-        set {
-            self.prepareConfig.rtcToken = newValue
+    private var tokenObj = TokenObject(rtmToken: "", rtcToken: "") {
+        didSet {
+            self.prepareConfig.rtcToken = tokenObj.rtcToken
             
             //refresh room info token
             let list = roomList
             self.roomList = list
-        } get {
-            return self.prepareConfig.rtcToken
         }
     }
-    private var rtmToken = ""
+    private lazy var stateManager: AppStateManager = {
+        let manager = AppStateManager()
+        manager.appStateChangeHandler = { [weak self] isInBackground in
+            if isInBackground { return }
+            self?.checkTokenValid()
+        }
+        
+        manager.networkStatusChangeHandler = { [weak self] isAvailable in
+            guard isAvailable else { return }
+            self?.checkTokenValid()
+        }
+        
+        return manager
+    }()
+    
     private lazy var rtcEngine: AgoraRtcEngineKit = _createRtcEngine()
     private lazy var rtmClient: AgoraRtmClientKit = createRtmClient(appId: AppContext.shared.appId, userId: userInfo!.uid)
     private var rtmManager: CallRtmManager?
@@ -70,7 +107,7 @@ class RoomListViewController: UIViewController {
     private var roomList: [ShowTo1v1RoomInfo] = [] {
         didSet {
             roomList.forEach { info in
-                info.token = self.rtcToken
+                info.token = self.tokenObj.rtcToken
             }
             self.listView.roomList = roomList
             noDataView.isHidden = roomList.count > 0
@@ -173,6 +210,7 @@ class RoomListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        _ = stateManager
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         view.addSubview(bgImgView)
         view.addSubview(noDataView)
@@ -215,6 +253,7 @@ class RoomListViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        checkTokenValid()
         _autoRefreshAction()
     }
     
@@ -234,6 +273,12 @@ class RoomListViewController: UIViewController {
 }
 
 extension RoomListViewController {
+    private func checkTokenValid() {
+        tokenObj.checkExpired()
+        if tokenObj.isValid() { return }
+        onTokenPrivilegeWillExpire(channelName: "")
+    }
+    
     private func _setupAPIConfig(completion: @escaping (NSError?) -> Void) {
         renewTokens {[weak self] success in
             guard let self = self else { return }
@@ -260,7 +305,7 @@ extension RoomListViewController {
     }
     
     private func renewTokens(completion: ((Bool)->Void)?) {
-        if setupStatus.contains(.token), rtcToken.count > 0, rtmToken.count > 0 {
+        if setupStatus.contains(.token), tokenObj.isValid() {
             completion?(true)
             return
         }
@@ -282,8 +327,7 @@ extension RoomListViewController {
                 completion?(false)
                 return
             }
-            self.rtcToken = rtcToken
-            self.rtmToken = rtmToken
+            self.tokenObj = TokenObject(rtmToken: rtmToken, rtcToken: rtcToken)
             self.debugInfo("renewTokens success")
             completion?(true)
         }
@@ -296,7 +340,7 @@ extension RoomListViewController {
             return
         }
         rtmClient.logout()
-        rtmClient.login(self.rtmToken) { resp, err in
+        rtmClient.login(self.tokenObj.rtmToken) { resp, err in
             var error: NSError? = nil
             if let err = err {
                 error = NSError(domain: err.reason, code: err.errorCode.rawValue)
@@ -522,7 +566,7 @@ extension RoomListViewController {
         vc.currentUser = self.userInfo
         vc.roomInfo = roomInfo
         vc.rtcEngine = self.rtcEngine
-        vc.broadcasterToken = self.rtcToken
+        vc.broadcasterToken = tokenObj.rtcToken
         vc.onBackClosure = {[weak self] in
             self?.service?.subscribeListener(listener: nil)
             self?.service?.leaveRoom(roomInfo: roomInfo, completion: { err in
@@ -691,12 +735,12 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
             }
             
             //renew callapi
-            self.callApi.renewToken(with: self.rtcToken)
-            self.rtmClient.renewToken(self.rtmToken)
+            self.callApi.renewToken(with: self.tokenObj.rtcToken)
+            self.rtmClient.renewToken(self.tokenObj.rtmToken)
             //renew videoloader
             VideoLoaderApiImpl.shared.getConnectionMap().forEach { (channelId, connection) in
                 let mediaOptions = AgoraRtcChannelMediaOptions()
-                mediaOptions.token = self.rtcToken
+                mediaOptions.token = self.tokenObj.rtcToken
                 let ret = self.rtcEngine.updateChannelEx(with: mediaOptions, connection: connection)
                 showTo1v1Print("renew token tokenPrivilegeWillExpire: \(channelId) \(ret)")
             }

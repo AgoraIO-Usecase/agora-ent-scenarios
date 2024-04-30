@@ -24,6 +24,30 @@ struct Pure1v1APISetupStatus: OptionSet {
     static let callApi = Pure1v1APISetupStatus(rawValue: 1 << 4)
 }
 
+class TokenObject {
+    var rtmToken: String = ""
+    var rtcToken: String = ""
+    var updateTime: Date
+    
+    init(rtmToken: String, rtcToken: String) {
+        self.rtmToken = rtmToken
+        self.rtcToken = rtcToken
+        self.updateTime = Date()
+    }
+    
+    func isValid() -> Bool {
+        return rtmToken.count > 0 && rtcToken.count > 0
+    }
+    
+    func checkExpired() {
+        if Int64(-updateTime.timeIntervalSinceNow * 1000) < 20 * 60 * 60 {
+            return
+        }
+        rtmToken = ""
+        rtcToken = ""
+    }
+}
+
 private let kShowGuideAlreadyKey = "already_show_guide"
 class Pure1v1UserListViewController: UIViewController {
     var userInfo: Pure1v1UserInfo?
@@ -41,14 +65,26 @@ class Pure1v1UserListViewController: UIViewController {
         return player
     }()
     
-    private var rtcToken: String {
-        set {
-            self.prepareConfig.rtcToken = newValue
-        } get {
-            return self.prepareConfig.rtcToken
+    private var tokenObj = TokenObject(rtmToken: "", rtcToken: "") {
+        didSet {
+            self.prepareConfig.rtcToken = tokenObj.rtcToken
         }
     }
-    private var rtmToken: String = ""
+    private lazy var stateManager: AppStateManager = {
+        let manager = AppStateManager()
+        manager.appStateChangeHandler = { [weak self] isInBackground in
+            if isInBackground { return }
+            self?.checkTokenValid()
+        }
+        
+        manager.networkStatusChangeHandler = { [weak self] isAvailable in
+            guard isAvailable else { return }
+            self?.checkTokenValid()
+        }
+        
+        return manager
+    }()
+    
     private lazy var rtcEngine = _createRtcEngine()
     private lazy var rtmClient: AgoraRtmClientKit = createRtmClient(appId: AppContext.shared.appId, userId: userInfo!.userId)
     private var rtmManager: CallRtmManager?
@@ -107,6 +143,7 @@ class Pure1v1UserListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        _ = stateManager
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         view.addSubview(bgImgView)
         view.addSubview(noDataView)
@@ -141,6 +178,7 @@ class Pure1v1UserListViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 //        _autoRefrshAction()
+        checkTokenValid()
     }
     
     @objc func onDebugAction() {
@@ -151,9 +189,15 @@ class Pure1v1UserListViewController: UIViewController {
 
 //MARK: setup & invoke api/service
 extension Pure1v1UserListViewController {
+    private func checkTokenValid() {
+        tokenObj.checkExpired()
+        if tokenObj.isValid() { return }
+        tokenPrivilegeWillExpire()
+    }
+    
     private func _generateTokens(completion: @escaping (String?, String?) -> ()) {
-        if setupStatus.contains(.token), rtcToken.count > 0, rtmToken.count > 0 {
-            completion(rtcToken, rtmToken)
+        if setupStatus.contains(.token), tokenObj.isValid() {
+            completion(tokenObj.rtcToken, tokenObj.rtmToken)
             return
         }
         let date = Date()
@@ -169,8 +213,7 @@ extension Pure1v1UserListViewController {
                 return
             }
             
-            self.rtcToken = rtcToken
-            self.rtmToken = rtmToken
+            self.tokenObj = TokenObject(rtmToken: rtmToken, rtcToken: rtcToken)
             completion(rtcToken, rtmToken)
         }
     }
@@ -208,7 +251,7 @@ extension Pure1v1UserListViewController {
         
         let date = Date()
         rtmClient.logout()
-        rtmClient.login(self.rtmToken) { resp, err in
+        rtmClient.login(tokenObj.rtmToken) { resp, err in
             pure1v1Print("rtm login cost: \(-Int(date.timeIntervalSinceNow * 1000))ms")
             var error: NSError? = nil
             if let err = err {
