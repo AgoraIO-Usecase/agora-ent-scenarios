@@ -466,7 +466,7 @@ extension RoomListViewController {
     @objc private func _createAction() {
         guard let userInfo = userInfo else {return}
         createRoomDialog =
-        CreateRoomDialog.show(user: userInfo, createClosure: {[weak self] roomName in
+        CreateRoomDialog.show(user: userInfo, engine: rtcEngine, createClosure: {[weak self] roomName in
             guard let self = self else {return}
             if roomName.count == 0 {
                 AUIToast.show(text: "create_room_name_empty_tips".showTo1v1Localization())
