@@ -26,6 +26,7 @@ import Bugly
     private var _cloudPlayerSecret: String = ""
     private var _hostUrl: String = ""
     private var _baseServerUrl: String = ""
+    private var _roomManagerUrl: String = ""
     
     @objc var isAgreeLicense: Bool = false {
         didSet {
@@ -140,6 +141,15 @@ import Bugly
         }
         set {
             _hostUrl = newValue
+        }
+    }
+    
+    @objc public var roomManagerUrl: String {
+        get {
+            return _roomManagerUrl
+        }
+        set {
+            _roomManagerUrl = newValue
         }
     }
     

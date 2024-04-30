@@ -16,6 +16,7 @@
 #import "MenuUtils.h"
 #import <Photos/Photos.h>
 #import "AgoraEntScenarios-Swift.h"
+#import "DevViewController.h"
 @import Masonry;
 @import LEEAlert;
 @import AgoraCommon;
@@ -37,6 +38,11 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     [super viewDidLoad];
     [self setBackgroundImage:@"home_bg_image" bundleName:nil];
     [self setUpUI];
+}
+
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    [self.mineView refreshTableView];
 }
 
 - (void)setUpUI {
@@ -89,7 +95,12 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
             [self about];
             break;
         case VLMineViewClickTypeDebug:
-            [self closeOffDebugMode];
+          //  [self closeOffDebugMode];
+        {
+            //跳转开发者界面
+            DevViewController *VC = [[DevViewController alloc]init];
+            [self.navigationController pushViewController:VC animated:YES];
+        }
             break;
         case VLMineViewClickTypSubmitFeedback:
         {
@@ -325,12 +336,14 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 }
 
 - (void)closeOffDebugMode {
+    
     [LEEAlert alert].config
     .LeeAddTitle(^(UILabel *label) {
         label.text = AGLocalizedString(@"app_exit_debug");
         label.textColor = UIColorMakeWithHex(@"#040925");
         label.font = UIFontBoldMake(16);
     })
+   // .LeeCustomView(customView)
     .LeeContent(AGLocalizedString(@"app_exit_debug_tip"))
     .LeeAddAction(^(LEEAction *action) {
         VL(weakSelf);
