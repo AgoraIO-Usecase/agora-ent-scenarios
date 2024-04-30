@@ -13,6 +13,7 @@ enum HomeType: Int {
     case ktv
     case voice_chat
     case live
+    case game
 }
 
 enum HomeContentType: Int {
@@ -26,6 +27,7 @@ enum HomeContentType: Int {
     case one_v_one
     case multiple
     case show_private_one_v_one
+    case game
     
     var sceneName: String {
         switch self {
@@ -39,6 +41,7 @@ enum HomeContentType: Int {
         case .one_v_one: return "Live_Pure1v1"
         case .multiple: return "Live_MultiPlayer"
         case .show_private_one_v_one: return "Live_Show1v1"
+        case .game: return "Joy"
         }
     }
 }
@@ -67,7 +70,7 @@ class HomeModel: NSObject {
         
         let liveModel = HomeModel()
         liveModel.title = NSLocalizedString("home_category_title_live", comment: "")
-        liveModel.vc = HomeContentViewController(type: .live)
+        liveModel.vc = HomeContentViewController(type: .game)
         dataArray.append(liveModel)
         
         return dataArray
@@ -78,57 +81,64 @@ struct HomeContentSesionModel {
     var title: String?
     var contentModels: [HomeContentModel]?
     var type: HomeType = .all
-    
+
     static func createData() -> [HomeContentSesionModel] {
         var dataArray = [HomeContentSesionModel]()
         var model = HomeContentSesionModel()
-        model.type = .ktv
-        model.title = NSLocalizedString("home_category_title_ktv", comment: "")
-        var contentArray = [createContentModel(title: NSLocalizedString("home_content_item_ktv_title_solo", comment: ""),
-                                               desc: NSLocalizedString("home_content_item_ktv_desc_solo", comment: ""),
-                                               imageName: "home_ktv_solo", type: .solo),
-                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_snatchsinging", comment: ""),
-                                               desc: NSLocalizedString("home_content_item_ktv_desc_snatchsinging", comment: ""),
-                                               imageName: "home_ktv_snatch_singing", type: .snatch_singing),
-                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_takesong", comment: ""),
-                                               desc: NSLocalizedString("home_content_item_ktv_desc_takesong", comment: ""),
-                                               imageName: "home_ktv_continue_singing", type: .continue_singing),
-                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_cantata", comment: ""),
-                                               desc: NSLocalizedString("home_content_item_ktv_desc_cantata", comment: ""),
-                                               imageName: "home_ktv_chorus", type: .chorus)
-        ]
-        model.contentModels = contentArray
-        dataArray.append(model)
-        
-        model = HomeContentSesionModel()
-        model.type = .voice_chat
-        model.title = NSLocalizedString("home_category_title_voiceChat", comment: "")
-        contentArray = [createContentModel(title: NSLocalizedString("home_category_title_voiceChat", comment: ""),
-                                           desc: NSLocalizedString("home_content_item_voice_desc_immersive", comment: ""),
-                                           imageName: "home_voice_chat", type: .voice_chat),
-                        createContentModel(title: NSLocalizedString("home_content_item_voice_title_spatial", comment: ""),
-                                           desc: NSLocalizedString("home_content_item_voice_desc_spatial", comment: ""),
-                                           imageName: "home_voice_spatial_chat", type: .spatial_voice)]
-        model.contentModels = contentArray
-        dataArray.append(model)
-        
-        model = HomeContentSesionModel()
+        model.type = .game
         model.title = NSLocalizedString("home_category_title_live", comment: "")
-        model.type = .live
-        contentArray = [createContentModel(title: NSLocalizedString("home_content_item_live_title_show", comment: ""),
-                                           desc: NSLocalizedString("home_content_item_live_desc_show", comment: ""),
-                                           imageName: "home_live_show", type: .show),
-                        createContentModel(title: NSLocalizedString("home_content_item_live_title_1v1_private", comment: ""),
-                                           desc: NSLocalizedString("home_content_item_live_desc_1v1_private", comment: ""),
-                                           imageName: "home_live_1v1", type: .one_v_one),
-                        createContentModel(title: NSLocalizedString("home_content_item_live_title_show_1v1_private", comment: ""),
-                                           desc: NSLocalizedString("home_content_item_live_desc_show_1v1_private", comment: ""),
-                                           imageName: "home_live_show_private_one_v_one",
-                                           type: .show_private_one_v_one),
-                        createContentModel(title: NSLocalizedString("home_content_item_live_title_multiple", comment: ""),
-                                           desc: NSLocalizedString("home_content_item_live_desc_multiple", comment: ""),
-                                           imageName: "home_live_multiple",
-                                           type: .multiple)
+//        var contentArray = [createContentModel(title: NSLocalizedString("home_content_item_ktv_title_solo", comment: ""),
+//                                               desc: NSLocalizedString("home_content_item_ktv_desc_solo", comment: ""),
+//                                               imageName: "home_ktv_solo", type: .solo),
+//                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_snatchsinging", comment: ""),
+//                                               desc: NSLocalizedString("home_content_item_ktv_desc_snatchsinging", comment: ""),
+//                                               imageName: "home_ktv_snatch_singing", type: .snatch_singing),
+//                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_takesong", comment: ""),
+//                                               desc: NSLocalizedString("home_content_item_ktv_desc_takesong", comment: ""),
+//                                               imageName: "home_ktv_continue_singing", type: .continue_singing),
+//                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_cantata", comment: ""),
+//                                               desc: NSLocalizedString("home_content_item_ktv_desc_cantata", comment: ""),
+//                                               imageName: "home_ktv_chorus", type: .chorus)
+//        ]
+//        model.contentModels = contentArray
+//        dataArray.append(model)
+//        
+//        model = HomeContentSesionModel()
+//        model.type = .voice_chat
+//        model.title = NSLocalizedString("home_category_title_voiceChat", comment: "")
+//        contentArray = [createContentModel(title: NSLocalizedString("home_category_title_voiceChat", comment: ""),
+//                                           desc: NSLocalizedString("home_content_item_voice_desc_immersive", comment: ""),
+//                                           imageName: "home_voice_chat", type: .voice_chat),
+//                        createContentModel(title: NSLocalizedString("home_content_item_voice_title_spatial", comment: ""),
+//                                           desc: NSLocalizedString("home_content_item_voice_desc_spatial", comment: ""),
+//                                           imageName: "home_voice_spatial_chat", type: .spatial_voice)]
+//        model.contentModels = contentArray
+//        dataArray.append(model)
+        
+//        model = HomeContentSesionModel()
+//        model.title = NSLocalizedString("home_category_title_live", comment: "")
+//        model.type = .live
+//        contentArray = [createContentModel(title: NSLocalizedString("home_content_item_live_title_show", comment: ""),
+//                                           desc: NSLocalizedString("home_content_item_live_desc_show", comment: ""),
+//                                           imageName: "home_live_show", type: .show),
+//                        createContentModel(title: NSLocalizedString("home_content_item_live_title_1v1_private", comment: ""),
+//                                           desc: NSLocalizedString("home_content_item_live_desc_1v1_private", comment: ""),
+//                                           imageName: "home_live_1v1", type: .one_v_one),
+//                        createContentModel(title: NSLocalizedString("home_content_item_live_title_show_1v1_private", comment: ""),
+//                                           desc: NSLocalizedString("home_content_item_live_desc_show_1v1_private", comment: ""),
+//                                           imageName: "home_live_show_private_one_v_one",
+//                                           type: .show_private_one_v_one),
+//                        createContentModel(title: NSLocalizedString("home_content_item_live_title_multiple", comment: ""),
+//                                           desc: NSLocalizedString("home_content_item_live_desc_multiple", comment: ""),
+//                                           imageName: "home_live_multiple",
+//                                           type: .multiple)
+//        ]
+//        model.contentModels = contentArray
+//        dataArray.append(model)
+
+        var contentArray = [createContentModel(title: NSLocalizedString("home_content_item_live_title_joy", comment: ""),
+                                           desc: NSLocalizedString("home_content_item_live_desc_joy", comment: ""),
+                                           imageName: "scene-card", type: .game),
         ]
         model.contentModels = contentArray
         dataArray.append(model)
