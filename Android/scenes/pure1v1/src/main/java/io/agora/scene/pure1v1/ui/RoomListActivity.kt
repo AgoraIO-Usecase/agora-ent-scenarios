@@ -190,7 +190,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
             }
             if (!binding.flCallContainer.isVisible) {
                 if (msg != null) {
-                    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.pure1v1_room_list_refreshed, msg), Toast.LENGTH_SHORT).show()
                 } else {
                     //Toast.makeText(this, getText(R.string.pure1v1_room_list_refresh), Toast.LENGTH_SHORT).show()
                 }
@@ -294,7 +294,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
 
     // 监听 callapi 内的状态变化驱动业务行为
-    override fun onCallStateChanged(
+    override fun onCallStatseChanged(
         state: CallStateType,
         stateReason: CallStateReason,
         eventReason: String,
@@ -310,7 +310,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 val fromRoomId = eventInfo[CallApiImpl.kFromRoomId] as? String ?: ""
                 val toUserId = eventInfo[CallApiImpl.kRemoteUserId] as? Int ?: 0
                 val remoteUser = CallServiceManager.instance.remoteUser
-                Log.d("shsh", "toUserId=$toUserId, fromUserId=$fromUserId, currentUid=$currentUid eventInfo=$eventInfo")
+                //Log.d("shsh", "toUserId=$toUserId, fromUserId=$fromUserId, currentUid=$currentUid eventInfo=$eventInfo")
                 if (remoteUser != null && remoteUser.userId != fromUserId.toString())  {
                     CallServiceManager.instance.callApi?.reject(fromUserId, "already calling") { err ->
                         Pure1v1Logger.d(tag, "callApi reject failed: $err")
@@ -370,8 +370,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
                     // 主叫显示来电秀UI
                     showCallSendDialog(user)
-                    CallServiceManager.instance.playCallShow(CallServiceManager.urls[Random.nextInt(CallServiceManager.urls.size)])
-                    CallServiceManager.instance.playCallMusic(CallServiceManager.callMusic)
                 }
 
                 // 设置视频最佳实践
@@ -449,9 +447,9 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 // TODO bug CallServiceManager.instance.rtcEngine?.stopAudioMixing()
 
                 // 自动刷新列表
-                if (!isFirstEnterScene) {
-                    fetchRoomList(false)
-                }
+//                if (!isFirstEnterScene) {
+//                    fetchRoomList(false)
+//                }
             }
             CallStateType.Failed -> {
                 Toast.makeText(this, eventReason, Toast.LENGTH_SHORT).show()
