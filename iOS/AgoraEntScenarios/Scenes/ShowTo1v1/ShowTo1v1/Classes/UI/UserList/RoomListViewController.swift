@@ -56,7 +56,7 @@ class TokenObject {
     }
     
     func checkExpired() {
-        if Int64(-updateTime.timeIntervalSinceNow * 1000) < 20 * 60 * 60 {
+        if Int64(-updateTime.timeIntervalSinceNow) < 20 * 60 * 60 {
             return
         }
         rtmToken = ""
