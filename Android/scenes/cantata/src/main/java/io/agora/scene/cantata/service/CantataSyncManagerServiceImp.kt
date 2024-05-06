@@ -807,6 +807,20 @@ class CantataSyncManagerServiceImp constructor(
                 }
             }
         }
+        Instance().subscribeLog(object :LogCallback{
+            override fun onLogInfo(message: String?) {
+                CantataLogger.d(TAG, message ?: "")
+            }
+
+            override fun onLogWarning(message: String?) {
+                CantataLogger.w(TAG, message ?: "")
+            }
+
+            override fun onLogError(message: String?) {
+                CantataLogger.e(TAG, message ?: "")
+            }
+
+        })
     }
 
 
