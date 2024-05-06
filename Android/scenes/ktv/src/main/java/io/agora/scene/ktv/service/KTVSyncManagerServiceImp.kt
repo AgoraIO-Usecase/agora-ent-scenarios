@@ -802,6 +802,20 @@ class KTVSyncManagerServiceImp(
                 }
             }
         }
+        Instance().subscribeLog(object :LogCallback{
+            override fun onLogInfo(message: String?) {
+                KTVLogger.d(TAG, message ?: "")
+            }
+
+            override fun onLogWarning(message: String?) {
+                KTVLogger.w(TAG, message ?: "")
+            }
+
+            override fun onLogError(message: String?) {
+                KTVLogger.e(TAG, message ?: "")
+            }
+
+        })
     }
 
 

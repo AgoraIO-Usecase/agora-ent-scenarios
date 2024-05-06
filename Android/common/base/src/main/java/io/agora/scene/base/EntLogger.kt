@@ -28,7 +28,7 @@ class EntLogger constructor(private val config: Config) {
         val maxFileCount: Int = MAX_FILE_COUNT, // 该场景最大文件数
     )
 
-    private val dataFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.US)
+    private val dataFormat:SimpleDateFormat = SimpleDateFormat("yy/MM/dd HH:mm:ss.SSS", Locale.getDefault())
 
     init {
         if (BuildConfig.DEBUG) {
@@ -84,9 +84,12 @@ class EntLogger constructor(private val config: Config) {
     }
 
     private fun formatMessage(level: String, tag: String?, message: String): String {
-        val sb = StringBuilder("[Agora][${level}][${config.sceneName}]")
+        // [AgoraEnt] 标记截取，orhanobut logger 有默认前缀需要截取掉
+        val sb = StringBuilder("[****]")
+        sb.append("[${dataFormat.format(Date(System.currentTimeMillis()))}]")
+        sb.append("[Agora][${level}][${config.sceneName}]")
         tag?.let { sb.append("[${tag}]"); }
-        sb.append(" : (${dataFormat.format(Date())}) : $message")
+        sb.append(" : $message")
         return sb.toString()
     }
 
@@ -119,9 +122,9 @@ class EntLogger constructor(private val config: Config) {
         @Throws(IOException::class)
         private fun writeLog(fileWriter: FileWriter, content: String) {
             var writeContent = content
-            val agoraTag = writeContent.indexOf("[Agora]")
-            if (agoraTag > 0) {
-                writeContent = writeContent.substring(agoraTag)
+            val agoraTag = writeContent.indexOf("[****]")
+            if (agoraTag + 6 > 0) {
+                writeContent = writeContent.substring(agoraTag + 6)
             }
             fileWriter.append(writeContent)
         }
