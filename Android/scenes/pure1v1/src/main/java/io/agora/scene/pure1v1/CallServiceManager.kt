@@ -18,16 +18,13 @@ import io.agora.rtm.RtmClient
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.pure1v1.audio.AudioScenarioApi
+import io.agora.scene.pure1v1.callapi.signalClient.CallRtmManager
+import io.agora.scene.pure1v1.callapi.signalClient.ICallRtmManagerListener
 import io.agora.scene.pure1v1.callapi.signalClient.createRtmSignalClient
 import io.agora.scene.pure1v1.service.Pure1v1ServiceImp
 import io.agora.scene.pure1v1.service.UserInfo
-import io.agora.scene.pure1v1.signalClient.CallRtmManager
-import io.agora.scene.pure1v1.signalClient.ICallRtmManagerListener
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /*
  * 业务逻辑管理模块
@@ -49,6 +46,8 @@ class CallServiceManager {
 
     private val tag = "CallServiceManager_LOG"
 
+    val tokenExpireTime = 20 * 60 * 60 * 1000 // 20h
+
     var rtcEngine: RtcEngineEx? = null
 
     var callApi: ICallApi? = null
@@ -58,6 +57,8 @@ class CallServiceManager {
     var localUser: UserInfo? = null
 
     var remoteUser: UserInfo? = null
+
+    var isCaller: Boolean = false
 
     var connectedChannelId: String? = null
 
@@ -73,6 +74,8 @@ class CallServiceManager {
     // rtm token
     var rtmToken: String = ""
 
+    var lastTokenFetchTime: Long = 0L
+
     var onUserChanged: (() -> Unit)? = null
 
     private var mContext: Context? = null
@@ -87,66 +90,68 @@ class CallServiceManager {
 
     fun setup(context: Context, completion: (success: Boolean)-> Unit) {
         // 初始化 rtm manager
-        val rtmManager = CallRtmManager(BuildConfig.AGORA_APP_ID, UserManager.getInstance().user.id.toInt())
-        callRtmManager = rtmManager
-        rtmManager.addListener(object : ICallRtmManagerListener {
-            override fun onConnected() {
-                // RTM 已连接
+        if (callRtmManager == null) {
+            val rtmManager = CallRtmManager(BuildConfig.AGORA_APP_ID, UserManager.getInstance().user.id.toInt())
+            callRtmManager = rtmManager
+            rtmManager.addListener(object : ICallRtmManagerListener {
+                override fun onConnected() {
+                    // RTM 已连接
+                }
+
+                override fun onDisconnected() {
+                    // RTM 已断开
+                }
+
+                override fun onConnectionLost() {
+                    // RTM 连接已失去，需要做重连逻辑
+                }
+
+                override fun onTokenPrivilegeWillExpire(channelName: String) {
+                    // RTM Token 过期， 需要重新获取 token
+                }
+            })
+
+            mPrepareConfig = PrepareConfig()
+            mContext = context
+            // 获取用户信息
+            val user = UserInfo()
+            user.userId = UserManager.getInstance().user.id.toString()
+            user.userName = UserManager.getInstance().user.name
+            user.avatar = UserManager.getInstance().user.headUrl
+            localUser = user
+            // 创建 rtc引擎实例
+            val engine = createRtcEngine()
+            rtcEngine = engine
+            // 初始化mpk，用于播放来电秀视频
+            mMediaPlayer = engine.createMediaPlayer()
+            // 初始化mpk2，用于播放来电铃声
+            mMediaPlayer2 = engine.createMediaPlayer()
+            // 初始化场景service
+            sceneService = Pure1v1ServiceImp(context, rtmManager.getRtmClient(), user) {
+                onUserChanged?.invoke()
             }
 
-            override fun onDisconnected() {
-                // RTM 已断开
-            }
+            // 创建并初始化CallAPI
+            val callApi = CallApiImpl(context)
+            this.callApi = callApi
+            callApi.initialize(CallConfig(
+                BuildConfig.AGORA_APP_ID,
+                user.userId.toInt(),
+                engine,
+                createRtmSignalClient(rtmManager.getRtmClient())
+            ))
 
-            override fun onConnectionLost() {
-                // RTM 连接已失去，需要做重连逻辑
-            }
-
-            override fun onTokenPrivilegeWillExpire(channelName: String) {
-                // RTM Token 过期， 需要重新获取 token
-            }
-        })
-
-        mPrepareConfig = PrepareConfig()
-        mContext = context
-        // 获取用户信息
-        val user = UserInfo()
-        user.userId = UserManager.getInstance().user.id.toString()
-        user.userName = UserManager.getInstance().user.name
-        user.avatar = UserManager.getInstance().user.headUrl
-        localUser = user
-        // 创建 rtc引擎实例
-        val engine = createRtcEngine()
-        rtcEngine = engine
-        // 初始化mpk，用于播放来电秀视频
-        mMediaPlayer = engine.createMediaPlayer()
-        // 初始化mpk2，用于播放来电铃声
-        mMediaPlayer2 = engine.createMediaPlayer()
-        // 初始化场景service
-        sceneService = Pure1v1ServiceImp(context, rtmManager.getRtmClient(), user) {
-            onUserChanged?.invoke()
+            // 初始化音频场景化API
+            val scenarioApi = AudioScenarioApi(engine)
+            scenarioApi.initialize()
+            this.scenarioApi = scenarioApi
         }
-
-        // 创建并初始化CallAPI
-        val callApi = CallApiImpl(context)
-        this.callApi = callApi
-        callApi.initialize(CallConfig(
-            BuildConfig.AGORA_APP_ID,
-            user.userId.toInt(),
-            engine,
-            createRtmSignalClient(rtmManager.getRtmClient())
-        ))
-
-        // 初始化音频场景化API
-        val scenarioApi = AudioScenarioApi(engine)
-        scenarioApi.initialize()
-        this.scenarioApi = scenarioApi
 
         // 获取万能Token
         fetchToken { success ->
             // 外部创建需要自行管理login
             if (success) {
-                rtmManager.login(rtmToken) {
+                callRtmManager?.login(rtmToken) {
                     if (it == null) {
                         completion.invoke(true)
                     } else {
@@ -193,7 +198,7 @@ class CallServiceManager {
         callApi?.initialize(CallConfig(
             BuildConfig.AGORA_APP_ID,
             uid.toInt(),
-            rtcEngine,
+            rtcEngine!!,
             createRtmSignalClient(manager.getRtmClient())
         ))
     }
@@ -201,7 +206,7 @@ class CallServiceManager {
     /*
      * 获取万能Token并初始化CallAPI
      */
-    private fun fetchToken(completion: (success: Boolean) -> Unit) {
+    fun fetchToken(completion: (success: Boolean) -> Unit) {
         val user = localUser ?: return
         Pure1v1Logger.d(tag, "generateTokens")
         TokenGenerator.generateTokens(
@@ -219,12 +224,19 @@ class CallServiceManager {
                 }
                 this.rtcToken = rtcToken
                 this.rtmToken = rtmToken
+                this.lastTokenFetchTime = TimeUtils.currentTimeMillis()
                 Pure1v1Logger.d(tag, "generateTokens success")
                 completion.invoke(true)
             }, {
                 Pure1v1Logger.e(tag, null,"generateTokens failed: $it")
                 completion.invoke(false)
             })
+    }
+
+    fun renewRtmToken() {
+        if (rtmToken != "") {
+            callRtmManager?.renewToken(rtmToken)
+        }
     }
 
     // 准备通话环境
@@ -242,7 +254,6 @@ class CallServiceManager {
                 prepareConfig.rtmToken = rtmToken
                 prepareConfig.localView = localView
                 prepareConfig.remoteView = remoteView
-                prepareConfig.autoJoinRTC = false
                 prepareConfig.userExtension = user.toMap()
                 api.prepareForCall(prepareConfig) {
                     if (it == null) {
@@ -256,7 +267,6 @@ class CallServiceManager {
             prepareConfig.rtmToken = rtmToken
             prepareConfig.localView = localView
             prepareConfig.remoteView = remoteView
-            prepareConfig.autoJoinRTC = false
             prepareConfig.userExtension = user.toMap()
             api.prepareForCall(prepareConfig) {
                 if (it == null) {
@@ -377,7 +387,7 @@ class CallServiceManager {
                     degradationPrefer = VideoEncoderConfiguration.DEGRADATION_PREFERENCE.MAINTAIN_BALANCED
                 }
             )
-            rtcEngine.setParameters("\"che.video.videoCodecIndex\": 2")
+            rtcEngine.setParameters("{\"che.video.videoCodecIndex\": 2}")
             rtcEngine.enableInstantMediaRendering()
             rtcEngine.setParameters("{\"rtc.video.quickIntraHighFec\": true}")
             rtcEngine.setParameters("{\"rtc.network.e2e_cc_mode\": 3}")

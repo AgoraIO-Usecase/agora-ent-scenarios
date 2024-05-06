@@ -6,6 +6,6 @@ import io.agora.rtmsyncmanager.model.AUIRoomInfo;
 
 
 public interface AUIRoomListCallback {
-    void onResult(@Nullable AUIException error, @Nullable List<AUIRoomInfo> roomList);
+    void onResult(@Nullable AUIException error, @Nullable List<AUIRoomInfo> roomList, @Nullable Long ts);
 }
 

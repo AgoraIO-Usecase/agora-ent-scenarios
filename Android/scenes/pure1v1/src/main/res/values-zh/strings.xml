@@ -14,10 +14,11 @@
     <string name="pure1v1_call_waiting_acceptance">等待对方接受</string>
     <string name="pure1v1_call_connecting">连接中…</string>
     <string name="pure1v1_call_toast_hangup">对方结束连线</string>
+    <string name="pure1v1_call_toast_hangup2">对方已离开，连线自动结束</string>
     <string name="pure1v1_call_local_rejected">已拒绝</string>
     <string name="pure1v1_call_toast_rejected">对方已拒绝</string>
     <string name="pure1v1_call_toast_no_answer">无应答</string>
-    <string name="pure1v1_call_toast_remote_busy">对方正忙</string>
+    <string name="pure1v1_call_toast_remote_busy">呼叫失败，对方正忙</string>
     <string name="pure1v1_call_content_inspect">监测到当前内容存在违规行为</string>
     <string name="pure1v1_dashboard_item">实时数据</string>
     <string name="pure1v1_dashboard_item_camera">摄像头开</string>
@@ -48,4 +49,7 @@
     <string name="pure1v1_dashboard_channel_name">频道名: %s</string>
     <string name="pure1v1_debug">开发者设置</string>
     <string name="pure1v1_audio_dump">音频 Dump</string>
+    <string name="pure1v1_call_failed">呼叫失败：%s</string>
+    <string name="pure1v1_accept_failed">网络不佳，接受邀请失败，错误码：%s</string>
+    <string name="pure1v1_room_list_refreshed">网络不佳，用户列表刷新失败，建议重试，错误：%s</string>
 </resources>

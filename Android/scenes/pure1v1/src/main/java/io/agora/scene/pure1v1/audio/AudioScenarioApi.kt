@@ -36,14 +36,14 @@ enum class AudioScenarioType(val value: Int) {
  * @param Close 关
  */
 enum class SoundCardType constructor(
-    val gainValue: Float,
+    val gainValue: Int,
     val presetValue: Int,
     val gender: Int,
     val effect: Int,
 ) {
-    Magnetic(gainValue = 1.0f, presetValue = 4, gender = 0, effect = 0),
-    Pleasant(gainValue = 1.0f, presetValue = 4, gender = 0, effect = 1),
-    Close(gainValue = -1.0f, presetValue = -1, gender = -1, effect = -1)
+    Magnetic(gainValue = 200, presetValue = 4, gender = 0, effect = 0),
+    Pleasant(gainValue = 200, presetValue = 4, gender = 0, effect = 1),
+    Close(gainValue = -100, presetValue = -1, gender = -1, effect = -1)
 }
 
 /**
@@ -262,6 +262,8 @@ class AudioScenarioApi(rtcEngine: RtcEngine): IRtcEngineEventHandler() {
                     AudioScenarioType.Chat_Caller -> {
                         rtcEngine.setAudioProfile(Constants.AUDIO_PROFILE_DEFAULT)
                         rtcEngine.setAudioScenario(Constants.AUDIO_SCENARIO_MEETING)
+                        // 大哥默认关闭虚拟声卡
+                        enableVirtualSoundCard(SoundCardType.Close)
                     }
                     AudioScenarioType.Chat_Callee -> {
                         rtcEngine.setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO)
@@ -280,10 +282,14 @@ class AudioScenarioApi(rtcEngine: RtcEngine): IRtcEngineEventHandler() {
                         rtcEngine.setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO)
                         rtcEngine.setAudioScenario(Constants.AUDIO_SCENARIO_GAME_STREAMING)
                         rtcEngine.setParameters("{\"che.audio.custom_payload_type\": 78}")
+                        // 主播默认关闭虚拟声卡
+                        enableVirtualSoundCard(SoundCardType.Close)
                     }
                     AudioScenarioType.Show_InteractiveAudience -> {
                         rtcEngine.setAudioProfile(Constants.AUDIO_PROFILE_DEFAULT)
                         rtcEngine.setAudioScenario(Constants.AUDIO_SCENARIO_MEETING)
+                        // 连麦观众默认关闭虚拟声卡
+                        enableVirtualSoundCard(SoundCardType.Close)
                     }
                     else -> {
                         scenarioApiLogError("not supported")

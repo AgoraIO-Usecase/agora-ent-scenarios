@@ -141,23 +141,8 @@
             android:textColor="@color/white"
             android:textSize="12sp"
             app:layout_constraintBottom_toTopOf="@id/tvTip"
-            app:layout_constraintEnd_toStartOf="@id/tvHD"
-            app:layout_constraintStart_toEndOf="@id/tvRotate" />
-
-        <TextView
-            android:id="@+id/tvHD"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableTop="@mipmap/show_live_prepare_ic_hd"
-            android:drawablePadding="3dp"
-            android:gravity="center"
-            android:text="@string/show_live_prepare_hd"
-            android:textColor="@color/white"
-            android:visibility="gone"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toTopOf="@id/tvTip"
             app:layout_constraintEnd_toStartOf="@id/tvSetting"
-            app:layout_constraintStart_toEndOf="@id/tvBeauty" />
+            app:layout_constraintStart_toEndOf="@id/tvRotate" />
 
         <TextView
             android:id="@+id/tvSetting"
@@ -171,7 +156,7 @@
             android:textSize="12sp"
             app:layout_constraintBottom_toTopOf="@id/tvTip"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/tvHD" />
+            app:layout_constraintStart_toEndOf="@id/tvBeauty" />
 
         <TextView
             android:id="@+id/tvTip"
