@@ -12,31 +12,23 @@
 * 1v1私密房
 * 秀场转1v1私密房
 
-**本分支是秀场直播独立版分支, 只包括以下场景**
-* 秀场直播
-* 1v1私密房
-* 秀场转1v1私密房
+**本分支是弹幕玩法独立版分支, 只包括以下场景**
+* 弹幕玩法
 
 >
 > Demo 效果:
 >
 > <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ent_home_scenes.jpg" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ent_home_explore.jpg" width="300" height="640">
 ## 1.2 运行示例
-* 运行秀场直播项目，请参考以下流程
-    * [Android](Android/scenes/show)
-    * [iOS](iOS/AgoraEntScenarios/Scenes/Show)
-* 运行1v1私密房项目，请参考以下流程
-    * [Android](Android/scenes/pure1v1)
-    * [iOS](iOS/AgoraEntScenarios/Scenes/Pure1v1)
-* 运行秀场转1v1私密房项目，请参考以下流程
-    * [Android](Android/scenes/showTo1v1)
-    * [iOS](iOS/AgoraEntScenarios/Scenes/ShowTo1v1)
+* 运行弹幕玩法项目，请参考以下流程
+    * [Android](Android/scenes/joy)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/Joy)
  
 ## 1.3 体验 APP 下载地址
 
 | iOS                                                          | Android                                                      |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [Testflight](https://testflight.apple.com/join/p7do9PBJ) | [Pgyer](https://www.pgyer.com/ase3) |
+| [Testflight](https://testflight.apple.com/join/cSfas2be) | [Pgyer](https://www.pgyer.com/yvTznS) |
 
 # 2. FAQ
 

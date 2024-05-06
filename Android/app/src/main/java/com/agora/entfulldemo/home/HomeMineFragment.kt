@@ -17,9 +17,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
-import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppFragmentHomeMineBinding
 import com.agora.entfulldemo.home.constructor.URLStatics
+import com.agora.entfulldemo.home.mine.AppDebugActivity
 import com.bumptech.glide.request.RequestOptions
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.Constant
@@ -31,9 +31,7 @@ import io.agora.scene.base.component.OnFastClickListener
 import io.agora.scene.base.manager.PagePilotManager
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.FileUtils
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.base.utils.UriUtils
-import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.dialog.SelectPhotoFromDialog
 import io.agora.scene.widget.utils.ImageCompressUtil
 import java.io.File
@@ -50,7 +48,6 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
     }
 
     private var selectPhotoFromDialog: SelectPhotoFromDialog? = null
-    private var debugModeDialog: CommonDialog? = null
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AppFragmentHomeMineBinding {
         return AppFragmentHomeMineBinding.inflate(inflater)
     }
@@ -119,9 +116,7 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
 
     override fun onResume() {
         super.onResume()
-        if (AgoraApplication.the().isDebugModeOpen) {
-            binding.tvDebugMode.visibility = View.VISIBLE
-        }
+        binding.tvDebugMode.isVisible = AgoraApplication.the().isDebugModeOpen
     }
 
     @SuppressLint("SetTextI18n")
@@ -181,10 +176,12 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
                 true
             )
         }
-        binding.tvDebugMode.setOnClickListener { v: View? -> showDebugModeCloseDialog() }
-        if (AgoraApplication.the().isDebugModeOpen) {
-            binding.tvDebugMode.visibility = View.VISIBLE
+        binding.tvDebugMode.setOnClickListener { v: View? ->
+            activity?.let { activity->
+                AppDebugActivity.startActivity(activity)
+            }
         }
+        binding.tvDebugMode.isVisible = AgoraApplication.the().isDebugModeOpen
         binding.etNickname.filters = arrayOf(mInputFilter)
     }
 
@@ -270,25 +267,6 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
 
     override fun requestData() {
         mainViewModel.requestUserInfo(UserManager.getInstance().user.userNo, true)
-    }
-
-
-    private fun showDebugModeCloseDialog() {
-        if (debugModeDialog == null) {
-            debugModeDialog = CommonDialog(requireContext())
-            debugModeDialog?.setDialogTitle(getString(R.string.app_exit_debug))
-            debugModeDialog?.setDescText(getString(R.string.app_exit_debug_tip))
-            debugModeDialog?.setDialogBtnText(getString(R.string.cancel), getString(R.string.app_exit))
-            debugModeDialog?.onButtonClickListener = object : OnButtonClickListener {
-                override fun onLeftButtonClick() {}
-                override fun onRightButtonClick() {
-                    binding.tvDebugMode.visibility = View.GONE
-                    AgoraApplication.the().enableDebugMode(false)
-                    ToastUtils.showToast(R.string.app_debug_off)
-                }
-            }
-        }
-        debugModeDialog?.show()
     }
 
     // 昵称限制 10 个字符
