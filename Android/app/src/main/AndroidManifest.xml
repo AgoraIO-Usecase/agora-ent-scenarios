@@ -32,10 +32,10 @@
     <application
         android:name="io.agora.scene.base.component.AgoraApplication"
         android:allowBackup="false"
-        android:icon="@mipmap/app_ic_show_launcher"
+        android:icon="@mipmap/app_ic_launcher_joy"
         android:label="@string/app_name"
         android:networkSecurityConfig="@xml/security_config"
-        android:roundIcon="@mipmap/app_ic_show_launcher"
+        android:roundIcon="@mipmap/app_ic_launcher_joy"
         android:supportsRtl="true"
         android:theme="@style/app_Theme.AgoraKTV"
         android:extractNativeLibs="true"
@@ -73,6 +73,10 @@
         <activity
             android:name="com.agora.entfulldemo.home.mine.FeedbackActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name="com.agora.entfulldemo.home.mine.AppDebugActivity"
+            android:screenOrientation="portrait" />
+
 
         <meta-data
             android:name="design_width_in_dp"
