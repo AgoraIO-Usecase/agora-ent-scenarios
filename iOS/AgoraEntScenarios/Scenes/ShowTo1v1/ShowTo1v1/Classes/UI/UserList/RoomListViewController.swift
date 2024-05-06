@@ -223,12 +223,10 @@ class RoomListViewController: UIViewController {
 //        naviBar.refreshButton.isHidden = false
 //        _refreshAction()
         
-        
         _setupAPI()
         callVC.callApi = callApi
         callVC.currentUser = userInfo
         callVC.rtcEngine = rtcEngine
-        
         
         if AppContext.shared.isDebugMode {
             //如果开启了debug模式
@@ -315,7 +313,7 @@ extension RoomListViewController {
             completion?(false)
             return
         }
-        debugInfo("renewTokens")
+        debugInfo("renewTokens start")
         NetworkManager.shared.generateTokens(channelName: "",
                                              uid: userInfo.uid,
                                              tokenGeneratorType: .token007,
@@ -335,7 +333,7 @@ extension RoomListViewController {
     
     private func _setupRtm(completion: @escaping (NSError?) -> Void) {
         if setupStatus.contains(.rtm) {
-            showTo1v1Error("_setupRtm fail! rtm already setup")
+            showTo1v1Warn("_setupRtm fail! rtm already setup")
             completion(nil)
             return
         }
@@ -471,10 +469,11 @@ extension RoomListViewController {
     
     @objc func _refreshAction() {
         let date = Date()
+        showTo1v1Print("refresh _setupAPIConfig start")
         _setupAPIConfig {[weak self] err in
             guard let self = self else {return}
             if let err = err {
-                showTo1v1Print("refresh _setupAPIConfig fail: \(err.localizedDescription)")
+                showTo1v1Error("refresh _setupAPIConfig fail: \(err.localizedDescription)")
                 self.listView.endRefreshing()
                 AUIToast.show(text: "\("room_list_get_fail".showTo1v1Localization())\(err.code)")
                 return
@@ -730,7 +729,10 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
         renewTokens {[weak self, weak engine] success in
             guard let self = self, let engine = engine else {return}
             guard success else {
-                self.rtcEngine(engine, tokenPrivilegeWillExpire: token)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    self.rtcEngine(engine, tokenPrivilegeWillExpire: token)
+                }
+                
                 return
             }
             
