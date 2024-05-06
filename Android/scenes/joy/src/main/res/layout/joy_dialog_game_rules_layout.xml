@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="@drawable/joy_bg_rect_top_radius20_white">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/joy_bg_rect_top_radius20_gradient_white"
+        app:layout_constraintBottom_toBottomOf="@+id/mtBottomSheetTitle"
+        app:layout_constraintTop_toTopOf="@+id/ivBottomSheetTitle" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBottomSheetTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:src="@drawable/joy_icon_dialog_top_rectangle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/mtBottomSheetTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingVertical="11dp"
+        android:text="@string/joy_tips_for_launching_anchors"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvIntroduceContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="3dp"
+        android:minHeight="100dp"
+        android:paddingHorizontal="20dp"
+        android:textColor="#191919"
+        android:textSize="13sp"
+        app:layout_constraintTop_toBottomOf="@id/mtBottomSheetTitle"
+        tools:text="【获胜规则】将对方boss推到的乙方获胜\n
+【加入对战】发送弹幕加入支持的阵营加入后本单局无法更换阵营\n
+火焰格里芬阵营：扣“红”或“8”加入\n
+冰雪格里芬阵营：扣“蓝”或“9”加入\n
+【出兵队召唤】\n
+点赞召唤 小黄鸡x6\n
+评论“666”召唤 小黄鸡x12\n
+评论“666”召唤 小黄鸡x12\n
+评论“666”召唤 小黄鸡x12\n
+评论“666”召唤 小黄鸡x12\n
+评论“666”召唤 小黄鸡x12\n
+评论“666”召唤 小黄鸡x12\n
+评论“666”召唤 小黄鸡x12\n
+评论“666”召唤 小黄鸡x12\n
+评论“666”召唤 小黄鸡x12" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnConfirm"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/joy_bg_game_choose_btn"
+        android:gravity="center"
+        android:text="@string/i_know"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvIntroduceContent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
