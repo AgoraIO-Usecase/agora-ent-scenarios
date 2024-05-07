@@ -248,7 +248,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
 
     private fun connectCallDetail() {
-        Pure1v1Logger.d(tag, "local pic debug log 4")
         binding.flCallContainer.isVisible = true
 
         val channelId =  CallServiceManager.instance.connectedChannelId ?: ""
@@ -294,7 +293,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     }
 
     // 监听 callapi 内的状态变化驱动业务行为
-    override fun onCallStatseChanged(
+    override fun onCallStateChanged(
         state: CallStateType,
         stateReason: CallStateReason,
         eventReason: String,
@@ -334,9 +333,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     val dialog = CallReceiveDialog(this, user)
                     dialog.setListener(object : CallReceiveDialog.CallReceiveDialogListener {
                         override fun onReceiveViewDidClickAccept() { // 点击接通
-                            Pure1v1Logger.d(tag, "local pic debug log 1")
                             if (CallServiceManager.instance.rtcToken != "") {
-                                Pure1v1Logger.d(tag, "local pic debug log 2")
                                 CallServiceManager.instance.callApi?.accept(fromUserId) {
                                     if (it != null) {
                                         Toast.makeText(this@RoomListActivity, getString(R.string.pure1v1_accept_failed, it.msg), Toast.LENGTH_SHORT).show()
@@ -393,28 +390,21 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 CallServiceManager.instance.stopCallMusic()
             }
             CallStateType.Connected -> {
-                Pure1v1Logger.d(tag, "local pic debug log 3")
                 if (CallServiceManager.instance.remoteUser == null) { return }
                 // 进入通话页面
                 connectCallDetail()
                 finishCallDialog()
 
-                // 停止来点秀视频和铃声
-                CallServiceManager.instance.stopCallShow()
-                CallServiceManager.instance.stopCallMusic()
-                // TODO bug CallServiceManager.instance.rtcEngine?.stopAudioMixing()
-
-                // 设置音频最佳实践
-                val toUserId = eventInfo[CallApiImpl.kRemoteUserId] as? Int ?: 0
-                val fromUserId = eventInfo[CallApiImpl.kFromUserId] as? Int ?: 0
-                Log.d("shsh", "toUserId=$toUserId, fromUserId=$fromUserId, currentUid=$currentUid eventInfo=$eventInfo")
-                if (CallServiceManager.instance.isCaller) {
-                    // 主叫
-                    CallServiceManager.instance.scenarioApi?.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Caller)
-                } else {
-                    // 被叫
-                    CallServiceManager.instance.scenarioApi?.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
-                }
+                // 设置音频最佳实践（防止卡主线程，将大量sdk调用后置）
+                binding.root.postDelayed( {
+                    if (CallServiceManager.instance.isCaller) {
+                        // 主叫
+                        CallServiceManager.instance.scenarioApi?.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Caller)
+                    } else {
+                        // 被叫
+                        CallServiceManager.instance.scenarioApi?.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
+                    }
+                }, 500)
             }
             CallStateType.Prepared -> {
                 when (stateReason) {
@@ -445,11 +435,6 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 CallServiceManager.instance.stopCallShow()
                 CallServiceManager.instance.stopCallMusic()
                 // TODO bug CallServiceManager.instance.rtcEngine?.stopAudioMixing()
-
-                // 自动刷新列表
-//                if (!isFirstEnterScene) {
-//                    fetchRoomList(false)
-//                }
             }
             CallStateType.Failed -> {
                 Toast.makeText(this, eventReason, Toast.LENGTH_SHORT).show()

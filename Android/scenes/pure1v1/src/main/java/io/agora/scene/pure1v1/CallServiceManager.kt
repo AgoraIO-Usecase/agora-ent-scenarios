@@ -208,7 +208,7 @@ class CallServiceManager {
      */
     fun fetchToken(completion: (success: Boolean) -> Unit) {
         val user = localUser ?: return
-        Pure1v1Logger.d(tag, "generateTokens")
+        //Pure1v1Logger.d(tag, "generateTokens")
         TokenGenerator.generateTokens(
             "",
             user.userId,
@@ -225,10 +225,10 @@ class CallServiceManager {
                 this.rtcToken = rtcToken
                 this.rtmToken = rtmToken
                 this.lastTokenFetchTime = TimeUtils.currentTimeMillis()
-                Pure1v1Logger.d(tag, "generateTokens success")
+                //Pure1v1Logger.d(tag, "generateTokens success")
                 completion.invoke(true)
             }, {
-                Pure1v1Logger.e(tag, null,"generateTokens failed: $it")
+                //Pure1v1Logger.e(tag, null,"generateTokens failed: $it")
                 completion.invoke(false)
             })
     }
@@ -313,19 +313,17 @@ class CallServiceManager {
 
     // 播放来电铃声
     fun playCallMusic(url: String) {
-        val ret = mMediaPlayer2?.openWithMediaSource(MediaPlayerSource().apply {
+        mMediaPlayer2?.openWithMediaSource(MediaPlayerSource().apply {
             setUrl(url)
             isAutoPlay = true
             isEnableCache = true
         })
         mMediaPlayer2?.setLoopCount(-1)
-        Pure1v1Logger.d(tag, "playCallMusic：$ret")
     }
 
     // 停止播放来电铃声
     fun stopCallMusic() {
-        val ret = mMediaPlayer2?.stop()
-        Pure1v1Logger.d(tag, "stopCallMusic：$ret")
+        mMediaPlayer2?.stop()
     }
 
     // 切换摄像头开关状态
@@ -363,7 +361,6 @@ class CallServiceManager {
         config.mEventHandler = object : IRtcEngineEventHandler() {
             override fun onError(err: Int) {
                 super.onError(err)
-                Pure1v1Logger.e(tag, null, "IRtcEngineEventHandler onError:$err")
             }
         }
         config.mChannelProfile = CHANNEL_PROFILE_LIVE_BROADCASTING
