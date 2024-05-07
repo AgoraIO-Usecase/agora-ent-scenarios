@@ -110,28 +110,35 @@ class ShowTo1v1Manger constructor() {
     private var isCallApiInit = false
 
     fun setup(context: Context) {
-        if (rtmManager != null) return
-        // 使用RtmManager管理RTM
-        rtmManager = createRtmManager(BuildConfig.AGORA_APP_ID, mCurrentUser.getIntUserId())
-        // 监听 rtm manager 事件
-        rtmManager?.addListener(object : ICallRtmManagerListener {
-            override fun onConnected() {
+        initRtm()
+        mService = ShowTo1v1ServiceImpl(context, rtmManager!!.getRtmClient(), mCurrentUser)
+    }
 
-            }
+    private fun initRtm() {
+        if (rtmManager == null) {
+            // 使用RtmManager管理RTM
+            rtmManager = createRtmManager(BuildConfig.AGORA_APP_ID, mCurrentUser.getIntUserId())
+            // 监听 rtm manager 事件
+            rtmManager?.addListener(object : ICallRtmManagerListener {
+                override fun onConnected() {
 
-            override fun onDisconnected() {
+                }
 
-            }
+                override fun onDisconnected() {
 
-            override fun onConnectionLost() {
-                // 表示rtm超时断连了，需要重新登录，这里模拟了3s重新登录
-            }
+                }
 
-            override fun onTokenPrivilegeWillExpire(channelName: String) {
-                // 重新获取token
-                renewTokens {  }
-            }
-        })
+                override fun onConnectionLost() {
+                    // 表示rtm超时断连了，需要重新登录，这里模拟了3s重新登录
+                }
+
+                override fun onTokenPrivilegeWillExpire(channelName: String) {
+                    // 重新获取token
+                    renewTokens {  }
+                }
+            })
+        }
+
         // rtm login
         rtmManager?.login(mPrepareConfig.rtmToken) {
             if (it == null) {
@@ -139,8 +146,6 @@ class ShowTo1v1Manger constructor() {
                 initCallAPi()
             }
         }
-
-        mService = ShowTo1v1ServiceImpl(context, rtmManager!!.getRtmClient(), mCurrentUser)
     }
 
     private fun initCallAPi() {
