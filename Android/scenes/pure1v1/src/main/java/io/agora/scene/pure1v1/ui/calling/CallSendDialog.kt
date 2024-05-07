@@ -95,7 +95,6 @@ class CallSendDialog(
     private var textCount: Int = 0
     private fun textAnimation() {
         if (callState == CallDialogState.Calling) {
-            Log.d("hugo", "textAnimation: ${binding.tvDot.text}")
             when (textCount) {
                 0 -> {binding.tvDot.text = ""}
                 1 -> {binding.tvDot.text = "."}
