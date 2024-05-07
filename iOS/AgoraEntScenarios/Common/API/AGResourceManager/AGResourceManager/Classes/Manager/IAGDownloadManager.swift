@@ -9,6 +9,11 @@ import Foundation
 
 public protocol IAGDownloadManager: NSObjectProtocol {
     
+    
+    /// 取消下载
+    /// - Parameter url: <#url description#>
+    func cancelDownloadFile(withURL url: URL)
+    
     /// 下载文件，并校验md5
     /// - Parameters:
     ///   - url: <#url description#>

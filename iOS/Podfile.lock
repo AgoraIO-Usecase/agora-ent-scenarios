@@ -32,7 +32,7 @@ PODS:
     - SocketRocket
   - AGResourceManager (0.1.0):
     - AFNetworking
-    - Zip
+    - SSZipArchive
   - AUIKitCore/UI (0.5.3):
     - AgoraLyricsScore
     - MJRefresh
@@ -157,7 +157,7 @@ DEPENDENCIES:
   - AgoraLyricsScore (= 1.1.2)
   - AgoraRtcEngine_Special_iOS (= 4.2.6.6)
   - AgoraSyncManager (~> 2.1.6)
-  - AGResourceManager (from `AGResourceManager.podspec`)
+  - AGResourceManager (from `AgoraEntScenarios/Common/API/AGResourceManager`)
   - Bugly (= 2.5.93)
   - bytedEffect (from `bytedEffect.podspec`)
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
@@ -233,7 +233,7 @@ EXTERNAL SOURCES:
   AgoraCommon:
     :path: AgoraEntScenarios
   AGResourceManager:
-    :path: AGResourceManager.podspec
+    :path: AgoraEntScenarios/Common/API/AGResourceManager
   bytedEffect:
     :path: bytedEffect.podspec
   CallAPI:
@@ -260,7 +260,7 @@ SPEC CHECKSUMS:
   AgoraRtcEngine_Special_iOS: e50d7b4709a0d5fc9db4ed96961d1eb72d349ef1
   AgoraRtm_iOS: 9fb76b5f71900d012aaed6c033e235d6fd201ed9
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
-  AGResourceManager: 0a7bdde28f8d5505e1dea358ecaac315b88af1ca
+  AGResourceManager: e6616ad4d9d0461c84d9582ef1118004fa534e5c
   AUIKitCore: fc5df86f26781fe6b76b4ced98f94da3872cf815
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   bytedEffect: 3d51767425dcaa67d2d6162c402225764d3c2156
@@ -299,6 +299,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: f5a73e10ce98c7005361579c2977d4f8e0827af5
+PODFILE CHECKSUM: c8004ba0924fbe806cc5d9d2697a15304b1778e2
 
 COCOAPODS: 1.15.2

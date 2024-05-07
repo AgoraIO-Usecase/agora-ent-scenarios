@@ -44,7 +44,7 @@ def all_pods
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
   pod 'AgoraRtcEngine_Special_iOS', '4.2.6.6'
   
-  pod 'AGResourceManager', :path => 'AGResourceManager.podspec'
+  pod 'AGResourceManager', :path => 'AgoraEntScenarios/Common/API/AGResourceManager'
   pod 'Test_metaSDK'
 
   pod 'CallAPI', :path => 'AgoraEntScenarios/Common/API/CallAPI'
