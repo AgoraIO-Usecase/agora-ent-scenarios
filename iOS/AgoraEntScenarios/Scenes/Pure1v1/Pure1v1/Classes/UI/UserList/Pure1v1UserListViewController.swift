@@ -502,14 +502,15 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 connectedChannelId = fromRoomId
                 //主叫userlist一定会有，因为需要点击
                 if let user = listView.userList.first {$0.userId == "\(toUserId)"} {
-                    let dialog = Pure1v1CallerDialog.show(user: user)
+                    let dialog = Pure1v1CallerDialog.show(user: user) { [weak self] in
+                        self?.startDail()
+                    }
                     dialog?.cancelClosure = {[weak self] in
                         self?.callApi.cancelCall(completion: { err in
                         })
                     }
                     callDialog = dialog
                     callVC.targetUser = user
-                    startDail()
                 } else {
                     pure1v1Print("caller user not found1")
                 }
