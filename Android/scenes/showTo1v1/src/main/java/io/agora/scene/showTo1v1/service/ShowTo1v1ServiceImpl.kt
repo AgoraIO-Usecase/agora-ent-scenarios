@@ -32,8 +32,6 @@ class ShowTo1v1ServiceImpl constructor(
 
     companion object {
         private const val TAG = "Show1v1_LOG"
-        private const val kSceneId = "scene_Livetoprivate_4.2.0"
-        private const val SYNC_SCENE_ROOM_USER_COLLECTION = "userCollection"
     }
 
     private val kSceneId = "scene_Livetoprivate_421"
@@ -204,8 +202,9 @@ class ShowTo1v1ServiceImpl constructor(
                 }
                 //按照创建时间顺序排序
                 ret.sortBy { it.createdAt }
-                ShowTo1v1Logger.d(TAG, "getRoomList end, roomCount:${ret.size}")
-                runOnMainThread { completion.invoke(null, ret.toList()) }
+                val roomList = ret.filter { it.userId.toLong() != UserManager.getInstance().user.id }
+                ShowTo1v1Logger.d(TAG, "getRoomList end, roomCount:${roomList.size}")
+                runOnMainThread { completion.invoke(null, roomList.toList()) }
             }
         }
     }
