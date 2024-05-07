@@ -44,7 +44,7 @@ private func setupBeResource() -> Bool {
         return false
     }
     
-    let beLicPath = manager.getFolderPath(resource: beLicResource) + "/LicenseBag.bundle/Agora_test_20240111_20240411_io.agora.test.entfull_4.5.0_1111.licbag"
+    let beLicPath = manager.getFolderPath(resource: beLicResource) + "/LicenseBag.bundle/Agora_test_\(Bundle.main.bundleIdentifier ?? "").licbag"
     let beResourcePath = manager.getFolderPath(resource: beResource) + "/ByteEffectLib"
     BEDynmicResourceConfig.shareInstance().licFilePath = beLicPath
     BEDynmicResourceConfig.shareInstance().resourceFolderPath = beResourcePath
