@@ -54,16 +54,19 @@ class ShowTo1v1ServiceImp: NSObject {
 extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
     func getRoomList(completion: @escaping (NSError?, [ShowTo1v1RoomInfo]?) -> Void) {
         roomManager.getRoomInfoList(lastCreateTime: 0, pageSize: 50) {[weak self] err, ts, list in
+            guard let self = self else {return}
             var showRoomList: [ShowTo1v1RoomInfo] = []
             list?.forEach({ info in
-                if ts - info.createTime >= 20 * 60 * 1000 {
-                    self?.roomManager.destroyRoom(roomId: info.roomId, callback: { _ in
+                if ts - info.createTime >= 20 * 60 * 1000 || info.owner?.userId == self.user.uid {
+                    self.roomManager.destroyRoom(roomId: info.roomId, callback: { _ in
                     })
+                    let scene = self.syncManager.createScene(channelName: info.roomId)
+                    scene.delete()
                     return
                 }
                 showRoomList.append(ShowTo1v1RoomInfo(roomInfo: info))
             })
-            self?.roomList = showRoomList
+            self.roomList = showRoomList
             completion(err, showRoomList)
         }
     }

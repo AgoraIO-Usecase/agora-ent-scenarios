@@ -67,6 +67,11 @@ open class AUIRtmManager: NSObject {
         super.init()
         self.rtmClient.addDelegate(proxy)
         aui_info("init AUIRtmManager", tag: "AUIRtmManager")
+        
+        //publish message/set metadata timeout seconds = 3s
+        let ret1 = self.rtmClient.setParameters("{\"rtm.msg.tx_timeout\": 3000}")
+        let ret2 = self.rtmClient.setParameters("{\"rtm.metadata.api_timeout\": 3000}")
+        let ret3 = self.rtmClient.setParameters("{\"rtm.metadata.api_max_retries\": 1}")
     }
     
     public func login(token: String, completion: @escaping (NSError?)->()) {
@@ -288,9 +293,9 @@ extension AUIRtmManager {
     public func cleanAllMedadata(channelName: String,
                                  lockName: String,
                                  completion: @escaping (NSError?)->()) {
-        let removeKeys = proxy.keys(channelName: channelName) ?? []
-        cleanMetadata(channelName: channelName, 
-                      removeKeys: removeKeys,
+//        let removeKeys = proxy.keys(channelName: channelName) ?? []
+        cleanMetadata(channelName: channelName,
+                      removeKeys: [],
                       lockName: lockName,
                       completion: completion)
     }
