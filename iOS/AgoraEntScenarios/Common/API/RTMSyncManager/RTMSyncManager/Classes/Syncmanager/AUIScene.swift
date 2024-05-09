@@ -188,7 +188,7 @@ public class AUIScene: NSObject {
     /// 销毁scene，清理所有缓存（包括rtm的所有metadata）
     public func delete() {
         aui_info("delete[\(channelName)]", tag: kSceneTag)
-        cleanScene()
+        cleanScene(forceClean: true)
         getArbiter().destroy()
         cleanSDK()
         AUIRoomContext.shared.clean(channelName: channelName)
@@ -252,9 +252,9 @@ extension AUIScene {
         //TODO: 用户离开后，需要清理这个用户对应在collection里的信息，例如上麦信息、点歌信息等
     }
     
-    private func cleanScene() {
+    private func cleanScene(forceClean: Bool = false) {
         aui_info("cleanScene[\(channelName)]", tag: kSceneTag)
-        guard getArbiter().isArbiter() else {
+        guard getArbiter().isArbiter() || forceClean else {
             return
         }
         
