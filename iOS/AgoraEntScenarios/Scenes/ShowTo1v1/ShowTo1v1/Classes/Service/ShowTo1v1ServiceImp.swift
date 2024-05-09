@@ -117,6 +117,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
         scene.enter { payload, err in
             if let err = err {
                 showTo1v1Error("enter scene fail: \(err.localizedDescription)")
+                scene.leave()
                 completion(err)
                 return
             }
