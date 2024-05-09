@@ -41,6 +41,11 @@ class AUIRtmManager constructor(
 
     init {
         rtmClient.addEventListener(proxy)
+
+        //publish message/set metadata timeout seconds = 3s
+        rtmClient.setParameters("{\"rtm.msg.tx_timeout\": 3000}")
+        rtmClient.setParameters("{\"rtm.metadata.api_timeout\": 3000}")
+        rtmClient.setParameters("{\"rtm.metadata.api_max_retries\": 1}")
     }
 
     fun deInit(){
@@ -307,10 +312,9 @@ class AUIRtmManager constructor(
     }
 
     fun cleanAllMetadata(channelName: String, lockName: String, completion: (AUIRtmException?) -> Unit) {
-        val removeKeys = proxy.keys(channelName) ?: emptyList()
         cleanMetadata(
             channelName = channelName,
-            removeKeys = removeKeys,
+            removeKeys = emptyList(),
             lockName = lockName,
             completion = completion
         )
