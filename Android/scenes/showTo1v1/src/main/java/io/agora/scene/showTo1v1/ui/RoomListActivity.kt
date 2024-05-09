@@ -421,7 +421,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                             if (it.isShowing) it.dismiss()
                             mCallDialog = null
                         }
-                    } else if (stateReason == CallStateReason.LocalHangup || stateReason == CallStateReason.RemoteHangup) {
+                    } else if ((stateReason == CallStateReason.LocalHangup || stateReason == CallStateReason.RemoteHangup) && mShowTo1v1Manger.isCaller) {
                         fetchRoomList()
                     }
                 }

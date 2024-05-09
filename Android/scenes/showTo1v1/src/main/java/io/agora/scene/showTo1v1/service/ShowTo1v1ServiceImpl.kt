@@ -181,7 +181,7 @@ class ShowTo1v1ServiceImpl constructor(
                 list.forEach {
                     val aliveTime = ts - it.createTime
                     ShowTo1v1Logger.d(TAG, "room alive time: $aliveTime, roomId: ${it.roomId}")
-                    if (aliveTime < ROOM_AVAILABLE_DURATION) {
+                    if (aliveTime < ROOM_AVAILABLE_DURATION && it.owner!!.userId.toLong() != UserManager.getInstance().user.id) {
                         ret.add(ShowTo1v1RoomInfo(
                             roomId = it.roomId,
                             roomName = it.roomName,
@@ -202,9 +202,8 @@ class ShowTo1v1ServiceImpl constructor(
                 }
                 //按照创建时间顺序排序
                 ret.sortBy { it.createdAt }
-                val roomList = ret.filter { it.userId.toLong() != UserManager.getInstance().user.id }
-                ShowTo1v1Logger.d(TAG, "getRoomList end, roomCount:${roomList.size}")
-                runOnMainThread { completion.invoke(null, roomList.toList()) }
+                ShowTo1v1Logger.d(TAG, "getRoomList end, roomCount:${ret.size}")
+                runOnMainThread { completion.invoke(null, ret.toList()) }
             }
         }
     }
