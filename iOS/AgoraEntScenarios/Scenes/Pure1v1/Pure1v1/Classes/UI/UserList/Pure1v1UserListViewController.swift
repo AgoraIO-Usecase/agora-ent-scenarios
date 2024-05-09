@@ -13,6 +13,19 @@ import AgoraCommon
 import AgoraRtmKit
 import AudioScenarioApi
 
+
+func pure1v1CreateRtmClient(appId: String, userId: String) -> AgoraRtmClientKit {
+    let rtmConfig = AgoraRtmClientConfig(appId: appId, userId: userId)
+    rtmConfig.presenceTimeout = 30
+    var rtmClient: AgoraRtmClientKit? = nil
+    do {
+        rtmClient = try AgoraRtmClientKit(rtmConfig, delegate: nil)
+    } catch {
+        pure1v1Print("create rtm client fail: \(error.localizedDescription)")
+    }
+    return rtmClient!
+}
+
 //当前api设置的状态
 struct Pure1v1APISetupStatus: OptionSet {
     let rawValue: Int
@@ -86,7 +99,7 @@ class Pure1v1UserListViewController: UIViewController {
     }()
     
     private lazy var rtcEngine = _createRtcEngine()
-    private lazy var rtmClient: AgoraRtmClientKit = createRtmClient(appId: AppContext.shared.appId, userId: userInfo!.userId)
+    private lazy var rtmClient: AgoraRtmClientKit = pure1v1CreateRtmClient(appId: AppContext.shared.appId, userId: userInfo!.userId)
     private var rtmManager: CallRtmManager?
     private var callState: CallStateType = .idle
     private var connectedUserId: UInt?
