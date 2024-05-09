@@ -78,7 +78,7 @@ extension AUISyncManager {
         let commonConfig = AUIRoomContext.shared.commonConfig!
         let userInfo = AUIRoomContext.shared.currentUserInfo
         let rtmConfig = AgoraRtmClientConfig(appId: commonConfig.appId, userId: userInfo.userId)
-        rtmConfig.presenceTimeout = 30
+        rtmConfig.presenceTimeout = 300
         if rtmConfig.userId.count == 0 {
             aui_error("userId is empty")
             assert(false, "userId is empty")
