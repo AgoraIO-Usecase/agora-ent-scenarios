@@ -260,8 +260,9 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
     func onCallEventChanged(with event: CallEvent, eventReason: String?) {
         pure1v1Print("onCallEventChanged event: \(event.rawValue) eventReason: '\(eventReason ?? "")'")
         switch event {
-        case .localLeave, .remoteLeave:
+        case .remoteLeft:
             _hangupAction()
+            AUIToast.show(text: "call_toast_remote_fail".pure1v1Localization())
         default:
             break
         }

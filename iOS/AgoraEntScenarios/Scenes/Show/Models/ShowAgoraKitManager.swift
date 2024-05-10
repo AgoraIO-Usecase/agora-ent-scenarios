@@ -259,11 +259,8 @@ class ShowAgoraKitManager: NSObject {
     
     func renewToken(channelId: String) {
         showPrint("renewToken with channelId: \(channelId)",
-                        context: kShowLogBaseContext)
-        NetworkManager.shared.generateToken(channelName: "",
-                                            uid: UserInfo.userId,
-                                            tokenType: .token007,
-                                            type: .rtc) {[weak self] token in
+                  context: kShowLogBaseContext)
+        preGenerateToken {[weak self] token in
             guard let token = token else {
                 showError("renewToken fail: token is empty")
                 return
@@ -345,7 +342,7 @@ class ShowAgoraKitManager: NSObject {
             return
         }
         
-        showPrint("updateChannelEx[\(channelId)] role: \(options.clientRoleType.rawValue) \(options.publishMicrophoneTrack) \(options.publishCameraTrack)")
+        showPrint("updateChannelEx[\(channelId)] role: \(options.clientRoleType.rawValue) publishMicrophoneTrack:\(options.publishMicrophoneTrack) publishCameraTrack:\(options.publishCameraTrack)")
         engine.updateChannelEx(with: options, connection: connection)
     }
     
@@ -369,7 +366,7 @@ class ShowAgoraKitManager: NSObject {
         showPrint("switchRole[\(channelId)], role: \(role?.rawValue ?? -1) localUid:\(UserInfo.userId) uid: \(uid)", context: kShowLogBaseContext)
         if role == .broadcaster {
             audioApi?.setAudioScenario(sceneType: .Show, audioScenarioType: .Show_InteractiveAudience)
-        }
+        } 
         
         if let role = role {
             let roleOptions = AgoraRtcChannelMediaOptions()
@@ -651,6 +648,25 @@ extension ShowAgoraKitManager: AgoraRtcMediaPlayerDelegate {
     func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
         if state == .openCompleted {
             playerKit.play()
+        }
+    }
+}
+
+
+extension ShowAgoraKitManager {
+    func preGenerateToken(completion: ((String?)->())?) {
+        AppContext.shared.rtcToken = nil
+        NetworkManager.shared.generateToken(channelName: "",
+                                            uid: UserInfo.userId,
+                                            tokenType: .token007,
+                                            type: .rtc) { token in
+            guard let token = token else {
+                showError("renewToken fail: token is empty")
+                completion?(nil)
+                return
+            }
+            AppContext.shared.rtcToken = token
+            completion?(token)
         }
     }
 }

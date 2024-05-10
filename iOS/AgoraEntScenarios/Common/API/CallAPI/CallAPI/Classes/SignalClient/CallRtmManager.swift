@@ -10,6 +10,7 @@ import AgoraRtmKit
 
 public func createRtmClient(appId: String, userId: String) -> AgoraRtmClientKit {
     let rtmConfig = AgoraRtmClientConfig(appId: appId, userId: userId)
+    rtmConfig.presenceTimeout = 300
     var rtmClient: AgoraRtmClientKit? = nil
     do {
         rtmClient = try AgoraRtmClientKit(rtmConfig, delegate: nil)
@@ -20,7 +21,7 @@ public func createRtmClient(appId: String, userId: String) -> AgoraRtmClientKit 
 }
 
 func callMessagePrint(_ message: String) {
-    pure1v1Print(message)
+    NSLog(message)
 }
 
 /// CallRtmManager回调协议
@@ -32,10 +33,8 @@ public protocol ICallRtmManagerListener: NSObjectProtocol {
     /// rtm连接断开
     func onDisconnected()
     
-    /// rtm中断，需要重新login
-    func onConnectionLost()
-    
-    ///token即将过期，需要renew token
+    /// token即将过期，需要renew token
+    /// - Parameter channelName: 即将过期的频道名
     func onTokenPrivilegeWillExpire(channelName: String)
 }
 
@@ -55,6 +54,12 @@ public class CallRtmManager: NSObject {
         self.rtmClient.removeDelegate(self)
     }
     
+    
+    /// 初始化
+    /// - Parameters:
+    ///   - appId: 声网AppId
+    ///   - userId: 用户id
+    ///   - rtmClient: [可选]声网实时消息(Rtm)实例，传空则CallRtmManager内部自行创建
     public required init(appId: String, userId: String, rtmClient: AgoraRtmClientKit? = nil) {
         if let rtmClient = rtmClient {
             //如果外部传入rtmclient，默认登陆成功
@@ -74,10 +79,18 @@ public class CallRtmManager: NSObject {
         callMessagePrint("init-- CallMessageManager ")
     }
     
+    
+    /// 获取到rtm实例，使用该方法获取到后传递给CallRtmSignalClient
+    /// - Returns: rtm实例对象
     public func getRtmClient() -> AgoraRtmClientKit {
         return rtmClient
     }
     
+    
+    /// rtm登录
+    /// - Parameters:
+    ///   - rtmToken: rtm token
+    ///   - completion: 完成回调
     public func login(rtmToken: String, completion: @escaping ((NSError?) -> ())) {
         callMessagePrint("initialize")
         if rtmToken.isEmpty, isExternalRtmClient == false {
@@ -99,6 +112,8 @@ public class CallRtmManager: NSObject {
         }
     }
     
+    
+    /// 登出
     public func logout() {
         if isExternalRtmClient == false {
             rtmClient.logout()
@@ -151,10 +166,6 @@ extension CallRtmManager: AgoraRtmClientDelegate {
         callMessagePrint("rtm connectionChangedToState: \(state.rawValue) reason: \(reason.rawValue)")
         if reason == .changedTokenExpired {
             self.delegate?.onTokenPrivilegeWillExpire(channelName: channelName)
-        } else if reason == .changedChangedLost {
-            //TODO: 内部重试，rtm 2.2.0支持
-            self.isConnected = false
-            self.delegate?.onConnectionLost()
         } else if state == .connected {
             if self.isConnected == true { return }
             self.isConnected = true

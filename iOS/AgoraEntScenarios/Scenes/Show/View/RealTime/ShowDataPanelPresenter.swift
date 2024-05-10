@@ -151,6 +151,7 @@ class ShowDataPanelPresenter {
         // micro stream switch
         let microStream = send ? ((localVideoStats.dualStreamEnabled) ? onStr : offStr) : "--"
         let microStreamStr = "show_statistic_micro_stream_switch".show_localized + ": " + microStream
+        let localUidStr = "show_statistic_local_userid".show_localized + ": " + VLUserCenter.user.id
         // right:
         // device cpu level
         let levelStr = "show_statistic_device_level".show_localized
@@ -164,7 +165,7 @@ class ShowDataPanelPresenter {
         let svc = send ? (params.svc ? onStr : offStr) : "--"
         let svcStr = "show_statistic_svc_switch".show_localized + ": " + svc
         let left = [title, startupStr, h265Str, srStr,  microStreamStr].joined(separator: "\n") + "\n"
-        let right = ["  ", levelStr,  pvcStr, svcStr].joined(separator: "\n") + "\n"
+        let right = ["  ", levelStr,  pvcStr, svcStr, localUidStr].joined(separator: "\n") + "\n"
         return ShowPanelData(left: left, right: right)
     }
 }

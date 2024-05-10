@@ -103,6 +103,7 @@ open class AUIUploadNetworkModel: AUINetworkModel {
         var headers = super.getHeaders()
         let contentType = "multipart/form-data; boundary=\(boundary)"
         headers["Content-Type"] = contentType
+        headers["Authorization"] = VLUserCenter.user.token
         return headers
     }
     

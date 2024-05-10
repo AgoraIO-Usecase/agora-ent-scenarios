@@ -8,16 +8,17 @@
 import Foundation
 
 public class AUIListCollection: AUIBaseCollection {
-    private var currentList: [[String: Any]] = []{
-        didSet {
-            if isValuesEqual(oldValue, currentList) {return}
-            self.attributesDidChangedClosure?(channelName, observeKey, AUIAttributesModel(list: currentList))
-        }
-    }
+    private var currentList: [[String: Any]] = []
 }
 
 //MARK: private set meta data
 extension AUIListCollection {
+    private func updateCurrentListAndNotify(_ list: [[String: Any]], _ needNotify: Bool) {
+        if isValuesEqual(list, currentList) || needNotify == false {return}
+        currentList = list
+        self.attributesDidChangedClosure?(channelName, observeKey, AUIAttributesModel(list: currentList))
+    }
+    
     private func rtmAddMetaData(publisherId: String,
                                 valueCmd: String?,
                                 value: [String: Any],
@@ -55,7 +56,8 @@ extension AUIListCollection {
             aui_collection_log("rtmAddMetaData completion: \(error?.localizedDescription ?? "success")")
             callback?(error)
         }
-        currentList = list
+        
+        updateCurrentListAndNotify(list, true)
     }
     
     private func rtmSetMetaData(publisherId: String,
@@ -102,7 +104,7 @@ extension AUIListCollection {
             aui_collection_log("rtmSetMetaData completion: \(error?.localizedDescription ?? "success")")
             callback?(error)
         }
-        currentList = list
+        updateCurrentListAndNotify(list, true)
     }
     
     private func rtmMergeMetaData(publisherId: String,
@@ -147,7 +149,7 @@ extension AUIListCollection {
             aui_collection_log("rtmMergeMetaData completion: \(error?.localizedDescription ?? "success")")
             callback?(error)
         }
-        currentList = list
+        updateCurrentListAndNotify(list, true)
     }
     
     private func rtmRemoveMetaData(publisherId: String,
@@ -189,7 +191,7 @@ extension AUIListCollection {
             aui_collection_log("rtmRemoveMetaData completion: \(error?.localizedDescription ?? "success")")
             callback?(error)
         }
-        currentList = list
+        updateCurrentListAndNotify(list, true)
     }
     
     private func rtmCalculateMetaData(publisherId: String,
@@ -221,11 +223,18 @@ extension AUIListCollection {
                 return
             }
             
-            guard let tempItem = calculateMap(origMap: item,
-                                              key: key,
-                                              value: value.value,
-                                              min: value.min,
-                                              max: value.max) else {
+            var tempItem: [String: Any]?
+            do {
+                tempItem = try calculateMap(origMap: item,
+                                            key: key,
+                                            value: value.value,
+                                            min: value.min,
+                                            max: value.max)
+            } catch {
+                callback?(error as NSError)
+                return
+            }
+            guard let tempItem = tempItem else {
                 callback?(AUICollectionOperationError.calculateMapFail.toNSError())
                 return
             }
@@ -242,14 +251,14 @@ extension AUIListCollection {
             callback?(AUICollectionOperationError.encodeToJsonStringFail.toNSError())
             return
         }
-        aui_collection_log("rtmCalculateMetaData valueCmd: \(valueCmd ?? "") key: \(key), value: \(value)")
+        aui_collection_log("rtmCalculateMetaData valueCmd: \(valueCmd ?? "") key: \(key), value: \(value) filter: \(filter)")
         self.rtmManager.setBatchMetadata(channelName: channelName,
                                          lockName: kRTM_Referee_LockName,
                                          metadata: [observeKey: value]) { error in
             aui_collection_log("rtmCalculateMetaData completion: \(error?.localizedDescription ?? "success")")
             callback?(error)
         }
-        currentList = list
+        updateCurrentListAndNotify(list, true)
     }
     
     private func rtmCleanMetaData(callback: ((NSError?)->())?) {
@@ -486,13 +495,15 @@ extension AUIListCollection {
     public override func onAttributesDidChanged(channelName: String, key: String, value: Any) {
         guard channelName == self.channelName, key == self.observeKey else {return}
         guard let list = value as? [[String: Any]] else {return}
-        self.currentList = list
+        //如果是仲裁者，不更新，因为本地已经修改了，否则这里收到的消息可能是老的数据，例如update1->update2->resp1->resp2，那么resp1的数据比update2要老，会造成ui上短暂的回滚
+        let needNotify = AUIRoomContext.shared.getArbiter(channelName: channelName)?.isArbiter() ?? false == true ? false : true
+        updateCurrentListAndNotify(list, needNotify)
     }
 }
 
 //MARK: override AUIRtmMessageProxyDelegate
 extension AUIListCollection {
-    public override func onMessageReceive(publisher: String, message: String) {
+    public override func onMessageReceive(publisher: String, channelName: String, message: String) {
         guard let map = decodeToJsonObj(message) as? [String: Any],
               let collectionMessage: AUICollectionMessage = decodeModel(map),
               collectionMessage.sceneKey == observeKey else {
@@ -509,7 +520,13 @@ extension AUIListCollection {
                 let error: AUICollectionError? = decodeModel(data)
                 let code = error?.code ?? 0
                 let reason = error?.reason ?? "success"
-                callback(code == 0 ? nil : AUICollectionOperationError.recvErrorReceipt.toNSError("code: \(code), reason: \(reason)"))
+                if code == 0 {
+                    callback(nil)
+                } else if let err = AUICollectionOperationError(rawValue: code) {
+                    callback(err.toNSError(reason))
+                } else {
+                    callback(AUICollectionOperationError.recvErrorReceipt.toNSError("code: \(code), reason: \(reason)"))
+                }
             }
             return
         }

@@ -37,23 +37,25 @@ TODO: Add long description of the pod here.
 
   s.source_files = ['Context/*.swift',
                     'Common/Manager/Helper/UserCenter/*',
+                    'Common/Manager/StateManager/*',
+                    'Common/Manager/Authorized/*',
+                    'Common/Manager/NetworkManager/*',
+                    'Common/Manager/VLDefine/VLMacroDefine.*',
                     'Common/UI/VLNetwork/Model/VLBaseModel.*',
                     'Common/UI/Base/View/VLBaseView.*',
                     'Common/UI/Base/View/VLUIView.*',
-                     'Common/UI/Base/View/VerifyCodeView.*',
-                     'Common/UI/Base/View/VRVerifyCodeTextView.*',
+                    'Common/UI/Base/View/VerifyCodeView.*',
+                    'Common/UI/Base/View/VRVerifyCodeTextView.*',
                     'Common/UI/VLEmptyView/VLEmptyView.h',
                     'Common/UI/Base/ViewController/VLBaseViewController.*',
                     'Common/UI/Base/View/VRVerifyCodeNumberView.*',
                     'Common/UI/VLFont/VLDeviceUtils.h',
-                    'Common/Manager/Authorized/AgoraEntAuthorizedManager.*',
                     'Common/Extension/String+Extension.swift',
                     'Common/Extension/UIImage+Resize.swift',
                     'HomeMenu/Login/Model/VLLoginModel.*',
                     'ThirdParty/QMUI/*',
                     'Common/Network/AUIError.*',
                     'Common/Utils/AESMacro.h',
-                    'Common/Manager/VLDefine/VLMacroDefine.*',
                     'Common/Network/AgoraEntCommonLogger.*',
                     'Common/Network/AUINetworking.*',
                     'Common/Network/VLNetworkModel.swift',
@@ -73,7 +75,6 @@ TODO: Add long description of the pod here.
                     'Common/UI/ToastView/AUiMoreDialog.*',
                     'Common/UI/Base/View/AttributedTextView.*',
                     'Common/UI/Base/View/KTVCreateRoomPresentView.swift',
-                    'Common/Manager/NetworkManager/NetworkManager.swift'
                     ]
                     
  s.resources = ['AgoraCommon/*.bundle']

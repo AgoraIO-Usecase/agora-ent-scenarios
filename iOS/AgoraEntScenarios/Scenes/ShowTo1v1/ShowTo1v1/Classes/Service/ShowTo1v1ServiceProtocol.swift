@@ -53,7 +53,7 @@ protocol ShowTo1v1ServiceProtocol: NSObjectProtocol {
     
     /// 获取房间列表
     /// - Parameter completion: 完成回调
-    func getRoomList(completion: @escaping ([ShowTo1v1RoomInfo]) -> Void)
+    func getRoomList(completion: @escaping (NSError?, [ShowTo1v1RoomInfo]?) -> Void)
     
     /// 订阅回调变化
     /// - Parameter listener: <#listener description#>

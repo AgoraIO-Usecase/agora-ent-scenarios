@@ -44,7 +44,7 @@ class Pure1v1ServiceImp: NSObject {
         owner.userAvatar = user.avatar
         config.owner = owner
         config.host = "\(AppContext.shared.baseServerUrl)/room-manager"
-        let manager = AUISyncManager(rtmClient: nil, commonConfig: config)
+        let manager = AUISyncManager(rtmClient: rtmClient, commonConfig: config)
         
         return manager
     }()
@@ -87,21 +87,16 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
         }
         let date = Date()
         userService.bindRespDelegate(delegate: self)
-        //TODO: Rtm 2.1.10及以下会有subscribe无返回的bug，先做workaround，等升级2.1.11后移除delay
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
-            self.syncManager.rtmManager.subscribe(channelName: kRoomId) {[weak self] err in
-                guard let self = self else {return}
-                pure1v1Print("enterRoom subscribe cost: \(-Int(date.timeIntervalSinceNow * 1000)) ms")
-                completion(err)
-                self.isEnterSuccess = err == nil ? true : false
-            }
+        syncManager.rtmManager.subscribe(channelName: kRoomId) {[weak self] err in
+            guard let self = self else {return}
+            pure1v1Print("enterRoom subscribe cost: \(-Int(date.timeIntervalSinceNow * 1000)) ms")
+            completion(err)
+            self.isEnterSuccess = err == nil ? true : false
         }
         
     }
     
     func leaveRoom(completion: @escaping (NSError?) -> Void) {
-        rtmClient.logout()
-        rtmClient.destroy()
         userService.unbindRespDelegate(delegate: self)
         isEnterSuccess = false
         completion(nil)

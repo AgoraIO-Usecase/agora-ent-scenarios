@@ -14,6 +14,7 @@ let kShowLogBaseContext = "AgoraKit"
 private let kShowRoomListKey = "kShowRoomListKey"
 private let kRtcTokenMapKey = "kRtcTokenMapKey"
 private let kRtcToken = "kRtcToken"
+private let kRtcTokenDate = "kRtcTokenDate"
 private let kDebugModeKey = "kDebugModeKey"
 
 func showLogger() -> SwiftyBeaver.Type {
@@ -86,9 +87,19 @@ extension AppContext {
     public var rtcToken: String? {
         set {
             self.extDic[kRtcToken] = newValue
+            self.tokenDate = Date()
         }
         get {
             return self.extDic[kRtcToken] as? String
+        }
+    }
+    
+    public var tokenDate: Date? {
+        set {
+            self.extDic[kRtcTokenDate] = newValue
+        }
+        get {
+            return self.extDic[kRtcTokenDate] as? Date
         }
     }
 }

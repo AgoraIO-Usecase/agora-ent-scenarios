@@ -16,7 +16,7 @@ public typealias AUICreateRoomCallback = (NSError?, AUIRoomInfo?) -> ()
 
 public typealias AUIUserListCallback = (NSError?, [AUIUserInfo]?) -> ()
 
-public typealias AUIRoomListCallback = (NSError?, [AUIRoomInfo]?) -> ()
+public typealias AUIRoomListCallback = (NSError?, Int64, [AUIRoomInfo]?) -> ()
 
 extension AUIRoomInfo {
     class func modelCustomPropertyMapper() -> NSDictionary {
