@@ -42,8 +42,6 @@ public class ShowTo1v1UserInfo: NSObject {
 //    }
 }
 
-private let kCreateAtKey = "createdAt"
-
 @objcMembers
 public class ShowTo1v1RoomInfo: ShowTo1v1UserInfo {
     public var roomId: String = ""
@@ -55,15 +53,13 @@ public class ShowTo1v1RoomInfo: ShowTo1v1UserInfo {
         self.init()
         self.roomId = roomInfo.roomId
         self.roomName = roomInfo.roomName
+        self.createdAt = roomInfo.createTime
         if let owner = roomInfo.owner {
             self.uid = owner.userId
             self.avatar = owner.userAvatar
             self.userName = owner.userName
         } else {
             assert(false)
-        }
-        if let createTime = roomInfo.customPayload[kCreateAtKey] as? Int64 {
-            self.createdAt = createTime
         }
     }
     
@@ -76,7 +72,6 @@ public class ShowTo1v1RoomInfo: ShowTo1v1UserInfo {
         owner.userName = userName
         owner.userAvatar = avatar
         roomInfo.owner = owner
-        roomInfo.customPayload = [kCreateAtKey: createdAt]
         return roomInfo
     }
 }

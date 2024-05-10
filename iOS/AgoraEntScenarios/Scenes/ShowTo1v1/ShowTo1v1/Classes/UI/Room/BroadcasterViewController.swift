@@ -200,6 +200,10 @@ class BroadcasterViewController: BaseRoomViewController {
     
     private func _publishMedia(_ publish: Bool) {
         guard let currentUser = currentUser, let roomInfo = roomInfo, let uid = UInt(currentUser.uid) else {return}
+        if publish {
+            rtcEngine?.enableLocalVideo(true)
+            rtcEngine?.enableLocalAudio(true)
+        }
         if currentUser.uid == roomInfo.uid {
             let mediaOptions = AgoraRtcChannelMediaOptions()
             mediaOptions.publishCameraTrack = publish
@@ -237,7 +241,13 @@ class BroadcasterViewController: BaseRoomViewController {
         if actionType == .call {
             AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
             AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
-            callApi?.call(remoteUserId: roomInfo!.getUIntUserId(), completion: { err in
+            callApi?.call(remoteUserId: roomInfo!.getUIntUserId(), completion: {[weak self] err in
+                guard let err = err else { return }
+                self?.callApi?.cancelCall(completion: { _ in
+                })
+                
+                let msg = "\("call_toast_callfail".showTo1v1Localization()): \(err.code)"
+                AUIToast.show(text: msg)
             })
             return
         }

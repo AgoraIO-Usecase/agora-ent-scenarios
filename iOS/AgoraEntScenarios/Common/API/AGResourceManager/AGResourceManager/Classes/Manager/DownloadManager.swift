@@ -99,6 +99,12 @@ public class DownloadManager: NSObject {
         let configuration = URLSessionConfiguration.default
         configuration.httpMaximumConnectionsPerHost = 3
         self.session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+        if let urlCache = URLSession.shared.configuration.urlCache {
+            // 删除所有缓存
+            urlCache.removeAllCachedResponses()
+            // 或者根据特定的 URL 请求删除缓存
+            // urlCache.removeCachedResponse(for: URLRequest(url: yourURL))
+        }
     }
 }
 
@@ -240,7 +246,7 @@ extension DownloadManager: IAGDownloadManager {
         }
         
         let temporaryDirectoryURL = FileManager.default.temporaryDirectory
-        let temporaryPath = "\(temporaryDirectoryURL.path)/\(md5 ?? "default")"
+        let temporaryPath = "\(temporaryDirectoryURL.path)/\(md5 ?? NSUUID().uuidString)"
         let currentLength = fileSize(atPath: temporaryPath)
         
         var request = URLRequest(url: url)

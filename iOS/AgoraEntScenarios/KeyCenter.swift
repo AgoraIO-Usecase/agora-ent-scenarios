@@ -22,7 +22,6 @@ class KeyCenter: NSObject {
      则应使用不同的 App ID。如果应用程序需要相互通信，则应使用同一个App ID。
      进入声网控制台(https://console.shengwang.cn/)，创建一个项目，进入项目配置页，即可看到APP ID。
      */
-    
     static let AppId: String = <#Your AppId#>
   
     /**
@@ -37,7 +36,7 @@ class KeyCenter: NSObject {
      进入声网控制台(https://console.shengwang.cn/)，创建一个带证书鉴权的项目，进入项目配置页，即可看到APP证书。
      注意：如果项目没有开启证书鉴权，这个字段留空。
      */
-
+    
     static let Certificate: String? = <#Your Certificate#>
 
     /**
@@ -98,7 +97,7 @@ class KeyCenter: NSObject {
     static let CloudPlayerSecret: String? = nil
 
     static var baseServerUrl: String? = "https://service.shengwang.cn"
-    static var baseTestServerUrl: String? = "https://service-staging.shengwang.cn"
+    static var baseTestServerUrl: String? = "https://service-staging.agora.io"
     static var onlineBaseServerUrl: String? = baseServerUrl
     
     static var dynamicResourceUrl: String = ""

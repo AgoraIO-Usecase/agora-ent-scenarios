@@ -100,7 +100,7 @@ public class NetworkManager:NSObject {
                               uid: String,
                               tokenType: TokenGeneratorType,
                               type: AgoraTokenType,
-                              expire: UInt = 1500,
+                              expire: UInt = 24 * 60 * 60,
                               success: @escaping (String?) -> Void)
     {
         /*

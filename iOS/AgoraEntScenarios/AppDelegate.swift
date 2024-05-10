@@ -31,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppContext.shared.imClientSecret = KeyCenter.IMClientSecret ?? ""
         AppContext.shared.cloudPlayerKey = KeyCenter.CloudPlayerKey ?? ""
         AppContext.shared.cloudPlayerSecret = KeyCenter.CloudPlayerSecret ?? ""
-        AppContext.shared.baseServerUrl = KeyCenter.baseServerUrl ?? ""
+        AppContext.shared.baseServerUrl = KeyCenter.onlineBaseServerUrl ?? ""
         
         
         AGResourceManagerContext.shared.displayLogClosure = { text in

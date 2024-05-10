@@ -16,15 +16,20 @@ import AgoraRtcKit
     public var signalClient: ISignalClient!                //信令通道对象实例
 }
 
-//TODO: 如何不设置万能token
 @objc public class PrepareConfig: NSObject {
     public var roomId: String = ""                      //自己的Rtc频道名，用于呼叫对端用户时让对端用户加入这个RTC频道
     public var rtcToken: String = ""                    //rtc token，需要使用万能token，token创建的时候channel name为空字符串
     public var localView: UIView!                       //显示本地流的画布
     public var remoteView: UIView!                      //显示远端流的画布
-    public var autoJoinRTC: Bool = false                //是否在不呼叫的情况下提前加入自己的RTC频道，该设置可以加快呼叫的出图速度
     public var callTimeoutMillisecond: UInt64 = 15000   //呼叫超时时间，单位毫秒，0表示内部不处理超时
     public var userExtension: [String: Any]?            //[可选]用户扩展字段，收到对端消息而改变状态(例如calling/connecting)时可以通过kFromUserExtension字段获取
+}
+
+
+/// 呼叫类型
+@objc public enum CallType: UInt {
+    case video = 0    //视频呼叫
+    case audio        //音频呼叫
 }
 
 /// 呼叫状态
@@ -50,14 +55,18 @@ import AgoraRtcKit
     case localAccepted = 8         //本地用户接受
     case localHangup = 9           //本地用户挂断
     case remoteHangup = 10         //远端用户挂断
-    case localCancel = 11          //本地用户取消呼叫
-    case remoteCancel = 12         //远端用户取消呼叫
+    case localCancelled = 11        //本地用户取消呼叫
+    case remoteCancelled = 12       //远端用户取消呼叫
     case recvRemoteFirstFrame = 13 //收到远端首帧
     case callingTimeout = 14       //本地呼叫超时
     case cancelByCallerRecall = 15 //同样的主叫呼叫不同频道导致取消
 //    case rtmLost = 16              //rtm超时断连[2.0.0废弃，请从信令管理中实现中处理相关的异常]
     case remoteCallBusy = 17       //远端用户忙
     case remoteCallingTimeout = 18 //远端呼叫超时
+    case localVideoCall = 30       //本地发起视频呼叫
+    case localAudioCall = 31       //本地发起音频呼叫
+    case remoteVideoCall = 32      //远端发起视频呼叫
+    case remoteAudioCall = 33      //远端发起音频呼叫
 }
 
 /// 呼叫事件
@@ -71,27 +80,33 @@ import AgoraRtcKit
 //    case rtmSetupSuccessed = 7                    //设置RTM成功[2.0.0已废弃，Rtm是否成功请通过CallRtmSignalClient的login显式调用]
 //    case messageFailed = 8                        //消息发送失败[已废弃，请使用onCallErrorOccur(state: sendMessageFail)]
     case stateMismatch = 9                        //状态流转异常
+    case joinRTCStart = 10                        //本地已经加入Rtc频道，但是还未成功(调用了JoinChannelEx)
     case remoteUserRecvCall = 99                  //主叫呼叫成功
     case localRejected = 100                      //本地用户拒绝
     case remoteRejected = 101                     //远端用户拒绝
-    case onCalling = 102                          //变成呼叫中
+//    case onCalling = 102                          //变成呼叫中[2.1.0废弃，请参考localVideoCall/localAudioCall/remoteVideoCall/remoteAudioCall]
     case remoteAccepted = 103                     //远端用户接收
     case localAccepted = 104                      //本地用户接收
     case localHangup = 105                        //本地用户挂断
     case remoteHangup = 106                       //远端用户挂断
-    case remoteJoin = 107                         //远端用户加入RTC频道
-    case remoteLeave = 108                        //远端用户离开RTC频道(eventReason请参考AgoraUserOfflineReason)
-    case localCancel = 109                        //本地用户取消呼叫
-    case remoteCancel = 110                       //远端用户取消呼叫
-    case localJoin = 111                          //本地用户加入RTC频道
-    case localLeave = 112                         //本地用户离开RTC频道
-    case recvRemoteFirstFrame = 113               //收到远端首帧
+    case remoteJoined = 107                       //远端用户加入RTC频道
+    case remoteLeft = 108                         //远端用户离开RTC频道(eventReason请参考AgoraUserOfflineReason)
+    case localCancelled = 109                      //本地用户取消呼叫
+    case remoteCancelled = 110                     //远端用户取消呼叫
+    case localJoined = 111                        //本地用户加入RTC频道
+    case localLeft = 112                          //本地用户离开RTC频道
+    case recvRemoteFirstFrame = 113               //收到远端首帧(视频呼叫为视频帧首帧，音频呼叫为音频帧首帧)
 //    case cancelByCallerRecall = 114               //同样的主叫呼叫不同频道导致取消[已废弃]
 //    case rtmLost = 115                            //rtm超时断连[2.0.0废弃，请从信令管理中实现中处理相关的异常]
 //    case rtcOccurError = 116                      //rtc出现错误[已废弃，请使用onCallErrorOccur(state: rtcOccurError)]
     case remoteCallBusy = 117                     //远端用户忙
     case captureFirstLocalVideoFrame = 119        //采集到首帧视频帧
     case publishFirstLocalVideoFrame = 120        //推送首帧视频帧成功
+    case publishFirstLocalAudioFrame = 130        //推送首帧音频帧成功[2.1.0开始支持]
+    case localVideoCall = 140                     //本地发起视频呼叫
+    case localAudioCall = 141                     //本地发起音频呼叫
+    case remoteVideoCall = 142                    //远端发起视频呼叫
+    case remoteAudioCall = 143                    //远端发起音频呼叫
 }
 
 /// 呼叫错误事件
@@ -214,11 +229,24 @@ import AgoraRtcKit
     /// - Parameter listener: <#listener description#>
     func removeListener(listener: CallApiListenerProtocol)
     
-    /// 发起呼叫邀请，主叫调用，通过prepareForCall设置的RTC频道号和远端用户建立RTC通话连接
+    /// 发起呼叫邀请(为视频呼叫)，主叫调用，通过prepareForCall设置的RTC频道号和远端用户建立RTC通话连接
     /// - Parameters:
     ///   - remoteUserId: 呼叫的用户id
     ///   - completion: <#completion description#>
     func call(remoteUserId: UInt, completion: ((NSError?)->())?)
+    
+    
+    /// 发起呼叫邀请，主叫调用，通过prepareForCall设置的RTC频道号和远端用户建立RTC通话连接
+    /// - Parameters:
+    ///   - remoteUserId: 呼叫的用户id
+    ///   - callType: 呼叫类型： 0: 视频呼叫， 1: 音频呼叫
+    ///   - callExtension: 呼叫需要扩展的字段，收到对端消息而改变状态(例如calling/connecting)时可以通过kFromUserExtension字段获取
+    ///   - completion: <#completion description#>
+    func call(remoteUserId: UInt, 
+              callType: CallType,
+              callExtension: [String: Any], 
+              completion: ((NSError?)->())?)
+    
     
     /// 取消正在发起的呼叫邀请，主叫调用
     /// - Parameter completion: <#completion description#>

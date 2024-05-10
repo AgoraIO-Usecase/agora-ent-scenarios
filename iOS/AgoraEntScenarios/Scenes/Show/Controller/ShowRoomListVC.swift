@@ -12,6 +12,21 @@ import AgoraCommon
 class ShowRoomListVC: UIViewController {
     let backgroundView = UIImageView()
     
+    private lazy var stateManager: AppStateManager = {
+        let manager = AppStateManager()
+        manager.appStateChangeHandler = { [weak self] isInBackground in
+            if isInBackground { return }
+            self?.checkTokenValid()
+        }
+        
+        manager.networkStatusChangeHandler = { [weak self] isAvailable in
+            guard isAvailable else { return }
+            self?.checkTokenValid()
+        }
+        
+        return manager
+    }()
+    
     private lazy var delegateHandler = {
         let handler = ShowCollectionLoadingDelegateHandler(localUid: UInt(UserInfo.userId)!)
 //        handler.didSelected = {[weak self] room in
@@ -76,6 +91,7 @@ class ShowRoomListVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        _ = stateManager
         AppContext.shared.sceneImageBundleName = "showResource"
         createViews()
         createConstrains()
@@ -94,6 +110,7 @@ class ShowRoomListVC: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        checkTokenValid()
         autoRefreshing()
     }
     
@@ -149,7 +166,7 @@ class ShowRoomListVC: UIViewController {
         }
     }
     
-   private func autoRefreshing(){
+    private func autoRefreshing(){
         if !refreshControl.isRefreshing {
             collectionView.setContentOffset(CGPoint(x: 0, y: -refreshControl.frame.size.height), animated: true)
             refreshControl.beginRefreshing()
@@ -160,20 +177,19 @@ class ShowRoomListVC: UIViewController {
     }
 
     private func preGenerateToken() {
-        AppContext.shared.rtcToken = nil
-        NetworkManager.shared.generateToken(
-            channelName: "",
-            uid: "\(UserInfo.userId)",
-            tokenType: .token007,
-            type: .rtc,
-            expire: 24 * 60 * 60
-        ) {[weak self] token in
+        ShowAgoraKitManager.shared.preGenerateToken {[weak self] token in
             guard let self = self, let rtcToken = token, rtcToken.count > 0 else {
                 return
             }
-            AppContext.shared.rtcToken = rtcToken
             self.delegateHandler.preLoadVisibleItems(scrollView: self.collectionView)
         }
+    }
+    
+    private func checkTokenValid() {
+        guard AppContext.shared.rtcToken?.count ?? 0 > 0, let date = AppContext.shared.tokenDate, Int64(-date.timeIntervalSinceNow) < 20 * 60 * 60 else{
+            return
+        }
+        preGenerateToken()
     }
 }
 // MARK: - UICollectionView Call Back
