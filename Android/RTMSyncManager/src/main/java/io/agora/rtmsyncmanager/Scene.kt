@@ -194,7 +194,7 @@ class Scene constructor(
     /// 销毁scene，清理所有缓存（包括rtm的所有metadata）
     fun delete() {
         AUILogger.logger().d(tag,"delete")
-        cleanScene()
+        cleanScene(true)
         getArbiter().destroy()
         cleanSDK()
         AUIRoomContext.shared().cleanRoom(channelName)
@@ -250,8 +250,8 @@ class Scene constructor(
         //TODO: 用户离开后，需要清理这个用户对应在collection里的信息，例如上麦信息、点歌信息等
     }
 
-    private fun cleanScene() {
-        if (!getArbiter().isArbiter()) {
+    private fun cleanScene(forceClean: Boolean = false) {
+        if (!getArbiter().isArbiter() && !forceClean) {
             return
         }
         _cleanScene()
