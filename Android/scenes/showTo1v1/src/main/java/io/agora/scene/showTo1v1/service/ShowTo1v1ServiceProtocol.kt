@@ -30,7 +30,7 @@ interface ShowTo1v1ServiceListenerProtocol {
     fun onUserListDidChanged(userNum: Int)
 
     // 房间销毁
-    fun onRoomDidDestroy(roomInfo: ShowTo1v1RoomInfo)
+    fun onRoomDidDestroy(roomId: String)
 
     // 房间体验时间到
     fun onRoomTimeUp()

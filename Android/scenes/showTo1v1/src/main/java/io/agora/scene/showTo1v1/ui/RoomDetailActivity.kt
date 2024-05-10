@@ -548,8 +548,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 binding.tvNumCount.text = userNum.number2K()
             }
 
-            override fun onRoomDidDestroy(roomInfo: ShowTo1v1RoomInfo) {
-                if (mRoomInfo.roomId == roomInfo.roomId) {
+            override fun onRoomDidDestroy(roomId: String) {
+                if (mRoomInfo.roomId == roomId) {
                     onBackPressed()
                 }
             }
