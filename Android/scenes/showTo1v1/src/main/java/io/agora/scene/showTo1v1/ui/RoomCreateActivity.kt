@@ -102,16 +102,24 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
                 return@setOnClickListener
             }
             enableCrateRoomButton(false)
-            mService?.createRoom(roomName, completion = { error, roomInfo ->
-                if (error == null && roomInfo != null) { // success
-                    isFinishToLiveDetail = true
-                    RoomDetailActivity.launch(this, false, roomInfo)
-                    finish()
-                } else { //failed
-                    ToastUtils.showToast(error?.message)
+            mShowTo1v1Manger.renewTokens {
+                if (it) {
+                    mShowTo1v1Manger.setup(this)
+                    mService?.createRoom(roomName, completion = { error, roomInfo ->
+                        if (error == null && roomInfo != null) { // success
+                            isFinishToLiveDetail = true
+                            RoomDetailActivity.launch(this, false, roomInfo)
+                            finish()
+                        } else { //failed
+                            ToastUtils.showToast(error?.message)
+                            enableCrateRoomButton(true)
+                        }
+                    })
+                } else {
+                    ToastUtils.showToast("fetch token failed!")
                     enableCrateRoomButton(true)
                 }
-            })
+            }
         }
 
     }

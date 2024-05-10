@@ -247,6 +247,8 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         mService?.getRoomList(completion = { error, roomList ->
             if (error != null) {
                 ToastUtils.showToast(getString(R.string.show_to1v1_room_list_refreshed, error.message))
+                binding.smartRefreshLayout.finishRefresh()
+                return@getRoomList
             }
             mRoomInfoList.clear()
             mRoomInfoList.addAll(roomList)
@@ -419,8 +421,9 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                             if (it.isShowing) it.dismiss()
                             mCallDialog = null
                         }
+                    } else if ((stateReason == CallStateReason.LocalHangup || stateReason == CallStateReason.RemoteHangup) && mShowTo1v1Manger.isCaller) {
+                        fetchRoomList()
                     }
-                    fetchRoomList()
                 }
 
                 CallStateType.Calling -> {

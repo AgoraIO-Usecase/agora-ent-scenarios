@@ -3,6 +3,7 @@ package io.agora.scene.showTo1v1.service
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import io.agora.rtm.*
 import io.agora.rtmsyncmanager.ISceneResponse
 import io.agora.rtmsyncmanager.SyncManager
@@ -32,8 +33,6 @@ class ShowTo1v1ServiceImpl constructor(
 
     companion object {
         private const val TAG = "Show1v1_LOG"
-        private const val kSceneId = "scene_Livetoprivate_4.2.0"
-        private const val SYNC_SCENE_ROOM_USER_COLLECTION = "userCollection"
     }
 
     private val kSceneId = "scene_Livetoprivate_421"
@@ -52,6 +51,10 @@ class ShowTo1v1ServiceImpl constructor(
 
     private var listener: ShowTo1v1ServiceListenerProtocol? = null
 
+    private var isConnected = false
+
+    private var needDestroy = ""
+
     init {
         HttpManager.setBaseURL(BuildConfig.ROOM_MANAGER_SERVER_HOST)
         AUILogger.initLogger(AUILogger.Config(context, "showTo1v1"))
@@ -67,6 +70,25 @@ class ShowTo1v1ServiceImpl constructor(
         commonConfig.host = BuildConfig.TOOLBOX_SERVER_HOST
         AUIRoomContext.shared().setCommonConfig(commonConfig)
         syncManager = SyncManager(context, rtmClient, commonConfig)
+        rtmClient.addEventListener(object :RtmEventListener {
+            override fun onConnectionStateChanged(
+                channelName: String?,
+                state: RtmConstants.RtmConnectionState?,
+                reason: RtmConstants.RtmConnectionChangeReason?
+            ) {
+                super.onConnectionStateChanged(channelName, state, reason)
+                if (state == RtmConstants.RtmConnectionState.CONNECTED) {
+                    isConnected = true
+                    if (needDestroy != "") {
+                        val scene = syncManager.getScene(needDestroy)
+                        scene.delete()
+                        needDestroy = ""
+                    }
+                } else if (state == RtmConstants.RtmConnectionState.DISCONNECTED) {
+                    isConnected = false
+                }
+            }
+        })
     }
 
     override fun reset() {
@@ -130,6 +152,7 @@ class ShowTo1v1ServiceImpl constructor(
         scene.bindRespDelegate(this)
         scene.enter { _, e ->
             if (e != null) {
+                scene.leave()
                 ShowTo1v1Logger.e(TAG, e,"joinRoom failed，roomId:${roomInfo.roomId}")
                 completion.invoke(Exception(e.message))
             } else {
@@ -183,7 +206,7 @@ class ShowTo1v1ServiceImpl constructor(
                 list.forEach {
                     val aliveTime = ts - it.createTime
                     ShowTo1v1Logger.d(TAG, "room alive time: $aliveTime, roomId: ${it.roomId}")
-                    if (aliveTime < ROOM_AVAILABLE_DURATION) {
+                    if (aliveTime < ROOM_AVAILABLE_DURATION && it.owner!!.userId.toLong() != UserManager.getInstance().user.id) {
                         ret.add(ShowTo1v1RoomInfo(
                             roomId = it.roomId,
                             roomName = it.roomName,
@@ -199,6 +222,12 @@ class ShowTo1v1ServiceImpl constructor(
                             } else {
                                 ShowTo1v1Logger.d(TAG, "broadcast leaveRoom end ${it.roomId}")
                             }
+                        }
+                        if (isConnected) {
+                            val scene = syncManager.getScene(it.roomId)
+                            scene.delete()
+                        } else {
+                            needDestroy = it.roomId
                         }
                     }
                 }
@@ -225,6 +254,7 @@ class ShowTo1v1ServiceImpl constructor(
     }
 
     override fun onSceneDestroy(roomId: String) {
+        listener?.onRoomDidDestroy(roomId)
         roomManager.destroyRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomId) {
             if (it!=null){
                 ShowTo1v1Logger.e(TAG, it,"destroyRoom failed，roomId:$roomId")

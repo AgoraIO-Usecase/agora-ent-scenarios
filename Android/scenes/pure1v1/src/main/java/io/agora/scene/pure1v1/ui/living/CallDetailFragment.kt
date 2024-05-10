@@ -50,11 +50,6 @@ class CallDetailFragment : Fragment(), ICallApiListener {
         return binding.root
     }
 
-    override fun onHiddenChanged(hidden: Boolean) {
-        super.onHiddenChanged(hidden)
-        Pure1v1Logger.d(TAG, "local pic debug onHiddenChanged: $hidden")
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupView()
@@ -99,7 +94,6 @@ class CallDetailFragment : Fragment(), ICallApiListener {
                     elapsed: Int
                 ) {
                     super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
-                    Pure1v1Logger.d(TAG, "onRemoteVideoStateChanged: uid:$uid, state:$state, reason:$reason")
                     if (state == Constants.REMOTE_VIDEO_STATE_STOPPED || state == Constants.REMOTE_VIDEO_STATE_FAILED) {
                         // 远端视频停止接收
                         runOnUiThread {
@@ -279,7 +273,11 @@ class CallDetailFragment : Fragment(), ICallApiListener {
     override fun onCallEventChanged(event: CallEvent, eventReason: String?) {
         when(event) {
             CallEvent.RemoteLeft -> {
-                ToastUtils.showToast(getString(R.string.pure1v1_call_toast_hangup2))
+                eventReason?.let {
+                    if (it.toInt() == Constants.USER_OFFLINE_DROPPED) {
+                        ToastUtils.showToast(getString(R.string.pure1v1_call_toast_hangup2))
+                    }
+                }
                 onHangup()
             }
             else -> {}

@@ -548,8 +548,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 binding.tvNumCount.text = userNum.number2K()
             }
 
-            override fun onRoomDidDestroy(roomInfo: ShowTo1v1RoomInfo) {
-                if (mRoomInfo.roomId == roomInfo.roomId) {
+            override fun onRoomDidDestroy(roomId: String) {
+                if (mRoomInfo.roomId == roomId) {
                     onBackPressed()
                 }
             }
@@ -825,7 +825,11 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
                 CallEvent.RemoteLeft -> {
                     // 主叫方离线，挂断
-                    ToastUtils.showToast(getString(R.string.show_to1v1_end_linking_tips2))
+                    eventReason?.let {
+                        if (it.toInt() == Constants.USER_OFFLINE_DROPPED) {
+                            ToastUtils.showToast(getString(R.string.show_to1v1_end_linking_tips2))
+                        }
+                    }
                     onHangup()
                 }
 
@@ -959,14 +963,16 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         "ShowTo1v1"
                     )
 
-                    // 设置音频最佳实践
-                    if (mShowTo1v1Manger.isCaller) {
-                        // 主叫
-                        mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Caller)
-                    } else {
-                        // 被叫
-                        mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
-                    }
+                    binding.root.postDelayed({
+                        // 设置音频最佳实践
+                        if (mShowTo1v1Manger.isCaller) {
+                            // 主叫
+                            mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Caller)
+                        } else {
+                            // 被叫
+                            mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
+                        }
+                    }, 500)
                 }
 
                 CallStateType.Failed -> {
