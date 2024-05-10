@@ -127,7 +127,7 @@ private let kDialogTag = 1112234567
 
 //主叫弹窗
 class Pure1v1CallerDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
-    
+    private var showCompletion: (()->())?
     private (set) var videoView = UIView()
     
     private lazy var tipsLabel: UILabel = {
@@ -271,6 +271,8 @@ class Pure1v1CallerDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
         UIView.animate(withDuration: kDialogAnimationDuration) {
             self.bgImageView.alpha = 1
             self.dialogView.aui_bottom = self.aui_height
+        } completion: { success in
+            self.showCompletion?()
         }
     }
     
@@ -283,13 +285,14 @@ class Pure1v1CallerDialog: Pure1v1Dialog, Pure1v1TextLoadingBinderDelegate {
         }
     }
     
-    static func show(user: Pure1v1UserInfo) -> Pure1v1CallerDialog? {
+    static func show(user: Pure1v1UserInfo, completion: (()->())?) -> Pure1v1CallerDialog? {
         Pure1v1CallerDialog.hidden()
         guard let window = getWindow() else {return nil}
         let dialog = Pure1v1CallerDialog(frame: window.bounds)
         dialog.userInfo = user
         dialog.tag = kDialogTag
         window.addSubview(dialog)
+        dialog.showCompletion = completion
         dialog.showAnimation()
         return dialog
     }

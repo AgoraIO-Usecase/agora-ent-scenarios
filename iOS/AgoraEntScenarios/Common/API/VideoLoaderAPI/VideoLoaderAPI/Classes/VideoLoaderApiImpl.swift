@@ -239,15 +239,6 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
             mediaOptions.autoSubscribeVideo = true
             
             isMuteAllRemoteAudioStreamsEx = true
-            if let engine = config?.rtcEngine,
-               let connection = exConnectionMap[anchorInfo.channelName]  {
-                DispatchQueue.main.async {
-                    engine.muteAllRemoteAudioStreamsEx(true, connection: connection)
-                }
-                
-            } else {
-                warningLoaderPrint("[\(anchorInfo.channelName)] muteAllRemoteAudioStreamsEx(true) fail")
-            }
         } else {
             mediaOptions.autoSubscribeAudio = false
             mediaOptions.autoSubscribeVideo = false

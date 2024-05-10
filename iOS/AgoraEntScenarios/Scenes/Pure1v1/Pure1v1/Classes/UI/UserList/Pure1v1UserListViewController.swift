@@ -13,6 +13,19 @@ import AgoraCommon
 import AgoraRtmKit
 import AudioScenarioApi
 
+
+func pure1v1CreateRtmClient(appId: String, userId: String) -> AgoraRtmClientKit {
+    let rtmConfig = AgoraRtmClientConfig(appId: appId, userId: userId)
+    rtmConfig.presenceTimeout = 30
+    var rtmClient: AgoraRtmClientKit? = nil
+    do {
+        rtmClient = try AgoraRtmClientKit(rtmConfig, delegate: nil)
+    } catch {
+        pure1v1Print("create rtm client fail: \(error.localizedDescription)")
+    }
+    return rtmClient!
+}
+
 //当前api设置的状态
 struct Pure1v1APISetupStatus: OptionSet {
     let rawValue: Int
@@ -22,6 +35,30 @@ struct Pure1v1APISetupStatus: OptionSet {
     static let rtm = Pure1v1APISetupStatus(rawValue: 1 << 2)
     static let syncService = Pure1v1APISetupStatus(rawValue: 1 << 3)
     static let callApi = Pure1v1APISetupStatus(rawValue: 1 << 4)
+}
+
+class TokenObject {
+    var rtmToken: String = ""
+    var rtcToken: String = ""
+    var updateTime: Date
+    
+    init(rtmToken: String, rtcToken: String) {
+        self.rtmToken = rtmToken
+        self.rtcToken = rtcToken
+        self.updateTime = Date()
+    }
+    
+    func isValid() -> Bool {
+        return rtmToken.count > 0 && rtcToken.count > 0
+    }
+    
+    func checkExpired() {
+        if Int64(-updateTime.timeIntervalSinceNow) < 20 * 60 * 60 {
+            return
+        }
+        rtmToken = ""
+        rtcToken = ""
+    }
 }
 
 private let kShowGuideAlreadyKey = "already_show_guide"
@@ -41,16 +78,28 @@ class Pure1v1UserListViewController: UIViewController {
         return player
     }()
     
-    private var rtcToken: String {
-        set {
-            self.prepareConfig.rtcToken = newValue
-        } get {
-            return self.prepareConfig.rtcToken
+    private var tokenObj = TokenObject(rtmToken: "", rtcToken: "") {
+        didSet {
+            self.prepareConfig.rtcToken = tokenObj.rtcToken
         }
     }
-    private var rtmToken: String = ""
+    private lazy var stateManager: AppStateManager = {
+        let manager = AppStateManager()
+        manager.appStateChangeHandler = { [weak self] isInBackground in
+            if isInBackground { return }
+            self?.checkTokenValid()
+        }
+        
+        manager.networkStatusChangeHandler = { [weak self] isAvailable in
+            guard isAvailable else { return }
+            self?.checkTokenValid()
+        }
+        
+        return manager
+    }()
+    
     private lazy var rtcEngine = _createRtcEngine()
-    private lazy var rtmClient: AgoraRtmClientKit = createRtmClient(appId: AppContext.shared.appId, userId: userInfo!.userId)
+    private lazy var rtmClient: AgoraRtmClientKit = pure1v1CreateRtmClient(appId: AppContext.shared.appId, userId: userInfo!.userId)
     private var rtmManager: CallRtmManager?
     private var callState: CallStateType = .idle
     private var connectedUserId: UInt?
@@ -107,6 +156,7 @@ class Pure1v1UserListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        _ = stateManager
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         view.addSubview(bgImgView)
         view.addSubview(noDataView)
@@ -135,11 +185,13 @@ class Pure1v1UserListViewController: UIViewController {
             
             AppContext.shared.resetDebugConfig(engine: rtcEngine)
         }
+        _autoRefrshAction()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        _autoRefrshAction()
+//        _autoRefrshAction()
+        checkTokenValid()
     }
     
     @objc func onDebugAction() {
@@ -150,9 +202,15 @@ class Pure1v1UserListViewController: UIViewController {
 
 //MARK: setup & invoke api/service
 extension Pure1v1UserListViewController {
+    private func checkTokenValid() {
+        tokenObj.checkExpired()
+        if tokenObj.isValid() { return }
+        tokenPrivilegeWillExpire()
+    }
+    
     private func _generateTokens(completion: @escaping (String?, String?) -> ()) {
-        if setupStatus.contains(.token), rtcToken.count > 0, rtmToken.count > 0 {
-            completion(rtcToken, rtmToken)
+        if setupStatus.contains(.token), tokenObj.isValid() {
+            completion(tokenObj.rtcToken, tokenObj.rtmToken)
             return
         }
         let date = Date()
@@ -168,8 +226,7 @@ extension Pure1v1UserListViewController {
                 return
             }
             
-            self.rtcToken = rtcToken
-            self.rtmToken = rtmToken
+            self.tokenObj = TokenObject(rtmToken: rtmToken, rtcToken: rtcToken)
             completion(rtcToken, rtmToken)
         }
     }
@@ -207,7 +264,7 @@ extension Pure1v1UserListViewController {
         
         let date = Date()
         rtmClient.logout()
-        rtmClient.login(self.rtmToken) { resp, err in
+        rtmClient.login(tokenObj.rtmToken) { resp, err in
             pure1v1Print("rtm login cost: \(-Int(date.timeIntervalSinceNow * 1000))ms")
             var error: NSError? = nil
             if let err = err {
@@ -271,7 +328,6 @@ extension Pure1v1UserListViewController {
         prepareConfig.roomId = NSString.withUUID()
         prepareConfig.localView = callVC.localCanvasView.canvasView
         prepareConfig.remoteView = callVC.remoteCanvasView.canvasView
-        prepareConfig.autoJoinRTC = false  // 如果期望立即加入自己的RTC呼叫频道，则需要设置为true
         prepareConfig.userExtension = userInfo?.yy_modelToJSONObject() as? [String: Any]
         callApi.prepareForCall(prepareConfig: prepareConfig) { err in
             // 成功即可以开始进行呼叫
@@ -306,9 +362,13 @@ extension Pure1v1UserListViewController {
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
         callApi.call(remoteUserId: remoteUserId) {[weak self] err in
-            guard let err = err else {return}
-            self?.callApi.cancelCall(completion: { err in
+            guard let self = self else {return}
+            guard let err = err, self.callState == .calling else {return}
+            self.callApi.cancelCall(completion: { err in
             })
+            
+            let msg = "\("call_toast_callfail".pure1v1Localization()): \(err.code)"
+            AUIToast.show(text: msg)
         }
     }
     
@@ -348,20 +408,21 @@ extension Pure1v1UserListViewController {
     @objc func _refreshAction() {
         let date = Date()
         _setupAPIConfig {[weak self] error in
-            guard let self = self, let service = self.service else { return }
+            guard let self = self else { return }
             if let error = error {
                 pure1v1Error("refresh _setupAPIConfig fail: \(error.localizedDescription)")
                 self.listView.endRefreshing()
-                AUIToast.show(text: error.localizedDescription)
+                AUIToast.show(text: "\("user_list_get_fail".pure1v1Localization())\(error.code)")
                 return
             }
+            guard let service = self.service else { return }
             pure1v1Print("refresh setupAPI cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
             service.enterRoom {[weak self] error in
                 guard let self = self, let service = self.service else { return }
                 if let error = error {
                     pure1v1Error("refresh enterRoom fail: \(error.localizedDescription)")
                     self.listView.endRefreshing()
-                    AUIToast.show(text: error.localizedDescription)
+                    AUIToast.show(text: "\("user_list_get_fail".pure1v1Localization())\(error.code)")
                     return
                 }
                 pure1v1Print("refresh enterRoom cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
@@ -370,14 +431,11 @@ extension Pure1v1UserListViewController {
                     self.listView.endRefreshing()
                     if let error = error {
                         pure1v1Error("refresh getUserList fail: \(error.localizedDescription)")
-                        AUIToast.show(text: error.localizedDescription)
+                        AUIToast.show(text: "\("user_list_get_fail".pure1v1Localization())\(error.code)")
                         return
                     }
                     pure1v1Print("refresh getUserList cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
                     self.userList = list
-                    if error != nil {
-                        AUIToast.show(text: error!.description)
-                    }
                 }
             }
         }
@@ -430,7 +488,12 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                         guard let self = self else {return}
                         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
                         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self)
-                        self.callApi.accept(remoteUserId: fromUserId) { err in
+                        self.callApi.accept(remoteUserId: fromUserId) {[weak self] err in
+                            guard let err = err else { return }
+                            self?.callApi.reject(remoteUserId: fromUserId, reason: "", completion: { _ in
+                            })
+                            let msg = "\("call_toast_acceptfail".pure1v1Localization()): \(err.code)"
+                            AUIToast.show(text: msg)
                         }
                     }
                     
@@ -452,14 +515,15 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 connectedChannelId = fromRoomId
                 //主叫userlist一定会有，因为需要点击
                 if let user = listView.userList.first {$0.userId == "\(toUserId)"} {
-                    let dialog = Pure1v1CallerDialog.show(user: user)
+                    let dialog = Pure1v1CallerDialog.show(user: user) { [weak self] in
+                        self?.startDail()
+                    }
                     dialog?.cancelClosure = {[weak self] in
                         self?.callApi.cancelCall(completion: { err in
                         })
                     }
                     callDialog = dialog
                     callVC.targetUser = user
-                    startDail()
                 } else {
                     pure1v1Print("caller user not found1")
                 }
@@ -498,8 +562,10 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             case .remoteHangup:
                 _updateCallChannel()
                 AUIToast.show(text: "call_toast_hangup".pure1v1Localization())
-            case .remoteRejected, .remoteCallBusy:
+            case .remoteRejected:
                 AUIToast.show(text: "call_toast_reject".pure1v1Localization())
+            case .remoteCallBusy:
+                AUIToast.show(text: "call_toast_busy".pure1v1Localization())
 //            case .callingTimeout:
 //                AUIToast.show(text: "无应答")
 //            case .localCancel, .remoteCancel:
@@ -678,16 +744,6 @@ extension Pure1v1UserListViewController: ICallRtmManagerListener {
     
     func onDisconnected() {
         pure1v1Print("onDisconnected")
-    }
-    
-    func onConnectionLost() {
-        pure1v1Print("onConnectionLost")
-        AUIToast.show(text: "call_toast_disconnect".pure1v1Localization())
-        self.setupStatus.remove(.rtm)
-        //掉线了，需要重新enter，否则对端看不到
-        self.service?.leaveRoom(completion: { _ in
-        })
-        _autoRefrshAction()
     }
     
     func onTokenPrivilegeWillExpire(channelName: String) {

@@ -12,11 +12,8 @@ extension PrepareConfig {
         let config = PrepareConfig()
         config.roomId = roomId
         config.rtcToken = rtcToken
-//        config.rtmToken = rtmToken
         config.localView = localView
         config.remoteView = remoteView
-//        config.autoAccept = autoAccept
-        config.autoJoinRTC = autoJoinRTC
         config.callTimeoutMillisecond = callTimeoutMillisecond
         config.userExtension = userExtension
         return config

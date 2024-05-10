@@ -21,6 +21,7 @@
 		DD1F53592B9FF0C0009E4287 /* AGResourceManager+Ent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1F53582B9FF0C0009E4287 /* AGResourceManager+Ent.swift */; };
 		DD1F535F2B9FF7C1009E4287 /* FUDynmicResourceConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = DD1F535E2B9FF7C1009E4287 /* FUDynmicResourceConfig.m */; };
 		DD1F53652BA01D9F009E4287 /* fu_authpack_reader.c in Sources */ = {isa = PBXBuildFile; fileRef = DD1F53642BA01D9F009E4287 /* fu_authpack_reader.c */; };
+		DD227ECA2BE9CE4F00013A18 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DD227EC92BE9CE4F00013A18 /* PrivacyInfo.xcprivacy */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
 		DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */; };
 		DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DD2A43D028FFCEE7004CEDCF /* Main.storyboard */; };
@@ -759,6 +760,7 @@
 		DD1F53632BA01D9F009E4287 /* fu_authpack_reader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fu_authpack_reader.h; sourceTree = "<group>"; };
 		DD1F53642BA01D9F009E4287 /* fu_authpack_reader.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = fu_authpack_reader.c; sourceTree = "<group>"; };
 		DD220BC1295B340A00F57F30 /* MenuUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuUtils.h; sourceTree = "<group>"; };
+		DD227EC92BE9CE4F00013A18 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -1808,6 +1810,7 @@
 		DD2A43C928FFCEE7004CEDCF /* AgoraEntScenarios */ = {
 			isa = PBXGroup;
 			children = (
+				DD227EC92BE9CE4F00013A18 /* PrivacyInfo.xcprivacy */,
 				DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */,
 				DDA198DC28FFE579009D3E61 /* Common */,
 				DDA1997928FFE579009D3E61 /* ThirdParty */,
@@ -4313,6 +4316,7 @@
 				DD84179029090C520026B624 /* Media.xcassets in Resources */,
 				DD2A43D428FFCEE7004CEDCF /* Assets.xcassets in Resources */,
 				E301C0042AF8E8E90089A79C /* README.md in Resources */,
+				DD227ECA2BE9CE4F00013A18 /* PrivacyInfo.xcprivacy in Resources */,
 				E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */,
 				DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */,
 				E301C0052AF8E8E90089A79C /* sbg_scene.png in Resources */,
@@ -5291,11 +5295,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YS397FG5PA;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5431,8 +5433,6 @@
 					"-framework",
 					"\"SDWebImage\"",
 					"-framework",
-					"\"SDWebImageAPNGCoder\"",
-					"-framework",
 					"\"SSZipArchive\"",
 					"-framework",
 					"\"SVGAPlayer\"",
@@ -5505,7 +5505,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.test.entfull;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = wildcard;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AgoraEntScenarios/AgoraEntScenarios-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -5522,11 +5521,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YS397FG5PA;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5662,8 +5659,6 @@
 					"-framework",
 					"\"SDWebImage\"",
 					"-framework",
-					"\"SDWebImageAPNGCoder\"",
-					"-framework",
 					"\"SSZipArchive\"",
 					"-framework",
 					"\"SVGAPlayer\"",
@@ -5736,7 +5731,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.test.entfull;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = wildcard;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AgoraEntScenarios/AgoraEntScenarios-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -5751,7 +5745,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = JDPG69R49Z;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;

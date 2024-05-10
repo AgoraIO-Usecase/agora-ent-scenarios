@@ -26,9 +26,13 @@
 "call_title_reject"="拒绝";
 "call_usage_tips"=" 本产品仅用于功能体验，单次直播时长不超过20mins";
 "call_toast_hangup"="对方结束连线";
+"call_toast_remote_fail"="对方已离开, 连线自动结束";
 "call_toast_reject"="对方已拒绝";
+"call_toast_busy"="呼叫失败, 对方正忙";
+"call_toast_callfail"="网络不佳, 呼叫失败, 错误码：";
+"call_toast_acceptfail"="网络不佳，接受邀请失败，错误码：";
 
-"call_toast_disconnect"="连接中断，重连中...";
+"user_list_get_fail"="网络不佳, 用户列表刷新失败, 建议重试, 错误:";
 
 "report_room" = "举报";
 "report_room_success" = "举报成功";
