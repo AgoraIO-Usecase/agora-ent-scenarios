@@ -2033,7 +2033,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(weakSelf.selSongsArray.count == 0){
             return;
         }
-        [weakSelf loadAndPlaySong];
+        //[weakSelf loadAndPlaySong];
     }];
 }
 
