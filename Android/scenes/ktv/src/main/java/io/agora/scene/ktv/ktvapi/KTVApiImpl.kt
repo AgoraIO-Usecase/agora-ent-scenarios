@@ -188,11 +188,13 @@ class KTVApiImpl(
 
     // 日志输出
     private fun ktvApiLog(msg: String) {
+        if (isRelease) return
         apiReporter.writeLog("[$tag][${ktvApiConfig.type}] $msg", LOG_LEVEL_INFO)
     }
 
     // 日志输出
     private fun ktvApiLogError(msg: String) {
+        if (isRelease) return
         apiReporter.writeLog("[$tag][${ktvApiConfig.type}] $msg", LOG_LEVEL_ERROR)
     }
 

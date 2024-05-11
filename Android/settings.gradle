@@ -38,10 +38,10 @@ include ':scenes:ktv_singbattle'
  */
 include ':scenes:ktv_relay'
 
-/**
- * 大合唱
- */
-include ':scenes:cantata'
+///**
+// * 大合唱
+// */
+//include ':scenes:cantata'
 
 /*
  * 语聊房
