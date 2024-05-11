@@ -1159,7 +1159,7 @@ extension CantataMainViewController {
     
     private func checkInEarMonitoring() {
         if singerRole != .audience {
-            self.RtcKit.enable(inEarMonitoring: isEarOn, includeAudioFilters: .builtInAudioFilters)
+            self.RtcKit.enable(inEarMonitoring: isEarOn, includeAudioFilters: .none)
         }
     }
     
