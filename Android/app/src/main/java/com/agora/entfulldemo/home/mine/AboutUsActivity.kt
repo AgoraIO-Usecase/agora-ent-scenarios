@@ -83,7 +83,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         adapter.scenes = mutableListOf<SceneInfo>()
         adapter.appInfo = AppInfo(
             this.getString(R.string.app_name),
-            "20240331-" + VersionUtils.getVersion("io.agora.scene.ktv.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
+            "20240511-" + VersionUtils.getVersion("io.agora.scene.ktv.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
             servicePhone,
             webSite
         )
