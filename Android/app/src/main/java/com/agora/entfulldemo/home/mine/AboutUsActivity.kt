@@ -39,6 +39,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val kSingBattleRoomAppID = "io.agora.singbattle"
     private val kCantataAppID = "io.agora.cantata"
     private val kShowRoomAppID = "io.agora.test.entfull"
+    private val kJoyRoomAppID = "io.agora.joy"
 
     private var counts = 0
     private val debugModeOpenTime: Long = 2000
@@ -66,7 +67,9 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             setupSingRelayAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kCantataAppID) {
             setupCantataAppInfo()
-        } else {
+        } else if (BuildConfig.APPLICATION_ID == kJoyRoomAppID){
+            setupJoyAppInfo()
+        }else {
             setupFullAppInfo()
         }
         setupDebugMode()
@@ -154,6 +157,20 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         }
     }
 
+    // 设置小玩法的信息
+    private fun setupJoyAppInfo() {
+        adapter.scenes = mutableListOf<SceneInfo>()
+        if (VersionUtils.getVersion("io.agora.scene.joy.BuildConfig").isNotEmpty()) {
+            adapter.appInfo = AppInfo(
+                this.getString(R.string.app_about_joy),
+                "20231230-" + VersionUtils.getVersion("io.agora.scene.joy.BuildConfig") + "-" + RtcEngine
+                    .getSdkVersion(),
+                servicePhone,
+                webSite
+            )
+        }
+    }
+
     // 设置综合App的信息
     private fun setupFullAppInfo() {
         val scenes = mutableListOf<SceneInfo>()
@@ -226,6 +243,14 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
                 SceneInfo(
                     this.getString(R.string.app_about_showTo1v1),
                     "XCSMF-" + VersionUtils.getVersion("io.agora.scene.showTo1v1.BuildConfig")
+                )
+            )
+        }
+        if (VersionUtils.getVersion("io.agora.scenes.joy.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_joy),
+                    "XWF-" + VersionUtils.getVersion("io.agora.scene.showTo1v1.BuildConfig")
                 )
             )
         }

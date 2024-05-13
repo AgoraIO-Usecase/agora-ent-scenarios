@@ -165,10 +165,6 @@ class AUIRtmMsgProxy : RtmEventListener {
         metadata ?: return
         val items = metadata.items
         if (metadata.items.isEmpty()) {
-            if (isMetaEmpty) {
-                return
-            }
-            isMetaEmpty = true
             errorRespObservers.forEach { handler ->
                 handler.onMsgReceiveEmpty(channelName)
             }

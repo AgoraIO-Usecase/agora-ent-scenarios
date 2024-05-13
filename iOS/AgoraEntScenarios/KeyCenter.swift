@@ -23,7 +23,7 @@ class KeyCenter: NSObject {
      进入声网控制台(https://console.shengwang.cn/)，创建一个项目，进入项目配置页，即可看到APP ID。
      */
     static let AppId: String = <#Your AppId#>
-  
+    
     /**
      Certificate.
      Agora provides App certificate to generate Token. You can deploy and generate a token on your server,
@@ -38,7 +38,7 @@ class KeyCenter: NSObject {
      */
     
     static let Certificate: String? = <#Your Certificate#>
-
+    
     /**
      Token.
      Agora provides Temporary Access Token to join the spatial channel with APP ID which enable App Certificate.
@@ -103,4 +103,9 @@ class KeyCenter: NSObject {
     static var dynamicResourceUrl: String = ""
 //    static var dynamicResourceUrl: String = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/resource/manifest/manifestList"
 
+    static var baseServerUrlDev: String? = "https://service-staging.agora.io/toolbox/"
+    static var baseServerUrl: String? = "https://service.shengwang.cn/toolbox/"
+    static var joyHostDev: String = "https://service-staging.agora.io/room-manager"
+    static var joyHost: String = "https://service.shengwang.cn/room-manager"
+    static var onlineBaseServerUrl: String? = baseServerUrl
 }

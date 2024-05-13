@@ -90,7 +90,6 @@ open class AUIRtmMsgProxy: NSObject {
             weakObjects.add(delegate)
             attributesDelegates[key] = weakObjects
         }
-
         let cache = attributesCacheAttr[channelName]
         let item = cache?[itemKey]
         guard let itemData = item?.data(using: .utf8), let itemValue = try? JSONSerialization.jsonObject(with: itemData) else {

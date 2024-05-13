@@ -23,16 +23,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func configKeyCenterData() {
+        
+        var isDebugMode = false
+        if let index: Int = UserDefaults.standard.object(forKey: "TOOLBOXENV") as? Int {
+            isDebugMode = index == 1
+        } else {
+            isDebugMode = false
+        }
+        
         AppContext.shared.appId = KeyCenter.AppId
         AppContext.shared.certificate = KeyCenter.Certificate ?? ""
         AppContext.shared.hostUrl = KeyCenter.HostUrl
+        AppContext.shared.roomManagerUrl = isDebugMode ? (KeyCenter.joyHostDev) : (KeyCenter.joyHost)
         AppContext.shared.imAppKey = KeyCenter.IMAppKey ?? ""
         AppContext.shared.imClientId = KeyCenter.IMClientId ?? ""
         AppContext.shared.imClientSecret = KeyCenter.IMClientSecret ?? ""
         AppContext.shared.cloudPlayerKey = KeyCenter.CloudPlayerKey ?? ""
         AppContext.shared.cloudPlayerSecret = KeyCenter.CloudPlayerSecret ?? ""
-        AppContext.shared.baseServerUrl = KeyCenter.onlineBaseServerUrl ?? ""
-        
+        AppContext.shared.baseServerUrl = isDebugMode ? (KeyCenter.baseServerUrlDev ?? "") : (KeyCenter.baseServerUrl ?? "")
         
         AGResourceManagerContext.shared.displayLogClosure = { text in
             asyncToMainThread {

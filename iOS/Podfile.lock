@@ -82,6 +82,18 @@ PODS:
     - HXPhotoPicker/Picker/Lite
   - HXPhotoPicker/Picker/Lite (4.1.7):
     - HXPhotoPicker/Core
+  - Joy (0.1.0):
+    - AgoraCommon
+    - AgoraRtcEngine_Special_iOS
+    - AgoraSyncManager
+    - RTMSyncManager
+    - SDWebImage
+    - SnapKit
+    - SVProgressHUD
+    - SwiftProtobuf (= 1.24.0)
+    - SwiftyBeaver
+    - YYCategories
+    - YYModel
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
   - LEEAlert (1.6.4)
@@ -139,6 +151,7 @@ PODS:
   - SVGAPlayer/ProtoFiles (2.5.7):
     - Protobuf (~> 3.4)
   - SVProgressHUD (2.2.5)
+  - SwiftProtobuf (1.24.0)
   - SwiftTheme (0.6.4)
   - SwiftyBeaver (1.9.5)
   - VideoLoaderAPI (0.1.3):
@@ -162,7 +175,6 @@ DEPENDENCIES:
   - AGResourceManager (from `AgoraEntScenarios/Common/API/AGResourceManager`)
   - AudioScenarioApi (from `AgoraEntScenarios/Common/API/AudioScenarioApi`)
   - Bugly (= 2.5.93)
-  - bytedEffect (from `bytedEffect.podspec`)
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
   - Cantata (from `AgoraEntScenarios/Scenes/Cantata`)
   - fuLib (from `fu.podspec`)
@@ -203,7 +215,6 @@ SPEC REPOS:
     - AUIKitCore
     - Bugly
     - FLAnimatedImage
-    - FURenderKit
     - HXPhotoPicker
     - JXCategoryView
     - KakaJSON
@@ -220,6 +231,7 @@ SPEC REPOS:
     - SSZipArchive
     - SVGAPlayer
     - SVProgressHUD
+    - SwiftProtobuf
     - SwiftTheme
     - SwiftyBeaver
     - YYCategories
@@ -240,8 +252,8 @@ EXTERNAL SOURCES:
     :path: AgoraEntScenarios/Common/API/CallAPI
   Cantata:
     :path: AgoraEntScenarios/Scenes/Cantata
-  fuLib:
-    :path: fu.podspec
+  Joy:
+    :path: AgoraEntScenarios/Scenes/Joy
   Pure1v1:
     :path: AgoraEntScenarios/Scenes/Pure1v1
   RTMSyncManager:
@@ -292,6 +304,7 @@ SPEC CHECKSUMS:
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
+  SwiftProtobuf: bcfd2bc231cf9ae552cdc7c4e877bd3b41fe57b1
   SwiftTheme: 007cbaf1f9e171caf6448a4657533e54c682b285
   SwiftyBeaver: 84069991dd5dca07d7069100985badaca7f0ce82
   VideoLoaderAPI: e42bcbf9c836297f0006d7a90068ffbf935c9acd

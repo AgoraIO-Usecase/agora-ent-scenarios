@@ -11,6 +11,7 @@ import Pure1v1;
 import ShowTo1v1;
 import AgoraCommon
 import Cantata
+import Joy
 @objc
 class HomeContentViewController: UIViewController {
     @objc var changeToNavigationBarAlpha: ((CGFloat) -> Void)?
@@ -88,10 +89,11 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
         NetworkManager.shared.reportDeviceInfo(sceneName: model.type.sceneName)
         NetworkManager.shared.reportUserBehavior(sceneName: model.type.sceneName)
         
-        switch model.type {
-        case .solo:
-            let vc = VLOnLineListVC()
-            navigationController?.pushViewController(vc, animated: true)
+        let userInfo = JoyUserInfo()
+        userInfo.userId = UInt(VLUserCenter.user.id) ?? 0
+        userInfo.userName = VLUserCenter.user.name
+        userInfo.avatar = VLUserCenter.user.headUrl
+        JoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: AppContext.shared.roomManagerUrl, appCertificate: KeyCenter.Certificate ?? "", userInfo: userInfo)
         
         case .chorus:
             let vc = CantataPlugin.getCantataRootViewController()
