@@ -151,7 +151,7 @@ class ShowAgoraKitManager: NSObject {
                                      "traceId": NSString.withUUID().md5(),
                                      "src": "iOS",
                                      "payload": JSONObject.toJsonString(dict: userInfo) ?? ""]
-        let baseURL = AppContext.shared.baseServerUrl ?? ""
+        let baseURL = AppContext.shared.baseServerUrl
         NetworkManager.shared.postRequest(urlString: "\(baseURL)/toolbox/v1/moderation/audio",
                                           params: parasm) { response in
             showPrint("response === \(response)")

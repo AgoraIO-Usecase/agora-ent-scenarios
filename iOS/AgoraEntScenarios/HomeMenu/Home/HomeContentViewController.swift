@@ -89,15 +89,15 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
         NetworkManager.shared.reportDeviceInfo(sceneName: model.type.sceneName)
         NetworkManager.shared.reportUserBehavior(sceneName: model.type.sceneName)
         
-        let userInfo = JoyUserInfo()
-        userInfo.userId = UInt(VLUserCenter.user.id) ?? 0
-        userInfo.userName = VLUserCenter.user.name
-        userInfo.avatar = VLUserCenter.user.headUrl
-        JoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: AppContext.shared.roomManagerUrl, appCertificate: KeyCenter.Certificate ?? "", userInfo: userInfo)
-        
+        switch model.type {
+        case .solo:
+            let vc = VLOnLineListVC()
+            navigationController?.pushViewController(vc, animated: true)
+            
         case .chorus:
             let vc = CantataPlugin.getCantataRootViewController()
             self.navigationController?.pushViewController(vc, animated: true)
+            
         case .continue_singing:
             let vc = VLSROnLineListVC()
             navigationController?.pushViewController(vc, animated: true)
@@ -116,7 +116,7 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
         case .show:
             let vc = ShowRoomListVC()
             navigationController?.pushViewController(vc, animated: true)
-    
+            
         case .one_v_one:
             let userInfo = Pure1v1UserInfo()
             userInfo.userId = VLUserCenter.user.id
@@ -135,6 +135,13 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
             userInfo.avatar = VLUserCenter.user.headUrl
             ShowTo1v1Context.showScene(viewController: self,
                                        userInfo: userInfo)
+       
+        case .game:
+            let userInfo = JoyUserInfo()
+            userInfo.userId = UInt(VLUserCenter.user.id) ?? 0
+            userInfo.userName = VLUserCenter.user.name
+            userInfo.avatar = VLUserCenter.user.headUrl
+            JoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: AppContext.shared.roomManagerUrl, appCertificate: KeyCenter.Certificate ?? "", userInfo: userInfo)
         }
     }
     

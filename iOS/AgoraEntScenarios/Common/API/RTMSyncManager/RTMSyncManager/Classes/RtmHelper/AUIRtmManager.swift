@@ -100,9 +100,11 @@ open class AUIRtmManager: NSObject {
         isLogin = false
     }
     
-    public func renew(token: String) {
+    public func renew(token: String, completion: ((NSError?)->())? = nil) {
         aui_info("renew: \(token)", tag: "AUIRtmManager")
-        rtmClient.renewToken(token)
+        rtmClient.renewToken(token) { _, err in
+            completion?(err == nil ? nil : AUICommonError.rtmError(Int32(err?.errorCode.rawValue ?? 0)).toNSError())
+        }
     }
 }
 

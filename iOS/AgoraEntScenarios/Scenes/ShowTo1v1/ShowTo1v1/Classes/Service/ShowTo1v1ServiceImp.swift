@@ -34,7 +34,7 @@ class ShowTo1v1ServiceImp: NSObject {
         owner.userName = user.userName
         owner.userAvatar = user.avatar
         config.owner = owner
-        config.host = "\(AppContext.shared.baseServerUrl)/room-manager"
+        config.host = AppContext.shared.roomManagerUrl
         let manager = AUISyncManager(rtmClient: rtmClient, commonConfig: config)
         
         return manager

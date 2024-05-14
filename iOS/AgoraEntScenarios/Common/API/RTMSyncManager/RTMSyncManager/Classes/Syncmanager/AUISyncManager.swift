@@ -46,8 +46,8 @@ public class AUISyncManager: NSObject {
         }
     }
     
-    public func renew(token: String) {
-        rtmManager.renew(token: token)
+    public func renew(token: String, completion: ((NSError?)->())? = nil) {
+        rtmManager.renew(token: token, completion: completion)
     }
     
     public func createScene(channelName: String) -> AUIScene {

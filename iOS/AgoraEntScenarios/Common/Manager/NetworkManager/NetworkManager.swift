@@ -585,7 +585,7 @@ extension NetworkManager {
             "headUrl":headUrl
         ]
         
-        let baseUrl = AppContext.shared.baseServerUrl
+        let baseUrl = self.baseServerUrl
         
         NetworkTools().request("\(baseUrl)/v1/ktv/song/grab", method: .post, parameters: params) {[weak self] result in
             switch result{
@@ -612,7 +612,7 @@ extension NetworkManager {
             "src": "postman"
         ]
         
-        let baseUrl = AppContext.shared.baseServerUrl
+        let baseUrl = self.baseServerUrl
         
         NetworkTools().request("\(baseUrl)/v1/ktv/song/grab/query".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "", method: .get, parameters: params) { result in
             switch result {
