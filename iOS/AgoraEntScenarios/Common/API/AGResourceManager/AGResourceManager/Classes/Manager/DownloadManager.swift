@@ -8,7 +8,7 @@
 import Foundation
 import CommonCrypto
 
-public func asyncToMainThread(closure: @escaping (() -> Void)) {
+func asyncToMainThread(closure: @escaping (() -> Void)) {
     if Thread.isMainThread {
         closure()
         return
@@ -149,13 +149,17 @@ extension DownloadManager: URLSessionDataDelegate {
 }
 
 extension DownloadManager: IAGDownloadManager {
-    public func checkResource(destinationPath: String, 
+    public func checkResource(destinationPath: String,
+                              fileSize: UInt64,
                               md5: String?,
                               completionHandler: @escaping (NSError?) -> Void) {
         let fm = FileManager.default
         
         //如果是文件夹，文件夹存在且zip不存在，暂时用来表示该md5文件解压正确且完成了
-        if calculateTotalSize(destinationPath) > 0 {
+        let totalSize = calculateTotalSize(destinationPath)
+        aui_info("calc fileSize: \(totalSize)/\(fileSize) \(destinationPath)")
+        //需要不小于原始文件大小
+        if totalSize >= fileSize {
             asyncToMainThread {
                 completionHandler(nil)
             }
@@ -222,6 +226,7 @@ extension DownloadManager: IAGDownloadManager {
         let fm = FileManager.default
         if fm.fileExists(atPath: destinationPath) {
             checkResource(destinationPath: destinationPath, 
+                          fileSize: 0,
                           md5: md5) { err in
                 guard let err = err else {
                     completionHandler(URL(string: destinationPath), nil)
@@ -294,6 +299,7 @@ extension DownloadManager: IAGDownloadManager {
     }
     
     public func startDownloadZip(withURL url: URL,
+                                 fileSize: UInt64,
                                  md5: String,
                                  destinationFolderPath: String,
                                  progressHandler: @escaping (Double) -> Void,
@@ -301,8 +307,8 @@ extension DownloadManager: IAGDownloadManager {
         let temporaryDirectoryURL = FileManager.default.temporaryDirectory
         let destinationZipPath = "\(temporaryDirectoryURL.path)/\(md5).zip"
         
-        //文件夹存在且zip不存在，暂时用来表示该md5文件解压正确且完成了
-        if calculateTotalSize(destinationFolderPath) > 0,
+        //文件夹存在且zip不存在，并且解压的资源大小不小于解压前的大小，暂时用来表示该md5文件解压正确且完成了
+        if calculateTotalSize(destinationFolderPath) >= fileSize,
            !FileManager.default.fileExists(atPath: destinationZipPath) {
             
             completionHandler(URL(string: destinationFolderPath), nil)

@@ -36,6 +36,7 @@ public protocol IAGDownloadManager: NSObjectProtocol {
     ///   - progressHandler: <#progressHandler description#>
     ///   - completionHandler: <#completionHandler description#>
     func startDownloadZip(withURL url: URL,
+                          fileSize: UInt64,
                           md5: String,
                           destinationFolderPath: String,
                           progressHandler: @escaping (Double) -> Void,
@@ -47,7 +48,8 @@ public protocol IAGDownloadManager: NSObjectProtocol {
     /// - Parameters:
     ///   - url: <#url description#>
     ///   - completionHandler: <#completionHandler description#>
-    func checkResource(destinationPath: String, 
+    func checkResource(destinationPath: String,
+                       fileSize: UInt64,
                        md5: String?,
                        completionHandler: @escaping (NSError?) -> Void)
     
