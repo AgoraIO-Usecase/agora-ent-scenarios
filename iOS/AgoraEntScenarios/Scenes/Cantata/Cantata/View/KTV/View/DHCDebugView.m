@@ -31,14 +31,14 @@
 
 -(void)layoutUI {
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = KTVLocalizedString(@"Debug Settings");
+    titleLabel.text = DHCLocalizedString(@"Debug Settings");
     titleLabel.font = UIFontMake(18);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:titleLabel];
     
     UILabel *headLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 60, 150, 30)];
-    headLabel.text = @"音频Dump";
+    headLabel.text = @"ktv_dump".toSceneLocalization;
     headLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:headLabel];
     
@@ -53,13 +53,13 @@
     [self addSubview:sepView3];
     
     UILabel *logLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 123, 150, 30)];
-    logLabel.text = @"导出Log";
+    logLabel.text = @"ktv_export_log".toSceneLocalization;
     logLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:logLabel];
     
     UIButton *exportLogBtn = [[UIButton alloc]initWithFrame:CGRectMake(190, 123, 150, 30)];
     [exportLogBtn setBackgroundColor:[UIColor blueColor]];
-    [exportLogBtn setTitle:@"确认" forState:UIControlStateNormal];
+    [exportLogBtn setTitle:@"ktv_debug_confirm".toSceneLocalization forState:UIControlStateNormal];
     [exportLogBtn setFont:[UIFont systemFontOfSize:13]];
     [exportLogBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     exportLogBtn.layer.cornerRadius = 5;
@@ -72,13 +72,13 @@
     [self addSubview:sepView];
     
     UILabel *clearDumpLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 186, 150, 30)];
-    clearDumpLabel.text = @"清除Dump";
+    clearDumpLabel.text = @"ktv_clear_dump".toSceneLocalization;
     clearDumpLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:clearDumpLabel];
     
     UIButton *clearDumpBtn = [[UIButton alloc]initWithFrame:CGRectMake(190, 186, 150, 30)];
     [clearDumpBtn setBackgroundColor:[UIColor blueColor]];
-    [clearDumpBtn setTitle:@"确认" forState:UIControlStateNormal];
+    [clearDumpBtn setTitle:@"ktv_debug_confirm".toSceneLocalization forState:UIControlStateNormal];
     clearDumpBtn.layer.cornerRadius = 5;
     clearDumpBtn.layer.masksToBounds = true;
     [clearDumpBtn setFont:[UIFont systemFontOfSize:13]];
@@ -91,13 +91,13 @@
     [self addSubview:sepView2];
     
     UILabel *clearLogLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 249, 100, 30)];
-    clearLogLabel.text = @"清除Log";
+    clearLogLabel.text = @"ktv_clear_log".toSceneLocalization;
     clearLogLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:clearLogLabel];
     
     UIButton *clearLogBtn = [[UIButton alloc]initWithFrame:CGRectMake(190, 249, 150, 30)];
     [clearLogBtn setBackgroundColor:[UIColor blueColor]];
-    [clearLogBtn setTitle:@"确认" forState:UIControlStateNormal];
+    [clearLogBtn setTitle:@"ktv_debug_confirm".toSceneLocalization forState:UIControlStateNormal];
     clearLogBtn.layer.cornerRadius = 5;
     clearLogBtn.layer.masksToBounds = true;
     [clearLogBtn setFont:[UIFont systemFontOfSize:13]];
@@ -115,13 +115,13 @@
     };
 
     self.keyTf = [[UITextField alloc]initWithFrame:CGRectMake(20, 310, SCREEN_WIDTH - 40, 20)];
-    NSAttributedString *keyPlaceholder = [[NSAttributedString alloc] initWithString:@"请输入私参Key" attributes:attributes];
+    NSAttributedString *keyPlaceholder = [[NSAttributedString alloc] initWithString:@"ktv_input_key".toSceneLocalization attributes:attributes];
     self.keyTf.attributedPlaceholder = keyPlaceholder;
     self.keyTf.textColor = [UIColor whiteColor];
     [self addSubview:self.keyTf];
     
     self.valueTf = [[UITextField alloc]initWithFrame:CGRectMake(20, 345, SCREEN_WIDTH - 40, 20)];
-    NSAttributedString *valuePlaceholder = [[NSAttributedString alloc] initWithString:@"请输入私参Value" attributes:attributes];
+    NSAttributedString *valuePlaceholder = [[NSAttributedString alloc] initWithString:@"ktv_input_value".toSceneLocalization attributes:attributes];
     self.valueTf.attributedPlaceholder = valuePlaceholder;
     self.valueTf.textColor = [UIColor whiteColor];
     [self addSubview:self.valueTf];
@@ -132,7 +132,7 @@
     setParamsBtn.layer.cornerRadius = 5;
     setParamsBtn.layer.masksToBounds = true;
     [setParamsBtn setFont:[UIFont systemFontOfSize:13]];
-    [setParamsBtn setTitle:@"设置私参" forState:UIControlStateNormal];
+    [setParamsBtn setTitle:@"ktv_set_params".toSceneLocalization forState:UIControlStateNormal];
     [setParamsBtn addTarget:self action:@selector(setParams) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:setParamsBtn];
 }

@@ -91,10 +91,12 @@ class DHCLRCControl: UIView {
         }
     }
     
-    private var loadingView: AUIKaraokeLoadingView!
+    private var loadingView: LRCLodingProgressView!
     @objc public weak var lrcDelegate: DHCLrcControlDelegate?
     weak var delegate: DHCGameDelegate?
     private var downloadManager = AgoraDownLoadManager()
+    
+    private let lrcDownload: LyricsFileDownloader = LyricsFileDownloader()
     public var controlState: DHCGameState = .noSong {
         didSet {
             DispatchQueue.main.async {
@@ -237,6 +239,7 @@ class DHCLRCControl: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         layoutUI()
+        lrcDownload.delegate = self
     }
     
     required init?(coder: NSCoder) {
@@ -269,7 +272,7 @@ class DHCLRCControl: UIView {
         
         noSongLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 50))
         noSongLabel.center = self.center
-        noSongLabel.text = "当前无人点歌，\n快选择歌曲一起合唱吧!"
+        noSongLabel.text = "ktv_no_song".toSceneLocalization() as String
         noSongLabel.textColor = .white
         noSongLabel.font = UIFont.systemFont(ofSize: 13)
         noSongLabel.textAlignment = .center
@@ -280,16 +283,19 @@ class DHCLRCControl: UIView {
         lrcView = KaraokeView(frame: CGRectMake(0, 30, self.bounds.width, bounds.size.height - 30 - 50 - 340), loggers: [FileLogger()])
         lrcView.scoringEnabled = false
         lrcView.lyricsView.inactiveLineTextColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
+        lrcView.lyricsView.inactiveLineFontSize = UIFont.systemFont(ofSize: 13)
         lrcView.lyricsView.activeLinePlayedTextColor = UIColor(hexString: "#EEFF25")!
+        lrcView.lyricsView.activeLineUpcomingFontSize = UIFont.systemFont(ofSize: 20)
         lrcView.lyricsView.lyricLineSpacing = 6
         lrcView.lyricsView.draggable = false
         lrcView.delegate = self
         addSubview(lrcView!)
+        lrcView.isHidden = true
         
         //重试歌词按钮
         retryBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 100, height: 40))
         retryBtn.center = lrcView.center
-        retryBtn.setTitle("点击重试", for: .normal)
+        retryBtn.setTitle("ktv_retry".toSceneLocalization() as String, for: .normal)
         retryBtn.layer.cornerRadius = 5
         retryBtn.layer.masksToBounds = true
         retryBtn.layer.borderColor = UIColor.white.cgColor
@@ -300,34 +306,38 @@ class DHCLRCControl: UIView {
 
         pauseBtn = UIButton(frame: CGRect(x: 20, y: self.bounds.maxY - 50, width: 34, height: 40))
         pauseBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
-        pauseBtn.setVerticalLayoutWithCenterAlignment(title: "播放", image: UIImage.sceneImage(name: "ktv_pause_resumeicon", bundleName: "DHCResource")!, spacing: 0, for: .selected)
-        pauseBtn.setVerticalLayoutWithCenterAlignment(title: "暂停", image: UIImage.sceneImage(name: "ktv_pause_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
+        pauseBtn.setVerticalLayoutWithCenterAlignment(title: "ktv_room_player_play".toSceneLocalization() as String, image: UIImage.sceneImage(name: "ktv_pause_resumeicon", bundleName: "DHCResource")!, spacing: 0, for: .selected)
+        pauseBtn.setVerticalLayoutWithCenterAlignment(title: "ktv_room_player_pause".toSceneLocalization() as String, image: UIImage.sceneImage(name: "ktv_pause_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         pauseBtn.addTarget(self, action: #selector(pause), for: .touchUpInside)
         addSubview(pauseBtn)
+        pauseBtn.isHidden = true
         
         nextBtn = UIButton(frame: CGRect(x: 74, y: self.bounds.maxY - 50, width: 34, height: 40))
         nextBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         nextBtn.addTarget(self, action: #selector(nextSong), for: .touchUpInside)
-        nextBtn.setVerticalLayoutWithCenterAlignment(title: "切歌", image: UIImage.sceneImage(name: "ktv_playNext_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
+        nextBtn.setVerticalLayoutWithCenterAlignment(title: "ktv_room_change_song".toSceneLocalization() as String, image: UIImage.sceneImage(name: "ktv_playNext_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         addSubview(nextBtn)
+        nextBtn.isHidden = true
         
         originBtn = UIButton(frame: CGRect(x: self.bounds.width - 54, y: self.bounds.maxY - 50, width: 34, height: 40))
         originBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         originBtn.addTarget(self, action: #selector(trackChange), for: .touchUpInside)
-        originBtn.setVerticalLayoutWithCenterAlignment(title: "原唱", image: UIImage.sceneImage(name: "original", bundleName: "DHCResource")!, spacing: 0, for: .selected)
-        originBtn.setVerticalLayoutWithCenterAlignment(title: "原唱", image: UIImage.sceneImage(name: "acc", bundleName: "DHCResource")!, spacing: 0, for: .normal)
+        originBtn.setVerticalLayoutWithCenterAlignment(title: "ktv_room_original".toSceneLocalization() as String, image: UIImage.sceneImage(name: "original", bundleName: "DHCResource")!, spacing: 0, for: .selected)
+        originBtn.setVerticalLayoutWithCenterAlignment(title: "ktv_room_original".toSceneLocalization() as String, image: UIImage.sceneImage(name: "acc", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         addSubview(originBtn)
+        originBtn.isHidden = true
         
         effectBtn = UIButton(frame: CGRect(x: self.bounds.width - 108, y: self.bounds.maxY - 50, width: 34, height: 40))
         effectBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         effectBtn.addTarget(self, action: #selector(effectChange), for: .touchUpInside)
-        effectBtn.setVerticalLayoutWithCenterAlignment(title: "调音", image: UIImage.sceneImage(name: "ktv_subtitle_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
+        effectBtn.setVerticalLayoutWithCenterAlignment(title: "ktv_room_player_tweak".toSceneLocalization() as String, image: UIImage.sceneImage(name: "ktv_subtitle_icon", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         addSubview(effectBtn)
+        effectBtn.isHidden = true
         
         leaveChorusBtn = UIButton(frame: CGRect(x: 20, y: self.bounds.maxY - 50, width: 50, height: 40))
         leaveChorusBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         leaveChorusBtn.addTarget(self, action: #selector(leaveChorus), for: .touchUpInside)
-        leaveChorusBtn.setVerticalLayoutWithCenterAlignment(title: "退出合唱", image: UIImage.sceneImage(name: "ic_leave_chorus", bundleName: "DHCResource")!, spacing: 0, for: .normal)
+        leaveChorusBtn.setVerticalLayoutWithCenterAlignment(title: "ktv_leave_chorus".toSceneLocalization() as String, image: UIImage.sceneImage(name: "ic_leave_chorus", bundleName: "DHCResource")!, spacing: 0, for: .normal)
         addSubview(leaveChorusBtn)
         leaveChorusBtn.isHidden = true
         
@@ -336,6 +346,7 @@ class DHCLRCControl: UIView {
         joinChorusBtn.setImage(UIImage.sceneImage(name: "join", bundleName: "DHCResource"), for: .normal)
         joinChorusBtn.setImage(UIImage.sceneImage(name: "ic_join_chorus_loading", bundleName: "DHCResource"), for: .selected)
         addSubview(joinChorusBtn)
+        joinChorusBtn.isHidden = true
         
         resultView = DHCResultView()
         resultView.frame = CGRect(x: 0, y: 0, width: ScreenWidth, height: 600)
@@ -346,7 +357,7 @@ class DHCLRCControl: UIView {
         addSubview(resultView)
         resultView.isHidden = true
 
-        loadingView = AUIKaraokeLoadingView(frame: CGRectMake(0, 30, self.bounds.width, 110))
+        loadingView = LRCLodingProgressView(frame: CGRectMake(0, 30, self.bounds.width, 110))
         addSubview(loadingView)
         loadingView.isHidden = true
         
@@ -435,7 +446,7 @@ class DHCLRCControl: UIView {
         skipBtn.isHidden = true
         musicNameBtn.isHidden = true
         musicNameBtn.setTitle("", for: .normal)
-        scoreLabel.text = "0总分"
+        scoreLabel.text = "0\("ktv_total_score".toSceneLocalization() as String)"
         currentLoadLrcPath = nil
     }
     
@@ -446,6 +457,7 @@ class DHCLRCControl: UIView {
             } else {
                 self?.loadingView.isHidden = false
                 self?.loadingView.setProgress(progress)
+                self?.noSongLabel.isHidden = true
             }
         }
     }
@@ -549,71 +561,72 @@ extension DHCLRCControl: KTVLrcViewDelegate {
     
     func onDownloadLrcData(url: String) {
         //开始歌词下载
-        startDownloadLrc(with: url) {[weak self] url in
-            guard let self = self, let url = url else {return}
-            print("获取地址:\(url)")
-            self.resetLrcData(with: url)
-        }
+//        startDownloadLrc(with: url) {[weak self] url in
+//            guard let self = self, let url = url else {return}
+//            print("获取地址:\(url)")
+//            self.resetLrcData(with: url)
+//        }
+        let requestId = lrcDownload.download(urlString: url)
     }
     
-    func startDownloadLrc(with url: String, callBack: @escaping LyricCallback) {
-        var path: String? = nil
-        downloadManager.downloadLrcFile(urlString: url) { lrcurl in
-            defer {
-                callBack(path)
-            }
-            guard let lrcurl = lrcurl else {
-                print("downloadLrcFile fail, lrcurl is nil")
-                return
-            }
-
-            let curSong = URL(string: url)?.lastPathComponent.components(separatedBy: ".").first
-            let loadSong = URL(string: lrcurl)?.lastPathComponent.components(separatedBy: ".").first
-            guard curSong == loadSong else {
-                print("downloadLrcFile fail, missmatch, cur:\(curSong ?? "") load:\(loadSong ?? "")")
-                return
-            }
-            path = lrcurl
-            print("获取地址本地:\(path)")
-        } failure: {
-            callBack(nil)
-            print("歌词解析失败")
-        }
-    }
+//    func startDownloadLrc(with url: String, callBack: @escaping LyricCallback) {
+//        var path: String? = nil
+//        downloadManager.downloadLrcFile(urlString: url) { lrcurl in
+//            defer {
+//                callBack(path)
+//            }
+//            guard let lrcurl = lrcurl else {
+//                print("downloadLrcFile fail, lrcurl is nil")
+//                return
+//            }
+//
+//            let curSong = URL(string: url)?.lastPathComponent.components(separatedBy: ".").first
+//            let loadSong = URL(string: lrcurl)?.lastPathComponent.components(separatedBy: ".").first
+//            guard curSong == loadSong else {
+//                print("downloadLrcFile fail, missmatch, cur:\(curSong ?? "") load:\(loadSong ?? "")")
+//                return
+//            }
+//            path = lrcurl
+//            print("获取地址本地:\(path)")
+//        } failure: {
+//            callBack(nil)
+//            print("歌词解析失败")
+//        }
+//    }
     
-    func resetLrcData(with url: String) {
-        guard currentLoadLrcPath != url else {
-            return
-        }
-        let musicUrl = URL(fileURLWithPath: url)
-        guard let data = try? Data(contentsOf: musicUrl),
-              let model = KaraokeView.parseLyricData(data: data) else {
-            return
-        }
-        currentLoadLrcPath = url
-        lyricModel = model
-        totalCount = model.lines.count
-        totalLines = 0
-        totalScore = 0
-        lrcView?.setLyricData(data: model)
-        musicNameBtn.setTitle("\(model.name)", for: .normal)
-      //  musicNameBtn.setTitle("\(model.name)-\(model.singer)", for: .normal)
-        musicNameBtn.isHidden = false
-        skipBtn.setSkipType(.prelude)
-        print("获取地址解析:\(url)")
-    }
+//    func resetLrcData(with url: String) {
+//        guard currentLoadLrcPath != url else {
+//            return
+//        }
+//        let musicUrl = URL(fileURLWithPath: url)
+//        guard let data = try? Data(contentsOf: musicUrl),
+//              let model = KaraokeView.parseLyricData(data: data) else {
+//            return
+//        }
+//        currentLoadLrcPath = url
+//        lyricModel = model
+//        totalCount = model.lines.count
+//        totalLines = 0
+//        totalScore = 0
+//        lrcView?.setLyricData(data: model)
+//        musicNameBtn.setTitle("\(model.name)", for: .normal)
+//      //  musicNameBtn.setTitle("\(model.name)-\(model.singer)", for: .normal)
+//        musicNameBtn.isHidden = false
+//        skipBtn.setSkipType(.prelude)
+//        print("获取地址解析:\(url)")
+//    }
     
     func onHighPartTime(highStartTime: Int, highEndTime: Int) {
         
     }
     
     public func setChoursNum(with count: Int) {
-        chorusNumBtn.setTitle("\(count)人合唱中", for: .normal)
+        chorusNumBtn.setTitle("\(count)\("ktv_on_chorus".toSceneLocalization() as String)", for: .normal)
     }
     
     public func setScore(with score: Int) {
         DispatchQueue.main.async {
-            self.scoreLabel.text = "\(score) 总分"
+            self.scoreLabel.text = "\(score) \("ktv_total_score".toSceneLocalization() as String)"
             let width = self.calculateLabelWidth(text: self.scoreLabel.text!, font: UIFont.systemFont(ofSize: 12))
             self.scoreLabel.frame = CGRect(x: self.bounds.width - width - 90, y: 0, width: width, height: 30)
             self.musicNameBtn.frame =  CGRect(x: 20, y: 0, width: self.bounds.width - width - 90 - 20 - 10, height: 30)
@@ -677,5 +690,25 @@ extension UIButton {
         self.imageEdgeInsets = imageInsets
         self.titleEdgeInsets = titleInsets
         self.contentEdgeInsets = UIEdgeInsets(top: spacing/2, left: 0, bottom: spacing/2, right: 0)
+    }
+}
+
+extension DHCLRCControl: LyricsFileDownloaderDelegate {
+    func onLyricsFileDownloadProgress(requestId: Int, progress: Float) {
+        print("lrc pro:\(progress)")
+    }
+    
+    func onLyricsFileDownloadCompleted(requestId: Int, fileData: Data?, error: AgoraLyricsScore.DownloadError?) {
+        if let data = fileData, let model = KaraokeView.parseLyricData(data: data) {
+            lyricModel = model
+            totalCount = model.lines.count
+            totalLines = 0
+            totalScore = 0
+            progress = 0
+            lrcView?.setLyricData(data: model)
+            musicNameBtn.setTitle("\(model.name)", for: .normal)
+            musicNameBtn.isHidden = false
+            skipBtn.setSkipType(.prelude)
+        }
     }
 }

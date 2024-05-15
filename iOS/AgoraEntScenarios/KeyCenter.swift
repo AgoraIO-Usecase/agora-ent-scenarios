@@ -78,6 +78,10 @@ class KeyCenter: NSObject {
      */
     
     static var IMClientSecret: String? = ""
+    // cantata cloud server key, cantata only!!!
+    static let RestfulApiKey: String? = nil
+    //cantata cloud server secret, cantata only!!!
+    static let RestfulApiSecret: String? = nil
   
     static let CloudPlayerKey: String? = nil
     static let CloudPlayerSecret: String? = nil

@@ -78,6 +78,8 @@ public class SongActionListenerImpl implements OnSongActionListener {
         LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.chooseSong(songModel), success -> {
             if (success && dialog.isVisible()) {
                 dialog.setChooseSongItemStatus(songItem, true);
+            } else if (!success) {
+                dialog.setChooseSongItemStatus(songItem, false);
             }
         });
     }

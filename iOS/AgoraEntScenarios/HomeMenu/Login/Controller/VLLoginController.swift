@@ -10,7 +10,7 @@ import UIKit
 @objc
 class VLLoginController: VLBaseViewController {
     private lazy var iconImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "login_icon"))
+        let imageView = UIImageView(image: UIImage(named: "agoraent_icon"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()

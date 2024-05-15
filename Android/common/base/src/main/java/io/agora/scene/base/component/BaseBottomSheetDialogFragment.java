@@ -1,10 +1,13 @@
 package io.agora.scene.base.component;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -52,5 +55,21 @@ public class BaseBottomSheetDialogFragment<B extends ViewBinding> extends Bottom
     public BaseBottomSheetDialogFragment<B> setBundleArgs(Bundle bundleArgs){
         setArguments(bundleArgs);
         return this;
+    }
+
+    protected void hideKeyboard(EditText editText) {
+        editText.clearFocus();
+        Activity context = getActivity();
+        if (context == null) return;
+        // 隐藏软键盘
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+    }
+
+    protected void showKeyboard(EditText editText) {
+        Activity context = getActivity();
+        if (context == null) return;
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(editText, 0);
     }
 }

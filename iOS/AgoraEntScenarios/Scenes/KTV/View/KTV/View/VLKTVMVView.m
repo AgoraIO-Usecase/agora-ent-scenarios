@@ -5,7 +5,7 @@
 
 #import "VLKTVMVView.h"
 #import "VLKTVSelBgModel.h"
-
+#import "AgoraEntScenarios-Swift.h"
 #import "VLKTVMVIdleView.h"
 //#import "HWWeakTimer.h"
 @import Masonry;
@@ -30,7 +30,7 @@
 
 //@property (nonatomic, strong) UIButton *originBtn;  /// 原唱按钮
 @property (nonatomic, strong) UIButton *trackBtn;  /// track按钮
-@property (nonatomic, strong) VLHotSpotBtn *settingBtn; /// 设置参数按钮
+//@property (nonatomic, strong) VLHotSpotBtn *settingBtn; /// 设置参数按钮
 @property (nonatomic, strong) VLKTVMVIdleView *idleView;//没有人演唱视图
 
 
@@ -43,8 +43,9 @@
 @property (nonatomic, strong) UIButton *leaveChorusBtn;
 @property (nonatomic, strong) UIView *BotView;
 @property (nonatomic, assign) VLKTVMVViewActionType actionType;
-@property (nonatomic, strong) UIView *perShowView;//突出人声视图
+//@property (nonatomic, strong) UIView *perShowView;//突出人声视图
 @property (nonatomic, strong) UIImageView *iconView;
+@property (nonatomic, strong) GradientProgressBar *progressView;
 @end
 
 @implementation VLKTVMVView
@@ -76,24 +77,26 @@
 
 - (void)setLoadingProgress:(NSInteger)loadingProgress {
     _loadingProgress = loadingProgress;
-#if DEBUG
-    self.loadingTipsLabel.text = [NSString stringWithFormat:@"loading %ld%%", loadingProgress];
-#else
-    self.loadingTipsLabel.text = KTVLocalizedString(@"ktv_lrc_loading");
-#endif
+    self.loadingTipsLabel.text = [NSString stringWithFormat:@"%ld%%%@", loadingProgress, KTVLocalizedString(@"ktv_lrc_loading")];
     [self.loadingTipsLabel setHidden:loadingProgress == 100];
+    self.progressView.progress = loadingProgress / 100.0;
+    [self.progressView setHidden:loadingProgress == 100];
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    [self.loadingView sizeToFit];
-    self.loadingView.center = CGRectGetCenter(self.bounds);
-    CGFloat tipsTop = self.loadingView.bottom + 5;
-    self.loadingTipsLabel.frame = CGRectMake(self.loadingView.centerX - 100, tipsTop, 200, 40);
+//    [self.loadingView sizeToFit];
+//    self.loadingView.center = CGRectGetCenter(self.bounds);
+    self.loadingTipsLabel.layer.cornerRadius = 10;
+    self.loadingTipsLabel.layer.masksToBounds = true;
+    self.loadingTipsLabel.frame = CGRectMake(0, 0, 200, 60);
+    self.loadingTipsLabel.center = CGRectGetCenter(self.bounds);
+    
+    self.progressView.frame = CGRectMake(0, self.loadingTipsLabel.height - 10, self.loadingTipsLabel.width, 10);
     
     [self.retryButton sizeToFit];
-    self.retryButton.center = CGPointMake(self.loadingView.centerX, self.loadingTipsLabel.bottom + self.retryButton.height / 2);
+    self.retryButton.center = CGRectGetCenter(self.bounds);
 }
 
 #pragma mark private
@@ -109,16 +112,22 @@
     self.contentView.backgroundColor = [UIColor clearColor];
     [self addSubview:self.contentView];
     
-    self.loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleLarge];
-    self.loadingView.color = [UIColor whiteColor];
-    [self.loadingView setHidden:YES];
-    [self addSubview:self.loadingView];
+//    self.loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleLarge];
+//    self.loadingView.color = [UIColor whiteColor];
+//    [self.loadingView setHidden:YES];
+//    [self addSubview:self.loadingView];
     
     self.loadingTipsLabel = [[UILabel alloc] init];
     self.loadingTipsLabel.textAlignment = NSTextAlignmentCenter;
-    self.loadingTipsLabel.font = [UIFont systemFontOfSize:16];
+    self.loadingTipsLabel.backgroundColor = [UIColor colorWithRed:21/255.0 green:19/255.0 blue:37/255.0 alpha:0.85];
+    self.loadingTipsLabel.font = [UIFont systemFontOfSize:13];
     self.loadingTipsLabel.textColor = [UIColor whiteColor];
     [self addSubview:self.loadingTipsLabel];
+    self.loadingTipsLabel.hidden = true;
+    
+    self.progressView = [[GradientProgressBar alloc]init];
+    [self.loadingTipsLabel addSubview:self.progressView];
+    self.progressView.hidden = true;
     
     self.retryButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.retryButton addTarget:self action:@selector(onRetryAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -150,7 +159,9 @@
     _karaokeView.scoringView.topSpaces = 5;
    // _karaokeView.lyricsView.textSelectedColor = [UIColor colorWithHexString:@"#33FFFFFF"];
     _karaokeView.lyricsView.inactiveLineTextColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.5];
+    _karaokeView.lyricsView.inactiveLineFontSize = [UIFont systemFontOfSize:13];
     _karaokeView.lyricsView.activeLinePlayedTextColor = [UIColor colorWithHexString:@"#FF8AB4"];
+    _karaokeView.lyricsView.activeLineUpcomingFontSize = [UIFont systemFontOfSize:20];
     _karaokeView.lyricsView.lyricLineSpacing = 6;
    // _karaokeView.scoringView.showDebugView = true;
     [self.contentView addSubview:_karaokeView];
@@ -179,9 +190,9 @@
     [self updateBtnLayout:self.trackBtn];
     [self.BotView addSubview:self.trackBtn];
     
-    self.settingBtn.frame = CGRectMake(_trackBtn.left-10-34, 0, 34, 54);
-    [self updateBtnLayout:self.settingBtn];
-    [self.BotView addSubview:self.settingBtn];
+//    self.settingBtn.frame = CGRectMake(_trackBtn.left-10-34, 0, 34, 54);
+//    [self updateBtnLayout:self.settingBtn];
+//    [self.BotView addSubview:self.settingBtn];
     
     self.idleView = [[VLKTVMVIdleView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height) withDelegate:self];
     self.idleView.hidden = NO;
@@ -204,30 +215,31 @@
     [self updateBtnLayout:self.leaveChorusBtn];
     [self.BotView addSubview:self.leaveChorusBtn];
     
-    _perShowView = [[UIView alloc]initWithFrame:CGRectMake(0, self.bounds.size.height / 2.0 - 12, 80, 24)];
-    _perShowView.backgroundColor = [UIColor colorWithRed:8/255.0 green:6/255.0 blue:47/255.0 alpha:0.3];
-    CAShapeLayer *maskLayer = [CAShapeLayer layer];
-    UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:_perShowView.bounds
-                                                   byRoundingCorners:UIRectCornerTopRight | UIRectCornerBottomRight
-                                                         cornerRadii:CGSizeMake(10.f, 10.f)];
-    maskLayer.path = path.CGPath;
-    _perShowView.layer.mask = maskLayer;
-    [self addSubview:_perShowView];
+//    _perShowView = [[UIView alloc]initWithFrame:CGRectMake(0, self.bounds.size.height / 2.0 - 12, 80, 24)];
+//    _perShowView.backgroundColor = [UIColor colorWithRed:8/255.0 green:6/255.0 blue:47/255.0 alpha:0.3];
+//    CAShapeLayer *maskLayer = [CAShapeLayer layer];
+//    UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:_perShowView.bounds
+//                                                   byRoundingCorners:UIRectCornerTopRight | UIRectCornerBottomRight
+//                                                         cornerRadii:CGSizeMake(10.f, 10.f)];
+//    maskLayer.path = path.CGPath;
+//    _perShowView.layer.mask = maskLayer;
+//    [self addSubview:_perShowView];
+//    _perShowView.hidden = true;
     
-    UILabel *perLabel = [[UILabel alloc]initWithFrame:CGRectMake(8, 6, 45, 12)];
-    perLabel.text = KTVLocalizedString(@"ktv_show_vol");
-    perLabel.font = [UIFont systemFontOfSize:11];
-    perLabel.textColor = [UIColor whiteColor];
-    [_perShowView addSubview:perLabel];
-    
-    _iconView = [[UIImageView alloc]initWithFrame:CGRectMake(57, 2, 20, 20)];
-    _iconView.image = [UIImage ktv_sceneImageWithName:@"ktv_showVoice" ];
-    [_perShowView addSubview:_iconView];
-    _perShowView.hidden = true;
-    
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(voiceChoose)];
-    _perShowView.userInteractionEnabled = true;
-    [_perShowView addGestureRecognizer:tap];
+//    UILabel *perLabel = [[UILabel alloc]initWithFrame:CGRectMake(8, 6, 45, 12)];
+//    perLabel.text = KTVLocalizedString(@"ktv_show_vol");
+//    perLabel.font = [UIFont systemFontOfSize:11];
+//    perLabel.textColor = [UIColor whiteColor];
+//    [_perShowView addSubview:perLabel];
+//    
+//    _iconView = [[UIImageView alloc]initWithFrame:CGRectMake(57, 2, 20, 20)];
+//    _iconView.image = [UIImage ktv_sceneImageWithName:@"ktv_showVoice" ];
+//    [_perShowView addSubview:_iconView];
+//    _perShowView.hidden = true;
+//    
+//    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(voiceChoose)];
+//    _perShowView.userInteractionEnabled = true;
+//    [_perShowView addGestureRecognizer:tap];
 }
 
 -(void)voiceChoose{
@@ -236,12 +248,22 @@
     }
 }
 
--(void)setPerViewHidden:(BOOL)isHidden {
-    _perShowView.hidden = isHidden;
-}
+//-(void)setPerViewHidden:(BOOL)isHidden {
+//    _perShowView.hidden = isHidden;
+//}
 
 -(void)setBotViewHidden:(BOOL)isHidden{
     [self.BotView setHidden:isHidden];
+}
+
+-(void)setLrcLevelWith:(LRCLEVEL)level{
+    if(level == LRCLEVELOW) {
+        [self.karaokeView setScoreLevelWithLevel:10];
+    } else if(level == LRCLEVELMID) {
+        [self.karaokeView setScoreLevelWithLevel:15];
+    } else if(level == LRCLEVELHIGH) {
+        [self.karaokeView setScoreLevelWithLevel:25];
+    }
 }
 
 -(void)updateBtnLayout:(UIButton*)button {
@@ -324,15 +346,15 @@
 
 - (void)buttonClick:(UIButton *)sender {
     // 设置参数
-    if (sender == self.settingBtn) {
-        if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
-            [self.delegate onKTVMVView:self btnTappedWithActionType:VLKTVMVViewActionTypeSetParam];
-        }
-    } else if (sender == self.nextButton) {
+//    if (sender == self.settingBtn) {
+//        if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
+//            [self.delegate onKTVMVView:self btnTappedWithActionType:VLKTVMVViewActionTypeSetParam];
+//        }
+//    } else if (sender == self.nextButton) {
         if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
             [self.delegate onKTVMVView:self btnTappedWithActionType:VLKTVMVViewActionTypeMVNext];
         }
-    }
+//    }
 }
 
 - (void)changeBgViewByModel:(VLKTVSelBgModel *)selBgModel {
@@ -359,40 +381,40 @@
             self.joinChorusBtn.hidden = YES;
             self.leaveChorusBtn.hidden = YES;
             self.pauseBtn.hidden = YES;
-            self.settingBtn.hidden = YES;
+          //  self.settingBtn.hidden = YES;
             self.nextButton.hidden = YES;
             self.trackBtn.hidden = YES;
             self.contentView.hidden = true;
             self.idleView.hidden = NO;
             self.retryButton.hidden = YES;
-            self.loadingView.hidden = YES;
+          //  self.loadingView.hidden = YES;
             self.musicTitleLabel.hidden = YES;
             break;
         case VLKTVMVViewStateMusicLoading:
             self.joinChorusBtn.hidden = YES;
             self.leaveChorusBtn.hidden = YES;
             self.pauseBtn.hidden = YES;
-            self.settingBtn.hidden = YES;
+         //   self.settingBtn.hidden = YES;
             self.nextButton.hidden = YES;
             self.trackBtn.hidden = YES;
             self.contentView.hidden = YES;
             self.idleView.hidden = YES;
             self.retryButton.hidden = YES;
             self.musicTitleLabel.hidden = YES;
-            self.loadingView.hidden = NO;
+         //   self.loadingView.hidden = NO;
             break;
         case VLKTVMVViewStateAudience:
             self.joinChorusBtn.hidden = NO;
             self.joinChorusBtn.selected = NO;
             self.leaveChorusBtn.hidden = YES;
             self.pauseBtn.hidden = YES;
-            self.settingBtn.hidden = YES;
+       //     self.settingBtn.hidden = YES;
             self.nextButton.hidden = YES;
             self.trackBtn.hidden = YES;
             self.contentView.hidden = NO;
             self.idleView.hidden = YES;
             self.retryButton.hidden = YES;
-            self.loadingView.hidden = YES;
+         //   self.loadingView.hidden = YES;
             self.musicTitleLabel.hidden = NO;
             break;
         case VLKTVMVViewStateOwnerSing:
@@ -400,13 +422,13 @@
             self.leaveChorusBtn.hidden = YES;
             self.pauseBtn.hidden = NO;
             self.pauseBtn.selected = YES;
-            self.settingBtn.hidden = NO;
+       //     self.settingBtn.hidden = NO;
             self.nextButton.hidden = NO;
             self.trackBtn.hidden = NO;
             self.contentView.hidden = NO;
             self.idleView.hidden = YES;
             self.retryButton.hidden = YES;
-            self.loadingView.hidden = YES;
+         //   self.loadingView.hidden = YES;
             self.musicTitleLabel.hidden = NO;
             break;
         case VLKTVMVViewStateOwnerAudience:
@@ -414,78 +436,78 @@
             self.joinChorusBtn.selected = NO;
             self.leaveChorusBtn.hidden = YES;
             self.pauseBtn.hidden = YES;
-            self.settingBtn.hidden = YES;
+       //     self.settingBtn.hidden = YES;
             self.nextButton.hidden = NO;
             self.trackBtn.hidden = YES;
             self.contentView.hidden = NO;
             self.idleView.hidden = YES;
             self.retryButton.hidden = YES;
-            self.loadingView.hidden = YES;
+          //  self.loadingView.hidden = YES;
             self.musicTitleLabel.hidden = NO;
             break;
         case VLKTVMVViewStateOwnerChorus:
             self.joinChorusBtn.hidden = YES;
             self.leaveChorusBtn.hidden = NO;
             self.pauseBtn.hidden = YES;
-            self.settingBtn.hidden = NO;
+      //      self.settingBtn.hidden = NO;
             self.nextButton.hidden = NO;
             self.trackBtn.hidden = NO;
             self.contentView.hidden = NO;
             self.idleView.hidden = YES;
             self.retryButton.hidden = YES;
-            self.loadingView.hidden = YES;
+      //      self.loadingView.hidden = YES;
             self.musicTitleLabel.hidden = NO;
             break;
         case VLKTVMVViewStateNotOwnerChorus:
             self.joinChorusBtn.hidden = YES;
             self.leaveChorusBtn.hidden = NO;
             self.pauseBtn.hidden = YES;
-            self.settingBtn.hidden = NO;
+     //       self.settingBtn.hidden = NO;
             self.nextButton.hidden = YES;
             self.trackBtn.hidden = NO;
             self.contentView.hidden = NO;
             self.idleView.hidden = YES;
             self.retryButton.hidden = YES;
-            self.loadingView.hidden = YES;
+          //  self.loadingView.hidden = YES;
             self.musicTitleLabel.hidden = NO;
             break;
         case VLKTVMVViewStateMusicOwnerLoadFailed:
             self.joinChorusBtn.hidden = YES;
             self.leaveChorusBtn.hidden = YES;
             self.pauseBtn.hidden = YES;
-            self.settingBtn.hidden = YES;
+      //      self.settingBtn.hidden = YES;
             self.nextButton.hidden = NO;
             self.trackBtn.hidden = YES;
             self.contentView.hidden = NO;
             self.idleView.hidden = YES;
             self.retryButton.hidden = YES;
-            self.loadingView.hidden = YES;
+         //   self.loadingView.hidden = YES;
             self.musicTitleLabel.hidden = NO;
             break;
         case VLKTVMVViewStateMusicLoadFailed:
             self.joinChorusBtn.hidden = YES;
             self.leaveChorusBtn.hidden = YES;
             self.pauseBtn.hidden = YES;
-            self.settingBtn.hidden = YES;
+       //     self.settingBtn.hidden = YES;
             self.nextButton.hidden = YES;
             self.trackBtn.hidden = YES;
             self.contentView.hidden = NO;
             self.idleView.hidden = YES;
             self.retryButton.hidden = YES;
-            self.loadingView.hidden = YES;
+          //  self.loadingView.hidden = YES;
             self.musicTitleLabel.hidden = NO;
             break;
         case VLKTVMVViewStateMusicOwnerLoadLrcFailed:
             self.joinChorusBtn.hidden = YES;
             self.leaveChorusBtn.hidden = YES;
             self.pauseBtn.hidden = YES;
-            self.settingBtn.hidden = YES;
+       //     self.settingBtn.hidden = YES;
             self.nextButton.hidden = NO;
             self.trackBtn.hidden = YES;
             self.contentView.hidden = NO;
             self.idleView.hidden = YES;
             self.retryButton.hidden = NO;
-            self.loadingView.hidden = YES;
+          //  self.loadingView.hidden = YES;
             self.musicTitleLabel.hidden = NO;
             [self bringSubviewToFront:self.retryButton];
             break;
@@ -493,14 +515,14 @@
             self.joinChorusBtn.hidden = YES;
             self.leaveChorusBtn.hidden = YES;
             self.pauseBtn.hidden = YES;
-            self.settingBtn.hidden = YES;
+       //     self.settingBtn.hidden = YES;
             self.nextButton.hidden = YES;
             self.trackBtn.hidden = YES;
             self.contentView.hidden = NO;
             self.idleView.hidden = YES;
             self.retryButton.hidden = NO;
             [self bringSubviewToFront:self.retryButton];
-            self.loadingView.hidden = YES;
+         //   self.loadingView.hidden = YES;
             self.musicTitleLabel.hidden = NO;
             break;
         case VLKTVMVViewStateJoinChorus:
@@ -508,13 +530,13 @@
             self.joinChorusBtn.selected = YES;
             self.leaveChorusBtn.hidden = YES;
             self.pauseBtn.hidden = YES;
-            self.settingBtn.hidden = YES;
+        //    self.settingBtn.hidden = YES;
             self.nextButton.hidden = YES;
             self.trackBtn.hidden = YES;
             self.contentView.hidden = NO;
             self.idleView.hidden = YES;
             self.retryButton.hidden = YES;
-            self.loadingView.hidden = YES;
+          //  self.loadingView.hidden = YES;
             self.musicTitleLabel.hidden = NO;
             break;
         default:
@@ -557,6 +579,17 @@
     } else {
         [_iconView sd_setImageWithURL:[NSURL URLWithString:url]];
     }
+}
+
+-(void)setJoinChorusFailedLoadingWith:(NSString *)msg{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.loadingTipsLabel.hidden = false;
+        self.loadingTipsLabel.text = msg;
+    });
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        self.loadingTipsLabel.hidden = true;
+    });
 }
 
 #pragma mark - 合唱代理
@@ -697,18 +730,18 @@
     return _trackBtn;
 }
 
-- (VLHotSpotBtn *)settingBtn {
-    if (!_settingBtn) {
-        _settingBtn = [[VLHotSpotBtn alloc] init];
-        [_settingBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_subtitle_icon" ] forState:UIControlStateNormal];
-        _settingBtn.accessibilityIdentifier = @"ktv_room_setting_button_id";
-        [self.settingBtn setTitle:KTVLocalizedString(@"ktv_room_player_tweak") forState:UIControlStateNormal];
-        [self.settingBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        self.settingBtn.titleLabel.font = UIFontMake(10.0);
-        [_settingBtn addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
-    }
-    return _settingBtn;
-}
+//- (VLHotSpotBtn *)settingBtn {
+//    if (!_settingBtn) {
+//        _settingBtn = [[VLHotSpotBtn alloc] init];
+//        [_settingBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_subtitle_icon" ] forState:UIControlStateNormal];
+//        _settingBtn.accessibilityIdentifier = @"ktv_room_setting_button_id";
+//        [self.settingBtn setTitle:KTVLocalizedString(@"ktv_room_player_tweak") forState:UIControlStateNormal];
+//        [self.settingBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+//        self.settingBtn.titleLabel.font = UIFontMake(10.0);
+//        [_settingBtn addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
+//    }
+//    return _settingBtn;
+//}
 
 - (UILabel *)scoreLabel {
     if (!_scoreLabel) {

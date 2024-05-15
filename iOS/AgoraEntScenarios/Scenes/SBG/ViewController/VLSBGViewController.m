@@ -791,11 +791,19 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.singRole = role;
     
     KTVSongConfiguration *songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = NO;
     songConfig.mode = role == KTVSingRoleAudience ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc;
     songConfig.mainSingerUid = [model.userNo integerValue];
     //songCode需要特殊转换一下
-    NSString *jsonStr = @"{\"format\":{\"highPart\":0}}";
+    NSString *jsonStr;
+    if([model.winnerNo isEqualToString:VLUserCenter.user.id]){
+        jsonStr = @"{\"format\":{\"highPartIndex\":0}}";
+        songConfig.songCutter = true;
+        songConfig.mainSingerUid = [model.winnerNo integerValue];
+    } else {
+        jsonStr = @"{\"format\":{\"highPart\":0}}";
+        songConfig.songCutter = false;
+    }
+
     NSInteger songcode = [self.SBGApi.getMusicContentCenter getInternalSongCode: [model.songNo integerValue] jsonOption:jsonStr];
     songConfig.songIdentifier = [NSString stringWithFormat:@"%li", songcode];
     VL(weakSelf);
@@ -891,31 +899,32 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (BOOL)removeSelSongWithSongNo:(NSInteger)songNo sync:(BOOL)sync {
-    __block VLSBGRoomSelSongModel* removed;
-    BOOL isTopSong = [self.selSongsArray.firstObject.songNo integerValue] == songNo;
+    __block VLSBGRoomSelSongModel *removed = nil;
+    
+    BOOL isTopSong = [self.selSongsArray count] > 0 && [self.selSongsArray.firstObject.songNo integerValue] == songNo;
     
     if (isTopSong) {
         [self stopPlaySong];
     }
     
-    NSMutableArray<VLSBGRoomSelSongModel*> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLSBGRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-        if([evaluatedObject.songNo integerValue] == songNo) {
+    NSMutableArray<VLSBGRoomSelSongModel *> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLSBGRoomSelSongModel *evaluatedObject, NSDictionary *bindings) {
+        if ([evaluatedObject.songNo integerValue] == songNo) {
             removed = evaluatedObject;
             return NO;
         }
         return YES;
     }]]];
     
-    if(removed != nil) {
-        //did remove
+    if (removed != nil) {
+        // Did remove
         self.selSongsArray = updatedList;
 
-        if(sync) {
-            SBGRemoveSongInputModel* inputModel = [SBGRemoveSongInputModel new];
+        if (sync) {
+            SBGRemoveSongInputModel *inputModel = [SBGRemoveSongInputModel new];
             inputModel.songNo = removed.songNo;
             inputModel.objectId = removed.objectId;
-            [[AppContext sbgServiceImp] removeSongWithInput:inputModel
-                                                 completion:^(NSError * error) {
+            
+            [[AppContext sbgServiceImp] removeSongWithInput:inputModel completion:^(NSError *error) {
                 if (error) {
                     SBGLogInfo(@"deleteSongEvent fail: %@ %ld", removed.songName, error.code);
                 }
@@ -927,6 +936,44 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return NO;
     }
 }
+
+//- (BOOL)removeSelSongWithSongNo:(NSInteger)songNo sync:(BOOL)sync {
+//    __block VLSBGRoomSelSongModel* removed;
+//    BOOL isTopSong = [self.selSongsArray.firstObject.songNo integerValue] == songNo;
+//    
+//    if (isTopSong) {
+//        [self stopPlaySong];
+//    }
+//    
+//    NSMutableArray<VLSBGRoomSelSongModel*> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLSBGRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+//        if([evaluatedObject.songNo integerValue] == songNo) {
+//            removed = evaluatedObject;
+//            return NO;
+//        }
+//        return YES;
+//    }]]];
+//    
+//    if(removed != nil) {
+//        //did remove
+//        self.selSongsArray = updatedList;
+//
+//        if(sync) {
+//            SBGRemoveSongInputModel* inputModel = [SBGRemoveSongInputModel new];
+//            inputModel.songNo = removed.songNo;
+//            inputModel.objectId = removed.objectId;
+//            [[AppContext sbgServiceImp] removeSongWithInput:inputModel
+//                                                 completion:^(NSError * error) {
+//                if (error) {
+//                    SBGLogInfo(@"deleteSongEvent fail: %@ %ld", removed.songName, error.code);
+//                }
+//            }];
+//        }
+//        
+//        return YES;
+//    } else {
+//        return NO;
+//    }
+//}
 
 //- (void)replaceSelSongWithInfo:(VLRoomSelSongModel*)songInfo {
 //    self.selSongsArray = [SBGSyncManagerServiceImp sortChooseSongWithSongList:self.selSongsArray];
@@ -1058,10 +1105,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                         chorusChannelName:@""
                                                         chorusChannelToken:@""
                                                                     type:KTVTypeSingbattle
+                                                       musicType:loadMusicTypeMcc
                                                             maxCacheSize:10
-                                                                musicType:loadMusicTypeMcc
-                                                                isDebugMode:false];
-    self.SBGApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
+                                                                mccDomain:nil];
+    self.SBGApi = [[KTVApiImpl alloc] init];
+    [self.SBGApi createKtvApiWithConfig:apiConfig];
     [self.SBGApi renewInnerDataStreamId];
     [self.SBGApi setLrcViewWithView:self.statusView.lrcView];
     [self.SBGApi muteMicWithMuteStatus:self.isNowMicMuted];
@@ -1279,7 +1327,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)startSBGGrap {
     VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
     kWeakSelf(self);
-    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singbattle_3.4.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
+    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singbattle_4.3.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
         if(flag){
             //抢唱成功
             NSLog(@"抢唱成功");
@@ -1312,7 +1360,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return;
     }
     kWeakSelf(self);
-    [[NetworkManager shared] songGrabQuery:[AppContext.shared appId] sceneId:@"scene_singbattle_3.4.0" roomId:_roomModel.roomNo songCode:model.songNo src:@"postman" success:^(NSString *userId,NSString *userName, BOOL flag) {
+    [[NetworkManager shared] songGrabQuery:[AppContext.shared appId] sceneId:@"scene_singbattle_4.3.0" roomId:_roomModel.roomNo songCode:model.songNo src:@"postman" success:^(NSString *userId,NSString *userName, BOOL flag) {
         if(flag){
             return;
         }
@@ -1616,7 +1664,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)reloadMusic{
     VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = YES;
     songConfig.mode = KTVLoadMusicModeLoadLrcOnly;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
@@ -2184,12 +2231,19 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
 //    [self.RTCkit enableLocalAudio:isOnMicSeat];
 //    [self.RTCkit muteLocalAudioStream:!isOnMicSeat];
     
-    VLSBGRoomSeatModel* info = [self getCurrentUserSeatInfo];
-    self.isNowMicMuted = info.isAudioMuted;
-    self.isNowCameraMuted = info.isVideoMuted;
-    
     self.bottomView.hidden = !_isOnMicSeat;
     self.requestOnLineView.hidden = !self.bottomView.hidden;
+    
+    VLSBGRoomSeatModel* info = [self getCurrentUserSeatInfo];
+    if(onMicSeatStatusDidChanged){
+        if(info == nil){
+            self.isNowMicMuted = true;
+            self.isNowCameraMuted = true;
+        } else {
+            self.isNowMicMuted = info.isAudioMuted;
+            self.isNowCameraMuted = info.isVideoMuted;
+        }
+    }
 }
 
 - (void)setIsNowMicMuted:(BOOL)isNowMicMuted {
