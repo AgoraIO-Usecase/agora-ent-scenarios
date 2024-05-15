@@ -67,4 +67,17 @@
         android:layout_height="match_parent"
         />
 
+    <Button
+        android:id="@+id/btnDebug"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:text="Debug"
+        android:textSize="11sp"
+        android:visibility="visible"
+        android:textAllCaps="false"
+        android:layout_marginBottom="200dp"
+        android:background="@drawable/bg_def_btn_selector"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,6 +2,7 @@ package io.agora.scene.pure1v1.service
 
 import android.os.Parcel
 import android.os.Parcelable
+import java.util.*
 
 /*
  * service 模块
@@ -45,7 +46,7 @@ class UserInfo(
 
     // 只在prepare阶段使用，因为是用了万能token，每次需要不同的channelId以保证安全性
     fun getCallChannelId(): String {
-        return "${userId}_${System.currentTimeMillis()}"
+        return UUID.randomUUID().toString()
     }
 
     constructor(parcel: Parcel) : this(
@@ -55,6 +56,10 @@ class UserInfo(
         parcel.readLong(),
         parcel.readString() ?: ""
     ) {
+    }
+
+    override fun toString(): String {
+        return "userId:$userId, userName:$userName, avatar:$avatar, createdAt:$createdAt"
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

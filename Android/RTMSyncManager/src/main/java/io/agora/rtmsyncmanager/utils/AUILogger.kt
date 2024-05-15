@@ -9,7 +9,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AUILogger constructor(private val config: Config) {
+class AUILogger(private val config: Config) {
 
     companion object {
 
@@ -45,7 +45,7 @@ class AUILogger constructor(private val config: Config) {
     }
 
 
-    data class Config constructor(
+    data class Config(
         val context: Context,
         val rootTag: String,
         val logFileSize: Int = 2 * 1024 * 1024, // 2M，单位Byte
@@ -54,6 +54,7 @@ class AUILogger constructor(private val config: Config) {
         val threadInfoEnable: Boolean = true,
         val threadMethodCount: Int = 2,
         val threadMethodOffset: Int = 2,
+        val logCallback: AUILogCallback? = null
     )
 
     private val consoleLogAdapter by lazy {
@@ -108,24 +109,29 @@ class AUILogger constructor(private val config: Config) {
     }
 
 
-    fun i(tag: String? = null, message: String, vararg args: Any) {
-        Logger.t(config.rootTag).i(formatMessage("INFO", tag, message), args)
+    fun i(tag: String, message: String, vararg args: Any) {
+        config.logCallback?.onLogInfo(tag, message)
+        //Logger.t(config.rootTag).i(formatMessage("INFO", tag, message), args)
     }
 
-    fun w(tag: String? = null, message: String, vararg args: Any) {
-        Logger.t(config.rootTag).w(formatMessage("Warn", tag, message), args)
+    fun w(tag: String, message: String, vararg args: Any) {
+        config.logCallback?.onLogWarning(tag, message)
+        //Logger.t(config.rootTag).w(formatMessage("Warn", tag, message), args)
     }
 
-    fun d(tag: String? = null, message: String, vararg args: Any) {
-        Logger.t(config.rootTag).d(formatMessage("Debug", tag, message), args)
+    fun d(tag: String, message: String, vararg args: Any) {
+        config.logCallback?.onLogDebug(tag, message)
+        //Logger.t(config.rootTag).d(formatMessage("Debug", tag, message), args)
     }
 
-    fun e(tag: String? = null, message: String, vararg args: Any) {
-        Logger.t(config.rootTag).e(formatMessage("Error", tag, message), args)
+    fun e(tag: String, message: String, vararg args: Any) {
+        config.logCallback?.onLogError(tag, message)
+        //Logger.t(config.rootTag).e(formatMessage("Error", tag, message), args)
     }
 
-    fun e(tag: String? = null, throwable: Throwable, message: String, vararg args: Any) {
-        Logger.t(config.rootTag).e(throwable, formatMessage("Error", tag, message), args)
+    fun e(tag: String, throwable: Throwable, message: String, vararg args: Any) {
+        config.logCallback?.onLogError(tag, message)
+        //Logger.t(config.rootTag).e(throwable, formatMessage("Error", tag, message), args)
     }
 
     private fun formatMessage(level: String, tag: String?, message: String): String {
@@ -197,6 +203,11 @@ class AUILogger constructor(private val config: Config) {
         }
     }
 
-
+    interface AUILogCallback {
+        fun onLogDebug(tag: String, message: String)
+        fun onLogInfo(tag: String, message: String)
+        fun onLogWarning(tag: String, message: String)
+        fun onLogError(tag: String, message: String)
+    }
 }
 

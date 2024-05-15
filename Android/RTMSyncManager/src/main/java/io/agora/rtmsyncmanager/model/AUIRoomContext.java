@@ -83,10 +83,10 @@ public class AUIRoomContext {
 
     public String getRoomOwner(String channelName){
         AUIRoomInfo roomInfo = roomInfoMap.get(channelName);
-        if(roomInfo == null || roomInfo.roomOwner == null){
+        if(roomInfo == null || roomInfo.owner == null){
             return "";
         }
-        return roomInfo.roomOwner.userId;
+        return roomInfo.owner.userId;
     }
 
     public @Nullable AUIRoomInfo getRoomInfo(String channelName) {

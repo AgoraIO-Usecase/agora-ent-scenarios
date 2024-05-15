@@ -77,8 +77,14 @@ extension AUIRoomManagerImpl {
         model.sceneId = sceneId
         model.lastCreateTime = lastCreateTime == 0 ? nil : NSNumber(value: Int(lastCreateTime))
         model.pageSize = pageSize
-        model.request { error, list in
-            callback(error as NSError?, list as? [AUIRoomInfo])
+        model.request { error, dic in
+            var ts: Int64 = 0
+            var roomList: [AUIRoomInfo]? = nil
+            if let dic = dic as? [String: Any] {
+                ts = dic["ts"] as? Int64 ?? 0
+                roomList = dic["list"] as? [AUIRoomInfo]
+            }
+            callback(error as NSError?, ts, roomList)
         }
     }
 }

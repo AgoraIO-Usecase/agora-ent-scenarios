@@ -40,7 +40,7 @@ public class CloudBarrageAPI: NSObject {
     
     public func setup(apiConfig: CloudBarrageConfig) {
         self.apiConfig = apiConfig
-        self.apiConfig?.host = "\(AppContext.shared.baseServerUrl)/v1/"
+        self.apiConfig?.host = "\(AppContext.shared.baseServerUrl)/toolbox/v1/"
     }
 }
 
@@ -60,7 +60,7 @@ extension CloudBarrageAPI {
 //            }
 //            completion(err, nil)
 //        }
-        postRequest(interface: interfaceName, host: "\(AppContext.shared.baseServerUrl)/v2/") { err, result in
+        postRequest(interface: interfaceName, host: "\(AppContext.shared.baseServerUrl)/toolbox/v2/") { err, result in
             if let result = result?["list"] as? [[String: Any]] {
                 let model: [CloudGameInfo]? = self.decodeModelArray(result)
                 completion(err, model)

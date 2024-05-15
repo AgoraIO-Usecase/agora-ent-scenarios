@@ -40,7 +40,7 @@ class NetworkManager:NSObject {
     }()
 
     @objc static let shared = NetworkManager()
-    private let baseServerUrl: String = AppContext.shared.baseServerUrl
+    private let baseServerUrl: String = AppContext.shared.baseServerUrl + "/toolbox/"
     
     private func basicAuth(key: String, password: String) -> String {
         let loginString = String(format: "%@:%@", key, password)

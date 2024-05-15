@@ -9,7 +9,7 @@ import Foundation
 import CallAPI
 import VideoLoaderAPI
 
-class CollectionViewDelegateProxy: CallApiProxy, UICollectionViewDelegate {}
+//class CollectionViewDelegateProxy: CallApiProxy, UICollectionViewDelegate {}
 
 /*
 class ShowCycleRoomArray: AGRoomArray {
@@ -87,7 +87,7 @@ class RoomPagingListView: UIView {
         let handler = AGCollectionSlicingDelegateHandler(localUid: self.localUserInfo.getUIntUserId() ?? 0, needPrejoin: true)
         handler.videoSlicingType = .visible
         handler.audioSlicingType = .never
-        handler.onRequireRenderVideo = { [weak self] (info, cell, indexPath) in
+        handler.onRequireRenderVideo = { [weak self] (info, canvas, cell, indexPath) in
             guard let cell = cell as? RoomListCell else { return nil }
             return cell.canvasView
         }

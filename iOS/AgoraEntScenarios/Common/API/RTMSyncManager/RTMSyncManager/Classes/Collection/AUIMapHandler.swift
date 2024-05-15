@@ -26,28 +26,38 @@ func calculateMap(origMap: [String: Any],
                   key: [String],
                   value: Int,
                   min: Int,
-                  max: Int) -> [String: Any]? {
+                  max: Int) throws -> [String: Any] {
     var _origMap = origMap
     if key.count > 1 {
         let curKey = key.first ?? ""
         let subKey = Array(key.suffix(from: 1))
         
-        guard let subValue = _origMap[curKey] as? [String: Any],
-              let newMap = calculateMap(origMap: subValue,
-                                        key: subKey,
-                                        value: value,
-                                        min: min,
-                                        max: max) else {
-            return nil
+        guard let subValue = _origMap[curKey] as? [String: Any]  else {
+            throw AUICollectionOperationError.calculateMapFail.toNSError()
+            return [:]
+        }
+        var newMap: [String: Any] = [:]
+        do {
+            newMap = try calculateMap(origMap: subValue,
+                                      key: subKey,
+                                      value: value,
+                                      min: min,
+                                      max: max)
+        } catch {
+            throw error
         }
         _origMap[curKey] = newMap
         return _origMap
     }
-    guard let curKey = key.first, let subValue = _origMap[curKey] as? Int else { return nil }
+    guard let curKey = key.first, let subValue = _origMap[curKey] as? Int else { 
+        throw AUICollectionOperationError.calculateMapFail.toNSError()
+        return [:]
+    }
     let curValue = subValue + value
     guard curValue <= max, curValue >= min else {
         aui_info("calculateMap out of range")
-        return nil
+        throw AUICollectionOperationError.calculateMapOutOfRange.toNSError()
+        return [:]
     }
     _origMap[curKey] = curValue
     

@@ -15,7 +15,7 @@ func createDateFormatter()-> DateFormatter {
 }
 
 public let formatter = createDateFormatter()
-public protocol IVideoLoaderRoomInfo: NSObjectProtocol {
+@objc public protocol IVideoLoaderRoomInfo: NSObjectProtocol {
     
     /// 当前房间的互动对象，如果有count > 1表示是pk或连麦，count == 1个表示单主播展示
     var anchorInfoList: [AnchorInfo] {get}

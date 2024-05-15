@@ -30,27 +30,6 @@ public class NetworkManager:NSObject {
         case GET
         case POST
     }
-    
-    @objc public enum SceneType: Int {
-        case show = 0
-        case voice = 1
-        case ktv = 2
-
-        func desc() ->String {
-            switch self {
-            case .show:
-                return "show"
-            case .voice:
-                return "voice_chat"
-            case .ktv:
-                return "ktv"
-            default:
-                break
-            }
-
-            return "unknown"
-        }
-    }
 
     var gameToken: String = ""
 
@@ -80,7 +59,7 @@ public class NetworkManager:NSObject {
     @objc public static let shared = NetworkManager()
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
     private var baseServerUrl: String {
-        return AppContext.shared.baseServerUrl
+        return AppContext.shared.baseServerUrl + "/toolbox/"
     }
     
     /// get tokens
@@ -121,7 +100,7 @@ public class NetworkManager:NSObject {
                               uid: String,
                               tokenType: TokenGeneratorType,
                               type: AgoraTokenType,
-                              expire: UInt = 1500,
+                              expire: UInt = 24 * 60 * 60,
                               success: @escaping (String?) -> Void)
     {
         /*
@@ -179,7 +158,6 @@ public class NetworkManager:NSObject {
                           imUid: String?,
                           password: String,
                           uid: String,
-                          sceneType: SceneType,
                           success: @escaping (String?, String?, String?) -> Void) {
         /*
         var chatParams = [
@@ -247,7 +225,7 @@ public class NetworkManager:NSObject {
       
         let imConfigModel = NMGenerateIMConfigNetworkModelIMParmas()
         
-        let payload: String = getPlayloadWithSceneType(.voice) ?? ""
+        let payload: String = getPlayloadWithSceneType("voice_chat") ?? ""
         
         let networkModel = NMGenerateIMConfigNetworkModel()
         networkModel.chat = chatParamsModel
@@ -268,7 +246,7 @@ public class NetworkManager:NSObject {
     
     @objc public func voiceIdentify(channelName: String,
                              channelType: Int,
-                             sceneType: SceneType,
+                             sceneType: String, //SceneType
                              success: @escaping (String?) -> Void) {
         let payload: String = getPlayloadWithSceneType(sceneType) ?? ""
         /*
@@ -302,10 +280,10 @@ public class NetworkManager:NSObject {
         }
     }
     
-    func getPlayloadWithSceneType(_ type: SceneType) -> String? {
+    func getPlayloadWithSceneType(_ type: String) -> String? {
         let userInfo: [String: Any] = [
             "id": VLUserCenter.user.id,     //用户id
-            "sceneName": type.desc(),
+            "sceneName": type,
             "userNo": VLUserCenter.user.userNo
         ]
                  
@@ -607,7 +585,7 @@ extension NetworkManager {
             "headUrl":headUrl
         ]
         
-        let baseUrl = AppContext.shared.baseServerUrl
+        let baseUrl = self.baseServerUrl
         
         NetworkTools().request("\(baseUrl)/v1/ktv/song/grab", method: .post, parameters: params) {[weak self] result in
             switch result{
@@ -634,7 +612,7 @@ extension NetworkManager {
             "src": "postman"
         ]
         
-        let baseUrl = AppContext.shared.baseServerUrl
+        let baseUrl = self.baseServerUrl
         
         NetworkTools().request("\(baseUrl)/v1/ktv/song/grab/query".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "", method: .get, parameters: params) { result in
             switch result {

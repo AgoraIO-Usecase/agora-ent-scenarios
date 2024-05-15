@@ -19,6 +19,7 @@ public enum AUICollectionOperationError: Int {
     case calculateMapFail = 106
     case recvErrorReceipt = 107
     case unsupportedAction = 108
+    case calculateMapOutOfRange = 111
     
     public func toNSError(_ customMsg: String? = nil) -> NSError {
         func createError(msg: String) -> NSError {
@@ -45,6 +46,8 @@ public enum AUICollectionOperationError: Int {
             return createError(msg: "receipt error")
         case .unsupportedAction:
             return createError(msg: "action unsupported")
+        case .calculateMapOutOfRange:
+            return createError(msg: "calculate map out of range")
         default:
             return createError(msg: "unknown error")
         }

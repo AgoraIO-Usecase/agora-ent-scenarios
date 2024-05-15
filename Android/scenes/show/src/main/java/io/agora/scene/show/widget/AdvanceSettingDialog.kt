@@ -543,7 +543,7 @@ class AdvanceSettingDialog constructor(context: Context, val rtcConnection: RtcC
             )
 
             ITEM_ID_SELECTOR_FRAME_RATE -> VideoSetting.updateBroadcastSetting(
-                captureResolution = VideoSetting.ResolutionList[index],
+//                captureResolution = VideoSetting.ResolutionList[index],
                 frameRate = VideoSetting.FrameRateList[index]
             )
         }

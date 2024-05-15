@@ -7,19 +7,22 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
+import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.ChannelMediaOptions
@@ -28,6 +31,7 @@ import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
@@ -38,13 +42,14 @@ import io.agora.scene.showTo1v1.CallRole
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
+import io.agora.scene.showTo1v1.audio.AudioScenarioType
+import io.agora.scene.showTo1v1.audio.SceneType
 import io.agora.scene.showTo1v1.callapi.*
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1CallDetailActivityBinding
 import io.agora.scene.showTo1v1.service.ROOM_AVAILABLE_DURATION
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceListenerProtocol
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceNetworkStatus
-import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import io.agora.scene.showTo1v1.ui.dialog.CallDetailSettingDialog
 import io.agora.scene.showTo1v1.ui.dialog.CallDialog
@@ -54,6 +59,10 @@ import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import io.agora.scene.widget.utils.StatusBarUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 import java.math.RoundingMode
@@ -95,9 +104,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     private var mDashboardFragment: DashboardFragment? = null
 
-    private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
     private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
     private val mRtcEngine by lazy { mShowTo1v1Manger.mRtcEngine }
+    private val mService by lazy { mShowTo1v1Manger.mService }
 
     private val mRoomInfo: ShowTo1v1RoomInfo by lazy {
         (intent.getParcelableExtra(EXTRA_ROOM_DETAIL_INFO) as? ShowTo1v1RoomInfo)!!
@@ -146,6 +155,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     }
 
     private var mTimeLinkAt: Long = 0
+
+    // 用于取消协程的 Job 对象
+    private var imageLoadingJob: Job? = null
 
     // 秀场 textureView
 //    private val mShowTextureView by lazy { SurfaceView(this) }
@@ -206,16 +218,20 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         }
         binding.vDragSmallWindow.canvasContainerAddView(mShowTo1v1Manger.mLocalVideoView)
 
-        Glide.with(this)
-            .load(mRoomInfo.avatar).apply(RequestOptions.circleCropTransform())
-            .into(binding.ivUserAvatar)
+        imageLoadingJob = lifecycleScope.launch {
+            // 在 IO 线程中加载图片
+            val bitmap = loadImageInBackground(mRoomInfo.avatar)
+            // 切换到主线程更新 UI
+            binding.ivUserAvatar.setImageBitmap(bitmap)
+        }
+
         binding.tvRoomName.text = mRoomInfo.roomName
         binding.tvNickname.text = mRoomInfo.userName
         binding.tvRoomNum.text = mRoomInfo.roomId
 
         binding.ivClose.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG, "click close end!")
+                ShowTo1v1Logger.d(TAG, "click close button!")
                 onBackPressed()
             }
         })
@@ -228,13 +244,11 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
         binding.ivSetting.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG, "click setting")
                 onShowSettingDialog()
             }
         })
         binding.ivDashboardClose.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG, "click dashboard close")
                 binding.ivDashboardClose.visibility = View.INVISIBLE
                 binding.flDashboard.visibility = View.INVISIBLE
                 mDashboardFragment?.updateVisible(false)
@@ -243,7 +257,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
         binding.ivHangup.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG, "click hangup")
+                ShowTo1v1Logger.d(TAG, "click hangup")
                 if (mCallConnected) {
                     onBackPressed()
                 } else {
@@ -253,15 +267,20 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         })
         binding.layoutCallPrivately.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG, "click call privately")
+                ShowTo1v1Logger.d(TAG, "click call privately")
                 toggleSelfVideo(true) {
                     mShowTo1v1Manger.prepareCall(CallRole.CALLER, mRoomInfo.roomId, callback = {
                         if (it) {
                             mShowTo1v1Manger.mCallApi.addListener(callApiListener)
-                            mShowTo1v1Manger.mCallApi.call(mRoomInfo.getIntUserId(), completion = {
-                                if (it != null) {
-                                    mShowTo1v1Manger.mCallApi.removeListener(callApiListener)
-                                    mShowTo1v1Manger.deInitialize()
+                            mShowTo1v1Manger.mCallApi.call(mRoomInfo.getIntUserId(), completion = { error ->
+                                if (error != null && mCallState == CallStateType.Calling) {
+                                    ToastUtils.showToast(getString(R.string.show_to1v1_call_failed, error.code.toString()))
+                                    // call 失败立刻挂断
+                                    mShowTo1v1Manger.mCallApi.cancelCall {  }
+                                    mCallDialog?.let {
+                                        if (it.isShowing) it.dismiss()
+                                        mCallDialog = null
+                                    }
                                 }
                             })
                         } else {
@@ -276,14 +295,14 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
         binding.includeConnectedView.root.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                Log.d(TAG, "click close connection view")
+                ShowTo1v1Logger.d(TAG, "click close connection view")
                 mainHandler.removeCallbacks(connectedViewCloseRun)
                 animateConnectedViewClose()
             }
 
         })
         binding.vDragSmallWindow.setOnViewClick {
-            Log.d(TAG, "click switch video")
+            ShowTo1v1Logger.d(TAG, "click switch video")
             exchangeDragWindow()
         }
         binding.layoutCall.isVisible = false
@@ -300,7 +319,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             resourceId = resources.getIdentifier(mRoomInfo.bgImage(), "drawable", packageName)
         } catch (e: Exception) {
             resourceId = R.drawable.show_to1v1_user_bg1
-            Log.e(TAG, "getResources ${e.message}")
+            ShowTo1v1Logger.e(TAG, e,"getResources error!")
         }
         val drawable = ContextCompat.getDrawable(this, resourceId)
         Glide.with(this).load(drawable).into(binding.ivRoomCover)
@@ -313,6 +332,23 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         binding.flDashboard.visibility = View.VISIBLE
         binding.ivDashboardClose.visibility = View.VISIBLE
         mDashboardFragment?.updateVisible(true)
+    }
+
+    // 在后台线程中加载图片
+    private suspend fun loadImageInBackground(url: String): Bitmap? {
+        return withContext(Dispatchers.IO) {
+            try {
+                Glide.with(this@RoomDetailActivity)
+                    .asBitmap()
+                    .load(url)
+                    .apply(RequestOptions.circleCropTransform())
+                    .submit()
+                    .get() // 等待加载完成并获取 Bitmap
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
     }
 
     private fun onCallSend(user: ShowTo1v1UserInfo) {
@@ -415,7 +451,12 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
         }
         toggleSelfAudio(isRoomOwner) {
-
+            if (isRoomOwner) {
+                mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
+            }
+        }
+        if (!isRoomOwner) {
+            mRtcEngine.adjustUserPlaybackSignalVolumeEx(mRoomInfo.userId.toInt(), 100, mMainRtcConnection)
         }
     }
 
@@ -454,6 +495,14 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             AudioModeration.moderationAudio(
                 channelName, uid, AudioModeration.AgoraChannelType.broadcast, ContentInspectName
             )
+            mRtcEngine.setVideoEncoderConfigurationEx(
+                VideoEncoderConfiguration().apply {
+                    dimensions = VideoEncoderConfiguration.VideoDimensions(720, 1280)
+                    frameRate = 24
+                    degradationPrefer = VideoEncoderConfiguration.DEGRADATION_PREFERENCE.MAINTAIN_BALANCED
+                },
+                rtcConnection
+            )
         }
     }
 
@@ -482,25 +531,25 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     //================== Service Operation ===============
     private fun initServiceWithJoinRoom() {
-        mService.joinRoom(mRoomInfo, completion = { error ->
+        mService?.joinRoom(mRoomInfo, completion = { error ->
             if (error == null) { // success
 
             } else { //failed
-                ToastUtils.showToast(getString(R.string.show_to1v1_end_tips))
+                ToastUtils.showToast(getString(R.string.show_to1v1_enter_room_failed, error.message))
                 onBackPressed()
             }
         })
-        mService.subscribeListener(object : ShowTo1v1ServiceListenerProtocol {
+        mService?.subscribeListener(object : ShowTo1v1ServiceListenerProtocol {
             override fun onNetworkStatusChanged(status: ShowTo1v1ServiceNetworkStatus) {
 
             }
 
-            override fun onUserListDidChanged(userList: List<ShowTo1v1UserInfo>) {
-                binding.tvNumCount.text = userList.size.number2K()
+            override fun onUserListDidChanged(userNum: Int) {
+                binding.tvNumCount.text = userNum.number2K()
             }
 
-            override fun onRoomDidDestroy(roomInfo: ShowTo1v1RoomInfo) {
-                if (mRoomInfo.roomId == roomInfo.roomId) {
+            override fun onRoomDidDestroy(roomId: String) {
+                if (mRoomInfo.roomId == roomId) {
                     onBackPressed()
                 }
             }
@@ -553,8 +602,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
     override fun onDestroy() {
         super.onDestroy()
-        // 取消 Glide 异步任务
-        //Glide.with(this).pauseRequests()
+        imageLoadingJob?.cancel()
     }
 
     override fun onBackPressed() {
@@ -562,7 +610,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         if (isGoingFinish) return
         isGoingFinish = true
         stopCallAnimator()
-        Log.d(TAG, "RoomDetail onBackPressed")
         mRtcEngine.removeHandlerEx(mainRtcListener, mMainRtcConnection)
         mainHandler.removeCallbacks(timerRoomRun)
         mainHandler.removeCallbacks(connectedViewCloseRun)
@@ -581,7 +628,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     }
 
     private fun destroy() {
-        mService.leaveRoom(mRoomInfo, completion = {})
+        mService?.leaveRoom(mRoomInfo, completion = {})
         if (isRoomOwner) {
             mRtcEngine.leaveChannelEx(mMainRtcConnection)
             mRtcEngine.stopPreview()
@@ -735,7 +782,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             contentInspectConfig.modules = arrayOf(module)
             contentInspectConfig.moduleCount = 1
             val ret = mRtcEngine.enableContentInspectEx(enable, contentInspectConfig, connection)
-            Log.d(TAG, "enableContentInspectEx $ret")
+            ShowTo1v1Logger.d(TAG, "enableContentInspectEx $ret")
         } catch (_: JSONException) {
         }
     }
@@ -769,15 +816,20 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             }
         }
 
-        override fun onCallEventChanged(event: CallEvent) {
-            super.onCallEventChanged(event)
+        override fun onCallEventChanged(event: CallEvent, eventReason: String?) {
+            super.onCallEventChanged(event, eventReason)
             when (event) {
-                CallEvent.LocalLeave -> {
+                CallEvent.LocalLeft -> {
                     onHangup()
                 }
 
-                CallEvent.RemoteLeave -> {
+                CallEvent.RemoteLeft -> {
                     // 主叫方离线，挂断
+                    eventReason?.let {
+                        if (it.toInt() == Constants.USER_OFFLINE_DROPPED) {
+                            ToastUtils.showToast(getString(R.string.show_to1v1_end_linking_tips2))
+                        }
+                    }
                     onHangup()
                 }
 
@@ -792,7 +844,11 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             message: String?
         ) {
             super.onCallError(errorEvent, errorType, errorCode, message)
-            ShowTo1v1Logger.d(TAG, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
+            ShowTo1v1Logger.e(TAG, Exception(message),"onCallError: errorEvent$errorEvent, errorType:$errorType,errorCode:$errorCode")
+        }
+
+        override fun canJoinRtcOnCalling(eventInfo: Map<String, Any>): Boolean {
+            return true
         }
 
         override fun onCallStateChanged(
@@ -803,7 +859,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         ) {
             val publisher = eventInfo[CallApiImpl.kPublisher] ?: mShowTo1v1Manger.mCurrentUser.userId
             if (publisher != mShowTo1v1Manger.mCurrentUser.userId) return
-            Log.d(TAG, "RoomDetail state:${state.name},stateReason:${stateReason.name},eventReason:${eventReason}")
+            ShowTo1v1Logger.d(TAG, "RoomDetail onCallStateChanged state:${state.name},stateReason:${stateReason.name},eventReason:${eventReason}")
             updateCallState(state)
             when (state) {
                 CallStateType.Prepared -> {
@@ -822,11 +878,22 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                             }
                         }
 
+                        CallStateReason.RemoteCallBusy -> {
+                            if (!isRoomOwner) {
+                                ToastUtils.showToast(getString(R.string.show_to1v1_call_toast_remote_busy))
+                            }
+                        }
+
                         else -> {}
                     }
                     finishCallDialog()
                     mShowTo1v1Manger.mRemoteUser = null
                     mShowTo1v1Manger.mConnectedChannelId = null
+
+                    if (isRoomOwner) {
+                        // 通话结束， 恢复音频配置
+                        mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
+                    }
                 }
 
                 CallStateType.Calling -> {
@@ -843,27 +910,42 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     // 触发状态的用户是自己才处理
                     if (mShowTo1v1Manger.mCurrentUser.userId == toUserId.toString()) {
                         // 收到大哥拨打电话
+                        mShowTo1v1Manger.isCaller = false
                         mShowTo1v1Manger.mConnectedChannelId = fromRoomId
                         val userMap = eventInfo[CallApiImpl.kFromUserExtension] as JSONObject
+
                         mShowTo1v1Manger.mRemoteUser = ShowTo1v1UserInfo(
                             userMap.getString("userId"),
                             userMap.getString("userName"),
                             userMap.getString("avatar"),
-                            userMap.getString("objectId"),
-                            userMap.getLong("createdAt")
+                            userMap.optString("objectId", ""),
+                            userMap.optLong("createdAt", 0L)
                         )
                         mShowTo1v1Manger.mCallApi.accept(fromUserId) {}
                     } else if (mShowTo1v1Manger.mCurrentUser.userId == fromUserId.toString()) {
                         // 大哥拨打电话
+                        mShowTo1v1Manger.isCaller = true
                         mShowTo1v1Manger.mConnectedChannelId = fromRoomId
                         mShowTo1v1Manger.mRemoteUser = mRoomInfo
                         onCallSend(mShowTo1v1Manger.mRemoteUser!!)
                     }
+
+
+                    // 设置视频最佳实践
+                    mShowTo1v1Manger.mRtcEngine.setVideoEncoderConfigurationEx(
+                        VideoEncoderConfiguration().apply {
+                            dimensions = VideoEncoderConfiguration.VideoDimensions(720, 1280)
+                            frameRate = 24
+                            degradationPrefer = VideoEncoderConfiguration.DEGRADATION_PREFERENCE.MAINTAIN_BALANCED
+                        },
+                        RtcConnection(mShowTo1v1Manger.mConnectedChannelId, mShowTo1v1Manger.mCurrentUser.userId.toInt())
+                    )
+                    mShowTo1v1Manger.mRtcEngine.setParameters("{\"che.video.videoCodecIndex\": 2}")
                 }
 
                 CallStateType.Connecting -> {
                     if (stateReason == CallStateReason.LocalAccepted || stateReason == CallStateReason.RemoteAccepted) {
-                        Log.d(TAG, "call Connecting LocalAccepted or RemoteAccepted")
+                        ShowTo1v1Logger.d(TAG, "call Connecting LocalAccepted or RemoteAccepted")
                     }
                 }
 
@@ -880,6 +962,17 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         channelId, localUid.toLong(), AudioModeration.AgoraChannelType.broadcast,
                         "ShowTo1v1"
                     )
+
+                    binding.root.postDelayed({
+                        // 设置音频最佳实践
+                        if (mShowTo1v1Manger.isCaller) {
+                            // 主叫
+                            mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Caller)
+                        } else {
+                            // 被叫
+                            mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
+                        }
+                    }, 500)
                 }
 
                 CallStateType.Failed -> {
@@ -904,7 +997,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             CallStateType.Idle,
             CallStateType.Failed -> {
                 mTimeLinkAt = 0
-
+                mShowTo1v1Manger.mRtcEngine.enableLocalAudio(true)
+                mShowTo1v1Manger.mRtcEngine.enableLocalVideo(true)
                 publishMedia(true)
                 setupVideoView(true)
 
@@ -952,7 +1046,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         .into(binding.ivCallingAvatar)
                 }
                 if (mShowTo1v1Manger.mRemoteUser == null) {
-                    Log.d(TAG, "Connected but remoteUser is null")
+                    ShowTo1v1Logger.e(TAG, Exception("Connected but remoteUser is null"))
                 }
                 mShowTo1v1Manger.mCurrentUser.let {
                     binding.vDragSmallWindow.setUserName(it.userName)
@@ -983,12 +1077,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     binding.layoutCallPrivately.isVisible = false
                     stopCallAnimator()
                 }
-//                mainLooper.queue.addIdleHandler {
-//                    Log.d(TAG, "animateConnectedViewOpen -- queueIdle -- 1")
-//                    // workaround
-//                    onShowSettingDialog(false)
-//                    false
-//                }
             }
 
             else -> {}

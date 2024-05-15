@@ -18,6 +18,10 @@
 		AB4746E72A5E82AB00E68FBA /* ShowRobotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */; };
 		ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */; };
 		ABE4B37A2A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */; };
+		DD1F53592B9FF0C0009E4287 /* AGResourceManager+Ent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1F53582B9FF0C0009E4287 /* AGResourceManager+Ent.swift */; };
+		DD1F535F2B9FF7C1009E4287 /* FUDynmicResourceConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = DD1F535E2B9FF7C1009E4287 /* FUDynmicResourceConfig.m */; };
+		DD1F53652BA01D9F009E4287 /* fu_authpack_reader.c in Sources */ = {isa = PBXBuildFile; fileRef = DD1F53642BA01D9F009E4287 /* fu_authpack_reader.c */; };
+		DD227ECA2BE9CE4F00013A18 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DD227EC92BE9CE4F00013A18 /* PrivacyInfo.xcprivacy */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
 		DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */; };
 		DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DD2A43D028FFCEE7004CEDCF /* Main.storyboard */; };
@@ -104,6 +108,9 @@
 		DD3610CB29B70CDC00CE7984 /* ShowServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36105729B70CDC00CE7984 /* ShowServiceProtocol.swift */; };
 		DD3610CD29B70F3300CE7984 /* VLMineSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3610CC29B70F3300CE7984 /* VLMineSwitchCell.swift */; };
 		DD3610D029B70F3800CE7984 /* VLMineCellModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD3610CF29B70F3800CE7984 /* VLMineCellModel.m */; };
+		DD38AE632BA92CDD00C418F4 /* LRCLodingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD38AE612BA92CDC00C418F4 /* LRCLodingProgressView.swift */; };
+		DD38AE642BA92CDD00C418F4 /* GradientProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD38AE622BA92CDC00C418F4 /* GradientProgressBar.swift */; };
+		DD5FC3A42BA99ECF0097E5D4 /* ShowCreateLiveVC+Beauty.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD5FC3A32BA99ECF0097E5D4 /* ShowCreateLiveVC+Beauty.swift */; };
 		DD614F5F2AD4FA620059F109 /* AUiAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD614F5B2AD4FA620059F109 /* AUiAlertView.swift */; };
 		DD614F612AD4FA620059F109 /* AlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD614F5D2AD4FA620059F109 /* AlertManager.swift */; };
 		DD619A6429E3E247008F63E4 /* SARequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199CF29E3E246008F63E4 /* SARequest.swift */; };
@@ -235,6 +242,7 @@
 		DD619C0829E3E84D008F63E4 /* SceneVersionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619C0529E3E84C008F63E4 /* SceneVersionCell.swift */; };
 		DD619C0929E3E84D008F63E4 /* AboutAgoraHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619C0629E3E84C008F63E4 /* AboutAgoraHeader.swift */; };
 		DD619C0A29E3E84D008F63E4 /* ContactInfoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD619C0729E3E84C008F63E4 /* ContactInfoCell.swift */; };
+		DD6334A02B9EF61A00608205 /* STDynmicResourceConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = DD63349F2B9EF61A00608205 /* STDynmicResourceConfig.m */; };
 		DD84177B29090C520026B624 /* VLHomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416A829090C520026B624 /* VLHomeViewController.m */; };
 		DD84178529090C520026B624 /* VLUploadImageResModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416C129090C520026B624 /* VLUploadImageResModel.m */; };
 		DD84178629090C520026B624 /* VLMineView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416C329090C520026B624 /* VLMineView.m */; };
@@ -404,6 +412,7 @@
 		DDA19A0A28FFE579009D3E61 /* Screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994A28FFE579009D3E61 /* Screen.swift */; };
 		DDA19A1028FFE579009D3E61 /* VLGlobalHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1995B28FFE579009D3E61 /* VLGlobalHelper.m */; };
 		DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */; };
+		DDED55522B9EEFF70066B49B /* BEDynmicResourceConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = DDED55502B9EEFF70066B49B /* BEDynmicResourceConfig.m */; };
 		E301BBCC2AF4A3E50089A79C /* URL+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BBCB2AF4A3E50089A79C /* URL+Extension.swift */; };
 		E301BBD92AF4C8F40089A79C /* AgoraRequestTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BBD32AF4C8F30089A79C /* AgoraRequestTask.swift */; };
 		E301BBDA2AF4C8F40089A79C /* AgoraDownLoadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BBD42AF4C8F40089A79C /* AgoraDownLoadManager.swift */; };
@@ -746,7 +755,13 @@
 		ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingBitrateCell.swift; sourceTree = "<group>"; };
 		ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNetStateSelectViewController.swift; sourceTree = "<group>"; };
 		CDE991620D7140A1BF78AFF2 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD1F53582B9FF0C0009E4287 /* AGResourceManager+Ent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AGResourceManager+Ent.swift"; sourceTree = "<group>"; };
+		DD1F535D2B9FF7C1009E4287 /* FUDynmicResourceConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FUDynmicResourceConfig.h; sourceTree = "<group>"; };
+		DD1F535E2B9FF7C1009E4287 /* FUDynmicResourceConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FUDynmicResourceConfig.m; sourceTree = "<group>"; };
+		DD1F53632BA01D9F009E4287 /* fu_authpack_reader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fu_authpack_reader.h; sourceTree = "<group>"; };
+		DD1F53642BA01D9F009E4287 /* fu_authpack_reader.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = fu_authpack_reader.c; sourceTree = "<group>"; };
 		DD220BC1295B340A00F57F30 /* MenuUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuUtils.h; sourceTree = "<group>"; };
+		DD227EC92BE9CE4F00013A18 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -837,6 +852,9 @@
 		DD3610CC29B70F3300CE7984 /* VLMineSwitchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VLMineSwitchCell.swift; sourceTree = "<group>"; };
 		DD3610CE29B70F3800CE7984 /* VLMineCellModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLMineCellModel.h; sourceTree = "<group>"; };
 		DD3610CF29B70F3800CE7984 /* VLMineCellModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLMineCellModel.m; sourceTree = "<group>"; };
+		DD38AE612BA92CDC00C418F4 /* LRCLodingProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LRCLodingProgressView.swift; sourceTree = "<group>"; };
+		DD38AE622BA92CDC00C418F4 /* GradientProgressBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradientProgressBar.swift; sourceTree = "<group>"; };
+		DD5FC3A32BA99ECF0097E5D4 /* ShowCreateLiveVC+Beauty.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ShowCreateLiveVC+Beauty.swift"; sourceTree = "<group>"; };
 		DD614F5B2AD4FA620059F109 /* AUiAlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUiAlertView.swift; sourceTree = "<group>"; };
 		DD614F5D2AD4FA620059F109 /* AlertManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertManager.swift; sourceTree = "<group>"; };
 		DD6199CF29E3E246008F63E4 /* SARequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SARequest.swift; sourceTree = "<group>"; };
@@ -968,6 +986,8 @@
 		DD619C0529E3E84C008F63E4 /* SceneVersionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneVersionCell.swift; sourceTree = "<group>"; };
 		DD619C0629E3E84C008F63E4 /* AboutAgoraHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutAgoraHeader.swift; sourceTree = "<group>"; };
 		DD619C0729E3E84C008F63E4 /* ContactInfoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactInfoCell.swift; sourceTree = "<group>"; };
+		DD63349E2B9EF61A00608205 /* STDynmicResourceConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STDynmicResourceConfig.h; sourceTree = "<group>"; };
+		DD63349F2B9EF61A00608205 /* STDynmicResourceConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STDynmicResourceConfig.m; sourceTree = "<group>"; };
 		DD8416A829090C520026B624 /* VLHomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLHomeViewController.m; sourceTree = "<group>"; };
 		DD8416AE29090C520026B624 /* VLHomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLHomeViewController.h; sourceTree = "<group>"; };
 		DD8416C029090C520026B624 /* VLUploadImageResModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLUploadImageResModel.h; sourceTree = "<group>"; };
@@ -1175,6 +1195,8 @@
 		DDA1995C28FFE579009D3E61 /* VLGlobalHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLGlobalHelper.h; sourceTree = "<group>"; };
 		DDDDDA2928FFD5DD005F4E8B /* AgoraEntScenarios-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AgoraEntScenarios-Bridging-Header.h"; sourceTree = "<group>"; };
 		DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
+		DDED55502B9EEFF70066B49B /* BEDynmicResourceConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BEDynmicResourceConfig.m; sourceTree = "<group>"; };
+		DDED55512B9EEFF70066B49B /* BEDynmicResourceConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BEDynmicResourceConfig.h; sourceTree = "<group>"; };
 		E301BBCB2AF4A3E50089A79C /* URL+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Extension.swift"; sourceTree = "<group>"; };
 		E301BBD32AF4C8F30089A79C /* AgoraRequestTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraRequestTask.swift; sourceTree = "<group>"; };
 		E301BBD42AF4C8F40089A79C /* AgoraDownLoadManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraDownLoadManager.swift; sourceTree = "<group>"; };
@@ -1746,6 +1768,25 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		DD1F53572B9FF0AC009E4287 /* ResourceManager */ = {
+			isa = PBXGroup;
+			children = (
+				DD1F53582B9FF0C0009E4287 /* AGResourceManager+Ent.swift */,
+			);
+			path = ResourceManager;
+			sourceTree = "<group>";
+		};
+		DD1F535C2B9FF7AF009E4287 /* DynamicSetting */ = {
+			isa = PBXGroup;
+			children = (
+				DD1F535D2B9FF7C1009E4287 /* FUDynmicResourceConfig.h */,
+				DD1F535E2B9FF7C1009E4287 /* FUDynmicResourceConfig.m */,
+				DD1F53632BA01D9F009E4287 /* fu_authpack_reader.h */,
+				DD1F53642BA01D9F009E4287 /* fu_authpack_reader.c */,
+			);
+			path = DynamicSetting;
+			sourceTree = "<group>";
+		};
 		DD2A43BE28FFCEE7004CEDCF = {
 			isa = PBXGroup;
 			children = (
@@ -1772,6 +1813,7 @@
 		DD2A43C928FFCEE7004CEDCF /* AgoraEntScenarios */ = {
 			isa = PBXGroup;
 			children = (
+				DD227EC92BE9CE4F00013A18 /* PrivacyInfo.xcprivacy */,
 				DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */,
 				DDA198DC28FFE579009D3E61 /* Common */,
 				DDA1997928FFE579009D3E61 /* ThirdParty */,
@@ -1870,6 +1912,7 @@
 		DD36100029B70CDC00CE7984 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				DD5FC3A32BA99ECF0097E5D4 /* ShowCreateLiveVC+Beauty.swift */,
 				DD36100129B70CDC00CE7984 /* ShowRoomListVC.swift */,
 				DD36100229B70CDC00CE7984 /* Alert */,
 				DD36100529B70CDC00CE7984 /* ShowMusicEffectVC.swift */,
@@ -1945,6 +1988,7 @@
 		DD36102129B70CDC00CE7984 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				DD38AE602BA92CDC00C418F4 /* Progress */,
 				DD36102229B70CDC00CE7984 /* Music */,
 				DD36102629B70CDC00CE7984 /* Alert */,
 				DD36102929B70CDC00CE7984 /* CreateLive */,
@@ -2074,6 +2118,15 @@
 				AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */,
 			);
 			path = Service;
+			sourceTree = "<group>";
+		};
+		DD38AE602BA92CDC00C418F4 /* Progress */ = {
+			isa = PBXGroup;
+			children = (
+				DD38AE612BA92CDC00C418F4 /* LRCLodingProgressView.swift */,
+				DD38AE622BA92CDC00C418F4 /* GradientProgressBar.swift */,
+			);
+			path = Progress;
 			sourceTree = "<group>";
 		};
 		DD614F5A2AD4FA620059F109 /* ToastView */ = {
@@ -2361,6 +2414,15 @@
 				DD619A6329E3E247008F63E4 /* SASoundTypeCard.swift */,
 			);
 			path = RoomManager;
+			sourceTree = "<group>";
+		};
+		DD63349D2B9EF61A00608205 /* DynamicSetting */ = {
+			isa = PBXGroup;
+			children = (
+				DD63349E2B9EF61A00608205 /* STDynmicResourceConfig.h */,
+				DD63349F2B9EF61A00608205 /* STDynmicResourceConfig.m */,
+			);
+			path = DynamicSetting;
 			sourceTree = "<group>";
 		};
 		DD84168629090C520026B624 /* Resource */ = {
@@ -3128,6 +3190,7 @@
 		DDA1994D28FFE579009D3E61 /* Manager */ = {
 			isa = PBXGroup;
 			children = (
+				DD1F53572B9FF0AC009E4287 /* ResourceManager */,
 				DD6199CA29E3D36D008F63E4 /* Authorized */,
 				DDA1994E28FFE579009D3E61 /* NetworkManager */,
 				DDA1995328FFE579009D3E61 /* VLDefine */,
@@ -3175,6 +3238,15 @@
 			children = (
 			);
 			path = ThirdParty;
+			sourceTree = "<group>";
+		};
+		DDED554F2B9EEFF70066B49B /* DynamicSetting */ = {
+			isa = PBXGroup;
+			children = (
+				DDED55502B9EEFF70066B49B /* BEDynmicResourceConfig.m */,
+				DDED55512B9EEFF70066B49B /* BEDynmicResourceConfig.h */,
+			);
+			path = DynamicSetting;
 			sourceTree = "<group>";
 		};
 		E301BBD12AF4C8470089A79C /* KTVLrcDownload */ = {
@@ -4044,6 +4116,7 @@
 		E732CDB92B4D2AF7004D6FB9 /* FUBeauty */ = {
 			isa = PBXGroup;
 			children = (
+				DD1F535C2B9FF7AF009E4287 /* DynamicSetting */,
 				E732CDBA2B4D2AF7004D6FB9 /* FUManager.h */,
 				E732CDBB2B4D2AF7004D6FB9 /* FUManager.m */,
 			);
@@ -4053,6 +4126,7 @@
 		E732CDBC2B4D2AF7004D6FB9 /* ByteBeaufy */ = {
 			isa = PBXGroup;
 			children = (
+				DDED554F2B9EEFF70066B49B /* DynamicSetting */,
 				E732CDBE2B4D2AF7004D6FB9 /* BELicenseHelper.mm */,
 				E732CDBF2B4D2AF7004D6FB9 /* BEOpenGLRenderHelper.m */,
 				E732CDC02B4D2AF7004D6FB9 /* Core.h */,
@@ -4081,6 +4155,7 @@
 		E732CDD82B4D2AF7004D6FB9 /* SenseBeaufy */ = {
 			isa = PBXGroup;
 			children = (
+				DD63349D2B9EF61A00608205 /* DynamicSetting */,
 				E732CE1C2B4D2B59004D6FB9 /* EffectsAttribute.h */,
 				E732CDDA2B4D2AF7004D6FB9 /* EffectsLicense.h */,
 				E732CDDB2B4D2AF7004D6FB9 /* EffectsAttribute.m */,
@@ -4246,6 +4321,7 @@
 				DD84179029090C520026B624 /* Media.xcassets in Resources */,
 				DD2A43D428FFCEE7004CEDCF /* Assets.xcassets in Resources */,
 				E301C0042AF8E8E90089A79C /* README.md in Resources */,
+				DD227ECA2BE9CE4F00013A18 /* PrivacyInfo.xcprivacy in Resources */,
 				E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */,
 				DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */,
 				E301C0052AF8E8E90089A79C /* sbg_scene.png in Resources */,
@@ -4354,6 +4430,7 @@
 				E301BE6E2AF4E06F0089A79C /* VLSRTonesView.m in Sources */,
 				DD9EBFA72AD5512300B4551F /* VRRoomMenuBarEntity.swift in Sources */,
 				DD619ACE29E3E247008F63E4 /* SAUserView.swift in Sources */,
+				DDED55522B9EEFF70066B49B /* BEDynmicResourceConfig.m in Sources */,
 				DD619C0429E3E81D008F63E4 /* AboutAgoraEntertainmentViewController.swift in Sources */,
 				DD9EC0042AD5512400B4551F /* VRCreateRoomView.swift in Sources */,
 				DD9EBFED2AD5512400B4551F /* VMANISSetTableViewCell.swift in Sources */,
@@ -4428,6 +4505,7 @@
 				E732CE082B4D2AF8004D6FB9 /* BEGLTexture.m in Sources */,
 				E301BE6C2AF4E06F0089A79C /* VLSRStatusView.swift in Sources */,
 				E301BD712AF4CAFF0089A79C /* VLAudioEffectPicker.m in Sources */,
+				DD38AE642BA92CDD00C418F4 /* GradientProgressBar.swift in Sources */,
 				DD619AB029E3E247008F63E4 /* SAGiftView.swift in Sources */,
 				E301C01C2AF8E8E90089A79C /* VLSBGSwitcherView.m in Sources */,
 				DD619AC629E3E247008F63E4 /* SABaseRtcUserView.swift in Sources */,
@@ -4445,6 +4523,7 @@
 				DD9EBFCB2AD5512300B4551F /* PopTip.swift in Sources */,
 				E301C00D2AF8E8E90089A79C /* VLSBGCreateRoomView.m in Sources */,
 				DDA199F928FFE579009D3E61 /* NSDictionary+dictToModel.m in Sources */,
+				DD1F535F2B9FF7C1009E4287 /* FUDynmicResourceConfig.m in Sources */,
 				DDA19A0428FFE579009D3E61 /* CALayer+JKBorderColor.m in Sources */,
 				DD9EBF942AD5512300B4551F /* PresentedViewType.swift in Sources */,
 				E301C01E2AF8E8E90089A79C /* VLSBGTonesView.m in Sources */,
@@ -4524,6 +4603,7 @@
 				E301BD592AF4CAFF0089A79C /* KTVLog.swift in Sources */,
 				DD3610BF29B70CDC00CE7984 /* ShowSettingActionSheetCell.swift in Sources */,
 				E301C03B2AF8E8E90089A79C /* SBGSyncManagerServiceImp.swift in Sources */,
+				DD1F53592B9FF0C0009E4287 /* AGResourceManager+Ent.swift in Sources */,
 				E732CE0A2B4D2AF8004D6FB9 /* BEGLUtils.m in Sources */,
 				E732CE142B4D2AF8004D6FB9 /* EffectsAnimal.m in Sources */,
 				DD619A9B29E3E247008F63E4 /* SAAudioSettingDetailViewController.swift in Sources */,
@@ -4789,6 +4869,7 @@
 				DD619ADB29E3E247008F63E4 /* SAChatBar.swift in Sources */,
 				DDA19A0028FFE579009D3E61 /* NSString+Emoji.m in Sources */,
 				E301C0142AF8E8E90089A79C /* SBGScoreCell.swift in Sources */,
+				DD5FC3A42BA99ECF0097E5D4 /* ShowCreateLiveVC+Beauty.swift in Sources */,
 				E732CE0C2B4D2AF8004D6FB9 /* ByteBeautyManager.swift in Sources */,
 				A851C5DE2AEF5F8400071F88 /* ShowDebugAgoraKitManager.swift in Sources */,
 				E301BD9D2AF4CB000089A79C /* KTVServiceProtocol.swift in Sources */,
@@ -4797,6 +4878,7 @@
 				E301C02C2AF8E8E90089A79C /* VLSBGPopSongList.m in Sources */,
 				DD619A9329E3E247008F63E4 /* SABaseViewController.swift in Sources */,
 				E301C03A2AF8E8E90089A79C /* AppContext+SBG.m in Sources */,
+				DD6334A02B9EF61A00608205 /* STDynmicResourceConfig.m in Sources */,
 				DD9EBFE32AD5512300B4551F /* VMSoundSelTableViewCell.swift in Sources */,
 				DD619ABC29E3E247008F63E4 /* SAChatCell.swift in Sources */,
 				DD36106529B70CDC00CE7984 /* ShowChatModel.swift in Sources */,
@@ -4852,6 +4934,7 @@
 				E301C01F2AF8E8E90089A79C /* VLSBGSliderView.m in Sources */,
 				E301BE692AF4E06F0089A79C /* VLSRPopMoreSelView.m in Sources */,
 				DD619A7029E3E247008F63E4 /* SAPresentationAnimation.swift in Sources */,
+				DD1F53652BA01D9F009E4287 /* fu_authpack_reader.c in Sources */,
 				DD9EBF902AD5512300B4551F /* FlipHorizontalAnimation.swift in Sources */,
 				DD9EBFC72AD5512300B4551F /* VoiceRoomSendGiftCell.swift in Sources */,
 				DD619AD129E3E247008F63E4 /* SASwitchTableViewCell.swift in Sources */,
@@ -4949,6 +5032,7 @@
 				DD619A9C29E3E247008F63E4 /* SAGiftersViewController.swift in Sources */,
 				E301C0172AF8E8E90089A79C /* VLSBGDropOnLineView.m in Sources */,
 				E301BE702AF4E06F0089A79C /* VLSRSliderView.m in Sources */,
+				DD38AE632BA92CDD00C418F4 /* LRCLodingProgressView.swift in Sources */,
 				DD619ABA29E3E247008F63E4 /* SAAudioSettingView.swift in Sources */,
 				DD36109329B70CDC00CE7984 /* ShowLiveViewController.swift in Sources */,
 				E301BD6B2AF4CAFF0089A79C /* VLSearchSongResultView.m in Sources */,
@@ -5241,7 +5325,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.10.1;
+				MARKETING_VERSION = 4.2.1;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
@@ -5354,8 +5438,6 @@
 					"\"QuartzCore\"",
 					"-framework",
 					"\"SDWebImage\"",
-					"-framework",
-					"\"SDWebImageAPNGCoder\"",
 					"-framework",
 					"\"SSZipArchive\"",
 					"-framework",
@@ -5426,7 +5508,7 @@
 					"\"Photos\"",
 					"-ld64",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.joy;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.test.entfull;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -5469,7 +5551,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.10.1;
+				MARKETING_VERSION = 4.2.1;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
@@ -5582,8 +5664,6 @@
 					"\"QuartzCore\"",
 					"-framework",
 					"\"SDWebImage\"",
-					"-framework",
-					"\"SDWebImageAPNGCoder\"",
 					"-framework",
 					"\"SSZipArchive\"",
 					"-framework",
@@ -5671,7 +5751,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = KR58Y29Q42;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;

@@ -6,6 +6,7 @@ import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -13,6 +14,8 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+import io.agora.rtc2.RtcConnection
+import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
@@ -21,10 +24,11 @@ import io.agora.scene.showTo1v1.CallRole
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
+import io.agora.scene.showTo1v1.audio.AudioScenarioType
+import io.agora.scene.showTo1v1.audio.SceneType
 import io.agora.scene.showTo1v1.callapi.*
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListActivityBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
-import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import io.agora.scene.showTo1v1.ui.dialog.CallDialog
 import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
@@ -49,9 +53,9 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         private const val POSITION_NONE = -1
     }
 
-    private val mService by lazy { ShowTo1v1ServiceProtocol.getImplInstance() }
     private val mShowTo1v1Manger by lazy { ShowTo1v1Manger.getImpl() }
     private val mRtcEngine by lazy { mShowTo1v1Manger.mRtcEngine }
+    private val mService by lazy { mShowTo1v1Manger.mService }
 
     private var mRoomInfoList = mutableListOf<ShowTo1v1RoomInfo>()
     private val mRtcVideoLoaderApi by lazy { VideoLoader.getImplInstance(mRtcEngine) }
@@ -78,14 +82,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setOnApplyWindowInsetsListener()
-        mShowTo1v1Manger.renewTokens {
-            if (it) {
-                binding.smartRefreshLayout.autoRefresh()
-            }
-        }
-        mShowTo1v1Manger.initCallAPi()
-
-        //RoomDetailActivity.launchBackGround(this)
+        binding.smartRefreshLayout.autoRefresh()
     }
 
     private fun setOnApplyWindowInsetsListener() {
@@ -96,18 +93,6 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             binding.emptyInclude.root.setPaddingRelative(0, inset.top, 0, 0)
             WindowInsetsCompat.CONSUMED
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
-    override fun onStop() {
-        super.onStop()
     }
 
     override fun onRestart() {
@@ -146,8 +131,10 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         binding.smartRefreshLayout.setOnRefreshListener {
             mShowTo1v1Manger.renewTokens {
                 if (it) {
+                    mShowTo1v1Manger.setup(this)
                     fetchRoomList()
                 } else {
+                    ToastUtils.showToast(getString(R.string.show_to1v1_room_list_refreshed, "fetch token failed!"))
                     binding.smartRefreshLayout.finishRefresh()
                 }
             }
@@ -155,118 +142,120 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     }
 
     private fun initOrUpdateViewPage() {
-        if (mRoomInfoList.size > 0) {
-            onPageScrollEventHandler = object : OnPageScrollEventHandler(
-                this,
-                mRtcEngine,
-                UserManager.getInstance().user.id.toInt(),
-                true,
-                AGSlicingType.VISIABLE
-            ) {
-                override fun onPageScrollStateChanged(state: Int) {
-                    when (state) {
-                        ViewPager2.SCROLL_STATE_SETTLING -> binding.viewPager2.isUserInputEnabled = false
-                        ViewPager2.SCROLL_STATE_IDLE -> binding.viewPager2.isUserInputEnabled = true
-                        ViewPager2.SCROLL_STATE_DRAGGING -> {
-                            // TODO 暂不支持
-                        }
-                    }
-                    super.onPageScrollStateChanged(state)
-                }
-
-                override fun onPageStartLoading(position: Int) {
-                    Log.d(TAG, "onPageLoad, position:$position")
-                    mVpFragments[position]?.startLoadPageSafely()
-                }
-
-                override fun onPageLoaded(position: Int) {
-                    Log.d(TAG, "onPageReLoad, position:$position")
-                    mVpFragments[position]?.onPageLoaded()
-                }
-
-                override fun onPageLeft(position: Int) {
-                    Log.d(TAG, "onPageHide, position:$position")
-                    mVpFragments[position]?.stopLoadPage(true)
-                }
-
-                override fun onRequireRenderVideo(
-                    position: Int,
-                    info: VideoLoader.AnchorInfo
-                ): VideoLoader.VideoCanvasContainer? {
-                    Log.d(TAG, "onRequireRenderVideo, position:$position")
-                    return mVpFragments[position]?.initAnchorVideoView(info)
-                }
-            }
-
-            val list = ArrayList<VideoLoader.RoomInfo>()
-            mRoomInfoList.forEach {
-                val anchorList = arrayListOf(
-                    VideoLoader.AnchorInfo(
-                        it.roomId,
-                        it.userId.toInt(),
-                        mShowTo1v1Manger.generalToken()
-                    )
-                )
-                list.add(
-                    VideoLoader.RoomInfo(it.roomId, anchorList)
-                )
-            }
-            onPageScrollEventHandler?.updateRoomList(list)
-
-            // 设置vp当前页面外的页面数
-            binding.viewPager2.offscreenPageLimit = 1
-            val fragmentAdapter = object : FragmentStateAdapter(this) {
-                override fun getItemCount() = mRoomInfoList.size
-
-                override fun createFragment(position: Int): Fragment {
-                    val roomInfo = mRoomInfoList[position % mRoomInfoList.size]
-                    return RoomListFragment.newInstance(
-                        roomInfo,
-                        onPageScrollEventHandler as OnPageScrollEventHandler, position
-                    ).apply {
-                        Log.d(TAG, "position：$position, room:${roomInfo.roomId}")
-                        mVpFragments.put(position, this)
-                        if (roomInfo.userId != UserManager.getInstance().user.id.toString()) {
-                            val anchorList = arrayListOf(
-                                VideoLoader.AnchorInfo(
-                                    roomInfo.roomId,
-                                    roomInfo.userId.toInt(),
-                                    mShowTo1v1Manger.generalToken()
-                                )
-                            )
-                            onPageScrollEventHandler?.onRoomCreated(position,
-                                VideoLoader.RoomInfo(
-                                    roomInfo.roomId,
-                                    anchorList
-                                ),position == this@RoomListActivity.binding.viewPager2.currentItem)
-                        } else {
-                            // 主播
-                            startLoadPageSafely()
-                        }
+        onPageScrollEventHandler = object : OnPageScrollEventHandler(
+            mRtcEngine,
+            UserManager.getInstance().user.id.toInt(),
+            true,
+            AGSlicingType.VISIBLE
+        ) {
+            override fun onPageScrollStateChanged(state: Int) {
+                when (state) {
+                    ViewPager2.SCROLL_STATE_SETTLING -> binding.viewPager2.isUserInputEnabled = false
+                    ViewPager2.SCROLL_STATE_IDLE -> binding.viewPager2.isUserInputEnabled = true
+                    ViewPager2.SCROLL_STATE_DRAGGING -> {
+                        // TODO 暂不支持
                     }
                 }
-
-                override fun getItemId(position: Int): Long {
-                    // 防止 fragment 变了不刷新
-                    val roomInfo = mRoomInfoList[position % mRoomInfoList.size]
-                    return (roomInfo.roomId.hashCode() + position).toLong()
-                }
+                super.onPageScrollStateChanged(state)
             }
-            binding.viewPager2.adapter = fragmentAdapter
-            binding.viewPager2.registerOnPageChangeCallback(onPageScrollEventHandler as OnPageChangeCallback)
-            binding.viewPager2.setCurrentItem(0, false)
-            mCurrLoadPosition = binding.viewPager2.currentItem
+
+            override fun onPageStartLoading(position: Int) {
+                Log.d(TAG, "onPageLoad, position:$position")
+                mVpFragments[position]?.startLoadPageSafely()
+            }
+
+            override fun onPageLoaded(position: Int) {
+                Log.d(TAG, "onPageReLoad, position:$position")
+                mVpFragments[position]?.onPageLoaded()
+            }
+
+            override fun onPageLeft(position: Int) {
+                Log.d(TAG, "onPageHide, position:$position")
+                mVpFragments[position]?.stopLoadPage(true)
+            }
+
+            override fun onRequireRenderVideo(
+                position: Int,
+                info: VideoLoader.AnchorInfo
+            ): VideoLoader.VideoCanvasContainer? {
+                Log.d(TAG, "onRequireRenderVideo, position:$position")
+                return mVpFragments[position]?.initAnchorVideoView(info)
+            }
         }
+
+        val list = ArrayList<VideoLoader.RoomInfo>()
+        mRoomInfoList.forEach {
+            val anchorList = arrayListOf(
+                VideoLoader.AnchorInfo(
+                    it.roomId,
+                    it.userId.toInt(),
+                    mShowTo1v1Manger.generalToken()
+                )
+            )
+            list.add(
+                VideoLoader.RoomInfo(it.roomId, anchorList)
+            )
+        }
+        onPageScrollEventHandler?.updateRoomList(list)
+
+        // 设置vp当前页面外的页面数
+        binding.viewPager2.offscreenPageLimit = 1
+        val fragmentAdapter = object : FragmentStateAdapter(this) {
+            override fun getItemCount() = mRoomInfoList.size
+
+            override fun createFragment(position: Int): Fragment {
+                val roomInfo = mRoomInfoList[position % mRoomInfoList.size]
+                return RoomListFragment.newInstance(
+                    roomInfo,
+                    onPageScrollEventHandler as OnPageScrollEventHandler, position
+                ).apply {
+                    Log.d(TAG, "position：$position, room:${roomInfo.roomId}")
+                    mVpFragments.put(position, this)
+                    if (roomInfo.userId != UserManager.getInstance().user.id.toString()) {
+                        val anchorList = arrayListOf(
+                            VideoLoader.AnchorInfo(
+                                roomInfo.roomId,
+                                roomInfo.userId.toInt(),
+                                mShowTo1v1Manger.generalToken()
+                            )
+                        )
+                        onPageScrollEventHandler?.onRoomCreated(position,
+                            VideoLoader.RoomInfo(
+                                roomInfo.roomId,
+                                anchorList
+                            ),position == this@RoomListActivity.binding.viewPager2.currentItem)
+                    } else {
+                        // 主播
+                        startLoadPageSafely()
+                    }
+                }
+            }
+
+            override fun getItemId(position: Int): Long {
+                // 防止 fragment 变了不刷新
+                val roomInfo = mRoomInfoList[position % mRoomInfoList.size]
+                return (roomInfo.roomId.hashCode() + position).toLong()
+            }
+        }
+        binding.viewPager2.adapter = fragmentAdapter
+        binding.viewPager2.registerOnPageChangeCallback(onPageScrollEventHandler as OnPageChangeCallback)
+        binding.viewPager2.setCurrentItem(0, false)
+        mCurrLoadPosition = binding.viewPager2.currentItem
     }
 
     private fun fetchRoomList() {
-        mService.getRoomList(completion = { error, roomList ->
+        mService?.getRoomList(completion = { error, roomList ->
+            if (error != null) {
+                ToastUtils.showToast(getString(R.string.show_to1v1_room_list_refreshed, error.message))
+                binding.smartRefreshLayout.finishRefresh()
+                return@getRoomList
+            }
             mRoomInfoList.clear()
             mRoomInfoList.addAll(roomList)
             updateListView()
             resetViewpage()
             initOrUpdateViewPage()
-            //ToastUtils.showToast(R.string.show_to1v1_room_list_refreshed)
+
             mayShowGuideView()
             if (roomList.isNotEmpty()) {
                 binding.viewPager2.setCurrentItem(0, false)
@@ -304,7 +293,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         mRtcVideoLoaderApi.cleanCache()
         VideoLoader.release()
         mShowTo1v1Manger.destroy()
-        mService.reset()
+        mService?.reset()
     }
 
 
@@ -334,10 +323,15 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 mShowTo1v1Manger.prepareCall(CallRole.CALLER, roomInfo.roomId, callback = {
                     if (it) {
                         mShowTo1v1Manger.mCallApi.addListener(callApiListener)
-                        mShowTo1v1Manger.mCallApi.call(roomInfo.getIntUserId(), completion = {
-                            if (it != null) {
-                                mShowTo1v1Manger.mCallApi.removeListener(callApiListener)
-                                mShowTo1v1Manger.deInitialize()
+                        mShowTo1v1Manger.mCallApi.call(roomInfo.getIntUserId(), completion = { error ->
+                            if (error != null && mCallState == CallStateType.Calling) {
+                                Toast.makeText(this, getString(R.string.show_to1v1_call_failed, error.code.toString()), Toast.LENGTH_SHORT).show()
+                                // call 失败立刻挂断
+                                mShowTo1v1Manger.mCallApi.cancelCall {  }
+                                mCallDialog?.let {
+                                    if (it.isShowing) it.dismiss()
+                                    mCallDialog = null
+                                }
                             }
                         })
                     } else {
@@ -375,6 +369,14 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     private val callApiListener = object : ICallApiListener {
 
+        override fun callDebugInfo(message: String, logLevel: CallLogLevel) {
+            super.callDebugInfo(message, logLevel)
+            when (logLevel) {
+                CallLogLevel.Normal, CallLogLevel.Warning -> ShowTo1v1Logger.d(RoomDetailActivity.TAG, "callDebugInfo $message")
+                CallLogLevel.Error -> ShowTo1v1Logger.e(RoomDetailActivity.TAG, null, "callDebugInfo $message")
+            }
+        }
+
         override fun tokenPrivilegeWillExpire() {
             super.tokenPrivilegeWillExpire()
             mShowTo1v1Manger.renewTokens {}
@@ -387,7 +389,11 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             message: String?
         ) {
             super.onCallError(errorEvent, errorType, errorCode, message)
-            ShowTo1v1Logger.d(TAG, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
+            ShowTo1v1Logger.e(TAG, Exception(message),"onCallError: errorEvent$errorEvent, errorType:$errorType,errorCode:$errorCode")
+        }
+
+        override fun canJoinRtcOnCalling(eventInfo: Map<String, Any>): Boolean {
+            return true
         }
 
         override fun onCallStateChanged(
@@ -399,7 +405,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
             val publisher = eventInfo[CallApiImpl.kPublisher] ?: mShowTo1v1Manger.mCurrentUser.userId
             if (publisher != mShowTo1v1Manger.mCurrentUser.userId) return
             mCallState = state
-            Log.d(TAG, "RooList state:${state.name},stateReason:${stateReason.name},eventReason:${eventReason}")
+            ShowTo1v1Logger.d(TAG, "RooList onCallStateChanged state:${state.name},stateReason:${stateReason.name},eventReason:${eventReason}")
             when (state) {
                 CallStateType.Prepared -> {
                     if (stateReason == CallStateReason.CallingTimeout || stateReason == CallStateReason.RemoteRejected) {
@@ -409,8 +415,15 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                             if (it.isShowing) it.dismiss()
                             mCallDialog = null
                         }
+                    } else if (stateReason == CallStateReason.RemoteCallBusy) {
+                        ToastUtils.showToast(getString(R.string.show_to1v1_call_toast_remote_busy))
+                        mCallDialog?.let {
+                            if (it.isShowing) it.dismiss()
+                            mCallDialog = null
+                        }
+                    } else if ((stateReason == CallStateReason.LocalHangup || stateReason == CallStateReason.RemoteHangup) && mShowTo1v1Manger.isCaller) {
+                        fetchRoomList()
                     }
-                    fetchRoomList()
                 }
 
                 CallStateType.Calling -> {
@@ -420,9 +433,10 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     // 触发状态的用户是自己才处理
                     if (mShowTo1v1Manger.mCurrentUser.userId == toUserId.toString()) {
                         // 收到大哥拨打电话
-                        // nothing
+                        mShowTo1v1Manger.isCaller = false
                     } else if (mShowTo1v1Manger.mCurrentUser.userId == fromUserId.toString()) {
                         // 大哥拨打电话
+                        mShowTo1v1Manger.isCaller = true
                         mShowTo1v1Manger.mConnectedChannelId = fromRoomId
                         val remoteUser = mRoomInfoList.firstOrNull {
                             it.userId == toUserId.toString()
@@ -430,6 +444,15 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                         mShowTo1v1Manger.mRemoteUser = remoteUser
                         onCallSend(remoteUser)
                     }
+
+                    mShowTo1v1Manger.mRtcEngine.setVideoEncoderConfigurationEx(
+                        VideoEncoderConfiguration().apply {
+                            dimensions = VideoEncoderConfiguration.VideoDimensions(720, 1280)
+                            frameRate = 24
+                            degradationPrefer = VideoEncoderConfiguration.DEGRADATION_PREFERENCE.MAINTAIN_BALANCED
+                        },
+                        RtcConnection(mShowTo1v1Manger.mConnectedChannelId, mShowTo1v1Manger.mCurrentUser.userId.toInt())
+                    )
                 }
 
                 CallStateType.Connecting -> {
@@ -446,6 +469,15 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     mRoomInfo?.let { roomInfo ->
                         mShowTo1v1Manger.mCallApi.removeListener(this)
                         RoomDetailActivity.launch(this@RoomListActivity, true, roomInfo)
+                    }
+
+                    // 设置音频最佳实践
+                    if (mShowTo1v1Manger.isCaller) {
+                        // 主叫
+                        mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Caller)
+                    } else {
+                        // 被叫
+                        mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
                     }
                 }
 

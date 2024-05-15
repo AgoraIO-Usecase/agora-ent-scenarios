@@ -13,7 +13,7 @@ open class NMCommonNetworkModel: AUINetworkModel {
     public var userId: String?
     public override init() {
         super.init()
-        host = AppContext.shared.baseServerUrl
+        host = AppContext.shared.baseServerUrl + "/toolbox/"
         method = .post
     }
     

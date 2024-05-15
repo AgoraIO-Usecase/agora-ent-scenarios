@@ -1,5 +1,8 @@
 package io.agora.rtmsyncmanager.service.collection
 
+fun fromValue(value: Int): AUICollectionException.ErrorCode? {
+    return enumValues<AUICollectionException.ErrorCode>().firstOrNull { it.value == value }
+}
 
 class AUICollectionException private constructor(val code: Int, override val message: String) :
     Exception() {
@@ -14,7 +17,8 @@ class AUICollectionException private constructor(val code: Int, override val mes
         encodeToJsonStringFail(105, "encode to json string fail"),
         calculateMapFail(106, "calculate map fail"),
         recvErrorReceipt(107, "receipt error"),
-        unsupportedAction(108, "action unsupported");
+        unsupportedAction(108, "action unsupported"),
+        calculateMapOutOfRange(111, "calculate map out of range");
 
         fun toException(msg: String? = null): AUICollectionException {
             return AUICollectionException(value, msg ?: message)

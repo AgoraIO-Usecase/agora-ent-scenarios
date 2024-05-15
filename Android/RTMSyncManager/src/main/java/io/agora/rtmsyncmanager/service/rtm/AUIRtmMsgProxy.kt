@@ -11,6 +11,7 @@ import io.agora.rtm.RtmConstants
 import io.agora.rtm.RtmEventListener
 import io.agora.rtm.StorageEvent
 import io.agora.rtm.TopicEvent
+import io.agora.rtmsyncmanager.utils.AUILogger
 
 interface AUIRtmErrorRespObserver {
 
@@ -48,7 +49,7 @@ interface AUIRtmLockRespObserver {
 }
 
 class AUIRtmMsgProxy : RtmEventListener {
-
+    private val tag = "AUIRtmMsgProxy"
     var originEventListeners: RtmEventListener? = null
     private val attributeRespObservers: MutableMap<String, ArrayList<AUIRtmAttributeRespObserver>> =
         mutableMapOf()
@@ -62,6 +63,7 @@ class AUIRtmMsgProxy : RtmEventListener {
 
     fun cleanCache(channelName: String) {
         msgCacheAttr.remove(channelName)
+        AUILogger.logger().d(tag, "cleanCache channelName$channelName, msgCacheAttr=$msgCacheAttr")
     }
 
     fun keys(channelName: String): List<String>? {
@@ -83,6 +85,7 @@ class AUIRtmMsgProxy : RtmEventListener {
         observer: AUIRtmAttributeRespObserver
     ) {
         val key = "${channelName}__${itemKey}"
+        AUILogger.logger().d(tag, "registerAttributeRespObserver: $key")
         val observers = attributeRespObservers[key] ?: ArrayList()
         observers.add(observer)
         attributeRespObservers[key] = observers
@@ -94,6 +97,7 @@ class AUIRtmMsgProxy : RtmEventListener {
         observer: AUIRtmAttributeRespObserver
     ) {
         val key = "${channelName}__${itemKey}"
+        AUILogger.logger().d(tag, "unRegisterAttributeRespObserver: $key")
         val observers = attributeRespObservers[key] ?: return
         observers.remove(observer)
     }
@@ -150,7 +154,7 @@ class AUIRtmMsgProxy : RtmEventListener {
     }
 
     override fun onStorageEvent(event: StorageEvent?) {
-        Log.d("rtm_event", "onStorageEvent update: $event")
+        AUILogger.logger().d("rtm_event", "onStorageEvent update: $event")
         originEventListeners?.onStorageEvent(event)
         event ?: return
         val channelName = event.target
@@ -159,12 +163,8 @@ class AUIRtmMsgProxy : RtmEventListener {
 
     fun processMetaData(channelName: String, metadata: Metadata?) {
         metadata ?: return
-        val items = metadata.metadataItems
-        if (metadata.metadataItems.isEmpty()) {
-            if (isMetaEmpty) {
-                return
-            }
-            isMetaEmpty = true
+        val items = metadata.items
+        if (metadata.items.isEmpty()) {
             errorRespObservers.forEach { handler ->
                 handler.onMsgReceiveEmpty(channelName)
             }
@@ -173,7 +173,7 @@ class AUIRtmMsgProxy : RtmEventListener {
         isMetaEmpty = false
 
         val cache = msgCacheAttr[channelName] ?: mutableMapOf()
-        metadata.metadataItems.forEach { item ->
+        metadata.items.forEach { item ->
             if (cache[item.key] == item.value) {
                 return@forEach
             }
@@ -276,7 +276,7 @@ class AUIRtmMsgProxy : RtmEventListener {
     }
 
     override fun onLockEvent(event: LockEvent?) {
-        Log.d("rtm_lock_event", "onLockEvent event: $event count: ${event?.lockDetailList?.count()}")
+        AUILogger.logger().d("rtm_lock_event", "onLockEvent event: $event")
         originEventListeners?.onLockEvent(event)
         event ?: return
         val addLockDetails = mutableListOf<LockDetail>()
@@ -322,7 +322,7 @@ class AUIRtmMsgProxy : RtmEventListener {
         reason: RtmConstants.RtmConnectionChangeReason?
     ) {
         super.onConnectionStateChanged(channelName, state, reason)
-        Log.d("rtm_event", "rtm -- connect state change: $state, reason: $reason")
+        AUILogger.logger().d(tag, "rtm -- connect state change: $state, reason: $reason")
 
         errorRespObservers.forEach {
             it.onConnectionStateChanged(

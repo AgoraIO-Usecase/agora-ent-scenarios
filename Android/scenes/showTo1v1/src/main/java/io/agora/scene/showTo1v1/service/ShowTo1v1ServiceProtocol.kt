@@ -27,31 +27,16 @@ interface ShowTo1v1ServiceListenerProtocol {
     fun onNetworkStatusChanged(status: ShowTo1v1ServiceNetworkStatus)
 
     // 用户变化
-    fun onUserListDidChanged(userList: List<ShowTo1v1UserInfo>)
+    fun onUserListDidChanged(userNum: Int)
 
     // 房间销毁
-    fun onRoomDidDestroy(roomInfo: ShowTo1v1RoomInfo)
+    fun onRoomDidDestroy(roomId: String)
 
     // 房间体验时间到
     fun onRoomTimeUp()
 }
 
 interface ShowTo1v1ServiceProtocol {
-
-    companion object {
-
-        private val instance by lazy {
-            ShowTo1v1ServiceImpl(ShowTo1v1Manger.getImpl().mCurrentUser) {
-                if (it.message != "action error") {
-                    ToastUtils.showToast(it.message)
-                }
-            }
-        }
-
-        fun getImplInstance(): ShowTo1v1ServiceProtocol {
-            return instance
-        }
-    }
 
     // 创建房间
     fun createRoom(roomName: String, completion: (error: Exception?, roomInfo: ShowTo1v1RoomInfo?) -> Unit)
