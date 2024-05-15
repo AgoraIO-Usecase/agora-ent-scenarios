@@ -1,5 +1,6 @@
 package io.agora.scene.showTo1v1
 
+import android.content.Context
 import android.util.Log
 import android.view.TextureView
 import io.agora.rtc2.IRtcEngineEventHandler
@@ -8,15 +9,21 @@ import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoEncoderConfiguration
-import io.agora.rtc2.video.VirtualBackgroundSource
+import io.agora.rtm.RtmClient
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
+import io.agora.scene.showTo1v1.audio.AudioScenarioApi
 import io.agora.scene.showTo1v1.callapi.CallApiImpl
 import io.agora.scene.showTo1v1.callapi.CallConfig
 import io.agora.scene.showTo1v1.callapi.PrepareConfig
+import io.agora.scene.showTo1v1.callapi.signalClient.CallRtmManager
+import io.agora.scene.showTo1v1.callapi.signalClient.ICallRtmManagerListener
+import io.agora.scene.showTo1v1.callapi.signalClient.createRtmManager
+import io.agora.scene.showTo1v1.callapi.signalClient.createRtmSignalClient
+import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceImpl
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -31,15 +38,7 @@ enum class CallRole(val value: Int) {
  */
 class ShowTo1v1Manger constructor() {
 
-    val videoEncoderConfiguration = VideoEncoderConfiguration().apply {
-        orientationMode = VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_ADAPTIVE
-    }
-    val virtualBackgroundSource = VirtualBackgroundSource().apply {
-        backgroundSourceType = VirtualBackgroundSource.BACKGROUND_COLOR
-    }
-    val videoCaptureConfiguration = CameraCapturerConfiguration(CameraCapturerConfiguration.CaptureFormat()).apply {
-        followEncodeDimensionRatio = false
-    }
+    val scenarioApi by lazy { AudioScenarioApi(mRtcEngine) }
 
     companion object {
 
@@ -65,6 +64,12 @@ class ShowTo1v1Manger constructor() {
     var mConnectedChannelId: String? = null
 
     private var innerCurrentUser: ShowTo1v1UserInfo? = null
+
+    private var rtmManager: CallRtmManager? = null
+
+    var mService: ShowTo1v1ServiceImpl? = null
+
+    var isCaller = false
 
     // 本地用户
     val mCurrentUser: ShowTo1v1UserInfo
@@ -104,12 +109,51 @@ class ShowTo1v1Manger constructor() {
     @Volatile
     private var isCallApiInit = false
 
-    fun initCallAPi() {
+    fun setup(context: Context) {
+        initRtm()
+        mService = ShowTo1v1ServiceImpl(context, rtmManager!!.getRtmClient(), mCurrentUser)
+    }
+
+    private fun initRtm() {
+        if (rtmManager == null) {
+            // 使用RtmManager管理RTM
+            rtmManager = createRtmManager(BuildConfig.AGORA_APP_ID, mCurrentUser.getIntUserId())
+            // 监听 rtm manager 事件
+            rtmManager?.addListener(object : ICallRtmManagerListener {
+                override fun onConnected() {
+
+                }
+
+                override fun onDisconnected() {
+
+                }
+
+                override fun onConnectionLost() {
+                    // 表示rtm超时断连了，需要重新登录，这里模拟了3s重新登录
+                }
+
+                override fun onTokenPrivilegeWillExpire(channelName: String) {
+                    // 重新获取token
+                    renewTokens {  }
+                }
+            })
+        }
+
+        // rtm login
+        rtmManager?.login(mPrepareConfig.rtmToken) {
+            if (it == null) {
+                // login 成功后初始化 call api
+                initCallAPi()
+            }
+        }
+    }
+
+    private fun initCallAPi() {
         val config = CallConfig(
             appId = BuildConfig.AGORA_APP_ID,
             userId = mCurrentUser.getIntUserId(),
             rtcEngine = mRtcEngine,
-            null
+            createRtmSignalClient(rtmManager!!.getRtmClient())
         )
         mCallApi.initialize(config)
     }
@@ -150,6 +194,10 @@ class ShowTo1v1Manger constructor() {
     }
 
     fun renewTokens(callback: ((Boolean)) -> Unit) {
+        if (generalToken() != "") {
+            callback.invoke(true)
+            return
+        }
         TokenGenerator.generateTokens(
             "", // 万能 token
             UserManager.getInstance().user.id.toString(),
@@ -168,7 +216,8 @@ class ShowTo1v1Manger constructor() {
                 mPrepareConfig.rtcToken = rtcToken
                 mPrepareConfig.rtmToken = rtmToken
                 setupGeneralToken(rtcToken)
-                mCallApi.renewToken(rtcToken, rtmToken)
+                mCallApi.renewToken(rtcToken)
+                rtmManager?.renewToken(rtmToken)
                 callback.invoke(true)
             },
             failure = {
@@ -205,6 +254,8 @@ class ShowTo1v1Manger constructor() {
                 val config = RtcEngineConfig()
                 config.mContext = AgoraApplication.the()
                 config.mAppId = BuildConfig.AGORA_APP_ID
+                config.addExtension("agora_ai_echo_cancellation_extension")
+                config.addExtension("agora_ai_noise_suppression_extension")
                 config.mEventHandler = object : IRtcEngineEventHandler() {
                     override fun onError(err: Int) {
                         super.onError(err)
@@ -213,18 +264,43 @@ class ShowTo1v1Manger constructor() {
                 }
                 innerRtcEngine = (RtcEngineEx.create(config) as RtcEngineEx).apply {
                     enableVideo()
+                    // 设置视频最佳配置
+                    setCameraCapturerConfiguration(CameraCapturerConfiguration(
+                        CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_FRONT,
+                        CameraCapturerConfiguration.CaptureFormat(720, 1280, 24)
+                    ).apply {
+                        followEncodeDimensionRatio = true
+                    })
+                    setVideoEncoderConfiguration(
+                        VideoEncoderConfiguration().apply {
+                            dimensions = VideoEncoderConfiguration.VideoDimensions(720, 1280)
+                            frameRate = 24
+                            degradationPrefer = VideoEncoderConfiguration.DEGRADATION_PREFERENCE.MAINTAIN_BALANCED
+                        }
+                    )
+                    setParameters("{\"che.video.videoCodecIndex\": 2}")
+                    enableInstantMediaRendering()
+                    setParameters("{\"rtc.video.quickIntraHighFec\": true}")
+                    setParameters("{\"rtc.network.e2e_cc_mode\": 3}")
                 }
+                scenarioApi.initialize()
             }
             return innerRtcEngine!!
         }
 
     fun destroy() {
+        mGeneralToken = ""
         mRemoteUser = null
         mConnectedChannelId = null
         isCallApiInit = false
         mCallApi.deinitialize {}
         innerCurrentUser = null
         innerPrepareConfig = null
+        rtmManager?.let {
+            it.logout()
+            RtmClient.release()
+            rtmManager = null
+        }
         innerRtcEngine?.let {
             workingExecutor.execute { RtcEngine.destroy() }
             innerRtcEngine = null

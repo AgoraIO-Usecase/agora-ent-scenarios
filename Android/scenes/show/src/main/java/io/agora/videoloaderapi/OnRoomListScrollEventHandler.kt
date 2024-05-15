@@ -14,7 +14,7 @@ abstract class OnRoomListScrollEventHandler constructor(
     private val mRtcEngine: RtcEngineEx,
     private val localUid: Int
 ): RecyclerView.OnScrollListener() {
-    private val tag = "OnRoomListScrollEventHandler"
+    private val tag = "[VideoLoader]Scroll0"
     private val roomList = ArrayList<VideoLoader.RoomInfo>()
 
     fun updateRoomList(list: ArrayList<VideoLoader.RoomInfo>) {

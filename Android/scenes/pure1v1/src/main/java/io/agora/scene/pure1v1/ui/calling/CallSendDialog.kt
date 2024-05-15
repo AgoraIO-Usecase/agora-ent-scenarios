@@ -16,6 +16,7 @@ import io.agora.scene.pure1v1.databinding.Pure1v1CallSendDialogBinding
 import io.agora.scene.pure1v1.service.UserInfo
 import io.agora.scene.pure1v1.ui.base.CallDialogState
 import io.agora.scene.pure1v1.ui.base.DebouncedOnClickListener
+import kotlin.random.Random
 
 /*
  * 1v1 拨打页面
@@ -49,22 +50,25 @@ class CallSendDialog(
             listener?.onSendViewDidClickHangup()
             hangUp()
         })
-//        val showView = SurfaceView(context)
     }
 
     fun initView(userInfo: UserInfo) {
+        // 主叫播放来电秀
         binding.root.post {
+            CallServiceManager.instance.playCallShow(CallServiceManager.urls[Random.nextInt(CallServiceManager.urls.size)])
+            CallServiceManager.instance.playCallMusic(CallServiceManager.callMusic)
             CallServiceManager.instance.renderCallShow(showView)
-            binding.tvShow.removeAllViews()
-            binding.tvShow.addView(showView)
-
-            binding.tvUserName.text = userInfo.userName
-            Glide.with(context)
-                .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
-                .into(binding.ivUserAvatar)
-
-            updateCallState(CallDialogState.Calling)
         }
+
+        binding.tvShow.removeAllViews()
+        binding.tvShow.addView(showView)
+        binding.tvUserName.text = userInfo.userName
+
+        Glide.with(context)
+            .load(userInfo.avatar).apply(RequestOptions.circleCropTransform())
+            .into(binding.ivUserAvatar)
+
+        updateCallState(CallDialogState.Calling)
     }
 
     fun setListener(l: CallSendDialogListener) {
@@ -84,9 +88,6 @@ class CallSendDialog(
             val fragment = parentFragmentManager.findFragmentByTag("CallSendFragment")
             fragment?.let {
                 binding.tvShow.removeAllViews()
-                val transaction = parentFragmentManager.beginTransaction()
-                transaction.hide(it)
-                transaction.commit()
             }
         }
     }
@@ -94,7 +95,6 @@ class CallSendDialog(
     private var textCount: Int = 0
     private fun textAnimation() {
         if (callState == CallDialogState.Calling) {
-            Log.d("hugo", "textAnimation: ${binding.tvDot.text}")
             when (textCount) {
                 0 -> {binding.tvDot.text = ""}
                 1 -> {binding.tvDot.text = "."}

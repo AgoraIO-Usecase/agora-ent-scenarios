@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AgoraRtcKit
 
 private let kDialogAnimationDuration = 0.3
 class ShowTo1v1Dialog: UIView {
@@ -24,6 +25,7 @@ class ShowTo1v1Dialog: UIView {
         view.backgroundColor = .clear
         return view
     }()
+    
     fileprivate lazy var contentView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
@@ -129,6 +131,25 @@ private let kDialogTag = 1112234567
 //创建房间弹窗
 class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate, UITextFieldDelegate {
     var stateTitle: String? = "user_list_creating".showTo1v1Localization() 
+    private var engine: AgoraRtcEngineKit?
+    
+    fileprivate lazy var previewView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .black
+        view.layer.cornerRadius = 20
+        view.clipsToBounds = true
+        return view
+    }()
+    
+    
+    private lazy var closeButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.aui_size = kNormalIconSize
+        button.setImage(UIImage.sceneImage(name: "live_close"), for: .normal)
+        button.addTarget(self, action: #selector(_onCloseAction), for: .touchUpInside)
+        return button
+    }()
+    
     var renderStateTitle: String? {
         set {
             createButton.setTitle(newValue ?? "", for: .disabled)
@@ -225,6 +246,8 @@ class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate, UITextFieldD
     
     override func _loadSubView() {
         super._loadSubView()
+        insertSubview(previewView, at: 0)
+        addSubview(closeButton)
         dialogView.addSubview(titleLabel)
         dialogView.addSubview(randomButton)
         dialogView.addSubview(textField)
@@ -257,7 +280,10 @@ class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate, UITextFieldD
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        
+        previewView.frame = bounds
+        closeButton.aui_right = aui_width - 15
+        closeButton.aui_top = UIDevice.current.aui_SafeDistanceTop
+
         titleLabel.sizeToFit()
         titleLabel.aui_tl = CGPoint(x: 38, y: 34)
         randomButton.aui_br = CGPoint(x: dialogView.aui_width - 26, y: titleLabel.aui_bottom)
@@ -270,11 +296,11 @@ class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate, UITextFieldD
         createButton.aui_bottom = dialogView.aui_height - UIDevice.current.aui_SafeDistanceBottom - 19
     }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesEnded(touches, with: event)
-        guard let point = touches.first?.location(in: self), !dialogView.frame.contains(point) else {return}
-        hiddenAnimation()
-    }
+//    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        super.touchesEnded(touches, with: event)
+//        guard let point = touches.first?.location(in: self), !dialogView.frame.contains(point) else {return}
+//        hiddenAnimation()
+//    }
     
     override func showAnimation() {
         setNeedsLayout()
@@ -294,22 +320,43 @@ class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate, UITextFieldD
     }
     
     static func show(user: ShowTo1v1UserInfo,
+                     engine: AgoraRtcEngineKit,
                      createClosure: @escaping (String)->(),
                      randomClosure: @escaping ()->(String)) -> CreateRoomDialog? {
         CreateRoomDialog.hidden()
         guard let window = getWindow() else {return nil}
         let dialog = CreateRoomDialog(frame: window.bounds)
+        dialog.engine = engine
         dialog.userInfo = user
         dialog.createClosure = createClosure
         dialog.randomClosure = randomClosure
         dialog.tag = kDialogTag
         window.addSubview(dialog)
+        dialog._startPreview()
         dialog.showAnimation()
         return dialog
     }
     
     static func hidden() {
         getWindow()?.viewWithTag(kDialogTag)?.removeFromSuperview()
+    }
+    
+    private func _startPreview() {
+        let canvas = AgoraRtcVideoCanvas()
+        canvas.view = previewView
+//        canvas.mirrorMode = mirrorMode
+        engine?.setupLocalVideo(canvas)
+        engine?.startPreview()
+        engine?.enableLocalVideo(true)
+        engine?.enableLocalVideo(true)
+    }
+    
+    private func _stopPreview() {
+        let canvas = AgoraRtcVideoCanvas()
+        canvas.view = nil
+        engine?.setupLocalVideo(canvas)
+        engine?.stopPreview()
+        engine?.enableLocalVideo(false)
     }
     
     @objc private func _createAction() {
@@ -319,6 +366,11 @@ class CreateRoomDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate, UITextFieldD
     @objc private func _randomAction() {
         let text = randomClosure?()
         textField.text = text
+    }
+    
+    @objc private func _onCloseAction() {
+        _stopPreview()
+        hiddenAnimation()
     }
     
     //MARK: UITextFieldDelegate
@@ -358,7 +410,7 @@ class CallerDialog: ShowTo1v1Dialog, TextLoadingBinderDelegate {
         didSet {
             avatarView.sd_setImage(with: URL(string: userInfo?.avatar ?? ""))
             userNameLabel.text = userInfo?.userName ?? ""
-            bgImageView.image = userInfo?.bgImage()
+            bgImageView.sd_setImage(with: URL(string: userInfo?.bgImage() ?? ""), placeholderImage: nil)
         }
     }
     

@@ -2,8 +2,25 @@ package io.agora.videoloaderapi
 
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
+import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcEngineEx
+import io.agora.videoloaderapi.report.APIReporter
+import io.agora.videoloaderapi.report.APIType
+
+/**
+ * 房间状态
+ * @param IDLE 默认状态
+ * @param PRE_JOINED 预加入房间状态
+ * @param JOINED 已进入房间状态
+ * @param JOINED_WITHOUT_AUDIO 不播放音频
+ */
+enum class AnchorState {
+    IDLE,
+    PRE_JOINED,
+    JOINED,
+    JOINED_WITHOUT_AUDIO,
+}
 
 /**
  * 视频流管理模块
@@ -11,20 +28,35 @@ import io.agora.rtc2.RtcEngineEx
 interface VideoLoader {
 
     companion object {
+        const val version = "1.0.0"
         private var rtcEngine: RtcEngineEx? = null
         private var instance: VideoLoader? = null
+        var reporter: APIReporter? = null
 
         fun getImplInstance(engine: RtcEngineEx): VideoLoader {
             rtcEngine = engine
             if (instance == null) {
-                instance = VideoLoaderImpl(rtcEngine!!)
+                instance = VideoLoaderImpl(engine)
+                reporter = APIReporter(APIType.VIDEO_LOADER, version, engine)
                 engine.enableInstantMediaRendering()
             }
             return instance as VideoLoader
         }
 
+        // 日志输出
+        fun videoLoaderApiLog(tag: String, msg: String) {
+            reporter?.writeLog("[$tag] $msg", Constants.LOG_LEVEL_INFO)
+        }
+
+        // 日志输出
+        fun videoLoaderApiLogWarning(tag: String, msg: String) {
+            reporter?.writeLog("[$tag] $msg", Constants.LOG_LEVEL_WARNING)
+        }
+
         fun release() {
             instance = null
+            rtcEngine = null
+            reporter = null
         }
     }
 
@@ -56,7 +88,7 @@ interface VideoLoader {
         val token: String = ""
     ) {
         override fun toString(): String {
-            return "{channelId=$channelId, anchorUid=$anchorUid"
+            return "channelId:$channelId, anchorUid:$anchorUid"
         }
     }
 
@@ -76,7 +108,7 @@ interface VideoLoader {
     fun cleanCache()
 
     /**
-     * 切换指定主播的状态
+     * 预加载主播频道
      * @param anchorList 主播列表
      * @param uid 用户uid
      */
@@ -86,20 +118,22 @@ interface VideoLoader {
      * 切换指定主播的状态
      * @param newState 目标状态
      * @param anchorInfo 主播信息
-     * @param uid 用户uid
+     * @param localUid 本地用户 uid
+     * @param mediaOptions 自定义的 ChannelMediaOptions
      */
     fun switchAnchorState(
         newState: AnchorState,
         anchorInfo: AnchorInfo,
-        uid: Int
+        localUid: Int,
+        mediaOptions: ChannelMediaOptions? = null
     )
 
     /**
-     * 切换指定房间的状态
+     * 获取指定房间的状态
      * @param channelId 频道名
      * @param localUid 用户id
      */
-    fun getRoomState(channelId: String, localUid: Int): AnchorState?
+    fun getAnchorState(channelId: String, localUid: Int): AnchorState?
 
 
     /**

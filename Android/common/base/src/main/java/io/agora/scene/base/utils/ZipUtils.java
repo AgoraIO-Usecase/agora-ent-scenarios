@@ -76,11 +76,7 @@ public final class ZipUtils {
         List<String> outPath = new ArrayList<>();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
-            if (entry.getName().matches(filter)) {
-                copyEntry(zzipFile, entry, targetDir, reserve, outPath);
-            } else {
-                Log.w(TAG, "Skipping unexpected file: " + entry.getName());
-            }
+            copyEntry(zzipFile, entry, targetDir, reserve, outPath);
         }
         return outPath;
     }
@@ -94,8 +90,14 @@ public final class ZipUtils {
         InputStream iStream = null;
         OutputStream oStream = null;
         if (entry.isDirectory()) {
-            if (reserve) {
-                // TODO 待实现
+            // 如果条目是目录，创建目录及其所有父目录
+            File newDir = new File(targetDir, entry.getName());
+            if (!newDir.exists()) {
+                boolean result = newDir.mkdirs();
+                if (!result && reserve) {
+                    // 如果无法创建目录，记录错误
+                    CommonBaseLogger.e(TAG, "Failed to create directory: " + newDir.getAbsolutePath());
+                }
             }
         } else {
             File oFile = new File(targetDir, entry.getName());

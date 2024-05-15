@@ -8,20 +8,33 @@
 import Foundation
 import SwiftyBeaver
 
-
-let commonLogger = AgoraEntCommonLog.createLog(config: AgoraEntCommonLogConfig())
+func commonLogger() -> SwiftyBeaver.Type {
+    AgoraEntLog.getSceneLogger(with: "Common")
+}
 public func agoraEnt_info(_ text: String, tag: String = "AgoraEntCommon") {
-    commonLogger.info(text, context: tag)
+    agoraDoMainThreadTask {
+        commonLogger().info(text, context: tag)
+    }
 }
 
 public func agoraEnt_warn(_ text: String, tag: String = "AgoraEntCommon") {
-    commonLogger.warning(text, context: tag)
+    agoraDoMainThreadTask {
+        commonLogger().warning(text, context: tag)
+    }
 }
 
 public func agoraEnt_error(_ text: String, tag: String = "AgoraEntCommon") {
-    commonLogger.error(text, context: tag)
+    agoraDoMainThreadTask {
+        commonLogger().error(text, context: tag)
+    }
 }
 
+public func agoraEnt_default_info(_ text: String, tag: String = "AgoraEntCommon") {
+    agoraDoMainThreadTask {
+        AgoraEntLog.currentLogger(with: "Common").info(text, context: tag)
+    }
+}
+/*
 @objc class AgoraEntCommonLogConfig: NSObject {
     var logFileMaxSize: Int = (2 * 1024 * 1024)
 }
@@ -44,7 +57,7 @@ public func agoraEnt_error(_ text: String, tag: String = "AgoraEntCommon") {
         let file = FileDestination()  // log to default swiftybeaver.log file
         let dateString = _dateFormat()
         let logDir = logsDir()
-        file.logFileURL = URL(fileURLWithPath: "\(logDir)/AgoraEntCommon_ios_\(dateString)_log.txt")
+        file.logFileURL = URL(fileURLWithPath: "\(logDir)/AgoraEntCommon_ios_\(dateString)_log.log")
         
         // use custom format and set console output to short time, log level & message
         console.format = "[AgoraEntCommon][$L][$X]$Dyyyy-MM-dd HH:mm:ss.SSS$d $M"
@@ -76,3 +89,4 @@ public func agoraEnt_error(_ text: String, tag: String = "AgoraEntCommon") {
         return logDir
     }
 }
+*/

@@ -66,7 +66,7 @@ class JoyServiceImpl: NSObject {
 extension JoyServiceImpl: JoyServiceProtocol {
     func getRoomList(completion: @escaping ([JoyRoomInfo]) -> Void) {
         let fetchRoomList: () -> Void = {[weak self] in
-            self?.roomManager.getRoomInfoList(lastCreateTime: 0, pageSize: 50) {[weak self] err, list in
+            self?.roomManager.getRoomInfoList(lastCreateTime: 0, pageSize: 50) {[weak self] err, ts, list in
                 let joyRoomList = list?.compactMap{ self?.convertAUIRoomInfo2JoyRoomInfo(with:$0) } ?? []
                 self?.roomList = joyRoomList
                 completion(joyRoomList)
@@ -351,7 +351,7 @@ extension JoyServiceImpl: JoyServiceProtocol {
 }
 
 extension JoyServiceImpl:AUIRtmMessageProxyDelegate {
-    func onMessageReceive(publisher: String, message: String) {
+    func onMessageReceive(publisher: String, channelName: String, message: String) {
         do {
             if let jsonData = message.data(using: .utf8) {
                 let model = try JSONDecoder().decode(JoyMessage.self, from: jsonData)
@@ -368,14 +368,14 @@ extension JoyServiceImpl: AUISceneRespDelegate {
         joyPrint("_leaveRoom: \(roomId) isRoomOwner:\(isRoomOwner)")
         let scene = self.syncManager.getScene(channelName: roomId)
         if isRoomOwner {
-            scene.delete()
+            scene?.delete()
             roomManager.destroyRoom(roomId: roomId) { _ in
             }
         } else {
-            scene.leave()
+            scene?.leave()
         }
-        scene.unbindRespDelegate(delegate: self)
-        scene.userService.unbindRespDelegate(delegate: self)
+        scene?.unbindRespDelegate(delegate: self)
+        scene?.userService.unbindRespDelegate(delegate: self)
     }
     
     func onSceneDestroy(roomId: String) {
@@ -515,7 +515,7 @@ extension JoyServiceImpl{
     }
     
     private func getCurrentScene(with channelName: String) -> AUIScene {
-        let scene = self.syncManager.getScene(channelName: channelName)
+        let scene = self.syncManager.createScene(channelName: channelName)
          //if !sceneBinded {
             scene.userService.bindRespDelegate(delegate: self)
             scene.bindRespDelegate(delegate: self)

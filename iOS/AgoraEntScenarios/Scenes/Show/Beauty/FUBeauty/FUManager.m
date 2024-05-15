@@ -10,8 +10,12 @@
 #import "BundleUtil.h"
 #if __has_include(<FURenderKit/FURenderKit.h>)
 #import <FURenderKit/FURenderKit.h>
+#endif
+#if __has_include("authpack.h")
 #import "authpack.h"
 #endif
+#import "FUDynmicResourceConfig.h"
+#import "fu_authpack_reader.h"
 
 static FUManager *shareManager = NULL;
 
@@ -50,10 +54,20 @@ static FUManager *shareManager = NULL;
             NSString *controllerPath = [[NSBundle mainBundle] pathForResource:@"controller_cpp" ofType:@"bundle"];
             NSString *controllerConfigPath = [[NSBundle mainBundle] pathForResource:@"controller_config" ofType:@"bundle"];
             FUSetupConfig *setupConfig = [[FUSetupConfig alloc] init];
-            setupConfig.authPack = FUAuthPackMake(g_auth_package, sizeof(g_auth_package));
             setupConfig.controllerPath = controllerPath;
             setupConfig.controllerConfigPath = controllerConfigPath;
+#if __has_include("authpack.h")
+            setupConfig.authPack = FUAuthPackMake(g_auth_package, sizeof(g_auth_package));
             self->_isSuccessLicense = sizeof(g_auth_package) > 0;
+#endif
+            NSString* licPath = [FUDynmicResourceConfig shareInstance].licFilePath;
+            if ([[NSFileManager defaultManager] fileExistsAtPath:licPath]) {
+                int length = 0;
+                char* auth_pack = parse_fu_auth_pack([licPath UTF8String], &length);
+                setupConfig.authPack = FUAuthPackMake(auth_pack, length);
+                self->_isSuccessLicense = length > 0;
+            }
+            
             // 初始化 FURenderKit
             [FURenderKit setupWithSetupConfig:setupConfig];
             

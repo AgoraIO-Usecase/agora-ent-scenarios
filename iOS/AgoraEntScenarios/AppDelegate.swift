@@ -7,6 +7,8 @@
 
 import UIKit
 import AgoraCommon
+import AGResourceManager
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
@@ -32,14 +34,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppContext.shared.appId = KeyCenter.AppId
         AppContext.shared.certificate = KeyCenter.Certificate ?? ""
         AppContext.shared.hostUrl = KeyCenter.HostUrl
-        AppContext.shared.roomManagerUrl = isDebugMode ? (KeyCenter.joyHostDev) : (KeyCenter.joyHost)
+        AppContext.shared.baseServerUrl = isDebugMode ? (KeyCenter.baseServerUrlDev ?? "") : (KeyCenter.baseServerUrl ?? "")
+        AppContext.shared.roomManagerUrl = "\(AppContext.shared.baseServerUrl)/room-manager"
         AppContext.shared.imAppKey = KeyCenter.IMAppKey ?? ""
         AppContext.shared.imClientId = KeyCenter.IMClientId ?? ""
         AppContext.shared.imClientSecret = KeyCenter.IMClientSecret ?? ""
         AppContext.shared.cloudPlayerKey = KeyCenter.CloudPlayerKey ?? ""
         AppContext.shared.cloudPlayerSecret = KeyCenter.CloudPlayerSecret ?? ""
-        AppContext.shared.baseServerUrl = isDebugMode ? (KeyCenter.baseServerUrlDev ?? "") : (KeyCenter.baseServerUrl ?? "")
         
+        AGResourceManagerContext.shared.displayLogClosure = { text in
+            asyncToMainThread {
+                agoraEnt_default_info(text, tag: "ResourceManager")
+            }
+        }
+        AGResourceManager.autoDownload()
     }
     
     @objc func didTokenExpired() {

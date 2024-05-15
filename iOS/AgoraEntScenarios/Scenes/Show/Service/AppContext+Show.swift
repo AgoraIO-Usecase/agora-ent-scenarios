@@ -7,13 +7,37 @@
 
 import Foundation
 import AgoraCommon
+import SwiftyBeaver
+
 let kShowLogBaseContext = "AgoraKit"
-let showLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig(sceneName: "Show"))
 
 private let kShowRoomListKey = "kShowRoomListKey"
 private let kRtcTokenMapKey = "kRtcTokenMapKey"
 private let kRtcToken = "kRtcToken"
+private let kRtcTokenDate = "kRtcTokenDate"
 private let kDebugModeKey = "kDebugModeKey"
+
+func showLogger() -> SwiftyBeaver.Type {
+    AgoraEntLog.getSceneLogger(with: "Show")
+}
+
+func showPrint(_ message: String, context: String? = nil) {
+    agoraDoMainThreadTask {
+        showLogger().info(message, context: context)
+    }
+}
+
+func showWarn(_ message: String, context: String? = nil) {
+    agoraDoMainThreadTask {
+        showLogger().warning(message, context: context)
+    }
+}
+
+func showError(_ message: String, context: String? = nil) {
+    agoraDoMainThreadTask {
+        showLogger().error(message, context: context)
+    }
+}
 
 extension AppContext {
     static private var _showServiceImpMap: [String: ShowSyncManagerServiceImp] = [String: ShowSyncManagerServiceImp]()
@@ -63,9 +87,19 @@ extension AppContext {
     public var rtcToken: String? {
         set {
             self.extDic[kRtcToken] = newValue
+            self.tokenDate = Date()
         }
         get {
             return self.extDic[kRtcToken] as? String
+        }
+    }
+    
+    public var tokenDate: Date? {
+        set {
+            self.extDic[kRtcTokenDate] = newValue
+        }
+        get {
+            return self.extDic[kRtcTokenDate] as? Date
         }
     }
 }
