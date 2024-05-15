@@ -38,19 +38,31 @@ PODS:
     - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS (= 2.1.7)
   - FLAnimatedImage (1.0.17)
-  - HXPhotoPicker/Camera/Lite (4.1.3):
+  - HXPhotoPicker/Camera/Lite (4.1.7):
     - HXPhotoPicker/Core
-  - HXPhotoPicker/Core (4.1.3)
-  - HXPhotoPicker/Editor/Lite (4.1.3):
+  - HXPhotoPicker/Core (4.1.7)
+  - HXPhotoPicker/Editor/Lite (4.1.7):
     - HXPhotoPicker/EditorView/Lite
-  - HXPhotoPicker/EditorView/Lite (4.1.3):
+  - HXPhotoPicker/EditorView/Lite (4.1.7):
     - HXPhotoPicker/Core
-  - HXPhotoPicker/Lite (4.1.3):
+  - HXPhotoPicker/Lite (4.1.7):
     - HXPhotoPicker/Camera/Lite
     - HXPhotoPicker/Editor/Lite
     - HXPhotoPicker/Picker/Lite
-  - HXPhotoPicker/Picker/Lite (4.1.3):
+  - HXPhotoPicker/Picker/Lite (4.1.7):
     - HXPhotoPicker/Core
+  - Joy (0.1.0):
+    - AgoraCommon
+    - AgoraRtcEngine_Special_iOS
+    - AgoraSyncManager
+    - RTMSyncManager
+    - SDWebImage
+    - SnapKit
+    - SVProgressHUD
+    - SwiftProtobuf (= 1.24.0)
+    - SwiftyBeaver
+    - YYCategories
+    - YYModel
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
   - LEEAlert (1.6.4)
@@ -61,18 +73,22 @@ PODS:
     - LSTTimer
   - LSTTimer (0.2.10)
   - Masonry (1.1.0)
-  - MJRefresh (3.7.6)
+  - MJRefresh (3.7.9)
   - Protobuf (3.22.1)
   - Pure1v1 (0.1.0):
     - AgoraCommon
     - AgoraSyncManager
+    - AudioScenarioApi
     - CallAPI
     - FLAnimatedImage
+    - RTMSyncManager
     - SDWebImage
-    - SDWebImage/GIF
     - SnapKit
     - SwiftyBeaver
     - YYCategories
+    - YYModel
+  - RTMSyncManager (0.1.0):
+    - AgoraRtm (~> 2.2.0)
     - YYModel
   - ScoreEffectUI (1.0.2)
   - SDWebImage (4.4.8):
@@ -86,16 +102,17 @@ PODS:
   - ShowTo1v1 (0.1.0):
     - AgoraCommon
     - AgoraSyncManager
+    - AudioScenarioApi
     - CallAPI
     - FLAnimatedImage
+    - RTMSyncManager
     - SDWebImage
-    - SDWebImage/GIF
     - SnapKit
     - SwiftyBeaver
     - VideoLoaderAPI
     - YYCategories
     - YYModel
-  - SnapKit (5.6.0)
+  - SnapKit (5.7.1)
   - SocketRocket (0.7.0)
   - SSZipArchive (2.4.3)
   - SVGAPlayer (2.5.7):
@@ -126,6 +143,8 @@ DEPENDENCIES:
   - AgoraLyricsScore (= 1.1.6)
   - AgoraRtcEngine_Special_iOS (= 4.1.1.29)
   - AgoraSyncManager (~> 2.1.6)
+  - AGResourceManager (from `AgoraEntScenarios/Common/API/AGResourceManager`)
+  - AudioScenarioApi (from `AgoraEntScenarios/Common/API/AudioScenarioApi`)
   - Bugly (= 2.5.93)
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
   - HXPhotoPicker/Lite
@@ -137,6 +156,7 @@ DEPENDENCIES:
   - MJRefresh
   - Protobuf (= 3.22.1)
   - Pure1v1 (from `AgoraEntScenarios/Scenes/Pure1v1`)
+  - RTMSyncManager (from `AgoraEntScenarios/Common/API/RTMSyncManager`)
   - ScoreEffectUI (= 1.0.2)
   - SDWebImage (= 4.4.8)
   - SDWebImageAPNGCoder
@@ -161,7 +181,7 @@ SPEC REPOS:
     - AgoraComponetLog
     - AgoraLyricsScore
     - AgoraRtcEngine_Special_iOS
-    - AgoraRtm_iOS
+    - AgoraRtm
     - AgoraSyncManager
     - Bugly
     - FLAnimatedImage
@@ -176,7 +196,6 @@ SPEC REPOS:
     - Protobuf
     - ScoreEffectUI
     - SDWebImage
-    - SDWebImageAPNGCoder
     - SnapKit
     - SocketRocket
     - SSZipArchive
@@ -214,16 +233,18 @@ SPEC CHECKSUMS:
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   CallAPI: eefee9fec496ca51cd1432e17551d0c43d75cd17
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
-  HXPhotoPicker: 2368393b187ce01fb0c8bb2ad8b02436fae913ab
+  HXPhotoPicker: 541da99aa88b8eb0b6222ddfe37cacbd06d73300
+  Joy: 20168a64bfbd0c6053382991957335eb2d452576
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
   LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb
   LSTPopView: 9379f00f6ce7d1fc620b50ab00ed3ef97b2d4d52
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
-  MJRefresh: 2fe7fb43a5167ceda20bb7e63f130c04fd1814a5
+  MJRefresh: ff9e531227924c84ce459338414550a05d2aea78
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
-  Pure1v1: 870f5b4e89f7d7bc0abceb89cffac6c43f821ba2
+  Pure1v1: 2f7baf4576168c6bc57e53ad4cf322158730796e
+  RTMSyncManager: 110b208a8bf57881decaef0e76891bdf5345ba21
   ScoreEffectUI: bf1195b4d41a73d43c236450b5d7f958989844aa
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24

@@ -14,17 +14,12 @@ def all_pods
   # 布局
   pod 'Masonry', '1.1.0'
   # tips
-#  pod 'MBProgressHUD', '~> 1.1.0'
   pod 'SVProgressHUD', '2.2.5'
   # 加载图片
-  pod 'SDWebImage', '4.4.8'
-  pod 'SDWebImageAPNGCoder'
+  pod 'SDWebImage', '5.0.6'
   # Model
   pod 'YYModel', '1.0.4'
-#  pod 'YYCache', '1.0.4'
   pod 'YYCategories', '1.0.4'
-  # 键盘
-#  pod 'IQKeyboardManager', '6.5.10'
 
   #弹框
   pod 'LEEAlert', '1.6.4'
@@ -36,20 +31,25 @@ def all_pods
   # 商汤美颜
   #pod 'SenseLib', :path => 'sense.podspec'
   # 相芯美颜
- # pod 'fuLib', :path => 'fu.podspec'
+#  pod 'fuLib', :path => 'fu.podspec'
 
   pod 'AgoraSyncManager', '~> 2.1.6'
-
+  pod 'RTMSyncManager', :path => 'AgoraEntScenarios/Common/API/RTMSyncManager'
 #  pod 'AgoraRtcEngine_Special_iOS', :path => 'AgoraRtcEngine_iOS.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
   pod 'AgoraRtcEngine_Special_iOS', '4.1.1.29'
-  pod 'SwiftProtobuf'
+  pod 'AgoraRtm', '2.2.0'
+
+  pod 'AudioScenarioApi', :path => 'AgoraEntScenarios/Common/API/AudioScenarioApi'
+  pod 'RTMSyncManager', :path => 'AgoraEntScenarios/Common/API/RTMSyncManager'
+  pod 'AGResourceManager', :path => 'AgoraEntScenarios/Common/API/AGResourceManager'
   pod 'CallAPI', :path => 'AgoraEntScenarios/Common/API/CallAPI'
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
   pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
   pod 'ShowTo1v1', :path => 'AgoraEntScenarios/Scenes/ShowTo1v1'
 #  pod 'Cantata', :path => 'AgoraEntScenarios/Scenes/Cantata'
   pod 'AgoraCommon', :path => 'AgoraEntScenarios'
+  pod 'Joy', :path => 'AgoraEntScenarios/Scenes/Joy'
   #ThirdParty
 #  pod 'HWWeakTimer', '1.0'
   pod 'LSTPopView', '0.3.10'
@@ -85,7 +85,7 @@ def all_pods
   #bugly
   pod 'Bugly','2.5.93'
   
-  pod 'HXPhotoPicker/Lite'
+  pod 'HXPhotoPicker/Lite', '4.1.7'
   
   
   #need to remove

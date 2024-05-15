@@ -87,19 +87,18 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 
 - (void)setupData {
     BOOL developIsOn = [AppContext shared].isDebugMode;
+    for (VLMineCellModel *model in self.dataArray.lastObject) {
+        if (model.clickType == VLMineViewClickTypeDebug) {
+            [self.dataArray removeLastObject];
+            break;
+        }
+    }
     if (developIsOn) {
         VLMineCellModel *model = [VLMineCellModel modelWithItemImg:@"mine_debug_icon"
                                                              title:NSLocalizedString(@"app_debug_mode", nil)
                                                              style:VLMineCellStyleSwitch
                                                          clickType:(VLMineViewClickTypeDebug)];
         [self.dataArray addObject:@[model]];
-    } else {
-        for (VLMineCellModel *model in self.dataArray.lastObject) {
-            if (model.clickType == VLMineViewClickTypeDebug) {
-                [self.dataArray removeLastObject];
-                break;
-            }
-        }
     }
     
     CGFloat height = 0;

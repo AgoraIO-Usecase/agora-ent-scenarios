@@ -1,7 +1,6 @@
 package io.agora.scene.show.beauty
 
 import android.content.Context
-import android.text.TextUtils
 import android.util.Log
 import com.faceunity.core.callback.OperateCallback
 import com.faceunity.core.entity.FUBundleData
@@ -16,7 +15,10 @@ import com.faceunity.core.model.prop.sticker.Sticker
 import com.faceunity.core.utils.FULogger
 import com.faceunity.wrapper.faceunity
 import io.agora.beautyapi.faceunity.FaceUnityBeautyAPI
+import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.show.BuildConfig
 import java.io.File
+import java.io.FileOutputStream
 
 object FaceUnityBeautySDK {
 
@@ -31,13 +33,21 @@ object FaceUnityBeautySDK {
 
     private var beautyAPI: FaceUnityBeautyAPI? = null
 
-    fun initBeauty(context: Context): Boolean {
-        val auth = try {
-            getAuth()
-        } catch (e: Exception) {
-            Log.w(TAG, e)
-            return false
-        } ?: return false
+    private var useLocalBeautyResource = true
+
+    fun initBeauty(context: Context, useLocalBeautyResource: Boolean): Boolean {
+        this.useLocalBeautyResource = useLocalBeautyResource
+
+        val auth = if (useLocalBeautyResource) {
+            try {
+                getAuth()
+            } catch (e: Exception) {
+                Log.w(TAG, e)
+                return false
+            } ?: return false
+        } else {
+            readFromFileToByteArray(context.getExternalFilesDir("")?.absolutePath + "/assets/beauty_faceunity/license/fu.txt")
+        }
 
         FURenderManager.setKitDebug(FULogger.LogLevel.TRACE)
         FURenderManager.setCoreDebug(FULogger.LogLevel.ERROR)
@@ -46,13 +56,23 @@ object FaceUnityBeautySDK {
                 Log.i(TAG, "FURenderManager onSuccess -- code=$code, msg=$msg")
                 if (code == OPERATE_SUCCESS_AUTH) {
                     faceunity.fuSetUseTexAsync(1)
-                    FUAIKit.getInstance()
-                        .loadAIProcessor(BUNDLE_AI_FACE, FUAITypeEnum.FUAITYPE_FACEPROCESSOR)
-                    FUAIKit.getInstance().loadAIProcessor(
-                        BUNDLE_AI_HUMAN,
-                        FUAITypeEnum.FUAITYPE_HUMAN_PROCESSOR
-                    )
-
+                    if (useLocalBeautyResource) {
+                        FUAIKit.getInstance()
+                            .loadAIProcessor(BUNDLE_AI_FACE, FUAITypeEnum.FUAITYPE_FACEPROCESSOR)
+                        FUAIKit.getInstance().loadAIProcessor(
+                            BUNDLE_AI_HUMAN,
+                            FUAITypeEnum.FUAITYPE_HUMAN_PROCESSOR
+                        )
+                    } else {
+                        FUAIKit.getInstance().loadAIProcessor(
+                            context.getExternalFilesDir("")?.absolutePath + "/assets/beauty_faceunity/$BUNDLE_AI_FACE",
+                            FUAITypeEnum.FUAITYPE_FACEPROCESSOR)
+                        FUAIKit.getInstance().loadAIProcessor(
+                            context.getExternalFilesDir("")?.absolutePath + "/assets/beauty_faceunity/$BUNDLE_AI_HUMAN",
+                            FUAITypeEnum.FUAITYPE_HUMAN_PROCESSOR
+                        )
+                    }
+                    beautyConfig.reset()
                 }
             }
 
@@ -68,6 +88,15 @@ object FaceUnityBeautySDK {
         beautyConfig.reset()
         FUAIKit.getInstance().releaseAllAIProcessor()
         FURenderKit.getInstance().release()
+    }
+
+    // 读取文件内容并写入字节数组
+    private fun readFromFileToByteArray(filePath: String): ByteArray {
+        val file = File(filePath)
+        val inputStream = file.inputStream()
+        val bytes = inputStream.readBytes()
+        inputStream.close()
+        return bytes
     }
 
     private fun getAuth(): ByteArray? {
@@ -93,7 +122,10 @@ object FaceUnityBeautySDK {
 
         // 美颜配置
         private val faceBeauty =
-            FaceBeauty(FUBundleData("graphics" + File.separator + "face_beautification.bundle"))
+            if (BuildConfig.BEAUTY_RESOURCE.isEmpty())
+                FaceBeauty(FUBundleData("graphics" + File.separator + "face_beautification.bundle"))
+            else
+                FaceBeauty(FUBundleData(AgoraApplication.the().externalFilesDir.absolutePath + "/assets/beauty_faceunity/graphics" + File.separator + "face_beautification.bundle"))
 
         // 资源基础路径
         private val resourceBase = "beauty_faceunity"
@@ -252,13 +284,14 @@ object FaceUnityBeautySDK {
             }
 
         // 贴纸
-        var sticker: String? = null
+        var sticker: StickerItem? = null
             set(value) {
                 field = value
                 runOnBeautyThread {
                     fuRenderKit.propContainer.removeAllProp()
-                    if (!TextUtils.isEmpty(value)) {
-                        val prop = Sticker(FUBundleData("$resourceBase/$sticker"))
+                    if (value != null) {
+                        val path = value.context.getExternalFilesDir(null)?.absolutePath + "/assets/$resourceBase/${value.path}"
+                        val prop = if (useLocalBeautyResource) Sticker(FUBundleData("$resourceBase/${value.path}")) else Sticker(FUBundleData(path))
                         fuRenderKit.propContainer.addProp(prop)
                     }
                 }
@@ -272,11 +305,20 @@ object FaceUnityBeautySDK {
                     if (value == null) {
                         fuRenderKit.makeup = null
                     } else {
-                        val makeup =
-                            SimpleMakeup(FUBundleData("graphics" + File.separator + "face_makeup.bundle"))
-                        makeup.setCombinedConfig(FUBundleData("$resourceBase/${value.path}"))
-                        makeup.makeupIntensity = value.intensity.toDouble()
-                        fuRenderKit.makeup = makeup
+                        if (useLocalBeautyResource) {
+                            val makeup =
+                                SimpleMakeup(FUBundleData("graphics" + File.separator + "face_makeup.bundle"))
+                            makeup.setCombinedConfig(FUBundleData("$resourceBase/${value.path}"))
+                            makeup.makeupIntensity = value.intensity.toDouble()
+                            fuRenderKit.makeup = makeup
+                        } else {
+                            val path = value.context.getExternalFilesDir(null)?.absolutePath + "/assets/$resourceBase/${value.path}"
+                            val makeup =
+                                SimpleMakeup(FUBundleData(value.context.getExternalFilesDir(null)?.absolutePath + "/assets/beauty_faceunity/graphics" + File.separator + "face_makeup.bundle"))
+                            makeup.setCombinedConfig(FUBundleData(path))
+                            makeup.makeupIntensity = value.intensity.toDouble()
+                            fuRenderKit.makeup = makeup
+                        }
                     }
                 }
             }
@@ -312,9 +354,13 @@ object FaceUnityBeautySDK {
     }
 
     data class MakeUpItem(
+        val context: Context,
         val path: String,
         val intensity: Float
     )
 
-
+    data class StickerItem(
+        val context: Context,
+        val path: String
+    )
 }

@@ -15,6 +15,8 @@ struct ShowPanelData {
 
 class ShowDataPanelPresenter {
     
+    private var isH265 = false
+    
     private var channelStats = AgoraChannelStats()
     private var localVideoStats = AgoraRtcLocalVideoStats()
     private var localAudioStats = AgoraRtcLocalAudioStats()
@@ -70,7 +72,7 @@ class ShowDataPanelPresenter {
         let sendTitle = "show_statistic_receive_title".show_localized
         let videoSize = "show_statistic_receive_resolution".show_localized+": --"
         let videoSend = "show_statistic_bitrate".show_localized+": --"
-        let downlink = "show_statistic_down_net_speech".show_localized+": \(downlink) KB/s"
+        let downlink = "show_statistic_down_net_speech".show_localized+": \(0) KB/s"
 
         let fps = "show_statistic_receive_fps".show_localized+": --"
         let vSendLoss = "show_statistic_down_loss_package".show_localized+": --"
@@ -86,7 +88,7 @@ class ShowDataPanelPresenter {
         let sendTitle = "show_statistic_send_title".show_localized
         let videoSize = "show_statistic_encode_resolution".show_localized+": --"
         let videoSend = "show_statistic_up_bitrate".show_localized+": --"
-        let uplink = "show_statistic_up_net_speech".show_localized+": \(uplink) KB/s"
+        let uplink = "show_statistic_up_net_speech".show_localized+": \(0) KB/s"
         
         let fps = "show_advance_setting_FPS_title".show_localized+": --"
         let vSendLoss = "show_statistic_up_loss_package".show_localized+": --"
@@ -104,6 +106,8 @@ class ShowDataPanelPresenter {
         
         let fps = "show_advance_setting_FPS_title".show_localized+": \(localVideoStats.sentFrameRate) fps"
         let vSendLoss = "show_statistic_up_loss_package".show_localized+": \(localVideoStats.txPacketLossRate) %"
+        
+        isH265 = localVideoStats.codecType == .H265
                 
         let leftInfo =  [sendTitle, videoSize, videoSend,   uplink ].joined(separator: "\n") + "\n"
         let rightInfo = ["   ",     fps,       vSendLoss,   " " ].joined(separator: "\n") + "\n"
@@ -138,7 +142,8 @@ class ShowDataPanelPresenter {
         let startup = audience ? "\(callTs) ms" : "--"
         let startupStr = "show_statistic_startup_time".show_localized + ": " + startup
         // h265 switch
-        let h265 = send ? onStr : "--"
+        let sendH265Value = isH265 ? onStr : offStr
+        let h265 = send ? sendH265Value : "--"
         let h265Str = "H265" + ": " + h265
         // super resolution switch
         let sr = audience ? (params.sr ? onStr : offStr) : "--"
@@ -146,6 +151,7 @@ class ShowDataPanelPresenter {
         // micro stream switch
         let microStream = send ? ((localVideoStats.dualStreamEnabled) ? onStr : offStr) : "--"
         let microStreamStr = "show_statistic_micro_stream_switch".show_localized + ": " + microStream
+        let localUidStr = "show_statistic_local_userid".show_localized + ": " + VLUserCenter.user.id
         // right:
         // device cpu level
         let levelStr = "show_statistic_device_level".show_localized
@@ -159,7 +165,7 @@ class ShowDataPanelPresenter {
         let svc = send ? (params.svc ? onStr : offStr) : "--"
         let svcStr = "show_statistic_svc_switch".show_localized + ": " + svc
         let left = [title, startupStr, h265Str, srStr,  microStreamStr].joined(separator: "\n") + "\n"
-        let right = ["  ", levelStr,  pvcStr, svcStr].joined(separator: "\n") + "\n"
+        let right = ["  ", levelStr,  pvcStr, svcStr, localUidStr].joined(separator: "\n") + "\n"
         return ShowPanelData(left: left, right: right)
     }
 }

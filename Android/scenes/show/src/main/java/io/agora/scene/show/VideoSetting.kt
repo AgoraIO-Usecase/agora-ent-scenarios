@@ -10,6 +10,9 @@ import io.agora.scene.base.utils.GsonUtil
 import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
 
+/*
+ * 高清设置模块
+ */
 object VideoSetting {
 
     enum class BitRate constructor(val value: Int) {
@@ -40,12 +43,12 @@ object VideoSetting {
     }
 
     enum class Resolution constructor(val width: Int, val height: Int) {
-        V_1080P(1920, 1080),
-        V_720P(1280, 720),
-        V_540P(960, 540),
-        V_480P(856, 480),
-        V_360P(640, 360),
-        V_180P(360, 180),
+        V_1080P(1080, 1920),
+        V_720P(720, 1280),
+        V_540P(540, 960),
+        V_480P(480, 856),
+        V_360P(360, 640),
+        V_180P(180, 360),
     }
 
     fun Resolution.toIndex() = ResolutionList.indexOf(this)
@@ -500,6 +503,9 @@ object VideoSetting {
         if (currAudienceDeviceLevel != DeviceLevel.Low) {
             setCurrAudienceEnhanceSwitch(true)
             updateAudioSetting(SR = SuperResolution.SR_AUTO)
+        } else {
+            setCurrAudienceEnhanceSwitch(false)
+            updateAudioSetting(SR = SuperResolution.SR_NONE)
         }
     }
 

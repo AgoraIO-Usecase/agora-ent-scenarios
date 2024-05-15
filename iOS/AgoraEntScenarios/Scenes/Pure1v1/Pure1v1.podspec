@@ -51,7 +51,8 @@ TODO: Add long description of the pod here.
   s.dependency 'SDWebImage'
   s.dependency 'SnapKit'
   s.dependency 'SwiftyBeaver'
-  s.dependency 'SDWebImage/GIF'
   s.dependency 'FLAnimatedImage'
   s.dependency 'AgoraCommon'
+  s.dependency 'RTMSyncManager'
+  s.dependency 'AudioScenarioApi'
 end

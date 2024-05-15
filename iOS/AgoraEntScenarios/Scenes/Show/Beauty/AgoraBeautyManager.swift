@@ -42,7 +42,10 @@ class AgoraBeautyManager: NSObject {
     }
     
     func reset(datas: [BeautyModel]) {
-        agoraKit?.setBeautyEffectOptions(false, options: beautifyOption)
+        for data in datas {
+            setBeauty(path: data.path, key: data.key, value: 0)
+        }
+//        agoraKit?.setBeautyEffectOptions(false, options: beautifyOption)
     }
             
     func destroy() {

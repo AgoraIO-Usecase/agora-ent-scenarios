@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.agora.scene.widget.clearScreen.ClearScreenLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clearScreenLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/joy_room_bg">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutGame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvEmptyGame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/joy_anchor_not_open_gameplay"
+            android:textColor="@color/white"
+            android:textSize="17sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <FrameLayout
+            android:id="@+id/flAssistantContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/vertical34"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.35" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/vertical68"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.65" />
+
+        <FrameLayout
+            android:id="@+id/flVideoContainer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/joy_bg_empty_video"
+            app:layout_constraintDimensionRatio="3:4"
+            app:layout_constraintEnd_toEndOf="@id/vertical68"
+            app:layout_constraintStart_toStartOf="@id/vertical34"
+            app:layout_constraintTop_toTopOf="parent" />
+
+<!--        <androidx.constraintlayout.widget.Group-->
+<!--            android:id="@+id/groupViews"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:constraint_referenced_ids="clRoomTitle,ivMore,ivClose,tvRules,tvInput,layoutBottom"-->
+<!--            tools:visibility="gone" />-->
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_dragEnable="true"
+        android:background="@android:color/transparent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clRoomTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:background="@drawable/joy_live_detail_top_view_bg"
+            android:paddingHorizontal="5dp"
+            android:paddingVertical="4dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivOwnerAvatar"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearance="@style/joy_widget_roundStyle"
+                app:strokeColor="@android:color/transparent"
+                tools:src="@mipmap/portrait01" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvRoomName"
+                android:layout_width="154dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:paddingHorizontal="8dp"
+                android:singleLine="true"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                app:layout_constraintStart_toEndOf="@id/ivOwnerAvatar"
+                app:layout_constraintTop_toTopOf="@id/ivOwnerAvatar"
+                tools:text="Chatroom-123555666Chatroom-123555666Chatroom-123555666Chatroom-123555666Chatroom-123555666Chatroom-123555666Chatroom-123555666" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvRoomId"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:paddingStart="8dp"
+                android:singleLine="true"
+                android:textColor="@color/white_80_percent"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toStartOf="@id/tvTimer"
+                app:layout_constraintStart_toStartOf="@id/tvRoomName"
+                app:layout_constraintTop_toBottomOf="@id/tvRoomName"
+                tools:text="ID: 11234477" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/joy_live_top_green_dot"
+                android:drawablePadding="5dp"
+                android:gravity="center"
+                android:maxLines="1"
+                android:paddingEnd="10dp"
+                android:textColor="@color/white_80_percent"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toEndOf="@id/tvRoomName"
+                app:layout_constraintStart_toEndOf="@id/tvRoomId"
+                app:layout_constraintTop_toBottomOf="@id/tvRoomName"
+                tools:text="00:00:00" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivClose"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginVertical="4dp"
+            android:layout_marginEnd="12dp"
+            android:padding="10dp"
+            android:scaleType="fitXY"
+            android:src="@mipmap/icon_close"
+            app:layout_constraintBottom_toBottomOf="@id/clRoomTitle"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/clRoomTitle" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivMore"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="2dp"
+            android:paddingVertical="8dp"
+            android:src="@drawable/joy_icon_more"
+            app:layout_constraintBottom_toBottomOf="@id/ivClose"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@id/ivClose"
+            app:layout_constraintTop_toTopOf="@id/ivClose" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRules"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/joy_bg_rect_radius_black20"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:text="@string/joy_rules_of_play"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/clRoomTitle"
+            tools:visibility="visible" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layoutEtMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:background="@android:color/transparent"
+            android:paddingVertical="8dp"
+            android:visibility="gone"
+            app:boxBackgroundMode="none"
+            app:boxStrokeColor="@android:color/transparent"
+            app:hintEnabled="false"
+            app:layout_constraintBottom_toTopOf="@+id/vKeyboardBg"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:visibility="visible">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etMessage"
+                android:layout_width="match_parent"
+                android:layout_height="38dp"
+                android:background="@drawable/joy_bg_send_message"
+                android:ellipsize="end"
+                android:gravity="start|center"
+                android:hint="@string/joy_send_message"
+                android:imeOptions="actionSend"
+                android:inputType="text"
+                android:maxLines="1"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="0dp"
+                android:singleLine="true"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white_80_percent"
+                android:textCursorDrawable="@drawable/joy_bg_edit_cursor"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnRandom" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <View
+            android:id="@+id/vKeyboardBg"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:background="@android:color/transparent"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvInput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginBottom="15dp"
+            android:background="@drawable/joy_bg_send_message"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="11dp"
+            android:text="@string/joy_send_message"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/layoutBottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@id/tvInput"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:id="@+id/layoutBottomAction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:gravity="bottom"
+                android:orientation="horizontal">
+
+                <!--            <androidx.appcompat.widget.AppCompatImageView-->
+                <!--                android:id="@+id/ivDeployTroops"-->
+                <!--                android:layout_width="wrap_content"-->
+                <!--                android:layout_height="wrap_content"-->
+                <!--                android:src="@drawable/joy_icon_deploy_troops" />-->
+            </LinearLayout>
+
+            <io.agora.scene.joy.widget.like.LikeLayout
+                android:id="@+id/likeView"
+                android:layout_width="66dp"
+                android:layout_height="wrap_content" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivGift"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="12dp"
+                android:src="@drawable/joy_icon_gift" />
+        </LinearLayout>
+
+        <io.agora.scene.joy.widget.NonInterceptingRecyclerView
+            android:id="@+id/rvMessage"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:layout_span="1"
+            android:fadingEdgeLength="30dp"
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
+            android:paddingBottom="8dp"
+            android:requiresFadingEdge="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@+id/tvInput"
+            tools:listitem="@layout/joy_item_live_detail_message" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</io.agora.scene.widget.clearScreen.ClearScreenLayout>

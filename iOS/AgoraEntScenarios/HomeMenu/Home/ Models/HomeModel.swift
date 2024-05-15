@@ -13,6 +13,7 @@ enum HomeType: Int {
     case ktv
     case voice_chat
     case live
+    case game
 }
 
 enum HomeContentType: Int {
@@ -26,6 +27,7 @@ enum HomeContentType: Int {
     case one_v_one
     case multiple
     case show_private_one_v_one
+    case game
     
     var sceneName: String {
         switch self {
@@ -39,6 +41,7 @@ enum HomeContentType: Int {
         case .one_v_one: return "Live_Pure1v1"
         case .multiple: return "Live_MultiPlayer"
         case .show_private_one_v_one: return "Live_Show1v1"
+        case .game: return "Joy"
         }
     }
 }
@@ -70,6 +73,12 @@ class HomeModel: NSObject {
 //        liveModel.vc = HomeContentViewController(type: .live)
 //        dataArray.append(liveModel)
         
+        
+        let gameModel = HomeModel()
+        gameModel.title = NSLocalizedString("home_category_title_joy", comment: "")
+        gameModel.vc = HomeContentViewController(type: .game)
+        dataArray.append(gameModel)
+        
         return dataArray
     }
 }
@@ -78,9 +87,10 @@ struct HomeContentSesionModel {
     var title: String?
     var contentModels: [HomeContentModel]?
     var type: HomeType = .all
-    
+
     static func createData() -> [HomeContentSesionModel] {
         var dataArray = [HomeContentSesionModel]()
+        
         var model = HomeContentSesionModel()
         model.type = .ktv
         model.title = NSLocalizedString("home_category_title_ktv", comment: "")
@@ -129,6 +139,16 @@ struct HomeContentSesionModel {
                                            desc: NSLocalizedString("home_content_item_live_desc_multiple", comment: ""),
                                            imageName: "home_live_multiple",
                                            type: .multiple)
+        ]
+        model.contentModels = contentArray
+        dataArray.append(model)
+        
+        model = HomeContentSesionModel()
+        model.title = NSLocalizedString("home_category_title_joy", comment: "")
+        model.type = .game
+        contentArray = [createContentModel(title: NSLocalizedString("home_content_item_live_title_joy", comment: ""),
+                                           desc: NSLocalizedString("home_content_item_live_desc_joy", comment: ""),
+                                           imageName: "scene-card", type: .game),
         ]
         model.contentModels = contentArray
         dataArray.append(model)

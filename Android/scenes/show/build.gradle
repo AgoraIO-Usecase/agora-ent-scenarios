@@ -2,7 +2,7 @@ ext { ktv_is_modular = false }
 apply from: 'vendors.gradle'
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_SHOW = "3.2.2"
+final def VERSION_SCENE_SHOW = "4.2.1"
 
 android {
     defaultConfig {
@@ -11,8 +11,9 @@ android {
         }
 
         buildConfigField "String", "VERSION", "\"${VERSION_SCENE_SHOW}\""
-        buildConfigField "String", "CLOUD_PLAYER_KEY", "\"${CLOUD_PLAYER_KEY}\""
-        buildConfigField "String", "CLOUD_PLAYER_SECRET", "\"${CLOUD_PLAYER_SECRET}\""
+        buildConfigField "String", "RESTFUL_API_KEY", "\"${RESTFUL_API_KEY}\""
+        buildConfigField "String", "RESTFUL_API_SECRET", "\"${RESTFUL_API_SECRET}\""
+        buildConfigField "String", "BEAUTY_RESOURCE", "\"${BEAUTY_RESOURCE}\""
     }
 }
 
@@ -23,7 +24,9 @@ dependencies {
     implementation project(path: ":scenes:show:aars:beauty_sensetime:HardwareBuffer")
     implementation project(path: ":scenes:show:aars:beauty_bytedance:EffectAAR")
     implementation 'com.faceunity:core:8.7.0'
-    implementation 'com.faceunity:model:8.7.0'
+    if (BEAUTY_RESOURCE == "") {
+        implementation 'com.faceunity:model:8.7.0'
+    }
 
     implementation project(":common:base")
     implementation project(':common:ui-widget')

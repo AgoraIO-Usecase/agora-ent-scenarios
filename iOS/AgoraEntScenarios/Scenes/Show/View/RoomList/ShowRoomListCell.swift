@@ -54,6 +54,15 @@ class ShowRoomListCell: UICollectionViewCell {
         return numberLabel
     }()
     
+    private lazy var coverLayer: CALayer = {
+        let layer = CALayer()
+        layer.backgroundColor = UIColor(hex: "#000000", alpha: 0.05).cgColor
+        layer.isHidden = true
+        layer.masksToBounds = true
+        layer.cornerRadius = 16
+        return layer
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         createSubviews()
@@ -64,6 +73,7 @@ class ShowRoomListCell: UICollectionViewCell {
     }
     
     func setBgImge(_ img: String, name: String?, id: String?, count: Int, avatarUrl: String?, isPrivate: Bool) {
+        self.coverLayer.isHidden = true
         imageView.image = UIImage.show_sceneImage(name: "show_room_bg_\(img)")
         nameLabel.text = name
         idLablel.text = "ID: \(id ?? "0")"
@@ -117,5 +127,21 @@ class ShowRoomListCell: UICollectionViewCell {
         contentView.addSubview(numberLabel)
         numberLabel.centerYAnchor.constraint(equalTo: idLablel.centerYAnchor).isActive = true
         numberLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor).isActive = true
+        
+        contentView.layer.addSublayer(coverLayer)
+        coverLayer.frame = contentView.bounds
+    }
+    
+    private func disableAnimationTask(_ task:(()->())) {
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        task()
+        CATransaction.commit()
+    }
+    
+    func showCoverView(){
+        disableAnimationTask {
+            self.coverLayer.isHidden = false
+        }
     }
 }

@@ -44,7 +44,10 @@ class SenseBeautyManager: NSObject {
     var isEnableBeauty: Bool = true
     
     private func checkLicense() {
-        let licensePath = Bundle.main.path(forResource: "SENSEME", ofType: "lic")
+        var licensePath = STDynmicResourceConfig.shareInstance().licFilePath ?? ""
+        if FileManager.default.fileExists(atPath: licensePath) == false {
+            licensePath = Bundle.main.path(forResource: "SENSEME", ofType: "lic") ?? ""
+        }
         isSuccessLicense = EffectsProcess.authorize(withLicensePath: licensePath)
         timer = Timer(timeInterval: 1, block: { [weak self] _ in
             guard let self = self else { return }

@@ -26,21 +26,21 @@ include ':common:ui-widget'
 /*
  * 在线K歌房
  */
-include ':scenes:ktv'
+//include ':scenes:ktv'
 
 /*
  * 嗨歌抢唱
  */
-include ':scenes:ktv_singbattle'
+//include ':scenes:ktv_singbattle'
 
 /*
  * 抢麦接唱
  */
-include ':scenes:ktv_relay'
+//include ':scenes:ktv_relay'
 
-///**
-// * 大合唱
-// */
+/**
+ * 大合唱
+ */
 //include ':scenes:cantata'
 
 /*
@@ -64,6 +64,7 @@ include ':scenes:ktv_relay'
 //include ':scenes:show:aars:beauty_sensetime:HardwareBuffer'
 //include ':scenes:show:aars:beauty_bytedance:EffectAAR'
 
+include ':RTMSyncManager'
 /*
  * 1V1私密房
  */
@@ -73,3 +74,8 @@ include ':scenes:ktv_relay'
  * 秀场转1V1私密房
  */
 //include ':scenes:showTo1v1'
+
+/**
+ * 弹幕游戏
+ */
+include ':scenes:joy'

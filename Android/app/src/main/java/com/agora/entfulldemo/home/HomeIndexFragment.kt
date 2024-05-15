@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -19,7 +20,10 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.GRAVITY_CENTER
 import com.google.android.material.tabs.TabLayout.GRAVITY_START
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
+import com.google.android.material.tabs.TabLayout.*
 import com.google.android.material.tabs.TabLayoutMediator
+import io.agora.scene.base.ServerConfig
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingFragment
 
 class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>() {
@@ -29,7 +33,8 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
 //            HomeScenesType.Full,
             HomeScenesType.KTV,
 //            HomeScenesType.Voice,
-//            HomeScenesType.Live
+//            HomeScenesType.Live,
+//            HomeScenesType.Game
         )
     }
 
@@ -52,6 +57,8 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
 
     override fun initView() {
         val act = activity ?: return
+        binding.tvDevEnv.isVisible = !ServerConfig.envRelease
+
         // 创建 Adapter
         val adapter = HomePagerAdapter(requireActivity(), mTabs)
         // 设置 Adapter 给 ViewPager2
@@ -64,7 +71,8 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
             when (mTabs[position]) {
                 HomeScenesType.KTV -> tvTabTitle.text = act.getString(R.string.app_home_scene_ktv)
                 HomeScenesType.Voice -> tvTabTitle.text = act.getString(R.string.app_home_scene_voice)
-                HomeScenesType.Live -> tvTabTitle.text = act.getString(R.string.app_home_scene_live)
+                HomeScenesType.Live -> tvTabTitle.text = if (mSingleScene) act.getString(R.string.app_home_scene_live_merge) else act.getString(R.string.app_home_scene_live)
+                HomeScenesType.Game -> tvTabTitle.text = act.getString(R.string.app_home_scene_game)
                 else -> tvTabTitle.text = act.getString(R.string.app_home_full_scene)
             }
         }.attach()

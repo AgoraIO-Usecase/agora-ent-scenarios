@@ -31,6 +31,10 @@
 "create_room_name_empty_tips"="房间名称不能为空";
 "call_usage_tips"=" 本产品仅用于功能体验，单次直播时长不超过20mins";
 "call_toast_hangup"="对方结束连线";
+"setting_video_on" = "摄像头开";
+"setting_mic_on" = "麦克风开";
+"setting_video_off" = "摄像头关";
+"setting_mic_off" = "麦克风关";
 "setting_statistic" = "实时数据";
 "call_user_empty_tips"="Hi，我暂时有事，很快回来...";
 "call_user_busy_tips"="我很快回来，一会再连线我把";
@@ -38,11 +42,17 @@
 "call_connected_toast_tips"="呼入，已自动接听...";
 "user_list_cell_local_user"="本人信息";
 "user_list_cell_remote_user"="对端信息";
+"call_toast_callfail"="网络不佳, 呼叫失败, 错误码：";
+"call_toast_acceptfail"=" 网络不佳，接受邀请失败，错误码：";
+"call_toast_busy"="呼叫失败, 对方正忙";
+"call_toast_remote_fail"="对方已离开, 连线自动结束";
+"call_toast_remote_leave"="对方离开, 连线自动结束";
+"call_enter_room_fail"="网络不佳，进入直播间失败，建议重试，错误：";
+
+"room_list_get_fail"="网络不佳, 直播间列表刷新失败, 建议重试, 错误:";
 
 "report_room" = "举报";
 "report_room_success" = "举报成功";
-
-"call_toast_disconnect"="连接中断，重连中...";
 
 "show_statistic_bitrate" = "码率";
 "show_statistic_delay" = "延迟";
@@ -70,3 +80,10 @@
 "show_create_room_name8"="疯狂星期几";
 "show_create_room_name9"="小黄鸭";
 "show_create_room_name10"="西二旗老板娘";
+
+"show_statistic_other_title" = "其他";
+"show_statistic_roomId" = "频道名";
+
+"audio_dump" = "音频Dump";
+"audio_dump_open" = "开启";
+"audio_dump_close" = "关闭";

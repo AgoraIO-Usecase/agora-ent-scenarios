@@ -74,7 +74,7 @@ object TokenGenerator {
         }
     }
 
-    private suspend fun fetchToken(
+    suspend fun fetchToken(
         channelName: String, uid: String, genType: TokenGeneratorType, tokenType: AgoraTokenType
     ) = withContext(Dispatchers.IO) {
 
@@ -89,8 +89,8 @@ object TokenGenerator {
         postBody.put("uid", uid + "")
 
         val request = Request.Builder().url(
-            if (genType == TokenGeneratorType.token006) "${BuildConfig.TOOLBOX_SERVER_HOST}/v2/token006/generate"
-            else "${BuildConfig.TOOLBOX_SERVER_HOST}/v2/token/generate"
+            if (genType == TokenGeneratorType.token006) "${ServerConfig.toolBoxUrl}/v2/token006/generate"
+            else "${ServerConfig.toolBoxUrl}/v2/token/generate"
         ).addHeader("Content-Type", "application/json").post(postBody.toString().toRequestBody()).build()
         val execute = okHttpClient.newCall(request).execute()
         if (execute.isSuccessful) {

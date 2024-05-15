@@ -737,7 +737,7 @@ extension CantataMainViewController {
         self.RtcKit.enableContentInspect(true, config: config)
         
         // 添加音频鉴黄接口
-        NetworkManager.shared.voiceIdentify(channelName: self.roomModel?.roomNo ?? "", channelType: 1, sceneType: .ktv) { msg in
+        NetworkManager.shared.voiceIdentify(channelName: self.roomModel?.roomNo ?? "", channelType: 1, sceneType: "ktv") { msg in
             // cp todo
             //KTVLogInfo("voiceIdentify success: \(msg)")
         }

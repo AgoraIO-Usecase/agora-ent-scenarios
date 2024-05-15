@@ -119,7 +119,7 @@ struct ShowStatisticsInfo {
         let sendTitle = "show_statistic_receive_title".pure1v1Localization() + "\n"
         let videoSize = "show_statistic_receive_resolution".pure1v1Localization() + ": 0 x 0"
         let videoSend = "show_statistic_bitrate".pure1v1Localization() + ": \(0) kbps"
-        let downlink = "show_statistic_down_net_speech".pure1v1Localization() + ": \(downlink) KB/s"
+        let downlink = "show_statistic_down_net_speech".pure1v1Localization() + ": \(0) KB/s"
 
         let fps = "show_statistic_receive_fps".pure1v1Localization() + ": \(0) fps"
         let vSendLoss = "show_statistic_down_loss_package".pure1v1Localization() + ": \(0) %"
@@ -135,7 +135,7 @@ struct ShowStatisticsInfo {
         let sendTitle = "show_statistic_send_title".pure1v1Localization() + "\n"
         let videoSize = "show_statistic_encode_resolution".pure1v1Localization() + ": 0 x 0"
         let videoSend = "show_statistic_up_bitrate".pure1v1Localization() + ": 0 kbps"
-        let uplink = "show_statistic_up_net_speech".pure1v1Localization() + ": \(uplink) KB/s"
+        let uplink = "show_statistic_up_net_speech".pure1v1Localization() + ": \(0) KB/s"
         
         let fps = "show_advance_setting_FPS_title".pure1v1Localization() + ": 0 fps"
         let vSendLoss = "show_statistic_up_loss_package".pure1v1Localization() + ": 0 %"
