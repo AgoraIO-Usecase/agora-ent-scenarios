@@ -825,7 +825,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 self?.roomId = room.room_id
                 self?._startCheckExpire()
                 //添加鉴黄接口
-                NetworkManager.shared.voiceIdentify(channelName: room.channel_id ?? "", channelType: room.sound_effect == 3 ? 0 : 1, sceneType: .voice) { msg in
+                NetworkManager.shared.voiceIdentify(channelName: room.channel_id ?? "", channelType: room.sound_effect == 3 ? 0 : 1, sceneType: "voice_chat") { msg in
                     agoraPrint("\(msg == nil ? "开启鉴黄成功" : "开启鉴黄失败")")
                 }
                 
@@ -1037,7 +1037,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
 
         impGroup.enter()
         imQueue.async {
-            NetworkManager.shared.generateIMConfig(type: type,channelName: roomName, nickName: VLUserCenter.user.name, chatId: chatId, imUid: imUid, password: pwd, uid:  VLUserCenter.user.id, sceneType: .voice) { uid, room_id, token in
+            NetworkManager.shared.generateIMConfig(type: type,channelName: roomName, nickName: VLUserCenter.user.name, chatId: chatId, imUid: imUid, password: pwd, uid:  VLUserCenter.user.id) { uid, room_id, token in
                 im_uid = uid ?? ""
                 chatroom_id = room_id ?? ""
                 im_token = token ?? ""

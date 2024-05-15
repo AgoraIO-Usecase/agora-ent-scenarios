@@ -102,7 +102,7 @@ class RoomListCell: UICollectionViewCell {
     var tapClosure: ((ShowTo1v1RoomInfo?)->())?
     var roomInfo: ShowTo1v1RoomInfo? {
         didSet {
-            contentImageView.image = roomInfo?.bgImage()
+            contentImageView.sd_setImage(with: URL(string: roomInfo?.bgImage() ?? ""), placeholderImage: nil)
             
             remoteUserView.setInfo(title: "user_list_cell_remote_user".showTo1v1Localization(),
                                    avatarUrl: roomInfo?.avatar ?? "",

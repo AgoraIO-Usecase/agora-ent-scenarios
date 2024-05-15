@@ -1,17 +1,26 @@
 import SwiftyBeaver
+import AgoraCommon
 
-let pure1v1Logger: SwiftyBeaver.Type = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "ShowTo1v1"))
+private func showTo1v1Logger() -> SwiftyBeaver.Type{
+    AgoraEntLog.getSceneLogger(with: "ShowTo1v1")
+}
 
 func showTo1v1Print(_ message: String, context: String = "ShowTo1v1") {
-    pure1v1Logger.info(message, context: context)
+    agoraDoMainThreadTask {
+        showTo1v1Logger().info(message, context: context)
+    }
 }
 
 func showTo1v1Warn(_ message: String, context: String = "ShowTo1v1") {
-    pure1v1Logger.warning(message, context: context)
+    agoraDoMainThreadTask {
+        showTo1v1Logger().warning(message, context: context)
+    }
 }
 
 func showTo1v1Error(_ message: String, context: String = "ShowTo1v1") {
-    pure1v1Logger.error(message, context: context)
+    agoraDoMainThreadTask {
+        showTo1v1Logger().error(message, context: context)
+    }
 }
 
 @objcMembers
@@ -32,11 +41,7 @@ public class ShowTo1v1Context: NSObject {
     }
     
     public static func showScene(viewController: UIViewController,
-                                 appId: String,
-                                 appCertificate: String,
                                  userInfo: ShowTo1v1UserInfo) {
-        showTo1v1AppId = appId
-        showTo1v1AppCertificate = appCertificate
         let vc = RoomListViewController()
         vc.userInfo = userInfo
         viewController.navigationController?.pushViewController(vc, animated: true)

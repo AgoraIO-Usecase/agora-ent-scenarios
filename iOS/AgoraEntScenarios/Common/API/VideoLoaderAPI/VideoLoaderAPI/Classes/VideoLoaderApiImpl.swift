@@ -8,12 +8,13 @@
 import Foundation
 import AgoraRtcKit
 
+@objcMembers
 public class VideoLoaderApiImpl: NSObject {
     public static let shared = VideoLoaderApiImpl()
     public var printClosure: ((String)->())?
     public var warningClosure: ((String)->())?
     public var errorClosure: ((String)->())?
-    private var config: VideoLoaderConfig?
+    var config: VideoLoaderConfig?
     
     private let apiProxy = VideoLoaderApiProxy()
     private var profilerMap: [String: VideoLoaderProfiler] = [:]
@@ -157,12 +158,17 @@ extension VideoLoaderApiImpl {
 //MARK: VideoLoaderApiProtocol
 extension VideoLoaderApiImpl: IVideoLoaderApi {
     public func setup(config: VideoLoaderConfig) {
+        self.config = config
+//        config.rtcEngine?.setParameters("{\"rtc.qos_for_test_purpose\": true}")
+        config.rtcEngine?.setParameters("{\"rtc.direct_send_custom_event\": true}")
+        config.rtcEngine?.setParameters("{\"rtc.log_external_input\": true}")
+        _reportMethod(event: "\(#function)")
         cleanCache()
 //        config.rtcEngine?.setParameters("{\"rtc.log_filter\":65535}")
-        self.config = config
     }
     
     public func preloadAnchor(preloadAnchorList: [AnchorInfo], uid: UInt) {
+        _reportMethod(event: "\(#function)", label: "uid=\(uid)&preloadAnchorList=\(preloadAnchorList.map({ $0.channelName }))")
         guard let rtcEngine = self.config?.rtcEngine else {return}
         debugLoaderPrint("preloadAnchor: \(preloadAnchorList.map({$0.channelName}))")
         preloadAnchorList.forEach { anchorInfo in
@@ -178,6 +184,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
                                   localUid: UInt,
                                   anchorInfo: AnchorInfo,
                                   tagId: String?) {
+        _reportMethod(event: "\(#function)", label: "newState=\(newState.rawValue)&localUid=\(localUid)&tagId=\(tagId ?? "")&anchorChannelName=\(anchorInfo.channelName)&anchorUid\(anchorInfo.uid)")
         if localUid == 0 {
             warningLoaderPrint("\(anchorInfo.channelName) localUid invalidate")
             return
@@ -203,11 +210,11 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
             errorLoaderPrint("switchAnchorState fatal, map init fail")
             return
         }
-        let oldState = getAnchorState(anchorInfo: anchorInfo)
+        let oldState = _getAnchorState(anchorInfo: anchorInfo)
         
         exConnectionDeps[anchorInfo.channelName] = map
         
-        let realState = getAnchorState(anchorInfo: anchorInfo)
+        let realState = _getAnchorState(anchorInfo: anchorInfo)
         
         if realState == .idle {
             _leaveChannelEx(channelId: anchorInfo.channelName)
@@ -232,21 +239,12 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
             mediaOptions.autoSubscribeVideo = true
             
             isMuteAllRemoteAudioStreamsEx = true
-            if let engine = config?.rtcEngine,
-               let connection = exConnectionMap[anchorInfo.channelName]  {
-                DispatchQueue.main.async {
-                    engine.muteAllRemoteAudioStreamsEx(true, connection: connection)
-                }
-                
-            } else {
-                warningLoaderPrint("[\(anchorInfo.channelName)] muteAllRemoteAudioStreamsEx(true) fail")
-            }
         } else {
             mediaOptions.autoSubscribeAudio = false
             mediaOptions.autoSubscribeVideo = false
         }
 
-        debugLoaderPrint("tagId[\(tagId)] switchAnchorState[\(anchorInfo.channelName)] want:\(newState.rawValue) real: \(realState.rawValue)")
+        debugLoaderPrint("tagId[\(tagId)] switchAnchorState[\(anchorInfo.channelName)] want:\(newState.rawValue) real:\(realState.rawValue) old:\(oldState.rawValue)")
 //        debugLoaderPrint("tagId[\(tagId)] switchAnchorState[\(anchorInfo.channelName)] autoSubscribeAudio:\(mediaOptions.autoSubscribeAudio) autoSubscribeVideo: \(mediaOptions.autoSubscribeVideo)")
         _updateChannelEx(channelId:anchorInfo.channelName, options: mediaOptions)
         
@@ -270,19 +268,8 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
     }
     
     public func getAnchorState(anchorInfo: AnchorInfo) -> AnchorState {
-        var realState: AnchorState = .idle
-        
-        guard let map: [String: AnchorState] = exConnectionDeps[anchorInfo.channelName] else {
-            return realState
-        }
-        //calc real type
-        map.forEach { (key: String, value: AnchorState) in
-            if realState.rawValue < value.rawValue {
-                realState = value
-            }
-        }
-        
-        return realState
+        _reportMethod(event: "\(#function)", label: "anchorChannelName=\(anchorInfo.channelName)&anchorUid\(anchorInfo.uid)")
+        return _getAnchorState(anchorInfo: anchorInfo)
     }
     
     public func getConnectionMap() -> [String: AgoraRtcConnection] {
@@ -290,6 +277,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
     }
     
     public func renderVideo(anchorInfo: AnchorInfo, container: VideoCanvasContainer) {
+        _reportMethod(event: "\(#function)", label: "anchorChannelName=\(anchorInfo.channelName)&anchorUid\(anchorInfo.uid)")
         guard let engine = config?.rtcEngine,
               let connection = exConnectionMap[anchorInfo.channelName] else {
             errorLoaderPrint("renderVideo fail: connection is empty")
@@ -300,6 +288,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
         videoCanvas.uid = container.uid
         videoCanvas.view = container.container
         videoCanvas.renderMode = .hidden
+        videoCanvas.mirrorMode = container.mirrorMode
         videoCanvas.setupMode = container.setupMode
         let ret = engine.setupRemoteVideoEx(videoCanvas, connection: connection)
         debugLoaderPrint("renderVideo[\(connection.channelId)] ret = \(ret), uid:\(anchorInfo.uid)")
@@ -324,6 +313,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
     }
     
     public func cleanCache() {
+        _reportMethod(event: "\(#function)")
         guard let rtcEngine = self.config?.rtcEngine else {return}
 //        rtcEngine.setAudioSessionOperationRestriction(.all)
         exConnectionMap.forEach { anchorId, connection in
@@ -338,11 +328,29 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
     }
     
     public func addListener(listener: IVideoLoaderApiListener) {
+        _reportMethod(event: "\(#function)")
         apiProxy.addListener(listener)
     }
     
     public func removeListener(listener: IVideoLoaderApiListener) {
+        _reportMethod(event: "\(#function)")
         apiProxy.removeListener(listener)
+    }
+    
+    func _getAnchorState(anchorInfo: AnchorInfo) -> AnchorState {
+        var realState: AnchorState = .idle
+        
+        guard let map: [String: AnchorState] = exConnectionDeps[anchorInfo.channelName] else {
+            return realState
+        }
+        //calc real type
+        map.forEach { (key: String, value: AnchorState) in
+            if realState.rawValue < value.rawValue {
+                realState = value
+            }
+        }
+        
+        return realState
     }
     
     public func addRTCListener(anchorId: String, listener: AgoraRtcEngineDelegate) {
@@ -363,7 +371,6 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
 }
 
 extension VideoLoaderApiImpl {
-
     func startMediaRenderingTracing(anchorId: String) {
         guard let engine = config?.rtcEngine, let connection = exConnectionMap[anchorId] else {return}
         engine.startMediaRenderingTracingEx(connection)
@@ -377,5 +384,20 @@ extension VideoLoaderApiImpl {
             anchorIds.append(key)
         }
         return anchorIds
+    }
+}
+
+let kReportCategory = "4_iOS_0.1.5"
+extension VideoLoaderApiImpl {
+    private func _reportMethod(event: String, label: String = "") {
+        let msgId = "agora:scenarioAPI"
+        debugLoaderPrint("_reportMethod event: \(event) label: \(label)")
+        var subEvent = event
+        if let range = event.range(of: "(") {
+            subEvent = String(event[..<range.lowerBound])
+        }
+        if let engine = config?.rtcEngine {
+            engine.sendCustomReportMessage(msgId, category: kReportCategory, event: subEvent, label: label, value: 0)
+        }
     }
 }

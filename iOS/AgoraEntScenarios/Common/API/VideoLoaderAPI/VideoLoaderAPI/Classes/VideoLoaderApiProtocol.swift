@@ -17,7 +17,7 @@ import AgoraRtcKit
 }
 
 /// 初始化配置信息
-@objc public class VideoLoaderConfig: NSObject {
+@objcMembers public class VideoLoaderConfig: NSObject {
     public weak var rtcEngine: AgoraRtcEngineKit?    //rtc engine实例
 }
 
@@ -29,9 +29,10 @@ import AgoraRtcKit
 }
 
 @objc public class VideoCanvasContainer: NSObject {
-    public var container: UIView?                          //需要渲染到的view
-    public var uid: UInt = 0                               //需要渲染的用户uid
-    public var setupMode: AgoraVideoViewSetupMode = .add   //画布模式
+    public var container: UIView?                            //需要渲染到的view
+    public var uid: UInt = 0                                 //需要渲染的用户uid
+    public var setupMode: AgoraVideoViewSetupMode = .add     //画布模式
+    public var mirrorMode: AgoraVideoMirrorMode = .disabled  //镜像模式
 //    public var viewIndex: Int = 0
 //    public var renderMode: Int = Constants.RENDER_MODE_HIDDEN
 }
@@ -98,17 +99,4 @@ import AgoraRtcKit
     /// 移除api代理
     /// - Parameter listener: <#listener description#>
     func removeListener(listener: IVideoLoaderApiListener)
-    
-    /// 添加RTC代理
-    /// - Parameter listener: <#listener description#>
-    func addRTCListener(anchorId: String, listener: AgoraRtcEngineDelegate)
-    
-    /// 移除RTC代理
-    /// - Parameter listener: <#listener description#>
-    func removeRTCListener(anchorId: String, listener: AgoraRtcEngineDelegate)
-    
-    /// 获取rtc delegate
-    /// - Parameter anchorId: 对应频道的id
-    /// - Returns: <#description#>
-    func getRTCListener(anchorId: String) -> AgoraRtcEngineDelegate?
 }

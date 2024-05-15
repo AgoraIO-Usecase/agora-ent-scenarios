@@ -47,12 +47,11 @@
             android:id="@+id/tvRoomId"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:ellipsize="marquee"
+            android:ellipsize="none"
             android:paddingStart="8dp"
             android:singleLine="true"
             android:textColor="@color/white_80_percent"
             android:textSize="14sp"
-            app:layout_constraintEnd_toStartOf="@id/tvTimer"
             app:layout_constraintStart_toStartOf="@id/tvRoomName"
             app:layout_constraintTop_toBottomOf="@id/tvRoomName"
             tools:text="ID: 11234477" />
@@ -64,11 +63,10 @@
             android:drawableStart="@mipmap/show_live_top_green_dot"
             android:drawablePadding="5dp"
             android:gravity="center"
+            android:layout_marginStart="5dp"
             android:maxLines="1"
-            android:paddingEnd="8dp"
             android:textColor="@color/white_80_percent"
             android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="@id/tvRoomName"
             app:layout_constraintStart_toEndOf="@id/tvRoomId"
             app:layout_constraintTop_toBottomOf="@id/tvRoomName"
             tools:text="00:00:00" />
@@ -314,6 +312,13 @@
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 tools:text="@string/show_statistic_low_stream" />
+
+            <TextView
+                android:id="@+id/tvLocalUid"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_local_uid" />
         </TableRow>
 
     </TableLayout>

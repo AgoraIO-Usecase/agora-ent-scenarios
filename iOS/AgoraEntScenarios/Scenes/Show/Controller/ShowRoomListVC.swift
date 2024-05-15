@@ -8,8 +8,24 @@
 import UIKit
 import VideoLoaderAPI
 import AgoraCommon
+
 class ShowRoomListVC: UIViewController {
     let backgroundView = UIImageView()
+    
+    private lazy var stateManager: AppStateManager = {
+        let manager = AppStateManager()
+        manager.appStateChangeHandler = { [weak self] isInBackground in
+            if isInBackground { return }
+            self?.checkTokenValid()
+        }
+        
+        manager.networkStatusChangeHandler = { [weak self] isAvailable in
+            guard isAvailable else { return }
+            self?.checkTokenValid()
+        }
+        
+        return manager
+    }()
     
     private lazy var delegateHandler = {
         let handler = ShowCollectionLoadingDelegateHandler(localUid: UInt(UserInfo.userId)!)
@@ -52,20 +68,20 @@ class ShowRoomListVC: UIViewController {
     deinit {
         AppContext.unloadShowServiceImp()
         ShowAgoraKitManager.shared.destoryEngine()
-        showLogger.info("deinit-- ShowRoomListVC")
+        showPrint("deinit-- ShowRoomListVC")
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        showLogger.info("init-- ShowRoomListVC")
+        showPrint("init-- ShowRoomListVC")
         VideoLoaderApiImpl.shared.printClosure = { msg in
-            showLogger.info(msg, context: "VideoLoaderApi")
+            showPrint(msg, context: "VideoLoaderApi")
         }
         VideoLoaderApiImpl.shared.warningClosure = { msg in
-            showLogger.warning(msg, context: "VideoLoaderApi")
+            showWarn(msg, context: "VideoLoaderApi")
         }
         VideoLoaderApiImpl.shared.errorClosure = { msg in
-            showLogger.error(msg, context: "VideoLoaderApi")
+            showError(msg, context: "VideoLoaderApi")
         }
     }
     
@@ -75,6 +91,7 @@ class ShowRoomListVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        _ = stateManager
         AppContext.shared.sceneImageBundleName = "showResource"
         createViews()
         createConstrains()
@@ -93,6 +110,7 @@ class ShowRoomListVC: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        checkTokenValid()
         autoRefreshing()
     }
     
@@ -141,14 +159,14 @@ class ShowRoomListVC: UIViewController {
             self?.refreshControl.endRefreshing()
             guard let self = self, let roomList = roomList else {return}
             if let error = error {
-                showLogger.error(error.localizedDescription)
+                showError(error.localizedDescription)
                 return
             }
             self.roomList = roomList
         }
     }
     
-   private func autoRefreshing(){
+    private func autoRefreshing(){
         if !refreshControl.isRefreshing {
             collectionView.setContentOffset(CGPoint(x: 0, y: -refreshControl.frame.size.height), animated: true)
             refreshControl.beginRefreshing()
@@ -159,20 +177,19 @@ class ShowRoomListVC: UIViewController {
     }
 
     private func preGenerateToken() {
-        AppContext.shared.rtcToken = nil
-        NetworkManager.shared.generateToken(
-            channelName: "",
-            uid: "\(UserInfo.userId)",
-            tokenType: .token007,
-            type: .rtc,
-            expire: 24 * 60 * 60
-        ) {[weak self] token in
+        ShowAgoraKitManager.shared.preGenerateToken {[weak self] token in
             guard let self = self, let rtcToken = token, rtcToken.count > 0 else {
                 return
             }
-            AppContext.shared.rtcToken = rtcToken
             self.delegateHandler.preLoadVisibleItems(scrollView: self.collectionView)
         }
+    }
+    
+    private func checkTokenValid() {
+        guard AppContext.shared.rtcToken?.count ?? 0 > 0, let date = AppContext.shared.tokenDate, Int64(-date.timeIntervalSinceNow) < 20 * 60 * 60 else{
+            return
+        }
+        preGenerateToken()
     }
 }
 // MARK: - UICollectionView Call Back
@@ -201,6 +218,8 @@ extension ShowRoomListVC: UICollectionViewDataSource, UICollectionViewDelegateFl
             }
             
             return true
+        } onRequireRenderVideo: { _, _ in
+            return nil
         } completion: { [weak self] in
             self?.joinRoom(room)
             cell.showCoverView()

@@ -125,7 +125,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         if (VersionUtils.getVersion("io.agora.scene.show.BuildConfig").isNotEmpty()) {
             adapter.appInfo = AppInfo(
                 this.getString(R.string.app_about_show),
-                "20230229-" + VersionUtils.getVersion("io.agora.scene.show.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
+                "20240511-" + VersionUtils.getVersion("io.agora.scene.show.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )

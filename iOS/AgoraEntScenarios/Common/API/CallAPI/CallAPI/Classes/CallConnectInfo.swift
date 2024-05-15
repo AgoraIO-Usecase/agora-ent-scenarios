@@ -10,11 +10,13 @@ import Foundation
 
 /// 耗时统计类型
 public enum CallConnectCostType: String {
-    case remoteUserRecvCall = "remoteUserRecvCall"         //主叫呼叫成功，收到呼叫成功表示已经送达对端(被叫)
-    case acceptCall = "acceptCall"                         //主叫收到被叫接受呼叫(onAccept)/被叫点击接受(accept)
-    case localUserJoinChannel = "localUserJoinChannel"     //本地用户加入频道
-    case remoteUserJoinChannel = "remoteUserJoinChannel"   //远端用户加入频道
-    case recvFirstFrame = "recvFirstFrame"                 //收到对端首帧
+    case remoteUserRecvCall = "remoteUserRecvCall"                              //主叫呼叫成功，收到呼叫成功表示已经送达对端(被叫)
+    case acceptCall = "acceptCall"                                              //主叫收到被叫接受呼叫(onAccept)/被叫点击接受(accept)
+    case localUserJoinChannel = "localUserJoinChannel"                          //本地用户加入频道
+    case localFirstFrameDidCapture = "localFirstFrameDidCapture"                //本地视频首帧被采集到(仅限视频呼叫)
+    case localFirstFrameDidPublish = "localFirstFrameDidPublish"                //本地用户推送首帧（音频或者视频）成功
+    case remoteUserJoinChannel = "remoteUserJoinChannel"                        //远端用户加入频道
+    case recvFirstFrame = "recvFirstFrame"                                      //收到对端首帧
 }
 
 class CallConnectInfo {
@@ -24,6 +26,10 @@ class CallConnectInfo {
     /// 是否获取到对端视频首帧
     var isRetrieveFirstFrame: Bool = false
     
+    
+    /// 呼叫类型
+    var callType: CallType = .video
+    
     /// 呼叫的session id
     var callId: String = ""
     
@@ -32,6 +38,9 @@ class CallConnectInfo {
     
     //呼叫中的远端用户
     var callingUserId: UInt?
+    
+    //通话开始的时间
+    var callConnectedTs: UInt64 = 0
     
     /// 本地是否已经同意
     var isLocalAccepted: Bool = false
@@ -61,12 +70,17 @@ class CallConnectInfo {
         isRetrieveFirstFrame = false
         startRetrieveFirstFrame = nil
         isLocalAccepted = false
+        callConnectedTs = 0
     }
     
-    func set(userId: UInt, 
-             roomId: String, 
+    func set(callType: CallType? = nil,
+             userId: UInt,
+             roomId: String,
              callId: String? = nil,
              isLocalAccepted: Bool = false) {
+        if let callType = callType {
+            self.callType = callType
+        }
         self.callingUserId = userId
         self.callingRoomId = roomId
         self.isLocalAccepted = isLocalAccepted

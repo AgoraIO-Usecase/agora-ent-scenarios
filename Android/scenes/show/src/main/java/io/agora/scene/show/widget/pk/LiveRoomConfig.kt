@@ -65,4 +65,6 @@ class LiveRoomConfig constructor(room: ShowRoomDetailModel, waitingForPK: Boolea
     }
 
     fun isRobotRoom() = roomId.length > 6
+
+    fun getRoomId() = roomId
 }

@@ -10,11 +10,13 @@ import io.agora.rtmsyncmanager.service.callback.AUIException
 import io.agora.rtmsyncmanager.service.callback.AUIRoomCallback
 import io.agora.rtmsyncmanager.service.callback.AUIRoomListCallback
 import io.agora.rtmsyncmanager.service.http.room.*
+import io.agora.rtmsyncmanager.utils.AUILogger
 import retrofit2.Call
 import retrofit2.Response
 
 class AUIRoomManager {
 
+    private val tag = "AUIRoomManager"
     private val roomInterface by lazy {
         HttpManager.getService(RoomInterface::class.java)
     }
@@ -25,6 +27,7 @@ class AUIRoomManager {
         roomInfo: AUIRoomInfo,
         callback: AUIRoomCallback?
     ) {
+        AUILogger.logger().d(tag, "createRoom sceneId:$sceneId, roomInfo:$roomInfo")
         val roomId = roomInfo.roomId
         roomInterface.createRoom(CreateRoomReq(
             appId,
@@ -59,6 +62,7 @@ class AUIRoomManager {
         roomId: String,
         callback: AUICallback?
     ) {
+        AUILogger.logger().d(tag, "destroyRoom sceneId:$sceneId, roomId:$roomId")
         roomInterface.destroyRoom(RoomUserReq(appId, sceneId, roomId))
             .enqueue(object : retrofit2.Callback<CommonResp<DestroyRoomResp>> {
                 override fun onResponse(
@@ -91,6 +95,7 @@ class AUIRoomManager {
         pageSize: Int,
         callback: AUIRoomListCallback?
     ) {
+        AUILogger.logger().d(tag, "getRoomInfoList sceneId:$sceneId, lastCreateTime:$lastCreateTime, pageSize:$pageSize")
         roomInterface.fetchRoomList(RoomListReq(appId, sceneId, pageSize, lastCreateTime))
             .enqueue(object : retrofit2.Callback<CommonResp<RoomListResp>> {
                 override fun onResponse(
@@ -98,11 +103,12 @@ class AUIRoomManager {
                     response: Response<CommonResp<RoomListResp>>
                 ) {
                     val roomList = response.body()?.data?.getRoomList()
+                    val ts = response.body()?.ts
                     if (roomList != null) {
                         AUIRoomContext.shared().resetRoomMap(roomList)
-                        callback?.onResult(null, roomList)
+                        callback?.onResult(null, roomList, ts)
                     } else {
-                        callback?.onResult(Utils.errorFromResponse(response), null)
+                        callback?.onResult(Utils.errorFromResponse(response), null, ts)
                     }
                 }
 
@@ -111,7 +117,7 @@ class AUIRoomManager {
                         AUIException(
                             -1,
                             t.message
-                        ), null
+                        ), null, null
                     )
                 }
             })
@@ -123,6 +129,7 @@ class AUIRoomManager {
         roomId: String,
         callback: AUIRoomCallback?
     ) {
+        AUILogger.logger().d(tag, "getRoomInfo sceneId:$sceneId, roomId:$roomId")
         roomInterface.queryRoomInfo(QueryRoomReq(appId, sceneId, roomId))
             .enqueue(object : retrofit2.Callback<CommonResp<QueryRoomResp>> {
                 override fun onResponse(
@@ -145,20 +152,27 @@ class AUIRoomManager {
             })
     }
 
-    fun updateRoom(
+    fun updateRoomInfo(
         appId: String,
         sceneId: String,
         roomInfo: AUIRoomInfo,
         callback: AUIRoomCallback?
     ) {
-        roomInterface.updateRoomInfo(UpdateRoomReq(appId, sceneId, roomInfo.roomId, roomInfo))
+        AUILogger.logger().d(tag, "updateRoomInfo sceneId:$sceneId, roomInfo:$roomInfo")
+        val roomId = roomInfo.roomId
+        roomInterface.updateRoomInfo(UpdateRoomReq(
+            appId,
+            sceneId,
+            roomId,
+            roomInfo
+        ))
             .enqueue(object : retrofit2.Callback<CommonResp<String>> {
                 override fun onResponse(
                     call: Call<CommonResp<String>>,
                     response: Response<CommonResp<String>>
                 ) {
                     val rsp = response.body()?.data
-                    if (response.body()?.code == 0) {
+                    if (response.body()?.code == 0 && rsp != null) {
                         AUIRoomContext.shared().insertRoomInfo(roomInfo)
                         // success
                         callback?.onResult(null, roomInfo)

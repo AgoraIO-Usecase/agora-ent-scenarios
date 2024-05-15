@@ -7,26 +7,20 @@ import io.agora.rtmsyncmanager.model.AUICommonConfig
 import io.agora.rtmsyncmanager.model.AUIRoomContext
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
-import io.agora.rtmsyncmanager.utils.AUILogger.Companion.logger
 
 class SyncManager constructor(
-    context: Context,
-    rtmClient: RtmClient? = null,
-    commonConfig: AUICommonConfig
+    private val context: Context,
+    private val rtmClient: RtmClient? = null,
+    private val commonConfig: AUICommonConfig
 ) {
-
-    private val tag = "SyncManager"
-
     var rtmManager: AUIRtmManager
         private set
 
     private var sceneMap = mutableMapOf<String, Scene>()
 
     init {
-        logger().d(tag, "init AUISyncManager")
         AUIRoomContext.shared().setCommonConfig(commonConfig)
         val rtm = rtmClient ?: createRtmClient()
-        rtm.setParameters("{\"rtm.msg.tx_timeout\": 3000}")
         rtmManager = AUIRtmManager(context, rtm, rtm == rtmClient)
     }
 
@@ -36,6 +30,10 @@ class SyncManager constructor(
 
     fun logout() {
         rtmManager.logout()
+    }
+
+    fun release() {
+        rtmManager.deInit()
     }
 
     fun getScene(channelName: String): Scene {
@@ -48,12 +46,14 @@ class SyncManager constructor(
         return newScene
     }
 
+    fun removeScene(channelName: String) {
+        sceneMap.remove(channelName)
+    }
+
     private fun createRtmClient(): RtmClient {
         val commonConfig = AUIRoomContext.shared().requireCommonConfig()
         val userInfo = AUIRoomContext.shared().currentUserInfo
-        val rtmConfig = RtmConfig.Builder(commonConfig.appId, userInfo.userId).apply {
-            presenceTimeout(60)
-        }.build()
+        val rtmConfig = RtmConfig.Builder(commonConfig.appId, userInfo.userId).build()
         if (rtmConfig.appId.isEmpty()) {
             assert(false) { "userId is empty" }
         }

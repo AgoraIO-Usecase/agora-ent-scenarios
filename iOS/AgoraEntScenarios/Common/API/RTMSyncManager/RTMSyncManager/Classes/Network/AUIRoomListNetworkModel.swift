@@ -28,11 +28,12 @@ public class SyncRoomListNetworkModel: SyncNetworkModel {
         guard let dic = dic as? [String: Any],
               let result = dic["data"] as? [String: Any],
               let list = result["list"],
-              let roomInfo = NSArray.yy_modelArray(with: AUIRoomInfo.self, json: list) else {
+              let ts = dic["ts"] as? Int64,
+              let roomList = NSArray.yy_modelArray(with: AUIRoomInfo.self, json: list) else {
             throw AUICommonError.networkParseFail.toNSError()
         }
         
-        return roomInfo
+        return ["ts": ts, "list": roomList]
     }
 }
 

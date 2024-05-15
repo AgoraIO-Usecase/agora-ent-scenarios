@@ -989,7 +989,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //添加音频鉴黄接口
     [[NetworkManager shared] voiceIdentifyWithChannelName:self.roomModel.roomNo
                                               channelType:1
-                                                sceneType:SceneTypeKtv
+                                                sceneType:@"ktv"
                                                   success:^(NSString * msg) {
         SRLogInfo(@"voiceIdentify success: %@", msg);
     }];

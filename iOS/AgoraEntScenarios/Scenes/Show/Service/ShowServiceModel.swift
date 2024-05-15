@@ -204,11 +204,11 @@ class ShowInteractionInfo: ShowBaseInfo {
     var ownerMuteAudio: Bool = false                    //房主静音状态（后续拆成两条interation info的muteAudio）
     var createdAt: Int64 = 0                            //创建时间，与19700101时间比较的毫秒数
     
-    #if DEBUG
+//    #if DEBUG
     override var description: String {
         return "userId: \(userId) roomId: \(roomId) status: \(interactStatus) objectId: \(objectId ?? "")"
     }
-    #endif
+//    #endif
     
     override func isEqual(_ object: Any?) -> Bool {
         guard let info = object as? ShowInteractionInfo,

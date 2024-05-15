@@ -10,11 +10,19 @@ import AgoraRtmKit
 
 public class AUISyncManager: NSObject {
     public var sceneMap: [String: AUIScene] = [:]
+    private var _rtmClientByInternal: AgoraRtmClientKit?
     public private(set) var rtmManager: AUIRtmManager
+    deinit {
+        aui_info("deinit AUISyncManager")
+    }
     
     public required init(rtmClient: AgoraRtmClientKit?, commonConfig: AUICommonConfig) {
+        aui_info("init AUISyncManager")
         AUIRoomContext.shared.commonConfig = commonConfig
         let _rtmClient = rtmClient ?? AUISyncManager.createRtmClient()
+        if _rtmClient != rtmClient {
+            _rtmClientByInternal = _rtmClient
+        }
         self.rtmManager = AUIRtmManager(rtmClient: _rtmClient,
                                         rtmChannelType: .message,
                                         isExternalLogin: _rtmClient == rtmClient)
@@ -22,29 +30,46 @@ public class AUISyncManager: NSObject {
     }
     
     public func login(with token: String, completion: @escaping (NSError?) -> ()) {
-        aui_info("login")
         rtmManager.login(token: token, completion: completion)
     }
     
     public func logout() {
-        aui_info("logout")
         rtmManager.logout()
+        if let rtmClient = _rtmClientByInternal {
+            rtmClient.logout()
+        }
     }
     
-//    public func renewToken(with token: String) {
-//        aui_info("logout")
-//        rtmManager.renew(token: token, completion: nil)
-//    }
+    public func destroy() {
+        if let rtmClient = _rtmClientByInternal {
+            rtmClient.destroy()
+        }
+    }
     
-    public func getScene(channelName: String) -> AUIScene {
+    public func renew(token: String, completion: ((NSError?)->())? = nil) {
+        rtmManager.renew(token: token, completion: completion)
+    }
+    
+    public func createScene(channelName: String) -> AUIScene {
+        aui_info("createScene: \(channelName)")
+        if let scene = getScene(channelName: channelName) {
+            return scene
+        }
+        
+        let scene = AUIScene(channelName: channelName, rtmManager: rtmManager) { [weak self] in
+            self?.sceneMap.removeValue(forKey: channelName)
+        }
+        sceneMap[channelName] = scene
+        return scene
+    }
+    
+    public func getScene(channelName: String) -> AUIScene? {
         aui_info("getScene: \(channelName)")
         if let scene = sceneMap[channelName] {
             return scene
         }
         
-        let scene = AUIScene(channelName: channelName, rtmManager: rtmManager)
-        sceneMap[channelName] = scene
-        return scene
+        return nil
     }
 }
 
@@ -53,7 +78,7 @@ extension AUISyncManager {
         let commonConfig = AUIRoomContext.shared.commonConfig!
         let userInfo = AUIRoomContext.shared.currentUserInfo
         let rtmConfig = AgoraRtmClientConfig(appId: commonConfig.appId, userId: userInfo.userId)
-        rtmConfig.presenceTimeout = 60
+        rtmConfig.presenceTimeout = 300
         if rtmConfig.userId.count == 0 {
             aui_error("userId is empty")
             assert(false, "userId is empty")
