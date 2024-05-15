@@ -604,6 +604,9 @@ class AUIListCollection(
             list[itemIdx] = tempMap
         }
         val retList =
+            attributesWillSetClosure?.invoke(
+                channelName,
+                observeKey,
                 valueCmd,
                 AUIAttributesModel(list)
             )?.getList()
