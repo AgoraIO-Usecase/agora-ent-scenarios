@@ -11,6 +11,10 @@
 #import "VLKTVRemoteVolumeView.h"
 #import "EffectCollectionViewCell.h"
 #import "AgoraEntScenarios-Swift.h"
+#import "VLKTVSegmentView.h"
+#import "VLSettingNetSwitcherView.h"
+#import "VLSettingAIAECSwitcherView.h"
+#import "VLSettingSwitcherView.h"
 @import Masonry;
 @import AgoraCommon;
 @interface VLKTVSettingView() <
@@ -19,11 +23,16 @@ VLKTVSliderViewDelegate,
 VLKTVKindsViewDelegate,
 VLKTVTonesViewDelegate,
 VLKTVRemoteVolumeViewDelegate,
+VLKTVSegmentViewDelegate,
+VLSettingSwitcherViewDelegate,
+VLSettingNetSwitcherViewDelegate,
+VLSettingAIAECSwitcherViewDelegate,
 UICollectionViewDelegate,
 UICollectionViewDataSource
 >
 
 @property (nonatomic, strong) UILabel *titleLabel;
+@property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) VLKTVSwitcherView *soundSwitcher;
 @property (nonatomic, strong) VLKTVTonesView *tonesView;
 @property (nonatomic, strong) VLKTVSliderView *soundSlider;
@@ -32,11 +41,21 @@ UICollectionViewDataSource
 @property (nonatomic, strong) VLKTVSliderView *remoteSlider;
 @property (nonatomic, strong) VLKTVKindsView *kindsView;
 @property (nonatomic, strong) VLKTVRemoteVolumeView* remoteVolumeView;
+@property (nonatomic, strong) VLKTVSegmentView *lrcSegmentView;
+@property (nonatomic, strong) VLKTVSegmentView *vqsSegmentView;
+@property (nonatomic, strong) VLKTVSegmentView *ansSegmentView;
+@property (nonatomic, strong) VLSettingNetSwitcherView *netSwitcherView;
+@property (nonatomic, strong) VLSettingAIAECSwitcherView *aiAecSwitcherView;
+@property (nonatomic, strong) VLSettingSwitcherView *perBroSwitcherView;
+@property (nonatomic, strong) VLSettingSwitcherView *delaySwitcherView;
 @property (nonatomic, strong, readonly) VLKTVSettingModel *setting;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, assign) CGFloat cellWidth;
 @property (nonatomic, strong) NSArray *effectImgs;
 @property (nonatomic, strong) NSArray *titles;
+@property (nonatomic, assign) NSInteger lrcLevel;
+@property (nonatomic, assign) NSInteger vqs;
+@property (nonatomic, assign) NSInteger ans;
 @end
 
 @implementation VLKTVSettingView
@@ -46,13 +65,16 @@ UICollectionViewDataSource
         [self configData:setting];
         [self initSubViews];
         [self addSubViewConstraints];
-        self.soundSlider.value = 1.0;
-        self.accSlider.value = 0.5;
-        self.remoteSlider.value = 0.3;
-        self.setting.remoteVolume = 40;
+//        self.soundSlider.value = 1.0;
+//        self.accSlider.value = 0.5;
+//        self.remoteSlider.value = 0.3;
+//        self.setting.remoteVolume = 30;
+//        self.lrcLevel = 1;
+//        self.vqs = 0;
+//        self.ans = 0;
         self.cellWidth = (CGRectGetWidth([UIScreen mainScreen].bounds) - 48) / 4.0;
-        self.titles = @[ KTVLocalizedString(@"ktv_effect_off"), @"KTV",KTVLocalizedString(@"ktv_effect_concert"), KTVLocalizedString(@"ktv_effect_studio"), KTVLocalizedString(@"ktv_effect_phonograph"), KTVLocalizedString(@"ktv_effect_spatial"), KTVLocalizedString(@"ktv_effect_ethereal"), KTVLocalizedString(@"ktv_effect_pop"),@"R&B"];
-        self.effectImgs = @[@"ktv_console_setting1",@"ktv_console_setting2",@"ktv_console_setting3",@"ktv_console_setting4"];
+        self.titles = @[ @"KTV", KTVLocalizedString(@"ktv_effect_off"),KTVLocalizedString(@"ktv_effect_concert"), KTVLocalizedString(@"ktv_effect_studio"), KTVLocalizedString(@"ktv_effect_phonograph"), KTVLocalizedString(@"ktv_effect_spatial"), KTVLocalizedString(@"ktv_effect_ethereal"), KTVLocalizedString(@"ktv_effect_pop"),@"R&B"];
+        self.effectImgs = @[@"ktv_console_setting3",@"ktv_console_setting4",@"ktv_console_setting2",@"ktv_console_setting1"];
     }
     return self;
 }
@@ -60,31 +82,81 @@ UICollectionViewDataSource
 - (void)configData:(VLKTVSettingModel *)setting {
     if (!setting) {
         _setting = [[VLKTVSettingModel alloc] init];
-        [self.setting setDefaultProperties];
+        [self setDefaultSetting];
     } else {
         _setting = setting;
     }
     self.soundCardSwitcher.on = self.setting.soundCardOn;
     self.soundSwitcher.on = self.setting.soundOn;
-    self.soundSlider.value = self.setting.soundValue;
-    self.accSlider.value = self.setting.accValue;
-    self.remoteSlider.value = self.setting.remoteValue;
+    self.soundSlider.value = self.setting.soundValue / 100.0;
+    self.accSlider.value = self.setting.accValue / 100.0;
+    self.remoteSlider.value = self.setting.remoteVolume / 100.0;
+    self.lrcSegmentView.selectIndex = self.setting.lrcLevel;
+    self.vqsSegmentView.selectIndex = self.setting.vqs;
+    self.ansSegmentView.selectIndex = self.setting.ans;
+    self.delaySwitcherView.on = self.setting.isDelay;
+    self.perBroSwitcherView.on = self.setting.isPerBro;
+    self.aiAecSwitcherView.on = self.setting.enableAec;
+    self.aiAecSwitcherView.aecValue = self.setting.aecLevel;
+    self.netSwitcherView.on = self.setting.enableMultipath;
+}
+
+-(void)setDefaultSetting{
+    self.setting.soundOn = NO;
+    self.setting.mvOn = NO;
+    self.setting.toneValue = 0;
+    self.setting.soundValue = 100;
+    self.setting.accValue = 50;
+    self.setting.remoteVolume = 30;
+    self.setting.lrcLevel = 1;
+    self.setting.vqs = 0;
+    self.setting.ans = 0;
+    self.setting.isDelay = false;
+    self.setting.isPerBro = false;
+    self.setting.enableAec = true;
+    self.setting.enableMultipath = true;
+    self.setting.aecLevel = 1;
+}
+
+-(void)setChorusStatus:(BOOL)status{
+    self.accSlider.userInteractionEnabled = status;
+    self.accSlider.alpha = status ? 1 : 0.6;
+    self.remoteSlider.userInteractionEnabled = status;
+    self.remoteSlider.alpha = status ? 1 : 0.6;
+    self.lrcSegmentView.userInteractionEnabled = !status;
+    self.lrcSegmentView.alpha = status ? 0.6 : 1;
+}
+
+-(void)setAEC:(BOOL)enable level:(NSInteger)level{
+    self.aiAecSwitcherView.on = enable;
+    self.aiAecSwitcherView.aecValue = level;
 }
 
 - (void)initSubViews {
-    [self addSubview:self.titleLabel];
-    [self addSubview:self.soundSwitcher];
-    [self addSubview:self.soundCardSwitcher];
-//    [self addSubview:self.tonesView];
-    [self addSubview:self.soundSlider];
-    [self addSubview:self.accSlider];
-    [self addSubview:self.remoteSlider];
-    [self addSubview:self.collectionView];
-   // [self addSubview:self.remoteVolumeView];
-//    [self addSubview:self.kindsView];
+    self.scrollView = [[UIScrollView alloc]init];
+    self.scrollView.scrollEnabled = true;
+    self.scrollView.contentSize = CGSizeMake(0, 720);
+    [self addSubview:self.scrollView];
+    [self.scrollView addSubview:self.titleLabel];
+    [self.scrollView addSubview:self.soundSwitcher];
+    [self.scrollView addSubview:self.soundCardSwitcher];
+    [self.scrollView addSubview:self.soundSlider];
+    [self.scrollView addSubview:self.accSlider];
+    [self.scrollView addSubview:self.remoteSlider];
+    [self.scrollView addSubview:self.collectionView];
+    [self.scrollView addSubview:self.lrcSegmentView];
+    [self.scrollView addSubview:self.perBroSwitcherView];
+    [self.scrollView addSubview:self.vqsSegmentView];
+    [self.scrollView addSubview:self.ansSegmentView];
+    [self.scrollView addSubview:self.netSwitcherView];
+    [self.scrollView addSubview:self.aiAecSwitcherView];
 }
 
 - (void)addSubViewConstraints {
+    [self.scrollView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.bottom.left.right.mas_equalTo(self);
+    }];
+    
     [self.titleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.mas_equalTo(20);
         make.centerX.mas_equalTo(self);
@@ -99,12 +171,6 @@ UICollectionViewDataSource
         make.left.right.mas_equalTo(self);
         make.top.mas_equalTo(self.soundSwitcher.mas_bottom).offset(16);
     }];
-    
-//    [self.tonesView mas_makeConstraints:^(MASConstraintMaker *make) {
-//        make.left.right.mas_equalTo(self);
-//        make.top.mas_equalTo(self.soundSwitcher.mas_bottom).offset(25);
-//        make.height.mas_equalTo(26);
-//    }];
     
     [self.soundSlider mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.mas_equalTo(self);
@@ -130,17 +196,41 @@ UICollectionViewDataSource
         make.height.mas_equalTo(78);
     }];
     
-//    [self.remoteVolumeView mas_makeConstraints:^(MASConstraintMaker *make) {
-//        make.left.right.mas_equalTo(self);
-//        make.top.mas_equalTo(self.remoteSlider.mas_bottom).offset(25);
-//        make.height.mas_equalTo(22);
-//    }];
+    [self.lrcSegmentView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.mas_equalTo(self);
+        make.top.mas_equalTo(self.collectionView.mas_bottom).offset(0);
+        make.height.mas_equalTo(50);
+    }];
     
-//    [self.kindsView mas_makeConstraints:^(MASConstraintMaker *make) {
-//        make.top.mas_equalTo(self.remoteVolumeView.mas_bottom).offset(35);
-//        make.left.right.mas_equalTo(self);
-//        make.bottom.mas_equalTo(self).offset(-64);
-//    }];
+    [self.perBroSwitcherView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.mas_equalTo(self);
+        make.top.mas_equalTo(self.lrcSegmentView.mas_bottom).offset(0);
+        make.height.mas_equalTo(50);
+    }];
+    
+    [self.netSwitcherView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.mas_equalTo(self);
+        make.top.mas_equalTo(self.perBroSwitcherView.mas_bottom).offset(0);
+        make.height.mas_equalTo(60);
+    }];
+    
+    [self.vqsSegmentView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.mas_equalTo(self);
+        make.top.mas_equalTo(self.netSwitcherView.mas_bottom).offset(0);
+        make.height.mas_equalTo(80);
+    }];
+    
+    [self.ansSegmentView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.mas_equalTo(self);
+        make.top.mas_equalTo(self.vqsSegmentView.mas_bottom).offset(0);
+        make.height.mas_equalTo(50);
+    }];
+
+    [self.aiAecSwitcherView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.mas_equalTo(self);
+        make.top.mas_equalTo(self.ansSegmentView.mas_bottom).offset(0);
+        make.height.mas_equalTo(90);
+    }];
 }
 
 #pragma mark - VLKTVSwitcherViewDelegate
@@ -167,7 +257,6 @@ UICollectionViewDataSource
 - (void)sliderView:(VLKTVSliderView *)sliderView valueChanged:(float)value {
     VLKTVValueDidChangedType type;
     if (sliderView == self.soundSlider) {
-        NSLog(@"value:%f", value);
         self.setting.soundValue = value;
         type = VLKTVValueDidChangedTypeSound;
     } else if (sliderView == self.accSlider){
@@ -222,8 +311,8 @@ UICollectionViewDataSource
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     self.setting.selectEffect = indexPath.item;
     [self.collectionView reloadData];
-    if([self.delegate respondsToSelector:@selector(settingViewEffectChoosed:)]){
-        [self.delegate settingViewEffectChoosed:indexPath.item];
+    if([self.delegate respondsToSelector:@selector(settingViewSettingChanged:effectChoosed:)]){
+        [self.delegate settingViewSettingChanged:self.setting effectChoosed:indexPath.item];
     }
 }
 
@@ -250,6 +339,14 @@ UICollectionViewDataSource
     self.setting.remoteVolume = value;
     if ([self.delegate respondsToSelector:@selector(settingViewSettingChanged:valueDidChangedType:)]) {
         [self.delegate settingViewSettingChanged:self.setting valueDidChangedType:VLKTVValueDidChangedTypeRemoteValue];
+    }
+}
+
+#pragma mark
+- (void)switcherNetView:(VLSettingNetSwitcherView *)switcherView on:(BOOL)on{
+    self.setting.enableMultipath = on;
+    if ([self.delegate respondsToSelector:@selector(settingViewSettingChanged:valueDidChangedType:)]) {
+        [self.delegate settingViewSettingChanged:self.setting valueDidChangedType:VLKTVValueDidChangedTypeenableMultipath];
     }
 }
 
@@ -283,6 +380,31 @@ UICollectionViewDataSource
         _soundCardSwitcher.delegate = self;
     }
     return _soundCardSwitcher;
+}
+
+- (VLSettingSwitcherView *)perBroSwitcherView {
+    if (!_perBroSwitcherView) {
+        _perBroSwitcherView = [[VLSettingSwitcherView alloc] init];
+        _perBroSwitcherView.subText = KTVLocalizedString(@"ktv_per_bro");
+        _perBroSwitcherView.delegate = self;
+    }
+    return _perBroSwitcherView;
+}
+
+- (VLSettingSwitcherView *)delaySwitcherView {
+    if (!_delaySwitcherView) {
+        _delaySwitcherView = [[VLSettingSwitcherView alloc] init];
+        _delaySwitcherView.delegate = self;
+    }
+    return _delaySwitcherView;
+}
+
+- (VLSettingNetSwitcherView *)netSwitcherView {
+    if (!_netSwitcherView) {
+        _netSwitcherView = [[VLSettingNetSwitcherView alloc] init];
+        _netSwitcherView.delegate = self;
+    }
+    return _netSwitcherView;
 }
 
 - (VLKTVTonesView *)tonesView {
@@ -338,15 +460,38 @@ UICollectionViewDataSource
     return _collectionView;
 }
 
-//- (VLKTVRemoteVolumeView*)remoteVolumeView {
-//    if (!_remoteVolumeView) {
-//        _remoteVolumeView = [[VLKTVRemoteVolumeView alloc] initWithMin:0 withMax:100 withCurrent:40];
-//        _remoteVolumeView.titleLabel.text = KTVLocalizedString(@"RemoteVolume");
-//        _remoteVolumeView.delegate = self;
-//        _setting.remoteVolume = 40;
-//    }
-//    return _remoteVolumeView;
-//}
+- (VLKTVSegmentView *)lrcSegmentView {
+    if (!_lrcSegmentView) {
+        _lrcSegmentView = [[VLKTVSegmentView alloc] init];
+        _lrcSegmentView.tag = 800;
+        _lrcSegmentView.delegate = self;
+        _lrcSegmentView.type = SegmentViewTypeScore;
+        _lrcSegmentView.subText = KTVLocalizedString(@"ktv_lrc_level");
+    }
+    return _lrcSegmentView;
+}
+
+- (VLKTVSegmentView *)vqsSegmentView {
+    if (!_vqsSegmentView) {
+        _vqsSegmentView = [[VLKTVSegmentView alloc] init];
+        _vqsSegmentView.tag = 801;
+        _vqsSegmentView.delegate = self;
+        _vqsSegmentView.type = SegmentViewTypeVQS;
+        [_vqsSegmentView setSubText:KTVLocalizedString(@"ktv_per_vol_quality") attrText:KTVLocalizedString(@"ktv_aec_war")];
+    }
+    return _vqsSegmentView;
+}
+
+- (VLKTVSegmentView *)ansSegmentView {
+    if (!_ansSegmentView) {
+        _ansSegmentView = [[VLKTVSegmentView alloc] init];
+        _ansSegmentView.tag = 802;
+        _ansSegmentView.delegate = self;
+        _ansSegmentView.type = SegmentViewTypeAns;
+        [_ansSegmentView setSubText:KTVLocalizedString(@"ktv_per_ans") attrText:nil];
+    }
+    return _ansSegmentView;
+}
 
 - (VLKTVKindsView *)kindsView {
     if (!_kindsView) {
@@ -355,6 +500,14 @@ UICollectionViewDataSource
         _kindsView.list = [VLKTVKindsModel kinds];
     }
     return _kindsView;
+}
+
+-(VLSettingAIAECSwitcherView *)aiAecSwitcherView {
+    if(!_aiAecSwitcherView){
+        _aiAecSwitcherView = [VLSettingAIAECSwitcherView new];
+        _aiAecSwitcherView.delegate = self;
+    }
+    return _aiAecSwitcherView;
 }
 
 - (void)setIsEarOn:(BOOL)isEarOn
@@ -384,18 +537,81 @@ UICollectionViewDataSource
     
 }
 
+-(void)aecSwitcherView:(VLSettingAIAECSwitcherView *)switcherView on:(BOOL)on{
+    self.setting.enableAec = on;
+    if([self.delegate respondsToSelector:@selector(settingViewSettingChanged:valueDidChangedType:)]){
+        [self.delegate settingViewSettingChanged:self.setting valueDidChangedType:VLKTVValueDidChangedTypeaiaec];
+    }
+}
+
+-(void)aecSwitcherView:(VLSettingAIAECSwitcherView *)switcherView level:(NSInteger)level{
+    self.setting.aecLevel = level;
+    if([self.delegate respondsToSelector:@selector(settingViewSettingChanged:valueDidChangedType:)]){
+        [self.delegate settingViewSettingChanged:self.setting valueDidChangedType:VLKTVValueDidChangedTypeAecLevel];
+    }
+}
+
+- (void)switcherSetView:(VLSettingSwitcherView *)switcherView on:(BOOL)on{
+    if(switcherView == self.delaySwitcherView){
+        self.setting.isDelay = on;
+        if([self.delegate respondsToSelector:@selector(settingViewSettingChanged:valueDidChangedType:)]){
+            [self.delegate settingViewSettingChanged:self.setting valueDidChangedType:VLKTVValueDidChangedTypeDelay];
+        }
+    } else if (switcherView == self.perBroSwitcherView){
+        self.setting.isPerBro = on;
+        if([self.delegate respondsToSelector:@selector(settingViewSettingChanged:valueDidChangedType:)]){
+            [self.delegate settingViewSettingChanged:self.setting valueDidChangedType:VLKTVValueDidChangedTypebro];
+        }
+    }
+}
+
+-(void)segmentView:(VLKTVSegmentView *)view DidSelectIndex:(NSInteger)index{
+    if(view.tag == 800){
+        self.lrcLevel = index;
+        self.setting.lrcLevel = index;
+        if([self.delegate respondsToSelector:@selector(settingViewSettingChanged:valueDidChangedType:)]){
+            [self.delegate settingViewSettingChanged:self.setting valueDidChangedType:VLKTVValueDidChangedTypeLrc];
+        }
+    } else if(view.tag == 801){
+        self.vqs = index;
+        self.setting.vqs = index;
+        if([self.delegate respondsToSelector:@selector(settingViewSettingChanged:valueDidChangedType:)]){
+            [self.delegate settingViewSettingChanged:self.setting valueDidChangedType:VLKTVValueDidChangedTypeVqs];
+        }
+    } else {
+        self.ans = index;
+        self.setting.ans = index;
+        if([self.delegate respondsToSelector:@selector(settingViewSettingChanged:valueDidChangedType:)]){
+            [self.delegate settingViewSettingChanged:self.setting valueDidChangedType:VLKTVValueDidChangedTypeAns];
+        }
+    }
+}
+
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+    [super touchesBegan:touches withEvent:event];
+    [self endEditing:true];
+}
+
 @end
 
 @implementation VLKTVSettingModel
 
-- (void)setDefaultProperties {
-    self.soundOn = NO;
-    self.mvOn = NO;
-    self.toneValue = 0;
-    self.soundValue = 0.0;
-    self.accValue = 0.0;
-    self.remoteValue = 0.0;
-    self.kindIndex = kKindUnSelectedIdentifier;
-}
+//- (void)setDefaultProperties {
+//    self.soundOn = NO;
+//    self.mvOn = NO;
+//    self.toneValue = 0;
+//    self.soundValue = 0.0;
+//    self.accValue = 0.0;
+//    self.remoteValue = 0.0;
+//    self.lrcLevel = 1;
+//    self.vqs = 0;
+//    self.ans = 0;
+//    self.isDelay = false;
+//    self.isPerBro = false;
+//    self.enableAec = true;
+//    self.enableMultipath = true;
+//    self.aecLevel = 1;
+//    self.kindIndex = kKindUnSelectedIdentifier;
+//}
 
 @end

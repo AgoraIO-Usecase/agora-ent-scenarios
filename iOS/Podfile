@@ -27,9 +27,9 @@ def all_pods
   pod 'JXCategoryView', '1.6.1'
 
   # 火山美颜
- # pod 'bytedEffect', :path => 'bytedEffect.podspec'
+  #pod 'bytedEffect', :path => 'bytedEffect.podspec'
   # 商汤美颜
-#  pod 'SenseLib', :path => 'sense.podspec'
+  #pod 'SenseLib', :path => 'sense.podspec'
   # 相芯美颜
 #  pod 'fuLib', :path => 'fu.podspec'
 
@@ -47,7 +47,7 @@ def all_pods
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
   pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
   pod 'ShowTo1v1', :path => 'AgoraEntScenarios/Scenes/ShowTo1v1'
-  pod 'Cantata', :path => 'AgoraEntScenarios/Scenes/Cantata'
+#  pod 'Cantata', :path => 'AgoraEntScenarios/Scenes/Cantata'
   pod 'AgoraCommon', :path => 'AgoraEntScenarios'
   pod 'Joy', :path => 'AgoraEntScenarios/Scenes/Joy'
   #ThirdParty
@@ -59,7 +59,7 @@ def all_pods
   
   #歌词组件
   pod "ScoreEffectUI", '1.0.2'
-  pod 'AgoraLyricsScore', '1.1.2'
+  pod 'AgoraLyricsScore', '1.1.6'
 #  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'cc0951f11f5fa6113ec2b9df2a509efa881d5bd7'
 #  pod 'AgoraLyricsScore', :path => '../../AgoraLyricsScore/AgoraLyricsScore.podspec'
 
@@ -79,6 +79,7 @@ def all_pods
   pod 'Agora_Chat_iOS', '1.0.8'
   pod 'SwiftyBeaver', '1.9.5'
   pod 'Protobuf', '3.22.1'
+  pod 'SwiftProtobuf'
  #  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
 
   #bugly

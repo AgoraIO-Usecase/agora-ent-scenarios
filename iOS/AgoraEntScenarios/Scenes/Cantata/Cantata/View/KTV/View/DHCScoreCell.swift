@@ -28,11 +28,11 @@ class DHCScoreCell: UITableViewCell {
         didSet {
             indexLabel.text = "\(score.index + 1)"
             if let userName = score.userName {
-                nameLabel.text = score.userName == "" ? "暂无上榜" : userName
+                nameLabel.text = score.userName == "" ? "ktv_empty_list".toSceneLocalization() as String : userName
             } else {
-                nameLabel.text = "暂无上榜"
+                nameLabel.text = "ktv_empty_list".toSceneLocalization() as String
             }
-            gradeLabel.text = "\(score.score)分"
+            gradeLabel.text = "\(score.score)\("ktv_song_score".toSceneLocalization() as String)"
             if(score.index == 0){
                 iconView.image = UIImage.sceneImage(name: "sbg-rank1", bundleName: "DHCResource")
             } else if score.index == 1 {

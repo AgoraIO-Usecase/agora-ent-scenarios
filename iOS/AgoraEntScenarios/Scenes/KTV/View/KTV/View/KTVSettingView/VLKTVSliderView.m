@@ -46,7 +46,7 @@
 - (void)addSubViewConstraints {
     CGFloat padding = 8;
     [self.reduceButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.mas_equalTo(79);
+        make.left.mas_equalTo(90);
         make.width.mas_equalTo(@(26));
         make.centerY.mas_equalTo(self);
     }];

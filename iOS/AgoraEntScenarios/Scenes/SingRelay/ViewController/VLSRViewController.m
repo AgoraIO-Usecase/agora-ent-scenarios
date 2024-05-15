@@ -716,7 +716,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = NO;
     songConfig.mode = (role == KTVSingRoleAudience) ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
@@ -858,7 +857,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
     KTVSingRole role = KTVSingRoleCoSinger;
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = NO;
     songConfig.mode = KTVLoadMusicModeLoadMusicOnly;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
@@ -1045,24 +1043,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                            config:config];
     
     NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
-    KTVApiConfig *apiConfig = [[KTVApiConfig alloc] initWithAppId:[[AppContext shared] appId]
-                                                        rtmToken:VLUserCenter.user.agoraRTMToken
-                                                        engine:self.RTCkit
-                                                        channelName:self.roomModel.roomNo
-                                                        localUid:[VLUserCenter.user.id integerValue]
-                                                        chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo]
-                                                        chorusChannelToken:@""
-                                                        type:KTVTypeSingRelay
-                                                        maxCacheSize:10
-                                                        musicType:loadMusicTypeMcc
-                                                        isDebugMode:false];
+    KTVApiConfig *apiConfig = [[KTVApiConfig alloc]initWithAppId:[[AppContext shared] appId] rtmToken:VLUserCenter.user.agoraRTMToken engine:self.RTCkit channelName:self.roomModel.roomNo localUid:[VLUserCenter.user.id integerValue] chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:@"" type:KTVTypeSingRelay musicType:loadMusicTypeMcc maxCacheSize:10 mccDomain:nil];
     
-    self.SRApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
+    self.SRApi = [[KTVApiImpl alloc] init];
+    [self.SRApi createKtvApiWithConfig:apiConfig];
     [self.SRApi renewInnerDataStreamId];
-//    SRLrcControl* lrcControl = [[SRLrcControl alloc] initWithLrcView:self.MVView.karaokeView];
-//    [self.SRApi setLrcViewWithView:lrcControl];
-//    self.lrcControl = lrcControl;
-//    self.lrcControl.delegate = self;
     [self.SRApi setLrcViewWithView:self.statusView.lrcView];
     [self.SRApi muteMicWithMuteStatus:self.isNowMicMuted];
     [self.SRApi addEventHandlerWithKtvApiEventHandler:self];
@@ -1282,6 +1267,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)didLrcProgressChanged:(NSInteger)progress{
+    if(self.currentIndex == 1 && progress > 60000){
+        return;
+    }
     [self handleProgress:progress];
 }
 
@@ -1532,7 +1520,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)startSBGGrapWith:(int)index {
     VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
     kWeakSelf(self);
-    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"sing_battle_game_info" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
+    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singrelay_4.3.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
         if(flag){
             //抢唱成功
             NSLog(@"抢唱成功");
@@ -1745,7 +1733,6 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
 - (void)reloadMusic{
     VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = YES;
     songConfig.mode = KTVLoadMusicModeLoadLrcOnly;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
@@ -2027,6 +2014,7 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
         if(![self isRoomOwner]){
             [self reNewAllData];
         }
+        self.currentIndex = 1;
         self.statusView.state = [self isRoomOwner] ? SRStateOwnerOrderMusic : SRStateAudienceWating;
     } else if(gameModel.status == SingRelayStatusStarted){
         /**
@@ -2221,11 +2209,22 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 //    [self.RTCkit enableLocalAudio:isOnMicSeat];
 //    [self.RTCkit muteLocalAudioStream:!isOnMicSeat];
     
-    VLSRRoomSeatModel* info = [self getCurrentUserSeatInfo];
-    self.isNowMicMuted = info.isAudioMuted;
-    self.isNowCameraMuted = info.isVideoMuted;
+//    VLSRRoomSeatModel* info = [self getCurrentUserSeatInfo];
+//    self.isNowMicMuted = info.isAudioMuted;
+//    self.isNowCameraMuted = info.isVideoMuted;
+//    
+//    self.bottomView.hidden = !_isOnMicSeat;
     
-    self.bottomView.hidden = !_isOnMicSeat;
+    VLSRRoomSeatModel* info = [self getCurrentUserSeatInfo];
+    if(onMicSeatStatusDidChanged){
+        if(info == nil){
+            self.isNowMicMuted = true;
+            self.isNowCameraMuted = true;
+        } else {
+            self.isNowMicMuted = info.isAudioMuted;
+            self.isNowCameraMuted = info.isVideoMuted;
+        }
+    }
     
     self.requestOnLineView.hidden = !self.bottomView.hidden;
     
@@ -2238,6 +2237,9 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
     BOOL oldValue = _isNowMicMuted;
     _isNowMicMuted = isNowMicMuted;
     [self.SRApi muteMicWithMuteStatus:isNowMicMuted];
+    if(self.isEarOn){
+        [self.RTCkit enableInEarMonitoring:!isNowMicMuted includeAudioFilters:AgoraEarMonitoringFilterNone];
+    }
     if([self isRoomOwner]){
         [self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
     } else {
@@ -2390,7 +2392,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
                         self.gameModel.status = SingRelayStatusEnded;
                         self.gameModel.rank = [self convertScoreArrayToRank];
                         [[AppContext srServiceImp] innerUpdateSingRelayInfo:self.gameModel completion:^(NSError * error) {
-                                        
+                              
                         }];
                     }
 //                    if([self.currentUserNo isEqualToString: VLUserCenter.user.id]){

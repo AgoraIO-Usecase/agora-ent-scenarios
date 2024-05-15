@@ -22,6 +22,9 @@ import io.agora.scene.ktv.service.CreateRoomOutputModel
 import io.agora.scene.ktv.service.JoinRoomOutputModel
 import java.util.*
 
+/**
+ * 创建房间弹框
+ */
 class CreateRoomDialog constructor(
     private val context: Context,
 ) : BaseBottomSheetDialogFragment<KtvDialogCreateRoomBinding>() {

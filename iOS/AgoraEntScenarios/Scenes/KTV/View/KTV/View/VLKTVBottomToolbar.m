@@ -43,6 +43,7 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
     [self.audioBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_mic_mute" ] forState:UIControlStateNormal];
     [self.audioBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_mic_unmute" ] forState:UIControlStateSelected];
     self.audioBtn.tag = VLKTVBottomBtnClickTypeAudio;
+    self.audioBtn.accessibilityIdentifier = @"ktv_bottom_bar_mic_mute_button";
     [self.audioBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.audioBtn];
     
@@ -50,12 +51,14 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
     [self.videoBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_cam_mute" ] forState:UIControlStateNormal];
     [self.videoBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_cam_unmute" ] forState:UIControlStateSelected];
     self.videoBtn.tag = VLKTVBottomBtnClickTypeVideo;
+    self.videoBtn.accessibilityIdentifier = @"ktv_bottom_bar_video_mute_button";
     [self.videoBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.videoBtn];
     
     UIButton *moreBtn = [[UIButton alloc]initWithFrame:CGRectMake(self.videoBtn.right+8, (self.height-38)*0.5, 38, 38)];
     [moreBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_more" ] forState:UIControlStateNormal];
     moreBtn.tag = VLKTVBottomBtnClickTypeMore;
+    moreBtn.accessibilityIdentifier = @"ktv_bottom_bar_setting_button";
     [moreBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:moreBtn];
    // moreBtn.alpha = 0;
@@ -64,6 +67,7 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
     [dianGeBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_diange_icon" ] forState:UIControlStateNormal];
     [dianGeBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     dianGeBtn.tag = VLKTVBottomBtnClickTypeChoose;
+    dianGeBtn.accessibilityIdentifier = @"ktv_bottom_bar_diange_button";
     [self addSubview:dianGeBtn];
     
     UIButton *voiceShowBtn = [[UIButton alloc]initWithFrame:CGRectMake(moreBtn.right + 14 , (self.height-24)*0.5, 24, 24)];

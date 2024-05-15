@@ -66,7 +66,7 @@
 "app_voice_chat_spatialTip"="—空间音频模式";
 
 "app_about_app"="关于声动互娱";
-"app_about_name"="声动互娱";
+"app_about_name"="声动互娱-K歌";
 "app_about_version"="版本号";
 "app_about_scene_version"="场景版本号";
 "app_about_chat_room"="语聊房";
@@ -172,7 +172,7 @@
 "home_content_item_ktv_title_snatchsinging" = "抢唱";
 "home_content_item_ktv_desc_snatchsinging" = "热歌高潮片段";
 "home_content_item_ktv_title_cantata" = "大合唱";
-"home_content_item_ktv_desc_cantata" = "敬请期待";
+"home_content_item_ktv_desc_cantata" = "最高支持128人";
 "home_content_item_ktv_title_takesong" = "接唱";
 "home_content_item_ktv_desc_takesong" = "歌曲接龙";
 "home_content_item_voice_desc_immersive" = "更沉浸、更有趣、更动听";
