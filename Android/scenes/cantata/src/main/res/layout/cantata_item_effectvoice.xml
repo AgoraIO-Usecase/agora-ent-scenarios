@@ -11,8 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
+        app:strokeColor="@null"
         app:shapeAppearance="@style/cantata_cornerTinyStyle"
-        tools:src="@drawable/cantata_music_background1" />
+        tools:src="@mipmap/bg_sound_mode_1" />
 
     <TextView
         android:id="@+id/tvTitle"

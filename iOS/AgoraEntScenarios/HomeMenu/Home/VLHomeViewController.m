@@ -76,7 +76,6 @@
         _listContainerView.translatesAutoresizingMaskIntoConstraints = NO;
         _listContainerView.backgroundColor = [UIColor clearColor];
         _listContainerView.listCellBackgroundColor = [UIColor clearColor];
-        
     }
     return _listContainerView;
 }
@@ -87,6 +86,7 @@
     
     [self setUpUI];
     [self getSceneConfigs];
+    
 }
 
 - (void)getSceneConfigs{

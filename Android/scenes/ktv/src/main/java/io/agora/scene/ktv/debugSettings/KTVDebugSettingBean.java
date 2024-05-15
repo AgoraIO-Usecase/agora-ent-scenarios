@@ -1,11 +1,14 @@
 package io.agora.scene.ktv.debugSettings;
 
+/**
+ * debug setting bean
+ */
 public class KTVDebugSettingBean {
     private final KTVDebugSettingsDialog.Callback mCallback;
 
     private boolean isAudioDumpEnabled = false;
 
-    private int mScoringLevel = 10; // According to Karaoke.getScoreLevel
+    private int mScoringLevel = 15; // According to Karaoke.getScoreLevel
     private int mScoringOffset = 0;
 
     public KTVDebugSettingBean(KTVDebugSettingsDialog.Callback mCallback) {

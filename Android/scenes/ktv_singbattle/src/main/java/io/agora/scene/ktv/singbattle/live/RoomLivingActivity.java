@@ -293,6 +293,22 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
         // density 3.0 densityDpi 480 system resources 2297 1080 display real 2400 1080 current window 2400 1080 1+ 9R
     }
 
+    private final Runnable onGraspDisableTask = new Runnable() {
+        @Override
+        public void run() {
+            if (getBinding() != null) {
+                getBinding().lrcControlView.onGraspDiasble();
+            }
+        }
+    };
+
+    private final Runnable onGraspFinshTask = new Runnable() {
+        @Override
+        public void run() {
+            roomLivingViewModel.onGraspFinish();
+        }
+    };
+
     @Override
     public void initListener() {
         getBinding().ivExit.setOnClickListener(view -> showExitDialog());
@@ -491,22 +507,27 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
                 getBinding().lrcControlView.onPlayStatus(roomLivingViewModel.songPlayingLiveData.getValue());
                 if (roomLivingViewModel.isRoomOwner() && roomLivingViewModel.songPlayingLiveData.getValue() != null && roomLivingViewModel.songPlayingLiveData.getValue().getWinnerNo().equals("")) {
                     getBinding().lrcControlView.startSingBattlePrepareTimeCount();
+
+                    getBinding().getRoot().removeCallbacks(onGraspDisableTask);
                     getBinding().getRoot().postDelayed(() -> {
-                        getBinding().lrcControlView.onGraspDiasble();
+                        onGraspDisableTask.run();
                     }, 12000);
+                    getBinding().getRoot().removeCallbacks(onGraspFinshTask);
                     getBinding().getRoot().postDelayed(() -> {
-                        roomLivingViewModel.onGraspFinish();
+                       onGraspFinshTask.run();
                     }, 13000);
                 }
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_BATTLE) {
                 getBinding().lrcControlView.onPlayStatus(roomLivingViewModel.songPlayingLiveData.getValue());
                 if (roomLivingViewModel.songPlayingLiveData.getValue() != null && roomLivingViewModel.songPlayingLiveData.getValue().getWinnerNo().equals("")) {
                     getBinding().lrcControlView.startSingBattlePrepareTimeCount();
+                    getBinding().getRoot().removeCallbacks(onGraspDisableTask);
                     getBinding().getRoot().postDelayed(() -> {
-                        getBinding().lrcControlView.onGraspDiasble();
+                        onGraspDisableTask.run();
                     }, 12000);
+                    getBinding().getRoot().removeCallbacks(onGraspFinshTask);
                     getBinding().getRoot().postDelayed(() -> {
-                        roomLivingViewModel.onGraspFinish();
+                        onGraspFinshTask.run();
                     }, 13000);
                 }
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE) {
@@ -812,7 +833,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
 
     private void showMusicSettingDialog() {
         //if (musicSettingDialog == null) {
-            musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting, roomLivingViewModel.playerMusicStatusLiveData.getValue() == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE);
+        musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting, roomLivingViewModel.playerMusicStatusLiveData.getValue() == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE);
         //}
         musicSettingDialog.show(getSupportFragmentManager(), MusicSettingDialog.TAG);
     }
@@ -940,6 +961,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        getBinding().getRoot().removeCallbacks(onGraspDisableTask);
+        getBinding().getRoot().removeCallbacks(onGraspFinshTask);
         roomLivingViewModel.release();
     }
 

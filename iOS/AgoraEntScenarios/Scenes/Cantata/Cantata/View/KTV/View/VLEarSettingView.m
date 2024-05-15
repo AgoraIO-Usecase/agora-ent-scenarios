@@ -42,13 +42,13 @@
     self.backgroundColor = UIColorMakeWithHex(@"#152164");
     
     _titleLabel = [[UILabel alloc]init];
-    _titleLabel.text = @"耳返";
+    _titleLabel.text = @"ktv_music_menu_dialog_ear".toSceneLocalization;
     _titleLabel.textAlignment = NSTextAlignmentCenter;
     _titleLabel.textColor = [UIColor whiteColor];
     [self addSubview:_titleLabel];
     
     _earLabel = [[UILabel alloc]init];
-    _earLabel.text = @"耳返开关";
+    _earLabel.text = @"ktv_ear_switch".toSceneLocalization;
     _earLabel.textColor = [UIColor whiteColor];
     [self addSubview:_earLabel];
     
@@ -67,8 +67,8 @@
     _earWarningBtn.imageView.contentMode = UIViewContentModeScaleAspectFit;
     [_earWarningBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     [_earWarningBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
-    [_earWarningBtn setImage:[UIImage sceneImageWithName:@"ktv_add_circle"] forState:UIControlStateNormal];
-    [_earWarningBtn setImage:[UIImage sceneImageWithName:@"ktv_add_circle_in"] forState:UIControlStateSelected];
+    [_earWarningBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_add_circle"] forState:UIControlStateNormal];
+    [_earWarningBtn setImage:[UIImage dhc_sceneImageWith:@"ktv_add_circle_in"] forState:UIControlStateSelected];
     _earWarningBtn.selected = [HeadSetManager hasHeadset];
     kWeakSelf(self);
     [HeadSetManager addHeadsetObserverWithCallback:^(BOOL inserted) {
@@ -97,7 +97,7 @@
     [self addSubview:_earSetView];
     
     _earSetLabel = [[UILabel alloc]init];
-    _earSetLabel.text = @"耳返设置";
+    _earSetLabel.text = @"ktv_ear_setting".toSceneLocalization;
     _earSetLabel.textColor = [UIColor grayColor];
     _earSetLabel.font = [UIFont systemFontOfSize:12];
     [_earSetView addSubview:_earSetLabel];
@@ -156,7 +156,7 @@
 - (VLKTVSliderView *)earSlider {
     if (!_earSlider) {
         _earSlider = [[VLKTVSliderView alloc] initWithMax:1 min:0];
-        _earSlider.titleLabel.text = @"耳返音量";
+        _earSlider.titleLabel.text = @"ktv_ear_vol".toSceneLocalization;
         _earSlider.titleLabel.textColor = [UIColor whiteColor];
         _earSlider.delegate = self;
     }

@@ -8,10 +8,9 @@
         android:id="@+id/status_prepare_view_lrc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="#99000000"
-        app:cardCornerRadius="@dimen/ktv_space_small"
+        app:cardBackgroundColor="@color/black_85_percent"
+        app:cardCornerRadius="12dp"
         app:cardElevation="0dp"
-        app:contentPadding="@dimen/ktv_space_normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,21 +20,33 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:orientation="horizontal">
-
-            <ProgressBar
-                android:id="@+id/pb"
-                android:layout_width="30dp"
-                android:layout_height="30dp" />
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tvMsg"
+                android:id="@+id/tvContent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginStart="10dp"
-                android:text="@string/ktv_lrc_loading"
-                android:textColor="@android:color/white" />
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="12dp"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp"
+                android:maxWidth="180dp"
+                android:minWidth="135dp"
+                android:text="@string/ktv_loading_music"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+            <ProgressBar
+                android:id="@+id/pbLoadingMusic"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_gravity="start"
+                android:max="100"
+                android:progress="0"
+                android:progressDrawable="@drawable/bg_progressbar_text_loading" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </merge>

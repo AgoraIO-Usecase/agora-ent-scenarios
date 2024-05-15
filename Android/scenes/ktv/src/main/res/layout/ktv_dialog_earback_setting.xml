@@ -4,368 +4,318 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:theme="@style/Theme.AppCompat"
-    android:background="@drawable/bg_full_blue_top_20">
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@drawable/bg_full_blue_top_20"
-        app:layout_constraintTop_toTopOf="@+id/ivBottomSheetTitle"
-        app:layout_constraintBottom_toBottomOf="@+id/mtBottomSheetTitle"/>
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivBottomSheetTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    android:layout_gravity="bottom"
+    android:background="@drawable/bg_full_blue_top_20"
+    tools:theme="@style/Theme.AppCompat">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivBackIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="11dp"
         android:paddingHorizontal="16dp"
-        android:paddingVertical="9dp"
-        android:src="@mipmap/back_empty_white"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:paddingVertical="8dp"
+        android:src="@mipmap/icon_back_white"
+        app:layout_constraintBottom_toBottomOf="@id/mtBottomSheetTitle"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/mtBottomSheetTitle"
-        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:textSize="20sp"
+        android:layout_height="48dp"
+        android:gravity="bottom"
+        android:paddingBottom="6dp"
         android:text="@string/ktv_earback_title"
+        android:textColor="@color/white"
+        android:textSize="16sp"
         android:textStyle="bold"
-        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvOpenSwitch"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:text="@string/ktv_earback_switch"
-        android:textColor="@color/white"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle" />
-
-    <androidx.appcompat.widget.AppCompatCheckBox
-        android:id="@+id/cbSwitch"
-        android:layout_width="45dp"
-        android:layout_height="28dp"
-        android:layout_marginEnd="20dp"
-        android:checked="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvOpenSwitch"
-        app:layout_constraintBottom_toBottomOf="@+id/tvOpenSwitch"
-        android:button="@drawable/cb_def_selector" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvTips1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:textColor="@color/white_60_percent"
-        android:drawableStart="@mipmap/ktv_ear_back_mention"
-        android:drawablePadding="5dp"
-        android:textSize="12sp"
-        android:textAlignment="textStart"
-        android:text="@string/ktv_earback_tips1"
-        android:visibility="invisible"
-        app:layout_constraintTop_toBottomOf="@+id/tvOpenSwitch"
-        />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivTips2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:paddingTop="2dp"
-        android:src="@mipmap/ktv_ear_back_mention"
-        android:visibility="invisible"
-        app:layout_constraintTop_toBottomOf="@+id/tvTips1"
-        app:layout_constraintStart_toStartOf="@+id/tvTips1"
-        />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvTips2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:textColor="@color/white_60_percent"
-        android:paddingStart="15dp"
-        android:textSize="12sp"
-        android:textAlignment="textStart"
-        android:text="@string/ktv_earback_tips2"
-        android:visibility="invisible"
-        app:layout_constraintTop_toTopOf="@+id/ivTips2"
-        />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvTipsNoEarPhone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:textColor="@color/red_e0"
-        android:drawableStart="@mipmap/ktv_ear_back_mention_no_earphone"
-        android:drawablePadding="5dp"
-        android:textSize="12sp"
-        android:textAlignment="textStart"
-        android:text="@string/ktv_earback_no_micphone"
-        android:visibility="visible"
-        app:layout_constraintTop_toBottomOf="@+id/tvOpenSwitch"
-        />
-
+    <!--   耳返开关 -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/clSettings"
+        android:id="@+id/layoutEarBackSwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/tvTips2">
+        android:layout_marginHorizontal="20dp"
+        android:paddingVertical="12dp"
+        app:layout_constraintTop_toBottomOf="@id/mtBottomSheetTitle">
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvSetting"
-            android:layout_width="match_parent"
-            android:layout_height="32dp"
-            android:layout_marginTop="10dp"
-            android:paddingHorizontal="20dp"
-            android:gravity="center_vertical"
-            android:text="@string/ktv_earback_setting"
-            android:background="#08062F"
-            android:alpha="0.2"
+            android:id="@+id/tvOpenSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ktv_earback_switch"
             android:textColor="@color/white"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <View
-            android:id="@+id/vSettingMark"
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/cbSwitch"
+            android:layout_width="45dp"
+            android:layout_height="28dp"
+            android:button="@drawable/cb_def_selector"
+            android:checked="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--   耳返提示 -->
+    <LinearLayout
+        android:id="@+id/layoutEarBackTips"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/layoutEarBackSwitch">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTips1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_ear_back_mention"
+            android:drawablePadding="5dp"
+            android:text="@string/ktv_earback_tips1"
+            android:textAlignment="textStart"
+            android:textColor="@color/white_60_percent"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTips2"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:elevation="0.5dp"
-            android:background="@color/ktv_dialog_bg_blue"
-            android:alpha="0.7"
-            android:visibility="invisible"
-            app:layout_constraintTop_toBottomOf="@+id/tvSetting"
-            />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:drawableStart="@drawable/ic_ear_back_mention"
+            android:drawablePadding="5dp"
+            android:text="@string/ktv_earback_tips2"
+            android:textAlignment="textStart"
+            android:textColor="@color/white_60_percent"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTipsNoEarPhone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_ear_back_mention_no_earphone"
+            android:drawablePadding="5dp"
+            android:text="@string/ktv_earback_no_micphone"
+            android:textAlignment="textStart"
+            android:textColor="@color/red_e0"
+            android:textSize="12sp"
+            android:visibility="visible"
+            tools:visibility="gone" />
+    </LinearLayout>
+
+    <!--   耳返设置 -->
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvSetting"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="16dp"
+        android:alpha="0.3"
+        android:background="#08062F"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="20dp"
+        android:text="@string/ktv_earback_setting"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutEarBackTips" />
+
+    <!--   耳返音量 -->
+    <LinearLayout
+        android:id="@+id/layoutEarBackVol"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="14dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingVertical="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvSetting">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvVolumeTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
             android:text="@string/ktv_earback_volume"
-            android:textColor="@color/white"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvSetting" />
+            android:textColor="@color/white" />
 
         <ImageButton
             android:id="@+id/btEarBackDown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="15dp"
             android:background="@null"
             android:contentDescription="@string/ktv_tone_down"
             android:padding="6dp"
-            android:src="@drawable/ic_tone_down"
-            app:layout_constraintStart_toEndOf="@+id/tvVolumeTitle"
-            app:layout_constraintTop_toTopOf="@+id/tvVolumeTitle"
-            app:layout_constraintBottom_toBottomOf="@+id/tvVolumeTitle"/>
+            android:src="@drawable/ic_tone_down" />
 
         <androidx.appcompat.widget.AppCompatSeekBar
             android:id="@+id/sbEarBack"
-            android:layout_width="180dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_weight="1"
             android:contentDescription="@string/ktv_earback_volume"
             android:max="100"
             android:progress="100"
             android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
-            android:thumb="@mipmap/ic_seekbar_btn"
-            app:layout_constraintStart_toEndOf="@+id/btEarBackDown"
-            app:layout_constraintTop_toTopOf="@+id/tvVolumeTitle"
-            app:layout_constraintBottom_toBottomOf="@+id/tvVolumeTitle"/>
+            android:thumb="@mipmap/ic_seekbar_btn" />
 
         <ImageButton
             android:id="@+id/btEarBackUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="5dp"
             android:background="@null"
             android:contentDescription="@string/ktv_tone_up"
             android:padding="6dp"
-            android:src="@drawable/ic_tone_up"
-            app:layout_constraintStart_toEndOf="@+id/sbEarBack"
-            app:layout_constraintTop_toTopOf="@+id/tvVolumeTitle"
-            app:layout_constraintBottom_toBottomOf="@+id/tvVolumeTitle"/>
+            android:src="@drawable/ic_tone_up" />
+    </LinearLayout>
+
+    <!--   耳返模式 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutEarBackMode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:orientation="horizontal"
+        android:paddingVertical="8dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutEarBackVol">
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvMode"
+            android:id="@+id/tvEarBackMode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="26dp"
             android:text="@string/ktv_earback_mode"
             android:textColor="@color/white"
-            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvVolumeTitle" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <RadioGroup
-            android:id="@+id/rgMode"
+            android:id="@+id/rgEarBackMode"
             android:layout_width="wrap_content"
-            android:layout_height="28dp"
-            android:layout_marginStart="30dp"
-            android:padding="4dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/ktv_ear_back_mode_radius"
-            android:orientation="horizontal"
             android:gravity="center"
-            android:visibility="gone"
-            app:layout_constraintTop_toTopOf="@+id/tvMode"
-            app:layout_constraintBottom_toBottomOf="@+id/tvMode"
-            app:layout_constraintStart_toEndOf="@+id/tvMode"
-            >
+            android:orientation="horizontal"
+            android:padding="3dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
             <RadioButton
                 android:id="@+id/tvModeAuto"
                 android:layout_width="wrap_content"
-                android:layout_height="24dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:textColor="@drawable/ktv_ear_back_mode_status"
+                android:layout_height="wrap_content"
                 android:background="@drawable/ktv_ear_back_mode_selector"
-                android:gravity="center"
                 android:button="@null"
                 android:checked="true"
+                android:gravity="center"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
                 android:text="@string/ktv_earback_auto"
-                app:layout_constraintTop_toTopOf="@+id/tvModeOboe"
-                app:layout_constraintBottom_toBottomOf="@+id/tvModeOboe"
-                app:layout_constraintEnd_toStartOf="@+id/tvModeOboe"
-                />
+                android:textColor="@drawable/ktv_ear_back_mode_status" />
+
             <RadioButton
                 android:id="@+id/tvModeOpenSL"
                 android:layout_width="wrap_content"
-                android:layout_height="24dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:textColor="@drawable/ktv_ear_back_mode_status"
+                android:layout_height="wrap_content"
                 android:background="@drawable/ktv_ear_back_mode_selector"
-                android:gravity="center"
                 android:button="@null"
                 android:checked="false"
-                android:text="强制OpenSL"
-                app:layout_constraintTop_toTopOf="@+id/tvModeOboe"
-                app:layout_constraintBottom_toBottomOf="@+id/tvModeOboe"
-                app:layout_constraintEnd_toStartOf="@+id/tvModeOboe"
-                />
+                android:gravity="center"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="@string/ktv_earback_opensl"
+                android:textColor="@drawable/ktv_ear_back_mode_status" />
+
             <RadioButton
                 android:id="@+id/tvModeOboe"
                 android:layout_width="wrap_content"
-                android:layout_height="24dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:textColor="@drawable/ktv_ear_back_mode_status"
+                android:layout_height="wrap_content"
                 android:background="@drawable/ktv_ear_back_mode_selector"
-                android:gravity="center"
                 android:button="@null"
                 android:checked="false"
-                android:text="强制Oboe"
-                app:layout_constraintTop_toTopOf="@+id/tvMode"
-                app:layout_constraintBottom_toBottomOf="@+id/tvMode"
-                app:layout_constraintEnd_toEndOf="parent"
-                />
+                android:gravity="center"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="@string/ktv_earback_oboe"
+                android:textColor="@drawable/ktv_ear_back_mode_status" />
         </RadioGroup>
-
-        <View
-            android:id="@+id/vPingMark"
-            android:layout_width="match_parent"
-            android:layout_height="140dp"
-            android:elevation="2dp"
-            android:background="@color/ktv_dialog_bg_blue"
-            android:visibility="gone"
-            app:layout_constraintTop_toTopOf="@+id/cvPing"
-            />
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cvPing"
-            android:layout_width="match_parent"
-            android:layout_height="111dp"
-            android:layout_marginTop="25dp"
-            android:layout_marginLeft="12sp"
-            android:layout_marginRight="12sp"
-            android:layout_marginBottom="20sp"
-            android:alpha="0.2"
-            android:visibility="gone"
-            app:cardElevation="0dp"
-            app:cardBackgroundColor="#08062F"
-            app:cardCornerRadius="8sp"
-            app:layout_constraintTop_toBottomOf="@+id/tvMode"
-            />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvPingTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginStart="8dp"
-            android:textColor="@color/white_60_percent"
-            android:textSize="13sp"
-            android:text="耳返延时"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="@+id/cvPing"
-            app:layout_constraintTop_toTopOf="@+id/cvPing" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvPingInfo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textSize="11sp"
-            android:text="请对着耳麦说话，测试实时耳返延时"
-            android:visibility="gone"
-            android:textColor="@color/white_60_percent"
-            app:layout_constraintStart_toStartOf="@+id/cvPing"
-            app:layout_constraintTop_toBottomOf="@+id/tvPingTitle" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvPing"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:textColor="#6d7291"
-            android:gravity="center"
-            android:text="105ms"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="@id/cvPing"
-            app:layout_constraintEnd_toEndOf="@+id/cvPing"
-            app:layout_constraintTop_toBottomOf="@+id/tvPingInfo" />
-
-        <ProgressBar
-            android:id="@+id/pbPing"
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginLeft="28dp"
-            android:layout_marginRight="28dp"
-            style="@android:style/Widget.ProgressBar.Horizontal"
-            android:progressDrawable="@drawable/ktv_ear_ping_progress"
-            android:max="150"
-            android:progress="105"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="@+id/cvPing"
-            app:layout_constraintTop_toBottomOf="@+id/tvPing"
-            />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--    耳返延时    -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvEarBackdelay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12sp"
+        android:alpha="0.3"
+        android:visibility="invisible"
+        app:cardBackgroundColor="#08062F"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutEarBackMode"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="12dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPingTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ktv_earback_delay"
+                android:textColor="@color/white_60_percent"
+                android:textSize="13sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPingInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ktv_earback_delay_test"
+                android:textColor="@color/white_60_percent"
+                android:textSize="11sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPing"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:text="105ms"
+                android:textColor="#6d7291" />
+
+            <ProgressBar
+                android:id="@+id/pbPing"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_marginTop="8dp"
+                android:max="150"
+                android:progress="105"
+                android:progressDrawable="@drawable/ktv_ear_ping_progress"
+                android:visibility="gone"
+                tools:visibility="visible" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

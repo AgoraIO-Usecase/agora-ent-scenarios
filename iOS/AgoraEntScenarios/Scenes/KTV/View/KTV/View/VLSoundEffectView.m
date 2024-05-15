@@ -8,6 +8,7 @@
 #import "VLHotSpotBtn.h"
 #import "AESMacro.h"
 #import "LSTPopView+KTVModal.h"
+#import "AgoraEntScenarios-Swift.h"
 @import YYCategories;
 //@import ChameleonFramework;
 

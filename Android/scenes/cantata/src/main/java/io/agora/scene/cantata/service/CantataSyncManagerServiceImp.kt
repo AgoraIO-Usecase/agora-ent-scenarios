@@ -13,18 +13,19 @@ import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.*
 import kotlin.random.Random
 
-
-/**
- * 使用SyncManager进行数据交互
- *
- *
+/*
+ * service 模块
+ * 简介：这个模块的作用是负责前端业务模块和业务服务器的交互(包括房间列表+房间内的业务数据同步等)
+ * 实现原理：该场景的业务服务器是包装了一个 rethinkDB 的后端服务，用于数据存储，可以认为它是一个 app 端上可以自由写入的 DB，房间列表数据、房间内的业务数据等在 app 上构造数据结构并存储在这个 DB 里
+ * 当 DB 内的数据发生增删改时，会通知各端，以此达到业务数据同步的效果
+ * TODO 注意⚠️：该场景的后端服务仅做场景演示使用，无法商用，如果需要上线，您必须自己部署后端服务或者云存储服务器（例如leancloud、环信等）并且重新实现这个模块！！！！！！！！！！！
  */
 class CantataSyncManagerServiceImp constructor(
     private val context: Context,
     private val errorHandler: ((Exception?) -> Unit)?
 ) : CantataServiceProtocol {
     private val TAG = "KTV_Service_LOG"
-    private val kSceneId = "scene_ktv_3.8.0"
+    private val kSceneId = "scene_cantata_4.3.0"
     private val kCollectionIdChooseSong = "choose_song"
     private val kCollectionIdSeatInfo = "seat_info"
     private val kCollectionIdUser = "userCollection"
@@ -83,7 +84,7 @@ class CantataSyncManagerServiceImp constructor(
 
     override fun reset() {
         if (syncUtilsInited) {
-            Instance().destroy()
+            Sync.Instance().destroy()
             syncUtilsInited = false
 
             objIdOfRoomNo.clear()
@@ -144,6 +145,7 @@ class CantataSyncManagerServiceImp constructor(
                 creatorName = mUser.name,
                 creatorAvatar = mUser.headUrl,
                 bgOption = "0",
+                streamMode = inputModel.delayType
             )
             val scene = Scene()
             scene.id = roomListModel.roomNo
@@ -177,7 +179,8 @@ class CantataSyncManagerServiceImp constructor(
         inputModel: JoinRoomInputModel,
         completion: (error: Exception?, out: JoinRoomOutputModel?) -> Unit
     ) {
-        if (isJoined) {
+        // fix FT-1055
+        if (isJoined && currRoomNo.isNotEmpty()) {
             completion.invoke(RuntimeException("The room $currRoomNo has been joined!"), null)
             return
         }
@@ -249,7 +252,8 @@ class CantataSyncManagerServiceImp constructor(
                                                         rtcToken,
                                                         chorusToken,
                                                         musicToken,
-                                                        cacheRoom.createdAt
+                                                        cacheRoom.createdAt,
+                                                        cacheRoom.streamMode
                                                     )
                                                     runOnMainThread {
                                                         completion.invoke(null, kTVJoinRoomOutputModel)
@@ -390,7 +394,8 @@ class CantataSyncManagerServiceImp constructor(
                         roomInfo.creatorAvatar,
                         roomInfo.createdAt,
                         inputModel.mvIndex.toString(),
-                        roomInfo.roomPeopleNum
+                        roomInfo.roomPeopleNum,
+                        roomInfo.streamMode
                     )
                 )
             ),
@@ -601,7 +606,7 @@ class CantataSyncManagerServiceImp constructor(
             return
         }
         if (targetSong.status == RoomSelSongModel.STATUS_PLAYING) {
-            completion.invoke(RuntimeException("The song is playing now!"))
+            completion.invoke(null)
             return
         }
 
@@ -802,6 +807,20 @@ class CantataSyncManagerServiceImp constructor(
                 }
             }
         }
+        Instance().subscribeLog(object :LogCallback{
+            override fun onLogInfo(message: String?) {
+                CantataLogger.d(TAG, message ?: "")
+            }
+
+            override fun onLogWarning(message: String?) {
+                CantataLogger.w(TAG, message ?: "")
+            }
+
+            override fun onLogError(message: String?) {
+                CantataLogger.e(TAG, message ?: "")
+            }
+
+        })
     }
 
 
@@ -955,7 +974,8 @@ class CantataSyncManagerServiceImp constructor(
                         roomInfo.creatorAvatar,
                         roomInfo.createdAt,
                         roomInfo.bgOption,
-                        count
+                        count,
+                        roomInfo.streamMode
                     )
                 )
             ),

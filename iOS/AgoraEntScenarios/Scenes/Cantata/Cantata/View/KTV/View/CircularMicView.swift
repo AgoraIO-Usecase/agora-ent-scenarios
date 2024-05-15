@@ -44,13 +44,13 @@ class ChorusMicView: UIView {
     
     public func updateMics(with model: VLRoomSeatModel, index: Int) {
         guard let micView = self.viewWithTag(1000 + index) as? MicView else {return}
-        micView.updateMicName(model.name?.count ?? 0 > 0 ? model.name! :  "\(index)号麦")
+        micView.updateMicName(model.name?.count ?? 0 > 0 ? model.name! :  "\(index)\(("ktv_mic_num").toSceneLocalization() as String)")
         micView.updateMicImage(with: model.headUrl?.count ?? 0 > 0 ? model.headUrl! : "")
     }
     
     public func releaseMic(with index: Int) {
         guard let micView = self.viewWithTag(1000 + index) as? MicView else {return}
-        micView.updateMicName("\(index)号麦")
+        micView.updateMicName("\(index)\(("ktv_mic_num").toSceneLocalization() as String)")
         micView.updateMicImage(with: "")
     }
 
@@ -107,7 +107,7 @@ class ChorusMicView: UIView {
                     isValidPosition = true
                     micView = MicView(frame: micFrame)
                     micView?.scoreLabel.textColor = .white
-                    micView?.scoreLabel.text = "\(i+1)号麦"
+                    micView?.scoreLabel.text = "\(i+1)\(("ktv_mic_num").toSceneLocalization() as String)"
                 }
             }
             

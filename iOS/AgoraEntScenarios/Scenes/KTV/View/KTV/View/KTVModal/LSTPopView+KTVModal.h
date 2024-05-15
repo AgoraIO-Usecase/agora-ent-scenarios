@@ -20,7 +20,6 @@
 #import "VLVoicePerShowView.h"
 #import "VLEarSettingView.h"
 #import "VLDebugView.h"
-#import "AgoraEntScenarios-Swift.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LSTPopView (KTVModal)
@@ -66,6 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 //控制台
 + (LSTPopView*)popSettingViewWithParentView:(UIView*)parentView
+                                    setting:(VLKTVSettingModel*)settingModel
                                settingView:(VLKTVSettingView*)settingView
                                withDelegate:(id<VLKTVSettingViewDelegate>)delegate;
 

@@ -25,8 +25,8 @@
     </string-array>
 
     <string-array name="cantata_audioPreset">
-        <item>原声</item>
         <item>大合唱</item>
+        <item>原声</item>
         <item>KTV</item>
         <item>演唱会</item>
         <item>录音棚</item>
@@ -34,6 +34,6 @@
         <item>空旷</item>
         <item>空灵</item>
         <item>流行</item>
-        <item>RnB</item>
+        <item>R&amp;B</item>
     </string-array>
 </resources>

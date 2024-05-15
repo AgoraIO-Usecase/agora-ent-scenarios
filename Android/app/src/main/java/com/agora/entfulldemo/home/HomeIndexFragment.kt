@@ -17,6 +17,9 @@ import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppFragmentHomeIndexBinding
 import com.agora.entfulldemo.home.constructor.HomeScenesType
 import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayout.GRAVITY_CENTER
+import com.google.android.material.tabs.TabLayout.GRAVITY_START
+import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayout.*
 import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.base.ServerConfig
@@ -28,13 +31,14 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
     private val mTabs by lazy {
         mutableListOf(
 //            HomeScenesType.Full,
-//            HomeScenesType.KTV,
+            HomeScenesType.KTV,
 //            HomeScenesType.Voice,
 //            HomeScenesType.Live,
-            HomeScenesType.Game
+//            HomeScenesType.Game
         )
     }
 
+    // Notice:构建场景,全场景tab 居左对齐；独立场景标题居中
     private val mSingleScene: Boolean
         get() = mTabs.size == 1
 

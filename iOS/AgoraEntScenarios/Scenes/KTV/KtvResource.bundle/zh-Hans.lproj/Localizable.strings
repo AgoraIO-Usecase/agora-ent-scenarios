@@ -43,7 +43,7 @@
 "ktv_dialog_migu_tip" = "";
 "ktv_dialog_music_list_empty" = "未找到相关搜索结果";
 "ktv_dialog_music_list_search_hint" = "搜索歌曲";
-"ktv_lrc_loading" = "歌曲准备中";
+"ktv_lrc_loading" = "歌曲准备中...";
 "ktv_lrc_load_fail" = "加载失败";
 "ktv_room_change_music_title" = "切歌";
 "ktv_room_change_music_msg" = "终止当前歌曲的演唱？";
@@ -66,6 +66,9 @@
 "ktv_music_menu_dialog_vol1" = "人声音量";
 "ktv_music_menu_dialog_remote_volume" = "远端音量";
 "ktv_music_menu_dialog_vol2" = "伴奏音量";
+"ktv_lrc_level" = "打分难度";
+"ktv_use_4G" = "使用移动网络改善体验";
+"ktv_bad_wifi" = "如Wi-Fi下网络质量差，将使用移动网络改善";
 "ktv_music_menu_dialog_effect" = "效果";
 "ktv_song_rank_1" = "热歌榜";
 "ktv_song_rank_2" = "嗨唱推荐";
@@ -156,6 +159,7 @@
 "ktv_join_chorus_failed" = "加入合唱失败";
 "ktv_enable_electronic" = "启用电音";
 "ktv_chooseSong_failed" = "点歌失败，请重试";
+"ktv_choose_fail" = "太火爆了，等会再试试";
 "ktv_audio_onmic" = "音频上麦";
 "ktv_video_onmic" = "视频上麦";
 "ktv_room_concert" = "演唱会";
@@ -177,9 +181,11 @@
 "ktv_per_setting" = "配置";
 "ktv_per_style" = "专业模式";
 "ktv_per_vol_quality" = "音质";
+"ktv_aec_war" = "aiaec关闭的情况下音质选项才能生效";
 "ktv_per_ans" = "降低背景噪音";
 "ktv_aiaec_switch" = "AIAEC开关";
 "ktv_aiaec_level" = "AIAEC强度选择";
+"ktv_aiaec_rule" = "请输入0-4的正整数";
 "ktv_perSetting" = "设置";
 "ktv_low_delay_mode" = "低延时模式";
 "ktv_close_aec" = "关闭";
@@ -198,9 +204,12 @@
 "ktv_effect_spatial" = "空旷";
 "ktv_effect_ethereal" = "空灵";
 "ktv_effect_pop" = "流行";
+"ktv_lrc_low" = "低难度";
+"ktv_lrc_mid" = "推荐难度";
+"ktv_lrc_high" = "高难度";
 
 "ktv_lrc_load_failed" = "歌词加载失败";
-"ktv_lrc_loading" = "加载中";
+"ktv_lrc_loading" = "歌曲准备中...";
 "ktv_retry" = "  点击重试  ";
 "ktv_leave_chorus" = "退出合唱";
 "ktv_show_vol" = "突出人声";
@@ -287,3 +296,4 @@
 "ktv_choose_sc_params" = "选择麦克风的预设参数";
 "ktv_skip_pre" = "跳过前奏";
 "ktv_skip_end" = "跳过尾奏";
+"ktv_per_bro" = "专业主播";

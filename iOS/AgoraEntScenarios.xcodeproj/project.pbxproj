@@ -417,8 +417,6 @@
 		E301BBD92AF4C8F40089A79C /* AgoraRequestTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BBD32AF4C8F30089A79C /* AgoraRequestTask.swift */; };
 		E301BBDA2AF4C8F40089A79C /* AgoraDownLoadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BBD42AF4C8F40089A79C /* AgoraDownLoadManager.swift */; };
 		E301BBDC2AF4C8F40089A79C /* AgoraCacheFileHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BBD62AF4C8F40089A79C /* AgoraCacheFileHandle.swift */; };
-		E301BBE12AF4C9000089A79C /* KTVApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BBDF2AF4C9000089A79C /* KTVApi.swift */; };
-		E301BBE22AF4C9000089A79C /* KTVApiImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BBE02AF4C9000089A79C /* KTVApiImpl.swift */; };
 		E301BD572AF4CAFF0089A79C /* HeadSetManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BCB92AF4CAFF0089A79C /* HeadSetManager.m */; };
 		E301BD582AF4CAFF0089A79C /* KTVHeadSetUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BCBA2AF4CAFF0089A79C /* KTVHeadSetUtil.swift */; };
 		E301BD592AF4CAFF0089A79C /* KTVLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BCBB2AF4CAFF0089A79C /* KTVLog.swift */; };
@@ -642,12 +640,22 @@
 		E36EC8B52A663A600089A374 /* AEACategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36EC8B42A663A600089A374 /* AEACategoryView.swift */; };
 		E36EC8B72A663B880089A374 /* AEACategoryTitleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36EC8B62A663B880089A374 /* AEACategoryTitleCell.swift */; };
 		E36EC8BA2A6680F60089A374 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E36EC8BC2A6680F60089A374 /* Localizable.strings */; };
+		E37117EA2B60B557003F03D6 /* VLKTVSegmentView.m in Sources */ = {isa = PBXBuildFile; fileRef = E37117E92B60B557003F03D6 /* VLKTVSegmentView.m */; };
 		E3735C342A5E4AFF004737EF /* UITextView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */; };
 		E3735CA72A5E8023004737EF /* VRBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3735CA62A5E8023004737EF /* VRBaseViewController.swift */; };
+		E37C844C2B68E3B4007DDF3B /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E37C844B2B68E3B4007DDF3B /* ProgressBar.swift */; };
+		E3808CAA2B72039300AA659E /* KTVApiImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3808CA82B72039300AA659E /* KTVApiImpl.swift */; };
+		E3808CAB2B72039300AA659E /* KTVApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3808CA92B72039300AA659E /* KTVApi.swift */; };
+		E38624972B60FB2300CEC849 /* VLSettingSwitcherView.m in Sources */ = {isa = PBXBuildFile; fileRef = E38624962B60FB2300CEC849 /* VLSettingSwitcherView.m */; };
+		E386249A2B60FCB200CEC849 /* VLSettingNetSwitcherView.m in Sources */ = {isa = PBXBuildFile; fileRef = E38624992B60FCB200CEC849 /* VLSettingNetSwitcherView.m */; };
+		E386249D2B610A9C00CEC849 /* VLSettingAIAECSwitcherView.m in Sources */ = {isa = PBXBuildFile; fileRef = E386249B2B610A9C00CEC849 /* VLSettingAIAECSwitcherView.m */; };
 		E3BCD4462BC3D61F005F5FEA /* DevViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E3BCD4452BC3D61F005F5FEA /* DevViewController.m */; };
 		E3C7726A2AE7B0E6008D17B7 /* VRCreateRoomPresentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C772692AE7B0E6008D17B7 /* VRCreateRoomPresentView.swift */; };
 		E3C7EF2C2AE66BC70023B069 /* VRRoomHomeListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C7EF2B2AE66BC70023B069 /* VRRoomHomeListCell.swift */; };
 		E3C7EF2E2AE66F1F0023B069 /* VRRoomHomeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C7EF2D2AE66F1F0023B069 /* VRRoomHomeListView.swift */; };
+		E3D5E67A2BCE801F00F8A9DA /* APIReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D5E6792BCE801E00F8A9DA /* APIReporter.swift */; };
+		E3DF5DFE2B635DBA00F24E5B /* LrcTime.proto in Sources */ = {isa = PBXBuildFile; fileRef = E3DF5DFC2B635DBA00F24E5B /* LrcTime.proto */; };
+		E3DF5DFF2B635DBA00F24E5B /* LrcTime.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3DF5DFD2B635DBA00F24E5B /* LrcTime.pb.swift */; };
 		E3E77BE02B5678D80090381C /* UIImage+SBG.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3E77BDF2B5678D80090381C /* UIImage+SBG.swift */; };
 		E3E77BE22B567A8E0090381C /* UIImage+KTV.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3E77BE12B567A8E0090381C /* UIImage+KTV.swift */; };
 		E3E77BE42B567CCE0090381C /* UIImage+SR.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3E77BE32B567CCE0090381C /* UIImage+SR.swift */; };
@@ -1201,8 +1209,6 @@
 		E301BBD32AF4C8F30089A79C /* AgoraRequestTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraRequestTask.swift; sourceTree = "<group>"; };
 		E301BBD42AF4C8F40089A79C /* AgoraDownLoadManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraDownLoadManager.swift; sourceTree = "<group>"; };
 		E301BBD62AF4C8F40089A79C /* AgoraCacheFileHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraCacheFileHandle.swift; sourceTree = "<group>"; };
-		E301BBDF2AF4C9000089A79C /* KTVApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApi.swift; sourceTree = "<group>"; };
-		E301BBE02AF4C9000089A79C /* KTVApiImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApiImpl.swift; sourceTree = "<group>"; };
 		E301BCB92AF4CAFF0089A79C /* HeadSetManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HeadSetManager.m; sourceTree = "<group>"; };
 		E301BCBA2AF4CAFF0089A79C /* KTVHeadSetUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVHeadSetUtil.swift; sourceTree = "<group>"; };
 		E301BCBB2AF4CAFF0089A79C /* KTVLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVLog.swift; sourceTree = "<group>"; };
@@ -1582,13 +1588,27 @@
 		E36EC8B62A663B880089A374 /* AEACategoryTitleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEACategoryTitleCell.swift; sourceTree = "<group>"; };
 		E36EC8BB2A6680F60089A374 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E36EC8BD2A6680FB0089A374 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		E37117E82B60B557003F03D6 /* VLKTVSegmentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVSegmentView.h; sourceTree = "<group>"; };
+		E37117E92B60B557003F03D6 /* VLKTVSegmentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLKTVSegmentView.m; sourceTree = "<group>"; };
 		E3735C332A5E4AFF004737EF /* UITextView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Extension.swift"; sourceTree = "<group>"; };
 		E3735CA62A5E8023004737EF /* VRBaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRBaseViewController.swift; sourceTree = "<group>"; };
+		E37C844B2B68E3B4007DDF3B /* ProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar.swift; sourceTree = "<group>"; };
+		E3808CA82B72039300AA659E /* KTVApiImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApiImpl.swift; sourceTree = "<group>"; };
+		E3808CA92B72039300AA659E /* KTVApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApi.swift; sourceTree = "<group>"; };
+		E38624952B60FB2300CEC849 /* VLSettingSwitcherView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLSettingSwitcherView.h; path = AgoraEntScenarios/Scenes/SingRelay/View/SingRelay/View/SRSettingView/VLSettingSwitcherView.h; sourceTree = SOURCE_ROOT; };
+		E38624962B60FB2300CEC849 /* VLSettingSwitcherView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLSettingSwitcherView.m; path = AgoraEntScenarios/Scenes/SingRelay/View/SingRelay/View/SRSettingView/VLSettingSwitcherView.m; sourceTree = SOURCE_ROOT; };
+		E38624982B60FCB200CEC849 /* VLSettingNetSwitcherView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLSettingNetSwitcherView.h; path = AgoraEntScenarios/Scenes/SingRelay/View/SingRelay/View/SRSettingView/VLSettingNetSwitcherView.h; sourceTree = SOURCE_ROOT; };
+		E38624992B60FCB200CEC849 /* VLSettingNetSwitcherView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLSettingNetSwitcherView.m; path = AgoraEntScenarios/Scenes/SingRelay/View/SingRelay/View/SRSettingView/VLSettingNetSwitcherView.m; sourceTree = SOURCE_ROOT; };
+		E386249B2B610A9C00CEC849 /* VLSettingAIAECSwitcherView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLSettingAIAECSwitcherView.m; path = AgoraEntScenarios/Scenes/SingRelay/View/SingRelay/View/SRSettingView/VLSettingAIAECSwitcherView.m; sourceTree = SOURCE_ROOT; };
+		E386249C2B610A9C00CEC849 /* VLSettingAIAECSwitcherView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLSettingAIAECSwitcherView.h; path = AgoraEntScenarios/Scenes/SingRelay/View/SingRelay/View/SRSettingView/VLSettingAIAECSwitcherView.h; sourceTree = SOURCE_ROOT; };
 		E3BCD4442BC3D61F005F5FEA /* DevViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DevViewController.h; sourceTree = "<group>"; };
 		E3BCD4452BC3D61F005F5FEA /* DevViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DevViewController.m; sourceTree = "<group>"; };
 		E3C772692AE7B0E6008D17B7 /* VRCreateRoomPresentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRCreateRoomPresentView.swift; sourceTree = "<group>"; };
 		E3C7EF2B2AE66BC70023B069 /* VRRoomHomeListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VRRoomHomeListCell.swift; sourceTree = "<group>"; };
 		E3C7EF2D2AE66F1F0023B069 /* VRRoomHomeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VRRoomHomeListView.swift; sourceTree = "<group>"; };
+		E3D5E6792BCE801E00F8A9DA /* APIReporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIReporter.swift; sourceTree = "<group>"; };
+		E3DF5DFC2B635DBA00F24E5B /* LrcTime.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.protobuf; path = LrcTime.proto; sourceTree = "<group>"; };
+		E3DF5DFD2B635DBA00F24E5B /* LrcTime.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LrcTime.pb.swift; sourceTree = "<group>"; };
 		E3E77BDF2B5678D80090381C /* UIImage+SBG.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+SBG.swift"; sourceTree = "<group>"; };
 		E3E77BE12B567A8E0090381C /* UIImage+KTV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+KTV.swift"; sourceTree = "<group>"; };
 		E3E77BE32B567CCE0090381C /* UIImage+SR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+SR.swift"; sourceTree = "<group>"; };
@@ -3262,8 +3282,11 @@
 		E301BBD22AF4C8470089A79C /* KTVApi */ = {
 			isa = PBXGroup;
 			children = (
-				E301BBDF2AF4C9000089A79C /* KTVApi.swift */,
-				E301BBE02AF4C9000089A79C /* KTVApiImpl.swift */,
+				E3D5E6792BCE801E00F8A9DA /* APIReporter.swift */,
+				E3808CA92B72039300AA659E /* KTVApi.swift */,
+				E3808CA82B72039300AA659E /* KTVApiImpl.swift */,
+				E3DF5DFD2B635DBA00F24E5B /* LrcTime.pb.swift */,
+				E3DF5DFC2B635DBA00F24E5B /* LrcTime.proto */,
 			);
 			path = KTVApi;
 			sourceTree = "<group>";
@@ -3379,6 +3402,7 @@
 				E301BD192AF4CAFF0089A79C /* VLEffectView.m */,
 				E301BD1A2AF4CAFF0089A79C /* VLKTVMVView.m */,
 				E301BD1B2AF4CAFF0089A79C /* DropMenu.swift */,
+				E37C844B2B68E3B4007DDF3B /* ProgressBar.swift */,
 				E301BD1C2AF4CAFF0089A79C /* VLEarSettingView.h */,
 				E301BD1D2AF4CAFF0089A79C /* VLKTVBottomToolbar.m */,
 				E301BD1E2AF4CAFF0089A79C /* VLVoiceShowView.m */,
@@ -3445,20 +3469,28 @@
 			children = (
 				E301BD002AF4CAFF0089A79C /* VLKTVSliderView.h */,
 				E301BD012AF4CAFF0089A79C /* VLKTVKindsCell.h */,
+				E301BD082AF4CAFF0089A79C /* VLKTVSettingView.h */,
 				E301BD022AF4CAFF0089A79C /* VLKTVSettingView.m */,
 				E301BD032AF4CAFF0089A79C /* VLKTVKindsView.h */,
 				E301BD042AF4CAFF0089A79C /* VLKTVTonesView.m */,
 				E301BD052AF4CAFF0089A79C /* VLKTVItemBaseView.h */,
 				E301BD062AF4CAFF0089A79C /* VLKTVRemoteVolumeView.h */,
 				E301BD072AF4CAFF0089A79C /* VLKTVSwitcherView.m */,
-				E301BD082AF4CAFF0089A79C /* VLKTVSettingView.h */,
 				E301BD092AF4CAFF0089A79C /* VLKTVKindsCell.m */,
 				E301BD0A2AF4CAFF0089A79C /* VLKTVSliderView.m */,
 				E301BD0B2AF4CAFF0089A79C /* VLKTVTonesView.h */,
-				E301BD0C2AF4CAFF0089A79C /* VLKTVKindsView.m */,
 				E301BD0D2AF4CAFF0089A79C /* VLKTVRemoteVolumeView.m */,
 				E301BD0E2AF4CAFF0089A79C /* VLKTVItemBaseView.m */,
 				E301BD0F2AF4CAFF0089A79C /* VLKTVSwitcherView.h */,
+				E38624952B60FB2300CEC849 /* VLSettingSwitcherView.h */,
+				E38624962B60FB2300CEC849 /* VLSettingSwitcherView.m */,
+				E386249C2B610A9C00CEC849 /* VLSettingAIAECSwitcherView.h */,
+				E386249B2B610A9C00CEC849 /* VLSettingAIAECSwitcherView.m */,
+				E38624982B60FCB200CEC849 /* VLSettingNetSwitcherView.h */,
+				E38624992B60FCB200CEC849 /* VLSettingNetSwitcherView.m */,
+				E301BD0C2AF4CAFF0089A79C /* VLKTVKindsView.m */,
+				E37117E92B60B557003F03D6 /* VLKTVSegmentView.m */,
+				E37117E82B60B557003F03D6 /* VLKTVSegmentView.h */,
 			);
 			path = KTVSettingView;
 			sourceTree = "<group>";
@@ -4433,6 +4465,7 @@
 				DDED55522B9EEFF70066B49B /* BEDynmicResourceConfig.m in Sources */,
 				DD619C0429E3E81D008F63E4 /* AboutAgoraEntertainmentViewController.swift in Sources */,
 				DD9EC0042AD5512400B4551F /* VRCreateRoomView.swift in Sources */,
+				E3D5E67A2BCE801F00F8A9DA /* APIReporter.swift in Sources */,
 				DD9EBFED2AD5512400B4551F /* VMANISSetTableViewCell.swift in Sources */,
 				E34B460C2AEA90E30082D334 /* VRSoundEffectViewController.swift in Sources */,
 				E301BE822AF4E06F0089A79C /* VLSRSearchEmptyView.m in Sources */,
@@ -4526,6 +4559,7 @@
 				DD1F535F2B9FF7C1009E4287 /* FUDynmicResourceConfig.m in Sources */,
 				DDA19A0428FFE579009D3E61 /* CALayer+JKBorderColor.m in Sources */,
 				DD9EBF942AD5512300B4551F /* PresentedViewType.swift in Sources */,
+				E38624972B60FB2300CEC849 /* VLSettingSwitcherView.m in Sources */,
 				E301C01E2AF8E8E90089A79C /* VLSBGTonesView.m in Sources */,
 				E732CE162B4D2AF8004D6FB9 /* VideoProcessingManager.m in Sources */,
 				DD619AB529E3E247008F63E4 /* SAANISSUPTableViewCell.swift in Sources */,
@@ -4600,6 +4634,7 @@
 				E301BE772AF4E06F0089A79C /* VLSRBottomToolbar.m in Sources */,
 				E71685792AEA4A7700C2915C /* ShowThumnbnailCanvasView.swift in Sources */,
 				DD9EBF9A2AD5512300B4551F /* Xcode14.m in Sources */,
+				E37C844C2B68E3B4007DDF3B /* ProgressBar.swift in Sources */,
 				E301BD592AF4CAFF0089A79C /* KTVLog.swift in Sources */,
 				DD3610BF29B70CDC00CE7984 /* ShowSettingActionSheetCell.swift in Sources */,
 				E301C03B2AF8E8E90089A79C /* SBGSyncManagerServiceImp.swift in Sources */,
@@ -4665,6 +4700,7 @@
 				DD619A8929E3E247008F63E4 /* SAGiftEntity.swift in Sources */,
 				E301BE712AF4E06F0089A79C /* VLSRRemoteVolumeView.m in Sources */,
 				DD9EBFD22AD5512300B4551F /* VoiceRoomGiftCell.swift in Sources */,
+				E3808CAA2B72039300AA659E /* KTVApiImpl.swift in Sources */,
 				DD9EBFC22AD5512300B4551F /* VRRoomListCell.swift in Sources */,
 				E301BD642AF4CAFF0089A79C /* VLSelectedSongListCell.m in Sources */,
 				E301BDA62AF4CB000089A79C /* VLCreateRoomViewController.m in Sources */,
@@ -4685,6 +4721,7 @@
 				DD619A8829E3E247008F63E4 /* SAUser.swift in Sources */,
 				DD9EBFFE2AD5512400B4551F /* VRCreateRoomInputView.swift in Sources */,
 				DD9EBFCA2AD5512300B4551F /* VMUserListView.swift in Sources */,
+				E3DF5DFF2B635DBA00F24E5B /* LrcTime.pb.swift in Sources */,
 				DD9EBFEF2AD5512400B4551F /* AgoraChatRoomHeaderView.swift in Sources */,
 				DD619A8B29E3E247008F63E4 /* SAMenuBarEntity.swift in Sources */,
 				E301BE662AF4E06F0089A79C /* VLSRPopSelBgView.m in Sources */,
@@ -4703,7 +4740,6 @@
 				E301BE982AF4E06F0089A79C /* SRDebugInfo.m in Sources */,
 				DD9EBFDF2AD5512300B4551F /* VoiceRoomGiftsView.swift in Sources */,
 				E34B46022AEA5CAD0082D334 /* VRSoundCardEffectCell.swift in Sources */,
-				E301BBE12AF4C9000089A79C /* KTVApi.swift in Sources */,
 				DD619AA629E3E247008F63E4 /* SARoomListCell.swift in Sources */,
 				DD36109629B70CDC00CE7984 /* ShowAdvancedSettingVC.swift in Sources */,
 				DD9EBF912AD5512300B4551F /* CrossZoomAnimation.swift in Sources */,
@@ -4778,6 +4814,7 @@
 				DD9EBFA42AD5512300B4551F /* VoiceRoomGiftEntity.swift in Sources */,
 				DD619A9529E3E247008F63E4 /* SAAlertViewController.swift in Sources */,
 				DD9EBFA92AD5512300B4551F /* VoiceRoomChatModel.swift in Sources */,
+				E386249A2B60FCB200CEC849 /* VLSettingNetSwitcherView.m in Sources */,
 				E301BD602AF4CAFF0089A79C /* VLRoomSeatModel.swift in Sources */,
 				A851C5DF2AEF5F8400071F88 /* ShowDebugSettingVC.swift in Sources */,
 				E301BE532AF4E06F0089A79C /* VLSRSelBgModel.m in Sources */,
@@ -4931,6 +4968,7 @@
 				E301C0422AF8E8E90089A79C /* SBGDebugInfo.m in Sources */,
 				DD9EBFB42AD5512300B4551F /* VoiceRoomViewController.swift in Sources */,
 				E71685182AE220D500C2915C /* VLDiscoveyrViewController.swift in Sources */,
+				E37117EA2B60B557003F03D6 /* VLKTVSegmentView.m in Sources */,
 				E301C01F2AF8E8E90089A79C /* VLSBGSliderView.m in Sources */,
 				E301BE692AF4E06F0089A79C /* VLSRPopMoreSelView.m in Sources */,
 				DD619A7029E3E247008F63E4 /* SAPresentationAnimation.swift in Sources */,
@@ -4991,6 +5029,7 @@
 				E301BE502AF4E06F0089A79C /* VLSRRoomSeatModel.swift in Sources */,
 				DD3610C429B70CDC00CE7984 /* ShowApplyView.swift in Sources */,
 				AB4746E72A5E82AB00E68FBA /* ShowRobotService.swift in Sources */,
+				E3808CAB2B72039300AA659E /* KTVApi.swift in Sources */,
 				DD9EBFA82AD5512300B4551F /* VoiceRoomAudiencesEntity.swift in Sources */,
 				DD3610C329B70CDC00CE7984 /* ShowApplyAndInviteView.swift in Sources */,
 				E301BDAD2AF4CB000089A79C /* KTVDebugInfo.m in Sources */,
@@ -5026,12 +5065,14 @@
 				E301C0222AF8E8E90089A79C /* VLSBGKindsView.m in Sources */,
 				DD619A8429E3E247008F63E4 /* ActionSheetManager.swift in Sources */,
 				E301BD662AF4CAFF0089A79C /* EffectCollectionViewCell.m in Sources */,
+				E3DF5DFE2B635DBA00F24E5B /* LrcTime.proto in Sources */,
 				DD84178D29090C520026B624 /* VLPopImageVerifyView.m in Sources */,
 				E301BE5B2AF4E06F0089A79C /* VLSRMicSeatCell.m in Sources */,
 				DD9EBFEE2AD5512400B4551F /* VoiceRoomAlertContainer.swift in Sources */,
 				DD619A9C29E3E247008F63E4 /* SAGiftersViewController.swift in Sources */,
 				E301C0172AF8E8E90089A79C /* VLSBGDropOnLineView.m in Sources */,
 				E301BE702AF4E06F0089A79C /* VLSRSliderView.m in Sources */,
+				E386249D2B610A9C00CEC849 /* VLSettingAIAECSwitcherView.m in Sources */,
 				DD38AE632BA92CDD00C418F4 /* LRCLodingProgressView.swift in Sources */,
 				DD619ABA29E3E247008F63E4 /* SAAudioSettingView.swift in Sources */,
 				DD36109329B70CDC00CE7984 /* ShowLiveViewController.swift in Sources */,
@@ -5078,7 +5119,6 @@
 				DD9EBFAF2AD5512300B4551F /* VoiceRoomViewController+ChatBar.swift in Sources */,
 				E301BD832AF4CB000089A79C /* VLKTVItemBaseView.m in Sources */,
 				E301BD5E2AF4CAFF0089A79C /* VLRoomListModel.swift in Sources */,
-				E301BBE22AF4C9000089A79C /* KTVApiImpl.swift in Sources */,
 				DD619B8C29E3E262008F63E4 /* Throttle.swift in Sources */,
 				E71685122ADF7C8400C2915C /* VLFeedbackViewController.swift in Sources */,
 				E301BD892AF4CB000089A79C /* SoundCardMicTypeView.swift in Sources */,

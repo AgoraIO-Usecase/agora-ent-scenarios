@@ -591,7 +591,6 @@ extension NetworkManager {
             switch result{
                 case .success(let data):
                     let obj = self?.data2Dict(with: data)
-                    print("obj:\(String(describing: obj))")
                     guard let code: Int = obj?["code"] as? Int else {return}
                     success(code == 0 ? true : false)
                 case .failure(let error):

@@ -86,8 +86,8 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private fun setupKtvRoomAppInfo() {
         adapter.scenes = mutableListOf<SceneInfo>()
         adapter.appInfo = AppInfo(
-            this.getString(R.string.app_about_name),
-            "20230926-" + VersionUtils.getVersion("io.agora.scene.ktv.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
+            this.getString(R.string.app_name),
+            "20240511-" + VersionUtils.getVersion("io.agora.scene.ktv.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
             servicePhone,
             webSite
         )
@@ -98,7 +98,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         adapter.scenes = mutableListOf<SceneInfo>()
         if (VersionUtils.getVersion("io.agora.scene.voice.BuildConfig").isNotEmpty()) {
             adapter.appInfo = AppInfo(
-                this.getString(R.string.app_about_name),
+                this.getString(R.string.app_name),
                 "20230110-" + VersionUtils.getVersion("io.agora.scene.voice.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
@@ -111,7 +111,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         adapter.scenes = mutableListOf<SceneInfo>()
         if (VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig").isNotEmpty()) {
             adapter.appInfo = AppInfo(
-                this.getString(R.string.app_sing_relay),
+                this.getString(R.string.app_name),
                 "20230830-" + VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
@@ -136,7 +136,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private fun setupSingBattleRoomAppInfo() {
         adapter.scenes = mutableListOf<SceneInfo>()
         adapter.appInfo = AppInfo(
-            this.getString(R.string.app_about_singbattle),
+            this.getString(R.string.app_name),
             "20230520-" + VersionUtils.getVersion("io.agora.scene.ktv.singbattle.BuildConfig") + RtcEngine.getSdkVersion(),
             servicePhone,
             webSite
@@ -148,7 +148,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         adapter.scenes = mutableListOf<SceneInfo>()
         if (VersionUtils.getVersion("io.agora.scene.cantata.BuildConfig").isNotEmpty()) {
             adapter.appInfo = AppInfo(
-                this.getString(R.string.app_about_cantata),
+                this.getString(R.string.app_name),
                 "20231230-" + VersionUtils.getVersion("io.agora.scene.cantata.BuildConfig") + "-" + RtcEngine
                     .getSdkVersion(),
                 servicePhone,
@@ -267,7 +267,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         } else if (scenes.size > 1) {
             adapter.scenes = scenes
             adapter.appInfo = AppInfo(
-                this.getString(R.string.app_about_name),
+                this.getString(R.string.app_name),
                 versionTime + io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
