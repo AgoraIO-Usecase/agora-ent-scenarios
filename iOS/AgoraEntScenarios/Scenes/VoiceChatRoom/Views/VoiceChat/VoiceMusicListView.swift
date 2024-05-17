@@ -386,7 +386,7 @@ class VoiceMusicListCell: UITableViewCell {
         statusImageView.isHidden = model.status == .download || model.status == .none
         model.status == .playing ? statusImageView.startAnimating() : statusImageView.stopAnimating()
         if model.status == .playing {
-            statusImageView.image = UIImage.sd_animatedGIF(with: gifData)
+//            statusImageView.image = UIImage.sd_animatedGIF(with: gifData)
         } else if model.status == .pause {
             statusImageView.image = UIImage.sceneImage(name: "voice_music_play")
         }

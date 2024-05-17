@@ -33,11 +33,11 @@ PODS:
   - AGResourceManager (0.1.0):
     - AFNetworking
     - SSZipArchive
-  - AUIKitCore/UI (0.5.3):
+  - AUIKitCore/UI (1.1.1):
     - AgoraLyricsScore
     - MJRefresh
     - ScoreEffectUI
-    - SDWebImage (~> 4.4.8)
+    - SDWebImage (~> 5.0.0)
     - SwiftTheme
     - SwiftyBeaver (~> 1.9.5)
     - YYModel
@@ -63,7 +63,7 @@ PODS:
   - FLAnimatedImage (1.0.17)
   - fuLib (1.0):
     - FURenderKit
-  - FURenderKit (8.9.0)
+  - FURenderKit (8.10.0)
   - HXPhotoPicker/Camera/Lite (4.1.5):
     - HXPhotoPicker/Core
   - HXPhotoPicker/Core (4.1.5)
@@ -80,8 +80,8 @@ PODS:
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
   - LEEAlert (1.6.4)
-  - LookinServer/Core (1.2.7)
-  - LookinServer/Swift (1.2.7):
+  - LookinServer/Core (1.2.8)
+  - LookinServer/Swift (1.2.8):
     - LookinServer/Core
   - LSTPopView (0.3.10):
     - LSTPopView/Code (= 0.3.10)
@@ -90,7 +90,7 @@ PODS:
     - LSTTimer
   - LSTTimer (0.2.10)
   - Masonry (1.1.0)
-  - MJRefresh (3.7.6)
+  - MJRefresh (3.7.9)
   - Protobuf (3.22.1)
   - Pure1v1 (0.1.0):
     - AgoraCommon
@@ -98,20 +98,14 @@ PODS:
     - CallAPI
     - FLAnimatedImage
     - SDWebImage
-    - SDWebImage/GIF
     - SnapKit
     - SwiftyBeaver
     - YYCategories
     - YYModel
   - ScoreEffectUI (1.0.2)
-  - SDWebImage (4.4.8):
-    - SDWebImage/Core (= 4.4.8)
-  - SDWebImage/Core (4.4.8)
-  - SDWebImage/GIF (4.4.8):
-    - FLAnimatedImage (~> 1.0)
-    - SDWebImage/Core
-  - SDWebImageAPNGCoder (0.1.1):
-    - SDWebImage/Core (~> 4.2)
+  - SDWebImage (5.0.0):
+    - SDWebImage/Core (= 5.0.0)
+  - SDWebImage/Core (5.0.0)
   - SenseLib (1.0)
   - ShowTo1v1 (0.1.0):
     - AgoraCommon
@@ -119,13 +113,12 @@ PODS:
     - CallAPI
     - FLAnimatedImage
     - SDWebImage
-    - SDWebImage/GIF
     - SnapKit
     - SwiftyBeaver
     - VideoLoaderAPI
     - YYCategories
     - YYModel
-  - SnapKit (5.6.0)
+  - SnapKit (5.7.1)
   - SocketRocket (0.7.0)
   - SSZipArchive (2.4.3)
   - SVGAPlayer (2.5.7):
@@ -139,7 +132,7 @@ PODS:
   - SVProgressHUD (2.2.5)
   - SwiftTheme (0.6.4)
   - SwiftyBeaver (1.9.5)
-  - Test_metaSDK (1.0.0)
+  - Test_metaSDK (1.2.1)
   - VideoLoaderAPI (0.1.3):
     - AgoraRtcEngine_Special_iOS
   - YYCategories (1.0.4):
@@ -163,7 +156,7 @@ DEPENDENCIES:
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
   - Cantata (from `AgoraEntScenarios/Scenes/Cantata`)
   - fuLib (from `fu.podspec`)
-  - HXPhotoPicker/Lite
+  - HXPhotoPicker/Lite (= 4.1.5)
   - JXCategoryView (= 1.6.1)
   - KakaJSON
   - LEEAlert (= 1.6.4)
@@ -174,8 +167,7 @@ DEPENDENCIES:
   - Protobuf (= 3.22.1)
   - Pure1v1 (from `AgoraEntScenarios/Scenes/Pure1v1`)
   - ScoreEffectUI (= 1.0.2)
-  - SDWebImage (= 4.4.8)
-  - SDWebImageAPNGCoder
+  - SDWebImage (= 5.0.0)
   - SenseLib (from `sense.podspec`)
   - ShowTo1v1 (from `AgoraEntScenarios/Scenes/ShowTo1v1`)
   - SnapKit
@@ -183,7 +175,7 @@ DEPENDENCIES:
   - SVGAPlayer
   - SVProgressHUD (= 2.2.5)
   - SwiftyBeaver (= 1.9.5)
-  - Test_metaSDK
+  - Test_metaSDK (= 1.2.1)
   - VideoLoaderAPI (from `AgoraEntScenarios/Common/API/VideoLoaderAPI`)
   - YYCategories (= 1.0.4)
   - YYModel (= 1.0.4)
@@ -215,7 +207,6 @@ SPEC REPOS:
     - Protobuf
     - ScoreEffectUI
     - SDWebImage
-    - SDWebImageAPNGCoder
     - SnapKit
     - SocketRocket
     - SSZipArchive
@@ -261,44 +252,43 @@ SPEC CHECKSUMS:
   AgoraRtm_iOS: 9fb76b5f71900d012aaed6c033e235d6fd201ed9
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
   AGResourceManager: e6616ad4d9d0461c84d9582ef1118004fa534e5c
-  AUIKitCore: fc5df86f26781fe6b76b4ced98f94da3872cf815
+  AUIKitCore: 3d08c145befed42dd5b28e543f7c073d09fded32
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   bytedEffect: 3d51767425dcaa67d2d6162c402225764d3c2156
   CallAPI: 172aa6ba58bb73dae9e2a088ba0dcfc4d06e9263
   Cantata: 1a210fcfeb32f93659c199c33ec34b52a56de380
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   fuLib: 43b6990d34caa47e0f12a61db57fe9bd2372f584
-  FURenderKit: c7aaea4e5e536206d8d98fcc2d96ff5af0f3f9d3
+  FURenderKit: d9a9d74427e281ed32827242218375c52602aa71
   HXPhotoPicker: a7f554cf87888724394c19870c13544ac7b65245
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
   LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb
-  LookinServer: 36f1a0ad280de34b9794cf8825867fcc2dd93e75
+  LookinServer: 1b2b61c6402ae29fa22182d48f5cd067b4e99e80
   LSTPopView: 9379f00f6ce7d1fc620b50ab00ed3ef97b2d4d52
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
-  MJRefresh: 2fe7fb43a5167ceda20bb7e63f130c04fd1814a5
+  MJRefresh: ff9e531227924c84ce459338414550a05d2aea78
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
-  Pure1v1: 870f5b4e89f7d7bc0abceb89cffac6c43f821ba2
+  Pure1v1: 98fb6d15af709b53ed3ec2e7e1b834d430ba6d59
   ScoreEffectUI: bf1195b4d41a73d43c236450b5d7f958989844aa
-  SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
-  SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
+  SDWebImage: 5de80a0302de9e377e62f47d2fa1304efff0e55f
   SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
-  ShowTo1v1: 89a4f5f84dd2ea3b7a8516c889b2b4638690e253
-  SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
+  ShowTo1v1: ba870df0ac554bed818d937c075fda0866564f50
+  SnapKit: d612e99e678a2d3b95bf60b0705ed0a35c03484a
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftTheme: 007cbaf1f9e171caf6448a4657533e54c682b285
   SwiftyBeaver: 84069991dd5dca07d7069100985badaca7f0ce82
-  Test_metaSDK: c62bd71485d2f8faf52018bd109b250977477002
+  Test_metaSDK: 3cfc33a1e49de4e2a32a9f7f973a2f872eae012e
   VideoLoaderAPI: e42bcbf9c836297f0006d7a90068ffbf935c9acd
   YYCategories: 6bcd4314c6661a561410dce4a793379ebd306abd
   YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: c8004ba0924fbe806cc5d9d2697a15304b1778e2
+PODFILE CHECKSUM: b91247f149e238d6ddb8cdd8afcc991fb845114a
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.14.3
