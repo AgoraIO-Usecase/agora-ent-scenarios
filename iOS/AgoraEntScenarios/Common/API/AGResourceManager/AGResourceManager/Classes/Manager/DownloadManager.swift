@@ -226,7 +226,7 @@ extension DownloadManager: IAGDownloadManager {
         let fm = FileManager.default
         if fm.fileExists(atPath: destinationPath) {
             checkResource(destinationPath: destinationPath, 
-                          fileSize: 0,
+                          fileSize: 1,
                           md5: md5) { err in
                 guard let err = err else {
                     completionHandler(URL(string: destinationPath), nil)
