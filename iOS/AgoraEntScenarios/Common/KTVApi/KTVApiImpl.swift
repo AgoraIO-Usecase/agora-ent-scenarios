@@ -7,25 +7,21 @@
 
 import Foundation
 import AgoraRtcKit
-
+import SwiftProtobuf
 /// 加载歌曲状态
-@objc public enum KTVLoadSongState: Int {
+@objc fileprivate enum KTVLoadSongState: Int {
     case idle = -1      //空闲
     case ok = 0         //成功
     case failed         //失败
     case inProgress    //加载中
 }
 
-enum KTVSongMode: Int {
+fileprivate enum KTVSongMode: Int {
     case songCode
     case songUrl
 }
 
-private func agoraPrint(_ message: String) {
-   print(message)
-}
-
-@objc class KTVApiImpl: NSObject{
+@objc class KTVApiImpl: NSObject, KTVApiDelegate{
     
     private var apiConfig: KTVApiConfig?
 
@@ -55,6 +51,7 @@ private func agoraPrint(_ message: String) {
     private var startHighTime: Int = 0
     private var isRelease: Bool = false
     private var songUrl2: String = ""
+    private var enableMultipathing = true
     private var playerState: AgoraMediaPlayerState = .idle {
         didSet {
             agoraPrint("playerState did changed: \(oldValue.rawValue)->\(playerState.rawValue)")
@@ -83,6 +80,11 @@ private func agoraPrint(_ message: String) {
     private var songUrl: String = ""
     private var songCode: Int = 0
     private var songIdentifier: String = ""
+    
+    private let tag = "KTV_API_LOG"
+    private let messageId = "agora:scenarioAPI"
+    private let version = "4.3.0"
+    private let lyricSyncVersion = 2
 
     private var singerRole: KTVSingRole = .audience {
         didSet {
@@ -93,21 +95,26 @@ private func agoraPrint(_ message: String) {
     
     private var timer: Timer?
     private var isPause: Bool = false
-    
+    private var recvFromDataStream = false
     public var remoteVolume: Int = 30
     private var joinChorusNewRole: KTVSingRole = .audience
     private var oldPitch: Double = 0
     private var isWearingHeadPhones: Bool = false
     private var enableProfessional: Bool = false
     private var isPublishAudio: Bool = false
+    private var preludeDuration: Int64 = 0
     private lazy var apiDelegateHandler = KTVApiRTCDelegateHandler(with: self)
+    
+    private var totalSize: Int = 0
+    
+    private var apiRepoter: APIReporter?
+    
     deinit {
         mcc?.register(nil)
         agoraPrint("deinit KTVApiImpl")
     }
-
-    @objc required init(config: KTVApiConfig) {
-        super.init()
+    
+    @objc func createKtvApi(config: KTVApiConfig) {
         agoraPrint("init KTVApiImpl")
         self.apiConfig = config
         
@@ -121,9 +128,8 @@ private func agoraPrint(_ message: String) {
             contentCenterConfiguration.token = config.rtmToken
             contentCenterConfiguration.rtcEngine = config.engine
             contentCenterConfiguration.maxCacheSize = UInt(config.maxCacheSize)
-            if config.isDebugMode {
-                //如果这一块报错为contentCenterConfiguration没有mccDomain这个属性 说明该版本不支持这个 可以注释掉这行代码。完全不影响
-                contentCenterConfiguration.mccDomain = "api-test.agora.io"
+            if let domain = config.mccDomain {
+                contentCenterConfiguration.mccDomain = domain
             }
             mcc = AgoraMusicContentCenter.sharedContentCenter(config: contentCenterConfiguration)
             mcc?.register(self)
@@ -137,7 +143,10 @@ private func agoraPrint(_ message: String) {
             mediaPlayer?.adjustPlayoutVolume(50)
             mediaPlayer?.adjustPublishSignalVolume(50)
         }
+        
+        apiRepoter = APIReporter(type: .ktv, version: version, engine: apiConfig?.engine ?? AgoraRtcEngineKit())
         apiConfig?.engine?.addDelegate(apiDelegateHandler)
+        mediaPlayer?.setPlayerOption("play_pos_change_callback", value: 100)
         initTimer()
     }
     
@@ -153,13 +162,24 @@ private func agoraPrint(_ message: String) {
         engine.setParameters("{\"che.audio.neteq.prebuffer_max_delay\": 600}")
         engine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
         engine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
-        engine.setParameters("{\"che.audio.direct.uplink_process\": false}")
         engine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
         engine.setParameters("{\"che.audio.ans.noise_gate\": 20}")
+        engine.setParameters("{\"rtc.use_audio4\": true}")
         if apiConfig?.type == .singRelay {
             engine.setParameters("{\"che.audio.aiaec.working_mode\": 1}")
         }
+        
+        //4.3.0 add
+        enableMultipathing = true
+//        engine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
+//        engine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
+        engine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
+       // engine.setParameters("{\"rtc.enableMultipath\": true}")
+        engine.setParameters("{\"rtc.log_external_input\":true}")
+        // 数据上报
+        engine.setParameters("{\"rtc.direct_send_custom_event\": true}")
+       // engine.setParameters("{\"rtc.qos_for_test_purpose\": true}")
     }
     
     func renewInnerDataStreamId() {
@@ -167,19 +187,58 @@ private func agoraPrint(_ message: String) {
         dataStreamConfig.ordered = false
         dataStreamConfig.syncWithAudio = true
         self.apiConfig?.engine?.createDataStream(&dataStreamId, config: dataStreamConfig)
-        sendCustomMessage(with: "renewInnerDataStreamId", label: "")
+        sendCustomMessage(with: "renewInnerDataStreamId", dict: [:])
+        agoraPrint("renewInnerDataStreamId")
     }
 }
 
 //MARK: KTVApiDelegate
-extension KTVApiImpl: KTVApiDelegate {
+extension KTVApiImpl {
+    
+    func objectContent(of object: Any) -> [String: Any] {
+        var content = [String: Any]()
+        
+        let mirror = Mirror(reflecting: object)
+        for child in mirror.children {
+            if let propertyName = child.label {
+                if let convertibleValue = convertToJSONSerializable(child.value) {
+                    content[propertyName] = convertibleValue
+                }
+            }
+        }
+        
+        return content
+    }
+
+    func convertToJSONSerializable(_ value: Any) -> Any? {
+        switch value {
+        case let value as String:
+            return value
+        case let value as Int:
+            return value
+        case let value as Double:
+            return value
+        case let value as Bool:
+            return value
+        case let value as Int?:
+            return value
+        case let value as Double?:
+            return value
+        case let value as Bool?:
+            return value
+        case let value as String?:
+            return value
+        default:
+            return nil
+        }
+    }
     
     func getMusicContentCenter() -> AgoraMusicContentCenter? {
         return mcc
     }
     
     func setLrcView(view: KTVLrcViewDelegate) {
-        sendCustomMessage(with: "renewInnerDataStreamId", label: "view:\(view.description)")
+        sendCustomMessage(with: "setLrcView", dict: [:])
         lrcControl = view
     }
     
@@ -192,15 +251,14 @@ extension KTVApiImpl: KTVApiDelegate {
         self.songUrl = url1
         self.songUrl2 = url2
         
-        if config.autoPlay {
-            // 主唱自动播放歌曲
-            if self.singerRole != .leadSinger {
-                switchSingerRole(newRole: .soloSinger) { state, failRes in
-                    
-                }
-            }
-            startSing(url: url1, startPos: 0)
-        }
+//        if config.autoPlay {
+//            // 主唱自动播放歌曲
+//            if self.singerRole != .leadSinger {
+//                switchSingerRole(newRole: .soloSinger) { state, failRes in
+//                }
+//            }
+//            startSing(url: url1, startPos: 0)
+       // }
     }
     
     //主要针对本地歌曲播放的主唱伴奏切换的 MCC直接忽视这个方法
@@ -218,7 +276,7 @@ extension KTVApiImpl: KTVApiDelegate {
     }
     
     func loadMusic(songCode: Int, config: KTVSongConfiguration, onMusicLoadStateListener: IMusicLoadStateListener) {
-        sendCustomMessage(with: "loadMusic", label: "config:\(config.printObjectContent())")
+        sendCustomMessage(with: "loadMusic", dict: objectContent(of: config))
         agoraPrint("loadMusic songCode:\(songCode) ")
         self.songMode = .songCode
         self.songCode = songCode
@@ -227,28 +285,27 @@ extension KTVApiImpl: KTVApiDelegate {
     }
     
     func loadMusic(config: KTVSongConfiguration, url: String) {
-        sendCustomMessage(with: "loadMusic", label: "config:\(config.printObjectContent()), url:\(url)")
+        sendCustomMessage(with: "loadMusicWithUrl:\(url)", dict: objectContent(of: config))
         self.songMode = .songUrl
         self.songUrl = url
         self.songIdentifier = config.songIdentifier
-        if config.autoPlay {
-            // 主唱自动播放歌曲
-            if singerRole != .leadSinger {
-                switchSingerRole(newRole: .soloSinger) { _, _ in
-                    
-                }
-            }
-            startSing(url: url, startPos: 0)
-        }
+//        if config.autoPlay {
+//            // 主唱自动播放歌曲
+//            if singerRole != .leadSinger {
+//                switchSingerRole(newRole: .soloSinger) { _, _ in
+//                }
+//            }
+//            startSing(url: url, startPos: 0)
+//        }
     }
     
     func getMusicPlayer() -> AgoraRtcMediaPlayerProtocol? {
-        sendCustomMessage(with: "getMusicPlayer", label: "")
+        sendCustomMessage(with: "getMusicPlayer", dict: [:])
         return mediaPlayer
     }
     
     func addEventHandler(ktvApiEventHandler: KTVApiEventHandlerDelegate) {
-        sendCustomMessage(with: "addEventHandler", label: "")
+        sendCustomMessage(with: "addEventHandler", dict: [:])
         if eventHandlers.contains(ktvApiEventHandler) {
             return
         }
@@ -256,12 +313,12 @@ extension KTVApiImpl: KTVApiDelegate {
     }
     
     func removeEventHandler(ktvApiEventHandler: KTVApiEventHandlerDelegate) {
-        sendCustomMessage(with: "removeEventHandler", label: "")
+        sendCustomMessage(with: "removeEventHandler", dict: [:])
         eventHandlers.remove(ktvApiEventHandler)
     }
     
     func cleanCache() {
-        sendCustomMessage(with: "cleanCache", label: "")
+        sendCustomMessage(with: "cleanCache", dict: [:])
         isRelease = true
         freeTimer()
         agoraPrint("cleanCache")
@@ -282,7 +339,12 @@ extension KTVApiImpl: KTVApiDelegate {
     }
     
     func renewToken(rtmToken: String, chorusChannelRtcToken: String) {
-        sendCustomMessage(with: "renewToken", label: "rtmToken:\(rtmToken), chorusChannelRtcToken:\(chorusChannelRtcToken)")
+        
+        let dict: [String: Any] = [
+                    "rtmToken":rtmToken,
+                    "chorusChannelRtcToken":chorusChannelRtcToken
+        ]
+        sendCustomMessage(with: "renewToken", dict: dict)
         // 更新RtmToken
         mcc?.renewToken(rtmToken)
         // 更新合唱频道RtcToken
@@ -294,7 +356,7 @@ extension KTVApiImpl: KTVApiDelegate {
     }
     
     func fetchMusicCharts(completion: @escaping MusicChartCallBacks) {
-        sendCustomMessage(with: "fetchMusicCharts", label: "")
+        sendCustomMessage(with: "fetchMusicCharts", dict: [:])
         agoraPrint("fetchMusicCharts")
         let requestId = mcc!.getMusicCharts()
         musicChartDict[requestId] = completion
@@ -306,7 +368,13 @@ extension KTVApiImpl: KTVApiDelegate {
                      jsonOption: String,
                      completion:@escaping (String, AgoraMusicContentCenterStatusCode, AgoraMusicCollection) -> Void) {
         agoraPrint("searchMusic with musicChartId: \(musicChartId)")
-        sendCustomMessage(with: "searchMusic", label: "musicChartId:\(musicChartId), page:\(page), pageSize:\(pageSize), jsonOption:\(jsonOption)")
+        let dict: [String: Any] = [
+                    "musicChartId":musicChartId,
+                    "page": page,
+                    "pageSize": pageSize,
+                    "jsonOption": jsonOption
+        ]
+        sendCustomMessage(with: "searchMusic", dict: dict)
         let requestId = mcc!.getMusicCollection(musicChartId: musicChartId, page: page, pageSize: pageSize, jsonOption: jsonOption)
         musicSearchDict[requestId] = completion
     }
@@ -317,22 +385,35 @@ extension KTVApiImpl: KTVApiDelegate {
                      jsonOption: String,
                      completion: @escaping (String, AgoraMusicContentCenterStatusCode, AgoraMusicCollection) -> Void) {
         agoraPrint("searchMusic with keyword: \(keyword)")
-        sendCustomMessage(with: "searchMusic", label: "keyword:\(keyword), page:\(page), pageSize:\(pageSize), jsonOption:\(jsonOption)")
+        let dict: [String: Any] = [
+                    "keyword": keyword,
+                    "page": page,
+                    "pageSize": pageSize,
+                    "jsonOption": jsonOption
+        ]
+        sendCustomMessage(with: "searchMusic", dict: dict)
         let requestId = mcc!.searchMusic(keyWord: keyword, page: page, pageSize: pageSize, jsonOption: jsonOption)
         musicSearchDict[requestId] = completion
     }
     
     func switchSingerRole(newRole: KTVSingRole, onSwitchRoleState: @escaping (KTVSwitchRoleState, KTVSwitchRoleFailReason) -> Void) {
         let oldRole = singerRole
-        sendCustomMessage(with: "switchSingerRole", label: "oldRole:\(oldRole.rawValue), newRole: \(newRole.rawValue)")
+        
+        let dict: [String: Any] = [
+            "oldRole": oldRole.rawValue,
+            "newRole": newRole.rawValue
+        ]
+        sendCustomMessage(with: "switchSingerRole", dict: dict)
         agoraPrint("switchSingerRole oldRole:\(oldRole.rawValue), newRole: \(newRole.rawValue)")
         
-        if ((oldRole == .leadSinger || oldRole == .soloSinger) && (newRole == .coSinger || newRole == .audience) && isNowMicMuted) {
-            apiConfig?.engine?.muteLocalAudioStream(true)
-            apiConfig?.engine?.adjustRecordingSignalVolume(100)
-        } else if ((oldRole == .audience || oldRole == .coSinger) && (newRole == .leadSinger || newRole == .soloSinger) && isNowMicMuted) {
-            apiConfig?.engine?.adjustRecordingSignalVolume(0)
-            apiConfig?.engine?.muteLocalAudioStream(false)
+        if (apiConfig?.type != .singRelay) {
+            if ((oldRole == .leadSinger || oldRole == .soloSinger) && (newRole == .coSinger || newRole == .audience) && isNowMicMuted) {
+                    apiConfig?.engine?.muteLocalAudioStream(true)
+                    apiConfig?.engine?.adjustRecordingSignalVolume(100)
+            } else if ((oldRole == .audience || oldRole == .coSinger) && (newRole == .leadSinger || newRole == .soloSinger) && isNowMicMuted) {
+                        apiConfig?.engine?.adjustRecordingSignalVolume(0)
+                        apiConfig?.engine?.muteLocalAudioStream(false)
+            }
         }
         
         self.switchSingerRole(oldRole: oldRole, newRole: newRole, token: apiConfig?.chorusChannelToken ?? "", stateCallBack: onSwitchRoleState)
@@ -342,7 +423,7 @@ extension KTVApiImpl: KTVApiDelegate {
      * 恢复播放
      */
     @objc public func resumeSing() {
-        sendCustomMessage(with: "resumeSing", label: "")
+        sendCustomMessage(with: "resumeSing", dict: [:])
         agoraPrint("resumeSing")
         if mediaPlayer?.getPlayerState() == .paused {
             mediaPlayer?.resume()
@@ -356,7 +437,7 @@ extension KTVApiImpl: KTVApiDelegate {
      * 暂停播放
      */
     @objc public func pauseSing() {
-        sendCustomMessage(with: "pauseSing", label: "")
+        sendCustomMessage(with: "pauseSing", dict: [:])
         agoraPrint("pauseSing")
         mediaPlayer?.pause()
     }
@@ -365,7 +446,7 @@ extension KTVApiImpl: KTVApiDelegate {
      * 调整进度
      */
     @objc public func seekSing(time: NSInteger) {
-        sendCustomMessage(with: "seekSing", label: "")
+        sendCustomMessage(with: "seekSing", dict: ["time":time])
         agoraPrint("seekSing")
         mediaPlayer?.seek(toPosition: time)
     }
@@ -381,24 +462,53 @@ extension KTVApiImpl: KTVApiDelegate {
      * 设置当前mic开关状态
      */
     @objc public func muteMic(muteStatus: Bool) {
-        sendCustomMessage(with: "setMicStatus", label: "\(muteStatus)")
+        sendCustomMessage(with: "setMicStatus", dict: ["muteStatus":muteStatus])
         self.isNowMicMuted = muteStatus
-        if self.singerRole == .leadSinger || self.singerRole == .soloSinger {
-            apiConfig?.engine?.adjustRecordingSignalVolume(muteStatus ? 0 : 100)
+        if (apiConfig?.type != .singRelay) {
+            if self.singerRole == .leadSinger || self.singerRole == .soloSinger {
+                apiConfig?.engine?.adjustRecordingSignalVolume(muteStatus ? 0 : 100)
+            } else {
+                let channelMediaOptions = AgoraRtcChannelMediaOptions()
+                channelMediaOptions.publishMicrophoneTrack = !muteStatus
+                channelMediaOptions.clientRoleType = .broadcaster
+                apiConfig?.engine?.updateChannel(with: channelMediaOptions)
+                apiConfig?.engine?.muteLocalAudioStream(muteStatus)
+            }
         } else {
-            apiConfig?.engine?.muteLocalAudioStream(muteStatus)
+            apiConfig?.engine?.adjustRecordingSignalVolume(muteStatus ? 0 : 100)
         }
     }
     
     @objc public func removeMusic(songCode: Int) {
-        sendCustomMessage(with: "removeMusic", label: "songCode:\(songCode)")
+        sendCustomMessage(with: "removeMusic", dict: ["songCode": songCode])
         let ret: Int = mcc?.removeCache(songCode: songCode) ?? 0
         if ret < 0 {
             agoraPrint("removeMusic failed: ret:\(ret)")
         }
     }
+    
+    @objc public func enableMutipath(enable: Bool) {
+        sendCustomMessage(with: "enableMutipath", dict: ["enable":enable])
+        agoraPrint("enableMutipath:\(enable)")
+        enableMultipathing = enable
+        if singerRole == .coSinger || singerRole == .leadSinger {
+            if let subChorusConnection = subChorusConnection {
+                let mediaOption = AgoraRtcChannelMediaOptions()
+                mediaOption.parameters = "{\"rtc.enableMultipath\": \(enable), \"rtc.path_scheduling_strategy\": 0, \"rtc.remote_path_scheduling_strategy\": 0}"
+                apiConfig?.engine?.updateChannelEx(with: mediaOption, connection: subChorusConnection)
+            }
+        }
+    }
 
+    private func agoraPrint(_ message: String) {
+        apiRepoter?.writeLog(content: message, level: .info)
+    }
+    
+    private func agoraPrintError(_ message: String) {
+        apiRepoter?.writeLog(content: message, level: .error)
+    }
 }
+
 
 // 主要是角色切换，加入合唱，加入多频道，退出合唱，退出多频道
 extension KTVApiImpl {
@@ -602,6 +712,10 @@ extension KTVApiImpl {
         mediaOption.publishMicrophoneTrack = newRole == .leadSinger
         mediaOption.enableAudioRecordingOrPlayout = role != .leadSinger
         mediaOption.clientRoleType = .broadcaster
+        mediaOption.parameters = "{\"rtc.use_audio4\": true}"
+        if enableMultipathing {
+            mediaOption.parameters = "{\"rtc.enableMultipath\": true, \"rtc.path_scheduling_strategy\": 0, \"rtc.remote_path_scheduling_strategy\": 0}"
+        }
 
         let rtcConnection = AgoraRtcConnection()
         rtcConnection.channelId = apiConfig?.chorusChannelName ?? ""
@@ -617,6 +731,7 @@ extension KTVApiImpl {
             apiConfig?.engine?.muteRemoteAudioStream(uid, mute: true)
             agoraPrint("muteRemoteAudioStream: \(uid), ret: \(ret ?? -1)")
         }
+        apiConfig?.engine?.setParameters("{\"rtc.use_audio4\": true}")
     }
 
     private func leaveChorus2ndChannel(_ role: KTVSingRole) {
@@ -696,19 +811,18 @@ extension KTVApiImpl {
                     onMusicLoadStateListener.onMusicLoadFail(songCode: self.songCode, reason: .noLyricUrl)
                 }
                 
-                if (config.autoPlay) {
-                    // 主唱自动播放歌曲
-                    if self.singerRole != .leadSinger {
-                        self.switchSingerRole(newRole: .soloSinger) { _, _ in
-                            
-                        }
-                    }
-                    self.startSing(songCode: self.songCode, startPos: 0)
-                }
+//                if (config.autoPlay) {
+//                    // 主唱自动播放歌曲
+//                    if self.singerRole != .leadSinger {
+//                        self.switchSingerRole(newRole: .soloSinger) { _, _ in
+//                        }
+//                    }
+//                    self.startSing(songCode: self.songCode, startPos: 0)
+//                }
             }
         } else {
             loadMusicListeners.setObject(onMusicLoadStateListener, forKey: "\(self.songCode)" as NSString)
-            onMusicLoadStateListener.onMusicLoadProgress(songCode: self.songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
+         //   onMusicLoadStateListener.onMusicLoadProgress(songCode: self.songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
             // TODO: 只有未缓存时才显示进度条
             if mcc?.isPreloaded(songCode: songCode) != 0 {
                 onMusicLoadStateListener.onMusicLoadProgress(songCode: self.songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
@@ -723,7 +837,6 @@ extension KTVApiImpl {
                     if mode == .loadMusicAndLrc {
                         // 需要加载歌词
                         self.loadLyric(with: songCode) { url in
-                            agoraPrint("loadMusicAndLrc: songCode:\(songCode) status:\(status.rawValue) ulr:\(String(describing: url))")
                             if self.songCode != songCode {
                                 onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .cancled)
                                 return
@@ -732,35 +845,35 @@ extension KTVApiImpl {
                                 self.lyricUrlMap[String(songCode)] = urlPath
                                 self.setLyric(with: urlPath) { lyricUrl in
                                     onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: urlPath)
+                                    self.agoraPrint("loadMusicAndLrc: songCode:\(songCode) status:\(status.rawValue) ulr:\(String(describing: url))")
                                 }
                             } else {
                                 onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .noLyricUrl)
+                                self.agoraPrint("loadMusicAndLrc: songCode:\(songCode) status:\(status.rawValue) ulr:\(String(describing: url))")
                             }
-                            if config.autoPlay {
-                                // 主唱自动播放歌曲
-                                if self.singerRole != .leadSinger {
-                                    self.switchSingerRole(newRole: .soloSinger) { _, _ in
-                                        
-                                    }
-                                }
-                                self.startSing(songCode: self.songCode, startPos: 0)
-                            }
+//                            if config.autoPlay {
+//                                // 主唱自动播放歌曲
+//                                if self.singerRole != .leadSinger {
+//                                    self.switchSingerRole(newRole: .soloSinger) { _, _ in
+//                                    }
+//                                }
+//                                self.startSing(songCode: self.songCode, startPos: 0)
+//                            }
                         }
                     } else if mode == .loadMusicOnly {
                         agoraPrint("loadMusicOnly: songCode:\(songCode) load success")
-                        if config.autoPlay {
-                            // 主唱自动播放歌曲
-                            if self.singerRole != .leadSinger {
-                                self.switchSingerRole(newRole: .soloSinger) { _, _ in
-                                    
-                                }
-                            }
-                            self.startSing(songCode: self.songCode, startPos: 0)
-                        }
+//                        if config.autoPlay {
+//                            // 主唱自动播放歌曲
+//                            if self.singerRole != .leadSinger {
+//                                self.switchSingerRole(newRole: .soloSinger) { _, _ in
+//                                }
+//                            }
+//                            self.startSing(songCode: self.songCode, startPos: 0)
+//                        }
                         onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: "")
                     }
                 } else {
-                    agoraPrint("load music failed songCode:\(songCode)")
+                    agoraPrintError("load music failed songCode:\(songCode)")
                     onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .musicPreloadFail)
                 }
             }
@@ -796,11 +909,15 @@ extension KTVApiImpl {
     }
 
     func startSing(songCode: Int, startPos: Int) {
-        sendCustomMessage(with: "startSing", label: "songCode:\(songCode), startPos: \(startPos)")
+        let dict: [String: Any] = [
+            "songCode": songCode,
+            "startPos": startPos
+        ]
+        sendCustomMessage(with: "startSing", dict: dict)
         let role = singerRole
         agoraPrint("startSing role: \(role.rawValue)")
         if self.songCode != songCode {
-            agoraPrint("startSing failed: canceled")
+            agoraPrintError("startSing failed: canceled")
             return
         }
         
@@ -809,20 +926,24 @@ extension KTVApiImpl {
         }
         apiConfig?.engine?.adjustPlaybackSignalVolume(Int(remoteVolume))
         let ret = (mediaPlayer as? AgoraMusicPlayerProtocol)?.openMedia(songCode: songCode, startPos: startPos)
-        agoraPrint("startSing->openMedia(\(songCode) fail: \(ret ?? -1)")
+        agoraPrintError("startSing->openMedia(\(songCode) fail: \(ret ?? -1)")
     }
     
     func startSing(url: String, startPos: Int) {
-        sendCustomMessage(with: "startSing", label: "url:\(url), startPos: \(startPos)")
+        let dict: [String: Any] = [
+            "url": url,
+            "startPos": startPos
+        ]
+        sendCustomMessage(with: "startSing", dict: dict)
         let role = singerRole
         agoraPrint("startSing role: \(role.rawValue)")
         if self.songUrl != songUrl {
-            agoraPrint("startSing failed: canceled")
+            agoraPrintError("startSing failed: canceled")
             return
         }
         apiConfig?.engine?.adjustPlaybackSignalVolume(Int(remoteVolume))
         let ret = mediaPlayer?.open(url, startPos: 0)
-        agoraPrint("startSing->openMedia(\(url) fail: \(ret ?? -1)")
+        agoraPrintError("startSing->openMedia(\(url) fail: \(ret ?? -1)")
     }
 
     /**
@@ -830,7 +951,7 @@ extension KTVApiImpl {
      */
     @objc public func stopSing() {
         agoraPrint("stopSing")
-        sendCustomMessage(with: "stopSing", label: "")
+        sendCustomMessage(with: "stopSing", dict: [:])
         let mediaOption = AgoraRtcChannelMediaOptions()
         mediaOption.publishMediaPlayerAudioTrack = false
         apiConfig?.engine?.updateChannel(with: mediaOption)
@@ -850,6 +971,7 @@ extension KTVApiImpl {
     
     @objc func enableProfessionalStreamerMode(_ enable: Bool)   {
         if self.isPublishAudio == false {return}
+        agoraPrint("enableProfessionalStreamerMode enable:\(enable)")
         self.enableProfessional = enable
         //专业非专业还需要根据是否佩戴耳机来判断是否开启3A
         apiConfig?.engine?.setAudioProfile(enable ? .musicHighQualityStereo : .musicStandardStereo)
@@ -868,6 +990,7 @@ extension KTVApiImpl {
             
         }
     }
+    
 }
 
 // rtc的子频道代理回调
@@ -888,9 +1011,8 @@ extension KTVApiImpl: AgoraRtcEngineDelegate {
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
-        agoraPrint("didOccurError: \(errorCode.rawValue)")
+        agoraPrintError("didOccurError: \(errorCode.rawValue)")
         if errorCode != .joinChannelRejected {return}
-        agoraPrint("join ex channel failed")
         engine.setAudioScenario(.gameStreaming)
         if joinChorusNewRole == .leadSinger {
             mainSingerHasJoinChannelEx = false
@@ -928,27 +1050,17 @@ extension KTVApiImpl {
                 let ntpTime = dict["ntp"] as? Int,
                 let songId = dict["songIdentifier"] as? String
         else { return }
-        agoraPrint("realTime:\(realPosition) position:\(position) lastNtpTime:\(lastNtpTime) ntpTime:\(ntpTime) ntpGap:\(ntpTime - self.lastNtpTime) ")
-        //如果接收到的歌曲和自己本地的歌曲不一致就不更新进度
-//        guard songCode == self.songCode else {
-//            agoraPrint("local songCode[\(songCode)] is not equal to recv songCode[\(self.songCode)] role: \(singerRole.rawValue)")
-//            return
-//        }
 
         self.lastNtpTime = ntpTime
         self.remotePlayerDuration = TimeInterval(duration)
         
         let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .stopped
-//        self.lastMainSingerUpdateTime = Date().milListamp
-//        self.remotePlayerPosition = TimeInterval(realPosition)
         if self.playerState != state {
             agoraPrint("[setLrcTime] recv state: \(self.playerState.rawValue)->\(state.rawValue) role: \(singerRole.rawValue) role: \(singerRole.rawValue)")
             
             if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
                 //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
                 self.localPlayerPosition = self.lastMainSingerUpdateTime - Double(position)
-                print("localPlayerPosition:playerKit:handleSetLrcTimeCommand \(localPlayerPosition)")
-                agoraPrint("seek toPosition: \(position)")
                 mediaPlayer?.seek(toPosition: Int(position))
             }
             
@@ -960,28 +1072,25 @@ extension KTVApiImpl {
             self.remotePlayerPosition = TimeInterval(realPosition)
             handleCoSingerRole(dict: dict)
         } else if role == .audience {
-            if self.songIdentifier == songId  {
-                self.lastMainSingerUpdateTime = Date().milListamp
-                self.remotePlayerPosition = TimeInterval(realPosition)
+            if dict.keys.contains("ver") {
+                recvFromDataStream = false
             } else {
-                self.lastMainSingerUpdateTime = 0
-                self.remotePlayerPosition = 0
+                recvFromDataStream = true
+                if self.songIdentifier == songId  {
+                    self.lastMainSingerUpdateTime = Date().milListamp
+                    self.remotePlayerPosition = TimeInterval(realPosition)
+                } else {
+                    self.lastMainSingerUpdateTime = 0
+                    self.remotePlayerPosition = 0
+                }
+                handleAudienceRole(dict: dict)
             }
-            handleAudienceRole(dict: dict)
         }
     }
     
     private func handlePlayerStateCommand(dict: [String: Any], role: KTVSingRole) {
         let mainSingerState: Int = dict["state"] as? Int ?? 0
         let state = AgoraMediaPlayerState(rawValue: mainSingerState) ?? .idle
-//
-//        if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
-//            //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
-//            self.localPlayerPosition = getPlayerCurrentTime()
-//            print("localPlayerPosition:playerKit:handlePlayerStateCommand \(localPlayerPosition)")
-//            agoraPrint("seek toPosition: \(self.localPlayerPosition)")
-//            mediaPlayer?.seek(toPosition: Int(self.localPlayerPosition))
-//        }
 
         agoraPrint("recv state with MainSinger: \(state.rawValue)")
         syncPlayStateFromRemote(state: state, needDisplay: true)
@@ -1010,9 +1119,9 @@ extension KTVApiImpl {
             let threshold = expectPosition - Int(localPosition)
             let ntpTime = dict["ntp"] as? Int ?? 0
             let time = dict["time"] as? Int64 ?? 0
-            agoraPrint("checkNtp, diff:\(threshold), localNtp:\(getNtpTimeInMs()), localPosition:\(localPosition), audioPlayoutDelay:\(audioPlayoutDelay), remoteDiff:\(String(describing: ntpTime - Int(time)))")
+           // agoraPrint("checkNtp, diff:\(threshold), localNtp:\(getNtpTimeInMs()), localPosition:\(localPosition), audioPlayoutDelay:\(audioPlayoutDelay), remoteDiff:\(String(describing: ntpTime - Int(time)))")
             if abs(threshold) > 50 {
-                print("expectPosition:\(expectPosition)")
+                 agoraPrint("expectPosition:\(expectPosition)")
                  mediaPlayer?.seek(toPosition: expectPosition)
             }
         }
@@ -1026,7 +1135,7 @@ extension KTVApiImpl {
                     let mainSingerUid = dict["uid"] as? Int ?? 0
                     songConfig?.mainSingerUid = mainSingerUid
                     let ret = apiConfig?.engine?.muteRemoteAudioStream(UInt(mainSingerUid), mute: true)
-                    print("ret:\(ret)")
+                agoraPrint("handleCosingerToLeadSinger:ret:\(String(describing: ret))")
             }
         }
     }
@@ -1073,7 +1182,31 @@ extension KTVApiImpl {
             if self.singerRole != .audience {
                 current = Date().milListamp - self.lastReceivedPosition + Double(self.localPosition)
             }
-            self.setProgress(with: Int(current) + Int(self.startHighTime))
+            
+            if self.singerRole == .audience && !recvFromDataStream {
+                
+            } else {
+                var curTime:Int64 = Int64(current) + Int64(self.startHighTime)
+                if songConfig?.songCutter == true {
+                    curTime = curTime - preludeDuration > 0 ? curTime - preludeDuration : curTime
+                }
+                if self.singerRole != .audience {
+                    current = Date().milListamp - self.lastReceivedPosition + Double(self.localPosition)
+                    
+                    if self.singerRole == .leadSinger || self.singerRole == .soloSinger {
+                        var time: LrcTime = LrcTime()
+                        time.forward = true
+                        time.ts = curTime
+                        time.songID = songIdentifier
+                        time.type = .lrcTime
+                        //大合唱的uid是musicuid
+                        time.uid = Int32(apiConfig?.localUid ?? 0)
+                        sendMetaMsg(with: time)
+                    }
+                }
+                self.setProgress(with: Int(curTime))
+            }
+            
             self.oldPitch = self.pitch
        })
     }
@@ -1213,17 +1346,20 @@ extension KTVApiImpl {
         sendStreamMessageWithDict(dict, success: nil)
     }
     
-    private func sendCustomMessage(with event: String, label: String) {
-        apiConfig?.engine?.sendCustomReportMessage("scenarioAPI", category: "1_ios_4.0.0", event: event, label: label, value: 0)
+    private func sendCustomMessage(with event: String, dict: [String: Any]) {
+        apiRepoter?.reportFuncEvent(name: event, value: dict, ext: [:])
     }
 
     private func sendStreamMessageWithDict(_ dict: [String: Any], success: ((_ success: Bool) -> Void)?) {
         let messageData = compactDictionaryToData(dict as [String: Any])
+        let sizeInBits = (messageData ?? Data()).count * 8
+        totalSize += sizeInBits
         let code = apiConfig?.engine?.sendStreamMessage(dataStreamId, data: messageData ?? Data())
         if code == 0 && success != nil { success!(true) }
         if code != 0 {
             agoraPrint("sendStreamMessage fail: \(String(describing: code))")
         }
+        print("totalSize:\(totalSize)")
     }
 
     private func syncPlayState(_ state: AgoraMediaPlayerState) {
@@ -1234,6 +1370,14 @@ extension KTVApiImpl {
     private func setProgress(with pos: Int) {
         lrcControl?.onUpdatePitch(pitch: Float(self.pitch))
         lrcControl?.onUpdateProgress(progress: pos > 200 ? pos - 200 : pos)
+    }
+    
+    private func sendMetaMsg(with time: LrcTime) {
+        let data: Data? = try? time.serializedData()
+        let code = apiConfig?.engine?.sendAudioMetadata(data ?? Data())
+        if code != 0 {
+            agoraPrintError("sendStreamMessage fail: \(String(describing: code))")
+        }
     }
 }
 
@@ -1253,11 +1397,10 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
                                        "realTime":position_ms,
                                        "ntp": timestamp_ms,
                                        "playerState": self.playerState.rawValue,
-                                       "songIdentifier": songIdentifier
-                                      // "songCode": self.songCode
+                                       "songIdentifier": songIdentifier,
+                                       "ver":2,
            ]
-           agoraPrint("position_ms:\(position_ms), ntp:\(getNtpTimeInMs()), delta:\(self.getNtpTimeInMs() - position_ms), autoPlayoutDelay:\(self.audioPlayoutDelay)")
-           print("autoPlayoutDelay:\(self.audioPlayoutDelay)")
+       //    agoraPrint("position_ms:\(position_ms), ntp:\(getNtpTimeInMs()), delta:\(self.getNtpTimeInMs() - position_ms), autoPlayoutDelay:\(self.audioPlayoutDelay)")
            
            sendStreamMessageWithDict(dict) { _ in
                
@@ -1330,11 +1473,14 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
                 let highPart = format["highPart"] as! [[String: Any]]
                 let highStartTime = highPart[0]["highStartTime"] as! Int
                 let highEndTime = highPart[0]["highEndTime"] as! Int
+                if highPart[0].keys.contains("preludeDuration") {
+                    self.preludeDuration = highPart[0]["preludeDuration"] as! Int64
+                }
                 let time = highStartTime
                 startHighTime = time
                 self.lrcControl?.onHighPartTime(highStartTime: highStartTime, highEndTime: highEndTime)
             } catch {
-                print("Error while parsing JSON: \(error.localizedDescription)")
+                agoraPrintError("Error while parsing JSON: \(error.localizedDescription)")
             }
         }
         if (errorCode == .errorGateway) {
@@ -1378,9 +1524,11 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
         }
         if lrcUrl.isEmpty {
             lyricCallback(nil)
+            agoraPrintError("onLyricResult: lrcUrl.isEmpty")
             return
         }
         lyricCallback(lrcUrl)
+        agoraPrint("onLyricResult: lrcUrl is \(lrcUrl)")
     }
     
     func onPreLoadEvent(_ requestId: String, songCode: Int, percent: Int, lyricUrl: String?, status: AgoraMusicContentCenterPreloadStatus, errorCode: AgoraMusicContentCenterStatusCode) {
@@ -1419,7 +1567,7 @@ extension Date {
 
 extension KTVApiImpl: KTVApiRTCDelegate {
     func didJoinChannel(channel: String, withUid uid: UInt, elapsed: Int) {
-        print("ktvapi加入主频道成功")
+        agoraPrint("ktvapi加入主频道成功")
     }
     
     func didJoinedOfUid(uid: UInt, elapsed: Int) {
@@ -1454,11 +1602,12 @@ extension KTVApiImpl: KTVApiRTCDelegate {
     func didAudioPublishStateChange(channelId: String, oldState: AgoraStreamPublishState, newState: AgoraStreamPublishState, elapseSinceLastState: Int32) {
         self.isPublishAudio = newState == .published
         enableProfessionalStreamerMode(self.enableProfessional)
-        print("PublishStateChange:\(newState)")
+        agoraPrint("PublishStateChange:\(newState)")
     }
     
     func receiveStreamMessageFromUid(uid: UInt, streamId: Int, data: Data) {
         let role = singerRole
+        if isRelease {return}
         guard let dict = dataToDictionary(data: data), let cmd = dict["cmd"] as? String else { return }
         
         switch cmd {
@@ -1481,7 +1630,7 @@ extension KTVApiImpl: KTVApiRTCDelegate {
     }
     
     func didRTCAudioRouteChanged(routing: AgoraAudioOutputRouting) {
-        print("Route changed:\(routing)")
+        agoraPrint("Route changed:\(routing)")
         let headPhones: [AgoraAudioOutputRouting] = [.headset, .headsetBluetooth, .headsetNoMic]
         let wearHeadPhone: Bool = headPhones.contains(routing)
         if wearHeadPhone == self.isWearingHeadPhones {
@@ -1490,7 +1639,17 @@ extension KTVApiImpl: KTVApiRTCDelegate {
         self.isWearingHeadPhones = wearHeadPhone
         enableProfessionalStreamerMode(self.enableProfessional)
     }
+    
+    func audioMetadataReceived(uid: UInt, metadata: Data) {
+       guard let time: LrcTime = try? LrcTime(serializedData: metadata) else {return}
+        if time.type == .lrcTime && self.singerRole == .audience {
+            self.setProgress(with: Int(time.ts))
+       }
+    }
 
+    @objc func didAudioMetadataReceived( uid: UInt, metadata: Data) {
+        
+    }
 }
 
 /*----这一块的代码主要是用来处理主频道的RTC代理事件，外部不再需要手动转代理，😁---*/
@@ -1502,6 +1661,7 @@ protocol KTVApiRTCDelegate: NSObjectProtocol  {
     func didAudioPublishStateChange(channelId: String, oldState: AgoraStreamPublishState, newState: AgoraStreamPublishState, elapseSinceLastState: Int32)
     func receiveStreamMessageFromUid(uid: UInt, streamId: Int, data: Data)
     func localAudioStats(stats: AgoraRtcLocalAudioStats)
+    func audioMetadataReceived( uid: UInt, metadata: Data)
 }
 
 class KTVApiRTCDelegateHandler: NSObject, AgoraRtcEngineDelegate {
@@ -1537,6 +1697,10 @@ class KTVApiRTCDelegateHandler: NSObject, AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, localAudioStats stats: AgoraRtcLocalAudioStats) {
         delegate.localAudioStats(stats: stats)
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, audioMetadataReceived uid: UInt, metadata: Data) {
+        delegate.audioMetadataReceived(uid: uid, metadata: metadata)
     }
 }
 

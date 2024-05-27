@@ -25,7 +25,14 @@ class BeautyManager: NSObject {
     
     override init() {
         super.init()
+    }
     
+    func setup(engine: AgoraRtcEngineKit) {
+        agoraKit = engine
+        
+    }
+    
+    func initBeautyRender() {
         switch BeautyModel.beautyType {
         case .byte:
             beautyAPI.beautyRender = ByteBeautyManager.shareManager.render
@@ -39,7 +46,16 @@ class BeautyManager: NSObject {
     
     var isEnableBeauty: Bool = true {
         didSet {
-            beautyAPI.enable(isEnableBeauty)
+            switch BeautyModel.beautyType {
+            case .agora:
+                if isEnableBeauty == false {
+                    AgoraBeautyManager.shareManager.setBeauty(path: nil, key: nil, value: 0)
+                }else{
+                    AgoraBeautyManager.shareManager.setBeauty(path: nil, key: "init", value: 0)
+                }
+            default:
+                beautyAPI.enable(isEnableBeauty)
+            }
         }
     }
     
@@ -52,10 +68,9 @@ class BeautyManager: NSObject {
         }
     }
     
-    func configBeautyAPIWithRtcEngine(engine: AgoraRtcEngineKit) {
-        agoraKit = engine
+    func configBeautyAPI() {
         let config = BeautyConfig()
-        config.rtcEngine = engine
+        config.rtcEngine = agoraKit
         config.captureMode = .agora
         switch BeautyModel.beautyType {
         case .byte:
@@ -66,7 +81,7 @@ class BeautyManager: NSObject {
             config.beautyRender = FUBeautyManager.shareManager.render
         case .agora:
             config.beautyRender = AgoraBeautyManager.shareManager.render
-            AgoraBeautyManager.shareManager.agoraKit = engine
+            AgoraBeautyManager.shareManager.agoraKit = agoraKit
         }
         config.statsEnable = false
         config.statsDuration = 1
@@ -84,7 +99,7 @@ class BeautyManager: NSObject {
     
     func updateBeautyRedner() {
         guard let agoraKit = agoraKit else { return }
-        configBeautyAPIWithRtcEngine(engine: agoraKit)
+        configBeautyAPI()
         if BeautyModel.beautyType == .agora {
             AgoraBeautyManager.shareManager.setBeauty(path: nil, key: "init", value: 0)
         } else {

@@ -1,329 +1,749 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_dialog_music_settings"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/bg_full_blue_top_20"
-    android:orientation="vertical">
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_full_blue_top_20">
 
     <TextView
+        android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:text="@string/ktv_music_menu_dialog_title"
+        android:layout_height="48dp"
+        android:layout_gravity="center|bottom"
+        android:gravity="bottom"
+        android:paddingBottom="6dp"
+        android:text="@string/ktv_voice_profile"
         android:textColor="@color/white"
         android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBackIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:src="@mipmap/icon_back_white"
+        app:layout_constraintBottom_toBottomOf="@id/tvTitle"
+        app:layout_constraintStart_toStartOf="parent" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/ktv_music_menu_dialog_ear"
-            android:textColor="@color/white" />
-
-<!--        <androidx.appcompat.widget.AppCompatCheckBox-->
-<!--            android:id="@+id/switchEar"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="35dp"-->
-<!--            android:button="@drawable/cb_def_selector" />-->
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/switchEar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="240dp"
-            android:drawableRight="@mipmap/ktv_ic_arrow_riight"
-            android:drawablePadding="5dp"
-            android:text="关闭"
-            android:textColor="@color/def_text_grey_6c7" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/ktv_virtual_sound_card"
-            android:textColor="@color/white" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/switchSoundCard"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="240dp"
-            android:drawableRight="@mipmap/ktv_ic_arrow_riight"
-            android:drawablePadding="5dp"
-            android:text="关闭"
-            android:textColor="@color/def_text_grey_6c7" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:visibility="gone"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/ktv_music_menu_dialog_mv"
-            android:textColor="@color/def_text_grey_979" />
-
-        <androidx.appcompat.widget.AppCompatCheckBox
-            android:id="@+id/switchMV"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="42dp"
-            android:button="@drawable/cb_def_selector" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
-        android:gravity="center"
-        android:visibility="gone"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:focusable="false"
-            android:text="@string/ktv_music_menu_dialog_tone"
-            android:textColor="#9BA2AB" />
-
-        <ImageButton
-            android:id="@+id/btn_tone_down_dialog_setting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="23dp"
-            android:background="@null"
-            android:contentDescription="@string/ktv_tone_down"
-            android:padding="6dp"
-            android:src="@drawable/ic_tone_down" />
-
-        <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/changeToneView"
-            android:layout_width="180dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:contentDescription="@string/ktv_music_menu_dialog_vol1"
-            android:max="12"
-            android:min="-12"
-            android:progress="0"
-            android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
-            android:thumb="@mipmap/ic_seekbar_btn" />
-
-        <ImageButton
-            android:id="@+id/btn_tone_up_dialog_setting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:background="@null"
-            android:contentDescription="@string/ktv_tone_up"
-            android:padding="6dp"
-            android:src="@drawable/ic_tone_up" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:focusable="false"
-            android:text="@string/ktv_music_menu_dialog_vol1"
-            android:textColor="@color/white" />
-
-        <ImageButton
-            android:id="@+id/btVol1Down"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:background="@null"
-            android:contentDescription="@string/ktv_tone_down"
-            android:padding="6dp"
-            android:src="@drawable/ic_tone_down" />
-
-        <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/sbVol1"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:contentDescription="@string/ktv_music_menu_dialog_vol1"
-            android:max="100"
-            android:progress="20"
-            android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
-            android:thumb="@mipmap/ic_seekbar_btn" />
-
-        <ImageButton
-            android:id="@+id/btVol1Up"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:background="@null"
-            android:contentDescription="@string/ktv_tone_up"
-            android:padding="6dp"
-            android:src="@drawable/ic_tone_up" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="20dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:focusable="false"
-            android:text="@string/ktv_music_menu_dialog_vol2"
-            android:textColor="@color/white" />
-
-        <ImageButton
-            android:id="@+id/btVol2Down"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:background="@null"
-            android:contentDescription="@string/ktv_tone_down"
-            android:padding="6dp"
-            android:src="@drawable/ic_tone_down" />
-
-        <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/sbVol2"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/ktv_music_menu_dialog_vol2"
-            android:max="100"
-            android:progress="20"
-            android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
-            android:thumb="@mipmap/ic_seekbar_btn" />
-
-        <ImageButton
-            android:id="@+id/btVol2Up"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:background="@null"
-            android:contentDescription="@string/ktv_tone_up"
-            android:padding="6dp"
-            android:src="@drawable/ic_tone_up" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="20dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:focusable="false"
-            android:text="@string/ktv_music_menu_dialog_remote_volume"
-            android:textColor="@color/white" />
-
-        <ImageButton
-            android:id="@+id/btn_remote_volume_down_dialog_setting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:background="@null"
-            android:contentDescription="@string/ktv_remote_volume_down"
-            android:padding="6dp"
-            android:src="@drawable/ic_tone_down" />
-
-        <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/sbRemoteVol"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/ktv_music_menu_dialog_vol2"
-            android:max="100"
-            android:progress="40"
-            android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
-            android:thumb="@mipmap/ic_seekbar_btn" />
-
-        <ImageButton
-            android:id="@+id/btn_remote_volume_up_dialog_setting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:background="@null"
-            android:contentDescription="@string/ktv_remote_volume_up"
-            android:padding="6dp"
-            android:src="@drawable/ic_tone_up" />
-
-    </LinearLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvVoiceEffectList"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:orientation="horizontal"
+        android:layout_height="match_parent"
+        android:layout_marginTop="48dp"
+        android:fillViewport="true"
+        android:orientation="vertical"
         android:overScrollMode="never"
-        android:maxHeight="345dp"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:spanCount="1"
-        tools:itemCount="9"
-        tools:listitem="@layout/ktv_item_mv"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:overScrollMode="never"
-        android:visibility="gone"
-        android:scrollbars="none">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <RadioGroup
-            android:id="@+id/radioGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" />
-    </HorizontalScrollView>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutEar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:paddingVertical="15dp"
+                app:layout_constraintTop_toTopOf="parent">
 
-    <View
-        android:layout_width="0dp"
-        android:layout_height="20dp" />
-</LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ktv_music_menu_dialog_ear"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/switchEar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:drawableEnd="@drawable/ic_arrow_right"
+                    android:drawablePadding="5dp"
+                    android:text="@string/close"
+                    android:textColor="@color/def_text_grey_6c7"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutSoundCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:paddingVertical="15dp"
+                app:layout_constraintTop_toBottomOf="@id/layoutEar">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ktv_virtual_sound_card"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/switchSoundCard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="240dp"
+                    android:drawableEnd="@drawable/ic_arrow_right"
+                    android:drawablePadding="5dp"
+                    android:text="@string/close"
+                    android:textColor="@color/def_text_grey_6c7"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutMicVol"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="14dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingVertical="12dp"
+                app:layout_constraintTop_toBottomOf="@id/layoutSoundCard">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:text="@string/ktv_music_menu_dialog_mic_vol"
+                    android:textColor="@color/white"
+                    android:textSize="15sp" />
+
+                <ImageButton
+                    android:id="@+id/btMicVolDown"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:background="@null"
+                    android:contentDescription="@string/ktv_tone_down"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_tone_down" />
+
+                <androidx.appcompat.widget.AppCompatSeekBar
+                    android:id="@+id/sbMicVol"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/ktv_music_menu_dialog_mic_vol"
+                    android:max="100"
+                    android:progress="20"
+                    android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
+                    android:thumb="@mipmap/ic_seekbar_btn" />
+
+                <ImageButton
+                    android:id="@+id/btnMicVolUp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:background="@null"
+                    android:contentDescription="@string/ktv_tone_up"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_tone_up" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutAccVol"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="14dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingVertical="12dp"
+                app:layout_constraintTop_toBottomOf="@+id/layoutMicVol">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:text="@string/ktv_music_menu_dialog_acc_vol"
+                    android:textColor="@color/white"
+                    android:textSize="15sp" />
+
+                <ImageButton
+                    android:id="@+id/btAccVolDown"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:background="@null"
+                    android:contentDescription="@string/ktv_tone_down"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_tone_down" />
+
+                <androidx.appcompat.widget.AppCompatSeekBar
+                    android:id="@+id/sbAccVol"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/ktv_music_menu_dialog_acc_vol"
+                    android:max="100"
+                    android:progress="20"
+                    android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
+                    android:thumb="@mipmap/ic_seekbar_btn" />
+
+                <ImageButton
+                    android:id="@+id/btAccVolUp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:background="@null"
+                    android:contentDescription="@string/ktv_tone_up"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_tone_up" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutRemoteVol"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="14dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingVertical="12dp"
+                app:layout_constraintTop_toBottomOf="@id/layoutAccVol">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:text="@string/ktv_music_menu_dialog_remote_vol"
+                    android:textColor="@color/white"
+                    android:textSize="15sp" />
+
+                <ImageButton
+                    android:id="@+id/btRemoteVolDown"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:background="@null"
+                    android:contentDescription="@string/ktv_remote_volume_down"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_tone_down" />
+
+                <androidx.appcompat.widget.AppCompatSeekBar
+                    android:id="@+id/sbRemoteVol"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/ktv_music_menu_dialog_remote_vol"
+                    android:max="100"
+                    android:progress="40"
+                    android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
+                    android:thumb="@mipmap/ic_seekbar_btn" />
+
+                <ImageButton
+                    android:id="@+id/btRemoteVolUp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:background="@null"
+                    android:contentDescription="@string/ktv_remote_volume_up"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_tone_up" />
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvVoiceEffectList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:maxHeight="345dp"
+                android:orientation="horizontal"
+                android:overScrollMode="never"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:layout_constraintTop_toBottomOf="@id/layoutRemoteVol"
+                app:spanCount="1"
+                tools:itemCount="9"
+                tools:listitem="@layout/ktv_item_effectvoice" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutVoiceScoringDifficulty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="12dp"
+                android:paddingVertical="15dp"
+                app:layout_constraintTop_toBottomOf="@id/rvVoiceEffectList">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ktv_voice_scoring_difficulty"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <RadioGroup
+                    android:id="@+id/rgVoiceScoringDifficulty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ktv_ear_back_mode_radius"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="3dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <RadioButton
+                        android:id="@+id/tvScoringDifficultyLow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ktv_ear_back_mode_selector"
+                        android:button="@null"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:text="@string/ktv_voice_scoring_difficulty_low"
+                        android:textColor="@drawable/ktv_ear_back_mode_status" />
+
+                    <RadioButton
+                        android:id="@+id/tvScoringDifficultyRecommend"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ktv_ear_back_mode_selector"
+                        android:button="@null"
+                        android:checked="true"
+                        android:gravity="center"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:text="@string/ktv_voice_scoring_difficulty_recommend"
+                        android:textColor="@drawable/ktv_ear_back_mode_status" />
+
+                    <RadioButton
+                        android:id="@+id/tvScoringDifficultyHigh"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ktv_ear_back_mode_selector"
+                        android:button="@null"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:text="@string/ktv_voice_scoring_difficulty_high"
+                        android:textColor="@drawable/ktv_ear_back_mode_status" />
+                </RadioGroup>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutProfessional"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:paddingVertical="12dp"
+                app:layout_constraintTop_toBottomOf="@id/layoutVoiceScoringDifficulty">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvProfessional"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ktv_voice_professional"
+                    android:textColor="@color/white_80_percent"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/cbStartProfessionalMode"
+                    android:layout_width="50dp"
+                    android:layout_height="26dp"
+                    android:button="@drawable/cb_def_selector"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="20dp"
+                app:dividerColor="@color/white_20_percent"
+                app:layout_constraintTop_toBottomOf="@id/layoutProfessional" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutMultipath"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="1dp"
+                android:paddingVertical="12dp"
+                app:layout_constraintTop_toBottomOf="@id/layoutProfessional">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvMultipath"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ktv_voice_multipath"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toTopOf="@+id/tvMultipathTips"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvMultipathTips"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ktv_voice_multipath_tips"
+                    android:textColor="@color/def_text_grey_979"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvMultipath" />
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/cbMultipath"
+                    android:layout_width="50dp"
+                    android:layout_height="26dp"
+                    android:button="@drawable/cb_def_selector"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="20dp"
+                app:dividerColor="@color/white_20_percent"
+                app:layout_constraintTop_toBottomOf="@id/layoutMultipath" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutVoiceQuality"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="1dp"
+                android:paddingVertical="12dp"
+                app:layout_constraintTop_toBottomOf="@id/layoutMultipath">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvVoiceQuality"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ktv_voice_quality"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toTopOf="@+id/tvVoiceQualityTips"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvVoiceQualityTips"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toStartOf="@+id/rgVoiceMode"
+                    android:text="@string/ktv_voice_quality_tips"
+                    android:textColor="@color/def_text_grey_979"
+                    android:textSize="12sp"
+                    android:layout_marginEnd="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvVoiceQuality" />
+
+                <RadioGroup
+                    android:id="@+id/rgVoiceMode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ktv_ear_back_mode_radius"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="3dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <RadioButton
+                        android:id="@+id/tvVoiceStandard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ktv_ear_back_mode_selector"
+                        android:button="@null"
+                        android:checked="true"
+                        android:gravity="center"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:text="@string/ktv_voice_quality_standard"
+                        android:textColor="@drawable/ktv_ear_back_mode_status" />
+
+                    <RadioButton
+                        android:id="@+id/tvVoiceHigh"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ktv_ear_back_mode_selector"
+                        android:button="@null"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:text="@string/ktv_voice_quality_high"
+                        android:textColor="@drawable/ktv_ear_back_mode_status" />
+                </RadioGroup>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="20dp"
+                app:dividerColor="@color/white_20_percent"
+                app:layout_constraintTop_toBottomOf="@id/layoutVoiceQuality" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutANIS"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="1dp"
+                android:paddingVertical="12dp"
+                app:layout_constraintTop_toBottomOf="@id/layoutVoiceQuality">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvAINS"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ktv_voice_AINS"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <RadioGroup
+                    android:id="@+id/rgAINSMode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ktv_ear_back_mode_radius"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="3dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <RadioButton
+                        android:id="@+id/tvAINSClose"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ktv_ear_back_mode_selector"
+                        android:button="@null"
+                        android:checked="true"
+                        android:gravity="center"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:text="@string/ktv_close"
+                        android:textColor="@drawable/ktv_ear_back_mode_status" />
+
+                    <RadioButton
+                        android:id="@+id/tvAINSMiddle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ktv_ear_back_mode_selector"
+                        android:button="@null"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:text="@string/ktv_voice_AINS_medium"
+                        android:textColor="@drawable/ktv_ear_back_mode_status" />
+
+                    <RadioButton
+                        android:id="@+id/tvAINSHigh"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ktv_ear_back_mode_selector"
+                        android:button="@null"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:text="@string/ktv_voice_AINS_high"
+                        android:textColor="@drawable/ktv_ear_back_mode_status" />
+                </RadioGroup>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="20dp"
+                app:dividerColor="@color/white_20_percent"
+                app:layout_constraintTop_toBottomOf="@id/layoutANIS" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutLowLatency"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="1dp"
+                android:paddingVertical="12dp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/layoutANIS">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvLowLatency"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ktv_low_latency"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/cbLowLatency"
+                    android:layout_width="50dp"
+                    android:layout_height="26dp"
+                    android:button="@drawable/cb_def_selector"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="20dp"
+                android:visibility="gone"
+                app:dividerColor="@color/white_20_percent"
+                app:layout_constraintTop_toBottomOf="@id/layoutLowLatency" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutAIAEC"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="1dp"
+                app:layout_constraintTop_toBottomOf="@id/layoutANIS">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvAIAECSwitcher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ktv_AIAEC_switcher"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="@id/cbAIAECSwitcher"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/cbAIAECSwitcher" />
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/cbAIAECSwitcher"
+                    android:layout_width="50dp"
+                    android:layout_height="26dp"
+                    android:layout_marginVertical="12dp"
+                    android:button="@drawable/cb_def_selector"
+                    app:layout_constraintBottom_toTopOf="@+id/layoutAIAECInput"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvAIAECStrength"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ktv_AIAEC_strength"
+                    android:textColor="@color/def_text_grey_979"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/layoutAIAECInput"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/layoutAIAECInput" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvAIAECInputHint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:text="@string/ktv_AIAEC_input_hint"
+                    android:textColor="@color/def_text_grey_979"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/layoutAIAECInput"
+                    app:layout_constraintEnd_toStartOf="@+id/layoutAIAECInput"
+                    app:layout_constraintTop_toTopOf="@+id/layoutAIAECInput" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layoutAIAECInput"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:paddingVertical="8dp"
+                    app:boxBackgroundMode="none"
+                    app:boxStrokeColor="@android:color/transparent"
+                    app:hintEnabled="false"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/cbAIAECSwitcher">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/AIAECInput"
+                        android:layout_width="48dp"
+                        android:layout_height="28dp"
+                        android:background="@drawable/ktv_aiaec_input_radius"
+                        android:gravity="center"
+                        android:imeOptions="actionDone"
+                        android:inputType="number"
+                        android:maxLength="1"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:text="1"
+                        android:textColor="@color/white"
+                        android:textSize="15sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/groupAIAECStrength"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:constraint_referenced_ids="layoutAIAECInput,tvAIAECInputHint,tvAIAECStrength">
+
+                </androidx.constraintlayout.widget.Group>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    app:dividerColor="@color/white_20_percent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/layoutAIAECInput"
+                    app:layout_goneMarginTop="8dp" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_marginTop="1dp"
+                app:layout_constraintTop_toBottomOf="@id/layoutAIAEC" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

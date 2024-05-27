@@ -22,10 +22,11 @@ import Bugly
     private var _imAppKey: String = ""
     private var _imClientId: String = ""
     private var _imClientSecret: String = ""
-    private var _cloudPlayerKey: String = ""
-    private var _cloudPlayerSecret: String = ""
+    private var _restfulApiKey: String = ""
+    private var _restfulApiSecret: String = ""
     private var _hostUrl: String = ""
     private var _baseServerUrl: String = ""
+    private var _roomManagerUrl: String = ""
     
     @objc var isAgreeLicense: Bool = false {
         didSet {
@@ -116,21 +117,21 @@ import Bugly
         }
     }
     
-    @objc public var cloudPlayerKey: String {
+    @objc public var RestfulApiKey: String {
         get {
-            return _cloudPlayerKey
+            return _restfulApiKey
         }
         set {
-            _cloudPlayerKey = newValue
+            _restfulApiKey = newValue
         }
     }
     
-    @objc public var cloudPlayerSecret: String {
+    @objc public var RestfulApiSecret: String {
         get {
-            return _cloudPlayerSecret
+            return _restfulApiSecret
         }
         set {
-            _cloudPlayerSecret = newValue
+            _restfulApiSecret = newValue
         }
     }
     
@@ -140,6 +141,15 @@ import Bugly
         }
         set {
             _hostUrl = newValue
+        }
+    }
+    
+    @objc public var roomManagerUrl: String {
+        get {
+            return _roomManagerUrl
+        }
+        set {
+            _roomManagerUrl = newValue
         }
     }
     

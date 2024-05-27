@@ -54,15 +54,17 @@ include ':scenes:voice:common'
  */
 include ':scenes:voice_spatial'
 include ':scenes:voice_spatial:common'
-
-/*
- * 秀场直播
- */
+//
+///*
+// * 秀场直播
+// */
 //include ':scenes:show'
 //include ':scenes:show:aars:beauty_sensetime:SenseArSourceManager'
 //include ':scenes:show:aars:beauty_sensetime:STMobileJNI'
 //include ':scenes:show:aars:beauty_sensetime:HardwareBuffer'
 //include ':scenes:show:aars:beauty_bytedance:EffectAAR'
+
+include ':RTMSyncManager'
 
 /*
  * 1V1私密房
@@ -72,4 +74,9 @@ include ':scenes:voice_spatial:common'
 /**
  * 秀场转1V1私密房
  */
-//include ':scenes:showTo1v1'
+include ':scenes:showTo1v1'
+
+/**
+ * 弹幕游戏
+ */
+include ':scenes:joy'

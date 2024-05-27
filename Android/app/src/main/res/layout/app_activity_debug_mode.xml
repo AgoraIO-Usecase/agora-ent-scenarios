@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F8FF">
+
+    <io.agora.scene.widget.CommonTitleView
+        android:id="@+id/titleView"
+        style="@style/title_view"
+        app:ctv_centerText="@string/app_debug_mode"
+        tools:ignore="MissingConstraints" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_full_white_r16"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/titleView">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutSwitchEnv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvMineAccount"
+                style="@style/app_tv_mine_w_style"
+                android:text="@string/app_debug_switch_env"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <RadioGroup
+                android:id="@+id/rgSwitchEnv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/app_bg_env_mode_radius"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvMineAccount">
+
+                <RadioButton
+                    android:id="@+id/rbEnvRelease"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/app_bg_env_mode_selector"
+                    android:button="@null"
+                    android:checked="true"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:text="@string/app_release_env"
+                    android:textColor="@color/def_text_grey_6c7"
+                    android:textSize="13sp" />
+
+                <RadioButton
+                    android:id="@+id/rbEnvDev"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/app_bg_env_mode_selector"
+                    android:button="@null"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:text="@string/app_dev_env"
+                    android:textColor="@color/def_text_grey_6c7"
+                    android:textSize="13sp" />
+            </RadioGroup>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btnEnvSwitch"
+                style="@style/def_btn_full"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:text="@string/app_debug_switch"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="normal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/rgSwitchEnv"
+                app:layout_constraintTop_toTopOf="@id/rgSwitchEnv" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnExitDebug"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/app_bg_button_grey_solid_r12"
+        android:text="@string/app_exit_debug"
+        android:textAllCaps="false"
+        android:textColor="@color/def_text_grey_303"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

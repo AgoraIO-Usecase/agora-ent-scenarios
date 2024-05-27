@@ -5,9 +5,9 @@
 //  Created by wushengtao on 2023/9/7.
 //
 
-import Foundation
+import UIKit
 
-private var ag_tapRoomId: String = ""
+private var ag_gestureId: String = ""
  
 struct APIRuntimeKey {
     static let handler = UnsafeRawPointer.init(bitPattern: "api_handler".hashValue)!
@@ -57,14 +57,16 @@ extension UIView {
         }
     }
     
-    public func ag_addPreloadTap(roomInfo: IVideoLoaderRoomInfo,
-                                 localUid: UInt,
-                                 enableProcess: @escaping ((UIGestureRecognizer.State)->Bool),
-                                 completion: @escaping (()->())) {
+    @objc public func ag_addPreloadTap(roomInfo: IVideoLoaderRoomInfo,
+                                       localUid: UInt,
+                                       enableProcess: @escaping ((UIGestureRecognizer.State)->Bool),
+                                       onRequireRenderVideo: ((AnchorInfo, VideoCanvasContainer)->UIView?)?,
+                                       completion: @escaping (()->())) {
         let eventHandler = VideoLoaderViewEventHandler()
         eventHandler.roomInfo = roomInfo
         eventHandler.localUid = localUid
         eventHandler.enableProcess = enableProcess
+        eventHandler.onRequireRenderVideo = onRequireRenderVideo
         eventHandler.completion = completion
         self.ag_eventHandler = eventHandler
         addGesture()
@@ -87,12 +89,15 @@ extension UIView {
     
     @objc func onGesture(_ ges: UIGestureRecognizer) {
         guard let roomInfo = ag_eventHandler?.roomInfo, let localUid = ag_eventHandler?.localUid else {return}
+        let unmanaged = Unmanaged.passUnretained(ges)
+        let gestureId = "\(unmanaged.toOpaque())"
+        
         //只允许一个item被预加载到
-        guard ag_tapRoomId.count == 0 || ag_tapRoomId == roomInfo.channelName() else { return }
+        guard ag_gestureId.count == 0 || ag_gestureId == gestureId else { return }
         
         switch ges.state {
         case .began:
-            ag_tapRoomId = roomInfo.channelName()
+            ag_gestureId = gestureId
             self.ag_touchTL = NSValue(cgPoint: convert(CGPoint.zero, to: api_getWinwdow()))
             debugLoaderPrint("[UI]onGesture began")
             guard ag_eventHandler?.enableProcess?(.began) ?? true else {
@@ -104,9 +109,16 @@ extension UIView {
                                                             localUid: localUid,
                                                             anchorInfo: anchorInfo,
                                                             tagId: roomInfo.channelName())
+                let container = VideoCanvasContainer()
+                if let renderView = self.ag_eventHandler?.onRequireRenderVideo?(anchorInfo, container) {
+                    container.uid = anchorInfo.uid
+                    container.container = renderView
+                    VideoLoaderApiImpl.shared.renderVideo(anchorInfo: anchorInfo, container: container)
+                }
             }
         case .cancelled, .ended:
-            ag_tapRoomId = ""
+            if ag_gestureId.isEmpty {return}
+            ag_gestureId = ""
             let point = ges.location(in: self)
             let currentTl = convert(CGPoint.zero, to:api_getWinwdow())
             
@@ -117,6 +129,9 @@ extension UIView {
                     return
                 }
                 ag_eventHandler?.completion?()
+                
+                //上报耗时开始
+                VideoLoaderApiImpl.shared.startMediaRenderingTracing(anchorId: roomInfo.channelName())
                 return
             }
             debugLoaderPrint("[UI]onGesture cancel")
@@ -126,9 +141,6 @@ extension UIView {
                                                             anchorInfo: anchorInfo,
                                                             tagId: roomInfo.channelName())
             }
-            
-            //上报耗时开始
-            VideoLoaderApiImpl.shared.startMediaRenderingTracing(anchorId: roomInfo.channelName())
         default:
             break
         }
@@ -139,6 +151,7 @@ class VideoLoaderViewEventHandler: NSObject, UIGestureRecognizerDelegate {
     var roomInfo: IVideoLoaderRoomInfo?
     var localUid: UInt = 0
     var enableProcess: ((UIGestureRecognizer.State)->Bool)?
+    var onRequireRenderVideo: ((AnchorInfo, VideoCanvasContainer)->UIView?)?
     var completion: (()->())?
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {

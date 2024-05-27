@@ -2,7 +2,11 @@ package io.agora.scene.pure1v1.service
 
 import android.os.Parcel
 import android.os.Parcelable
+import java.util.*
 
+/*
+ * 用户信息数据结构
+ */
 class UserInfo(
     var userId: String = "",
     var userName: String = "",
@@ -32,6 +36,11 @@ class UserInfo(
         return "${userId}_${createdAt}"
     }
 
+    // 只在prepare阶段使用，因为是用了万能token，每次需要不同的channelId以保证安全性
+    fun getCallChannelId(): String {
+        return UUID.randomUUID().toString()
+    }
+
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
         parcel.readString() ?: "",
@@ -39,6 +48,10 @@ class UserInfo(
         parcel.readLong(),
         parcel.readString() ?: ""
     ) {
+    }
+
+    override fun toString(): String {
+        return "userId:$userId, userName:$userName, avatar:$avatar, createdAt:$createdAt"
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

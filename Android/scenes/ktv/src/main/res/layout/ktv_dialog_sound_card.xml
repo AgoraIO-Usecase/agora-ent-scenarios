@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     tools:theme="@style/Theme.AppCompat"
     android:paddingBottom="24dp"
     android:background="@drawable/ktv_rect_white_top_r20">
@@ -111,7 +111,7 @@
             android:layout_marginEnd="20dp"
             android:textColor="@color/def_text_color_3c4"
             app:layout_constraintEnd_toEndOf="parent"
-            android:drawableEnd="@mipmap/ktv_ic_arrow_riight"
+            android:drawableEnd="@drawable/ic_arrow_right"
             android:textSize="13sp"
             tools:text="TypeA"
             android:gravity="center_vertical|end"

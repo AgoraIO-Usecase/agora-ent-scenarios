@@ -60,9 +60,9 @@
     <string name="ktv_music_menu_dialog_title">控制台</string>
     <string name="ktv_music_menu_dialog_ear">耳返设置</string>
     <string name="ktv_music_menu_dialog_tone">升降调</string>
-    <string name="ktv_music_menu_dialog_vol1">人声音量</string>
-    <string name="ktv_music_menu_dialog_remote_volume">远端音量</string>
-    <string name="ktv_music_menu_dialog_vol2">伴奏音量</string>
+    <string name="ktv_music_menu_dialog_mic_vol">人声音量</string>
+    <string name="ktv_music_menu_dialog_remote_vol">远端音量</string>
+    <string name="ktv_music_menu_dialog_acc_vol">伴奏音量</string>
     <string name="ktv_music_menu_dialog_effect">效果</string>
     <string name="ktv_song_rank_1">热歌榜</string>
     <string name="ktv_song_rank_2">嗨唱推荐</string>
@@ -114,12 +114,26 @@
     <string name="ktv_leave_chorus">退出合唱</string>
     <string name="ktv_voice_highlight">突出人声</string>
     <string name="ktv_voice_profile">配置</string>
+    <string name="ktv_voice_scoring_difficulty">打分难度</string>
+    <string name="ktv_voice_scoring_difficulty_low">低难度</string>
+    <string name="ktv_voice_scoring_difficulty_recommend">推荐难度</string>
+    <string name="ktv_voice_scoring_difficulty_high">高难度</string>
     <string name="ktv_voice_professional">专业主播</string>
+    <string name="ktv_voice_multipath">使用移动网络改善体验</string>
+    <string name="ktv_voice_multipath_tips">如Wi-Fi下网络质量差，将使用移动网络改善</string>
     <string name="ktv_voice_quality">音质</string>
+    <string name="ktv_voice_quality_standard">标准音质</string>
+    <string name="ktv_voice_quality_high">高音质</string>
+    <string name="ktv_voice_quality_tips">aiaec关闭的情况下音质选项才能生效</string>
     <string name="ktv_voice_AINS">降低背景噪音</string>
+    <string name="ktv_close">关闭</string>
+    <string name="ktv_open">开启</string>
+    <string name="ktv_voice_AINS_medium">中</string>
+    <string name="ktv_voice_AINS_high">高</string>
     <string name="ktv_low_latency">低延迟模式</string>
-    <string name="ktv_AIAEC_switcher">AIAEC 开关（beta）</string>
-    <string name="ktv_AIAEC_strength">AIAEC 强度选择（beta）</string>
+    <string name="ktv_AIAEC_switcher">AIAEC 开关</string>
+    <string name="ktv_AIAEC_strength">AIAEC 强度选择</string>
+    <string name="ktv_AIAEC_input_hint">请输入0～4的正整数</string>
     <string name="ktv_seat_num">%s号麦</string>
 
     <!--    Content Description-->
@@ -160,9 +174,15 @@
     <string name="ktv_earback_setting">耳返设置</string>
     <string name="ktv_earback_volume">耳返音量</string>
     <string name="ktv_earback_auto">自动</string>
+    <string name="ktv_earback_oboe">强制Oboe</string>
+    <string name="ktv_earback_opensl">强制OpenSL</string>
+    <string name="ktv_earback_opensl_tips">切换后将强制使用OpenSL模式，\n确认？</string>
+    <string name="ktv_earback_oboe_tips">切换后将强制使用Oboe模式，\n确认？</string>
     <string name="ktv_earback_tips1">开启耳返可实时听到自己的声音，唱歌的时候及时调整</string>
     <string name="ktv_earback_tips2">因为延时和体验问题，在耳返里听到的声音是没有音效的（包括虚拟声卡、场景塑造（KTV、演唱会））</string>
     <string name="ktv_earback_no_micphone">使用耳返必须插入耳机，当前未检测到耳机</string>
+    <string name="ktv_earback_delay">耳返延时</string>
+    <string name="ktv_earback_delay_test">请对着耳麦说话，测试实时耳返延时</string>
     <string name="ktv_virtual_sound_card">虚拟声卡</string>
     <string name="ktv_input_device">麦克风类型</string>
     <string name="ktv_sound_card_mic_type">麦克风类型%d</string>
@@ -192,6 +212,7 @@
     <string name="ktv_sound_preset_off">关闭</string>
     <string name="ktv_highlight_disable">人声突出已失效</string>
     <string name="ktv_highlight_limit">每首歌仅可设置一次人声突出对象，请在下首歌再设置</string>
+    <string name="ktv_notice">提示</string>
 
     <string name="ktv_debug">Debug</string>
     <string name="ktv_debug_settings">开发者设置</string>
@@ -200,5 +221,7 @@
     <string name="ktv_debug_settings_private_param">私有参数</string>
     <string name="ktv_debug_settings_set">设置</string>
     <string name="ktv_debug_settings_audio_dump">音频Dump</string>
-    <string name="ktv_ear_phone_tip">耳返已关闭，请插入耳机重新开启</string>
+    <string name="ktv_earphone_close_tip">耳返已关闭，请插入耳机重新开启</string>
+    <string name="ktv_loading_music">%1s歌曲准备中…</string>
+    <string name="ktv_join_chorus_seat_full">没有空麦位，等等再唱吧</string>
 </resources>

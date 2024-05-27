@@ -219,9 +219,9 @@
             android:layout_gravity="end"
             android:paddingHorizontal="12dp"
             android:paddingVertical="16dp"
-            app:layout_constraintBottom_toBottomOf="@id/ivClose"
+            app:layout_constraintBottom_toBottomOf="@+id/cvRoomInfo"
             app:layout_constraintEnd_toStartOf="@id/ivClose"
-            app:layout_constraintTop_toTopOf="@id/ivClose"
+            app:layout_constraintTop_toTopOf="parent"
             android:src="@mipmap/icon_more" />
 
         <LinearLayout

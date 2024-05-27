@@ -1,5 +1,6 @@
 package com.agora.entfulldemo.home.mine
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -38,12 +39,13 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val kSingBattleRoomAppID = "io.agora.singbattle"
     private val kCantataAppID = "io.agora.cantata"
     private val kShowRoomAppID = "io.agora.test.entfull"
+    private val kJoyRoomAppID = "io.agora.joy"
 
     private var counts = 0
     private val debugModeOpenTime: Long = 2000
     private var beginTime: Long = 0
 
-    private val adapter = AboutUsAdapter()
+    private val adapter = AboutUsAdapter(this)
 
     override fun getViewBinding(inflater: LayoutInflater): AppActivityAboutUsBinding {
         return AppActivityAboutUsBinding.inflate(inflater)
@@ -65,7 +67,9 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             setupSingRelayAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kCantataAppID) {
             setupCantataAppInfo()
-        } else {
+        } else if (BuildConfig.APPLICATION_ID == kJoyRoomAppID){
+            setupJoyAppInfo()
+        }else {
             setupFullAppInfo()
         }
         setupDebugMode()
@@ -82,8 +86,8 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private fun setupKtvRoomAppInfo() {
         adapter.scenes = mutableListOf<SceneInfo>()
         adapter.appInfo = AppInfo(
-            this.getString(R.string.app_about_name),
-            "20230926-" + VersionUtils.getVersion("io.agora.scene.ktv.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
+            this.getString(R.string.app_name),
+            "20240511-" + VersionUtils.getVersion("io.agora.scene.ktv.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
             servicePhone,
             webSite
         )
@@ -94,7 +98,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         adapter.scenes = mutableListOf<SceneInfo>()
         if (VersionUtils.getVersion("io.agora.scene.voice.BuildConfig").isNotEmpty()) {
             adapter.appInfo = AppInfo(
-                this.getString(R.string.app_about_name),
+                this.getString(R.string.app_name),
                 "20230110-" + VersionUtils.getVersion("io.agora.scene.voice.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
@@ -107,7 +111,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         adapter.scenes = mutableListOf<SceneInfo>()
         if (VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig").isNotEmpty()) {
             adapter.appInfo = AppInfo(
-                this.getString(R.string.app_sing_relay),
+                this.getString(R.string.app_name),
                 "20230830-" + VersionUtils.getVersion("io.agora.scene.ktv.singrelay.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
@@ -121,7 +125,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         if (VersionUtils.getVersion("io.agora.scene.show.BuildConfig").isNotEmpty()) {
             adapter.appInfo = AppInfo(
                 this.getString(R.string.app_about_show),
-                "20230915-" + VersionUtils.getVersion("io.agora.scene.show.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
+                "20240511-" + VersionUtils.getVersion("io.agora.scene.show.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
@@ -132,7 +136,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private fun setupSingBattleRoomAppInfo() {
         adapter.scenes = mutableListOf<SceneInfo>()
         adapter.appInfo = AppInfo(
-            this.getString(R.string.app_about_singbattle),
+            this.getString(R.string.app_name),
             "20230520-" + VersionUtils.getVersion("io.agora.scene.ktv.singbattle.BuildConfig") + RtcEngine.getSdkVersion(),
             servicePhone,
             webSite
@@ -144,8 +148,22 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         adapter.scenes = mutableListOf<SceneInfo>()
         if (VersionUtils.getVersion("io.agora.scene.cantata.BuildConfig").isNotEmpty()) {
             adapter.appInfo = AppInfo(
-                this.getString(R.string.app_about_cantata),
+                this.getString(R.string.app_name),
                 "20231230-" + VersionUtils.getVersion("io.agora.scene.cantata.BuildConfig") + "-" + RtcEngine
+                    .getSdkVersion(),
+                servicePhone,
+                webSite
+            )
+        }
+    }
+
+    // 设置小玩法的信息
+    private fun setupJoyAppInfo() {
+        adapter.scenes = mutableListOf<SceneInfo>()
+        if (VersionUtils.getVersion("io.agora.scene.joy.BuildConfig").isNotEmpty()) {
+            adapter.appInfo = AppInfo(
+                this.getString(R.string.app_about_joy),
+                "20231230-" + VersionUtils.getVersion("io.agora.scene.joy.BuildConfig") + "-" + RtcEngine
                     .getSdkVersion(),
                 servicePhone,
                 webSite
@@ -228,6 +246,14 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
                 )
             )
         }
+        if (VersionUtils.getVersion("io.agora.scene.joy.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_joy),
+                    "XWF-" + VersionUtils.getVersion("io.agora.scene.joy.BuildConfig")
+                )
+            )
+        }
         val versionTime = "20231230-"
         if (scenes.size == 1) {
             adapter.scenes = mutableListOf()
@@ -241,7 +267,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         } else if (scenes.size > 1) {
             adapter.scenes = scenes
             adapter.appInfo = AppInfo(
-                this.getString(R.string.app_about_name),
+                this.getString(R.string.app_name),
                 versionTime + io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
@@ -329,7 +355,9 @@ private data class SceneInfo(
     val version: String
 )
 
-private class AboutUsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+private class AboutUsAdapter(
+    val context: Context
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val VIEW_TYPE_APP_INFO = 0
 
@@ -359,8 +387,8 @@ private class AboutUsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>()
         if (holder.itemViewType == VIEW_TYPE_APP_INFO) {
             val current = holder as AppInfoViewHolder
             appInfo?.let {
-                current.binding.tvAppName.text = it.name
-                current.binding.tvVersion.text = it.version
+//                current.binding.tvAppName.text = it.name
+                current.binding.tvVersion.text = context.getString(R.string.app_mine_current_version, it.version)
                 current.binding.tvServiceNumber.text = it.servicePhone
                 current.binding.tvHomeWebSite.text = it.webSite
             }

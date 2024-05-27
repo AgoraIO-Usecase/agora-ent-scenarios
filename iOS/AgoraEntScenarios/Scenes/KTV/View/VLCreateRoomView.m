@@ -89,7 +89,7 @@
     [randomBtn addTarget:self action:@selector(randomBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:randomBtn];
     [randomBtn sizeToFit];
-    randomBtn.frame = CGRectMake(SCREEN_WIDTH - randomBtn.width - 20, roomTitleLabel.top, randomBtn.width, 20);
+    randomBtn.frame = CGRectMake(SCREEN_WIDTH - randomBtn.width - 20 - 10, roomTitleLabel.top, randomBtn.width+10, 20);
     
     UIView *inputBgView = [[UIView alloc] initWithFrame:CGRectMake(20, roomTitleLabel.bottom+8, SCREEN_WIDTH-40, 48)];
     inputBgView.layer.cornerRadius = 8;

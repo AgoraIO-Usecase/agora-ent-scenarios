@@ -41,7 +41,7 @@
             android:id="@+id/switchEar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableRight="@drawable/cantata_ic_arrow_right"
+            android:drawableRight="@drawable/ic_arrow_right"
             android:drawablePadding="5dp"
             android:text="关闭"
             android:textColor="@color/def_text_grey_6c7" />
@@ -72,57 +72,6 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
-        android:gravity="center"
-        android:visibility="gone"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:focusable="false"
-            android:text="@string/cantata_music_menu_dialog_tone"
-            android:textColor="#9BA2AB" />
-
-        <ImageButton
-            android:id="@+id/btn_tone_down_dialog_setting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="23dp"
-            android:background="@null"
-            android:contentDescription="@string/cantata_tone_down"
-            android:padding="6dp"
-            android:src="@drawable/ic_tone_down" />
-
-        <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/changeToneView"
-            android:layout_width="180dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:contentDescription="@string/cantata_music_menu_dialog_vol1"
-            android:max="12"
-            android:min="-12"
-            android:progress="0"
-            android:progressDrawable="@drawable/bg_seekbar_progress"
-            android:thumb="@mipmap/ic_seekbar_btn" />
-
-        <ImageButton
-            android:id="@+id/btn_tone_up_dialog_setting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:background="@null"
-            android:contentDescription="@string/cantata_tone_up"
-            android:padding="6dp"
-            android:src="@drawable/ic_tone_up" />
-    </LinearLayout>
-
-    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -139,7 +88,7 @@
             android:textColor="@color/white" />
 
         <ImageButton
-            android:id="@+id/btVol1Down"
+            android:id="@+id/btMicVolDown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -149,7 +98,7 @@
             android:src="@drawable/ic_tone_down" />
 
         <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/sbVol1"
+            android:id="@+id/sbMicVol"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
@@ -157,11 +106,11 @@
             android:contentDescription="@string/cantata_music_menu_dialog_vol1"
             android:max="100"
             android:progress="20"
-            android:progressDrawable="@drawable/bg_seekbar_progress"
+            android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
             android:thumb="@mipmap/ic_seekbar_btn" />
 
         <ImageButton
-            android:id="@+id/btVol1Up"
+            android:id="@+id/btnMicVolUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
@@ -172,6 +121,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layoutAccVol"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -188,7 +138,7 @@
             android:textColor="@color/white" />
 
         <ImageButton
-            android:id="@+id/btVol2Down"
+            android:id="@+id/btAccVolDown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -198,18 +148,18 @@
             android:src="@drawable/ic_tone_down" />
 
         <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/sbVol2"
+            android:id="@+id/sbAccVol"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:contentDescription="@string/cantata_music_menu_dialog_vol2"
             android:max="100"
             android:progress="20"
-            android:progressDrawable="@drawable/bg_seekbar_progress"
+            android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
             android:thumb="@mipmap/ic_seekbar_btn" />
 
         <ImageButton
-            android:id="@+id/btVol2Up"
+            android:id="@+id/btAccVolUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
@@ -220,6 +170,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layoutRemoteVol"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -236,7 +187,7 @@
             android:textColor="@color/white" />
 
         <ImageButton
-            android:id="@+id/btn_remote_volume_down_dialog_setting"
+            android:id="@+id/btRemoteVolDown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -253,15 +204,14 @@
             android:max="100"
             android:progress="40"
             android:layout_weight="1"
-            android:progressDrawable="@drawable/bg_seekbar_progress"
+            android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
             android:thumb="@mipmap/ic_seekbar_btn" />
 
         <ImageButton
-            android:id="@+id/btn_remote_volume_up_dialog_setting"
+            android:id="@+id/btRemoteVolUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-
             android:background="@null"
             android:contentDescription="@string/cantata_remote_volume_up"
             android:padding="6dp"
@@ -315,20 +265,6 @@
         app:spanCount="1"
         tools:itemCount="9"
         tools:listitem="@layout/cantata_item_mv"/>
-
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:overScrollMode="never"
-        android:visibility="gone"
-        android:scrollbars="none">
-
-        <RadioGroup
-            android:id="@+id/radioGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" />
-    </HorizontalScrollView>
 
     <View
         android:layout_width="0dp"

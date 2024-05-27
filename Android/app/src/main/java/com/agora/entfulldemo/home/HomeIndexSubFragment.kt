@@ -5,11 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.Nullable
-import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ConcatAdapter
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.agora.entfulldemo.R
@@ -117,6 +114,15 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
             }
         }, HomeIndexSubHolder::class.java)
 
+        val joyHeadAdapter = HomeHeadAdapter(
+            mutableListOf(cxt.getString(R.string.app_home_scene_game)), HomeHeadSubHolder::class.java
+        )
+        val joyScenesModels = ScenesConstructor.buildScene(cxt, HomeScenesType.Game)
+        val joyAdapter = BaseRecyclerViewAdapter(joyScenesModels, object : OnItemClickListener<HomeSceneModel?> {
+            override fun onItemClick(scenesModel: HomeSceneModel, view: View, position: Int, viewType: Long) {
+                onItemClickScene(scenesModel)
+            }
+        }, HomeIndexSubHolder::class.java)
 
         val config = ConcatAdapter.Config.Builder().setIsolateViewTypes(true).build()
 
@@ -124,7 +130,8 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
             config,
             ktvHeadAdapter, ktvAdapter,
             voiceHeadAdapter, voiceAdapter,
-            liveHeadAdapter, liveAdapter
+            liveHeadAdapter, liveAdapter,
+            joyHeadAdapter, joyAdapter,
         )
         binding.rvScenes.adapter = concatAdapter
     }

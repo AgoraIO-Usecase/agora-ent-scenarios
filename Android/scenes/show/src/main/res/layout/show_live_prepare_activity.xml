@@ -141,23 +141,8 @@
             android:textColor="@color/white"
             android:textSize="12sp"
             app:layout_constraintBottom_toTopOf="@id/tvTip"
-            app:layout_constraintEnd_toStartOf="@id/tvHD"
-            app:layout_constraintStart_toEndOf="@id/tvRotate" />
-
-        <TextView
-            android:id="@+id/tvHD"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableTop="@mipmap/show_live_prepare_ic_hd"
-            android:drawablePadding="3dp"
-            android:gravity="center"
-            android:text="@string/show_live_prepare_hd"
-            android:textColor="@color/white"
-            android:visibility="gone"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toTopOf="@id/tvTip"
             app:layout_constraintEnd_toStartOf="@id/tvSetting"
-            app:layout_constraintStart_toEndOf="@id/tvBeauty" />
+            app:layout_constraintStart_toEndOf="@id/tvRotate" />
 
         <TextView
             android:id="@+id/tvSetting"
@@ -171,7 +156,7 @@
             android:textSize="12sp"
             app:layout_constraintBottom_toTopOf="@id/tvTip"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/tvHD" />
+            app:layout_constraintStart_toEndOf="@id/tvBeauty" />
 
         <TextView
             android:id="@+id/tvTip"
@@ -203,6 +188,52 @@
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/status_prepare_view_lrc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/black_85_percent"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="12dp"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp"
+                android:maxWidth="180dp"
+                android:minWidth="135dp"
+                android:text="@string/show_beauty_loading"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+            <ProgressBar
+                android:id="@+id/pbLoading"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_gravity="start"
+                android:max="100"
+                android:progress="0"
+                android:progressDrawable="@drawable/bg_progressbar_text_loading" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

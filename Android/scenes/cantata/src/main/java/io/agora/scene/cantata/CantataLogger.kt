@@ -4,7 +4,7 @@ import io.agora.scene.base.EntLogger
 
 object CantataLogger {
 
-    private val entLogger = EntLogger(EntLogger.Config("KTV"))
+    private val entLogger = EntLogger(EntLogger.Config("KTV_Cantata"))
 
     @JvmStatic
     fun d(tag: String, message: String, vararg args: Any) {

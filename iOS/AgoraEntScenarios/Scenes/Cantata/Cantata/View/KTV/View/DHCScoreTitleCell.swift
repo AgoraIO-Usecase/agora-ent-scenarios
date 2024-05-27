@@ -23,21 +23,21 @@ class DHCScoreTitleCell: UITableViewCell {
     
     private func layoutUI() {
         indexLabel = UILabel()
-        indexLabel.text = "排名"
+        indexLabel.text = "ktv_rank_list".toSceneLocalization() as String
         indexLabel.textAlignment = .center
         indexLabel.textColor = .white
         indexLabel.font = UIFont.systemFont(ofSize: 10)
         self.contentView.addSubview(indexLabel)
         
         playerLabel = UILabel()
-        playerLabel.text = "玩家"
+        playerLabel.text = "ktv_rank_player".toSceneLocalization() as String
         playerLabel.textAlignment = .center
         playerLabel.textColor = .white
         playerLabel.font = UIFont.systemFont(ofSize: 10)
         self.contentView.addSubview(playerLabel)
         
         scoreLabel = UILabel()
-        scoreLabel.text = "个人得分"
+        scoreLabel.text = "ktv_per_score".toSceneLocalization() as String
         scoreLabel.textAlignment = .center
         scoreLabel.textColor = .white
         scoreLabel.font = UIFont.systemFont(ofSize: 10)

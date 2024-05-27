@@ -127,5 +127,21 @@
 
         </TableRow>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/show_to1v1_dashboard_other"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvChannelName"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            tools:text="@string/show_to1v1_dashboard_channel_name" />
+
     </TableLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,7 +15,7 @@ import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
 import io.agora.scene.ktv.databinding.KtvDialogDebugOptionsBinding;
 
 /**
- * 控制台
+ * debug 控制台
  */
 public class KTVDebugSettingsDialog extends BaseBottomSheetDialogFragment<KtvDialogDebugOptionsBinding> {
     public static final String TAG = "KTVDebugSettingsDialog";

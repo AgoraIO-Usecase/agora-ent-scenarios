@@ -7,6 +7,8 @@
 
 import UIKit
 import AgoraCommon
+import AGResourceManager
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
@@ -21,15 +23,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func configKeyCenterData() {
+        
+        var isDebugMode = false
+        if let index: Int = UserDefaults.standard.object(forKey: "TOOLBOXENV") as? Int {
+            isDebugMode = index == 1
+        } else {
+            isDebugMode = false
+        }
+        
         AppContext.shared.appId = KeyCenter.AppId
         AppContext.shared.certificate = KeyCenter.Certificate ?? ""
         AppContext.shared.hostUrl = KeyCenter.HostUrl
+        AppContext.shared.baseServerUrl = isDebugMode ? (KeyCenter.baseServerUrlDev ?? "") : (KeyCenter.baseServerUrl ?? "")
+        AppContext.shared.roomManagerUrl = "\(AppContext.shared.baseServerUrl)/room-manager"
         AppContext.shared.imAppKey = KeyCenter.IMAppKey ?? ""
         AppContext.shared.imClientId = KeyCenter.IMClientId ?? ""
         AppContext.shared.imClientSecret = KeyCenter.IMClientSecret ?? ""
+        AppContext.shared.RestfulApiKey = KeyCenter.RestfulApiKey ?? ""
+        AppContext.shared.RestfulApiSecret = KeyCenter.RestfulApiSecret ?? ""
+        AppContext.shared.baseServerUrl = KeyCenter.baseServerUrl ?? ""
         AppContext.shared.cloudPlayerKey = KeyCenter.CloudPlayerKey ?? ""
         AppContext.shared.cloudPlayerSecret = KeyCenter.CloudPlayerSecret ?? ""
-        AppContext.shared.baseServerUrl = KeyCenter.baseServerUrl ?? ""
+        
+        AGResourceManagerContext.shared.displayLogClosure = { text in
+            asyncToMainThread {
+                agoraEnt_default_info(text, tag: "ResourceManager")
+            }
+        }
+        AGResourceManager.autoDownload()
     }
     
     @objc func didTokenExpired() {

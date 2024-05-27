@@ -9,16 +9,49 @@ import Foundation
 import SwiftyBeaver
 @objc public class AgoraEntLogConfig: NSObject {
     var sceneName: String = ""
-    var logFileMaxSize: Int = (2 * 1024 * 1024)
+    var logFileMaxSize: Int = (1 * 1024 * 1024)
     
-    public init(sceneName: String, logFileMaxSize: Int = 2 * 1024 * 1024) {
+    public init(sceneName: String, logFileMaxSize: Int = 1 * 1024 * 1024) {
         super.init()
         self.sceneName = sceneName
         self.logFileMaxSize = logFileMaxSize
     }
 }
 
+public func agoraDoMainThreadTask(_ task: (()->())?) {
+    if Thread.current.isMainThread == false {
+        DispatchQueue.main.async {
+            task?()
+        }
+    }else{
+        task?()
+    }
+}
+
 @objc public class AgoraEntLog: NSObject {
+    
+    private static var currentLogKey = ""
+    
+    public static func currentLogger(with defaultKey: String) -> SwiftyBeaver.Type {
+        if currentLogKey.isEmpty {
+            return getSceneLogger(with: defaultKey)
+        }
+        
+        let logger = SwiftyBeaver.self
+        return logger
+    }
+    
+    public static func getSceneLogger(with key: String) -> SwiftyBeaver.Type {
+        let logger = SwiftyBeaver.self
+        if key == currentLogKey {
+            return logger
+        }
+        logger.removeAllDestinations()
+        createLog(config: AgoraEntLogConfig.init(sceneName: key))
+        currentLogKey = key
+        return logger
+    }
+    
     public static func createLog(config: AgoraEntLogConfig) -> SwiftyBeaver.Type {
         let log = SwiftyBeaver.self
         
@@ -26,18 +59,14 @@ import SwiftyBeaver
         let console = ConsoleDestination()
          // log to Xcode Console
         let file = FileDestination()  // log to default swiftybeaver.log file
-       // let dateString = NSDate().string(withFormat: "yyyy-MM-dd", timeZone: nil, locale: nil) ?? ""
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        let dateString = dateFormatter.string(from: Date())
         let logDir = logsDir()
-        file.logFileURL = URL(fileURLWithPath: "\(logDir)/agora_ent_\(config.sceneName)_ios_\(dateString)_log.log")
+        file.logFileURL = URL(fileURLWithPath: "\(logDir)/agora_ent_\(config.sceneName).log")
         
         // use custom format and set console output to short time, log level & message
-        console.format = "$Dyyyy-MM-dd HH:mm:ss.SSS[Agora][$L][\(config.sceneName)][$X]$d $M"
+        console.format = "[$DMM/dd/yy HH:mm:ss.SSS$d][Agora][$L][\(config.sceneName)][$X]: $M"
         file.format = console.format
         file.logFileMaxSize = config.logFileMaxSize
-        file.logFileAmount = 4
+        file.logFileAmount = 2
         // or use this for JSON output: console.format = "$J"
 
         // add the destinations to SwiftyBeaver
@@ -57,9 +86,29 @@ import SwiftyBeaver
     
     @objc public static func logsDir() ->String {
         let dir = cacheDir()
-        let logDir = "\(dir)/agora_ent_logs"
+        let logDir = "\(dir)/agora_ent_log"
         try? FileManager.default.createDirectory(at: URL(fileURLWithPath: logDir), withIntermediateDirectories: true)
         
         return logDir
+    }
+    
+    @objc public static func allLogsUrls() -> [URL] {
+        let dir = cacheDir()
+        var urls = [URL(fileURLWithPath: logsDir())]
+        
+        let dirUrl = URL(fileURLWithPath: dir)
+        guard let directoryContents = try? FileManager.default.contentsOfDirectory(at: dirUrl, includingPropertiesForKeys: nil, options: []) else {
+            return urls
+        }
+        //查找dir里所有文件名包含'agoraapi'、'agorartmsdk'、'agorasdk'的三类文件
+        for fileURL in directoryContents {
+            // 过滤出文件名包含'agoraapi'、'agorartmsdk'、'agorasdk'的文件
+            let fileName = fileURL.lastPathComponent.lowercased()
+            if fileName.contains("agoraapi") || fileName.contains("agorartmsdk") || fileName.contains("agorasdk") {
+                urls.append(fileURL)
+            }
+        }
+        
+        return urls
     }
 }

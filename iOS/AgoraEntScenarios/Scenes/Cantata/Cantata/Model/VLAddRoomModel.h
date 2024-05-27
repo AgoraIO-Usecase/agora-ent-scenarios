@@ -7,6 +7,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger, StreamMode){
+    StreamModeNormol = 1,
+    StreamModeVol = 2,
+    StreamModeMix = 3,
+};
+
 @interface VLAddRoomModel : VLBaseModel
 
 @property (nonatomic, copy) NSString *belCanto;
@@ -17,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *soundEffect;
 @property (nonatomic, copy) NSString *userNo;
 @property (nonatomic, copy) NSString *icon;
-
+@property (nonatomic, assign) int streamMode;
 @end
 
 NS_ASSUME_NONNULL_END

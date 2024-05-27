@@ -1,6 +1,7 @@
 package io.agora.scene.show.widget.pk
 
 import android.view.View
+import androidx.core.view.isVisible
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.utils.dp
@@ -17,7 +18,7 @@ class LivePKViewAdapter: BindingSingleAdapter<LiveRoomConfig, ShowLivePkRequestM
     ) {
         val roomItem = getItem(position)!!
         val binding = holder.binding
-        binding.titleItemBoardcasterStatus.text = roomItem.getOwnerName()
+        binding.titleItemBoardcasterStatus.text = roomItem.getOwnerName() + "  (ID:${roomItem.getRoomId()})"
         binding.coverBoardcasterIcon.visibility = View.VISIBLE
         GlideApp.with(binding.coverBoardcasterIcon).load(roomItem.getOwnerAvatar())
             .fallback(R.mipmap.show_default_icon)

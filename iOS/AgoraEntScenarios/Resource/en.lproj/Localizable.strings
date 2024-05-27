@@ -53,6 +53,7 @@
 "app_logoff"="确认注销";
 "app_not_logoff"="暂不注销";
 "app_debug_mode"="开发者模式";
+"exit_app_debug_mode"="退出开发者模式";
 
 "app_voice_chat"="语聊房";
 "app_show_live"="秀场直播";
@@ -65,7 +66,7 @@
 "app_voice_chat_spatialTip"="—空间音频模式";
 
 "app_about_app"="关于声动互娱";
-"app_about_name"="声动互娱";
+"app_about_name"="声动互娱-K歌";
 "app_about_version"="版本号";
 "app_about_scene_version"="场景版本号";
 "app_about_chat_room"="语聊房";
@@ -165,12 +166,13 @@
 "home_category_title_ktv" = "在线K歌房";
 "home_category_title_voiceChat" = "语聊房";
 "home_category_title_live" = "直播";
+"home_category_title_joy" = "弹幕玩法";
 "home_content_item_ktv_title_solo" = "独唱&合唱";
 "home_content_item_ktv_desc_solo" = "超低延迟真合唱";
 "home_content_item_ktv_title_snatchsinging" = "抢唱";
 "home_content_item_ktv_desc_snatchsinging" = "热歌高潮片段";
 "home_content_item_ktv_title_cantata" = "大合唱";
-"home_content_item_ktv_desc_cantata" = "敬请期待";
+"home_content_item_ktv_desc_cantata" = "最高支持128人";
 "home_content_item_ktv_title_takesong" = "接唱";
 "home_content_item_ktv_desc_takesong" = "歌曲接龙";
 "home_content_item_voice_desc_immersive" = "更沉浸、更有趣、更动听";
@@ -184,6 +186,8 @@
 "home_content_item_live_desc_multiple" = "敬请期待";
 "home_content_item_live_title_show_1v1_private" = "秀场转1v1私密房";
 "home_content_item_live_desc_show_1v1_private" = "秒转场&秒接通";
+"home_content_item_live_title_joy" = "弹幕玩法";
+"home_content_item_live_desc_joy" = "直播互动新玩法";
 
 "feedback_tags_flashback" = "闪退";
 "feedback_tags_audioStuck" = "音频卡顿";

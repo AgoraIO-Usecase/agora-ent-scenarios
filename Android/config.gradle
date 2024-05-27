@@ -31,6 +31,8 @@ ext {
             rxjava2           : 'io.reactivex.rxjava2:rxjava:2.2.16',
             retrofit2         : "com.squareup.retrofit2:retrofit:$retrofit2_version",
             retrofit2_adapter : "com.squareup.retrofit2:adapter-rxjava2:$retrofit2_version",
+            retrofit2_cov     : "com.squareup.retrofit2:converter-gson:$retrofit2_version",
+            retrofit2_gson    : "com.squareup.retrofit2:converter-gson:$retrofit2_version",
             okhttp            : 'com.squareup.okhttp3:okhttp:3.12.0',
             okhttp_logger     : 'com.squareup.okhttp3:logging-interceptor:4.10.0',
 
@@ -48,10 +50,10 @@ ext {
             gson              : 'com.google.code.gson:gson:2.9.0',
             autosize          : 'com.github.JessYanCoding:AndroidAutoSize:v1.2.1',
 
-            rtc               : 'io.agora.rtc:agora-special-voice:4.1.1.169',
-            rtm               : 'io.agora:agora-rtm:2.1.8',
-            syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.2.9',
-            lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.1.1',
+            rtc               : 'io.agora.rtc:full-sdk:4.3.1',
+            rtm               : 'io.agora:agora-rtm:2.2.0',
+            syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.2.11',
+            lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.1.4',
 
             // android native libraries
             core_ktx           : "androidx.core:core-ktx:1.7.0",
@@ -69,7 +71,10 @@ ext {
             picturecompress    : 'io.github.lucksiege:compress:v3.11.1',
 
             // other
-            audiokit           : 'com.huawei.multimedia:audiokit:1.0.1'
+            audiokit           : 'com.huawei.multimedia:audiokit:1.0.1',
+
+            protobuf_java      : 'com.google.protobuf:protobuf-java:3.19.3',
+            protobuf_java_util : 'com.google.protobuf:protobuf-java-util:3.19.3'
     ]
     android = [
             compileSdkVersion: 31,

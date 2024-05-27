@@ -27,12 +27,14 @@ android {
 
         buildConfigField "String", "SERVER_HOST", "\"${SERVER_HOST}\""
         buildConfigField "String", "TOOLBOX_SERVER_HOST", "\"${TOOLBOX_SERVER_HOST}\""
+        buildConfigField "String", "ROOM_MANAGER_SERVER_HOST", "\"${ROOM_MANAGER_SERVER_HOST}\""
+        buildConfigField "String", "TOOLBOX_SERVER_HOST_DEV", "\"${TOOLBOX_SERVER_HOST_DEV}\""
 
         buildConfigField "String", "AGORA_APP_ID", "\"${AGORA_APP_ID}\""
         buildConfigField "String", "AGORA_APP_CERTIFICATE", "\"${AGORA_APP_CERTIFICATE}\""
 
-        buildConfigField "String", "CLOUD_PLAYER_KEY", "\"${CLOUD_PLAYER_KEY}\""
-        buildConfigField "String", "CLOUD_PLAYER_SECRET", "\"${CLOUD_PLAYER_SECRET}\""
+        buildConfigField "String", "RESTFUL_API_KEY", "\"${RESTFUL_API_KEY}\""
+        buildConfigField "String", "RESTFUL_API_SECRET", "\"${RESTFUL_API_SECRET}\""
     }
 
     buildTypes {
@@ -68,6 +70,7 @@ dependencies {
     api rootProject.ext.deps.okhttp_logger
     api rootProject.ext.deps.retrofit2
     api rootProject.ext.deps.retrofit2_adapter
+    api rootProject.ext.deps.retrofit2_gson
     api rootProject.ext.deps.gson
     implementation rootProject.ext.deps.autosize
 
@@ -81,4 +84,7 @@ dependencies {
 
     api rootProject.ext.deps.rtc
     api rootProject.ext.deps.ok2curl
+
+    api rootProject.ext.deps.protobuf_java
+    api rootProject.ext.deps.protobuf_java_util
 }
