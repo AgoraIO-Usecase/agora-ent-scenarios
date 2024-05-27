@@ -33,7 +33,6 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
             HomeScenesType.Full,
             HomeScenesType.KTV,
             HomeScenesType.Voice,
-            HomeScenesType.Live
             HomeScenesType.Live,
             HomeScenesType.Game
         )

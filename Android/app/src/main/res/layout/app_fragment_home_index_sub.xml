@@ -28,6 +28,7 @@
         android:textSize="16sp"
         android:textColor="@color/red_e0"
         android:text="@string/app_demo_test"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
