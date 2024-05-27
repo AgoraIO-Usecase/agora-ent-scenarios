@@ -26,22 +26,22 @@ include ':common:ui-widget'
 /*
  * 在线K歌房
  */
-include ':scenes:ktv'
+//include ':scenes:ktv'
 
 /*
  * 嗨歌抢唱
  */
-include ':scenes:ktv_singbattle'
+//include ':scenes:ktv_singbattle'
 
 /*
  * 抢麦接唱
  */
-include ':scenes:ktv_relay'
+//include ':scenes:ktv_relay'
 
 /**
  * 大合唱
  */
-include ':scenes:cantata'
+//include ':scenes:cantata'
 
 /*
  * 语聊房
@@ -69,7 +69,7 @@ include ':RTMSyncManager'
 /*
  * 1V1私密房
  */
-include ':scenes:pure1v1'
+//include ':scenes:pure1v1'
 
 /**
  * 秀场转1V1私密房
