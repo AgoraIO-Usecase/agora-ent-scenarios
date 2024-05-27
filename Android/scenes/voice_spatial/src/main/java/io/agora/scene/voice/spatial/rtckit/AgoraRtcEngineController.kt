@@ -2,7 +2,7 @@ package io.agora.scene.voice.spatial.rtckit
 
 import android.content.Context
 import android.util.Log
-import io.agora.mediaplayer.Constants.MediaPlayerError
+import io.agora.mediaplayer.Constants.MediaPlayerReason
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.*
@@ -552,7 +552,7 @@ class AgoraRtcEngineController {
     private var botRedPlayer: IMediaPlayer? = null
 
     private val firstMediaPlayerObserver = object : MediaPlayerObserver() {
-        override fun onPlayerStateChanged(state: MediaPlayerState?, error: MediaPlayerError?) {
+        override fun onPlayerStateChanged(state: MediaPlayerState?, error: MediaPlayerReason?) {
             "firstMediaPlayerObserver onPlayerStateChanged state:$state error:$error".logD(TAG)
             when (state) {
                 MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
