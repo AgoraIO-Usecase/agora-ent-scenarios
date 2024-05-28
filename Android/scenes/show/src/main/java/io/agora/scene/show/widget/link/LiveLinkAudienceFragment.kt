@@ -35,11 +35,11 @@ class LiveLinkAudienceFragment : BaseFragment() {
         binding.linkRequestList.adapter = linkRequestViewAdapter
         binding.iBtnStopLink.setOnClickListener {
             // 观众停止连麦
-            mListener?.onStopLinkingChosen()
+            mListener?.onStopLinkingChosen(it)
         }
         binding.iBtnCancelApply.setOnClickListener {
             // 观众撤回申请
-            mListener?.onStopApplyingChosen()
+            mListener?.onStopApplyingChosen(it)
             binding.iBtnStopLink.isVisible = false
             binding.iBtnCancelApply.isVisible = false
         }
@@ -54,7 +54,7 @@ class LiveLinkAudienceFragment : BaseFragment() {
      */
     fun setOnSeatStatus(userName: String, status: Int?) {
         if (mBinding == null) return
-        if (status == ShowInteractionStatus.onSeat.value) {
+        if (status == ShowInteractionStatus.linking) {
             if (userName == UserManager.getInstance().user.name) {
                 binding.iBtnCancelApply.isVisible = false
                 binding.iBtnStopLink.isVisible = true
@@ -89,7 +89,7 @@ class LiveLinkAudienceFragment : BaseFragment() {
             }
         }
 
-        if (interactionInfo != null && interactionInfo.interactStatus == ShowInteractionStatus.onSeat.value &&
+        if (interactionInfo != null && interactionInfo.interactStatus == ShowInteractionStatus.linking &&
             interactionInfo.userId == UserManager.getInstance().user.id.toString()
         ) {
             binding.iBtnCancelApply.isVisible = false
@@ -106,7 +106,7 @@ class LiveLinkAudienceFragment : BaseFragment() {
 
     interface Listener {
         fun onRequestRefreshing()
-        fun onStopLinkingChosen()
-        fun onStopApplyingChosen()
+        fun onStopLinkingChosen(view: View)
+        fun onStopApplyingChosen(view: View)
     }
 }

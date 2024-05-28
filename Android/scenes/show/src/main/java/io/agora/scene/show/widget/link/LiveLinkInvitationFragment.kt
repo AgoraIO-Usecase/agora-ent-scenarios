@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import io.agora.scene.base.component.BaseFragment
 import io.agora.scene.show.databinding.ShowLiveLinkInvitationMessageListBinding
+import io.agora.scene.show.service.ShowInteractionStatus
 import io.agora.scene.show.service.ShowUser
 
 class LiveLinkInvitationFragment : BaseFragment() {
@@ -17,9 +18,9 @@ class LiveLinkInvitationFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         linkInvitationViewAdapter.setClickListener(object : LiveLinkInvitationViewAdapter.OnClickListener {
-            override fun onClick(userItem: ShowUser, position: Int) {
+            override fun onClick(view : View, userItem: ShowUser, position: Int) {
                 // 主播发起邀请
-                mListener?.onInviteMicSeatItemChosen(userItem)
+                mListener?.onInviteMicSeatItemChosen(view, userItem)
             }
         })
     }
@@ -54,6 +55,7 @@ class LiveLinkInvitationFragment : BaseFragment() {
         binding.smartRefreshLayout.finishRefresh()
     }
 
+
     /**å
      * 连麦邀请列表-接受连麦-更新item选中状态
      */
@@ -79,9 +81,41 @@ class LiveLinkInvitationFragment : BaseFragment() {
         mListener = listener
     }
 
+    fun setOnSeatStatus(userName: String, status: Int?) {
+        val itemCount: Int = linkInvitationViewAdapter.itemCount
+        for (i in 0 until itemCount) {
+            linkInvitationViewAdapter.getItem(i)?.let {
+                if(status == null && it.status != ShowInteractionStatus.idle){
+                    linkInvitationViewAdapter.replace(
+                        i, ShowUser(
+                            it.userId,
+                            it.avatar,
+                            it.userName,
+                            ShowInteractionStatus.idle
+                        )
+                    )
+                    linkInvitationViewAdapter.notifyItemChanged(i)
+                    return
+                }
+                else if (it.userName == userName && status != null) {
+                    linkInvitationViewAdapter.replace(
+                        i, ShowUser(
+                            it.userId,
+                            it.avatar,
+                            it.userName,
+                            status
+                        )
+                    )
+                    linkInvitationViewAdapter.notifyItemChanged(i)
+                    return
+                }
+            }
+        }
+    }
+
     interface Listener {
-        fun onInviteMicSeatItemChosen(userItem: ShowUser)
+        fun onInviteMicSeatItemChosen(view: View, userItem: ShowUser)
         fun onRequestRefreshing()
-        fun onStopLinkingChosen()
+        fun onStopLinkingChosen(view: View)
     }
 }

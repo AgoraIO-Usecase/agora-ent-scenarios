@@ -52,7 +52,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
     private val mInputMethodManager by lazy { getSystemService(InputMethodManager::class.java) }
 
-    private val mThumbnailId by lazy { getRandomThumbnailId() }
     private val mRoomId by lazy { getRandomRoomId() }
 
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
@@ -244,7 +243,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         }
 
         binding.btnStartLive.isEnabled = false
-        mService.createRoom(mRoomId, roomName, mThumbnailId, {
+        mService.createRoom(mRoomId, roomName, {
             runOnUiThread {
                 isFinishToLiveDetail = true
                 LiveDetailActivity.launch(this@LivePrepareActivity, it)
@@ -343,8 +342,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     private fun getRandomRoomId() =
         (Random(TimeUtils.currentTimeMillis()).nextInt(10000) + 100000).toString()
 
-    private fun getRandomThumbnailId() =
-        Random(TimeUtils.currentTimeMillis()).nextInt(0, 3).toString()
 
     private fun getBeautySDKName(uri: String): String {
         return when (uri) {

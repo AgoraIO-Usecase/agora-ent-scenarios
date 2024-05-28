@@ -11,6 +11,7 @@ import android.util.Log
 import android.util.Size
 import android.view.*
 import android.view.ViewGroup.MarginLayoutParams
+import android.widget.Button
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
@@ -23,6 +24,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.IMediaPlayerObserver
+import io.agora.mediaplayer.data.MediaPlayerSource
 import io.agora.mediaplayer.data.PlayerUpdatedInfo
 import io.agora.mediaplayer.data.SrcInfo
 import io.agora.rtc2.ChannelMediaOptions
@@ -86,7 +88,11 @@ class LiveDetailFragment : Fragment() {
 
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
 
-        fun newInstance(roomDetail: ShowRoomDetailModel, handler: OnPageScrollEventHandler, position: Int) = LiveDetailFragment().apply {
+        fun newInstance(
+            roomDetail: ShowRoomDetailModel,
+            handler: OnPageScrollEventHandler,
+            position: Int
+        ) = LiveDetailFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(EXTRA_ROOM_DETAIL_INFO, roomDetail)
             }
@@ -98,7 +104,13 @@ class LiveDetailFragment : Fragment() {
     val mRoomInfo by lazy { (arguments?.getParcelable(EXTRA_ROOM_DETAIL_INFO) as? ShowRoomDetailModel)!! }
     private lateinit var mHandler: OnPageScrollEventHandler
     private var mPosition: Int = 0
-    private val mBinding by lazy { ShowLiveDetailFragmentBinding.inflate(LayoutInflater.from(requireContext())) }
+    private val mBinding by lazy {
+        ShowLiveDetailFragmentBinding.inflate(
+            LayoutInflater.from(
+                requireContext()
+            )
+        )
+    }
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
     private val isRoomOwner by lazy { mRoomInfo.ownerId == UserManager.getInstance().user.id.toString() }
 
@@ -133,10 +145,18 @@ class LiveDetailFragment : Fragment() {
     private val timerRoomEndRun = Runnable {
         destroy(false) // 房间到了限制时间
         showLivingEndLayout() // 房间到了限制时间
-        ShowLogger.d("showLivingEndLayout","timer end!")
+        ShowLogger.d("showLivingEndLayout", "timer end!")
     }
 
-    private val mMainRtcConnection by lazy { RtcConnection(mRoomInfo.roomId, UserManager.getInstance().user.id.toInt()) }
+    private val mMainRtcConnection by lazy {
+        RtcConnection(
+            mRoomInfo.roomId,
+            UserManager.getInstance().user.id.toInt()
+        )
+    }
+
+    private var mMicInvitationDialog: AlertDialog?= null
+    private var mPKInvitationDialog: AlertDialog?= null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -202,7 +222,10 @@ class LiveDetailFragment : Fragment() {
             val roomLeftTime =
                 ShowServiceProtocol.ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong())
             if (roomLeftTime > 0) {
-                mBinding.root.postDelayed(timerRoomEndRun, ShowServiceProtocol.ROOM_AVAILABLE_DURATION)
+                mBinding.root.postDelayed(
+                    timerRoomEndRun,
+                    ShowServiceProtocol.ROOM_AVAILABLE_DURATION
+                )
                 initRtcEngine()
                 initServiceWithJoinRoom()
             }
@@ -274,11 +297,11 @@ class LiveDetailFragment : Fragment() {
     }
 
     private var needRender = false
-    fun initAnchorVideoView(info: VideoLoader.AnchorInfo) : VideoLoader.VideoCanvasContainer? {
+    fun initAnchorVideoView(info: VideoLoader.AnchorInfo): VideoLoader.VideoCanvasContainer? {
         // 判断是否此时view还没有创建，即在View创建后第一时间渲染视频
         needRender = activity == null
         activity?.let {
-            if (interactionInfo != null && interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) {
+            if (interactionInfo != null && interactionInfo!!.interactStatus == ShowInteractionStatus.pking) {
                 if (info.channelId == mRoomInfo.roomId) {
                     return VideoLoader.VideoCanvasContainer(
                         viewLifecycleOwner,
@@ -317,7 +340,8 @@ class LiveDetailFragment : Fragment() {
 
     private fun initLivingEndLayout() {
         val livingEndLayout = mBinding.livingEndLayout
-        livingEndLayout.root.isVisible = ShowServiceProtocol.ROOM_AVAILABLE_DURATION < (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong()) && !isRoomOwner && !mRoomInfo.isRobotRoom()
+        livingEndLayout.root.isVisible =
+            ShowServiceProtocol.ROOM_AVAILABLE_DURATION < (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong()) && !isRoomOwner && !mRoomInfo.isRobotRoom()
         livingEndLayout.tvUserName.text = mRoomInfo.ownerName
         Glide.with(this@LiveDetailFragment)
             .load(mRoomInfo.ownerAvatar)
@@ -576,63 +600,121 @@ class LiveDetailFragment : Fragment() {
             return
         }
         // 编码分辨率
-        encodeVideoSize?.let { topBinding.tvEncodeResolution.text = getString(R.string.show_statistic_encode_resolution, "${it.height}x${it.width}") }
-        if (topBinding.tvEncodeResolution.text.isEmpty()) topBinding.tvEncodeResolution.text = getString(R.string.show_statistic_encode_resolution, "--")
+        encodeVideoSize?.let {
+            topBinding.tvEncodeResolution.text =
+                getString(R.string.show_statistic_encode_resolution, "${it.height}x${it.width}")
+        }
+        if (topBinding.tvEncodeResolution.text.isEmpty()) topBinding.tvEncodeResolution.text =
+            getString(R.string.show_statistic_encode_resolution, "--")
         // 接收分辨率
-        receiveVideoSize?.let { topBinding.tvReceiveResolution.text = getString(R.string.show_statistic_receive_resolution, "${it.height}x${it.width}") }
-        if (topBinding.tvReceiveResolution.text.isEmpty()) topBinding.tvReceiveResolution.text = getString(R.string.show_statistic_receive_resolution, "--")
+        receiveVideoSize?.let {
+            topBinding.tvReceiveResolution.text =
+                getString(R.string.show_statistic_receive_resolution, "${it.height}x${it.width}")
+        }
+        if (topBinding.tvReceiveResolution.text.isEmpty()) topBinding.tvReceiveResolution.text =
+            getString(R.string.show_statistic_receive_resolution, "--")
         // 编码帧率
-        encodeFps?.let { topBinding.tvStatisticEncodeFPS.text = getString(R.string.show_statistic_encode_fps, it.toString()) }
-        if (topBinding.tvStatisticEncodeFPS.text.isEmpty()) topBinding.tvStatisticEncodeFPS.text = getString(R.string.show_statistic_encode_fps, "--")
+        encodeFps?.let {
+            topBinding.tvStatisticEncodeFPS.text =
+                getString(R.string.show_statistic_encode_fps, it.toString())
+        }
+        if (topBinding.tvStatisticEncodeFPS.text.isEmpty()) topBinding.tvStatisticEncodeFPS.text =
+            getString(R.string.show_statistic_encode_fps, "--")
         // 接收帧率
-        receiveFPS?.let { topBinding.tvStatisticReceiveFPS.text = getString(R.string.show_statistic_receive_fps, it.toString()) }
-        if (topBinding.tvStatisticReceiveFPS.text.isEmpty()) topBinding.tvStatisticReceiveFPS.text = getString(R.string.show_statistic_receive_fps, "--")
+        receiveFPS?.let {
+            topBinding.tvStatisticReceiveFPS.text =
+                getString(R.string.show_statistic_receive_fps, it.toString())
+        }
+        if (topBinding.tvStatisticReceiveFPS.text.isEmpty()) topBinding.tvStatisticReceiveFPS.text =
+            getString(R.string.show_statistic_receive_fps, "--")
         // 下行延迟
-        downDelay?.let { topBinding.tvStatisticDownDelay.text = getString(R.string.show_statistic_delay, it.toString()) }
-        if (topBinding.tvStatisticDownDelay.text.isEmpty()) topBinding.tvStatisticDownDelay.text = getString(R.string.show_statistic_delay, "--")
+        downDelay?.let {
+            topBinding.tvStatisticDownDelay.text =
+                getString(R.string.show_statistic_delay, it.toString())
+        }
+        if (topBinding.tvStatisticDownDelay.text.isEmpty()) topBinding.tvStatisticDownDelay.text =
+            getString(R.string.show_statistic_delay, "--")
         // 上行丢包率
-        upLossPackage?.let { topBinding.tvStatisticUpLossPackage.text = getString(R.string.show_statistic_up_loss_package, it.toString()) }
-        if (topBinding.tvStatisticUpLossPackage.text.isEmpty()) topBinding.tvStatisticUpLossPackage.text = getString(R.string.show_statistic_up_loss_package, "--")
+        upLossPackage?.let {
+            topBinding.tvStatisticUpLossPackage.text =
+                getString(R.string.show_statistic_up_loss_package, it.toString())
+        }
+        if (topBinding.tvStatisticUpLossPackage.text.isEmpty()) topBinding.tvStatisticUpLossPackage.text =
+            getString(R.string.show_statistic_up_loss_package, "--")
         // 下行丢包率
-        downLossPackage?.let { topBinding.tvStatisticDownLossPackage.text = getString(R.string.show_statistic_down_loss_package, it.toString()) }
-        if (topBinding.tvStatisticDownLossPackage.text.isEmpty()) topBinding.tvStatisticDownLossPackage.text = getString(R.string.show_statistic_down_loss_package, "--")
+        downLossPackage?.let {
+            topBinding.tvStatisticDownLossPackage.text =
+                getString(R.string.show_statistic_down_loss_package, it.toString())
+        }
+        if (topBinding.tvStatisticDownLossPackage.text.isEmpty()) topBinding.tvStatisticDownLossPackage.text =
+            getString(R.string.show_statistic_down_loss_package, "--")
         // 上行码率
-        upBitrate?.let { topBinding.tvStatisticUpBitrate.text = getString(R.string.show_statistic_up_bitrate, it.toString()) }
-        if (topBinding.tvStatisticUpBitrate.text.isEmpty()) topBinding.tvStatisticUpBitrate.text = getString(R.string.show_statistic_up_bitrate, "--")
+        upBitrate?.let {
+            topBinding.tvStatisticUpBitrate.text =
+                getString(R.string.show_statistic_up_bitrate, it.toString())
+        }
+        if (topBinding.tvStatisticUpBitrate.text.isEmpty()) topBinding.tvStatisticUpBitrate.text =
+            getString(R.string.show_statistic_up_bitrate, "--")
         // 下行码率
-        downBitrate?.let { topBinding.tvStatisticDownBitrate.text = getString(R.string.show_statistic_down_bitrate, it.toString()) }
-        if (topBinding.tvStatisticDownBitrate.text.isEmpty()) topBinding.tvStatisticDownBitrate.text = getString(R.string.show_statistic_down_bitrate, "--")
+        downBitrate?.let {
+            topBinding.tvStatisticDownBitrate.text =
+                getString(R.string.show_statistic_down_bitrate, it.toString())
+        }
+        if (topBinding.tvStatisticDownBitrate.text.isEmpty()) topBinding.tvStatisticDownBitrate.text =
+            getString(R.string.show_statistic_down_bitrate, "--")
         // 上行网络
         topBinding.tvStatisticUpNet.isVisible = !isAudioOnlyMode
-        upLinkBps?.let { topBinding.tvStatisticUpNet.text = getString(R.string.show_statistic_up_net_speech, (it / 8192).toString()) }
-        if (topBinding.tvStatisticUpNet.text.isEmpty()) topBinding.tvStatisticUpNet.text = getString(R.string.show_statistic_up_net_speech, "--")
+        upLinkBps?.let {
+            topBinding.tvStatisticUpNet.text =
+                getString(R.string.show_statistic_up_net_speech, (it / 8192).toString())
+        }
+        if (topBinding.tvStatisticUpNet.text.isEmpty()) topBinding.tvStatisticUpNet.text =
+            getString(R.string.show_statistic_up_net_speech, "--")
         // 下行网络
         topBinding.tvStatisticDownNet.isVisible = !isAudioOnlyMode
-        downLinkBps?.let { topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, (it / 8192).toString()) }
-        if (topBinding.tvStatisticDownNet.text.isEmpty()) topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, "--")
+        downLinkBps?.let {
+            topBinding.tvStatisticDownNet.text =
+                getString(R.string.show_statistic_down_net_speech, (it / 8192).toString())
+        }
+        if (topBinding.tvStatisticDownNet.text.isEmpty()) topBinding.tvStatisticDownNet.text =
+            getString(R.string.show_statistic_down_net_speech, "--")
         // 秒开时间
         topBinding.tvQuickStartTime.isVisible = true
         if (isRoomOwner) {
-            topBinding.tvQuickStartTime.text = getString(R.string.show_statistic_quick_start_time, "--")
+            topBinding.tvQuickStartTime.text =
+                getString(R.string.show_statistic_quick_start_time, "--")
         } else {
             // TODO
-            topBinding.tvQuickStartTime.text = getString(R.string.show_statistic_quick_start_time, quickStartTime.toString())
+            topBinding.tvQuickStartTime.text =
+                getString(R.string.show_statistic_quick_start_time, quickStartTime.toString())
         }
         // 机型等级
         topBinding.tvStatisticDeviceGrade.isVisible = true
         val score = mRtcEngine.queryDeviceScore()
         if (score >= 90) {
-            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_high)) + "（$score）"
+            topBinding.tvStatisticDeviceGrade.text = getString(
+                R.string.show_device_grade,
+                getString(R.string.show_setting_preset_device_high)
+            ) + "（$score）"
         } else if (score >= 75) {
-            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_medium)) + "（$score）"
+            topBinding.tvStatisticDeviceGrade.text = getString(
+                R.string.show_device_grade,
+                getString(R.string.show_setting_preset_device_medium)
+            ) + "（$score）"
         } else {
-            topBinding.tvStatisticDeviceGrade.text = getString(R.string.show_device_grade, getString(R.string.show_setting_preset_device_low)) + "（$score）"
+            topBinding.tvStatisticDeviceGrade.text = getString(
+                R.string.show_device_grade,
+                getString(R.string.show_setting_preset_device_low)
+            ) + "（$score）"
         }
         // H265开关
         topBinding.tvStatisticH265.isVisible = true
         if (isRoomOwner) {
             codecType?.let {
-                topBinding.tvStatisticH265.text = getString(R.string.show_statistic_h265, if (it == 3) getString(R.string.show_setting_opened) else getString(R.string.show_setting_closed))
+                topBinding.tvStatisticH265.text = getString(
+                    R.string.show_statistic_h265,
+                    if (it == 3) getString(R.string.show_setting_opened) else getString(R.string.show_setting_closed)
+                )
             }
         } else {
             topBinding.tvStatisticH265.text = getString(R.string.show_statistic_h265, "--")
@@ -642,12 +724,22 @@ class LiveDetailFragment : Fragment() {
         if (isRoomOwner) {
             topBinding.tvStatisticSR.text = getString(R.string.show_statistic_sr, "--")
         } else {
-            topBinding.tvStatisticSR.text = getString(R.string.show_statistic_sr, if (VideoSetting.getCurrAudienceEnhanceSwitch()) getString(R.string.show_setting_opened) else getString(R.string.show_setting_closed))
+            topBinding.tvStatisticSR.text = getString(
+                R.string.show_statistic_sr,
+                if (VideoSetting.getCurrAudienceEnhanceSwitch()) getString(R.string.show_setting_opened) else getString(
+                    R.string.show_setting_closed
+                )
+            )
         }
         // pvc开关
         topBinding.tvStatisticPVC.isVisible = true
         if (isRoomOwner) {
-            topBinding.tvStatisticPVC.text = getString(R.string.show_statistic_pvc, if (VideoSetting.getCurrBroadcastSetting().video.PVC) getString(R.string.show_setting_opened) else getString(R.string.show_setting_closed))
+            topBinding.tvStatisticPVC.text = getString(
+                R.string.show_statistic_pvc,
+                if (VideoSetting.getCurrBroadcastSetting().video.PVC) getString(R.string.show_setting_opened) else getString(
+                    R.string.show_setting_closed
+                )
+            )
         } else {
             topBinding.tvStatisticPVC.text = getString(R.string.show_statistic_pvc, "--")
         }
@@ -655,29 +747,41 @@ class LiveDetailFragment : Fragment() {
         // 小流开关
         topBinding.tvStatisticLowStream.isVisible = true
         if (isRoomOwner) {
-            topBinding.tvStatisticLowStream.text = getString(R.string.show_statistic_low_stream, if (VideoSetting.getCurrLowStreamSetting() == null) getString(R.string.show_setting_closed) else getString(R.string.show_setting_opened))
+            topBinding.tvStatisticLowStream.text = getString(
+                R.string.show_statistic_low_stream,
+                if (VideoSetting.getCurrLowStreamSetting() == null) getString(R.string.show_setting_closed) else getString(
+                    R.string.show_setting_opened
+                )
+            )
         } else {
-            topBinding.tvStatisticLowStream.text = getString(R.string.show_statistic_low_stream, "--")
+            topBinding.tvStatisticLowStream.text =
+                getString(R.string.show_statistic_low_stream, "--")
         }
 
         // svc开关
         topBinding.tvStatisticSVC.isVisible = true
         if (isRoomOwner) {
-            topBinding.tvStatisticSVC.text = getString(R.string.show_statistic_svc, if (VideoSetting.getCurrLowStreamSetting()?.SVC == true) getString(R.string.show_setting_opened) else getString(R.string.show_setting_closed))
+            topBinding.tvStatisticSVC.text = getString(
+                R.string.show_statistic_svc,
+                if (VideoSetting.getCurrLowStreamSetting()?.SVC == true) getString(R.string.show_setting_opened) else getString(
+                    R.string.show_setting_closed
+                )
+            )
         } else {
             topBinding.tvStatisticSVC.text = getString(R.string.show_statistic_svc, "--")
         }
 
         // 本地uid
-        topBinding.tvLocalUid.text = getString(R.string.show_local_uid, "${UserManager.getInstance().user.id}")
+        topBinding.tvLocalUid.text =
+            getString(R.string.show_local_uid, "${UserManager.getInstance().user.id}")
     }
 
     private fun refreshViewDetailLayout(status: Int) {
         when (status) {
-            ShowInteractionStatus.idle.value -> {
-                if (interactionInfo?.interactStatus == ShowInteractionStatus.onSeat.value) {
+            ShowInteractionStatus.idle -> {
+                if (interactionInfo?.interactStatus == ShowInteractionStatus.linking) {
                     ToastUtils.showToast(R.string.show_link_is_stopped)
-                } else if (interactionInfo?.interactStatus == ShowInteractionStatus.pking.value) {
+                } else if (interactionInfo?.interactStatus == ShowInteractionStatus.pking) {
                     ToastUtils.showToast(R.string.show_pk_is_stopped)
                 }
 
@@ -685,12 +789,14 @@ class LiveDetailFragment : Fragment() {
                 mBinding.videoPKLayout.root.isVisible = false
                 mBinding.videoLinkingLayout.root.isVisible = true
             }
-            ShowInteractionStatus.onSeat.value -> {
+
+            ShowInteractionStatus.linking -> {
                 mBinding.videoPKLayout.root.isVisible = false
                 mBinding.videoLinkingLayout.root.isVisible = true
                 mBinding.videoLinkingAudienceLayout.root.isVisible = true
             }
-            ShowInteractionStatus.pking.value -> {
+
+            ShowInteractionStatus.pking -> {
                 mBinding.videoLinkingLayout.root.isVisible = false
                 mBinding.videoLinkingAudienceLayout.root.isVisible = false
                 mBinding.videoPKLayout.root.isVisible = true
@@ -699,24 +805,29 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun refreshPKTimeCount() {
-        if (interactionInfo != null && interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) {
+        if (interactionInfo != null && interactionInfo!!.interactStatus == ShowInteractionStatus.pking) {
             if (mPKCountDownLatch != null) {
                 mPKCountDownLatch!!.cancel()
                 mPKCountDownLatch = null
             }
-            mPKCountDownLatch = object : CountDownTimer(ShowServiceProtocol.PK_AVAILABLE_DURATION - 1, 1000) {
-                override fun onTick(millisUntilFinished: Long) {
-                    val min: Long = (millisUntilFinished / 1000) / 60
-                    val sec: Long = (millisUntilFinished / 1000) % 60
-                    activity ?: return
-                    mBinding.videoPKLayout.iPKTimeText.text =
-                        getString(R.string.show_count_time_for_pk, min.toString(), sec.toString())
-                }
+            mPKCountDownLatch =
+                object : CountDownTimer(ShowServiceProtocol.PK_AVAILABLE_DURATION - 1, 1000) {
+                    override fun onTick(millisUntilFinished: Long) {
+                        val min: Long = (millisUntilFinished / 1000) / 60
+                        val sec: Long = (millisUntilFinished / 1000) % 60
+                        activity ?: return
+                        mBinding.videoPKLayout.iPKTimeText.text =
+                            getString(
+                                R.string.show_count_time_for_pk,
+                                min.toString(),
+                                sec.toString()
+                            )
+                    }
 
-                override fun onFinish() {
-                    mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!)
-                }
-            }.start()
+                    override fun onFinish() {
+                        mService.stopInteraction(mRoomInfo.roomId)
+                    }
+                }.start()
         } else {
             if (mPKCountDownLatch != null) {
                 mPKCountDownLatch!!.cancel()
@@ -725,15 +836,6 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-    private fun refreshMicMuteStatus() {
-        if (interactionInfo == null) return
-        if (interactionInfo!!.interactStatus == ShowInteractionStatus.onSeat.value) {
-            mBinding.videoLinkingAudienceLayout.userName.isActivated = !interactionInfo!!.muteAudio
-        } else if (interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) {
-            mBinding.videoPKLayout.userNameA.isActivated = !interactionInfo!!.ownerMuteAudio
-            mBinding.videoPKLayout.userNameB.isActivated = !interactionInfo!!.muteAudio
-        }
-    }
 
     private fun insertMessageItem(msg: ShowMessage) = runOnUiThread {
         mMessageAdapter?.let {
@@ -746,11 +848,11 @@ class LiveDetailFragment : Fragment() {
         mSettingDialog.apply {
             setHostView(isRoomOwner || isMeLinking())
             if (isMeLinking()) {
-                resetSettingsItem(interactionInfo!!.muteAudio)
+                resetSettingsItem(false)
             }
 
             if (isRoomOwner && isPKing()) {
-                resetSettingsItem(interactionInfo!!.ownerMuteAudio)
+                resetSettingsItem(false)
             }
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
@@ -758,20 +860,32 @@ class LiveDetailFragment : Fragment() {
                     SettingDialog.ITEM_ID_QUALITY -> showPictureQualityDialog(this)
                     SettingDialog.ITEM_ID_VIDEO -> {
                         // 设置弹框设置摄像头，需要同步到PK 弹框中摄像头状态，后续需要统一获取
-                        if (activity is LiveDetailActivity){
+                        if (activity is LiveDetailActivity) {
                             (activity as LiveDetailActivity).toggleSelfVideo(activated, callback = {
                                 enableLocalVideo(activated)
-                                mPKSettingsDialog.resetItemStatus(LivePKSettingsDialog.ITEM_ID_CAMERA, activated)
+                                mPKSettingsDialog.resetItemStatus(
+                                    LivePKSettingsDialog.ITEM_ID_CAMERA,
+                                    activated
+                                )
                             })
                         }
                     }
+
                     SettingDialog.ITEM_ID_MIC -> {
-                        if (activity is LiveDetailActivity){
+                        if (activity is LiveDetailActivity) {
                             (activity as LiveDetailActivity).toggleSelfAudio(activated, callback = {
                                 if (!isRoomOwner) {
-                                    mService.muteAudio(mRoomInfo.roomId, !activated, interactionInfo!!.userId)
+                                    mService.muteAudio(
+                                        mRoomInfo.roomId,
+                                        !activated,
+                                        interactionInfo!!.userId
+                                    )
                                 } else {
-                                    mService.muteAudio(mRoomInfo.roomId, !activated, mRoomInfo.ownerId)
+                                    mService.muteAudio(
+                                        mRoomInfo.roomId,
+                                        !activated,
+                                        mRoomInfo.ownerId
+                                    )
                                     enableLocalAudio(activated)
                                     if (isPKing()) {
                                         mBinding.videoPKLayout.userNameA.isActivated = activated
@@ -780,12 +894,15 @@ class LiveDetailFragment : Fragment() {
                             })
                         }
                     }
+
                     SettingDialog.ITEM_ID_STATISTIC -> changeStatisticVisible()
                     SettingDialog.ITEM_ID_SETTING -> {
                         if (AgoraApplication.the().isDebugModeOpen) {
                             if (isHostView()) showDebugModeDialog() else showAudienceDebugModeDialog()
                         } else {
-                            if (isHostView()) showAdvanceSettingDialog() else AdvanceSettingAudienceDialog(context).show()
+                            if (isHostView()) showAdvanceSettingDialog() else AdvanceSettingAudienceDialog(
+                                context
+                            ).show()
                         }
                     }
                 }
@@ -851,28 +968,47 @@ class LiveDetailFragment : Fragment() {
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_NONE -> {
                     stopAudioMixing()
                 }
+
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY -> {
-                    startAudioMixing("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/happy.mp3", false, -1)
+                    startAudioMixing(
+                        "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/happy.mp3",
+                        false,
+                        -1
+                    )
                 }
+
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_ROMANTIC -> {
-                    startAudioMixing("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/romantic.mp3", false, -1)
+                    startAudioMixing(
+                        "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/romantic.mp3",
+                        false,
+                        -1
+                    )
                 }
+
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY2 -> {
-                    startAudioMixing("https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/relax.mp3", false, -1)
+                    startAudioMixing(
+                        "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/music/relax.mp3",
+                        false,
+                        -1
+                    )
                 }
 
                 MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_ORIGINAL -> {
                     mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CONVERSION_OFF)
                 }
+
                 MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_SWEET -> {
                     mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CHANGER_SWEET)
                 }
+
                 MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_ZHONGXIN -> {
                     mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CHANGER_NEUTRAL)
                 }
+
                 MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_WENZHONG -> {
                     mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CHANGER_SOLID)
                 }
+
                 MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_MOHUAN -> {
                     mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CHANGER_BASS)
                 }
@@ -880,15 +1016,19 @@ class LiveDetailFragment : Fragment() {
                 MusicEffectDialog.ITEM_ID_MIXING_NONE -> {
                     mRtcEngine.setAudioEffectPreset(Constants.AUDIO_EFFECT_OFF)
                 }
+
                 MusicEffectDialog.ITEM_ID_MIXING_KTV -> {
                     mRtcEngine.setAudioEffectPreset(Constants.ROOM_ACOUSTICS_KTV)
                 }
+
                 MusicEffectDialog.ITEM_ID_MIXING_CONCERT -> {
                     mRtcEngine.setAudioEffectPreset(Constants.ROOM_ACOUSTICS_VOCAL_CONCERT)
                 }
+
                 MusicEffectDialog.ITEM_ID_MIXING_LUYINPEN -> {
                     mRtcEngine.setAudioEffectPreset(Constants.ROOM_ACOUSTICS_STUDIO)
                 }
+
                 MusicEffectDialog.ITEM_ID_MIXING_KONGKUANG -> {
                     mRtcEngine.setAudioEffectPreset(Constants.ROOM_ACOUSTICS_SPACIAL)
                 }
@@ -900,19 +1040,24 @@ class LiveDetailFragment : Fragment() {
     private fun showLinkSettingsDialog() {
         mLinkSettingDialog.apply {
             setAudienceInfo(interactionInfo!!.userName)
-            resetSettingsItem(interactionInfo!!.muteAudio)
+            resetSettingsItem(false)
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
                     LiveLinkAudienceSettingsDialog.ITEM_ID_MIC -> {
-                        if (activity is LiveDetailActivity){
+                        if (activity is LiveDetailActivity) {
                             (activity as LiveDetailActivity).toggleSelfAudio(activated, callback = {
-                                mService.muteAudio(mRoomInfo.roomId, !activated, interactionInfo!!.userId)
+                                mService.muteAudio(
+                                    mRoomInfo.roomId,
+                                    !activated,
+                                    interactionInfo!!.userId
+                                )
                             })
                         }
                     }
+
                     LiveLinkAudienceSettingsDialog.ITEM_ID_STOP_LINK -> {
                         if (interactionInfo != null) {
-                            mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!, {
+                            mService.stopInteraction(mRoomInfo.roomId, {
                                 // success
                                 dismiss()
                             })
@@ -938,6 +1083,7 @@ class LiveDetailFragment : Fragment() {
             // 主播点击同意连麦申请
             override fun onAcceptMicSeatApplyChosen(
                 dialog: LiveLinkDialog,
+                view: View,
                 seatApply: ShowMicSeatApply
             ) {
                 if (interactionInfo != null) {
@@ -945,7 +1091,16 @@ class LiveDetailFragment : Fragment() {
                     return
                 }
                 linkStartTime = TimeUtils.currentTimeMillis()
-                mService.acceptMicSeatApply(mRoomInfo.roomId, seatApply)
+                view.isEnabled = false
+                mService.acceptMicSeatApply(mRoomInfo.roomId, seatApply.userId,
+                    success = {
+                        view.isEnabled = true
+                        ToastUtils.showToast("accept message successfully!")
+                    },
+                    error = {
+                        view.isEnabled = true
+                        ToastUtils.showToast("accept message failed!")
+                    })
             }
 
             // 在线用户列表刷新
@@ -958,27 +1113,48 @@ class LiveDetailFragment : Fragment() {
             }
 
             // 主播邀请用户连麦
-            override fun onOnlineAudienceInvitation(dialog: LiveLinkDialog, userItem: ShowUser) {
+            override fun onOnlineAudienceInvitation(dialog: LiveLinkDialog, view: View, userItem: ShowUser) {
                 if (interactionInfo != null) {
                     ToastUtils.showToast(R.string.show_cannot_invite)
                     return
                 }
-                mService.createMicSeatInvitation(mRoomInfo.roomId, userItem)
+                view.isEnabled = false
+                mService.createMicSeatInvitation(mRoomInfo.roomId, userItem.userId, success = {
+                    view.isEnabled = true
+                    ToastUtils.showToast("invite successfully!")
+                }, error = {
+                    view.isEnabled = true
+                    ToastUtils.showToast("invite failed!")
+                })
             }
 
             // 主播或连麦者停止连麦
-            override fun onStopLinkingChosen(dialog: LiveLinkDialog) {
+            override fun onStopLinkingChosen(dialog: LiveLinkDialog, view: View) {
                 if (interactionInfo != null) {
-                    mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!, {
-                        // success
+                    view.isEnabled = false
+                    mService.stopInteraction(mRoomInfo.roomId, success = {
+                        view.isEnabled = true
+                    }, error = {
+                        view.isEnabled = true
+                        ToastUtils.showToast("stop linking failed!")
                     })
                 }
             }
 
             // 观众撤回连麦申请
-            override fun onStopApplyingChosen(dialog: LiveLinkDialog) {
+            override fun onStopApplyingChosen(dialog: LiveLinkDialog, view: View) {
                 updateIdleMode()
-                mService.cancelMicSeatApply(mRoomInfo.roomId){}
+                view.isEnabled = false
+                mService.cancelMicSeatApply(
+                    mRoomInfo.roomId,
+                    UserManager.getInstance().user.id.toString(),
+                    success = {
+                        view.isEnabled = true
+                    },
+                    error = {
+                        view.isEnabled = true
+                        ToastUtils.showToast("cancel apply failed!")
+                    })
             }
         })
 
@@ -989,38 +1165,61 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-    private fun showInvitationDialog() {
+    private fun showInvitationDialog(invitation: ShowMicSeatInvitation) {
+        if (mMicInvitationDialog?.isShowing == true) {
+            return
+        }
         prepareLinkingMode()
-        val dialog = AlertDialog.Builder(requireContext(), R.style.show_alert_dialog).apply {
-            setTitle(getString(R.string.show_ask_for_link, mRoomInfo.ownerName))
-            setPositiveButton(R.string.show_setting_confirm) { dialog, _ ->
+        mMicInvitationDialog = AlertDialog.Builder(requireContext(), R.style.show_alert_dialog).apply {
+            setTitle(getString(R.string.show_ask_for_link, invitation.userName))
+
+            setPositiveButton(R.string.show_setting_confirm) { dialog, which ->
                 if (mLinkInvitationCountDownLatch != null) {
                     mLinkInvitationCountDownLatch!!.cancel()
                     mLinkInvitationCountDownLatch = null
                 }
-                mService.acceptMicSeatInvitation(mRoomInfo.roomId)
-                dialog.dismiss()
+                (dialog as? AlertDialog)?.getButton(which)?.isEnabled = false
+                mService.acceptMicSeatInvitation(mRoomInfo.roomId, invitation.id,
+                    success = {
+                        (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
+                        ToastUtils.showToast("accept invitation successfully!")
+                    },
+                    error = {
+                        (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
+                        ToastUtils.showToast("accept invitation failed!")
+                    }
+                )
             }
-            setNegativeButton(R.string.show_setting_cancel) { dialog, _ ->
+            setNegativeButton(R.string.show_setting_cancel) { dialog, which ->
                 updateIdleMode()
-                mService.rejectMicSeatInvitation(mRoomInfo.roomId)
-                dialog.dismiss()
+                (dialog as? AlertDialog)?.getButton(which)?.isEnabled = false
+                mService.rejectMicSeatInvitation(mRoomInfo.roomId, invitation.id,
+                    success = {
+                        (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
+                        ToastUtils.showToast("reject invitation successfully!")
+                        dialog.dismiss()
+                    },
+                    error = {
+                        (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
+                        ToastUtils.showToast("reject invitation failed!")
+                    }
+                )
             }
         }.create()
-        dialog.show()
+        mMicInvitationDialog?.show()
         if (mLinkInvitationCountDownLatch != null) {
             mLinkInvitationCountDownLatch!!.cancel()
             mLinkInvitationCountDownLatch = null
         }
         mLinkInvitationCountDownLatch = object : CountDownTimer(15 * 1000 - 1, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                dialog.getButton(DialogInterface.BUTTON_NEGATIVE).text =
+                mMicInvitationDialog?.getButton(DialogInterface.BUTTON_NEGATIVE)?.text =
                     "${getString(R.string.show_setting_cancel)}(" + millisUntilFinished / 1000 + "s)"
             }
 
             override fun onFinish() {
-                mService.rejectMicSeatInvitation(mRoomInfo.roomId)
-                dialog.dismiss()
+                mService.rejectMicSeatInvitation(mRoomInfo.roomId, invitation.id)
+                mMicInvitationDialog?.dismiss()
             }
         }.start()
     }
@@ -1028,18 +1227,32 @@ class LiveDetailFragment : Fragment() {
     private fun showPKDialog() {
         mPKDialog.setPKDialogActionListener(object : OnPKDialogActionListener {
             override fun onRequestMessageRefreshing(dialog: LivePKDialog) {
-                mService.getAllPKUserList({ roomList ->
-                    mService.getAllPKInvitationList(mRoomInfo.roomId,true, null, { invitationList ->
-                        mPKDialog.setOnlineBroadcasterList(
-                            interactionInfo,
-                            roomList,
-                            invitationList
-                        )
-                    })
+                mService.getAllPKUserList(mRoomInfo.roomId, { pkUserList ->
+                    mPKDialog.setOnlineBroadcasterList(
+                        interactionInfo,
+                        pkUserList.map {
+                            LiveRoomConfig(
+                                ShowRoomDetailModel(
+                                    it.roomId,
+                                    "",
+                                    0,
+                                    it.userId,
+                                    it.avatar,
+                                    it.userName,
+                                ),
+                                it.status,
+                                false
+                            )
+                        }
+                    )
                 })
             }
 
-            override fun onInviteButtonChosen(dialog: LivePKDialog, roomItem: LiveRoomConfig) {
+            override fun onInviteButtonChosen(
+                dialog: LivePKDialog,
+                view: View,
+                roomItem: LiveRoomConfig
+            ) {
                 if (roomItem.isRobotRoom()) {
                     ToastUtils.showToast(context?.getString(R.string.show_tip1))
                     return
@@ -1048,14 +1261,19 @@ class LiveDetailFragment : Fragment() {
                     val roomDetail = roomItem.convertToShowRoomDetailModel()
                     prepareRoomInfo = roomDetail
                     preparePKingMode(roomDetail.roomId)
-                    mService.createPKInvitation(mRoomInfo.roomId, roomDetail) {
+                    view.isEnabled = false
+                    mService.createPKInvitation(mRoomInfo.roomId, roomDetail.roomId, success = {
+                        view.isEnabled = true
+                        ToastUtils.showToast("invite message successfully!")
+                    }) {
+                        view.isEnabled = true
                         ToastUtils.showToast("invite message failed!")
                     }
                 }
             }
 
             override fun onStopPKingChosen(dialog: LivePKDialog) {
-                mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!)
+                mService.stopInteraction(mRoomInfo.roomId)
             }
         })
         if (!mPKDialog.isVisible) {
@@ -1067,79 +1285,99 @@ class LiveDetailFragment : Fragment() {
 
     var pkStartTime = 0L
 
-    private fun showPKInvitationDialog(name: String) {
-        val dialog = AlertDialog.Builder(requireContext(), R.style.show_alert_dialog).apply {
+    private fun showPKInvitationDialog(name: String, pkInvitation: ShowPKInvitation) {
+        if(mPKInvitationDialog?.isShowing == true){
+            return
+        }
+        mPKInvitationDialog = AlertDialog.Builder(requireContext(), R.style.show_alert_dialog).apply {
             setCancelable(false)
             setTitle(getString(R.string.show_ask_for_pk, name))
-            setPositiveButton(R.string.show_setting_confirm) { dialog, _ ->
+            setPositiveButton(R.string.show_setting_confirm) { dialog, which ->
                 if (mPKInvitationCountDownLatch != null) {
                     mPKInvitationCountDownLatch!!.cancel()
                     mPKInvitationCountDownLatch = null
                 }
                 pkStartTime = TimeUtils.currentTimeMillis()
-                mService.acceptPKInvitation(mRoomInfo.roomId, {
-                    dialog.dismiss()
+                (dialog as? AlertDialog)?.getButton(which)?.isEnabled = false
+                mService.acceptPKInvitation(mRoomInfo.roomId, pkInvitation.id, {
+                    (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
+                    ToastUtils.showToast("accept message successfully!")
                 }) {
+                    (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
                     ToastUtils.showToast("accept message failed!")
                 }
             }
-            setNegativeButton(R.string.show_setting_cancel) { dialog, _ ->
+            setNegativeButton(R.string.show_setting_cancel) { dialog, which ->
                 updateIdleMode()
-                mService.rejectPKInvitation(mRoomInfo.roomId, {
+                (dialog as? AlertDialog)?.getButton(which)?.isEnabled = false
+                mService.rejectPKInvitation(mRoomInfo.roomId, pkInvitation.id, {
+                    (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
                     dialog.dismiss()
                 }) {
+                    (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
                     ToastUtils.showToast("reject message failed!")
                 }
                 isPKCompetition = false
             }
         }.create()
-        dialog.show()
+        mPKInvitationDialog?.show()
         if (mPKInvitationCountDownLatch != null) {
             mPKInvitationCountDownLatch!!.cancel()
             mPKInvitationCountDownLatch = null
         }
         mPKInvitationCountDownLatch = object : CountDownTimer(15 * 1000 - 1, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                dialog.getButton(DialogInterface.BUTTON_NEGATIVE).text =
+                mPKInvitationDialog?.getButton(DialogInterface.BUTTON_NEGATIVE)?.text =
                     "取消(" + millisUntilFinished / 1000 + "s)"
             }
 
             override fun onFinish() {
                 updateIdleMode()
-                mService.rejectPKInvitation(mRoomInfo.roomId) { }
-                dialog.dismiss()
+                mService.rejectPKInvitation(mRoomInfo.roomId, pkInvitation.id) { }
+                mPKInvitationDialog?.dismiss()
             }
         }.start()
     }
 
     private fun showPKSettingsDialog() {
         mPKSettingsDialog.apply {
-            resetSettingsItem(interactionInfo!!.ownerMuteAudio)
+            resetSettingsItem(false)
             setPKInfo(interactionInfo!!.userName)
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
                     LivePKSettingsDialog.ITEM_ID_CAMERA -> {
-                        if (activity is LiveDetailActivity){
+                        if (activity is LiveDetailActivity) {
                             (activity as LiveDetailActivity).toggleSelfVideo(activated, callback = {
                                 enableLocalVideo(activated)
                                 // pk 弹框设置摄像头，需要同步到设置弹框中摄像头状态，后续需要统一获取
-                                mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_VIDEO, activated)
+                                mSettingDialog.resetItemStatus(
+                                    SettingDialog.ITEM_ID_VIDEO,
+                                    activated
+                                )
                             })
                         }
 
                     }
+
                     LivePKSettingsDialog.ITEM_ID_SWITCH_CAMERA -> mRtcEngine.switchCamera()
                     LivePKSettingsDialog.ITEM_ID_MIC -> {
-                        if (activity is LiveDetailActivity){
+                        if (activity is LiveDetailActivity) {
                             (activity as LiveDetailActivity).toggleSelfAudio(activated, callback = {
                                 mService.muteAudio(mRoomInfo.roomId, !activated, mRoomInfo.ownerId)
-                                mRtcEngine.muteLocalAudioStreamEx(!activated, RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()))
+                                mRtcEngine.muteLocalAudioStreamEx(
+                                    !activated,
+                                    RtcConnection(
+                                        interactionInfo!!.roomId,
+                                        UserManager.getInstance().user.id.toInt()
+                                    )
+                                )
                             })
                         }
                     }
+
                     LivePKSettingsDialog.ITEM_ID_STOP_PK -> {
                         if (interactionInfo != null) {
-                            mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!, {
+                            mService.stopInteraction(mRoomInfo.roomId, {
                                 // success
                                 dismiss()
                             })
@@ -1171,17 +1409,18 @@ class LiveDetailFragment : Fragment() {
     private fun initServiceWithJoinRoom() {
         mService.joinRoom(mRoomInfo.roomId,
             success = {
-                mService.sendChatMessage(mRoomInfo.roomId, getString(R.string.show_live_chat_coming))
+                mService.sendChatMessage(
+                    mRoomInfo.roomId,
+                    getString(R.string.show_live_chat_coming)
+                )
                 initService()
             },
             error = {
-                if ((it as? RoomException)?.currRoomNo == mRoomInfo.roomId) {
-                    runOnUiThread {
-                        destroy(false)
-                        // 进房Error
-                        showLivingEndLayout() // 进房Error
-                        ShowLogger.d("showLivingEndLayout", "join room error!:${it.message}")
-                    }
+                runOnUiThread {
+                    destroy(false)
+                    // 进房Error
+                    showLivingEndLayout() // 进房Error
+                    ShowLogger.d("showLivingEndLayout", "join room error!:${it.message}")
                 }
             })
     }
@@ -1189,68 +1428,42 @@ class LiveDetailFragment : Fragment() {
     private fun initService() {
         reFetchUserList()
         mService.subscribeReConnectEvent(mRoomInfo.roomId) {
+            context ?: return@subscribeReConnectEvent
             reFetchUserList()
             reFetchPKInvitationList()
             reFetchInteractionList()
         }
         mService.subscribeCurrRoomEvent(mRoomInfo.roomId) { status, _ ->
-            if (status == ShowServiceProtocol.ShowSubscribeStatus.deleted) {
+            if (status == ShowSubscribeStatus.deleted) {
                 destroy(false) // 房间被房主关闭
                 showLivingEndLayout()// 房间被房主关闭
-                ShowLogger.d("showLivingEndLayout","room delete by owner!")
+                ShowLogger.d("showLivingEndLayout", "room delete by owner!")
+            }
+        }
+        mService.subscribeMicSeatInvitation(mRoomInfo.roomId) { _, invitation ->
+            invitation ?: return@subscribeMicSeatInvitation
+            context ?: return@subscribeMicSeatInvitation
+            if (invitation.type == ShowInvitationType.invitation) {
+                showInvitationDialog(invitation)
             }
         }
         mService.subscribeUser(mRoomInfo.roomId) { status, user ->
             reFetchUserList()
-            if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && user != null) {
-                if (user.status == ShowRoomRequestStatus.waitting.value) {
-                    if (isRoomOwner) {
-                        mLinkDialog.setSeatInvitationItemStatus(
-                            ShowUser(
-                                user.userId,
-                                user.avatar,
-                                user.userName,
-                                user.status
-                            )
-                        )
-                    } else if (user.userId == UserManager.getInstance().user.id.toString()) {
-                        showInvitationDialog()
-                    }
-                } else {
-                    mLinkDialog.setSeatInvitationItemStatus(
-                        ShowUser(
-                            user.userId,
-                            user.avatar,
-                            user.userName,
-                            user.status
-                        )
-                    )
-                }
-            }
         }
         mService.subscribeMessage(mRoomInfo.roomId) { _, showMessage ->
             insertMessageItem(showMessage)
         }
-        mService.subscribeMicSeatApply(mRoomInfo.roomId) { _, _ ->
-            mService.getAllMicSeatApplyList(mRoomInfo.roomId, { list ->
-                if (isRoomOwner) {
-                    mBinding.bottomLayout.vLinkingDot.isVisible =
-                        list.any { it.status == ShowRoomRequestStatus.waitting.value }
-                }
-                mLinkDialog.setSeatApplyList(interactionInfo, list)
-            })
+        mService.subscribeMicSeatApply(mRoomInfo.roomId) { _, list ->
+            if (isRoomOwner) {
+                mBinding.bottomLayout.vLinkingDot.isVisible = list.isNotEmpty() || isMeLinking()
+            }
+            mLinkDialog.setSeatApplyList(interactionInfo, list)
         }
         mService.subscribeInteractionChanged(mRoomInfo.roomId) { status, info ->
-            if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && info != null) {
+            context ?: return@subscribeInteractionChanged
+            if (status == ShowSubscribeStatus.updated && info != null) {
                 // 开始互动
                 if (interactionInfo == null) {
-//                    if (deletedPKInvitation != null) {
-//                        mService.stopInteraction(mRoomInfo.roomId, info, {
-//                            // success
-//                        })
-//                        deletedPKInvitation = null
-//                        return@subscribeInteractionChanged
-//                    }
                     interactionInfo = info
                     // UI
                     updateVideoSetting(true)
@@ -1265,13 +1478,13 @@ class LiveDetailFragment : Fragment() {
                 } else {
                     // 互动中状态更新
                     interactionInfo = info
-                    updateAudioMuteStatus()
-                    refreshMicMuteStatus()
                 }
+                mMicInvitationDialog?.dismiss()
+                mPKInvitationDialog?.dismiss()
             } else {
                 // 停止互动
                 // UI
-                refreshViewDetailLayout(ShowInteractionStatus.idle.value)
+                refreshViewDetailLayout(ShowInteractionStatus.idle)
                 mLinkDialog.setOnSeatStatus("", null)
                 mPKDialog.setPKInvitationItemStatus("", null)
                 // RTC
@@ -1285,51 +1498,35 @@ class LiveDetailFragment : Fragment() {
         }
 
         mService.subscribePKInvitationChanged(mRoomInfo.roomId) { status, info ->
-            mService.getAllPKUserList({ roomList ->
-                mService.getAllPKInvitationList(mRoomInfo.roomId, true, null, { invitationList ->
-                    mPKDialog.setOnlineBroadcasterList(interactionInfo, roomList, invitationList)
-                })
-            })
-            if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && info != null) {
-                if (info.status == ShowRoomRequestStatus.waitting.value && info.userId == UserManager.getInstance().user.id.toString() && interactionInfo == null) {
+            info ?: return@subscribePKInvitationChanged
+            if (info.userId == UserManager.getInstance().user.id.toString()
+                && context != null
+            ) {
+                if (info.type == ShowInvitationType.invitation) {
                     isPKCompetition = true
                     preparePKingMode(info.fromRoomId)
-                    showPKInvitationDialog(info.fromName)
-                }
-            } else {
-                // 被邀请者结束pk
-                val curUserId = UserManager.getInstance().user.id.toString()
-                if (info != null && (info.userId == curUserId || info.fromUserId == curUserId)) {
-//                    deletedPKInvitation = info
-                    updateIdleMode()
-                    if (interactionInfo != null) {
-                        mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!, {
-                            // success
-                        })
-//                        deletedPKInvitation = null
-                    }
+                    showPKInvitationDialog(info.fromUserName, info)
                 }
             }
         }
 
-        mService.getAllInterationList(mRoomInfo.roomId, {
-            val interactionInfo = it.getOrNull(0)
+        mService.getInteractionInfo(mRoomInfo.roomId, { interactionInfo ->
             this.interactionInfo = interactionInfo
             if (interactionInfo != null && isRoomOwner) {
-                mService.stopInteraction(mRoomInfo.roomId, interactionInfo)
+                mService.stopInteraction(mRoomInfo.roomId)
             }
             refreshBottomLayout()
-            val isPkMode = interactionInfo?.interactStatus == ShowInteractionStatus.pking.value
+            val isPkMode = interactionInfo?.interactStatus == ShowInteractionStatus.pking
             updateVideoSetting(isPkMode)
             if (interactionInfo != null) {
                 refreshViewDetailLayout(interactionInfo.interactStatus)
-                if (interactionInfo.interactStatus == ShowInteractionStatus.onSeat.value) {
+                if (interactionInfo.interactStatus == ShowInteractionStatus.linking) {
                     updateLinkingMode()
-                } else if (interactionInfo.interactStatus == ShowInteractionStatus.pking.value) {
+                } else if (interactionInfo.interactStatus == ShowInteractionStatus.pking) {
                     updatePKingMode()
                 }
             } else {
-                refreshViewDetailLayout(ShowInteractionStatus.idle.value)
+                refreshViewDetailLayout(ShowInteractionStatus.idle)
             }
         })
     }
@@ -1342,36 +1539,10 @@ class LiveDetailFragment : Fragment() {
 
     private fun reFetchPKInvitationList() {
         ShowLogger.d(TAG, "reFetchPKInvitationList")
-        mService.getAllPKInvitationList(mRoomInfo.roomId,false, null, { list ->
-            list.forEach {
-                if (it.userId == UserManager.getInstance().user.id.toString()
-                    && it.status == ShowRoomRequestStatus.waitting.value && interactionInfo == null
-                ) {
-                    ShowLogger.d(TAG, "reconnect pk invitation")
-                    isPKCompetition = true
-                    preparePKingMode(it.fromRoomId)
-                    showPKInvitationDialog(it.fromName)
-                }
-            }
-        })
-        if (prepareRkRoomId.isNotEmpty() && prepareRoomInfo != null) {
-            ShowLogger.d(TAG, "reFetchPKInvitationList1")
-            mService.getAllPKInvitationList(mRoomInfo.roomId, false, prepareRoomInfo, { list ->
-                list.forEach {
-                    if (it.fromUserId == UserManager.getInstance().user.id.toString() && it.fromRoomId == mRoomInfo.roomId
-                        && it.status == ShowRoomRequestStatus.accepted.value && interactionInfo == null
-                    ) {
-                        ShowLogger.d(TAG, "reconnect pk accepted")
-                        mService.startInteraction(it)
-                    }
-                }
-            }) {}
-        }
     }
 
     private fun reFetchInteractionList() {
-        mService.getAllInterationList(mRoomInfo.roomId, { list ->
-            val info = list.getOrNull(0)
+        mService.getInteractionInfo(mRoomInfo.roomId, { info ->
             if (info != null && this.interactionInfo == null) {
                 interactionInfo = info
                 // UI
@@ -1388,7 +1559,7 @@ class LiveDetailFragment : Fragment() {
 
             if (info == null && this.interactionInfo != null) {
                 // UI
-                refreshViewDetailLayout(ShowInteractionStatus.idle.value)
+                refreshViewDetailLayout(ShowInteractionStatus.idle)
                 mLinkDialog.setOnSeatStatus("", null)
                 mPKDialog.setPKInvitationItemStatus("", null)
                 // RTC
@@ -1407,34 +1578,34 @@ class LiveDetailFragment : Fragment() {
         isLinking() && interactionInfo?.userId == UserManager.getInstance().user.id.toString()
 
     private fun isLinking() = (interactionInfo?.interactStatus
-        ?: ShowInteractionStatus.idle.value) == ShowInteractionStatus.onSeat.value
+        ?: ShowInteractionStatus.idle) == ShowInteractionStatus.linking
 
     private fun isPKing() = (interactionInfo?.interactStatus
-        ?: ShowInteractionStatus.idle.value) == ShowInteractionStatus.pking.value
+        ?: ShowInteractionStatus.idle) == ShowInteractionStatus.pking
 
     private fun destroyService() {
-        if (interactionInfo != null &&
-            ((interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) && isRoomOwner)
-        ) {
-            mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!, {
-                mService.leaveRoom(mRoomInfo.roomId)
-            }, {
-                mService.leaveRoom(mRoomInfo.roomId)
-            })
-        }else{
-            mService.leaveRoom(mRoomInfo.roomId)
+        val info = interactionInfo
+        if (info != null) {
+            if (info.userId == UserManager.getInstance().user.id.toString() || isRoomOwner) {
+                mService.stopInteraction(mRoomInfo.roomId)
+            }
         }
+
+        mService.leaveRoom(mRoomInfo.roomId)
     }
 
     private fun showLivingEndLayout() {
         if (isRoomOwner) {
             val context = activity ?: return
             AlertDialog.Builder(context, R.style.show_alert_dialog)
-                .setView(ShowLivingEndDialogBinding.inflate(LayoutInflater.from(requireContext())).apply {
-                    Glide.with(this@LiveDetailFragment)
-                        .load(mRoomInfo.ownerAvatar)
-                        .into(ivAvatar)
-                }.root)
+                .setView(
+                    ShowLivingEndDialogBinding.inflate(LayoutInflater.from(requireContext()))
+                        .apply {
+                            Glide.with(this@LiveDetailFragment)
+                                .load(mRoomInfo.ownerAvatar)
+                                .into(ivAvatar)
+                        }.root
+                )
                 .setCancelable(false)
                 .setPositiveButton(R.string.show_living_end_back_room_list) { dialog, _ ->
                     activity?.finish()
@@ -1455,8 +1626,8 @@ class LiveDetailFragment : Fragment() {
         val eventListener = object : IRtcEngineEventHandler() {
             override fun onUserOffline(uid: Int, reason: Int) {
                 super.onUserOffline(uid, reason)
-                if (interactionInfo != null && interactionInfo!!.userId == uid.toString() && interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) {
-                    mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!)
+                if (interactionInfo != null && interactionInfo!!.userId == uid.toString() && interactionInfo!!.interactStatus == ShowInteractionStatus.pking) {
+                    mService.stopInteraction(mRoomInfo.roomId)
                 }
             }
 
@@ -1490,7 +1661,7 @@ class LiveDetailFragment : Fragment() {
                     }
                 }
 
-                if (state == Constants.REMOTE_VIDEO_STATE_PLAYING
+                if (state == Constants.REMOTE_VIDEO_STATE_DECODING
                     && (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED || reason == Constants.REMOTE_VIDEO_STATE_REASON_LOCAL_UNMUTED)
                 ) {
                     val durationFromSubscribe = SystemClock.elapsedRealtime() - subscribeMediaTime
@@ -1536,7 +1707,8 @@ class LiveDetailFragment : Fragment() {
 
             override fun onRemoteVideoStats(stats: RemoteVideoStats) {
                 super.onRemoteVideoStats(stats)
-                val isLinkingAudience = isRoomOwner && isLinking() && stats.uid.toString() == interactionInfo?.userId
+                val isLinkingAudience =
+                    isRoomOwner && isLinking() && stats.uid.toString() == interactionInfo?.userId
                 if (stats.uid == mRoomInfo.ownerId.toInt() || isLinkingAudience) {
                     runOnUiThread {
                         refreshStatisticInfo(
@@ -1553,7 +1725,8 @@ class LiveDetailFragment : Fragment() {
             override fun onRemoteAudioStats(stats: RemoteAudioStats) {
                 super.onRemoteAudioStats(stats)
                 // 连麦观众
-                val isLinkingAudience = isRoomOwner && isLinking() && stats.uid.toString() == interactionInfo?.userId
+                val isLinkingAudience =
+                    isRoomOwner && isLinking() && stats.uid.toString() == interactionInfo?.userId
                 if (stats.uid == mRoomInfo.ownerId.toInt() || isLinkingAudience) {
                     runOnUiThread {
                         refreshStatisticInfo(
@@ -1607,24 +1780,31 @@ class LiveDetailFragment : Fragment() {
         }
 
         if (activity is LiveDetailActivity) {
-            (activity as LiveDetailActivity).toggleSelfVideo(isRoomOwner || isMeLinking(), callback = {
-                joinChannel(eventListener)
-                initVideoView()
-                initAudioModeration()
-            })
-            (activity as LiveDetailActivity).toggleSelfAudio(isRoomOwner || isMeLinking(), callback = {
-                // nothing
-                scenarioApi.initialize()
-                if (isRoomOwner) {
-                    scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
-                } else if (isMeLinking()) {
-                    scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_InteractiveAudience)
-                }
-            })
+            (activity as LiveDetailActivity).toggleSelfVideo(
+                isRoomOwner || isMeLinking(),
+                callback = {
+                    joinChannel(eventListener)
+                    initVideoView()
+                    initAudioModeration()
+                })
+            (activity as LiveDetailActivity).toggleSelfAudio(
+                isRoomOwner || isMeLinking(),
+                callback = {
+                    // nothing
+                    scenarioApi.initialize()
+                    if (isRoomOwner) {
+                        scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
+                    } else if (isMeLinking()) {
+                        scenarioApi.setAudioScenario(
+                            SceneType.Show,
+                            AudioScenarioType.Show_InteractiveAudience
+                        )
+                    }
+                })
         }
     }
 
-    private fun enableContentInspectEx(){
+    private fun enableContentInspectEx() {
         // ------------------ 开启鉴黄服务 ------------------
         val contentInspectConfig = ContentInspectConfig()
         try {
@@ -1636,11 +1816,10 @@ class LiveDetailFragment : Fragment() {
             val module = ContentInspectModule()
             module.interval = 60
             module.type = CONTENT_INSPECT_TYPE_IMAGE_MODERATION
-            contentInspectConfig.modules = arrayOf( module)
+            contentInspectConfig.modules = arrayOf(module)
             contentInspectConfig.moduleCount = 1
             mRtcEngine.enableContentInspectEx(true, contentInspectConfig, mMainRtcConnection)
-        }
-        catch (_: JSONException) {
+        } catch (_: JSONException) {
 
         }
     }
@@ -1669,7 +1848,8 @@ class LiveDetailFragment : Fragment() {
                     }
                     // 540P、480P
                     else if ((stats.width == VideoSetting.Resolution.V_540P.height && stats.height == VideoSetting.Resolution.V_540P.width)
-                        || (stats.width == VideoSetting.Resolution.V_480P.height && stats.height == VideoSetting.Resolution.V_480P.width)) {
+                        || (stats.width == VideoSetting.Resolution.V_480P.height && stats.height == VideoSetting.Resolution.V_480P.width)
+                    ) {
                         superResolution = VideoSetting.SuperResolution.SR_1_33
                     }
                     // 360P以及以下
@@ -1699,6 +1879,7 @@ class LiveDetailFragment : Fragment() {
                     superResolution = VideoSetting.SuperResolution.SR_NONE
                 }
             }
+
             VideoSetting.RecommendBroadcastSetting.LowDevicePK, VideoSetting.RecommendBroadcastSetting.MediumDevicePK, VideoSetting.RecommendBroadcastSetting.HighDevicePK -> when (VideoSetting.getCurrAudiencePlaySetting()) {
                 // 画质增强、高端机
                 VideoSetting.AudiencePlaySetting.ENHANCE_HIGH -> {
@@ -1731,7 +1912,12 @@ class LiveDetailFragment : Fragment() {
             mMediaPlayer?.destroy()
 
             if (isPKing()) {
-                mRtcEngine.leaveChannelEx(RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()))
+                mRtcEngine.leaveChannelEx(
+                    RtcConnection(
+                        interactionInfo!!.roomId,
+                        UserManager.getInstance().user.id.toInt()
+                    )
+                )
             }
             mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CONVERSION_OFF)
             mRtcEngine.setAudioEffectPreset(Constants.AUDIO_EFFECT_OFF)
@@ -1748,7 +1934,7 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-    private fun enableLocalVideo(enable: Boolean){
+    private fun enableLocalVideo(enable: Boolean) {
         mRtcEngine.muteLocalVideoStreamEx(!enable, mMainRtcConnection)
         if (enable) {
             mRtcEngine.startPreview()
@@ -1784,7 +1970,12 @@ class LiveDetailFragment : Fragment() {
         }
 
         if (isRoomOwner) {
-            mRtcEngine.joinChannelEx(RtcEngineInstance.generalToken(), mMainRtcConnection, channelMediaOptions, eventListener)
+            mRtcEngine.joinChannelEx(
+                RtcEngineInstance.generalToken(),
+                mMainRtcConnection,
+                channelMediaOptions,
+                eventListener
+            )
         } else {
             mRtcEngine.addHandlerEx(eventListener, mMainRtcConnection)
         }
@@ -1823,12 +2014,12 @@ class LiveDetailFragment : Fragment() {
         BeautyManager.setupLocalVideo(videoView, container.renderMode)
     }
 
-    private fun updateVideoSetting(isPkMode:Boolean) {
+    private fun updateVideoSetting(isPkMode: Boolean) {
         VideoSetting.setIsPkMode(isPkMode)
         if (isRoomOwner || isMeLinking()) {
             VideoSetting.updateBroadcastSetting(
                 when (interactionInfo?.interactStatus) {
-                    ShowInteractionStatus.pking.value -> VideoSetting.LiveMode.PK
+                    ShowInteractionStatus.pking -> VideoSetting.LiveMode.PK
                     else -> VideoSetting.LiveMode.OneVOne
                 },
                 isLinkAudience = !isRoomOwner,
@@ -1839,35 +2030,39 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-    private fun updateAudioMuteStatus() {
-        if (interactionInfo == null) return
-        if (interactionInfo!!.interactStatus == ShowInteractionStatus.onSeat.value) {
-            if (interactionInfo!!.userId == UserManager.getInstance().user.id.toString()) {
-                enableLocalAudio(!interactionInfo!!.muteAudio)
-            }
-        } else if (interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) {
-            if (isRoomOwner) {
-                enableLocalAudio(!interactionInfo!!.ownerMuteAudio)
-            }
-        }
-    }
 
     private fun updateIdleMode() {
         ShowLogger.d(TAG, "Interaction >> updateIdleMode")
-        if (interactionInfo?.interactStatus == ShowInteractionStatus.pking.value) {
+        if (interactionInfo?.interactStatus == ShowInteractionStatus.pking) {
             // 退出连麦多频道，主播需要离开对方频道
             if (isRoomOwner) {
-                mRtcEngine.leaveChannelEx(RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()))
+                mRtcEngine.leaveChannelEx(
+                    RtcConnection(
+                        interactionInfo!!.roomId,
+                        UserManager.getInstance().user.id.toInt()
+                    )
+                )
             } else {
                 mHandler.updateRoomInfo(
                     position = mPosition,
-                    VideoLoader.RoomInfo(mRoomInfo.roomId, arrayListOf(
-                        VideoLoader.AnchorInfo(mRoomInfo.roomId, mRoomInfo.ownerId.toInt(), RtcEngineInstance.generalToken())
-                    ))
+                    VideoLoader.RoomInfo(
+                        mRoomInfo.roomId, arrayListOf(
+                            VideoLoader.AnchorInfo(
+                                mRoomInfo.roomId,
+                                mRoomInfo.ownerId.toInt(),
+                                RtcEngineInstance.generalToken()
+                            )
+                        )
+                    )
                 )
             }
         } else if (prepareRkRoomId.isNotEmpty()) {
-            mRtcEngine.leaveChannelEx(RtcConnection(prepareRkRoomId, UserManager.getInstance().user.id.toInt()))
+            mRtcEngine.leaveChannelEx(
+                RtcConnection(
+                    prepareRkRoomId,
+                    UserManager.getInstance().user.id.toInt()
+                )
+            )
         }
         prepareRkRoomId = ""
 
@@ -1876,7 +2071,13 @@ class LiveDetailFragment : Fragment() {
             enableLocalVideo(true)
             mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_VIDEO, true)
             activity?.let {
-                setupLocalVideo(VideoLoader.VideoCanvasContainer(it, mBinding.videoLinkingLayout.videoContainer, 0))
+                setupLocalVideo(
+                    VideoLoader.VideoCanvasContainer(
+                        it,
+                        mBinding.videoLinkingLayout.videoContainer,
+                        0
+                    )
+                )
             }
             refreshStatisticInfo(
                 receiveVideoSize = Size(0, 0),
@@ -1901,7 +2102,7 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-    private fun prepareLinkingMode(){
+    private fun prepareLinkingMode() {
         ShowLogger.d(TAG, "Interaction >> prepareLinkingMode")
 
         val channelMediaOptions = ChannelMediaOptions()
@@ -1928,14 +2129,13 @@ class LiveDetailFragment : Fragment() {
     private fun updateLinkingMode() {
         // 开始连麦
         if (interactionInfo == null) return
-        if (interactionInfo?.interactStatus != ShowInteractionStatus.onSeat.value) return
+        if (interactionInfo?.interactStatus != ShowInteractionStatus.linking) return
         val rtcConnection = mMainRtcConnection
         ShowLogger.d(TAG, "Interaction >> updateLinkingMode")
 
         mBinding.videoLinkingAudienceLayout.userName.text = interactionInfo!!.userName
         mBinding.videoLinkingAudienceLayout.userName.bringToFront()
-        mBinding.videoLinkingAudienceLayout.userName.isActivated =
-            interactionInfo?.muteAudio?.not() ?: false
+        mBinding.videoLinkingAudienceLayout.userName.isActivated = false
         if (isRoomOwner) {
             // 连麦主播视角
             mBinding.videoLinkingAudienceLayout.videoContainer.setOnClickListener {
@@ -1989,9 +2189,12 @@ class LiveDetailFragment : Fragment() {
                     (activity as LiveDetailActivity).toggleSelfVideo(true, callback = {
                         if (it) {
                             // 有权限
-                            mRtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, rtcConnection)
+                            mRtcEngine.updateChannelMediaOptionsEx(
+                                channelMediaOptions,
+                                rtcConnection
+                            )
                             val context = activity ?: return@toggleSelfVideo
-                            val textureView =  TextureView(context)
+                            val textureView = TextureView(context)
                             mBinding.videoLinkingAudienceLayout.videoContainer.addView(textureView)
                             mRtcEngine.setupLocalVideo(VideoCanvas(
                                 textureView
@@ -2000,12 +2203,15 @@ class LiveDetailFragment : Fragment() {
                             })
                         } else {
                             // 没有权限
-                            mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!)
+                            mService.stopInteraction(mRoomInfo.roomId)
                         }
                     })
                     (activity as LiveDetailActivity).toggleSelfAudio(true, callback = {
                         // nothing
-                        scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_InteractiveAudience)
+                        scenarioApi.setAudioScenario(
+                            SceneType.Show,
+                            AudioScenarioType.Show_InteractiveAudience
+                        )
                     })
                 }
             } else {
@@ -2039,7 +2245,8 @@ class LiveDetailFragment : Fragment() {
         channelMediaOptions.autoSubscribeVideo = true
         channelMediaOptions.autoSubscribeAudio = false
         channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-        channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_ULTRA_LOW_LATENCY
+        channelMediaOptions.audienceLatencyLevel =
+            Constants.AUDIENCE_LATENCY_LEVEL_ULTRA_LOW_LATENCY
         channelMediaOptions.isInteractiveAudience = true
         val pkRtcConnection = RtcConnection(
             pkRoomId,
@@ -2049,7 +2256,7 @@ class LiveDetailFragment : Fragment() {
             RtcEngineInstance.generalToken(),
             pkRtcConnection,
             channelMediaOptions,
-            object: IRtcEngineEventHandler() {
+            object : IRtcEngineEventHandler() {
                 override fun onRemoteVideoStats(stats: RemoteVideoStats) {
                     super.onRemoteVideoStats(stats)
                     if (isRoomOwner) {
@@ -2082,7 +2289,12 @@ class LiveDetailFragment : Fragment() {
                     }
                 }
 
-                override fun onFirstRemoteVideoFrame(uid: Int, width: Int, height: Int, elapsed: Int) {
+                override fun onFirstRemoteVideoFrame(
+                    uid: Int,
+                    width: Int,
+                    height: Int,
+                    elapsed: Int
+                ) {
                     super.onFirstRemoteVideoFrame(uid, width, height, elapsed)
                     if (interactionInfo?.userId == uid.toString()) {
                         if (pkStartTime != 0L) {
@@ -2109,9 +2321,9 @@ class LiveDetailFragment : Fragment() {
     private fun updatePKingMode() {
         // 开始pk
         if (interactionInfo == null) return
-        if (interactionInfo?.interactStatus != ShowInteractionStatus.pking.value) return
+        if (interactionInfo?.interactStatus != ShowInteractionStatus.pking) return
         ShowLogger.d(TAG, "Interaction >> updatePKingMode pkRoomId=${interactionInfo!!.roomId}")
-        val eventListener = object: IRtcEngineEventHandler() {
+        val eventListener = object : IRtcEngineEventHandler() {
             override fun onRemoteVideoStats(stats: RemoteVideoStats) {
                 super.onRemoteVideoStats(stats)
                 if (isRoomOwner) {
@@ -2165,9 +2377,7 @@ class LiveDetailFragment : Fragment() {
         }
 
         mBinding.videoPKLayout.userNameA.text = mRoomInfo.ownerName
-        mBinding.videoPKLayout.userNameA.isActivated = interactionInfo!!.ownerMuteAudio.not()
         mBinding.videoPKLayout.userNameB.text = interactionInfo!!.userName
-        mBinding.videoPKLayout.userNameB.isActivated = interactionInfo!!.muteAudio.not()
         if (isRoomOwner) {
             // pk 主播
             mBinding.livingComeSoonLayout.root.isVisible = false
@@ -2185,7 +2395,7 @@ class LiveDetailFragment : Fragment() {
                 )
             }
             enableLocalAudio(true)
-            if (isRoomOwner){
+            if (isRoomOwner) {
                 // 连麦摄像头默认开启 todo 统一入口获取摄像头状态
                 mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_VIDEO, true)
                 mPKSettingsDialog.resetItemStatus(LivePKSettingsDialog.ITEM_ID_CAMERA, true)
@@ -2198,7 +2408,8 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.autoSubscribeVideo = true
             channelMediaOptions.autoSubscribeAudio = true
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-            channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_ULTRA_LOW_LATENCY
+            channelMediaOptions.audienceLatencyLevel =
+                Constants.AUDIENCE_LATENCY_LEVEL_ULTRA_LOW_LATENCY
             channelMediaOptions.isInteractiveAudience = true
             val pkRtcConnection = RtcConnection(
                 interactionInfo!!.roomId,
@@ -2236,10 +2447,20 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
             mHandler.updateRoomInfo(
                 position = mPosition,
-                VideoLoader.RoomInfo(mRoomInfo.roomId, arrayListOf(
-                    VideoLoader.AnchorInfo(mRoomInfo.roomId, mRoomInfo.ownerId.toInt(), RtcEngineInstance.generalToken()),
-                    VideoLoader.AnchorInfo(interactionInfo!!.roomId, interactionInfo?.userId!!.toInt(), RtcEngineInstance.generalToken()),
-                ))
+                VideoLoader.RoomInfo(
+                    mRoomInfo.roomId, arrayListOf(
+                        VideoLoader.AnchorInfo(
+                            mRoomInfo.roomId,
+                            mRoomInfo.ownerId.toInt(),
+                            RtcEngineInstance.generalToken()
+                        ),
+                        VideoLoader.AnchorInfo(
+                            interactionInfo!!.roomId,
+                            interactionInfo?.userId!!.toInt(),
+                            RtcEngineInstance.generalToken()
+                        ),
+                    )
+                )
             )
         }
     }
@@ -2307,69 +2528,13 @@ class LiveDetailFragment : Fragment() {
         loopbackOnly: Boolean,
         cycle: Int
     ) {
-        val mediaPlayer = mMediaPlayer ?: mRtcEngine.createMediaPlayer().apply {
-            registerPlayerObserver(object : IMediaPlayerObserver {
-                override fun onPlayerStateChanged(
-                    state: io.agora.mediaplayer.Constants.MediaPlayerState?,
-                    error: io.agora.mediaplayer.Constants.MediaPlayerError?
-                ) {
-                    if(error == io.agora.mediaplayer.Constants.MediaPlayerError.PLAYER_ERROR_NONE){
-                        if(state == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED){
-                            play()
-                        }
-                    }
-                }
-
-                override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
-
-                }
-
-                override fun onPlayerEvent(
-                    eventCode: io.agora.mediaplayer.Constants.MediaPlayerEvent?,
-                    elapsedTime: Long,
-                    message: String?
-                ) {
-
-                }
-
-                override fun onMetaData(
-                    type: io.agora.mediaplayer.Constants.MediaPlayerMetadataType?,
-                    data: ByteArray?
-                ) {
-
-                }
-
-                override fun onPlayBufferUpdated(playCachedBuffer: Long) {
-
-                }
-
-                override fun onPreloadEvent(
-                    src: String?,
-                    event: io.agora.mediaplayer.Constants.MediaPlayerPreloadEvent?
-                ) {
-
-                }
-
-                override fun onAgoraCDNTokenWillExpire() {
-
-                }
-
-                override fun onPlayerSrcInfoChanged(from: SrcInfo?, to: SrcInfo?) {
-
-                }
-
-                override fun onPlayerInfoUpdated(info: PlayerUpdatedInfo?) {
-
-                }
-
-                override fun onAudioVolumeIndication(volume: Int) {
-
-                }
-            })
-        }
+        val mediaPlayer = mMediaPlayer ?: mRtcEngine.createMediaPlayer()
         mMediaPlayer = mediaPlayer
         mediaPlayer.stop()
-        mediaPlayer.open(filePath, 0)
+        mediaPlayer.openWithMediaSource(MediaPlayerSource().apply {
+            url = filePath
+            isAutoPlay = true
+        })
         mediaPlayer.setLoopCount(if (cycle >= 0) 0 else Int.MAX_VALUE)
 
         if (!loopbackOnly) {
