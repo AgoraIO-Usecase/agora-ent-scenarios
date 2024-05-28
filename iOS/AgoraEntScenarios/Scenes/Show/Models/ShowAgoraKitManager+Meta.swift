@@ -14,7 +14,7 @@ extension ShowAgoraKitManager {
         // 背景分割
         let ret = engine?.setParameters("{\"rtc.video.seg_before_exts\":true}")
         showLogger.info("registerMetaPlugin setParameters ret:\(ret ?? -9999)")
-        enableAIVirtualBackground()
+//        enableAIVirtualBackground()
         // metakit
         engine?.registerExtension(withVendor: "agora_video_filters_metakit",extension: "metakit", sourceType: AgoraMediaSourceType.primaryCamera)
         engine?.enableExtension(withVendor: "agora_video_filters_metakit",extension: "metakit", enabled: true)
@@ -138,7 +138,7 @@ extension ShowAgoraKitManager {
         let light_info = String(data: light_data!, encoding: String.Encoding.utf8)
         
         // 根据 JSON 配置添加人像边缘火焰效果
-//        enableAIVirtualBackground()
+        enableAIVirtualBackground()
         engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit",extension: "metakit",key: "setEffectVideo",value: light_info!)
     }
     
@@ -188,7 +188,7 @@ extension ShowAgoraKitManager {
         if enabled {
             // 开启
             guard let imagePath = effectBgImgPath else { return }
-//            enableAIVirtualBackground()
+            enableAIVirtualBackground()
             bg_dict = ["mode": "tex360", "param" : ["path": "\(imagePath)/pano.jpg", "rotation": "0"]] as [String : Any]
             // 开启 对于360全景、3d最好打开陀螺仪，才能体验其效果
             gyro_dict = ["state": "on"]
