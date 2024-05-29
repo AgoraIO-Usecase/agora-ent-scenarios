@@ -4,14 +4,21 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.CountDownTimer
+import android.os.Looper
+import android.os.SystemClock
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.util.Size
-import android.view.*
+import android.view.LayoutInflater
+import android.view.SurfaceView
+import android.view.TextureView
+import android.view.View
+import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
-import android.widget.Button
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
@@ -23,10 +30,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.mediaplayer.IMediaPlayer
-import io.agora.mediaplayer.IMediaPlayerObserver
 import io.agora.mediaplayer.data.MediaPlayerSource
-import io.agora.mediaplayer.data.PlayerUpdatedInfo
-import io.agora.mediaplayer.data.SrcInfo
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
@@ -52,9 +56,18 @@ import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
 import io.agora.scene.show.databinding.ShowLivingEndDialogBinding
 import io.agora.scene.show.debugSettings.DebugAudienceSettingDialog
 import io.agora.scene.show.debugSettings.DebugSettingDialog
-import io.agora.scene.show.service.*
-import io.agora.videoloaderapi.OnPageScrollEventHandler
-import io.agora.videoloaderapi.VideoLoader
+import io.agora.scene.show.service.ShowInteractionInfo
+import io.agora.scene.show.service.ShowInteractionStatus
+import io.agora.scene.show.service.ShowInvitationType
+import io.agora.scene.show.service.ShowMessage
+import io.agora.scene.show.service.ShowMicSeatApply
+import io.agora.scene.show.service.ShowMicSeatInvitation
+import io.agora.scene.show.service.ShowPKInvitation
+import io.agora.scene.show.service.ShowRoomDetailModel
+import io.agora.scene.show.service.ShowServiceProtocol
+import io.agora.scene.show.service.ShowSubscribeStatus
+import io.agora.scene.show.service.ShowUser
+import io.agora.scene.show.service.isRobotRoom
 import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
 import io.agora.scene.show.widget.AdvanceSettingDialog
 import io.agora.scene.show.widget.MusicEffectDialog
@@ -72,6 +85,8 @@ import io.agora.scene.show.widget.pk.OnPKDialogActionListener
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.videoloaderapi.OnPageScrollEventHandler
+import io.agora.videoloaderapi.VideoLoader
 import org.json.JSONException
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -847,13 +862,6 @@ class LiveDetailFragment : Fragment() {
     private fun showSettingDialog() {
         mSettingDialog.apply {
             setHostView(isRoomOwner || isMeLinking())
-            if (isMeLinking()) {
-                resetSettingsItem(false)
-            }
-
-            if (isRoomOwner && isPKing()) {
-                resetSettingsItem(false)
-            }
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
                     SettingDialog.ITEM_ID_CAMERA -> mRtcEngine.switchCamera()
@@ -874,23 +882,11 @@ class LiveDetailFragment : Fragment() {
                     SettingDialog.ITEM_ID_MIC -> {
                         if (activity is LiveDetailActivity) {
                             (activity as LiveDetailActivity).toggleSelfAudio(activated, callback = {
-                                if (!isRoomOwner) {
-                                    mService.muteAudio(
-                                        mRoomInfo.roomId,
-                                        !activated,
-                                        interactionInfo!!.userId
-                                    )
-                                } else {
-                                    mService.muteAudio(
-                                        mRoomInfo.roomId,
-                                        !activated,
-                                        mRoomInfo.ownerId
-                                    )
-                                    enableLocalAudio(activated)
-                                    if (isPKing()) {
-                                        mBinding.videoPKLayout.userNameA.isActivated = activated
-                                    }
-                                }
+                                mService.muteAudio(
+                                    mRoomInfo.roomId,
+                                    !activated
+                                )
+                                enableLocalAudio(activated)
                             })
                         }
                     }
@@ -1040,21 +1036,9 @@ class LiveDetailFragment : Fragment() {
     private fun showLinkSettingsDialog() {
         mLinkSettingDialog.apply {
             setAudienceInfo(interactionInfo!!.userName)
-            resetSettingsItem(false)
+            resetSettingsItem()
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
-                    LiveLinkAudienceSettingsDialog.ITEM_ID_MIC -> {
-                        if (activity is LiveDetailActivity) {
-                            (activity as LiveDetailActivity).toggleSelfAudio(activated, callback = {
-                                mService.muteAudio(
-                                    mRoomInfo.roomId,
-                                    !activated,
-                                    interactionInfo!!.userId
-                                )
-                            })
-                        }
-                    }
-
                     LiveLinkAudienceSettingsDialog.ITEM_ID_STOP_LINK -> {
                         if (interactionInfo != null) {
                             mService.stopInteraction(mRoomInfo.roomId, {
@@ -1363,7 +1347,7 @@ class LiveDetailFragment : Fragment() {
                     LivePKSettingsDialog.ITEM_ID_MIC -> {
                         if (activity is LiveDetailActivity) {
                             (activity as LiveDetailActivity).toggleSelfAudio(activated, callback = {
-                                mService.muteAudio(mRoomInfo.roomId, !activated, mRoomInfo.ownerId)
+                                mService.muteAudio(mRoomInfo.roomId, !activated)
                                 mRtcEngine.muteLocalAudioStreamEx(
                                     !activated,
                                     RtcConnection(
@@ -1449,6 +1433,12 @@ class LiveDetailFragment : Fragment() {
         }
         mService.subscribeUser(mRoomInfo.roomId) { status, user ->
             reFetchUserList()
+
+            if (status == ShowSubscribeStatus.updated) {
+                if (interactionInfo?.interactStatus == ShowInteractionStatus.linking && interactionInfo?.userId == user?.userId) {
+                    mBinding.videoLinkingAudienceLayout.userName.isActivated = !(user?.muteAudio ?: false)
+                }
+            }
         }
         mService.subscribeMessage(mRoomInfo.roomId) { _, showMessage ->
             insertMessageItem(showMessage)
@@ -1512,9 +1502,6 @@ class LiveDetailFragment : Fragment() {
 
         mService.getInteractionInfo(mRoomInfo.roomId, { interactionInfo ->
             this.interactionInfo = interactionInfo
-            if (interactionInfo != null && isRoomOwner) {
-                mService.stopInteraction(mRoomInfo.roomId)
-            }
             refreshBottomLayout()
             val isPkMode = interactionInfo?.interactStatus == ShowInteractionStatus.pking
             updateVideoSetting(isPkMode)
@@ -1584,13 +1571,6 @@ class LiveDetailFragment : Fragment() {
         ?: ShowInteractionStatus.idle) == ShowInteractionStatus.pking
 
     private fun destroyService() {
-        val info = interactionInfo
-        if (info != null) {
-            if (info.userId == UserManager.getInstance().user.id.toString() || isRoomOwner) {
-                mService.stopInteraction(mRoomInfo.roomId)
-            }
-        }
-
         mService.leaveRoom(mRoomInfo.roomId)
     }
 
@@ -2135,13 +2115,14 @@ class LiveDetailFragment : Fragment() {
 
         mBinding.videoLinkingAudienceLayout.userName.text = interactionInfo!!.userName
         mBinding.videoLinkingAudienceLayout.userName.bringToFront()
-        mBinding.videoLinkingAudienceLayout.userName.isActivated = false
+        mBinding.videoLinkingAudienceLayout.userName.isActivated = true
         if (isRoomOwner) {
             // 连麦主播视角
             mBinding.videoLinkingAudienceLayout.videoContainer.setOnClickListener {
                 showLinkSettingsDialog()
             }
             enableLocalAudio(true)
+            mService.muteAudio(mRoomInfo.roomId, false)
             // pk摄像头默认开启 todo 统一入口获取摄像头状态
             mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_VIDEO, true)
             mPKSettingsDialog.resetItemStatus(LivePKSettingsDialog.ITEM_ID_CAMERA, true)

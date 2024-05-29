@@ -183,7 +183,6 @@ interface ShowServiceProtocol {
     fun muteAudio(
         roomId: String,
         mute: Boolean,
-        userId: String,
         success: (() -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )

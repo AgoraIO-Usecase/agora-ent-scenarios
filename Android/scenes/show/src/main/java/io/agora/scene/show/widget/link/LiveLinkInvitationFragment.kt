@@ -64,12 +64,7 @@ class LiveLinkInvitationFragment : BaseFragment() {
         for (i in 0 until itemCount) {
             linkInvitationViewAdapter.getItem(i)?.let {
                 if (it.userId == user.userId) {
-                    linkInvitationViewAdapter.replace(i, ShowUser(
-                        it.userId,
-                        it.avatar,
-                        it.userName,
-                        user.status
-                    ))
+                    linkInvitationViewAdapter.replace(i, it.copy(status = user.status))
                     linkInvitationViewAdapter.notifyItemChanged(i)
                     return
                 }
@@ -87,24 +82,14 @@ class LiveLinkInvitationFragment : BaseFragment() {
             linkInvitationViewAdapter.getItem(i)?.let {
                 if(status == null && it.status != ShowInteractionStatus.idle){
                     linkInvitationViewAdapter.replace(
-                        i, ShowUser(
-                            it.userId,
-                            it.avatar,
-                            it.userName,
-                            ShowInteractionStatus.idle
-                        )
+                        i, it.copy(status = ShowInteractionStatus.idle)
                     )
                     linkInvitationViewAdapter.notifyItemChanged(i)
                     return
                 }
                 else if (it.userName == userName && status != null) {
                     linkInvitationViewAdapter.replace(
-                        i, ShowUser(
-                            it.userId,
-                            it.avatar,
-                            it.userName,
-                            status
-                        )
+                        i, it.copy(status = status)
                     )
                     linkInvitationViewAdapter.notifyItemChanged(i)
                     return

@@ -80,6 +80,7 @@ data class ShowUser constructor(
     val userId: String,
     val avatar: String,
     val userName: String,
+    val muteAudio: Boolean,
     @ShowInteractionStatus val status: Int = ShowInteractionStatus.idle,
     val isWaiting: Boolean = false
 )
@@ -144,11 +145,11 @@ data class ShowPKInvitation constructor(
 
 //连麦/Pk模型
 data class ShowInteractionInfo constructor(
-    val userId: String,
-    val userName: String,
-    val roomId: String,
-    @ShowInteractionStatus val interactStatus: Int,
-    val createdAt: Double
+    val userId: String, // 互动者ID
+    val userName: String, // 互动者用户名
+    val roomId: String, // 互动房间ID
+    @ShowInteractionStatus val interactStatus: Int, // 互动状态
+    val createdAt: Double // 开始时间
 )
 
 

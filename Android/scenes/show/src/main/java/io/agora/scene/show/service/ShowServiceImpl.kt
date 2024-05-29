@@ -33,7 +33,6 @@ import io.agora.scene.show.service.rtmsync.CollectionProvider
 import io.agora.scene.show.service.rtmsync.MessageRetainer
 import io.agora.scene.show.service.rtmsync.MessageRetainerProvider
 import io.agora.scene.show.service.rtmsync.RoomPresenceService
-import java.util.ArrayList
 
 
 const val kRoomSceneId = "scene_show_5.0.0_2"
@@ -275,7 +274,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
 
         // 监听邀请申请
         subscribeMicSeatInvitation(roomId) { _, value ->
-            if (value?.type == ShowInvitationType.accept) {
+            if (interaction != null && value?.type == ShowInvitationType.accept) {
                 startInteraction(
                     roomId, ShowInteractionInfo(
                         value.userId,
@@ -286,7 +285,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
                     )
                 )
             } else if (value?.type == ShowInvitationType.end) {
-                stopInteractionReal(roomId)
+                stopInteraction(roomId)
             }
         }
 
@@ -329,7 +328,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
                     } else if (info.interactionStatus == ShowInteractionStatus.idle
                         && myRoomInteractionInfo.interactionStatus == ShowInteractionStatus.pking
                     ) {
-                        stopInteractionReal(roomId)
+                        stopInteraction(roomId)
                     }
                 }
             }
@@ -448,6 +447,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
                         user.userId,
                         user.userAvatar,
                         user.userName,
+                        user.muteAudio,
                         if (interactionInfo?.interactorId == user.userId) {
                             interactionInfo.interactionStatus
                         } else {
@@ -464,15 +464,16 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
         roomId: String,
         onUserChange: (ShowSubscribeStatus, ShowUser?) -> Unit
     ) {
-        val scene = syncManager.getScene(roomId) ?: return
-        scene.userService.registerRespObserver(object : AUIUserRespObserver {
+        val userService = syncManager.getScene(roomId)?.userService ?: return
+        userService.registerRespObserver(object : AUIUserRespObserver {
             override fun onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {
                 super.onRoomUserEnter(roomId, userInfo)
                 onUserChange.invoke(
                     ShowSubscribeStatus.added, ShowUser(
                         userInfo.userId,
                         userInfo.userName,
-                        userInfo.userAvatar
+                        userInfo.userAvatar,
+                        userInfo.muteAudio
                     )
                 )
             }
@@ -483,7 +484,8 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
                     ShowSubscribeStatus.updated, ShowUser(
                         userInfo.userId,
                         userInfo.userName,
-                        userInfo.userAvatar
+                        userInfo.userAvatar,
+                        userInfo.muteAudio
                     )
                 )
             }
@@ -494,7 +496,21 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
                     ShowSubscribeStatus.deleted, ShowUser(
                         userInfo.userId,
                         userInfo.userName,
-                        userInfo.userAvatar
+                        userInfo.userAvatar,
+                        userInfo.muteAudio
+                    )
+                )
+            }
+
+            override fun onUserAudioMute(userId: String, mute: Boolean) {
+                super.onUserAudioMute(userId, mute)
+                val userInfo = userService.getUserInfo(userId) ?: return
+                onUserChange.invoke(
+                    ShowSubscribeStatus.updated, ShowUser(
+                        userInfo.userId,
+                        userInfo.userName,
+                        userInfo.userAvatar,
+                        mute
                     )
                 )
             }
@@ -504,14 +520,9 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
     override fun muteAudio(
         roomId: String,
         mute: Boolean,
-        userId: String,
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
-        if (userId != UserManager.getInstance().user.id.toString()) {
-            error?.invoke(RuntimeException("only owner can mute audio"))
-            return
-        }
         val scene = syncManager.getScene(roomId)
         scene?.userService?.muteUserAudio(mute) {
             if (it != null) {
@@ -634,14 +645,6 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
         roomId: String,
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
-    ) {
-        stopInteractionReal(roomId, success, error)
-    }
-
-    private fun stopInteractionReal(
-        roomId: String,
-        success: (() -> Unit)? = null,
-        error: ((Exception) -> Unit)? = null
     ) {
         val collection = collectionProvider.getRoomInteractionCollection(roomId)
         if (collection == null) {
@@ -878,6 +881,13 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
             error?.invoke(RuntimeException("invitation not found"))
             return
         }
+
+        val roomPresenceInfo = roomPresenceService.getRoomPresenceInfo(roomId)
+        if (roomPresenceInfo?.interactionStatus != ShowInteractionStatus.idle) {
+            error?.invoke(RuntimeException("room is not idle"))
+            return
+        }
+
         val resp = ShowMicSeatInvitation(
             id = invitationId,
             UserManager.getInstance().user.id.toString(),
@@ -1025,6 +1035,12 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
         val pkInvitation = messageRetainer.removeMessage { it.id == invitationId }
         if (pkInvitation == null) {
             error?.invoke(RuntimeException("invitation not found"))
+            return
+        }
+
+        val fromRoomPresenceInfo = roomPresenceService.getRoomPresenceInfo(pkInvitation.fromRoomId)
+        if(fromRoomPresenceInfo?.interactionStatus != ShowInteractionStatus.idle){
+            error?.invoke(RuntimeException("from room is not idle"))
             return
         }
 
