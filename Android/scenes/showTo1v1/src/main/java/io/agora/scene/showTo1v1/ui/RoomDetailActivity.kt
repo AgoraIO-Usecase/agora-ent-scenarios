@@ -539,6 +539,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 onBackPressed()
             }
         })
+
         mService?.subscribeListener(object : ShowTo1v1ServiceListenerProtocol {
             override fun onNetworkStatusChanged(status: ShowTo1v1ServiceNetworkStatus) {
 

@@ -5,18 +5,46 @@ import io.agora.voice.common.constant.ConfigConstants
 import io.agora.scene.voice.R
 import io.agora.scene.voice.model.AINSModeBean
 import io.agora.scene.voice.model.AINSSoundsBean
+import io.agora.scene.voice.model.AINSType
 
 object RoomAINSConstructor {
 
     /**
      * 降噪等级
      */
-    fun builderDefaultAINSList(context: Context, anisMode: Int): MutableList<AINSModeBean> {
-        return mutableListOf(
-            AINSModeBean(context.getString(R.string.voice_chatroom_your_ains), anisMode),
-//            AINSModeBean(context.getString(R.string.chatroom_agora_blue_bot_ains), AINSUser.BlueBot),
-//            AINSModeBean(context.getString(R.string.chatroom_agora_red_bot_ains), AINSUser.RedBot)
-        )
+    fun builderDefaultAINSList(
+        context: Context,
+        anisMode: Int,
+        anisMusicMode: Int,
+        anisMicMode: Int
+    ): MutableList<AINSModeBean> {
+        return if (anisMode == ConfigConstants.AINSMode.AINS_Off) {
+            mutableListOf(buildAIBean(context, AINSType.AINS_Default, anisMode))
+        } else {
+            mutableListOf(
+                buildAIBean(context, AINSType.AINS_Default, anisMode),
+                buildAIBean(context, AINSType.AINS_Music, anisMusicMode),
+                buildAIBean(context, AINSType.AINS_Mic, anisMicMode)
+            )
+        }
+    }
+
+    fun buildAIBean(context: Context, ainsType: AINSType, anisMode: Int): AINSModeBean {
+        return when (ainsType) {
+            AINSType.AINS_Music -> AINSModeBean(
+                ainsType,
+                context.getString(R.string.voice_chatroom_setting_music),
+                anisMode
+            )
+
+            AINSType.AINS_Mic -> AINSModeBean(
+                ainsType,
+                context.getString(R.string.voice_chatroom_setting_mic),
+                anisMode
+            )
+
+            else -> AINSModeBean(ainsType, context.getString(R.string.voice_chatroom_setting_ains), anisMode)
+        }
     }
 
     /**
@@ -24,7 +52,10 @@ object RoomAINSConstructor {
      */
     fun builderDefaultSoundList(context: Context): MutableList<AINSSoundsBean> {
         return mutableListOf(
-            AINSSoundsBean(ConfigConstants.AINSSoundType.AINS_TVSound, context.getString(R.string.voice_chatroom_sounds_tv)),
+            AINSSoundsBean(
+                ConfigConstants.AINSSoundType.AINS_TVSound,
+                context.getString(R.string.voice_chatroom_sounds_tv)
+            ),
             AINSSoundsBean(
                 ConfigConstants.AINSSoundType.AINS_KitchenSound,
                 context.getString(R.string.voice_chatroom_sounds_kitchen)
