@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentTransaction
 import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
 import io.agora.scene.voice.R
@@ -474,6 +473,8 @@ class RoomObservableViewDelegate constructor(
                     botVolume = voiceRoomModel.robotVolume,
                     soundSelection = roomKitBean.soundEffect,
                     AINSMode = VoiceBuddyFactory.get().rtcChannelTemp.AINSMode,
+                    AINSMusicMode = VoiceBuddyFactory.get().rtcChannelTemp.AINSMusicMode,
+                    AINSMicMode = VoiceBuddyFactory.get().rtcChannelTemp.AINSMicMode,
                     isAIAECOn = VoiceBuddyFactory.get().rtcChannelTemp.isAIAECOn,
                     isAIAGCOn = VoiceBuddyFactory.get().rtcChannelTemp.isAIAGCOn,
                     spatialOpen = false
@@ -485,8 +486,8 @@ class RoomObservableViewDelegate constructor(
         roomAudioSettingDialog?.audioSettingsListener =
             object : RoomAudioSettingsSheetDialog.OnClickAudioSettingsListener {
 
-                override fun onAINS(mode: Int, isEnable: Boolean) {
-                    onAINSDialog(mode)
+                override fun onAINS(mode: Int, musicMode: Int, micMode: Int, isEnable: Boolean) {
+                    onAINSDialog(mode, musicMode, micMode)
                 }
 
                 override fun onAIAEC(isOn: Boolean, isEnable: Boolean) {
@@ -557,20 +558,41 @@ class RoomObservableViewDelegate constructor(
     /**
      * AI降噪弹框
      */
-    fun onAINSDialog(ainsMode: Int) {
+    fun onAINSDialog(ainsMode: Int,musicMode: Int, micMode: Int) {
         val ainsDialog = RoomAINSSheetDialog().apply {
             arguments = Bundle().apply {
                 putInt(RoomAINSSheetDialog.KEY_AINS_MODE, ainsMode)
+                putInt(RoomAINSSheetDialog.KEY_AINS_MUSIC_MODE, musicMode)
+                putInt(RoomAINSSheetDialog.KEY_AINS_MIC_MODE, micMode)
                 putBoolean(RoomAINSSheetDialog.KEY_IS_ENABLE, roomKitBean.isOwner)
             }
         }
         ainsDialog.anisModeCallback = {
-            VoiceBuddyFactory.get().rtcChannelTemp.AINSMode = it.anisMode
-            AgoraRtcEngineController.get().deNoise(it.anisMode)
-            roomAudioSettingDialog?.apply {
-                audioSettingsInfo.AINSMode = it.anisMode
-                updateAINSView()
+            when(it.type){
+                AINSType.AINS_Default ->{
+                    VoiceBuddyFactory.get().rtcChannelTemp.AINSMode = it.anisMode
+                    AgoraRtcEngineController.get().deDefaultNoise(it.anisMode)
+                    roomAudioSettingDialog?.apply {
+                        audioSettingsInfo.AINSMode = it.anisMode
+                        updateAINSView()
+                    }
+                }
+                AINSType.AINS_Music ->{
+                    VoiceBuddyFactory.get().rtcChannelTemp.AINSMusicMode = it.anisMode
+                    roomAudioSettingDialog?.apply {
+                        audioSettingsInfo.AINSMusicMode = it.anisMode
+                    }
+                    AgoraRtcEngineController.get().deMusicNoise(it.anisMode)
+                }
+                AINSType.AINS_Mic ->{
+                    VoiceBuddyFactory.get().rtcChannelTemp.AINSMicMode = it.anisMode
+                    roomAudioSettingDialog?.apply {
+                        audioSettingsInfo.AINSMicMode = it.anisMode
+                    }
+                    AgoraRtcEngineController.get().deMicNoise(it.anisMode)
+                }
             }
+
             if (roomKitBean.isOwner && voiceRoomModel.useRobot && VoiceBuddyFactory.get().rtcChannelTemp.firstSwitchAnis) {
                 VoiceBuddyFactory.get().rtcChannelTemp.firstSwitchAnis = false
                 RoomSoundAudioConstructor.anisIntroduceAudioMap[it.anisMode]?.let { soundAudioList ->

@@ -4,15 +4,12 @@ interface ISceneResponse {
 
     fun onTokenPrivilegeWillExpire(channelName: String?) {}
 
-    /// 房间被销毁的回调
-    /// - Parameter roomId: 房间id
-    fun onSceneDestroy(roomId: String) {}
+    // 房间过期的回调
+    fun onSceneExpire(channelName: String) {}
 
-    /// Description 房间用户被踢出房间
-    ///
-    /// - Parameters:
-    ///   - roomId: 房间id
-    ///   - userId: 用户id
-    fun onSceneUserBeKicked(roomId: String, userId: String) {}
+    // 房间被销毁的回调
+    fun onSceneDestroy(channelName: String) {}
 
+    // 房间用户被踢出房间
+    fun onSceneUserBeKicked(channelName: String, userId: String) {}
 }

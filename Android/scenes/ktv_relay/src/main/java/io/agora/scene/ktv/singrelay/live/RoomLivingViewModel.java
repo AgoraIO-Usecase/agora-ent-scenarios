@@ -888,7 +888,7 @@ public class RoomLivingViewModel extends ViewModel {
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
                                            @Override
-                                           public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, @NonNull io.agora.mediaplayer.Constants.MediaPlayerError error, boolean isLocal) {
+                                           public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, @NonNull io.agora.mediaplayer.Constants.MediaPlayerReason reason, boolean isLocal) {
                                                switch (state) {
                                                    case PLAYER_STATE_OPEN_COMPLETED:
                                                        playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());

@@ -161,7 +161,7 @@ class RoomAIAGCSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiagcBinding>() {
     }
 
     private val mediaPlayerObserver = object : MediaPlayerObserver() {
-        override fun onPlayerStateChanged(state: Constants.MediaPlayerState?, error: Constants.MediaPlayerError?) {
+        override fun onPlayerStateChanged(state: Constants.MediaPlayerState?, error: Constants.MediaPlayerReason?) {
             when (state) {
                 Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                     mediaPlayer?.play()

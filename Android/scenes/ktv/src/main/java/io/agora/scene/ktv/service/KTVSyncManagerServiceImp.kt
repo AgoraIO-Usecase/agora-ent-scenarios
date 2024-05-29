@@ -26,7 +26,7 @@ class KTVSyncManagerServiceImp(
     private val errorHandler: ((Exception?) -> Unit)?
 ) : KTVServiceProtocol {
     private val TAG = "KTV_Service_LOG"
-    private val kSceneId = "scene_ktv_4.3.0"
+    private val kSceneId = "scene_ktv_5.0.0"
     private val kCollectionIdChooseSong = "choose_song"
     private val kCollectionIdSeatInfo = "seat_info"
     private val kCollectionIdUser = "userCollection"

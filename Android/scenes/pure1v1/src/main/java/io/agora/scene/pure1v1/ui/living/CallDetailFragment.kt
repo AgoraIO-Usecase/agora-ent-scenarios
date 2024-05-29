@@ -99,7 +99,7 @@ class CallDetailFragment : Fragment(), ICallApiListener {
                         runOnUiThread {
                             binding.vDragWindow1.addView(remoteComeSoonView.root)
                         }
-                    } else if (state == Constants.REMOTE_VIDEO_STATE_STARTING || state == Constants.REMOTE_VIDEO_STATE_PLAYING) {
+                    } else if (state == Constants.REMOTE_VIDEO_STATE_STARTING || state == Constants.REMOTE_VIDEO_STATE_DECODING) {
                         // 远端视频正常播放
                         runOnUiThread {
                             binding.vDragWindow1.removeView(remoteComeSoonView.root)

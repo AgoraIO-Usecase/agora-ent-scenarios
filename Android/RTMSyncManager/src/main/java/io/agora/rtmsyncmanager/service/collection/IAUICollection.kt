@@ -65,6 +65,97 @@ interface IAUICollection {
     fun getMetaData(callback: ((error: AUICollectionException?, value: Any?) -> Unit)?)
 
     /**
+     * Release
+     *
+     */
+    fun release()
+}
+
+interface IAUIMapCollection : IAUICollection {
+    /**
+     * Update meta data
+     *
+     * @param valueCmd
+     * @param value
+     * @param filter
+     * @param callback
+     */
+    fun updateMetaData(
+        valueCmd: String?,
+        value: Map<String, Any>,
+        callback: ((error: AUICollectionException?) -> Unit)?
+    )
+
+    /**
+     * Merge meta data
+     *
+     * @param valueCmd
+     * @param value
+     * @param filter
+     * @param callback
+     */
+    fun mergeMetaData(
+        valueCmd: String?,
+        value: Map<String, Any>,
+        callback: ((error: AUICollectionException?) -> Unit)?
+    )
+
+    /**
+     * Add meta data
+     *
+     * @param valueCmd
+     * @param value
+     * @param filter
+     * @param callback
+     */
+    fun addMetaData(
+        valueCmd: String?,
+        value: Map<String, Any>,
+        callback: ((error: AUICollectionException?) -> Unit)?
+    )
+
+    /**
+     * Remove meta data
+     *
+     * @param valueCmd
+     * @param filter
+     * @param callback
+     */
+    fun removeMetaData(
+        valueCmd: String?,
+        callback: ((error: AUICollectionException?) -> Unit)?
+    )
+
+    /**
+     * Calculate meta data
+     *
+     * @param valueCmd
+     * @param key
+     * @param value
+     * @param min
+     * @param max
+     * @param filter
+     * @param callback
+     */
+    fun calculateMetaData(
+        valueCmd: String?,
+        key: List<String>,
+        value: Int,
+        min: Int,
+        max: Int,
+        callback: ((error: AUICollectionException?) -> Unit)?
+    )
+
+    /**
+     * Clean meta data
+     *
+     * @param callback
+     */
+    fun cleanMetaData(callback: ((error: AUICollectionException?) -> Unit)?)
+}
+
+interface IAUIListCollection : IAUICollection {
+    /**
      * Update meta data
      *
      * @param valueCmd
@@ -149,10 +240,4 @@ interface IAUICollection {
      * @param callback
      */
     fun cleanMetaData(callback: ((error: AUICollectionException?) -> Unit)?)
-
-    /**
-     * Release
-     *
-     */
-    fun release()
 }

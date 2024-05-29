@@ -394,8 +394,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     override fun requestData() {
         super.requestData()
-        val createTime = (mRoomInfo.customPayload[JoyParameters.CREATED_AT] as? Long) ?: 0
-        val roomLeftTime = JoyServiceProtocol.ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - createTime)
+        val roomLeftTime = JoyServiceProtocol.ROOM_AVAILABLE_DURATION - mJoyService.getCurrentRoomDuration(mRoomInfo.roomId)
         if (roomLeftTime > 0) {
             toggleSelfVideo {
                 initRtcEngine()
@@ -864,8 +863,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         val dataFormat = SimpleDateFormat("HH:mm:ss").apply { timeZone = TimeZone.getTimeZone("GMT") }
         binding.tvTimer.post(object : Runnable {
             override fun run() {
-                val createTime = (mRoomInfo.customPayload[JoyParameters.CREATED_AT] as? Long) ?: 0
-                binding.tvTimer.text = dataFormat.format(Date(TimeUtils.currentTimeMillis() - createTime))
+                binding.tvTimer.text = dataFormat.format(Date(mJoyService.getCurrentRoomDuration(mRoomInfo.roomId)))
                 binding.tvTimer.postDelayed(this, 1000)
                 binding.tvTimer.tag = this
             }

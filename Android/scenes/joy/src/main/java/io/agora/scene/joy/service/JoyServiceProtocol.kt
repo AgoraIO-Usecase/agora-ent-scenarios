@@ -75,6 +75,11 @@ interface JoyServiceProtocol {
     fun updateRoom(roomInfo: AUIRoomInfo, completion: (error: Exception?) -> Unit)
 
     /**
+     * 获取房间剩余时间
+     */
+    fun getCurrentRoomDuration(roomId: String): Long
+
+    /**
      * 获取正在进行的游戏信息
      */
     fun getStartGame(roomId: String, completion: (error: Exception?, out: JoyStartGameInfo?) -> Unit)

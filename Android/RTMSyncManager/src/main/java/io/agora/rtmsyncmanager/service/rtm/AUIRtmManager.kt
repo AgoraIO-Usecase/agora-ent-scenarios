@@ -20,10 +20,6 @@ import io.agora.rtm.SubscribeOptions
 import io.agora.rtm.WhoNowResult
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.ArrayList
-import kotlin.concurrent.scheduleAtFixedRate
 
 class AUIRtmManager constructor(
     context: Context,
@@ -808,6 +804,14 @@ class AUIRtmManager constructor(
             receiptTimeoutRun[uniqueId] = receipt
             receiptHandler.postDelayed(receipt.runnable, timeout)
         }
+    }
+
+    fun publish(
+        channelName: String,
+        message: String,
+        completion: (AUIRtmException?) -> Unit
+    ) {
+        this.publish(channelName, "", message, completion)
     }
 
     fun publish(
