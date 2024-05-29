@@ -20,8 +20,8 @@ class AUICollectionException private constructor(val code: Int, override val mes
         unsupportedAction(108, "action unsupported"),
         calculateMapOutOfRange(111, "calculate map out of range");
 
-        fun toException(msg: String? = null): AUICollectionException {
-            return AUICollectionException(value, msg ?: message)
+        fun toException(code: Int? = null, msg: String? = null): AUICollectionException {
+            return AUICollectionException(code ?: value, msg ?: message)
         }
     }
 }

@@ -42,9 +42,16 @@ class AUIRoomManager {
                 ) {
                     val rsp = response.body()?.data
                     if (response.body()?.code == 0 && rsp != null) {
-                        AUIRoomContext.shared().insertRoomInfo(rsp.payload)
                         // success
-                        callback?.onResult(null, rsp.payload)
+                        val info = rsp.payload
+                        val rInfo = AUIRoomInfo()
+                        rInfo.roomId = info.roomId
+                        rInfo.roomName = info.roomName
+                        rInfo.roomOwner = roomInfo.roomOwner
+                        rInfo.customPayload = roomInfo.customPayload
+                        rInfo.createTime = rsp.createTime
+                        AUIRoomContext.shared().insertRoomInfo(rInfo)
+                        callback?.onResult(null, rInfo)
                     } else {
                         callback?.onResult(Utils.errorFromResponse(response), null)
                     }

@@ -1,15 +1,6 @@
 package io.agora.scene.ktv.live;
 
-import static io.agora.rtc2.Constants.AUDIO_EFFECT_OFF;
-import static io.agora.rtc2.Constants.AUDIO_EFFECT_OFF_HARMONY;
 import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_KTV;
-import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_KTV_HARMONY;
-import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_PHONOGRAPH;
-import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_PHONOGRAPH_HARMONY;
-import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_STUDIO;
-import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_STUDIO_HARMONY;
-import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_VOCAL_CONCERT;
-import static io.agora.rtc2.Constants.ROOM_ACOUSTICS_VOCAL_CONCERT_HARMONY;
 import static io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE.CONNECTION_STATE_CONNECTED;
 import static io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE.getValue;
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION;
@@ -109,8 +100,6 @@ public class RoomLivingViewModel extends ViewModel {
         }
     }
 
-    // 默认音效
-    private final int DEFAULT_AUDIO_EFFECT = ROOM_ACOUSTICS_KTV;
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();
     private KTVApi ktvApiProtocol;
 
@@ -1435,8 +1424,8 @@ public class RoomLivingViewModel extends ViewModel {
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
                @Override
-               public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, io.agora.mediaplayer.Constants.MediaPlayerError error, boolean isLocal) {
-                   KTVLogger.d(TAG, "onMusicPlayerStateChanged, state:" + state + " error:" + error + " isLocal:" + isLocal);
+               public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, @NonNull io.agora.mediaplayer.Constants.MediaPlayerReason reason, boolean isLocal) {
+                   KTVLogger.d(TAG, "onMusicPlayerStateChanged, state:" + state + " reason:" + reason + " isLocal:" + isLocal);
                    switch (state) {
                        case PLAYER_STATE_OPEN_COMPLETED:
                            playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());
