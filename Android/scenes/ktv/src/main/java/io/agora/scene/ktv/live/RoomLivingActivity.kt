@@ -730,14 +730,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
             val isRoomOwner = seatInfo.owner?.userId == roomInfo.roomOwner?.userId
             setSeatView(holder.binding, seatInfo)
             holder.binding.root.setOnClickListener { v: View? ->
-                if (isIdleSeat) {// 上麦
-                    toggleAudioRun = Runnable {
-                        roomLivingViewModel.enterSeat(position)
-                        binding.cbMic.setChecked(false)
-                        binding.cbVideo.setChecked(false)
-                    }
-                    requestRecordPermission()
-                } else { // 下麦
+                if (!isIdleSeat) { // 下麦
                     if (isRoomOwner) { // 房主踢他人下麦
                         if (seatInfo.owner?.userId != KtvCenter.mUser.id.toString()) {
                             showUserLeaveSeatMenuDialog(seatInfo)
@@ -745,6 +738,14 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
                     } else if (seatInfo.owner?.userId == KtvCenter.mUser.id.toString()) { // 自己下麦
                         showUserLeaveSeatMenuDialog(seatInfo)
                     }
+
+                } else { // 上麦
+                    toggleAudioRun = Runnable {
+                        roomLivingViewModel.enterSeat(position)
+                        binding.cbMic.setChecked(false)
+                        binding.cbVideo.setChecked(false)
+                    }
+                    requestRecordPermission()
                 }
             }
         }
