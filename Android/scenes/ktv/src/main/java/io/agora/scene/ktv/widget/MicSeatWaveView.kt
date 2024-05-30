@@ -13,7 +13,9 @@ import io.agora.scene.ktv.R
 import io.agora.scene.ktv.databinding.KtvLayoutMicWaveBinding
 
 /**
- * 座位音纹
+ * Mic seat wave view
+ *
+ * @constructor Create empty Mic seat wave view
  */
 class MicSeatWaveView : ConstraintLayout {
 
@@ -33,6 +35,10 @@ class MicSeatWaveView : ConstraintLayout {
         setupView()
     }
 
+    /**
+     * Start wave
+     *
+     */
     fun startWave() {
         if (!animatorSet.isRunning) {
             Log.d("micWaveLog", "volume start")
@@ -40,6 +46,10 @@ class MicSeatWaveView : ConstraintLayout {
         }
     }
 
+    /**
+     * End wave
+     *
+     */
     fun endWave() {
         if (animatorSet.isRunning) {
             Log.d("micWaveLog", "volume end")

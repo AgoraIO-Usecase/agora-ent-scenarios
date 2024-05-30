@@ -17,7 +17,10 @@ import io.agora.scene.ktv.live.RoomLivingActivity
 import io.agora.scene.ktv.live.bean.SoundCardSettingBean
 
 /**
- * 虚拟声卡
+ * Sound card fragment
+ *
+ * @property soundCardSetting
+ * @constructor Create empty Sound card fragment
  */
 class SoundCardFragment constructor(private val soundCardSetting: SoundCardSettingBean) :
     BaseViewBindingFragment<KtvDialogSoundCardBinding>() {
@@ -179,6 +182,15 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
 
 }
 
+/**
+ * Preset sound model
+ *
+ * @property type
+ * @property name
+ * @property tips
+ * @property resId
+ * @constructor Create empty Preset sound model
+ */
 data class PresetSoundModel constructor(
     val type: AgoraPresetSound,
     val name: String,
@@ -190,21 +202,95 @@ data class PresetSoundModel constructor(
     }
 }
 
+/**
+ * Agora preset sound
+ *
+ * @property presetValue
+ * @property gainValue
+ * @property gender
+ * @property effect
+ * @constructor Create empty Agora preset sound
+ */
 enum class AgoraPresetSound constructor(
     val presetValue: Int,
     val gainValue: Float,
     val gender: Int,
     val effect: Int,
 ) {
+    /**
+     * Close
+     *
+     * @constructor Create empty Close
+     */
     Close(-1,-1f,-1,-1),
+
+    /**
+     * Sound1001
+     *
+     * @constructor Create empty Sound1001
+     */
     Sound1001(4,1f,0,0),
+
+    /**
+     * Sound1002
+     *
+     * @constructor Create empty Sound1002
+     */
     Sound1002(4,1f,0,1),
+
+    /**
+     * Sound1003
+     *
+     * @constructor Create empty Sound1003
+     */
     Sound1003(4,1f,1,0),
+
+    /**
+     * Sound1004
+     *
+     * @constructor Create empty Sound1004
+     */
     Sound1004(4,1f,1,1),
+
+    /**
+     * Sound2001
+     *
+     * @constructor Create empty Sound2001
+     */
     Sound2001(4,1f,0,2),
+
+    /**
+     * Sound2002
+     *
+     * @constructor Create empty Sound2002
+     */
     Sound2002(4,1f,1,2),
+
+    /**
+     * Sound2003
+     *
+     * @constructor Create empty Sound2003
+     */
     Sound2003(4,1f,0,3),
+
+    /**
+     * Sound2004
+     *
+     * @constructor Create empty Sound2004
+     */
     Sound2004(4,1f,1,3),
+
+    /**
+     * Sound2005
+     *
+     * @constructor Create empty Sound2005
+     */
     Sound2005(4,1f,0,4),
+
+    /**
+     * Sound2006
+     *
+     * @constructor Create empty Sound2006
+     */
     Sound2006(4,1f,1,4)
 }

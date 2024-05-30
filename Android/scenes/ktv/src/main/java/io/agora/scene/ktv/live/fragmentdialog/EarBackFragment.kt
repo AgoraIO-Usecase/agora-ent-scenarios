@@ -8,7 +8,6 @@ import android.widget.CompoundButton
 import android.widget.RadioGroup
 import io.agora.scene.base.component.BaseBindingFragment
 import io.agora.scene.base.component.OnButtonClickListener
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.ktv.R
 import io.agora.scene.ktv.databinding.KtvDialogEarbackSettingBinding
 import io.agora.scene.ktv.live.RoomLivingActivity
@@ -18,7 +17,10 @@ import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.doOnProgressChanged
 
 /**
- * 耳返设置
+ * Ear back fragment
+ *
+ * @property mSetting
+ * @constructor Create empty Ear back fragment
  */
 class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
     BaseBindingFragment<KtvDialogEarbackSettingBinding?>() {
@@ -62,7 +64,7 @@ class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
             btEarBackDown.setOnClickListener { v: View? -> tuningEarVolume(false) }
             btEarBackUp.setOnClickListener { v: View? -> tuningEarVolume(true) }
             sbEarBack.progress = mSetting.mEarBackVolume
-            sbEarBack.doOnProgressChanged { seekBar, progress, fromUser ->
+            sbEarBack.doOnProgressChanged  { seekBar, progress, fromUser ->
                 if (fromUser) {
                     mSetting.mEarBackVolume = progress
                 }
@@ -186,7 +188,23 @@ class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
     }
 }
 
+/**
+ * Ear phone callback
+ *
+ * @constructor Create empty Ear phone callback
+ */
 interface EarPhoneCallback {
+    /**
+     * On has ear phone changed
+     *
+     * @param hasEarPhone
+     */
     fun onHasEarPhoneChanged(hasEarPhone: Boolean)
+
+    /**
+     * On ear monitor delay
+     *
+     * @param earsBackDelay
+     */
     fun onEarMonitorDelay(earsBackDelay: Int)
 }
