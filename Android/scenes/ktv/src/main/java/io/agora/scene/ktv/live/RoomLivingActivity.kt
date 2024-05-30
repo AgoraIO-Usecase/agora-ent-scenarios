@@ -457,7 +457,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
     /**
      * 下麦提示
      */
-    private fun showUserLeaveSeatMenuDialog(setInfo: RoomMicSeatInfo) {
+    private fun showUserLeaveSeatMenuDialog(setInfo: RoomMicSeatInfo, kickSeat: Boolean) {
         if (mUserLeaveSeatMenuDialog == null) {
             mUserLeaveSeatMenuDialog = UserLeaveSeatMenuDialog(this)
         }
@@ -469,7 +469,11 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
 
             override fun onRightButtonClick() {
                 setDarkStatusIcon(isBlackDarkStatus)
-                roomLivingViewModel.leaveSeat(setInfo)
+                if (kickSeat) {
+                    roomLivingViewModel.kickSeat(setInfo)
+                } else {
+                    roomLivingViewModel.leaveSeat(setInfo)
+                }
             }
         }
         mUserLeaveSeatMenuDialog?.setAgoraMember(setInfo.owner?.userName ?: "", setInfo.owner?.fullHeadUrl ?: "")
@@ -727,25 +731,25 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
         override fun onBindViewHolder(holder: BindingViewHolder<KtvItemRoomSpeakerBinding>, position: Int) {
             val seatInfo = getItem(position) ?: return
             val isIdleSeat = seatInfo.owner?.userId.isNullOrEmpty()
-            val isRoomOwner = seatInfo.owner?.userId == roomInfo.roomOwner?.userId
             setSeatView(holder.binding, seatInfo)
             holder.binding.root.setOnClickListener { v: View? ->
                 if (!isIdleSeat) { // 下麦
-                    if (isRoomOwner) { // 房主踢他人下麦
+                    if (roomLivingViewModel.isRoomOwner) { // 房主踢他人下麦
                         if (seatInfo.owner?.userId != KtvCenter.mUser.id.toString()) {
-                            showUserLeaveSeatMenuDialog(seatInfo)
+                            showUserLeaveSeatMenuDialog(seatInfo, kickSeat = true)
                         }
                     } else if (seatInfo.owner?.userId == KtvCenter.mUser.id.toString()) { // 自己下麦
-                        showUserLeaveSeatMenuDialog(seatInfo)
+                        showUserLeaveSeatMenuDialog(seatInfo, kickSeat = false)
                     }
-
                 } else { // 上麦
-                    toggleAudioRun = Runnable {
-                        roomLivingViewModel.enterSeat(position)
-                        binding.cbMic.setChecked(false)
-                        binding.cbVideo.setChecked(false)
+                    if (roomLivingViewModel.localSeatInfo == null) {
+                        toggleAudioRun = Runnable {
+                            roomLivingViewModel.enterSeat(position)
+                            binding.cbMic.setChecked(false)
+                            binding.cbVideo.setChecked(false)
+                        }
+                        requestRecordPermission()
                     }
-                    requestRecordPermission()
                 }
             }
         }

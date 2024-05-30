@@ -402,6 +402,21 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
         }
     }
 
+    fun kickSeat(seatModel: RoomMicSeatInfo) {
+        KTVLogger.d(TAG, "RoomLivingViewModel.kickSeat() called")
+        ktvServiceProtocol.kickSeat(seatModel.seatIndex) { e: Exception? ->
+            if (e == null) { // success
+                KTVLogger.d(TAG, "RoomLivingViewModel.kickSeat() success")
+            } else { // failure
+                KTVLogger.e(TAG, "RoomLivingViewModel.kickSeat() failed: $e")
+            }
+            e?.message?.let { error ->
+                CustomToast.show(error, Toast.LENGTH_SHORT)
+            }
+        }
+    }
+
+
     /**
      * Is camera opened
      */

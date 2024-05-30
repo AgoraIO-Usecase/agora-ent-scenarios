@@ -41,7 +41,7 @@ class KTVSyncManagerServiceImp constructor(
     private val mContext: Context, private val mErrorHandler: ((Exception?) -> Unit)?
 ) : KTVServiceProtocol, ISceneResponse, IAUIUserService.AUIUserRespObserver {
     private val TAG = "KTV_Service_LOG"
-    private val kSceneId = "scene_ktv_4.3.0"
+    private val kSceneId = "scene_ktv_5.0.0"
     private val kCollectionSeatInfo = "seat_info" // map collection
     private val kCollectionChosenSong = "choose_song" // list collection
     private val kCollectionChorusInfo = "chorister_info" // list collection
@@ -218,22 +218,27 @@ class KTVSyncManagerServiceImp constructor(
                 completion.invoke(Exception("${it.message}(${it.code})"), null)
                 return@initRtmSync
             }
-            mRoomService.getRoomList(KtvCenter.mAppId, kSceneId, 0, 20) { uiException, ts, roomList ->
-                if (uiException == null) {
-                    ts?.let { serverTs ->
-                        rsetfulDiffTs = System.currentTimeMillis() - serverTs
-                        KTVLogger.d(TAG, "getRoomList ts:$serverTs")
+            mRoomService.getRoomList(KtvCenter.mAppId, kSceneId, 0, 20,
+                cleanClosure = { auiRoomInfo ->
+                    return@getRoomList auiRoomInfo.roomOwner?.userId == KtvCenter.mUser.id.toString()
+
+                },
+                completion = { uiException, ts, roomList ->
+                    if (uiException == null) {
+                        ts?.let { serverTs ->
+                            rsetfulDiffTs = System.currentTimeMillis() - serverTs
+                            KTVLogger.d(TAG, "getRoomList ts:$serverTs")
+                        }
+                        val newRoomList = roomList?.sortedBy { it.createTime } ?: emptyList()
+                        KTVLogger.d(TAG, "getRoomList success, roomCount:${newRoomList.size}")
+                        runOnMainThread { completion.invoke(null, newRoomList) }
+                    } else {
+                        KTVLogger.e(TAG, "getRoomList error, $uiException")
+                        runOnMainThread {
+                            completion.invoke(uiException, null)
+                        }
                     }
-                    val newRoomList = roomList?.sortedBy { it.createTime } ?: emptyList()
-                    KTVLogger.d(TAG, "getRoomList success, roomCount:${newRoomList.size}")
-                    runOnMainThread { completion.invoke(null, newRoomList) }
-                } else {
-                    KTVLogger.e(TAG, "getRoomList error, $uiException")
-                    runOnMainThread {
-                        completion.invoke(uiException, null)
-                    }
-                }
-            }
+                })
         }
     }
 
@@ -1208,7 +1213,8 @@ class KTVSyncManagerServiceImp constructor(
 
             val tempItem = mutableMapOf<String, Any>()
 
-            for (i in 0 until 7) {
+            // 只允许修改 1～7 位置
+            for (i in 1..7) {
                 val value = seatValueMap["$i"]
                 if (getUserId(value).isNullOrEmpty()) { //寻找空买为上麦
                     val newValue = newItem.values.first()
@@ -1565,25 +1571,29 @@ class KTVSyncManagerServiceImp constructor(
     }
 
     private fun sortChooseSongList(songList: List<Map<String, Any>>): List<Map<String, Any>> {
-        val sortSongList = songList.sortedWith(Comparator { o1, o2 ->
-            if (o1["status"] == PlayStatus.playing.toLong()) {
-                return@Comparator -1
-            }
-            if (o2["status"] == PlayStatus.playing.toLong()) {
-                return@Comparator 1
-            }
 
-            val pinAt1 = o1["pinAt"] as? Long ?: 0
-            val pinAt2 = o2["pinAt"] as? Long ?: 0
-            val createAt1 = o1["createAt"] as? Long ?: 0
-            val createAt2 = o2["createAt"] as? Long ?: 0
-            if (pinAt1 < 1 && pinAt2 < 1) {
-                return@Comparator if ((createAt1 - createAt2) > 0) 1 else -1
-            }
+        fun status(songValue: Map<String, Any>): Int {
+            return songValue["status"] as? Int ?: 0
+        }
 
-            return@Comparator if ((pinAt2 - pinAt1) > 0) 1 else -1
-        })
+        fun pin(songValue: Map<String, Any>): Long {
+            return songValue["pinAt"] as? Long ?: 0
+        }
 
+        fun createAt(songValue: Map<String, Any>): Long {
+            return songValue["createAt"] as? Long ?: 0
+        }
+        // 正在播放的排在前面，正常就有一个
+        val playingList = songList.filter { status(it) == PlayStatus.playing }
+        // 置顶优先播放，后置顶在前
+        val pinList = songList.filter { pin(it) > 0 && status(it) != PlayStatus.playing }.sortedBy { pin(it) * -1 }
+        // 先点歌的在前
+        val normalList = songList.filter { pin(it) <= 0 && status(it) != PlayStatus.playing }.sortedBy { createAt(it) }
+
+        val sortSongList = mutableListOf<Map<String, Any>>()
+        sortSongList.addAll(playingList)
+        sortSongList.addAll(pinList)
+        sortSongList.addAll(normalList)
         return sortSongList
     }
 }
