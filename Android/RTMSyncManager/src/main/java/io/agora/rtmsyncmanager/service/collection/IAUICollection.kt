@@ -8,6 +8,13 @@ package io.agora.rtmsyncmanager.service.collection
 interface IAUICollection {
 
     /**
+     * Subscribe will change
+     *
+     * @param closure
+     */
+    fun subscribeValueWillChange(closure: ((publisherId: String, valueCmd: String?, value: Map<String, Any>) -> Map<String, Any>?)?)
+
+    /**
      * Subscribe will add
      *
      * @param closure
@@ -63,6 +70,11 @@ interface IAUICollection {
      * @param callback
      */
     fun getMetaData(callback: ((error: AUICollectionException?, value: Any?) -> Unit)?)
+
+    /**
+     * Get Local meta data
+     */
+    fun getLocalMetaData(): AUIAttributesModel?
 
     /**
      * Release

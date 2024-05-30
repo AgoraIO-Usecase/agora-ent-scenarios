@@ -13,6 +13,7 @@ import io.agora.rtmsyncmanager.model.AUIUserInfo
 import io.agora.rtmsyncmanager.service.IAUIUserService
 import io.agora.rtmsyncmanager.service.arbiter.AUIArbiter
 import io.agora.rtmsyncmanager.service.arbiter.AUIArbiterCallback
+import io.agora.rtmsyncmanager.service.collection.AUIListCollection
 import io.agora.rtmsyncmanager.service.collection.AUIMapCollection
 import io.agora.rtmsyncmanager.service.collection.IAUICollection
 import io.agora.rtmsyncmanager.service.imp.AUIUserServiceImpl
@@ -128,7 +129,32 @@ class Scene constructor(
         if (payload != null) {
             roomInfo[kRoomInfoPayloadId] = Gson().toJson(payload)
         }
-        roomCollection.initMetaData(channelName, roomInfo) { err ->
+
+        respHandlers.notifyEventHandlers {
+            val collectionDataMap = it.onWillInitSceneMetadata(channelName)
+            collectionDataMap?.forEach { data ->
+                val metadata = data.value as? Map<String, Any>
+                if (metadata != null) {
+                    val collection: AUIMapCollection = getCollection(data.key) { channelName, sceneKey, rtmManager ->
+                        AUIMapCollection(channelName, sceneKey, rtmManager)
+                    }
+                    collection.initMetaData(channelName, metadata, false) { e -> }
+                    return@forEach
+                }
+
+                val listMetadata = data.value as? List<Map<String, Any>>
+                if (listMetadata != null) {
+                    val collection: AUIListCollection = getCollection(data.key) { channelName, sceneKey, rtmManager ->
+                        AUIListCollection(channelName, sceneKey, rtmManager)
+                    }
+                    collection.initMetaData(channelName, listMetadata, false) { e -> }
+                    return@forEach
+                }
+                AUILogger.logger().e(tag, "init meta data fail, key: ${data.key} value: ${data.value}")
+            }
+        }
+
+        roomCollection.initMetaData(channelName, roomInfo, true) { err ->
             if (err != null) {
                 runOnUiThread { completion.invoke(err) }
                 return@initMetaData
@@ -235,6 +261,7 @@ class Scene constructor(
             it.release()
         }
         collectionMap.clear()
+        userService.release()
     }
 
     /// 获取一个collection，例如let collection: AUIMapCollection = scene.getCollection("musicList")

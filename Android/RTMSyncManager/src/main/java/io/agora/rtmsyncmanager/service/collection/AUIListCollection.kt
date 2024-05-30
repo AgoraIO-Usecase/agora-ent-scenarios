@@ -8,9 +8,9 @@ import io.agora.rtmsyncmanager.utils.GsonTools
 import java.util.UUID
 
 class AUIListCollection(
-    private val channelName: String,
-    private val observeKey: String,
-    private val rtmManager: AUIRtmManager
+    val channelName: String,
+    val observeKey: String,
+    val rtmManager: AUIRtmManager
 ) : AUIBaseCollection(channelName, observeKey, rtmManager), IAUIListCollection {
 
     private var currentList = listOf<Map<String, Any>>()
@@ -335,14 +335,16 @@ class AUIListCollection(
             return
         }
 
-        val error = metadataWillAddClosure?.invoke(publisherId, valueCmd, value)
+        val newValue = valueWillChangeClosure?.invoke(publisherId, valueCmd, value) ?: value
+
+        val error = metadataWillAddClosure?.invoke(publisherId, valueCmd, newValue)
         if (error != null) {
             callback?.invoke(error)
             return
         }
 
         val list = ArrayList(currentList)
-        list.add(value)
+        list.add(newValue)
         val retList =
             attributesWillSetClosure?.invoke(
                 channelName,
@@ -370,7 +372,7 @@ class AUIListCollection(
                 callback?.invoke(null)
             }
         }
-        currentList = list
+        currentList = retList
     }
 
     private fun rtmUpdateMetaData(
@@ -387,17 +389,20 @@ class AUIListCollection(
             )
             return
         }
+
+        val newValue = valueWillChangeClosure?.invoke(publisherId, valueCmd, value) ?: value
+
         val list = ArrayList(currentList)
         itemIndexes.forEach { itemIdx ->
             val item = list[itemIdx]
-            val error = metadataWillUpdateClosure?.invoke(publisherId, valueCmd, value, item)
+            val error = metadataWillUpdateClosure?.invoke(publisherId, valueCmd, newValue, item)
             if (error != null) {
                 callback?.invoke(error)
                 return
             }
 
             val tempItem = HashMap(item)
-            value.forEach { key, value ->
+            newValue.forEach { (key, value) ->
                 tempItem[key] = value
             }
             list[itemIdx] = tempItem
@@ -429,7 +434,7 @@ class AUIListCollection(
                 callback?.invoke(null)
             }
         }
-        currentList = list
+        currentList = retList
     }
 
     private fun rtmMergeMetaData(
@@ -446,16 +451,19 @@ class AUIListCollection(
             )
             return
         }
+
+        val newValue = valueWillChangeClosure?.invoke(publisherId, valueCmd, value) ?: value
+
         val list = ArrayList(currentList)
         itemIndexes.forEach { itemIdx ->
             val item = list[itemIdx]
-            val error = metadataWillMergeClosure?.invoke(publisherId, valueCmd, value, item)
+            val error = metadataWillMergeClosure?.invoke(publisherId, valueCmd, newValue, item)
             if (error != null) {
                 callback?.invoke(error)
                 return
             }
 
-            val tempItem = AUICollectionUtils.mergeMap(item, value)
+            val tempItem = AUICollectionUtils.mergeMap(item, newValue)
             list[itemIdx] = tempItem
         }
         val retList =
@@ -484,7 +492,7 @@ class AUIListCollection(
                 callback?.invoke(null)
             }
         }
-        currentList = list
+        currentList = retList
     }
 
     private fun rtmRemoveMetaData(
@@ -539,7 +547,7 @@ class AUIListCollection(
                 callback?.invoke(null)
             }
         }
-        currentList = list
+        currentList = retList
     }
 
     private fun rtmCalculateMetaData(
@@ -622,7 +630,7 @@ class AUIListCollection(
                 callback?.invoke(null)
             }
         }
-        currentList = list
+        currentList = retList
     }
 
     private fun rtmCleanMetaData(callback: ((error: AUICollectionException?) -> Unit)?) {
@@ -785,5 +793,7 @@ class AUIListCollection(
         }
     }
 
-
+    override fun getLocalMetaData(): AUIAttributesModel {
+        return AUIAttributesModel(currentList)
+    }
 }
