@@ -59,7 +59,6 @@ public class SongActionListenerImpl implements OnSongActionListener {
             Log.e("KTV","getSongType null");
             return;
         }
-        Log.e("liu0228", "index = " + index + "    songType = " + songType);
 
         LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.getSongList(songType, mCurrPage), list -> {
             if (dialog.isVisible()) {

@@ -1235,9 +1235,14 @@ class KTVSyncManagerServiceImp constructor(
             return (parentMap?.get("owner") as? Map<*, *>)?.get("userId") as? String
         }
 
-        fun getPlayStatus(map: Any?): Int? {
-            val parentMap = map as? Map<*, *>
-            return parentMap?.get("status") as? Int
+        fun status(songValue: Map<String, Any>): Int {
+            val status = songValue["status"]
+            val statusValue = if (status is Long) {
+                (status as? Long)?.toInt()
+            } else {
+                status as? Int
+            }
+            return statusValue ?: PlayStatus.idle
         }
 
         songCollection.subscribeAttributesDidChanged { channelName, observeKey, value ->
@@ -1305,7 +1310,7 @@ class KTVSyncManagerServiceImp constructor(
                     if (!onSeat) {
                         return@subscribeWillMerge AUICollectionException.ErrorCode.unknown.toException(msg = "not permitted")
                     }
-                    if (getPlayStatus(oldValue) == PlayStatus.playing) {
+                    if (status(oldValue) == PlayStatus.playing) {
                         return@subscribeWillMerge AUICollectionException.ErrorCode.unknown.toException(msg = "the song is playing")
                     }
                     return@subscribeWillMerge null
@@ -1332,7 +1337,7 @@ class KTVSyncManagerServiceImp constructor(
                     if (!canRemove) {
                         return@subscribeWillRemove AUICollectionException.ErrorCode.unknown.toException(msg = "not permitted")
                     }
-                    if (getPlayStatus(value) == PlayStatus.playing) {
+                    if (status(value) == PlayStatus.playing) {
                         // 移除合唱列表
                         innerRemoveAllChorus {}
                     }
@@ -1366,6 +1371,16 @@ class KTVSyncManagerServiceImp constructor(
         fun getUserId(map: Any?): String? {
             val parentMap = map as? Map<*, *>
             return (parentMap?.get("owner") as? Map<*, *>)?.get("userId") as? String
+        }
+
+        fun status(songValue: Map<String, Any>): Int {
+            val status = songValue["status"]
+            val statusValue = if (status is Long) {
+                (status as? Long)?.toInt()
+            } else {
+                status as? Int
+            }
+            return statusValue ?: PlayStatus.idle
         }
 
         chorusCollection.subscribeAttributesDidChanged { channelName, observeKey, value ->
@@ -1440,9 +1455,9 @@ class KTVSyncManagerServiceImp constructor(
                         return@subscribeWillAdd AUICollectionException.ErrorCode.unknown.toException(msg = "not permitted")
                     }
 
-                    val sameSong = currentSongValue["songNo"] as? String == value["chorusSongNo"] as? String
-                    val songStatue = currentSongValue["status"] as? Int
-                    val canJoin = sameSong && songStatue == PlayStatus.playing
+                    val sameSong = (currentSongValue["songNo"] as? String) == (value["chorusSongNo"] as? String)
+                    val isPlaying = status(currentSongValue) == PlayStatus.playing
+                    val canJoin = sameSong && isPlaying
                     if (!canJoin) {
                         return@subscribeWillAdd AUICollectionException.ErrorCode.unknown.toException(msg = "not permitted")
                     }
@@ -1573,7 +1588,13 @@ class KTVSyncManagerServiceImp constructor(
     private fun sortChooseSongList(songList: List<Map<String, Any>>): List<Map<String, Any>> {
 
         fun status(songValue: Map<String, Any>): Int {
-            return songValue["status"] as? Int ?: 0
+            val status = songValue["status"]
+            val statusValue = if (status is Long) {
+                (status as? Long)?.toInt()
+            } else {
+                status as? Int
+            }
+            return statusValue ?: PlayStatus.idle
         }
 
         fun pin(songValue: Map<String, Any>): Long {

@@ -41,7 +41,6 @@ class MicSeatWaveView : ConstraintLayout {
      */
     fun startWave() {
         if (!animatorSet.isRunning) {
-            Log.d("micWaveLog", "volume start")
             animatorSet.start()
         }
     }
@@ -52,7 +51,6 @@ class MicSeatWaveView : ConstraintLayout {
      */
     fun endWave() {
         if (animatorSet.isRunning) {
-            Log.d("micWaveLog", "volume end")
             animatorSet.end()
         }
     }

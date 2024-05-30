@@ -174,12 +174,10 @@ public class ScreenSlidePageFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Log.e("liu0228", "onDestroyView    " + position);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.e("liu0228", "onDestroy    " + position);
     }
 }

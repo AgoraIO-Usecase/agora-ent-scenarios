@@ -802,10 +802,12 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
                                 // 成为合唱成功
                                 val songModel = songPlayingLiveData.value ?: return
                                 ktvServiceProtocol.joinChorus(songModel.songNo) { e: Exception? ->
-                                    joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_CHORUS)
                                     if (e == null) { // success
+                                        joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_CHORUS)
                                         KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus() success")
                                     } else { // failure
+                                        ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null)
+                                        joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
                                         KTVLogger.e(TAG, "RoomLivingViewModel.joinChorus() failed: $e ")
                                     }
                                     e?.message?.let { error ->
