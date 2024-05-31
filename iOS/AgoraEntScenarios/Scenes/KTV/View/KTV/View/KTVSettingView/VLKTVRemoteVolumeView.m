@@ -7,6 +7,7 @@
 
 #import "VLKTVRemoteVolumeView.h"
 #import "AgoraEntScenarios-Swift.h"
+#import "AESMacro.h"
 @import Masonry;
 
 @interface VLKTVRemoteVolumeView() <UITextFieldDelegate>

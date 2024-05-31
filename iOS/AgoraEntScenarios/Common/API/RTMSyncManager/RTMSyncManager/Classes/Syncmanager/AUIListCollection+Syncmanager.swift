@@ -1,15 +1,15 @@
 //
-//  AUIMapCollection+SyncManager.swift
+//  AUIListCollection+Syncmanager.swift
 //  RTMSyncManager
 //
-//  Created by wushengtao on 2024/1/30.
+//  Created by wushengtao on 2024/5/20.
 //
 
 import Foundation
 
-extension AUIMapCollection {
+extension AUIListCollection {
     func initMetaData(channelName: String,
-                      metadata: [String: Any],
+                      metadata: [[String: Any]],
                       fetchImmediately: Bool,
                       completion: @escaping (NSError?)->()) {
         guard let value = encodeToJsonStr(metadata) else {
@@ -20,6 +20,6 @@ extension AUIMapCollection {
                                     lockName: "",
                                     metadata: [observeKey: value],
                                     fetchImmediately: fetchImmediately,
-                                    completion: completion) 
+                                    completion: completion)
     }
 }

@@ -15,20 +15,16 @@
 #import "VLURLPathConfig.h"
 #import "VLToast.h"
 #import "AppContext+KTV.h"
-#import "AESMacro.h"
 #import "VLAlert.h"
 #import "AgoraEntScenarios-Swift.h"
 @import AgoraCommon;
+
 @interface VLOnLineListVC ()<VLHomeOnLineListViewDelegate/*,AgoraRtmDelegate*/,VLPopScoreViewDelegate>
 
 @property (nonatomic, strong) VLHomeOnLineListView *listView;
 @end
 
 @implementation VLOnLineListVC
-
-- (void)dealloc {
-    [AppContext unloadServiceImp];
-}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
@@ -52,25 +48,16 @@
     }
 }
 
-- (void)viewWillAppear:(BOOL)animated{
-    [super viewWillAppear:animated];
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
     [VLUserCenter clearUserRoomInfo];
-    [self.listView getRoomListIfRefresh:YES];
+    [self.listView loadData];
 }
 
 - (void)setUpUI {
     VLHomeOnLineListView *listView = [[VLHomeOnLineListView alloc]initWithFrame:CGRectMake(0, kTopNavHeight, SCREEN_WIDTH, SCREEN_HEIGHT-kTopNavHeight) withDelegate:self];
     self.listView = listView;
     [self.view addSubview:listView];
-}
-
-- (BOOL)checkIsLogin {
-    if (![VLUserCenter center].isLogin) {
-        VLLoginController *loginVC = [[VLLoginController alloc] init];
-        [self.navigationController pushViewController:loginVC animated:YES];
-        return NO;
-    }
-    return YES;
 }
 
 #pragma mark - Public Methods
@@ -82,12 +69,16 @@
     return true;
 }
 
+- (void)backBtnClickEvent {
+    [super backBtnClickEvent];
+    [AppContext unloadKtvServiceImp];
+}
+
 #pragma mark --NetWork
 
 #pragma mark - deleagate
 - (void)createBtnAction {
-    if (![self checkIsLogin]) return;
-    
+
     VLCreateRoomViewController *createRoomVC = [[VLCreateRoomViewController alloc]init];
     createRoomVC.createRoomBlock = ^(CGFloat height) {
         [[KTVCreateRoomPresentView shared] update:height];
@@ -105,9 +96,8 @@
     [self.view addSubview:presentView];
 }
 
-- (void)listItemClickAction:(VLRoomListModel *)listModel {
-    if (![self checkIsLogin]) return;
-     
+- (void)listItemClickAction:(SyncRoomInfo *)listModel {
+
     if (listModel.isPrivate) {
         NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"ktv_cancel"),KTVLocalizedString(@"ktv_confirm"), nil];
         VL(weakSelf);
@@ -120,31 +110,25 @@
     }
 }
 
-- (void)joinInRoomWithModel:(VLRoomListModel *)listModel withInPutText:(NSString *)inputText {
+- (void)joinInRoomWithModel:(SyncRoomInfo *)listModel withInPutText:(NSString *)inputText {
     if (listModel.isPrivate && ![listModel.password isEqualToString:inputText]) {
         [VLToast toast:KTVLocalizedString(@"PasswordError")];
         return;
     }
-    
-    KTVJoinRoomInputModel* inputModel = [KTVJoinRoomInputModel new];
-    inputModel.roomNo = listModel.roomNo;
-//    inputModel.userNo = VLUserCenter.user.id;
-    inputModel.password = inputText;
-
     VL(weakSelf);
-    [[AppContext ktvServiceImp] joinRoomWithInputModel:inputModel completion:^(NSError * _Nullable error, KTVJoinRoomOutputModel * _Nullable outputModel) {
+    [[AppContext ktvServiceImp] joinRoomWithRoomId:listModel.roomNo password:inputText completion:^(NSError * _Nullable error) {
         if (error != nil) {
             [VLToast toast:error.description];
             return;
         }
         
-        listModel.creatorNo = outputModel.creatorNo;
+//        listModel.creatorNo = outputModel.creatorNo;
+//        listModel.roomPeopleNum = [NSString stringWithFormat:@"%li",[listModel.roomPeopleNum integerValue] + 1] ;
         VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
         ktvVC.roomModel = listModel;
-        ktvVC.seatsArray = outputModel.seatsArray;
+//        ktvVC.seatsArray = outputModel.seatsArray;
         [weakSelf.navigationController pushViewController:ktvVC animated:YES];
     }];
-
 }
 
 //- (NSArray *)configureSeatsWithArray:(NSArray *)seatsArray songArray:(NSArray *)songArray {

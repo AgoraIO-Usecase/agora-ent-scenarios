@@ -21,7 +21,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) UIButton *singingBtn;
 @property (nonatomic, strong) UIView *bottomLine;
 
-@property (nonatomic, strong) VLRoomSelSongModel *selSongModel;
+
+
+- (void)setSelSongModel:(VLRoomSelSongModel *)selSongModel isOwner:(BOOL)isOwner;
 
 @property (nonatomic, copy) void (^deleteBtnClickBlock)(VLRoomSelSongModel *model);
 

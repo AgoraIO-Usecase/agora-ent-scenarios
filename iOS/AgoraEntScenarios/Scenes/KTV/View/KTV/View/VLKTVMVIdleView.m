@@ -5,6 +5,7 @@
 
 #import "VLKTVMVIdleView.h"
 #import "AgoraEntScenarios-Swift.h"
+@import AgoraCommon;
 
 @interface VLKTVMVIdleView ()
 

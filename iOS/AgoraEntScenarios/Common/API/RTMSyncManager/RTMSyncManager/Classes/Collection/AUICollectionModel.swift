@@ -9,6 +9,7 @@ import Foundation
 
 enum AUIAnyType : Codable, Equatable {
      case int(Int)
+     case bool(Bool)
      case string(String)
      case list([AUIAnyType])
      case dictionary([String : AUIAnyType])
@@ -20,12 +21,16 @@ enum AUIAnyType : Codable, Equatable {
              self = .int(try container.decode(Int.self))
          } catch DecodingError.typeMismatch {
              do {
-                 self = .string(try container.decode(String.self))
+                 self = .bool(try container.decode(Bool.self))
              } catch DecodingError.typeMismatch {
                  do {
-                     self = .list(try container.decode([AUIAnyType].self))
+                     self = .string(try container.decode(String.self))
                  } catch DecodingError.typeMismatch {
-                     self = .dictionary(try container.decode([String : AUIAnyType].self))
+                     do {
+                         self = .list(try container.decode([AUIAnyType].self))
+                     } catch DecodingError.typeMismatch {
+                         self = .dictionary(try container.decode([String : AUIAnyType].self))
+                     }
                  }
              }
          }
@@ -35,6 +40,7 @@ enum AUIAnyType : Codable, Equatable {
          var container = encoder.singleValueContainer()
          switch self {
          case .int(let int): try container.encode(int)
+         case .bool(let bool): try container.encode(bool)
          case .string(let string): try container.encode(string)
          case .list(let list): try container.encode(list)
          case .dictionary(let dictionary): try container.encode(dictionary)
@@ -44,6 +50,7 @@ enum AUIAnyType : Codable, Equatable {
     static func ==(_ lhs: AUIAnyType, _ rhs: AUIAnyType) -> Bool {
         switch (lhs, rhs) {
         case (.int(let int1), .int(let int2)): return int1 == int2
+        case (.bool(let bool1), .bool(let bool2)): return bool1 == bool2
         case (.string(let string1), .string(let string2)): return string1 == string2
         case (.list(let list1), .list(let list2)): return list1 == list2
         case (.dictionary(let dict1), .dictionary(let dict2)): return dict1 == dict2
@@ -56,6 +63,8 @@ enum AUIAnyType : Codable, Equatable {
         array.forEach { value in
             if let v = value as? Int {
                 typeArray.append(.int(v))
+            } else if let v = value as? Bool {
+                typeArray.append(.bool(v))
             } else if let v = value as? String {
                 typeArray.append(.string(v))
             } else if let v = value as? [Any] {
@@ -73,7 +82,7 @@ enum AUIAnyType : Codable, Equatable {
             if let v = value as? Int {
                 typeMap[key] = .int(v)
             } else if let v = value as? Bool {
-                typeMap[key] = .int(v ? 1 : 0)
+                typeMap[key] = .bool(v)
             } else if let v = value as? String {
                 typeMap[key] = .string(v)
             } else if let v = value as? [Any] {
@@ -89,6 +98,8 @@ enum AUIAnyType : Codable, Equatable {
         switch self {
         case .int(let int):
             return int
+        case .bool(let bool):
+            return bool
         case .string(let string):
             return string
         case .list(let list):

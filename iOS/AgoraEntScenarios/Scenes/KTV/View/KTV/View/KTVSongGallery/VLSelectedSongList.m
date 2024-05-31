@@ -34,7 +34,6 @@ UITextFieldDelegate
 @property (nonatomic, strong) VLRoomListModel *roomModel;
 @property (nonatomic, strong) NSMutableSet *selSongViews;
 @property (nonatomic, copy) NSString *roomNo;
-@property (nonatomic, assign) BOOL ifChorus;
 @end
 
 @implementation VLSelectedSongList
@@ -46,13 +45,11 @@ UITextFieldDelegate
 
 - (instancetype)initWithFrame:(CGRect)frame
                  withDelegate:(id<VLSelectedSongListDelegate>)delegate
-                   withRoomNo:(NSString *)roomNo
-                     ifChorus:(BOOL)ifChorus{
+                   withRoomNo:(NSString *)roomNo{
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
         self.delegate = delegate;
         self.roomNo = roomNo;
-        self.ifChorus = ifChorus;
         [self setupView];
     }
     return self;
@@ -140,8 +137,7 @@ UITextFieldDelegate
     //搜索结果
     self.resultView = [[VLSearchSongResultView alloc]initWithFrame:CGRectMake(0, bgView.bottom+4, SCREEN_WIDTH, self.height-bgView.bottom-4)
                                                       withDelegate:self
-                                                        withRoomNo:self.roomNo
-                                                          ifChorus:self.ifChorus];
+                                                        withRoomNo:self.roomNo];
     self.resultView.hidden = YES;
     [self addSubview:self.resultView];
     
@@ -189,8 +185,7 @@ UITextFieldDelegate
 // 根据下标 index 返回对应遵守并实现 `JXCategoryListContentViewDelegate` 协议的列表实例
 - (id<JXCategoryListContentViewDelegate>)listContainerView:(JXCategoryListContainerView *)listContainerView initListForIndex:(NSInteger)index {
     VLSelectSongTableItemView *selSongView = [[VLSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)
-                                                                                    withRooNo:self.roomNo
-                                                                                     ifChorus:self.ifChorus];
+                                                                                    withRooNo:self.roomNo];
    // selSongView.selSongsArray = self.selSongsArray;
     [selSongView loadDatasWithIndex:index+1 ifRefresh:YES];
     selSongView.tag = BASICVCINDEX + index;

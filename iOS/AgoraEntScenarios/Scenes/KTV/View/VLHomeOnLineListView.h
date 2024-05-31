@@ -24,7 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong) UICollectionView *listCollectionView;
 
-- (void)getRoomListIfRefresh:(BOOL)ifRefresh;
+//- (void)getRoomListIfRefresh:(BOOL)ifRefresh;
+-(void)loadData;
 
 @end
 

@@ -91,7 +91,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
                 completion(nil, err)
                 return
             }
-            scene.create(payload: [:]) {[weak self] err in
+            scene.create(createTime: roomInfo.createdAt, payload: [:]) {[weak self] err in
                 if let err = err {
                     showTo1v1Error("create scene fail: \(err.localizedDescription)")
                     completion(nil, err)
