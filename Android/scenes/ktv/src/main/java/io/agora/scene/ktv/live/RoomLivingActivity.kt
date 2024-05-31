@@ -527,7 +527,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
 
                     override fun onRightButtonClick() {
                         setDarkStatusIcon(isBlackDarkStatus)
-                        roomLivingViewModel.exitRoom(true)
+                        roomLivingViewModel.exitRoom()
                         finish()
                     }
                 }

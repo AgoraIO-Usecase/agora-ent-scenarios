@@ -251,7 +251,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
                 // 自己上麦
                 mRtcEngine?.let {
                     mainChannelMediaOption.publishCameraTrack = false
-                    mainChannelMediaOption.publishMicrophoneTrack = true
+                    mainChannelMediaOption.publishMicrophoneTrack = !originSeat.isAudioMuted
                     mainChannelMediaOption.enableAudioRecordingOrPlayout = true
                     mainChannelMediaOption.autoSubscribeVideo = true
                     mainChannelMediaOption.autoSubscribeAudio = true
@@ -349,7 +349,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
      * Exit room
      *
      */
-    fun exitRoom(needLeave: Boolean = true) {
+    fun exitRoom() {
         KTVLogger.d(TAG, "RoomLivingViewModel.exitRoom() called")
         ktvServiceProtocol.leaveRoom { e: Exception? ->
             if (e == null) { // success
