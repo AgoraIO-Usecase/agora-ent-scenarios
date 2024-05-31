@@ -100,7 +100,7 @@
     }
     cell.roomerLabel.text = KTVLocalizedString(@"ktv_room_owner");
     if (seatModel.owner.userAvatar.length > 0) {
-        cell.avatarImgView.image = [UIImage imageNamed:seatModel.owner.userAvatar];
+        [cell.avatarImgView sd_setImageWithURL: [NSURL URLWithString:seatModel.owner.userAvatar]];
     }else{
         cell.avatarImgView.image = [UIImage ktv_sceneImageWithName:@"ktv_emptySeat_icon"];
         cell.volume = 0;
