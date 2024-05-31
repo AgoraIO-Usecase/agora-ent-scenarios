@@ -192,6 +192,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     bottomView.backgroundColor = [UIColor clearColor];
     self.bottomView = bottomView;
     [self.view addSubview:bottomView];
+    [bottomView setHidden:!self.requestOnLineView.isHidden];
     
     //去掉首尾的高度
     CGFloat musicHeight = SCREEN_HEIGHT -64 - kSafeAreaBottomHeight - kStatusBarHeight - 60 - 20;
