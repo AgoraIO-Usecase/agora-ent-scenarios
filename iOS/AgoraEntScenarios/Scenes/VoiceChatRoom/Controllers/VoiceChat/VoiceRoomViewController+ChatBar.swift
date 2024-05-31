@@ -18,6 +18,8 @@ extension VoiceRoomViewController {
         audioSetVC.roomInfo = roomInfo
         audioSetVC.isAudience = !isOwner
         audioSetVC.ains_state = ains_state
+        audioSetVC.aed_state = aed_state
+        audioSetVC.aspt_state = aspt_state
         audioSetVC.isTouchAble = roomInfo?.room?.use_robot ?? false
         audioSetVC.soundOpen = self.soundOpen
         audioSetVC.gainValue = self.gainValue
@@ -70,6 +72,16 @@ extension VoiceRoomViewController {
             } else {
                 self?.rtckit.playMusic(with: .ainsOff)
             }
+        }
+        
+        audioSetVC.aedBlock = { [weak self] state in
+            self?.aed_state = state
+            self?.rtckit.setAed(with: state)
+        }
+        
+        audioSetVC.asptBlock = { [weak self] state in
+            self?.aspt_state = state
+            self?.rtckit.setASPT(with: state)
         }
         
         audioSetVC.turnAIAECBlock = {[weak self] flag in
