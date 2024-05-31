@@ -6,41 +6,87 @@
 //
 
 import Foundation
+import RTMSyncManager
 
-@objc enum KTVServiceNetworkStatus: Int {
-    case connecting = 0 // 连接中
-    case open // 已打开
-    case fail // 失败
-    case closed // 已关闭
-}
+@objc protocol KTVServiceListenerProtocol: NSObjectProtocol {
+    
+    /// 房间过期
+    func onRoomDidExpire()
+    
+    /// 房间被销毁
+    func onRoomDidDestroy()
+    
+    /// 房间用户数量变更
+    /// - Parameter userCount: 用户数
+    func onUserCountUpdate(userCount: UInt)
+    
+    /// 麦位更新
+    /// - Parameter seat: 麦位对象
+    func onMicSeatSnapshot(seat: [String: VLRoomSeatModel])
+    
+    /// 麦位更新
+    /// - Parameter seat: 麦位对象
+    func onUserSeatUpdate(seat: VLRoomSeatModel)
+    
+    /// 有成员上麦（主动上麦/房主抱人上麦）
+    /// - Parameters:
+    ///   - seatIndex: 麦位索引
+    ///   - user: 用户信息
+    func onUserEnterSeat(seatIndex: Int, user: AUIUserThumbnailInfo)
+    
+    /// 有成员下麦（主动下麦/房主踢人下麦）
+    /// - Parameters:
+    ///   - seatIndex: 麦位索引
+    ///   - user: 用户信息
+    func onUserLeaveSeat(seatIndex: Int, user: AUIUserThumbnailInfo)
+    
+    /// 房主对麦位进行了静音/解禁
+    /// - Parameters:
+    ///   - seatIndex: 麦位索引
+    ///   - isMute:麦克风开关状态
+    func onSeatAudioMute(seatIndex: Int, isMute: Bool)
 
-@objc enum KTVSubscribe: Int {
-    case created // 创建
-    case deleted // 删除
-    case updated // 更新
+    /// 房主对麦位摄像头进行禁用/启用
+    /// - Parameters:
+    ///   - seatIndex: 麦位索引
+    ///   - isMute: 摄像头开关状态
+    func onSeatVideoMute(seatIndex: Int, isMute: Bool)
+    
+    /// 更新所有歌曲回调（例如pin）
+    /// - Parameter song: 歌曲列表
+    func onChosenSongListDidChanged(songs: [VLRoomSelSongModel])
+    
+    /// 合唱者加入
+    /// - Parameter chorus: 加入的合唱者信息
+    func onChoristerDidEnter(chorister: KTVChoristerModel)
+    
+    /// 合唱者离开
+    /// - Parameter chorister: 离开的合唱者
+    func onChoristerDidLeave(chorister: KTVChoristerModel)
+    
 }
 
 @objc protocol KTVServiceProtocol: NSObjectProtocol {
-    
     // room info
     
     /// 获取房间列表
     /// - Parameters:
     ///   - page: 页码
     ///   - completion: 完成回调
-    func getRoomList(page: UInt, completion: @escaping (Error?, [VLRoomListModel]?) -> Void)
+    func getRoomList(page: UInt, completion: @escaping (Error?, [AUIRoomInfo]?) -> Void)
     
     /// 创建房间
     /// - Parameters:
     ///   - inputModel: 输入模型
     ///   - completion: 完成回调
-    func createRoom(inputModel: KTVCreateRoomInputModel, completion: @escaping (Error?, KTVCreateRoomOutputModel?) -> Void)
+    func createRoom(inputModel: KTVCreateRoomInfo, completion: @escaping (Error?, AUIRoomInfo?) -> Void)
     
     /// 加入房间
     /// - Parameters:
-    ///   - inputModel: 输入模型
+    ///   - roomId: 房间id
+    ///   - password: 密码
     ///   - completion: 完成回调
-    func joinRoom(inputModel: KTVJoinRoomInputModel, completion: @escaping (Error?, KTVJoinRoomOutputModel?) -> Void)
+    func joinRoom(roomId: String, password: String, completion: @escaping (Error?) -> Void)
     
     /// 离开房间
     /// - Parameter completion: 完成回调
@@ -50,15 +96,20 @@ import Foundation
     
     /// 上麦
     /// - Parameters:
-    ///   - inputModel: 输入模型
+    ///   - seatIndex: 麦位索引
     ///   - completion: 完成回调
-    func enterSeat(inputModel: KTVOnSeatInputModel, completion: @escaping (Error?) -> Void)
+    func enterSeat(seatIndex: NSNumber?, completion: @escaping (Error?) -> Void)
     
     /// 下麦
     /// - Parameters:
-    ///   - inputModel: 输入模型
     ///   - completion: 完成回调
-    func leaveSeat(inputModel: KTVOutSeatInputModel, completion: @escaping (Error?) -> Void)
+    func leaveSeat(completion: @escaping (Error?) -> Void)
+    
+    /// 踢人下麦
+    /// - Parameters:
+    ///   - seatIndex: 麦位index
+    ///   - completion: 完成回调
+    func kickSeat(seatIndex: Int, completion: @escaping (NSError?) -> ())
     
     /// 设置麦位声音
     /// - Parameters:
@@ -76,9 +127,9 @@ import Foundation
     
     /// 删除选中歌曲
     /// - Parameters:
-    ///   - inputModel: 输入模型
+    ///   - songCode: 歌曲id
     ///   - completion: 完成回调
-    func removeSong(inputModel: KTVRemoveSongInputModel, completion: @escaping (Error?) -> Void)
+    func removeSong(songCode: String, completion: @escaping (Error?) -> Void)
     
     /// 获取选择歌曲列表
     /// - Parameter completion: 完成回调
@@ -86,9 +137,9 @@ import Foundation
     
     /// 主唱告诉后台当前播放的歌曲
     /// - Parameters:
-    ///   - inputModel: 输入模型
+    ///   - songCode: 房间id
     ///   - completion: 完成回调
-    func markSongDidPlay(inputModel: VLRoomSelSongModel, completion: @escaping (Error?) -> Void)
+    func markSongDidPlay(songCode: String, completion: @escaping (Error?) -> Void)
     
     /// 点歌
     /// - Parameters:
@@ -98,61 +149,28 @@ import Foundation
     
     /// 置顶歌曲
     /// - Parameters:
-    ///   - inputModel: 输入模型
+    ///   - songCode: 歌曲id
     ///   - completion: 完成回调
-    func pinSong(inputModel: KTVMakeSongTopInputModel, completion: @escaping (Error?) -> Void)
-    
-    // lyrics
+    func pinSong(songCode: String, completion: @escaping (Error?) -> Void)
     
     /// 加入合唱
     /// - Parameters:
-    ///   - inputModel: 输入模型
+    ///   - songCode: 歌曲id
     ///   - completion: 完成回调
-    func joinChorus(inputModel: KTVJoinChorusInputModel, completion: @escaping (Error?) -> Void)
+    func joinChorus(songCode: String, completion: @escaping (Error?) -> Void)
     
     /// 伴唱取消合唱
-    /// - Parameter completion: 完成回调
-    func coSingerLeaveChorus(completion: @escaping (Error?) -> Void)
-    
-    /// 当前歌曲合唱改为独唱
-    func enterSoloMode()
-    
-    /// 切换MV封面
     /// - Parameters:
-    ///   - inputModel: 输入模型
+    ///   - songCode: 歌曲id
     ///   - completion: 完成回调
-    func changeMVCover(inputModel: KTVChangeMVCoverInputModel, completion: @escaping (Error?) -> Void)
+    func leaveChorus(songCode: String, completion: @escaping (Error?) -> Void)
     
-    // subscribe
+    /// 订阅监听者
+    /// - Parameter listener: 监听者对象
+    func subscribe(listener: KTVServiceListenerProtocol?)
     
-    /// 订阅用户变化
-    /// - Parameter changedBlock: 变化回调
-    func subscribeUserListCountChanged(changedBlock: @escaping (UInt) -> Void)
-    
-    /// 用户属性变化
-    /// - Parameter changedBlock: 变化回调
-    func subscribeUserChanged(changedBlock: @escaping (KTVSubscribe, VLLoginModel) -> Void)
-    
-    /// 订阅麦位变化
-    /// - Parameter changedBlock: 变化回调
-    func subscribeSeatListChanged(changedBlock: @escaping (KTVSubscribe, VLRoomSeatModel) -> Void)
-    
-    /// 订阅房间状态变化
-    /// - Parameter changedBlock: 变化回调
-    func subscribeRoomStatusChanged(changedBlock: @escaping (KTVSubscribe, VLRoomListModel) -> Void)
-    
-    /// 订阅选中歌曲变化
-    /// - Parameter changedBlock: 变化回调
-    func subscribeChooseSongChanged(changedBlock: @escaping (KTVSubscribe, VLRoomSelSongModel, [VLRoomSelSongModel]) -> Void)
-    
-    /// 订阅网络状态变化
-    /// - Parameter changedBlock: 变化回调
-    func subscribeNetworkStatusChanged(changedBlock: @escaping (KTVServiceNetworkStatus) -> Void)
-    
-    /// 订阅房间过期
-    /// - Parameter changedBlock: 变化回调
-    func subscribeRoomWillExpire(changedBlock: @escaping () -> Void)
-    
-    /// 取消全部订阅
-    func unsubscribeAll()
+    /// 获取当前房间使用时长
+    /// - Parameter channelName: 频道名
+    /// - Returns: 使用时长，单位ms
+    func getCurrentDuration(channelName: String) -> UInt64
 }
