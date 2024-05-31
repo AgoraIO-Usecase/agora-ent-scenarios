@@ -166,6 +166,8 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     var effectClickBlock: ((SOUND_TYPE) -> Void)?
     var visitBlock: (() -> Void)?
     var selBlock: ((AINS_STATE) -> Void)?
+    var aedBlock: ((AED_STATE) -> Void)?
+    var asptBlock: ((ASPT_STATE) -> Void)?
     var soundBlock: ((Int) -> Void)?
     var turnAIAECBlock:((Bool) ->Void)?
     var turnAGCBlock:((Bool) ->Void)?
@@ -184,6 +186,9 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     public var gainValue: String?
     public var typeValue: Int?
     public var effectType: Int?
+    
+    public var aed_state: AED_STATE = .off
+    public var aspt_state: ASPT_STATE = .off
     
     init(rtcKit: VoiceRoomRTCManager?) {
         super.init(nibName: nil, bundle: nil)
@@ -344,6 +349,12 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 cell.contentLabel.text = "voice_Medium".voice_localized()
             case .off:
                 cell.contentLabel.text = "voice_off".voice_localized()
+            case .aiMid:
+                cell.contentLabel.text = "AI弱"
+            case .aiHigh:
+                cell.contentLabel.text = "AI强"
+            case .custom:
+                cell.contentLabel.text = "自定义"
             }
             return cell
         } else if (type == .AIAEC) {
@@ -570,6 +581,8 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         detailVC.soundEffect = roomInfo?.room?.sound_effect ?? 1
         detailVC.settingType = state
         detailVC.ains_state = ains_state
+        detailVC.aed_state = aed_state
+        detailVC.aspt_state = aspt_state
         detailVC.isTouchAble = isTouchAble
         detailVC.tableViewHeight = tableViewHeight
         detailVC.selBlock = { [weak self] state in
@@ -580,6 +593,23 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             self?.tableView.reloadData()
             selBlock(state)
         }
+        
+        detailVC.aedBlock = { [weak self] state in
+            guard let selBlock = self?.aedBlock else {
+                return
+            }
+            self?.aed_state = state
+            selBlock(state)
+        }
+        
+        detailVC.asptBlock = { [weak self] state in
+            guard let selBlock = self?.asptBlock else {
+                return
+            }
+            self?.aspt_state = state
+            selBlock(state)
+        }
+        
         detailVC.turnAIAECBlock = { [weak self] flag in
             guard let turnAIAECBlock = self?.turnAIAECBlock else {
                 return
