@@ -12,8 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSArray *selSongsArray;
 
 - (instancetype)initWithFrame:(CGRect)frame
-                    withRooNo:(NSString *)roomNo
-                     ifChorus:(BOOL)ifChorus;
+                    withRooNo:(NSString *)roomNo;
 
 - (void)loadDatasWithIndex:(NSInteger)pageType ifRefresh:(BOOL)ifRefresh;
 //更新别人点的歌曲状态

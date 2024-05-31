@@ -8,6 +8,7 @@
 #import "VLVoiceShowView.h"
 #import <SDWebImage/UIImageView+WebCache.h>
 #import "AgoraEntScenarios-Swift.h"
+
 @interface VLVoiceShowView()
 @property(nonatomic, weak) id <VLVoiceShowViewDelegate>delegate;
 @property (nonatomic,strong) UILabel *selLabel;
@@ -128,5 +129,8 @@
 -(void)layoutSubviews{
     [super layoutSubviews];
 }
+
+//- (void)setSelectedIndex:(NSInteger)index {
+//}
 
 @end

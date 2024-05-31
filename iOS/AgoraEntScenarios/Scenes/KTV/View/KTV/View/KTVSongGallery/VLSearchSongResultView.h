@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLSearchSongResultView : UIView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLSearchSongResultViewDelegate>)delegate withRoomNo:(nonnull NSString *)roomNo ifChorus:(BOOL)ifChorus;
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLSearchSongResultViewDelegate>)delegate withRoomNo:(nonnull NSString *)roomNo;
 
 - (void)loadSearchDataWithKeyWord:(NSString *)keyWord ifRefresh:(BOOL)ifRefresh;
 

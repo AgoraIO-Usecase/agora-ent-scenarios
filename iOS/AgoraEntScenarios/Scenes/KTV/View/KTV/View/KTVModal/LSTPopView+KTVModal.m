@@ -112,6 +112,7 @@
 
 //弹出点歌视图
 + (LSTPopView*)popUpChooseSongViewWithParentView:(UIView*)parentView
+                                         isOwner: (BOOL)isOwner
                                         isChorus:(BOOL)isChorus
                                  chooseSongArray: (NSArray*)chooseSongArray
                                       withRoomNo:(NSString*)roomNo
@@ -122,7 +123,7 @@
                                            withDelegate:delegate
                                            withRoomNo:roomNo
                                            ifChorus:isChorus];
-    chooseSongView.selSongsArray = chooseSongArray;
+    [chooseSongView setSelSongsArray:chooseSongArray isOwner:isOwner];
     chooseSongView = chooseSongView;
     LSTPopView* popView = [self _createKTVPopContainerWithContentView:chooseSongView
                                                           withParentView:parentView];
