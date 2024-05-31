@@ -456,7 +456,7 @@ class KTVSyncManagerServiceImp constructor(
     override fun kickSeat(seatIndex: Int, completion: (error: Exception?) -> Unit) {
         val collection = getSeatCollection(mCurRoomNo) ?: return
         collection.mergeMetaData(
-            valueCmd = RoomSeatCmd.leaveSeatCmd.name,
+            valueCmd = RoomSeatCmd.kickSeatCmd.name,
             value = mapOf(
                 seatIndex.toString() to mapOf(
                     "owner" to GsonTools.beanToMap(AUIUserThumbnailInfo())
@@ -946,16 +946,15 @@ class KTVSyncManagerServiceImp constructor(
             delegate.onUserCountUpdate(mUserList.size)
         }
         val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return
-        if (mCurrentUser.userId == cacheRoom.roomOwner?.userId) {
-            cacheRoom.customPayload[KTVParameters.ROOM_USER_COUNT] = mUserList.count()
-            mRoomManager.updateRoomInfo(KtvCenter.mAppId, kSceneId, cacheRoom, callback = { auiException, roomInfo ->
-                if (auiException == null) {
-                    KTVLogger.d(TAG, "onRoomUserEnter updateRoom success: $mCurRoomNo, $roomInfo")
-                } else {
-                    KTVLogger.e(TAG, "onRoomUserEnter updateRoom failed: $mCurRoomNo $auiException")
-                }
-            })
-        }
+        // 所有人都可修改用户数
+        cacheRoom.customPayload[KTVParameters.ROOM_USER_COUNT] = mUserList.count()
+        mRoomManager.updateRoomInfo(KtvCenter.mAppId, kSceneId, cacheRoom, callback = { auiException, roomInfo ->
+            if (auiException == null) {
+                KTVLogger.d(TAG, "onRoomUserEnter updateRoom success: $mCurRoomNo, $roomInfo")
+            } else {
+                KTVLogger.e(TAG, "onRoomUserEnter updateRoom failed: $mCurRoomNo $auiException")
+            }
+        })
     }
 
     /**
@@ -969,77 +968,26 @@ class KTVSyncManagerServiceImp constructor(
         if (mCurRoomNo != roomId) {
             return
         }
-        if (AUIRoomContext.shared().isRoomOwner(roomId)) {
-            innerCleanUserInfo(userInfo.userId)
-        }
         mUserList.removeIf { it.userId == userInfo.userId }
         mObservableHelper.notifyEventHandlers { delegate ->
             delegate.onUserCountUpdate(mUserList.size)
         }
         val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return
-        if (AUIRoomContext.shared().isRoomOwner(roomId)) {
-            cacheRoom.customPayload[KTVParameters.ROOM_USER_COUNT] = mUserList.count()
-            mRoomManager.updateRoomInfo(KtvCenter.mAppId, kSceneId, cacheRoom, callback = { auiException, roomInfo ->
-                if (auiException == null) {
-                    KTVLogger.d(TAG, "onRoomUserLeave updateRoom success: $roomId, $roomInfo")
-                } else {
-                    KTVLogger.d(TAG, "onRoomUserLeave updateRoom failed: $roomId $auiException")
-                }
-            })
-        }
+        // 所有人都可修改用户数
+        cacheRoom.customPayload[KTVParameters.ROOM_USER_COUNT] = mUserList.count()
+        mRoomManager.updateRoomInfo(KtvCenter.mAppId, kSceneId, cacheRoom, callback = { auiException, roomInfo ->
+            if (auiException == null) {
+                KTVLogger.d(TAG, "onRoomUserLeave updateRoom success: $roomId, $roomInfo")
+            } else {
+                KTVLogger.d(TAG, "onRoomUserLeave updateRoom failed: $roomId $auiException")
+            }
+        })
+        // 仲裁者剔除麦位
         if (AUIRoomContext.shared().getArbiter(roomId)?.isArbiter() == true) {
             mSeatMap.values.firstOrNull { it.owner?.userId == userInfo.userId }?.let { roomMicSeatInfo ->
                 kickSeat(roomMicSeatInfo.seatIndex) {}
             }
         }
-    }
-
-    /**
-     * Inner clean user info
-     *
-     * @param userId
-     */
-    private fun innerCleanUserInfo(userId: String) {
-//        val seatIndex = mSeatMap.values.firstOrNull { it.owner?.userId == userId }?.seatIndex
-//        if (seatIndex != null) {
-//            // 移除麦位信息
-//            mSeatInfoCollection?.mergeMetaData(
-//                valueCmd = RoomSeatCmd.leaveSeatCmd.name,
-//                value = mapOf(
-//                    seatIndex.toString() to mapOf(
-//                        "owner" to GsonTools.beanToMap(AUIUserThumbnailInfo())
-//                    )
-//                ),
-//                callback = {
-//                    if (it == null) {
-//                        KTVLogger.d(TAG, "innerCleanUserInfo-->removeSeat success, index:$seatIndex")
-//                    } else {
-//                        KTVLogger.e(TAG, "innerCleanUserInfo-->removeSeat failed, index:$seatIndex, $it")
-//                    }
-//                })
-//        }
-//        // 移除点歌信息，
-//        mChosenSongCollection?.removeMetaData(
-//            valueCmd = RoomSongCmd.removeSongCmd.name,
-//            filter = listOf(mapOf("owner" to mapOf("userId" to userId))),
-//            callback = {
-//                if (it == null) {
-//                    KTVLogger.d(TAG, "innerCleanUserInfo-->removeSongByUid success, uid:$userId")
-//                } else {
-//                    KTVLogger.e(TAG, "innerCleanUserInfo-->removeSongByUid failed, uid:$userId $it")
-//                }
-//            })
-//        // 移除合唱信息
-//        mChoristerInfoCollection?.removeMetaData(
-//            valueCmd = null,
-//            filter = listOf(mapOf("userId" to userId)),
-//            callback = {
-//                if (it == null) {
-//                    KTVLogger.d(TAG, "innerCleanUserInfo-->leaveChorus success, useId:$userId")
-//                } else {
-//                    KTVLogger.e(TAG, "innerCleanUserInfo-->leaveChorus failed, useId:$userId, $it")
-//                }
-//            })
     }
 
     /**

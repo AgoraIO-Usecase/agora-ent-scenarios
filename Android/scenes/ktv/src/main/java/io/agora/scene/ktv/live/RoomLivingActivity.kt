@@ -371,16 +371,24 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
             }
         }
         roomLivingViewModel.joinchorusStatusLiveData.observe(this) { status: JoinChorusStatus ->
-            if (status == JoinChorusStatus.ON_JOIN_CHORUS) {
-                binding.cbMic.setChecked(true)
-                binding.lrcControlView.onSelfJoinedChorus()
-            } else if (status == JoinChorusStatus.ON_JOIN_FAILED) {
-                binding.lrcControlView.onSelfJoinedChorusFailed()
-                val yOfChorusBtn = binding.lrcControlView.getYOfChorusBtn()
-                CustomToast.showByPosition(R.string.ktv_join_chorus_failed, Gravity.TOP, yOfChorusBtn)
-            } else if (status == JoinChorusStatus.ON_LEAVE_CHORUS) {
-                binding.cbMic.setChecked(false)
-                binding.lrcControlView.onSelfLeavedChorus()
+            when (status) {
+                JoinChorusStatus.ON_JOIN_CHORUS -> {
+                    binding.lrcControlView.onSelfJoinedChorus()
+                }
+
+                JoinChorusStatus.ON_JOIN_FAILED -> {
+                    binding.lrcControlView.onSelfJoinedChorusFailed()
+                    val yOfChorusBtn = binding.lrcControlView.getYOfChorusBtn()
+                    CustomToast.showByPosition(R.string.ktv_join_chorus_failed, Gravity.TOP, yOfChorusBtn)
+                }
+
+                JoinChorusStatus.ON_LEAVE_CHORUS -> {
+                    binding.lrcControlView.onSelfLeavedChorus()
+                }
+
+                JoinChorusStatus.ON_IDLE -> {
+                    //nothing
+                }
             }
         }
         roomLivingViewModel.playerMusicOpenDurationLiveData.observe(this) { duration: Long ->

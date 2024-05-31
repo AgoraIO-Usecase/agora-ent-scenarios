@@ -375,7 +375,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
             if (e == null) { // success
                 KTVLogger.d(TAG, "RoomLivingViewModel.haveSeat() success")
             } else { // failure
-                KTVLogger.e(TAG, "RoomLivingViewModel.haveSeat() failed: " + e.message)
+                KTVLogger.e(TAG, "RoomLivingViewModel.haveSeat() failed: $e")
             }
             e?.message?.let { error ->
                 CustomToast.show(error, Toast.LENGTH_SHORT)
@@ -495,7 +495,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
                 KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() success")
             } else { // failed
                 if (e != null) {
-                    KTVLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed: " + e.message)
+                    KTVLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed: $e")
                 }
                 e?.message?.let { error ->
                     CustomToast.show(error, Toast.LENGTH_SHORT)
@@ -726,7 +726,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
             if (e == null) { // success: do nothing for subscriber dealing with the event already
                 KTVLogger.d(TAG, "RoomLivingViewModel.topUpSong() success")
             } else { // failure
-                KTVLogger.e(TAG, "RoomLivingViewModel.topUpSong() failed: " + e.message)
+                KTVLogger.e(TAG, "RoomLivingViewModel.topUpSong() failed: $e")
             }
             e?.message?.let { error ->
                 CustomToast.show(error, Toast.LENGTH_SHORT)
