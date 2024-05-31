@@ -72,7 +72,7 @@
 
 - (void)setListModel:(SyncRoomInfo *)listModel {
     _listModel = listModel;
-    self.iconImgView.image = [UIImage imageNamed:listModel.creatorAvatar];
+    [self.iconImgView sd_setImageWithURL:[NSURL URLWithString:listModel.creatorAvatar]];
 
     if (listModel.isPrivate) {
         self.lockImgView.hidden = NO;

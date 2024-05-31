@@ -140,7 +140,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 
 @implementation VLKTVViewController
 
-- (VLAudienceIndicator *)customView {
+- (VLAudienceIndicator *)requestOnLineView {
     if (!_requestOnLineView) {
         _requestOnLineView = [[VLAudienceIndicator alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT-kSafeAreaBottomHeight-56-VLREALVALUE_WIDTH(30), SCREEN_WIDTH, 56)
                                                            withDelegate:self];
@@ -301,106 +301,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 
 #pragma mark service handler
 - (void)subscribeServiceEvent {
-    VL(weakSelf);
     [[AppContext ktvServiceImp] subscribeWithListener:self];
-    
-//    [[AppContext ktvServiceImp] unsubscribeAll];
-//    [[AppContext ktvServiceImp] subscribeUserListCountChangedWithChangedBlock:^(NSUInteger count) {
-//        //TODO
-//        [weakSelf setRoomUsersCount:count];
-//    }];
-    
-//    [[AppContext ktvServiceImp] subscribeSeatListChangedWithChangedBlock:^(KTVSubscribe status, VLRoomSeatModel* seatModel) {
-////        [AgoraEntAuthorizedManager checkMediaAuthorizedWithParent:self type: self.checkType completion:^(BOOL granted) {
-////            if (!granted) { return; }
-//            VLRoomSeatModel* model = [self getUserSeatInfoWithIndex:seatModel.seatIndex];
-//            if (model == nil) {
-//                return;
-//            }
-//            
-//            if (status == KTVSubscribeCreated || status == KTVSubscribeUpdated) {
-//                //上麦消息 / 是否打开视频 / 是否静音
-//                [model resetWithSeatInfo:seatModel];
-//                [weakSelf setSeatsArray:weakSelf.seatsArray];
-//            } else if (status == KTVSubscribeDeleted) {
-//                // 下麦消息
-//                
-//                // 下麦重置占位模型
-//                [model resetWithSeatInfo:nil];
-//                [weakSelf setSeatsArray:weakSelf.seatsArray];
-//                
-//            }
-//            
-//            VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
-//            if(!self.isJoinChorus){
-//                [weakSelf setMVViewStateWith:song];
-//            }
-//            [weakSelf.roomPersonView reloadSeatIndex:model.seatIndex];
-//            
-//            [weakSelf onSeatFull];
-//        //}];
-//    }];
-    
-//    [[AppContext ktvServiceImp] subscribeRoomStatusChangedWithChangedBlock:^(KTVSubscribe status, SyncRoomInfo* roomInfo) {
-//        if (KTVSubscribeUpdated == status) {
-//            //切换背景
-//        } else if (status == KTVSubscribeDeleted) {
-//            //房主关闭房间
-//            if ([roomInfo.creatorNo isEqualToString:VLUserCenter.user.id]) {
-//                NSString *mes = KTVLocalizedString(@"ktv_room_exit");
-//                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage ktv_sceneImageWithName:@"empty" ] message:mes buttonTitle:KTVLocalizedString(@"ktv_confirm") completion:^(bool flag, NSString * _Nullable text) {
-//                    [[VLKTVAlert shared]dismiss];
-//                    [weakSelf leaveRoom];
-//                }];
-//                return;
-//            }
-//            
-//            [weakSelf popForceLeaveRoom];
-//        }
-//    }];
-    
-    //callback if choose song list did changed
-//    [[AppContext ktvServiceImp] subscribeChooseSongChangedWithChangedBlock:^(KTVSubscribe status, VLRoomSelSongModel * songInfo, NSArray<VLRoomSelSongModel*>* songArray) {
-//        // update in-ear monitoring
-//        [weakSelf _checkInEarMonitoring];
-//        
-//        if (KTVSubscribeDeleted == status) {
-//            BOOL success = [weakSelf removeSelSongWithSongNo:[songInfo.songNo integerValue] sync:NO];
-//            if (!success) {
-//                weakSelf.selSongsArray = songArray;
-//                KTVLogInfo(@"removeSelSongWithSongNo fail, reload it");
-//            }
-//            //清除合唱者总分
-//            weakSelf.coSingerDegree = 0;
-//            [LSTPopView removeAllPopView];
-//        } else {
-//            VLRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
-//            //add new song
-//            KTVLogInfo(@"song did updated: %@ status: %ld", song.name, songInfo.status);
-//            weakSelf.selSongsArray = [NSMutableArray arrayWithArray:songArray];
-//        }
-//    }];
-    
-//    [[AppContext ktvServiceImp] subscribeNetworkStatusChangedWithChangedBlock:^(KTVServiceNetworkStatus status) {
-//        if (status != KTVServiceNetworkStatusOpen) {
-////            [VLToast toast:[NSString stringWithFormat:@"network changed: %ld", status]];
-//            return;
-//        }
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            // 在主线程中执行的代码
-//            [weakSelf subscribeServiceEvent];
-//            [weakSelf _fetchServiceAllData];
-//        });
-//    }];
-    
-//    [[AppContext ktvServiceImp] subscribeRoomWillExpireWithChangedBlock:^{
-//        bool isOwner = [weakSelf.roomModel.creatorNo isEqualToString:VLUserCenter.user.id];
-//        NSString *mes = isOwner ? KTVLocalizedString(@"ktv_room_timeout") : KTVLocalizedString(@"ktv_room_offline");
-//        [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage ktv_sceneImageWithName:@"empty" ] message:mes buttonTitle:KTVLocalizedString(@"ktv_confirm") completion:^(bool flag, NSString * _Nullable text) {
-//            [[VLKTVAlert shared]dismiss];
-//            [weakSelf leaveRoom];
-//        }];
-//    }];
 }
 
 -(void)setMVViewStateWith:(VLRoomSelSongModel *)song {
@@ -2327,8 +2228,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //    [self.RTCkit enableLocalAudio:isOnMicSeat];
     //    [self.RTCkit muteLocalAudioStream:!isOnMicSeat];
     
-    self.bottomView.hidden = !_isOnMicSeat;
-    self.requestOnLineView.hidden = !self.bottomView.hidden;
+    self.bottomView.hidden = !isOnMicSeat;
+    self.requestOnLineView.hidden = isOnMicSeat;
     
 //    VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
 //    if(onMicSeatStatusDidChanged){

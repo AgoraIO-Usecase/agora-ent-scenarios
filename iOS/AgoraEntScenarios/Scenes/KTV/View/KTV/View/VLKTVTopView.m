@@ -97,7 +97,7 @@
     _listModel = listModel;
     self.titleLabel.text = listModel.name;
     NSString *roomCountPre = KTVLocalizedString(@"ktv_room_count");
-    self.logoImgView.image = [UIImage imageNamed:listModel.creatorAvatar];
+    [self.logoImgView sd_setImageWithURL:[NSURL URLWithString:listModel.creatorAvatar]];
     if (listModel.roomPeopleNum) {
         NSString *roomCountString = [NSString stringWithFormat:@"%ld%@  |", listModel.roomPeopleNum, roomCountPre];
         self.countLabel.text = roomCountString;
