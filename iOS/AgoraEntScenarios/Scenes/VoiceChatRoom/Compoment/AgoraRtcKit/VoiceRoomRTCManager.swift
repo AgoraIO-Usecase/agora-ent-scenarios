@@ -30,6 +30,25 @@ public enum AINS_STATE {
     case high
     case mid
     case off
+    case aiHigh
+    case aiMid
+    case custom
+}
+
+//音乐保护
+public enum AED_STATE {
+    case off
+    case low
+    case high
+    case custom
+}
+
+//人声保护
+public enum ASPT_STATE {
+    case off
+    case low
+    case high
+    case custom
 }
 
 /**
@@ -299,6 +318,13 @@ public let kMPK_RTC_UID: UInt = 1
     public func joinVoicRoomWith(with channelName: String,token: String?, rtcUid: Int?, type: VMMUSIC_TYPE) -> Int32 {
         self.type = .VoiceChat
         rtcKit.delegate = self
+        print("V:\(AgoraRtcEngineKit.getSdkVersion())")
+        rtcKit.setParameters("{\"che.audio.sf.enabled\":true}")
+        rtcKit.setParameters("{\"che.audio.sf.nsEnable\":1}")
+        rtcKit.setParameters("{\"che.audio.sf.nlpEnable\":1}")
+        rtcKit.setParameters("{\"che.audio.ans.enable\":false}")
+        rtcKit.setParameters("{\"che.audio.aec.nlpEanble\":false}")
+        
         rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
         self.setParametersWithMD()
         if type == .ktv || type == .social {
@@ -320,6 +346,7 @@ public let kMPK_RTC_UID: UInt = 1
         setAINS(with: .mid)
         rtcKit.setParameters("{\"che.audio.start_debug_recording\":\"all\"}")
         rtcKit.setParameters("{\"che.audio.input_sample_rate\":48000}")
+        
         rtcKit.setEnableSpeakerphone(true)
         rtcKit.setDefaultAudioRouteToSpeakerphone(true)
         let mediaOption = AgoraRtcChannelMediaOptions()
@@ -328,6 +355,12 @@ public let kMPK_RTC_UID: UInt = 1
         mediaOption.autoSubscribeAudio = true
         mediaOption.autoSubscribeVideo = false
         mediaOption.clientRoleType = role == .audience ? .audience : .broadcaster
+        
+        UserDefaults.standard.setValue(false, forKey: "AINSCUSTOM")
+        UserDefaults.standard.setValue(false, forKey: "AEDCUSTOM")
+        UserDefaults.standard.setValue(false, forKey: "ASPTCUSTOM")
+        UserDefaults.standard.synchronize()
+        
         return rtcKit.joinChannel(byToken: token, channelId: channelName, uid: UInt(rtcUid ?? 0), mediaOptions: mediaOption)
     }
 
@@ -571,27 +604,90 @@ public let kMPK_RTC_UID: UInt = 1
      */
     public func setAINS(with level: AINS_STATE) {
         switch level {
-        case .high:
-            rtcKit.setParameters("{\"che.audio.ains_mode\":2}")
-            rtcKit.setParameters("{\"che.audio.nsng.lowerBound\":10}")
-            rtcKit.setParameters("{\"che.audio.nsng.lowerMask\":10}")
-            rtcKit.setParameters("{\"che.audio.nsng.statisticalbound\":0}")
-            rtcKit.setParameters("{\"che.audio.nsng.finallowermask\":8}")
-            rtcKit.setParameters("{\"che.audio.nsng.enhfactorstastical\":200}")
+         case .high:
+            rtcKit.setParameters("{\"che.audio.sf.nsEnable\":1}")
+            rtcKit.setParameters("{\"che.audio.sf.nsngAlgRoute\":10}")
+            rtcKit.setParameters("{\"che.audio.sf.nsngPredefAgg\":11}")
+            rtcKit.setParameters("{\"che.audio.sf.statNsFastNsSpeechTrigThreshold\":50}")
         case .mid:
-            rtcKit.setParameters("{\"che.audio.ains_mode\":2}")
-            rtcKit.setParameters("{\"che.audio.nsng.lowerBound\":80}")
-            rtcKit.setParameters("{\"che.audio.nsng.lowerMask\":50}")
-            rtcKit.setParameters("{\"che.audio.nsng.statisticalbound\":5}")
-            rtcKit.setParameters("{\"che.audio.nsng.finallowermask\":30}")
-            rtcKit.setParameters("{\"che.audio.nsng.enhfactorstastical\":200}")
+            rtcKit.setParameters("{\"che.audio.sf.nsEnable\":1}")
+            rtcKit.setParameters("{\"che.audio.sf.nsngAlgRoute\":10}")
+            rtcKit.setParameters("{\"che.audio.sf.nsngPredefAgg\":10}")
+            rtcKit.setParameters("{\"che.audio.sf.statNsFastNsSpeechTrigThreshold\":0}")
         case .off:
-            rtcKit.setParameters("{\"che.audio.ains_mode\":-1}")
-            rtcKit.setParameters("{\"che.audio.nsng.lowerBound\":80}")
-            rtcKit.setParameters("{\"che.audio.nsng.lowerMask\":50}")
-            rtcKit.setParameters("{\"che.audio.nsng.statisticalbound\":5}")
-            rtcKit.setParameters("{\"che.audio.nsng.finallowermask\":30}")
-            rtcKit.setParameters("{\"che.audio.nsng.enhfactorstastical\":200}")
+            rtcKit.setParameters("{\"che.audio.sf.nsEnable\":0}")
+        case .aiHigh:
+            rtcKit.setParameters("{\"che.audio.sf.nsEnable\":1}")
+            rtcKit.setParameters("{\"che.audio.sf.ainsToLoadFlag\":1}")
+            rtcKit.setParameters("{\"che.audio.sf.nsngAlgRoute\":12}")
+            rtcKit.setParameters("{\"che.audio.sf.nsngPredefAgg\":10}")
+        case .aiMid:
+            rtcKit.setParameters("{\"che.audio.sf.nsEnable\":1}")
+            rtcKit.setParameters("{\"che.audio.sf.ainsToLoadFlag\":1}")
+            rtcKit.setParameters("{\"che.audio.sf.nsngAlgRoute\":12}")
+            rtcKit.setParameters("{\"che.audio.sf.nsngPredefAgg\":11}")
+        case .custom:
+            let nsEnable = Int(AgoraConfig.parmVals[0])
+            let ainsToLoadFlag = Int(AgoraConfig.parmVals[1])
+            let nsngAlgRoute = Int(AgoraConfig.parmVals[2])
+            let nsngPredefAgg = Int(AgoraConfig.parmVals[3])
+            let nsngMapInMaskMin = Int(AgoraConfig.parmVals[4])
+            let nsngMapOutMaskMin = Int(AgoraConfig.parmVals[5])
+            let statNsLowerBound = Int(AgoraConfig.parmVals[6])
+            let nsngFinalMaskLowerBound = Int(AgoraConfig.parmVals[7])
+            let statNsEnhFactor = Int(AgoraConfig.parmVals[8])
+            let statNsFastNsSpeechTrigThreshold = Int(AgoraConfig.parmVals[9])
+            
+            rtcKit.setParameters("{\"che.audio.sf.nsEnable\":\(nsEnable)}")
+            rtcKit.setParameters("{\"che.audio.sf.ainsToLoadFlag\":\(ainsToLoadFlag)}")
+            rtcKit.setParameters("{\"che.audio.sf.nsngAlgRoute\":\(nsngAlgRoute)}")
+            rtcKit.setParameters("{\"che.audio.sf.nsngPredefAgg\":\(nsngPredefAgg)}")
+            rtcKit.setParameters("{\"che.audio.sf.nsngMapInMaskMin\":\(nsngMapInMaskMin)}")
+            rtcKit.setParameters("{\"che.audio.sf.nsngMapOutMaskMin\":\(nsngMapOutMaskMin)}")
+            rtcKit.setParameters("{\"che.audio.sf.statNsLowerBound\":\(statNsLowerBound)}")
+            rtcKit.setParameters("{\"che.audio.sf.nsngFinalMaskLowerBound\":\(nsngFinalMaskLowerBound)}")
+            rtcKit.setParameters("{\"che.audio.sf.statNsEnhFactor\":\(statNsEnhFactor)}")
+            rtcKit.setParameters("{\"che.audio.sf.statNsFastNsSpeechTrigThreshold\":\(statNsFastNsSpeechTrigThreshold)}")
+        }
+    }
+    
+    public func setAed(with state: AED_STATE){
+        switch state {
+        case .off:
+            rtcKit.setParameters("{\"che.audio.aed.enable\":0}")
+        case .low:
+            rtcKit.setParameters("{\"che.audio.aed.enable\":1}")
+            rtcKit.setParameters("{\"che.audio.sf.nsngMusicProbThr\":85}")
+            rtcKit.setParameters("{\"che.audio.sf.ainsMusicModeBackoffDB\":270}")
+            rtcKit.setParameters("{\"che.audio.sf.statNsMusicModeBackoffDB\":200}")
+        case .high:
+            rtcKit.setParameters("{\"che.audio.aed.enable\":1}")
+            rtcKit.setParameters("{\"che.audio.sf.nsngMusicProbThr\":60}")
+            rtcKit.setParameters("{\"che.audio.sf.ainsMusicModeBackoffDB\":270}")
+            rtcKit.setParameters("{\"che.audio.sf.statNsMusicModeBackoffDB\":200}")
+        case .custom:
+            let aedEnable = Int(AgoraConfig.parmVals[10])
+            let nsngMusicProbThr = Int(AgoraConfig.parmVals[11])
+            let statNsMusicModeBackoffDB = Int(AgoraConfig.parmVals[12])
+            let ainsMusicModeBackoffDB = Int(AgoraConfig.parmVals[13])
+            rtcKit.setParameters("{\"che.audio.aed.enable\":\(aedEnable)}")
+            rtcKit.setParameters("{\"che.audio.aed.nsngMusicProbThr\":\(nsngMusicProbThr)}")
+            rtcKit.setParameters("{\"che.audio.aed.statNsMusicModeBackoffDB\":\(statNsMusicModeBackoffDB)}")
+            rtcKit.setParameters("{\"che.audio.aed.ainsMusicModeBackoffDB\":\(ainsMusicModeBackoffDB)}")
+        }
+    }
+    
+    public func setASPT(with state: ASPT_STATE){
+        switch state {
+        case .off:
+            rtcKit.setParameters("{\"che.audio.sf.ainsSpeechProtectThreshold\":100}")
+        case .low:
+            rtcKit.setParameters("{\"che.audio.sf.ainsSpeechProtectThreshold\":85}")
+        case .high:
+            rtcKit.setParameters("{\"che.audio.sf.ainsSpeechProtectThreshold\":50}")
+        case .custom:
+            let ainsSpeechProtectThreshold = Int(AgoraConfig.parmVals.last ?? 0)
+            rtcKit.setParameters("{\"che.audio.sf.ainsSpeechProtectThreshold\":\(ainsSpeechProtectThreshold)}")
         }
     }
 

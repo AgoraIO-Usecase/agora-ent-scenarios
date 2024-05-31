@@ -18,6 +18,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         NotificationCenter.default.addObserver(self, selector: #selector(didTokenExpired), name: NSNotification.Name(rawValue: "AGORAENTTOKENEXPIRED"), object: nil)
         
+        //重置ains的自定义状态
+        UserDefaults.standard.setValue(false, forKey: "AINSCUSTOM")
+        UserDefaults.standard.setValue(false, forKey: "AEDCUSTOM")
+        UserDefaults.standard.setValue(false, forKey: "ASPTCUSTOM")
+        UserDefaults.standard.synchronize()
+        
         window?.configRootViewController()
         return true
     }
@@ -42,8 +48,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppContext.shared.RestfulApiKey = KeyCenter.RestfulApiKey ?? ""
         AppContext.shared.RestfulApiSecret = KeyCenter.RestfulApiSecret ?? ""
         AppContext.shared.baseServerUrl = KeyCenter.baseServerUrl ?? ""
-        AppContext.shared.cloudPlayerKey = KeyCenter.CloudPlayerKey ?? ""
-        AppContext.shared.cloudPlayerSecret = KeyCenter.CloudPlayerSecret ?? ""
+//        AppContext.shared.cloudPlayerKey = KeyCenter.CloudPlayerKey ?? ""
+//        AppContext.shared.cloudPlayerSecret = KeyCenter.CloudPlayerSecret ?? ""
         
         AGResourceManagerContext.shared.displayLogClosure = { text in
             asyncToMainThread {

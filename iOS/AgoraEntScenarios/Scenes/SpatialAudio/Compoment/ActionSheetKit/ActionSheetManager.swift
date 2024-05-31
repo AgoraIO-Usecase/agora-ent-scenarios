@@ -14,6 +14,13 @@ enum ActionSheetCellType {
     case segment
     case tips
     case custom
+    case tf
+}
+
+public enum AINS_CUSTOM_SET_TYPE {
+    case ns
+    case aed
+    case aspt
 }
 
 class ActionSheetModel: NSObject {
@@ -41,6 +48,7 @@ class ActionSheetModel: NSObject {
         case .segment: return ActionSheetSegmentCell.description()
         case .tips: return ActionSheetTipsCell.description()
         case .custom: return ActionSheetCustomCell.description()
+        case .tf: return ActionSheetTFCell.description()
         }
     }
 }
@@ -56,6 +64,7 @@ class ActionSheetManager: UIView {
     @objc var didSliderValueChangeClosure: ((IndexPath, Double) -> Void)?
     @objc var didSwitchValueChangeClosure: ((IndexPath, Bool) -> Void)?
     @objc var didSegmentValueChangeClosure: ((IndexPath, String, Int) -> Void)?
+    var didCustomModeSetClosure:((AINS_CUSTOM_SET_TYPE) -> Void)?
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .grouped)
@@ -80,6 +89,7 @@ class ActionSheetManager: UIView {
                            forCellReuseIdentifier: ActionSheetTipsCell.description())
         tableView.register(ActionSheetCustomCell.self,
                            forCellReuseIdentifier: ActionSheetCustomCell.description())
+        tableView.register(ActionSheetTFCell.self, forCellReuseIdentifier:ActionSheetTFCell.description())
         return tableView
     }()
     private lazy var backButton: UIButton = {
@@ -217,6 +227,21 @@ class ActionSheetManager: UIView {
         insertEmptyHeaderData()
         return self
     }
+    
+    @objc func tfCell(
+        title: String,
+        value: Double,
+        desc: String) -> ActionSheetManager {
+        let model = ActionSheetModel()
+        model.title = title
+        model.decs = desc
+        model.value = value
+        model.cellType = .tf
+        dataArray.append(model)
+        insertEmptyHeaderData()
+        return self
+    }
+    
     @objc func sliderCell(iconName: String? = nil,
                     title: String?,
                     value: Double,
@@ -266,6 +291,14 @@ class ActionSheetManager: UIView {
         model.decs = desc
         tableView.reloadData()
     }
+    
+    func updateTFCellDesc(indexPath: IndexPath, value: Double) {
+        let section = indexPath.section >= sectionArray.count ? indexPath.section - 1 : indexPath.section
+        let model = sectionArray.count > 0 ? sectionArray[section][indexPath.row] : dataArray[indexPath.row]
+        model.value = value
+        tableView.reloadData()
+    }
+    
     func updateTipsCellTitle(indexPath: IndexPath, title: String?, titleColor: UIColor?) {
         let section = indexPath.section >= sectionArray.count ? indexPath.section - 1 : indexPath.section
         let model = sectionArray.count > 0 ? sectionArray[section][indexPath.row] : dataArray[indexPath.row]
@@ -407,6 +440,11 @@ class ActionSheetManager: UIView {
         let vcs = vc?.navigationController?.viewControllers ?? []
         sender.isHidden = vcs.isEmpty
     }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        self.endEditing(true)
+    }
 }
 
 extension ActionSheetManager: UITableViewDelegate, UITableViewDataSource {
@@ -426,7 +464,38 @@ extension ActionSheetManager: UITableViewDelegate, UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: model.cellIdentifier, for: indexPath) as! ActionSheetTextCell
             cell.setupModel(model: model)
             return cell
-            
+        case .tf:
+            let cell = tableView.dequeueReusableCell(withIdentifier: model.cellIdentifier, for: indexPath) as! ActionSheetTFCell
+            cell.setupModel(model: model)
+            cell.tag = indexPath.row + 100
+            cell.sendBlock = {[weak self](key, value) in
+                //设置指令
+                let newModel: ActionSheetModel = model
+                newModel.value = Double(value)
+                self?.dataArray[indexPath.row] = newModel
+                 UserDefaults.standard.setValue(value, forKey: key)
+                UserDefaults.standard.synchronize()
+                if indexPath.row > 0 && indexPath.row < 11 {
+                    guard let flag: Bool = UserDefaults.standard.object(forKey: "AINSCUSTOM") as? Bool, let self = self, let block = didCustomModeSetClosure else {return}
+                    if flag == true {
+                        block(.ns)
+                    }
+                } else if indexPath.row >= 11 && indexPath.row < 15 {
+                    guard let flag: Bool = UserDefaults.standard.object(forKey: "AEDCUSTOM") as? Bool, let self = self, let block = didCustomModeSetClosure else {return}
+                    if flag == true {
+                        block(.aed)
+                    }
+                    
+                } else if indexPath.row == 15 {
+                    guard let flag: Bool = UserDefaults.standard.object(forKey: "ASPTCUSTOM") as? Bool, let self = self, let block = didCustomModeSetClosure else {return}
+                    if flag == true {
+                        block(.aspt)
+                    }
+                    
+                }
+                
+            }
+            return cell
         case .tips:
             let cell = tableView.dequeueReusableCell(withIdentifier: model.cellIdentifier, for: indexPath) as! ActionSheetTipsCell
             model.isHiddenLine = true
@@ -1136,5 +1205,116 @@ class ActionSheetCustomCell: UITableViewCell {
         lineView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20).isActive = true
         lineView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         lineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
+    }
+}
+
+class ActionSheetTFCell: UITableViewCell {
+    private lazy var stackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.spacing = 15
+        stackView.axis = .horizontal
+        stackView.alignment = .fill
+        stackView.distribution = .fill
+        return stackView
+    }()
+    private lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "标题"
+        label.font = .systemFont(ofSize: 13)
+        label.textColor = .black
+        label.textAlignment = .left
+        label.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        label.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        return label
+    }()
+    private lazy var inputTF: UITextField = {
+        let view = UITextField()
+        view.placeholder = ""
+        view.font = .systemFont(ofSize: 13)
+        view.textColor = UIColor(hex: "#3C4267", alpha: 1.0)
+        view.textAlignment = .center
+        view.backgroundColor = .lightGray
+        view.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        view.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        return view
+    }()
+    private lazy var subBtn: UIButton = {
+        let view = UIButton()
+        view.setTitle("设置", for: .normal)
+        view.backgroundColor = .blue
+        view.setTitleColor(.white, for: .normal)
+        view.titleLabel?.font = UIFont.systemFont(ofSize: 13)
+        view.layer.cornerRadius = 5
+        view.layer.masksToBounds = true
+        return view
+    }()
+    
+    private lazy var lineView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor(hex: "#F8F5FA")
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    public var sendBlock:((String,Int)->Void)?
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setupUI()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setupModel(model: ActionSheetModel) {
+        titleLabel.text = model.title
+        inputTF.text = String(Int(model.value))
+        lineView.isHidden = model.isHiddenLine
+    }
+    
+    private func setupUI() {
+        selectionStyle = .none
+        contentView.addSubview(stackView)
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.addArrangedSubview(titleLabel)
+        stackView.addArrangedSubview(inputTF)
+        stackView.addArrangedSubview(subBtn)
+        
+        stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
+        stackView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15).isActive = true
+        stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: 0).isActive = true
+        titleLabel.topAnchor.constraint(equalTo: stackView.topAnchor, constant: 10).isActive = true
+        titleLabel.widthAnchor.constraint(equalToConstant: 200).isActive = true
+        titleLabel.bottomAnchor.constraint(equalTo: stackView.bottomAnchor, constant: -10).isActive = true
+        
+        inputTF.translatesAutoresizingMaskIntoConstraints = false
+        inputTF.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 15).isActive = true
+        inputTF.topAnchor.constraint(equalTo: titleLabel.topAnchor, constant: 10).isActive = true
+        inputTF.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        inputTF.bottomAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: -10).isActive = true
+
+        subBtn.translatesAutoresizingMaskIntoConstraints = false
+        subBtn.leadingAnchor.constraint(equalTo: inputTF.trailingAnchor, constant: 15).isActive = true
+        subBtn.topAnchor.constraint(equalTo: inputTF.topAnchor, constant: 10).isActive = true
+        subBtn.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        subBtn.bottomAnchor.constraint(equalTo: inputTF.bottomAnchor, constant: -10).isActive = true
+        subBtn.addTarget(self, action: #selector(send), for: .touchUpInside)
+        
+        contentView.addSubview(lineView)
+        lineView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
+        lineView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20).isActive = true
+        lineView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        lineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
+    }
+    
+    @objc func send(_ btn: UIButton) {
+        let text = inputTF.text
+        guard let block = sendBlock else {return}
+        block(titleLabel.text ?? "", Int(text ?? "0") ?? 0)
     }
 }

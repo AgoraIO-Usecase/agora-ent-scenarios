@@ -112,7 +112,7 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
         case .spatial_voice:
             let vc = SARoomsViewController(user: VLUserCenter.user)
             navigationController?.pushViewController(vc, animated: true)
-            
+            break
         case .show:
             let vc = ShowRoomListVC()
             navigationController?.pushViewController(vc, animated: true)
