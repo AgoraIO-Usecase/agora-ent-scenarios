@@ -150,4 +150,43 @@ public enum AgoraConfig {
         "\(AgoraConfig.VMBaseUrl)/20ANISMicrophoneFingerRubSound/CN/None/20-01-B-CN-None.wav",
         "\(AgoraConfig.VMBaseUrl)/21ANISScreenTapSound/CN/None/21-01-B-CN-None.wav",
     ]
+    
+    public static let parmKeys: [String] = ["che.audio.sf.nsEnable",
+                                  "che.audio.sf.ainsToLoadFlag",
+                                  "che.audio.sf.nsngAlgRoute",
+                                  "che.audio.sf.nsngPredefAgg",
+                                  "che.audio.sf.nsngMapInMaskMin",
+                                  "che.audio.sf.nsngMapOutMaskMin",
+                                  "che.audio.sf.statNsLowerBound",
+                                  "che.audio.sf.nsngFinalMaskLowerBound",
+                                  "che.audio.sf.statNsEnhFactor",
+                                  "che.audio.sf.statNsFastNsSpeechTrigThreshold",
+                                  "che.audio.aed.enable",
+                                  "che.audio.sf.nsngMusicProbThr",
+                                  "che.audio.sf.ainsMusicModeBackoffDB",
+                                  "che.audio.sf.statNsMusicModeBackoffDB",
+                                  "che.audio.sf.ainsSpeechProtectThreshold",
+                                   ]
+    
+    public static var parmVals: [Double] {
+        UserDefaults.standard.synchronize()
+        
+        return [
+            UserDefaults.standard.object(forKey: parKeys[0]) as? Double ?? 0,
+            UserDefaults.standard.object(forKey: parKeys[1]) as? Double ?? 0,
+            UserDefaults.standard.object(forKey: parKeys[2]) as? Double ?? 10,
+            UserDefaults.standard.object(forKey: parKeys[3]) as? Double ?? 11,
+            UserDefaults.standard.object(forKey: parKeys[4]) as? Double ?? 80,
+            UserDefaults.standard.object(forKey: parKeys[5]) as? Double ?? 50,
+            UserDefaults.standard.object(forKey: parKeys[6]) as? Double ?? 5,
+            UserDefaults.standard.object(forKey: parKeys[7]) as? Double ?? 30,
+            UserDefaults.standard.object(forKey: parKeys[8]) as? Double ?? 200,
+            UserDefaults.standard.object(forKey: parKeys[9]) as? Double ?? 0,
+            UserDefaults.standard.object(forKey: parKeys[10]) as? Double ?? 1,
+            UserDefaults.standard.object(forKey: parKeys[11]) as? Double ?? 85,
+            UserDefaults.standard.object(forKey: parKeys[12]) as? Double ?? 200,
+            UserDefaults.standard.object(forKey: parKeys[13]) as? Double ?? 270,
+            UserDefaults.standard.object(forKey: parKeys[14]) as? Double ?? 100
+        ]
+    }
 }
