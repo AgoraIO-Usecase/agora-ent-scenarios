@@ -34,7 +34,6 @@ func calculateMap(origMap: [String: Any],
         
         guard let subValue = _origMap[curKey] as? [String: Any]  else {
             throw AUICollectionOperationError.calculateMapFail.toNSError()
-            return [:]
         }
         var newMap: [String: Any] = [:]
         do {
@@ -51,13 +50,11 @@ func calculateMap(origMap: [String: Any],
     }
     guard let curKey = key.first, let subValue = _origMap[curKey] as? Int else { 
         throw AUICollectionOperationError.calculateMapFail.toNSError()
-        return [:]
     }
     let curValue = subValue + value
     guard curValue <= max, curValue >= min else {
         aui_info("calculateMap out of range")
         throw AUICollectionOperationError.calculateMapOutOfRange.toNSError()
-        return [:]
     }
     _origMap[curKey] = curValue
     
@@ -104,15 +101,15 @@ func getItemIndexes(array: [[String: Any]], filter: [[String: Any]]?) -> [Int]? 
     
     var indexes: [Int] = []
     for (i, value) in array.enumerated() {
+        //对于filter来说，只要满足任何的filterItem就可以，对于filterItem来说，需要所有条件都满足
         for filterItem in filter {
-            var match = false
+            var matchCount = 0
             for (k, v) in filterItem {
                 if isMatchFilter(key: k, itemValue: value, filterValue: v) {
-                    match = true
-                    break
+                    matchCount += 1
                 }
             }
-            if match {
+            if matchCount == filterItem.keys.count {
                 indexes.append(i)
                 break
             }

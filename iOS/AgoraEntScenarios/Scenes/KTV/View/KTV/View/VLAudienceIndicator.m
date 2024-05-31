@@ -6,6 +6,7 @@
 #import "VLAudienceIndicator.h"
 #import "AgoraEntScenarios-Swift.h"
 @import YYCategories;
+@import AgoraCommon;
 
 @interface VLAudienceIndicator ()
 

@@ -88,12 +88,13 @@ extension JoyServiceImpl: JoyServiceProtocol {
     
     func createRoom(roomName: String, completion: @escaping (JoyRoomInfo?, Error?) -> Void) { joyPrint("createRoom start")
 
+        let createAt = Int64(Date().timeIntervalSince1970 * 1000)
         let roomInfo = AUIRoomInfo()
         roomInfo.roomName = roomName
         roomInfo.roomId = "\(arc4random_uniform(899999) + 100000)"
         roomInfo.customPayload = [
             "roomUserCount": 1,
-            "createdAt": Int64(Date().timeIntervalSince1970 * 1000)
+            "createdAt": createAt
         ]
 
         let owner = AUIUserThumbnailInfo()
@@ -113,7 +114,7 @@ extension JoyServiceImpl: JoyServiceProtocol {
                     return
                 }
                 
-                scene.create(payload: [:]) { [weak self] err in
+                scene.create(createTime: createAt, payload: [:]) { [weak self] err in
                     if let err = err {
                         joyPrint("create scene fail: \(err.localizedDescription)")
                         completion(nil, err)
@@ -265,7 +266,7 @@ extension JoyServiceImpl: JoyServiceProtocol {
             dict["assistantUid"] = gameInfo.assistantUid
             dict["gameName"] = gameInfo.gameName
             dict["objectId"] = gameInfo.objectId
-            mapCollection?.updateMetaData(valueCmd: nil, value: dict, filter: nil, callback: { err in
+            mapCollection?.updateMetaData(valueCmd: nil, value: dict, callback: { err in
                 completion(err)
             })
         }

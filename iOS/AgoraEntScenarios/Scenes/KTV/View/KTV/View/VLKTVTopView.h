@@ -6,7 +6,7 @@
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
-@class VLRoomListModel, VLKTVTopView;
+@class VLRoomListModel, VLKTVTopView, SyncRoomInfo;
 @protocol VLKTVTopViewDelegate <NSObject>
 
 - (void)onVLKTVTopView:(VLKTVTopView*)view closeBtnTapped:(id)sender;
@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setNetworkQuality:(int)quality;
 
-@property (nonatomic, strong) VLRoomListModel *listModel;
+@property (nonatomic, strong) SyncRoomInfo *listModel;
 
 @end
 

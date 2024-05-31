@@ -9,6 +9,10 @@ import Foundation
 
 public typealias AUICollectionGetClosure = (NSError?, Any?)-> Void
 
+
+//(publisher uid, valueCmd, new value of item) -> value[new value of edit item]
+public typealias AUICollectionValueWillChangeClosure = (String, String?, [String: Any]) -> [String: Any]?
+
 //(publisher uid, valueCmd, new value)
 public typealias AUICollectionAddClosure = (String, String?, [String: Any]) -> NSError?
 
@@ -29,11 +33,11 @@ public typealias AUICollectionAttributesDidChangedClosure = (String, String, AUI
 
 @objc public class AUIAttributesModel: NSObject {
     private var attributes: Any?
-    required init(list: [[String: Any]]) {
+    public required init(list: [[String: Any]]) {
         self.attributes = list
         super.init()
     }
-    required init(map: [String: Any]) {
+    public required init(map: [String: Any]) {
         self.attributes = map
         super.init()
     }
@@ -50,6 +54,10 @@ public typealias AUICollectionAttributesDidChangedClosure = (String, String, AUI
 @objc public protocol IAUICollection: NSObjectProtocol {
     
     init(channelName: String, observeKey: String, rtmManager: AUIRtmManager) 
+    
+    /// 对应的节点对象将要被更新，询问是否需要本地增删(例如更新一个节点，需要再次更新最新时间)
+    /// - Parameter callback: <#callback description#>
+    @objc optional func subsceibeValueWillChange(callback: AUICollectionValueWillChangeClosure?)
     
     /// 订阅即将添加新的节点的事件
     /// - Parameter callback: <#callback description#>
@@ -82,6 +90,71 @@ public typealias AUICollectionAttributesDidChangedClosure = (String, String, AUI
     /// 查询当前scene节点所有内容
     /// - Parameter callback: <#callback description#>
     func getMetaData(callback: AUICollectionGetClosure?)
+    
+    /// 获取本地metadata，仲裁者为本地缓存数据（可能比远端数据更新），观众则为真实远端数据
+    /// - Parameter attributes: <#attributes description#>
+    func getLocalMetaData() -> AUIAttributesModel?
+}
+
+
+@objc public protocol IAUIMapCollection: IAUICollection {
+    
+    /// 添加节点
+    /// - Parameters:
+    ///   - valueCmd: <#valueCmd description#>
+    ///   - value: <#value description#>
+    ///   - callback: <#callback description#>
+    func addMetaData(valueCmd: String?,
+                     value: [String: Any],
+                     callback: ((NSError?)->())?)
+    
+    /// 更新节点
+    /// - Parameters:
+    ///   - valueCmd: 命令类型
+    ///   - value: <#value description#>
+    ///   - callback: <#callback description#>
+    func updateMetaData(valueCmd: String?,
+                        value: [String: Any],
+                        callback: ((NSError?)->())?)
+    
+    /// 合并节点
+    /// - Parameters:
+    ///   - valueCmd: <#valueCmd description#>
+    ///   - value: <#value description#>
+    ///   - callback: <#callback description#>
+    func mergeMetaData(valueCmd: String?,
+                       value: [String: Any],
+                       callback: ((NSError?)->())?)
+    
+    /// 移除
+    /// - Parameters:
+    ///   - valueCmd: <#value description#>
+    ///   - callback: <#callback description#>
+    func removeMetaData(valueCmd: String?,
+                        callback: ((NSError?)->())?)
+    
+    /// 增加/减小节点(节点必须是Int)
+    /// - Parameters:
+    ///   - valueCmd: <#valueCmd description#>
+    ///   - key: <#key description#>
+    ///   - value: <#value description#>
+    ///   - min: <#min description#>
+    ///   - max: <#max description#>
+    ///   - callback: <#callback description#>
+    func calculateMetaData(valueCmd: String?,
+                           key: [String],
+                           value: Int,
+                           min: Int,
+                           max: Int,
+                           callback: ((NSError?)->())?)
+    
+    /// 移除整个collection对应的key
+    /// - Parameter callback: <#callback description#>
+    func cleanMetaData(callback: ((NSError?)->())?)
+}
+
+
+@objc public protocol IAUIListCollection: IAUICollection {
     
     /// 添加节点
     /// - Parameters:
@@ -121,7 +194,7 @@ public typealias AUICollectionAttributesDidChangedClosure = (String, String, AUI
     ///   - valueCmd: <#value description#>
     ///   - filter: <#value description#>
     ///   - callback: <#callback description#>
-    func removeMetaData(valueCmd: String?, 
+    func removeMetaData(valueCmd: String?,
                         filter: [[String: Any]]?,
                         callback: ((NSError?)->())?)
     
@@ -146,4 +219,3 @@ public typealias AUICollectionAttributesDidChangedClosure = (String, String, AUI
     /// - Parameter callback: <#callback description#>
     func cleanMetaData(callback: ((NSError?)->())?)
 }
-

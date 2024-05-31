@@ -93,13 +93,13 @@
     }
 }
 
-- (void)setListModel:(VLRoomListModel *)listModel {
+- (void)setListModel:(SyncRoomInfo *)listModel {
     _listModel = listModel;
     self.titleLabel.text = listModel.name;
     NSString *roomCountPre = KTVLocalizedString(@"ktv_room_count");
-    [self.logoImgView sd_setImageWithURL:[NSURL URLWithString: listModel.creatorAvatar]];
+    self.logoImgView.image = [UIImage imageNamed:listModel.creatorAvatar];
     if (listModel.roomPeopleNum) {
-        NSString *roomCountString = [NSString stringWithFormat:@"%@%@  |",  listModel.roomPeopleNum, roomCountPre];
+        NSString *roomCountString = [NSString stringWithFormat:@"%ld%@  |", listModel.roomPeopleNum, roomCountPre];
         self.countLabel.text = roomCountString;
     }else{
         NSString *roomCountString = [NSString stringWithFormat:@"%i%@  |",1, roomCountPre];

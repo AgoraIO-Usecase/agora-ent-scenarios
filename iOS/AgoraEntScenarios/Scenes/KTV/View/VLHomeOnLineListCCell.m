@@ -70,9 +70,10 @@
     [self.bgImgView addSubview:self.roomOwnerLabel];
 }
 
-- (void)setListModel:(VLRoomListModel *)listModel {
+- (void)setListModel:(SyncRoomInfo *)listModel {
     _listModel = listModel;
-    [self.iconImgView sd_setImageWithURL:[NSURL URLWithString:listModel.creatorAvatar]];
+    self.iconImgView.image = [UIImage imageNamed:listModel.creatorAvatar];
+
     if (listModel.isPrivate) {
         self.lockImgView.hidden = NO;
     } else {
@@ -80,7 +81,7 @@
     }
     self.titleLabel.text = listModel.name;
     self.roomOwnerLabel.text = listModel.creatorName;
-    self.countLabel.text = [NSString stringWithFormat:@"%@%@",listModel.roomPeopleNum, KTVLocalizedString(@"ktv_people")];
+    self.countLabel.text = [NSString stringWithFormat:@"%ld%@",listModel.roomPeopleNum, KTVLocalizedString(@"ktv_people")];
 }
 
 @end

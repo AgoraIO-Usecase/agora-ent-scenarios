@@ -21,8 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
                    withRoomNo:(NSString *)roomNo
                      ifChorus:(BOOL)ifChorus;
 
-@property (nonatomic, strong) NSArray *selSongsArray;
-
+- (void)setSelSongsArray:(NSArray *)selSongsArray isOwner:(BOOL)isOwner;
 @end
 
 NS_ASSUME_NONNULL_END

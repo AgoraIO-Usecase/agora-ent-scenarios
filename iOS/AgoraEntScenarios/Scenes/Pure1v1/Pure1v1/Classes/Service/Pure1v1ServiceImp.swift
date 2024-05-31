@@ -67,8 +67,7 @@ class Pure1v1ServiceImp: NSObject {
 extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
     func getUserList(completion: @escaping ([Pure1v1UserInfo], NSError?) -> Void) {
         
-        self.userService.getUserInfoList(roomId: kRoomId,
-                                         userIdList: []) {[weak self] err, list in
+        self.userService.getUserInfoList(roomId: kRoomId) {[weak self] err, list in
             guard let self = self else {return}
             if let err = err {
                 completion([], err)

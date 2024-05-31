@@ -5,12 +5,13 @@
 
 #import "VLKTVMVView.h"
 #import "VLKTVSelBgModel.h"
+#import "VLHotSpotBtn.h"
 #import "AgoraEntScenarios-Swift.h"
 #import "VLKTVMVIdleView.h"
-//#import "HWWeakTimer.h"
 @import Masonry;
 @import SDWebImage;
 @import AgoraCommon;
+
 @interface VLKTVMVView () <VLKTVMVIdleViewDelegate, KaraokeDelegate>
 
 @property(nonatomic, weak) id <VLKTVMVViewDelegate>delegate;
