@@ -78,7 +78,7 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
     voiceShowBtn.hidden = YES;
     
     for (VLRoomSeatModel *info in self.seatsArray) {
-        if ([info.rtcUid integerValue] == [VLUserCenter.user.id integerValue]) {
+        if ([info.owner.userId integerValue] == [VLUserCenter.user.id integerValue]) {
             //is self
             //TODO
             self.isSelfMuted = info.isAudioMuted;

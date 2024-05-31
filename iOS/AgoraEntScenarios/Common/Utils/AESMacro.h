@@ -34,7 +34,9 @@
 /// tabBar相关frame
 //#define TabBarHeight (IS_IPAD ? (IS_NOTCHED_SCREEN ? 65 : (IOS_VERSION >= 12.0 ? 50 : 49)) : (IS_LANDSCAPE ? PreferredValueForVisualDevice(49, 32) : 49) + SafeAreaInsetsConstantForDeviceWithNotch.bottom)
 
-#define KTVLocalizedString(s) ([s toSceneLocalization])
+#define NullToString(s) (s == NULL ? @"": s)
+
+#define KTVLocalizedString(s) ([s toSceneLocalizationWith:@"KtvResource"])
 #define DHCLocalizedString(s) ([s toSceneLocalizationWith:@"DHCResource"])
 #define SRLocalizedString(s) ([s toSceneLocalizationWith:@"SRResource"])
 #define SRLogInfo(format, ...)  ([SRLog infoWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"SingRelay"])

@@ -42,8 +42,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppContext.shared.RestfulApiKey = KeyCenter.RestfulApiKey ?? ""
         AppContext.shared.RestfulApiSecret = KeyCenter.RestfulApiSecret ?? ""
         AppContext.shared.baseServerUrl = KeyCenter.baseServerUrl ?? ""
+        #if DEBUG
+        #else
         AppContext.shared.cloudPlayerKey = KeyCenter.CloudPlayerKey ?? ""
         AppContext.shared.cloudPlayerSecret = KeyCenter.CloudPlayerSecret ?? ""
+        #endif
         
         AGResourceManagerContext.shared.displayLogClosure = { text in
             asyncToMainThread {

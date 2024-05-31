@@ -69,10 +69,11 @@ public class NetworkManager:NSObject {
     ///   - tokenGeneratorType: token types
     ///   - tokenTypes: [token type :  token string]
     public func generateTokens(channelName: String,
-                        uid: String,
-                        tokenGeneratorType: TokenGeneratorType,
-                        tokenTypes: [AgoraTokenType],
-                        success: @escaping ([Int: String]) -> Void)
+                               uid: String,
+                               tokenGeneratorType: TokenGeneratorType,
+                               tokenTypes: [AgoraTokenType],
+                               expire: UInt = 24 * 60 * 60,
+                               success: @escaping ([Int: String]) -> Void)
     {
         let group = DispatchGroup()
         var tokenMap: [Int: String] = [Int:String]()
@@ -82,7 +83,8 @@ public class NetworkManager:NSObject {
             generateToken(channelName: channelName,
                           uid: uid,
                           tokenType: tokenGeneratorType,
-                          type: type) { token in
+                          type: type,
+                          expire: expire) { token in
                 if let token = token, token.count > 0 {
                     tokenMap[type.rawValue] = token
                 }

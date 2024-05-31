@@ -48,6 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 //弹出点歌视图
 + (LSTPopView*)popUpChooseSongViewWithParentView:(UIView*)parentView
+                                         isOwner: (BOOL)isOwner
                                         isChorus:(BOOL)isChorus
                                  chooseSongArray: (NSArray*)chooseSongArray
                                       withRoomNo:(NSString*)roomNo
