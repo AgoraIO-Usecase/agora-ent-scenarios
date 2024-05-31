@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 //是否被点过
 @property (nonatomic, assign) BOOL ifChoosed;
-@property (nonatomic, assign) BOOL ifChorus;
+//@property (nonatomic, assign) BOOL ifChorus;
 
 
 @end

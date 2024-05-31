@@ -72,6 +72,7 @@ open class AUIRtmManager: NSObject {
         let ret1 = self.rtmClient.setParameters("{\"rtm.msg.tx_timeout\": 3000}")
         let ret2 = self.rtmClient.setParameters("{\"rtm.metadata.api_timeout\": 3000}")
         let ret3 = self.rtmClient.setParameters("{\"rtm.metadata.api_max_retries\": 1}")
+        aui_info("setParameters: \(ret1.rawValue)/\(ret2.rawValue)/\(ret3.rawValue)", tag: "AUIRtmManager")
     }
     
     public func login(token: String, completion: @escaping (NSError?)->()) {
@@ -100,10 +101,10 @@ open class AUIRtmManager: NSObject {
         isLogin = false
     }
     
-    public func renew(token: String, completion: ((NSError?)->())? = nil) {
+    public func renew(token: String, completion: ((NSError?)->())?) {
         aui_info("renew: \(token)", tag: "AUIRtmManager")
         rtmClient.renewToken(token) { _, err in
-            completion?(err == nil ? nil : AUICommonError.rtmError(Int32(err?.errorCode.rawValue ?? 0)).toNSError())
+            completion?(err)
         }
     }
 }
@@ -131,7 +132,7 @@ extension AUIRtmManager {
         aui_info("presence whoNow '\(channelName)'", tag: "AUIRtmManager")
     }
     
-    func whoNow(channelName: String, completion:@escaping (Error?, [[String: String]]?)->()) {
+    public func whoNow(channelName: String, completion:@escaping (Error?, [[String: String]]?)->()) {
         guard let presence = rtmClient.getPresence() else {
             completion(AUICommonError.rtmError(-1).toNSError(), nil)
             return
@@ -177,7 +178,7 @@ extension AUIRtmManager {
             aui_info("presence setState '\(channelName)' finished: \(error?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
             completion(error?.toNSError())
         })
-        aui_info("presence setState'\(channelName)' ", tag: "AUIRtmManager")
+        aui_info("presence setState'\(channelName)' attr: \(attr)", tag: "AUIRtmManager")
     }
 }
 
@@ -249,7 +250,7 @@ extension AUIRtmManager {
         let options = AgoraRtmSubscribeOptions()
         options.features = [.metadata, .presence, .lock, .message]
         let date = Date()
-        rtmClient.subscribe(channelName: channelName, option: options) {[weak self] resp, error in
+        rtmClient.subscribe(channelName: channelName, option: options) { resp, error in
             aui_benchmark("rtm subscribe '\(channelName)' with message type", cost: -date.timeIntervalSinceNow)
             aui_info("subscribe '\(channelName)' finished: \(error?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
             completion(error?.toNSError())
@@ -295,7 +296,6 @@ extension AUIRtmManager {
     public func cleanAllMedadata(channelName: String,
                                  lockName: String,
                                  completion: @escaping (NSError?)->()) {
-//        let removeKeys = proxy.keys(channelName: channelName) ?? []
         cleanMetadata(channelName: channelName,
                       removeKeys: [],
                       lockName: lockName,
@@ -323,7 +323,7 @@ extension AUIRtmManager {
             aui_info("cleanMetadata[\(channelName)][\(lockName)] finished: \(error?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
             completion(error?.toNSError())
         }
-        aui_info("cleanMetadata[\(channelName)] \(removeKeys)", tag: "AUIRtmManager")
+        aui_info("cleanMetadata[\(channelName)][\(lockName)] \(removeKeys)", tag: "AUIRtmManager")
     }
     
     public func setBatchMetadata(channelName: String,
@@ -570,9 +570,9 @@ extension AUIRtmManager {
                 callbackError = AUICommonError.httpError(error.errorCode.rawValue, error.reason).toNSError()
             }
             completion(callbackError)
-            aui_info("publish '\(message)' to '\(channelName)': \(error?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
+            aui_info("publish '\(message)' to user '\(userId)': \(error?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
         }
-        aui_info("publish '\(message)' to '\(channelName)'", tag: "AUIRtmManager")
+        aui_info("publish '\(message)' to user '\(userId)'", tag: "AUIRtmManager")
     }
     
     public func publish(channelName: String, 
@@ -589,9 +589,9 @@ extension AUIRtmManager {
                 callbackError = AUICommonError.httpError(error.errorCode.rawValue, error.reason).toNSError()
             }
             completion(callbackError)
-            aui_info("publish '\(message)' to '\(channelName)': \(error?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
+            aui_info("publish '\(message)' to channelName '\(channelName)': \(error?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
         }
-        aui_info("publish '\(message)' to '\(channelName)'", tag: "AUIRtmManager")
+        aui_info("publish '\(message)' to channelName '\(channelName)'", tag: "AUIRtmManager")
     }
     
     public func sendReceipt(userId: String, 

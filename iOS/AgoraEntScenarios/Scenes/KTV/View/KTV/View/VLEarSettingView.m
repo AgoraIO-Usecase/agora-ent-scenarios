@@ -11,6 +11,7 @@
 #import "HeadSetManager.h"
 #import "VLToast.h"
 #import "AgoraEntScenarios-Swift.h"
+@import AgoraCommon;
 @interface VLEarSettingView()<VLKTVSliderViewDelegate>
 @property (nonatomic,strong) UILabel *titleLabel;
 @property (nonatomic,strong) UILabel *earLabel;
