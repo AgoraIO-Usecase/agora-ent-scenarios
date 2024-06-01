@@ -33,5 +33,5 @@ interface OnLinkDialogActionListener {
     /**
      * 连麦-item"取消申请上麦"按钮点击时回调
      */
-    fun onStopApplyingChosen(dialog: LiveLinkDialog, view: View)
+    fun onStopApplyingChosen(dialog: LiveLinkDialog, view: View, seatApply: ShowMicSeatApply?)
 }

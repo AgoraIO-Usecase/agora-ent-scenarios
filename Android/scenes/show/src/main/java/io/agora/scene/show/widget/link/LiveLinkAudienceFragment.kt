@@ -66,9 +66,10 @@ class LiveLinkAudienceFragment : BaseFragment() {
         }
     }
 
-    fun setOnApplySuccess() {
+    fun setOnApplySuccess(apply: ShowMicSeatApply) {
         if (mBinding == null) return
         binding.iBtnCancelApply.isVisible = true
+        binding.iBtnCancelApply.tag = apply
     }
 
     /**
@@ -85,7 +86,7 @@ class LiveLinkAudienceFragment : BaseFragment() {
 
             val apply = list.filter { it.userId == UserManager.getInstance().user.id.toString() }.getOrNull(0)
             if (apply != null) {
-                setOnApplySuccess()
+                setOnApplySuccess(apply)
             }
         }
 

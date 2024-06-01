@@ -16,7 +16,9 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLiveLinkDialogBinding
-import io.agora.scene.show.service.*
+import io.agora.scene.show.service.ShowInteractionInfo
+import io.agora.scene.show.service.ShowMicSeatApply
+import io.agora.scene.show.service.ShowUser
 
 class LiveLinkDialog : BottomSheetDialogFragment() {
     private var mBinding : ShowLiveLinkDialogBinding? = null
@@ -126,7 +128,7 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
                 }
 
                 override fun onStopApplyingChosen(view: View) {
-                    linkDialogListener?.onStopApplyingChosen(this@LiveLinkDialog, view)
+                    linkDialogListener?.onStopApplyingChosen(this@LiveLinkDialog, view, view.tag as? ShowMicSeatApply)
                 }
             })
 
@@ -190,8 +192,8 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
         }
     }
 
-    fun setOnApplySuccess() {
-        audienceFragment.setOnApplySuccess()
+    fun setOnApplySuccess(apply: ShowMicSeatApply) {
+        audienceFragment.setOnApplySuccess(apply)
     }
 
     /**

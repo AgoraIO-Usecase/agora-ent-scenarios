@@ -3,6 +3,7 @@ package io.agora.scene.show.service
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.annotation.IntDef
+import io.agora.scene.base.utils.TimeUtils
 import java.util.UUID
 
 /*
@@ -99,15 +100,13 @@ data class ShowMessage constructor(
     val userId: String,
     val userName: String,
     val message: String,
-    val createAt: Double
 )
 
 // 连麦申请
 data class ShowMicSeatApply constructor(
     val userId: String,
     val avatar: String,
-    val userName: String,
-    val createAt: Double
+    val userName: String
 )
 
 @IntDef(ShowInvitationType.invitation, ShowInvitationType.accept, ShowInvitationType.reject, ShowInvitationType.end)
@@ -139,7 +138,6 @@ data class ShowPKInvitation constructor(
     val fromUserId: String,
     val fromUserName: String,
     val fromRoomId: String,
-    val createAt: Double,
     @ShowInvitationType val type: Int = ShowInvitationType.invitation,
 )
 
@@ -149,7 +147,7 @@ data class ShowInteractionInfo constructor(
     val userName: String, // 互动者用户名
     val roomId: String, // 互动房间ID
     @ShowInteractionStatus val interactStatus: Int, // 互动状态
-    val createdAt: Double // 开始时间
+    val createdAt: Double = TimeUtils.currentTimeMillis().toDouble()// 开始时间
 )
 
 

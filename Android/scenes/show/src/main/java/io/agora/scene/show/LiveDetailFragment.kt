@@ -102,14 +102,17 @@ class LiveDetailFragment : Fragment() {
     companion object {
 
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
+        private const val EXTRA_CREATE_ROOM = "createRoom"
 
         fun newInstance(
             roomDetail: ShowRoomDetailModel,
             handler: OnPageScrollEventHandler,
-            position: Int
+            position: Int,
+            createRoom: Boolean
         ) = LiveDetailFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(EXTRA_ROOM_DETAIL_INFO, roomDetail)
+                putBoolean(EXTRA_CREATE_ROOM, createRoom)
             }
             mHandler = handler
             mPosition = position
@@ -434,7 +437,7 @@ class LiveDetailFragment : Fragment() {
                     prepareLinkingMode()
                     mService.createMicSeatApply(mRoomInfo.roomId, {
                         // success
-                        mLinkDialog.setOnApplySuccess()
+                        mLinkDialog.setOnApplySuccess(it)
                     })
                 }
             }
@@ -1126,12 +1129,12 @@ class LiveDetailFragment : Fragment() {
             }
 
             // 观众撤回连麦申请
-            override fun onStopApplyingChosen(dialog: LiveLinkDialog, view: View) {
+            override fun onStopApplyingChosen(dialog: LiveLinkDialog, view: View, apply: ShowMicSeatApply?) {
                 updateIdleMode()
                 view.isEnabled = false
                 mService.cancelMicSeatApply(
                     mRoomInfo.roomId,
-                    UserManager.getInstance().user.id.toString(),
+                    apply?.userId ?: "",
                     success = {
                         view.isEnabled = true
                     },
@@ -1391,22 +1394,44 @@ class LiveDetailFragment : Fragment() {
     //================== Service Operation ===============
 
     private fun initServiceWithJoinRoom() {
-        mService.joinRoom(mRoomInfo.roomId,
-            success = {
-                mService.sendChatMessage(
-                    mRoomInfo.roomId,
-                    getString(R.string.show_live_chat_coming)
-                )
-                initService()
-            },
-            error = {
-                runOnUiThread {
-                    destroy(false)
-                    // 进房Error
-                    showLivingEndLayout() // 进房Error
-                    ShowLogger.d("showLivingEndLayout", "join room error!:${it.message}")
-                }
-            })
+        val create = arguments?.getBoolean(EXTRA_CREATE_ROOM, false) ?: false
+        if (create) {
+            mService.createRoom(
+                mRoomInfo.roomId,
+                mRoomInfo.roomName,
+                success = {
+                    mService.sendChatMessage(
+                        mRoomInfo.roomId,
+                        getString(R.string.show_live_chat_coming)
+                    )
+                    initService()
+                },
+                error = {
+                    runOnUiThread {
+                        destroy(false)
+                        // 进房Error
+                        showLivingEndLayout() // 进房Error
+                        ShowLogger.d("showLivingEndLayout", "join room error!:${it.message}")
+                    }
+                })
+        } else {
+            mService.joinRoom(mRoomInfo.roomId,
+                success = {
+                    mService.sendChatMessage(
+                        mRoomInfo.roomId,
+                        getString(R.string.show_live_chat_coming)
+                    )
+                    initService()
+                },
+                error = {
+                    runOnUiThread {
+                        destroy(false)
+                        // 进房Error
+                        showLivingEndLayout() // 进房Error
+                        ShowLogger.d("showLivingEndLayout", "join room error!:${it.message}")
+                    }
+                })
+        }
     }
 
     private fun initService() {
