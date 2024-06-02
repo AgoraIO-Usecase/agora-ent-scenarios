@@ -53,7 +53,7 @@ import kotlin.random.Random
 @RequiresApi(Build.VERSION_CODES.M)
 class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBinding>() {
     private val tag = "LivePrepareActivity"
-    private val mService by lazy { ShowServiceProtocol.getImplInstance() }
+    private val mService by lazy { ShowServiceProtocol.get() }
     private val mInputMethodManager by lazy { getSystemService(InputMethodManager::class.java) }
 
     private val mRoomId by lazy { getRandomRoomId() }

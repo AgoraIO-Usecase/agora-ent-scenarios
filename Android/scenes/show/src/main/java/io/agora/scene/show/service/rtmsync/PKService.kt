@@ -57,7 +57,7 @@ class PKService(
                                 )
                             )
                         }
-                    } else{
+                    } else if(currInfo?.status == RoomPresenceStatus.IDLE){
                         roomPresenceService.updateRoomPresenceInfo(
                             channelName,
                             status = RoomPresenceStatus.INTERACTING_PK,

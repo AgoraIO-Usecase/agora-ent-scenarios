@@ -129,7 +129,7 @@ class LiveDetailFragment : Fragment() {
             )
         )
     }
-    private val mService by lazy { ShowServiceProtocol.getImplInstance() }
+    private val mService by lazy { ShowServiceProtocol.get() }
     private val isRoomOwner by lazy { mRoomInfo.ownerId == UserManager.getInstance().user.id.toString() }
 
     private var mMessageAdapter: BindingSingleAdapter<ShowMessage, ShowLiveDetailMessageItemBinding>? =
@@ -2166,7 +2166,7 @@ class LiveDetailFragment : Fragment() {
                 mRtcEngine.setupRemoteVideoEx(
                     VideoCanvas(
                         view,
-                        1,
+                        Constants.RENDER_MODE_HIDDEN,
                         interactionInfo?.userId!!.toInt()
                     ),
                     rtcConnection
@@ -2229,7 +2229,7 @@ class LiveDetailFragment : Fragment() {
                     mRtcEngine.setupRemoteVideoEx(
                         VideoCanvas(
                             view,
-                            1,
+                            Constants.RENDER_MODE_HIDDEN,
                             interactionInfo?.userId!!.toInt()
                         ),
                         rtcConnection
@@ -2434,7 +2434,7 @@ class LiveDetailFragment : Fragment() {
                 mRtcEngine.setupRemoteVideoEx(
                     VideoCanvas(
                         pkAgainstView,
-                        1,
+                        Constants.RENDER_MODE_HIDDEN,
                         interactionInfo?.userId!!.toInt(),
                     ),
                     pkRtcConnection

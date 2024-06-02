@@ -194,6 +194,30 @@ class InteractionService(
 
     fun getInteractionInfo(): InteractionInfo? = interactionInfo
 
+    fun getLatestInteractionInfo(
+        success: (InteractionInfo?) -> Unit,
+        failure: ((Throwable) -> Unit)? = null
+    ) {
+        val collection = syncManager.getScene(channelName)?.getCollection(key, mapCollectionCreator)
+        if(collection == null){
+            failure?.invoke(RuntimeException("collection not found"))
+            return
+        }
+        collection.getMetaData { error, value ->
+            if(error != null){
+                failure?.invoke(RuntimeException(error))
+                return@getMetaData
+            }
+            val map = value as Map<String, Any> ?: emptyMap()
+            val info = if (map.isEmpty()) null else GsonTools.toBean(
+                GsonTools.beanToString(map),
+                InteractionInfo::class.java
+            )
+            interactionInfo = info
+            success.invoke(info)
+        }
+    }
+
     fun subscribeInteractionEvent(onUpdate: (InteractionInfo?) -> Unit) {
         observableHelper.subscribeEvent(onUpdate)
     }

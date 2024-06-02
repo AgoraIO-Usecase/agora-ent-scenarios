@@ -127,7 +127,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
         )
     }
 
-    override fun destroy() {
+    fun destroy() {
         syncManager.destroyExtensions()
         syncManager.logout()
         syncManager.release()
@@ -458,10 +458,19 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
         success: ((ShowInteractionInfo?) -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
-        val interactionInfo =
-            syncManager.getExInteractionService(roomId)
-                .getInteractionInfo()
-        success?.invoke(interactionInfo?.toShowInteraction())
+        syncManager.getExInteractionService(roomId)
+            .getLatestInteractionInfo(
+                success = {
+                    ThreadManager.getInstance().runOnMainThread {
+                        success?.invoke(it?.toShowInteraction())
+                    }
+                },
+                failure = {
+                    ThreadManager.getInstance().runOnMainThread {
+                        error?.invoke(RuntimeException(it))
+                    }
+                }
+            )
     }
 
     override fun subscribeInteractionChanged(
@@ -905,7 +914,7 @@ private fun PKInfo.toShowPKInfo(): ShowPKInvitation {
     )
 }
 
-private fun RoomPresenceInfo.toShowPKUserInfo(): ShowPKUser{
+private fun RoomPresenceInfo.toShowPKUserInfo(): ShowPKUser {
     return ShowPKUser(
         ownerId,
         ownerName,

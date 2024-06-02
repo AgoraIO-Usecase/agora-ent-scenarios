@@ -17,13 +17,23 @@ interface ShowServiceProtocol {
         // PK单局时间，单位ms
         var PK_AVAILABLE_DURATION: Long = 120 * 1000
 
-        private val instance by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
-            ShowServiceImpl(AgoraApplication.the())
-        }
-        fun getImplInstance(): ShowServiceProtocol = instance
-    }
+        private var instance : ShowServiceProtocol? = null
+            get() {
+                if (field == null) {
+                    field = ShowServiceImpl(AgoraApplication.the())
+                }
+                return field
+            }
 
-    fun destroy()
+        @Synchronized
+        fun get(): ShowServiceProtocol = instance!!
+
+        @Synchronized
+        fun destroy() {
+            (instance as? ShowServiceImpl)?.destroy()
+            instance = null
+        }
+    }
 
     // 获取房间列表
     fun getRoomList(
