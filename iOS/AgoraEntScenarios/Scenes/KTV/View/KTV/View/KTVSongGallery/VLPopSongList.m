@@ -6,8 +6,8 @@
 #import "VLPopSongList.h"
 #import "VLSelectedSongList.h"
 #import "VLSongList.h"
+#import "VLHotSpotBtn.h"
 @import AgoraCommon;
-
 @interface VLPopSongList ()<VLSelectedSongListDelegate,VLSongListDelegate>
 
 @property(nonatomic, weak) id <VLPopSongListDelegate>delegate;
@@ -21,6 +21,9 @@
 @property (nonatomic, copy) NSString *roomNo;
 
 @property (nonatomic, assign) BOOL ifChorus;
+@property (nonatomic, strong) NSArray *selSongsArray;
+
+@property (nonatomic, assign) BOOL isOwner;
 
 @end
 
@@ -74,8 +77,9 @@
 }
 
 #pragma mark --setter,getter
-- (void)setSelSongsArray:(NSArray *)selSongsArray {
-    _selSongsArray = selSongsArray;
+- (void)setSelSongsArray:(NSArray *)selSongsArray isOwner:(BOOL)isOwner {
+    self.selSongsArray = selSongsArray;
+    self.isOwner = isOwner;
     if (selSongsArray.count > 0) {
         self.choosedCountLabel.hidden = NO;
     }else{
@@ -83,7 +87,7 @@
     }
 
     self.selsectSongView.selSongsArray = selSongsArray;
-    self.choosedSongView.selSongsArray = selSongsArray;
+    [self.choosedSongView setSelSongsArray:selSongsArray isOwner:isOwner];
 
     self.choosedCountLabel.text = [NSString stringWithFormat:@"%d",(int)selSongsArray.count];
 }
@@ -129,7 +133,7 @@
 
 - (VLSelectedSongList *)selsectSongView {
     if (!_selsectSongView) {
-        _selsectSongView = [[VLSelectedSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20) withDelegate:self withRoomNo:self.roomNo ifChorus:self.ifChorus];
+        _selsectSongView = [[VLSelectedSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20) withDelegate:self withRoomNo:self.roomNo];
     }
     return _selsectSongView;
 }
