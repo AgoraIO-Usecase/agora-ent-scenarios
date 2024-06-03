@@ -1,6 +1,5 @@
 package io.agora.rtmsyncmanager.service.arbiter
 
-import android.util.Log
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmLockRespObserver
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
@@ -24,7 +23,7 @@ class AUIArbiter(
 
     private val rtmLockRespObserver = object : AUIRtmLockRespObserver {
         override fun onReceiveLock(channelName: String, lockName: String, lockOwner: String) {
-            Log.d(tag, "onReceiveLock channelName: $channelName lockName: $lockName lockOwner: $lockOwner")
+            AUILogger.logger().d(tag, "onReceiveLock channelName: $channelName lockName: $lockName lockOwner: $lockOwner")
             if (channelName != this@AUIArbiter.channelName) return
             /*
              下列两种情况需要刷新下 metadata 到最新
@@ -49,7 +48,7 @@ class AUIArbiter(
         }
 
         override fun onReleaseLock(channelName: String, lockName: String, lockOwner: String, isExpire: Boolean) {
-            Log.d(tag, "onReleaseLock channelName: $channelName lockName: $lockName lockOwner: $lockOwner")
+            AUILogger.logger().d(tag, "onReleaseLock channelName: $channelName lockName: $lockName lockOwner: $lockOwner")
             if (channelName == this@AUIArbiter.channelName) {
                 acquire()
                 if (isExpire && lockOwnerId != currentUserId) return

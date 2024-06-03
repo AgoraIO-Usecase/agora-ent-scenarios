@@ -38,6 +38,10 @@ class SyncManager constructor(
         rtmManager.deInit()
     }
 
+    fun renew(token: String, completion: (AUIRtmException?) -> Unit) {
+        rtmManager.renew(token, completion)
+    }
+
     fun createScene(channelName: String, roomExpiration: RoomExpirationPolicy? = null): Scene {
         AUILogger.logger().d(tag, "createScene: $channelName")
         getScene(channelName)?.let {

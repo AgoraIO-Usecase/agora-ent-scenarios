@@ -2,6 +2,10 @@ package io.agora.rtmsyncmanager
 
 interface ISceneResponse {
 
+    // 即将更新metadata
+    fun onWillInitSceneMetadata(channelName: String): Map<String, Any>? { return null }
+
+    // token即将过期
     fun onTokenPrivilegeWillExpire(channelName: String?) {}
 
     // 房间过期的回调

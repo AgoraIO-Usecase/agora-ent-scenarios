@@ -179,7 +179,7 @@ class AUIRoomManager {
                     response: Response<CommonResp<String>>
                 ) {
                     val rsp = response.body()?.data
-                    if (response.body()?.code == 0 && rsp != null) {
+                    if (response.body()?.code == 0) {
                         AUIRoomContext.shared().insertRoomInfo(roomInfo)
                         // success
                         callback?.onResult(null, roomInfo)
