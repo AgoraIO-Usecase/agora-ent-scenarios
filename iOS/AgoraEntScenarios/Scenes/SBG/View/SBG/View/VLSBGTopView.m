@@ -94,7 +94,7 @@
     }
 }
 
-- (void)setListModel:(VLRoomListModel *)listModel {
+- (void)setListModel:(VLSBGRoomListModel *)listModel {
     _listModel = listModel;
     self.titleLabel.text = listModel.name;
     NSString *roomCountPre = SBGLocalizedString(@"sbg_room_count");

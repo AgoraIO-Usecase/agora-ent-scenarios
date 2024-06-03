@@ -34,7 +34,6 @@ def all_pods
 #  pod 'fuLib', :path => 'fu.podspec'
 
   pod 'AgoraSyncManager', '~> 2.1.6'
-  pod 'RTMSyncManager', :path => 'AgoraEntScenarios/Common/API/RTMSyncManager'
 #  pod 'AgoraRtcEngine_Special_iOS', :path => 'AgoraRtcEngine_iOS.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
   pod 'AgoraRtcEngine_Special_iOS', '4.1.1.29'

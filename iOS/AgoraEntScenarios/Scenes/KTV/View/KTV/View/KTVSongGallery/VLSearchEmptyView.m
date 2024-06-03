@@ -5,9 +5,9 @@
 
 #import "VLSearchEmptyView.h"
 #import "VLMacroDefine.h"
-#import "AESMacro.h"
-@import YYCategories;
 @import AgoraCommon;
+@import YYCategories;
+
 @implementation VLSearchEmptyView
 
 - (instancetype)initWithFrame:(CGRect)frame {

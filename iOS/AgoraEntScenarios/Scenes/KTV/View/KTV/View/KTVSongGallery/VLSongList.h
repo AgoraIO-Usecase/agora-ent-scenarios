@@ -21,11 +21,11 @@ typedef enum : NSUInteger {
 
 @interface VLSongList : UIView
 
-@property (nonatomic, strong) NSArray *selSongsArray;
 
 - (instancetype)initWithFrame:(CGRect)frame
                  withDelegate:(id<VLSongListDelegate>)delegate;
 
+- (void)setSelSongsArray:(NSArray * _Nonnull)selSongsArray isOwner:(BOOL)isOwner;
 @end
 
 NS_ASSUME_NONNULL_END
