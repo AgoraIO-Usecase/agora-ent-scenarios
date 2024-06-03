@@ -646,8 +646,7 @@ extension KTVSyncManagerServiceImp {
         let seatInfo = _createCurrentUserSeat(seatIndex: seatIdx)
         
         agoraPrint("enterSeat \(seatIdx)")
-        var params = mapConvert(model: seatInfo)
-        params["seatIndex"] = nil
+        var params = seatMapConvert(model: seatInfo)
         let collection = getSeatCollection(with: roomNo)
         collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.enterSeatCmd.rawValue,
                                   value: ["\(seatIdx)": params],
@@ -665,8 +664,7 @@ extension KTVSyncManagerServiceImp {
         let collection = getSeatCollection(with: roomNo)
         let model = VLRoomSeatModel()
         model.seatIndex = seatInfo.seatIndex
-        var params = mapConvert(model: model)
-        params["seatIndex"] = nil
+        var params = seatMapConvert(model: model)
         collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.leaveSeatCmd.rawValue,
                                   value: ["\(seatInfo.seatIndex)": params],
                                   callback: completion)
@@ -682,8 +680,7 @@ extension KTVSyncManagerServiceImp {
         let collection = getSeatCollection(with: roomNo)
         let model = VLRoomSeatModel()
         model.seatIndex = seatIndex
-        var params = mapConvert(model: model)
-        params["seatIndex"] = nil
+        var params = seatMapConvert(model: model)
         collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.kickSeatCmd.rawValue,
                                   value: ["\(seatIndex)": params],
                                   callback: completion)
@@ -1198,5 +1195,13 @@ private func _hideLoadingView() {
 
 private func mapConvert(model: NSObject) ->[String: Any] {
     let params = model.yy_modelToJSONObject() as! [String: Any]
+    return params
+}
+
+private func seatMapConvert(model: VLRoomSeatModel) ->[String: Any] {
+    var params = model.yy_modelToJSONObject() as! [String: Any]
+    params["seatIndex"] = nil
+    params["isAudioMuted"] = model.isAudioMuted
+    params["isVideoMuted"] = model.isVideoMuted
     return params
 }
