@@ -698,7 +698,7 @@ extension KTVSyncManagerServiceImp {
             return
         }
         
-        let params = ["\(seatInfo.seatIndex)": ["isAudioMuted": muted ? 1 : 0]]
+        let params = ["\(seatInfo.seatIndex)": ["isAudioMuted": muted]]
         let collection = getSeatCollection(with: roomNo ?? "")
         collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.muteAudioCmd.rawValue, value: params, callback: completion)
     }
@@ -712,7 +712,7 @@ extension KTVSyncManagerServiceImp {
             return
         }
         
-        let params = ["\(seatInfo.seatIndex)": ["isVideoMuted": muted ? 1 : 0]]
+        let params = ["\(seatInfo.seatIndex)": ["isVideoMuted": muted]]
         let collection = getSeatCollection(with: roomNo ?? "")
         collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.muteVideoCmd.rawValue, value: params, callback: completion)
     }
