@@ -13,17 +13,17 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
-import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.ktv.R
 import io.agora.scene.ktv.databinding.KtvDialogCreateRoomBinding
 import io.agora.scene.ktv.live.RoomLivingActivity
-import io.agora.scene.ktv.service.CreateRoomOutputModel
-import io.agora.scene.ktv.service.JoinRoomOutputModel
 import java.util.*
 
 /**
- * 创建房间弹框
+ * Create room dialog
+ *
+ * @property context
+ * @constructor Create empty Create room dialog
  */
 class CreateRoomDialog constructor(
     private val context: Context,
@@ -95,24 +95,15 @@ class CreateRoomDialog constructor(
             }
         }
 
-        roomCreateViewModel.joinRoomResult.observe(this) { out: JoinRoomOutputModel? ->
+        roomCreateViewModel.roomInfoLiveData.observe(this) { roomInfo  ->
             hideLoadingView()
-            if (out != null) {
+            if (roomInfo != null) {
                 dismiss()
-                RoomLivingActivity.launch(context, out)
+                RoomLivingActivity.launch(context, roomInfo)
             } else {
                 // 加入房间失败
             }
         }
-        roomCreateViewModel.createRoomResult.observe(this) { out: CreateRoomOutputModel? ->
-            if (out != null) {
-                roomCreateViewModel.joinRoom(out.roomNo, out.password)
-            } else {
-                hideLoadingView()
-                mBinding.btnCreateRoom.isEnabled = true
-            }
-        }
-
     }
 
     private fun randomName() {
@@ -133,10 +124,8 @@ class CreateRoomDialog constructor(
             ToastUtils.showToast(getString(R.string.ktv_please_input_4_pwd))
             return
         }
-        val userNo = UserManager.getInstance().user.id.toString()
-        val numPrivate = if (isPrivate) 1 else 0
         showLoadingView()
-        roomCreateViewModel.createRoom(numPrivate, roomName, password, userNo, "1")
+        roomCreateViewModel.createRoom( roomName, password, "1")
     }
 
     private fun showLoadingView() {

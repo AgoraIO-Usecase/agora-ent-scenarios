@@ -126,6 +126,10 @@ class RoomService(
         roomInfoMap.remove(roomId)
     }
 
+    fun isRoomOwner(roomId: String): Boolean {
+        return AUIRoomContext.shared().isRoomOwner(roomId)
+    }
+
     private fun createRoomRevert(appId: String, sceneId: String, roomId: String) {
         AUILogger.logger().d(tag, "createRoomRevert: $roomId")
         leaveRoom(appId, sceneId, roomId)

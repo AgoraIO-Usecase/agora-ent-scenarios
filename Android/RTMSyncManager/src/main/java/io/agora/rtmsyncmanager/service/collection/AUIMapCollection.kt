@@ -287,25 +287,23 @@ class AUIMapCollection(
         value: Map<String, Any>,
         callback: ((error: AUICollectionException?) -> Unit)?
     ) {
+        val newValue = valueWillChangeClosure?.invoke(publisherId, valueCmd, value) ?: value
         val error =
-            metadataWillAddClosure?.invoke(publisherId, valueCmd, value)
+            metadataWillAddClosure?.invoke(publisherId, valueCmd, newValue)
         if (error != null) {
             callback?.invoke(error)
             return
         }
 
-        val map = HashMap(currentMap)
-        value.forEach { (k, v) ->
-            map[k] = v
-        }
         val retMap =
             attributesWillSetClosure?.invoke(
                 channelName,
                 observeKey,
                 valueCmd,
-                AUIAttributesModel(map)
+                AUIAttributesModel(newValue)
             )?.getMap()
-                ?: map
+                ?: newValue
+
         val data = GsonTools.beanToString(retMap)
         if (data == null) {
             callback?.invoke(AUICollectionException.ErrorCode.encodeToJsonStringFail.toException())
@@ -324,7 +322,7 @@ class AUIMapCollection(
                 callback?.invoke(null)
             }
         }
-        currentMap = map
+        currentMap = retMap
     }
 
     private fun rtmUpdateMetaData(
@@ -333,15 +331,16 @@ class AUIMapCollection(
         value: Map<String, Any>,
         callback: ((error: AUICollectionException?) -> Unit)?
     ) {
+        val newValue = valueWillChangeClosure?.invoke(publisherId, valueCmd, value) ?: value
         val error =
-            metadataWillUpdateClosure?.invoke(publisherId, valueCmd, value, HashMap(currentMap))
+            metadataWillUpdateClosure?.invoke(publisherId, valueCmd, newValue, HashMap(currentMap))
         if (error != null) {
             callback?.invoke(error)
             return
         }
 
         val map = HashMap(currentMap)
-        value.forEach { (k, v) ->
+        newValue.forEach { (k, v) ->
             map[k] = v
         }
         val retMap =
@@ -370,7 +369,7 @@ class AUIMapCollection(
                 callback?.invoke(null)
             }
         }
-        currentMap = map
+        currentMap = retMap
     }
 
     private fun rtmMergeMetaData(
@@ -379,14 +378,15 @@ class AUIMapCollection(
         value: Map<String, Any>,
         callback: ((error: AUICollectionException?) -> Unit)?
     ) {
+        val newValue = valueWillChangeClosure?.invoke(publisherId, valueCmd, value) ?: value
         val error =
-            metadataWillMergeClosure?.invoke(publisherId, valueCmd, value, HashMap(currentMap))
+            metadataWillMergeClosure?.invoke(publisherId, valueCmd, newValue, HashMap(currentMap))
         if (error != null) {
             callback?.invoke(error)
             return
         }
 
-        val map = AUICollectionUtils.mergeMap(currentMap, value)
+        val map = AUICollectionUtils.mergeMap(currentMap, newValue)
         val retMap =
             attributesWillSetClosure?.invoke(
                 channelName,
@@ -413,7 +413,7 @@ class AUIMapCollection(
                 callback?.invoke(null)
             }
         }
-        currentMap = map
+        currentMap = retMap
     }
 
     private fun rtmCalculateMetaData(
@@ -477,7 +477,7 @@ class AUIMapCollection(
                 callback?.invoke(null)
             }
         }
-        currentMap = tempMap
+        currentMap = retMap
     }
 
     private fun rtmCleanMetaData(callback: ((error: AUICollectionException?) -> Unit)?) {
@@ -621,4 +621,7 @@ class AUIMapCollection(
         }
     }
 
+    override fun getLocalMetaData(): AUIAttributesModel {
+        return AUIAttributesModel(currentMap)
+    }
 }
