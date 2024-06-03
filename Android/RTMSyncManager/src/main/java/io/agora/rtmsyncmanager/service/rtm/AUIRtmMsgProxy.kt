@@ -17,7 +17,7 @@ import java.sql.Timestamp
 interface AUIRtmErrorRespObserver {
 
     /*
-     * token过期
+     * token即将过期
      */
     fun onTokenPrivilegeWillExpire(channelName: String?)
 

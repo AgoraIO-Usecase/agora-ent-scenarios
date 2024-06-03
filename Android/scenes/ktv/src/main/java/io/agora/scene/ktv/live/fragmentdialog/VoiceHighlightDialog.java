@@ -21,6 +21,7 @@ import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvDialogVoiceHighlightBinding;
 import io.agora.scene.ktv.live.bean.MusicSettingBean;
 import io.agora.scene.ktv.live.bean.VoiceHighlightBean;
+import io.agora.scene.ktv.service.KTVServiceModelKt;
 import io.agora.scene.widget.DividerDecoration;
 
 /**
@@ -66,12 +67,12 @@ public class VoiceHighlightDialog extends BaseBottomSheetDialogFragment<KtvDialo
             adapter.notifyItemChanged(i);
         }
         mListener.onUserItemChosen(data);
-        mSettings.setMHighLighterUid(data.user.getRtcUid());
+        mSettings.setMHighLighterUid(data.getUser().userId);
     }
 
     public void setUserList(List<VoiceHighlightBean> list) {
         list.forEach(bean -> {
-            if (bean.user.getRtcUid().equals(mSettings.getMHighLighterUid())) {
+            if (bean.getUser().userId.equals(mSettings.getMHighLighterUid())) {
                 bean.setSelect(true);
             }
         });
@@ -91,11 +92,11 @@ public class VoiceHighlightDialog extends BaseBottomSheetDialogFragment<KtvDialo
         @Override
         public void binding(@Nullable VoiceHighlightBean data, int selectedIndex) {
             GlideApp.with(mBinding.getRoot())
-                    .load(data.user.getHeadUrl())
-                    .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                    .load( KTVServiceModelKt.getFullHeadUrl(data.getUser()))
+                    .error(R.mipmap.default_user_avatar)
                     .apply(RequestOptions.circleCropTransform())
                     .into(mBinding.ivBg);
-            mBinding.tvTitle.setText(data.user.getName());
+            mBinding.tvTitle.setText(data.getUser().userName);
             mBinding.select.setVisibility(data.isSelect() ? View.VISIBLE : View.GONE);
         }
     }
