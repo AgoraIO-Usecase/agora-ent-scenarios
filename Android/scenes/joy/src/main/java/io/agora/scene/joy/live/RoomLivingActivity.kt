@@ -1,10 +1,5 @@
 package io.agora.scene.joy.live
 
-import agora.pb.rctrl.RemoteCtrlMsg
-import agora.pb.rctrl.RemoteCtrlMsg.KeyboardEventMsg
-import agora.pb.rctrl.RemoteCtrlMsg.KeyboardEventType
-import agora.pb.rctrl.RemoteCtrlMsg.RctrlMsg
-import agora.pb.rctrl.RemoteCtrlMsg.RctrlMsges
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -26,6 +21,7 @@ import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
@@ -50,7 +46,6 @@ import io.agora.scene.base.GlideApp
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.joy.JoyLogger
 import io.agora.scene.joy.JoyServiceManager
 import io.agora.scene.joy.R
@@ -60,10 +55,14 @@ import io.agora.scene.joy.live.fragmentdialog.JoyChooseGameDialog
 import io.agora.scene.joy.live.fragmentdialog.JoyGameRulesDialog
 import io.agora.scene.joy.live.fragmentdialog.JoyGiftDialog
 import io.agora.scene.joy.service.JoyMessage
-import io.agora.scene.joy.service.JoyParameters
 import io.agora.scene.joy.service.JoyServiceListenerProtocol
 import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.joy.service.JoyStartGameInfo
+import io.agora.scene.joy.service.RemoteCtrlMsg
+import io.agora.scene.joy.service.RemoteCtrlMsg.KeyboardEventMsg
+import io.agora.scene.joy.service.RemoteCtrlMsg.KeyboardEventType
+import io.agora.scene.joy.service.RemoteCtrlMsg.RctrlMsg
+import io.agora.scene.joy.service.RemoteCtrlMsg.RctrlMsges
 import io.agora.scene.joy.service.api.JoyAction
 import io.agora.scene.joy.service.api.JoyApiService
 import io.agora.scene.joy.service.api.JoyGameListResult
@@ -112,8 +111,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     private var mStartGameInfo: JoyStartGameInfo? = null
 
-    private val mUser: User
-        get() = UserManager.getInstance().user
+    private val mUser: User get() = UserManager.getInstance().user
 
     private val mMainRtcConnection by lazy {
         RtcConnection(
@@ -287,7 +285,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 showNormalInputLayout()
             }
             binding.vKeyboardBg.layoutParams = lp
-            null
         }
 
         binding.root.post {
@@ -398,19 +395,18 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         if (roomLeftTime > 0) {
             toggleSelfVideo {
                 initRtcEngine()
-                initServiceWithJoinRoom()
+                getStartGameInfo()
             }
             toggleSelfAudio { }
             startTopLayoutTimer()
         } else {
             CustomToast.show(getString(R.string.joy_living_end))
-            destroy()
+            innerRleasee()
             finish()
             return
         }
         mJoyService.subscribeListener(object : JoyServiceListenerProtocol {
             override fun onUserListDidChanged(userList: List<AUIUserInfo>) {
-                mRoomInfo.customPayload[JoyParameters.ROOM_USER_COUNT] = userList.size
             }
 
             override fun onMessageDidAdded(message: JoyMessage) {
@@ -429,12 +425,14 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 }
             }
 
-            override fun onRoomDidDestroy(roomInfo: AUIRoomInfo, abnormal: Boolean) {
-                destroy()
-                showLivingEndLayout(abnormal)
+            override fun onRoomDestroy() {
+                innerRleasee()
+                showLivingEndLayout(false)
             }
 
-            override fun onRoomDidChanged(roomInfo: AUIRoomInfo) {
+            override fun onRoomExpire() {
+                innerRleasee()
+                showLivingEndLayout(false)
             }
         })
 
@@ -446,8 +444,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     showBottomView(true)
                     if (mIsRoomOwner) {
                         showRulesDialog()
-                        mRoomInfo.customPayload[JoyParameters.BADGE_TITLE] = mJoyViewModel.mGameDetail?.name ?: ""
-                        mJoyService.updateRoom(mRoomInfo, completion = {})
                         setupActionView(it.data?.actions)
                     }
                 }
@@ -652,7 +648,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 binding.root.post {
                     if (uid == mStartGameInfo?.assistantUid) {
                         // todo 远端游戏退出
-                        destroy()
+                        innerRleasee()
                         showLivingEndLayout(true)
                     }
                 }
@@ -685,7 +681,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
             override fun onError(err: Int) {
                 super.onError(err)
-                JoyLogger.e(TAG, null, "rtc onError:$err ${RtcEngine.getErrorDescription(err)} ")
+                JoyLogger.e(TAG, "rtc onError:$err ${RtcEngine.getErrorDescription(err)} ")
             }
         }
 
@@ -773,18 +769,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         adjustAssistantVideoSize(assistantUid)
     }
 
-    private fun initServiceWithJoinRoom() {
-        mJoyService.joinRoom(mRoomInfo, completion = {
-            if (it == null) { //success
-                getStartGameInfo()
-            } else {
-                CustomToast.showError(getString(R.string.joy_join_room_error))
-                destroy()
-                finish()
-            }
-        })
-    }
-
     private fun getStartGameInfo() {
         mJoyService.getStartGame(mRoomInfo.roomId, completion = { error, startGameInfo ->
             if (error == null) { //success
@@ -823,7 +807,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
 
         mRtcEngine.joinChannelEx(
-            JoyServiceManager.mTokenConfig.rtcToken,
+            JoyServiceManager.mRtcToken,
             mMainRtcConnection,
             channelMediaOptions,
             eventListener
@@ -934,8 +918,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton(R.string.confirm) { dialog, id ->
-                destroy()
                 dialog.dismiss()
+               exitRoom()
                 finish()
             }
             .setNegativeButton(R.string.cancel) { dialog, id ->
@@ -944,18 +928,33 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             .show()
     }
 
+    private fun exitRoom(){
+        mJoyService.leaveRoom {
+            mJoyService.leaveRoom { e: Exception? ->
+                if (e == null) { // success
+                    JoyLogger.d(TAG, "RoomLivingViewModel.exitRoom() success")
+                } else { // failure
+                    JoyLogger.e(TAG, "RoomLivingViewModel.exitRoom() failed: " + e.message)
+                }
+                e?.message?.let { error ->
+                    io.agora.scene.widget.toast.CustomToast.show(error, Toast.LENGTH_SHORT)
+                }
+            }
+        }
+        innerRleasee()
+    }
+
     override fun onBackPressed() {
         if (showNormalInputLayout()) return
         showEndRoomDialog()
     }
 
-    private fun destroy() {
+    private fun innerRleasee() {
         (binding.tvTimer.tag as? Runnable)?.let {
             it.run()
             binding.tvTimer.removeCallbacks(it)
             binding.tvTimer.tag = null
         }
-        mJoyService.leaveRoom(mRoomInfo, {})
         if (mIsRoomOwner) {
             mStartGameInfo?.taskId?.let { taskId ->
                 mJoyViewModel.stopGame(mRoomInfo.roomId, mJoyViewModel.mGamId, taskId)

@@ -22,7 +22,6 @@ import io.agora.scene.joy.databinding.JoyItemRoomList4Binding
 import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.joy.live.RoomLivingActivity
 import io.agora.scene.joy.service.JoyParameters
-import io.agora.scene.joy.service.TokenConfig
 import io.agora.scene.joy.service.api.JoyApiManager
 import io.agora.scene.widget.utils.UiUtils
 
@@ -68,12 +67,8 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
         binding.smartRefreshLayout.setEnableRefresh(true)
 
         binding.smartRefreshLayout.setOnRefreshListener {
-            JoyServiceManager.renewTokens { tokenConfig: TokenConfig?, exception: Exception? ->
-                if (exception == null) {
-                    mJoyService.getRoomList { roomList ->
-                        updateList(roomList)
-                    }
-                }
+            mJoyService.getRoomList { error, roomList ->
+                updateList(roomList ?: emptyList())
             }
         }
         binding.smartRefreshLayout.autoRefresh()
@@ -101,7 +96,6 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
     override fun onDestroy() {
         super.onDestroy()
         JoyServiceManager.destroy()
-        mJoyService.reset()
     }
 
     private class RoomListAdapter constructor(
