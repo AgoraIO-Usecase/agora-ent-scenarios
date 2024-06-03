@@ -139,6 +139,8 @@ class KTVSyncManagerServiceImp constructor(
      */
     private val mObservableHelper = ObservableHelper<KtvServiceListenerProtocol>()
 
+    // time limit
+    private val ROOM_AVAILABLE_DURATION: Long = 20 * 60 * 1000 // 20min
 
     init {
         HttpManager.setBaseURL(ServerConfig.roomManagerUrl)
@@ -157,9 +159,27 @@ class KTVSyncManagerServiceImp constructor(
         mSyncManager = SyncManager(mContext, null, commonConfig)
 
         val roomExpirationPolicy = RoomExpirationPolicy()
-        roomExpirationPolicy.expirationTime = 20 * 60 * 1000
+        roomExpirationPolicy.expirationTime = ROOM_AVAILABLE_DURATION
         roomExpirationPolicy.isAssociatedWithOwnerOffline = true
         mRoomService = RoomService(roomExpirationPolicy, mRoomManager, mSyncManager)
+    }
+
+    private fun startTimer() {
+        mMainHandler.postDelayed(timerRoomCountDownTask, 1000)
+    }
+
+    private val timerRoomCountDownTask = object : Runnable {
+        override fun run() {
+            if (mCurRoomNo.isEmpty()) return
+            val roomDuration = getCurrentDuration(mCurRoomNo)
+            if (roomDuration >= ROOM_AVAILABLE_DURATION) {
+                mMainHandler.removeCallbacks(this)
+                onSceneExpire(mCurRoomNo)
+            } else {
+                mMainHandler.postDelayed(this, 1000)
+            }
+        }
+
     }
 
     /**
@@ -290,6 +310,7 @@ class KTVSyncManagerServiceImp constructor(
                     if (rtmException == null) {
                         KTVLogger.d(TAG, "createRoom success: $roomInfo")
                         mCurRoomNo = roomInfo.roomId
+                        startTimer()
                         runOnMainThread {
                             completion.invoke(null, roomInfo)
                         }
@@ -368,10 +389,14 @@ class KTVSyncManagerServiceImp constructor(
      * @receiver
      */
     override fun leaveRoom(completion: (error: Exception?) -> Unit) {
+
         val scene = mSyncManager.createScene(mCurRoomNo)
         scene.unbindRespDelegate(this)
         scene.userService.unRegisterRespObserver(this)
 
+        if (AUIRoomContext.shared().isRoomOwner(mCurRoomNo)) {
+            mMainHandler.removeCallbacks(timerRoomCountDownTask)
+        }
         mRoomService.leaveRoom(KtvCenter.mAppId, kSceneId, mCurRoomNo)
         mUserList.clear()
         mSeatMap.clear()
@@ -1586,9 +1611,11 @@ class KTVSyncManagerServiceImp constructor(
         // 正在播放的排在前面，正常就有一个
         val playingList = songList.filter { songStatus(it) == PlayStatus.playing }
         // 置顶优先播放，后置顶在前
-        val pinList = songList.filter { songPin(it) > 0 && songStatus(it) != PlayStatus.playing }.sortedBy { songPin(it) * -1 }
+        val pinList =
+            songList.filter { songPin(it) > 0 && songStatus(it) != PlayStatus.playing }.sortedBy { songPin(it) * -1 }
         // 先点歌的在前
-        val normalList = songList.filter { songPin(it) <= 0 && songStatus(it) != PlayStatus.playing }.sortedBy { songCreateAt(it) }
+        val normalList =
+            songList.filter { songPin(it) <= 0 && songStatus(it) != PlayStatus.playing }.sortedBy { songCreateAt(it) }
 
         val sortSongList = mutableListOf<Map<String, Any>>()
         sortSongList.addAll(playingList)

@@ -817,7 +817,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
                         binding.tvZC.setText(R.string.ktv_zc)
                         binding.tvHC.visibility = View.GONE
                         binding.tvZC.visibility = View.VISIBLE
-                    } else if (!choristerInfo?.userId.isNullOrEmpty() && choristerInfo?.userId == songModel.owner?.userId) {
+                    } else if (!choristerInfo?.userId.isNullOrEmpty() && choristerInfo?.chorusSongNo == songModel.songNo) {
                         binding.tvHC.setText(R.string.ktv_hc)
                         binding.tvZC.visibility = View.GONE
                         binding.tvHC.visibility = View.VISIBLE

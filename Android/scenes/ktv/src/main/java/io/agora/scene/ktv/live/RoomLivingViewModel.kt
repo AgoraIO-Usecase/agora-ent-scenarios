@@ -302,6 +302,8 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
             val index = choristerList.indexOfFirst { it.userId == chorister.userId }
             if (index >= 0) {
                 choristerList[index] = chorister
+            }else{
+                choristerList.add(chorister)
             }
             val originSeat = seatListLiveData.value?.firstOrNull { it.owner?.userId == chorister.userId }
             if (originSeat != null) {
