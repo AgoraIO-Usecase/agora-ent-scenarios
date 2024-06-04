@@ -30,9 +30,12 @@ class ApplyService(
     private val delegate: (channelName: String, observeKey: String, value: AUIAttributesModel) -> Unit =
         { cn: String, observeKey: String, value: AUIAttributesModel ->
             if (observeKey == key) {
-                val list = value.getList()?.map {
-                    GsonTools.toBean(GsonTools.beanToString(it), ApplyInfo::class.java)!!
-                } ?: emptyList()
+
+                val list = mutableListOf<ApplyInfo>()
+                value.getList()?.forEach {
+                    val item = GsonTools.toBeanSafely(it, ApplyInfo::class.java)?: return@forEach
+                    list.add(item)
+                }
 
                 observableHelper.notifyEventHandlers {
                     it.invoke(ArrayList(list))
@@ -132,10 +135,12 @@ class ApplyService(
             return
         }
 
-        val applyInfo =
-            scene.getCollection(key, listCollectionCreator).getLocalMetaData().getList()?.map {
-                GsonTools.toBean(GsonTools.beanToString(it), ApplyInfo::class.java)!!
-            }?.find {
+        val list = mutableListOf<ApplyInfo>()
+        scene.getCollection(key, listCollectionCreator).getLocalMetaData().getList()?.forEach {
+            val item = GsonTools.toBeanSafely(it, ApplyInfo::class.java)?: return@forEach
+            list.add(item)
+        }
+        val applyInfo = list.find {
                 it.userId == userId
             }
 
@@ -204,8 +209,10 @@ class ApplyService(
                 return@getMetaData
             }
             val list = (value as? List<*>) ?: emptyList<Any>()
-            val ret = list.map {
-                GsonTools.toBean(GsonTools.beanToString(it), ApplyInfo::class.java)!!
+            val ret = mutableListOf<ApplyInfo>()
+            list.forEach {
+                val item = GsonTools.toBeanSafely(it, ApplyInfo::class.java)?: return@forEach
+                ret.add(item)
             }
             success?.invoke(ret)
         }

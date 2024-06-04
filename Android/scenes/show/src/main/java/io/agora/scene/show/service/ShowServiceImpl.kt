@@ -146,8 +146,9 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
             if (ex != null) {
                 error?.invoke(RuntimeException(ex))
             } else {
-                success.invoke(appendRobotRooms(list?.map { it.toShowRoomDetailModel() }
-                    ?: emptyList()))
+                val listWithRobot = appendRobotRooms(list?.map { it.toShowRoomDetailModel() } ?: emptyList())
+                val listWithoutMe = listWithRobot.filter { it.ownerId != UserManager.getInstance().user.id.toString() }
+                success.invoke(listWithoutMe)
             }
         }
     }
@@ -749,7 +750,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
-        syncManager.getExPKService(roomId).acceptPK(
+        syncManager.getExPKService(roomId).rejectPK(
             invitationId,
             success = {
                 ThreadManager.getInstance().runOnMainThread {

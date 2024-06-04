@@ -6,6 +6,7 @@ import io.agora.rtmsyncmanager.SyncManager
 import io.agora.rtmsyncmanager.service.http.HttpManager
 import io.agora.rtmsyncmanager.service.room.AUIRoomManager
 import io.agora.rtmsyncmanager.utils.AUILogger
+import io.agora.rtmsyncmanager.utils.GsonTools
 
 private val mInteractionServiceMap = mutableMapOf<String, InteractionService>()
 
@@ -121,5 +122,15 @@ fun SyncManager.destroyExtensions() {
     mMessageRetainerMap.clear()
     mRoomService = null
     mRoomPresenceService = null
+}
+
+internal fun <T> GsonTools.toBeanSafely(data: Any?, clazz: Class<T>): T? {
+    if(data == null){
+        return null
+    }
+    if (data is Map<*, *> && data.isEmpty()) {
+        return null
+    }
+    return toBean(beanToString(data), clazz)
 }
 

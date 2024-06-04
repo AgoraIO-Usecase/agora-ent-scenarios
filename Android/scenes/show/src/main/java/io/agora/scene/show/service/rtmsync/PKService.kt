@@ -20,7 +20,7 @@ class PKService(
 
     private val messageRetainer = MessageRetainer(syncManager.rtmManager, channelName, key).apply {
         subscribe { msg ->
-            val pkInfo = GsonTools.toBean(
+            val pkInfo = GsonTools.toBeanSafely(
                 msg.content,
                 PKInfo::class.java
             )
@@ -165,12 +165,12 @@ class PKService(
         error: ((Throwable) -> Unit)? = null
     ) {
         val message = messageRetainer.getMessage {
-            GsonTools.toBean(
+            GsonTools.toBeanSafely(
                 it.content,
                 PKInfo::class.java
             )?.id == pkId
         }
-        val pkInfo = GsonTools.toBean(
+        val pkInfo = GsonTools.toBeanSafely(
             message?.content,
             PKInfo::class.java
         )
@@ -200,12 +200,12 @@ class PKService(
         error: ((Throwable) -> Unit)? = null
     ) {
         val message = messageRetainer.getMessage {
-            GsonTools.toBean(
+            GsonTools.toBeanSafely(
                 it.content,
                 PKInfo::class.java
             )?.id == pkId
         }
-        var pkInfo = GsonTools.toBean(
+        var pkInfo = GsonTools.toBeanSafely(
             message?.content,
             PKInfo::class.java
         )

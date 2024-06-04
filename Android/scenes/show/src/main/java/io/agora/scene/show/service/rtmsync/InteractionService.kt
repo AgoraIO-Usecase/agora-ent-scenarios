@@ -31,8 +31,8 @@ class InteractionService(
     private val delegate: (channelName: String, observeKey: String, value: AUIAttributesModel) -> Unit =
         { cn: String, observeKey: String, value: AUIAttributesModel ->
             if (channelName == cn && observeKey == key) {
-                val info = if (value.getMap()?.isEmpty() != false) null else GsonTools.toBean(
-                    GsonTools.beanToString(value.getMap()),
+                val info = GsonTools.toBeanSafely(
+                    value.getMap(),
                     InteractionInfo::class.java
                 )
                 if(info?.type == InteractionType.LINKING){
@@ -208,9 +208,8 @@ class InteractionService(
                 failure?.invoke(RuntimeException(error))
                 return@getMetaData
             }
-            val map = value as Map<String, Any> ?: emptyMap()
-            val info = if (map.isEmpty()) null else GsonTools.toBean(
-                GsonTools.beanToString(map),
+            val info =GsonTools.toBeanSafely(
+                value,
                 InteractionInfo::class.java
             )
             interactionInfo = info

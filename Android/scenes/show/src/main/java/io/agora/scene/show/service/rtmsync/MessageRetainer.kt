@@ -32,7 +32,7 @@ class MessageRetainer(
             publisherId: String,
             message: String
         ) {
-            val msg = GsonTools.toBean(message, MessageInfo::class.java) ?: return
+            val msg = GsonTools.toBeanSafely(message, MessageInfo::class.java) ?: return
             if (key != msg.key) {
                 return
             }

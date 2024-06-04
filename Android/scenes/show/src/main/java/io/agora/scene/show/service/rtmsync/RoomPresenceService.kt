@@ -27,10 +27,7 @@ class RoomPresenceService(
                 return
             }
             userList.forEach {
-                val info = GsonTools.toBean(
-                    GsonTools.beanToString(it),
-                    RoomPresenceInfo::class.java
-                )!!
+                val info = GsonTools.toBeanSafely(it, RoomPresenceInfo::class.java) ?: return@forEach
                 val index = roomPresenceInfoList.indexOfFirst { it.roomId == info.roomId }
                 if (index == -1) {
                     roomPresenceInfoList.add(info)
@@ -51,10 +48,7 @@ class RoomPresenceService(
             if (channelName != this@RoomPresenceService.channelName) {
                 return
             }
-            val info = GsonTools.toBean(
-                GsonTools.beanToString(userInfo),
-                RoomPresenceInfo::class.java
-            )!!
+            val info = GsonTools.toBeanSafely(userInfo, RoomPresenceInfo::class.java) ?: return
             val index = roomPresenceInfoList.indexOfFirst { it.roomId == info.roomId }
             if (index == -1) {
                 roomPresenceInfoList.add(info)
@@ -91,10 +85,7 @@ class RoomPresenceService(
             if (channelName != this@RoomPresenceService.channelName) {
                 return
             }
-            val info = GsonTools.toBean(
-                GsonTools.beanToString(userInfo),
-                RoomPresenceInfo::class.java
-            )!!
+            val info = GsonTools.toBeanSafely(userInfo, RoomPresenceInfo::class.java) ?: return
             val index = roomPresenceInfoList.indexOfFirst { it.roomId == info.roomId }
             if (index == -1) {
                 roomPresenceInfoList.add(info)
@@ -206,9 +197,11 @@ class RoomPresenceService(
                 error?.invoke(RuntimeException(ex))
                 return@whoNow
             }
-            val list = userList?.map {
-                GsonTools.toBean(GsonTools.beanToString(it), RoomPresenceInfo::class.java)!!
-            } ?: emptyList()
+            val list = mutableListOf<RoomPresenceInfo>()
+            userList?.forEach {
+                val info = GsonTools.toBeanSafely(it, RoomPresenceInfo::class.java) ?: return@forEach
+                list.add(info)
+            }
             ThreadManager.getInstance().runOnMainThread {
                 success.invoke(list)
             }

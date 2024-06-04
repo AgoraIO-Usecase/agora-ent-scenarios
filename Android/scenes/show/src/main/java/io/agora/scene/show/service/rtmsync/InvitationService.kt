@@ -18,7 +18,7 @@ class InvitationService(
 
     private val messageRetainer = MessageRetainer(syncManager.rtmManager, channelName, key).apply {
         subscribe { msg ->
-            val invitationInfo = GsonTools.toBean(
+            val invitationInfo = GsonTools.toBeanSafely(
                 msg.content,
                 InvitationInfo::class.java
             )
@@ -71,7 +71,7 @@ class InvitationService(
         failure: ((Throwable) -> Unit)? = null
     ) {
         val inviteMessage = messageRetainer.getMessage {
-            GsonTools.toBean(
+            GsonTools.toBeanSafely(
                 it.content,
                 InvitationInfo::class.java
             )?.id == invitationId
@@ -82,7 +82,7 @@ class InvitationService(
             return
         }
 
-        var invitationInfo = GsonTools.toBean(
+        var invitationInfo = GsonTools.toBeanSafely(
             inviteMessage.content,
             InvitationInfo::class.java
         )
@@ -114,7 +114,7 @@ class InvitationService(
         failure: ((Throwable) -> Unit)? = null
     ) {
         val inviteMessage = messageRetainer.getMessage {
-            GsonTools.toBean(
+            GsonTools.toBeanSafely(
                 it.content,
                 InvitationInfo::class.java
             )?.id == invitationId
@@ -125,7 +125,7 @@ class InvitationService(
             return
         }
 
-        var invitationInfo = GsonTools.toBean(
+        var invitationInfo = GsonTools.toBeanSafely(
             inviteMessage.content,
             InvitationInfo::class.java
         )
