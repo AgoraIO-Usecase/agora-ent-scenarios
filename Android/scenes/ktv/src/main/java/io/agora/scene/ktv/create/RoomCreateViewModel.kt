@@ -5,7 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.ktv.service.CreateRoomInfo
 import io.agora.scene.ktv.service.KTVServiceProtocol.Companion.getImplInstance
 
 /**
@@ -47,10 +46,9 @@ class RoomCreateViewModel
      *
      * @param name      the name
      * @param password  the password
-     * @param icon      the icon
      */
-    fun createRoom(name: String, password: String, icon: String) {
-        ktvServiceProtocol.createRoom(CreateRoomInfo(icon, name, password)) { err, roomInfo ->
+    fun createRoom(name: String, password: String) {
+        ktvServiceProtocol.createRoom(name, password) { err, roomInfo ->
             if (err == null && roomInfo != null) {
                 roomInfoLiveData.postValue(roomInfo)
             } else {

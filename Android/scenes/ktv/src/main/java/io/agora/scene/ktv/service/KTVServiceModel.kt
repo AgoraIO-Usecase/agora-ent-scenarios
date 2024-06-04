@@ -19,20 +19,6 @@ object KTVParameters {
 }
 
 /**
- * Create room input model
- *
- * @property icon
- * @property name
- * @property password
- * @constructor Create empty Create room input model
- */
-data class CreateRoomInfo constructor(
-    val icon: String,
-    val name: String,
-    val password: String,
-)
-
-/**
  * Room mic seat status
  *
  * @constructor Create empty Room mic seat status
