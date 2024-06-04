@@ -273,7 +273,11 @@ class KTVSyncManagerServiceImp constructor(
      * @param completion
      * @receiver
      */
-    override fun createRoom(roomMame:String,password: String?, completion: (error: Exception?, out: AUIRoomInfo?) -> Unit) {
+    override fun createRoom(
+        roomName: String,
+        password: String?,
+        completion: (error: Exception?, out: AUIRoomInfo?) -> Unit
+    ) {
         KTVLogger.d(TAG, "createRoom start")
         val roomId = (Random(System.currentTimeMillis()).nextInt(100000) + 1000000).toString()
         initRtmSync {
