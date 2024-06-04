@@ -18,6 +18,7 @@ import io.agora.rtmsyncmanager.service.collection.AUIMapCollection
 import io.agora.rtmsyncmanager.service.http.HttpManager
 import io.agora.rtmsyncmanager.service.room.AUIRoomManager
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmAttributeRespObserver
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmMessageRespObserver
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
@@ -25,7 +26,6 @@ import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.base.utils.GsonUtil
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.joy.JoyLogger
 import io.agora.scene.joy.JoyServiceManager
@@ -47,7 +47,7 @@ class JoySyncManagerServiceImp constructor(
         private const val TAG = "Joy_Service_LOG"
         private const val kSceneId = "scene_joy_5.0.0"
 
-        private const val SYNC_SCENE_ROOM_START_GAME_COLLECTION = "startGameCollection"
+        private const val kCollectionStartGameInfo = "startGameCollection"
     }
 
     private val mMainHandler by lazy { Handler(Looper.getMainLooper()) }
@@ -66,8 +66,6 @@ class JoySyncManagerServiceImp constructor(
 
     private lateinit var roomService: RoomService
 
-    private val mRoomMap = mutableMapOf<String, AUIRoomInfo>()
-
     private var mUserList: MutableList<AUIUserInfo> = mutableListOf()
 
     private var mJoyServiceListener: JoyServiceListenerProtocol? = null
@@ -75,19 +73,19 @@ class JoySyncManagerServiceImp constructor(
     @Volatile
     private var mCurrRoomNo: String = ""
 
-    private val mUser: User
-        get() = UserManager.getInstance().user
+    private val mUser: User get() = UserManager.getInstance().user
 
-    private val mTimerRoomEndRun = Runnable {
-        runOnMainThread {
-            JoyLogger.d(TAG, "time up exit room! roomId:$mCurrRoomNo")
-            val roomInfo = mRoomMap[mCurrRoomNo] ?: return@runOnMainThread
-            mJoyServiceListener?.onRoomDidDestroy(roomInfo, false)
-        }
-    }
 
     private fun getRandomThumbnailId(crateAt: Long) =
         Random(crateAt).nextInt(0, 5).toString()
+
+    private fun getStartGameCollection(roomId: String): AUIMapCollection? {
+        if (roomId.isEmpty()) {
+            return null
+        }
+        val scene = mSyncManager.createScene(roomId)
+        return scene.getCollection(kCollectionStartGameInfo) { a, b, c -> AUIMapCollection(a, b, c) }
+    }
 
     init {
         HttpManager.setBaseURL(ServerConfig.roomManagerUrl)
@@ -110,31 +108,67 @@ class JoySyncManagerServiceImp constructor(
         roomService = RoomService(roomExpirationPolicy, mRoomManager, mSyncManager)
     }
 
-    override fun getRoomList(completion: (list: List<AUIRoomInfo>) -> Unit) {
-        JoyLogger.d(TAG, "getRoomList start")
-        roomService.getRoomList(BuildConfig.AGORA_APP_ID, kSceneId, System.currentTimeMillis(), 20, {
-            it.roomOwner?.userId == UserManager.getInstance().user.id.toString()
-        }) { err, ts, list ->
-            if (list != null) {
-                //按照创建时间顺序排序
-                val arrayList = ArrayList<AUIRoomInfo>(list)
-                arrayList.sortBy { it.customPayload[JoyParameters.CREATED_AT] as? Long }
-                JoyLogger.d(TAG, "getRoomList end,roomCount:${list.size}")
-                runOnMainThread { completion.invoke(list) }
+    private fun startTimer() {
+        mMainHandler.removeCallbacks(timerRoomCountDownTask)
+        mMainHandler.postDelayed(timerRoomCountDownTask, 1000)
+    }
+
+    private val timerRoomCountDownTask = object : Runnable {
+        override fun run() {
+            if (mCurrRoomNo.isEmpty()) return
+            val roomDuration = getCurrentRoomDuration(mCurrRoomNo)
+            if (roomDuration == -1L || roomDuration >= JoyServiceProtocol.ROOM_AVAILABLE_DURATION) {
+                mMainHandler.removeCallbacks(this)
+                onSceneExpire(mCurrRoomNo)
             } else {
-                err?.let {
-                    JoyLogger.e(TAG, it, "getRoomList error")
-                }
-                runOnMainThread { completion.invoke(emptyList()) }
+                mMainHandler.postDelayed(this, 1000)
             }
+        }
+    }
+
+    // 本地时间与restful 服务端差值
+    private var rsetfulDiffTs: Long = 0
+
+    override fun getRoomList(completion: (error: Exception?, roomList: List<AUIRoomInfo>?) -> Unit) {
+        JoyLogger.d(TAG, "getRoomList start")
+        initRtmSync {
+            if (it != null) {
+                completion.invoke(Exception("${it.message}(${it.code})"), null)
+                return@initRtmSync
+            }
+            roomService.getRoomList(
+                BuildConfig.AGORA_APP_ID, kSceneId, 0, 20,
+                cleanClosure = { auiRoomInfo ->
+                    return@getRoomList auiRoomInfo.roomOwner?.userId == mUser.id.toString()
+
+                },
+                completion = { uiException, ts, roomList ->
+                    if (uiException == null) {
+                        ts?.let { serverTs ->
+                            rsetfulDiffTs = System.currentTimeMillis() - serverTs
+                        }
+                        val newRoomList = roomList?.sortedBy { it.createTime } ?: emptyList()
+                        JoyLogger.d(TAG, "getRoomList success, roomCount:${newRoomList.size}")
+                        runOnMainThread { completion.invoke(null, newRoomList) }
+                    } else {
+                        JoyLogger.e(TAG, "getRoomList error, $uiException")
+                        runOnMainThread {
+                            completion.invoke(uiException, null)
+                        }
+                    }
+                })
         }
     }
 
     override fun createRoom(roomName: String, completion: (error: Exception?, out: AUIRoomInfo?) -> Unit) {
         JoyLogger.d(TAG, "createRoom start,roomName:$roomName")
+        val roomId = (Random(System.currentTimeMillis()).nextInt(100000) + 1000000).toString()
         initRtmSync {
-            val roomId = (Random(System.currentTimeMillis()).nextInt(100000) + 1000000).toString()
-            val createdAt = TimeUtils.currentTimeMillis()
+            if (it != null) {
+                completion.invoke(Exception("${it.message}(${it.code})"), null)
+                return@initRtmSync
+            }
+            val createdAt = System.currentTimeMillis() - rsetfulDiffTs
             val roomInfo = AUIRoomInfo().apply {
                 this.roomId = roomId
                 this.roomName = roomName
@@ -143,148 +177,118 @@ class JoySyncManagerServiceImp constructor(
                     userName = mUser.name
                     userAvatar = mUser.headUrl
                 }
+                this.createTime = createdAt
                 this.customPayload[JoyParameters.ROOM_USER_COUNT] = 1
                 this.customPayload[JoyParameters.THUMBNAIL_ID] = getRandomThumbnailId(createdAt)
-                this.customPayload[JoyParameters.CREATED_AT] = createdAt
             }
-            roomService.createRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomInfo) { e, info ->
-                if (info != null) {
-                    mRoomMap[roomInfo.roomId] = roomInfo
+            val scene = mSyncManager.createScene(roomInfo.roomId)
+            scene.bindRespDelegate(this)
+            scene.userService.registerRespObserver(this)
+            mSyncManager.rtmManager.subscribeMessage(this)
+            mSyncManager.rtmManager.subscribeAttribute(roomInfo.roomId, kCollectionStartGameInfo, this)
+            mCurrRoomNo = roomInfo.roomId
+            roomService.createRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomInfo) { rtmException, info ->
+                if (rtmException == null) {
+                    JoyLogger.d(TAG, "createRoom success: $roomInfo")
+                    mCurrRoomNo = roomInfo.roomId
+                    startTimer()
                     runOnMainThread {
                         completion.invoke(null, roomInfo)
                     }
                 } else {
-                    e?.let {
-                        JoyLogger.e(TAG, e, "createRoom failed: $e")
-                    }
+                    mCurrRoomNo = ""
+                    JoyLogger.e(TAG, "createRoom failed: $rtmException")
                     runOnMainThread {
-                        completion.invoke(Exception(e?.message), null)
+                        completion.invoke(Exception("${rtmException.message}(${rtmException.code})"), null)
                     }
                 }
             }
         }
     }
 
-    override fun updateRoom(roomInfo: AUIRoomInfo, completion: (error: Exception?) -> Unit) {
-        initRtmSync {
-            mRoomManager.updateRoomInfo(BuildConfig.AGORA_APP_ID, kSceneId, roomInfo) { error, roomInfo ->
-                roomInfo?.let {
-                    mRoomMap[it.roomId] = roomInfo
-                }
-                error?.let {
-                    JoyLogger.d(TAG, "updateRoom failed: $it")
-                }
-                runOnMainThread {
-                    completion.invoke(error)
-                }
-            }
+    override fun joinRoom(roomId: String, completion: (error: Exception?) -> Unit) {
+        JoyLogger.d(TAG, "joinRoom start")
+        if (mCurrRoomNo.isNotEmpty()) {
+            completion.invoke(Exception("already join room $mCurrRoomNo!"))
+            return
         }
+        val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId)
+        if (cacheRoom == null) {
+            completion.invoke(Exception("room $mCurrRoomNo null!"))
+            return
+        }
+        initRtmSync {
+            if (it != null) {
+                completion.invoke(Exception("${it.message}(${it.code})"))
+                return@initRtmSync
+            }
+            JoyServiceManager.generateRtcToken { rtcToken, exception ->
+                // 进入房间提前获取 rtcToken
+                val token = rtcToken ?: run {
+                    JoyLogger.e(TAG, "joinRoom, with renewRtcToken failed: $exception")
+                    return@generateRtcToken
+                }
+                val scene = mSyncManager.createScene(roomId)
+                scene.bindRespDelegate(this)
+                scene.userService.registerRespObserver(this)
+                mSyncManager.rtmManager.subscribeMessage(this)
+                mSyncManager.rtmManager.subscribeAttribute(roomId, kCollectionStartGameInfo, this)
+                mCurrRoomNo = roomId
+            }
+            roomService.enterRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomId, completion = { rtmException ->
+                if (rtmException == null) {
+                    JoyLogger.d(TAG, "enterRoom success: ${cacheRoom.roomId}")
+                    mCurrRoomNo = cacheRoom.roomId
+                    runOnMainThread {
+                        completion.invoke(null)
+                    }
+                } else {
+                    mCurrRoomNo = ""
+                    JoyLogger.e(TAG, "enterRoom failed: $rtmException")
+                    runOnMainThread {
+                        completion.invoke(Exception("${rtmException.message}(${rtmException.code})"))
+                    }
+                }
+            })
+        }
+
+    }
+
+    override fun leaveRoom(completion: (error: Exception?) -> Unit) {
+        val scene = mSyncManager.createScene(mCurrRoomNo)
+        scene.userService.unRegisterRespObserver(this)
+        scene.unbindRespDelegate(this)
+
+        if (AUIRoomContext.shared().isRoomOwner(mCurrRoomNo)) {
+            mMainHandler.removeCallbacks(timerRoomCountDownTask)
+        }
+        mSyncManager.rtmManager.unsubscribeMessage(this)
+        mSyncManager.rtmManager.unsubscribeAttribute(mCurrRoomNo, kCollectionStartGameInfo, this)
+
+        roomService.leaveRoom(BuildConfig.AGORA_APP_ID, kSceneId, mCurrRoomNo)
+
+        mUserList.clear()
+        mCurrRoomNo = ""
+        completion.invoke(null)
     }
 
     override fun getCurrentRoomDuration(roomId: String): Long {
+        if (roomId.isEmpty()) {
+            return 0
+        }
         val scene = mSyncManager.createScene(roomId)
         return scene.getRoomDuration()
     }
 
-    override fun joinRoom(roomInfo: AUIRoomInfo, completion: (error: Exception?) -> Unit) {
-        JoyLogger.d(TAG, "joinRoom start")
+    override fun getStartGame(
+        roomId: String, completion: (error: Exception?, startGameInfo: JoyStartGameInfo?) -> Unit
+    ) {
         initRtmSync {
-            mCurrRoomNo = ""
-            val scene = mSyncManager.createScene(roomInfo.roomId)
-            scene.bindRespDelegate(this)
-
-            if (roomInfo.roomOwner?.userId != UserManager.getInstance().user.id.toString()) {
-                roomService.enterRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomInfo.roomId) { e ->
-                    if (e != null) {
-                        JoyLogger.d(TAG, "joinRoom fail: $e")
-                        runOnMainThread {
-                            completion.invoke(Exception(e.message))
-                        }
-                    } else {
-                        JoyLogger.d(TAG, "joinRoom success")
-                        mCurrRoomNo = roomInfo.roomId
-                        // 重置体验时间事件
-                        mMainHandler.removeCallbacks(mTimerRoomEndRun)
-                        val createTime = (roomInfo.customPayload[JoyParameters.CREATED_AT] as? Long) ?: 0
-                        // 定时删除房间
-                        val expireLeftTime =
-                            JoyServiceProtocol.ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - createTime)
-                        JoyLogger.d(TAG, "expireLeftTime: $expireLeftTime")
-                        mMainHandler.postDelayed(mTimerRoomEndRun, expireLeftTime)
-                        runOnMainThread {
-                            completion.invoke(null)
-                        }
-                    }
-                }
-            } else {
-                JoyLogger.d(TAG, "joinRoom success")
-                mCurrRoomNo = roomInfo.roomId
-                // 重置体验时间事件
-                mMainHandler.removeCallbacks(mTimerRoomEndRun)
-                val createTime = (roomInfo.customPayload[JoyParameters.CREATED_AT] as? Long) ?: 0
-                // 定时删除房间
-                val expireLeftTime =
-                    JoyServiceProtocol.ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - createTime)
-                JoyLogger.d(TAG, "expireLeftTime: $expireLeftTime")
-                mMainHandler.postDelayed(mTimerRoomEndRun, expireLeftTime)
-                runOnMainThread {
-                    completion.invoke(null)
-                }
+            if (it != null) {
+                completion.invoke(Exception("${it.message}(${it.code})"), null)
+                return@initRtmSync
             }
-
-            scene.userService.registerRespObserver(this)
-            mSyncManager.rtmManager.subscribeMessage(this)
-            mSyncManager.rtmManager.subscribeAttribute(roomInfo.roomId, SYNC_SCENE_ROOM_START_GAME_COLLECTION, this)
-        }
-    }
-
-    override fun leaveRoom(roomInfo: AUIRoomInfo, completion: (error: Exception?) -> Unit) {
-        // 重置体验时间事件
-        mMainHandler.removeCallbacks(mTimerRoomEndRun)
-        val scene = mSyncManager.createScene(roomInfo.roomId)
-        scene.userService.unRegisterRespObserver(this)
-        scene.unbindRespDelegate(this)
-        mSyncManager.rtmManager.unsubscribeMessage(this)
-        mSyncManager.rtmManager.unsubscribeAttribute(roomInfo.roomName, SYNC_SCENE_ROOM_START_GAME_COLLECTION, this)
-
-        roomService.leaveRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomInfo.roomId)
-
-//        val createTime = (roomInfo.customPayload[JoyParameters.CREATED_AT] as? Long) ?: 0
-//        if (roomInfo.roomOwner?.userId == mUser.id.toString() ||
-//            TimeUtils.currentTimeMillis() - createTime >= JoyServiceProtocol.ROOM_AVAILABLE_DURATION
-//        ) {
-//            // 房主离开
-//            scene.delete()
-//            mRoomManager.destroyRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomInfo.roomId) { e ->
-//                if (e != null) {
-//                    JoyLogger.d(TAG, "leaveRoom-->destroyRoom ${roomInfo.roomId} failed: $e")
-//                    runOnMainThread {
-//                        completion.invoke(Exception(e.message))
-//                    }
-//                } else {
-//                    innerReset(true)
-//                    runOnMainThread {
-//                        completion.invoke(null)
-//                    }
-//                }
-//            }
-//        } else {
-//            // 观众离开
-//            scene.leave()
-//            innerReset(false)
-//            runOnMainThread {
-//                completion.invoke(null)
-//            }
-//        }
-    }
-
-    override fun getStartGame(roomId: String, completion: (error: Exception?, out: JoyStartGameInfo?) -> Unit) {
-        initRtmSync {
-            val scene = mSyncManager.createScene(roomId)
-            val startGameCollection = scene.getCollection(SYNC_SCENE_ROOM_START_GAME_COLLECTION)
-            { channelName, sceneKey, rtmManager ->
-                AUIMapCollection(channelName, sceneKey, rtmManager)
-            }
+            val startGameCollection = getStartGameCollection(mCurrRoomNo) ?: return@initRtmSync
             startGameCollection.getMetaData { error, metadata ->
                 if (error != null) {
                     JoyLogger.d(TAG, "getStartGame failed roomId:$roomId $error")
@@ -294,11 +298,11 @@ class JoySyncManagerServiceImp constructor(
                     return@getMetaData
                 }
                 try {
-                    val out =
-                        GsonUtil.instance.fromJson(GsonUtil.instance.toJson(metadata), JoyStartGameInfo::class.java)
-                    JoyLogger.d(TAG, "getStartGame onSuccess roomId:$roomId $out")
+                    val startGameInfo =
+                        GsonTools.toBean(GsonTools.beanToString(metadata), JoyStartGameInfo::class.java)
+                    JoyLogger.d(TAG, "getStartGame onSuccess roomId:$roomId $startGameInfo")
                     runOnMainThread {
-                        completion.invoke(null, out)
+                        completion.invoke(null, startGameInfo)
                     }
                 } catch (e: Exception) {
                     JoyLogger.d(TAG, "getStartGame onFail roomId:$roomId $e")
@@ -312,16 +316,12 @@ class JoySyncManagerServiceImp constructor(
 
     override fun updateStartGame(roomId: String, gameInfo: JoyStartGameInfo, completion: (error: Exception?) -> Unit) {
         initRtmSync {
-            val scene = mSyncManager.createScene(roomId)
-            val startGameCollection = scene.getCollection(SYNC_SCENE_ROOM_START_GAME_COLLECTION)
-            { channelName, sceneKey, rtmManager ->
-                AUIMapCollection(channelName, sceneKey, rtmManager)
+            if (it != null) {
+                completion.invoke(Exception("${it.message}(${it.code})"))
+                return@initRtmSync
             }
-            val gson = GsonUtil.instance
-            val map = gson.fromJson<Map<String, String>>(
-                gson.toJson(gameInfo),
-                object : TypeToken<HashMap<String, String>>() {}.type
-            )
+            val startGameCollection = getStartGameCollection(mCurrRoomNo) ?: return@initRtmSync
+            val map = GsonTools.beanToMap(gameInfo)
             startGameCollection.updateMetaData(roomId, map) {
                 if (it != null) {
                     JoyLogger.d(TAG, "updateStartGame failed roomId:$roomId $it")
@@ -332,6 +332,19 @@ class JoySyncManagerServiceImp constructor(
                     runOnMainThread {
                         completion.invoke(null)
                     }
+                    val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return@updateMetaData
+                    cacheRoom.customPayload[JoyParameters.BADGE_TITLE] = gameInfo.gameName
+                    mRoomManager.updateRoomInfo(
+                        BuildConfig.AGORA_APP_ID,
+                        kSceneId,
+                        cacheRoom,
+                        callback = { auiException, roomInfo ->
+                            if (auiException == null) {
+                                JoyLogger.d(TAG, "updateStartGame updateRoom success, $roomInfo")
+                            } else {
+                                JoyLogger.e(TAG, "updateStartGame updateRoom failed, $auiException")
+                            }
+                        })
                 }
             }
         }
@@ -339,6 +352,10 @@ class JoySyncManagerServiceImp constructor(
 
     override fun sendChatMessage(roomId: String, message: String, completion: (error: Exception?) -> Unit) {
         initRtmSync {
+            if (it != null) {
+                completion.invoke(Exception("${it.message}(${it.code})"))
+                return@initRtmSync
+            }
             val joyMessage = JoyMessage(
                 userId = mUser.id.toString(),
                 userName = mUser.name,
@@ -353,13 +370,26 @@ class JoySyncManagerServiceImp constructor(
                         completion.invoke(null)
                     }
                 } else {
-                    JoyLogger.e(TAG, it, "sendChatMessage onFail roomId:$roomId $it")
+                    JoyLogger.e(TAG, "sendChatMessage onFail roomId:$roomId $it")
                     runOnMainThread {
                         completion.invoke(Exception(it.message))
                     }
                 }
             })
         }
+    }
+
+
+    /**
+     * Get current ts
+     *
+     * @param channelName
+     * @return
+     */
+    override fun getCurrentTs(channelName: String): Long {
+        if (channelName.isEmpty()) return 0
+        val scene = mSyncManager.createScene(channelName)
+        return scene.getCurrentTs()
     }
 
     override fun subscribeListener(listener: JoyServiceListenerProtocol) {
@@ -379,7 +409,7 @@ class JoySyncManagerServiceImp constructor(
     }
 
     override fun onAttributeChanged(channelName: String, key: String, value: Any) {
-        if (key == SYNC_SCENE_ROOM_START_GAME_COLLECTION) {
+        if (key == kCollectionStartGameInfo) {
             val newValue = when (value) {
                 is ByteArray -> String(value)
                 is String -> value
@@ -387,7 +417,7 @@ class JoySyncManagerServiceImp constructor(
             }
             JoyLogger.d(
                 TAG,
-                "onAttributeChanged $SYNC_SCENE_ROOM_START_GAME_COLLECTION:$channelName,key:$key, value:$value"
+                "onAttributeChanged $kCollectionStartGameInfo:$channelName,key:$key, value:$value"
             )
             GsonTools.toBean(newValue, JoyStartGameInfo::class.java)?.let { startGameInfo ->
                 runOnMainThread {
@@ -401,24 +431,38 @@ class JoySyncManagerServiceImp constructor(
     // ----------  ISceneResponse -----------------------
     override fun onTokenPrivilegeWillExpire(channelName: String?) {
         JoyLogger.d(TAG, "onTokenPrivilegeWillExpire, channelName:$channelName")
-        JoyServiceManager.renewTokens { tokenConfig: TokenConfig?, exception: Exception? ->
-            val rtmToken = tokenConfig?.rtmToken ?: return@renewTokens
-            mSyncManager.login(rtmToken, completion = {})
+        JoyServiceManager.generateRtmToken { rtmToken, exception ->
+            val token = rtmToken ?: run {
+                JoyLogger.e(TAG, "onTokenPrivilegeWillExpire, with renewRtmToken failed: $exception")
+                return@generateRtmToken
+            }
+            mSyncManager.login(token, completion = { rtmException ->
+                if (rtmException == null) {
+                    JoyLogger.d(TAG, "onTokenPrivilegeWillExpire, with loginRtm success")
+                } else {
+                    JoyLogger.e(TAG, "onTokenPrivilegeWillExpire, with loginRtm failed: $rtmException")
+                }
+            })
         }
     }
 
     override fun onSceneDestroy(roomId: String) {
         JoyLogger.d(TAG, "onSceneDestroy, roomId:$roomId")
-        mRoomManager.destroyRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomId) {
-            innerReset(true)
+        if (mCurrRoomNo == roomId) {
+            leaveRoom { }
+            mJoyServiceListener?.onRoomDestroy()
+        }
+    }
+
+    override fun onSceneExpire(channelName: String) {
+        if (mCurrRoomNo == channelName) {
+            leaveRoom { }
+            mJoyServiceListener?.onRoomExpire()
         }
     }
 
     override fun onSceneUserBeKicked(roomId: String, userId: String) {
         JoyLogger.d(TAG, "onSceneUserBeKicked, roomId:$roomId,userId:$userId")
-        if (roomId != mCurrRoomNo) return
-        val roomInfo = mRoomMap[mCurrRoomNo] ?: return
-        leaveRoom(roomInfo, {})
     }
 
 
@@ -433,74 +477,80 @@ class JoySyncManagerServiceImp constructor(
 
     override fun onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {
         JoyLogger.d(TAG, "onRoomUserEnter, roomId:$roomId, userInfo:$userInfo")
+        if (mCurrRoomNo != roomId) {
+            return
+        }
         mUserList.removeIf { it.userId == userInfo.userId }
         mUserList.add(userInfo)
         mJoyServiceListener?.onUserListDidChanged(mUserList)
-        val roomInfo = mRoomMap[roomId] ?: return
-        if (mUser.id.toString() == roomInfo.roomOwner?.userId) {
-            roomInfo.customPayload[JoyParameters.ROOM_USER_COUNT] = mUserList.count()
-            updateRoom(roomInfo, completion = {
-
+        val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return
+        // 所有人都可修改用户数
+        cacheRoom.customPayload[JoyParameters.ROOM_USER_COUNT] = mUserList.count()
+        mRoomManager.updateRoomInfo(
+            BuildConfig.AGORA_APP_ID,
+            kSceneId,
+            cacheRoom,
+            callback = { auiException, roomInfo ->
+                if (auiException == null) {
+                    JoyLogger.d(TAG, "onRoomUserEnter updateRoom success: $mCurrRoomNo, $roomInfo")
+                } else {
+                    JoyLogger.e(TAG, "onRoomUserEnter updateRoom failed: $mCurrRoomNo $auiException")
+                }
             })
-        }
     }
 
     override fun onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
         JoyLogger.d(TAG, "onRoomUserLeave, roomId:$roomId, userInfo:$userInfo")
+        if (mCurrRoomNo != roomId) {
+            return
+        }
         mUserList.removeIf { it.userId == userInfo.userId }
         mJoyServiceListener?.onUserListDidChanged(mUserList)
-        val roomInfo = mRoomMap[roomId] ?: return
-        if (mUser.id.toString() == roomInfo.roomOwner?.userId) {
-            roomInfo.customPayload[JoyParameters.ROOM_USER_COUNT] = mUserList.count()
-            updateRoom(roomInfo, completion = {
-
+        val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return
+        // 所有人都可修改用户数
+        cacheRoom.customPayload[JoyParameters.ROOM_USER_COUNT] = mUserList.count()
+        mRoomManager.updateRoomInfo(
+            BuildConfig.AGORA_APP_ID,
+            kSceneId,
+            cacheRoom,
+            callback = { auiException, roomInfo ->
+                if (auiException == null) {
+                    JoyLogger.d(TAG, "onRoomUserLeave updateRoom success: $mCurrRoomNo, $roomInfo")
+                } else {
+                    JoyLogger.e(TAG, "onRoomUserLeave updateRoom failed: $mCurrRoomNo $auiException")
+                }
             })
-        }
     }
 
     override fun onRoomUserUpdate(roomId: String, userInfo: AUIUserInfo) {
         JoyLogger.d(TAG, "onRoomUserUpdate, roomId:$roomId, userInfo:$userInfo")
-        mUserList.removeIf { it.userId == userInfo.userId }
-        mUserList.add(userInfo)
-        mJoyServiceListener?.onUserListDidChanged(mUserList)
     }
 
-    private fun innerReset(isRoomDestroy: Boolean) {
-        mUserList.clear()
-        if (isRoomDestroy) {
-            mRoomMap.clear()
-        }
-        mCurrRoomNo = ""
-    }
-
-    override fun reset() {
-        innerReset(true)
-        mSyncManager.rtmManager.logout()
-    }
-
-    private fun initRtmSync(completion: () -> Unit) {
+    private fun initRtmSync(completion: (exception: AUIRtmException?) -> Unit) {
         if (mSyncManager.rtmManager.isLogin) {
-            completion.invoke()
+            completion.invoke(null)
             return
         }
-        if (JoyServiceManager.mTokenConfig.rtmToken.isEmpty()) {
+        if (JoyServiceManager.mRtmToken.isEmpty()) {
             JoyLogger.d(TAG, "initRtmSync, renewTokens start")
-            JoyServiceManager.renewTokens { tokenConfig: TokenConfig?, exception: Exception? ->
-                val rtmToken = tokenConfig?.rtmToken ?: return@renewTokens
+            JoyServiceManager.generateRtmToken { rtmToken, exception ->
+                val rtmToken = rtmToken ?: return@generateRtmToken
                 mSyncManager.login(rtmToken, completion = {
                     if (it == null) {
-                        completion.invoke()
+                        completion.invoke(null)
                     } else {
-                        JoyLogger.d(TAG, "initRtmSync, with renewTokens loginRtm failed: $it")
+                        completion.invoke(it)
+                        JoyLogger.d(TAG, "initRtmSync, with renewToken loginRtm failed: $it")
                     }
                 })
             }
         } else {
-            mSyncManager.login(JoyServiceManager.mTokenConfig.rtmToken, completion = {
+            mSyncManager.login(JoyServiceManager.mRtmToken, completion = {
                 if (it == null) {
-                    completion.invoke()
+                    completion.invoke(it)
                 } else {
-                    JoyLogger.d(TAG, "initRtmSync, without renewTokens loginRtm failed: $it")
+                    completion.invoke(it)
+                    JoyLogger.d(TAG, "initRtmSync, without renewToken loginRtm failed: $it")
                 }
             })
         }
