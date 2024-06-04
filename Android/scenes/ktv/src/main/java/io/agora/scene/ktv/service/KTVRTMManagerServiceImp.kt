@@ -262,14 +262,18 @@ class KTVSyncManagerServiceImp constructor(
         }
     }
 
+    private fun getRandomThumbnailId(crateAt: Long) =
+        Random(crateAt).nextInt(0, 5).toString()
+
     /**
      * Create room
      *
-     * @param createInfo
+     * @param roomMame
+     * @param password
      * @param completion
      * @receiver
      */
-    override fun createRoom(createInfo: CreateRoomInfo, completion: (error: Exception?, out: AUIRoomInfo?) -> Unit) {
+    override fun createRoom(roomMame:String,password: String?, completion: (error: Exception?, out: AUIRoomInfo?) -> Unit) {
         KTVLogger.d(TAG, "createRoom start")
         val roomId = (Random(System.currentTimeMillis()).nextInt(100000) + 1000000).toString()
         initRtmSync {
@@ -287,19 +291,20 @@ class KTVSyncManagerServiceImp constructor(
                     completion.invoke(exception, null)
                     return@generateRtcToken
                 }
+                val createAt = System.currentTimeMillis() - rsetfulDiffTs
                 val roomInfo = AUIRoomInfo().apply {
                     this.roomId = roomId
-                    this.roomName = createInfo.name
+                    this.roomName = roomName
                     this.roomOwner = AUIUserThumbnailInfo().apply {
                         userId = mCurrentUser.userId
                         userName = mCurrentUser.userName
                         userAvatar = mCurrentUser.userAvatar
                     }
-                    this.createTime = System.currentTimeMillis() - rsetfulDiffTs
-                    this.customPayload[KTVParameters.ROOM_USER_COUNT] = 1
-                    this.customPayload[KTVParameters.THUMBNAIL_ID] = createInfo.icon
-                    this.customPayload[KTVParameters.PASSWORD] = createInfo.password
-                    this.customPayload[KTVParameters.IS_PRIVATE] = createInfo.password.isNotEmpty()
+                    this.createTime = createAt
+                    this.customPayload[KTVParameters.ROOM_USER_COUNT] = 2 // K歌房间开启后，无论有没有真人加入房间，人数显示自动+1
+                    this.customPayload[KTVParameters.THUMBNAIL_ID] = getRandomThumbnailId(createAt)
+                    this.customPayload[KTVParameters.PASSWORD] = password?:""
+                    this.customPayload[KTVParameters.IS_PRIVATE] = !password.isNullOrEmpty()
                 }
                 val scene = mSyncManager.createScene(roomInfo.roomId)
                 scene.bindRespDelegate(this)
