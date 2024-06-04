@@ -391,7 +391,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     override fun requestData() {
         super.requestData()
-        val roomLeftTime = JoyServiceProtocol.ROOM_AVAILABLE_DURATION - mJoyService.getCurrentRoomDuration(mRoomInfo.roomId)
+        val roomLeftTime =
+            JoyServiceProtocol.ROOM_AVAILABLE_DURATION - mJoyService.getCurrentRoomDuration(mRoomInfo.roomId)
         if (roomLeftTime > 0) {
             toggleSelfVideo {
                 initRtcEngine()
@@ -474,7 +475,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     )
                     // 获取游戏详情
                     mJoyViewModel.getGameDetail(gameSelect.gameId!!)
-                    // 加载游戏画面
+                    // 房主优先加载游戏画面,
                     setupAssistantVideoView()
                     mJoyService.updateStartGame(mRoomInfo.roomId, mStartGameInfo!!, completion = { error ->
                         if (error == null) { //启动游戏成功
@@ -919,7 +920,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             .setMessage(message)
             .setPositiveButton(R.string.confirm) { dialog, id ->
                 dialog.dismiss()
-               exitRoom()
+                exitRoom()
                 finish()
             }
             .setNegativeButton(R.string.cancel) { dialog, id ->
@@ -928,17 +929,15 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             .show()
     }
 
-    private fun exitRoom(){
-        mJoyService.leaveRoom {
-            mJoyService.leaveRoom { e: Exception? ->
-                if (e == null) { // success
-                    JoyLogger.d(TAG, "RoomLivingViewModel.exitRoom() success")
-                } else { // failure
-                    JoyLogger.e(TAG, "RoomLivingViewModel.exitRoom() failed: " + e.message)
-                }
-                e?.message?.let { error ->
-                    io.agora.scene.widget.toast.CustomToast.show(error, Toast.LENGTH_SHORT)
-                }
+    private fun exitRoom() {
+        mJoyService.leaveRoom { e: Exception? ->
+            if (e == null) { // success
+                JoyLogger.d(TAG, "RoomLivingViewModel.exitRoom() success")
+            } else { // failure
+                JoyLogger.e(TAG, "RoomLivingViewModel.exitRoom() failed: " + e.message)
+            }
+            e?.message?.let { error ->
+                io.agora.scene.widget.toast.CustomToast.show(error, Toast.LENGTH_SHORT)
             }
         }
         innerRleasee()

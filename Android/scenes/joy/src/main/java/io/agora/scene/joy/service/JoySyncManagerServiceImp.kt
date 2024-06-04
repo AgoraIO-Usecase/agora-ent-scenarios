@@ -273,8 +273,11 @@ class JoySyncManagerServiceImp constructor(
     }
 
     override fun getCurrentRoomDuration(roomId: String): Long {
-        val scene = mSyncManager.getScene(roomId)
-        return scene?.getRoomDuration() ?: -1L
+        if (roomId.isEmpty()) {
+            return 0
+        }
+        val scene = mSyncManager.createScene(roomId)
+        return scene.getRoomDuration()
     }
 
     override fun getStartGame(

@@ -15,6 +15,7 @@ import com.bumptech.glide.request.RequestOptions
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.joy.R
 import io.agora.scene.joy.JoyServiceManager
 import io.agora.scene.joy.databinding.JoyActivityRoomListBinding
@@ -47,18 +48,22 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setOnApplyWindowInsetsListener(binding.root)
-//        JoyServiceManager.renewTokens { tokenConfig: TokenConfig?, exception: Exception? ->
-//            if (exception == null) {
-//                binding.smartRefreshLayout.autoRefresh()
-//            }
-//        }
     }
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
         binding.titleView.setLeftClick { finish() }
         mJoyListAdapter = RoomListAdapter(emptyList(), this) { position, roomInfo ->
-            RoomLivingActivity.launch(this, roomInfo)
+
+            mJoyService.joinRoom(roomInfo.roomId) { error ->
+                if (error == null) {
+                    RoomLivingActivity.launch(this, roomInfo)
+                } else {
+                    error.message?.let {
+                        ToastUtils.showToast(it)
+                    }
+                }
+            }
         }
 
         binding.rvRooms.adapter = mJoyListAdapter
