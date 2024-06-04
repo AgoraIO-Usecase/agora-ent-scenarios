@@ -177,9 +177,9 @@ class JoySyncManagerServiceImp constructor(
                     userName = mUser.name
                     userAvatar = mUser.headUrl
                 }
+                this.createTime = createdAt
                 this.customPayload[JoyParameters.ROOM_USER_COUNT] = 1
                 this.customPayload[JoyParameters.THUMBNAIL_ID] = getRandomThumbnailId(createdAt)
-                this.customPayload[JoyParameters.CREATED_AT] = createdAt
             }
             val scene = mSyncManager.createScene(roomInfo.roomId)
             scene.bindRespDelegate(this)
@@ -332,6 +332,19 @@ class JoySyncManagerServiceImp constructor(
                     runOnMainThread {
                         completion.invoke(null)
                     }
+                    val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return@updateMetaData
+                    cacheRoom.customPayload[JoyParameters.BADGE_TITLE] = gameInfo.gameName
+                    mRoomManager.updateRoomInfo(
+                        BuildConfig.AGORA_APP_ID,
+                        kSceneId,
+                        cacheRoom,
+                        callback = { auiException, roomInfo ->
+                            if (auiException == null) {
+                                JoyLogger.d(TAG, "updateStartGame updateRoom success, $roomInfo")
+                            } else {
+                                JoyLogger.e(TAG, "updateStartGame updateRoom failed, $auiException")
+                            }
+                        })
                 }
             }
         }

@@ -848,7 +848,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         val dataFormat = SimpleDateFormat("HH:mm:ss").apply { timeZone = TimeZone.getTimeZone("GMT") }
         binding.tvTimer.post(object : Runnable {
             override fun run() {
-                binding.tvTimer.text = dataFormat.format(Date(mJoyService.getCurrentRoomDuration(mRoomInfo.roomId)))
+                val currentTime = mJoyService.getCurrentRoomDuration(mRoomInfo.roomId)
+                if (currentTime > 0) {
+                    binding.tvTimer.text = dataFormat.format(Date(currentTime))
+                }
                 binding.tvTimer.postDelayed(this, 1000)
                 binding.tvTimer.tag = this
             }
