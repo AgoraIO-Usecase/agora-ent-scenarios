@@ -223,7 +223,7 @@ class MusicSettingDialog constructor(
         // 降低背景噪音
         when (mSetting.mAinsMode) {
             AINSMode.Medium -> mBinding.rgAINSMode.check(R.id.tvAINSMiddle)
-            AINSMode.High -> mBinding.rgAINSMode.check(R.id.tvAINSMiddle)
+            AINSMode.High -> mBinding.rgAINSMode.check(R.id.tvAINSHigh)
             else -> mBinding.rgAINSMode.check(R.id.tvAINSClose)
         }
         mBinding.rgAINSMode.setOnCheckedChangeListener { group, checkedId ->
