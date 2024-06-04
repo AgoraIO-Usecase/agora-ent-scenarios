@@ -301,7 +301,7 @@ class KTVSyncManagerServiceImp constructor(
                         userAvatar = mCurrentUser.userAvatar
                     }
                     this.createTime = createAt
-                    this.customPayload[KTVParameters.ROOM_USER_COUNT] = 2 // K歌房间开启后，无论有没有真人加入房间，人数显示自动+1
+                    this.customPayload[KTVParameters.ROOM_USER_COUNT] = 1
                     this.customPayload[KTVParameters.THUMBNAIL_ID] = getRandomThumbnailId(createAt)
                     this.customPayload[KTVParameters.PASSWORD] = password?:""
                     this.customPayload[KTVParameters.IS_PRIVATE] = !password.isNullOrEmpty()
