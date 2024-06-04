@@ -7,7 +7,6 @@ import java.io.Serializable
 object JoyParameters {
     const val ROOM_USER_COUNT = "roomUserCount"
     const val THUMBNAIL_ID = "thumbnailId"
-    const val CREATED_AT = "createdAt"
     const val BADGE_TITLE = "badgeTitle"
 }
 
@@ -16,9 +15,6 @@ data class JoyStartGameInfo constructor(
     var taskId: String = "", // 游戏 taskid
     var assistantUid: Int = 0, //游戏画面uid
     var gameName: String = "",
-    @Expose
-    @SerializedName("objectId")
-    var objectId: String? = null,
 ) : Serializable
 
 data class JoyMessage constructor(

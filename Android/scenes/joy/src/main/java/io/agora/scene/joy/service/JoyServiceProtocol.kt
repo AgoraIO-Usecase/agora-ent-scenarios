@@ -4,16 +4,19 @@ import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.rtmsyncmanager.model.AUIUserInfo
 import io.agora.scene.base.component.AgoraApplication
 
-data class TokenConfig constructor(
-    var rtcToken: String = "",   // rtc token，需要使用万能token，token创建的时候channel name为空字符串
-    var rtmToken: String = "",   // rtm token
-)
-
 interface JoyServiceListenerProtocol {
+
     /**
-     *  网络状况变化
+     * On room expire
+     *
      */
-//    fun onNetworkStatusChanged(status: Sync.ConnectionState)
+    fun onRoomExpire() {}
+
+    /**
+     * On room destroy
+     *
+     */
+    fun onRoomDestroy() {}
 
     /**
      * 用户变化
@@ -29,16 +32,6 @@ interface JoyServiceListenerProtocol {
      * 房间进行的游戏变化
      */
     fun onStartGameInfoDidChanged(startGameInfo: JoyStartGameInfo)
-
-    /**
-     * 房间信息变化
-     */
-    fun onRoomDidChanged(roomInfo: AUIRoomInfo)
-
-    /**
-     * 房间销毁
-     */
-    fun onRoomDidDestroy(roomInfo: AUIRoomInfo, abnormal: Boolean = false)
 }
 
 interface JoyServiceProtocol {
@@ -62,17 +55,10 @@ interface JoyServiceProtocol {
         }
     }
 
-    // ============== 房间相关 ==============
-
     /**
      * 获取房间列表
      */
-    fun getRoomList(completion: (list: List<AUIRoomInfo>) -> Unit)
-
-    /**
-     * 修改房间信息
-     */
-    fun updateRoom(roomInfo: AUIRoomInfo, completion: (error: Exception?) -> Unit)
+    fun getRoomList(completion: (error: Exception?, roomList: List<AUIRoomInfo>?) -> Unit)
 
     /**
      * 获取房间剩余时间
@@ -92,18 +78,17 @@ interface JoyServiceProtocol {
     /**
      * 创建房间
      */
-    fun createRoom(roomName: String, completion: (error: Exception?, out: AUIRoomInfo?) -> Unit)
+    fun createRoom(roomName: String, completion: (error: Exception?, roomInfo: AUIRoomInfo?) -> Unit)
 
     /**
      * 加入房间
      */
-    fun joinRoom(roomInfo: AUIRoomInfo, completion: (error: Exception?) -> Unit)
+    fun joinRoom(roomId: String, completion: (error: Exception?) -> Unit)
 
     /**
      * 离开房间
      */
-    fun leaveRoom(roomInfo: AUIRoomInfo, completion: (error: Exception?) -> Unit)
-
+    fun leaveRoom(completion: (error: Exception?) -> Unit)
 
     /**
      * 发送消息
@@ -111,9 +96,15 @@ interface JoyServiceProtocol {
     fun sendChatMessage(roomId: String, message: String, completion: (error: Exception?) -> Unit)
 
     /**
+     * Get current ts
+     *
+     * @param channelName
+     * @return
+     */
+    fun getCurrentTs(channelName: String): Long
+
+    /**
      * 订阅回调变化
      */
     fun subscribeListener(listener: JoyServiceListenerProtocol)
-
-    fun reset()
 }
