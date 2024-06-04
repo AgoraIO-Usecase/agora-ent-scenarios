@@ -97,7 +97,6 @@
         app:layout_constraintVertical_bias="0.0"
         app:lineSpacing="8dp"
         app:paddingTop="2dp"
-        app:enableDragging="true"
         app:startOfVerseIndicatorPaddingTop="6dp"
         app:startOfVerseIndicatorRadius="4dp"
         app:textGravity="center"

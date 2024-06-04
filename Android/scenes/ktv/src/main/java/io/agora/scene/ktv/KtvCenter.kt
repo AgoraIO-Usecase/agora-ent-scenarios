@@ -12,7 +12,7 @@ import io.agora.scene.base.manager.UserManager
  */
 object KtvCenter {
 
-    val mAppId:String get() = BuildConfig.AGORA_APP_ID
+    val mAppId: String get() = BuildConfig.AGORA_APP_ID
 
     val mUser: User get() = UserManager.getInstance().user
 
@@ -30,6 +30,9 @@ object KtvCenter {
         }
 
     private const val TAG = "KtvCenter"
+
+    // 显示在线用户需要多加
+    const val userAddMore: Int = 1
 
     /**
      * Renew rtm token

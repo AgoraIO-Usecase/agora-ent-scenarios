@@ -153,8 +153,9 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
         }
         val roomModel = roomLivingViewModel.mRoomInfo
         binding.tvRoomName.text = roomModel.roomName
-        val userCount = roomModel.customPayload[KTVParameters.ROOM_USER_COUNT] as? Int ?: 0
-        binding.tvRoomMCount.text = getString(R.string.ktv_room_count, userCount.toString())
+        val userCount = roomModel.customPayload[KTVParameters.ROOM_USER_COUNT] as? Int
+        val showCount = (userCount ?: 0) + KtvCenter.userAddMore
+        binding.tvRoomMCount.text = getString(R.string.ktv_room_count, showCount)
         GlideApp.with(binding.getRoot())
             .load(roomModel.roomOwner?.fullHeadUrl)
             .error(R.mipmap.default_user_avatar)
@@ -248,7 +249,8 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
             }
         }
         roomLivingViewModel.userCountLiveData.observe(this) { userCount ->
-            binding.tvRoomMCount.text = getString(R.string.ktv_room_count, userCount.toString())
+            val showCount = (userCount ?: 0) + KtvCenter.userAddMore
+            binding.tvRoomMCount.text = getString(R.string.ktv_room_count, showCount)
         }
         roomLivingViewModel.seatListLiveData.observe(this) { seaInfoList ->
             mRoomSpeakerAdapter?.resetAll(seaInfoList)
