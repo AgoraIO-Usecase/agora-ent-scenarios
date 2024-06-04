@@ -11,7 +11,6 @@ import io.agora.scene.show.databinding.ShowLiveLinkRequestMessageListBinding
 import io.agora.scene.show.service.ShowInteractionInfo
 import io.agora.scene.show.service.ShowInteractionStatus
 import io.agora.scene.show.service.ShowMicSeatApply
-import io.agora.scene.show.service.ShowRoomRequestStatus
 
 class LiveLinkRequestFragment : BaseFragment() {
     private var mBinding: ShowLiveLinkRequestMessageListBinding? = null
@@ -22,9 +21,9 @@ class LiveLinkRequestFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         linkRequestViewAdapter.setClickListener(object : LiveLinkRequestViewAdapter.OnClickListener {
-            override fun onClick(seatApply: ShowMicSeatApply, position: Int) {
+            override fun onClick(view: View, seatApply: ShowMicSeatApply, position: Int) {
                 // 主播接受连麦
-                mListener?.onAcceptMicSeatItemChosen(seatApply, position)
+                mListener?.onAcceptMicSeatItemChosen(view, seatApply, position)
             }
         })
     }
@@ -39,7 +38,7 @@ class LiveLinkRequestFragment : BaseFragment() {
         binding.linkRequestList.adapter = linkRequestViewAdapter
         binding.iBtnStopLink.setOnClickListener {
             // 主播停止连麦
-            mListener?.onStopLinkingChosen()
+            mListener?.onStopLinkingChosen(it)
         }
         binding.smartRefreshLayout.setOnRefreshListener {
             mListener?.onRequestRefreshing()
@@ -60,7 +59,7 @@ class LiveLinkRequestFragment : BaseFragment() {
         if (status == null) {
             binding.iBtnStopLink.isVisible = false
             binding.textLinking.isVisible = false
-        } else if (status == ShowInteractionStatus.onSeat.value) {
+        } else if (status == ShowInteractionStatus.linking) {
             binding.textLinking.isVisible = true
             binding.iBtnStopLink.isVisible = true
             binding.textLinking.text = getString(R.string.show_link_to, userName)
@@ -92,26 +91,26 @@ class LiveLinkRequestFragment : BaseFragment() {
      * 接受连麦-更新item选中状态
      */
     fun setSeatApplyItemStatus(seatApply: ShowMicSeatApply) {
-        if (seatApply.status == ShowRoomRequestStatus.accepted.value) {
-            val itemCount: Int = linkRequestViewAdapter.itemCount
-            for (i in 0 until itemCount) {
-                linkRequestViewAdapter.getItem(i)?.let {
-                    if (it.userId == seatApply.userId) {
-                        linkRequestViewAdapter.replace(
-                            i, ShowMicSeatApply(
-                                it.userId,
-                                it.avatar,
-                                it.userName,
-                                seatApply.status,
-                                it.createAt
-                            )
-                        )
-                        linkRequestViewAdapter.notifyItemChanged(i)
-                        return
-                    }
-                }
-            }
-        }
+//        if (seatApply.status == ShowRoomRequestStatus.accepted.value) {
+//            val itemCount: Int = linkRequestViewAdapter.itemCount
+//            for (i in 0 until itemCount) {
+//                linkRequestViewAdapter.getItem(i)?.let {
+//                    if (it.userId == seatApply.userId) {
+//                        linkRequestViewAdapter.replace(
+//                            i, ShowMicSeatApply(
+//                                it.userId,
+//                                it.avatar,
+//                                it.userName,
+//                                seatApply.status,
+//                                it.createAt
+//                            )
+//                        )
+//                        linkRequestViewAdapter.notifyItemChanged(i)
+//                        return
+//                    }
+//                }
+//            }
+//        }
     }
 
     fun setListener(listener: Listener) {
@@ -119,13 +118,13 @@ class LiveLinkRequestFragment : BaseFragment() {
     }
 
     interface Listener {
-        fun onAcceptMicSeatItemChosen(seatApply: ShowMicSeatApply, position: Int)
+        fun onAcceptMicSeatItemChosen(view: View, seatApply: ShowMicSeatApply, position: Int)
         fun onRequestRefreshing()
-        fun onStopLinkingChosen()
+        fun onStopLinkingChosen(view: View)
     }
 
     private fun updateUI(userName: String, status: Int?) {
-        if (status == ShowInteractionStatus.onSeat.value) {
+        if (status == ShowInteractionStatus.linking) {
             binding.textLinking.isVisible = true
             binding.iBtnStopLink.isVisible = true
             binding.textLinking.text = getString(R.string.show_link_to, userName)

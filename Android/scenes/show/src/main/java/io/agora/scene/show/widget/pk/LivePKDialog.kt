@@ -13,9 +13,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.agora.scene.show.databinding.ShowLivePkDialogBinding
 import io.agora.scene.show.service.ShowInteractionInfo
-import io.agora.scene.show.service.ShowPKInvitation
-import io.agora.scene.show.service.ShowRoomDetailModel
-import io.agora.scene.show.service.ShowRoomRequestStatus
 
 class LivePKDialog : BottomSheetDialogFragment() {
     private var mBinding : ShowLivePkDialogBinding? = null
@@ -50,8 +47,8 @@ class LivePKDialog : BottomSheetDialogFragment() {
         binding.pager.getChildAt(0).overScrollMode = View.OVER_SCROLL_NEVER
 
         pkFragment.setListener(object : LivePKRequestMessageFragment.Listener {
-            override fun onAcceptMicSeatItemChosen(roomItem: LiveRoomConfig) {
-                pkDialogListener.onInviteButtonChosen(this@LivePKDialog, roomItem)
+            override fun onAcceptMicSeatItemChosen(view: View, roomItem: LiveRoomConfig) {
+                pkDialogListener.onInviteButtonChosen(this@LivePKDialog, view, roomItem)
             }
 
             override fun onRequestRefreshing() {
@@ -91,17 +88,9 @@ class LivePKDialog : BottomSheetDialogFragment() {
     /**
      * 设置PK申请列表
      */
-    fun setOnlineBroadcasterList(interactionInfo: ShowInteractionInfo?, roomList : List<ShowRoomDetailModel>, invitationList : List<ShowPKInvitation>) {
-        val list = ArrayList<LiveRoomConfig>()
-        roomList.forEach { roomItem ->
-            val invitation = invitationList.filter { it.userId == roomItem.ownerId && it.roomId == roomItem.roomId }.getOrNull(0)
-            if (invitation != null && invitation.status == ShowRoomRequestStatus.waitting.value) {
-                list.add(LiveRoomConfig(roomItem, true))
-            } else {
-                list.add(LiveRoomConfig(roomItem, false))
-            }
-        }
-        pkFragment.setOnlineBroadcasterList(interactionInfo, list)
+    fun setOnlineBroadcasterList(interactionInfo: ShowInteractionInfo?,
+                                 roomList: List<LiveRoomConfig>) {
+        pkFragment.setOnlineBroadcasterList(interactionInfo, roomList)
     }
 
     /**
