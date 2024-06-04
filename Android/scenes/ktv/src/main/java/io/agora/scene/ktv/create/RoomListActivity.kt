@@ -14,6 +14,7 @@ import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnItemClickListener
+import io.agora.scene.ktv.KtvCenter
 import io.agora.scene.ktv.R
 import io.agora.scene.ktv.databinding.KtvActivityRoomListBinding
 import io.agora.scene.ktv.databinding.KtvItemRoomListBinding
@@ -180,7 +181,8 @@ class RoomListActivity : BaseViewBindingActivity<KtvActivityRoomListBinding>() {
             }
             holder.binding.tvRoomName.text = data.roomName
             val userCount = data.customPayload[KTVParameters.ROOM_USER_COUNT] as? Long
-            holder.binding.tvPersonNum.text = mContext.getString(R.string.ktv_people_count, userCount ?: 0)
+            val showCount = (userCount ?: 0) + KtvCenter.userAddMore
+            holder.binding.tvPersonNum.text = mContext.getString(R.string.ktv_people_count, showCount)
             holder.binding.tvUserName.text = data.roomOwner?.userName ?: ""
             val password = data.customPayload[KTVParameters.PASSWORD] as? String
             holder.binding.ivLock.isVisible = !password.isNullOrEmpty()

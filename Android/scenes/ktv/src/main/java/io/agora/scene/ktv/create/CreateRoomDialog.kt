@@ -95,7 +95,7 @@ class CreateRoomDialog constructor(
             }
         }
 
-        roomCreateViewModel.roomInfoLiveData.observe(this) { roomInfo  ->
+        roomCreateViewModel.roomInfoLiveData.observe(this) { roomInfo ->
             hideLoadingView()
             if (roomInfo != null) {
                 dismiss()
@@ -125,7 +125,7 @@ class CreateRoomDialog constructor(
             return
         }
         showLoadingView()
-        roomCreateViewModel.createRoom( roomName, password, "1")
+        roomCreateViewModel.createRoom(roomName, password)
     }
 
     private fun showLoadingView() {

@@ -129,11 +129,12 @@ interface KTVServiceProtocol {
     /**
      * Create room
      *
-     * @param createRoomInfo
+     * @param roomName
+     * @param password
      * @param completion
      * @receiver
      */
-    fun createRoom(createRoomInfo: CreateRoomInfo, completion: (error: Exception?, roomInfo: AUIRoomInfo?) -> Unit)
+    fun createRoom(roomName: String, password: String?, completion: (error: Exception?, roomInfo: AUIRoomInfo?) -> Unit)
 
     /**
      * Join room
