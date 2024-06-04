@@ -42,6 +42,8 @@ import io.agora.base.VideoFrame.TextureBuffer
 import io.agora.base.internal.video.RendererCommon
 import io.agora.base.internal.video.YuvConverter
 import io.agora.base.internal.video.YuvHelper
+import io.agora.beautyapi.sensetime.utils.APIReporter
+import io.agora.beautyapi.sensetime.utils.APIType
 import io.agora.beautyapi.sensetime.utils.LogUtils
 import io.agora.beautyapi.sensetime.utils.StatsHelper
 import io.agora.beautyapi.sensetime.utils.processor.IBeautyProcessor
@@ -58,8 +60,6 @@ import java.util.concurrent.Executors
 
 class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
     private val TAG = "SenseTimeBeautyAPIImpl"
-    private val reportId = "scenarioAPI"
-    private val reportCategory = "beauty_android_$VERSION"
     private var beautyMode = 0 // 0: 自动根据buffer类型切换，1：固定使用OES纹理，2：固定使用i420
 
     private var textureBufferHelper: TextureBufferHelper? = null
@@ -67,7 +67,6 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
     private var config: Config? = null
     private var enable: Boolean = false
     private var enableChange: Boolean = false
-    @Volatile
     private var isReleased: Boolean = false
     private var captureMirror = true
     private var renderMirror = false
@@ -79,6 +78,7 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
     private var cameraConfig = CameraConfig()
     private var localVideoRenderMode = Constants.RENDER_MODE_HIDDEN
     private val pendingProcessRunList = Collections.synchronizedList(mutableListOf<()->Unit>())
+    private val apiReporter by lazy { APIReporter(APIType.BEAUTY, VERSION, config!!.rtcEngine) }
 
     private enum class ProcessSourceType{
         UNKNOWN,
@@ -96,6 +96,7 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
             return ErrorCode.ERROR_HAS_INITIALIZED.value
         }
         this.config = config
+        this.cameraConfig = config.cameraConfig
         if (config.captureMode == CaptureMode.Agora) {
             config.rtcEngine.registerVideoFrameObserver(this)
         }
@@ -103,11 +104,19 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
             this.config?.eventCallback?.onBeautyStats(it)
         }
         cameraConfig = CameraConfig(config.cameraConfig.frontMirror, config.cameraConfig.backMirror)
-        LogUtils.setLogFilePath(config.context.getExternalFilesDir("")?.absolutePath ?: "")
         LogUtils.i(TAG, "initialize >> config = $config")
         LogUtils.i(TAG, "initialize >> beauty api version=$VERSION, beauty sdk version=${STCommonNative.getVersion()}")
-        // config.rtcEngine.setParameters("{\"rtc.qos_for_test_purpose\":101}") // 实时上报
-        config.rtcEngine.sendCustomReportMessage(reportId, reportCategory, "initialize", "config=$config", 0)
+        apiReporter.reportFuncEvent(
+            "initialize",
+            mapOf(
+                "captureMode" to config.captureMode,
+                "statsDuration" to config.statsDuration,
+                "statsEnable" to config.statsEnable,
+                "cameraConfig" to config.cameraConfig,
+            ),
+            emptyMap()
+        )
+        apiReporter.startDurationEvent("initialize-release")
         return ErrorCode.ERROR_OK.value
     }
 
@@ -125,7 +134,11 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
             skipFrame = 2
             LogUtils.i(TAG, "enable >> skipFrame = $skipFrame")
         }
-        config?.rtcEngine?.sendCustomReportMessage(reportId, reportCategory, "enable", "enable=$enable", 0)
+        apiReporter.reportFuncEvent(
+            "enable",
+            mapOf("enable" to enable),
+            emptyMap()
+        )
 
         if(this.enable != enable){
             this.enable = enable
@@ -144,7 +157,11 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
         }
         LogUtils.i(TAG, "setupLocalVideo >> view=$view, renderMode=$renderMode")
         localVideoRenderMode = renderMode
-        rtcEngine.sendCustomReportMessage(reportId, reportCategory, "enable", "view=$view, renderMode=$renderMode", 0)
+        apiReporter.reportFuncEvent(
+            "setupLocalVide",
+            mapOf("view" to view, "renderMode" to renderMode),
+            emptyMap()
+        )
         if(view is TextureView || view is SurfaceView){
             val canvas = VideoCanvas(view, renderMode, 0)
             canvas.mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
@@ -186,7 +203,11 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
             return ErrorCode.ERROR_HAS_RELEASED.value
         }
         LogUtils.i(TAG, "setBeautyPreset >> preset = $preset")
-        config?.rtcEngine?.sendCustomReportMessage(reportId, reportCategory, "enable", "preset=$preset", 0)
+        apiReporter.reportFuncEvent(
+            "setBeautyPreset",
+            mapOf("preset" to preset),
+            emptyMap()
+        )
 
         val enable = preset == BeautyPreset.DEFAULT
         workerThreadExecutor.submit {
@@ -309,7 +330,7 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
         if (textureBufferHelper?.handler?.looper?.thread == Thread.currentThread()) {
             run.invoke()
         } else if (textureBufferHelper != null) {
-            textureBufferHelper?.handler?.post(run)
+            textureBufferHelper?.invoke(run)
         } else {
             pendingProcessRunList.add(run)
         }
@@ -318,7 +339,11 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
     override fun updateCameraConfig(config: CameraConfig): Int {
         LogUtils.i(TAG, "updateCameraConfig >> oldCameraConfig=$cameraConfig, newCameraConfig=$config")
         cameraConfig = CameraConfig(config.frontMirror, config.backMirror)
-        this.config?.rtcEngine?.sendCustomReportMessage(reportId, reportCategory, "updateCameraConfig", "config=$config", 0)
+        apiReporter.reportFuncEvent(
+            "updateCameraConfig",
+            mapOf("config" to config),
+            emptyMap()
+        )
 
         return ErrorCode.ERROR_OK.value
     }
@@ -326,6 +351,7 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
     override fun isFrontCamera() = isFrontCamera
 
     override fun setParameters(key: String, value: String) {
+        apiReporter.reportFuncEvent("setParameters", mapOf("key" to key, "value" to value), emptyMap())
         when(key){
             "beauty_mode" -> beautyMode = value.toInt()
         }
@@ -344,14 +370,15 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
         if (conf.captureMode == CaptureMode.Agora) {
             conf.rtcEngine.registerVideoFrameObserver(null)
         }
-        conf.rtcEngine.sendCustomReportMessage(reportId, reportCategory, "release", "", 0)
+        apiReporter.reportFuncEvent("release", emptyMap(), emptyMap())
+        apiReporter.endDurationEvent("initialize-release", emptyMap())
 
         LogUtils.i(TAG, "release")
         isReleased = true
         workerThreadExecutor.shutdown()
         textureBufferHelper?.let {
             textureBufferHelper = null
-            it.handler.removeCallbacksAndMessages(null)
+            // it.handler.removeCallbacksAndMessages(null)
             it.invoke {
                 beautyProcessor?.release()
                 null
@@ -406,7 +433,7 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
         if (captureMirror != cMirror || renderMirror != rMirror) {
             LogUtils.w(TAG, "processBeauty >> enable=$enable, captureMirror=$captureMirror->$cMirror, renderMirror=$renderMirror->$rMirror")
             captureMirror = cMirror
-            if(renderMirror != rMirror && !isReleased){
+            if(renderMirror != rMirror){
                 renderMirror = rMirror
                 config?.rtcEngine?.setLocalRenderMode(
                     localVideoRenderMode,
@@ -416,6 +443,7 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
             textureBufferHelper?.invoke {
                 beautyProcessor?.reset()
             }
+            apiReporter.startDurationEvent("first_beauty_frame")
             return false
         }
 
@@ -476,6 +504,8 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
             LogUtils.w(TAG, "processBeauty >> skipFrame=$skipFrame")
             return false
         }
+
+        apiReporter.endDurationEvent("first_beauty_frame", emptyMap())
 
         val processBuffer: TextureBuffer = textureBufferHelper?.wrapTextureBuffer(
             videoFrame.rotatedWidth,

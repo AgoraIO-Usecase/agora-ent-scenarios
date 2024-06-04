@@ -31,16 +31,20 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
 import io.agora.scene.show.debugSettings.DebugSettingDialog
+import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.widget.PictureQualityDialog
 import io.agora.scene.show.widget.PresetDialog
 import io.agora.scene.show.widget.beauty.MultiBeautyDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
-import kotlinx.coroutines.*
-import java.io.File
-import java.lang.Exception
-import java.lang.Runnable
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 /*
@@ -49,10 +53,9 @@ import kotlin.random.Random
 @RequiresApi(Build.VERSION_CODES.M)
 class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBinding>() {
     private val tag = "LivePrepareActivity"
-    private val mService by lazy { ShowServiceProtocol.getImplInstance() }
+    private val mService by lazy { ShowServiceProtocol.get() }
     private val mInputMethodManager by lazy { getSystemService(InputMethodManager::class.java) }
 
-    private val mThumbnailId by lazy { getRandomThumbnailId() }
     private val mRoomId by lazy { getRandomRoomId() }
 
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
@@ -243,19 +246,18 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             return
         }
 
-        binding.btnStartLive.isEnabled = false
-        mService.createRoom(mRoomId, roomName, mThumbnailId, {
-            runOnUiThread {
-                isFinishToLiveDetail = true
-                LiveDetailActivity.launch(this@LivePrepareActivity, it)
-                finish()
-            }
-        }, {
-            runOnUiThread {
-                ToastUtils.showToast(it.message)
-                binding.btnStartLive.isEnabled = true
-            }
-        })
+        isFinishToLiveDetail = true
+        LiveDetailActivity.launch(this@LivePrepareActivity, ShowRoomDetailModel(
+            mRoomId,
+            roomName,
+            1,
+            UserManager.getInstance().user.id.toString(),
+            UserManager.getInstance().user.headUrl,
+            UserManager.getInstance().user.name,
+            TimeUtils.currentTimeMillis().toDouble(),
+            TimeUtils.currentTimeMillis().toDouble(),
+        ))
+        finish()
     }
 
     // 下载美颜资源, 下载成功后默认应用商汤美颜
@@ -343,8 +345,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     private fun getRandomRoomId() =
         (Random(TimeUtils.currentTimeMillis()).nextInt(10000) + 100000).toString()
 
-    private fun getRandomThumbnailId() =
-        Random(TimeUtils.currentTimeMillis()).nextInt(0, 3).toString()
 
     private fun getBeautySDKName(uri: String): String {
         return when (uri) {
