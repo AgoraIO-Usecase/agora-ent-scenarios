@@ -141,14 +141,15 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
             appId,
             kRoomSceneId,
             0,
-            50
+            50,
+            cleanClosure = {
+                it.roomOwner?.userId == UserManager.getInstance().user.id.toString()
+            },
         ) { ex, _, list ->
             if (ex != null) {
                 error?.invoke(RuntimeException(ex))
             } else {
-                val listWithRobot = appendRobotRooms(list?.map { it.toShowRoomDetailModel() } ?: emptyList())
-                val listWithoutMe = listWithRobot.filter { it.ownerId != UserManager.getInstance().user.id.toString() }
-                success.invoke(listWithoutMe)
+                success.invoke(appendRobotRooms(list?.map { it.toShowRoomDetailModel() } ?: emptyList()))
             }
         }
     }

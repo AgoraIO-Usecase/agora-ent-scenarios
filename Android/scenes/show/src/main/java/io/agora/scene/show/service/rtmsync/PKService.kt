@@ -106,6 +106,28 @@ class PKService(
                             )
                         )
                     }
+                } else if (info.status == RoomPresenceStatus.INTERACTING_PK
+                    && currInfo?.interactorId == info.ownerId
+                    && info.interactorId != AUIRoomContext.shared().currentUserInfo.userId
+                ) {
+                    // 主播已经和其他人PK
+                    roomPresenceService.updateRoomPresenceInfo(
+                        channelName,
+                        status = RoomPresenceStatus.IDLE,
+                    )
+                    observerHelper.notifyEventHandlers {
+                        it.invoke(
+                            PKInfo(
+                                userId = currInfo.ownerId,
+                                userName = currInfo.ownerName,
+                                roomId = currInfo.roomId,
+                                fromUserId = currInfo.interactorId,
+                                fromUserName = currInfo.interactorName,
+                                fromRoomId = currInfo.roomId,
+                                type = PKType.END
+                            )
+                        )
+                    }
                 }
             }
         },
@@ -138,6 +160,11 @@ class PKService(
         }
         if (roomPresenceInfo.status != RoomPresenceStatus.IDLE) {
             error?.invoke(RuntimeException("room presence status is not idle"))
+            return
+        }
+        val currRoomPresenceInfo = roomPresenceService.getRoomPresenceInfo(channelName)
+        if(currRoomPresenceInfo?.status != RoomPresenceStatus.IDLE){
+            error?.invoke(RuntimeException("current room presence status is not idle"))
             return
         }
         val pkInfo = PKInfo(
@@ -176,6 +203,11 @@ class PKService(
         )
         if (message == null || pkInfo == null) {
             error?.invoke(RuntimeException("pk info is null"))
+            return
+        }
+        val roomPresenceInfo = roomPresenceService.getRoomPresenceInfo(pkInfo.fromRoomId)
+        if (roomPresenceInfo?.status != RoomPresenceStatus.IDLE) {
+            error?.invoke(RuntimeException("room presence status is not idle"))
             return
         }
 
