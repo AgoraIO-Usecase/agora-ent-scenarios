@@ -37,8 +37,9 @@ class TextureProcessHelper(
     private val cacheCount: Int = 2
 ) {
     private val TAG = "TextureProcessHelper"
-    private val glTextureBufferQueueIn = GLTextureBufferQueue(cacheCount = cacheCount)
-    private val glTextureBufferQueueOut = GLTextureBufferQueue(cacheCount = cacheCount)
+    private val glTextureBufferQueueIn = GLTextureBufferQueue(cacheCount = cacheCount, loggable = true)
+    private val glTextureBufferQueueOut = GLTextureBufferQueue(cacheCount = cacheCount, loggable = false)
+    private val glFrameBuffer = GLFrameBuffer()
     private val futureQueue = ConcurrentLinkedQueue<Future<Int>>()
     private val workerThread = Executors.newSingleThreadExecutor()
     private val eglContextHelper =
@@ -87,7 +88,7 @@ class TextureProcessHelper(
                 width,
                 height,
                 rotation,
-                true,
+                false,
                 isFrontCamera,
                 isMirror,
                 transform,
@@ -105,7 +106,7 @@ class TextureProcessHelper(
                 return@Callable -2
             }
 
-            val frame = glTextureBufferQueueIn.dequeue() ?: return@Callable -2
+            val frame = glTextureBufferQueueIn.dequeue(false) ?: return@Callable -2
             val filterTexId =  filter?.invoke(frame) ?: -1
             if (filterTexId >= 0) {
                 glTextureBufferQueueOut.enqueue(
@@ -138,7 +139,7 @@ class TextureProcessHelper(
                     )
                 )
             }
-
+            glTextureBufferQueueIn.dequeue(true)
             return@Callable 0
         }))
 
@@ -148,8 +149,9 @@ class TextureProcessHelper(
             try {
                 val get =  futureQueue.poll()?.get() ?: -1
                 if (get == 0) {
-                    val dequeue = glTextureBufferQueueOut.dequeue()
-                    ret = dequeue?.textureId ?: -1
+                    val dequeue = glTextureBufferQueueOut.dequeue() ?: return -1
+                    glFrameBuffer.setSize(dequeue.width, dequeue.height)
+                    ret = glFrameBuffer.process(dequeue.textureId, dequeue.textureType)
                 }
             }catch (e: Exception){
                 LogUtils.e(TAG, "process end with exception: $e")
@@ -170,8 +172,9 @@ class TextureProcessHelper(
             future.cancel(true)
             future = futureQueue.poll()
         }
+        glTextureBufferQueueIn.reset()
+        glFrameBuffer.resetTexture()
         executeSync {
-            glTextureBufferQueueIn.reset()
             glTextureBufferQueueOut.reset()
         }
     }
@@ -188,13 +191,14 @@ class TextureProcessHelper(
             future.cancel(true)
             future = futureQueue.poll()
         }
+        glTextureBufferQueueIn.release()
+        glFrameBuffer.release()
         executeSync {
+            glTextureBufferQueueOut.release()
             if (eglContextBase != null) {
                 eglContextHelper.release()
                 eglContextBase = null
             }
-            glTextureBufferQueueIn.release()
-            glTextureBufferQueueOut.release()
         }
         workerThread.shutdown()
     }

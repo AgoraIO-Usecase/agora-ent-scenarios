@@ -3,32 +3,28 @@ package io.agora.scene.show.widget.pk
 import io.agora.scene.show.service.ShowRoomDetailModel
 
 // 房间详情信息
-class LiveRoomConfig constructor(room: ShowRoomDetailModel, waitingForPK: Boolean) {
+class LiveRoomConfig constructor(room: ShowRoomDetailModel, interactStatus: Int, waitingForPK: Boolean) {
     private val roomId: String
     private val roomName: String
     private val roomUserCount: Int
-    private val thumbnailId: String // 0, 1, 2, 3
     private val ownerId: String
-    private val ownerAvatar: String// http url
+    private val ownerAvatar: String // http url
     private val ownerName: String
-    private val roomStatus: Int
-    private val interactStatus: Int
     private val createdAt: Double
     private val updatedAt: Double
     private val waitingForPK: Boolean
+    private var interactStatus: Int
 
     init {
         roomId = room.roomId
         roomName = room.roomName
         roomUserCount = room.roomUserCount
-        thumbnailId = room.thumbnailId
         ownerId = room.ownerId
         ownerAvatar = room.ownerAvatar
         ownerName = room.ownerName
-        roomStatus = room.roomStatus
-        interactStatus = room.interactStatus
         createdAt = room.createdAt
         updatedAt = room.updatedAt
+        this.interactStatus = interactStatus
         this.waitingForPK = waitingForPK
     }
 
@@ -37,12 +33,9 @@ class LiveRoomConfig constructor(room: ShowRoomDetailModel, waitingForPK: Boolea
             roomId,
             roomName,
             roomUserCount,
-            thumbnailId,
             ownerId,
             ownerAvatar,
             ownerName,
-            roomStatus,
-            interactStatus,
             createdAt,
             updatedAt
         )
@@ -58,6 +51,10 @@ class LiveRoomConfig constructor(room: ShowRoomDetailModel, waitingForPK: Boolea
 
     fun getInteractStatus() : Int {
         return interactStatus
+    }
+
+    fun setInteractStatus(interactStatus: Int) {
+        this.interactStatus = interactStatus
     }
 
     fun isWaitingForPK() : Boolean {
