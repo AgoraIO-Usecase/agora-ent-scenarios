@@ -106,7 +106,7 @@
         cell.volume = 0;
     }
     
-    cell.singingBtn.hidden = ![AppContext isKtvSongOwnerWithSeat:seatModel];
+    cell.singingBtn.hidden = ![AppContext isKtvPlayingSongOwnerWithSeat:seatModel];
     if (seatModel.isAudioMuted) {
         cell.muteImgView.hidden = NO;
         cell.volume = 0;
@@ -178,7 +178,7 @@
         VLRoomSelSongModel *songModel = choosedSongArray.firstObject;
         self.currentPlayingSongCode = songModel.chorusSongId;
         for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
-            BOOL isSongOwner = [AppContext isKtvSongOwnerWithSeat:seatModel];
+            BOOL isSongOwner = [AppContext isKtvPlayingSongOwnerWithSeat:seatModel];
             if (isSongOwner != seatModel.isSongOwner) {
                 seatModel.isSongOwner = isSongOwner;
                 [changeSet addObject:@(seatModel.seatIndex)];
@@ -194,7 +194,7 @@
                 [changeSet addObject:@(seatModel.seatIndex)];
             }
 //            }
-            NSLog(@"seat: %@--%li", songModel.chorusSongId, seatModel.seatIndex);
+            KTVLogInfo(@"seat: %@--%li", songModel.chorusSongId, seatModel.seatIndex);
             
         }
     } else{

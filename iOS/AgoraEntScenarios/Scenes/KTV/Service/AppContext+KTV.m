@@ -117,10 +117,16 @@ NSString* kAgoraKTVAPIKey = @"kAgoraKTVAPIKey";
     return NO;
 }
 
-+ (BOOL)isKtvSongOwnerWithSeat:(VLRoomSeatModel*)seat {
++ (BOOL)isKtvPlayingSongOwnerWithSeat:(VLRoomSeatModel*)seat {
     VLRoomSelSongModel* song = [[self ktvSongList] firstObject];
     BOOL isSongOwner = [song.owner.userId isEqualToString:NullToString(seat.owner.userId)];
     BOOL isPlaying = [song status] == VLSongPlayStatusPlaying;
     return isSongOwner && isPlaying;
+}
+
++ (BOOL)isKtvSongOwnerWithUserId:(NSString*)userId {
+    VLRoomSelSongModel* song = [[self ktvSongList] firstObject];
+    BOOL isSongOwner = [song.owner.userId isEqualToString:userId];
+    return isSongOwner;
 }
 @end
