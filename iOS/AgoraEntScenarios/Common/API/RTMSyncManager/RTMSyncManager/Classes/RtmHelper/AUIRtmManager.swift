@@ -280,7 +280,7 @@ extension AUIRtmManager {
             let callbacks = self.throttlerRemoveModel.callbacks
             aui_info("cleanBatchMetadata[\(channelName)] keys count: \(self.throttlerRemoveModel.keys.count)")
             self.cleanMetadata(channelName: channelName,
-                               removeKeys: self.throttlerRemoveModel.keys,
+                               removeKeys: self.throttlerRemoveModel.keys.sorted(),
                                lockName: lockName) { err in
                 callbacks.forEach { callback in
                     callback(err)
