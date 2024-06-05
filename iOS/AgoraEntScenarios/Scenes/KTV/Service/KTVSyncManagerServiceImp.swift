@@ -977,7 +977,7 @@ extension KTVSyncManagerServiceImp: AUIUserRespDelegate {
         KTVLog.info(text: "user: enter\(userInfo.userName)")
         let userCount = getCurrentScene(with: roomId)?.userService.userList.count ?? 0
 //        self.userDidChanged?(.created, user)
-        self.delegate?.onUserCountUpdate(userCount: UInt(userCount))
+        self.delegate?.onUserCountUpdate(userCount: UInt(userCount + 1))
         if roomService.isRoomOwner(roomId: roomId) {
             self.updateRoom(with: userCount) { err in
             }
@@ -988,7 +988,7 @@ extension KTVSyncManagerServiceImp: AUIUserRespDelegate {
         KTVLog.info(text: "user: leave\(userInfo.userName)")
 //        self.userDidChanged?(.deleted, user)
         let userCount = getCurrentScene(with: roomId)?.userService.userList.count ?? 0
-        self.delegate?.onUserCountUpdate(userCount: UInt(userCount))
+        self.delegate?.onUserCountUpdate(userCount: UInt(userCount + 1))
         if roomService.isRoomOwner(roomId: roomId) {
             self.updateRoom(with: userCount) { err in
             }
@@ -1007,7 +1007,7 @@ extension KTVSyncManagerServiceImp: AUIUserRespDelegate {
         KTVLog.info(text: "user: update\(userInfo.userName)")
 //        self.userDidChanged?(.updated, user)
         let userCount = getCurrentScene(with: roomId)?.userService.userList.count ?? 0
-        self.delegate?.onUserCountUpdate(userCount: UInt(userCount))
+        self.delegate?.onUserCountUpdate(userCount: UInt(userCount + 1))
     }
   
     func onUserAudioMute(userId: String, mute: Bool) {
