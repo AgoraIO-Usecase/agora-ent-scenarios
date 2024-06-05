@@ -27,7 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)isKtvRoomOwnerWithSeat:(VLRoomSeatModel*)seat;
 + (BOOL)isKtvChorusingWithSeat:(VLRoomSeatModel*)seat;
 + (BOOL)isKtvChorusingWithUserId:(NSString*)userId;
-+ (BOOL)isKtvSongOwnerWithSeat:(VLRoomSeatModel*)seat;
++ (BOOL)isKtvPlayingSongOwnerWithSeat:(VLRoomSeatModel*)seat;
++ (BOOL)isKtvSongOwnerWithUserId:(NSString*)userId;
 @end
 
 NS_ASSUME_NONNULL_END
