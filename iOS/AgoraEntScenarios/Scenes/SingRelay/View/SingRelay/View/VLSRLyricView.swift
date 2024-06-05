@@ -389,7 +389,7 @@ extension VLSRLyricView: KTVLrcViewDelegate {
             let curSong = URL(string: url)?.lastPathComponent.components(separatedBy: ".").first
             let loadSong = URL(string: lrcurl)?.lastPathComponent.components(separatedBy: ".").first
             guard curSong == loadSong else {
-                print("downloadLrcFile fail, missmatch, cur:\(curSong ?? "") load:\(loadSong ?? "")")
+//                print("downloadLrcFile fail, missmatch, cur:\(curSong ?? "") load:\(loadSong ?? "")")
                 return
             }
             path = lrcurl
