@@ -377,6 +377,7 @@
 */
 -(void)setMvState:(VLKTVMVViewState)mvState {
     _mvState = mvState;
+    KTVLogInfo(@"setMvState: %ld", mvState);
     switch (mvState) {
         case VLKTVMVViewStateNone://无人演唱
             self.joinChorusBtn.hidden = YES;
@@ -658,7 +659,7 @@
     self.scoreLabel.text = [NSString stringWithFormat:@"%.0lf",score];
     self.totalLines += 1;
     self.totalScore = cumulativeScore;
-    VLLog(@"Recording: %d lines at totalScore: %f", self.totalLines, cumulativeScore);
+//    KTVLogInfo(@"Recording: %d lines at totalScore: %f", self.totalLines, cumulativeScore);
     if ([self.delegate respondsToSelector:@selector(onKTVMVView:scoreDidUpdate:)]) {
         [self.delegate onKTVMVView:self scoreDidUpdate:realScore];
     }

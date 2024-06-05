@@ -55,7 +55,7 @@
     for(int i=0;i< nameSource.count; i++){
         CGFloat tx =  margin + (i) % 4 * (width + margin);
         CGFloat ty = margin + (i) / 4 * (btnHeight + margin) + 42 + 62;
-        NSLog(@"t:frame %f--%f--%f--%f", tx, ty, width, titleHeight);
+//        KTVLogInfo(@"t:frame %f--%f--%f--%f", tx, ty, width, titleHeight);
         UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(tx, ty, width, titleHeight)];
         titleLabel.text = nameSource[i];
         titleLabel.tag = 1000 + i;
@@ -70,7 +70,7 @@
         
         CGFloat ix =  margin + (i) % 4 * (width + margin);
         CGFloat iy = margin + (i) / 4 * (btnHeight + margin) + 42;
-        NSLog(@"i:frame %f--%f--%f--%f", ix, iy, width, imgHeight);
+//        KTVLogInfo(@"i:frame %f--%f--%f--%f", ix, iy, width, imgHeight);
         UIImageView *imgView = [[UIImageView alloc]initWithFrame:CGRectMake(ix, iy, width, imgHeight)];
         [imgView sd_setImageWithURL:[NSURL URLWithString:imgSource[i]]];
         [self addSubview:imgView];
@@ -86,7 +86,7 @@
         
         CGFloat bx =  margin + (i) % 4 * (width + margin);
         CGFloat by = margin + (i) / 4 * (btnHeight + margin) + 42;
-        NSLog(@"b:frame %f--%f--%f--%f", bx, by, width, btnHeight);
+//        KTVLogInfo(@"b:frame %f--%f--%f--%f", bx, by, width, btnHeight);
         UIButton *btn = [[UIButton alloc]initWithFrame:CGRectMake(bx, by, width, btnHeight)];
         btn.tag = 200 + i;
         [btn addTarget:self action:@selector(click:) forControlEvents:UIControlEventTouchUpInside];

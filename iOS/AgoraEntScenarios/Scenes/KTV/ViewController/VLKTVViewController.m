@@ -151,7 +151,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 
 #pragma mark view lifecycles
 - (void)dealloc {
-    NSLog(@"dealloc:%s",__FUNCTION__);
+    KTVLogInfo(@"dealloc:%s",__FUNCTION__);
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
@@ -309,6 +309,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     if(!song){
         self.MVView.mvState = VLKTVMVViewStateNone;
     } else {
+        KTVLogInfo(@"setMVViewState: singRole: %ld, isRoomOwner: %ld", self.singRole, [self isRoomOwner]);
         switch (self.singRole) {
             case KTVSingRoleSoloSinger:
                 self.MVView.mvState = VLKTVMVViewStateOwnerSing;
@@ -486,7 +487,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         return;
     }
     self.earValue = Value;
-    NSLog(@"ear vol:%f", Value);
+    KTVLogInfo(@"ear vol:%f", Value);
     [self.RTCkit setInEarMonitoringVolume:Value];
 }
 
@@ -645,7 +646,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         KTVLogInfo(@"score: %ds",score);
         return;
     } else if([dict[@"cmd"] isEqualToString:@"singleLineScore"]) {//观众接收主唱的分数
-        NSLog(@"index: %li", [dict[@"index"] integerValue]);
+        KTVLogInfo(@"index: %li", [dict[@"index"] integerValue]);
         if(self.singRole != KTVSingRoleAudience){
             return;
         }
@@ -659,7 +660,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [self.MVView.gradeView setScoreWithCumulativeScore:cumulativeScore totalScore:total];
             [self.MVView.incentiveView showWithScore:score];
         });
-        NSLog(@"index: %li, score: %li, cumulativeScore: %li, total: %li", index, score, cumulativeScore, total);
+        KTVLogInfo(@"index: %li, score: %li, cumulativeScore: %li, total: %li", index, score, cumulativeScore, total);
     } else if([dict[@"cmd"] isEqualToString:@"checkVoiceHighlight"]) {
         //首先判断是不是自己被设置成了人声突出
         NSString *uid = dict[@"uid"];
@@ -680,27 +681,27 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         switch (audioEffectPreset) {
             case AgoraAudioEffectPresetOff:
                 [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOffHarmony];
-                NSLog(@"effect:Off");
+                KTVLogInfo(@"effect:Off");
                 break;
             case AgoraAudioEffectPresetRoomAcousticsKTV:
                 [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousticsKTVHarmony];
-                NSLog(@"effect:KTV");
+                KTVLogInfo(@"effect:KTV");
                 break;
             case AgoraAudioEffectPresetRoomAcousVocalConcer:
                 [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousVocalConcerHarmony];
-                NSLog(@"effect:Concer");
+                KTVLogInfo(@"effect:Concer");
                 break;
             case AgoraAudioEffectPresetRoomAcousStudio:
                 [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousStudioHarmony];
-                NSLog(@"effect:Studio");
+                KTVLogInfo(@"effect:Studio");
                 break;
             case AgoraAudioEffectPresetRoomAcousPhonograph:
                 [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousPhonographHarmony];
-                NSLog(@"effect:graph");
+                KTVLogInfo(@"effect:graph");
                 break;
             default:
                 [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOffHarmony];
-                NSLog(@"effect:Off");
+                KTVLogInfo(@"effect:Off");
                 break;
         }
     } else if([dict[@"cmd"] isEqualToString:@"cancelVoiceHighlight"]) {
@@ -807,6 +808,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self setPlayoutVolume:50];
 
     KTVSingRole role = [self getUserSingRole];
+    KTVLogInfo(@"loadAndPlaySong[%@]: role: %ld", model.songNo, role);
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
   //  songConfig.autoPlay = (role == KTVSingRoleAudience || role == KTVSingRoleCoSinger) ? NO : YES ;
     songConfig.mode = (role == KTVSingRoleAudience || role == KTVSingRoleCoSinger) ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc;
@@ -977,7 +979,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
         
         [weakSelf.ktvApi startSingWithSongCode:songCode startPos:0];
-        NSLog(@"before switch role, load music success");
+        KTVLogInfo(@"before switch role, load music success");
         [weakSelf.ktvApi switchSingerRoleWithNewRole:role
                                    onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
             if (state == KTVSwitchRoleStateFail && reason != KTVSwitchRoleFailReasonNoPermission) {
@@ -1119,6 +1121,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)joinRTCChannel {
+    KTVLogInfo(@"joinRTCChannel");
     self.RTCkit = [AgoraRtcEngineKit sharedEngineWithAppId:[AppContext.shared appId] delegate:self];
     
     //use game streaming in so mode, chrous profile in chrous mode
@@ -1298,7 +1301,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         
     };
     [self sendStreamMessageWithDict:dict success:nil];
-    NSLog(@"index: %li, score: %li, cumulativeScore: %li, total: %li", lineIndex, lineScore, cumulativeScore, totalScore);
+    KTVLogInfo(@"index: %li, score: %li, cumulativeScore: %li, total: %li", lineIndex, lineScore, cumulativeScore, totalScore);
 }
 
 - (void)didSongLoadedWith:(LyricModel *)model{
@@ -1992,7 +1995,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     BOOL flag = false;
     VLRoomSeatModel *model = seatArray.firstObject;
 
-    if([AppContext isKtvSongOwnerWithSeat:model] || [self checkIfCosingerWith:0]){
+    if([AppContext isKtvPlayingSongOwnerWithSeat:model] || [self checkIfCosingerWith:0]){
         flag = true;
     }
     if(flag){
@@ -2000,7 +2003,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     
     for(VLRoomSeatModel *seatModel in seatArray){
-        if([AppContext isKtvSongOwnerWithSeat:seatModel] && ![AppContext isKtvRoomOwnerWithSeat:seatModel]){
+        if([AppContext isKtvPlayingSongOwnerWithSeat:seatModel] && ![AppContext isKtvRoomOwnerWithSeat:seatModel]){
             [singerSeatArray addObject:seatModel];
         }
     }
@@ -2029,9 +2032,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 /// 计算当前歌曲用户的演唱角色
 - (KTVSingRole)getUserSingRole {
-    VLRoomSelSongModel* songModel = [[self selSongsArray] firstObject];
     BOOL currentSongIsJoinSing = [AppContext isKtvChorusingWithUserId:VLUserCenter.user.id];
-    BOOL currentSongIsSongOwner = [songModel isSongOwner];
+    BOOL currentSongIsSongOwner = [AppContext isKtvSongOwnerWithUserId:VLUserCenter.user.id];
     BOOL currentSongIsChorus = [self getChorusNumWithSeatArray:self.seatsArray] > 0;
     if (currentSongIsSongOwner) {
         return currentSongIsChorus ? KTVSingRoleLeadSinger : KTVSingRoleSoloSinger;
@@ -2420,6 +2422,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if(oldRole == newRole){
         KTVLogInfo(@"old role:%li is equal to new role", oldRole);
     }
+    
+    KTVLogInfo(@"onSingerRoleChangedWithOldRole oldRole: %ld, newRole: %ld", oldRole, newRole);
     self.singRole = newRole;
 }
 
@@ -2442,7 +2446,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                  status:(AgoraMusicContentCenterPreloadStatus)status
                                     msg:(NSString *)msg
                                lyricUrl:(NSString *)lyricUrl {
-    KTVLogInfo(@"load: %li, %li", status, percent);
+//    KTVLogInfo(@"load: %li, %li", status, percent);
     dispatch_async_on_main_queue(^{
         
         if(status == AgoraMusicContentCenterPreloadStatusError){
@@ -2471,6 +2475,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)onMusicLoadFailWithSongCode:(NSInteger)songCode reason:(enum KTVLoadSongFailReason)reason{
     
     dispatch_async_on_main_queue(^{
+        KTVLogError(@"onMusicLoadFail songCode: %ld error: %ld", songCode, reason);
+        VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
+        if (![model.songNo isEqualToString:[NSString stringWithFormat:@"%ld", songCode]]) {
+            KTVLogInfo(@"onMusicLoadFail break songCode missmatch");
+            return;
+        }
         if(self.loadMusicCallBack) {
             self.loadMusicCallBack(NO, songCode);
             self.loadMusicCallBack = nil;
@@ -2482,12 +2492,17 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [self.MVView setMvState:[self isRoomOwner] ? VLKTVMVViewStateMusicOwnerLoadFailed : VLKTVMVViewStateMusicLoadFailed];
         }
         
-        KTVLogError(@"onMusicLoadFail songCode: %ld error: %ld", songCode, reason);
     });
 }
 
 - (void)onMusicLoadSuccessWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl {
     dispatch_async_on_main_queue(^{
+        KTVLogError(@"onMusicLoadSuccess songCode: %ld error: %ld", songCode);
+        VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
+        if (![model.songNo isEqualToString:[NSString stringWithFormat:@"%ld", songCode]]) {
+            KTVLogInfo(@"onMusicLoadSuccess break songCode missmatch");
+            return;
+        }
         if(self.loadMusicCallBack){
             self.loadMusicCallBack(YES, songCode);
             self.loadMusicCallBack = nil;
