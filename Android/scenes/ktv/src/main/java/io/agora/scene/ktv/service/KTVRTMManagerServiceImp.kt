@@ -144,7 +144,27 @@ class KTVSyncManagerServiceImp constructor(
 
     init {
         HttpManager.setBaseURL(ServerConfig.roomManagerUrl)
-        AUILogger.initLogger(AUILogger.Config(mContext, "KTV"))
+        val rtmSyncTag = "KTV_RTM_LOG"
+        AUILogger.initLogger(
+            AUILogger.Config(mContext, "KTV", logCallback = object : AUILogger.AUILogCallback {
+                override fun onLogDebug(tag: String, message: String) {
+                    KTVLogger.d(rtmSyncTag, "$tag $message")
+                }
+
+                override fun onLogInfo(tag: String, message: String) {
+                    KTVLogger.d(rtmSyncTag, "$tag $message")
+                }
+
+                override fun onLogWarning(tag: String, message: String) {
+                    KTVLogger.w(rtmSyncTag, "$tag $message")
+                }
+
+                override fun onLogError(tag: String, message: String) {
+                    KTVLogger.e(rtmSyncTag, "$tag $message")
+                }
+
+            })
+        )
 
         val commonConfig = AUICommonConfig().apply {
             context = mContext
@@ -307,7 +327,7 @@ class KTVSyncManagerServiceImp constructor(
                     this.createTime = createAt
                     this.customPayload[KTVParameters.ROOM_USER_COUNT] = 1
                     this.customPayload[KTVParameters.THUMBNAIL_ID] = getRandomThumbnailId(createAt)
-                    this.customPayload[KTVParameters.PASSWORD] = password?:""
+                    this.customPayload[KTVParameters.PASSWORD] = password ?: ""
                     this.customPayload[KTVParameters.IS_PRIVATE] = !password.isNullOrEmpty()
                 }
                 val scene = mSyncManager.createScene(roomInfo.roomId)
