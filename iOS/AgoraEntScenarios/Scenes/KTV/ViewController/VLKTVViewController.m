@@ -2475,7 +2475,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)onMusicLoadFailWithSongCode:(NSInteger)songCode reason:(enum KTVLoadSongFailReason)reason{
     
     dispatch_async_on_main_queue(^{
-        KTVLogError(@"onMusicLoadFail songCode: %ld error: %ld", songCode, reason);
+        KTVLogError(@"onMusicLoadFail songCode: %ld reason: %ld", songCode, reason);
         VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
         if (![model.songNo isEqualToString:[NSString stringWithFormat:@"%ld", songCode]]) {
             KTVLogInfo(@"onMusicLoadFail break songCode missmatch");
@@ -2489,15 +2489,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if (reason == KTVLoadSongFailReasonNoLyricUrl) {
             [self.MVView setMvState:[self isRoomOwner] ? VLKTVMVViewStateMusicOwnerLoadLrcFailed : VLKTVMVViewStateMusicLoadLrcFailed];
         } else {
-            [self.MVView setMvState:[self isRoomOwner] ? VLKTVMVViewStateMusicOwnerLoadFailed : VLKTVMVViewStateMusicLoadFailed];
+            BOOL isOwner = [self isRoomOwner] || [AppContext isKtvSongOwnerWithUserId:VLUserCenter.user.id];
+            [self.MVView setMvState:isOwner ? VLKTVMVViewStateMusicOwnerLoadFailed : VLKTVMVViewStateMusicLoadFailed];
         }
-        
     });
 }
 
 - (void)onMusicLoadSuccessWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl {
     dispatch_async_on_main_queue(^{
-        KTVLogError(@"onMusicLoadSuccess songCode: %ld error: %ld", songCode);
+        KTVLogError(@"onMusicLoadSuccess songCode: %ld", songCode);
         VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
         if (![model.songNo isEqualToString:[NSString stringWithFormat:@"%ld", songCode]]) {
             KTVLogInfo(@"onMusicLoadSuccess break songCode missmatch");
