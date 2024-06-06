@@ -310,6 +310,7 @@ private let SYNC_MANAGER_CHORUS_INFO = "chorister_info"
                 return KTVCommonError.unknown.toNSError()
             }
             
+            
             let userId = getUserId(updateMap) ?? ""
             switch dataCmd {
             case .pinSongCmd:
@@ -320,6 +321,12 @@ private let SYNC_MANAGER_CHORUS_INFO = "chorister_info"
                 }
                 return nil
             case .updatePlayStatusCmd:
+                guard let songValues = self.getSongCollection(with: roomNo)?.getLocalMetaData()?.getList(),
+                      let topSongNo = songValues.first?["songNo"] as? String,
+                      let updateSongNo = currentMap["songNo"] as? String,
+                      topSongNo == updateSongNo else {
+                    return KTVCommonError.currentSongNotFirst.toNSError()
+                }
                 //only song owner can update status
                 guard seatValues.contains(where: { getUserId($0) == userId }) else {
                     return KTVCommonError.noPermission.toNSError()
