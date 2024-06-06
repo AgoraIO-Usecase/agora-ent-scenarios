@@ -1012,9 +1012,9 @@ extension KTVSyncManagerServiceImp: AUIUserRespDelegate {
     
     func onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {
         KTVLog.info(text: "user: enter\(userInfo.userName)")
-        let userCount = getCurrentScene(with: roomId)?.userService.userList.count ?? 0
+        let userCount = (getCurrentScene(with: roomId)?.userService.userList.count ?? 0) + 1
 //        self.userDidChanged?(.created, user)
-        self.delegate?.onUserCountUpdate(userCount: UInt(userCount + 1))
+        self.delegate?.onUserCountUpdate(userCount: UInt(userCount))
         if roomService.isRoomOwner(roomId: roomId) {
             self.updateRoom(with: userCount) { err in
             }
@@ -1024,8 +1024,8 @@ extension KTVSyncManagerServiceImp: AUIUserRespDelegate {
     func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
         KTVLog.info(text: "user: leave\(userInfo.userName)")
 //        self.userDidChanged?(.deleted, user)
-        let userCount = getCurrentScene(with: roomId)?.userService.userList.count ?? 0
-        self.delegate?.onUserCountUpdate(userCount: UInt(userCount + 1))
+        let userCount = (getCurrentScene(with: roomId)?.userService.userList.count ?? 0) + 1
+        self.delegate?.onUserCountUpdate(userCount: UInt(userCount))
         if roomService.isRoomOwner(roomId: roomId) {
             self.updateRoom(with: userCount) { err in
             }
