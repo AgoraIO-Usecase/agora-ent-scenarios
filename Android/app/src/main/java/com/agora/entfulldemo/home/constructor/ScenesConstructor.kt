@@ -162,7 +162,7 @@ object ScenesConstructor {
                         clazzName = joyGameClazz,
                         name = context.getString(R.string.app_home_scene_game),
                         tip = context.getString(R.string.app_home_scene_game_joy_tips),
-                        background = R.drawable.bg_scene_live_show,
+                        background = R.drawable.bg_scene_game_joy,
                         active = true
                     )
                 )

@@ -19,8 +19,8 @@ class LivePKRequestMessageFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         linkPKViewAdapter.setClickListener(object : LivePKViewAdapter.OnClickListener {
-            override fun onClick(roomItem: LiveRoomConfig, position: Int) {
-                mListener.onAcceptMicSeatItemChosen(roomItem)
+            override fun onClick(view: View, roomItem: LiveRoomConfig, position: Int) {
+                mListener.onAcceptMicSeatItemChosen(view, roomItem)
             }
         })
     }
@@ -76,21 +76,38 @@ class LivePKRequestMessageFragment : BaseFragment() {
     }
 
     interface Listener {
-        fun onAcceptMicSeatItemChosen(roomItem: LiveRoomConfig)
+        fun onAcceptMicSeatItemChosen(view: View, roomItem: LiveRoomConfig)
         fun onRequestRefreshing()
         fun onStopPKingChosen()
     }
 
     private fun updateUI(userName: String, status: Int?) {
-        if (status == ShowInteractionStatus.pking.value) {
+        if (status == ShowInteractionStatus.pking) {
             binding.textPking.isVisible = true
             binding.iBtnStopPK.isVisible = true
             if (isAdded) {
                 binding.textPking.text = getString(R.string.show_pk_to, userName)
             }
+            for (i in 0 until linkPKViewAdapter.itemCount) {
+                val item = linkPKViewAdapter.getItem(i)
+                if (item != null && item.getOwnerName() == userName) {
+                    item.setInteractStatus(ShowInteractionStatus.pking)
+                    linkPKViewAdapter.notifyItemChanged(i)
+                    break
+                }
+            }
+
         } else if (status == null) {
             binding.iBtnStopPK.isVisible = false
             binding.textPking.isVisible = false
+            for (i in 0 until linkPKViewAdapter.itemCount) {
+                val item = linkPKViewAdapter.getItem(i)
+                if (item != null && item.getInteractStatus() == ShowInteractionStatus.pking) {
+                    item.setInteractStatus(ShowInteractionStatus.idle)
+                    linkPKViewAdapter.notifyItemChanged(i)
+                    break
+                }
+            }
         }
     }
 }

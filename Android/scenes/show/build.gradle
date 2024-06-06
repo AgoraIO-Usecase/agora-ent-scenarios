@@ -30,6 +30,7 @@ dependencies {
 
     implementation project(":common:base")
     implementation project(':common:ui-widget')
+    implementation project(':RTMSyncManager')
 
     implementation rootProject.ext.deps.appcompat
     implementation rootProject.ext.deps.annotation
@@ -48,5 +49,6 @@ dependencies {
     implementation rootProject.ext.deps.fragment_ktx
 
     implementation rootProject.ext.deps.syncManager
+    // implementation rootProject.ext.deps.rtm
 
 }

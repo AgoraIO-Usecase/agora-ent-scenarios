@@ -349,7 +349,8 @@ class AudioScenarioApi(rtcEngine: RtcEngine): IRtcEngineEventHandler() {
                     else -> {}
                 }
             }
-            Constants.AUDIO_ROUTE_HEADSETBLUETOOTH -> {
+            Constants.AUDIO_ROUTE_BLUETOOTH_DEVICE_A2DP,
+            Constants.AUDIO_ROUTE_BLUETOOTH_DEVICE_HFP -> {
                 // 蓝牙耳机
                 when (audioScenarioType) {
                     AudioScenarioType.Chat_Caller -> {

@@ -18,11 +18,21 @@ import io.agora.scene.ktv.databinding.KtvDialogDebugOptionsBinding;
  * debug 控制台
  */
 public class KTVDebugSettingsDialog extends BaseBottomSheetDialogFragment<KtvDialogDebugOptionsBinding> {
+    /**
+     * The constant TAG.
+     */
     public static final String TAG = "KTVDebugSettingsDialog";
     private final KTVDebugSettingBean mSetting;
     private final String channelName;
     private final String sdkBuildNum;
 
+    /**
+     * Instantiates a new Ktv debug settings dialog.
+     *
+     * @param mSetting    the m setting
+     * @param channelName the channel name
+     * @param sdkBuildNum the sdk build num
+     */
     public KTVDebugSettingsDialog(KTVDebugSettingBean mSetting, String channelName, String sdkBuildNum) {
         this.mSetting = mSetting;
         this.channelName = channelName;
@@ -94,11 +104,30 @@ public class KTVDebugSettingsDialog extends BaseBottomSheetDialogFragment<KtvDia
         mBinding.tvSDKVersion.setText("agora sdk ver: " + sdkBuildNum);
     }
 
+    /**
+     * The interface Callback.
+     */
     public interface Callback {
+        /**
+         * On audio dump enable.
+         *
+         * @param enable the enable
+         */
         void onAudioDumpEnable(boolean enable);
 
+        /**
+         * On scoring control.
+         *
+         * @param level  the level
+         * @param offset the offset
+         */
         void onScoringControl(int level, int offset);
 
+        /**
+         * On set parameters.
+         *
+         * @param parameters the parameters
+         */
         void onSetParameters(String parameters);
     }
 }

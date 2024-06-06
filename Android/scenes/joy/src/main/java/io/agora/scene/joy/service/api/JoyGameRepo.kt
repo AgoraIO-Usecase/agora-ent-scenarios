@@ -25,7 +25,7 @@ class JoyGameRepo constructor(private val service: JoyApiService) : BaseReposito
         get() = BuildConfig.AGORA_APP_ID
 
     private val mBasicAuth: String
-        get() = String.format("agora token=%s", JoyServiceManager.mTokenConfig.rtcToken)
+        get() = String.format("agora token=%s", JoyServiceManager.mRtcToken)
 
     private val mSrc: String
         get() = "Android"

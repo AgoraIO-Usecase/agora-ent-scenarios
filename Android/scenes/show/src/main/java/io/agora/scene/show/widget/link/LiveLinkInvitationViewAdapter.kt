@@ -5,7 +5,7 @@ import com.bumptech.glide.request.RequestOptions
 import io.agora.scene.base.GlideApp
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLiveLinkInvitationMessageBinding
-import io.agora.scene.show.service.ShowRoomRequestStatus
+import io.agora.scene.show.service.ShowInteractionStatus
 import io.agora.scene.show.service.ShowUser
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
@@ -25,34 +25,24 @@ class LiveLinkInvitationViewAdapter: BindingSingleAdapter<ShowUser, ShowLiveLink
             .apply(RequestOptions.circleCropTransform())
             .into(binding.coverUserIcon)
         when (userItem.status) {
-            ShowRoomRequestStatus.accepted.value -> {
+            ShowInteractionStatus.linking -> {
                 binding.btnItemInvite.isEnabled = false
                 binding.btnItemInvite.setText(R.string.show_is_onseat)
                 binding.btnItemInvite.setOnClickListener(null)
             }
-            ShowRoomRequestStatus.idle.value -> {
+            else -> {
                 binding.btnItemInvite.isEnabled = true
                 binding.btnItemInvite.setText(R.string.show_application)
                 binding.btnItemInvite.setOnClickListener {
-                    onClickListener.onClick(userItem, position)
+                    onClickListener.onClick(it, userItem, position)
                 }
-            }
-            ShowRoomRequestStatus.waitting.value -> {
-                binding.btnItemInvite.isEnabled = false
-                binding.btnItemInvite.setText(R.string.show_application_waitting)
-                binding.btnItemInvite.setOnClickListener(null)
-            }
-            ShowRoomRequestStatus.rejected.value -> {
-                binding.btnItemInvite.isEnabled = false
-                binding.btnItemInvite.setText(R.string.show_reject_onseat)
-                binding.btnItemInvite.setOnClickListener(null)
             }
         }
     }
 
     private lateinit var onClickListener : OnClickListener
     interface OnClickListener {
-        fun onClick(userItem: ShowUser, position: Int)
+        fun onClick(view: View, userItem: ShowUser, position: Int)
     }
     fun setClickListener(listener : OnClickListener) {
         onClickListener = listener

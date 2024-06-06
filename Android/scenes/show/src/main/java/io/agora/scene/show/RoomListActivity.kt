@@ -23,11 +23,11 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
+import io.agora.scene.show.widget.PresetAudienceDialog
+import io.agora.scene.widget.utils.StatusBarUtil
 import io.agora.videoloaderapi.OnLiveRoomItemTouchEventHandler
 import io.agora.videoloaderapi.OnRoomListScrollEventHandler
 import io.agora.videoloaderapi.VideoLoader
-import io.agora.scene.show.widget.PresetAudienceDialog
-import io.agora.scene.widget.utils.StatusBarUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,7 +40,7 @@ class RoomListActivity : AppCompatActivity() {
 
     private val mBinding by lazy { ShowRoomListActivityBinding.inflate(LayoutInflater.from(this)) }
     private var mAdapter: RoomListAdapter? = null
-    private val mService by lazy { ShowServiceProtocol.getImplInstance() }
+    private val mService by lazy { ShowServiceProtocol.get() }
     private val roomDetailModelList = mutableListOf<ShowRoomDetailModel>()
     private var isFirstLoad = true
     private var onRoomListScrollEventHandler: OnRoomListScrollEventHandler? = null
@@ -212,7 +212,7 @@ class RoomListActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mService.destroy()
+        ShowServiceProtocol.destroy()
         RtcEngineInstance.destroy()
         RtcEngineInstance.setupGeneralToken("")
     }
