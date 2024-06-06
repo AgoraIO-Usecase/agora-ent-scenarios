@@ -31,7 +31,7 @@ public class ScreenSlidePageFragment extends Fragment {
     private int position;
     private final SongChooseViewAdapter mRankListAdapter = new SongChooseViewAdapter() {
         @Override
-        void onSongChosen(SongItem song, int position) {
+        public void onSongChosen(SongItem song, int position) {
             if (callBack == null) {
                 return;
             }

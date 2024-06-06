@@ -35,6 +35,7 @@
     <string name="ktv_room_player_play">播放</string>
     <string name="ktv_room_player_tweak">调音</string>
     <string name="ktv_room_choose_song">点歌</string>
+    <string name="ktv_room_choose_song_loading">加载中</string>
     <string name="ktv_room_chosen_song_list">已点</string>
     <string name="ktv_room_sing2">演唱中</string>
     <string name="ktv_room_no_sing">当前无人演唱\n点击“点歌”一展歌喉</string>

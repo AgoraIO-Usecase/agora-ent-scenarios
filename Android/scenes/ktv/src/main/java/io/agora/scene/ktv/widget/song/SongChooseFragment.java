@@ -1,6 +1,5 @@
 package io.agora.scene.ktv.widget.song;
 
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -11,7 +10,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -38,7 +36,7 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
 
     private final SongChooseViewAdapter mSearchAdapter = new SongChooseViewAdapter() {
         @Override
-        void onSongChosen(SongItem song, int position) {
+        public void onSongChosen(SongItem song, int position) {
             onSongItemChosen(song);
         }
     };
