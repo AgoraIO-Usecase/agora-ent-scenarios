@@ -132,6 +132,8 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
 
     /**
      * 设置事件监听
+     *
+     * @param chooseSongListener the choose song listener
      */
     public void setChooseSongListener(SongActionListenerImpl chooseSongListener) {
         this.chooseSongListener = chooseSongListener;
@@ -140,6 +142,8 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
 
     /**
      * 点歌-获取当前选中tab位置
+     *
+     * @return the int
      */
     public int getChooseCurrentTabIndex(){
         return songChooseFragment.getCurrentTabIndex();
@@ -147,6 +151,10 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
 
     /**
      * 点歌-标题设置
+     *
+     * @param titles       the titles
+     * @param types        the types
+     * @param defaultIndex the default index
      */
     public void setChooseSongTabsTitle(List<String> titles, List<Integer> types, int defaultIndex) {
         songChooseFragment.setSongTagsTitle(titles, types, defaultIndex);
@@ -154,6 +162,9 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
 
     /**
      * 点歌-更新item选中状态
+     *
+     * @param songItem the song item
+     * @param isChosen the is chosen
      */
     public void setChooseSongItemStatus(SongItem songItem, boolean isChosen) {
         songChooseFragment.setSongItemStatus(songItem, isChosen);
@@ -161,6 +172,8 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
 
     /**
      * 点歌-更新搜索列表
+     *
+     * @param list the list
      */
     public void setChooseSearchResult(List<SongItem> list) {
         songChooseFragment.setSearchResult(list);
@@ -168,6 +181,9 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
 
     /**
      * 点歌-下拉刷新重置列表
+     *
+     * @param list  the list
+     * @param index the index
      */
     public void setChooseRefreshingResult(List<SongItem> list,int index) {
         songChooseFragment.setRefreshingResult(list, index);
@@ -175,6 +191,10 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
 
     /**
      * 点歌-加载更多刷新列表
+     *
+     * @param list    the list
+     * @param hasMore the has more
+     * @param index   the index
      */
     public void setChooseLoadMoreResult(List<SongItem> list, boolean hasMore, int index) {
         songChooseFragment.setLoadMoreResult(list, hasMore, index);
@@ -182,6 +202,8 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
 
     /**
      * 已点歌单-设置是否可以做删除置顶等操作
+     *
+     * @param controllable the controllable
      */
     public void setChosenControllable(boolean controllable) {
         songChosenFragment.setControllable(controllable);
@@ -189,6 +211,8 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
 
     /**
      * 已点歌单-重置列表
+     *
+     * @param songs the songs
      */
     public void resetChosenSongList(List<SongItem> songs) {
         songChosenFragment.resetSongList(songs);
@@ -197,6 +221,8 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
 
     /**
      * 已点歌单-添加歌曲
+     *
+     * @param song the song
      */
     public void addChosenSongItem(SongItem song) {
         songChosenFragment.addSongItem(song);
@@ -205,6 +231,8 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
 
     /**
      * 已点歌单-删除歌曲
+     *
+     * @param song the song
      */
     public void deleteChosenSongItem(SongItem song) {
         songChosenFragment.deleteSongItem(song);
@@ -213,6 +241,8 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
 
     /**
      * 已点歌单-置顶歌曲
+     *
+     * @param song the song
      */
     public void topUpChosenSongItem(SongItem song) {
         songChosenFragment.topUpSongItem(song);

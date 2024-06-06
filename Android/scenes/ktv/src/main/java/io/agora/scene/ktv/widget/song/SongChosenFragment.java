@@ -110,18 +110,38 @@ public final class SongChosenFragment extends BaseViewBindingFragment<KtvFragmen
         getBinding().list.setAdapter(mAdapter);
     }
 
+    /**
+     * Sets controllable.
+     *
+     * @param controllable the controllable
+     */
     void setControllable(boolean controllable) {
         this.controllable = controllable;
     }
 
+    /**
+     * Reset song list.
+     *
+     * @param songs the songs
+     */
     void resetSongList(List<SongItem> songs) {
         mAdapter.resetAll(songs);
     }
 
+    /**
+     * Add song item.
+     *
+     * @param song the song
+     */
     void addSongItem(SongItem song){
         mAdapter.insertLast(song);
     }
 
+    /**
+     * Delete song item.
+     *
+     * @param song the song
+     */
     void deleteSongItem(SongItem song){
         for (int i = 0; i < mAdapter.getItemCount(); i++) {
             SongItem item = mAdapter.getItem(i);
@@ -132,6 +152,11 @@ public final class SongChosenFragment extends BaseViewBindingFragment<KtvFragmen
         }
     }
 
+    /**
+     * Top up song item.
+     *
+     * @param song the song
+     */
     void topUpSongItem(SongItem song){
         for (int i = 0; i < mAdapter.getItemCount(); i++) {
             SongItem item = mAdapter.getItem(i);
@@ -145,11 +170,21 @@ public final class SongChosenFragment extends BaseViewBindingFragment<KtvFragmen
         }
     }
 
+    /**
+     * Get song size int.
+     *
+     * @return the int
+     */
     int getSongSize(){
         return mAdapter.getItemCount();
     }
 
 
+    /**
+     * Sets listener.
+     *
+     * @param listener the listener
+     */
     public void setListener(Listener listener) {
         this.listener = listener;
     }
@@ -167,8 +202,22 @@ public final class SongChosenFragment extends BaseViewBindingFragment<KtvFragmen
     }
 
 
+    /**
+     * The interface Listener.
+     */
     interface Listener {
+        /**
+         * On song delete clicked.
+         *
+         * @param song the song
+         */
         void onSongDeleteClicked(SongItem song);
+
+        /**
+         * On song top clicked.
+         *
+         * @param song the song
+         */
         void onSongTopClicked(SongItem song);
     }
 }

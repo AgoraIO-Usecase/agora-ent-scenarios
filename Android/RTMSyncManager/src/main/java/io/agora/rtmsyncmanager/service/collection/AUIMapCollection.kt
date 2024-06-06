@@ -10,7 +10,7 @@ class AUIMapCollection(
     val channelName: String,
     val observeKey: String,
     val rtmManager: AUIRtmManager
-) : AUIBaseCollection(channelName, observeKey, rtmManager) {
+) : AUIBaseCollection(channelName, observeKey, rtmManager), IAUIMapCollection {
 
     private var currentMap: Map<String, Any> = mutableMapOf()
 
@@ -54,7 +54,6 @@ class AUIMapCollection(
     override fun updateMetaData(
         valueCmd: String?,
         value: Map<String, Any>,
-        filter: List<Map<String, Any>>?,
         callback: ((error: AUICollectionException?) -> Unit)?
     ) {
         if (isArbiter()) {
@@ -85,7 +84,7 @@ class AUIMapCollection(
         ) { error ->
             if (error != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.recvErrorReceipt.toException()
+                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(null, "$error")
                 )
             } else {
                 callback?.invoke(null)
@@ -96,7 +95,6 @@ class AUIMapCollection(
     override fun mergeMetaData(
         valueCmd: String?,
         value: Map<String, Any>,
-        filter: List<Map<String, Any>>?,
         callback: ((error: AUICollectionException?) -> Unit)?
     ) {
         if (isArbiter()) {
@@ -127,7 +125,7 @@ class AUIMapCollection(
             uniqueId = uniqueId
         ) { error ->
             if (error != null) {
-                callback?.invoke(AUICollectionException.ErrorCode.recvErrorReceipt.toException("$error"))
+                callback?.invoke(AUICollectionException.ErrorCode.recvErrorReceipt.toException(null, "$error"))
             } else {
                 callback?.invoke(null)
             }
@@ -143,15 +141,47 @@ class AUIMapCollection(
     override fun addMetaData(
         valueCmd: String?,
         value: Map<String, Any>,
-        filter: List<Map<String, Any>>?,
         callback: ((error: AUICollectionException?) -> Unit)?
     ) {
-        updateMetaData(valueCmd, value, filter, callback)
+        if (isArbiter()) {
+            rtmAddMetaData(localUid(), valueCmd, value, callback)
+            return
+        }
+
+        val uniqueId = UUID.randomUUID().toString()
+        val data = AUICollectionMessage(
+            channelName = channelName,
+            uniqueId = uniqueId,
+            sceneKey = observeKey,
+            payload = AUICollectionMessagePayload(
+                type = AUICollectionOperationTypeAdd,
+                dataCmd = valueCmd,
+                data = value
+            )
+        )
+        val jsonStr = GsonTools.beanToString(data)
+        if (jsonStr == null) {
+            callback?.invoke(AUICollectionException.ErrorCode.encodeToJsonStringFail.toException())
+            return
+        }
+        rtmManager.publishAndWaitReceipt(
+            channelName = channelName,
+            userId = arbiterUid(),
+            message = jsonStr,
+            uniqueId = uniqueId
+        ) { error ->
+            if (error != null) {
+                callback?.invoke(
+                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(null, "$error")
+                )
+            } else {
+                callback?.invoke(null)
+            }
+        }
     }
 
     override fun removeMetaData(
         valueCmd: String?,
-        filter: List<Map<String, Any>>?,
         callback: ((error: AUICollectionException?) -> Unit)?
     ) {
         callback?.invoke(AUICollectionException.ErrorCode.unsupportedAction.toException())
@@ -163,7 +193,6 @@ class AUIMapCollection(
         value: Int,
         min: Int,
         max: Int,
-        filter: List<Map<String, Any>>?,
         callback: ((error: AUICollectionException?) -> Unit)?
     ) {
         if (isArbiter()) {
@@ -206,7 +235,7 @@ class AUIMapCollection(
         ) { error ->
             if (error != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.recvErrorReceipt.toException("$error")
+                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(null, "$error")
                 )
             } else {
                 callback?.invoke(null)
@@ -244,12 +273,56 @@ class AUIMapCollection(
         ) { error ->
             if (error != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.recvErrorReceipt.toException("$error")
+                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(null, "$error")
                 )
             } else {
                 callback?.invoke(null)
             }
         }
+    }
+
+    private fun rtmAddMetaData(
+        publisherId: String,
+        valueCmd: String?,
+        value: Map<String, Any>,
+        callback: ((error: AUICollectionException?) -> Unit)?
+    ) {
+        val newValue = valueWillChangeClosure?.invoke(publisherId, valueCmd, value) ?: value
+        val error =
+            metadataWillAddClosure?.invoke(publisherId, valueCmd, newValue)
+        if (error != null) {
+            callback?.invoke(error)
+            return
+        }
+
+        val retMap =
+            attributesWillSetClosure?.invoke(
+                channelName,
+                observeKey,
+                valueCmd,
+                AUIAttributesModel(newValue)
+            )?.getMap()
+                ?: newValue
+
+        val data = GsonTools.beanToString(retMap)
+        if (data == null) {
+            callback?.invoke(AUICollectionException.ErrorCode.encodeToJsonStringFail.toException())
+            return
+        }
+
+        rtmManager.setBatchMetadata(
+            channelName,
+            metadata = mapOf(Pair(observeKey, data)),
+        ) { e ->
+            if (e != null) {
+                callback?.invoke(
+                    AUICollectionException.ErrorCode.unknown.toException(null, "rtm setBatchMetadata error: $e")
+                )
+            } else {
+                callback?.invoke(null)
+            }
+        }
+        currentMap = retMap
     }
 
     private fun rtmUpdateMetaData(
@@ -258,15 +331,16 @@ class AUIMapCollection(
         value: Map<String, Any>,
         callback: ((error: AUICollectionException?) -> Unit)?
     ) {
+        val newValue = valueWillChangeClosure?.invoke(publisherId, valueCmd, value) ?: value
         val error =
-            metadataWillUpdateClosure?.invoke(publisherId, valueCmd, value, HashMap(currentMap))
+            metadataWillUpdateClosure?.invoke(publisherId, valueCmd, newValue, HashMap(currentMap))
         if (error != null) {
             callback?.invoke(error)
             return
         }
 
         val map = HashMap(currentMap)
-        value.forEach { (k, v) ->
+        newValue.forEach { (k, v) ->
             map[k] = v
         }
         val retMap =
@@ -289,13 +363,13 @@ class AUIMapCollection(
         ) { e ->
             if (e != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.unknown.toException("rtm setBatchMetadata error: $e")
+                    AUICollectionException.ErrorCode.unknown.toException(null, "rtm setBatchMetadata error: $e")
                 )
             } else {
                 callback?.invoke(null)
             }
         }
-        updateCurrentListAndNotify(map, true)
+        currentMap = retMap
     }
 
     private fun rtmMergeMetaData(
@@ -304,14 +378,15 @@ class AUIMapCollection(
         value: Map<String, Any>,
         callback: ((error: AUICollectionException?) -> Unit)?
     ) {
+        val newValue = valueWillChangeClosure?.invoke(publisherId, valueCmd, value) ?: value
         val error =
-            metadataWillMergeClosure?.invoke(publisherId, valueCmd, value, HashMap(currentMap))
+            metadataWillMergeClosure?.invoke(publisherId, valueCmd, newValue, HashMap(currentMap))
         if (error != null) {
             callback?.invoke(error)
             return
         }
 
-        val map = AUICollectionUtils.mergeMap(currentMap, value)
+        val map = AUICollectionUtils.mergeMap(currentMap, newValue)
         val retMap =
             attributesWillSetClosure?.invoke(
                 channelName,
@@ -332,13 +407,13 @@ class AUIMapCollection(
         ) { e ->
             if (e != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.unknown.toException("rtm setBatchMetadata error: $e")
+                    AUICollectionException.ErrorCode.unknown.toException(null, "rtm setBatchMetadata error: $e")
                 )
             } else {
                 callback?.invoke(null)
             }
         }
-        updateCurrentListAndNotify(map, true)
+        currentMap = retMap
     }
 
     private fun rtmCalculateMetaData(
@@ -396,13 +471,13 @@ class AUIMapCollection(
         ) { e ->
             if (e != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.unknown.toException("rtm setBatchMetadata error: $e")
+                    AUICollectionException.ErrorCode.unknown.toException(null, "rtm setBatchMetadata error: $e")
                 )
             } else {
                 callback?.invoke(null)
             }
         }
-        updateCurrentListAndNotify(tempMap, true)
+        currentMap = retMap
     }
 
     private fun rtmCleanMetaData(callback: ((error: AUICollectionException?) -> Unit)?) {
@@ -412,7 +487,7 @@ class AUIMapCollection(
             fetchImmediately = false,
             completion = { error ->
                 if (error != null) {
-                    callback?.invoke(AUICollectionException.ErrorCode.unknown.toException("rtm rtmCleanMetaData error: $error"))
+                    callback?.invoke(AUICollectionException.ErrorCode.unknown.toException(null, "rtm rtmCleanMetaData error: $error"))
                 } else {
                     callback?.invoke(null)
                 }
@@ -421,14 +496,17 @@ class AUIMapCollection(
     }
 
     override fun onAttributeChanged(value: Any) {
-        val strValue = value as? String ?: return
+        val strValue = value as? String ?: ""
 
         val map = GsonTools.toBean<Map<String, Any>>(
             strValue,
             object : TypeToken<Map<String, Any>>() {}.type
-        ) ?: return
+        ) ?: emptyMap()
 
-        updateCurrentListAndNotify(map, !isArbiter())
+        if (!isArbiter()) {
+            currentMap = map
+        }
+        attributesDidChangedClosure?.invoke(channelName, observeKey, AUIAttributesModel(map))
     }
 
     override fun onMessageReceive(publisherId: String, message: String) {
@@ -485,7 +563,11 @@ class AUIMapCollection(
             AUICollectionOperationTypeAdd, AUICollectionOperationTypeUpdate, AUICollectionOperationTypeMerge -> {
                 val data = messageModel.payload.data
                 if (data != null) {
-                    if (updateType == AUICollectionOperationTypeMerge) {
+                    if (updateType == AUICollectionOperationTypeAdd) {
+                        rtmAddMetaData(publisherId, valueCmd, data) {
+                            sendReceipt(publisherId, uniqueId, it)
+                        }
+                    } else if (updateType == AUICollectionOperationTypeMerge) {
                         rtmMergeMetaData(publisherId, valueCmd, data) {
                             sendReceipt(publisherId, uniqueId, it)
                         }
@@ -539,4 +621,7 @@ class AUIMapCollection(
         }
     }
 
+    override fun getLocalMetaData(): AUIAttributesModel {
+        return AUIAttributesModel(currentMap)
+    }
 }

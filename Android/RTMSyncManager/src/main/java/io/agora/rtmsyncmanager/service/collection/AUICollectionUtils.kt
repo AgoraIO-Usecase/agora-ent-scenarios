@@ -44,16 +44,15 @@ object AUICollectionUtils {
         }
         array.forEachIndexed { index, value ->
             filter.forEach { filterItem ->
-                var match = false
+                var match = 0
                 for (entry in filterItem) {
                     val k = entry.key
                     val v = entry.value
                     if(isMatchFilter(k, value, v)){
-                        match = true
-                        break
+                        match += 1
                     }
                 }
-                if(match){
+                if (match == filterItem.keys.size) {
                     indexes.add(index)
                     return@forEach
                 }

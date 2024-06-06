@@ -115,13 +115,13 @@ class RoomListActivity : BaseViewBindingActivity<CantataActivityRoomListBinding>
         if (inputPasswordDialog == null) {
             inputPasswordDialog = InputPasswordDialog(this)
         }
-        inputPasswordDialog?.clearContent()
-        inputPasswordDialog?.iSingleCallback = ISingleCallback { type: Int?, o: Any? ->
-            roomCreateViewModel.joinRoom(
-                roomInfo.roomNo, (o as String?)
-            )
+        inputPasswordDialog?.apply {
+            clearContent()
+            onDefineClickListener = InputPasswordDialog.OnDefineClickListener { password ->
+                roomCreateViewModel.joinRoom(roomInfo.roomNo, password)
+            }
+            show()
         }
-        inputPasswordDialog?.show()
     }
 
 
