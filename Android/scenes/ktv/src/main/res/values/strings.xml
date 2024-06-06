@@ -112,7 +112,6 @@
     <string name="ktv_voice_effect">音效</string>
     <string name="ktv_camera">摄像头</string>
     <string name="ktv_leave_chorus">退出合唱</string>
-    <string name="ktv_voice_highlight">突出人声</string>
     <string name="ktv_voice_profile">配置</string>
     <string name="ktv_voice_scoring_difficulty">打分难度</string>
     <string name="ktv_voice_scoring_difficulty_low">低难度</string>
@@ -210,8 +209,6 @@
     <string name="ktv_sound_mic_phone_type_tips">选择麦克风的预设参数</string>
     <string name="ktv_sound_preset_type">预设音效</string>
     <string name="ktv_sound_preset_off">关闭</string>
-    <string name="ktv_highlight_disable">人声突出已失效</string>
-    <string name="ktv_highlight_limit">每首歌仅可设置一次人声突出对象，请在下首歌再设置</string>
     <string name="ktv_notice">提示</string>
 
     <string name="ktv_debug">Debug</string>

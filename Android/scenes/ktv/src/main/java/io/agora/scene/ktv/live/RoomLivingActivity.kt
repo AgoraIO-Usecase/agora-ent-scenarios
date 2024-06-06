@@ -222,11 +222,6 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
                     super.onChangeMusicClick()
                     showChangeMusicDialog()
                 }
-
-                override fun onVocalHighlightClick() {
-                    super.onVocalHighlightClick()
-                    //showVoiceHighlightDialog();
-                }
             }
         binding.lrcControlView.setOnLrcClickListener(lrcActionListenerImpl)
         binding.cbVideo.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
@@ -338,11 +333,6 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
                 return@observe
             }
             onMusicChanged(model)
-            if (roomLivingViewModel.isRoomOwner) {
-                binding.lrcControlView.showHighLightButton(false)
-                binding.lrcControlView.setHighLightPersonHeadUrl("")
-            }
-            roomLivingViewModel.mMusicSetting?.mHighLighterUid = ""
         }
         roomLivingViewModel.scoringAlgoControlLiveData.observe(this) { model: ScoringAlgoControlModel? ->
             model ?: return@observe

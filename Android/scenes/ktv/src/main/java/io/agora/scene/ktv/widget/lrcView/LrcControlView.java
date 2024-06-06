@@ -208,8 +208,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
         mKaraokeView = new KaraokeView(mBinding.ilActive.lyricsView, mBinding.ilActive.scoringView);
 
-        mBinding.ilActive.btnVocalHighlight.setVisibility(View.GONE);
-
         initListener();
     }
 
@@ -233,9 +231,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.ivJoinChorusBtn.setOnClickListener(this);
         mBinding.ilActive.ivLeaveChorus.setOnClickListener(this);
         mBinding.ilActive.downloadLrcFailedBtn.setOnClickListener(this);
-
-        mBinding.ilActive.btnVocalHighlight.setOnClickListener(this);
-        mBinding.ilActive.btnVocalHighlight.bringToFront();
 
         mKaraokeView.setKaraokeEvent(new KaraokeEvent() {
             @Override
@@ -770,10 +765,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             } else {
                 downloadAndSetLrcData();
             }
-        } else if (v == mBinding.ilActive.btnVocalHighlight) {
-            if (mOnKaraokeActionListener != null) {
-                mOnKaraokeActionListener.onVocalHighlightClick();
-            }
         }
     }
 
@@ -877,33 +868,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     }
 
     /**
-     * Sets high light person head url.
-     *
-     * @param url the url
-     */
-    public void setHighLightPersonHeadUrl(String url) {
-        GlideApp.with(mBinding.getRoot())
-                .load(url)
-                .error(R.mipmap.ktv_highlight_head_bg)
-                .apply(RequestOptions.circleCropTransform())
-                .into(mBinding.ilActive.ivVocalHighlight);
-    }
-
-    /**
-     * Show high light button.
-     *
-     * @param show the show
-     */
-    public void showHighLightButton(boolean show) {
-        if (show) {
-            mBinding.ilActive.btnVocalHighlight.setVisibility(View.VISIBLE);
-            mBinding.ilActive.btnVocalHighlight.bringToFront();
-        } else {
-            mBinding.ilActive.btnVocalHighlight.setVisibility(View.GONE);
-        }
-    }
-
-    /**
      * The interface On karaoke event listener.
      */
     public interface OnKaraokeEventListener {
@@ -990,13 +954,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
          * On re get lrc url.
          */
         default void onReGetLrcUrl() {
-        }
-
-        /**
-         * On vocal highlight click.
-         */
-        default void onVocalHighlightClick() {
-
         }
     }
 }

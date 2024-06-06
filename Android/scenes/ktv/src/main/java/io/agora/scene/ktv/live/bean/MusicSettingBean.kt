@@ -313,11 +313,6 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         }
 
     /**
-     *  人声突出
-     */
-    var mHighLighterUid = ""
-
-    /**
      * AIAEC 开关
      */
     var mAIAECEnable = true
