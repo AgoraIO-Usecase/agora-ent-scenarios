@@ -8,38 +8,50 @@
 import Foundation
 
 enum AUIAnyType : Codable, Equatable {
+     case uint(UInt)
      case int(Int)
+     case uint64(UInt64)
+     case int64(Int64)
      case bool(Bool)
      case string(String)
      case list([AUIAnyType])
      case dictionary([String : AUIAnyType])
-
+    
      public init(from decoder: Decoder) throws {
-         // Can be made prettier, but as a simple example:
-         let container = try decoder.singleValueContainer()
-         do {
-             self = .int(try container.decode(Int.self))
-         } catch DecodingError.typeMismatch {
-             do {
-                 self = .bool(try container.decode(Bool.self))
-             } catch DecodingError.typeMismatch {
-                 do {
-                     self = .string(try container.decode(String.self))
-                 } catch DecodingError.typeMismatch {
-                     do {
-                         self = .list(try container.decode([AUIAnyType].self))
-                     } catch DecodingError.typeMismatch {
-                         self = .dictionary(try container.decode([String : AUIAnyType].self))
-                     }
-                 }
-             }
-         }
-     }
+        let container = try decoder.singleValueContainer()
+        
+        let result: Result<AUIAnyType, Error> = Result {
+            if let intValue = try? container.decode(Int.self) {
+                return .int(intValue)
+            } else if let uintValue = try? container.decode(UInt.self) {
+                return .uint(uintValue)
+            } else if let intValue = try? container.decode(Int64.self) {
+                return .int64(intValue)
+            } else if let uintValue = try? container.decode(UInt64.self) {
+                return .uint64(uintValue)
+            } else if let boolValue = try? container.decode(Bool.self) {
+                return .bool(boolValue)
+            } else if let stringValue = try? container.decode(String.self) {
+                return .string(stringValue)
+            } else if let listValue = try? container.decode([AUIAnyType].self) {
+                return .list(listValue)
+            } else if let dictionaryValue = try? container.decode([String: AUIAnyType].self) {
+                return .dictionary(dictionaryValue)
+            } else {
+                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath, debugDescription: "Unable to decode AUIAnyType"))
+            }
+        }
+        
+        self = try result.get()
+    }
 
      public func encode(to encoder: Encoder) throws {
          var container = encoder.singleValueContainer()
          switch self {
+         case .uint(let uint): try container.encode(uint)
          case .int(let int): try container.encode(int)
+         case .uint64(let uint): try container.encode(uint)
+         case .int64(let int): try container.encode(int)
          case .bool(let bool): try container.encode(bool)
          case .string(let string): try container.encode(string)
          case .list(let list): try container.encode(list)
@@ -49,7 +61,10 @@ enum AUIAnyType : Codable, Equatable {
 
     static func ==(_ lhs: AUIAnyType, _ rhs: AUIAnyType) -> Bool {
         switch (lhs, rhs) {
+        case (.uint(let uint1), .int(let uint2)): return uint1 == uint2
         case (.int(let int1), .int(let int2)): return int1 == int2
+        case (.uint64(let uint1), .uint64(let uint2)): return uint1 == uint2
+        case (.int64(let int1), .int64(let int2)): return int1 == int2
         case (.bool(let bool1), .bool(let bool2)): return bool1 == bool2
         case (.string(let string1), .string(let string2)): return string1 == string2
         case (.list(let list1), .list(let list2)): return list1 == list2
@@ -61,8 +76,14 @@ enum AUIAnyType : Codable, Equatable {
     public init(array: [Any]) {
         var typeArray: [AUIAnyType] = []
         array.forEach { value in
-            if let v = value as? Int {
+            if let v = value as? UInt {
+                typeArray.append(.uint(v))
+            } else if let v = value as? Int {
                 typeArray.append(.int(v))
+            } else if let v = value as? UInt64 {
+                typeArray.append(.uint64(v))
+            } else if let v = value as? Int64 {
+                typeArray.append(.int64(v))
             } else if let v = value as? Bool {
                 typeArray.append(.bool(v))
             } else if let v = value as? String {
@@ -79,8 +100,14 @@ enum AUIAnyType : Codable, Equatable {
     public init(map: [String: Any]) {
         var typeMap: [String: AUIAnyType] = [:]
         map.forEach { (key: String, value: Any) in
-            if let v = value as? Int {
+            if let v = value as? UInt {
+                typeMap[key] = .uint(v)
+            } else if let v = value as? Int {
                 typeMap[key] = .int(v)
+            } else if let v = value as? UInt64 {
+                typeMap[key] = .uint64(v)
+            } else if let v = value as? Int64 {
+                typeMap[key] = .int64(v)
             } else if let v = value as? Bool {
                 typeMap[key] = .bool(v)
             } else if let v = value as? String {
@@ -96,7 +123,13 @@ enum AUIAnyType : Codable, Equatable {
     
     public func toJsonObject() -> Any {
         switch self {
+        case .uint(let uint):
+            return uint
         case .int(let int):
+            return int
+        case .uint64(let uint):
+            return uint
+        case .int64(let int):
             return int
         case .bool(let bool):
             return bool

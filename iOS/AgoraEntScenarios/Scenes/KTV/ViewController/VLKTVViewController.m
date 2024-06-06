@@ -1369,6 +1369,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             if (!isOnSeat) {
                 //not yet seated
                 [self enterSeatWithIndex:@(seatIndex) completion:^(NSError *error) {
+                    if (error == nil) {return;}
+                    [VLToast toast: error.localizedDescription];
                 }];
             }
         }
@@ -1442,6 +1444,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)onVLDropOnLineView:(VLDropOnLineView *)view action:(VLRoomSeatModel *)seatModel {
     [self leaveSeatWithSeatModel:seatModel withCompletion:^(NSError *error) {
         [[LSTPopView getPopViewWithCustomView:view] dismiss];
+        if (error == nil) {return;}
+        [VLToast toast:error.localizedDescription];
     }];
 }
 
@@ -2248,7 +2252,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             KTVLogInfo(@"onMusicLoadProgressWithSongCode break songCode missmatch %@/%ld percent: %ld", model.songNo, songCode, percent);
             return;
         }
-        KTVLogInfo(@"onMusicLoadProgressWithSongCode songCode %@/%ld percent: %ld", model.songNo, songCode, percent);
+//        KTVLogInfo(@"onMusicLoadProgressWithSongCode songCode %@/%ld percent: %ld", model.songNo, songCode, percent);
         if(status == AgoraMusicContentCenterPreloadStatusError){
             [VLToast toast:KTVLocalizedString(@"ktv_load_failed_and_change")];
             if(self.loadMusicCallBack) {
