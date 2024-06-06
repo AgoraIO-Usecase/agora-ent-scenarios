@@ -524,7 +524,7 @@ extension KTVSyncManagerServiceImp {
                 if let err = err {
                     KTVLog.info(text: "enter scene fail: \(err.localizedDescription)")
                     _hideLoadingView()
-                    completion(err, nil)
+                    completion(KTVServiceError.createRoomFail(err.code).toNSError(), nil)
                     return
                 }
                 
@@ -536,10 +536,10 @@ extension KTVSyncManagerServiceImp {
 
         if isConnected == false {
             login { err in
-                if err == nil {
-                    create(roomInfo: roomModel)
+                if let err = err {
+                    completion(KTVServiceError.createRoomFail(err.code).toNSError(), nil)
                 } else {
-                    completion(err, nil)
+                    create(roomInfo: roomModel)
                 }
             }
         } else {
@@ -558,7 +558,7 @@ extension KTVSyncManagerServiceImp {
                 if let err = err {
                     agoraPrint("enter scene fail: \(err.localizedDescription)")
                     _hideLoadingView()
-                    completion(err)
+                    completion(KTVServiceError.joinRoomFail(err.code).toNSError())
                     return
                 }
                 _hideLoadingView()
@@ -568,12 +568,12 @@ extension KTVSyncManagerServiceImp {
                 
         if isConnected == false {
             login { err in
-                if err == nil {
+                if let err = err {
                     _hideLoadingView()
-                    enterScene()
+                    completion(KTVServiceError.joinRoomFail(err.code).toNSError())
                 } else {
                     _hideLoadingView()
-                    completion(err)
+                    enterScene()
                 }
             }
         } else {
@@ -653,11 +653,16 @@ extension KTVSyncManagerServiceImp {
         let seatInfo = _createCurrentUserSeat(seatIndex: seatIdx)
         
         agoraPrint("enterSeat \(seatIdx)")
-        var params = seatMapConvert(model: seatInfo)
+        let params = seatMapConvert(model: seatInfo)
         let collection = getSeatCollection(with: roomNo)
         collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.enterSeatCmd.rawValue,
-                                  value: ["\(seatIdx)": params],
-                                  callback: completion)
+                                  value: ["\(seatIdx)": params]) { err in
+            var error: NSError? = nil
+            if let err = err {
+                error = KTVServiceError.enterSeatFail(err.code).toNSError()
+            }
+            completion(error)
+        }
     }
     
     func leaveSeat(completion: @escaping (Error?) -> Void) {
@@ -671,10 +676,15 @@ extension KTVSyncManagerServiceImp {
         let collection = getSeatCollection(with: roomNo)
         let model = VLRoomSeatModel()
         model.seatIndex = seatInfo.seatIndex
-        var params = seatMapConvert(model: model)
+        let params = seatMapConvert(model: model)
         collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.leaveSeatCmd.rawValue,
-                                  value: ["\(seatInfo.seatIndex)": params],
-                                  callback: completion)
+                                  value: ["\(seatInfo.seatIndex)": params]) { err in
+            var error: NSError? = nil
+            if let err = err {
+                error = KTVServiceError.leaveSeatFail(err.code).toNSError()
+            }
+            completion(error)
+        }
     }
     
     func kickSeat(seatIndex: Int, completion: @escaping (NSError?) -> ()) {
@@ -687,10 +697,15 @@ extension KTVSyncManagerServiceImp {
         let collection = getSeatCollection(with: roomNo)
         let model = VLRoomSeatModel()
         model.seatIndex = seatIndex
-        var params = seatMapConvert(model: model)
+        let params = seatMapConvert(model: model)
         collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.kickSeatCmd.rawValue,
-                                  value: ["\(seatIndex)": params],
-                                  callback: completion)
+                                  value: ["\(seatIndex)": params]) { err in
+            var error: NSError? = nil
+            if let err = err {
+                error = KTVServiceError.kickSeatFail(err.code).toNSError()
+            }
+            completion(error)
+        }
     }
     
     func updateSeatAudioMuteStatus(muted: Bool, completion: @escaping (Error?) -> Void) {
@@ -732,9 +747,13 @@ extension KTVSyncManagerServiceImp {
         agoraPrint("imp song delete... songCode[\(songCode)]")
         let collection = getSongCollection(with: channelName)
         collection?.removeMetaData(valueCmd: AUIMusicCmd.removeSongCmd.rawValue,
-                                   filter: [["songNo": songCode]], callback: { err in
-            completion(err)
-        })
+                                   filter: [["songNo": songCode]]) { err in
+            var error: NSError? = nil
+            if let err = err {
+                error = KTVServiceError.removeSongFail(err.code).toNSError()
+            }
+            completion(error)
+        }
     }
     
     func getChoosedSongsList(completion: @escaping (Error?, [VLRoomSelSongModel]?) -> Void) {
@@ -772,8 +791,13 @@ extension KTVSyncManagerServiceImp {
         //add a filter to ensure that objects with the same songNo are not repeatedly inserted
         collection?.addMetaData(valueCmd: AUIMusicCmd.chooseSongCmd.rawValue,
                                 value: params,
-                                filter: [["songNo": songInfo.songNo ?? ""]],
-                                callback: completion)
+                                filter: [["songNo": songInfo.songNo ?? ""]]) { err in
+            var error: NSError? = nil
+            if let err = err {
+                error = KTVServiceError.chooseSongFail(err.code).toNSError()
+            }
+            completion(error)
+        }
     }
     
     func pinSong(songCode: String, completion: @escaping (Error?) -> Void) {
@@ -784,8 +808,13 @@ extension KTVSyncManagerServiceImp {
         let collection = getSongCollection(with: roomNo)
         collection?.mergeMetaData(valueCmd: AUIMusicCmd.pinSongCmd.rawValue,
                                   value: ["pinAt": getCurrentTs(channelName: roomNo)],
-                                  filter: [["songNo": songCode]],
-                                  callback: completion)
+                                  filter: [["songNo": songCode]]) { err in
+            var error: NSError? = nil
+            if let err = err {
+                error = KTVServiceError.pinSongFail(err.code).toNSError()
+            }
+            completion(error)
+        }
     }
 }
 
@@ -840,7 +869,7 @@ extension KTVSyncManagerServiceImp {
         }
         
         // 立即执行一次检查到期的方法
-        checkAndHandleRoomExpire(changedBlock: changedBlock)
+        _ = checkAndHandleRoomExpire(changedBlock: changedBlock)
     }
 
     private func checkAndHandleRoomExpire(changedBlock: @escaping () -> Void) -> Bool {
@@ -1039,7 +1068,7 @@ extension KTVSyncManagerServiceImp: AUIRtmErrorProxyDelegate {
         return scene
     }
     
-    private func login(completion:(@escaping (Error?)-> Void)) {
+    private func login(completion:(@escaping (NSError?)-> Void)) {
         let token = AppContext.shared.agoraRTMToken
         if !token.isEmpty {
             let date = Date()
@@ -1099,6 +1128,10 @@ extension KTVSyncManagerServiceImp {
 // for song
 extension KTVSyncManagerServiceImp {
     private func _sortChooseSongList(chooseSongList: [[String: Any]]) -> [[String: Any]] {
+        func convert(_ value: Any?) -> UInt64{
+            guard let value = value else {return 0}
+            return UInt64("\(value)") ?? 0
+        }
         let songList = chooseSongList.sorted(by: { model1, model2 in
             //歌曲播放中优先（只会有一个，多个目前没有，如果有需要修改排序策略）
             if model1["status"] as? Int == VLSongPlayStatus.playing.rawValue {
@@ -1108,10 +1141,10 @@ extension KTVSyncManagerServiceImp {
                 return false
             }
             
-            let pinAt1 = model1["pinAt"] as? UInt64 ?? 0
-            let pinAt2 = model2["pinAt"] as? UInt64 ?? 0
-            let createAt1 = model1["createAt"] as? UInt64 ?? 0
-            let createAt2 = model2["createAt"] as? UInt64 ?? 0
+            var pinAt1 = convert(model1["pinAt"])
+            let pinAt2 = convert(model2["pinAt"])
+            let createAt1 = convert(model1["createAt"])
+            let createAt2 = convert(model2["createAt"])
             //都没有置顶时间，比较创建时间，创建时间小的在前（即创建早的在前）
             if pinAt1 < 1,  pinAt2 < 1 {
                 return createAt1 < createAt2 ? true : false

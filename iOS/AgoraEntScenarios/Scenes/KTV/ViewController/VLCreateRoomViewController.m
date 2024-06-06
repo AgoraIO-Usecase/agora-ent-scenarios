@@ -55,7 +55,7 @@
                                               completion:^(NSError* error, SyncRoomInfo* outputModel) {
         weakSelf.view.userInteractionEnabled = YES;
         if (error != nil) {
-            [VLToast toast:error.description];
+            [VLToast toast:error.localizedDescription];
             return;
         }
         
