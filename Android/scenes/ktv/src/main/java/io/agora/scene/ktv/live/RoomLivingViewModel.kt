@@ -377,14 +377,12 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
      */
     fun enterSeat(onSeatIndex: Int) {
         KTVLogger.d(TAG, "RoomLivingViewModel.haveSeat() called: $onSeatIndex")
-        ktvServiceProtocol.enterSeat(onSeatIndex) { e: Exception? ->
-            if (e == null) { // success
+        ktvServiceProtocol.enterSeat(onSeatIndex) { error ->
+            if (error == null) { // success
                 KTVLogger.d(TAG, "RoomLivingViewModel.haveSeat() success")
             } else { // failure
-                KTVLogger.e(TAG, "RoomLivingViewModel.haveSeat() failed: $e")
-            }
-            e?.message?.let { error ->
-                CustomToast.show(error, Toast.LENGTH_SHORT)
+                KTVLogger.e(TAG, "RoomLivingViewModel.haveSeat() failed: $error")
+                CustomToast.show(R.string.ktv_enter_seat_failed, error.message ?: "")
             }
         }
     }
@@ -396,32 +394,32 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
      */
     fun leaveSeat(seatModel: RoomMicSeatInfo) {
         KTVLogger.d(TAG, "RoomLivingViewModel.leaveSeat() called")
-        ktvServiceProtocol.leaveSeat() { e: Exception? ->
-            if (e == null) { // success
+        ktvServiceProtocol.leaveSeat() { error ->
+            if (error == null) { // success
                 KTVLogger.d(TAG, "RoomLivingViewModel.leaveSeat() success")
             } else { // failure
-                KTVLogger.e(TAG, "RoomLivingViewModel.leaveSeat() failed: $e")
-            }
-            e?.message?.let { error ->
-                CustomToast.show(error, Toast.LENGTH_SHORT)
+                KTVLogger.e(TAG, "RoomLivingViewModel.leaveSeat() failed: $error")
+                CustomToast.show(R.string.ktv_leave_seat_failed, error.message ?: "")
             }
         }
     }
 
+    /**
+     * Kick seat
+     *
+     * @param seatModel
+     */
     fun kickSeat(seatModel: RoomMicSeatInfo) {
         KTVLogger.d(TAG, "RoomLivingViewModel.kickSeat() called")
-        ktvServiceProtocol.kickSeat(seatModel.seatIndex) { e: Exception? ->
-            if (e == null) { // success
+        ktvServiceProtocol.kickSeat(seatModel.seatIndex) { error ->
+            if (error == null) { // success
                 KTVLogger.d(TAG, "RoomLivingViewModel.kickSeat() success")
             } else { // failure
-                KTVLogger.e(TAG, "RoomLivingViewModel.kickSeat() failed: $e")
-            }
-            e?.message?.let { error ->
-                CustomToast.show(error, Toast.LENGTH_SHORT)
+                KTVLogger.e(TAG, "RoomLivingViewModel.kickSeat() failed: $error")
+                CustomToast.show(R.string.ktv_kick_seat_failed, error.message ?: "")
             }
         }
     }
-
 
     /**
      * Is camera opened
@@ -435,14 +433,14 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
      */
     fun updateSeatVideoMuteStatus(mute: Boolean) {
         KTVLogger.d(TAG, "RoomLivingViewModel.updateSeatVideoMuteStatus() called mute：$mute")
-        ktvServiceProtocol.updateSeatVideoMuteStatus(mute) { e: Exception? ->
-            if (e == null) { // success
+        ktvServiceProtocol.updateSeatVideoMuteStatus(mute) { error ->
+            if (error == null) { // success
                 KTVLogger.d(TAG, "RoomLivingViewModel.updateSeatVideoMuteStatus() success")
             } else { // failure
-                KTVLogger.e(TAG, "RoomLivingViewModel.updateSeatVideoMuteStatus() failed: $e")
-            }
-            e?.message?.let { error ->
-                CustomToast.show(error, Toast.LENGTH_SHORT)
+                KTVLogger.e(TAG, "RoomLivingViewModel.updateSeatVideoMuteStatus() failed: $error")
+                error.message?.let {
+                    CustomToast.show(it, Toast.LENGTH_SHORT)
+                }
             }
         }
     }
@@ -479,14 +477,14 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
      */
     fun updateSeatAudioMuteStatus(mute: Boolean) {
         KTVLogger.d(TAG, "RoomLivingViewModel.updateSeatAudioMuteStatus() called mute：$mute")
-        ktvServiceProtocol.updateSeatAudioMuteStatus(mute) { e: Exception? ->
-            if (e == null) { // success
+        ktvServiceProtocol.updateSeatAudioMuteStatus(mute) { error ->
+            if (error == null) { // success
                 KTVLogger.d(TAG, "RoomLivingViewModel.updateSeatAudioMuteStatus() success")
             } else { // failure
-                KTVLogger.e(TAG, "RoomLivingViewModel.updateSeatAudioMuteStatus() failed: $e")
-            }
-            e?.message?.let { error ->
-                CustomToast.show(error, Toast.LENGTH_SHORT)
+                KTVLogger.e(TAG, "RoomLivingViewModel.updateSeatAudioMuteStatus() failed: $error")
+                error.message?.let {
+                    CustomToast.show(it, Toast.LENGTH_SHORT)
+                }
             }
         }
     }
@@ -495,16 +493,14 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
      * Song chosen list
      */
     fun getSongChosenList() {
-        ktvServiceProtocol.getChosenSongList { e: Exception?, data: List<ChosenSongInfo>? ->
-            if (e == null && data != null) { // success
-                chosenSongListLiveData.value = data
+        ktvServiceProtocol.getChosenSongList { error, chosenSongList ->
+            if (error == null && chosenSongList != null) { // success
+                chosenSongListLiveData.value = chosenSongList
                 KTVLogger.d(TAG, "RoomLivingViewModel.getSongChosenList() success")
             } else { // failed
-                if (e != null) {
-                    KTVLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed: $e")
-                }
-                e?.message?.let { error ->
-                    CustomToast.show(error, Toast.LENGTH_SHORT)
+                if (error != null) {
+                    KTVLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed: $error")
+//                    CustomToast.show(R.string.ktv_get_songs_failed, error.message ?: "")
                 }
             }
         }
@@ -592,6 +588,9 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
         ) { id: String?, status: Int, p: Int, size: Int, total: Int, list: Array<out Music>? ->
             KTVLogger.d(TAG, "RoomLivingViewModel.getSongList() return")
             val musicList: List<Music> = if (list == null) emptyList() else listOf(*list)
+            if (status != 0) {
+                CustomToast.show(R.string.ktv_get_songs_failed, "mcc reason:$status")
+            }
             val songs: MutableList<ChosenSongInfo> = ArrayList()
             // 需要再调一个接口获取当前已点的歌单来补充列表信息 >_<
             ktvServiceProtocol.getChosenSongList { e: Exception?, songsChosen: List<ChosenSongInfo>? ->
@@ -612,9 +611,9 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
                     }
                     liveData.postValue(songs)
                 } else {
-                    e?.message?.let { error ->
-                        CustomToast.show(error, Toast.LENGTH_SHORT)
-                    }
+//                    e?.message?.let { error ->
+//                        CustomToast.show(error, Toast.LENGTH_SHORT)
+//                    }
                 }
                 return@getChosenSongList
             }
@@ -688,16 +687,14 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
             singer = songItem.singer,
             imageUrl = songItem.imageUrl,
         )
-        ktvServiceProtocol.chooseSong(chosenSong) { e: Exception? ->
-            if (e == null) { // success
+        ktvServiceProtocol.chooseSong(chosenSong) { error ->
+            if (error == null) { // success
                 KTVLogger.d(TAG, "RoomLivingViewModel.chooseSong() success")
             } else { // failure
-                KTVLogger.e(TAG, "RoomLivingViewModel.chooseSong() failed: $e")
+                KTVLogger.e(TAG, "RoomLivingViewModel.chooseSong() failed: $error")
+                CustomToast.show(R.string.ktv_choose_song_failed, error.message ?: "")
             }
-            e?.message?.let { error ->
-                CustomToast.show(error, Toast.LENGTH_SHORT)
-            }
-            liveData.postValue(e == null)
+            liveData.postValue(error == null)
         }
         return liveData
     }
@@ -709,14 +706,12 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
      */
     fun deleteSong(songModel: ChosenSongInfo) {
         KTVLogger.d(TAG, "RoomLivingViewModel.deleteSong() called, name:" + songModel.songName)
-        ktvServiceProtocol.removeSong(songModel.songNo) { e ->
-            if (e == null) { // success: do nothing for subscriber dealing with the event already
+        ktvServiceProtocol.removeSong(songModel.songNo) { error ->
+            if (error == null) { // success: do nothing for subscriber dealing with the event already
                 KTVLogger.d(TAG, "RoomLivingViewModel.deleteSong() success")
             } else { // failure
-                KTVLogger.e(TAG, "RoomLivingViewModel.deleteSong() failed: $e")
-            }
-            e?.message?.let { error ->
-                CustomToast.show(error, Toast.LENGTH_SHORT)
+                KTVLogger.e(TAG, "RoomLivingViewModel.deleteSong() failed: $error")
+                CustomToast.show(R.string.ktv_remove_song_failed, error.message ?: "")
             }
         }
     }
@@ -726,16 +721,14 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
      *
      * @param songModel the song model
      */
-    fun topUpSong(songModel: ChosenSongInfo) {
-        KTVLogger.d(TAG, "RoomLivingViewModel.topUpSong() called, name:" + songModel.songName)
-        ktvServiceProtocol.pinSong(songModel.songNo) { e: Exception? ->
-            if (e == null) { // success: do nothing for subscriber dealing with the event already
-                KTVLogger.d(TAG, "RoomLivingViewModel.topUpSong() success")
+    fun pinSong(songModel: ChosenSongInfo) {
+        KTVLogger.d(TAG, "RoomLivingViewModel.pinSong() called, name:" + songModel.songName)
+        ktvServiceProtocol.pinSong(songModel.songNo) { error ->
+            if (error == null) { // success: do nothing for subscriber dealing with the event already
+                KTVLogger.d(TAG, "RoomLivingViewModel.pinSong() success")
             } else { // failure
-                KTVLogger.e(TAG, "RoomLivingViewModel.topUpSong() failed: $e")
-            }
-            e?.message?.let { error ->
-                CustomToast.show(error, Toast.LENGTH_SHORT)
+                KTVLogger.e(TAG, "RoomLivingViewModel.pinSong() failed: $error")
+                CustomToast.show(R.string.ktv_pin_song_failed, error.message ?: "")
             }
         }
     }
@@ -866,16 +859,14 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
         }
         //ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, "", null);
         playerMusicStatusLiveData.value = PlayerMusicStatus.ON_CHANGING_START
-        ktvServiceProtocol.removeSong(musicModel.songNo) { e: Exception? ->
-            if (e == null) { // success do nothing for dealing in song subscriber
+        ktvServiceProtocol.removeSong(musicModel.songNo) { error ->
+            if (error == null) { // success do nothing for dealing in song subscriber
                 KTVLogger.d(TAG, "RoomLivingViewModel.changeMusic() success")
             } else { // failed
-                KTVLogger.e(TAG, "RoomLivingViewModel.changeMusic() failed: " + e.message)
+                KTVLogger.e(TAG, "RoomLivingViewModel.changeMusic() failed: " + error.message)
+                CustomToast.show(R.string.ktv_change_song_failed, error.message ?: "")
             }
             playerMusicStatusLiveData.value = PlayerMusicStatus.ON_CHANGING_END
-            e?.message?.let { error ->
-                CustomToast.show(error, Toast.LENGTH_SHORT)
-            }
         }
     }
 

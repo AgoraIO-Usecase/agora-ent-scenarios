@@ -224,4 +224,15 @@
     <string name="ktv_earphone_close_tip">耳返已关闭，请插入耳机重新开启</string>
     <string name="ktv_loading_music">%1s歌曲准备中…</string>
     <string name="ktv_join_chorus_seat_full">没有空麦位，等等再唱吧</string>
+
+    <string name="ktv_create_room_failed">创建房间失败，错误：%1s</string>
+    <string name="ktv_join_room_failed">加入房间失败，错误：%1s</string>
+    <string name="ktv_enter_seat_failed">上麦失败，错误：%1s</string>
+    <string name="ktv_leave_seat_failed">下麦失败，错误：%1s</string>
+    <string name="ktv_kick_seat_failed">踢人下麦失败，错误：%1s</string>
+    <string name="ktv_get_songs_failed">拉取歌单失败，错误：%1s</string>
+    <string name="ktv_choose_song_failed">点歌失败，错误：%1s</string>
+    <string name="ktv_remove_song_failed">删除歌曲失败，错误：%1s</string>
+    <string name="ktv_pin_song_failed">置顶歌曲失败，错误：%1s</string>
+    <string name="ktv_change_song_failed">切歌失败，错误：%1s</string>
 </resources>

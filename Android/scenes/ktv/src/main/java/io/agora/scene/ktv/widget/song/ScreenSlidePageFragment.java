@@ -125,8 +125,9 @@ public class ScreenSlidePageFragment extends Fragment {
         int itemCount = mRankListAdapter.getItemCount();
         for (int i = 0; i < itemCount; i++) {
             SongItem item = mRankListAdapter.getItem(i);
-            if (item.songNo.equals(songItem.songNo)) {
+            if (item!=null && item.songNo.equals(songItem.songNo)) {
                 item.isChosen = isChosen;
+                item.loading = songItem.loading;
                 mRankListAdapter.notifyItemChanged(i);
                 break;
             }

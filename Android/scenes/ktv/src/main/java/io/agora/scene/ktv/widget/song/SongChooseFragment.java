@@ -214,8 +214,9 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
             int searchCount = mSearchAdapter.getItemCount();
             for (int i = 0; i < searchCount; i++) {
                 SongItem item = mSearchAdapter.getItem(i);
-                if (item.songNo.equals(songItem.songNo)) {
+                if (item!=null && item.songNo.equals(songItem.songNo)) {
                     item.isChosen = isChosen;
+                    item.loading = songItem.loading;
                     mSearchAdapter.notifyItemChanged(i);
                     break;
                 }
