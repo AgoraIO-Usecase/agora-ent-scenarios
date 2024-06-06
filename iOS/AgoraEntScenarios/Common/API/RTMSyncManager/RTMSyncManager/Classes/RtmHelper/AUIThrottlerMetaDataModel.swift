@@ -27,11 +27,11 @@ class AUIThrottlerUpdateMetaDataModel: NSObject {
 
 class AUIThrottlerRemoveMetaDataModel: NSObject {
     private(set) lazy var throttler: AUIThrottler = AUIThrottler()
-    private(set) var keys: [String] = []
+    private(set) var keys: Set<String> = Set<String>()
     private(set) var callbacks: [((NSError?) -> ())] = []
     
     func appendMetaDataInfo(keys: [String], completion:@escaping ((NSError?) -> ())) {
-        self.keys += keys
+        self.keys.union(keys)
         callbacks.append(completion)
     }
     

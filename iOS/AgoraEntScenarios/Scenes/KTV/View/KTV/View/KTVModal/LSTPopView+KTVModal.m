@@ -176,25 +176,6 @@
     return popView;
 }
 
-//弹出人声突出
-+ (LSTPopView*)popVoiceShowViewWithParentView:(UIView*)parentView
-                                         showView:(VLVoiceShowView*)showView
-                                   imgSource:(NSArray *)imgSource
-                                    nameSource:(NSArray *)nameSource
-                                  selectUserNo:(NSString *)selectUserNo
-                                  userNoArray:(NSArray *)userNoArray
-                                 UIUpdateAble:(BOOL)UIUpdateAble
-                                      withDelegate:(id<VLVoiceShowViewDelegate>)delegate {
-    CGFloat popViewH = 88+17+ (imgSource.count > 4 ? 200 : 100)+kSafeAreaBottomHeight;
-    VLVoiceShowView* voiceView = [[VLVoiceShowView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:delegate imgSource:imgSource nameSource:nameSource userNoArray:userNoArray selectUserNo:selectUserNo UIUpdateAble:UIUpdateAble
-                                                                                             ];
-    LSTPopView* popView = [self _createKTVPopContainerWithContentView:voiceView
-                                                       withParentView:parentView];
-    [popView pop];
-    
-    return popView;
-}
-
 //弹出耳返视图
 + (LSTPopView*)popEarSettingViewWithParentView:(UIView*)parentView
                                    isEarOn:(BOOL)isEarOn

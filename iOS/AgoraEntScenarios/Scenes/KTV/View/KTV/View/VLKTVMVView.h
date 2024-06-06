@@ -70,8 +70,6 @@ typedef enum : NSUInteger {
 
 -(void)didLeaveChours;
 
--(void)didShowVoiceChooseView;
-
 @end
 
 @interface VLKTVMVView : UIView
@@ -102,8 +100,6 @@ typedef enum : NSUInteger {
 
 /// 重置分数
 - (void)reset;
-
--(void)setPerViewHidden:(BOOL)isHidden;
 
 -(void)setPerViewAvatar:(NSString *)url;
 

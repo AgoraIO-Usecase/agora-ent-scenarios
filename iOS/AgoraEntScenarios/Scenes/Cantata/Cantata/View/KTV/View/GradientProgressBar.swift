@@ -35,7 +35,7 @@ class GradientProgressBar: UIView {
     }
 
     private func updateProgress() {
-        print("pro:\(progress)--\(bounds.width * progress)")
+//        print("pro:\(progress)--\(bounds.width * progress)")
         progressView.frame = CGRect(x: 0, y: 0, width: bounds.width * progress, height: bounds.height)
         gradientLayer.frame = CGRect(x: 0, y: 0, width: bounds.width * progress, height: bounds.height)
     }

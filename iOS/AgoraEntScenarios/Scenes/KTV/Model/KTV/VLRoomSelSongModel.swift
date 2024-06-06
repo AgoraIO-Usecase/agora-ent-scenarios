@@ -29,15 +29,4 @@ class VLRoomSelSongModel: VLBaseModel {
     
     /// 0 未开始 1.已唱 2.正在唱 3. match完毕
     @objc var status: VLSongPlayStatus = .idle
-    
-    @objc func isSongOwner() -> Bool {
-        if VLUserCenter.user.id == self.owner?.userId {
-            return true
-        }
-        return false
-    }
-
-    @objc func chorusSongId() -> String {
-        return "\(self.songNo ?? "")\(self.createAt)"
-    }
 }
