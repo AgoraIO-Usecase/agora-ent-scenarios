@@ -1502,7 +1502,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)reloadMusic{
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    KTVSingRole role = [self getUserSingRole];
+//    KTVSingRole role = [self getUserSingRole];
     songConfig.mode = KTVLoadMusicModeLoadLrcOnly;
     songConfig.mainSingerUid = [model.owner.userId integerValue];
     songConfig.songIdentifier = model.songNo;
@@ -2242,8 +2242,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                  status:(AgoraMusicContentCenterPreloadStatus)status
                                     msg:(NSString *)msg
                                lyricUrl:(NSString *)lyricUrl {
-//    KTVLogInfo(@"load: %li, %li", status, percent);
     dispatch_async_on_main_queue(^{
+        VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
+        if (![model.songNo isEqualToString:[NSString stringWithFormat:@"%ld", songCode]]) {
+            KTVLogInfo(@"onMusicLoadProgressWithSongCode break songCode missmatch %@/%ld percent: %ld", model.songNo, songCode, percent);
+            return;
+        }
+        KTVLogInfo(@"onMusicLoadProgressWithSongCode songCode %@/%ld percent: %ld", model.songNo, songCode, percent);
         if(status == AgoraMusicContentCenterPreloadStatusError){
             [VLToast toast:KTVLocalizedString(@"ktv_load_failed_and_change")];
             if(self.loadMusicCallBack) {
@@ -2272,7 +2277,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         KTVLogError(@"onMusicLoadFail songCode: %ld reason: %ld", songCode, reason);
         VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
         if (![model.songNo isEqualToString:[NSString stringWithFormat:@"%ld", songCode]]) {
-            KTVLogInfo(@"onMusicLoadFail break songCode missmatch");
+            KTVLogInfo(@"onMusicLoadFail break songCode missmatch %@/%ld", model.songNo, songCode);
             return;
         }
         if(self.loadMusicCallBack) {
@@ -2291,10 +2296,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)onMusicLoadSuccessWithSongCode:(NSInteger)songCode lyricUrl:(NSString * _Nonnull)lyricUrl {
     dispatch_async_on_main_queue(^{
-        KTVLogError(@"onMusicLoadSuccess songCode: %ld", songCode);
+        KTVLogInfo(@"onMusicLoadSuccess songCode: %ld, lyricUrl: %@", songCode, lyricUrl);
         VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
         if (![model.songNo isEqualToString:[NSString stringWithFormat:@"%ld", songCode]]) {
-            KTVLogInfo(@"onMusicLoadSuccess break songCode missmatch");
+            KTVLogInfo(@"onMusicLoadSuccess break songCode missmatch %@/%ld", model.songNo, songCode);
             return;
         }
         if(self.loadMusicCallBack){
@@ -2307,7 +2312,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         
         self.MVView.loadingProgress = 100;
         if(lyricUrl.length > 0){
-            KTVLogInfo(@"onMusicLoadSuccessWithSongCode: %ld", self.singRole);
+            KTVLogInfo(@"onMusicLoadSuccessWithSongCode: %ld role:%ld", songCode, self.singRole);
         }
         self.retryCount = 0;
     });
@@ -2482,6 +2487,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     NSString* origTopSongNo = NullToString(self.selSongsArray.firstObject.songNo);
     NSString* currentTopSongNo = NullToString(songs.firstObject.songNo);
     if (![origTopSongNo isEqualToString:currentTopSongNo]) {
+        KTVLogInfo(@"clean old song: %@", origTopSongNo);
+        [self.ktvApi removeMusicWithSongCode:[origTopSongNo integerValue]];
         [self stopPlaySong];
         self.coSingerDegree = 0;
         [LSTPopView removeAllPopView];
