@@ -45,5 +45,11 @@ abstract class SongChooseViewAdapter extends BindingSingleAdapter<SongItem, KtvI
         }
     }
 
+    /**
+     * On song chosen.
+     *
+     * @param song     the song
+     * @param position the position
+     */
     abstract void onSongChosen(SongItem song, int position);
 }

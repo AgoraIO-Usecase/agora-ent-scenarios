@@ -1,4 +1,4 @@
-package io.agora.scene.show.service
+package io.agora.scene.show.service.cloudplayer
 
 import android.os.CountDownTimer
 import android.util.Base64

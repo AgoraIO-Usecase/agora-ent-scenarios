@@ -4,6 +4,7 @@ import android.graphics.Matrix;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 
+import io.agora.base.internal.video.EglBase;
 import io.agora.base.internal.video.GlRectDrawer;
 import io.agora.base.internal.video.RendererCommon;
 
@@ -112,12 +113,15 @@ public class GLFrameBuffer {
         transform.preTranslate(-0.5f, -0.5f);
         float[] matrix = RendererCommon.convertMatrixFromAndroidGraphicsMatrix(transform);
 
-        if(textureType == GLES11Ext.GL_TEXTURE_EXTERNAL_OES){
-            drawer.drawOes(textureId, 0, matrix, mWidth, mHeight, 0, 0, mWidth, mHeight);
-        }else{
-            drawer.drawRgb(textureId, 0, matrix, mWidth, mHeight, 0, 0, mWidth, mHeight);
+        synchronized (EglBase.lock){
+            if(textureType == GLES11Ext.GL_TEXTURE_EXTERNAL_OES){
+                drawer.drawOes(textureId, 0, matrix, mWidth, mHeight, 0, 0, mWidth, mHeight);
+            }else{
+                drawer.drawRgb(textureId, 0, matrix, mWidth, mHeight, 0, 0, mWidth, mHeight);
+            }
         }
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, GLES20.GL_NONE);
         GLES20.glFinish();
 
         return mTextureId;
@@ -197,4 +201,7 @@ public class GLFrameBuffer {
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, GLES20.GL_NONE);
     }
 
+    public void resetTexture() {
+        deleteTexture();
+    }
 }

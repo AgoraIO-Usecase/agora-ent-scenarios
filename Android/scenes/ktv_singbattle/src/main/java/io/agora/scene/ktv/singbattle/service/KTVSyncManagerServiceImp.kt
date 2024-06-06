@@ -27,7 +27,7 @@ class KTVSyncManagerServiceImp(
     private val TAG = "KTV_Service_LOG"
     companion object{
         @JvmField
-        val kSceneId = "scene_singbattle_4.3.0"
+        val kSceneId = "scene_singbattle_5.0.0"
     }
     private val kCollectionIdChooseSong = "choose_song"
     private val kCollectionIdSeatInfo = "seat_info"

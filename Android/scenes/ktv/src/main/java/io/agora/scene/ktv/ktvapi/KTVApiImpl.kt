@@ -6,6 +6,8 @@ import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.IMediaPlayerObserver
+import io.agora.mediaplayer.data.CacheStatistics
+import io.agora.mediaplayer.data.PlayerPlaybackStats
 import io.agora.mediaplayer.data.PlayerUpdatedInfo
 import io.agora.mediaplayer.data.SrcInfo
 import io.agora.musiccontentcenter.*
@@ -22,7 +24,7 @@ class KTVApiImpl(
     companion object {
         private val scheduledThreadPool: ScheduledExecutorService = Executors.newScheduledThreadPool(5)
         const val tag = "KTV_API_LOG"
-        const val version = "4.3.0"
+        const val version = "5.0.0"
         const val lyricSyncVersion = 2
     }
 
@@ -249,6 +251,15 @@ class KTVApiImpl(
         //mRtcEngine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
     }
 
+    private fun resetParameters() {
+        mRtcEngine.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING)
+        mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 80000}")     // 兼容之前的profile = 3设置
+        mRtcEngine.setParameters("{\"che.audio.max_mixed_participants\": 3}") // 正常3路下行流混流
+        mRtcEngine.setParameters("{\"che.audio.neteq.prebuffer\": false}")    // 关闭 接收端快速对齐模式
+        mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp\": false}") // 观众关闭 多端同步
+        mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\": false}") //主播关闭多端同步
+    }
+
     override fun addEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {
         apiReporter.reportFuncEvent("addEventHandler", mapOf("ktvApiEventHandler" to ktvApiEventHandler), mapOf())
         ktvApiEventHandlerList.add(ktvApiEventHandler)
@@ -265,6 +276,7 @@ class KTVApiImpl(
         isRelease = true
         singerRole = KTVSingRole.Audience
 
+        resetParameters()
         stopSyncPitch()
         stopDisplayLrc()
         this.mLastReceivedPlayPosTime = null
@@ -335,21 +347,16 @@ class KTVApiImpl(
     override fun enableMulitpathing(enable: Boolean) {
         apiReporter.reportFuncEvent("enableMulitpathing", mapOf("enable" to enable), mapOf())
         this.enableMultipathing = enable
-//        mRtcEngine.setParameters("{\"rtc.enableMultipath\": $enable}")
-//        if (enable) {
-//            mRtcEngine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
-//            mRtcEngine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
-//            mRtcEngine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
-//        }
 
-        if (singerRole == KTVSingRole.LeadSinger || singerRole == KTVSingRole.CoSinger) {
-            subChorusConnection?.let {
-                mRtcEngine.updateChannelMediaOptionsEx(ChannelMediaOptions().apply {
-                    parameters =
-                        "{\"rtc.enableMultipath\": $enable, \"rtc.path_scheduling_strategy\": 0, \"rtc.remote_path_scheduling_strategy\": 0}"
-                }, subChorusConnection)
-            }
-        }
+        // TODO 4.3.1 not ready
+//        if (singerRole == KTVSingRole.LeadSinger || singerRole == KTVSingRole.CoSinger) {
+//            subChorusConnection?.let {
+//                mRtcEngine.updateChannelMediaOptionsEx(ChannelMediaOptions().apply {
+//                    parameters =
+//                        "{\"rtc.enableMultipath\": $enable, \"rtc.path_scheduling_strategy\": 0, \"rtc.remote_path_scheduling_strategy\": 0}"
+//                }, subChorusConnection)
+//            }
+//        }
     }
 
     override fun switchAudioTrack(mode: AudioTrackMode) {
@@ -804,6 +811,12 @@ class KTVApiImpl(
         if (ktvApiConfig.type != KTVType.SingRelay) {
             if (this.singerRole == KTVSingRole.SoloSinger || this.singerRole == KTVSingRole.LeadSinger) {
                 mRtcEngine.adjustRecordingSignalVolume(if (isOnMicOpen) 100 else 0)
+
+                val channelMediaOption = ChannelMediaOptions()
+                channelMediaOption.publishMicrophoneTrack = isOnMicOpen
+                channelMediaOption.clientRoleType = CLIENT_ROLE_BROADCASTER
+                mRtcEngine.updateChannelMediaOptions(channelMediaOption)
+                mRtcEngine.muteLocalAudioStream(!isOnMicOpen)
             } else {
                 val channelMediaOption = ChannelMediaOptions()
                 channelMediaOption.publishMicrophoneTrack = isOnMicOpen
@@ -955,12 +968,12 @@ class KTVApiImpl(
 
     private fun syncPlayState(
         state: MediaPlayerState,
-        error: Constants.MediaPlayerError
+        reason: Constants.MediaPlayerReason
     ) {
         val msg: MutableMap<String?, Any?> = HashMap()
         msg["cmd"] = "PlayerState"
         msg["state"] = MediaPlayerState.getValue(state)
-        msg["error"] = Constants.MediaPlayerError.getValue(error)
+        msg["error"] = Constants.MediaPlayerReason.getValue(reason)
         val jsonMsg = JSONObject(msg)
         sendStreamMessageWithJsonObject(jsonMsg) {}
     }
@@ -1004,10 +1017,11 @@ class KTVApiImpl(
         channelMediaOption.enableAudioRecordingOrPlayout =
             newRole != KTVSingRole.LeadSinger
         channelMediaOption.clientRoleType = CLIENT_ROLE_BROADCASTER
-        if (enableMultipathing) {
-            channelMediaOption.parameters =
-                "{\"rtc.path_scheduling_strategy\":0, \"rtc.enableMultipath\": true, \"rtc.remote_path_scheduling_strategy\": 0}"
-        }
+        // TODO 4.3.1 not ready
+//        if (enableMultipathing) {
+//            channelMediaOption.parameters =
+//                "{\"rtc.path_scheduling_strategy\":0, \"rtc.enableMultipath\": true, \"rtc.remote_path_scheduling_strategy\": 0}"
+//        }
 
         val rtcConnection = RtcConnection()
         rtcConnection.channelId = ktvApiConfig.chorusChannelName
@@ -1343,7 +1357,7 @@ class KTVApiImpl(
                 ktvApiEventHandlerList.forEach {
                     it.onMusicPlayerStateChanged(
                         MediaPlayerState.getStateByValue(state),
-                        Constants.MediaPlayerError.getErrorByValue(error),
+                        Constants.MediaPlayerReason.getErrorByValue(error),
                         false
                     )
                 }
@@ -1525,10 +1539,10 @@ class KTVApiImpl(
     private var duration: Long = 0
     override fun onPlayerStateChanged(
         state: MediaPlayerState?,
-        error: Constants.MediaPlayerError?
+        reason: Constants.MediaPlayerReason?
     ) {
         val mediaPlayerState = state ?: return
-        val mediaPlayerError = error ?: return
+        val mediaPlayerError = reason ?: return
         ktvApiLog("onPlayerStateChanged: $state")
         this.mediaPlayerState = mediaPlayerState
         when (mediaPlayerState) {
@@ -1614,6 +1628,10 @@ class KTVApiImpl(
     override fun onPlayerSrcInfoChanged(from: SrcInfo?, to: SrcInfo?) {}
 
     override fun onPlayerInfoUpdated(info: PlayerUpdatedInfo?) {}
+
+    override fun onPlayerCacheStats(stats: CacheStatistics?) {}
+
+    override fun onPlayerPlaybackStats(stats: PlayerPlaybackStats?) {}
 
     override fun onAudioVolumeIndication(volume: Int) {}
 }
