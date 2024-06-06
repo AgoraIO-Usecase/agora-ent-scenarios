@@ -44,11 +44,16 @@ private let kAUIRtmMsgProxyKey = "AUIRtmMsgProxy"
     func onMessageReceive(publisher: String, channelName: String, message: String)
 }
 
+@objc public enum AUIRtmUserLeaveReason: Int {
+    case normal = 0
+    case timeout = 1
+}
+
 @objc public protocol AUIRtmUserProxyDelegate: NSObjectProtocol {
     func onCurrentUserJoined(channelName: String)
     func onUserSnapshotRecv(channelName: String, userId:String, userList: [[String: Any]])
     func onUserDidJoined(channelName: String, userId:String, userInfo: [String: Any])
-    func onUserDidLeaved(channelName: String, userId:String, userInfo: [String: Any])
+    func onUserDidLeaved(channelName: String, userId:String, userInfo: [String: Any], reason: AUIRtmUserLeaveReason)
     func onUserDidUpdated(channelName: String, userId:String, userInfo: [String: Any])
 }
 
@@ -325,9 +330,10 @@ extension AUIRtmMsgProxy: AgoraRtmClientDelegate {
                 }
             }
         } else if event.type == .remoteLeaveChannel || event.type == .remoteConnectionTimeout {
+            let reason: AUIRtmUserLeaveReason = event.type == .remoteLeaveChannel ? .normal : .timeout
             if let elements = self.userDelegates[event.channelName] {
                 for element in elements.allObjects {
-                    element.onUserDidLeaved(channelName: event.channelName, userId: userId, userInfo: map)
+                    element.onUserDidLeaved(channelName: event.channelName, userId: userId, userInfo: map, reason: reason)
                 }
             }
         } else if event.type == .remoteStateChanged {

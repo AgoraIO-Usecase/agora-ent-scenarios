@@ -119,7 +119,7 @@ extension Pure1v1ServiceImp: AUIUserRespDelegate {
         self.userList.append(Pure1v1UserInfo(userInfo: userInfo))
     }
     
-    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
+    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
         let userList = self.userList
         self.userList = userList.filter({ $0.userId != userInfo.userId})
     }

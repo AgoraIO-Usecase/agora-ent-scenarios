@@ -415,7 +415,7 @@ extension JoyServiceImpl: AUIUserRespDelegate {
         self.listener?.onUserListDidChanged(userList: self.userList)
     }
     
-    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
+    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
         print("user: leave\(userInfo.userName)")
         let userList = self.userList
         self.userList = userList.filter({ $0.userId != UInt(userInfo.userId)})
