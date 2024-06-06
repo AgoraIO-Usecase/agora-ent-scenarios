@@ -515,6 +515,7 @@ extension KTVSyncManagerServiceImp {
         roomModel.icon = inputModel.icon
         roomModel.creatorName = VLUserCenter.user.name
         roomModel.creatorAvatar = VLUserCenter.user.headUrl
+        roomModel.roomPeopleNum = 2
         
         _showLoadingView()
         self.roomNo = roomModel.roomId
@@ -1005,7 +1006,7 @@ extension KTVSyncManagerServiceImp: AUISceneRespDelegate {
 
 extension KTVSyncManagerServiceImp: AUIUserRespDelegate {
     func onRoomUserSnapshot(roomId: String, userList: [AUIUserInfo]) {
-        updateRoom(with: userList.count) { err in
+        updateRoom(with: userList.count + 1) { err in
         }
     }
     
