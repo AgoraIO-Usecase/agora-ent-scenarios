@@ -16,7 +16,7 @@
 @property(nonatomic, weak) id <VLMicSeatListDelegate>delegate;
 
 @property (nonatomic, strong) UICollectionView *personCollectionView;
-@property (nonatomic, copy) NSString *currentPlayingSongCode;
+//@property (nonatomic, copy) NSString *currentPlayingSongCode;
 @end
 
 @implementation VLMicSeatList
@@ -59,10 +59,12 @@
 }
 
 - (void)reloadSeatIndex: (NSUInteger)seatIndex {
+    KTVLogInfo(@"[MicSeatListView]reloadSeatIndex: %ld", seatIndex);
     [self.personCollectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:seatIndex inSection:0]]];
 }
 
 - (void)reloadData {
+    KTVLogInfo(@"[MicSeatListView]reloadData");
     [self.personCollectionView reloadData];
 }
 
@@ -106,7 +108,7 @@
         cell.volume = 0;
     }
     
-    cell.singingBtn.hidden = ![AppContext isKtvSongOwnerWithSeat:seatModel];
+    cell.singingBtn.hidden = ![AppContext isKtvPlayingSongOwnerWithSeat:seatModel];
     if (seatModel.isAudioMuted) {
         cell.muteImgView.hidden = NO;
         cell.volume = 0;
@@ -171,14 +173,14 @@
 
 - (void)updateSingBtnWithChoosedSongArray:(NSArray *)choosedSongArray {
     NSMutableSet* changeSet = [NSMutableSet set];
-    if(choosedSongArray.count == 0){
-        self.currentPlayingSongCode = @"0";
-    }
+//    if(choosedSongArray.count == 0){
+//        self.currentPlayingSongCode = @"0";
+//    }
     if (choosedSongArray.count > 0) {
-        VLRoomSelSongModel *songModel = choosedSongArray.firstObject;
-        self.currentPlayingSongCode = songModel.chorusSongId;
+//        VLRoomSelSongModel *songModel = choosedSongArray.firstObject;
+//        self.currentPlayingSongCode = songModel.chorusSongId;
         for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
-            BOOL isSongOwner = [AppContext isKtvSongOwnerWithSeat:seatModel];
+            BOOL isSongOwner = [AppContext isKtvPlayingSongOwnerWithSeat:seatModel];
             if (isSongOwner != seatModel.isSongOwner) {
                 seatModel.isSongOwner = isSongOwner;
                 [changeSet addObject:@(seatModel.seatIndex)];
@@ -194,7 +196,7 @@
                 [changeSet addObject:@(seatModel.seatIndex)];
             }
 //            }
-            NSLog(@"seat: %@--%li", songModel.chorusSongId, seatModel.seatIndex);
+            KTVLogInfo(@"update seat index: %ld", seatModel.seatIndex);
             
         }
     } else{

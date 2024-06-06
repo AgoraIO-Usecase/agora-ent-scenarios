@@ -310,6 +310,7 @@ private let SYNC_MANAGER_CHORUS_INFO = "chorister_info"
                 return KTVCommonError.unknown.toNSError()
             }
             
+            
             let userId = getUserId(updateMap) ?? ""
             switch dataCmd {
             case .pinSongCmd:
@@ -320,6 +321,12 @@ private let SYNC_MANAGER_CHORUS_INFO = "chorister_info"
                 }
                 return nil
             case .updatePlayStatusCmd:
+                guard let songValues = self.getSongCollection(with: roomNo)?.getLocalMetaData()?.getList(),
+                      let topSongNo = songValues.first?["songNo"] as? String,
+                      let updateSongNo = currentMap["songNo"] as? String,
+                      topSongNo == updateSongNo else {
+                    return KTVCommonError.currentSongNotFirst.toNSError()
+                }
                 //only song owner can update status
                 guard seatValues.contains(where: { getUserId($0) == userId }) else {
                     return KTVCommonError.noPermission.toNSError()
@@ -646,8 +653,7 @@ extension KTVSyncManagerServiceImp {
         let seatInfo = _createCurrentUserSeat(seatIndex: seatIdx)
         
         agoraPrint("enterSeat \(seatIdx)")
-        var params = mapConvert(model: seatInfo)
-        params["seatIndex"] = nil
+        var params = seatMapConvert(model: seatInfo)
         let collection = getSeatCollection(with: roomNo)
         collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.enterSeatCmd.rawValue,
                                   value: ["\(seatIdx)": params],
@@ -665,8 +671,7 @@ extension KTVSyncManagerServiceImp {
         let collection = getSeatCollection(with: roomNo)
         let model = VLRoomSeatModel()
         model.seatIndex = seatInfo.seatIndex
-        var params = mapConvert(model: model)
-        params["seatIndex"] = nil
+        var params = seatMapConvert(model: model)
         collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.leaveSeatCmd.rawValue,
                                   value: ["\(seatInfo.seatIndex)": params],
                                   callback: completion)
@@ -682,8 +687,7 @@ extension KTVSyncManagerServiceImp {
         let collection = getSeatCollection(with: roomNo)
         let model = VLRoomSeatModel()
         model.seatIndex = seatIndex
-        var params = mapConvert(model: model)
-        params["seatIndex"] = nil
+        var params = seatMapConvert(model: model)
         collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.kickSeatCmd.rawValue,
                                   value: ["\(seatIndex)": params],
                                   callback: completion)
@@ -698,7 +702,7 @@ extension KTVSyncManagerServiceImp {
             return
         }
         
-        let params = ["\(seatInfo.seatIndex)": ["isAudioMuted": muted ? 1 : 0]]
+        let params = ["\(seatInfo.seatIndex)": ["isAudioMuted": muted]]
         let collection = getSeatCollection(with: roomNo ?? "")
         collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.muteAudioCmd.rawValue, value: params, callback: completion)
     }
@@ -712,7 +716,7 @@ extension KTVSyncManagerServiceImp {
             return
         }
         
-        let params = ["\(seatInfo.seatIndex)": ["isVideoMuted": muted ? 1 : 0]]
+        let params = ["\(seatInfo.seatIndex)": ["isVideoMuted": muted]]
         let collection = getSeatCollection(with: roomNo ?? "")
         collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.muteVideoCmd.rawValue, value: params, callback: completion)
     }
@@ -980,7 +984,7 @@ extension KTVSyncManagerServiceImp: AUIUserRespDelegate {
         KTVLog.info(text: "user: enter\(userInfo.userName)")
         let userCount = getCurrentScene(with: roomId)?.userService.userList.count ?? 0
 //        self.userDidChanged?(.created, user)
-        self.delegate?.onUserCountUpdate(userCount: UInt(userCount))
+        self.delegate?.onUserCountUpdate(userCount: UInt(userCount + 1))
         if roomService.isRoomOwner(roomId: roomId) {
             self.updateRoom(with: userCount) { err in
             }
@@ -991,7 +995,7 @@ extension KTVSyncManagerServiceImp: AUIUserRespDelegate {
         KTVLog.info(text: "user: leave\(userInfo.userName)")
 //        self.userDidChanged?(.deleted, user)
         let userCount = getCurrentScene(with: roomId)?.userService.userList.count ?? 0
-        self.delegate?.onUserCountUpdate(userCount: UInt(userCount))
+        self.delegate?.onUserCountUpdate(userCount: UInt(userCount + 1))
         if roomService.isRoomOwner(roomId: roomId) {
             self.updateRoom(with: userCount) { err in
             }
@@ -1010,7 +1014,7 @@ extension KTVSyncManagerServiceImp: AUIUserRespDelegate {
         KTVLog.info(text: "user: update\(userInfo.userName)")
 //        self.userDidChanged?(.updated, user)
         let userCount = getCurrentScene(with: roomId)?.userService.userList.count ?? 0
-        self.delegate?.onUserCountUpdate(userCount: UInt(userCount))
+        self.delegate?.onUserCountUpdate(userCount: UInt(userCount + 1))
     }
   
     func onUserAudioMute(userId: String, mute: Bool) {
@@ -1198,5 +1202,13 @@ private func _hideLoadingView() {
 
 private func mapConvert(model: NSObject) ->[String: Any] {
     let params = model.yy_modelToJSONObject() as! [String: Any]
+    return params
+}
+
+private func seatMapConvert(model: VLRoomSeatModel) ->[String: Any] {
+    var params = model.yy_modelToJSONObject() as! [String: Any]
+    params["seatIndex"] = nil
+    params["isAudioMuted"] = model.isAudioMuted
+    params["isVideoMuted"] = model.isVideoMuted
     return params
 }
