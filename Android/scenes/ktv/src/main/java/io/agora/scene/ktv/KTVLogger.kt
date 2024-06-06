@@ -21,4 +21,13 @@ object KTVLogger {
         entLogger.e(tag, message, args)
     }
 
+    @JvmStatic
+    fun e(tag: String, throwable: Throwable? = null, message: String = "") {
+        if (throwable != null) {
+            entLogger.e(tag, throwable, message)
+        } else {
+            entLogger.e(tag, message)
+        }
+    }
+
 }

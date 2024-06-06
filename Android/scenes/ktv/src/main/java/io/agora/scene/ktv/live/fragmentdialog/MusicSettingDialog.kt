@@ -16,7 +16,6 @@ import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.base.component.BaseRecyclerViewAdapter.BaseViewHolder
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.component.OnItemClickListener
-import io.agora.scene.base.utils.dp
 import io.agora.scene.ktv.R
 import io.agora.scene.ktv.databinding.KtvDialogMusicSettingBinding
 import io.agora.scene.ktv.databinding.KtvItemEffectvoiceBinding
@@ -27,16 +26,26 @@ import io.agora.scene.ktv.live.bean.EffectVoiceBean
 import io.agora.scene.ktv.live.bean.MusicSettingBean
 import io.agora.scene.ktv.live.bean.ScoringDifficultyMode
 import io.agora.scene.ktv.live.bean.SoundCardSettingBean
-import io.agora.scene.ktv.service.RoomSelSongModel
-import io.agora.scene.widget.doOnProgressChanged
+import io.agora.scene.ktv.service.ChosenSongInfo
 import io.agora.scene.widget.toast.CustomToast
+import io.agora.scene.base.utils.dp
+import io.agora.scene.widget.doOnProgressChanged
 
 
+/**
+ * Music setting dialog
+ *
+ * @property mSetting
+ * @property mSoundCardSetting
+ * @property isListener
+ * @property currentSong
+ * @constructor Create empty Music setting dialog
+ */
 class MusicSettingDialog constructor(
     private var mSetting: MusicSettingBean,
     private var mSoundCardSetting: SoundCardSettingBean,
     private var isListener: Boolean, // 是否是观众
-    private var currentSong: RoomSelSongModel?, // 当前歌曲
+    private var currentSong: ChosenSongInfo?, // 当前歌曲
 ) :
     BaseBottomSheetDialogFragment<KtvDialogMusicSettingBinding>() {
 
@@ -214,7 +223,7 @@ class MusicSettingDialog constructor(
         // 降低背景噪音
         when (mSetting.mAinsMode) {
             AINSMode.Medium -> mBinding.rgAINSMode.check(R.id.tvAINSMiddle)
-            AINSMode.High -> mBinding.rgAINSMode.check(R.id.tvAINSMiddle)
+            AINSMode.High -> mBinding.rgAINSMode.check(R.id.tvAINSHigh)
             else -> mBinding.rgAINSMode.check(R.id.tvAINSClose)
         }
         mBinding.rgAINSMode.setOnCheckedChangeListener { group, checkedId ->
@@ -375,8 +384,8 @@ class MusicSettingDialog constructor(
                         super.onItemClick(data, view, position, viewType)
                         Log.d(TAG, "onItemClick audio effect  $position")
                         mVoiceEffectAdapter?.apply {
-                            for (i in dataList.indices) {
-                                dataList[i].isSelect = i == position
+                            for (i in list.indices) {
+                                list[i].isSelect = i == position
                                 notifyItemChanged(i)
                             }
                             mSetting.mAudioEffect = data.audioEffect
@@ -412,6 +421,13 @@ class MusicSettingDialog constructor(
 }
 
 
+/**
+ * Effect voice holder
+ *
+ * @constructor
+ *
+ * @param mBinding
+ */
 class EffectVoiceHolder constructor(mBinding: KtvItemEffectvoiceBinding) :
     BaseViewHolder<KtvItemEffectvoiceBinding, EffectVoiceBean>(mBinding) {
     override fun binding(data: EffectVoiceBean?, selectedIndex: Int) {
@@ -422,79 +438,114 @@ class EffectVoiceHolder constructor(mBinding: KtvItemEffectvoiceBinding) :
     }
 }
 
+/**
+ * Music setting callback
+ *
+ * @constructor Create empty Music setting callback
+ */
 interface MusicSettingCallback {
     /**
-     * 耳返开关
+     * On ear changed
+     *
+     * @param isEar
      */
     fun onEarChanged(isEar: Boolean)
 
     /**
-     * 耳返音量
+     * On ear back volume changed
+     *
+     * @param volume
      */
     fun onEarBackVolumeChanged(volume: Int)
 
     /**
-     * 耳返模式
+     * On ear back mode changed
+     *
+     * @param mode
      */
     fun onEarBackModeChanged(mode: Int)
 
     /**
-     * 人声音量
+     * On mic vol changed
+     *
+     * @param vol
      */
     fun onMicVolChanged(vol: Int)
 
     /**
-     * 伴奏音量
+     * On acc vol changed
+     *
+     * @param vol
      */
     fun onAccVolChanged(vol: Int)
 
     /**
-     * 远端音量
+     * On remote vol changed
+     *
+     * @param volume
      */
     fun onRemoteVolChanged(volume: Int)
 
     /**
-     * 音效
+     * On audio effect changed
+     *
+     * @param audioEffect
      */
     fun onAudioEffectChanged(audioEffect: Int)
 
     /**
-     * 打分难度
+     * On scoring difficulty changed
+     *
+     * @param difficulty
      */
     fun onScoringDifficultyChanged(difficulty: Int)
 
     /**
-     * 专业模式
+     * On professional mode changed
+     *
+     * @param enable
      */
     fun onProfessionalModeChanged(enable: Boolean)
 
     /**
-     * MultiPath 开关
+     * On multi path changed
+     *
+     * @param enable
      */
     fun onMultiPathChanged(enable: Boolean)
 
     /**
-     * 音质
+     * On a e c level changed
+     *
+     * @param level
      */
     fun onAECLevelChanged(level: Int)
 
     /**
-     * 低延迟模式
+     * On low latency mode changed
+     *
+     * @param enable
      */
     fun onLowLatencyModeChanged(enable: Boolean)
 
     /**
-     * 降低背景噪音
+     * On a i n s mode changed
+     *
+     * @param mode
      */
     fun onAINSModeChanged(mode: Int)
 
     /**
-     * AIAEC 开关
+     * On a i a e c changed
+     *
+     * @param enable
      */
     fun onAIAECChanged(enable: Boolean)
 
     /**
-     * AIAEC 强度
+     * On a i a e c strength select
+     *
+     * @param strength
      */
     fun onAIAECStrengthSelect(strength: Int)
 }

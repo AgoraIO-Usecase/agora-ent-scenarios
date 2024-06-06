@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/voice_bg_rect_top_radius20_white"
+    tools:theme="@style/Theme.AppCompat">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/voice_bg_rect_top_radius20_gradient_white"
+        app:layout_constraintBottom_toBottomOf="@+id/mtBottomSheetTitle"
+        app:layout_constraintTop_toTopOf="@+id/ivBottomSheetTitle" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBottomSheetTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:src="@drawable/voice_icon_room_rectangle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtBottomSheetTitle"
+        style="@style/voice_bottom_sheet_title_style"
+        android:text="Dump数据类型"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="60dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="20dp"
+            android:paddingHorizontal="20dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/mtAPM"
+                    android:layout_weight="1"
+                    style="@style/voice_bottom_sheet_text_style"
+                    android:text="APM全链路音频"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/accbAPM"
+                    style="@style/voice_bottom_sheet_checkbox"
+                    android:layout_width="45dp"
+                    android:layout_height="28dp"
+                    android:layout_marginEnd="0dp"
+                    android:checked="true"
+                    app:layout_constraintBottom_toBottomOf="@+id/mtAPM"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/mtAPM" />
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/voice_bottom_sheet_divider_style" />
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+                
+                <TextView
+                    android:id="@+id/tvNsEnable"
+                    style="@style/voice_12sp_text_style"
+                    android:layout_weight="1"
+                    android:text="che.audio.sf.nsEnable"/>
+
+                <EditText
+                    android:id="@+id/etNsEnable"
+                    android:layout_width="60dp"
+                    android:text="0"
+                    android:inputType="number"
+                    style="@style/voice_12sp_number_edittext_style" />
+
+                <TextView
+                    android:id="@+id/tvSettingNsEnable"
+                    style="@style/voice_12sp_blue_text_style"
+                    android:text="@string/comm_setting" />
+            </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/voice_bottom_sheet_divider_style" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvAinsToLoadFlag"
+                    style="@style/voice_12sp_text_style"
+                    android:layout_weight="1"
+                    android:text="che.audio.sf.ainsToLoadFlag"/>
+
+                <EditText
+                    android:id="@+id/etAinsToLoadFlag"
+                    android:layout_width="60dp"
+                    android:text="0"
+                    android:inputType="number"
+                    style="@style/voice_12sp_number_edittext_style" />
+
+                <TextView
+                    android:id="@+id/tvSettingAinsToLoadFlag"
+                    style="@style/voice_12sp_blue_text_style"
+                    android:text="@string/comm_setting" />
+            </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/voice_bottom_sheet_divider_style" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvNsngAlgRoute"
+                    style="@style/voice_12sp_text_style"
+                    android:layout_weight="1"
+                    android:text="che.audio.sf.nsngAlgRoute"/>
+
+                <EditText
+                    android:id="@+id/etNsngAlgRoute"
+                    android:layout_width="60dp"
+                    android:text="10"
+                    android:inputType="number"
+                    style="@style/voice_12sp_number_edittext_style" />
+
+                <TextView
+                    android:id="@+id/tvSettingNsngAlgRoute"
+                    style="@style/voice_12sp_blue_text_style"
+                    android:text="@string/comm_setting" />
+            </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/voice_bottom_sheet_divider_style" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvNsngPredefAgg"
+                    style="@style/voice_12sp_text_style"
+                    android:layout_weight="1"
+                    android:text="che.audio.sf.nsngPredefAgg"/>
+
+                <EditText
+                    android:id="@+id/etNsngPredefAgg"
+                    android:layout_width="60dp"
+                    android:text="11"
+                    android:inputType="number"
+                    style="@style/voice_12sp_number_edittext_style" />
+
+                <TextView
+                    android:id="@+id/tvSettingNsngPredefAgg"
+                    style="@style/voice_12sp_blue_text_style"
+                    android:text="@string/comm_setting" />
+            </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/voice_bottom_sheet_divider_style" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvNsngMapInMaskMin"
+                    style="@style/voice_12sp_text_style"
+                    android:layout_weight="1"
+                    android:text="che.audio.sf.nsngMapInMaskMin"/>
+
+                <EditText
+                    android:id="@+id/etNsngMapInMaskMin"
+                    android:layout_width="60dp"
+                    android:text="80"
+                    android:inputType="number"
+                    style="@style/voice_12sp_number_edittext_style" />
+
+                <TextView
+                    android:id="@+id/tvSettingNsngMapInMaskMin"
+                    style="@style/voice_12sp_blue_text_style"
+                    android:text="@string/comm_setting" />
+            </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/voice_bottom_sheet_divider_style" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvNsngMapOutMaskMin"
+                    style="@style/voice_12sp_text_style"
+                    android:layout_weight="1"
+                    android:text="che.audio.sf.nsngMapOutMaskMin"/>
+
+                <EditText
+                    android:id="@+id/etNsngMapOutMaskMin"
+                    android:layout_width="60dp"
+                    android:text="50"
+                    android:inputType="number"
+                    style="@style/voice_12sp_number_edittext_style" />
+
+                <TextView
+                    android:id="@+id/tvSettingNsngMapOutMaskMin"
+                    style="@style/voice_12sp_blue_text_style"
+                    android:text="@string/comm_setting" />
+            </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/voice_bottom_sheet_divider_style" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvStatNsLowerBound"
+                    style="@style/voice_12sp_text_style"
+                    android:layout_weight="1"
+                    android:text="che.audio.sf.statNsLowerBound"/>
+
+                <EditText
+                    android:id="@+id/etStatNsLowerBound"
+                    android:layout_width="60dp"
+                    android:text="5"
+                    android:inputType="number"
+                    style="@style/voice_12sp_number_edittext_style" />
+
+                <TextView
+                    android:id="@+id/tvSettingStatNsLowerBound"
+                    style="@style/voice_12sp_blue_text_style"
+                    android:text="@string/comm_setting" />
+            </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/voice_bottom_sheet_divider_style" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvNsngFinalMaskLowerBound"
+                    style="@style/voice_12sp_text_style"
+                    android:layout_weight="1"
+                    android:text="che.audio.sf.nsngFinalMaskLowerBound"/>
+
+                <EditText
+                    android:id="@+id/etNsngFinalMaskLowerBound"
+                    android:layout_width="60dp"
+                    android:text="30"
+                    android:inputType="number"
+                    style="@style/voice_12sp_number_edittext_style" />
+
+                <TextView
+                    android:id="@+id/tvSettingNsngFinalMaskLowerBound"
+                    style="@style/voice_12sp_blue_text_style"
+                    android:text="@string/comm_setting" />
+            </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/voice_bottom_sheet_divider_style" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvStatNsEnhFactor"
+                    style="@style/voice_12sp_text_style"
+                    android:layout_weight="1"
+                    android:text="che.audio.sf.statNsEnhFactor"/>
+
+                <EditText
+                    android:id="@+id/etStatNsEnhFactor"
+                    android:layout_width="60dp"
+                    android:text="200"
+                    android:inputType="number"
+                    style="@style/voice_12sp_number_edittext_style" />
+
+                <TextView
+                    android:id="@+id/tvSettingStatNsEnhFactor"
+                    style="@style/voice_12sp_blue_text_style"
+                    android:text="@string/comm_setting" />
+            </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/voice_bottom_sheet_divider_style" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvStatNsFastNsSpeechTrigThreshold"
+                    style="@style/voice_12sp_text_style"
+                    android:layout_weight="1"
+                    android:text="che.audio.sf.statNsFastNsSpeechTrigThreshold"/>
+
+                <EditText
+                    android:id="@+id/etStatNsFastNsSpeechTrigThreshold"
+                    android:layout_width="60dp"
+                    android:text="0"
+                    android:inputType="number"
+                    style="@style/voice_12sp_number_edittext_style" />
+
+                <TextView
+                    android:id="@+id/tvSettingStatNsFastNsSpeechTrigThreshold"
+                    style="@style/voice_12sp_blue_text_style"
+                    android:text="@string/comm_setting" />
+            </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/voice_bottom_sheet_divider_style" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvAedEnable"
+                    style="@style/voice_12sp_text_style"
+                    android:layout_weight="1"
+                    android:text="che.audio.aed.enable"/>
+
+                <EditText
+                    android:id="@+id/etAedEnable"
+                    android:layout_width="60dp"
+                    android:text="1"
+                    android:inputType="number"
+                    style="@style/voice_12sp_number_edittext_style" />
+
+                <TextView
+                    android:id="@+id/tvSettingAedEnable"
+                    style="@style/voice_12sp_blue_text_style"
+                    android:text="@string/comm_setting" />
+            </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/voice_bottom_sheet_divider_style" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvNsngMusicProbThr"
+                    style="@style/voice_12sp_text_style"
+                    android:layout_weight="1"
+                    android:text="che.audio.sf.nsngMusicProbThr"/>
+
+                <EditText
+                    android:id="@+id/etNsngMusicProbThr"
+                    android:layout_width="60dp"
+                    android:text="85"
+                    android:inputType="number"
+                    style="@style/voice_12sp_number_edittext_style" />
+
+                <TextView
+                    android:id="@+id/tvSettingNsngMusicProbThr"
+                    style="@style/voice_12sp_blue_text_style"
+                    android:text="@string/comm_setting" />
+            </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/voice_bottom_sheet_divider_style" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvStatNsMusicModeBackoffDB"
+                    style="@style/voice_12sp_text_style"
+                    android:layout_weight="1"
+                    android:text="che.audio.sf.statNsMusicModeBackoffDB"/>
+
+                <EditText
+                    android:id="@+id/etStatNsMusicModeBackoffDB"
+                    android:layout_width="60dp"
+                    android:text="100"
+                    android:inputType="number"
+                    style="@style/voice_12sp_number_edittext_style" />
+
+                <TextView
+                    android:id="@+id/tvSettingStatNsMusicModeBackoffDB"
+                    style="@style/voice_12sp_blue_text_style"
+                    android:text="@string/comm_setting" />
+            </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/voice_bottom_sheet_divider_style" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvAinsMusicModeBackoffDB"
+                    style="@style/voice_12sp_text_style"
+                    android:layout_weight="1"
+                    android:text="che.audio.sf.ainsMusicModeBackoffDB"/>
+
+                <EditText
+                    android:id="@+id/etAinsMusicModeBackoffDB"
+                    android:layout_width="60dp"
+                    android:text="270"
+                    android:inputType="number"
+                    style="@style/voice_12sp_number_edittext_style" />
+
+                <TextView
+                    android:id="@+id/tvSettingAinsMusicModeBackoffDB"
+                    style="@style/voice_12sp_blue_text_style"
+                    android:text="@string/comm_setting" />
+            </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/voice_bottom_sheet_divider_style" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvAinsSpeechProtectThreshold"
+                    style="@style/voice_12sp_text_style"
+                    android:layout_weight="1"
+                    android:text="che.audio.sf.ainsSpeechProtectThreshold"/>
+
+                <EditText
+                    android:id="@+id/etAinsSpeechProtectThreshold"
+                    android:layout_width="60dp"
+                    android:text="100"
+                    android:inputType="number"
+                    style="@style/voice_12sp_number_edittext_style" />
+
+                <TextView
+                    android:id="@+id/tvSettingAinsSpeechProtectThreshold"
+                    style="@style/voice_12sp_blue_text_style"
+                    android:text="@string/comm_setting" />
+            </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/voice_bottom_sheet_divider_style" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

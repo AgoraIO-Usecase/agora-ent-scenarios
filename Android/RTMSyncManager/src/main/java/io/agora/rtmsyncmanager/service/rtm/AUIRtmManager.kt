@@ -20,10 +20,6 @@ import io.agora.rtm.SubscribeOptions
 import io.agora.rtm.WhoNowResult
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.ArrayList
-import kotlin.concurrent.scheduleAtFixedRate
 
 class AUIRtmManager constructor(
     context: Context,
@@ -56,7 +52,7 @@ class AUIRtmManager constructor(
         rtmClient.removeEventListener(proxy)
     }
 
-    fun renew(token: String) {
+    fun renew(token: String, completion: (AUIRtmException?) -> Unit) {
         rtmClient.renewToken(token, object : ResultCallback<Void> {
             override fun onSuccess(responseInfo: Void?) {
                 AUILogger.logger().d("AUIRtmManager", "renew success")
@@ -64,6 +60,13 @@ class AUIRtmManager constructor(
 
             override fun onFailure(errorInfo: ErrorInfo?) {
                 AUILogger.logger().e("AUIRtmManager", "renew failed -- $errorInfo")
+                completion.invoke(
+                    AUIRtmException(
+                        RtmErrorCode.getValue(errorInfo?.errorCode),
+                        errorInfo?.errorReason ?: "UnKnow",
+                        errorInfo?.operation ?: "UnKnow",
+                    )
+                )
             }
         })
     }
@@ -91,7 +94,6 @@ class AUIRtmManager constructor(
             completion.invoke(null)
             return
         }
-        Log.d("ShowSyncManagerServiceImpl111", "response success -> rtm login")
         rtmClient.login(token, object : ResultCallback<Void> {
             override fun onSuccess(responseInfo: Void?) {
                 AUILogger.logger().d(tag, "login success")
@@ -808,6 +810,14 @@ class AUIRtmManager constructor(
             receiptTimeoutRun[uniqueId] = receipt
             receiptHandler.postDelayed(receipt.runnable, timeout)
         }
+    }
+
+    fun publish(
+        channelName: String,
+        message: String,
+        completion: (AUIRtmException?) -> Unit
+    ) {
+        this.publish(channelName, "", message, completion)
     }
 
     fun publish(

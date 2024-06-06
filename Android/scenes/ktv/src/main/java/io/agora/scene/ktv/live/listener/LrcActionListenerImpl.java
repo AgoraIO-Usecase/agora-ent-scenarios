@@ -16,6 +16,13 @@ public class LrcActionListenerImpl implements LrcControlView.OnKaraokeEventListe
     private final RoomLivingViewModel mViewModel;
     private final LrcControlView mLrcControlView;
 
+    /**
+     * Instantiates a new Lrc action listener.
+     *
+     * @param context        the context
+     * @param viewModel      the view model
+     * @param lrcControlView the lrc control view
+     */
     public LrcActionListenerImpl(Context context, RoomLivingViewModel viewModel, LrcControlView lrcControlView) {
         mContext = context;
         mViewModel = viewModel;
