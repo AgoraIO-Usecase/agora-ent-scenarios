@@ -328,6 +328,13 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
         }
 
         override fun onChosenSongListDidChanged(chosenSongList: List<ChosenSongInfo>) {
+            songPlayingLiveData.value?.let { currentSong ->
+                val firstSong = chosenSongList.firstOrNull()
+                if (currentSong.owner?.userId == KtvCenter.mUser.id.toString() && firstSong?.songNo != currentSong.songNo) {
+                    KTVLogger.d(TAG, "RoomLivingViewModel remove music: ${currentSong.songNo}")
+                    ktvApiProtocol.removeMusic(currentSong.songNo.toLong())
+                }
+            }
             chosenSongListLiveData.value = chosenSongList
             onUpdateAllChooseSongs(chosenSongList)
         }

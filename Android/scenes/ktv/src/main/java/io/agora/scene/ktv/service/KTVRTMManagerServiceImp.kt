@@ -1247,6 +1247,10 @@ class KTVSyncManagerServiceImp constructor(
             return statusValue ?: PlayStatus.idle
         }
 
+        fun songNo(songValue: Map<String, Any>): String {
+            return songValue["songNo"] as? String ?: ""
+        }
+
 //        fun getSeatAudio(map: Any?): Boolean? {
 //            val parentMap = map as? Map<*, *>
 //            return parentMap?.get("isAudioMuted") as? Boolean
@@ -1326,8 +1330,15 @@ class KTVSyncManagerServiceImp constructor(
                     val userId = getUserId(oldValue)
                     val seatValue = seatValueMap.values.firstOrNull { getUserId(it) == userId }
                         ?: return@subscribeWillMerge AUICollectionException.ErrorCode.unknown.toException(msg = "not permitted")
+
                     if (songStatus(oldValue) == PlayStatus.playing) {
                         return@subscribeWillMerge AUICollectionException.ErrorCode.unknown.toException(msg = "the song is playing")
+                    }
+                    // 当前播放歌曲
+                    val topSongValue = getChosenSongCollection(mCurRoomNo)?.getLocalMetaData()?.getList()?.first()
+                    val canUpdate = topSongValue != null && songNo(topSongValue) == songNo(oldValue)
+                    if (!canUpdate) {
+                        return@subscribeWillMerge AUICollectionException.ErrorCode.unknown.toException(msg = "current song not first")
                     }
                     // 如果闭麦主动开麦
 //                    val isAudioMuted = getSeatAudio(seatValue)
