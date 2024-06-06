@@ -103,13 +103,13 @@ extension AUIUserServiceImpl: AUIRtmUserProxyDelegate {
         }
     }
     
-    public func onUserDidLeaved(channelName: String, userId: String, userInfo: [String : Any]) {
+    public func onUserDidLeaved(channelName: String, userId: String, userInfo: [String : Any], reason: AUIRtmUserLeaveReason) {
         aui_info("onUserDidLeaved[\(channelName)]: \(userId) \(userInfo)", tag: "AUIUserServiceImpl")
         let user = userList.filter({$0.userId == userId}).first ?? AUIUserInfo.yy_model(withJSON: userInfo)!
         self.userList = userList.filter({$0.userId != userId})
         self.respDelegates.allObjects.forEach { obj in
             guard let obj = obj as? AUIUserRespDelegate else {return}
-            obj.onRoomUserLeave(roomId: channelName, userInfo: user)
+            obj.onRoomUserLeave(roomId: channelName, userInfo: user, reason: reason)
         }
     }
     
