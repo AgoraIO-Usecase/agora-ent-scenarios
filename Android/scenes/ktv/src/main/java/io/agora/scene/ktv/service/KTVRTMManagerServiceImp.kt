@@ -258,7 +258,7 @@ class KTVSyncManagerServiceImp constructor(
                 completion.invoke(Exception("${it.message}(${it.code})"), null)
                 return@initRtmSync
             }
-            mRoomService.getRoomList(KtvCenter.mAppId, kSceneId, 0, 20,
+            mRoomService.getRoomList(KtvCenter.mAppId, kSceneId, 0, 50,
                 cleanClosure = { auiRoomInfo ->
                     return@getRoomList auiRoomInfo.roomOwner?.userId == KtvCenter.mUser.id.toString()
 
@@ -269,7 +269,7 @@ class KTVSyncManagerServiceImp constructor(
                             rsetfulDiffTs = System.currentTimeMillis() - serverTs
                             KTVLogger.d(TAG, "getRoomList ts:$serverTs")
                         }
-                        val newRoomList = roomList?.sortedBy { it.createTime } ?: emptyList()
+                        val newRoomList = roomList?.sortedBy { -it.createTime } ?: emptyList()
                         KTVLogger.d(TAG, "getRoomList success, roomCount:${newRoomList.size}")
                         runOnMainThread { completion.invoke(null, newRoomList) }
                     } else {
