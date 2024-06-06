@@ -70,7 +70,6 @@ NSString* kAgoraKTVAPIKey = @"kAgoraKTVAPIKey";
     return [ktvServiceImp choristerList];
 }
 
-
 + (BOOL)isKtvRoomOwnerWithSeat:(VLRoomSeatModel*)seat {
     KTVSyncManagerServiceImp* ktvServiceImp = (KTVSyncManagerServiceImp*)[self ktvServiceImp];
     if (![ktvServiceImp isKindOfClass:[KTVSyncManagerServiceImp class]]) {
