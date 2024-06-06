@@ -331,7 +331,7 @@ extension AUIScene: AUIUserRespDelegate {
         aui_info("onRoomUserEnter[\(roomId)] userId: \(userInfo.userId)", tag: kSceneTag)
     }
     
-    public func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
+    public func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
         aui_info("onRoomUserLeave[\(roomId)] userId: \(userInfo.userId)", tag: kSceneTag)
         guard AUIRoomContext.shared.isRoomOwner(channelName: roomId, userId: userInfo.userId) else {
             cleanUserInfo(userId: userInfo.userId)
