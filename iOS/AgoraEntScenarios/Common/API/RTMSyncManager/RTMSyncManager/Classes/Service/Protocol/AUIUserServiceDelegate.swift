@@ -65,7 +65,8 @@ import Foundation
     /// - Parameters:
     ///   - roomId: 房间id
     ///   - userInfo:  用户信息
-    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo)
+    ///   - reason: 离开房间原因
+    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason)
     
     /// 用户的信息被修改
     /// - Parameters:
