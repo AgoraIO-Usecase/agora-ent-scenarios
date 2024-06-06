@@ -28,12 +28,9 @@ import kotlin.math.absoluteValue
 import kotlin.math.sign
 
 /**
- * Layout to wrap a scrollable component inside a ViewPager2. Provided as a solution to the problem
- * where pages of ViewPager2 have nested scrollable elements that scroll in the same direction as
- * ViewPager2. The scrollable element needs to be the immediate and only child of this host layout.
+ * Nested scrollable host
  *
- * This solution has limitations when using multiple levels of nested scrollable elements
- * (e.g. a horizontal RecyclerView in a vertical RecyclerView in a horizontal ViewPager2).
+ * @constructor Create empty Nested scrollable host
  */
 class NestedScrollableHost : FrameLayout {
     constructor(context: Context) : super(context)

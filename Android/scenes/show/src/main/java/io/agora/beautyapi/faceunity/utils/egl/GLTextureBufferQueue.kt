@@ -107,7 +107,6 @@ class GLTextureBufferQueue(
             }
             glFrameBuffer.setFlipV(iN.flipV)
             glFrameBuffer.process(iN.textureId, iN.textureType)
-            GLES20.glFinish()
             out.index = cacheIndex
             out.tag = iN.tag
             textureIdQueue.offer(out)
@@ -126,13 +125,16 @@ class GLTextureBufferQueue(
         return size
     }
 
-    fun dequeue(): TextureOut? {
+    fun dequeue(remove: Boolean = true): TextureOut? {
         val size = textureIdQueue.size
-        val poll = textureIdQueue.poll()
+        val poll = if(remove){
+            textureIdQueue.poll()
+        }else{
+            textureIdQueue.peek()
+        }
         if(loggable){
             Log.d(TAG, "TextureIdQueue dequeue index=${poll?.index}, size=$size")
         }
-
         return poll
     }
 

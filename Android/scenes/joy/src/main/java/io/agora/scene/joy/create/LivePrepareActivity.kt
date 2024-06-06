@@ -125,7 +125,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
         }
         mToggleVideoRun = Runnable {
             binding.flVideoContainer.post {
-                mRtcEngine.setupLocalVideo(VideoCanvas(mTextureView, Constants.RENDER_MODE_HIDDEN))
+                mRtcEngine.setupLocalVideo(VideoCanvas(mTextureView))
                 binding.flVideoContainer.addView(mTextureView)
             }
             initRtcEngine()

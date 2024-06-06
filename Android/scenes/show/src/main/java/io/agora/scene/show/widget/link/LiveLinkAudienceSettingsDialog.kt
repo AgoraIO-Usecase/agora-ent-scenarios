@@ -121,16 +121,8 @@ class LiveLinkAudienceSettingsDialog constructor(context: Context) : BottomDarkD
         mAdapter.resetAll(mHostItemList)
     }
 
-    fun resetSettingsItem(mute: Boolean) {
+    fun resetSettingsItem() {
         val itemList = listOf(
-            SettingItem(
-                ITEM_ID_MIC,
-                R.mipmap.show_setting_ic_mic_off,
-                R.mipmap.show_setting_ic_mic_on,
-                R.string.show_setting_mic_off,
-                R.string.show_setting_mic_on,
-                !mute
-            ),
             SettingItem(
                 ITEM_ID_STOP_LINK,
                 R.mipmap.show_stop_link,

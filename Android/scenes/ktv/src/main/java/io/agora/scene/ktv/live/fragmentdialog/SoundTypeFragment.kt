@@ -14,7 +14,10 @@ import io.agora.scene.ktv.live.RoomLivingActivity
 import io.agora.scene.ktv.live.bean.SoundCardSettingBean
 
 /**
- * 预设音效
+ * Sound type fragment
+ *
+ * @property soundCardSetting
+ * @constructor Create empty Sound type fragment
  */
 class SoundTypeFragment constructor(private val soundCardSetting: SoundCardSettingBean) :
     BaseViewBindingFragment<KtvDialogSoundTypeBinding>() {
@@ -101,6 +104,13 @@ class SoundTypeFragment constructor(private val soundCardSetting: SoundCardSetti
         private var onDidSelectIndex: ((Int) -> Unit)? = null
     ) : RecyclerView.Adapter<SoundPresetsAdapter.ViewHolder>() {
 
+        /**
+         * View holder
+         *
+         * @constructor
+         *
+         * @param itemView
+         */
         class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val ivAvatar: ImageView = itemView.findViewById(R.id.ivAvatar)
             val tvPresetName: TextView = itemView.findViewById(R.id.tvPresetName)

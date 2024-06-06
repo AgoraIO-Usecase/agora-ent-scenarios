@@ -44,7 +44,7 @@ import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
 import io.agora.scene.ktv.ktvapi.ILrcView;
-import io.agora.scene.ktv.service.RoomSelSongModel;
+import io.agora.scene.ktv.service.ChosenSongInfo;
 import io.agora.scene.widget.basic.OutlineSpan;
 import io.agora.scene.widget.toast.CustomToast;
 import io.agora.scene.widget.utils.UiUtils;
@@ -54,19 +54,44 @@ import io.agora.scene.widget.utils.UiUtils;
  */
 public class LrcControlView extends FrameLayout implements View.OnClickListener, ILrcView {
 
+    /**
+     * The M binding.
+     */
     protected KtvLayoutLrcControlViewBinding mBinding;
+    /**
+     * The M prepare binding.
+     */
     protected KtvLayoutLrcPrepareBinding mPrepareBinding;
 
+    /**
+     * The M karaoke view.
+     */
     protected KaraokeView mKaraokeView;
 
+    /**
+     * The M cumulative score in percentage.
+     */
     protected int mCumulativeScoreInPercentage;
 
+    /**
+     * Gets cumulative score in percentage.
+     *
+     * @return the cumulative score in percentage
+     */
     public int getCumulativeScoreInPercentage() {
         return mCumulativeScoreInPercentage;
     }
 
+    /**
+     * The M combo control.
+     */
     protected ComboControl mComboControl;
 
+    /**
+     * Gets lyrics view.
+     *
+     * @return the lyrics view
+     */
     public LyricsView getLyricsView() {
         if (mBinding != null && mBinding.ilActive != null) {
             return mBinding.ilActive.lyricsView;
@@ -75,10 +100,20 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         }
     }
 
+    /**
+     * Gets scoring view.
+     *
+     * @return the scoring view
+     */
     public ScoringView getScoringView() {
         return mBinding.ilActive.scoringView;
     }
 
+    /**
+     * Gets karaoke view.
+     *
+     * @return the karaoke view
+     */
     public KaraokeView getKaraokeView() {
         return mKaraokeView;
     }
@@ -88,27 +123,76 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     }
 
+    /**
+     * The enum Role.
+     */
     public enum Role {
-        Singer, Listener, CoSinger
+        /**
+         * Singer role.
+         */
+        Singer,
+        /**
+         * Listener role.
+         */
+        Listener,
+        /**
+         * Co singer role.
+         */
+        CoSinger
     }
 
+    /**
+     * The M role.
+     */
     public Role mRole = Role.Listener;
 
+    /**
+     * The enum Audio track.
+     */
     public enum AudioTrack {
-        Origin, Acc, DaoChang
+        /**
+         * Origin audio track.
+         */
+        Origin,
+        /**
+         * Acc audio track.
+         */
+        Acc,
+        /**
+         * Dao chang audio track.
+         */
+        DaoChang
     }
 
     private AudioTrack mAudioTrack = AudioTrack.Acc;
     private OnKaraokeEventListener mOnKaraokeActionListener;
 
+    /**
+     * Instantiates a new Lrc control view.
+     *
+     * @param context the context
+     */
     public LrcControlView(@NonNull Context context) {
         this(context, null);
     }
 
+    /**
+     * Instantiates a new Lrc control view.
+     *
+     * @param context the context
+     * @param attrs   the attrs
+     */
     public LrcControlView(@NonNull Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
+    /**
+     * Instantiates a new Lrc control view.
+     *
+     * @param context      the context
+     * @param attrs        the attrs
+     * @param defStyleAttr the def style attr
+     */
     public LrcControlView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
@@ -180,10 +264,18 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         });
     }
 
+    /**
+     * Sets on lrc click listener.
+     *
+     * @param karaokeActionListener the karaoke action listener
+     */
     public void setOnLrcClickListener(OnKaraokeEventListener karaokeActionListener) {
         this.mOnKaraokeActionListener = karaokeActionListener;
     }
 
+    /**
+     * On self joined chorus.
+     */
     public void onSelfJoinedChorus() {
         mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_score_formatter), "" + chorusScore));
         this.mRole = Role.CoSinger;
@@ -202,12 +294,18 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         }
     }
 
+    /**
+     * On self joined chorus failed.
+     */
     public void onSelfJoinedChorusFailed() {
         mBinding.ilActive.ivJoinChorusBtn.setVisibility(VISIBLE);
         mBinding.ilActive.ivJoinChorusLoading.setVisibility(INVISIBLE);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(GONE);
     }
 
+    /**
+     * On self leaved chorus.
+     */
     public void onSelfLeavedChorus() {
         mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_score_formatter), "" + 0));
         this.mRole = Role.Listener;
@@ -219,6 +317,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     private boolean isSeatFull = false;
 
+    /**
+     * On seat full.
+     *
+     * @param isFull the is full
+     */
     public void onSeatFull(boolean isFull) {
         this.isSeatFull = isFull;
         if (!isOnSeat && this.mRole == Role.Listener) {
@@ -228,12 +331,22 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     private boolean isOnSeat = false;
 
+    /**
+     * On seat.
+     *
+     * @param isOnSeat the is on seat
+     */
     public void onSeat(boolean isOnSeat) {
         this.isOnSeat = isOnSeat;
     }
 
     private boolean isMineOwner = false;
 
+    /**
+     * On prepare status.
+     *
+     * @param isMineOwner the is mine owner
+     */
     public void onPrepareStatus(boolean isMineOwner) {
         chorusScore = 0;
         this.isMineOwner = isMineOwner;
@@ -247,14 +360,24 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         changeViewByRole();
     }
 
+    /**
+     * On music load progress.
+     *
+     * @param percent the percent
+     */
     public void onMusicLoadProgress(int percent) {
         mPrepareBinding.tvContent.setText(String.format(getResources().getString(R.string.ktv_loading_music), percent + "%"));
         mPrepareBinding.pbLoadingMusic.setProgress(percent);
     }
 
-    private RoomSelSongModel songPlaying;
+    private ChosenSongInfo songPlaying;
 
-    public void onPlayStatus(RoomSelSongModel songPlaying) {
+    /**
+     * On play status.
+     *
+     * @param songPlaying the song playing
+     */
+    public void onPlayStatus(ChosenSongInfo songPlaying) {
         this.songPlaying = songPlaying;
 
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
@@ -272,7 +395,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
         mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.INVISIBLE);
         if (this.mRole == Role.Singer) {
-            mBinding.ilActive.lyricsView.enableDragging(false);
+//            mBinding.ilActive.lyricsView.enableDragging(false);
             mBinding.ilActive.ivMusicStart.setVisibility(View.VISIBLE);
             mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
@@ -283,7 +406,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mBinding.ilActive.ivJoinChorusBtn.setVisibility(View.INVISIBLE);
             mBinding.ilActive.ivLeaveChorus.setVisibility(View.INVISIBLE);
         } else if (this.mRole == Role.Listener) {
-            mBinding.ilActive.lyricsView.enableDragging(false);
+//            mBinding.ilActive.lyricsView.enableDragging(false);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
             if (!isSeatFull || isOnSeat) {
                 mBinding.ilActive.ivJoinChorusBtn.setVisibility(View.VISIBLE);
@@ -304,6 +427,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         }
     }
 
+    /**
+     * On pause status.
+     */
     public void onPauseStatus() {
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
@@ -314,6 +440,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.ivMusicStart.setText(R.string.ktv_room_player_play);
     }
 
+    /**
+     * On idle status.
+     */
     public void onIdleStatus() {
         mBinding.ilIDLE.getRoot().setVisibility(View.VISIBLE);
         mBinding.clActive.setVisibility(View.GONE);
@@ -321,17 +450,32 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
     }
 
+    /**
+     * Sets role.
+     *
+     * @param mRole the m role
+     */
     public void setRole(@NonNull Role mRole) {
         this.mRole = mRole;
         lrcUrl = null;
         changeViewByRole();
     }
 
+    /**
+     * Gets role.
+     *
+     * @return the role
+     */
     public Role getRole() {
         return this.mRole;
     }
 
-    public void setMusic(@NonNull RoomSelSongModel mMusic) {
+    /**
+     * Sets music.
+     *
+     * @param mMusic the m music
+     */
+    public void setMusic(@NonNull ChosenSongInfo mMusic) {
         mKaraokeView.reset();
         if (mComboControl != null) {
             mComboControl.reset(mBinding);
@@ -344,6 +488,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.gradeView.setScore(0, 0, 0);
     }
 
+    /**
+     * Sets lrc view background.
+     *
+     * @param resId the res id
+     */
     public void setLrcViewBackground(@DrawableRes int resId) {
         int defaultColor = ContextCompat.getColor(getContext(), R.color.pink_b4);
         mBinding.ilActive.lyricsView.setCurrentLineHighlightedTextColor(defaultColor);
@@ -353,6 +502,13 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.clActive.setBackgroundResource(resId);
     }
 
+    /**
+     * Update score.
+     *
+     * @param score           the score
+     * @param cumulativeScore the cumulative score
+     * @param perfectScore    the perfect score
+     */
     public void updateScore(double score, double cumulativeScore, double perfectScore) {
         mCumulativeScoreInPercentage = (int) ((cumulativeScore / perfectScore) * 100);
 
@@ -534,6 +690,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
 
     private float mInitialYOfChorus;
 
+    /**
+     * Gets y of chorus btn.
+     *
+     * @return the y of chorus btn
+     */
     public int getYOfChorusBtn() {
         if (mInitialYOfChorus == 0) {
             mInitialYOfChorus = mBinding.ilActive.ivJoinChorusBtn.getY();
@@ -616,6 +777,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         }
     }
 
+    /**
+     * Sets switch original checked.
+     *
+     * @param checked the checked
+     */
     public void setSwitchOriginalChecked(boolean checked) {
         mBinding.ilActive.switchOriginal.setChecked(checked);
     }
@@ -630,6 +796,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     @Override
     public void onUpdateProgress(Long progress) {
         if (mKaraokeView.getLyricsData() == null) return;
+        if (mBinding == null) return;
         if (mRole == Role.Singer) {
             if (progress >= mKaraokeView.getLyricsData().startOfVerse - 2000) {
                 mBinding.ilActive.ivSkipPrelude.setVisibility(INVISIBLE);
@@ -686,18 +853,34 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         LyricsFileDownloader.getInstance(context).download(lrcUrl);
     }
 
+    /**
+     * On no lrc.
+     */
     public void onNoLrc() {
         lrcUrl = null;
         mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
         mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * On receive single line score.
+     *
+     * @param score           the score
+     * @param index           the index
+     * @param cumulativeScore the cumulative score
+     * @param total           the total
+     */
     public void onReceiveSingleLineScore(int score, int index, int cumulativeScore, int total) {
         if (mRole == Role.Listener) {
             updateScore(score, cumulativeScore, /** Workaround(Hai_Guo)*/total);
         }
     }
 
+    /**
+     * Sets high light person head url.
+     *
+     * @param url the url
+     */
     public void setHighLightPersonHeadUrl(String url) {
         GlideApp.with(mBinding.getRoot())
                 .load(url)
@@ -706,6 +889,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                 .into(mBinding.ilActive.ivVocalHighlight);
     }
 
+    /**
+     * Show high light button.
+     *
+     * @param show the show
+     */
     public void showHighLightButton(boolean show) {
         if (show) {
             mBinding.ilActive.btnVocalHighlight.setVisibility(View.VISIBLE);
@@ -715,43 +903,98 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         }
     }
 
+    /**
+     * The interface On karaoke event listener.
+     */
     public interface OnKaraokeEventListener {
+        /**
+         * On switch original click.
+         *
+         * @param audioTrack the audio track
+         */
         default void onSwitchOriginalClick(AudioTrack audioTrack) { // 0: origin 1: acc 2: daochang
         }
 
+        /**
+         * On play click.
+         */
         default void onPlayClick() {
         }
 
+        /**
+         * On change music click.
+         */
         default void onChangeMusicClick() {
         }
 
+        /**
+         * On start sing.
+         */
         default void onStartSing() {
         }
 
+        /**
+         * On join chorus.
+         */
         default void onJoinChorus() {
         }
 
+        /**
+         * On leave chorus.
+         */
         default void onLeaveChorus() {
         }
 
+        /**
+         * On drag to.
+         *
+         * @param position the position
+         */
         default void onDragTo(long position) {
         }
 
+        /**
+         * On ref pitch update.
+         *
+         * @param refPitch           the ref pitch
+         * @param numberOfRefPitches the number of ref pitches
+         */
         default void onRefPitchUpdate(float refPitch, int numberOfRefPitches) {
         }
 
+        /**
+         * On line finished.
+         *
+         * @param line            the line
+         * @param score           the score
+         * @param cumulativeScore the cumulative score
+         * @param index           the index
+         * @param total           the total
+         */
         default void onLineFinished(LyricsLineModel line, int score, int cumulativeScore, int index, int total) {
         }
 
+        /**
+         * On skip prelude click.
+         */
         default void onSkipPreludeClick() {
         }
 
+        /**
+         * On skip postlude click.
+         */
         default void onSkipPostludeClick() {
         }
 
+        /**
+         * On re get lrc url.
+         */
         default void onReGetLrcUrl() {
         }
 
+        /**
+         * On vocal highlight click.
+         */
         default void onVocalHighlightClick() {
 
         }
