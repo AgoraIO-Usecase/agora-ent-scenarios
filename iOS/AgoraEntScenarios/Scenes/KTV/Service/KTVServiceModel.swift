@@ -20,6 +20,7 @@ public enum KTVCommonError {
     case choristerNotExist    //合唱用户不存在
     case noPermission   //无权限
     case chooseSongIsFail   //选择歌曲失败
+    case currentSongNotFirst  //预期要变更为播放状态的歌曲不是第一首
     
     public func toNSError() -> NSError {
         func createError(code: Int = -1, msg: String) -> NSError {
@@ -44,6 +45,8 @@ public enum KTVCommonError {
             return createError(msg: "no permission")
         case .chooseSongIsFail:
             return createError(msg: "choost song model fail")
+        case .currentSongNotFirst:
+            return createError(msg: "current song not first")
         default:
             return createError(msg: "unknown error")
         }
