@@ -5,6 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import io.agora.rtm.*
+import io.agora.rtmsyncmanager.RoomExpirationPolicy
 import io.agora.rtmsyncmanager.Scene
 import io.agora.rtmsyncmanager.SyncManager
 import io.agora.rtmsyncmanager.model.*
@@ -17,13 +18,6 @@ import io.agora.scene.base.manager.UserManager
 import io.agora.scene.pure1v1.Pure1v1Logger
 import okhttp3.internal.wait
 
-/*
- * service 模块
- * 简介：这个模块的作用是负责前端业务模块和业务服务器的交互(包括房间列表+房间内的业务数据同步等)
- * 实现原理：该场景的业务服务器是包装了一个 rethinkDB 的后端服务，用于数据存储，可以认为它是一个 app 端上可以自由写入的 DB，房间列表数据、房间内的业务数据等在 app 上构造数据结构并存储在这个 DB 里
- * 当 DB 内的数据发生增删改时，会通知各端，以此达到业务数据同步的效果
- * TODO 注意⚠️：该场景的后端服务仅做场景演示使用，无法商用，如果需要上线，您必须自己部署后端服务或者云存储服务器（例如leancloud、环信等）并且重新实现这个模块！！！！！！！！！！！
- */
 class Pure1v1ServiceImp(
     private val context: Context,
     private val rtmClient: RtmClient,
@@ -32,8 +26,7 @@ class Pure1v1ServiceImp(
 ): IAUIUserService.AUIUserRespObserver {
 
     private val tag = "1v1_Service_LOG"
-    private val kSceneId = "scene_1v1PrivateVideo_4.2.1"
-    private val kRoomId = "pure421"
+    private val kRoomId = "pure500"
     @Volatile
     private var syncUtilsInited = false
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
@@ -61,8 +54,8 @@ class Pure1v1ServiceImp(
         commonConfig.host = BuildConfig.TOOLBOX_SERVER_HOST
         AUIRoomContext.shared().setCommonConfig(commonConfig)
         syncManager = SyncManager(context, rtmClient, commonConfig)
-        scene = syncManager.getScene(kRoomId)
 
+        scene = syncManager.createScene(kRoomId)
         scene.userService.registerRespObserver(this)
         syncUtilsInited = true
     }
@@ -109,16 +102,15 @@ class Pure1v1ServiceImp(
             completion(null)
             return
         }
-        Handler(Looper.getMainLooper()).postDelayed({
-            syncManager.rtmManager.subscribe(kRoomId) { error ->
-                error?.let { e ->
-                    Log.d(tag, "enter scene fail: ${e.message}")
-                    runOnMainThread { completion.invoke(Error(e.message)) }
-                    return@subscribe
-                }
-                runOnMainThread { completion.invoke(null) }
+        syncManager.rtmManager.subscribe(kRoomId) { error ->
+            error?.let { e ->
+                Log.d(tag, "enter scene fail: ${e.message}")
+                runOnMainThread { completion.invoke(Error(e.message)) }
+                return@subscribe
             }
-        }, 100)
+            scene.userService.setUserAttr {}
+            runOnMainThread { completion.invoke(null) }
+        }
     }
 
     /*

@@ -186,4 +186,41 @@
         <!--        <item name="android:elevation">4dp</item>-->
         <item name="android:background">@drawable/voice_bg_rect_radius24_gradient_blue</item>
     </style>
+
+    <style name="voice_12sp_text_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingEnd">30dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:textColor">@color/voice_color_3c4267</item>
+        <item name="android:textSize">@dimen/voice_sp_12</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="voice_12sp_number_edittext_style">
+        <item name="android:layout_width">60dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:inputType">number</item>
+        <item name="android:background">@color/grey_e1</item>
+        <item name="android:textColor">@color/voice_color_3c4267</item>
+        <item name="android:textSize">@dimen/voice_sp_12</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="voice_12sp_blue_text_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:background">@color/blue_2e</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/voice_sp_12</item>
+        <item name="android:gravity">center</item>
+    </style>
 </resources>

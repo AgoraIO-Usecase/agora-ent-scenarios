@@ -16,10 +16,9 @@ public interface IAUIUserService extends IAUICommonService<IAUIUserService.AUIUs
      * 获取指定 userId 的用户信息，如果为 null，则获取房间内所有人的信息
      *
      * @param roomId     房间唯一id
-     * @param userIdList 用户id列表
      * @param callback   成功/失败回调
      */
-    void getUserInfoList(@NonNull String roomId, @Nullable List<String> userIdList, @Nullable AUIUserListCallback callback);
+    void getUserInfoList(@NonNull String roomId, @Nullable AUIUserListCallback callback);
 
     /**
      * 获取指定 userId 的用户信息

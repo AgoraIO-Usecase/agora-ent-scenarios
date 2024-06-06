@@ -5,7 +5,7 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import io.agora.mediaplayer.Constants.MediaPlayerError
+import io.agora.mediaplayer.Constants.MediaPlayerReason
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.musiccontentcenter.Music
 import io.agora.rtc2.*
@@ -1080,7 +1080,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         CantataLogger.d("hugohugo", "GiantChorusRouteSelectionConfig: ${KTVApi.routeSelectionConfig}")
 
         mKtvApi.addEventHandler(object : IKTVApiEventHandler() {
-            override fun onMusicPlayerStateChanged(state: MediaPlayerState, error: MediaPlayerError, isLocal: Boolean) {
+            override fun onMusicPlayerStateChanged(state: MediaPlayerState, error: MediaPlayerReason, isLocal: Boolean) {
                 when (state) {
                     MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                         if (!isLocal || (mSongPlayingLiveData.value != null && mSongPlayingLiveData.value!!.userNo == UserManager.getInstance().user.id.toString())) {

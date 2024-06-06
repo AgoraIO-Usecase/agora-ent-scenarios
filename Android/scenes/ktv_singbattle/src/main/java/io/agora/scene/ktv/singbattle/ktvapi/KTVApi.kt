@@ -226,11 +226,11 @@ abstract class IKTVApiEventHandler {
     /**
      * 播放器状态变化
      * @param state MediaPlayer 播放状态
-     * @param error MediaPlayer Error 信息
+     * @param reason MediaPlayer Error 信息
      * @param isLocal 本地还是主唱端的 Player 信息
      */
     open fun onMusicPlayerStateChanged(
-        state: Constants.MediaPlayerState, error: Constants.MediaPlayerError, isLocal: Boolean
+        state: Constants.MediaPlayerState, reason: Constants.MediaPlayerReason, isLocal: Boolean
     ) {
     }
 
@@ -326,7 +326,7 @@ data class KTVGiantChorusApiConfig constructor(
  * @param mode 歌曲加载的模式，默认为音乐和歌词均加载
  * @param needPrelude 播放切片歌曲情况下，是否播放
  */
-data class KTVLoadMusicConfiguration constructor(
+data class KTVLoadMusicConfiguration(
     val songIdentifier: String,
     val mainSingerUid: Int,
     val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC,
