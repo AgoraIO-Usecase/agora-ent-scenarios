@@ -991,7 +991,7 @@ extension KTVSyncManagerServiceImp: AUIUserRespDelegate {
         }
     }
     
-    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
+    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
         KTVLog.info(text: "user: leave\(userInfo.userName)")
 //        self.userDidChanged?(.deleted, user)
         let userCount = getCurrentScene(with: roomId)?.userService.userList.count ?? 0
