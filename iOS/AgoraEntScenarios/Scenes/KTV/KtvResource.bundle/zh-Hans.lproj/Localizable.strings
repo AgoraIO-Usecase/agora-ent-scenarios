@@ -259,9 +259,7 @@
 "ktv_owner_leave" = "房主已解散房间,请确认离开房间";
 "ktv_mic_full" = "麦位已满，请在他人下麦后重试";
 "ktv_join_chorus_failed" = "加入合唱失败，原因:连接已断开";
-"ktv_per_lose" = "人声突出功能已失效，请重设";
 "ktv_change_failed" = "切歌失败，理由:连接已断开";
-"ktv_per_set_once" = "每首歌仅可设置一次人声突出对象，请在下首歌再设置";
 "ktv_load_failed_and_change" = "加载歌曲失败，请切歌";
 "ktv_onMic" = "上麦";
 "ktv_people" = "人";

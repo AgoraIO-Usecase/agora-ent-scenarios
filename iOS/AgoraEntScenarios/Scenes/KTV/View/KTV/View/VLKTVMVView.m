@@ -215,43 +215,7 @@
     [self.leaveChorusBtn addTarget:self action:@selector(leaveChorus) forControlEvents:UIControlEventTouchUpInside];
     [self updateBtnLayout:self.leaveChorusBtn];
     [self.BotView addSubview:self.leaveChorusBtn];
-    
-//    _perShowView = [[UIView alloc]initWithFrame:CGRectMake(0, self.bounds.size.height / 2.0 - 12, 80, 24)];
-//    _perShowView.backgroundColor = [UIColor colorWithRed:8/255.0 green:6/255.0 blue:47/255.0 alpha:0.3];
-//    CAShapeLayer *maskLayer = [CAShapeLayer layer];
-//    UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:_perShowView.bounds
-//                                                   byRoundingCorners:UIRectCornerTopRight | UIRectCornerBottomRight
-//                                                         cornerRadii:CGSizeMake(10.f, 10.f)];
-//    maskLayer.path = path.CGPath;
-//    _perShowView.layer.mask = maskLayer;
-//    [self addSubview:_perShowView];
-//    _perShowView.hidden = true;
-    
-//    UILabel *perLabel = [[UILabel alloc]initWithFrame:CGRectMake(8, 6, 45, 12)];
-//    perLabel.text = KTVLocalizedString(@"ktv_show_vol");
-//    perLabel.font = [UIFont systemFontOfSize:11];
-//    perLabel.textColor = [UIColor whiteColor];
-//    [_perShowView addSubview:perLabel];
-//    
-//    _iconView = [[UIImageView alloc]initWithFrame:CGRectMake(57, 2, 20, 20)];
-//    _iconView.image = [UIImage ktv_sceneImageWithName:@"ktv_showVoice" ];
-//    [_perShowView addSubview:_iconView];
-//    _perShowView.hidden = true;
-//    
-//    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(voiceChoose)];
-//    _perShowView.userInteractionEnabled = true;
-//    [_perShowView addGestureRecognizer:tap];
 }
-
--(void)voiceChoose{
-    if([self.delegate respondsToSelector:@selector(didShowVoiceChooseView)]){
-        [self.delegate didShowVoiceChooseView];
-    }
-}
-
-//-(void)setPerViewHidden:(BOOL)isHidden {
-//    _perShowView.hidden = isHidden;
-//}
 
 -(void)setBotViewHidden:(BOOL)isHidden{
     [self.BotView setHidden:isHidden];
@@ -377,6 +341,7 @@
 */
 -(void)setMvState:(VLKTVMVViewState)mvState {
     _mvState = mvState;
+    KTVLogInfo(@"setMvState: %ld", mvState);
     switch (mvState) {
         case VLKTVMVViewStateNone://无人演唱
             self.joinChorusBtn.hidden = YES;
@@ -658,7 +623,7 @@
     self.scoreLabel.text = [NSString stringWithFormat:@"%.0lf",score];
     self.totalLines += 1;
     self.totalScore = cumulativeScore;
-    VLLog(@"Recording: %d lines at totalScore: %f", self.totalLines, cumulativeScore);
+//    KTVLogInfo(@"Recording: %d lines at totalScore: %f", self.totalLines, cumulativeScore);
     if ([self.delegate respondsToSelector:@selector(onKTVMVView:scoreDidUpdate:)]) {
         [self.delegate onKTVMVView:self scoreDidUpdate:realScore];
     }
