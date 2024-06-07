@@ -17,9 +17,9 @@ let kRoomInfoPayloadId = "room_payload_id"
 public class AUIScene: NSObject {
     private var channelName: String
     public let userService: AUIUserServiceImpl
+    public let arbiter: AUIArbiter
     private var removeClosure: ()->()
     private var rtmManager: AUIRtmManager
-    private var arbiter: AUIArbiter
     private var enterCondition: AUISceneEnterCondition
     private var expireCondition: AUISceneExpiredCondition
     private var collectionMap: [String: IAUICollection] = [:]
