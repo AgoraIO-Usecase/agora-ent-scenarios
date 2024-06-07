@@ -5,7 +5,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.ktv.R
 import io.agora.scene.ktv.service.KTVServiceProtocol.Companion.getImplInstance
+import io.agora.scene.widget.toast.CustomToast
 
 /**
  * The type Room create view model.
@@ -53,9 +55,7 @@ class RoomCreateViewModel
                 roomInfoLiveData.postValue(roomInfo)
             } else {
                 roomInfoLiveData.postValue(null)
-            }
-            err?.message?.let {
-                ToastUtils.showToast(it)
+                CustomToast.show(R.string.ktv_create_room_failed, err?.message ?: "")
             }
         }
     }
@@ -67,14 +67,12 @@ class RoomCreateViewModel
      * @param password the password
      */
     fun joinRoom(roomInfo: AUIRoomInfo, password: String?) {
-        ktvServiceProtocol.joinRoom(roomInfo.roomId, password) { error ->
-            if (error == null) { // success
+        ktvServiceProtocol.joinRoom(roomInfo.roomId, password) { err ->
+            if (err == null) { // success
                 roomInfoLiveData.postValue(roomInfo)
             } else {
                 roomInfoLiveData.postValue(null)
-            }
-            error?.message?.let {
-                ToastUtils.showToast(it)
+                CustomToast.show(R.string.ktv_join_room_failed, err.message ?: "")
             }
         }
     }
