@@ -15,7 +15,6 @@ import Foundation
     /// - Returns: 返回的map对象[key: value]，key: collection id，value：初始化结构，为map则是map collection，为array则是list collection
     @objc optional func onWillInitSceneMetadata(channelName: String) -> [String: Any]?
     
-    
     /// token即将过期
     /// - Parameter channelName: <#channelName description#>
     @objc optional func onTokenPrivilegeWillExpire(channelName: String?)
