@@ -116,17 +116,14 @@
         return;
     }
     VL(weakSelf);
+    VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
     [[AppContext ktvServiceImp] joinRoomWithRoomId:listModel.roomNo password:inputText completion:^(NSError * _Nullable error) {
         if (error != nil) {
-            [VLToast toast:error.description];
+            [VLToast toast:error.localizedDescription];
             return;
         }
         
-//        listModel.creatorNo = outputModel.creatorNo;
-//        listModel.roomPeopleNum = [NSString stringWithFormat:@"%li",[listModel.roomPeopleNum integerValue] + 1] ;
-        VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
         ktvVC.roomModel = listModel;
-//        ktvVC.seatsArray = outputModel.seatsArray;
         [weakSelf.navigationController pushViewController:ktvVC animated:YES];
     }];
 }

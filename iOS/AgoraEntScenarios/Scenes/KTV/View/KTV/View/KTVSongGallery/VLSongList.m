@@ -104,7 +104,8 @@
 
 - (void)deleteSongEvent:(VLRoomSelSongModel *)model {
     [[AppContext ktvServiceImp] removeSongWithSongCode:model.songNo completion:^(NSError * error) {
-        //
+        if(error == nil) {return;}
+        [VLToast toast:[error localizedDescription]];
     }];
 }
 

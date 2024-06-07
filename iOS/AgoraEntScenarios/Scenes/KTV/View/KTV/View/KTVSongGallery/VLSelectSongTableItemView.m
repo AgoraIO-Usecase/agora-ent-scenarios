@@ -205,7 +205,7 @@ UITableViewDelegate
                                               completion:^(NSError * error) {
         if (error != nil) {
             [self dianGeFailedWithModel:model];
-            [VLToast toast:KTVLocalizedString(@"ktv_choose_fail") duration:2];
+            [VLToast toast: error.localizedDescription];
             return;
         }
         //点歌完成发送通知
