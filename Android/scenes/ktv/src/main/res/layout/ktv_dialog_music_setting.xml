@@ -663,78 +663,84 @@
                     android:layout_height="26dp"
                     android:layout_marginVertical="12dp"
                     android:button="@drawable/cb_def_selector"
-                    app:layout_constraintBottom_toTopOf="@+id/layoutAIAECInput"
+                    app:layout_constraintBottom_toTopOf="@+id/layoutAIACStrength"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tvAIAECStrength"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/layoutAIACStrength"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/ktv_AIAEC_strength"
-                    android:textColor="@color/def_text_grey_979"
-                    android:textSize="12sp"
-                    app:layout_constraintBottom_toBottomOf="@+id/layoutAIAECInput"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/layoutAIAECInput" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tvAIAECInputHint"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="20dp"
-                    android:text="@string/ktv_AIAEC_input_hint"
-                    android:textColor="@color/def_text_grey_979"
-                    android:textSize="12sp"
-                    app:layout_constraintBottom_toBottomOf="@+id/layoutAIAECInput"
-                    app:layout_constraintEnd_toStartOf="@+id/layoutAIAECInput"
-                    app:layout_constraintTop_toTopOf="@+id/layoutAIAECInput" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/layoutAIAECInput"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:paddingVertical="8dp"
-                    app:boxBackgroundMode="none"
-                    app:boxStrokeColor="@android:color/transparent"
-                    app:hintEnabled="false"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingVertical="12dp"
                     app:layout_constraintTop_toBottomOf="@id/cbAIAECSwitcher">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/AIAECInput"
-                        android:layout_width="48dp"
-                        android:layout_height="28dp"
-                        android:background="@drawable/ktv_aiaec_input_radius"
-                        android:gravity="center"
-                        android:imeOptions="actionDone"
-                        android:inputType="number"
-                        android:maxLength="1"
-                        android:maxLines="1"
-                        android:singleLine="true"
-                        android:text="1"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:text="@string/ktv_AIAEC"
                         android:textColor="@color/white"
                         android:textSize="15sp" />
-                </com.google.android.material.textfield.TextInputLayout>
 
-                <androidx.constraintlayout.widget.Group
-                    android:id="@+id/groupAIAECStrength"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:constraint_referenced_ids="layoutAIAECInput,tvAIAECInputHint,tvAIAECStrength">
+                    <ImageButton
+                        android:id="@+id/btAIAECDown"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="30dp"
+                        android:background="@null"
+                        android:contentDescription="@string/ktv_AIAEC_strength_down"
+                        android:padding="6dp"
+                        android:src="@drawable/ic_tone_down" />
 
-                </androidx.constraintlayout.widget.Group>
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:layout_marginStart="10dp"
+                        android:textSize="14sp"
+                        android:textColor="@color/def_text_grey_979"/>
+
+                    <androidx.appcompat.widget.AppCompatSeekBar
+                        android:id="@+id/sbAIAEStrength"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:contentDescription="@string/ktv_AIAEC_strength"
+                        android:max="4"
+                        android:progress="1"
+                        android:progressDrawable="@drawable/ktv_bg_seekbar_progress"
+                        android:thumb="@mipmap/ic_seekbar_btn" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="4"
+                        android:layout_marginEnd="10dp"
+                        android:textSize="14sp"
+                        android:textColor="@color/def_text_grey_979"/>
+
+                    <ImageButton
+                        android:id="@+id/btAIAECUp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:contentDescription="@string/ktv_AIAEC_strength_up"
+                        android:padding="6dp"
+                        android:src="@drawable/ic_tone_up" />
+
+                </LinearLayout>
 
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     app:dividerColor="@color/white_20_percent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/layoutAIAECInput"
+                    app:layout_constraintTop_toBottomOf="@+id/layoutAIACStrength"
                     app:layout_goneMarginTop="8dp" />
             </androidx.constraintlayout.widget.ConstraintLayout>
-
 
             <View
                 android:layout_width="match_parent"

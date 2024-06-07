@@ -102,6 +102,9 @@ public class SongActionListenerImpl implements OnSongActionListener {
         LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.chooseSong(songItem, isChorus), success -> {
             if (success && dialog.isVisible()) {
                 dialog.setChooseSongItemStatus(songItem, true);
+            }else if (!success){ // 点歌失败
+                songItem.loading = false;
+                dialog.setChooseSongItemStatus(songItem, false);
             }
         });
     }
@@ -117,7 +120,7 @@ public class SongActionListenerImpl implements OnSongActionListener {
     public void onChosenSongTopClicked(@NonNull SongDialog dialog, @NonNull SongItem song) {
         // 置顶
         ChosenSongInfo songModel = song.getTag(ChosenSongInfo.class);
-        mViewModel.topUpSong(songModel);
+        mViewModel.pinSong(songModel);
     }
 
     /**
