@@ -6,6 +6,7 @@ import io.agora.rtmsyncmanager.service.collection.AUIAttributesModel
 import io.agora.rtmsyncmanager.service.collection.AUIListCollection
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserRespObserver
+import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ObservableHelper
 
@@ -18,6 +19,8 @@ class ApplyService(
     private val syncManager: SyncManager,
     private val interactionService: InteractionService
 ) {
+    private val tag = "ApplyService($channelName)"
+
     private val key = "apply"
 
     private val listCollectionCreator =
@@ -36,7 +39,7 @@ class ApplyService(
                     val item = GsonTools.toBeanSafely(it, ApplyInfo::class.java)?: return@forEach
                     list.add(item)
                 }
-
+                AUILogger.logger().d(tag, "onApplyList Updated: $list")
                 observableHelper.notifyEventHandlers {
                     it.invoke(ArrayList(list))
                 }
@@ -65,6 +68,7 @@ class ApplyService(
             userId: String,
             userInfo: Map<String, Any>
         ) {
+            AUILogger.logger().d(tag, "onUserDidLeaved userId:$userId")
             removeUserApply(userId)
         }
 
@@ -91,13 +95,16 @@ class ApplyService(
         success: ((ApplyInfo) -> Unit)? = null,
         failure: ((Throwable) -> Unit)? = null
     ) {
+        AUILogger.logger().d(tag, "addApply userId:$userId")
         val scene = syncManager.getScene(channelName)
         if (scene == null) {
+            AUILogger.logger().d(tag, "addApply scene not found")
             failure?.invoke(RuntimeException("scene not found"))
             return
         }
         val userInfo = scene.userService.getUserInfo(userId)
         if (userInfo == null) {
+            AUILogger.logger().d(tag, "addApply user not found")
             failure?.invoke(RuntimeException("user not found"))
             return
         }
@@ -116,6 +123,7 @@ class ApplyService(
                 )
             )
         ) {
+            AUILogger.logger().d(tag, "addApply result:$it")
             if (it != null) {
                 failure?.invoke(RuntimeException(it))
                 return@addMetaData
@@ -129,8 +137,10 @@ class ApplyService(
         success: (() -> Unit)? = null,
         failure: ((Throwable) -> Unit)? = null
     ) {
+        AUILogger.logger().d(tag, "acceptApply userId:$userId")
         val scene = syncManager.getScene(channelName)
         if (scene == null) {
+            AUILogger.logger().d(tag, "acceptApply scene not found")
             failure?.invoke(RuntimeException("scene not found"))
             return
         }
@@ -145,6 +155,7 @@ class ApplyService(
             }
 
         if (applyInfo == null) {
+            AUILogger.logger().d(tag, "acceptApply apply not found")
             failure?.invoke(RuntimeException("apply not found"))
             return
         }
@@ -163,6 +174,7 @@ class ApplyService(
         success: (() -> Unit)? = null,
         failure: ((Throwable) -> Unit)? = null
     ) {
+        AUILogger.logger().d(tag, "cancelApply userId:$userId")
         removeApply(userId, success, failure)
     }
 
@@ -171,8 +183,10 @@ class ApplyService(
         success: (() -> Unit)? = null,
         failure: ((Throwable) -> Unit)? = null
     ) {
+        AUILogger.logger().d(tag, "removeApply userId:$userId")
         val scene = syncManager.getScene(channelName)
         if (scene == null) {
+            AUILogger.logger().d(tag, "removeApply scene not found")
             failure?.invoke(RuntimeException("scene not found"))
             return
         }
@@ -185,6 +199,7 @@ class ApplyService(
                 )
             )
         ) {
+            AUILogger.logger().d(tag, "removeApply result:$it")
             if (it != null) {
                 failure?.invoke(RuntimeException(it))
                 return@removeMetaData
@@ -222,6 +237,7 @@ class ApplyService(
         onUpdate: (List<ApplyInfo>) -> Unit,
         failure: ((Throwable) -> Unit)? = null
     ) {
+        AUILogger.logger().d(tag, "subscribeApplyEvent onUpdate:$onUpdate")
         val scene = syncManager.getScene(channelName)
         if (scene == null) {
             failure?.invoke(RuntimeException("scene not found"))
@@ -232,10 +248,12 @@ class ApplyService(
     }
 
     fun unSubscribeApplyEvent(onUpdate: (List<ApplyInfo>) -> Unit) {
+        AUILogger.logger().d(tag, "unSubscribeApplyEvent onUpdate:$onUpdate")
         observableHelper.unSubscribeEvent(onUpdate)
     }
 
     fun release() {
+        AUILogger.logger().d(tag, "release")
         observableHelper.unSubscribeAll()
         syncManager.getScene(channelName)?.getCollection(key, listCollectionCreator)
             ?.subscribeAttributesDidChanged(null)
@@ -253,8 +271,10 @@ class ApplyService(
         success: (() -> Unit)? = null,
         failure: ((Throwable) -> Unit)? = null
     ) {
+        AUILogger.logger().d(tag, "removeUserApply userId:$userId")
         val scene = syncManager.getScene(channelName)
         if (scene == null) {
+            AUILogger.logger().d(tag, "removeUserApply scene not found")
             failure?.invoke(RuntimeException("scene not found"))
             return
         }
@@ -267,6 +287,7 @@ class ApplyService(
                 )
             )
         ) {
+            AUILogger.logger().d(tag, "removeUserApply result:$it")
             if (it != null) {
                 failure?.invoke(RuntimeException(it))
                 return@removeMetaData

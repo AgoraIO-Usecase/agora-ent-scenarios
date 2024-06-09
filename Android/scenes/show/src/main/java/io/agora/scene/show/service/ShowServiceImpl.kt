@@ -59,6 +59,7 @@ val kRobotVideoStreamUrls = arrayListOf(
 
 class ShowServiceImpl(context: Context) : ShowServiceProtocol {
 
+    private val tag = "ShowServiceImpl"
     private val appId: String = BuildConfig.AGORA_APP_ID
     private val appCert: String = BuildConfig.AGORA_APP_CERTIFICATE
 
@@ -83,22 +84,22 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
                 roomHostUrl = BuildConfig.ROOM_MANAGER_SERVER_HOST,
                 loggerConfig = AUILogger.Config(
                     context,
-                    "show",
+                    "ShowLiveSyncExtensions",
                     logCallback = object : AUILogger.AUILogCallback {
                         override fun onLogDebug(tag: String, message: String) {
-                            ShowLogger.d(tag, message)
+                             ShowLogger.d(tag, "[SyncExtensions] $message")
                         }
 
                         override fun onLogInfo(tag: String, message: String) {
-                            ShowLogger.d(tag, message)
+                             ShowLogger.d(tag, "[SyncExtensions] $message")
                         }
 
                         override fun onLogWarning(tag: String, message: String) {
-                            ShowLogger.d(tag, message)
+                             ShowLogger.d(tag, "[SyncExtensions] $message")
                         }
 
                         override fun onLogError(tag: String, message: String) {
-                            ShowLogger.e(tag, message = message)
+                             ShowLogger.e(tag, message = "[SyncExtensions] $message")
                         }
                     })
             )
@@ -117,17 +118,19 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
             success = {
                 syncManager.login(it) { ex ->
                     if (ex != null) {
-                        AUILogger.logger().e("login", "login failed: ${ex.message}")
+                         ShowLogger.e(tag, message = "login syncManager failed: ${ex.message}")
                     }
+                    ShowLogger.d(tag, message = "login syncManager success: ${UserManager.getInstance().user.id}")
                 }
             },
             failure = {
-                AUILogger.logger().e("login", "login failed: $it")
+                 ShowLogger.e(tag, message = "generateToken failed: $it")
             }
         )
     }
 
     fun destroy() {
+        ShowLogger.d(tag, message = "destroy")
         syncManager.destroyExtensions()
         syncManager.logout()
         syncManager.release()
@@ -160,6 +163,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
         success: (ShowRoomDetailModel) -> Unit,
         error: ((Exception) -> Unit)?
     ) {
+        ShowLogger.d(tag, "createRoom: $roomId")
         syncManager.getExRoomService().createRoom(
             appId,
             kRoomSceneId,
@@ -173,6 +177,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
             ).toAUIRoomInfo()
         ) { ex, roomInfo ->
             if (ex == null && roomInfo != null) {
+                ShowLogger.d(tag, "createRoom success: $roomId")
                 syncManager.getExRoomPresenceService().login {
                     syncManager.getExRoomPresenceService().setup(
                         RoomPresenceInfo(
@@ -187,6 +192,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
                 }
                 success.invoke(roomInfo.toShowRoomDetailModel())
             } else {
+                ShowLogger.e(tag, message = "createRoom failed: $roomId")
                 error?.invoke(RuntimeException(ex))
             }
         }
@@ -198,15 +204,20 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
         success: () -> Unit,
         error: ((Exception) -> Unit)?
     ) {
-        if (roomId.isRobotRoom()) {
+        val robotRoom = roomId.isRobotRoom()
+        ShowLogger.d(tag, "joinRoom:$roomId, isRobotRoom:$robotRoom")
+
+        if (robotRoom) {
             success.invoke()
             return
         }
+        ShowLogger.d(tag, "enterRoom: $roomId")
         syncManager.getExRoomService().enterRoom(
             appId,
             kRoomSceneId,
             roomId
         ) { ex ->
+            ShowLogger.d(tag, "enterRoom: $roomId, ex: $ex")
             if (ex != null) {
                 error?.invoke(RuntimeException(ex))
                 return@enterRoom
@@ -219,6 +230,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
         roomId: String,
         onUpdate: (status: ShowSubscribeStatus, roomInfo: ShowRoomDetailModel?) -> Unit
     ) {
+        ShowLogger.d(tag, "subscribeCurrRoomEvent: $roomId")
         val scene = syncManager.getScene(roomId)
         scene?.bindRespDelegate(object : ISceneResponse {
             override fun onSceneDestroy(channelName: String) {
@@ -231,7 +243,10 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
     }
 
     override fun leaveRoom(roomId: String) {
-        if (roomId.isRobotRoom()) {
+        val robotRoom = roomId.isRobotRoom()
+        ShowLogger.d(tag, "leaveRoom:$roomId, isRobotRoom:$robotRoom")
+
+        if (robotRoom) {
             return
         }
 
@@ -355,8 +370,8 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
                 onUserChange.invoke(
                     ShowSubscribeStatus.added, ShowUser(
                         userInfo.userId,
-                        userInfo.userName,
                         userInfo.userAvatar,
+                        userInfo.userName,
                         userInfo.muteAudio
                     )
                 )
@@ -367,8 +382,8 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
                 onUserChange.invoke(
                     ShowSubscribeStatus.updated, ShowUser(
                         userInfo.userId,
-                        userInfo.userName,
                         userInfo.userAvatar,
+                        userInfo.userName,
                         userInfo.muteAudio
                     )
                 )
@@ -379,8 +394,8 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
                 onUserChange.invoke(
                     ShowSubscribeStatus.deleted, ShowUser(
                         userInfo.userId,
-                        userInfo.userName,
                         userInfo.userAvatar,
+                        userInfo.userName,
                         userInfo.muteAudio
                     )
                 )
