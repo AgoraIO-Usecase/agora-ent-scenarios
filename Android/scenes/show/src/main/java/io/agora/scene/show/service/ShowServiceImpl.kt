@@ -14,6 +14,7 @@ import io.agora.rtmsyncmanager.service.IAUIUserService.AUIUserRespObserver
 import io.agora.rtmsyncmanager.service.callback.AUIException
 import io.agora.rtmsyncmanager.service.callback.AUIRoomCallback
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmErrorRespObserver
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ThreadManager
@@ -389,8 +390,12 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
                 )
             }
 
-            override fun onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
-                super.onRoomUserLeave(roomId, userInfo)
+            override fun onRoomUserLeave(
+                roomId: String,
+                userInfo: AUIUserInfo,
+                reason: AUIRtmUserLeaveReason
+            ) {
+                super.onRoomUserLeave(roomId, userInfo, reason)
                 onUserChange.invoke(
                     ShowSubscribeStatus.deleted, ShowUser(
                         userInfo.userId,
