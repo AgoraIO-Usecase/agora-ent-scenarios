@@ -7,6 +7,8 @@
 
 import Foundation
 import SwiftyBeaver
+import SSZipArchive
+
 @objc public class AgoraEntLogConfig: NSObject {
     var sceneName: String = ""
     var logFileMaxSize: Int = (1 * 1024 * 1024)
@@ -110,5 +112,72 @@ public func agoraDoMainThreadTask(_ task: (()->())?) {
         }
         
         return urls
+    }
+    
+    private static func zipSceneLog(scene: String, completion: @escaping (String?, Error?) -> Void) {
+        var logFiles = [String]()
+        let logDir = logsDir()
+        if let dirs = try? FileManager.default.contentsOfDirectory(atPath: logDir) {
+            for file in dirs {
+                if file.contains(scene) {
+                    let filePath = "\(logDir)/\(file)"
+                    logFiles.append(filePath)
+                }
+            }
+        }
+        let cacheDir = cacheDir()
+        if let dirs = try? FileManager.default.contentsOfDirectory(atPath: cacheDir) {
+            for file in dirs {
+                // 过滤出文件名包含'agoraapi'、'agorartmsdk'、'agorasdk'的文件
+                if file.contains("agoraapi") || file.contains("agorartmsdk") || file.contains("agorasdk") {
+                    let filePath = "\(cacheDir)/\(file)"
+                    logFiles.append(filePath)
+                }
+            }
+        }
+        guard logFiles.isEmpty == false else {
+            completion(nil, nil)
+            return
+        }
+        let zipFile = NSTemporaryDirectory() + "/log_\(UUID().uuidString).zip"
+        do {
+            SSZipArchive.createZipFile(atPath: zipFile, withFilesAtPaths: logFiles)
+            completion(zipFile, nil)
+        } catch {
+            // 异常处理，回调错误闭包
+            completion(nil, error)
+        }
+    }
+    
+    private static let kAutoSendLog = "AUTO_SEND_LOG"
+    @objc public static func setAutoUploadLog(_ isOn: Bool) {
+        UserDefaults.standard.setValue(isOn, forKey: kAutoSendLog)
+    }
+    
+    @objc public static func getAutoUploadLog() -> Bool {
+        return UserDefaults.standard.bool(forKey: kAutoSendLog)
+    }
+    
+    @objc public static func autoUploadLog(scene: String) {
+        guard UserDefaults.standard.bool(forKey: kAutoSendLog) == true else {
+            return
+        }
+        AgoraEntLog.zipSceneLog(scene: scene, completion: { str, err in
+            guard let filePath = str, let data = try? Data.init(contentsOf: URL(fileURLWithPath: filePath)) else {
+                return
+            }
+            let req = AUIUploadNetworkModel()
+            req.interfaceName = "/api-login/upload/log"
+            req.fileData = data
+            req.name = "file"
+            req.mimeType = "application/zip"
+            req.fileName = URL(fileURLWithPath: filePath).lastPathComponent
+            req.upload { progress in
+                
+            } completion: { err, content in
+                if let e = err {
+                }
+            }
+        })
     }
 }

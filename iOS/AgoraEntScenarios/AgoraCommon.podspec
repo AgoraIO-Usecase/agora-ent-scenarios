@@ -89,4 +89,6 @@ TODO: Add long description of the pod here.
  s.dependency 'AgoraSyncManager'
  s.dependency 'ZSwiftBaseLib'
  s.dependency 'SVProgressHUD'
+ s.dependency 'SSZipArchive'
+ 
 end

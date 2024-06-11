@@ -66,13 +66,13 @@ class RoomListViewController: UIViewController {
     }()
     
     deinit {
-        joyPrint("deinit-- RoomListViewController")
+        JoyLogger.info("deinit-- RoomListViewController")
     }
     
     required init(userInfo: JoyUserInfo) {
         super.init(nibName: nil, bundle: nil)
         self.userInfo = userInfo
-        joyPrint("init-- RoomListViewController")
+        JoyLogger.info("init-- RoomListViewController")
     }
     
     required init?(coder: NSCoder) {
@@ -141,11 +141,11 @@ extension RoomListViewController {
     private func renewRTMTokens(completion: ((String?)->Void)?) {
         guard let userInfo = userInfo else {
             assert(false, "userInfo == nil")
-            joyError("renewTokens fail,userInfo == nil")
+            JoyLogger.error("renewTokens fail,userInfo == nil")
             completion?(nil)
             return
         }
-        joyPrint("renewRTMTokens")
+        JoyLogger.info("renewRTMTokens")
         NetworkManager.shared.generateTokens(appId: joyAppId,
                                              appCertificate: joyAppCertificate,
                                              channelName: ""/*tokenConfig.roomId*/,
@@ -154,11 +154,11 @@ extension RoomListViewController {
                                              tokenTypes: [.rtm]) {[weak self] tokens in
             guard let self = self else {return}
             guard let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
-                joyWarn("renewRTMTokens fail")
+                JoyLogger.warn("renewRTMTokens fail")
                 completion?(nil)
                 return
             }
-            joyPrint("renewRTMTokens success")
+            JoyLogger.info("renewRTMTokens success")
             completion?(rtmToken)
         }
     }
@@ -216,7 +216,7 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
             assert(false, "userInfo == nil")
             return
         }
-        joyPrint("tokenPrivilegeWillExpire")
+        JoyLogger.info("tokenPrivilegeWillExpire")
 //        renewTokens {[weak self, weak engine] success in
 //            guard let self = self, let engine = engine else {return}
 //            guard success else {

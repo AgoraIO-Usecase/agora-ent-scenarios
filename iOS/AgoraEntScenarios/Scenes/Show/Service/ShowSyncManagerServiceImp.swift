@@ -64,11 +64,11 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
         return
     }
     
-    showError(message, context: "Service")
+    ShowLogger.error(message, context: "Service")
 }
 
 private func agoraPrint(_ message: String) {
-    showPrint(message, context: "Service")
+    ShowLogger.info(message, context: "Service")
 }
 
 class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {

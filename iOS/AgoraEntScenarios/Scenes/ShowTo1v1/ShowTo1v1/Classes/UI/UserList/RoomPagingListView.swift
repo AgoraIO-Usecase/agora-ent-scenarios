@@ -140,7 +140,7 @@ class RoomPagingListView: UIView {
               let indexPath = collectionView.indexPath(for: cell) else {
             return
         }
-        showTo1v1Print("reloadCurrentItem: \(indexPath.row)")
+        ShowTo1v1Logger.info("reloadCurrentItem: \(indexPath.row)")
         collectionView.delegate?.collectionView?(collectionView, willDisplay: cell, forItemAt: indexPath)
     }
     
@@ -180,7 +180,7 @@ extension RoomPagingListView: UICollectionViewDataSource {
         cell.tapClosure = { [weak self] room in
             self?.tapClosure?(room)
         }
-        showTo1v1Print("load user: \(roomInfo?.userName ?? "") \(indexPath.row)")
+        ShowTo1v1Logger.info("load user: \(roomInfo?.userName ?? "") \(indexPath.row)")
         return cell
     }
  }
@@ -201,7 +201,7 @@ class ShowLivePagesSlicingDelegateHandler: AGCollectionSlicingDelegateHandler {
         if let cycleArray = roomList as? ShowCycleRoomArray {
             let realIndex = cycleArray.realCellIndex(with: toIndex)
             let fakeIndex = cycleArray.fakeCellIndex(with: realIndex)
-            showTo1v1Print("collectionView scrollViewDidEndDecelerating: from: \(currentIndex) to: \(toIndex) real: \(realIndex)")
+            ShowTo1v1Logger.info("collectionView scrollViewDidEndDecelerating: from: \(currentIndex) to: \(toIndex) real: \(realIndex)")
 
             scroll(to: toIndex)
         }

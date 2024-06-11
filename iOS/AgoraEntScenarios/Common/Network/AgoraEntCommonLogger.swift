@@ -8,85 +8,31 @@
 import Foundation
 import SwiftyBeaver
 
-func commonLogger() -> SwiftyBeaver.Type {
-    AgoraEntLog.getSceneLogger(with: "Common")
-}
-public func agoraEnt_info(_ text: String, tag: String = "AgoraEntCommon") {
-    agoraDoMainThreadTask {
-        commonLogger().info(text, context: tag)
-    }
-}
-
-public func agoraEnt_warn(_ text: String, tag: String = "AgoraEntCommon") {
-    agoraDoMainThreadTask {
-        commonLogger().warning(text, context: tag)
-    }
-}
-
-public func agoraEnt_error(_ text: String, tag: String = "AgoraEntCommon") {
-    agoraDoMainThreadTask {
-        commonLogger().error(text, context: tag)
-    }
-}
-
-public func agoraEnt_default_info(_ text: String, tag: String = "AgoraEntCommon") {
-    agoraDoMainThreadTask {
-        AgoraEntLog.currentLogger(with: "Common").info(text, context: tag)
-    }
-}
-/*
-@objc class AgoraEntCommonLogConfig: NSObject {
-    var logFileMaxSize: Int = (2 * 1024 * 1024)
-}
-
-@objc public class AgoraEntCommonLog: NSObject {
-    static let formatter = DateFormatter()
-    fileprivate static func _dateFormat() ->String {
-        formatter.dateFormat = "yyyy-MM-dd"
-        
-        return formatter.string(from: Date())
-        
-    }
+public class CommonLogger: NSObject {
     
-    static func createLog(config: AgoraEntCommonLogConfig) -> SwiftyBeaver.Type {
-        let log = SwiftyBeaver.self
-        
-        // add log destinations. at least one is needed!
-        let console = ConsoleDestination()
-         // log to Xcode Console
-        let file = FileDestination()  // log to default swiftybeaver.log file
-        let dateString = _dateFormat()
-        let logDir = logsDir()
-        file.logFileURL = URL(fileURLWithPath: "\(logDir)/AgoraEntCommon_ios_\(dateString)_log.log")
-        
-        // use custom format and set console output to short time, log level & message
-        console.format = "[AgoraEntCommon][$L][$X]$Dyyyy-MM-dd HH:mm:ss.SSS$d $M"
-        file.format = console.format
-        file.logFileMaxSize = config.logFileMaxSize
-        file.logFileAmount = 4
-        // or use this for JSON output: console.format = "$J"
-
-        // add the destinations to SwiftyBeaver
-        #if DEBUG
-        log.addDestination(console)
-        #endif
-        log.addDestination(file)
-
-        return log
-    }
+    static let kLogKey = "Common"
     
-    @objc public static func cacheDir() ->String {
-        let dir = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.cachesDirectory,
-                                                      FileManager.SearchPathDomainMask.userDomainMask, true).first
-        return dir ?? ""
+    public static func info(_ text: String, tag: String = "AgoraEntCommon") {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).info(text, context: tag)
+        }
     }
-    
-    @objc static func logsDir() ->String {
-        let dir = cacheDir()
-        let logDir = "\(dir)/AgoraEntCommon_logs"
-        try? FileManager.default.createDirectory(at: URL(fileURLWithPath: logDir), withIntermediateDirectories: true)
-        
-        return logDir
+
+    public static func warn(_ text: String, tag: String = "AgoraEntCommon") {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).warning(text, context: tag)
+        }
+    }
+
+    public static func error(_ text: String, tag: String = "AgoraEntCommon") {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).error(text, context: tag)
+        }
+    }
+
+    public static func default_info(_ text: String, tag: String = "AgoraEntCommon") {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).info(text, context: tag)
+        }
     }
 }
-*/

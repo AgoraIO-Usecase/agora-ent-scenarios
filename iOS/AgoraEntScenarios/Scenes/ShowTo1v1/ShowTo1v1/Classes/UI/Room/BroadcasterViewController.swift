@@ -75,12 +75,12 @@ class BroadcasterViewController: BaseRoomViewController {
     }()
     
     deinit {
-        showTo1v1Print("deinit-- BroadcasterViewController")
+        ShowTo1v1Logger.info("deinit-- BroadcasterViewController")
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        showTo1v1Print("init-- BroadcasterViewController")
+        ShowTo1v1Logger.info("init-- BroadcasterViewController")
     }
     
     required init?(coder: NSCoder) {
@@ -131,13 +131,13 @@ class BroadcasterViewController: BaseRoomViewController {
             let mediaOptions = AgoraRtcChannelMediaOptions()
             mediaOptions.publishCameraTrack = true
             mediaOptions.publishMicrophoneTrack = true
-            showTo1v1Print("broadcaster joinChannel[\(channelId)] \(uid)")
+            ShowTo1v1Logger.info("broadcaster joinChannel[\(channelId)] \(uid)")
             rtcEngine?.joinChannel(byToken: broadcasterToken,
                                    channelId: channelId,
                                    uid: uid,
                                    mediaOptions: mediaOptions,
                                    joinSuccess: {[weak self] channelId, uid, elapsed in
-                showTo1v1Print("broadcaster joinChannel[\(channelId)] success:  \(uid)")
+                ShowTo1v1Logger.info("broadcaster joinChannel[\(channelId)] success:  \(uid)")
                 guard let self = self, let rtcEngine = self.rtcEngine else {return}
                 self.callApi?.setupContentInspectConfig(rtcEngine: rtcEngine, enable: true, uid: "\(uid)", channelId: channelId)
                 self.callApi?.moderationAudio(channelName: channelId)
