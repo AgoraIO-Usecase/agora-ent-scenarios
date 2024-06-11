@@ -25,6 +25,8 @@ import com.google.android.material.card.MaterialCardView
 import io.agora.rtc2.Constants
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.LogUploader
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnButtonClickListener
@@ -714,6 +716,9 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
 
     override fun onDestroy() {
         super.onDestroy()
+        if (SceneConfigManager.logUpload) {
+            LogUploader.uploadLog()
+        }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
