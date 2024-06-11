@@ -12,7 +12,6 @@ import io.agora.rtm.RtmEventListener
 import io.agora.rtm.StorageEvent
 import io.agora.rtm.TopicEvent
 import io.agora.rtmsyncmanager.utils.AUILogger
-import java.sql.Timestamp
 
 interface AUIRtmErrorRespObserver {
 
@@ -45,10 +44,15 @@ interface AUIRtmMessageRespObserver {
     fun onMessageReceive(channelName: String, publisherId: String, message: String)
 }
 
+enum class AUIRtmUserLeaveReason(val value: Int) {
+    NORMAL(0),
+    TIMEOUT(1)
+}
+
 interface AUIRtmUserRespObserver {
     fun onUserSnapshotRecv(channelName: String, userId: String, userList: List<Map<String, Any>>)
     fun onUserDidJoined(channelName: String, userId: String, userInfo: Map<String, Any>)
-    fun onUserDidLeaved(channelName: String, userId: String, userInfo: Map<String, Any>)
+    fun onUserDidLeaved(channelName: String, userId: String, userInfo: Map<String, Any>, reason: AUIRtmUserLeaveReason)
     fun onUserDidUpdated(channelName: String, userId: String, userInfo: Map<String, Any>)
 }
 
@@ -236,10 +240,14 @@ class AUIRtmMsgProxy : RtmEventListener {
                     handler.onUserDidJoined(event.channelName, event.publisherId ?: "", map)
                 }
 
-            RtmConstants.RtmPresenceEventType.REMOTE_LEAVE,
+            RtmConstants.RtmPresenceEventType.REMOTE_LEAVE ->
+                userRespObservers.forEach { handler ->
+                    handler.onUserDidLeaved(event.channelName, event.publisherId ?: "", map, AUIRtmUserLeaveReason.NORMAL)
+                }
+
             RtmConstants.RtmPresenceEventType.REMOTE_TIMEOUT ->
                 userRespObservers.forEach { handler ->
-                    handler.onUserDidLeaved(event.channelName, event.publisherId ?: "", map)
+                    handler.onUserDidLeaved(event.channelName, event.publisherId ?: "", map, AUIRtmUserLeaveReason.TIMEOUT)
                 }
 
             RtmConstants.RtmPresenceEventType.REMOTE_STATE_CHANGED ->

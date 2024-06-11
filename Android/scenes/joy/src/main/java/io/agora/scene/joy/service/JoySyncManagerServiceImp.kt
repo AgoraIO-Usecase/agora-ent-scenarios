@@ -20,6 +20,7 @@ import io.agora.rtmsyncmanager.service.room.AUIRoomManager
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmAttributeRespObserver
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmMessageRespObserver
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.scene.base.BuildConfig
@@ -499,7 +500,7 @@ class JoySyncManagerServiceImp constructor(
             })
     }
 
-    override fun onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
+    override fun onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
         JoyLogger.d(TAG, "onRoomUserLeave, roomId:$roomId, userInfo:$userInfo")
         if (mCurrRoomNo != roomId) {
             return
