@@ -439,7 +439,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 // TODO bug CallServiceManager.instance.rtcEngine?.stopAudioMixing()
 
                 if (SceneConfigManager.logUpload) {
-                    LogUploader.uploadLog()
+                    LogUploader.uploadLog(LogUploader.SceneType.PURE1V1)
                 }
             }
             CallStateType.Failed -> {
