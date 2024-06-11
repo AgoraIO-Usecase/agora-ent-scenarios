@@ -70,13 +70,6 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
     dianGeBtn.accessibilityIdentifier = @"ktv_bottom_bar_diange_button";
     [self addSubview:dianGeBtn];
     
-    UIButton *voiceShowBtn = [[UIButton alloc]initWithFrame:CGRectMake(moreBtn.right + 14 , (self.height-24)*0.5, 24, 24)];
-    [voiceShowBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_moreItem_icon" ] forState:UIControlStateNormal];
-    [voiceShowBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
-    voiceShowBtn.tag = VLKTVBottomBtnClickTypeShowVoice;
-    [self addSubview:voiceShowBtn];
-    voiceShowBtn.hidden = YES;
-    
     for (VLRoomSeatModel *info in self.seatsArray) {
         if ([info.owner.userId integerValue] == [VLUserCenter.user.id integerValue]) {
             //is self

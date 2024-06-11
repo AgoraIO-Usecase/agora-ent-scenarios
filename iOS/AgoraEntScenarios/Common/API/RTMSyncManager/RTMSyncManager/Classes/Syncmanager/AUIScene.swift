@@ -17,9 +17,9 @@ let kRoomInfoPayloadId = "room_payload_id"
 public class AUIScene: NSObject {
     private var channelName: String
     public let userService: AUIUserServiceImpl
+    public let arbiter: AUIArbiter
     private var removeClosure: ()->()
     private var rtmManager: AUIRtmManager
-    private var arbiter: AUIArbiter
     private var enterCondition: AUISceneEnterCondition
     private var expireCondition: AUISceneExpiredCondition
     private var collectionMap: [String: IAUICollection] = [:]
@@ -331,7 +331,7 @@ extension AUIScene: AUIUserRespDelegate {
         aui_info("onRoomUserEnter[\(roomId)] userId: \(userInfo.userId)", tag: kSceneTag)
     }
     
-    public func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
+    public func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
         aui_info("onRoomUserLeave[\(roomId)] userId: \(userInfo.userId)", tag: kSceneTag)
         guard AUIRoomContext.shared.isRoomOwner(channelName: roomId, userId: userInfo.userId) else {
             cleanUserInfo(userId: userInfo.userId)

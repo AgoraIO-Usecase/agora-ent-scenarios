@@ -2,6 +2,8 @@ package io.agora.scene.voice.rtckit.listener
 
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.IMediaPlayerObserver
+import io.agora.mediaplayer.data.CacheStatistics
+import io.agora.mediaplayer.data.PlayerPlaybackStats
 import io.agora.mediaplayer.data.PlayerUpdatedInfo
 import io.agora.mediaplayer.data.SrcInfo
 
@@ -9,7 +11,7 @@ import io.agora.mediaplayer.data.SrcInfo
  * @author create by zhangwei03
  */
 open class MediaPlayerObserver : IMediaPlayerObserver {
-    override fun onPlayerStateChanged(state: Constants.MediaPlayerState?, error: Constants.MediaPlayerError?) {
+    override fun onPlayerStateChanged(state: Constants.MediaPlayerState?, error: Constants.MediaPlayerReason?) {
     }
 
     override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
@@ -33,6 +35,14 @@ open class MediaPlayerObserver : IMediaPlayerObserver {
     }
 
     override fun onPlayerInfoUpdated(info: PlayerUpdatedInfo?) {
+    }
+
+    override fun onPlayerCacheStats(stats: CacheStatistics?) {
+
+    }
+
+    override fun onPlayerPlaybackStats(stats: PlayerPlaybackStats?) {
+
     }
 
     override fun onAudioVolumeIndication(volume: Int) {

@@ -13,35 +13,77 @@
         android:textColor="@color/voice_color_3c4267"
         android:textSize="@dimen/voice_sp_13"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/mtChatroomOff"
+        app:layout_constraintBottom_toBottomOf="@+id/mtSettingOff"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/mtChatroomOff"
-        tools:text="@string/voice_chatroom_your_ains" />
+        app:layout_constraintTop_toTopOf="@+id/mtSettingOff"
+        tools:text="@string/voice_chatroom_setting_ains" />
 
+    <!--   传统强 -->
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/mtChatroomHigh"
+        android:id="@+id/mtTraditionalStrong"
         style="@style/voice_bottom_sheet_frame_text_style"
-        android:layout_marginEnd="6dp"
+        android:layout_marginEnd="4dp"
         android:background="@drawable/voice_bg_rect_radius4_grey"
         android:minWidth="38dp"
-        android:text="@string/voice_chatroom_high"
+        android:text="@string/voice_chatroom_setting_traditional_strong"
         android:textColor="@color/voice_dark_grey_color_979cbb"
-        app:layout_constraintBottom_toBottomOf="@+id/mtChatroomOff"
-        app:layout_constraintEnd_toStartOf="@+id/mtChatroomMedium"
-        app:layout_constraintTop_toTopOf="@+id/mtChatroomOff" />
+        app:layout_constraintBottom_toBottomOf="@+id/mtSettingOff"
+        app:layout_constraintEnd_toStartOf="@+id/mtTraditionalWeakness"
+        app:layout_constraintTop_toTopOf="@+id/mtSettingOff" />
 
+    <!--   传统弱 -->
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/mtChatroomMedium"
+        android:id="@+id/mtTraditionalWeakness"
         style="@style/voice_bottom_sheet_frame_text_style"
-        android:layout_marginEnd="6dp"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/voice_bg_rect_radius4_grey"
         android:minWidth="38dp"
-        android:text="@string/voice_chatroom_medium"
-        app:layout_constraintBottom_toBottomOf="@+id/mtChatroomOff"
-        app:layout_constraintEnd_toStartOf="@+id/mtChatroomOff"
-        app:layout_constraintTop_toTopOf="@+id/mtChatroomOff" />
+        android:text="@string/voice_chatroom_setting_traditional_weakness"
+        android:textColor="@color/voice_dark_grey_color_979cbb"
+        app:layout_constraintBottom_toBottomOf="@+id/mtSettingOff"
+        app:layout_constraintEnd_toStartOf="@+id/mtAiStrong"
+        app:layout_constraintTop_toTopOf="@+id/mtSettingOff" />
 
+    <!--   AI 强 -->
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/mtChatroomOff"
+        android:id="@+id/mtAiStrong"
+        style="@style/voice_bottom_sheet_frame_text_style"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/voice_bg_rect_radius4_grey"
+        android:minWidth="38dp"
+        android:text="@string/voice_chatroom_setting_ai_strong"
+        android:textColor="@color/voice_dark_grey_color_979cbb"
+        app:layout_constraintBottom_toBottomOf="@+id/mtSettingOff"
+        app:layout_constraintEnd_toStartOf="@+id/mtAiWeakness"
+        app:layout_constraintTop_toTopOf="@+id/mtSettingOff" />
+
+    <!--   AI 弱 -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtAiWeakness"
+        style="@style/voice_bottom_sheet_frame_text_style"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/voice_bg_rect_radius4_grey"
+        android:minWidth="38dp"
+        android:text="@string/voice_chatroom_setting_ai_weakness"
+        android:textColor="@color/voice_dark_grey_color_979cbb"
+        app:layout_constraintBottom_toBottomOf="@+id/mtSettingOff"
+        app:layout_constraintEnd_toStartOf="@+id/mtSettingCustom"
+        app:layout_constraintTop_toTopOf="@+id/mtSettingOff" />
+
+    <!--   自定义 -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtSettingCustom"
+        style="@style/voice_bottom_sheet_frame_text_style"
+        android:layout_marginEnd="4dp"
+        android:minWidth="38dp"
+        android:text="@string/voice_chatroom_setting_custom"
+        app:layout_constraintBottom_toBottomOf="@+id/mtSettingOff"
+        app:layout_constraintEnd_toStartOf="@+id/mtSettingOff"
+        app:layout_constraintTop_toTopOf="@+id/mtSettingOff" />
+
+    <!--  关闭  -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtSettingOff"
         style="@style/voice_bottom_sheet_frame_text_style"
         android:layout_marginTop="14dp"
         android:layout_marginEnd="20dp"

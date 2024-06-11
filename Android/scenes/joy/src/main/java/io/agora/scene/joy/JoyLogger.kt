@@ -17,6 +17,11 @@ object JoyLogger {
     }
 
     @JvmStatic
+    fun e(tag: String, message: String, vararg args: Any) {
+        entLogger.e(tag, message, args)
+    }
+
+    @JvmStatic
     fun e(tag: String, throwable: Throwable? = null, message: String = "") {
         if (throwable != null) {
             entLogger.e(tag, throwable, message)
