@@ -5,6 +5,7 @@ import io.agora.rtmsyncmanager.model.AUIRoomContext
 import io.agora.rtmsyncmanager.service.collection.AUIAttributesModel
 import io.agora.rtmsyncmanager.service.collection.AUIListCollection
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserRespObserver
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
@@ -66,7 +67,8 @@ class ApplyService(
         override fun onUserDidLeaved(
             channelName: String,
             userId: String,
-            userInfo: Map<String, Any>
+            userInfo: Map<String, Any>,
+            reason: AUIRtmUserLeaveReason
         ) {
             AUILogger.logger().d(tag, "onUserDidLeaved userId:$userId")
             removeUserApply(userId)

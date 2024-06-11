@@ -43,6 +43,8 @@ import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.rtmsyncmanager.model.AUIUserInfo
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.LogUploader
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
@@ -147,6 +149,13 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     override fun onPermissionDined(permission: String?) {
         PermissionLeakDialog(this).show(permission, { getPermissions() }) { launchAppSetting(permission) }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (SceneConfigManager.logUpload) {
+            LogUploader.uploadLog()
+        }
     }
 
     override fun getViewBinding(inflater: LayoutInflater): JoyActivityLiveDetailBinding {
