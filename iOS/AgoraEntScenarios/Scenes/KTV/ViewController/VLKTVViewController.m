@@ -438,6 +438,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 //                [weakSelf destroyMediaPlayer];
 //                [weakSelf leaveRTCChannel];
                 [weakSelf.navigationController popToViewController:vc animated:YES];
+                [AgoraEntLog autoUploadLogWithScene:KTVLog.kLogKey];
             }
         }
         [[VLKTVAlert shared] dismiss];
@@ -606,7 +607,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 #pragma mark - rtc callbacks
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine didJoinedOfUid:(NSUInteger)uid elapsed:(NSInteger)elapsed
 {
-    KTVLogInfo(@"didJoinedOfUid: %ld", uid);
+    [KTVLog infoWithText:[NSString stringWithFormat:@"didJoinedOfUid: %ld", uid]];
 //    [self.ktvApi mainRtcEngine:engine didJoinedOfUid:uid elapsed:elapsed];
 }
 
@@ -1088,6 +1089,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLOnLineListVC class]]) {
                 [weakSelf.navigationController popToViewController:vc animated:YES];
+                [AgoraEntLog autoUploadLogWithScene:KTVLog.kLogKey];
             }
         }
     }];

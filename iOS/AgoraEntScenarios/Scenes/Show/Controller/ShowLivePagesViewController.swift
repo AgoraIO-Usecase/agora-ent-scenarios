@@ -22,14 +22,14 @@ class ShowLivePagesViewController: ViewController {
                   localUid != info.uid else {
                 return nil
             }
-            showPrint("[\(room.roomId)]onRequireRenderVideo: \(info.channelName)  \(vc.liveView.canvasView.localView)", context: kPagesVCTag)
+            ShowLogger.info("[\(room.roomId)]onRequireRenderVideo: \(info.channelName)  \(vc.liveView.canvasView.localView)", context: kPagesVCTag)
             if room.channelName() == info.channelName, room.userId() == "\(info.uid)" {
                 return vc.liveView.canvasView.localView
             } else {
                 if let _ = room.interactionAnchorInfoList.filter({ $0.uid == info.uid && $0.channelName == info.channelName }).first {
                     return vc.liveView.canvasView.remoteView
                 }
-                showPrint("onRequireRenderVideo fail: \(info.channelName)/\(room.roomId)", context: kPagesVCTag)
+                ShowLogger.info("onRequireRenderVideo fail: \(info.channelName)/\(room.roomId)", context: kPagesVCTag)
                 return nil
             }
         }
@@ -64,7 +64,7 @@ class ShowLivePagesViewController: ViewController {
     }()
     
     deinit {
-        showPrint("deinit-- ShowLivePagesViewController", context: kPagesVCTag)
+        ShowLogger.info("deinit-- ShowLivePagesViewController", context: kPagesVCTag)
         ShowAgoraKitManager.shared.leaveAllRoom()
         AppContext.unloadShowServiceImpExcludeRoomList()
     }
@@ -224,7 +224,7 @@ class ShowLivePagesSlicingDelegateHandler: AGCollectionSlicingDelegateHandler {
         let cell = super.collectionView(collectionView, cellForItemAt: indexPath)
         let idx = indexPath.row
         defer {
-            showPrint("collectionView cellForItemAt: \(idx)/\(indexPath.row)", context: kPagesVCTag)
+            ShowLogger.info("collectionView cellForItemAt: \(idx)/\(indexPath.row)", context: kPagesVCTag)
         }
         
         guard let room = roomList?[idx] as? ShowRoomListModel else {
@@ -284,7 +284,7 @@ class ShowLivePagesSlicingDelegateHandler: AGCollectionSlicingDelegateHandler {
         if let cycleArray = roomList as? ShowCycleRoomArray {
             let realIndex = cycleArray.realCellIndex(with: toIndex)
             let fakeIndex = cycleArray.fakeCellIndex(with: realIndex)
-            showPrint("scrollViewDidEndDecelerating: from: \(currentIndex) to: \(fakeIndex)", context: kPagesVCTag)
+            ShowLogger.info("scrollViewDidEndDecelerating: from: \(currentIndex) to: \(fakeIndex)", context: kPagesVCTag)
             self.scrollView = nil
             (scrollView as? UICollectionView)?.scrollToItem(at: IndexPath(row: fakeIndex, section: 0),
                                                             at: .centeredVertically,

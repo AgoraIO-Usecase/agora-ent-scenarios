@@ -511,6 +511,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 //                [weakSelf destroyMediaPlayer];
 //                [weakSelf leaveRTCChannel];
                 [weakSelf.navigationController popToViewController:vc animated:YES];
+                [AgoraEntLog autoUploadLogWithScene:SRLog.kLogKey];
             }
         }
         [[VLKTVAlert shared] dismiss];
@@ -963,6 +964,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLSROnLineListVC class]]) {
                 [weakSelf.navigationController popToViewController:vc animated:YES];
+                [AgoraEntLog autoUploadLogWithScene:SRLog.kLogKey];
             }
         }
     }];

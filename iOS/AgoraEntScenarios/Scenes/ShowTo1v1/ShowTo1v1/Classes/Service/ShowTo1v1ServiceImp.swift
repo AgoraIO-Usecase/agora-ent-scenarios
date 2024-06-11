@@ -44,7 +44,7 @@ class ShowTo1v1ServiceImp: NSObject {
         self.user = user
         self.rtmClient = rtmClient
         AUIRoomContext.shared.displayLogClosure = { msg in
-            showTo1v1Print(msg, context: "RTMSyncManager")
+            ShowTo1v1Logger.info(msg, context: "RTMSyncManager")
         }
         super.init()
         let _ = self.syncManager
@@ -72,7 +72,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
     }
     
     func createRoom(roomName: String, completion: @escaping (ShowTo1v1RoomInfo?, Error?) -> Void) {
-        showTo1v1Print("createRoom start")
+        ShowTo1v1Logger.info("createRoom start")
         let roomInfo = ShowTo1v1RoomInfo()
         roomInfo.uid = user.uid
         roomInfo.userName = user.userName
@@ -87,19 +87,19 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
         scene.bindRespDelegate(delegate: self)
         roomManager.createRoom(room: aui_roomInfo) { err, info in
             if let err = err {
-                showTo1v1Error("create room fail: \(err.localizedDescription)")
+                ShowTo1v1Logger.error("create room fail: \(err.localizedDescription)")
                 completion(nil, err)
                 return
             }
             scene.create(createTime: roomInfo.createdAt, payload: [:]) {[weak self] err in
                 if let err = err {
-                    showTo1v1Error("create scene fail: \(err.localizedDescription)")
+                    ShowTo1v1Logger.error("create scene fail: \(err.localizedDescription)")
                     completion(nil, err)
                     return
                 }
                 scene.enter { payload, err in
                     if let err = err {
-                        showTo1v1Error("enter scene fail: \(err.localizedDescription)")
+                        ShowTo1v1Logger.error("enter scene fail: \(err.localizedDescription)")
                         completion(nil, err)
                         return
                     }
@@ -116,7 +116,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
         scene.userService.bindRespDelegate(delegate: self)
         scene.enter { payload, err in
             if let err = err {
-                showTo1v1Error("enter scene fail: \(err.localizedDescription)")
+                ShowTo1v1Logger.error("enter scene fail: \(err.localizedDescription)")
                 scene.leave()
                 completion(err)
                 return
@@ -151,7 +151,7 @@ extension ShowTo1v1ServiceImp: AUISceneRespDelegate {
         }
     }
     func onSceneDestroy(roomId: String) {
-        showTo1v1Print("onSceneDestroy: \(roomId)")
+        ShowTo1v1Logger.info("onSceneDestroy: \(roomId)")
         guard let model = self.roomList.filter({ $0.roomId == roomId }).first else {
             return
         }

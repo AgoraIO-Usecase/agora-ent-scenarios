@@ -9,6 +9,7 @@
 @import LEEAlert;
 #import "MenuUtils.h"
 #import "AgoraEntScenarios-Swift.h"
+#import "Masonry.h"
 @interface DevViewController ()
 
 @end
@@ -67,12 +68,44 @@
     [subBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [subBtn addTarget:self action:@selector(leaveDev) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:subBtn];
+    
+    
+    // auto send log segment
+    UIView *sendLogView = [[UIView alloc] initWithFrame:CGRectMake(20, 80, 300, 50)];
+    [self.view addSubview:sendLogView];
+    [sendLogView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.equalTo(self.view);
+        make.top.equalTo(customView.mas_bottom);
+        make.height.equalTo(@48);
+    }];
+    
+    UILabel *sendLogTitle = [[UILabel alloc] init];
+    sendLogTitle.text = AGLocalizedString(@"app_devmode_send_log");
+    [sendLogView addSubview:sendLogTitle];
+    [sendLogTitle mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(sendLogView);
+        make.left.equalTo(@20);
+    }];
+    
+    UISegmentedControl *sendLogSegment = [[UISegmentedControl alloc] initWithItems:@[@"on", @"off"]];
+    sendLogSegment.selectedSegmentIndex = [AgoraEntLog getAutoUploadLog] ? 0 : 1;
+    [sendLogSegment addTarget:self action:@selector(onClickSendLogSegment:) forControlEvents:UIControlEventValueChanged];
+    [sendLogView addSubview:sendLogSegment];
+    [sendLogSegment mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(sendLogView);
+        make.right.equalTo(@-20);
+    }];
+}
+
+- (void)onClickSendLogSegment:(UISegmentedControl *)sender {
+    NSInteger index = sender.selectedSegmentIndex;
+    BOOL isOn = (index == 0);
+    [AgoraEntLog setAutoUploadLog:isOn];
 }
 
 - (void)segChanged:(UISegmentedControl *)seg {
     NSInteger index = seg.selectedSegmentIndex;
     [[NSUserDefaults standardUserDefaults] setValue:@(index) forKey:@"TOOLBOXENV"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)confirm {

@@ -562,6 +562,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
 //                [weakSelf destroyMediaPlayer];
 //                [weakSelf leaveRTCChannel];
                 [weakSelf.navigationController popToViewController:vc animated:YES];
+                [AgoraEntLog autoUploadLogWithScene:SBGLog.kLogKey];
             }
         }
         [[VLKTVAlert shared] dismiss];
@@ -989,6 +990,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         for (VLBaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLSBGOnLineListVC class]]) {
                 [weakSelf.navigationController popToViewController:vc animated:YES];
+                [AgoraEntLog autoUploadLogWithScene:SBGLog.kLogKey];
             }
         }
     }];

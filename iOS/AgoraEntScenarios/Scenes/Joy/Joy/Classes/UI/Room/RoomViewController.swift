@@ -8,6 +8,7 @@
 import UIKit
 import AgoraRtcKit
 import SVProgressHUD
+import AgoraCommon
 
 class TouchGameView: UIView {
     var touchEnd: (()->())?
@@ -258,7 +259,7 @@ class RoomViewController: UIViewController {
                 }
             } else {
                 CloudBarrageAPI.shared.getGameStatus(gameId: gameId, taskId: taskId) { status in
-                    joyPrint("getGameStatus: \(status?.rawValue ?? .none)")
+                    JoyLogger.info("getGameStatus: \(status?.rawValue ?? .none)")
                     guard status == .startFailed else {
                         return
                     }
@@ -271,7 +272,7 @@ class RoomViewController: UIViewController {
                         }
                         
                         guard let game = list?.first(where: { $0.gameId == gameId }) else {
-                            joyError("restart game[\(gameId)] not found! game list count: \(list?.count ?? 0)")
+                            JoyLogger.error("restart game[\(gameId)] not found! game list count: \(list?.count ?? 0)")
                             return
                         }
                         self?.startGame(gameInfo: game, assistantUid: assistantUid)
@@ -456,7 +457,7 @@ extension RoomViewController {
                                channelId: roomId,
                                uid: userId,
                                mediaOptions: mediaOptions) { channel, uid, elapsed in
-                joyPrint("joinChannel[\(channel)][\(uid)] cost: \(elapsed)ms")
+                JoyLogger.info("joinChannel[\(channel)][\(uid)] cost: \(elapsed)ms")
             }
         }
         
@@ -494,7 +495,7 @@ extension RoomViewController {
     }
     
     private func renewRTCTokens(roomId: String, userId: UInt, completion: ((String?)->Void)?) {
-        joyPrint("renewRTCTokens[\(roomId)][\(userId)]")
+        JoyLogger.info("renewRTCTokens[\(roomId)][\(userId)]")
         NetworkManager.shared.generateTokens(appId: joyAppId,
                                              appCertificate: joyAppCertificate,
                                              channelName: roomId,
@@ -503,11 +504,11 @@ extension RoomViewController {
                                              tokenTypes: [.rtc]) {[weak self] tokens in
             guard let self = self else {return}
             guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue] else {
-                joyWarn("renewRTCTokens[\(roomId)] fail")
+                JoyLogger.warn("renewRTCTokens[\(roomId)] fail")
                 completion?(nil)
                 return
             }
-            joyPrint("renewRTCTokens[\(roomId)] success")
+            JoyLogger.info("renewRTCTokens[\(roomId)] success")
             completion?(rtcToken)
         }
     }
@@ -519,6 +520,7 @@ extension RoomViewController {
         })
         leaveRTCChannel()
         stopGame()
+        AgoraEntLog.autoUploadLog(scene: JoyLogger.kLogKey)
     }
 }
 
@@ -549,7 +551,7 @@ extension RoomViewController: RoomBottomBarDelegate {
     
     func onClickGiftButton() {
         guard let gameId = gameInfo?.gameId, let giftList = gameInfo?.gifts else {
-            joyWarn("show gift fail!")
+            JoyLogger.warn("show gift fail!")
             getGameInfo(gameId: gameInfo?.gameId ?? "")
             return
         }
@@ -681,7 +683,7 @@ extension RoomViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, firstRemoteVideoFrameOfUid uid: UInt, size: CGSize, elapsed: Int) {
         if uid == startGameInfo?.assistantUid ?? 0 {
-//            joyPrint("size = \(size)")
+//            JoyLogger.info("size = \(size)")
             resetAssistantCanvasView(size: size)
         }
     }

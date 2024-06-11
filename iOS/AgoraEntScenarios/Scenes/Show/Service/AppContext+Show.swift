@@ -17,25 +17,26 @@ private let kRtcToken = "kRtcToken"
 private let kRtcTokenDate = "kRtcTokenDate"
 private let kDebugModeKey = "kDebugModeKey"
 
-func showLogger() -> SwiftyBeaver.Type {
-    AgoraEntLog.getSceneLogger(with: "Show")
-}
-
-func showPrint(_ message: String, context: String? = nil) {
-    agoraDoMainThreadTask {
-        showLogger().info(message, context: context)
+public class ShowLogger: NSObject {
+    
+    public static let kLogKey = "Show"
+    
+    public static func info(_ text: String, context: String? = nil) {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).info(text, context: context)
+        }
     }
-}
 
-func showWarn(_ message: String, context: String? = nil) {
-    agoraDoMainThreadTask {
-        showLogger().warning(message, context: context)
+    public static func warn(_ text: String, context: String? = nil) {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).warning(text, context: context)
+        }
     }
-}
 
-func showError(_ message: String, context: String? = nil) {
-    agoraDoMainThreadTask {
-        showLogger().error(message, context: context)
+    public static func error(_ text: String, context: String? = nil) {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).error(text, context: context)
+        }
     }
 }
 

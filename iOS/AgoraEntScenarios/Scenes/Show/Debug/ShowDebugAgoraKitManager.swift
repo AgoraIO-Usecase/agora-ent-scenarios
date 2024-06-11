@@ -170,22 +170,22 @@ class ShowDebugAgoraKitManager {
         switch key {
         case .encodeFrameRate:
             guard let value = Int(text), let fps = AgoraVideoFrameRate(rawValue: value) else {
-                showPrint("***Debug*** 编码帧率参数为空 ")
+                ShowLogger.info("***Debug*** 编码帧率参数为空 ")
                 return
             }
             encoderConfig.frameRate = fps
             engine?.setVideoEncoderConfiguration(encoderConfig)
             saveVideoEncoderConfiguration()
-            showPrint("***Debug*** setVideoEncoderConfiguration.encodeFrameRate = \(encoderConfig.frameRate) ")
+            ShowLogger.info("***Debug*** setVideoEncoderConfiguration.encodeFrameRate = \(encoderConfig.frameRate) ")
         case .bitRate:
             guard let value = Int(text) else {
-                showPrint("***Debug*** 码率参数为空")
+                ShowLogger.info("***Debug*** 码率参数为空")
                 return
             }
             encoderConfig.bitrate = value
             engine?.setVideoEncoderConfiguration(encoderConfig)
             saveVideoEncoderConfiguration()
-            showPrint("***Debug*** setVideoEncoderConfiguration.bitrate = \(encoderConfig.bitrate) ")
+            ShowLogger.info("***Debug*** setVideoEncoderConfiguration.bitrate = \(encoderConfig.bitrate) ")
         }
     }
     
@@ -199,7 +199,7 @@ class ShowDebugAgoraKitManager {
             encoderConfig.dimensions = CGSize(width: value1, height: value2)
             engine?.setVideoEncoderConfiguration(encoderConfig)
             saveVideoEncoderConfiguration()
-            showPrint("***Debug*** setVideoEncoderConfiguration.encodeVideoSize = \(encoderConfig.dimensions) ")
+            ShowLogger.info("***Debug*** setVideoEncoderConfiguration.encodeVideoSize = \(encoderConfig.dimensions) ")
         case .exposureRange:
             exposureRangeX = value1
             exposureRangeY = value2
@@ -226,28 +226,28 @@ class ShowDebugAgoraKitManager {
             engine?.setVideoDenoiserOptions(isOn, options: AgoraVideoDenoiserOptions())
         case .focusFace:
             engine?.setCameraAutoFocusFaceModeEnabled(isOn)
-            showPrint("***Debug*** setCameraAutoFocusFaceModeEnabled  \(isOn)")
+            ShowLogger.info("***Debug*** setCameraAutoFocusFaceModeEnabled  \(isOn)")
         case .encode:
             let index = indexValue % debugEncodeItems.count
             engine?.setParameters("{\"engine.video.enable_hw_encoder\":\"\(debugEncodeItems[index])\"}")
-            showPrint("***Debug*** engine.video.enable_hw_encoder  \(debugEncodeItems[index])")
+            ShowLogger.info("***Debug*** engine.video.enable_hw_encoder  \(debugEncodeItems[index])")
         case .codeCType:
             let index = indexValue % debugCodeCTypeItems.count
             engine?.setParameters("{\"engine.video.codec_type\":\"\(debugCodeCTypeItems[index])\"}")
-            showPrint("***Debug*** engine.video.codec_type  \(debugCodeCTypeItems[index])")
+            ShowLogger.info("***Debug*** engine.video.codec_type  \(debugCodeCTypeItems[index])")
 
         case .mirror, .renderMode:
             let index = ShowDebugSettingKey.renderMode.intValue % debugRenderModeItems.count
             let mirrorIsOn = ShowDebugSettingKey.mirror.boolValue
             engine?.setLocalRenderMode(debugRenderModeItems[index], mirror: mirrorIsOn ? .enabled : .disabled)
-            showPrint("***Debug*** setLocalRenderMode  mirror = \(mirrorIsOn ? AgoraVideoMirrorMode.enabled : AgoraVideoMirrorMode.disabled), rendermode = \(debugRenderModeItems[index])")
+            ShowLogger.info("***Debug*** setLocalRenderMode  mirror = \(mirrorIsOn ? AgoraVideoMirrorMode.enabled : AgoraVideoMirrorMode.disabled), rendermode = \(debugRenderModeItems[index])")
         case .debugSR, .debugSrType:
             let srIsOn = ShowDebugSettingKey.debugSR.boolValue
             let index = ShowDebugSettingKey.debugSrType.intValue % debugSrTypeItems.count
             setDebugSuperResolutionOn(srIsOn, srType: debugSrTypeItems[index])
         case .debugPVC:
             engine?.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
-            showPrint("***Debug*** rtc.video.enable_pvc \(isOn)")
+            ShowLogger.info("***Debug*** rtc.video.enable_pvc \(isOn)")
         }
     }
 }
@@ -257,7 +257,7 @@ extension ShowDebugAgoraKitManager {
     private func setExposureRange() {
         if let x = exposureRangeX, let y = exposureRangeY {
             engine?.setCameraExposurePosition(CGPoint(x: x, y: y))
-            showPrint("***Debug*** setCameraExposurePosition = \(CGPoint(x: x, y: y)) ")
+            ShowLogger.info("***Debug*** setCameraExposurePosition = \(CGPoint(x: x, y: y)) ")
         }
     }
     
@@ -265,7 +265,7 @@ extension ShowDebugAgoraKitManager {
         if let v1 = videoFullrangeExt, let v2 = matrixCoefficientsExt {
             engine?.setParameters("{\"che.video.videoFullrangeExt\":\(v1)}")
             engine?.setParameters("{\"che.video.matrixCoefficientsExt\":\(v2)}")
-            showPrint("***Debug*** {\"che.video.videoFullrangeExt\":\(v1)} {\"che.video.matrixCoefficientsExt\":\(v2)} ")
+            ShowLogger.info("***Debug*** {\"che.video.videoFullrangeExt\":\(v1)} {\"che.video.matrixCoefficientsExt\":\(v2)} ")
         }
     }
     

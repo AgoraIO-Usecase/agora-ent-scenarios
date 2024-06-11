@@ -170,7 +170,7 @@ class ShowLiveViewController: UIViewController {
     private var currentInteraction: ShowInteractionInfo? {
         didSet {
             if let currentInteraction = currentInteraction {
-                showPrint("currentInteraction: \(currentInteraction.description)")
+                ShowLogger.info("currentInteraction: \(currentInteraction.description)")
             }
             if self.room?.userId() == self.currentUserId {
                 self.liveView.showThumnbnailCanvasView = false
@@ -262,7 +262,7 @@ class ShowLiveViewController: UIViewController {
 //        leaveRoom()
 //        AppContext.unloadShowServiceImp(roomId)
 //        VideoLoaderApiImpl.shared.removeListener(listener: self)
-        showPrint("deinit-- ShowLiveViewController \(roomId)")
+        ShowLogger.info("deinit-- ShowLiveViewController \(roomId)")
     }
     
     override func viewDidLoad() {
@@ -380,7 +380,7 @@ extension ShowLiveViewController {
                 guard let self = self else {return}
                 guard self.room?.roomId == room.roomId else { return }
                 if let err = error {
-                    showPrint("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
+                    ShowLogger.info("joinRoom[\(room.roomId)] error: \(error?.code ?? 0)")
                     if err.code == -1 {
                         self.onRoomExpired()
                     }
@@ -482,7 +482,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onUserLeftRoom(user: ShowUser) {
         if user.userId == room?.ownerId {
-            showPrint(" finishAlertVC onUserLeftRoom : roomid = \(roomId)")
+            ShowLogger.info(" finishAlertVC onUserLeftRoom : roomid = \(roomId)")
             onRoomExpired()
         }
     }
@@ -495,7 +495,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onMicSeatApplyUpdated(apply: ShowMicSeatApply) {
-        showPrint("onMicSeatApplyUpdated: \(apply.userId)/\(apply.userName ?? "") status: \(apply.status.rawValue)")
+        ShowLogger.info("onMicSeatApplyUpdated: \(apply.userId)/\(apply.userName ?? "") status: \(apply.status.rawValue)")
         _updateApplyMenu()
         if apply.status == .waitting, role == .broadcaster {
             liveView.bottomBar.linkButton.isShowRedDot = true
@@ -519,17 +519,17 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onMicSeatApplyDeleted(apply: ShowMicSeatApply) {
-        showPrint("onMicSeatApplyDeleted: \(apply.userId)/\(apply.userName ?? "")")
+        ShowLogger.info("onMicSeatApplyDeleted: \(apply.userId)/\(apply.userName ?? "")")
         _updateApplyMenu()
     }
     
     func onMicSeatApplyAccepted(apply: ShowMicSeatApply) {
-        showPrint("onMicSeatApplyAccepted: \(apply.userId)/\(apply.userName ?? "")")
+        ShowLogger.info("onMicSeatApplyAccepted: \(apply.userId)/\(apply.userName ?? "")")
         _updateApplyMenu()
     }
     
     func onMicSeatApplyRejected(apply: ShowMicSeatApply) {
-        showPrint("onMicSeatApplyRejected: \(apply.userId)/\(apply.userName ?? "")")
+        ShowLogger.info("onMicSeatApplyRejected: \(apply.userId)/\(apply.userName ?? "")")
         _updateApplyMenu()
     }
     
@@ -610,7 +610,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                                                      ownerId: uid,
                                                      options: self.channelOptions,
                                                      role: .audience) {
-                showPrint("\(self.roomId) updateLoadingType _onStartInteraction---------- \(self.roomId)")
+                ShowLogger.info("\(self.roomId) updateLoadingType _onStartInteraction---------- \(self.roomId)")
                 ShowAgoraKitManager.shared.preSubscribePKVideo(isOn: true, channelId: invitation.fromRoomId)
             }
             ShowReceivePKAlertVC.present(name: invitation.fromName) { result in
@@ -693,7 +693,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     private func _onStartInteraction(interaction: ShowInteractionInfo) {
-        showPrint("_onStartInteraction: \(interaction.userId) \(interaction.userName ?? "") status: \(interaction.interactStatus.rawValue)")
+        ShowLogger.info("_onStartInteraction: \(interaction.userId) \(interaction.userName ?? "") status: \(interaction.interactStatus.rawValue)")
         switch interaction.interactStatus {
         case .pking:
             view.layer.contents = UIImage.show_sceneImage(name: "show_live_pk_bg")?.cgImage
@@ -750,7 +750,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     private func _onStopInteraction(interaction: ShowInteractionInfo) {
-        showPrint("_onStopInteraction: \(interaction.userId) \(interaction.userName ?? "") status: \(interaction.interactStatus.rawValue)")
+        ShowLogger.info("_onStopInteraction: \(interaction.userId) \(interaction.userName ?? "") status: \(interaction.interactStatus.rawValue)")
         switch interaction.interactStatus {
         case .pking:
             view.layer.contents = UIImage.show_sceneImage(name: "show_live_room_bg")?.cgImage
@@ -798,22 +798,22 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
 extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
-        showWarn("rtcEngine warningCode == \(warningCode.rawValue)")
+        ShowLogger.warn("rtcEngine warningCode == \(warningCode.rawValue)")
     }
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
-        showWarn("rtcEngine errorCode == \(errorCode.rawValue)")
+        ShowLogger.warn("rtcEngine errorCode == \(errorCode.rawValue)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
-        showPrint("rtcEngine didJoinChannel \(channel) with uid \(uid) elapsed \(elapsed)ms")
+        ShowLogger.info("rtcEngine didJoinChannel \(channel) with uid \(uid) elapsed \(elapsed)ms")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-        showPrint("rtcEngine didJoinedOfUid \(uid) channelId: \(roomId)", context: kShowLogBaseContext)
+        ShowLogger.info("rtcEngine didJoinedOfUid \(uid) channelId: \(roomId)", context: kShowLogBaseContext)
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
-        showPrint("rtcEngine didOfflineOfUid === \(uid) reason: \(reason.rawValue)")
+        ShowLogger.info("rtcEngine didOfflineOfUid === \(uid) reason: \(reason.rawValue)")
         if let interaction = self.currentInteraction {
             let isRoomOwner: Bool = role == .broadcaster
             let isInteractionLeave: Bool = interaction.userId == "\(uid)"
@@ -843,7 +843,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, localVideoStats stats: AgoraRtcLocalVideoStats, sourceType: AgoraVideoSourceType) {
         panelPresenter.updateLocalVideoStats(stats)
         throttleRefreshRealTimeInfo()
-//        showPrint("localVideoStats  width = \(stats.encodedFrameWidth), height = \(stats.encodedFrameHeight)")
+//        ShowLogger.info("localVideoStats  width = \(stats.encodedFrameWidth), height = \(stats.encodedFrameHeight)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
@@ -882,18 +882,18 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, contentInspectResult result: AgoraContentInspectResult) {
-        showWarn("contentInspectResult: \(result.rawValue)")
+        ShowLogger.warn("contentInspectResult: \(result.rawValue)")
         guard result != .neutral else { return }
         ToastView.show(text: "监测到当前内容存在违规行为")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, firstLocalVideoFramePublishedWithElapsed elapsed: Int, sourceType: AgoraVideoSourceType) {
-        showPrint("firstLocalVideoFramePublishedWithElapsed: \(elapsed)ms \(sourceType.rawValue)",
+        ShowLogger.info("firstLocalVideoFramePublishedWithElapsed: \(elapsed)ms \(sourceType.rawValue)",
                         context: kShowLogBaseContext)
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, tokenPrivilegeWillExpire token: String) {
-        showWarn("tokenPrivilegeWillExpire: \(roomId)",
+        ShowLogger.warn("tokenPrivilegeWillExpire: \(roomId)",
                            context: kShowLogBaseContext)
         if let channelId = currentChannelId {
             ShowAgoraKitManager.shared.renewToken(channelId: channelId)
@@ -948,11 +948,13 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
                 guard let self = self else {return}
                 self.delegate?.willLeaveRoom(roomId: self.roomId)
                 self.dismiss(animated: true)
+                AgoraEntLog.autoUploadLog(scene: ShowLogger.kLogKey)
             }
         }else {
             updateLoadingType(playState: .idle)
             self.delegate?.willLeaveRoom(roomId: self.roomId)
             dismiss(animated: true)
+            AgoraEntLog.autoUploadLog(scene: ShowLogger.kLogKey)
         }
     }
     
