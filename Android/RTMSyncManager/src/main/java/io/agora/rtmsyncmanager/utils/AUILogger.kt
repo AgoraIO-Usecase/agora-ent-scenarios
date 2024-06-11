@@ -20,7 +20,8 @@ class AUILogger(private val config: Config) {
 
         private fun addLogAdapterSafe(adapter: LogAdapter){
             if(!logAdapters.contains(adapter)){
-                Logger.clearLogAdapters()
+                // not clear in case of other log adapter ineffective
+                // Logger.clearLogAdapters()
                 logAdapters.add(adapter)
                 logAdapters.forEach { Logger.addLogAdapter(it) }
             }
@@ -28,7 +29,8 @@ class AUILogger(private val config: Config) {
 
         private fun removeLogAdapterSafe(adapter: LogAdapter) {
             if (logAdapters.contains(adapter)) {
-                Logger.clearLogAdapters()
+                // not clear in case of other log adapter ineffective
+                // Logger.clearLogAdapters()
                 logAdapters.remove(adapter)
                 logAdapters.forEach { Logger.addLogAdapter(it) }
             }
