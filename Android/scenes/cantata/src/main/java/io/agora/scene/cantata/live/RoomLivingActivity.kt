@@ -506,7 +506,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
         mRoomLivingViewModel.release()
         if (SceneConfigManager.logUpload) {
-            LogUploader.uploadLog()
+            LogUploader.uploadLog(LogUploader.SceneType.KTV_CANTATA)
         }
     }
 

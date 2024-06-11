@@ -803,7 +803,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
         super.onDestroy();
         roomLivingViewModel.release();
         if (SceneConfigManager.INSTANCE.getLogUpload()) {
-            LogUploader.INSTANCE.uploadLog();
+            LogUploader.INSTANCE.uploadLog(LogUploader.SceneType.KTV_REALY);
         }
     }
 

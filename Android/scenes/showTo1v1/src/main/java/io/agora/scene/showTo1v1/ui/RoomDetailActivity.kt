@@ -607,7 +607,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         super.onDestroy()
         imageLoadingJob?.cancel()
         if (SceneConfigManager.logUpload) {
-            LogUploader.uploadLog()
+            LogUploader.uploadLog(LogUploader.SceneType.SHOW_TO_1V1)
         }
     }
 

@@ -967,7 +967,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
         getBinding().getRoot().removeCallbacks(onGraspFinshTask);
         roomLivingViewModel.release();
         if (SceneConfigManager.INSTANCE.getLogUpload()) {
-            LogUploader.INSTANCE.uploadLog();
+            LogUploader.INSTANCE.uploadLog(LogUploader.SceneType.CHAT_SPATIAL);
         }
     }
 

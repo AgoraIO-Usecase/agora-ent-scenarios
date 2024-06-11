@@ -114,7 +114,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
     override fun onDestroy() {
         super.onDestroy()
         if (SceneConfigManager.logUpload) {
-            LogUploader.uploadLog()
+            LogUploader.uploadLog(LogUploader.SceneType.CHAT)
         }
     }
 

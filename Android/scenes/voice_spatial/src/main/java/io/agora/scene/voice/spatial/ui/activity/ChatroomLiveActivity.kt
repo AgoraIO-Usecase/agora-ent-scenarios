@@ -106,7 +106,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         super.onDestroy()
         setSpatialSeatInfo(null)
         if (SceneConfigManager.logUpload) {
-            LogUploader.uploadLog()
+            LogUploader.uploadLog(LogUploader.SceneType.CHAT_SPATIAL)
         }
     }
 

@@ -132,7 +132,7 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
     override fun onDestroy() {
         super.onDestroy()
         if (SceneConfigManager.logUpload) {
-            LogUploader.uploadLog()
+            LogUploader.uploadLog(LogUploader.SceneType.SHOW)
         }
     }
 
