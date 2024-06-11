@@ -3,7 +3,7 @@ package io.agora.voice.common.utils
 import io.agora.scene.base.EntLogger
 
 object LogTools {
-    private val entLogger = EntLogger(EntLogger.Config("Voice"))
+    private val entLogger = EntLogger(EntLogger.Config("Voice_spatial"))
 
      @JvmStatic
     fun String.logD(tag: String = "Agora_VoiceChat") {

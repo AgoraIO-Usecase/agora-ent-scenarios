@@ -18,6 +18,21 @@ import io.reactivex.disposables.Disposable
 import java.io.File
 
 object LogUploader {
+
+    enum class SceneType(val value: String) {
+        KTV("ktv_log"),
+        KTV_BATTLE("ktv_battle"),
+        KTV_REALY("ktv_relay"),
+        KTV_CANTATA("ktv_cantata"),
+        CHAT("Voice_log"),
+        CHAT_SPATIAL("Voice_spatial"),
+        SHOW("showlive"),
+        PURE1V1("pure"),
+        SHOW_TO_1V1("showto1v1"),
+        JOY("joy"),
+    }
+
+
     private const val tag = "LogUploader"
     private val logFolder = AgoraApplication.the().getExternalFilesDir("")!!.absolutePath
     private val logFileWriteThread by lazy {
@@ -50,12 +65,13 @@ object LogUploader {
         return paths
     }
 
-    private fun getScenePaths(): List<String> {
+    private fun getScenePaths(type: SceneType): List<String> {
         val paths = mutableListOf<String>()
         File(logFolder + File.separator + "ent").listFiles()?.forEach { file ->
             if (file.isFile) {
                 if (!file.name.contains(commonBaseMiddle) &&
-                    !file.name.contains(commonUIMiddle)
+                    !file.name.contains(commonUIMiddle) &&
+                    file.name.contains(type.value)
                 ) {
                     paths.add(file.path)
                 }
@@ -64,12 +80,12 @@ object LogUploader {
         return paths
     }
 
-     fun uploadLog() {
+     fun uploadLog(type: SceneType) {
         mUploadLogUrl = ""
         val sdkLogZipPath = logFolder + File.separator + "agoraSdkLog.zip"
 
         val sdkPaths = getAgoraSDKPaths()
-        val scenePaths = getScenePaths()
+        val scenePaths = getScenePaths(type)
         val logPaths = mutableListOf<String>().apply {
             addAll(sdkPaths)
             addAll(scenePaths)
