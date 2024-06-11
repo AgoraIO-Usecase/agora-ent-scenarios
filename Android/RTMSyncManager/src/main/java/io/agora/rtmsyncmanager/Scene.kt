@@ -20,6 +20,7 @@ import io.agora.rtmsyncmanager.service.imp.AUIUserServiceImpl
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmErrorRespObserver
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.ObservableHelper
 import java.util.*
@@ -60,7 +61,11 @@ class Scene constructor(
                 }
             }
             override fun onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {}
-            override fun onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
+            override fun onRoomUserLeave(
+                roomId: String,
+                userInfo: AUIUserInfo,
+                reason: AUIRtmUserLeaveReason
+            ) {
                 if (AUIRoomContext.shared().isRoomOwner(roomId, userInfo.userId)) else {
                     cleanUserInfo(userInfo.userId)
                     return

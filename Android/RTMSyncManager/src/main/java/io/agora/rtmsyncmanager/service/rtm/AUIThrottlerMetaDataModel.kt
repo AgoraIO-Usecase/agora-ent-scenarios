@@ -39,7 +39,7 @@ class AUIThrottlerRemoveMetaDataModel {
         get() = ArrayList(_callbacks)
 
     fun appendMetaDataInfo(keys: List<String>, callback: (AUIRtmException?) -> Unit) {
-        _keys.addAll(keys)
+        _keys.addAll(keys.filter { !_keys.contains(it) })
         _callbacks.add(callback)
     }
 

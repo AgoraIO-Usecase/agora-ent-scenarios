@@ -62,5 +62,4 @@ object HttpManager {
             })
             .enableComplexMapKeySerialization()
             .create()
-
 }

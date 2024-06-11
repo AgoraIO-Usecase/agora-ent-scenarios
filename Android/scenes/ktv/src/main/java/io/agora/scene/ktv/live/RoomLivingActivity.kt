@@ -330,6 +330,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
         roomLivingViewModel.songPlayingLiveData.observe(this) { model: ChosenSongInfo? ->
             if (model == null) {
                 roomLivingViewModel.musicStop()
+                mRoomSpeakerAdapter?.notifyDataSetChanged()
                 return@observe
             }
             onMusicChanged(model)
