@@ -1,6 +1,5 @@
 package io.agora.rtmsyncmanager.service.imp
 
-import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserRespObserver
 import io.agora.rtmsyncmanager.model.AUIRoomContext
 import io.agora.rtmsyncmanager.model.AUIUserInfo
 import io.agora.rtmsyncmanager.service.IAUIUserService
@@ -9,6 +8,8 @@ import io.agora.rtmsyncmanager.service.callback.AUIException
 import io.agora.rtmsyncmanager.service.callback.AUIUserListCallback
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserRespObserver
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ObservableHelper
@@ -142,6 +143,7 @@ class AUIUserServiceImpl constructor(
         userId: String,
         userList: List<Map<String, Any>>
     ) {
+        if (this.channelName != channelName) return
         val users = mutableListOf<AUIUserInfo>()
         userList.forEach { userMap ->
             GsonTools.toBean(GsonTools.beanToString(userMap), AUIUserInfo::class.java)?.let {
@@ -173,12 +175,14 @@ class AUIUserServiceImpl constructor(
     override fun onUserDidLeaved(
         channelName: String,
         userId: String,
-        userInfo: Map<String, Any>
+        userInfo: Map<String, Any>,
+        reason: AUIRtmUserLeaveReason
     ) {
+        if (this.channelName != channelName) return
         val index = mUserList.indexOfFirst{ it.userId == userId }
         val info = mUserList.removeAt(index)
         this.observableHelper.notifyEventHandlers {
-            it.onRoomUserLeave(channelName, info)
+            it.onRoomUserLeave(channelName, info, reason)
         }
     }
 
@@ -187,6 +191,7 @@ class AUIUserServiceImpl constructor(
         userId: String,
         userInfo: Map<String, Any>
     ) {
+        if (this.channelName != channelName) return
         if (userInfo.isEmpty()) {
             return
         }

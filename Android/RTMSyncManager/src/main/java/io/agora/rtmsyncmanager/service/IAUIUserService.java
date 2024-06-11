@@ -6,6 +6,7 @@ import java.util.List;
 import io.agora.rtmsyncmanager.model.AUIUserInfo;
 import io.agora.rtmsyncmanager.service.callback.AUICallback;
 import io.agora.rtmsyncmanager.service.callback.AUIUserListCallback;
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason;
 
 /**
  * 房间Service抽象协议
@@ -65,7 +66,7 @@ public interface IAUIUserService extends IAUICommonService<IAUIUserService.AUIUs
          * @param roomId   房间唯一id
          * @param userInfo 用户信息
          */
-        default void onRoomUserLeave(@NonNull String roomId, @NonNull AUIUserInfo userInfo) {}
+        default void onRoomUserLeave(@NonNull String roomId, @NonNull AUIUserInfo userInfo, @NonNull AUIRtmUserLeaveReason reason) {}
 
         /**
          * 用户信息修改
