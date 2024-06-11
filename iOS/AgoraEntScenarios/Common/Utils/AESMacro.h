@@ -41,10 +41,10 @@
 #define SRLocalizedString(s) ([s toSceneLocalizationWith:@"SRResource"])
 #define SRLogInfo(format, ...)  ([SRLog infoWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"SingRelay"])
 #define SRLogError(format, ...)  ([SRLog errorWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"SingRelay"])
-#define KTVLogInfo(format, ...)  ([KTVLog infoWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"KTV"])
-#define KTVLogError(format, ...)  ([KTVLog errorWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"KTV"])
-#define KTVLogWarn(format, ...)  ([KTVLog warningWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"KTV"])
-#define KTVLogDebug(format, ...)  ([KTVLog debugWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"KTV"])
+#define KTVLogInfo(format, ...)  ([KTVLog infoWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"UI"])
+#define KTVLogError(format, ...)  ([KTVLog errorWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"UI"])
+#define KTVLogWarn(format, ...)  ([KTVLog warningWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"UI"])
+#define KTVLogDebug(format, ...)  ([KTVLog debugWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: @"UI"])
 
 
 

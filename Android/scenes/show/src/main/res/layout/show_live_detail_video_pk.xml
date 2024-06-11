@@ -45,7 +45,6 @@
                     android:textSize="12sp"
                     android:layout_marginBottom="20dp"
                     android:layout_gravity="bottom|center_horizontal"
-                    android:drawableEnd="@drawable/show_mic_bg"
                     android:textColor="@color/white"/>
 
 
@@ -66,7 +65,6 @@
                     android:textSize="12sp"
                     android:layout_marginBottom="20dp"
                     android:layout_gravity="bottom|center_horizontal"
-                    android:drawableEnd="@drawable/show_mic_bg"
                     android:textColor="@color/white"/>
             </FrameLayout>
 

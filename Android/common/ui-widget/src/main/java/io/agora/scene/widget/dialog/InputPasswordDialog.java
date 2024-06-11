@@ -19,7 +19,11 @@ public class InputPasswordDialog extends BaseDialog<DialogInputPasswordBinding> 
         super(context);
     }
 
-    public ISingleCallback<Integer, Object> iSingleCallback;
+    /**
+     * The On define click listener.
+     */
+    public OnDefineClickListener onDefineClickListener;
+
 
     @NonNull
     @Override
@@ -33,7 +37,7 @@ public class InputPasswordDialog extends BaseDialog<DialogInputPasswordBinding> 
             dismiss();
         });
         getBinding().btnDefine.setOnClickListener(view -> {
-            iSingleCallback.onSingleCallback(0, getBinding().etDeviceName.getText().toString());
+            onDefineClickListener.onDefineClicked( getBinding().etDeviceName.getText().toString());
             dismiss();
         });
         getBinding().etDeviceName.addTextChangedListener(new TextWatcher() {
@@ -84,10 +88,18 @@ public class InputPasswordDialog extends BaseDialog<DialogInputPasswordBinding> 
 
     @Override
     protected void setGravity() {
-//        getWindow().setLayout(
-//                UiUtil.dp2px(300),
-//                UiUtil.dp2px(230)
-//        );
         getWindow().getAttributes().gravity = Gravity.CENTER;
+    }
+
+    /**
+     * The interface On define click listener.
+     */
+    public interface OnDefineClickListener {
+        /**
+         * On define clicked.
+         *
+         * @param password the password
+         */
+        void onDefineClicked(String password);
     }
 }

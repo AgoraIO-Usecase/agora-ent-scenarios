@@ -27,30 +27,42 @@ abstract class AUIBaseCollection(
         }
     }
 
+    // (publisher uid, valueCmd, new value of item) -> value[new value of edit item]
+    protected var valueWillChangeClosure: ((
+        publisherId: String, valueCmd: String?, value: Map<String, Any>
+    ) -> Map<String, Any>?)? = null
+
+    // (publisher uid, valueCmd, new value)
     protected var metadataWillAddClosure: ((
         publisherId: String, valueCmd: String?, value: Map<String, Any>
     ) -> AUICollectionException?)? = null
 
+    // (publisher uid, valueCmd, new value, old value of item)
     protected var metadataWillUpdateClosure: ((
         publisherId: String, valueCmd: String?, newValue: Map<String, Any>, oldValue: Map<String, Any>
     ) -> AUICollectionException?)? = null
 
+    // (publisher uid, valueCmd, oldValue)
     protected var metadataWillMergeClosure: ((
         publisherId: String, valueCmd: String?, newValue: Map<String, Any>, oldValue: Map<String, Any>
     ) -> AUICollectionException?)? = null
 
+    // (publisher uid, valueCmd, oldValue)
     protected var metadataWillRemoveClosure: ((
         publisherId: String, valueCmd: String?, value: Map<String, Any>
     ) -> AUICollectionException?)? = null
 
+    // (publisher uid, valueCmd, old value of item, keys, update value, min, max)
     protected var metadataWillCalculateClosure: ((
         publisherId: String, valueCmd: String?, value: Map<String, Any>, cKey: List<String>, cValue: Int, cMin: Int, cMax: Int
     ) -> AUICollectionException?)? = null
 
+    // (channelName, key, value)
     protected var attributesDidChangedClosure: ((
         channelName: String, observeKey: String, value: AUIAttributesModel
     ) -> Unit)? = null
 
+    // (channelName, key, valueCmd, value[will set metadata])->value[can set metadata]
     protected var attributesWillSetClosure: ((
         channelName: String, observeKey: String, valueCmd: String?, value: AUIAttributesModel
     ) -> AUIAttributesModel)? = null
@@ -67,6 +79,10 @@ abstract class AUIBaseCollection(
             channelName, observeKey,
             attributeRespObserver
         )
+    }
+
+    final override fun subscribeValueWillChange(closure: ((publisherId: String, valueCmd: String?, value: Map<String, Any>) -> Map<String, Any>?)?) {
+        valueWillChangeClosure = closure
     }
 
     final override fun subscribeWillAdd(closure: ((publisherId: String, valueCmd: String?, value: Map<String, Any>) -> AUICollectionException?)?) {
@@ -91,6 +107,10 @@ abstract class AUIBaseCollection(
 
     final override fun subscribeAttributesWillSet(closure: ((channelName: String, observeKey: String, valueCmd: String?, value: AUIAttributesModel) -> AUIAttributesModel)?) {
         attributesWillSetClosure = closure
+    }
+
+    override fun getLocalMetaData(): AUIAttributesModel? {
+        return null
     }
 
     override fun subscribeWillCalculate(closure: ((publisherId: String, valueCmd: String?, value: Map<String, Any>, cKey: List<String>, cValue: Int, cMin: Int, cMax: Int) -> AUICollectionException?)?) {

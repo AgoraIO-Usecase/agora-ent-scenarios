@@ -193,7 +193,7 @@ UITableViewDelegate
     [[AppContext ktvServiceImp] chooseSongWithInputModel:inputModel
                                               completion:^(NSError * error) {
         if (error != nil) {
-            [VLToast toast:KTVLocalizedString(@"ktv_choose_fail") duration:2];
+            [VLToast toast: error.localizedDescription];
             return;
         }
         
