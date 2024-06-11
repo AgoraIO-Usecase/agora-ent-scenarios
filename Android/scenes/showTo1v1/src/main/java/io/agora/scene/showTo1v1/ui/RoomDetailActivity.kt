@@ -34,6 +34,8 @@ import io.agora.rtc2.video.VideoCanvas
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.LogUploader
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
@@ -604,6 +606,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     override fun onDestroy() {
         super.onDestroy()
         imageLoadingJob?.cancel()
+        if (SceneConfigManager.logUpload) {
+            LogUploader.uploadLog()
+        }
     }
 
     override fun onBackPressed() {

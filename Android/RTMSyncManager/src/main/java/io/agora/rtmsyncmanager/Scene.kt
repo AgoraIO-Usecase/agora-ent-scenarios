@@ -251,6 +251,7 @@ class Scene constructor(
             it.release()
         }
         collectionMap.clear()
+        userService.release()
     }
 
     /// 销毁scene，清理所有缓存（包括rtm的所有metadata）

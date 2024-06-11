@@ -27,6 +27,8 @@ import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.rtmsyncmanager.model.AUIUserThumbnailInfo
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.AudioModeration.moderationAudio
+import io.agora.scene.base.LogUploader
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.ktv.KTVLogger
 import io.agora.scene.ktv.KtvCenter

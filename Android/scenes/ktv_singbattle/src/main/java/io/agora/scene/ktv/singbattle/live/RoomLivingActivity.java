@@ -31,6 +31,8 @@ import java.util.Map;
 
 import io.agora.rtc2.Constants;
 import io.agora.scene.base.GlideApp;
+import io.agora.scene.base.LogUploader;
+import io.agora.scene.base.SceneConfigManager;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnButtonClickListener;
@@ -964,6 +966,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
         getBinding().getRoot().removeCallbacks(onGraspDisableTask);
         getBinding().getRoot().removeCallbacks(onGraspFinshTask);
         roomLivingViewModel.release();
+        if (SceneConfigManager.INSTANCE.getLogUpload()) {
+            LogUploader.INSTANCE.uploadLog();
+        }
     }
 
     @Override
