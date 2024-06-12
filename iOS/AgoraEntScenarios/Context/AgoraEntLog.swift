@@ -149,17 +149,8 @@ public func agoraDoMainThreadTask(_ task: (()->())?) {
         }
     }
     
-    private static let kAutoSendLog = "AUTO_SEND_LOG"
-    @objc public static func setAutoUploadLog(_ isOn: Bool) {
-        UserDefaults.standard.setValue(isOn, forKey: kAutoSendLog)
-    }
-    
-    @objc public static func getAutoUploadLog() -> Bool {
-        return UserDefaults.standard.bool(forKey: kAutoSendLog)
-    }
-    
     @objc public static func autoUploadLog(scene: String) {
-        guard UserDefaults.standard.bool(forKey: kAutoSendLog) == true else {
+        guard AppContext.shared.sceneConfig?.logUpload == 1 else {
             return
         }
         AgoraEntLog.zipSceneLog(scene: scene, completion: { str, err in
