@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:src="@drawable/voice_icon_create_3d_room"
+            android:src="@drawable/voice_bg_room_3d_spatial"
             app:layout_constraintDimensionRatio="1:1"
             app:shapeAppearance="@style/voice_RoundedStyle"
             />

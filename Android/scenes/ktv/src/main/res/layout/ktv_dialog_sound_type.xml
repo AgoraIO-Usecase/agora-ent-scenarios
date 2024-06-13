@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:theme="@style/Theme.AppCompat"
-    android:paddingBottom="24dp"
     android:background="@drawable/ktv_rect_white_top_r20">
 
     <androidx.appcompat.widget.AppCompatImageView
