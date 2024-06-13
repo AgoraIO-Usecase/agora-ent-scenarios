@@ -16,4 +16,15 @@ public class AUIRoomInfo implements Serializable {
     public @Nullable AUIUserThumbnailInfo roomOwner; // 房主信息
     public Map<String, Object> customPayload = new HashMap<String, Object>();
     public Long createTime;
+
+    @Override
+    public String toString() {
+        return "AUIRoomInfo{" +
+                "roomId='" + roomId + '\'' +
+                ", roomName='" + roomName + '\'' +
+                ", roomOwner=" + roomOwner +
+                ", customPayload=" + customPayload +
+                ", createTime=" + createTime +
+                '}';
+    }
 }

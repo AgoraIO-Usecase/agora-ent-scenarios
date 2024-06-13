@@ -55,8 +55,8 @@ public class SongActionListenerImpl implements OnSongActionListener {
         // 点歌-列表刷新
         mCurrPage = 1;
         int songType = getSongType(index);
-        if (songType==-1) {
-            Log.e("KTV","getSongType null");
+        if (songType == -1) {
+            Log.e("KTV", "getSongType null");
             return;
         }
 
@@ -99,10 +99,10 @@ public class SongActionListenerImpl implements OnSongActionListener {
     @Override
     public void onChooseSongChosen(@NonNull SongDialog dialog, @NonNull SongItem songItem) {
         // 点歌
-        LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.chooseSong(songItem, isChorus), success -> {
+        LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.chooseSong(songItem), success -> {
             if (success && dialog.isVisible()) {
                 dialog.setChooseSongItemStatus(songItem, true);
-            }else if (!success){ // 点歌失败
+            } else if (!success) { // 点歌失败
                 songItem.loading = false;
                 dialog.setChooseSongItemStatus(songItem, false);
             }
@@ -173,8 +173,8 @@ public class SongActionListenerImpl implements OnSongActionListener {
         if (data != null) {
             for (ChosenSongInfo song : data) {
                 String userName = "";
-                String chooserUserId = "" ;
-                if (song.getOwner()!=null){
+                String chooserUserId = "";
+                if (song.getOwner() != null) {
                     userName = song.getOwner().userName;
                     chooserUserId = song.getOwner().userId;
                 }
