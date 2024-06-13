@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.annotation.DrawableRes
-import androidx.core.view.isVisible
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.ktv.R
 import io.agora.scene.ktv.databinding.KtvDialogSoundCardBinding
@@ -51,7 +50,6 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                 vPramsMark.visibility = View.VISIBLE
                 clSoundCardParams.alpha = 0.4f
             }
-            groupSoundCardAbnormal.isVisible = false
             mcbSoundCardSwitch.isChecked = soundCardSetting.isEnable()
 
             ivBackIcon.setOnClickListener {

@@ -5,7 +5,7 @@
     android:id="@+id/superLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/cantata_room_bg"
+    android:background="@drawable/bg_room_living"
     tools:context=".live.RoomLivingActivity">
 
 <!--    <androidx.appcompat.widget.AppCompatImageView-->
