@@ -71,7 +71,6 @@ TODO: Add long description of the pod here.
     
   s.dependency 'AgoraRtcEngine_Special_iOS'
   s.dependency 'AgoraCommon'
-  s.dependency 'LSTPopView'
   s.dependency 'JXCategoryView'
   s.dependency 'ScoreEffectUI'
   s.dependency 'AgoraLyricsScore'

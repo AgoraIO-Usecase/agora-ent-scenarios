@@ -3772,7 +3772,6 @@
 			isa = PBXGroup;
 			children = (
 				E301BF702AF8E8E90089A79C /* sbgResource.bundle */,
-				E301BF712AF8E8E90089A79C /* NetWork */,
 				E301BF732AF8E8E90089A79C /* SBGAPI */,
 				E301BF782AF8E8E90089A79C /* Utils */,
 				E301BF7B2AF8E8E90089A79C /* README.md */,
@@ -3784,13 +3783,6 @@
 				E301BFF62AF8E8E90089A79C /* Debug */,
 			);
 			path = SBG;
-			sourceTree = "<group>";
-		};
-		E301BF712AF8E8E90089A79C /* NetWork */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = NetWork;
 			sourceTree = "<group>";
 		};
 		E301BF732AF8E8E90089A79C /* SBGAPI */ = {
@@ -5337,7 +5329,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = YEE372TYE8;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5452,10 +5444,6 @@
 					"\"KakaJSON\"",
 					"-framework",
 					"\"LEEAlert\"",
-					"-framework",
-					"\"LSTPopView\"",
-					"-framework",
-					"\"LSTTimer\"",
 					"-framework",
 					"\"MJRefresh\"",
 					"-framework",
@@ -5563,7 +5551,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = YEE372TYE8;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5678,10 +5666,6 @@
 					"\"KakaJSON\"",
 					"-framework",
 					"\"LEEAlert\"",
-					"-framework",
-					"\"LSTPopView\"",
-					"-framework",
-					"\"LSTTimer\"",
 					"-framework",
 					"\"MJRefresh\"",
 					"-framework",
