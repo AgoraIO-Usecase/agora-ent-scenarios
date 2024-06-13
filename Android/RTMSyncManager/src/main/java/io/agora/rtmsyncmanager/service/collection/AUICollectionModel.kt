@@ -80,4 +80,7 @@ class AUIAttributesModel {
 
     fun getList() = attributes as? List<Map<String, Any>>
 
+    override fun toString(): String {
+        return "AUIAttributesModel(attributes=$attributes)"
+    }
 }
