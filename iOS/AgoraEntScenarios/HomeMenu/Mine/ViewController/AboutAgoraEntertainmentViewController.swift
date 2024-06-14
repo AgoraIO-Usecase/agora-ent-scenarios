@@ -13,19 +13,21 @@ import AgoraCommon
     
     var infos = [
         ["contents":[["title": NSLocalizedString("app_about_customer_service", comment: ""),
-                               "detail": "400-632-6626"],
-                              ["title": NSLocalizedString("app_about_official_website", comment: ""),
-                               "detail":"https://www.shengwang.cn"]],
-                  "sectionName": ""],
-//                 ["contents": [["title": NSLocalizedString("app_voice_chat", comment: ""), "detail":"YL-3.1.0"],
-//                               ["title": NSLocalizedString("app_about_chat_room_spatial", comment: ""), "detail":"YLKJ-3.1.0"],
-//                               ["title": NSLocalizedString("app_about_karaoke", comment: ""),"detail":"KTV-3.3.0"],
-//                               ["title": NSLocalizedString("app_about_hiSong", comment: ""),"detail":"QC-3.4.0"],
-//                               ["title": NSLocalizedString("app_about_continuesinging", comment: ""),"detail":"JC-3.5.0"],
-//                               ["title": NSLocalizedString("app_about_show", comment: ""), "detail":"ZB-3.2.0"],
-//                               ["title": NSLocalizedString("app_about_1v1", comment: ""), "detail":"SMF-3.6.0"],
-//                               ["title": NSLocalizedString("app_about_live_to_1v1", comment: ""), "detail":"XCSMF-3.7.0"]],
-//                  "sectionName": NSLocalizedString("app_about_scene_version", comment: "")]
+                      "detail": "400-632-6626"],
+                     ["title": NSLocalizedString("app_about_official_website", comment: ""),
+                      "detail":"https://www.shengwang.cn"]],
+         "sectionName": ""],
+        ["contents": [["title": NSLocalizedString("app_voice_chat", comment: ""), "detail":"YL-4.1.200"],
+                      ["title": NSLocalizedString("app_about_chat_room_spatial", comment: ""), "detail":"YLKJ-4.1.200"],
+                      ["title": NSLocalizedString("app_about_karaoke", comment: ""),"detail":"KTV-4.3.0"],
+                      ["title": NSLocalizedString("app_about_hiSong", comment: ""),"detail":"QC-4.3.0"],
+                      ["title": NSLocalizedString("app_about_continuesinging", comment: ""),"detail":"JC-4.3.0"],
+                      ["title": NSLocalizedString("app_about_cantata", comment: ""),"detail":"DHC-4.3.0"],
+                      ["title": NSLocalizedString("app_about_show", comment: ""), "detail":"ZB-4.2.1"],
+                      ["title": NSLocalizedString("app_about_1v1", comment: ""), "detail":"SMF-3.6.0"],
+                      ["title": NSLocalizedString("app_about_live_to_1v1", comment: ""), "detail":"XCSMF-3.7.0"],
+                      ["title": NSLocalizedString("app_about_joy", comment: ""), "detail":"XWF-4.10.1"]],
+         "sectionName": NSLocalizedString("app_about_scene_version", comment: "")]
     ]
     
     let tableHeader = AboutAgoraHeader(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 220),
