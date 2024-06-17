@@ -16,6 +16,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 
+/**
+ * HttpManager is a singleton object that manages HTTP requests.
+ * It provides methods for setting the base URL and getting the service instance.
+ */
 object HttpManager {
 
     private var baseUrl = ""

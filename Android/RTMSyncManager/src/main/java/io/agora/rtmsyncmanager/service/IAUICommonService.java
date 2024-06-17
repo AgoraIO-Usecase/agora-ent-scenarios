@@ -6,44 +6,72 @@ import io.agora.rtmsyncmanager.service.arbiter.AUIArbiter;
 import io.agora.rtmsyncmanager.model.AUIRoomContext;
 import io.agora.rtmsyncmanager.service.callback.AUICallback;
 
+/**
+ * IAUICommonService is an interface that defines the common services for all users.
+ * It includes methods for registering and unregistering response observers, initializing and deinitializing services,
+ * cleaning user information, getting room context, and getting the channel name and lock owner ID.
+ *
+ * @param <Observer> The type of the response observer.
+ */
 public interface IAUICommonService<Observer> {
 
     /**
-     * 绑定响应事件回调，可绑定多个
-     *
-     * @param observer 响应事件回调
+     * Register a response observer. Multiple observers can be registered.
+     * @param observer The response observer.
      */
     void registerRespObserver(@Nullable Observer observer);
 
     /**
-     * 解绑响应事件回调
-     *
-     * @param observer 响应事件回调
+     * Unregister a response observer.
+     * @param observer The response observer.
      */
     void unRegisterRespObserver(@Nullable Observer observer);
 
-    default void deInitService(@Nullable AUICallback completion) {}
-
-    default void initService(@Nullable AUICallback completion) {}
-
-    default void cleanUserInfo(@NonNull String userId, @Nullable AUICallback completion) {}
+    /**
+     * Deinitialize the service.
+     * @param completion The callback to be invoked when the operation is complete.
+     */
+    default void deInitService(@Nullable AUICallback completion) { }
 
     /**
-     * room setup success
+     * Initialize the service.
+     * @param completion The callback to be invoked when the operation is complete.
      */
-    default void serviceDidLoad(){}
+    default void initService(@Nullable AUICallback completion) { }
 
-    /** 获取当前房间上下文
-     *
-     * @return
+    /**
+     * Clean the information of a specific user.
+     * @param userId The ID of the user.
+     * @param completion The callback to be invoked when the operation is complete.
      */
-    default @NonNull AUIRoomContext getRoomContext() { return AUIRoomContext.shared(); }
+    default void cleanUserInfo(@NonNull String userId, @Nullable AUICallback completion) { }
 
+    /**
+     * This method is called when the room setup is successful.
+     */
+    default void serviceDidLoad() { }
+
+    /**
+     * Get the current room context.
+     * @return The room context.
+     */
+    default @NonNull AUIRoomContext getRoomContext() {
+        return AUIRoomContext.shared();
+    }
+
+    /**
+     * Get the channel name.
+     * @return The channel name.
+     */
     @NonNull String getChannelName();
 
+    /**
+     * Get the ID of the lock owner.
+     * @return The ID of the lock owner.
+     */
     default @NonNull String getLockOwnerId() {
         AUIArbiter arbiter = AUIRoomContext.shared().getArbiter(getChannelName());
-        if(arbiter == null){
+        if (arbiter == null) {
             return "";
         }
         return arbiter.lockOwnerId();

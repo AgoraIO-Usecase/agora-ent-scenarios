@@ -25,7 +25,7 @@ class RoomService(
         cleanClosure: ((AUIRoomInfo) -> Boolean)? = null,
         completion: (AUIException?, Long?, List<AUIRoomInfo>?) -> Unit
     ) {
-        // 房间列表会返回最新的服务端时间ts
+        // The room list will return the latest server time ts.
         roomManager.getRoomInfoList(appId, sceneId, lastCreateTime, pageSize) { err, roomList, ts ->
             if (err != null || ts == null) {
                 completion(err, ts, null)
@@ -34,7 +34,7 @@ class RoomService(
 
             val list: MutableList<AUIRoomInfo> = mutableListOf()
             roomList?.forEach { roomInfo ->
-                // 遍历每个房间信息，查询是否已经过期
+                // Traverse each room information to check if it has expired.
                 var needCleanRoom: Boolean = false
                 if (expirationPolicy.expirationTime > 0 && ts - roomInfo.createTime >= expirationPolicy.expirationTime + 60 * 1000) {
                     needCleanRoom = true
@@ -56,7 +56,7 @@ class RoomService(
         }
     }
 
-    // TODO: 将 AUIRoomInfo 替换为接口 IAUIRoomInfo。服务端会创建房间id，这里是否 roomManager 创建后往外抛 roomId
+    // TODO: Replace AUIRoomInfo with the IAUIRoomInfo interface. The server will create a room id, should roomManager throw it out here?.
     fun createRoom(appId: String, sceneId: String, room: AUIRoomInfo, completion: (AUIRtmException?, AUIRoomInfo?) -> Unit) {
         val scene = syncManager.createScene(channelName = room.roomId, roomExpiration = expirationPolicy)
         roomManager.createRoom(appId, sceneId, room) { err, roomInfo ->
@@ -73,7 +73,7 @@ class RoomService(
 
             scene.create(createTime = roomInfo.createTime, mapOf(kPayloadOwnerId to (room.roomOwner?.userId ?: ""))) { error ->
                 if (error != null) {
-                    // 失败需要清理脏房间信息
+                    // Need to clean up dirty room information on failure.
                     createRoomRevert(appId, sceneId, room.roomId)
                     completion(error, null)
                     return@create
@@ -81,7 +81,7 @@ class RoomService(
 
                 scene.enter { _, err ->
                     if (err != null) {
-                        // 失败需要清理脏房间信息
+                        // Need to clean up dirty room information on failure.
                         createRoomRevert(appId, sceneId, room.roomId)
                         completion(err, null)
                         return@enter

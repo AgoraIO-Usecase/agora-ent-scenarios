@@ -44,7 +44,7 @@ class AUIRtmManager constructor(
         rtmClient.setParameters("{\"rtm.metadata.api_max_retries\": 1}")
     }
 
-    fun deInit(){
+    fun deInit() {
         cleanReceipts()
         throttlerUpdateMetaDataModel.reset()
         throttlerRemoveMetaDataModel.reset()

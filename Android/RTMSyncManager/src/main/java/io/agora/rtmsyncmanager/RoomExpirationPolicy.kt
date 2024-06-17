@@ -1,11 +1,19 @@
 package io.agora.rtmsyncmanager
 
-/*
- * 房间过期策略模型
+/**
+ * Class representing the room expiration policy.
  */
 class RoomExpirationPolicy {
-    // 房间过期时间，单位ms，0表示房间不过期
+    /**
+     * The expiration time of the room in milliseconds.
+     * A value of 0 indicates that the room does not expire.
+     */
     var expirationTime: Long = 0
-    // 是否和房主离线关联，true: 房主不在线则销毁房间，false: 房主不在线不销毁房间
+
+    /**
+     * A flag indicating whether the room's existence is associated with the owner's online status.
+     * If true, the room is destroyed when the owner goes offline.
+     * If false, the room persists even when the owner goes offline.
+     */
     var isAssociatedWithOwnerOffline: Boolean = true
 }
