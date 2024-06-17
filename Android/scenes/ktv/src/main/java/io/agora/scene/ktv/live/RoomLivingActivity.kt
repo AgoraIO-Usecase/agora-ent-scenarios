@@ -213,10 +213,20 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
             val seatLocal = roomLivingViewModel.localSeatInfo
             if (seatLocal != null) {
                 if (b) {
-                    toggleAudioRun = Runnable { roomLivingViewModel.updateSeatAudioMuteStatus(false) }
+                    toggleAudioRun = Runnable {
+                        roomLivingViewModel.updateSeatAudioMuteStatus(false) {
+                            if (it != null) { // 设置失败
+                                binding.cbMic.setChecked(false)
+                            }
+                        }
+                    }
                     requestRecordPermission(true)
                 } else {
-                    roomLivingViewModel.updateSeatAudioMuteStatus(true)
+                    roomLivingViewModel.updateSeatAudioMuteStatus(true) {
+                        if (it != null) { // 设置失败
+                            binding.cbMic.setChecked(true)
+                        }
+                    }
                 }
             }
         }
@@ -684,10 +694,20 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
     //开启 关闭摄像头
     private fun toggleSelfVideo(isOpen: Boolean) {
         if (isOpen) {
-            toggleVideoRun = Runnable { roomLivingViewModel.updateSeatVideoMuteStatus(false) }
+            toggleVideoRun = Runnable {
+                roomLivingViewModel.updateSeatVideoMuteStatus(false) {
+                    if (it != null) { // 设置失败
+                        binding.cbVideo.setChecked(false)
+                    }
+                }
+            }
             requestCameraPermission(true)
         } else {
-            roomLivingViewModel.updateSeatVideoMuteStatus(true)
+            roomLivingViewModel.updateSeatVideoMuteStatus(true) {
+                if (it != null) { // 设置失败
+                    binding.cbVideo.setChecked(true)
+                }
+            }
         }
     }
 
