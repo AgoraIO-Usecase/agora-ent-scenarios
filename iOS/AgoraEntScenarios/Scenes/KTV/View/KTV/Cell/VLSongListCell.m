@@ -9,6 +9,11 @@
 #import "AESMacro.h"
 @import SDWebImage;
 
+@interface VLSongListCell()
+
+@property (nonatomic, strong) VLRoomSelSongModel *selSongModel;
+@end
+
 @implementation VLSongListCell
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
@@ -102,16 +107,16 @@
     self.bottomLine.frame = CGRectMake(20, self.height-1, self.width-40, 1);
 }
 
-- (void)setSelSongModel:(VLRoomSelSongModel *)selSongModel {
-    _selSongModel = selSongModel;
+- (void)setSelSongModel:(VLRoomSelSongModel *)selSongModel isOwner:(BOOL)isOwner {
+    self.selSongModel = selSongModel;
     self.nameLabel.text = selSongModel.songName;
     NSString *localizedPropertyName = KTVLocalizedString(@"ktv_song_ordering_person");
-    NSString *formattedString = [NSString stringWithFormat:@"%@ %@", localizedPropertyName, selSongModel.name];
+    NSString *formattedString = [NSString stringWithFormat:@"%@ %@", localizedPropertyName, selSongModel.owner.userName];
     self.chooserLabel.text = formattedString;
     
     if (selSongModel.status == VLSongPlayStatusIdle) {
-        if(!VLUserCenter.user.ifMaster) {
-            if ([selSongModel.userNo isEqualToString:VLUserCenter.user.id]){
+        if(!isOwner) {
+            if ([selSongModel.owner.userName isEqualToString:VLUserCenter.user.id]){
                 self.sortBtn.hidden = YES;
                 self.deleteBtn.hidden = NO;
             } else {

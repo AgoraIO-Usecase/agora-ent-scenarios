@@ -91,7 +91,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
                 completion(nil, err)
                 return
             }
-            scene.create(payload: [:]) {[weak self] err in
+            scene.create(createTime: roomInfo.createdAt, payload: [:]) {[weak self] err in
                 if let err = err {
                     showTo1v1Error("create scene fail: \(err.localizedDescription)")
                     completion(nil, err)
@@ -172,7 +172,7 @@ extension ShowTo1v1ServiceImp: AUIUserRespDelegate {
         self.userList.append(ShowTo1v1UserInfo(userInfo: userInfo))
     }
     
-    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
+    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
         let userList = self.userList
         self.userList = userList.filter({ $0.uid != userInfo.userId})
     }

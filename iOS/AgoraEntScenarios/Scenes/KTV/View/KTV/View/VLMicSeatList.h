@@ -32,6 +32,6 @@ typedef enum : NSUInteger {
 - (void)updateVolumeForSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *) speakers;
 
 - (void)updateSingBtnWithChoosedSongArray:(NSArray *)choosedSongArray;
-- (void)updateIfNeeded;
+- (void)reloadData;
 @end
 
