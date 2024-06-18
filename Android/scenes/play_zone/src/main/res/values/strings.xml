@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="play_zone_game_hall">模拟游戏大厅</string>
+    <string name="play_zone_switch_vendor">切换供应</string>
+    <string name="play_zone_vendor_sub">忽然玩法</string>
+    <string name="play_zone_vendor_yygame">元游玩法</string>
+    <string name="play_zone_vendor_groupplay">群玩玩法</string>
+    <string name="play_zone_room_list">房间列表</string>
+    <string name="play_zone_currently_the_hottest">时下最热</string>
+    <string name="play_zone_currently_the_hottest_tips">体验弹幕互动新玩法</string>
+    <string name="play_zone_gameplay">休闲玩法</string>
+    <string name="play_zone_gameplay_tips">开启一站式选型体验</string>
+    <string name="play_zone_leisure_and_entertainment">休闲娱乐</string>
+    <string name="play_zone_voice_interaction">语音互动</string>
+    <string name="play_zone_realtime_competition">实时竞技</string>
+    <string name="play_zone_classic_board_games">经典棋牌</string>
+    <string name="play_zone_party_games">Party Game</string>
+</resources>

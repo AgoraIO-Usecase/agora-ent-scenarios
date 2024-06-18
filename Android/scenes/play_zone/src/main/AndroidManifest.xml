@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.agora.scene.playzone">
+
+    <application>
+
+        <activity android:name="io.agora.scene.playzone.sub.quickstart.QuickStartActivity"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity android:name="io.agora.scene.playzone.hall.PlayGameHallActivity" />
+    </application>
+</manifest>
