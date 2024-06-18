@@ -1514,7 +1514,7 @@ class LiveDetailFragment : Fragment() {
         }
         mService.subscribeInteractionChanged(mRoomInfo.roomId) { status, info ->
             context ?: return@subscribeInteractionChanged
-            if (status == ShowSubscribeStatus.updated && info != null) {
+            if (status == ShowSubscribeStatus.updated && info != null && info.interactStatus != ShowInteractionStatus.idle) {
                 // 开始互动
                 if (interactionInfo == null) {
                     interactionInfo = info
