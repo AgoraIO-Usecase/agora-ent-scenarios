@@ -730,7 +730,7 @@ extension Pure1v1UserListViewController {
 
 //MARK: AgoraRtcMediaPlayerDelegate
 extension Pure1v1UserListViewController: AgoraRtcMediaPlayerDelegate {
-    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason) {
         if state == .openCompleted {
             playerKit.play()
         }

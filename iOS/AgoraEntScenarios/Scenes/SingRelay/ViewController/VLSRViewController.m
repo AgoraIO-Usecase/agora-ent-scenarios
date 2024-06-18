@@ -2370,7 +2370,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 }
 
 #pragma mark SRApiEventHandlerDelegate
-- (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error isLocal:(BOOL)isLocal {
+- (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state reason:(AgoraMediaPlayerReason)reason isLocal:(BOOL)isLocal {
     dispatch_async(dispatch_get_main_queue(), ^{
         if(state == AgoraMediaPlayerStatePlaying) {
             if(isLocal) {
@@ -2449,13 +2449,13 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 
 - (void)onMusicLoadProgressWithSongCode:(NSInteger)songCode
                                 percent:(NSInteger)percent
-                                 status:(AgoraMusicContentCenterPreloadStatus)status
+                                  state:(AgoraMusicContentCenterPreloadState)state
                                     msg:(NSString *)msg
                                lyricUrl:(NSString *)lyricUrl {
-    SRLogInfo(@"load: %li, %li", status, percent);
+    SRLogInfo(@"load: %li, %li", state, percent);
     dispatch_async_on_main_queue(^{
         [self.statusView updateLoadingViewWith:percent];
-        if(status == AgoraMusicContentCenterPreloadStatusError){
+        if(state == AgoraMusicContentCenterPreloadStateError){
             [VLToast toast:SRLocalizedString(@"sr_load_failed_and_change")];
 //            [self.MVView setBotViewHidden:false];
 //            self.MVView.loadingType = VLSRMVViewStateIdle;
@@ -2463,7 +2463,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
             return;
         }
         
-        if (status == AgoraMusicContentCenterPreloadStatusOK){
+        if (state == AgoraMusicContentCenterPreloadStateOK){
            // self.MVView.loadingType = VLSRMVViewStateIdle;
         }
        // self.MVView.loadingProgress = percent;

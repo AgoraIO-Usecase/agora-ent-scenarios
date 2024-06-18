@@ -811,11 +811,11 @@ extension CantataMainViewController: IMusicLoadStateListener {
         }
     }
     
-    public func onMusicLoadProgress(songCode: Int, percent: Int, status: AgoraMusicContentCenterPreloadStatus, msg: String?, lyricUrl: String?) {
+    public func onMusicLoadProgress(songCode: Int, percent: Int, state: AgoraMusicContentCenterPreloadState, msg: String?, lyricUrl: String?) {
         let topSong = self.selSongArray?.first
         let flag = topSong?.userNo == VLUserCenter.user.id
         if self.singerRole == .soloSinger || self.singerRole == .leadSinger || self.isJoinChorus == true || flag {
-            self.lrcControlView.updateLoadingView(with: status == .OK ? 100 : percent)
+            self.lrcControlView.updateLoadingView(with: state == .OK ? 100 : percent)
         }
     }
     
@@ -1697,7 +1697,7 @@ extension CantataMainViewController: KTVApiEventHandlerDelegate {
         
     }
     
-    public func onMusicPlayerStateChanged(state: AgoraMediaPlayerState, error: AgoraMediaPlayerError, isLocal: Bool) {
+    public func onMusicPlayerStateChanged(state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason, isLocal: Bool) {
         if isLocal && singerRole == .leadSinger || singerRole == .soloSinger {
             if state == .playBackCompleted || state == .playBackAllLoopsCompleted {
                 //展示结算界面

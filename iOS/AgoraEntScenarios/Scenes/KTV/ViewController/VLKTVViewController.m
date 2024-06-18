@@ -642,27 +642,27 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         NSInteger audioEffectPreset = [dict[@"preset"] integerValue];
         switch (audioEffectPreset) {
             case AgoraAudioEffectPresetOff:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOffHarmony];
+                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
                 KTVLogInfo(@"effect:Off");
                 break;
             case AgoraAudioEffectPresetRoomAcousticsKTV:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousticsKTVHarmony];
+                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousticsKTV];
                 KTVLogInfo(@"effect:KTV");
                 break;
             case AgoraAudioEffectPresetRoomAcousVocalConcer:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousVocalConcerHarmony];
+                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousVocalConcer];
                 KTVLogInfo(@"effect:Concer");
                 break;
             case AgoraAudioEffectPresetRoomAcousStudio:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousStudioHarmony];
+                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousStudio];
                 KTVLogInfo(@"effect:Studio");
                 break;
             case AgoraAudioEffectPresetRoomAcousPhonograph:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousPhonographHarmony];
+                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousPhonograph];
                 KTVLogInfo(@"effect:graph");
                 break;
             default:
-                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOffHarmony];
+                [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetOff];
                 KTVLogInfo(@"effect:Off");
                 break;
         }
@@ -2188,7 +2188,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark KTVApiEventHandlerDelegate
-- (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error isLocal:(BOOL)isLocal {
+- (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state reason:(AgoraMediaPlayerReason)reason isLocal:(BOOL)isLocal {
     dispatch_async(dispatch_get_main_queue(), ^{
         if(state == AgoraMediaPlayerStatePlaying) {
             //显示跳过前奏
@@ -2245,7 +2245,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)onMusicLoadProgressWithSongCode:(NSInteger)songCode
                                 percent:(NSInteger)percent
-                                 status:(AgoraMusicContentCenterPreloadStatus)status
+                                  state:(AgoraMusicContentCenterPreloadState)state
                                     msg:(NSString *)msg
                                lyricUrl:(NSString *)lyricUrl {
     dispatch_async_on_main_queue(^{
@@ -2255,7 +2255,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
 //        KTVLogInfo(@"onMusicLoadProgressWithSongCode songCode %@/%ld percent: %ld", model.songNo, songCode, percent);
-        if(status == AgoraMusicContentCenterPreloadStatusError){
+        if(state == AgoraMusicContentCenterPreloadStateError){
             [VLToast toast:KTVLocalizedString(@"ktv_load_failed_and_change")];
             if(self.loadMusicCallBack) {
                 self.loadMusicCallBack(NO, songCode);
@@ -2264,7 +2264,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
         
-        if (status == AgoraMusicContentCenterPreloadStatusOK){
+        if (state == AgoraMusicContentCenterPreloadStateOK){
         }
         
         VLRoomSelSongModel *topSong = self.selSongsArray.firstObject;
