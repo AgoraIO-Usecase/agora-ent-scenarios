@@ -46,17 +46,19 @@ public class AUISyncManager: NSObject {
         }
     }
     
-    public func renew(token: String, completion: ((NSError?)->())? = nil) {
+    public func renew(token: String, completion: ((NSError?)->())?) {
         rtmManager.renew(token: token, completion: completion)
     }
     
-    public func createScene(channelName: String) -> AUIScene {
+    public func createScene(channelName: String, roomExpiration: RoomExpirationPolicy? = nil) -> AUIScene {
         aui_info("createScene: \(channelName)")
         if let scene = getScene(channelName: channelName) {
             return scene
         }
         
-        let scene = AUIScene(channelName: channelName, rtmManager: rtmManager) { [weak self] in
+        let scene = AUIScene(channelName: channelName, 
+                             rtmManager: rtmManager,
+                             roomExpiration: roomExpiration ?? RoomExpirationPolicy()) { [weak self] in
             self?.sceneMap.removeValue(forKey: channelName)
         }
         sceneMap[channelName] = scene
@@ -64,7 +66,7 @@ public class AUISyncManager: NSObject {
     }
     
     public func getScene(channelName: String) -> AUIScene? {
-        aui_info("getScene: \(channelName)")
+//        aui_info("getScene: \(channelName)")
         if let scene = sceneMap[channelName] {
             return scene
         }

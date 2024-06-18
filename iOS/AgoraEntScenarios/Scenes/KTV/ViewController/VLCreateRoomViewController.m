@@ -40,7 +40,7 @@
         return;
     }
     
-    KTVCreateRoomInputModel* intputModel = [KTVCreateRoomInputModel new];
+    KTVCreateRoomInfo* intputModel = [KTVCreateRoomInfo new];
     intputModel.belCanto = @"0";
     intputModel.icon = [NSString stringWithFormat:@"%@",roomModel.icon];
     intputModel.isPrivate = roomModel.isPrivate ? @(1) : @(0);
@@ -50,24 +50,17 @@
     
     VL(weakSelf);
     self.view.userInteractionEnabled = NO;
+    VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
     [[AppContext ktvServiceImp] createRoomWithInputModel:intputModel
-                                              completion:^(NSError * error, KTVCreateRoomOutputModel * outputModel) {
+                                              completion:^(NSError* error, SyncRoomInfo* outputModel) {
         weakSelf.view.userInteractionEnabled = YES;
         if (error != nil) {
-            [VLToast toast:error.description];
+            [VLToast toast:error.localizedDescription];
             return;
         }
-        //处理座位信息 
-        VLRoomListModel *listModel = [[VLRoomListModel alloc]init];
-        listModel.roomNo = outputModel.roomNo;
-        listModel.name = outputModel.name;
-        listModel.bgOption = 0;
-        listModel.creatorNo = VLUserCenter.user.id;
-        listModel.creatorName = VLUserCenter.user.name;
-        listModel.creatorAvatar = VLUserCenter.user.headUrl;
-        VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
-        ktvVC.roomModel = listModel;
-        ktvVC.seatsArray = outputModel.seatsArray;
+        
+        ktvVC.roomModel = outputModel;
+//        ktvVC.seatsArray = outputModel.seatsArray;
         weakSelf.createRoomVCBlock(ktvVC);
     }];
 }

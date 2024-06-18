@@ -471,7 +471,6 @@
 		E301BD8D2AF4CB000089A79C /* VLKTVMVView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BD1A2AF4CAFF0089A79C /* VLKTVMVView.m */; };
 		E301BD8E2AF4CB000089A79C /* DropMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = E301BD1B2AF4CAFF0089A79C /* DropMenu.swift */; };
 		E301BD8F2AF4CB000089A79C /* VLKTVBottomToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BD1D2AF4CAFF0089A79C /* VLKTVBottomToolbar.m */; };
-		E301BD902AF4CB000089A79C /* VLVoiceShowView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BD1E2AF4CAFF0089A79C /* VLVoiceShowView.m */; };
 		E301BD912AF4CB000089A79C /* VLDebugView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BD2A2AF4CAFF0089A79C /* VLDebugView.m */; };
 		E301BD922AF4CB000089A79C /* VLKTVTopView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BD2B2AF4CAFF0089A79C /* VLKTVTopView.m */; };
 		E301BD932AF4CB000089A79C /* VLEarSettingView.m in Sources */ = {isa = PBXBuildFile; fileRef = E301BD2C2AF4CAFF0089A79C /* VLEarSettingView.m */; };
@@ -1250,7 +1249,6 @@
 		E301BCE92AF4CAFF0089A79C /* VLBadNetWorkView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLBadNetWorkView.m; sourceTree = "<group>"; };
 		E301BCEA2AF4CAFF0089A79C /* VLAudioEffectPicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAudioEffectPicker.m; sourceTree = "<group>"; };
 		E301BCEB2AF4CAFF0089A79C /* VLMicSeatList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLMicSeatList.m; sourceTree = "<group>"; };
-		E301BCEC2AF4CAFF0089A79C /* VLVoiceShowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLVoiceShowView.h; sourceTree = "<group>"; };
 		E301BCEE2AF4CAFF0089A79C /* VLPopScoreView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLPopScoreView.h; sourceTree = "<group>"; };
 		E301BCEF2AF4CAFF0089A79C /* VLDropOnLineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLDropOnLineView.m; sourceTree = "<group>"; };
 		E301BCF02AF4CAFF0089A79C /* VLPopMoreSelView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLPopMoreSelView.m; sourceTree = "<group>"; };
@@ -1296,7 +1294,6 @@
 		E301BD1B2AF4CAFF0089A79C /* DropMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DropMenu.swift; sourceTree = "<group>"; };
 		E301BD1C2AF4CAFF0089A79C /* VLEarSettingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLEarSettingView.h; sourceTree = "<group>"; };
 		E301BD1D2AF4CAFF0089A79C /* VLKTVBottomToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLKTVBottomToolbar.m; sourceTree = "<group>"; };
-		E301BD1E2AF4CAFF0089A79C /* VLVoiceShowView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLVoiceShowView.m; sourceTree = "<group>"; };
 		E301BD1F2AF4CAFF0089A79C /* VLMicSeatList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLMicSeatList.h; sourceTree = "<group>"; };
 		E301BD202AF4CAFF0089A79C /* VLBadNetWorkView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLBadNetWorkView.h; sourceTree = "<group>"; };
 		E301BD212AF4CAFF0089A79C /* VLAudioEffectPicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLAudioEffectPicker.h; sourceTree = "<group>"; };
@@ -3390,7 +3387,6 @@
 				E301BCE92AF4CAFF0089A79C /* VLBadNetWorkView.m */,
 				E301BCEA2AF4CAFF0089A79C /* VLAudioEffectPicker.m */,
 				E301BCEB2AF4CAFF0089A79C /* VLMicSeatList.m */,
-				E301BCEC2AF4CAFF0089A79C /* VLVoiceShowView.h */,
 				E301BCED2AF4CAFF0089A79C /* KTVModal */,
 				E301BCFA2AF4CAFF0089A79C /* VLAudienceIndicator.m */,
 				E301BCFB2AF4CAFF0089A79C /* VLListEmptyView.m */,
@@ -3405,7 +3401,6 @@
 				E37C844B2B68E3B4007DDF3B /* ProgressBar.swift */,
 				E301BD1C2AF4CAFF0089A79C /* VLEarSettingView.h */,
 				E301BD1D2AF4CAFF0089A79C /* VLKTVBottomToolbar.m */,
-				E301BD1E2AF4CAFF0089A79C /* VLVoiceShowView.m */,
 				E301BD1F2AF4CAFF0089A79C /* VLMicSeatList.h */,
 				E301BD202AF4CAFF0089A79C /* VLBadNetWorkView.h */,
 				E301BD212AF4CAFF0089A79C /* VLAudioEffectPicker.h */,
@@ -5037,7 +5032,6 @@
 				DD3610BE29B70CDC00CE7984 /* ShowSettingSliderCell.swift in Sources */,
 				DD9EBFD42AD5512300B4551F /* VMANISSUPTableViewCell.swift in Sources */,
 				DD9EBF9B2AD5512300B4551F /* ResourceBundleExtension.swift in Sources */,
-				E301BD902AF4CB000089A79C /* VLVoiceShowView.m in Sources */,
 				DDA199F128FFE579009D3E61 /* BaseNavigationController.m in Sources */,
 				DD9EBFAB2AD5512300B4551F /* VoiceChatServiceModel.swift in Sources */,
 				DD619ACC29E3E247008F63E4 /* SAUserListView.swift in Sources */,
@@ -5774,7 +5768,7 @@
 					"\"Photos\"",
 					"-ld64",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.joy;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.test.entfull;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;

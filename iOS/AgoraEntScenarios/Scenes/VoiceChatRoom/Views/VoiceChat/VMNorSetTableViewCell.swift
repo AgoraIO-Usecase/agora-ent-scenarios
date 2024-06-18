@@ -27,7 +27,7 @@ class VMNorSetTableViewCell: UITableViewCell {
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
+    }                                                                                          
 
     private func layoutUI() {
         iconView.frame = CGRect(x: 20, y: 17, width: 20, height: 20)

@@ -7,6 +7,7 @@
 
 #import "VLKTVRemoteVolumeView.h"
 #import "AgoraEntScenarios-Swift.h"
+#import "AESMacro.h"
 @import Masonry;
 
 @interface VLKTVRemoteVolumeView() <UITextFieldDelegate>
@@ -139,7 +140,7 @@ shouldChangeCharactersInRange:(NSRange)range
 replacementString:(NSString *)string {
     NSMutableString* str = [NSMutableString stringWithString:textField.text];
     [str replaceCharactersInRange:range withString:string];
-    NSLog(@"textField %@", str);
+//    KTVLogInfo(@"textField %@", str);
     int value = [str intValue];
     if (value >= self.minValue && value <= self.maxValue) {
         _currentValue = value;
