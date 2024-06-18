@@ -88,55 +88,6 @@ import AgoraCommon
     }
     
     @objc func onClickCloseDebugMode(_ sender: UIButton){
-        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
-        // 创建一个包含 segment 和 button 的自定义视图
-        let customView = UIView(frame: CGRect(x: 0, y: 0, width: 300, height: 50))
-
-        // 创建 segment 控件
-        let segment = UISegmentedControl(items: ["Option 1", "Option 2"])
-        segment.frame = CGRect(x: 10, y: 5, width: 150, height: 40)
-        customView.addSubview(segment)
-
-        // 创建 button 控件
-        let button = UIButton(type: .system)
-        button.setTitle("Button", for: .normal)
-        button.frame = CGRect(x: 160, y: 5, width: 130, height: 40)
-        customView.addSubview(button)
-
-        // 设置自定义视图的位置
-        customView.center = alertController.view.center
-
-        // 添加自定义视图到 alertController 的 view 上
-        alertController.view.addSubview(customView)
-
-        let submitAction = UIAlertAction(title: NSLocalizedString("confirm", comment: ""), style: .default) { action in
-            // 点击确认按钮后的操作
-            AppContext.shared.isDebugMode = false
-            self.debugModeButton.isHidden = true
-        }
-
-        let cancelAction = UIAlertAction(title: NSLocalizedString("cancel", comment: ""), style: .cancel) { action in
-            // 点击取消按钮后的操作
-        }
-
-        // 添加操作按钮到 alertController
-        alertController.addAction(submitAction)
-        alertController.addAction(cancelAction)
-
-        // 创建一个空的 UIViewController 来充当弹出窗口
-        let popupViewController = UIViewController()
-        popupViewController.modalPresentationStyle = .overFullScreen
-
-        // 弹出窗口的背景设置为透明
-        popupViewController.view.backgroundColor = UIColor.clear
-
-        // 将 alertController 添加到弹出窗口上
-        popupViewController.addChild(alertController)
-        popupViewController.view.addSubview(alertController.view)
-        alertController.didMove(toParent: popupViewController)
-
-        // 显示弹出窗口
-        present(popupViewController, animated: true, completion: nil)
 
     }
     
