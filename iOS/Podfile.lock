@@ -30,7 +30,41 @@ PODS:
   - AgoraLyricsScore (1.1.6):
     - AgoraComponetLog
     - Zip
-  - AgoraRtcEngine_Special_iOS (4.1.1.29)
+  - AgoraRtcEngine_iOS (4.3.1):
+    - AgoraRtcEngine_iOS/AIAEC (= 4.3.1)
+    - AgoraRtcEngine_iOS/AINS (= 4.3.1)
+    - AgoraRtcEngine_iOS/AudioBeauty (= 4.3.1)
+    - AgoraRtcEngine_iOS/ClearVision (= 4.3.1)
+    - AgoraRtcEngine_iOS/ContentInspect (= 4.3.1)
+    - AgoraRtcEngine_iOS/FaceCapture (= 4.3.1)
+    - AgoraRtcEngine_iOS/FaceDetection (= 4.3.1)
+    - AgoraRtcEngine_iOS/LipSync (= 4.3.1)
+    - AgoraRtcEngine_iOS/ReplayKit (= 4.3.1)
+    - AgoraRtcEngine_iOS/RtcBasic (= 4.3.1)
+    - AgoraRtcEngine_iOS/SpatialAudio (= 4.3.1)
+    - AgoraRtcEngine_iOS/VideoAv1CodecDec (= 4.3.1)
+    - AgoraRtcEngine_iOS/VideoAv1CodecEnc (= 4.3.1)
+    - AgoraRtcEngine_iOS/VideoCodecDec (= 4.3.1)
+    - AgoraRtcEngine_iOS/VideoCodecEnc (= 4.3.1)
+    - AgoraRtcEngine_iOS/VirtualBackground (= 4.3.1)
+    - AgoraRtcEngine_iOS/VQA (= 4.3.1)
+  - AgoraRtcEngine_iOS/AIAEC (4.3.1)
+  - AgoraRtcEngine_iOS/AINS (4.3.1)
+  - AgoraRtcEngine_iOS/AudioBeauty (4.3.1)
+  - AgoraRtcEngine_iOS/ClearVision (4.3.1)
+  - AgoraRtcEngine_iOS/ContentInspect (4.3.1)
+  - AgoraRtcEngine_iOS/FaceCapture (4.3.1)
+  - AgoraRtcEngine_iOS/FaceDetection (4.3.1)
+  - AgoraRtcEngine_iOS/LipSync (4.3.1)
+  - AgoraRtcEngine_iOS/ReplayKit (4.3.1)
+  - AgoraRtcEngine_iOS/RtcBasic (4.3.1)
+  - AgoraRtcEngine_iOS/SpatialAudio (4.3.1)
+  - AgoraRtcEngine_iOS/VideoAv1CodecDec (4.3.1)
+  - AgoraRtcEngine_iOS/VideoAv1CodecEnc (4.3.1)
+  - AgoraRtcEngine_iOS/VideoCodecDec (4.3.1)
+  - AgoraRtcEngine_iOS/VideoCodecEnc (4.3.1)
+  - AgoraRtcEngine_iOS/VirtualBackground (4.3.1)
+  - AgoraRtcEngine_iOS/VQA (4.3.1)
   - AgoraRtm (2.2.0)
   - AgoraSyncManager (2.1.6):
     - SocketRocket
@@ -38,7 +72,7 @@ PODS:
     - AFNetworking
     - SSZipArchive
   - AudioScenarioApi (0.1.0):
-    - AgoraRtcEngine_Special_iOS
+    - AgoraRtcEngine_iOS
   - AUIKitCore/UI (1.1.1):
     - AgoraLyricsScore
     - MJRefresh
@@ -49,15 +83,15 @@ PODS:
     - YYModel
   - Bugly (2.5.93)
   - CallAPI (2.1.0):
-    - AgoraRtcEngine_Special_iOS (~> 4.1.1.26)
+    - AgoraRtcEngine_iOS
     - CallAPI/All (= 2.1.0)
   - CallAPI/All (2.1.0):
-    - AgoraRtcEngine_Special_iOS (~> 4.1.1.26)
+    - AgoraRtcEngine_iOS
     - AgoraRtm (~> 2.2.0)
   - Cantata (0.1.0):
     - AgoraCommon
     - AgoraLyricsScore
-    - AgoraRtcEngine_Special_iOS
+    - AgoraRtcEngine_iOS
     - AUIKitCore/UI
     - JXCategoryView
     - Masonry
@@ -84,7 +118,7 @@ PODS:
     - HXPhotoPicker/Core
   - Joy (0.1.0):
     - AgoraCommon
-    - AgoraRtcEngine_Special_iOS
+    - AgoraRtcEngine_iOS
     - AgoraSyncManager
     - RTMSyncManager
     - SDWebImage
@@ -148,7 +182,7 @@ PODS:
   - SwiftTheme (0.6.4)
   - SwiftyBeaver (1.9.5)
   - VideoLoaderAPI (0.1.3):
-    - AgoraRtcEngine_Special_iOS
+    - AgoraRtcEngine_iOS
   - YYCategories (1.0.4):
     - YYCategories/no-arc (= 1.0.4)
   - YYCategories/no-arc (1.0.4)
@@ -162,7 +196,7 @@ DEPENDENCIES:
   - Agora_Chat_iOS (= 1.0.8)
   - AgoraCommon (from `AgoraEntScenarios`)
   - AgoraLyricsScore (= 1.1.6)
-  - AgoraRtcEngine_Special_iOS (= 4.1.1.29)
+  - AgoraRtcEngine_iOS (~> 4.3.1)
   - AgoraRtm (= 2.2.0)
   - AgoraSyncManager (~> 2.1.6)
   - AGResourceManager (from `AgoraEntScenarios/Common/API/AGResourceManager`)
@@ -202,7 +236,7 @@ SPEC REPOS:
     - Agora_Chat_iOS
     - AgoraComponetLog
     - AgoraLyricsScore
-    - AgoraRtcEngine_Special_iOS
+    - AgoraRtcEngine_iOS
     - AgoraRtm
     - AgoraSyncManager
     - AUIKitCore
@@ -259,18 +293,18 @@ SPEC CHECKSUMS:
   AgoraCommon: a58ba94ab35c2318bd55687a398f84dcd354a476
   AgoraComponetLog: b359777d2ff8e9ee0237cbd0c42ceb422fd514f1
   AgoraLyricsScore: 7576387b199cdc3b2752a113688abd0a807a2ca3
-  AgoraRtcEngine_Special_iOS: a8d0405efb20323b93ce77ae3d0573ea80837c31
+  AgoraRtcEngine_iOS: f64be00fdda786bb7edd84ab461c31b7b4c93534
   AgoraRtm: 4813aab832ca612facb29c831339546c71e0b764
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
   AGResourceManager: e6616ad4d9d0461c84d9582ef1118004fa534e5c
-  AudioScenarioApi: 9dd859e4de75140b5086725f493315d47d935e14
+  AudioScenarioApi: b309ae6f8d221759811787afe7f8b69024548028
   AUIKitCore: 3d08c145befed42dd5b28e543f7c073d09fded32
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
-  CallAPI: 488dd168950494c0cfbad7d94af63851b127cda5
-  Cantata: 81ecbee986502fac219e581b88fc33653bcb3d97
+  CallAPI: acefb5e71efd29301eea00cf2e8f1d6548ffabe2
+  Cantata: 05f2d634cd2f253f49afa37db6ba7fbb9e343ae8
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   HXPhotoPicker: 541da99aa88b8eb0b6222ddfe37cacbd06d73300
-  Joy: 20168a64bfbd0c6053382991957335eb2d452576
+  Joy: 41ddfe60dc6bd0e62bfbe20d63acb3c3446fac50
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
   LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb
@@ -290,12 +324,12 @@ SPEC CHECKSUMS:
   SwiftProtobuf: bcfd2bc231cf9ae552cdc7c4e877bd3b41fe57b1
   SwiftTheme: 007cbaf1f9e171caf6448a4657533e54c682b285
   SwiftyBeaver: 84069991dd5dca07d7069100985badaca7f0ce82
-  VideoLoaderAPI: e42bcbf9c836297f0006d7a90068ffbf935c9acd
+  VideoLoaderAPI: b4326ab6200906ce6008c72661bb4b2eeed06868
   YYCategories: 6bcd4314c6661a561410dce4a793379ebd306abd
   YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: a6f00eb6490b2cd2f67e66df5d63cd921b5f0444
+PODFILE CHECKSUM: 6d0f7a2388cf028d21180ae4f859e2956e3668bd
 
 COCOAPODS: 1.12.1

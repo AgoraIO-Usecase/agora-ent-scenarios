@@ -80,7 +80,6 @@ TODO: Add long description of the pod here.
  s.resources = ['AgoraCommon/*.bundle']
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
- # s.dependency 'AgoraRtcEngine_Special_iOS'
  s.dependency 'SwiftyBeaver'
  s.dependency 'Bugly'
  s.dependency 'YYModel'
