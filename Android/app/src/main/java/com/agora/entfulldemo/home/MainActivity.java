@@ -76,6 +76,7 @@ public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding
                 }, 500);
             }
         }
+        mainViewModel.fetchSceneConfig();
     }
 
     @Override

@@ -140,19 +140,3 @@ data class EffectVoiceBean constructor(
     var title: String,
     var isSelect: Boolean = false
 )
-
-/**
- * 人声突出
- */
-data class VoiceHighlightBean constructor(
-    var user: AUIUserThumbnailInfo? = null
-) {
-
-    var isSelect = false
-        private set
-
-    fun setSelect(select: Boolean): VoiceHighlightBean {
-        isSelect = select
-        return this
-    }
-}

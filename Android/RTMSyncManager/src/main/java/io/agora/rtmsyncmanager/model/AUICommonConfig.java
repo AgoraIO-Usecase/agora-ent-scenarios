@@ -4,18 +4,26 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+/**
+ * AUICommonConfig is a class that holds configuration details for the application.
+ * This includes the application context, application ID, application certificate, host, user information, and IM details.
+ */
 public class AUICommonConfig {
+    // The application context
     public @NonNull Context context;
-    // 声网AppId
+    // The application ID from Agora
     public @NonNull String appId = "";
-    // 声网App证书(可选，如果没有用到后端token生成服务可以不设置)
+    // The application certificate from Agora (optional, if not using backend token generation service, this can be unset)
     public @NonNull String appCert = "";
-    // 域名(可选，如果没有用到后端服务可以不设置)
+    // The host (optional, if not using backend service, this can be unset)
     public @NonNull String host = "";
-    // 用户信息
+    // The user information
     public @NonNull AUIUserThumbnailInfo owner;
 
+    // The IM application key
     public @NonNull String imAppKey = "";
+    // The IM client ID
     public @NonNull String imClientId = "";
+    // The IM client secret
     public @NonNull String imClientSecret = "";
 }

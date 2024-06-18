@@ -8,6 +8,8 @@ import io.agora.rtmsyncmanager.service.room.AUIRoomManager
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 
+private val tag = "SyncExtensions"
+
 private val mInteractionServiceMap = mutableMapOf<String, InteractionService>()
 
 private val mApplyServiceMap = mutableMapOf<String, ApplyService>()
@@ -105,11 +107,13 @@ fun SyncManager.setupExtensions(
     loggerConfig?.let {
         AUILogger.initLogger(it)
     }
+    AUILogger.logger().d(tag, "setupExtensions")
     mRoomService = RoomService(roomExpirationPolicy, getExRoomManager(), this)
     mRoomPresenceService = RoomPresenceService(rtmManager, roomPresenceChannelName)
 }
 
 fun SyncManager.destroyExtensions() {
+    AUILogger.logger().d(tag, "destroyExtensions")
     mInteractionServiceMap.values.forEach { it.release() }
     mApplyServiceMap.values.forEach { it.release() }
     mInvitationServiceMap.values.forEach { it.release() }

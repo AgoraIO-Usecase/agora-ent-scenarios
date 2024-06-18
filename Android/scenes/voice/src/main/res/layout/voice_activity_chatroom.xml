@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:clipToPadding="false"
     android:clipChildren="false"
-    android:background="@drawable/voice_img_room_bg"
+    android:background="@drawable/bg_room_living"
     tools:context=".ui.activity.ChatroomLiveActivity">
 
     <io.agora.scene.voice.ui.widget.top.RoomLiveTopView

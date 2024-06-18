@@ -160,7 +160,7 @@ public final class SongChosenFragment extends BaseViewBindingFragment<KtvFragmen
     void topUpSongItem(SongItem song){
         for (int i = 0; i < mAdapter.getItemCount(); i++) {
             SongItem item = mAdapter.getItem(i);
-            if (song.songNo.equals(item.songNo)) {
+            if (item!=null && song.songNo.equals(item.songNo)) {
                 if (i > 1) {
                     mAdapter.remove(i);
                     mAdapter.insert(1, item);
