@@ -3,6 +3,7 @@ package io.agora.scene.show.service.rtmsync
 import io.agora.rtmsyncmanager.SyncManager
 import io.agora.rtmsyncmanager.model.AUIRoomContext
 import io.agora.rtmsyncmanager.service.collection.AUIAttributesModel
+import io.agora.rtmsyncmanager.service.collection.AUICollectionException
 import io.agora.rtmsyncmanager.service.collection.AUIListCollection
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
@@ -71,7 +72,7 @@ class ApplyService(
             reason: AUIRtmUserLeaveReason
         ) {
             AUILogger.logger().d(tag, "onUserDidLeaved userId:$userId")
-            removeUserApply(userId)
+            removeApply(ApplyCmd.CANCEL, userId)
         }
 
         override fun onUserDidUpdated(
@@ -85,8 +86,39 @@ class ApplyService(
     }
 
     init {
-        syncManager.getScene(channelName)?.getCollection(key, listCollectionCreator)
-            ?.subscribeAttributesDidChanged(delegate)
+        val collection =
+            syncManager.getScene(channelName)?.getCollection(key, listCollectionCreator)
+        collection?.subscribeAttributesDidChanged(delegate)
+        collection?.subscribeWillAdd { publisherId, valueCmd, value ->
+            val interactionInfo = interactionService.getInteractionInfo()
+            AUILogger.logger().d(tag, "subscribeWillAdd : valueCmd=$valueCmd, value=$value, interactionInfo=$interactionInfo")
+            if(valueCmd != ApplyCmd.CREATE.value){
+                return@subscribeWillAdd AUICollectionException.ErrorCode.unknown.toException(
+                    msg = "unsupported action"
+                )
+            }
+
+            if (interactionInfo != null && interactionInfo.type != InteractionType.IDLE) {
+                return@subscribeWillAdd AUICollectionException.ErrorCode.unknown.toException(
+                    msg = "interaction is not idle"
+                )
+            }
+            return@subscribeWillAdd null
+        }
+        collection?.subscribeWillRemove { publisherId, valueCmd, value ->
+            val interactionInfo = interactionService.getInteractionInfo()
+            AUILogger.logger().d(tag, "subscribeWillRemove : valueCmd=$valueCmd, value=$value, interactionInfo=$interactionInfo")
+            when (valueCmd) {
+                ApplyCmd.ACCEPT.value -> {
+                    if (interactionInfo?.type != InteractionType.LINKING) {
+                        return@subscribeWillRemove AUICollectionException.ErrorCode.unknown.toException(
+                            msg = "interaction is not linking"
+                        )
+                    }
+                }
+            }
+            return@subscribeWillRemove null
+        }
         if (AUIRoomContext.shared().isRoomOwner(channelName)) {
             syncManager.rtmManager.subscribeUser(userObserver)
         }
@@ -117,7 +149,7 @@ class ApplyService(
             userAvatar = userInfo.userAvatar
         )
         scene.getCollection(key, listCollectionCreator).addMetaData(
-            "createApply",
+            ApplyCmd.CREATE.value,
             GsonTools.beanToMap(applyInfo),
             listOf(
                 mapOf(
@@ -147,25 +179,14 @@ class ApplyService(
             return
         }
 
-        val list = mutableListOf<ApplyInfo>()
-        scene.getCollection(key, listCollectionCreator).getLocalMetaData().getList()?.forEach {
-            val item = GsonTools.toBeanSafely(it, ApplyInfo::class.java)?: return@forEach
-            list.add(item)
-        }
-        val applyInfo = list.find {
-                it.userId == userId
-            }
-
-        if (applyInfo == null) {
-            AUILogger.logger().d(tag, "acceptApply apply not found")
-            failure?.invoke(RuntimeException("apply not found"))
-            return
-        }
-        removeApply(userId)
+        // 修改为以下逻辑：
+        // 1.startLinkingInteraction
+        // 2.仲裁者通过interaction请求，通过subscribeWillAdd回调去查apply表，看下对应的互动用户是不是在apply里
+        // 3.如果确认可以插入interaction，顺便把apply里的这个用户移除
         interactionService.startLinkingInteraction(
-            applyInfo.userId,
+            userId,
             success = {
-                success?.invoke()
+                removeApply(ApplyCmd.ACCEPT, userId, success, failure)
             },
             failure = failure
         )
@@ -177,10 +198,11 @@ class ApplyService(
         failure: ((Throwable) -> Unit)? = null
     ) {
         AUILogger.logger().d(tag, "cancelApply userId:$userId")
-        removeApply(userId, success, failure)
+        removeApply(ApplyCmd.CANCEL, userId, success, failure)
     }
 
     private fun removeApply(
+        cmd: ApplyCmd,
         userId: String,
         success: (() -> Unit)? = null,
         failure: ((Throwable) -> Unit)? = null
@@ -194,7 +216,7 @@ class ApplyService(
         }
 
         scene.getCollection(key, listCollectionCreator).removeMetaData(
-            "removeApply",
+            cmd.value,
             listOf(
                 mapOf(
                     "userId" to userId
@@ -266,37 +288,6 @@ class ApplyService(
                 ?.cleanMetaData { }
         }
     }
-
-
-    private fun removeUserApply(
-        userId: String,
-        success: (() -> Unit)? = null,
-        failure: ((Throwable) -> Unit)? = null
-    ) {
-        AUILogger.logger().d(tag, "removeUserApply userId:$userId")
-        val scene = syncManager.getScene(channelName)
-        if (scene == null) {
-            AUILogger.logger().d(tag, "removeUserApply scene not found")
-            failure?.invoke(RuntimeException("scene not found"))
-            return
-        }
-
-        scene.getCollection(key, listCollectionCreator).removeMetaData(
-            "removeUserApply",
-            listOf(
-                mapOf(
-                    "userId" to userId
-                )
-            )
-        ) {
-            AUILogger.logger().d(tag, "removeUserApply result:$it")
-            if (it != null) {
-                failure?.invoke(RuntimeException(it))
-                return@removeMetaData
-            }
-            success?.invoke()
-        }
-    }
 }
 
 data class ApplyInfo constructor(
@@ -304,3 +295,9 @@ data class ApplyInfo constructor(
     val userName: String,
     val userAvatar: String
 )
+
+enum class ApplyCmd(val value: String) {
+    CREATE("createApply"),
+    CANCEL("cancelApply"),
+    ACCEPT("acceptApply")
+}
