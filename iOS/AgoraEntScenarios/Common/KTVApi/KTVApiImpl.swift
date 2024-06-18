@@ -501,10 +501,16 @@ extension KTVApiImpl {
     }
 
     private func agoraPrint(_ message: String) {
+        #if DEBUG
+        print("[KTVAPI]\(message)")
+        #endif
         apiRepoter?.writeLog(content: message, level: .info)
     }
     
     private func agoraPrintError(_ message: String) {
+        #if DEBUG
+        print("[KTVAPI][Error]\(message)")
+        #endif
         apiRepoter?.writeLog(content: message, level: .error)
     }
 }
@@ -827,6 +833,7 @@ extension KTVApiImpl {
             if mcc?.isPreloaded(songCode: songCode) != 0 {
                 onMusicLoadStateListener.onMusicLoadProgress(songCode: self.songCode, percent: 0, status: .preloading, msg: "", lyricUrl: "")
             }
+            
             preloadMusic(with: songCode) { [weak self] status, songCode in
                 guard let self = self else { return }
                 if self.songCode != songCode {
@@ -1359,7 +1366,7 @@ extension KTVApiImpl {
         if code != 0 {
             agoraPrint("sendStreamMessage fail: \(String(describing: code))")
         }
-        print("totalSize:\(totalSize)")
+//        print("totalSize:\(totalSize)")
     }
 
     private func syncPlayState(_ state: AgoraMediaPlayerState) {

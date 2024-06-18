@@ -9,7 +9,8 @@ import Foundation
 
 extension AUIMapCollection {
     func initMetaData(channelName: String,
-                      metadata: [String: String],
+                      metadata: [String: Any],
+                      fetchImmediately: Bool,
                       completion: @escaping (NSError?)->()) {
         guard let value = encodeToJsonStr(metadata) else {
             completion(AUICollectionOperationError.encodeToJsonStringFail.toNSError())
@@ -18,7 +19,7 @@ extension AUIMapCollection {
         rtmManager.setBatchMetadata(channelName: channelName,
                                     lockName: "",
                                     metadata: [observeKey: value],
-                                    fetchImmediately: true,
+                                    fetchImmediately: fetchImmediately,
                                     completion: completion) 
     }
 }

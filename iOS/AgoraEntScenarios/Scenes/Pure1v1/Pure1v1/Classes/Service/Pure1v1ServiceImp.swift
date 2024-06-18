@@ -67,8 +67,7 @@ class Pure1v1ServiceImp: NSObject {
 extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
     func getUserList(completion: @escaping ([Pure1v1UserInfo], NSError?) -> Void) {
         
-        self.userService.getUserInfoList(roomId: kRoomId,
-                                         userIdList: []) {[weak self] err, list in
+        self.userService.getUserInfoList(roomId: kRoomId) {[weak self] err, list in
             guard let self = self else {return}
             if let err = err {
                 completion([], err)
@@ -120,7 +119,7 @@ extension Pure1v1ServiceImp: AUIUserRespDelegate {
         self.userList.append(Pure1v1UserInfo(userInfo: userInfo))
     }
     
-    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
+    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
         let userList = self.userList
         self.userList = userList.filter({ $0.userId != userInfo.userId})
     }

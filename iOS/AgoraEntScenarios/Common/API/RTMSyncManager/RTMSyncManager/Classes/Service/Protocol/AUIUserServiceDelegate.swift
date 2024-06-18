@@ -17,12 +17,11 @@ import Foundation
     /// - Parameter delegate: 需要回调的对象
     func unbindRespDelegate(delegate: AUIUserRespDelegate)
     
-    /// 获取指定 userId 的用户信息，如果为 null，则获取房间内所有人的信息
+    /// 获取指定频道的所有用户信息
     /// - Parameters:
     ///   - roomId: 房间id
-    ///   - userIdList: 用户列表
     ///   - callback: 操作完成回调
-    func getUserInfoList(roomId: String, userIdList: [String] , callback: @escaping AUIUserListCallback)
+    func getUserInfoList(roomId: String, callback: @escaping AUIUserListCallback)
 
     /// 获取用户信息
     /// - Parameter userId: <#userId description#>
@@ -66,7 +65,8 @@ import Foundation
     /// - Parameters:
     ///   - roomId: 房间id
     ///   - userInfo:  用户信息
-    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo)
+    ///   - reason: 离开房间原因
+    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason)
     
     /// 用户的信息被修改
     /// - Parameters:

@@ -159,7 +159,6 @@
 "ktv_join_chorus_failed" = "加入合唱失败";
 "ktv_enable_electronic" = "启用电音";
 "ktv_chooseSong_failed" = "点歌失败，请重试";
-"ktv_choose_fail" = "太火爆了，等会再试试";
 "ktv_audio_onmic" = "音频上麦";
 "ktv_video_onmic" = "视频上麦";
 "ktv_room_concert" = "演唱会";
@@ -259,9 +258,7 @@
 "ktv_owner_leave" = "房主已解散房间,请确认离开房间";
 "ktv_mic_full" = "麦位已满，请在他人下麦后重试";
 "ktv_join_chorus_failed" = "加入合唱失败，原因:连接已断开";
-"ktv_per_lose" = "人声突出功能已失效，请重设";
 "ktv_change_failed" = "切歌失败，理由:连接已断开";
-"ktv_per_set_once" = "每首歌仅可设置一次人声突出对象，请在下首歌再设置";
 "ktv_load_failed_and_change" = "加载歌曲失败，请切歌";
 "ktv_onMic" = "上麦";
 "ktv_people" = "人";
@@ -297,3 +294,14 @@
 "ktv_skip_pre" = "跳过前奏";
 "ktv_skip_end" = "跳过尾奏";
 "ktv_per_bro" = "专业主播";
+
+"ktv_create_room_fail_toast"="创建房间失败, 错误:";
+"ktv_join_room_fail_toast"="加入房间失败, 错误:";
+"ktv_enter_seat_fail_toast"="上麦失败, 错误:";
+"ktv_leave_seat_fail_toast"="下麦失败, 错误:";
+"ktv_kick_seat_fail_toast"="踢人下麦失败, 错误:";
+"ktv_get_song_list_fail_toast"="拉取歌单失败, 错误:";
+"ktv_choose_song_fail_toast"="点歌失败, 错误:";
+"ktv_remove_song_fail_toast"="删除歌曲失败, 错误:";
+"ktv_pin_song_fail_toast"="置顶歌曲失败, 错误:";
+"ktv_switch_song_fail_toast"="切歌失败, 错误:";

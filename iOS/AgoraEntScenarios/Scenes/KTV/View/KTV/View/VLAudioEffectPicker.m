@@ -7,7 +7,8 @@
 #import "VLBelcantoModel.h"
 #import "AgoraEntScenarios-Swift.h"
 #import "LSTPopView+KTVModal.h"
-
+#import "VLHotSpotBtn.h"
+@import AgoraCommon;
 @interface VLAudioEffectPicker ()<UICollectionViewDataSource,UICollectionViewDelegate>
 
 @property(nonatomic, weak) id <VLAudioEffectPickerDelegate>delegate;

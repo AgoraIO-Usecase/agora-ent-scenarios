@@ -7,6 +7,7 @@
 
 #import "VLEffectView.h"
 #import "AgoraEntScenarios-Swift.h"
+@import AgoraCommon;
 
 @interface VLEffectView()
 @property(nonatomic, weak) id <VLEffectViewDelegate>delegate;

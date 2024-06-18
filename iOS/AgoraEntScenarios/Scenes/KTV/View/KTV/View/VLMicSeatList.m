@@ -6,15 +6,17 @@
 #import "VLMicSeatList.h"
 #import "VLMicSeatCell.h"
 #import "AgoraEntScenarios-Swift.h"
+#import "AppContext+KTV.h"
 @import YYCategories;
 @import SDWebImage;
 @import AgoraCommon;
+
 @interface VLMicSeatList ()<UICollectionViewDataSource,UICollectionViewDelegate>
 
 @property(nonatomic, weak) id <VLMicSeatListDelegate>delegate;
 
 @property (nonatomic, strong) UICollectionView *personCollectionView;
-@property (nonatomic, copy) NSString *currentPlayingSongCode;
+//@property (nonatomic, copy) NSString *currentPlayingSongCode;
 @end
 
 @implementation VLMicSeatList
@@ -57,10 +59,12 @@
 }
 
 - (void)reloadSeatIndex: (NSUInteger)seatIndex {
+    KTVLogInfo(@"[MicSeatListView]reloadSeatIndex: %ld", seatIndex);
     [self.personCollectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:seatIndex inSection:0]]];
 }
 
-- (void)updateIfNeeded {
+- (void)reloadData {
+    KTVLogInfo(@"[MicSeatListView]reloadData");
     [self.personCollectionView reloadData];
 }
 
@@ -80,12 +84,13 @@
     }
     VLRoomSeatModel *seatModel = self.roomSeatsArray[indexPath.row];
     
-    if (seatModel.name.length > 0) {
-        cell.nickNameLabel.text = seatModel.name;
+    if (seatModel.owner.userName.length > 0) {
+        cell.nickNameLabel.text = seatModel.owner.userName;
     }else{
         cell.nickNameLabel.text = [NSString stringWithFormat:@"%d%@", (int)indexPath.row + 1, KTVLocalizedString(@"ktv_mic_index")];
     }
-    if (seatModel.isMaster) {
+    
+    if ([AppContext isKtvRoomOwnerWithSeat:seatModel]) {
         cell.avatarImgView.layer.borderWidth = 2.0;
         cell.avatarImgView.layer.borderColor = UIColorMakeWithHex(@"#75ADFF").CGColor;
         cell.roomerImgView.hidden = cell.roomerLabel.hidden = NO;
@@ -96,37 +101,38 @@
         cell.avatarImgView.layer.borderColor = UIColorClear.CGColor;
     }
     cell.roomerLabel.text = KTVLocalizedString(@"ktv_room_owner");
-    if (seatModel.headUrl.length > 0) {
-        [cell.avatarImgView sd_setImageWithURL:[NSURL URLWithString:seatModel.headUrl]];
+    if (seatModel.owner.userAvatar.length > 0) {
+        [cell.avatarImgView sd_setImageWithURL: [NSURL URLWithString:seatModel.owner.userAvatar]];
     }else{
-        cell.avatarImgView.image = [UIImage ktv_sceneImageWithName:@"ktv_emptySeat_icon" ];
+        cell.avatarImgView.image = [UIImage ktv_sceneImageWithName:@"ktv_emptySeat_icon"];
         cell.volume = 0;
-    }
-    cell.singingBtn.hidden = !seatModel.isOwner;
-    if (seatModel.isAudioMuted) {
-        cell.muteImgView.hidden = false;
-        cell.volume = 0;
-    } else {
-        cell.muteImgView.hidden = true;
     }
     
-    if([seatModel.chorusSongCode isEqualToString:self.currentPlayingSongCode]){
+    cell.singingBtn.hidden = ![AppContext isKtvPlayingSongOwnerWithSeat:seatModel];
+    if (seatModel.isAudioMuted) {
+        cell.muteImgView.hidden = NO;
+        cell.volume = 0;
+    } else {
+        cell.muteImgView.hidden = YES;
+    }
+    
+    if ([AppContext isKtvChorusingWithSeat:seatModel]) {
         cell.joinChorusBtn.hidden = NO;
     } else {
         cell.joinChorusBtn.hidden = YES;
     }
     
-    if (seatModel.rtcUid == nil) {
+    if (seatModel.owner.userId.length == 0) {
         cell.muteImgView.hidden = YES;
         cell.singingBtn.hidden = YES;
         cell.joinChorusBtn.hidden = YES;
     }
     
     //only display when rtcUid exists (on mic seat), and video is not muted
-    cell.videoView.hidden = !(seatModel.rtcUid != nil && !seatModel.isVideoMuted);
+    cell.videoView.hidden = !([seatModel.owner.userId length] > 0 && !seatModel.isVideoMuted);
     //avatar or camera will only be displayed 1 at atime
     cell.avatarImgView.hidden = !cell.videoView.isHidden;
-    if (!seatModel.isVideoMuted && seatModel.rtcUid != nil) { //开启了视频
+    if (!seatModel.isVideoMuted && seatModel.owner.userId.length > 0) { //开启了视频
         [self.delegate onVLRoomPersonView:self onRenderVideo:seatModel inView:cell.videoView atIndex:indexPath.row];
     }
     
@@ -145,10 +151,10 @@
         // 0是自己在说话
         NSInteger speakerUid = (speaker.uid == 0) ? VLUserCenter.user.id.integerValue : speaker.uid;
         for (VLRoomSeatModel *model in self.roomSeatsArray) {
-            if (model.userNo == nil) {
+            if (model.owner.userId.length == 0) {
                 continue;
             }
-            if(model.userNo.integerValue == speakerUid) {
+            if(model.owner.userId.integerValue == speakerUid) {
                 if (model.isAudioMuted == 1) {
                     [self updateVolumeForIndex:model.seatIndex volume:0];
                 } else {
@@ -167,20 +173,20 @@
 
 - (void)updateSingBtnWithChoosedSongArray:(NSArray *)choosedSongArray {
     NSMutableSet* changeSet = [NSMutableSet set];
-    if(choosedSongArray.count == 0){
-        self.currentPlayingSongCode = @"0";
-    }
+//    if(choosedSongArray.count == 0){
+//        self.currentPlayingSongCode = @"0";
+//    }
     if (choosedSongArray.count > 0) {
-        VLRoomSelSongModel *songModel = choosedSongArray.firstObject;
-        self.currentPlayingSongCode = songModel.chorusSongId;
+//        VLRoomSelSongModel *songModel = choosedSongArray.firstObject;
+//        self.currentPlayingSongCode = songModel.chorusSongId;
         for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
-            BOOL isOwner = [seatModel.userNo isEqualToString:songModel.userNo];
-            if (isOwner != seatModel.isOwner) {
-                seatModel.isOwner = isOwner;
+            BOOL isSongOwner = [AppContext isKtvPlayingSongOwnerWithSeat:seatModel];
+            if (isSongOwner != seatModel.isSongOwner) {
+                seatModel.isSongOwner = isSongOwner;
                 [changeSet addObject:@(seatModel.seatIndex)];
             }
             //检查麦上用户
-            BOOL needtoJoinChorus = [seatModel.chorusSongCode isEqualToString:[songModel chorusSongId]];
+            BOOL needtoJoinChorus = [AppContext isKtvChorusingWithSeat:seatModel];//[seatModel.chorusSongCode isEqualToString:[songModel chorusSongId]];
 //            cell.joinsttus
             NSIndexPath *path = [NSIndexPath indexPathForRow:seatModel.seatIndex inSection:0];
             VLMicSeatCell* cell = [self.personCollectionView cellForItemAtIndexPath:path];
@@ -190,16 +196,17 @@
                 [changeSet addObject:@(seatModel.seatIndex)];
             }
 //            }
-            NSLog(@"seat: %@--%@--%li", seatModel.chorusSongCode, songModel.chorusSongId, seatModel.seatIndex);
+            KTVLogInfo(@"update seat index: %ld", seatModel.seatIndex);
             
         }
-    }else{
+    } else{
         for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
-            if (seatModel.isOwner) {
-                seatModel.isOwner = NO;
+            if (seatModel.isSongOwner) {
+                seatModel.isSongOwner = NO;
                 [changeSet addObject:@(seatModel.seatIndex)];
             }
-            if (seatModel.chorusSongCode.length > 0) {
+
+            if ([AppContext isKtvChorusingWithSeat:seatModel]) {
                // seatModel.chorusSongCode = @"";
                 [changeSet addObject:@(seatModel.seatIndex)];
             }
