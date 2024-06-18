@@ -78,14 +78,6 @@
         make.top.equalTo(customView.mas_bottom);
         make.height.equalTo(@48);
     }];
-    
-    UILabel *sendLogTitle = [[UILabel alloc] init];
-    sendLogTitle.text = AGLocalizedString(@"app_devmode_send_log");
-    [sendLogView addSubview:sendLogTitle];
-    [sendLogTitle mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerY.equalTo(sendLogView);
-        make.left.equalTo(@20);
-    }];
 }
 
 - (void)segChanged:(UISegmentedControl *)seg {
