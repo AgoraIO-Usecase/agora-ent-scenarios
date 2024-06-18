@@ -19,7 +19,7 @@ import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
-import androidx.activity.addCallback
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -173,6 +173,14 @@ class LiveDetailFragment : Fragment() {
         )
     }
 
+    private val mBackPressedCallback by lazy {
+        object: OnBackPressedCallback(isVisible){
+            override fun handleOnBackPressed() {
+                onBackPressed()
+            }
+        }
+    }
+
     private var mMicInvitationDialog: AlertDialog?= null
     private var mPKInvitationDialog: AlertDialog?= null
 
@@ -189,9 +197,7 @@ class LiveDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         ShowLogger.d(TAG, "Fragment Lifecycle: onViewCreated")
         initView()
-        activity?.onBackPressedDispatcher?.addCallback(enabled = isVisible) {
-            onBackPressed()
-        }
+        activity?.onBackPressedDispatcher?.addCallback(mBackPressedCallback)
         // 需求：打开直播显示
         changeStatisticVisible(true)
     }
@@ -232,6 +238,7 @@ class LiveDetailFragment : Fragment() {
     private fun startLoadPage() {
         ShowLogger.d(TAG, "Fragment PageLoad start load, roomId=${mRoomInfo.roomId}")
         isPageLoaded = true
+        mBackPressedCallback.isEnabled = true
         subscribeMediaTime = SystemClock.elapsedRealtime()
         if (mRoomInfo.isRobotRoom()) {
             initRtcEngine()
@@ -255,6 +262,7 @@ class LiveDetailFragment : Fragment() {
     fun stopLoadPage(isScrolling: Boolean) {
         ShowLogger.d(TAG, "Fragment PageLoad stop load, roomId=${mRoomInfo.roomId}")
         isPageLoaded = false
+        mBackPressedCallback.isEnabled = false
         destroy(isScrolling) // 切页或activity销毁
     }
 
