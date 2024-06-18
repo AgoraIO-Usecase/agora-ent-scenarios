@@ -31,7 +31,7 @@ public class ScreenSlidePageFragment extends Fragment {
     private int position;
     private final SongChooseViewAdapter mRankListAdapter = new SongChooseViewAdapter() {
         @Override
-        void onSongChosen(SongItem song, int position) {
+        public void onSongChosen(SongItem song, int position) {
             if (callBack == null) {
                 return;
             }
@@ -125,8 +125,9 @@ public class ScreenSlidePageFragment extends Fragment {
         int itemCount = mRankListAdapter.getItemCount();
         for (int i = 0; i < itemCount; i++) {
             SongItem item = mRankListAdapter.getItem(i);
-            if (item.songNo.equals(songItem.songNo)) {
+            if (item!=null && item.songNo.equals(songItem.songNo)) {
                 item.isChosen = isChosen;
+                item.loading = songItem.loading;
                 mRankListAdapter.notifyItemChanged(i);
                 break;
             }

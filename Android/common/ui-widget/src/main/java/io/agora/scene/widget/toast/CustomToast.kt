@@ -16,6 +16,11 @@ object CustomToast {
     }
 
     @JvmStatic
+    fun show(@StringRes resId: Int, vararg formatArgs: String?) {
+        show(AgoraApplication.the().getString(resId, *formatArgs))
+    }
+
+    @JvmStatic
     fun show(@StringRes resId: Int, duration: Int = Toast.LENGTH_SHORT) {
         show(AgoraApplication.the().getString(resId), InternalToast.COMMON, duration)
     }

@@ -25,11 +25,13 @@ import com.google.android.material.card.MaterialCardView
 import io.agora.rtc2.Constants
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.LogUploader
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.utils.LiveDataUtils
-import io.agora.scene.ktv.KTVLogger.d
+import io.agora.scene.ktv.KTVLogger
 import io.agora.scene.ktv.KtvCenter
 import io.agora.scene.ktv.R
 import io.agora.scene.ktv.databinding.KtvActivityRoomLivingBinding
@@ -68,6 +70,7 @@ import io.agora.scene.widget.utils.UiUtils
 class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>() {
 
     companion object {
+        private const val TAG = "RoomLivingActivity"
         private const val EXTRA_ROOM_INFO = "roomInfo"
 
         /**
@@ -163,6 +166,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
             .into(binding.ivOwnerAvatar)
         binding.btnDebug.isVisible = AgoraApplication.the().isDebugModeOpen
         binding.btnDebug.setOnClickListener { v: View? ->
+            KTVLogger.d(TAG, "showKtvDebugDialog called")
             val dialog = KTVDebugSettingsDialog(
                 roomLivingViewModel.mDebugSetting,
                 roomModel.roomId,
@@ -170,7 +174,10 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
             )
             dialog.show(supportFragmentManager, "debugSettings")
         }
-        binding.ivMore.setOnClickListener { v: View? -> TopFunctionDialog(this).show() }
+        binding.ivMore.setOnClickListener { v: View? ->
+            KTVLogger.d(TAG, "showTopFunctionDialog called")
+            TopFunctionDialog(this).show()
+        }
     }
 
     override fun onAttachedToWindow() {
@@ -206,10 +213,20 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
             val seatLocal = roomLivingViewModel.localSeatInfo
             if (seatLocal != null) {
                 if (b) {
-                    toggleAudioRun = Runnable { roomLivingViewModel.updateSeatAudioMuteStatus(false) }
+                    toggleAudioRun = Runnable {
+                        roomLivingViewModel.updateSeatAudioMuteStatus(false) {
+                            if (it != null) { // 设置失败
+                                binding.cbMic.setChecked(false)
+                            }
+                        }
+                    }
                     requestRecordPermission(true)
                 } else {
-                    roomLivingViewModel.updateSeatAudioMuteStatus(true)
+                    roomLivingViewModel.updateSeatAudioMuteStatus(true) {
+                        if (it != null) { // 设置失败
+                            binding.cbMic.setChecked(true)
+                        }
+                    }
                 }
             }
         }
@@ -221,11 +238,6 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
                 override fun onChangeMusicClick() {
                     super.onChangeMusicClick()
                     showChangeMusicDialog()
-                }
-
-                override fun onVocalHighlightClick() {
-                    super.onVocalHighlightClick()
-                    //showVoiceHighlightDialog();
                 }
             }
         binding.lrcControlView.setOnLrcClickListener(lrcActionListenerImpl)
@@ -335,14 +347,10 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
         roomLivingViewModel.songPlayingLiveData.observe(this) { model: ChosenSongInfo? ->
             if (model == null) {
                 roomLivingViewModel.musicStop()
+                mRoomSpeakerAdapter?.notifyDataSetChanged()
                 return@observe
             }
             onMusicChanged(model)
-            if (roomLivingViewModel.isRoomOwner) {
-                binding.lrcControlView.showHighLightButton(false)
-                binding.lrcControlView.setHighLightPersonHeadUrl("")
-            }
-            roomLivingViewModel.mMusicSetting?.mHighLighterUid = ""
         }
         roomLivingViewModel.scoringAlgoControlLiveData.observe(this) { model: ScoringAlgoControlModel? ->
             model ?: return@observe
@@ -460,7 +468,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
 
     override fun onResume() {
         super.onResume()
-        d("ktv", "onResume() $isBlackDarkStatus")
+        KTVLogger.d(TAG, "onResume() isBlackDarkStatus:$isBlackDarkStatus")
         setDarkStatusIcon(isBlackDarkStatus)
     }
 
@@ -468,6 +476,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
      * 下麦提示
      */
     private fun showUserLeaveSeatMenuDialog(setInfo: RoomMicSeatInfo, kickSeat: Boolean) {
+        KTVLogger.d(TAG, "showUserLeaveSeatMenuDialog called:kickSeat:$kickSeat")
         if (mUserLeaveSeatMenuDialog == null) {
             mUserLeaveSeatMenuDialog = UserLeaveSeatMenuDialog(this)
         }
@@ -491,6 +500,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
     }
 
     private fun showTimeUpExitDialog() {
+        KTVLogger.d(TAG, "showTimeUpExitDialog called")
         if (timeUpExitDialog == null) {
             timeUpExitDialog = KtvCommonDialog(this).apply {
                 if (roomLivingViewModel.isRoomOwner) {
@@ -512,6 +522,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
     }
 
     private fun showExitDialog() {
+        KTVLogger.d(TAG, "showExitDialog called")
         if (exitDialog == null) {
             exitDialog = CommonDialog(this).apply {
                 if (roomLivingViewModel.isRoomOwner) {
@@ -576,6 +587,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
 
     private var showChooseSongDialogTag = false
     private fun showChooseSongDialog() {
+        KTVLogger.d(TAG, "showChooseSongDialog called")
         if (showChooseSongDialogTag) {
             return
         }
@@ -610,6 +622,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
     }
 
     private fun showMusicSettingDialog() {
+        KTVLogger.d(TAG, "showMusicSettingDialog called")
         if (musicSettingDialog == null) {
             musicSettingDialog = MusicSettingDialog(
                 roomLivingViewModel.mMusicSetting!!,
@@ -642,6 +655,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
             CustomToast.show(R.string.ktv_too_fast, Toast.LENGTH_SHORT)
             return
         }
+        KTVLogger.d(TAG, "showChangeMusicDialog called")
         if (changeMusicDialog == null) {
             changeMusicDialog = CommonDialog(this).apply {
                 setDialogTitle(getString(R.string.ktv_room_change_music_title))
@@ -680,10 +694,20 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
     //开启 关闭摄像头
     private fun toggleSelfVideo(isOpen: Boolean) {
         if (isOpen) {
-            toggleVideoRun = Runnable { roomLivingViewModel.updateSeatVideoMuteStatus(false) }
+            toggleVideoRun = Runnable {
+                roomLivingViewModel.updateSeatVideoMuteStatus(false) {
+                    if (it != null) { // 设置失败
+                        binding.cbVideo.setChecked(false)
+                    }
+                }
+            }
             requestCameraPermission(true)
         } else {
-            roomLivingViewModel.updateSeatVideoMuteStatus(true)
+            roomLivingViewModel.updateSeatVideoMuteStatus(true) {
+                if (it != null) { // 设置失败
+                    binding.cbVideo.setChecked(true)
+                }
+            }
         }
     }
 
@@ -705,6 +729,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
 
 
     private fun showCreatorExitDialog() {
+        KTVLogger.d(TAG, "showCreatorExitDialog called")
         if (creatorExitDialog == null) {
             creatorExitDialog = KtvCommonDialog(this).apply {
                 setDescText(getString(R.string.room_has_close))
@@ -723,6 +748,9 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
 
     override fun onDestroy() {
         super.onDestroy()
+        if (SceneConfigManager.logUpload) {
+            LogUploader.uploadLog(LogUploader.SceneType.KTV)
+        }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {

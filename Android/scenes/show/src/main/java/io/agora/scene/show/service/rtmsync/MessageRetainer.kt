@@ -3,7 +3,9 @@ package io.agora.scene.show.service.rtmsync
 import io.agora.rtmsyncmanager.model.AUIRoomContext
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmMessageRespObserver
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserRespObserver
+import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ObservableHelper
 import java.util.UUID
@@ -22,7 +24,7 @@ class MessageRetainer(
     private val channelName: String,
     private val key: String,
 ) {
-
+    private val tag = "MessageRetainer($channelName, $key)"
     private val messageList = mutableListOf<MessageInfo>()
     private val observableHelper = ObservableHelper<(MessageInfo)->Unit>()
 
@@ -36,6 +38,7 @@ class MessageRetainer(
             if (key != msg.key) {
                 return
             }
+            AUILogger.logger().d(tag, "onMessageReceive $msg")
             insertMessage(msg, true)
         }
     }
@@ -60,8 +63,10 @@ class MessageRetainer(
         override fun onUserDidLeaved(
             channelName: String,
             userId: String,
-            userInfo: Map<String, Any>
+            userInfo: Map<String, Any>,
+            reason: AUIRtmUserLeaveReason
         ) {
+            AUILogger.logger().d(tag, "onUserDidLeaved $userId")
             removeMessages(filter = { it.publisherId == userId })
         }
 
@@ -92,16 +97,19 @@ class MessageRetainer(
     }
 
     fun release() {
+        AUILogger.logger().d(tag, "release")
         rtmManager.unsubscribeMessage(messageObserver)
         observableHelper.unSubscribeAll()
         rtmManager.unsubscribeUser(userObserver)
     }
 
     fun subscribe(onReceived: (MessageInfo)->Unit) {
+        AUILogger.logger().d(tag, "subscribe $onReceived")
         observableHelper.subscribeEvent(onReceived)
     }
 
     fun unsubscribe(onReceived: (MessageInfo)->Unit) {
+        AUILogger.logger().d(tag, "unsubscribe $onReceived")
         observableHelper.unSubscribeEvent(onReceived)
     }
 
@@ -114,19 +122,23 @@ class MessageRetainer(
         val messageInfo = MessageInfo(key = key, publisherId = AUIRoomContext.shared().currentUserInfo.userId, content = message)
         val typeMessage = GsonTools.beanToString(messageInfo)
         if (typeMessage == null) {
+            AUILogger.logger().d(tag, "sendMessage >> message serialize failed : $message")
             error?.invoke(RuntimeException("message serialize failed"))
             return
         }
+        AUILogger.logger().d(tag, "sendMessage >> publish $channelName $userId $typeMessage")
         rtmManager.publish(
             channelName,
             userId,
             typeMessage
         ) {
+            AUILogger.logger().d(tag, "sendMessage >> publish complete: $it")
             if (it != null) {
                 error?.invoke(RuntimeException(it))
                 return@publish
             }
             if (userId.isNotEmpty()) {
+                AUILogger.logger().d(tag, "sendMessage >> insertMessage $messageInfo")
                 insertMessage(messageInfo, false)
             }
             success?.invoke()
@@ -134,18 +146,16 @@ class MessageRetainer(
     }
 
     fun getMessage(predicate: (MessageInfo) -> Boolean): MessageInfo? {
-        val found = messageList.findLast(predicate)
-        if (found != null) {
-            messageList.remove(found)
-        }
-        return found
+        return messageList.findLast(predicate)
     }
 
     fun removeMessage(id: String) {
+        AUILogger.logger().d(tag, "removeMessage $id")
         messageList.removeIf { it.id == id }
     }
 
     fun removeMessages(filter: ((MessageInfo) -> Boolean)? = null) {
+        AUILogger.logger().d(tag, "removeMessages $filter")
         if (filter != null) {
             messageList.removeIf(filter)
         } else {

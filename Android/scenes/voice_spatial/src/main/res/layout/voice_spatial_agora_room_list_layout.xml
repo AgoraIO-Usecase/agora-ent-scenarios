@@ -29,7 +29,7 @@
             android:id="@+id/image_avatar"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:background="@drawable/voice_icon_create_3d_room"
+            android:background="@drawable/voice_bg_room_3d_spatial"
             android:src="@drawable/voice_bg_oval_black20"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"

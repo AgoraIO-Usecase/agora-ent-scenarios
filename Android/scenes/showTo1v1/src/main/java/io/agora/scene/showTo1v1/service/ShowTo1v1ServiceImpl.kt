@@ -13,6 +13,7 @@ import io.agora.rtmsyncmanager.model.*
 import io.agora.rtmsyncmanager.service.IAUIUserService
 import io.agora.rtmsyncmanager.service.http.HttpManager
 import io.agora.rtmsyncmanager.service.room.AUIRoomManager
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.manager.UserManager
@@ -231,7 +232,11 @@ class ShowTo1v1ServiceImpl constructor(
         listener?.onUserListDidChanged(userList.size)
     }
 
-    override fun onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
+    override fun onRoomUserLeave(
+        roomId: String,
+        userInfo: AUIUserInfo,
+        reason: AUIRtmUserLeaveReason
+    ) {
         ShowTo1v1Logger.d(TAG, "onRoomUserLeave, roomId:$roomId, userInfo:$userInfo")
         listener?.onUserListDidChanged(userList.size)
     }

@@ -36,6 +36,8 @@ public class SongItem {
      */
     public boolean isChosen; // 是否已被点
 
+    public Boolean loading = false; // 是否正在加载中
+
     /**
      * Instantiates a new Song item.
      *

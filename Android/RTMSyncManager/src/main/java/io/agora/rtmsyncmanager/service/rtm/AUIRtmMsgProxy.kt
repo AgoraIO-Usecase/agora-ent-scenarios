@@ -12,51 +12,83 @@ import io.agora.rtm.RtmEventListener
 import io.agora.rtm.StorageEvent
 import io.agora.rtm.TopicEvent
 import io.agora.rtmsyncmanager.utils.AUILogger
-import java.sql.Timestamp
 
+/**
+ * Interface for handling RTM error responses.
+ */
 interface AUIRtmErrorRespObserver {
 
-    /*
-     * token即将过期
+    /**
+     * Called when the token is about to expire.
+     * @param channelName The name of the channel.
      */
     fun onTokenPrivilegeWillExpire(channelName: String?)
 
-    /*
-     * 网络状态变化
+    /**
+     * Called when the network state changes.
+     * @param channelName The name of the channel.
+     * @param state The new state.
+     * @param reason The reason for the state change.
      */
     fun onConnectionStateChanged(channelName: String?, state: Int, reason: Int) {}
 
-    /*
-     * 收到的KV为空
+    /**
+     * Called when the received message is empty.
+     * @param channelName The name of the channel.
      */
     fun onMsgReceiveEmpty(channelName: String) {}
 
-    /*
-     * 系统时间戳更新
+    /**
+     * Called when the system timestamps update.
+     * @param timestamp The new timestamp.
      */
     fun onTimeStampsDidUpdate(timestamp: Long) {}
 }
 
+/**
+ * Interface for handling RTM attribute responses.
+ */
 interface AUIRtmAttributeRespObserver {
     fun onAttributeChanged(channelName: String, key: String, value: Any)
 }
 
+/**
+ * Interface for handling RTM message responses.
+ */
 interface AUIRtmMessageRespObserver {
     fun onMessageReceive(channelName: String, publisherId: String, message: String)
 }
 
+/**
+ * Enum for defining the reasons a user leaves.
+ */
+enum class AUIRtmUserLeaveReason(val value: Int) {
+    NORMAL(0),
+    TIMEOUT(1)
+}
+
+/**
+ * Interface for handling RTM user responses.
+ */
 interface AUIRtmUserRespObserver {
     fun onUserSnapshotRecv(channelName: String, userId: String, userList: List<Map<String, Any>>)
     fun onUserDidJoined(channelName: String, userId: String, userInfo: Map<String, Any>)
-    fun onUserDidLeaved(channelName: String, userId: String, userInfo: Map<String, Any>)
+    fun onUserDidLeaved(channelName: String, userId: String, userInfo: Map<String, Any>, reason: AUIRtmUserLeaveReason)
     fun onUserDidUpdated(channelName: String, userId: String, userInfo: Map<String, Any>)
 }
 
+/**
+ * Interface for handling RTM lock responses.
+ */
 interface AUIRtmLockRespObserver {
     fun onReceiveLock(channelName: String, lockName: String, lockOwner: String)
     fun onReleaseLock(channelName: String, lockName: String, lockOwner: String, isExpire: Boolean)
 }
 
+/**
+ * Class for handling RTM messages.
+ * It includes methods for registering and unregistering observers, cleaning cache, and handling various RTM events.
+ */
 class AUIRtmMsgProxy : RtmEventListener {
     private val tag = "AUIRtmMsgProxy"
     var originEventListeners: RtmEventListener? = null
@@ -199,7 +231,7 @@ class AUIRtmMsgProxy : RtmEventListener {
         val cacheKeys = cache.keys
         cacheKeys.forEach { key ->
             if (existKeys.contains(key)) return@forEach
-            //远端已经不存在对应的key了，需要通知所有的delegate
+            // If the remote no longer has the corresponding key, all delegates need to be notified
             cache.remove(key)
             val delegateKey = "${channelName}__${key}"
             attributeRespObservers[delegateKey]?.forEach { handler ->
@@ -236,10 +268,14 @@ class AUIRtmMsgProxy : RtmEventListener {
                     handler.onUserDidJoined(event.channelName, event.publisherId ?: "", map)
                 }
 
-            RtmConstants.RtmPresenceEventType.REMOTE_LEAVE,
+            RtmConstants.RtmPresenceEventType.REMOTE_LEAVE ->
+                userRespObservers.forEach { handler ->
+                    handler.onUserDidLeaved(event.channelName, event.publisherId ?: "", map, AUIRtmUserLeaveReason.NORMAL)
+                }
+
             RtmConstants.RtmPresenceEventType.REMOTE_TIMEOUT ->
                 userRespObservers.forEach { handler ->
-                    handler.onUserDidLeaved(event.channelName, event.publisherId ?: "", map)
+                    handler.onUserDidLeaved(event.channelName, event.publisherId ?: "", map, AUIRtmUserLeaveReason.TIMEOUT)
                 }
 
             RtmConstants.RtmPresenceEventType.REMOTE_STATE_CHANGED ->
