@@ -1444,8 +1444,8 @@ class LiveDetailFragment : Fragment() {
                     runOnUiThread {
                         destroy(false)
                         // 进房Error
-                        showLivingEndLayout() // 进房Error
-                        ShowLogger.d("showLivingEndLayout", "join room error!:${it.message}")
+                        showLivingEndLayout(true) // 进房Error
+                        ShowLogger.d("showLivingEndLayout", "create room error!:${it.message}")
                     }
                 })
         } else {
@@ -1457,7 +1457,7 @@ class LiveDetailFragment : Fragment() {
                     runOnUiThread {
                         destroy(false)
                         // 进房Error
-                        showLivingEndLayout() // 进房Error
+                        showLivingEndLayout(true) // 进房Error
                         ShowLogger.d("showLivingEndLayout", "join room error!:${it.message}")
                     }
                 })
@@ -1657,13 +1657,16 @@ class LiveDetailFragment : Fragment() {
         mService.leaveRoom(mRoomInfo.roomId)
     }
 
-    private fun showLivingEndLayout() {
+    private fun showLivingEndLayout(fromError: Boolean = false) {
         if (isRoomOwner) {
             val context = activity ?: return
             AlertDialog.Builder(context, R.style.show_alert_dialog)
                 .setView(
                     ShowLivingEndDialogBinding.inflate(LayoutInflater.from(requireContext()))
                         .apply {
+                            if (fromError) {
+                                tvTitle.setText(R.string.show_living_end_title_error)
+                            }
                             Glide.with(this@LiveDetailFragment)
                                 .load(mRoomInfo.ownerAvatar)
                                 .into(ivAvatar)
@@ -1676,6 +1679,9 @@ class LiveDetailFragment : Fragment() {
                 }
                 .show()
         } else {
+            if (fromError) {
+                mBinding.livingEndLayout.tvLivingEnd.setText(R.string.show_live_detail_living_end_error)
+            }
             mBinding.livingEndLayout.root.isVisible = true
             mBinding.livingEndLayout.root.bringToFront()
         }
