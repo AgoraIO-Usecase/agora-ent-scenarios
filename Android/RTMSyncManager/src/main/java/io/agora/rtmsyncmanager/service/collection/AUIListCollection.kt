@@ -81,7 +81,10 @@ class AUIListCollection(
         ) { error ->
             if (error != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.recvErrorReceipt.toException()
+                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(
+                        code = error.code,
+                        msg = error.message
+                    )
                 )
             } else {
                 callback?.invoke(null)
@@ -125,7 +128,10 @@ class AUIListCollection(
         ) { error ->
             if (error != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.recvErrorReceipt.toException()
+                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(
+                        code = error.code,
+                        msg = error.message
+                    )
                 )
             } else {
                 callback?.invoke(null)
@@ -169,7 +175,10 @@ class AUIListCollection(
         ) { error ->
             if (error != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.recvErrorReceipt.toException()
+                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(
+                        code = error.code,
+                        msg = error.message
+                    )
                 )
             } else {
                 callback?.invoke(null)
@@ -212,7 +221,10 @@ class AUIListCollection(
         ) { error ->
             if (error != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.recvErrorReceipt.toException()
+                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(
+                        code = error.code,
+                        msg = error.message
+                    )
                 )
             } else {
                 callback?.invoke(null)
@@ -271,7 +283,10 @@ class AUIListCollection(
         ) { error ->
             if (error != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(null, error.message)
+                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(
+                        code = error.code,
+                        msg = error.message
+                    )
                 )
             } else {
                 callback?.invoke(null)
@@ -309,7 +324,10 @@ class AUIListCollection(
         ) { error ->
             if (error != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.removeMetaDataFail.toException()
+                    AUICollectionException.ErrorCode.removeMetaDataFail.toException(
+                        code = error.code,
+                        msg = error.message
+                    )
                 )
             } else {
                 callback?.invoke(null)
@@ -330,7 +348,7 @@ class AUIListCollection(
             filter.isNotEmpty() &&
             AUICollectionUtils.getItemIndexes(currentList, filter)?.isNotEmpty() == true) {
             callback?.invoke(
-                AUICollectionException.ErrorCode.encodeToJsonStringFail.toException()
+                AUICollectionException.ErrorCode.filterFoundSame.toException()
             )
             return
         }
