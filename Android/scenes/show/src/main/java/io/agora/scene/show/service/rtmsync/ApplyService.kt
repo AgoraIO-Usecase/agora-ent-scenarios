@@ -158,7 +158,7 @@ class ApplyService(
             )
         ) {
             AUILogger.logger().d(tag, "addApply result:$it")
-            if (it != null) {
+            if (it != null && it.code != AUICollectionException.ErrorCode.filterFoundSame.value) {
                 failure?.invoke(RuntimeException(it))
                 return@addMetaData
             }
