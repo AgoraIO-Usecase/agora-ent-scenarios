@@ -440,7 +440,10 @@ class LiveDetailFragment : Fragment() {
             bottomLayout.vLinkingDot.isVisible = false
             if (!isRoomOwner) {
                 // 观众发送连麦申请
-                if (!(interactionInfo != null && interactionInfo!!.userId == UserManager.getInstance().user.id.toString())) {
+                if (interactionInfo == null
+                    || interactionInfo?.interactStatus == ShowInteractionStatus.idle
+                    || interactionInfo?.userId != UserManager.getInstance().user.id.toString()
+                ) {
                     // 观众发视频流
                     prepareLinkingMode()
                     mService.createMicSeatApply(mRoomInfo.roomId, {
@@ -454,6 +457,8 @@ class LiveDetailFragment : Fragment() {
                             )
                         )
                     }
+                } else {
+                    ShowLogger.d(TAG, "audience not create mic seat apply. interactionInfo=$interactionInfo")
                 }
             }
             showLinkingDialog()
@@ -1522,24 +1527,22 @@ class LiveDetailFragment : Fragment() {
         }
         mService.subscribeInteractionChanged(mRoomInfo.roomId) { status, info ->
             context ?: return@subscribeInteractionChanged
-            if (status == ShowSubscribeStatus.updated && info != null && info.interactStatus != ShowInteractionStatus.idle) {
+            if (status == ShowSubscribeStatus.updated
+                && info != null
+                && info.interactStatus != ShowInteractionStatus.idle) {
                 // 开始互动
-                if (interactionInfo == null) {
-                    interactionInfo = info
-                    // UI
-                    updateVideoSetting(true)
-                    refreshBottomLayout()
-                    refreshViewDetailLayout(info.interactStatus)
-                    mLinkDialog.setOnSeatStatus(info.userName, info.interactStatus)
-                    mPKDialog.setPKInvitationItemStatus(info.userName, info.interactStatus)
-                    // RTC
-                    updateLinkingMode()
-                    updatePKingMode()
-                    refreshPKTimeCount()
-                } else {
-                    // 互动中状态更新
-                    interactionInfo = info
-                }
+                interactionInfo = info
+                // UI
+                updateVideoSetting(true)
+                refreshBottomLayout()
+                refreshViewDetailLayout(info.interactStatus)
+                mLinkDialog.setOnSeatStatus(info.userName, info.interactStatus)
+                mPKDialog.setPKInvitationItemStatus(info.userName, info.interactStatus)
+                // RTC
+                updateLinkingMode()
+                updatePKingMode()
+                refreshPKTimeCount()
+
                 dismissMicInvitaionDialog()
                 dismissPKInvitationDialog()
             } else {
@@ -1560,17 +1563,19 @@ class LiveDetailFragment : Fragment() {
 
         mService.subscribePKInvitationChanged(mRoomInfo.roomId) { status, info ->
             info ?: return@subscribePKInvitationChanged
-            if (info.userId == UserManager.getInstance().user.id.toString()
-                && context != null
-            ) {
-                if (info.type == ShowInvitationType.invitation) {
+            context ?: return@subscribePKInvitationChanged
+            when(info.type){
+                ShowInvitationType.invitation -> {
                     isPKCompetition = true
                     preparePKingMode(info.fromRoomId)
                     showPKInvitationDialog(info.fromUserName, info)
                 }
+                ShowInvitationType.reject -> {
+                    isPKCompetition = false
+                    updateIdleMode()
+                }
             }
         }
-
         mService.getInteractionInfo(mRoomInfo.roomId, { interactionInfo ->
             this.interactionInfo = interactionInfo
             refreshBottomLayout()
@@ -2168,6 +2173,8 @@ class LiveDetailFragment : Fragment() {
                 encodeVideoSize = Size(0, 0),
                 upBitrate = 0,
             )
+
+            mBinding.videoLinkingAudienceLayout.videoContainer.setOnClickListener(null)
         }
     }
 
@@ -2472,25 +2479,16 @@ class LiveDetailFragment : Fragment() {
                 enableLocalVideo(true)
             }
             val channelMediaOptions = ChannelMediaOptions()
-            channelMediaOptions.publishCameraTrack = false
-            channelMediaOptions.publishMicrophoneTrack = false
-            channelMediaOptions.publishCustomAudioTrack = false
-            channelMediaOptions.autoSubscribeVideo = true
             channelMediaOptions.autoSubscribeAudio = true
-            channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-            channelMediaOptions.audienceLatencyLevel =
-                Constants.AUDIENCE_LATENCY_LEVEL_ULTRA_LOW_LATENCY
-            channelMediaOptions.isInteractiveAudience = true
             val pkRtcConnection = RtcConnection(
                 interactionInfo!!.roomId,
                 UserManager.getInstance().user.id.toInt()
             )
-            mRtcEngine.joinChannelEx(
-                RtcEngineInstance.generalToken(),
-                pkRtcConnection,
+            mRtcEngine.updateChannelMediaOptionsEx(
                 channelMediaOptions,
-                eventListener
+                pkRtcConnection
             )
+            mRtcEngine.addHandlerEx(eventListener, pkRtcConnection)
             activity?.let {
                 mBinding.videoPKLayout.iBroadcasterBView.removeView(pkAgainstView)
                 pkAgainstView = TextureView(it)

@@ -25,6 +25,7 @@ class PKService(
                 msg.content,
                 PKInfo::class.java
             )
+            AUILogger.logger().d(tag, "onPKUpdated from message: $pkInfo")
             if (pkInfo != null) {
                 observerHelper.notifyEventHandlers {
                     it.invoke(pkInfo)
@@ -35,6 +36,7 @@ class PKService(
 
     private val roomPresenceSubscriber = RoomPresenceSubscriber(
         onUpdate = { info: RoomPresenceInfo ->
+            AUILogger.logger().d(tag, "onRoomPresenceUpdated: $info")
 
             // 被PK方 -> 发起PK方
             if (info.roomId != channelName) {
@@ -321,7 +323,7 @@ class PKService(
         AUILogger.logger().d(tag, "[$pkId] rejectPK >> sendMessage : $pkInfo")
         messageRetainer.sendMessage(
             GsonTools.beanToString(pkInfo) ?: "",
-            pkInfo.userId,
+            pkInfo.fromUserId,
             success = {
                 AUILogger.logger().d(tag, "[$pkId] rejectPK >> sendMessage success")
                 messageRetainer.removeMessage(message.id)
