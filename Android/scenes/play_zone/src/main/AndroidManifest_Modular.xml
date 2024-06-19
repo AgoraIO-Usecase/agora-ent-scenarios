@@ -31,6 +31,6 @@
 
         <activity android:name="io.agora.scene.playzone.sub.quickstart.QuickStartActivity" />
 
-        <activity android:name="io.agora.scene.playzone.hall.PlayZoneRoomListActivity" />
+        <activity android:name="io.agora.scene.playzone.hall.PlayRoomListActivity" />
     </application>
 </manifest>

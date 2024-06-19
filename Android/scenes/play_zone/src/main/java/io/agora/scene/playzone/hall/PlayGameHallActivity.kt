@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
@@ -135,6 +134,14 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
 
     override fun requestData() {
         super.requestData()
+        mPlayZoneViewModel.createRoomInfoLiveData.observe(this) { roomInfo->
+            if (roomInfo == null) {
+                setDarkStatusIcon(isBlackDarkStatus)
+            } else {
+               ToastUtils.showToast("创建房间成功")
+            }
+        }
+
         mPlayZoneViewModel.gameConfig()
         mPlayZoneViewModel.mGameConfigLiveData.observe(this) {
             if (!it.isNullOrEmpty()) {
@@ -191,6 +198,8 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
                         ToastUtils.showToast("点击了${subGameInfo.gameName}")
                         if (!subGameInfo.gameUrl.isNullOrEmpty()) {
                             PagePilotManager.pageWebViewWithBrowser(subGameInfo.gameUrl)
+                        }else{
+                            showCreateRoomDialog(subGameInfo)
                         }
                     }
                 }, GameSubHolder::class.java)
@@ -199,6 +208,16 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
             concatAdapter = ConcatAdapter(listAdapter)
             binding.rvLeisureGame.adapter = concatAdapter
         }
+    }
+
+    private fun showCreateRoomDialog(subGameInfo: SubGameInfoModel) {
+            val bundle = Bundle().apply {
+                putSerializable(PlayCreateRoomDialog.Key_GameInfo, subGameInfo)
+            }
+            val dialog = PlayCreateRoomDialog(this).apply {
+                setBundleArgs(bundle)
+            }
+            dialog.show(supportFragmentManager, "createDialog")
     }
 
     override fun onDestroy() {

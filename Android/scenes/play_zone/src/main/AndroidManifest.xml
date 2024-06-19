@@ -9,8 +9,10 @@
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan" />
 
-        <activity android:name="io.agora.scene.playzone.hall.PlayGameHallActivity" />
+        <activity
+            android:name="io.agora.scene.playzone.hall.PlayGameHallActivity"
+            android:theme="@style/def_material_theme" />
 
-        <activity android:name="io.agora.scene.playzone.hall.PlayZoneRoomListActivity" />
+        <activity android:name="io.agora.scene.playzone.hall.PlayRoomListActivity" />
     </application>
 </manifest>

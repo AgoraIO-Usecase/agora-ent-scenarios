@@ -5,32 +5,43 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.core.view.isGone
-import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
+import io.agora.scene.base.component.ISingleCallback
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.playzone.R
 import io.agora.scene.playzone.databinding.PlayZoneActivityRoomListBinding
 import io.agora.scene.playzone.databinding.PlayZoneItemRoomListBinding
 import io.agora.scene.playzone.service.PlayZoneParameters
 import io.agora.scene.playzone.service.PlayZoneServiceProtocol
+import io.agora.scene.widget.dialog.InputPasswordDialog
 import io.agora.scene.widget.utils.UiUtils
 
-class PlayZoneRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomListBinding>() {
+class PlayRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomListBinding>() {
 
     companion object {
         private const val TAG = "Joy_RoomListActivity"
     }
 
-    private val mPlayZoneService by lazy { PlayZoneServiceProtocol.serviceProtocol }
+    private val mRoomViewModel: PlayHallViewModel by lazy {
+        ViewModelProvider(this)[PlayHallViewModel::class.java]
+    }
 
-    private var mJoyListAdapter: RoomListAdapter? = null
+
+    private var mPlayZoneListAdapter: PlayRoomListAdapter? = null
+
+    private var inputPasswordDialog: InputPasswordDialog? = null
+
+    private var isJoining = false
 
     init {
         PlayZoneServiceProtocol.reset()
@@ -48,41 +59,72 @@ class PlayZoneRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomLis
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
         binding.titleView.setLeftClick { finish() }
-        mJoyListAdapter = RoomListAdapter(emptyList(), this) { position, roomInfo ->
+        mPlayZoneListAdapter = PlayRoomListAdapter(emptyList(), this) { position, roomInfo ->
+            val password = roomInfo.customPayload[PlayZoneParameters.PASSWORD] as? String
 
-//            mPlayZoneService.joinRoom(roomInfo.roomId) { error ->
-//                if (error == null) {
-//
-//                } else {
-//                    error.message?.let {
-//                        ToastUtils.showToast(it)
-//                    }
-//                }
-//            }
+            if (!password.isNullOrEmpty()) {
+                showInputPwdDialog(roomInfo)
+            } else {
+                if (!isJoining) {
+                    isJoining = true
+                    mRoomViewModel.joinRoom(roomInfo, null)
+                }
+            }
         }
 
-        binding.rvRooms.adapter = mJoyListAdapter
+        binding.rvRooms.adapter = mPlayZoneListAdapter
 
         binding.smartRefreshLayout.setEnableLoadMore(false)
         binding.smartRefreshLayout.setEnableRefresh(true)
 
         binding.smartRefreshLayout.setOnRefreshListener {
-//            mPlayZoneService.getRoomList { error, roomList ->
-//                updateList(roomList ?: emptyList())
-//            }
+            mRoomViewModel.getRoomList()
         }
         binding.smartRefreshLayout.autoRefresh()
 
     }
 
-    private fun updateList(data: List<AUIRoomInfo>) {
-        binding.tvTips1.isVisible = data.isEmpty()
-        binding.ivBgMobile.isVisible = data.isEmpty()
-        binding.rvRooms.isVisible = data.isNotEmpty()
-        mJoyListAdapter?.setDataList(data)
-
-        binding.smartRefreshLayout.finishRefresh()
+    private fun showInputPwdDialog(roomInfo: AUIRoomInfo) {
+        if (inputPasswordDialog == null) {
+            inputPasswordDialog = InputPasswordDialog(this)
+        }
+        inputPasswordDialog?.apply {
+            clearContent()
+            iSingleCallback = ISingleCallback<Int, Any> { type, data ->
+                if (data is String) {
+                    mRoomViewModel.joinRoom(roomInfo, data)
+                }
+            }
+            show()
+        }
     }
+
+    override fun requestData() {
+        super.requestData()
+        mRoomViewModel.roomModelListLiveData.observe(this) { roomList ->
+            hideLoadingView()
+            binding.smartRefreshLayout.finishRefresh()
+            if (roomList.isNullOrEmpty()) {
+                binding.rvRooms.visibility = View.GONE
+                binding.tvTips1.visibility = View.VISIBLE
+                binding.ivBgMobile.setVisibility(View.VISIBLE)
+            } else {
+                mPlayZoneListAdapter?.setDataList(roomList)
+                binding.rvRooms.visibility = View.VISIBLE
+                binding.tvTips1.visibility = View.GONE
+                binding.ivBgMobile.setVisibility(View.GONE)
+            }
+        }
+        mRoomViewModel.joinRoomInfoLiveData.observe(this) { roomInfo ->
+            isJoining = false
+            if (roomInfo == null) {
+                setDarkStatusIcon(isBlackDarkStatus)
+            } else {
+                ToastUtils.showToast("加入房间成功")
+            }
+        }
+    }
+
 
     override fun onRestart() {
         super.onRestart()
@@ -94,11 +136,11 @@ class PlayZoneRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomLis
         super.onDestroy()
     }
 
-    private class RoomListAdapter constructor(
+    private class PlayRoomListAdapter constructor(
         private var mList: List<AUIRoomInfo>,
         private val mContext: Context,
         private val mOnGotoRoom: ((position: Int, info: AUIRoomInfo) -> Unit)? = null
-    ) : RecyclerView.Adapter<RoomListAdapter.ViewHolder?>() {
+    ) : RecyclerView.Adapter<PlayRoomListAdapter.ViewHolder?>() {
 
         @DrawableRes
         private fun getThumbnailIcon(thumbnailId: String?) = when (thumbnailId) {

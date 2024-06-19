@@ -50,4 +50,6 @@ dependencies {
 
     // 工具类库: https://github.com/Blankj/AndroidUtilCode
     implementation 'com.blankj:utilcodex:1.31.0'
+
+    implementation rootProject.ext.deps.agora_chat
 }

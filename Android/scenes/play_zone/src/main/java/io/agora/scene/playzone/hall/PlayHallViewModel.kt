@@ -2,10 +2,16 @@ package io.agora.scene.playzone.hall
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import io.agora.rtmsyncmanager.model.AUIRoomInfo
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.playzone.R
+import io.agora.scene.playzone.service.PlayCreateRoomModel
+import io.agora.scene.playzone.service.PlayZoneServiceProtocol
 import io.agora.scene.playzone.service.api.PlayApiManager
 import io.agora.scene.playzone.service.api.PlayZoneGameBanner
 import io.agora.scene.playzone.sub.api.SubApiManager
+import io.agora.scene.playzone.sub.api.SubGameInfoModel
 import io.agora.scene.playzone.sub.api.SubGameListModel
 
 class PlayHallViewModel : ViewModel() {
@@ -14,7 +20,13 @@ class PlayHallViewModel : ViewModel() {
         PlayApiManager()
     }
 
+    private val mPlayZoneService by lazy { PlayZoneServiceProtocol.serviceProtocol }
+
     val mGameConfigLiveData = MutableLiveData<List<PlayZoneGameBanner>>()
+
+    val roomModelListLiveData = MutableLiveData<List<AUIRoomInfo>?>()
+    val createRoomInfoLiveData = MutableLiveData<AUIRoomInfo?>()
+    val joinRoomInfoLiveData = MutableLiveData<AUIRoomInfo?>()
 
     fun gameConfig() {
         playZoneApiManager.getGameBanner { error, list ->
@@ -54,4 +66,47 @@ class PlayHallViewModel : ViewModel() {
         }
         mGameListLiveData.postValue(gameList)
     }
+
+    fun getRoomList(){
+        mPlayZoneService.getRoomList { error, vlRoomListModels ->
+            roomModelListLiveData.postValue(vlRoomListModels)
+            error?.message?.let {
+                ToastUtils.showToast(it)
+            }
+        }
+    }
+
+    fun createRoom(gameInfoModel: SubGameInfoModel, roomName: String, password: String) {
+        val createRoomModel = PlayCreateRoomModel(
+            roomName = roomName,
+            password = password,
+            gameId = gameInfoModel.gameId,
+            gameName = gameInfoModel.gameName
+        )
+        mPlayZoneService.createRoom(createRoomModel, completion = { error, roomInfo ->
+            if (error == null && roomInfo != null) {
+                createRoomInfoLiveData.postValue(roomInfo)
+            } else {
+                createRoomInfoLiveData.postValue(null)
+                ToastUtils.showToast(
+                    AgoraApplication.the().getString(R.string.play_zone_create_room_failed, error?.message ?: "")
+                )
+            }
+        })
+    }
+
+    fun joinRoom(roomInfo: AUIRoomInfo, password: String?) {
+        mPlayZoneService.joinRoom(roomInfo.roomId, password) { error ->
+            if (error == null) { // success
+                joinRoomInfoLiveData.postValue(roomInfo)
+            } else {
+                joinRoomInfoLiveData.postValue(null)
+                ToastUtils.showToast(
+                    AgoraApplication.the().getString(R.string.play_zone_join_room_failed, error?.message ?: "")
+                )
+            }
+        }
+    }
+
+
 }
