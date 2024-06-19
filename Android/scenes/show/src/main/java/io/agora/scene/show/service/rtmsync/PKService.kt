@@ -179,7 +179,7 @@ class PKService(
         },
         onDelete = {
             val interactionInfo = interactionService.getInteractionInfo()
-            if(interactionInfo?.type == InteractionType.PK && it.interactorId == interactionInfo.userId){
+            if (interactionInfo?.type == InteractionType.PK && it.ownerId == interactionInfo.userId) {
                 interactionService.stopInteraction()
                 roomPresenceService.updateRoomPresenceInfo(
                     channelName,
