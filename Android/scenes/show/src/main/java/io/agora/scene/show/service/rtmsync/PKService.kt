@@ -231,6 +231,7 @@ class PKService(
         messageRetainer.sendMessage(
             GsonTools.beanToString(pkInfo) ?: "",
             roomPresenceInfo.ownerId,
+            roomPresenceInfo.roomId,
             success = {
                 AUILogger.logger().d(tag, "[${pkInfo.id}] invitePK >> sendMessage success")
                 success.invoke(pkInfo)
@@ -272,6 +273,7 @@ class PKService(
         messageRetainer.sendMessage(
             GsonTools.beanToString(pkInfo.copy(type = PKType.ACCEPT)) ?: "",
             pkInfo.fromUserId,
+            pkInfo.fromRoomId,
             success = {
                 AUILogger.logger().d(tag, "[$pkId] acceptPK >> sendMessage success")
                 AUILogger.logger().d(tag, "[$pkId] acceptPK >> updateRoomPresenceInfo : interactorId=${pkInfo.fromUserId}, interactorName=${pkInfo.fromUserName}")
@@ -324,6 +326,7 @@ class PKService(
         messageRetainer.sendMessage(
             GsonTools.beanToString(pkInfo) ?: "",
             pkInfo.fromUserId,
+            pkInfo.fromRoomId,
             success = {
                 AUILogger.logger().d(tag, "[$pkId] rejectPK >> sendMessage success")
                 messageRetainer.removeMessage(message.id)

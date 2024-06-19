@@ -119,6 +119,7 @@ class MessageRetainer(
     fun sendMessage(
         message: String,
         userId: String,
+        channelName: String = this@MessageRetainer.channelName,
         success: (() -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     ) {
