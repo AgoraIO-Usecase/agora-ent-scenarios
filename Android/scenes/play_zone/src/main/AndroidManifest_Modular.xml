@@ -19,7 +19,8 @@
         android:networkSecurityConfig="@xml/security_config" android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true" android:theme="@style/def_theme">
 
-        <activity android:name="io.agora.scene.playzone.sub.quickstart.QuickStartActivity" android:exported="true"
+        <activity
+            android:name="io.agora.scene.playzone.hall.PlayGameHallActivity" android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,5 +28,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name="io.agora.scene.playzone.sub.quickstart.QuickStartActivity" />
+
+        <activity android:name="io.agora.scene.playzone.hall.PlayZoneRoomListActivity" />
     </application>
 </manifest>

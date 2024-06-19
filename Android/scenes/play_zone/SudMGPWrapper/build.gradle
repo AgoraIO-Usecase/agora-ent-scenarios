@@ -27,9 +27,9 @@ dependencies {
     api 'tech.sud.mgp:SudMGP:1.4.0.1191'
 
     // 依赖okhttp
-    api 'com.squareup.okhttp3:okhttp:4.9.2'
+    implementation rootProject.ext.deps.okhttp
 
     // gson
-    api 'com.google.code.gson:gson:2.8.6'
+    implementation rootProject.ext.deps.gson
 
 }

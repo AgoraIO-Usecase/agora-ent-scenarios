@@ -4,10 +4,13 @@
 
     <application>
 
-        <activity android:name="io.agora.scene.playzone.sub.quickstart.QuickStartActivity"
+        <activity
+            android:name="io.agora.scene.playzone.sub.quickstart.QuickStartActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan" />
 
         <activity android:name="io.agora.scene.playzone.hall.PlayGameHallActivity" />
+
+        <activity android:name="io.agora.scene.playzone.hall.PlayZoneRoomListActivity" />
     </application>
 </manifest>

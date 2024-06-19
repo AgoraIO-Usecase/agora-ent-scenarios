@@ -15,4 +15,8 @@
     <string name="play_zone_realtime_competition">实时竞技</string>
     <string name="play_zone_classic_board_games">经典棋牌</string>
     <string name="play_zone_party_games">Party Game</string>
+    <string name="play_zone_empty_room">欢迎来到声网休闲玩法方案\n目前暂无房间</string>
+    <string name="play_zone_live_prepare_tip">本产品仅用于功能体验，单次直播时长不超过10mins</string>
+    <string name="play_zone_room_id">ID: %s</string>
+    <string name="play_zone_user_count">%d人</string>
 </resources>
