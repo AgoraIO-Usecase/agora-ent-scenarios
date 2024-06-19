@@ -88,19 +88,19 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
                     "ShowLiveSyncExtensions",
                     logCallback = object : AUILogger.AUILogCallback {
                         override fun onLogDebug(tag: String, message: String) {
-                             ShowLogger.d(tag, "[SyncExtensions] $message")
+                             ShowLogger.d(tag, message)
                         }
 
                         override fun onLogInfo(tag: String, message: String) {
-                             ShowLogger.d(tag, "[SyncExtensions] $message")
+                             ShowLogger.d(tag, message)
                         }
 
                         override fun onLogWarning(tag: String, message: String) {
-                             ShowLogger.d(tag, "[SyncExtensions] $message")
+                             ShowLogger.d(tag, message)
                         }
 
                         override fun onLogError(tag: String, message: String) {
-                             ShowLogger.e(tag, message = "[SyncExtensions] $message")
+                             ShowLogger.e(tag, message = message)
                         }
                     })
             )
