@@ -1,13 +1,15 @@
 package io.agora.rtmsyncmanager.service.imp
 
-import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserRespObserver
 import io.agora.rtmsyncmanager.model.AUIRoomContext
 import io.agora.rtmsyncmanager.model.AUIUserInfo
 import io.agora.rtmsyncmanager.service.IAUIUserService
 import io.agora.rtmsyncmanager.service.callback.AUICallback
 import io.agora.rtmsyncmanager.service.callback.AUIException
 import io.agora.rtmsyncmanager.service.callback.AUIUserListCallback
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserRespObserver
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ObservableHelper
@@ -28,6 +30,11 @@ class AUIUserServiceImpl constructor(
         rtmManager.subscribeUser(this)
     }
 
+    fun release() {
+        observableHelper.unSubscribeAll()
+        rtmManager.unsubscribeUser(this)
+    }
+
     override fun registerRespObserver(observer: IAUIUserService.AUIUserRespObserver?) {
         observableHelper.subscribeEvent(observer)
         if(mUserList.isNotEmpty()){
@@ -43,7 +50,6 @@ class AUIUserServiceImpl constructor(
 
     override fun getUserInfoList(
         roomId: String,
-        userIdList: MutableList<String>?,
         callback: AUIUserListCallback?
     ) {
         rtmManager.whoNow(roomId) { error, userList ->
@@ -76,7 +82,7 @@ class AUIUserServiceImpl constructor(
     override fun muteUserAudio(isMute: Boolean, callback: AUICallback?) {
         val currentUserId = roomContext.currentUserInfo.userId
         val user = mUserList.first { it.userId == currentUserId }
-        user.muteAudio = if (isMute) 1 else 0
+        user.muteAudio = isMute
         val map = GsonTools.beanToMap(user)
         rtmManager.setPresenceState(channelName, attr = map.mapValues { it.value.toString() }) { error ->
             if (error != null) {
@@ -107,7 +113,7 @@ class AUIUserServiceImpl constructor(
             )
             return
         }
-        user.muteVideo = if (isMute) 1 else 0
+        user.muteVideo = isMute
         val map = GsonTools.beanToMap(user) as Map<String, String>
         rtmManager.setPresenceState(channelName, attr = map) { error ->
             if (error != null) {
@@ -137,6 +143,7 @@ class AUIUserServiceImpl constructor(
         userId: String,
         userList: List<Map<String, Any>>
     ) {
+        if (this.channelName != channelName) return
         val users = mutableListOf<AUIUserInfo>()
         userList.forEach { userMap ->
             GsonTools.toBean(GsonTools.beanToString(userMap), AUIUserInfo::class.java)?.let {
@@ -147,7 +154,6 @@ class AUIUserServiceImpl constructor(
         this.observableHelper.notifyEventHandlers {
             it.onRoomUserSnapshot(channelName, mUserList)
         }
-        setupUserAttr(channelName)
     }
 
     override fun onUserDidJoined(
@@ -155,6 +161,8 @@ class AUIUserServiceImpl constructor(
         userId: String,
         userInfo: Map<String, Any>
     ) {
+        if (this.channelName != channelName) return
+        if (userInfo.size <= 1) return
         GsonTools.toBean(GsonTools.beanToString(userInfo), AUIUserInfo::class.java)?.let { info ->
             info.userId = userId
             mUserList.add(info)
@@ -167,12 +175,14 @@ class AUIUserServiceImpl constructor(
     override fun onUserDidLeaved(
         channelName: String,
         userId: String,
-        userInfo: Map<String, Any>
+        userInfo: Map<String, Any>,
+        reason: AUIRtmUserLeaveReason
     ) {
+        if (this.channelName != channelName) return
         val index = mUserList.indexOfFirst{ it.userId == userId }
         val info = mUserList.removeAt(index)
         this.observableHelper.notifyEventHandlers {
-            it.onRoomUserLeave(channelName, info)
+            it.onRoomUserLeave(channelName, info, reason)
         }
     }
 
@@ -181,6 +191,7 @@ class AUIUserServiceImpl constructor(
         userId: String,
         userInfo: Map<String, Any>
     ) {
+        if (this.channelName != channelName) return
         if (userInfo.isEmpty()) {
             return
         }
@@ -188,13 +199,17 @@ class AUIUserServiceImpl constructor(
             val index = mUserList.indexOfFirst{ it.userId == info.userId }
             if (index == -1) { // 不存在该用户
                 mUserList.add(info)
+                this.observableHelper.notifyEventHandlers {
+                    it.onRoomUserEnter(channelName, info)
+                }
+                return
             } else {
                 val oldInfo = mUserList[index]
                 mUserList[index] = info
                 // 单独更新语音被禁用回调
                 if (oldInfo.muteAudio != info.muteAudio) {
                     this.observableHelper.notifyEventHandlers {
-                        it.onUserAudioMute(info.userId, (info.muteAudio == 1))
+                        it.onUserAudioMute(info.userId, info.muteAudio)
                     }
                 }
             }
@@ -204,7 +219,26 @@ class AUIUserServiceImpl constructor(
         }
     }
 
-    private fun setupUserAttr(roomId: String){
+    fun setUserPayload(payload: String) {
+        val roomId = channelName
+        val userId = AUIRoomContext.shared().currentUserInfo.userId
+        AUILogger.logger().d(TAG, "setPayload[$channelName] : $payload")
+        val userAttr = mapOf("customPayload" to payload)
+        rtmManager.setPresenceState(channelName = roomId, attr = userAttr) { error ->
+            if (error != null) {
+                AUILogger.logger().d(TAG, "setPayload[$roomId] fail: ${error.localizedMessage}")
+                //TODO: retry
+                return@setPresenceState
+            }
+
+            // rtm不会返回自己更新的数据，需要手动处理
+            onUserDidUpdated(channelName = roomId, userId = userId, userInfo = userAttr)
+        }
+    }
+
+
+    fun setUserAttr(completion: (AUIRtmException?) -> Unit) {
+        val roomId = channelName
         val userId = AUIRoomContext.shared().currentUserInfo.userId
         val userInfo = mUserList.firstOrNull { it.userId == userId } ?: AUIUserInfo()
         userInfo.userId = AUIRoomContext.shared().currentUserInfo.userId
@@ -214,9 +248,9 @@ class AUIUserServiceImpl constructor(
         val userAttr = GsonTools.beanToMap(userInfo)
         AUILogger.logger().d(TAG, "setupUserAttr: $roomId : $userAttr")
         rtmManager.setPresenceState(roomId, attr = userAttr) { error ->
-            if(error != null){
+            if (error != null) {
                 AUILogger.logger().d(TAG, "setupUserAttr: $roomId fail: ${error.reason}")
-            }else{
+            } else {
                 //rtm不会返回自己更新的数据，需要手动处理
                 onUserDidUpdated(roomId, userId, userAttr)
             }

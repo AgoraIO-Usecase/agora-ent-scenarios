@@ -1,5 +1,6 @@
 package io.agora.rtmsyncmanager.service.collection
 
+import android.util.Log
 import com.google.gson.reflect.TypeToken
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
@@ -7,26 +8,22 @@ import io.agora.rtmsyncmanager.utils.GsonTools
 import java.util.UUID
 
 class AUIListCollection(
-    private val channelName: String,
-    private val observeKey: String,
-    private val rtmManager: AUIRtmManager
-) : AUIBaseCollection(channelName, observeKey, rtmManager) {
+    val channelName: String,
+    val observeKey: String,
+    val rtmManager: AUIRtmManager
+) : AUIBaseCollection(channelName, observeKey, rtmManager), IAUIListCollection {
 
     private var currentList = listOf<Map<String, Any>>()
-        set(value) {
-            field = value
-            attributesDidChangedClosure?.invoke(channelName, observeKey, AUIAttributesModel(value))
-        }
 
     override fun getMetaData(callback: ((error: AUICollectionException?, value: Any?) -> Unit)?) {
         rtmManager.getMetadata(
             channelName = channelName,
             completion = { error, metaData ->
                 if (error != null) {
-                    callback?.invoke(AUICollectionException.ErrorCode.unknown.toException("rtm getMetadata error: $error"), null)
+                    callback?.invoke(AUICollectionException.ErrorCode.rtm.toException(error.code, "rtm getMetadata error: ${error.reason}"), null)
                     return@getMetadata
                 }
-                val data = metaData?.metadataItems?.find { it.key == observeKey }
+                val data = metaData?.items?.find { it.key == observeKey }
                 if (data == null) {
                     callback?.invoke(null, null)
                     return@getMetadata
@@ -56,7 +53,7 @@ class AUIListCollection(
         callback: ((error: AUICollectionException?) -> Unit)?
     ) {
         if (isArbiter()) {
-            rtmSetMetaData(localUid(), valueCmd, value, filter, callback)
+            rtmUpdateMetaData(localUid(), valueCmd, value, filter, callback)
             return
         }
 
@@ -274,7 +271,7 @@ class AUIListCollection(
         ) { error ->
             if (error != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.recvErrorReceipt.toException()
+                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(null, error.message)
                 )
             } else {
                 callback?.invoke(null)
@@ -338,14 +335,16 @@ class AUIListCollection(
             return
         }
 
-        val error = metadataWillAddClosure?.invoke(publisherId, valueCmd, value)
+        val newValue = valueWillChangeClosure?.invoke(publisherId, valueCmd, value) ?: value
+
+        val error = metadataWillAddClosure?.invoke(publisherId, valueCmd, newValue)
         if (error != null) {
             callback?.invoke(error)
             return
         }
 
         val list = ArrayList(currentList)
-        list.add(value)
+        list.add(newValue)
         val retList =
             attributesWillSetClosure?.invoke(
                 channelName,
@@ -367,15 +366,16 @@ class AUIListCollection(
         ) { e ->
             if (e != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.unknown.toException("rtm setBatchMetadata error: $e")
+                    AUICollectionException.ErrorCode.rtm.toException(e.code, "rtm setBatchMetadata error: ${e.reason}")
                 )
             } else {
                 callback?.invoke(null)
             }
         }
+        currentList = retList
     }
 
-    private fun rtmSetMetaData(
+    private fun rtmUpdateMetaData(
         publisherId: String,
         valueCmd: String?,
         value: Map<String, Any>,
@@ -389,17 +389,20 @@ class AUIListCollection(
             )
             return
         }
+
+        val newValue = valueWillChangeClosure?.invoke(publisherId, valueCmd, value) ?: value
+
         val list = ArrayList(currentList)
         itemIndexes.forEach { itemIdx ->
             val item = list[itemIdx]
-            val error = metadataWillUpdateClosure?.invoke(publisherId, valueCmd, value, item)
+            val error = metadataWillUpdateClosure?.invoke(publisherId, valueCmd, newValue, item)
             if (error != null) {
                 callback?.invoke(error)
                 return
             }
 
             val tempItem = HashMap(item)
-            value.forEach { key, value ->
+            newValue.forEach { (key, value) ->
                 tempItem[key] = value
             }
             list[itemIdx] = tempItem
@@ -425,12 +428,13 @@ class AUIListCollection(
         ) { e ->
             if (e != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.unknown.toException("rtm setBatchMetadata error: $e")
+                    AUICollectionException.ErrorCode.rtm.toException(e.code, "rtm setBatchMetadata error: ${e.reason}")
                 )
             } else {
                 callback?.invoke(null)
             }
         }
+        currentList = retList
     }
 
     private fun rtmMergeMetaData(
@@ -447,16 +451,19 @@ class AUIListCollection(
             )
             return
         }
+
+        val newValue = valueWillChangeClosure?.invoke(publisherId, valueCmd, value) ?: value
+
         val list = ArrayList(currentList)
         itemIndexes.forEach { itemIdx ->
             val item = list[itemIdx]
-            val error = metadataWillMergeClosure?.invoke(publisherId, valueCmd, value, item)
+            val error = metadataWillMergeClosure?.invoke(publisherId, valueCmd, newValue, item)
             if (error != null) {
                 callback?.invoke(error)
                 return
             }
 
-            val tempItem = AUICollectionUtils.mergeMap(item, value)
+            val tempItem = AUICollectionUtils.mergeMap(item, newValue)
             list[itemIdx] = tempItem
         }
         val retList =
@@ -479,12 +486,13 @@ class AUIListCollection(
         ) { e ->
             if (e != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.unknown.toException("rtm setBatchMetadata error: $e")
+                    AUICollectionException.ErrorCode.rtm.toException(e.code, "rtm setBatchMetadata error: ${e.reason}")
                 )
             } else {
                 callback?.invoke(null)
             }
         }
+        currentList = retList
     }
 
     private fun rtmRemoveMetaData(
@@ -533,12 +541,13 @@ class AUIListCollection(
         ) { e ->
             if (e != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.unknown.toException("rtm setBatchMetadata error: $e")
+                    AUICollectionException.ErrorCode.rtm.toException(e.code, "rtm setBatchMetadata error: ${e.reason}")
                 )
             } else {
                 callback?.invoke(null)
             }
         }
+        currentList = retList
     }
 
     private fun rtmCalculateMetaData(
@@ -567,21 +576,34 @@ class AUIListCollection(
                 callback?.invoke(error)
                 return
             }
-
-            val calcItem = AUICollectionUtils.calculateMap(
+            var tempMap: Map<String, Any>? = null
+            try {
+                tempMap = AUICollectionUtils.calculateMap(
+                    item,
+                    key,
+                    value.value,
+                    value.min,
+                    value.max,
+                )
+            } catch (e: AUICollectionException) {
+                callback?.invoke(e)
+                return
+            }
+            AUICollectionUtils.calculateMap(
                 item,
                 key,
                 value.value,
                 value.min,
-                value.max
+                value.max,
             )
-            if (calcItem == null) {
+            Log.d("ListCollection", "AUICollectionUtils.calculateMap calcItem:$tempMap")
+            if (tempMap == null) {
                 callback?.invoke(
                     AUICollectionException.ErrorCode.calculateMapFail.toException()
                 )
                 return
             }
-            list[itemIdx] = calcItem
+            list[itemIdx] = tempMap
         }
 
         val retList =
@@ -603,11 +625,12 @@ class AUIListCollection(
             metadata = mapOf(Pair(observeKey, data)),
         ) { e ->
             if (e != null) {
-                callback?.invoke(AUICollectionException.ErrorCode.unknown.toException("rtm setBatchMetadata error: $e"))
+                callback?.invoke(AUICollectionException.ErrorCode.rtm.toException(e.code, "rtm setBatchMetadata error: ${e.reason}"))
             } else {
                 callback?.invoke(null)
             }
         }
+        currentList = retList
     }
 
     private fun rtmCleanMetaData(callback: ((error: AUICollectionException?) -> Unit)?) {
@@ -625,12 +648,16 @@ class AUIListCollection(
     }
 
     override fun onAttributeChanged(value: Any) {
-        val strValue = value as? String ?: return
+        val strValue = value as? String ?: ""
         val list = GsonTools.toBean<List<Map<String, Any>>>(
             strValue,
             object : TypeToken<List<Map<String, Any>>>() {}.type
-        ) ?: return
-        currentList = list
+        ) ?: emptyList()
+        //如果是仲裁者，不更新，因为本地已经修改了，否则这里收到的消息可能是老的数据，例如update1->update2->resp1->resp2，那么resp1的数据比update2要老，会造成ui上短暂的回滚
+        if (!isArbiter()) {
+            currentList = list
+        }
+        attributesDidChangedClosure?.invoke(channelName, observeKey, AUIAttributesModel(list))
     }
 
     override fun onMessageReceive(publisherId: String, message: String) {
@@ -645,6 +672,7 @@ class AUIListCollection(
         }
 
         if (messageModel.messageType == AUICollectionMessageTypeReceipt) {
+            Log.d("huit", "message:$message")
             // receipt message from arbiter
             val collectionError = GsonTools.toBean(
                 GsonTools.beanToString(messageModel.payload?.data),
@@ -664,6 +692,14 @@ class AUIListCollection(
             if (code == 0) {
                 // success
                 rtmManager.markReceiptFinished(uniqueId, null)
+            } else if (fromValue(code) != null) {
+                rtmManager.markReceiptFinished(
+                    uniqueId, AUIRtmException(
+                        code,
+                        fromValue(code)!!.message,
+                        "receipt message from arbiter"
+                    )
+                )
             } else {
                 // failure
                 rtmManager.markReceiptFinished(
@@ -704,7 +740,7 @@ class AUIListCollection(
                             sendReceipt(publisherId, uniqueId, it)
                         }
                     } else {
-                        rtmSetMetaData(publisherId, valueCmd, data, filter) {
+                        rtmUpdateMetaData(publisherId, valueCmd, data, filter) {
                             sendReceipt(publisherId, uniqueId, it)
                         }
                     }
@@ -757,5 +793,7 @@ class AUIListCollection(
         }
     }
 
-
+    override fun getLocalMetaData(): AUIAttributesModel {
+        return AUIAttributesModel(currentList)
+    }
 }

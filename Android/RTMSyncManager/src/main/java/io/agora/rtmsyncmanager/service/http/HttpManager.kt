@@ -16,6 +16,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 
+/**
+ * HttpManager is a singleton object that manages HTTP requests.
+ * It provides methods for setting the base URL and getting the service instance.
+ */
 object HttpManager {
 
     private var baseUrl = ""
@@ -42,27 +46,24 @@ object HttpManager {
                     }))
                     .build()
             )
-            .baseUrl("$url/$version/")
-            .addConverterFactory(GsonConverterFactory.create(
-                GsonBuilder()
-                    .setDateFormat("yyyy-MM-dd HH:mm:ss")
-                    .setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
-                    .setNumberToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
-                    .registerTypeAdapter(TypeToken.get(JSONObject::class.java).type, object : TypeAdapter<JSONObject>() {
-                        @Throws(IOException::class)
-                        override fun write(jsonWriter: JsonWriter, value: JSONObject) {
-                            jsonWriter.jsonValue(value.toString())
-                        }
-
-                        @Throws(IOException::class)
-                        override fun read(jsonReader: JsonReader): JSONObject? {
-                            return null
-                        }
-                    })
-                    .enableComplexMapKeySerialization()
-                    .create()
-            ))
+            .baseUrl(url + "/$version/")
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
 
+    private val gson =
+        GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
+            .registerTypeAdapter(TypeToken.get(JSONObject::class.java).type, object : TypeAdapter<JSONObject>() {
+                @Throws(IOException::class)
+                override fun write(jsonWriter: JsonWriter, value: JSONObject) {
+                    jsonWriter.jsonValue(value.toString())
+                }
+
+                @Throws(IOException::class)
+                override fun read(jsonReader: JsonReader): JSONObject? {
+                    return null
+                }
+            })
+            .enableComplexMapKeySerialization()
+            .create()
 }
