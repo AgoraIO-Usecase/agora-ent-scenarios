@@ -7,6 +7,15 @@
 
 import Foundation
 
+func decodeModel<T: Codable>(jsonStr: String) -> T? {
+    guard let map = decodeToJsonObj(jsonStr) as? [String: Any] else {
+        return nil
+    }
+          
+    let model: T? = decodeModel(map)
+    return model
+}
+
 func decodeModel<T: Codable>(_ dictionary: [String: Any]) -> T? {
     let decoder = JSONDecoder()
     do {

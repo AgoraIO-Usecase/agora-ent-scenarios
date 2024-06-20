@@ -438,7 +438,14 @@ class LiveDetailFragment : Fragment() {
                     mService.createMicSeatApply(mRoomInfo.roomId, {
                         // success
                         mLinkDialog.setOnApplySuccess(it)
-                    })
+                    }) {
+                        ToastUtils.showToast(
+                            context?.getString(
+                                R.string.show_create_micseat_apply_error,
+                                it.message
+                            )
+                        )
+                    }
                 }
             }
             showLinkingDialog()
@@ -1086,7 +1093,12 @@ class LiveDetailFragment : Fragment() {
                     },
                     error = {
                         view.isEnabled = true
-                        ToastUtils.showToast("accept message failed!")
+                        ToastUtils.showToast(
+                            context?.getString(
+                                R.string.show_accept_micseat_apply_error,
+                                it.message
+                            )
+                        )
                     })
             }
 
@@ -1111,7 +1123,10 @@ class LiveDetailFragment : Fragment() {
                     ToastUtils.showToast("invite successfully!")
                 }, error = {
                     view.isEnabled = true
-                    ToastUtils.showToast("invite failed!")
+                    ToastUtils.showToast(context?.getString(
+                        R.string.show_create_micseat_invitation_error,
+                        it.message
+                    ))
                 })
             }
 
@@ -1158,25 +1173,9 @@ class LiveDetailFragment : Fragment() {
         }
         prepareLinkingMode()
         mMicInvitationDialog = AlertDialog.Builder(requireContext(), R.style.show_alert_dialog).apply {
+            setCancelable(false)
             setTitle(getString(R.string.show_ask_for_link, invitation.userName))
-
-            setPositiveButton(R.string.show_setting_confirm) { dialog, which ->
-                if (mLinkInvitationCountDownLatch != null) {
-                    mLinkInvitationCountDownLatch!!.cancel()
-                    mLinkInvitationCountDownLatch = null
-                }
-                (dialog as? AlertDialog)?.getButton(which)?.isEnabled = false
-                mService.acceptMicSeatInvitation(mRoomInfo.roomId, invitation.id,
-                    success = {
-                        (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
-                        ToastUtils.showToast("accept invitation successfully!")
-                    },
-                    error = {
-                        (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
-                        ToastUtils.showToast("accept invitation failed!")
-                    }
-                )
-            }
+            setPositiveButton(R.string.show_setting_confirm, null)
             setNegativeButton(R.string.show_setting_cancel) { dialog, which ->
                 updateIdleMode()
                 (dialog as? AlertDialog)?.getButton(which)?.isEnabled = false
@@ -1184,7 +1183,7 @@ class LiveDetailFragment : Fragment() {
                     success = {
                         (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
                         ToastUtils.showToast("reject invitation successfully!")
-                        dialog.dismiss()
+                        dismissMicInvitaionDialog()
                     },
                     error = {
                         (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
@@ -1193,6 +1192,29 @@ class LiveDetailFragment : Fragment() {
                 )
             }
         }.create()
+        mMicInvitationDialog?.setOnShowListener {
+            mMicInvitationDialog?.getButton(DialogInterface.BUTTON_POSITIVE)?.let { btn ->
+                btn.setOnClickListener {
+                    btn.isEnabled = false
+                    mService.acceptMicSeatInvitation(mRoomInfo.roomId, invitation.id,
+                        success = {
+                            btn.isEnabled = true
+                            ToastUtils.showToast("accept invitation successfully!")
+                            dismissMicInvitaionDialog()
+                        },
+                        error = { error ->
+                            btn.isEnabled = true
+                            ToastUtils.showToast(
+                                context?.getString(
+                                    R.string.show_accept_micseat_invitation_error,
+                                    error.message
+                                )
+                            )
+                        }
+                    )
+                }
+            }
+        }
         mMicInvitationDialog?.show()
         if (mLinkInvitationCountDownLatch != null) {
             mLinkInvitationCountDownLatch!!.cancel()
@@ -1254,7 +1276,10 @@ class LiveDetailFragment : Fragment() {
                         ToastUtils.showToast("invite message successfully!")
                     }) {
                         view.isEnabled = true
-                        ToastUtils.showToast("invite message failed!")
+                        ToastUtils.showToast(context?.getString(
+                            R.string.show_create_pk_invitation_error,
+                            it.message
+                        ))
                     }
                 }
             }
@@ -1279,27 +1304,13 @@ class LiveDetailFragment : Fragment() {
         mPKInvitationDialog = AlertDialog.Builder(requireContext(), R.style.show_alert_dialog).apply {
             setCancelable(false)
             setTitle(getString(R.string.show_ask_for_pk, name))
-            setPositiveButton(R.string.show_setting_confirm) { dialog, which ->
-                if (mPKInvitationCountDownLatch != null) {
-                    mPKInvitationCountDownLatch!!.cancel()
-                    mPKInvitationCountDownLatch = null
-                }
-                pkStartTime = TimeUtils.currentTimeMillis()
-                (dialog as? AlertDialog)?.getButton(which)?.isEnabled = false
-                mService.acceptPKInvitation(mRoomInfo.roomId, pkInvitation.id, {
-                    (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
-                    ToastUtils.showToast("accept message successfully!")
-                }) {
-                    (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
-                    ToastUtils.showToast("accept message failed!")
-                }
-            }
+            setPositiveButton(R.string.show_setting_confirm, null)
             setNegativeButton(R.string.show_setting_cancel) { dialog, which ->
                 updateIdleMode()
                 (dialog as? AlertDialog)?.getButton(which)?.isEnabled = false
                 mService.rejectPKInvitation(mRoomInfo.roomId, pkInvitation.id, {
                     (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
-                    dialog.dismiss()
+                    dismissPKInvitationDialog()
                 }) {
                     (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
                     ToastUtils.showToast("reject message failed!")
@@ -1307,6 +1318,25 @@ class LiveDetailFragment : Fragment() {
                 isPKCompetition = false
             }
         }.create()
+        mPKInvitationDialog?.setOnShowListener {
+            mPKInvitationDialog?.getButton(DialogInterface.BUTTON_POSITIVE)?.let { btn ->
+                btn.setOnClickListener {
+                    pkStartTime = TimeUtils.currentTimeMillis()
+                    btn.isEnabled = false
+                    mService.acceptPKInvitation(mRoomInfo.roomId, pkInvitation.id, {
+                        btn.isEnabled = true
+                        ToastUtils.showToast("accept message successfully!")
+                        dismissPKInvitationDialog()
+                    }) {
+                        btn.isEnabled = true
+                        ToastUtils.showToast(context?.getString(
+                            R.string.show_accept_pk_invitation_error,
+                            it.message
+                        ))
+                    }
+                }
+            }
+        }
         mPKInvitationDialog?.show()
         if (mPKInvitationCountDownLatch != null) {
             mPKInvitationCountDownLatch!!.cancel()
@@ -1400,10 +1430,6 @@ class LiveDetailFragment : Fragment() {
                 mRoomInfo.roomId,
                 mRoomInfo.roomName,
                 success = {
-                    mService.sendChatMessage(
-                        mRoomInfo.roomId,
-                        getString(R.string.show_live_chat_coming)
-                    )
                     initService()
                 },
                 error = {
@@ -1417,10 +1443,6 @@ class LiveDetailFragment : Fragment() {
         } else {
             mService.joinRoom(mRoomInfo.roomId,
                 success = {
-                    mService.sendChatMessage(
-                        mRoomInfo.roomId,
-                        getString(R.string.show_live_chat_coming)
-                    )
                     initService()
                 },
                 error = {
@@ -1463,6 +1485,22 @@ class LiveDetailFragment : Fragment() {
                 if (interactionInfo?.interactStatus == ShowInteractionStatus.linking && interactionInfo?.userId == user?.userId) {
                     mBinding.videoLinkingAudienceLayout.userName.isActivated = !(user?.muteAudio ?: false)
                 }
+            } else if (status == ShowSubscribeStatus.added && user != null) {
+                insertMessageItem(
+                    ShowMessage(
+                        user.userId,
+                        user.userName,
+                        getString(R.string.show_live_chat_coming)
+                    )
+                )
+            } else if (status == ShowSubscribeStatus.deleted && user != null) {
+                insertMessageItem(
+                    ShowMessage(
+                        user.userId,
+                        user.userName,
+                        getString(R.string.show_live_chat_leaving)
+                    )
+                )
             }
         }
         mService.subscribeMessage(mRoomInfo.roomId) { _, showMessage ->
@@ -1494,8 +1532,8 @@ class LiveDetailFragment : Fragment() {
                     // 互动中状态更新
                     interactionInfo = info
                 }
-                mMicInvitationDialog?.dismiss()
-                mPKInvitationDialog?.dismiss()
+                dismissMicInvitaionDialog()
+                dismissPKInvitationDialog()
             } else {
                 // 停止互动
                 // UI
@@ -1541,6 +1579,18 @@ class LiveDetailFragment : Fragment() {
                 refreshViewDetailLayout(ShowInteractionStatus.idle)
             }
         })
+    }
+
+    private fun dismissPKInvitationDialog() {
+        mPKInvitationDialog?.dismiss()
+        mPKInvitationCountDownLatch?.cancel()
+        mPKInvitationCountDownLatch = null
+    }
+
+    private fun dismissMicInvitaionDialog() {
+        mMicInvitationDialog?.dismiss()
+        mLinkInvitationCountDownLatch?.cancel()
+        mLinkInvitationCountDownLatch = null
     }
 
     private fun reFetchUserList() {

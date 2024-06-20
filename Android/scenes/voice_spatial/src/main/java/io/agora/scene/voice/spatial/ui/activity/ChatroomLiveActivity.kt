@@ -15,6 +15,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.reflect.TypeToken
+import io.agora.scene.base.LogUploader
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.voice.spatial.R
@@ -103,6 +105,9 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
     override fun onDestroy() {
         super.onDestroy()
         setSpatialSeatInfo(null)
+        if (SceneConfigManager.logUpload) {
+            LogUploader.uploadLog(LogUploader.SceneType.CHAT_SPATIAL)
+        }
     }
 
     private var toggleAudioRun: Runnable? = null

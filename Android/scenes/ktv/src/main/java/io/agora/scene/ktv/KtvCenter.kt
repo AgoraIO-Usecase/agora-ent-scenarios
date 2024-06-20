@@ -78,16 +78,6 @@ object KtvCenter {
                 KTVLogger.d(TAG, "generate RtcToken success")
                 mRtcToken = rtcToken
                 callback.invoke(mRtcToken, null)
-//                TokenGenerator.generateToken(channelName + "_rtc_ex", mCurrentUser.userId,
-//                    TokenGenerator.TokenGeneratorType.Token006, TokenGenerator.AgoraTokenType.Rtc,
-//                    success = { rtcChorusToken ->
-//                        KTVLogger.d(TAG, "renewRtcChorusToken success")
-//                        callback.invoke(rtcToken, rtcChorusToken, null)
-//                    },
-//                    failure = { exception ->
-//                        KTVLogger.e(TAG, "renewRtcChorusToken failed, $exception")
-//                        callback.invoke(rtcToken, null, exception)
-//                    })
             },
             failure = { exception ->
                 KTVLogger.e(TAG, "generate RtcToken failed, $exception")

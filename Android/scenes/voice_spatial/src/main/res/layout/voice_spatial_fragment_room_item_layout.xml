@@ -89,7 +89,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintDimensionRatio="1:1"
-                android:background="@drawable/voice_icon_create_3d_room"
+                android:background="@drawable/voice_bg_room_3d_spatial"
                 app:shapeAppearance="@style/ui_widget_roundStyle"
                 android:src="@drawable/voice_bg_oval_black20"
                 android:id="@+id/owner_avatar"
