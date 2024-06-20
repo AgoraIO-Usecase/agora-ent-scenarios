@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -19,14 +20,15 @@ import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.ISingleCallback
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.playzone.R
-import io.agora.scene.playzone.databinding.PlayZoneActivityRoomListBinding
+import io.agora.scene.playzone.databinding.PlayZoneActivityRoomListLayoutBinding
 import io.agora.scene.playzone.databinding.PlayZoneItemRoomListBinding
+import io.agora.scene.playzone.live.PlayRoomGameActivity
 import io.agora.scene.playzone.service.PlayZoneParameters
 import io.agora.scene.playzone.service.PlayZoneServiceProtocol
 import io.agora.scene.widget.dialog.InputPasswordDialog
 import io.agora.scene.widget.utils.UiUtils
 
-class PlayRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomListBinding>() {
+class PlayRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomListLayoutBinding>() {
 
     companion object {
         private const val TAG = "Joy_RoomListActivity"
@@ -47,8 +49,8 @@ class PlayRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomListBin
         PlayZoneServiceProtocol.reset()
     }
 
-    override fun getViewBinding(inflater: LayoutInflater): PlayZoneActivityRoomListBinding {
-        return PlayZoneActivityRoomListBinding.inflate(inflater)
+    override fun getViewBinding(inflater: LayoutInflater): PlayZoneActivityRoomListLayoutBinding {
+        return PlayZoneActivityRoomListLayoutBinding.inflate(inflater)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -121,6 +123,7 @@ class PlayRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomListBin
                 setDarkStatusIcon(isBlackDarkStatus)
             } else {
                 ToastUtils.showToast("加入房间成功")
+                PlayRoomGameActivity.launch(this, roomInfo)
             }
         }
     }
@@ -164,7 +167,6 @@ class PlayRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomListBin
             )
         }
 
-
         override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
             val data: AUIRoomInfo = mList[position]
             holder.binding.tvRoomName.text = data.roomName
@@ -181,6 +183,8 @@ class PlayRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomListBin
             (data.customPayload[PlayZoneParameters.THUMBNAIL_ID] as String?)?.let { thumbnail ->
                 holder.binding.ivCover.setImageResource(getThumbnailIcon(thumbnail))
             }
+            val password = data.customPayload[PlayZoneParameters.PASSWORD] as? String
+            holder.binding.ivLock.isVisible = !password.isNullOrEmpty()
             holder.itemView.setOnClickListener {
                 if (UiUtils.isFastClick()) return@setOnClickListener
                 mOnGotoRoom?.invoke(position, data)

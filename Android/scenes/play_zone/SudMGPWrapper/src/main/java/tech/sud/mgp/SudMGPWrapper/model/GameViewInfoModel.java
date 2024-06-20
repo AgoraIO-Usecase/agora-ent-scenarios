@@ -28,6 +28,14 @@ public class GameViewInfoModel {
 
         // 游戏View的高 （单位像素）
         public int height;
+
+        @Override
+        public String toString() {
+            return "GameViewSizeModel{" +
+                    "width=" + width +
+                    ", height=" + height +
+                    '}';
+        }
     }
 
     public static class GameViewRectModel {
@@ -39,6 +47,16 @@ public class GameViewInfoModel {
         public int right;
         // 相对于view_size下边框偏移（单位像素）
         public int bottom;
+
+        @Override
+        public String toString() {
+            return "GameViewRectModel{" +
+                    "left=" + left +
+                    ", top=" + top +
+                    ", right=" + right +
+                    ", bottom=" + bottom +
+                    '}';
+        }
     }
 
 }

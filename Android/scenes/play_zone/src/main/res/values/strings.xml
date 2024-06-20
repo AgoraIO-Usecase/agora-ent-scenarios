@@ -27,6 +27,18 @@
     <string name="play_zone_room_pwd">房间加密</string>
     <string name="play_zone_create_room_tips">本应用为测试产品，仅用于功能体验，请勿商用。单次使用时长不超过10分钟，过时房问将自动解散。为配合相关部门监管要求，严禁色情、辱骂、暴恐、涉政等违规内容。警惕电信诈骗，请勿在使用过程中进行货款申请和网银转账！国家反诈专用号码：96110</string>
     <string name="play_zone_please_input_room_name">请输入房间名称</string>
+    <string name="play_zone_get_game_list_error">获取游戏列表失败</string>
+    <string name="play_zone_game_rules">游戏规则</string>
+    <string name="play_zone_send_message">发送弹幕</string>
+
+    <string name="play_zone_living_host_end_title">结束游戏</string>
+    <string name="play_zone_living_user_end_title">结束玩法</string>
+    <string name="play_zone_living_host_end_content">是否退出游戏？</string>
+    <string name="play_zone_living_user_end_content">是否退出游戏？</string>
+    <string name="play_zone_living_timeout_title">游戏超时自动退出</string>
+    <string name="play_zone_living_host_timeout">重新体验游戏请返回创建房间</string>
+    <string name="play_zone_living_abnormal_title">主播端异常</string>
+    <string name="play_zone_living_user_timeout">重新体验游戏请返回进入房间</string>
 
     <string name="play_zone_create_room_failed">创建房间失败，错误：%1s</string>
     <string name="play_zone_join_room_failed">加入房间失败，错误：%1s</string>

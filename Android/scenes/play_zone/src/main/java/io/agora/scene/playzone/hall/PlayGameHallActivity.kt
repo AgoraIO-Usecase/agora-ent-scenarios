@@ -34,10 +34,9 @@ import io.agora.scene.playzone.databinding.PlayZoneItemGameHeaderLayoutBinding
 import io.agora.scene.playzone.databinding.PlayZoneItemGameLayoutBinding
 import io.agora.scene.playzone.databinding.PlayZoneItemGameTypeLayoutBinding
 import io.agora.scene.playzone.service.api.PlayApiManager
+import io.agora.scene.playzone.service.api.PlayGameInfoModel
+import io.agora.scene.playzone.service.api.PlayGameType
 import io.agora.scene.playzone.service.api.PlayZoneGameBanner
-import io.agora.scene.playzone.sub.api.SubGameInfoModel
-import io.agora.scene.playzone.sub.api.SubGameType
-import io.agora.scene.playzone.sub.quickstart.QuickStartActivity
 import java.util.Timer
 import java.util.TimerTask
 
@@ -87,8 +86,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
             showVendorDialog()
         }
         binding.tvRoomList.setOnClickListener {
-            ToastUtils.showToast("房间列表")
-            startActivity(Intent(this, QuickStartActivity::class.java))
+            startActivity(Intent(this, PlayRoomListActivity::class.java))
         }
 
         binding.currentlyHottest.setOnClickListener {
@@ -134,14 +132,6 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
 
     override fun requestData() {
         super.requestData()
-        mPlayZoneViewModel.createRoomInfoLiveData.observe(this) { roomInfo->
-            if (roomInfo == null) {
-                setDarkStatusIcon(isBlackDarkStatus)
-            } else {
-               ToastUtils.showToast("创建房间成功")
-            }
-        }
-
         mPlayZoneViewModel.gameConfig()
         mPlayZoneViewModel.mGameConfigLiveData.observe(this) {
             if (!it.isNullOrEmpty()) {
@@ -159,7 +149,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
             }
         }
 
-        mPlayZoneViewModel.subGameList(mCurrentVendor)
+        mPlayZoneViewModel.getGameList(mCurrentVendor)
 
         mPlayZoneViewModel.mGameListLiveData.observe(this) {
 
@@ -168,41 +158,31 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
             listAdapter.add(gameTypeAdapter)
 
             var headTitle = ""
-            it.forEach { subGameListModel ->
-                when (subGameListModel.gameType) {
-                    SubGameType.leisure_and_entertainment -> {
-                        headTitle = getString(R.string.play_zone_leisure_and_entertainment)
-                    }
-
-                    SubGameType.voice_interaction -> {
-                        headTitle = getString(R.string.play_zone_voice_interaction)
-                    }
-
-                    SubGameType.realtime_competition -> {
-                        headTitle = getString(R.string.play_zone_realtime_competition)
-                    }
-
-                    SubGameType.classic_board_games -> {
-                        headTitle = getString(R.string.play_zone_classic_board_games)
-                    }
-
-                    SubGameType.party_games -> {
-                        headTitle = getString(R.string.play_zone_party_games)
-                    }
+            it?.forEach { subGameListModel ->
+                headTitle = when (subGameListModel.gameType) {
+                    PlayGameType.leisure_and_entertainment -> getString(R.string.play_zone_leisure_and_entertainment)
+                    PlayGameType.voice_interaction -> getString(R.string.play_zone_voice_interaction)
+                    PlayGameType.realtime_competition -> getString(R.string.play_zone_realtime_competition)
+                    PlayGameType.classic_board_games -> getString(R.string.play_zone_classic_board_games)
+                    PlayGameType.party_games -> getString(R.string.play_zone_party_games)
                 }
                 val headAdapter = GameHeadAdapter(mutableListOf(headTitle), GameHeadHolder::class.java)
                 listAdapter.add(headAdapter)
                 val gameAdapter = BaseRecyclerViewAdapter(subGameListModel.gameList, object :
-                    OnItemClickListener<SubGameInfoModel?> {
-                    override fun onItemClick(subGameInfo: SubGameInfoModel, view: View, position: Int, viewType: Long) {
-                        ToastUtils.showToast("点击了${subGameInfo.gameName}")
+                    OnItemClickListener<PlayGameInfoModel?> {
+                    override fun onItemClick(
+                        subGameInfo: PlayGameInfoModel,
+                        view: View,
+                        position: Int,
+                        viewType: Long
+                    ) {
                         if (!subGameInfo.gameUrl.isNullOrEmpty()) {
                             PagePilotManager.pageWebViewWithBrowser(subGameInfo.gameUrl)
-                        }else{
+                        } else {
                             showCreateRoomDialog(subGameInfo)
                         }
                     }
-                }, GameSubHolder::class.java)
+                }, GameInfoeHolder::class.java)
                 listAdapter.add(gameAdapter)
             }
             concatAdapter = ConcatAdapter(listAdapter)
@@ -210,14 +190,14 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
         }
     }
 
-    private fun showCreateRoomDialog(subGameInfo: SubGameInfoModel) {
-            val bundle = Bundle().apply {
-                putSerializable(PlayCreateRoomDialog.Key_GameInfo, subGameInfo)
-            }
-            val dialog = PlayCreateRoomDialog(this).apply {
-                setBundleArgs(bundle)
-            }
-            dialog.show(supportFragmentManager, "createDialog")
+    private fun showCreateRoomDialog(subGameInfo: PlayGameInfoModel) {
+        val bundle = Bundle().apply {
+            putSerializable(PlayCreateRoomDialog.Key_GameInfo, subGameInfo)
+        }
+        val dialog = PlayCreateRoomDialog(this).apply {
+            setBundleArgs(bundle)
+        }
+        dialog.show(supportFragmentManager, "createDialog")
     }
 
     override fun onDestroy() {
@@ -237,7 +217,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
         dialog.vendorCallback = {
             if (mCurrentVendor != it) {
                 mCurrentVendor = it
-                mPlayZoneViewModel.subGameList(mCurrentVendor)
+                mPlayZoneViewModel.getGameList(mCurrentVendor)
                 ToastUtils.showToast("切换到${it}")
             }
         }
@@ -248,7 +228,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
     private var mTimer: Timer? = null
 
     private val mGameInfoAdapter by lazy {
-        GameInfoAdapter(emptyList(), itemClick = {
+        GameBannerAdapter(emptyList(), itemClick = {
             ToastUtils.showToast("click $it")
         })
     }
@@ -301,17 +281,24 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
     }
 
 
-    class GameInfoAdapter constructor(
-        var gameInfoList: List<PlayZoneGameBanner>,
+    /**
+     * 轮播图
+     *
+     * @property bannerList
+     * @property itemClick
+     * @constructor Create empty Game banner adapter
+     */
+    class GameBannerAdapter constructor(
+        var bannerList: List<PlayZoneGameBanner>,
         private val itemClick: (position: Int) -> Unit
     ) :
-        RecyclerView.Adapter<GameInfoAdapter.GameViewHolder>() {
+        RecyclerView.Adapter<GameBannerAdapter.GameViewHolder>() {
 
         inner class GameViewHolder(val binding: PlayZoneItemGameBannerLayoutBinding) :
             RecyclerView.ViewHolder(binding.root)
 
         fun setDataList(list: List<PlayZoneGameBanner>) {
-            gameInfoList = list
+            bannerList = list
             notifyDataSetChanged()
         }
 
@@ -321,12 +308,10 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
             )
         }
 
-        override fun getItemCount(): Int {
-            return gameInfoList.size
-        }
+        override fun getItemCount(): Int = bannerList.size
 
         override fun onBindViewHolder(holder: GameViewHolder, position: Int) {
-            val data = gameInfoList[position]
+            val data = bannerList[position]
             GlideApp.with(holder.binding.ivGuide)
                 .load(data.url)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
@@ -337,17 +322,24 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
         }
     }
 
-    class GameSubHolder constructor(mBinding: PlayZoneItemGameLayoutBinding) :
-        BaseRecyclerViewAdapter.BaseViewHolder<PlayZoneItemGameLayoutBinding, SubGameInfoModel?>(mBinding) {
+    /**
+     * 具体游戏 viewHolder
+     *
+     * @constructor
+     *
+     * @param mBinding
+     */
+    class GameInfoeHolder constructor(mBinding: PlayZoneItemGameLayoutBinding) :
+        BaseRecyclerViewAdapter.BaseViewHolder<PlayZoneItemGameLayoutBinding, PlayGameInfoModel?>(mBinding) {
 
-        override fun binding(subGame: SubGameInfoModel?, selectedIndex: Int) {
+        override fun binding(subGame: PlayGameInfoModel?, selectedIndex: Int) {
             subGame ?: return
             mBinding.tvGameName.text = subGame.gameName
             mBinding.ivGameIcon.setImageResource(subGame.gamePic)
         }
     }
 
-    // 休闲玩法
+    // 休闲玩法 adapter
     class GameTypeAdapter<B : ViewBinding, T, H : BaseRecyclerViewAdapter.BaseViewHolder<B, T>>(
         dataList: List<T>, viewHolderClass: Class<H>
     ) : BaseRecyclerViewAdapter<B, T, H>(dataList, viewHolderClass) {
@@ -364,7 +356,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
         }
     }
 
-    // 游戏分类标题
+    // 游戏分类标题 adapter
     class GameHeadAdapter<B : ViewBinding, T, H : BaseRecyclerViewAdapter.BaseViewHolder<B, T>>(
         dataList: List<T>, viewHolderClass: Class<H>
     ) : BaseRecyclerViewAdapter<B, T, H>(dataList, viewHolderClass) {
@@ -374,6 +366,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
         }
     }
 
+    // 游戏分类标题 viewHolder
     class GameHeadHolder constructor(mBinding: PlayZoneItemGameHeaderLayoutBinding) :
         BaseRecyclerViewAdapter.BaseViewHolder<PlayZoneItemGameHeaderLayoutBinding, String>(mBinding) {
         override fun binding(data: String?, selectedIndex: Int) {

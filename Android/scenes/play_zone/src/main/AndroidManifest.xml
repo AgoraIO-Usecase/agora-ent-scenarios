@@ -5,14 +5,23 @@
     <application>
 
         <activity
-            android:name="io.agora.scene.playzone.sub.quickstart.QuickStartActivity"
-            android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustPan" />
-
-        <activity
             android:name="io.agora.scene.playzone.hall.PlayGameHallActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/def_material_theme" />
 
-        <activity android:name="io.agora.scene.playzone.hall.PlayRoomListActivity" />
+        <activity
+            android:name="io.agora.scene.playzone.live.PlayRoomGameActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="false"
+            android:keepScreenOn="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/def_material_theme"
+            android:windowSoftInputMode="adjustNothing" />
+
+        <activity
+            android:name="io.agora.scene.playzone.hall.PlayRoomListActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
     </application>
 </manifest>

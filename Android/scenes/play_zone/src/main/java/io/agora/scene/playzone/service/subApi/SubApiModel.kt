@@ -1,28 +1,6 @@
-package io.agora.scene.playzone.sub.api
+package io.agora.scene.playzone.service.subApi
 
 import com.google.gson.annotations.SerializedName
-import java.io.Serializable
-
-enum class SubGameType(val value: Int) {
-    leisure_and_entertainment(0), // 休闲娱乐
-    voice_interaction(1), // 语音互动
-    realtime_competition(2), // 实时竞技
-    classic_board_games(3), // 经典棋牌
-    party_games(4), // Party Game
-}
-
-data class SubGameListModel constructor(
-    val gameType: SubGameType, // 游戏类型
-    val gameList: List<SubGameInfoModel>, // 游戏列表
-)
-
-data class SubGameInfoModel constructor(
-    var gameName: String = "", // 游戏名称
-    var gameId: Long = 0, // 游戏id
-    var gamePic: Int = 0, // 游戏图标
-    var gameUrl: String? = null, // 游戏地址
-) : Serializable
-
 
 data class SubGameRequestModel constructor(
     val platform: Int, // 客户端平台 (默认值为1) 1:iOS 2:Android 3:Web

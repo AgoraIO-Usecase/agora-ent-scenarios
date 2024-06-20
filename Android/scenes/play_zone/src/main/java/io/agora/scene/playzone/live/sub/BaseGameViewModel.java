@@ -1,4 +1,4 @@
-package io.agora.scene.playzone.sub.quickstart;
+package io.agora.scene.playzone.live.sub;
 
 import android.app.Activity;
 import android.os.Handler;

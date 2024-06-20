@@ -21,7 +21,8 @@ import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.playzone.R
 import io.agora.scene.playzone.databinding.PlayZoneDialogCreateRoomBinding
-import io.agora.scene.playzone.sub.api.SubGameInfoModel
+import io.agora.scene.playzone.live.PlayRoomGameActivity
+import io.agora.scene.playzone.service.api.PlayGameInfoModel
 import java.util.Random
 
 class PlayCreateRoomDialog constructor(
@@ -32,8 +33,8 @@ class PlayCreateRoomDialog constructor(
         const val Key_GameInfo = "key_gameInfo"
     }
 
-    private val mGameInfo: SubGameInfoModel by lazy {
-        arguments?.getSerializable(Key_GameInfo) as SubGameInfoModel
+    private val mGameInfo: PlayGameInfoModel by lazy {
+        arguments?.getSerializable(Key_GameInfo) as PlayGameInfoModel
     }
 
     private lateinit var roomCreateViewModel: PlayHallViewModel
@@ -106,9 +107,9 @@ class PlayCreateRoomDialog constructor(
             hideLoadingView()
             if (roomInfo != null) {
                 dismiss()
-
+                PlayRoomGameActivity.launch(context, roomInfo)
             } else {
-                // 加入房间失败
+                // 创建房间失败
             }
         }
     }

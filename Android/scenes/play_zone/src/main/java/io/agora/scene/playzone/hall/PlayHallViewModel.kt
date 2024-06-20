@@ -9,10 +9,10 @@ import io.agora.scene.playzone.R
 import io.agora.scene.playzone.service.PlayCreateRoomModel
 import io.agora.scene.playzone.service.PlayZoneServiceProtocol
 import io.agora.scene.playzone.service.api.PlayApiManager
+import io.agora.scene.playzone.service.api.PlayGameInfoModel
+import io.agora.scene.playzone.service.api.PlayGameListModel
 import io.agora.scene.playzone.service.api.PlayZoneGameBanner
-import io.agora.scene.playzone.sub.api.SubApiManager
-import io.agora.scene.playzone.sub.api.SubGameInfoModel
-import io.agora.scene.playzone.sub.api.SubGameListModel
+import io.agora.scene.playzone.service.subApi.SubApiManager
 
 class PlayHallViewModel : ViewModel() {
 
@@ -43,9 +43,11 @@ class PlayHallViewModel : ViewModel() {
     }
 
 
-    val mGameListLiveData = MutableLiveData<List<SubGameListModel>>()
+    val mGameListLiveData = MutableLiveData<List<PlayGameListModel>?>()
 
-    fun subGameList(vendor: GameVendor) {
+    fun getGameList(vendor: GameVendor) {
+
+        // only test
         subApiManager.getGameApiInfo { error, gameApi ->
             if (gameApi != null) {
                 subApiManager.getSubGameList(gameApi.api.get_mg_list) { gameError, list ->
@@ -59,15 +61,18 @@ class PlayHallViewModel : ViewModel() {
             }
         }
 
-        val gameList = when (vendor) {
-            GameVendor.Sub -> subApiManager.getSubGameList()
-            GameVendor.GroupPlay -> subApiManager.getGroupPlayList()
-            GameVendor.YYGame -> subApiManager.getYYGameList()
-        }
-        mGameListLiveData.postValue(gameList)
+        playZoneApiManager.getGameList(vendor, completion = { error, gameList ->
+            if (error == null && gameList != null) {
+                mGameListLiveData.postValue(gameList)
+            } else {
+                error?.message?.let {
+                    ToastUtils.showToast(it)
+                }
+            }
+        })
     }
 
-    fun getRoomList(){
+    fun getRoomList() {
         mPlayZoneService.getRoomList { error, vlRoomListModels ->
             roomModelListLiveData.postValue(vlRoomListModels)
             error?.message?.let {
@@ -76,7 +81,7 @@ class PlayHallViewModel : ViewModel() {
         }
     }
 
-    fun createRoom(gameInfoModel: SubGameInfoModel, roomName: String, password: String) {
+    fun createRoom(gameInfoModel: PlayGameInfoModel, roomName: String, password: String) {
         val createRoomModel = PlayCreateRoomModel(
             roomName = roomName,
             password = password,
@@ -107,6 +112,4 @@ class PlayHallViewModel : ViewModel() {
             }
         }
     }
-
-
 }

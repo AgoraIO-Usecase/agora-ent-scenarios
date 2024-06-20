@@ -1,4 +1,4 @@
-package io.agora.scene.playzone.sub.utils;
+package io.agora.scene.playzone.utils;
 
 import android.text.Editable;
 import android.view.View;

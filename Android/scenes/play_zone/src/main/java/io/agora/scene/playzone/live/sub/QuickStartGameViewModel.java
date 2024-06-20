@@ -1,4 +1,4 @@
-package io.agora.scene.playzone.sub.quickstart;
+package io.agora.scene.playzone.live.sub;
 
 import android.app.Activity;
 import android.util.Log;
@@ -308,5 +308,4 @@ public class QuickStartGameViewModel extends BaseGameViewModel {
     public void onGameMGCommonGameState(ISudFSMStateHandle handle, SudMGPMGState.MGCommonGameState model) {
         super.onGameMGCommonGameState(handle, model);
     }
-
 }
