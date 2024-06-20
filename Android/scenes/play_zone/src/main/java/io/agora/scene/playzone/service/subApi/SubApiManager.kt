@@ -11,7 +11,7 @@ import com.moczul.ok2curl.CurlInterceptor
 import com.moczul.ok2curl.logger.Logger
 import io.agora.rtmsyncmanager.service.callback.AUIException
 import io.agora.scene.playzone.BuildConfig
-import io.agora.scene.playzone.PlayZoneLogger
+import io.agora.scene.playzone.PlayLogger
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
@@ -137,7 +137,7 @@ class SubApiManager {
     }
 
     fun getSubGameList(url: String, completion: (error: Exception?, list: List<SubGameInfo>) -> Unit) {
-        PlayZoneLogger.d(tag, "getGameList start")
+        PlayLogger.d(tag, "getGameList start")
         val requestModel = SubGameListRequestModel(BuildConfig.sub_appid, BuildConfig.sub_appSecret)
         apiInterface.gameList(url, requestModel)
             .enqueue(object : retrofit2.Callback<SubCommonResp<SubGameResp>> {
@@ -146,10 +146,10 @@ class SubApiManager {
                     response: Response<SubCommonResp<SubGameResp>>
                 ) {
                     val rsp = response.body()?.data
-                    PlayZoneLogger.d(tag, "zzzzzz getGameList return ${rsp?.mg_info_list?.size}")
-                    PlayZoneLogger.d(tag, "zzzzzz getGameList return $rsp")
+                    PlayLogger.d(tag, "zzzzzz getGameList return ${rsp?.mg_info_list?.size}")
+                    PlayLogger.d(tag, "zzzzzz getGameList return ${ response.raw()}")
                     rsp?.mg_info_list?.forEach {
-                        PlayZoneLogger.d(tag, "zzzzzz ${it.name.zh_CN} ${it.mg_id} ${it.thumbnail192x192.zh_CN}")
+                        PlayLogger.d(tag, "zzzzzz ${it.name.zh_CN} ${it.mg_id} ${it.thumbnail192x192.zh_CN}")
                     }
                     if (response.body()?.ret_code == 0 && rsp != null) { // success
                         completion.invoke(null, rsp.mg_info_list ?: emptyList())

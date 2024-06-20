@@ -22,6 +22,13 @@ interface PlayZoneServiceListenerProtocol {
     fun onRoomDestroy() {}
 
     /**
+     * 机器人列表
+     *
+     * @param robotMap
+     */
+    fun onRobotMapSnapshot(robotMap: Map<String, RoomRobotInfo>) {}
+
+    /**
      * 房间人数更新
      *
      * @param userCount

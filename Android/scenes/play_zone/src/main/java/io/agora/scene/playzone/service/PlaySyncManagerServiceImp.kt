@@ -25,8 +25,9 @@ import io.agora.rtmsyncmanager.utils.ObservableHelper
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.playzone.PlayZoneCenter
-import io.agora.scene.playzone.PlayZoneLogger
+import io.agora.scene.playzone.PlayCenter
+import io.agora.scene.playzone.PlayLogger
+import tech.sud.mgp.SudMGPWrapper.state.SudMGPAPPState
 import kotlin.random.Random
 
 class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZoneServiceProtocol, ISceneResponse,
@@ -36,6 +37,16 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
         private const val TAG = "PZ_Service_LOG"
         private const val kSceneId = "scene_play_zone_4.10.2"
         private const val kCollectionStartGameInfo = "startGameCollection"
+        private const val kCollectionRobotInfo = "robot_info" // map collection
+    }
+
+    // 机器人 mapCollection
+    private fun getRobotCollection(roomId: String): AUIMapCollection? {
+        if (roomId.isEmpty()) {
+            return null
+        }
+        val scene = mSyncManager.getScene(roomId)
+        return scene?.getCollection(kCollectionRobotInfo) { a, b, c -> AUIMapCollection(a, b, c) }
     }
 
     private val mMainHandler by lazy { Handler(Looper.getMainLooper()) }
@@ -99,19 +110,19 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
         AUILogger.initLogger(
             AUILogger.Config(cxt, "KTV", logCallback = object : AUILogger.AUILogCallback {
                 override fun onLogDebug(tag: String, message: String) {
-                    PlayZoneLogger.d(rtmSyncTag, "$tag $message")
+                    PlayLogger.d(rtmSyncTag, "$tag $message")
                 }
 
                 override fun onLogInfo(tag: String, message: String) {
-                    PlayZoneLogger.d(rtmSyncTag, "$tag $message")
+                    PlayLogger.d(rtmSyncTag, "$tag $message")
                 }
 
                 override fun onLogWarning(tag: String, message: String) {
-                    PlayZoneLogger.w(rtmSyncTag, "$tag $message")
+                    PlayLogger.w(rtmSyncTag, "$tag $message")
                 }
 
                 override fun onLogError(tag: String, message: String) {
-                    PlayZoneLogger.e(rtmSyncTag, "$tag $message")
+                    PlayLogger.e(rtmSyncTag, "$tag $message")
                 }
 
             })
@@ -119,7 +130,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
 
         val commonConfig = AUICommonConfig().apply {
             context = cxt
-            appId = PlayZoneCenter.mAppId
+            appId = PlayCenter.mAppId
             owner = AUIUserThumbnailInfo().apply {
                 userId = UserManager.getInstance().user.id.toString()
                 userName = UserManager.getInstance().user.name
@@ -174,32 +185,32 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
             completion.invoke(null)
             return
         }
-        if (PlayZoneCenter.mRtmToken.isEmpty()) {
-            PlayZoneLogger.d(TAG, "initRtmSync, renewToken start")
-            PlayZoneCenter.generateRtmToken { rtmToken, exception ->
+        if (PlayCenter.mRtmToken.isEmpty()) {
+            PlayLogger.d(TAG, "initRtmSync, renewToken start")
+            PlayCenter.generateRtmToken { rtmToken, exception ->
                 val token = rtmToken ?: run {
-                    PlayZoneLogger.e(TAG, "initRtmSync, $exception")
+                    PlayLogger.e(TAG, "initRtmSync, $exception")
                     completion.invoke(AUIRtmException(-1, exception?.message ?: "error", ""))
                     return@generateRtmToken
                 }
                 mSyncManager.login(token, completion = {
                     if (it == null) {
                         completion.invoke(null)
-                        PlayZoneLogger.d(TAG, "initRtmSync, with renewToken loginRtm success")
+                        PlayLogger.d(TAG, "initRtmSync, with renewToken loginRtm success")
                     } else {
                         completion.invoke(it)
-                        PlayZoneLogger.e(TAG, "initRtmSync, with renewToken loginRtm failed: $it")
+                        PlayLogger.e(TAG, "initRtmSync, with renewToken loginRtm failed: $it")
                     }
                 })
             }
         } else {
-            mSyncManager.login(PlayZoneCenter.mRtmToken, completion = {
+            mSyncManager.login(PlayCenter.mRtmToken, completion = {
                 if (it == null) {
                     completion.invoke(null)
-                    PlayZoneLogger.d(TAG, "initRtmSync, without loginRtm success")
+                    PlayLogger.d(TAG, "initRtmSync, without loginRtm success")
                 } else {
                     completion.invoke(it)
-                    PlayZoneLogger.e(TAG, "initRtmSync, without renewToken loginRtm failed: $it")
+                    PlayLogger.e(TAG, "initRtmSync, without renewToken loginRtm failed: $it")
                 }
             })
         }
@@ -213,7 +224,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
                 is String -> value
                 else -> ""
             }
-            PlayZoneLogger.d(TAG, "onAttributeChanged $kCollectionStartGameInfo:$channelName,key:$key, value:$value")
+            PlayLogger.d(TAG, "onAttributeChanged $kCollectionStartGameInfo:$channelName,key:$key, value:$value")
             GsonTools.toBean(newValue, PlayStartGameInfo::class.java)?.let { startGameInfo ->
                 mObservableHelper.notifyEventHandlers { delegate ->
                     delegate.onStartGameInfoDidChanged(startGameInfo)
@@ -222,29 +233,52 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
         }
     }
 
+    private val robotUid = 3000000001
+    private val headUrl = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/{head}.png"
     override fun onWillInitSceneMetadata(channelName: String): Map<String, Any>? {
         return super.onWillInitSceneMetadata(channelName)
+        val rotBotMap = mutableMapOf<String, Any>()
+        for (i in 0 until 9) {
+            val modelMale = SudMGPAPPState.AIPlayers().apply {
+                this.userId = (robotUid + i * 2).toString()
+                this.name = "机器人${1 + i * 2}"
+                this.avatar = headUrl.replace("{head}", "male" + (i + 1))
+                this.gender = "male"
+                this.level = 1
+            }
+            rotBotMap[modelMale.userId] = modelMale
+            val modelFemale = SudMGPAPPState.AIPlayers().apply {
+                this.userId = (robotUid + 2 + i * 2).toString()
+                this.name = "机器人${2 + i * 2}"
+                this.avatar = headUrl.replace("{head}", "female" + (i + 1))
+                this.gender = "female"
+                this.level = 1
+            }
+            rotBotMap[modelFemale.userId] = modelFemale
+        }
+
+        return mapOf(kCollectionRobotInfo to rotBotMap)
     }
 
     override fun onTokenPrivilegeWillExpire(channelName: String?) {
-        PlayZoneLogger.d(TAG, "onTokenPrivilegeWillExpire, $channelName")
-        PlayZoneCenter.generateRtmToken { rtmToken, exception ->
+        PlayLogger.d(TAG, "onTokenPrivilegeWillExpire, $channelName")
+        PlayCenter.generateRtmToken { rtmToken, exception ->
             val token = rtmToken ?: run {
-                PlayZoneLogger.e(TAG, "onTokenPrivilegeWillExpire, with renewRtmToken failed: $exception")
+                PlayLogger.e(TAG, "onTokenPrivilegeWillExpire, with renewRtmToken failed: $exception")
                 return@generateRtmToken
             }
             mSyncManager.login(token, completion = { rtmException ->
                 if (rtmException == null) {
-                    PlayZoneLogger.d(TAG, "onTokenPrivilegeWillExpire, with loginRtm success")
+                    PlayLogger.d(TAG, "onTokenPrivilegeWillExpire, with loginRtm success")
                 } else {
-                    PlayZoneLogger.e(TAG, "onTokenPrivilegeWillExpire, with loginRtm failed: $rtmException")
+                    PlayLogger.e(TAG, "onTokenPrivilegeWillExpire, with loginRtm failed: $rtmException")
                 }
             })
         }
     }
 
     override fun onSceneExpire(channelName: String) {
-        PlayZoneLogger.d(TAG, "onSceneExpire, channelName:$channelName")
+        PlayLogger.d(TAG, "onSceneExpire, channelName:$channelName")
         if (mCurRoomNo == channelName) {
             leaveRoom { }
             mObservableHelper.notifyEventHandlers { delegate ->
@@ -254,7 +288,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
     }
 
     override fun onSceneDestroy(channelName: String) {
-        PlayZoneLogger.d(TAG, "onSceneExpire, channelName:$channelName")
+        PlayLogger.d(TAG, "onSceneExpire, channelName:$channelName")
         if (mCurRoomNo == channelName) {
             leaveRoom { }
             mObservableHelper.notifyEventHandlers { delegate ->
@@ -264,11 +298,11 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
     }
 
     override fun onSceneUserBeKicked(channelName: String, userId: String) {
-        PlayZoneLogger.d(TAG, "onSceneUserBeKicked, channelName:$channelName, userId:$userId")
+        PlayLogger.d(TAG, "onSceneUserBeKicked, channelName:$channelName, userId:$userId")
     }
 
     override fun onRoomUserSnapshot(roomId: String, userList: MutableList<AUIUserInfo>?) {
-        PlayZoneLogger.d(TAG, "onRoomUserSnapshot, roomId:$roomId, userList:${userList?.count()}")
+        PlayLogger.d(TAG, "onRoomUserSnapshot, roomId:$roomId, userList:${userList?.count()}")
         if (mCurRoomNo != roomId) {
             return
         }
@@ -282,7 +316,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
     }
 
     override fun onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {
-        PlayZoneLogger.d(TAG, "onRoomUserEnter, roomId:$roomId, userInfo:$userInfo")
+        PlayLogger.d(TAG, "onRoomUserEnter, roomId:$roomId, userInfo:$userInfo")
         if (mCurRoomNo != roomId) {
             return
         }
@@ -294,21 +328,21 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
         val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return
         // 所有人都可修改用户数
         cacheRoom.customPayload[PlayZoneParameters.ROOM_USER_COUNT] = mUserList.count()
-        mRoomManager.updateRoomInfo(PlayZoneCenter.mAppId, kSceneId, cacheRoom, callback = { auiException, roomInfo ->
+        mRoomManager.updateRoomInfo(PlayCenter.mAppId, kSceneId, cacheRoom, callback = { auiException, roomInfo ->
             if (auiException == null) {
-                PlayZoneLogger.d(TAG, "onRoomUserEnter updateRoom success: $roomInfo")
+                PlayLogger.d(TAG, "onRoomUserEnter updateRoom success: $roomInfo")
             } else {
-                PlayZoneLogger.e(TAG, "onRoomUserEnter updateRoom failed: $mCurRoomNo $auiException")
+                PlayLogger.e(TAG, "onRoomUserEnter updateRoom failed: $mCurRoomNo $auiException")
             }
         })
     }
 
     override fun onRoomUserUpdate(roomId: String, userInfo: AUIUserInfo) {
-        PlayZoneLogger.d(TAG, "onRoomUserUpdate, roomId:$roomId, userInfo:$userInfo")
+        PlayLogger.d(TAG, "onRoomUserUpdate, roomId:$roomId, userInfo:$userInfo")
     }
 
     override fun onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
-        PlayZoneLogger.d(TAG, "onRoomUserLeave, roomId:$roomId, userInfo:$userInfo")
+        PlayLogger.d(TAG, "onRoomUserLeave, roomId:$roomId, userInfo:$userInfo")
         if (mCurRoomNo != roomId) {
             return
         }
@@ -319,11 +353,11 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
         val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return
         // 所有人都可修改用户数
         cacheRoom.customPayload[PlayZoneParameters.ROOM_USER_COUNT] = mUserList.count()
-        mRoomManager.updateRoomInfo(PlayZoneCenter.mAppId, kSceneId, cacheRoom, callback = { auiException, roomInfo ->
+        mRoomManager.updateRoomInfo(PlayCenter.mAppId, kSceneId, cacheRoom, callback = { auiException, roomInfo ->
             if (auiException == null) {
-                PlayZoneLogger.d(TAG, "onRoomUserLeave updateRoom success: $roomId, $roomInfo")
+                PlayLogger.d(TAG, "onRoomUserLeave updateRoom success: $roomId, $roomInfo")
             } else {
-                PlayZoneLogger.d(TAG, "onRoomUserLeave updateRoom failed: $roomId $auiException")
+                PlayLogger.d(TAG, "onRoomUserLeave updateRoom failed: $roomId $auiException")
             }
         })
     }
@@ -345,15 +379,15 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
     }
 
     override fun getRoomList(completion: (error: Exception?, roomList: List<AUIRoomInfo>?) -> Unit) {
-        PlayZoneLogger.d(TAG, "getRoomList start")
+        PlayLogger.d(TAG, "getRoomList start")
         initRtmSync {
             if (it != null) {
                 completion.invoke(Exception("${it.message}"), null)
                 return@initRtmSync
             }
-            mRoomService.getRoomList(PlayZoneCenter.mAppId, kSceneId, 0, 50,
+            mRoomService.getRoomList(PlayCenter.mAppId, kSceneId, 0, 50,
                 cleanClosure = { auiRoomInfo ->
-                    return@getRoomList auiRoomInfo.roomOwner?.userId == PlayZoneCenter.mUser.id.toString()
+                    return@getRoomList auiRoomInfo.roomOwner?.userId == PlayCenter.mUser.id.toString()
 
                 },
                 completion = { uiException, ts, roomList ->
@@ -362,10 +396,10 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
                             restfulDiffTs = System.currentTimeMillis() - serverTs
                         }
                         val newRoomList = roomList?.sortedBy { -it.createTime } ?: emptyList()
-                        PlayZoneLogger.d(TAG, "getRoomList success,serverTs:$ts roomCount:${newRoomList.size}")
+                        PlayLogger.d(TAG, "getRoomList success,serverTs:$ts roomCount:${newRoomList.size}")
                         runOnMainThread { completion.invoke(null, newRoomList) }
                     } else {
-                        PlayZoneLogger.e(TAG, "getRoomList error, $uiException")
+                        PlayLogger.e(TAG, "getRoomList error, $uiException")
                         runOnMainThread {
                             completion.invoke(uiException, null)
                         }
@@ -379,17 +413,17 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
     override fun createRoom(
         inputModel: PlayCreateRoomModel, completion: (error: Exception?, result: AUIRoomInfo?) -> Unit
     ) {
-        PlayZoneLogger.d(TAG, "createRoom start")
+        PlayLogger.d(TAG, "createRoom start")
         val roomId = (Random(System.currentTimeMillis()).nextInt(100000) + 1000000).toString()
         initRtmSync {
             if (it != null) {
                 completion.invoke(Exception("${it.message}"), null)
                 return@initRtmSync
             }
-            PlayZoneCenter.generateRtcToken { rtcToken, exception ->
+            PlayCenter.generateRtcToken { rtcToken, exception ->
                 // 创建房间提前获取 rtcToken
                 val token = rtcToken ?: run {
-                    PlayZoneLogger.e(TAG, "createRoom, with renewRtcToken failed: $exception")
+                    PlayLogger.e(TAG, "createRoom, with renewRtcToken failed: $exception")
                     completion.invoke(exception, null)
                     return@generateRtcToken
                 }
@@ -418,9 +452,9 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
                 scene.userService.registerRespObserver(this)
                 mSyncManager.rtmManager.subscribeAttribute(roomInfo.roomId, kCollectionStartGameInfo, this)
                 mCurRoomNo = roomInfo.roomId
-                mRoomService.createRoom(PlayZoneCenter.mAppId, kSceneId, roomInfo, completion = { rtmException, _ ->
+                mRoomService.createRoom(PlayCenter.mAppId, kSceneId, roomInfo, completion = { rtmException, _ ->
                     if (rtmException == null) {
-                        PlayZoneLogger.d(TAG, "createRoom success: $roomInfo")
+                        PlayLogger.d(TAG, "createRoom success: $roomInfo")
                         mCurRoomNo = roomInfo.roomId
                         startTimer()
                         runOnMainThread {
@@ -428,7 +462,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
                         }
                     } else {
                         mCurRoomNo = ""
-                        PlayZoneLogger.e(TAG, "createRoom failed: $rtmException")
+                        PlayLogger.e(TAG, "createRoom failed: $rtmException")
                         runOnMainThread {
                             completion.invoke(Exception("${rtmException.message}(${rtmException.code})"), null)
                         }
@@ -458,10 +492,10 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
                 completion.invoke(Exception("${it.message}"))
                 return@initRtmSync
             }
-            PlayZoneCenter.generateRtcToken(callback = { rtcToken, exception ->
+            PlayCenter.generateRtcToken(callback = { rtcToken, exception ->
                 // 进入房间提前获取 rtcToken
                 val token = rtcToken ?: run {
-                    PlayZoneLogger.e(TAG, "joinRoom, with renewRtcToken failed: $exception")
+                    PlayLogger.e(TAG, "joinRoom, with renewRtcToken failed: $exception")
                     completion.invoke(exception)
                     return@generateRtcToken
                 }
@@ -470,16 +504,16 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
                 scene.userService.registerRespObserver(this)
                 mSyncManager.rtmManager.subscribeAttribute(roomId, kCollectionStartGameInfo, this)
                 mCurRoomNo = roomId
-                mRoomService.enterRoom(PlayZoneCenter.mAppId, kSceneId, roomId, completion = { rtmException ->
+                mRoomService.enterRoom(PlayCenter.mAppId, kSceneId, roomId, completion = { rtmException ->
                     if (rtmException == null) {
-                        PlayZoneLogger.d(TAG, "enterRoom success: ${cacheRoom.roomId}")
+                        PlayLogger.d(TAG, "enterRoom success: ${cacheRoom.roomId}")
                         mCurRoomNo = cacheRoom.roomId
                         runOnMainThread {
                             completion.invoke(null)
                         }
                     } else {
                         mCurRoomNo = ""
-                        PlayZoneLogger.e(TAG, "enterRoom failed: $rtmException")
+                        PlayLogger.e(TAG, "enterRoom failed: $rtmException")
                         runOnMainThread {
                             completion.invoke(Exception("${rtmException.message}(${rtmException.code})"))
                         }
@@ -503,7 +537,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
                 return@initRtmSync
             } else {
                 completion.invoke(null)
-                mRoomService.leaveRoom(PlayZoneCenter.mAppId, kSceneId, mCurRoomNo)
+                mRoomService.leaveRoom(PlayCenter.mAppId, kSceneId, mCurRoomNo)
             }
         }
         mUserList.clear()
@@ -519,7 +553,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
             val startGameCollection = getStartGameCollection(mCurRoomNo) ?: return@initRtmSync
             startGameCollection.getMetaData { error, metadata ->
                 if (error != null) {
-                    PlayZoneLogger.d(TAG, "getStartGame failed roomId:$roomId $error")
+                    PlayLogger.d(TAG, "getStartGame failed roomId:$roomId $error")
                     runOnMainThread {
                         completion.invoke(Exception(error.message), null)
                     }
@@ -528,12 +562,12 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
                 try {
                     val startGameInfo =
                         GsonTools.toBean(GsonTools.beanToString(metadata), PlayStartGameInfo::class.java)
-                    PlayZoneLogger.d(TAG, "getStartGame onSuccess roomId:$roomId $startGameInfo")
+                    PlayLogger.d(TAG, "getStartGame onSuccess roomId:$roomId $startGameInfo")
                     runOnMainThread {
                         completion.invoke(null, startGameInfo)
                     }
                 } catch (e: Exception) {
-                    PlayZoneLogger.d(TAG, "getStartGame onFail roomId:$roomId $e")
+                    PlayLogger.d(TAG, "getStartGame onFail roomId:$roomId $e")
                     runOnMainThread {
                         completion.invoke(e, null)
                     }
@@ -552,7 +586,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
             val map = GsonTools.beanToMap(gameInfo)
             startGameCollection.updateMetaData(roomId, map) {
                 if (it != null) {
-                    PlayZoneLogger.d(TAG, "updateStartGame failed roomId:$roomId $it")
+                    PlayLogger.d(TAG, "updateStartGame failed roomId:$roomId $it")
                     runOnMainThread {
                         completion.invoke(Exception(it.message))
                     }
@@ -568,9 +602,9 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
                         cacheRoom,
                         callback = { auiException, roomInfo ->
                             if (auiException == null) {
-                                PlayZoneLogger.d(TAG, "updateStartGame updateRoom success, $roomInfo")
+                                PlayLogger.d(TAG, "updateStartGame updateRoom success, $roomInfo")
                             } else {
-                                PlayZoneLogger.e(TAG, "updateStartGame updateRoom failed, $auiException")
+                                PlayLogger.e(TAG, "updateStartGame updateRoom failed, $auiException")
                             }
                         })
                 }

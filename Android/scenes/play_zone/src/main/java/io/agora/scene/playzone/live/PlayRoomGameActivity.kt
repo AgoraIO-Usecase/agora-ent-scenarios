@@ -20,47 +20,32 @@ import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.request.RequestOptions
-import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
-import io.agora.rtc2.DataStreamConfig
-import io.agora.rtc2.IRtcEngineEventHandler
-import io.agora.rtc2.RtcConnection
-import io.agora.rtc2.RtcEngine
-import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
-import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.base.utils.dp
-import io.agora.scene.playzone.PlayRtcEngineInstance
-import io.agora.scene.playzone.PlayZoneCenter
-import io.agora.scene.playzone.PlayZoneLogger
+import io.agora.scene.playzone.PlayLogger
 import io.agora.scene.playzone.R
 import io.agora.scene.playzone.databinding.PlayZoneActivityRoomGameLayoutBinding
 import io.agora.scene.playzone.databinding.PlayZoneItemLiveDetailMessageBinding
 import io.agora.scene.playzone.live.sub.QuickStartGameViewModel
-import io.agora.scene.playzone.service.PlayStartGameInfo
 import io.agora.scene.playzone.service.PlayZoneParameters
-import io.agora.scene.playzone.service.PlayZoneServiceListenerProtocol
-import io.agora.scene.playzone.service.PlayZoneServiceProtocol
 import io.agora.scene.playzone.service.api.PlayGameInfoModel
 import io.agora.scene.playzone.service.api.PlayZoneMessage
 import io.agora.scene.playzone.widget.KeyboardStatusWatcher
 import io.agora.scene.playzone.widget.statusBarHeight
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
-import org.json.JSONException
-import org.json.JSONObject
 import tech.sud.mgp.SudMGPWrapper.model.GameViewInfoModel.GameViewRectModel
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.TimeZone
 
 class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLayoutBinding>() {
 
@@ -81,19 +66,20 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
 
     private val gameViewModel = QuickStartGameViewModel()
 
+    private val roomGameViewModel: PlayGameViewModel by lazy {
+        ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(aClass: Class<T>): T {
+                val roomInfo = (intent.getSerializableExtra(EXTRA_ROOM_DETAIL_INFO) as AUIRoomInfo?)!!
+                return PlayGameViewModel(roomInfo) as T
+            }
+        })[PlayGameViewModel::class.java]
+    }
+
     private val mRoomInfo by lazy { (intent?.getSerializableExtra(EXTRA_ROOM_DETAIL_INFO) as? AUIRoomInfo)!! }
 
     private val mUser: User get() = UserManager.getInstance().user
 
-    private val mMainRtcConnection by lazy {
-        RtcConnection(mRoomInfo.roomId, mUser.id.toInt())
-    }
     private val mIsRoomOwner by lazy { mRoomInfo.roomOwner?.userId == mUser.id.toString() }
-
-    private val mPlayZoneService by lazy { PlayZoneServiceProtocol.serviceProtocol }
-    private val mRtcEngine by lazy { PlayRtcEngineInstance.rtcEngine }
-
-    private var mStreamId = -1
 
     private var mToggleAudioRun: Runnable? = null
 
@@ -124,7 +110,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
             gameViewRectModel.right = 0
             gameViewRectModel.bottom = binding.layoutBottom.height
             gameViewModel.gameViewRectModel = gameViewRectModel
-            PlayZoneLogger.d(TAG, "gameViewRectModel: $gameViewRectModel")
+            PlayLogger.d(TAG, "gameViewRectModel: $gameViewRectModel")
 
             // 游戏配置
             val gameConfigModel = gameViewModel.getGameConfigModel()
@@ -228,43 +214,17 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         showInput(binding.etMessage)
     }
 
-    private fun toggleSelfAudio(callback: () -> Unit) {
-        if (mIsRoomOwner) {
-            mToggleAudioRun = Runnable {
-                callback.invoke()
-            }
-            requestRecordPermission(true)
-        } else {
-            callback.invoke()
-        }
-    }
-
     override fun requestData() {
         super.requestData()
-        toggleSelfAudio {
-            initRtcEngine()
+
+        if (roomGameViewModel.isRoomOwner) {
+            mToggleAudioRun = Runnable {
+                roomGameViewModel.initData()
+            }
+            requestRecordPermission()
+        } else {
+            roomGameViewModel.initData()
         }
-        startTopLayoutTimer()
-        mPlayZoneService.subscribeListener(object : PlayZoneServiceListenerProtocol {
-            override fun onUserCountUpdate(userCount: Int) {
-                super.onUserCountUpdate(userCount)
-            }
-
-
-            override fun onStartGameInfoDidChanged(gameInfo: PlayStartGameInfo) {
-                super.onStartGameInfoDidChanged(gameInfo)
-            }
-
-            override fun onRoomDestroy() {
-                innerRelease()
-                showLivingEndLayout(false)
-            }
-
-            override fun onRoomExpire() {
-                innerRelease()
-                showLivingEndLayout(false)
-            }
-        })
         val gameId = mRoomInfo.customPayload[PlayZoneParameters.GAME_ID] as? Long ?: 0L
         gameViewModel.switchGame(this, mRoomInfo.roomId, gameId)
 
@@ -279,121 +239,37 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
                 )
             }
         }
-    }
 
-    private fun initRtcEngine() {
-        val eventListener = object : IRtcEngineEventHandler() {
-            override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
-                super.onJoinChannelSuccess(channel, uid, elapsed)
-                Log.d(TAG, "rtc onJoinChannelSuccess channel:$channel ,uid:$uid }")
-                val config = DataStreamConfig()
-                config.ordered = true
-                config.syncWithAudio = true
-                mStreamId = mRtcEngine.createDataStreamEx(config, mMainRtcConnection)
-            }
-
-            override fun onUserJoined(uid: Int, elapsed: Int) {
-                super.onUserJoined(uid, elapsed)
-                Log.d(TAG, "rtc onUserJoined uid:$uid }")
-            }
-
-            override fun onUserOffline(uid: Int, reason: Int) {
-                super.onUserOffline(uid, reason)
-                Log.d(TAG, "rtc onUserOffline uid:$uid }")
-            }
-
-            override fun onVideoSizeChanged(
-                source: Constants.VideoSourceType?,
-                uid: Int,
-                width: Int,
-                height: Int,
-                rotation: Int
-            ) {
-                super.onVideoSizeChanged(source, uid, width, height, rotation)
-                Log.i(TAG, "onVideoSizeChanged->uid:$uid,width:$width,height:$height,rotation:$rotation")
-            }
-
-            override fun onRemoteVideoStateChanged(uid: Int, state: Int, reason: Int, elapsed: Int) {
-                super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
-                Log.d(TAG, "rtc onRemoteVideoStateChanged uid:$uid,state:$state,reason:$reason}")
-            }
-
-            override fun onFirstRemoteVideoFrame(uid: Int, width: Int, height: Int, elapsed: Int) {
-                super.onFirstRemoteVideoFrame(uid, width, height, elapsed)
-                Log.d(TAG, "rtc onFirstRemoteVideoFrame uid:$uid")
-            }
-
-            override fun onError(err: Int) {
-                super.onError(err)
-                PlayZoneLogger.e(TAG, "rtc onError:$err ${RtcEngine.getErrorDescription(err)} ")
+        roomGameViewModel.mRoomTimeLiveData.observe(this) {
+            binding.tvTimer.text = it
+        }
+        roomGameViewModel.networkStatusLiveData.observe(this) { netWorkStatus: NetWorkEvent ->
+            setNetWorkStatus(netWorkStatus.txQuality, netWorkStatus.rxQuality)
+        }
+        roomGameViewModel.roomExpireLiveData.observe(this) {roomExpire ->
+            if (roomExpire) {
+                showLivingEndLayout(false)
             }
         }
-
-        joinChannel(eventListener)
-    }
-
-    private fun joinChannel(eventListener: IRtcEngineEventHandler) {
-        val channelMediaOptions = ChannelMediaOptions()
-        channelMediaOptions.clientRoleType =
-            if (mIsRoomOwner) Constants.CLIENT_ROLE_BROADCASTER else Constants.CLIENT_ROLE_AUDIENCE
-        channelMediaOptions.autoSubscribeVideo = false
-        channelMediaOptions.autoSubscribeAudio = true
-        channelMediaOptions.publishCameraTrack = false
-        channelMediaOptions.publishMicrophoneTrack = mIsRoomOwner
-        // 如果是观众 把 ChannelMediaOptions 的 audienceLatencyLevel 设置为 AUDIENCE_LATENCY_LEVEL_LOW_LATENCY（超低延时）
-        if (!mIsRoomOwner) {
-            channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
-        }
-
-        mRtcEngine.joinChannelEx(
-            PlayZoneCenter.mRtcToken,
-            mMainRtcConnection,
-            channelMediaOptions,
-            eventListener
-        )
-        if (mIsRoomOwner) {
-            enableContentInspectEx()
-        }
-        AudioModeration.moderationAudio(
-            mMainRtcConnection.channelId,
-            mMainRtcConnection.localUid.toLong(),
-            AudioModeration.AgoraChannelType.broadcast,
-            "Play_Zone"
-        )
-    }
-
-    private fun enableContentInspectEx() {
-        // ------------------ 开启鉴黄服务 ------------------
-        val contentInspectConfig = ContentInspectConfig()
-        try {
-            val jsonObject = JSONObject()
-            jsonObject.put("sceneName", "show")
-            jsonObject.put("id", mUser.id)
-            jsonObject.put("userNo", mUser.userNo)
-            contentInspectConfig.extraInfo = jsonObject.toString()
-            val module = ContentInspectConfig.ContentInspectModule()
-            module.interval = 10
-            module.type = ContentInspectConfig.CONTENT_INSPECT_TYPE_IMAGE_MODERATION
-            contentInspectConfig.modules = arrayOf(module)
-            contentInspectConfig.moduleCount = 1
-            mRtcEngine.enableContentInspectEx(true, contentInspectConfig, mMainRtcConnection)
-        } catch (_: JSONException) {
-
+        roomGameViewModel.roomDestroyLiveData.observe(this) { roomDestroy ->
+            if (roomDestroy) {
+                showLivingEndLayout(false)
+            }
         }
     }
 
-    private fun startTopLayoutTimer() {
-        val dataFormat = SimpleDateFormat("HH:mm:ss").apply { timeZone = TimeZone.getTimeZone("GMT") }
-        binding.tvTimer.post(object : Runnable {
-            override fun run() {
-                val currentTime = mPlayZoneService.getCurrentDuration(mRoomInfo.roomId)
-                if (currentTime > 0) {
-                    binding.tvTimer.text = dataFormat.format(Date(currentTime))
-                }
-                binding.tvTimer.postDelayed(this, 1000)
-                binding.tvTimer.tag = this
-            }
-        })
+    private fun setNetWorkStatus(txQuality: Int, rxQuality: Int) {
+        if (txQuality == Constants.QUALITY_BAD || txQuality == Constants.QUALITY_POOR || rxQuality == Constants.QUALITY_BAD || rxQuality == Constants.QUALITY_POOR) {
+            binding.ivNetStatus.setImageResource(R.drawable.bg_round_yellow)
+        } else if (txQuality == Constants.QUALITY_VBAD || txQuality == Constants.QUALITY_DOWN || rxQuality == Constants.QUALITY_VBAD || rxQuality == Constants.QUALITY_DOWN) {
+            binding.ivNetStatus.setImageResource(R.drawable.bg_round_red)
+        } else if (txQuality == Constants.QUALITY_EXCELLENT || txQuality == Constants.QUALITY_GOOD || rxQuality == Constants.QUALITY_EXCELLENT || rxQuality == Constants.QUALITY_GOOD) {
+            binding.ivNetStatus.setImageResource(R.drawable.bg_round_green)
+        } else if (txQuality == Constants.QUALITY_UNKNOWN || rxQuality == Constants.QUALITY_UNKNOWN) {
+            binding.ivNetStatus.setImageResource(R.drawable.bg_round_red)
+        } else {
+            binding.ivNetStatus.setImageResource(R.drawable.bg_round_green)
+        }
     }
 
     /**
@@ -433,37 +309,24 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
      *
      */
     private fun showEndRoomDialog() {
-        val title =
-            if (mIsRoomOwner) R.string.play_zone_living_host_end_title else R.string.play_zone_living_user_end_title
-        val message =
-            if (mIsRoomOwner) R.string.play_zone_living_host_end_content else R.string.play_zone_living_user_end_content
+        val title = if (mIsRoomOwner) R.string.play_zone_living_host_end_title else R.string.play_zone_living_user_end_title
+        val message = if (mIsRoomOwner) R.string.play_zone_living_host_end_content else R.string.play_zone_living_user_end_content
         AlertDialog.Builder(this, R.style.play_zone_alert_dialog)
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton(R.string.confirm) { dialog, id ->
                 dialog.dismiss()
-                exitRoom()
+                setDarkStatusIcon(isBlackDarkStatus)
+                roomGameViewModel.exitRoom()
                 finish()
             }
             .setNegativeButton(R.string.cancel) { dialog, id ->
+                setDarkStatusIcon(isBlackDarkStatus)
                 dialog.dismiss()
             }
             .show()
     }
 
-    private fun exitRoom() {
-        mPlayZoneService.leaveRoom { e: Exception? ->
-            if (e == null) { // success
-                PlayZoneLogger.d(TAG, "RoomLivingViewModel.exitRoom() success")
-            } else { // failure
-                PlayZoneLogger.e(TAG, "RoomLivingViewModel.exitRoom() failed: " + e.message)
-            }
-            e?.message?.let { error ->
-                ToastUtils.showToast(error)
-            }
-        }
-        innerRelease()
-    }
 
     override fun onResume() {
         super.onResume()
@@ -499,7 +362,6 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
             binding.tvTimer.removeCallbacks(it)
             binding.tvTimer.tag = null
         }
-        mRtcEngine.leaveChannelEx(mMainRtcConnection)
     }
 
 

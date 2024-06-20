@@ -259,6 +259,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
     }
 
     private fun startAutoScroll() {
+        if (mGameInfoAdapter.bannerList.isEmpty()) return
         mTimer?.cancel()
         mTimer = Timer()
         mTimer?.schedule(object : TimerTask() {
@@ -280,6 +281,15 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
         mTimer?.cancel()
     }
 
+    override fun onPause() {
+        super.onPause()
+        stopAutoScroll()
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        startAutoScroll()
+    }
 
     /**
      * 轮播图

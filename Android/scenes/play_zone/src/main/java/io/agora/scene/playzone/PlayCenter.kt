@@ -7,10 +7,10 @@ import io.agora.scene.base.api.model.User
 import io.agora.scene.base.manager.UserManager
 
 /**
- * Ktv center
- * ktv 场景全局
+ * Play Zone center
+ * Play Zone 场景全局
  */
-object PlayZoneCenter {
+object PlayCenter {
 
     val mAppId: String get() = BuildConfig.AGORA_APP_ID
 
@@ -45,11 +45,11 @@ object PlayZoneCenter {
             tokenType = TokenGenerator.AgoraTokenType.rtm,
             success = { rtmToken ->
                 mRtmToken = rtmToken
-                PlayZoneLogger.d(TAG, "generate RtmTokens success")
+                PlayLogger.d(TAG, "generate RtmTokens success")
                 callback.invoke(rtmToken, null)
             },
             failure = {
-                PlayZoneLogger.e(TAG, it, "generate RtmToken failed,$it")
+                PlayLogger.e(TAG, it, "generate RtmToken failed,$it")
                 callback.invoke(null, it)
             })
     }
@@ -72,12 +72,12 @@ object PlayZoneCenter {
             genType = TokenGenerator.TokenGeneratorType.token007,
             tokenType = TokenGenerator.AgoraTokenType.rtc,
             success = { rtcToken ->
-                PlayZoneLogger.d(TAG, "generate RtcToken success")
+                PlayLogger.d(TAG, "generate RtcToken success")
                 mRtcToken = rtcToken
                 callback.invoke(mRtcToken, null)
             },
             failure = { exception ->
-                PlayZoneLogger.e(TAG, "generate RtcToken failed, $exception")
+                PlayLogger.e(TAG, "generate RtcToken failed, $exception")
                 callback.invoke(null, exception)
             })
     }

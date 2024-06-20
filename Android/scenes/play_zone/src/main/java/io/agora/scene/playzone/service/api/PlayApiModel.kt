@@ -24,14 +24,6 @@ data class PlayZoneGameBanner constructor(
     var url: String? = null,
 )
 
-data class PlayZoneGameModel constructor(
-    val vendorId:String, // 厂商id
-    val gameType: String, // 游戏类型
-    val gameId: Int,
-    val name: String?,
-    val icon:String?
-)
-
 /**
  * 游戏类型
  *

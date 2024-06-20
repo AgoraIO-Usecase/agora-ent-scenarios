@@ -2,7 +2,7 @@ package io.agora.scene.playzone
 
 import io.agora.scene.base.EntLogger
 
-object PlayZoneLogger {
+object PlayLogger {
 
     private val entLogger = EntLogger(EntLogger.Config("PlayZone"))
 

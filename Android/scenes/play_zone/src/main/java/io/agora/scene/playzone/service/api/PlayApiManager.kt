@@ -10,7 +10,7 @@ import com.google.gson.stream.JsonWriter
 import com.moczul.ok2curl.CurlInterceptor
 import com.moczul.ok2curl.logger.Logger
 import io.agora.rtmsyncmanager.service.callback.AUIException
-import io.agora.scene.playzone.PlayZoneLogger
+import io.agora.scene.playzone.PlayLogger
 import io.agora.scene.playzone.R
 import io.agora.scene.playzone.hall.GameVendor
 import okhttp3.OkHttpClient
@@ -97,7 +97,7 @@ class PlayApiManager {
     }
 
     fun getGameBanner(completion: (error: Exception?, list: List<PlayZoneGameBanner>) -> Unit) {
-        PlayZoneLogger.d(tag, "getSongList start")
+        PlayLogger.d(tag, "getSongList start")
         apiInterface.gameConfig("game")
             .enqueue(object : retrofit2.Callback<PlayZoneCommonResp<PlayZoneGameListModel>> {
                 override fun onResponse(

@@ -30,6 +30,7 @@
     <string name="play_zone_get_game_list_error">获取游戏列表失败</string>
     <string name="play_zone_game_rules">游戏规则</string>
     <string name="play_zone_send_message">发送弹幕</string>
+    <string name="play_zone_content_inspect">监测到当前内容存在违规行为</string>
 
     <string name="play_zone_living_host_end_title">结束游戏</string>
     <string name="play_zone_living_user_end_title">结束玩法</string>
