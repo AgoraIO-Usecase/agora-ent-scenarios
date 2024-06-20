@@ -11,6 +11,7 @@ import io.agora.rtmsyncmanager.SyncManager
 import io.agora.rtmsyncmanager.model.*
 import io.agora.rtmsyncmanager.service.IAUIUserService
 import io.agora.rtmsyncmanager.service.http.HttpManager
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.scene.base.BuildConfig
@@ -141,7 +142,11 @@ class Pure1v1ServiceImp(
         onUserChanged.invoke()
     }
 
-    override fun onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
+    override fun onRoomUserLeave(
+        roomId: String,
+        userInfo: AUIUserInfo,
+        reason: AUIRtmUserLeaveReason
+    ) {
         Log.d(tag, "onRoomUserLeave, roomId:$roomId, userInfo:$userInfo")
         onUserChanged.invoke()
     }

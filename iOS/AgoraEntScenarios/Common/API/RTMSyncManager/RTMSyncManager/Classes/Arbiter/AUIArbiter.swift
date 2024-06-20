@@ -16,7 +16,7 @@ import AgoraRtmKit
             notifyArbiterDidChange()
         }
     }
-    private var arbiterDelegates: NSHashTable<AUIArbiterDelegate> = NSHashTable<AUIArbiterDelegate>()
+    private var arbiterDelegates = NSHashTable<AUIArbiterDelegate>()
     
     deinit {
         aui_info("deinit AUIArbiter", tag: "AUIArbiter")

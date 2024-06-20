@@ -54,15 +54,15 @@ include ':scenes:voice:common'
  */
 include ':scenes:voice_spatial'
 include ':scenes:voice_spatial:common'
-//
-///*
-// * 秀场直播
-// */
-//include ':scenes:show'
-//include ':scenes:show:aars:beauty_sensetime:SenseArSourceManager'
-//include ':scenes:show:aars:beauty_sensetime:STMobileJNI'
-//include ':scenes:show:aars:beauty_sensetime:HardwareBuffer'
-//include ':scenes:show:aars:beauty_bytedance:EffectAAR'
+
+/*
+ * 秀场直播
+ */
+include ':scenes:show'
+include ':scenes:show:aars:beauty_sensetime:SenseArSourceManager'
+include ':scenes:show:aars:beauty_sensetime:STMobileJNI'
+include ':scenes:show:aars:beauty_sensetime:HardwareBuffer'
+include ':scenes:show:aars:beauty_bytedance:EffectAAR'
 
 include ':RTMSyncManager'
 
