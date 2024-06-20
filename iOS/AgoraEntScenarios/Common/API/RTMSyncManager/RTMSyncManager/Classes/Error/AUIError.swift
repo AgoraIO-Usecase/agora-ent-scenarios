@@ -18,12 +18,12 @@ public enum AUICommonError {
     case micSeatNotIdle   //麦位不空闲
     case micSeatAlreadyEnter   //已经上麦过了
     case userNoEnterSeat   //观众未上麦
-    case chooseSongAlreadyExist   //歌曲已经选择过了
-    case chooseSongNotExist   //歌曲已经选择过了
-    case choristerAlreadyExist   //合唱用户已存在
-    case choristerNotExist    //合唱用户不存在
+//    case chooseSongAlreadyExist   //歌曲已经选择过了
+//    case chooseSongNotExist   //歌曲已经选择过了
+//    case choristerAlreadyExist   //合唱用户已存在
+//    case choristerNotExist    //合唱用户不存在
     case noPermission   //无权限
-    case chooseSongIsFail   //选择歌曲失败
+//    case chooseSongIsFail   //选择歌曲失败
     case noResponse    //无响应
     
     public func toNSError() -> NSError {
@@ -52,18 +52,18 @@ public enum AUICommonError {
             return createError(msg: "user already enter seat")
         case .userNoEnterSeat:
             return createError(msg: "user not enter seat")
-        case .chooseSongAlreadyExist:
-            return createError(msg: "already choose song")
-        case .chooseSongNotExist:
-            return createError(msg: "song not exist")
-        case .choristerAlreadyExist:
-            return createError(msg: "chorister already exist")
-        case .choristerNotExist:
-            return createError(msg: "chorister not exist")
+//        case .chooseSongAlreadyExist:
+//            return createError(msg: "already choose song")
+//        case .chooseSongNotExist:
+//            return createError(msg: "song not exist")
+//        case .choristerAlreadyExist:
+//            return createError(msg: "chorister already exist")
+//        case .choristerNotExist:
+//            return createError(msg: "chorister not exist")
         case .noPermission:
             return createError(msg: "no permission")
-        case .chooseSongIsFail:
-            return createError(msg: "choost song model fail")
+//        case .chooseSongIsFail:
+//            return createError(msg: "choost song model fail")
         case .noResponse:
             return createError(msg: "no response")
         default:

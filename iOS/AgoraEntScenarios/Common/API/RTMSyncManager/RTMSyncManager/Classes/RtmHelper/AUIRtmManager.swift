@@ -132,7 +132,7 @@ extension AUIRtmManager {
         aui_info("presence whoNow '\(channelName)'", tag: "AUIRtmManager")
     }
     
-    public func whoNow(channelName: String, completion:@escaping (Error?, [[String: String]]?)->()) {
+    public func whoNow(channelName: String, completion:@escaping (NSError?, [[String: String]]?)->()) {
         guard let presence = rtmClient.getPresence() else {
             completion(AUICommonError.rtmError(-1).toNSError(), nil)
             return
@@ -152,7 +152,7 @@ extension AUIRtmManager {
     
     public func setPresenceState(channelName: String, 
                                  attr:[String: Any],
-                                 completion: @escaping (Error?)->()) {
+                                 completion: @escaping (NSError?)->()) {
         guard let presence = rtmClient.getPresence() else {
             completion(AUICommonError.rtmError(-1).toNSError())
             return

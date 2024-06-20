@@ -10,7 +10,7 @@ import YYModel
 
 @objc open class AUIUserServiceImpl: NSObject {
     public private(set) var userList: [AUIUserInfo] = []
-    private var respDelegates: NSHashTable<AnyObject> = NSHashTable<AnyObject>.weakObjects()
+    private var respDelegates = NSHashTable<AUIUserRespDelegate>.weakObjects()
     private var channelName: String
     private let rtmManager: AUIRtmManager
     
@@ -52,7 +52,6 @@ extension AUIUserServiceImpl: AUIRtmUserProxyDelegate {
             if oldUser.muteAudio != user.muteAudio {
                 oldUser.muteAudio = user.muteAudio
                 self.respDelegates.allObjects.forEach { obj in
-                    guard let obj = obj as? AUIUserRespDelegate else {return}
                     obj.onUserAudioMute(userId: userId, mute: user.muteAudio)
                 }
             }
@@ -60,7 +59,6 @@ extension AUIUserServiceImpl: AUIRtmUserProxyDelegate {
             if oldUser.muteVideo != user.muteVideo {
                 oldUser.muteVideo = user.muteVideo
                 self.respDelegates.allObjects.forEach { obj in
-                    guard let obj = obj as? AUIUserRespDelegate else {return}
                     obj.onUserVideoMute(userId: userId, mute: user.muteVideo)
                 }
             }
@@ -68,7 +66,6 @@ extension AUIUserServiceImpl: AUIRtmUserProxyDelegate {
         
         self.userList.replaceSubrange(idx...idx, with: [user])
         self.respDelegates.allObjects.forEach { obj in
-            guard let obj = obj as? AUIUserRespDelegate else {return}
             obj.onRoomUserUpdate(roomId: channelName, userInfo: user)
         }
     }
@@ -80,7 +77,6 @@ extension AUIUserServiceImpl: AUIRtmUserProxyDelegate {
             return
         }
         self.respDelegates.allObjects.forEach { obj in
-            guard let obj = obj as? AUIUserRespDelegate else {return}
             self.userList = users
             obj.onRoomUserSnapshot(roomId: channelName, userList: users)
         }
@@ -98,7 +94,6 @@ extension AUIUserServiceImpl: AUIRtmUserProxyDelegate {
         user.userId = userId
         self.userList.append(user)
         self.respDelegates.allObjects.forEach { obj in
-            guard let obj = obj as? AUIUserRespDelegate else {return}
             obj.onRoomUserEnter(roomId: channelName, userInfo: user)
         }
     }
@@ -108,7 +103,6 @@ extension AUIUserServiceImpl: AUIRtmUserProxyDelegate {
         let user = userList.filter({$0.userId == userId}).first ?? AUIUserInfo.yy_model(withJSON: userInfo)!
         self.userList = userList.filter({$0.userId != userId})
         self.respDelegates.allObjects.forEach { obj in
-            guard let obj = obj as? AUIUserRespDelegate else {return}
             obj.onRoomUserLeave(roomId: channelName, userInfo: user, reason: reason)
         }
     }
@@ -118,7 +112,6 @@ extension AUIUserServiceImpl: AUIRtmUserProxyDelegate {
         let user = userList.filter({$0.userId == userId}).first ?? AUIUserInfo.yy_model(withJSON: userInfo)!
         self.userList = userList.filter({$0.userId != userId})
         self.respDelegates.allObjects.forEach { obj in
-            guard let obj = obj as? AUIUserRespDelegate else {return}
             obj.onUserBeKicked(roomId: channelName, userId: user.userId)
         }
     }
@@ -184,7 +177,6 @@ extension AUIUserServiceImpl: AUIUserServiceDelegate {
             
             //自己状态不会更新，在这里手动回调
             self.respDelegates.allObjects.forEach { obj in
-                guard let obj = obj as? AUIUserRespDelegate else {return}
                 obj.onUserAudioMute(userId: currentUserId, mute: isMute)
             }
         }
@@ -208,7 +200,6 @@ extension AUIUserServiceImpl: AUIUserServiceDelegate {
             
             //自己状态不会更新，在这里手动回调
             self.respDelegates.allObjects.forEach { obj in
-                guard let obj = obj as? AUIUserRespDelegate else {return}
                 obj.onUserVideoMute(userId: currentUserId, mute: isMute)
             }
         }
