@@ -23,7 +23,7 @@ extension AUIListCollection {
         if let filter = filter,
            filter.isEmpty == false,
            let _ = getItemIndexes(array: currentList, filter: filter) {
-            callback?(AUICollectionOperationError.filterNotFound.toNSError("list rtmAddMetaData: '\(filter)'"))
+            callback?(AUICollectionOperationError.filterFoundSame.toNSError("list rtmAddMetaData: '\(filter)'"))
             return
         }
         
@@ -517,12 +517,11 @@ extension AUIListCollection {
 //MARK: override AUIRtmMessageProxyDelegate
 extension AUIListCollection {
     public override func onMessageReceive(publisher: String, channelName: String, message: String) {
-        guard let map = decodeToJsonObj(message) as? [String: Any],
-              let collectionMessage: AUICollectionMessage = decodeModel(map),
+        guard let collectionMessage: AUICollectionMessage = decodeModel(jsonStr: message),
               collectionMessage.sceneKey == observeKey else {
             return
         }
-        aui_collection_log("onMessageReceive: \(map)")
+        aui_collection_log("onMessageReceive: \(message)")
         let uniqueId = collectionMessage.uniqueId
         let channelName = collectionMessage.channelName
         guard channelName == self.channelName else {return}
