@@ -25,6 +25,7 @@ class PKService(
                 msg.content,
                 PKInfo::class.java
             )
+            AUILogger.logger().d(tag, "onPKUpdated from message: $pkInfo")
             if (pkInfo != null) {
                 observerHelper.notifyEventHandlers {
                     it.invoke(pkInfo)
@@ -35,6 +36,7 @@ class PKService(
 
     private val roomPresenceSubscriber = RoomPresenceSubscriber(
         onUpdate = { info: RoomPresenceInfo ->
+            AUILogger.logger().d(tag, "onRoomPresenceUpdated: $info")
 
             // 被PK方 -> 发起PK方
             if (info.roomId != channelName) {
@@ -179,7 +181,7 @@ class PKService(
         },
         onDelete = {
             val interactionInfo = interactionService.getInteractionInfo()
-            if(interactionInfo?.type == InteractionType.PK && it.interactorId == interactionInfo.userId){
+            if (interactionInfo?.type == InteractionType.PK && it.ownerId == interactionInfo.userId) {
                 interactionService.stopInteraction()
                 roomPresenceService.updateRoomPresenceInfo(
                     channelName,
@@ -229,6 +231,7 @@ class PKService(
         messageRetainer.sendMessage(
             GsonTools.beanToString(pkInfo) ?: "",
             roomPresenceInfo.ownerId,
+            roomPresenceInfo.roomId,
             success = {
                 AUILogger.logger().d(tag, "[${pkInfo.id}] invitePK >> sendMessage success")
                 success.invoke(pkInfo)
@@ -270,6 +273,7 @@ class PKService(
         messageRetainer.sendMessage(
             GsonTools.beanToString(pkInfo.copy(type = PKType.ACCEPT)) ?: "",
             pkInfo.fromUserId,
+            pkInfo.fromRoomId,
             success = {
                 AUILogger.logger().d(tag, "[$pkId] acceptPK >> sendMessage success")
                 AUILogger.logger().d(tag, "[$pkId] acceptPK >> updateRoomPresenceInfo : interactorId=${pkInfo.fromUserId}, interactorName=${pkInfo.fromUserName}")
@@ -321,7 +325,8 @@ class PKService(
         AUILogger.logger().d(tag, "[$pkId] rejectPK >> sendMessage : $pkInfo")
         messageRetainer.sendMessage(
             GsonTools.beanToString(pkInfo) ?: "",
-            pkInfo.userId,
+            pkInfo.fromUserId,
+            pkInfo.fromRoomId,
             success = {
                 AUILogger.logger().d(tag, "[$pkId] rejectPK >> sendMessage success")
                 messageRetainer.removeMessage(message.id)
