@@ -4,6 +4,7 @@ import androidx.annotation.IntDef
 import io.agora.rtmsyncmanager.SyncManager
 import io.agora.rtmsyncmanager.model.AUIRoomContext
 import io.agora.rtmsyncmanager.service.collection.AUIAttributesModel
+import io.agora.rtmsyncmanager.service.collection.AUICollectionException
 import io.agora.rtmsyncmanager.service.collection.AUIMapCollection
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
@@ -46,7 +47,7 @@ class InteractionService(
                         info.userName
                     )
                 }
-                if (info == null) {
+                if (info == null || info.type == InteractionType.IDLE) {
                     roomPresenceService.updateRoomPresenceInfo(
                         channelName,
                         RoomPresenceStatus.IDLE
@@ -102,8 +103,43 @@ class InteractionService(
         val roomOwner = AUIRoomContext.shared().isRoomOwner(channelName)
         AUILogger.logger().d(tag, "init >> isRoomOwner: $roomOwner")
 
-        syncManager.getScene(channelName)?.getCollection(key, mapCollectionCreator)
-            ?.subscribeAttributesDidChanged(delegate)
+        val collection = syncManager.getScene(channelName)?.getCollection(key, mapCollectionCreator)
+        collection?.subscribeAttributesDidChanged(delegate)
+
+        collection?.subscribeWillAdd { publisherId, valueCmd, value ->
+                val newInfo = GsonTools.toBeanSafely(
+                    value,
+                    InteractionInfo::class.java
+                )
+                val currInfo = collection.getLocalMetaData().getMap()?.let {
+                    GsonTools.toBeanSafely(
+                        it,
+                        InteractionInfo::class.java
+                    )
+                }
+                AUILogger.logger().d(tag, "subscribeWillAdd : publisherId=$publisherId, valueCmd=$valueCmd, value=$value, newInfo=$newInfo, currInfo=$currInfo")
+                when (valueCmd) {
+                    InteractionCmd.START_PK.value, InteractionCmd.START_LINKING.value -> {
+                        if (currInfo == null || currInfo.type == InteractionType.IDLE) {
+                            return@subscribeWillAdd null
+                        }
+                        return@subscribeWillAdd AUICollectionException.ErrorCode.unknown.toException(
+                            -1,
+                            "interaction already started"
+                        )
+                    }
+                    InteractionCmd.STOP.value -> {
+                        if(currInfo?.userId == newInfo?.userId || AUIRoomContext.shared().isRoomOwner(channelName, newInfo?.userId)){
+                            return@subscribeWillAdd null
+                        }
+                        return@subscribeWillAdd AUICollectionException.ErrorCode.unknown.toException(
+                            -1,
+                            "interaction already stopped or not allowed to stop"
+                        )
+                    }
+                }
+                return@subscribeWillAdd null
+            }
 
         if (roomOwner) {
             syncManager.rtmManager.subscribeUser(userObserver)
@@ -117,8 +153,13 @@ class InteractionService(
         success: ((InteractionInfo) -> Unit)? = null,
         failure: ((Throwable) -> Unit)? = null
     ) {
-        if (interactionInfo != null) {
-            AUILogger.logger().d(tag, "startPKInteraction: interaction already started")
+        if (interactionInfo?.type == InteractionType.LINKING) {
+            AUILogger.logger().d(tag, "startPKInteraction: linking interaction already started -- $interactionInfo")
+            failure?.invoke(RuntimeException("interaction already started"))
+            return
+        }
+        if (interactionInfo?.type == InteractionType.PK) {
+            AUILogger.logger().d(tag, "startPKInteraction: pk interaction already started -- $interactionInfo")
             failure?.invoke(RuntimeException("interaction already started"))
             return
         }
@@ -137,7 +178,7 @@ class InteractionService(
         )
         AUILogger.logger().d(tag, "startPKInteraction: $info")
         scene.getCollection(key, mapCollectionCreator).addMetaData(
-            "startPKInteraction",
+            InteractionCmd.START_PK.value,
             GsonTools.beanToMap(info),
         ) {
             AUILogger.logger().d(tag, "startPKInteraction complete : $it")
@@ -145,6 +186,7 @@ class InteractionService(
                 failure?.invoke(RuntimeException(it))
                 return@addMetaData
             }
+            this.interactionInfo = info
             success?.invoke(info)
         }
     }
@@ -154,8 +196,13 @@ class InteractionService(
         success: ((InteractionInfo) -> Unit)? = null,
         failure: ((Throwable) -> Unit)? = null
     ) {
-        if (interactionInfo != null) {
-            AUILogger.logger().d(tag, "startLinkingInteraction: interaction already started")
+        if (interactionInfo?.type == InteractionType.LINKING) {
+            AUILogger.logger().d(tag, "startLinkingInteraction: linking interaction already started -- $interactionInfo")
+            failure?.invoke(RuntimeException("interaction already started"))
+            return
+        }
+        if (interactionInfo?.type == InteractionType.PK) {
+            AUILogger.logger().d(tag, "startLinkingInteraction: pk interaction already started -- $interactionInfo")
             failure?.invoke(RuntimeException("interaction already started"))
             return
         }
@@ -173,10 +220,15 @@ class InteractionService(
         }
 
         val info =
-            InteractionInfo(userId = userId, userName = userInfo.userName, roomId = channelName)
+            InteractionInfo(
+                type = InteractionType.LINKING,
+                userId = userId,
+                userName = userInfo.userName,
+                roomId = channelName
+            )
         AUILogger.logger().d(tag, "startLinkingInteraction: $info")
         scene.getCollection(key, mapCollectionCreator).addMetaData(
-            "startLinkingInteraction",
+            InteractionCmd.START_LINKING.value,
             GsonTools.beanToMap(info),
         ) {
             AUILogger.logger().d(tag, "startLinkingInteraction complete : $it")
@@ -184,6 +236,7 @@ class InteractionService(
                 failure?.invoke(RuntimeException(it))
                 return@addMetaData
             }
+            this.interactionInfo = info
             success?.invoke(info)
         }
     }
@@ -193,6 +246,17 @@ class InteractionService(
         success: (() -> Unit)? = null,
         failure: ((Throwable) -> Unit)? = null
     ) {
+        if (interactionInfo == null) {
+            AUILogger.logger().d(tag, "stopInteraction: no interaction started")
+            failure?.invoke(RuntimeException("interaction already started"))
+            return
+        }
+        if (interactionInfo?.type == InteractionType.IDLE) {
+            AUILogger.logger().d(tag, "stopInteraction: the interaction type is idle -- $interactionInfo")
+            failure?.invoke(RuntimeException("interaction already started"))
+            return
+        }
+
         val scene = syncManager.getScene(channelName)
         if (scene == null) {
             AUILogger.logger().d(tag, "stopInteraction: scene not found")
@@ -200,17 +264,29 @@ class InteractionService(
             return
         }
         AUILogger.logger().d(tag, "stopInteraction")
-        scene.getCollection(key, mapCollectionCreator).cleanMetaData {
+        val info = InteractionInfo(userId = AUIRoomContext.shared().currentUserInfo.userId)
+        scene.getCollection(key, mapCollectionCreator).addMetaData(
+            InteractionCmd.STOP.value,
+            GsonTools.beanToMap(info),
+        ) {
             AUILogger.logger().d(tag, "stopInteraction complete : $it")
             if (it != null) {
                 failure?.invoke(RuntimeException(it))
-                return@cleanMetaData
+                return@addMetaData
             }
             success?.invoke()
         }
     }
 
-    fun getInteractionInfo(): InteractionInfo? = interactionInfo
+    fun getInteractionInfo(): InteractionInfo?  {
+        interactionInfo = syncManager.getScene(channelName)?.getCollection(key, mapCollectionCreator)?.getLocalMetaData()?.getMap()?.let {
+            GsonTools.toBeanSafely(
+                it,
+                InteractionInfo::class.java
+            )
+        }
+        return interactionInfo
+    }
 
     fun getLatestInteractionInfo(
         success: (InteractionInfo?) -> Unit,
@@ -264,18 +340,25 @@ class InteractionService(
     }
 }
 
-@IntDef(InteractionType.LINKING, InteractionType.PK)
+@IntDef(InteractionType.IDLE, InteractionType.LINKING, InteractionType.PK)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class InteractionType {
     companion object {
+        const val IDLE = 0
         const val LINKING = 1
         const val PK = 2
     }
 }
 
 data class InteractionInfo constructor(
-    @InteractionType val type: Int = InteractionType.LINKING,
-    val userId: String, // 互动者ID
-    val userName: String, // 互动者用户名
-    val roomId: String, // 互动者所在房间ID
+    @InteractionType val type: Int = InteractionType.IDLE,
+    val userId: String = "", // 互动者ID
+    val userName: String = "", // 互动者用户名
+    val roomId: String = "", // 互动者所在房间ID
 )
+
+enum class InteractionCmd(val value: String) {
+    START_PK("startPKInteraction"),
+    START_LINKING("startLinkingInteraction"),
+    STOP("stopInteraction")
+}

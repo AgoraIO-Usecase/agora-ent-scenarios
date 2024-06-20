@@ -15,14 +15,18 @@ android {
         exclude 'lib/*/libagora_face_capture_extension.so'
         exclude 'lib/*/libagora_face_detection_extension.so'
         exclude 'lib/*/libagora_video_av1_decoder_extension.so'
-    }
 
-    buildTypes {
-        release {
-            minifyEnabled true
-            shrinkResources true
+        if (BEAUTY_RESOURCE != "") {
+            exclude 'lib/*/libeffect.so'
         }
     }
+
+//    buildTypes {
+//        release {
+//            minifyEnabled true
+//            shrinkResources true
+//        }
+//    }
 
     lint {
         baseline = file("lint-baseline.xml")

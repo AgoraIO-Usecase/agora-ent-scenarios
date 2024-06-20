@@ -66,8 +66,8 @@ class APIReporter(
     }
 
     fun endDurationEvent(name: String, ext: Map<String, Any>) {
-        Log.d(tag, "endDurationEvent: $name")
         val beginTs = durationEventStartMap[name] ?: return
+        Log.d(tag, "endDurationEvent: $name")
         durationEventStartMap.remove(name)
         val ts = getCurrentTs()
         val cost = (ts - beginTs).toInt()

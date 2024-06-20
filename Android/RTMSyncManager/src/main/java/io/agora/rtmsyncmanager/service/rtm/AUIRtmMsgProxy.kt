@@ -2,6 +2,7 @@ package io.agora.rtmsyncmanager.service.rtm
 
 import android.text.TextUtils
 import android.util.Log
+import io.agora.rtm.LinkStateEvent
 import io.agora.rtm.LockDetail
 import io.agora.rtm.LockEvent
 import io.agora.rtm.MessageEvent
@@ -23,6 +24,12 @@ interface AUIRtmErrorRespObserver {
      * @param channelName The name of the channel.
      */
     fun onTokenPrivilegeWillExpire(channelName: String?)
+
+    /**
+     * Called when the link state changes.
+     * @param event The link state event.
+     */
+    fun onLinkStateEvent(event: LinkStateEvent?) {}
 
     /**
      * Called when the network state changes.
@@ -57,6 +64,11 @@ interface AUIRtmAttributeRespObserver {
  */
 interface AUIRtmMessageRespObserver {
     fun onMessageReceive(channelName: String, publisherId: String, message: String)
+}
+
+enum class AUIConnectionState(val value: Int) {
+    CONNECTED(0),
+    DISCONNECTED(1)
 }
 
 /**
@@ -381,6 +393,15 @@ class AUIRtmMsgProxy : RtmEventListener {
             lockRespObservers.forEach { observer ->
                 observer.onReleaseLock(event.channelName, lockDetail.lockName, lockDetail.lockOwner, event.eventType == RtmConstants.RtmLockEventType.EXPIRED)
             }
+        }
+    }
+
+    override fun onLinkStateEvent(event: LinkStateEvent?) {
+        super.onLinkStateEvent(event)
+        AUILogger.logger().d(tag, "rtm -- link state event: currentState=${event?.currentState}, event: $event")
+
+        errorRespObservers.forEach {
+            it.onLinkStateEvent(event)
         }
     }
 
