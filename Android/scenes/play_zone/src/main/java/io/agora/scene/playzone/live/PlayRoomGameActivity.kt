@@ -487,6 +487,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     override fun onDestroy() {
         super.onDestroy()
         gameViewModel.destroyMG()
+        // TODO: 日志上传
 //        if (SceneConfigManager.logUpload) {
 //            LogUploader.uploadLog(LogUploader.SceneType.JOY)
 //        }
