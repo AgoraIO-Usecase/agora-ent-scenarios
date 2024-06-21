@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.SurfaceView
+import android.view.TextureView
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
@@ -59,7 +60,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
     private var isFinishToLiveDetail = false
 
-    private var view: SurfaceView? = null
+    private var view: View? = null
 
     override fun getViewBinding(inflater: LayoutInflater): ShowLivePrepareActivityBinding {
         return ShowLivePrepareActivityBinding.inflate(inflater)
@@ -118,12 +119,23 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             binding.statusPrepareViewLrc.isVisible = false
             // 美颜资源文件已放在assets目录内
             BeautyManager.initialize(this@LivePrepareActivity, mRtcEngine)
-            BeautyManager.setupLocalVideo(SurfaceView(this@LivePrepareActivity).apply {
+
+            val videoView = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                SurfaceView(this@LivePrepareActivity)
+            } else {
+                TextureView(this@LivePrepareActivity)
+            }
+            BeautyManager.setupLocalVideo(videoView.apply {
                 binding.flVideoContainer.addView(this)
             }, Constants.RENDER_MODE_HIDDEN)
         } else {
             // 设置preview视图
-            mRtcEngine.setupLocalVideo(VideoCanvas(SurfaceView(this@LivePrepareActivity).apply {
+            val videoView = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                SurfaceView(this@LivePrepareActivity)
+            } else {
+                TextureView(this@LivePrepareActivity)
+            }
+            mRtcEngine.setupLocalVideo(VideoCanvas(videoView.apply {
                 view = this
                 binding.flVideoContainer.addView(this)
             }))
