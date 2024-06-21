@@ -62,12 +62,14 @@ public class ShowSyncManagerServiceImp: NSObject {
 //MARK: private
 extension ShowSyncManagerServiceImp {
     private func interactionEnter(roomId: String, roomName: String) {
+        interactionManager.subscribe(channelName: roomId, delegate: self)
         interactionManager.enterScene(channelName: roomId, roomName: roomName)
         let msgManager = interactionManager.getMessageManager(channelName: roomId, key: "chatMessage")
         msgManager.subscribe(delegate: self)
     }
     
     private func interactionLeave(roomId: String) {
+        interactionManager.unsubscribe(channelName: roomId, delegate: self)
         let msgManager = interactionManager.getMessageManager(channelName: roomId, key: "chatMessage")
         msgManager.unsubscribe(delegate: self)
         interactionManager.leaveScene(channelName: roomId)
