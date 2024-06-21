@@ -86,10 +86,6 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         mPlayServiceProtocol.subscribeListener(serviceListenerProtocol)
     }
 
-    private val channelMediaOption by lazy {
-        ChannelMediaOptions()
-    }
-
     private fun initRtcEngine() {
         val rtcAppId = PlayCenter.mAppId
         if (TextUtils.isEmpty(rtcAppId)) {
@@ -129,16 +125,17 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         // ------------------ 加入频道 ------------------
         mRtcEngine?.apply {
             enableAudio()
-            channelMediaOption.clientRoleType =
-                if (isRoomOwner) Constants.CLIENT_ROLE_BROADCASTER else Constants.CLIENT_ROLE_AUDIENCE
+            val channelMediaOption = ChannelMediaOptions()
+            channelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
             channelMediaOption.autoSubscribeAudio = true
-            channelMediaOption.publishMicrophoneTrack = isRoomOwner
+            channelMediaOption.publishMicrophoneTrack = true
             val ret =
                 joinChannel(PlayCenter.mRtcToken, mRoomInfo.roomId, PlayCenter.mUser.id.toInt(), channelMediaOption)
             if (ret != Constants.ERR_OK) {
                 PlayLogger.e(TAG, "joinRTC() called error: $ret")
             }
         }
+        muteMic(!isRoomOwner)
 
         // ------------------ 开启语音鉴定服务 ------------------
         AudioModeration.moderationAudio(mRoomInfo.roomId,
@@ -203,17 +200,6 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
     // mute mic
     fun muteMic(mute: Boolean) {
         PlayLogger.d(TAG, "RoomLivingViewModel.mute() called mute:$mute")
-        if (isRoomOwner) {
-            mRtcEngine?.muteLocalAudioStream(mute)
-        } else {
-            if (mute) {
-                channelMediaOption.publishMicrophoneTrack = true
-                channelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
-            } else {
-                channelMediaOption.publishMicrophoneTrack = false
-                channelMediaOption.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-            }
-            mRtcEngine?.updateChannelMediaOptions(channelMediaOption)
-        }
+        mRtcEngine?.muteLocalAudioStream(mute)
     }
 }

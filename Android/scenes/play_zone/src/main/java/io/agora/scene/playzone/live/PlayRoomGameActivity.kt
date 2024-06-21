@@ -149,9 +149,9 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         binding.ivMore.setOnClickListener {
             TopFunctionDialog(this).show()
         }
-        binding.tvRules.setOnClickListener {
-            showRulesDialog()
-        }
+//        binding.tvRules.setOnClickListener {
+//            showRulesDialog()
+//        }
         binding.tvInput.setOnClickListener {
             showKeyboardInputLayout()
         }
@@ -173,6 +173,8 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
                 gameViewModel.addRobot()
             }
         }
+
+        binding.cbMic.isChecked = roomGameViewModel.isRoomOwner
         binding.cbMic.setOnCheckedChangeListener { compoundButton, isChecked ->
             if (compoundButton.isPressed) return@setOnCheckedChangeListener
             if (isChecked) {
@@ -222,14 +224,10 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     override fun requestData() {
         super.requestData()
 
-        if (roomGameViewModel.isRoomOwner) {
-            mToggleAudioRun = Runnable {
-                roomGameViewModel.initData()
-            }
-            requestRecordPermission()
-        } else {
+        mToggleAudioRun = Runnable {
             roomGameViewModel.initData()
         }
+        requestRecordPermission()
         val gameId = roomGameViewModel.mRoomInfo.customPayload[PlayZoneParameters.GAME_ID] as? Long ?: 0L
         gameViewModel.switchGame(this, roomGameViewModel.mRoomInfo.roomId, gameId)
 
@@ -251,9 +249,6 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
                 }
             }
         }
-        gameViewModel.gameLocalPlayerInLiveData.observe(this) {
-            binding.cbMic.isVisible = it
-        }
         gameViewModel.captainIdLiveData.observe(this) {
             binding.ivAddBot.isVisible = it.first == PlayCenter.mUser.id.toString() && it.second
         }
@@ -266,12 +261,12 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         }
         roomGameViewModel.roomExpireLiveData.observe(this) { roomExpire ->
             if (roomExpire) {
-                showLivingEndLayout(false)
+                showTimeUpExitDialog()
             }
         }
         roomGameViewModel.roomDestroyLiveData.observe(this) { roomDestroy ->
             if (roomDestroy) {
-                showLivingEndLayout(false)
+                showCreatorExitDialog()
             }
         }
         roomGameViewModel.mRobotListLiveData.observe(this) { robotList ->
@@ -300,21 +295,36 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
      *  游戏规则
      *
      */
-    private fun showRulesDialog() {
-        // TODO:
-        val gameInfo = PlayGameInfoModel()
-        val bundle = Bundle().apply {
-            putSerializable(PlayGameRulesDialog.Key_Game, gameInfo)
-            putBoolean(PlayGameRulesDialog.Key_IsOwner, roomGameViewModel.isRoomOwner)
-        }
-        val dialog = PlayGameRulesDialog().apply {
-            setBundleArgs(bundle)
-        }
-        dialog.show(supportFragmentManager, "rulesDialog")
+//    private fun showRulesDialog() {
+//        // TODO:
+//        val gameInfo = PlayGameInfoModel()
+//        val bundle = Bundle().apply {
+//            putSerializable(PlayGameRulesDialog.Key_Game, gameInfo)
+//            putBoolean(PlayGameRulesDialog.Key_IsOwner, roomGameViewModel.isRoomOwner)
+//        }
+//        val dialog = PlayGameRulesDialog().apply {
+//            setBundleArgs(bundle)
+//        }
+//        dialog.show(supportFragmentManager, "rulesDialog")
+//    }
+
+    private fun showCreatorExitDialog() {
+        val title = R.string.play_zone_living_destroy_title
+        val message = R.string.play_zone_living_destroy_content
+        AlertDialog.Builder(this, R.style.play_zone_alert_dialog)
+            .setTitle(title)
+            .setMessage(message)
+            .setCancelable(false)
+            .setPositiveButton(R.string.i_know) { dialog, _ ->
+                dialog.dismiss()
+                finish()
+            }
+            .show()
     }
 
-    private fun showLivingEndLayout(abnormal: Boolean) {
-        val title = if (abnormal) R.string.play_zone_living_abnormal_title else R.string.play_zone_living_timeout_title
+
+    private fun showTimeUpExitDialog() {
+        val title = R.string.play_zone_living_timeout_title
         val message =
             if (roomGameViewModel.isRoomOwner) R.string.play_zone_living_host_timeout else R.string.play_zone_living_user_timeout
         AlertDialog.Builder(this, R.style.play_zone_alert_dialog)
@@ -362,9 +372,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     override fun onBackPressed() {
         if (showNormalInputLayout()) return
 
-        // 注意：需要保证页面销毁之前，先调用游戏的销毁方法
-        // 如果有其他地方调用finish()，那么也要在finish()之前，先调用游戏的销毁方法
-        gameViewModel.destroyMG()
+
         showEndRoomDialog()
     }
 
@@ -374,8 +382,8 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         gameViewModel.destroyMG()
+        super.onDestroy()
         // TODO: 日志上传
 //        if (SceneConfigManager.logUpload) {
 //            LogUploader.uploadLog(LogUploader.SceneType.JOY)
