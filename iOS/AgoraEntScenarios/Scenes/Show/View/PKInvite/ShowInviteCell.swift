@@ -117,7 +117,7 @@ class ShowPKInviteViewCell: ShowInviteCell {
             }
             
             guard let info = pkUser else { return }
-            avatarImageView.sd_setImage(with: URL(string: info.ownerAvatar ?? ""),
+            avatarImageView.sd_setImage(with: URL(string: info.ownerAvatar),
                                         placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
             nameLabel.text = info.ownerName
         }
@@ -137,9 +137,9 @@ class ShowPKInviteViewCell: ShowInviteCell {
     }
     
     private func _refreshPKStatus() {
-        var stauts: ShowPKInviteStatus = (pkUser?.interactStatus.isInteracting ?? false) ? .interacting : .invite
+        var stauts: ShowPKInviteStatus = (pkUser?.status.isInteracting ?? false) ? .interacting : .invite
         if stauts == .invite {
-            stauts = pkInvitation?.status == .waitting ? .waitting : .invite
+            stauts = pkInvitation?.type == .inviting ? .waitting : .invite
         }
         pkStatus = stauts
     }
@@ -147,11 +147,14 @@ class ShowPKInviteViewCell: ShowInviteCell {
     @objc
     fileprivate override func onTapStatusButton(sender: UIButton) {
         super.onTapStatusButton(sender: sender)
-        guard let invitation = pkUser, invitation.interactStatus == .idle else {
+        guard let roomId = roomId,
+              let invitation = pkUser,
+              invitation.status == .idle else {
             return
         }
 
-        AppContext.showServiceImp(roomId!)?.createPKInvitation(room: invitation) {[weak self] error in
+        AppContext.showServiceImp()?.createPKInvitation(roomId: roomId,
+                                                        pkRoomId: invitation.roomId) {[weak self] error in
             if let err = error {
                 ToastView.show(text: err.localizedDescription)
                 return
@@ -173,8 +176,14 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
             seatApplyModel = model
             nameLabel.text = model.userName
             statusButton.tag = 1
-            avatarImageView.sd_setImage(with: URL(string: model.avatar ?? ""),
+            avatarImageView.sd_setImage(with: URL(string: model.userAvatar),
                                         placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
+            #if DEBUG
+            statusButton.isUserInteractionEnabled = true
+            statusButton.setTitle("show_onseat_agree".show_localized, for: .normal)
+            statusButton.setBackgroundImage(UIImage.show_sceneImage(name: "show_invite_btn_bg"), for: .normal)
+            statusButton.setTitleColor(.white, for: .normal)
+            #else
             switch model.status {
             case .accepted:
                 statusButton.isUserInteractionEnabled = false
@@ -190,14 +199,20 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
                 
             default: break
             }
+            #endif
             
         } else if let model = model as? ShowUser {
             seatInvitationModel = model
             nameLabel.text = model.userName
             statusButton.tag = 2
-            avatarImageView.sd_setImage(with: URL(string: model.avatar ?? ""),
+            avatarImageView.sd_setImage(with: URL(string: model.userAvatar),
                                         placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
-
+#if DEBUG
+            statusButton.setTitle("show_application".show_localized, for: .normal)
+            statusButton.setBackgroundImage(UIImage.show_sceneImage(name: "show_invite_btn_bg"), for: .normal)
+            statusButton.setTitleColor(.white, for: .normal)
+            statusButton.isUserInteractionEnabled = true
+#else
             switch model.status {
             case .waitting:
                 statusButton.isUserInteractionEnabled = false
@@ -211,6 +226,7 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
                 statusButton.setTitleColor(.white, for: .normal)
                 statusButton.isUserInteractionEnabled = true
             }
+#endif
         }
     }
     
@@ -245,12 +261,13 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
     @objc
     fileprivate override func onTapStatusButton(sender: UIButton) {
         super.onTapStatusButton(sender: sender)
+        guard let roomId = roomId else {return}
         if let model = seatApplyModel, sender.tag == 1 {
-            AppContext.showServiceImp(roomId!)?.acceptMicSeatApply(apply: model) {[weak self] _ in
+            AppContext.showServiceImp()?.acceptMicSeatApply(roomId: roomId, userId: model.userId) {[weak self] _ in
                 self?.refreshDataClosure?()
             }
         } else if let model = seatInvitationModel {
-            AppContext.showServiceImp(roomId!)?.createMicSeatInvitation(user: model) {[weak self] error in
+            AppContext.showServiceImp()?.createMicSeatInvitation(roomId: roomId, userId: model.userId) {[weak self] error in
                 if let err = error {
                     ToastView.show(text: err.localizedDescription)
                     return

@@ -91,8 +91,9 @@ class ShowApplyView: UIView {
     }
     
     func getAllMicSeatList(autoApply: Bool) {
-        var imp = AppContext.showServiceImp(roomId)
-        imp?.getAllMicSeatApplyList {[weak self] _, list in
+        var imp = AppContext.showServiceImp()
+        let channelName = roomId ?? ""
+        imp?.getAllMicSeatApplyList(roomId: channelName) {[weak self] _, list in
             guard let list = list?.filter({ $0.userId != self?.interactionModel?.userId }) else { return }
             let seatUserModel = list.filter({ $0.userId == VLUserCenter.user.id }).first
             var updateRevokeButton = false
@@ -100,7 +101,7 @@ class ShowApplyView: UIView {
                 updateRevokeButton = true
             } else if seatUserModel == nil, autoApply, self?.interactionModel?.userId != VLUserCenter.user.id {
                 updateRevokeButton = true
-                imp?.createMicSeatApply { error in
+                imp?.createMicSeatApply(roomId: channelName) { error in
                     if let error = error {
                         self?.revokeutton.isHidden = true
                         ToastView.show(text: error.localizedDescription)
@@ -193,13 +194,13 @@ class ShowApplyView: UIView {
     private func onTapRevokeButton(sender: AGEButton) {
         if sender.tag == 0, let dataArray = tableView.dataArray, dataArray.count > 0 {
 //            revokeutton.isHidden = true
-            AppContext.showServiceImp(roomId)?.cancelMicSeatApply { _ in }
+            AppContext.showServiceImp()?.cancelMicSeatApply(roomId: roomId) { _ in }
             let index = tableView.dataArray?.firstIndex(where: { ($0 as? ShowMicSeatApply)?.userId == VLUserCenter.user.id }) ?? 0
             tableView.dataArray?.remove(at: index)
             setupTipsInfo(count: dataArray.count)
             self.invokeClosure?()
         } else if let interactionModel = interactionModel {
-            AppContext.showServiceImp(roomId)?.stopInteraction(interaction: interactionModel) { _ in }
+            AppContext.showServiceImp()?.stopInteraction(roomId: roomId) { _ in }
             AlertManager.hiddenView()
         }
     }
@@ -267,7 +268,7 @@ class ShowApplyViewCell: UITableViewCell {
     
     func setupApplyData(model: ShowMicSeatApply, index: Int) {
         sortLabel.text = "\(index + 1)"
-        avatarImageView.sd_setImage(with: URL(string: model.avatar ?? ""),
+        avatarImageView.sd_setImage(with: URL(string: model.userAvatar),
                                     placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
         nameLabel.text = model.userName
         if model.userId == VLUserCenter.user.id {

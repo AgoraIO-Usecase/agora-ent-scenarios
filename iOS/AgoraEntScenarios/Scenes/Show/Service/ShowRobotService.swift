@@ -45,8 +45,12 @@ class ShowRobotService {
         }
     }
     
+    public func isRobotOwner(ownerId: String) -> Bool {
+        return "\(kRobotUid)" == ownerId
+    }
+    
     public func generateRobotRoomsAppend(rooms: [ShowRoomListModel]) -> [ShowRoomListModel] {
-        var dataArray = rooms
+        var dataArray: [ShowRoomListModel] = []
         var robotIds = robotRoomIds
         dataArray.forEach { room in
             let roomId = (Int(room.roomId) ?? 0) - kRobotRoomStartId
@@ -61,13 +65,13 @@ class ShowRobotService {
             let userId = "\(kRobotUid)"
             room.roomName = "Smooth \(robotId)"
             room.roomId = robotRoomId(from: robotId)
-            room.thumbnailId = "1"
             room.ownerId = userId
             room.ownerName = userId
             room.ownerAvatar = robotRoomOwnerHeaders[((Int(robotId) ?? 1) - 1) % robotRoomOwnerHeaders.count]//VLUserCenter.user.headUrl
             room.createdAt = Date().millionsecondSince1970()
             dataArray.append(room)
         }
+        dataArray += rooms
         return dataArray
     }
     private func robotRoomId(from robotId: String) -> String {
