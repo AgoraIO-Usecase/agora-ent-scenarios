@@ -320,7 +320,10 @@ extension ShowSyncManagerServiceImp: ShowServiceProtocol {
     }
     
     func getAllPKUserList(completion: @escaping (NSError?, [ShowPKUserInfo]?) -> Void) {
-        interactionManager.getPKUserList(completion: completion)
+        interactionManager.getPKUserList { err, list in
+            let list = list?.filter({ $0.ownerId != self.user.userId})
+            completion(err, list)
+        }
     }
     
     func createPKInvitation(roomId: String, pkRoomId: String, completion: @escaping (NSError?) -> Void) {
