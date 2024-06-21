@@ -19,12 +19,7 @@ data class PlayCreateRoomModel constructor(
     val gameName: String = "",
 )
 
-data class PlayStartGameInfo constructor(
-    var gameId: String = "", //游戏 id
-    var gameName: String = "",
-) : Serializable
-
-data class RoomRobotInfo constructor(
+data class PlayRobotInfo constructor(
     var gender: String? = null, // 性别 male：男，female：女
     var level: Int = 0, // 机器人等级 1:简单 2:适中 3:困难
     var owner: AUIUserThumbnailInfo? = null,

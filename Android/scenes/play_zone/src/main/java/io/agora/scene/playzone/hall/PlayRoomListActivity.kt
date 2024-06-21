@@ -122,7 +122,6 @@ class PlayRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomListLay
             if (roomInfo == null) {
                 setDarkStatusIcon(isBlackDarkStatus)
             } else {
-                ToastUtils.showToast("加入房间成功")
                 PlayRoomGameActivity.launch(this, roomInfo)
             }
         }

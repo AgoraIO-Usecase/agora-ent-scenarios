@@ -560,5 +560,4 @@ public abstract class BaseGameViewModel implements SudFSMMGListener {
     public SudFSMMGCache getSudFSMMGCache() {
         return sudFSMMGDecorator.getSudFSMMGCache();
     }
-
 }

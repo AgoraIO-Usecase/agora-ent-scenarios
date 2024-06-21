@@ -3,7 +3,6 @@ package io.agora.scene.playzone.live
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.agora.rtc2.ChannelMediaOptions
@@ -21,8 +20,7 @@ import io.agora.scene.playzone.PlayLogger
 import io.agora.scene.playzone.R
 import io.agora.scene.playzone.service.PlayZoneServiceListenerProtocol
 import io.agora.scene.playzone.service.PlayZoneServiceProtocol
-import io.agora.scene.playzone.service.RoomRobotInfo
-import io.agora.scene.playzone.service.api.PlayApiManager
+import io.agora.scene.playzone.service.PlayRobotInfo
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone
@@ -36,7 +34,6 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
     }
 
     private fun runOnMainThread(runnable: Runnable) {
-
         if (Thread.currentThread() == mainHandler.looper.thread) {
             runnable.run()
         } else {
@@ -63,7 +60,7 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
     val userCountLiveData = MutableLiveData<Int>()
 
     // 机器人
-    val mRobotListLiveData = MutableLiveData<List<RoomRobotInfo>>()
+    val mRobotListLiveData = MutableLiveData<List<PlayRobotInfo>>()
 
     val mRoomTimeLiveData = MutableLiveData<String>()
 
@@ -172,8 +169,8 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
             userCountLiveData.value = userCount
         }
 
-        override fun onRobotMapSnapshot(robotMap: Map<String, RoomRobotInfo>) {
-            val robotList = mutableListOf<RoomRobotInfo>()
+        override fun onRobotMapSnapshot(robotMap: Map<String, PlayRobotInfo>) {
+            val robotList = mutableListOf<PlayRobotInfo>()
             robotMap.values.forEach { robotInfo ->
                 robotList.add(robotInfo)
             }
@@ -181,16 +178,13 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         }
     }
 
-
     private fun innerRelease() {
+        mainHandler.removeCallbacks(topTimerTask)
         mPlayServiceProtocol.unsubscribeListener(serviceListenerProtocol)
         PlayLogger.d(TAG, "release called")
     }
 
-    /**
-     * Exit room
-     *
-     */
+    // 退出房间
     fun exitRoom() {
         PlayLogger.d(TAG, "RoomLivingViewModel.exitRoom() called")
         mPlayServiceProtocol.leaveRoom { e: Exception? ->
@@ -204,5 +198,22 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
             }
         }
         innerRelease()
+    }
+
+    // mute mic
+    fun muteMic(mute: Boolean) {
+        PlayLogger.d(TAG, "RoomLivingViewModel.mute() called mute:$mute")
+        if (isRoomOwner) {
+            mRtcEngine?.muteLocalAudioStream(mute)
+        } else {
+            if (mute) {
+                channelMediaOption.publishMicrophoneTrack = true
+                channelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
+            } else {
+                channelMediaOption.publishMicrophoneTrack = false
+                channelMediaOption.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+            }
+            mRtcEngine?.updateChannelMediaOptions(channelMediaOption)
+        }
     }
 }

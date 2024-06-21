@@ -3,6 +3,7 @@ package io.agora.scene.playzone.service
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import com.google.gson.reflect.TypeToken
 import io.agora.rtmsyncmanager.ISceneResponse
 import io.agora.rtmsyncmanager.RoomExpirationPolicy
 import io.agora.rtmsyncmanager.RoomService
@@ -31,12 +32,11 @@ import tech.sud.mgp.SudMGPWrapper.state.SudMGPAPPState
 import kotlin.random.Random
 
 class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZoneServiceProtocol, ISceneResponse,
-    IAUIUserService.AUIUserRespObserver, AUIRtmAttributeRespObserver {
+    IAUIUserService.AUIUserRespObserver {
 
     companion object {
         private const val TAG = "PZ_Service_LOG"
         private const val kSceneId = "scene_play_zone_4.10.2"
-        private const val kCollectionStartGameInfo = "startGameCollection"
         private const val kCollectionRobotInfo = "robot_info" // map collection
     }
 
@@ -51,11 +51,6 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
 
     private val mMainHandler by lazy { Handler(Looper.getMainLooper()) }
 
-    /**
-     * Run on main thread
-     *
-     * @param r
-     */
     private fun runOnMainThread(r: Runnable) {
         if (Thread.currentThread() == mMainHandler.looper.thread) {
             r.run()
@@ -64,37 +59,27 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
         }
     }
 
-
-    /**
-     * sync manager
-     */
+    // sync manager
     private val mSyncManager: SyncManager
 
-    /**
-     * room manager
-     */
+    // room manager
     private val mRoomManager = AUIRoomManager()
 
-    /**
-     * room service
-     */
+    // room service
     private val mRoomService: RoomService
 
-    /**
-     * current room no
-     */
+    // 房间号
     @Volatile
     private var mCurRoomNo: String = ""
 
-    /**
-     * current user
-     */
+    // 当前用户信息
     private val mCurrentUser: AUIUserThumbnailInfo get() = AUIRoomContext.shared().currentUserInfo
 
-    /**
-     * room user list
-     */
+    // 用户信息
     private val mUserList = mutableListOf<AUIUserInfo>()
+
+    // 机器人信息
+    private val mRobotMap = mutableMapOf<String, PlayRobotInfo>()
 
     /**
      * Observable helper
@@ -146,16 +131,6 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
         mRoomService = RoomService(roomExpirationPolicy, mRoomManager, mSyncManager)
     }
 
-
-    private fun getStartGameCollection(roomId: String): AUIMapCollection? {
-        if (roomId.isEmpty()) {
-            return null
-        }
-        val scene = mSyncManager.createScene(roomId)
-        return scene.getCollection(kCollectionStartGameInfo) { a, b, c -> AUIMapCollection(a, b, c) }
-    }
-
-
     private fun startTimer() {
         mMainHandler.postDelayed(timerRoomCountDownTask, 1000)
     }
@@ -172,7 +147,6 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
             }
         }
     }
-
 
     /**
      * Init rtm sync
@@ -216,45 +190,34 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
         }
     }
 
-
-    override fun onAttributeChanged(channelName: String, key: String, value: Any) {
-        if (key == kCollectionStartGameInfo) {
-            val newValue = when (value) {
-                is ByteArray -> String(value)
-                is String -> value
-                else -> ""
-            }
-            PlayLogger.d(TAG, "onAttributeChanged $kCollectionStartGameInfo:$channelName,key:$key, value:$value")
-            GsonTools.toBean(newValue, PlayStartGameInfo::class.java)?.let { startGameInfo ->
-                mObservableHelper.notifyEventHandlers { delegate ->
-                    delegate.onStartGameInfoDidChanged(startGameInfo)
-                }
-            }
-        }
-    }
-
     private val robotUid = 3000000001
     private val headUrl = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/{head}.png"
-    override fun onWillInitSceneMetadata(channelName: String): Map<String, Any>? {
-        return super.onWillInitSceneMetadata(channelName)
+    override fun onWillInitSceneMetadata(channelName: String): Map<String, Any> {
+        // 初始化机器人信息
         val rotBotMap = mutableMapOf<String, Any>()
         for (i in 0 until 9) {
-            val modelMale = SudMGPAPPState.AIPlayers().apply {
-                this.userId = (robotUid + i * 2).toString()
-                this.name = "机器人${1 + i * 2}"
-                this.avatar = headUrl.replace("{head}", "male" + (i + 1))
-                this.gender = "male"
-                this.level = 1
-            }
-            rotBotMap[modelMale.userId] = modelMale
-            val modelFemale = SudMGPAPPState.AIPlayers().apply {
-                this.userId = (robotUid + 2 + i * 2).toString()
-                this.name = "机器人${2 + i * 2}"
-                this.avatar = headUrl.replace("{head}", "female" + (i + 1))
-                this.gender = "female"
-                this.level = 1
-            }
-            rotBotMap[modelFemale.userId] = modelFemale
+            val robotId1 = (robotUid + i * 2).toString()
+            val modelMale = PlayRobotInfo(
+                gender = "male",
+                level = 1,
+                owner = AUIUserThumbnailInfo().apply {
+                    userId = robotId1
+                    userName = "机器人${1 + i * 2}"
+                    userAvatar = headUrl.replace("{head}", "man" + (i + 1))
+                }
+            )
+            rotBotMap[robotId1] = modelMale
+            val robotId2 = (robotUid + i * 2 + 1).toString()
+            val modelFemale = PlayRobotInfo(
+                gender = "female",
+                level = 1,
+                owner = AUIUserThumbnailInfo().apply {
+                    userId = robotId2
+                    userName = "机器人${2 + i * 2}"
+                    userAvatar = headUrl.replace("{head}", "woman" + (i + 1))
+                }
+            )
+            rotBotMap[robotId2] = modelFemale
         }
 
         return mapOf(kCollectionRobotInfo to rotBotMap)
@@ -450,7 +413,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
                 val scene = mSyncManager.createScene(roomInfo.roomId)
                 scene.bindRespDelegate(this)
                 scene.userService.registerRespObserver(this)
-                mSyncManager.rtmManager.subscribeAttribute(roomInfo.roomId, kCollectionStartGameInfo, this)
+                innerSubscribeAll(roomId)
                 mCurRoomNo = roomInfo.roomId
                 mRoomService.createRoom(PlayCenter.mAppId, kSceneId, roomInfo, completion = { rtmException, _ ->
                     if (rtmException == null) {
@@ -502,7 +465,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
                 val scene = mSyncManager.createScene(roomId)
                 scene.bindRespDelegate(this)
                 scene.userService.registerRespObserver(this)
-                mSyncManager.rtmManager.subscribeAttribute(roomId, kCollectionStartGameInfo, this)
+                innerSubscribeAll(roomId)
                 mCurRoomNo = roomId
                 mRoomService.enterRoom(PlayCenter.mAppId, kSceneId, roomId, completion = { rtmException ->
                     if (rtmException == null) {
@@ -544,69 +507,27 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
         mCurRoomNo = ""
     }
 
-    override fun getStartGame(roomId: String, completion: (error: Exception?, out: PlayStartGameInfo?) -> Unit) {
-        initRtmSync {
-            if (it != null) {
-                completion.invoke(Exception("${it.message}(${it.code})"), null)
-                return@initRtmSync
-            }
-            val startGameCollection = getStartGameCollection(mCurRoomNo) ?: return@initRtmSync
-            startGameCollection.getMetaData { error, metadata ->
-                if (error != null) {
-                    PlayLogger.d(TAG, "getStartGame failed roomId:$roomId $error")
-                    runOnMainThread {
-                        completion.invoke(Exception(error.message), null)
-                    }
-                    return@getMetaData
-                }
-                try {
-                    val startGameInfo =
-                        GsonTools.toBean(GsonTools.beanToString(metadata), PlayStartGameInfo::class.java)
-                    PlayLogger.d(TAG, "getStartGame onSuccess roomId:$roomId $startGameInfo")
-                    runOnMainThread {
-                        completion.invoke(null, startGameInfo)
-                    }
-                } catch (e: Exception) {
-                    PlayLogger.d(TAG, "getStartGame onFail roomId:$roomId $e")
-                    runOnMainThread {
-                        completion.invoke(e, null)
+    private fun innerSubscribeAll(roomId: String) {
+        val robotCollection = getRobotCollection(roomId)
+        robotCollection?.subscribeAttributesDidChanged { channelName, observeKey, value ->
+            if (observeKey != kCollectionRobotInfo) return@subscribeAttributesDidChanged
+            PlayLogger.d(TAG, "attributesDidChanged roomId: $channelName key: $observeKey")
+            val robots = value.getMap() ?: GsonTools.toBean(
+                GsonTools.beanToString(value),
+                object : TypeToken<Map<String, Any>>() {}.type
+            )
+            val robotMap = mutableMapOf<String, PlayRobotInfo>()
+            robots?.values?.forEach {
+                GsonTools.toBean(GsonTools.beanToString(it), PlayRobotInfo::class.java)?.let { robotInfo ->
+                    robotInfo.owner?.userId?.let { userId ->
+                        robotMap[userId] = robotInfo
                     }
                 }
             }
-        }
-    }
-
-    override fun updateStartGame(roomId: String, gameInfo: PlayStartGameInfo, completion: (error: Exception?) -> Unit) {
-        initRtmSync {
-            if (it != null) {
-                completion.invoke(Exception("${it.message}(${it.code})"))
-                return@initRtmSync
-            }
-            val startGameCollection = getStartGameCollection(mCurRoomNo) ?: return@initRtmSync
-            val map = GsonTools.beanToMap(gameInfo)
-            startGameCollection.updateMetaData(roomId, map) {
-                if (it != null) {
-                    PlayLogger.d(TAG, "updateStartGame failed roomId:$roomId $it")
-                    runOnMainThread {
-                        completion.invoke(Exception(it.message))
-                    }
-                } else {
-                    runOnMainThread {
-                        completion.invoke(null)
-                    }
-                    val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return@updateMetaData
-                    cacheRoom.customPayload[PlayZoneParameters.BADGE_TITLE] = gameInfo.gameName
-                    mRoomManager.updateRoomInfo(
-                        BuildConfig.AGORA_APP_ID,
-                        kSceneId,
-                        cacheRoom,
-                        callback = { auiException, roomInfo ->
-                            if (auiException == null) {
-                                PlayLogger.d(TAG, "updateStartGame updateRoom success, $roomInfo")
-                            } else {
-                                PlayLogger.e(TAG, "updateStartGame updateRoom failed, $auiException")
-                            }
-                        })
+            if (mRobotMap.isEmpty()) {
+                mRobotMap.putAll(robotMap)
+                mObservableHelper.notifyEventHandlers { delegate ->
+                    delegate.onRobotMapSnapshot(mRobotMap)
                 }
             }
         }
@@ -614,6 +535,12 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
 
     override fun subscribeListener(listener: PlayZoneServiceListenerProtocol) {
         mObservableHelper.subscribeEvent(listener)
+        if (mUserList.isNotEmpty()) {
+            listener.onUserCountUpdate(mUserList.size)
+        }
+        if (mRobotMap.isNotEmpty()) {
+            listener.onRobotMapSnapshot(mRobotMap)
+        }
     }
 
     override fun unsubscribeListener(listener: PlayZoneServiceListenerProtocol) {

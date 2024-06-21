@@ -1,7 +1,9 @@
 package io.agora.scene.playzone.live.sub;
 
 import android.app.Activity;
+import android.util.ArraySet;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -14,10 +16,18 @@ import com.moczul.ok2curl.logger.Logger;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
+import io.agora.rtmsyncmanager.model.AUIUserThumbnailInfo;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.playzone.BuildConfig;
+import io.agora.scene.playzone.PlayCenter;
+import io.agora.scene.playzone.service.PlayRobotInfo;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -31,6 +41,7 @@ import tech.sud.mgp.SudMGPWrapper.decorator.SudFSTAPPDecorator;
 import tech.sud.mgp.SudMGPWrapper.model.GameConfigModel;
 import tech.sud.mgp.SudMGPWrapper.model.GameViewInfoModel;
 import tech.sud.mgp.SudMGPWrapper.state.MGStateResponse;
+import tech.sud.mgp.SudMGPWrapper.state.SudMGPAPPState;
 import tech.sud.mgp.SudMGPWrapper.state.SudMGPMGState;
 import tech.sud.mgp.core.ISudFSMMG;
 import tech.sud.mgp.core.ISudFSMStateHandle;
@@ -76,6 +87,24 @@ public class QuickStartGameViewModel extends BaseGameViewModel {
     // Game View callback.
     public final MutableLiveData<View> gameViewLiveData = new MutableLiveData<>();
 
+    // 游戏是否
+    public final MutableLiveData<Boolean> gameStartedLiveData = new MutableLiveData<>();
+
+    // 当前玩家是否加入游戏
+    public final MutableLiveData<Boolean> gameLocalPlayerInLiveData = new MutableLiveData<>();
+
+    // 队长回调
+    public final MutableLiveData<Pair<String, Boolean>> captainIdLiveData = new MutableLiveData<>();
+
+    // 机器人列表
+    public List<PlayRobotInfo> robotInfoList = new ArrayList<>();
+
+    // 玩家列表
+    public Set<String> playerSet = new ArraySet<>();
+
+    // 已添加机器人玩家
+    public List<SudMGPAPPState.AIPlayers> aiPlayers = new ArrayList<>();
+
     /**
      * 向接入方服务器获取code
      * Retrieve the code from the partner's server.
@@ -96,7 +125,7 @@ public class QuickStartGameViewModel extends BaseGameViewModel {
                     public void log(@NonNull String message) {
                         Log.v("Ok2Curl", message);
                     }
-                },new Configuration()))
+                }, new Configuration()))
                 .build();
         String req;
         try {
@@ -290,6 +319,11 @@ public class QuickStartGameViewModel extends BaseGameViewModel {
         sudFSTAPPDecorator.notifyAPPCommonSelfIn(isIn, seatIndex, isSeatRandom, teamId);
     }
 
+    // 指定队长
+    public void notifyAPPCommonSelfCaptain(@NonNull String captainId) {
+        sudFSTAPPDecorator.notifyAPPCommonSelfCaptain(captainId);
+    }
+
     /**
      * 2.游戏向App回调状态
      * 这里演示的是接收游戏回调状态：10. 游戏状态 mg_common_game_state
@@ -307,5 +341,76 @@ public class QuickStartGameViewModel extends BaseGameViewModel {
     @Override
     public void onGameMGCommonGameState(ISudFSMStateHandle handle, SudMGPMGState.MGCommonGameState model) {
         super.onGameMGCommonGameState(handle, model);
+    }
+
+    @Override
+    public void onGameStarted() {
+        super.onGameStarted();
+        gameStartedLiveData.postValue(true);
+    }
+
+    @Override
+    public void onGameDestroyed() {
+        super.onGameDestroyed();
+    }
+
+    @Override
+    public void onGameLoadingProgress(int stage, int retCode, int progress) {
+        super.onGameLoadingProgress(stage, retCode, progress);
+    }
+
+    // 1.加入状态（
+    @Override
+    public void onPlayerMGCommonPlayerIn(ISudFSMStateHandle handle, String userId, SudMGPMGState.MGCommonPlayerIn model) {
+        super.onPlayerMGCommonPlayerIn(handle, userId, model);
+        if (Objects.equals(userId, PlayCenter.INSTANCE.getMUser().id.toString())) {
+            gameLocalPlayerInLiveData.postValue(model.isIn);
+        }
+        if (model.isIn) {
+            playerSet.add(userId);
+        } else {
+            playerSet.remove(userId);
+        }
+    }
+
+    // 2.准备状态
+    @Override
+    public void onPlayerMGCommonPlayerReady(ISudFSMStateHandle handle, String userId, SudMGPMGState.MGCommonPlayerReady model) {
+        super.onPlayerMGCommonPlayerReady(handle, userId, model);
+    }
+
+    // 3.队长状态
+    @Override
+    public void onPlayerMGCommonPlayerCaptain(ISudFSMStateHandle handle, String userId, SudMGPMGState.MGCommonPlayerCaptain model) {
+        super.onPlayerMGCommonPlayerCaptain(handle, userId, model);
+        captainIdLiveData.postValue(new Pair<>(userId, model.isCaptain));
+    }
+
+    // 添加机器人
+    public void addRobot() {
+        PlayRobotInfo playRobotInfo = findAvailableRobotInfo();
+        if (playRobotInfo != null) {
+            List<SudMGPAPPState.AIPlayers> aiPlayerList = new ArrayList<>();
+            SudMGPAPPState.AIPlayers aiPlayers = new SudMGPAPPState.AIPlayers();
+            aiPlayers.level = playRobotInfo.getLevel();
+            AUIUserThumbnailInfo owner = playRobotInfo.getOwner();
+            if (owner != null) {
+                aiPlayers.userId = owner.userId;
+                aiPlayers.name = owner.userName;
+                aiPlayers.avatar = owner.userAvatar;
+            }
+            aiPlayerList.add(aiPlayers);
+            sudFSTAPPDecorator.notifyAPPCommonGameAddAIPlayers(aiPlayerList, 1);
+        }
+    }
+
+    private PlayRobotInfo findAvailableRobotInfo() {
+        for (int i = 0; i < robotInfoList.size(); i++) {
+            PlayRobotInfo playRobotInfo = robotInfoList.get(i);
+            if (!playerSet.contains(playRobotInfo.getOwner().userId)) {
+                return playRobotInfo;
+            }
+        }
+        return null;
     }
 }

@@ -33,6 +33,7 @@ import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.base.utils.dp
+import io.agora.scene.playzone.PlayCenter
 import io.agora.scene.playzone.PlayLogger
 import io.agora.scene.playzone.R
 import io.agora.scene.playzone.databinding.PlayZoneActivityRoomGameLayoutBinding
@@ -75,11 +76,6 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         })[PlayGameViewModel::class.java]
     }
 
-    private val mRoomInfo by lazy { (intent?.getSerializableExtra(EXTRA_ROOM_DETAIL_INFO) as? AUIRoomInfo)!! }
-
-    private val mUser: User get() = UserManager.getInstance().user
-
-    private val mIsRoomOwner by lazy { mRoomInfo.roomOwner?.userId == mUser.id.toString() }
 
     private var mToggleAudioRun: Runnable? = null
 
@@ -115,7 +111,6 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
             // 游戏配置
             val gameConfigModel = gameViewModel.getGameConfigModel()
             gameConfigModel.ui.ping.hide = false // 配置不隐藏ping值 English: Configuration to not hide ping value
-
         }
     }
 
@@ -135,16 +130,14 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         binding.layoutTop.layoutParams = titleParams
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        binding.tvRoomName.text = mRoomInfo.roomName
-        binding.tvRoomId.text = mRoomInfo.roomId
+        binding.tvRoomName.text = roomGameViewModel.mRoomInfo.roomName
+        binding.tvRoomId.text = roomGameViewModel.mRoomInfo.roomId
         GlideApp.with(this)
-            .load(mRoomInfo.roomOwner?.userAvatar ?: "")
+            .load(roomGameViewModel.mRoomInfo.roomOwner?.userAvatar ?: "")
             .placeholder(R.mipmap.default_user_avatar)
             .error(R.mipmap.default_user_avatar)
             .apply(RequestOptions.circleCropTransform())
             .into(binding.ivOwnerAvatar)
-
-        binding.ivAddBot.isVisible = mIsRoomOwner
 
         // 消息
         (binding.rvMessage.layoutManager as LinearLayoutManager).stackFromEnd = true
@@ -176,7 +169,20 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
             true
         }
         binding.ivAddBot.setOnClickListener {
-            ToastUtils.showToast("点击添加机器人")
+            if (gameViewModel.sudFSMMGCache.captainUserId == PlayCenter.mUser.id.toString()) {
+                gameViewModel.addRobot()
+            }
+        }
+        binding.cbMic.setOnCheckedChangeListener { compoundButton, isChecked ->
+            if (compoundButton.isPressed) return@setOnCheckedChangeListener
+            if (isChecked) {
+                mToggleAudioRun = Runnable {
+                    roomGameViewModel.muteMic(false)
+                }
+                requestRecordPermission(true)
+            } else {
+                roomGameViewModel.muteMic(false)
+            }
         }
 
         KeyboardStatusWatcher(this, this) { isKeyboardShowed: Boolean, keyboardHeight: Int ->
@@ -208,7 +214,6 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     private fun showKeyboardInputLayout() {
         binding.layoutEtMessage.isVisible = true
         binding.tvInput.isEnabled = false
-
         // 隐藏
         binding.layoutBottom.isVisible = false
         showInput(binding.etMessage)
@@ -225,8 +230,8 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         } else {
             roomGameViewModel.initData()
         }
-        val gameId = mRoomInfo.customPayload[PlayZoneParameters.GAME_ID] as? Long ?: 0L
-        gameViewModel.switchGame(this, mRoomInfo.roomId, gameId)
+        val gameId = roomGameViewModel.mRoomInfo.customPayload[PlayZoneParameters.GAME_ID] as? Long ?: 0L
+        gameViewModel.switchGame(this, roomGameViewModel.mRoomInfo.roomId, gameId)
 
         gameViewModel.gameViewLiveData.observe(this) { view ->
             if (view == null) { // 在关闭游戏时，把游戏View给移除
@@ -239,6 +244,19 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
                 )
             }
         }
+        gameViewModel.gameStartedLiveData.observe(this) {
+            if (it) {
+                if (roomGameViewModel.isRoomOwner) {
+                    gameViewModel.notifyAPPCommonSelfIn(true, 0, false, 1)
+                }
+            }
+        }
+        gameViewModel.gameLocalPlayerInLiveData.observe(this) {
+            binding.cbMic.isVisible = it
+        }
+        gameViewModel.captainIdLiveData.observe(this) {
+            binding.ivAddBot.isVisible = it.first == PlayCenter.mUser.id.toString() && it.second
+        }
 
         roomGameViewModel.mRoomTimeLiveData.observe(this) {
             binding.tvTimer.text = it
@@ -246,7 +264,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         roomGameViewModel.networkStatusLiveData.observe(this) { netWorkStatus: NetWorkEvent ->
             setNetWorkStatus(netWorkStatus.txQuality, netWorkStatus.rxQuality)
         }
-        roomGameViewModel.roomExpireLiveData.observe(this) {roomExpire ->
+        roomGameViewModel.roomExpireLiveData.observe(this) { roomExpire ->
             if (roomExpire) {
                 showLivingEndLayout(false)
             }
@@ -254,6 +272,12 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         roomGameViewModel.roomDestroyLiveData.observe(this) { roomDestroy ->
             if (roomDestroy) {
                 showLivingEndLayout(false)
+            }
+        }
+        roomGameViewModel.mRobotListLiveData.observe(this) { robotList ->
+            if (robotList.isNotEmpty()) {
+                gameViewModel.robotInfoList.clear()
+                gameViewModel.robotInfoList.addAll(robotList)
             }
         }
     }
@@ -281,7 +305,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         val gameInfo = PlayGameInfoModel()
         val bundle = Bundle().apply {
             putSerializable(PlayGameRulesDialog.Key_Game, gameInfo)
-            putBoolean(PlayGameRulesDialog.Key_IsOwner, mIsRoomOwner)
+            putBoolean(PlayGameRulesDialog.Key_IsOwner, roomGameViewModel.isRoomOwner)
         }
         val dialog = PlayGameRulesDialog().apply {
             setBundleArgs(bundle)
@@ -292,7 +316,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     private fun showLivingEndLayout(abnormal: Boolean) {
         val title = if (abnormal) R.string.play_zone_living_abnormal_title else R.string.play_zone_living_timeout_title
         val message =
-            if (mIsRoomOwner) R.string.play_zone_living_host_timeout else R.string.play_zone_living_user_timeout
+            if (roomGameViewModel.isRoomOwner) R.string.play_zone_living_host_timeout else R.string.play_zone_living_user_timeout
         AlertDialog.Builder(this, R.style.play_zone_alert_dialog)
             .setTitle(title)
             .setMessage(message)
@@ -309,8 +333,10 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
      *
      */
     private fun showEndRoomDialog() {
-        val title = if (mIsRoomOwner) R.string.play_zone_living_host_end_title else R.string.play_zone_living_user_end_title
-        val message = if (mIsRoomOwner) R.string.play_zone_living_host_end_content else R.string.play_zone_living_user_end_content
+        val title =
+            if (roomGameViewModel.isRoomOwner) R.string.play_zone_living_host_end_title else R.string.play_zone_living_user_end_title
+        val message =
+            if (roomGameViewModel.isRoomOwner) R.string.play_zone_living_host_end_content else R.string.play_zone_living_user_end_content
         AlertDialog.Builder(this, R.style.play_zone_alert_dialog)
             .setTitle(title)
             .setMessage(message)

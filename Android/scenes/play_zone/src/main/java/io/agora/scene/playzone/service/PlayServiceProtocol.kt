@@ -26,7 +26,7 @@ interface PlayZoneServiceListenerProtocol {
      *
      * @param robotMap
      */
-    fun onRobotMapSnapshot(robotMap: Map<String, RoomRobotInfo>) {}
+    fun onRobotMapSnapshot(robotMap: Map<String, PlayRobotInfo>) {}
 
     /**
      * 房间人数更新
@@ -34,8 +34,6 @@ interface PlayZoneServiceListenerProtocol {
      * @param userCount
      */
     fun onUserCountUpdate(userCount: Int) {}
-
-    fun onStartGameInfoDidChanged(gameInfo: PlayStartGameInfo) {}
 }
 
 /**
@@ -84,26 +82,6 @@ interface PlayZoneServiceProtocol {
      * @receiver
      */
     fun getRoomList(completion: (error: Exception?, roomList: List<AUIRoomInfo>?) -> Unit)
-
-    /**
-     *
-     * 获取正在进行的游戏信息
-     *
-     * @param roomId
-     * @param completion
-     * @receiver
-     */
-    fun getStartGame(roomId: String, completion: (error: Exception?, out: PlayStartGameInfo?) -> Unit)
-
-    /**
-     * 更新正在进行的游戏信息
-     *
-     * @param roomId
-     * @param gameInfo
-     * @param completion
-     * @receiver
-     */
-    fun updateStartGame(roomId: String, gameInfo: PlayStartGameInfo, completion: (error: Exception?) -> Unit)
 
     /**
      * 创建房间

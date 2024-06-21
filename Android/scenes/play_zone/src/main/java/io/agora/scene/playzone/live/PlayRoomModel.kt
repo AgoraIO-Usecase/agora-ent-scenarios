@@ -4,3 +4,4 @@ data class NetWorkEvent constructor(
     var txQuality: Int,
     var rxQuality: Int
 )
+
