@@ -29,7 +29,7 @@ import Foundation
 }
 
 @objc public protocol ApplyServiceProtocol: NSObjectProtocol {
-    func onApplyListDidUpdate(list: [ApplyInfo])
+    func onApplyListDidUpdate(channelName: String, list: [ApplyInfo])
 }
 
 enum ApplyCmd: String {
@@ -65,7 +65,7 @@ public class ApplyService: NSObject {
             guard applyKey == observeKey else {return}
             let list: [ApplyInfo] = decodeModelArray(value.getList() ?? []) ?? []
             for element in self.respDelegates.allObjects {
-                element.onApplyListDidUpdate(list: list)
+                element.onApplyListDidUpdate(channelName: channelName, list: list)
             }
         }
         

@@ -11,6 +11,15 @@ import Foundation
     case idle = 0
     case linking = 1
     case pk = 2
+    
+    public var isInteracting: Bool {
+        switch self {
+        case .linking, .pk:
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 @objc public class InteractionInfo: NSObject, Codable {
@@ -33,7 +42,7 @@ enum InteractionCmd: String {
 private let interactionKey = "interaction"
 
 @objc public protocol InteractionServiceProtocol: NSObjectProtocol {
-    func onInteractionListDidUpdate(list: [InteractionInfo])
+    func onInteractionListDidUpdate(channelName: String, list: [InteractionInfo])
 }
 
 public class InteractionService: NSObject {
@@ -82,7 +91,7 @@ public class InteractionService: NSObject {
                                                            completion: nil)
             }
             for element in self.respDelegates.allObjects {
-                element.onInteractionListDidUpdate(list: [info])
+                element.onInteractionListDidUpdate(channelName: channelName, list: [info])
             }
         }
         let scene = syncManager.getScene(channelName: channelName)
@@ -180,6 +189,19 @@ extension InteractionService {
                                           value: value) { err in
             aui_info("stopInteraction completion: \(err?.localizedDescription ?? "success")", tag: "InteractionService")
             completion?(err)
+        }
+    }
+    
+    public func getLatestInteractionInfo(completion: ((NSError?, InteractionInfo?)->())?) {
+        let channelName = channelName
+        aui_info("getLatestInteractionInfo[\(channelName)]", tag: "InteractionService")
+        interactionCollection.getMetaData { err, value in
+            aui_info("getLatestInteractionInfo[\(channelName)] completion: \(err?.localizedDescription ?? "success")", tag: "InteractionService")
+            var info: InteractionInfo? = nil
+            if let value = value as? [String: Any] {
+                info = decodeModel(value)
+            }
+            completion?(err, info)
         }
     }
 }

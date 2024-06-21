@@ -155,7 +155,7 @@ class ShowRoomListVC: UIViewController {
     }
     
     private func fetchRoomList() {
-        AppContext.showServiceImp("")?.getRoomList(page: 1) { [weak self] error, roomList in
+        AppContext.showServiceImp()?.getRoomList(page: 1) { [weak self] error, roomList in
             self?.refreshControl.endRefreshing()
             guard let self = self, let roomList = roomList else {return}
             if let error = error {
