@@ -97,7 +97,7 @@ interface ShowServiceProtocol {
     fun createMicSeatApply(roomId: String, success: ((ShowMicSeatApply) -> Unit)? = null, error: ((Exception) -> Unit)? = null)
 
     // 观众取消连麦申请
-    fun cancelMicSeatApply(roomId: String, userId: String, success: (() -> Unit)? = null, error: ((Exception) -> Unit)? = null)
+    fun cancelMicSeatApply(roomId: String, success: (() -> Unit)? = null, error: ((Exception) -> Unit)? = null)
 
     // 主播接受连麦申请
     fun acceptMicSeatApply(
