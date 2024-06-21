@@ -615,13 +615,12 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
 
     override fun cancelMicSeatApply(
         roomId: String,
-        userId: String,
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
         syncManager.getExApplyService(roomId)
             .cancelApply(
-                userId,
+                UserManager.getInstance().user.id.toString(),
                 success = {
                     ThreadManager.getInstance().runOnMainThread {
                         success?.invoke()

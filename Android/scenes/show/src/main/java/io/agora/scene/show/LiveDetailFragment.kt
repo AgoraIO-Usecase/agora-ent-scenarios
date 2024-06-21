@@ -1162,7 +1162,6 @@ class LiveDetailFragment : Fragment() {
                 view.isEnabled = false
                 mService.cancelMicSeatApply(
                     mRoomInfo.roomId,
-                    apply?.userId ?: "",
                     success = {
                         view.isEnabled = true
                     },
