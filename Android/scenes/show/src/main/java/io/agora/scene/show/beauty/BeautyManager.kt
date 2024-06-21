@@ -344,6 +344,9 @@ object BeautyManager {
     class MultiBeautyVideoObserver : IVideoFrameObserver {
         private var isFront = true
         override fun onCaptureVideoFrame(type: Int, videoFrame: VideoFrame?): Boolean {
+            if (destroyBeautyFuture?.isDone != true) {
+                return false
+            }
             if (createBeautyFuture?.isDone != true) {
                 return false
             }

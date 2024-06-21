@@ -153,7 +153,7 @@ class FaceUnityBeautyAPIImpl : FaceUnityBeautyAPI, IVideoFrameObserver {
             return ErrorCode.ERROR_HAS_RELEASED.value
         }
         if(config?.captureMode == CaptureMode.Custom){
-            skipFrame = 2
+            skipFrame = 8
             LogUtils.i(TAG, "enable >> skipFrame = $skipFrame")
         }
         apiReporter.reportFuncEvent(
