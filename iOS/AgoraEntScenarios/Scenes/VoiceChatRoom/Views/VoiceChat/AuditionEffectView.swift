@@ -8,7 +8,7 @@
 import UIKit
 import ZSwiftBaseLib
 import SDWebImage
-import SDWebImageAPNGCoder
+//import SDWebImageAPNGCoder
 //162 height
 
 private let beforPlayTag = 11
@@ -63,7 +63,7 @@ final class AuditionEffectView: UIView {
 
     private override init(frame: CGRect) {
         super.init(frame: frame)
-        SDWebImageCodersManager.sharedInstance().addCoder(SDWebImageAPNGCoder.shared())
+//        SDWebImageCodersManager.sharedInstance().addCoder(SDWebImageAPNGCoder.shared())
     }
     
     convenience init(frame: CGRect,type: AUDIO_SETTING_TYPE) {

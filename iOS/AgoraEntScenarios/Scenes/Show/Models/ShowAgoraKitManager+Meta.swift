@@ -11,10 +11,12 @@ import AGResourceManager
 extension ShowAgoraKitManager {
     
     func registerMetaPlugin(){
-        engine?.registerExtension(withVendor: "agora_video_filters_metakit",extension: "metakit", sourceType: AgoraMediaSourceType.primaryCamera)
-        
         // 背景分割
-        engine?.setParameters("{\"rtc.video.seg_before_exts\":true}")
+        let ret = engine?.setParameters("{\"rtc.video.seg_before_exts\":true}")
+        showLogger.info("registerMetaPlugin setParameters ret:\(ret ?? -9999)")
+//        enableAIVirtualBackground()
+        // metakit
+        engine?.registerExtension(withVendor: "agora_video_filters_metakit",extension: "metakit", sourceType: AgoraMediaSourceType.primaryCamera)
         engine?.enableExtension(withVendor: "agora_video_filters_metakit",extension: "metakit", enabled: true)
     }
     
@@ -331,6 +333,9 @@ extension ShowAgoraKitManager {
     }
     
     static func downloadManifestList(completion:(()->())? = nil) {
+        AGResourceManagerContext.shared.displayLogClosure = { msg in
+            showLogger.info(msg, context: "AGResourceManager")
+        }
         let url = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/resource/manifest/manifestList"
         AGResourceManager.shared.downloadManifestList(url: url) { _ in
         } completionHandler: { fileList, err in
