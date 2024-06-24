@@ -28,6 +28,26 @@ include ':common:scenario-api:lib_callapi'
 include ':common:scenario-api:lib_audioscenarioapi'
 
 /*
+ * 在线K歌房
+ */
+include ':scenes:ktv'
+
+/*
+ * 嗨歌抢唱
+ */
+include ':scenes:ktv_singbattle'
+
+/*
+ * 抢麦接唱
+ */
+include ':scenes:ktv_relay'
+
+/**
+ * 大合唱
+ */
+include ':scenes:cantata'
+
+/*
  * 语聊房
  */
 include ':scenes:voice'
