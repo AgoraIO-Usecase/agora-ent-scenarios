@@ -22,40 +22,32 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/vpGame"
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivBanner"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginTop="10dp"
-                app:layout_constraintDimensionRatio="16:9"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <io.agora.scene.playzone.widget.FadeDotsIndicator
-                android:id="@+id/dotIndicator"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                app:layout_constraintBottom_toBottomOf="@+id/vpGame"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                android:background="@drawable/play_zone_banner"
+                app:layout_constraintDimensionRatio="335:200"
+                app:layout_constraintTop_toTopOf="parent"
+                app:strokeColor="@android:color/transparent" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/currentlyHottest"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
-                android:id="@+id/currentlyHottest"
-                app:layout_constraintTop_toBottomOf="@+id/vpGame"
                 android:layout_marginHorizontal="20dp"
-                android:background="@drawable/play_zone_shape_game_24dp_bg">
+                android:background="@drawable/play_zone_shape_game_24dp_bg"
+                app:layout_constraintTop_toBottomOf="@id/ivBanner">
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/ivGameType"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
+                    android:layout_marginStart="14dp"
+                    android:src="@drawable/play_zone_ic_the_hottest"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    android:layout_marginStart="14dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:src="@drawable/play_zone_ic_the_hottest" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/horizontal50"
@@ -69,10 +61,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
+                    android:layout_marginBottom="2dp"
                     android:text="@string/play_zone_currently_the_hottest"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:layout_marginBottom="2dp"
                     app:layout_constraintBottom_toTopOf="@id/horizontal50"
                     app:layout_constraintStart_toEndOf="@id/ivGameType" />
 
@@ -81,10 +73,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:textSize="14sp"
                     android:text="@string/play_zone_currently_the_hottest_tips"
-                    app:layout_constraintTop_toBottomOf="@id/horizontal50"
-                    app:layout_constraintStart_toStartOf="@id/tvGameName" />
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="@id/tvGameName"
+                    app:layout_constraintTop_toBottomOf="@id/horizontal50" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -95,13 +87,13 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="12dp"
-                android:paddingBottom="18dp"
                 android:background="@drawable/play_zone_shape_game_24dp_bg"
-                tools:listitem="@layout/play_zone_item_game_layout"
+                android:paddingBottom="18dp"
                 app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/currentlyHottest"
-                app:spanCount="4" />
+                app:spanCount="4"
+                tools:listitem="@layout/play_zone_item_game_layout" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>

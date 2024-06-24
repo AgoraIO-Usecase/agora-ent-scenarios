@@ -35,10 +35,7 @@ interface SubApiService {
     @GET("{auth}")
     fun gameConfig(@Path("auth") auth: String): Call<SubGameApiInfo>
 
-    @POST("")
+    @POST
     fun gameList(@Url url: String, @Body requestModel: SubGameListRequestModel): Call<SubCommonResp<SubGameResp>>
-
-//    @POST("$get_mg_list")
-//    fun gameList(@Body requestModel: SubGameRequestModel): Call<SubCommonResp<SubGameResp>>
 }
 

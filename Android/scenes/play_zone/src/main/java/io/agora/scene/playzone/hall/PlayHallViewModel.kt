@@ -11,7 +11,6 @@ import io.agora.scene.playzone.service.PlayZoneServiceProtocol
 import io.agora.scene.playzone.service.api.PlayApiManager
 import io.agora.scene.playzone.service.api.PlayGameInfoModel
 import io.agora.scene.playzone.service.api.PlayGameListModel
-import io.agora.scene.playzone.service.api.PlayZoneGameBanner
 import io.agora.scene.playzone.service.subApi.SubApiManager
 
 class PlayHallViewModel : ViewModel() {
@@ -22,31 +21,17 @@ class PlayHallViewModel : ViewModel() {
 
     private val mPlayZoneService by lazy { PlayZoneServiceProtocol.serviceProtocol }
 
-    val mGameConfigLiveData = MutableLiveData<List<PlayZoneGameBanner>>()
-
     val roomModelListLiveData = MutableLiveData<List<AUIRoomInfo>?>()
     val createRoomInfoLiveData = MutableLiveData<AUIRoomInfo?>()
     val joinRoomInfoLiveData = MutableLiveData<AUIRoomInfo?>()
-
-    fun gameConfig() {
-        playZoneApiManager.getGameBanner { error, list ->
-            error?.message?.let {
-                ToastUtils.showToast(it)
-            }
-            mGameConfigLiveData.postValue(list)
-        }
-    }
-
 
     private val subApiManager by lazy {
         SubApiManager()
     }
 
-
     val mGameListLiveData = MutableLiveData<List<PlayGameListModel>?>()
 
     fun getGameList(vendor: GameVendor) {
-
         // only test
         subApiManager.getGameApiInfo { error, gameApi ->
             if (gameApi != null) {

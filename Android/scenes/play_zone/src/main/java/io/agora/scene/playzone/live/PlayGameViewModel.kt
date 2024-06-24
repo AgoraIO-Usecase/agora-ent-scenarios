@@ -179,6 +179,11 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         mainHandler.removeCallbacks(topTimerTask)
         mPlayServiceProtocol.unsubscribeListener(serviceListenerProtocol)
         PlayLogger.d(TAG, "release called")
+        mRtcEngine?.apply {
+            leaveChannel()
+            RtcEngine.destroy()
+            mRtcEngine = null
+        }
     }
 
     // 退出房间

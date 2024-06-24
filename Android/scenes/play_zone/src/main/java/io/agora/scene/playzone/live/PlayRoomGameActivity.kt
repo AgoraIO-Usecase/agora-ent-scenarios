@@ -176,14 +176,14 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
 
         binding.cbMic.isChecked = roomGameViewModel.isRoomOwner
         binding.cbMic.setOnCheckedChangeListener { compoundButton, isChecked ->
-            if (compoundButton.isPressed) return@setOnCheckedChangeListener
+            if (!compoundButton.isPressed) return@setOnCheckedChangeListener
             if (isChecked) {
                 mToggleAudioRun = Runnable {
                     roomGameViewModel.muteMic(false)
                 }
                 requestRecordPermission(true)
             } else {
-                roomGameViewModel.muteMic(false)
+                roomGameViewModel.muteMic(true)
             }
         }
 
@@ -261,11 +261,13 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         }
         roomGameViewModel.roomExpireLiveData.observe(this) { roomExpire ->
             if (roomExpire) {
+                gameViewModel.destroyMG()
                 showTimeUpExitDialog()
             }
         }
         roomGameViewModel.roomDestroyLiveData.observe(this) { roomDestroy ->
             if (roomDestroy) {
+                gameViewModel.destroyMG()
                 showCreatorExitDialog()
             }
         }

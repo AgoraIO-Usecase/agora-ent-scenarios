@@ -409,6 +409,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
                     this.customPayload[PlayZoneParameters.PASSWORD] = inputModel.password ?: ""
                     this.customPayload[PlayZoneParameters.IS_PRIVATE] = !inputModel.password.isNullOrEmpty()
                     this.customPayload[PlayZoneParameters.GAME_ID] = inputModel.gameId
+                    this.customPayload[PlayZoneParameters.BADGE_TITLE] = inputModel.gameName
                 }
                 val scene = mSyncManager.createScene(roomInfo.roomId)
                 scene.bindRespDelegate(this)
