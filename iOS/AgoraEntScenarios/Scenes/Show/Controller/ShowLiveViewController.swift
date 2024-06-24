@@ -46,7 +46,6 @@ class ShowLiveViewController: UIViewController {
             if loadingType == oldValue {
                 return
             }
-            updateLoadingType(playState: loadingType)
             remoteVideoWidth = nil
             currentMode = nil
         }
@@ -181,17 +180,6 @@ class ShowLiveViewController: UIViewController {
             if let interaction = currentInteraction {
                 liveView.canvasView.setLocalUserInfo(name: room?.ownerName ?? "")
                 liveView.canvasView.setRemoteUserInfo(name: interaction.userName)
-#if DEBUG
-#else
-                liveView.canvasView.isLocalMuteMic = interaction.ownerMuteAudio
-                liveView.canvasView.isRemoteMuteMic = interaction.muteAudio
-                
-                if role == .broadcaster {
-                    self.muteLocalAudio = interaction.ownerMuteAudio
-                } else if interaction.userId == VLUserCenter.user.id {
-                    self.muteLocalAudio = interaction.muteAudio
-                }
-#endif
             } else if role == .broadcaster {
                 //unmute if interaction did stop
                 self.muteLocalAudio = false
@@ -379,7 +367,6 @@ extension ShowLiveViewController {
             service.joinRoom(room: room) {[weak self] error, detailModel in
                 guard let self = self else {return}
                 guard self.room?.roomId == room.roomId else { return }
-                self.updateLoadingType(playState: self.loadingType)
             }
             self._subscribeServiceEvent()
         } else {
@@ -392,19 +379,6 @@ extension ShowLiveViewController {
         serviceImp?.unsubscribeEvent(roomId: roomId, delegate: self)
         serviceImp?.leaveRoom(roomId: roomId) { error in
         }
-    }
-    
-    func updateLoadingType(playState: AnchorState) {
-        #if DEBUG
-        #else
-        if playState == .joinedWithVideo {
-            serviceImp?.initRoom(roomId: roomId, completion: { error in
-            })
-        } else if playState == .prejoined {
-            serviceImp?.deinitRoom(roomId: roomId) { error in }
-        } else {
-        }
-        #endif
     }
 }
 
@@ -502,31 +476,12 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     func onMicSeatApplyUpdated(channelName: String, applies: [ShowMicSeatApply]) {
         showPrint("onMicSeatApplyUpdated: \(applies.count)")
         _updateApplyMenu()
-        #if DEBUG
         liveView.bottomBar.linkButton.isShowRedDot = applies.count > 0 ? true : false
-        guard let apply = applies.first(where: { $0.userId == VLUserCenter.user.id}) else { return }
-        liveView.bottomBar.linkButton.isSelected = false
-        #else
-        if apply.status == .waitting, role == .broadcaster {
-            liveView.bottomBar.linkButton.isShowRedDot = true
-        }
-        guard apply.userId == VLUserCenter.user.id else { return }
-        //TODO: migration to interaction did start
-        if apply.status == .accepted {
-            liveView.canvasView.canvasType = .joint_broadcasting
-            liveView.canvasView.setRemoteUserInfo(name: apply.userName ?? "", img: apply.avatar)
-            liveView.bottomBar.linkButton.isSelected = true
-            liveView.bottomBar.linkButton.isShowRedDot = false
-        } else if apply.status == .rejected {
-            applyView.getAllMicSeatList(autoApply: false)
-            liveView.bottomBar.linkButton.isShowRedDot = false
-            liveView.bottomBar.linkButton.isSelected = false
-            
-        } else {
-//            liveView.canvasView.canvasType = .none
-            liveView.bottomBar.linkButton.isSelected = false
-        }
-        #endif
+//        if currentInteraction?.userId == VLUserCenter.user.id {
+//            liveView.bottomBar.linkButton.isEnabled = false
+//        } else {
+//            liveView.bottomBar.linkButton.isEnabled = false
+//        }
     }
     
     func onMicSeatInvitationUpdated(channelName: String, invitation: ShowMicSeatInvitation) {
@@ -561,10 +516,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onMicSeatInvitationAccepted(channelName: String, invitation: ShowMicSeatInvitation) {
-        #if DEBUG
-        #else
-        liveView.canvasView.setRemoteUserInfo(name: invitation.userName ?? "", img: invitation.avatar)
-        #endif
     }
     
     func onMicSeatInvitationRejected(channelName: String, invitation: ShowMicSeatInvitation) {
@@ -596,7 +547,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                                                      ownerId: uid,
                                                      options: self.channelOptions,
                                                      role: .audience) {
-                showPrint("\(self.roomId) updateLoadingType _onStartInteraction---------- \(self.roomId)")
+                showPrint("\(self.roomId) joinChannelEx inviting channel completion _onStartInteraction---------- \(invitation.fromRoomId)")
                 ShowAgoraKitManager.shared.preSubscribePKVideo(isOn: true, channelId: invitation.fromRoomId)
             }
             let roomId = self.roomId
@@ -900,10 +851,8 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     
     func onClickRemoteCanvas() {
         guard let info = currentInteraction else { return }
-        if role == .audience, info.userId != VLUserCenter.user.id {
-            return
-        }
-        let title = info.type == .linking ? 
+        guard room?.ownerId == VLUserCenter.user.id || info.userId == VLUserCenter.user.id else { return }
+        let title = info.type == .linking ?
         "show_seat_with_audience_end_seat_title".show_localized
         : "show_pking_with_broadcastor_end_pk_title".show_localized
         let alertVC = UIAlertController(title: title+"\(info.userName)", message: nil, preferredStyle: .alert)
@@ -913,22 +862,9 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
         }
         alertVC.addAction(ok)
         
-        if info.type == .linking {
-            #if DEBUG
-            #else
-            let actionTitle = info.muteAudio ?
-            "show_setting_mic_on".show_localized
-            : "show_setting_mic_off".show_localized
-            let micAction = UIAlertAction(title: actionTitle, style: .default) { _ in
-                self.serviceImp?.muteAudio(mute: !info.muteAudio, userId: info.userId) { err in
-                }
-            }
-            alertVC.addAction(micAction)
-            #endif
-        } else {
-            let cancel = UIAlertAction(title: "show_alert_cancel_btn_title".show_localized, style: .cancel)
-            alertVC.addAction(cancel)
-        }
+        let cancel = UIAlertAction(title: "show_alert_cancel_btn_title".show_localized, style: .cancel)
+        alertVC.addAction(cancel)
+        
         present(alertVC, animated: true)
     }
     
@@ -945,7 +881,6 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
                 self.dismiss(animated: true)
             }
         }else {
-            updateLoadingType(playState: .idle)
             self.delegate?.willLeaveRoom(roomId: self.roomId)
             dismiss(animated: true)
         }
@@ -992,22 +927,16 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickSettingButton() {
-#if DEBUG
-#else
-        var muteAudio: Bool = self.muteLocalAudio
-        if let info = currentInteraction, info.userId == VLUserCenter.user.id {
-            muteAudio = info.muteAudio
-        }
+        var muteAudio = self.muteLocalAudio
         settingMenuVC.selectedMap = [.camera: self.muteLocalVideo, .mic: muteAudio, .mute_mic: muteAudio]
         
         if interactionStatus == .idle {
             settingMenuVC.type = role == .broadcaster ? .idle_broadcaster : .idle_audience
         }else{
             settingMenuVC.type = role == .broadcaster ? .pking : (currentInteraction?.userId == VLUserCenter.user.id ? .pking : .idle_audience)
-            settingMenuVC.menuTitle = currentInteraction?.interactStatus == .pking ? "show_setting_menu_on_pk_title".show_localized : "show_setting_menu_on_seat_title".show_localized
+            settingMenuVC.menuTitle = currentInteraction?.type == .pk ? "show_setting_menu_on_pk_title".show_localized : "show_setting_menu_on_seat_title".show_localized
         }
         present(settingMenuVC, animated: true)
-#endif
     }
 }
 
@@ -1077,7 +1006,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
     // 结束连麦
     func onClickEndPkButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
-        guard let info = currentInteraction else { return }
+        guard let _ = currentInteraction else { return }
         serviceImp?.stopInteraction(roomId: roomId) { _ in
         }
     }
@@ -1086,7 +1015,6 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     func onClickMicButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self) {[weak self] granted in
             guard let self = self, granted else { return }
-            let uid = menu.type == .managerMic ? self.currentInteraction?.userId ?? "" : VLUserCenter.user.id
             self.serviceImp?.muteAudio(roomId: self.roomId, mute: selected) { err in
             }
             self.muteLocalAudio = selected
