@@ -92,13 +92,15 @@ extension ShowReceivePKAlertVC: ShowReceivePKViewDelegate {
 }
 
 extension ShowReceivePKAlertVC {
-    class func present(name:String?,style: ShowReceivePKView.Style = .pk, dismiss: @escaping ShowReceivePKAlertVCDismiss){
+    class func present(name:String?,style: ShowReceivePKView.Style = .pk, dismiss: @escaping ShowReceivePKAlertVCDismiss) -> UIViewController? {
         let vc = ShowReceivePKAlertVC()
         vc.name = name
         vc.style = style
         vc.dismissWithResult = dismiss
         let topVC = UIViewController.cl_topViewController()
         topVC?.present(vc, animated: true)
+        
+        return vc
     }
 }
 

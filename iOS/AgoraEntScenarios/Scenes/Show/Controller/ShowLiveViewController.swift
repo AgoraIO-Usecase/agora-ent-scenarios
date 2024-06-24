@@ -50,6 +50,7 @@ class ShowLiveViewController: UIViewController {
             currentMode = nil
         }
     }
+    private weak var inviteVC: UIViewController?
     private var currentChannelId: String?
     
     private var roomId: String {
@@ -492,13 +493,13 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onMicSeatInvitationUpdated(channelName: String, invitation: ShowMicSeatInvitation) {
-        guard invitation.userId == VLUserCenter.user.id else { return }
+        guard invitation.userId == VLUserCenter.user.id, inviteVC == nil else { return }
         if invitation.type == .inviting {
             isSendJointBroadcasting = true
             muteLocalVideo = true
             //收到连麦邀请，先推流，加速出图
             ShowAgoraKitManager.shared.prePublishOnseatVideo(isOn: true, channelId: roomId)
-            ShowReceivePKAlertVC.present(name: invitation.userName, style: .mic) {[weak self] result in
+            inviteVC = ShowReceivePKAlertVC.present(name: invitation.userName, style: .mic) {[weak self] result in
                 guard let self = self else {return}
                 switch result {
                 case .accept:
@@ -535,6 +536,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onPKInvitationUpdated(channelName: String, invitation: ShowPKInvitation) {
+        guard inviteVC == nil else {return}
         if invitation.type == .end, invitation.userId == VLUserCenter.user.id {
             ToastView.show(text: "show_end_broadcasting".show_localized)
         }
@@ -558,7 +560,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 ShowAgoraKitManager.shared.preSubscribePKVideo(isOn: true, channelId: invitation.fromRoomId)
             }
             let roomId = self.roomId
-            ShowReceivePKAlertVC.present(name: invitation.fromUserName) { result in
+            inviteVC = ShowReceivePKAlertVC.present(name: invitation.fromUserName) { result in
                 switch result {
                 case .accept:
                     self.serviceImp?.acceptPKInvitation(roomId: roomId,
