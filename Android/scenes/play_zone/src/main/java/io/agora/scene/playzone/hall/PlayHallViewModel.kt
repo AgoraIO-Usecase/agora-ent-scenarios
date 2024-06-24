@@ -11,11 +11,10 @@ import io.agora.scene.playzone.service.PlayZoneServiceProtocol
 import io.agora.scene.playzone.service.api.PlayApiManager
 import io.agora.scene.playzone.service.api.PlayGameInfoModel
 import io.agora.scene.playzone.service.api.PlayGameListModel
-import io.agora.scene.playzone.service.subApi.SubApiManager
 
 class PlayHallViewModel : ViewModel() {
 
-    private val playZoneApiManager by lazy {
+    private val playApiManager by lazy {
         PlayApiManager()
     }
 
@@ -25,17 +24,14 @@ class PlayHallViewModel : ViewModel() {
     val createRoomInfoLiveData = MutableLiveData<AUIRoomInfo?>()
     val joinRoomInfoLiveData = MutableLiveData<AUIRoomInfo?>()
 
-    private val subApiManager by lazy {
-        SubApiManager()
-    }
 
     val mGameListLiveData = MutableLiveData<List<PlayGameListModel>?>()
 
     fun getGameList(vendor: GameVendor) {
         // only test
-        subApiManager.getGameApiInfo { error, gameApi ->
+        playApiManager.getSubGameApiInfo { error, gameApi ->
             if (gameApi != null) {
-                subApiManager.getSubGameList(gameApi.api.get_mg_list) { gameError, list ->
+                playApiManager.getSubGameList(gameApi.api.get_mg_list) { gameError, list ->
                     if (gameError == null) {
                     } else {
                         ToastUtils.showToast(gameError.message ?: "获取游戏列表失败")
@@ -46,7 +42,7 @@ class PlayHallViewModel : ViewModel() {
             }
         }
 
-        playZoneApiManager.getGameList(vendor, completion = { error, gameList ->
+        playApiManager.getGameList(vendor, completion = { error, gameList ->
             if (error == null && gameList != null) {
                 mGameListLiveData.postValue(gameList)
             } else {

@@ -250,7 +250,8 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
             }
         }
         gameViewModel.captainIdLiveData.observe(this) {
-            binding.ivAddBot.isVisible = it.first == PlayCenter.mUser.id.toString() && it.second
+            val supportRobots = gameViewModel.supportRobots(gameId)
+            binding.ivAddBot.isVisible = supportRobots && it.first == PlayCenter.mUser.id.toString() && it.second
         }
 
         roomGameViewModel.mRoomTimeLiveData.observe(this) {

@@ -1,4 +1,4 @@
-package io.agora.scene.playzone.service.subApi
+package io.agora.scene.playzone.service.api
 
 import com.google.gson.annotations.SerializedName
 

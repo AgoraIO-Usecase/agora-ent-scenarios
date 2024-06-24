@@ -26,6 +26,7 @@ data class PlayGameInfoModel constructor(
     var gameId: Long = 0, // 游戏id
     var gamePic: Int = 0, // 游戏图标
     var gameUrl: String? = null, // 游戏地址
+    var supportRobots: Boolean = true, // 是否支持机器人
 ) : Serializable
 
 

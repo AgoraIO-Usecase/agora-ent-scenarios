@@ -1,11 +1,173 @@
 package io.agora.scene.playzone.service.api
 
+import android.util.Log
+import com.google.gson.GsonBuilder
+import com.google.gson.ToNumberPolicy
+import com.google.gson.TypeAdapter
+import com.google.gson.reflect.TypeToken
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
+import com.moczul.ok2curl.CurlInterceptor
+import com.moczul.ok2curl.logger.Logger
+import io.agora.rtmsyncmanager.service.callback.AUIException
+import io.agora.scene.playzone.BuildConfig
+import io.agora.scene.playzone.PlayLogger
 import io.agora.scene.playzone.R
 import io.agora.scene.playzone.hall.GameVendor
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
 
 class PlayApiManager {
 
+    companion object {
+        fun <T> errorFromResponse(response: Response<T>): AUIException {
+            val errorMsg = response.errorBody()?.string()
+            var code = response.code()
+            var msg = errorMsg
+            if (errorMsg != null) {
+                try {
+                    val obj = JSONObject(errorMsg)
+                    if (obj.has("code")) {
+                        code = obj.getInt("code")
+                    }
+                    if (obj.has("message")) {
+                        msg = obj.getString("message")
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            return AUIException(code, msg)
+        }
+
+        private var baseUrl = "https://sim-asc.sudden.ltd/"
+        private var retrofit: Retrofit? = null
+
+        fun <T> getService(clazz: Class<T>): T {
+            initRetrofit()
+            return retrofit!!.create(clazz)
+        }
+
+        private fun initRetrofit() {
+            if (retrofit == null) {
+                retrofit = Retrofit.Builder()
+                    .client(
+                        OkHttpClient.Builder()
+                            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+                            .addInterceptor(CurlInterceptor(object : Logger {
+                                override fun log(message: String) {
+                                    Log.v("Ok2Curl", message)
+                                }
+                            }))
+                            .build()
+                    )
+                    .baseUrl("$baseUrl")
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .build()
+            }
+        }
+
+
+        private val gson =
+            GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
+                .registerTypeAdapter(TypeToken.get(JSONObject::class.java).type, object : TypeAdapter<JSONObject>() {
+                    @Throws(IOException::class)
+                    override fun write(jsonWriter: JsonWriter, value: JSONObject) {
+                        jsonWriter.jsonValue(value.toString())
+                    }
+
+                    @Throws(IOException::class)
+                    override fun read(jsonReader: JsonReader): JSONObject? {
+                        return null
+                    }
+                })
+                .enableComplexMapKeySerialization()
+                .create()
+
+        private fun auth(): String {
+
+            // 实际的AppId和AppSecret
+            val appId = BuildConfig.sub_appid
+            val appSecret = BuildConfig.sub_appSecret
+            // 将AppSecret转换为字节数组
+            val secretKey = appSecret.toByteArray()
+            val secretKeySpec = SecretKeySpec(secretKey, "HmacMD5")
+
+            // 初始化 Mac 对象
+            val mac = Mac.getInstance("HmacMD5")
+            mac.init(secretKeySpec)
+
+            // 计算 HMAC
+            val hmacBytes = mac.doFinal(appId.toByteArray())
+
+            // 将字节数组转换为十六进制字符串
+            val appServerSign = hmacBytes.joinToString("") { "%02x".format(it) }
+            return appServerSign
+        }
+    }
+
     private val tag = "PlayApiManager"
+
+    private val apiInterface by lazy {
+        getService(SubApiService::class.java)
+    }
+
+    // 获取忽然 api
+    fun getSubGameApiInfo(completion: (error: Exception?, gameApi: SubGameApiInfo?) -> Unit) {
+        apiInterface.gameConfig(auth())
+            .enqueue(object : retrofit2.Callback<SubGameApiInfo> {
+                override fun onResponse(call: Call<SubGameApiInfo>, response: Response<SubGameApiInfo>) {
+                    val body = response.body()
+                    if (response.isSuccessful && body != null) {
+                        completion.invoke(null, body)
+                    } else {
+                        completion.invoke(errorFromResponse(response), null)
+                    }
+                }
+
+                override fun onFailure(call: Call<SubGameApiInfo>, t: Throwable) {
+                    completion.invoke(Exception(t.message), null)
+                }
+            })
+    }
+
+    // 获取忽然游戏列表
+    fun getSubGameList(url: String, completion: (error: Exception?, list: List<SubGameInfo>) -> Unit) {
+        PlayLogger.d(tag, "getGameList start")
+        val requestModel = SubGameListRequestModel(BuildConfig.sub_appid, BuildConfig.sub_appSecret)
+        apiInterface.gameList(url, requestModel)
+            .enqueue(object : retrofit2.Callback<SubCommonResp<SubGameResp>> {
+                override fun onResponse(
+                    call: Call<SubCommonResp<SubGameResp>>,
+                    response: Response<SubCommonResp<SubGameResp>>
+                ) {
+                    val rsp = response.body()?.data
+                    PlayLogger.d(tag, "zzzzzz getGameList return ${rsp?.mg_info_list?.size}")
+                    PlayLogger.d(tag, "zzzzzz getGameList return ${ response.raw()}")
+                    rsp?.mg_info_list?.forEach {
+                        PlayLogger.d(tag, "zzzzzz ${it.name.zh_CN} ${it.mg_id} ${it.thumbnail192x192.zh_CN}")
+                    }
+                    if (response.body()?.ret_code == 0 && rsp != null) { // success
+                        completion.invoke(null, rsp.mg_info_list ?: emptyList())
+                    } else {
+                        completion.invoke(errorFromResponse(response), emptyList())
+                    }
+                }
+
+                override fun onFailure(call: Call<SubCommonResp<SubGameResp>>, t: Throwable) {
+                    completion.invoke(Exception(t.message), emptyList())
+                }
+            })
+    }
+
 
     //--------------------------------------- 本地构建游戏列表-----------------------------------------
     fun getGameList(vendor: GameVendor, completion: (error: Exception?, list: List<PlayGameListModel>?) -> Unit) {
@@ -45,7 +207,7 @@ class PlayApiManager {
                 buildGameModel(1704460412809043970L, "欢乐大富翁", R.drawable.play_zone_ic_hldfw),
                 buildGameModel(1777154372100497410L, "Carrom", R.drawable.play_zone_ic_carrom),
 
-            )
+                )
         )
 
 
@@ -82,12 +244,12 @@ class PlayApiManager {
                 buildGameModel(1468180338417074177L, "飞行棋", R.drawable.play_zone_ic_fxq),
                 buildGameModel(1461297789198663710L, "黑白棋", R.drawable.play_zone_ic_hbq),
                 buildGameModel(1676069429630722049L, "五子棋", R.drawable.play_zone_ic_wzq),
-                buildGameModel(1557194487352053761L, "TeenPatti", R.drawable.play_zone_ic_teen_patti),
+                buildGameModel(1557194487352053761L, "TeenPatti", R.drawable.play_zone_ic_teen_patti, false),
                 buildGameModel(1537330258004504578L, "多米诺骨牌", R.drawable.play_zone_ic_dmngp),
                 buildGameModel(1533746206861164546L, "Okey101", R.drawable.play_zone_ic_ok101),
                 buildGameModel(1472142559912517633L, "UMO", R.drawable.play_zone_ic_umo),
                 buildGameModel(1472142695162044417L, "台湾麻将", R.drawable.play_zone_ic_twmj),
-                buildGameModel(1557194155570024449L, "德州扑克", R.drawable.play_zone_ic_dz),
+                buildGameModel(1557194155570024449L, "德州扑克", R.drawable.play_zone_ic_dz, false),
                 buildGameModel(1759471374694019074L, "Baloot", R.drawable.play_zone_ic_blt),
             )
         )
@@ -96,7 +258,7 @@ class PlayApiManager {
         val partyGameList = PlayGameListModel(
             gameType = PlayGameType.party_games,
             gameList = mutableListOf(
-                buildGameModel(1490944230389182466L, "友尽闯关", R.drawable.play_zone_ic_picopark),
+                buildGameModel(1490944230389182466L, "友尽闯关", R.drawable.play_zone_ic_picopark, false),
                 buildGameModel(1559030313895714818L, "麻将对对碰", R.drawable.play_zone_ic_mjddp),
                 buildGameModel(1564814666005299201L, "科学计算器", R.drawable.play_zone_ic_kxjsq),
                 buildGameModel(1564814818015264770L, "疯狂购物", R.drawable.play_zone_ic_fkgw),
@@ -113,11 +275,13 @@ class PlayApiManager {
     }
 
 
-    private fun buildGameModel(gameId: Long, gameName: String, gamePic: Int): PlayGameInfoModel {
+    private fun buildGameModel(gameId: Long, gameName: String, gamePic: Int, supportRobots: Boolean = true):
+            PlayGameInfoModel {
         val model: PlayGameInfoModel = PlayGameInfoModel().apply {
             this.gameId = gameId
             this.gameName = gameName
             this.gamePic = gamePic
+            this.supportRobots = supportRobots
         }
         return model
     }

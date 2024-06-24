@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
-import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnItemClickListener
@@ -27,7 +26,6 @@ import io.agora.scene.playzone.databinding.PlayZoneActivityGameHallLayoutBinding
 import io.agora.scene.playzone.databinding.PlayZoneItemGameHeaderLayoutBinding
 import io.agora.scene.playzone.databinding.PlayZoneItemGameLayoutBinding
 import io.agora.scene.playzone.databinding.PlayZoneItemGameTypeLayoutBinding
-import io.agora.scene.playzone.service.api.PlayApiManager
 import io.agora.scene.playzone.service.api.PlayGameInfoModel
 import io.agora.scene.playzone.service.api.PlayGameType
 
@@ -140,7 +138,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
                             showCreateRoomDialog(subGameInfo)
                         }
                     }
-                }, GameInfoeHolder::class.java)
+                }, GameInfoHolder::class.java)
                 listAdapter.add(gameAdapter)
             }
             concatAdapter = ConcatAdapter(listAdapter)
@@ -196,7 +194,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
      *
      * @param mBinding
      */
-    class GameInfoeHolder constructor(mBinding: PlayZoneItemGameLayoutBinding) :
+    class GameInfoHolder constructor(mBinding: PlayZoneItemGameLayoutBinding) :
         BaseRecyclerViewAdapter.BaseViewHolder<PlayZoneItemGameLayoutBinding, PlayGameInfoModel?>(mBinding) {
 
         override fun binding(subGame: PlayGameInfoModel?, selectedIndex: Int) {

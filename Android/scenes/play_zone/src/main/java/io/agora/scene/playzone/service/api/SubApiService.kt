@@ -1,4 +1,4 @@
-package io.agora.scene.playzone.service.subApi
+package io.agora.scene.playzone.service.api
 
 import io.agora.scene.playzone.BuildConfig
 import retrofit2.Call

@@ -399,6 +399,7 @@ public class QuickStartGameViewModel extends BaseGameViewModel {
                 aiPlayers.name = owner.userName;
                 aiPlayers.avatar = owner.userAvatar;
             }
+            aiPlayers.gender = playRobotInfo.getGender();
             aiPlayerList.add(aiPlayers);
             sudFSTAPPDecorator.notifyAPPCommonGameAddAIPlayers(aiPlayerList, 1);
         }
@@ -412,5 +413,13 @@ public class QuickStartGameViewModel extends BaseGameViewModel {
             }
         }
         return null;
+    }
+
+    public boolean supportRobots(long gameId) {
+        // TeenPatti, 德州扑克, 友尽闯关 暂时不支持机器人
+       if (gameId == 1557194487352053761L || gameId ==1557194155570024449L || gameId == 1490944230389182466L) {
+           return false;
+       }
+       return true;
     }
 }
