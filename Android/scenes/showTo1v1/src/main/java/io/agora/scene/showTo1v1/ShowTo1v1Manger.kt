@@ -15,14 +15,15 @@ import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
-import io.agora.scene.showTo1v1.audio.AudioScenarioApi
-import io.agora.scene.showTo1v1.callapi.CallApiImpl
-import io.agora.scene.showTo1v1.callapi.CallConfig
-import io.agora.scene.showTo1v1.callapi.PrepareConfig
-import io.agora.scene.showTo1v1.callapi.signalClient.CallRtmManager
-import io.agora.scene.showTo1v1.callapi.signalClient.ICallRtmManagerListener
-import io.agora.scene.showTo1v1.callapi.signalClient.createRtmManager
-import io.agora.scene.showTo1v1.callapi.signalClient.createRtmSignalClient
+import io.agora.audioscenarioapi.AudioScenarioApi
+import io.agora.onetoone.AGError
+import io.agora.onetoone.CallApiImpl
+import io.agora.onetoone.CallConfig
+import io.agora.onetoone.PrepareConfig
+import io.agora.onetoone.signalClient.CallRtmManager
+import io.agora.onetoone.signalClient.ICallRtmManagerListener
+import io.agora.onetoone.signalClient.createRtmManager
+import io.agora.onetoone.signalClient.createRtmSignalClient
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceImpl
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import java.util.concurrent.ExecutorService
@@ -109,12 +110,9 @@ class ShowTo1v1Manger constructor() {
     @Volatile
     private var isCallApiInit = false
 
-    fun setup(context: Context) {
-        initRtm()
-        mService = ShowTo1v1ServiceImpl(context, rtmManager!!.getRtmClient(), mCurrentUser)
-    }
+    private var isLogined = false
 
-    private fun initRtm() {
+    fun setup(context: Context, callback: (e: AGError?) -> Unit) {
         if (rtmManager == null) {
             // 使用RtmManager管理RTM
             rtmManager = createRtmManager(BuildConfig.AGORA_APP_ID, mCurrentUser.getIntUserId())
@@ -128,24 +126,27 @@ class ShowTo1v1Manger constructor() {
 
                 }
 
-                override fun onConnectionLost() {
-                    // 表示rtm超时断连了，需要重新登录，这里模拟了3s重新登录
-                }
-
                 override fun onTokenPrivilegeWillExpire(channelName: String) {
                     // 重新获取token
                     renewTokens {  }
                 }
             })
+            mService = ShowTo1v1ServiceImpl(context, rtmManager!!.getRtmClient(), mCurrentUser)
+            initCallAPi()
         }
 
         // rtm login
-        rtmManager?.login(mPrepareConfig.rtmToken) {
-            if (it == null) {
-                // login 成功后初始化 call api
-                initCallAPi()
+        if (!isLogined) {
+            rtmManager?.login(mPrepareConfig.rtmToken) {
+                if (it == null) {
+                    isLogined = true
+                }
+                callback.invoke(it)
             }
+        } else {
+            callback.invoke(null)
         }
+
     }
 
     private fun initCallAPi() {
@@ -283,7 +284,6 @@ class ShowTo1v1Manger constructor() {
                     setParameters("{\"rtc.video.quickIntraHighFec\": true}")
                     setParameters("{\"rtc.network.e2e_cc_mode\": 3}")
                 }
-                scenarioApi.initialize()
             }
             return innerRtcEngine!!
         }
@@ -300,6 +300,7 @@ class ShowTo1v1Manger constructor() {
             it.logout()
             RtmClient.release()
             rtmManager = null
+            isLogined = false
         }
         innerRtcEngine?.let {
             workingExecutor.execute { RtcEngine.destroy() }

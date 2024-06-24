@@ -44,9 +44,9 @@ import io.agora.scene.showTo1v1.CallRole
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
-import io.agora.scene.showTo1v1.audio.AudioScenarioType
-import io.agora.scene.showTo1v1.audio.SceneType
-import io.agora.scene.showTo1v1.callapi.*
+import io.agora.audioscenarioapi.AudioScenarioType
+import io.agora.audioscenarioapi.SceneType
+import io.agora.onetoone.*
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1CallDetailActivityBinding
 import io.agora.scene.showTo1v1.service.ROOM_AVAILABLE_DURATION
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
@@ -426,21 +426,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         )
     }
 
-    private val mainRtcListener = object : IRtcEngineEventHandler() {
-        override fun onUserOffline(uid: Int, reason: Int) {
-            super.onUserOffline(uid, reason)
-            if (!isRoomOwner && uid == mRoomInfo.getIntUserId()) {
-                runOnUiThread {
-                    // 主播离线，退出房间
-                    ToastUtils.showToast(R.string.show_to1v1_end_tips)
-                    onBackPressed()
-                }
-            }
-        }
-    }
-
     private fun initRtcEngine() {
-        mRtcEngine.addHandlerEx(mainRtcListener, mMainRtcConnection)
         toggleSelfVideo(isRoomOwner) {
             if (isRoomOwner) {
                 mRtcEngine.startPreview()
@@ -553,6 +539,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
             override fun onRoomDidDestroy(roomId: String) {
                 if (mRoomInfo.roomId == roomId) {
+                    ToastUtils.showToast(R.string.show_to1v1_end_tips)
                     onBackPressed()
                 }
             }
@@ -616,7 +603,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         if (isGoingFinish) return
         isGoingFinish = true
         stopCallAnimator()
-        mRtcEngine.removeHandlerEx(mainRtcListener, mMainRtcConnection)
         mainHandler.removeCallbacks(timerRoomRun)
         mainHandler.removeCallbacks(connectedViewCloseRun)
         mainHandler.removeCallbacksAndMessages(null)
