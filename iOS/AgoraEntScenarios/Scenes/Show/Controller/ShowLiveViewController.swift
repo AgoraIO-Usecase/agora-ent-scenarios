@@ -477,6 +477,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         showPrint("onMicSeatApplyUpdated: \(applies.count)")
         _updateApplyMenu()
         liveView.bottomBar.linkButton.isShowRedDot = applies.count > 0 ? true : false
+        self.applyAndInviteView.reloadData()
 //        if currentInteraction?.userId == VLUserCenter.user.id {
 //            liveView.bottomBar.linkButton.isEnabled = false
 //        } else {
