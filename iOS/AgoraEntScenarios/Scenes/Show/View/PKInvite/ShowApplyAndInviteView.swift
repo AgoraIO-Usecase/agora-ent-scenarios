@@ -70,7 +70,7 @@ class ShowApplyAndInviteView: UIView {
     }()
     private lazy var tipsLabel: AGELabel = {
         let label = AGELabel(colorStyle: .black, fontStyle: .middle)
-        label.text = "与主播gdsklgjlgPK中"
+        label.text = "与主播PK中"
         return label
     }()
     private lazy var endButton: AGEButton = {
