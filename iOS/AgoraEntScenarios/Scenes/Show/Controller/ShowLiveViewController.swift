@@ -495,7 +495,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 guard let self = self else {return}
                 switch result {
                 case .accept:
-                    ToastView.showWait(text: "show_is_onseat_doing".show_localized)
+                    ToastView.show(text: "show_is_onseat_doing".show_localized)
                     self.serviceImp?.acceptMicSeatInvitation(roomId: roomId, 
                                                              invitationId: invitation.id) { err in
                         guard let _ = err else { return }
