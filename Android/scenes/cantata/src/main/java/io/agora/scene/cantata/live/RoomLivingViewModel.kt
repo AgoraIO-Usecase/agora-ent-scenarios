@@ -21,7 +21,7 @@ import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.debugSettings.CantataDebugSettingBean
 import io.agora.scene.cantata.debugSettings.CantataDebugSettingsDialog
-import io.agora.scene.cantata.ktvapi.*
+import io.agora.ktvapi.*
 import io.agora.scene.cantata.live.bean.MusicSettingBean
 import io.agora.scene.cantata.live.fragmentdialog.MusicSettingCallback
 import io.agora.scene.cantata.service.*

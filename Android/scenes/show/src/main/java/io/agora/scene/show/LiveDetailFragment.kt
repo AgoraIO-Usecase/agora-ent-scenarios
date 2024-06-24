@@ -47,9 +47,9 @@ import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.show.audio.AudioScenarioApi
-import io.agora.scene.show.audio.AudioScenarioType
-import io.agora.scene.show.audio.SceneType
+import io.agora.audioscenarioapi.AudioScenarioApi
+import io.agora.audioscenarioapi.AudioScenarioType
+import io.agora.audioscenarioapi.SceneType
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLiveDetailFragmentBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
@@ -1864,7 +1864,6 @@ class LiveDetailFragment : Fragment() {
                 isRoomOwner || isMeLinking(),
                 callback = {
                     // nothing
-                    scenarioApi.initialize()
                     if (isRoomOwner) {
                         scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
                     } else if (isMeLinking()) {

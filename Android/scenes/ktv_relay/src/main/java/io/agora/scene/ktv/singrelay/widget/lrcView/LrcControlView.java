@@ -49,7 +49,7 @@ import io.agora.scene.ktv.singrelay.KTVLogger;
 import io.agora.scene.ktv.singrelay.R;
 import io.agora.scene.ktv.singrelay.databinding.KtvRelayLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.singrelay.databinding.KtvRelayLayoutLrcPrepareBinding;
-import io.agora.scene.ktv.singrelay.ktvapi.ILrcView;
+import io.agora.ktvapi.ILrcView;
 import io.agora.scene.ktv.singrelay.service.RoomSelSongModel;
 import io.agora.scene.widget.basic.OutlineSpan;
 import io.agora.scene.widget.utils.UiUtils;
