@@ -132,7 +132,7 @@ class ShowPKInviteViewCell: ShowInviteCell {
             statusButton.setTitle(pkStatus.title, for: .normal)
             statusButton.setTitleColor(pkStatus.titleColor, for: .normal)
             statusButton.setBackgroundImage(pkStatus.bgImage, for: .normal)
-            statusButton.isEnabled = pkStatus != .waitting
+//            statusButton.isEnabled = pkStatus != .waitting
         }
     }
     
@@ -153,13 +153,16 @@ class ShowPKInviteViewCell: ShowInviteCell {
             return
         }
 
+        statusButton.isEnabled = false
         AppContext.showServiceImp()?.createPKInvitation(roomId: roomId,
                                                         pkRoomId: invitation.roomId) {[weak self] error in
+            guard let self = self else { return }
+            self.statusButton.isEnabled = true
             if let err = error {
                 ToastView.show(text: err.localizedDescription)
                 return
             }
-            self?.refreshDataClosure?()
+            self.refreshDataClosure?()
         }
     }
 }
@@ -172,34 +175,17 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
 
     func setupApplyAndInviteData(model: Any?, isLink: Bool) {
         statusButton.isHidden = isLink
+        statusButton.isEnabled = true
         if let model = model as? ShowMicSeatApply {
             seatApplyModel = model
             nameLabel.text = model.userName
             statusButton.tag = 1
             avatarImageView.sd_setImage(with: URL(string: model.userAvatar),
                                         placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
-            #if DEBUG
             statusButton.isUserInteractionEnabled = true
             statusButton.setTitle("show_onseat_agree".show_localized, for: .normal)
             statusButton.setBackgroundImage(UIImage.show_sceneImage(name: "show_invite_btn_bg"), for: .normal)
             statusButton.setTitleColor(.white, for: .normal)
-            #else
-            switch model.status {
-            case .accepted:
-                statusButton.isUserInteractionEnabled = false
-                statusButton.setTitle("show_is_onseat".show_localized, for: .normal)
-                statusButton.setTitleColor(.black, for: .normal)
-                statusButton.setBackgroundImage(nil, for: .normal)
-                
-            case .waitting:
-                statusButton.isUserInteractionEnabled = true
-                statusButton.setTitle("show_onseat_agree".show_localized, for: .normal)
-                statusButton.setBackgroundImage(UIImage.show_sceneImage(name: "show_invite_btn_bg"), for: .normal)
-                statusButton.setTitleColor(.white, for: .normal)
-                
-            default: break
-            }
-            #endif
             
         } else if let model = model as? ShowUser {
             seatInvitationModel = model
@@ -207,26 +193,10 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
             statusButton.tag = 2
             avatarImageView.sd_setImage(with: URL(string: model.userAvatar),
                                         placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
-#if DEBUG
             statusButton.setTitle("show_application".show_localized, for: .normal)
             statusButton.setBackgroundImage(UIImage.show_sceneImage(name: "show_invite_btn_bg"), for: .normal)
             statusButton.setTitleColor(.white, for: .normal)
             statusButton.isUserInteractionEnabled = true
-#else
-            switch model.status {
-            case .waitting:
-                statusButton.isUserInteractionEnabled = false
-                statusButton.setTitle("show_is_waitting".show_localized, for: .normal)
-                statusButton.setBackgroundImage(nil, for: .normal)
-                statusButton.setTitleColor(.black, for: .normal)
-                
-            default:
-                statusButton.setTitle("show_application".show_localized, for: .normal)
-                statusButton.setBackgroundImage(UIImage.show_sceneImage(name: "show_invite_btn_bg"), for: .normal)
-                statusButton.setTitleColor(.white, for: .normal)
-                statusButton.isUserInteractionEnabled = true
-            }
-#endif
         }
     }
     
@@ -263,17 +233,23 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
         super.onTapStatusButton(sender: sender)
         guard let roomId = roomId else {return}
         if let model = seatApplyModel, sender.tag == 1 {
+            self.statusButton.isEnabled = false
             AppContext.showServiceImp()?.acceptMicSeatApply(roomId: roomId, userId: model.userId) {[weak self] _ in
-                self?.refreshDataClosure?()
+                guard let self = self else { return }
+                self.statusButton.isEnabled = true
+                self.refreshDataClosure?()
             }
         } else if let model = seatInvitationModel {
+            self.statusButton.isEnabled = false
             AppContext.showServiceImp()?.createMicSeatInvitation(roomId: roomId, userId: model.userId) {[weak self] error in
+                guard let self = self else { return }
+                self.statusButton.isEnabled = true
                 if let err = error {
                     ToastView.show(text: err.localizedDescription)
                     return
                 }
                 
-                self?.refreshDataClosure?()
+                self.refreshDataClosure?()
             }
         }
     }

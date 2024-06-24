@@ -10,7 +10,7 @@ import AgoraCommon
 import RTMSyncManager
 
 private let kSceneId = "scene_show_5.0.0"
-private let kRoomPresenceChannelName = "scene_show_pk_list"
+private let kRoomPresenceChannelName = "scene_show_5_0_0_9999999"
 
 private func agoraPrint(_ message: String) {
     showPrint(message, context: "Service")
