@@ -132,6 +132,22 @@ extension ShowSyncManagerServiceImp {
         scene?.unbindRespDelegate(delegate: self)
         scene?.userService.unbindRespDelegate(delegate: self)
     }
+    
+    private func _sendJoinOrLeaveText(channelName: String,
+                                      user: AUIUserInfo,
+                                      isJoin: Bool) {
+        if let values = delegates[channelName] {
+            let message = ShowMessage()
+            message.userId = user.userId
+            message.userName = user.userName
+            message.message = (isJoin ? "join_live_room" : "leave_live_room").show_localized
+            message.createAt = Date().millionsecondSince1970()
+            
+            for element in values.allObjects {
+                element.onMessageDidAdded(channelName: channelName, message: message)
+            }
+        }
+    }
 }
 
 //MARK: ShowServiceProtocol
@@ -522,6 +538,8 @@ extension ShowSyncManagerServiceImp: AUIUserRespDelegate {
                                            userCount: scene?.userService.userList.count ?? 0)
             }
         }
+        
+        _sendJoinOrLeaveText(channelName: roomId, user: userInfo, isJoin: true)
     }
     
     public func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
@@ -533,6 +551,7 @@ extension ShowSyncManagerServiceImp: AUIUserRespDelegate {
                                            userCount: scene?.userService.userList.count ?? 0)
             }
         }
+        _sendJoinOrLeaveText(channelName: roomId, user: userInfo, isJoin: false)
     }
     
     public func onRoomUserUpdate(roomId: String, userInfo: AUIUserInfo) {
