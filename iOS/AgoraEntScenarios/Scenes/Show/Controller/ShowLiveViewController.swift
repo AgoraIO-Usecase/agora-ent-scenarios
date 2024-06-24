@@ -387,8 +387,10 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     private func _subscribeServiceEvent() {
         serviceImp?.subscribeEvent(roomId: roomId, delegate: self)
         //TODO: migration
-        applyAndInviteView.applyStatusClosure = { [weak self] status in
-            self?.liveView.canvasView.canvasType = status == .linking ? .joint_broadcasting : .none
+        if role == .broadcaster {
+            applyAndInviteView.applyStatusClosure = { [weak self] status in
+                self?.liveView.canvasView.canvasType = status == .linking ? .joint_broadcasting : .none
+            }
         }
         
         _refreshPKUserList()
@@ -477,7 +479,11 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         showPrint("onMicSeatApplyUpdated: \(applies.count)")
         _updateApplyMenu()
         liveView.bottomBar.linkButton.isShowRedDot = applies.count > 0 ? true : false
-        self.applyAndInviteView.reloadData()
+        if role == .broadcaster {
+            applyAndInviteView.reloadData()
+        } else {
+            applyView.reloadData()
+        }
 //        if currentInteraction?.userId == VLUserCenter.user.id {
 //            liveView.bottomBar.linkButton.isEnabled = false
 //        } else {
@@ -589,7 +595,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onPKInvitationRejected(channelName: String, invitation: ShowPKInvitation) {
-        guard  invitation.fromUserId == VLUserCenter.user.id else { return }
+        guard invitation.fromUserId == VLUserCenter.user.id else { return }
         
         if invitation.fromRoomId == room?.roomId {
             //send invitation
@@ -749,20 +755,20 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
         showPrint("rtcEngine didOfflineOfUid === \(uid) reason: \(reason.rawValue)")
-        if let interaction = self.currentInteraction {
-            let isRoomOwner: Bool = role == .broadcaster
-            let isInteractionLeave: Bool = interaction.userId == "\(uid)"
-            let roomOwnerExit: Bool = room?.ownerId ?? "" == "\(uid)"
-            if roomOwnerExit {
-                //room owner exit
-                serviceImp?.stopInteraction(roomId: roomId) { err in
-                }
-            } else if isRoomOwner, isInteractionLeave {
-                //room owner found interaction(pk/onseat) user offline
-                serviceImp?.stopInteraction(roomId: roomId) { err in
-                }
-            }
-        }
+//        if let interaction = self.currentInteraction {
+//            let isRoomOwner: Bool = role == .broadcaster
+//            let isInteractionLeave: Bool = interaction.userId == "\(uid)"
+//            let roomOwnerExit: Bool = room?.ownerId ?? "" == "\(uid)"
+//            if roomOwnerExit {
+//                //room owner exit
+//                serviceImp?.stopInteraction(roomId: roomId) { err in
+//                }
+//            } else if isRoomOwner, isInteractionLeave {
+//                //room owner found interaction(pk/onseat) user offline
+//                serviceImp?.stopInteraction(roomId: roomId) { err in
+//                }
+//            }
+//        }
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, reportRtcStats stats: AgoraChannelStats) {
@@ -928,8 +934,8 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickSettingButton() {
-        var muteAudio = self.muteLocalAudio
-        settingMenuVC.selectedMap = [.camera: self.muteLocalVideo, .mic: muteAudio, .mute_mic: muteAudio]
+        let muteAudio = self.muteLocalAudio
+        settingMenuVC.selectedMap = [.camera: self.muteLocalVideo, .mic: muteAudio]
         
         if interactionStatus == .idle {
             settingMenuVC.type = role == .broadcaster ? .idle_broadcaster : .idle_audience
@@ -1024,10 +1030,10 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
     // 静音
     func onClickMuteMicButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
-//        let uid = menu.type == .managerMic ? currentInteraction?.userId ?? "" : VLUserCenter.user.id
-//        serviceImp?.muteAudio(roomId: roomId，mute: selected, userId: uid) { err in
-//        }
-//        self.muteLocalAudio = selected
+        let uid = menu.type == .managerMic ? currentInteraction?.userId ?? "" : VLUserCenter.user.id
+        serviceImp?.muteAudio(roomId: self.roomId, mute: selected) { err in
+        }
+        self.muteLocalAudio = selected
     }
     
     func onClickRealTimeDataButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {

@@ -90,6 +90,10 @@ class ShowApplyView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func reloadData() {
+        getAllMicSeatList(autoApply: false)
+    }
+    
     func getAllMicSeatList(autoApply: Bool) {
         var imp = AppContext.showServiceImp()
         let channelName = roomId ?? ""
@@ -103,13 +107,9 @@ class ShowApplyView: UIView {
                 updateRevokeButton = true
                 imp?.createMicSeatApply(roomId: channelName) { error in
                     if let error = error {
-                        self?.revokeutton.isHidden = true
+//                        self?.revokeutton.isHidden = true
                         ToastView.show(text: error.localizedDescription)
                         return
-                    }
-                    
-                    DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
-                        self?.getAllMicSeatList(autoApply: autoApply)
                     }
                 }
             }
@@ -122,6 +122,8 @@ class ShowApplyView: UIView {
                                            spacing: 5)
                 self?.revokeutton.tag = 0
                 self?.revokeutton.isHidden = false
+            } else {
+                self?.revokeutton.isHidden = true
             }
             
             self?.setupTipsInfo(count: list.count)
@@ -193,13 +195,12 @@ class ShowApplyView: UIView {
     @objc
     private func onTapRevokeButton(sender: AGEButton) {
         if sender.tag == 0, let dataArray = tableView.dataArray, dataArray.count > 0 {
-//            revokeutton.isHidden = true
             AppContext.showServiceImp()?.cancelMicSeatApply(roomId: roomId) { _ in }
-            let index = tableView.dataArray?.firstIndex(where: { ($0 as? ShowMicSeatApply)?.userId == VLUserCenter.user.id }) ?? 0
-            tableView.dataArray?.remove(at: index)
-            setupTipsInfo(count: dataArray.count)
+//            let index = tableView.dataArray?.firstIndex(where: { ($0 as? ShowMicSeatApply)?.userId == VLUserCenter.user.id }) ?? 0
+//            tableView.dataArray?.remove(at: index)
+//            setupTipsInfo(count: dataArray.count)
             self.invokeClosure?()
-        } else if let interactionModel = interactionModel {
+        } else if let _ = interactionModel {
             AppContext.showServiceImp()?.stopInteraction(roomId: roomId) { _ in }
             AlertManager.hiddenView()
         }
