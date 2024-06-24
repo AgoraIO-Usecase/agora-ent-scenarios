@@ -202,6 +202,14 @@ public typealias ShowInteractionInfo = InteractionInfo
 
 
 extension AUIRoomInfo {
+    @objc var roomUserCount: Int {
+        set {
+            self.customPayload["roomUserCount"]  = newValue
+        } get {
+            return self.customPayload["roomUserCount"] as? Int ?? 0
+        }
+    }
+    
     func createShowServiceModel() -> ShowRoomListModel {
         let model = ShowRoomListModel()
         model.roomId = roomId
@@ -223,7 +231,7 @@ extension AUIRoomInfo {
         let roomInfo = AUIRoomInfo()
         roomInfo.roomId = model.roomId
         roomInfo.roomName = model.roomName ?? ""
-        roomInfo.customPayload["roomUserCount"] = model.roomUserCount
+        roomInfo.roomUserCount = model.roomUserCount
         let owner = AUIUserThumbnailInfo()
         owner.userId = model.ownerId
         owner.userName = model.ownerName ?? ""

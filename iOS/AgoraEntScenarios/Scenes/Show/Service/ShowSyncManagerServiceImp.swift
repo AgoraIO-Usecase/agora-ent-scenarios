@@ -148,6 +148,40 @@ extension ShowSyncManagerServiceImp {
             }
         }
     }
+    
+    
+    private func updateRoom(channelName:String, 
+                            userCount: Int,
+                            completion: @escaping (NSError?) -> Void) {
+        guard let roomInfo = roomService.getRoomInfo(roomId: channelName) else {
+            completion(NSError(domain: "not found roominfo", code: -1))
+            return
+        }
+        let updateRoomInfo: () -> Void = {[weak self] in
+            guard let self = self else {return}
+            roomInfo.roomUserCount = userCount
+            roomManager.updateRoom(room: roomInfo) { err, info in
+                if let err = err {
+                    agoraPrint("enter scene fail: \(err.localizedDescription)")
+                    completion(err)
+                    return
+                }
+                completion(nil)
+            }
+        }
+        
+        if isLogined == false {
+            login { err in
+                if err == nil {
+                    updateRoomInfo()
+                } else {
+                    completion(err as NSError?)
+                }
+            }
+        } else {
+            updateRoomInfo()
+        }
+    }
 }
 
 //MARK: ShowServiceProtocol
@@ -520,47 +554,67 @@ extension ShowSyncManagerServiceImp: InteractionManagerProtocol {
 //MARK: AUIUserRespDelegate
 extension ShowSyncManagerServiceImp: AUIUserRespDelegate {
     public func onRoomUserSnapshot(roomId: String, userList: [AUIUserInfo]) {
+        let scene = syncManager.getScene(channelName: roomId)
+        let userCount = scene?.userService.userList.count ?? 0
         if let values = delegates[roomId] {
             for element in values.allObjects {
                 let scene = syncManager.getScene(channelName: roomId)
                 element.onUserCountChanged(channelName: roomId,
-                                           userCount: scene?.userService.userList.count ?? 0)
+                                           userCount: userCount)
             }
+        }
+        
+        updateRoom(channelName: roomId, userCount: userCount) { _ in
         }
     }
     
     public func onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {
+        let scene = syncManager.getScene(channelName: roomId)
+        let userCount = scene?.userService.userList.count ?? 0
         if let values = delegates[roomId] {
             for element in values.allObjects {
                 element.onUserJoinedRoom(channelName: roomId, user: userInfo)
                 let scene = syncManager.getScene(channelName: roomId)
                 element.onUserCountChanged(channelName: roomId,
-                                           userCount: scene?.userService.userList.count ?? 0)
+                                           userCount: userCount)
             }
+        }
+        
+        updateRoom(channelName: roomId, userCount: userCount) { _ in
         }
         
         _sendJoinOrLeaveText(channelName: roomId, user: userInfo, isJoin: true)
     }
     
     public func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
+        let scene = syncManager.getScene(channelName: roomId)
+        let userCount = scene?.userService.userList.count ?? 0
         if let values = delegates[roomId] {
             for element in values.allObjects {
                 element.onUserLeftRoom(channelName: roomId, user: userInfo)
                 let scene = syncManager.getScene(channelName: roomId)
                 element.onUserCountChanged(channelName: roomId,
-                                           userCount: scene?.userService.userList.count ?? 0)
+                                           userCount: userCount)
             }
         }
+        
+        updateRoom(channelName: roomId, userCount: userCount) { _ in
+        }
+        
         _sendJoinOrLeaveText(channelName: roomId, user: userInfo, isJoin: false)
     }
     
     public func onRoomUserUpdate(roomId: String, userInfo: AUIUserInfo) {
+        let scene = syncManager.getScene(channelName: roomId)
+        let userCount = scene?.userService.userList.count ?? 0
         if let values = delegates[roomId] {
             for element in values.allObjects {
-                let scene = syncManager.getScene(channelName: roomId)
                 element.onUserCountChanged(channelName: roomId,
-                                           userCount: scene?.userService.userList.count ?? 0)
+                                           userCount: userCount)
             }
+        }
+        
+        updateRoom(channelName: roomId, userCount: userCount) { _ in
         }
     }
     
