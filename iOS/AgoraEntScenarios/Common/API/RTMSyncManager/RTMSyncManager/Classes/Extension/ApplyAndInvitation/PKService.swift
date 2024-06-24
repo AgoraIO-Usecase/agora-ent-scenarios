@@ -226,9 +226,9 @@ extension PKService: RoomPresenceProtocol {
     
     public func onUserUpdate(channelName: String, user: RoomPresenceInfo) {
         aui_info("onUserUpdate[\(user.roomId)] userId: \(user.ownerId), name: \(user.ownerName), status: \(user.status.rawValue)", tag: "PKService")
+        let channelName = self.channelName
         // 被PK方 -> 发起PK方
         if user.roomId != channelName {
-            
             if let currInfo = roomPresenceService.getRoomPresenceInfo(roomId: channelName),
                user.status == .pk,
                currInfo.status == .idle,
