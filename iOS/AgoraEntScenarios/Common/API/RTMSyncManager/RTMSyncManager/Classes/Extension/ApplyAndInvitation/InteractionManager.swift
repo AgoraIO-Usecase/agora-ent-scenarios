@@ -86,17 +86,6 @@ private let inviteKey = ""
         return service
     }
     
-    private func getMessageManager(channelName: String) -> InviteMessageManager {
-        if let manager = messageManagerMap[channelName] {
-            return manager
-        }
-        
-        let manager = InviteMessageManager(channelName: channelName, 
-                                           key: channelName,
-                                           rtmManager: syncmanager.rtmManager)
-        messageManagerMap[channelName] = manager
-        return manager
-    }
     
     private func subscribeInteraction(channelName: String) {
         let collection = getInteractionService(channelName: channelName).interactionCollection
@@ -227,8 +216,19 @@ private let inviteKey = ""
 
 //MARK: public
 extension InteractionManager {
-    public func enterScene(roomInfo: AUIRoomInfo) {
-        let channelName = roomInfo.roomId
+    public func getMessageManager(channelName: String, key: String) -> InviteMessageManager {
+        if let manager = messageManagerMap[channelName] {
+            return manager
+        }
+        
+        let manager = InviteMessageManager(channelName: channelName,
+                                           key: key,
+                                           rtmManager: syncmanager.rtmManager)
+        messageManagerMap[channelName] = manager
+        return manager
+    }
+    
+    public func enterScene(channelName: String, roomName: String) {
         let scene = syncmanager.getScene(channelName: channelName)
         scene?.bindRespDelegate(delegate: self)
         
@@ -237,7 +237,7 @@ extension InteractionManager {
             //set pk user list
             let user = RoomPresenceInfo()
             user.roomId = channelName
-            user.roomName = roomInfo.roomName
+            user.roomName = roomName
             user.ownerId = AUIRoomContext.shared.currentUserInfo.userId
             user.ownerName = AUIRoomContext.shared.currentUserInfo.userName
             user.ownerAvatar = AUIRoomContext.shared.currentUserInfo.userAvatar
@@ -249,7 +249,7 @@ extension InteractionManager {
         }
         
         //lazy load service
-        let messageManager = getMessageManager(channelName: channelName)
+//        let messageManager = getMessageManager(channelName: channelName)
         let interactionService = getInteractionService(channelName: channelName)
         let applyService = getApplyService(channelName: channelName)
         let invitationService = getInvitationService(channelName: channelName)
@@ -297,6 +297,11 @@ extension InteractionManager {
         service.cancelApply(userId: userId, completion: completion)
     }
     
+    public func getApplyList(channelName: String, completion:@escaping ((NSError?, [ApplyInfo]?)-> Void)) {
+        let service = getApplyService(channelName: channelName)
+        service.getApplyList(completion: completion)
+    }
+    
     //invitation
     public func startInvite(channelName: String, userId: String, completion: ((NSError?)->())?) {
         let service = getInvitationService(channelName: channelName)
@@ -335,9 +340,14 @@ extension InteractionManager {
         service.rejectPK(pkId: pkId, completion: completion)
     }
     
-    //get
-    public func getPKUserList() -> [RoomPresenceInfo] {
-        return roomPresenceService.userList
+    public func getPKUserList(completion: @escaping (NSError?, [RoomPresenceInfo]?)->()) {
+        roomPresenceService.getAllRoomPresenceInfo(completion: completion)
+    }
+    
+    public func getLatestInteractionInfo(channelName: String,
+                                         completion: ((NSError?, InteractionInfo?)->())?) {
+        let service = getInteractionService(channelName: channelName)
+        service.getLatestInteractionInfo(completion: completion)
     }
     
     public func stopInteraction(channelName: String,

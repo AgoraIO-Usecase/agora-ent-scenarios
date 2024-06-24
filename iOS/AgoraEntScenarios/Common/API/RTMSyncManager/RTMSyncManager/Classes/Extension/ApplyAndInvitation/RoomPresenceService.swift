@@ -7,19 +7,13 @@
 
 import Foundation
 
-@objc public enum RoomPresenceStatus: Int, Codable {
-    case idle = 0
-    case linking = 1
-    case pk = 2
-}
-
 @objcMembers public class RoomPresenceInfo: NSObject, Codable {
     public var roomId: String = "" // 唯一房间ID
     public var roomName: String = "" // 房间名
     public var ownerId: String = "" // 房主用户ID
     public var ownerName: String = "" // 房主名
     public var ownerAvatar: String = "" // 房主头像
-    public var status: RoomPresenceStatus = .idle
+    public var status: InteractionType = .idle
     public var interactorId: String = "" // 互动者ID
     public var interactorName: String = ""  // 互动者名
     
@@ -46,11 +40,17 @@ import Foundation
 //    }
 }
 
+private func convertMap(_ map: [String: Any]) -> [String: Any] {
+    var convertMap = map
+    convertMap["status"] = Int("\(map["status"] as? String ?? "")") ?? 0
+    return convertMap
+}
+
 @objc public protocol RoomPresenceProtocol: NSObjectProtocol {
-    func onUserSnapshot(userList: [RoomPresenceInfo])
-    func onUserUpdate(user: RoomPresenceInfo)
-    func onUserDelete(user: RoomPresenceInfo)
-    func onUserError(error: NSError)
+    func onUserSnapshot(channelName: String, userList: [RoomPresenceInfo])
+    func onUserUpdate(channelName: String, user: RoomPresenceInfo)
+    func onUserDelete(channelName: String, user: RoomPresenceInfo)
+    func onUserError(channelName: String, error: NSError)
 }
 
 public class RoomPresenceService: NSObject {
@@ -105,7 +105,7 @@ extension RoomPresenceService {
     }
     
     public func updateRoomPresenceInfo(roomId: String,
-                                       status: RoomPresenceStatus,
+                                       status: InteractionType,
                                        interactorId: String,
                                        interactorName: String,
                                        completion: ((NSError?) -> ())?) {
@@ -139,7 +139,8 @@ extension RoomPresenceService {
                 completion(err, nil)
                 return
             }
-            let userList: [RoomPresenceInfo] = decodeModelArray(userList ?? []) ?? []
+            let convertUserList = userList?.map { convertMap($0)} ?? []
+            let userList: [RoomPresenceInfo] = decodeModelArray(convertUserList) ?? []
             self.userList = userList
             completion(nil, userList)
         }
@@ -147,11 +148,7 @@ extension RoomPresenceService {
 }
 
 extension RoomPresenceService: AUIRtmUserProxyDelegate {
-    private func convertMap(_ map: [String: Any]) -> [String: Any] {
-        var convertMap = map
-        convertMap["status"] = Int("\(map["status"] as? String ?? "")") ?? 0
-        return convertMap
-    }
+    
     
     public func onCurrentUserJoined(channelName: String) {
         
@@ -159,11 +156,11 @@ extension RoomPresenceService: AUIRtmUserProxyDelegate {
     
     public func onUserSnapshotRecv(channelName: String, userId: String, userList: [[String : Any]]) {
         aui_info("onUserSnapshotRecv user count: \(userList.count)", tag: "RoomPresenceService")
-        let convertUserList = userList.map { self.convertMap($0) }
+        let convertUserList = userList.map { convertMap($0) }
         let userList: [RoomPresenceInfo] = decodeModelArray(convertUserList) ?? []
         self.userList = userList
         respDelegates.allObjects.forEach { delegate in
-            delegate.onUserSnapshot(userList: userList)
+            delegate.onUserSnapshot(channelName: channelName, userList: userList)
         }
     }
     
@@ -180,7 +177,7 @@ extension RoomPresenceService: AUIRtmUserProxyDelegate {
         guard let user = userList.filter({ $0.ownerId == userId }).first else {return}
         self.userList.removeAll { $0.ownerId == userId }
         respDelegates.allObjects.forEach { delegate in
-            delegate.onUserDelete(user: user)
+            delegate.onUserDelete(channelName: channelName, user: user)
         }
     }
     
@@ -195,9 +192,7 @@ extension RoomPresenceService: AUIRtmUserProxyDelegate {
         }
         
         respDelegates.allObjects.forEach { delegate in
-            delegate.onUserUpdate(user: user)
+            delegate.onUserUpdate(channelName: channelName, user: user)
         }
     }
-    
-    
 }

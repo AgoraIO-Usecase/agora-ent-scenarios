@@ -90,9 +90,14 @@ class ShowApplyView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func reloadData() {
+        getAllMicSeatList(autoApply: false)
+    }
+    
     func getAllMicSeatList(autoApply: Bool) {
-        var imp = AppContext.showServiceImp(roomId)
-        imp?.getAllMicSeatApplyList {[weak self] _, list in
+        var imp = AppContext.showServiceImp()
+        let channelName = roomId ?? ""
+        imp?.getAllMicSeatApplyList(roomId: channelName) {[weak self] _, list in
             guard let list = list?.filter({ $0.userId != self?.interactionModel?.userId }) else { return }
             let seatUserModel = list.filter({ $0.userId == VLUserCenter.user.id }).first
             var updateRevokeButton = false
@@ -100,15 +105,11 @@ class ShowApplyView: UIView {
                 updateRevokeButton = true
             } else if seatUserModel == nil, autoApply, self?.interactionModel?.userId != VLUserCenter.user.id {
                 updateRevokeButton = true
-                imp?.createMicSeatApply { error in
+                imp?.createMicSeatApply(roomId: channelName) { error in
                     if let error = error {
-                        self?.revokeutton.isHidden = true
+//                        self?.revokeutton.isHidden = true
                         ToastView.show(text: error.localizedDescription)
                         return
-                    }
-                    
-                    DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
-                        self?.getAllMicSeatList(autoApply: autoApply)
                     }
                 }
             }
@@ -121,6 +122,8 @@ class ShowApplyView: UIView {
                                            spacing: 5)
                 self?.revokeutton.tag = 0
                 self?.revokeutton.isHidden = false
+            } else {
+                self?.revokeutton.isHidden = true
             }
             
             self?.setupTipsInfo(count: list.count)
@@ -192,14 +195,13 @@ class ShowApplyView: UIView {
     @objc
     private func onTapRevokeButton(sender: AGEButton) {
         if sender.tag == 0, let dataArray = tableView.dataArray, dataArray.count > 0 {
-//            revokeutton.isHidden = true
-            AppContext.showServiceImp(roomId)?.cancelMicSeatApply { _ in }
-            let index = tableView.dataArray?.firstIndex(where: { ($0 as? ShowMicSeatApply)?.userId == VLUserCenter.user.id }) ?? 0
-            tableView.dataArray?.remove(at: index)
-            setupTipsInfo(count: dataArray.count)
+            AppContext.showServiceImp()?.cancelMicSeatApply(roomId: roomId) { _ in }
+//            let index = tableView.dataArray?.firstIndex(where: { ($0 as? ShowMicSeatApply)?.userId == VLUserCenter.user.id }) ?? 0
+//            tableView.dataArray?.remove(at: index)
+//            setupTipsInfo(count: dataArray.count)
             self.invokeClosure?()
-        } else if let interactionModel = interactionModel {
-            AppContext.showServiceImp(roomId)?.stopInteraction(interaction: interactionModel) { _ in }
+        } else if let _ = interactionModel {
+            AppContext.showServiceImp()?.stopInteraction(roomId: roomId) { _ in }
             AlertManager.hiddenView()
         }
     }
@@ -267,7 +269,7 @@ class ShowApplyViewCell: UITableViewCell {
     
     func setupApplyData(model: ShowMicSeatApply, index: Int) {
         sortLabel.text = "\(index + 1)"
-        avatarImageView.sd_setImage(with: URL(string: model.avatar ?? ""),
+        avatarImageView.sd_setImage(with: URL(string: model.userAvatar),
                                     placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
         nameLabel.text = model.userName
         if model.userId == VLUserCenter.user.id {
