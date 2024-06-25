@@ -112,12 +112,33 @@ public class AUIRoomService: NSObject {
         }
     }
     
+    public func enterRoom(roomInfo: AUIRoomInfo, completion: @escaping ((NSError?)->())) {
+        let scene = syncmanager.createScene(channelName: roomInfo.roomId, roomExpiration: self.expirationPolicy)
+        let date = Date()
+        aui_info("enterRoom enter restful[\(roomInfo.roomId)] start", tag: RoomServiceTag)
+        scene.enter {[weak self] payload, err in
+            aui_info("[Timing]enterRoom enter restful[\(roomInfo.roomId)] cost: \(Int64(-date.timeIntervalSinceNow * 1000))ms", tag: RoomServiceTag)
+            if let err = err {
+                self?.enterRoomRevert(roomId: roomInfo.roomId)
+                completion(err)
+                return
+            }
+            self?.roomInfoMap[roomInfo.roomId] = roomInfo
+            completion(nil)
+        }
+    }
+    
     public func enterRoom(roomId: String, completion: @escaping ((NSError?)->())) {
         let scene = syncmanager.createScene(channelName: roomId, roomExpiration: self.expirationPolicy)
         let date = Date()
         aui_info("enterRoom enter restful[\(roomId)] start", tag: RoomServiceTag)
         scene.enter {[weak self] payload, err in
             aui_info("[Timing]enterRoom enter restful[\(roomId)] cost: \(Int64(-date.timeIntervalSinceNow * 1000))ms", tag: RoomServiceTag)
+            if let err = err {
+                self?.enterRoomRevert(roomId: roomId)
+                completion(err)
+                return
+            }
             let ownerId = payload?[kRoomServicePayloadOwnerId] as? String ?? ""
             let room = AUIRoomInfo()
             room.roomId = roomId
@@ -125,11 +146,6 @@ public class AUIRoomService: NSObject {
             owner.userId = ownerId
             room.owner = owner
             self?.roomInfoMap[room.roomId] = room
-            if let err = err {
-                self?.enterRoomRevert(roomId: room.roomId)
-                completion(err)
-                return
-            }
             completion(nil)
         }
     }

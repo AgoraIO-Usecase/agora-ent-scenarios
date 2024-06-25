@@ -253,7 +253,7 @@ extension ShowSyncManagerServiceImp: ShowServiceProtocol {
             }
             return
         }
-        
+        let roomInfo = AUIRoomInfo.convertFromShowRoomListModel(room)
         if ShowRobotService.shared.isRobotOwner(ownerId: room.ownerId) {
             let poliocy = RoomExpirationPolicy()
             poliocy.isAssociatedWithOwnerOffline = false
@@ -266,7 +266,7 @@ extension ShowSyncManagerServiceImp: ShowServiceProtocol {
                     completion(err, nil)
                     return
                 }
-                self.roomService.enterRoom(roomId: room.roomId) {[weak self] err in
+                self.roomService.enterRoom(roomInfo: roomInfo) {[weak self] err in
                     if err == nil {
                         self?.interactionEnter(roomId: room.roomId, roomName: room.roomName ?? "")
                     } else {
@@ -276,7 +276,7 @@ extension ShowSyncManagerServiceImp: ShowServiceProtocol {
                 }
             }
         } else {
-            roomService.enterRoom(roomId: room.roomId) {[weak self] err in
+            roomService.enterRoom(roomInfo: roomInfo) {[weak self] err in
                 if err == nil {
                     self?.interactionEnter(roomId: room.roomId, roomName: room.roomName ?? "")
                 } else {
