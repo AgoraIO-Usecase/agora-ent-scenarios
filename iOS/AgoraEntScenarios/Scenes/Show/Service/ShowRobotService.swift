@@ -66,7 +66,7 @@ class ShowRobotService {
             room.roomName = "Smooth \(robotId)"
             room.roomId = robotRoomId(from: robotId)
             room.ownerId = userId
-            room.ownerName = userId
+            room.ownerName = "Robot \(robotId)"
             room.ownerAvatar = robotRoomOwnerHeaders[((Int(robotId) ?? 1) - 1) % robotRoomOwnerHeaders.count]//VLUserCenter.user.headUrl
             room.createdAt = Date().millionsecondSince1970()
             dataArray.append(room)

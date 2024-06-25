@@ -152,8 +152,9 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         AppContext.showServiceImp()?.createRoom(roomId: createView.roomNo, 
                                                 roomName: roomName) { [weak self] err, detailModel in
             SVProgressHUD.dismiss()
-            if err != nil {
-                ToastView.show(text: err!.localizedDescription)
+            if let _ = err {
+                ToastView.show(text: "show_create_room_fail".show_localized)
+                return
             }
             guard let wSelf = self, let detailModel = detailModel else { return }
             let liveVC = ShowLivePagesViewController()

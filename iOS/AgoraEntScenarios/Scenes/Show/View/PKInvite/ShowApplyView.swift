@@ -97,21 +97,27 @@ class ShowApplyView: UIView {
     func getAllMicSeatList(autoApply: Bool) {
         var imp = AppContext.showServiceImp()
         let channelName = roomId ?? ""
-        imp?.getAllMicSeatApplyList(roomId: channelName) {[weak self] _, list in
-            guard let list = list?.filter({ $0.userId != self?.interactionModel?.userId }) else { return }
+        imp?.getAllMicSeatApplyList(roomId: channelName) {[weak self] error, list in
+            if let error = error {
+                if autoApply {
+                    ToastView.show(text: "\("show_request_linking_fail".show_localized)\(error.code)")
+                }
+                return
+            }
+            let list = list ?? []
             let seatUserModel = list.filter({ $0.userId == VLUserCenter.user.id }).first
             var updateRevokeButton = false
             if seatUserModel != nil {
                 updateRevokeButton = true
             } else if seatUserModel == nil, autoApply, self?.interactionModel?.userId != VLUserCenter.user.id {
-                updateRevokeButton = true
                 imp?.createMicSeatApply(roomId: channelName) { error in
                     if let error = error {
 //                        self?.revokeutton.isHidden = true
-                        ToastView.show(text: error.localizedDescription)
+                        ToastView.show(text: "\("show_request_linking_fail".show_localized)\(error.code)")
                         return
                     }
                 }
+                return
             }
             
             if updateRevokeButton {
