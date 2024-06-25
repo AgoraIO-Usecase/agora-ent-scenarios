@@ -207,6 +207,13 @@ extension Pure1v1CallViewController: Pure1v1RoomBottomBarDelegate {
         settingMenuVC.delegate = self
         present(settingMenuVC, animated: true)
     }
+    
+    func onClickRttButton() {
+        let rttVC = ShowRttViewController()
+        guard let channelName = self.rtcChannelName else {return}
+        rttVC.channelName = channelName
+        present(rttVC, animated: true)
+    }
 }
 
 extension Pure1v1CallViewController: ShowToolMenuViewControllerDelegate {
@@ -289,5 +296,18 @@ extension Pure1v1CallViewController: AgoraRtcEngineDelegate {
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didVideoMuted muted: Bool, byUid uid: UInt) {
         pure1v1Print("didVideoMuted[\(uid)] \(muted)")
         self.remoteCanvasView.canvasView.isHidden = muted
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, receiveStreamMessageFromUid uid: UInt, streamId: Int, data: Data) {
+        pure1v1Print("RttApiManager receiveStreamMessageFromUid[\(uid)] \(data)")
+        guard let text: Agora_SpeechToText_Text = try? Agora_SpeechToText_Text(serializedData: data) else {return}
+        
+        var translate: String = ""
+        text.trans.first?.texts.forEach({ word in
+            translate += word
+        })
+        if (translate != "") {
+            print("RttApiManager \(translate)")
+        }
     }
 }
