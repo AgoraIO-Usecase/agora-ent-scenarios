@@ -103,6 +103,7 @@ PODS:
     - RTMSyncManager
     - SDWebImage
     - SnapKit
+    - SwiftProtobuf
     - SwiftyBeaver
     - YYCategories
     - YYModel
@@ -139,6 +140,7 @@ PODS:
   - SVGAPlayer/ProtoFiles (2.5.7):
     - Protobuf (~> 3.4)
   - SVProgressHUD (2.2.5)
+  - SwiftProtobuf (1.26.0)
   - SwiftTheme (0.6.4)
   - SwiftyBeaver (1.9.5)
   - VideoLoaderAPI (0.1.3):
@@ -184,6 +186,7 @@ DEPENDENCIES:
   - SocketRocket (= 0.7.0)
   - SVGAPlayer
   - SVProgressHUD (= 2.2.5)
+  - SwiftProtobuf
   - SwiftyBeaver (= 1.9.5)
   - VideoLoaderAPI (from `AgoraEntScenarios/Common/API/VideoLoaderAPI`)
   - YYCategories (= 1.0.4)
@@ -220,6 +223,7 @@ SPEC REPOS:
     - SSZipArchive
     - SVGAPlayer
     - SVProgressHUD
+    - SwiftProtobuf
     - SwiftTheme
     - SwiftyBeaver
     - YYCategories
@@ -281,7 +285,7 @@ SPEC CHECKSUMS:
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MJRefresh: ff9e531227924c84ce459338414550a05d2aea78
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
-  Pure1v1: 2f7baf4576168c6bc57e53ad4cf322158730796e
+  Pure1v1: fc62a1caff64c2a7c5cb63d944ee1d594eb83a99
   RTMSyncManager: 110b208a8bf57881decaef0e76891bdf5345ba21
   ScoreEffectUI: bf1195b4d41a73d43c236450b5d7f958989844aa
   SDWebImage: 920f1a2ff1ca8296ad34f6e0510a1ef1d70ac965
@@ -292,6 +296,7 @@ SPEC CHECKSUMS:
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
+  SwiftProtobuf: 5e8349171e7c2f88f5b9e683cb3cb79d1dc780b3
   SwiftTheme: 007cbaf1f9e171caf6448a4657533e54c682b285
   SwiftyBeaver: 84069991dd5dca07d7069100985badaca7f0ce82
   VideoLoaderAPI: e42bcbf9c836297f0006d7a90068ffbf935c9acd
@@ -300,6 +305,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: b61ed1f249631026c410348e2807a421d5ff3182
+PODFILE CHECKSUM: 67bd3b30f1a7f12d0458bac29bad8b66818d3923
 
 COCOAPODS: 1.15.2

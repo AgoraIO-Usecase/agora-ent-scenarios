@@ -55,4 +55,5 @@ TODO: Add long description of the pod here.
   s.dependency 'AgoraCommon'
   s.dependency 'RTMSyncManager'
   s.dependency 'AudioScenarioApi'
+  s.dependency 'SwiftProtobuf'
 end

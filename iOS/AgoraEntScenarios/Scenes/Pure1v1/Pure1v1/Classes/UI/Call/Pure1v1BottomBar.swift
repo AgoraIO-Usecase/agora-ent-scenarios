@@ -8,6 +8,7 @@ import UIKit
 
 protocol Pure1v1RoomBottomBarDelegate: NSObjectProtocol {
     func onClickSettingButton()
+    func onClickRttButton()
 }
 
 class Pure1v1RoomBottomBar: UIView {
@@ -18,6 +19,14 @@ class Pure1v1RoomBottomBar: UIView {
         let button = UIButton(type: .custom)
         button.setImage(UIImage.scene1v1Image(name: "live_setting"), for: .normal)
         button.addTarget(self, action: #selector(didClickSettingButton), for: .touchUpInside)
+        return button
+    }()
+    
+    // RTT
+    private lazy var rttButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage.scene1v1Image(name: "live_rtt"), for: .normal)
+        button.addTarget(self, action: #selector(didClickRttButton), for: .touchUpInside)
         return button
     }()
     
@@ -33,7 +42,7 @@ class Pure1v1RoomBottomBar: UIView {
     }
     
     private func _loadSubviews(){
-        buttonArray = [settingButton]
+        buttonArray = [rttButton, settingButton]
         for button in buttonArray {
             addSubview(button)
         }
@@ -54,5 +63,9 @@ class Pure1v1RoomBottomBar: UIView {
     
     @objc private func didClickSettingButton() {
         delegate?.onClickSettingButton()
+    }
+    
+    @objc private func didClickRttButton() {
+        delegate?.onClickRttButton()
     }
 }

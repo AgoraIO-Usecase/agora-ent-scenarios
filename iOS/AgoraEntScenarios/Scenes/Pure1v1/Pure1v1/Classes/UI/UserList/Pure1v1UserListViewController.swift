@@ -227,7 +227,7 @@ extension Pure1v1UserListViewController {
             }
             
             self.tokenObj = TokenObject(rtmToken: rtmToken, rtcToken: rtcToken)
-            completion(rtcToken, rtmToken)
+            completion("", rtmToken)
         }
     }
     
