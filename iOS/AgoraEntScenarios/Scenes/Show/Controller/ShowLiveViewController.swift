@@ -30,14 +30,14 @@ class ShowLiveViewController: UIViewController {
             oldValue?.interactionAnchorInfoList.removeAll()
             liveView.room = room
             liveView.canvasView.canvasType = .none
-            if let oldRoom = oldValue {
-                _leavRoom(oldRoom)
-            }
-            if let room = room {
-                serviceImp = AppContext.showServiceImp()
-                _joinRoom(room)
-            }
-            loadingType = .prejoined
+//            if let oldRoom = oldValue {
+//                _leavRoom(oldRoom)
+//            }
+//            if let room = room {
+//                serviceImp = AppContext.showServiceImp()
+//                _joinRoom(room)
+//            }
+//            loadingType = .prejoined
         }
     }
     
@@ -48,6 +48,15 @@ class ShowLiveViewController: UIViewController {
             }
             remoteVideoWidth = nil
             currentMode = nil
+            switch loadingType {
+            case .idle, .prejoined:
+                leaveRoom()
+            case .joinedWithVideo, .joinedWithAudioVideo:
+                if let room = room {
+                    serviceImp = AppContext.showServiceImp()
+                    _joinRoom(room)
+                }
+            }
         }
     }
     private weak var inviteVC: UIViewController?
@@ -252,10 +261,6 @@ class ShowLiveViewController: UIViewController {
     private var serviceImp: ShowServiceProtocol?
     
     deinit {
-//        let roomId = room?.roomId ?? ""
-//        leaveRoom()
-//        AppContext.unloadShowServiceImp(roomId)
-//        VideoLoaderApiImpl.shared.removeListener(listener: self)
         showPrint("deinit-- ShowLiveViewController \(roomId)")
     }
     
@@ -267,8 +272,6 @@ class ShowLiveViewController: UIViewController {
         setupUI()
         if room.ownerId == VLUserCenter.user.id {// 自己的房间
             self.joinChannel()
-            //房主join room在showListVC里已经处理
-//            self._subscribeServiceEvent()
             AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self)
         }
     }
@@ -493,11 +496,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         } else {
             applyView.reloadData()
         }
-//        if currentInteraction?.userId == VLUserCenter.user.id {
-//            liveView.bottomBar.linkButton.isEnabled = false
-//        } else {
-//            liveView.bottomBar.linkButton.isEnabled = false
-//        }
     }
     
     func onMicSeatInvitationUpdated(channelName: String, invitation: ShowMicSeatInvitation) {
@@ -658,7 +656,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             if roomId != interaction.roomId {
                 ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: interactionRoomId)
                 
-//                let uid = UInt(interaction.userId)!
                 ShowAgoraKitManager.shared.updateVideoProfileForMode(.pk)
                 currentChannelId = roomId
                 liveView.canvasView.canvasType = .pk
@@ -895,7 +892,6 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onClickCloseButton() {
         if role == .broadcaster {
             showAlert(message: "show_alert_live_end_title".show_localized) {[weak self] in
-//                self?.leaveRoom()
                 guard let self = self else {return}
                 self.delegate?.willLeaveRoom(roomId: self.roomId)
                 self.dismiss(animated: true)
@@ -995,7 +991,6 @@ extension ShowLiveViewController {
 extension ShowLiveViewController {
     private func showError(title: String, errMsg: String) {
         showAlert(title: title, message: errMsg) { [weak self] in
-//            self?.leaveRoom()
             guard let self = self else {return}
             self.delegate?.willLeaveRoom(roomId: self.roomId)
             self.dismiss(animated: true)
@@ -1043,10 +1038,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
     // 静音
     func onClickMuteMicButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
-        let uid = menu.type == .managerMic ? currentInteraction?.userId ?? "" : VLUserCenter.user.id
-        serviceImp?.muteAudio(roomId: self.roomId, mute: selected) { err in
-        }
-        self.muteLocalAudio = selected
+        onClickMicButtonSelected(menu, selected)
     }
     
     func onClickRealTimeDataButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {

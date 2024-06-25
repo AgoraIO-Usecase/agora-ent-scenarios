@@ -16,7 +16,6 @@ import Foundation
 
 @objc public protocol ShowSubscribeServiceProtocol: NSObjectProtocol {
     
-    
     /// 房间过期
     func onRoomExpired(channelName: String)
     

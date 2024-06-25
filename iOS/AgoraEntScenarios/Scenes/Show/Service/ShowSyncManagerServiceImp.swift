@@ -233,7 +233,7 @@ extension ShowSyncManagerServiceImp: ShowServiceProtocol {
         roomInfo.owner = user
         roomService.createRoom(room: roomInfo, enterEnable: false) {[weak self] err, info in
             if err == nil {
-                self?.interactionEnter(roomId: roomId, roomName: roomName)
+//                self?.interactionEnter(roomId: roomId, roomName: roomName)
             } else {
                 self?.unSubscribeScene(chanelName: roomId)
             }
