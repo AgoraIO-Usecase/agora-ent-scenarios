@@ -159,7 +159,7 @@ class ShowPKInviteViewCell: ShowInviteCell {
             guard let self = self else { return }
             self.statusButton.isEnabled = true
             if let err = error {
-                ToastView.show(text: err.localizedDescription)
+                ToastView.show(text: "\("show_request_invite_pk_fail".show_localized)\(err.code)")
                 return
             }
             self.refreshDataClosure?()
@@ -234,10 +234,13 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
         guard let roomId = roomId else {return}
         if let model = seatApplyModel, sender.tag == 1 {
             self.statusButton.isEnabled = false
-            AppContext.showServiceImp()?.acceptMicSeatApply(roomId: roomId, userId: model.userId) {[weak self] _ in
+            AppContext.showServiceImp()?.acceptMicSeatApply(roomId: roomId, userId: model.userId) {[weak self] err in
                 guard let self = self else { return }
                 self.statusButton.isEnabled = true
                 self.refreshDataClosure?()
+                if let err = err {
+                    ToastView.show(text: "\("show_accept_linking_fail".show_localized)\(err.code)")
+                }
             }
         } else if let model = seatInvitationModel {
             self.statusButton.isEnabled = false
@@ -245,7 +248,7 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
                 guard let self = self else { return }
                 self.statusButton.isEnabled = true
                 if let err = error {
-                    ToastView.show(text: err.localizedDescription)
+                    ToastView.show(text: "\("show_request_invite_linking_fail".show_localized)\(err.code)")
                     return
                 }
                 

@@ -23,21 +23,21 @@ protocol ShowLiveViewControllerDelegate: NSObjectProtocol {
 
 class ShowLiveViewController: UIViewController {
     weak var delegate: ShowLiveViewControllerDelegate?
+    
     var room: ShowRoomListModel? {
         didSet{
-            if oldValue?.roomId != room?.roomId {
-                oldValue?.interactionAnchorInfoList.removeAll()
-                liveView.room = room
-                liveView.canvasView.canvasType = .none
-                if let oldRoom = oldValue {
-                    _leavRoom(oldRoom)
-                }
-                if let room = room {
-                    serviceImp = AppContext.showServiceImp()
-                    _joinRoom(room)
-                }
-                loadingType = .prejoined
+            if oldValue?.roomId == room?.roomId, finishView?.superview == nil { return }
+            oldValue?.interactionAnchorInfoList.removeAll()
+            liveView.room = room
+            liveView.canvasView.canvasType = .none
+            if let oldRoom = oldValue {
+                _leavRoom(oldRoom)
             }
+            if let room = room {
+                serviceImp = AppContext.showServiceImp()
+                _joinRoom(room)
+            }
+            loadingType = .prejoined
         }
     }
     
@@ -368,6 +368,9 @@ extension ShowLiveViewController {
             service.joinRoom(room: room) {[weak self] error, detailModel in
                 guard let self = self else {return}
                 guard self.room?.roomId == room.roomId else { return }
+                if let _ = error {
+                    self.onRoomFailed(channelName: room.roomId, title: "show_join_room_fail".show_localized)
+                }
             }
             self._subscribeServiceEvent()
         } else {
@@ -428,6 +431,19 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         }
     }
     
+    private func onRoomFailed(channelName: String, title: String? = nil) {
+        finishView?.removeFromSuperview()
+        finishView = ShowReceiveFinishView()
+        finishView?.title = title
+        finishView?.headImg = room?.ownerAvatar ?? ""
+        finishView?.headName = room?.ownerName ?? ""
+        finishView?.delegate = self
+        self.view.addSubview(finishView!)
+        finishView?.snp.makeConstraints { make in
+            make.left.right.top.bottom.equalToSuperview()
+        }
+    }
+    
     //MARK: ShowSubscribeServiceProtocol
     func onConnectStateChanged(channelName: String, state: ShowServiceConnectState) {
         guard state == .open else {
@@ -440,15 +456,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onRoomExpired(channelName: String) {
-        finishView?.removeFromSuperview()
-        finishView = ShowReceiveFinishView()
-        finishView?.headImg = room?.ownerAvatar ?? ""
-        finishView?.headName = room?.ownerName ?? ""
-        finishView?.delegate = self
-        self.view.addSubview(finishView!)
-        finishView?.snp.makeConstraints { make in
-            make.left.right.top.bottom.equalToSuperview()
-        }
+        onRoomFailed(channelName: channelName)
     }
     
     func onRoomDestroy(channelName: String) {
@@ -506,7 +514,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                     ToastView.show(text: "show_is_onseat_doing".show_localized)
                     self.serviceImp?.acceptMicSeatInvitation(roomId: roomId, 
                                                              invitationId: invitation.id) { err in
-                        guard let _ = err else { return }
+                        guard let err = err else { return }
+                        ToastView.show(text: "\("show_accept_invite_linking_fail".show_localized)\(err.code)")
                         //失败，关闭推流
                         ShowAgoraKitManager.shared.prePublishOnseatVideo(isOn: false, channelId: self.roomId)
                     }
@@ -565,6 +574,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 case .accept:
                     self.serviceImp?.acceptPKInvitation(roomId: roomId,
                                                         invitationId: invitation.id) { error in
+                        guard let error = error else {return}
+                        ToastView.show(text: "\("show_accept_invite_pk_fail".show_localized)\(error.code)")
                     }
                     break
                 default:
