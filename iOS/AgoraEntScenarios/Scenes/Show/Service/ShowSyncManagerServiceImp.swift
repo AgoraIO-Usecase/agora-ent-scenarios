@@ -187,6 +187,10 @@ extension ShowSyncManagerServiceImp {
     }
     
     public func startCheckExpireTimer(roomId: String) {
+        guard let ownerId = roomService.getRoomInfo(roomId: roomId)?.owner?.userId,
+           ShowRobotService.shared.isRobotOwner(ownerId: ownerId) == false else {
+            return
+        }
         let expireTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
             guard let self = self,
                   let scene = self.syncManager.getScene(channelName: roomId) else { return }
