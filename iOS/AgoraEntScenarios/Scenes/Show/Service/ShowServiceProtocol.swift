@@ -193,6 +193,7 @@ protocol ShowServiceProtocol: NSObjectProtocol {
                    completion: @escaping (NSError?) -> Void)
 
     
+    func getCurrentNtpTs(roomId: String) -> UInt64
     
     func unsubscribeEvent(roomId: String, delegate: ShowSubscribeServiceProtocol)
     

@@ -27,10 +27,10 @@ import Foundation
     public var userId: String = ""     // 互动者ID
     public var userName: String = ""   // 互动者用户名
     public var roomId: String = ""     // 互动者所在房间ID
-    public var createdAt: UInt64 = 0
+    public var createdAt: UInt64 = 0   // 互动开始时间，与19700101的时间差，单位ms
     
     enum CodingKeys: String, CodingKey {
-        case type, userId, userName, roomId
+        case type, userId, userName, roomId, createdAt
     }
 }
 
