@@ -27,10 +27,10 @@ import Foundation
     /// - Parameter channelName: 房间id
     @objc optional func onSceneDestroy(channelName: String)
     
-    /// Description 房间用户被踢出房间
+    /// Description 房间异常，需要退出
     ///
     /// - Parameters:
     ///   - channelName: 房间id
-    ///   - userId: 用户id
-    @objc optional func onSceneUserBeKicked(channelName: String, userId: String)
+    ///   - reason: 异常原因
+    @objc optional func onSceneFailed(channelName: String, reason: String)
 }
