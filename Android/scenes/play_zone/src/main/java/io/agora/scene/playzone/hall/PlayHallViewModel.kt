@@ -6,6 +6,7 @@ import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.playzone.R
+import io.agora.scene.playzone.service.PlayChatRoomService
 import io.agora.scene.playzone.service.PlayCreateRoomModel
 import io.agora.scene.playzone.service.PlayZoneServiceProtocol
 import io.agora.scene.playzone.service.api.PlayApiManager
@@ -18,14 +19,28 @@ class PlayHallViewModel : ViewModel() {
         PlayApiManager()
     }
 
-    private val mPlayZoneService by lazy { PlayZoneServiceProtocol.serviceProtocol }
+    private val mPlayServiceProtocol by lazy { PlayZoneServiceProtocol.serviceProtocol }
 
+    val loginImLiveData = MutableLiveData<Boolean>()
     val roomModelListLiveData = MutableLiveData<List<AUIRoomInfo>?>()
     val createRoomInfoLiveData = MutableLiveData<AUIRoomInfo?>()
     val joinRoomInfoLiveData = MutableLiveData<AUIRoomInfo?>()
 
+    val mGameListLiveData = MutableLiveData<List<PlayGameListModel>>()
 
-    val mGameListLiveData = MutableLiveData<List<PlayGameListModel>?>()
+    private val mChatRoomService by lazy {
+        PlayChatRoomService.chatRoomService
+    }
+
+    // 登录 IM
+    fun checkLoginIm() {
+        mChatRoomService.imManagerService.loginChat { error ->
+            loginImLiveData.postValue(error == null)
+            error?.message?.let {
+                ToastUtils.showToast(it)
+            }
+        }
+    }
 
     fun getGameList(vendor: GameVendor) {
         // only test
@@ -44,7 +59,7 @@ class PlayHallViewModel : ViewModel() {
 
         playApiManager.getGameList(vendor, completion = { error, gameList ->
             if (error == null && gameList != null) {
-                mGameListLiveData.postValue(gameList)
+                mGameListLiveData.postValue(gameList!!)
             } else {
                 error?.message?.let {
                     ToastUtils.showToast(it)
@@ -54,7 +69,7 @@ class PlayHallViewModel : ViewModel() {
     }
 
     fun getRoomList() {
-        mPlayZoneService.getRoomList { error, vlRoomListModels ->
+        mPlayServiceProtocol.getRoomList { error, vlRoomListModels ->
             roomModelListLiveData.postValue(vlRoomListModels)
             error?.message?.let {
                 ToastUtils.showToast(it)
@@ -69,7 +84,7 @@ class PlayHallViewModel : ViewModel() {
             gameId = gameInfoModel.gameId,
             gameName = gameInfoModel.gameName
         )
-        mPlayZoneService.createRoom(createRoomModel, completion = { error, roomInfo ->
+        mPlayServiceProtocol.createRoom(createRoomModel, completion = { error, roomInfo ->
             if (error == null && roomInfo != null) {
                 createRoomInfoLiveData.postValue(roomInfo)
             } else {
@@ -82,7 +97,7 @@ class PlayHallViewModel : ViewModel() {
     }
 
     fun joinRoom(roomInfo: AUIRoomInfo, password: String?) {
-        mPlayZoneService.joinRoom(roomInfo.roomId, password) { error ->
+        mPlayServiceProtocol.joinRoom(roomInfo.roomId, password) { error ->
             if (error == null) { // success
                 joinRoomInfoLiveData.postValue(roomInfo)
             } else {

@@ -20,6 +20,10 @@ android {
         buildConfigField "String", "sub_appid", "\"${sub_appid}\""
         buildConfigField "String", "sub_appkey", "\"${sub_appkey}\""
         buildConfigField "String", "sub_appSecret", "\"${sub_appSecret}\""
+
+        buildConfigField "String", "IM_APP_KEY", "\"${IM_APP_KEY}\""
+        buildConfigField "String", "IM_APP_CLIENT_ID", "\"${IM_APP_CLIENT_ID}\""
+        buildConfigField "String", "IM_APP_CLIENT_SECRET", "\"${IM_APP_CLIENT_SECRET}\""
     }
 }
 
@@ -27,6 +31,7 @@ dependencies {
     implementation project(":common:base")
     implementation project(':common:ui-widget')
     implementation project(':RTMSyncManager')
+    implementation project(':IMKitManager')
     implementation project(':scenes:play_zone:SudMGPWrapper')
 
     implementation rootProject.ext.deps.lyricsView

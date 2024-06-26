@@ -10,6 +10,7 @@ object PlayZoneParameters {
     const val IS_PRIVATE = "isPrivate"
     const val BADGE_TITLE = "badgeTitle"
     const val GAME_ID = "gameId"
+    const val CHAT_ID = "chatId"
 }
 
 data class PlayCreateRoomModel constructor(

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="36dp"
+    android:orientation="horizontal"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:theme="?attr/aui_chatListView_appearance"
+    android:background="?attr/aui_barrage_system_layout_bg"
+    android:gravity="center_vertical"
+    android:layout_marginHorizontal="15dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="9dp"
+    android:paddingStart="14dp">
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_marginStart="6dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Stefano"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:textColor="?attr/aui_barrage_system_title_TextColor" />
+
+    <TextView
+        android:id="@+id/content"
+        android:layout_marginStart="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        tools:text="Joined"
+        android:textColor="?attr/aui_barrage_system_content_TextColor" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/icon_system"
+        android:src="?attr/aui_barrage_system_endIcon_resource"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="12dp"
+        android:layout_width="18dp"
+        android:layout_height="18dp"/>
+</LinearLayout>

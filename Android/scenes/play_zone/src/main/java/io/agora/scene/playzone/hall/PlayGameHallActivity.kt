@@ -78,7 +78,6 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
 
                         for (adapter in cAdapter.adapters) {
                             val itemCount = adapter.itemCount
-                            Log.d("xxxxx", "$adapterStartPosition $itemCount")
                             if (position in adapterStartPosition until (adapterStartPosition + itemCount)) {
                                 if ((position - adapterStartPosition) % 4 == 0) { // 最左边 item
                                     outRect.left = 12.dp.toInt()
@@ -143,6 +142,13 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
             }
             concatAdapter = ConcatAdapter(listAdapter)
             binding.rvLeisureGame.adapter = concatAdapter
+        }
+
+        mPlayZoneViewModel.checkLoginIm()
+
+        showLoadingView()
+        mPlayZoneViewModel.loginImLiveData.observe(this) {
+            hideLoadingView()
         }
     }
 

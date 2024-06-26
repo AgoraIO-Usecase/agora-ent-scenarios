@@ -45,6 +45,8 @@
     <string name="play_zone_create_room_failed">创建房间失败，错误：%1s</string>
     <string name="play_zone_join_room_failed">加入房间失败，错误：%1s</string>
 
+    <string name="play_zone_room_welcome">欢迎来到声网休闲玩法！房间内严禁色情、赌博或暴力内容。</string>
+
     <string-array name="play_zone_roomName_array">
         <item>和你一起看月亮</item>
         <item>治愈</item>

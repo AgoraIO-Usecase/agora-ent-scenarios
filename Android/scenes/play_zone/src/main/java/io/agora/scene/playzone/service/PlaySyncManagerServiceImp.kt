@@ -4,6 +4,13 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import com.google.gson.reflect.TypeToken
+import io.agora.imkitmanager.AUIChatManager
+import io.agora.imkitmanager.model.AUIChatCommonConfig
+import io.agora.imkitmanager.model.AUIChatUserInfo
+import io.agora.imkitmanager.service.AUIIMManagerServiceImpl
+import io.agora.imkitmanager.service.IAUIIMManagerService
+import io.agora.imkitmanager.service.http.ChatHttpManager
+import io.agora.imkitmanager.utils.AUIChatLogger
 import io.agora.rtmsyncmanager.ISceneResponse
 import io.agora.rtmsyncmanager.RoomExpirationPolicy
 import io.agora.rtmsyncmanager.RoomService
@@ -17,18 +24,16 @@ import io.agora.rtmsyncmanager.service.IAUIUserService
 import io.agora.rtmsyncmanager.service.collection.AUIMapCollection
 import io.agora.rtmsyncmanager.service.http.HttpManager
 import io.agora.rtmsyncmanager.service.room.AUIRoomManager
-import io.agora.rtmsyncmanager.service.rtm.AUIRtmAttributeRespObserver
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ObservableHelper
-import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.playzone.BuildConfig
 import io.agora.scene.playzone.PlayCenter
 import io.agora.scene.playzone.PlayLogger
-import tech.sud.mgp.SudMGPWrapper.state.SudMGPAPPState
 import kotlin.random.Random
 
 class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZoneServiceProtocol, ISceneResponse,
@@ -89,27 +94,27 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
     // time limit
     private val ROOM_AVAILABLE_DURATION: Long = 10 * 60 * 1000 // 10min
 
+
     init {
+        // rtm SyncManager
         HttpManager.setBaseURL(ServerConfig.roomManagerUrl)
-        val rtmSyncTag = "PlayZone_RTM_LOG"
         AUILogger.initLogger(
-            AUILogger.Config(cxt, "KTV", logCallback = object : AUILogger.AUILogCallback {
+            AUILogger.Config(cxt, "Play_RTM", logCallback = object : AUILogger.AUILogCallback {
                 override fun onLogDebug(tag: String, message: String) {
-                    PlayLogger.d(rtmSyncTag, "$tag $message")
+                    PlayLogger.d(TAG, "$tag $message")
                 }
 
                 override fun onLogInfo(tag: String, message: String) {
-                    PlayLogger.d(rtmSyncTag, "$tag $message")
+                    PlayLogger.d(TAG, "$tag $message")
                 }
 
                 override fun onLogWarning(tag: String, message: String) {
-                    PlayLogger.w(rtmSyncTag, "$tag $message")
+                    PlayLogger.w(TAG, "$tag $message")
                 }
 
                 override fun onLogError(tag: String, message: String) {
-                    PlayLogger.e(rtmSyncTag, "$tag $message")
+                    PlayLogger.e(TAG, "$tag $message")
                 }
-
             })
         )
 
@@ -129,6 +134,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
         roomExpirationPolicy.expirationTime = ROOM_AVAILABLE_DURATION
         roomExpirationPolicy.isAssociatedWithOwnerOffline = true
         mRoomService = RoomService(roomExpirationPolicy, mRoomManager, mSyncManager)
+
     }
 
     private fun startTimer() {
@@ -351,7 +357,6 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
             mRoomService.getRoomList(PlayCenter.mAppId, kSceneId, 0, 50,
                 cleanClosure = { auiRoomInfo ->
                     return@getRoomList auiRoomInfo.roomOwner?.userId == PlayCenter.mUser.id.toString()
-
                 },
                 completion = { uiException, ts, roomList ->
                     if (uiException == null) {

@@ -1,5 +1,6 @@
 package io.agora.scene.playzone.service
 
+import io.agora.imkitmanager.service.IAUIIMManagerService
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.component.AgoraApplication
 
@@ -99,7 +100,7 @@ interface PlayZoneServiceProtocol {
      * @param completion
      * @receiver
      */
-    fun joinRoom(roomId: String, password:String?,completion: (error: Exception?) -> Unit)
+    fun joinRoom(roomId: String, password: String?, completion: (error: Exception?) -> Unit)
 
     /**
      * 离开房间

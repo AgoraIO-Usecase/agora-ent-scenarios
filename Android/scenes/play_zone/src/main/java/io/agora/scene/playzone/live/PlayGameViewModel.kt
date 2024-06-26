@@ -1,10 +1,13 @@
 package io.agora.scene.playzone.live
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import io.agora.imkitmanager.model.AUIChatEntity
+import io.agora.imkitmanager.service.IAUIIMManagerService
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
@@ -18,9 +21,11 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.playzone.PlayCenter
 import io.agora.scene.playzone.PlayLogger
 import io.agora.scene.playzone.R
+import io.agora.scene.playzone.service.PlayChatRoomService
 import io.agora.scene.playzone.service.PlayZoneServiceListenerProtocol
 import io.agora.scene.playzone.service.PlayZoneServiceProtocol
 import io.agora.scene.playzone.service.PlayRobotInfo
+import io.agora.scene.playzone.service.PlayZoneParameters
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone
@@ -41,11 +46,15 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         }
     }
 
-
     // rtc 引擎
     private var mRtcEngine: RtcEngineEx? = null
 
     private val mPlayServiceProtocol by lazy { PlayZoneServiceProtocol.serviceProtocol }
+
+    private val mChatRoomService by lazy {
+        PlayChatRoomService.chatRoomService
+    }
+
 
     // 网络状态
     val networkStatusLiveData = MutableLiveData<NetWorkEvent>()
@@ -62,7 +71,11 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
     // 机器人
     val mRobotListLiveData = MutableLiveData<List<PlayRobotInfo>>()
 
+    // 房间存活时间
     val mRoomTimeLiveData = MutableLiveData<String>()
+
+    // 聊天消息
+    val mRoomChatListLiveData = MutableLiveData<List<AUIChatEntity>>()
 
     // 是否房主
     val isRoomOwner: Boolean get() = mRoomInfo.roomOwner?.userId == PlayCenter.mUser.id.toString()
@@ -77,6 +90,33 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
             }
             mainHandler.postDelayed(this, 1000)
         }
+    }
+
+    private fun context(): Context {
+        return AgoraApplication.the().applicationContext
+    }
+
+    // 初始化 chat
+    fun initChatRoom() {
+        mChatRoomService.imManagerService.registerRespObserver(auiIMManagerRespObserver)
+        if (isRoomOwner) {
+            mChatRoomService.imManagerService.createChatRoom(
+                roomName = mRoomInfo.roomName,
+                description = "welcome",
+                completion = { response, error ->
+                    error?.message?.let {
+                        ToastUtils.showToast(it)
+                    }
+                })
+        } else {
+            val chatRoomId = mRoomInfo.customPayload[PlayZoneParameters.CHAT_ID] as? String ?: return
+            mChatRoomService.imManagerService.joinChatRoom(chatRoomId, completion = { error ->
+                error?.message?.let {
+                    ToastUtils.showToast(it)
+                }
+            })
+        }
+        mChatRoomService.chatManager.saveWelcomeMsg(context().getString(R.string.play_zone_room_welcome))
     }
 
     // 初始化
@@ -184,6 +224,12 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
             RtcEngine.destroy()
             mRtcEngine = null
         }
+        mChatRoomService.imManagerService.unRegisterRespObserver(auiIMManagerRespObserver)
+        if (isRoomOwner){
+            mChatRoomService.imManagerService.userDestroyedChatroom()
+        } else{
+            mChatRoomService.imManagerService.userQuitRoom {  }
+        }
     }
 
     // 退出房间
@@ -206,5 +252,23 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
     fun muteMic(mute: Boolean) {
         PlayLogger.d(TAG, "RoomLivingViewModel.mute() called mute:$mute")
         mRtcEngine?.muteLocalAudioStream(mute)
+    }
+
+    private val auiIMManagerRespObserver = object : IAUIIMManagerService.AUIIMManagerRespObserver {
+        override fun messageDidReceive(chatRoomId: String, message: IAUIIMManagerService.AgoraChatTextMessage) {
+            mRoomChatListLiveData.postValue(mChatRoomService.chatManager.getMsgList())
+        }
+
+        override fun onUserDidJoinRoom(chatRoomId: String, message: IAUIIMManagerService.AgoraChatTextMessage) {
+            mRoomChatListLiveData.postValue(mChatRoomService.chatManager.getMsgList())
+        }
+    }
+
+    fun sendMessage(message: String) {
+        mChatRoomService.imManagerService.sendMessage(message, completion = { chatMessage,error->
+            if (error==null){
+                mRoomChatListLiveData.postValue(mChatRoomService.chatManager.getMsgList())
+            }
+        })
     }
 }

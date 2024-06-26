@@ -257,18 +257,15 @@
             app:layout_constraintStart_toStartOf="parent" />
     </LinearLayout>
 
-    <io.agora.scene.playzone.widget.NonInterceptingRecyclerView
-        android:id="@+id/rvMessage"
+
+    <io.agora.imkitmanager.ui.impl.AUIChatListView
+        android:id="@+id/chatListView"
+        app:layout_constraintLeft_toLeftOf="parent"
         android:layout_width="match_parent"
         android:layout_height="220dp"
-        android:layout_span="1"
-        android:fadingEdgeLength="30dp"
-        android:orientation="vertical"
-        android:paddingHorizontal="10dp"
+        android:layout_marginBottom="10dp"
         android:paddingBottom="8dp"
-        android:requiresFadingEdge="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@+id/layoutBottom"
-        tools:listitem="@layout/play_zone_item_live_detail_message" />
+
+        app:layout_constraintBottom_toTopOf="@+id/layoutBottom"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

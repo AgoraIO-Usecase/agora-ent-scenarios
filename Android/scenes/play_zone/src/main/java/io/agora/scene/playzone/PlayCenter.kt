@@ -1,6 +1,5 @@
 package io.agora.scene.playzone
 
-import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.model.User
@@ -15,9 +14,6 @@ object PlayCenter {
     val mAppId: String get() = BuildConfig.AGORA_APP_ID
 
     val mUser: User get() = UserManager.getInstance().user
-
-    val AUIRoomInfo.rtcChorusChannelName
-        get() = this.roomId + "_rtc_ex"
 
     var mRtmToken: String = ""
         private set(value) {

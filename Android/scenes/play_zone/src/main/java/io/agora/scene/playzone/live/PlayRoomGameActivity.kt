@@ -25,12 +25,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.request.RequestOptions
+import io.agora.imkitmanager.ui.AUIChatInfo
 import io.agora.rtc2.Constants
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.GlideApp
-import io.agora.scene.base.api.model.User
 import io.agora.scene.base.component.BaseViewBindingActivity
-import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.base.utils.dp
 import io.agora.scene.playzone.PlayCenter
@@ -40,7 +39,6 @@ import io.agora.scene.playzone.databinding.PlayZoneActivityRoomGameLayoutBinding
 import io.agora.scene.playzone.databinding.PlayZoneItemLiveDetailMessageBinding
 import io.agora.scene.playzone.live.sub.QuickStartGameViewModel
 import io.agora.scene.playzone.service.PlayZoneParameters
-import io.agora.scene.playzone.service.api.PlayGameInfoModel
 import io.agora.scene.playzone.service.api.PlayZoneMessage
 import io.agora.scene.playzone.widget.KeyboardStatusWatcher
 import io.agora.scene.playzone.widget.statusBarHeight
@@ -59,10 +57,6 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
             intent.putExtra(EXTRA_ROOM_DETAIL_INFO, roomInfo)
             context.startActivity(intent)
         }
-    }
-
-    private val mMessageAdapter: RoomMessageAdapter by lazy {
-        RoomMessageAdapter(mutableListOf())
     }
 
     private val gameViewModel = QuickStartGameViewModel()
@@ -139,9 +133,6 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
             .apply(RequestOptions.circleCropTransform())
             .into(binding.ivOwnerAvatar)
 
-        // 消息
-        (binding.rvMessage.layoutManager as LinearLayoutManager).stackFromEnd = true
-        binding.rvMessage.adapter = mMessageAdapter
 
         binding.ivClose.setOnClickListener {
             showEndRoomDialog()
@@ -162,7 +153,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
                     Log.d(TAG, "action send：${v.text}")
                     showNormalInputLayout()
                     if (content.isNotEmpty()) {
-                        ToastUtils.showToast("发送弹幕：$content")
+                        roomGameViewModel.sendMessage(content)
                     }
                 }
             }
@@ -198,6 +189,8 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
             }
             binding.vKeyboardBg.layoutParams = lp
         }
+
+        binding.chatListView.setOwnerId(roomGameViewModel.mRoomInfo.roomOwner?.userId ?: "")
     }
 
     private fun showNormalInputLayout(): Boolean {
@@ -224,6 +217,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     override fun requestData() {
         super.requestData()
 
+        roomGameViewModel.initChatRoom()
         mToggleAudioRun = Runnable {
             roomGameViewModel.initData()
         }
@@ -277,6 +271,16 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
                 gameViewModel.robotInfoList.clear()
                 gameViewModel.robotInfoList.addAll(robotList)
             }
+        }
+        roomGameViewModel.mRoomChatListLiveData.observe(this) { chatList ->
+            binding.chatListView.refreshSelectLast(chatList.map {
+                AUIChatInfo(
+                    userId = it.chatUser?.userId ?: "",
+                    userName = it.chatUser?.userName ?: "",
+                    content = it.content,
+                    joined = it.joined
+                )
+            })
         }
     }
 
@@ -392,15 +396,6 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
 //            LogUploader.uploadLog(LogUploader.SceneType.JOY)
 //        }
     }
-
-    private fun innerRelease() {
-        (binding.tvTimer.tag as? Runnable)?.let {
-            it.run()
-            binding.tvTimer.removeCallbacks(it)
-            binding.tvTimer.tag = null
-        }
-    }
-
 
     private class RoomMessageAdapter constructor(
         private var mList: MutableList<PlayZoneMessage>,

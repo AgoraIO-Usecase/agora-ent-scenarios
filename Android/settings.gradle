@@ -85,3 +85,4 @@ include ':RTMSyncManager'
  */
 include ':scenes:play_zone'
 include ':scenes:play_zone:SudMGPWrapper'
+include ':IMKitManager'
