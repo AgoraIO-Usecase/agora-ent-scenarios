@@ -55,7 +55,7 @@ import io.agora.scene.ktv.singbattle.KTVLogger;
 import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleLayoutLrcPrepareBinding;
-import io.agora.scene.ktv.singbattle.ktvapi.ILrcView;
+import io.agora.ktvapi.ILrcView;
 import io.agora.scene.ktv.singbattle.service.RoomSelSongModel;
 import io.agora.scene.widget.basic.OutlineSpan;
 import io.agora.scene.widget.utils.UiUtils;

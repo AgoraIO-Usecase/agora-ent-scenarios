@@ -13,7 +13,6 @@ import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.show.debugSettings.DebugSettingModel
 import io.agora.videoloaderapi.VideoLoader
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 
 object RtcEngineInstance {
 

@@ -19,7 +19,7 @@ import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
-import androidx.activity.addCallback
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -47,9 +47,9 @@ import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.show.audio.AudioScenarioApi
-import io.agora.scene.show.audio.AudioScenarioType
-import io.agora.scene.show.audio.SceneType
+import io.agora.audioscenarioapi.AudioScenarioApi
+import io.agora.audioscenarioapi.AudioScenarioType
+import io.agora.audioscenarioapi.SceneType
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLiveDetailFragmentBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
@@ -173,6 +173,14 @@ class LiveDetailFragment : Fragment() {
         )
     }
 
+    private val mBackPressedCallback by lazy {
+        object: OnBackPressedCallback(isVisible){
+            override fun handleOnBackPressed() {
+                onBackPressed()
+            }
+        }
+    }
+
     private var mMicInvitationDialog: AlertDialog?= null
     private var mPKInvitationDialog: AlertDialog?= null
 
@@ -189,9 +197,7 @@ class LiveDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         ShowLogger.d(TAG, "Fragment Lifecycle: onViewCreated")
         initView()
-        activity?.onBackPressedDispatcher?.addCallback(enabled = isVisible) {
-            onBackPressed()
-        }
+        activity?.onBackPressedDispatcher?.addCallback(mBackPressedCallback)
         // 需求：打开直播显示
         changeStatisticVisible(true)
     }
@@ -232,6 +238,7 @@ class LiveDetailFragment : Fragment() {
     private fun startLoadPage() {
         ShowLogger.d(TAG, "Fragment PageLoad start load, roomId=${mRoomInfo.roomId}")
         isPageLoaded = true
+        mBackPressedCallback.isEnabled = true
         subscribeMediaTime = SystemClock.elapsedRealtime()
         if (mRoomInfo.isRobotRoom()) {
             initRtcEngine()
@@ -255,6 +262,7 @@ class LiveDetailFragment : Fragment() {
     fun stopLoadPage(isScrolling: Boolean) {
         ShowLogger.d(TAG, "Fragment PageLoad stop load, roomId=${mRoomInfo.roomId}")
         isPageLoaded = false
+        mBackPressedCallback.isEnabled = false
         destroy(isScrolling) // 切页或activity销毁
     }
 
@@ -432,7 +440,10 @@ class LiveDetailFragment : Fragment() {
             bottomLayout.vLinkingDot.isVisible = false
             if (!isRoomOwner) {
                 // 观众发送连麦申请
-                if (!(interactionInfo != null && interactionInfo!!.userId == UserManager.getInstance().user.id.toString())) {
+                if (interactionInfo == null
+                    || interactionInfo?.interactStatus == ShowInteractionStatus.idle
+                    || interactionInfo?.userId != UserManager.getInstance().user.id.toString()
+                ) {
                     // 观众发视频流
                     prepareLinkingMode()
                     mService.createMicSeatApply(mRoomInfo.roomId, {
@@ -446,6 +457,8 @@ class LiveDetailFragment : Fragment() {
                             )
                         )
                     }
+                } else {
+                    ShowLogger.d(TAG, "audience not create mic seat apply. interactionInfo=$interactionInfo")
                 }
             }
             showLinkingDialog()
@@ -1149,7 +1162,6 @@ class LiveDetailFragment : Fragment() {
                 view.isEnabled = false
                 mService.cancelMicSeatApply(
                     mRoomInfo.roomId,
-                    apply?.userId ?: "",
                     success = {
                         view.isEnabled = true
                     },
@@ -1436,8 +1448,8 @@ class LiveDetailFragment : Fragment() {
                     runOnUiThread {
                         destroy(false)
                         // 进房Error
-                        showLivingEndLayout() // 进房Error
-                        ShowLogger.d("showLivingEndLayout", "join room error!:${it.message}")
+                        showLivingEndLayout(true) // 进房Error
+                        ShowLogger.d("showLivingEndLayout", "create room error!:${it.message}")
                     }
                 })
         } else {
@@ -1449,7 +1461,7 @@ class LiveDetailFragment : Fragment() {
                     runOnUiThread {
                         destroy(false)
                         // 进房Error
-                        showLivingEndLayout() // 进房Error
+                        showLivingEndLayout(true) // 进房Error
                         ShowLogger.d("showLivingEndLayout", "join room error!:${it.message}")
                     }
                 })
@@ -1514,24 +1526,22 @@ class LiveDetailFragment : Fragment() {
         }
         mService.subscribeInteractionChanged(mRoomInfo.roomId) { status, info ->
             context ?: return@subscribeInteractionChanged
-            if (status == ShowSubscribeStatus.updated && info != null) {
+            if (status == ShowSubscribeStatus.updated
+                && info != null
+                && info.interactStatus != ShowInteractionStatus.idle) {
                 // 开始互动
-                if (interactionInfo == null) {
-                    interactionInfo = info
-                    // UI
-                    updateVideoSetting(true)
-                    refreshBottomLayout()
-                    refreshViewDetailLayout(info.interactStatus)
-                    mLinkDialog.setOnSeatStatus(info.userName, info.interactStatus)
-                    mPKDialog.setPKInvitationItemStatus(info.userName, info.interactStatus)
-                    // RTC
-                    updateLinkingMode()
-                    updatePKingMode()
-                    refreshPKTimeCount()
-                } else {
-                    // 互动中状态更新
-                    interactionInfo = info
-                }
+                interactionInfo = info
+                // UI
+                updateVideoSetting(true)
+                refreshBottomLayout()
+                refreshViewDetailLayout(info.interactStatus)
+                mLinkDialog.setOnSeatStatus(info.userName, info.interactStatus)
+                mPKDialog.setPKInvitationItemStatus(info.userName, info.interactStatus)
+                // RTC
+                updateLinkingMode()
+                updatePKingMode()
+                refreshPKTimeCount()
+
                 dismissMicInvitaionDialog()
                 dismissPKInvitationDialog()
             } else {
@@ -1552,17 +1562,19 @@ class LiveDetailFragment : Fragment() {
 
         mService.subscribePKInvitationChanged(mRoomInfo.roomId) { status, info ->
             info ?: return@subscribePKInvitationChanged
-            if (info.userId == UserManager.getInstance().user.id.toString()
-                && context != null
-            ) {
-                if (info.type == ShowInvitationType.invitation) {
+            context ?: return@subscribePKInvitationChanged
+            when(info.type){
+                ShowInvitationType.invitation -> {
                     isPKCompetition = true
                     preparePKingMode(info.fromRoomId)
                     showPKInvitationDialog(info.fromUserName, info)
                 }
+                ShowInvitationType.reject -> {
+                    isPKCompetition = false
+                    updateIdleMode()
+                }
             }
         }
-
         mService.getInteractionInfo(mRoomInfo.roomId, { interactionInfo ->
             this.interactionInfo = interactionInfo
             refreshBottomLayout()
@@ -1649,13 +1661,16 @@ class LiveDetailFragment : Fragment() {
         mService.leaveRoom(mRoomInfo.roomId)
     }
 
-    private fun showLivingEndLayout() {
+    private fun showLivingEndLayout(fromError: Boolean = false) {
         if (isRoomOwner) {
             val context = activity ?: return
             AlertDialog.Builder(context, R.style.show_alert_dialog)
                 .setView(
                     ShowLivingEndDialogBinding.inflate(LayoutInflater.from(requireContext()))
                         .apply {
+                            if (fromError) {
+                                tvTitle.setText(R.string.show_living_end_title_error)
+                            }
                             Glide.with(this@LiveDetailFragment)
                                 .load(mRoomInfo.ownerAvatar)
                                 .into(ivAvatar)
@@ -1668,6 +1683,9 @@ class LiveDetailFragment : Fragment() {
                 }
                 .show()
         } else {
+            if (fromError) {
+                mBinding.livingEndLayout.tvLivingEnd.setText(R.string.show_live_detail_living_end_error)
+            }
             mBinding.livingEndLayout.root.isVisible = true
             mBinding.livingEndLayout.root.bringToFront()
         }
@@ -1846,7 +1864,6 @@ class LiveDetailFragment : Fragment() {
                 isRoomOwner || isMeLinking(),
                 callback = {
                     // nothing
-                    scenarioApi.initialize()
                     if (isRoomOwner) {
                         scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
                     } else if (isMeLinking()) {
@@ -2154,6 +2171,8 @@ class LiveDetailFragment : Fragment() {
                 encodeVideoSize = Size(0, 0),
                 upBitrate = 0,
             )
+
+            mBinding.videoLinkingAudienceLayout.videoContainer.setOnClickListener(null)
         }
     }
 
@@ -2458,25 +2477,16 @@ class LiveDetailFragment : Fragment() {
                 enableLocalVideo(true)
             }
             val channelMediaOptions = ChannelMediaOptions()
-            channelMediaOptions.publishCameraTrack = false
-            channelMediaOptions.publishMicrophoneTrack = false
-            channelMediaOptions.publishCustomAudioTrack = false
-            channelMediaOptions.autoSubscribeVideo = true
             channelMediaOptions.autoSubscribeAudio = true
-            channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-            channelMediaOptions.audienceLatencyLevel =
-                Constants.AUDIENCE_LATENCY_LEVEL_ULTRA_LOW_LATENCY
-            channelMediaOptions.isInteractiveAudience = true
             val pkRtcConnection = RtcConnection(
                 interactionInfo!!.roomId,
                 UserManager.getInstance().user.id.toInt()
             )
-            mRtcEngine.joinChannelEx(
-                RtcEngineInstance.generalToken(),
-                pkRtcConnection,
+            mRtcEngine.updateChannelMediaOptionsEx(
                 channelMediaOptions,
-                eventListener
+                pkRtcConnection
             )
+            mRtcEngine.addHandlerEx(eventListener, pkRtcConnection)
             activity?.let {
                 mBinding.videoPKLayout.iBroadcasterBView.removeView(pkAgainstView)
                 pkAgainstView = TextureView(it)

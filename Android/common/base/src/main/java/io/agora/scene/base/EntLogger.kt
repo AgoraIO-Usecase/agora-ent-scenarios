@@ -31,23 +31,23 @@ class EntLogger constructor(private val config: Config) {
     private val dataFormat:SimpleDateFormat = SimpleDateFormat("yy/MM/dd HH:mm:ss.SSS", Locale.getDefault())
 
     init {
-//        if (BuildConfig.DEBUG) {
-//            Logger.addLogAdapter(
-//                object : AndroidLogAdapter(
-//                    PrettyFormatStrategy.newBuilder()
-//                        .showThreadInfo(true)          // (Optional) Whether to show thread info or not. Default true
-//                        .methodCount(1)                 // (Optional) How many method line to show. Default 2
-//                        .methodOffset(2)                // (Optional) Hides internal method calls up to offset. Default 5
-//                        .logStrategy(LogcatLogStrategy())   // (Optional) Changes the log strategy to print out. Default LogCat
-//                        .tag(config.sceneName)                     // (Optional) Global tag for every log. Default PRETTY_LOGGER
-//                        .build()
-//                ) {
-//                    override fun isLoggable(priority: Int, tag: String?): Boolean {
-//                        return tag == config.sceneName
-//                    }
-//                }
-//            )
-//        }
+        if (BuildConfig.DEBUG) {
+            Logger.addLogAdapter(
+                object : AndroidLogAdapter(
+                    PrettyFormatStrategy.newBuilder()
+                        .showThreadInfo(true)          // (Optional) Whether to show thread info or not. Default true
+                        .methodCount(1)                 // (Optional) How many method line to show. Default 2
+                        .methodOffset(2)                // (Optional) Hides internal method calls up to offset. Default 5
+                        .logStrategy(LogcatLogStrategy())   // (Optional) Changes the log strategy to print out. Default LogCat
+                        .tag(config.sceneName)                     // (Optional) Global tag for every log. Default PRETTY_LOGGER
+                        .build()
+                ) {
+                    override fun isLoggable(priority: Int, tag: String?): Boolean {
+                        return tag == config.sceneName
+                    }
+                }
+            )
+        }
         Logger.addLogAdapter(
             object : DiskLogAdapter(
                 CsvFormatStrategy

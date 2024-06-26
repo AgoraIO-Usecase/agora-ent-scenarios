@@ -1,7 +1,8 @@
 package io.agora.scene.show.service
 
 import android.content.Context
-import io.agora.rtm.RtmConstants
+import android.os.Handler
+import android.os.Looper
 import io.agora.rtmsyncmanager.ISceneResponse
 import io.agora.rtmsyncmanager.RoomExpirationPolicy
 import io.agora.rtmsyncmanager.SyncManager
@@ -13,7 +14,6 @@ import io.agora.rtmsyncmanager.model.AUIUserThumbnailInfo
 import io.agora.rtmsyncmanager.service.IAUIUserService.AUIUserRespObserver
 import io.agora.rtmsyncmanager.service.callback.AUIException
 import io.agora.rtmsyncmanager.service.callback.AUIRoomCallback
-import io.agora.rtmsyncmanager.service.rtm.AUIRtmErrorRespObserver
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
@@ -43,12 +43,13 @@ import io.agora.scene.show.service.rtmsync.getExPKService
 import io.agora.scene.show.service.rtmsync.getExRoomManager
 import io.agora.scene.show.service.rtmsync.getExRoomPresenceService
 import io.agora.scene.show.service.rtmsync.getExRoomService
+import io.agora.scene.show.service.rtmsync.isExConnected
 import io.agora.scene.show.service.rtmsync.isExRoomOwner
 import io.agora.scene.show.service.rtmsync.setupExtensions
-
+import io.agora.scene.show.service.rtmsync.subscribeExConnectionState
 
 const val kRoomSceneId = "scene_show_5.0.0"
-const val kRoomPresenceChannelName = "9999999999"
+const val kRoomPresenceChannelName = "scene_show_5_0_0_9999999"
 const val kRobotUid = 2000000001
 val kRobotAvatars = listOf("https://download.shengwang.cn/demo/release/bot1.png")
 val kRobotVideoRoomIds = arrayListOf(2023004, 2023005, 2023006)
@@ -64,6 +65,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
     private val appId: String = BuildConfig.AGORA_APP_ID
     private val appCert: String = BuildConfig.AGORA_APP_CERTIFICATE
 
+    private var shouldRetryLogin = false
     private val syncManager by lazy {
         // 初始化SyncManager
         val config = AUICommonConfig()
@@ -76,41 +78,46 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
         config.owner = owner
         config.host = BuildConfig.SERVER_HOST
         AUIRoomContext.shared().setCommonConfig(config)
-        SyncManager(context, null, config).apply {
-            setupExtensions(
-                kRoomPresenceChannelName,
-                RoomExpirationPolicy().apply {
-                    expirationTime = ShowServiceProtocol.ROOM_AVAILABLE_DURATION
-                },
-                roomHostUrl = BuildConfig.ROOM_MANAGER_SERVER_HOST,
-                loggerConfig = AUILogger.Config(
-                    context,
-                    "ShowLiveSyncExtensions",
-                    logCallback = object : AUILogger.AUILogCallback {
-                        override fun onLogDebug(tag: String, message: String) {
-                             ShowLogger.d(tag, "[SyncExtensions] $message")
-                        }
-
-                        override fun onLogInfo(tag: String, message: String) {
-                             ShowLogger.d(tag, "[SyncExtensions] $message")
-                        }
-
-                        override fun onLogWarning(tag: String, message: String) {
-                             ShowLogger.d(tag, "[SyncExtensions] $message")
-                        }
-
-                        override fun onLogError(tag: String, message: String) {
-                             ShowLogger.e(tag, message = "[SyncExtensions] $message")
-                        }
-                    })
-            )
-        }
+        SyncManager(context, null, config)
     }
+
     private val cloudPlayerService by lazy {
         CloudPlayerService()
     }
 
     init {
+        syncManager.setupExtensions(
+            kRoomPresenceChannelName,
+            RoomExpirationPolicy().apply {
+                expirationTime = ShowServiceProtocol.ROOM_AVAILABLE_DURATION
+            },
+            roomHostUrl = BuildConfig.ROOM_MANAGER_SERVER_HOST,
+            loggerConfig = AUILogger.Config(
+                context,
+                "ShowLiveSyncExtensions",
+                logCallback = object : AUILogger.AUILogCallback {
+                    override fun onLogDebug(tag: String, message: String) {
+                        ShowLogger.d(tag, message)
+                    }
+
+                    override fun onLogInfo(tag: String, message: String) {
+                        ShowLogger.d(tag, message)
+                    }
+
+                    override fun onLogWarning(tag: String, message: String) {
+                        ShowLogger.d(tag, message)
+                    }
+
+                    override fun onLogError(tag: String, message: String) {
+                        ShowLogger.e(tag, message = message)
+                    }
+                })
+        )
+
+        loginSync()
+    }
+
+    private fun loginSync(success: (() -> Unit)? = null, error: ((Exception) -> Unit)? = null) {
         TokenGenerator.generateToken(
             "",
             UserManager.getInstance().user.id.toString(),
@@ -119,15 +126,34 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
             success = {
                 syncManager.login(it) { ex ->
                     if (ex != null) {
-                         ShowLogger.e(tag, message = "login syncManager failed: ${ex.message}")
+                        ShowLogger.e(tag, message = "login syncManager failed: ${ex.message}")
+                        shouldRetryLogin = true
+                        error?.invoke(RuntimeException(ex.message))
+                        return@login
                     }
-                    ShowLogger.d(tag, message = "login syncManager success: ${UserManager.getInstance().user.id}")
+                    success?.invoke()
+                    ShowLogger.d(
+                        tag,
+                        message = "login syncManager success: ${UserManager.getInstance().user.id}"
+                    )
                 }
             },
             failure = {
-                 ShowLogger.e(tag, message = "generateToken failed: $it")
+                shouldRetryLogin = true
+                error?.invoke(it ?: RuntimeException("generateToken failed"))
+                ShowLogger.e(tag, message = "generateToken failed: $it")
             }
         )
+    }
+
+    private fun runOnLogined(success: () -> Unit, error: ((Exception) -> Unit)? = null) {
+        if (shouldRetryLogin) {
+            ShowLogger.d(tag, "retry login")
+            shouldRetryLogin = false
+            loginSync(success, error)
+        } else {
+            success.invoke()
+        }
     }
 
     fun destroy() {
@@ -165,38 +191,40 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
         error: ((Exception) -> Unit)?
     ) {
         ShowLogger.d(tag, "createRoom: $roomId")
-        syncManager.getExRoomService().createRoom(
-            appId,
-            kRoomSceneId,
-            ShowRoomDetailModel(
-                roomId,
-                roomName,
-                1,
-                UserManager.getInstance().user.id.toString(),
-                UserManager.getInstance().user.headUrl,
-                UserManager.getInstance().user.name,
-            ).toAUIRoomInfo()
-        ) { ex, roomInfo ->
-            if (ex == null && roomInfo != null) {
-                ShowLogger.d(tag, "createRoom success: $roomId")
-                syncManager.getExRoomPresenceService().login {
-                    syncManager.getExRoomPresenceService().setup(
-                        RoomPresenceInfo(
-                            roomId,
-                            roomName,
-                            UserManager.getInstance().user.id.toString(),
-                            UserManager.getInstance().user.name,
-                            UserManager.getInstance().user.headUrl,
-                            RoomPresenceStatus.IDLE
+        runOnLogined({
+            syncManager.getExRoomService().createRoom(
+                appId,
+                kRoomSceneId,
+                ShowRoomDetailModel(
+                    roomId,
+                    roomName,
+                    1,
+                    UserManager.getInstance().user.id.toString(),
+                    UserManager.getInstance().user.headUrl,
+                    UserManager.getInstance().user.name,
+                ).toAUIRoomInfo()
+            ) { ex, roomInfo ->
+                if (ex == null && roomInfo != null) {
+                    ShowLogger.d(tag, "createRoom success: $roomId")
+                    syncManager.getExRoomPresenceService().login {
+                        syncManager.getExRoomPresenceService().setup(
+                            RoomPresenceInfo(
+                                roomId,
+                                roomName,
+                                UserManager.getInstance().user.id.toString(),
+                                UserManager.getInstance().user.name,
+                                UserManager.getInstance().user.headUrl,
+                                RoomPresenceStatus.IDLE
+                            )
                         )
-                    )
+                    }
+                    success.invoke(roomInfo.toShowRoomDetailModel())
+                } else {
+                    ShowLogger.e(tag, message = "createRoom failed: $roomId, $ex")
+                    error?.invoke(RuntimeException(ex))
                 }
-                success.invoke(roomInfo.toShowRoomDetailModel())
-            } else {
-                ShowLogger.e(tag, message = "createRoom failed: $roomId")
-                error?.invoke(RuntimeException(ex))
             }
-        }
+        }, error)
     }
 
 
@@ -207,24 +235,40 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
     ) {
         val robotRoom = roomId.isRobotRoom()
         ShowLogger.d(tag, "joinRoom:$roomId, isRobotRoom:$robotRoom")
-
-        if (robotRoom) {
-            success.invoke()
-            return
-        }
-        ShowLogger.d(tag, "enterRoom: $roomId")
-        syncManager.getExRoomService().enterRoom(
-            appId,
-            kRoomSceneId,
-            roomId
-        ) { ex ->
-            ShowLogger.d(tag, "enterRoom: $roomId, ex: $ex")
-            if (ex != null) {
-                error?.invoke(RuntimeException(ex))
-                return@enterRoom
+        runOnLogined({
+            if (robotRoom) {
+                if (syncManager.isExConnected()) {
+                    success.invoke()
+                } else {
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        if (syncManager.isExConnected()) {
+                            success.invoke()
+                        } else {
+                            val ex = RuntimeException("robot room not connected")
+                            ShowLogger.d(
+                                tag,
+                                "joinRoom error :$roomId, isRobotRoom:$robotRoom, ex:${ex.message}"
+                            )
+                            error?.invoke(ex)
+                        }
+                    }, 500)
+                }
+                return@runOnLogined
             }
-            success.invoke()
-        }
+            ShowLogger.d(tag, "enterRoom: $roomId")
+            syncManager.getExRoomService().enterRoom(
+                appId,
+                kRoomSceneId,
+                roomId
+            ) { ex ->
+                ShowLogger.d(tag, "enterRoom: $roomId, ex: $ex")
+                if (ex != null) {
+                    error?.invoke(RuntimeException(ex))
+                    return@enterRoom
+                }
+                success.invoke()
+            }
+        }, error)
     }
 
     override fun subscribeCurrRoomEvent(
@@ -571,13 +615,12 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
 
     override fun cancelMicSeatApply(
         roomId: String,
-        userId: String,
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
         syncManager.getExApplyService(roomId)
             .cancelApply(
-                userId,
+                UserManager.getInstance().user.id.toString(),
                 success = {
                     ThreadManager.getInstance().runOnMainThread {
                         success?.invoke()
@@ -787,19 +830,11 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
     }
 
     override fun subscribeReConnectEvent(roomId: String, onReconnect: () -> Unit) {
-        val rtmManager = syncManager.rtmManager
-        rtmManager.subscribeError(object : AUIRtmErrorRespObserver {
-            override fun onTokenPrivilegeWillExpire(channelName: String?) {
-
+        syncManager.subscribeExConnectionState(roomId) { isConnected ->
+            if (isConnected) {
+                onReconnect.invoke()
             }
-
-            override fun onConnectionStateChanged(channelName: String?, state: Int, reason: Int) {
-                super.onConnectionStateChanged(channelName, state, reason)
-                if (state == RtmConstants.RtmConnectionState.getValue(RtmConstants.RtmConnectionState.CONNECTED)) {
-                    onReconnect.invoke()
-                }
-            }
-        })
+        }
     }
 
     private fun appendRobotRooms(roomList: List<ShowRoomDetailModel>): List<ShowRoomDetailModel> {

@@ -30,6 +30,8 @@ dependencies {
 
     implementation project(":common:base")
     implementation project(':common:ui-widget')
+    implementation project(':common:scenario-api:lib_videoloaderapi')
+    implementation project(':common:scenario-api:lib_audioscenarioapi')
     implementation project(':RTMSyncManager')
 
     implementation rootProject.ext.deps.appcompat
