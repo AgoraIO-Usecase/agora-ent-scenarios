@@ -84,7 +84,10 @@ class AUIMapCollection(
         ) { error ->
             if (error != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(null, "$error")
+                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(
+                        code = error.code,
+                        msg = error.message
+                    )
                 )
             } else {
                 callback?.invoke(null)
@@ -125,7 +128,10 @@ class AUIMapCollection(
             uniqueId = uniqueId
         ) { error ->
             if (error != null) {
-                callback?.invoke(AUICollectionException.ErrorCode.recvErrorReceipt.toException(null, "$error"))
+                callback?.invoke(AUICollectionException.ErrorCode.recvErrorReceipt.toException(
+                    code = error.code,
+                    msg = error.message
+                ))
             } else {
                 callback?.invoke(null)
             }
@@ -172,7 +178,10 @@ class AUIMapCollection(
         ) { error ->
             if (error != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(null, "$error")
+                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(
+                        code = error.code,
+                        msg = error.message
+                    )
                 )
             } else {
                 callback?.invoke(null)
@@ -235,7 +244,10 @@ class AUIMapCollection(
         ) { error ->
             if (error != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(null, "$error")
+                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(
+                        code = error.code,
+                        msg = error.message
+                    )
                 )
             } else {
                 callback?.invoke(null)
@@ -273,7 +285,10 @@ class AUIMapCollection(
         ) { error ->
             if (error != null) {
                 callback?.invoke(
-                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(null, "$error")
+                    AUICollectionException.ErrorCode.recvErrorReceipt.toException(
+                        code = error.code,
+                        msg = error.message
+                    )
                 )
             } else {
                 callback?.invoke(null)

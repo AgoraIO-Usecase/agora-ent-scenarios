@@ -1,7 +1,7 @@
 ext { ktv_is_modular = false }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_SING_RELAY = "3.5.0"
+final def VERSION_SCENE_SING_RELAY = "4.3.0"
 android {
     defaultConfig {
         if(isModular()){
@@ -14,7 +14,7 @@ android {
 dependencies {
     implementation project(":common:base")
     implementation project(':common:ui-widget')
-
+    implementation project(':common:scenario-api:lib_ktvapi')
     implementation rootProject.ext.deps.lyricsView
     implementation rootProject.ext.deps.annotation
     implementation rootProject.ext.deps.material

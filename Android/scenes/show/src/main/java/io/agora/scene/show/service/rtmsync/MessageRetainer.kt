@@ -35,7 +35,7 @@ class MessageRetainer(
             message: String
         ) {
             val msg = GsonTools.toBeanSafely(message, MessageInfo::class.java) ?: return
-            if (key != msg.key) {
+            if (key != msg.key || this@MessageRetainer.channelName != msg.channelName) {
                 return
             }
             AUILogger.logger().d(tag, "onMessageReceive $msg")
@@ -66,6 +66,9 @@ class MessageRetainer(
             userInfo: Map<String, Any>,
             reason: AUIRtmUserLeaveReason
         ) {
+            if (this@MessageRetainer.channelName != channelName) {
+                return
+            }
             AUILogger.logger().d(tag, "onUserDidLeaved $userId")
             removeMessages(filter = { it.publisherId == userId })
         }
@@ -116,10 +119,11 @@ class MessageRetainer(
     fun sendMessage(
         message: String,
         userId: String,
+        channelName: String = this@MessageRetainer.channelName,
         success: (() -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     ) {
-        val messageInfo = MessageInfo(key = key, publisherId = AUIRoomContext.shared().currentUserInfo.userId, content = message)
+        val messageInfo = MessageInfo(key = key, publisherId = AUIRoomContext.shared().currentUserInfo.userId, channelName = channelName, content = message)
         val typeMessage = GsonTools.beanToString(messageInfo)
         if (typeMessage == null) {
             AUILogger.logger().d(tag, "sendMessage >> message serialize failed : $message")
@@ -167,6 +171,7 @@ class MessageRetainer(
 data class MessageInfo(
     val id: String = UUID.randomUUID().toString(),
     val key: String,
+    val channelName: String,
     val publisherId: String,
     val content: String
 )

@@ -18,7 +18,8 @@ class AUICollectionException private constructor(val code: Int, override val mes
         calculateMapFail(106, "calculate map fail"),
         recvErrorReceipt(107, "receipt error"),
         unsupportedAction(108, "action unsupported"),
-        calculateMapOutOfRange(111, "calculate map out of range");
+        calculateMapOutOfRange(111, "calculate map out of range"),
+        filterFoundSame(112, "filter result found the same value");
 
         fun toException(code: Int? = null, msg: String? = null): AUICollectionException {
             return AUICollectionException(code ?: value, msg ?: message)

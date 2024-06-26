@@ -129,8 +129,8 @@ class AGResourceManager(private val context: Context) {
         resource: AGResource,
         progressHandler: (Int) -> Unit,
         completionHandler: (File?, Exception?) -> Unit
-    ) {
-        val destinationPath = getCachePath(context, "assets") ?: return
+    )= withContext(Dispatchers.IO)  {
+        val destinationPath = getCachePath(context, "assets") ?: return@withContext
         try {
             val inputFile = File(destinationPath, resource.url.substringAfterLast("/"))
             Log.d(tag, "downloadAndUnZipResource resource:$resource, inputFile:${inputFile.length()}")
