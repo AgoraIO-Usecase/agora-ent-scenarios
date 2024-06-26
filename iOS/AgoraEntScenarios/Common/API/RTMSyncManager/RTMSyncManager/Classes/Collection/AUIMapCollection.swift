@@ -399,12 +399,11 @@ extension AUIMapCollection {
 //MARK: override AUIRtmMessageProxyDelegate
 extension AUIMapCollection {
     public override func onMessageReceive(publisher: String, channelName: String, message: String) {
-        guard let map = decodeToJsonObj(message) as? [String: Any],
-              let collectionMessage: AUICollectionMessage = decodeModel(map),
+        guard let collectionMessage: AUICollectionMessage = decodeModel(jsonStr: message),
               collectionMessage.sceneKey == observeKey else {
             return
         }
-        aui_collection_log("onMessageReceive: \(map)")
+        aui_collection_log("onMessageReceive: \(message)")
         let uniqueId = collectionMessage.uniqueId
         let channelName = collectionMessage.channelName
         guard channelName == self.channelName else {return}

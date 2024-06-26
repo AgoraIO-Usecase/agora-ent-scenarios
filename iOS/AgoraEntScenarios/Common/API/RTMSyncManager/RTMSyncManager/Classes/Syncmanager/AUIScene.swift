@@ -26,7 +26,7 @@ public class AUIScene: NSObject {
     private lazy var roomCollection: AUIMapCollection = getCollection(key: kRoomInfoKey)!
     private var roomPayload: [String: Any]?
     private var enterRoomCompletion: (([String: Any]?, NSError?)-> ())?
-    private var respDelegates: NSHashTable<AUISceneRespDelegate> = NSHashTable<AUISceneRespDelegate>.weakObjects()
+    private var respDelegates = NSHashTable<AUISceneRespDelegate>.weakObjects()
     private var subscribeDate: Date?
     
     deinit {
@@ -77,8 +77,21 @@ public class AUIScene: NSObject {
         respDelegates.remove(delegate)
     }
     
+    
+    public func create(createTime: Int64, 
+                       payload: [String: Any]?,
+                       completion:@escaping (NSError?)->()) {
+        create(createTime: createTime,
+               ownerId: AUIRoomContext.shared.currentUserInfo.userId,
+               payload: payload,
+               completion: completion)
+    }
+    
     //TODO: 是否需要像UIKit一样传入一个房间信息对象，还是这个对象业务上自己创建map collection来写入
-    public func create(createTime: Int64, payload: [String: Any]?, completion:@escaping (NSError?)->()) {
+    public func create(createTime: Int64, 
+                       ownerId: String,
+                       payload: [String: Any]?,
+                       completion:@escaping (NSError?)->()) {
         aui_info("create[\(channelName)] with payload \(payload ?? [:])", tag: kSceneTag)
         
         guard rtmManager.isLogin else {
@@ -86,7 +99,7 @@ public class AUIScene: NSObject {
             completion(NSError.auiError("create fail! not login"))
             return
         }
-        let ownerId = AUIRoomContext.shared.currentUserInfo.userId
+        
         var roomInfo = [
             kRoomInfoRoomId: channelName,
             kRoomInfoRoomOwnerId: ownerId,
@@ -374,19 +387,17 @@ extension AUIScene: AUIRtmErrorProxyDelegate {
         }
     }
     
-    @objc public func onConnectionStateChanged(channelName: String,
-                                               connectionStateChanged state: AgoraRtmClientConnectionState,
-                                               result reason: AgoraRtmClientConnectionChangeReason) {
-        aui_info("onConnectionStateChanged[\(channelName)] state: \(state.rawValue), reason: \(reason.rawValue)", tag: kSceneTag)
-        if reason == .changedRejoinSuccess {
+    @objc public func didReceiveLinkStateEvent(event: AgoraRtmLinkStateEvent) {
+        aui_info("didReceiveLinkStateEvent state: \(event.currentState.rawValue), reason: \(event.reason ?? "")", tag: kSceneTag)
+        if event.currentState == .connected, event.operation == .reconnected {
+            //TODO: 推荐重连后lock的snapshot来获取
             getArbiter().acquire()
         }
-        guard state == .failed, reason == .changedBannedByServer else {
-            return
-        }
-        
-        for obj in self.respDelegates.allObjects {
-            obj.onSceneUserBeKicked?(channelName: channelName, userId: AUIRoomContext.shared.currentUserInfo.userId)
+
+        if event.currentState == .failed {
+            for obj in self.respDelegates.allObjects {
+                obj.onSceneFailed?(channelName: channelName, reason: event.reason ?? "")
+            }
         }
     }
 }
