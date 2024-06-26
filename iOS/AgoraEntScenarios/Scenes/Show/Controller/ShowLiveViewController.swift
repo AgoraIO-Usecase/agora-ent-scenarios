@@ -26,7 +26,7 @@ class ShowLiveViewController: UIViewController {
     
     var room: ShowRoomListModel? {
         didSet{
-            if oldValue?.roomId == room?.roomId, finishView?.superview == nil { return }
+            if oldValue?.roomId == room?.roomId { return }
             oldValue?.interactionAnchorInfoList.removeAll()
             liveView.room = room
             liveView.canvasView.canvasType = .none
@@ -244,17 +244,17 @@ class ShowLiveViewController: UIViewController {
     
     private var muteLocalAudio: Bool = false {
         didSet {
-            let options = self.channelOptions
-            options.publishMicrophoneTrack = !muteLocalAudio
-            ShowAgoraKitManager.shared.updateChannelEx(channelId: self.room?.roomId ?? "", options: options)
+            showPrint("muteLocalAudio: \(muteLocalVideo)")
+            channelOptions.publishMicrophoneTrack = !muteLocalAudio
+            ShowAgoraKitManager.shared.updateChannelEx(channelId: self.room?.roomId ?? "", options: channelOptions)
         }
     }
     
     private var muteLocalVideo: Bool = false {
         didSet {
-            let options = self.channelOptions
-            options.publishCameraTrack = !muteLocalVideo
-            ShowAgoraKitManager.shared.updateChannelEx(channelId: self.room?.roomId ?? "", options: options)
+            showPrint("muteLocalVideo: \(muteLocalVideo)")
+            channelOptions.publishCameraTrack = !muteLocalVideo
+            ShowAgoraKitManager.shared.updateChannelEx(channelId: self.room?.roomId ?? "", options: channelOptions)
         }
     }
     
@@ -318,6 +318,7 @@ class ShowLiveViewController: UIViewController {
         VideoLoaderApiImpl.shared.removeListener(listener: self)
     }
     
+    //主播加入频道
     private func joinChannel() {
         assert(role == .broadcaster, "role invalid")
         guard let channelId = room?.roomId, let ownerId = room?.ownerId,  let uid: UInt = UInt(ownerId) else {
@@ -333,8 +334,6 @@ class ShowLiveViewController: UIViewController {
         ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: channelId)
         ShowAgoraKitManager.shared.setupLocalVideo(canvasView: self.liveView.canvasView.localView)
         liveView.canvasView.setLocalUserInfo(name: room?.ownerName ?? "", img: room?.ownerAvatar ?? "")
-        self.muteLocalVideo = false
-        self.muteLocalAudio = false
     }
     
     private func sendMessageWithText(_ text: String) {
@@ -400,8 +399,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             }
         }
         
-        _refreshPKUserList()
-        _refreshInteractionList()
+//        _refreshPKUserList()
+//        _refreshInteractionList()
     }
     
     private func _refreshPKUserList() {
@@ -558,6 +557,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         //recv invitation
         if invitation.type == .inviting {
             let uid = UInt(VLUserCenter.user.id)!
+            //观众身份加入pk主播的频道
             ShowAgoraKitManager.shared.joinChannelEx(currentChannelId: roomId,
                                                      targetChannelId: invitation.fromRoomId,
                                                      ownerId: uid,
@@ -649,8 +649,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         switch interaction.type {
         case .pk:
             view.layer.contents = UIImage.show_sceneImage(name: "show_live_pk_bg")?.cgImage
-            self.muteLocalVideo = false
-            self.muteLocalAudio = false
             let interactionRoomId = interaction.roomId
             if interactionRoomId.isEmpty { return }
             if roomId != interaction.roomId {
@@ -662,26 +660,27 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 liveView.canvasView.setRemoteUserInfo(name: interaction.userName)
             }
         case .linking:
-            self.muteLocalVideo = false
-            self.muteLocalAudio = false
             liveView.canvasView.canvasType = .joint_broadcasting
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName)
             
             //TODO: 这个是不是需要真正的角色，放进switchRole里？
             if role == .audience {
+                //只有连麦观众才需要改，主播原则上保持原先的mute状态
+                self.muteLocalVideo = false
+                self.muteLocalAudio = false
                 ShowAgoraKitManager.shared.setPVCon(true)
                 ShowAgoraKitManager.shared.setSuperResolutionOn(false)
             }
             //如果是连麦双方为broadcaster，观众不修改，因为观众可能已经申请上麦，申请时已经修改了角色并提前推流
             let toRole: AgoraClientRole? = (role == .broadcaster || interaction.userId == VLUserCenter.user.id) ? .broadcaster : nil
+            ShowAgoraKitManager.shared.updateLiveView(role: toRole,
+                                                      channelId: roomId,
+                                                      uid: interaction.userId,
+                                                      canvasView: liveView.canvasView.remoteView)
             ShowAgoraKitManager.shared.switchRole(role: toRole,
                                                   channelId: roomId,
                                                   options: self.channelOptions,
                                                   uid: interaction.userId)
-            ShowAgoraKitManager.shared.updateLiveView(role: toRole, 
-                                                      channelId: roomId,
-                                                      uid: interaction.userId,
-                                                      canvasView: liveView.canvasView.remoteView)
             
             liveView.bottomBar.linkButton.isSelected = true
             liveView.bottomBar.linkButton.isShowRedDot = false
@@ -707,15 +706,11 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             view.layer.contents = UIImage.show_sceneImage(name: "show_live_room_bg")?.cgImage
             ShowAgoraKitManager.shared.removeRtcDelegate(delegate: self, roomId: interaction.roomId)
             
-            self.muteLocalVideo = false
-            self.muteLocalAudio = false
             ShowAgoraKitManager.shared.updateVideoProfileForMode(.single)
             ShowAgoraKitManager.shared.leaveChannelEx(roomId: self.roomId, channelId: interaction.roomId)
             liveView.canvasView.canvasType = .none
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName)
         case .linking:
-            self.muteLocalVideo = false
-            self.muteLocalAudio = false
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName)
             liveView.canvasView.canvasType = .none
             liveView.bottomBar.linkButton.isShowRedDot = false
