@@ -27,6 +27,7 @@ import Foundation
     public var userId: String = ""     // 互动者ID
     public var userName: String = ""   // 互动者用户名
     public var roomId: String = ""     // 互动者所在房间ID
+    public var createdAt: UInt64 = 0
     
     enum CodingKeys: String, CodingKey {
         case type, userId, userName, roomId
@@ -131,6 +132,7 @@ extension InteractionService {
         info.roomId = roomId
         info.userId = userId
         info.userName = userName
+        info.createdAt = syncManager.getScene(channelName: channelName)?.getCurrentTs() ?? 0
         let value = encodeModel(info) ?? [:]
         interactionCollection.addMetaData(valueCmd: InteractionCmd.startPk.rawValue,
                                           value: value) { err in
@@ -159,6 +161,7 @@ extension InteractionService {
         info.roomId = channelName
         info.userId = userId
         info.userName = userInfo.userName
+        info.createdAt = syncManager.getScene(channelName: channelName)?.getCurrentTs() ?? 0
         let value = encodeModel(info) ?? [:]
         interactionCollection.addMetaData(valueCmd: InteractionCmd.startLink.rawValue,
                                           value: value) { err in

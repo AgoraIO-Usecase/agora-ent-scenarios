@@ -19,6 +19,7 @@ private func agoraPrint(_ message: String) {
 public class ShowSyncManagerServiceImp: NSObject {
     private let user: AUIUserThumbnailInfo
     private var isLogined: Bool = false
+    private var expireTimerMap: [String: Timer] = [:]
     private var delegates: [String: NSHashTable<ShowSubscribeServiceProtocol>] = [:]
     private lazy var roomManager = AUIRoomManagerImpl(sceneId: kSceneId)
     private lazy var syncManager: AUISyncManager = {
@@ -66,6 +67,7 @@ extension ShowSyncManagerServiceImp {
         interactionManager.enterScene(channelName: roomId, roomName: roomName)
         let msgManager = interactionManager.getMessageManager(channelName: roomId, key: "chatMessage")
         msgManager.subscribe(delegate: self)
+        startCheckExpireTimer(roomId: roomId)
     }
     
     private func interactionLeave(roomId: String) {
@@ -73,6 +75,7 @@ extension ShowSyncManagerServiceImp {
         let msgManager = interactionManager.getMessageManager(channelName: roomId, key: "chatMessage")
         msgManager.unsubscribe(delegate: self)
         interactionManager.leaveScene(channelName: roomId)
+        stopCheckExpireTimer(roomId: roomId)
     }
     
     private func preGenerateToken(completion:@escaping (NSError?)->()) {
@@ -181,6 +184,29 @@ extension ShowSyncManagerServiceImp {
         } else {
             updateRoomInfo()
         }
+    }
+    
+    public func startCheckExpireTimer(roomId: String) {
+        let expireTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
+            guard let self = self,
+                  let scene = self.syncManager.getScene(channelName: roomId) else { return }
+            
+            let duration = scene.getRoomDuration()
+            let expiredDuration = 20 * 60 * 1000
+            if duration >= expiredDuration {
+                self.stopCheckExpireTimer(roomId: roomId)
+                
+                self.onSceneExpire(channelName: roomId)
+                return
+            }
+        }
+        expireTimerMap[roomId] = expireTimer
+    }
+    
+    public func stopCheckExpireTimer(roomId: String) {
+        let expireTimer = expireTimerMap[roomId]
+        expireTimer?.invalidate()
+        expireTimerMap[roomId] = nil
     }
 }
 
@@ -401,9 +427,7 @@ extension ShowSyncManagerServiceImp: ShowServiceProtocol {
                 return
             }
             
-            let showInfo = ShowInteractionInfo()
-            
-            completion(nil, showInfo)
+            completion(nil, info)
         }
     }
     
@@ -558,7 +582,7 @@ extension ShowSyncManagerServiceImp: AUIUserRespDelegate {
         let userCount = scene?.userService.userList.count ?? 0
         if let values = delegates[roomId] {
             for element in values.allObjects {
-                let scene = syncManager.getScene(channelName: roomId)
+//                let scene = syncManager.getScene(channelName: roomId)
                 element.onUserCountChanged(channelName: roomId,
                                            userCount: userCount)
             }
@@ -574,7 +598,7 @@ extension ShowSyncManagerServiceImp: AUIUserRespDelegate {
         if let values = delegates[roomId] {
             for element in values.allObjects {
                 element.onUserJoinedRoom(channelName: roomId, user: userInfo)
-                let scene = syncManager.getScene(channelName: roomId)
+//                let scene = syncManager.getScene(channelName: roomId)
                 element.onUserCountChanged(channelName: roomId,
                                            userCount: userCount)
             }
@@ -592,7 +616,7 @@ extension ShowSyncManagerServiceImp: AUIUserRespDelegate {
         if let values = delegates[roomId] {
             for element in values.allObjects {
                 element.onUserLeftRoom(channelName: roomId, user: userInfo)
-                let scene = syncManager.getScene(channelName: roomId)
+//                let scene = syncManager.getScene(channelName: roomId)
                 element.onUserCountChanged(channelName: roomId,
                                            userCount: userCount)
             }
