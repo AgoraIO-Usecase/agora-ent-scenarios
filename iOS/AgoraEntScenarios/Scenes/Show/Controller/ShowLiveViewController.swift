@@ -145,6 +145,7 @@ class ShowLiveViewController: UIViewController {
     private lazy var panelPresenter = ShowDataPanelPresenter()
     
     private var finishView: ShowReceiveFinishView?
+    private var ownerExpiredView: ShowRoomOwnerExpiredView?
     
     //pk user list (room list)
     private var pkUserInvitationList: [ShowPKUserInfo]? {
@@ -365,6 +366,7 @@ extension ShowLiveViewController {
     
     func _joinRoom(_ room: ShowRoomListModel){
         finishView?.removeFromSuperview()
+        ownerExpiredView?.removeFromSuperview()
         ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: room.roomId)
         if let service = serviceImp {
             service.joinRoom(room: room) {[weak self] error, detailModel in
@@ -433,16 +435,38 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         }
     }
     
-    private func onRoomFailed(channelName: String, title: String? = nil) {
+    private func _broadcasterRoomExpired(){
+        if ownerExpiredView != nil {return}
+        ownerExpiredView = ShowRoomOwnerExpiredView()
+        ownerExpiredView?.headImg = VLUserCenter.user.headUrl
+        ownerExpiredView?.clickBackButtonAction = {[weak self] in
+            self?.leaveRoom()
+            self?.dismiss(animated: true)
+        }
+        self.view.addSubview(ownerExpiredView!)
+        ownerExpiredView?.snp.makeConstraints { make in
+            make.left.right.top.bottom.equalToSuperview()
+        }
+    }
+    
+    private func _audienceRoomOwnerExpired( title: String? = nil){
         finishView?.removeFromSuperview()
         finishView = ShowReceiveFinishView()
-        finishView?.title = title
         finishView?.headImg = room?.ownerAvatar ?? ""
         finishView?.headName = room?.ownerName ?? ""
+        finishView?.title = title
         finishView?.delegate = self
         self.view.addSubview(finishView!)
         finishView?.snp.makeConstraints { make in
             make.left.right.top.bottom.equalToSuperview()
+        }
+    }
+    
+    private func onRoomFailed(channelName: String, title: String? = nil) {
+        if role == .broadcaster {
+            _broadcasterRoomExpired()
+        }else{
+            _audienceRoomOwnerExpired(title: title)
         }
     }
     
