@@ -17,6 +17,7 @@ enum ShowLiveCanvasType {
 protocol ShowCanvasViewDelegate: NSObjectProtocol {
     func onClickRemoteCanvas()
     func onPKDidTimeout()
+    func getPKDuration() -> UInt64
 }
 
 class ShowCanvasView: UIView {
@@ -156,7 +157,7 @@ class ShowCanvasView: UIView {
                 timer.scheduledSecondsTimer(withName: "pk", timeInterval: 1, queue: .main) { [weak self] _, duration in
                     guard let self = self else { return }
                     let maxTime: TimeInterval = TimeInterval(AppContext.shared.sceneConfig?.showpk ?? 120)
-                    var timeLeft = maxTime - duration
+                    var timeLeft = maxTime - TimeInterval((self.delegate?.getPKDuration() ?? 0) / 1000)
                     if timeLeft < 0 {
                         self.timer.destoryAllTimer()
                         self.delegate?.onPKDidTimeout()

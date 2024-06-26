@@ -441,6 +441,11 @@ extension ShowSyncManagerServiceImp: ShowServiceProtocol {
         scene?.userService.muteUserAudio(isMute: mute, callback: completion)
     }
     
+    func getCurrentNtpTs(roomId: String) -> UInt64 {
+        let scene = syncManager.getScene(channelName: roomId)
+        return scene?.getCurrentTs() ?? 0
+    }
+    
     func subscribeEvent(roomId: String, delegate: ShowSubscribeServiceProtocol) {
         if let value = delegates[roomId] {
             if !value.contains(delegate) {

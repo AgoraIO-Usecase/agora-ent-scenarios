@@ -885,6 +885,15 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
         interruptInteractionReason = "show_pk_end_timeout".show_localized
     }
     
+    func getPKDuration() -> UInt64 {
+        guard let ts = serviceImp?.getCurrentNtpTs(roomId: roomId),
+              let interactionTs = currentInteraction?.createdAt,
+              interactionTs <= ts else {
+            return 0
+        }
+        return ts - interactionTs
+    }
+    
     func onClickRemoteCanvas() {
         guard let info = currentInteraction else { return }
         guard room?.ownerId == VLUserCenter.user.id || info.userId == VLUserCenter.user.id else { return }
