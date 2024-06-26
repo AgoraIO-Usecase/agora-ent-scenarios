@@ -27,9 +27,7 @@ private let kAUIRtmMsgProxyKey = "AUIRtmMsgProxy"
     ///   - channelName: <#channelName description#>
     ///   - state: <#state description#>
     ///   - reason: <#reason description#>
-    @objc optional func onConnectionStateChanged(channelName: String,
-                                                 connectionStateChanged state: AgoraRtmClientConnectionState,
-                                                 result reason: AgoraRtmClientConnectionChangeReason)
+    @objc optional func didReceiveLinkStateEvent(event: AgoraRtmLinkStateEvent)
     
     /// 收到的KV为空
     /// - Parameter channelName: <#channelName description#>
@@ -69,7 +67,7 @@ open class AUIRtmMsgProxy: NSObject {
     private var attributesCacheAttr: [String: [String: String]] = [:]
     private var lockDelegates: [String: NSHashTable<AUIRtmLockProxyDelegate>] = [:]
     private var lockDetailCaches: [String: [AgoraRtmLockDetail]] = [:]
-    private var messageDelegates:NSHashTable<AUIRtmMessageProxyDelegate> = NSHashTable<AUIRtmMessageProxyDelegate>.weakObjects()
+    private var messageDelegates = NSHashTable<AUIRtmMessageProxyDelegate>.weakObjects()
     private var userDelegates: [String: NSHashTable<AUIRtmUserProxyDelegate>] = [:]
     private var errorDelegates: [String: NSHashTable<AUIRtmErrorProxyDelegate>] = [:]
     
@@ -261,24 +259,21 @@ extension AUIRtmMsgProxy: AgoraRtmClientDelegate {
         }
     }
     
-    public func rtmKit(_ kit: AgoraRtmClientKit,
-                       channel channelName: String,
-                       connectionChangedToState state: AgoraRtmClientConnectionState,
-                       reason: AgoraRtmClientConnectionChangeReason) {
-        aui_info("connectionStateChanged[\(channelName)] state: \(state.rawValue) reason: \(reason.rawValue)", tag: kAUIRtmMsgProxyKey)
+    public func rtmKit(_ rtmKit: AgoraRtmClientKit, didReceiveLinkStateEvent event: AgoraRtmLinkStateEvent) {
+        aui_info("didReceiveLinkStateEvent currentState: \(event.currentState.rawValue) serviceType: \(event.serviceType.rawValue) operation: \(event.operation.rawValue) reason: \(event.reason ?? "") isResumed: \(event.isResumed)", tag: kAUIRtmMsgProxyKey)
         
-        if let elements = self.errorDelegates[channelName] {
-            for element in elements.allObjects {
-                element.onConnectionStateChanged?(channelName: channelName,
-                                                  connectionStateChanged: state,
-                                                  result: reason)
-            }
-        }
-        
-        if reason == .changedRejoinSuccess {
-            if let elements = self.userDelegates[channelName] {
+        for channelName in event.affectedChannels {
+            if let elements = self.errorDelegates[channelName] {
                 for element in elements.allObjects {
-                    element.onCurrentUserJoined(channelName: channelName)
+                    element.didReceiveLinkStateEvent?(event: event)
+                }
+            }
+            
+            if event.currentState == .connected, event.operation == .reconnected {
+                if let elements = self.userDelegates[channelName] {
+                    for element in elements.allObjects {
+                        element.onCurrentUserJoined(channelName: channelName)
+                    }
                 }
             }
         }

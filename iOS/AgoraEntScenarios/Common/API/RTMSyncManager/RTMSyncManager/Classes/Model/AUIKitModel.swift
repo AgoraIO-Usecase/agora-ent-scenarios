@@ -34,4 +34,11 @@ let kUserMuteVideoInitStatus = true
     public var muteAudio: Bool = kUserMuteAudioInitStatus  //是否静音状态
     public var muteVideo: Bool = kUserMuteVideoInitStatus   //是否关闭视频状态
     public var customPayload: String?   //扩展信息
+    
+    public convenience init(thumbUser: AUIUserThumbnailInfo) {
+        self.init()
+        self.userId = thumbUser.userId
+        self.userName = thumbUser.userName
+        self.userAvatar = thumbUser.userAvatar
+    }
 }
