@@ -73,6 +73,7 @@ class AUIChatListView : RelativeLayout, IAUIChatListView {
                 listener?.onItemClickListener(message)
             }
         })
+        mViewBinding.root.isActivated = false
 
         mViewBinding.listview.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {

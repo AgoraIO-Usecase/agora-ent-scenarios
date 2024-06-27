@@ -16,6 +16,9 @@ import io.agora.imkitmanager.R;
 public class AUIRecyclerView extends RecyclerView {
     private AUISpaceItemDecoration spaceItemDecoration;
 
+    //  0:default， 1 intercept， 2 non intercept
+    private int interceptTouchEventValue;
+
     public AUIRecyclerView(@NonNull Context context) {
         this(context, null);
     }
@@ -31,6 +34,8 @@ public class AUIRecyclerView extends RecyclerView {
         int spaceHorizontal = typedArray.getDimensionPixelOffset(R.styleable.AUIRecyclerView_aui_spaceHorizontal, 0);
         int spaceVertical = typedArray.getDimensionPixelOffset(R.styleable.AUIRecyclerView_aui_spaceVertical, 0);
         int orientation = typedArray.getInt(R.styleable.AUIRecyclerView_android_orientation, 0); // 0: h; 1: v
+        interceptTouchEventValue = typedArray.getInt(R.styleable.AUIRecyclerView_aui_interceptTouchEvent, 0);
+
         Drawable listDivider = typedArray.getDrawable(R.styleable.AUIRecyclerView_aui_listDivider);
         typedArray.recycle();
 
@@ -86,11 +91,23 @@ public class AUIRecyclerView extends RecyclerView {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent e) {
-        return super.onInterceptTouchEvent(e);
+        if (interceptTouchEventValue == 1) {
+            return true;
+        } else if (interceptTouchEventValue == 2) {
+            return false;
+        } else {
+            return super.onInterceptTouchEvent(e);
+        }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-        return super.onTouchEvent(e);
+        if (interceptTouchEventValue == 1) {
+            return true;
+        } else if (interceptTouchEventValue == 2) {
+            return false;
+        } else {
+            return super.onTouchEvent(e);
+        }
     }
 }

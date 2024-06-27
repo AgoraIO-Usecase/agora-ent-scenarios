@@ -4,6 +4,11 @@
         <attr name="aui_spaceHorizontal" format="dimension"/>
         <attr name="aui_spaceVertical" format="dimension"/>
         <attr name="aui_listDivider" format="reference"/>
+        <attr name="aui_interceptTouchEvent">
+            <enum name="super_intercept" value="0" />
+            <enum name="intercept" value="1" />
+            <enum name="non_intercept" value="2" />
+        </attr>
         <attr name="android:orientation"/>
     </declare-styleable>
 
@@ -12,6 +17,7 @@
         <item name="aui_spaceHorizontal">0dp</item>
         <item name="aui_spaceVertical">0dp</item>
         <item name="aui_listDivider">@null</item>
+        <item name="aui_interceptTouchEvent">super_intercept</item>
         <item name="android:orientation">vertical</item>
     </style>
 
@@ -39,6 +45,11 @@
         <attr name="aui_barrage_system_content_TextColor" format="reference|color"/>
         <attr name="aui_barrage_system_endIcon_resource" format="reference"/>
         <attr name="aui_barrage_system_layout_bg" format="reference|color"/>
+        <attr name="aui_chatListView_interceptTouchEvent">
+            <enum name="super_intercept" value="0" />
+            <enum name="intercept" value="1" />
+            <enum name="non_intercept" value="2" />
+        </attr>
 
     </declare-styleable>
 </resources>

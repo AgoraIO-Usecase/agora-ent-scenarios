@@ -49,12 +49,5 @@ dependencies {
     implementation rootProject.ext.deps.fragment_ktx
 
     implementation rootProject.ext.deps.rtm
-
-    // 沉浸式状态栏
-    implementation 'com.geyifeng.immersionbar:immersionbar:3.2.2'
-
-    // 工具类库: https://github.com/Blankj/AndroidUtilCode
-    implementation 'com.blankj:utilcodex:1.31.0'
-
     implementation rootProject.ext.deps.agora_chat
 }
