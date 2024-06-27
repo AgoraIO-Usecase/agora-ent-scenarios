@@ -3,7 +3,6 @@ package io.agora.imkitmanager.ui.impl
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.Typeface
-import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextUtils
@@ -17,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import io.agora.imkitmanager.R
 import io.agora.imkitmanager.ui.AUIChatInfo
-import io.agora.imkitmanager.utils.AUIEmojiUtils
 
 class AUIChatListAdapter(
     private val context: Context,
@@ -141,54 +139,6 @@ class AUIChatListAdapter(
             builder.append("O").append(nickName).append(" : ").append(content)
         } else {
             builder.append(nickName).append(" : ").append(content)
-        }
-        if (!TextUtils.isEmpty(builder.toString()) && AUIEmojiUtils.containsKey(builder.toString())) {
-            val span1: Spannable = AUIEmojiUtils.getSmiledText(context, builder.toString())
-            if (isOwner) {
-                span1.setSpan(
-                    AUICenteredImageSpan(
-                        context,
-                        normalTagIcon,
-                        0,
-                        10
-                    ), 0, 1, 0
-                )
-                span1.setSpan(
-                    ForegroundColorSpan(
-                        normalTitleColor
-                    ),
-                    0, nickName.length + 4, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                span1.setSpan(
-                    ForegroundColorSpan(normalContentColor),
-                    nickName.length + 4, builder.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                span1.setSpan(
-                    StyleSpan(Typeface.BOLD),
-                    0,
-                    nickName.length + 4,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-            } else {
-                span1.setSpan(
-                    ForegroundColorSpan(
-                        normalContentColor
-                    ),
-                    0, nickName.length + 3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                span1.setSpan(
-                    ForegroundColorSpan(normalContentColor),
-                    nickName.length + 3, builder.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                span1.setSpan(
-                    StyleSpan(Typeface.BOLD),
-                    0,
-                    nickName.length + 3,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-            }
-            con.setText(span1, TextView.BufferType.SPANNABLE)
-            return
         }
         val span = SpannableString(builder.toString())
         if (isOwner) {

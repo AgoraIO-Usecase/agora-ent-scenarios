@@ -44,18 +44,18 @@ class PlayHallViewModel : ViewModel() {
 
     fun getGameList(vendor: GameVendor) {
         // only test
-        playApiManager.getSubGameApiInfo { error, gameApi ->
-            if (gameApi != null) {
-                playApiManager.getSubGameList(gameApi.api.get_mg_list) { gameError, list ->
-                    if (gameError == null) {
-                    } else {
-                        ToastUtils.showToast(gameError.message ?: "获取游戏列表失败")
-                    }
-                }
-            } else if (error != null) {
-                ToastUtils.showToast(error.message ?: "未知错误")
-            }
-        }
+//        playApiManager.getSubGameApiInfo { error, gameApi ->
+//            if (gameApi != null) {
+//                playApiManager.getSubGameList(gameApi.api.get_mg_list) { gameError, list ->
+//                    if (gameError == null) {
+//                    } else {
+//                        ToastUtils.showToast(gameError.message ?: "获取游戏列表失败")
+//                    }
+//                }
+//            } else if (error != null) {
+//                ToastUtils.showToast(error.message ?: "未知错误")
+//            }
+//        }
 
         playApiManager.getGameList(vendor, completion = { error, gameList ->
             if (error == null && gameList != null) {
@@ -89,7 +89,7 @@ class PlayHallViewModel : ViewModel() {
                 createRoomInfoLiveData.postValue(roomInfo)
             } else {
                 createRoomInfoLiveData.postValue(null)
-                ToastUtils.showToast(
+                ToastUtils.showToastLong(
                     AgoraApplication.the().getString(R.string.play_zone_create_room_failed, error?.message ?: "")
                 )
             }
@@ -102,7 +102,7 @@ class PlayHallViewModel : ViewModel() {
                 joinRoomInfoLiveData.postValue(roomInfo)
             } else {
                 joinRoomInfoLiveData.postValue(null)
-                ToastUtils.showToast(
+                ToastUtils.showToastLong(
                     AgoraApplication.the().getString(R.string.play_zone_join_room_failed, error?.message ?: "")
                 )
             }

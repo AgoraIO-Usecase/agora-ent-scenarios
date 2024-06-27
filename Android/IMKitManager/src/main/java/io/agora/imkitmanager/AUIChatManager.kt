@@ -7,7 +7,6 @@ import io.agora.CallBack
 import io.agora.ChatRoomChangeListener
 import io.agora.MessageListener
 import io.agora.ValueCallBack
-import io.agora.imkitmanager.model.AUIGiftEntity
 import io.agora.chat.ChatClient
 import io.agora.chat.ChatMessage
 import io.agora.chat.ChatOptions
@@ -36,7 +35,6 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
     private var chatRoomId: String = ""
 
     private val currentMsgList: ArrayList<AUIChatEntity> = ArrayList()
-    private val currentGiftList: ArrayList<AUIGiftEntity> = ArrayList()
 
     init {
         AUIChatRoomContext.shared().setCommonConfig(commonConfig)
@@ -72,7 +70,6 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
     fun clear() {
         chatRoomId = ""
         currentMsgList.clear()
-        currentGiftList.clear()
         if (ChatClient.getInstance().isSdkInited) {
             ChatClient.getInstance().chatManager().removeMessageListener(this)
             ChatClient.getInstance().chatroomManager().removeChatRoomListener(this)
@@ -274,16 +271,6 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
             }
         }
         currentMsgList.add(AUIChatEntity(chatUser = chatUser, content = content, joined = joined))
-    }
-
-
-    fun getGiftList(): ArrayList<AUIGiftEntity> {
-        return currentGiftList
-    }
-
-    fun addGiftList(gift: AUIGiftEntity) {
-        currentGiftList.clear()
-        currentGiftList.add(gift)
     }
 
     fun getMsgList(): ArrayList<AUIChatEntity> {
