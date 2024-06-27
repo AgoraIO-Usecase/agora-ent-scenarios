@@ -123,8 +123,8 @@ class VideoLoaderImpl constructor(private val rtcEngine: RtcEngineEx) : VideoLoa
         )
     }
 
-    fun getProfiler(roomId: String): VideoLoaderProfiler {
-        val profiler = videoProfileMap[roomId] ?: VideoLoaderProfiler(roomId)
+    fun getProfiler(roomId: String, anchorUid: Int): VideoLoaderProfiler {
+        val profiler = videoProfileMap[roomId] ?: VideoLoaderProfiler(roomId, anchorUid)
         videoProfileMap[roomId] = profiler
         return profiler
     }
@@ -160,26 +160,26 @@ class VideoLoaderImpl constructor(private val rtcEngine: RtcEngineEx) : VideoLoa
                         audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
                         autoSubscribeVideo = false
                         autoSubscribeAudio = false
-                    })
+                    }, getProfiler(roomId, anchorUid))
                 }
                 AnchorState.JOINED -> {
                     // 加入频道且收流
-                    getProfiler(roomId).actualStartTime = System.currentTimeMillis()
+                    getProfiler(roomId, anchorUid).actualStartTime = System.currentTimeMillis()
                     joinRtcChannel(token, connection, mediaOptions ?: ChannelMediaOptions().apply {
                         clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
                         audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
                         autoSubscribeVideo = true
                         autoSubscribeAudio = true
-                    })
+                    }, getProfiler(roomId, anchorUid))
                 }
                 AnchorState.JOINED_WITHOUT_AUDIO -> {
-                    getProfiler(roomId).actualStartTime = System.currentTimeMillis()
+                    getProfiler(roomId, anchorUid).actualStartTime = System.currentTimeMillis()
                     joinRtcChannel(token, connection, mediaOptions ?: ChannelMediaOptions().apply {
                         clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
                         audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
                         autoSubscribeVideo = true
                         autoSubscribeAudio = true
-                    })
+                    }, getProfiler(roomId, anchorUid))
                     // 防止音画不同步， 我们采用先订阅再将播放调为0的方式
                     rtcEngine.adjustUserPlaybackSignalVolumeEx(anchorUid, 0, connection)
                 }
@@ -207,12 +207,12 @@ class VideoLoaderImpl constructor(private val rtcEngine: RtcEngineEx) : VideoLoa
                             audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
                             autoSubscribeVideo = false
                             autoSubscribeAudio = false
-                        })
+                        }, getProfiler(roomId, anchorUid))
                     }
                     (oldState == AnchorState.PRE_JOINED || oldState == AnchorState.JOINED_WITHOUT_AUDIO) && newState == AnchorState.JOINED -> {
                         // 保持在频道内, 收流
                         if (oldState == AnchorState.PRE_JOINED) {
-                            getProfiler(roomId).actualStartTime = System.currentTimeMillis()
+                            getProfiler(roomId, anchorUid).actualStartTime = System.currentTimeMillis()
                         }
                         val options = mediaOptions ?: ChannelMediaOptions().apply {
                             clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
@@ -238,29 +238,29 @@ class VideoLoaderImpl constructor(private val rtcEngine: RtcEngineEx) : VideoLoa
                     }
                     oldState == AnchorState.IDLE && newState == AnchorState.JOINED -> {
                         // 加入频道，且收流
-                        getProfiler(roomId).actualStartTime = System.currentTimeMillis()
+                        getProfiler(roomId, anchorUid).actualStartTime = System.currentTimeMillis()
                         joinRtcChannel(token, connection, mediaOptions ?: ChannelMediaOptions().apply {
                             clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
                             audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
                             autoSubscribeVideo = true
                             autoSubscribeAudio = true
-                        })
+                        }, getProfiler(roomId, anchorUid))
                     }
                     oldState == AnchorState.IDLE && newState == AnchorState.JOINED_WITHOUT_AUDIO -> {
                         // 加入频道，且收流
-                        getProfiler(roomId).actualStartTime = System.currentTimeMillis()
+                        getProfiler(roomId, anchorUid).actualStartTime = System.currentTimeMillis()
                         joinRtcChannel(token, connection, mediaOptions ?: ChannelMediaOptions().apply {
                             clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
                             audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
                             autoSubscribeVideo = true
                             autoSubscribeAudio = true
-                        })
+                        }, getProfiler(roomId, anchorUid))
                         // 防止音画不同步， 我们采用先订阅再将播放调为0的方式
                         rtcEngine.adjustUserPlaybackSignalVolumeEx(anchorUid, 0, connection)
                     }
                     oldState == AnchorState.PRE_JOINED && newState == AnchorState.JOINED_WITHOUT_AUDIO -> {
                         // 保持在频道内, 收流
-                        getProfiler(roomId).actualStartTime = System.currentTimeMillis()
+                        getProfiler(roomId, anchorUid).actualStartTime = System.currentTimeMillis()
                         val options = mediaOptions ?: ChannelMediaOptions().apply {
                             clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
                             audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
@@ -282,8 +282,8 @@ class VideoLoaderImpl constructor(private val rtcEngine: RtcEngineEx) : VideoLoa
         }
     }
 
-    private fun joinRtcChannel(token: String?, connection: RtcConnection, options: ChannelMediaOptions) {
-        val ret = rtcEngine.joinChannelEx(token, connection, options, getProfiler(connection.channelId))
+    private fun joinRtcChannel(token: String?, connection: RtcConnection, options: ChannelMediaOptions, profiler: VideoLoaderProfiler) {
+        val ret = rtcEngine.joinChannelEx(token, connection, options, profiler)
         VideoLoader.videoLoaderApiLog(tag, "joinRtcChannel, connection:$connection, ret:$ret")
     }
 
@@ -346,11 +346,13 @@ class VideoLoaderImpl constructor(private val rtcEngine: RtcEngineEx) : VideoLoa
     }
 
     inner class VideoLoaderProfiler(
-        private val channelId: String
+        private val channelId: String,
+        private val anchorUid: Int
     ) : IRtcEngineEventHandler() {
         private val tag = "VideoLoaderProfiler"
         var actualStartTime: Long = 0
         var perceivedStartTime: Long = 0
+        var perceivedCost: Long = 0
         var reportExt: MutableMap<String, Any> = HashMap()
         var firstFrameCompletion: ((Long, Int) -> Unit)? = null
 
@@ -366,11 +368,11 @@ class VideoLoaderImpl constructor(private val rtcEngine: RtcEngineEx) : VideoLoa
             elapsed: Int
         ) {
             Log.d(tag, "remoteVideoStateChangedOfUid[$channelId]: $uid state: $state reason: $reason")
-            if (state == 2 && (reason == 6 || reason == 4 || reason == 3)) {
+            if (state == 2 && (reason == 6 || reason == 4 || reason == 3) && anchorUid == uid) {
                 val currentTs = System.currentTimeMillis()
                 val actualCost = currentTs - actualStartTime
                 val perceivedCost = currentTs - perceivedStartTime
-
+                this.perceivedCost = perceivedCost
                 Log.d(tag, "channelId[$channelId] uid[$uid] show first frame! actualCost: $actualCost ms perceivedCost: $perceivedCost ms")
                 val ext = reportExt.toMutableMap()
                 ext["channelName"] = channelId

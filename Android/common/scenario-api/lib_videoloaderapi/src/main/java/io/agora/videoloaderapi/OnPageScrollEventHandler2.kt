@@ -182,8 +182,8 @@ abstract class OnPageScrollEventHandler2 constructor(
 
             // 打点
             mRtcEngine.startMediaRenderingTracingEx(RtcConnection(anchorInfo.channelId, localUid))
-            (videoLoader as VideoLoaderImpl).getProfiler(anchorInfo.channelId).perceivedStartTime = System.currentTimeMillis()
-            (videoLoader as VideoLoaderImpl).getProfiler(anchorInfo.channelId).reportExt = mutableMapOf("videoScrollMode" to videoScrollMode.value, "needPreJoin" to needPreJoin)
+            (videoLoader as VideoLoaderImpl).getProfiler(anchorInfo.channelId, anchorInfo.anchorUid).perceivedStartTime = System.currentTimeMillis()
+            (videoLoader as VideoLoaderImpl).getProfiler(anchorInfo.channelId, anchorInfo.anchorUid).reportExt = mutableMapOf("videoScrollMode" to videoScrollMode.value, "needPreJoin" to needPreJoin)
         }
     }
 
