@@ -354,6 +354,20 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
     }
 
     /**
+     * 插入本地消息
+     *
+     * @param content
+     */
+    fun insertLocalMsg(content: String) {
+        val auiChatEntity = AUIChatEntity(
+            content = content,
+            joined = false,
+            localMsg = true
+        )
+        currentMsgList.add(auiChatEntity)
+    }
+
+    /**
      * 获取自定义消息类型
      * @param event
      * @return

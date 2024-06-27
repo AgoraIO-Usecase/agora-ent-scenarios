@@ -247,6 +247,9 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
             val supportRobots = gameViewModel.supportRobots(gameId)
             binding.ivAddBot.isVisible = supportRobots && it.first == PlayCenter.mUser.id.toString() && it.second
         }
+        gameViewModel.gameMessageLiveData.observe(this){
+            roomGameViewModel.insertLocalMessage(it)
+        }
 
         roomGameViewModel.mRoomTimeLiveData.observe(this) {
             binding.tvTimer.text = it
@@ -278,7 +281,8 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
                     userId = it.chatUser?.userId ?: "",
                     userName = it.chatUser?.userName ?: "",
                     content = it.content,
-                    joined = it.joined
+                    joined = it.joined,
+                    localMsg = it.localMsg
                 )
             })
         }

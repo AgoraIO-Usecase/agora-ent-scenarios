@@ -264,11 +264,18 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         }
     }
 
+    // 发送消息
     fun sendMessage(message: String) {
         mChatRoomService.imManagerService.sendMessage(message, completion = { chatMessage,error->
             if (error==null){
                 mRoomChatListLiveData.postValue(mChatRoomService.chatManager.getMsgList())
             }
         })
+    }
+
+    // 插入本地消息
+    fun insertLocalMessage(message: String) {
+        mChatRoomService.chatManager.insertLocalMsg(message)
+        mRoomChatListLiveData.postValue(mChatRoomService.chatManager.getMsgList())
     }
 }

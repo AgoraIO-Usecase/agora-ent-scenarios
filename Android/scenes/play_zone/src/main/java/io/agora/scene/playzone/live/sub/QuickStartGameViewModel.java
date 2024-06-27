@@ -1,6 +1,7 @@
 package io.agora.scene.playzone.live.sub;
 
 import android.app.Activity;
+import android.text.TextUtils;
 import android.util.ArraySet;
 import android.util.Log;
 import android.util.Pair;
@@ -17,9 +18,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -43,6 +42,7 @@ import tech.sud.mgp.SudMGPWrapper.model.GameViewInfoModel;
 import tech.sud.mgp.SudMGPWrapper.state.MGStateResponse;
 import tech.sud.mgp.SudMGPWrapper.state.SudMGPAPPState;
 import tech.sud.mgp.SudMGPWrapper.state.SudMGPMGState;
+import tech.sud.mgp.SudMGPWrapper.utils.GameCommonStateUtils;
 import tech.sud.mgp.core.ISudFSMMG;
 import tech.sud.mgp.core.ISudFSMStateHandle;
 
@@ -95,6 +95,9 @@ public class QuickStartGameViewModel extends BaseGameViewModel {
 
     // 队长回调
     public final MutableLiveData<Pair<String, Boolean>> captainIdLiveData = new MutableLiveData<>();
+
+    // 游戏消息
+    public final MutableLiveData<String> gameMessageLiveData = new MutableLiveData<>(); // 游戏消息
 
     // 机器人列表
     public List<PlayRobotInfo> robotInfoList = new ArrayList<>();
@@ -384,6 +387,16 @@ public class QuickStartGameViewModel extends BaseGameViewModel {
     public void onPlayerMGCommonPlayerCaptain(ISudFSMStateHandle handle, String userId, SudMGPMGState.MGCommonPlayerCaptain model) {
         super.onPlayerMGCommonPlayerCaptain(handle, userId, model);
         captainIdLiveData.postValue(new Pair<>(userId, model.isCaptain));
+    }
+
+    // 游戏公屏消息
+    @Override
+    public void onGameMGCommonPublicMessage(ISudFSMStateHandle handle, SudMGPMGState.MGCommonPublicMessage model) {
+        String message = GameCommonStateUtils.parseMGCommonPublicMessage(model, "zh-CN");
+        if (!TextUtils.isEmpty(message)) {
+            gameMessageLiveData.postValue(message);
+        }
+        super.onGameMGCommonPublicMessage(handle, model);
     }
 
     // 添加机器人

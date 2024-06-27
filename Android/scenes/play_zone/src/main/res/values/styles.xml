@@ -29,6 +29,7 @@
     <style name="play_zone_chatListView_style" parent="AUIChatListView.Appearance">
         <item name="aui_barrage_normal_layout_bg">@drawable/play_zone_bg_live_message</item>
         <item name="aui_barrage_system_layout_bg">@drawable/play_zone_bg_live_message</item>
+        <item name="aui_barrage_local_layout_bg">@drawable/play_zone_bg_live_message</item>
         <item name="aui_chatListView_interceptTouchEvent">non_intercept</item>
     </style>
 </resources>

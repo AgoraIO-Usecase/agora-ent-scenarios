@@ -45,6 +45,8 @@
         <attr name="aui_barrage_system_content_TextColor" format="reference|color"/>
         <attr name="aui_barrage_system_endIcon_resource" format="reference"/>
         <attr name="aui_barrage_system_layout_bg" format="reference|color"/>
+        <attr name="aui_barrage_local_content_TextColor" format="reference|color"/>
+        <attr name="aui_barrage_local_layout_bg" format="reference|color"/>
         <attr name="aui_chatListView_interceptTouchEvent">
             <enum name="super_intercept" value="0" />
             <enum name="intercept" value="1" />

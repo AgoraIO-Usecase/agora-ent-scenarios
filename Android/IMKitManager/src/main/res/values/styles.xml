@@ -18,6 +18,9 @@
         <item name="aui_barrage_system_endIcon_resource">@drawable/aui_icon_shaking_hand</item>
         <item name="aui_barrage_system_layout_bg">@drawable/aui_bg_barrage_system_shape</item>
 
+        <item name="aui_barrage_local_content_TextColor">@color/aui_white</item>
+        <item name="aui_barrage_local_layout_bg">@drawable/aui_bg_barrage_local_shape</item>
+
         <item name="aui_chatListView_interceptTouchEvent">super_intercept</item>
     </style>
 </resources>

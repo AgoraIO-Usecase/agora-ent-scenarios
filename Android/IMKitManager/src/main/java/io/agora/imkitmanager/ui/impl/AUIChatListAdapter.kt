@@ -25,12 +25,13 @@ class AUIChatListAdapter(
     private var messages: ArrayList<AUIChatInfo> = ArrayList()
     private val ITEM_DEFAULT_TYPE = 0
     private val ITEM_SYSTEM_TYPE = 1
+    private val ITEM_LOCAL_TYPE = 2
     private var normalTagIcon: Int = 0
-    private var normalTitleColor:Int = 0
-    private var normalContentColor:Int = 0
-    private var systemTitleColor:Int = 0
-    private var systemContentColor:Int = 0
-    private lateinit var ownerId:String
+    private var normalTitleColor: Int = 0
+    private var normalContentColor: Int = 0
+    private var systemTitleColor: Int = 0
+    private var systemContentColor: Int = 0
+    private lateinit var ownerId: String
 
     init {
         normalTagIcon = typedArray.getResourceId(
@@ -61,7 +62,7 @@ class AUIChatListAdapter(
         typedArray.recycle()
     }
 
-    fun setOwner(ownerId:String){
+    fun setOwner(ownerId: String) {
         this.ownerId = ownerId
     }
 
@@ -74,6 +75,10 @@ class AUIChatListAdapter(
             return SystemViewHolder(
                 LayoutInflater.from(context).inflate(R.layout.aui_chat_list_system_msgs_item, parent, false)
             )
+        } else if (viewType == ITEM_LOCAL_TYPE) {
+            return LocalViewHolder(
+                LayoutInflater.from(context).inflate(R.layout.aui_chat_list_local_msgs_item, parent, false)
+            )
         }
         return NormalViewHolder(
             LayoutInflater.from(context).inflate(R.layout.aui_chat_list_msgs_item, parent, false)
@@ -82,7 +87,13 @@ class AUIChatListAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val message: AUIChatInfo = messages[position]
-        return if (message.joined) { ITEM_SYSTEM_TYPE } else ITEM_DEFAULT_TYPE
+        return if (message.localMsg) {
+            ITEM_LOCAL_TYPE
+        } else if (message.joined) {
+            ITEM_SYSTEM_TYPE
+        } else {
+            ITEM_DEFAULT_TYPE
+        }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -96,8 +107,8 @@ class AUIChatListAdapter(
             }
             if (s != null) {
                 showNormalText(
-                    ownerId ==  message.userId,
-                    (holder as NormalViewHolder).content,
+                    ownerId == message.userId,
+                    holder.content,
                     from,
                     s
                 )
@@ -105,10 +116,14 @@ class AUIChatListAdapter(
         } else if (holder is SystemViewHolder) {
             from = message.userName
             showSystemMsg(
-                (holder as SystemViewHolder).name,
+                holder.name,
                 from,
-                (holder as SystemViewHolder).content
+                holder.content
             )
+        } else if (holder is LocalViewHolder) {
+            if (s != null) {
+                showLocalMsg(holder.content, s)
+            }
         }
         holder.itemView.setOnClickListener {
             messageViewListener?.onItemClickListener(message)
@@ -125,7 +140,7 @@ class AUIChatListAdapter(
         this.messageViewListener = messageViewListener
     }
 
-    private fun showSystemMsg(name: TextView, nickName: String ,content: TextView) {
+    private fun showSystemMsg(name: TextView, nickName: String, content: TextView) {
         val builder = StringBuilder()
         builder.append(nickName).append(" ")
         val span = SpannableString(builder.toString())
@@ -187,14 +202,18 @@ class AUIChatListAdapter(
         con.setText(span, TextView.BufferType.SPANNABLE)
     }
 
+    private fun showLocalMsg(con: TextView, content: String) {
+        con.text = content
+    }
+
     override fun getItemCount(): Int {
-        if (messages.size > 0){
+        if (messages.size > 0) {
             return messages.size
         }
         return 0
     }
 
-    fun refresh(msgList:List<AUIChatInfo>) {
+    fun refresh(msgList: List<AUIChatInfo>) {
         msgList.let {
             messages = ArrayList(msgList)
         }
@@ -218,6 +237,14 @@ class AUIChatListAdapter(
             name = itemView.findViewById<View>(R.id.name) as TextView
             content = itemView.findViewById<View>(R.id.content) as TextView
             icon = itemView.findViewById(R.id.icon_system)
+        }
+    }
+
+    class LocalViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var content: TextView
+
+        init {
+            content = itemView.findViewById<View>(R.id.content) as TextView
         }
     }
 }
