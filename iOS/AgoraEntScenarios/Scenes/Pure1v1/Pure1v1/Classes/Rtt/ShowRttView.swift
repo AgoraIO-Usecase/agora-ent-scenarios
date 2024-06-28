@@ -9,6 +9,8 @@ import UIKit
 
 protocol ShowRttViewDelegate: NSObjectProtocol {
     func onClickRtt(start: Bool)
+    func onClickSourceLanguage()
+    func onClickTargetLanguage()
 }
 
 class ShowRttView: UIView {
@@ -41,18 +43,12 @@ class ShowRttView: UIView {
     // 源语言标签
     private let sourceLanguageLabel: PureRttLabelView = {
         let label = PureRttLabelView()
-        label.setTitle("对方语言", value: "中文") {
-        
-        }
         return label
     }()
     
     // 翻译字幕标签
     private let translationSubtitleLabel: PureRttLabelView = {
         let label = PureRttLabelView()
-        label.setTitle("翻译字幕", value: "英文") {
-        
-        }
         return label
     }()
     
@@ -85,6 +81,14 @@ class ShowRttView: UIView {
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         layer.masksToBounds = true
         //heightAnchor.constraint(equalToConstant: 360).isActive = true
+        
+        sourceLanguageLabel.setTitle("对方语言", value: RttManager.shared.currentSourceLanguageDisplayName()) {
+            self.delegate?.onClickSourceLanguage()
+        }
+        
+        translationSubtitleLabel.setTitle("翻译字幕", value: RttManager.shared.currentTargetLanguageDisplayName()) {
+            self.delegate?.onClickTargetLanguage()
+        }
         
         addSubview(titleLabel)
         addSubview(descriptionLabel)
@@ -133,8 +137,8 @@ class ShowRttView: UIView {
             startButton.heightAnchor.constraint(equalToConstant: 48)
         ])
         
-        // 根据内容动态计算视图的高度
-        self.heightAnchor.constraint(equalToConstant: titleLabel.frame.height + descriptionLabel.frame.height + sourceLanguageLabel.frame.height + translationSubtitleLabel.frame.height + startButton.frame.height).isActive = true
+//        // 根据内容动态计算视图的高度
+//        self.heightAnchor.constraint(equalToConstant: titleLabel.frame.height + descriptionLabel.frame.height + sourceLanguageLabel.frame.height + translationSubtitleLabel.frame.height + startButton.frame.height).isActive = true
     }
     
     func setStartRttStatus(open: Bool) {
@@ -152,10 +156,19 @@ class ShowRttView: UIView {
         startButton.isEnabled = true
     }
     
+    func reloadChosenLanguage() {
+        sourceLanguageLabel.updataValue(value: RttManager.shared.currentSourceLanguageDisplayName())
+        translationSubtitleLabel.updataValue(value: RttManager.shared.currentTargetLanguageDisplayName())
+    }
+    
     @objc private func didClickRttButton() {
         startButton.isEnabled = false
         startButton.backgroundColor = .gray
         startButton.setTitleColor(.black, for: .normal)
         delegate?.onClickRtt(start: !self.isRttOpen)
+    }
+    
+    @objc private func didClickSourceLanguage() {
+        delegate?.onClickSourceLanguage()
     }
 }

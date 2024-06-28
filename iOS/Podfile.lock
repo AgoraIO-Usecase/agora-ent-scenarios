@@ -25,11 +25,15 @@ PODS:
     - YYCategories
     - YYModel
     - ZSwiftBaseLib
+  - AgoraComponetLog (0.0.2)
   - AgoraLyricsScore (1.1.2)
   - AgoraRtcEngine_Special_iOS (4.1.1.29)
   - AgoraRtm (2.2.0)
   - AgoraSyncManager (2.1.6):
     - SocketRocket
+  - AgoraTranscriptSubtitle (0.0.1):
+    - AgoraComponetLog (= 0.0.2)
+    - Protobuf (= 3.22.1)
   - AGResourceManager (0.1.0):
     - AFNetworking
     - SSZipArchive
@@ -97,6 +101,7 @@ PODS:
   - Pure1v1 (0.1.0):
     - AgoraCommon
     - AgoraSyncManager
+    - AgoraTranscriptSubtitle
     - AudioScenarioApi
     - CallAPI
     - FLAnimatedImage
@@ -157,10 +162,12 @@ DEPENDENCIES:
   - Agora-Scene-Utils (= 1.1.0)
   - Agora_Chat_iOS (= 1.0.8)
   - AgoraCommon (from `AgoraEntScenarios`)
+  - AgoraComponetLog
   - AgoraLyricsScore (= 1.1.2)
   - AgoraRtcEngine_Special_iOS (= 4.1.1.29)
   - AgoraRtm (= 2.2.0)
   - AgoraSyncManager (~> 2.1.6)
+  - AgoraTranscriptSubtitle (from `./AgoraTranscriptSubtitle.podspec`)
   - AGResourceManager (from `AgoraEntScenarios/Common/API/AGResourceManager`)
   - AudioScenarioApi (from `AgoraEntScenarios/Common/API/AudioScenarioApi`)
   - Bugly (= 2.5.93)
@@ -199,6 +206,7 @@ SPEC REPOS:
     - AFNetworking
     - Agora-Scene-Utils
     - Agora_Chat_iOS
+    - AgoraComponetLog
     - AgoraLyricsScore
     - AgoraRtcEngine_Special_iOS
     - AgoraRtm
@@ -234,6 +242,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   AgoraCommon:
     :path: AgoraEntScenarios
+  AgoraTranscriptSubtitle:
+    :path: "./AgoraTranscriptSubtitle.podspec"
   AGResourceManager:
     :path: AgoraEntScenarios/Common/API/AGResourceManager
   AudioScenarioApi:
@@ -262,10 +272,12 @@ SPEC CHECKSUMS:
   Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraCommon: 9d6c083bcb72f9ecc9b56295b8227d14b4086d66
+  AgoraComponetLog: b359777d2ff8e9ee0237cbd0c42ceb422fd514f1
   AgoraLyricsScore: 0c3e6b701dfe036ba26ba208fc65c3b65ecaeb06
   AgoraRtcEngine_Special_iOS: a8d0405efb20323b93ce77ae3d0573ea80837c31
   AgoraRtm: 4813aab832ca612facb29c831339546c71e0b764
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
+  AgoraTranscriptSubtitle: 479ead66b247784c62b85a3ce1b4d203aa71a789
   AGResourceManager: e6616ad4d9d0461c84d9582ef1118004fa534e5c
   AudioScenarioApi: 9dd859e4de75140b5086725f493315d47d935e14
   AUIKitCore: 3d08c145befed42dd5b28e543f7c073d09fded32
@@ -285,7 +297,7 @@ SPEC CHECKSUMS:
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MJRefresh: ff9e531227924c84ce459338414550a05d2aea78
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
-  Pure1v1: fc62a1caff64c2a7c5cb63d944ee1d594eb83a99
+  Pure1v1: e4476300358d19beb0cb7f49e1f29094a5b96ebc
   RTMSyncManager: 110b208a8bf57881decaef0e76891bdf5345ba21
   ScoreEffectUI: bf1195b4d41a73d43c236450b5d7f958989844aa
   SDWebImage: 920f1a2ff1ca8296ad34f6e0510a1ef1d70ac965
@@ -305,6 +317,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: 67bd3b30f1a7f12d0458bac29bad8b66818d3923
+PODFILE CHECKSUM: c187afec576d0c13383c4347fc0c94f3a8557ff2
 
 COCOAPODS: 1.15.2

@@ -225,7 +225,7 @@ extension Pure1v1UserListViewController {
                 completion(nil, nil)
                 return
             }
-            
+            RttApiManager.shared.setBasicAuth(token: rtcToken)
             self.tokenObj = TokenObject(rtmToken: rtmToken, rtcToken: rtcToken)
             completion("", rtmToken)
         }

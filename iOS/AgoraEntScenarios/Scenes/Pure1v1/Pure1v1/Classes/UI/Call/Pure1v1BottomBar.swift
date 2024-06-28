@@ -68,4 +68,12 @@ class Pure1v1RoomBottomBar: UIView {
     @objc private func didClickRttButton() {
         delegate?.onClickRttButton()
     }
+    
+    func setRttButtonView(enable: Bool) {
+        if (enable) {
+            rttButton.setImage(UIImage.scene1v1Image(name: "live_rtt_start"), for: .normal)
+        } else {
+            rttButton.setImage(UIImage.scene1v1Image(name: "live_rtt"), for: .normal)
+        }
+    }
 }

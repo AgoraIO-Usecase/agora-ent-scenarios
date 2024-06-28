@@ -85,6 +85,9 @@ def all_pods
   pod 'Bugly','2.5.93'
   
   pod 'HXPhotoPicker/Lite', '4.1.7'
+
+  pod 'AgoraComponetLog'
+  pod 'AgoraTranscriptSubtitle', :path => './AgoraTranscriptSubtitle.podspec'#, :testspecs => ['Tests']
   
   
   #need to remove

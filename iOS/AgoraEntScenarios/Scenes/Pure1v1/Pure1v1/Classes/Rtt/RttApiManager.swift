@@ -13,7 +13,7 @@ class RttApiManager {
     private let domain = "https://api.agora.io"
     
     private let TAG = "RttApiManager"
-    
+    private var auth = ""
     private var tokenName = ""
     private var taskId = ""
     
@@ -23,6 +23,10 @@ class RttApiManager {
         configuration.timeoutIntervalForResource = 30
         return URLSession(configuration: configuration)
     }()
+    
+    func setBasicAuth(token: String) {
+        self.auth = "agora token=" + token
+    }
     
     func fetchCloudToken() -> String? {
         var token: String? = nil
@@ -39,7 +43,7 @@ class RttApiManager {
             var request = URLRequest(url: requestUrl)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue(getBasicAuth(), forHTTPHeaderField: "Authorization")
+            request.setValue(auth, forHTTPHeaderField: "Authorization")
             request.httpBody = acquireOjb
             
             let semaphore = DispatchSemaphore(value: 0)
@@ -121,9 +125,7 @@ class RttApiManager {
                     "vendor": "<YourOssVendor>",
                     "region": "<YourOssRegion>",
                     "fileNamePrefix": ["<YourOssPrefix>"]
-                    // 根据需要添加其他 storage 字段
                 ],
-                // 根据需要添加其他 captionConfig 字段
             ]
             
             let translateConfig: [String: Any] = [
@@ -134,7 +136,6 @@ class RttApiManager {
                         "target": targetLanguages
                     ]
                 ]
-                // 根据需要添加其他 translateConfig 字段
             ]
             
             // 构建顶级字典
@@ -151,7 +152,7 @@ class RttApiManager {
             var request = URLRequest(url: requestUrl)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue(getBasicAuth(), forHTTPHeaderField: "Authorization")
+            request.setValue(auth, forHTTPHeaderField: "Authorization")
             request.httpBody = try JSONSerialization.data(withJSONObject: postBody, options: [])
             print("RttApiManager fetchStartRtt url: \(request.httpBody)")
             
@@ -209,7 +210,7 @@ class RttApiManager {
             var request = URLRequest(url: requestUrl)
             request.httpMethod = "DELETE"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue(getBasicAuth(), forHTTPHeaderField: "Authorization")
+            request.setValue(auth, forHTTPHeaderField: "Authorization")
                         
             let task = session.dataTask(with: request) { (data, response, error) in
                 // Handle response
@@ -227,7 +228,7 @@ class RttApiManager {
             
             task.resume()
         } catch {
-            print("云端合流任务停止失败: \(error.localizedDescription)")
+            print("RttApiManager fetchStopRtt failed: \(error.localizedDescription)")
             DispatchQueue.main.async {
                 completion(false)
             }
@@ -247,15 +248,5 @@ class RttApiManager {
     // 结束 RTT 任务
     private func deleteTaskUrl(domain: String, appid: String, taskid: String, tokenName: String) -> String {
         return String(format: "%@/v1/projects/%@/rtsc/speech-to-text/tasks/%@?builderToken=%@", domain, appid, taskid, tokenName)
-    }
-
-    private func getBasicAuth() -> String {
-        // 拼接客户 ID 和客户密钥并使用 base64 编码
-        let plainCredentials = "\(AppContext.shared.appId):\(AppContext.shared.certificate)"
-        guard let base64Credentials = plainCredentials.data(using: .utf8)?.base64EncodedString() else {
-            return ""
-        }
-        // 创建 authorization header
-        return "Basic M2Q5NTE4MmQ0NGEzNGUwMjkxNzY5OTVlNWI3NDA2ZWU6NGRjNTE5ODRhYWQwNDRlMWJkYzU3ZjI5NjRmMGZkYjY="
     }
 }
