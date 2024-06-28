@@ -101,7 +101,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutBottom"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="55dp"
+        android:background="@color/white_90_percent"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <com.google.android.material.divider.MaterialDivider
@@ -120,7 +121,7 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvSwitchVendor"
             android:layout_width="wrap_content"
-            android:layout_height="49dp"
+            android:layout_height="54dp"
             android:drawableEnd="@drawable/play_zone_ic_arrow_down"
             android:drawablePadding="2dp"
             android:gravity="center"
@@ -135,7 +136,7 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvRoomList"
             android:layout_width="wrap_content"
-            android:layout_height="49dp"
+            android:layout_height="54dp"
             android:gravity="center"
             android:paddingHorizontal="16dp"
             android:text="@string/play_zone_room_list"

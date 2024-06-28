@@ -132,7 +132,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
                         viewType: Long
                     ) {
                         if (!subGameInfo.gameUrl.isNullOrEmpty()) {
-                            PagePilotManager.pageWebViewWithBrowser(subGameInfo.gameUrl)
+                            PagePilotManager.pageWebView(subGameInfo.gameUrl)
                         } else {
                             showCreateRoomDialog(subGameInfo)
                         }
@@ -179,7 +179,6 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
             if (mCurrentVendor != it) {
                 mCurrentVendor = it
                 mPlayZoneViewModel.getGameList(mCurrentVendor)
-                ToastUtils.showToast("切换到${it}")
             }
         }
         dialog.show(supportFragmentManager, "VendorDialog")
