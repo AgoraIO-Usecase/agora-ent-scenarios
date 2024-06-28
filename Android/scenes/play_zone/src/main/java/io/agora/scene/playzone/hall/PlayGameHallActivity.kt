@@ -5,7 +5,6 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -35,8 +34,8 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
         private const val TAG = "RoomGameHallActivity"
     }
 
-    private val mPlayZoneViewModel: PlayHallViewModel by lazy {
-        ViewModelProvider(this)[PlayHallViewModel::class.java]
+    private val mPlayZoneViewModel: PlayCreateViewModel by lazy {
+        ViewModelProvider(this)[PlayCreateViewModel::class.java]
     }
 
     private val mMainHandler by lazy {
@@ -105,6 +104,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
 
     override fun requestData() {
         super.requestData()
+        mPlayZoneViewModel.getRoomList()
         mPlayZoneViewModel.getGameList(mCurrentVendor)
         mPlayZoneViewModel.mGameListLiveData.observe(this) {
 

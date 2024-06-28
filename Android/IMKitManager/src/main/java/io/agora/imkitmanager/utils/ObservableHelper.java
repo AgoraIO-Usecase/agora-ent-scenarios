@@ -49,5 +49,4 @@ public class ObservableHelper<EventHandler> {
     public interface EventHandlerRunnable<EventHandler> {
         void run(EventHandler eventHandler);
     }
-
 }

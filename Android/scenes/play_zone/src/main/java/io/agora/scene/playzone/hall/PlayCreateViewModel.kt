@@ -13,7 +13,7 @@ import io.agora.scene.playzone.service.api.PlayApiManager
 import io.agora.scene.playzone.service.api.PlayGameInfoModel
 import io.agora.scene.playzone.service.api.PlayGameListModel
 
-class PlayHallViewModel : ViewModel() {
+class PlayCreateViewModel : ViewModel() {
 
     private val playApiManager by lazy {
         PlayApiManager()
@@ -78,22 +78,41 @@ class PlayHallViewModel : ViewModel() {
     }
 
     fun createRoom(gameInfoModel: PlayGameInfoModel, roomName: String, password: String) {
-        val createRoomModel = PlayCreateRoomModel(
-            roomName = roomName,
-            password = password,
-            gameId = gameInfoModel.gameId,
-            gameName = gameInfoModel.gameName
-        )
-        mPlayServiceProtocol.createRoom(createRoomModel, completion = { error, roomInfo ->
-            if (error == null && roomInfo != null) {
-                createRoomInfoLiveData.postValue(roomInfo)
-            } else {
+        innerCreateChatRoom(roomName) { chatId, error ->
+            if (error != null || chatId.isNullOrEmpty()) {
                 createRoomInfoLiveData.postValue(null)
                 ToastUtils.showToastLong(
                     AgoraApplication.the().getString(R.string.play_zone_create_room_failed, error?.message ?: "")
                 )
+                return@innerCreateChatRoom
             }
-        })
+            val createRoomModel = PlayCreateRoomModel(
+                roomName = roomName,
+                password = password,
+                gameId = gameInfoModel.gameId,
+                gameName = gameInfoModel.gameName,
+                chatRoomId = chatId
+            )
+            mPlayServiceProtocol.createRoom(createRoomModel, completion = { error, roomInfo ->
+                if (error == null && roomInfo != null) {
+                    createRoomInfoLiveData.postValue(roomInfo)
+                } else {
+                    createRoomInfoLiveData.postValue(null)
+                    ToastUtils.showToastLong(
+                        AgoraApplication.the().getString(R.string.play_zone_create_room_failed, error?.message ?: "")
+                    )
+                }
+            })
+        }
+    }
+
+    private fun innerCreateChatRoom(roomName: String, completion: (chatId: String?, error: Exception?) -> Unit) {
+        mChatRoomService.imManagerService.createChatRoom(
+            roomName = roomName,
+            description = "welcome",
+            completion = { chatId, error ->
+                completion.invoke(chatId, error)
+            })
     }
 
     fun joinRoom(roomInfo: AUIRoomInfo, password: String?) {

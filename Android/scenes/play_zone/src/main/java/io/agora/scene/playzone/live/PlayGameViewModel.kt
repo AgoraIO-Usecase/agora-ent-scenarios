@@ -7,6 +7,7 @@ import android.text.TextUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.agora.imkitmanager.model.AUIChatEntity
+import io.agora.imkitmanager.model.AUIChatRoomInfo
 import io.agora.imkitmanager.service.IAUIIMManagerService
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
@@ -55,7 +56,6 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         PlayChatRoomService.chatRoomService
     }
 
-
     // 网络状态
     val networkStatusLiveData = MutableLiveData<NetWorkEvent>()
 
@@ -80,6 +80,9 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
     // 是否房主
     val isRoomOwner: Boolean get() = mRoomInfo.roomOwner?.userId == PlayCenter.mUser.id.toString()
 
+    // 房主
+    val mRoomOwner: String get() = mRoomInfo.roomOwner?.userId ?: ""
+
     private val dataFormat = SimpleDateFormat("HH:mm:ss").apply { timeZone = TimeZone.getTimeZone("GMT") }
 
     private val topTimerTask = object : Runnable {
@@ -99,24 +102,17 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
     // 初始化 chat
     fun initChatRoom() {
         mChatRoomService.imManagerService.registerRespObserver(auiIMManagerRespObserver)
-        if (isRoomOwner) {
-            mChatRoomService.imManagerService.createChatRoom(
-                roomName = mRoomInfo.roomName,
-                description = "welcome",
-                completion = { response, error ->
-                    error?.message?.let {
-                        ToastUtils.showToast(it)
-                    }
-                })
-        } else {
-            val chatRoomId = mRoomInfo.customPayload[PlayZoneParameters.CHAT_ID] as? String ?: return
-            mChatRoomService.imManagerService.joinChatRoom(chatRoomId, completion = { error ->
-                error?.message?.let {
-                    ToastUtils.showToast(it)
-                }
-            })
-        }
-        mChatRoomService.chatManager.saveWelcomeMsg(context().getString(R.string.play_zone_room_welcome))
+        val chatRoomId = mRoomInfo.customPayload[PlayZoneParameters.CHAT_ID] as? String ?: return
+        val chatRoomInfo = AUIChatRoomInfo(mRoomOwner, chatRoomId)
+        mChatRoomService.imManagerService.joinChatRoom(chatRoomInfo, completion = { error ->
+            error?.message?.let {
+                ToastUtils.showToast(it)
+            }
+        })
+        mChatRoomService.chatManager.saveWelcomeMsg(
+            context().getString(R.string.play_zone_system),
+            context().getString(R.string.play_zone_room_welcome)
+        )
     }
 
     // 初始化
@@ -225,11 +221,7 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
             mRtcEngine = null
         }
         mChatRoomService.imManagerService.unRegisterRespObserver(auiIMManagerRespObserver)
-        if (isRoomOwner){
-            mChatRoomService.imManagerService.userDestroyedChatroom()
-        } else{
-            mChatRoomService.imManagerService.userQuitRoom {  }
-        }
+        mChatRoomService.imManagerService.leaveChatRoom { }
     }
 
     // 退出房间
@@ -266,8 +258,8 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
 
     // 发送消息
     fun sendMessage(message: String) {
-        mChatRoomService.imManagerService.sendMessage(message, completion = { chatMessage,error->
-            if (error==null){
+        mChatRoomService.imManagerService.sendMessage(message, completion = { chatMessage, error ->
+            if (error == null) {
                 mRoomChatListLiveData.postValue(mChatRoomService.chatManager.getMsgList())
             }
         })

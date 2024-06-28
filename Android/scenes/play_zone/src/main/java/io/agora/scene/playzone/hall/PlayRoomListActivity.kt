@@ -18,11 +18,11 @@ import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.ISingleCallback
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.playzone.R
 import io.agora.scene.playzone.databinding.PlayZoneActivityRoomListLayoutBinding
 import io.agora.scene.playzone.databinding.PlayZoneItemRoomListBinding
 import io.agora.scene.playzone.live.PlayRoomGameActivity
+import io.agora.scene.playzone.service.PlayChatRoomService
 import io.agora.scene.playzone.service.PlayZoneParameters
 import io.agora.scene.playzone.service.PlayZoneServiceProtocol
 import io.agora.scene.widget.dialog.InputPasswordDialog
@@ -34,8 +34,8 @@ class PlayRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomListLay
         private const val TAG = "Joy_RoomListActivity"
     }
 
-    private val mRoomViewModel: PlayHallViewModel by lazy {
-        ViewModelProvider(this)[PlayHallViewModel::class.java]
+    private val mRoomViewModel: PlayCreateViewModel by lazy {
+        ViewModelProvider(this)[PlayCreateViewModel::class.java]
     }
 
 
@@ -135,6 +135,7 @@ class PlayRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomListLay
     }
 
     override fun onDestroy() {
+        PlayChatRoomService.chatRoomService.imManagerService.logoutChat {  }
         super.onDestroy()
     }
 

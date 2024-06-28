@@ -326,7 +326,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
             if (auiException == null) {
                 PlayLogger.d(TAG, "onRoomUserLeave updateRoom success: $roomId, $roomInfo")
             } else {
-                PlayLogger.d(TAG, "onRoomUserLeave updateRoom failed: $roomId $auiException")
+                PlayLogger.e(TAG, "onRoomUserLeave updateRoom failed: $roomId $auiException")
             }
         })
     }
@@ -415,6 +415,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
                     this.customPayload[PlayZoneParameters.IS_PRIVATE] = !inputModel.password.isNullOrEmpty()
                     this.customPayload[PlayZoneParameters.GAME_ID] = inputModel.gameId
                     this.customPayload[PlayZoneParameters.BADGE_TITLE] = inputModel.gameName
+                    this.customPayload[PlayZoneParameters.CHAT_ID] = inputModel.chatRoomId
                 }
                 val scene = mSyncManager.createScene(roomInfo.roomId)
                 scene.bindRespDelegate(this)

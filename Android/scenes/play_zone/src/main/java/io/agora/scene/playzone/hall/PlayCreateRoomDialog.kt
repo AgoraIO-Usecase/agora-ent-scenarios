@@ -37,7 +37,7 @@ class PlayCreateRoomDialog constructor(
         arguments?.getSerializable(Key_GameInfo) as PlayGameInfoModel
     }
 
-    private lateinit var roomCreateViewModel: PlayHallViewModel
+    private lateinit var roomCreateViewModel: PlayCreateViewModel
 
     private var window: Window? = null
     private var loadingView: View? = null
@@ -50,7 +50,7 @@ class PlayCreateRoomDialog constructor(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        roomCreateViewModel = ViewModelProvider(this)[PlayHallViewModel::class.java]
+        roomCreateViewModel = ViewModelProvider(this)[PlayCreateViewModel::class.java]
         // 用户提示颜色
         val spannableString = SpannableString(getString(R.string.play_zone_create_room_tips))
         spannableString.setSpan(

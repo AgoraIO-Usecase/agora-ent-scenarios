@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="36dp"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
     xmlns:tools="http://schemas.android.com/tools"
     android:theme="?attr/aui_chatListView_appearance"
     android:background="?attr/aui_barrage_local_layout_bg"
     android:gravity="center_vertical"
     android:layout_marginHorizontal="15dp"
-    android:paddingTop="8dp"
-    android:paddingBottom="9dp"
-    android:paddingStart="14dp">
+    android:paddingVertical="9dp"
+    android:paddingHorizontal="12dp">
 
     <TextView
         android:id="@+id/content"

@@ -2,6 +2,6 @@
 <resources>
     <color name="aui_white">#FFFFFFFF</color>
     <color name="aui_transparent">#00000000</color>
-    <color name="aui_color_8bb3ff">#8BB3FF</color>
+    <color name="aui_default_blue">#A6C4FF</color>
     <color name="aui_color_fcf0b3">#FCF0B3</color>
 </resources>

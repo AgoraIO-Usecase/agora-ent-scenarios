@@ -38,10 +38,14 @@ class AUIChatRoomContext private constructor() {
             field = value
         }
 
-    fun setupImToken(chatToken:String){
-        if (chatToken.isNotEmpty()){
+    fun setupChatToken(chatToken: String) {
+        if (chatToken.isNotEmpty()) {
             mChatToken = chatToken
         }
+    }
+
+    fun clearChatToken(){
+        mChatToken = ""
     }
 
     var mCommonConfig: AUIChatCommonConfig? = null
@@ -76,7 +80,9 @@ class AUIChatRoomContext private constructor() {
     }
 
     fun insertRoomInfo(info: AUIChatRoomInfo) {
-        chatRoomInfoMap[info.chatRoomId] = info
+        if (info.chatRoomId.isNotEmpty() && info.ownerUserId.isNotEmpty()) {
+            chatRoomInfoMap[info.chatRoomId] = info
+        }
     }
 
     fun cleanRoom(roomId: String) {

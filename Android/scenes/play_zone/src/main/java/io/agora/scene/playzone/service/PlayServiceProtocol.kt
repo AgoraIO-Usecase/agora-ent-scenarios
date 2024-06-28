@@ -1,6 +1,5 @@
 package io.agora.scene.playzone.service
 
-import io.agora.imkitmanager.service.IAUIIMManagerService
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.component.AgoraApplication
 

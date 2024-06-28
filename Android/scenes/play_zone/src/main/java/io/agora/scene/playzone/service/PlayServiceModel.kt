@@ -18,6 +18,7 @@ data class PlayCreateRoomModel constructor(
     val password: String? = null,
     val gameId:Long = 0L,
     val gameName: String = "",
+    val chatRoomId:String = ""
 )
 
 data class PlayRobotInfo constructor(

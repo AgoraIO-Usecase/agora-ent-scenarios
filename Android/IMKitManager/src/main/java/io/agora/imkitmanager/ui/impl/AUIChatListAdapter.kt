@@ -31,6 +31,7 @@ class AUIChatListAdapter(
     private var normalContentColor: Int = 0
     private var systemTitleColor: Int = 0
     private var systemContentColor: Int = 0
+    private var localContentColor: Int = 0
     private lateinit var ownerId: String
 
     init {
@@ -41,7 +42,7 @@ class AUIChatListAdapter(
 
         normalTitleColor = typedArray.getColor(
             R.styleable.AUIChatListView_aui_barrage_normal_title_TextColor,
-            context.resources.getColor(R.color.aui_color_8bb3ff)
+            context.resources.getColor(R.color.aui_default_blue)
         )
 
         normalContentColor = typedArray.getColor(
@@ -51,12 +52,17 @@ class AUIChatListAdapter(
 
         systemTitleColor = typedArray.getColor(
             R.styleable.AUIChatListView_aui_barrage_system_title_TextColor,
-            context.resources.getColor(R.color.aui_color_8bb3ff)
+            context.resources.getColor(R.color.aui_default_blue)
         )
 
         systemContentColor = typedArray.getColor(
             R.styleable.AUIChatListView_aui_barrage_system_content_TextColor,
             context.resources.getColor(R.color.aui_color_fcf0b3)
+        )
+
+        localContentColor = typedArray.getColor(
+            R.styleable.AUIChatListView_aui_barrage_local_content_TextColor,
+            context.resources.getColor(R.color.aui_white)
         )
 
         typedArray.recycle()
