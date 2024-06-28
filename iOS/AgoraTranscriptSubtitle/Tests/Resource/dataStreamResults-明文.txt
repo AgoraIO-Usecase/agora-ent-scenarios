@@ -1,0 +1,701 @@
+[
+    {
+        "endOfSegment": false,
+        "dataType": "transcribe",
+        "vendor": 0,
+        "uid": 187469,
+        "wordsArray": [
+            {
+                "durationMs": 680,
+                "startMs": 777823957,
+                "confidence": 0,
+                "isFinal": false,
+                "text": "再找一下"
+            }
+        ],
+        "wordsArray_Count": 1,
+        "transArray_Count": 0,
+        "seqnum": 0,
+        "offtime": 0,
+        "version": 0,
+        "transArray": [
+
+        ],
+        "lang": 0,
+        "textTs": 1718764743753,
+        "durationMs": 0,
+        "culture": "zh-CN",
+        "time": 0,
+        "flag": 0,
+        "starttime": 0
+    },
+    {
+        "lang": 0,
+        "seqnum": 0,
+        "uid": 187469,
+        "wordsArray_Count": 0,
+        "wordsArray": [
+
+        ],
+        "vendor": 0,
+        "offtime": 0,
+        "durationMs": 0,
+        "textTs": 1718764743753,
+        "dataType": "translate",
+        "endOfSegment": false,
+        "transArray": [
+            {
+                "isFinal": false,
+                "textsArray_Count": 1,
+                "textsArray": [
+                    "Look again"
+                ],
+                "lang": "en-US"
+            }
+        ],
+        "starttime": 0,
+        "version": 0,
+        "transArray_Count": 1,
+        "time": 0,
+        "culture": "",
+        "flag": 0
+    },
+    {
+        "seqnum": 0,
+        "vendor": 0,
+        "offtime": 0,
+        "endOfSegment": false,
+        "lang": 0,
+        "starttime": 0,
+        "wordsArray_Count": 1,
+        "wordsArray": [
+            {
+                "startMs": 777833967,
+                "confidence": 0,
+                "text": "你",
+                "durationMs": 600,
+                "isFinal": false
+            }
+        ],
+        "durationMs": 0,
+        "culture": "zh-CN",
+        "transArray": [
+
+        ],
+        "flag": 0,
+        "uid": 187469,
+        "transArray_Count": 0,
+        "textTs": 1718764756951,
+        "dataType": "transcribe",
+        "version": 0,
+        "time": 0
+    },
+    {
+        "seqnum": 0,
+        "culture": "zh-CN",
+        "starttime": 0,
+        "durationMs": 0,
+        "time": 0,
+        "version": 0,
+        "endOfSegment": false,
+        "offtime": 0,
+        "dataType": "transcribe",
+        "textTs": 1718764757052,
+        "uid": 187469,
+        "lang": 0,
+        "vendor": 0,
+        "flag": 0,
+        "wordsArray_Count": 1,
+        "wordsArray": [
+            {
+                "confidence": 0,
+                "isFinal": false,
+                "text": "你好吗你好",
+                "startMs": 777833967,
+                "durationMs": 840
+            }
+        ],
+        "transArray": [
+
+        ],
+        "transArray_Count": 0
+    },
+    {
+        "dataType": "transcribe",
+        "version": 0,
+        "wordsArray": [
+            {
+                "text": "你好吗你好吗",
+                "startMs": 777833967,
+                "isFinal": false,
+                "confidence": 0,
+                "durationMs": 1120
+            }
+        ],
+        "lang": 0,
+        "endOfSegment": false,
+        "textTs": 1718764757254,
+        "offtime": 0,
+        "transArray_Count": 0,
+        "seqnum": 0,
+        "vendor": 0,
+        "uid": 187469,
+        "wordsArray_Count": 1,
+        "flag": 0,
+        "time": 0,
+        "culture": "zh-CN",
+        "starttime": 0,
+        "transArray": [
+
+        ],
+        "durationMs": 0
+    },
+    {
+        "uid": 187469,
+        "time": 0,
+        "lang": 0,
+        "wordsArray_Count": 1,
+        "durationMs": 0,
+        "culture": "zh-CN",
+        "transArray": [
+
+        ],
+        "wordsArray": [
+            {
+                "confidence": 0,
+                "text": "你好吗？你好吗？",
+                "durationMs": 1120,
+                "isFinal": true,
+                "startMs": 777833967
+            }
+        ],
+        "offtime": 0,
+        "dataType": "transcribe",
+        "flag": 0,
+        "starttime": 0,
+        "seqnum": 0,
+        "textTs": 1718764757824,
+        "endOfSegment": false,
+        "transArray_Count": 0,
+        "version": 0,
+        "vendor": 0
+    },
+    {
+        "wordsArray": [
+
+        ],
+        "lang": 0,
+        "flag": 0,
+        "dataType": "translate",
+        "transArray_Count": 1,
+        "transArray": [
+            {
+                "isFinal": false,
+                "textsArray_Count": 1,
+                "textsArray": [
+                    "You"
+                ],
+                "lang": "en-US"
+            }
+        ],
+        "endOfSegment": false,
+        "time": 0,
+        "textTs": 1718764756951,
+        "uid": 187469,
+        "vendor": 0,
+        "offtime": 0,
+        "wordsArray_Count": 0,
+        "culture": "",
+        "version": 0,
+        "seqnum": 0,
+        "durationMs": 0,
+        "starttime": 0
+    },
+    {
+        "time": 0,
+        "transArray_Count": 1,
+        "seqnum": 0,
+        "starttime": 0,
+        "textTs": 1718764757824,
+        "version": 0,
+        "uid": 187469,
+        "wordsArray_Count": 0,
+        "transArray": [
+            {
+                "lang": "en-US",
+                "isFinal": true,
+                "textsArray_Count": 1,
+                "textsArray": [
+                    "How are you? How are you? "
+                ]
+            }
+        ],
+        "offtime": 0,
+        "endOfSegment": false,
+        "dataType": "translate",
+        "lang": 0,
+        "vendor": 0,
+        "culture": "",
+        "wordsArray": [
+
+        ],
+        "durationMs": 0,
+        "flag": 0
+    },
+    {
+        "seqnum": 0,
+        "offtime": 0,
+        "vendor": 0,
+        "textTs": 1718764768398,
+        "starttime": 0,
+        "culture": "zh-CN",
+        "wordsArray_Count": 1,
+        "endOfSegment": false,
+        "transArray": [
+
+        ],
+        "lang": 0,
+        "flag": 0,
+        "uid": 187469,
+        "durationMs": 0,
+        "version": 0,
+        "wordsArray": [
+            {
+                "text": "你可以做什么",
+                "durationMs": 880,
+                "confidence": 0,
+                "isFinal": false,
+                "startMs": 777835957
+            }
+        ],
+        "dataType": "transcribe",
+        "transArray_Count": 0,
+        "time": 0
+    },
+    {
+        "offtime": 0,
+        "transArray": [
+
+        ],
+        "seqnum": 0,
+        "culture": "zh-CN",
+        "textTs": 1718764768949,
+        "starttime": 0,
+        "wordsArray_Count": 1,
+        "transArray_Count": 0,
+        "endOfSegment": false,
+        "lang": 0,
+        "durationMs": 0,
+        "dataType": "transcribe",
+        "wordsArray": [
+            {
+                "text": "你可以做什么？",
+                "startMs": 777835957,
+                "durationMs": 880,
+                "isFinal": true,
+                "confidence": 0
+            }
+        ],
+        "version": 0,
+        "vendor": 0,
+        "time": 0,
+        "flag": 0,
+        "uid": 187469
+    },
+    {
+        "wordsArray_Count": 0,
+        "transArray": [
+            {
+                "textsArray": [
+                    "What can you do"
+                ],
+                "lang": "en-US",
+                "isFinal": false,
+                "textsArray_Count": 1
+            }
+        ],
+        "transArray_Count": 1,
+        "culture": "",
+        "lang": 0,
+        "textTs": 1718764768398,
+        "starttime": 0,
+        "dataType": "translate",
+        "endOfSegment": false,
+        "seqnum": 0,
+        "uid": 187469,
+        "vendor": 0,
+        "flag": 0,
+        "time": 0,
+        "offtime": 0,
+        "wordsArray": [
+
+        ],
+        "version": 0,
+        "durationMs": 0
+    },
+    {
+        "transArray": [
+            {
+                "isFinal": true,
+                "textsArray_Count": 1,
+                "textsArray": [
+                    "What can you do? "
+                ],
+                "lang": "en-US"
+            }
+        ],
+        "wordsArray_Count": 0,
+        "seqnum": 0,
+        "lang": 0,
+        "vendor": 0,
+        "transArray_Count": 1,
+        "offtime": 0,
+        "version": 0,
+        "dataType": "translate",
+        "starttime": 0,
+        "flag": 0,
+        "textTs": 1718764768949,
+        "culture": "",
+        "uid": 187469,
+        "wordsArray": [
+
+        ],
+        "time": 0,
+        "endOfSegment": false,
+        "durationMs": 0
+    },
+    {
+        "seqnum": 0,
+        "flag": 0,
+        "starttime": 0,
+        "transArray_Count": 0,
+        "durationMs": 0,
+        "culture": "zh-CN",
+        "time": 0,
+        "uid": 187469,
+        "offtime": 0,
+        "endOfSegment": false,
+        "lang": 0,
+        "dataType": "transcribe",
+        "version": 0,
+        "transArray": [
+
+        ],
+        "wordsArray_Count": 1,
+        "textTs": 1718764772826,
+        "wordsArray": [
+            {
+                "durationMs": 560,
+                "text": "你是谁",
+                "isFinal": false,
+                "startMs": 777837637,
+                "confidence": 0
+            }
+        ],
+        "vendor": 0
+    },
+    {
+        "offtime": 0,
+        "wordsArray": [
+            {
+                "isFinal": true,
+                "text": "你是谁？",
+                "startMs": 777837637,
+                "durationMs": 560,
+                "confidence": 0
+            }
+        ],
+        "seqnum": 0,
+        "endOfSegment": false,
+        "flag": 0,
+        "transArray_Count": 0,
+        "starttime": 0,
+        "vendor": 0,
+        "time": 0,
+        "wordsArray_Count": 1,
+        "transArray": [
+
+        ],
+        "dataType": "transcribe",
+        "durationMs": 0,
+        "textTs": 1718764773378,
+        "uid": 187469,
+        "lang": 0,
+        "culture": "zh-CN",
+        "version": 0
+    },
+    {
+        "flag": 0,
+        "transArray_Count": 1,
+        "version": 0,
+        "time": 0,
+        "textTs": 1718764772826,
+        "durationMs": 0,
+        "wordsArray_Count": 0,
+        "endOfSegment": false,
+        "vendor": 0,
+        "starttime": 0,
+        "dataType": "translate",
+        "seqnum": 0,
+        "lang": 0,
+        "wordsArray": [
+
+        ],
+        "transArray": [
+            {
+                "textsArray": [
+                    "Who are you"
+                ],
+                "isFinal": false,
+                "textsArray_Count": 1,
+                "lang": "en-US"
+            }
+        ],
+        "offtime": 0,
+        "uid": 187469,
+        "culture": ""
+    },
+    {
+        "offtime": 0,
+        "wordsArray_Count": 0,
+        "version": 0,
+        "starttime": 0,
+        "endOfSegment": false,
+        "durationMs": 0,
+        "textTs": 1718764773378,
+        "uid": 187469,
+        "time": 0,
+        "flag": 0,
+        "vendor": 0,
+        "transArray": [
+            {
+                "isFinal": true,
+                "textsArray_Count": 1,
+                "textsArray": [
+                    "Who are you? "
+                ],
+                "lang": "en-US"
+            }
+        ],
+        "wordsArray": [
+
+        ],
+        "dataType": "translate",
+        "transArray_Count": 1,
+        "seqnum": 0,
+        "culture": "",
+        "lang": 0
+    },
+    {
+        "culture": "zh-CN",
+        "seqnum": 0,
+        "vendor": 0,
+        "wordsArray_Count": 1,
+        "offtime": 0,
+        "flag": 0,
+        "time": 0,
+        "uid": 187469,
+        "version": 0,
+        "durationMs": 0,
+        "transArray": [
+
+        ],
+        "endOfSegment": false,
+        "wordsArray": [
+            {
+                "confidence": 0,
+                "isFinal": false,
+                "text": "你",
+                "durationMs": 400,
+                "startMs": 777839077
+            }
+        ],
+        "lang": 0,
+        "dataType": "transcribe",
+        "transArray_Count": 0,
+        "textTs": 1718764776744,
+        "starttime": 0
+    },
+    {
+        "seqnum": 0,
+        "wordsArray_Count": 1,
+        "dataType": "transcribe",
+        "version": 0,
+        "textTs": 1718764776947,
+        "offtime": 0,
+        "culture": "zh-CN",
+        "durationMs": 0,
+        "time": 0,
+        "transArray": [
+
+        ],
+        "lang": 0,
+        "uid": 187469,
+        "vendor": 0,
+        "wordsArray": [
+            {
+                "text": "你为什",
+                "startMs": 777839077,
+                "confidence": 0,
+                "isFinal": false,
+                "durationMs": 1000
+            }
+        ],
+        "transArray_Count": 0,
+        "flag": 0,
+        "starttime": 0,
+        "endOfSegment": false
+    },
+    {
+        "flag": 0,
+        "culture": "zh-CN",
+        "endOfSegment": false,
+        "dataType": "transcribe",
+        "uid": 187469,
+        "seqnum": 0,
+        "lang": 0,
+        "offtime": 0,
+        "wordsArray_Count": 1,
+        "textTs": 1718764777048,
+        "wordsArray": [
+            {
+                "startMs": 777839077,
+                "confidence": 0,
+                "text": "你为什么在",
+                "durationMs": 1120,
+                "isFinal": false
+            }
+        ],
+        "time": 0,
+        "durationMs": 0,
+        "version": 0,
+        "vendor": 0,
+        "starttime": 0,
+        "transArray_Count": 0,
+        "transArray": [
+
+        ]
+    },
+    {
+        "endOfSegment": false,
+        "flag": 0,
+        "textTs": 1718764776744,
+        "seqnum": 0,
+        "version": 0,
+        "wordsArray_Count": 0,
+        "wordsArray": [
+
+        ],
+        "culture": "",
+        "durationMs": 0,
+        "vendor": 0,
+        "time": 0,
+        "starttime": 0,
+        "lang": 0,
+        "uid": 187469,
+        "offtime": 0,
+        "transArray": [
+            {
+                "textsArray_Count": 1,
+                "lang": "en-US",
+                "textsArray": [
+                    "You"
+                ],
+                "isFinal": false
+            }
+        ],
+        "dataType": "translate",
+        "transArray_Count": 1
+    },
+    {
+        "starttime": 0,
+        "culture": "zh-CN",
+        "version": 0,
+        "dataType": "transcribe",
+        "lang": 0,
+        "vendor": 0,
+        "transArray_Count": 0,
+        "textTs": 1718764777654,
+        "wordsArray": [
+            {
+                "text": "你为什么在我这里",
+                "startMs": 777839077,
+                "durationMs": 1320,
+                "isFinal": false,
+                "confidence": 0
+            }
+        ],
+        "transArray": [
+
+        ],
+        "endOfSegment": false,
+        "durationMs": 0,
+        "seqnum": 0,
+        "flag": 0,
+        "time": 0,
+        "wordsArray_Count": 1,
+        "offtime": 0,
+        "uid": 187469
+    },
+    {
+        "transArray_Count": 0,
+        "transArray": [
+
+        ],
+        "lang": 0,
+        "starttime": 0,
+        "durationMs": 0,
+        "wordsArray_Count": 1,
+        "version": 0,
+        "dataType": "transcribe",
+        "textTs": 1718764777728,
+        "time": 0,
+        "seqnum": 0,
+        "uid": 187469,
+        "offtime": 0,
+        "culture": "zh-CN",
+        "endOfSegment": false,
+        "wordsArray": [
+            {
+                "startMs": 777839077,
+                "durationMs": 1320,
+                "confidence": 0,
+                "isFinal": true,
+                "text": "你为什么在我这里？"
+            }
+        ],
+        "vendor": 0,
+        "flag": 0
+    },
+    {
+        "transArray_Count": 1,
+        "version": 0,
+        "flag": 0,
+        "transArray": [
+            {
+                "isFinal": true,
+                "lang": "en-US",
+                "textsArray": [
+                    "Why are you here with me? "
+                ],
+                "textsArray_Count": 1
+            }
+        ],
+        "durationMs": 0,
+        "uid": 187469,
+        "wordsArray_Count": 0,
+        "culture": "",
+        "textTs": 1718764777728,
+        "seqnum": 0,
+        "time": 0,
+        "lang": 0,
+        "wordsArray": [
+
+        ],
+        "dataType": "translate",
+        "starttime": 0,
+        "offtime": 0,
+        "endOfSegment": false,
+        "vendor": 0
+    }
+]

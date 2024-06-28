@@ -100,8 +100,13 @@ class Pure1v1CallViewController: UIViewController {
         return realTimeView
     }()
     
+    private let subtitleView = SubtitleView()
+    
+    private let rttVC = ShowRttViewController()
+    
     deinit {
         pure1v1Print("deinit-- Pure1v1CallViewController")
+        RttManager.shared.removeListener(listener: self)
     }
     
     override func viewDidLoad() {
@@ -119,6 +124,7 @@ class Pure1v1CallViewController: UIViewController {
         view.addSubview(bottomBar)
         view.addSubview(hangupButton)
         view.addSubview(moreBtn)
+        view.addSubview(subtitleView)
         
         moveViewModel.touchArea = view.bounds
         roomInfoView.frame = CGRect(x: 15, y: UIDevice.current.aui_SafeDistanceTop, width: 202, height: 40)
@@ -129,9 +135,17 @@ class Pure1v1CallViewController: UIViewController {
         hangupButton.aui_bottom = self.view.aui_height - 20 - UIDevice.current.aui_SafeDistanceBottom
         hangupButton.aui_centerX = self.view.aui_width / 2
         
+        subtitleView.snp.makeConstraints { make in
+            make.width.equalToSuperview()
+            make.bottom.equalTo(bottomBar.snp.top)
+            make.height.equalTo(235)
+        }
+        
         moreBtn.aui_size = CGSize(width: 32, height: 32)
         moreBtn.aui_right = view.aui_width - 15
         moreBtn.aui_centerY = roomInfoView.aui_centerY
+        
+        RttManager.shared.addListener(listener: self)
     }
     
     private func _resetCanvas() {
@@ -209,9 +223,12 @@ extension Pure1v1CallViewController: Pure1v1RoomBottomBarDelegate {
     }
     
     func onClickRttButton() {
-        let rttVC = ShowRttViewController()
         guard let channelName = self.rtcChannelName else {return}
         rttVC.channelName = channelName
+        
+        rttVC.clickDetailButonAction = { vc in
+            self.present(vc, animated: true)
+        }
         present(rttVC, animated: true)
     }
 }
@@ -259,6 +276,11 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
             remoteCanvasView.emptyView.isHidden = false
             localCanvasView.emptyView.isHidden = false
         } else {
+            if (state == .prepared) {
+                RttManager.shared.disableRtt(force: true) { success in
+                }
+                self.subtitleView.rttView.clear()
+            }
             remoteCanvasView.emptyView.isHidden = true
             localCanvasView.emptyView.isHidden = true
         }
@@ -295,19 +317,32 @@ extension Pure1v1CallViewController: AgoraRtcEngineDelegate {
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didVideoMuted muted: Bool, byUid uid: UInt) {
         pure1v1Print("didVideoMuted[\(uid)] \(muted)")
-        self.remoteCanvasView.canvasView.isHidden = muted
+        if (uid != 2000) {
+            self.remoteCanvasView.canvasView.isHidden = muted
+        }
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, receiveStreamMessageFromUid uid: UInt, streamId: Int, data: Data) {
         pure1v1Print("RttApiManager receiveStreamMessageFromUid[\(uid)] \(data)")
-        guard let text: Agora_SpeechToText_Text = try? Agora_SpeechToText_Text(serializedData: data) else {return}
-        
-        var translate: String = ""
-        text.trans.first?.texts.forEach({ word in
-            translate += word
-        })
-        if (translate != "") {
-            print("RttApiManager \(translate)")
-        }
+        subtitleView.rttView.pushMessageData(data: data, uid: uid)
+//        guard let text: Agora_SpeechToText_Text = try? Agora_SpeechToText_Text(serializedData: data) else {return}
+//        
+//        var translate: String = ""
+//        text.trans.first?.texts.forEach({ word in
+//            translate += word
+//        })
+//        if (translate != "") {
+//            print("RttApiManager \(translate)")
+//        }
+    }
+}
+
+extension Pure1v1CallViewController: RttEventListener {
+    func onRttStart() {
+        self.bottomBar.setRttButtonView(enable: true)
+    }
+    
+    func onRttStop() {
+        self.bottomBar.setRttButtonView(enable: false)
     }
 }

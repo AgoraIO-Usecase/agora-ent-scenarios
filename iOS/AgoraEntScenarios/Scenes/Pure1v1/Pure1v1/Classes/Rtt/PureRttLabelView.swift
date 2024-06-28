@@ -91,5 +91,9 @@ class PureRttLabelView: UIView {
         valueLabel.text = value
         self.cellDidSelectedAction = cellDidSelectedAction
     }
+    
+    func updataValue(value: String) {
+        valueLabel.text = value
+    }
 }
 
