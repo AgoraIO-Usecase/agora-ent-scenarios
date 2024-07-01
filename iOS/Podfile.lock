@@ -295,7 +295,7 @@ SPEC CHECKSUMS:
   AgoraComponetLog: b359777d2ff8e9ee0237cbd0c42ceb422fd514f1
   AgoraLyricsScore: 7576387b199cdc3b2752a113688abd0a807a2ca3
   AgoraRtcEngine_iOS: eaa97751fcfe1b50d9b067e0df92752a6a5f899f
-  AgoraRtm: 4a2e07b7c9b49fe98d8a91afff424f91d11b4fe5
+  AgoraRtm: 874bbc0db49e4581832ce4fb8c47023bbd32ef10
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
   AGResourceManager: e6616ad4d9d0461c84d9582ef1118004fa534e5c
   AudioScenarioApi: b309ae6f8d221759811787afe7f8b69024548028
@@ -333,4 +333,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: d2d699de35df3c3db67ccb230e12e9aeeac356b0
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.15.2
