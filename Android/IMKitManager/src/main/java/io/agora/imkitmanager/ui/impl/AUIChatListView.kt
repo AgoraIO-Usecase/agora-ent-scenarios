@@ -114,7 +114,6 @@ class AUIChatListView : RelativeLayout, IAUIChatListView {
     override fun refreshSelectLast(msgList: List<AUIChatInfo>?) {
         if (adapter != null) {
             post {
-                Log.e("apex", "refreshSelectLast ${msgList?.size}")
                 msgList?.let { adapter?.refresh(it) }
                 val position = adapter?.itemCount
                 if (position != null && position > 0) {

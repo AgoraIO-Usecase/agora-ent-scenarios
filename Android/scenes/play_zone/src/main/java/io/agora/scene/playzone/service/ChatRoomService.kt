@@ -46,6 +46,7 @@ class PlayChatRoomService constructor(val cxt:Context){
         AUIChatLogger.initLogger(
             AUIChatLogger.Config(
                 cxt, "Play_IM",
+                debug = io.agora.scene.base.BuildConfig.DEBUG,
                 logCallback = object : AUIChatLogger.AUILogCallback {
                     override fun onLogDebug(tag: String, message: String) {
                         PlayLogger.d(TAG, "$tag $message")
