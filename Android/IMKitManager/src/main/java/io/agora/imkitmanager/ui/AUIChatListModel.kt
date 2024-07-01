@@ -8,10 +8,10 @@ enum class AUIChatListInterceptType constructor(val type: Int){
     NON_INTERCEPT(2)
 }
 
-data class AUIChatInfo(
+data class AUIChatInfo constructor(
     var userId: String,
     var userName: String,
     var content: String?,
-    var joined: Boolean,
+    var joined: Boolean = false,
     var localMsg: Boolean = false
 ) : Serializable

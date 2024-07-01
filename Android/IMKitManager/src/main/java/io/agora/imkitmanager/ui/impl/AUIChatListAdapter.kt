@@ -269,7 +269,7 @@ class AUIChatListAdapter constructor(private val context: Context, typedArray: T
 
     class NormalViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var content: TextView
-        var rootView:View
+        var rootView: View
 
         init {
             rootView = itemView.findViewById(R.id.rootView)

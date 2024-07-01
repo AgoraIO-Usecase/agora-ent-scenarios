@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.imkitmanager.R
 import io.agora.imkitmanager.databinding.AuiChatListLayoutBinding
+import io.agora.imkitmanager.service.IAUIIMManagerService
 import io.agora.imkitmanager.ui.AUIChatInfo
 import io.agora.imkitmanager.ui.IAUIChatListView
 import io.agora.imkitmanager.ui.listener.AUIChatListItemClickListener

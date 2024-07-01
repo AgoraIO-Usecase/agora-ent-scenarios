@@ -21,6 +21,8 @@ import io.agora.imkitmanager.service.http.CreateChatRoomRequest
 import io.agora.imkitmanager.service.http.ChatHttpManager
 import io.agora.imkitmanager.service.http.ChatUserConfig
 import io.agora.imkitmanager.service.http.CreateChatRoomInput
+import io.agora.imkitmanager.ui.AUIChatInfo
+import io.agora.imkitmanager.ui.IAUIChatListView
 import io.agora.imkitmanager.utils.ObservableHelper
 import retrofit2.Call
 import retrofit2.Callback
@@ -47,6 +49,8 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
 
     private var mCurChatRoomId: String = ""
 
+    private var mChatListView: IAUIChatListView? = null
+
     override fun registerRespObserver(observer: IAUIIMManagerService.AUIIMManagerRespObserver?) {
         observableHelper.subscribeEvent(observer)
     }
@@ -55,12 +59,37 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
         observableHelper.unSubscribeEvent(observer)
     }
 
+    override fun setChatListView(view: IAUIChatListView) {
+        mChatListView = view
+    }
+
     override fun sendMessage(
-        text: String, completion: (IAUIIMManagerService.AgoraChatTextMessage?, Exception?) -> Unit
+        text: String, completion: (IAUIIMManagerService.AgoraChatTextMessage?, Exception?) -> Unit, localMsg: Boolean
     ) {
         innerLoginChat { loginError ->
             if (loginError != null) {
                 completion.invoke(null, Exception("sendChatMessage ==> ${loginError.message}"))
+                return@innerLoginChat
+            }
+            if (localMsg) {
+                chatManager.insertLocalMsg(text)
+                runOnMainThread {
+                    mChatListView?.let { chatListView ->
+                        chatListView.refreshSelectLast(chatManager.getMsgList().map {
+                            AUIChatInfo(
+                                userId = it.chatUser?.userId ?: "",
+                                userName = it.chatUser?.userName ?: "",
+                                content = it.content,
+                                joined = it.joined,
+                                localMsg = it.localMsg
+                            )
+                        })
+                    }
+                    val chatTextMessage = IAUIIMManagerService.AgoraChatTextMessage(
+                        "", text, null
+                    )
+                    completion.invoke(chatTextMessage, null)
+                }
                 return@innerLoginChat
             }
             chatManager.sendTxtMsg(
@@ -75,12 +104,23 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
                                 completion.invoke(null, error)
                                 return@runOnMainThread
                             }
-                            completion.invoke(
-                                IAUIIMManagerService.AgoraChatTextMessage(
-                                    message?.messageId,
-                                    message?.content, chatRoomContext.currentUserInfo
-                                ), null
+                            val chatTextMessage = IAUIIMManagerService.AgoraChatTextMessage(
+                                message?.messageId,
+                                message?.content, chatRoomContext.currentUserInfo
                             )
+                            completion.invoke(chatTextMessage, null)
+
+                            mChatListView?.let { chatListView ->
+                                chatListView.refreshSelectLast(chatManager.getMsgList().map {
+                                    AUIChatInfo(
+                                        userId = it.chatUser?.userId ?: "",
+                                        userName = it.chatUser?.userName ?: "",
+                                        content = it.content,
+                                        joined = it.joined,
+                                        localMsg = it.localMsg
+                                    )
+                                })
+                            }
                         }
                     }
                 })
@@ -218,7 +258,9 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
                 override fun onOriginalResult(error: Exception?, message: ChatMessage?) {
                     super.onOriginalResult(error, message)
                     if (error != null) {
-                        completion.invoke(Exception("joinChatRoom >> IM join chat room failed! -- $error"))
+                        runOnMainThread {
+                            completion.invoke(Exception("joinChatRoom >> IM join chat room failed! -- $error"))
+                        }
                         return
                     }
                     mCurChatRoomId = chatId
@@ -226,7 +268,24 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
                     val textMsg = IAUIIMManagerService.AgoraChatTextMessage(
                         message?.msgId, message?.body?.toString(), null
                     )
-                    completion.invoke(null)
+                    runOnMainThread {
+                        completion.invoke(null)
+                    }
+
+                    mChatListView?.let { chatListView ->
+                        runOnMainThread {
+                            chatListView.refreshSelectLast(chatManager.getMsgList().map {
+                                AUIChatInfo(
+                                    userId = it.chatUser?.userId ?: "",
+                                    userName = it.chatUser?.userName ?: "",
+                                    content = it.content,
+                                    joined = it.joined,
+                                    localMsg = it.localMsg
+                                )
+                            })
+                        }
+                    }
+
                     observableHelper.notifyEventHandlers {
                         it.onUserDidJoinRoom(chatId, textMsg)
                     }
@@ -310,6 +369,7 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
         chatManager.unsubscribeChatMsg(this)
         chatManager.clear()
         mCurChatRoomId = ""
+        mChatListView = null
         completion.invoke(null)
     }
 
@@ -318,6 +378,21 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
         message ?: return
         chatRoomId ?: return
         if (this.mCurChatRoomId != chatRoomId) return
+
+        mChatListView?.let { chatListView ->
+            runOnMainThread {
+                chatListView.refreshSelectLast(chatManager.getMsgList().map {
+                    AUIChatInfo(
+                        userId = it.chatUser?.userId ?: "",
+                        userName = it.chatUser?.userName ?: "",
+                        content = it.content,
+                        joined = it.joined,
+                        localMsg = it.localMsg
+                    )
+                })
+            }
+        }
+
         observableHelper.notifyEventHandlers {
             it.onUserDidJoinRoom(
                 chatRoomId, IAUIIMManagerService.AgoraChatTextMessage(
@@ -334,6 +409,21 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
         message ?: return
         chatRoomId ?: return
         if (this.mCurChatRoomId != chatRoomId) return
+
+        mChatListView?.let { chatListView ->
+            runOnMainThread {
+                chatListView.refreshSelectLast(chatManager.getMsgList().map {
+                    AUIChatInfo(
+                        userId = it.chatUser?.userId ?: "",
+                        userName = it.chatUser?.userName ?: "",
+                        content = it.content,
+                        joined = it.joined,
+                        localMsg = it.localMsg
+                    )
+                })
+            }
+        }
+
         observableHelper.notifyEventHandlers {
             it.messageDidReceive(
                 chatRoomId,

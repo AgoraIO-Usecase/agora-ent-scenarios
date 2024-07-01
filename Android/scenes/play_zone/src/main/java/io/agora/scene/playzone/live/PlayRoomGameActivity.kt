@@ -19,12 +19,10 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.request.RequestOptions
-import io.agora.imkitmanager.ui.AUIChatInfo
 import io.agora.rtc2.Constants
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.base.utils.dp
 import io.agora.scene.playzone.PlayCenter
 import io.agora.scene.playzone.PlayLogger
@@ -132,9 +130,6 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         binding.ivMore.setOnClickListener {
             TopFunctionDialog(this).show()
         }
-//        binding.tvRules.setOnClickListener {
-//            showRulesDialog()
-//        }
         binding.tvInput.setOnClickListener {
             showKeyboardInputLayout()
         }
@@ -209,7 +204,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     override fun requestData() {
         super.requestData()
 
-        roomGameViewModel.initChatRoom()
+        roomGameViewModel.initChatRoom(binding.chatListView)
         mToggleAudioRun = Runnable {
             roomGameViewModel.initData()
         }
@@ -266,17 +261,6 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
                 gameViewModel.robotInfoList.clear()
                 gameViewModel.robotInfoList.addAll(robotList)
             }
-        }
-        roomGameViewModel.mRoomChatListLiveData.observe(this) { chatList ->
-            binding.chatListView.refreshSelectLast(chatList.map {
-                AUIChatInfo(
-                    userId = it.chatUser?.userId ?: "",
-                    userName = it.chatUser?.userName ?: "",
-                    content = it.content,
-                    joined = it.joined,
-                    localMsg = it.localMsg
-                )
-            })
         }
     }
 

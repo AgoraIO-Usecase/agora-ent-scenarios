@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import io.agora.imkitmanager.model.AUIChatEntity
 import io.agora.imkitmanager.model.AUIChatRoomInfo
 import io.agora.imkitmanager.service.IAUIIMManagerService
+import io.agora.imkitmanager.ui.IAUIChatListView
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
@@ -74,9 +75,6 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
     // 房间存活时间
     val mRoomTimeLiveData = MutableLiveData<String>()
 
-    // 聊天消息
-    val mRoomChatListLiveData = MutableLiveData<List<AUIChatEntity>>()
-
     // 是否房主
     val isRoomOwner: Boolean get() = mRoomInfo.roomOwner?.userId == PlayCenter.mUser.id.toString()
 
@@ -100,8 +98,8 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
     }
 
     // 初始化 chat
-    fun initChatRoom() {
-        mChatRoomService.imManagerService.registerRespObserver(auiIMManagerRespObserver)
+    fun initChatRoom(chatListView: IAUIChatListView) {
+        mChatRoomService.imManagerService.setChatListView(chatListView)
         val chatRoomId = mRoomInfo.customPayload[PlayZoneParameters.CHAT_ID] as? String ?: return
         val chatRoomInfo = AUIChatRoomInfo(mRoomOwner, chatRoomId)
         mChatRoomService.imManagerService.joinChatRoom(chatRoomInfo, completion = { error ->
@@ -220,7 +218,6 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
             RtcEngine.destroy()
             mRtcEngine = null
         }
-        mChatRoomService.imManagerService.unRegisterRespObserver(auiIMManagerRespObserver)
         mChatRoomService.imManagerService.leaveChatRoom { }
     }
 
@@ -246,28 +243,13 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         mRtcEngine?.muteLocalAudioStream(mute)
     }
 
-    private val auiIMManagerRespObserver = object : IAUIIMManagerService.AUIIMManagerRespObserver {
-        override fun messageDidReceive(chatRoomId: String, message: IAUIIMManagerService.AgoraChatTextMessage) {
-            mRoomChatListLiveData.postValue(mChatRoomService.chatManager.getMsgList())
-        }
-
-        override fun onUserDidJoinRoom(chatRoomId: String, message: IAUIIMManagerService.AgoraChatTextMessage) {
-            mRoomChatListLiveData.postValue(mChatRoomService.chatManager.getMsgList())
-        }
-    }
-
     // 发送消息
     fun sendMessage(message: String) {
-        mChatRoomService.imManagerService.sendMessage(message, completion = { chatMessage, error ->
-            if (error == null) {
-                mRoomChatListLiveData.postValue(mChatRoomService.chatManager.getMsgList())
-            }
-        })
+        mChatRoomService.imManagerService.sendMessage(message, completion = { chatMessage, error -> })
     }
 
     // 插入本地消息
     fun insertLocalMessage(message: String) {
-        mChatRoomService.chatManager.insertLocalMsg(message)
-        mRoomChatListLiveData.postValue(mChatRoomService.chatManager.getMsgList())
+        mChatRoomService.imManagerService.sendMessage(message, completion = { chatMessage, error -> }, true)
     }
 }
