@@ -45,6 +45,10 @@ import AgoraRtmKit
     /// 创建锁
     public func create(completion: ((NSError?)-> ())? = nil) {
         rtmManager.setLock(channelName: channelName, lockName: kRTM_Referee_LockName) {[weak self] err in
+            guard let err = err, err.code != AgoraRtmErrorCode.lockAlreadyExist.rawValue else {
+                completion?(nil)
+                return
+            }
             self?.notifyError(error: err)
             completion?(err)
         }

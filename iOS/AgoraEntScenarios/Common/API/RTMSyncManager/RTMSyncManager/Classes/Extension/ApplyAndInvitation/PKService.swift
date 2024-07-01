@@ -30,7 +30,7 @@ import Foundation
 }
 
 @objc public protocol PKServiceProtocol: NSObjectProtocol {
-    func onPKInfoDidReceive(info: PKInfo)
+    func onPKInfoDidReceive(channelName: String, info: PKInfo)
 }
 
 private let key = "pk"
@@ -209,31 +209,31 @@ extension PKService {
 
 //MARK: InviteMessageProtocol
 extension PKService: InviteMessageProtocol {
-    public func onNewInviteDidReceived(message: InviteMessageInfo) {
+    public func onNewInviteDidReceived(channelName: String, message: InviteMessageInfo) {
         guard let info: PKInfo = decodeModel(jsonStr: message.content) else { return }
         aui_info("onNewInviteDidReceived message: \(message.content)", tag: "PKService")
         respDelegates.allObjects.forEach { delegate in
-            delegate.onPKInfoDidReceive(info: info)
+            delegate.onPKInfoDidReceive(channelName: channelName, info: info)
         }
     }
 }
 
 //MARK: RoomPresenceProtocol
 extension PKService: RoomPresenceProtocol {
-    public func onUserSnapshot(userList: [RoomPresenceInfo]) {
+    public func onUserSnapshot(channelName: String, userList: [RoomPresenceInfo]) {
         
     }
     
-    public func onUserUpdate(user: RoomPresenceInfo) {
+    public func onUserUpdate(channelName: String, user: RoomPresenceInfo) {
         aui_info("onUserUpdate[\(user.roomId)] userId: \(user.ownerId), name: \(user.ownerName), status: \(user.status.rawValue)", tag: "PKService")
+        let channelName = self.channelName
         // 被PK方 -> 发起PK方
         if user.roomId != channelName {
-            
             if let currInfo = roomPresenceService.getRoomPresenceInfo(roomId: channelName),
                user.status == .pk,
                currInfo.status == .idle,
                user.interactorId == AUIRoomContext.shared.currentUserInfo.userId {
-                aui_info("after acceptPK >> updateRoomPresenceInfo : status=\(RoomPresenceStatus.pk.rawValue), interactorId=\(user.ownerId), interactorName=\(user.ownerName)", tag: "PKService")
+                aui_info("after acceptPK >> updateRoomPresenceInfo : status=\(InteractionType.pk.rawValue), interactorId=\(user.ownerId), interactorName=\(user.ownerName)", tag: "PKService")
                 roomPresenceService.updateRoomPresenceInfo(roomId: channelName,
                                                            status: .pk,
                                                            interactorId: user.ownerId,
@@ -256,7 +256,7 @@ extension PKService: RoomPresenceProtocol {
                                                       completion: nil)
                 let info = self.createPKInfo(user, type: .accept)
                 respDelegates.allObjects.forEach { delegate in
-                    delegate.onPKInfoDidReceive(info: info)
+                    delegate.onPKInfoDidReceive(channelName: channelName, info: info)
                 }
             }
         }
@@ -276,7 +276,7 @@ extension PKService: RoomPresenceProtocol {
                                                       completion: nil)
                 let info = self.createPKInfo(pkRoomInfo, type: .accept)
                 respDelegates.allObjects.forEach { delegate in
-                    delegate.onPKInfoDidReceive(info: info)
+                    delegate.onPKInfoDidReceive(channelName: channelName, info: info)
                 }
             }
         }
@@ -299,7 +299,7 @@ extension PKService: RoomPresenceProtocol {
                 info.fromUserName = user.ownerId
                 info.fromRoomId = user.ownerName
                 respDelegates.allObjects.forEach { delegate in
-                    delegate.onPKInfoDidReceive(info: info)
+                    delegate.onPKInfoDidReceive(channelName: channelName, info: info)
                 }
             }
         }
@@ -311,7 +311,7 @@ extension PKService: RoomPresenceProtocol {
                currInfo.status == .pk,
                currInfo.interactorId == user.ownerId,
                user.interactorId != AUIRoomContext.shared.currentUserInfo.userId {
-                aui_info("after startPK >> updateRoomPresenceInfo for pk owner has started interaction with others: status=\(RoomPresenceStatus.idle.rawValue)", tag: "PKService")
+                aui_info("after startPK >> updateRoomPresenceInfo for pk owner has started interaction with others: status=\(InteractionType.idle.rawValue)", tag: "PKService")
                 
                 roomPresenceService.updateRoomPresenceInfo(roomId: channelName,
                                                            status: .idle,
@@ -321,7 +321,7 @@ extension PKService: RoomPresenceProtocol {
                 
                 let info = self.createPKInfo(currInfo, type: .end)
                 respDelegates.allObjects.forEach { delegate in
-                    delegate.onPKInfoDidReceive(info: info)
+                    delegate.onPKInfoDidReceive(channelName: channelName,info: info)
                 }
                 
             }
@@ -329,7 +329,7 @@ extension PKService: RoomPresenceProtocol {
         
     }
     
-    public func onUserDelete(user: RoomPresenceInfo) {
+    public func onUserDelete(channelName: String, user: RoomPresenceInfo) {
         guard let info = interactionService.interactionInfo,
               info.type == .pk,
               info.userId == user.ownerId else { return }
@@ -342,7 +342,7 @@ extension PKService: RoomPresenceProtocol {
                                                    completion: nil)
     }
     
-    public func onUserError(error: NSError) {
+    public func onUserError(channelName: String, error: NSError) {
         
     }
 }

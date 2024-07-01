@@ -24,9 +24,9 @@ import io.agora.scene.showTo1v1.CallRole
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
-import io.agora.scene.showTo1v1.audio.AudioScenarioType
-import io.agora.scene.showTo1v1.audio.SceneType
-import io.agora.scene.showTo1v1.callapi.*
+import io.agora.audioscenarioapi.AudioScenarioType
+import io.agora.audioscenarioapi.SceneType
+import io.agora.onetoone.*
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListActivityBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
@@ -34,9 +34,9 @@ import io.agora.scene.showTo1v1.ui.dialog.CallDialog
 import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
 import io.agora.scene.showTo1v1.ui.fragment.RoomListFragment
 import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
-import io.agora.scene.showTo1v1.videoloaderapi.AGSlicingType
-import io.agora.scene.showTo1v1.videoloaderapi.OnPageScrollEventHandler
-import io.agora.scene.showTo1v1.videoloaderapi.VideoLoader
+import io.agora.videoloaderapi.AGSlicingType
+import io.agora.videoloaderapi.OnPageScrollEventHandler
+import io.agora.videoloaderapi.VideoLoader
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 
@@ -131,8 +131,14 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         binding.smartRefreshLayout.setOnRefreshListener {
             mShowTo1v1Manger.renewTokens {
                 if (it) {
-                    mShowTo1v1Manger.setup(this)
-                    fetchRoomList()
+                    mShowTo1v1Manger.setup(this) { e ->
+                        if (e == null) {
+                            fetchRoomList()
+                        } else {
+                            ToastUtils.showToast(getString(R.string.show_to1v1_room_list_refreshed, e.msg))
+                            binding.smartRefreshLayout.finishRefresh()
+                        }
+                    }
                 } else {
                     ToastUtils.showToast(getString(R.string.show_to1v1_room_list_refreshed, "fetch token failed!"))
                     binding.smartRefreshLayout.finishRefresh()
@@ -182,6 +188,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 return mVpFragments[position]?.initAnchorVideoView(info)
             }
         }
+        onPageScrollEventHandler?.muteAudio()
 
         val list = ArrayList<VideoLoader.RoomInfo>()
         mRoomInfoList.forEach {

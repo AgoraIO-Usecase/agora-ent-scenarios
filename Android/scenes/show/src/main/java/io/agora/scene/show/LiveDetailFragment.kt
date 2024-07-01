@@ -47,9 +47,9 @@ import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.show.audio.AudioScenarioApi
-import io.agora.scene.show.audio.AudioScenarioType
-import io.agora.scene.show.audio.SceneType
+import io.agora.audioscenarioapi.AudioScenarioApi
+import io.agora.audioscenarioapi.AudioScenarioType
+import io.agora.audioscenarioapi.SceneType
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLiveDetailFragmentBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
@@ -87,6 +87,7 @@ import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import io.agora.videoloaderapi.OnPageScrollEventHandler
 import io.agora.videoloaderapi.VideoLoader
+import io.agora.videoloaderapi.VideoLoaderImpl
 import org.json.JSONException
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -239,7 +240,6 @@ class LiveDetailFragment : Fragment() {
         ShowLogger.d(TAG, "Fragment PageLoad start load, roomId=${mRoomInfo.roomId}")
         isPageLoaded = true
         mBackPressedCallback.isEnabled = true
-        subscribeMediaTime = SystemClock.elapsedRealtime()
         if (mRoomInfo.isRobotRoom()) {
             initRtcEngine()
             initServiceWithJoinRoom()
@@ -724,7 +724,7 @@ class LiveDetailFragment : Fragment() {
         } else {
             // TODO
             topBinding.tvQuickStartTime.text =
-                getString(R.string.show_statistic_quick_start_time, quickStartTime.toString())
+                getString(R.string.show_statistic_quick_start_time, (mRtcVideoLoaderApi as VideoLoaderImpl).getProfiler(mRoomInfo.roomId, mRoomInfo.ownerId.toInt()).perceivedCost.toString())
         }
         // 机型等级
         topBinding.tvStatisticDeviceGrade.isVisible = true
@@ -1162,7 +1162,6 @@ class LiveDetailFragment : Fragment() {
                 view.isEnabled = false
                 mService.cancelMicSeatApply(
                     mRoomInfo.roomId,
-                    apply?.userId ?: "",
                     success = {
                         view.isEnabled = true
                     },
@@ -1694,165 +1693,156 @@ class LiveDetailFragment : Fragment() {
 
     //================== RTC Operation ===================
 
-    private var quickStartTime = 0L
-    private var subscribeMediaTime = 0L
-    private fun initRtcEngine() {
-        val eventListener = object : IRtcEngineEventHandler() {
-            override fun onUserOffline(uid: Int, reason: Int) {
-                super.onUserOffline(uid, reason)
-                if (interactionInfo != null && interactionInfo!!.userId == uid.toString() && interactionInfo!!.interactStatus == ShowInteractionStatus.pking) {
-                    mService.stopInteraction(mRoomInfo.roomId)
-                }
+    private val eventListener = object : IRtcEngineEventHandler() {
+        override fun onUserOffline(uid: Int, reason: Int) {
+            super.onUserOffline(uid, reason)
+            if (interactionInfo != null && interactionInfo!!.userId == uid.toString() && interactionInfo!!.interactStatus == ShowInteractionStatus.pking) {
+                mService.stopInteraction(mRoomInfo.roomId)
             }
+        }
 
-            override fun onLocalVideoStateChanged(
-                source: Constants.VideoSourceType?,
-                state: Int,
-                error: Int
-            ) {
-                super.onLocalVideoStateChanged(source, state, error)
-                if (isRoomOwner) {
-                    isAudioOnlyMode = state == Constants.LOCAL_VIDEO_STREAM_STATE_STOPPED
-                }
+        override fun onLocalVideoStateChanged(
+            source: Constants.VideoSourceType?,
+            state: Int,
+            error: Int
+        ) {
+            super.onLocalVideoStateChanged(source, state, error)
+            if (isRoomOwner) {
+                isAudioOnlyMode = state == Constants.LOCAL_VIDEO_STREAM_STATE_STOPPED
             }
+        }
 
-            override fun onRemoteVideoStateChanged(
-                uid: Int,
-                state: Int,
-                reason: Int,
-                elapsed: Int
-            ) {
-                super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
-                if (uid == mRoomInfo.ownerId.toInt()) {
-                    isAudioOnlyMode = state == Constants.REMOTE_VIDEO_STATE_STOPPED
+        override fun onRemoteVideoStateChanged(
+            uid: Int,
+            state: Int,
+            reason: Int,
+            elapsed: Int
+        ) {
+            super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
+            if (uid == mRoomInfo.ownerId.toInt()) {
+                isAudioOnlyMode = state == Constants.REMOTE_VIDEO_STATE_STOPPED
 
-                    runOnUiThread {
-                        if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_MUTED) {
-                            enableComeBackSoonView(true)
-                        } else if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED) {
-                            enableComeBackSoonView(false)
-                        }
-                    }
-                }
-
-                if (state == Constants.REMOTE_VIDEO_STATE_DECODING
-                    && (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED || reason == Constants.REMOTE_VIDEO_STATE_REASON_LOCAL_UNMUTED)
-                ) {
-                    val durationFromSubscribe = SystemClock.elapsedRealtime() - subscribeMediaTime
-                    quickStartTime = durationFromSubscribe
-                }
-            }
-
-            override fun onRtcStats(stats: RtcStats) {
-                super.onRtcStats(stats)
                 runOnUiThread {
-                    refreshStatisticInfo(
-                        cpuAppUsage = stats.cpuAppUsage,
-                        cpuTotalUsage = stats.cpuTotalUsage,
-                    )
-                }
-            }
-
-            override fun onLocalVideoStats(
-                source: Constants.VideoSourceType,
-                stats: LocalVideoStats
-            ) {
-                super.onLocalVideoStats(source, stats)
-                runOnUiThread {
-                    refreshStatisticInfo(
-                        upBitrate = stats.sentBitrate,
-                        encodeFps = stats.encoderOutputFrameRate,
-                        upLossPackage = stats.txPacketLossRate,
-                        encodeVideoSize = Size(stats.encodedFrameWidth, stats.encodedFrameHeight),
-                        codecType = stats.codecType
-                    )
-                }
-            }
-
-            override fun onLocalAudioStats(stats: LocalAudioStats) {
-                super.onLocalAudioStats(stats)
-                runOnUiThread {
-                    refreshStatisticInfo(
-                        audioBitrate = stats.sentBitrate,
-                        audioLossPackage = stats.txPacketLossRate
-                    )
-                }
-            }
-
-            override fun onRemoteVideoStats(stats: RemoteVideoStats) {
-                super.onRemoteVideoStats(stats)
-                val isLinkingAudience =
-                    isRoomOwner && isLinking() && stats.uid.toString() == interactionInfo?.userId
-                if (stats.uid == mRoomInfo.ownerId.toInt() || isLinkingAudience) {
-                    runOnUiThread {
-                        refreshStatisticInfo(
-                            downBitrate = stats.receivedBitrate,
-                            receiveFPS = stats.decoderOutputFrameRate,
-                            downLossPackage = stats.packetLossRate,
-                            receiveVideoSize = Size(stats.width, stats.height),
-                            downDelay = stats.delay
-                        )
-                    }
-                }
-            }
-
-            override fun onRemoteAudioStats(stats: RemoteAudioStats) {
-                super.onRemoteAudioStats(stats)
-                // 连麦观众
-                val isLinkingAudience =
-                    isRoomOwner && isLinking() && stats.uid.toString() == interactionInfo?.userId
-                if (stats.uid == mRoomInfo.ownerId.toInt() || isLinkingAudience) {
-                    runOnUiThread {
-                        refreshStatisticInfo(
-                            audioBitrate = stats.receivedBitrate,
-                            audioLossPackage = stats.audioLossRate
-                        )
-                    }
-                }
-            }
-
-            override fun onUplinkNetworkInfoUpdated(info: UplinkNetworkInfo) {
-                super.onUplinkNetworkInfoUpdated(info)
-                runOnUiThread {
-                    refreshStatisticInfo(
-                        upLinkBps = info.video_encoder_target_bitrate_bps
-                    )
-                }
-            }
-
-            override fun onDownlinkNetworkInfoUpdated(info: DownlinkNetworkInfo) {
-                super.onDownlinkNetworkInfoUpdated(info)
-                runOnUiThread {
-                    refreshStatisticInfo(
-                        downLinkBps = info.bandwidth_estimation_bps
-                    )
-                }
-            }
-
-            override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
-                super.onJoinChannelSuccess(channel, uid, elapsed)
-                enableContentInspectEx()
-            }
-
-            override fun onFirstRemoteVideoFrame(uid: Int, width: Int, height: Int, elapsed: Int) {
-                super.onFirstRemoteVideoFrame(uid, width, height, elapsed)
-                if (interactionInfo?.userId == uid.toString()) {
-                    if (linkStartTime != 0L) {
-                        ShowLogger.d(
-                            TAG,
-                            "Interaction user first video frame from host accept linking: ${TimeUtils.currentTimeMillis() - linkStartTime}"
-                        )
-                        linkStartTime = 0L
-                    } else {
-                        ShowLogger.d(
-                            TAG,
-                            "Interaction user first video frame from user accept linking: ${TimeUtils.currentTimeMillis() - (interactionInfo?.createdAt?.toLong() ?: 0L)}"
-                        )
+                    if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_MUTED) {
+                        enableComeBackSoonView(true)
+                    } else if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED) {
+                        enableComeBackSoonView(false)
                     }
                 }
             }
         }
 
+        override fun onRtcStats(stats: RtcStats) {
+            super.onRtcStats(stats)
+            runOnUiThread {
+                refreshStatisticInfo(
+                    cpuAppUsage = stats.cpuAppUsage,
+                    cpuTotalUsage = stats.cpuTotalUsage,
+                )
+            }
+        }
+
+        override fun onLocalVideoStats(
+            source: Constants.VideoSourceType,
+            stats: LocalVideoStats
+        ) {
+            super.onLocalVideoStats(source, stats)
+            runOnUiThread {
+                refreshStatisticInfo(
+                    upBitrate = stats.sentBitrate,
+                    encodeFps = stats.encoderOutputFrameRate,
+                    upLossPackage = stats.txPacketLossRate,
+                    encodeVideoSize = Size(stats.encodedFrameWidth, stats.encodedFrameHeight),
+                    codecType = stats.codecType
+                )
+            }
+        }
+
+        override fun onLocalAudioStats(stats: LocalAudioStats) {
+            super.onLocalAudioStats(stats)
+            runOnUiThread {
+                refreshStatisticInfo(
+                    audioBitrate = stats.sentBitrate,
+                    audioLossPackage = stats.txPacketLossRate
+                )
+            }
+        }
+
+        override fun onRemoteVideoStats(stats: RemoteVideoStats) {
+            super.onRemoteVideoStats(stats)
+            val isLinkingAudience =
+                isRoomOwner && isLinking() && stats.uid.toString() == interactionInfo?.userId
+            if (stats.uid == mRoomInfo.ownerId.toInt() || isLinkingAudience) {
+                runOnUiThread {
+                    refreshStatisticInfo(
+                        downBitrate = stats.receivedBitrate,
+                        receiveFPS = stats.decoderOutputFrameRate,
+                        downLossPackage = stats.packetLossRate,
+                        receiveVideoSize = Size(stats.width, stats.height),
+                        downDelay = stats.delay
+                    )
+                }
+            }
+        }
+
+        override fun onRemoteAudioStats(stats: RemoteAudioStats) {
+            super.onRemoteAudioStats(stats)
+            // 连麦观众
+            val isLinkingAudience =
+                isRoomOwner && isLinking() && stats.uid.toString() == interactionInfo?.userId
+            if (stats.uid == mRoomInfo.ownerId.toInt() || isLinkingAudience) {
+                runOnUiThread {
+                    refreshStatisticInfo(
+                        audioBitrate = stats.receivedBitrate,
+                        audioLossPackage = stats.audioLossRate
+                    )
+                }
+            }
+        }
+
+        override fun onUplinkNetworkInfoUpdated(info: UplinkNetworkInfo) {
+            super.onUplinkNetworkInfoUpdated(info)
+            runOnUiThread {
+                refreshStatisticInfo(
+                    upLinkBps = info.video_encoder_target_bitrate_bps
+                )
+            }
+        }
+
+        override fun onDownlinkNetworkInfoUpdated(info: DownlinkNetworkInfo) {
+            super.onDownlinkNetworkInfoUpdated(info)
+            runOnUiThread {
+                refreshStatisticInfo(
+                    downLinkBps = info.bandwidth_estimation_bps
+                )
+            }
+        }
+
+        override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
+            super.onJoinChannelSuccess(channel, uid, elapsed)
+            enableContentInspectEx()
+        }
+
+        override fun onFirstRemoteVideoFrame(uid: Int, width: Int, height: Int, elapsed: Int) {
+            super.onFirstRemoteVideoFrame(uid, width, height, elapsed)
+            if (interactionInfo?.userId == uid.toString()) {
+                if (linkStartTime != 0L) {
+                    ShowLogger.d(
+                        TAG,
+                        "Interaction user first video frame from host accept linking: ${TimeUtils.currentTimeMillis() - linkStartTime}"
+                    )
+                    linkStartTime = 0L
+                } else {
+                    ShowLogger.d(
+                        TAG,
+                        "Interaction user first video frame from user accept linking: ${TimeUtils.currentTimeMillis() - (interactionInfo?.createdAt?.toLong() ?: 0L)}"
+                    )
+                }
+            }
+        }
+    }
+
+    private fun initRtcEngine() {
         if (activity is LiveDetailActivity) {
             (activity as LiveDetailActivity).toggleSelfVideo(
                 isRoomOwner || isMeLinking(),
@@ -1865,7 +1855,6 @@ class LiveDetailFragment : Fragment() {
                 isRoomOwner || isMeLinking(),
                 callback = {
                     // nothing
-                    scenarioApi.initialize()
                     if (isRoomOwner) {
                         scenarioApi.setAudioScenario(SceneType.Show, AudioScenarioType.Show_Host)
                     } else if (isMeLinking()) {
@@ -1995,6 +1984,8 @@ class LiveDetailFragment : Fragment() {
             }
             mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CONVERSION_OFF)
             mRtcEngine.setAudioEffectPreset(Constants.AUDIO_EFFECT_OFF)
+        } else {
+            mRtcEngine.removeHandlerEx(eventListener, mMainRtcConnection)
         }
         return true
     }

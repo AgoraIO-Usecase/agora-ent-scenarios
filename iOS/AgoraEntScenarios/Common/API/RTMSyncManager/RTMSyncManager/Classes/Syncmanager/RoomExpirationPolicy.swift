@@ -14,4 +14,11 @@ public class RoomExpirationPolicy: NSObject {
     
     // 是否和房主离线关联，true: 房主不在线则销毁房间，false: 房主不在线不销毁房间
     public var isAssociatedWithOwnerOffline: Bool = true
+    
+    public static func defaultPolicy() -> RoomExpirationPolicy {
+        let policy = RoomExpirationPolicy()
+        policy.expirationTime = 20 * 60 * 1000
+        
+        return policy
+    }
 }

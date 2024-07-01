@@ -24,6 +24,16 @@ include ':common:base'
 include ':common:ui-widget'
 
 /*
+ * 场景化 API
+ */
+include ':common:scenario-api:lib_ktvapi'
+include ':common:scenario-api:lib_videoloaderapi'
+include ':common:scenario-api:lib_callapi'
+include ':common:scenario-api:lib_audioscenarioapi'
+
+include ':RTMSyncManager'
+
+/*
  * 在线K歌房
  */
 include ':scenes:ktv'
@@ -63,8 +73,6 @@ include ':scenes:show:aars:beauty_sensetime:SenseArSourceManager'
 include ':scenes:show:aars:beauty_sensetime:STMobileJNI'
 include ':scenes:show:aars:beauty_sensetime:HardwareBuffer'
 include ':scenes:show:aars:beauty_bytedance:EffectAAR'
-
-include ':RTMSyncManager'
 
 /*
  * 1V1私密房

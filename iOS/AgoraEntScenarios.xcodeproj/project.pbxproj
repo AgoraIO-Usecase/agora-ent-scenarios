@@ -22,6 +22,7 @@
 		DD1F535F2B9FF7C1009E4287 /* FUDynmicResourceConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = DD1F535E2B9FF7C1009E4287 /* FUDynmicResourceConfig.m */; };
 		DD1F53652BA01D9F009E4287 /* fu_authpack_reader.c in Sources */ = {isa = PBXBuildFile; fileRef = DD1F53642BA01D9F009E4287 /* fu_authpack_reader.c */; };
 		DD227ECA2BE9CE4F00013A18 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DD227EC92BE9CE4F00013A18 /* PrivacyInfo.xcprivacy */; };
+		DD2A03172C2BBD5400E46FAD /* ShowRoomOwnerExpiredView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A03162C2BBD5400E46FAD /* ShowRoomOwnerExpiredView.swift */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
 		DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */; };
 		DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DD2A43D028FFCEE7004CEDCF /* Main.storyboard */; };
@@ -769,6 +770,7 @@
 		DD1F53642BA01D9F009E4287 /* fu_authpack_reader.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = fu_authpack_reader.c; sourceTree = "<group>"; };
 		DD220BC1295B340A00F57F30 /* MenuUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuUtils.h; sourceTree = "<group>"; };
 		DD227EC92BE9CE4F00013A18 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		DD2A03162C2BBD5400E46FAD /* ShowRoomOwnerExpiredView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowRoomOwnerExpiredView.swift; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -2032,6 +2034,7 @@
 		DD36102629B70CDC00CE7984 /* Alert */ = {
 			isa = PBXGroup;
 			children = (
+				DD2A03162C2BBD5400E46FAD /* ShowRoomOwnerExpiredView.swift */,
 				DD36102729B70CDC00CE7984 /* ShowReceiveFinishView.swift */,
 				DD36102829B70CDC00CE7984 /* ShowReceivePKView.swift */,
 			);
@@ -4879,6 +4882,7 @@
 				E301BD732AF4CAFF0089A79C /* VLDropOnLineView.m in Sources */,
 				DD36108E29B70CDC00CE7984 /* ShowBeautySettingVC.swift in Sources */,
 				DD619AAB29E3E247008F63E4 /* SABaseNavigationView.swift in Sources */,
+				DD2A03172C2BBD5400E46FAD /* ShowRoomOwnerExpiredView.swift in Sources */,
 				DD3610C529B70CDC00CE7984 /* ShowPKInviteView.swift in Sources */,
 				DD9EBFEC2AD5512400B4551F /* VoiceMusicPlayingView.swift in Sources */,
 				E716851D2AE2285B00C2915C /* VLDiscoveryModel.swift in Sources */,

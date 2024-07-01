@@ -77,8 +77,21 @@ public class AUIScene: NSObject {
         respDelegates.remove(delegate)
     }
     
+    
+    public func create(createTime: Int64, 
+                       payload: [String: Any]?,
+                       completion:@escaping (NSError?)->()) {
+        create(createTime: createTime,
+               ownerId: AUIRoomContext.shared.currentUserInfo.userId,
+               payload: payload,
+               completion: completion)
+    }
+    
     //TODO: 是否需要像UIKit一样传入一个房间信息对象，还是这个对象业务上自己创建map collection来写入
-    public func create(createTime: Int64, payload: [String: Any]?, completion:@escaping (NSError?)->()) {
+    public func create(createTime: Int64, 
+                       ownerId: String,
+                       payload: [String: Any]?,
+                       completion:@escaping (NSError?)->()) {
         aui_info("create[\(channelName)] with payload \(payload ?? [:])", tag: kSceneTag)
         
         guard rtmManager.isLogin else {
@@ -86,7 +99,7 @@ public class AUIScene: NSObject {
             completion(NSError.auiError("create fail! not login"))
             return
         }
-        let ownerId = AUIRoomContext.shared.currentUserInfo.userId
+        
         var roomInfo = [
             kRoomInfoRoomId: channelName,
             kRoomInfoRoomOwnerId: ownerId,
