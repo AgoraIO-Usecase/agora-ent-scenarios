@@ -10,9 +10,9 @@ Pod::Spec.new do |s|
    s.source        = { :http => 'https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/release/sdk/AgoraRtm2.2.0.zip'}
    
    s.prepare_command = <<-CMD
-       curl -L -o resource.zip https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/release/sdk/AgoraRtm2.2.0.zip
-       unzip resource.zip -d libs
-       rm resource.zip
+       curl -L -o rtmSDKResource.zip https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/release/sdk/AgoraRtm2.2.0.zip
+       unzip rtmSDKResource.zip -d libs
+       rm rtmSDKResource.zip
    CMD
 
    s.vendored_frameworks = 'libs/AgoraRtmKit.xcframework'
