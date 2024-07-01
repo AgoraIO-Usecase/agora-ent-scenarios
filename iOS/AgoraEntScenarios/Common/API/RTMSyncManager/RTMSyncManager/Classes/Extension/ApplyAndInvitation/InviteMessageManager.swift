@@ -20,11 +20,12 @@ import Foundation
 @objc public class InviteMessageInfo: NSObject, Codable {
     public var id: String = UUID().uuidString
     public var key: String = ""
+    public var channelName: String = ""
     public var publisherId: String = ""
     public var content: String = ""
     
     enum CodingKeys: String, CodingKey {
-        case id, key, publisherId, content
+        case id, key, channelName, publisherId, content
     }
 }
 
@@ -92,15 +93,17 @@ extension InviteMessageManager {
     
     public func sendMessage(content: String,
                             userId: String,
+                            channelName: String? = nil,
                             completion: ((NSError?)-> ())?) {
         let model = InviteMessageInfo()
         model.key = key
+        model.channelName = channelName ?? self.channelName
         model.publisherId = AUIRoomContext.shared.currentUserInfo.userId
         model.content = content
         let messageStr = encodeModelToJsonStr(model) ?? ""
         aui_info("sendMessage userId: \(userId) content: \(content)", tag: "InviteMessageManager")
         rtmManager.publish(userId: userId,
-                           channelName: channelName,
+                           channelName: model.channelName,
                            message: messageStr) { err in
             aui_info("sendMessage userId: \(userId) completion: \(err?.localizedDescription ?? "success")", tag: "InviteMessageManager")
             if err == nil {
@@ -156,7 +159,8 @@ extension InviteMessageManager: AUIRtmUserProxyDelegate {
 extension InviteMessageManager: AUIRtmMessageProxyDelegate {
     public func onMessageReceive(publisher: String, channelName: String, message: String) {
         guard let messageInfo: InviteMessageInfo = decodeModel(jsonStr: message),
-              key == messageInfo.key else {
+              key == messageInfo.key,
+              self.channelName == messageInfo.channelName else {
             return
         }
         aui_info("onMessageReceive message: \(message)", tag: "InviteMessageManager")
