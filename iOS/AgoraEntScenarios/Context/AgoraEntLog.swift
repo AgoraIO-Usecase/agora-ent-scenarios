@@ -153,9 +153,9 @@ public func agoraDoMainThreadTask(_ task: (()->())?) {
         let zipStart = DispatchTime.now()
         print("[AgoraEntLog] autoUploadLog: func start t:\(zipStart)")
         DispatchQueue.global().async {
-//            guard AppContext.shared.sceneConfig?.logUpload == 1 else {
-//                return
-//            }
+            guard AppContext.shared.sceneConfig?.logUpload == 1 else {
+                return
+            }
             print("[AgoraEntLog] autoUploadLog: zip start t:\(DispatchTime.now())")
             AgoraEntLog.zipSceneLog(scene: scene, completion: { str, err in
                 print("[AgoraEntLog] autoUploadLog: zip end cost: \(zipStart.distance(to: DispatchTime.now()))")
