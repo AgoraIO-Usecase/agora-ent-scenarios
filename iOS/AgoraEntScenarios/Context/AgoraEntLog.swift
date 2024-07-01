@@ -150,25 +150,33 @@ public func agoraDoMainThreadTask(_ task: (()->())?) {
     }
     
     @objc public static func autoUploadLog(scene: String) {
-        guard AppContext.shared.sceneConfig?.logUpload == 1 else {
-            return
-        }
-        AgoraEntLog.zipSceneLog(scene: scene, completion: { str, err in
-            guard let filePath = str, let data = try? Data.init(contentsOf: URL(fileURLWithPath: filePath)) else {
-                return
-            }
-            let req = AUIUploadNetworkModel()
-            req.interfaceName = "/api-login/upload/log"
-            req.fileData = data
-            req.name = "file"
-            req.mimeType = "application/zip"
-            req.fileName = URL(fileURLWithPath: filePath).lastPathComponent
-            req.upload { progress in
-                
-            } completion: { err, content in
-                if let e = err {
+        let zipStart = DispatchTime.now()
+        print("[AgoraEntLog] autoUploadLog: func start t:\(zipStart)")
+        DispatchQueue.global().async {
+//            guard AppContext.shared.sceneConfig?.logUpload == 1 else {
+//                return
+//            }
+            print("[AgoraEntLog] autoUploadLog: zip start t:\(DispatchTime.now())")
+            AgoraEntLog.zipSceneLog(scene: scene, completion: { str, err in
+                print("[AgoraEntLog] autoUploadLog: zip end cost: \(zipStart.distance(to: DispatchTime.now()))")
+                guard let filePath = str, let data = try? Data.init(contentsOf: URL(fileURLWithPath: filePath)) else {
+                    return
                 }
-            }
-        })
+                print("[AgoraEntLog] autoUploadLog: upload start t:\(DispatchTime.now())")
+                let req = AUIUploadNetworkModel()
+                req.interfaceName = "/api-login/upload/log"
+                req.fileData = data
+                req.name = "file"
+                req.mimeType = "application/zip"
+                req.fileName = URL(fileURLWithPath: filePath).lastPathComponent
+                req.upload { progress in
+                    
+                } completion: { err, content in
+                    print("[AgoraEntLog] autoUploadLog: upload end cost:\(zipStart.distance(to: DispatchTime.now())) e: \(err?.localizedDescription)")
+                    if let e = err {
+                    }
+                }
+            })
+        }
     }
 }
