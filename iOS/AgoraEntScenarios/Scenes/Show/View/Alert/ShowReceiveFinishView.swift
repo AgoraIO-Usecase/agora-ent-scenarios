@@ -21,6 +21,12 @@ class ShowReceiveFinishView: UIView {
             headLabel.text = headName
         }
     }
+    
+    var title: String? {
+        didSet {
+            titleLabel.text = title ?? "show_alert_live_finish_title".show_localized
+        }
+    }
 
     var headImg: String? {
         didSet {

@@ -41,48 +41,19 @@ public class ShowLogger: NSObject {
 }
 
 extension AppContext {
-    static private var _showServiceImpMap: [String: ShowSyncManagerServiceImp] = [String: ShowSyncManagerServiceImp]()
-    static func showServiceImp(_ roomId: String) -> ShowServiceProtocol? {
-        let showServiceImp = _showServiceImpMap[roomId]
-        guard let showServiceImp = showServiceImp else {
-            var serviceImp: ShowServiceProtocol? = _showServiceImpMap[roomId]
-            if let imp = serviceImp {return imp}
-            if roomId.count == 6 {
-                serviceImp = ShowSyncManagerServiceImp()
-            } else {
-                serviceImp = ShowRobotSyncManagerServiceImp()
-            }
-            _showServiceImpMap[roomId] = serviceImp as? ShowSyncManagerServiceImp
-            return serviceImp!
+    static private var _showServiceImp: ShowSyncManagerServiceImp?
+    static func showServiceImp() -> ShowServiceProtocol? {
+        if let service = _showServiceImp {
+            return service
         }
-        return showServiceImp
-    }
-    
-    static func unloadShowServiceImp(_ roomId: String) {
-        _showServiceImpMap[roomId] = nil
+        
+        _showServiceImp = ShowSyncManagerServiceImp()
+        
+        return _showServiceImp
     }
     
     static func unloadShowServiceImp() {
-        _showServiceImpMap = [String: ShowSyncManagerServiceImp]()
-        SyncUtilsWrapper.cleanScene()
-    }
-    
-    static func unloadShowServiceImpExcludeRoomList() {
-        _showServiceImpMap.forEach { (key, value) in
-            if key.count > 0 {
-                _showServiceImpMap.removeValue(forKey: key)
-            }
-        }
-        SyncUtilsWrapper.cleanScene()
-    }
-    
-    var showRoomList: [ShowRoomListModel]? {
-        set {
-            self.extDic[kShowRoomListKey] = newValue
-        }
-        get {
-            return self.extDic[kShowRoomListKey] as? [ShowRoomListModel]
-        }
+        _showServiceImp = nil
     }
     
     public var rtcToken: String? {

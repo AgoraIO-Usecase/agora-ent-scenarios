@@ -12,7 +12,7 @@ import io.agora.rtc2.RtcConnection
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
-import io.agora.scene.showTo1v1.callapi.CallStateType
+import io.agora.onetoone.CallStateType
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1DashboardFragmentBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 
