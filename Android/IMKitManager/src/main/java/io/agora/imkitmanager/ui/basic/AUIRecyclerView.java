@@ -11,11 +11,17 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.jetbrains.annotations.NotNull;
+
 import io.agora.imkitmanager.R;
 
 public class AUIRecyclerView extends RecyclerView {
     private AUISpaceItemDecoration spaceItemDecoration;
 
+    private int spaceHorizontal;
+    private int spaceVertical;
+    private int orientation;
+    private Drawable listDivider;
     //  0:default， 1 intercept， 2 non intercept
     private int interceptTouchEventValue;
 
@@ -31,13 +37,7 @@ public class AUIRecyclerView extends RecyclerView {
         super(context, attrs, defStyleAttr);
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.AUIRecyclerView, defStyleAttr, 0);
-        int spaceHorizontal = typedArray.getDimensionPixelOffset(R.styleable.AUIRecyclerView_aui_spaceHorizontal, 0);
-        int spaceVertical = typedArray.getDimensionPixelOffset(R.styleable.AUIRecyclerView_aui_spaceVertical, 0);
-        int orientation = typedArray.getInt(R.styleable.AUIRecyclerView_android_orientation, 0); // 0: h; 1: v
-        interceptTouchEventValue = typedArray.getInt(R.styleable.AUIRecyclerView_aui_interceptTouchEvent, 0);
-
-        Drawable listDivider = typedArray.getDrawable(R.styleable.AUIRecyclerView_aui_listDivider);
-        typedArray.recycle();
+        initAtts(typedArray);
 
         spaceItemDecoration = new AUISpaceItemDecoration(spaceHorizontal, spaceVertical);
         addItemDecoration(spaceItemDecoration);
@@ -47,6 +47,31 @@ public class AUIRecyclerView extends RecyclerView {
             divider.setDrawable(listDivider);
             addItemDecoration(divider);
         }
+    }
+
+    private void initAtts(TypedArray typedArray) {
+        spaceHorizontal = typedArray.getDimensionPixelOffset(R.styleable.AUIRecyclerView_aui_spaceHorizontal, 0);
+        spaceVertical = typedArray.getDimensionPixelOffset(R.styleable.AUIRecyclerView_aui_spaceVertical, 0);
+        orientation = typedArray.getInt(R.styleable.AUIRecyclerView_android_orientation, 0); // 0: h; 1: v
+        interceptTouchEventValue = typedArray.getInt(R.styleable.AUIRecyclerView_aui_interceptTouchEvent, 0);
+
+        listDivider = typedArray.getDrawable(R.styleable.AUIRecyclerView_aui_listDivider);
+        typedArray.recycle();
+    }
+
+    public void setStyledAttributes(Context context, @Nullable AttributeSet attrs) {
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.AUIRecyclerView, 0, 0);
+        initAtts(typedArray);
+
+        spaceItemDecoration = new AUISpaceItemDecoration(spaceHorizontal, spaceVertical);
+        addItemDecoration(spaceItemDecoration);
+
+        if (listDivider != null) {
+            DividerItemDecoration divider = new DividerItemDecoration(context, orientation);
+            divider.setDrawable(listDivider);
+            addItemDecoration(divider);
+        }
+        invalidate();
     }
 
     public void setSpaceHorizontal(int space) {

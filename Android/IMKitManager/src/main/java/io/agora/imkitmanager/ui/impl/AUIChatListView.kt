@@ -14,12 +14,13 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
-import io.agora.imkitmanager.ui.listener.AUIChatListItemClickListener
 import io.agora.imkitmanager.R
 import io.agora.imkitmanager.databinding.AuiChatListLayoutBinding
 import io.agora.imkitmanager.ui.AUIChatInfo
 import io.agora.imkitmanager.ui.IAUIChatListView
+import io.agora.imkitmanager.ui.listener.AUIChatListItemClickListener
 import io.agora.imkitmanager.utils.DeviceTools
+
 
 class AUIChatListView : RelativeLayout, IAUIChatListView {
     private val mViewBinding = AuiChatListLayoutBinding.inflate(LayoutInflater.from(context))
@@ -29,22 +30,18 @@ class AUIChatListView : RelativeLayout, IAUIChatListView {
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr
-    ) {
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
         addView(mViewBinding.root)
-        val themeTa = context.obtainStyledAttributes(attrs, R.styleable.AUIChatListView, defStyleAttr, 0)
-        val appearanceId = themeTa.getResourceId(R.styleable.AUIChatListView_aui_chatListView_appearance, 0)
-        themeTa.recycle()
+
         initListener()
-        initView(appearanceId)
+        initView(context, attrs)
     }
 
-    fun initView(appearanceId: Int) {
-        val typedArray = context.obtainStyledAttributes(appearanceId, R.styleable.AUIChatListView)
-        adapter = AUIChatListAdapter(context, typedArray)
+    private fun initView(context: Context, attrs: AttributeSet?) {
+        mViewBinding.listview.setStyledAttributes(context, attrs)
+
+        val typedArray2 = context.obtainStyledAttributes(attrs, R.styleable.AUIChatListView, 0, 0)
+        adapter = AUIChatListAdapter(context, typedArray2)
         val linearLayout = LinearLayoutManager(context)
         mViewBinding.listview.layoutManager = linearLayout
 

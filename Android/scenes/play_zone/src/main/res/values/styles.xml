@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="play_zone_widget_roundStyle">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
@@ -26,10 +27,13 @@
         <item name="android:layout">@layout/play_zone_alert_dialog_layout</item>
     </style>
 
-    <style name="play_zone_chatListView_style" parent="AUIChatListView.Appearance">
+    <style name="play_zone_chatListView_style">
         <item name="aui_barrage_normal_layout_bg">@drawable/play_zone_bg_live_message</item>
         <item name="aui_barrage_system_layout_bg">@drawable/play_zone_bg_live_message</item>
         <item name="aui_barrage_local_layout_bg">@drawable/play_zone_bg_live_message</item>
-        <item name="aui_chatListView_interceptTouchEvent">non_intercept</item>
+        <!--  列表子 item 事件拦截 -->
+        <item name="aui_barrage_interceptTouchEvent">non_intercept</item>
+        <!--  列表事件拦截 -->
+        <item name="aui_interceptTouchEvent">non_intercept</item>
     </style>
 </resources>

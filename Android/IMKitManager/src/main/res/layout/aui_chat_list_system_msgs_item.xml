@@ -1,41 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:theme="?attr/aui_chatListView_appearance"
-    android:background="?attr/aui_barrage_system_layout_bg"
-    android:gravity="center_vertical"
     android:layout_marginHorizontal="15dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
     android:paddingHorizontal="12dp"
     android:paddingVertical="9dp">
 
     <TextView
         android:id="@+id/name"
-        android:layout_marginStart="6dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="Stefano"
-        android:textStyle="bold"
+        android:layout_marginStart="6dp"
         android:textSize="14sp"
-        android:textColor="?attr/aui_barrage_system_title_TextColor" />
+        android:textStyle="bold"
+        tools:text="Stefano" />
 
     <TextView
         android:id="@+id/content"
-        android:layout_marginStart="4dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
         android:textSize="14sp"
         android:textStyle="bold"
-        tools:text="Joined"
-        android:textColor="?attr/aui_barrage_system_content_TextColor" />
+        tools:text="Joined" />
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/icon_system"
-        android:src="?attr/aui_barrage_system_endIcon_resource"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="12dp"
         android:layout_width="18dp"
-        android:layout_height="18dp"/>
+        android:layout_height="18dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="12dp" />
 </LinearLayout>
