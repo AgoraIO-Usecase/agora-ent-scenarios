@@ -1,12 +1,8 @@
 package io.agora.scene.playzone.live
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
-import android.text.SpannableStringBuilder
-import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -22,8 +18,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.request.RequestOptions
 import io.agora.imkitmanager.ui.AUIChatInfo
 import io.agora.rtc2.Constants
@@ -36,10 +30,8 @@ import io.agora.scene.playzone.PlayCenter
 import io.agora.scene.playzone.PlayLogger
 import io.agora.scene.playzone.R
 import io.agora.scene.playzone.databinding.PlayZoneActivityRoomGameLayoutBinding
-import io.agora.scene.playzone.databinding.PlayZoneItemLiveDetailMessageBinding
 import io.agora.scene.playzone.live.sub.QuickStartGameViewModel
 import io.agora.scene.playzone.service.PlayZoneParameters
-import io.agora.scene.playzone.service.api.PlayZoneMessage
 import io.agora.scene.playzone.widget.KeyboardStatusWatcher
 import io.agora.scene.playzone.widget.statusBarHeight
 import io.agora.scene.widget.dialog.PermissionLeakDialog
@@ -399,49 +391,5 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
 //        if (SceneConfigManager.logUpload) {
 //            LogUploader.uploadLog(LogUploader.SceneType.JOY)
 //        }
-    }
-
-    private class RoomMessageAdapter constructor(
-        private var mList: MutableList<PlayZoneMessage>,
-    ) : RecyclerView.Adapter<RoomMessageAdapter.ViewHolder?>() {
-
-        inner class ViewHolder(val binding: PlayZoneItemLiveDetailMessageBinding) :
-            RecyclerView.ViewHolder(binding.root)
-
-        fun insertLast(item: PlayZoneMessage) {
-            insert(itemCount, item)
-        }
-
-        fun insert(position: Int, item: PlayZoneMessage) {
-            var index = position
-            val itemCount = itemCount
-            if (index < 0) {
-                index = 0
-            }
-            if (index > itemCount) {
-                index = itemCount
-            }
-            mList.add(index, item)
-            notifyItemInserted(index)
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder = ViewHolder(
-            PlayZoneItemLiveDetailMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        )
-
-        override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
-            val playMessage: PlayZoneMessage = mList[position]
-            holder.binding.text.text = SpannableStringBuilder().append(
-                "${playMessage.userName}: ",
-                ForegroundColorSpan(Color.parseColor("#A6C4FF")),
-                SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE
-            ).append(
-                playMessage.message,
-                ForegroundColorSpan(Color.WHITE),
-                SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE
-            )
-        }
-
-        override fun getItemCount(): Int = mList.size
     }
 }

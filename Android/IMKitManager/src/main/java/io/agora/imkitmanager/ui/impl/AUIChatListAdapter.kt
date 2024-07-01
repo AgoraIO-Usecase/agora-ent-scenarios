@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import io.agora.imkitmanager.R
 import io.agora.imkitmanager.ui.AUIChatInfo
+import io.agora.imkitmanager.ui.AUIChatListInterceptType
 
 class AUIChatListAdapter(
     private val context: Context,
@@ -32,6 +33,7 @@ class AUIChatListAdapter(
     private var systemTitleColor: Int = 0
     private var systemContentColor: Int = 0
     private var localContentColor: Int = 0
+    private var interceptTouchEvent: Int = 0
     private lateinit var ownerId: String
 
     init {
@@ -63,6 +65,11 @@ class AUIChatListAdapter(
         localContentColor = typedArray.getColor(
             R.styleable.AUIChatListView_aui_barrage_local_content_TextColor,
             context.resources.getColor(R.color.aui_white)
+        )
+
+        interceptTouchEvent = typedArray.getInt(
+            R.styleable.AUIChatListView_aui_chatListView_interceptTouchEvent,
+            AUIChatListInterceptType.SUPER_INTERCEPT.type
         )
 
         typedArray.recycle()
@@ -131,8 +138,10 @@ class AUIChatListAdapter(
                 showLocalMsg(holder.content, s)
             }
         }
-        holder.itemView.setOnClickListener {
-            messageViewListener?.onItemClickListener(message)
+        if (interceptTouchEvent != AUIChatListInterceptType.NON_INTERCEPT.type) {
+            holder.itemView.setOnClickListener {
+                messageViewListener?.onItemClickListener(message)
+            }
         }
     }
 
