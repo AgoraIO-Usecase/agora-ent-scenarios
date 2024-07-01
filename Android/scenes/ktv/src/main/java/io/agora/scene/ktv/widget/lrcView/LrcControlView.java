@@ -43,7 +43,7 @@ import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
-import io.agora.scene.ktv.ktvapi.ILrcView;
+import io.agora.ktvapi.ILrcView;
 import io.agora.scene.ktv.service.ChosenSongInfo;
 import io.agora.scene.widget.basic.OutlineSpan;
 import io.agora.scene.widget.toast.CustomToast;

@@ -22,7 +22,7 @@ import io.agora.scene.cantata.BuildConfig
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataLayoutLrcControlViewBinding
 import io.agora.scene.cantata.databinding.CantataLayoutLrcPrepareBinding
-import io.agora.scene.cantata.ktvapi.ILrcView
+import io.agora.ktvapi.ILrcView
 import io.agora.scene.cantata.service.RoomSeatModel
 import io.agora.scene.cantata.service.RoomSelSongModel
 import io.agora.scene.cantata.widget.OnClickJackingListener

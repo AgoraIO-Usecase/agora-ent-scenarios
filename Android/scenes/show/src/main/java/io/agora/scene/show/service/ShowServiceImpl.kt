@@ -49,7 +49,7 @@ import io.agora.scene.show.service.rtmsync.setupExtensions
 import io.agora.scene.show.service.rtmsync.subscribeExConnectionState
 
 const val kRoomSceneId = "scene_show_5.0.0"
-const val kRoomPresenceChannelName = "9999999999"
+const val kRoomPresenceChannelName = "scene_show_5_0_0_9999999"
 const val kRobotUid = 2000000001
 val kRobotAvatars = listOf("https://download.shengwang.cn/demo/release/bot1.png")
 val kRobotVideoRoomIds = arrayListOf(2023004, 2023005, 2023006)
@@ -615,13 +615,12 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
 
     override fun cancelMicSeatApply(
         roomId: String,
-        userId: String,
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
         syncManager.getExApplyService(roomId)
             .cancelApply(
-                userId,
+                UserManager.getInstance().user.id.toString(),
                 success = {
                     ThreadManager.getInstance().runOnMainThread {
                         success?.invoke()

@@ -29,7 +29,7 @@ import Foundation
 }
 
 @objc public protocol ApplyServiceProtocol: NSObjectProtocol {
-    func onApplyListDidUpdate(list: [ApplyInfo])
+    func onApplyListDidUpdate(channelName: String, list: [ApplyInfo])
 }
 
 enum ApplyCmd: String {
@@ -65,7 +65,7 @@ public class ApplyService: NSObject {
             guard applyKey == observeKey else {return}
             let list: [ApplyInfo] = decodeModelArray(value.getList() ?? []) ?? []
             for element in self.respDelegates.allObjects {
-                element.onApplyListDidUpdate(list: list)
+                element.onApplyListDidUpdate(channelName: channelName, list: list)
             }
         }
         
@@ -104,6 +104,7 @@ extension ApplyService {
                                     value: value,
                                     filter: [["userId": userId]]) { err in
             aui_info("addApply userId: \(userId) completion: \(err?.localizedDescription ?? "success")", tag: "ApplyService")
+            completion?(err)
         }
     }
     
@@ -160,7 +161,6 @@ extension ApplyService {
     private func getApplyInfo(userId: String) -> ApplyInfo? {
         guard let scene = syncManager.getScene(channelName: channelName),
               let userInfo = scene.userService.userList.first(where: { $0.userId == userId }) else {
-            
             return nil
         }
         

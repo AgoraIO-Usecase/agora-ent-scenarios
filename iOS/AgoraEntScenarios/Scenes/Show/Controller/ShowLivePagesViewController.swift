@@ -66,7 +66,6 @@ class ShowLivePagesViewController: ViewController {
     deinit {
         ShowLogger.info("deinit-- ShowLivePagesViewController", context: kPagesVCTag)
         ShowAgoraKitManager.shared.leaveAllRoom()
-        AppContext.unloadShowServiceImpExcludeRoomList()
     }
     
     override func viewDidLoad() {
@@ -238,10 +237,15 @@ class ShowLivePagesSlicingDelegateHandler: AGCollectionSlicingDelegateHandler {
         
         let vc = ShowLiveViewController()
         vc.room = room
+        //count == 1时不会走willDisplay
+        if roomList?.count() ?? 0 <= 1 {
+            vc.loadingType = .joinedWithVideo
+        } else {
+            vc.loadingType = .prejoined
+        }
         vc.delegate = vcDelegate
         vc.view.frame = parentVC!.view.bounds
         vc.view.tag = kShowLiveRoomViewTag
-        vc.loadingType = .joinedWithVideo
         cell.contentView.addSubview(vc.view)
         parentVC!.addChild(vc)
         return cell

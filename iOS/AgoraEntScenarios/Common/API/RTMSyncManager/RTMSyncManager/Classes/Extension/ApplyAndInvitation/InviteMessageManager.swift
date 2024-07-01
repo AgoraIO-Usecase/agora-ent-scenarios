@@ -18,10 +18,10 @@ import Foundation
  */
 
 @objc public class InviteMessageInfo: NSObject, Codable {
-    var id: String = UUID().uuidString
-    var key: String = ""
-    var publisherId: String = ""
-    var content: String = ""
+    public var id: String = UUID().uuidString
+    public var key: String = ""
+    public var publisherId: String = ""
+    public var content: String = ""
     
     enum CodingKeys: String, CodingKey {
         case id, key, publisherId, content
@@ -29,7 +29,7 @@ import Foundation
 }
 
 @objc public protocol InviteMessageProtocol: NSObjectProtocol {
-    func onNewInviteDidReceived(message: InviteMessageInfo)
+    func onNewInviteDidReceived(channelName: String, message: InviteMessageInfo)
 }
 
 public class InviteMessageManager: NSObject {
@@ -71,7 +71,7 @@ public class InviteMessageManager: NSObject {
         messageList.append(msg)
         guard notify else {return}
         self.respDelegates.allObjects.forEach { delegate in
-            delegate.onNewInviteDidReceived(message: msg)
+            delegate.onNewInviteDidReceived(channelName: channelName, message: msg)
         }
     }
 }
