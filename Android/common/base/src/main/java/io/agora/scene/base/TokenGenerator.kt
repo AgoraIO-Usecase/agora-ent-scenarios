@@ -98,7 +98,7 @@ object TokenGenerator {
                 ?: throw RuntimeException("Fetch token error: httpCode=${execute.code}, httpMsg=${execute.message}, body is null")
             val bodyJobj = JSONObject(body.string())
             if (bodyJobj["code"] != 0) {
-                throw RuntimeException("Fetch token error: httpCode=${execute.code}, httpMsg=${execute.message}, reqCode=${bodyJobj["code"]}, reqMsg=${bodyJobj["message"]},")
+                throw RuntimeException("Fetch token error: httpCode=${execute.code}, httpMsg=${execute.message}, reqCode=${bodyJobj["code"]}, reqMsg=${bodyJobj["msg"]},")
             } else {
                 (bodyJobj["data"] as JSONObject)["token"] as String
             }

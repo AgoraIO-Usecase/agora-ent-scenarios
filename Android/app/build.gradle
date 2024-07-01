@@ -9,6 +9,7 @@ android {
 
     packagingOptions {
         pickFirst 'lib/*/libc++_shared.so'
+        pickFirst 'lib/*/libaosl.so'
     }
 
     lint {
@@ -50,6 +51,9 @@ dependencies {
     }
     if (isProjectLibrary(':scenes:joy')) {
         runtimeOnly project(':scenes:joy')
+    }
+    if (isProjectLibrary(':scenes:play_zone')) {
+        runtimeOnly project(':scenes:play_zone')
     }
 
     //glide 图片加载

@@ -41,6 +41,9 @@ object ScenesConstructor {
     // 弹幕玩法
     private const val joyGameClazz = "io.agora.scene.joy.create.RoomListActivity"
 
+    // 休闲游戏
+    private const val leisureGameClazz = "io.agora.scene.playzone.hall.PlayGameHallActivity"
+
     @JvmStatic
     fun buildScene(context: Context, sceneType: HomeScenesType): List<HomeSceneModel> {
         val subScenes = mutableListOf<HomeSceneModel>()
@@ -160,9 +163,19 @@ object ScenesConstructor {
                     HomeSceneModel(
                         scene = HomeSubScenes.Game_Joy,
                         clazzName = joyGameClazz,
-                        name = context.getString(R.string.app_home_scene_game),
+                        name = context.getString(R.string.app_home_scene_game_joy),
                         tip = context.getString(R.string.app_home_scene_game_joy_tips),
-                        background = R.drawable.bg_scene_live_show,
+                        background = R.drawable.bg_scene_game_joy,
+                        active = true
+                    )
+                )
+                subScenes.add(
+                    HomeSceneModel(
+                        scene = HomeSubScenes.Play_Zone,
+                        clazzName = leisureGameClazz,
+                        name = context.getString(R.string.app_home_scene_game_leisure),
+                        tip = context.getString(R.string.app_home_scene_game_leisure_tips),
+                        background = R.drawable.bg_scene_play_zone,
                         active = true
                     )
                 )

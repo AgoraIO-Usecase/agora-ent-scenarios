@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:theme="?attr/aui_chatListView_appearance"
+    android:background="?attr/aui_barrage_local_layout_bg"
+    android:gravity="center_vertical"
+    android:layout_marginHorizontal="15dp"
+    android:paddingVertical="9dp"
+    android:paddingHorizontal="12dp">
+
+    <TextView
+        android:id="@+id/content"
+        android:layout_marginStart="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        tools:text="xxx 加入游戏"
+        android:textColor="?attr/aui_barrage_local_content_TextColor" />
+</LinearLayout>

@@ -1,5 +1,6 @@
 package io.agora.rtmsyncmanager.service.collection
 
+import android.util.Log
 import org.json.JSONObject
 
 object AUICollectionUtils {
@@ -43,16 +44,15 @@ object AUICollectionUtils {
         }
         array.forEachIndexed { index, value ->
             filter.forEach { filterItem ->
-                var match = false
+                var match = 0
                 for (entry in filterItem) {
                     val k = entry.key
                     val v = entry.value
                     if(isMatchFilter(k, value, v)){
-                        match = true
-                        break
+                        match += 1
                     }
                 }
-                if(match){
+                if (match == filterItem.keys.size) {
                     indexes.add(index)
                     return@forEach
                 }
@@ -78,36 +78,40 @@ object AUICollectionUtils {
     }
 
 
-    fun calculateMap(
-        origMap: Map<String, Any>,
-        key: List<String>,
-        value: Int,
-        min: Int,
-        max: Int
-    ): Map<String, Any>? {
-        val retMap = HashMap(origMap)
-        if(key.size > 1){
+    @Throws(AUICollectionException::class)
+    fun calculateMap(origMap: Map<String, Any>,
+                     key: List<String>,
+                     value: Int,
+                     min: Int,
+                     max: Int): Map<String, Any> {
+        val _origMap = origMap.toMutableMap()
+        if (key.size > 1) {
             val curKey = key.firstOrNull() ?: ""
             val subKey = key.subList(1, key.size)
 
-            val subValue = retMap[curKey] as? Map<String, Any> ?: return null
-            val newMap = calculateMap(
-                subValue,
-                subKey,
-                value,
-                min,
-                max
-            ) ?: return null
-            retMap[curKey] = newMap
-            return retMap
+            val subValue = _origMap[curKey] as? MutableMap<String, Any>
+                ?: throw AUICollectionException.ErrorCode.calculateMapFail.toException()
+
+            val newMap: Map<String, Any> = try {
+                calculateMap(subValue, subKey, value, min, max)
+            } catch (e: AUICollectionException) {
+                throw e
+            }
+
+            _origMap[curKey] = newMap
+            return _origMap
         }
-        val curKey = key.firstOrNull() ?: return null
-        val subValue = retMap[curKey] as? Long ?: return null
+
+        val curKey = key.firstOrNull() ?: return emptyMap()
+        val subValue = _origMap[curKey] as? Long
+            ?: throw AUICollectionException.ErrorCode.calculateMapFail.toException()
+
         val curValue = subValue + value
-        if(curValue < min || curValue > max){
-            return null
+        if (curValue > max || curValue < min) {
+            throw AUICollectionException.ErrorCode.calculateMapOutOfRange.toException()
         }
-        retMap[curKey] = curValue
-        return retMap
+
+        _origMap[curKey] = curValue
+        return _origMap
     }
 }

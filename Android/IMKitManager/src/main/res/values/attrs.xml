@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AUIRecyclerView">
+        <attr name="aui_spaceHorizontal" format="dimension"/>
+        <attr name="aui_spaceVertical" format="dimension"/>
+        <attr name="aui_listDivider" format="reference"/>
+        <attr name="aui_interceptTouchEvent">
+            <enum name="super_intercept" value="0" />
+            <enum name="intercept" value="1" />
+            <enum name="non_intercept" value="2" />
+        </attr>
+        <attr name="android:orientation"/>
+    </declare-styleable>
+
+
+    <style name="AUIRecyclerView">
+        <item name="aui_spaceHorizontal">0dp</item>
+        <item name="aui_spaceVertical">0dp</item>
+        <item name="aui_listDivider">@null</item>
+        <item name="aui_interceptTouchEvent">super_intercept</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <!--================= 主题属性 =================-->
+    <attr name="aui_chatListView_appearance" format="reference"/>
+
+    <declare-styleable name="aui_SubtitleView">
+        <attr name="voice_customScrollSpeed">
+            <enum name="fast" value="9" />
+            <enum name="medium" value="6" />
+            <enum name="slow" value="3" />
+        </attr>
+        <attr name="voice_setSubtitleBgResource" format="reference"/>
+    </declare-styleable>
+
+
+    <declare-styleable name="AUIChatListView">
+        <attr name="aui_chatListView_appearance"/>
+
+        <!--    普通消息样式    -->
+        <attr name="aui_barrage_normal_title_tag_icon" format="reference"/>
+        <attr name="aui_barrage_normal_title_TextColor" format="reference|color"/>
+        <attr name="aui_barrage_normal_content_TextColor" format="reference|color"/>
+        <attr name="aui_barrage_normal_layout_bg" format="reference|color"/>
+        <!--    系统消息样式    -->
+        <attr name="aui_barrage_system_title_TextColor" format="reference|color"/>
+        <attr name="aui_barrage_system_content_TextColor" format="reference|color"/>
+        <attr name="aui_barrage_system_endIcon_resource" format="reference"/>
+        <attr name="aui_barrage_system_layout_bg" format="reference|color"/>
+        <!--    本地消息样式    -->
+        <attr name="aui_barrage_local_content_TextColor" format="reference|color"/>
+        <attr name="aui_barrage_local_layout_bg" format="reference|color"/>
+        <!--    聊天消息列表是否可以穿透    -->
+        <attr name="aui_chatListView_interceptTouchEvent">
+            <enum name="super_intercept" value="0" />
+            <enum name="intercept" value="1" />
+            <enum name="non_intercept" value="2" />
+        </attr>
+
+    </declare-styleable>
+</resources>
