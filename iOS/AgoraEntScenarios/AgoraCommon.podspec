@@ -53,7 +53,6 @@ TODO: Add long description of the pod here.
                     'Common/Extension/String+Extension.swift',
                     'Common/Extension/UIImage+Resize.swift',
                     'HomeMenu/Login/Model/VLLoginModel.*',
-                    'ThirdParty/QMUI/*',
                     'Common/Network/AUIError.*',
                     'Common/Utils/AESMacro.h',
                     'Common/Network/AgoraEntCommonLogger.*',
@@ -75,12 +74,12 @@ TODO: Add long description of the pod here.
                     'Common/UI/ToastView/AUiMoreDialog.*',
                     'Common/UI/Base/View/AttributedTextView.*',
                     'Common/UI/Base/View/KTVCreateRoomPresentView.swift',
+                    'ThirdParty/**/*.{h,m,swift}',
                     ]
                     
  s.resources = ['AgoraCommon/*.bundle']
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
- # s.dependency 'AgoraRtcEngine_Special_iOS'
  s.dependency 'SwiftyBeaver'
  s.dependency 'Bugly'
  s.dependency 'YYModel'
@@ -89,4 +88,6 @@ TODO: Add long description of the pod here.
  s.dependency 'AgoraSyncManager'
  s.dependency 'ZSwiftBaseLib'
  s.dependency 'SVProgressHUD'
+ s.dependency 'SSZipArchive'
+ 
 end

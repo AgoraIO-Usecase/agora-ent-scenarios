@@ -55,7 +55,7 @@ class BaseRoomViewController: UIViewController {
     
     deinit {
         callApi = nil
-        showTo1v1Print("deinit-- ShowTo1v1BaseRoomViewController")
+        ShowTo1v1Logger.info("deinit-- ShowTo1v1BaseRoomViewController")
     }
     
     override func viewDidLoad() {

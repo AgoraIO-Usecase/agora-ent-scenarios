@@ -101,7 +101,7 @@ class Pure1v1CallViewController: UIViewController {
     }()
     
     deinit {
-        pure1v1Print("deinit-- Pure1v1CallViewController")
+        Pure1v1Logger.info("deinit-- Pure1v1CallViewController")
     }
     
     override func viewDidLoad() {
@@ -258,7 +258,7 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
     }
     
     func onCallEventChanged(with event: CallEvent, eventReason: String?) {
-        pure1v1Print("onCallEventChanged event: \(event.rawValue) eventReason: '\(eventReason ?? "")'")
+        Pure1v1Logger.info("onCallEventChanged event: \(event.rawValue) eventReason: '\(eventReason ?? "")'")
         switch event {
         case .remoteLeft:
             _hangupAction()
@@ -271,11 +271,11 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
     func callDebugInfo(message: String, logLevel: CallLogLevel) {
         switch logLevel {
         case .normal:
-            pure1v1Print(message, context: "CallApi")
+            Pure1v1Logger.info(message, tag: "CallApi")
         case .warning:
-            pure1v1Warn(message, context: "CallApi")
+            Pure1v1Logger.info(message, tag: "CallApi")
         case .error:
-            pure1v1Error(message, context: "CallApi")
+            Pure1v1Logger.info(message, tag: "CallApi")
         }
     }
 }
@@ -283,11 +283,11 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
 
 extension Pure1v1CallViewController: AgoraRtcEngineDelegate {
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didAudioMuted muted: Bool, byUid uid: UInt) {
-        pure1v1Print("didAudioMuted[\(uid)] \(muted)")
+        Pure1v1Logger.info("didAudioMuted[\(uid)] \(muted)")
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didVideoMuted muted: Bool, byUid uid: UInt) {
-        pure1v1Print("didVideoMuted[\(uid)] \(muted)")
+        Pure1v1Logger.info("didVideoMuted[\(uid)] \(muted)")
         self.remoteCanvasView.canvasView.isHidden = muted
     }
 }

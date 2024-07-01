@@ -13,7 +13,7 @@ private let kSceneId = "scene_show_5.0.0"
 private let kRoomPresenceChannelName = "scene_show_5_0_0_9999999"
 
 private func agoraPrint(_ message: String) {
-    showPrint(message, context: "Service")
+    ShowLogger.info(message, context: "Service")
 }
 
 public class ShowSyncManagerServiceImp: NSObject {
@@ -53,7 +53,7 @@ public class ShowSyncManagerServiceImp: NSObject {
         owner.userAvatar = VLUserCenter.user.headUrl
         self.user = owner
         AUIRoomContext.shared.displayLogClosure = { msg in
-            showPrint(msg, context: "RTMSyncManager")
+            ShowLogger.info(msg, context: "RTMSyncManager")
         }
         super.init()
         syncManager.rtmManager.subscribeError(channelName: "", delegate: self)

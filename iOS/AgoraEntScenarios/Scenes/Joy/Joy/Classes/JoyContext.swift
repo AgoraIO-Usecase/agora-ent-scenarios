@@ -1,20 +1,24 @@
 import SwiftyBeaver
+import AgoraCommon
+
+public class JoyLogger: NSObject {
+    
+    public static let kLogKey = "Joy"
+    
+    public static func info(_ text: String, context: String? = nil) {
+        AgoraEntLog.getSceneLogger(with: kLogKey).info(text, context: context)
+    }
+
+    public static func warn(_ text: String, context: String? = nil) {
+        AgoraEntLog.getSceneLogger(with: kLogKey).warning(text, context: context)
+    }
+
+    public static func error(_ text: String, context: String? = nil) {
+        AgoraEntLog.getSceneLogger(with: kLogKey).error(text, context: context)
+    }
+}
 
 let kSceneName = "Joy"
-
-let joyLogger: SwiftyBeaver.Type = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: kSceneName))
-
-func joyPrint(_ message: String, context: String = kSceneName) {
-    joyLogger.info(message, context: context)
-}
-
-func joyWarn(_ message: String, context: String = kSceneName) {
-    joyLogger.warning(message, context: context)
-}
-
-func joyError(_ message: String, context: String = kSceneName) {
-    joyLogger.error(message, context: context)
-}
 
 var joyAppId: String = ""
 var joyAppCertificate: String = ""

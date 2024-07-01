@@ -174,6 +174,7 @@ extension SARoomViewController {
     }
 
     @objc func leaveRoom() {
+        AgoraEntLog.autoUploadLog(scene: SpatialVoiceChatLog.kLogKey)
         AppContext.saServiceImp().leaveRoom(self.roomInfo?.room?.room_id ?? "") { _, _ in }
     }
 

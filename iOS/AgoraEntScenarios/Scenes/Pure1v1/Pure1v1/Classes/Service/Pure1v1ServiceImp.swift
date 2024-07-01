@@ -58,7 +58,7 @@ class Pure1v1ServiceImp: NSObject {
         self.user = user
         self.rtmClient = rtmClient
         AUIRoomContext.shared.displayLogClosure = { msg in
-            pure1v1Print(msg, context: "RTMSyncManager")
+            Pure1v1Logger.info(msg, tag: "RTMSyncManager")
         }
         super.init()
     }
@@ -88,7 +88,7 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
         userService.bindRespDelegate(delegate: self)
         syncManager.rtmManager.subscribe(channelName: kRoomId) {[weak self] err in
             guard let self = self else {return}
-            pure1v1Print("enterRoom subscribe cost: \(-Int(date.timeIntervalSinceNow * 1000)) ms")
+            Pure1v1Logger.info("enterRoom subscribe cost: \(-Int(date.timeIntervalSinceNow * 1000)) ms")
             completion(err)
             self.isEnterSuccess = err == nil ? true : false
         }

@@ -10,8 +10,11 @@ import UIKit
 import SwiftyBeaver
 import AgoraCommon
 @objc class SBGLog: NSObject {
+    
+    @objc static let kLogKey = "SBG"
+    
     fileprivate static let log: SwiftyBeaver.Type = {
-        let config = AgoraEntLogConfig(sceneName: "SBG")
+        let config = AgoraEntLogConfig(sceneName: kLogKey)
         let log = AgoraEntLog.createLog(config: config)
         return log
     }()

@@ -85,7 +85,7 @@ import AgoraRtcKit
     ///   - status: <#status description#>
     ///   - msg: <#msg description#>
     ///   - lyricUrl: <#lyricUrl description#>
-    func onMusicLoadProgress(songCode: Int, percent: Int, status: AgoraMusicContentCenterPreloadStatus, msg: String?, lyricUrl: String?)
+    func onMusicLoadProgress(songCode: Int, percent: Int, state: AgoraMusicContentCenterPreloadState, msg: String?, lyricUrl: String?)
     
     /// 歌曲加载成功
     /// - Parameters:
@@ -117,7 +117,7 @@ import AgoraRtcKit
     ///   - error: <#error description#>
     ///   - isLocal: <#isLocal description#>
     func onMusicPlayerStateChanged(state: AgoraMediaPlayerState,
-                                   error: AgoraMediaPlayerError,
+                                   reason: AgoraMediaPlayerReason,
                                    isLocal: Bool)
     
     
@@ -280,10 +280,10 @@ enum GiantChorusRouteSelectionType: Int {
 
 
 public typealias LyricCallback = ((String?) -> Void)
-public typealias LoadMusicCallback = ((AgoraMusicContentCenterPreloadStatus, NSInteger) -> Void)
+public typealias LoadMusicCallback = ((AgoraMusicContentCenterPreloadState, NSInteger) -> Void)
 public typealias ISwitchRoleStateListener = (KTVSwitchRoleState, KTVSwitchRoleFailReason) -> Void
-public typealias MusicChartCallBacks = (String, AgoraMusicContentCenterStatusCode, [AgoraMusicChartInfo]?) -> Void
-public typealias MusicResultCallBacks = (String, AgoraMusicContentCenterStatusCode, AgoraMusicCollection) -> Void
+public typealias MusicChartCallBacks = (String, AgoraMusicContentCenterStateReason, [AgoraMusicChartInfo]?) -> Void
+public typealias MusicResultCallBacks = (String, AgoraMusicContentCenterStateReason, AgoraMusicCollection) -> Void
 public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Void)
 
 @objc public protocol KTVApiDelegate: NSObjectProtocol {

@@ -15,7 +15,7 @@ extension NSObject {
             let model = try decoder.decode(T.self, from: data)
             return model
         } catch {
-            joyWarn("decode model fail: \(error)")
+            JoyLogger.warn("decode model fail: \(error)")
         }
         return nil
     }
@@ -41,7 +41,7 @@ extension NSObject {
             let data = try encoder.encode(model)
             dictionary = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
         } catch {
-            joyWarn("encode model fail: \(error.localizedDescription)")
+            JoyLogger.warn("encode model fail: \(error.localizedDescription)")
             return nil
         }
         

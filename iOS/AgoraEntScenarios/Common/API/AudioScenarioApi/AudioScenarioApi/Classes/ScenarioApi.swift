@@ -410,7 +410,7 @@ extension AudioScenarioApi: AgoraRtcEngineDelegate {
             case .Show_InteractiveAudience:
                 setAudioSettingsWithConfig(RecommendAudioScenarioSetting.AudienceSpeaker)
             }
-        case .headsetBluetooth:
+        case .bluetoothDeviceA2dp, .bluetoothDeviceHfp:
             // 蓝牙耳机
             switch type {
             case .Chat_Caller:

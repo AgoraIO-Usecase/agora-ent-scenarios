@@ -32,7 +32,7 @@ public class AppStateManager {
         // 监听网络状态改变
         monitor.pathUpdateHandler = { [weak self] path in
             let isNetworkAvailable = path.status == .satisfied
-            commonLogger().info("networkChange isNetworkAvailable: \(isNetworkAvailable)", context: "AppStateManager")
+            CommonLogger.info("networkChange isNetworkAvailable: \(isNetworkAvailable)", tag: "AppStateManager")
             DispatchQueue.main.async {
                 self?.networkStatusChangeHandler?(isNetworkAvailable)
             }
@@ -49,19 +49,19 @@ public class AppStateManager {
     // 应用状态改变通知处理
     @objc private func appStateChanged() {
         let isInBackground = UIApplication.shared.applicationState == .background
-        commonLogger().info("appStateChanged isInBackground: \(isInBackground)", context: "AppStateManager")
+        CommonLogger.info("appStateChanged isInBackground: \(isInBackground)", tag: "AppStateManager")
         appStateChangeHandler?(isInBackground)
     }
     
     // 锁屏通知处理
     @objc private func screenLocked() {
-        commonLogger().info("screenLocked", context: "AppStateManager")
+        CommonLogger.info("screenLocked", tag: "AppStateManager")
         screenLockHandler?(true)
     }
     
     // 解锁通知处理
     @objc private func screenUnlocked() {
-        commonLogger().info("screenUnlocked", context: "AppStateManager")
+        CommonLogger.info("screenUnlocked", tag: "AppStateManager")
         screenLockHandler?(false)
     }
 }

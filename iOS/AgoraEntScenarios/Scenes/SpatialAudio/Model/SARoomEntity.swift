@@ -72,10 +72,10 @@ import KakaJSON
     var airAbsorb: Bool = false
     var voiceBlur: Bool = false
     
-    var pos: [NSNumber]?
-    var forward: [NSNumber]?
-    var right: [NSNumber]?
-    var up: [NSNumber] = [0, 0, 1]
+    var pos: simd_float3?
+    var forward: simd_float3?
+    var right: simd_float3?
+    var up: simd_float3 = [0,0,1]
 }
 
 @objc open class SAUsers: NSObject, Convertible {

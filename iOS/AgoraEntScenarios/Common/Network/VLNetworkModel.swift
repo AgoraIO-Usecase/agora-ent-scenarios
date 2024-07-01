@@ -26,12 +26,22 @@ open class VLResponseData: NSObject, Convertible {
 @objcMembers
 open class VLSceneConfigsModel: NSObject,Convertible {
     
-    public var chat: Int = 0
-    public var ktv: Int = 0
-    public var show: Int = 0
-    public var showpk: Int = 0
+    public var chat: Int = 1200
+    public var ktv: Int = 1200
+    public var show: Int = 1200
+    public var showpk: Int = 1200
+    public var joy: Int = 1200
+    public var logUpload: Int = 0
+    public var oneToOne: Int = 1200
     
     override public required init() {}
+    
+    public func kj_modelKey(from property: Property) -> ModelPropertyKey {
+        switch property.name{
+        case "oneToOne": return "1v1"
+        default:return property.name
+        }
+    }
 }
 
 @objcMembers
@@ -195,7 +205,7 @@ open class VLSceneConfigsNetworkModel: VLCommonNetworkModel {
     
     public override init() {
         super.init()
-//        host = "https://test-toolbox.bj2.shengwang.cn"
+//        host = "https://service-staging.agora.io/toolbox"
         interfaceName = "/v1/configs/scene"
         method = .get
     }

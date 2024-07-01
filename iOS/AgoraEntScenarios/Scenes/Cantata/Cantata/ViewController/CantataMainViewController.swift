@@ -8,7 +8,6 @@
 import Foundation
 import AgoraCommon
 import AgoraRtcKit
-import LSTPopView
 import AUIKitCore
 import ZSwiftBaseLib
 class CantataMainViewController: UIViewController{
@@ -169,7 +168,7 @@ class CantataMainViewController: UIViewController{
         isRoomOwner = VLUserCenter.user.ifMaster
         if isRoomOwner == true {
             self.timeManager.startTimer(withTarget: self, andSelector: #selector(giveupRoom))
-            KTVLog.info(text: "ROOM owner start timer")
+            CantataLog.info(text: "ROOM owner start timer")
         }
         
         addDebugLogic()
@@ -213,7 +212,7 @@ class CantataMainViewController: UIViewController{
                 guard let self = self else {return}
                 VLKTVAlert.shared().dismiss()
                 self.timeManager.stopTimer()
-                KTVLog.info(text: "ROOM owner stop timer")
+                CantataLog.info(text: "ROOM owner stop timer")
                 self.leaveRoom()
             }
         }
@@ -231,7 +230,7 @@ class CantataMainViewController: UIViewController{
                 guard let self = self else {return}
                 VLKTVAlert.shared().dismiss()
                 self.timeManager.stopTimer()
-                KTVLog.info(text: "ROOM owner stop timer")
+                CantataLog.info(text: "ROOM owner stop timer")
                 self.leaveRoom()
             }
         }
@@ -812,11 +811,11 @@ extension CantataMainViewController: IMusicLoadStateListener {
         }
     }
     
-    public func onMusicLoadProgress(songCode: Int, percent: Int, status: AgoraMusicContentCenterPreloadStatus, msg: String?, lyricUrl: String?) {
+    public func onMusicLoadProgress(songCode: Int, percent: Int, state: AgoraMusicContentCenterPreloadState, msg: String?, lyricUrl: String?) {
         let topSong = self.selSongArray?.first
         let flag = topSong?.userNo == VLUserCenter.user.id
         if self.singerRole == .soloSinger || self.singerRole == .leadSinger || self.isJoinChorus == true || flag {
-            self.lrcControlView.updateLoadingView(with: status == .OK ? 100 : percent)
+            self.lrcControlView.updateLoadingView(with: state == .OK ? 100 : percent)
         }
     }
     
@@ -933,10 +932,10 @@ extension CantataMainViewController {
                 }
                 
                 if status == .updated && self.singerRole == .audience {//
-                    KTVLog.info(text: "观众分数更新")
+                    CantataLog.info(text: "观众分数更新")
                     let totalScore = self.scoreMap.values.map({ $0.score }).reduce(0, +)
                     self.lrcControlView.setScore(with: totalScore ?? 0)
-                    KTVLog.info(text: "观众分数更新完毕")
+                    CantataLog.info(text: "观众分数更新完毕")
                 }
                 
                 let currentSeat = getCurrentUserMicSeat()
@@ -1022,7 +1021,7 @@ extension CantataMainViewController {
             
             if status == .created && isRoomOwner == true {
                 if self.selSongArray?.count == 0 {
-                    KTVLog.info(text: "ROOM owner stop timer")
+                    CantataLog.info(text: "ROOM owner stop timer")
                     self.timeManager.stopTimer() //有人点歌 需要关闭
                 }
             }
@@ -1052,7 +1051,7 @@ extension CantataMainViewController {
                 self.selSongArray = songArray
                 
                 if self.selSongArray?.count == 0 && isRoomOwner == true{
-                    KTVLog.info(text: "ROOM owner restart timer:\(self.singerRole)")
+                    CantataLog.info(text: "ROOM owner restart timer:\(self.singerRole)")
                     self.timeManager.restartTimer()
                 }
 
@@ -1172,6 +1171,7 @@ extension CantataMainViewController {
         for vc in self.navigationController?.children ?? [] {
             if type(of: vc) == type(of: rootVC) {
                 self.navigationController?.popToViewController(vc, animated: true)
+                AgoraEntLog.autoUploadLog(scene: CantataLog.kLogKey)
                 break
             }
         }
@@ -1187,6 +1187,7 @@ extension CantataMainViewController {
             for vc in weakSelf.navigationController?.children ?? [] {
                 if type(of: vc) == type(of: rootVC) {
                     self?.navigationController?.popToViewController(vc, animated: true)
+                    AgoraEntLog.autoUploadLog(scene: CantataLog.kLogKey)
                     break
                 }
             }
@@ -1696,7 +1697,7 @@ extension CantataMainViewController: KTVApiEventHandlerDelegate {
         
     }
     
-    public func onMusicPlayerStateChanged(state: AgoraMediaPlayerState, error: AgoraMediaPlayerError, isLocal: Bool) {
+    public func onMusicPlayerStateChanged(state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason, isLocal: Bool) {
         if isLocal && singerRole == .leadSinger || singerRole == .soloSinger {
             if state == .playBackCompleted || state == .playBackAllLoopsCompleted {
                 //展示结算界面

@@ -9,6 +9,7 @@
 @import LEEAlert;
 #import "MenuUtils.h"
 #import "AgoraEntScenarios-Swift.h"
+#import "Masonry.h"
 @interface DevViewController ()
 
 @end
@@ -67,12 +68,21 @@
     [subBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [subBtn addTarget:self action:@selector(leaveDev) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:subBtn];
+    
+    
+    // auto send log segment
+    UIView *sendLogView = [[UIView alloc] initWithFrame:CGRectMake(20, 80, 300, 50)];
+    [self.view addSubview:sendLogView];
+    [sendLogView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.equalTo(self.view);
+        make.top.equalTo(customView.mas_bottom);
+        make.height.equalTo(@48);
+    }];
 }
 
 - (void)segChanged:(UISegmentedControl *)seg {
     NSInteger index = seg.selectedSegmentIndex;
     [[NSUserDefaults standardUserDefaults] setValue:@(index) forKey:@"TOOLBOXENV"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)confirm {

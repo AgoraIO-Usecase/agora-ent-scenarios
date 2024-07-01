@@ -5,7 +5,7 @@
 //  Created by wushengtao on 2022/11/10.
 //
 
-#import <LSTPopView/LSTPopView.h>
+#import <AgoraCommon/LSTPopView.h>
 #import "VLSRPopMoreSelView.h"
 #import "VLSRPopSelBgView.h"
 #import "VLSRDropOnLineView.h"

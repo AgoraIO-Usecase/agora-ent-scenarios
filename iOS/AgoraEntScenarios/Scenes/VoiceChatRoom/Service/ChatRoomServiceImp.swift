@@ -13,13 +13,16 @@ import AgoraSyncManager
 import AgoraCommon
 private let kSceneId = "scene_chatRoom_4.0.0"
 
-
-private func agoraPrint(_ message: String) {
-    voiceLogger.info(message, context: "Service")
+@objc public class VoiceChatLog: NSObject {
+    
+    static let kLogKey = "VoiceChat"
+    
+    @objc public static func info(_ text: String) {
+        AgoraEntLog.getSceneLogger(with: kLogKey).info(text, context: "Service")
+    }
 }
-let roomBGMKey = "room_bgm"
 
-let voiceLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "VoiceChat"))
+let roomBGMKey = "room_bgm"
 public class ChatRoomServiceImp: NSObject {
     
     static var _sharedInstance: ChatRoomServiceImp?
@@ -45,7 +48,7 @@ public class ChatRoomServiceImp: NSObject {
         
         let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
         let expiredDuration = (AppContext.shared.sceneConfig?.chat ?? 20 * 60) * 1000
-        agoraPrint("checkRoomExpire: \(currentTs - Int64(created_at)) / \(expiredDuration)")
+        VoiceChatLog.info("checkRoomExpire: \(currentTs - Int64(created_at)) / \(expiredDuration)")
         guard currentTs - Int64(created_at) > expiredDuration else { return }
         
         self.roomServiceDelegate?.onRoomExpired()
@@ -283,13 +286,13 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         group.enter()
         VoiceRoomIMManager.shared?.fetchChatroomAttributes(keys: keys, completion: { error, map in
             if let ranking_list = map?["ranking_list"]?.toArray() {
-                agoraPrint("ranking_list: \(ranking_list)")
+                VoiceChatLog.info("ranking_list: \(ranking_list)")
                 roomInfo.room?.ranking_list = ranking_list.kj.modelArray(VRUser.self)
             } else {
                 roomInfo.room?.ranking_list = [VRUser]()
             }
             if let member_list = map?["member_list"]?.toArray() {
-                agoraPrint("member_list: \(member_list)")
+                VoiceChatLog.info("member_list: \(member_list)")
                 roomInfo.room?.member_list = member_list.kj.modelArray(VRUser.self)
             } else {
                 roomInfo.room?.member_list = [VRUser]()
@@ -743,7 +746,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             if let chatState = self.connectState {
                 self.roomServiceDelegate?.onConnectStateChanged(state: chatState)
             }
-            agoraPrint("subscribeConnectState: \(state) \(self.syncUtilsInited)")
+            VoiceChatLog.info("subscribeConnectState: \(state) \(self.syncUtilsInited)")
 //            self.networkDidChanged?(KTVServiceNetworkStatus(rawValue: UInt(state.rawValue)))
             guard !self.syncUtilsInited else {
                 //TODO: retry get data if restore connection
@@ -769,7 +772,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 return
             }
             SyncUtil.fetchAll { [weak self] results in
-                agoraPrint("result == \(results.compactMap { $0.toJson() })")
+                VoiceChatLog.info("result == \(results.compactMap { $0.toJson() })")
                 
                 let dataArray = results.map({ info in
                     return model(from: info.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
@@ -826,7 +829,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 self?._startCheckExpire()
                 //添加鉴黄接口
                 NetworkManager.shared.voiceIdentify(channelName: room.channel_id ?? "", channelType: room.sound_effect == 3 ? 0 : 1, sceneType: "voice_chat") { msg in
-                    agoraPrint("\(msg == nil ? "开启鉴黄成功" : "开启鉴黄失败")")
+                    VoiceChatLog.info("\(msg == nil ? "开启鉴黄成功" : "开启鉴黄失败")")
                 }
                 
                 var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
@@ -977,10 +980,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                             .update(key: "",
                                     data: params,
                                     success: { obj in
-                                agoraPrint("updateUserCount success")
+                                VoiceChatLog.info("updateUserCount success")
                             },
                                     fail: { error in
-                                agoraPrint("updateUserCount fail")
+                                VoiceChatLog.info("updateUserCount fail")
                             })
                         VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
                     }
