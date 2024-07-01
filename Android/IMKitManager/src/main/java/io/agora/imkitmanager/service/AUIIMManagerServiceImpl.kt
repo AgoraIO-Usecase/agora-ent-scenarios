@@ -47,7 +47,6 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
 
     private var mCurChatRoomId: String = ""
 
-
     override fun registerRespObserver(observer: IAUIIMManagerService.AUIIMManagerRespObserver?) {
         observableHelper.subscribeEvent(observer)
     }
@@ -111,6 +110,12 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
         AUIChatRoomContext.shared().clearChatToken()
     }
 
+    /**
+     * Inner login chat
+     *
+     * @param completion
+     * @receiver
+     */
     private fun innerLoginChat(completion: (error: Exception?) -> Unit) {
         if (chatManager.isLoggedIn()) {
             completion.invoke(null)
@@ -141,7 +146,7 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
     }
 
     /**
-     * 创建环信聊天室
+     * 创建环信聊天室并登录
      *
      * @param roomName
      * @param description
@@ -151,6 +156,7 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
     override fun createChatRoom(
         roomName: String, description: String, completion: (chatId: String?, error: Exception?) -> Unit
     ) {
+        // check login
         innerLoginChat { loginError ->
             if (loginError != null) {
                 runOnMainThread {
@@ -165,6 +171,7 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
                 chatRoomOwner = chatRoomOwner,
                 type = CHATROOM_CREATE_TYPE_ROOM
             )
+            // create chat room
             innerCreateUserOrChaRoom(createChatRoomInput) { resp, error ->
                 if (error == null && resp != null) { // success
                     runOnMainThread {
@@ -175,9 +182,7 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
                             AUIChatRoomContext.shared().insertRoomInfo(
                                 AUIChatRoomInfo(chatRoomOwner, chatId)
                             )
-                            innerJoinChatRoom(chatId, callback = { error ->
-                                completion.invoke(chatId, error)
-                            })
+                            completion.invoke(chatId, null)
                         }
                     }
                 } else {
@@ -197,6 +202,7 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
      * @receiver
      */
     override fun joinChatRoom(chatRoomInfo: AUIChatRoomInfo, completion: (error: Exception?) -> Unit) {
+        // check login
         innerLoginChat { loginError ->
             if (loginError != null) {
                 runOnMainThread {
@@ -204,12 +210,26 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
                 }
                 return@innerLoginChat
             }
-            innerJoinChatRoom(chatRoomInfo.chatRoomId, callback = { error ->
-                runOnMainThread {
-                    if (error == null) {
-                        AUIChatRoomContext.shared().insertRoomInfo(chatRoomInfo)
+            // join chat room
+            val chatId = chatRoomInfo.chatRoomId
+            chatManager.setOnManagerListener()
+            chatManager.subscribeChatMsg(this)
+            chatManager.joinRoom(chatId, object : AUIChatMsgCallback {
+                override fun onOriginalResult(error: Exception?, message: ChatMessage?) {
+                    super.onOriginalResult(error, message)
+                    if (error != null) {
+                        completion.invoke(Exception("joinChatRoom >> IM join chat room failed! -- $error"))
+                        return
                     }
-                    completion.invoke(error)
+                    mCurChatRoomId = chatId
+
+                    val textMsg = IAUIIMManagerService.AgoraChatTextMessage(
+                        message?.msgId, message?.body?.toString(), null
+                    )
+                    completion.invoke(null)
+                    observableHelper.notifyEventHandlers {
+                        it.onUserDidJoinRoom(chatId, textMsg)
+                    }
                 }
             })
         }
@@ -279,33 +299,6 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
                     completion.invoke(null, Exception("$action >> onFailure ${t.message}"))
                 }
             })
-    }
-
-    // 加入IM 聊天室
-    private fun innerJoinChatRoom(chatId: String, callback: (error: Exception?) -> Unit) {
-        chatManager.setOnManagerListener()
-        chatManager.subscribeChatMsg(this)
-        chatManager.joinRoom(chatId, object : AUIChatMsgCallback {
-            override fun onOriginalResult(
-                error: Exception?,
-                message: ChatMessage?
-            ) {
-                super.onOriginalResult(error, message)
-                if (error != null) {
-                    callback.invoke(Exception("joinChatRoom >> IM join chat room failed! -- $error"))
-                    return
-                }
-                mCurChatRoomId = chatId
-
-                val textMsg = IAUIIMManagerService.AgoraChatTextMessage(
-                    message?.msgId, message?.body?.toString(), null
-                )
-                callback.invoke(null)
-                observableHelper.notifyEventHandlers {
-                    it.onUserDidJoinRoom(chatId, textMsg)
-                }
-            }
-        })
     }
 
     override fun leaveChatRoom(completion: (error: Exception?) -> Unit) {
