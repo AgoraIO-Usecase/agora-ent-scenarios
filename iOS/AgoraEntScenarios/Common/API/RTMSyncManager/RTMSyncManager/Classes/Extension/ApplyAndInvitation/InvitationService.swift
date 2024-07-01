@@ -27,7 +27,7 @@ private let key = "invitation"
 }
 
 @objc public protocol InvitationServiceProtocol: NSObjectProtocol {
-    func onInvitationDidReceive(info: InvitationInfo)
+    func onInvitationDidReceive(channelName: String, info: InvitationInfo)
 }
 
 public class InvitationService: NSObject {
@@ -169,14 +169,14 @@ extension InvitationService {
 
 //MARK: InviteMessageProtocol
 extension InvitationService: InviteMessageProtocol {
-    public func onNewInviteDidReceived(message: InviteMessageInfo) {
+    public func onNewInviteDidReceived(channelName: String, message: InviteMessageInfo) {
         guard let info: InvitationInfo = decodeModel(jsonStr: message.content) else { return }
         aui_info("onNewInviteDidReceived: \(message.content)", tag: "InvitationService")
         if info.type != .inviting {
             messageManager.removeMessages { $0.publisherId == message.publisherId}
         }
         respDelegates.allObjects.forEach { delegate in
-            delegate.onInvitationDidReceive(info: info)
+            delegate.onInvitationDidReceive(channelName: channelName, info: info)
         }
     }
 }

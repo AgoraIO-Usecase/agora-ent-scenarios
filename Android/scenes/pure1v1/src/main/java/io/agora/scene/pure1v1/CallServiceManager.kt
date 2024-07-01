@@ -3,10 +3,10 @@ package io.agora.scene.pure1v1
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import io.agora.scene.pure1v1.callapi.CallApiImpl
-import io.agora.scene.pure1v1.callapi.CallConfig
-import io.agora.scene.pure1v1.callapi.ICallApi
-import io.agora.scene.pure1v1.callapi.PrepareConfig
+import io.agora.onetoone.CallApiImpl
+import io.agora.onetoone.CallConfig
+import io.agora.onetoone.ICallApi
+import io.agora.onetoone.PrepareConfig
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.data.MediaPlayerSource
 import io.agora.rtc2.*
@@ -19,10 +19,10 @@ import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
-import io.agora.scene.pure1v1.audio.AudioScenarioApi
-import io.agora.scene.pure1v1.callapi.signalClient.CallRtmManager
-import io.agora.scene.pure1v1.callapi.signalClient.ICallRtmManagerListener
-import io.agora.scene.pure1v1.callapi.signalClient.createRtmSignalClient
+import io.agora.audioscenarioapi.AudioScenarioApi
+import io.agora.onetoone.signalClient.CallRtmManager
+import io.agora.onetoone.signalClient.ICallRtmManagerListener
+import io.agora.onetoone.signalClient.createRtmSignalClient
 import io.agora.scene.pure1v1.service.Pure1v1ServiceImp
 import io.agora.scene.pure1v1.service.UserInfo
 
@@ -102,10 +102,6 @@ class CallServiceManager {
                     // RTM 已断开
                 }
 
-                override fun onConnectionLost() {
-                    // RTM 连接已失去，需要做重连逻辑
-                }
-
                 override fun onTokenPrivilegeWillExpire(channelName: String) {
                     // RTM Token 过期， 需要重新获取 token
                 }
@@ -143,7 +139,6 @@ class CallServiceManager {
 
             // 初始化音频场景化API
             val scenarioApi = AudioScenarioApi(engine)
-            scenarioApi.initialize()
             this.scenarioApi = scenarioApi
         }
 

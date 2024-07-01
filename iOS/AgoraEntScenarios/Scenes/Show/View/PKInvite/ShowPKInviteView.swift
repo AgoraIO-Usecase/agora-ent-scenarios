@@ -8,6 +8,7 @@
 import UIKit
 import Agora_Scene_Utils
 import AgoraCommon
+
 class ShowPKInviteView: UIView {
     var roomId: String!
     var pkUserInvitationList: [ShowPKUserInfo]? {
@@ -22,7 +23,7 @@ class ShowPKInviteView: UIView {
     }
     var interactionList: [ShowInteractionInfo]? {
         didSet {
-            let pkInfo = interactionList?.filter({ $0.interactStatus == .pking }).first
+            let pkInfo = interactionList?.filter({ $0.type == .pk }).first
             let pkTipsVisible = pkInfo == nil ? false : true
             _showTipsView(show: pkTipsVisible)
             pkTipsLabel.text = String(format: "show_pking_with_broadcastor".show_localized, pkInfo?.userName ?? "")
@@ -146,11 +147,11 @@ class ShowPKInviteView: UIView {
     private func onTapEndButton(sender: AGEButton) {
         _showTipsView(show: false)
         
-        guard let pkInfo = interactionList?.filter({ $0.interactStatus == .pking }).first else {
+        guard let pkInfo = interactionList?.filter({ $0.type == .pk }).first else {
             return
         }
         
-        AppContext.showServiceImp(roomId)?.stopInteraction(interaction: pkInfo) { error in
+        AppContext.showServiceImp()?.stopInteraction(roomId: roomId) { error in
         }
     }
     

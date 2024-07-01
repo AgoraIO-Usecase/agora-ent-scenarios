@@ -90,13 +90,13 @@ class ShowAgoraKitManager: NSObject {
         config.rtcEngine = engine
         loader.setup(config: config)
         
-        ShowLogger.info("load AgoraRtcEngineKit, sdk version: \(AgoraRtcEngineKit.getSdkVersion())", context: kShowLogBaseContext)
+        showPrint("load AgoraRtcEngineKit, sdk version: \(AgoraRtcEngineKit.getSdkVersion())", context: kShowLogBaseContext)
     }
     
     func destoryEngine() {
         AgoraRtcEngineKit.destroy()
         ShowAgoraKitManager._sharedManager = nil
-        ShowLogger.info("deinit-- ShowAgoraKitManager")
+        showPrint("deinit-- ShowAgoraKitManager")
     }
     // 退出已加入的频道和子频道
     func leaveAllRoom() {
@@ -125,7 +125,7 @@ class ShowAgoraKitManager: NSObject {
         ]
         
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
-            ShowLogger.error("setupContentInspectConfig fail")
+            showError("setupContentInspectConfig fail")
             return
         }
         let jsonStr = String(data: jsonData, encoding: .utf8)
@@ -135,7 +135,7 @@ class ShowAgoraKitManager: NSObject {
         module.type = .imageModeration
         config.modules = [module]
         let ret = engine?.enableContentInspectEx(enable, config: config, connection: connection)
-        ShowLogger.info("setupContentInspectConfig: \(ret ?? -1)")
+        showPrint("setupContentInspectConfig: \(ret ?? -1)")
     }
     
     /// 语音审核
@@ -154,9 +154,9 @@ class ShowAgoraKitManager: NSObject {
         let baseURL = AppContext.shared.baseServerUrl
         NetworkManager.shared.postRequest(urlString: "\(baseURL)/toolbox/v1/moderation/audio",
                                           params: parasm) { response in
-            ShowLogger.info("response === \(response)")
+            showPrint("response === \(response)")
         } failure: { errr in
-            ShowLogger.error(errr)
+            showError(errr)
         }
     }
     
@@ -200,31 +200,37 @@ class ShowAgoraKitManager: NSObject {
 
 //        let proxy = VideoLoaderApiImpl.shared.getRTCListener(anchorId: currentChannelId)
         let date = Date()
-        ShowLogger.info("try to join room[\(connection.channelId)] ex uid: \(connection.localUid)", context: kShowLogBaseContext)
+        showPrint("try to join room[\(connection.channelId)] ex uid: \(connection.localUid)", context: kShowLogBaseContext)
         let ret =
         engine.joinChannelEx(byToken: token,
                                connection: connection,
                                delegate: nil,
                                mediaOptions: mediaOptions) {[weak self] channelName, uid, elapsed in
             let cost = Int(-date.timeIntervalSinceNow * 1000)
-            ShowLogger.info("join room[\(channelName)] ex success uid: \(uid) cost \(cost) ms", context: kShowLogBaseContext)
+            showPrint("join room[\(channelName)] ex success uid: \(uid) cost \(cost) ms", context: kShowLogBaseContext)
             self?.setupContentInspectConfig(true, connection: connection)
 //            self?.moderationAudio(channelName: targetChannelId, role: role)
             self?.applySimulcastStream(connection: connection)
         }
 //        engine.addDelegateEx(<#T##delegate: AgoraRtcEngineDelegate##AgoraRtcEngineDelegate#>, connection: connection)
         
-        ShowLogger.info("_joinChannelEx[\(connection.channelId)] role: \(mediaOptions.clientRoleType.rawValue) \(mediaOptions.publishMicrophoneTrack) \(mediaOptions.publishCameraTrack)")
-        engine.updateChannelEx(with: mediaOptions, connection: connection)
+        showPrint("_joinChannelEx[\(connection.channelId)] role: \(mediaOptions.clientRoleType.rawValue) \(mediaOptions.publishMicrophoneTrack) \(mediaOptions.publishCameraTrack)")
+        _updateChannelEx(options: mediaOptions, connection: connection)
         broadcasterConnection = connection
 
         if ret == 0 {
-            ShowLogger.info("join room ex: channelId: \(targetChannelId) ownerId: \(ownerId)",
+            showPrint("join room ex: channelId: \(targetChannelId) ownerId: \(ownerId)",
                             context: "AgoraKitManager")
         }else{
-            ShowLogger.error("join room ex fail: channelId: \(targetChannelId) ownerId: \(ownerId) token = \(token), \(ret)",
+            showError("join room ex fail: channelId: \(targetChannelId) ownerId: \(ownerId) token = \(token), \(ret)",
                              context: kShowLogBaseContext)
         }
+    }
+    
+    private func _updateChannelEx(options: AgoraRtcChannelMediaOptions,
+                                  connection: AgoraRtcConnection) {
+        showPrint("_updateChannelEx[\(connection.channelId)][\(connection.localUid)] role: \(options.clientRoleType.rawValue) publishMicrophoneTrack:\(options.publishMicrophoneTrack) publishCameraTrack:\(options.publishCameraTrack)")
+        engine?.updateChannelEx(with: options, connection: connection)
     }
     
     func updateVideoEncoderConfigurationForConnenction(currentChannelId: String) {
@@ -237,12 +243,12 @@ class ShowAgoraKitManager: NSObject {
         connection.localUid = UInt(VLUserCenter.user.id) ?? 0
         let encoderConfig = getEncoderConfig()
         let encoderRet = engine.setVideoEncoderConfigurationEx(encoderConfig, connection: connection)
-        ShowLogger.info("setVideoEncoderConfigurationEx  dimensions = \(encoderConfig.dimensions), bitrate = \(encoderConfig.bitrate), fps = \(encoderConfig.frameRate),  encoderRet = \(encoderRet)", context: kShowLogBaseContext)
+        showPrint("setVideoEncoderConfigurationEx  dimensions = \(encoderConfig.dimensions), bitrate = \(encoderConfig.bitrate), fps = \(encoderConfig.frameRate),  encoderRet = \(encoderRet)", context: kShowLogBaseContext)
     }
     
     //MARK: public method
     func addRtcDelegate(delegate: AgoraRtcEngineDelegate, roomId: String) {
-        ShowLogger.info("addRtcDelegate[\(roomId)]")
+        showPrint("addRtcDelegate[\(roomId)]")
         let localUid = Int(VLUserCenter.user.id)!
         let connection = AgoraRtcConnection(channelId: roomId, localUid: localUid)
         engine?.addDelegateEx(delegate, connection: connection)
@@ -250,7 +256,7 @@ class ShowAgoraKitManager: NSObject {
     }
     
     func removeRtcDelegate(delegate: AgoraRtcEngineDelegate, roomId: String) {
-        ShowLogger.info("removeRtcDelegate[\(roomId)]")
+        showPrint("removeRtcDelegate[\(roomId)]")
         let localUid = Int(VLUserCenter.user.id)!
         let connection = AgoraRtcConnection(channelId: roomId, localUid: localUid)
         engine?.removeDelegateEx(delegate, connection: connection)
@@ -258,11 +264,11 @@ class ShowAgoraKitManager: NSObject {
     }
     
     func renewToken(channelId: String) {
-        ShowLogger.info("renewToken with channelId: \(channelId)",
+        showPrint("renewToken with channelId: \(channelId)",
                   context: kShowLogBaseContext)
         preGenerateToken {[weak self] token in
             guard let token = token else {
-                ShowLogger.error("renewToken fail: token is empty")
+                showError("renewToken fail: token is empty")
                 return
             }
             let option = AgoraRtcChannelMediaOptions()
@@ -311,7 +317,7 @@ class ShowAgoraKitManager: NSObject {
             seg?.greenCapacity = greenCapacity
         }
         let ret = engine.enableVirtualBackground(isOn, backData: source, segData: seg)
-        ShowLogger.info("isOn = \(isOn), enableVirtualBackground ret = \(ret)")
+        showPrint("isOn = \(isOn), enableVirtualBackground ret = \(ret)")
     }
     
     /// 设置虚拟背景
@@ -336,14 +342,13 @@ class ShowAgoraKitManager: NSObject {
     }
     
     func updateChannelEx(channelId: String, options: AgoraRtcChannelMediaOptions) {
-        guard let engine = engine,
-              let connection = (broadcasterConnection?.channelId == channelId ? broadcasterConnection : nil) ?? VideoLoaderApiImpl.shared.getConnectionMap()[channelId] else {
-            ShowLogger.error("updateChannelEx fail: connection is empty")
+        guard let connection = (broadcasterConnection?.channelId == channelId ? broadcasterConnection : nil) ?? VideoLoaderApiImpl.shared.getConnectionMap()[channelId] else {
+            showError("updateChannelEx fail: connection is empty")
             return
         }
         
-        ShowLogger.info("updateChannelEx[\(channelId)] role: \(options.clientRoleType.rawValue) publishMicrophoneTrack:\(options.publishMicrophoneTrack) publishCameraTrack:\(options.publishCameraTrack)")
-        engine.updateChannelEx(with: options, connection: connection)
+        showPrint("updateChannelEx[\(channelId)] role: \(options.clientRoleType.rawValue) publishMicrophoneTrack:\(options.publishMicrophoneTrack) publishCameraTrack:\(options.publishCameraTrack)")
+        _updateChannelEx(options: options, connection: connection)
     }
     
     
@@ -359,11 +364,11 @@ class ShowAgoraKitManager: NSObject {
                     options:AgoraRtcChannelMediaOptions,
                     uid: String?) {
         guard let uid = UInt(uid ?? "") else {
-            ShowLogger.error("switchRole fatel")
+            showError("switchRole fatel")
             return
         }
         
-        ShowLogger.info("switchRole[\(channelId)], role: \(role?.rawValue ?? -1) localUid:\(UserInfo.userId) uid: \(uid)", context: kShowLogBaseContext)
+        showPrint("switchRole[\(channelId)], role: \(role?.rawValue ?? -1) localUid:\(UserInfo.userId) uid: \(uid)", context: kShowLogBaseContext)
         if role == .broadcaster {
             audioApi?.setAudioScenario(sceneType: .Show, audioScenarioType: .Show_InteractiveAudience)
         } 
@@ -372,26 +377,10 @@ class ShowAgoraKitManager: NSObject {
             let roleOptions = AgoraRtcChannelMediaOptions()
             roleOptions.clientRoleType = role
             roleOptions.audienceLatencyLevel = role == .audience ? .lowLatency : .ultraLowLatency
+            roleOptions.publishCameraTrack = options.publishCameraTrack
+            roleOptions.publishMicrophoneTrack = options.publishMicrophoneTrack
             updateChannelEx(channelId:channelId, options: roleOptions)
         }
-        
-        //更新外部options
-        updateChannelEx(channelId:channelId, options: options)
-        
-//        if role == .audience {
-//            //观众先清理本地画面，然后设置远端画面
-//            setupLocalVideo(canvasView: nil)
-//            cleanCapture()
-//        }
-//        
-//        
-//        if "\(uid)" == VLUserCenter.user.id {
-//            //自己是连麦主播，渲染本地画面
-//            setupLocalVideo(canvasView: canvasView)
-//        } else {
-//            //自己不是连麦主播，渲染连麦主播远端画面
-//            setupRemoteVideo(channelId: channelId, uid: uid, canvasView: canvasView)
-//        }
     }
     
     func updateLiveView(role: AgoraClientRole? = nil,
@@ -399,7 +388,7 @@ class ShowAgoraKitManager: NSObject {
                         uid: String?,
                         canvasView: UIView?) {
         guard let uid = UInt(uid ?? "") else {
-            ShowLogger.error("updateLiveView fatel")
+            showError("updateLiveView fatel")
             return
         }
         
@@ -443,8 +432,7 @@ class ShowAgoraKitManager: NSObject {
         mediaOptions.clientRoleType = isOn ? .broadcaster : .audience
         let uid = Int(VLUserCenter.user.id) ?? 0
         let connection = AgoraRtcConnection(channelId: channelId, localUid: uid)
-        ShowLogger.info("updateMediaOptionsEx[\(channelId)] role: \(mediaOptions.clientRoleType.rawValue) \(mediaOptions.publishMicrophoneTrack) \(mediaOptions.publishCameraTrack)")
-        engine?.updateChannelEx(with: mediaOptions, connection: connection)
+        _updateChannelEx(options: mediaOptions, connection: connection)
     }
     
     /// 设置编码分辨率
@@ -518,7 +506,7 @@ class ShowAgoraKitManager: NSObject {
         engine.setDefaultAudioRouteToSpeakerphone(true)
         engine.enableLocalAudio(true)
         engine.enableLocalVideo(true)
-        ShowLogger.info("setupLocalVideo, user uid:\(UserInfo.userId) view: \(canvasView?.description ?? "")", context: kShowLogBaseContext)
+        showPrint("setupLocalVideo, user uid:\(UserInfo.userId) view: \(canvasView?.description ?? "")", context: kShowLogBaseContext)
     }
     
     //连麦用，pk走的VideoloaderAPI
@@ -539,7 +527,7 @@ class ShowAgoraKitManager: NSObject {
         if let _ = canvasView {
             channelIdUidCanvasMap[channelId] = uid
         }
-        ShowLogger.info("setupRemoteVideoEx[\(channelId)] ret = \(ret ?? -1), uid:\(uid) view: \(canvasView?.description ?? "")", context: kShowLogBaseContext)
+        showPrint("setupRemoteVideoEx[\(channelId)] ret = \(ret ?? -1), uid:\(uid) view: \(canvasView?.description ?? "")", context: kShowLogBaseContext)
     }
     
     func updateLoadingType(roomId: String, channelId: String, playState: AnchorState) {
@@ -608,15 +596,14 @@ extension ShowAgoraKitManager {
     
     func setOffMediaOptionsVideo(roomid: String) {
         guard let connection = VideoLoaderApiImpl.shared.getConnectionMap()[roomid] else {
-            ShowLogger.info("setOffMediaOptionsVideo  connection 不存在 \(roomid)")
+            showPrint("setOffMediaOptionsVideo  connection 不存在 \(roomid)")
             return
         }
-        ShowLogger.info("setOffMediaOptionsVideo with roomid = \(roomid)")
+        showPrint("setOffMediaOptionsVideo with roomid = \(roomid)")
         let mediaOptions = AgoraRtcChannelMediaOptions()
         mediaOptions.autoSubscribeVideo = false
         
-        ShowLogger.info("setOffMediaOptionsVideo[\(roomid)] role: \(mediaOptions.clientRoleType.rawValue) \(mediaOptions.publishMicrophoneTrack) \(mediaOptions.publishCameraTrack)")
-        engine?.updateChannelEx(with: mediaOptions, connection: connection)
+        _updateChannelEx(options: mediaOptions, connection: connection)
     }
     
     func setOffMediaOptionsAudio() {
@@ -624,8 +611,7 @@ extension ShowAgoraKitManager {
             let mediaOptions = AgoraRtcChannelMediaOptions()
             mediaOptions.autoSubscribeAudio = false
             
-            ShowLogger.info("setOffMediaOptionsAudio[\(connention.channelId)] role: \(mediaOptions.clientRoleType.rawValue) \(mediaOptions.publishMicrophoneTrack) \(mediaOptions.publishCameraTrack)")
-            engine?.updateChannelEx(with: mediaOptions, connection: connention)
+            _updateChannelEx(options: mediaOptions, connection: connention)
         }
     }
     
@@ -633,24 +619,23 @@ extension ShowAgoraKitManager {
 // MARK: - IVideoLoaderApiListener
 extension ShowAgoraKitManager: IVideoLoaderApiListener {
     public func debugInfo(_ message: String) {
-        ShowLogger.info(message, context: "VideoLoaderApi")
+        showPrint(message, context: "VideoLoaderApi")
     }
     public func debugWarning(_ message: String) {
-        ShowLogger.warn(message, context: "VideoLoaderApi")
+        showWarn(message, context: "VideoLoaderApi")
     }
     public func debugError(_ message: String) {
-        ShowLogger.error(message, context: "VideoLoaderApi")
+        showError(message, context: "VideoLoaderApi")
     }
 }
 // MARK: - AgoraRtcMediaPlayerDelegate
 extension ShowAgoraKitManager: AgoraRtcMediaPlayerDelegate {
     
-    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason) {
+    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
         if state == .openCompleted {
             playerKit.play()
         }
     }
-    
 }
 
 
@@ -662,7 +647,7 @@ extension ShowAgoraKitManager {
                                             tokenType: .token007,
                                             type: .rtc) { token in
             guard let token = token else {
-                ShowLogger.error("renewToken fail: token is empty")
+                showError("renewToken fail: token is empty")
                 completion?(nil)
                 return
             }

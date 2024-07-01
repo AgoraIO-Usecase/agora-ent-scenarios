@@ -28,8 +28,8 @@ import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListFragmentBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.ui.RoomListActivity
 import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
-import io.agora.scene.showTo1v1.videoloaderapi.OnPageScrollEventHandler
-import io.agora.scene.showTo1v1.videoloaderapi.VideoLoader
+import io.agora.videoloaderapi.OnPageScrollEventHandler
+import io.agora.videoloaderapi.VideoLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
