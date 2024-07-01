@@ -2,6 +2,7 @@ package io.agora.rtmsyncmanager.utils
 
 import android.content.Context
 import android.os.*
+import android.util.Log
 import com.orhanobut.logger.*
 import java.io.File
 import java.io.FileWriter
@@ -9,7 +10,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AUILogger constructor(private val config: Config) {
+class AUILogger(private val config: Config) {
 
     companion object {
 
@@ -20,7 +21,8 @@ class AUILogger constructor(private val config: Config) {
 
         private fun addLogAdapterSafe(adapter: LogAdapter){
             if(!logAdapters.contains(adapter)){
-                Logger.clearLogAdapters()
+                // not clear in case of other log adapter ineffective
+                // Logger.clearLogAdapters()
                 logAdapters.add(adapter)
                 logAdapters.forEach { Logger.addLogAdapter(it) }
             }
@@ -28,7 +30,8 @@ class AUILogger constructor(private val config: Config) {
 
         private fun removeLogAdapterSafe(adapter: LogAdapter) {
             if (logAdapters.contains(adapter)) {
-                Logger.clearLogAdapters()
+                // not clear in case of other log adapter ineffective
+                // Logger.clearLogAdapters()
                 logAdapters.remove(adapter)
                 logAdapters.forEach { Logger.addLogAdapter(it) }
             }
@@ -44,8 +47,9 @@ class AUILogger constructor(private val config: Config) {
 
     }
 
+    private val wrapTag = "${config.rootTag}-${Random().nextInt(10) + 100}"
 
-    data class Config constructor(
+    data class Config(
         val context: Context,
         val rootTag: String,
         val logFileSize: Int = 2 * 1024 * 1024, // 2M，单位Byte
@@ -54,6 +58,7 @@ class AUILogger constructor(private val config: Config) {
         val threadInfoEnable: Boolean = true,
         val threadMethodCount: Int = 2,
         val threadMethodOffset: Int = 2,
+        val logCallback: AUILogCallback? = null
     )
 
     private val consoleLogAdapter by lazy {
@@ -63,11 +68,11 @@ class AUILogger constructor(private val config: Config) {
                 .methodCount(config.threadMethodCount)
                 .methodOffset(config.threadMethodOffset)
                 .logStrategy(LogcatLogStrategy())
-                .tag(config.rootTag)
+                .tag(wrapTag)
                 .build()
         ) {
             override fun isLoggable(priority: Int, tag: String?): Boolean {
-                return tag == config.rootTag
+                return tag == wrapTag
             }
         }
     }
@@ -77,18 +82,43 @@ class AUILogger constructor(private val config: Config) {
             CsvFormatStrategy
                 .newBuilder()
                 .logStrategy(DiskLogStrategy(WriteHandler(config, logFileWriteThread.looper)))
-                .tag(config.rootTag)
+                .tag(wrapTag)
                 .build()
         ) {
             override fun isLoggable(priority: Int, tag: String?): Boolean {
-                return tag == config.rootTag
+                return tag == wrapTag
+            }
+        }
+    }
+
+    private val callbackLogAdapter by lazy {
+        object : LogAdapter {
+            var lastMessage = ""
+
+            override fun isLoggable(priority: Int, tag: String?): Boolean {
+                return tag == wrapTag
+            }
+
+            override fun log(priority: Int, tag: String?, message: String) {
+                if (lastMessage == message) {
+                    return
+                }
+                // In case of the same message, only log once
+                lastMessage = message
+
+                when (priority) {
+                    Log.DEBUG -> config.logCallback?.onLogDebug(tag ?: "", message)
+                    Log.INFO -> config.logCallback?.onLogInfo(tag ?: "", message)
+                    Log.WARN -> config.logCallback?.onLogWarning(tag ?: "", message)
+                    Log.ERROR -> config.logCallback?.onLogError(tag ?: "", message)
+                }
             }
         }
     }
 
 
     init {
-        addLogAdapterSafe(consoleLogAdapter)
+        addLogAdapterSafe(callbackLogAdapter)
     }
 
     fun enableConsoleLog(enable: Boolean) {
@@ -108,28 +138,28 @@ class AUILogger constructor(private val config: Config) {
     }
 
 
-    fun i(tag: String? = null, message: String, vararg args: Any) {
-        Logger.t(config.rootTag).i(formatMessage("INFO", tag, message), args)
+    fun i(tag: String, message: String, vararg args: Any) {
+        Logger.t(wrapTag).i(formatMessage("INFO", tag, message), args)
     }
 
-    fun w(tag: String? = null, message: String, vararg args: Any) {
-        Logger.t(config.rootTag).w(formatMessage("Warn", tag, message), args)
+    fun w(tag: String, message: String, vararg args: Any) {
+        Logger.t(wrapTag).w(formatMessage("Warn", tag, message), args)
     }
 
-    fun d(tag: String? = null, message: String, vararg args: Any) {
-        Logger.t(config.rootTag).d(formatMessage("Debug", tag, message), args)
+    fun d(tag: String, message: String, vararg args: Any) {
+        Logger.t(wrapTag).d(formatMessage("Debug", tag, message), args)
     }
 
-    fun e(tag: String? = null, message: String, vararg args: Any) {
-        Logger.t(config.rootTag).e(formatMessage("Error", tag, message), args)
+    fun e(tag: String, message: String, vararg args: Any) {
+        Logger.t(wrapTag).e(formatMessage("Error", tag, message), args)
     }
 
-    fun e(tag: String? = null, throwable: Throwable, message: String, vararg args: Any) {
-        Logger.t(config.rootTag).e(throwable, formatMessage("Error", tag, message), args)
+    fun e(tag: String, throwable: Throwable, message: String, vararg args: Any) {
+        Logger.t(wrapTag).e(throwable, formatMessage("Error", tag, message), args)
     }
 
     private fun formatMessage(level: String, tag: String?, message: String): String {
-        val sb = StringBuilder("[Agora][${level}][${config.rootTag}]")
+        val sb = StringBuilder("[Agora][${level}][${wrapTag}]")
         tag?.let { sb.append("[${tag}]"); }
         sb.append(" : (${dataFormat.format(Date())}) : $message")
         return sb.toString()
@@ -197,6 +227,11 @@ class AUILogger constructor(private val config: Config) {
         }
     }
 
-
+    interface AUILogCallback {
+        fun onLogDebug(tag: String, message: String)
+        fun onLogInfo(tag: String, message: String)
+        fun onLogWarning(tag: String, message: String)
+        fun onLogError(tag: String, message: String)
+    }
 }
 

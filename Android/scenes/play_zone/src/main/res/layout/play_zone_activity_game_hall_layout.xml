@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/bg_app_def_white">
+
+    <io.agora.scene.widget.CommonTitleView
+        android:id="@+id/title_view"
+        style="@style/title_view"
+        app:ctv_centerText="@string/play_zone_game_hall"
+        tools:ignore="MissingConstraints" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/layoutBottom"
+        app:layout_constraintTop_toBottomOf="@+id/title_view">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivBanner"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@drawable/play_zone_banner"
+                app:layout_constraintDimensionRatio="335:200"
+                app:layout_constraintTop_toTopOf="parent"
+                app:strokeColor="@android:color/transparent" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/currentlyHottest"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_marginHorizontal="20dp"
+                android:background="@drawable/play_zone_shape_game_24dp_bg"
+                app:layout_constraintTop_toBottomOf="@id/ivBanner">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/ivGameType"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginStart="14dp"
+                    android:src="@drawable/play_zone_ic_the_hottest"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/horizontal50"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="0.5" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvGameName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginBottom="2dp"
+                    android:text="@string/play_zone_currently_the_hottest"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toTopOf="@id/horizontal50"
+                    app:layout_constraintStart_toEndOf="@id/ivGameType" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvGameTypeTips"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/play_zone_currently_the_hottest_tips"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="@id/tvGameName"
+                    app:layout_constraintTop_toBottomOf="@id/horizontal50" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvLeisureGame"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/play_zone_shape_game_24dp_bg"
+                android:paddingBottom="18dp"
+                app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/currentlyHottest"
+                app:spanCount="4"
+                tools:listitem="@layout/play_zone_item_game_layout" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutBottom"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@color/white_90_percent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            app:dividerColor="#CCCCCCCC"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/vertical50"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSwitchVendor"
+            android:layout_width="wrap_content"
+            android:layout_height="54dp"
+            android:drawableEnd="@drawable/play_zone_ic_arrow_down"
+            android:drawablePadding="2dp"
+            android:gravity="center"
+            android:paddingHorizontal="16dp"
+            android:text="@string/play_zone_switch_vendor"
+            android:textColor="#040925"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/vertical50"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRoomList"
+            android:layout_width="wrap_content"
+            android:layout_height="54dp"
+            android:gravity="center"
+            android:paddingHorizontal="16dp"
+            android:text="@string/play_zone_room_list"
+            android:textColor="#040925"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/vertical50" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

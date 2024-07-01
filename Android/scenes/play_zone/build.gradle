@@ -1,0 +1,53 @@
+ext { leisure_is_modular = false }
+apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
+
+final def VERSION_SCENE_CODE = "4.10.2"
+
+final def sub_appid = "1802594543385935873"
+final def sub_appkey = "*****************************"
+final def sub_appSecret = "*****************************"
+
+if (sub_appid.isEmpty() || sub_appkey.isEmpty()) {
+    throw new GradleException("请在 leisure:build.gradle 中配置完整的 sub_appid，sub_appkey")
+}
+
+android {
+    defaultConfig {
+        if(isModular()){
+            applicationId "io.agora.scenes.playzone"
+        }
+        buildConfigField "String", "VERSION", "\"${VERSION_SCENE_CODE}\""
+        buildConfigField "String", "sub_appid", "\"${sub_appid}\""
+        buildConfigField "String", "sub_appkey", "\"${sub_appkey}\""
+        buildConfigField "String", "sub_appSecret", "\"${sub_appSecret}\""
+
+        buildConfigField "String", "IM_APP_KEY", "\"${IM_APP_KEY}\""
+        buildConfigField "String", "IM_APP_CLIENT_ID", "\"${IM_APP_CLIENT_ID}\""
+        buildConfigField "String", "IM_APP_CLIENT_SECRET", "\"${IM_APP_CLIENT_SECRET}\""
+    }
+}
+
+dependencies {
+    implementation project(":common:base")
+    implementation project(':common:ui-widget')
+    implementation project(':RTMSyncManager')
+    implementation project(':IMKitManager')
+    implementation project(':scenes:play_zone:SudMGPWrapper')
+
+    implementation rootProject.ext.deps.lyricsView
+    implementation rootProject.ext.deps.annotation
+    implementation rootProject.ext.deps.material
+    implementation rootProject.ext.deps.palette_ktx
+    implementation rootProject.ext.deps.layout_kernel
+    implementation rootProject.ext.deps.header_classics
+    implementation rootProject.ext.deps.recyclerview
+
+    kapt rootProject.ext.deps.glide_compiler
+    implementation rootProject.ext.deps.glide
+
+    implementation rootProject.ext.deps.lifecycle
+    implementation rootProject.ext.deps.fragment_ktx
+
+    implementation rootProject.ext.deps.rtm
+    implementation rootProject.ext.deps.agora_chat
+}
