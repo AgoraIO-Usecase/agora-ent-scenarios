@@ -27,7 +27,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:singleLine="true"
         tools:text="1212344556"
-        android:drawableEnd="@drawable/show_mic_bg"
         android:textColor="@color/white"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

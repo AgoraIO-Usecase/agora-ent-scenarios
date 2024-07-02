@@ -1694,12 +1694,6 @@ class LiveDetailFragment : Fragment() {
     //================== RTC Operation ===================
 
     private val eventListener = object : IRtcEngineEventHandler() {
-        override fun onUserOffline(uid: Int, reason: Int) {
-            super.onUserOffline(uid, reason)
-            if (interactionInfo != null && interactionInfo!!.userId == uid.toString() && interactionInfo!!.interactStatus == ShowInteractionStatus.pking) {
-                mService.stopInteraction(mRoomInfo.roomId)
-            }
-        }
 
         override fun onLocalVideoStateChanged(
             source: Constants.VideoSourceType?,
