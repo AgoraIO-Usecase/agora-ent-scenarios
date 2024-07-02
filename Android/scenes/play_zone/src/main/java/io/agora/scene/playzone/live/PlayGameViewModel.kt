@@ -159,6 +159,7 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         // ------------------ 加入频道 ------------------
         mRtcEngine?.apply {
             enableAudio()
+            setAudioScenario(Constants.AUDIO_SCENARIO_GAME_STREAMING)
             val channelMediaOption = ChannelMediaOptions()
             channelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
             channelMediaOption.autoSubscribeAudio = true

@@ -159,12 +159,39 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
 
     // 设置小玩法的信息
     private fun setupJoyAppInfo() {
-        adapter.scenes = mutableListOf<SceneInfo>()
+        val versionTime = "20231230-"
+        val scenes = mutableListOf<SceneInfo>()
         if (VersionUtils.getVersion("io.agora.scene.joy.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_joy),
+                    "DMWF-" + VersionUtils.getVersion("io.agora.scene.joy.BuildConfig")
+                )
+            )
+        }
+        if (VersionUtils.getVersion("io.agora.scene.playzone.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_play_zone),
+                    "XXWF-" + VersionUtils.getVersion("io.agora.scene.playzone.BuildConfig")
+                )
+            )
+        }
+
+        if (scenes.size == 1) {
+            adapter.scenes = mutableListOf()
+            val scene = scenes[0]
             adapter.appInfo = AppInfo(
-                this.getString(R.string.app_about_joy),
-                "20231230-" + VersionUtils.getVersion("io.agora.scene.joy.BuildConfig") + "-" + RtcEngine
-                    .getSdkVersion(),
+                scene.name,
+                versionTime + scene.version + "-" + RtcEngine.getSdkVersion(),
+                servicePhone,
+                webSite
+            )
+        } else if (scenes.size > 1) {
+            adapter.scenes = scenes
+            adapter.appInfo = AppInfo(
+                this.getString(R.string.app_about_name),
+                versionTime + io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
@@ -250,10 +277,19 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             scenes.add(
                 SceneInfo(
                     this.getString(R.string.app_about_joy),
-                    "XWF-" + VersionUtils.getVersion("io.agora.scene.showTo1v1.BuildConfig")
+                    "XWF-" + VersionUtils.getVersion("io.agora.scene.joy.BuildConfig")
                 )
             )
         }
+        if (VersionUtils.getVersion("io.agora.scenes.playzone.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_play_zone),
+                    "XXWF-" + VersionUtils.getVersion("io.agora.scene.playzone.BuildConfig")
+                )
+            )
+        }
+
         val versionTime = "20231230-"
         if (scenes.size == 1) {
             adapter.scenes = mutableListOf()
