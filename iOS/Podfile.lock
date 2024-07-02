@@ -30,41 +30,41 @@ PODS:
   - AgoraLyricsScore (1.1.6):
     - AgoraComponetLog
     - Zip
-  - AgoraRtcEngine_iOS (4.3.2):
-    - AgoraRtcEngine_iOS/AIAEC (= 4.3.2)
-    - AgoraRtcEngine_iOS/AINS (= 4.3.2)
-    - AgoraRtcEngine_iOS/AudioBeauty (= 4.3.2)
-    - AgoraRtcEngine_iOS/ClearVision (= 4.3.2)
-    - AgoraRtcEngine_iOS/ContentInspect (= 4.3.2)
-    - AgoraRtcEngine_iOS/FaceCapture (= 4.3.2)
-    - AgoraRtcEngine_iOS/FaceDetection (= 4.3.2)
-    - AgoraRtcEngine_iOS/LipSync (= 4.3.2)
-    - AgoraRtcEngine_iOS/ReplayKit (= 4.3.2)
-    - AgoraRtcEngine_iOS/RtcBasic (= 4.3.2)
-    - AgoraRtcEngine_iOS/SpatialAudio (= 4.3.2)
-    - AgoraRtcEngine_iOS/VideoAv1CodecDec (= 4.3.2)
-    - AgoraRtcEngine_iOS/VideoAv1CodecEnc (= 4.3.2)
-    - AgoraRtcEngine_iOS/VideoCodecDec (= 4.3.2)
-    - AgoraRtcEngine_iOS/VideoCodecEnc (= 4.3.2)
-    - AgoraRtcEngine_iOS/VirtualBackground (= 4.3.2)
-    - AgoraRtcEngine_iOS/VQA (= 4.3.2)
-  - AgoraRtcEngine_iOS/AIAEC (4.3.2)
-  - AgoraRtcEngine_iOS/AINS (4.3.2)
-  - AgoraRtcEngine_iOS/AudioBeauty (4.3.2)
-  - AgoraRtcEngine_iOS/ClearVision (4.3.2)
-  - AgoraRtcEngine_iOS/ContentInspect (4.3.2)
-  - AgoraRtcEngine_iOS/FaceCapture (4.3.2)
-  - AgoraRtcEngine_iOS/FaceDetection (4.3.2)
-  - AgoraRtcEngine_iOS/LipSync (4.3.2)
-  - AgoraRtcEngine_iOS/ReplayKit (4.3.2)
-  - AgoraRtcEngine_iOS/RtcBasic (4.3.2)
-  - AgoraRtcEngine_iOS/SpatialAudio (4.3.2)
-  - AgoraRtcEngine_iOS/VideoAv1CodecDec (4.3.2)
-  - AgoraRtcEngine_iOS/VideoAv1CodecEnc (4.3.2)
-  - AgoraRtcEngine_iOS/VideoCodecDec (4.3.2)
-  - AgoraRtcEngine_iOS/VideoCodecEnc (4.3.2)
-  - AgoraRtcEngine_iOS/VirtualBackground (4.3.2)
-  - AgoraRtcEngine_iOS/VQA (4.3.2)
+  - AgoraRtcEngine_iOS (4.3.1):
+    - AgoraRtcEngine_iOS/AIAEC (= 4.3.1)
+    - AgoraRtcEngine_iOS/AINS (= 4.3.1)
+    - AgoraRtcEngine_iOS/AudioBeauty (= 4.3.1)
+    - AgoraRtcEngine_iOS/ClearVision (= 4.3.1)
+    - AgoraRtcEngine_iOS/ContentInspect (= 4.3.1)
+    - AgoraRtcEngine_iOS/FaceCapture (= 4.3.1)
+    - AgoraRtcEngine_iOS/FaceDetection (= 4.3.1)
+    - AgoraRtcEngine_iOS/LipSync (= 4.3.1)
+    - AgoraRtcEngine_iOS/ReplayKit (= 4.3.1)
+    - AgoraRtcEngine_iOS/RtcBasic (= 4.3.1)
+    - AgoraRtcEngine_iOS/SpatialAudio (= 4.3.1)
+    - AgoraRtcEngine_iOS/VideoAv1CodecDec (= 4.3.1)
+    - AgoraRtcEngine_iOS/VideoAv1CodecEnc (= 4.3.1)
+    - AgoraRtcEngine_iOS/VideoCodecDec (= 4.3.1)
+    - AgoraRtcEngine_iOS/VideoCodecEnc (= 4.3.1)
+    - AgoraRtcEngine_iOS/VirtualBackground (= 4.3.1)
+    - AgoraRtcEngine_iOS/VQA (= 4.3.1)
+  - AgoraRtcEngine_iOS/AIAEC (4.3.1)
+  - AgoraRtcEngine_iOS/AINS (4.3.1)
+  - AgoraRtcEngine_iOS/AudioBeauty (4.3.1)
+  - AgoraRtcEngine_iOS/ClearVision (4.3.1)
+  - AgoraRtcEngine_iOS/ContentInspect (4.3.1)
+  - AgoraRtcEngine_iOS/FaceCapture (4.3.1)
+  - AgoraRtcEngine_iOS/FaceDetection (4.3.1)
+  - AgoraRtcEngine_iOS/LipSync (4.3.1)
+  - AgoraRtcEngine_iOS/ReplayKit (4.3.1)
+  - AgoraRtcEngine_iOS/RtcBasic (4.3.1)
+  - AgoraRtcEngine_iOS/SpatialAudio (4.3.1)
+  - AgoraRtcEngine_iOS/VideoAv1CodecDec (4.3.1)
+  - AgoraRtcEngine_iOS/VideoAv1CodecEnc (4.3.1)
+  - AgoraRtcEngine_iOS/VideoCodecDec (4.3.1)
+  - AgoraRtcEngine_iOS/VideoCodecEnc (4.3.1)
+  - AgoraRtcEngine_iOS/VirtualBackground (4.3.1)
+  - AgoraRtcEngine_iOS/VQA (4.3.1)
   - AgoraRtm (2.2.0)
   - AgoraSyncManager (2.1.6):
     - SocketRocket
@@ -196,7 +196,7 @@ DEPENDENCIES:
   - Agora_Chat_iOS (= 1.0.8)
   - AgoraCommon (from `AgoraEntScenarios`)
   - AgoraLyricsScore (= 1.1.6)
-  - AgoraRtcEngine_iOS (~> 4.3.1)
+  - AgoraRtcEngine_iOS (= 4.3.1)
   - AgoraRtm (from `AgoraRtm.podspec`)
   - AgoraSyncManager (~> 2.1.6)
   - AGResourceManager (from `AgoraEntScenarios/Common/API/AGResourceManager`)
@@ -294,7 +294,7 @@ SPEC CHECKSUMS:
   AgoraCommon: a58ba94ab35c2318bd55687a398f84dcd354a476
   AgoraComponetLog: b359777d2ff8e9ee0237cbd0c42ceb422fd514f1
   AgoraLyricsScore: 7576387b199cdc3b2752a113688abd0a807a2ca3
-  AgoraRtcEngine_iOS: eaa97751fcfe1b50d9b067e0df92752a6a5f899f
+  AgoraRtcEngine_iOS: f64be00fdda786bb7edd84ab461c31b7b4c93534
   AgoraRtm: 874bbc0db49e4581832ce4fb8c47023bbd32ef10
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
   AGResourceManager: e6616ad4d9d0461c84d9582ef1118004fa534e5c
@@ -331,6 +331,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: d2d699de35df3c3db67ccb230e12e9aeeac356b0
+PODFILE CHECKSUM: 4f3e791639e0455bfe33104a292a2695346692b7
 
 COCOAPODS: 1.15.2
