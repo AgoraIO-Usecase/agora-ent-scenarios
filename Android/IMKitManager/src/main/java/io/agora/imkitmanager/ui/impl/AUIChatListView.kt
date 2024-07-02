@@ -55,7 +55,7 @@ class AUIChatListView : RelativeLayout, IAUIChatListView {
         mViewBinding.listview.adapter = adapter
     }
 
-    fun setOwnerId(ownerId: String) {
+    override fun setOwnerId(ownerId: String) {
         adapter?.setOwner(ownerId)
     }
 

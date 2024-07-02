@@ -246,6 +246,7 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
      * @receiver
      */
     override fun joinChatRoom(chatRoomInfo: AUIChatRoomInfo, completion: (error: Exception?) -> Unit) {
+        mChatListView?.setOwnerId(chatRoomInfo.ownerUserId)
         // check login
         innerLoginChat { loginError ->
             if (loginError != null) {

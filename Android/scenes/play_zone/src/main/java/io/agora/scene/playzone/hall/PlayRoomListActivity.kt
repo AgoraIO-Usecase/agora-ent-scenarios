@@ -119,9 +119,7 @@ class PlayRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomListLay
         }
         mRoomViewModel.joinRoomInfoLiveData.observe(this) { roomInfo ->
             isJoining = false
-            if (roomInfo == null) {
-                setDarkStatusIcon(isBlackDarkStatus)
-            } else {
+            if (roomInfo != null) {
                 PlayRoomGameActivity.launch(this, roomInfo)
             }
         }
