@@ -10,7 +10,7 @@ import RTMSyncManager
 import YYModel
 import AgoraRtmKit
 
-private let kSceneId = "scene_joy_4.10.1"
+private let kSceneId = "scene_joy_5.0.0"
 private let SYNC_SCENE_ROOM_STARTGAME_COLLECTION = "startGameCollection"
 class JoyServiceImpl: NSObject {
     private var appId: String
