@@ -144,8 +144,12 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
             binding.rvLeisureGame.adapter = concatAdapter
         }
 
-        mPlayZoneViewModel.checkLoginIm()
 
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+        mPlayZoneViewModel.checkLoginIm()
         showLoadingView()
         mPlayZoneViewModel.loginImLiveData.observe(this) {
             hideLoadingView()
