@@ -2,7 +2,6 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:theme="?attr/aui_chatListView_appearance"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="9dp"
@@ -13,7 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:requiresFadingEdge="vertical"
-        app:aui_interceptTouchEvent="?attr/aui_chatListView_interceptTouchEvent"
         android:fadingEdgeLength="100dp" />
 
 </RelativeLayout>

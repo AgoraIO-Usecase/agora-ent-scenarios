@@ -67,6 +67,7 @@
     <color name="bg_color_blue_66">#66B5FF</color>
     <color name="black33">#333333</color>
     <color name="black_20_percent">#33000000</color>
+    <color name="black_25_percent">#40000000</color>
     <color name="black_30_percent">#4D000000</color>
     <color name="black_50_percent">#80000000</color>
     <color name="black_60_percent">#99000000</color>

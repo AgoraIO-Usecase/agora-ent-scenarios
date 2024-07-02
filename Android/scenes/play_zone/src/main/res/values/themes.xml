@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- chat 组件主题 -->
-    <style name="play_zone_chat_theme" parent="def_material_theme">
-        <item name="aui_chatListView_appearance">@style/play_zone_chatListView_style</item>
-    </style>
-</resources>

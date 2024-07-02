@@ -9,10 +9,12 @@
         android:id="@+id/ivGameType"
         android:layout_width="60dp"
         android:layout_height="60dp"
+        android:src="@drawable/play_zone_ic_gameplay"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/play_zone_ic_gameplay" />
+        app:shapeAppearance="@style/play_zone_roundStyle_16"
+        app:strokeColor="@android:color/transparent" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/horizontal50"
@@ -26,10 +28,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
+        android:layout_marginBottom="2dp"
         android:text="@string/play_zone_gameplay"
         android:textColor="@color/black"
         android:textSize="16sp"
-        android:layout_marginBottom="2dp"
         app:layout_constraintBottom_toTopOf="@id/horizontal50"
         app:layout_constraintStart_toEndOf="@id/ivGameType" />
 
@@ -38,8 +40,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:textSize="14sp"
         android:text="@string/play_zone_gameplay_tips"
-        app:layout_constraintTop_toBottomOf="@id/horizontal50"
-        app:layout_constraintStart_toStartOf="@id/tvGameName" />
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="@id/tvGameName"
+        app:layout_constraintTop_toBottomOf="@id/horizontal50" />
 </androidx.constraintlayout.widget.ConstraintLayout>
