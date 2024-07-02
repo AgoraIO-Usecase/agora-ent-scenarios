@@ -437,12 +437,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
             override fun onRoomDestroy() {
                 innerRleasee()
-                showLivingEndLayout(false)
+                showLivingEndLayout()
             }
 
             override fun onRoomExpire() {
                 innerRleasee()
-                showLivingEndLayout(false)
+                showLivingEndLayout()
             }
         })
 
@@ -659,7 +659,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     if (uid == mStartGameInfo?.assistantUid) {
                         // todo 远端游戏退出
                         innerRleasee()
-                        showLivingEndLayout(true)
+                        showAssistantUidOffline()
                     }
                 }
             }
@@ -910,12 +910,23 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         dialog.show(supportFragmentManager, "rulesDialog")
     }
 
-    private fun showLivingEndLayout(abnormal: Boolean) {
-        val title = if (abnormal) R.string.joy_living_abnormal_title else R.string.joy_living_timeout_title
+    private fun showLivingEndLayout() {
         val message = if (mIsRoomOwner) R.string.joy_living_host_timeout else R.string.joy_living_user_timeout
         AlertDialog.Builder(this, R.style.joy_alert_dialog)
-            .setTitle(title)
+            .setTitle(R.string.joy_living_timeout_title)
             .setMessage(message)
+            .setCancelable(false)
+            .setPositiveButton(R.string.i_know) { dialog, _ ->
+                dialog.dismiss()
+                finish()
+            }
+            .show()
+    }
+
+    private fun showAssistantUidOffline() {
+        AlertDialog.Builder(this, R.style.joy_alert_dialog)
+            .setTitle(R.string.joy_living_abnormal_title)
+            .setMessage(R.string.joy_living_assistantUid_offline)
             .setCancelable(false)
             .setPositiveButton(R.string.i_know) { dialog, _ ->
                 dialog.dismiss()
