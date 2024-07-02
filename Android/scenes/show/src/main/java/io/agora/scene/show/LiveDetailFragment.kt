@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Looper
-import android.os.SystemClock
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.Log
@@ -29,6 +28,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import io.agora.audioscenarioapi.AudioScenarioApi
+import io.agora.audioscenarioapi.AudioScenarioType
+import io.agora.audioscenarioapi.SceneType
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.data.MediaPlayerSource
 import io.agora.rtc2.ChannelMediaOptions
@@ -47,9 +49,6 @@ import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.audioscenarioapi.AudioScenarioApi
-import io.agora.audioscenarioapi.AudioScenarioType
-import io.agora.audioscenarioapi.SceneType
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLiveDetailFragmentBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
@@ -849,10 +848,10 @@ class LiveDetailFragment : Fragment() {
                 mPKCountDownLatch = null
             }
             mPKCountDownLatch =
-                object : CountDownTimer(ShowServiceProtocol.PK_AVAILABLE_DURATION - 1, 1000) {
+                object : CountDownTimer((ShowServiceProtocol.PK_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - interactionInfo!!.createdAt)).toLong(), 1000) {
                     override fun onTick(millisUntilFinished: Long) {
                         val min: Long = (millisUntilFinished / 1000) / 60
-                        val sec: Long = (millisUntilFinished / 1000) % 60
+                        val sec: Long = (millisUntilFinished / 1000) % 60 + 1
                         activity ?: return
                         mBinding.videoPKLayout.iPKTimeText.text =
                             getString(
@@ -1586,6 +1585,7 @@ class LiveDetailFragment : Fragment() {
                     updateLinkingMode()
                 } else if (interactionInfo.interactStatus == ShowInteractionStatus.pking) {
                     updatePKingMode()
+                    refreshPKTimeCount()
                 }
             } else {
                 refreshViewDetailLayout(ShowInteractionStatus.idle)

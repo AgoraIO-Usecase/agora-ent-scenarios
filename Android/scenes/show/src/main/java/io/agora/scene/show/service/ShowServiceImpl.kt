@@ -928,7 +928,8 @@ private fun InteractionInfo.toShowInteraction(): ShowInteractionInfo {
             InteractionType.LINKING -> ShowInteractionStatus.linking
             InteractionType.PK -> ShowInteractionStatus.pking
             else -> ShowInteractionStatus.idle
-        }
+        },
+        createdAt
     )
 }
 
