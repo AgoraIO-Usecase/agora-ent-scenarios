@@ -129,7 +129,8 @@ class ShowApplyView: UIView {
                 self?.revokeutton.tag = 0
                 self?.revokeutton.isHidden = false
             } else {
-                self?.revokeutton.isHidden = true
+//                self?.revokeutton.isHidden = true
+                self?.revokeutton.isHidden = self?.interactionModel == nil ? true : false
             }
             
             self?.setupTipsInfo(count: list.count)
