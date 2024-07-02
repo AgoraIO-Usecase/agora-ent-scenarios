@@ -23,4 +23,11 @@ interface IAUIChatListView {
      * @param msgList
      */
     fun refreshSelectLast(msgList: List<AUIChatInfo>?) {}
+
+    /**
+     * 设置房主 uid
+     *
+     * @param ownerId
+     */
+    fun setOwnerId(ownerId: String)
 }

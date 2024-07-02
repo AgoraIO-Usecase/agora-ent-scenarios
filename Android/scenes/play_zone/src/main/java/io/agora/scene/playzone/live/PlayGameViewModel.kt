@@ -6,9 +6,7 @@ import android.os.Looper
 import android.text.TextUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import io.agora.imkitmanager.model.AUIChatEntity
 import io.agora.imkitmanager.model.AUIChatRoomInfo
-import io.agora.imkitmanager.service.IAUIIMManagerService
 import io.agora.imkitmanager.ui.IAUIChatListView
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
@@ -102,15 +100,15 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         mChatRoomService.imManagerService.setChatListView(chatListView)
         val chatRoomId = mRoomInfo.customPayload[PlayZoneParameters.CHAT_ID] as? String ?: return
         val chatRoomInfo = AUIChatRoomInfo(mRoomOwner, chatRoomId)
+        mChatRoomService.chatManager.saveWelcomeMsg(
+            context().getString(R.string.play_zone_system),
+            context().getString(R.string.play_zone_room_welcome)
+        )
         mChatRoomService.imManagerService.joinChatRoom(chatRoomInfo, completion = { error ->
             error?.message?.let {
                 ToastUtils.showToast(it)
             }
         })
-        mChatRoomService.chatManager.saveWelcomeMsg(
-            context().getString(R.string.play_zone_system),
-            context().getString(R.string.play_zone_room_welcome)
-        )
     }
 
     // 初始化
@@ -149,7 +147,7 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
                 PlayLogger.e(TAG, "Rtc Error code:$err, msg:" + RtcEngine.getErrorDescription(err))
             }
         }
-        config.mChannelProfile = Constants.CHANNEL_PROFILE_COMMUNICATION
+        config.mChannelProfile = Constants.CHANNEL_PROFILE_GAME
         try {
             mRtcEngine = RtcEngine.create(config) as RtcEngineEx
         } catch (e: Exception) {
