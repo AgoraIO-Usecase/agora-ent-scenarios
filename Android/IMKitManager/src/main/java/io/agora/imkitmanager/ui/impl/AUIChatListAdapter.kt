@@ -16,6 +16,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import io.agora.imkitmanager.R
+import io.agora.imkitmanager.model.AUIChatRoomContext
 import io.agora.imkitmanager.ui.AUIChatInfo
 import io.agora.imkitmanager.ui.AUIChatListInterceptType
 
@@ -39,6 +40,8 @@ class AUIChatListAdapter constructor(private val context: Context, typedArray: T
     private var localLayoutBackground: Int = 0
     private var itemInterceptTouchEvent: Int = AUIChatListInterceptType.SUPER_INTERCEPT.type
     private lateinit var ownerId: String
+
+//    private val ownerId get() = AUIChatRoomContext.shared().isRoomOwner()
 
     init {
         normalTagIcon = typedArray.getResourceId(

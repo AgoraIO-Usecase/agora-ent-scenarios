@@ -176,8 +176,6 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
             }
             binding.vKeyboardBg.layoutParams = lp
         }
-
-        binding.chatListView.setOwnerId(roomGameViewModel.mRoomInfo.roomOwner?.userId ?: "")
     }
 
     private fun showNormalInputLayout(): Boolean {

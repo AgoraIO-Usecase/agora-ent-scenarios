@@ -62,7 +62,6 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
     }
 
     private fun setOnManagerListener() {
-        currentMsgList.clear()
         chatLogCallback?.onDebugInfo(tag, "setOnManagerListener")
         if (ChatClient.getInstance().isSdkInited) {
             ChatClient.getInstance().chatManager().addMessageListener(this)
