@@ -838,12 +838,11 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
     }
 
     private fun appendRobotRooms(roomList: List<ShowRoomDetailModel>): List<ShowRoomDetailModel> {
-        val retRoomList = mutableListOf<ShowRoomDetailModel>()
-        retRoomList.addAll(roomList)
+
 
         val robotRoomIds = ArrayList(kRobotVideoRoomIds)
         val kRobotRoomStartId = kRobotVideoRoomIds[0]
-        retRoomList.forEach { roomDetail ->
+        roomList.forEach { roomDetail ->
             val differValue = roomDetail.roomId.toInt() - kRobotRoomStartId
             if (differValue >= 0) {
                 robotRoomIds.firstOrNull { robotRoomId -> robotRoomId == roomDetail.roomId.toInt() }
@@ -851,8 +850,8 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
                         robotRoomIds.remove(id)
                     }
             }
-
         }
+        val retRoomList = mutableListOf<ShowRoomDetailModel>()
         for (i in 0 until robotRoomIds.size) {
             val robotRoomId = robotRoomIds[i]
             val robotId = robotRoomId % 10
@@ -868,6 +867,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
             )
             retRoomList.add(roomInfo)
         }
+        retRoomList.addAll(roomList)
         return retRoomList
     }
 
