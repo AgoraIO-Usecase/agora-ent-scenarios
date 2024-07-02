@@ -10,24 +10,25 @@
         android:id="@+id/ivGameIcon"
         android:layout_width="62dp"
         android:layout_height="62dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         android:layout_marginHorizontal="2dp"
+        android:src="@drawable/play_zone_ic_gameplay"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearance="@style/play_zone_roundStyle_16"
-        android:src="@drawable/play_zone_ic_gameplay" />
+        app:strokeColor="@android:color/transparent" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvGameName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:maxLines="1"
         android:text="@string/play_zone_currently_the_hottest"
         android:textColor="#040925"
         android:textSize="11sp"
-        android:maxLines="1"
-        android:gravity="center"
-        android:layout_marginTop="4dp"
-        app:layout_constraintTop_toBottomOf="@+id/ivGameIcon"
+        app:layout_constraintEnd_toEndOf="@+id/ivGameIcon"
         app:layout_constraintStart_toStartOf="@+id/ivGameIcon"
-        app:layout_constraintEnd_toEndOf="@+id/ivGameIcon"/>
+        app:layout_constraintTop_toBottomOf="@+id/ivGameIcon" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -78,7 +78,7 @@ include ':RTMSyncManager'
 /**
  * 弹幕游戏
  */
-//include ':scenes:joy'
+include ':scenes:joy'
 
 /**
  * 休闲游戏

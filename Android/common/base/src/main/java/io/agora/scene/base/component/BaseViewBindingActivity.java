@@ -351,9 +351,6 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
     }
 
     public final void hideLoadingView() {
-        if (this.loadingView == null) {
-            return;
-        }
         getWindow().getDecorView().post(() -> {
             if (this.loadingView != null) {
                 this.loadingView.setVisibility(View.GONE);

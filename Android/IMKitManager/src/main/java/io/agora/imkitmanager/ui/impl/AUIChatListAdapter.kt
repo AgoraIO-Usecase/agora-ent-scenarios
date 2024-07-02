@@ -12,15 +12,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import io.agora.imkitmanager.R
 import io.agora.imkitmanager.ui.AUIChatInfo
+import io.agora.imkitmanager.ui.AUIChatListInterceptType
 
-class AUIChatListAdapter(
-    private val context: Context,
-    typedArray: TypedArray
-) :
+class AUIChatListAdapter constructor(private val context: Context, typedArray: TypedArray) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var messages: ArrayList<AUIChatInfo> = ArrayList()
     private val ITEM_DEFAULT_TYPE = 0
@@ -29,9 +28,16 @@ class AUIChatListAdapter(
     private var normalTagIcon: Int = 0
     private var normalTitleColor: Int = 0
     private var normalContentColor: Int = 0
+    private var normalLayoutBackground: Int = 0
+
     private var systemTitleColor: Int = 0
     private var systemContentColor: Int = 0
+    private var systemEndTagIcon: Int = 0
+    private var systemLayoutBackground: Int = 0
+
     private var localContentColor: Int = 0
+    private var localLayoutBackground: Int = 0
+    private var itemInterceptTouchEvent: Int = AUIChatListInterceptType.SUPER_INTERCEPT.type
     private lateinit var ownerId: String
 
     init {
@@ -50,6 +56,11 @@ class AUIChatListAdapter(
             context.resources.getColor(R.color.aui_white)
         )
 
+        normalLayoutBackground = typedArray.getResourceId(
+            R.styleable.AUIChatListView_aui_barrage_normal_layout_bg,
+            R.drawable.aui_bg_barrage_local_shape
+        )
+
         systemTitleColor = typedArray.getColor(
             R.styleable.AUIChatListView_aui_barrage_system_title_TextColor,
             context.resources.getColor(R.color.aui_default_blue)
@@ -60,9 +71,29 @@ class AUIChatListAdapter(
             context.resources.getColor(R.color.aui_color_fcf0b3)
         )
 
+        systemEndTagIcon = typedArray.getResourceId(
+            R.styleable.AUIChatListView_aui_barrage_system_endIcon_resource,
+            R.drawable.aui_icon_shaking_hand
+        )
+
+        systemLayoutBackground = typedArray.getResourceId(
+            R.styleable.AUIChatListView_aui_barrage_system_layout_bg,
+            R.drawable.aui_bg_barrage_system_shape
+        )
+
         localContentColor = typedArray.getColor(
             R.styleable.AUIChatListView_aui_barrage_local_content_TextColor,
             context.resources.getColor(R.color.aui_white)
+        )
+
+        itemInterceptTouchEvent = typedArray.getInt(
+            R.styleable.AUIChatListView_aui_barrage_interceptTouchEvent,
+            AUIChatListInterceptType.SUPER_INTERCEPT.type
+        )
+
+        localLayoutBackground = typedArray.getResourceId(
+            R.styleable.AUIChatListView_aui_barrage_local_layout_bg,
+            R.drawable.aui_bg_barrage_local_shape
         )
 
         typedArray.recycle()
@@ -108,6 +139,8 @@ class AUIChatListAdapter(
         from = message.userName
         val s: String? = message.content
         if (holder is NormalViewHolder) {
+            holder.rootView.setBackgroundResource(normalLayoutBackground)
+            holder.content.setTextColor(normalContentColor)
             if (TextUtils.isEmpty(from)) {
                 from = message.userId
             }
@@ -120,6 +153,10 @@ class AUIChatListAdapter(
                 )
             }
         } else if (holder is SystemViewHolder) {
+            holder.rooView.setBackgroundResource(systemLayoutBackground)
+            holder.name.setTextColor(systemTitleColor)
+            holder.content.setTextColor(systemContentColor)
+            holder.icon.setImageResource(systemEndTagIcon)
             from = message.userName
             showSystemMsg(
                 holder.name,
@@ -127,12 +164,16 @@ class AUIChatListAdapter(
                 holder.content
             )
         } else if (holder is LocalViewHolder) {
+            holder.rooView.setBackgroundResource(localLayoutBackground)
+            holder.content.setTextColor(localContentColor)
             if (s != null) {
                 showLocalMsg(holder.content, s)
             }
         }
-        holder.itemView.setOnClickListener {
-            messageViewListener?.onItemClickListener(message)
+        if (itemInterceptTouchEvent != AUIChatListInterceptType.NON_INTERCEPT.type) {
+            holder.itemView.setOnClickListener {
+                messageViewListener?.onItemClickListener(message)
+            }
         }
     }
 
@@ -228,18 +269,22 @@ class AUIChatListAdapter(
 
     class NormalViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var content: TextView
+        var rootView: View
 
         init {
+            rootView = itemView.findViewById(R.id.rootView)
             content = itemView.findViewById<View>(R.id.content) as TextView
         }
     }
 
     class SystemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var rooView: View
         var name: TextView
         var content: TextView
         var icon: ShapeableImageView
 
         init {
+            rooView = itemView.findViewById(R.id.rootView)
             name = itemView.findViewById<View>(R.id.name) as TextView
             content = itemView.findViewById<View>(R.id.content) as TextView
             icon = itemView.findViewById(R.id.icon_system)
@@ -247,9 +292,11 @@ class AUIChatListAdapter(
     }
 
     class LocalViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var rooView: View
         var content: TextView
 
         init {
+            rooView = itemView.findViewById(R.id.rootView)
             content = itemView.findViewById<View>(R.id.content) as TextView
         }
     }

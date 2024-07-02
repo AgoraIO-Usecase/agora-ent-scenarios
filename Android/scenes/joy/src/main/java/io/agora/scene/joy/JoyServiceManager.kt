@@ -7,7 +7,6 @@ import io.agora.rtc2.RtcEngineEx
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.joy.service.TokenConfig
 import java.util.concurrent.Executors
 
 object JoyServiceManager {
@@ -16,7 +15,15 @@ object JoyServiceManager {
 
     private val mWorkingExecutor = Executors.newSingleThreadExecutor()
 
-    val mTokenConfig: TokenConfig = TokenConfig()
+    var mRtmToken: String = ""
+        private set(value) {
+            field = value
+        }
+
+    var mRtcToken: String = ""
+        private set(value) {
+            field = value
+        }
 
     private var innerRtcEngine: RtcEngineEx? = null
     val rtcEngine: RtcEngineEx
@@ -38,29 +45,54 @@ object JoyServiceManager {
             return innerRtcEngine!!
         }
 
-    fun renewTokens(callback: (tokenConfig: TokenConfig?, exception: Exception?) -> Unit) {
-        TokenGenerator.generateTokens(
-            "", // 万能 token
-            UserManager.getInstance().user.id.toString(),
-            TokenGenerator.TokenGeneratorType.token007,
-            arrayOf(
-                TokenGenerator.AgoraTokenType.rtc,
-                TokenGenerator.AgoraTokenType.rtm
-            ),
-            success = { ret ->
-                val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc]
-                val rtmToken = ret[TokenGenerator.AgoraTokenType.rtm]
-                if (rtcToken == null || rtmToken == null) {
-                    callback.invoke(null, Exception("rtcToken or rtmToken is null"))
-                    return@generateTokens
-                }
-                mTokenConfig.rtcToken = rtcToken
-                mTokenConfig.rtmToken = rtmToken
-                callback.invoke(mTokenConfig, null)
+    /**
+     * Renew rtm token
+     *
+     * @param callback
+     * @receiver
+     */
+    fun generateRtmToken(callback: (rtmToken: String?, exception: Exception?) -> Unit) {
+        TokenGenerator.generateToken(
+            channelName = "", // 万能 token
+            uid = UserManager.getInstance().user.id.toString(),
+            genType = TokenGenerator.TokenGeneratorType.token007,
+            tokenType = TokenGenerator.AgoraTokenType.rtm,
+            success = { rtmToken ->
+                mRtmToken = rtmToken
+                JoyLogger.d(TAG, "generate RtmTokens success")
+                callback.invoke(rtmToken, null)
             },
             failure = {
-                JoyLogger.e(TAG, it, "generateTokens failed")
+                JoyLogger.e(TAG, "generate RtmToken failed,$it")
                 callback.invoke(null, it)
+            })
+    }
+
+    /**
+     * Renew rtc token
+     *
+     * @param channelName
+     * @param callback
+     * @receiver
+     */
+    fun generateRtcToken(callback: (rtcToken: String?, exception: Exception?) -> Unit) {
+        if (mRtcToken.isNotEmpty()) {
+            callback.invoke(mRtcToken, null)
+            return
+        }
+        TokenGenerator.generateToken(
+            channelName = "",
+            uid = UserManager.getInstance().user.id.toString(),
+            genType = TokenGenerator.TokenGeneratorType.token007,
+            tokenType = TokenGenerator.AgoraTokenType.rtc,
+            success = { rtcToken ->
+                JoyLogger.d(TAG, "generate RtcToken success")
+                mRtcToken = rtcToken
+                callback.invoke(mRtcToken, null)
+            },
+            failure = { exception ->
+                JoyLogger.e(TAG, "generate RtcToken failed, $exception")
+                callback.invoke(null, exception)
             })
     }
 
@@ -69,7 +101,7 @@ object JoyServiceManager {
             mWorkingExecutor.execute { RtcEngineEx.destroy() }
             innerRtcEngine = null
         }
-        mTokenConfig.rtcToken = ""
-        mTokenConfig.rtmToken = ""
+        mRtmToken = ""
+        mRtcToken = ""
     }
 }

@@ -265,7 +265,7 @@
         android:layout_height="220dp"
         android:layout_marginBottom="10dp"
         android:paddingBottom="8dp"
-
+        style="@style/play_zone_chatListView_style"
         app:layout_constraintBottom_toTopOf="@+id/layoutBottom"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

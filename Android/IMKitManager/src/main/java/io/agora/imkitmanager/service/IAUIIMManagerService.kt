@@ -1,8 +1,12 @@
 package io.agora.imkitmanager.service
 
+import io.agora.imkitmanager.model.AUIChatEntity
 import io.agora.imkitmanager.model.AUIChatRoomInfo
 import io.agora.imkitmanager.model.AUIChatUserInfo
 import io.agora.imkitmanager.service.http.CreateChatRoomResponse
+import io.agora.imkitmanager.ui.AUIChatInfo
+import io.agora.imkitmanager.ui.IAUIChatListView
+import io.agora.imkitmanager.ui.impl.AUIChatListView
 
 interface IAUIIMManagerService {
 
@@ -15,13 +19,19 @@ interface IAUIIMManagerService {
      */
     fun unRegisterRespObserver(observer: AUIIMManagerRespObserver?)
 
-
     /**
-     *  发送聊天室消息
-     *  - text: 文本内容
-     *  - userInfo: 用户信息
+     * 发送聊天室消息
+     *
+     * @param text
+     * @param completion
+     * @param localMsg
+     * @receiver
      */
-    fun sendMessage(text: String, completion: (chatMessage: AgoraChatTextMessage?, error: Exception?) -> Unit)
+    fun sendMessage(
+        text: String,
+        completion: (chatMessage: AgoraChatTextMessage?, error: Exception?) -> Unit,
+        localMsg: Boolean = false
+    )
 
     /**
      * 登录环信
@@ -67,6 +77,8 @@ interface IAUIIMManagerService {
      * @receiver
      */
     fun leaveChatRoom(completion: (error: Exception?) -> Unit)
+
+    fun setChatListView(view: IAUIChatListView)
 
     data class AgoraChatTextMessage(
         val messageId: String?,
