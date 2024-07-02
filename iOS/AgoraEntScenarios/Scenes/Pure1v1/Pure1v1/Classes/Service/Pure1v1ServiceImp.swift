@@ -50,7 +50,7 @@ class Pure1v1ServiceImp: NSObject {
     }()
     
     private lazy var userService: AUIUserServiceImpl = {
-        let service = AUIUserServiceImpl(channelName: kRoomId, rtmManager: syncManager.rtmManager)
+        let service = AUIUserServiceImpl(channelName: kRoomId, rtmManager: syncManager.rtmManager, autoSetUserAttr: true)
         return service
     }()
     

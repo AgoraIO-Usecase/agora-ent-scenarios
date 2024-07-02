@@ -41,7 +41,7 @@ public class AUIScene: NSObject {
         self.channelName = channelName
         self.rtmManager = rtmManager
         self.removeClosure = removeClosure
-        self.userService = AUIUserServiceImpl(channelName: channelName, rtmManager: rtmManager, autoSetUserAttr: true)
+        self.userService = AUIUserServiceImpl(channelName: channelName, rtmManager: rtmManager)
         self.arbiter = AUIArbiter(channelName: channelName, rtmManager: rtmManager, userInfo: AUIRoomContext.shared.currentUserInfo)
         AUIRoomContext.shared.roomArbiterMap[channelName] = self.arbiter
         self.enterCondition = AUISceneEnterCondition(channelName: channelName, arbiter: self.arbiter)
