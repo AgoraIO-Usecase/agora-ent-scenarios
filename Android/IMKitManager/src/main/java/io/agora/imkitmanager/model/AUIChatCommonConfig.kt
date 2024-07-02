@@ -10,5 +10,11 @@ data class AUIChatCommonConfig(
     var owner: AUIChatUserInfo,
     var imAppKey: String = "",
     var imClientId: String = "",
-    var imClientSecret: String = ""
+    var imClientSecret: String = "",
+    var chatLogCallback: ChatLogCallback? = null
 )
+
+interface ChatLogCallback {
+    fun onDebugInfo(tag: String, message: String) {}
+    fun onErrorInfo(tag: String, message: String) {}
+}

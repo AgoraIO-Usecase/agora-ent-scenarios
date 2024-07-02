@@ -44,6 +44,8 @@
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:layout_marginStart="14dp"
+                    app:shapeAppearance="@style/play_zone_roundStyle_16"
+                    app:strokeColor="@android:color/transparent"
                     android:src="@drawable/play_zone_ic_the_hottest"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

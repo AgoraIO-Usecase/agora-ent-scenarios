@@ -45,6 +45,10 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
         }
     }
 
+    init {
+        ChatHttpManager.setBaseURL(chatRoomContext.requireCommonConfig().host)
+    }
+
     private val observableHelper = ObservableHelper<IAUIIMManagerService.AUIIMManagerRespObserver>()
 
     private var mCurChatRoomId: String = ""
@@ -252,9 +256,8 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
             }
             // join chat room
             val chatId = chatRoomInfo.chatRoomId
-            chatManager.setOnManagerListener()
             chatManager.subscribeChatMsg(this)
-            chatManager.joinRoom(chatId, object : AUIChatMsgCallback {
+            chatManager.joinChatRoom(chatId, object : AUIChatMsgCallback {
                 override fun onOriginalResult(error: Exception?, message: ChatMessage?) {
                     super.onOriginalResult(error, message)
                     if (error != null) {

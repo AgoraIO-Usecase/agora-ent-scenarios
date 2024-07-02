@@ -4,13 +4,6 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import com.google.gson.reflect.TypeToken
-import io.agora.imkitmanager.AUIChatManager
-import io.agora.imkitmanager.model.AUIChatCommonConfig
-import io.agora.imkitmanager.model.AUIChatUserInfo
-import io.agora.imkitmanager.service.AUIIMManagerServiceImpl
-import io.agora.imkitmanager.service.IAUIIMManagerService
-import io.agora.imkitmanager.service.http.ChatHttpManager
-import io.agora.imkitmanager.utils.AUIChatLogger
 import io.agora.rtmsyncmanager.ISceneResponse
 import io.agora.rtmsyncmanager.RoomExpirationPolicy
 import io.agora.rtmsyncmanager.RoomService
@@ -31,7 +24,6 @@ import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ObservableHelper
 import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.playzone.BuildConfig
 import io.agora.scene.playzone.PlayCenter
 import io.agora.scene.playzone.PlayLogger
 import kotlin.random.Random

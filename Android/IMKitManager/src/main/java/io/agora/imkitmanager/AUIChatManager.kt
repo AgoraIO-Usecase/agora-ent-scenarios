@@ -20,7 +20,6 @@ import io.agora.imkitmanager.model.AUIChatRoomContext
 import io.agora.imkitmanager.model.AUIChatUserInfo
 import io.agora.imkitmanager.model.AgoraChatMessage
 import io.agora.imkitmanager.service.callback.AUIChatMsgCallback
-import io.agora.imkitmanager.utils.AUIChatLogger
 import io.agora.imkitmanager.utils.GsonTools
 import io.agora.imkitmanager.utils.ProcessUtils
 import org.json.JSONObject
@@ -39,6 +38,8 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
         AUIChatRoomContext.shared().setCommonConfig(commonConfig)
         createChatClient(commonConfig.context, commonConfig.imAppKey)
     }
+
+    private val chatLogCallback get() = AUIChatRoomContext.shared().mCommonConfig?.chatLogCallback
 
     private fun createChatClient(context: Context, appKey: String) {
         // ------------------ 初始化IM ------------------
@@ -60,9 +61,9 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
         chatEventHandlers.remove(delegate)
     }
 
-    fun setOnManagerListener() {
+    private fun setOnManagerListener() {
         currentMsgList.clear()
-        AUIChatLogger.logger().d(tag, "setOnManagerListener")
+        chatLogCallback?.onDebugInfo(tag, "setOnManagerListener")
         if (ChatClient.getInstance().isSdkInited) {
             ChatClient.getInstance().chatManager().addMessageListener(this)
             ChatClient.getInstance().chatroomManager().addChatRoomChangeListener(this)
@@ -72,39 +73,35 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
     fun clear() {
         chatRoomId = ""
         currentMsgList.clear()
-        if (ChatClient.getInstance().isSdkInited) {
-            ChatClient.getInstance().chatManager().removeMessageListener(this)
-            ChatClient.getInstance().chatroomManager().removeChatRoomListener(this)
-        }
     }
 
     fun loginChat(userId: String, userToken: String, callback: CallBack) {
-        AUIChatLogger.logger().d(tag, "loginChat called")
+        chatLogCallback?.onDebugInfo(tag, "loginChat called")
         ChatClient.getInstance().loginWithToken(userId, userToken, object : CallBack {
             override fun onSuccess() {
                 callback.onSuccess()
-                AUIChatLogger.logger().d(tag, "loginChat success")
+                chatLogCallback?.onDebugInfo(tag, "loginChat success")
             }
 
             override fun onError(code: Int, error: String?) {
                 callback.onError(code, error)
-                AUIChatLogger.logger().e(tag, "loginChat error code=$code message=$error")
+                chatLogCallback?.onErrorInfo(tag, "loginChat error code=$code message=$error")
             }
         })
     }
 
     fun logoutChat(callback: CallBack? = null) {
-        AUIChatLogger.logger().d(tag, "logoutChat called")
+        chatLogCallback?.onDebugInfo(tag, "logoutChat called")
         if (ChatClient.getInstance().isSdkInited) {
             ChatClient.getInstance().logout(false, object : CallBack {
                 override fun onSuccess() {
                     callback?.onSuccess()
-                    AUIChatLogger.logger().d(tag, "logoutChat success")
+                    chatLogCallback?.onDebugInfo(tag, "logoutChat success")
                 }
 
                 override fun onError(code: Int, error: String?) {
                     callback?.onError(code, error)
-                    AUIChatLogger.logger().d(tag, "logoutChat success")
+                    chatLogCallback?.onErrorInfo(tag, "logoutChat success")
                 }
             })
         }
@@ -113,23 +110,24 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
     /**
      * 加入房间
      */
-    fun joinRoom(chatRoomId: String, callback: AUIChatMsgCallback) {
+    fun joinChatRoom(chatRoomId: String, callback: AUIChatMsgCallback) {
+        chatLogCallback?.onDebugInfo(tag, "joinChatRoom called")
         this.chatRoomId = chatRoomId
+        setOnManagerListener()
         ChatClient.getInstance().chatroomManager().joinChatRoom(chatRoomId, object : ValueCallBack<ChatRoom> {
             override fun onSuccess(value: ChatRoom?) {
-                AUIChatLogger.logger().d(tag, "joinRoom onSuccess $chatRoomId")
+                chatLogCallback?.onDebugInfo(tag, "joinChatRoom onSuccess $chatRoomId")
                 //加入成功后 返回成员加入消息
                 sendJoinMsg(chatRoomId, AUIChatRoomContext.shared().currentUserInfo, object : AUIChatMsgCallback {
                     override fun onOriginalResult(error: Exception?, message: ChatMessage?) {
-                        if (error == null) {
-                            callback.onOriginalResult(null, message)
-                        }
+                        // 无论发送加入房间消息是否成功，用户都已经加入房间了
+                        callback.onOriginalResult(null, message)
                     }
                 })
             }
 
             override fun onError(code: Int, errorMsg: String?) {
-                AUIChatLogger.logger().e(tag, "joinChatRoom onError $chatRoomId $code $errorMsg")
+                chatLogCallback?.onErrorInfo(tag, "joinChatRoom onError $chatRoomId $code $errorMsg")
                 this@AUIChatManager.chatRoomId = ""
                 callback.onOriginalResult(
                     Exception("joinChatRoom error code=$code,message=$errorMsg"), null
@@ -142,7 +140,10 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
      * 离开房间
      */
     fun leaveChatRoom() {
+        chatLogCallback?.onDebugInfo(tag, "leaveChatRoom called")
         if (ChatClient.getInstance().isSdkInited) {
+            ChatClient.getInstance().chatManager().removeMessageListener(this)
+            ChatClient.getInstance().chatroomManager().removeChatRoomListener(this)
             ChatClient.getInstance().chatroomManager().leaveChatRoom(chatRoomId)
         }
     }
@@ -152,6 +153,7 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
      *
      */
     fun destroyChatRoom() {
+        chatLogCallback?.onDebugInfo(tag, "destroyChatRoom called")
         if (ChatClient.getInstance().isSdkInited) {
             // 同步销毁房间阻塞线程
             ChatClient.getInstance().chatroomManager().destroyChatRoom(chatRoomId)
@@ -162,12 +164,15 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
      * 销毁房间
      */
     fun asyncDestroyChatRoom(callBack: CallBack?) {
+        chatLogCallback?.onDebugInfo(tag, "asyncDestroyChatRoom called")
         ChatClient.getInstance().chatroomManager().asyncDestroyChatRoom(chatRoomId, object : CallBack {
             override fun onSuccess() {
+                chatLogCallback?.onDebugInfo(tag, "asyncDestroyChatRoom success")
                 callBack?.onSuccess()
             }
 
             override fun onError(code: Int, error: String) {
+                chatLogCallback?.onErrorInfo(tag, "asyncDestroyChatRoom onError $code $error")
                 callBack?.onError(code, error)
             }
         })

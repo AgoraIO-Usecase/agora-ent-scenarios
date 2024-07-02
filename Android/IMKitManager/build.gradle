@@ -39,7 +39,6 @@ dependencies {
     implementation rootProject.ext.deps.constraintlayout
     implementation rootProject.ext.deps.gson
     implementation rootProject.ext.deps.annotation
-    implementation rootProject.ext.deps.logger
     implementation rootProject.ext.deps.ok2curl
     implementation rootProject.ext.deps.okhttp
     implementation rootProject.ext.deps.okhttp_logger

@@ -1,13 +1,11 @@
 package io.agora.scene.playzone.service
 
-import android.content.Context
 import io.agora.imkitmanager.AUIChatManager
 import io.agora.imkitmanager.model.AUIChatCommonConfig
 import io.agora.imkitmanager.model.AUIChatUserInfo
+import io.agora.imkitmanager.model.ChatLogCallback
 import io.agora.imkitmanager.service.AUIIMManagerServiceImpl
 import io.agora.imkitmanager.service.IAUIIMManagerService
-import io.agora.imkitmanager.service.http.ChatHttpManager
-import io.agora.imkitmanager.utils.AUIChatLogger
 import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
@@ -15,7 +13,7 @@ import io.agora.scene.playzone.BuildConfig
 import io.agora.scene.playzone.PlayCenter
 import io.agora.scene.playzone.PlayLogger
 
-class PlayChatRoomService constructor(val cxt:Context){
+class PlayChatRoomService {
 
     companion object {
         private const val TAG = "Chat_Service_LOG"
@@ -25,7 +23,7 @@ class PlayChatRoomService constructor(val cxt:Context){
         val chatRoomService: PlayChatRoomService
             get() {
                 if (innerChatRoomService == null) {
-                    innerChatRoomService = PlayChatRoomService(AgoraApplication.the())
+                    innerChatRoomService = PlayChatRoomService()
                 }
                 return innerChatRoomService!!
             }
@@ -41,31 +39,6 @@ class PlayChatRoomService constructor(val cxt:Context){
 
     init {
         val cxt = AgoraApplication.the().applicationContext
-        // chat ImManager
-        ChatHttpManager.setBaseURL(ServerConfig.toolBoxUrl)
-        AUIChatLogger.initLogger(
-            AUIChatLogger.Config(
-                cxt, "Play_IM",
-                debug = io.agora.scene.base.BuildConfig.DEBUG,
-                logCallback = object : AUIChatLogger.AUILogCallback {
-                    override fun onLogDebug(tag: String, message: String) {
-                        PlayLogger.d(TAG, "$tag $message")
-                    }
-
-                    override fun onLogInfo(tag: String, message: String) {
-                        PlayLogger.d(TAG, "$tag $message")
-                    }
-
-                    override fun onLogWarning(tag: String, message: String) {
-                        PlayLogger.w(TAG, "$tag $message")
-                    }
-
-                    override fun onLogError(tag: String, message: String) {
-                        PlayLogger.e(TAG, "$tag $message")
-                    }
-                })
-        )
-
         val chatRoomConfig = AUIChatCommonConfig(
             context = cxt,
             appId = PlayCenter.mAppId,
@@ -76,6 +49,15 @@ class PlayChatRoomService constructor(val cxt:Context){
             ),
             host = ServerConfig.toolBoxUrl,
             imAppKey = BuildConfig.IM_APP_KEY,
+            chatLogCallback = object : ChatLogCallback {
+                override fun onDebugInfo(tag: String, message: String) {
+                    PlayLogger.d(TAG, "$tag $message")
+                }
+
+                override fun onErrorInfo(tag: String, message: String) {
+                    PlayLogger.e(TAG, "$tag $message")
+                }
+            }
         )
         chatManager = AUIChatManager(chatRoomConfig)
         imManagerService = AUIIMManagerServiceImpl(chatManager)
