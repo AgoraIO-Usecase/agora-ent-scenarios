@@ -23,7 +23,7 @@ private func mainTreadTask(_ task: (()->())?){
 }
 
 /// 房间内用户列表
-private let kRoomId = "pure421"
+private let kRoomId = "pure500"
 class Pure1v1ServiceImp: NSObject {
     private var user: Pure1v1UserInfo
     private var rtmClient: AgoraRtmClientKit
@@ -92,7 +92,6 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
             completion(err)
             self.isEnterSuccess = err == nil ? true : false
         }
-        
     }
     
     func leaveRoom(completion: @escaping (NSError?) -> Void) {

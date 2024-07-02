@@ -12,7 +12,7 @@ import AgoraRtmKit
 import AgoraCommon
 
 /// 房间内用户列表
-private let kSceneId = "scene_Livetoprivate_421"
+private let kSceneId = "scene_Livetoprivate_500"
 class ShowTo1v1ServiceImp: NSObject {
     private var user: ShowTo1v1UserInfo
     private var rtmClient: AgoraRtmClientKit

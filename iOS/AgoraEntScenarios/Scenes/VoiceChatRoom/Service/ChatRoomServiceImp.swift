@@ -11,7 +11,7 @@ import ZSwiftBaseLib
 import AgoraChat.AgoraChatError
 import AgoraSyncManager
 import AgoraCommon
-private let kSceneId = "scene_chatRoom_4.0.0"
+private let kSceneId = "scene_chatRoom_5.0.0"
 
 @objc public class VoiceChatLog: NSObject {
     
