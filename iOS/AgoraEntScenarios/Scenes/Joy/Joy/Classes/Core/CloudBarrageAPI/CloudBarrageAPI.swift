@@ -241,7 +241,7 @@ extension CloudBarrageAPI {
         }
         
         sendEventMessage(msg: msg)
-        joyPrint("sendMouseEvent: type: \(type.rawValue) x: \(event.x) y: \(event.y)")
+        JoyLogger.info("sendMouseEvent: type: \(type.rawValue) x: \(event.x) y: \(event.y)")
     }
 }
 
@@ -264,7 +264,7 @@ extension CloudBarrageAPI {
     
     private func createDataStream() {
         guard let engine = self.apiConfig?.engine else {
-            joyError("createDataStream fail: engine == nil")
+            JoyLogger.error("createDataStream fail: engine == nil")
             return
         }
         let config = AgoraDataStreamConfig()
@@ -272,12 +272,12 @@ extension CloudBarrageAPI {
         config.syncWithAudio = true
         let ret = engine.createDataStream(&streamId, config: config)
         if ret == 0 { return }
-        joyWarn("createStream fail! ret:\(ret), streamId: \(streamId)")
+        JoyLogger.warn("createStream fail! ret:\(ret), streamId: \(streamId)")
     }
     
     private func sendDataStream() {
         guard let engine = self.apiConfig?.engine else {
-            joyError("sendDataStream fail: engine == nil")
+            JoyLogger.error("sendDataStream fail: engine == nil")
             return
         }
         guard let data = self.createData() else { return }
@@ -287,7 +287,7 @@ extension CloudBarrageAPI {
         self.msgArray.removeAll()
         let ret = engine.sendStreamMessage(streamId, data: data)
         if ret == 0 { return }
-        joyWarn("sendStreamMessage fail! ret:\(ret), streamId: \(streamId)")
+        JoyLogger.warn("sendStreamMessage fail! ret:\(ret), streamId: \(streamId)")
         streamId = 0
     }
 }
@@ -362,7 +362,7 @@ extension CloudBarrageAPI {
         var url = URL(string: "\(host)\(interface)")!
         if httpMethod == "GET" {
             url = appendQueryParams(to: url, queryParams: params) ?? url
-//            joyPrint(" GET url = \(url)")
+//            JoyLogger.info(" GET url = \(url)")
         }
        
         var request = getHeaderRequest(url: url)
@@ -370,7 +370,7 @@ extension CloudBarrageAPI {
         if httpMethod == "POST" {
             let jsonBody = try? JSONSerialization.data(withJSONObject: params)
             request.httpBody = jsonBody
-//            joyPrint(" POST url = \(url), params = \(params.debugDescription)")
+//            JoyLogger.info(" POST url = \(url), params = \(params.debugDescription)")
         }
         
         httpRequest(request: request, completion: completion)
@@ -398,7 +398,7 @@ extension CloudBarrageAPI {
         var url = URL(string: "\(host)\(interface)")!
         if httpMethod == "GET" {
             url = appendQueryParams(to: url, queryParams: params) ?? url
-//            joyPrint(" GET url = \(url)")
+//            JoyLogger.info(" GET url = \(url)")
         }
        
         var request = getHeaderRequest(url: url)
@@ -406,7 +406,7 @@ extension CloudBarrageAPI {
         if httpMethod == "POST" {
             let jsonBody = try? JSONSerialization.data(withJSONObject: params)
             request.httpBody = jsonBody
-//            joyPrint(" POST url = \(url), params = \(params.debugDescription)")
+//            JoyLogger.info(" POST url = \(url), params = \(params.debugDescription)")
         }
         
         httpRequest(request: request, completion: completion)
@@ -416,10 +416,10 @@ extension CloudBarrageAPI {
                              completion: @escaping (NSError?, Any?)->()) {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data, error == nil else {
-                joyError("Error: \(error?.localizedDescription ?? "Unknown error")")
+                JoyLogger.error("Error: \(error?.localizedDescription ?? "Unknown error")")
                 return
             }
-            joyPrint(" httpRequest request:\n \(request.cURL(pretty: true)) \nresp:\n \(NSString(data: data, encoding: NSUTF8StringEncoding) ?? "") ")
+            JoyLogger.info(" httpRequest request:\n \(request.cURL(pretty: true)) \nresp:\n \(NSString(data: data, encoding: NSUTF8StringEncoding) ?? "") ")
             if let dic = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
                 var result = dic["data"]
                 var code = dic["code"] as? Int ?? 0
@@ -438,7 +438,7 @@ extension CloudBarrageAPI {
                         error = NSError(domain: msg, code: code)
                     }
                 }
-//                joyPrint("result = \(String(describing: result)), code = \(code)")
+//                JoyLogger.info("result = \(String(describing: result)), code = \(code)")
                 DispatchQueue.main.async {
                     completion(error, result)
                 }

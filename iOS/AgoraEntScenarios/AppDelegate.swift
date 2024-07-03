@@ -51,7 +51,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         AGResourceManagerContext.shared.displayLogClosure = { text in
             asyncToMainThread {
-                agoraEnt_default_info(text, tag: "ResourceManager")
+                CommonLogger.default_info(text, tag: "ResourceManager")
             }
         }
         AGResourceManager.autoDownload()

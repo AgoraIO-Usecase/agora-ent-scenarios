@@ -23,7 +23,7 @@ extension CallApiImpl {
         ]
         
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
-            showTo1v1Warn("setupContentInspectConfig fail")
+            ShowTo1v1Logger.warn("setupContentInspectConfig fail")
             return
         }
         let jsonStr = String(data: jsonData, encoding: .utf8)
@@ -33,7 +33,7 @@ extension CallApiImpl {
       //  module.type = .imageModeration
         config.modules = [module]
         let ret = rtcEngine.enableContentInspect(enable, config: config)
-        showTo1v1Print("setupContentInspectConfig[\(enable)]: uid:\(uid) channelId: \(channelId) ret:\(ret)")
+        ShowTo1v1Logger.info("setupContentInspectConfig[\(enable)]: uid:\(uid) channelId: \(channelId) ret:\(ret)")
     }
     
     func setupContentInspectExConfig(rtcEngine: AgoraRtcEngineKit,
@@ -47,7 +47,7 @@ extension CallApiImpl {
         ]
         
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
-            showTo1v1Warn("setupContentInspectExConfig fail")
+            ShowTo1v1Logger.warn("setupContentInspectExConfig fail")
             return
         }
         let jsonStr = String(data: jsonData, encoding: .utf8)
@@ -57,7 +57,7 @@ extension CallApiImpl {
         module.type = .imageModeration
         config.modules = [module]
         let ret = rtcEngine.enableContentInspectEx(enable, config: config, connection: connection)
-        showTo1v1Print("setupContentInspectExConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret)")
+        ShowTo1v1Logger.info("setupContentInspectExConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret)")
     }
     
     /// 语音审核
@@ -66,7 +66,7 @@ extension CallApiImpl {
                                             channelType: AgoraChannelProfile.liveBroadcasting.rawValue,
                                             sceneType: "showTo1v1") { errStr in
             guard let errStr = errStr else {return}
-            showTo1v1Warn("moderationAudio response === \(errStr)")
+            ShowTo1v1Logger.warn("moderationAudio response === \(errStr)")
         }
 //        let userInfo = ["id": user.uid ?? "",
 //                        "sceneName": "showTo1v1",
@@ -80,9 +80,9 @@ extension CallApiImpl {
 //                                     "payload": userInfo.yy_modelToJSONString()]
 //        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.shengwang.cn/v1/moderation/audio",
 //                                          params: parasm) { response in
-//            showTo1v1Print("moderationAudio response === \(response)")
+//            ShowTo1v1Logger.info("moderationAudio response === \(response)")
 //        } failure: { errr in
-//            showTo1v1Warn(errr)
+//            ShowTo1v1Logger.warn(errr)
 //        }
     }
 }
@@ -90,7 +90,7 @@ extension CallApiImpl {
 extension CallApiImpl: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, contentInspectResult result: AgoraContentInspectResult) {
-        showTo1v1Warn("contentInspectResult: \(result.rawValue)")
+        ShowTo1v1Logger.warn("contentInspectResult: \(result.rawValue)")
         guard result != .neutral else { return }
         AUIToast.show(text: "call_content_inspect_warning".showTo1v1Localization())
     }

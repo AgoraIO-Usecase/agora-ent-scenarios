@@ -10,7 +10,7 @@ import RTMSyncManager
 import YYModel
 import AgoraRtmKit
 
-private let kSceneId = "scene_joy_4.10.1"
+private let kSceneId = "scene_joy_5.0.0"
 private let SYNC_SCENE_ROOM_STARTGAME_COLLECTION = "startGameCollection"
 class JoyServiceImpl: NSObject {
     private var appId: String
@@ -53,7 +53,7 @@ class JoyServiceImpl: NSObject {
         self.host = host
         self.appCertificate = appCertificate
         AUIRoomContext.shared.displayLogClosure = { msg in
-            joyPrint(msg, context: "RTMSyncManager")
+            JoyLogger.info(msg, context: "RTMSyncManager")
         }
         super.init()
         syncManager.rtmManager.subscribeError(channelName: "", delegate: self)
@@ -86,7 +86,7 @@ extension JoyServiceImpl: JoyServiceProtocol {
         }
     }
     
-    func createRoom(roomName: String, completion: @escaping (JoyRoomInfo?, Error?) -> Void) { joyPrint("createRoom start")
+    func createRoom(roomName: String, completion: @escaping (JoyRoomInfo?, Error?) -> Void) { JoyLogger.info("createRoom start")
 
         let createAt = Int64(Date().timeIntervalSince1970 * 1000)
         let roomInfo = AUIRoomInfo()
@@ -109,21 +109,21 @@ extension JoyServiceImpl: JoyServiceProtocol {
                 guard let self = self else { return }
                 
                 if let err = err {
-                    joyPrint("create room fail: \(err.localizedDescription)")
+                    JoyLogger.info("create room fail: \(err.localizedDescription)")
                     completion(nil, err)
                     return
                 }
                 
                 scene.create(createTime: createAt, payload: [:]) { [weak self] err in
                     if let err = err {
-                        joyPrint("create scene fail: \(err.localizedDescription)")
+                        JoyLogger.info("create scene fail: \(err.localizedDescription)")
                         completion(nil, err)
                         return
                     }
                     
                     scene.enter { [weak self] payload, err in
                         if let err = err {
-                            joyPrint("enter scene fail: \(err.localizedDescription)")
+                            JoyLogger.info("enter scene fail: \(err.localizedDescription)")
                             completion(nil, err)
                             return
                         }
@@ -153,7 +153,7 @@ extension JoyServiceImpl: JoyServiceProtocol {
             let scene = self?.getCurrentScene(with: roomInfo.roomId)
             scene?.enter {[weak self] payload, err in
                 if let err = err {
-                    joyPrint("enter scene fail: \(err.localizedDescription)")
+                    JoyLogger.info("enter scene fail: \(err.localizedDescription)")
                     completion(err)
                     return
                 }
@@ -183,7 +183,7 @@ extension JoyServiceImpl: JoyServiceProtocol {
             let aui_roominfo = convertJoyRoomInfo2AUIRoomInfo(with: roomInfo)
             roomManager.updateRoom(room: aui_roominfo) {[weak self] err, info in
                 if let err = err {
-                    joyPrint("enter scene fail: \(err.localizedDescription)")
+                    JoyLogger.info("enter scene fail: \(err.localizedDescription)")
                     completion(err)
                     return
                 }
@@ -206,7 +206,7 @@ extension JoyServiceImpl: JoyServiceProtocol {
 
     
     func getStartGame(roomId: String, completion: @escaping (NSError?, JoyStartGameInfo?) -> Void)  {
-        joyPrint("imp start game get...")
+        JoyLogger.info("imp start game get...")
         
         let fetchStartGameInfo: () -> Void = {[weak self] in
             guard let self = self else {return}
@@ -366,7 +366,7 @@ extension JoyServiceImpl:AUIRtmMessageProxyDelegate {
 
 extension JoyServiceImpl: AUISceneRespDelegate {
     private func _leaveRoom(roomId: String, isRoomOwner: Bool) {
-        joyPrint("_leaveRoom: \(roomId) isRoomOwner:\(isRoomOwner)")
+        JoyLogger.info("_leaveRoom: \(roomId) isRoomOwner:\(isRoomOwner)")
         let scene = self.syncManager.getScene(channelName: roomId)
         if isRoomOwner {
             scene?.delete()
@@ -380,7 +380,7 @@ extension JoyServiceImpl: AUISceneRespDelegate {
     }
     
     func onSceneDestroy(roomId: String) {
-        joyPrint("onSceneDestroy: \(roomId)")
+        JoyLogger.info("onSceneDestroy: \(roomId)")
         guard let model = self.roomList.filter({ $0.roomId == roomId }).first else {
             return
         }
@@ -393,7 +393,7 @@ extension JoyServiceImpl: AUISceneRespDelegate {
         NetworkManager.shared.generateToken(appId: appId, appCertificate: appCertificate, channelName: "", uid: String(user.userId), tokenType: .token007, type: .rtm) { token in
             if let token = token {
                 self.syncManager.rtmManager.renew(token: token) { err in
-                    joyPrint("renew token：err \(err)")
+                    JoyLogger.info("renew token：err \(err)")
                     if err == nil {
                         
                     }

@@ -11,16 +11,21 @@ import AgoraSyncManager
 import ZSwiftBaseLib
 import AgoraCommon
 
-private func agoraAssert(_ message: String) {
-    agoraAssert(false, message)
-}
+@objc public class SpatialVoiceChatLog: NSObject {
+    
+    static let kLogKey = "SpatialAudio"
+    
+    public static func info(_ text: String) {
+        AgoraEntLog.getSceneLogger(with: kLogKey).info(text)
+    }
 
-private func agoraAssert(_ condition: Bool, _ message: String) {
-    saLogger.error(message)
-}
+    public static func warn(_ text: String) {
+        AgoraEntLog.getSceneLogger(with: kLogKey).warning(text)
+    }
 
-private func agoraPrint(_ message: String) {
-    saLogger.info(message)
+    public static func error(_ text: String) {
+        AgoraEntLog.getSceneLogger(with: kLogKey).error(text)
+    }
 }
 
 enum SAErrorType {
@@ -47,7 +52,7 @@ enum SAErrorType {
     }
 }
 
-private let cSceneId = "scene_spatialChatRoom_4.0.0"
+private let cSceneId = "scene_spatialChatRoom_5.0.0"
 private let kCollectionIdUser = "user_collection"
 private let kCollectionIdSeatInfo = "seat_info_collection"
 private let kCollectionIdSeatApply = "show_seat_apply_collection"
@@ -80,8 +85,7 @@ extension SpatialAudioSyncSerciceImp {
             guard let self = self else {
                 return
             }
-            
-            agoraPrint("subscribeConnectState: \(state) \(self.syncUtilsInited)")
+            SpatialVoiceChatLog.info("subscribeConnectState: \(state) \(self.syncUtilsInited)")
 //            self.networkDidChanged?(KTVServiceNetworkStatus(rawValue: UInt(state.rawValue)))
             guard !self.syncUtilsInited else {
                 //TODO: retry get data if restore connection
@@ -186,7 +190,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     }
     
     func unsubscribeEvent() {
-        agoraPrint("imp all unsubscribe ...")
+        SpatialVoiceChatLog.info("imp all unsubscribe ...")
 //        self.subscribeDelegate = nil
         SyncUtil
             .scene(id: self.roomId ?? "")?
@@ -196,7 +200,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     func fetchRoomList(page: Int, completion: @escaping (Error?, [SARoomEntity]?) -> Void) {
         initScene { [weak self] in
             SyncUtil.fetchAll { [weak self] results in
-                agoraPrint("result == \(results.compactMap { $0.toJson() })")
+                SpatialVoiceChatLog.info("result == \(results.compactMap { $0.toJson() })")
                 
                 let dataArray = results.map({ info in
                     return model(from: info.toJson()?.z.jsonToDictionary() ?? [:], SARoomEntity.self)
@@ -247,7 +251,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     
     func joinRoom(_ roomId: String, completion: @escaping (Error?, SARoomEntity?, SARobotAudioInfo?) -> Void) {
         guard let room = _roomInfo(roomId: roomId) else {
-            agoraAssert("join room fail, \(roomId) not found")
+            SpatialVoiceChatLog.error("join room fail, \(roomId) not found")
             completion(SAErrorType.roomInfoNotFound("join room", roomId).error(), nil, robotInfo)
             return
         }
@@ -288,7 +292,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     
     func leaveRoom(_ roomId: String, completion: @escaping (Error?, Bool) -> Void) {
         guard let room = self.roomList.filter({$0.room_id == roomId}).first else {
-            agoraAssert("join room fail, \(roomId) not found")
+            SpatialVoiceChatLog.error("join room fail, \(roomId) not found")
             completion(SAErrorType.roomInfoNotFound("leave room", roomId).error(), false)
             return
         }
@@ -299,7 +303,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         }
         if isOwner {
 //            SAIMManager.shared?.userDestroyedChatroom()
-            agoraPrint("imp leaveRoom deleteScenes: \(roomId)")
+            SpatialVoiceChatLog.info("imp leaveRoom deleteScenes: \(roomId)")
             SyncUtil.scene(id: roomId)?.deleteScenes()
         } else {
 //            let updateRoom: SARoomEntity = room
@@ -310,17 +314,17 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
 //                .update(key: "",
 //                        data: params,
 //                        success: { obj in
-//                    agoraPrint("imp updateUserCount success")
+//                    SpatialVoiceChatLog.info("imp updateUserCount success")
 //
 //                },
 //                        fail: { error in
-//                    agoraPrint("imp updateUserCount fail")
+//                    SpatialVoiceChatLog.info("imp updateUserCount fail")
 //                })
 //            SAIMManager.shared?.userQuitRoom(completion: nil)
             
             cancelMicSeatApply(chat_uid: VLUserCenter.user.id) { _, _ in }
             _removeUser(roomId: self.roomId!) { error in }
-            agoraPrint("imp leaveRoom leaveScene \(roomId)")
+            SpatialVoiceChatLog.info("imp leaveRoom leaveScene \(roomId)")
             
             SyncUtil.leaveScene(id: self.roomId!)
         }
@@ -332,7 +336,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         roomInfo.robotInfo = robotInfo ?? SARobotAudioInfo()
         _getMicSeatList(roomId: entity.room_id ?? "") { error, mics in
             if let error = error {
-                agoraAssert(error.localizedDescription)
+                SpatialVoiceChatLog.error(error.localizedDescription)
                 completion(error, nil)
                 return
             }
@@ -572,7 +576,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     
     func startMicSeatInvitation(chatUid: String, index: Int?, completion: @escaping (Error?, Bool) -> Void) {
         guard let user = self.userList.first(where: { $0.uid == chatUid }) else {
-            agoraAssert("startMicSeatInvitation not found")
+            SpatialVoiceChatLog.error("startMicSeatInvitation not found")
             completion(SAErrorType.unknown("startMicSeatInvitation", "user not found").error(), false)
             return
         }
@@ -653,7 +657,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     
     func refuseInvite(chat_uid: String, completion: @escaping (Error?, Bool) -> Void) {
         guard let user = userList.first(where: { $0.uid == chat_uid }) else {
-            agoraAssert("startMicSeatInvitation not found")
+            SpatialVoiceChatLog.error("startMicSeatInvitation not found")
             completion(SAErrorType.unknown("startMicSeatInvitation", "user not found").error(), false)
             return
         }
@@ -691,7 +695,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     
     func cancelMicSeatApply(chat_uid: String, completion: @escaping (Error?, Bool) -> Void) {
         guard let apply = micApplys.first(where: { $0.member?.uid == chat_uid }) else {
-            agoraAssert("cancelMicSeatApply not found")
+            SpatialVoiceChatLog.error("cancelMicSeatApply not found")
             completion(SAErrorType.unknown("cancelMicSeatApply", "apply not found").error(), false)
             return
         }
@@ -764,7 +768,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     
     func updateAnnouncement(content: String, completion: @escaping (Bool) -> Void) {
         guard let room = _roomInfo() else {
-            agoraAssert("update announcement fail, \(roomId ?? "") not found")
+            SpatialVoiceChatLog.error("update announcement fail, \(roomId ?? "") not found")
             completion(false)
             return
         }
@@ -776,7 +780,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     
     func enableRobot(enable: Bool, completion: @escaping (Error?) -> Void) {
 //        guard let room = _roomInfo() else {
-//            agoraAssert("update robot enable fail, \(roomId ?? "") not found")
+//            SpatialVoiceChatLog.error("update robot enable fail, \(roomId ?? "") not found")
 //            completion(SAErrorType.roomInfoNotFound("enableRobot", roomId ?? "").error())
 //            return
 //        }
@@ -786,7 +790,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     
     func updateRobotVolume(value: Int, completion: @escaping (Error?) -> Void) {
 //        guard let room = _roomInfo() else {
-//            agoraAssert("update robot volume fail, \(roomId ?? "") not found")
+//            SpatialVoiceChatLog.error("update robot volume fail, \(roomId ?? "") not found")
 //            completion(SAErrorType.roomInfoNotFound("updateRobotVolume", roomId ?? "").error())
 //            return
 //        }
@@ -806,7 +810,7 @@ extension SpatialAudioSyncSerciceImp {
         
         let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
         let expiredDuration = 20 * 60 * 1000
-//        agoraPrint("checkRoomExpire: \(currentTs - Int64(created_at)) / \(expiredDuration)")
+//        SpatialVoiceChatLog.info("checkRoomExpire: \(currentTs - Int64(created_at)) / \(expiredDuration)")
         guard currentTs - Int64(created_at) > expiredDuration else { return }
         
         self.subscribeDelegate?.onRoomExpired()
@@ -837,10 +841,10 @@ extension SpatialAudioSyncSerciceImp {
     
     func _subscribeRoomStatusChanged() {
         guard let channelName = roomId else {
-            agoraAssert("channelName = nil")
+            SpatialVoiceChatLog.error("channelName = nil")
             return
         }
-        agoraPrint("imp room subscribe...")
+        SpatialVoiceChatLog.info("imp room subscribe...")
         SyncUtil
             .scene(id: channelName)?
             .subscribe(key: "",
@@ -850,13 +854,13 @@ extension SpatialAudioSyncSerciceImp {
                            
                            let modelDic = jsonStr.z.jsonToDictionary()
                            if modelDic.isEmpty {
-                               agoraPrint("imp room subscribe jsonStr fail = \(jsonStr)")
+                               SpatialVoiceChatLog.info("imp room subscribe jsonStr fail = \(jsonStr)")
                            }
                            
                            let room = model(from: modelDic, SARoomEntity.self)
                            guard room.room_id == channelName else {return}
                            let origRoom = self.roomList.filter({ $0.room_id == room.room_id }).first
-                           agoraPrint("imp room subscribe onUpdated...")
+                           SpatialVoiceChatLog.info("imp room subscribe onUpdated...")
                            if origRoom?.announcement != room.announcement {
                                origRoom?.announcement = room.announcement
                                self.subscribeDelegate?.onRoomAnnouncementChanged(announce: room.announcement ?? "")
@@ -873,7 +877,7 @@ extension SpatialAudioSyncSerciceImp {
                                  model.owner?.uid != VLUserCenter.user.id else {
                                return
                            }
-                           agoraPrint("imp room subscribe onDeleted...")
+                           SpatialVoiceChatLog.info("imp room subscribe onDeleted...")
                            self?.subscribeDelegate?.onUserBeKicked(roomId: channelName, reason: .destroyed)
 //                           self?.roomStatusDidChanged?(KTVSubscribeDeleted.rawValue, model)
                        }, onSubscribed: {}, fail: { error in
@@ -882,21 +886,21 @@ extension SpatialAudioSyncSerciceImp {
     
     fileprivate func _updateRoom(with room: SARoomEntity, completion: @escaping (Error?) -> Void) {
         guard let channelName = roomId else {
-            agoraPrint("_updateRoom channelName = nil")
+            SpatialVoiceChatLog.info("_updateRoom channelName = nil")
 //            userListCountDidChanged?(UInt(count))
             return
         }
-        agoraPrint("imp _updateRoom")
+        SpatialVoiceChatLog.info("imp _updateRoom")
         let params = room.kj.JSONObject()
         SyncUtil
             .scene(id: channelName)?
             .update(key: "",
                     data: params,
                     success: { obj in
-                agoraPrint("imp _updateRoom success")
+                SpatialVoiceChatLog.info("imp _updateRoom success")
                 completion(nil)
             },fail: { error in
-                agoraPrint("imp _updateRoom fail")
+                SpatialVoiceChatLog.info("imp _updateRoom fail")
                 completion(error)
             })
     }
@@ -914,14 +918,14 @@ extension SpatialAudioSyncSerciceImp {
     }
     
     fileprivate func _subscribeMicSeatInfoChanged() {
-        agoraPrint("imp seat info subscribe ...")
+        SpatialVoiceChatLog.info("imp seat info subscribe ...")
         guard let roomId = self.roomId else { return }
         SyncUtil
             .scene(id: roomId)?
             .subscribe(key: kCollectionIdSeatInfo,
                        onCreated: { _ in
                        }, onUpdated: {[weak self] object in
-                           agoraPrint("imp seat info subscribe onUpdated...")
+                           SpatialVoiceChatLog.info("imp seat info subscribe onUpdated...")
                            guard let self = self,
                                  let jsonStr = object.toJson() else { return }
                            let seat = model(from: jsonStr.z.jsonToDictionary(), SARoomMic.self)
@@ -932,51 +936,51 @@ extension SpatialAudioSyncSerciceImp {
                                self.mics[index] = seat
                            }
                        }, onDeleted: { _ in
-                           agoraPrint("imp seat info subscribe onDeleted...")
+                           SpatialVoiceChatLog.info("imp seat info subscribe onDeleted...")
 
                        }, onSubscribed: {
                        }, fail: { error in
-                           agoraPrint("imp seat info subscribe fail \(error.message)...")
+                           SpatialVoiceChatLog.info("imp seat info subscribe fail \(error.message)...")
                            ToastView.show(text: error.message)
                        })
     }
     
     fileprivate func _getMicSeatList(roomId: String, completion: @escaping (Error?, [SARoomMic]?) -> Void) {
-        agoraPrint("imp mic seat list get...")
+        SpatialVoiceChatLog.info("imp mic seat list get...")
         SyncUtil
             .scene(id: roomId)?
             .collection(className: kCollectionIdSeatInfo)
             .get(success: { [weak self] list in
-                agoraPrint("imp mics seat list get success...")
+                SpatialVoiceChatLog.info("imp mics seat list get success...")
                 let mics = list.map({ $0.toJson() }).kj.modelArray(SARoomMic.self).sorted(by: {
                     $0.mic_index < $1.mic_index
                 })
                 self?.mics = mics
                 completion(nil, mics)
             }, fail: { error in
-                agoraPrint("imp mics seat list get fail :\(error.message)...")
+                SpatialVoiceChatLog.info("imp mics seat list get fail :\(error.message)...")
                 completion(SAErrorType.unknown("get mic list", error.message).error(), nil)
             })
     }
     
     fileprivate func _addMicSeat(roomId: String, mic: SARoomMic, completion: @escaping (Error?, SARoomMic?) -> Void) {
         let params = mic.kj.JSONObject()
-        agoraPrint("imp seat add...")
+        SpatialVoiceChatLog.info("imp seat add...")
         SyncUtil
             .scene(id: roomId)?
             .collection(className: kCollectionIdSeatInfo)
             .add(data: params, success: { object in
-                agoraPrint("imp seat add success...")
+                SpatialVoiceChatLog.info("imp seat add success...")
                 let seat = model(from: (object.toJson() ?? "").z.jsonToDictionary(), SARoomMic.self)
                 completion(nil, seat)
             }, fail: { error in
-                agoraPrint("imp seat add fail :\(error.message)...")
+                SpatialVoiceChatLog.info("imp seat add fail :\(error.message)...")
                 completion(SAErrorType.unknown("add seat", error.message).error(), nil)
             })
     }
     
     fileprivate func _updateMicSeat(roomId: String, mic: SARoomMic, completion: @escaping (Error?) -> Void) {
-        agoraPrint("imp mic seat update... ")
+        SpatialVoiceChatLog.info("imp mic seat update... ")
         guard let selfRoomId = self.roomId else {
             completion(SAErrorType.unknown("update mic seat", "room id is nil").error())
             return
@@ -988,10 +992,10 @@ extension SpatialAudioSyncSerciceImp {
             .update(id: mic.objectId ?? "",
                     data:params,
                     success: {
-                agoraPrint("imp mic seat update success... ")
+                SpatialVoiceChatLog.info("imp mic seat update success... ")
                 completion(nil)
             }, fail: { error in
-                agoraPrint("imp mic seat update fail :\(error.message)... ")
+                SpatialVoiceChatLog.info("imp mic seat update fail :\(error.message)... ")
                 completion(SAErrorType.unknown("update mic seat", error.message).error())
             })
     }
@@ -1000,7 +1004,7 @@ extension SpatialAudioSyncSerciceImp {
 //MARK: seat application
 extension SpatialAudioSyncSerciceImp {
     fileprivate func _subscribeMicSeatApplyChanged() {
-        agoraPrint("imp seat apply subscribe ...")
+        SpatialVoiceChatLog.info("imp seat apply subscribe ...")
         guard let myRoomId = self.roomId else {
             return
         }
@@ -1009,7 +1013,7 @@ extension SpatialAudioSyncSerciceImp {
             .subscribe(key: kCollectionIdSeatApply,
                        onCreated: { _ in
                        }, onUpdated: {[weak self] object in
-                           agoraPrint("imp seat apply subscribe onUpdated...")
+                           SpatialVoiceChatLog.info("imp seat apply subscribe onUpdated...")
                            guard let self = self,
                                  let jsonStr = object.toJson(),
                                  let roomId = self.roomId else { return }
@@ -1020,7 +1024,7 @@ extension SpatialAudioSyncSerciceImp {
                            self.micApplys.removeAll { $0.objectId == apply.objectId}
                            self.micApplys.append(apply)
                        }, onDeleted: {[weak self] object in
-                           agoraPrint("imp seat apply subscribe onDeleted...")
+                           SpatialVoiceChatLog.info("imp seat apply subscribe onDeleted...")
                            guard let self = self,
                                  let jsonStr = object.toJson(), let roomId = self.roomId else {return}
                            let applicant = model(from: jsonStr.z.jsonToDictionary(), SAApply.self)
@@ -1034,15 +1038,15 @@ extension SpatialAudioSyncSerciceImp {
                            }
                        }, onSubscribed: {
                        }, fail: { error in
-                           agoraPrint("imp seat apply subscribe fail \(error.message)...")
+                           SpatialVoiceChatLog.info("imp seat apply subscribe fail \(error.message)...")
                            ToastView.show(text: error.message)
                        })
     }
     
     fileprivate func _getMicSeatApplyList(roomId: String, completion: @escaping (Error?, [SAApply]?) -> Void) {
-        agoraPrint("imp seat apply list get...")
+        SpatialVoiceChatLog.info("imp seat apply list get...")
         self._getMicSeatApplyListBlock = { [weak self] list in
-            agoraPrint("imp seat apply list get success...")
+            SpatialVoiceChatLog.info("imp seat apply list get success...")
             let applys = list.map({$0.toJson()}).kj.modelArray(SAApply.self)
             guard let self = self else {return}
             self.micApplys.removeAll()
@@ -1060,53 +1064,53 @@ extension SpatialAudioSyncSerciceImp {
                 self?._getMicSeatApplyListBlock?(list)
                 self?._getMicSeatApplyListBlock = nil
             }, fail: { error in
-                agoraPrint("imp seat apply list get fail :\(error.message)...")
+                SpatialVoiceChatLog.info("imp seat apply list get fail :\(error.message)...")
                 completion(SAErrorType.unknown("get seat apply list", error.message).error(), nil)
             })
     }
     
     fileprivate func _addMicSeatApply(roomId: String, apply: SAApply, completion: @escaping (Error?) -> Void) {
         let params = apply.kj.JSONObject()
-        agoraPrint("imp seat apply add...")
+        SpatialVoiceChatLog.info("imp seat apply add...")
         SyncUtil
             .scene(id: roomId)?
             .collection(className: kCollectionIdSeatApply)
             .add(data: params, success: { object in
-                agoraPrint("imp seat apply add success...")
+                SpatialVoiceChatLog.info("imp seat apply add success...")
                 completion(nil)
             }, fail: { error in
-                agoraPrint("imp seat apply add fail :\(error.message)...")
+                SpatialVoiceChatLog.info("imp seat apply add fail :\(error.message)...")
                 completion(SAErrorType.unknown("add seat apply", error.message).error())
             })
     }
     
     func _removeMicSeatApply(roomId: String, apply: SAApply, completion: @escaping (Error?) -> Void) {
-        agoraPrint("imp seat apply remove...")
+        SpatialVoiceChatLog.info("imp seat apply remove...")
         SyncUtil
             .scene(id: roomId)?
             .collection(className: kCollectionIdSeatApply)
             .delete(id: apply.objectId!, success: { object in
-                agoraPrint("imp seat apply remove success...")
+                SpatialVoiceChatLog.info("imp seat apply remove success...")
                 completion(nil)
             }, fail: { error in
-                agoraPrint("imp seat apply remove fail :\(error.message)...")
+                SpatialVoiceChatLog.info("imp seat apply remove fail :\(error.message)...")
                 completion(SAErrorType.unknown("remove seat apply", error.message).error())
             })
     }
     
     fileprivate func _updateMicSeatApply(roomId: String, apply: SAApply, completion: @escaping (Error?) -> Void) {
         let params = apply.kj.JSONObject()
-        agoraPrint("imp seat apply update...")
+        SpatialVoiceChatLog.info("imp seat apply update...")
         SyncUtil
             .scene(id: roomId)?
             .collection(className: kCollectionIdSeatApply)
             .update(id: roomId,
                     data: params,
                     success: {
-                agoraPrint("imp seat apply update success ...")
+                SpatialVoiceChatLog.info("imp seat apply update success ...")
                 completion(nil)
             }, fail: { error in
-                agoraPrint("imp seat apply update fail :\(error.message)...")
+                SpatialVoiceChatLog.info("imp seat apply update fail :\(error.message)...")
                 completion(SAErrorType.unknown("update seat apply", error.message).error())
             })
     }
@@ -1134,19 +1138,19 @@ extension SpatialAudioSyncSerciceImp {
     }
 
     fileprivate func _getUserList(roomId: String, finished: @escaping (Error?, [SAUser]?) -> Void) {
-        agoraPrint("imp user get...")
+        SpatialVoiceChatLog.info("imp user get...")
         SyncUtil
             .scene(id: roomId)?
             .collection(className: kCollectionIdUser)
             .get(success: { [weak self] list in
-                agoraPrint("imp user get success...")
+                SpatialVoiceChatLog.info("imp user get success...")
                 let users = list.map({ $0.toJson()}).kj.modelArray(SAUser.self)
                 self?.userList = users
                 self?._updateUserCount(completion: { error in
                 })
                 finished(nil, users)
             }, fail: { error in
-                agoraPrint("imp user get fail :\(error.message)...")
+                SpatialVoiceChatLog.info("imp user get fail :\(error.message)...")
                 finished(SAErrorType.unknown(roomId, error.message).error(), nil)
             })
     }
@@ -1162,22 +1166,22 @@ extension SpatialAudioSyncSerciceImp {
         owner.portrait = VLUserCenter.user.headUrl
 
         let params = owner.kj.JSONObject()
-        agoraPrint("imp user add ...")
+        SpatialVoiceChatLog.info("imp user add ...")
         SyncUtil
             .scene(id: roomId)?
             .collection(className: kCollectionIdUser)
             .add(data: params, success: { object in
                 owner.objectId = object.getId()
-                agoraPrint("imp user add success...")
+                SpatialVoiceChatLog.info("imp user add success...")
                 finished(owner)
             }, fail: { error in
-                agoraPrint("imp user add fail :\(error.message)...")
+                SpatialVoiceChatLog.info("imp user add fail :\(error.message)...")
                 finished(nil)
             })
     }
     
     fileprivate func _updateUserInfo(roomId: String, user: SAUser, completion: @escaping (Error?) -> Void) {
-        agoraPrint("imp user update...")
+        SpatialVoiceChatLog.info("imp user update...")
         if user.objectId == nil {
             _getUserList(roomId: roomId) { [weak self] _, users in
                 guard let self = self else { return }
@@ -1198,23 +1202,23 @@ extension SpatialAudioSyncSerciceImp {
             .update(id: user.objectId!,
                     data:params,
                     success: {
-                agoraPrint("imp user update success...")
+                SpatialVoiceChatLog.info("imp user update success...")
                 completion(nil)
             }, fail: { error in
-                agoraPrint("imp user update fail :\(error.message)...")
+                SpatialVoiceChatLog.info("imp user update fail :\(error.message)...")
                 completion(SAErrorType.unknown("update userInfo", error.message).error())
             })
     }
     
     fileprivate func _subscribeUsersChanged() {
-        agoraPrint("imp user subscribe ...")
+        SpatialVoiceChatLog.info("imp user subscribe ...")
         guard let roomId = self.roomId else { return  }
         SyncUtil
             .scene(id: roomId)?
             .subscribe(key: kCollectionIdUser,
                        onCreated: { _ in
                        }, onUpdated: { [weak self] object in
-                           agoraPrint("imp user subscribe onUpdated...")
+                           SpatialVoiceChatLog.info("imp user subscribe onUpdated...")
                            guard let self = self,
                                  let jsonStr = object.toJson(), let roomId = self.roomId else { return }
                            let user = model(from: jsonStr.z.jsonToDictionary(), SAUser.self)
@@ -1239,7 +1243,7 @@ extension SpatialAudioSyncSerciceImp {
                                self.subscribeDelegate?.onUserJoinedRoom(roomId: roomId, user: user)
                            }
                        }, onDeleted: { [weak self] object in
-                           agoraPrint("imp user subscribe onDeleted... [\(object.getId())]")
+                           SpatialVoiceChatLog.info("imp user subscribe onDeleted... [\(object.getId())]")
                            guard let self = self, let roomId = self.roomId else { return }
                            var user: SAUser? = nil
                            if let index = self.userList.firstIndex(where: { object.getId() == $0.objectId }) {
@@ -1259,25 +1263,25 @@ extension SpatialAudioSyncSerciceImp {
                        }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
                        }, fail: { error in
-                           agoraPrint("imp user subscribe fail \(error.message)...")
+                           SpatialVoiceChatLog.info("imp user subscribe fail \(error.message)...")
                            ToastView.show(text: error.message)
                        })
     }
 
     fileprivate func _removeUser(roomId: String, completion: @escaping (Error?) -> Void) {
         guard let objectId = userList.filter({ $0.uid == VLUserCenter.user.id }).first?.objectId else {
-            agoraPrint("_removeUser objectId = nil")
+            SpatialVoiceChatLog.info("_removeUser objectId = nil")
             return
         }
-        agoraPrint("imp user delete... [\(objectId)]")
+        SpatialVoiceChatLog.info("imp user delete... [\(objectId)]")
         SyncUtil
             .scene(id: roomId)?
             .collection(className: kCollectionIdUser)
             .delete(id: objectId,
                     success: { _ in
-                agoraPrint("imp user delete success...")
+                SpatialVoiceChatLog.info("imp user delete success...")
             }, fail: { error in
-                agoraPrint("imp user delete fail \(error.message)...")
+                SpatialVoiceChatLog.info("imp user delete fail \(error.message)...")
                 completion(SAErrorType.unknown("remove user", error.message).error())
             })
     }
@@ -1300,7 +1304,7 @@ extension SpatialAudioSyncSerciceImp {
 //              let roomInfo = roomList?.filter({ $0.roomId == self.getRoomId() }).first,
 //              roomInfo.ownerId == VLUserCenter.user.id
 //        else {
-////            agoraPrint("updateUserCount channelName = nil")
+////            SpatialVoiceChatLog.info("updateUserCount channelName = nil")
 ////            userListCountDidChanged?(UInt(count))
 //            return
 //        }
@@ -1312,15 +1316,15 @@ extension SpatialAudioSyncSerciceImp {
 //        roomInfo.roomUserCount = roomUserCount
 //        roomInfo.objectId = channelName
 //        let params = roomInfo.yy_modelToJSONObject() as! [String: Any]
-//        agoraPrint("imp room update user count... [\(channelName)]")
+//        SpatialVoiceChatLog.info("imp room update user count... [\(channelName)]")
 //        SyncUtil
 //            .scene(id: channelName)?
 //            .update(key: "",
 //                    data: params,
 //                    success: { obj in
-//                agoraPrint("imp room update user count success...")
+//                SpatialVoiceChatLog.info("imp room update user count success...")
 //            }, fail: { error in
-//                agoraPrint("imp room update user count fail \(error.message)...")
+//                SpatialVoiceChatLog.info("imp room update user count fail \(error.message)...")
 //            })
 
 //        userListCountDidChanged?(UInt(count))
@@ -1331,51 +1335,51 @@ extension SpatialAudioSyncSerciceImp {
 extension SpatialAudioSyncSerciceImp {
     
     fileprivate func _subscribeRobotChanged() {
-        agoraPrint("imp robot subscribe ...")
+        SpatialVoiceChatLog.info("imp robot subscribe ...")
         guard let roomId = self.roomId else { return }
         SyncUtil
             .scene(id: roomId)?
             .subscribe(key: kCollectionIdRobotInfo,
                        onCreated: { _ in
                        }, onUpdated: { [weak self] object in
-                           agoraPrint("imp robot subscribe onUpdated...")
+                           SpatialVoiceChatLog.info("imp robot subscribe onUpdated...")
                            guard let self = self,
                                  let jsonStr = object.toJson() else { return }
                            let robotInfo = model(from: jsonStr.z.jsonToDictionary(), SARobotAudioInfo.self)
                            self.robotInfo = robotInfo
                            self.subscribeDelegate?.onRobotUpdate(robotInfo: robotInfo)
                        }, onDeleted: { object in
-                           agoraPrint("imp robot subscribe onDeleted... [\(object.getId())]")
-                           agoraAssert("not implemeted")
+                           SpatialVoiceChatLog.info("imp robot subscribe onDeleted... [\(object.getId())]")
+                           SpatialVoiceChatLog.error("not implemeted")
 //                           self.subscribeDelegate?.onUserCountChanged(userCount: self.userList.count)
                        }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
                        }, fail: { error in
-                           agoraPrint("imp user subscribe fail \(error.message)...")
+                           SpatialVoiceChatLog.info("imp user subscribe fail \(error.message)...")
                            ToastView.show(text: error.message)
                        })
     }
     
     private func _getRobotInfo(completion: @escaping (Error?, SARobotAudioInfo?)->()) {
-        agoraPrint("imp robot get...")
+        SpatialVoiceChatLog.info("imp robot get...")
         guard let roomId = self.roomId else { return }
         SyncUtil
             .scene(id: roomId)?
             .collection(className: kCollectionIdRobotInfo)
             .get(success: { [weak self] list in
                 guard let self = self else {return}
-                agoraPrint("imp robot get success...")
+                SpatialVoiceChatLog.info("imp robot get success...")
                 let robotList = list.map({$0.toJson()}).kj.modelArray(SARobotAudioInfo.self)
                 self.robotInfo = robotList.first
                 completion(nil, self.robotInfo)
             }, fail: { error in
-                agoraPrint("imp robot get fail :\(error.message)...")
+                SpatialVoiceChatLog.info("imp robot get fail :\(error.message)...")
                 completion(SAErrorType.unknown(roomId, error.message).error(), nil)
             })
     }
     
     private func _updateRobot(info: SARobotAudioInfo, completion: @escaping (Error?)->()) {
-        agoraPrint("imp robot info update...")
+        SpatialVoiceChatLog.info("imp robot info update...")
         guard let roomId = self.roomId else { return }
         let params = info.kj.JSONObject()
         SyncUtil
@@ -1384,10 +1388,10 @@ extension SpatialAudioSyncSerciceImp {
             .update(id: info.objectId,
                     data:params,
                     success: {
-                agoraPrint("imp robot info success...")
+                SpatialVoiceChatLog.info("imp robot info success...")
                 completion(nil)
             }, fail: { error in
-                agoraPrint("imp robot info fail :\(error.message)...")
+                SpatialVoiceChatLog.info("imp robot info fail :\(error.message)...")
                 completion(SAErrorType.unknown("update robot info", error.message).error())
             })
     }

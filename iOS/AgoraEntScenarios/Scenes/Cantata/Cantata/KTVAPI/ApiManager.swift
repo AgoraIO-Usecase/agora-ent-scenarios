@@ -40,6 +40,9 @@ class ApiManager {
             let semaphore = DispatchSemaphore(value: 0)
             
             let task = session.dataTask(with: request) { (data, response, error) in
+                defer {
+                    semaphore.signal()
+                }
                 if let error = error {
                     print("getToken error: \(error.localizedDescription)")
                     token = nil
@@ -58,7 +61,6 @@ class ApiManager {
                     }
                 }
                 
-                semaphore.signal()
             }
             
             task.resume()
