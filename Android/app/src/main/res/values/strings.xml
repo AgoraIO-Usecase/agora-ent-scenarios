@@ -36,7 +36,7 @@
     <string name="app_home_scene_ktv">在线K歌房</string>
     <string name="app_home_scene_voice">语聊房</string>
     <string name="app_home_scene_live">直播</string>
-    <string name="app_home_scene_game">弹幕玩法</string>
+    <string name="app_home_scene_game">互动玩法</string>
     <string name="app_home_scene_live_merge">直播社交</string>
     <string name="app_home_scene_ktv_solo_chorus">独唱&amp;合唱</string>
     <string name="app_home_scene_ktv_solo_chorus_tips">超低延迟真合唱</string>
@@ -58,7 +58,8 @@
     <string name="app_home_scene_live_multiplayer_tips">敬请期待</string>
     <string name="app_home_scene_live_show1v1">秀场转1v1\n私密房</string>
     <string name="app_home_scene_live_show1v1_tips">秒转场&amp;秒接通</string>
-    <string name="app_home_scene_game_joy_tips">直播互动新玩法</string>
+    <string name="app_home_scene_game_joy">弹幕玩法</string>
+    <string name="app_home_scene_game_joy_tips">发弹幕 畅快玩</string>
 
     <string name="app_title_home">玩法</string>
     <string name="app_title_find">发现</string>
