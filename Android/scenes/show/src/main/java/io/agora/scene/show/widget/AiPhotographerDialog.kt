@@ -21,18 +21,15 @@ import io.agora.scene.widget.basic.BindingViewHolder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.internal.wait
 import java.io.File
 
 class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(context) {
 
     private val TAG = "AiPhotographerDialog"
 
-    private val URL_RESOURCE =
-        "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/resource/manifest/manifestList"
+    private val URL_RESOURCE = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/ai/manifestList"
 
     private data class ItemInfo constructor(
         val itemId: Int,
@@ -164,7 +161,7 @@ class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(cont
     private fun checkFileDownload() {
         val vtBgFile = File(context.getExternalFilesDir("assets"), "pano.jpg")
         val vtBgDownloaded = vtBgFile.exists()
-        val file = File(context.getExternalFilesDir("assets"), "DefaultPackage")
+        val file = File(context.getExternalFilesDir("assets"), "AREffect")
         if (file.exists()) {
             mAiPhotographerItemList.forEach {
                 when (it.itemId) {
@@ -231,8 +228,6 @@ class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(cont
         }
     }
 
-    private val tempUrl = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/ent/ai/AREffect.zip"
-
     // 下载 AI摄影师资源/虚拟背景图片 json
     private suspend fun downloadManifestFile(agResource: AGResource) {
         Log.d(TAG, "下载 ${agResource.uri} 资源 start")
@@ -243,9 +238,6 @@ class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(cont
                 agResourceFirst = aGManifest?.files?.get(0) ?: return@downloadManifest
             })
         val resource = agResourceFirst ?: return
-        if (resource.uri == "DefaultPackage") {
-            resource.url = tempUrl
-        }
         Log.d(TAG, "下载 ${resource.uri} 资源并解压 start")
         agResourceManager.downloadAndUnZipResource(resource, {},
             completionHandler = { file, exception ->

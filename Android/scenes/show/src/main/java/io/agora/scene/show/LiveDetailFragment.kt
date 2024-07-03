@@ -23,6 +23,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.IMediaPlayerObserver
+import io.agora.mediaplayer.data.CacheStatistics
+import io.agora.mediaplayer.data.PlayerPlaybackStats
 import io.agora.mediaplayer.data.PlayerUpdatedInfo
 import io.agora.mediaplayer.data.SrcInfo
 import io.agora.rtc2.ChannelMediaOptions
@@ -1617,7 +1619,7 @@ class LiveDetailFragment : Fragment() {
                     }
                 }
 
-                if (state == Constants.REMOTE_VIDEO_STATE_PLAYING
+                if (state == Constants.REMOTE_VIDEO_STATE_DECODING
                     && (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED || reason == Constants.REMOTE_VIDEO_STATE_REASON_LOCAL_UNMUTED)
                 ) {
                     val durationFromSubscribe = SystemClock.elapsedRealtime() - subscribeMediaTime
@@ -2463,16 +2465,16 @@ class LiveDetailFragment : Fragment() {
             registerPlayerObserver(object : IMediaPlayerObserver {
                 override fun onPlayerStateChanged(
                     state: io.agora.mediaplayer.Constants.MediaPlayerState?,
-                    error: io.agora.mediaplayer.Constants.MediaPlayerError?
+                    error: io.agora.mediaplayer.Constants.MediaPlayerReason?
                 ) {
-                    if (error == io.agora.mediaplayer.Constants.MediaPlayerError.PLAYER_ERROR_NONE) {
+                    if (error == io.agora.mediaplayer.Constants.MediaPlayerReason.PLAYER_REASON_NONE) {
                         if (state == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED) {
                             play()
                         }
                     }
                 }
 
-                override fun onPositionChanged(position_ms: Long) {
+                override fun onPositionChanged(positionMs: Long, timestampMs: Long) {
 
                 }
 
@@ -2512,6 +2514,12 @@ class LiveDetailFragment : Fragment() {
 
                 override fun onPlayerInfoUpdated(info: PlayerUpdatedInfo?) {
 
+                }
+
+                override fun onPlayerCacheStats(stats: CacheStatistics?) {
+                }
+
+                override fun onPlayerPlaybackStats(stats: PlayerPlaybackStats?) {
                 }
 
                 override fun onAudioVolumeIndication(volume: Int) {

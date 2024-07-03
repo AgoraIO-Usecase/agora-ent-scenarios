@@ -98,7 +98,7 @@ class MetaEngineHandler : AGExtensionHandler {
     }
 
     private val mCurrentAssetPath by lazy {
-        AgoraApplication.the().getExternalFilesDir("assets").toString()
+        AgoraApplication.the().getExternalFilesDir("assets/AREffect").toString()
     }
     private val mCurrentMetaFilesPath by lazy {
         AgoraApplication.the().getExternalFilesDir("assets").toString()
@@ -319,11 +319,33 @@ class MetaEngineHandler : AGExtensionHandler {
         }
     }
 
+    private fun triggerSegmentLowcostMode(enable: Boolean) {
+        Log.d(TAG, "metakitx trigger Lowcost Mode, enable: $enable")
+        val rtcEngine = mRtcEngine ?: return
+        val valueObj = JSONObject()
+        try {
+            valueObj.put("fill_alpha_data", true)
+            if (enable) {
+                val configObj = JSONObject()
+                configObj.put("optical_flow", 0)
+                configObj.put("low_cost_mode", true)
+                valueObj.put("seg_params", configObj)
+            }
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+        rtcEngine.setExtensionProperty(
+            "agora_video_filters_segmentation",
+            "portrait_segmentation", "configs", valueObj.toString()
+        )
+    }
+
     // 灯光特效
     fun configEffect3D(
         enable: Boolean,
         aiPhotographerType: Int = AiPhotographerType.ITEM_ID_AI_PHOTOGRAPHER_NONE
     ) {
+        triggerSegmentLowcostMode(enable)
         if (enable) {
             enableSegmentation()
             val effect3DId: Int = when (aiPhotographerType) {
@@ -370,6 +392,12 @@ class MetaEngineHandler : AGExtensionHandler {
         try {
             configObj.put("id", id)
             configObj.put("enable", enable)
+            if (id == AiPhotographerType.ITEM_ID_AI_LIGHTING_AD) {
+                val paramObj = JSONObject()
+                paramObj.put("text", "Agora") // text 表示广告文字文本，支持中英
+                paramObj.put("animation", 1) // animation 表示文字动画，可选择 1,2,3
+                configObj.put("param", paramObj)
+            }
         } catch (e: JSONException) {
             e.printStackTrace()
         }
@@ -422,11 +450,13 @@ class MetaEngineHandler : AGExtensionHandler {
                 filePath = "$mCurrentMetaFilesPath/pano.jpg"
                 gyroState = "on"
             }
+
             BackgroundType.BGTypeNull -> {
                 mode = "off"
                 filePath = ""
                 gyroState = "off"
             }
+
             else -> {}
         }
         val picObj = JSONObject()
