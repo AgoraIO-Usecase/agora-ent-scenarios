@@ -22,12 +22,13 @@ public class DynamicLoadUtil {
     public static void loadSoFile(Context context, String fromPath, String soName) {
         File dir = context.getDir("libs", Context.MODE_PRIVATE);
         if (!isLoadSoFile(dir, soName)) {
-            int ret = copy(fromPath, dir.getAbsolutePath());
+            int ret = copy(fromPath, dir.getAbsolutePath(), soName);
             if (ret != 0) {
                 Log.e("DynamicLoadUtil", "copy so file failed");
                 return;
             }
         }
+        Log.d("hugo", "load so file: " + dir.getAbsolutePath() + "/" + soName + ".so");
         System.load(dir.getAbsolutePath() + "/" + soName + ".so");
     }
 
@@ -49,9 +50,10 @@ public class DynamicLoadUtil {
      * 拷贝 so 文件到 app 私有目录
      * @param fromFile so 文件路径, 通常是下载目录
      * @param toFile 目标存放 so 文件的 app 私有目录
+     * @param soName so 文件名, 例如 libeffect, 不要带 .so 后缀
      * @return 拷贝结果
      */
-    private static int copy(String fromFile, String toFile) {
+    private static int copy(String fromFile, String toFile, String soName) {
         File root = new File(fromFile);
         if (!root.exists()) {
             return -1;
@@ -66,12 +68,8 @@ public class DynamicLoadUtil {
             Log.d("DynamicLoadUtil", "create dir: " + ret);
         }
         for (File currentFile : currentFiles) {
-            if (currentFile.isDirectory()) {
-                copy(currentFile.getPath() + "/", toFile + currentFile.getName() + "/");
-            } else {
-                if (currentFile.getName().contains(".so")) {
-                    return copySdcardFile(currentFile.getPath(), toFile + File.separator + currentFile.getName());
-                }
+            if (currentFile.getName().contains(soName)) {
+                return copySdcardFile(currentFile.getPath(), toFile + File.separator + currentFile.getName());
             }
         }
         return 0;
