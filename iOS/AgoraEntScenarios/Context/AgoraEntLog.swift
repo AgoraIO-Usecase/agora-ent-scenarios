@@ -7,6 +7,8 @@
 
 import Foundation
 import SwiftyBeaver
+import SSZipArchive
+
 @objc public class AgoraEntLogConfig: NSObject {
     var sceneName: String = ""
     var logFileMaxSize: Int = (1 * 1024 * 1024)
@@ -110,5 +112,71 @@ public func agoraDoMainThreadTask(_ task: (()->())?) {
         }
         
         return urls
+    }
+    
+    private static func zipSceneLog(scene: String, completion: @escaping (String?, Error?) -> Void) {
+        var logFiles = [String]()
+        let logDir = logsDir()
+        if let dirs = try? FileManager.default.contentsOfDirectory(atPath: logDir) {
+            for file in dirs {
+                if file.contains(scene) {
+                    let filePath = "\(logDir)/\(file)"
+                    logFiles.append(filePath)
+                }
+            }
+        }
+        let cacheDir = cacheDir()
+        if let dirs = try? FileManager.default.contentsOfDirectory(atPath: cacheDir) {
+            for file in dirs {
+                // 过滤出文件名包含'agoraapi'、'agorartmsdk'、'agorasdk'的文件
+                if file.contains("agoraapi") || file.contains("agorartmsdk") || file.contains("agorasdk") {
+                    let filePath = "\(cacheDir)/\(file)"
+                    logFiles.append(filePath)
+                }
+            }
+        }
+        guard logFiles.isEmpty == false else {
+            completion(nil, nil)
+            return
+        }
+        let zipFile = NSTemporaryDirectory() + "/log_\(UUID().uuidString).zip"
+        do {
+            SSZipArchive.createZipFile(atPath: zipFile, withFilesAtPaths: logFiles)
+            completion(zipFile, nil)
+        } catch {
+            // 异常处理，回调错误闭包
+            completion(nil, error)
+        }
+    }
+    
+    @objc public static func autoUploadLog(scene: String) {
+        let zipStart = DispatchTime.now()
+        print("[AgoraEntLog] autoUploadLog: func start t:\(zipStart)")
+        DispatchQueue.global().async {
+            guard AppContext.shared.sceneConfig?.logUpload == 1 else {
+                return
+            }
+            print("[AgoraEntLog] autoUploadLog: zip start t:\(DispatchTime.now())")
+            AgoraEntLog.zipSceneLog(scene: scene, completion: { str, err in
+                print("[AgoraEntLog] autoUploadLog: zip end cost: \(zipStart.distance(to: DispatchTime.now()))")
+                guard let filePath = str, let data = try? Data.init(contentsOf: URL(fileURLWithPath: filePath)) else {
+                    return
+                }
+                print("[AgoraEntLog] autoUploadLog: upload start t:\(DispatchTime.now())")
+                let req = AUIUploadNetworkModel()
+                req.interfaceName = "/api-login/upload/log"
+                req.fileData = data
+                req.name = "file"
+                req.mimeType = "application/zip"
+                req.fileName = URL(fileURLWithPath: filePath).lastPathComponent
+                req.upload { progress in
+                    
+                } completion: { err, content in
+                    print("[AgoraEntLog] autoUploadLog: upload end cost:\(zipStart.distance(to: DispatchTime.now())) e: \(err?.localizedDescription)")
+                    if let e = err {
+                    }
+                }
+            })
+        }
     }
 }

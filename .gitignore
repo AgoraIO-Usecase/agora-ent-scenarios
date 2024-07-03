@@ -11,6 +11,7 @@ Pods
 **/SenseLib*/*
 **/*.lic
 **/libs/*
+**/RTMLibs/*
 **/buglyqq-upload-symbol/**
 **/build.sh
 **/FULib*/*

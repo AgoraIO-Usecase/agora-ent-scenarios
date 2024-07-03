@@ -10,7 +10,7 @@ import YYCategories
 import SVProgressHUD
 import AgoraCommon
 
-private let kSceneId = "scene_cantata_4.3.0"
+private let kSceneId = "scene_cantata_5.0.0"
 
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"
@@ -22,7 +22,7 @@ private func agoraAssert(_ message: String) {
 }
 
 private func agoraAssert(_ condition: Bool, _ message: String) {
-    KTVLog.error(text: message, tag: "KTVService")
+    CantataLog.error(text: message, tag: "KTVService")
     #if DEBUG
 //    assert(condition, message)
     #else
@@ -31,7 +31,7 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
 
 private func agoraPrint(_ message: String) {
 //    #if DEBUG
-    KTVLog.info(text: message, tag: "KTVService")
+    CantataLog.info(text: message, tag: "KTVService")
 //    #else
 //    #endif
 }
@@ -1432,7 +1432,7 @@ extension DHCSyncManagerServiceImp {
             //  topSong.isChorus == true, // current is chorus
               topSong.userNo == VLUserCenter.user.id
         else {
-            KTVLog.warning(text: "_markSoloSongIfNeed break:  \(songList.first?.status.rawValue ?? 0) \(songList.first?.userNo ?? "")/\(VLUserCenter.user.id)")
+            CantataLog.warning(text: "_markSoloSongIfNeed break:  \(songList.first?.status.rawValue ?? 0) \(songList.first?.userNo ?? "")/\(VLUserCenter.user.id)")
             return
         }
         

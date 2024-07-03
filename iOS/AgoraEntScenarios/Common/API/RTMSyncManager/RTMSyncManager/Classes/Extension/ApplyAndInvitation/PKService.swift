@@ -131,7 +131,8 @@ extension PKService {
         
         let content = encodeModelToJsonStr(info) ?? ""
         messageManager.sendMessage(content: content,
-                                   userId: roomPresenceInfo.ownerId) { err in
+                                   userId: roomPresenceInfo.ownerId,
+                                   channelName: roomPresenceInfo.roomId) { err in
             aui_info("invitePK roomId: \(roomId) completion: \(err?.localizedDescription ?? "success")", tag: "PKService")
             completion?(err)
         }

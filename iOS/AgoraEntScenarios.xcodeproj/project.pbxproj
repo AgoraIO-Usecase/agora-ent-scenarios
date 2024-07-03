@@ -3775,7 +3775,6 @@
 			isa = PBXGroup;
 			children = (
 				E301BF702AF8E8E90089A79C /* sbgResource.bundle */,
-				E301BF712AF8E8E90089A79C /* NetWork */,
 				E301BF732AF8E8E90089A79C /* SBGAPI */,
 				E301BF782AF8E8E90089A79C /* Utils */,
 				E301BF7B2AF8E8E90089A79C /* README.md */,
@@ -3787,13 +3786,6 @@
 				E301BFF62AF8E8E90089A79C /* Debug */,
 			);
 			path = SBG;
-			sourceTree = "<group>";
-		};
-		E301BF712AF8E8E90089A79C /* NetWork */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = NetWork;
 			sourceTree = "<group>";
 		};
 		E301BF732AF8E8E90089A79C /* SBGAPI */ = {
@@ -5363,7 +5355,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.2.1;
+				MARKETING_VERSION = 5.0.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
@@ -5386,8 +5378,6 @@
 					"\"AgoraClearVisionExtension\"",
 					"-framework",
 					"\"AgoraContentInspectExtension\"",
-					"-framework",
-					"\"AgoraDav1d\"",
 					"-framework",
 					"\"AgoraFaceDetectionExtension\"",
 					"-framework",
@@ -5456,10 +5446,6 @@
 					"\"KakaJSON\"",
 					"-framework",
 					"\"LEEAlert\"",
-					"-framework",
-					"\"LSTPopView\"",
-					"-framework",
-					"\"LSTTimer\"",
 					"-framework",
 					"\"MJRefresh\"",
 					"-framework",
@@ -5589,7 +5575,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.2.1;
+				MARKETING_VERSION = 5.0.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
@@ -5612,8 +5598,6 @@
 					"\"AgoraClearVisionExtension\"",
 					"-framework",
 					"\"AgoraContentInspectExtension\"",
-					"-framework",
-					"\"AgoraDav1d\"",
 					"-framework",
 					"\"AgoraFaceDetectionExtension\"",
 					"-framework",
@@ -5682,10 +5666,6 @@
 					"\"KakaJSON\"",
 					"-framework",
 					"\"LEEAlert\"",
-					"-framework",
-					"\"LSTPopView\"",
-					"-framework",
-					"\"LSTTimer\"",
 					"-framework",
 					"\"MJRefresh\"",
 					"-framework",
