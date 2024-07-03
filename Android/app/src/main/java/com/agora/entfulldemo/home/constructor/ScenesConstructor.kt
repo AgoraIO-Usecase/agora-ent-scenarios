@@ -160,7 +160,7 @@ object ScenesConstructor {
                     HomeSceneModel(
                         scene = HomeSubScenes.Game_Joy,
                         clazzName = joyGameClazz,
-                        name = context.getString(R.string.app_home_scene_game),
+                        name = context.getString(R.string.app_home_scene_game_joy),
                         tip = context.getString(R.string.app_home_scene_game_joy_tips),
                         background = R.drawable.bg_scene_game_joy,
                         active = true
