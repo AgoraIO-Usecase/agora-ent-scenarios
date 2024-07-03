@@ -469,7 +469,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 }
 
                 DataState.STATE_SUCCESS -> {
-                    hideLoadingView()
                     val mTaskId = it.data?.taskId ?: return@observe
                     val gameSelect = mGameChooseGameDialog?.mSelectGame ?: return@observe
                     mGameChooseGameDialog?.let { dialog ->
@@ -687,6 +686,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             override fun onFirstRemoteVideoFrame(uid: Int, width: Int, height: Int, elapsed: Int) {
                 super.onFirstRemoteVideoFrame(uid, width, height, elapsed)
                 Log.d(TAG, "rtc onFirstRemoteVideoFrame uid:$uid")
+                if (uid == mStartGameInfo?.assistantUid) {
+                    // 回调云机器第一帧画面在隐藏loading
+                    hideLoadingView()
+                }
             }
 
             override fun onError(err: Int) {
