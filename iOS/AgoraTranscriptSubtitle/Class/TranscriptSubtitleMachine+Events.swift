@@ -8,6 +8,10 @@
 import Foundation
 
 protocol TranscriptSubtitleMachineDelegate: NSObjectProtocol {
-    func transcriptSubtitleMachine(_ machine: TranscriptSubtitleMachine, didAddRenderInfo renderInfo: TranscriptSubtitleMachine.RenderInfo)
-    func transcriptSubtitleMachine(_ machine: TranscriptSubtitleMachine, didUpadteRenderInfo renderInfo: TranscriptSubtitleMachine.RenderInfo)
+    func transcriptSubtitleMachine(_ machine: TranscriptSubtitleMachine, didAddRenderInfo renderInfo: RenderInfo)
+    func transcriptSubtitleMachine(_ machine: TranscriptSubtitleMachine, didUpadteRenderInfo renderInfo: RenderInfo)
+}
+
+protocol DebugMachineIntermediateDelegate: NSObjectProtocol {
+    func debugMachineIntermediate(_ machine: TranscriptSubtitleMachine, diduUpdate infos: [Info])
 }

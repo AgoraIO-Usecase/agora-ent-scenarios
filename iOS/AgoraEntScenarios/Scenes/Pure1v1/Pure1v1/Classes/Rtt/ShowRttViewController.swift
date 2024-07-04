@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import AgoraCommon
+import SVProgressHUD
 
 class ShowRttViewController: UIViewController {
     
@@ -36,6 +37,11 @@ class ShowRttViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func resetRttStatus() {
+        self.showRttView.setStartRttStatus(open: RttManager.shared.checkSttStatus())
+        self.showRttView.reloadChosenLanguage()
+    }
+    
     // 设置实时翻译视图
     private func setupRttView() {
         view.addSubview(showRttView)
@@ -59,77 +65,47 @@ class ShowRttViewController: UIViewController {
 extension ShowRttViewController: ShowRttViewDelegate {
     func onClickRtt(start: Bool) {
         if (start) {
-            var rtcToken: String?
-            var rtcToken2: String?
-
-            let dispatchGroup = DispatchGroup()
-
-            // 2. 生成 token for uid "1000"
-            dispatchGroup.enter()
-            NetworkManager.shared.generateTokens(channelName: channelName,
-                                                 uid: "1000",
-                                                 tokenGeneratorType: .token007,
-                                                 tokenTypes: [.rtc]) { [weak self] tokens in
-                defer { dispatchGroup.leave() }
-                guard let self = self else { return }
-                guard let token = tokens[AgoraTokenType.rtc.rawValue] else { return }
-                rtcToken = token // 将 token 赋值给 rtcToken
-                print("RttApiManager bot1000 token: \(rtcToken)")
-            }
-
-            // 3. 生成 token for uid "2000"
-            dispatchGroup.enter()
-            NetworkManager.shared.generateTokens(channelName: channelName,
-                                                 uid: "2000",
-                                                 tokenGeneratorType: .token007,
-                                                 tokenTypes: [.rtc]) { [weak self] tokens in
-                defer { dispatchGroup.leave() }
-                guard let self = self else { return }
-                guard let token = tokens[AgoraTokenType.rtc.rawValue] else { return }
-                rtcToken2 = token // 将 token 赋值给 rtcToken2
-                print("RttApiManager bot2000 token: \(rtcToken2)")
-            }
-
-            // 4. 通知在主队列上执行
-            dispatchGroup.notify(queue: .main) {
-                // 在这里访问 rtcToken 和 rtcToken2
-                guard let rtcToken = rtcToken, let rtcToken2 = rtcToken2 else {
-                    // 如果 rtcToken 或 rtcToken2 为空，处理错误情况
-                    return
-                }
-                
-                // 现在可以使用 rtcToken 和 rtcToken2 来调用 RttManager.shared.enableRtt
-                RttManager.shared.enableRtt(channelName: self.channelName,
-                                            subBotToken: rtcToken,
-                                            pubBotToken: rtcToken2) { success in
-                    if success {
-                        self.showRttView.setStartRttStatus(open: true)
-                        self.dismiss(animated: true)
-                        AUIToast.show(text: "RTT实时语音功能已开启")
-                    } else {
-                        AUIToast.show(text: "RTT实时语音功能开启失败")
-                        self.showRttView.setStartRttStatus(open: RttManager.shared.checkSttStatus())
+            generateTokens { success in
+                if (success) {
+                    RttManager.shared.enableRtt(channelName: self.channelName) { success in
+                        if success {
+                            self.showRttView.setStartRttStatus(open: true)
+                            self.dismiss(animated: true)
+                            AUIToast.show(text: "rtt_enable_success".pure1v1Localization())
+                        } else {
+                            AUIToast.show(text: "rtt_enable_failed".pure1v1Localization())
+                            self.showRttView.setStartRttStatus(open: RttManager.shared.checkSttStatus())
+                        }
                     }
+                } else {
+                    AUIToast.show(text: "rtt_enable_failed".pure1v1Localization())
+                    self.showRttView.setStartRttStatus(open: RttManager.shared.checkSttStatus())
                 }
             }
         } else {
+            SVProgressHUD.show()
             RttManager.shared.disableRtt(force: false) { success in
                 if success {
                     self.showRttView.setStartRttStatus(open: false)
-                    AUIToast.show(text: "RTT实时语音功能已关闭")
+                    AUIToast.show(text: "rtt_disable_success".pure1v1Localization())
                 } else {
-                    AUIToast.show(text: "RTT实时语音功能关闭失败")
+                    AUIToast.show(text: "rtt_disable_failed".pure1v1Localization())
                     self.showRttView.setStartRttStatus(open: RttManager.shared.checkSttStatus())
                 }
+                SVProgressHUD.dismiss()
             }
         }
     }
     
     func onClickSourceLanguage() {
+        
+        if (RttManager.shared.checkSttStatus()) {
+            AUIToast.show(text: "rtt_switch_note".pure1v1Localization())
+            return
+        }
 
         let vc = RttLanguageSheetViewController()
-        //vc.transitioningDelegate = self?.transDelegate
-        vc.title = "对方语言"
+        vc.title = "rtt_source_language".pure1v1Localization()
         vc.defaultSelectedIndex = RttManager.shared.selectedSourceLanguageIndex
         vc.dataArray = RttManager.shared.languages
         vc.didSelectedIndex = { index in
@@ -139,13 +115,17 @@ extension ShowRttViewController: ShowRttViewDelegate {
         self.present(vc, animated: true, completion: {
             //vc.showBgView()
         })
-        //self.dismiss(animated: true)
     }
     
     func onClickTargetLanguage() {
+        
+        if (RttManager.shared.checkSttStatus()) {
+            AUIToast.show(text: "rtt_switch_note".pure1v1Localization())
+            return
+        }
+        
         let vc = RttLanguageSheetViewController()
-        //vc.transitioningDelegate = self?.transDelegate
-        vc.title = "翻译语言"
+        vc.title = "rtt_target_language".pure1v1Localization()
         vc.defaultSelectedIndex = RttManager.shared.selectedTargetLanguageIndex
         vc.dataArray = RttManager.shared.languages
         vc.didSelectedIndex = { index in
@@ -155,5 +135,58 @@ extension ShowRttViewController: ShowRttViewDelegate {
         self.present(vc, animated: true, completion: {
             //vc.showBgView()
         })
+    }
+    
+    func generateTokens(completion: @escaping (Bool) -> ()) {
+        if (RttManager.shared.subBotToken != "" && RttManager.shared.pubBotToken != "") {
+            completion(true)
+            return
+        }
+        
+        var rtcToken: String?
+        var rtcToken2: String?
+
+        let dispatchGroup = DispatchGroup()
+
+        // 2. 生成 token for subBotUid
+        dispatchGroup.enter()
+        NetworkManager.shared.generateTokens(channelName: channelName,
+                                             uid: RttManager.shared.subBotUid,
+                                             tokenGeneratorType: .token007,
+                                             tokenTypes: [.rtc]) { [weak self] tokens in
+            defer { dispatchGroup.leave() }
+            guard let self = self else { return }
+            guard let token = tokens[AgoraTokenType.rtc.rawValue] else { return }
+            rtcToken = token // 将 token 赋值给 rtcToken
+            print("RttApiManager bot1000 token: \(rtcToken)")
+        }
+
+        // 3. 生成 token for pubBotUid
+        dispatchGroup.enter()
+        NetworkManager.shared.generateTokens(channelName: channelName,
+                                             uid: RttManager.shared.pubBotUid,
+                                             tokenGeneratorType: .token007,
+                                             tokenTypes: [.rtc]) { [weak self] tokens in
+            defer { dispatchGroup.leave() }
+            guard let self = self else { return }
+            guard let token = tokens[AgoraTokenType.rtc.rawValue] else { return }
+            rtcToken2 = token // 将 token 赋值给 rtcToken2
+            print("RttApiManager bot2000 token: \(rtcToken2)")
+        }
+
+        // 4. 通知在主队列上执行
+        dispatchGroup.notify(queue: .main) {
+            // 在这里访问 rtcToken 和 rtcToken2
+            guard let rtcToken = rtcToken, let rtcToken2 = rtcToken2 else {
+                // 如果 rtcToken 或 rtcToken2 为空，处理错误情况
+                completion(false)
+                return
+            }
+            
+            RttManager.shared.subBotToken = rtcToken
+            RttManager.shared.pubBotToken = rtcToken2
+            completion(true)
+            return
+        }
     }
 }

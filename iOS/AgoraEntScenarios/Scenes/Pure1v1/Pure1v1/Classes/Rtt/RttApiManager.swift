@@ -10,7 +10,7 @@ import AgoraCommon
 class RttApiManager {
     static let shared = RttApiManager()
     
-    private let domain = "https://api.agora.io"
+    private let domain = "https://service-staging.agora.io/speech-to-text"
     
     private let TAG = "RttApiManager"
     private var auth = ""
@@ -28,56 +28,63 @@ class RttApiManager {
         self.auth = "agora token=" + token
     }
     
-    func fetchCloudToken() -> String? {
-        var token: String? = nil
+    func fetchCloudToken(completion: @escaping ((String?)->Void)) {
         
         do {
             let timeInterval: TimeInterval = Date().timeIntervalSince1970
             let millisecond = CLongLong(round(timeInterval*1000))
             let acquireOjb = try JSONSerialization.data(withJSONObject: [
-                "instanceId": "\(Int(millisecond))"
+                "instanceId": "\(Int(millisecond))",
+                "testIp" : "218.205.37.49",
+                "testPort": 4447
             ])
 
             let url = getTokenUrl(domain: domain, appId: AppContext.shared.appId)
-            guard let requestUrl = URL(string: url) else {return ""}
+            guard let requestUrl = URL(string: url) else {
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+                return
+            }
             var request = URLRequest(url: requestUrl)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue(auth, forHTTPHeaderField: "Authorization")
             request.httpBody = acquireOjb
-            
-            let semaphore = DispatchSemaphore(value: 0)
-            
+                        
             let task = session.dataTask(with: request) { (data, response, error) in
                 if let error = error {
-                    print("RttApiManager getToken error: \(error.localizedDescription)")
-                    token = nil
+                    pure1v1Print("RttApiManager getToken error: \(error.localizedDescription)")
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
                 } else if let data = data {
                     do {
                         guard let responseDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any], let tokenName = responseDict["tokenName"] as? String else {
-                            semaphore.signal()
+                            pure1v1Print("RttApiManager getToken error: \(data)")
                             return
                         }
-                        token = tokenName
-                        print("RttApiManager getToken success")
+                        DispatchQueue.main.async {
+                            completion(tokenName)
+                        }
+                        pure1v1Print("RttApiManager getToken success")
                     } catch {
-                        print("RttApiManager getToken error: \(error.localizedDescription)")
-                        token = nil
+                        pure1v1Print("RttApiManager getToken error: \(error.localizedDescription)")
+                        DispatchQueue.main.async {
+                            completion(nil)
+                        }
                     }
                 }
-                
-                semaphore.signal()
             }
             
             task.resume()
-            semaphore.wait()
             
         } catch {
-            print("RttApiManager getToken error: \(error.localizedDescription)")
-            token = nil
+            pure1v1Print("RttApiManager getToken error: \(error.localizedDescription)")
+            DispatchQueue.main.async {
+                completion(nil)
+            }
         }
-        
-        return token
     }
     
     func fetchStartRtt(
@@ -91,116 +98,119 @@ class RttApiManager {
         pubBotToken: String,
         completion: @escaping ((Bool)->Void)) {
             
-        let token = fetchCloudToken()
-        if token == nil {
-            print("RttApiManager fetchStartRtt failed token is null")
-            completion(false)
-            return
-        } else {
-            tokenName = token!
-        }
-        
-        do {
-            // 根据提供的 JSON 结构定义字段
-            let languages = languages
-            let sourceLanguage = sourceLanguage
-            let targetLanguages = targetLanguages
+        self.fetchCloudToken { token in
+            if token == nil {
+                pure1v1Print("RttApiManager fetchStartRtt failed token is null")
+                completion(false)
+                return
+            } else {
+                self.tokenName = token!
+            }
             
-            // 配置字典
-            let rtcConfig = [
-                "channelName": channelName,
-                "subBotUid": subBotUid,
-                "subBotToken": subBotToken,
-                "pubBotUid": pubBotUid,
-                "pubBotToken": pubBotToken
-                // 根据需要添加其他 rtcConfig 字段
-            ]
-            
-            let captionConfig: [String: Any] = [
-                "sliceDuration": 60,
-                "storage": [
-                    "accessKey": "<YourOssAccessKey>",
-                    "secretKey": "<YourOssSecretKey>",
-                    "bucket": "<YourOssBucketName>",
-                    "vendor": "<YourOssVendor>",
-                    "region": "<YourOssRegion>",
-                    "fileNamePrefix": ["<YourOssPrefix>"]
-                ],
-            ]
-            
-            let translateConfig: [String: Any] = [
-                "forceTranslateInterval": 2,
-                "languages": [
-                    [
-                        "source": sourceLanguage,
-                        "target": targetLanguages
+            do {
+                // 根据提供的 JSON 结构定义字段
+                let languages = languages
+                let sourceLanguage = sourceLanguage
+                let targetLanguages = targetLanguages
+                
+                // 配置字典
+                let rtcConfig: [String: Any] = [
+                    "channelName": channelName,
+                    "subBotUid": subBotUid,
+                    "subBotToken": subBotToken,
+                    "pubBotUid": pubBotUid,
+                    "pubBotToken": pubBotToken,
+                    "subscribeAudioUids": [RttManager.shared.targetUid]
+                    // 根据需要添加其他 rtcConfig 字段
+                ]
+                
+                let captionConfig: [String: Any] = [
+                    "sliceDuration": 60,
+                    "storage": [
+                        "accessKey": "<YourOssAccessKey>",
+                        "secretKey": "<YourOssSecretKey>",
+                        "bucket": "<YourOssBucketName>",
+                        "vendor": "<YourOssVendor>",
+                        "region": "<YourOssRegion>",
+                        "fileNamePrefix": ["<YourOssPrefix>"]
+                    ],
+                ]
+                
+                let translateConfig: [String: Any] = [
+                    "forceTranslateInterval": 2,
+                    "languages": [
+                        [
+                            "source": sourceLanguage,
+                            "target": targetLanguages
+                        ]
                     ]
                 ]
-            ]
-            
-            // 构建顶级字典
-            let postBody: [String: Any] = [
-                "languages": languages,
-                "maxIdleTime": 50,
-                "rtcConfig": rtcConfig,
-                //"captionConfig": captionConfig,
-                "translateConfig": translateConfig
-            ]
-            
-            let url = startTaskUrl(domain: domain, appId: AppContext.shared.appId, tokenName: tokenName)
-            guard let requestUrl = URL(string: url) else {return}
-            var request = URLRequest(url: requestUrl)
-            request.httpMethod = "POST"
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue(auth, forHTTPHeaderField: "Authorization")
-            request.httpBody = try JSONSerialization.data(withJSONObject: postBody, options: [])
-            print("RttApiManager fetchStartRtt url: \(request.httpBody)")
-            
-         //   let semaphore = DispatchSemaphore(value: 0)
-            
-            let task = session.dataTask(with: request) { (data, response, error) in
-                if let error = error {
-                    print("RttApiManager fetchStartRtt failed: \(error.localizedDescription)")
-                    DispatchQueue.main.async {
-                        completion(false)
-                    }
-                } else if let data = data {
-                    do {
-                        guard let responseDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any], let taskId = responseDict["taskId"] as? String else {
-                            DispatchQueue.main.async {
-                                completion(false)
-                            }
-                            return
-                        }
-                        
-                        self.taskId = taskId
-                        print("RttApiManager fetchStartRtt success taskId: \(taskId)")
-                        DispatchQueue.main.async {
-                            completion(true)
-                        }
-                    } catch {
-                        print("RttApiManager fetchStartRtt failed: \(error.localizedDescription)")
+                
+                // 构建顶级字典
+                let postBody: [String: Any] = [
+                    "languages": languages,
+                    "maxIdleTime": 50,
+                    "rtcConfig": rtcConfig,
+                    //"captionConfig": captionConfig,
+                    "translateConfig": translateConfig
+                ]
+                
+                let url = self.startTaskUrl(domain: self.domain, appId: AppContext.shared.appId, tokenName: self.tokenName)
+                guard let requestUrl = URL(string: url) else {return}
+                var request = URLRequest(url: requestUrl)
+                request.httpMethod = "POST"
+                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                request.setValue(self.auth, forHTTPHeaderField: "Authorization")
+                request.httpBody = try JSONSerialization.data(withJSONObject: postBody, options: [])
+                pure1v1Print("RttApiManager fetchStartRtt url: \(request.httpBody)")
+                
+             //   let semaphore = DispatchSemaphore(value: 0)
+                
+                let task = self.session.dataTask(with: request) { (data, response, error) in
+                    if let error = error {
+                        pure1v1Print("RttApiManager fetchStartRtt failed: \(error.localizedDescription)")
                         DispatchQueue.main.async {
                             completion(false)
                         }
+                    } else if let data = data {
+                        do {
+                            guard let responseDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any], let taskId = responseDict["taskId"] as? String else {
+                                DispatchQueue.main.async {
+                                    completion(false)
+                                }
+                                return
+                            }
+                            
+                            self.taskId = taskId
+                            pure1v1Print("RttApiManager fetchStartRtt success taskId: \(taskId)")
+                            DispatchQueue.main.async {
+                                completion(true)
+                            }
+                        } catch {
+                            pure1v1Print("RttApiManager fetchStartRtt failed: \(error.localizedDescription)")
+                            DispatchQueue.main.async {
+                                completion(false)
+                            }
+                        }
                     }
                 }
-            }
-            
-            task.resume()
-           // semaphore.wait()
-            
-        } catch {
-            print("RttApiManager fetchStartRtt failed: \(error.localizedDescription)")
-            DispatchQueue.main.async {
-                completion(false)
+                
+                task.resume()
+               // semaphore.wait()
+                
+            } catch {
+                pure1v1Print("RttApiManager fetchStartRtt failed: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    completion(false)
+                }
             }
         }
+        
     }
     
     func fetchStopRtt(completion: @escaping ((Bool)->Void)) {
         if taskId.isEmpty || tokenName.isEmpty {
-            print("RttApiManager fetchStopRtt failed taskId || tokenName is null")
+            pure1v1Print("RttApiManager fetchStopRtt failed taskId || tokenName is null")
             return
         }
         
@@ -214,7 +224,7 @@ class RttApiManager {
                         
             let task = session.dataTask(with: request) { (data, response, error) in
                 // Handle response
-                print("RttApiManager fetchStopRtt: \(error)")
+                pure1v1Print("RttApiManager fetchStopRtt: \(error)")
                 if let error = error {
                     DispatchQueue.main.async {
                         completion(false)
@@ -228,7 +238,7 @@ class RttApiManager {
             
             task.resume()
         } catch {
-            print("RttApiManager fetchStopRtt failed: \(error.localizedDescription)")
+            pure1v1Print("RttApiManager fetchStopRtt failed: \(error.localizedDescription)")
             DispatchQueue.main.async {
                 completion(false)
             }

@@ -66,6 +66,7 @@ typedef GPB_ENUM(SttText_FieldNumber) {
   SttText_FieldNumber_TransArray = 14,
   SttText_FieldNumber_Culture = 15,
   SttText_FieldNumber_TextTs = 16,
+  SttText_FieldNumber_SentenceEndIndex = 17,
 };
 
 GPB_FINAL @interface SttText : GPBMessage
@@ -106,6 +107,8 @@ GPB_FINAL @interface SttText : GPBMessage
 @property(nonatomic, readwrite, copy, null_resettable) NSString *culture;
 
 @property(nonatomic, readwrite) int64_t textTs;
+
+@property(nonatomic, readwrite) int32_t sentenceEndIndex;
 
 @end
 

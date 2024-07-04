@@ -8,37 +8,35 @@
 import Foundation
 
 extension TranscriptSubtitleMachine {
-    
-    /// spilit stt words to transcript words
-    static func makeTranscriptWords(sttWord: SttWord) -> [TranscriptWord] {
-        return sttWord.text!.map({ String($0) }).map({ TranscriptWord.init(text: $0, isFinal: sttWord.isFinal, confidence: sttWord.confidence, startMs: sttWord.startMs, durationMs: sttWord.durationMs) })
-    }
-    
-    static func convertToRenderInfo(info: TranscriptSubtitleMachine.Info) -> MessageView.RenderInfo {
-        let transcriptString = info.transcriptInfo.words.map({ $0.text }).joined()
-        var index = 0
-        var transcriptRanges = [SegmentRangeInfo]()
-        for w in info.transcriptInfo.words {
-            let range = NSRange(location: index, length: w.text.count)
-            let segment = SegmentRangeInfo(range: range, isFinal: w.isFinal)
-            transcriptRanges.append(segment)
-            index += w.text.count
+    func _handleMessage(message: ProtobufDeserializer.DataStreamMessage, uid: UInt) {
+        Log.debug(text: "_handleMessage", tag: logTag)
+        guard let type = MessageType(string: message.dataType!) else {
+            Log.errorText(text: "unknown message type: \(message.dataType!)", tag: logTag)
+            return
         }
         
-        let translateString = info.translateInfo.words.map({ $0.text }).joined()
-        index = 0
-        var translateRanges = [SegmentRangeInfo]()
-        for w in info.translateInfo.words {
-            let range = NSRange(location: index, length: w.text.count)
-            let segment = SegmentRangeInfo(range: range, isFinal: w.isFinal)
-            translateRanges.append(segment)
-            index += w.text.count
+        if type == .transcribe {
+            if debugParam.dump_deserialize {
+                Log.debug(text: "[transcriptBeautyString]:\(message.debug_transcriptBeautyString)", tag: logTag)
+            }
+            
+            _handleTranscriptPreProcess(message: message, uid: uid)
+            
+            if !debugParam.useFinalTagAsParagraphDistinction {
+                _handleTranscriptPostProcess(message: message, uid: uid)
+            }
+            return
         }
-        
-        return MessageView.RenderInfo(transcriptText: transcriptString,
-                                      translatetText: translateString,
-                                      transcriptRanges: transcriptRanges,
-                                      translateRanges: translateRanges,
-                                      identifier: info.transcriptInfo.startMs)
+        if type == .translate {
+            if !debugParam.showTranslateContent {
+                return
+            }
+            
+            _handleTranlatePreProcess(message: message, uid: uid)
+            
+            if !debugParam.useFinalTagAsParagraphDistinction {
+                _handleTranslatePostProcess(message: message, uid: uid)
+            }
+        }
     }
 }

@@ -8,7 +8,6 @@
 import UIKit
 
 class MessageView: UIView {
-    typealias RenderInfo = TranscriptSubtitleMachine.RenderInfo
     private let logTag = "MessageView"
     var finalTextColor: UIColor = .black
     var nonFinalTextColor: UIColor = .gray
@@ -50,25 +49,74 @@ class MessageView: UIView {
         tableView.dataSource = self
     }
     
-    func addItem(renderInfo: RenderInfo) {
+    func addOrUpdate(renderInfo: RenderInfo) {
+        if items.contains(where: { $0.identifier == renderInfo.identifier }) {
+            for index in 0..<items.count {
+                if items[index].identifier == renderInfo.identifier {
+                    items[index] = renderInfo
+                    let indexPath = IndexPath(row: index, section: 0)
+                    UIView.performWithoutAnimation {
+                        tableView.reloadRows(at: [indexPath], with: .fade)
+                    }
+                    if indexPath.row == items.count - 1 { /** only scroll to last **/
+                        tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+                    }
+                    return
+                }
+            }
+        }
+        
         items.append(renderInfo)
         let indexPath = IndexPath(row: items.count - 1, section: 0)
-        
-        
         UIView.performWithoutAnimation {
             tableView.insertRows(at: [indexPath], with: .fade)
         }
         tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
     }
     
-    func updateLast(renderInfo: RenderInfo) {
-        guard let (offset, _) = items.enumerated().map({ ($0.offset, $0.element) }).last(where: { $0.1.identifier == renderInfo.identifier }) else {
-            Log.debug(text: "can not find last: \(renderInfo.identifier)", tag: logTag)
-            return
+    func clear() {
+        items = []
+        tableView.reloadData()
+    }
+    
+    private func makeAttributedText(item: RenderInfo) -> NSAttributedString {
+        let transcriptText = NSMutableAttributedString(string: item.transcriptText)
+        for range in item.transcriptRanges {
+            let color: UIColor = range.isFinal ? finalTextColor : nonFinalTextColor
+            transcriptText.addAttribute(.foregroundColor, value: color, range: range.range)
         }
-        let indexPath = IndexPath(row: offset, section: 0)
-        items[offset] = renderInfo
-        tableView.reloadRows(at: [indexPath], with: .fade)
+        
+        let translateText = NSMutableAttributedString()
+        for (index, translateRenderInfo) in item.translateRenderInfos.enumerated() {
+            let attributedString = NSMutableAttributedString(string: translateRenderInfo.text)
+            for range in translateRenderInfo.ranges {
+                let color: UIColor = range.isFinal ? finalTextColor : nonFinalTextColor
+                attributedString.addAttribute(.foregroundColor, value: color, range: range.range)
+            }
+            if index != item.translateRenderInfos.count - 1 {
+                attributedString.append(NSAttributedString(string: "\n"))
+            }
+            translateText.append(attributedString)
+        }
+        
+        let allText = NSMutableAttributedString(string: "")
+        if !item.transcriptText.isEmpty {
+            allText.append(transcriptText)
+        }
+        
+        if !translateText.string.isEmpty, !item.transcriptText.isEmpty {
+            allText.append(NSAttributedString(string: "\n"))
+        }
+        
+        if !translateText.string.isEmpty {
+            allText.append(translateText)
+        }
+        
+        if allText.string.isEmpty { /** set a placeholder text if allText is empty **/
+            allText.append(NSAttributedString(string: "      "))
+        }
+        
+        return allText
     }
 }
 
@@ -80,22 +128,9 @@ extension MessageView: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MessageCell
         let item = items[indexPath.row]
-        
-        let transcriptText = NSMutableAttributedString(string: item.transcriptText)
-        for range in item.transcriptRanges {
-            let color: UIColor = range.isFinal ? finalTextColor : nonFinalTextColor
-            transcriptText.addAttribute(.foregroundColor, value: color, range: range.range)
-        }
-        
-        let translateText = NSMutableAttributedString(string: item.translateText)
-        for range in item.translateRanges {
-            let color: UIColor = range.isFinal ? finalTextColor : nonFinalTextColor
-            translateText.addAttribute(.foregroundColor, value: color, range: range.range)
-        }
-        cell.transcriptLabel.font = textFont
-        cell.translateLabel.font = textFont
-        cell.transcriptLabel.attributedText = transcriptText
-        cell.translateLabel.attributedText = translateText
+        let attributedText = makeAttributedText(item: item)
+        cell.label.font = textFont
+        cell.label.attributedText = attributedText
         cell.bgView.backgroundColor = textAreaBackgroundColor
         return cell
     }

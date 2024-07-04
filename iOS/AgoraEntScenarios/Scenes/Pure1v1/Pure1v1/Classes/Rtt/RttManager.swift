@@ -78,10 +78,10 @@ class RttManager {
         "id-ID": "印度尼西亚语",
         "ar-JO": "阿拉伯语（约旦）",
         "ar-EG": "阿拉伯语（埃及)",
-        "ar-SA": "阿拉伯语(沙特)",
-        "ar-AE": "阿拉伯语（阿联酋）",
-        "zh-TW": "中文(台湾)",
-        "en-US": "英语(美国)",
+        "ar-SA": "阿拉伯语（沙特)",
+        "ar-AE": "阿拉伯语（阿联酋)",
+        "zh-TW": "中文（台湾)",
+        "en-US": "英语（美国)",
         "hi-IN": "印地语",
         "ko-KR": "韩语",
         "ja-JP": "日语",
@@ -98,13 +98,20 @@ class RttManager {
     // 当前选中的条目索引
     var selectedSourceLanguageIndex: Int = 29
     
-    var selectedTargetLanguageIndex: Int = 24
+    var selectedTargetLanguageIndex: Int = 21
     
-    var subBotUid: String = "1000"
+    var subBotUid: String = "3000"
     
-    var pubBotUid: String = "2000"
+    var pubBotUid: String = "4000"
+    
+    var targetUid: String = ""
+    
+    var subBotToken: String = ""
+    
+    var pubBotToken: String = ""
 
-    func enableRtt(channelName: String, subBotToken: String, pubBotToken: String, completion: @escaping ((Bool)->Void)) {
+    func enableRtt(channelName: String, completion: @escaping ((Bool)->Void)) {
+        pure1v1Print("RttManager enableRtt[\(channelName)] subBotUid[\(subBotUid)] pubBotUid[\(pubBotUid)] targetUid[\(targetUid)] isRttEnabled[\(isRttEnabled)]")
         if (isRttEnabled) {
             completion(false)
             return
@@ -115,9 +122,9 @@ class RttManager {
             targetLanguages: [languages[selectedTargetLanguageIndex]],
             channelName: channelName,
             subBotUid: self.subBotUid,
-            subBotToken: subBotToken,
+            subBotToken: self.subBotToken,
             pubBotUid: self.pubBotUid,
-            pubBotToken: pubBotToken
+            pubBotToken: self.pubBotToken
         ) { success in
             if (success) {
                 self.isRttEnabled = true
@@ -130,6 +137,7 @@ class RttManager {
     }
 
     func disableRtt(force: Bool, completion: @escaping ((Bool)->Void)) {
+        pure1v1Print("RttManager disableRtt force[\(force)] isRttEnabled[\(isRttEnabled)]")
         if (!isRttEnabled) {
             completion(false)
             return

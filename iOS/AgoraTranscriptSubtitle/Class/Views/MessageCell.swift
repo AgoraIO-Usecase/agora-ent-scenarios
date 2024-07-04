@@ -9,8 +9,7 @@ import UIKit
 
 class MessageCell: UITableViewCell {
     private let logTag = "MessageCell"
-    let transcriptLabel = UILabel()
-    let translateLabel = UILabel()
+    let label = UILabel()
     let bgView = UIView()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -24,34 +23,25 @@ class MessageCell: UITableViewCell {
     
     private func setupUI() {
         backgroundColor = .clear
-        contentView.layer.cornerRadius = 5
-        contentView.layer.masksToBounds = true
         
-        transcriptLabel.numberOfLines = 0
-        translateLabel.numberOfLines = 0
-        bgView.layer.cornerRadius = 5
+        label.numberOfLines = 0
+        bgView.layer.cornerRadius = 10
         bgView.layer.masksToBounds = true
         
         contentView.addSubview(bgView)
-        bgView.addSubview(transcriptLabel)
-        bgView.addSubview(translateLabel)
+        contentView.addSubview(label)
         
         bgView.translatesAutoresizingMaskIntoConstraints = false
-        transcriptLabel.translatesAutoresizingMaskIntoConstraints = false
-        translateLabel.translatesAutoresizingMaskIntoConstraints = false
+        label.translatesAutoresizingMaskIntoConstraints = false
         
-        bgView.leftAnchor.constraint(equalTo: contentView.leftAnchor).isActive = true
-        bgView.rightAnchor.constraint(equalTo: contentView.rightAnchor).isActive = true
-        bgView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        bgView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
+        label.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10).isActive = true
+        label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
+        label.rightAnchor.constraint(lessThanOrEqualTo: contentView.rightAnchor, constant: -10).isActive = true
+        label.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
         
-        transcriptLabel.leftAnchor.constraint(equalTo: bgView.leftAnchor, constant: 5).isActive = true
-        transcriptLabel.rightAnchor.constraint(equalTo: bgView.rightAnchor, constant: -5).isActive = true
-        transcriptLabel.topAnchor.constraint(equalTo: bgView.topAnchor, constant: 5).isActive = true
-        
-        translateLabel.leftAnchor.constraint(equalTo: bgView.leftAnchor, constant: 5).isActive = true
-        translateLabel.rightAnchor.constraint(equalTo: bgView.rightAnchor, constant: -5).isActive = true
-        translateLabel.topAnchor.constraint(equalTo: transcriptLabel.bottomAnchor, constant: 5).isActive = true
-        translateLabel.bottomAnchor.constraint(equalTo: bgView.bottomAnchor, constant: -5).isActive = true
+        bgView.leftAnchor.constraint(equalTo: label.leftAnchor, constant: -5).isActive = true
+        bgView.rightAnchor.constraint(equalTo: label.rightAnchor, constant: 5).isActive = true
+        bgView.topAnchor.constraint(equalTo: label.topAnchor, constant: -5).isActive = true
+        bgView.bottomAnchor.constraint(equalTo: label.bottomAnchor, constant: 5).isActive = true
     }
 }

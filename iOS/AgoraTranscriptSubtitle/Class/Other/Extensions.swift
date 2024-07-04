@@ -41,9 +41,16 @@ extension ProtobufDeserializer.DataStreamMessage {
                 "transArray_Count" : transArray_Count,
                 "culture" : culture ?? "nil",
                 "textTs" : textTs,
+                "sentenceEndIndex" : sentenceEndIndex,
                 "wordsArray" : words.map({ $0.dict }),
                 "transArray" : trans.map({ $0.dict })
         ]
+    }
+    
+    var debug_transcriptBeautyString: String {
+        return """
+        {"text" : \(words.first?.text ?? "nil"), "startMs" : \(words.first?.startMs ?? 0), "durationMs" : \(words.first?.durationMs ?? 0), "isFinal" : \(words.first?.isFinal ?? false), "sentenceEndIndex" : \(sentenceEndIndex)} wordsArray_Count:\(wordsArray_Count) textTs:\(textTs)
+"""
     }
     
     var words: [SttWord] {
@@ -73,6 +80,10 @@ extension SttWord {
         let data = try! JSONSerialization.data(withJSONObject: dict, options: .init(rawValue: 0))
         return String(data: data, encoding: .utf8) ?? "nil"
     }
+    
+    var splitToTranscriptWords: [TranscriptWord] {
+        return text!.map({ String($0) }).map({ TranscriptWord.init(text: $0, isFinal: isFinal, confidence: confidence, startMs: startMs, durationMs: durationMs) })
+    }
 }
 
 extension SttTranslation {
@@ -85,5 +96,25 @@ extension SttTranslation {
     var jsonString: String {
         let data = try! JSONSerialization.data(withJSONObject: dict, options: .init(rawValue: 0))
         return String(data: data, encoding: .utf8) ?? "nil"
+    }
+}
+
+extension Array where Element == SttWord {
+    var isFinal: Bool {
+        return last?.isFinal ?? false
+    }
+    
+    var splitToTranscriptWords: [TranscriptWord] {
+        map({ $0.splitToTranscriptWords }).flatMap({ $0 })
+    }
+}
+
+extension SttText {
+    var translateWords: [TranslateWord] {
+        (transArray as! [SttTranslation]).map({ TranslateWord(sttTranslation: $0) })
+    }
+    
+    var splitToTranscriptWords: [TranscriptWord] {
+        words.splitToTranscriptWords
     }
 }

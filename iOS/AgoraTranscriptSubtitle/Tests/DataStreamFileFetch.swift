@@ -16,10 +16,19 @@ class DataStreamFileFetch {
         let string = String(data: data, encoding: .utf8)!
         
         let datas = string.split(separator: "\n")
-            .map({ String($0) })
-            .filter({ !$0.isEmpty })
-            .map({ Data(base64Encoded: $0)! })
-        return datas
+        
+        if datas.count > 2 {
+            return datas
+                .map({ String($0) })
+                .filter({ !$0.isEmpty })
+                .map({ Data(base64Encoded: $0)! })
+        }
+        else {
+            return string.split(separator: "\r\n")
+                .map({ String($0) })
+                .filter({ !$0.isEmpty })
+                .map({ Data(base64Encoded: $0)! })
+        }
     }
     
     static func printJsonString(fileName: String) {

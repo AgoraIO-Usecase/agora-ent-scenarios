@@ -125,7 +125,6 @@ extension RttLanguageSheetViewController: UITableViewDelegate, UITableViewDataSo
         let cell = tableView.dequeueReusableCell(withIdentifier: RttSheetCellID, for: indexPath) as! RttLanguageCell
         cell.selectionStyle = .none
         cell.text = RttManager.shared.displayName(for: key)
-        print("xiru\(cell.text)")
         return cell
     }
     

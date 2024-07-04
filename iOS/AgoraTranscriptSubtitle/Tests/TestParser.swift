@@ -68,11 +68,13 @@ final class TestParser: XCTestCase {
 
             ]
         }*/
+        
         XCTAssertNotNil(info)
         XCTAssertEqual(info.textTs, 1718764743753)
         XCTAssertEqual(info.dataType, "transcribe")
         XCTAssertEqual(info.wordsArray_Count, 1)
         XCTAssertEqual(info.words.first!.text, "再找一下")
+        XCTAssertEqual(info.splitToTranscriptWords.count, 4)
         XCTAssertEqual(info.words.first!.isFinal, false)
         XCTAssertEqual(info.words.first!.startMs, 777823957)
         XCTAssertEqual(info.words.first!.durationMs, 680)

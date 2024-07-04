@@ -71,6 +71,7 @@ static GPBFileDescriptor *SttMessageRoot_FileDescriptor(void) {
 @dynamic transArray, transArray_Count;
 @dynamic culture;
 @dynamic textTs;
+@dynamic sentenceEndIndex;
 
 typedef struct SttText__storage_ {
   uint32_t _has_storage_[1];
@@ -82,6 +83,7 @@ typedef struct SttText__storage_ {
   int32_t starttime;
   int32_t offtime;
   int32_t durationMs;
+  int32_t sentenceEndIndex;
   NSMutableArray *wordsArray;
   NSString *dataType;
   NSMutableArray *transArray;
@@ -240,6 +242,15 @@ typedef struct SttText__storage_ {
         .offset = (uint32_t)offsetof(SttText__storage_, textTs),
         .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldClearHasIvarOnZero),
         .dataType = GPBDataTypeInt64,
+      },
+      {
+        .name = "sentenceEndIndex",
+        .dataTypeSpecific.clazz = Nil,
+        .number = SttText_FieldNumber_SentenceEndIndex,
+        .hasIndex = 15,
+        .offset = (uint32_t)offsetof(SttText__storage_, sentenceEndIndex),
+        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldClearHasIvarOnZero),
+        .dataType = GPBDataTypeInt32,
       },
     };
     GPBDescriptor *localDescriptor =

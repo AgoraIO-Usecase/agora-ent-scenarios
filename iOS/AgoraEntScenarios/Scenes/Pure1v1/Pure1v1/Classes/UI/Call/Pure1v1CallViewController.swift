@@ -137,7 +137,7 @@ class Pure1v1CallViewController: UIViewController {
         
         subtitleView.snp.makeConstraints { make in
             make.width.equalToSuperview()
-            make.bottom.equalTo(bottomBar.snp.top)
+            make.bottom.equalTo(hangupButton.snp.top)
             make.height.equalTo(235)
         }
         
@@ -225,7 +225,7 @@ extension Pure1v1CallViewController: Pure1v1RoomBottomBarDelegate {
     func onClickRttButton() {
         guard let channelName = self.rtcChannelName else {return}
         rttVC.channelName = channelName
-        
+        rttVC.resetRttStatus()
         rttVC.clickDetailButonAction = { vc in
             self.present(vc, animated: true)
         }
@@ -317,14 +317,16 @@ extension Pure1v1CallViewController: AgoraRtcEngineDelegate {
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didVideoMuted muted: Bool, byUid uid: UInt) {
         pure1v1Print("didVideoMuted[\(uid)] \(muted)")
-        if (uid != 2000) {
+        if (uid != 20000 && uid != 40000) {
             self.remoteCanvasView.canvasView.isHidden = muted
         }
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, receiveStreamMessageFromUid uid: UInt, streamId: Int, data: Data) {
-        pure1v1Print("RttApiManager receiveStreamMessageFromUid[\(uid)] \(data)")
-        subtitleView.rttView.pushMessageData(data: data, uid: uid)
+        if (String(uid) == RttManager.shared.pubBotUid) {
+            subtitleView.rttView.pushMessageData(data: data, uid: uid)
+        }
+        
 //        guard let text: Agora_SpeechToText_Text = try? Agora_SpeechToText_Text(serializedData: data) else {return}
 //        
 //        var translate: String = ""
