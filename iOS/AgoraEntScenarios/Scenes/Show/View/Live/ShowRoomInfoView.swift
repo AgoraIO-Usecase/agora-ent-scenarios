@@ -131,8 +131,8 @@ class ShowRoomInfoView: UIView {
     
     func setRoomInfo(avatar: String?, name: String?, id: String?, time: Int64?) {
         headImgView.sd_setImage(with: URL(string: avatar ?? ""))
-        nameLabel.text = "ID: \(name ?? "")"
-        idLabel.text = id
+        nameLabel.text = name ?? ""
+        idLabel.text = "ID: \(id ?? "")"
         if let startTime = time {
             self.startTime = startTime
             updateTime()
