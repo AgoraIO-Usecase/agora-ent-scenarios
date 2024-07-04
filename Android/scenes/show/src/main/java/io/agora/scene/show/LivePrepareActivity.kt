@@ -169,7 +169,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         // reset virtual background config
         RtcEngineInstance.virtualBackgroundSource.backgroundSourceType = 0
         RtcEngineInstance.rtcEngine.enableVirtualBackground(false, VirtualBackgroundSource(), SegmentationProperty())
-        mRtcEngine.startPreview()
+//        mRtcEngine.startPreview()
 //        RtcEngineInstance.mMetaEngineHandler.enableSegmentation()
     }
 

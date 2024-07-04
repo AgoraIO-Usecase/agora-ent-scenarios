@@ -134,19 +134,7 @@ class AGResourceManager(private val context: Context) {
             if (!checkUnzipFolderExists(inputFile.path) /*&& inputFile.length() == resource.size*/) {
                 DownloadManager.instance.unzipFile(inputFile.path, destinationPath)
             }
-            val imageExtensions = arrayOf(".jpg", ".jpeg", ".png", ".gif", ".bmp")
-            var isImage = false
-            imageExtensions.forEach {
-                if (inputFileName.contains(it)) {
-                    isImage = true
-                }
-            }
-            if (isImage) { // 图片解压后没有文件夹，直接返回
-                unzipHandler.invoke(destinationPath)
-            } else {
-                // 文件解压后，返回解压后的文件夹路径
-                unzipHandler.invoke(destinationPath + File.separator + inputFileName.substringBeforeLast("."))
-            }
+            unzipHandler.invoke(destinationPath)
         } catch (e: Exception) {
             // 处理异常
             Log.e(tag, "Error processing file: $e")
