@@ -115,20 +115,21 @@ struct HomeContentSesionModel {
         model = HomeContentSesionModel()
         model.title = NSLocalizedString("home_category_title_live", comment: "")
         model.type = .live
-        contentArray = [createContentModel(title: NSLocalizedString("home_content_item_live_title_show", comment: ""),
-                                           desc: NSLocalizedString("home_content_item_live_desc_show", comment: ""),
-                                           imageName: "home_live_show", type: .show),
+        contentArray = [
+//            createContentModel(title: NSLocalizedString("home_content_item_live_title_show", comment: ""),
+//                                           desc: NSLocalizedString("home_content_item_live_desc_show", comment: ""),
+//                                           imageName: "home_live_show", type: .show),
                         createContentModel(title: NSLocalizedString("home_content_item_live_title_1v1_private", comment: ""),
                                            desc: NSLocalizedString("home_content_item_live_desc_1v1_private", comment: ""),
                                            imageName: "home_live_1v1", type: .one_v_one),
-                        createContentModel(title: NSLocalizedString("home_content_item_live_title_show_1v1_private", comment: ""),
-                                           desc: NSLocalizedString("home_content_item_live_desc_show_1v1_private", comment: ""),
-                                           imageName: "home_live_show_private_one_v_one",
-                                           type: .show_private_one_v_one),
-                        createContentModel(title: NSLocalizedString("home_content_item_live_title_multiple", comment: ""),
-                                           desc: NSLocalizedString("home_content_item_live_desc_multiple", comment: ""),
-                                           imageName: "home_live_multiple",
-                                           type: .multiple)
+//                        createContentModel(title: NSLocalizedString("home_content_item_live_title_show_1v1_private", comment: ""),
+//                                           desc: NSLocalizedString("home_content_item_live_desc_show_1v1_private", comment: ""),
+//                                           imageName: "home_live_show_private_one_v_one",
+//                                           type: .show_private_one_v_one),
+//                        createContentModel(title: NSLocalizedString("home_content_item_live_title_multiple", comment: ""),
+//                                           desc: NSLocalizedString("home_content_item_live_desc_multiple", comment: ""),
+//                                           imageName: "home_live_multiple",
+//                                           type: .multiple)
         ]
         model.contentModels = contentArray
         dataArray.append(model)

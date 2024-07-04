@@ -8,21 +8,23 @@
 import UIKit
 
 @objc public class TranscriptSubtitleView: UIView {
-    /**
-     决定分割句子的时间间隔 单位：ms，
-     如果在两句之间，相差大于该值，则认为需要分割
-     **/
     private let messageView = MessageView()
-    @objc public var spiltSentenceTimeInterval: UInt = 150
-    @objc public var finalTextColor: UIColor = .white { didSet{ messageView.finalTextColor = finalTextColor } }
-    @objc public var nonFinalTextColor: UIColor = .gray { didSet{ messageView.nonFinalTextColor = nonFinalTextColor } }
-    @objc public var textFont: UIFont = .systemFont(ofSize: 16) { didSet{ messageView.textFont = textFont } }
-    @objc public var textAreaBackgroundColor: UIColor = UIColor.black.withAlphaComponent(0.25) { didSet{ messageView.textAreaBackgroundColor = textAreaBackgroundColor } }
-    @objc public var debug_dump_input = false { didSet { transcriptSubtitleMachine.debug_dump_input = debug_dump_input } }
-    @objc public var debug_dump_deserialize = false { didSet { transcriptSubtitleMachine.debug_dump_deserialize = debug_dump_deserialize } }
     private let transcriptSubtitleMachine = TranscriptSubtitleMachine()
     private let logTag = "TranscriptSubtitleView"
     
+    /// the color of text, when the recognized state is final.
+    @objc public var finalTextColor: UIColor = .white { didSet{ updateParam(varName:"finalTextColor") }}
+    /// the color of text, when the recognized state is nonfinal.
+    @objc public var nonFinalTextColor: UIColor = .gray { didSet{ updateParam(varName:"nonFinalTextColor") }}
+    /// the font of text. include TranscriptContent and TranslateContent.
+    @objc public var textFont: UIFont = .systemFont(ofSize: 16) { didSet{ updateParam(varName:"textFont") }}
+    /// the background color of text area.
+    @objc public var textAreaBackgroundColor: UIColor = UIColor.black.withAlphaComponent(0.25) { didSet{ updateParam(varName:"textAreaBackgroundColor") }}
+    /// show or hide the transcript content.
+    @objc public var showTranscriptContent = true { didSet{ updateParam(varName:"showTranscriptContent") }}
+    
+    @objc public var debugParam = DebugParam() { didSet { updateDebugParam() } }
+     
     // MARK: - Public Method
     
     @objc public convenience init(frame: CGRect, loggers: [ILogger] = [AGFileLogger(), ConsoleLogger()]) {
@@ -56,7 +58,8 @@ import UIKit
     
     /// clear all data, and the view will be empty.
     @objc public func clear() {
-        
+        transcriptSubtitleMachine.clear()
+        messageView.clear()
     }
     
     // MARK: - Private Method
@@ -73,15 +76,48 @@ import UIKit
     private func commonInit() {
         transcriptSubtitleMachine.delegate = self
     }
+    
+    private func updateDebugParam() {
+        Log.info(text: "debug param was updated: \(debugParam)", tag: logTag)
+        transcriptSubtitleMachine.debugParam = debugParam
+    }
+    
+    private func updateParam(varName: String) {
+        switch varName {
+        case "finalTextColor":
+            messageView.finalTextColor = finalTextColor
+            Log.info(text: "param was updated, \(varName) = \(finalTextColor)", tag: logTag)
+            break
+        case "nonFinalTextColor":
+            messageView.nonFinalTextColor = nonFinalTextColor
+            Log.info(text: "param was updated, \(varName) = \(nonFinalTextColor)", tag: logTag)
+            break
+        case "textFont":
+            messageView.textFont = textFont
+            Log.info(text: "param was updated, \(varName) = \(textFont)", tag: logTag)
+            break
+        case "textAreaBackgroundColor":
+            messageView.textAreaBackgroundColor = textAreaBackgroundColor
+            Log.info(text: "param was updated, \(varName) = \(textAreaBackgroundColor)", tag: logTag)
+            break
+        case "showTranscriptContent":
+            transcriptSubtitleMachine.showTranscriptContent = showTranscriptContent
+            Log.info(text: "param was updated, \(varName) = \(showTranscriptContent)", tag: logTag)
+            break
+        default:
+            Log.errorText(text: "unknow var update \(varName)", tag: logTag)
+            fatalError("unknow var update \(varName)")
+        }
+    }
 }
 
 // MARK: - TranscriptSubtitleMachineDelegate
 extension TranscriptSubtitleView: TranscriptSubtitleMachineDelegate {
-    func transcriptSubtitleMachine(_ machine: TranscriptSubtitleMachine, didAddRenderInfo renderInfo: TranscriptSubtitleMachine.RenderInfo) {
-        messageView.addItem(renderInfo: renderInfo)
+    func transcriptSubtitleMachine(_ machine: TranscriptSubtitleMachine, didAddRenderInfo renderInfo: RenderInfo) {
+        messageView.addOrUpdate(renderInfo: renderInfo)
     }
     
-    func transcriptSubtitleMachine(_ machine: TranscriptSubtitleMachine, didUpadteRenderInfo renderInfo: TranscriptSubtitleMachine.RenderInfo) {
-        messageView.updateLast(renderInfo: renderInfo)
+    func transcriptSubtitleMachine(_ machine: TranscriptSubtitleMachine, didUpadteRenderInfo renderInfo: RenderInfo) {
+        messageView.addOrUpdate(renderInfo: renderInfo)
     }
 }

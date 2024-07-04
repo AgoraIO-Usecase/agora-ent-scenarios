@@ -68,3 +68,18 @@
 "audio_dump" = "音频Dump";
 "audio_dump_open" = "开启";
 "audio_dump_close" = "关闭";
+
+
+// ---------- RTT ------------
+"rtt_cancel" = "取消";
+"rtt_title" = "RTT实时语音翻译";
+"rtt_note" = "开启后，将自动为您实时翻译，将对方口语语言实时翻译为你所需语言的相应字幕";
+"rtt_enable" = "开启该功能";
+"rtt_disable" = "关闭该功能";
+"rtt_source_language" = "对方语言";
+"rtt_target_language" = "翻译字幕";
+"rtt_enable_success" = "RTT实时语音功能已开启";
+"rtt_enable_failed" = "RTT实时语音功能开启失败";
+"rtt_disable_success" = "RTT实时语音功能已关闭";
+"rtt_disable_failed" = "RTT实时语音功能关闭失败";
+"rtt_switch_note" = "如需切换语言，请先关闭该功能后重新设置";

@@ -17,7 +17,7 @@ class RttSettingActionSheetFooterView: UIView {
     
     lazy var button: UIButton = {
         let button = UIButton(type: .custom)
-        button.setTitle("取消", for: .normal)
+        button.setTitle("rtt_cancel".pure1v1Localization(), for: .normal)
         button.setTitleColor(.show_Ellipse6, for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
         return button
