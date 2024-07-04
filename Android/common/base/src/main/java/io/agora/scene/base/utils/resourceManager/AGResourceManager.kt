@@ -1,7 +1,8 @@
+package io.agora.scene.base.utils.resourceManager
+
 import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
-import io.agora.scene.base.utils.resourceManager.DownloadManager
 import kotlinx.coroutines.*
 import java.io.File
 
@@ -47,7 +48,7 @@ class AGResourceManager(private val context: Context) {
         DownloadManager.instance.download(
             url = url,
             destinationPath = destinationPath,
-            callback = object: DownloadManager.FileDownloadCallback {
+            callback = object : DownloadManager.FileDownloadCallback {
                 override fun onProgress(file: File, progress: Int) {
                     Log.d(tag, "downloading... $url progress:$progress")
                     progressHandler.invoke(progress)
@@ -75,7 +76,7 @@ class AGResourceManager(private val context: Context) {
         DownloadManager.instance.download(
             url = url,
             destinationPath = destinationPath,
-            callback = object: DownloadManager.FileDownloadCallback {
+            callback = object : DownloadManager.FileDownloadCallback {
                 override fun onProgress(file: File, progress: Int) {
                     Log.d(tag, "downloading... $url progress:$progress")
                     progressHandler.invoke(progress)
@@ -98,29 +99,32 @@ class AGResourceManager(private val context: Context) {
     suspend fun downloadAndUnZipResource(
         resource: AGResource,
         progressHandler: (Int) -> Unit,
-        completionHandler: (File?, Exception?) -> Unit
+        downloadedHandler: (File) -> Unit,
+        unzipHandler: (String) -> Unit,
+        errorHandler: (Exception?) -> Unit
     ) {
         val destinationPath = getCachePath(context, "assets") ?: return
         try {
-            val inputFile = File(destinationPath, resource.url.substringAfterLast("/"))
-            Log.d(tag, "downloadAndUnZipResource resource:$resource, inputFile:${inputFile.length()} ${inputFile.path}")
+            val inputFileName = resource.url.substringAfterLast("/")
+            val inputFile = File(destinationPath, inputFileName)
+            Log.d(tag, "downloadAndUnZipResource resource:$resource, inputFileName:${inputFileName} ${inputFile.path}")
             // 下载文件
             if (!inputFile.exists()) {
                 DownloadManager.instance.download(
                     url = resource.url,
                     destinationPath = destinationPath,
-                    callback = object: DownloadManager.FileDownloadCallback {
+                    callback = object : DownloadManager.FileDownloadCallback {
                         override fun onProgress(file: File, progress: Int) {
                             // Log.d(tag, "downloading... $resource progress:$progress")
                             progressHandler.invoke(progress)
                         }
 
                         override fun onSuccess(file: File) {
-                            completionHandler(file, null)
+                            downloadedHandler(file)
                         }
 
                         override fun onFailed(exception: Exception) {
-                            completionHandler.invoke(null, exception)
+                            errorHandler.invoke(exception)
                         }
                     }
                 )
@@ -130,11 +134,12 @@ class AGResourceManager(private val context: Context) {
             if (!checkUnzipFolderExists(inputFile.path) /*&& inputFile.length() == resource.size*/) {
                 DownloadManager.instance.unzipFile(inputFile.path, destinationPath)
             }
+            unzipHandler.invoke(destinationPath)
         } catch (e: Exception) {
             // 处理异常
             Log.e(tag, "Error processing file: $e")
             withContext(Dispatchers.Main) {
-                completionHandler.invoke(null, e)
+                errorHandler.invoke(e)
             }
         }
     }

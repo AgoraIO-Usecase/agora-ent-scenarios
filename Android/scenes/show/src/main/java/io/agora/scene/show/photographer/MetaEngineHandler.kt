@@ -10,10 +10,12 @@ import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.video.SegmentationProperty
 import io.agora.rtc2.video.VirtualBackgroundSource
+import io.agora.scene.base.Constant
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
+import io.agora.scene.show.ShowLogger
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -97,12 +99,18 @@ class MetaEngineHandler : AGExtensionHandler {
         Handler(Looper.getMainLooper())
     }
 
-    private val mCurrentAssetPath by lazy {
-        AgoraApplication.the().getExternalFilesDir("assets").toString()
-    }
-    private val mCurrentMetaFilesPath by lazy {
-        AgoraApplication.the().getExternalFilesDir("assets").toString()
-    }
+    // meta 资源路径
+    var metaResourcesPath: String = SPUtil.getString(Constant.SHOW_META_RESOURCES_PATH,"")
+        set(value) {
+            field =value
+           ShowLogger.d(TAG, "metaResourcesPath: $value")
+        }
+    // meta 图片路径
+    var metaImagePath: String = SPUtil.getString(Constant.SHOW_META_IMAGE_PATH,"")
+        set(value) {
+            field =value
+            ShowLogger.d(TAG, "metaImagePath: $value")
+        }
 
     var mRunningState: Int = IMetaRunningState.idle
 
@@ -246,7 +254,7 @@ class MetaEngineHandler : AGExtensionHandler {
         val valueObj = JSONObject()
         try {
             val sceneObj = JSONObject()
-            sceneObj.put("scenePath", mCurrentAssetPath)
+            sceneObj.put("scenePath", metaResourcesPath)
             val customObj = JSONObject()
             customObj.put("sceneIndex", 0)
             valueObj.put("sceneInfo", sceneObj)
@@ -319,11 +327,33 @@ class MetaEngineHandler : AGExtensionHandler {
         }
     }
 
+    private fun triggerSegmentLowcostMode(enable: Boolean) {
+        Log.d(TAG, "metakitx trigger Lowcost Mode, enable: $enable")
+        val rtcEngine = mRtcEngine ?: return
+        val valueObj = JSONObject()
+        try {
+            valueObj.put("fill_alpha_data", true)
+            if (enable) {
+                val configObj = JSONObject()
+                configObj.put("optical_flow", 0)
+                configObj.put("low_cost_mode", true)
+                valueObj.put("seg_params", configObj)
+            }
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+        rtcEngine.setExtensionProperty(
+            "agora_video_filters_segmentation",
+            "portrait_segmentation", "configs", valueObj.toString()
+        )
+    }
+
     // 灯光特效
     fun configEffect3D(
         enable: Boolean,
         aiPhotographerType: Int = AiPhotographerType.ITEM_ID_AI_PHOTOGRAPHER_NONE
     ) {
+//        triggerSegmentLowcostMode(enable)
         if (enable) {
             enableSegmentation()
             val effect3DId: Int = when (aiPhotographerType) {
@@ -370,6 +400,12 @@ class MetaEngineHandler : AGExtensionHandler {
         try {
             configObj.put("id", id)
             configObj.put("enable", enable)
+//            if (id == SpecialEffectType.SETypeAdvLight) {
+//                val paramObj = JSONObject()
+//                paramObj.put("text", "Agora") // text 表示广告文字文本，支持中英
+//                paramObj.put("animation", 1) // animation 表示文字动画，可选择 1,2,3
+//                configObj.put("param", paramObj)
+//            }
         } catch (e: JSONException) {
             e.printStackTrace()
         }
@@ -419,14 +455,16 @@ class MetaEngineHandler : AGExtensionHandler {
         when (bgMode) {
             BackgroundType.BGTypePano -> {
                 mode = "tex360"
-                filePath = "$mCurrentMetaFilesPath/pano.jpg"
+                filePath = metaImagePath
                 gyroState = "on"
             }
+
             BackgroundType.BGTypeNull -> {
                 mode = "off"
                 filePath = ""
                 gyroState = "off"
             }
+
             else -> {}
         }
         val picObj = JSONObject()
