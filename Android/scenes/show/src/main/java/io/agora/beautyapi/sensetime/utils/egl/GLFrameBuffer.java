@@ -50,15 +50,15 @@ public class GLFrameBuffer {
         }
     }
 
-    public void setTextureId(int textureId){
-        if(mTextureId != textureId){
+    public void setTextureId(int textureId) {
+        if (mTextureId != textureId) {
             deleteTexture();
             mTextureId = textureId;
             isTextureChanged = true;
         }
     }
 
-    public int getTextureId(){
+    public int getTextureId() {
         return mTextureId;
     }
 
@@ -70,7 +70,7 @@ public class GLFrameBuffer {
         }
     }
 
-    public void resetTransform(){
+    public void resetTransform() {
         mTexMatrix = GlUtil.IDENTITY_MATRIX;
         isFlipH = isFlipV = false;
         mRotation = 0;
@@ -81,21 +81,21 @@ public class GLFrameBuffer {
             throw new RuntimeException("setSize firstly!");
         }
 
-        if(mTextureId == -1){
+        if (mTextureId == -1) {
             mTextureId = createTexture(mWidth, mHeight);
             bindFramebuffer(mTextureId);
             isTextureInner = true;
-        }else if(isTextureInner && isSizeChanged){
+        } else if (isTextureInner && isSizeChanged) {
             GLES20.glDeleteTextures(1, new int[]{mTextureId}, 0);
             mTextureId = createTexture(mWidth, mHeight);
             bindFramebuffer(mTextureId);
-        }else if(isTextureChanged){
+        } else if (isTextureChanged) {
             bindFramebuffer(mTextureId);
         }
         isTextureChanged = false;
         isSizeChanged = false;
 
-        if(drawer == null){
+        if (drawer == null) {
             drawer = new GlRectDrawer();
         }
 
@@ -106,16 +106,16 @@ public class GLFrameBuffer {
         transform.preTranslate(0.5f, 0.5f);
         transform.preRotate(mRotation, 0.f, 0.f);
         transform.preScale(
-                isFlipH ? -1.f: 1.f,
-                isFlipV ? -1.f: 1.f
+                isFlipH ? -1.f : 1.f,
+                isFlipV ? -1.f : 1.f
         );
         transform.preTranslate(-0.5f, -0.5f);
         float[] matrix = RendererCommon.convertMatrixFromAndroidGraphicsMatrix(transform);
 
-        if(textureType == GLES11Ext.GL_TEXTURE_EXTERNAL_OES){
-            drawer.drawOes(textureId, matrix, mWidth, mHeight, 0, 0, mWidth, mHeight);
-        }else{
-            drawer.drawRgb(textureId,  matrix, mWidth, mHeight, 0, 0, mWidth, mHeight);
+        if (textureType == GLES11Ext.GL_TEXTURE_EXTERNAL_OES) {
+            drawer.drawOes(textureId, 0, matrix, mWidth, mHeight, 0, 0, mWidth, mHeight);
+        } else {
+            drawer.drawRgb(textureId, 0, matrix, mWidth, mHeight, 0, 0, mWidth, mHeight);
         }
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
         GLES20.glFinish();
@@ -123,11 +123,11 @@ public class GLFrameBuffer {
         return mTextureId;
     }
 
-    public void release(){
+    public void release() {
         deleteTexture();
         deleteFramebuffer();
 
-        if(drawer != null){
+        if (drawer != null) {
             drawer.release();
             drawer = null;
         }
@@ -141,7 +141,7 @@ public class GLFrameBuffer {
         }
     }
 
-    public int createTexture(int width, int height){
+    public int createTexture(int width, int height) {
         int[] textures = new int[1];
         GLES20.glGenTextures(1, textures, 0);
         GlUtil.checkGlError("glGenTextures");
@@ -181,7 +181,7 @@ public class GLFrameBuffer {
     }
 
     private void bindFramebuffer(int textureId) {
-        if(mFramebufferId == -1){
+        if (mFramebufferId == -1) {
             int[] framebuffers = new int[1];
             GLES20.glGenFramebuffers(1, framebuffers, 0);
             GlUtil.checkGlError("glGenFramebuffers");
