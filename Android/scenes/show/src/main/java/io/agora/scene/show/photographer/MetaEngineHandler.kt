@@ -400,7 +400,7 @@ class MetaEngineHandler : AGExtensionHandler {
         try {
             configObj.put("id", id)
             configObj.put("enable", enable)
-            if (id == AiPhotographerType.ITEM_ID_AI_LIGHTING_AD) {
+            if (id == SpecialEffectType.SETypeAdvLight) {
                 val paramObj = JSONObject()
                 paramObj.put("text", "Agora") // text 表示广告文字文本，支持中英
                 paramObj.put("animation", 1) // animation 表示文字动画，可选择 1,2,3
