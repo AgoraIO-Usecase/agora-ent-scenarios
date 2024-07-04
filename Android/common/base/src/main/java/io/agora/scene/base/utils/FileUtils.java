@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.agora.scene.base.CommonBaseLogger;
 import io.agora.scene.base.component.AgoraApplication;
@@ -87,6 +89,68 @@ public class FileUtils {
         File file = new File(filePath);
         if (file.exists()) {
             return file.delete();
+        }
+        return false;
+    }
+
+    /**
+     * 获取指定目录下的所有文件
+     * @param directory
+     * @return
+     */
+    public static List<File> findInnermostFiles(File directory) {
+        List<File> innermostFiles = new ArrayList<>();
+        findInnermostFilesRecursively(directory, innermostFiles);
+        return innermostFiles;
+    }
+
+    private static void findInnermostFilesRecursively(File directory, List<File> innermostFiles) {
+        File[] files = directory.listFiles();
+        if (files != null) {
+            boolean hasSubdirectory = false;
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    hasSubdirectory = true;
+                    findInnermostFilesRecursively(file, innermostFiles);
+                }
+            }
+            if (!hasSubdirectory) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        innermostFiles.add(file);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 获取指定目录下的所有图片文件
+     * @param directoryPath
+     * @return
+     */
+    public static List<String> loadImages(String directoryPath) {
+        List<String > imagePaths = new ArrayList<>();
+        File directory = new File(directoryPath);
+        if (directory.exists() && directory.isDirectory()) {
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile() && isImageFile(file)) {
+                        imagePaths.add(file.getAbsolutePath());
+                    }
+                }
+            }
+        }
+        return imagePaths;
+    }
+
+    private static boolean isImageFile(File file) {
+        String[] imageExtensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp"};
+        for (String extension : imageExtensions) {
+            if (file.getName().toLowerCase().endsWith(extension)) {
+                return true;
+            }
         }
         return false;
     }

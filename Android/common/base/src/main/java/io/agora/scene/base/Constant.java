@@ -53,4 +53,9 @@ public class Constant {
 
     // xxx
     public static final String CURR_AUDIENCE_SETTING = "currAudienceSetting";
+
+    // meta 资源
+    public static final String SHOW_META_RESOURCES_PATH = "showMetaResources";
+    // meta 图片
+    public static final String SHOW_META_IMAGE_PATH = "showMetaImage";
 }
