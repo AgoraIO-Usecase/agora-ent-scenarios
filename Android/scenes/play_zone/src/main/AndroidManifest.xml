@@ -23,5 +23,8 @@
             android:name="io.agora.scene.playzone.hall.PlayRoomListActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
+        <activity android:name="io.agora.scene.playzone.live.PlayWebViewActivity"
+            android:exported="false"/>
     </application>
 </manifest>
