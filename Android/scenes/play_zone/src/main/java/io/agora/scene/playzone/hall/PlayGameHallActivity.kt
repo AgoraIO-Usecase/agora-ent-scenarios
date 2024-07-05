@@ -17,14 +17,13 @@ import androidx.viewbinding.ViewBinding
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnItemClickListener
-import io.agora.scene.base.manager.PagePilotManager
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.base.utils.dp
 import io.agora.scene.playzone.R
 import io.agora.scene.playzone.databinding.PlayZoneActivityGameHallLayoutBinding
 import io.agora.scene.playzone.databinding.PlayZoneItemGameHeaderLayoutBinding
 import io.agora.scene.playzone.databinding.PlayZoneItemGameLayoutBinding
 import io.agora.scene.playzone.databinding.PlayZoneItemGameTypeLayoutBinding
+import io.agora.scene.playzone.live.PlayWebViewActivity
 import io.agora.scene.playzone.service.api.PlayGameInfoModel
 import io.agora.scene.playzone.service.api.PlayGameType
 
@@ -132,7 +131,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
                         viewType: Long
                     ) {
                         if (!subGameInfo.gameUrl.isNullOrEmpty()) {
-                            PagePilotManager.pageWebView(subGameInfo.gameUrl)
+                            PlayWebViewActivity.startActivity(this@PlayGameHallActivity, subGameInfo.gameUrl)
                         } else {
                             showCreateRoomDialog(subGameInfo)
                         }
