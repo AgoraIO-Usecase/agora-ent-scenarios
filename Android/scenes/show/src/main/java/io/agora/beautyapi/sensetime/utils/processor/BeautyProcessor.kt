@@ -4,6 +4,7 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.opengl.GLES20
 import android.os.Build
+import android.util.Log
 import com.softsugar.hardwarebuffer.STMobileHardwareBufferNative
 import com.softsugar.stmobile.STCommonNative
 import com.softsugar.stmobile.STMobileColorConvertNative
@@ -129,6 +130,7 @@ class BeautyProcessor : IBeautyProcessor {
 
         if(processInTextureId == -1){
             processInTextureId = glFrameBuffer.createTexture(width, height)
+            Log.d(TAG, "processInTextureId >> processSingleTextureInput create $processInTextureId, width=${input.width}, height=${input.height}")
         }
 
         if (mSTMobileHardwareBufferNative == null) {
@@ -142,10 +144,11 @@ class BeautyProcessor : IBeautyProcessor {
                     STMobileHardwareBufferNative.HARDWARE_BUFFER_USAGE_DOWNLOAD
                 )
             }
+            glFrameBuffer.resizeTexture(processInTextureId, width, height)
+            Log.d(TAG, "processInTextureId >> processSingleTextureInput resizeTexture $processInTextureId, width=${input.width}, height=${input.height}")
         } else if (mProcessWidth != width || mProcessHeight != height) {
             mSTMobileHardwareBufferNative?.release()
             mSTMobileHardwareBufferNative = null
-            glFrameBuffer.resizeTexture(processInTextureId, width, height)
             return null
         }
 
@@ -201,12 +204,14 @@ class BeautyProcessor : IBeautyProcessor {
         }
         if (processInTextureId == -1) {
             processInTextureId = glFrameBuffer.createTexture(input.width, input.height)
+            Log.d(TAG, "processInTextureId >> processSingleBytesInput create $processInTextureId, width=${input.width}, height=${input.height}")
         }
 
         if (mSTMobileColorConvertNative == null) {
             mProcessWidth = input.width
             mProcessHeight = input.height
             glFrameBuffer.resizeTexture(processInTextureId, input.width, input.height)
+            Log.d(TAG, "processInTextureId >> processSingleBytesInput mSTMobileColorConvertNative==null resizeTexture $processInTextureId, width=${input.width}, height=${input.height}")
             mSTMobileColorConvertNative = STMobileColorConvertNative().apply {
                 createInstance()
                 setTextureSize(mProcessWidth, mProcessHeight)

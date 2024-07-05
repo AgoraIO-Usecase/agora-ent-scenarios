@@ -416,6 +416,7 @@ class SenseTimeBeautyAPIImpl : SenseTimeBeautyAPI, IVideoFrameObserver {
                 if(currProcessSourceType != ProcessSourceType.TEXTURE_2D_API26){
                     LogUtils.i(TAG, "processBeautyAuto >> process source type change old=$currProcessSourceType, new=${ProcessSourceType.TEXTURE_2D_API26}")
                     currProcessSourceType = ProcessSourceType.TEXTURE_2D_API26
+                    skipFrame = 6
                 }
             }
         }
