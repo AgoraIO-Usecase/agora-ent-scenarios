@@ -184,6 +184,8 @@ class LiveDetailFragment : Fragment() {
     private var mMicInvitationDialog: AlertDialog?= null
     private var mPKInvitationDialog: AlertDialog?= null
 
+    private var mPKEventHandler: IRtcEngineEventHandler? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -1419,7 +1421,7 @@ class LiveDetailFragment : Fragment() {
 
     private fun enableComeBackSoonView(enable: Boolean) {
         if (isPKing()) {
-            // TODO
+            mBinding.videoPKLayout.iBroadcasterAViewOverlay.isVisible = enable
         } else {
             mBinding.livingComeSoonLayout.root.isVisible = enable
             if (enable) {
@@ -1701,6 +1703,7 @@ class LiveDetailFragment : Fragment() {
             error: Int
         ) {
             super.onLocalVideoStateChanged(source, state, error)
+            ShowLogger.d(TAG, "onLocalVideoStateChanged: $state")
             if (isRoomOwner) {
                 isAudioOnlyMode = state == Constants.LOCAL_VIDEO_STREAM_STATE_STOPPED
             }
@@ -1713,6 +1716,7 @@ class LiveDetailFragment : Fragment() {
             elapsed: Int
         ) {
             super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
+            ShowLogger.d(TAG, "onRemoteVideoStateChanged: uid=$uid, state=$state, reason=$reason")
             if (uid == mRoomInfo.ownerId.toInt()) {
                 isAudioOnlyMode = state == Constants.REMOTE_VIDEO_STATE_STOPPED
 
@@ -1721,6 +1725,14 @@ class LiveDetailFragment : Fragment() {
                         enableComeBackSoonView(true)
                     } else if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED) {
                         enableComeBackSoonView(false)
+                    }
+                }
+            } else if (isLinking() && uid == interactionInfo?.userId?.toInt()) {
+                runOnUiThread {
+                    if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_MUTED) {
+                        mBinding.videoLinkingAudienceLayout.videoOverlay.isVisible = true
+                    } else if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED) {
+                        mBinding.videoLinkingAudienceLayout.videoOverlay.isVisible = false
                     }
                 }
             }
@@ -1980,6 +1992,12 @@ class LiveDetailFragment : Fragment() {
             mRtcEngine.setAudioEffectPreset(Constants.AUDIO_EFFECT_OFF)
         } else {
             mRtcEngine.removeHandlerEx(eventListener, mMainRtcConnection)
+            if(isPKing()){
+                mPKEventHandler?.let {
+                    mRtcEngine.removeHandlerEx(it, RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()))
+                    mPKEventHandler = null
+                }
+            }
         }
         return true
     }
@@ -2002,6 +2020,8 @@ class LiveDetailFragment : Fragment() {
         }
         if (isRoomOwner) {
             enableComeBackSoonView(!enable)
+        } else if (isMeLinking()) {
+            mBinding.videoLinkingAudienceLayout.videoOverlay.isVisible = !enable
         }
     }
 
@@ -2102,6 +2122,10 @@ class LiveDetailFragment : Fragment() {
                     )
                 )
             } else {
+                mPKEventHandler?.let {
+                    mRtcEngine.removeHandlerEx(mPKEventHandler, RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()))
+                    mPKEventHandler = null
+                }
                 mHandler.updateRoomInfo(
                     position = mPosition,
                     VideoLoader.RoomInfo(
@@ -2197,6 +2221,7 @@ class LiveDetailFragment : Fragment() {
         mBinding.videoLinkingAudienceLayout.userName.text = interactionInfo!!.userName
         mBinding.videoLinkingAudienceLayout.userName.bringToFront()
         mBinding.videoLinkingAudienceLayout.userName.isActivated = true
+        mBinding.videoLinkingAudienceLayout.videoOverlay.isVisible = false
         if (isRoomOwner) {
             // 连麦主播视角
             mBinding.videoLinkingAudienceLayout.videoContainer.setOnClickListener {
@@ -2318,63 +2343,7 @@ class LiveDetailFragment : Fragment() {
             RtcEngineInstance.generalToken(),
             pkRtcConnection,
             channelMediaOptions,
-            object : IRtcEngineEventHandler() {
-                override fun onRemoteVideoStats(stats: RemoteVideoStats) {
-                    super.onRemoteVideoStats(stats)
-                    if (isRoomOwner) {
-                        activity?.runOnUiThread {
-                            refreshStatisticInfo(
-                                downBitrate = stats.receivedBitrate,
-                                receiveFPS = stats.decoderOutputFrameRate,
-                                downLossPackage = stats.packetLossRate,
-                                receiveVideoSize = Size(stats.width, stats.height),
-                                downDelay = stats.delay
-                            )
-                        }
-                    }
-                }
-
-                override fun onRemoteAudioStats(stats: RemoteAudioStats) {
-                    super.onRemoteAudioStats(stats)
-                    activity?.runOnUiThread {
-                        refreshStatisticInfo(
-                            audioBitrate = stats.receivedBitrate,
-                            audioLossPackage = stats.audioLossRate
-                        )
-                    }
-                }
-
-                override fun onDownlinkNetworkInfoUpdated(info: DownlinkNetworkInfo) {
-                    super.onDownlinkNetworkInfoUpdated(info)
-                    activity?.runOnUiThread {
-                        refreshStatisticInfo(downLinkBps = info.bandwidth_estimation_bps)
-                    }
-                }
-
-                override fun onFirstRemoteVideoFrame(
-                    uid: Int,
-                    width: Int,
-                    height: Int,
-                    elapsed: Int
-                ) {
-                    super.onFirstRemoteVideoFrame(uid, width, height, elapsed)
-                    if (interactionInfo?.userId == uid.toString()) {
-                        if (pkStartTime != 0L) {
-                            ShowLogger.d(
-                                TAG,
-                                "Interaction user first video frame from host accept pking : ${TimeUtils.currentTimeMillis() - pkStartTime}"
-                            )
-                            pkStartTime = 0L
-                        } else {
-                            ShowLogger.d(
-                                TAG,
-                                "Interaction user first video frame from host accepted pking : ${TimeUtils.currentTimeMillis() - (interactionInfo?.createdAt?.toLong() ?: 0L)}"
-                            )
-                            pkStartTime = 0L
-                        }
-                    }
-                }
-            }
+            object : IRtcEngineEventHandler() {}
         )
         prepareRkRoomId = pkRoomId
     }
@@ -2397,6 +2366,25 @@ class LiveDetailFragment : Fragment() {
                             receiveVideoSize = Size(stats.width, stats.height),
                             downDelay = stats.delay
                         )
+                    }
+                }
+            }
+
+            override fun onRemoteVideoStateChanged(
+                uid: Int,
+                state: Int,
+                reason: Int,
+                elapsed: Int
+            ) {
+                super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
+                ShowLogger.d(TAG, "onRemoteVideoStateChanged pk : uid=$uid, state=$state, reason=$reason")
+                if(isPKing() && uid == interactionInfo?.userId?.toInt()){
+                    runOnUiThread {
+                        if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_MUTED) {
+                            mBinding.videoPKLayout.iBroadcasterBViewOverlay.isVisible = true
+                        } else if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED) {
+                            mBinding.videoPKLayout.iBroadcasterBViewOverlay.isVisible = false
+                        }
                     }
                 }
             }
@@ -2440,6 +2428,8 @@ class LiveDetailFragment : Fragment() {
 
         mBinding.videoPKLayout.userNameA.text = mRoomInfo.ownerName
         mBinding.videoPKLayout.userNameB.text = interactionInfo!!.userName
+        mBinding.videoPKLayout.iBroadcasterAViewOverlay.isVisible = false
+        mBinding.videoPKLayout.iBroadcasterBViewOverlay.isVisible = false
         if (isRoomOwner) {
             // pk 主播
             mBinding.livingComeSoonLayout.root.isVisible = false
@@ -2473,6 +2463,7 @@ class LiveDetailFragment : Fragment() {
                 channelMediaOptions,
                 pkRtcConnection
             )
+            mPKEventHandler = eventListener
             mRtcEngine.addHandlerEx(eventListener, pkRtcConnection)
             activity?.let {
                 mBinding.videoPKLayout.iBroadcasterBView.removeView(pkAgainstView)
@@ -2515,6 +2506,8 @@ class LiveDetailFragment : Fragment() {
                     )
                 )
             )
+            mPKEventHandler = eventListener
+            mRtcEngine.addHandlerEx(mPKEventHandler, RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()))
         }
     }
 
