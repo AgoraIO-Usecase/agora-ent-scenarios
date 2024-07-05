@@ -7,6 +7,8 @@ plugins {
 if (project.property("AGORA_APP_ID").toString().isEmpty()) {
     throw new GradleException("请在 gradle.properties 中配置完整的 Agora ID 和 Certificate")
 }
+// 使用本地rtm sdk step 1
+//def localSdkPath = "rtm"
 
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
@@ -51,6 +53,13 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    // 使用本地rtm sdk step 2
+//    sourceSets {
+//        main {
+//            jniLibs.srcDirs += "${localSdkPath}"
+//        }
+//    }
 }
 
 dependencies {
@@ -86,4 +95,8 @@ dependencies {
 
     api rootProject.ext.deps.protobuf_java
     api rootProject.ext.deps.protobuf_java_util
+
+    api rootProject.ext.deps.rtm
+    // 使用本地rtm sdk step 3
+//    api fileTree(dir: "${localSdkPath}", include: ['*.jar'])
 }
