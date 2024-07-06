@@ -186,6 +186,8 @@ class LiveDetailFragment : Fragment() {
 
     private var mPKEventHandler: IRtcEngineEventHandler? = null
 
+    private val mUserMuteAudioStateMap = mutableMapOf<Int, Boolean>()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -1494,11 +1496,7 @@ class LiveDetailFragment : Fragment() {
         mService.subscribeUser(mRoomInfo.roomId) { status, user ->
             reFetchUserList()
 
-            if (status == ShowSubscribeStatus.updated) {
-                if (interactionInfo?.interactStatus == ShowInteractionStatus.linking && interactionInfo?.userId == user?.userId) {
-                    mBinding.videoLinkingAudienceLayout.userName.isActivated = !(user?.muteAudio ?: false)
-                }
-            } else if (status == ShowSubscribeStatus.added && user != null) {
+            if (status == ShowSubscribeStatus.added && user != null) {
                 insertMessageItem(
                     ShowMessage(
                         user.userId,
@@ -1734,6 +1732,63 @@ class LiveDetailFragment : Fragment() {
                     } else if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED) {
                         mBinding.videoLinkingAudienceLayout.videoOverlay.isVisible = false
                     }
+                }
+            }
+        }
+
+        override fun onLocalAudioStateChanged(state: Int, reason: Int) {
+            super.onLocalAudioStateChanged(state, reason)
+            ShowLogger.d(TAG, "onLocalAudioStateChanged: state=$state, reason=$reason")
+            runOnUiThread {
+                if (state == Constants.LOCAL_AUDIO_STREAM_STATE_STOPPED) {
+                    if (isMeLinking()) {
+                        mBinding.videoLinkingAudienceLayout.userName.isActivated = false
+                    }
+                    mBinding.videoPKLayout.userNameA.isActivated = false
+                } else if (state == Constants.LOCAL_AUDIO_STREAM_STATE_ENCODING) {
+                    if (isMeLinking()) {
+                        mBinding.videoLinkingAudienceLayout.userName.isActivated = true
+                    }
+                    mBinding.videoPKLayout.userNameA.isActivated = true
+                }
+            }
+        }
+
+        override fun onAudioPublishStateChanged(
+            channel: String?,
+            oldState: Int,
+            newState: Int,
+            elapseSinceLastState: Int
+        ) {
+            super.onAudioPublishStateChanged(channel, oldState, newState, elapseSinceLastState)
+            ShowLogger.d(TAG, "onAudioPublishStateChanged: channel=$channel, oldState=$oldState, newState=$newState, elapseSinceLastState=$elapseSinceLastState")
+            runOnUiThread {
+                if (newState == 1) {
+                    if (isMeLinking()) {
+                        mBinding.videoLinkingAudienceLayout.userName.isActivated = false
+                    }
+                    mBinding.videoPKLayout.userNameA.isActivated = false
+                } else if (newState == 3) {
+                    if (isMeLinking()) {
+                        mBinding.videoLinkingAudienceLayout.userName.isActivated = true
+                    }
+                    mBinding.videoPKLayout.userNameA.isActivated = true
+                }
+            }
+        }
+
+        override fun onRemoteAudioStateChanged(uid: Int, state: Int, reason: Int, elapsed: Int) {
+            super.onRemoteAudioStateChanged(uid, state, reason, elapsed)
+            ShowLogger.d(TAG, "onRemoteAudioStateChanged: uid=$uid, state=$state, reason=$reason")
+            val unmute = state == Constants.REMOTE_AUDIO_STATE_DECODING
+            mUserMuteAudioStateMap[uid] = !unmute
+            if (isLinking() && uid == interactionInfo?.userId?.toInt()) {
+                runOnUiThread {
+                    mBinding.videoLinkingAudienceLayout.userName.isActivated = unmute
+                }
+            } else if (isPKing()) {
+                runOnUiThread {
+                    mBinding.videoPKLayout.userNameA.isActivated = unmute
                 }
             }
         }
@@ -2153,6 +2208,7 @@ class LiveDetailFragment : Fragment() {
             enableLocalAudio(true)
             enableLocalVideo(true)
             mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_VIDEO, true)
+            mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_MIC, true)
             activity?.let {
                 setupLocalVideo(
                     VideoLoader.VideoCanvasContainer(
@@ -2220,7 +2276,10 @@ class LiveDetailFragment : Fragment() {
 
         mBinding.videoLinkingAudienceLayout.userName.text = interactionInfo!!.userName
         mBinding.videoLinkingAudienceLayout.userName.bringToFront()
-        mBinding.videoLinkingAudienceLayout.userName.isActivated = true
+        mBinding.videoLinkingAudienceLayout.userName.isActivated = !mUserMuteAudioStateMap.getOrDefault(
+            interactionInfo!!.userId.toInt(),
+            false
+        )
         mBinding.videoLinkingAudienceLayout.videoOverlay.isVisible = false
         if (isRoomOwner) {
             // 连麦主播视角
@@ -2231,6 +2290,7 @@ class LiveDetailFragment : Fragment() {
             mService.muteAudio(mRoomInfo.roomId, false)
             // pk摄像头默认开启 todo 统一入口获取摄像头状态
             mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_VIDEO, true)
+            mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_MIC, true)
             mPKSettingsDialog.resetItemStatus(LivePKSettingsDialog.ITEM_ID_CAMERA, true)
             enableLocalVideo(true)
             activity?.let {
@@ -2263,6 +2323,7 @@ class LiveDetailFragment : Fragment() {
                 }
                 // 重新连麦，恢复摄像头开启状态
                 mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_VIDEO, true)
+                mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_MIC, true)
                 enableLocalAudio(true)
                 val channelMediaOptions = ChannelMediaOptions()
                 channelMediaOptions.publishCameraTrack = true
@@ -2389,6 +2450,25 @@ class LiveDetailFragment : Fragment() {
                 }
             }
 
+            override fun onRemoteAudioStateChanged(
+                uid: Int,
+                state: Int,
+                reason: Int,
+                elapsed: Int
+            ) {
+                super.onRemoteAudioStateChanged(uid, state, reason, elapsed)
+                ShowLogger.d(TAG, "onRemoteAudioStateChanged pk : uid=$uid, state=$state, reason=$reason")
+                if(isPKing() && uid == interactionInfo?.userId?.toInt()){
+                    runOnUiThread {
+                        if (state == Constants.REMOTE_AUDIO_STATE_STOPPED) {
+                            mBinding.videoPKLayout.userNameB.isActivated = false
+                        } else if (state == Constants.REMOTE_AUDIO_STATE_DECODING) {
+                            mBinding.videoPKLayout.userNameB.isActivated = true
+                        }
+                    }
+                }
+            }
+
             override fun onRemoteAudioStats(stats: RemoteAudioStats) {
                 super.onRemoteAudioStats(stats)
                 activity?.runOnUiThread {
@@ -2427,7 +2507,9 @@ class LiveDetailFragment : Fragment() {
         }
 
         mBinding.videoPKLayout.userNameA.text = mRoomInfo.ownerName
+        mBinding.videoPKLayout.userNameA.isActivated = true
         mBinding.videoPKLayout.userNameB.text = interactionInfo!!.userName
+        mBinding.videoPKLayout.userNameB.isActivated = true
         mBinding.videoPKLayout.iBroadcasterAViewOverlay.isVisible = false
         mBinding.videoPKLayout.iBroadcasterBViewOverlay.isVisible = false
         if (isRoomOwner) {
@@ -2446,6 +2528,7 @@ class LiveDetailFragment : Fragment() {
                     )
                 )
             }
+            mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_MIC, true)
             enableLocalAudio(true)
             if (isRoomOwner) {
                 // 连麦摄像头默认开启 todo 统一入口获取摄像头状态
