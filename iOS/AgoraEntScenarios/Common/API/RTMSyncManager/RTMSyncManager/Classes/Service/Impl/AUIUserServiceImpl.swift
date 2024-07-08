@@ -19,7 +19,7 @@ import YYModel
         rtmManager.unsubscribeUser(channelName: channelName, delegate: self)
     }
     
-    public init(channelName: String, rtmManager: AUIRtmManager, autoSetUserAttr: Bool = false) {
+    public init(channelName: String, rtmManager: AUIRtmManager) {
         self.rtmManager = rtmManager
         self.channelName = channelName
         super.init()
@@ -29,10 +29,6 @@ import YYModel
 //        _setupUserAttr(roomId: channelName) { _ in
 //            //TODO: retry
 //        }
-        if autoSetUserAttr == true {
-            setUserAttr { _ in
-            }
-        }
     }
 }
 
