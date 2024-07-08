@@ -78,6 +78,7 @@ public class InteractionService: NSObject {
             guard interactionKey == observeKey else {return}
             let info: InteractionInfo = decodeModel(value.getMap() ?? [:]) ?? InteractionInfo()
             self.interactionInfo = info
+            var list = [info]
             if info.type == .linking {
                 roomPresenceService.updateRoomPresenceInfo(roomId: channelName,
                                                            status: .linking,
@@ -90,9 +91,10 @@ public class InteractionService: NSObject {
                                                            interactorId: "",
                                                            interactorName: "",
                                                            completion: nil)
+                list = []
             }
             for element in self.respDelegates.allObjects {
-                element.onInteractionListDidUpdate(channelName: channelName, list: [info])
+                element.onInteractionListDidUpdate(channelName: channelName, list: list)
             }
         }
         let scene = syncManager.getScene(channelName: channelName)
