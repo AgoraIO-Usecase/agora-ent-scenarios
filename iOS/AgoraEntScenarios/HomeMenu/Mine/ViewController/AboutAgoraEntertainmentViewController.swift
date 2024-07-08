@@ -24,8 +24,8 @@ import AgoraCommon
                       ["title": NSLocalizedString("app_about_continuesinging", comment: ""),"detail":"JC-4.3.0"],
                       ["title": NSLocalizedString("app_about_cantata", comment: ""),"detail":"DHC-4.3.0"],
                       ["title": NSLocalizedString("app_about_show", comment: ""), "detail":"ZB-4.2.1"],
-                      ["title": NSLocalizedString("app_about_1v1", comment: ""), "detail":"SMF-3.6.0"],
-                      ["title": NSLocalizedString("app_about_live_to_1v1", comment: ""), "detail":"XCSMF-3.7.0"],
+                      ["title": NSLocalizedString("app_about_1v1", comment: ""), "detail":"SMF-4.2.1"],
+                      ["title": NSLocalizedString("app_about_live_to_1v1", comment: ""), "detail":"XCSMF-4.2.1"],
                       ["title": NSLocalizedString("app_about_joy", comment: ""), "detail":"XWF-4.10.1"]],
          "sectionName": NSLocalizedString("app_about_scene_version", comment: "")]
     ]
