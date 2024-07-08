@@ -58,4 +58,9 @@ public class Constant {
     public static final String SHOW_META_RESOURCES_PATH = "showMetaResources";
     // meta 图片
     public static final String SHOW_META_IMAGE_PATH = "showMetaImage";
+
+    // meta 资源md5
+    public static final String SHOW_META_RESOURCES_MD5 = "showMetaResourcesMd5";
+    // meta 图片md5
+    public static final String SHOW_META_IMAGE_MD5 = "showMetaImageMd5";
 }

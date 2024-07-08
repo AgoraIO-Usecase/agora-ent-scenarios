@@ -100,17 +100,37 @@ class MetaEngineHandler : AGExtensionHandler {
     }
 
     // meta 资源路径
-    var metaResourcesPath: String = SPUtil.getString(Constant.SHOW_META_RESOURCES_PATH,"")
+    var metaResourcesPath: String = SPUtil.getString(Constant.SHOW_META_RESOURCES_PATH, "")
         set(value) {
-            field =value
-           ShowLogger.d(TAG, "metaResourcesPath: $value")
+            field = value
+            SPUtil.putString(Constant.SHOW_META_RESOURCES_PATH, value)
+            ShowLogger.d(TAG, "metaResourcesPath: $value")
         }
+
     // meta 图片路径
-    var metaImagePath: String = SPUtil.getString(Constant.SHOW_META_IMAGE_PATH,"")
+    var metaImagePath: String = SPUtil.getString(Constant.SHOW_META_IMAGE_PATH, "")
         set(value) {
-            field =value
+            field = value
+            SPUtil.putString(Constant.SHOW_META_IMAGE_PATH, value)
             ShowLogger.d(TAG, "metaImagePath: $value")
         }
+
+    // meta 资源m5d
+    var metaResourcesMd5: String = SPUtil.getString(Constant.SHOW_META_RESOURCES_MD5, "")
+        set(value) {
+            field = value
+            SPUtil.putString(Constant.SHOW_META_RESOURCES_MD5, value)
+            ShowLogger.d(TAG, "metaResourcesMd5: $value")
+        }
+
+    // meta 图片md5
+    var metaImageMd5: String = SPUtil.getString(Constant.SHOW_META_IMAGE_MD5, "")
+        set(value) {
+            field = value
+            SPUtil.putString(Constant.SHOW_META_IMAGE_MD5, value)
+            ShowLogger.d(TAG, "metaImageMd5: $value")
+        }
+
 
     var mRunningState: Int = IMetaRunningState.idle
 
