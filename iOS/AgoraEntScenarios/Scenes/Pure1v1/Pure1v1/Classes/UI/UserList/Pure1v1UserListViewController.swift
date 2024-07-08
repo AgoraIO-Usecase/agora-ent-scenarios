@@ -113,6 +113,7 @@ class Pure1v1UserListViewController: UIViewController {
     
     private var userList: [Pure1v1UserInfo] = [] {
         didSet {
+            Pure1v1Logger.info("update userList: \(userList.count)")
             let list = userList.filter({$0.userId != self.userInfo?.userId})
             self.listView.userList = list
             self.noDataView.isHidden = list.count > 0
