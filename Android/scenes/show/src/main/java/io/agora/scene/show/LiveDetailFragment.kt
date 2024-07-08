@@ -440,7 +440,6 @@ class LiveDetailFragment : Fragment() {
                 ToastUtils.showToast(context?.getString(R.string.show_tip1))
                 return@setOnClickListener
             }
-            bottomLayout.vLinkingDot.isVisible = false
             if (!isRoomOwner) {
                 // 观众发送连麦申请
                 if (interactionInfo == null
@@ -503,8 +502,11 @@ class LiveDetailFragment : Fragment() {
     private fun refreshBottomLayout() {
         val context = context ?: return
         val bottomLayout = mBinding.bottomLayout
+        bottomLayout.flLinking.isVisible = true
+
         if (isRoomOwner) {
             // 房主
+            bottomLayout.flPK.isVisible = true
 
             // 房主都能控制视频
             bottomLayout.ivSetting.isVisible = true
@@ -514,14 +516,10 @@ class LiveDetailFragment : Fragment() {
             if (isPKing()) {
                 // PK状态
                 // 房主一定是PK的一方
-                bottomLayout.ivLinking.isEnabled = false
-                bottomLayout.flPK.isEnabled = true
-                bottomLayout.flPK.isVisible = true
+
             } else if (isLinking()) {
                 // 连麦状态
                 // 房主一定是连麦的一方
-                bottomLayout.flPK.isEnabled = false
-                bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList = null
                 mSettingDialog.apply {
                     resetSettingsItem(false)
@@ -529,10 +527,6 @@ class LiveDetailFragment : Fragment() {
             } else {
                 // 单主播状态
                 // 房主是主播
-                bottomLayout.flPK.isEnabled = true
-                bottomLayout.ivLinking.isEnabled = true
-                bottomLayout.flPK.isVisible = true
-                bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList =
                     ColorStateList.valueOf(context.resources.getColor(R.color.grey_7e))
                 mSettingDialog.apply {
@@ -547,13 +541,11 @@ class LiveDetailFragment : Fragment() {
             // 观众没有PK权限
             bottomLayout.flPK.isVisible = false
 
-
             if (isPKing()) {
                 // PK状态
                 // PK是房主和房主的事，和观众无关，观众只能看，同时无法再连麦
                 bottomLayout.ivMusic.isVisible = false
                 bottomLayout.ivBeauty.isVisible = false
-                bottomLayout.flLinking.isVisible = false
             } else if (isLinking()) {
                 // 连麦状态
                 if (isMeLinking()) {
@@ -561,13 +553,11 @@ class LiveDetailFragment : Fragment() {
                     bottomLayout.ivMusic.isVisible = false
                     bottomLayout.ivBeauty.isVisible = false
 
-                    bottomLayout.flLinking.isVisible = true
                     bottomLayout.ivLinking.imageTintList = null
                 } else {
                     // 只是观看者，不参与连麦
                     bottomLayout.ivMusic.isVisible = false
                     bottomLayout.ivBeauty.isVisible = false
-                    bottomLayout.flLinking.isVisible = false
                 }
             } else {
                 // 单主播状态
@@ -575,7 +565,6 @@ class LiveDetailFragment : Fragment() {
                 bottomLayout.ivMusic.isVisible = false
                 bottomLayout.ivBeauty.isVisible = false
 
-                bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList =
                     ColorStateList.valueOf(context.resources.getColor(R.color.grey_7e))
             }
@@ -1518,9 +1507,7 @@ class LiveDetailFragment : Fragment() {
             insertMessageItem(showMessage)
         }
         mService.subscribeMicSeatApply(mRoomInfo.roomId) { _, list ->
-            if (isRoomOwner) {
-                mBinding.bottomLayout.vLinkingDot.isVisible = list.isNotEmpty() || isMeLinking()
-            }
+            mBinding.bottomLayout.vLinkingDot.isVisible = list.isNotEmpty()
             mLinkDialog.setSeatApplyList(interactionInfo, list)
         }
         mService.subscribeInteractionChanged(mRoomInfo.roomId) { status, info ->
