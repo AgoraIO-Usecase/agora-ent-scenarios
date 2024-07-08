@@ -1,6 +1,7 @@
 package io.agora.scene.show.widget
 
 import android.content.Context
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,12 +12,12 @@ import com.google.android.material.divider.MaterialDividerItemDecoration
 import io.agora.scene.base.Constant
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.utils.FileUtils
-import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.dp
 import io.agora.scene.base.utils.resourceManager.AGResource
 import io.agora.scene.base.utils.resourceManager.AGResourceManager
 import io.agora.scene.show.R
 import io.agora.scene.show.RtcEngineInstance
+import io.agora.scene.show.ShowLogger
 import io.agora.scene.show.databinding.ShowAiPhotographerItemBinding
 import io.agora.scene.show.databinding.ShowWidgetAiPhotographerDialogBinding
 import io.agora.scene.show.photographer.AiPhotographerType
@@ -27,7 +28,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 
 class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(context) {
 
@@ -80,6 +80,9 @@ class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(cont
     var onItemSelectedListener: ((AiPhotographerDialog, itemId: Int) -> Unit)? = null
 
     val scope = CoroutineScope(Job() + Dispatchers.Main)
+
+    // 资源目录
+    private val manifestResourceList = mutableListOf<AGResource>()
 
     init {
         setBottomView(mBinding.root)
@@ -139,8 +142,37 @@ class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(cont
                 dividerThickness = 24.dp.toInt()
                 dividerColor = ContextCompat.getColor(context, android.R.color.transparent)
             })
-            checkFileDownload()
             resetAll(mAiPhotographerItemList)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        checkDownloadFromRemote()
+    }
+
+    /**
+     * Check download from remote
+     *
+     */
+    private fun checkDownloadFromRemote() {
+        scope.launch(Dispatchers.IO) {
+            if (manifestResourceList.isEmpty()) {
+                // 下载资源目录 json
+                ShowLogger.d(TAG, "checkDownloadFromRemote 下载资源目录 start")
+                agResourceManager.downloadManifestList(URL_RESOURCE, null, {},
+                    completionHandler = { agResourceList, err ->
+                        manifestResourceList.clear()
+                        agResourceList?.let {
+                            manifestResourceList.addAll(it)
+                        }
+                        ShowLogger.d(TAG, "checkDownloadFromRemote 下载资源目录 end")
+                    })
+            }
+            withContext(Dispatchers.Main) {
+                checkFileDownload()
+                mAiPhotographerAdapter.resetAll(mAiPhotographerItemList)
+            }
         }
     }
 
@@ -172,9 +204,13 @@ class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(cont
     }
 
     private fun checkFileDownload() {
-        val isImageDownload = SPUtil.getString(Constant.SHOW_META_IMAGE_PATH, "")
-        val isResourcesDownload = SPUtil.getString(Constant.SHOW_META_RESOURCES_PATH, "")
-        if (isResourcesDownload.isNotEmpty()) {
+        val newResourceMd5 = manifestResourceList.firstOrNull { it.uri == URI_META_RESOURCES }?.md5 ?: ""
+        val newImageMd5 = manifestResourceList.firstOrNull { it.uri == URI_IMAGE_RESOURCES }?.md5 ?: ""
+        val metaResourcesMd5 = RtcEngineInstance.mMetaEngineHandler.metaResourcesMd5
+        val metaImageMd5 = RtcEngineInstance.mMetaEngineHandler.metaImageMd5
+
+        val isResourcesDownload = newResourceMd5.isNotEmpty() && newResourceMd5 == metaResourcesMd5
+        if (isResourcesDownload) {
             mAiPhotographerItemList.forEach {
                 when (it.itemId) {
                     AiPhotographerType.ITEM_ID_AI_EDGE_LIGHT,
@@ -185,7 +221,8 @@ class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(cont
                     }
 
                     AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG -> {
-                        if (isImageDownload.isNotEmpty()) {
+                        val isImageDownload = newImageMd5.isNotEmpty() && newImageMd5 == metaImageMd5
+                        if (isImageDownload) {
                             it.status = DownloadStatus.Downloaded
                         }
                     }
@@ -205,31 +242,32 @@ class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(cont
         onItemSelectedListener?.invoke(this@AiPhotographerDialog, item.itemId)
     }
 
-    // 资源目录
-    private val manifestResourceList = mutableListOf<AGResource>()
 
     private fun gotoDownload(itemId: Int) {
         // 更新下载状态
         updateLoading(itemId)
         mAiPhotographerAdapter.resetAll(mAiPhotographerItemList)
         scope.launch(Dispatchers.IO) {
-            // 下载资源目录 json
-            Log.d(TAG, "下载资源目录 start")
-            agResourceManager.downloadManifestList(URL_RESOURCE, null, {},
-                completionHandler = { agResourceList, err ->
-                    manifestResourceList.clear()
-                    agResourceList?.let {
-                        manifestResourceList.addAll(it)
-                    }
-                    Log.d(TAG, "下载资源目录 end")
-                })
+            if (manifestResourceList.isEmpty()) {
+                // 下载资源目录 json
+                ShowLogger.d(TAG, "gotoDownload 下载资源目录 start")
+                agResourceManager.downloadManifestList(URL_RESOURCE, null, {},
+                    completionHandler = { agResourceList, err ->
+                        manifestResourceList.clear()
+                        agResourceList?.let {
+                            manifestResourceList.addAll(it)
+                        }
+                        ShowLogger.d(TAG, "gotoDownload 下载资源目录 end")
+                    })
+            }
+
             // AI摄影师资源
-            manifestResourceList.find { it.uri == URI_META_RESOURCES }?.let { agResource ->
+            manifestResourceList.firstOrNull { it.uri == URI_META_RESOURCES }?.let { agResource ->
                 downloadManifestFile(agResource)
             }
             // 背景图片
             if (itemId == AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG) {
-                manifestResourceList.find { it.uri == URI_IMAGE_RESOURCES }?.let { agResource ->
+                manifestResourceList.firstOrNull { it.uri == URI_IMAGE_RESOURCES }?.let { agResource ->
                     downloadManifestFile(agResource)
                 }
             }
@@ -242,39 +280,39 @@ class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(cont
 
     // 下载 AI摄影师资源/虚拟背景图片 json
     private suspend fun downloadManifestFile(agResource: AGResource) {
-        Log.d(TAG, "下载 ${agResource.uri} 资源 start")
+        ShowLogger.d(TAG, "下载 ${agResource.uri} 资源 start")
         var agResourceFirst: AGResource? = null
         agResourceManager.downloadManifest(agResource.url, {},
             completionHandler = { aGManifest, err ->
-                Log.d(TAG, "下载 ${agResource.uri} 资源 end")
+                ShowLogger.d(TAG, "下载 ${agResource.uri} 资源 end")
                 agResourceFirst = aGManifest?.files?.get(0) ?: return@downloadManifest
             })
         val resource = agResourceFirst ?: return
-        Log.d(TAG, "下载 ${resource.uri} 资源并解压 start")
+        ShowLogger.d(TAG, "下载 ${resource.uri} 资源并解压 start")
         agResourceManager.downloadAndUnZipResource(resource,
             progressHandler = { progress ->
 
             },
             downloadedHandler = { file ->
-                Log.d(TAG, "downloaded filePath ${file.path}")
+                ShowLogger.d(TAG, "downloaded filePath ${file.path}")
             },
             unzipHandler = { path ->
                 if (agResource.uri == URI_META_RESOURCES) {
                     RtcEngineInstance.mMetaEngineHandler.metaResourcesPath = path
-                    Log.d(TAG, "unzip $URI_META_RESOURCES $path")
-                    SPUtil.putString(Constant.SHOW_META_RESOURCES_PATH, path)
+                    RtcEngineInstance.mMetaEngineHandler.metaResourcesMd5 = agResource.md5
+                    ShowLogger.d(TAG, "unzip $URI_META_RESOURCES $path")
                 } else if (agResource.uri == URI_IMAGE_RESOURCES) {
                     val imagePaths = FileUtils.loadImages(path)
                     imagePaths.firstOrNull()?.let { imagePath ->
                         RtcEngineInstance.mMetaEngineHandler.metaImagePath = imagePath
-                        Log.d(TAG, "unzip $URI_IMAGE_RESOURCES $imagePath")
-                        SPUtil.putString(Constant.SHOW_META_IMAGE_PATH, imagePath)
+                        RtcEngineInstance.mMetaEngineHandler.metaImageMd5 = agResource.md5
+                        ShowLogger.d(TAG, "unzip $URI_IMAGE_RESOURCES $imagePath")
                     }
                 }
 
             },
             errorHandler = { error ->
-                Log.e(TAG, "error ${error}")
+                ShowLogger.e(TAG, null, "error ${error}")
             })
 
     }
