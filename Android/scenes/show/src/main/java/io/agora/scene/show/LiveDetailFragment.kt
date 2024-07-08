@@ -1416,11 +1416,11 @@ class LiveDetailFragment : Fragment() {
         } else {
             mBinding.livingComeSoonLayout.root.isVisible = enable
             if (enable) {
-                mBinding.topLayout.root.bringToFront()
-                mBinding.bottomLayout.root.bringToFront()
                 if (isLinking()) {
                     mBinding.videoLinkingAudienceLayout.root.bringToFront()
                 }
+                mBinding.topLayout.root.bringToFront()
+                mBinding.bottomLayout.root.bringToFront()
             }
         }
     }
