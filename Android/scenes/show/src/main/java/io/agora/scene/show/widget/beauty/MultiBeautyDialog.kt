@@ -109,6 +109,12 @@ class MultiBeautyDialog : BottomSheetDialog {
     }
 
     private fun setupControllerView(controllerView: BaseControllerView) {
+        val virtualBgBinding =
+            ShowWidgetBeautyMultiDialogVirtualBgBinding.inflate(LayoutInflater.from(context))
+        controllerView.viewBinding.topCustomView.addView(virtualBgBinding.root)
+        virtualBgBinding.mSwitchMaterial.isChecked =
+            RtcEngineInstance.virtualBackgroundSegmentation.modelType == SegmentationProperty.SEG_MODEL_GREEN
+
         // 美颜开关
         controllerView.beautyOpenClickListener =
             OnClickListener { BeautyManager.enable = !BeautyManager.enable }
@@ -126,6 +132,17 @@ class MultiBeautyDialog : BottomSheetDialog {
                             onValueChanged = { _ ->
                                 RtcEngineInstance.virtualBackgroundSource.backgroundSourceType =
                                     VirtualBackgroundSource.BACKGROUND_COLOR
+                                RtcEngineInstance.virtualBackgroundSegmentation.modelType = SegmentationProperty.SEG_MODEL_AI
+                                RtcEngineInstance.virtualBackgroundSegmentation.greenCapacity = 0.5f
+                                controllerView.updateItemInfo {
+                                    if (it.name == R.string.show_beauty_item_virtual_bg_mitao
+                                        || it.name == R.string.show_beauty_item_virtual_bg_blur
+                                    ) {
+                                        it.value = 0.5f
+                                    }
+                                    false
+                                }
+                                virtualBgBinding.mSwitchMaterial.isChecked = false
                                 RtcEngineInstance.rtcEngine.enableVirtualBackground(
                                     false,
                                     RtcEngineInstance.virtualBackgroundSource,
@@ -178,11 +195,6 @@ class MultiBeautyDialog : BottomSheetDialog {
             )
         }
 
-        val virtualBgBinding =
-            ShowWidgetBeautyMultiDialogVirtualBgBinding.inflate(LayoutInflater.from(context))
-        controllerView.viewBinding.topCustomView.addView(virtualBgBinding.root)
-        virtualBgBinding.mSwitchMaterial.isChecked =
-            RtcEngineInstance.virtualBackgroundSegmentation.modelType == SegmentationProperty.SEG_MODEL_GREEN
         virtualBgBinding.mSwitchMaterial.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 AlertDialog.Builder(context, R.style.show_alert_dialog).apply {

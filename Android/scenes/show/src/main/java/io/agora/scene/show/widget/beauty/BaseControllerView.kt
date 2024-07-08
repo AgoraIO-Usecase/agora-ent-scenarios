@@ -203,6 +203,17 @@ open class BaseControllerView : FrameLayout {
         onSelectedChangeListener?.invoke(pageIndex, itemIndex)
     }
 
+    fun updateItemInfo(updater: (itemInfo: ItemInfo) -> Boolean) {
+        pageList.forEach { pageInfo ->
+            pageInfo.itemList.forEach { itemInfo ->
+                if (updater(itemInfo)) {
+                    itemInfo.onValueChanged.invoke(itemInfo.value)
+                    return
+                }
+            }
+        }
+    }
+
     data class PageInfo(
         @StringRes val name: Int,
         val itemList: List<ItemInfo>,
