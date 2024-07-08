@@ -19,16 +19,18 @@ import YYModel
         rtmManager.unsubscribeUser(channelName: channelName, delegate: self)
     }
     
-    public init(channelName: String, rtmManager: AUIRtmManager) {
+    public init(channelName: String, rtmManager: AUIRtmManager, autoSetUserAttr: Bool = false) {
         self.rtmManager = rtmManager
         self.channelName = channelName
         super.init()
         aui_info("init AUIUserServiceImpl[\(channelName)]", tag: "AUIUserServiceImpl")
         self.rtmManager.subscribeUser(channelName: channelName, delegate: self)
         //rtm2.2 支持预设置，在subscribe成功之后会更新
-//        _setupUserAttr(roomId: channelName) { _ in
-//            //TODO: retry
-//        }
+        if autoSetUserAttr {
+            setUserAttr { _ in
+                //TODO: retry
+            }
+        }
     }
 }
 
