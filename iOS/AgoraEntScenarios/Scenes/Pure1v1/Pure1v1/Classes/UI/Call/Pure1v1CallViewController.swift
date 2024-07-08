@@ -34,6 +34,7 @@ class Pure1v1CallViewController: UIViewController {
             }
         }
     }
+    var currentState: CallStateType = .idle
     var rtcEngine: AgoraRtcEngineKit?
     var currentUser: Pure1v1UserInfo?
     var targetUser: Pure1v1UserInfo? {
@@ -246,6 +247,7 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
                             stateReason: CallStateReason,
                             eventReason: String,
                             eventInfo: [String : Any]) {
+        self.currentState = state
         if state == .connected {
             selectedMap.removeAll()
             self.remoteCanvasView.canvasView.isHidden = false
@@ -261,8 +263,10 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
         Pure1v1Logger.info("onCallEventChanged event: \(event.rawValue) eventReason: '\(eventReason ?? "")'")
         switch event {
         case .remoteLeft:
+            if currentState == .connected {
+                AUIToast.show(text: "call_toast_remote_fail".pure1v1Localization())
+            }
             _hangupAction()
-            AUIToast.show(text: "call_toast_remote_fail".pure1v1Localization())
         default:
             break
         }
