@@ -18,6 +18,8 @@ android {
 
         if (BEAUTY_RESOURCE != "") {
             exclude 'lib/*/libeffect.so'
+//            exclude 'lib/*/libfuai.so'
+//            exclude 'lib/*/libCNamaSDK.so'
         }
     }
 
@@ -32,6 +34,8 @@ android {
         baseline = file("lint-baseline.xml")
     }
 }
+
+apply from: "${rootDir.absolutePath}/git-hooks.gradle"
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
