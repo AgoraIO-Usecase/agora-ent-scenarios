@@ -134,13 +134,6 @@ class PlayRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomListLay
         Log.d(TAG, "joy roomList activity onRestart")
     }
 
-    override fun onDestroy() {
-        PlayChatRoomService.chatRoomService.imManagerService.logoutChat {
-            PlayChatRoomService.reset()
-        }
-        super.onDestroy()
-    }
-
     private class PlayRoomListAdapter constructor(
         private var mList: List<AUIRoomInfo>,
         private val mContext: Context,
