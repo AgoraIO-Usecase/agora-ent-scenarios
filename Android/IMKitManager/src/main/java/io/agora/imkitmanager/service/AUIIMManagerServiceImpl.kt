@@ -10,6 +10,7 @@ import io.agora.chat.ChatMessage
 import io.agora.chat.adapter.EMAError
 import io.agora.imkitmanager.AUIChatEventHandler
 import io.agora.imkitmanager.AUIChatManager
+import io.agora.imkitmanager.model.AUIChatCommonConfig
 import io.agora.imkitmanager.model.AUIChatRoomContext
 import io.agora.imkitmanager.model.AUIChatRoomInfo
 import io.agora.imkitmanager.model.AgoraChatMessage
@@ -22,16 +23,15 @@ import io.agora.imkitmanager.service.http.ChatHttpManager
 import io.agora.imkitmanager.service.http.ChatUserConfig
 import io.agora.imkitmanager.service.http.CreateChatRoomInput
 import io.agora.imkitmanager.ui.AUIChatInfo
+import io.agora.imkitmanager.ui.AUIChatInfoType
 import io.agora.imkitmanager.ui.IAUIChatListView
 import io.agora.imkitmanager.utils.ObservableHelper
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManager) :
+class AUIIMManagerServiceImpl constructor(private val chatRoomConfig: AUIChatCommonConfig) :
     IAUIIMManagerService, AUIChatEventHandler {
-
-    private val chatRoomContext = AUIChatRoomContext.shared()
 
     private val mainHandler: Handler by lazy {
         Handler(Looper.getMainLooper())
@@ -45,8 +45,12 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
         }
     }
 
+    private val chatManager: AUIChatManager
+
     init {
-        ChatHttpManager.setBaseURL(chatRoomContext.requireCommonConfig().host)
+        AUIChatRoomContext.shared().setCommonConfig(chatRoomConfig)
+        ChatHttpManager.setBaseURL(chatRoomConfig.host)
+        chatManager = AUIChatManager(chatRoomConfig)
     }
 
     private val observableHelper = ObservableHelper<IAUIIMManagerService.AUIIMManagerRespObserver>()
@@ -67,39 +71,39 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
         mChatListView = view
     }
 
+    override fun insertLocalMessage(
+        text: String,
+        index: Int,
+        completion: (chatMessage: IAUIIMManagerService.AgoraChatTextMessage?, error: Exception?) -> Unit
+    ) {
+        chatManager.insertLocalMsg(index, text)
+        val chatTextMessage = IAUIIMManagerService.AgoraChatTextMessage("", text, null)
+        completion.invoke(chatTextMessage, null)
+        mChatListView?.let { chatListView ->
+            chatListView.refreshSelectLast(chatManager.getMsgList().map {
+                AUIChatInfo(
+                    type = it.type,
+                    userId = it.chatUser?.userId ?: "",
+                    userName = it.chatUser?.userName ?: "",
+                    content = it.content,
+                    customMsgType = it.customMsgType
+                )
+            })
+        }
+    }
+
     override fun sendMessage(
-        text: String, completion: (IAUIIMManagerService.AgoraChatTextMessage?, Exception?) -> Unit, localMsg: Boolean
+        text: String, completion: (IAUIIMManagerService.AgoraChatTextMessage?, Exception?) -> Unit
     ) {
         innerLoginChat { loginError ->
             if (loginError != null) {
                 completion.invoke(null, Exception("sendChatMessage ==> ${loginError.message}"))
                 return@innerLoginChat
             }
-            if (localMsg) {
-                chatManager.insertLocalMsg(text)
-                runOnMainThread {
-                    mChatListView?.let { chatListView ->
-                        chatListView.refreshSelectLast(chatManager.getMsgList().map {
-                            AUIChatInfo(
-                                userId = it.chatUser?.userId ?: "",
-                                userName = it.chatUser?.userName ?: "",
-                                content = it.content,
-                                joined = it.joined,
-                                localMsg = it.localMsg
-                            )
-                        })
-                    }
-                    val chatTextMessage = IAUIIMManagerService.AgoraChatTextMessage(
-                        "", text, null
-                    )
-                    completion.invoke(chatTextMessage, null)
-                }
-                return@innerLoginChat
-            }
             chatManager.sendTxtMsg(
                 mCurChatRoomId,
                 text,
-                chatRoomContext.currentUserInfo,
+                AUIChatRoomContext.shared().currentUserInfo,
                 object : AUIChatMsgCallback {
                     override fun onResult(error: Exception?, message: AgoraChatMessage?) {
                         super.onResult(error, message)
@@ -110,18 +114,19 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
                             }
                             val chatTextMessage = IAUIIMManagerService.AgoraChatTextMessage(
                                 message?.messageId,
-                                message?.content, chatRoomContext.currentUserInfo
+                                message?.content,
+                                AUIChatRoomContext.shared().currentUserInfo
                             )
                             completion.invoke(chatTextMessage, null)
 
                             mChatListView?.let { chatListView ->
                                 chatListView.refreshSelectLast(chatManager.getMsgList().map {
                                     AUIChatInfo(
+                                        type = it.type,
                                         userId = it.chatUser?.userId ?: "",
                                         userName = it.chatUser?.userName ?: "",
                                         content = it.content,
-                                        joined = it.joined,
-                                        localMsg = it.localMsg
+                                        customMsgType = it.customMsgType
                                     )
                                 })
                             }
@@ -168,7 +173,7 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
         val createChatRoomInput = CreateChatRoomInput(type = CHATROOM_CREATE_TYPE_USER)
         innerCreateUserOrChaRoom(createChatRoomInput) { resp, error ->
             if (error == null && resp != null) { // success
-                val chatUserId = chatRoomContext.currentUserInfo.userId
+                val chatUserId = AUIChatRoomContext.shared().currentUserInfo.userId
                 val chatUserToken = AUIChatRoomContext.shared().mChatToken
                 chatManager.loginChat(chatUserId, chatUserToken, object : CallBack {
                     override fun onSuccess() {
@@ -280,11 +285,11 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
                         runOnMainThread {
                             chatListView.refreshSelectLast(chatManager.getMsgList().map {
                                 AUIChatInfo(
+                                    type = it.type,
                                     userId = it.chatUser?.userId ?: "",
                                     userName = it.chatUser?.userName ?: "",
                                     content = it.content,
-                                    joined = it.joined,
-                                    localMsg = it.localMsg
+                                    customMsgType = it.customMsgType
                                 )
                             })
                         }
@@ -307,22 +312,19 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
             CHATROOM_CREATE_TYPE_ROOM -> "createRoom"
             else -> "createUserAndRoom"
         }
-        val commonConfig = chatRoomContext.mCommonConfig ?: run {
-            completion.invoke(null, Exception("inner $action >> commonConfig null."))
-            return
-        }
+
         val request = CreateChatRoomRequest(
-            appId = commonConfig.appId,
+            appId = chatRoomConfig.appId,
             type = input.type,
             imConfig = ChatIMConfig().apply {
-                this.appKey = commonConfig.imAppKey
-                this.clientId = commonConfig.imClientId
-                this.clientSecret = commonConfig.imClientSecret
+                this.appKey = chatRoomConfig.imAppKey
+                this.clientId = chatRoomConfig.imClientId
+                this.clientSecret = chatRoomConfig.imClientSecret
             },
         )
         val chatUserConfig = ChatUserConfig().apply {
-            this.username = chatRoomContext.currentUserInfo.userId
-            this.nickname = chatRoomContext.currentUserInfo.userName
+            this.username = AUIChatRoomContext.shared().currentUserInfo.userId
+            this.nickname = AUIChatRoomContext.shared().currentUserInfo.userName
         }
         val chatRoomConfig = ChatRoomConfig().apply {
             if (!input.chatRoomId.isNullOrEmpty()) {
@@ -387,11 +389,11 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
             runOnMainThread {
                 chatListView.refreshSelectLast(chatManager.getMsgList().map {
                     AUIChatInfo(
+                        type = it.type,
                         userId = it.chatUser?.userId ?: "",
                         userName = it.chatUser?.userName ?: "",
                         content = it.content,
-                        joined = it.joined,
-                        localMsg = it.localMsg
+                        customMsgType = it.customMsgType
                     )
                 })
             }
@@ -418,11 +420,11 @@ class AUIIMManagerServiceImpl constructor(private val chatManager: AUIChatManage
             runOnMainThread {
                 chatListView.refreshSelectLast(chatManager.getMsgList().map {
                     AUIChatInfo(
+                        type = it.type,
                         userId = it.chatUser?.userId ?: "",
                         userName = it.chatUser?.userName ?: "",
                         content = it.content,
-                        joined = it.joined,
-                        localMsg = it.localMsg
+                        customMsgType = it.customMsgType
                     )
                 })
             }

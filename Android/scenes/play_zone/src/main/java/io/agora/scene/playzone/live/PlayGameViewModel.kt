@@ -100,11 +100,11 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         mChatRoomService.imManagerService.setChatListView(chatListView)
         val chatRoomId = mRoomInfo.customPayload[PlayZoneParameters.CHAT_ID] as? String ?: return
         val chatRoomInfo = AUIChatRoomInfo(mRoomOwner, chatRoomId)
-        mChatRoomService.chatManager.saveWelcomeMsg(
-            context().getString(R.string.play_zone_system),
-            context().getString(R.string.play_zone_room_welcome)
-        )
+
         mChatRoomService.imManagerService.joinChatRoom(chatRoomInfo, completion = { error ->
+            if (error == null) {
+                insertLocalMessage(context().getString(R.string.play_zone_room_welcome), 0)
+            }
             error?.message?.let {
                 ToastUtils.showToast(it)
             }
@@ -248,7 +248,7 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
     }
 
     // 插入本地消息
-    fun insertLocalMessage(message: String) {
-        mChatRoomService.imManagerService.sendMessage(message, completion = { chatMessage, error -> }, true)
+    fun insertLocalMessage(message: String, index: Int = -1) {
+        mChatRoomService.imManagerService.insertLocalMessage(message, index, completion = { chatMessage, error -> })
     }
 }

@@ -20,6 +20,7 @@ import io.agora.imkitmanager.model.AUIChatRoomContext
 import io.agora.imkitmanager.model.AUIChatUserInfo
 import io.agora.imkitmanager.model.AgoraChatMessage
 import io.agora.imkitmanager.service.callback.AUIChatMsgCallback
+import io.agora.imkitmanager.ui.AUIChatInfoType
 import io.agora.imkitmanager.utils.GsonTools
 import io.agora.imkitmanager.utils.ProcessUtils
 import org.json.JSONObject
@@ -35,7 +36,7 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
     private val currentMsgList: ArrayList<AUIChatEntity> = ArrayList()
 
     init {
-        AUIChatRoomContext.shared().setCommonConfig(commonConfig)
+
         createChatClient(commonConfig.context, commonConfig.imAppKey)
     }
 
@@ -110,6 +111,7 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
      * 加入房间
      */
     fun joinChatRoom(chatRoomId: String, callback: AUIChatMsgCallback) {
+        currentMsgList.clear()
         chatLogCallback?.onDebugInfo(tag, "joinChatRoom called")
         this.chatRoomId = chatRoomId
         setOnManagerListener()
@@ -254,11 +256,11 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
      */
     fun parseMsgChatEntity(chatMessage: ChatMessage) {
         var content = ""
-        var joined = false
+        var type = AUIChatInfoType.Common
+        var customMsgType: AUICustomMsgType? = null
         val chatUser = AUIChatUserInfo()
         if (chatMessage.body is TextMessageBody) {
             content = (chatMessage.body as TextMessageBody).message
-            joined = false
             val attr = chatMessage.getStringAttribute("user", "")
             if (!attr.isNullOrEmpty()) {
                 val json = JSONObject(attr)
@@ -267,8 +269,10 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
                 chatUser.userAvatar = json.get("userAvatar") as String
             }
         } else if (chatMessage.body is CustomMessageBody) {
-            joined = true
+            type = AUIChatInfoType.Custom
             val params = (chatMessage.body as CustomMessageBody).params
+            val event = (chatMessage.body as CustomMessageBody).event()
+            customMsgType = AUICustomMsgType.fromName(event)
             val attr = params["user"]
             if (!attr.isNullOrEmpty()) {
                 val json = JSONObject(attr)
@@ -277,7 +281,14 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
                 chatUser.userAvatar = json.get("userAvatar") as String
             }
         }
-        currentMsgList.add(AUIChatEntity(chatUser = chatUser, content = content, joined = joined))
+        currentMsgList.add(
+            AUIChatEntity(
+                type = type,
+                chatUser = chatUser,
+                content = content,
+                customMsgType = customMsgType
+            )
+        )
     }
 
     fun getMsgList(): ArrayList<AUIChatEntity> {
@@ -346,32 +357,45 @@ class AUIChatManager constructor(private val commonConfig: AUIChatCommonConfig) 
         }
     }
 
-    /**
-     * 插入欢迎消息
-     * @param content
-     */
-    fun saveWelcomeMsg(name: String, content: String) {
-        currentMsgList.clear()
-        val auiChatEntity = AUIChatEntity(
-            chatUser = AUIChatUserInfo("", name, ""),
-            content = content,
-            joined = false
-        )
-        currentMsgList.add(auiChatEntity)
-    }
+//    /**
+//     * 插入欢迎消息
+//     * @param content
+//     */
+//    fun saveWelcomeMsg(name: String, content: String) {
+//        currentMsgList.clear()
+//        val auiChatEntity = AUIChatEntity(
+//            chatUser = AUIChatUserInfo("", name, ""),
+//            content = content,
+//            type = AUIChatInfoType.Common
+//        )
+//        currentMsgList.add(auiChatEntity)
+//    }
 
     /**
      * 插入本地消息
      *
+     * @param index
      * @param content
      */
-    fun insertLocalMsg(content: String) {
+    fun insertLocalMsg(index: Int, content: String) {
         val auiChatEntity = AUIChatEntity(
+            type = AUIChatInfoType.Local,
             content = content,
-            joined = false,
-            localMsg = true
         )
-        currentMsgList.add(auiChatEntity)
+        if (index == 0) {
+            val firstContent = currentMsgList.firstOrNull()?.content ?: ""
+            // 防止重复插入
+            if (firstContent.isNotEmpty() && firstContent == content) {
+                return
+            }
+            currentMsgList.add(0, auiChatEntity)
+        } else {
+            if (index >= currentMsgList.size || index < 0) {
+                currentMsgList.add(auiChatEntity)
+            } else {
+                currentMsgList.add(index, auiChatEntity)
+            }
+        }
     }
 
     /**
