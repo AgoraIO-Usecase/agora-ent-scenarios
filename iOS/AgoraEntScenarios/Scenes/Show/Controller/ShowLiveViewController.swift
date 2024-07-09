@@ -484,6 +484,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onRoomExpired(channelName: String) {
+        ShowAgoraKitManager.shared.leaveAllRoom()
+        ShowAgoraKitManager.shared.leaveChannelEx(roomId: roomId, channelId: roomId)
         onRoomFailed(channelName: channelName)
     }
     
