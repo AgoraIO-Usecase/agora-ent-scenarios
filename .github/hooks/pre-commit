@@ -10,6 +10,13 @@ PATTERNS=(
     "+IM_APP_CLIENT_SECRET="
     "+RESTFUL_API_KEY="
     "+RESTFUL_API_SECRET="
+    "static let AppId: String ="
+    "static let Certificate: String? ="
+    "static var IMAppKey: String? ="
+    "static var IMClientId: String? ="
+    "static var IMClientSecret: String? ="
+    "static let RestfulApiKey: String? ="
+    "static let RestfulApiSecret: String? ="
 )
 
 # 检查暂存区中是否有指定文件的更改
