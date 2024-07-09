@@ -116,8 +116,12 @@ class MultiBeautyDialog : BottomSheetDialog {
             RtcEngineInstance.virtualBackgroundSegmentation.modelType == SegmentationProperty.SEG_MODEL_GREEN
 
         // 美颜开关
+        controllerView.beautyOpenIsActivated = BeautyManager.enable
         controllerView.beautyOpenClickListener =
-            OnClickListener { BeautyManager.enable = !BeautyManager.enable }
+            OnClickListener {
+                BeautyManager.enable = !BeautyManager.enable
+                it.isActivated = BeautyManager.enable
+            }
 
         // 虚拟背景配置
         controllerView.pageList = ArrayList(controllerView.pageList).apply {

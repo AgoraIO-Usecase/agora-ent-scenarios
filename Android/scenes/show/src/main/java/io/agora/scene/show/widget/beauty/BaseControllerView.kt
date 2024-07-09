@@ -85,6 +85,12 @@ open class BaseControllerView : FrameLayout {
             viewBinding.ivCompare.setOnClickListener((value))
         }
 
+    var beautyOpenIsActivated: Boolean? = null
+        set(value) {
+            field = value
+            viewBinding.ivCompare.isActivated = value ?: false
+        }
+
     var onSelectedChangeListener: ((pageIndex: Int, itemIndex: Int) -> Unit)? = null
 
     constructor(context: Context) : this(context, null)
