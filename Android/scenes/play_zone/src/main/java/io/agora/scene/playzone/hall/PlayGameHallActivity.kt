@@ -24,6 +24,7 @@ import io.agora.scene.playzone.databinding.PlayZoneItemGameHeaderLayoutBinding
 import io.agora.scene.playzone.databinding.PlayZoneItemGameLayoutBinding
 import io.agora.scene.playzone.databinding.PlayZoneItemGameTypeLayoutBinding
 import io.agora.scene.playzone.live.PlayWebViewActivity
+import io.agora.scene.playzone.service.PlayChatRoomService
 import io.agora.scene.playzone.service.api.PlayGameInfoModel
 import io.agora.scene.playzone.service.api.PlayGameType
 
@@ -166,6 +167,9 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
     }
 
     override fun onDestroy() {
+        PlayChatRoomService.chatRoomService.imManagerService.logoutChat {
+            PlayChatRoomService.reset()
+        }
         super.onDestroy()
     }
 
