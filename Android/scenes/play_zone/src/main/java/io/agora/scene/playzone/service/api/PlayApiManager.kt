@@ -202,7 +202,7 @@ class PlayApiManager {
                 buildGameModel(1716668321022017537L, "蛇梯", R.drawable.play_zone_ic_st),
                 buildGameModel(1664525565526667266L, "怪物消消乐", R.drawable.play_zone_ic_gwxxl),
                 buildGameModel(1689904909564116994L, "对战消消乐", R.drawable.play_zone_ic_dzxxl),
-                buildGameModel(1734504890293981185L, "连连看", R.drawable.play_zone_ic_dzxxl),
+                buildGameModel(1734504890293981185L, "连连看", R.drawable.play_zone_ic_llk),
                 buildGameModel(1680881367829176322L, "跳一跳", R.drawable.play_zone_ic_tyt),
                 buildGameModel(1704460412809043970L, "欢乐大富翁", R.drawable.play_zone_ic_hldfw),
                 buildGameModel(1777154372100497410L, "Carrom", R.drawable.play_zone_ic_carrom),

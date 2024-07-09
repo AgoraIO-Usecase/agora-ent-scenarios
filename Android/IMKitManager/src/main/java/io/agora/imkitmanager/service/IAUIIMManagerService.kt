@@ -20,6 +20,19 @@ interface IAUIIMManagerService {
     fun unRegisterRespObserver(observer: AUIIMManagerRespObserver?)
 
     /**
+     * 插入本地消息，
+     *
+     * @param text
+     * @param index 插入位置，-1 插入尾部
+     * @param completion
+     * @receiver
+     */
+    fun insertLocalMessage(
+        text: String, index: Int,
+        completion: (chatMessage: AgoraChatTextMessage?, error: Exception?) -> Unit
+    )
+
+    /**
      * 发送聊天室消息
      *
      * @param text
@@ -28,9 +41,7 @@ interface IAUIIMManagerService {
      * @receiver
      */
     fun sendMessage(
-        text: String,
-        completion: (chatMessage: AgoraChatTextMessage?, error: Exception?) -> Unit,
-        localMsg: Boolean = false
+        text: String, completion: (chatMessage: AgoraChatTextMessage?, error: Exception?) -> Unit,
     )
 
     /**

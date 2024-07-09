@@ -121,6 +121,8 @@ class PlayRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomListLay
             isJoining = false
             if (roomInfo != null) {
                 PlayRoomGameActivity.launch(this, roomInfo)
+            } else {
+                binding.smartRefreshLayout.autoRefresh()
             }
         }
     }
@@ -133,7 +135,9 @@ class PlayRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomListLay
     }
 
     override fun onDestroy() {
-        PlayChatRoomService.chatRoomService.imManagerService.logoutChat {  }
+        PlayChatRoomService.chatRoomService.imManagerService.logoutChat {
+            PlayChatRoomService.reset()
+        }
         super.onDestroy()
     }
 
