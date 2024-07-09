@@ -8,7 +8,7 @@ final def sub_appkey = "*****************************"
 final def sub_appSecret = "*****************************"
 
 if (sub_appid.isEmpty() || sub_appkey.isEmpty()) {
-    throw new GradleException("请在 leisure:build.gradle 中配置完整的 sub_appid，sub_appkey")
+    throw new GradleException("请在 play_zone:build.gradle 中配置完整的 sub_appid，sub_appkey")
 }
 
 android {
