@@ -12,29 +12,29 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import io.agora.imkitmanager.R
-import io.agora.imkitmanager.model.AUIChatRoomContext
+import io.agora.imkitmanager.model.AUICustomMsgType
 import io.agora.imkitmanager.ui.AUIChatInfo
+import io.agora.imkitmanager.ui.AUIChatInfoType
 import io.agora.imkitmanager.ui.AUIChatListInterceptType
 
 class AUIChatListAdapter constructor(private val context: Context, typedArray: TypedArray) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var messages: ArrayList<AUIChatInfo> = ArrayList()
     private val ITEM_DEFAULT_TYPE = 0
-    private val ITEM_SYSTEM_TYPE = 1
+    private val ITEM_CUSTOM_TYPE = 1
     private val ITEM_LOCAL_TYPE = 2
     private var normalTagIcon: Int = 0
     private var normalTitleColor: Int = 0
     private var normalContentColor: Int = 0
     private var normalLayoutBackground: Int = 0
 
-    private var systemTitleColor: Int = 0
-    private var systemContentColor: Int = 0
-    private var systemEndTagIcon: Int = 0
-    private var systemLayoutBackground: Int = 0
+    private var customTitleColor: Int = 0
+    private var customContentColor: Int = 0
+    private var customEndTagIcon: Int = 0
+    private var customLayoutBackground: Int = 0
 
     private var localContentColor: Int = 0
     private var localLayoutBackground: Int = 0
@@ -64,23 +64,23 @@ class AUIChatListAdapter constructor(private val context: Context, typedArray: T
             R.drawable.aui_bg_barrage_local_shape
         )
 
-        systemTitleColor = typedArray.getColor(
-            R.styleable.AUIChatListView_aui_barrage_system_title_TextColor,
+        customTitleColor = typedArray.getColor(
+            R.styleable.AUIChatListView_aui_barrage_custom_title_TextColor,
             context.resources.getColor(R.color.aui_default_blue)
         )
 
-        systemContentColor = typedArray.getColor(
-            R.styleable.AUIChatListView_aui_barrage_system_content_TextColor,
+        customContentColor = typedArray.getColor(
+            R.styleable.AUIChatListView_aui_barrage_custom_content_TextColor,
             context.resources.getColor(R.color.aui_color_fcf0b3)
         )
 
-        systemEndTagIcon = typedArray.getResourceId(
-            R.styleable.AUIChatListView_aui_barrage_system_endIcon_resource,
+        customEndTagIcon = typedArray.getResourceId(
+            R.styleable.AUIChatListView_aui_barrage_custom_endIcon_resource,
             R.drawable.aui_icon_shaking_hand
         )
 
-        systemLayoutBackground = typedArray.getResourceId(
-            R.styleable.AUIChatListView_aui_barrage_system_layout_bg,
+        customLayoutBackground = typedArray.getResourceId(
+            R.styleable.AUIChatListView_aui_barrage_custom_layout_bg,
             R.drawable.aui_bg_barrage_system_shape
         )
 
@@ -107,32 +107,33 @@ class AUIChatListAdapter constructor(private val context: Context, typedArray: T
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        if (viewType == ITEM_DEFAULT_TYPE) {
-            return NormalViewHolder(
-                LayoutInflater.from(context).inflate(R.layout.aui_chat_list_msgs_item, parent, false)
-            )
-        } else if (viewType == ITEM_SYSTEM_TYPE) {
-            return SystemViewHolder(
-                LayoutInflater.from(context).inflate(R.layout.aui_chat_list_system_msgs_item, parent, false)
-            )
-        } else if (viewType == ITEM_LOCAL_TYPE) {
-            return LocalViewHolder(
-                LayoutInflater.from(context).inflate(R.layout.aui_chat_list_local_msgs_item, parent, false)
-            )
+        return when (viewType) {
+            ITEM_CUSTOM_TYPE -> {
+                CustomViewHolder(
+                    LayoutInflater.from(context).inflate(R.layout.aui_chat_list_custom_msgs_item, parent, false)
+                )
+            }
+
+            ITEM_LOCAL_TYPE -> {
+                LocalViewHolder(
+                    LayoutInflater.from(context).inflate(R.layout.aui_chat_list_local_msgs_item, parent, false)
+                )
+            }
+
+            else -> {
+                NormalViewHolder(
+                    LayoutInflater.from(context).inflate(R.layout.aui_chat_list_normal_msgs_item, parent, false)
+                )
+            }
         }
-        return NormalViewHolder(
-            LayoutInflater.from(context).inflate(R.layout.aui_chat_list_msgs_item, parent, false)
-        )
     }
 
     override fun getItemViewType(position: Int): Int {
         val message: AUIChatInfo = messages[position]
-        return if (message.localMsg) {
-            ITEM_LOCAL_TYPE
-        } else if (message.joined) {
-            ITEM_SYSTEM_TYPE
-        } else {
-            ITEM_DEFAULT_TYPE
+        return when (message.type) {
+            AUIChatInfoType.Local -> ITEM_LOCAL_TYPE
+            AUIChatInfoType.Custom -> ITEM_CUSTOM_TYPE
+            else -> ITEM_DEFAULT_TYPE
         }
     }
 
@@ -155,16 +156,17 @@ class AUIChatListAdapter constructor(private val context: Context, typedArray: T
                     s
                 )
             }
-        } else if (holder is SystemViewHolder) {
-            holder.rooView.setBackgroundResource(systemLayoutBackground)
-            holder.name.setTextColor(systemTitleColor)
-            holder.content.setTextColor(systemContentColor)
-            holder.icon.setImageResource(systemEndTagIcon)
+        } else if (holder is CustomViewHolder) {
+            holder.rooView.setBackgroundResource(customLayoutBackground)
+            holder.name.setTextColor(customTitleColor)
+            holder.content.setTextColor(customContentColor)
+            holder.icon.setImageResource(customEndTagIcon)
             from = message.userName
-            showSystemMsg(
-                holder.name,
-                from,
-                holder.content
+            showCustomMsg(
+                name = holder.name,
+                nickName = from,
+                content = holder.content,
+                customMsgType = message.customMsgType
             )
         } else if (holder is LocalViewHolder) {
             holder.rooView.setBackgroundResource(localLayoutBackground)
@@ -190,12 +192,16 @@ class AUIChatListAdapter constructor(private val context: Context, typedArray: T
         this.messageViewListener = messageViewListener
     }
 
-    private fun showSystemMsg(name: TextView, nickName: String, content: TextView) {
+    private fun showCustomMsg(name: TextView, nickName: String, content: TextView, customMsgType: AUICustomMsgType?) {
         val builder = StringBuilder()
         builder.append(nickName).append(" ")
         val span = SpannableString(builder.toString())
         name.text = span
-        content.text = context.getString(R.string.aui_room_system_msg_member_add)
+        if (customMsgType == AUICustomMsgType.AUIChatRoomJoinedMember) {
+            content.text = context.getString(R.string.aui_room_system_msg_member_add)
+        } else {
+            content.text = ""
+        }
     }
 
     private fun showNormalText(isOwner: Boolean, con: TextView, nickName: String, content: String) {
@@ -280,7 +286,7 @@ class AUIChatListAdapter constructor(private val context: Context, typedArray: T
         }
     }
 
-    class SystemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class CustomViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var rooView: View
         var name: TextView
         var content: TextView

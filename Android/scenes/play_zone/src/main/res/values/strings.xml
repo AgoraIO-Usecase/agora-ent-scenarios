@@ -46,7 +46,7 @@
     <string name="play_zone_join_room_failed">加入房间失败，错误：%1s</string>
 
     <string name="play_zone_system">系统</string>
-    <string name="play_zone_room_welcome">由环信IM提供消息服务能力</string>
+    <string name="play_zone_room_welcome">系统：由环信IM提供消息服务能力</string>
 
     <string-array name="play_zone_roomName_array">
         <item>和你一起看月亮</item>

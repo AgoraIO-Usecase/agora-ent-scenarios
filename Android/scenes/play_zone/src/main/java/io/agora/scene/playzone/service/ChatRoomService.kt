@@ -34,7 +34,6 @@ class PlayChatRoomService {
     }
 
 
-    val chatManager: AUIChatManager
     val imManagerService: IAUIIMManagerService
 
     init {
@@ -59,7 +58,6 @@ class PlayChatRoomService {
                 }
             }
         )
-        chatManager = AUIChatManager(chatRoomConfig)
-        imManagerService = AUIIMManagerServiceImpl(chatManager)
+        imManagerService = AUIIMManagerServiceImpl(chatRoomConfig)
     }
 }
