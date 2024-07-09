@@ -17,15 +17,6 @@
     <string name="joy_gift">礼物</string>
     <string name="joy_send_message">发送弹幕</string>
     <string name="joy_send">发送</string>
-    <string name="joy_living_host_end_title">结束游戏</string>
-    <string name="joy_living_user_end_title">结束玩法</string>
-    <string name="joy_living_host_end_content">是否退出游戏直播？</string>
-    <string name="joy_living_user_end_content">是否退出直播？</string>
-    <string name="joy_living_timeout_title">游戏超时自动退出</string>
-    <string name="joy_living_host_timeout">重新体验游戏请返回创建房间</string>
-    <string name="joy_living_abnormal_title">主播端异常</string>
-    <string name="joy_living_assistantUid_offline">需要主播端重新创建房间启动游戏</string>
-    <string name="joy_living_user_timeout">重新体验游戏请返回进入房间</string>
     <string name="joy_send_message_success">指令发送成功</string>
     <string name="joy_join_the_camp_first">请先加入阵营</string>
     <string name="joy_send_gift_success">发送礼物成功</string>
@@ -37,6 +28,13 @@
     <string name="joy_instruction_error">玩法指令错误</string>
     <string name="joy_send_gift_failed">送礼失败</string>
     <string name="joy_request_no_cloud_host">暂无可用云机</string>
+
+    <string name="joy_living_timeout_title">游戏超时自动退出</string>
+    <string name="joy_living_host_timeout">您已体验超过10分钟，当前房间已过期，请退出重新创建房间</string>
+    <string name="joy_living_user_timeout">当前房间已过期，请退出</string>
+    <string name="joy_living_destroy_content">房主已解散房间，请确认离开房间</string>
+    <string name="joy_living_abnormal_title">主播端异常</string>
+    <string name="joy_living_assistantUid_offline">需要主播端重新创建房间启动游戏</string>
 
     <string-array name="joy_gift_array">
         <item>爱心</item>
