@@ -38,13 +38,16 @@ import io.agora.rtc2.Constants
 import io.agora.rtc2.Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
 import io.agora.rtc2.Constants.VIDEO_MIRROR_MODE_DISABLED
 import io.agora.rtc2.IRtcEngineEventHandler
+import io.agora.rtc2.LeaveChannelOptions
 import io.agora.rtc2.RtcConnection
+import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_IMAGE_MODERATION
 import io.agora.rtc2.video.ContentInspectConfig.ContentInspectModule
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.AudioModeration
+import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
@@ -434,7 +437,7 @@ class LiveDetailFragment : Fragment() {
         bottomLayout.ivMusic.setOnClickListener {
             showMusicEffectDialog()
         }
-        bottomLayout.ivLinking.setOnClickListener {
+        bottomLayout.ivLinking.setOnClickListener {view ->
             // 如果是机器人
             if (mRoomInfo.isRobotRoom()) {
                 ToastUtils.showToast(context?.getString(R.string.show_tip1))
@@ -448,10 +451,13 @@ class LiveDetailFragment : Fragment() {
                 ) {
                     // 观众发视频流
                     prepareLinkingMode()
+                    view.isClickable = false
                     mService.createMicSeatApply(mRoomInfo.roomId, {
                         // success
+                        view.isClickable = true
                         mLinkDialog.setOnApplySuccess(it)
                     }) {
+                        view.isClickable = true
                         ToastUtils.showToast(
                             context?.getString(
                                 R.string.show_create_micseat_apply_error,
@@ -1682,6 +1688,20 @@ class LiveDetailFragment : Fragment() {
 
     private val eventListener = object : IRtcEngineEventHandler() {
 
+        override fun onUserJoined(uid: Int, elapsed: Int) {
+            super.onUserJoined(uid, elapsed)
+            if (uid != mAudioMxingChannel?.localUid) {
+                mRtcEngine.muteRemoteAudioStreamEx(uid, false, mMainRtcConnection)
+            }
+        }
+
+        override fun onUserOffline(uid: Int, reason: Int) {
+            super.onUserOffline(uid, reason)
+            if (uid != mAudioMxingChannel?.localUid) {
+                mRtcEngine.muteRemoteAudioStreamEx(uid, true, mMainRtcConnection)
+            }
+        }
+
         override fun onLocalVideoStateChanged(
             source: Constants.VideoSourceType?,
             state: Int,
@@ -2020,7 +2040,7 @@ class LiveDetailFragment : Fragment() {
         if (isRoomOwner) {
             mRtcEngine.stopPreview()
             mRtcEngine.leaveChannelEx(mMainRtcConnection)
-            mMediaPlayer?.destroy()
+            stopAudioMixing()
 
             if (isPKing()) {
                 mRtcEngine.leaveChannelEx(
@@ -2082,7 +2102,7 @@ class LiveDetailFragment : Fragment() {
         channelMediaOptions.clientRoleType =
             if (isRoomOwner) Constants.CLIENT_ROLE_BROADCASTER else Constants.CLIENT_ROLE_AUDIENCE
         channelMediaOptions.autoSubscribeVideo = true
-        channelMediaOptions.autoSubscribeAudio = true
+        channelMediaOptions.autoSubscribeAudio = false
         channelMediaOptions.publishCameraTrack = isRoomOwner
         channelMediaOptions.publishMicrophoneTrack = isRoomOwner
         // 如果是观众 把 ChannelMediaOptions 的 audienceLatencyLevel 设置为 AUDIENCE_LATENCY_LEVEL_LOW_LATENCY（超低延时）
@@ -2638,7 +2658,9 @@ class LiveDetailFragment : Fragment() {
     }
 
     // 播放音乐相关接口
+    private var mAudioMxingChannel: RtcConnection? = null
     private var mMediaPlayer: IMediaPlayer? = null
+    private var mAudioMixing = false
     private fun startAudioMixing(
         filePath: String,
         loopbackOnly: Boolean,
@@ -2651,25 +2673,68 @@ class LiveDetailFragment : Fragment() {
             url = filePath
             isAutoPlay = true
         })
+        adjustAudioMixingVolume(VideoSetting.getCurrBroadcastSetting().audio.audioMixingVolume)
         mediaPlayer.setLoopCount(if (cycle >= 0) 0 else Int.MAX_VALUE)
+        mAudioMixing = true
+        if (!loopbackOnly && mAudioMxingChannel == null) {
+            val uid = UserManager.getInstance().user.id.toInt() + 100000
+            val channel = RtcConnection(mRoomInfo.roomId, uid)
+            mAudioMxingChannel = channel
 
-        if (!loopbackOnly) {
             val mediaOptions = ChannelMediaOptions()
+            mediaOptions.channelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING
+            mediaOptions.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
             mediaOptions.publishMediaPlayerId = mediaPlayer.mediaPlayerId
-            // TODO: 没开启麦克风权限情况下，publishMediaPlayerAudioTrack = true 会自动停止音频播放
             mediaOptions.publishMediaPlayerAudioTrack = true
-            mRtcEngine.updateChannelMediaOptionsEx(mediaOptions, mMainRtcConnection)
+            mediaOptions.publishCameraTrack = false
+            mediaOptions.autoSubscribeAudio = false
+            mediaOptions.autoSubscribeVideo = false
+            mediaOptions.enableAudioRecordingOrPlayout = false
+
+            TokenGenerator.generateToken(channel.channelId, channel.localUid.toString(),
+                TokenGenerator.TokenGeneratorType.token007,
+                TokenGenerator.AgoraTokenType.rtc,
+                success = {
+                    ShowLogger.d("RoomListActivity", "generateToken success， uid：${channel.localUid}")
+                    if (!mAudioMixing) {
+                        return@generateToken
+                    }
+                    val ret = mRtcEngine.joinChannelEx(
+                        it,
+                        channel,
+                        mediaOptions,
+                        object : IRtcEngineEventHandler() {
+                            override fun onError(err: Int) {
+                                super.onError(err)
+                                ToastUtils.showToast("startAudioMixing joinChannelEx onError, error code: $err, ${RtcEngine.getErrorDescription(err)}")
+                            }
+                        }
+                    )
+                    if(ret != Constants.ERR_OK){
+                        ToastUtils.showToast("startAudioMixing joinChannelEx failed, error code: $ret, ${RtcEngine.getErrorDescription(ret)}")
+                    }
+                },
+                failure = {
+                    ShowLogger.e("RoomListActivity", it, "generateToken failure：$it")
+                    mAudioMxingChannel = null
+                    ToastUtils.showToast(it?.message ?: "generate token failure")
+                })
         }
     }
 
     private fun stopAudioMixing() {
+        mAudioMixing = false
+
         // 停止播放，拿到connection对应的MediaPlayer并停止释放
         mMediaPlayer?.stop()
 
         // 停止推流，使用updateChannelMediaOptionEx
-        val mediaOptions = ChannelMediaOptions()
-        mediaOptions.publishMediaPlayerAudioTrack = false
-        mRtcEngine.updateChannelMediaOptionsEx(mediaOptions, mMainRtcConnection)
+        mAudioMxingChannel?.let {
+            val options = LeaveChannelOptions()
+            options.stopMicrophoneRecording = false
+            mRtcEngine.leaveChannelEx(it, options)
+            mAudioMxingChannel = null
+        }
     }
 
     private fun adjustAudioMixingVolume(volume: Int) {
