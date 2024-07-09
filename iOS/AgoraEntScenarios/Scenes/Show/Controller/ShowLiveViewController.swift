@@ -950,6 +950,10 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
             applyAndInviteView.reloadData()
             AlertManager.show(view: applyAndInviteView, alertPostion: .bottom)
         } else {
+            if ShowRobotService.shared.isRobotOwner(ownerId: "\(roomOwnerId)") {
+                ToastView.show(text: "show_error_interaction_rejected_by_owner".show_localized)
+                return
+            }
             AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self) { granted in
                 guard granted else { return }
                 self.applyView.getAllMicSeatList(autoApply: self.role == .audience)

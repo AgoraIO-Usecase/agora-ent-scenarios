@@ -91,15 +91,7 @@ class Pure1v1CallViewController: UIViewController {
         return bar
     }()
     
-    private lazy var realTimeView: ShowRealTimeDataView = {
-        let realTimeView = ShowRealTimeDataView(isLocal: true)
-        view.addSubview(realTimeView)
-        realTimeView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(UIDevice.current.aui_SafeDistanceTop + 50)
-        }
-        return realTimeView
-    }()
+    private lazy var realTimeView = ShowRealTimeDataView(isLocal: true)
     
     deinit {
         Pure1v1Logger.info("deinit-- Pure1v1CallViewController")
@@ -133,6 +125,8 @@ class Pure1v1CallViewController: UIViewController {
         moreBtn.aui_size = CGSize(width: 32, height: 32)
         moreBtn.aui_right = view.aui_width - 15
         moreBtn.aui_centerY = roomInfoView.aui_centerY
+        
+        showRealDataView()
     }
     
     private func _resetCanvas() {
@@ -188,6 +182,14 @@ class Pure1v1CallViewController: UIViewController {
         _updateCanvas()
     }
     
+    private func showRealDataView() {
+        view.addSubview(realTimeView)
+        realTimeView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.equalTo(UIDevice.current.aui_SafeDistanceTop + 50)
+        }
+    }
+    
     @objc private func _hangupAction() {
         callApi?.hangup(remoteUserId: UInt(targetUser?.userId ?? "") ?? 0, reason: nil, completion: { err in
         })
@@ -233,11 +235,7 @@ extension Pure1v1CallViewController: ShowToolMenuViewControllerDelegate {
     }
     
     func onClickRealTimeDataButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
-        view.addSubview(realTimeView)
-        realTimeView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(UIDevice.current.aui_SafeDistanceTop + 50)
-        }
+        showRealDataView()
     }
 }
 
