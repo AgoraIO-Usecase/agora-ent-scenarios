@@ -150,13 +150,18 @@ extension ShowTo1v1ServiceImp: AUISceneRespDelegate {
             scene.leave()
         }
     }
-    func onSceneDestroy(roomId: String) {
-        ShowTo1v1Logger.info("onSceneDestroy: \(roomId)")
-        guard let model = self.roomList.filter({ $0.roomId == roomId }).first else {
+    
+    func onSceneExpire(channelName: String) {
+        onSceneDestroy(channelName: channelName)
+    }
+    
+    func onSceneDestroy(channelName: String) {
+        ShowTo1v1Logger.info("onSceneDestroy: \(channelName)")
+        guard let model = self.roomList.filter({ $0.roomId == channelName }).first else {
             return
         }
         
-        _leaveRoom(roomId: roomId, isRoomOwner: true)
+        _leaveRoom(roomId: channelName, isRoomOwner: true)
         self.listener?.onRoomDidDestroy(roomInfo: model)
     }
 }
