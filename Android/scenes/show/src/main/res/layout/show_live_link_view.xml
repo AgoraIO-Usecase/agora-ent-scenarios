@@ -6,11 +6,26 @@
     android:layout_height="163dp">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/video_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:cardCornerRadius="20dp"
-        app:cardBackgroundColor="@color/show_view" />
+        app:cardBackgroundColor="@color/show_view" >
+
+        <FrameLayout
+            android:id="@+id/video_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@mipmap/show_room_default_bg"/>
+
+        <View
+            android:id="@+id/video_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:background="@mipmap/show_room_default_bg"/>
+
+
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/userName"
@@ -27,6 +42,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:singleLine="true"
         tools:text="1212344556"
+        android:drawableEnd="@drawable/show_mic_bg"
         android:textColor="@color/white"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
