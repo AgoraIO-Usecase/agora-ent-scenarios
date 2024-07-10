@@ -42,16 +42,16 @@ def all_pods
 
 #  pod 'AgoraRtcEngine_Special_iOS', :path => 'AgoraRtcEngine_iOS.podspec'
 #  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
-  pod 'AgoraRtcEngine_Special_iOS', '4.2.6.6'
+  pod 'AgoraRtcEngine_Special_iOS', '4.3.1.133'
   
   pod 'AGResourceManager', :path => 'AgoraEntScenarios/Common/API/AGResourceManager'
-  pod 'Test_metaSDK', '1.2.1'
+  pod 'Test_metaSDK', :path => 'Test_metaSDK.podspec'
 
   pod 'CallAPI', :path => 'AgoraEntScenarios/Common/API/CallAPI'
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
-  pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
-  pod 'ShowTo1v1', :path => 'AgoraEntScenarios/Scenes/ShowTo1v1'
-  pod 'Cantata', :path => 'AgoraEntScenarios/Scenes/Cantata'
+#  pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
+#  pod 'ShowTo1v1', :path => 'AgoraEntScenarios/Scenes/ShowTo1v1'
+#  pod 'Cantata', :path => 'AgoraEntScenarios/Scenes/Cantata'
   pod 'AgoraCommon', :path => 'AgoraEntScenarios'
   #ThirdParty
 #  pod 'HWWeakTimer', '1.0'

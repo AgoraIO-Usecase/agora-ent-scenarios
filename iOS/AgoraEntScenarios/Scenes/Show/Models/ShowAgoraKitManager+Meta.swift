@@ -336,7 +336,7 @@ extension ShowAgoraKitManager {
         AGResourceManagerContext.shared.displayLogClosure = { msg in
             showLogger.info(msg, context: "AGResourceManager")
         }
-        let url = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/resource/manifest/manifestList"
+        let url = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/resource/manifest/4_2_100/manifestList"
         AGResourceManager.shared.downloadManifestList(url: url) { _ in
         } completionHandler: { fileList, err in
             completion?()
