@@ -15,7 +15,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/joy_living_host_end_title"
+        android:text="@string/exit_room"
         android:textColor="#040A25"
         android:textSize="18sp" />
 
