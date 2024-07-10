@@ -126,7 +126,7 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     
     func onClickCameraBtnAction() {
         guard isBeautyDownloaded() else { return }
-        ShowAgoraKitManager.shared.switchCamera()
+        ShowAgoraKitManager.shared.switchCamera(enableBeauty: true)
     }
     
     func onClickBeautyBtnAction() {
