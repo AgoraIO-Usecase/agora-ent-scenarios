@@ -517,7 +517,11 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     func onMicSeatApplyUpdated(channelName: String, applies: [ShowMicSeatApply]) {
         ShowLogger.info("onMicSeatApplyUpdated: \(applies.count)")
         _updateApplyMenu()
-        liveView.bottomBar.linkButton.isShowRedDot = applies.count > 0 ? true : false
+        if role == .broadcaster {
+            liveView.bottomBar.linkButton.isShowRedDot = applies.count > 0 ? true : false
+        } else {
+            liveView.bottomBar.linkButton.isShowRedDot = false
+        }
         if role == .broadcaster {
             applyAndInviteView.reloadData()
         } else {
@@ -711,7 +715,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                                                   uid: interaction.userId)
             
             liveView.bottomBar.linkButton.isSelected = true
-            liveView.bottomBar.linkButton.isShowRedDot = false
             AlertManager.hiddenView()
             if toRole == .broadcaster {
                 self.delegate?.currentUserIsOnSeat()
@@ -741,7 +744,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         case .linking:
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName)
             liveView.canvasView.canvasType = .none
-            liveView.bottomBar.linkButton.isShowRedDot = false
             liveView.bottomBar.linkButton.isSelected = false
 //            currentInteraction?.ownerMuteAudio = false
             //TODO: 这个是不是需要真正的角色，放进switchRole里？
