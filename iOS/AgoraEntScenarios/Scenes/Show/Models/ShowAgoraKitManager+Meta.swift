@@ -11,6 +11,7 @@ import AGResourceManager
 extension ShowAgoraKitManager {
     
     func registerMetaPlugin(){
+        showLogger.info("registerMetaPlugin", context: "Meta")
         // 背景分割
         let ret = engine?.setParameters("{\"rtc.video.seg_before_exts\":true}")
         showLogger.info("registerMetaPlugin setParameters ret:\(ret ?? -9999)")
@@ -21,11 +22,16 @@ extension ShowAgoraKitManager {
     }
     
     func initializeMeta(){
+        showLogger.info("initializeMeta", context: "Meta")
         engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit",extension: "metakit", key:"initialize", value:"{}")
+        if baseResourceIsLoaded {
+            loadScene()
+        }
     }
     
     //3. 等待插件注册完成后加载资源
     private func setupMetaKitEngine() {
+        showLogger.info("setupMetaKitEngine", context: "Meta")
         let metakit: MetaKitEngine = MetaKitEngine.sharedInstance()
         guard let metaView = metakit.createSceneView(UIScreen.main.bounds) else { return }
         
@@ -58,6 +64,7 @@ extension ShowAgoraKitManager {
     }
     
     private func loadScene(scenePath:String){
+        showLogger.info("loadScene: \(scenePath)", context: "Meta")
         // unity
         let info_dict = ["sceneInfo" : ["scenePath" : scenePath]] as [String : Any]
         let info_data = try? JSONSerialization.data(withJSONObject: info_dict,options: [])
@@ -67,6 +74,7 @@ extension ShowAgoraKitManager {
     }
     
     func unloadScene(){
+        showLogger.info("unloadScene", context: "Meta")
         if let metaView = self.sceneView {
             let address = unsafeBitCast(metaView, to: Int64.self)
             engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", extension: "metakit",
@@ -79,6 +87,7 @@ extension ShowAgoraKitManager {
     }
     
     func destroyScene(){
+        showLogger.info("destroyScene", context: "Meta")
         self.sceneView?.removeFromSuperview()
         self.sceneView = nil;
         self.metakit?.removeSceneView(self.sceneView)
@@ -89,6 +98,7 @@ extension ShowAgoraKitManager {
 
 extension ShowAgoraKitManager: AgoraMediaFilterEventDelegate {
     func onEvent(_ provider: String?, extension extensionStr: String?, key: String?, value: String?) {
+        showLogger.info("onEvent extension: \(provider ?? "") extensionStr: \(extensionStr ?? "") key: \(key ?? "") value: \(value ?? "")", context: "Meta")
         if (provider == "agora_video_filters_metakit" && extensionStr == "metakit") {
             guard let status = key else {
                 return
@@ -107,6 +117,7 @@ extension ShowAgoraKitManager: AgoraMediaFilterEventDelegate {
     }
     
     func onExtensionError(_ provider: String?, extension extensionStr: String?, error: Int32, message: String?) {
+        showLogger.info("onExtensionError extension: \(provider ?? "") extensionStr: \(extensionStr ?? "") error: \(error) message: \(message ?? "")", context: "Meta")
         if provider == "agora_video_filters_metakit" && extensionStr == "metakit" {
             showLogger.error("[MetaKit] onExtensionError, Code: \(error), Message: \(message ?? "")")
          }
@@ -125,6 +136,7 @@ extension ShowAgoraKitManager {
     
     //设置特效
     func setOnEffect3D(type:Effect3DType) {
+        showLogger.info("setOnEffect3D: \(type.rawValue)", context: "Meta")
         if self.metakit == nil {
             self.setupMetaKitEngine()
         }
@@ -143,6 +155,7 @@ extension ShowAgoraKitManager {
     }
     
     func setupBGVideo() {
+        showLogger.info("setupBGVideo", context: "Meta")
         // 背景特效3D需要提前准备好相应的图资源
         let bg_dict = ["mode" : "off"]
         let bg_data = try? JSONSerialization.data(withJSONObject: bg_dict, options: [.withoutEscapingSlashes])
@@ -163,6 +176,7 @@ extension ShowAgoraKitManager {
     
     // 开关特效
     func setOffEffect3D(type:Effect3DType) {
+        showLogger.info("setOffEffect3D: \(type.rawValue)", context: "Meta")
             // 关闭
         let close_dict = ["id": type.rawValue, "enable": false] as [String : Any]
         let close_data = try? JSONSerialization.data(withJSONObject: close_dict, options: [])
@@ -183,6 +197,7 @@ extension ShowAgoraKitManager {
     
     // 开关特效
     func setupBackground360(enabled:Bool) {
+        showLogger.info("setupBackground360: \(enabled)", context: "Meta")
         var bg_dict : [String : Any] = ["mode": "off"]
         var gyro_dict:  [String : String] = ["state": "off"]
         if enabled {
@@ -226,11 +241,13 @@ extension ShowAgoraKitManager {
     
     /// 开关律动
     func enableRhythm(_ enable: Bool){
+        showLogger.info("enableRhythm: \(enable)", context: "Meta")
         engine?.enableExtension(withVendor: "agora_video_filters_portrait_rhythm", extension: "portrait_rhythm", enabled: enable)
     }
     
     /// 切换律动模式
     func swithRhythm(mode: RhythmMode) {
+        showLogger.info("swithRhythm: \(mode.rawValue)", context: "Meta")
         engine?.setExtensionPropertyWithVendor("agora_video_filters_portrait_rhythm", extension: "portrait_rhythm", key: "mode", value: "\(mode.rawValue)")
         enableRhythm(true)
     }

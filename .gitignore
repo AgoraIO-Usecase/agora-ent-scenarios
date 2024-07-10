@@ -15,4 +15,5 @@ Pods
 **/build.sh
 **/FULib*/*
 **/build/*
+**/RTMLibs/*
 **/AgoraMetaKitSDK/*
