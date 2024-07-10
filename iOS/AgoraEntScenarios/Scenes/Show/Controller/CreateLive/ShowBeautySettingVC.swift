@@ -130,7 +130,7 @@ class ShowBeautySettingVC: UIViewController {
         let button = LLButton()
         button.setTitleColor(UIColor(hex: "#FFFFFF", alpha: 0.6), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 14)
-        button.setTitle(BeautyModel.beautyType.title, for: .normal)
+        button.setTitle("show_beautification_vendor_name".show_localized, for: .normal)
         button.backgroundColor = UIColor(hex: "#18191B", alpha: 0.4)
         let image = UIImage.sceneImage(name: "show_beauty_vernder_arrow_right") ?? UIImage()
         button.setImage(image, for: .normal)
@@ -147,7 +147,7 @@ class ShowBeautySettingVC: UIViewController {
         let view = ShowBeautyVenderView()
         view.onSelectedBeautyVenderClosure = { [weak self] type in
             guard let self = self else { return }
-            self.beautyVenderButton.setTitle(type.title, for: .normal)
+//            self.beautyVenderButton.setTitle(type.title, for: .normal)
             BeautyManager.shareManager.destroy(isAll: false)
             BeautyModel.beautyType = type
             ShowBeautyFaceVC.resetData()
