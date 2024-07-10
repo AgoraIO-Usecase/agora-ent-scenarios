@@ -205,7 +205,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         binding.rvMessage.adapter = mMessageAdapter
 
         binding.ivClose.setOnClickListener {
-            showEndRoomDialog()
+            showExitRoomDialog()
         }
         binding.ivMore.setOnClickListener {
             TopFunctionDialog(this).show()
@@ -437,12 +437,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
             override fun onRoomDestroy() {
                 innerRleasee()
-                showLivingEndLayout()
+                showCreatorExitDialog()
             }
 
             override fun onRoomExpire() {
                 innerRleasee()
-                showLivingEndLayout()
+                showTimeUpExitDialog()
             }
         })
 
@@ -896,7 +896,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     private fun checkCloseByEvent(x: Int, y: Int) {
         if (::mCloseRect.isInitialized) {
             if (x >= mCloseRect.left && x <= mCloseRect.right && y >= mCloseRect.top && y <= mCloseRect.bottom) {
-                showEndRoomDialog()
+                showExitRoomDialog()
             }
         }
     }
@@ -913,7 +913,21 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         dialog.show(supportFragmentManager, "rulesDialog")
     }
 
-    private fun showLivingEndLayout() {
+    // 房主销毁房间
+    private fun showCreatorExitDialog() {
+        AlertDialog.Builder(this, R.style.joy_alert_dialog)
+            .setTitle("")
+            .setMessage(R.string.joy_living_destroy_content)
+            .setCancelable(false)
+            .setPositiveButton(R.string.i_know) { dialog, _ ->
+                dialog.dismiss()
+                finish()
+            }
+            .show()
+    }
+
+    // 房间超时
+    private fun showTimeUpExitDialog() {
         val message = if (mIsRoomOwner) R.string.joy_living_host_timeout else R.string.joy_living_user_timeout
         AlertDialog.Builder(this, R.style.joy_alert_dialog)
             .setTitle(R.string.joy_living_timeout_title)
@@ -926,6 +940,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             .show()
     }
 
+    // 远端机器人退出
     private fun showAssistantUidOffline() {
         AlertDialog.Builder(this, R.style.joy_alert_dialog)
             .setTitle(R.string.joy_living_abnormal_title)
@@ -938,9 +953,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             .show()
     }
 
-    private fun showEndRoomDialog() {
-        val title = if (mIsRoomOwner) R.string.joy_living_host_end_title else R.string.joy_living_user_end_title
-        val message = if (mIsRoomOwner) R.string.joy_living_host_end_content else R.string.joy_living_user_end_content
+    // 退出房间提示
+    private fun showExitRoomDialog() {
+        val title =
+            if (mIsRoomOwner) io.agora.scene.widget.R.string.dismiss_room else io.agora.scene.widget.R.string.exit_room
+        val message =
+            if (mIsRoomOwner) io.agora.scene.widget.R.string.confirm_to_dismiss_room else io.agora.scene.widget.R.string.confirm_to_exit_room
         AlertDialog.Builder(this, R.style.joy_alert_dialog)
             .setTitle(title)
             .setMessage(message)
@@ -954,7 +972,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             }
             .show()
     }
-
     private fun exitRoom() {
         mJoyService.leaveRoom { e: Exception? ->
             if (e == null) { // success
@@ -971,7 +988,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     override fun onBackPressed() {
         if (showNormalInputLayout()) return
-        showEndRoomDialog()
+        showExitRoomDialog()
     }
 
     private fun innerRleasee() {
