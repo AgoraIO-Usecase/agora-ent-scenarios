@@ -3,7 +3,6 @@ package io.agora.rtmsyncmanager.service.rtm
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import io.agora.rtm.ErrorInfo
 import io.agora.rtm.JoinChannelOptions
 import io.agora.rtm.MetadataItem
@@ -761,8 +760,8 @@ class AUIRtmManager constructor(
 
     fun markReceiptFinished(uniqueId: String, error: AUIRtmException? ) {
         receiptTimeoutRun.remove(uniqueId)?.let {
-            it.closure.invoke(error)
             receiptHandler.removeCallbacks(it.runnable)
+            it.closure.invoke(error)
         }
     }
 

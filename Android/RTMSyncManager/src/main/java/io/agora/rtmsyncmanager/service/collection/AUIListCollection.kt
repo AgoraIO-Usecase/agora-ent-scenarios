@@ -714,7 +714,11 @@ class AUIListCollection(
                 rtmManager.markReceiptFinished(
                     uniqueId, AUIRtmException(
                         code,
-                        fromValue(code)!!.message,
+                        if (fromValue(code)?.value != AUICollectionException.ErrorCode.unknown.value) {
+                            fromValue(code)?.message ?: reason
+                        } else {
+                            reason
+                        },
                         "receipt message from arbiter"
                     )
                 )
