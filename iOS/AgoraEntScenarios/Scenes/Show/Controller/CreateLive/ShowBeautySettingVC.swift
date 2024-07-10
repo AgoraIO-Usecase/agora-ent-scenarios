@@ -74,12 +74,10 @@ class ShowBeautySettingVC: UIViewController {
     // 对比按钮
     private lazy var compareButton: UIButton = {
         let compareButton = UIButton(type: .custom)
-        compareButton.setImage(UIImage.show_sceneImage(name: "show_beauty_compare"), for: .selected)
-        if #available(iOS 13.0, *) {
-            compareButton.setImage(UIImage.show_sceneImage(name: "show_beauty_compare")?
-                                    .withTintColor(.show_zi03,
-                                                   renderingMode: .alwaysOriginal), for: .normal)
-        }
+        compareButton.setImage(UIImage.show_sceneImage(name: "show_beauty_compare"), for: .normal)
+        compareButton.setImage(UIImage.show_sceneImage(name: "show_beauty_compare")?
+                                .withTintColor(.show_zi03,
+                                               renderingMode: .alwaysOriginal), for: .selected)
         compareButton.addTarget(self, action: #selector(didClickCompareButton(sender:)), for: .touchUpInside)
         compareButton.backgroundColor = UIColor(hex: "#000000", alpha: 0.25)
         compareButton.isSelected = BeautyManager.shareManager.isEnableBeauty
