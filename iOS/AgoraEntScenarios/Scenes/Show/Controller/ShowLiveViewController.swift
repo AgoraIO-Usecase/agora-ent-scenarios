@@ -99,6 +99,10 @@ class ShowLiveViewController: UIViewController {
             VLUserCenter.user.id
         }
     }
+    
+    private var isPublishCameraStream: Bool {
+        return role == .broadcaster || currentInteraction?.userId == VLUserCenter.user.id
+    }
 
     private var role: AgoraClientRole {
         return room?.ownerId == VLUserCenter.user.id ? .broadcaster : .audience
@@ -697,14 +701,11 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             
             //TODO: 这个是不是需要真正的角色，放进switchRole里？
             if role == .audience {
-                //只有连麦观众才需要改，主播原则上保持原先的mute状态
-                self.muteLocalVideo = false
-                self.muteLocalAudio = false
                 ShowAgoraKitManager.shared.setPVCon(true)
                 ShowAgoraKitManager.shared.setSuperResolutionOn(false)
             }
             //如果是连麦双方为broadcaster，观众不修改，因为观众可能已经申请上麦，申请时已经修改了角色并提前推流
-            let toRole: AgoraClientRole? = (role == .broadcaster || interaction.userId == VLUserCenter.user.id) ? .broadcaster : nil
+            let toRole: AgoraClientRole? = isPublishCameraStream ? .broadcaster : nil
             ShowAgoraKitManager.shared.updateLiveView(role: toRole,
                                                       channelId: roomId,
                                                       uid: interaction.userId,
@@ -721,12 +722,16 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 // 创建默认美颜效果
                 ShowBeautyFaceVC.beautyData.forEach({
                     BeautyManager.shareManager.setBeauty(path: $0.path,
-                                                             key: $0.key,
-                                                             value: $0.value)
+                                                         key: $0.key,
+                                                         value: $0.value)
                 })
             }
         default:
             break
+        }
+        if isPublishCameraStream {
+            self.muteLocalVideo = false
+            self.muteLocalAudio = false
         }
     }
     
@@ -903,7 +908,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     
     func onClickRemoteCanvas() {
         guard let info = currentInteraction else { return }
-        guard room?.ownerId == VLUserCenter.user.id || info.userId == VLUserCenter.user.id else { return }
+        guard isPublishCameraStream else { return }
         let title = info.type == .linking ?
         "show_seat_with_audience_end_seat_title".show_localized
         : "show_pking_with_broadcastor_end_pk_title".show_localized
