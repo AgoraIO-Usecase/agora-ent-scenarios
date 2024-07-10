@@ -882,6 +882,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
 }
 
+//MARK: ShowRoomLiveViewDelegate
 extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onPKDidTimeout() {
         guard let _ = currentInteraction else { return }
@@ -995,7 +996,6 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
 }
 
 extension ShowLiveViewController {
-    
     private func throttleRefreshRealTimeInfo() {
         ShowThrottler.throttle(delay: .seconds(1)) { [weak self] in
             guard let `self` = self else {
@@ -1037,7 +1037,6 @@ extension ShowLiveViewController {
 }
 
 extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
-    
     // 开关摄像头
     func onClickCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self) { granted in
@@ -1079,6 +1078,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
         onClickMicButtonSelected(menu, selected)
     }
     
+    // 实时数据
     func onClickRealTimeDataButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         view.addSubview(realTimeView)
         realTimeView.snp.makeConstraints { make in
@@ -1087,13 +1087,15 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
         }
     }
     
+    // 翻转镜头
     func onClickSwitchCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self) { granted in
             guard granted else { return }
-            ShowAgoraKitManager.shared.switchCamera(self.roomId)
+            ShowAgoraKitManager.shared.switchCamera()
         }
     }
     
+    // 高级设置
     func onClickSettingButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         settingMenuVC.dismiss(animated: true) {[weak self] in
             guard let wSelf = self else { return }
