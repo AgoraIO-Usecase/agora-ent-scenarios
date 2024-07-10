@@ -297,8 +297,12 @@ class ShowAgoraKitManager: NSObject {
     }
     
     /// 切换摄像头
-    func switchCamera(_ channelId: String? = nil) {
-        BeautyManager.shareManager.beautyAPI.switchCamera()
+    func switchCamera(enableBeauty: Bool) {
+        if enableBeauty {
+            BeautyManager.shareManager.beautyAPI.switchCamera()
+        } else {
+            engine?.switchCamera()
+        }
     }
     
     /// 开启虚化背景

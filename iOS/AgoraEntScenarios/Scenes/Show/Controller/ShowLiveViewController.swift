@@ -1091,7 +1091,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     func onClickSwitchCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self) { granted in
             guard granted else { return }
-            ShowAgoraKitManager.shared.switchCamera()
+            ShowAgoraKitManager.shared.switchCamera(enableBeauty: self.role == .broadcaster)
         }
     }
     
