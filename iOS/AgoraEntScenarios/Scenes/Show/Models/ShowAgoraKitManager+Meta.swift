@@ -344,7 +344,7 @@ extension ShowAgoraKitManager {
         }
         if baseResourceIsLoaded {
             guard let file = baseResourceFile else {return}
-            let path = AGResourceManager.shared.getFolderPath(resource: file)
+            let path = AGResourceManager.shared.getFolderPath(resource: file) + "/DefaultPackage"
             loadScene(scenePath: path)
         }
     }
