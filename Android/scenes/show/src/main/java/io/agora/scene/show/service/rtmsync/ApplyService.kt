@@ -98,11 +98,6 @@ class ApplyService(
                 )
             }
 
-            if (interactionInfo != null && interactionInfo.type != InteractionType.IDLE) {
-                return@subscribeWillAdd AUICollectionException.ErrorCode.unknown.toException(
-                    msg = "interaction is not idle"
-                )
-            }
             return@subscribeWillAdd null
         }
         collection?.subscribeWillRemove { publisherId, valueCmd, value ->
