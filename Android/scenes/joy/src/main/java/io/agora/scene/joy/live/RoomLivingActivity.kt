@@ -205,7 +205,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         binding.rvMessage.adapter = mMessageAdapter
 
         binding.ivClose.setOnClickListener {
-            showEndRoomDialog()
+            showExitRoomDialog()
         }
         binding.ivMore.setOnClickListener {
             TopFunctionDialog(this).show()
@@ -437,12 +437,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
             override fun onRoomDestroy() {
                 innerRleasee()
-                showLivingEndLayout(false)
+                showCreatorExitDialog()
             }
 
             override fun onRoomExpire() {
                 innerRleasee()
-                showLivingEndLayout(false)
+                showTimeUpExitDialog()
             }
         })
 
@@ -469,7 +469,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 }
 
                 DataState.STATE_SUCCESS -> {
-                    hideLoadingView()
+
                     val mTaskId = it.data?.taskId ?: return@observe
                     val gameSelect = mGameChooseGameDialog?.mSelectGame ?: return@observe
                     mGameChooseGameDialog?.let { dialog ->
@@ -659,7 +659,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                     if (uid == mStartGameInfo?.assistantUid) {
                         // todo 远端游戏退出
                         innerRleasee()
-                        showLivingEndLayout(true)
+                        showAssistantUidOffline()
                     }
                 }
             }
@@ -687,6 +687,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             override fun onFirstRemoteVideoFrame(uid: Int, width: Int, height: Int, elapsed: Int) {
                 super.onFirstRemoteVideoFrame(uid, width, height, elapsed)
                 Log.d(TAG, "rtc onFirstRemoteVideoFrame uid:$uid")
+                if (uid == mStartGameInfo?.assistantUid) {
+                    // 回调云机器第一帧画面在隐藏loading
+                    hideLoadingView()
+                }
             }
 
             override fun onError(err: Int) {
@@ -893,7 +897,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     private fun checkCloseByEvent(x: Int, y: Int) {
         if (::mCloseRect.isInitialized) {
             if (x >= mCloseRect.left && x <= mCloseRect.right && y >= mCloseRect.top && y <= mCloseRect.bottom) {
-                showEndRoomDialog()
+                showExitRoomDialog()
             }
         }
     }
@@ -910,11 +914,24 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         dialog.show(supportFragmentManager, "rulesDialog")
     }
 
-    private fun showLivingEndLayout(abnormal: Boolean) {
-        val title = if (abnormal) R.string.joy_living_abnormal_title else R.string.joy_living_timeout_title
+    // 房主销毁房间
+    private fun showCreatorExitDialog() {
+        AlertDialog.Builder(this, R.style.joy_alert_dialog)
+            .setTitle("")
+            .setMessage(R.string.joy_living_destroy_content)
+            .setCancelable(false)
+            .setPositiveButton(R.string.i_know) { dialog, _ ->
+                dialog.dismiss()
+                finish()
+            }
+            .show()
+    }
+
+    // 房间超时
+    private fun showTimeUpExitDialog() {
         val message = if (mIsRoomOwner) R.string.joy_living_host_timeout else R.string.joy_living_user_timeout
         AlertDialog.Builder(this, R.style.joy_alert_dialog)
-            .setTitle(title)
+            .setTitle(R.string.joy_living_timeout_title)
             .setMessage(message)
             .setCancelable(false)
             .setPositiveButton(R.string.i_know) { dialog, _ ->
@@ -924,9 +941,25 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             .show()
     }
 
-    private fun showEndRoomDialog() {
-        val title = if (mIsRoomOwner) R.string.joy_living_host_end_title else R.string.joy_living_user_end_title
-        val message = if (mIsRoomOwner) R.string.joy_living_host_end_content else R.string.joy_living_user_end_content
+    // 远端机器人退出
+    private fun showAssistantUidOffline() {
+        AlertDialog.Builder(this, R.style.joy_alert_dialog)
+            .setTitle(R.string.joy_living_abnormal_title)
+            .setMessage(R.string.joy_living_assistantUid_offline)
+            .setCancelable(false)
+            .setPositiveButton(R.string.i_know) { dialog, _ ->
+                dialog.dismiss()
+                finish()
+            }
+            .show()
+    }
+
+    // 退出房间提示
+    private fun showExitRoomDialog() {
+        val title =
+            if (mIsRoomOwner) io.agora.scene.widget.R.string.dismiss_room else io.agora.scene.widget.R.string.exit_room
+        val message =
+            if (mIsRoomOwner) io.agora.scene.widget.R.string.confirm_to_dismiss_room else io.agora.scene.widget.R.string.confirm_to_exit_room
         AlertDialog.Builder(this, R.style.joy_alert_dialog)
             .setTitle(title)
             .setMessage(message)
@@ -957,7 +990,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     override fun onBackPressed() {
         if (showNormalInputLayout()) return
-        showEndRoomDialog()
+        showExitRoomDialog()
     }
 
     private fun innerRleasee() {

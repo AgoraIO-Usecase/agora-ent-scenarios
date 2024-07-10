@@ -12,6 +12,7 @@ import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserRespObserver
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ObservableHelper
+import io.agora.scene.base.utils.TimeUtils
 
 class InteractionService(
     private val channelName: String,
@@ -129,7 +130,7 @@ class InteractionService(
                         )
                     }
                     InteractionCmd.STOP.value -> {
-                        if(currInfo?.userId == newInfo?.userId || AUIRoomContext.shared().isRoomOwner(channelName, newInfo?.userId)){
+                        if(currInfo?.userId == publisherId || AUIRoomContext.shared().isRoomOwner(channelName, newInfo?.userId)){
                             return@subscribeWillAdd null
                         }
                         return@subscribeWillAdd AUICollectionException.ErrorCode.unknown.toException(
@@ -355,6 +356,7 @@ data class InteractionInfo constructor(
     val userId: String = "", // 互动者ID
     val userName: String = "", // 互动者用户名
     val roomId: String = "", // 互动者所在房间ID
+    val createdAt: Double = TimeUtils.currentTimeMillis().toDouble()
 )
 
 enum class InteractionCmd(val value: String) {

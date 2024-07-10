@@ -85,6 +85,12 @@ open class BaseControllerView : FrameLayout {
             viewBinding.ivCompare.setOnClickListener((value))
         }
 
+    var beautyOpenIsActivated: Boolean? = null
+        set(value) {
+            field = value
+            viewBinding.ivCompare.isActivated = value ?: false
+        }
+
     var onSelectedChangeListener: ((pageIndex: Int, itemIndex: Int) -> Unit)? = null
 
     constructor(context: Context) : this(context, null)
@@ -201,6 +207,17 @@ open class BaseControllerView : FrameLayout {
             itemInfo.onValueChanged.invoke(value)
         }
         onSelectedChangeListener?.invoke(pageIndex, itemIndex)
+    }
+
+    fun updateItemInfo(updater: (itemInfo: ItemInfo) -> Boolean) {
+        pageList.forEach { pageInfo ->
+            pageInfo.itemList.forEach { itemInfo ->
+                if (updater(itemInfo)) {
+                    itemInfo.onValueChanged.invoke(itemInfo.value)
+                    return
+                }
+            }
+        }
     }
 
     data class PageInfo(

@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# 指定要查找的文件名和模式
+FILES_TO_CHECK=("gradle.properties" "KeyCenter.swift")
+PATTERNS=(
+    "+AGORA_APP_ID=" 
+    "+AGORA_APP_CERTIFICATE=" 
+    "+IM_APP_KEY="
+    "+IM_APP_CLIENT_ID="
+    "+IM_APP_CLIENT_SECRET="
+    "+RESTFUL_API_KEY="
+    "+RESTFUL_API_SECRET="
+    "static let AppId: String ="
+    "static let Certificate: String? ="
+    "static var IMAppKey: String? ="
+    "static var IMClientId: String? ="
+    "static var IMClientSecret: String? ="
+    "static let RestfulApiKey: String? ="
+    "static let RestfulApiSecret: String? ="
+)
+
+# 检查暂存区中是否有指定文件的更改
+for file_name in "${FILES_TO_CHECK[@]}"; do
+    changed=$(git diff --cached --name-only --diff-filter=ACM | grep "$file_name")
+
+    if [[ -n $changed ]]; then
+        # 如果文件被更改，检查是否包含特定模式
+        for pattern in "${PATTERNS[@]}"; do
+            pattern_diff=$(git diff --cached -- "$changed" | grep "$pattern")
+            if [[ -n $pattern_diff ]]; then
+                echo -e "\033[31m Pattern diff: $pattern_diff \033[0m"
+                echo -e "\033[31m Error: Committing keys and secrets is not allowed. \033[0m"
+                echo -e "\033[31m The file '$changed' contains changes with the pattern '$pattern'. \033[0m"
+                exit 1
+            fi
+        done
+    fi
+done
+
+exit 0

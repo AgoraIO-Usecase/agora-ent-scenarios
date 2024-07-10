@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Looper
-import android.os.SystemClock
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.Log
@@ -29,6 +28,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import io.agora.audioscenarioapi.AudioScenarioApi
+import io.agora.audioscenarioapi.AudioScenarioType
+import io.agora.audioscenarioapi.SceneType
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.data.MediaPlayerSource
 import io.agora.rtc2.ChannelMediaOptions
@@ -36,20 +38,20 @@ import io.agora.rtc2.Constants
 import io.agora.rtc2.Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
 import io.agora.rtc2.Constants.VIDEO_MIRROR_MODE_DISABLED
 import io.agora.rtc2.IRtcEngineEventHandler
+import io.agora.rtc2.LeaveChannelOptions
 import io.agora.rtc2.RtcConnection
+import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_IMAGE_MODERATION
 import io.agora.rtc2.video.ContentInspectConfig.ContentInspectModule
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.AudioModeration
+import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.audioscenarioapi.AudioScenarioApi
-import io.agora.audioscenarioapi.AudioScenarioType
-import io.agora.audioscenarioapi.SceneType
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLiveDetailFragmentBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
@@ -184,6 +186,10 @@ class LiveDetailFragment : Fragment() {
 
     private var mMicInvitationDialog: AlertDialog?= null
     private var mPKInvitationDialog: AlertDialog?= null
+
+    private var mPKEventHandler: IRtcEngineEventHandler? = null
+
+    private val mUserMuteAudioStateMap = mutableMapOf<Int, Boolean>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -431,13 +437,12 @@ class LiveDetailFragment : Fragment() {
         bottomLayout.ivMusic.setOnClickListener {
             showMusicEffectDialog()
         }
-        bottomLayout.ivLinking.setOnClickListener {
+        bottomLayout.ivLinking.setOnClickListener {view ->
             // 如果是机器人
             if (mRoomInfo.isRobotRoom()) {
                 ToastUtils.showToast(context?.getString(R.string.show_tip1))
                 return@setOnClickListener
             }
-            bottomLayout.vLinkingDot.isVisible = false
             if (!isRoomOwner) {
                 // 观众发送连麦申请
                 if (interactionInfo == null
@@ -446,10 +451,13 @@ class LiveDetailFragment : Fragment() {
                 ) {
                     // 观众发视频流
                     prepareLinkingMode()
+                    view.isClickable = false
                     mService.createMicSeatApply(mRoomInfo.roomId, {
                         // success
+                        view.isClickable = true
                         mLinkDialog.setOnApplySuccess(it)
                     }) {
+                        view.isClickable = true
                         ToastUtils.showToast(
                             context?.getString(
                                 R.string.show_create_micseat_apply_error,
@@ -500,8 +508,11 @@ class LiveDetailFragment : Fragment() {
     private fun refreshBottomLayout() {
         val context = context ?: return
         val bottomLayout = mBinding.bottomLayout
+        bottomLayout.flLinking.isVisible = true
+
         if (isRoomOwner) {
             // 房主
+            bottomLayout.flPK.isVisible = true
 
             // 房主都能控制视频
             bottomLayout.ivSetting.isVisible = true
@@ -511,14 +522,10 @@ class LiveDetailFragment : Fragment() {
             if (isPKing()) {
                 // PK状态
                 // 房主一定是PK的一方
-                bottomLayout.ivLinking.isEnabled = false
-                bottomLayout.flPK.isEnabled = true
-                bottomLayout.flPK.isVisible = true
+
             } else if (isLinking()) {
                 // 连麦状态
                 // 房主一定是连麦的一方
-                bottomLayout.flPK.isEnabled = false
-                bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList = null
                 mSettingDialog.apply {
                     resetSettingsItem(false)
@@ -526,10 +533,6 @@ class LiveDetailFragment : Fragment() {
             } else {
                 // 单主播状态
                 // 房主是主播
-                bottomLayout.flPK.isEnabled = true
-                bottomLayout.ivLinking.isEnabled = true
-                bottomLayout.flPK.isVisible = true
-                bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList =
                     ColorStateList.valueOf(context.resources.getColor(R.color.grey_7e))
                 mSettingDialog.apply {
@@ -544,13 +547,11 @@ class LiveDetailFragment : Fragment() {
             // 观众没有PK权限
             bottomLayout.flPK.isVisible = false
 
-
             if (isPKing()) {
                 // PK状态
                 // PK是房主和房主的事，和观众无关，观众只能看，同时无法再连麦
                 bottomLayout.ivMusic.isVisible = false
                 bottomLayout.ivBeauty.isVisible = false
-                bottomLayout.flLinking.isVisible = false
             } else if (isLinking()) {
                 // 连麦状态
                 if (isMeLinking()) {
@@ -558,13 +559,11 @@ class LiveDetailFragment : Fragment() {
                     bottomLayout.ivMusic.isVisible = false
                     bottomLayout.ivBeauty.isVisible = false
 
-                    bottomLayout.flLinking.isVisible = true
                     bottomLayout.ivLinking.imageTintList = null
                 } else {
                     // 只是观看者，不参与连麦
                     bottomLayout.ivMusic.isVisible = false
                     bottomLayout.ivBeauty.isVisible = false
-                    bottomLayout.flLinking.isVisible = false
                 }
             } else {
                 // 单主播状态
@@ -572,7 +571,6 @@ class LiveDetailFragment : Fragment() {
                 bottomLayout.ivMusic.isVisible = false
                 bottomLayout.ivBeauty.isVisible = false
 
-                bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList =
                     ColorStateList.valueOf(context.resources.getColor(R.color.grey_7e))
             }
@@ -849,10 +847,10 @@ class LiveDetailFragment : Fragment() {
                 mPKCountDownLatch = null
             }
             mPKCountDownLatch =
-                object : CountDownTimer(ShowServiceProtocol.PK_AVAILABLE_DURATION - 1, 1000) {
+                object : CountDownTimer((ShowServiceProtocol.PK_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - interactionInfo!!.createdAt)).toLong(), 1000) {
                     override fun onTick(millisUntilFinished: Long) {
                         val min: Long = (millisUntilFinished / 1000) / 60
-                        val sec: Long = (millisUntilFinished / 1000) % 60
+                        val sec: Long = (millisUntilFinished / 1000) % 60 + 1
                         activity ?: return
                         mBinding.videoPKLayout.iPKTimeText.text =
                             getString(
@@ -1420,15 +1418,15 @@ class LiveDetailFragment : Fragment() {
 
     private fun enableComeBackSoonView(enable: Boolean) {
         if (isPKing()) {
-            // TODO
+            mBinding.videoPKLayout.iBroadcasterAViewOverlay.isVisible = enable
         } else {
             mBinding.livingComeSoonLayout.root.isVisible = enable
             if (enable) {
-                mBinding.topLayout.root.bringToFront()
-                mBinding.bottomLayout.root.bringToFront()
                 if (isLinking()) {
                     mBinding.videoLinkingAudienceLayout.root.bringToFront()
                 }
+                mBinding.topLayout.root.bringToFront()
+                mBinding.bottomLayout.root.bringToFront()
             }
         }
     }
@@ -1493,11 +1491,7 @@ class LiveDetailFragment : Fragment() {
         mService.subscribeUser(mRoomInfo.roomId) { status, user ->
             reFetchUserList()
 
-            if (status == ShowSubscribeStatus.updated) {
-                if (interactionInfo?.interactStatus == ShowInteractionStatus.linking && interactionInfo?.userId == user?.userId) {
-                    mBinding.videoLinkingAudienceLayout.userName.isActivated = !(user?.muteAudio ?: false)
-                }
-            } else if (status == ShowSubscribeStatus.added && user != null) {
+            if (status == ShowSubscribeStatus.added && user != null) {
                 insertMessageItem(
                     ShowMessage(
                         user.userId,
@@ -1519,9 +1513,7 @@ class LiveDetailFragment : Fragment() {
             insertMessageItem(showMessage)
         }
         mService.subscribeMicSeatApply(mRoomInfo.roomId) { _, list ->
-            if (isRoomOwner) {
-                mBinding.bottomLayout.vLinkingDot.isVisible = list.isNotEmpty() || isMeLinking()
-            }
+            mBinding.bottomLayout.vLinkingDot.isVisible = list.isNotEmpty()
             mLinkDialog.setSeatApplyList(interactionInfo, list)
         }
         mService.subscribeInteractionChanged(mRoomInfo.roomId) { status, info ->
@@ -1586,6 +1578,7 @@ class LiveDetailFragment : Fragment() {
                     updateLinkingMode()
                 } else if (interactionInfo.interactStatus == ShowInteractionStatus.pking) {
                     updatePKingMode()
+                    refreshPKTimeCount()
                 }
             } else {
                 refreshViewDetailLayout(ShowInteractionStatus.idle)
@@ -1694,10 +1687,18 @@ class LiveDetailFragment : Fragment() {
     //================== RTC Operation ===================
 
     private val eventListener = object : IRtcEngineEventHandler() {
+
+        override fun onUserJoined(uid: Int, elapsed: Int) {
+            super.onUserJoined(uid, elapsed)
+            if (uid != mAudioMxingChannel?.localUid) {
+                mRtcEngine.muteRemoteAudioStreamEx(uid, false, mMainRtcConnection)
+            }
+        }
+
         override fun onUserOffline(uid: Int, reason: Int) {
             super.onUserOffline(uid, reason)
-            if (interactionInfo != null && interactionInfo!!.userId == uid.toString() && interactionInfo!!.interactStatus == ShowInteractionStatus.pking) {
-                mService.stopInteraction(mRoomInfo.roomId)
+            if (uid != mAudioMxingChannel?.localUid) {
+                mRtcEngine.muteRemoteAudioStreamEx(uid, true, mMainRtcConnection)
             }
         }
 
@@ -1707,6 +1708,7 @@ class LiveDetailFragment : Fragment() {
             error: Int
         ) {
             super.onLocalVideoStateChanged(source, state, error)
+            ShowLogger.d(TAG, "onLocalVideoStateChanged: $state")
             if (isRoomOwner) {
                 isAudioOnlyMode = state == Constants.LOCAL_VIDEO_STREAM_STATE_STOPPED
             }
@@ -1719,6 +1721,7 @@ class LiveDetailFragment : Fragment() {
             elapsed: Int
         ) {
             super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
+            ShowLogger.d(TAG, "onRemoteVideoStateChanged: uid=$uid, state=$state, reason=$reason")
             if (uid == mRoomInfo.ownerId.toInt()) {
                 isAudioOnlyMode = state == Constants.REMOTE_VIDEO_STATE_STOPPED
 
@@ -1728,6 +1731,71 @@ class LiveDetailFragment : Fragment() {
                     } else if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED) {
                         enableComeBackSoonView(false)
                     }
+                }
+            } else if (isLinking() && uid == interactionInfo?.userId?.toInt()) {
+                runOnUiThread {
+                    if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_MUTED) {
+                        mBinding.videoLinkingAudienceLayout.videoOverlay.isVisible = true
+                    } else if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED) {
+                        mBinding.videoLinkingAudienceLayout.videoOverlay.isVisible = false
+                    }
+                }
+            }
+        }
+
+        override fun onLocalAudioStateChanged(state: Int, reason: Int) {
+            super.onLocalAudioStateChanged(state, reason)
+            ShowLogger.d(TAG, "onLocalAudioStateChanged: state=$state, reason=$reason")
+            runOnUiThread {
+                if (state == Constants.LOCAL_AUDIO_STREAM_STATE_STOPPED) {
+                    if (isMeLinking()) {
+                        mBinding.videoLinkingAudienceLayout.userName.isActivated = false
+                    }
+                    mBinding.videoPKLayout.userNameA.isActivated = false
+                } else if (state == Constants.LOCAL_AUDIO_STREAM_STATE_ENCODING) {
+                    if (isMeLinking()) {
+                        mBinding.videoLinkingAudienceLayout.userName.isActivated = true
+                    }
+                    mBinding.videoPKLayout.userNameA.isActivated = true
+                }
+            }
+        }
+
+        override fun onAudioPublishStateChanged(
+            channel: String?,
+            oldState: Int,
+            newState: Int,
+            elapseSinceLastState: Int
+        ) {
+            super.onAudioPublishStateChanged(channel, oldState, newState, elapseSinceLastState)
+            ShowLogger.d(TAG, "onAudioPublishStateChanged: channel=$channel, oldState=$oldState, newState=$newState, elapseSinceLastState=$elapseSinceLastState")
+            runOnUiThread {
+                if (newState == 1) {
+                    if (isMeLinking()) {
+                        mBinding.videoLinkingAudienceLayout.userName.isActivated = false
+                    }
+                    mBinding.videoPKLayout.userNameA.isActivated = false
+                } else if (newState == 3) {
+                    if (isMeLinking()) {
+                        mBinding.videoLinkingAudienceLayout.userName.isActivated = true
+                    }
+                    mBinding.videoPKLayout.userNameA.isActivated = true
+                }
+            }
+        }
+
+        override fun onRemoteAudioStateChanged(uid: Int, state: Int, reason: Int, elapsed: Int) {
+            super.onRemoteAudioStateChanged(uid, state, reason, elapsed)
+            ShowLogger.d(TAG, "onRemoteAudioStateChanged: uid=$uid, state=$state, reason=$reason")
+            val unmute = state == Constants.REMOTE_AUDIO_STATE_DECODING
+            mUserMuteAudioStateMap[uid] = !unmute
+            if (isLinking() && uid == interactionInfo?.userId?.toInt()) {
+                runOnUiThread {
+                    mBinding.videoLinkingAudienceLayout.userName.isActivated = unmute
+                }
+            } else if (isPKing()) {
+                runOnUiThread {
+                    mBinding.videoPKLayout.userNameA.isActivated = unmute
                 }
             }
         }
@@ -1972,7 +2040,7 @@ class LiveDetailFragment : Fragment() {
         if (isRoomOwner) {
             mRtcEngine.stopPreview()
             mRtcEngine.leaveChannelEx(mMainRtcConnection)
-            mMediaPlayer?.destroy()
+            stopAudioMixing()
 
             if (isPKing()) {
                 mRtcEngine.leaveChannelEx(
@@ -1986,6 +2054,12 @@ class LiveDetailFragment : Fragment() {
             mRtcEngine.setAudioEffectPreset(Constants.AUDIO_EFFECT_OFF)
         } else {
             mRtcEngine.removeHandlerEx(eventListener, mMainRtcConnection)
+            if(isPKing()){
+                mPKEventHandler?.let {
+                    mRtcEngine.removeHandlerEx(it, RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()))
+                    mPKEventHandler = null
+                }
+            }
         }
         return true
     }
@@ -2008,6 +2082,8 @@ class LiveDetailFragment : Fragment() {
         }
         if (isRoomOwner) {
             enableComeBackSoonView(!enable)
+        } else if (isMeLinking()) {
+            mBinding.videoLinkingAudienceLayout.videoOverlay.isVisible = !enable
         }
     }
 
@@ -2026,7 +2102,7 @@ class LiveDetailFragment : Fragment() {
         channelMediaOptions.clientRoleType =
             if (isRoomOwner) Constants.CLIENT_ROLE_BROADCASTER else Constants.CLIENT_ROLE_AUDIENCE
         channelMediaOptions.autoSubscribeVideo = true
-        channelMediaOptions.autoSubscribeAudio = true
+        channelMediaOptions.autoSubscribeAudio = false
         channelMediaOptions.publishCameraTrack = isRoomOwner
         channelMediaOptions.publishMicrophoneTrack = isRoomOwner
         // 如果是观众 把 ChannelMediaOptions 的 audienceLatencyLevel 设置为 AUDIENCE_LATENCY_LEVEL_LOW_LATENCY（超低延时）
@@ -2108,6 +2184,10 @@ class LiveDetailFragment : Fragment() {
                     )
                 )
             } else {
+                mPKEventHandler?.let {
+                    mRtcEngine.removeHandlerEx(mPKEventHandler, RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()))
+                    mPKEventHandler = null
+                }
                 mHandler.updateRoomInfo(
                     position = mPosition,
                     VideoLoader.RoomInfo(
@@ -2135,6 +2215,7 @@ class LiveDetailFragment : Fragment() {
             enableLocalAudio(true)
             enableLocalVideo(true)
             mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_VIDEO, true)
+            mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_MIC, true)
             activity?.let {
                 setupLocalVideo(
                     VideoLoader.VideoCanvasContainer(
@@ -2202,7 +2283,11 @@ class LiveDetailFragment : Fragment() {
 
         mBinding.videoLinkingAudienceLayout.userName.text = interactionInfo!!.userName
         mBinding.videoLinkingAudienceLayout.userName.bringToFront()
-        mBinding.videoLinkingAudienceLayout.userName.isActivated = true
+        mBinding.videoLinkingAudienceLayout.userName.isActivated = !mUserMuteAudioStateMap.getOrDefault(
+            interactionInfo!!.userId.toInt(),
+            false
+        )
+        mBinding.videoLinkingAudienceLayout.videoOverlay.isVisible = false
         if (isRoomOwner) {
             // 连麦主播视角
             mBinding.videoLinkingAudienceLayout.videoContainer.setOnClickListener {
@@ -2212,6 +2297,7 @@ class LiveDetailFragment : Fragment() {
             mService.muteAudio(mRoomInfo.roomId, false)
             // pk摄像头默认开启 todo 统一入口获取摄像头状态
             mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_VIDEO, true)
+            mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_MIC, true)
             mPKSettingsDialog.resetItemStatus(LivePKSettingsDialog.ITEM_ID_CAMERA, true)
             enableLocalVideo(true)
             activity?.let {
@@ -2244,6 +2330,7 @@ class LiveDetailFragment : Fragment() {
                 }
                 // 重新连麦，恢复摄像头开启状态
                 mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_VIDEO, true)
+                mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_MIC, true)
                 enableLocalAudio(true)
                 val channelMediaOptions = ChannelMediaOptions()
                 channelMediaOptions.publishCameraTrack = true
@@ -2324,63 +2411,7 @@ class LiveDetailFragment : Fragment() {
             RtcEngineInstance.generalToken(),
             pkRtcConnection,
             channelMediaOptions,
-            object : IRtcEngineEventHandler() {
-                override fun onRemoteVideoStats(stats: RemoteVideoStats) {
-                    super.onRemoteVideoStats(stats)
-                    if (isRoomOwner) {
-                        activity?.runOnUiThread {
-                            refreshStatisticInfo(
-                                downBitrate = stats.receivedBitrate,
-                                receiveFPS = stats.decoderOutputFrameRate,
-                                downLossPackage = stats.packetLossRate,
-                                receiveVideoSize = Size(stats.width, stats.height),
-                                downDelay = stats.delay
-                            )
-                        }
-                    }
-                }
-
-                override fun onRemoteAudioStats(stats: RemoteAudioStats) {
-                    super.onRemoteAudioStats(stats)
-                    activity?.runOnUiThread {
-                        refreshStatisticInfo(
-                            audioBitrate = stats.receivedBitrate,
-                            audioLossPackage = stats.audioLossRate
-                        )
-                    }
-                }
-
-                override fun onDownlinkNetworkInfoUpdated(info: DownlinkNetworkInfo) {
-                    super.onDownlinkNetworkInfoUpdated(info)
-                    activity?.runOnUiThread {
-                        refreshStatisticInfo(downLinkBps = info.bandwidth_estimation_bps)
-                    }
-                }
-
-                override fun onFirstRemoteVideoFrame(
-                    uid: Int,
-                    width: Int,
-                    height: Int,
-                    elapsed: Int
-                ) {
-                    super.onFirstRemoteVideoFrame(uid, width, height, elapsed)
-                    if (interactionInfo?.userId == uid.toString()) {
-                        if (pkStartTime != 0L) {
-                            ShowLogger.d(
-                                TAG,
-                                "Interaction user first video frame from host accept pking : ${TimeUtils.currentTimeMillis() - pkStartTime}"
-                            )
-                            pkStartTime = 0L
-                        } else {
-                            ShowLogger.d(
-                                TAG,
-                                "Interaction user first video frame from host accepted pking : ${TimeUtils.currentTimeMillis() - (interactionInfo?.createdAt?.toLong() ?: 0L)}"
-                            )
-                            pkStartTime = 0L
-                        }
-                    }
-                }
-            }
+            object : IRtcEngineEventHandler() {}
         )
         prepareRkRoomId = pkRoomId
     }
@@ -2403,6 +2434,44 @@ class LiveDetailFragment : Fragment() {
                             receiveVideoSize = Size(stats.width, stats.height),
                             downDelay = stats.delay
                         )
+                    }
+                }
+            }
+
+            override fun onRemoteVideoStateChanged(
+                uid: Int,
+                state: Int,
+                reason: Int,
+                elapsed: Int
+            ) {
+                super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
+                ShowLogger.d(TAG, "onRemoteVideoStateChanged pk : uid=$uid, state=$state, reason=$reason")
+                if(isPKing() && uid == interactionInfo?.userId?.toInt()){
+                    runOnUiThread {
+                        if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_MUTED) {
+                            mBinding.videoPKLayout.iBroadcasterBViewOverlay.isVisible = true
+                        } else if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED) {
+                            mBinding.videoPKLayout.iBroadcasterBViewOverlay.isVisible = false
+                        }
+                    }
+                }
+            }
+
+            override fun onRemoteAudioStateChanged(
+                uid: Int,
+                state: Int,
+                reason: Int,
+                elapsed: Int
+            ) {
+                super.onRemoteAudioStateChanged(uid, state, reason, elapsed)
+                ShowLogger.d(TAG, "onRemoteAudioStateChanged pk : uid=$uid, state=$state, reason=$reason")
+                if(isPKing() && uid == interactionInfo?.userId?.toInt()){
+                    runOnUiThread {
+                        if (state == Constants.REMOTE_AUDIO_STATE_STOPPED) {
+                            mBinding.videoPKLayout.userNameB.isActivated = false
+                        } else if (state == Constants.REMOTE_AUDIO_STATE_DECODING) {
+                            mBinding.videoPKLayout.userNameB.isActivated = true
+                        }
                     }
                 }
             }
@@ -2445,7 +2514,11 @@ class LiveDetailFragment : Fragment() {
         }
 
         mBinding.videoPKLayout.userNameA.text = mRoomInfo.ownerName
+        mBinding.videoPKLayout.userNameA.isActivated = true
         mBinding.videoPKLayout.userNameB.text = interactionInfo!!.userName
+        mBinding.videoPKLayout.userNameB.isActivated = true
+        mBinding.videoPKLayout.iBroadcasterAViewOverlay.isVisible = false
+        mBinding.videoPKLayout.iBroadcasterBViewOverlay.isVisible = false
         if (isRoomOwner) {
             // pk 主播
             mBinding.livingComeSoonLayout.root.isVisible = false
@@ -2462,6 +2535,7 @@ class LiveDetailFragment : Fragment() {
                     )
                 )
             }
+            mSettingDialog.resetItemStatus(SettingDialog.ITEM_ID_MIC, true)
             enableLocalAudio(true)
             if (isRoomOwner) {
                 // 连麦摄像头默认开启 todo 统一入口获取摄像头状态
@@ -2479,6 +2553,7 @@ class LiveDetailFragment : Fragment() {
                 channelMediaOptions,
                 pkRtcConnection
             )
+            mPKEventHandler = eventListener
             mRtcEngine.addHandlerEx(eventListener, pkRtcConnection)
             activity?.let {
                 mBinding.videoPKLayout.iBroadcasterBView.removeView(pkAgainstView)
@@ -2521,6 +2596,8 @@ class LiveDetailFragment : Fragment() {
                     )
                 )
             )
+            mPKEventHandler = eventListener
+            mRtcEngine.addHandlerEx(mPKEventHandler, RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()))
         }
     }
 
@@ -2581,7 +2658,9 @@ class LiveDetailFragment : Fragment() {
     }
 
     // 播放音乐相关接口
+    private var mAudioMxingChannel: RtcConnection? = null
     private var mMediaPlayer: IMediaPlayer? = null
+    private var mAudioMixing = false
     private fun startAudioMixing(
         filePath: String,
         loopbackOnly: Boolean,
@@ -2594,25 +2673,68 @@ class LiveDetailFragment : Fragment() {
             url = filePath
             isAutoPlay = true
         })
+        adjustAudioMixingVolume(VideoSetting.getCurrBroadcastSetting().audio.audioMixingVolume)
         mediaPlayer.setLoopCount(if (cycle >= 0) 0 else Int.MAX_VALUE)
+        mAudioMixing = true
+        if (!loopbackOnly && mAudioMxingChannel == null) {
+            val uid = UserManager.getInstance().user.id.toInt() + 100000
+            val channel = RtcConnection(mRoomInfo.roomId, uid)
+            mAudioMxingChannel = channel
 
-        if (!loopbackOnly) {
             val mediaOptions = ChannelMediaOptions()
+            mediaOptions.channelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING
+            mediaOptions.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
             mediaOptions.publishMediaPlayerId = mediaPlayer.mediaPlayerId
-            // TODO: 没开启麦克风权限情况下，publishMediaPlayerAudioTrack = true 会自动停止音频播放
             mediaOptions.publishMediaPlayerAudioTrack = true
-            mRtcEngine.updateChannelMediaOptionsEx(mediaOptions, mMainRtcConnection)
+            mediaOptions.publishCameraTrack = false
+            mediaOptions.autoSubscribeAudio = false
+            mediaOptions.autoSubscribeVideo = false
+            mediaOptions.enableAudioRecordingOrPlayout = false
+
+            TokenGenerator.generateToken(channel.channelId, channel.localUid.toString(),
+                TokenGenerator.TokenGeneratorType.token007,
+                TokenGenerator.AgoraTokenType.rtc,
+                success = {
+                    ShowLogger.d("RoomListActivity", "generateToken success， uid：${channel.localUid}")
+                    if (!mAudioMixing) {
+                        return@generateToken
+                    }
+                    val ret = mRtcEngine.joinChannelEx(
+                        it,
+                        channel,
+                        mediaOptions,
+                        object : IRtcEngineEventHandler() {
+                            override fun onError(err: Int) {
+                                super.onError(err)
+                                ToastUtils.showToast("startAudioMixing joinChannelEx onError, error code: $err, ${RtcEngine.getErrorDescription(err)}")
+                            }
+                        }
+                    )
+                    if(ret != Constants.ERR_OK){
+                        ToastUtils.showToast("startAudioMixing joinChannelEx failed, error code: $ret, ${RtcEngine.getErrorDescription(ret)}")
+                    }
+                },
+                failure = {
+                    ShowLogger.e("RoomListActivity", it, "generateToken failure：$it")
+                    mAudioMxingChannel = null
+                    ToastUtils.showToast(it?.message ?: "generate token failure")
+                })
         }
     }
 
     private fun stopAudioMixing() {
+        mAudioMixing = false
+
         // 停止播放，拿到connection对应的MediaPlayer并停止释放
         mMediaPlayer?.stop()
 
         // 停止推流，使用updateChannelMediaOptionEx
-        val mediaOptions = ChannelMediaOptions()
-        mediaOptions.publishMediaPlayerAudioTrack = false
-        mRtcEngine.updateChannelMediaOptionsEx(mediaOptions, mMainRtcConnection)
+        mAudioMxingChannel?.let {
+            val options = LeaveChannelOptions()
+            options.stopMicrophoneRecording = false
+            mRtcEngine.leaveChannelEx(it, options)
+            mAudioMxingChannel = null
+        }
     }
 
     private fun adjustAudioMixingVolume(volume: Int) {
