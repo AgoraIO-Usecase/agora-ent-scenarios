@@ -42,6 +42,14 @@ class CallDraggableView @JvmOverloads constructor(
         binding.llContainer.clipToOutline = small
     }
 
+    fun setComeBackSoonViewStyle(isLocal: Boolean) {
+        binding.comeSoonView.setComeBackSoonViewStyle(isLocal)
+    }
+
+    fun showComeBackSoonView(show: Boolean) {
+        binding.comeSoonView.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
     val canvasContainer: ViewGroup
         get() { return binding.llContainer }
 
