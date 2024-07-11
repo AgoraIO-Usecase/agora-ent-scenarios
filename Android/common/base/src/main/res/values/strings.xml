@@ -3,4 +3,11 @@
     <string name="try_again_to_exit">再按一次退出应用</string>
     <string name="permission_leak_tip">需要相应权限，请打开</string>
     <string name="id_is_">ID:%s</string>
+
+    <string name="comm_cancel">取消</string>
+    <string name="comm_i_know">我知道了</string>
+    <string name="comm_upload_logging">日志上传中</string>
+    <string name="comm_upload_logging_error">日志上传失败</string>
+    <string name="comm_upload_logging_complete">日志上传成功</string>
+    <string name="comm_upload_repeat">重新上传</string>
 </resources>

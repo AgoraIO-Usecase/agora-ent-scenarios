@@ -87,4 +87,6 @@ dependencies {
 
     api rootProject.ext.deps.protobuf_java
     api rootProject.ext.deps.protobuf_java_util
+
+    api rootProject.ext.deps.lifecycle_extensions
 }

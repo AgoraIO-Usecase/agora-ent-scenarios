@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
@@ -30,7 +31,11 @@ import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.event.UserTokenErrorEvent;
 import io.agora.scene.base.manager.PagePilotManager;
+import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.widget.dialog.PermissionLeakDialog;
+import io.agora.scene.base.uploader.OverallLayoutController;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 
 /**
  * 主页容器
@@ -41,7 +46,7 @@ public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding
     private static final String KEY_CODE = "key_code";
     public static final int PARAMS_EXIT = 100;
 
-    public static void startActivity(Activity activity, int code){
+    public static void startActivity(Activity activity, int code) {
         Intent intent = new Intent(activity, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra(KEY_CODE, code);
@@ -64,9 +69,9 @@ public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
-        if (intent != null){
-            int code = intent.getIntExtra(KEY_CODE,-1);
-            if (code==PARAMS_EXIT){
+        if (intent != null) {
+            int code = intent.getIntExtra(KEY_CODE, -1);
+            if (code == PARAMS_EXIT) {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -77,11 +82,14 @@ public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding
             }
         }
         mainViewModel.fetchSceneConfig();
-    }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+        OverallLayoutController.checkOverlayPermission(this, new Function0<Unit>() {
+            @Override
+            public Unit invoke() {
+                OverallLayoutController.startMonkServer(MainActivity.this);
+                return null;
+            }
+        });
     }
 
     @Override
@@ -110,6 +118,14 @@ public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode == OverallLayoutController.REQUEST_FLOAT_CODE) {
+            if (Settings.canDrawOverlays(this)) {
+                ToastUtils.showToast("悬浮窗权限已经打开");
+                OverallLayoutController.startMonkServer(MainActivity.this);
+            } else {
+                ToastUtils.showToast("请打开悬浮窗权限");
+            }
+        }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
