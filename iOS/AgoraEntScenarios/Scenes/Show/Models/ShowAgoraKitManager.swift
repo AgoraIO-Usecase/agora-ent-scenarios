@@ -110,10 +110,13 @@ class ShowAgoraKitManager: NSObject {
     //MARK: private
     private func engineConfig() -> AgoraRtcEngineConfig {
         let config = AgoraRtcEngineConfig()
-         config.appId = KeyCenter.AppId
-         config.channelProfile = .liveBroadcasting
-         config.areaCode = .global
-         return config
+        config.appId = KeyCenter.AppId
+        config.channelProfile = .liveBroadcasting
+        config.areaCode = .global
+        let logConfig = AgoraLogConfig()
+        logConfig.filePath = AgoraEntLog.sdkLogPath()
+        config.logConfig = logConfig
+        return config
     }
     
     private func setupContentInspectConfig(_ enable: Bool, connection: AgoraRtcConnection) {
@@ -249,18 +252,18 @@ class ShowAgoraKitManager: NSObject {
     //MARK: public method
     func addRtcDelegate(delegate: AgoraRtcEngineDelegate, roomId: String) {
         ShowLogger.info("addRtcDelegate[\(roomId)]")
-        let localUid = Int(VLUserCenter.user.id)!
-        let connection = AgoraRtcConnection(channelId: roomId, localUid: localUid)
-        engine?.addDelegateEx(delegate, connection: connection)
-//        VideoLoaderApiImpl.shared.addRTCListener(anchorId: roomId, listener: delegate)
+//        let localUid = Int(VLUserCenter.user.id)!
+//        let connection = AgoraRtcConnection(channelId: roomId, localUid: localUid)
+//        engine?.addDelegateEx(delegate, connection: connection)
+        VideoLoaderApiImpl.shared.addRTCListener(anchorId: roomId, listener: delegate)
     }
     
     func removeRtcDelegate(delegate: AgoraRtcEngineDelegate, roomId: String) {
         ShowLogger.info("removeRtcDelegate[\(roomId)]")
-        let localUid = Int(VLUserCenter.user.id)!
-        let connection = AgoraRtcConnection(channelId: roomId, localUid: localUid)
-        engine?.removeDelegateEx(delegate, connection: connection)
-//        VideoLoaderApiImpl.shared.removeRTCListener(anchorId: roomId, listener: delegate)
+//        let localUid = Int(VLUserCenter.user.id)!
+//        let connection = AgoraRtcConnection(channelId: roomId, localUid: localUid)
+//        engine?.removeDelegateEx(delegate, connection: connection)
+        VideoLoaderApiImpl.shared.removeRTCListener(anchorId: roomId, listener: delegate)
     }
     
     func renewToken(channelId: String) {
