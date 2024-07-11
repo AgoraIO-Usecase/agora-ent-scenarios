@@ -8,6 +8,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.databinding.Pure1v1DraggableViewBinding
 
 class CallDraggableView @JvmOverloads constructor(
@@ -45,6 +46,14 @@ class CallDraggableView @JvmOverloads constructor(
 
     fun setOnViewClick(action: (() -> Unit)?) {
         onViewClick = action
+    }
+
+    fun setComeBackSoonViewStyle(isLocal: Boolean) {
+        binding.comeSoonView.setComeBackSoonViewStyle(isLocal)
+    }
+
+    fun showComeBackSoonView(show: Boolean) {
+        binding.comeSoonView.visibility = if (show) View.VISIBLE else View.GONE
     }
 
     private fun setupDragAction() {
