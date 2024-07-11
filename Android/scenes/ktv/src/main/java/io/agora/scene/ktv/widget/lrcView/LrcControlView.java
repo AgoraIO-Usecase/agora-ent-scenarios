@@ -747,6 +747,8 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                 return;
             }
             mOnKaraokeActionListener.onJoinChorus();
+            // fix ENT-1831 加入合唱按钮未隐藏导致能重复点
+            mBinding.ilActive.ivJoinChorusBtn.setVisibility(INVISIBLE);
             mBinding.ilActive.ivJoinChorusLoading.setVisibility(VISIBLE);
             mPrepareBinding.tvContent.setText(String.format(getResources().getString(R.string.ktv_loading_music), "0%"));
             mPrepareBinding.pbLoadingMusic.setProgress(0);
