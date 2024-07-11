@@ -86,6 +86,10 @@ public func agoraDoMainThreadTask(_ task: (()->())?) {
         return dir ?? ""
     }
     
+    @objc public static func sdkLogPath() -> String {
+        return AgoraEntLog.cacheDir() + "/agorasdk.log"
+    }
+    
     @objc public static func logsDir() ->String {
         let dir = cacheDir()
         let logDir = "\(dir)/agora_ent_log"

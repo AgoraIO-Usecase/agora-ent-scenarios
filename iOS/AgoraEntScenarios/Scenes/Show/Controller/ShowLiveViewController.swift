@@ -266,7 +266,16 @@ class ShowLiveViewController: UIViewController {
     private var serviceImp: ShowServiceProtocol?
     
     deinit {
-        ShowLogger.info("deinit-- ShowLiveViewController \(roomId)")
+        ShowLogger.info("deinit-- ShowLiveViewController \(self)")
+    }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        ShowLogger.info("init-- ShowLiveViewController \(self)")
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
