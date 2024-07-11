@@ -145,6 +145,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         SimpleDateFormat("HH:mm:ss").apply { timeZone = TimeZone.getTimeZone("GMT") }
     }
 
+    private var cameraOn = true
+    private var micOn = true
+
     private val timerRoomRun = object : Runnable {
         override fun run() {
             if (mCallState == CallStateType.Connected && mTimeLinkAt > 0) {
@@ -185,6 +188,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 }
             } else if (mCallConnected) {
                 mShowTo1v1Manger.mCallApi.addListener(callApiListener)
+                setRtcHandler()
             } else {
                 mShowTo1v1Manger.prepareCall(CallRole.CALLER, mRoomInfo.roomId) {
                     mShowTo1v1Manger.mCallApi.addListener(callApiListener)
@@ -331,9 +335,11 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         fragmentTransaction.commit()
         mDashboardFragment = fragment
 
-        binding.flDashboard.visibility = View.VISIBLE
-        binding.ivDashboardClose.visibility = View.VISIBLE
+//        binding.flDashboard.visibility = View.VISIBLE
+//        binding.ivDashboardClose.visibility = View.VISIBLE
         mDashboardFragment?.updateVisible(true)
+        binding.vDragBigWindow.setComeBackSoonViewStyle(false)
+        binding.vDragSmallWindow.setComeBackSoonViewStyle(true)
     }
 
     // 在后台线程中加载图片
@@ -365,14 +371,30 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
     }
 
     private fun onShowSettingDialog(needShow: Boolean = true) {
-        val dialog = CallDetailSettingDialog(this@RoomDetailActivity)
+        val dialog = CallDetailSettingDialog(this@RoomDetailActivity, cameraOn, micOn)
         dialog.setListener(object : CallDetailSettingDialog.CallDetailSettingItemListener {
             override fun onClickDashboard() {
                 binding.flDashboard.visibility = View.VISIBLE
                 binding.ivDashboardClose.visibility = View.VISIBLE
                 mDashboardFragment?.updateVisible(true)
             }
+
+            override fun onCameraSwitch(isCameraOn: Boolean) {
+                cameraOn = isCameraOn
+                if (cameraOn) {
+                    binding.vDragSmallWindow.showComeBackSoonView(false)
+                } else {
+                    binding.vDragSmallWindow.showComeBackSoonView(true)
+                }
+                mShowTo1v1Manger.switchCamera(isCameraOn)
+            }
+
+            override fun onMicSwitch(isMicOn: Boolean) {
+                micOn = isMicOn
+                mShowTo1v1Manger.switchMic(isMicOn)
+            }
         })
+        dialog.hideCameraAndMicBtn(mCallState != CallStateType.Connected && !mCallConnected)
         dialog.show()
         if (!needShow) {
             dialog.dismiss()
@@ -955,6 +977,10 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         "ShowTo1v1"
                     )
 
+                    cameraOn = true
+                    micOn = true
+                    setRtcHandler()
+
                     binding.root.postDelayed({
                         // 设置音频最佳实践
                         if (mShowTo1v1Manger.isCaller) {
@@ -1012,9 +1038,14 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 }
 
                 animateConnectedViewClose()
+
+                mCallSettingDialogs?.dismiss()
             }
 
             CallStateType.Connected -> {
+                mCallSettingDialogs?.dismiss()
+                binding.vDragBigWindow.showComeBackSoonView(false)
+                binding.vDragSmallWindow.showComeBackSoonView(false)
                 mShowTo1v1Manger.mConnectedChannelId?.let {
                     mDashboardFragment?.renewCallChannel(it)
                 }
@@ -1073,6 +1104,35 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
             else -> {}
         }
+    }
+
+    private fun setRtcHandler() {
+        // 通话开始后监听视频流状态回调，用于在视频流状态改变时显示对应的UI
+        // 因为 CAllAPI 内使用 joinChannelEx 加入频道此处需要使用 addHandlerEx 注册监听
+        mShowTo1v1Manger.mRtcEngine.addHandlerEx(
+            object : IRtcEngineEventHandler() {
+                override fun onRemoteVideoStateChanged(
+                    uid: Int,
+                    state: Int,
+                    reason: Int,
+                    elapsed: Int
+                ) {
+                    super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
+                    if (state == Constants.REMOTE_VIDEO_STATE_STOPPED || state == Constants.REMOTE_VIDEO_STATE_FAILED) {
+                        // 远端视频停止接收
+                        runOnUiThread {
+                            binding.vDragBigWindow.showComeBackSoonView(true)
+                        }
+                    } else if (state == Constants.REMOTE_VIDEO_STATE_STARTING || state == Constants.REMOTE_VIDEO_STATE_DECODING) {
+                        // 远端视频正常播放
+                        runOnUiThread {
+                            binding.vDragBigWindow.showComeBackSoonView(false)
+                        }
+                    }
+                }
+            },
+            RtcConnection(mShowTo1v1Manger.mConnectedChannelId, mShowTo1v1Manger.mCurrentUser.userId.toInt())
+        )
     }
 }
 
