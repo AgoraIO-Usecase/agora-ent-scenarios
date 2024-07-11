@@ -205,7 +205,7 @@ class Pure1v1CallViewController: UIViewController {
 
 extension Pure1v1CallViewController: Pure1v1RoomBottomBarDelegate {
     func onClickSettingButton() {
-        let settingMenuVC = ShowToolMenuViewController(menuTypes: [.camera, .mic, .real_time_data])
+        let settingMenuVC = ShowToolMenuViewController(menuTypes: [.real_time_data, .camera, .mic])
         settingMenuVC.selectedMap = selectedMap
         settingMenuVC.delegate = self
         present(settingMenuVC, animated: true)
