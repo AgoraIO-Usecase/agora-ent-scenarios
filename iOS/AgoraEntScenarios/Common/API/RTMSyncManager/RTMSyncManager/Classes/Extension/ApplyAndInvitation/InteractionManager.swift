@@ -119,22 +119,22 @@ private let inviteKey = ""
     private func subscribeApply(channelName: String) {
         
         let collection = self.getApplyService(channelName: channelName).applyCollection
-        collection.subscribeWillAdd {[weak self] uid, valueCmd, newItem in
-            //添加申请需要判断当前是否在互动
-            guard let valueCmd = valueCmd,
-                  let cmd = ApplyCmd(rawValue: valueCmd),
-                  cmd == .create else {
-                return AUICommonError.unknown.toNSError()
-            }
-            
-            guard let collection = self?.getInteractionService(channelName: channelName).interactionCollection,
-                  let interationMap = collection.getLocalMetaData()?.getMap(),
-                  interationMap["type"] as? Int ?? 0 == InteractionType.idle.rawValue else {
-                return AUICommonError.unknown.toNSError()
-            }
-            
-            return nil
-        }
+//        collection.subscribeWillAdd {[weak self] uid, valueCmd, newItem in
+//            //添加申请需要判断当前是否在互动
+//            guard let valueCmd = valueCmd,
+//                  let cmd = ApplyCmd(rawValue: valueCmd),
+//                  cmd == .create else {
+//                return AUICommonError.unknown.toNSError()
+//            }
+//            
+//            guard let collection = self?.getInteractionService(channelName: channelName).interactionCollection,
+//                  let interationMap = collection.getLocalMetaData()?.getMap(),
+//                  interationMap["type"] as? Int ?? 0 == InteractionType.idle.rawValue else {
+//                return AUICommonError.unknown.toNSError()
+//            }
+//            
+//            return nil
+//        }
         collection.subscribeWillRemove {[weak self] publisherId, valueCmd, oldValue in
             guard let valueCmd = valueCmd, let cmd = ApplyCmd(rawValue: valueCmd) else {
                 return AUICommonError.unknown.toNSError()
