@@ -384,6 +384,7 @@ extension ShowLiveViewController {
             }
             self._subscribeServiceEvent()
         } else {
+            ShowLogger.info("serviceImp is nil, roomid = \(roomId)")
             self.onRoomExpired(channelName: roomId)
         }
     }
