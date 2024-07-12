@@ -48,9 +48,9 @@ import io.agora.scene.ktv.live.fragmentdialog.MusicSettingDialog
 import io.agora.scene.ktv.live.fragmentdialog.UserLeaveSeatMenuDialog
 import io.agora.scene.ktv.live.listener.LrcActionListenerImpl
 import io.agora.scene.ktv.live.listener.SongActionListenerImpl
-import io.agora.scene.ktv.service.RoomMicSeatInfo
 import io.agora.scene.ktv.service.ChosenSongInfo
 import io.agora.scene.ktv.service.KTVParameters
+import io.agora.scene.ktv.service.RoomMicSeatInfo
 import io.agora.scene.ktv.service.fullHeadUrl
 import io.agora.scene.ktv.widget.KtvCommonDialog
 import io.agora.scene.ktv.widget.lrcView.LrcControlView
@@ -63,6 +63,7 @@ import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.UiUtils
+import okhttp3.internal.filterList
 
 /**
  * 房间主页
@@ -280,6 +281,17 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
                 binding.cbVideo.setChecked(false)
                 binding.lrcControlView.onSeat(false)
             }
+            val haveUser = mutableListOf<RoomMicSeatInfo>()
+            seaInfoList.forEach {
+                if (!it.owner?.userId.isNullOrEmpty()) {
+                    haveUser.add(it)
+                }
+            }
+            if (haveUser.size == 8) {
+                binding.lrcControlView.onSeatFull(true)
+            } else if ((haveUser.size < 8)) {
+                binding.lrcControlView.onSeatFull(false)
+            }
         }
         roomLivingViewModel.seatUpdateLiveData.observe(this) { seatInfo ->
             if (seatInfo.seatIndex < 0 || seatInfo.seatIndex >= mRoomSpeakerAdapter?.itemCount ?: 8) {
@@ -303,6 +315,20 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
                 }
             }
             mRoomSpeakerAdapter?.replace(seatInfo.seatIndex, seatInfo)
+
+            val seaInfoList = mRoomSpeakerAdapter?.getDataList()?:return@observe
+
+            val haveUser = mutableListOf<RoomMicSeatInfo>()
+            seaInfoList.forEach {
+                if (!it.owner?.userId.isNullOrEmpty()) {
+                    haveUser.add(it)
+                }
+            }
+            if (haveUser.size == 8) {
+                binding.lrcControlView.onSeatFull(true)
+            } else if ((haveUser.size < 8)) {
+                binding.lrcControlView.onSeatFull(false)
+            }
         }
         roomLivingViewModel.chosenSongListLiveData.observe(this) { chosenSongList ->
             if (chosenSongList.isNullOrEmpty()) { // songs empty
@@ -860,6 +886,10 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
                     binding.tvHC.visibility = View.GONE
                 }
             }
+        }
+
+        fun getDataList(): List<RoomMicSeatInfo> {
+            return mDataList
         }
     }
 }
