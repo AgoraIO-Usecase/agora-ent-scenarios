@@ -252,17 +252,21 @@ class ShowAgoraKitManager: NSObject {
     //MARK: public method
     func addRtcDelegate(delegate: AgoraRtcEngineDelegate, roomId: String) {
         ShowLogger.info("addRtcDelegate[\(roomId)]")
-//        let localUid = Int(VLUserCenter.user.id)!
-//        let connection = AgoraRtcConnection(channelId: roomId, localUid: localUid)
-//        engine?.addDelegateEx(delegate, connection: connection)
-        VideoLoaderApiImpl.shared.addRTCListener(anchorId: roomId, listener: delegate)
+        
+        if let _ = VideoLoaderApiImpl.shared.getConnectionMap()[roomId] {
+            VideoLoaderApiImpl.shared.addRTCListener(anchorId: roomId, listener: delegate)
+        } else {
+            let localUid = Int(VLUserCenter.user.id)!
+            let connection = AgoraRtcConnection(channelId: roomId, localUid: localUid)
+            engine?.addDelegateEx(delegate, connection: connection)
+        }
     }
     
     func removeRtcDelegate(delegate: AgoraRtcEngineDelegate, roomId: String) {
         ShowLogger.info("removeRtcDelegate[\(roomId)]")
-//        let localUid = Int(VLUserCenter.user.id)!
-//        let connection = AgoraRtcConnection(channelId: roomId, localUid: localUid)
-//        engine?.removeDelegateEx(delegate, connection: connection)
+        let localUid = Int(VLUserCenter.user.id)!
+        let connection = AgoraRtcConnection(channelId: roomId, localUid: localUid)
+        engine?.removeDelegateEx(delegate, connection: connection)
         VideoLoaderApiImpl.shared.removeRTCListener(anchorId: roomId, listener: delegate)
     }
     
