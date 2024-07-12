@@ -89,21 +89,22 @@ extension ApplyService {
     }
     
     public func addApply(userId: String, completion: ((NSError?)->())?) {
+        let roomId = channelName
         guard let apply = getApplyInfo(userId: userId),
               let value = encodeModel(apply) else {
-            aui_info("addApply userId: \(userId) fail", tag: "ApplyService")
+            aui_info("[\(roomId)]addApply userId: \(userId) fail", tag: "ApplyService")
             completion?(NSError(domain: "ApplyService",
                                 code: 0,
                                 userInfo: ["msg": "apply info is nil"]))
             return
         }
         
-        aui_info("addApply userId: \(userId) start", tag: "ApplyService")
+        aui_info("[\(roomId)]addApply userId: \(userId) start", tag: "ApplyService")
         //TODO: 保证该次申请没有在互动中，互动时不可发起申请
         applyCollection.addMetaData(valueCmd: ApplyCmd.create.rawValue,
                                     value: value,
                                     filter: [["userId": userId]]) { err in
-            aui_info("addApply userId: \(userId) completion: \(err?.localizedDescription ?? "success")", tag: "ApplyService")
+            aui_info("[\(roomId)]addApply userId: \(userId) completion: \(err?.localizedDescription ?? "success")", tag: "ApplyService")
             completion?(err)
         }
     }
@@ -135,9 +136,10 @@ extension ApplyService {
     
     
     public func getApplyList(completion: @escaping (NSError?, [ApplyInfo]?)->()) {
-        aui_info("getApplyList start", tag: "ApplyService")
+        let roomId = channelName
+        aui_info("[\(roomId)]getApplyList start", tag: "ApplyService")
         applyCollection.getMetaData { err, value in
-            aui_info("getApplyList completion: \(err?.localizedDescription ?? "success")", tag: "ApplyService")
+            aui_info("[\(roomId)]getApplyList completion: \(err?.localizedDescription ?? "success")", tag: "ApplyService")
             if let err = err {
                 completion(err, nil)
                 return
@@ -152,7 +154,8 @@ extension ApplyService {
 //MARK: private
 extension ApplyService {
     private func removeApply(applyCmd: ApplyCmd, userId: String, completion: ((NSError?)->())?) {
-        aui_info("removeApply userId: \(userId) cmd: \(applyCmd.rawValue)", tag: "ApplyService")
+        let roomId = channelName
+        aui_info("[\(roomId)]removeApply userId: \(userId) cmd: \(applyCmd.rawValue)", tag: "ApplyService")
         applyCollection.removeMetaData(valueCmd: applyCmd.rawValue,
                                        filter: [["userId": userId]],
                                        callback: completion)
