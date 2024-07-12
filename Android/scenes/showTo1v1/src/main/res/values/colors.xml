@@ -2,4 +2,5 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="show_to1v1_come_soon_background">#0038FF</color>
 </resources>

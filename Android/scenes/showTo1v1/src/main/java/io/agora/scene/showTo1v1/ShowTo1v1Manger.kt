@@ -24,6 +24,7 @@ import io.agora.onetoone.signalClient.CallRtmManager
 import io.agora.onetoone.signalClient.ICallRtmManagerListener
 import io.agora.onetoone.signalClient.createRtmManager
 import io.agora.onetoone.signalClient.createRtmSignalClient
+import io.agora.rtc2.RtcConnection
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceImpl
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import java.util.concurrent.ExecutorService
@@ -226,6 +227,29 @@ class ShowTo1v1Manger constructor() {
             })
     }
 
+    // 切换摄像头开关状态
+    fun switchCamera(cameraOn: Boolean) {
+        val channelId = mConnectedChannelId ?: return
+        val uid = innerCurrentUser?.userId ?: return
+        if (cameraOn) {
+            mRtcEngine.startPreview()
+            mRtcEngine.muteLocalVideoStreamEx(false, RtcConnection(channelId, uid.toInt()))
+        } else {
+            mRtcEngine.stopPreview()
+            mRtcEngine.muteLocalVideoStreamEx(true, RtcConnection(channelId, uid.toInt()))
+        }
+    }
+
+    // 切换麦克风开关状态
+    fun switchMic(micOn: Boolean) {
+        val channelId = mConnectedChannelId ?: return
+        val uid = innerCurrentUser?.userId ?: return
+        if (micOn) {
+            mRtcEngine.muteLocalAudioStreamEx(false, RtcConnection(channelId, uid.toInt()))
+        } else {
+            mRtcEngine.muteLocalAudioStreamEx(true, RtcConnection(channelId, uid.toInt()))
+        }
+    }
 
     // call api tokenConfig
     private fun checkCallTokenConfig(callback: (Boolean) -> Unit) {

@@ -40,9 +40,6 @@ class CallDetailFragment : Fragment(), ICallApiListener {
     private var cameraOn = true
     private var micOn = true
 
-    // 视频流停止播放的view（表示本地关闭摄像头或远端用户关闭摄像头）
-    private lateinit var localComeSoonView: Pure1v1RoomComeSoonViewBinding
-    private lateinit var remoteComeSoonView: Pure1v1RoomComeSoonViewBinding
     private var settingDialog: CallDetailSettingDialog? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -75,11 +72,11 @@ class CallDetailFragment : Fragment(), ICallApiListener {
             }
             CallServiceManager.instance.remoteUser?.let { userInfo ->
                 binding.vDragWindow1.setUserName(userInfo.userName)
-                binding.vDragWindow1.removeView(remoteComeSoonView.root)
+                binding.vDragWindow1.showComeBackSoonView(false)
             }
             CallServiceManager.instance.localUser?.let { userInfo ->
                 binding.vDragWindow2.setUserName(userInfo.userName)
-                binding.vDragWindow2.removeView(localComeSoonView.root)
+                binding.vDragWindow2.showComeBackSoonView(false)
             }
         }
 
@@ -97,12 +94,12 @@ class CallDetailFragment : Fragment(), ICallApiListener {
                     if (state == Constants.REMOTE_VIDEO_STATE_STOPPED || state == Constants.REMOTE_VIDEO_STATE_FAILED) {
                         // 远端视频停止接收
                         runOnUiThread {
-                            binding.vDragWindow1.addView(remoteComeSoonView.root)
+                            binding.vDragWindow1.showComeBackSoonView(true)
                         }
                     } else if (state == Constants.REMOTE_VIDEO_STATE_STARTING || state == Constants.REMOTE_VIDEO_STATE_DECODING) {
                         // 远端视频正常播放
                         runOnUiThread {
-                            binding.vDragWindow1.removeView(remoteComeSoonView.root)
+                            binding.vDragWindow1.showComeBackSoonView(false)
                         }
                     }
                 }
@@ -136,17 +133,14 @@ class CallDetailFragment : Fragment(), ICallApiListener {
         settingDialog?.dismiss()
         timerHandler?.removeCallbacksAndMessages(null)
         runOnUiThread {
-            binding.vDragWindow1.removeView(remoteComeSoonView.root)
-            binding.vDragWindow2.removeView(localComeSoonView.root)
+            binding.vDragWindow1.showComeBackSoonView(false)
+            binding.vDragWindow2.showComeBackSoonView(false)
         }
     }
 
     private fun setupView() {
-        localComeSoonView = Pure1v1RoomComeSoonViewBinding.inflate(LayoutInflater.from(context))
-        localComeSoonView.layoutVideoEmpty.setBackgroundResource(R.drawable.pure1v1_come_soon_bg)
-        localComeSoonView.tvComeSoon.text = getString(R.string.pure1v1_come_soon_local)
-        remoteComeSoonView = Pure1v1RoomComeSoonViewBinding.inflate(LayoutInflater.from(context))
-        remoteComeSoonView.layoutVideoEmpty.setBackgroundResource(R.color.pure1v1_come_soon_background)
+        binding.vDragWindow1.setComeBackSoonViewStyle(false)
+        binding.vDragWindow2.setComeBackSoonViewStyle(true)
 
         // 将试图容器设置进manager
         CallServiceManager.instance.localCanvas = binding.vDragWindow2.canvasContainer
@@ -236,9 +230,9 @@ class CallDetailFragment : Fragment(), ICallApiListener {
             override fun onCameraSwitch(isCameraOn: Boolean) {
                 cameraOn = isCameraOn
                 if (cameraOn) {
-                    binding.vDragWindow2.removeView(localComeSoonView.root)
+                    binding.vDragWindow2.showComeBackSoonView(false)
                 } else {
-                    binding.vDragWindow2.addView(localComeSoonView.root)
+                    binding.vDragWindow2.showComeBackSoonView(true)
                 }
                 CallServiceManager.instance.switchCamera(isCameraOn)
             }

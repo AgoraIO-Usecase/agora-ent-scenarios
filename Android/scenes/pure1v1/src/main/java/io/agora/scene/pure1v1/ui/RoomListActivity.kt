@@ -237,7 +237,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 // 拨打
                 CallServiceManager.instance.callApi?.call(user.userId.toInt()) { error ->
                     if (error != null && callState == CallStateType.Calling) {
-                        Toast.makeText(this, getString(R.string.pure1v1_call_failed, error.msg), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.pure1v1_call_failed, error.code), Toast.LENGTH_SHORT).show()
                         // call 失败立刻挂断
                         CallServiceManager.instance.callApi?.cancelCall {  }
                     }
@@ -338,7 +338,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                             if (CallServiceManager.instance.rtcToken != "") {
                                 CallServiceManager.instance.callApi?.accept(fromUserId) {
                                     if (it != null) {
-                                        Toast.makeText(this@RoomListActivity, getString(R.string.pure1v1_accept_failed, it.msg), Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(this@RoomListActivity, getString(R.string.pure1v1_accept_failed, it.code), Toast.LENGTH_SHORT).show()
                                         // 如果接受消息出错，则发起拒绝，回到初始状态
                                         CallServiceManager.instance.callApi?.reject(fromUserId, it.msg) {}
                                     }

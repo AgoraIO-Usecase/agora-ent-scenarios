@@ -8,12 +8,29 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import io.agora.ktvapi.AudioTrackMode
+import io.agora.ktvapi.IKTVApiEventHandler
+import io.agora.ktvapi.ILrcView
+import io.agora.ktvapi.IMusicLoadStateListener
+import io.agora.ktvapi.ISwitchRoleStateListener
+import io.agora.ktvapi.KTVApi
+import io.agora.ktvapi.KTVApiConfig
+import io.agora.ktvapi.KTVLoadMusicConfiguration
+import io.agora.ktvapi.KTVLoadMusicFailReason
+import io.agora.ktvapi.KTVLoadMusicMode
+import io.agora.ktvapi.KTVMusicType
+import io.agora.ktvapi.KTVSingRole
+import io.agora.ktvapi.KTVType
+import io.agora.ktvapi.MusicLoadStatus
+import io.agora.ktvapi.SwitchRoleFailReason
+import io.agora.ktvapi.createKTVApi
 import io.agora.mediaplayer.Constants.MediaPlayerReason
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.musiccontentcenter.Music
 import io.agora.musiccontentcenter.MusicChartInfo
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
+import io.agora.rtc2.Constants.LogLevel
 import io.agora.rtc2.DataStreamConfig
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE
@@ -34,22 +51,6 @@ import io.agora.scene.ktv.KtvCenter.rtcChorusChannelName
 import io.agora.scene.ktv.R
 import io.agora.scene.ktv.debugSettings.KTVDebugSettingBean
 import io.agora.scene.ktv.debugSettings.KTVDebugSettingsDialog
-import io.agora.ktvapi.AudioTrackMode
-import io.agora.ktvapi.IKTVApiEventHandler
-import io.agora.ktvapi.ILrcView
-import io.agora.ktvapi.IMusicLoadStateListener
-import io.agora.ktvapi.ISwitchRoleStateListener
-import io.agora.ktvapi.KTVApi
-import io.agora.ktvapi.KTVApiConfig
-import io.agora.ktvapi.KTVLoadMusicConfiguration
-import io.agora.ktvapi.KTVLoadMusicFailReason
-import io.agora.ktvapi.KTVLoadMusicMode
-import io.agora.ktvapi.KTVMusicType
-import io.agora.ktvapi.KTVSingRole
-import io.agora.ktvapi.KTVType
-import io.agora.ktvapi.MusicLoadStatus
-import io.agora.ktvapi.SwitchRoleFailReason
-import io.agora.ktvapi.createKTVApi
 import io.agora.scene.ktv.live.bean.JoinChorusStatus
 import io.agora.scene.ktv.live.bean.LineScore
 import io.agora.scene.ktv.live.bean.MusicSettingBean
@@ -213,6 +214,20 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
 
     private val serviceListenerProtocol = object : KtvServiceListenerProtocol {
 
+        private fun updateLocalEnterSeat(seatInfo: RoomMicSeatInfo) {
+            if (seatInfo.owner?.userId == KtvCenter.mUser.id.toString()) {
+                mRtcEngine?.let {
+                    mainChannelMediaOption.publishCameraTrack = false
+                    mainChannelMediaOption.publishMicrophoneTrack = !seatInfo.isAudioMuted
+                    mainChannelMediaOption.enableAudioRecordingOrPlayout = true
+                    mainChannelMediaOption.autoSubscribeVideo = true
+                    mainChannelMediaOption.autoSubscribeAudio = true
+                    mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
+                    it.updateChannelMediaOptions(mainChannelMediaOption)
+                }
+            }
+        }
+
         override fun onRoomDestroy() {
             innerRelease()
             roomDestroyLiveData.value = true
@@ -235,6 +250,12 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
             }
             seatList.sortBy { it.seatIndex }
             seatListLiveData.value = seatList
+
+            // fix ENT-1826 主唱杀进程再次进入房间，rtc 角色不对导致不能同步歌词
+            seatList.firstOrNull { it.owner?.userId == KtvCenter.mUser.id.toString() }?.let { originSeat ->
+                updateLocalEnterSeat(originSeat)
+            }
+
         }
 
         override fun onUserSeatUpdate(seatInfo: RoomMicSeatInfo) {
@@ -246,16 +267,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
             originSeat.owner = user
             seatListLiveData.value?.set(seatIndex, originSeat)
             if (user.userId == KtvCenter.mUser.id.toString()) {
-                // 自己上麦
-                mRtcEngine?.let {
-                    mainChannelMediaOption.publishCameraTrack = false
-                    mainChannelMediaOption.publishMicrophoneTrack = !originSeat.isAudioMuted
-                    mainChannelMediaOption.enableAudioRecordingOrPlayout = true
-                    mainChannelMediaOption.autoSubscribeVideo = true
-                    mainChannelMediaOption.autoSubscribeAudio = true
-                    mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
-                    it.updateChannelMediaOptions(mainChannelMediaOption)
-                }
+                updateLocalEnterSeat(originSeat)
             }
         }
 
