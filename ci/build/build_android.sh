@@ -113,7 +113,8 @@ if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then
     mkdir -p common/base/agora-sdk
 
     echo source sdk path: "${unzip_name}rtc/sdk/"
-    mv "${unzip_name}rtc/sdk/" "common/base/agora-sdk/"
+    cp -a ${unzip_name}rtc/sdk/. common/base/agora-sdk/
+    ls common/base/agora-sdk/
 
     # 修改gradle文件
     sed -ie "s#$(sed -n '/USE_LOCAL_SDK/p' gradle.properties)#USE_LOCAL_SDK=true#g" gradle.properties
