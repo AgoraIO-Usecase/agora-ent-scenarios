@@ -293,6 +293,7 @@ class ShowLivePagesSlicingDelegateHandler: AGCollectionSlicingDelegateHandler {
             (scrollView as? UICollectionView)?.scrollToItem(at: IndexPath(row: fakeIndex, section: 0),
                                                             at: .centeredVertically,
                                                             animated: false)
+            self.scrollView = scrollView
         }
     }
 }

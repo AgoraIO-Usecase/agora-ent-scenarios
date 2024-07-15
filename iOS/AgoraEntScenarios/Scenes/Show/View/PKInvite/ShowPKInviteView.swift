@@ -23,7 +23,11 @@ class ShowPKInviteView: UIView {
     }
     var interactionList: [ShowInteractionInfo]? {
         didSet {
-            let pkInfo = interactionList?.filter({ $0.type == .pk }).first
+            pkInfo = interactionList?.filter({ $0.type == .pk }).first
+        }
+    }
+    private var pkInfo: ShowInteractionInfo? {
+        didSet {
             let pkTipsVisible = pkInfo == nil ? false : true
             _showTipsView(show: pkTipsVisible)
             pkTipsLabel.text = String(format: "show_pking_with_broadcastor".show_localized, pkInfo?.userName ?? "")

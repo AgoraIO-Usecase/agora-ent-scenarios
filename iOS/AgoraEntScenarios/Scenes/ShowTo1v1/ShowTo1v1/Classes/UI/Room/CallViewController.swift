@@ -17,6 +17,7 @@ class CallViewController: BaseRoomViewController {
         }
     }
     var currentUser: ShowTo1v1UserInfo?
+    var currentState: CallStateType = .idle
     
     var rtcChannelName: String? {
         didSet {
@@ -195,6 +196,7 @@ extension CallViewController {
                                      stateReason: CallStateReason,
                                      eventReason: String,
                                      eventInfo: [String : Any]) {
+        currentState = state
         localCanvasView.emptyView.isHidden = true
         remoteCanvasView.emptyView.isHidden = true
         switch state {
@@ -234,8 +236,10 @@ extension CallViewController {
         ShowTo1v1Logger.info("onCallEventChanged: \(event.rawValue) eventReason: '\(eventReason ?? "")'")
         switch event {
         case .remoteLeft:
+            if currentState == .connected {
+                AUIToast.show(text: "call_toast_remote_fail".showTo1v1Localization())
+            }
             _hangupAction()
-            AUIToast.show(text: "call_toast_remote_fail".showTo1v1Localization())
         default:
             break
         }

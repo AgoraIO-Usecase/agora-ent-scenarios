@@ -256,7 +256,7 @@ extension ShowSyncManagerServiceImp: ShowServiceProtocol {
             }
             return
         }
-        
+        agoraPrint("createRoom roomId: \(roomId) roomName: \(roomName)")
         let roomInfo = AUIRoomInfo()
         roomInfo.roomId = roomId
         roomInfo.roomName = roomName
@@ -283,6 +283,7 @@ extension ShowSyncManagerServiceImp: ShowServiceProtocol {
             }
             return
         }
+        agoraPrint("joinRoom roomId: \(room.roomId) roomName: \(room.roomName ?? "")")
         let roomInfo = AUIRoomInfo.convertFromShowRoomListModel(room)
         if ShowRobotService.shared.isRobotOwner(ownerId: room.ownerId) {
             let poliocy = RoomExpirationPolicy()

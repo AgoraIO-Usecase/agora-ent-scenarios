@@ -110,10 +110,13 @@ class ShowAgoraKitManager: NSObject {
     //MARK: private
     private func engineConfig() -> AgoraRtcEngineConfig {
         let config = AgoraRtcEngineConfig()
-         config.appId = KeyCenter.AppId
-         config.channelProfile = .liveBroadcasting
-         config.areaCode = .global
-         return config
+        config.appId = KeyCenter.AppId
+        config.channelProfile = .liveBroadcasting
+        config.areaCode = .global
+        let logConfig = AgoraLogConfig()
+        logConfig.filePath = AgoraEntLog.sdkLogPath()
+        config.logConfig = logConfig
+        return config
     }
     
     private func setupContentInspectConfig(_ enable: Bool, connection: AgoraRtcConnection) {
@@ -249,10 +252,14 @@ class ShowAgoraKitManager: NSObject {
     //MARK: public method
     func addRtcDelegate(delegate: AgoraRtcEngineDelegate, roomId: String) {
         ShowLogger.info("addRtcDelegate[\(roomId)]")
-        let localUid = Int(VLUserCenter.user.id)!
-        let connection = AgoraRtcConnection(channelId: roomId, localUid: localUid)
-        engine?.addDelegateEx(delegate, connection: connection)
-//        VideoLoaderApiImpl.shared.addRTCListener(anchorId: roomId, listener: delegate)
+        
+        if let _ = VideoLoaderApiImpl.shared.getConnectionMap()[roomId] {
+            VideoLoaderApiImpl.shared.addRTCListener(anchorId: roomId, listener: delegate)
+        } else {
+            let localUid = Int(VLUserCenter.user.id)!
+            let connection = AgoraRtcConnection(channelId: roomId, localUid: localUid)
+            engine?.addDelegateEx(delegate, connection: connection)
+        }
     }
     
     func removeRtcDelegate(delegate: AgoraRtcEngineDelegate, roomId: String) {
@@ -260,7 +267,7 @@ class ShowAgoraKitManager: NSObject {
         let localUid = Int(VLUserCenter.user.id)!
         let connection = AgoraRtcConnection(channelId: roomId, localUid: localUid)
         engine?.removeDelegateEx(delegate, connection: connection)
-//        VideoLoaderApiImpl.shared.removeRTCListener(anchorId: roomId, listener: delegate)
+        VideoLoaderApiImpl.shared.removeRTCListener(anchorId: roomId, listener: delegate)
     }
     
     func renewToken(channelId: String) {
@@ -297,8 +304,12 @@ class ShowAgoraKitManager: NSObject {
     }
     
     /// 切换摄像头
-    func switchCamera(_ channelId: String? = nil) {
-        BeautyManager.shareManager.beautyAPI.switchCamera()
+    func switchCamera(enableBeauty: Bool) {
+        if enableBeauty {
+            BeautyManager.shareManager.beautyAPI.switchCamera()
+        } else {
+            engine?.switchCamera()
+        }
     }
     
     /// 开启虚化背景

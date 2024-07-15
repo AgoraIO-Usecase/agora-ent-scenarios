@@ -113,6 +113,7 @@ class Pure1v1UserListViewController: UIViewController {
     
     private var userList: [Pure1v1UserInfo] = [] {
         didSet {
+            Pure1v1Logger.info("update userList: \(userList.count)")
             let list = userList.filter({$0.userId != self.userInfo?.userId})
             self.listView.userList = list
             self.noDataView.isHidden = list.count > 0
@@ -517,7 +518,8 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 //主叫userlist一定会有，因为需要点击
                 if let user = listView.userList.first {$0.userId == "\(toUserId)"} {
                     let dialog = Pure1v1CallerDialog.show(user: user) { [weak self] in
-                        self?.startDail()
+                        guard let self = self, self.callState == .calling else {return}
+                        self.startDail()
                     }
                     dialog?.cancelClosure = {[weak self] in
                         self?.callApi.cancelCall(completion: { err in
