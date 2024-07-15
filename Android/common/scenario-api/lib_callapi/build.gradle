@@ -54,7 +54,5 @@ dependencies {
     api 'com.google.code.gson:gson:2.9.0'
 
     // rtc
-    implementation rootProject.ext.deps.rtc
-    // rtm
-    implementation rootProject.ext.deps.rtm
+    implementation project(":common:base")
 }

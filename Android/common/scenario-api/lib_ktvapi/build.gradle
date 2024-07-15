@@ -76,7 +76,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
-    implementation rootProject.ext.deps.rtc
+    implementation project(":common:base")
     implementation 'com.google.protobuf:protobuf-java:3.19.3'
     implementation 'com.google.protobuf:protobuf-java-util:3.19.3'
 }

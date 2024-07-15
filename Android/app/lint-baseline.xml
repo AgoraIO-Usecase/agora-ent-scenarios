@@ -8,7 +8,7 @@
         errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="46"
+            line="47"
             column="27"/>
     </issue>
 
@@ -19,7 +19,7 @@
         errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="62"
+            line="63"
             column="27"/>
     </issue>
 
@@ -30,7 +30,7 @@
         errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="68"
+            line="69"
             column="27"/>
     </issue>
 
@@ -41,7 +41,7 @@
         errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="71"
+            line="72"
             column="27"/>
     </issue>
 
@@ -52,7 +52,18 @@
         errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="74"
+            line="75"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="Instantiatable"
+        message="`AppDebugActivity` must extend android.app.Activity"
+        errorLine1="            android:name=&quot;com.agora.entfulldemo.home.mine.AppDebugActivity&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="78"
             column="27"/>
     </issue>
 
