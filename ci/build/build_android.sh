@@ -80,6 +80,7 @@ echo build_time: $build_time
 echo release_version: $release_version
 echo short_version: $short_version
 echo beauty_sources $beauty_sources
+echo sdk_url: $sdk_url
 echo pwd: `pwd`
 
 # enter android project direction
@@ -92,6 +93,30 @@ ls ~/.gradle || mkdir -p /tmp/.gradle && ln -s /tmp/.gradle ~/.gradle && touch ~
 echo ANDROID_HOME: $ANDROID_HOME
 java --version
 
+# download Agora SDK
+# download_file () {
+#     url=$1
+#     zip_name=${url##*/}
+#     curl -o "${WORKSPACE}/${zip_name}" ${url} --progress-bar
+#     echo ${zip_name}
+
+#     unzip ${WORKSPACE}/$zip_name -d common/base/agora-sdk/
+# }
+if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then
+    zip_name=${sdk_url##*/}
+    python3 ${WORKSPACE}/artifactory_utils.py --action=download_file --file=$sdk_url
+    7za x ./$zip_name -y
+
+    unzip_name=`ls -S -d */ | grep Agora`
+    echo unzip_name: $unzip_name
+
+    mkdir -p common/base/agora-sdk
+
+    mv "${unzip_name}/rtc/sdk/" "common/base/agora-sdk/"
+
+    # 修改gradle文件
+    sed -ie "s#$(sed -n '/USE_LOCAL_SDK/p' gradle.properties)#USE_LOCAL_SDK=true#g" gradle.properties
+fi
 
 # config app global properties
 sed -ie "s#$(sed -n '/SERVER_HOST/p' gradle.properties)#SERVER_HOST=${SERVER_HOST}#g" gradle.properties
