@@ -34,6 +34,7 @@ class Pure1v1CallViewController: UIViewController {
             }
         }
     }
+    var currentState: CallStateType = .idle
     var rtcEngine: AgoraRtcEngineKit?
     var currentUser: Pure1v1UserInfo?
     var targetUser: Pure1v1UserInfo? {
@@ -90,15 +91,7 @@ class Pure1v1CallViewController: UIViewController {
         return bar
     }()
     
-    private lazy var realTimeView: ShowRealTimeDataView = {
-        let realTimeView = ShowRealTimeDataView(isLocal: true)
-        view.addSubview(realTimeView)
-        realTimeView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(UIDevice.current.aui_SafeDistanceTop + 50)
-        }
-        return realTimeView
-    }()
+    private lazy var realTimeView = ShowRealTimeDataView(isLocal: true)
     
     deinit {
         Pure1v1Logger.info("deinit-- Pure1v1CallViewController")
@@ -132,6 +125,8 @@ class Pure1v1CallViewController: UIViewController {
         moreBtn.aui_size = CGSize(width: 32, height: 32)
         moreBtn.aui_right = view.aui_width - 15
         moreBtn.aui_centerY = roomInfoView.aui_centerY
+        
+        showRealDataView()
     }
     
     private func _resetCanvas() {
@@ -187,6 +182,14 @@ class Pure1v1CallViewController: UIViewController {
         _updateCanvas()
     }
     
+    private func showRealDataView() {
+        view.addSubview(realTimeView)
+        realTimeView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.equalTo(UIDevice.current.aui_SafeDistanceTop + 50)
+        }
+    }
+    
     @objc private func _hangupAction() {
         callApi?.hangup(remoteUserId: UInt(targetUser?.userId ?? "") ?? 0, reason: nil, completion: { err in
         })
@@ -202,7 +205,7 @@ class Pure1v1CallViewController: UIViewController {
 
 extension Pure1v1CallViewController: Pure1v1RoomBottomBarDelegate {
     func onClickSettingButton() {
-        let settingMenuVC = ShowToolMenuViewController(menuTypes: [.camera, .mic, .real_time_data])
+        let settingMenuVC = ShowToolMenuViewController(menuTypes: [.real_time_data, .camera, .mic])
         settingMenuVC.selectedMap = selectedMap
         settingMenuVC.delegate = self
         present(settingMenuVC, animated: true)
@@ -232,11 +235,7 @@ extension Pure1v1CallViewController: ShowToolMenuViewControllerDelegate {
     }
     
     func onClickRealTimeDataButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
-        view.addSubview(realTimeView)
-        realTimeView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(UIDevice.current.aui_SafeDistanceTop + 50)
-        }
+        showRealDataView()
     }
 }
 
@@ -246,6 +245,7 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
                             stateReason: CallStateReason,
                             eventReason: String,
                             eventInfo: [String : Any]) {
+        self.currentState = state
         if state == .connected {
             selectedMap.removeAll()
             self.remoteCanvasView.canvasView.isHidden = false
@@ -261,8 +261,10 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
         Pure1v1Logger.info("onCallEventChanged event: \(event.rawValue) eventReason: '\(eventReason ?? "")'")
         switch event {
         case .remoteLeft:
+            if currentState == .connected {
+                AUIToast.show(text: "call_toast_remote_fail".pure1v1Localization())
+            }
             _hangupAction()
-            AUIToast.show(text: "call_toast_remote_fail".pure1v1Localization())
         default:
             break
         }

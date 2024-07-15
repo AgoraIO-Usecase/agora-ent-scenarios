@@ -74,21 +74,21 @@ class AUISceneExpiredCondition: NSObject {
     
     var joinCompletion: Bool = false {
         didSet {
-            aui_info("set joinCompletion \(joinCompletion)", tag: kSceneTag)
+            aui_info("[\(channelName)]set joinCompletion \(joinCompletion)", tag: kSceneTag)
             checkRoomExpired()
         }
     }
     
     var createTimestemp: UInt64? {
         didSet {
-            aui_info("set createTimestemp \(createTimestemp ?? 0)", tag: kSceneTag)
+            aui_info("[\(channelName)]set createTimestemp \(createTimestemp ?? 0)", tag: kSceneTag)
             checkRoomExpired()
         }
     }
     
     var userSnapshotList: [AUIUserInfo]? {
         didSet {
-            aui_info("set userSnapshotList count = \(userSnapshotList?.count ?? 0)", tag: kSceneTag)
+            aui_info("[\(channelName)]set userSnapshotList count = \(userSnapshotList?.count ?? 0)", tag: kSceneTag)
             checkRoomExpired()
         }
     }
@@ -96,7 +96,7 @@ class AUISceneExpiredCondition: NSObject {
     //房主曾经离开过房间
     var ownerHasLeftRoom: Bool = false {
         didSet {
-            aui_info("set ownerHasLeftRoom = \(ownerHasLeftRoom)", tag: kSceneTag)
+            aui_info("[\(channelName)]set ownerHasLeftRoom = \(ownerHasLeftRoom)", tag: kSceneTag)
             checkRoomExpired()
         }
     }
@@ -104,7 +104,7 @@ class AUISceneExpiredCondition: NSObject {
     var lastUpdateTimestemp: UInt64? {
         didSet {
             self.lastUpdateDate = Date()
-            aui_info("set lastUpdateTimestemp = \(lastUpdateTimestemp ?? 0)", tag: kSceneTag)
+            aui_info("[\(channelName)]set lastUpdateTimestemp = \(lastUpdateTimestemp ?? 0)", tag: kSceneTag)
             checkRoomExpired()
         }
     }

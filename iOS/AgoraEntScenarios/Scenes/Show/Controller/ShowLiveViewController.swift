@@ -99,6 +99,10 @@ class ShowLiveViewController: UIViewController {
             VLUserCenter.user.id
         }
     }
+    
+    private var isPublishCameraStream: Bool {
+        return role == .broadcaster || currentInteraction?.userId == VLUserCenter.user.id
+    }
 
     private var role: AgoraClientRole {
         return room?.ownerId == VLUserCenter.user.id ? .broadcaster : .audience
@@ -262,7 +266,16 @@ class ShowLiveViewController: UIViewController {
     private var serviceImp: ShowServiceProtocol?
     
     deinit {
-        ShowLogger.info("deinit-- ShowLiveViewController \(roomId)")
+        ShowLogger.info("deinit-- ShowLiveViewController \(self)")
+    }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        ShowLogger.info("init-- ShowLiveViewController \(self)")
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
@@ -335,6 +348,8 @@ class ShowLiveViewController: UIViewController {
         ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: channelId)
         ShowAgoraKitManager.shared.setupLocalVideo(canvasView: self.liveView.canvasView.localView)
         liveView.canvasView.setLocalUserInfo(name: room?.ownerName ?? "", img: room?.ownerAvatar ?? "")
+        self.muteLocalVideo = false
+        self.muteLocalAudio = false
     }
     
     private func sendMessageWithText(_ text: String) {
@@ -378,6 +393,7 @@ extension ShowLiveViewController {
             }
             self._subscribeServiceEvent()
         } else {
+            ShowLogger.info("serviceImp is nil, roomid = \(roomId)")
             self.onRoomExpired(channelName: roomId)
         }
     }
@@ -482,6 +498,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onRoomExpired(channelName: String) {
+        ShowAgoraKitManager.shared.leaveAllRoom()
+        ShowAgoraKitManager.shared.leaveChannelEx(roomId: roomId, channelId: roomId)
         onRoomFailed(channelName: channelName)
     }
     
@@ -513,7 +531,11 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     func onMicSeatApplyUpdated(channelName: String, applies: [ShowMicSeatApply]) {
         ShowLogger.info("onMicSeatApplyUpdated: \(applies.count)")
         _updateApplyMenu()
-        liveView.bottomBar.linkButton.isShowRedDot = applies.count > 0 ? true : false
+        if role == .broadcaster {
+            liveView.bottomBar.linkButton.isShowRedDot = applies.count > 0 ? true : false
+        } else {
+            liveView.bottomBar.linkButton.isShowRedDot = false
+        }
         if role == .broadcaster {
             applyAndInviteView.reloadData()
         } else {
@@ -689,14 +711,11 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             
             //TODO: 这个是不是需要真正的角色，放进switchRole里？
             if role == .audience {
-                //只有连麦观众才需要改，主播原则上保持原先的mute状态
-                self.muteLocalVideo = false
-                self.muteLocalAudio = false
                 ShowAgoraKitManager.shared.setPVCon(true)
                 ShowAgoraKitManager.shared.setSuperResolutionOn(false)
             }
             //如果是连麦双方为broadcaster，观众不修改，因为观众可能已经申请上麦，申请时已经修改了角色并提前推流
-            let toRole: AgoraClientRole? = (role == .broadcaster || interaction.userId == VLUserCenter.user.id) ? .broadcaster : nil
+            let toRole: AgoraClientRole? = isPublishCameraStream ? .broadcaster : nil
             ShowAgoraKitManager.shared.updateLiveView(role: toRole,
                                                       channelId: roomId,
                                                       uid: interaction.userId,
@@ -707,19 +726,22 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                                                   uid: interaction.userId)
             
             liveView.bottomBar.linkButton.isSelected = true
-            liveView.bottomBar.linkButton.isShowRedDot = false
             AlertManager.hiddenView()
             if toRole == .broadcaster {
                 self.delegate?.currentUserIsOnSeat()
                 // 创建默认美颜效果
                 ShowBeautyFaceVC.beautyData.forEach({
                     BeautyManager.shareManager.setBeauty(path: $0.path,
-                                                             key: $0.key,
-                                                             value: $0.value)
+                                                         key: $0.key,
+                                                         value: $0.value)
                 })
             }
         default:
             break
+        }
+        if isPublishCameraStream {
+            self.muteLocalVideo = false
+            self.muteLocalAudio = false
         }
     }
     
@@ -737,7 +759,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         case .linking:
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName)
             liveView.canvasView.canvasType = .none
-            liveView.bottomBar.linkButton.isShowRedDot = false
             liveView.bottomBar.linkButton.isSelected = false
 //            currentInteraction?.ownerMuteAudio = false
             //TODO: 这个是不是需要真正的角色，放进switchRole里？
@@ -876,6 +897,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
 }
 
+//MARK: ShowRoomLiveViewDelegate
 extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onPKDidTimeout() {
         guard let _ = currentInteraction else { return }
@@ -896,7 +918,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     
     func onClickRemoteCanvas() {
         guard let info = currentInteraction else { return }
-        guard room?.ownerId == VLUserCenter.user.id || info.userId == VLUserCenter.user.id else { return }
+        guard isPublishCameraStream else { return }
         let title = info.type == .linking ?
         "show_seat_with_audience_end_seat_title".show_localized
         : "show_pking_with_broadcastor_end_pk_title".show_localized
@@ -946,6 +968,10 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
             applyAndInviteView.reloadData()
             AlertManager.show(view: applyAndInviteView, alertPostion: .bottom)
         } else {
+            if ShowRobotService.shared.isRobotOwner(ownerId: "\(roomOwnerId)") {
+                ToastView.show(text: "show_error_interaction_rejected_by_owner".show_localized)
+                return
+            }
             AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self) { granted in
                 guard granted else { return }
                 self.applyView.getAllMicSeatList(autoApply: self.role == .audience)
@@ -985,7 +1011,6 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
 }
 
 extension ShowLiveViewController {
-    
     private func throttleRefreshRealTimeInfo() {
         ShowThrottler.throttle(delay: .seconds(1)) { [weak self] in
             guard let `self` = self else {
@@ -1027,7 +1052,6 @@ extension ShowLiveViewController {
 }
 
 extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
-    
     // 开关摄像头
     func onClickCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self) { granted in
@@ -1069,6 +1093,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
         onClickMicButtonSelected(menu, selected)
     }
     
+    // 实时数据
     func onClickRealTimeDataButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         view.addSubview(realTimeView)
         realTimeView.snp.makeConstraints { make in
@@ -1077,13 +1102,15 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
         }
     }
     
+    // 翻转镜头
     func onClickSwitchCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self) { granted in
             guard granted else { return }
-            ShowAgoraKitManager.shared.switchCamera(self.roomId)
+            ShowAgoraKitManager.shared.switchCamera(enableBeauty: self.role == .broadcaster)
         }
     }
     
+    // 高级设置
     func onClickSettingButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         settingMenuVC.dismiss(animated: true) {[weak self] in
             guard let wSelf = self else { return }

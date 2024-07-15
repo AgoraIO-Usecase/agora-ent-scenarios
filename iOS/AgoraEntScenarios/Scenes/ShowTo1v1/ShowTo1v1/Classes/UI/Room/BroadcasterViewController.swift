@@ -166,9 +166,9 @@ class BroadcasterViewController: BaseRoomViewController {
             container.uid = roomInfo.getUIntUserId()
             VideoLoaderApiImpl.shared.renderVideo(anchorInfo: room, container: container)
             //观众的直播数据面板
-            let connection = AgoraRtcConnection(channelId: roomInfo.roomId, localUid: Int(uid))
-            rtcEngine?.addDelegateEx(self.realTimeView, connection: connection)
-//            VideoLoaderApiImpl.shared.addRTCListener(anchorId: room.channelName, listener: self.realTimeView)
+//            let connection = AgoraRtcConnection(channelId: roomInfo.roomId, localUid: Int(uid))
+//            rtcEngine?.addDelegateEx(self.realTimeView, connection: connection)
+            VideoLoaderApiImpl.shared.addRTCListener(anchorId: room.channelName, listener: self.realTimeView)
             
             bottomBar.buttonTypes = [.call, .more]
             
@@ -183,9 +183,9 @@ class BroadcasterViewController: BaseRoomViewController {
             rtcEngine?.removeDelegate(self.realTimeView)
         } else {
             //观众不需要离开频道，交给场景化api处理，需要移除画布并静音
-            let connection = AgoraRtcConnection(channelId: roomInfo.roomId, localUid: Int(uid))
-            rtcEngine?.removeDelegateEx(self.realTimeView, connection: connection)
-//            VideoLoaderApiImpl.shared.removeRTCListener(anchorId: roomInfo.channelName(), listener: self.realTimeView)
+//            let connection = AgoraRtcConnection(channelId: roomInfo.roomId, localUid: Int(uid))
+//            rtcEngine?.removeDelegateEx(self.realTimeView, connection: connection)
+            VideoLoaderApiImpl.shared.removeRTCListener(anchorId: roomInfo.channelName(), listener: self.realTimeView)
             
             let room = roomInfo.anchorInfoList.first!
             let container = VideoCanvasContainer()
