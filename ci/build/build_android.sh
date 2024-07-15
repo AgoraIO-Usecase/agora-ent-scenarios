@@ -79,6 +79,7 @@ echo build_date: $build_date
 echo build_time: $build_time
 echo release_version: $release_version
 echo short_version: $short_version
+echo beauty_sources $beauty_sources
 echo pwd: `pwd`
 
 # enter android project direction
@@ -95,21 +96,22 @@ java --version
 # config app global properties
 sed -ie "s#$(sed -n '/SERVER_HOST/p' gradle.properties)#SERVER_HOST=${SERVER_HOST}#g" gradle.properties
 sed -ie "s#$(sed -n '/AGORA_APP_ID/p' gradle.properties)#AGORA_APP_ID=${APP_ID}#g" gradle.properties
-sed -ie "s#$(sed -n '/AGORA_APP_CERTIFICATE/p' gradle.properties)#AGORA_APP_CERTIFICATE=${APP_CERT}#g" gradle.properties
+sed -ie "s#$(sed -n '/IM_APP_KEY/p' gradle.properties)#IM_APP_KEY=${IM_APP_KEY}#g" gradle.properties
+sed -ie "s#$(sed -n '/BEAUTY_RESOURCE/p' gradle.properties)#BEAUTY_RESOURCE=${beauty_sources}#g" gradle.properties
 cat gradle.properties
 
-# config voice properties
-voicePropFile=scenes/voice/voice/voice_gradle.properties
-rm -f $voicePropFile
-touch $voicePropFile
-echo "isBuildTypesTest=false\n" >> $voicePropFile
-echo "AGORA_APP_ID_RELEASE=\"${APP_ID}\"\n" >> $voicePropFile
-echo "AGORA_APP_CERTIFICATE_RELEASE=\"${APP_CERT}\"\n" >> $voicePropFile
-echo "IM_APP_KEY_RELEASE=\"${IM_APP_KEY}\"\n" >> $voicePropFile
-echo "TOOLBOX_SERVER_HOST_RELEASE=\"${TOOLBOX_SERVER_HOST}\"\n" >> $voicePropFile
-echo "IM_APP_CLIENT_ID_RELEASE=\"${IM_CLIENT_ID}\"\n" >> $voicePropFile
-echo "IM_APP_CLIENT_SECRET_RELEASE=\"${IM_CLIENT_SECRET}\"\n" >> $voicePropFile
-cat $voicePropFile
+# # config voice properties
+# voicePropFile=scenes/voice/voice/voice_gradle.properties
+# rm -f $voicePropFile
+# touch $voicePropFile
+# echo "isBuildTypesTest=false\n" >> $voicePropFile
+# echo "AGORA_APP_ID_RELEASE=\"${APP_ID}\"\n" >> $voicePropFile
+# echo "AGORA_APP_CERTIFICATE_RELEASE=\"${APP_CERT}\"\n" >> $voicePropFile
+# echo "IM_APP_KEY_RELEASE=\"${IM_APP_KEY}\"\n" >> $voicePropFile
+# echo "TOOLBOX_SERVER_HOST_RELEASE=\"${TOOLBOX_SERVER_HOST}\"\n" >> $voicePropFile
+# echo "IM_APP_CLIENT_ID_RELEASE=\"${IM_CLIENT_ID}\"\n" >> $voicePropFile
+# echo "IM_APP_CLIENT_SECRET_RELEASE=\"${IM_CLIENT_SECRET}\"\n" >> $voicePropFile
+# cat $voicePropFile
 
 # download hw-audio.jar and copy to libs
 #mkdir -p scenes/ktv/libs
