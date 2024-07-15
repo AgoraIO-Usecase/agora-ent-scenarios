@@ -8,6 +8,7 @@
 import UIKit
 import ZSwiftBaseLib
 import AgoraRtcKit
+import Masonry
 
 @objcMembers final class AboutAgoraEntertainmentViewController: VLBaseViewController {
     
@@ -73,13 +74,14 @@ import AgoraRtcKit
     }
     
     private func createConstrains() {
-        infoList.snp.makeConstraints { make in
-            make.left.right.bottom.equalToSuperview()
-            make.top.equalToSuperview().offset(ZNavgationHeight)
+        infoList.mas_makeConstraints { make in
+            make?.left.right().bottom().equalTo()(self.view)
+            make?.top.equalTo()(self.view.mas_top)?.offset()(ZNavgationHeight)
         }
-        debugModeButton.snp.makeConstraints { make in
-            make.left.bottom.right.equalToSuperview()
-            make.height.equalTo(44)
+
+        debugModeButton.mas_makeConstraints { make in
+            make?.left.bottom().right().equalTo()(self.view)
+            make?.height.equalTo()(44)
         }
     }
     

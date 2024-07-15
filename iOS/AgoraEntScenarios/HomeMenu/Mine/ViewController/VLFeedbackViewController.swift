@@ -14,10 +14,10 @@ class VLFeedbackViewController: VLBaseViewController {
         let view = VLSelectTagView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.content_titleFont = .systemFont(ofSize: 14)
-        view.content_norTitleColor = UIColor(hex: "#303553", alpha: 1.0)
-        view.content_selTitleColor = UIColor(hex: "#FFFFFF", alpha: 1.0)
-        view.content_backNorColor = UIColor(hex: "#E9ECF5", alpha: 1.0)
-        view.content_backSelColor = UIColor(hex: "#303553", alpha: 1.0)
+        view.content_norTitleColor = UIColor(hex: "#303553", alpha: 1.0)!
+        view.content_selTitleColor = UIColor(hex: "#FFFFFF", alpha: 1.0)!
+        view.content_backNorColor = UIColor(hex: "#E9ECF5", alpha: 1.0)!
+        view.content_backSelColor = UIColor(hex: "#303553", alpha: 1.0)!
         view.isDefaultChoice = true
         view.defaultSelIndex = 4
         view.titleLabHeight = 0

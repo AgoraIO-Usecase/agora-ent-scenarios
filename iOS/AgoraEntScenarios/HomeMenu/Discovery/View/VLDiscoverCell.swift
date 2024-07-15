@@ -15,7 +15,7 @@ class VLDiscoverCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.cornerRadius(16.fit)
         imageView.layer.borderWidth = 0.5
-        imageView.layer.borderColor = UIColor(hex: "#CCCCCC", alpha: 0.8).cgColor
+        imageView.layer.borderColor = UIColor(hex: "#CCCCCC", alpha: 0.8)!.cgColor
         return imageView
     }()
     private lazy var iconImageView: UIImageView = {

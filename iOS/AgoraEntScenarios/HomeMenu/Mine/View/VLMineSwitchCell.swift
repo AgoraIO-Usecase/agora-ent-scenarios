@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Masonry
 
 class VLMineSwitchCell: UITableViewCell {
     
@@ -39,15 +40,15 @@ class VLMineSwitchCell: UITableViewCell {
     private func createSubviews(){
         
         contentView.addSubview(titleLabel)
-        titleLabel.snp.makeConstraints { make in
-            make.left.equalTo(20)
-            make.centerY.equalToSuperview()
+        titleLabel.mas_makeConstraints { make in
+            make?.left.equalTo()(20)
+            make?.centerY.equalTo()(self.contentView)
         }
-        
-        contentView.addSubview(aSwitch)
-        aSwitch.snp.makeConstraints { make in
-            make.right.equalTo(-20)
-            make.centerY.equalTo(titleLabel)
+
+        self.contentView.addSubview(aSwitch)
+        aSwitch.mas_makeConstraints { make in
+            make?.right.equalTo()(-20)
+            make?.centerY.equalTo()(self.titleLabel)
         }
     }
     

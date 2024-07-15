@@ -41,8 +41,8 @@ class VLLoginController: VLBaseViewController {
                                           font: .systemFont(ofSize: 14),
                                           attributedStringS: [userProtocol, privacyPolicy, userProtocol, privacyPolicy],
                                           ranges: [range1, range2, range3, range4],
-                                          textColor: UIColor(hex: "#000000", alpha: 1.0),
-                                          attributeTextColor: UIColor(hex: "#2E6CF6", alpha: 1.0),
+                                          textColor: UIColor(hex: "#000000", alpha: 1.0)!,
+                                          attributeTextColor: UIColor(hex: "#2E6CF6", alpha: 1.0)!,
                                           attrs: attrs)
 
         textView.delegate = self
@@ -133,8 +133,8 @@ class VLLoginController: VLBaseViewController {
                                             text: textString,
                                             attributedStringS: arrayTitles,
                                             ranges: [range1, range2],
-                                            textColor: UIColor(hex: "#6C7192"),
-                                            attributeTextColor: UIColor(hex: "#009FFF"),
+                                            textColor: UIColor(hex: "#6C7192")!,
+                                            attributeTextColor: UIColor(hex: "#009FFF")!,
                                             buttonTitles: [NSLocalizedString("disagree_and_exit", comment: ""),
                                                            NSLocalizedString("agree_and_goon", comment: "")], completion: { flag, text in
             VLAlert.shared().dismiss()

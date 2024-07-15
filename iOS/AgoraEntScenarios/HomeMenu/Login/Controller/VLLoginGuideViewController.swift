@@ -78,8 +78,8 @@ class VLLoginGuideViewController: VLBaseViewController {
                                           font: .systemFont(ofSize: 13),
                                           attributedStringS: [userProtocol, privacyPolicy],
                                           ranges: [range1, range2],
-                                          textColor: UIColor(hex: "#979CBB", alpha: 1.0),
-                                          attributeTextColor: UIColor(hex: "#2E6CF6", alpha: 1.0))
+                                          textColor: UIColor(hex: "#979CBB", alpha: 1.0)!,
+                                          attributeTextColor: UIColor(hex: "#2E6CF6", alpha: 1.0)!)
         textView.textAlignment = .center
         textView.delegate = self
         textView.translatesAutoresizingMaskIntoConstraints = false

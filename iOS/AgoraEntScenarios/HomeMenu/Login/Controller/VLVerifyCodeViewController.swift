@@ -30,7 +30,7 @@ class VLVerifyCodeViewController: VLBaseViewController {
         let maxY = descLabel.frame.maxY
         let codeView = VerifyCodeView(frame: CGRect(x: 25.fit, y: maxY + 40.fit, width: Screen.width - 50.fit, height: 60.fit), codeNumbers: 4, space: 20, padding: 0)
         codeView.textFiled.becomeFirstResponder()
-        codeView.codeViews.forEach({ $0.layer.borderWidth = 0; $0.layer.borderColor = UIColor(hex: "#2E6CF6", alpha: 1.0).cgColor; $0.backgroundColor = .white })
+        codeView.codeViews.forEach({ $0.layer.borderWidth = 0; $0.layer.borderColor = UIColor(hex: "#2E6CF6", alpha: 1.0)!.cgColor; $0.backgroundColor = .white })
         codeView.inputFinish = { [weak self] code in
             self?.verifyCodeHandler(code: code)
         }

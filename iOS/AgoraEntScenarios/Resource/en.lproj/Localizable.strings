@@ -212,3 +212,6 @@
 "discover_spetial_voice" = "凤鸣空间音频";
 "discover_spetial_voice_desc" = "身临其境的实时音频互动体验";
 "discover_document_title" = "集成文档";
+
+"common_report"="举报";
+"common_report_success"="举报成功";

@@ -14,18 +14,11 @@ PODS:
   - AFNetworking/Serialization (4.0.1)
   - AFNetworking/UIKit (4.0.1):
     - AFNetworking/NSURLSession
-  - Agora-Scene-Utils (1.1.0)
-  - Agora_Chat_iOS (1.0.8)
   - AgoraLyricsScore (1.1.2)
   - AgoraRtcEngine_Special_iOS (4.1.1.23)
-  - AgoraRtm_iOS (2.1.7)
   - AgoraSyncManager (2.1.6):
     - SocketRocket
   - Bugly (2.5.93)
-  - CallAPI (0.3.0):
-    - AgoraRtcEngine_Special_iOS
-    - AgoraRtm_iOS (= 2.1.7)
-  - FLAnimatedImage (1.0.17)
   - HXPhotoPicker/Camera/Lite (4.1.3):
     - HXPhotoPicker/Core
   - HXPhotoPicker/Core (4.1.3)
@@ -41,7 +34,6 @@ PODS:
     - HXPhotoPicker/Core
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
-  - LEEAlert (1.6.4)
   - LSTPopView (0.3.10):
     - LSTPopView/Code (= 0.3.10)
     - LSTTimer
@@ -49,54 +41,16 @@ PODS:
     - LSTTimer
   - LSTTimer (0.2.10)
   - Masonry (1.1.0)
-  - MJRefresh (3.7.6)
-  - Protobuf (3.22.1)
-  - Pure1v1 (0.1.0):
-    - AgoraSyncManager
-    - CallAPI
-    - FLAnimatedImage
-    - SDWebImage
-    - SDWebImage/GIF
-    - SnapKit
-    - SwiftyBeaver
-    - YYCategories
-    - YYModel
+  - MJRefresh (3.7.9)
   - ScoreEffectUI (1.0.2)
   - SDWebImage (4.4.8):
     - SDWebImage/Core (= 4.4.8)
   - SDWebImage/Core (4.4.8)
-  - SDWebImage/GIF (4.4.8):
-    - FLAnimatedImage (~> 1.0)
-    - SDWebImage/Core
   - SDWebImageAPNGCoder (0.1.1):
     - SDWebImage/Core (~> 4.2)
-  - SenseLib (1.0)
-  - ShowTo1v1 (0.1.0):
-    - AgoraSyncManager
-    - CallAPI
-    - FLAnimatedImage
-    - SDWebImage
-    - SDWebImage/GIF
-    - SnapKit
-    - SwiftyBeaver
-    - VideoLoaderAPI
-    - YYCategories
-    - YYModel
-  - SnapKit (5.6.0)
   - SocketRocket (0.7.0)
-  - SSZipArchive (2.4.3)
-  - SVGAPlayer (2.5.7):
-    - SVGAPlayer/Core (= 2.5.7)
-    - SVGAPlayer/ProtoFiles (= 2.5.7)
-  - SVGAPlayer/Core (2.5.7):
-    - SSZipArchive (>= 1.8.1)
-    - SVGAPlayer/ProtoFiles
-  - SVGAPlayer/ProtoFiles (2.5.7):
-    - Protobuf (~> 3.4)
   - SVProgressHUD (2.2.5)
   - SwiftyBeaver (1.9.5)
-  - VideoLoaderAPI (0.1.3):
-    - AgoraRtcEngine_Special_iOS
   - YYCategories (1.0.4):
     - YYCategories/no-arc (= 1.0.4)
   - YYCategories/no-arc (1.0.4)
@@ -106,33 +60,21 @@ PODS:
 
 DEPENDENCIES:
   - AFNetworking (= 4.0.1)
-  - Agora-Scene-Utils (= 1.1.0)
-  - Agora_Chat_iOS (= 1.0.8)
   - AgoraLyricsScore (= 1.1.2)
   - AgoraRtcEngine_Special_iOS (= 4.1.1.23)
   - AgoraSyncManager (~> 2.1.6)
   - Bugly (= 2.5.93)
-  - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
-  - HXPhotoPicker/Lite
+  - HXPhotoPicker/Lite (= 4.1.3)
   - JXCategoryView (= 1.6.1)
   - KakaJSON
-  - LEEAlert (= 1.6.4)
   - LSTPopView (= 0.3.10)
   - Masonry (= 1.1.0)
   - MJRefresh
-  - Protobuf (= 3.22.1)
-  - Pure1v1 (from `AgoraEntScenarios/Scenes/Pure1v1`)
   - ScoreEffectUI (= 1.0.2)
   - SDWebImage (= 4.4.8)
   - SDWebImageAPNGCoder
-  - SenseLib (from `sense.podspec`)
-  - ShowTo1v1 (from `AgoraEntScenarios/Scenes/ShowTo1v1`)
-  - SnapKit
-  - SocketRocket (= 0.7.0)
-  - SVGAPlayer
   - SVProgressHUD (= 2.2.5)
   - SwiftyBeaver (= 1.9.5)
-  - VideoLoaderAPI (from `AgoraEntScenarios/Common/API/VideoLoaderAPI`)
   - YYCategories (= 1.0.4)
   - YYModel (= 1.0.4)
   - Zip
@@ -141,30 +83,21 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
     - AFNetworking
-    - Agora-Scene-Utils
-    - Agora_Chat_iOS
     - AgoraLyricsScore
     - AgoraRtcEngine_Special_iOS
-    - AgoraRtm_iOS
     - AgoraSyncManager
     - Bugly
-    - FLAnimatedImage
     - HXPhotoPicker
     - JXCategoryView
     - KakaJSON
-    - LEEAlert
     - LSTPopView
     - LSTTimer
     - Masonry
     - MJRefresh
-    - Protobuf
     - ScoreEffectUI
     - SDWebImage
     - SDWebImageAPNGCoder
-    - SnapKit
     - SocketRocket
-    - SSZipArchive
-    - SVGAPlayer
     - SVProgressHUD
     - SwiftyBeaver
     - YYCategories
@@ -172,56 +105,30 @@ SPEC REPOS:
     - Zip
     - ZSwiftBaseLib
 
-EXTERNAL SOURCES:
-  CallAPI:
-    :path: AgoraEntScenarios/Common/API/CallAPI
-  Pure1v1:
-    :path: AgoraEntScenarios/Scenes/Pure1v1
-  SenseLib:
-    :path: sense.podspec
-  ShowTo1v1:
-    :path: AgoraEntScenarios/Scenes/ShowTo1v1
-  VideoLoaderAPI:
-    :path: AgoraEntScenarios/Common/API/VideoLoaderAPI
-
 SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
-  Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
-  Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraLyricsScore: 0c3e6b701dfe036ba26ba208fc65c3b65ecaeb06
   AgoraRtcEngine_Special_iOS: 6a3f7814058f819b374cec3037cbbf7c4de519a5
-  AgoraRtm_iOS: cd26cf8a377a79934864d37e184866dbd1430eaf
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
-  CallAPI: eefee9fec496ca51cd1432e17551d0c43d75cd17
-  FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   HXPhotoPicker: 2368393b187ce01fb0c8bb2ad8b02436fae913ab
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
-  LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb
   LSTPopView: 9379f00f6ce7d1fc620b50ab00ed3ef97b2d4d52
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
-  MJRefresh: 2fe7fb43a5167ceda20bb7e63f130c04fd1814a5
-  Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
-  Pure1v1: a29e30be7dfe87afdda85cfd5b8845e719c29d3f
+  MJRefresh: ff9e531227924c84ce459338414550a05d2aea78
   ScoreEffectUI: bf1195b4d41a73d43c236450b5d7f958989844aa
   SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
   SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
-  SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
-  ShowTo1v1: 4da6561d6f12576ce61d05add891595d18bc08d0
-  SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
-  SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftyBeaver: 84069991dd5dca07d7069100985badaca7f0ce82
-  VideoLoaderAPI: e42bcbf9c836297f0006d7a90068ffbf935c9acd
   YYCategories: 6bcd4314c6661a561410dce4a793379ebd306abd
   YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: cc42ac9d0cfae40cf0214343e4465a77b5df0963
+PODFILE CHECKSUM: 69dd9ce3fb548230d4757270c28722fdc5f7a814
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.15.2

@@ -22,7 +22,7 @@ class HomeContentViewCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.cornerRadius(16.fit)
-        imageView.layer.borderColor = UIColor(hex: "#CCCCCC", alpha: 0.8).cgColor
+        imageView.layer.borderColor = UIColor(hex: "#CCCCCC", alpha: 0.8)!.cgColor
         imageView.layer.borderWidth = 0.3
         return imageView
     }()

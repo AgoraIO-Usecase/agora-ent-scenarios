@@ -29,7 +29,7 @@ class VLRegisterViewController: VLBaseViewController {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.cornerRadius(12.fit)
-        view.layer.borderColor = UIColor(hex: "#2E6CF6", alpha: 1.0).cgColor
+        view.layer.borderColor = UIColor(hex: "#2E6CF6", alpha: 1.0)?.cgColor
         view.layer.borderWidth = 2.0
         return view
     }()

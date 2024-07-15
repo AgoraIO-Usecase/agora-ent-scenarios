@@ -22,7 +22,7 @@
 #import "AgoraEntScenarios-Swift.h"
 #import "AESMacro.h"
 @import Masonry;
-@import LEEAlert;
+//@import LEEAlert;
 
 typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     photoLibrary = 0,
@@ -156,35 +156,35 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 
 - (void)showUploadPicAlter {
     kWeakSelf(self)
-    [LEEAlert actionsheet].config
-    .LeeAddAction(^(LEEAction * _Nonnull action) {
-        action.type = LEEActionTypeDefault;
-        action.title = AGLocalizedString(@"app_upload_avatar");
-        action.height = 20;
-        action.titleColor = [UIColor whiteColor];
-        action.font = VLUIFontMake(14);
-    })
-    .LeeAddAction(^(LEEAction * _Nonnull action) {
-        action.type = LEEActionTypeDefault;
-        action.title = AGLocalizedString(@"take_photo_and_upload");
-        action.clickBlock = ^{
-            [weakself requestAuthorizationForCamera];
-        };
-    })
-    .LeeAddAction(^(LEEAction * _Nonnull action) {
-        action.type = LEEActionTypeDefault;
-        action.title = AGLocalizedString(@"local_upload");
-        action.clickBlock = ^{
-            [weakself requestAuthorizationForPhotoLibrary];
-        };
-    })
-    .LeeAddAction(^(LEEAction * _Nonnull action) {
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"cancel");
-        action.clickBlock = ^{
-        };
-    })
-    .LeeShow();
+//    [LEEAlert actionsheet].config
+//    .LeeAddAction(^(LEEAction * _Nonnull action) {
+//        action.type = LEEActionTypeDefault;
+//        action.title = AGLocalizedString(@"app_upload_avatar");
+//        action.height = 20;
+//        action.titleColor = [UIColor whiteColor];
+//        action.font = VLUIFontMake(14);
+//    })
+//    .LeeAddAction(^(LEEAction * _Nonnull action) {
+//        action.type = LEEActionTypeDefault;
+//        action.title = AGLocalizedString(@"take_photo_and_upload");
+//        action.clickBlock = ^{
+//            [weakself requestAuthorizationForCamera];
+//        };
+//    })
+//    .LeeAddAction(^(LEEAction * _Nonnull action) {
+//        action.type = LEEActionTypeDefault;
+//        action.title = AGLocalizedString(@"local_upload");
+//        action.clickBlock = ^{
+//            [weakself requestAuthorizationForPhotoLibrary];
+//        };
+//    })
+//    .LeeAddAction(^(LEEAction * _Nonnull action) {
+//        action.type = LEEActionTypeCancel;
+//        action.title = AGLocalizedString(@"cancel");
+//        action.clickBlock = ^{
+//        };
+//    })
+//    .LeeShow();
 }
 
 - (void)requestAuthorizationForPhotoLibrary {
@@ -330,44 +330,44 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 }
 
 - (void)closeOffDebugMode {
-    [LEEAlert alert].config
-    .LeeAddTitle(^(UILabel *label) {
-        label.text = AGLocalizedString(@"app_exit_debug");
-        label.textColor = UIColorMakeWithHex(@"#040925");
-        label.font = UIFontBoldMake(16);
-    })
-    .LeeContent(AGLocalizedString(@"app_exit_debug_tip"))
-    .LeeAddAction(^(LEEAction *action) {
-        VL(weakSelf);
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"confirm");
-        action.titleColor = UIColorMakeWithHex(@"#000000");
-        action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.font = UIFontBoldMake(16);
-        action.clickBlock = ^{
-            [AppContext shared].isDebugMode = NO;
-            [self.mineView refreshTableView];
-        };
-    })
-    .LeeAddAction(^(LEEAction *action) {
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"cancel");
-        action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
-        action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.font = UIFontBoldMake(16);
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.borderColor = UIColorMakeWithHex(@"#2753FF");
-        action.clickBlock = ^{
-            // 取消点击事件Block
-        };
-    })
-    .LeeShow();
+//    [LEEAlert alert].config
+//    .LeeAddTitle(^(UILabel *label) {
+//        label.text = AGLocalizedString(@"app_exit_debug");
+//        label.textColor = UIColorMakeWithHex(@"#040925");
+//        label.font = UIFontBoldMake(16);
+//    })
+//    .LeeContent(AGLocalizedString(@"app_exit_debug_tip"))
+//    .LeeAddAction(^(LEEAction *action) {
+//        VL(weakSelf);
+//        action.type = LEEActionTypeCancel;
+//        action.title = AGLocalizedString(@"confirm");
+//        action.titleColor = UIColorMakeWithHex(@"#000000");
+//        action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
+//        action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
+//        action.cornerRadius = 20;
+//        action.height = 40;
+//        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
+//        action.font = UIFontBoldMake(16);
+//        action.clickBlock = ^{
+//            [AppContext shared].isDebugMode = NO;
+//            [self.mineView refreshTableView];
+//        };
+//    })
+//    .LeeAddAction(^(LEEAction *action) {
+//        action.type = LEEActionTypeCancel;
+//        action.title = AGLocalizedString(@"cancel");
+//        action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
+//        action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
+//        action.cornerRadius = 20;
+//        action.height = 40;
+//        action.font = UIFontBoldMake(16);
+//        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
+//        action.borderColor = UIColorMakeWithHex(@"#2753FF");
+//        action.clickBlock = ^{
+//            // 取消点击事件Block
+//        };
+//    })
+//    .LeeShow();
 }
  
 /// 上传图片
