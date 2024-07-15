@@ -104,7 +104,7 @@ java --version
 # }
 if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then
     zip_name=${sdk_url##*/}
-    python3 ${WORKSPACE}/artifactory_utils.py --action=download_file --file=$sdk_url || exit 1
+    curl -L -H "X-JFrog-Art-Api:${packageName}" -O $sdk_url || exit 1
     7za x ./$zip_name -y
 
     unzip_name=`ls -S -d */ | grep Agora`
