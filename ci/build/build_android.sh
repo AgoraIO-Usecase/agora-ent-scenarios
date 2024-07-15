@@ -79,6 +79,8 @@ echo build_date: $build_date
 echo build_time: $build_time
 echo release_version: $release_version
 echo short_version: $short_version
+echo beauty_sources $beauty_sources
+echo sdk_url: $sdk_url
 echo pwd: `pwd`
 
 # enter android project direction
@@ -91,29 +93,31 @@ ls ~/.gradle || mkdir -p /tmp/.gradle && ln -s /tmp/.gradle ~/.gradle && touch ~
 echo ANDROID_HOME: $ANDROID_HOME
 java --version
 
+# download native sdk if need
+if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then
+    zip_name=${sdk_url##*/}
+    curl -L -H "X-JFrog-Art-Api:${JFROG_API_KEY}" -O $sdk_url || exit 1
+    7za x ./$zip_name -y
+
+    unzip_name=`ls -S -d */ | grep Agora`
+    echo unzip_name: $unzip_name
+
+    mkdir -p common/base/agora-sdk
+
+    echo source sdk path: "${unzip_name}rtc/sdk/"
+    cp -a ${unzip_name}rtc/sdk/. common/base/agora-sdk/
+    ls common/base/agora-sdk/
+
+    # config app global properties
+    sed -ie "s#$(sed -n '/USE_LOCAL_SDK/p' gradle.properties)#USE_LOCAL_SDK=true#g" gradle.properties
+fi
 
 # config app global properties
 sed -ie "s#$(sed -n '/SERVER_HOST/p' gradle.properties)#SERVER_HOST=${SERVER_HOST}#g" gradle.properties
 sed -ie "s#$(sed -n '/AGORA_APP_ID/p' gradle.properties)#AGORA_APP_ID=${APP_ID}#g" gradle.properties
-sed -ie "s#$(sed -n '/AGORA_APP_CERTIFICATE/p' gradle.properties)#AGORA_APP_CERTIFICATE=${APP_CERT}#g" gradle.properties
+sed -ie "s#$(sed -n '/IM_APP_KEY/p' gradle.properties)#IM_APP_KEY=${IM_APP_KEY}#g" gradle.properties
+sed -ie "s#$(sed -n '/BEAUTY_RESOURCE/p' gradle.properties)#BEAUTY_RESOURCE=${beauty_sources}#g" gradle.properties
 cat gradle.properties
-
-# config voice properties
-voicePropFile=scenes/voice/voice/voice_gradle.properties
-rm -f $voicePropFile
-touch $voicePropFile
-echo "isBuildTypesTest=false\n" >> $voicePropFile
-echo "AGORA_APP_ID_RELEASE=\"${APP_ID}\"\n" >> $voicePropFile
-echo "AGORA_APP_CERTIFICATE_RELEASE=\"${APP_CERT}\"\n" >> $voicePropFile
-echo "IM_APP_KEY_RELEASE=\"${IM_APP_KEY}\"\n" >> $voicePropFile
-echo "TOOLBOX_SERVER_HOST_RELEASE=\"${TOOLBOX_SERVER_HOST}\"\n" >> $voicePropFile
-echo "IM_APP_CLIENT_ID_RELEASE=\"${IM_CLIENT_ID}\"\n" >> $voicePropFile
-echo "IM_APP_CLIENT_SECRET_RELEASE=\"${IM_CLIENT_SECRET}\"\n" >> $voicePropFile
-cat $voicePropFile
-
-# download hw-audio.jar and copy to libs
-mkdir -p scenes/ktv/libs
-curl -o scenes/ktv/libs/hw-audiokit.jar https://download.agora.io/demo/test/hw-audiokit.jar
 
 # Compile apk
 ./gradlew clean || exit 1
