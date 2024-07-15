@@ -8,6 +8,15 @@ if (project.property("AGORA_APP_ID").toString().isEmpty()) {
     throw new GradleException("请在 gradle.properties 中配置完整的 Agora ID 和 Certificate")
 }
 
+def baseProps = new File(rootProject.projectDir.absolutePath + File.separator + "gradle.properties")
+def properties = new Properties()
+if (baseProps.exists()) {
+    baseProps.withReader('UTF-8') { reader ->
+        properties.load(reader)
+    }
+}
+final def USE_LOCAL_SDK = properties.getProperty("USE_LOCAL_SDK").toBoolean()
+
 def localsdkPath = "agora-sdk"
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
@@ -25,8 +34,6 @@ android {
 
         buildConfigField "String", "APP_VERSION_NAME", "\"${APP_VERSION_NAME}\""
         buildConfigField "String", "APP_VERSION_CODE", "\"${APP_VERSION_CODE}\""
-
-        buildConfigField "Boolean", "USE_LOCAL_SDK", "\"${USE_LOCAL_SDK}\""
 
         buildConfigField "String", "SERVER_HOST", "\"${SERVER_HOST}\""
         buildConfigField "String", "TOOLBOX_SERVER_HOST", "\"${TOOLBOX_SERVER_HOST}\""
