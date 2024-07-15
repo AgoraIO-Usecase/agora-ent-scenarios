@@ -119,7 +119,9 @@ extension KTVSyncManagerServiceImp {
     
     func getRoomList(page: UInt, completion: @escaping (Error?, [AUIRoomInfo]?) -> Void) {
         let fetchRoomList: () -> Void = {[weak self] in
-            self?.roomService.getRoomList(lastCreateTime: 0, pageSize: 50) {[weak self] err, ts, list in
+            self?.roomService.getRoomList(lastCreateTime: 0, pageSize: 50) {[weak self] info in
+                return info.owner?.userId == self?.currentUserId()
+            } completion: {[weak self] err, ts, list in
                 let roomList = list ?? []
                 self?.roomList = roomList
                 completion(nil, roomList)
