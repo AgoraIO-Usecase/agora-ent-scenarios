@@ -105,6 +105,8 @@ dependencies {
     } else {
         api rootProject.ext.deps.rtc
     }
+
+    api rootProject.ext.deps.rtm
     api rootProject.ext.deps.ok2curl
 
     api rootProject.ext.deps.protobuf_java

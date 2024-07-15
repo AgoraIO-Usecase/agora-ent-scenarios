@@ -104,7 +104,7 @@ java --version
 # }
 if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then
     zip_name=${sdk_url##*/}
-    curl -L -H "X-JFrog-Art-Api:${packageName}" -O $sdk_url || exit 1
+    curl -L -H "X-JFrog-Art-Api:${JFROG_API_KEY}" -O $sdk_url || exit 1
     7za x ./$zip_name -y
 
     unzip_name=`ls -S -d */ | grep Agora`
