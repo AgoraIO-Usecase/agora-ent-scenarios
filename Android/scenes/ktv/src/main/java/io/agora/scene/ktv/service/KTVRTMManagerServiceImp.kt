@@ -216,11 +216,11 @@ class KTVSyncManagerServiceImp constructor(
         }
         if (KtvCenter.mRtmToken.isEmpty()) {
             KTVLogger.d(TAG, "initRtmSync, renewToken start")
-            KtvCenter.generateRtmToken { rtmToken, exception ->
+            KtvCenter.generateToken { rtmToken, exception ->
                 val token = rtmToken ?: run {
                     KTVLogger.e(TAG, "initRtmSync, $exception")
                     completion.invoke(AUIRtmException(-1, exception?.message ?: "error", ""))
-                    return@generateRtmToken
+                    return@generateToken
                 }
                 mSyncManager.login(token, completion = {
                     if (it == null) {
@@ -307,54 +307,42 @@ class KTVSyncManagerServiceImp constructor(
                 completion.invoke(Exception("${it.message}"), null)
                 return@initRtmSync
             }
-            KtvCenter.generateRtcToken { rtcToken, exception ->
-                // 创建房间提前获取 rtcToken
-                val token = rtcToken ?: run {
-                    KTVLogger.e(TAG, "createRoom, with renewRtcToken failed: $exception")
-                    completion.invoke(exception, null)
-                    return@generateRtcToken
+            val createAt = System.currentTimeMillis() - rsetfulDiffTs
+            val roomInfo = AUIRoomInfo().apply {
+                this.roomId = roomId
+                this.roomName = roomName
+                this.roomOwner = AUIUserThumbnailInfo().apply {
+                    userId = mCurrentUser.userId
+                    userName = mCurrentUser.userName
+                    userAvatar = mCurrentUser.userAvatar
                 }
-                if (exception != null) {
-                    completion.invoke(exception, null)
-                    return@generateRtcToken
-                }
-                val createAt = System.currentTimeMillis() - rsetfulDiffTs
-                val roomInfo = AUIRoomInfo().apply {
-                    this.roomId = roomId
-                    this.roomName = roomName
-                    this.roomOwner = AUIUserThumbnailInfo().apply {
-                        userId = mCurrentUser.userId
-                        userName = mCurrentUser.userName
-                        userAvatar = mCurrentUser.userAvatar
-                    }
-                    this.createTime = createAt
-                    this.customPayload[KTVParameters.ROOM_USER_COUNT] = 1
-                    this.customPayload[KTVParameters.THUMBNAIL_ID] = getRandomThumbnailId(createAt)
-                    this.customPayload[KTVParameters.PASSWORD] = password ?: ""
-                    this.customPayload[KTVParameters.IS_PRIVATE] = !password.isNullOrEmpty()
-                }
-                val scene = mSyncManager.createScene(roomInfo.roomId)
-                scene.bindRespDelegate(this)
-                scene.userService.registerRespObserver(this)
-                innerSubscribeAll(roomId)
-                mCurRoomNo = roomInfo.roomId
-                mRoomService.createRoom(KtvCenter.mAppId, kSceneId, roomInfo, completion = { rtmException, _ ->
-                    if (rtmException == null) {
-                        KTVLogger.d(TAG, "createRoom success: $roomInfo")
-                        mCurRoomNo = roomInfo.roomId
-                        startTimer()
-                        runOnMainThread {
-                            completion.invoke(null, roomInfo)
-                        }
-                    } else {
-                        mCurRoomNo = ""
-                        KTVLogger.e(TAG, "createRoom failed: $rtmException")
-                        runOnMainThread {
-                            completion.invoke(Exception("${rtmException.message}(${rtmException.code})"), null)
-                        }
-                    }
-                })
+                this.createTime = createAt
+                this.customPayload[KTVParameters.ROOM_USER_COUNT] = 1
+                this.customPayload[KTVParameters.THUMBNAIL_ID] = getRandomThumbnailId(createAt)
+                this.customPayload[KTVParameters.PASSWORD] = password ?: ""
+                this.customPayload[KTVParameters.IS_PRIVATE] = !password.isNullOrEmpty()
             }
+            val scene = mSyncManager.createScene(roomInfo.roomId)
+            scene.bindRespDelegate(this)
+            scene.userService.registerRespObserver(this)
+            innerSubscribeAll(roomId)
+            mCurRoomNo = roomInfo.roomId
+            mRoomService.createRoom(KtvCenter.mAppId, kSceneId, roomInfo, completion = { rtmException, _ ->
+                if (rtmException == null) {
+                    KTVLogger.d(TAG, "createRoom success: $roomInfo")
+                    mCurRoomNo = roomInfo.roomId
+                    startTimer()
+                    runOnMainThread {
+                        completion.invoke(null, roomInfo)
+                    }
+                } else {
+                    mCurRoomNo = ""
+                    KTVLogger.e(TAG, "createRoom failed: $rtmException")
+                    runOnMainThread {
+                        completion.invoke(Exception("${rtmException.message}(${rtmException.code})"), null)
+                    }
+                }
+            })
         }
     }
 
@@ -384,33 +372,25 @@ class KTVSyncManagerServiceImp constructor(
                 completion.invoke(Exception("${it.message}"))
                 return@initRtmSync
             }
-            KtvCenter.generateRtcToken(callback = { rtcToken, exception ->
-                // 进入房间提前获取 rtcToken
-                val token = rtcToken ?: run {
-                    KTVLogger.e(TAG, "joinRoom, with renewRtcToken failed: $exception")
-                    completion.invoke(exception)
-                    return@generateRtcToken
-                }
-                val scene = mSyncManager.createScene(roomId)
-                scene.bindRespDelegate(this)
-                scene.userService.registerRespObserver(this)
-                innerSubscribeAll(roomId)
-                mCurRoomNo = roomId
-                mRoomService.enterRoom(KtvCenter.mAppId, kSceneId, roomId, completion = { rtmException ->
-                    if (rtmException == null) {
-                        KTVLogger.d(TAG, "enterRoom success: ${cacheRoom.roomId}")
-                        mCurRoomNo = cacheRoom.roomId
-                        runOnMainThread {
-                            completion.invoke(null)
-                        }
-                    } else {
-                        mCurRoomNo = ""
-                        KTVLogger.e(TAG, "enterRoom failed: $rtmException")
-                        runOnMainThread {
-                            completion.invoke(Exception("${rtmException.message}(${rtmException.code})"))
-                        }
+            val scene = mSyncManager.createScene(roomId)
+            scene.bindRespDelegate(this)
+            scene.userService.registerRespObserver(this)
+            innerSubscribeAll(roomId)
+            mCurRoomNo = roomId
+            mRoomService.enterRoom(KtvCenter.mAppId, kSceneId, roomId, completion = { rtmException ->
+                if (rtmException == null) {
+                    KTVLogger.d(TAG, "enterRoom success: ${cacheRoom.roomId}")
+                    mCurRoomNo = cacheRoom.roomId
+                    runOnMainThread {
+                        completion.invoke(null)
                     }
-                })
+                } else {
+                    mCurRoomNo = ""
+                    KTVLogger.e(TAG, "enterRoom failed: $rtmException")
+                    runOnMainThread {
+                        completion.invoke(Exception("${rtmException.message}(${rtmException.code})"))
+                    }
+                }
             })
         }
     }
@@ -917,10 +897,10 @@ class KTVSyncManagerServiceImp constructor(
      */
     override fun onTokenPrivilegeWillExpire(channelName: String?) {
         KTVLogger.d(TAG, "onTokenPrivilegeWillExpire, $channelName")
-        KtvCenter.generateRtmToken { rtmToken, exception ->
+        KtvCenter.generateToken { rtmToken, exception ->
             val token = rtmToken ?: run {
                 KTVLogger.e(TAG, "onTokenPrivilegeWillExpire, with renewRtmToken failed: $exception")
-                return@generateRtmToken
+                return@generateToken
             }
             mSyncManager.login(token, completion = { rtmException ->
                 if (rtmException == null) {
