@@ -959,12 +959,20 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickPKButton(_ button: ShowRedDotButton) {
+        guard interactionStatus == .idle else {
+            ToastView.show(text: "show_error_disable_pk".show_localized)
+            return
+        }
         AlertManager.show(view: pkInviteView, alertPostion: .bottom)
         _refreshPKUserList()
     }
     
     func onClickLinkButton(_ button: ShowRedDotButton) {
         if role == .broadcaster {
+            guard interactionStatus == .idle else {
+                ToastView.show(text: "show_error_disable_linking".show_localized)
+                return
+            }
             applyAndInviteView.reloadData()
             AlertManager.show(view: applyAndInviteView, alertPostion: .bottom)
         } else {
