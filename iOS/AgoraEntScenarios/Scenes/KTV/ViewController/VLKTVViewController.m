@@ -765,6 +765,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
     VL(weakSelf);
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
+        KTVLogInfo(@"load music[%ld] completion, isSuccess: %d, role: %ld", songCode, isSuccess, role);
         if (!isSuccess) {
             return;
         }
