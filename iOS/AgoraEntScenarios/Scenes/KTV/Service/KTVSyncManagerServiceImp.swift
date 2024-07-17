@@ -406,6 +406,7 @@ extension KTVSyncManagerServiceImp {
             return
         }
         let collection = getSongCollection(with: roomNo)
+        agoraPrint("markSongDidPlay songCode: \(songCode)")
         collection?.mergeMetaData(valueCmd: AUIMusicCmd.updatePlayStatusCmd.rawValue,
                                   value: ["status": VLSongPlayStatus.playing.rawValue],
                                   filter: [["songNo": songCode]],
