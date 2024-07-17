@@ -868,23 +868,23 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)joinChorus {
-
-    [self.MVView setMvState:VLKTVMVViewStateJoinChorus];
     self.isJoinChorus = YES;
+    [self.MVView setMvState:VLKTVMVViewStateJoinChorus];
     if([self getOnMicUserCount] == 8 && !_isOnMicSeat){
+        [self _rollbackAfterChorusJoinFailure];
         [VLToast toast:KTVLocalizedString(@"ktv_mic_full")];
         return;
     }
     
     if(self.RTCkit.getConnectionState != AgoraConnectionStateConnected){
-        [self.MVView setMvState: [self isRoomOwner] ? VLKTVMVViewStateOwnerAudience : VLKTVMVViewStateAudience];
+        [self _rollbackAfterChorusJoinFailure];
         [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
         return;
     }
     
     if (![self getJoinChorusEnable]) {
         KTVLogInfo(@"getJoinChorusEnable false");
-        [self.MVView setMvState: [self isRoomOwner] ? VLKTVMVViewStateOwnerAudience : VLKTVMVViewStateAudience];
+        [self _rollbackAfterChorusJoinFailure];
         [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
         return;
     }
@@ -895,9 +895,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self enterSeatWithIndex:nil completion:^(NSError *error) {
             if(error){
                 KTVLogError(@"enterSeat error:%@", error.description);
-               // weakSelf.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
-                [self.MVView setMvState: [self isRoomOwner] ? VLKTVMVViewStateOwnerAudience : VLKTVMVViewStateAudience];
-                weakSelf.isJoinChorus = NO;
+                [weakSelf _rollbackAfterChorusJoinFailure];
                 [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
                 return;
             }
@@ -915,6 +913,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)joinChorusFailedAndUIUpadte {
 }
 
+- (void)_rollbackAfterChorusJoinFailure {
+    [self.MVView setMvState: [self isRoomOwner] ? VLKTVMVViewStateOwnerAudience : VLKTVMVViewStateAudience];
+    self.isJoinChorus = NO;
+    KTVLogInfo(@"join chorus fail");
+}
+
 - (void)_joinChorus {
     [self.MVView.incentiveView reset];
     
@@ -928,8 +932,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VL(weakSelf);
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
         if (!isSuccess) {
-            weakSelf.isJoinChorus = NO;
-           [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
+            [weakSelf _rollbackAfterChorusJoinFailure];
+            [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
             return;
         }
         
@@ -938,11 +942,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [weakSelf.ktvApi switchSingerRoleWithNewRole:role
                                    onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
             if (state == KTVSwitchRoleStateFail && reason != KTVSwitchRoleFailReasonNoPermission) {
-                [weakSelf.MVView setMvState: [weakSelf isRoomOwner] ? VLKTVMVViewStateOwnerAudience : VLKTVMVViewStateAudience];
-                weakSelf.isJoinChorus = NO;
-                [VLToast toast:[NSString stringWithFormat:@"join chorus fail: %ld", reason]];
-                KTVLogInfo(@"join chorus fail");
-                //TODO: error toast?
+                [weakSelf _rollbackAfterChorusJoinFailure];
                 [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
                 return;
             }
