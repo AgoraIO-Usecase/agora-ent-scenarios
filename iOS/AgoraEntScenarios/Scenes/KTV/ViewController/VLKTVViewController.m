@@ -789,21 +789,30 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [weakSelf.ktvApi startSingWithSongCode:songCode startPos:0];
         }
         
-        [weakSelf.ktvApi switchSingerRoleWithNewRole:role
-                               onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-            if(state != KTVSwitchRoleStateSuccess && role != KTVSingRoleAudience) {
-                //TODO(chenpan): error toast and retry?
-                KTVLogError(@"switchSingerRole error: %ld", reason);
-                return;
-            } else {
-                if(role == KTVSingRoleSoloSinger || role == KTVSingRoleLeadSinger){
-                    [weakSelf.ktvApi startSingWithSongCode:songCode startPos:0];
-                    weakSelf.aecLevel = 0;
-                    weakSelf.aecState = false;
-                }
-                [weakSelf setMVViewStateWith:model];
+        if(self.singRole == role) {
+            if(role == KTVSingRoleSoloSinger || role == KTVSingRoleLeadSinger){
+                [self.ktvApi startSingWithSongCode:songCode startPos:0];
+                self.aecLevel = 0;
+                self.aecState = false;
             }
-        }];
+            [self setMVViewStateWith:model];
+        } else {
+            [weakSelf.ktvApi switchSingerRoleWithNewRole:role
+                                       onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+                if(state != KTVSwitchRoleStateSuccess && role != KTVSingRoleAudience) {
+                    //TODO: error toast and retry?
+                    KTVLogError(@"switchSingerRole error: %ld", reason);
+                    return;
+                } else {
+                    if(role == KTVSingRoleSoloSinger || role == KTVSingRoleLeadSinger){
+                        [weakSelf.ktvApi startSingWithSongCode:songCode startPos:0];
+                        weakSelf.aecLevel = 0;
+                        weakSelf.aecState = false;
+                    }
+                    [weakSelf setMVViewStateWith:model];
+                }
+            }];
+        }
     };
     
     [self.lrcControl resetShowOnce];
@@ -2011,7 +2020,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(![self isCurrentSongMainSinger:VLUserCenter.user.id]) {
             return;
         }
-        KTVLogInfo(@"seat array update chorusNum %ld->%ld", origChorusNum, chorusNum);
+        KTVLogInfo(@"seat array update chorusNum %ld->%ld, currentRole: %ld", origChorusNum, chorusNum, self.singRole);
+        if(self.singRole == KTVSingRoleAudience) { return; }
         //lead singer <-> solo
         KTVSingRole role = [self getUserSingRole];
         [self.ktvApi switchSingerRoleWithNewRole:role
