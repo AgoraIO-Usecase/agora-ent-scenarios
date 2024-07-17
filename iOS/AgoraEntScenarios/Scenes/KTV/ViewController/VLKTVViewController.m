@@ -870,7 +870,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)joinChorus {
     self.isJoinChorus = YES;
     [self.MVView setMvState:VLKTVMVViewStateJoinChorus];
-    if([self getOnMicUserCount] == 8 && !_isOnMicSeat){
+    if(![self hasAvailableMicSeat]){
         [self _rollbackAfterChorusJoinFailure];
         [VLToast toast:KTVLocalizedString(@"ktv_mic_full")];
         return;
@@ -1261,6 +1261,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:YES
                                                         completion:^(NSError * error) {
     }];
+}
+
+- (BOOL)hasAvailableMicSeat {
+    if(_isOnMicSeat) {
+        return YES;
+    }
+    return [self getOnMicUserCount] < 8;
 }
 
 #pragma mark -- VLKTVTopViewDelegate
