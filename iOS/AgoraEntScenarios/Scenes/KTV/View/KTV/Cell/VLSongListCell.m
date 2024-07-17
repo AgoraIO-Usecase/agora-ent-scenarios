@@ -116,7 +116,7 @@
     
     if (selSongModel.status == VLSongPlayStatusIdle) {
         if(!isOwner) {
-            if ([selSongModel.owner.userName isEqualToString:VLUserCenter.user.id]){
+            if ([selSongModel.owner.userId isEqualToString:VLUserCenter.user.id]){
                 self.sortBtn.hidden = YES;
                 self.deleteBtn.hidden = NO;
             } else {
