@@ -122,7 +122,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) BOOL aecState; //AIAEC开关
 @property (nonatomic, assign) NSInteger aecLevel; //AEC等级
 @property (nonatomic, assign) NSString *selectUserNo;
-@property (nonatomic, strong) UIButton *testButton;
 @property (nonatomic, assign) BOOL soundOpen;
 @property (nonatomic, copy)  NSString *gainValue;
 @property (nonatomic, assign) NSInteger typeValue;
@@ -221,13 +220,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     
     self.earValue = 100;
     
-    //测试使用
-    _testButton = [[UIButton alloc]initWithFrame:CGRectMake((SCREEN_WIDTH - 60)/2.0, SCREEN_HEIGHT - 60, 60, 40)];
-    _testButton.backgroundColor = [UIColor redColor];
-    [_testButton addTarget:self action:@selector(testCosinger) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:_testButton];
-    [_testButton setHidden:true];
-    
     if(AppContext.shared.isDebugMode){
         //如果开启了debug模式
         UIButton *debugBtn = [[UIButton alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 200, 80, 80)];
@@ -248,11 +240,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
                 [VLToast toast:KTVLocalizedString(@"ktv_earback_micphone_pull")];
             }
         }
-    }];
-}
-
--(void)testCosinger{
-    [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleLeadSinger onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
     }];
 }
 
@@ -926,11 +913,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 -(void)joinChorusFailedAndUIUpadte {
-    
 }
 
 - (void)_joinChorus {
-    
     [self.MVView.incentiveView reset];
     
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
