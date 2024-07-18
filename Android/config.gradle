@@ -48,7 +48,7 @@ ext {
             gson              : 'com.google.code.gson:gson:2.9.0',
             autosize          : 'com.github.JessYanCoding:AndroidAutoSize:v1.2.1',
 
-            rtc               : 'io.agora.rtc:agora-special-full:4.1.1.23',
+            rtc               : 'io.agora.rtc:full-sdk:4.3.1',
             rtm               : 'io.agora:agora-rtm:2.1.8',
             syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.2.9',
             lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.1.1',

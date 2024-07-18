@@ -7,7 +7,7 @@ plugins {
 if (project.property("AGORA_APP_ID").toString().isEmpty()) {
     throw new GradleException("请在 gradle.properties 中配置完整的 Agora ID 和 Certificate")
 }
-def localsdkPath = "4.3.1-sdk"
+//def localsdkPath = "4.3.1-sdk"
 
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
@@ -49,11 +49,11 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    sourceSets {
-        main {
-            jniLibs.srcDirs += "${localsdkPath}"
-        }
-    }
+//    sourceSets {
+//        main {
+//            jniLibs.srcDirs += "${localsdkPath}"
+//        }
+//    }
 }
 
 dependencies {
@@ -82,7 +82,7 @@ dependencies {
 
     implementation rootProject.ext.deps.coroutines_android
 
-
-    api fileTree(dir: "${localsdkPath}", include: ['*.jar'])
+    api rootProject.ext.deps.rtc
+    //api fileTree(dir: "${localsdkPath}", include: ['*.jar'])
     api rootProject.ext.deps.ok2curl
 }
