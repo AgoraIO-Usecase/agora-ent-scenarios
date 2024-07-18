@@ -384,10 +384,11 @@ extension KTVSyncManagerServiceImp {
             completion(NSError(domain: "removeSong fail", code: -1))
             return
         }
-        agoraPrint("imp song delete... songCode[\(songCode)]")
+        agoraPrint("[\(channelName)]removeSong songCode: \(songCode)")
         let collection = getSongCollection(with: channelName)
         collection?.removeMetaData(valueCmd: AUIMusicCmd.removeSongCmd.rawValue,
                                    filter: [["songNo": songCode]]) { err in
+            agoraPrint("[\(channelName)]removeSong songCode: \(songCode) completion: \(err?.localizedDescription ?? "success")")
             var error: NSError? = nil
             if let err = err {
                 error = KTVServiceError.removeSongFail(err.code).toNSError()
@@ -406,11 +407,13 @@ extension KTVSyncManagerServiceImp {
             return
         }
         let collection = getSongCollection(with: roomNo)
-        agoraPrint("markSongDidPlay songCode: \(songCode)")
+        agoraPrint("[\(roomNo)]markSongDidPlay songCode: \(songCode)")
         collection?.mergeMetaData(valueCmd: AUIMusicCmd.updatePlayStatusCmd.rawValue,
                                   value: ["status": VLSongPlayStatus.playing.rawValue],
-                                  filter: [["songNo": songCode]],
-                                  callback: completion)
+                                  filter: [["songNo": songCode]]) { err in
+            agoraPrint("[\(roomNo)]markSongDidPlay songCode \(songCode) completion: \(err?.localizedDescription ?? "success")")
+            completion(err)
+        }
     }
     
     func chooseSong(inputModel: KTVChooseSongInputModel, completion: @escaping (Error?) -> Void) {
@@ -426,13 +429,14 @@ extension KTVSyncManagerServiceImp {
         songInfo.owner = AUIUserThumbnailInfo.createUserInfo()
         songInfo.createAt = getCurrentTs(channelName: roomNo)
 
-        agoraPrint("imp song add...[\(roomNo)]")
         let params = mapConvert(model: songInfo)
         let collection = getSongCollection(with: roomNo)
         //add a filter to ensure that objects with the same songNo are not repeatedly inserted
+        agoraPrint("[\(roomNo)]chooseSong songCode \(inputModel.songNo ?? "")")
         collection?.addMetaData(valueCmd: AUIMusicCmd.chooseSongCmd.rawValue,
                                 value: params,
                                 filter: [["songNo": songInfo.songNo ?? ""]]) { err in
+            agoraPrint("[\(roomNo)]chooseSong songCode \(inputModel.songNo ?? "") completion: \(err?.localizedDescription ?? "success")")
             var error: NSError? = nil
             if let err = err {
                 error = KTVServiceError.chooseSongFail(err.code).toNSError()
@@ -447,9 +451,11 @@ extension KTVSyncManagerServiceImp {
             return
         }
         let collection = getSongCollection(with: roomNo)
+        agoraPrint("[\(roomNo)]pinSong songCode \(songCode)")
         collection?.mergeMetaData(valueCmd: AUIMusicCmd.pinSongCmd.rawValue,
                                   value: ["pinAt": getCurrentTs(channelName: roomNo)],
                                   filter: [["songNo": songCode]]) { err in
+            agoraPrint("[\(roomNo)]pinSong songCode \(songCode) completion: \(err?.localizedDescription ?? "success")")
             var error: NSError? = nil
             if let err = err {
                 error = KTVServiceError.pinSongFail(err.code).toNSError()
@@ -472,10 +478,13 @@ extension KTVSyncManagerServiceImp {
         
         let value = mapConvert(model: model)
         let collection = getChorusCollection(with: roomNo)
+        agoraPrint("[\(roomNo)]joinChorus songCode \(songCode)")
         collection?.addMetaData(valueCmd: AUIChorusCmd.joinCmd.rawValue,
                                 value: value,
-                                filter: [["chorusSongNo": songCode, "userId": currentUserId()]],
-                                callback: completion)
+                                filter: [["chorusSongNo": songCode, "userId": currentUserId()]]) { error in
+            agoraPrint("[\(roomNo)]joinChorus songCode \(songCode) completion: \(error?.localizedDescription ?? "success")")
+            completion(error)
+        }
     }
     
     func leaveChorus(songCode: String, completion: @escaping (Error?) -> Void) {
@@ -484,9 +493,12 @@ extension KTVSyncManagerServiceImp {
             return
         }
         let collection = getChorusCollection(with: roomNo)
+        agoraPrint("[\(roomNo)]leaveChorus songCode \(songCode)")
         collection?.removeMetaData(valueCmd: AUIChorusCmd.leaveCmd.rawValue,
-                                   filter: [["chorusSongNo": songCode, "userId": currentUserId()]],
-                                   callback: completion)
+                                   filter: [["chorusSongNo": songCode, "userId": currentUserId()]]){ error in
+            agoraPrint("[\(roomNo)]leaveChorus songCode \(songCode) completion: \(error?.localizedDescription ?? "success")")
+            completion(error)
+        }
     }
 }
 
