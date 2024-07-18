@@ -86,15 +86,11 @@ private let SYNC_MANAGER_CHORUS_INFO = "chorister_info"
         
         let userId = VLUserCenter.user.id
         let date = Date()
-        NetworkManager.shared.generateTokens(channelName: "",
-                                             uid: "\(userId)",
-                                             tokenGeneratorType: .token007,
-                                             tokenTypes: [.rtc, .rtm],
-                                             expire: 24 * 60 * 60) {  tokenMap in
-            guard let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue],
-                  rtcToken.count > 0,
-                  let rtmToken = tokenMap[NetworkManager.AgoraTokenType.rtm.rawValue],
-                  rtmToken.count > 0 else {
+        NetworkManager.shared.generateToken(channelName: "",
+                                            uid: "\(userId)",
+                                            tokenTypes: [.rtc, .rtm],
+                                            expire: 24 * 60 * 60) {  token in
+            guard let rtcToken = token, let rtmToken = token else {
                 completion(NSError(domain: "generate token fail", code: -1))
                 return
             }
@@ -994,7 +990,9 @@ extension KTVSyncManagerServiceImp: AUISceneRespDelegate {
     }
     
     func onTokenPrivilegeWillExpire(channelName: String?) {
-        NetworkManager.shared.generateToken(channelName: "", uid: String(user.id), tokenType: .token007, type: .rtm) { token in
+        NetworkManager.shared.generateToken(channelName: "",
+                                            uid: String(user.id),
+                                            tokenTypes: [.rtm]) { token in
             if let token = token {
                 self.syncManager.renew(token: token) { err in
                     guard let err = err else { return }
