@@ -314,9 +314,9 @@ extension RoomListViewController {
             return
         }
         debugInfo("renewTokens start")
-        NetworkManager.shared.generateTokens(channelName: "",
-                                             uid: userInfo.uid,
-                                             tokenTypes: [.rtc, .rtm]) {[weak self] token in
+        NetworkManager.shared.generateToken(channelName: "",
+                                            uid: userInfo.uid,
+                                            tokenTypes: [.rtc, .rtm]) {[weak self] token in
             guard let self = self else {return}
             guard let rtcToken = token, let rtmToken = token else {
                 self.debugInfo("renewTokens fail")
