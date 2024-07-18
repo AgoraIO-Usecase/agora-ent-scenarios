@@ -725,22 +725,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     SBGLogInfo(@"tokenPrivilegeWillExpire: %@", token);
     [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
                                                       uid:VLUserCenter.user.id
-                                                tokenType:TokenGeneratorTypeToken006
-                                                     type:AgoraTokenTypeRtc
+                                                    types:@[@(AgoraTokenTypeRtc), @(AgoraTokenTypeRtm)]
                                                    expire:1500
                                                   success:^(NSString * token) {
         SBGLogInfo(@"tokenPrivilegeWillExpire rtc renewToken: %@", token);
         [self.RTCkit renewToken:token];
-    }];
-    
-    //TODO: mcc missing token expire callback
-    [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
-                                                      uid:VLUserCenter.user.id
-                                                tokenType:TokenGeneratorTypeToken006
-                                                     type:AgoraTokenTypeRtm
-                                                   expire:1500
-                                                  success:^(NSString * token) {
-        SBGLogInfo(@"tokenPrivilegeWillExpire rtm renewToken: %@", token);
         //TODO(chenpan): mcc missing
 //        [self.AgoraMcc renewToken:token];
     }];
