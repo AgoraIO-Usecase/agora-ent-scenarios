@@ -9,6 +9,7 @@ import Foundation
 import RTMSyncManager
 import YYModel
 import AgoraRtmKit
+import AgoraCommon
 
 private let kSceneId = "scene_joy_5.0.0"
 private let SYNC_SCENE_ROOM_STARTGAME_COLLECTION = "startGameCollection"
@@ -20,7 +21,6 @@ class JoyServiceImpl: NSObject {
     private var sceneBinded: Bool = false
     private var collectionBinded: Bool = false
     private var host: String
-    private var appCertificate: String
     private weak var listener: JoyServiceListenerProtocol?
     
     private var userList: [JoyUserInfo] = [] {
@@ -54,12 +54,11 @@ class JoyServiceImpl: NSObject {
         return service
     }()
     
-    required init(appId: String, host: String, appCertificate: String, user: JoyUserInfo, rtmClient: AgoraRtmClientKit?) {
+    required init(appId: String, host: String, user: JoyUserInfo, rtmClient: AgoraRtmClientKit?) {
         self.appId = appId
         self.user = user
         self.rtmClient = rtmClient
         self.host = host
-        self.appCertificate = appCertificate
         AUIRoomContext.shared.displayLogClosure = { msg in
             JoyLogger.info(msg, context: "RTMSyncManager")
         }
@@ -379,7 +378,9 @@ extension JoyServiceImpl: AUISceneRespDelegate {
     }
     
     func onTokenPrivilegeWillExpire(channelName: String?) {
-        NetworkManager.shared.generateToken(appId: appId, appCertificate: appCertificate, channelName: "", uid: String(user.userId), tokenType: .token007, type: .rtm) { token in
+        NetworkManager.shared.generateToken(channelName: "",
+                                            uid: String(user.userId),
+                                            tokenTypes: [.rtm]) { token in
             if let token = token {
                 self.syncManager.rtmManager.renew(token: token) { err in
                     JoyLogger.info("renew token：err \(err)")
@@ -560,7 +561,9 @@ extension JoyServiceImpl{
 extension JoyServiceImpl: AUIRtmErrorProxyDelegate {
     
     private func login(completion:(@escaping (Error?)-> Void)) {
-        NetworkManager.shared.generateToken(appId: appId, appCertificate: appCertificate, channelName: "", uid: String(user.userId), tokenType: .token007, type: .rtm) { token in
+        NetworkManager.shared.generateToken(channelName: "",
+                                            uid: String(user.userId),
+                                            tokenTypes: [.rtm]) { token in
             if let token = token {
                 self.syncManager.rtmManager.login(token: token) { err in
                     self.isConnected = err == nil ? true : false

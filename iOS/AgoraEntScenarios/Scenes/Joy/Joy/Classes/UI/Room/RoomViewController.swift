@@ -496,14 +496,11 @@ extension RoomViewController {
     
     private func renewRTCTokens(roomId: String, userId: UInt, completion: ((String?)->Void)?) {
         JoyLogger.info("renewRTCTokens[\(roomId)][\(userId)]")
-        NetworkManager.shared.generateTokens(appId: joyAppId,
-                                             appCertificate: joyAppCertificate,
-                                             channelName: roomId,
-                                             uid: "\(userId)",
-                                             tokenGeneratorType: .token007,
-                                             tokenTypes: [.rtc]) {[weak self] tokens in
+        NetworkManager.shared.generateToken(channelName: roomId,
+                                            uid: "\(userId)",
+                                            tokenTypes: [.rtc]) {[weak self] token in
             guard let self = self else {return}
-            guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue] else {
+            guard let rtcToken = token else {
                 JoyLogger.warn("renewRTCTokens[\(roomId)] fail")
                 completion?(nil)
                 return

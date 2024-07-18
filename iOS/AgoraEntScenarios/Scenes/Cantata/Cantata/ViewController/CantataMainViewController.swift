@@ -1563,15 +1563,11 @@ extension CantataMainViewController: AgoraRtcEngineDelegate {
     
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, tokenPrivilegeWillExpire token: String) {
-        NetworkManager.shared.generateToken(channelName: roomModel?.roomNo ?? "", uid: VLUserCenter.user.id, tokenType: .token006, type: .rtc) {[weak self] token  in
+        NetworkManager.shared.generateToken(channelName: roomModel?.roomNo ?? "",
+                                            uid: VLUserCenter.user.id,
+                                            tokenTypes: [.rtc, .rtm]) {[weak self] token  in
             guard let self = self, let token = token else {return}
             self.RtcKit.renewToken(token)
-        }
-        
-        //mcc renew token
-        NetworkManager.shared.generateToken(channelName: roomModel?.roomNo ?? "", uid: VLUserCenter.user.id, tokenType: .token006, type: .rtm) {[weak self] token  in
-            guard let self = self, let token = token else {return}
-            // cp todo
         }
     }
     

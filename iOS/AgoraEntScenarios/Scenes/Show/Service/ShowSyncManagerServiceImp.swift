@@ -84,15 +84,10 @@ extension ShowSyncManagerServiceImp {
         AppContext.shared.agoraRTMToken = ""
         
         let date = Date()
-        NetworkManager.shared.generateTokens(channelName: "",
-                                             uid: "\(user.userId)",
-                                             tokenGeneratorType: .token007,
-                                             tokenTypes: [.rtc, .rtm],
-                                             expire: 24 * 60 * 60) {  tokenMap in
-            guard let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue],
-                  rtcToken.count > 0,
-                  let rtmToken = tokenMap[NetworkManager.AgoraTokenType.rtm.rawValue],
-                  rtmToken.count > 0 else {
+        NetworkManager.shared.generateToken(channelName: "",
+                                            uid: "\(user.userId)",
+                                            tokenTypes: [.rtc, .rtm]) {  token in
+            guard let rtcToken = token, let rtmToken = token else {
                 completion(NSError(domain: "generate token fail", code: -1))
                 return
             }
