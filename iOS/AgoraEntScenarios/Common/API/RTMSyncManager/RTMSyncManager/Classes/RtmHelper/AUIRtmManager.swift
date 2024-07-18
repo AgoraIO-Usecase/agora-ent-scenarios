@@ -549,7 +549,10 @@ extension AUIRtmManager {
                 return
             }
             self.receiptCallbackMap[uniqueId] = AUIReceipt(closure: { error in
-                aui_benchmark("publishAndWaitReceipt completion", cost: -date.timeIntervalSinceNow)
+                aui_benchmark("publishAndWaitReceipt cost", cost: -date.timeIntervalSinceNow, tag: "AUIRtmManager")
+                if let err = error {
+                    aui_warn("publishAndWaitReceipt fail: \(err.localizedDescription)", tag: "AUIRtmManager")
+                }
                 completion?(error)
             }, uniqueId: uniqueId)
         }
@@ -570,7 +573,7 @@ extension AUIRtmManager {
                 callbackError = AUICommonError.httpError(error.errorCode.rawValue, error.reason).toNSError()
             }
             completion(callbackError)
-            aui_info("publish '\(message)' to user '\(userId)': \(error?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
+            aui_info("publish '\(message)' to user '\(userId)' completion, error code: \(error?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
         }
         aui_info("publish '\(message)' to user '\(userId)'", tag: "AUIRtmManager")
     }
@@ -622,12 +625,12 @@ extension AUIRtmManager {
             }
             return
         }
-        aui_info("setLock[\(channelName)][\(lockName)] start")
+        aui_info("setLock[\(channelName)][\(lockName)] start", tag: "AUIRtmManager")
         lock.setLock(channelName: channelName,
                      channelType: rtmChannelType,
                      lockName: lockName,
                      ttl: 10) { resp, errorInfo in
-            aui_info("setLock[\(channelName)][\(lockName)]: \(errorInfo?.errorCode.rawValue ?? 0)")
+            aui_info("setLock[\(channelName)][\(lockName)] completion, error code: \(errorInfo?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
             completion(errorInfo?.toNSError())
         }
     }
@@ -640,12 +643,12 @@ extension AUIRtmManager {
             }
             return
         }
-        aui_info("acquireLock[\(channelName)][\(lockName)] start")
+        aui_info("acquireLock[\(channelName)][\(lockName)] start", tag: "AUIRtmManager")
         lock.acquireLock(channelName: channelName,
                          channelType: rtmChannelType,
                          lockName: lockName,
                          retry: true) { resp, errorInfo in
-            aui_info("acquireLock[\(channelName)][\(lockName)]: \(errorInfo?.errorCode.rawValue ?? 0)")
+            aui_info("acquireLock[\(channelName)][\(lockName)] completion, error code: \(errorInfo?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
             completion(errorInfo?.toNSError())
         }
     }
@@ -659,12 +662,12 @@ extension AUIRtmManager {
             }
             return
         }
-        aui_info("releaseLock[\(channelName)][\(lockName)] start")
+        aui_info("releaseLock[\(channelName)][\(lockName)] start", tag: "AUIRtmManager")
         lock.releaseLock(channelName: channelName,
                          channelType: rtmChannelType,
                          lockName: lockName,
                          completion: { resp, errorInfo in
-            aui_info("releaseLock[\(channelName)][\(lockName)]: \(errorInfo?.reason ?? "")")
+            aui_info("releaseLock[\(channelName)][\(lockName)] completion, error code: \(errorInfo?.reason ?? "")", tag: "AUIRtmManager")
             completion(errorInfo?.toNSError())
         })
     }
@@ -678,12 +681,12 @@ extension AUIRtmManager {
             }
             return
         }
-        aui_info("removeLock[\(channelName)][\(lockName)] start")
+        aui_info("removeLock[\(channelName)][\(lockName)] start", tag: "AUIRtmManager")
         lock.removeLock(channelName: channelName,
                         channelType: rtmChannelType,
                         lockName: lockName,
                         completion: { resp, errorInfo in
-            aui_info("removeLock[\(channelName)][\(lockName)]: \(errorInfo?.reason ?? "")")
+            aui_info("removeLock[\(channelName)][\(lockName)] completion, error code: \(errorInfo?.reason ?? "")", tag: "AUIRtmManager")
             completion(errorInfo?.toNSError())
         })
     }
