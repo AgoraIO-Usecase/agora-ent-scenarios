@@ -41,6 +41,9 @@ class AUIRtmManager constructor(
         rtmClient.setParameters("{\"rtm.msg.tx_timeout\": 3000}")
         rtmClient.setParameters("{\"rtm.metadata.api_timeout\": 3000}")
         rtmClient.setParameters("{\"rtm.metadata.api_max_retries\": 1}")
+
+        rtmClient.setParameters("{\"rtm.heartbeat_interval\": 1}")
+        rtmClient.setParameters("{\"rtm.lock_ttl_minimum_value\": 5}")
     }
 
     fun deInit() {
@@ -613,7 +616,7 @@ class AUIRtmManager constructor(
         channelName: String,
         channelType: RtmChannelType = RtmChannelType.MESSAGE,
         lockName: String = kRTM_Referee_LockName,
-        ttl: Long = 10,
+        ttl: Long = 5,
         completion: (AUIRtmException?) -> Unit
     ) {
         val lock = rtmClient.lock
