@@ -66,7 +66,7 @@ class JoyViewModel : ViewModel() {
                 roomId,
                 assistantUid.toString(),
                 TokenGenerator.TokenGeneratorType.token007,
-                TokenGenerator.AgoraTokenType.rtc
+                arrayOf(TokenGenerator.AgoraTokenType.rtc)
             )
             mJoyGameRepo.startGame(
                 gameId = gameId,
@@ -140,7 +140,7 @@ class JoyViewModel : ViewModel() {
                 roomId,
                 assistantUid,
                 TokenGenerator.TokenGeneratorType.token007,
-                TokenGenerator.AgoraTokenType.rtc
+                arrayOf(TokenGenerator.AgoraTokenType.rtc)
             )
             mJoyGameRepo.gameRenewToken(
                 gameId = gameId,

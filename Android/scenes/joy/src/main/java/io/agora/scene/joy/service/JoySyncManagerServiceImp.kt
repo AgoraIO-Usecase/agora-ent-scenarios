@@ -223,19 +223,12 @@ class JoySyncManagerServiceImp constructor(
                 completion.invoke(Exception("${it.message}(${it.code})"))
                 return@initRtmSync
             }
-            JoyServiceManager.generateRtcToken { rtcToken, exception ->
-                // 进入房间提前获取 rtcToken
-                val token = rtcToken ?: run {
-                    JoyLogger.e(TAG, "joinRoom, with renewRtcToken failed: $exception")
-                    return@generateRtcToken
-                }
-                val scene = mSyncManager.createScene(roomId)
-                scene.bindRespDelegate(this)
-                scene.userService.registerRespObserver(this)
-                mSyncManager.rtmManager.subscribeMessage(this)
-                mSyncManager.rtmManager.subscribeAttribute(roomId, kCollectionStartGameInfo, this)
-                mCurrRoomNo = roomId
-            }
+            val scene = mSyncManager.createScene(roomId)
+            scene.bindRespDelegate(this)
+            scene.userService.registerRespObserver(this)
+            mSyncManager.rtmManager.subscribeMessage(this)
+            mSyncManager.rtmManager.subscribeAttribute(roomId, kCollectionStartGameInfo, this)
+            mCurrRoomNo = roomId
             roomService.enterRoom(BuildConfig.AGORA_APP_ID, kSceneId, roomId, completion = { rtmException ->
                 if (rtmException == null) {
                     JoyLogger.d(TAG, "enterRoom success: ${cacheRoom.roomId}")
@@ -432,10 +425,10 @@ class JoySyncManagerServiceImp constructor(
     // ----------  ISceneResponse -----------------------
     override fun onTokenPrivilegeWillExpire(channelName: String?) {
         JoyLogger.d(TAG, "onTokenPrivilegeWillExpire, channelName:$channelName")
-        JoyServiceManager.generateRtmToken { rtmToken, exception ->
+        JoyServiceManager.generateToken { rtmToken, exception ->
             val token = rtmToken ?: run {
                 JoyLogger.e(TAG, "onTokenPrivilegeWillExpire, with renewRtmToken failed: $exception")
-                return@generateRtmToken
+                return@generateToken
             }
             mSyncManager.login(token, completion = { rtmException ->
                 if (rtmException == null) {
@@ -534,9 +527,9 @@ class JoySyncManagerServiceImp constructor(
         }
         if (JoyServiceManager.mRtmToken.isEmpty()) {
             JoyLogger.d(TAG, "initRtmSync, renewTokens start")
-            JoyServiceManager.generateRtmToken { rtmToken, exception ->
-                val rtmToken = rtmToken ?: return@generateRtmToken
-                mSyncManager.login(rtmToken, completion = {
+            JoyServiceManager.generateToken { rtmToken, exception ->
+                val token = rtmToken ?: return@generateToken
+                mSyncManager.login(token, completion = {
                     if (it == null) {
                         completion.invoke(null)
                     } else {

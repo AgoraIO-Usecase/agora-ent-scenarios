@@ -59,9 +59,10 @@ class AgoraBGMManager(
     ) -> Unit>() // (songNo, callback)
 
     private val mMusicCenter: IAgoraMusicContentCenter = IAgoraMusicContentCenter.create(mRtcEngine)
-    private val mPlayer: IAgoraMusicPlayer = mMusicCenter.createMusicPlayer()
+    private var mPlayer: IAgoraMusicPlayer
 
     fun release() {
+        Log.d(TAG, "release")
         mListeners = null
         mPlayer.unRegisterPlayerObserver(this)
         mPlayer.stop()
@@ -72,6 +73,7 @@ class AgoraBGMManager(
     }
 
     init {
+        Log.d(TAG, "init")
         val contentCenterConfiguration = MusicContentCenterConfiguration()
         contentCenterConfiguration.appId = mAppId
         contentCenterConfiguration.mccUid = mUid.toLong()
@@ -79,6 +81,7 @@ class AgoraBGMManager(
         contentCenterConfiguration.maxCacheSize = 10
 
         mMusicCenter.initialize(contentCenterConfiguration)
+        mPlayer = mMusicCenter.createMusicPlayer()
         mPlayer.setLoopCount(1) // 只播放一次
         mPlayer.adjustPlayoutVolume(mpkPlayerVolume)
         mPlayer.adjustPublishSignalVolume(mpkPublishVolume)
@@ -149,7 +152,8 @@ class AgoraBGMManager(
             Log.d(TAG, "loadMusic: status $status")
             if (bgm?.songCode == songCode && status == 0) {
                 mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
-                mPlayer.open(songCode, 0)
+                val ret = mPlayer.open(songCode, 0)
+                Log.d(TAG, "mPlayer: open $ret")
             }
         }
     }

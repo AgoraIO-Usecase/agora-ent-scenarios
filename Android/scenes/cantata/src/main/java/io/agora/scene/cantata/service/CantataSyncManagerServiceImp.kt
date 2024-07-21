@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import io.agora.scene.base.BuildConfig
 import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.apiutils.GsonUtils
@@ -206,14 +207,12 @@ class CantataSyncManagerServiceImp constructor(
                     TokenGenerator.generateTokens(
                         currRoomNo + "_ad",
                         mUser.id.toString(),
-                        TokenGenerator.TokenGeneratorType.token006,
+                        TokenGenerator.TokenGeneratorType.token007,
                         arrayOf(
                             TokenGenerator.AgoraTokenType.rtc,
                             TokenGenerator.AgoraTokenType.rtm
                         ),
-                        { ret ->
-                            val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc] ?: ""
-                            val rtmToken = ret[TokenGenerator.AgoraTokenType.rtm] ?: ""
+                        { rtcRtmToken ->
                             innerSubscribeRoomChanged()
                             innerSubscribeChooseSong {}
                             innerAddUserIfNeed { addUserError, userSize ->
@@ -248,8 +247,8 @@ class CantataSyncManagerServiceImp constructor(
                                                         cacheRoom.bgOption,
                                                         seats,
                                                         userSize,
-                                                        rtmToken,
-                                                        rtcToken,
+                                                        rtcRtmToken,
+                                                        rtcRtmToken,
                                                         chorusToken,
                                                         musicToken,
                                                         cacheRoom.createdAt,
@@ -270,7 +269,8 @@ class CantataSyncManagerServiceImp constructor(
                                                 },
                                                 {
                                                     completion.invoke(it, null)
-                                                }
+                                                },
+                                                io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID
                                             )
                                         },
                                         {
@@ -283,7 +283,8 @@ class CantataSyncManagerServiceImp constructor(
                         },
                         {
                             completion.invoke(it, null)
-                        }
+                        },
+                        io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID
                     )
 
 
@@ -771,7 +772,9 @@ class CantataSyncManagerServiceImp constructor(
         }
 
         Instance().init(
-            RethinkConfig(io.agora.scene.base.BuildConfig.AGORA_APP_ID, kSceneId),
+            RethinkConfig(
+                if (io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID == "") BuildConfig.AGORA_APP_ID else io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID,
+                kSceneId),
             object : Callback {
                 override fun onSuccess() {
                     syncUtilsInited = true

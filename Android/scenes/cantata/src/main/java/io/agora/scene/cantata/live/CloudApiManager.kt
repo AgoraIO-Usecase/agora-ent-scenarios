@@ -3,16 +3,13 @@ package io.agora.scene.cantata.live
 import com.moczul.ok2curl.CurlInterceptor
 import com.moczul.ok2curl.logger.Logger
 import io.agora.scene.base.BuildConfig
-import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.CantataLogger
-import io.agora.scene.cantata.R
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Request.Builder
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.logging.HttpLoggingInterceptor
-import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -27,8 +24,6 @@ class CloudApiManager private constructor() {
             return InstanceHolder.apiManager
         }
 
-        private const val testIp = "218.205.37.50"
-        private const val domain = "https://api.sd-rtn.com"
         private const val TAG = "ApiManager"
         private const val cloudRtcUid = 20232023
     }
@@ -51,101 +46,57 @@ class CloudApiManager private constructor() {
         }))
         .build()
 
-    private fun fetchCloudToken(): String {
-        var token = ""
-        try {
-            val acquireOjb = JSONObject()
-            acquireOjb.put("instanceId", System.currentTimeMillis().toString() + "")
-            //acquireOjb.put("testIp", testIp)
-            val request: Request = Builder()
-                .url(getTokenUrl(domain, BuildConfig.AGORA_APP_ID))
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", basicAuth)
-                .post(acquireOjb.toString().toRequestBody())
-                .build()
-
-            val responseToken = okHttpClient.newCall(request).execute()
-            if (responseToken.isSuccessful) {
-                val body = responseToken.body!!
-                val bodyString = body.string()
-                val jsonToken = JSONObject(bodyString)
-                if (jsonToken.has("tokenName")) {
-                    token = jsonToken.getString("tokenName")
-                }
-            }
-        } catch (e: Exception) {
-            CantataLogger.e(TAG, "getToken error " + e.message)
-        }
-        return token
-    }
-
     fun fetchStartCloud(mainChannel: String, completion: (error: Exception?) -> Unit) {
-        val token = fetchCloudToken()
-        tokenName = token.ifEmpty {
-            CantataLogger.e(TAG, "云端合流uid 请求报错 token is null")
-            completion.invoke(Exception(getString(R.string.cantata_start_cloud_error)))
-            return
-        }
         var taskId = ""
         try {
             val transcoderObj = JSONObject()
             val inputRetObj = JSONObject()
                 .put("rtcUid", 0)
-                .put("rtcToken", BuildConfig.AGORA_APP_ID)
                 .put("rtcChannel", mainChannel)
-            val intObj = JSONObject()
-                .put("rtc", inputRetObj)
-            transcoderObj.put("audioInputs", JSONArray().put(intObj))
-            transcoderObj.put("idleTimeout", 300)
-            val audioOptionObj = JSONObject()
-                .put("profileType", "AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO")
-                .put("fullChannelMixer", "native-mixer-weighted")
             val outputRetObj = JSONObject()
                 .put("rtcUid", cloudRtcUid)
-                .put("rtcToken", BuildConfig.AGORA_APP_ID)
                 .put("rtcChannel", mainChannel + "_ad")
-            val dataStreamObj = JSONObject()
-                .put("source", JSONObject().put("audioMetaData", true))
-                .put("sink", JSONObject())
-            val outputsObj = JSONObject()
-                .put("audioOption", audioOptionObj)
-                .put("rtc", outputRetObj)
-                .put("metaDataOption", dataStreamObj)
-            transcoderObj.put("outputs", JSONArray().put(outputsObj))
-            val postBody = JSONObject()
-                .put(
-                    "services", JSONObject()
-                        .put(
-                            "cloudTranscoder", JSONObject()
-                                .put("serviceType", "cloudTranscoderV2")
-                                .put(
-                                    "config", JSONObject()
-                                        .put("transcoder", transcoderObj)
-                                )
-                        )
-                )
+
+            if (io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID == "") {
+                transcoderObj.put("appId", BuildConfig.AGORA_APP_ID)
+                transcoderObj.put("appCert", BuildConfig.AGORA_APP_CERTIFICATE)
+                transcoderObj.put("basicAuth", basicAuth)
+            } else {
+                transcoderObj.put("appId", io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID)
+                transcoderObj.put("appCert", "")
+                transcoderObj.put("basicAuth", "")
+            }
+
+            transcoderObj.put("src", "Android")
+            transcoderObj.put("traceId", "12345")
+            transcoderObj.put("instanceId", System.currentTimeMillis().toString())
+            transcoderObj.put("audioInputsRtc", inputRetObj)
+            transcoderObj.put("outputsRtc", outputRetObj)
+
             val request: Request = Builder()
-                .url(startTaskUrl(domain, BuildConfig.AGORA_APP_ID, tokenName))
+                .url(startTaskUrl())
                 .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", basicAuth)
-                .post(postBody.toString().toRequestBody())
+                .post(transcoderObj.toString().toRequestBody())
                 .build()
+
+            CantataLogger.d(TAG, "fetchStartCloud: ${request.url}")
 
             val responseStart = okHttpClient.newCall(request).execute()
             if (responseStart.isSuccessful) {
                 val body = responseStart.body!!
                 val bodyString = body.string()
-                val jsonUid = JSONObject(bodyString)
+                val jsonUid = JSONObject(bodyString).get("data") as JSONObject
+
                 if (jsonUid.has("taskId")) {
                     taskId = jsonUid.getString("taskId")
                 }
-                completion.invoke(null)
+                if (jsonUid.has("builderToken")) {
+                    tokenName = jsonUid.getString("builderToken")
+                }
                 ToastUtils.showToastLong("云端合流服务开启成功")
-            } else {
-                completion.invoke(Exception(getString(R.string.cantata_start_cloud_error)))
             }
         } catch (e: Exception) {
-            completion.invoke(Exception(getString(R.string.cantata_start_cloud_error)))
+            completion.invoke(Exception())
             CantataLogger.e(TAG, "云端合流uid 请求报错 " + e.message)
         }
         if (taskId.isNotEmpty()) {
@@ -159,11 +110,25 @@ class CloudApiManager private constructor() {
             return
         }
         try {
+            val transcoderObj = JSONObject()
+            if (io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID == "") {
+                transcoderObj.put("appId", BuildConfig.AGORA_APP_ID)
+                transcoderObj.put("appCert", BuildConfig.AGORA_APP_CERTIFICATE)
+                transcoderObj.put("basicAuth", basicAuth)
+            } else {
+                transcoderObj.put("appId", io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID)
+                transcoderObj.put("appCert", "")
+                transcoderObj.put("basicAuth", "")
+            }
+            transcoderObj.put("src", "Android")
+            transcoderObj.put("traceId", "12345")
+            transcoderObj.put("taskId", taskId)
+            transcoderObj.put("builderToken", tokenName)
+
             val request: Request = Builder()
-                .url(deleteTaskUrl(domain, BuildConfig.AGORA_APP_ID, taskId, tokenName))
+                .url(deleteTaskUrl())
                 .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", basicAuth)
-                .delete()
+                .delete(transcoderObj.toString().toRequestBody())
                 .build()
             val response = okHttpClient.newCall(request).execute()
             if (response.isSuccessful) {
@@ -175,22 +140,14 @@ class CloudApiManager private constructor() {
         }
     }
 
-    private fun getTokenUrl(domain: String, appId: String): String {
-        return String.format("%s/v1/projects/%s/rtsc/cloud-transcoder/builderTokens", domain, appId)
+    private fun startTaskUrl(): String {
+        val domain = BuildConfig.TOOLBOX_SERVER_HOST
+        return String.format("%s/v1/cloud-transcoder/start", domain)
     }
 
-    private fun startTaskUrl(domain: String, appId: String, tokenName: String): String {
-        return String.format("%s/v1/projects/%s/rtsc/cloud-transcoder/tasks?builderToken=%s", domain, appId, tokenName)
-    }
-
-    private fun deleteTaskUrl(domain: String, appid: String, taskid: String, tokenName: String): String {
-        return String.format(
-            "%s/v1/projects/%s/rtsc/cloud-transcoder/tasks/%s?builderToken=%s",
-            domain,
-            appid,
-            taskid,
-            tokenName
-        )
+    private fun deleteTaskUrl(): String {
+        val domain = BuildConfig.TOOLBOX_SERVER_HOST
+        return String.format("%s/v1/cloud-transcoder/stop", domain)
     }
 
     private val basicAuth: String
@@ -200,10 +157,6 @@ class CloudApiManager private constructor() {
             var base64Credentials: String? = null
             base64Credentials = String(Base64.getEncoder().encode(plainCredentials.toByteArray()))
             // 创建 authorization header
-            return "Basic $base64Credentials"
+            return "$base64Credentials"
         }
-
-    private fun getString(resId:Int):String{
-        return AgoraApplication.the().getString(resId)
-    }
 }
