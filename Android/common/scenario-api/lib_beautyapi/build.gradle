@@ -3,9 +3,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'maven-publish'
 apply plugin: 'de.undercouch.download'
+apply from: 'vendors.gradle'
 
 android {
-    namespace 'io.agora.callapi'
+    namespace 'io.agora.beautyapi'
     compileSdk 33
 
     defaultConfig {
@@ -53,6 +54,16 @@ dependencies {
 
     api 'com.google.code.gson:gson:2.9.0'
 
+    api project(path: ":common:scenario-api:lib_beautyapi:aars:beauty_sensetime:SenseArSourceManager")
+    api project(path: ":common:scenario-api:lib_beautyapi:aars:beauty_sensetime:STMobileJNI")
+    api project(path: ":common:scenario-api:lib_beautyapi:aars:beauty_sensetime:HardwareBuffer")
+    api project(path: ":common:scenario-api:lib_beautyapi:aars:beauty_bytedance:EffectAAR")
+    api 'com.faceunity:core:8.7.0'
+    if (BEAUTY_RESOURCE == "") {
+        api 'com.faceunity:model:8.7.0'
+    }
+
     // rtc
-    implementation project(":common:base")
+    implementation rootProject.ext.deps.rtc
+
 }

@@ -947,10 +947,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
     // ======================= Player/RTC/MPK相关 =======================
     private fun initRTCPlayer() {
-        if (TextUtils.isEmpty(BuildConfig.AGORA_APP_ID)) {
-            throw NullPointerException("please check \"strings_config.xml\"")
-        }
-
         // ------------------ 初始化音乐播放设置面版 ------------------
         mMusicSetting = MusicSettingBean(
             object : MusicSettingCallback {
@@ -1002,7 +998,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         // ------------------ 初始化RTC ------------------
         val config = RtcEngineConfig()
         config.mContext = AgoraApplication.the()
-        config.mAppId = BuildConfig.AGORA_APP_ID
+        config.mAppId = if (io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID == "") BuildConfig.AGORA_APP_ID else io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID
         config.mEventHandler = object : IRtcEngineEventHandler() {
             override fun onNetworkQuality(uid: Int, txQuality: Int, rxQuality: Int) {
                 // 网络状态回调, 本地user uid = 0
@@ -1056,7 +1052,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
         mKtvApi = createKTVGiantChorusApi(
             KTVGiantChorusApiConfig(
-                BuildConfig.AGORA_APP_ID,
+                if (io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID == "") BuildConfig.AGORA_APP_ID else io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID,
                 mRoomInfoLiveData.value!!.agoraRTMToken,
                 mRtcEngine!!,
                 UserManager.getInstance().user.id.toInt(),

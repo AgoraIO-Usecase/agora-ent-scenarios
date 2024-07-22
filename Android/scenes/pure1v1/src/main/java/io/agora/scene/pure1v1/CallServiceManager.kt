@@ -212,13 +212,8 @@ class CallServiceManager {
                 TokenGenerator.AgoraTokenType.rtc,
                 TokenGenerator.AgoraTokenType.rtm
             ), { ret ->
-                val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc]
-                val rtmToken = ret[TokenGenerator.AgoraTokenType.rtm]
-                if (rtcToken == null || rtmToken == null) {
-                    return@generateTokens
-                }
-                this.rtcToken = rtcToken
-                this.rtmToken = rtmToken
+                this.rtcToken = ret
+                this.rtmToken = ret
                 this.lastTokenFetchTime = TimeUtils.currentTimeMillis()
                 //Pure1v1Logger.d(tag, "generateTokens success")
                 completion.invoke(true)

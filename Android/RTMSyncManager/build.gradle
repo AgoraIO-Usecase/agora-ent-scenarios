@@ -41,6 +41,5 @@ dependencies {
     implementation rootProject.ext.deps.retrofit2
     implementation rootProject.ext.deps.retrofit2_cov
 
-    implementation rootProject.ext.deps.rtm
-    implementation rootProject.ext.deps.rtc
+    implementation project(":common:base")
 }

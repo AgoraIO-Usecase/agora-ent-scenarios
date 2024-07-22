@@ -40,48 +40,24 @@ object KtvCenter {
      * @param callback
      * @receiver
      */
-    fun generateRtmToken(callback: (rtmToken: String?, exception: Exception?) -> Unit) {
-        TokenGenerator.generateToken(
+    fun generateToken(callback: (token: String?, exception: Exception?) -> Unit) {
+        TokenGenerator.generateTokens(
             channelName = "", // 万能 token
             uid = UserManager.getInstance().user.id.toString(),
             genType = TokenGenerator.TokenGeneratorType.token007,
-            tokenType = TokenGenerator.AgoraTokenType.rtm,
-            success = { rtmToken ->
-                mRtmToken = rtmToken
-                KTVLogger.d(TAG, "generate RtmTokens success")
-                callback.invoke(rtmToken, null)
+            tokenTypes = arrayOf(
+                TokenGenerator.AgoraTokenType.rtc,
+                TokenGenerator.AgoraTokenType.rtm
+            ),
+            success = { token ->
+                mRtmToken = token
+                mRtcToken = token
+                KTVLogger.d(TAG, "generate tokens success")
+                callback.invoke(token, null)
             },
             failure = {
-                KTVLogger.e(TAG, it, "generate RtmToken failed,$it")
+                KTVLogger.e(TAG, it, "generate tokens failed,$it")
                 callback.invoke(null, it)
-            })
-    }
-
-    /**
-     * Renew rtc token
-     *
-     * @param channelName
-     * @param callback
-     * @receiver
-     */
-    fun generateRtcToken(callback: (rtcToken: String?, exception: Exception?) -> Unit) {
-        if (mRtcToken.isNotEmpty()) {
-            callback.invoke(mRtcToken, null)
-            return
-        }
-        TokenGenerator.generateToken(
-            channelName = "",
-            uid = UserManager.getInstance().user.id.toString(),
-            genType = TokenGenerator.TokenGeneratorType.token007,
-            tokenType = TokenGenerator.AgoraTokenType.rtc,
-            success = { rtcToken ->
-                KTVLogger.d(TAG, "generate RtcToken success")
-                mRtcToken = rtcToken
-                callback.invoke(mRtcToken, null)
-            },
-            failure = { exception ->
-                KTVLogger.e(TAG, "generate RtcToken failed, $exception")
-                callback.invoke(null, exception)
             })
     }
 }
