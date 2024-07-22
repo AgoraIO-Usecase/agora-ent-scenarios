@@ -110,6 +110,7 @@ class ShowInviteCell: UITableViewCell {
 
 //pk invite cell
 class ShowPKInviteViewCell: ShowInviteCell {
+    var isCurrentInteracting: Bool = false
     var pkUser: ShowPKUserInfo? {
         didSet {
             defer {
@@ -152,6 +153,11 @@ class ShowPKInviteViewCell: ShowInviteCell {
               invitation.status == .idle else {
             return
         }
+        
+        if isCurrentInteracting {
+            ToastView.show(text: "show_error_disable_pk".show_localized)
+            return
+        }
 
         statusButton.isEnabled = false
         AppContext.showServiceImp()?.createPKInvitation(roomId: roomId,
@@ -170,10 +176,12 @@ class ShowPKInviteViewCell: ShowInviteCell {
 
 //mic seat apply and invite cell
 class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
+    private var isCurrentInteracting: Bool = false
     private var seatApplyModel: ShowMicSeatApply?
     private var seatInvitationModel: ShowUser?
 
-    func setupApplyAndInviteData(model: Any?, isLink: Bool) {
+    func setupApplyAndInviteData(model: Any?, isLink: Bool, isInteracting: Bool) {
+        self.isCurrentInteracting = isInteracting
         statusButton.isHidden = isLink
         statusButton.isEnabled = true
         if let model = model as? ShowMicSeatApply {
@@ -243,6 +251,11 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
                 }
             }
         } else if let model = seatInvitationModel {
+            if isCurrentInteracting {
+                ToastView.show(text: "show_error_disable_linking".show_localized)
+                return
+            }
+            
             self.statusButton.isEnabled = false
             AppContext.showServiceImp()?.createMicSeatInvitation(roomId: roomId, userId: model.userId) {[weak self] error in
                 guard let self = self else { return }

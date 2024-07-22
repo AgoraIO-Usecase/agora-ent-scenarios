@@ -215,14 +215,12 @@ extension Pure1v1UserListViewController {
             return
         }
         let date = Date()
-        NetworkManager.shared.generateTokens(channelName: "",
-                                             uid: userInfo?.userId ?? "",
-                                             tokenGeneratorType: .token007,
-                                             tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
+        NetworkManager.shared.generateToken(channelName: "",
+                                            uid: userInfo?.userId ?? "",
+                                            tokenTypes: [.rtc, .rtm]) {[weak self] token in
             guard let self = self else {return}
             Pure1v1Logger.info("generateTokens cost: \(-Int(date.timeIntervalSinceNow * 1000))ms")
-            guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue],
-                  let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
+            guard let rtcToken = token, let rtmToken = token else {
                 completion(nil, nil)
                 return
             }

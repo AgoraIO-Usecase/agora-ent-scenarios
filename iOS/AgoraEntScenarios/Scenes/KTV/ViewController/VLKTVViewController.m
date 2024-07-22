@@ -122,7 +122,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, assign) BOOL aecState; //AIAEC开关
 @property (nonatomic, assign) NSInteger aecLevel; //AEC等级
 @property (nonatomic, assign) NSString *selectUserNo;
-@property (nonatomic, strong) UIButton *testButton;
 @property (nonatomic, assign) BOOL soundOpen;
 @property (nonatomic, copy)  NSString *gainValue;
 @property (nonatomic, assign) NSInteger typeValue;
@@ -221,13 +220,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     
     self.earValue = 100;
     
-    //测试使用
-    _testButton = [[UIButton alloc]initWithFrame:CGRectMake((SCREEN_WIDTH - 60)/2.0, SCREEN_HEIGHT - 60, 60, 40)];
-    _testButton.backgroundColor = [UIColor redColor];
-    [_testButton addTarget:self action:@selector(testCosinger) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:_testButton];
-    [_testButton setHidden:true];
-    
     if(AppContext.shared.isDebugMode){
         //如果开启了debug模式
         UIButton *debugBtn = [[UIButton alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 200, 80, 80)];
@@ -248,11 +240,6 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
                 [VLToast toast:KTVLocalizedString(@"ktv_earback_micphone_pull")];
             }
         }
-    }];
-}
-
--(void)testCosinger{
-    [self.ktvApi switchSingerRoleWithNewRole:KTVSingRoleLeadSinger onSwitchRoleState:^(KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
     }];
 }
 
@@ -700,23 +687,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     KTVLogInfo(@"tokenPrivilegeWillExpire: %@", token);
     [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
                                                       uid:VLUserCenter.user.id
-                                                tokenType:TokenGeneratorTypeToken006
-                                                     type:AgoraTokenTypeRtc
+                                                    types: @[@(AgoraTokenTypeRtc), @(AgoraTokenTypeRtm)]
                                                    expire:1500
                                                   success:^(NSString * token) {
         KTVLogInfo(@"tokenPrivilegeWillExpire rtc renewToken: %@", token);
         [self.RTCkit renewToken:token];
-    }];
-    
-    //TODO: mcc missing token expire callback
-    [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
-                                                      uid:VLUserCenter.user.id
-                                                tokenType:TokenGeneratorTypeToken006
-                                                     type:AgoraTokenTypeRtm
-                                                   expire:1500
-                                                  success:^(NSString * token) {
-        KTVLogInfo(@"tokenPrivilegeWillExpire rtm renewToken: %@", token);
-        //TODO(chenpan): mcc missing
+        //TODO: mcc missing
 //        [self.AgoraMcc renewToken:token];
     }];
 }
@@ -778,6 +754,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
     VL(weakSelf);
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
+        KTVLogInfo(@"load music[%ld] completion, isSuccess: %d, role: %ld", songCode, isSuccess, role);
         if (!isSuccess) {
             return;
         }
@@ -789,21 +766,30 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [weakSelf.ktvApi startSingWithSongCode:songCode startPos:0];
         }
         
-        [weakSelf.ktvApi switchSingerRoleWithNewRole:role
-                               onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
-            if(state != KTVSwitchRoleStateSuccess && role != KTVSingRoleAudience) {
-                //TODO(chenpan): error toast and retry?
-                KTVLogError(@"switchSingerRole error: %ld", reason);
-                return;
-            } else {
-                if(role == KTVSingRoleSoloSinger || role == KTVSingRoleLeadSinger){
-                    [weakSelf.ktvApi startSingWithSongCode:songCode startPos:0];
-                    weakSelf.aecLevel = 0;
-                    weakSelf.aecState = false;
-                }
-                [weakSelf setMVViewStateWith:model];
+        if(self.singRole == role) {
+            if(role == KTVSingRoleSoloSinger || role == KTVSingRoleLeadSinger){
+                [self.ktvApi startSingWithSongCode:songCode startPos:0];
+                self.aecLevel = 0;
+                self.aecState = false;
             }
-        }];
+            [self setMVViewStateWith:model];
+        } else {
+            [weakSelf.ktvApi switchSingerRoleWithNewRole:role
+                                       onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
+                if(state != KTVSwitchRoleStateSuccess && role != KTVSingRoleAudience) {
+                    //TODO: error toast and retry?
+                    KTVLogError(@"switchSingerRole error: %ld", reason);
+                    return;
+                } else {
+                    if(role == KTVSingRoleSoloSinger || role == KTVSingRoleLeadSinger){
+                        [weakSelf.ktvApi startSingWithSongCode:songCode startPos:0];
+                        weakSelf.aecLevel = 0;
+                        weakSelf.aecState = false;
+                    }
+                    [weakSelf setMVViewStateWith:model];
+                }
+            }];
+        }
     };
     
     [self.lrcControl resetShowOnce];
@@ -872,23 +858,23 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)joinChorus {
-
-    [self.MVView setMvState:VLKTVMVViewStateJoinChorus];
     self.isJoinChorus = YES;
-    if([self getOnMicUserCount] == 8 && !_isOnMicSeat){
+    [self.MVView setMvState:VLKTVMVViewStateJoinChorus];
+    if(![self hasAvailableMicSeat]){
+        [self _rollbackAfterChorusJoinFailure];
         [VLToast toast:KTVLocalizedString(@"ktv_mic_full")];
         return;
     }
     
     if(self.RTCkit.getConnectionState != AgoraConnectionStateConnected){
-        [self.MVView setMvState: [self isRoomOwner] ? VLKTVMVViewStateOwnerAudience : VLKTVMVViewStateAudience];
+        [self _rollbackAfterChorusJoinFailure];
         [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
         return;
     }
     
     if (![self getJoinChorusEnable]) {
         KTVLogInfo(@"getJoinChorusEnable false");
-        [self.MVView setMvState: [self isRoomOwner] ? VLKTVMVViewStateOwnerAudience : VLKTVMVViewStateAudience];
+        [self _rollbackAfterChorusJoinFailure];
         [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
         return;
     }
@@ -899,9 +885,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self enterSeatWithIndex:nil completion:^(NSError *error) {
             if(error){
                 KTVLogError(@"enterSeat error:%@", error.description);
-               // weakSelf.MVView.joinCoSingerState = KTVJoinCoSingerStateWaitingForJoin;
-                [self.MVView setMvState: [self isRoomOwner] ? VLKTVMVViewStateOwnerAudience : VLKTVMVViewStateAudience];
-                weakSelf.isJoinChorus = NO;
+                [weakSelf _rollbackAfterChorusJoinFailure];
                 [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
                 return;
             }
@@ -917,11 +901,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 -(void)joinChorusFailedAndUIUpadte {
-    
+}
+
+- (void)_rollbackAfterChorusJoinFailure {
+    [self.MVView setMvState: [self isRoomOwner] ? VLKTVMVViewStateOwnerAudience : VLKTVMVViewStateAudience];
+    self.isJoinChorus = NO;
+    KTVLogInfo(@"join chorus fail");
 }
 
 - (void)_joinChorus {
-    
     [self.MVView.incentiveView reset];
     
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
@@ -934,8 +922,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VL(weakSelf);
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
         if (!isSuccess) {
-            weakSelf.isJoinChorus = NO;
-           [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
+            [weakSelf _rollbackAfterChorusJoinFailure];
+            [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
             return;
         }
         
@@ -944,11 +932,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [weakSelf.ktvApi switchSingerRoleWithNewRole:role
                                    onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {
             if (state == KTVSwitchRoleStateFail && reason != KTVSwitchRoleFailReasonNoPermission) {
-                [weakSelf.MVView setMvState: [weakSelf isRoomOwner] ? VLKTVMVViewStateOwnerAudience : VLKTVMVViewStateAudience];
-                weakSelf.isJoinChorus = NO;
-                [VLToast toast:[NSString stringWithFormat:@"join chorus fail: %ld", reason]];
-                KTVLogInfo(@"join chorus fail");
-                //TODO: error toast?
+                [weakSelf _rollbackAfterChorusJoinFailure];
                 [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
                 return;
             }
@@ -1058,12 +1042,17 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)joinRTCChannel {
     KTVLogInfo(@"joinRTCChannel");
-    self.RTCkit = [AgoraRtcEngineKit sharedEngineWithAppId:[AppContext.shared appId] delegate:self];
+    AgoraRtcEngineConfig* rtcConfig = [AgoraRtcEngineConfig new];
+    rtcConfig.appId = [AppContext.shared appId];
+    rtcConfig.channelProfile = AgoraChannelProfileLiveBroadcasting;
+    AgoraLogConfig* logConfig = [AgoraLogConfig new];
+    logConfig.filePath = [AgoraEntLog sdkLogPath];
+    rtcConfig.logConfig = logConfig;
+    self.RTCkit = [AgoraRtcEngineKit sharedEngineWithConfig:rtcConfig delegate:self];
     
     //use game streaming in so mode, chrous profile in chrous mode
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQualityStereo];
-    [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     if(AppContext.shared.isDebugMode){
         [self.RTCkit setParameters: @"{\"che.audio.neteq.dump_level\": 1}"];
     }
@@ -1267,6 +1256,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:YES
                                                         completion:^(NSError * error) {
     }];
+}
+
+- (BOOL)hasAvailableMicSeat {
+    if(_isOnMicSeat) {
+        return YES;
+    }
+    return [self getOnMicUserCount] < 8;
 }
 
 #pragma mark -- VLKTVTopViewDelegate
@@ -2011,7 +2007,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(![self isCurrentSongMainSinger:VLUserCenter.user.id]) {
             return;
         }
-        KTVLogInfo(@"seat array update chorusNum %ld->%ld", origChorusNum, chorusNum);
+        KTVLogInfo(@"seat array update chorusNum %ld->%ld, currentRole: %ld", origChorusNum, chorusNum, self.singRole);
+        if(self.singRole == KTVSingRoleAudience) { return; }
         //lead singer <-> solo
         KTVSingRole role = [self getUserSingRole];
         [self.ktvApi switchSingerRoleWithNewRole:role
