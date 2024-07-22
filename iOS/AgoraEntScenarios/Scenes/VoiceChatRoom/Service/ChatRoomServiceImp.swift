@@ -36,7 +36,6 @@ public class ChatRoomServiceImp: NSObject {
     @objc public weak var roomServiceDelegate:ChatRoomServiceSubscribeDelegate?
     
     private let user: AUIUserThumbnailInfo
-    private var isLogined: Bool = false
     private lazy var roomManager = AUIRoomManagerImpl(sceneId: kSceneId)
     private lazy var syncManager: AUISyncManager = {
         let config = AUICommonConfig()
@@ -757,67 +756,13 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
 
 // MARK: Room Management
-    
-    private func preGenerateToken(completion:@escaping (NSError?)->()) {
-        AppContext.shared.agoraRTCToken = ""
-        AppContext.shared.agoraRTMToken = ""
-        
-        let date = Date()
-        NetworkManager.shared.generateTokens(channelName: "",
-                                             uid: "\(user.userId)",
-                                             tokenGeneratorType: .token007,
-                                             tokenTypes: [.rtc, .rtm],
-                                             expire: 24 * 60 * 60) {  tokenMap in
-            guard let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue],
-                  rtcToken.count > 0,
-                  let rtmToken = tokenMap[NetworkManager.AgoraTokenType.rtm.rawValue],
-                  rtmToken.count > 0 else {
-                completion(NSError(domain: "generate token fail", code: -1))
-                return
-            }
-            
-            VoiceChatLog.info("[Timing]preGenerateToken rtc & rtm cost: \(Int64(-date.timeIntervalSinceNow * 1000)) ms")
-            AppContext.shared.agoraRTCToken = rtcToken
-            AppContext.shared.agoraRTMToken = rtmToken
-            completion(nil)
-        }
-    }
-    
-    private func login(completion:(@escaping (NSError?)-> Void)) {
-        let token = AppContext.shared.agoraRTMToken
-        if !token.isEmpty {
-            let date = Date()
-            self.syncManager.rtmManager.login(token: token) { err in
-                VoiceChatLog.info("[Timing]login cost: \(Int64(-date.timeIntervalSinceNow * 1000))ms")
-                self.isLogined = err == nil ? true : false
-                completion(err)
-            }
-            return
-        }
-        preGenerateToken { [weak self] err in
-            if let err = err {
-                completion(err)
-                return
-            }
-            self?.login(completion: completion)
-        }
-    }
+     
     /// 获取房间列表
     /// - Parameters:
     ///   - page: 分页索引，从0开始(由于SyncManager无法进行分页，这个属性暂时无效)
     ///   - completion: 完成回调   (错误信息， 房间列表)
     func fetchRoomList(page: Int,
                        completion: @escaping (Error?, [VRRoomEntity]?) -> Void) {
-        if isLogined == false {
-            login {[weak self] err in
-                if let err = err {
-                    completion(err, nil)
-                    return
-                }
-                self?.fetchRoomList(page: page, completion: completion)
-            }
-            return
-        }
         let currentUserId = user.userId
         roomService.getRoomList(lastCreateTime: 0,
                                 pageSize: 50) { info in
@@ -853,17 +798,6 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     ///   - room: 房间对象信息
     ///   - completion: 完成回调   (错误信息)
     func createRoom(room: VRRoomEntity, completion: @escaping (Error?, VRRoomEntity?) -> Void) {
-        if isLogined == false {
-            login {[weak self] err in
-                if let err = err {
-                    completion(err, nil)
-                    return
-                }
-                self?.createRoom(room: room,
-                                 completion: completion)
-            }
-            return
-        }
         let roomInfo = AUIRoomInfo.voice_fromVRRoomEntity(room)
         roomService.createRoom(room: roomInfo, enterEnable: false) { [weak self] err, info in
             if err != nil {
@@ -876,38 +810,15 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             NetworkManager.shared.voiceIdentify(channelName: room.channel_id ?? "", channelType: room.sound_effect == 3 ? 0 : 1, sceneType: "voice_chat") { msg in
                 VoiceChatLog.info("\(msg == nil ? "开启鉴黄成功" : "开启鉴黄失败")")
             }
-            
-            var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
-            let dispatchGroup = DispatchGroup()
-            dispatchGroup.enter()
-            NetworkManager.shared.generateTokens(channelName: room.room_id ?? "",
-                                                 uid: "\(UserInfo.userId)",
-                                                 tokenGeneratorType: .token006,
-                                                 tokenTypes: [.rtc, .rtm]) { tokenMap in
-                tokenMap1 = tokenMap
-                dispatchGroup.leave()
-            }
-            
-            dispatchGroup.enter()
-            NetworkManager.shared.generateTokens(channelName: "\(room.room_id ?? "")_ex",
-                                                 uid: "\(UserInfo.userId)",
-                                                 tokenGeneratorType: .token006,
-                                                 tokenTypes: [.rtc]) { tokenMap in
-                tokenMap2 = tokenMap
-                dispatchGroup.leave()
-            }
-            
-            dispatchGroup.notify(queue: .main){
-                guard let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
-                      let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
-                      let rtcPlayerToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue]
-                else {
+            NetworkManager.shared.generateToken(channelName: room.room_id ?? "",
+                                                uid: "\(UserInfo.userId)",
+                                                tokenTypes: [.rtc, .rtm]) { token in
+                guard let rtcToken = token, let rtmToken = token else {
                     completion(nil, nil)
                     return
                 }
                 VLUserCenter.user.agoraRTCToken = rtcToken
                 VLUserCenter.user.agoraRTMToken = rtmToken
-                VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
                 let roomEntity = info?.voice_toRoomEntity()
                 completion(nil, roomEntity)
             }
@@ -915,16 +826,6 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func joinRoom(_ roomId: String, completion: @escaping (Error?, VRRoomEntity?) -> Void) {
-        if isLogined == false {
-            login {[weak self] err in
-                if let err = err {
-                    completion(err, nil)
-                    return
-                }
-                self?.joinRoom(roomId, completion: completion)
-            }
-            return
-        }
         guard let roomEntity = self.roomList?.first(where: {$0.room_id == roomId}) else {
             completion(nil, nil)
             return
@@ -935,37 +836,15 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             if err != nil {
                 completion(err, nil)
             }
-            var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
-            let dispatchGroup = DispatchGroup()
-            dispatchGroup.enter()
-            NetworkManager.shared.generateTokens(channelName: roomInfo.roomId,
-                                                 uid: "\(UserInfo.userId)",
-                                                 tokenGeneratorType: .token006,
-                                                 tokenTypes: [.rtc, .rtm]) { tokenMap in
-                tokenMap1 = tokenMap
-                dispatchGroup.leave()
-            }
-            
-            dispatchGroup.enter()
-            NetworkManager.shared.generateTokens(channelName: "\(roomInfo.roomId)_ex",
-                                                 uid: "\(UserInfo.userId)",
-                                                 tokenGeneratorType: .token006,
-                                                 tokenTypes: [.rtc]) { tokenMap in
-                tokenMap2 = tokenMap
-                dispatchGroup.leave()
-            }
-            
-            dispatchGroup.notify(queue: .main){
-                guard let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
-                      let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
-                      let rtcPlayerToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue]
-                else {
+            NetworkManager.shared.generateToken(channelName: roomId,
+                                                uid: "\(UserInfo.userId)",
+                                                tokenTypes: [.rtc, .rtm]) { token in
+                guard let rtcToken = token, let rtmToken = token else {
                     completion(nil, nil)
                     return
                 }
                 VLUserCenter.user.agoraRTCToken = rtcToken
                 VLUserCenter.user.agoraRTMToken = rtmToken
-                VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
                 self?.roomId = roomId
                 self?._startCheckExpire()
                 completion(nil, roomEntity)
@@ -1050,7 +929,6 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func initIM(with roomName: String, type: Int,chatId: String?, channelId: String, imUid: String?, pwd: String, completion: @escaping (String, String, String) -> Void) {
-
         var im_token = ""
         var im_uid = ""
         var chatroom_id = ""
@@ -1061,18 +939,24 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
 
         impGroup.enter()
         imQueue.async {
-            NetworkManager.shared.generateIMConfig(type: type,channelName: roomName, nickName: VLUserCenter.user.name, chatId: chatId, imUid: imUid, password: pwd, uid:  VLUserCenter.user.id) { uid, room_id, token in
+            NetworkManager.shared.generateIMConfig(type: type,channelName: roomName,
+                                                   nickName: VLUserCenter.user.name,
+                                                   chatId: chatId,
+                                                   imUid: imUid,
+                                                   password: pwd,
+                                                   uid:  VLUserCenter.user.id) { uid, room_id, token in
                 im_uid = uid ?? ""
                 chatroom_id = room_id ?? ""
                 im_token = token ?? ""
                 impGroup.leave()
             }
-            
         }
         
         impGroup.enter()
         tokenQueue.async {
-            NetworkManager.shared.generateToken(channelName: channelId, uid: VLUserCenter.user.id, tokenType: .token007, type: .rtc) { token in
+            NetworkManager.shared.generateToken(channelName: channelId,
+                                                uid: VLUserCenter.user.id,
+                                                tokenTypes: [.rtc]) { token in
                 VLUserCenter.user.agoraRTCToken = token ?? ""
                 impGroup.leave()
             }
