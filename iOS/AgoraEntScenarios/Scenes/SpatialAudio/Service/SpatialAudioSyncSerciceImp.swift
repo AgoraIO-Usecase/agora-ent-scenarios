@@ -230,7 +230,9 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
                 self._subscribeAll()
                 self.updateRobotInfo(info: SARobotAudioInfo()) { error in }
                 let userId = VLUserCenter.user.id
-                NetworkManager.shared.generateToken(channelName: room_id, uid: userId, tokenType: .token007, type: .rtc) { token in
+                NetworkManager.shared.generateToken(channelName: room_id,
+                                                    uid: userId,
+                                                    tokenTypes: [.rtc]) { token in
                     VLUserCenter.user.agoraRTCToken = token ?? ""
                     VLUserCenter.user.chat_uid = userId
                     self._addUserIfNeed(roomId: room_id) { err in
@@ -274,7 +276,9 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             }
             self._startCheckExpire()
             self._subscribeAll()
-            NetworkManager.shared.generateToken(channelName: room_id, uid: userId, tokenType: .token007, type: .rtc) { token in
+            NetworkManager.shared.generateToken(channelName: room_id,
+                                                uid: userId,
+                                                tokenTypes: [.rtc]) { token in
                 VLUserCenter.user.agoraRTCToken = token ?? ""
                 VLUserCenter.user.chat_uid = userId
                 self._addUserIfNeed(roomId: room_id) { err in

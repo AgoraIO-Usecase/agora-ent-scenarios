@@ -26,8 +26,7 @@ extension TemplateServiceImp: TemplateServiceProtocol {
             self?.channelName = channelName
             NetworkManager.shared.generateToken(channelName: channelName ?? "",
                                                 uid: "\(UserInfo.userId)",
-                                                tokenType: .token007,
-                                                type: .rtc) { token in
+                                                tokenTypes: [.rtc] ) { token in
                 let resp = TemplateScene.JoinResponse(channelName: channelName ?? "", userId: "\(UserInfo.userId)")
                 completion(nil, resp)
             }

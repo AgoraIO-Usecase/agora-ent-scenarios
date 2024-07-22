@@ -171,10 +171,10 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             scheduledThreadPool.execute {
                 CloudApiManager.getInstance()
                     .fetchStartCloud(mRoomLivingViewModel.mRoomInfoLiveData.value!!.roomNo, completion = {
-                        it?.let { error ->
+                        it?.let { _ ->
                             mMainHandler.post {
                                 mRoomLivingViewModel.release()
-                                showStartCloudErrorDialog(error.message ?: "")
+                                showStartCloudErrorDialog(getString(R.string.cantata_start_cloud_error))
                             }
                         }
                     })

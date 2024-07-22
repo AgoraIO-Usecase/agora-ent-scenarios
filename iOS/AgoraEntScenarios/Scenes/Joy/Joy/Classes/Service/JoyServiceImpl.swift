@@ -9,6 +9,7 @@ import Foundation
 import RTMSyncManager
 import YYModel
 import AgoraRtmKit
+import AgoraCommon
 
 private let kSceneId = "scene_joy_5.0.0"
 private let SYNC_SCENE_ROOM_STARTGAME_COLLECTION = "startGameCollection"
@@ -20,7 +21,6 @@ class JoyServiceImpl: NSObject {
     private var sceneBinded: Bool = false
     private var collectionBinded: Bool = false
     private var host: String
-    private var appCertificate: String
     private weak var listener: JoyServiceListenerProtocol?
     
     private var userList: [JoyUserInfo] = [] {
@@ -46,12 +46,19 @@ class JoyServiceImpl: NSObject {
         return manager
     }()
     
-    required init(appId: String, host: String, appCertificate: String, user: JoyUserInfo, rtmClient: AgoraRtmClientKit?) {
+    private lazy var roomService: AUIRoomService = {
+        let poliocy = RoomExpirationPolicy()
+        poliocy.expirationTime = 20 * 60 * 1000
+        let service = AUIRoomService(expirationPolicy: poliocy, roomManager: roomManager, syncmanager: syncManager)
+        
+        return service
+    }()
+    
+    required init(appId: String, host: String, user: JoyUserInfo, rtmClient: AgoraRtmClientKit?) {
         self.appId = appId
         self.user = user
         self.rtmClient = rtmClient
         self.host = host
-        self.appCertificate = appCertificate
         AUIRoomContext.shared.displayLogClosure = { msg in
             JoyLogger.info(msg, context: "RTMSyncManager")
         }
@@ -66,7 +73,9 @@ class JoyServiceImpl: NSObject {
 extension JoyServiceImpl: JoyServiceProtocol {
     func getRoomList(completion: @escaping ([JoyRoomInfo]) -> Void) {
         let fetchRoomList: () -> Void = {[weak self] in
-            self?.roomManager.getRoomInfoList(lastCreateTime: 0, pageSize: 50) {[weak self] err, ts, list in
+            self?.roomService.getRoomList(lastCreateTime: 0, pageSize: 50)  {[weak self] info in
+                return info.owner?.userId == "\(self?.user.userId ?? 0)"
+            } completion: {[weak self] err, ts, list in
                 let joyRoomList = list?.compactMap{ self?.convertAUIRoomInfo2JoyRoomInfo(with:$0) } ?? []
                 self?.roomList = joyRoomList
                 completion(joyRoomList)
@@ -87,7 +96,6 @@ extension JoyServiceImpl: JoyServiceProtocol {
     }
     
     func createRoom(roomName: String, completion: @escaping (JoyRoomInfo?, Error?) -> Void) { JoyLogger.info("createRoom start")
-
         let createAt = Int64(Date().timeIntervalSince1970 * 1000)
         let roomInfo = AUIRoomInfo()
         roomInfo.roomName = roomName
@@ -104,35 +112,17 @@ extension JoyServiceImpl: JoyServiceProtocol {
         roomInfo.owner = owner
 
         func create(roomInfo: AUIRoomInfo) {
-            let scene = getCurrentScene(with: roomInfo.roomId)
-            roomManager.createRoom(room: roomInfo) { [weak self] err, info in
+            roomService.createRoom(room: roomInfo) { [weak self] err, info in
                 guard let self = self else { return }
-                
                 if let err = err {
-                    JoyLogger.info("create room fail: \(err.localizedDescription)")
+                    JoyLogger.info("enter scene fail: \(err.localizedDescription)")
                     completion(nil, err)
                     return
                 }
                 
-                scene.create(createTime: createAt, payload: [:]) { [weak self] err in
-                    if let err = err {
-                        JoyLogger.info("create scene fail: \(err.localizedDescription)")
-                        completion(nil, err)
-                        return
-                    }
-                    
-                    scene.enter { [weak self] payload, err in
-                        if let err = err {
-                            JoyLogger.info("enter scene fail: \(err.localizedDescription)")
-                            completion(nil, err)
-                            return
-                        }
-                        self?.syncManager.rtmManager.subscribeMessage(channelName: roomInfo.roomId, delegate: self!)
-                        
-                        completion(self?.convertAUIRoomInfo2JoyRoomInfo(with: info ?? roomInfo), nil)
-                    }
-                }
+                completion(self.convertAUIRoomInfo2JoyRoomInfo(with: info ?? roomInfo), nil)
             }
+            subscribeAll(channelName: roomInfo.roomId)
         }
 
         if isConnected == false {
@@ -150,16 +140,18 @@ extension JoyServiceImpl: JoyServiceProtocol {
     
     func joinRoom(roomInfo: JoyRoomInfo, completion: @escaping (Error?) -> Void) {
         let enterScene: () -> Void = {[weak self] in
-            let scene = self?.getCurrentScene(with: roomInfo.roomId)
-            scene?.enter {[weak self] payload, err in
+            guard let self = self else {return}
+            let aui_roominfo = convertJoyRoomInfo2AUIRoomInfo(with: roomInfo)
+            self.roomService.enterRoom(roomInfo: aui_roominfo) { err in
                 if let err = err {
                     JoyLogger.info("enter scene fail: \(err.localizedDescription)")
                     completion(err)
                     return
                 }
-                self?.syncManager.rtmManager.subscribeMessage(channelName: roomInfo.roomId, delegate: self!)
+                
                 completion(nil)
             }
+            subscribeAll(channelName: roomInfo.roomId)
         }
         
         if isConnected == false {
@@ -367,30 +359,28 @@ extension JoyServiceImpl:AUIRtmMessageProxyDelegate {
 extension JoyServiceImpl: AUISceneRespDelegate {
     private func _leaveRoom(roomId: String, isRoomOwner: Bool) {
         JoyLogger.info("_leaveRoom: \(roomId) isRoomOwner:\(isRoomOwner)")
-        let scene = self.syncManager.getScene(channelName: roomId)
-        if isRoomOwner {
-            scene?.delete()
-            roomManager.destroyRoom(roomId: roomId) { _ in
-            }
-        } else {
-            scene?.leave()
-        }
-        scene?.unbindRespDelegate(delegate: self)
-        scene?.userService.unbindRespDelegate(delegate: self)
+        roomService.leaveRoom(roomId: roomId)
+        unsubscribeAll(channelName: roomId)
     }
     
-    func onSceneDestroy(roomId: String) {
-        JoyLogger.info("onSceneDestroy: \(roomId)")
-        guard let model = self.roomList.filter({ $0.roomId == roomId }).first else {
+    func onSceneExpire(channelName: String) {
+        onSceneDestroy(channelName: channelName)
+    }
+    
+    func onSceneDestroy(channelName: String) {
+        JoyLogger.info("onSceneDestroy: \(channelName)")
+        guard let model = self.roomList.filter({ $0.roomId == channelName }).first else {
             return
         }
         
-        _leaveRoom(roomId: roomId, isRoomOwner: true)
+        _leaveRoom(roomId: channelName, isRoomOwner: true)
         self.listener?.onRoomDidDestroy(roomInfo: model)
     }
     
     func onTokenPrivilegeWillExpire(channelName: String?) {
-        NetworkManager.shared.generateToken(appId: appId, appCertificate: appCertificate, channelName: "", uid: String(user.userId), tokenType: .token007, type: .rtm) { token in
+        NetworkManager.shared.generateToken(channelName: "",
+                                            uid: String(user.userId),
+                                            tokenTypes: [.rtm]) { token in
             if let token = token {
                 self.syncManager.rtmManager.renew(token: token) { err in
                     JoyLogger.info("renew token：err \(err)")
@@ -515,13 +505,22 @@ extension JoyServiceImpl{
         return userInfo
     }
     
-    private func getCurrentScene(with channelName: String) -> AUIScene {
-        let scene = self.syncManager.createScene(channelName: channelName)
-         //if !sceneBinded {
-            scene.userService.bindRespDelegate(delegate: self)
-            scene.bindRespDelegate(delegate: self)
-           // sceneBinded = true
-        //}
+    private func subscribeAll(channelName: String) {
+        let scene = getCurrentScene(with: channelName)
+        scene?.userService.bindRespDelegate(delegate: self)
+        scene?.bindRespDelegate(delegate: self)
+        syncManager.rtmManager.subscribeMessage(channelName: channelName, delegate: self)
+    }
+    
+    private func unsubscribeAll(channelName: String) {
+        let scene = getCurrentScene(with: channelName)
+        scene?.userService.unbindRespDelegate(delegate: self)
+        scene?.unbindRespDelegate(delegate: self)
+        syncManager.rtmManager.unsubscribeMessage(channelName: channelName, delegate: self)
+    }
+    
+    private func getCurrentScene(with channelName: String) -> AUIScene? {
+        let scene = self.syncManager.getScene(channelName: channelName)
         return scene
     }
 
@@ -546,7 +545,7 @@ extension JoyServiceImpl{
     }
     
     private func getCurrentCollection(with roomId: String) -> AUIMapCollection? {
-        let collection: AUIMapCollection? = getCurrentScene(with: roomId).getCollection(key: SYNC_SCENE_ROOM_STARTGAME_COLLECTION)
+        let collection: AUIMapCollection? = getCurrentScene(with: roomId)?.getCollection(key: SYNC_SCENE_ROOM_STARTGAME_COLLECTION)
      //   if !collectionBinded {
             collection?.subscribeAttributesDidChanged(callback: {[weak self] str1, str2, model in
                 if let dict = model.getMap(), let self = self {
@@ -562,7 +561,9 @@ extension JoyServiceImpl{
 extension JoyServiceImpl: AUIRtmErrorProxyDelegate {
     
     private func login(completion:(@escaping (Error?)-> Void)) {
-        NetworkManager.shared.generateToken(appId: appId, appCertificate: appCertificate, channelName: "", uid: String(user.userId), tokenType: .token007, type: .rtm) { token in
+        NetworkManager.shared.generateToken(channelName: "",
+                                            uid: String(user.userId),
+                                            tokenTypes: [.rtm]) { token in
             if let token = token {
                 self.syncManager.rtmManager.login(token: token) { err in
                     self.isConnected = err == nil ? true : false

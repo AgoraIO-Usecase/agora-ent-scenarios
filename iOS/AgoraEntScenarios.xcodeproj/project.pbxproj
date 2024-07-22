@@ -2158,13 +2158,6 @@
 			path = ToastView;
 			sourceTree = "<group>";
 		};
-		DD6199CA29E3D36D008F63E4 /* Authorized */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Authorized;
-			sourceTree = "<group>";
-		};
 		DD6199CD29E3E246008F63E4 /* SpatialAudio */ = {
 			isa = PBXGroup;
 			children = (
@@ -3211,19 +3204,10 @@
 			isa = PBXGroup;
 			children = (
 				DD1F53572B9FF0AC009E4287 /* ResourceManager */,
-				DD6199CA29E3D36D008F63E4 /* Authorized */,
-				DDA1994E28FFE579009D3E61 /* NetworkManager */,
 				DDA1995328FFE579009D3E61 /* VLDefine */,
 				DDA1995A28FFE579009D3E61 /* Helper */,
 			);
 			path = Manager;
-			sourceTree = "<group>";
-		};
-		DDA1994E28FFE579009D3E61 /* NetworkManager */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = NetworkManager;
 			sourceTree = "<group>";
 		};
 		DDA1995328FFE579009D3E61 /* VLDefine */ = {
@@ -5534,7 +5518,7 @@
 					"\"Photos\"",
 					"-ld64",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.test.entfull;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = wildcard;
@@ -5757,7 +5741,7 @@
 					"\"Photos\"",
 					"-ld64",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.test.entfull;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = wildcard;

@@ -504,14 +504,14 @@ extension KTVApiImpl {
         #if DEBUG
         print("[KTVAPI]\(message)")
         #endif
-        apiRepoter?.writeLog(content: message, level: .info)
+        apiRepoter?.writeLog(content: "[KTVAPI]\(message)", level: .info)
     }
     
     private func agoraPrintError(_ message: String) {
         #if DEBUG
         print("[KTVAPI][Error]\(message)")
         #endif
-        apiRepoter?.writeLog(content: message, level: .error)
+        apiRepoter?.writeLog(content: "[KTVAPI][Error]\(message)", level: .error)
     }
 }
 

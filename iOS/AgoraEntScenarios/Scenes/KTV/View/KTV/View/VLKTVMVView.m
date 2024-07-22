@@ -370,7 +370,7 @@
          //   self.loadingView.hidden = NO;
             break;
         case VLKTVMVViewStateAudience:
-            self.joinChorusBtn.hidden = NO;
+            self.joinChorusBtn.hidden = [self.delegate hasAvailableMicSeat] ? NO : YES;
             self.joinChorusBtn.selected = NO;
             self.leaveChorusBtn.hidden = YES;
             self.pauseBtn.hidden = YES;
@@ -398,7 +398,7 @@
             self.musicTitleLabel.hidden = NO;
             break;
         case VLKTVMVViewStateOwnerAudience:
-            self.joinChorusBtn.hidden = NO;
+            self.joinChorusBtn.hidden = [self.delegate hasAvailableMicSeat] ? NO : YES;
             self.joinChorusBtn.selected = NO;
             self.leaveChorusBtn.hidden = YES;
             self.pauseBtn.hidden = YES;
@@ -492,7 +492,7 @@
             self.musicTitleLabel.hidden = NO;
             break;
         case VLKTVMVViewStateJoinChorus:
-            self.joinChorusBtn.hidden = NO;
+            self.joinChorusBtn.hidden = [self.delegate hasAvailableMicSeat] ? NO : YES;
             self.joinChorusBtn.selected = YES;
             self.leaveChorusBtn.hidden = YES;
             self.pauseBtn.hidden = YES;

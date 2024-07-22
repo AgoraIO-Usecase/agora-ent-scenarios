@@ -332,7 +332,7 @@ object RoomSoundAudioConstructor {
      */
     val anisIntroduceAudioMap: Map<Int, List<SoundAudioBean>> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         mutableMapOf(
-            ConfigConstants.AINSMode.AINS_High to
+            ConfigConstants.AINSMode.AINS_Tradition_Strong and ConfigConstants.AINSMode.AINS_AI_Strong to
                     mutableListOf(
                         SoundAudioBean(
                             ConfigConstants.BotSpeaker.BotRed,
@@ -370,7 +370,7 @@ object RoomSoundAudioConstructor {
                             getANISIntroduceUrl("/CN/Share/07-07-R-CN.wav")
                         )
                     ),
-            ConfigConstants.AINSMode.AINS_Medium to
+            ConfigConstants.AINSMode.AINS_Tradition_Weakness and ConfigConstants.AINSMode.AINS_AI_Weakness to
                     mutableListOf(
                         SoundAudioBean(
                             ConfigConstants.BotSpeaker.BotRed,

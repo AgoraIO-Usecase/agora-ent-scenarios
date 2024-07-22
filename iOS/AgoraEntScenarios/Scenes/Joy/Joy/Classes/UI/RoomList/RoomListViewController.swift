@@ -9,6 +9,7 @@ import UIKit
 import YYCategories
 import AgoraRtcKit
 import AgoraRtmKit
+import AgoraCommon
 
 class RoomListViewController: UIViewController {
     private var userInfo: JoyUserInfo!
@@ -89,7 +90,7 @@ class RoomListViewController: UIViewController {
         view.addSubview(naviBar)
         view.addSubview(createButton)
         
-        service = JoyServiceImpl(appId: joyAppId, host:joyHost, appCertificate: joyAppCertificate, user: userInfo, rtmClient: nil)
+        service = JoyServiceImpl(appId: joyAppId, host:joyHost, user: userInfo, rtmClient: nil)
         
         renewRTMTokens {[weak self] token in
             guard let self = self else {return}
@@ -146,14 +147,11 @@ extension RoomListViewController {
             return
         }
         JoyLogger.info("renewRTMTokens")
-        NetworkManager.shared.generateTokens(appId: joyAppId,
-                                             appCertificate: joyAppCertificate,
-                                             channelName: ""/*tokenConfig.roomId*/,
-                                             uid: "\(userInfo.userId)",
-                                             tokenGeneratorType: .token007,
-                                             tokenTypes: [.rtm]) {[weak self] tokens in
+        NetworkManager.shared.generateToken(channelName: "",
+                                            uid: "\(userInfo.userId)",
+                                            tokenTypes: [.rtm]) {[weak self] token in
             guard let self = self else {return}
-            guard let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
+            guard let rtmToken = token else {
                 JoyLogger.warn("renewRTMTokens fail")
                 completion?(nil)
                 return
