@@ -209,17 +209,11 @@ class ShowTo1v1Manger constructor() {
                 TokenGenerator.AgoraTokenType.rtm
             ),
             success = { ret ->
-                val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc]
-                val rtmToken = ret[TokenGenerator.AgoraTokenType.rtm]
-                if (rtcToken == null || rtmToken == null) {
-                    callback.invoke(false)
-                    return@generateTokens
-                }
-                mPrepareConfig.rtcToken = rtcToken
-                mPrepareConfig.rtmToken = rtmToken
-                setupGeneralToken(rtcToken)
-                mCallApi.renewToken(rtcToken)
-                rtmManager?.renewToken(rtmToken)
+                mPrepareConfig.rtcToken = ret
+                mPrepareConfig.rtmToken = ret
+                setupGeneralToken(ret)
+                mCallApi.renewToken(ret)
+                rtmManager?.renewToken(ret)
                 callback.invoke(true)
             },
             failure = {

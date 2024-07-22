@@ -10,17 +10,17 @@ enum class AgoraPresetSound constructor(
     val gender: Int,
     val effect: Int,
 ) {
-    Close(-1,-1f,-1,-1),
-    Sound1001(4,1f,0,0),
-    Sound1002(4,1f,0,1),
-    Sound1003(4,1f,1,0),
-    Sound1004(4,1f,1,1),
-    Sound2001(4,1f,0,2),
-    Sound2002(4,1f,1,2),
-    Sound2003(4,1f,0,3),
-    Sound2004(4,1f,1,3),
-    Sound2005(4,1f,0,4),
-    Sound2006(4,1f,1,4)
+    Close(-1,-100f,-1,-1),
+    Sound1001(4,100f,0,0),
+    Sound1002(4,100f,0,1),
+    Sound1003(4,100f,1,0),
+    Sound1004(4,100f,1,1),
+    Sound2001(4,100f,0,2),
+    Sound2002(4,100f,1,2),
+    Sound2003(4,100f,0,3),
+    Sound2004(4,100f,1,3),
+    Sound2005(4,100f,0,4),
+    Sound2006(4,100f,1,4)
 }
 
 val AgoraPresetSound.titleStringID: Int
@@ -72,7 +72,7 @@ class AgoraSoundCardManager constructor(private val rtcEngineEx: RtcEngineEx) {
 
     private var presetSound: AgoraPresetSound = AgoraPresetSound.Close
     private var isEnable: Boolean = false
-    private var gainValue: Float = -1f
+    private var gainValue: Float = -100f
     private var presetValue: Int = -1
     private var gender: Int = -1
     private var effect: Int = -1

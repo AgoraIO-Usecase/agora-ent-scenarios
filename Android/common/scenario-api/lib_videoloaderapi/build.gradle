@@ -47,5 +47,5 @@ dependencies {
     implementation 'com.google.android.material:material:1.5.0'
     testImplementation 'junit:junit:4.13.2'
 
-    implementation rootProject.ext.deps.rtc
+    implementation project(":common:base")
 }

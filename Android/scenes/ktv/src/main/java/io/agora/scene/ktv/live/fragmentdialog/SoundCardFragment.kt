@@ -77,7 +77,7 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {}
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {
                     seekBar?.progress?.let { progress ->
-                        val gainValue: Float = progress / 10.0f
+                        val gainValue: Float = progress.toFloat()
                         etGainAdjust.setText(gainValue.toString())
                         soundCardSetting.setGainValue(gainValue)
                     }
@@ -108,15 +108,15 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                         if (currentWindowHeight < initialWindowHeight) {
                             Log.d(TAG, "current: $currentWindowHeight, initial: $initialWindowHeight, show: true")
                         } else {
-                            var value = 1f
+                            var value = 100f
                             try {
                                 val input = etGainAdjust.text.toString()
                                 value = input.toFloat()
                             } catch (e: NumberFormatException) {}
                             if (value < 0) {
-                                value = 1f
-                            } else if (value > 4) {
-                                value = 4f
+                                value = 100f
+                            } else if (value > 400) {
+                                value = 400f
                             }
                             setupGainView(value)
                             etGainAdjust.clearFocus()
@@ -130,7 +130,7 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
 
     private fun setupGainView(gainValue: Float) {
         binding?.apply {
-            pbGainAdjust.progress = (gainValue * 10).toInt()
+            pbGainAdjust.progress = gainValue.toInt()
             etGainAdjust.setText(gainValue.toString())
         }
     }
@@ -220,75 +220,75 @@ enum class AgoraPresetSound constructor(
      *
      * @constructor Create empty Close
      */
-    Close(-1,-1f,-1,-1),
+    Close(-1,-100f,-1,-1),
 
     /**
      * Sound1001
      *
      * @constructor Create empty Sound1001
      */
-    Sound1001(4,1f,0,0),
+    Sound1001(4,100f,0,0),
 
     /**
      * Sound1002
      *
      * @constructor Create empty Sound1002
      */
-    Sound1002(4,1f,0,1),
+    Sound1002(4,100f,0,1),
 
     /**
      * Sound1003
      *
      * @constructor Create empty Sound1003
      */
-    Sound1003(4,1f,1,0),
+    Sound1003(4,100f,1,0),
 
     /**
      * Sound1004
      *
      * @constructor Create empty Sound1004
      */
-    Sound1004(4,1f,1,1),
+    Sound1004(4,100f,1,1),
 
     /**
      * Sound2001
      *
      * @constructor Create empty Sound2001
      */
-    Sound2001(4,1f,0,2),
+    Sound2001(4,100f,0,2),
 
     /**
      * Sound2002
      *
      * @constructor Create empty Sound2002
      */
-    Sound2002(4,1f,1,2),
+    Sound2002(4,100f,1,2),
 
     /**
      * Sound2003
      *
      * @constructor Create empty Sound2003
      */
-    Sound2003(4,1f,0,3),
+    Sound2003(4,100f,0,3),
 
     /**
      * Sound2004
      *
      * @constructor Create empty Sound2004
      */
-    Sound2004(4,1f,1,3),
+    Sound2004(4,100f,1,3),
 
     /**
      * Sound2005
      *
      * @constructor Create empty Sound2005
      */
-    Sound2005(4,1f,0,4),
+    Sound2005(4,100f,0,4),
 
     /**
      * Sound2006
      *
      * @constructor Create empty Sound2006
      */
-    Sound2006(4,1f,1,4)
+    Sound2006(4,100f,1,4)
 }

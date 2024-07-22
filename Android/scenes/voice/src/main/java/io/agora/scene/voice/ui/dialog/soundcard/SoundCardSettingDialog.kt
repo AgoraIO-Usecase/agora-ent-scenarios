@@ -96,7 +96,7 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {}
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {
                     seekBar?.progress?.let { progress ->
-                        val gainValue: Float = progress / 10.0f
+                        val gainValue: Float = progress.toFloat()
                         etGainAdjust.setText(gainValue.toString())
                         mManager.setGainValue(gainValue)
                     }
@@ -127,15 +127,15 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
                         if (currentWindowHeight < initialWindowHeight) {
                             Log.d(TAG, "current: $currentWindowHeight, initial: $initialWindowHeight, show: true")
                         } else {
-                            var value = 1f
+                            var value = 100f
                             try {
                                 val input = etGainAdjust.text.toString()
                                 value = input.toFloat()
                             } catch (e: NumberFormatException) {}
                             if (value < 0) {
-                                value = 1f
-                            } else if (value > 4) {
-                                value = 4f
+                                value = 100f
+                            } else if (value > 400) {
+                                value = 400f
                             }
                             setupGainView(value)
                             etGainAdjust.clearFocus()
@@ -149,7 +149,7 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
 
     private fun setupGainView(gainValue: Float) {
         binding?.apply {
-            pbGainAdjust.progress = (gainValue * 10).toInt()
+            pbGainAdjust.progress = gainValue.toInt()
             etGainAdjust.setText(gainValue.toString())
         }
     }

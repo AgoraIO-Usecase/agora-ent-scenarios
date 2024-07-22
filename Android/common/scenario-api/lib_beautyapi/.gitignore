@@ -1,0 +1,11 @@
+/build
+arm64-v8a/
+armeabi-v7a/
+x86/
+x86_64/
+agora-rtm-sdk.jar
+third-party/
+/aars/beauty_bytedance/EffectAAR/effectAAR-release.aar
+/aars/beauty_sensetime/HardwareBuffer/HardwareBuffer-release.aar
+/aars/beauty_sensetime/SenseArSourceManager/SenseArSourceManager-release.aar
+/aars/beauty_sensetime/STMobileJNI/STMobileJNI-release.aar
