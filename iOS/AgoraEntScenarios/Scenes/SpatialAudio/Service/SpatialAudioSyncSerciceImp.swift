@@ -985,7 +985,8 @@ extension SpatialAudioSyncSerciceImp {
             completion(SAErrorType.unknown("update mic seat", "room id is nil").error())
             return
         }
-        let params = mic.kj.JSONObject()
+        var params = mic.kj.JSONObject()
+        params.removeValue(forKey: "up")
         SyncUtil
             .scene(id: selfRoomId)?
             .collection(className: kCollectionIdSeatInfo)

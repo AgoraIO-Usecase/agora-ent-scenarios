@@ -180,7 +180,7 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
                 cell.setTitle(data.title, enable:true, isOn: value) {[weak self] isOn in
                     self?.barrierValueChange(complete: {
                         ShowAgoraKitManager.shared.rtcParam.sr = isOn
-                        ShowAgoraKitManager.shared.updateSettingForkey(.SR, currentChannelId: self?.currentChannelId)
+                        ShowAgoraKitManager.shared.setSuperResolutionOn(isOn)
                     })
                 } detailButtonAction: {[weak self] in
                     self?.showAlert(title: data.title, message: data.tips, confirmTitle: "OK", cancelTitle: nil)
