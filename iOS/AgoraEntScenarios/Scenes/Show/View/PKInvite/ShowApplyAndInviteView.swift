@@ -22,7 +22,7 @@ enum ShowApplyAndInviteType: String, CaseIterable {
 
 class ShowApplyAndInviteView: UIView {
     var applyStatusClosure: ((ShowInteractionStatus) -> Void)?
-    
+    private var isCurrentInteracting: Bool = false
     private lazy var segmentView: ShowSegmentView = {
         let segmentView = ShowSegmentView(frame: CGRect(x: 10,
                                                         y: 23,
@@ -148,12 +148,14 @@ class ShowApplyAndInviteView: UIView {
     private func getApplyPKInfo() {
         AppContext.showServiceImp()?.getInterationInfo(roomId: roomId) {[weak self] err, info in
             guard let self = self else {return}
+            self.isCurrentInteracting = info?.type ?? .idle == .idle ? false : true
             if info?.type == .pk {
                 self.tipsContainerView.isHidden = false
                 self.tipsLabel.text = String(format: "show_pking_with_broadcastor".show_localized, info?.userName ?? "")
             } else {
                 self.tipsContainerView.isHidden = true
             }
+            self.reloadData()
         }
     }
     private func getApplyLinkInfo() {
@@ -231,7 +233,7 @@ extension ShowApplyAndInviteView: AGETableViewDelegate {
         cell.roomId = roomId
         let model = self.tableView.dataArray?[indexPath.row]
         
-        cell.setupApplyAndInviteData(model: model, isLink: seatMicModel != nil)
+        cell.setupApplyAndInviteData(model: model, isLink: seatMicModel != nil, isInteracting: isCurrentInteracting)
         return cell
     }
 }

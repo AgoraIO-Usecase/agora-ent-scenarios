@@ -506,7 +506,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 - (void)popForceLeaveRoom {
     VL(weakSelf);
     [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sr_sceneImageWithName:@"empty" ] message:SRLocalizedString(@"room_has_close") buttonTitle:SRLocalizedString(@"confirm") completion:^(bool flag, NSString * _Nullable text) {
-        for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
+        for (UIViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLSROnLineListVC class]]) {
 //                [weakSelf destroyMediaPlayer];
 //                [weakSelf leaveRTCChannel];
@@ -647,23 +647,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     SRLogInfo(@"tokenPrivilegeWillExpire: %@", token);
     [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
                                                       uid:VLUserCenter.user.id
-                                                tokenType:TokenGeneratorTypeToken006
-                                                     type:AgoraTokenTypeRtc
+                                                    types:@[@(AgoraTokenTypeRtc), @(AgoraTokenTypeRtm)]
                                                    expire:1500
                                                   success:^(NSString * token) {
         SRLogInfo(@"tokenPrivilegeWillExpire rtc renewToken: %@", token);
         [self.RTCkit renewToken:token];
-    }];
-    
-    //TODO: mcc missing token expire callback
-    [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
-                                                      uid:VLUserCenter.user.id
-                                                tokenType:TokenGeneratorTypeToken006
-                                                     type:AgoraTokenTypeRtm
-                                                   expire:1500
-                                                  success:^(NSString * token) {
-        SRLogInfo(@"tokenPrivilegeWillExpire rtm renewToken: %@", token);
-        //TODO(chenpan): mcc missing
+        //TODO: mcc missing
 //        [self.AgoraMcc renewToken:token];
     }];
 }
