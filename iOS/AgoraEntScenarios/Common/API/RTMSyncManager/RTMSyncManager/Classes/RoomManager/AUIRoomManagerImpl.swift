@@ -23,7 +23,7 @@ import Foundation
 extension AUIRoomManagerImpl {
     public func createRoom(room: AUIRoomInfo,
                            callback: @escaping (NSError?, AUIRoomInfo?) -> ()) {
-        aui_info("enterRoom: \(room.roomName) ", tag: "AUIRoomManagerImpl")
+        aui_info("createRoom[\(room.roomId)]: \(room.roomName) ", tag: "AUIRoomManagerImpl")
         
         let model = SyncRoomCreateNetworkModel()
         model.sceneId = sceneId
@@ -33,6 +33,7 @@ extension AUIRoomManagerImpl {
         var roomInfo: AUIRoomInfo? = nil
         //create a room from the server
         model.request { error, resp in
+            aui_info("createRoom[\(room.roomId)] completion \(error?.localizedDescription ?? "success") ", tag: "AUIRoomManagerImpl")
             createRoomError = error as? NSError
             roomInfo = resp as? AUIRoomInfo
             callback(createRoomError, roomInfo)
@@ -41,7 +42,7 @@ extension AUIRoomManagerImpl {
     
     public func updateRoom(room: AUIRoomInfo,
                            callback: @escaping (NSError?, AUIRoomInfo?) -> ()) {
-        aui_info("updateRoom: \(room.roomName) ", tag: "AUIRoomManagerImpl")
+        aui_info("updateRoom[\(room.roomId)]: \(room.roomName) ", tag: "AUIRoomManagerImpl")
         
         let model = SyncRoomUpdateNetworkModel()
         model.sceneId = sceneId
@@ -51,6 +52,7 @@ extension AUIRoomManagerImpl {
         var roomInfo: AUIRoomInfo? = nil
         //update a room from the server
         model.request { error, resp in
+            aui_info("updateRoom[\(room.roomId)] completion \(error?.localizedDescription ?? "success") ", tag: "AUIRoomManagerImpl")
             createRoomError = error as? NSError
             roomInfo = resp as? AUIRoomInfo
             callback(createRoomError, roomInfo)
@@ -65,6 +67,7 @@ extension AUIRoomManagerImpl {
         model.userId = AUIRoomContext.shared.currentUserInfo.userId
         model.roomId = roomId
         model.request { error, _ in
+            aui_info("destroyRoom[\(roomId)] completion \(error?.localizedDescription ?? "success") ", tag: "AUIRoomManagerImpl")
             callback(error as? NSError)
         }
     }
@@ -78,6 +81,7 @@ extension AUIRoomManagerImpl {
         model.lastCreateTime = lastCreateTime == 0 ? nil : NSNumber(value: Int(lastCreateTime))
         model.pageSize = pageSize
         model.request { error, dic in
+            aui_info("getRoomInfoList completion: \(error?.localizedDescription ?? "success")", tag: "AUIRoomManagerImpl")
             var ts: Int64 = 0
             var roomList: [AUIRoomInfo]? = nil
             if let dic = dic as? [String: Any] {
