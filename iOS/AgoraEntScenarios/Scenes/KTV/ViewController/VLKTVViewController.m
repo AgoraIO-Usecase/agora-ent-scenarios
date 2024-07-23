@@ -1849,10 +1849,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 /// 获取当前用户的麦位
 - (VLRoomSeatModel*)getCurrentUserSeatInfo {
-    return [self gettUserSeatInfoWithUserId:VLUserCenter.user.id];
+    return [self getUserSeatInfoWithUserId:VLUserCenter.user.id];
 }
 
-- (VLRoomSeatModel*)gettUserSeatInfoWithUserId:(NSString*)userId {
+- (VLRoomSeatModel*)getUserSeatInfoWithUserId:(NSString*)userId {
     for (VLRoomSeatModel *model in self.seatsArray) {
         if ([model.owner.userId isEqualToString:userId]) {
             return model;
@@ -2505,20 +2505,22 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)onChoristerDidEnterWithChorister:(KTVChoristerModel *)chorister {
     KTVLogInfo(@"onChoristerDidEnterWithChorister: %@", chorister.userId);
-    VLRoomSeatModel* model = [self gettUserSeatInfoWithUserId:chorister.userId];
+    VLRoomSeatModel* model = [self getUserSeatInfoWithUserId:chorister.userId];
     if (model == nil) {
         return;
     }
     [self.roomPersonView reloadSeatIndex:model.seatIndex];
+    self.chorusNum = [self getChorusNumWithSeatArray:self.seatsArray];
 }
 
 - (void)onChoristerDidLeaveWithChorister:(KTVChoristerModel *)chorister {
     KTVLogInfo(@"onChoristerDidLeaveWithChorister: %@", chorister.userId);
-    VLRoomSeatModel* model = [self gettUserSeatInfoWithUserId:chorister.userId];
+    VLRoomSeatModel* model = [self getUserSeatInfoWithUserId:chorister.userId];
     if (model == nil) {
         return;
     }
     [self.roomPersonView reloadSeatIndex:model.seatIndex];
+    self.chorusNum = [self getChorusNumWithSeatArray:self.seatsArray];
 }
 
 @end
