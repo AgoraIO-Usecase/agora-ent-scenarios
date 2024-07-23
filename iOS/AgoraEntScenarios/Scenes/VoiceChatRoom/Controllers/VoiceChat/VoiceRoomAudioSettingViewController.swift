@@ -344,17 +344,17 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             cell.titleLabel.text = LanguageManager.localValue(key: "voice_AINS")
             switch ains_state {
             case .high:
-                cell.contentLabel.text = "voice_High".voice_localized()
+                cell.contentLabel.text = "voice_ains_legacy_high".voice_localized()
             case .mid:
-                cell.contentLabel.text = "voice_Medium".voice_localized()
+                cell.contentLabel.text = "voice_ains_legacy_low".voice_localized()
             case .off:
-                cell.contentLabel.text = "voice_off".voice_localized()
+                cell.contentLabel.text = "voice_ains_ai_high".voice_localized()
             case .aiMid:
-                cell.contentLabel.text = "AI弱"
+                cell.contentLabel.text = "voice_ains_ai_low".voice_localized()
             case .aiHigh:
-                cell.contentLabel.text = "AI强"
+                cell.contentLabel.text = "voice_ains_custom".voice_localized()
             case .custom:
-                cell.contentLabel.text = "自定义"
+                cell.contentLabel.text = "voice_ains_off".voice_localized()
             }
             return cell
         } else if (type == .AIAEC) {

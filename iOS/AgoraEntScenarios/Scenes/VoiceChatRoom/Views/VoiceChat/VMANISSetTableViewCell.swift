@@ -116,7 +116,7 @@ class VMANISSetTableViewCell: UITableViewCell {
         contentView.addSubview(titleLabel)
 
         offBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
-        offBtn.setTitle(" \("voice_off".voice_localized()) ", for: .normal)
+        offBtn.setTitle(" \("voice_ains_off".voice_localized()) ", for: .normal)
         offBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
         offBtn.font(UIFont.systemFont(ofSize: 11))
         offBtn.layer.cornerRadius = 3
@@ -128,7 +128,7 @@ class VMANISSetTableViewCell: UITableViewCell {
       //  selBtn = offBtn
         
         aiMidBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
-        aiMidBtn.setTitle(" AI弱 ", for: .normal)
+        aiMidBtn.setTitle(" \("voice_ains_ai_low".voice_localized()) ", for: .normal)
         aiMidBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
         aiMidBtn.font(UIFont.systemFont(ofSize: 11))
         aiMidBtn.layer.cornerRadius = 3
@@ -139,7 +139,7 @@ class VMANISSetTableViewCell: UITableViewCell {
         addSubview(aiMidBtn)
 
         aiHighBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
-        aiHighBtn.setTitle(" AI强 ", for: .normal)
+        aiHighBtn.setTitle(" \("voice_ains_ai_high".voice_localized()) ", for: .normal)
         aiHighBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
         aiHighBtn.font(UIFont.systemFont(ofSize: 11))
         aiHighBtn.layer.cornerRadius = 3
@@ -150,7 +150,7 @@ class VMANISSetTableViewCell: UITableViewCell {
         addSubview(aiHighBtn)
         
         midBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
-        midBtn.setTitle(" 传统弱 ", for: .normal)
+        midBtn.setTitle(" \("voice_ains_legacy_low".voice_localized()) ", for: .normal)
         midBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
         midBtn.font(UIFont.systemFont(ofSize: 11))
         midBtn.layer.cornerRadius = 3
@@ -161,7 +161,7 @@ class VMANISSetTableViewCell: UITableViewCell {
         addSubview(midBtn)
 
         highBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
-        highBtn.setTitle(" 传统强 ", for: .normal)
+        highBtn.setTitle(" \("voice_ains_legacy_high".voice_localized()) ", for: .normal)
         highBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
         highBtn.font(UIFont.systemFont(ofSize: 11))
         highBtn.layer.cornerRadius = 3
@@ -172,7 +172,7 @@ class VMANISSetTableViewCell: UITableViewCell {
         addSubview(highBtn)
         
         cusBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
-        cusBtn.setTitle(" 自定义 ", for: .normal)
+        cusBtn.setTitle(" \("voice_ains_custom".voice_localized()) ", for: .normal)
         cusBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
         cusBtn.font(UIFont.systemFont(ofSize: 11))
         cusBtn.layer.cornerRadius = 3
