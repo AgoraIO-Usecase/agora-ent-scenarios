@@ -2323,6 +2323,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
 - (void)onRoomDidDestroy {
     KTVLogInfo(@"onRoomDidDestroy");
+    [self leaveRTCChannel];
     BOOL isOwner = [self.roomModel.creatorNo isEqualToString:VLUserCenter.user.id];
     //房主关闭房间
     if (isOwner) {
@@ -2344,6 +2345,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)onRoomDidExpire {
     KTVLogInfo(@"onRoomDidExpire");
+    [self leaveRTCChannel];
     BOOL isOwner = [self.roomModel.creatorNo isEqualToString:VLUserCenter.user.id];
     NSString *mes = isOwner ? KTVLocalizedString(@"ktv_room_timeout") : KTVLocalizedString(@"ktv_room_offline");
     kWeakSelf(self);
