@@ -1094,17 +1094,17 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                            config:config];
     
     NSString* exChannelToken = AppContext.shared.agoraRTCToken;
-    KTVApiConfig* apiConfig = [[KTVApiConfig alloc] initWithAppId:[[AppContext shared] appId]
-                                                         rtmToken:AppContext.shared.agoraRTMToken
-                                                           engine:self.RTCkit
-                                                      channelName:self.roomModel.roomNo
-                                                         localUid:[VLUserCenter.user.id integerValue]
-                                                        chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:exChannelToken
+    KTVApiConfig* apiConfig = [[KTVApiConfig alloc] initWithAppId: [[AppContext shared] appId]
+                                                         rtmToken: AppContext.shared.agoraRTMToken
+                                                           engine: self.RTCkit
+                                                      channelName: self.roomModel.roomNo
+                                                         localUid: [VLUserCenter.user.id integerValue]
+                                                chorusChannelName: [NSString stringWithFormat:@"%@_rtc_ex", self.roomModel.roomNo]
+                                               chorusChannelToken: exChannelToken
                                                              type: KTVTypeNormal
-                                                        musicType:loadMusicTypeMcc
-                                                        maxCacheSize:10
-                                                        mccDomain: AppContext.shared.isDebugMode ? @"api-test.agora.io" : nil
-    ];
+                                                        musicType: loadMusicTypeMcc
+                                                        maxCacheSize: 10
+                                                        mccDomain: AppContext.shared.isDebugMode ? @"api-test.agora.io" : nil];
     self.ktvApi = [[KTVApiImpl alloc] init];
     [self.ktvApi createKtvApiWithConfig:apiConfig];
     [self.ktvApi renewInnerDataStreamId];
