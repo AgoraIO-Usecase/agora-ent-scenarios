@@ -392,15 +392,12 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 //用户弹框离开房间
 - (void)popForceLeaveRoom {
     VL(weakSelf);
-    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage ktv_sceneImageWithName:@"empty" ] message:KTVLocalizedString(@"ktv_owner_leave") buttonTitle:KTVLocalizedString(KTVLocalizedString(@"ktv_confirm")) completion:^(bool flag, NSString * _Nullable text) {
-        for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
-            if ([vc isKindOfClass:[VLOnLineListVC class]]) {
-//                [weakSelf destroyMediaPlayer];
-//                [weakSelf leaveRTCChannel];
-                [weakSelf.navigationController popToViewController:vc animated:YES];
-                [AgoraEntLog autoUploadLogWithScene:KTVLog.kLogKey];
-            }
-        }
+    [[VLKTVAlert shared]showKTVToastWithFrame: UIScreen.mainScreen.bounds
+                                        image: [UIImage ktv_sceneImageWithName:@"empty" ]
+                                      message: KTVLocalizedString(@"ktv_owner_leave") 
+                                  buttonTitle:KTVLocalizedString(KTVLocalizedString(@"ktv_confirm"))
+                                   completion:^(bool flag, NSString * _Nullable text) {
+        [weakSelf leaveRoom];
         [[VLKTVAlert shared] dismiss];
     }];
 }
@@ -2331,7 +2328,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if (isOwner) {
         kWeakSelf(self);
         NSString *mes = KTVLocalizedString(@"ktv_room_exit");
-        [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage ktv_sceneImageWithName:@"empty" ] message:mes buttonTitle:KTVLocalizedString(@"ktv_confirm") completion:^(bool flag, NSString * _Nullable text) {
+        [[VLKTVAlert shared]showKTVToastWithFrame: UIScreen.mainScreen.bounds
+                                            image: [UIImage ktv_sceneImageWithName:@"empty" ]
+                                          message: mes
+                                      buttonTitle: KTVLocalizedString(@"ktv_confirm")
+                                       completion: ^(bool flag, NSString * _Nullable text) {
             [[VLKTVAlert shared]dismiss];
             [weakself leaveRoom];
         }];
@@ -2346,7 +2347,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     BOOL isOwner = [self.roomModel.creatorNo isEqualToString:VLUserCenter.user.id];
     NSString *mes = isOwner ? KTVLocalizedString(@"ktv_room_timeout") : KTVLocalizedString(@"ktv_room_offline");
     kWeakSelf(self);
-    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage ktv_sceneImageWithName:@"empty" ] message:mes buttonTitle:KTVLocalizedString(@"ktv_confirm") completion:^(bool flag, NSString * _Nullable text) {
+    [[VLKTVAlert shared]showKTVToastWithFrame: UIScreen.mainScreen.bounds
+                                        image: [UIImage ktv_sceneImageWithName:@"empty" ]
+                                      message: mes buttonTitle:KTVLocalizedString(@"ktv_confirm")
+                                   completion: ^(bool flag, NSString * _Nullable text) {
         [[VLKTVAlert shared]dismiss];
         [weakself leaveRoom];
     }];
