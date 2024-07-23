@@ -9,7 +9,7 @@ import Foundation
 import AVFoundation
 import UIKit
 
-open class AgoraEntAuthorizedManager: NSObject {
+class AgoraEntAuthorizedManager: NSObject {
     @objc class func showAudioAuthorizedFail(parent: UIViewController) {
         showAuthorizedFail(parent: parent, message: "authorized_microphone_fail".showTo1v1Localization())
     }
@@ -42,7 +42,7 @@ open class AgoraEntAuthorizedManager: NSObject {
         }
     }
     
-    @objc class func checkAudioAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
+    class func checkAudioAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
         requestAudioSession { granted in
             if !granted {
                 showAudioAuthorizedFail(parent: parent)
@@ -51,7 +51,7 @@ open class AgoraEntAuthorizedManager: NSObject {
         }
     }
     
-    @objc class func checkCameraAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
+    class func checkCameraAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
         requestCapture { granted in
             if !granted {
                 showCameraAuthorizedFail(parent: parent)
@@ -60,7 +60,7 @@ open class AgoraEntAuthorizedManager: NSObject {
         }
     }
     
-    @objc class func showAuthorizedFail(parent: UIViewController, message: String) {
+    class func showAuthorizedFail(parent: UIViewController, message: String) {
         let vc = UIAlertController(title: "authorized_title".showTo1v1Localization() as String,
                                    message: message,
                                    preferredStyle: .alert)
@@ -76,7 +76,7 @@ open class AgoraEntAuthorizedManager: NSObject {
         parent.present(vc, animated: true)
     }
     
-    @objc class func requestCapture(completion:@escaping (Bool)->()) {
+    class func requestCapture(completion:@escaping (Bool)->()) {
         let status = AVCaptureDevice.authorizationStatus(for: .video)
         if status == .denied || status == .restricted {
             DispatchQueue.main.async {
@@ -97,7 +97,7 @@ open class AgoraEntAuthorizedManager: NSObject {
         }
     }
     
-    @objc class func requestAudioSession(completion:@escaping (Bool)->()) {
+    class func requestAudioSession(completion:@escaping (Bool)->()) {
         let status = AVCaptureDevice.authorizationStatus(for: .audio)
         if status == .denied || status == .restricted {
             DispatchQueue.main.async {
