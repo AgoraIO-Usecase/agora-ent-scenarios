@@ -7,7 +7,7 @@
 
 import UIKit
 
-@objc public class AUiMoreDialog: UIView {
+public class AUiMoreDialog: UIView {
     private lazy var contentView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor.black.withAlphaComponent(0.85)
@@ -63,14 +63,14 @@ import UIKit
         }
     }
     
-    @objc func show() {
+    func show() {
         contentView.bottom = 0
         UIView.animate(withDuration: 0.3, delay: 0) {
             self.contentView.top = 0
         }
     }
     
-    @objc func hidden() {
+    func hidden() {
         UIView.animate(withDuration: 0.3, delay: 0) {
             self.contentView.bottom = 0
         } completion: { flag in

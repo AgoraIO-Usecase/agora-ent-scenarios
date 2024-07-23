@@ -9,16 +9,16 @@ import Foundation
 import AVFoundation
 import UIKit
 
-open class AgoraEntAuthorizedManager: NSObject {
-    @objc class func showAudioAuthorizedFail(parent: UIViewController) {
+class AgoraEntAuthorizedManager: NSObject {
+    class func showAudioAuthorizedFail(parent: UIViewController) {
         showAuthorizedFail(parent: parent, message: "authorized_microphone_fail".pure1v1Localization())
     }
     
-    @objc class func showCameraAuthorizedFail(parent: UIViewController) {
+    class func showCameraAuthorizedFail(parent: UIViewController) {
         showAuthorizedFail(parent: parent, message: "authorized_camera_fail".pure1v1Localization())
     }
     
-    @objc class func checkMediaAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
+    class func checkMediaAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
         var isPermission: Bool = true
         let group = DispatchGroup()
         group.enter()
@@ -42,7 +42,7 @@ open class AgoraEntAuthorizedManager: NSObject {
         }
     }
     
-    @objc class func checkAudioAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
+    class func checkAudioAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
         requestAudioSession { granted in
             if !granted {
                 showAudioAuthorizedFail(parent: parent)
@@ -51,7 +51,7 @@ open class AgoraEntAuthorizedManager: NSObject {
         }
     }
     
-    @objc class func checkCameraAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
+    class func checkCameraAuthorized(parent: UIViewController, completion: ((Bool) -> Void)? = nil) {
         requestCapture { granted in
             if !granted {
                 showCameraAuthorizedFail(parent: parent)
@@ -60,7 +60,7 @@ open class AgoraEntAuthorizedManager: NSObject {
         }
     }
     
-    @objc class func showAuthorizedFail(parent: UIViewController, message: String) {
+    class func showAuthorizedFail(parent: UIViewController, message: String) {
         let vc = UIAlertController(title: "authorized_title".pure1v1Localization() as String,
                                    message: message,
                                    preferredStyle: .alert)
@@ -76,7 +76,7 @@ open class AgoraEntAuthorizedManager: NSObject {
         parent.present(vc, animated: true)
     }
     
-    @objc class func requestCapture(completion:@escaping (Bool)->()) {
+    class func requestCapture(completion:@escaping (Bool)->()) {
         let status = AVCaptureDevice.authorizationStatus(for: .video)
         if status == .denied || status == .restricted {
             DispatchQueue.main.async {
@@ -97,7 +97,7 @@ open class AgoraEntAuthorizedManager: NSObject {
         }
     }
     
-    @objc class func requestAudioSession(completion:@escaping (Bool)->()) {
+    class func requestAudioSession(completion:@escaping (Bool)->()) {
         let status = AVCaptureDevice.authorizationStatus(for: .audio)
         if status == .denied || status == .restricted {
             DispatchQueue.main.async {
