@@ -65,12 +65,34 @@ extension VoiceRoomViewController {
             self?.ains_state = state
             self?.rtckit.setAINS(with: state)
             if self?.isOwner == false || self?.roomInfo?.room?.use_robot == false { return }
-            if state == .high {
-                self?.rtckit.playMusic(with: .ainsHigh)
-            } else if state == .mid {
-                self?.rtckit.playMusic(with: .ainsMid)
-            } else {
-                self?.rtckit.playMusic(with: .ainsOff)
+            switch state {
+            case .high:
+                if (self?.ainsLevelHighChecked == false) {
+                    self?.ainsLevelHighChecked = true
+                    self?.rtckit.playMusic(with: .ainsHigh)
+                }
+            case .aiHigh:
+                if (self?.ainsLevelAiHighChecked == false) {
+                    self?.ainsLevelAiHighChecked = true
+                    self?.rtckit.playMusic(with: .ainsHigh)
+                }
+            case .mid:
+                if (self?.ainsLevelMidChecked == false) {
+                    self?.ainsLevelMidChecked = true
+                    self?.rtckit.playMusic(with: .ainsMid)
+                }
+            case .aiMid:
+                if (self?.ainsLevelAiMidChecked == false) {
+                    self?.ainsLevelAiMidChecked = true
+                    self?.rtckit.playMusic(with: .ainsMid)
+                }
+            case .custom:
+                self?.rtckit.stopPlayMusic()
+            default:
+                if (self?.ainsLevelAiMidChecked == false) {
+                    self?.ainsLevelAiMidChecked = true
+                    self?.rtckit.playMusic(with: .ainsOff)
+                }
             }
         }
         

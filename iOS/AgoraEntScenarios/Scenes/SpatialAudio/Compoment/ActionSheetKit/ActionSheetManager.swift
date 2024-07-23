@@ -1223,6 +1223,7 @@ class ActionSheetTFCell: UITableViewCell {
         label.font = .systemFont(ofSize: 13)
         label.textColor = .black
         label.textAlignment = .left
+        label.numberOfLines = 0
         label.setContentHuggingPriority(.defaultLow, for: .horizontal)
         label.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         return label
@@ -1290,7 +1291,7 @@ class ActionSheetTFCell: UITableViewCell {
         titleLabel.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: 0).isActive = true
         titleLabel.topAnchor.constraint(equalTo: stackView.topAnchor, constant: 10).isActive = true
         titleLabel.widthAnchor.constraint(equalToConstant: 200).isActive = true
-        titleLabel.bottomAnchor.constraint(equalTo: stackView.bottomAnchor, constant: -10).isActive = true
+        titleLabel.centerYAnchor.constraint(equalTo: stackView.centerYAnchor, constant: 0).isActive = true
         
         inputTF.translatesAutoresizingMaskIntoConstraints = false
         inputTF.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 15).isActive = true
