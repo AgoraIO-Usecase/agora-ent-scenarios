@@ -392,15 +392,12 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 //用户弹框离开房间
 - (void)popForceLeaveRoom {
     VL(weakSelf);
-    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage ktv_sceneImageWithName:@"empty" ] message:KTVLocalizedString(@"ktv_owner_leave") buttonTitle:KTVLocalizedString(KTVLocalizedString(@"ktv_confirm")) completion:^(bool flag, NSString * _Nullable text) {
-        for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
-            if ([vc isKindOfClass:[VLOnLineListVC class]]) {
-//                [weakSelf destroyMediaPlayer];
-//                [weakSelf leaveRTCChannel];
-                [weakSelf.navigationController popToViewController:vc animated:YES];
-                [AgoraEntLog autoUploadLogWithScene:KTVLog.kLogKey];
-            }
-        }
+    [[VLKTVAlert shared]showKTVToastWithFrame: UIScreen.mainScreen.bounds
+                                        image: [UIImage ktv_sceneImageWithName:@"empty" ]
+                                      message: KTVLocalizedString(@"ktv_owner_leave") 
+                                  buttonTitle:KTVLocalizedString(KTVLocalizedString(@"ktv_confirm"))
+                                   completion:^(bool flag, NSString * _Nullable text) {
+        [weakSelf leaveRoom];
         [[VLKTVAlert shared] dismiss];
     }];
 }
@@ -1097,17 +1094,17 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                            config:config];
     
     NSString* exChannelToken = AppContext.shared.agoraRTCToken;
-    KTVApiConfig* apiConfig = [[KTVApiConfig alloc] initWithAppId:[[AppContext shared] appId]
-                                                         rtmToken:AppContext.shared.agoraRTMToken
-                                                           engine:self.RTCkit
-                                                      channelName:self.roomModel.roomNo
-                                                         localUid:[VLUserCenter.user.id integerValue]
-                                                        chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:exChannelToken
+    KTVApiConfig* apiConfig = [[KTVApiConfig alloc] initWithAppId: [[AppContext shared] appId]
+                                                         rtmToken: AppContext.shared.agoraRTMToken
+                                                           engine: self.RTCkit
+                                                      channelName: self.roomModel.roomNo
+                                                         localUid: [VLUserCenter.user.id integerValue]
+                                                chorusChannelName: [NSString stringWithFormat:@"%@_rtc_ex", self.roomModel.roomNo]
+                                               chorusChannelToken: exChannelToken
                                                              type: KTVTypeNormal
-                                                        musicType:loadMusicTypeMcc
-                                                        maxCacheSize:10
-                                                        mccDomain: AppContext.shared.isDebugMode ? @"api-test.agora.io" : nil
-    ];
+                                                        musicType: loadMusicTypeMcc
+                                                        maxCacheSize: 10
+                                                        mccDomain: AppContext.shared.isDebugMode ? @"api-test.agora.io" : nil];
     self.ktvApi = [[KTVApiImpl alloc] init];
     [self.ktvApi createKtvApiWithConfig:apiConfig];
     [self.ktvApi renewInnerDataStreamId];
@@ -1852,10 +1849,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 /// 获取当前用户的麦位
 - (VLRoomSeatModel*)getCurrentUserSeatInfo {
-    return [self gettUserSeatInfoWithUserId:VLUserCenter.user.id];
+    return [self getUserSeatInfoWithUserId:VLUserCenter.user.id];
 }
 
-- (VLRoomSeatModel*)gettUserSeatInfoWithUserId:(NSString*)userId {
+- (VLRoomSeatModel*)getUserSeatInfoWithUserId:(NSString*)userId {
     for (VLRoomSeatModel *model in self.seatsArray) {
         if ([model.owner.userId isEqualToString:userId]) {
             return model;
@@ -2331,7 +2328,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if (isOwner) {
         kWeakSelf(self);
         NSString *mes = KTVLocalizedString(@"ktv_room_exit");
-        [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage ktv_sceneImageWithName:@"empty" ] message:mes buttonTitle:KTVLocalizedString(@"ktv_confirm") completion:^(bool flag, NSString * _Nullable text) {
+        [[VLKTVAlert shared]showKTVToastWithFrame: UIScreen.mainScreen.bounds
+                                            image: [UIImage ktv_sceneImageWithName:@"empty" ]
+                                          message: mes
+                                      buttonTitle: KTVLocalizedString(@"ktv_confirm")
+                                       completion: ^(bool flag, NSString * _Nullable text) {
             [[VLKTVAlert shared]dismiss];
             [weakself leaveRoom];
         }];
@@ -2346,7 +2347,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     BOOL isOwner = [self.roomModel.creatorNo isEqualToString:VLUserCenter.user.id];
     NSString *mes = isOwner ? KTVLocalizedString(@"ktv_room_timeout") : KTVLocalizedString(@"ktv_room_offline");
     kWeakSelf(self);
-    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage ktv_sceneImageWithName:@"empty" ] message:mes buttonTitle:KTVLocalizedString(@"ktv_confirm") completion:^(bool flag, NSString * _Nullable text) {
+    [[VLKTVAlert shared]showKTVToastWithFrame: UIScreen.mainScreen.bounds
+                                        image: [UIImage ktv_sceneImageWithName:@"empty" ]
+                                      message: mes buttonTitle:KTVLocalizedString(@"ktv_confirm")
+                                   completion: ^(bool flag, NSString * _Nullable text) {
         [[VLKTVAlert shared]dismiss];
         [weakself leaveRoom];
     }];
@@ -2501,20 +2505,22 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)onChoristerDidEnterWithChorister:(KTVChoristerModel *)chorister {
     KTVLogInfo(@"onChoristerDidEnterWithChorister: %@", chorister.userId);
-    VLRoomSeatModel* model = [self gettUserSeatInfoWithUserId:chorister.userId];
+    VLRoomSeatModel* model = [self getUserSeatInfoWithUserId:chorister.userId];
     if (model == nil) {
         return;
     }
     [self.roomPersonView reloadSeatIndex:model.seatIndex];
+    self.chorusNum = [self getChorusNumWithSeatArray:self.seatsArray];
 }
 
 - (void)onChoristerDidLeaveWithChorister:(KTVChoristerModel *)chorister {
     KTVLogInfo(@"onChoristerDidLeaveWithChorister: %@", chorister.userId);
-    VLRoomSeatModel* model = [self gettUserSeatInfoWithUserId:chorister.userId];
+    VLRoomSeatModel* model = [self getUserSeatInfoWithUserId:chorister.userId];
     if (model == nil) {
         return;
     }
     [self.roomPersonView reloadSeatIndex:model.seatIndex];
+    self.chorusNum = [self getChorusNumWithSeatArray:self.seatsArray];
 }
 
 @end
