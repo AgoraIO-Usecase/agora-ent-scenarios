@@ -23,9 +23,8 @@ private let SYNC_MANAGER_CHORUS_INFO = "chorister_info"
 @objcMembers class KTVSyncManagerServiceImp: NSObject, KTVServiceProtocol {
     
     private var user: VLLoginModel
-    
     private var roomList: [AUIRoomInfo]?
-//    private var userList: [VLLoginModel] = .init()
+    
     @objc var seatMap: [String: VLRoomSeatModel] = [:]
     @objc var songList: [VLRoomSelSongModel] = []
     @objc var choristerList: [KTVChoristerModel] = []
@@ -230,6 +229,10 @@ extension KTVSyncManagerServiceImp {
           // syncManager.rtmManager.unsubscribeMessage(channelName: roomInfo.roomId, delegate: self)
            roomNo = nil
            unsubscribeAll()
+           
+           choristerList.removeAll()
+           songList.removeAll()
+           seatMap.removeAll()
            completion(nil)
        }
        
@@ -336,6 +339,7 @@ extension KTVSyncManagerServiceImp {
         let params = seatMapConvert(model: model)
         collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.kickSeatCmd.rawValue,
                                   value: ["\(seatIndex)": params]) { err in
+            agoraPrint("kickSeat [\(seatIndex)] completion: \(err?.localizedDescription ?? "success")")
             var error: NSError? = nil
             if let err = err {
                 error = KTVServiceError.kickSeatFail(err.code).toNSError()
@@ -355,7 +359,12 @@ extension KTVSyncManagerServiceImp {
         
         let params = ["\(seatInfo.seatIndex)": ["isAudioMuted": muted]]
         let collection = getSeatCollection(with: roomNo ?? "")
-        collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.muteAudioCmd.rawValue, value: params, callback: completion)
+        agoraPrint("updateSeatAudioMuteStatus \(muted)")
+        collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.muteAudioCmd.rawValue,
+                                  value: params){ err in
+            agoraPrint("updateSeatAudioMuteStatus \(muted) completion: \(err?.localizedDescription ?? "success")")
+            completion(err)
+        }
     }
     
     func updateSeatVideoMuteStatus(muted: Bool, completion: @escaping (Error?) -> Void) {
@@ -369,7 +378,12 @@ extension KTVSyncManagerServiceImp {
         
         let params = ["\(seatInfo.seatIndex)": ["isVideoMuted": muted]]
         let collection = getSeatCollection(with: roomNo ?? "")
-        collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.muteVideoCmd.rawValue, value: params, callback: completion)
+        agoraPrint("updateSeatVideoMuteStatus \(muted)")
+        collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.muteVideoCmd.rawValue,
+                                  value: params) { err in
+            agoraPrint("updateSeatVideoMuteStatus \(muted) completion: \(err?.localizedDescription ?? "success")")
+            completion(err)
+        }
     }
 }
 
