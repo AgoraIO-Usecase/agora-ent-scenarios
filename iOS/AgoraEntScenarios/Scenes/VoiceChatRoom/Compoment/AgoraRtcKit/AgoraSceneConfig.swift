@@ -151,22 +151,23 @@ public enum AgoraConfig {
         "\(AgoraConfig.VMBaseUrl)/21ANISScreenTapSound/CN/None/21-01-B-CN-None.wav",
     ]
     
-    public static let parmKeys: [String] = ["che.audio.sf.nsEnable",
-                                  "che.audio.sf.ainsToLoadFlag",
-                                  "che.audio.sf.nsngAlgRoute",
-                                  "che.audio.sf.nsngPredefAgg",
-                                  "che.audio.sf.nsngMapInMaskMin",
-                                  "che.audio.sf.nsngMapOutMaskMin",
-                                  "che.audio.sf.statNsLowerBound",
-                                  "che.audio.sf.nsngFinalMaskLowerBound",
-                                  "che.audio.sf.statNsEnhFactor",
-                                  "che.audio.sf.statNsFastNsSpeechTrigThreshold",
-                                  "che.audio.aed.enable",
-                                  "che.audio.sf.nsngMusicProbThr",
-                                  "che.audio.sf.ainsMusicModeBackoffDB",
-                                  "che.audio.sf.statNsMusicModeBackoffDB",
-                                  "che.audio.sf.ainsSpeechProtectThreshold",
-                                   ]
+    public static let parmKeys: [String] = [
+        "che.audio.sf.nsEnable", // 0
+        "che.audio.sf.ainsToLoadFlag",// 1
+        "che.audio.sf.nsngAlgRoute",// 2
+        "che.audio.sf.nsngPredefAgg",// 3
+        "che.audio.sf.nsngMapInMaskMin",// 4
+        "che.audio.sf.nsngMapOutMaskMin",// 5
+        "che.audio.sf.statNsLowerBound",// 6
+        "che.audio.sf.nsngFinalMaskLowerBound",// 7
+        "che.audio.sf.statNsEnhFactor",// 8
+        "che.audio.sf.statNsFastNsSpeechTrigThreshold",// 9
+        "che.audio.aed.enable",// 10
+        "che.audio.sf.nsngMusicProbThr",// 11
+        "che.audio.sf.statNsMusicModeBackoffDB",// 12
+        "che.audio.sf.ainsMusicModeBackoffDB",// 13
+        "che.audio.sf.ainsSpeechProtectThreshold",// 14
+    ]
     
     public static var parmVals: [Double] {
         UserDefaults.standard.synchronize()

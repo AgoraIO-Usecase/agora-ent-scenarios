@@ -284,7 +284,7 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// - Parameters:
     ///   - room: 房间对象信息
     ///   - completion: 完成回调   (错误信息)
-    func createRoom(room: VRRoomEntity, completion: @escaping (SyncError?, VRRoomEntity?) -> Void)
+    func createRoom(room: VRRoomEntity, completion: @escaping (Error?, VRRoomEntity?) -> Void)
     
     /// Description 更新公告
     /// - Parameters:
