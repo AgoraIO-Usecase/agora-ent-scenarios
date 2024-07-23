@@ -317,8 +317,6 @@ extension ShowAgoraKitManager {
             engine?.setBeautyEffectOptions(isOn, options: AgoraBeautyOptions())
         case .PVC:
             break
-        case .SR:
-            break
         case .BFrame:
            break
         case .videoEncodeSize:
@@ -379,6 +377,7 @@ extension ShowAgoraKitManager {
             engine?.adjustAudioMixingVolume(value)
         case .audioBitRate:
             break
+        default: break
         }
     }
 

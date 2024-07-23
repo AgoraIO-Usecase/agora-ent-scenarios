@@ -671,9 +671,9 @@ public let kMPK_RTC_UID: UInt = 1
             let statNsMusicModeBackoffDB = Int(AgoraConfig.parmVals[12])
             let ainsMusicModeBackoffDB = Int(AgoraConfig.parmVals[13])
             rtcKit.setParameters("{\"che.audio.aed.enable\":\(aedEnable)}")
-            rtcKit.setParameters("{\"che.audio.aed.nsngMusicProbThr\":\(nsngMusicProbThr)}")
-            rtcKit.setParameters("{\"che.audio.aed.statNsMusicModeBackoffDB\":\(statNsMusicModeBackoffDB)}")
-            rtcKit.setParameters("{\"che.audio.aed.ainsMusicModeBackoffDB\":\(ainsMusicModeBackoffDB)}")
+            rtcKit.setParameters("{\"che.audio.sf.nsngMusicProbThr\":\(nsngMusicProbThr)}")
+            rtcKit.setParameters("{\"che.audio.sf.statNsMusicModeBackoffDB\":\(statNsMusicModeBackoffDB)}")
+            rtcKit.setParameters("{\"che.audio.sf.ainsMusicModeBackoffDB\":\(ainsMusicModeBackoffDB)}")
         }
     }
     

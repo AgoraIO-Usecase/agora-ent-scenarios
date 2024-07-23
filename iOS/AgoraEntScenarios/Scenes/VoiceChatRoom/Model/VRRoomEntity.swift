@@ -7,6 +7,7 @@
 
 import Foundation
 import KakaJSON
+import RTMSyncManager
 
 @objc public class VRRoomsEntity: NSObject, Convertible {
     public var total: Int? // 总房间数量
@@ -52,6 +53,60 @@ import KakaJSON
 
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
+    }
+}
+
+extension AUIRoomInfo {
+    @objc var voice_roomUserCount: Int {
+        set {
+            self.customPayload["roomUserCount"]  = newValue
+        } get {
+            return self.customPayload["roomUserCount"] as? Int ?? 0
+        }
+    }
+    
+    func voice_toRoomEntity() -> VRRoomEntity {
+        let model = VRRoomEntity()
+        model.room_id = roomId
+        model.name = roomName
+        model.member_count = roomUserCount
+        let chatRoomOwner = VRUser()
+        chatRoomOwner.name = owner?.userName ?? ""
+        chatRoomOwner.portrait = customPayload["portrait"] as? String
+        chatRoomOwner.uid = owner?.userId ?? ""
+        chatRoomOwner.chat_uid = owner?.userId ?? ""
+        chatRoomOwner.chat_uid = owner?.userId ?? ""
+        chatRoomOwner.rtc_uid = owner?.userId ?? ""
+        model.owner = chatRoomOwner
+        model.created_at = UInt(createTime)
+        model.channel_id = customPayload["channel_id"] as? String
+        model.chatroom_id = customPayload["chatroom_id"] as? String
+        model.is_private = customPayload["is_private"] as? Bool ?? false
+        model.roomPassword = customPayload["roomPassword"] as? String ?? ""
+        model.rtc_uid = customPayload["rtc_uid"] as? Int
+        model.type = customPayload["type"] as? Int
+        return model
+    }
+    
+    static func voice_fromVRRoomEntity(_ model: VRRoomEntity) -> AUIRoomInfo {
+        let roomInfo = AUIRoomInfo()
+        roomInfo.roomId = model.room_id ?? ""
+        roomInfo.roomName = model.name ?? ""
+        roomInfo.roomUserCount = model.member_count ?? 0
+        let owner = AUIUserThumbnailInfo()
+        owner.userId = model.owner?.uid ?? ""
+        owner.userName = model.owner?.name ?? ""
+        roomInfo.owner = owner
+        roomInfo.createTime = Int64(model.created_at ?? 0)
+        roomInfo.customPayload["channel_id"] = model.channel_id
+        roomInfo.customPayload["chatroom_id"] = model.chatroom_id
+        roomInfo.customPayload["is_private"] = model.is_private
+        roomInfo.customPayload["roomPassword"] = model.roomPassword
+        roomInfo.customPayload["rtc_uid"] = model.rtc_uid
+        roomInfo.customPayload["type"] = model.type
+        // owner
+        roomInfo.customPayload["portrait"] = model.owner?.portrait
+        return roomInfo
     }
 }
 
