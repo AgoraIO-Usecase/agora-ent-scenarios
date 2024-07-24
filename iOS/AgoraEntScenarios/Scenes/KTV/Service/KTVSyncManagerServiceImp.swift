@@ -10,6 +10,7 @@ import RTMSyncManager
 import YYModel
 import SVProgressHUD
 import AgoraCommon
+import AgoraRtmKit
 
 private let kSceneId = "scene_ktv_5.0.0"
 
@@ -52,7 +53,11 @@ private let SYNC_MANAGER_CHORUS_INFO = "chorister_info"
         owner.userAvatar = user.headUrl
         config.owner = owner
         config.host = AppContext.shared.roomManagerUrl
-        let manager = AUISyncManager(rtmClient: nil, commonConfig: config)
+        let logConfig = AgoraRtmLogConfig()
+        logConfig.filePath = AgoraEntLog.rtmSdkLogPath()
+        logConfig.fileSizeInKB = 1024
+        logConfig.level = .info
+        let manager = AUISyncManager(rtmClient: nil, commonConfig: config, logConfig: logConfig)
         
         return manager
     }()

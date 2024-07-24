@@ -10,11 +10,19 @@ import YYCategories
 import AgoraRtcKit
 import AgoraRtmKit
 import AgoraCommon
+import RTMSyncManager
 
 class RoomListViewController: UIViewController {
     private var userInfo: JoyUserInfo!
     private lazy var rtcEngine: AgoraRtcEngineKit = _createRtcEngine()
-    private lazy var rtmClient: AgoraRtmClientKit = createRtmClient(appId: joyAppId, userId: String(userInfo.userId))
+    private lazy var rtmClient: AgoraRtmClientKit = {
+        let logConfig = AgoraRtmLogConfig()
+        logConfig.filePath = AgoraEntLog.rtmSdkLogPath()
+        logConfig.fileSizeInKB = 1024
+        logConfig.level = .info
+        let client = createRtmClient(appId: joyAppId, userId: String(userInfo.userId), logConfig: logConfig)
+        return client
+    }()
     private var service: JoyServiceProtocol!
     private lazy var naviBar: JoyNavigationBar = {
         let bar = JoyNavigationBar(frame: CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop, width: self.view.width, height: 44))
@@ -167,6 +175,9 @@ extension RoomListViewController {
         config.channelProfile = .liveBroadcasting
         config.audioScenario = .gameStreaming
         config.areaCode = .global
+        let logConfig = AgoraLogConfig()
+        logConfig.filePath = AgoraEntLog.sdkLogPath()
+        config.logConfig = logConfig
         let engine = AgoraRtcEngineKit.sharedEngine(with: config,
                                                     delegate: self)
         
