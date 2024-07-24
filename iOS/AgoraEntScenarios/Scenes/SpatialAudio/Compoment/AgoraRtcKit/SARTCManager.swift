@@ -228,7 +228,15 @@ public let kMPK_RTC_UID_SA: UInt = 1
     }
 
     // init rtc
-    private let rtcKit: AgoraRtcEngineKit = AgoraRtcEngineKit.sharedEngine(withAppId: KeyCenter.AppId, delegate: nil)
+    private let rtcKit: AgoraRtcEngineKit = {
+        let config = AgoraRtcEngineConfig()
+        config.appId = KeyCenter.AppId
+        let logConfig = AgoraLogConfig()
+        logConfig.filePath = AgoraEntLog.sdkLogPath()
+        config.logConfig = logConfig
+        let engine = AgoraRtcEngineKit.sharedEngine(with: config, delegate: nil)
+        return engine
+    }()
 
     func setClientRole(role: SARtcType.ASRoleType) {
         self.role = role

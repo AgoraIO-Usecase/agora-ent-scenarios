@@ -41,7 +41,12 @@ class JoyServiceImpl: NSObject {
         owner.userAvatar = user.avatar
         config.owner = owner
         config.host = self.host
-        let manager = AUISyncManager(rtmClient: rtmClient, commonConfig: config)
+        
+        let logConfig = AgoraRtmLogConfig()
+        logConfig.filePath = AgoraEntLog.rtmSdkLogPath()
+        logConfig.fileSizeInKB = 1024
+        logConfig.level = .info
+        let manager = AUISyncManager(rtmClient: rtmClient, commonConfig: config, logConfig: logConfig)
         
         return manager
     }()

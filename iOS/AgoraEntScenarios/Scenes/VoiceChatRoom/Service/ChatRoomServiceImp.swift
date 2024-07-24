@@ -12,6 +12,7 @@ import AgoraChat.AgoraChatError
 import AgoraSyncManager
 import AgoraCommon
 import RTMSyncManager
+import AgoraRtmKit
 
 private let kSceneId = "scene_chatRoom_5.0.0"
 
@@ -43,7 +44,11 @@ public class ChatRoomServiceImp: NSObject {
         config.appId = AppContext.shared.appId
         config.owner = user
         config.host = AppContext.shared.roomManagerUrl
-        let manager = AUISyncManager(rtmClient: nil, commonConfig: config)
+        let logConfig = AgoraRtmLogConfig()
+        logConfig.filePath = AgoraEntLog.rtmSdkLogPath()
+        logConfig.fileSizeInKB = 1024
+        logConfig.level = .info
+        let manager = AUISyncManager(rtmClient: nil, commonConfig: config, logConfig: logConfig)
         
         return manager
     }()

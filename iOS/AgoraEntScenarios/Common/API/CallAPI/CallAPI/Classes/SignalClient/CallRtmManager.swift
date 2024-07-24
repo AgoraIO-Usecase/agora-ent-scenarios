@@ -8,9 +8,10 @@
 import Foundation
 import AgoraRtmKit
 
-public func createRtmClient(appId: String, userId: String) -> AgoraRtmClientKit {
+public func createRtmClient(appId: String, userId: String, logConfig: AgoraRtmLogConfig?) -> AgoraRtmClientKit {
     let rtmConfig = AgoraRtmClientConfig(appId: appId, userId: userId)
     rtmConfig.presenceTimeout = 300
+    rtmConfig.logConfig = logConfig
     var rtmClient: AgoraRtmClientKit? = nil
     do {
         rtmClient = try AgoraRtmClientKit(rtmConfig, delegate: nil)
@@ -68,7 +69,7 @@ public class CallRtmManager: NSObject {
             self.rtmClient = rtmClient
             self.isConnected = true
         } else {
-            self.rtmClient = createRtmClient(appId: appId, userId: userId)
+            self.rtmClient = createRtmClient(appId: appId, userId: userId, logConfig: nil)
         }
         super.init()
         
