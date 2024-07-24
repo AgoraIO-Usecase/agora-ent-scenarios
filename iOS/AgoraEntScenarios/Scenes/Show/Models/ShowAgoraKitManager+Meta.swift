@@ -11,14 +11,14 @@ import AGResourceManager
 extension ShowAgoraKitManager {
     
     func registerMetaPlugin(){
-        showLogger.info("registerMetaPlugin", context: "Meta")
         // 背景分割
         let ret = engine?.setParameters("{\"rtc.video.seg_before_exts\":true}")
         showLogger.info("registerMetaPlugin setParameters ret:\(ret ?? -9999)")
 //        enableAIVirtualBackground()
         // metakit
-        engine?.registerExtension(withVendor: "agora_video_filters_metakit",extension: "metakit", sourceType: AgoraMediaSourceType.primaryCamera)
-        engine?.enableExtension(withVendor: "agora_video_filters_metakit",extension: "metakit", enabled: true)
+        let ret1 = engine?.registerExtension(withVendor: "agora_video_filters_metakit",extension: "metakit", sourceType: AgoraMediaSourceType.primaryCamera)
+        let ret2 = engine?.enableExtension(withVendor: "agora_video_filters_metakit",extension: "metakit", enabled: true)
+        showLogger.info("registerMetaPlugin \(ret)/\(ret1)/\(ret2))", context: "Meta")
     }
     
     func initializeMeta(){
@@ -241,15 +241,15 @@ extension ShowAgoraKitManager {
     
     /// 开关律动
     func enableRhythm(_ enable: Bool){
-        showLogger.info("enableRhythm: \(enable)", context: "Meta")
-        engine?.enableExtension(withVendor: "agora_video_filters_portrait_rhythm", extension: "portrait_rhythm", enabled: enable)
+        let ret = engine?.enableExtension(withVendor: "agora_video_filters_portrait_rhythm", extension: "portrait_rhythm", enabled: enable)
+        showLogger.info("enableRhythm: \(enable) ret: \(ret)", context: "Meta")
     }
     
     /// 切换律动模式
     func swithRhythm(mode: RhythmMode) {
-        showLogger.info("swithRhythm: \(mode.rawValue)", context: "Meta")
-        engine?.setExtensionPropertyWithVendor("agora_video_filters_portrait_rhythm", extension: "portrait_rhythm", key: "mode", value: "\(mode.rawValue)")
+        let ret = engine?.setExtensionPropertyWithVendor("agora_video_filters_portrait_rhythm", extension: "portrait_rhythm", key: "mode", value: "\(mode.rawValue)")
         enableRhythm(true)
+        showLogger.info("swithRhythm: \(mode.rawValue) ret: \(ret)", context: "Meta")
     }
 }
 
