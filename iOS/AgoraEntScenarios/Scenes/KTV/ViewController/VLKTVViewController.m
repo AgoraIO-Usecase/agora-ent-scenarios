@@ -954,46 +954,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
 }
 
-- (void)removeCurrentSongWithSync:(BOOL)sync
-{
+- (void)removeCurrentSong {
     VLRoomSelSongModel* top = [self.selSongsArray firstObject];
-    if(top && top.songNo.length != 0) {
-        [self removeSelSongWithSongNo:[top.songNo integerValue] sync:sync];
-    }
-}
-
-- (BOOL)removeSelSongWithSongNo:(NSInteger)songNo sync:(BOOL)sync {
-    __block VLRoomSelSongModel* removed;
-    BOOL isTopSong = [self.selSongsArray.firstObject.songNo integerValue] == songNo;
-    
-    if (isTopSong) {
-        [self stopPlaySong];
-    }
-    
-    NSMutableArray<VLRoomSelSongModel*> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-        if([evaluatedObject.songNo integerValue] == songNo) {
-            removed = evaluatedObject;
-            return NO;
+    if(top == NULL) {return;}
+    [[AppContext ktvServiceImp] removeSongWithSongCode:top.songNo completion:^(NSError * error) {
+        if (error) {
+            KTVLogInfo(@"deleteSongEvent fail: %@ %ld", top.songName, error.code);
         }
-        return YES;
-    }]]];
-    
-    if(removed != nil) {
-        //did remove
-        self.selSongsArray = updatedList;
-
-        if(sync) {
-            [[AppContext ktvServiceImp] removeSongWithSongCode:removed.songNo completion:^(NSError * error) {
-                if (error) {
-                    KTVLogInfo(@"deleteSongEvent fail: %@ %ld", removed.songName, error.code);
-                }
-            }];
-        }
-        
-        return YES;
-    } else {
-        return NO;
-    }
+    }];
 }
 
 - (void)leaveRoom {
@@ -1476,10 +1444,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"ktv_cancel"),KTVLocalizedString(@"ktv_confirm"), nil];
         [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
             if(flag == YES){
-                if (weakSelf.selSongsArray.count >= 1) {
-                    [weakSelf stopPlaySong];
-                    [weakSelf removeCurrentSongWithSync:YES];
-                }
+                [weakSelf removeCurrentSong];
             }
             [[VLAlert shared] dismiss];
         }];
@@ -2202,7 +2167,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 if(self.singRole == KTVSingRoleLeadSinger || self.singRole == KTVSingRoleSoloSinger){
                     [self syncChoruScore:[self.lrcControl getAvgScore]];
                     [self showScoreViewWithScore: [self.lrcControl getAvgScore]];
-                    [self removeCurrentSongWithSync:YES];
+                    [self removeCurrentSong];
                 }
             }
         }
