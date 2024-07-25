@@ -185,6 +185,7 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
         statusButton.isHidden = isLink
         statusButton.isEnabled = true
         if let model = model as? ShowMicSeatApply {
+            //apply
             seatApplyModel = model
             nameLabel.text = model.userName
             statusButton.tag = 1
@@ -196,6 +197,7 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
             statusButton.setTitleColor(.white, for: .normal)
             
         } else if let model = model as? ShowUser {
+            //invit
             seatInvitationModel = model
             nameLabel.text = model.userName
             statusButton.tag = 2
@@ -241,6 +243,10 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
         super.onTapStatusButton(sender: sender)
         guard let roomId = roomId else {return}
         if let model = seatApplyModel, sender.tag == 1 {
+            if isCurrentInteracting {
+                ToastView.show(text: "show_error_disable_invite_linking".show_localized)
+                return
+            }
             self.statusButton.isEnabled = false
             AppContext.showServiceImp()?.acceptMicSeatApply(roomId: roomId, userId: model.userId) {[weak self] err in
                 guard let self = self else { return }
