@@ -52,7 +52,6 @@ public class ChatRoomServiceImp: NSObject {
         let service = AUIRoomService(expirationPolicy: RoomExpirationPolicy.defaultPolicy(),
                                      roomManager: roomManager,
                                      syncmanager: syncManager)
-        
         return service
     }()
     
@@ -904,8 +903,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let roomInfo = AUIRoomInfo.voice_fromVRRoomEntity(roomEntity)
         VoiceChatLog.info("joinRoom roomId: \(roomInfo.roomId) roomName: \(roomInfo.roomName)")
         roomService.enterRoom(roomInfo: roomInfo) {[weak self] err in
+            guard let `self` = self else { return }
             if err != nil {
                 completion(err, nil)
+                return
             }
             NetworkManager.shared.generateToken(channelName:roomId,
                                                 uid: "\(UserInfo.userId)",
@@ -916,52 +917,41 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 }
                 VLUserCenter.user.agoraRTCToken = rtcToken
                 VLUserCenter.user.agoraRTMToken = rtmToken
-                self?.roomId = roomId
-                self?._startCheckExpire()
+                self.roomId = roomId
+                self._startCheckExpire()
+                let scene = self.syncManager.getScene(channelName: roomId)
+                scene?.bindRespDelegate(delegate: self)
                 completion(nil, roomEntity)
             }
         }
     }
     
-    // todo 去掉owner
     func leaveRoom(_ roomId: String, completion: @escaping (Error?, Bool) -> Void) {
-        self.roomId = nil
-        /**
-         先拿到对应的房间信息
-         1.如果是房主需要销毁房间，普通成员需要click_count - 1. 同时需要退出RTC+IM
-         2.房主需要调用destory
-         */
-        if let roomList = self.roomList {
-            for (index,room) in roomList.enumerated() {
-                if room.room_id == roomId {
-                    var isOwner = false
-                    if let owner_uid = room.owner?.uid {
-                        isOwner = owner_uid == VLUserCenter.user.id
-                    }
-                    if isOwner {
-                        self.roomList?.remove(at: index)
-                        VoiceRoomIMManager.shared?.userDestroyedChatroom()
-                        SyncUtil.scene(id: roomId)?.deleteScenes()
-                    } else {
-                        let updateRoom: VRRoomEntity = room
-                        updateRoom.member_count = (updateRoom.member_count ?? 0) - 1
-                        let params = updateRoom.kj.JSONObject()
-                        SyncUtil
-                            .scene(id: roomId)?
-                            .update(key: "",
-                                    data: params,
-                                    success: { obj in
-                                VoiceChatLog.info("updateUserCount success")
-                            },
-                                    fail: { error in
-                                VoiceChatLog.info("updateUserCount fail")
-                            })
-                        VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
-                    }
-                    break
+        if isLogined == false {
+            login {[weak self] err in
+                if let err = err {
+                    completion(err, false)
+                    return
                 }
+                self?.leaveRoom(roomId, completion: completion)
             }
+            return
         }
+        roomService.leaveRoom(roomId: roomId)
+        if let scene = self.syncManager.getScene(channelName: roomId) {
+            scene.unbindRespDelegate(delegate: self)
+            scene.arbiter.unSubscribeEvent(delegate: self)
+        }
+        if roomService.isRoomOwner(roomId: roomId) {
+            VoiceRoomIMManager.shared?.userDestroyedChatroom()
+            SyncUtil.scene(id: roomId)?.deleteScenes()
+        } else {
+            // 更新房间列表人数信息
+            VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
+        }
+        let scene = self.syncManager.getScene(channelName: roomId)
+        scene?.unbindRespDelegate(delegate: self)
+        completion(nil, true)
     }
     
     func createMics() -> [String:String] {
@@ -1036,6 +1026,40 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         impGroup.notify(queue: .main) {
             completion(im_token, im_uid, chatroom_id )
         }
+    }
+}
+
+extension ChatRoomServiceImp: AUISceneRespDelegate {
+    /// 房间过期的回调
+    /// - Parameter channelName: <#channelName description#>
+    public func onSceneExpire(channelName: String) {
+        
+    }
+    
+    /// 房间被销毁的回调
+    /// - Parameter channelName: 房间id
+    public func onSceneDestroy(channelName: String) {
+        roomService.leaveRoom(roomId: channelName)
+        self.roomServiceDelegate?.onRoomExpired()
+    }
+    
+    /// Description 房间异常，需要退出
+    ///
+    /// - Parameters:
+    ///   - channelName: 房间id
+    ///   - reason: 异常原因
+    public func onSceneFailed(channelName: String, reason: String) {
+        
+    }
+}
+
+extension ChatRoomServiceImp: AUIArbiterDelegate {
+    public func onArbiterDidChange(channelName: String, arbiterId: String) {
+        
+    }
+    
+    public func onError(channelName: String, error: NSError) {
+        
     }
 }
 
