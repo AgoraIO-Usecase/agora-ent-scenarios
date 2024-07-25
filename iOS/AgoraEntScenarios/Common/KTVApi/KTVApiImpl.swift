@@ -1711,3 +1711,9 @@ class KTVApiRTCDelegateHandler: NSObject, AgoraRtcEngineDelegate {
     }
 }
 
+
+extension KTVApiImpl {
+    @objc public func isSongLoading(songCode: String) -> Bool {
+        return musicCallbacks[songCode] == nil ? false : true
+    }
+}
