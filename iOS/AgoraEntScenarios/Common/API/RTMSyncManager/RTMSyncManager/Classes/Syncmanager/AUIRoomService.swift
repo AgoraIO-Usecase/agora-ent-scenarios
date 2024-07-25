@@ -16,6 +16,8 @@ public class AUIRoomService: NSObject {
     private var syncmanager: AUISyncManager
     private var roomInfoMap: [String: AUIRoomInfo] = [:]
     
+    private var creatingRoomIds: Set<String> = Set()
+    
     public required init(expirationPolicy: RoomExpirationPolicy, roomManager: AUIRoomManagerImpl, syncmanager: AUISyncManager) {
         self.expirationPolicy = expirationPolicy
         self.roomManager = roomManager
@@ -39,9 +41,11 @@ public class AUIRoomService: NSObject {
             
             var list: [AUIRoomInfo] = []
             roomList?.forEach({ roomInfo in
-                var needCleanRoom: Bool = false
                 //遍历每个房间信息，查询是否已经过期
-                if self.expirationPolicy.expirationTime > 0, ts - roomInfo.createTime >= self.expirationPolicy.expirationTime + 60 * 1000 {
+                var needCleanRoom: Bool = false
+                if self.creatingRoomIds.contains(roomInfo.roomId) {
+                    //正在创建，不删除，防止刷新的时候开始创建，导致因为时序问题创建的restful房间被删除了
+                } else if self.expirationPolicy.expirationTime > 0, ts - roomInfo.createTime >= self.expirationPolicy.expirationTime + 60 * 1000 {
                     aui_info("remove expired room[\(roomInfo.roomId)]", tag: RoomServiceTag)
                     needCleanRoom = true
                 } else if cleanClosure?(roomInfo) ?? false {
@@ -70,10 +74,22 @@ public class AUIRoomService: NSObject {
                            completion: @escaping ((NSError?, AUIRoomInfo?)->())) {
         let scene = self.syncmanager.createScene(channelName: room.roomId, roomExpiration: self.expirationPolicy)
         let date = Date()
+        creatingRoomIds.insert(room.roomId)
+        var innerCompletion: ((NSError?, AUIRoomInfo?)->()) = {[weak self] error, info in
+            guard let self = self else {return}
+            self.creatingRoomIds.remove(room.roomId)
+            if let error = error {
+                //失败需要清理脏房间信息
+                self.createRoomRevert(roomId: room.roomId)
+                completion(error, nil)
+            }
+            completion(nil, info)
+        }
+        
         roomManager.createRoom(room: room) {[weak self] err, roomInfo in
             guard let self = self else { return }
             if let err = err {
-                completion(err, nil)
+                innerCompletion(err, nil)
                 return
             }
             guard let roomInfo = roomInfo else {
@@ -88,25 +104,17 @@ public class AUIRoomService: NSObject {
                          payload: [kRoomServicePayloadOwnerId: room.owner?.userId ?? ""]) {[weak self] err in
                 aui_info("[Timing]createRoom create scene[\(roomInfo.roomId)] cost: \(Int64(-date.timeIntervalSinceNow * 1000))ms", tag: RoomServiceTag)
                 if let err = err {
-                    //失败需要清理脏房间信息
-                    self?.createRoomRevert(roomId: room.roomId)
-                    completion(err, nil)
+                    innerCompletion(err, nil)
                     return
                 }
                 
                 if enterEnable {
                     scene.enter { payload, err in
                         aui_info("[Timing]createRoom enter scene[\(roomInfo.roomId)] cost: \(Int64(-date.timeIntervalSinceNow * 1000))ms", tag: RoomServiceTag)
-                        if let err = err {
-                            //失败需要清理脏房间信息
-                            self?.createRoomRevert(roomId: room.roomId)
-                            completion(err, nil)
-                            return
-                        }
-                        completion(nil, roomInfo)
+                        innerCompletion(err, roomInfo)
                     }
                 } else {
-                    completion(nil, roomInfo)
+                    innerCompletion(nil, roomInfo)
                 }
             }
         }
