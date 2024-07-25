@@ -17,6 +17,11 @@ import AudioScenarioApi
 func pure1v1CreateRtmClient(appId: String, userId: String) -> AgoraRtmClientKit {
     let rtmConfig = AgoraRtmClientConfig(appId: appId, userId: userId)
     rtmConfig.presenceTimeout = 30
+    let logConfig = AgoraRtmLogConfig()
+    logConfig.filePath = AgoraEntLog.rtmSdkLogPath()
+    logConfig.fileSizeInKB = 1024
+    logConfig.level = .info
+    rtmConfig.logConfig = logConfig
     var rtmClient: AgoraRtmClientKit? = nil
     do {
         rtmClient = try AgoraRtmClientKit(rtmConfig, delegate: nil)
@@ -339,6 +344,9 @@ extension Pure1v1UserListViewController {
         config.channelProfile = .liveBroadcasting
         config.audioScenario = .gameStreaming
         config.areaCode = .global
+        let logConfig = AgoraLogConfig()
+        logConfig.filePath = AgoraEntLog.sdkLogPath()
+        config.logConfig = logConfig
         let engine = AgoraRtcEngineKit.sharedEngine(with: config,
                                                     delegate: nil)
         

@@ -269,13 +269,13 @@ extension AUIRtmMsgProxy: AgoraRtmClientDelegate {
                 }
             }
             
-            if event.currentState == .connected, event.operation == .reconnected {
-                if let elements = self.userDelegates[channelName] {
-                    for element in elements.allObjects {
-                        element.onCurrentUserJoined(channelName: channelName)
-                    }
-                }
-            }
+//            if event.currentState == .connected, event.operation == .reconnected {
+//                if let elements = self.userDelegates[channelName] {
+//                    for element in elements.allObjects {
+//                        element.onCurrentUserJoined(channelName: channelName)
+//                    }
+//                }
+//            }
         }
     }
     
