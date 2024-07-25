@@ -46,7 +46,7 @@ class VRSoundCardViewController: UIViewController {
                 guard let clicKBlock = self?.clicKBlock else {return}
                 self?.settingView.effectType = index
                 self?.effectType = index
-                self?.gainValue = "1.0"
+                self?.gainValue = "100.0"
                 self?.settingView.tableView.reloadData()
                 clicKBlock(index)
             }
@@ -69,7 +69,7 @@ class VRSoundCardViewController: UIViewController {
             guard let soundCardBlock = self?.soundCardBlock else {return}
             self?.soundOpen = flag
             if flag == true {
-                self?.gainValue = "1.0"
+                self?.gainValue = "100.0"
                 self?.effectType = 0
                 self?.settingView.effectType = 0
                 self?.settingView.tableView.reloadData()
