@@ -524,7 +524,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     self.soundOpen = isEnabled;
     [self.settingView setUseSoundCard:isEnabled];
     if (isEnabled) {
-        self.gainValue = @"1.0";
+        self.gainValue = @"100.0";
         self.effectType = 0;
         self.typeValue = 4;
         [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":2}}"];
@@ -534,7 +534,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 }
 
 - (void)didUpdateEffectValue:(NSInteger)value{
-    self.gainValue = @"1.0";
+    self.gainValue = @"100.0";
     self.effectType = value;
     self.typeValue = 4;
     switch (value) {
