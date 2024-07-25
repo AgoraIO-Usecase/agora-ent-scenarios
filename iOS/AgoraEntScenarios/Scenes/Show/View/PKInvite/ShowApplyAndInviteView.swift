@@ -219,7 +219,7 @@ class ShowApplyAndInviteView: UIView {
     @objc
     private func onTapEndButton(sender: AGEButton) {
         updateLayout(isHidden: true)
-        if let model = linkingInteractionInfo {
+        if let _ = linkingInteractionInfo {
             AppContext.showServiceImp()?.stopInteraction(roomId: roomId) { _ in }
         }
         applyStatusClosure?(.idle)
