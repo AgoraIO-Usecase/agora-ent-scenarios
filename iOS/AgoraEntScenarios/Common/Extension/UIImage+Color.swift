@@ -8,12 +8,17 @@
 import UIKit
 
 extension UIImage {
-    func color(_ color: UIColor?, width: CGFloat = Screen.width, height: CGFloat) -> UIImage? {
-        let r = CGRect(x: 0.0, y: 0.0, width: width, height: height)
-        UIGraphicsBeginImageContext(r.size)
+    func color(_ color: UIColor,
+               width: CGFloat,
+               height: CGFloat,
+               cornerRadius: CGFloat) -> UIImage? {
+        let rect = CGRect(x: 0.0, y: 0.0, width: width, height: height)
+        UIGraphicsBeginImageContext(rect.size)
         let context = UIGraphicsGetCurrentContext()
-        context?.setFillColor(color!.cgColor)
-        context?.fill(r)
+        let path = UIBezierPath(roundedRect: rect, cornerRadius: cornerRadius) // Adjust cornerRadius as needed
+        context?.setFillColor(color.cgColor)
+        path.fill()
+        
         let img: UIImage? = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return img

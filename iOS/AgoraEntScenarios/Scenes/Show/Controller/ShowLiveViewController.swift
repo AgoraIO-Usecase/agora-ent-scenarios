@@ -202,7 +202,7 @@ class ShowLiveViewController: UIViewController {
             
             //update menu
             if role == .broadcaster {
-                applyAndInviteView.seatMicModel = seatInteraction
+                applyAndInviteView.linkingInteractionInfo = seatInteraction
                 applyView.interactionModel = nil
             } else {
                 if currentInteraction?.userId == VLUserCenter.user.id {
@@ -210,7 +210,7 @@ class ShowLiveViewController: UIViewController {
                 } else {
                     applyView.interactionModel = nil
                 }
-                applyAndInviteView.seatMicModel = nil
+                applyAndInviteView.linkingInteractionInfo = nil
             }
             
             //stop or start interaction
