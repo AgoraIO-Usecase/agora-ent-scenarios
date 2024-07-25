@@ -14,7 +14,7 @@ import io.agora.scene.voice.databinding.VoiceFragmentHandsListLayoutBinding
 import io.agora.scene.voice.imkit.bean.ChatMessageData
 import io.agora.scene.voice.viewmodel.VoiceUserListViewModel
 import io.agora.scene.voice.model.VoiceMemberModel
-import io.agora.scene.voice.service.VoiceRoomSubscribeDelegate
+import io.agora.scene.voice.service.VoiceChatServiceListenerProtocol
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.adapter.ChatroomInviteAdapter
 import io.agora.scene.voice.ui.dialog.ChatroomHandsDialog
@@ -134,7 +134,7 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
     private fun initListener() {
         adapter?.setOnActionListener(this)
         binding?.swipeLayout?.setOnRefreshListener { reset() }
-        voiceServiceProtocol.subscribeEvent(object : VoiceRoomSubscribeDelegate{
+        voiceServiceProtocol.subscribeEvent(object : VoiceChatServiceListenerProtocol{
             override fun onReceiveSeatInvitationRejected(
                 chatUid: String,
                 message: ChatMessageData?

@@ -17,7 +17,7 @@ import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.OnCustomMsgReceiveListener;
 import io.agora.scene.voice.model.VoiceMemberModel;
 import io.agora.scene.voice.service.VoiceRoomServiceKickedReason;
-import io.agora.scene.voice.service.VoiceRoomSubscribeDelegate;
+import io.agora.scene.voice.service.VoiceChatServiceListenerProtocol;
 import io.agora.scene.voice.service.VoiceServiceProtocol;
 import io.agora.util.EMLog;
 import io.agora.voice.common.utils.LogTools;
@@ -28,7 +28,8 @@ public class ChatroomConfigManager {
     private Context mContext;
     private VoiceServiceProtocol voiceServiceProtocol;
 
-    ChatroomConfigManager(){}
+    ChatroomConfigManager() {
+    }
 
     public static ChatroomConfigManager getInstance() {
         if (mInstance == null) {
@@ -53,7 +54,7 @@ public class ChatroomConfigManager {
         voiceServiceProtocol = VoiceServiceProtocol.getImplInstance();
     }
 
-    private void registerListener(){
+    private void registerListener() {
         ChatroomIMManager.getInstance().setChatRoomConnectionListener(new OnChatroomConnectionListener() {
             @Override
             public void onConnected() {
@@ -62,7 +63,7 @@ public class ChatroomConfigManager {
 
             @Override
             public void onDisconnected(int error) {
-                EMLog.i(TAG, "onDisconnected ="+error);
+                EMLog.i(TAG, "onDisconnected =" + error);
             }
 
             @Override
@@ -78,13 +79,9 @@ public class ChatroomConfigManager {
         ChatroomIMManager.getInstance().setOnCustomMsgReceiveListener(new OnCustomMsgReceiveListener() {
             @Override
             public void onReceiveGiftMsg(ChatMessageData message) {
-                try {
-                    for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
-                        listener.onReceiveGift(message.getConversationId(), message);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                    listener.onReceiveGift(message.getConversationId(), message);
+                });
             }
 
             @Override
@@ -94,61 +91,41 @@ public class ChatroomConfigManager {
 
             @Override
             public void onReceiveNormalMsg(ChatMessageData message) {
-                try {
-                    for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
-                        listener.onReceiveTextMsg(message.getConversationId(), message);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                    listener.onReceiveTextMsg(message.getConversationId(), message);
+                });
             }
 
             @Override
             public void onReceiveApplySite(ChatMessageData message) {
-                LogTools.d(TAG,"onReceiveSeatRequest");
-                try {
-                    for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
-                        listener.onReceiveSeatRequest(message);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                LogTools.d(TAG, "onReceiveSeatRequest");
+                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                    listener.onReceiveSeatRequest(message);
+                });
             }
 
             @Override
             public void onReceiveCancelApplySite(ChatMessageData message) {
-                LogTools.d(TAG,"onReceiveSeatRequestRejected");
-                try {
-                    for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
-                        listener.onReceiveSeatRequestRejected(message.getFrom());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                LogTools.d(TAG, "onReceiveSeatRequestRejected");
+                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                    listener.onReceiveSeatRequestRejected(message.getFrom());
+                });
             }
 
             @Override
             public void onReceiveInviteSite(ChatMessageData message) {
-                LogTools.d(TAG,"onReceiveSeatInvitation");
-                try {
-                    for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
-                        listener.onReceiveSeatInvitation(message);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                LogTools.d(TAG, "onReceiveSeatInvitation");
+                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                    listener.onReceiveSeatInvitation(message);
+                });
             }
 
             @Override
             public void onReceiveInviteRefusedSite(ChatMessageData message) {
-                LogTools.d(TAG,"onReceiveSeatInvitationRejected");
-                try {
-                    for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
-                        listener.onReceiveSeatInvitationRejected(message.getConversationId(), message);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                LogTools.d(TAG, "onReceiveSeatInvitationRejected");
+                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                    listener.onReceiveSeatInvitationRejected(message.getConversationId(), message);
+                });
             }
 
             @Override
@@ -158,15 +135,11 @@ public class ChatroomConfigManager {
 
             @Override
             public void onReceiveSystem(ChatMessageData message) {
-                try {
-                    VoiceMemberModel voiceMemberModel = ChatroomIMManager.getInstance().getVoiceMemberModel(message);
-                    if (voiceMemberModel != null){
-                        for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
-                            listener.onUserJoinedRoom(message.getConversationId(), voiceMemberModel);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                VoiceMemberModel voiceMemberModel = ChatroomIMManager.getInstance().getVoiceMemberModel(message);
+                if (voiceMemberModel != null) {
+                    voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                        listener.onUserJoinedRoom(message.getConversationId(), voiceMemberModel);
+                    });
                 }
             }
         });
@@ -174,13 +147,9 @@ public class ChatroomConfigManager {
         ChatroomIMManager.getInstance().setChatRoomEventListener(new OnChatroomEventReceiveListener() {
             @Override
             public void onRoomDestroyed(String roomId) {
-                try {
-                    for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
-                        listener.onRoomDestroyed(roomId);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                    listener.onRoomDestroyed(roomId);
+                });
             }
 
             @Override
@@ -190,49 +159,31 @@ public class ChatroomConfigManager {
 
             @Override
             public void onMemberExited(String roomId, String reason, String name) {
-                try {
-                    for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
-                        listener.onUserLeftRoom(roomId, name);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                    listener.onUserLeftRoom(roomId, name);
+                });
             }
 
             @Override
             public void onKicked(String roomId, int reason) {
                 VoiceRoomServiceKickedReason kickedReason = ChatroomIMManager.getInstance().getKickReason(reason);
-                try {
-                    if (kickedReason != null){
-                        for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
-                            listener.onUserBeKicked(roomId,kickedReason);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                    listener.onUserBeKicked(roomId, kickedReason);
+                });
             }
 
             @Override
             public void onAnnouncementChanged(String roomId, String announcement) {
-                try {
-                    for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
-                        listener.onAnnouncementChanged(roomId,announcement);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                    listener.onAnnouncementChanged(roomId, announcement);
+                });
             }
 
             @Override
             public void onAttributesUpdate(String roomId, Map<String, String> attributeMap, String from) {
-                try {
-                    for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
-                        listener.onSeatUpdated(roomId,attributeMap,from);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                    listener.onSeatUpdated(roomId, attributeMap, from);
+                });
             }
 
             @Override
@@ -245,7 +196,7 @@ public class ChatroomConfigManager {
         return mContext;
     }
 
-    private ChatOptions initChatOptions(String imKey){
+    private ChatOptions initChatOptions(String imKey) {
         ChatOptions options = new ChatOptions();
         options.setAppKey(imKey);
         options.setAutoLogin(false);
@@ -254,9 +205,9 @@ public class ChatroomConfigManager {
 
     private boolean isMainProcess(Context context) {
         String processName;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             processName = getProcessNameByApplication();
-        }else {
+        } else {
             processName = getProcessNameByReflection();
         }
         return context.getApplicationInfo().packageName.equals(processName);
@@ -282,7 +233,7 @@ public class ChatroomConfigManager {
         return processName;
     }
 
-    public void removeChatRoomListener(VoiceRoomSubscribeDelegate listener){
+    public void removeChatRoomListener(VoiceChatServiceListenerProtocol listener) {
         if (listener != null) {
             ChatroomIMManager.getInstance().removeChatRoomChangeListener();
             ChatroomIMManager.getInstance().removeChatRoomConnectionListener();

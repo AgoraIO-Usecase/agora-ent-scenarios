@@ -26,6 +26,11 @@ object LogTools {
     }
 
     @JvmStatic
+    fun w(tag: String, message: String, vararg args: Any) {
+        entLogger.w(tag, message, args)
+    }
+
+    @JvmStatic
     fun e(tag: String, message: String) {
         entLogger.e(tag, message)
     }

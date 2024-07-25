@@ -1,5 +1,6 @@
 package io.agora.scene.voice.service
 
+import io.agora.rtmsyncmanager.utils.ObservableHelper
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.model.*
 import io.agora.voice.common.utils.LogTools.logE
@@ -33,9 +34,9 @@ interface VoiceServiceProtocol {
 
     /**
      * 注册订阅
-     * @param delegate 聊天室内IM回调处理
+     * @param listener 聊天室内IM回调处理
      */
-    fun subscribeEvent(delegate: VoiceRoomSubscribeDelegate)
+    fun subscribeEvent(listener: VoiceChatServiceListenerProtocol)
 
     /**
      *  取消订阅
@@ -44,7 +45,37 @@ interface VoiceServiceProtocol {
 
     fun reset()
 
-    fun getSubscribeDelegates():MutableList<VoiceRoomSubscribeDelegate>
+    fun getSubscribeEvents(): ObservableHelper<VoiceChatServiceListenerProtocol>
+
+    /**
+     * Subscribe listener
+     *
+     * @param listener
+     */
+    fun subscribeListener(listener: VoiceRtmServiceListenerProtocol)
+
+    /**
+     * Unsubscribe listener
+     *
+     * @param listener
+     */
+    fun unsubscribeListener(listener: VoiceRtmServiceListenerProtocol)
+
+    /**
+     * Get current duration
+     *
+     * @param channelName
+     * @return
+     */
+    fun getCurrentDuration(channelName: String): Long
+
+    /**
+     * Get current ts
+     *
+     * @param channelName
+     * @return
+     */
+    fun getCurrentTs(channelName: String): Long
 
     /**
      * 获取房间列表
@@ -71,7 +102,7 @@ interface VoiceServiceProtocol {
      * 离开房间
      * @param roomId 房间id
      */
-    fun leaveRoom(roomId: String, isRoomOwnerLeave: Boolean, completion: (error: Int, result: Boolean) -> Unit)
+    fun leaveRoom(completion: (error: Int, result: Boolean) -> Unit)
 
     /**
      * 获取房间详情

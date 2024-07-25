@@ -17,7 +17,7 @@ import io.agora.scene.voice.databinding.VoiceItemRoomAudienceListBinding
 import io.agora.scene.voice.model.RoomKitBean
 import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.annotation.MicClickAction
-import io.agora.scene.voice.service.VoiceRoomSubscribeDelegate
+import io.agora.scene.voice.service.VoiceChatServiceListenerProtocol
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.adapter.viewholder.RoomAudienceListViewHolder
 import io.agora.scene.voice.viewmodel.VoiceUserListViewModel
@@ -72,7 +72,7 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
             roomKitBean = getSerializable(KEY_ROOM_INFO) as RoomKitBean?
             roomKitBean?.let {
                 userListViewModel.fetchMemberList()
-                voiceServiceProtocol.subscribeEvent(object : VoiceRoomSubscribeDelegate{
+                voiceServiceProtocol.subscribeEvent(object : VoiceChatServiceListenerProtocol{
                     override fun onUserJoinedRoom(roomId: String, voiceMember: VoiceMemberModel) {
                         "voiceServiceProtocol onUserJoinedRoom：".logE()
                         ThreadManager.getInstance().runOnMainThread{
