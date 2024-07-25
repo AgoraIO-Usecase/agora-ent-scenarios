@@ -40,7 +40,7 @@ class SoundCardSwitchCell: UITableViewCell {
         
         numLable = UITextField()
         numLable.font = UIFont.systemFont(ofSize: 13)
-        numLable.text = "4.0"
+        numLable.text = "400.0"
         numLable.keyboardType = .decimalPad
         numLable.textColor = .gray
         numLable.textAlignment = .center
@@ -66,15 +66,16 @@ class SoundCardSwitchCell: UITableViewCell {
     
     @objc func gain() {
         let gain = slider.value
-        numLable.text = String(format: "%.1f", Double(calculateLevel(for: gain)) * 0.1)
+        numLable.text = String(format: "%.1f", Double(calculateLevel(for: gain)))
     }
 
     @objc func gainSend() {
         let gain = slider.value
-        let level = String(format: "%.1f", Double(calculateLevel(for: gain)) * 0.1)
-        print("send lev:\(round(Double(calculateLevel(for: gain)) * 0.1, decimalPlaces: 1))")
+        let level = String(format: "%.1f", Double(calculateLevel(for: gain)))
+        let levNum = Double(level)
+        print("send lev:\(round(Double(calculateLevel(for: gain)), decimalPlaces: 1))")
         guard let valueBlock = valueBlock else {return}
-        valueBlock(round(Double(calculateLevel(for: gain)) * 0.1, decimalPlaces: 1))
+        valueBlock(round(Double(calculateLevel(for: gain)), decimalPlaces: 1))
     }
     
     func round(_ value: Double, decimalPlaces: Int) -> Double {
@@ -85,12 +86,12 @@ class SoundCardSwitchCell: UITableViewCell {
     }
     
     func calculateLevel(for value: Float) -> Int {
-        let stepSize: Float = 1/40
+        let stepSize: Float = 1/400
 
         if value <= 0 {
             return 0
         } else if value >= 1 {
-            return 40
+            return 400
         } else {
             let level = Int(value / stepSize)
             return level
@@ -112,12 +113,12 @@ extension SoundCardSwitchCell: UITextFieldDelegate {
             // 在此处执行输入结束后的操作
             if let text = textField.text {
                 guard let num = Float(text) else {return}
-                if num > 4.0 || num < 0 {
-                    textField.text = "4.0"
+                if num > 400.0 || num < 0 {
+                    textField.text = "400.0"
                     //同时更新slider
                     slider.value = 1.0
                 } else {
-                    slider.value = num / 4.0
+                    slider.value = num / 400.0
                 }
                 gainSend()
             }
