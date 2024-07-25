@@ -202,7 +202,7 @@ class ShowLiveViewController: UIViewController {
             
             //update menu
             if role == .broadcaster {
-                applyAndInviteView.seatMicModel = seatInteraction
+                applyAndInviteView.linkingInteractionInfo = seatInteraction
                 applyView.interactionModel = nil
             } else {
                 if currentInteraction?.userId == VLUserCenter.user.id {
@@ -210,7 +210,7 @@ class ShowLiveViewController: UIViewController {
                 } else {
                     applyView.interactionModel = nil
                 }
-                applyAndInviteView.seatMicModel = nil
+                applyAndInviteView.linkingInteractionInfo = nil
             }
             
             //stop or start interaction
@@ -692,6 +692,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     private func _onStartInteraction(interaction: ShowInteractionInfo) {
         ShowLogger.info("_onStartInteraction: \(interaction.userId) \(interaction.userName) status: \(interaction.type.rawValue)")
+        self.applyAndInviteView.isCurrentInteracting = true
         switch interaction.type {
         case .pk:
             view.layer.contents = UIImage.show_sceneImage(name: "show_live_pk_bg")?.cgImage
@@ -747,6 +748,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     private func _onStopInteraction(interaction: ShowInteractionInfo) {
         ShowLogger.info("_onStopInteraction: \(interaction.userId) \(interaction.userName) status: \(interaction.type.rawValue)")
+        self.applyAndInviteView.isCurrentInteracting = false
         switch interaction.type {
         case .pk:
             view.layer.contents = UIImage.show_sceneImage(name: "show_live_room_bg")?.cgImage
@@ -782,6 +784,11 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             self.delegate?.currentUserIsOffSeat()
         default:
             break
+        }
+        
+        if isPublishCameraStream {
+            self.muteLocalVideo = false
+            self.muteLocalAudio = false
         }
     }
 }

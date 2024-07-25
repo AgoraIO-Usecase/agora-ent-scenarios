@@ -35,7 +35,7 @@ def all_pods
 
   pod 'AgoraSyncManager', '~> 2.1.6'
 #  pod 'AgoraRtcEngine_Special_iOS', :path => 'AgoraRtcEngine_iOS.podspec'
-  pod 'AgoraRtcEngine_Special_iOS', '4.3.1.133'
+  pod 'AgoraRtcEngine_Special_iOS', '4.3.2.2'
 #  pod 'AgoraRtm', '2.2.1'
   pod 'AgoraRtm', :path => 'AgoraRtm.podspec'
 
@@ -49,11 +49,8 @@ def all_pods
   pod 'Cantata', :path => 'AgoraEntScenarios/Scenes/Cantata'
   pod 'AgoraCommon', :path => 'AgoraEntScenarios'
   pod 'Joy', :path => 'AgoraEntScenarios/Scenes/Joy'
-  #ThirdParty
-#  pod 'HWWeakTimer', '1.0'
   pod 'SocketRocket', '0.7.0'
   pod 'Agora-Scene-Utils', '1.1.0'
-#  pod 'Alamofire'
   
   #歌词组件
   pod "ScoreEffectUI", '1.0.2'

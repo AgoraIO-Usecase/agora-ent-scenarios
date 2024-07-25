@@ -350,7 +350,12 @@ extension CantataMainViewController {
     }
     
     private func loadRtc() {
-        RtcKit = AgoraRtcEngineKit.sharedEngine(withAppId: AppContext.shared.appId, delegate: self)
+        let rtcConfig = AgoraRtcEngineConfig()
+        rtcConfig.appId = AppContext.shared.appId
+        let logConfig = AgoraLogConfig()
+        logConfig.filePath = AgoraEntLog.sdkLogPath()
+        rtcConfig.logConfig = logConfig
+        RtcKit = AgoraRtcEngineKit.sharedEngine(with: rtcConfig, delegate: self)
         RtcKit.setAudioProfile(.musicHighQualityStereo)
         RtcKit.setAudioScenario(.gameStreaming)
         RtcKit.setChannelProfile(.liveBroadcasting)

@@ -8,6 +8,7 @@
 import Foundation
 import AgoraCommon
 import RTMSyncManager
+import AgoraRtmKit
 
 private let kSceneId = "scene_show_5.0.0"
 private let kRoomPresenceChannelName = "scene_show_5_0_0_9999999"
@@ -27,7 +28,11 @@ public class ShowSyncManagerServiceImp: NSObject {
         config.appId = AppContext.shared.appId
         config.owner = user
         config.host = AppContext.shared.roomManagerUrl
-        let manager = AUISyncManager(rtmClient: nil, commonConfig: config)
+        let logConfig = AgoraRtmLogConfig()
+        logConfig.filePath = AgoraEntLog.rtmSdkLogPath()
+        logConfig.fileSizeInKB = 1024
+        logConfig.level = .info
+        let manager = AUISyncManager(rtmClient: nil, commonConfig: config, logConfig: logConfig)
         
         return manager
     }()
