@@ -340,6 +340,10 @@ extension InteractionManager {
         service.rejectPK(pkId: pkId, completion: completion)
     }
     
+    public func getPKUserList() -> [RoomPresenceInfo] {
+        return roomPresenceService.userList
+    }
+    
     public func getPKUserList(completion: @escaping (NSError?, [RoomPresenceInfo]?)->()) {
         roomPresenceService.getAllRoomPresenceInfo(completion: completion)
     }

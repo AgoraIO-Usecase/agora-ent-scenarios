@@ -350,7 +350,10 @@ extension AUIScene: AUIUserRespDelegate {
             cleanUserInfo(userId: userInfo.userId)
             return
         }
-        cleanScene()
+        cleanUserInfo(userId: userInfo.userId)
+        for obj in self.respDelegates.allObjects {
+            obj.onSceneDestroy?(channelName: roomId)
+        }
     }
     
     public func onRoomUserUpdate(roomId: String, userInfo: AUIUserInfo) {
@@ -389,9 +392,13 @@ extension AUIScene: AUIRtmErrorProxyDelegate {
     
     @objc public func didReceiveLinkStateEvent(event: AgoraRtmLinkStateEvent) {
         aui_info("didReceiveLinkStateEvent state: \(event.currentState.rawValue), reason: \(event.reason ?? "")", tag: kSceneTag)
-        if event.currentState == .connected, event.operation == .reconnected {
+        if event.currentState == .disconnected, event.previousState == .connected {
+            expireCondition.offlineTimestamp = event.timestamp
+        } else if event.currentState == .connected, event.operation == .reconnected {
             //TODO: 推荐重连后lock的snapshot来获取
             getArbiter().acquire()
+            
+            expireCondition.reconnectNow(timestamp: event.timestamp)
         }
 
         if event.currentState == .failed {

@@ -16,10 +16,12 @@ public class AUISyncManager: NSObject {
         aui_info("deinit AUISyncManager")
     }
     
-    public required init(rtmClient: AgoraRtmClientKit?, commonConfig: AUICommonConfig, logConfig: AgoraRtmLogConfig?) {
+    public required init(rtmClient: AgoraRtmClientKit?,
+                         commonConfig: AUICommonConfig,
+                         logConfig: AgoraRtmLogConfig?) {
         aui_info("init AUISyncManager")
         AUIRoomContext.shared.commonConfig = commonConfig
-        let _rtmClient = rtmClient ?? AUISyncManager.createRtmClient(logConfig: logConfig)
+        let _rtmClient = rtmClient ?? AUISyncManager.createRtmClient(logConfig:logConfig)
         if _rtmClient != rtmClient {
             _rtmClientByInternal = _rtmClient
         }
