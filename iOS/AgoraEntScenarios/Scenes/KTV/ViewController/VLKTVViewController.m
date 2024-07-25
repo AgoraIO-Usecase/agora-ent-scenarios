@@ -2462,7 +2462,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     NSString* currentTopSongNo = NullToString(songs.firstObject.songNo);
     if (![origTopSongNo isEqualToString:currentTopSongNo]) {
         KTVLogInfo(@"clean old song: %@", origTopSongNo);
-        [self.ktvApi removeMusicWithSongCode:[origTopSongNo integerValue]];
+        if ([self.ktvApi isSongLoadingWithSongCode:origTopSongNo]) {
+            //认为在下载中，可能会有弱网0%也是下载中导致移除不正确
+            [self.ktvApi removeMusicWithSongCode:[origTopSongNo integerValue]];
+        }
         [self stopPlaySong];
         self.coSingerDegree = 0;
         [LSTPopView removeAllPopView];
