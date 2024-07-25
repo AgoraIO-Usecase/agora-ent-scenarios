@@ -1040,7 +1040,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)joinRTCChannel {
-    self.RTCkit = [AgoraRtcEngineKit sharedEngineWithAppId:[AppContext.shared appId] delegate:self];
+    AgoraRtcEngineConfig* rtcConfig = [AgoraRtcEngineConfig new];
+    rtcConfig.appId = [AppContext.shared appId];
+    rtcConfig.channelProfile = AgoraChannelProfileLiveBroadcasting;
+    AgoraLogConfig* logConfig = [AgoraLogConfig new];
+    logConfig.filePath = [AgoraEntLog sdkLogPath];
+    rtcConfig.logConfig = logConfig;
+    self.RTCkit = [AgoraRtcEngineKit sharedEngineWithConfig:rtcConfig delegate:self];
     //setup private param
 //    [self.RTCkit setParameters:@"{\"rtc.debug.enable\": true}"];
 //    [self.RTCkit setParameters:@"{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}"];
@@ -1048,7 +1054,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //use game streaming in so mode, chrous profile in chrous mode
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
-    [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:50 smooth:10 reportVad:true];

@@ -16,10 +16,12 @@ public class AUISyncManager: NSObject {
         aui_info("deinit AUISyncManager")
     }
     
-    public required init(rtmClient: AgoraRtmClientKit?, commonConfig: AUICommonConfig) {
+    public required init(rtmClient: AgoraRtmClientKit?,
+                         commonConfig: AUICommonConfig,
+                         logConfig: AgoraRtmLogConfig?) {
         aui_info("init AUISyncManager")
         AUIRoomContext.shared.commonConfig = commonConfig
-        let _rtmClient = rtmClient ?? AUISyncManager.createRtmClient()
+        let _rtmClient = rtmClient ?? AUISyncManager.createRtmClient(logConfig:logConfig)
         if _rtmClient != rtmClient {
             _rtmClientByInternal = _rtmClient
         }
@@ -76,20 +78,26 @@ public class AUISyncManager: NSObject {
 }
 
 extension AUISyncManager {
-    private static func createRtmClient() -> AgoraRtmClientKit {
+    private static func createRtmClient(logConfig: AgoraRtmLogConfig?) -> AgoraRtmClientKit {
         let commonConfig = AUIRoomContext.shared.commonConfig!
         let userInfo = AUIRoomContext.shared.currentUserInfo
-        let rtmConfig = AgoraRtmClientConfig(appId: commonConfig.appId, userId: userInfo.userId)
-        rtmConfig.presenceTimeout = 300
-        if rtmConfig.userId.count == 0 {
-            aui_error("userId is empty")
-            assert(false, "userId is empty")
-        }
-        if rtmConfig.appId.count == 0 {
-            aui_error("appId is empty, please check 'AUIRoomContext.shared.commonConfig.appId' ")
-            assert(false, "appId is empty, please check 'AUIRoomContext.shared.commonConfig.appId' ")
-        }
-        let rtmClient = try? AgoraRtmClientKit(rtmConfig, delegate: nil)
-        return rtmClient!
+        let rtmClient = RTMSyncManager.createRtmClient(appId: commonConfig.appId, userId: userInfo.userId, logConfig: logConfig)
+        return rtmClient
     }
+}
+
+public func createRtmClient(appId: String, userId: String, logConfig: AgoraRtmLogConfig?) -> AgoraRtmClientKit {
+    let rtmConfig = AgoraRtmClientConfig(appId: appId, userId: userId)
+    rtmConfig.presenceTimeout = 300
+    if rtmConfig.userId.count == 0 {
+        aui_error("userId is empty")
+        assert(false, "userId is empty")
+    }
+    if rtmConfig.appId.count == 0 {
+        aui_error("appId is empty, please check 'AUIRoomContext.shared.commonConfig.appId' ")
+        assert(false, "appId is empty, please check 'AUIRoomContext.shared.commonConfig.appId' ")
+    }
+    rtmConfig.logConfig = logConfig
+    let rtmClient = try? AgoraRtmClientKit(rtmConfig, delegate: nil)
+    return rtmClient!
 }

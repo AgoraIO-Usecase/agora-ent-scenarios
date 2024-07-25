@@ -44,7 +44,7 @@ class Pure1v1ServiceImp: NSObject {
         owner.userAvatar = user.avatar
         config.owner = owner
         config.host = AppContext.shared.roomManagerUrl
-        let manager = AUISyncManager(rtmClient: rtmClient, commonConfig: config)
+        let manager = AUISyncManager(rtmClient: rtmClient, commonConfig: config, logConfig: nil)
         
         return manager
     }()
