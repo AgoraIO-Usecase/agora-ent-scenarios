@@ -61,7 +61,7 @@ extension VoiceRoomViewController {
     func didUpdateSoundSetting(_ isEnabled: Bool) {
         self.soundOpen = isEnabled
         if isEnabled {
-            self.gainValue = "1.0"
+            self.gainValue = "100.0"
             self.effectType = 4
             self.typeValue = 4
             self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":0}}")
@@ -71,7 +71,7 @@ extension VoiceRoomViewController {
     }
 
     func didUpdateEffectValue(_ value: Int) {
-        self.gainValue = "1.0"
+        self.gainValue = "100.0"
         self.effectType = value
         self.typeValue = 4
         switch value {
