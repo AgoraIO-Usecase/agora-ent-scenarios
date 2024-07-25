@@ -99,37 +99,45 @@ class MetaEngineHandler : AGExtensionHandler {
         Handler(Looper.getMainLooper())
     }
 
+    private val mCurrentAssetPath by lazy {
+        AgoraApplication.the().getExternalFilesDir("assets").toString()
+    }
+    private val mCurrentMetaFilesPath by lazy {
+        AgoraApplication.the().getExternalFilesDir("assets").toString()
+    }
+
+
     // meta 资源路径
-    var metaResourcesPath: String = SPUtil.getString(Constant.SHOW_META_RESOURCES_PATH, "")
-        set(value) {
-            field = value
-            SPUtil.putString(Constant.SHOW_META_RESOURCES_PATH, value)
-            ShowLogger.d(TAG, "metaResourcesPath: $value")
-        }
+//    var metaResourcesPath: String = SPUtil.getString(Constant.SHOW_META_RESOURCES_PATH, "")
+//        set(value) {
+//            field = value
+//            SPUtil.putString(Constant.SHOW_META_RESOURCES_PATH, value)
+//            ShowLogger.d(TAG, "metaResourcesPath: $value")
+//        }
 
     // meta 图片路径
-    var metaImagePath: String = SPUtil.getString(Constant.SHOW_META_IMAGE_PATH, "")
-        set(value) {
-            field = value
-            SPUtil.putString(Constant.SHOW_META_IMAGE_PATH, value)
-            ShowLogger.d(TAG, "metaImagePath: $value")
-        }
+//    var metaImagePath: String = SPUtil.getString(Constant.SHOW_META_IMAGE_PATH, "")
+//        set(value) {
+//            field = value
+//            SPUtil.putString(Constant.SHOW_META_IMAGE_PATH, value)
+//            ShowLogger.d(TAG, "metaImagePath: $value")
+//        }
 
     // meta 资源m5d
-    var metaResourcesMd5: String = SPUtil.getString(Constant.SHOW_META_RESOURCES_MD5, "")
-        set(value) {
-            field = value
-            SPUtil.putString(Constant.SHOW_META_RESOURCES_MD5, value)
-            ShowLogger.d(TAG, "metaResourcesMd5: $value")
-        }
-
-    // meta 图片md5
-    var metaImageMd5: String = SPUtil.getString(Constant.SHOW_META_IMAGE_MD5, "")
-        set(value) {
-            field = value
-            SPUtil.putString(Constant.SHOW_META_IMAGE_MD5, value)
-            ShowLogger.d(TAG, "metaImageMd5: $value")
-        }
+//    var metaResourcesMd5: String = SPUtil.getString(Constant.SHOW_META_RESOURCES_MD5, "")
+//        set(value) {
+//            field = value
+//            SPUtil.putString(Constant.SHOW_META_RESOURCES_MD5, value)
+//            ShowLogger.d(TAG, "metaResourcesMd5: $value")
+//        }
+//
+//    // meta 图片md5
+//    var metaImageMd5: String = SPUtil.getString(Constant.SHOW_META_IMAGE_MD5, "")
+//        set(value) {
+//            field = value
+//            SPUtil.putString(Constant.SHOW_META_IMAGE_MD5, value)
+//            ShowLogger.d(TAG, "metaImageMd5: $value")
+//        }
 
 
     var mRunningState: Int = IMetaRunningState.idle
@@ -274,7 +282,7 @@ class MetaEngineHandler : AGExtensionHandler {
         val valueObj = JSONObject()
         try {
             val sceneObj = JSONObject()
-            sceneObj.put("scenePath", metaResourcesPath)
+            sceneObj.put("scenePath", mCurrentAssetPath)
             val customObj = JSONObject()
             customObj.put("sceneIndex", 0)
             valueObj.put("sceneInfo", sceneObj)
@@ -384,11 +392,11 @@ class MetaEngineHandler : AGExtensionHandler {
                 AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG -> SpecialEffectType.SEType3DLight
                 else -> 0
             }
-            if (effect3DId > 0) {
-                configEffectLight(true, effect3DId)
-            }
             if (aiPhotographerType == AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG) {
                 setMetaBGMode(BackgroundType.BGTypePano)
+            }
+            if (effect3DId > 0) {
+                configEffectLight(true, effect3DId)
             }
         } else {
             stopEffect3D()
@@ -475,7 +483,7 @@ class MetaEngineHandler : AGExtensionHandler {
         when (bgMode) {
             BackgroundType.BGTypePano -> {
                 mode = "tex360"
-                filePath = metaImagePath
+                filePath = "$mCurrentAssetPath/pano.jpg"
                 gyroState = "on"
             }
 

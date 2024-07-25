@@ -5,9 +5,13 @@ import android.content.res.AssetManager;
 import android.text.TextUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -153,5 +157,32 @@ public class FileUtils {
             }
         }
         return false;
+    }
+
+    public static byte[] getFileMD5(final File file) {
+        if (file == null) return null;
+        DigestInputStream dis = null;
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            dis = new DigestInputStream(fis, md);
+            byte[] buffer = new byte[1024 * 256];
+            while (true) {
+                if (!(dis.read(buffer) > 0)) break;
+            }
+            md = dis.getMessageDigest();
+            return md.digest();
+        } catch (NoSuchAlgorithmException | IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (dis != null) {
+                    dis.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 }
