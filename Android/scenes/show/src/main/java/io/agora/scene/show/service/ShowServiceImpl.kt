@@ -22,6 +22,7 @@ import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
+import io.agora.scene.show.RtcEngineInstance
 import io.agora.scene.show.ShowLogger
 import io.agora.scene.show.service.cloudplayer.CloudPlayerService
 import io.agora.scene.show.service.rtmsync.ApplyInfo
@@ -54,9 +55,9 @@ const val kRobotUid = 2000000001
 val kRobotAvatars = listOf("https://download.shengwang.cn/demo/release/bot1.png")
 val kRobotVideoRoomIds = arrayListOf(2023004, 2023005, 2023006)
 val kRobotVideoStreamUrls = arrayListOf(
-    "https://download.shengwang.cn/demo/test/agora_test_video_10.mp4",
-    "https://download.shengwang.cn/demo/test/agora_test_video_11.mp4",
-    "https://download.shengwang.cn/demo/test/agora_test_video_12.mp4"
+    "https://download.agora.io/demo/release/agora_test_video_20_music.mp4",
+    "https://download.agora.io/demo/release/agora_test_video_21_music.mp4",
+    "https://download.agora.io/demo/release/agora_test_video_22_music.mp4"
 )
 
 class ShowServiceImpl(context: Context) : ShowServiceProtocol {
@@ -118,11 +119,11 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
     }
 
     private fun loginSync(success: (() -> Unit)? = null, error: ((Exception) -> Unit)? = null) {
-        TokenGenerator.generateToken(
+        TokenGenerator.generateTokens(
             "",
             UserManager.getInstance().user.id.toString(),
             TokenGenerator.TokenGeneratorType.token007,
-            TokenGenerator.AgoraTokenType.rtm,
+            arrayOf(TokenGenerator.AgoraTokenType.rtc, TokenGenerator.AgoraTokenType.rtm),
             success = {
                 syncManager.login(it) { ex ->
                     if (ex != null) {
