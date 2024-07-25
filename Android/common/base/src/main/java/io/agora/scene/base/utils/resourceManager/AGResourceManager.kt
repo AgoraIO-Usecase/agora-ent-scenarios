@@ -1,8 +1,7 @@
-package io.agora.scene.base.utils.resourceManager
-
 import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
+import io.agora.scene.base.utils.resourceManager.DownloadManager
 import kotlinx.coroutines.*
 import java.io.File
 
@@ -13,7 +12,7 @@ enum class AGResourceStatus {
 
 // 定义资源模型
 data class AGResource(
-    var url: String = "",
+    val url: String = "",
     val uri: String = "",
     val md5: String = "",
     val size: Long = 0,
@@ -21,7 +20,11 @@ data class AGResource(
     val encrypt: Boolean = false,
     val group: String = "",
     val desc: String = ""
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        return (other as AGResource).uri == uri
+    }
+}
 
 // 定义清单模型
 data class AGManifest(
@@ -34,8 +37,47 @@ data class AGManifest(
 class AGResourceManager(private val context: Context) {
     private val tag = "DownloadUtils"
 
-    private val manifestFileList = mutableListOf<AGResource>()
-    private val manifestList = mutableListOf<AGManifest>()
+    private val localManifestFileList = mutableListOf<AGResource>()
+    private val remoteManifestList = mutableListOf<AGManifest>()
+
+    // 本地清单配置
+    fun checkManifestResource(manifestUrl: String) {
+        val destinationPath = getCachePath(context, "manifest") ?: return
+        val manifestFile = File(destinationPath, manifestUrl.substringAfterLast("/"))
+        if (manifestFile.exists()) {
+            try {
+                val manifestList = parseResourceList(manifestFile.absolutePath)
+                manifestList.forEach { resource ->
+                    if (!localManifestFileList.contains(resource)) {
+                        localManifestFileList.add(resource)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(tag, "checkManifestResource ${e.message}")
+            }
+        }
+        Log.d(tag, "checkManifestResource localManifestFileList:$localManifestFileList")
+    }
+
+    fun checkFileResource(fileUrl: String) {
+        val destinationPath = getCachePath(context, "manifest") ?: return
+        val manifestFile = File(destinationPath, fileUrl.substringAfterLast("/"))
+        if (manifestFile.exists()) {
+            val resourcePath = getCachePath(context, "assets") ?: return
+            try {
+                val fileList = parseManifest(manifestFile.absolutePath)
+                fileList.files.forEach { resource ->
+                    val inputFile = File(resourcePath, resource.url.substringAfterLast("/"))
+                    if (inputFile.length() == resource.size && !localManifestFileList.contains(resource)) {
+                        localManifestFileList.add(resource)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(tag, "checkFileResource ${e.message}")
+            }
+        }
+        Log.d(tag, "checkFileResource manifestFileList:$localManifestFileList")
+    }
 
     // 下载清单列表文件
     suspend fun downloadManifestList(
@@ -45,6 +87,11 @@ class AGResourceManager(private val context: Context) {
         completionHandler: (List<AGResource>?, Exception?) -> Unit
     ) = withContext(Dispatchers.IO) {
         val destinationPath = getCachePath(context, "manifest") ?: return@withContext completionHandler(null, null)
+        val manifestListFile = File(destinationPath, url.substringAfterLast("/"))
+        if (manifestListFile.exists()) {
+            Log.d(tag, "renew manifestListFile: $url")
+            manifestListFile.delete()
+        }
         DownloadManager.instance.download(
             url = url,
             destinationPath = destinationPath,
@@ -73,6 +120,11 @@ class AGResourceManager(private val context: Context) {
         completionHandler: (AGManifest?, Exception?) -> Unit
     ) = withContext(Dispatchers.IO) {
         val destinationPath = getCachePath(context, "manifest") ?: return@withContext completionHandler(null, null)
+        val manifestFile = File(destinationPath, url.substringAfterLast("/"))
+        if (manifestFile.exists()) {
+            Log.d(tag, "renew manifestFile: $url")
+            manifestFile.delete()
+        }
         DownloadManager.instance.download(
             url = url,
             destinationPath = destinationPath,
@@ -83,8 +135,9 @@ class AGResourceManager(private val context: Context) {
                 }
 
                 override fun onSuccess(file: File) {
+                    Log.d(tag, "download success: $url")
                     val manifest = parseManifest(file.absolutePath)
-                    manifestList.add(manifest)
+                    remoteManifestList.add(manifest)
                     completionHandler(manifest, null)
                 }
 
@@ -99,47 +152,80 @@ class AGResourceManager(private val context: Context) {
     suspend fun downloadAndUnZipResource(
         resource: AGResource,
         progressHandler: (Int) -> Unit,
-        downloadedHandler: (File) -> Unit,
-        unzipHandler: (String) -> Unit,
-        errorHandler: (Exception?) -> Unit
-    ) {
-        val destinationPath = getCachePath(context, "assets") ?: return
+        completionHandler: (File?, Exception?) -> Unit
+    ) = withContext(Dispatchers.IO) {
+        val destinationPath = getCachePath(context, "assets") ?: return@withContext
         try {
-            val inputFileName = resource.url.substringAfterLast("/")
-            val inputFile = File(destinationPath, inputFileName)
-            Log.d(tag, "downloadAndUnZipResource resource:$resource, inputFileName:${inputFileName} ${inputFile.path}")
-            // 下载文件
-            if (!inputFile.exists()) {
-                DownloadManager.instance.download(
-                    url = resource.url,
-                    destinationPath = destinationPath,
-                    callback = object : DownloadManager.FileDownloadCallback {
-                        override fun onProgress(file: File, progress: Int) {
-                            // Log.d(tag, "downloading... $resource progress:$progress")
-                            progressHandler.invoke(progress)
-                        }
+            val inputFile = File(destinationPath, resource.url.substringAfterLast("/"))
+            Log.d(tag, "downloadAndUnZipResource resource:$resource, inputFile:${inputFile.length()}")
 
-                        override fun onSuccess(file: File) {
-                            downloadedHandler(file)
-                        }
+            val oldResource = localManifestFileList.firstOrNull { it.uri == resource.uri }
 
-                        override fun onFailed(exception: Exception) {
-                            errorHandler.invoke(exception)
+            var file:File? = null
+            // 已经下载了历史文件
+            if (oldResource != null) {
+                Log.d(tag, "oldResource:$oldResource}")
+                if (oldResource.md5 != resource.md5) {
+                    // 删除历史文件
+                    val oldFile = File(destinationPath, oldResource.url.substringAfterLast("/"))
+                    oldFile.delete()
+                    deleteRecursively(File(oldFile.path.substringBeforeLast(".zip")))
+                    localManifestFileList.remove(oldResource)
+
+                    // 下载新文件
+                    DownloadManager.instance.download(
+                        url = resource.url,
+                        destinationPath = destinationPath,
+                        callback = object : DownloadManager.FileDownloadCallback {
+                            override fun onProgress(file: File, progress: Int) {
+                                progressHandler.invoke(progress)
+                            }
+
+                            override fun onSuccess(file: File) {
+                                localManifestFileList.add(resource)
+                                completionHandler(file, null)
+                            }
+
+                            override fun onFailed(exception: Exception) {
+                                completionHandler.invoke(null, exception)
+                            }
                         }
-                    }
-                )
+                    )
+                }
+            } else {
+                // 没有下载过
+                if (inputFile.length() != resource.size) {
+                    DownloadManager.instance.download(
+                        url = resource.url,
+                        destinationPath = destinationPath,
+                        callback = object : DownloadManager.FileDownloadCallback {
+                            override fun onProgress(file: File, progress: Int) {
+                                // Log.d(tag, "downloading... $resource progress:$progress")
+                                progressHandler.invoke(progress)
+                            }
+
+                            override fun onSuccess(file: File) {
+                                localManifestFileList.add(resource)
+                                completionHandler(file, null)
+                            }
+
+                            override fun onFailed(exception: Exception) {
+                                completionHandler.invoke(null, exception)
+                            }
+                        }
+                    )
+                }
             }
 
             // 解压文件
-            if (!checkUnzipFolderExists(inputFile.path) /*&& inputFile.length() == resource.size*/) {
+            if (!checkUnzipFolderExists(inputFile.path) && (inputFile.length() == resource.size)) {
                 DownloadManager.instance.unzipFile(inputFile.path, destinationPath)
             }
-            unzipHandler.invoke(destinationPath)
         } catch (e: Exception) {
             // 处理异常
             Log.e(tag, "Error processing file: $e")
             withContext(Dispatchers.Main) {
-                errorHandler.invoke(e)
+                completionHandler.invoke(null, e)
             }
         }
     }
@@ -152,12 +238,12 @@ class AGResourceManager(private val context: Context) {
 
     // 根据uri获取清单
     fun getManifest(uri: String): AGResource? {
-        return manifestFileList.firstOrNull { it.uri == uri }
+        return localManifestFileList.firstOrNull { it.uri == uri }
     }
 
     // 根据uri获取资源对象
     fun getResource(uri: String): AGResource? {
-        for (manifest in manifestList) {
+        for (manifest in remoteManifestList) {
             for (resource in manifest.files) {
                 if (resource.uri == uri) {
                     return resource
@@ -192,5 +278,21 @@ class AGResourceManager(private val context: Context) {
         val fileContent = File(path).readText()
         val gson = Gson()
         return gson.fromJson(fileContent, AGManifest::class.java)
+    }
+
+    // 删除一个文件夹内所有文件
+    private fun deleteRecursively(fileOrDirectory: File): Boolean {
+        if (fileOrDirectory.isDirectory) {
+            val children = fileOrDirectory.listFiles()
+            if (children != null) {
+                for (child in children) {
+                    val success = deleteRecursively(child)
+                    if (!success) {
+                        return false
+                    }
+                }
+            }
+        }
+        return fileOrDirectory.delete()
     }
 }

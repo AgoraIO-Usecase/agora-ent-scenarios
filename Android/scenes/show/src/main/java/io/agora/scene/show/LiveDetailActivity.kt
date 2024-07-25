@@ -261,6 +261,7 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
         RtcEngineInstance.cleanCache()
         RtcEngineInstance.resetVirtualBackground()
         BeautyManager.destroy()
+        RtcEngineInstance.mMetaEngineHandler.resetAiPhotographer()
         if (RtcEngineInstance.mMetaEngineHandler.mRunningState > IMetaRunningState.idle) {
             RtcEngineInstance.mMetaEngineHandler.leaveScene()
         }
