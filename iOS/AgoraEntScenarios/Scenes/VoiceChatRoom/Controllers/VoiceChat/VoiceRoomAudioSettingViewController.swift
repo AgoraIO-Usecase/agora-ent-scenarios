@@ -542,7 +542,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             soundCardVC.clicKBlock = {[weak self] effect in
                 guard let clicKBlock = self?.clicKBlock else {return}
                 self?.effectType = effect
-                self?.gainValue = "1.0"
+                self?.gainValue = "100.0"
                 clicKBlock(effect)
             }
             soundCardVC.gainBlock = {[weak self] gain in
@@ -561,7 +561,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 guard let soundCardBlock = self?.soundCardBlock else {return}
                 self?.soundOpen = flag
                 if flag == true {
-                    self?.gainValue = "1.0"
+                    self?.gainValue = "100.0"
                     self?.effectType = 4
                 }
                 self?.tableView.reloadData()
