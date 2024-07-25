@@ -84,8 +84,8 @@ class JoySyncManagerServiceImp constructor(
         if (roomId.isEmpty()) {
             return null
         }
-        val scene = mSyncManager.createScene(roomId)
-        return scene.getCollection(kCollectionStartGameInfo) { a, b, c -> AUIMapCollection(a, b, c) }
+        val scene = mSyncManager.getScene(roomId)
+        return scene?.getCollection(kCollectionStartGameInfo) { a, b, c -> AUIMapCollection(a, b, c) }
     }
 
     init {
@@ -208,7 +208,7 @@ class JoySyncManagerServiceImp constructor(
     }
 
     override fun joinRoom(roomId: String, completion: (error: Exception?) -> Unit) {
-        JoyLogger.d(TAG, "joinRoom start")
+        JoyLogger.d(TAG, "joinRoom start $roomId")
         if (mCurrRoomNo.isNotEmpty()) {
             completion.invoke(Exception("already join room $mCurrRoomNo!"))
             return
@@ -249,9 +249,10 @@ class JoySyncManagerServiceImp constructor(
     }
 
     override fun leaveRoom(completion: (error: Exception?) -> Unit) {
-        val scene = mSyncManager.createScene(mCurrRoomNo)
-        scene.userService.unRegisterRespObserver(this)
-        scene.unbindRespDelegate(this)
+        JoyLogger.d(TAG, "leaveRoom start $mCurrRoomNo")
+        val scene = mSyncManager.getScene(mCurrRoomNo)
+        scene?.userService?.unRegisterRespObserver(this)
+        scene?.unbindRespDelegate(this)
 
         if (AUIRoomContext.shared().isRoomOwner(mCurrRoomNo)) {
             mMainHandler.removeCallbacks(timerRoomCountDownTask)
@@ -270,8 +271,8 @@ class JoySyncManagerServiceImp constructor(
         if (roomId.isEmpty()) {
             return 0
         }
-        val scene = mSyncManager.createScene(roomId)
-        return scene.getRoomDuration()
+        val scene = mSyncManager.getScene(roomId)
+        return scene?.getRoomDuration() ?: 0L
     }
 
     override fun getStartGame(
@@ -382,8 +383,8 @@ class JoySyncManagerServiceImp constructor(
      */
     override fun getCurrentTs(channelName: String): Long {
         if (channelName.isEmpty()) return 0
-        val scene = mSyncManager.createScene(channelName)
-        return scene.getCurrentTs()
+        val scene = mSyncManager.getScene(channelName)
+        return scene?.getCurrentTs() ?: 0L
     }
 
     override fun subscribeListener(listener: JoyServiceListenerProtocol) {
