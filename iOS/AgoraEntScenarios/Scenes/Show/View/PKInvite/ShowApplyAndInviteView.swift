@@ -98,14 +98,14 @@ class ShowApplyAndInviteView: UIView {
     private var tipsViewHeightCons: NSLayoutConstraint?
     private var roomId: String!
     private var type: ShowApplyAndInviteType = .apply
-    var seatMicModel: ShowInteractionInfo? {
+    var linkingInteractionInfo: ShowInteractionInfo? {
         didSet {
-            if seatMicModel == oldValue {
+            if linkingInteractionInfo == oldValue {
                 return
             }
-            self.tipsContainerView.isHidden = seatMicModel == nil
-            self.tipsLabel.text = String(format: "show_onseat_with_broadcastor".show_localized, seatMicModel?.userName ?? "")
-            self.updateLayout(isHidden: seatMicModel == nil)
+            self.tipsContainerView.isHidden = linkingInteractionInfo == nil
+            self.tipsLabel.text = String(format: "show_onseat_with_broadcastor".show_localized, linkingInteractionInfo?.userName ?? "")
+            self.updateLayout(isHidden: linkingInteractionInfo == nil)
             self.tableView.reloadData()
         }
     }
@@ -219,7 +219,7 @@ class ShowApplyAndInviteView: UIView {
     @objc
     private func onTapEndButton(sender: AGEButton) {
         updateLayout(isHidden: true)
-        if let model = seatMicModel {
+        if let model = linkingInteractionInfo {
             AppContext.showServiceImp()?.stopInteraction(roomId: roomId) { _ in }
         }
         applyStatusClosure?(.idle)
@@ -232,7 +232,9 @@ extension ShowApplyAndInviteView: AGETableViewDelegate {
         cell.roomId = roomId
         let model = self.tableView.dataArray?[indexPath.row]
         
-        cell.setupApplyAndInviteData(model: model, isLink: seatMicModel != nil, isInteracting: isCurrentInteracting)
+        cell.setupApplyAndInviteData(model: model,
+                                     linkingUid: linkingInteractionInfo?.userId,
+                                     isInteracting: isCurrentInteracting)
         return cell
     }
 }
