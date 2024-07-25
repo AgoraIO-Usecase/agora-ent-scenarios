@@ -149,7 +149,7 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
                 holder.binding.ivCover.setImageResource(getThumbnailIcon(thumbnail))
             }
             holder.itemView.setOnClickListener {
-                if (UiUtils.isFastClick()) return@setOnClickListener
+                if (UiUtils.isFastClick(2000)) return@setOnClickListener
                 mOnGotoRoom?.invoke(position, data)
             }
             GlideApp.with(holder.binding.ivAvatar)
