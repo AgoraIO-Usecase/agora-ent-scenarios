@@ -192,8 +192,8 @@
 "home_content_item_live_desc_show_1v1_private" = "秒转场&秒接通";
 "home_content_item_live_title_joy" = "弹幕玩法";
 "home_content_item_live_desc_joy" = "直播互动新玩法";
-"home_content_item_live_title_interactive_joy" = "互动小游戏";
-"home_content_item_live_desc_interactive_joy" = "直播互动新玩法";
+"home_content_item_live_title_interactive_joy" = "休闲玩法";
+"home_content_item_live_desc_interactive_joy" = "直播间 更好玩";
 
 "feedback_tags_flashback" = "闪退";
 "feedback_tags_audioStuck" = "音频卡顿";
