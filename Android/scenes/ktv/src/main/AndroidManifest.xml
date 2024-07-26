@@ -11,6 +11,7 @@
         <activity
             android:name="io.agora.scene.ktv.live.RoomLivingActivity"
             android:launchMode="singleTop"
+            android:theme="@style/def_theme"
             android:screenOrientation="portrait" />
     </application>
 </manifest>
