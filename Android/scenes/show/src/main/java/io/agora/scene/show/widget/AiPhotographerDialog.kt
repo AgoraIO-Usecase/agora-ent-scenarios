@@ -64,12 +64,16 @@ class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(cont
 
     private val mAiPhotographerItemList = arrayListOf(
         ItemInfo(AiPhotographerType.ITEM_ID_AI_RHYTHM, R.mipmap.show_ai_rhythm, DownloadStatus.Downloaded),
-        ItemInfo(AiPhotographerType.ITEM_ID_AI_EDGE_LIGHT, R.mipmap.show_ai_edge_light),
+        ItemInfo(AiPhotographerType.ITEM_ID_AI_EDGE_LIGHT, R.mipmap.show_ai_edge_light, DownloadStatus.Downloaded),
         ItemInfo(AiPhotographerType.ITEM_ID_AI_SHADOW, R.mipmap.show_ai_shadow, DownloadStatus.Downloaded),
-        ItemInfo(AiPhotographerType.ITEM_ID_AI_LIGHTING_AD, R.mipmap.show_ai_lighting_ad),
-        ItemInfo(AiPhotographerType.ITEM_ID_AI_LIGHTING_3D, R.mipmap.show_ai_lighting_3d),
-        ItemInfo(AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG, R.mipmap.show_ai_lighting_3d_virtul_bg),
-        ItemInfo(AiPhotographerType.ITEM_ID_AI_AURORA, R.mipmap.show_ai_aurora),
+        ItemInfo(AiPhotographerType.ITEM_ID_AI_LIGHTING_AD, R.mipmap.show_ai_lighting_ad, DownloadStatus.Downloaded),
+        ItemInfo(AiPhotographerType.ITEM_ID_AI_LIGHTING_3D, R.mipmap.show_ai_lighting_3d, DownloadStatus.Downloaded),
+        ItemInfo(
+            AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG,
+            R.mipmap.show_ai_lighting_3d_virtul_bg,
+            DownloadStatus.Downloaded
+        ),
+        ItemInfo(AiPhotographerType.ITEM_ID_AI_AURORA, R.mipmap.show_ai_aurora, DownloadStatus.Downloaded),
     )
 
     private var mAiSelectedIndex = -1
@@ -259,7 +263,21 @@ class AiPhotographerDialog constructor(context: Context) : BottomDarkDialog(cont
                         val isImageDownload = newImageMd5.isNotEmpty() && newImageMd5 == metaImageMd5
                         if (isImageDownload) {
                             it.status = DownloadStatus.Downloaded
+                        } else {
+                            it.status = DownloadStatus.None
                         }
+                    }
+                }
+            }
+        } else {
+            mAiPhotographerItemList.forEach {
+                when (it.itemId) {
+                    AiPhotographerType.ITEM_ID_AI_EDGE_LIGHT,
+                    AiPhotographerType.ITEM_ID_AI_LIGHTING_AD,
+                    AiPhotographerType.ITEM_ID_AI_LIGHTING_3D,
+                    AiPhotographerType.ITEM_ID_AI_AURORA,
+                    AiPhotographerType.ITEM_ID_AI_LIGHTING_3D_VIRTUAL_BG -> {
+                        it.status = DownloadStatus.None
                     }
                 }
             }
