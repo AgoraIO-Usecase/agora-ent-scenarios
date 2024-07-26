@@ -16,4 +16,9 @@ class RoomExpirationPolicy {
      * If false, the room persists even when the owner goes offline.
      */
     var isAssociatedWithOwnerOffline: Boolean = true
+
+    /**
+     * The maximum time in milliseconds that the owner can be offline before the room is destroyed.
+     */
+    var ownerReconnectMaxTime: Long = 5 * 60 * 1000
 }

@@ -213,14 +213,14 @@ abstract class OnPageScrollEventHandler constructor(
                 }
             }
 
-//            if (currLoadPosition != position) {
-//                // TODO currLoadPosition 页面消失
-//                leaveRoom(roomList[currLoadPosition] ?: return)
+            if (currLoadPosition != position) {
+                // TODO currLoadPosition 页面消失
+                leaveRoom(roomList[currLoadPosition] ?: return)
 //                onPageLeft(currLoadPosition)
 //
 //                joinRoomWithoutAudio(position, roomList[position] ?: return, localUid)
 //                onPageStartLoading(position)
-//            }
+            }
         }
         currLoadPosition = position
         preLoadPosition = POSITION_NONE
