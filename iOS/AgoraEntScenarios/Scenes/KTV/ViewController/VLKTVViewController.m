@@ -2408,6 +2408,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.roomPersonView reloadSeatIndex:model.seatIndex];
 }
 
+- (void)onUserSeatUpdateWithSeat:(VLRoomSeatModel *)seat {
+    
+}
+
+
 - (void)updateNowCameraMuted: (BOOL)isMute {
     self.isNowCameraMuted = isMute;
     if (!isMute) {
