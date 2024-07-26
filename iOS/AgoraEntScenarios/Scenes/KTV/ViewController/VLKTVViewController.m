@@ -1549,7 +1549,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)settingViewSettingChanged:(VLKTVSettingModel *)setting effectChoosed:(NSInteger)effectIndex { 
-    
+    [self settingViewEffectChoosed:effectIndex];
 }
 
 
@@ -2091,7 +2091,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     KTVLogInfo(@"setSelSongsArray current top[%@] songName: %@, status: %ld",
                updatedTopSong.songNo, updatedTopSong.songName, updatedTopSong.status);
     KTVLogInfo(@"setSelSongsArray orig top[%@] songName: %@, status: %ld",
-               updatedTopSong.songNo, originalTopSong.songName, originalTopSong.status);
+               originalTopSong.songNo, originalTopSong.songName, originalTopSong.status);
     if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
         [self.MVView reset];
         [self.lrcControl resetLrc];
@@ -2428,33 +2428,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     model.isVideoMuted = isMute;
     [self.roomPersonView reloadSeatIndex:model.seatIndex];
 }
-
-- (void)onUserSeatUpdateWithSeat:(VLRoomSeatModel *)seat {
-    
-}
-
-- (void)onAddChooseSongWithSong:(VLRoomSelSongModel * _Nonnull)songInfo {
-    KTVLogInfo(@"onAddChooseSongWithSong songNo: %@, songName: %@, owner: %@, status: %ld", songInfo.songNo, songInfo.songName, songInfo.owner.userName, songInfo.status);
-    [self _checkInEarMonitoring];
-    
-    NSMutableArray* songArray = [NSMutableArray arrayWithArray:self.selSongsArray];
-    self.selSongsArray = [NSMutableArray arrayWithArray:songArray];
-}
-    
-
-//- (void)onRemoveChooseSongWithSong:(VLRoomSelSongModel * _Nonnull)songInfo {
-//    [self _checkInEarMonitoring];
-//    NSMutableArray* songArray = [NSMutableArray arrayWithArray:self.selSongsArray];
-//    BOOL success = [self removeSelSongWithSongNo:[songInfo.songNo integerValue] sync:NO];
-//    if (!success) {
-//        self.selSongsArray = songArray;
-//        KTVLogInfo(@"removeSelSongWithSongNo fail, reload it");
-//    }
-//    //清除合唱者总分
-//    self.coSingerDegree = 0;
-//    [LSTPopView removeAllPopView];
-//}
-
 
 - (void)onChosenSongListDidChangedWithSongs:(NSArray<VLRoomSelSongModel *> *)songs {
     [self _checkInEarMonitoring];
