@@ -86,6 +86,17 @@ PODS:
     - HXPhotoPicker/Picker/Lite
   - HXPhotoPicker/Picker/Lite (4.1.7):
     - HXPhotoPicker/Core
+  - InteractiveJoy (0.1.0):
+    - AgoraCommon
+    - AgoraRtcEngine_Special_iOS
+    - AgoraSyncManager
+    - RTMSyncManager
+    - SDWebImage
+    - SnapKit
+    - SVProgressHUD
+    - SwiftyBeaver
+    - YYCategories
+    - YYModel
   - Joy (0.1.0):
     - AgoraCommon
     - AgoraRtcEngine_Special_iOS
@@ -178,6 +189,7 @@ DEPENDENCIES:
   - Cantata (from `AgoraEntScenarios/Scenes/Cantata`)
   - fuLib (from `fu.podspec`)
   - HXPhotoPicker/Lite (= 4.1.7)
+  - InteractiveJoy (from `AgoraEntScenarios/Scenes/InteractiveJoy`)
   - Joy (from `AgoraEntScenarios/Scenes/Joy`)
   - JXCategoryView (= 1.6.1)
   - KakaJSON
@@ -255,6 +267,8 @@ EXTERNAL SOURCES:
     :path: AgoraEntScenarios/Scenes/Cantata
   fuLib:
     :path: fu.podspec
+  InteractiveJoy:
+    :path: AgoraEntScenarios/Scenes/InteractiveJoy
   Joy:
     :path: AgoraEntScenarios/Scenes/Joy
   Pure1v1:
@@ -289,6 +303,7 @@ SPEC CHECKSUMS:
   fuLib: 43b6990d34caa47e0f12a61db57fe9bd2372f584
   FURenderKit: 29a1273700cd6de35b66042468a8a4c4c015e25a
   HXPhotoPicker: 541da99aa88b8eb0b6222ddfe37cacbd06d73300
+  InteractiveJoy: 32645990d48bda587db313fe44a251ca1d9a2d58
   Joy: 20168a64bfbd0c6053382991957335eb2d452576
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
@@ -316,6 +331,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: cd55de32c0b4fdcf161f099009532a545ffe75f2
+PODFILE CHECKSUM: 17a1de3d37b567138acc5f49e5eca0913cdd90c8
 
 COCOAPODS: 1.15.2

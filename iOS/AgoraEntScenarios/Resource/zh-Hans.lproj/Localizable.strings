@@ -171,6 +171,7 @@
 "home_category_title_voiceChat" = "语聊房";
 "home_category_title_live" = "直播";
 "home_category_title_joy" = "弹幕玩法";
+"home_category_title_interactiveJoy" = "互动玩法";
 "home_content_item_ktv_title_solo" = "独唱&合唱";
 "home_content_item_ktv_desc_solo" = "超低延迟真合唱";
 "home_content_item_ktv_title_snatchsinging" = "抢唱";
@@ -192,6 +193,8 @@
 "home_content_item_live_desc_show_1v1_private" = "秒转场&秒接通";
 "home_content_item_live_title_joy" = "弹幕玩法";
 "home_content_item_live_desc_joy" = "直播互动新玩法";
+"home_content_item_live_title_interactive_joy" = "互动小游戏";
+"home_content_item_live_desc_interactive_joy" = "直播互动新玩法";
 
 "feedback_tags_flashback" = "闪退";
 "feedback_tags_audioStuck" = "音频卡顿";

@@ -28,6 +28,7 @@ enum HomeContentType: Int {
     case multiple
     case show_private_one_v_one
     case game
+    case interactive_game
     
     var sceneName: String {
         switch self {
@@ -42,6 +43,7 @@ enum HomeContentType: Int {
         case .multiple: return "Live_MultiPlayer"
         case .show_private_one_v_one: return "Live_Show1v1"
         case .game: return "Joy"
+        case .interactive_game: return "InteractiveJoy"
         }
     }
 }
@@ -149,6 +151,9 @@ struct HomeContentSesionModel {
         contentArray = [createContentModel(title: NSLocalizedString("home_content_item_live_title_joy", comment: ""),
                                            desc: NSLocalizedString("home_content_item_live_desc_joy", comment: ""),
                                            imageName: "scene-card", type: .game),
+                        createContentModel(title: NSLocalizedString("home_content_item_live_title_interactive_joy", comment: ""),
+                                                           desc: NSLocalizedString("home_content_item_live_desc_interactive_joy", comment: ""),
+                                                           imageName: "scene-card", type: .interactive_game)
         ]
         model.contentModels = contentArray
         dataArray.append(model)

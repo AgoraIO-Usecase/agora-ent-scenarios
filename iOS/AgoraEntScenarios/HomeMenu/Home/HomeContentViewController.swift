@@ -12,6 +12,8 @@ import ShowTo1v1;
 import AgoraCommon
 import Cantata
 import Joy
+import InteractiveJoy
+
 @objc
 class HomeContentViewController: UIViewController {
     @objc var changeToNavigationBarAlpha: ((CGFloat) -> Void)?
@@ -142,6 +144,13 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
             userInfo.userName = VLUserCenter.user.name
             userInfo.avatar = VLUserCenter.user.headUrl
             JoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: AppContext.shared.roomManagerUrl, appCertificate: KeyCenter.Certificate ?? "", userInfo: userInfo)
+            
+        case .interactive_game:
+            let userInfo = InteractiveJoyUserInfo()
+            userInfo.userId = UInt(VLUserCenter.user.id) ?? 0
+            userInfo.userName = VLUserCenter.user.name
+            userInfo.avatar = VLUserCenter.user.headUrl
+            InteractiveJoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: AppContext.shared.roomManagerUrl, appCertificate: KeyCenter.Certificate ?? "", userInfo: userInfo)
         }
     }
     

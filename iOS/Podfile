@@ -49,6 +49,7 @@ def all_pods
   pod 'Cantata', :path => 'AgoraEntScenarios/Scenes/Cantata'
   pod 'AgoraCommon', :path => 'AgoraEntScenarios'
   pod 'Joy', :path => 'AgoraEntScenarios/Scenes/Joy'
+  pod 'InteractiveJoy', :path => 'AgoraEntScenarios/Scenes/InteractiveJoy'
   pod 'SocketRocket', '0.7.0'
   pod 'Agora-Scene-Utils', '1.1.0'
   
