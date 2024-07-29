@@ -294,8 +294,8 @@ extension CloudBarrageAPI {
 
 extension CloudBarrageAPI {
     func getBannerList(completion:@escaping((NSError?, [CloudBannerInfo]?)->())) {
-//        let url = "https://service.agora.io/toolbox/v1/configs/game?key=carousel"
-        let url = "https://test-toolbox.bj2.agoralab.co/v1/configs/game?key=carousel"
+        let url = "\(AppContext.shared.baseServerUrl)/toolbox/v1/configs/game?key=carousel"
+//        let url = "https://test-toolbox.bj2.agoralab.co/v1/configs/game?key=carousel"
         let request = URLRequest(url: URL(string: "\(url)")!)
         httpRequest(request: request) { err, data in
             if let err = err {
