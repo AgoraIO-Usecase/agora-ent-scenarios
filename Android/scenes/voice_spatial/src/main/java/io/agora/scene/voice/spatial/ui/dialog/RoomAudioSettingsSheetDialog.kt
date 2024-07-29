@@ -9,19 +9,20 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.view.isVisible
 import io.agora.scene.voice.spatial.R
+import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogAudioSettingBinding
 import io.agora.scene.voice.spatial.model.RoomAudioSettingsBean
+import io.agora.scene.widget.doOnStopTrackingTouch
 import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.constant.ConfigConstants.DISABLE_ALPHA
 import io.agora.voice.common.constant.ConfigConstants.ENABLE_ALPHA
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
-import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ToastTools
-import io.agora.voice.common.utils.onStopTrackingTouch
 
 class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceSpatialDialogAudioSettingBinding>() {
 
     companion object {
+        private const val TAG = "RoomAudioSettingsSheetDialog"
         const val KEY_AUDIO_SETTINGS_INFO = "audio_settings"
     }
 
@@ -35,7 +36,10 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceSpatialD
 
     private var botTask: Runnable? = null
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceSpatialDialogAudioSettingBinding {
+    override fun getViewBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): VoiceSpatialDialogAudioSettingBinding {
         return VoiceSpatialDialogAudioSettingBinding.inflate(inflater, container, false)
     }
 
@@ -68,7 +72,7 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceSpatialD
             mtAgoraBotVolumeValue.text = audioSettingsInfo.botVolume.toString()
 
             mcbAgoraBot.setOnCheckedChangeListener { button, isChecked ->
-                "isChecked：$isChecked".logD("mcbAgoraBot")
+                VoiceSpatialLogger.d(TAG, "isChecked：$isChecked")
                 audioSettingsListener?.onBotCheckedChanged(button, isChecked)
                 mcbAgoraBot.isEnabled = false
                 mcbAgoraBot.alpha = DISABLE_ALPHA
@@ -82,7 +86,7 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceSpatialD
             mtSpatialAudioArrow.setOnClickListener {
                 audioSettingsListener?.onSpatialAudio(audioSettingsInfo.spatialOpen, audioSettingsInfo.enable)
             }
-            pbAgoraBotVolume.onStopTrackingTouch {
+            pbAgoraBotVolume.doOnStopTrackingTouch {
                 it?.progress?.let { progress ->
                     mtAgoraBotVolumeValue.text = progress.toString()
                     audioSettingsListener?.onBotVolumeChange(progress)

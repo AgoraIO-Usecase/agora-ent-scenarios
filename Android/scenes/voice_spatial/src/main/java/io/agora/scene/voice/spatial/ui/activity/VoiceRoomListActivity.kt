@@ -14,6 +14,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
+import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.voice.spatial.BuildConfig
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialAgoraRoomListLayoutBinding
@@ -21,13 +22,12 @@ import io.agora.scene.voice.spatial.global.VoiceConfigManager
 import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
 import io.agora.scene.voice.spatial.ui.dialog.CreateRoomDialog
 import io.agora.scene.voice.spatial.ui.fragment.VoiceRoomListFragment
-import io.agora.voice.common.ui.BaseUiActivity
+import io.agora.scene.widget.utils.UiUtils
 import io.agora.voice.common.utils.DeviceTools
-import io.agora.voice.common.utils.FastClickTools
 import io.agora.voice.common.utils.ResourcesTools
 import io.agora.voice.common.utils.StatusBarCompat
 
-class VoiceRoomListActivity : BaseUiActivity<VoiceSpatialAgoraRoomListLayoutBinding>(){
+class VoiceRoomListActivity : BaseViewBindingActivity<VoiceSpatialAgoraRoomListLayoutBinding>(){
 
     private var title: TextView? = null
     private var index = 0
@@ -63,12 +63,12 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceSpatialAgoraRoomListLayoutBind
         initListener()
     }
 
-    private fun initListener() {
+    override fun initListener() {
         binding.titleBar.setOnBackPressListener{
             finish()
         }
         binding.btnCreateRoom.setOnClickListener {
-            if (FastClickTools.isFastClick(it)) return@setOnClickListener
+            if (UiUtils.isFastClick()) return@setOnClickListener
             CreateRoomDialog(this).show(supportFragmentManager, "CreateRoomDialog")
         }
         binding.agoraTabLayout.addOnTabSelectedListener(object : OnTabSelectedListener {

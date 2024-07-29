@@ -7,11 +7,11 @@ import android.text.TextUtils
 import android.util.Base64
 import android.util.Log
 import androidx.annotation.Nullable
+import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.VoiceRankUserModel
 import io.agora.voice.common.utils.GsonTools
-import io.agora.voice.common.utils.LogTools.logD
 import java.io.*
 
 class ChatroomCacheManager {
@@ -59,14 +59,14 @@ class ChatroomCacheManager {
      */
     fun updateGiftAmountCache(amount:Int){
         giftAmount += amount
-        "updateGiftAmountCache(${giftAmount}) ".logD(TAG)
+        VoiceLogger.d(TAG,"updateGiftAmountCache(${giftAmount}) ")
     }
 
     /**
      * 获取房间礼物总金额
      */
     fun getGiftAmountCache():Int{
-        "getGiftAmountCache(${giftAmount}) ".logD(TAG)
+        VoiceLogger.d(TAG, "getGiftAmountCache(${giftAmount}) ")
         return giftAmount
     }
 
@@ -220,7 +220,7 @@ class ChatroomCacheManager {
      * 根据chatUid 获取对应实体类
      */
     fun getMember(chatUid: String): VoiceMemberModel?{
-        "roomMemberMap(${roomMemberMap}) getMember: $chatUid ".logD(TAG)
+        VoiceLogger.d(TAG,"roomMemberMap(${roomMemberMap}) getMember: $chatUid ")
         return roomMemberMap[chatUid]
     }
 
@@ -241,14 +241,14 @@ class ChatroomCacheManager {
         for (entry in getMicInfoMap()?.entries!!) {
             val micInfo = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)
             micInfo?.member?.chatUid.let {
-                "invitationMap remove(${it})".logD(TAG)
+                VoiceLogger.d(TAG, "invitationMap remove(${it})")
                 invitationMap.remove(it)
             }
         }
         for (entry in invitationMap.entries) {
             invitationList.add(entry.value)
         }
-        "invitationList(${invitationList})".logD(TAG)
+        VoiceLogger.d(TAG,"invitationList(${invitationList})")
         return invitationList
     }
 
@@ -306,7 +306,7 @@ class ChatroomCacheManager {
             o2.amount.compareTo(o1.amount)
         }
         rankingList.sortWith(comparator)
-        "getRankList (${rankingList})".logD(TAG)
+        VoiceLogger.d(TAG,"getRankList (${rankingList})")
         return rankingList
     }
 

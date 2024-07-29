@@ -1,10 +1,10 @@
 package io.agora.scene.voice.spatial.ui.adapter.viewholder
 
+import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialItemRoomAudienceListBinding
 import io.agora.scene.voice.spatial.model.VoiceMemberModel
 import io.agora.scene.voice.spatial.model.annotation.MicClickAction
-import io.agora.voice.common.ui.adapter.BaseRecyclerViewAdapter
 import io.agora.voice.common.utils.ImageTools
 import io.agora.voice.common.utils.ResourcesTools
 

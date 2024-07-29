@@ -17,13 +17,13 @@ import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.textview.MaterialTextView
 import io.agora.scene.voice.spatial.R
+import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialRoomHandLayoutBinding
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 import io.agora.scene.voice.spatial.ui.fragment.ChatroomInviteHandsFragment
 import io.agora.scene.voice.spatial.ui.fragment.ChatroomRaisedHandsFragment
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
 import io.agora.voice.common.utils.DeviceTools
-import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ResourcesTools
 
 class ChatroomHandsDialog constructor(): BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>() {
@@ -72,7 +72,7 @@ class ChatroomHandsDialog constructor(): BaseSheetDialog<VoiceSpatialRoomHandLay
         binding?.tabLayout?.addOnTabSelectedListener(object : OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 tab.customView?.let {
-                    "onTabSelected：$mCount".logD(TAG)
+                    VoiceSpatialLogger.d(TAG,"onTabSelected：$mCount")
                     index = tab.position
                     title = it.findViewById(R.id.mtTabText)
                     val tag_line = it.findViewById<ShapeableImageView>(R.id.tab_bg)
@@ -99,7 +99,7 @@ class ChatroomHandsDialog constructor(): BaseSheetDialog<VoiceSpatialRoomHandLay
 
             override fun onTabUnselected(tab: TabLayout.Tab) {
                 if (tab.customView != null) {
-                    "onTabUnselected：$mCount".logD(TAG)
+                    VoiceSpatialLogger.d(TAG,"onTabUnselected：$mCount")
                     val title = tab.customView?.findViewById<MaterialTextView>(R.id.mtTabText)
                     val tag_line = tab.customView?.findViewById<ShapeableImageView>(R.id.tab_bg)
                     title?.apply {
@@ -113,7 +113,7 @@ class ChatroomHandsDialog constructor(): BaseSheetDialog<VoiceSpatialRoomHandLay
             }
 
             override fun onTabReselected(tab: TabLayout.Tab) {
-                "onTabReselected：".logD(TAG)
+                VoiceSpatialLogger.d(TAG,"onTabReselected：")
                 title = tab.customView?.findViewById(R.id.mtTabText)
                 val tagLine = tab.customView?.findViewById<ShapeableImageView>(R.id.tab_bg)
                 title?.apply {
@@ -143,7 +143,7 @@ class ChatroomHandsDialog constructor(): BaseSheetDialog<VoiceSpatialRoomHandLay
                                     R.string.voice_spatial_room_tab_layout_count,
                                     mCount.toString()
                                 )
-                                "getItemCount content1: $content".logD(TAG)
+                                VoiceSpatialLogger.d(TAG,"getItemCount content1: $content")
                                 title?.text = content
                             }
                         }
@@ -157,7 +157,7 @@ class ChatroomHandsDialog constructor(): BaseSheetDialog<VoiceSpatialRoomHandLay
                                         R.string.voice_spatial_room_tab_layout_count,
                                         mCount.toString()
                                     )
-                                    "getItemCount content1: $content".logD(TAG)
+                                    VoiceSpatialLogger.d(TAG,"getItemCount content1: $content")
                                     title?.text = content
                                 }
                             }
@@ -175,7 +175,7 @@ class ChatroomHandsDialog constructor(): BaseSheetDialog<VoiceSpatialRoomHandLay
                                     R.string.voice_spatial_room_tab_layout_count,
                                     mCount.toString()
                                 )
-                                "getItemCount content2: $content".logD(TAG)
+                                VoiceSpatialLogger.d(TAG, "getItemCount content2: $content")
                                 title?.text = content
                             }
                         }

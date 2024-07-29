@@ -10,7 +10,9 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.voice.spatial.R
+import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialFragmentHandsListLayoutBinding
 import io.agora.scene.voice.spatial.model.VoiceMemberModel
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
@@ -19,14 +21,13 @@ import io.agora.scene.voice.spatial.ui.dialog.ChatroomHandsDialog
 import io.agora.scene.voice.spatial.viewmodel.VoiceUserListViewModel
 import io.agora.voice.common.net.OnResourceParseCallback
 import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.BaseUiFragment
+import io.agora.voice.common.ui.IParserSource
 import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter
-import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
 
-class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsListLayoutBinding>(),
-    ChatroomRaisedAdapter.onActionListener {
+class ChatroomRaisedHandsFragment : BaseViewBindingFragment<VoiceSpatialFragmentHandsListLayoutBinding>(),
+    ChatroomRaisedAdapter.onActionListener, IParserSource {
     private lateinit var userListViewModel: VoiceUserListViewModel
     private var baseAdapter: RoomBaseRecyclerViewAdapter<VoiceMemberModel>? = null
     private var adapter: ChatroomRaisedAdapter? = null
@@ -36,7 +37,7 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
     private var isRefreshing = false
     private var isLoadingNextPage = false
     private var emptyView: View? = null
-    private var currentIndex:Int = 0
+    private var currentIndex: Int = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         emptyView = layoutInflater.inflate(R.layout.voice_spatial_no_data_layout, container, false)
@@ -49,7 +50,10 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceSpatialFragmentHandsListLayoutBinding? {
+    override fun getViewBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): VoiceSpatialFragmentHandsListLayoutBinding? {
         return VoiceSpatialFragmentHandsListLayoutBinding.inflate(inflater)
     }
 
@@ -61,7 +65,7 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
         initViewModel()
     }
 
-    private fun initView() {
+    override fun initView() {
         baseAdapter =
             ChatroomRaisedAdapter()
         adapter = baseAdapter as ChatroomRaisedAdapter
@@ -90,8 +94,8 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
                 parseResource(response, object : OnResourceParseCallback<List<VoiceMemberModel>>() {
                     override fun onSuccess(data: List<VoiceMemberModel>?) {
                         finishRefresh()
-                        val total = data?.size?:0
-                        adapter?.data = data?: mutableListOf()
+                        val total = data?.size ?: 0
+                        adapter?.data = data ?: mutableListOf()
                         onFragmentListener?.getItemCount(total)
                         isRefreshing = false
                         adapter?.data?.let {
@@ -117,7 +121,7 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
             .observe(requireActivity()) { response: Resource<VoiceMicInfoModel> ->
                 parseResource(response, object : OnResourceParseCallback<VoiceMicInfoModel>() {
                     override fun onSuccess(data: VoiceMicInfoModel?) {
-                        "accept mic seat apply：${data?.micIndex}".logD()
+                        VoiceSpatialLogger.d(TAG, "accept mic seat apply：${data?.micIndex}")
                         data?.let {
                             it.member?.userId?.let {
                                 adapter?.notifyItemRemoved(currentIndex)
@@ -129,14 +133,14 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
                     override fun onError(code: Int, message: String?) {
                         super.onError(code, message)
                         activity?.let {
-                            ToastTools.show(it,getString(R.string.voice_spatial_room_agree_fail))
+                            ToastTools.show(it, getString(R.string.voice_spatial_room_agree_fail))
                         }
                     }
                 })
             }
     }
 
-    private fun initListener() {
+    override fun initListener() {
         adapter?.setOnActionListener(this)
         binding?.swipeLayout?.setOnRefreshListener { reset() }
         binding?.list?.addOnScrollListener(object : RecyclerView.OnScrollListener() {

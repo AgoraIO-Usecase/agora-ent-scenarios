@@ -12,7 +12,7 @@ import android.os.Bundle;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.agora.voice.common.utils.LogTools;
+import io.agora.scene.voice.spatial.VoiceSpatialLogger;
 
 /**
  * 专门用于维护声明周期
@@ -24,18 +24,18 @@ public class UserActivityLifecycleCallbacks implements Application.ActivityLifec
 
     @Override
     public void onActivityCreated(Activity activity, Bundle bundle) {
-        LogTools.d("ActivityLifecycle", "onActivityCreated "+activity.getLocalClassName());
+        VoiceSpatialLogger.d("ActivityLifecycle", "onActivityCreated "+activity.getLocalClassName());
         activityList.add(0, activity);
     }
 
     @Override
     public void onActivityStarted(Activity activity) {
-        LogTools.d("ActivityLifecycle", "onActivityStarted "+activity.getLocalClassName());
+        VoiceSpatialLogger.d("ActivityLifecycle", "onActivityStarted "+activity.getLocalClassName());
     }
 
     @Override
     public void onActivityResumed(Activity activity) {
-        LogTools.d("ActivityLifecycle", "onActivityResumed activity's taskId = "+activity.getTaskId() + " name: "+activity.getLocalClassName());
+        VoiceSpatialLogger.d("ActivityLifecycle", "onActivityResumed activity's taskId = "+activity.getTaskId() + " name: "+activity.getLocalClassName());
         if (!resumeActivity.contains(activity)) {
             resumeActivity.add(activity);
             if(resumeActivity.size() == 1) {
@@ -46,23 +46,23 @@ public class UserActivityLifecycleCallbacks implements Application.ActivityLifec
 
     @Override
     public void onActivityPaused(Activity activity) {
-        LogTools.d("ActivityLifecycle", "onActivityPaused "+activity.getLocalClassName());
+        VoiceSpatialLogger.d("ActivityLifecycle", "onActivityPaused "+activity.getLocalClassName());
     }
 
     @Override
     public void onActivityStopped(Activity activity) {
-        LogTools.d("ActivityLifecycle", "onActivityStopped "+activity.getLocalClassName());
+        VoiceSpatialLogger.d("ActivityLifecycle", "onActivityStopped "+activity.getLocalClassName());
         resumeActivity.remove(activity);
     }
 
     @Override
     public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
-        LogTools.d("ActivityLifecycle", "onActivitySaveInstanceState "+activity.getLocalClassName());
+        VoiceSpatialLogger.d("ActivityLifecycle", "onActivitySaveInstanceState "+activity.getLocalClassName());
     }
 
     @Override
     public void onActivityDestroyed(Activity activity) {
-        LogTools.d("ActivityLifecycle", "onActivityDestroyed "+activity.getLocalClassName());
+        VoiceSpatialLogger.d("ActivityLifecycle", "onActivityDestroyed "+activity.getLocalClassName());
         activityList.remove(activity);
     }
 
@@ -148,7 +148,7 @@ public class UserActivityLifecycleCallbacks implements Application.ActivityLifec
                         taskId = taskInfo.id;
                     }
                     //将任务栈置于前台
-                    LogTools.d("ActivityLifecycle", "执行moveTaskToFront，current activity:"+activity.getClass().getName());
+                    VoiceSpatialLogger.d("ActivityLifecycle", "执行moveTaskToFront，current activity:"+activity.getClass().getName());
                     manager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME);
                 }
             }
@@ -156,7 +156,7 @@ public class UserActivityLifecycleCallbacks implements Application.ActivityLifec
     }
 
     private void makeTaskToFront(Activity activity) {
-        LogTools.d("ActivityLifecycle", "makeTaskToFront activity: "+activity.getLocalClassName());
+        VoiceSpatialLogger.d("ActivityLifecycle", "makeTaskToFront activity: "+activity.getLocalClassName());
         ActivityManager manager = (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
         manager.moveTaskToFront(activity.getTaskId(), ActivityManager.MOVE_TASK_WITH_HOME);
     }

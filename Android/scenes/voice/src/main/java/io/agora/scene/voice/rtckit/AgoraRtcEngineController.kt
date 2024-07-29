@@ -8,6 +8,7 @@ import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.*
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.model.SoundAudioBean
 import io.agora.scene.voice.rtckit.listener.MediaPlayerObserver
@@ -15,8 +16,6 @@ import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
 import io.agora.scene.voice.ui.debugSettings.VoiceDebugSettingModel
 import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.net.callback.VRValueCallBack
-import io.agora.voice.common.utils.LogTools.logD
-import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.ThreadManager
 
 /**
@@ -119,12 +118,12 @@ class AgoraRtcEngineController {
 
                 override fun onError(err: Int) {
                     super.onError(err)
-                    "voice rtc onError code:$err".logE(TAG)
+                    VoiceLogger.e(TAG, "voice rtc onError code:$err")
                 }
 
                 override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
                     super.onJoinChannelSuccess(channel, uid, elapsed)
-                    "voice rtc onJoinChannelSuccess channel:$channel,uid:$uid".logD(TAG)
+                    VoiceLogger.d(TAG, "voice rtc onJoinChannelSuccess channel:$channel,uid:$uid")
                     rtcEngine?.setEnableSpeakerphone(true)
                     // 默认开启降噪
                     ThreadManager.getInstance().runOnMainThread {
@@ -177,7 +176,7 @@ class AgoraRtcEngineController {
                 rtcEngine?.setParameters("{\"che.audio.input_sample_rate\" : 48000}")
             } catch (e: Exception) {
                 e.printStackTrace()
-                "voice rtc engine init error:${e.message}".logE(TAG)
+                VoiceLogger.d(TAG, "voice rtc engine init error:${e.message}")
                 return false
             }
             setInitNoiseParameters()
@@ -198,7 +197,7 @@ class AgoraRtcEngineController {
     }
 
     private fun checkJoinChannel(channelId: String, rtcUid: Int, soundEffect: Int, isBroadcaster: Boolean): Boolean {
-        "joinChannel $channelId,${VoiceBuddyFactory.get().getVoiceBuddy().rtcToken()}:$rtcUid".logD(TAG)
+        VoiceLogger.d(TAG, "joinChannel $channelId,${VoiceBuddyFactory.get().getVoiceBuddy().rtcToken()}:$rtcUid")
         if (channelId.isEmpty() || rtcUid < 0) {
             joinCallback?.onError(Constants.ERR_FAILED, "roomId or rtcUid illegal!")
             return false
@@ -504,30 +503,31 @@ class AgoraRtcEngineController {
         }
     }
 
-    fun updateAedEnable(){
+    fun updateAedEnable() {
         rtcEngine?.apply {
             setParameters("{\"che.audio.aed.enable\":${VoiceDebugSettingModel.aedEnable}}")
         }
     }
 
-    fun updateNsngMusicProbThr(){
+    fun updateNsngMusicProbThr() {
         rtcEngine?.apply {
             setParameters("{\"che.audio.sf.nsngMusicProbThr\":${VoiceDebugSettingModel.nsngMusicProbThr}}")
         }
     }
 
-    fun updateAinsMusicModeBackoffDB(){
+    fun updateAinsMusicModeBackoffDB() {
         rtcEngine?.apply {
             setParameters("{\"che.audio.sf.ainsMusicModeBackoffDB\":${VoiceDebugSettingModel.ainsMusicModeBackoffDB}}")
         }
     }
-    fun updateStatNsMusicModeBackoffDB(){
+
+    fun updateStatNsMusicModeBackoffDB() {
         rtcEngine?.apply {
             setParameters("{\"che.audio.sf.statNsMusicModeBackoffDB\":${VoiceDebugSettingModel.statNsMusicModeBackoffDB}}")
         }
     }
 
-    fun updateAinsSpeechProtectThreshold(){
+    fun updateAinsSpeechProtectThreshold() {
         rtcEngine?.apply {
             setParameters("{\"che.audio.sf.ainsSpeechProtectThreshold\":${VoiceDebugSettingModel.ainsSpeechProtectThreshold}}")
         }
@@ -613,7 +613,7 @@ class AgoraRtcEngineController {
      * @param speakerType 模拟哪个机器人
      */
     fun playMusic(soundId: Int, audioUrl: String, speakerType: Int) {
-        "playMusic soundId:$soundId".logD(TAG)
+        VoiceLogger.d(TAG, "playMusic soundId:$soundId")
         resetMediaPlayer()
         openMediaPlayer(audioUrl, speakerType)
     }
@@ -667,7 +667,7 @@ class AgoraRtcEngineController {
 
     private val firstMediaPlayerObserver = object : MediaPlayerObserver() {
         override fun onPlayerStateChanged(state: MediaPlayerState?, error: MediaPlayerReason?) {
-            "firstMediaPlayerObserver onPlayerStateChanged state:$state error:$error".logD(TAG)
+            VoiceLogger.d(TAG, "firstMediaPlayerObserver onPlayerStateChanged state:$state error:$error")
 
             when (state) {
                 MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {

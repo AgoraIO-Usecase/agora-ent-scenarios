@@ -1,10 +1,10 @@
 package io.agora.scene.voice.spatial.ui.adapter
 
+import io.agora.scene.base.component.BaseRecyclerViewAdapter
+import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialItemRoomMicManagerBinding
 import io.agora.scene.voice.spatial.model.MicManagerBean
 import io.agora.scene.voice.spatial.ui.adapter.viewholder.RoomMicManagerViewHolder
-import io.agora.voice.common.ui.adapter.BaseRecyclerViewAdapter
-import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.utils.DeviceTools
 
 class RoomMicManagerAdapter constructor(

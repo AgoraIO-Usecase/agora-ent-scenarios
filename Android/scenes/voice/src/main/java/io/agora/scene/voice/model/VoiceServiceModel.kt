@@ -3,12 +3,21 @@ package io.agora.scene.voice.model
 import com.google.gson.annotations.SerializedName
 import io.agora.voice.common.constant.ConfigConstants
 
+object VoiceParameters {
+    const val ROOM_USER_COUNT = "roomPeopleNum"
+    const val PASSWORD = "roomPassword"
+    const val IS_PRIVATE = "is_private"
+    const val CHANNEL_ID = "channel_id"
+    const val CHATROOM_ID = "chatroom_id"
+    const val RTC_UID = "rtc_uid"
+    const val TYPE = "type"
+}
+
 /**
  *创建房间数据
  */
 data class VoiceCreateRoomModel constructor(
     val roomName: String,
-    val isPrivate: Boolean,
     val password: String,
     val soundEffect: Int = 0,
     val roomType: Int = 0,

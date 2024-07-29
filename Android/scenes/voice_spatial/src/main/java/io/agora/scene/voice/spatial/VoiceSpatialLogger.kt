@@ -1,28 +1,18 @@
-package io.agora.voice.common.utils
+package io.agora.scene.voice.spatial
 
 import io.agora.scene.base.EntLogger
 
-object LogTools {
-    private val entLogger = EntLogger(EntLogger.Config("Voice_spatial"))
-
-     @JvmStatic
-    fun String.logD(tag: String = "Agora_VoiceChat") {
-         entLogger.d(tag, this)
-    }
-
-    @JvmStatic
-    fun String.logE(tag: String = "Agora_VoiceChat") {
-        entLogger.e(tag, this)
-    }
-
-    @JvmStatic
-    fun String.logI(tag: String = "Agora_VoiceChat") {
-        entLogger.i(tag, this)
-    }
+object VoiceSpatialLogger {
+    private val entLogger = EntLogger(EntLogger.Config("Voice_Spatial"))
 
     @JvmStatic
     fun d(tag: String, message: String) {
         entLogger.d(tag, message)
+    }
+
+    @JvmStatic
+    fun w(tag: String, message: String, vararg args: Any) {
+        entLogger.w(tag, message, args)
     }
 
     @JvmStatic

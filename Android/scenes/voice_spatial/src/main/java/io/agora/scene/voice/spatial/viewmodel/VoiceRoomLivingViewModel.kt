@@ -3,6 +3,7 @@ package io.agora.scene.voice.spatial.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.*
 import io.agora.scene.voice.spatial.rtckit.AgoraRtcEngineController
@@ -10,8 +11,6 @@ import io.agora.scene.voice.spatial.viewmodel.repositories.VoiceRoomLivingReposi
 import io.agora.voice.common.net.Resource
 import io.agora.voice.common.net.callback.ResultCallBack
 import io.agora.voice.common.net.callback.VRValueCallBack
-import io.agora.voice.common.utils.LogTools.logD
-import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.viewmodel.NetworkOnlyResource
 import io.agora.voice.common.viewmodel.SingleSourceLiveData
@@ -23,13 +22,17 @@ import io.agora.voice.common.viewmodel.SingleSourceLiveData
  */
 class VoiceRoomLivingViewModel : ViewModel() {
 
+    companion object {
+        private val TAG = VoiceRoomLivingViewModel::class.java.simpleName
+    }
+
     private val mRepository by lazy { VoiceRoomLivingRepository() }
 
     private val _roomDetailsObservable: SingleSourceLiveData<Resource<VoiceRoomInfo>> =
         SingleSourceLiveData()
     private val _joinObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()
-    private val _roomNoticeObservable: SingleSourceLiveData<Resource<Pair<String,Boolean>>> =
+    private val _roomNoticeObservable: SingleSourceLiveData<Resource<Pair<String, Boolean>>> =
         SingleSourceLiveData()
 
     private val _openBotObservable: SingleSourceLiveData<Resource<Boolean>> =
@@ -91,7 +94,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
     fun joinObservable(): LiveData<Resource<Boolean>> = _joinObservable
 
     /**更新公告*/
-    fun roomNoticeObservable(): LiveData<Resource<Pair<String,Boolean>>> = _roomNoticeObservable
+    fun roomNoticeObservable(): LiveData<Resource<Pair<String, Boolean>>> = _roomNoticeObservable
 
     /**打开机器人*/
     fun openBotObservable(): LiveData<Resource<Boolean>> = _openBotObservable
@@ -160,7 +163,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
     fun leaveSyncRoomObservable(): LiveData<Resource<Boolean>> = _leaveSyncRoomObservable
 
     /**更新成员列表*/
-    fun updateRoomMemberObservable():LiveData<Resource<Boolean>> = _updateRoomMemberObservable
+    fun updateRoomMemberObservable(): LiveData<Resource<Boolean>> = _updateRoomMemberObservable
 
     /**获取详情*/
     fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel) {
@@ -175,7 +178,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
             roomKitBean.soundEffect, roomKitBean.isOwner,
             object : VRValueCallBack<Boolean> {
                 override fun onSuccess(value: Boolean) {
-                    "rtc  joinChannel onSuccess channelId:${roomKitBean.channelId}".logD()
+                    VoiceSpatialLogger.d(TAG, "rtc  joinChannel onSuccess channelId:${roomKitBean.channelId}")
                     ThreadManager.getInstance().runOnMainThread {
                         _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
                             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
@@ -186,7 +189,10 @@ class VoiceRoomLivingViewModel : ViewModel() {
                 }
 
                 override fun onError(error: Int, errorMsg: String) {
-                    "rtc  joinChannel onError channelId:${roomKitBean.channelId},error:$error  $errorMsg".logE()
+                    VoiceSpatialLogger.e(
+                        TAG,
+                        "rtc  joinChannel onError channelId:${roomKitBean.channelId}, error:$error  $errorMsg"
+                    )
                     ThreadManager.getInstance().runOnMainThread {
                         _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
                             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {

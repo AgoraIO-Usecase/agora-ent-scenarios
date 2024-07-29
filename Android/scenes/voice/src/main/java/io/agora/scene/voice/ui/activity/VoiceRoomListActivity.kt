@@ -16,6 +16,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.base.PagePathConstant
+import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.voice.BuildConfig
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceAgoraRoomListLayoutBinding
@@ -23,17 +24,16 @@ import io.agora.scene.voice.global.VoiceConfigManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.dialog.CreateRoomDialog
 import io.agora.scene.voice.ui.fragment.VoiceRoomListFragment
-import io.agora.voice.common.ui.BaseUiActivity
+import io.agora.scene.widget.utils.UiUtils
 import io.agora.voice.common.utils.*
 
 @Route(path = PagePathConstant.pageVoiceChat)
-class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
+class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBinding>(){
 
     private var title: TextView? = null
     private var index = 0
     private val titles = intArrayOf(R.string.voice_tab_layout_all)
 
-    private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
     override fun getViewBinding(inflater: LayoutInflater): VoiceAgoraRoomListLayoutBinding? {
         return VoiceAgoraRoomListLayoutBinding.inflate(inflater)
     }
@@ -45,7 +45,6 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
         }else{
             // library 初始化
             ResourcesTools.isZh(this)
-            voiceServiceProtocol.reset()
             VoiceConfigManager.initMain()
         }
     }
@@ -68,12 +67,12 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
         initListener()
     }
 
-    private fun initListener() {
+    override fun initListener() {
         binding.titleBar.setOnBackPressListener{
             finish()
         }
         binding.btnCreateRoom.setOnClickListener {
-            if (FastClickTools.isFastClick(it)) return@setOnClickListener
+            if (UiUtils.isFastClick()) return@setOnClickListener
             CreateRoomDialog(this).show(supportFragmentManager, "CreateRoomDialog")
         }
         binding.agoraTabLayout.addOnTabSelectedListener(object : OnTabSelectedListener {
@@ -157,7 +156,6 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
     }
 
     override fun finish() {
-        voiceServiceProtocol.reset()
         super.finish()
     }
 

@@ -10,25 +10,28 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.google.android.material.divider.MaterialDividerItemDecoration
+import io.agora.scene.base.component.BaseRecyclerViewAdapter
+import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.voice.model.RoomKitBean
 import io.agora.scene.voice.ui.adapter.viewholder.RoomContributionRankingViewHolder
-import io.agora.voice.common.ui.BaseUiFragment
-import io.agora.voice.common.ui.adapter.BaseRecyclerViewAdapter
 import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.DeviceTools.dp
 import io.agora.voice.common.utils.ResourcesTools
 import io.agora.scene.voice.R
+import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.databinding.VoiceFragmentContributionRankingBinding
 import io.agora.scene.voice.databinding.VoiceItemContributionRankingBinding
 import io.agora.scene.voice.viewmodel.VoiceUserListViewModel
 import io.agora.scene.voice.model.VoiceRankUserModel
 import io.agora.voice.common.net.Resource
+import io.agora.voice.common.ui.IParserSource
 
-class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContributionRankingBinding>(),
-    OnRefreshListener {
+class RoomContributionRankingFragment : BaseViewBindingFragment<VoiceFragmentContributionRankingBinding>(),
+    OnRefreshListener, IParserSource {
 
     companion object {
+        private const val TAG = "RoomContributionRankingFragment"
+
         private const val KEY_ROOM_INFO = "room_info"
 
         fun getInstance(roomKitBean: RoomKitBean): RoomContributionRankingFragment {
@@ -71,9 +74,9 @@ class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContribution
                     override fun onSuccess(data: List<VoiceRankUserModel>?) {
                         binding?.slContributionRanking?.isRefreshing = false
                         val total = data?.size ?: 0
-                        "getGifts total：$total".logD()
+                        VoiceLogger.d(TAG, "getGifts total：$total")
                         checkEmpty(total)
-                        contributionAdapter?.submitListAndPurge(data ?: mutableListOf())
+                        contributionAdapter?.replaceItems(data ?: mutableListOf())
                     }
 
                     override fun onError(code: Int, message: String?) {

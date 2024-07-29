@@ -12,7 +12,6 @@ import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 import io.agora.scene.voice.spatial.model.annotation.MicStatus
 import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.utils.ImageTools
-import io.agora.voice.common.utils.ResourcesTools
 
 /**
  * @author create by zhangwei03
@@ -45,7 +44,7 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
             if (micInfo.micStatus == MicStatus.BotActivated || micInfo.micStatus == MicStatus.BotInactive) { // 机器人
 
                 ivMicInfo.setBackgroundResource(R.drawable.voice_bg_oval_white)
-                val botDrawable = ResourcesTools.getDrawableId(context, micInfo.member?.portrait ?: "")
+                val botDrawable =  context.resources.getIdentifier(micInfo.member?.portrait ?: "", "drawable", context.packageName)
                 ImageTools.loadImage(ivMicInfo, botDrawable)
                 mtMicUsername.text = micInfo.member?.nickName ?: ""
                 mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(

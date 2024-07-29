@@ -1,6 +1,7 @@
 package io.agora.scene.voice.spatial.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +10,9 @@ import android.widget.TextView
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.voice.spatial.R
+import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialFragmentHandsListLayoutBinding
 import io.agora.scene.voice.spatial.model.VoiceMemberModel
 import io.agora.scene.voice.spatial.service.VoiceRoomSubscribeDelegate
@@ -19,14 +22,15 @@ import io.agora.scene.voice.spatial.ui.dialog.ChatroomHandsDialog
 import io.agora.scene.voice.spatial.viewmodel.VoiceUserListViewModel
 import io.agora.voice.common.net.OnResourceParseCallback
 import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.BaseUiFragment
+import io.agora.voice.common.ui.IParserSource
 import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter
-import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
 
-class ChatroomInviteHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsListLayoutBinding>(),
-    ChatroomInviteAdapter.onActionListener {
+class ChatroomInviteHandsFragment : BaseViewBindingFragment<VoiceSpatialFragmentHandsListLayoutBinding>(),
+    ChatroomInviteAdapter.onActionListener, IParserSource {
+    private val TAG = ChatroomInviteHandsFragment::class.java.simpleName
+
     private lateinit var userListViewModel: VoiceUserListViewModel
     private val dataList: MutableList<VoiceMemberModel> = ArrayList()
     private var baseAdapter: RoomBaseRecyclerViewAdapter<VoiceMemberModel>? = null
@@ -50,7 +54,10 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceSpatialFragmentHandsListLayoutBinding {
+    override fun getViewBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): VoiceSpatialFragmentHandsListLayoutBinding {
         return VoiceSpatialFragmentHandsListLayoutBinding.inflate(inflater)
     }
 
@@ -62,7 +69,7 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
         initListener()
     }
 
-    private fun initView() {
+    override fun initView() {
         baseAdapter = ChatroomInviteAdapter()
         adapter = baseAdapter as ChatroomInviteAdapter
         binding.let {
@@ -85,33 +92,34 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
 
     private fun initViewModel() {
         userListViewModel = ViewModelProvider(this)[VoiceUserListViewModel::class.java]
-        userListViewModel.inviteListObservable().observe(requireActivity()){ response: Resource<List<VoiceMemberModel>> ->
-            parseResource(response, object : OnResourceParseCallback<List<VoiceMemberModel>>() {
-                override fun onSuccess(data: List<VoiceMemberModel>?) {
-                    finishRefresh()
-                    adapter?.data = data?.filter { it.micIndex == -1 }
-                    onFragmentListener?.getItemCount(adapter?.data?.size ?: 0)
-                    isRefreshing = false
-                    adapter?.data?.let {
-                        for (datum in it) {
-                            if (map.containsKey(datum.userId)) {
-                                adapter?.setInvited(map)
+        userListViewModel.inviteListObservable()
+            .observe(requireActivity()) { response: Resource<List<VoiceMemberModel>> ->
+                parseResource(response, object : OnResourceParseCallback<List<VoiceMemberModel>>() {
+                    override fun onSuccess(data: List<VoiceMemberModel>?) {
+                        finishRefresh()
+                        adapter?.data = data?.filter { it.micIndex == -1 }
+                        onFragmentListener?.getItemCount(adapter?.data?.size ?: 0)
+                        isRefreshing = false
+                        adapter?.data?.let {
+                            for (datum in it) {
+                                if (map.containsKey(datum.userId)) {
+                                    adapter?.setInvited(map)
+                                }
                             }
                         }
                     }
-                }
 
-                override fun onError(code: Int, message: String?) {
-                    super.onError(code, message)
-                    finishRefresh()
-                }
-            })
-        }
+                    override fun onError(code: Int, message: String?) {
+                        super.onError(code, message)
+                        finishRefresh()
+                    }
+                })
+            }
         // 邀请上麦
         userListViewModel.startMicSeatInvitationObservable().observe(requireActivity()) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
-                    "invitation mic：$data".logD()
+                    VoiceSpatialLogger.d(TAG, "invitation mic：$data")
                     if (data != true) return
                     activity?.let {
                         ToastTools.show(it, getString(R.string.voice_spatial_room_invited))
@@ -129,10 +137,10 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
 
     }
 
-    private fun initListener() {
+    override fun initListener() {
         adapter?.setOnActionListener(this)
         binding?.swipeLayout?.setOnRefreshListener { reset() }
-        voiceServiceProtocol.subscribeEvent(object : VoiceRoomSubscribeDelegate{
+        voiceServiceProtocol.subscribeEvent(object : VoiceRoomSubscribeDelegate {
             override fun onReceiveSeatInvitationRejected(chatUid: String) {
                 ThreadManager.getInstance().runOnMainThread {
                     adapter?.removeInvited(chatUid)
@@ -173,7 +181,7 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
     }
 
     fun micChanged(data: Map<Int, String>) {
-        if (!adapter?.data.isNullOrEmpty()){
+        if (!adapter?.data.isNullOrEmpty()) {
             adapter?.data?.let {
                 dataList.addAll(it)
                 for (key in data.keys) {

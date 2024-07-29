@@ -3,14 +3,13 @@ package io.agora.scene.voice.spatial.netkit
 import android.content.Context
 import com.google.gson.reflect.TypeToken
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
 import io.agora.voice.common.net.VRHttpClientManager
 import io.agora.voice.common.net.callback.VRHttpCallback
 import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.voice.common.utils.GsonTools
-import io.agora.voice.common.utils.LogTools.logD
-import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.ThreadManager
 import org.json.JSONArray
 import org.json.JSONException
@@ -82,7 +81,7 @@ class VoiceToolboxServerHttpManager {
             .setRequestMethod(VRHttpClientManager.Method_POST)
             .asyncExecute(object : VRHttpCallback {
                 override fun onSuccess(result: String) {
-                    "voice generateToken success".logD(TAG)
+                    VoiceSpatialLogger.d(TAG,"voice generateToken success")
                     val bean = GsonTools.toBean<VRGenerateTokenResponse>(
                         result,
                         object : TypeToken<VRGenerateTokenResponse>() {}.type
@@ -95,7 +94,7 @@ class VoiceToolboxServerHttpManager {
                 }
 
                 override fun onError(code: Int, msg: String) {
-                    "voice generateToken onError: $code msg: $msg".logE(TAG)
+                    VoiceSpatialLogger.e(TAG, "voice generateToken onError: $code msg: $msg")
                     callBack.onError(code, msg)
                 }
             })
@@ -133,7 +132,7 @@ class VoiceToolboxServerHttpManager {
                     }
 
                     override fun onError(var1: Int, var2: String?) {
-                        "SyncToolboxService generate token error code:$var1,msg:$var2".logE()
+                        VoiceSpatialLogger.e(TAG,"SyncToolboxService generate token error code:$var1,msg:$var2")
                         latch.countDown()
                         code = VoiceServiceProtocol.ERR_FAILED
                     }

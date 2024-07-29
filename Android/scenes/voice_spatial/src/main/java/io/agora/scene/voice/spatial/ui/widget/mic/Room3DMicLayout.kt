@@ -7,11 +7,13 @@ import android.graphics.RectF
 import android.os.SystemClock
 import android.text.TextUtils
 import android.util.AttributeSet
+import android.util.Log
 import android.util.Size
 import android.view.MotionEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialViewRoom3dMicLayoutBinding
 import io.agora.scene.voice.spatial.model.OnItemMoveListener
@@ -20,8 +22,6 @@ import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 import io.agora.scene.voice.spatial.model.annotation.MicStatus
 import io.agora.scene.voice.spatial.model.constructor.RoomMicConstructor
 import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
-import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ThreadManager
 import kotlin.math.*
 
@@ -298,7 +298,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                         preMovePoint.y = curPoint.y
                         preAngle = angle
                     }
-                    "onTouchEvent ACTION_MOVE x:${x} y:${y} dx:${dx} dy:${dy} angle:${angle}".logD(TAG)
+                    Log.d(TAG,"onTouchEvent ACTION_MOVE x:${x} y:${y} dx:${dx} dy:${dy} angle:${angle}")
                     micInfoMap[ConfigConstants.MicConstant.KeyIndex0]?.let {
                         val point = getPosition(binding.micV0Center)
                         val p = SeatPositionInfo(
@@ -356,7 +356,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
      */
     private fun check3DMicChildView(x: Int, y: Int): Boolean {
         if (getRect(binding.micV0Center).contains(x.toFloat(), y.toFloat())) {
-            "onTouchEvent ACTION_DOWN checkChildView:${x} ${y}".logD(TAG)
+            Log.d(TAG,"onTouchEvent ACTION_DOWN checkChildView:${x} ${y}")
             return true
         }
         return false

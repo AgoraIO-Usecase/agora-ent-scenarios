@@ -3,14 +3,13 @@ package io.agora.scene.voice.netkit
 import android.content.Context
 import com.google.gson.reflect.TypeToken
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.voice.common.net.VRHttpClientManager
 import io.agora.voice.common.net.callback.VRHttpCallback
 import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.voice.common.utils.GsonTools
-import io.agora.voice.common.utils.LogTools.logD
-import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.ThreadManager
 import org.json.JSONArray
 import org.json.JSONException
@@ -21,7 +20,7 @@ import java.util.concurrent.CountDownLatch
 /**
  * @author create by zhangwei03
  */
-class VoiceToolboxServerHttpManager {
+object VoiceToolboxServerHttpManager {
 
     private val TAG = "VoiceToolboxServerHttpManager"
 
@@ -29,16 +28,32 @@ class VoiceToolboxServerHttpManager {
         return VoiceBuddyFactory.get().getVoiceBuddy().application().applicationContext
     }
 
-    companion object {
-        @JvmStatic
-        fun get(): VoiceToolboxServerHttpManager {
-            val sSingle = InstanceHelper.sSingle
-            return sSingle
-        }
-    }
+    /**
+     * 生成RTC/RTM/Chat等Token007
+     *
+     * @param callback
+     * @receiver
+     */
+    fun generateAllToken(callback: (token: String?, exception: Exception?) -> Unit){
+        generateToken(
+            "",
+            VoiceBuddyFactory.get().getVoiceBuddy().rtcUid().toString(),
+            callBack = object :
+                VRValueCallBack<VRGenerateTokenResponse> {
+                override fun onSuccess(response: VRGenerateTokenResponse?) {
+                    response?.let {
+                        VoiceBuddyFactory.get().getVoiceBuddy().setupRtcToken(it.token)
+                        VoiceBuddyFactory.get().getVoiceBuddy().setupRtmToken(it.token)
+                        VoiceBuddyFactory.get().getVoiceBuddy().setupChatToken(it.token)
+                        callback.invoke(it.token, null)
+                    }
+                }
 
-    internal object InstanceHelper {
-        val sSingle = VoiceToolboxServerHttpManager()
+                override fun onError(var1: Int, var2: String?) {
+                    VoiceLogger.e(TAG,"SyncToolboxService generate token error code:$var1,msg:$var2")
+                    callback.invoke(null, Exception(var2))
+                }
+            })
     }
 
     /**
@@ -49,12 +64,12 @@ class VoiceToolboxServerHttpManager {
      * @param types 类型 1: RTC Token，2: RTM Token,3: Chat Token
      * @param uid 用户ID
      */
-    fun generateToken(
+    public fun generateToken(
         channelName: String,
         uid: String,
         expire: Int = 3600,
         src: String = "android",
-        types: Array<Int> = arrayOf(1, 3),
+        types: Array<Int> = arrayOf(1, 2, 3),
         callBack: VRValueCallBack<VRGenerateTokenResponse>
     ) {
         val headers = mutableMapOf<String, String>()
@@ -83,7 +98,7 @@ class VoiceToolboxServerHttpManager {
             .setRequestMethod(VRHttpClientManager.Method_POST)
             .asyncExecute(object : VRHttpCallback {
                 override fun onSuccess(result: String) {
-                    "voice generateToken success".logD(TAG)
+                    VoiceLogger.d(TAG,"voice generateToken success")
                     val bean = GsonTools.toBean<VRGenerateTokenResponse>(
                         result,
                         object : TypeToken<VRGenerateTokenResponse>() {}.type
@@ -96,7 +111,7 @@ class VoiceToolboxServerHttpManager {
                 }
 
                 override fun onError(code: Int, msg: String) {
-                    "voice generateToken onError: $code msg: $msg".logE(TAG)
+                    VoiceLogger.e(TAG,"voice generateToken onError: $code msg: $msg")
                     callBack.onError(code, msg)
                 }
             })
@@ -126,8 +141,8 @@ class VoiceToolboxServerHttpManager {
     fun createImRoom(
         roomName: String,
         roomOwner: String,
-        chatroomId: String,
-        type:Int? = 0,
+        chatroomId: String = "",
+        type: Int = 0,
         callBack: VRValueCallBack<VRCreateRoomResponse>
     ) {
         val headers = mutableMapOf<String, String>()
@@ -158,15 +173,17 @@ class VoiceToolboxServerHttpManager {
             requestBody.putOpt("appCertificate", BuildConfig.AGORA_APP_CERTIFICATE)
             requestBody.putOpt("src", "Android")
             requestBody.putOpt("traceId", UUID.randomUUID().toString())
-            requestBody.putOpt("type",type)
+            requestBody.putOpt("type", type)
 
             when (type) {
                 1 -> {
                     requestBody.putOpt("user", requestUser)
                 }
+
                 2 -> {
                     requestBody.putOpt("chat", requestChat)
                 }
+
                 else -> {
                     requestBody.putOpt("user", requestUser)
                     requestBody.putOpt("chat", requestChat)
@@ -182,7 +199,7 @@ class VoiceToolboxServerHttpManager {
             .setRequestMethod(VRHttpClientManager.Method_POST)
             .asyncExecute(object : VRHttpCallback {
                 override fun onSuccess(result: String) {
-                    "voice createImRoom success: $result".logD(TAG)
+                    VoiceLogger.d(TAG,"voice createImRoom success: $result")
                     val bean = GsonTools.toBean<VRCreateRoomResponse>(
                         result,
                         object : TypeToken<VRCreateRoomResponse>() {}.type
@@ -195,7 +212,7 @@ class VoiceToolboxServerHttpManager {
                 }
 
                 override fun onError(code: Int, msg: String) {
-                    "voice createImRoom onError: $code msg: $msg".logE(TAG)
+                    VoiceLogger.d(TAG,"voice createImRoom onError: $code msg: $msg")
                     callBack.onError(code, msg)
                 }
             })
@@ -233,7 +250,7 @@ class VoiceToolboxServerHttpManager {
                     }
 
                     override fun onError(var1: Int, var2: String?) {
-                        "SyncToolboxService generate token error code:$var1,msg:$var2".logE()
+                        VoiceLogger.e(TAG,"SyncToolboxService generate token error code:$var1,msg:$var2")
                         latch.countDown()
                         code = VoiceServiceProtocol.ERR_FAILED
                     }
@@ -254,7 +271,7 @@ class VoiceToolboxServerHttpManager {
                     }
 
                     override fun onError(var1: Int, var2: String?) {
-                        "SyncToolboxService create room error code:$var1,msg:$var2".logE()
+                        VoiceLogger.e(TAG,"SyncToolboxService create room error code:$var1,msg:$var2")
                         if (roomId.isEmpty()) {
                             code = VoiceServiceProtocol.ERR_ROOM_NAME_INCORRECT
                         } else {

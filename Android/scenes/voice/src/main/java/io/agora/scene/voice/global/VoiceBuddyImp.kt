@@ -11,6 +11,7 @@ class VoiceBuddyImp : IVoiceBuddy {
 
     private var chatToken: String = ""
     private var rtcToken: String = ""
+    private var rtmToken: String = ""
 
     override fun application(): Application {
         return AgoraApplication.the()
@@ -71,5 +72,13 @@ class VoiceBuddyImp : IVoiceBuddy {
 
     override fun setupChatToken(chatToken: String) {
         this.chatToken = chatToken
+    }
+
+    override fun rtmToken(): String {
+        return rtmToken
+    }
+
+    override fun setupRtmToken(rtmToken: String) {
+        this.rtmToken = rtmToken
     }
 }

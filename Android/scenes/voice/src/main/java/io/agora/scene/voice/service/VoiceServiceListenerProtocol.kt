@@ -8,7 +8,7 @@ import io.agora.scene.voice.model.VoiceMemberModel
  *
  * im kv 回调协议
  */
-interface VoiceChatServiceListenerProtocol {
+interface VoiceServiceListenerProtocol {
     /**
      * 收到礼物消息
      * @param roomId 环信IMSDK聊天室id
@@ -92,20 +92,18 @@ interface VoiceChatServiceListenerProtocol {
      * @param fromId 谁操作发生的变化
      */
     fun onSeatUpdated(roomId: String, attributeMap: Map<String, String>, fromId: String) {}
-}
-
-interface VoiceRtmServiceListenerProtocol {
-    /**
-     * 房间过期
-     *
-     */
-    fun onRoomExpire() {}
 
     /**
-     * 房间销毁
+     * rtm房间过期
      *
      */
-    fun onRoomDestroy() {}
+    fun onSyncRoomExpire() {}
+
+    /**
+     * rtm房间销毁
+     *
+     */
+    fun onSyncRoomDestroy() {}
 }
 
 enum class VoiceRoomServiceKickedReason{

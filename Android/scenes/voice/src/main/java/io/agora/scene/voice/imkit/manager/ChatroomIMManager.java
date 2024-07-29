@@ -21,6 +21,7 @@ import io.agora.chat.Conversation;
 import io.agora.chat.CustomMessageBody;
 import io.agora.chat.TextMessageBody;
 import io.agora.chat.adapter.EMAChatRoomManagerListener;
+import io.agora.scene.voice.VoiceLogger;
 import io.agora.scene.voice.global.VoiceBuddyFactory;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
@@ -38,7 +39,6 @@ import io.agora.scene.voice.model.VoiceRoomModel;
 import io.agora.scene.voice.service.VoiceRoomServiceKickedReason;
 import io.agora.util.EMLog;
 import io.agora.voice.common.utils.GsonTools;
-import io.agora.voice.common.utils.LogTools;
 import io.agora.voice.common.utils.ThreadManager;
 
 public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionListener {
@@ -227,7 +227,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
                 userName = (String) ext.get("userName");
             }
         }
-        LogTools.d("Helper","getUserName: " + userName);
+        VoiceLogger.d("Helper","getUserName: " + userName);
         return userName;
     }
 
@@ -237,7 +237,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         Map<String,String> params = msg.getCustomParams();
         if (params.containsKey("user")){
             jsonString = params.get("user");
-            LogTools.d("getSystemUserName","jsonString: " + jsonString);
+            VoiceLogger.d("getSystemUserName","jsonString: " + jsonString);
             if (!TextUtils.isEmpty(jsonString)){
                 try {
                     assert jsonString != null;
@@ -248,7 +248,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
                 }
             }
         }
-        LogTools.d("getSystemUserName","userName: " + userName);
+        VoiceLogger.d("getSystemUserName","userName: " + userName);
         return userName;
     }
 
@@ -438,7 +438,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
                         callBack.onSuccess();
                     }
                 });
-                LogTools.d("ChatroomConfigManager","Login success");
+                VoiceLogger.d("ChatroomConfigManager","Login success");
             }
 
             @Override
@@ -449,7 +449,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
                         callBack.onError(code,msg);
                     }
                 });
-                LogTools.e("ChatroomConfigManager", "Login onError code:" + code + " desc: " + msg);
+                VoiceLogger.e("ChatroomConfigManager", "Login onError code:" + code + " desc: " + msg);
             }
         });
     }
@@ -458,12 +458,12 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         ChatClient.getInstance().loginWithAgoraToken(uid, token, new CallBack() {
             @Override
             public void onSuccess() {
-                LogTools.d("ChatroomConfigManager","Login success");
+                VoiceLogger.d("ChatroomConfigManager","Login success");
             }
 
             @Override
             public void onError(int code, String msg) {
-                LogTools.e("ChatroomConfigManager", "Login onError code:" + code + " desc: " + msg);
+                VoiceLogger.e("ChatroomConfigManager", "Login onError code:" + code + " desc: " + msg);
             }
         });
     }
@@ -584,7 +584,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
                 VoiceBuddyFactory.get().getVoiceBuddy().headUrl(),
                 VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
                 0,1);
-        LogTools.d(TAG,"initMicInfo:" + voiceMemberModel);
+        VoiceLogger.d(TAG,"initMicInfo:" + voiceMemberModel);
         delegate.initMicInfo(roomType,voiceMemberModel,callBack);
     }
 

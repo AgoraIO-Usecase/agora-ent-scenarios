@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.agora.ValueCallBack
 import io.agora.chat.ChatRoom
+import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.*
@@ -14,8 +15,6 @@ import io.agora.scene.voice.viewmodel.repositories.VoiceRoomLivingRepository
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.voice.common.net.Resource
 import io.agora.voice.common.net.callback.ResultCallBack
-import io.agora.voice.common.utils.LogTools.logD
-import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.viewmodel.SingleSourceLiveData
 import java.util.concurrent.atomic.AtomicBoolean
@@ -26,6 +25,10 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @author create by zhangwei03
  */
 class VoiceRoomLivingViewModel : ViewModel() {
+
+    companion object{
+        private const val TAG = "VoiceRoomLivingViewModel"
+    }
 
     private val mRepository by lazy { VoiceRoomLivingRepository() }
 
@@ -153,13 +156,13 @@ class VoiceRoomLivingViewModel : ViewModel() {
             roomKitBean.soundEffect, roomKitBean.isOwner,
             object : VRValueCallBack<Boolean> {
                 override fun onSuccess(value: Boolean) {
-                    "rtc  joinChannel onSuccess channelId:${roomKitBean.channelId}".logD()
+                    VoiceLogger.d(TAG,"rtc  joinChannel onSuccess channelId:${roomKitBean.channelId}")
                     joinRtcChannel.set(true)
                     checkJoinRoom()
                 }
 
                 override fun onError(error: Int, errorMsg: String) {
-                    "rtc  joinChannel onError channelId:${roomKitBean.channelId},error:$error  $errorMsg".logE()
+                    VoiceLogger.e(TAG,"rtc  joinChannel onError channelId:${roomKitBean.channelId},error:$error $errorMsg")
                     ThreadManager.getInstance().runOnMainThread {
                         _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
                             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
@@ -174,7 +177,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
         ChatroomIMManager.getInstance()
             .joinRoom(roomKitBean.chatroomId, object : ValueCallBack<ChatRoom?> {
                 override fun onSuccess(value: ChatRoom?) {
-                    "im joinChatRoom onSuccess roomId:${roomKitBean.chatroomId}".logD()
+                    VoiceLogger.d(TAG,"im joinChatRoom onSuccess roomId:${roomKitBean.chatroomId}")
                     joinImRoom.set(true)
                     checkJoinRoom()
                 }
@@ -185,7 +188,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
                             callBack.onError(error, errorMsg)
                         }
                     }.asLiveData())
-                    "im joinChatRoom onError roomId:${roomKitBean.chatroomId},$error  $errorMsg".logE()
+                    VoiceLogger.e(TAG, "im joinChatRoom onError roomId:${roomKitBean.chatroomId},$error  $errorMsg")
                 }
             })
     }
@@ -291,8 +294,8 @@ class VoiceRoomLivingViewModel : ViewModel() {
         _changeMicObservable.setSource(mRepository.changeMic(oldIndex, newIndex))
     }
 
-    fun leaveSyncManagerRoom(roomId: String, isRoomOwnerLeave: Boolean) {
-        _leaveSyncRoomObservable.setSource(mRepository.leaveSyncManagerRoom(roomId, isRoomOwnerLeave))
+    fun leaveSyncManagerRoom() {
+        _leaveSyncRoomObservable.setSource(mRepository.leaveSyncManagerRoom())
     }
 
     fun updateRoomMember(){

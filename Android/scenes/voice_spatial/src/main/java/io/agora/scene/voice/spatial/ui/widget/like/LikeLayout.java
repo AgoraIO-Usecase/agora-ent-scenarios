@@ -31,7 +31,7 @@ import java.lang.ref.WeakReference;
 import java.util.Random;
 
 import io.agora.scene.voice.spatial.R;
-import io.agora.voice.common.utils.LogTools;
+import io.agora.scene.voice.spatial.VoiceSpatialLogger;
 
 /**
  * like动画
@@ -262,7 +262,7 @@ public class LikeLayout extends RelativeLayout implements View.OnClickListener {
         int i = v.getId();
         if (i == R.id.img) {
             if (onHearLayoutListener != null) {
-                LogTools.d("setOnHearLayoutListener","onClick");
+                VoiceSpatialLogger.d("setOnHearLayoutListener","onClick");
                 onHearLayoutListener.onLikeClick(v);
                 boolean isAdd = onHearLayoutListener.onAddFavor();
                 if (isAdd) addFavor();

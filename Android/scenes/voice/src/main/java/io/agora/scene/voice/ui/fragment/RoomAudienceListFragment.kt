@@ -10,31 +10,33 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.divider.MaterialDividerItemDecoration
-import io.agora.voice.common.ui.adapter.BaseRecyclerViewAdapter
+import io.agora.scene.base.component.BaseRecyclerViewAdapter
+import io.agora.scene.base.component.BaseViewBindingFragment
+import io.agora.scene.base.component.OnItemChildClickListener
 import io.agora.scene.voice.R
+import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.databinding.VoiceFragmentAudienceListBinding
 import io.agora.scene.voice.databinding.VoiceItemRoomAudienceListBinding
 import io.agora.scene.voice.model.RoomKitBean
 import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.annotation.MicClickAction
-import io.agora.scene.voice.service.VoiceChatServiceListenerProtocol
+import io.agora.scene.voice.service.VoiceServiceListenerProtocol
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.adapter.viewholder.RoomAudienceListViewHolder
 import io.agora.scene.voice.viewmodel.VoiceUserListViewModel
 import io.agora.voice.common.net.OnResourceParseCallback
 import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.BaseUiFragment
-import io.agora.voice.common.ui.adapter.listener.OnItemChildClickListener
+import io.agora.voice.common.ui.IParserSource
 import io.agora.voice.common.utils.DeviceTools.dp
-import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.ResourcesTools
 import io.agora.voice.common.utils.ThreadManager
 
-class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding>(),
-    SwipeRefreshLayout.OnRefreshListener {
+class RoomAudienceListFragment : BaseViewBindingFragment<VoiceFragmentAudienceListBinding>(),
+    SwipeRefreshLayout.OnRefreshListener, IParserSource {
 
     companion object {
 
+        private val TAG = RoomAudienceListFragment::class.java.simpleName
         private const val KEY_ROOM_INFO = "room_info"
         private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
 
@@ -52,14 +54,15 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
     private lateinit var userListViewModel: VoiceUserListViewModel
 
     private var total = 0
-     set(value) {
-         field = value
-         checkEmpty()
-     }
+        set(value) {
+            field = value
+            checkEmpty()
+        }
     private var isEnd = false
     private val members = mutableListOf<VoiceMemberModel>()
 
-    private var audienceAdapter: BaseRecyclerViewAdapter<VoiceItemRoomAudienceListBinding, VoiceMemberModel, RoomAudienceListViewHolder>? = null
+    private var audienceAdapter: BaseRecyclerViewAdapter<VoiceItemRoomAudienceListBinding, VoiceMemberModel, RoomAudienceListViewHolder>? =
+        null
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceFragmentAudienceListBinding {
         return VoiceFragmentAudienceListBinding.inflate(inflater, container, false)
@@ -72,10 +75,10 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
             roomKitBean = getSerializable(KEY_ROOM_INFO) as RoomKitBean?
             roomKitBean?.let {
                 userListViewModel.fetchMemberList()
-                voiceServiceProtocol.subscribeEvent(object : VoiceChatServiceListenerProtocol{
+                voiceServiceProtocol.subscribeListener(object : VoiceServiceListenerProtocol {
                     override fun onUserJoinedRoom(roomId: String, voiceMember: VoiceMemberModel) {
-                        "voiceServiceProtocol onUserJoinedRoom：".logE()
-                        ThreadManager.getInstance().runOnMainThread{
+                        VoiceLogger.d(TAG, "voiceServiceProtocol onUserJoinedRoom：")
+                        ThreadManager.getInstance().runOnMainThread {
                             audienceAdapter?.addItem(voiceMember)
                             total += 1
                         }
@@ -107,7 +110,7 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
         audienceAdapter = BaseRecyclerViewAdapter(
             members,
             null,
-            object :OnItemChildClickListener<VoiceMemberModel>{
+            object : OnItemChildClickListener<VoiceMemberModel> {
                 override fun onItemChildClick(
                     data: VoiceMemberModel?,
                     extData: Any?,
@@ -117,12 +120,13 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
                 ) {
                     data?.chatUid?.let {
                         if (extData is Int) {
-                            handleRequest(it, extData,position)
+                            handleRequest(it, extData, position)
                         }
                     }
                 }
             },
-            RoomAudienceListViewHolder::class.java)
+            RoomAudienceListViewHolder::class.java
+        )
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         context?.let {
@@ -139,34 +143,35 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
     }
 
     private fun onObservable() {
-        userListViewModel.memberListObservable().observe(requireActivity()) { response: Resource<List<VoiceMemberModel>> ->
-            parseResource(response, object : OnResourceParseCallback<List<VoiceMemberModel>>() {
-                override fun onSuccess(data: List<VoiceMemberModel>?) {
-                    binding?.slAudienceList?.isRefreshing = false
-                    "getMembers total：${data?.size}".logE()
-                    if (data == null) return
-                    total = data.size
-                    isEnd = true
-                    if (data.isNotEmpty()) {
-                        audienceAdapter?.addItems(data)
-                    } else {
+        userListViewModel.memberListObservable()
+            .observe(requireActivity()) { response: Resource<List<VoiceMemberModel>> ->
+                parseResource(response, object : OnResourceParseCallback<List<VoiceMemberModel>>() {
+                    override fun onSuccess(data: List<VoiceMemberModel>?) {
+                        binding?.slAudienceList?.isRefreshing = false
+                        VoiceLogger.d(TAG, "getMembers total：${data?.size}")
+                        if (data == null) return
+                        total = data.size
                         isEnd = true
+                        if (data.isNotEmpty()) {
+                            audienceAdapter?.addItems(data)
+                        } else {
+                            isEnd = true
+                        }
                     }
-                }
 
-                override fun onError(code: Int, message: String?) {
-                    super.onError(code, message)
-                    binding?.slAudienceList?.isRefreshing = false
-                }
-            })
-        }
-        userListViewModel.kickOffObservable().observe(requireActivity()) { response:Resource<Int> ->
-            parseResource(response,object :OnResourceParseCallback<Int>(){
+                    override fun onError(code: Int, message: String?) {
+                        super.onError(code, message)
+                        binding?.slAudienceList?.isRefreshing = false
+                    }
+                })
+            }
+        userListViewModel.kickOffObservable().observe(requireActivity()) { response: Resource<Int> ->
+            parseResource(response, object : OnResourceParseCallback<Int>() {
                 override fun onSuccess(position: Int?) {
                     ThreadManager.getInstance().runOnMainThread {
                         position?.let {
                             audienceAdapter?.deleteItem(it)
-                            if (total > 0){
+                            if (total > 0) {
                                 total -= 1
                             }
                         }
@@ -174,7 +179,7 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
                 }
 
                 override fun onError(code: Int, message: String?) {
-                    "kickOff member：$code $message".logE()
+                    VoiceLogger.e(TAG, "kickOff member：$code $message")
                 }
             })
 
@@ -191,11 +196,11 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
         userListViewModel.fetchMemberList()
     }
 
-    private fun handleRequest(uid: String, @MicClickAction action: Int,position:Int) {
+    private fun handleRequest(uid: String, @MicClickAction action: Int, position: Int) {
         if (action == MicClickAction.Invite) {
             userListViewModel.startMicSeatInvitation(uid, -1)
         } else if (action == MicClickAction.KickOff) {
-            userListViewModel.kickMembersOutOfTheRoom(uid,position)
+            userListViewModel.kickMembersOutOfTheRoom(uid, position)
         }
     }
 }

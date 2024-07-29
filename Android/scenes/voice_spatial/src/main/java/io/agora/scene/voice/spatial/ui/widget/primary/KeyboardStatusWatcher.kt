@@ -11,6 +11,7 @@ import android.widget.PopupWindow
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.voice.common.utils.*
 
 class KeyboardStatusWatcher(
@@ -105,7 +106,7 @@ class KeyboardStatusWatcher(
 //            Log.d(TAG, "isPortrait = ${activity.isPortrait}   ")
             if (activity.hasNavBar && NavigationUtils.hasNavigationBar(activity) && activity.isPortrait) {
                 keyboardHeight -= activity.navBarHeight
-                LogTools.d(TAG, "keyboardHeight = $keyboardHeight   ")
+                VoiceSpatialLogger.d(TAG, "keyboardHeight = $keyboardHeight   ")
             }
         } else {
             //软键盘隐藏时键盘高度为0

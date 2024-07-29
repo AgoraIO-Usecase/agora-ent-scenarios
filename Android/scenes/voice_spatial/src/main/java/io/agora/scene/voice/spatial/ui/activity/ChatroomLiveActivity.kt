@@ -19,7 +19,9 @@ import io.agora.scene.base.LogUploader
 import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
+import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.voice.spatial.R
+import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialActivityChatroomBinding
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.*
@@ -38,10 +40,7 @@ import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.net.OnResourceParseCallback
 import io.agora.voice.common.net.Resource
 import io.agora.voice.common.ui.IParserSource
-import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.utils.GsonTools
-import io.agora.voice.common.utils.LogTools.logD
-import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.StatusBarCompat
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
@@ -112,7 +111,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
 
     private var toggleAudioRun: Runnable? = null
 
-    fun toggleSelfAudio(isOpen: Boolean, callback : () -> Unit) {
+    fun toggleSelfAudio(isOpen: Boolean, callback: () -> Unit) {
         if (isOpen) {
             toggleAudioRun = Runnable {
                 callback.invoke()
@@ -159,7 +158,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
 
                 override fun onError(code: Int, message: String?) {
                     super.onError(code, message)
-                    "roomDetailsObservable onError -- code=$code, message=$message".logD()
+                    VoiceSpatialLogger.e(TAG, "roomDetailsObservable onError -- code=$code, message=$message")
                 }
             })
         }
@@ -185,20 +184,17 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         roomLivingViewModel.updateRoomMemberObservable().observe(this) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
-                    "ChatroomLiveActivity updateRoomMember onSuccess".logD()
+                    VoiceSpatialLogger.d(TAG, "ChatroomLiveActivity updateRoomMember onSuccess")
                 }
 
                 override fun onError(code: Int, message: String?) {
                     super.onError(code, message)
-                    "ChatroomLiveActivity updateRoomMember onError $code $message".logE()
+                    VoiceSpatialLogger.e(TAG, "ChatroomLiveActivity updateRoomMember onError $code $message")
                 }
             })
         }
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _: View?, insets: WindowInsetsCompat ->
             val systemInset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            "systemInset:left:${systemInset.left},top:${systemInset.top},right:${systemInset.right},bottom:${systemInset.bottom}".logD(
-                "insets=="
-            )
             binding.clMain.setPaddingRelative(0, systemInset.top, 0, systemInset.bottom)
             WindowInsetsCompat.CONSUMED
         }
@@ -210,7 +206,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
 
             override fun onReceiveSeatRequest() {
                 super.onReceiveSeatRequest()
-                "onReceiveSeatRequest ${roomKitBean.isOwner}".logD(TAG)
+                VoiceSpatialLogger.d(TAG, "onReceiveSeatRequest ${roomKitBean.isOwner}")
                 if (roomKitBean.isOwner) {
                     ThreadManager.getInstance().runOnMainThread {
                         binding.chatBottom.setShowHandStatus(true, true)
@@ -220,7 +216,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
 
             override fun onReceiveSeatRequestRejected(userId: String) {
                 super.onReceiveSeatRequestRejected(userId)
-                "onReceiveSeatRequestRejected $userId".logD(TAG)
+                VoiceSpatialLogger.d(TAG, "onReceiveSeatRequestRejected $userId")
                 ThreadManager.getInstance().runOnMainThread {
                     //刷新 owner 申请列表
                     roomObservableDelegate.handsUpdate(0)
@@ -240,7 +236,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
 
             override fun onAnnouncementChanged(roomId: String, content: String) {
                 super.onAnnouncementChanged(roomId, content)
-                "onAnnouncementChanged $content".logD(TAG)
+                VoiceSpatialLogger.d(TAG, "onAnnouncementChanged $content")
                 if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
                 ThreadManager.getInstance().runOnMainThread {
                     roomObservableDelegate.updateAnnouncement(content)
@@ -250,7 +246,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             override fun onUserJoinedRoom(roomId: String, voiceMember: VoiceMemberModel) {
                 super.onUserJoinedRoom(roomId, voiceMember)
                 if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
-                "onUserJoinedRoom $roomId, ${voiceMember.userId}".logD(TAG)
+                VoiceSpatialLogger.d(TAG, "onUserJoinedRoom $roomId, ${voiceMember.userId}")
                 ThreadManager.getInstance().runOnMainThread {
                     voiceRoomModel.memberCount = voiceRoomModel.memberCount + 1
                     voiceRoomModel.clickCount = voiceRoomModel.clickCount + 1
@@ -262,7 +258,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             override fun onUserLeftRoom(roomId: String, userId: String) {
                 super.onUserLeftRoom(roomId, userId)
                 if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
-                "onUserLeftRoom $roomId, $userId".logD(TAG)
+                VoiceSpatialLogger.d(TAG, "onUserLeftRoom $roomId, $userId")
                 ThreadManager.getInstance().runOnMainThread {
                     userId.let {
                         if (roomKitBean.isOwner) {
@@ -280,7 +276,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             override fun onUserBeKicked(roomId: String, reason: VoiceRoomServiceKickedReason) {
                 super.onUserBeKicked(roomId, reason)
                 if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
-                "userBeKicked $reason".logD(TAG)
+                VoiceSpatialLogger.d(TAG, "userBeKicked $reason")
                 ThreadManager.getInstance().runOnMainThread {
                     if (reason == VoiceRoomServiceKickedReason.destroyed) {
                         ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_spatial_room_close))
@@ -297,7 +293,10 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                 attributeMap: Map<String, String>
             ) {
                 super.onSeatUpdated(roomId, attributeMap)
-                "roomAttributesDidUpdated ${Thread.currentThread()},roomId:$roomId,map:$attributeMap".logD()
+                VoiceSpatialLogger.d(
+                    TAG,
+                    "roomAttributesDidUpdated ${Thread.currentThread()},roomId:$roomId,map:$attributeMap"
+                )
                 if (isFinishing || !TextUtils.equals(roomKitBean.roomId, roomId)) return
                 attributeMap.let {
                     roomObservableDelegate.onSeatUpdated(it)
@@ -321,7 +320,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             override fun onRoomDestroyed(roomId: String) {
                 super.onRoomDestroyed(roomId)
                 if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
-                "onRoomDestroyed $roomId".logD(TAG)
+                VoiceSpatialLogger.d(TAG, "onRoomDestroyed $roomId")
                 ThreadManager.getInstance().runOnMainThread {
                     ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_spatial_room_close))
                     isRoomOwnerLeave = true
@@ -429,9 +428,11 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                             finish()
                         })
                     }
+
                     R.id.voice_extend_item_mic -> {
                         roomObservableDelegate.onClickBottomMic()
                     }
+
                     R.id.voice_extend_item_hand_up -> {
                         roomObservableDelegate.onClickBottomHandUp()
                     }
@@ -488,8 +489,8 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             VoiceRoomDebugOptionsDialog().show(supportFragmentManager, "mtDebug")
         }
         if (roomKitBean.isOwner) {
-            toggleAudioRun =  Runnable {
-                "onPermissionGrant initSdkJoin".logD(TAG)
+            toggleAudioRun = Runnable {
+                VoiceSpatialLogger.d(TAG, "onPermissionGrant initSdkJoin")
                 roomLivingViewModel.initSdkJoin(roomKitBean)
             }
             requestRecordPermission(true)

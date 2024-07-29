@@ -12,15 +12,15 @@ import java.util.Map;
 
 import io.agora.chat.ChatClient;
 import io.agora.chat.ChatOptions;
+import io.agora.scene.voice.VoiceLogger;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.OnCustomMsgReceiveListener;
 import io.agora.scene.voice.model.VoiceMemberModel;
 import io.agora.scene.voice.service.VoiceRoomServiceKickedReason;
-import io.agora.scene.voice.service.VoiceChatServiceListenerProtocol;
+import io.agora.scene.voice.service.VoiceServiceListenerProtocol;
 import io.agora.scene.voice.service.VoiceServiceProtocol;
 import io.agora.util.EMLog;
-import io.agora.voice.common.utils.LogTools;
 
 public class ChatroomConfigManager {
     private static final String TAG = ChatroomConfigManager.class.getSimpleName();
@@ -46,7 +46,7 @@ public class ChatroomConfigManager {
         this.mContext = context;
         ChatOptions options = initChatOptions(imKey);
         if (!isMainProcess(context)) {
-            LogTools.e(TAG, "enter the service process!");
+            VoiceLogger.e(TAG, "enter the service process!");
             return;
         }
         ChatClient.getInstance().init(context, options);
@@ -79,7 +79,7 @@ public class ChatroomConfigManager {
         ChatroomIMManager.getInstance().setOnCustomMsgReceiveListener(new OnCustomMsgReceiveListener() {
             @Override
             public void onReceiveGiftMsg(ChatMessageData message) {
-                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                voiceServiceProtocol.getSubscribeListeners().notifyEventHandlers(listener -> {
                     listener.onReceiveGift(message.getConversationId(), message);
                 });
             }
@@ -91,39 +91,39 @@ public class ChatroomConfigManager {
 
             @Override
             public void onReceiveNormalMsg(ChatMessageData message) {
-                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                voiceServiceProtocol.getSubscribeListeners().notifyEventHandlers(listener -> {
                     listener.onReceiveTextMsg(message.getConversationId(), message);
                 });
             }
 
             @Override
             public void onReceiveApplySite(ChatMessageData message) {
-                LogTools.d(TAG, "onReceiveSeatRequest");
-                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                VoiceLogger.d(TAG, "onReceiveSeatRequest");
+                voiceServiceProtocol.getSubscribeListeners().notifyEventHandlers(listener -> {
                     listener.onReceiveSeatRequest(message);
                 });
             }
 
             @Override
             public void onReceiveCancelApplySite(ChatMessageData message) {
-                LogTools.d(TAG, "onReceiveSeatRequestRejected");
-                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                VoiceLogger.d(TAG, "onReceiveSeatRequestRejected");
+                voiceServiceProtocol.getSubscribeListeners().notifyEventHandlers(listener -> {
                     listener.onReceiveSeatRequestRejected(message.getFrom());
                 });
             }
 
             @Override
             public void onReceiveInviteSite(ChatMessageData message) {
-                LogTools.d(TAG, "onReceiveSeatInvitation");
-                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                VoiceLogger.d(TAG, "onReceiveSeatInvitation");
+                voiceServiceProtocol.getSubscribeListeners().notifyEventHandlers(listener -> {
                     listener.onReceiveSeatInvitation(message);
                 });
             }
 
             @Override
             public void onReceiveInviteRefusedSite(ChatMessageData message) {
-                LogTools.d(TAG, "onReceiveSeatInvitationRejected");
-                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                VoiceLogger.d(TAG, "onReceiveSeatInvitationRejected");
+                voiceServiceProtocol.getSubscribeListeners().notifyEventHandlers(listener -> {
                     listener.onReceiveSeatInvitationRejected(message.getConversationId(), message);
                 });
             }
@@ -137,7 +137,7 @@ public class ChatroomConfigManager {
             public void onReceiveSystem(ChatMessageData message) {
                 VoiceMemberModel voiceMemberModel = ChatroomIMManager.getInstance().getVoiceMemberModel(message);
                 if (voiceMemberModel != null) {
-                    voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                    voiceServiceProtocol.getSubscribeListeners().notifyEventHandlers(listener -> {
                         listener.onUserJoinedRoom(message.getConversationId(), voiceMemberModel);
                     });
                 }
@@ -147,7 +147,7 @@ public class ChatroomConfigManager {
         ChatroomIMManager.getInstance().setChatRoomEventListener(new OnChatroomEventReceiveListener() {
             @Override
             public void onRoomDestroyed(String roomId) {
-                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                voiceServiceProtocol.getSubscribeListeners().notifyEventHandlers(listener -> {
                     listener.onRoomDestroyed(roomId);
                 });
             }
@@ -159,7 +159,7 @@ public class ChatroomConfigManager {
 
             @Override
             public void onMemberExited(String roomId, String reason, String name) {
-                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                voiceServiceProtocol.getSubscribeListeners().notifyEventHandlers(listener -> {
                     listener.onUserLeftRoom(roomId, name);
                 });
             }
@@ -167,21 +167,21 @@ public class ChatroomConfigManager {
             @Override
             public void onKicked(String roomId, int reason) {
                 VoiceRoomServiceKickedReason kickedReason = ChatroomIMManager.getInstance().getKickReason(reason);
-                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                voiceServiceProtocol.getSubscribeListeners().notifyEventHandlers(listener -> {
                     listener.onUserBeKicked(roomId, kickedReason);
                 });
             }
 
             @Override
             public void onAnnouncementChanged(String roomId, String announcement) {
-                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                voiceServiceProtocol.getSubscribeListeners().notifyEventHandlers(listener -> {
                     listener.onAnnouncementChanged(roomId, announcement);
                 });
             }
 
             @Override
             public void onAttributesUpdate(String roomId, Map<String, String> attributeMap, String from) {
-                voiceServiceProtocol.getSubscribeEvents().notifyEventHandlers(listener -> {
+                voiceServiceProtocol.getSubscribeListeners().notifyEventHandlers(listener -> {
                     listener.onSeatUpdated(roomId, attributeMap, from);
                 });
             }
@@ -233,7 +233,7 @@ public class ChatroomConfigManager {
         return processName;
     }
 
-    public void removeChatRoomListener(VoiceChatServiceListenerProtocol listener) {
+    public void removeChatRoomListener(VoiceServiceListenerProtocol listener) {
         if (listener != null) {
             ChatroomIMManager.getInstance().removeChatRoomChangeListener();
             ChatroomIMManager.getInstance().removeChatRoomConnectionListener();

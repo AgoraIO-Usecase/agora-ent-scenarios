@@ -7,10 +7,10 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogRoomSpatialAudioBinding
+import io.agora.scene.widget.doOnProgressChanged
 import io.agora.voice.common.constant.ConfigConstants.DISABLE_ALPHA
 import io.agora.voice.common.constant.ConfigConstants.ENABLE_ALPHA
 import io.agora.voice.common.ui.dialog.BaseFixedHeightSheetDialog
-import io.agora.voice.common.utils.doOnProgressChanged
 
 class RoomSpatialAudioSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceSpatialDialogRoomSpatialAudioBinding>() {
 

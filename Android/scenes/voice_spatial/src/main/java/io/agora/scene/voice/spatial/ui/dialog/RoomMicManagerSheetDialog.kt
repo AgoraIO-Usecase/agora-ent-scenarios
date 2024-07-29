@@ -9,6 +9,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.divider.MaterialDividerItemDecoration
+import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogMicManagerBinding
 import io.agora.scene.voice.spatial.model.MicManagerBean
@@ -17,7 +18,6 @@ import io.agora.scene.voice.spatial.model.annotation.MicStatus
 import io.agora.scene.voice.spatial.model.constructor.RoomMicConstructor
 import io.agora.scene.voice.spatial.ui.adapter.RoomMicManagerAdapter
 import io.agora.scene.voice.spatial.ui.adapter.viewholder.RoomMicManagerViewHolder
-import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
 import io.agora.voice.common.utils.DeviceTools.dp
 import io.agora.voice.common.utils.ImageTools

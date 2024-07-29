@@ -12,10 +12,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.model.RoomKitBean
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
 import io.agora.scene.voice.databinding.VoiceDialogRoomNoticeBinding
-import io.agora.voice.common.utils.LogTools.logD
 import java.util.regex.Pattern
 
 /**
@@ -27,6 +27,7 @@ class RoomNoticeSheetDialog constructor() :
     BaseSheetDialog<VoiceDialogRoomNoticeBinding>() {
 
     companion object {
+        const val TAG = "RoomNoticeSheetDialog"
         const val KEY_ROOM_KIT_BEAN = "room_kit_bean"
     }
 
@@ -105,7 +106,7 @@ class RoomNoticeSheetDialog constructor() :
         ): CharSequence {
             val destCount = (dest.toString().length + getChineseCount(dest.toString()))
             val sourceCount = (source.toString().length + getChineseCount(source.toString()))
-            "NameLengthFilter $destCount $sourceCount".logD("NameLengthFilter")
+            VoiceLogger.d(TAG, "NameLengthFilter $destCount $sourceCount")
             return if (destCount + sourceCount > maxEn) {
                 ""
             } else {

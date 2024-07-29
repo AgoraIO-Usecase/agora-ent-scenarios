@@ -293,4 +293,7 @@
     <string name="voice_preset_sound_shaoyu">少御音</string>
     <string name="voice_preset_sound_shaoyu_tips">女声唱歌3：醇厚 | 饱满</string>
     <string name="voice_sound_preset_off">关闭</string>
+
+    <string name="voice_create_room_failed">创建房间失败，错误：%1s</string>
+    <string name="voice_join_room_failed">加入房间失败，错误：%1s</string>
 </resources>
