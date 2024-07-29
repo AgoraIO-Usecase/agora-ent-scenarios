@@ -223,6 +223,11 @@ class MusicSettingDialog constructor(
         mBinding.cbAIAECSwitcher.setOnCheckedChangeListener { buttonView, isChecked ->
             mBinding.layoutAIACStrength.isVisible = isChecked
             mSetting.mAIAECEnable = isChecked
+            if (isChecked) {
+                mBinding.root.postDelayed({
+                    mBinding.scrollView.smoothScrollTo(0, mBinding.layoutContent.measuredHeight)
+                }, 100)
+            }
         }
         mBinding.cbAIAECSwitcher.isChecked = mSetting.mAIAECEnable
         mBinding.layoutAIACStrength.isVisible = mSetting.mAIAECEnable

@@ -119,6 +119,9 @@ sed -ie "s#$(sed -n '/IM_APP_KEY/p' gradle.properties)#IM_APP_KEY=${IM_APP_KEY}#
 sed -ie "s#$(sed -n '/BEAUTY_RESOURCE/p' gradle.properties)#BEAUTY_RESOURCE=${beauty_sources}#g" gradle.properties
 cat gradle.properties
 
+# config cantata properties
+sed -ie "s#$(sed -n '/final def CANTATA_AGORA_APP_ID = \"\"/p' Android/scenes/cantata/build.gradle)#final def CANTATA_AGORA_APP_ID = \"${CANTATA_APP_ID}\"#g" Android/scenes/cantata/build.gradle
+
 # Compile apk
 ./gradlew clean || exit 1
 ./gradlew :app:assembleRelease || exit 1

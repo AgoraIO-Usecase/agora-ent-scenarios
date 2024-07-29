@@ -1276,6 +1276,10 @@ class LiveDetailFragment : Fragment() {
                     ToastUtils.showToast(context?.getString(R.string.show_tip1))
                     return
                 }
+                if (interactionInfo != null) {
+                    ToastUtils.showToast(R.string.show_cannot_invite_pk)
+                    return
+                }
                 if (isRoomOwner) {
                     val roomDetail = roomItem.convertToShowRoomDetailModel()
                     prepareRoomInfo = roomDetail
@@ -1513,7 +1517,7 @@ class LiveDetailFragment : Fragment() {
             insertMessageItem(showMessage)
         }
         mService.subscribeMicSeatApply(mRoomInfo.roomId) { _, list ->
-            mBinding.bottomLayout.vLinkingDot.isVisible = list.isNotEmpty()
+            mBinding.bottomLayout.vLinkingDot.isVisible = list.isNotEmpty() && isRoomOwner
             mLinkDialog.setSeatApplyList(interactionInfo, list)
         }
         mService.subscribeInteractionChanged(mRoomInfo.roomId) { status, info ->
@@ -2513,6 +2517,7 @@ class LiveDetailFragment : Fragment() {
             }
         }
 
+        mBinding.livingComeSoonLayout.root.isVisible = false
         mBinding.videoPKLayout.userNameA.text = mRoomInfo.ownerName
         mBinding.videoPKLayout.userNameA.isActivated = true
         mBinding.videoPKLayout.userNameB.text = interactionInfo!!.userName
