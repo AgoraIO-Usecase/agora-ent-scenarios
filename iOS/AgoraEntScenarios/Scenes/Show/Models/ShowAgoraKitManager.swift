@@ -35,7 +35,7 @@ class ShowAgoraKitManager: NSObject {
     public var deviceLevel: DeviceLevel = .medium
     public var deviceScore: Int = 100
     public var netCondition: NetCondition = .good
-    public var performanceMode: PerformanceMode = .smooth
+    public var performanceMode: PerformanceMode = .fluent
     
     private var broadcasterConnection: AgoraRtcConnection?
     
