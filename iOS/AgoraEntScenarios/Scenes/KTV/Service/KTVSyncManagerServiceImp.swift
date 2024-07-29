@@ -598,6 +598,9 @@ extension KTVSyncManagerServiceImp {
             
             switch dataCmd {
             case .enterSeatCmd:
+                guard let intValue = Int(key), (1...8).contains(intValue) else {
+                    return KTVCommonError.noPermission.toNSError()
+                }
                 let willEnterSeatUserId = getSeatUserId(value) ?? ""
                 //check wheather the user has entered the seat
                 if currentMap.values.contains(where: { getSeatUserId($0) == willEnterSeatUserId }) {
