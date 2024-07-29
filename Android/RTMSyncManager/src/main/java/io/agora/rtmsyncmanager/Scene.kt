@@ -2,9 +2,10 @@ package io.agora.rtmsyncmanager
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import io.agora.rtm.LinkStateEvent
+import io.agora.rtm.RtmConstants
 import io.agora.rtm.RtmConstants.RtmConnectionChangeReason
 import io.agora.rtm.RtmConstants.RtmConnectionState
 import io.agora.rtm.RtmConstants.RtmErrorCode
@@ -81,7 +82,10 @@ class Scene constructor(
                     cleanUserInfo(userInfo.userId)
                     return
                 }
-                cleanScene()
+                cleanUserInfo(userInfo.userId)
+                respHandlers.notifyEventHandlers { handler ->
+                    handler.onSceneDestroy(channelName)
+                }
             }
             override fun onRoomUserUpdate(roomId: String, userInfo: AUIUserInfo) {}
             override fun onUserAudioMute(userId: String, mute: Boolean) {}
@@ -408,6 +412,24 @@ class Scene constructor(
             if (expireCondition.lastUpdateTimestamp == null) {
                 expireCondition.lastUpdateTimestamp = timestamp
             }
+        }
+
+        override fun onLinkStateEvent(event: LinkStateEvent?) {
+            super.onLinkStateEvent(event)
+            event ?: return
+            if (event.currentState == RtmConstants.RtmLinkState.DISCONNECTED && event.previousState == RtmConstants.RtmLinkState.CONNECTED) {
+                expireCondition.offlineTimestamp = event.timestamp
+            } else if (event.currentState == RtmConstants.RtmLinkState.CONNECTED && event.operation == RtmConstants.RtmLinkOperation.RECONNECTED) {
+                getArbiter().acquire()
+                expireCondition.reconnectNow(event.timestamp)
+            }
+
+            if (event.currentState == RtmConstants.RtmLinkState.FAILED) {
+                respHandlers.notifyEventHandlers { handler ->
+                    // TODO onSceneFailed
+                }
+            }
+
         }
     }
 
