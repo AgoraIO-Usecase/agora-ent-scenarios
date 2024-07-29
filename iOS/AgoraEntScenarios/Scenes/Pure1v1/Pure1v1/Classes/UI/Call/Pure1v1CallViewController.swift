@@ -126,7 +126,7 @@ class Pure1v1CallViewController: UIViewController {
         moreBtn.aui_right = view.aui_width - 15
         moreBtn.aui_centerY = roomInfoView.aui_centerY
         
-        showRealDataView()
+//        showRealDataView()
     }
     
     private func _resetCanvas() {
