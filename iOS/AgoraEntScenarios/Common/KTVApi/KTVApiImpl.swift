@@ -468,11 +468,13 @@ extension KTVApiImpl {
             if self.singerRole == .leadSinger || self.singerRole == .soloSinger {
                 apiConfig?.engine?.adjustRecordingSignalVolume(muteStatus ? 0 : 100)
             } else {
-                let channelMediaOptions = AgoraRtcChannelMediaOptions()
-                channelMediaOptions.publishMicrophoneTrack = !muteStatus
-                channelMediaOptions.clientRoleType = .broadcaster
-                apiConfig?.engine?.updateChannel(with: channelMediaOptions)
-                apiConfig?.engine?.muteLocalAudioStream(muteStatus)
+//                let channelMediaOptions = AgoraRtcChannelMediaOptions()
+//                channelMediaOptions.publishMicrophoneTrack = !muteStatus
+//                channelMediaOptions.clientRoleType = .broadcaster
+//                apiConfig?.engine?.updateChannel(with: channelMediaOptions)
+//                apiConfig?.engine?.muteLocalAudioStream(muteStatus)
+                
+                apiConfig?.engine?.adjustRecordingSignalVolume(muteStatus ? 0 : 100)
             }
         } else {
             apiConfig?.engine?.adjustRecordingSignalVolume(muteStatus ? 0 : 100)
