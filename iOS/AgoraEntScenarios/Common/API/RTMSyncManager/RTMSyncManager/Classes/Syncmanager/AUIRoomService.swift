@@ -83,6 +83,13 @@ public class AUIRoomService: NSObject {
                 self.createRoomRevert(roomId: room.roomId)
                 completion(error, nil)
             }
+            guard let info = info else {
+                //失败需要清理脏房间信息
+                self.createRoomRevert(roomId: room.roomId)
+                aui_info("create fail[\(room.roomId)] room info not found", tag: RoomServiceTag)
+                completion(NSError(domain: "room not found", code: -1), nil)
+                return
+            }
             completion(nil, info)
         }
         

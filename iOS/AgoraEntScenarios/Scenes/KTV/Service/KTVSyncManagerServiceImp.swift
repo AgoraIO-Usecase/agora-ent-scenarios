@@ -170,7 +170,6 @@ extension KTVSyncManagerServiceImp {
                 
                 _hideLoadingView()
                 completion(nil, room!)
-                
             }
         }
 
