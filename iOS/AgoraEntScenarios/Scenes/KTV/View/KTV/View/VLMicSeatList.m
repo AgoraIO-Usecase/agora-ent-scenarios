@@ -117,7 +117,12 @@
     }
     
     if ([AppContext isKtvChorusingWithSeat:seatModel]) {
-        cell.joinChorusBtn.hidden = NO;
+        if (cell.singingBtn.hidden) {
+            cell.joinChorusBtn.hidden = NO;
+        } else {
+            cell.joinChorusBtn.hidden = YES;
+            KTVLogError(@"join chorus button and singing button can't be displayed at the same time!");
+        }
     } else {
         cell.joinChorusBtn.hidden = YES;
     }
@@ -125,7 +130,6 @@
     if (seatModel.owner.userId.length == 0) {
         cell.muteImgView.hidden = YES;
         cell.singingBtn.hidden = YES;
-        cell.joinChorusBtn.hidden = YES;
     }
     
     //only display when rtcUid exists (on mic seat), and video is not muted
