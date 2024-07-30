@@ -60,6 +60,8 @@ public class ChatRoomServiceImp: NSObject {
         return service
     }()
     
+    private var bgm: VoiceChatBGM? = nil
+    
     public override init() {
         let owner = AUIUserThumbnailInfo()
         owner.userId = VLUserCenter.user.id
@@ -242,25 +244,32 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
 //MARK: ChatRoomServiceProtocol
 extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     func fetchRoomBGM(roomId: String?, completion: @escaping (String?, String?, Bool) -> Void) {
-        SyncUtil.scene(id: roomId ?? "")?.get(key: roomBGMKey, success: { object in
-            let singerName = object?.toDict()["singerName"] as? String
-            let isOrigin = object?.toDict()["isOrigin"] as? Bool
-            let songName = object?.toDict()["songName"] as? String
-            completion(songName, singerName, isOrigin ?? false)
-        })
+        guard let `roomId` = roomId,
+              let scene = self.syncManager.getScene(channelName: roomId)
+        else { return }
     }
     
     func updateRoomBGM(songName: String?, singerName: String?, isOrigin: Bool) {
-        let params = ["songName": songName ?? "", "singerName": singerName ?? "", "isOrigin": !isOrigin] as [String : Any]
-        SyncUtil.scene(id: roomId ?? "")?.update(key: roomBGMKey, data: params)
+        guard let `roomId` = roomId,
+              let scene = self.syncManager.getScene(channelName: roomId)
+        else { return }
+        let bgm = VoiceChatBGM(songName: songName ?? "", singerName: singerName ?? "", isOrigin: isOrigin)
+        let collection: AUIMapCollection? = scene.getCollection(key: roomBGMKey)
+        collection?.updateMetaData(valueCmd: nil, value: bgm.toDict()) { e in
+        }
     }
     
     func subscribeRoomBGMChange(roomId: String?, completion: @escaping (String?, String?, Bool) -> Void) {
-        SyncUtil.scene(id: roomId ?? "")?.subscribe(key: roomBGMKey, onUpdated: { object in
-            let singerName = object.toDict()["singerName"] as? String
-            let isOrigin = object.toDict()["isOrigin"] as? Bool
-            let songName = object.toDict()["songName"] as? String
-            completion(songName, singerName, isOrigin ?? false)
+        guard let `roomId` = roomId,
+              let scene = self.syncManager.getScene(channelName: roomId)
+        else { return }
+        let collection: AUIMapCollection? = scene.getCollection(key: roomBGMKey)
+        collection?.subscribeAttributesDidChanged(callback: { channelName, key, object in
+            guard let dict = object.getMap() else {
+                return
+            }
+            let bgm = VoiceChatBGM.fromDict(dict: dict)
+            completion(bgm.songName, bgm.singerName, bgm.isOrigin)
         })
     }
     

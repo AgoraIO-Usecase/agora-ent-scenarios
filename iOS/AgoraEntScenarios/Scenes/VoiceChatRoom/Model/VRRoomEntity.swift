@@ -72,7 +72,7 @@ extension AUIRoomInfo {
         model.member_count = roomUserCount
         let chatRoomOwner = VRUser()
         chatRoomOwner.name = owner?.userName ?? ""
-        chatRoomOwner.portrait = customPayload["portrait"] as? String
+        chatRoomOwner.portrait = owner?.userAvatar ?? ""
         chatRoomOwner.uid = owner?.userId ?? ""
         chatRoomOwner.chat_uid = owner?.userId ?? ""
         chatRoomOwner.chat_uid = owner?.userId ?? ""
@@ -96,6 +96,7 @@ extension AUIRoomInfo {
         let owner = AUIUserThumbnailInfo()
         owner.userId = model.owner?.uid ?? ""
         owner.userName = model.owner?.name ?? ""
+        owner.userAvatar = model.owner?.portrait ?? ""
         roomInfo.owner = owner
         roomInfo.createTime = Int64(model.created_at ?? 0)
         roomInfo.customPayload["channel_id"] = model.channel_id
@@ -104,8 +105,6 @@ extension AUIRoomInfo {
         roomInfo.customPayload["roomPassword"] = model.roomPassword
         roomInfo.customPayload["rtc_uid"] = model.rtc_uid
         roomInfo.customPayload["type"] = model.type
-        // owner
-        roomInfo.customPayload["portrait"] = model.owner?.portrait
         return roomInfo
     }
 }
