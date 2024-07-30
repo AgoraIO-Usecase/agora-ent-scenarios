@@ -9,14 +9,6 @@ import Foundation
 import RTMSyncManager
 import AgoraCommon
 
-/*
- 
- ""="拉取歌单失败, 错误:";
- "ktv_choose_song_fail_toast"="点歌失败, 错误:";
- "ktv_remove_song_fail_toast"="删除歌曲失败, 错误:";
- "ktv_pin_song_fail_toast"="置顶歌曲失败, 错误:";
- "ktv_switch_song_fail_toast"="切歌失败, 错误:";
- */
 
 func toKtvLocalize(_ str: String) -> String {
     return str.toSceneLocalization(with: "KtvResource") as String

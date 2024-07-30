@@ -857,20 +857,22 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)joinChorus {
     self.isJoinChorus = YES;
     [self.MVView setMvState:VLKTVMVViewStateJoinChorus];
-    if(![self hasAvailableMicSeat]){
+    if(![self enableShowJoinChorusButton]){
+        KTVLogInfo(@"joinChorus fail! enableShowJoinChorusButton false");
         [self _rollbackAfterChorusJoinFailure];
         [VLToast toast:KTVLocalizedString(@"ktv_mic_full")];
         return;
     }
     
     if(self.RTCkit.getConnectionState != AgoraConnectionStateConnected){
+        KTVLogInfo(@"joinChorus fail! rtc connected(%d) is not connected", self.RTCkit.getConnectionState);
         [self _rollbackAfterChorusJoinFailure];
         [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
         return;
     }
     
     if (![self getJoinChorusEnable]) {
-        KTVLogInfo(@"getJoinChorusEnable false");
+        KTVLogInfo(@"joinChorus fail! getJoinChorusEnable false");
         [self _rollbackAfterChorusJoinFailure];
         [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
         return;
@@ -881,7 +883,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         VL(weakSelf);
         [self enterSeatWithIndex:nil completion:^(NSError *error) {
             if(error){
-                KTVLogError(@"enterSeat error:%@", error.description);
+                KTVLogError(@"joinChorus fail! enterSeat error:%@", error.description);
                 [weakSelf _rollbackAfterChorusJoinFailure];
                 [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
                 return;
@@ -1223,11 +1225,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
 }
 
-- (BOOL)hasAvailableMicSeat {
+- (BOOL)enableShowJoinChorusButton {
     if(_isOnMicSeat) {
         return YES;
     }
-    return [self getOnMicUserCount] < 8;
+    NSUInteger count = [self getOnMicUserCount];
+    KTVLogInfo(@"getOnMicUserCount = %ld", count);
+    return count < 8;
 }
 
 #pragma mark -- VLKTVTopViewDelegate
@@ -1876,12 +1880,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (BOOL)getJoinChorusEnable {
     //不是观众不允许加入
     if ([self getUserSingRole] != KTVSingRoleAudience) {
+        KTVLogInfo(@"getJoinChorusEnable fail role = %ld", [self getUserSingRole]);
         return NO;
     }
     
     VLRoomSelSongModel* topSong = [[self selSongsArray] firstObject];
     //TODO: 不在播放不允许加入
     if (topSong.status != VLSongPlayStatusPlaying) {
+        KTVLogInfo(@"getJoinChorusEnable fail status = %ld", topSong.status);
         return NO;
     }
     
