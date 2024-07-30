@@ -79,7 +79,7 @@ class BaseRoomViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        _showRealTimeView()
+//        _showRealTimeView()
     }
     
     @objc func onBackAction() {
