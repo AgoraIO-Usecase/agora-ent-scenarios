@@ -163,7 +163,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     self.selectedVoiceShowIndex = -1;
     self.selectUserNo = @"";
     self.soundOpen = false;
-    self.gainValue = @"1.0";
+    self.gainValue = @"100.0";
     self.effectType = 0;
     self.typeValue = 4;
     self.isDelay = true;
