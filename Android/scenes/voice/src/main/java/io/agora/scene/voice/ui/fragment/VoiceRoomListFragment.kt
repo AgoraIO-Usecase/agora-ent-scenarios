@@ -65,6 +65,8 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayou
                 voiceRoomViewModel.getRoomList()
             }
         }
+        showLoadingView()
+        voiceRoomViewModel.checkLoginIm()
         voiceRoomObservable()
     }
 
@@ -74,6 +76,9 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayou
     }
 
     private fun voiceRoomObservable() {
+        voiceRoomViewModel.loginImObservable.observe(this) {
+            hideLoadingView()
+        }
         voiceRoomViewModel.roomListObservable.observe(this) { roomList: List<AUIRoomInfo>? ->
             binding?.apply {
                 smartRefreshLayout.finishRefresh()
@@ -92,22 +97,6 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayou
         voiceRoomViewModel.joinRoomObservable.observe(this) { roomInfo: AUIRoomInfo? ->
             if (roomInfo != null) {
                 curVoiceRoomModel = roomInfo
-                val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
-                val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
-                ChatroomIMManager.getInstance().login(chatUsername, chatToken, object : CallBack {
-                    override fun onSuccess() {
-                        goChatroomPage()
-                    }
-
-                    override fun onError(code: Int, desc: String) {
-                        if (code == EMAError.USER_ALREADY_LOGIN) {
-                            goChatroomPage()
-                        } else {
-                            hideLoadingView()
-                            ToastUtils.showToast(R.string.voice_room_login_exception)
-                        }
-                    }
-                })
             }
         }
     }

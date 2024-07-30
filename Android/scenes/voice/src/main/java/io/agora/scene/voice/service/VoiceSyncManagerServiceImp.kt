@@ -297,7 +297,6 @@ class VoiceSyncManagerServiceImp(
                 completion.invoke(Exception("${it.message}"), null)
                 return@initRtmSync
             }
-
             // 创建环信房间
             innerCreateChatRoom(inputModel.roomName, completion = { chatId, error ->
                 if (chatId == null) {

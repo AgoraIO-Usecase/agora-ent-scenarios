@@ -17,8 +17,8 @@ import io.agora.scene.voice.R
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.databinding.VoiceFragmentAudienceListBinding
 import io.agora.scene.voice.databinding.VoiceItemRoomAudienceListBinding
-import io.agora.scene.voice.model.RoomKitBean
 import io.agora.scene.voice.model.VoiceMemberModel
+import io.agora.scene.voice.model.VoiceRoomModel
 import io.agora.scene.voice.model.annotation.MicClickAction
 import io.agora.scene.voice.service.VoiceServiceListenerProtocol
 import io.agora.scene.voice.service.VoiceServiceProtocol
@@ -37,19 +37,19 @@ class RoomAudienceListFragment : BaseViewBindingFragment<VoiceFragmentAudienceLi
     companion object {
 
         private val TAG = RoomAudienceListFragment::class.java.simpleName
-        private const val KEY_ROOM_INFO = "room_info"
+        private const val KEY_ROOM_INFO = "voice_room_info"
         private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
 
-        fun getInstance(roomKitBean: RoomKitBean): RoomAudienceListFragment {
+        fun getInstance(voiceRoomModel: VoiceRoomModel): RoomAudienceListFragment {
             return RoomAudienceListFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable(KEY_ROOM_INFO, roomKitBean)
+                    putSerializable(KEY_ROOM_INFO, voiceRoomModel)
                 }
             }
         }
     }
 
-    private var roomKitBean: RoomKitBean? = null
+    private var voiceRoomModel: VoiceRoomModel? = null
 
     private lateinit var userListViewModel: VoiceUserListViewModel
 
@@ -72,8 +72,8 @@ class RoomAudienceListFragment : BaseViewBindingFragment<VoiceFragmentAudienceLi
         super.onViewCreated(view, savedInstanceState)
         userListViewModel = ViewModelProvider(this)[VoiceUserListViewModel::class.java]
         arguments?.apply {
-            roomKitBean = getSerializable(KEY_ROOM_INFO) as RoomKitBean?
-            roomKitBean?.let {
+            voiceRoomModel = getSerializable(KEY_ROOM_INFO) as VoiceRoomModel?
+            voiceRoomModel?.let {
                 userListViewModel.fetchMemberList()
                 voiceServiceProtocol.subscribeListener(object : VoiceServiceListenerProtocol {
                     override fun onUserJoinedRoom(roomId: String, voiceMember: VoiceMemberModel) {

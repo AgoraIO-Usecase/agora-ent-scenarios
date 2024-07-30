@@ -4,12 +4,20 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import io.agora.CallBack
+import io.agora.chat.adapter.EMAError
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.voice.R
+import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.VoiceCreateRoomModel
+import io.agora.scene.voice.netkit.VRCreateRoomResponse
+import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
+import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.voice.common.viewmodel.SingleSourceLiveData
 
 /**
@@ -26,17 +34,57 @@ class VoiceCreateViewModel : ViewModel() {
         VoiceServiceProtocol.getImplInstance()
     }
 
+    private val _loginImObservable: SingleSourceLiveData<Boolean> = SingleSourceLiveData()
+
     private val _roomListObservable: SingleSourceLiveData<List<AUIRoomInfo>?> = SingleSourceLiveData()
 
     private val _createRoomObservable: SingleSourceLiveData<AUIRoomInfo?> = SingleSourceLiveData()
 
     private val _joinRoomObservable: SingleSourceLiveData<AUIRoomInfo?> = SingleSourceLiveData()
 
+    val loginImObservable: LiveData<Boolean> get() = _loginImObservable
+
     val roomListObservable: LiveData<List<AUIRoomInfo>?> get() = _roomListObservable
 
     val createRoomObservable: LiveData<AUIRoomInfo?> get() = _createRoomObservable
 
     val joinRoomObservable: LiveData<AUIRoomInfo?> get() = _joinRoomObservable
+
+    fun checkLoginIm() {
+        VoiceToolboxServerHttpManager.createImRoom(
+            roomName = "",
+            roomOwner = "",
+            chatroomId = "",
+            type = 1,
+            callBack = object : VRValueCallBack<VRCreateRoomResponse> {
+                override fun onSuccess(response: VRCreateRoomResponse?) {
+                    response?.chatToken?.let {
+                        VoiceBuddyFactory.get().getVoiceBuddy().setupChatToken(it)
+                    }
+                    val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
+                    val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
+                    ChatroomIMManager.getInstance().login(chatUsername, chatToken, object : CallBack {
+                        override fun onSuccess() {
+                            _loginImObservable.postValue(true)
+                        }
+
+                        override fun onError(code: Int, desc: String) {
+                            if (code == EMAError.USER_ALREADY_LOGIN) {
+                                _loginImObservable.postValue(true)
+                            } else {
+                                _loginImObservable.postValue(false)
+                                ToastUtils.showToast(R.string.voice_room_login_exception)
+                            }
+                        }
+                    })
+                }
+
+                override fun onError(code: Int, message: String?) {
+                   _loginImObservable.postValue(false)
+                }
+
+            })
+    }
 
     /**
      * 获取房间列表

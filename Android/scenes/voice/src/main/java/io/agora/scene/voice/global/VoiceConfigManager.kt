@@ -21,7 +21,6 @@ object VoiceConfigManager {
                 VoiceBuddyFactory.get().getVoiceBuddy().application(),
                 VoiceBuddyFactory.get().getVoiceBuddy().chatAppKey()
             )
-        VoiceToolboxRequestApi.get().setBaseUrl(VoiceBuddyFactory.get().getVoiceBuddy().toolboxServiceUrl())
         VoiceBuddyFactory.get().getVoiceBuddy().application().registerActivityLifecycleCallbacks(mLifecycleCallbacks)
         SVGAParser.shareParser().init( VoiceBuddyFactory.get().getVoiceBuddy().application())
         SVGALogger.setLogEnabled(true)

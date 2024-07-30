@@ -17,10 +17,6 @@ class VoiceBuddyImp : IVoiceBuddy {
         return AgoraApplication.the()
     }
 
-    override fun toolboxServiceUrl(): String {
-        return io.agora.scene.base.BuildConfig.TOOLBOX_SERVER_HOST
-    }
-
     override fun headUrl(): String {
         return UserManager.getInstance().user?.headUrl ?: ""
     }

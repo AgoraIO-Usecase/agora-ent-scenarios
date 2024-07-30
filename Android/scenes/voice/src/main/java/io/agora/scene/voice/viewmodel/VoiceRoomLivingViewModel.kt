@@ -146,23 +146,23 @@ class VoiceRoomLivingViewModel : ViewModel() {
         _roomDetailsObservable.setSource(mRepository.fetchRoomDetail(voiceRoomModel))
     }
 
-    fun initSdkJoin(roomKitBean: RoomKitBean) {
+    fun initSdkJoin(voiceRoomModel: VoiceRoomModel) {
         joinRtcChannel.set(false)
         joinImRoom.set(false)
         AgoraRtcEngineController.get().joinChannel(
             VoiceBuddyFactory.get().getVoiceBuddy().application(),
-            roomKitBean.channelId,
+            voiceRoomModel.channelId,
             VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
-            roomKitBean.soundEffect, roomKitBean.isOwner,
+            voiceRoomModel.soundEffect, voiceRoomModel.isOwner,
             object : VRValueCallBack<Boolean> {
                 override fun onSuccess(value: Boolean) {
-                    VoiceLogger.d(TAG,"rtc  joinChannel onSuccess channelId:${roomKitBean.channelId}")
+                    VoiceLogger.d(TAG,"rtc  joinChannel onSuccess channelId:${voiceRoomModel.channelId}")
                     joinRtcChannel.set(true)
                     checkJoinRoom()
                 }
 
                 override fun onError(error: Int, errorMsg: String) {
-                    VoiceLogger.e(TAG,"rtc  joinChannel onError channelId:${roomKitBean.channelId},error:$error $errorMsg")
+                    VoiceLogger.e(TAG,"rtc  joinChannel onError channelId:${voiceRoomModel.channelId},error:$error $errorMsg")
                     ThreadManager.getInstance().runOnMainThread {
                         _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
                             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
@@ -175,9 +175,9 @@ class VoiceRoomLivingViewModel : ViewModel() {
             }
         )
         ChatroomIMManager.getInstance()
-            .joinRoom(roomKitBean.chatroomId, object : ValueCallBack<ChatRoom?> {
+            .joinRoom(voiceRoomModel.chatroomId, object : ValueCallBack<ChatRoom?> {
                 override fun onSuccess(value: ChatRoom?) {
-                    VoiceLogger.d(TAG,"im joinChatRoom onSuccess roomId:${roomKitBean.chatroomId}")
+                    VoiceLogger.d(TAG,"im joinChatRoom onSuccess roomId:${voiceRoomModel.chatroomId}")
                     joinImRoom.set(true)
                     checkJoinRoom()
                 }
@@ -188,7 +188,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
                             callBack.onError(error, errorMsg)
                         }
                     }.asLiveData())
-                    VoiceLogger.e(TAG, "im joinChatRoom onError roomId:${roomKitBean.chatroomId},$error  $errorMsg")
+                    VoiceLogger.e(TAG, "im joinChatRoom onError roomId:${voiceRoomModel.chatroomId},$error  $errorMsg")
                 }
             })
     }

@@ -1,10 +1,11 @@
 package io.agora.scene.voice.model
 
 import com.google.gson.annotations.SerializedName
+import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.voice.common.constant.ConfigConstants
 
 object VoiceParameters {
-    const val ROOM_USER_COUNT = "roomPeopleNum"
+    const val ROOM_USER_COUNT = "roomUserCount"
     const val PASSWORD = "roomPassword"
     const val IS_PRIVATE = "is_private"
     const val CHANNEL_ID = "channel_id"
@@ -55,7 +56,7 @@ data class VoiceRankUserModel constructor(
  * 房间数据
  */
 data class VoiceRoomModel constructor(
-    var owner: VoiceMemberModel? = null,
+    var owner: VoiceMemberModel = VoiceMemberModel(),
     @SerializedName("room_id") var roomId: String = "",
     @SerializedName("is_private") var isPrivate: Boolean = false,
     @SerializedName("member_count") var memberCount: Int = 0,
@@ -73,7 +74,9 @@ data class VoiceRoomModel constructor(
     @Transient var useRobot: Boolean = false,
     @Transient var robotVolume: Int = 50,
     @Transient var announcement: String = "",
-) : BaseRoomBean
+) : BaseRoomBean {
+    val isOwner: Boolean get() = owner.userId == VoiceBuddyFactory.get().getVoiceBuddy().userId()
+}
 
 data class VoiceBgmModel constructor(
     var songName: String = "",
@@ -98,9 +101,9 @@ data class VoiceMicInfoModel constructor(
 data class VoiceRoomApply constructor(
     var index: Int? = -1,
     var member: VoiceMemberModel? = null,
-    var created_at:Long? = 0
+    var created_at: Long? = 0
 
-) :BaseRoomBean
+) : BaseRoomBean
 
 /**
  * 房间详情
@@ -116,7 +119,7 @@ data class VoiceRoomInfo constructor(
  */
 data class VoiceGiftModel constructor(
     var gift_id: String? = "",
-    var gift_count:String? = "",
+    var gift_count: String? = "",
     var gift_name: String? = "",
     var gift_price: String? = "",
     var userName: String? = "",

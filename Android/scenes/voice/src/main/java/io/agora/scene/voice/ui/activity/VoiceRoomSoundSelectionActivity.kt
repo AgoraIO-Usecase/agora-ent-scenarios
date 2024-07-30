@@ -10,7 +10,6 @@ import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import io.agora.CallBack
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnItemClickListener
@@ -18,8 +17,6 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceActivitySoundSelectionLayoutBinding
-import io.agora.scene.voice.global.VoiceBuddyFactory
-import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.SoundSelectionBean
 import io.agora.scene.voice.model.constructor.RoomSoundSelectionConstructor.builderSoundSelectionList
 import io.agora.scene.voice.ui.adapter.VoiceRoomSoundSelectionAdapter
@@ -93,22 +90,9 @@ class VoiceRoomSoundSelectionActivity : BaseViewBindingActivity<VoiceActivitySou
         binding.list.adapter = soundSelectAdapter
 
         voiceRoomViewModel.createRoomObservable.observe(this) { roomInfo: AUIRoomInfo? ->
+            hideLoadingView()
             roomInfo ?: return@observe
-            if (ChatroomIMManager.getInstance().isLoggedIn) {
-                gotoChatRoom(roomInfo)
-            } else {
-                ChatroomIMManager.getInstance().login(
-                    VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
-                    VoiceBuddyFactory.get().getVoiceBuddy().chatToken(), object : CallBack {
-                        override fun onSuccess() {
-                            gotoChatRoom(roomInfo)
-                        }
-
-                        override fun onError(code: Int, desc: String) {
-                            hideLoadingView()
-                        }
-                    })
-            }
+            gotoChatRoom(roomInfo)
         }
     }
 

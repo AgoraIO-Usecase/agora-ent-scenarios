@@ -9,9 +9,6 @@ interface IVoiceBuddy {
     /** app */
     fun application(): Application
 
-    /** api url */
-    fun toolboxServiceUrl(): String
-
     /** user avatar */
     fun headUrl(): String
 

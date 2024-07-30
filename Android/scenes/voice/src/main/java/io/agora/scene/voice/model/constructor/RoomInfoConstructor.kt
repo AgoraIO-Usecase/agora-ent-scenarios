@@ -1,9 +1,9 @@
 package io.agora.scene.voice.model.constructor
 
-import android.text.TextUtils
-import io.agora.scene.voice.model.RoomKitBean
-import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.rtmsyncmanager.model.AUIRoomInfo
+import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
+import io.agora.scene.voice.model.VoiceParameters
 import io.agora.scene.voice.model.VoiceRoomModel
 import io.agora.voice.common.constant.ConfigConstants
 
@@ -12,27 +12,33 @@ import io.agora.voice.common.constant.ConfigConstants
  */
 object RoomInfoConstructor {
 
-    /** VoiceRoomModel convert RoomKitBean*/
-    fun RoomKitBean.convertByVoiceRoomModel(voiceRoomModel: VoiceRoomModel) {
-        roomId = voiceRoomModel.roomId
-        chatroomId = voiceRoomModel.chatroomId
-        channelId = voiceRoomModel.channelId
-        ownerId = voiceRoomModel.owner?.userId ?: ""
-        ownerChatUid = voiceRoomModel.owner?.chatUid?:""
-        roomType = voiceRoomModel.roomType
-        isOwner = curUserIsHost(voiceRoomModel.owner?.userId)
-        soundEffect = voiceRoomModel.soundEffect
-    }
-
-    /** Check if you are a host */
-    private fun curUserIsHost(ownerId: String?): Boolean {
-        return TextUtils.equals(ownerId, VoiceBuddyFactory.get().getVoiceBuddy().userId())
+    fun VoiceRoomModel.convertByRoomInfo(roomInfo: AUIRoomInfo) {
+        owner = VoiceMemberModel().apply {
+            userId = roomInfo.roomOwner?.userId ?: ""
+            chatUid = roomInfo.roomOwner?.userId ?: ""
+            nickName = roomInfo.roomOwner?.userName ?: ""
+            portrait = roomInfo.roomOwner?.userAvatar ?: ""
+            rtcUid = roomInfo.roomOwner?.userId?.toIntOrNull() ?: 0
+        }
+        roomId = roomInfo.roomId
+        isPrivate = roomInfo.customPayload[VoiceParameters.IS_PRIVATE] as? Boolean ?: false
+        memberCount = roomInfo.customPayload[VoiceParameters.ROOM_USER_COUNT] as? Int ?: 0
+        roomName = roomInfo.roomName
+        soundEffect = roomInfo.customPayload[VoiceParameters.TYPE] as? Int ?: 0
+        channelId = roomInfo.roomId // 同 roomId
+        chatroomId = roomInfo.customPayload[VoiceParameters.CHATROOM_ID] as? String ?: ""
+        createdAt = roomInfo.createTime
+        roomPassword = roomInfo.customPayload[VoiceParameters.PASSWORD] as? String ?: ""
     }
 
     /**
      * 扩展麦位数据
      */
-    fun extendMicInfoList(vMicInfoList: List<VoiceMicInfoModel>, roomType: Int, ownerUid: String): List<VoiceMicInfoModel> {
+    fun extendMicInfoList(
+        vMicInfoList: List<VoiceMicInfoModel>,
+        roomType: Int,
+        ownerUid: String
+    ): List<VoiceMicInfoModel> {
         val micInfoList = mutableListOf<VoiceMicInfoModel>()
         val interceptIndex = if (roomType == ConfigConstants.RoomType.Common_Chatroom) 5 else 4
         for (i in vMicInfoList.indices) {
