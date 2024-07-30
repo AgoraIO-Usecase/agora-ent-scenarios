@@ -19,7 +19,11 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     
     func onRoomExpired() {
         ToastView.show(text: ChatRoomServiceKickedReason.destroyed.errorDesc())
-        fetchDetailError()
+        DispatchQueue.main.async {
+            self.notifySeverLeave()
+            self.rtckit.leaveChannel()
+            self.backAction()
+        }
     }
     
     func chatTokenWillExpire() {
