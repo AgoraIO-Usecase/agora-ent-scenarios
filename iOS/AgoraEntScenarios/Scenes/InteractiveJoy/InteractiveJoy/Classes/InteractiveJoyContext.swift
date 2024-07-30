@@ -14,6 +14,7 @@ class JoyLogger: NSObject {
     }
 
     public static func error(_ text: String, context: String? = nil) {
+        
         AgoraEntLog.getSceneLogger(with: kLogKey).error(text, context: context)
     }
 }
@@ -49,7 +50,7 @@ public class InteractiveJoyContext: NSObject {
         joyAppId = appId
         joyHost = host
         joyAppCertificate = appCertificate
-        let vc = RoomListViewController(userInfo: userInfo)
+        let vc = GameListViewController(userInfo: userInfo)
         vc.hidesBottomBarWhenPushed = true
         viewController.navigationController?.pushViewController(vc, animated: true)
     }

@@ -55,4 +55,5 @@ TODO: Add long description of the pod here.
   s.dependency 'SVProgressHUD'
   s.dependency 'RTMSyncManager'
   s.dependency 'AgoraCommon'
+  s.dependency 'SudMGPWrapper'
 end

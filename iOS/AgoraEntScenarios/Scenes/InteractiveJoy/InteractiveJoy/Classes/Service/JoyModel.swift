@@ -27,6 +27,9 @@ public class InteractiveJoyRoomInfo: NSObject {
     var ownerAvatar: String?       //房主头像
     var ownerName: String?         //房主名
     var badgeTitle: String = ""    //胖可争霸/羊羊抗狼
+    var gameId: Int64 = 0          //游戏Id
+    var password: String?          //房间密码
+    var isPrivate: Bool = false    //是否为私密房间
     var createdAt: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
     
     var objectId: String = ""

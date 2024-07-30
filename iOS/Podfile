@@ -76,6 +76,7 @@ def all_pods
   pod 'SwiftyBeaver', '1.9.5'
   pod 'Protobuf', '3.22.1'
   pod 'SwiftProtobuf'
+  pod 'SudMGPWrapper'
  #  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
 
   #bugly

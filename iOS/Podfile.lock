@@ -93,6 +93,7 @@ PODS:
     - RTMSyncManager
     - SDWebImage
     - SnapKit
+    - SudMGPWrapper
     - SVProgressHUD
     - SwiftyBeaver
     - YYCategories
@@ -113,6 +114,7 @@ PODS:
   - KakaJSON (1.1.2)
   - LEEAlert (1.6.4)
   - Masonry (1.1.0)
+  - MJExtension (3.4.2)
   - MJRefresh (3.7.9)
   - Protobuf (3.22.1)
   - Pure1v1 (0.1.0):
@@ -151,6 +153,10 @@ PODS:
   - SnapKit (5.7.1)
   - SocketRocket (0.7.0)
   - SSZipArchive (2.4.3)
+  - SudMGP (1.4.0)
+  - SudMGPWrapper (1.4.0.1):
+    - MJExtension (~> 3.4.1)
+    - SudMGP
   - SVGAPlayer (2.5.7):
     - SVGAPlayer/Core (= 2.5.7)
     - SVGAPlayer/ProtoFiles (= 2.5.7)
@@ -205,6 +211,7 @@ DEPENDENCIES:
   - ShowTo1v1 (from `AgoraEntScenarios/Scenes/ShowTo1v1`)
   - SnapKit
   - SocketRocket (= 0.7.0)
+  - SudMGPWrapper
   - SVGAPlayer
   - SVProgressHUD (= 2.2.5)
   - SwiftProtobuf
@@ -233,6 +240,7 @@ SPEC REPOS:
     - KakaJSON
     - LEEAlert
     - Masonry
+    - MJExtension
     - MJRefresh
     - Protobuf
     - ScoreEffectUI
@@ -240,6 +248,8 @@ SPEC REPOS:
     - SnapKit
     - SocketRocket
     - SSZipArchive
+    - SudMGP
+    - SudMGPWrapper
     - SVGAPlayer
     - SVProgressHUD
     - SwiftProtobuf
@@ -303,12 +313,13 @@ SPEC CHECKSUMS:
   fuLib: 43b6990d34caa47e0f12a61db57fe9bd2372f584
   FURenderKit: 29a1273700cd6de35b66042468a8a4c4c015e25a
   HXPhotoPicker: 541da99aa88b8eb0b6222ddfe37cacbd06d73300
-  InteractiveJoy: 32645990d48bda587db313fe44a251ca1d9a2d58
+  InteractiveJoy: c1a7e200cb4cc42a0ad0a70a585b4dc16206b96e
   Joy: 20168a64bfbd0c6053382991957335eb2d452576
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
   LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
+  MJExtension: e97d164cb411aa9795cf576093a1fa208b4a8dd8
   MJRefresh: ff9e531227924c84ce459338414550a05d2aea78
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
   Pure1v1: 2f7baf4576168c6bc57e53ad4cf322158730796e
@@ -320,6 +331,8 @@ SPEC CHECKSUMS:
   SnapKit: d612e99e678a2d3b95bf60b0705ed0a35c03484a
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
+  SudMGP: 780c36ec2468e41995d593b74801c9b08bfdf4d6
+  SudMGPWrapper: c5f794982d1a94cb18cf09fd155e5c2a3af3078a
   SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftProtobuf: bcfd2bc231cf9ae552cdc7c4e877bd3b41fe57b1
@@ -331,6 +344,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: 17a1de3d37b567138acc5f49e5eca0913cdd90c8
+PODFILE CHECKSUM: 19e39da1d25d7e4653c6c3d1d324b65e68824016
 
 COCOAPODS: 1.15.2

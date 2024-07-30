@@ -11,7 +11,7 @@ import YYModel
 import AgoraRtmKit
 import AgoraCommon
 
-private let kSceneId = "scene_joy_5.0.0"
+private let kSceneId = "scene_play_zone_4.10.2"
 private let SYNC_SCENE_ROOM_STARTGAME_COLLECTION = "startGameCollection"
 class JoyServiceImpl: NSObject {
     private var appId: String
@@ -100,14 +100,18 @@ extension JoyServiceImpl: JoyServiceProtocol {
         }
     }
     
-    func createRoom(roomName: String, completion: @escaping (InteractiveJoyRoomInfo?, Error?) -> Void) { JoyLogger.info("createRoom start")
+    func createRoom(roomName: String, gameId: Int64, password: String, completion: @escaping (InteractiveJoyRoomInfo?, Error?) -> Void) {
+        JoyLogger.info("createRoom start")
         let createAt = Int64(Date().timeIntervalSince1970 * 1000)
         let roomInfo = AUIRoomInfo()
         roomInfo.roomName = roomName
         roomInfo.roomId = "\(arc4random_uniform(899999) + 100000)"
         roomInfo.customPayload = [
             "roomUserCount": 1,
-            "createdAt": createAt
+            "createdAt": createAt,
+            "gameId": gameId,
+            "password": password,
+            "isPrivate": !password.isEmpty
         ]
 
         let owner = AUIUserThumbnailInfo()
@@ -334,6 +338,18 @@ extension JoyServiceImpl{
             joyRoom.objectId = objectId
         }
         
+        if let gameId = roomDict["gameId"] as? Int64 {
+            joyRoom.gameId = gameId
+        }
+        
+        if let pwd = roomDict["password"] as? String {
+            joyRoom.password = pwd
+        }
+        
+        if let isPrivate = roomDict["isPrivate"] as? Bool {
+            joyRoom.isPrivate = isPrivate
+        }
+        
         return joyRoom
     }
     
@@ -346,14 +362,17 @@ extension JoyServiceImpl{
         customPayload["badgeTitle"] = model.badgeTitle
         customPayload["createdAt"] = model.createdAt
         customPayload["objectId"] = model.objectId
+        customPayload["gameId"] = model.gameId
+        customPayload["password"] = model.password
+        customPayload["isPrivate"] = model.isPrivate
         
         roomInfo.customPayload = customPayload
         roomInfo.roomId = model.roomId
         
         let owner = AUIUserThumbnailInfo()
-        owner.userId = String(user.userId)
-        owner.userName = user.userName
-        owner.userAvatar = user.avatar
+        owner.userId = "\(model.ownerId)"
+        owner.userName = model.ownerName ?? ""
+        owner.userAvatar = model.ownerAvatar ?? ""
         roomInfo.roomName = model.roomName ?? ""
         roomInfo.owner = owner
         
@@ -397,7 +416,6 @@ extension JoyServiceImpl{
 }
 
 extension JoyServiceImpl: AUIRtmErrorProxyDelegate {
-    
     private func login(completion:(@escaping (Error?)-> Void)) {
         NetworkManager.shared.generateToken(channelName: "",
                                             uid: String(user.userId),
