@@ -21,8 +21,15 @@ enum KTVSongMode: Int {
     case songUrl
 }
 
+func createDateFormatter()-> DateFormatter {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+    return formatter
+}
+
+public let formatter = createDateFormatter()
 private func agoraPrint(_ message: String) {
-   print(message)
+   print("\(formatter.string(from: Date()))[KTVAPI]\(message)")
 }
 
 @objc class KTVApiImpl: NSObject{
@@ -667,6 +674,7 @@ extension KTVApiImpl {
     
     private func _loadMusic(config: KTVSongConfiguration, mode: KTVLoadMusicMode, onMusicLoadStateListener: IMusicLoadStateListener){
         
+        agoraPrint("_loadMusic \(config.songIdentifier) as role: \(singerRole.rawValue)")
         songConfig = config
         lastReceivedPosition = 0
         localPosition = 0
@@ -699,6 +707,7 @@ extension KTVApiImpl {
                 if (config.autoPlay) {
                     // 主唱自动播放歌曲
                     if self.singerRole != .leadSinger {
+                        agoraPrint("loadLrcOnly autoplay switch \(self.singerRole.rawValue) to soloSinger")
                         self.switchSingerRole(newRole: .soloSinger) { _, _ in
                             
                         }
@@ -739,6 +748,7 @@ extension KTVApiImpl {
                             if config.autoPlay {
                                 // 主唱自动播放歌曲
                                 if self.singerRole != .leadSinger {
+                                    agoraPrint("loadMusicAndLrc autoplay switch \(self.singerRole.rawValue) to soloSinger")
                                     self.switchSingerRole(newRole: .soloSinger) { _, _ in
                                         
                                     }
@@ -751,6 +761,7 @@ extension KTVApiImpl {
                         if config.autoPlay {
                             // 主唱自动播放歌曲
                             if self.singerRole != .leadSinger {
+                                agoraPrint("loadMusicOnly autoplay switch \(self.singerRole.rawValue) to soloSinger")
                                 self.switchSingerRole(newRole: .soloSinger) { _, _ in
                                     
                                 }
@@ -790,7 +801,7 @@ extension KTVApiImpl {
     }
     
     private func setLyric(with url: String, callBack: @escaping LyricCallback) {
-        agoraPrint("setLyric url: (url)")
+        agoraPrint("setLyric url: \(url)")
         self.lrcControl?.onDownloadLrcData(url: url)
         callBack(url)
     }
