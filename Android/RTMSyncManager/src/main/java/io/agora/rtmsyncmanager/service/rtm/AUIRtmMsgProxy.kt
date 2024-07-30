@@ -430,6 +430,4 @@ class AUIRtmMsgProxy : RtmEventListener {
             }
         }
     }
-
-
 }

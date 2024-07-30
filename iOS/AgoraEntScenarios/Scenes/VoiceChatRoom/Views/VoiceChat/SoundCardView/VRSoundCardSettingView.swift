@@ -186,12 +186,13 @@ import Foundation
             self.gainValue = 100.0;
             self.effectType = 0;
             self.typeValue = 4;
+            gainBlock?(gainValue)
+            typeBlock?(effectType)
         }
         self.soundOpen = swich.isOn
         coverView.isHidden = swich.isOn
         tableView.reloadData()
-        guard let soundCardBlock = soundCardBlock else {return}
-        soundCardBlock(swich.isOn)
+        soundCardBlock?(swich.isOn)
     }
     
 }

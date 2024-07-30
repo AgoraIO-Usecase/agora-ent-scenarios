@@ -13,7 +13,7 @@ import java.util.*
  * This class checks whether the conditions for entering a room are met.
  */
 class AUISceneEnterCondition(private val channelName: String, private val arbiter: AUIArbiter) {
-    private val tag = "AUISceneEnterCondition"
+    private val kConditionKey = "AUICondition"
     var enterCompletion: (() -> Unit)? = null
 
     var lockOwnerRetrieved: Boolean = false
@@ -53,7 +53,7 @@ class AUISceneEnterCondition(private val channelName: String, private val arbite
      * 4. The lock owner is obtained (modifying metadata requires sending a message to the lock owner).
      */
     private fun checkRoomValid() {
-        AUILogger.logger().d(tag, "checkRoomValid:$channelName subscribeSuccess:$subscribeSuccess lockOwnerRetrieved:$lockOwnerRetrieved ownerId:$ownerId")
+        AUILogger.logger().d(kConditionKey, "checkRoomValid:$channelName subscribeSuccess:$subscribeSuccess lockOwnerRetrieved:$lockOwnerRetrieved ownerId:$ownerId")
         if (subscribeSuccess && lockOwnerRetrieved && ownerId.isNotEmpty()) {
             if (arbiter.isArbiter() && !lockOwnerAcquireSuccess) return
             enterCompletion?.invoke()
@@ -70,6 +70,12 @@ class AUISceneExpiredCondition(private val channelName: String, private val room
     private val tag = "AUISceneExpiredCondition"
     private var lastUpdateDate: Date? = null
     var roomDidExpired: (() -> Unit)? = null
+
+    var offlineTimestamp: Long = 0
+        set(value) {
+            field = value
+            AUILogger.logger().d(tag, "[$channelName]did offline: $value")
+        }
 
     var joinCompletion: Boolean = false
         set(value) {
@@ -89,6 +95,9 @@ class AUISceneExpiredCondition(private val channelName: String, private val room
             checkRoomExpired()
         }
 
+    /**
+     * A flag indicating whether the room owner has left the room.
+     */
     var ownerHasLeftRoom: Boolean = false
         set(value) {
             field = value
@@ -101,6 +110,18 @@ class AUISceneExpiredCondition(private val channelName: String, private val room
             lastUpdateDate = Date()
             checkRoomExpired()
         }
+
+    fun reconnectNow(timestamp: Long) {
+        AUILogger.logger().d(tag, "[$channelName]reconnectNow: currentTs:$timestamp, offlineTs:$offlineTimestamp")
+        if (offlineTimestamp <= 0 || roomExpiration.ownerReconnectMaxTime <= 0) {
+            return
+        }
+        if (timestamp - offlineTimestamp <= roomExpiration.ownerReconnectMaxTime) {
+            return
+        }
+        offlineTimestamp = 0
+        roomDidExpired?.invoke()
+    }
 
     /**
      * Checks if the room has expired.

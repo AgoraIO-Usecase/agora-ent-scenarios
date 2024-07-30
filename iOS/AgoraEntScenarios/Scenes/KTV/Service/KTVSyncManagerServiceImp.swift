@@ -170,7 +170,6 @@ extension KTVSyncManagerServiceImp {
                 
                 _hideLoadingView()
                 completion(nil, room!)
-                
             }
         }
 
@@ -599,6 +598,9 @@ extension KTVSyncManagerServiceImp {
             
             switch dataCmd {
             case .enterSeatCmd:
+                guard let intValue = Int(key), (1...8).contains(intValue) else {
+                    return KTVCommonError.noPermission.toNSError()
+                }
                 let willEnterSeatUserId = getSeatUserId(value) ?? ""
                 //check wheather the user has entered the seat
                 if currentMap.values.contains(where: { getSeatUserId($0) == willEnterSeatUserId }) {
@@ -1195,15 +1197,16 @@ extension KTVSyncManagerServiceImp {
 //            agoraAssert("channelName = nil")
             return
         }
-        agoraPrint("imp song get...")
+        agoraPrint("getChooseSongInfo[\(channelName)] start")
         let collection = getSongCollection(with: channelName)
         collection?.getMetaData(callback: {[weak self] err, songs in
             guard let self = self else {return}
             if err != nil {
-                agoraPrint("imp song get fail :\(String(describing: err?.description))...")
+                agoraPrint("getChooseSongInfo[\(channelName)]  fail :\(String(describing: err?.description))...")
                 finished(err, nil)
             } else {
                 let songData = songs as? [[String: Any]] ?? []
+                agoraPrint("getChooseSongInfo[\(channelName)] end, count: \(songData.count)")
                 let songs = songData.compactMap { self.convertSongDictToSong(with: $0) }
                 finished(nil, songs)
             }

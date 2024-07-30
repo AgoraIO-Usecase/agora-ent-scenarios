@@ -16,6 +16,7 @@ class RoomService(
     private val tag = "RoomService"
     private val kPayloadOwnerId = "room_payload_owner_id"
     private val roomInfoMap: MutableMap<String, AUIRoomInfo> = mutableMapOf()
+    private val creatingRoomIds: MutableSet<String> = mutableSetOf()
 
     fun getRoomList(
         appId: String,
@@ -36,7 +37,9 @@ class RoomService(
             roomList?.forEach { roomInfo ->
                 // Traverse each room information to check if it has expired.
                 var needCleanRoom: Boolean = false
-                if (expirationPolicy.expirationTime > 0 && ts - roomInfo.createTime >= expirationPolicy.expirationTime + 60 * 1000) {
+                if (creatingRoomIds.contains(roomInfo.roomId)) {
+                    // Do nothing
+                } else if (expirationPolicy.expirationTime > 0 && ts - roomInfo.createTime >= expirationPolicy.expirationTime + 60 * 1000) {
                     needCleanRoom = true
                 } else if (cleanClosure?.invoke(roomInfo) == true) {
                     needCleanRoom = true
@@ -59,9 +62,19 @@ class RoomService(
     // TODO: Replace AUIRoomInfo with the IAUIRoomInfo interface. The server will create a room id, should roomManager throw it out here?.
     fun createRoom(appId: String, sceneId: String, room: AUIRoomInfo, completion: (AUIRtmException?, AUIRoomInfo?) -> Unit) {
         val scene = syncManager.createScene(channelName = room.roomId, roomExpiration = expirationPolicy)
+        creatingRoomIds.add(room.roomId)
+        val innerCompletion: ((AUIRtmException?, AUIRoomInfo?) -> Unit) = { error, info ->
+            creatingRoomIds.remove(room.roomId)
+            if (error != null) {
+                // Need to clean up dirty room information on failure.
+                createRoomRevert(appId, sceneId, room.roomId)
+                completion(error, null)
+            }
+            completion(null, info)
+        }
         roomManager.createRoom(appId, sceneId, room) { err, roomInfo ->
             if (err != null) {
-                completion(AUIRtmException(err.code, err.message.toString(), ""), null)
+                innerCompletion(AUIRtmException(err.code, err.message.toString(), ""), null)
                 return@createRoom
             }
 
@@ -73,21 +86,12 @@ class RoomService(
 
             scene.create(createTime = roomInfo.createTime, mapOf(kPayloadOwnerId to (room.roomOwner?.userId ?: ""))) { error ->
                 if (error != null) {
-                    // Need to clean up dirty room information on failure.
-                    createRoomRevert(appId, sceneId, room.roomId)
-                    completion(error, null)
+                    innerCompletion(error, null)
                     return@create
                 }
 
                 scene.enter { _, err ->
-                    if (err != null) {
-                        // Need to clean up dirty room information on failure.
-                        createRoomRevert(appId, sceneId, room.roomId)
-                        completion(err, null)
-                        return@enter
-                    }
-
-                    completion(null, roomInfo)
+                    innerCompletion(err, roomInfo)
                 }
             }
         }

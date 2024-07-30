@@ -163,7 +163,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     self.selectedVoiceShowIndex = -1;
     self.selectUserNo = @"";
     self.soundOpen = false;
-    self.gainValue = @"1.0";
+    self.gainValue = @"100.0";
     self.effectType = 0;
     self.typeValue = 4;
     self.isDelay = true;
@@ -527,7 +527,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
         self.gainValue = @"100.0";
         self.effectType = 0;
         self.typeValue = 4;
-        [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":2}}"];
+        [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":0,\"effect\":2}}"];
     } else {
         [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":-1,\"gain\":-1.0,\"gender\":-1,\"effect\":-1}}"];
     }
@@ -539,22 +539,22 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     self.typeValue = 4;
     switch (value) {
         case 0:
-            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":2}}"];
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":0,\"effect\":2}}"];
             break;
         case 1:
-            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":2}}"];
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":1,\"effect\":2}}"];
             break;
         case 2:
-            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":3}}"];
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":0,\"effect\":3}}"];
             break;
         case 3:
-            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":3}}"];
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":1,\"effect\":3}}"];
             break;
         case 4:
-            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":4}}"];
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":0,\"effect\":4}}"];
             break;
         case 5:
-            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":4}}"];
+            [self.RTCkit setParameters:@"{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":1,\"effect\":4}}"];
             break;
         default:
             break;
@@ -857,20 +857,22 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)joinChorus {
     self.isJoinChorus = YES;
     [self.MVView setMvState:VLKTVMVViewStateJoinChorus];
-    if(![self hasAvailableMicSeat]){
+    if(![self enableShowJoinChorusButton]){
+        KTVLogInfo(@"joinChorus fail! enableShowJoinChorusButton false");
         [self _rollbackAfterChorusJoinFailure];
         [VLToast toast:KTVLocalizedString(@"ktv_mic_full")];
         return;
     }
     
     if(self.RTCkit.getConnectionState != AgoraConnectionStateConnected){
+        KTVLogInfo(@"joinChorus fail! rtc connected(%d) is not connected", self.RTCkit.getConnectionState);
         [self _rollbackAfterChorusJoinFailure];
         [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
         return;
     }
     
     if (![self getJoinChorusEnable]) {
-        KTVLogInfo(@"getJoinChorusEnable false");
+        KTVLogInfo(@"joinChorus fail! getJoinChorusEnable false");
         [self _rollbackAfterChorusJoinFailure];
         [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
         return;
@@ -881,7 +883,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         VL(weakSelf);
         [self enterSeatWithIndex:nil completion:^(NSError *error) {
             if(error){
-                KTVLogError(@"enterSeat error:%@", error.description);
+                KTVLogError(@"joinChorus fail! enterSeat error:%@", error.description);
                 [weakSelf _rollbackAfterChorusJoinFailure];
                 [VLToast toast:KTVLocalizedString(@"ktv_join_chorus_failed")];
                 return;
@@ -1223,11 +1225,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
 }
 
-- (BOOL)hasAvailableMicSeat {
+- (BOOL)enableShowJoinChorusButton {
     if(_isOnMicSeat) {
         return YES;
     }
-    return [self getOnMicUserCount] < 8;
+    NSUInteger count = [self getOnMicUserCount];
+    KTVLogInfo(@"getOnMicUserCount = %ld", count);
+    return count < 8;
 }
 
 #pragma mark -- VLKTVTopViewDelegate
@@ -1549,7 +1553,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)settingViewSettingChanged:(VLKTVSettingModel *)setting effectChoosed:(NSInteger)effectIndex { 
-    
+    [self settingViewEffectChoosed:effectIndex];
 }
 
 
@@ -1876,12 +1880,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (BOOL)getJoinChorusEnable {
     //不是观众不允许加入
     if ([self getUserSingRole] != KTVSingRoleAudience) {
+        KTVLogInfo(@"getJoinChorusEnable fail role = %ld", [self getUserSingRole]);
         return NO;
     }
     
     VLRoomSelSongModel* topSong = [[self selSongsArray] firstObject];
     //TODO: 不在播放不允许加入
     if (topSong.status != VLSongPlayStatusPlaying) {
+        KTVLogInfo(@"getJoinChorusEnable fail status = %ld", topSong.status);
         return NO;
     }
     
@@ -2091,7 +2097,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     KTVLogInfo(@"setSelSongsArray current top[%@] songName: %@, status: %ld",
                updatedTopSong.songNo, updatedTopSong.songName, updatedTopSong.status);
     KTVLogInfo(@"setSelSongsArray orig top[%@] songName: %@, status: %ld",
-               updatedTopSong.songNo, originalTopSong.songName, originalTopSong.status);
+               originalTopSong.songNo, originalTopSong.songName, originalTopSong.status);
     if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
         [self.MVView reset];
         [self.lrcControl resetLrc];
@@ -2408,6 +2414,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.roomPersonView reloadSeatIndex:model.seatIndex];
 }
 
+- (void)onUserSeatUpdateWithSeat:(VLRoomSeatModel *)seat {
+    
+}
+
+
 - (void)updateNowCameraMuted: (BOOL)isMute {
     self.isNowCameraMuted = isMute;
     if (!isMute) {
@@ -2429,40 +2440,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.roomPersonView reloadSeatIndex:model.seatIndex];
 }
 
-- (void)onUserSeatUpdateWithSeat:(VLRoomSeatModel *)seat {
-    
-}
-
-- (void)onAddChooseSongWithSong:(VLRoomSelSongModel * _Nonnull)songInfo {
-    KTVLogInfo(@"onAddChooseSongWithSong songNo: %@, songName: %@, owner: %@, status: %ld", songInfo.songNo, songInfo.songName, songInfo.owner.userName, songInfo.status);
-    [self _checkInEarMonitoring];
-    
-    NSMutableArray* songArray = [NSMutableArray arrayWithArray:self.selSongsArray];
-    self.selSongsArray = [NSMutableArray arrayWithArray:songArray];
-}
-    
-
-//- (void)onRemoveChooseSongWithSong:(VLRoomSelSongModel * _Nonnull)songInfo {
-//    [self _checkInEarMonitoring];
-//    NSMutableArray* songArray = [NSMutableArray arrayWithArray:self.selSongsArray];
-//    BOOL success = [self removeSelSongWithSongNo:[songInfo.songNo integerValue] sync:NO];
-//    if (!success) {
-//        self.selSongsArray = songArray;
-//        KTVLogInfo(@"removeSelSongWithSongNo fail, reload it");
-//    }
-//    //清除合唱者总分
-//    self.coSingerDegree = 0;
-//    [LSTPopView removeAllPopView];
-//}
-
-
 - (void)onChosenSongListDidChangedWithSongs:(NSArray<VLRoomSelSongModel *> *)songs {
     [self _checkInEarMonitoring];
     NSString* origTopSongNo = NullToString(self.selSongsArray.firstObject.songNo);
     NSString* currentTopSongNo = NullToString(songs.firstObject.songNo);
     if (![origTopSongNo isEqualToString:currentTopSongNo]) {
         KTVLogInfo(@"clean old song: %@", origTopSongNo);
-        [self.ktvApi removeMusicWithSongCode:[origTopSongNo integerValue]];
+        if ([self.ktvApi isSongLoadingWithSongCode:origTopSongNo]) {
+            //认为在下载中，可能会有弱网0%也是下载中导致移除不正确
+            [self.ktvApi removeMusicWithSongCode:[origTopSongNo integerValue]];
+        }
         [self stopPlaySong];
         self.coSingerDegree = 0;
         [LSTPopView removeAllPopView];
