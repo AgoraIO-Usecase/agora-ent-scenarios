@@ -9,18 +9,14 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import io.agora.CallBack
-import io.agora.chat.adapter.EMAError
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingFragment
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentRoomListLayoutBinding
 import io.agora.scene.voice.databinding.VoiceItemRoomListBinding
-import io.agora.scene.voice.global.VoiceBuddyFactory
-import io.agora.scene.voice.imkit.manager.ChatroomIMManager
-import io.agora.scene.voice.model.VoiceParameters
+import io.agora.scene.voice.model.isPrivate
+import io.agora.scene.voice.model.memberCount
 import io.agora.scene.voice.ui.activity.ChatroomLiveActivity
 import io.agora.scene.voice.ui.widget.encryption.RoomEncryptionInputDialog
 import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
@@ -37,8 +33,6 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayou
     }
     private var mAdapter: RoomListAdapter? = null
 
-    private var curVoiceRoomModel: AUIRoomInfo? = null
-
     var itemCountListener: ((count: Int) -> Unit)? = null
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceFragmentRoomListLayoutBinding {
@@ -49,11 +43,10 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayou
         super.onViewCreated(view, savedInstanceState)
         mAdapter = RoomListAdapter(null, this.context!!) { data, view ->
             if (UiUtils.isFastClick()) return@RoomListAdapter
-            curVoiceRoomModel = data
-            val password = data.customPayload[VoiceParameters.PASSWORD] as? String
-            if (!password.isNullOrEmpty()) {
+            if (data.isPrivate()) {
                 showInputDialog(data)
             } else {
+                showLoadingView()
                 voiceRoomViewModel.joinRoom(data.roomId)
             }
         }
@@ -95,18 +88,12 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayou
             }
         }
         voiceRoomViewModel.joinRoomObservable.observe(this) { roomInfo: AUIRoomInfo? ->
-            if (roomInfo != null) {
-                curVoiceRoomModel = roomInfo
+            hideLoadingView()
+            roomInfo ?: return@observe
+            activity?.let {
+                ChatroomLiveActivity.startActivity(it, roomInfo)
             }
         }
-    }
-
-    private fun goChatroomPage() {
-        val parentActivity = activity
-        curVoiceRoomModel?.let {
-            if (parentActivity != null) ChatroomLiveActivity.startActivity(parentActivity, it)
-        }
-        hideLoadingView()
     }
 
     private fun showInputDialog(voiceRoomModel: AUIRoomInfo) {
@@ -152,12 +139,9 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayou
                 .load(data.roomOwner?.userAvatar)
                 .into(holder.binding.ivAvatar)
             holder.binding.tvRoomName.text = data.roomName
-            val userCount = data.customPayload[VoiceParameters.ROOM_USER_COUNT] as? Long
-            val showCount = (userCount ?: 0)
-            holder.binding.tvPersonNum.text = mContext.getString(R.string.voice_room_list_count, showCount)
+            holder.binding.tvPersonNum.text = mContext.getString(R.string.voice_room_list_count, data.memberCount())
             holder.binding.tvUserName.text = data.roomOwner?.userName ?: ""
-            val password = data.customPayload[VoiceParameters.PASSWORD] as? String
-            holder.binding.ivLock.isVisible = !password.isNullOrEmpty()
+            holder.binding.ivLock.isVisible = data.isPrivate()
             holder.itemView.setOnClickListener { view ->
                 mOnItemClick?.invoke(data, view)
             }

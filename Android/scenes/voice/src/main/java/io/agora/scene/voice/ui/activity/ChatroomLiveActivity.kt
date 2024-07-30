@@ -76,7 +76,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
     /**room viewModel*/
     private lateinit var roomLivingViewModel: VoiceRoomLivingViewModel
     private lateinit var giftViewDelegate: RoomGiftViewDelegate
-    private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
+    private val voiceServiceProtocol = VoiceServiceProtocol.serviceProtocol
     private var isActivityStop = false
 
     /**
@@ -112,6 +112,11 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
         }
     }
 
+//    /** voice room info */
+//    private val rtmRoomInfo: AUIRoomInfo by lazy {
+//        intent.getSerializableExtra(KEY_VOICE_ROOM_MODEL) as AUIRoomInfo
+//    }
+
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
         StatusBarCompat.setLightStatusBar(this, false)
@@ -119,11 +124,11 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
         giftViewDelegate =
             RoomGiftViewDelegate.getInstance(this, roomLivingViewModel, binding.chatroomGiftView, binding.svgaView)
 
-        /** voice room info */
-        val auiRoomInfo: AUIRoomInfo = intent.getSerializableExtra(KEY_VOICE_ROOM_MODEL) as AUIRoomInfo
-        voiceRoomModel.convertByRoomInfo(auiRoomInfo)
+        val rtmRoomInfo: AUIRoomInfo = intent.getSerializableExtra(KEY_VOICE_ROOM_MODEL) as AUIRoomInfo
+
+        voiceRoomModel.convertByRoomInfo(rtmRoomInfo)
         initView()
-        giftViewDelegate.onRoomDetails(voiceRoomModel.roomId, voiceRoomModel.owner.userId)
+        giftViewDelegate.onRoomDetails(voiceRoomModel.roomId, voiceRoomModel.owner?.userId)
         ChatroomIMManager.getInstance().init(voiceRoomModel.chatroomId, voiceRoomModel.isOwner)
         ChatroomIMManager.getInstance().saveWelcomeMsg(
             getString(R.string.voice_room_welcome),
@@ -197,7 +202,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                     ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_chatroom_join_room_success))
                     roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
                     CustomMsgHelper.getInstance().sendSystemMsg(
-                        voiceRoomModel.owner.chatUid, object : OnMsgCallBack() {
+                        voiceRoomModel.owner?.chatUid, object : OnMsgCallBack() {
                             override fun onSuccess(message: ChatMessageData?) {
                                 VoiceLogger.d(TAG, "sendSystemMsg onSuccess $message")
                                 binding.messageView.refreshSelectLast()
@@ -240,7 +245,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
             WindowInsetsCompat.CONSUMED
         }
         binding.clMain.setOnTouchListener { v, event ->
-            reset()
+            resetUI()
             false
         }
         binding.messageView.setMessageViewListener(object : ChatroomMessagesView.MessageViewListener {
@@ -248,10 +253,14 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
             }
 
             override fun onListClickListener() {
-                reset()
+                resetUI()
             }
         })
         voiceServiceProtocol.subscribeListener(object : VoiceServiceListenerProtocol {
+
+            override fun onChatTokenWillExpire() {
+                roomLivingViewModel.renewChatToken()
+            }
 
             override fun onReceiveGift(roomId: String, message: ChatMessageData?) {
                 super.onReceiveGift(roomId, message)
@@ -263,7 +272,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                     binding.subtitle.showSubtitleView(
                         resources.getString(
                             R.string.voice_chatroom_gift_notice,
-                            ChatroomIMManager.getInstance().getUserName(message), voiceRoomModel.owner.nickName
+                            ChatroomIMManager.getInstance().getUserName(message), voiceRoomModel.owner?.nickName
                         )
                     )
                 }
@@ -438,10 +447,10 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
     }
 
     private fun initView() {
-        binding.chatBottom.initMenu(voiceRoomModel.roomType)
+        binding.chatBottom.initMenu(ConfigConstants.RoomType.Common_Chatroom)
         binding.likeView.likeView.setOnClickListener { binding.likeView.addFavor() }
         binding.chatroomGiftView.init(voiceRoomModel.chatroomId)
-        binding.messageView.init(voiceRoomModel.chatroomId, voiceRoomModel.owner.chatUid)
+        binding.messageView.init(voiceRoomModel.chatroomId, voiceRoomModel.owner?.chatUid)
         binding.rvChatroom2dMicLayout.isVisible = true
         roomObservableDelegate =
             RoomObservableViewDelegate(
@@ -540,7 +549,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                                         resources.getString(
                                             R.string.voice_chatroom_gift_notice,
                                             ChatroomIMManager.getInstance().getUserName(message),
-                                            voiceRoomModel.owner.nickName
+                                            voiceRoomModel.owner?.nickName
                                         )
                                     )
                                 }
@@ -783,14 +792,12 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
         super.finish()
     }
 
-    private fun reset() {
-        if (voiceRoomModel.roomType == ConfigConstants.RoomType.Common_Chatroom) {
-            binding.chatBottom.hideExpressionView(false)
-            hideInput()
-            binding.chatBottom.showInput()
-            binding.likeView.isVisible = true
-            binding.chatBottom.hindViewChangeIcon()
-        }
+    private fun resetUI() {
+        binding.chatBottom.hideExpressionView(false)
+        hideInput()
+        binding.chatBottom.showInput()
+        binding.likeView.isVisible = true
+        binding.chatBottom.hindViewChangeIcon()
     }
 
     private fun checkFocus(focus: Boolean) {

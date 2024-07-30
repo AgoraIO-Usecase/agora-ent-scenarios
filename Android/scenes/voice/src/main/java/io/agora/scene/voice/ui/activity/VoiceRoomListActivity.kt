@@ -15,12 +15,16 @@ import com.alibaba.android.arouter.facade.annotation.Route
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
+import com.opensource.svgaplayer.SVGAParser
+import com.opensource.svgaplayer.SVGASoundManager
+import com.opensource.svgaplayer.utils.log.SVGALogger
 import io.agora.scene.base.PagePathConstant
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.voice.BuildConfig
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceAgoraRoomListLayoutBinding
-import io.agora.scene.voice.global.VoiceConfigManager
+import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.scene.voice.imkit.manager.ChatroomConfigManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.dialog.CreateRoomDialog
 import io.agora.scene.voice.ui.fragment.VoiceRoomListFragment
@@ -28,11 +32,15 @@ import io.agora.scene.widget.utils.UiUtils
 import io.agora.voice.common.utils.*
 
 @Route(path = PagePathConstant.pageVoiceChat)
-class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBinding>(){
+class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBinding>() {
 
     private var title: TextView? = null
     private var index = 0
     private val titles = intArrayOf(R.string.voice_tab_layout_all)
+
+    init {
+        VoiceServiceProtocol.reset()
+    }
 
     override fun getViewBinding(inflater: LayoutInflater): VoiceAgoraRoomListLayoutBinding? {
         return VoiceAgoraRoomListLayoutBinding.inflate(inflater)
@@ -40,35 +48,37 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBi
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        if (BuildConfig.is_modular){
-            // nothing
-        }else{
-            // library 初始化
-            ResourcesTools.isZh(this)
-            VoiceConfigManager.initMain()
-        }
+        // library 初始化
+        ResourcesTools.isZh(this)
+        ChatroomConfigManager.getInstance()
+            .initRoomConfig(
+                VoiceBuddyFactory.get().getVoiceBuddy().application(),
+                VoiceBuddyFactory.get().getVoiceBuddy().chatAppKey()
+            )
+        SVGAParser.shareParser().init( VoiceBuddyFactory.get().getVoiceBuddy().application())
+        SVGALogger.setLogEnabled(true)
+        SVGASoundManager.init()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        VoiceConfigManager.unInitMain()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         StatusBarCompat.setLightStatusBar(this, true)
         super.onCreate(savedInstanceState)
-         if (BuildConfig.IM_APP_KEY.isEmpty()) {
-             finish()
-             ToastTools.show(this, "IM_APP_KEY / IM_APP_CLIENT_ID / IM_APP_CLIENT_SECRET 未配置")
-             return
-         }
+        if (BuildConfig.IM_APP_KEY.isEmpty()) {
+            finish()
+            ToastTools.show(this, "IM_APP_KEY / IM_APP_CLIENT_ID / IM_APP_CLIENT_SECRET 未配置")
+            return
+        }
         binding.titleBar.title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
         setupWithViewPager()
         initListener()
     }
 
     override fun initListener() {
-        binding.titleBar.setOnBackPressListener{
+        binding.titleBar.setOnBackPressListener {
             finish()
         }
         binding.btnCreateRoom.setOnClickListener {

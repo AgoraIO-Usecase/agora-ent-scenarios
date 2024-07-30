@@ -38,7 +38,7 @@ class RoomAudienceListFragment : BaseViewBindingFragment<VoiceFragmentAudienceLi
 
         private val TAG = RoomAudienceListFragment::class.java.simpleName
         private const val KEY_ROOM_INFO = "voice_room_info"
-        private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
+        private val voiceServiceProtocol = VoiceServiceProtocol.serviceProtocol
 
         fun getInstance(voiceRoomModel: VoiceRoomModel): RoomAudienceListFragment {
             return RoomAudienceListFragment().apply {

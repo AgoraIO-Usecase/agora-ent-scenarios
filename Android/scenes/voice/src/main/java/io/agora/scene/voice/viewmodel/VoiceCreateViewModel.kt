@@ -31,7 +31,7 @@ class VoiceCreateViewModel : ViewModel() {
      * voice chat protocol
      */
     private val voiceServiceProtocol by lazy {
-        VoiceServiceProtocol.getImplInstance()
+        VoiceServiceProtocol.serviceProtocol
     }
 
     private val _loginImObservable: SingleSourceLiveData<Boolean> = SingleSourceLiveData()
@@ -109,7 +109,6 @@ class VoiceCreateViewModel : ViewModel() {
             roomName = roomName,
             soundEffect = soundEffect,
             password = password ?: "",
-            roomType = 0
         )
         voiceServiceProtocol.createRoom(voiceCreateRoomModel, completion = { err, result ->
             if (err == null && result != null) {

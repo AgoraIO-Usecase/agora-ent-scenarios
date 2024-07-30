@@ -44,7 +44,6 @@ object VoiceToolboxServerHttpManager {
                     response?.let {
                         VoiceBuddyFactory.get().getVoiceBuddy().setupRtcToken(it.token)
                         VoiceBuddyFactory.get().getVoiceBuddy().setupRtmToken(it.token)
-                        VoiceBuddyFactory.get().getVoiceBuddy().setupChatToken(it.token)
                         callback.invoke(it.token, null)
                     }
                 }
@@ -69,7 +68,7 @@ object VoiceToolboxServerHttpManager {
         uid: String,
         expire: Int = 3600,
         src: String = "android",
-        types: Array<Int> = arrayOf(1, 2, 3),
+        types: Array<Int> = arrayOf(1, 2),
         callBack: VRValueCallBack<VRGenerateTokenResponse>
     ) {
         val headers = mutableMapOf<String, String>()

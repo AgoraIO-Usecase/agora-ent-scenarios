@@ -1,17 +1,17 @@
 package io.agora.scene.voice.model
 
 import com.google.gson.annotations.SerializedName
+import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.voice.common.constant.ConfigConstants
 
 object VoiceParameters {
-    const val ROOM_USER_COUNT = "roomUserCount"
+    const val ROOM_USER_COUNT = "member_count"
+    const val ROOM_CLICK_COUNT = "click_count"
+    const val ROOM_SOUND_EFFECT = "sound_effect"
     const val PASSWORD = "roomPassword"
     const val IS_PRIVATE = "is_private"
-    const val CHANNEL_ID = "channel_id"
     const val CHATROOM_ID = "chatroom_id"
-    const val RTC_UID = "rtc_uid"
-    const val TYPE = "type"
 }
 
 /**
@@ -21,7 +21,6 @@ data class VoiceCreateRoomModel constructor(
     val roomName: String,
     val password: String,
     val soundEffect: Int = 0,
-    val roomType: Int = 0,
 ) : BaseRoomBean
 
 /**
@@ -30,7 +29,7 @@ data class VoiceCreateRoomModel constructor(
  */
 data class VoiceMemberModel constructor(
 
-    // 这里用的是user.userNo
+    // 这里用的是user.id
     @SerializedName("uid") var userId: String? = null,
     // 这里用的是user.id
     @SerializedName("chat_uid") var chatUid: String? = null,
@@ -52,19 +51,53 @@ data class VoiceRankUserModel constructor(
     var amount: Int = 0
 ) : BaseRoomBean
 
+fun AUIRoomInfo.memberCount(): Int {
+    return when (val userCount = customPayload[VoiceParameters.ROOM_USER_COUNT]) {
+        is Int -> userCount
+        is Long -> userCount.toInt()
+        else -> 0
+    }
+}
+
+fun AUIRoomInfo.clickCount(): Int {
+    return when (val clickCount = customPayload[VoiceParameters.ROOM_CLICK_COUNT]) {
+        is Int -> clickCount
+        is Long -> clickCount.toInt()
+        else -> 0
+    }
+}
+
+fun AUIRoomInfo.soundEffect(): Int {
+    return when (val soundEffect = customPayload[VoiceParameters.ROOM_SOUND_EFFECT]) {
+        is Int -> soundEffect
+        is Long -> soundEffect.toInt()
+        else -> ConfigConstants.SoundSelection.Social_Chat
+    }
+}
+
+fun AUIRoomInfo.roomPassword(): String {
+    return customPayload[VoiceParameters.PASSWORD] as? String ?: ""
+}
+
+fun AUIRoomInfo.isPrivate(): Boolean {
+    return customPayload[VoiceParameters.IS_PRIVATE] as? Boolean ?: false
+}
+
+fun AUIRoomInfo.chatroomId(): String {
+    return customPayload[VoiceParameters.CHATROOM_ID] as? String ?: ""
+}
+
 /**
  * 房间数据
  */
 data class VoiceRoomModel constructor(
-    var owner: VoiceMemberModel = VoiceMemberModel(),
+    var owner: VoiceMemberModel? = null,
     @SerializedName("room_id") var roomId: String = "",
     @SerializedName("is_private") var isPrivate: Boolean = false,
     @SerializedName("member_count") var memberCount: Int = 0,
     @SerializedName("click_count") var clickCount: Int = 0,
-    @SerializedName("type") var roomType: Int = 0,
-    @SerializedName("name") var roomName: String = "",
-    @SerializedName("sound_effect") var soundEffect: Int = 0,
-    @SerializedName("channel_id") var channelId: String = "",
+    @SerializedName("room_name") var roomName: String = "",
+    @SerializedName("sound_effect") var soundEffect: Int = ConfigConstants.SoundSelection.Social_Chat,
     @SerializedName("chatroom_id") var chatroomId: String = "",
     @SerializedName("created_at") var createdAt: Long = 0,
     @SerializedName("roomPassword") var roomPassword: String = "",
@@ -75,7 +108,7 @@ data class VoiceRoomModel constructor(
     @Transient var robotVolume: Int = 50,
     @Transient var announcement: String = "",
 ) : BaseRoomBean {
-    val isOwner: Boolean get() = owner.userId == VoiceBuddyFactory.get().getVoiceBuddy().userId()
+    val isOwner: Boolean get() = owner?.userId == VoiceBuddyFactory.get().getVoiceBuddy().userId()
 }
 
 data class VoiceBgmModel constructor(
@@ -111,7 +144,7 @@ data class VoiceRoomApply constructor(
 data class VoiceRoomInfo constructor(
     var roomInfo: VoiceRoomModel? = null,
     var micInfo: List<VoiceMicInfoModel>? = null,
-    var bgmInfo: VoiceBgmModel? = null
+    var bgmInfo: VoiceBgmModel? = null,
 ) : BaseRoomBean
 
 /**

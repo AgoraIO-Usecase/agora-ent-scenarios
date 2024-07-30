@@ -3,8 +3,13 @@ package io.agora.scene.voice.model.constructor
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
-import io.agora.scene.voice.model.VoiceParameters
 import io.agora.scene.voice.model.VoiceRoomModel
+import io.agora.scene.voice.model.chatroomId
+import io.agora.scene.voice.model.clickCount
+import io.agora.scene.voice.model.isPrivate
+import io.agora.scene.voice.model.memberCount
+import io.agora.scene.voice.model.roomPassword
+import io.agora.scene.voice.model.soundEffect
 import io.agora.voice.common.constant.ConfigConstants
 
 /**
@@ -21,14 +26,14 @@ object RoomInfoConstructor {
             rtcUid = roomInfo.roomOwner?.userId?.toIntOrNull() ?: 0
         }
         roomId = roomInfo.roomId
-        isPrivate = roomInfo.customPayload[VoiceParameters.IS_PRIVATE] as? Boolean ?: false
-        memberCount = roomInfo.customPayload[VoiceParameters.ROOM_USER_COUNT] as? Int ?: 0
+        isPrivate = roomInfo.isPrivate()
+        memberCount = roomInfo.memberCount()
+        clickCount = roomInfo.clickCount()
         roomName = roomInfo.roomName
-        soundEffect = roomInfo.customPayload[VoiceParameters.TYPE] as? Int ?: 0
-        channelId = roomInfo.roomId // 同 roomId
-        chatroomId = roomInfo.customPayload[VoiceParameters.CHATROOM_ID] as? String ?: ""
+        soundEffect = roomInfo.soundEffect()
+        chatroomId = roomInfo.chatroomId()
         createdAt = roomInfo.createTime
-        roomPassword = roomInfo.customPayload[VoiceParameters.PASSWORD] as? String ?: ""
+        roomPassword = roomInfo.roomPassword()
     }
 
     /**
@@ -36,11 +41,10 @@ object RoomInfoConstructor {
      */
     fun extendMicInfoList(
         vMicInfoList: List<VoiceMicInfoModel>,
-        roomType: Int,
         ownerUid: String
     ): List<VoiceMicInfoModel> {
         val micInfoList = mutableListOf<VoiceMicInfoModel>()
-        val interceptIndex = if (roomType == ConfigConstants.RoomType.Common_Chatroom) 5 else 4
+        val interceptIndex = 5
         for (i in vMicInfoList.indices) {
             if (i > interceptIndex) break
             val serverMicInfo = vMicInfoList[i]

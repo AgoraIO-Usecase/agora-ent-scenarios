@@ -7,7 +7,6 @@ import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.*
 import io.agora.scene.base.AudioModeration
-import io.agora.scene.base.TokenGenerator
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.model.SoundAudioBean
@@ -45,8 +44,6 @@ class AgoraRtcEngineController {
 
     private var mSoundCardManager: AgoraSoundCardManager? = null
 
-    private var mRtmToken = ""
-
     private var micVolumeListener: RtcMicVolumeListener? = null
 
     fun setMicVolumeListener(micVolumeListener: RtcMicVolumeListener) {
@@ -60,28 +57,14 @@ class AgoraRtcEngineController {
         context: Context, channelId: String, rtcUid: Int, soundEffect: Int, broadcaster: Boolean = false,
         joinCallback: VRValueCallBack<Boolean>
     ) {
-        TokenGenerator.generateTokens(
-            channelId,
-            rtcUid.toString(),
-            TokenGenerator.TokenGeneratorType.token006,
-            arrayOf(
-                TokenGenerator.AgoraTokenType.rtm
-            ),
-            { ret ->
-                mRtmToken = ret
-
-                initRtcEngine(context)
-                this.mLocalUid = rtcUid
-                this.joinCallback = joinCallback
-                VoiceBuddyFactory.get().rtcChannelTemp.broadcaster = broadcaster
-                checkJoinChannel(channelId, rtcUid, soundEffect, broadcaster)
-                // 语音鉴定
-                AudioModeration.moderationAudio(channelId, rtcUid.toLong(),
-                    AudioModeration.AgoraChannelType.broadcast, "voice", {})
-            }, {
-                joinCallback?.onError(Constants.ERR_FAILED, "get token error")
-            }
-        )
+        initRtcEngine(context)
+        this.mLocalUid = rtcUid
+        this.joinCallback = joinCallback
+        VoiceBuddyFactory.get().rtcChannelTemp.broadcaster = broadcaster
+        checkJoinChannel(channelId, rtcUid, soundEffect, broadcaster)
+        // 语音鉴定
+        AudioModeration.moderationAudio(channelId, rtcUid.toLong(),
+            AudioModeration.AgoraChannelType.broadcast, "voice", {})
     }
 
     fun bgmManager(): AgoraBGMManager {
@@ -90,7 +73,7 @@ class AgoraRtcEngineController {
                 rtcEngine!!,
                 VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(),
                 mLocalUid,
-                mRtmToken
+                VoiceBuddyFactory.get().getVoiceBuddy().rtmToken()
             )
         }
         return mBgmManager!!
@@ -702,5 +685,9 @@ class AgoraRtcEngineController {
     private fun openMediaPlayer(url: String, soundSpeaker: Int = ConfigConstants.BotSpeaker.BotBlue) {
         mediaPlayer?.open(url, 0)
         this.soundSpeakerType = soundSpeaker
+    }
+
+    fun renewRtcToken(rtcToken: String){
+        rtcEngine?.renewToken(rtcToken)
     }
 }

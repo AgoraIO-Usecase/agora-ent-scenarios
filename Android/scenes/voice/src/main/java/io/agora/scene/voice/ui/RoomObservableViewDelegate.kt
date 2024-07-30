@@ -118,7 +118,7 @@ class RoomObservableViewDelegate constructor(
                         VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot = false
                         AgoraRtcEngineController.get()
                             .updateEffectVolume(voiceRoomModel.robotVolume)
-                        RoomSoundAudioConstructor.createRoomSoundAudioMap[voiceRoomModel.roomType]?.let {
+                        RoomSoundAudioConstructor.createRoomSoundAudioMap[ConfigConstants.RoomType.Common_Chatroom]?.let {
                             AgoraRtcEngineController.get().playMusic(it)
                         }
                     }
@@ -363,14 +363,6 @@ class RoomObservableViewDelegate constructor(
     }
 
     /**
-     * 房间概要
-     */
-    fun onRoomModel(voiceRoomModel: VoiceRoomModel) {
-        this.voiceRoomModel = voiceRoomModel
-        iRoomTopView.onChatroomInfo(voiceRoomModel)
-    }
-
-    /**
      * 房间详情
      */
     fun onRoomDetails(voiceRoomInfo: VoiceRoomInfo) {
@@ -382,7 +374,7 @@ class RoomObservableViewDelegate constructor(
             // 麦位数据不为空
             voiceRoomInfo.micInfo?.let { micList ->
                 val micInfoList: List<VoiceMicInfoModel> =
-                    RoomInfoConstructor.extendMicInfoList(micList, voiceRoomModel.roomType, voiceRoomModel.owner.userId ?: "")
+                    RoomInfoConstructor.extendMicInfoList(micList, voiceRoomModel.owner?.userId ?: "")
                 micInfoList.forEach { micInfo ->
                     micInfo.member?.let { userInfo ->
                         val rtcUid = userInfo.rtcUid
@@ -467,7 +459,7 @@ class RoomObservableViewDelegate constructor(
             arguments = Bundle().apply {
                 val audioSettingsInfo = RoomAudioSettingsBean(
                     enable = voiceRoomModel.isOwner,
-                    roomType = voiceRoomModel.roomType,
+                    roomType = ConfigConstants.RoomType.Common_Chatroom,
                     botOpen = voiceRoomModel.useRobot,
                     botVolume = voiceRoomModel.robotVolume,
                     soundSelection = voiceRoomModel.soundEffect,
@@ -992,27 +984,6 @@ class RoomObservableViewDelegate constructor(
             }).show(activity.supportFragmentManager, "CommonFragmentAlertDialog")
     }
 
-    /**接受系统消息*/
-    fun receiveSystem(ext: MutableMap<String, String>) {
-        ThreadManager.getInstance().runOnMainThread {
-            if (ext.containsKey("click_count")) {
-                ext["click_count"]?.toIntOrNull()?.let {
-                    iRoomTopView.onUpdateWatchCount(it)
-                }
-            }
-            if (ext.containsKey("member_count")) {
-                ext["member_count"]?.toIntOrNull()?.let {
-                    iRoomTopView.onUpdateMemberCount(it)
-                }
-            }
-            if (ext.containsKey("gift_amount")) {
-                ext["gift_amount"]?.toIntOrNull()?.let {
-                    iRoomTopView.onUpdateGiftCount(it)
-                }
-            }
-        }
-    }
-
     fun destroy() {
         AgoraRtcEngineController.get().destroy()
     }
@@ -1162,7 +1133,7 @@ class RoomObservableViewDelegate constructor(
                         }
                     }
                 }
-            val newMicMap = RoomInfoConstructor.extendMicInfoMap(micInfoMap, voiceRoomModel.owner.userId ?: "")
+            val newMicMap = RoomInfoConstructor.extendMicInfoMap(micInfoMap, voiceRoomModel.owner?.userId ?: "")
             dealMicDataMap(newMicMap)
             ThreadManager.getInstance().runOnMainThread {
                 updateViewByMicMap(newMicMap)

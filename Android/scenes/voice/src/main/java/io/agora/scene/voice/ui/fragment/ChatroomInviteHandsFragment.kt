@@ -41,7 +41,7 @@ class ChatroomInviteHandsFragment : BaseViewBindingFragment<VoiceFragmentHandsLi
     private val map: MutableMap<String, Boolean> = HashMap()
     private var isRefreshing = false
     private var emptyView: View? = null
-    private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
+    private val voiceServiceProtocol = VoiceServiceProtocol.serviceProtocol
 
     // 房主准备邀请的麦位
     private var inviteMicIndex: Int = -1

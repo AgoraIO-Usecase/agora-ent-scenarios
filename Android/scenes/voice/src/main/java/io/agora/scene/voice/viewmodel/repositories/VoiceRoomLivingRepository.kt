@@ -18,7 +18,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
     /**
      * voice chat protocol
      */
-    private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
+    private val voiceServiceProtocol by lazy {
+        VoiceServiceProtocol.serviceProtocol
+    }
 
     /**
      * 获取详情
@@ -81,10 +83,10 @@ class VoiceRoomLivingRepository : BaseRepository() {
         val resource = object : NetworkOnlyResource<VoiceBgmModel>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceBgmModel>>) {
                 voiceServiceProtocol.updateBGMInfo(info, completion = { error ->
-                    if (error == VoiceServiceProtocol.ERR_OK) {
+                    if (error == null) {
                         callBack.onSuccess(createLiveData(info))
                     } else {
-                        callBack.onError(error)
+                        callBack.onError(-1)
                     }
                 })
             }

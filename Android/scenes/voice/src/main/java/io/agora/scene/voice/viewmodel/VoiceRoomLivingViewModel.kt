@@ -3,12 +3,18 @@ package io.agora.scene.voice.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import io.agora.CallBack
 import io.agora.ValueCallBack
 import io.agora.chat.ChatRoom
+import io.agora.chat.adapter.EMAError
+import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.voice.R
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.*
+import io.agora.scene.voice.netkit.VRCreateRoomResponse
+import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
 import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.voice.common.viewmodel.NetworkOnlyResource
 import io.agora.scene.voice.viewmodel.repositories.VoiceRoomLivingRepository
@@ -26,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 class VoiceRoomLivingViewModel : ViewModel() {
 
-    companion object{
+    companion object {
         private const val TAG = "VoiceRoomLivingViewModel"
     }
 
@@ -39,7 +45,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
         SingleSourceLiveData()
     private val _joinObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()
-    private val _roomNoticeObservable: SingleSourceLiveData<Resource<Pair<String,Boolean>>> =
+    private val _roomNoticeObservable: SingleSourceLiveData<Resource<Pair<String, Boolean>>> =
         SingleSourceLiveData()
     private val _bgmInfoObservable: SingleSourceLiveData<Resource<VoiceBgmModel>> =
         SingleSourceLiveData()
@@ -87,9 +93,11 @@ class VoiceRoomLivingViewModel : ViewModel() {
     fun joinObservable(): LiveData<Resource<Boolean>> = _joinObservable
 
     /**更新公告*/
-    fun roomNoticeObservable(): LiveData<Resource<Pair<String,Boolean>>> = _roomNoticeObservable
+    fun roomNoticeObservable(): LiveData<Resource<Pair<String, Boolean>>> = _roomNoticeObservable
+
     /**更新背景音乐*/
     fun bgmInfoObservable(): LiveData<Resource<VoiceBgmModel>> = _bgmInfoObservable
+
     /**打开机器人*/
     fun openBotObservable(): LiveData<Resource<Boolean>> = _openBotObservable
 
@@ -139,7 +147,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
     fun acceptMicSeatInvitationObservable(): LiveData<Resource<VoiceMicInfoModel>> = _acceptMicSeatInvitationObservable
 
     /**更新成员列表*/
-    fun updateRoomMemberObservable():LiveData<Resource<Boolean>> = _updateRoomMemberObservable
+    fun updateRoomMemberObservable(): LiveData<Resource<Boolean>> = _updateRoomMemberObservable
 
     /**获取详情*/
     fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel) {
@@ -151,18 +159,21 @@ class VoiceRoomLivingViewModel : ViewModel() {
         joinImRoom.set(false)
         AgoraRtcEngineController.get().joinChannel(
             VoiceBuddyFactory.get().getVoiceBuddy().application(),
-            voiceRoomModel.channelId,
+            voiceRoomModel.roomId,
             VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
             voiceRoomModel.soundEffect, voiceRoomModel.isOwner,
             object : VRValueCallBack<Boolean> {
                 override fun onSuccess(value: Boolean) {
-                    VoiceLogger.d(TAG,"rtc  joinChannel onSuccess channelId:${voiceRoomModel.channelId}")
+                    VoiceLogger.d(TAG, "rtc  joinChannel onSuccess channelId:${voiceRoomModel.roomId}")
                     joinRtcChannel.set(true)
                     checkJoinRoom()
                 }
 
                 override fun onError(error: Int, errorMsg: String) {
-                    VoiceLogger.e(TAG,"rtc  joinChannel onError channelId:${voiceRoomModel.channelId},error:$error $errorMsg")
+                    VoiceLogger.e(
+                        TAG,
+                        "rtc  joinChannel onError channelId:${voiceRoomModel.roomId},error:$error $errorMsg"
+                    )
                     ThreadManager.getInstance().runOnMainThread {
                         _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
                             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
@@ -177,7 +188,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
         ChatroomIMManager.getInstance()
             .joinRoom(voiceRoomModel.chatroomId, object : ValueCallBack<ChatRoom?> {
                 override fun onSuccess(value: ChatRoom?) {
-                    VoiceLogger.d(TAG,"im joinChatRoom onSuccess roomId:${voiceRoomModel.chatroomId}")
+                    VoiceLogger.d(TAG, "im joinChatRoom onSuccess roomId:${voiceRoomModel.chatroomId}")
                     joinImRoom.set(true)
                     checkJoinRoom()
                 }
@@ -194,7 +205,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
     }
 
     private fun checkJoinRoom() {
-        ThreadManager.getInstance().runOnMainThread{
+        ThreadManager.getInstance().runOnMainThread {
             if (joinRtcChannel.get() && joinImRoom.get()) {
                 _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
                     override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
@@ -298,7 +309,28 @@ class VoiceRoomLivingViewModel : ViewModel() {
         _leaveSyncRoomObservable.setSource(mRepository.leaveSyncManagerRoom())
     }
 
-    fun updateRoomMember(){
+    fun updateRoomMember() {
         _updateRoomMemberObservable.setSource(mRepository.updateRoomMember())
+    }
+
+    fun renewChatToken() {
+        VoiceToolboxServerHttpManager.createImRoom(
+            roomName = "",
+            roomOwner = "",
+            chatroomId = "",
+            type = 1,
+            callBack = object : VRValueCallBack<VRCreateRoomResponse> {
+                override fun onSuccess(response: VRCreateRoomResponse?) {
+                    VoiceLogger.d(TAG, "renewChatToken getToken success:${response}")
+                    response?.chatToken?.let {
+                        VoiceBuddyFactory.get().getVoiceBuddy().setupChatToken(it)
+                        ChatroomIMManager.getInstance().renewToken(it)
+                    }
+                }
+
+                override fun onError(code: Int, message: String?) {
+                    VoiceLogger.d(TAG, "renewChatToken getToken error:$code + $message")
+                }
+            })
     }
 }

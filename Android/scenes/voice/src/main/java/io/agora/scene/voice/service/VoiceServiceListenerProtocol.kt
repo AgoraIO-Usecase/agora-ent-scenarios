@@ -9,6 +9,8 @@ import io.agora.scene.voice.model.VoiceMemberModel
  * im kv 回调协议
  */
 interface VoiceServiceListenerProtocol {
+
+    fun onChatTokenWillExpire(){}
     /**
      * 收到礼物消息
      * @param roomId 环信IMSDK聊天室id

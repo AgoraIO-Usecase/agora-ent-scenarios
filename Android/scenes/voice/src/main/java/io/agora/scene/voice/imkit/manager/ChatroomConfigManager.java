@@ -51,7 +51,7 @@ public class ChatroomConfigManager {
         }
         ChatClient.getInstance().init(context, options);
         registerListener();
-        voiceServiceProtocol = VoiceServiceProtocol.getImplInstance();
+        voiceServiceProtocol = VoiceServiceProtocol.getServiceProtocol();
     }
 
     private void registerListener() {
@@ -68,7 +68,9 @@ public class ChatroomConfigManager {
 
             @Override
             public void onTokenWillExpire() {
-
+                voiceServiceProtocol.getSubscribeListeners().notifyEventHandlers(listener -> {
+                    listener.onChatTokenWillExpire();
+                });
             }
 
             @Override

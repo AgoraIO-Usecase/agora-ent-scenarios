@@ -30,6 +30,7 @@ import io.agora.scene.voice.VoiceLogger;
 import io.agora.scene.voice.ui.widget.expression.ExpressionIcon;
 import io.agora.scene.voice.ui.widget.expression.ExpressionView;
 import io.agora.scene.voice.ui.widget.expression.SmileUtils;
+import io.agora.voice.common.constant.ConfigConstants;
 import io.agora.voice.common.utils.DeviceTools;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
@@ -214,14 +215,14 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
 
     public void initMenu(int roomType) {
         VoiceLogger.d("initMenu","roomType: " + roomType);
-        if (roomType == 0){
+        if (roomType == ConfigConstants.RoomType.Common_Chatroom){
             normalLayout.setVisibility(VISIBLE);
             registerMenuItem(R.drawable.voice_icon_close_mic,R.id.voice_extend_item_mic);
             registerMenuItem(R.drawable.voice_icon_handuphard,R.id.voice_extend_item_hand_up);
             registerMenuItem(R.drawable.voice_icon_eq,R.id.voice_extend_item_eq);
             registerMenuItem(R.drawable.voice_icon_gift,R.id.voice_extend_item_gift);
             addView();
-        }else if (roomType == 1){
+        }else if (roomType == ConfigConstants.RoomType.Spatial_Chatroom){
             normalLayout.setVisibility(VISIBLE);
             inputLayout.setVisibility(INVISIBLE);
             menuLayout.setVisibility(VISIBLE);

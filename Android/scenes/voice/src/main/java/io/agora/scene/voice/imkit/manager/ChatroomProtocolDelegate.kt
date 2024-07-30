@@ -7,6 +7,7 @@ import io.agora.CallBack
 import io.agora.ValueCallBack
 import io.agora.chat.ChatClient
 import io.agora.chat.ChatRoomManager
+import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.model.annotation.MicClickAction
 import io.agora.scene.voice.model.annotation.MicStatus
@@ -33,28 +34,22 @@ class ChatroomProtocolDelegate constructor(private val roomId: String) {
     /**
      * 初始化麦位信息
      */
-    fun initMicInfo(roomType: Int, ownerBean: VoiceMemberModel, callBack: CallBack) {
+    fun initMicInfo(ownerBean: VoiceMemberModel, callBack: CallBack) {
         val attributeMap = mutableMapOf<String, String>()
         this@ChatroomProtocolDelegate.ownerBean = ownerBean
-        if (roomType == ConfigConstants.RoomType.Common_Chatroom) {
-            attributeMap["use_robot"] = "0"
-            attributeMap["robot_volume"] = "50"
-            attributeMap["mic_0"] = GsonTools.beanToString(VoiceMicInfoModel(0, ownerBean, MicStatus.Normal)).toString()
-            for (i in 1..7) {
-                var key = "mic_$i"
-                var status = MicStatus.Idle
-                if (i >= 6) status = MicStatus.BotInactive
-                var mBean = GsonTools.beanToString(VoiceMicInfoModel(i, null, status))
-                if (mBean != null) {
-                    attributeMap[key] = mBean
-                }
+        attributeMap["use_robot"] = "0"
+        attributeMap["robot_volume"] = "50"
+        attributeMap["mic_0"] = GsonTools.beanToString(VoiceMicInfoModel(0, ownerBean, MicStatus.Normal)).toString()
+        for (i in 1..7) {
+            val key = "mic_$i"
+            var status = MicStatus.Idle
+            if (i >= 6) status = MicStatus.BotInactive
+            val mBean = GsonTools.beanToString(VoiceMicInfoModel(i, null, status))
+            if (mBean != null) {
+                attributeMap[key] = mBean
             }
-        } else if (roomType == ConfigConstants.RoomType.Spatial_Chatroom) {
-
         }
-        roomManager.asyncSetChatroomAttributesForced(
-            roomId, attributeMap, true
-        ) { code, result_map ->
+        roomManager.asyncSetChatroomAttributesForced(roomId, attributeMap, true) { code, result_map ->
             if (code == 0 && result_map.isEmpty()) {
                 callBack.onSuccess()
                 ChatroomCacheManager.cacheManager.setMicInfo(attributeMap)
@@ -88,7 +83,6 @@ class ChatroomProtocolDelegate constructor(private val roomId: String) {
         })
         roomManager.asyncFetchChatroomAttributesFromServer(roomId, keyList,
             object : ValueCallBack<Map<String, String>> {
-                @RequiresApi(Build.VERSION_CODES.N)
                 override fun onSuccess(result: Map<String, String>) {
                     val micInfoList = mutableListOf<VoiceMicInfoModel>()
                     val micMap = mutableMapOf<String, String>()

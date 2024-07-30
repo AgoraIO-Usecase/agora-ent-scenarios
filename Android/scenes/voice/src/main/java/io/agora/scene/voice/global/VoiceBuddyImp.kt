@@ -26,7 +26,7 @@ class VoiceBuddyImp : IVoiceBuddy {
     }
 
     override fun userId(): String {
-        return (UserManager.getInstance().user?.userNo ?: "").toString()
+        return UserManager.getInstance().user?.id?.toString() ?: ""
     }
 
     override fun userToken(): String {
