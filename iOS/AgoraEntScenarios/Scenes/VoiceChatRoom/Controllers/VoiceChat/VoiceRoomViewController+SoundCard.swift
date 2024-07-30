@@ -64,7 +64,7 @@ extension VoiceRoomViewController {
             self.gainValue = "100.0"
             self.effectType = 4
             self.typeValue = 4
-            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":0}}")
+            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":0,\"effect\":0}}")
         } else {
             self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":-1,\"gain\":-1.0,\"gender\":-1,\"effect\":-1}}")
         }
@@ -76,25 +76,25 @@ extension VoiceRoomViewController {
         self.typeValue = 4
         switch value {
         case 0:
-            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":0}}")
+            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":0,\"effect\":0}}")
         case 1:
-            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":1}}")
+            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":0,\"effect\":1}}")
         case 2:
-            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":0}}")
+            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":1,\"effect\":0}}")
         case 3:
-            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":1}}")
+            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":1,\"effect\":1}}")
         case 4:
-            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":2}}")
+            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":0,\"effect\":2}}")
         case 5:
-            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":2}}")
+            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":1,\"effect\":2}}")
         case 6:
-            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":3}}")
+            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":0,\"effect\":3}}")
         case 7:
-            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":3}}")
+            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":1,\"effect\":3}}")
         case 8:
-            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":0,\"effect\":4}}")
+            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":0,\"effect\":4}}")
         case 9:
-            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":1.0,\"gender\":1,\"effect\":4}}")
+            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":4,\"gain\":100.0,\"gender\":1,\"effect\":4}}")
         default:
             break
         }
