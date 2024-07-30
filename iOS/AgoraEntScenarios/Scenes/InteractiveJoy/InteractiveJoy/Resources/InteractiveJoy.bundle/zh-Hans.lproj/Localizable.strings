@@ -95,4 +95,13 @@
 "game_enter_4_digit_password"="请输入4位数密码";
 "game_private_room_title"="请输入房间密码";
 "game_room_password_error"="密码错误";
+"game_list_rex_section_title"="休闲玩法";
+"game_list_rex_section_des"="开启一站式选型体验";
+"game_list_hot_section_title"="时下最热";
+"game_list_hot_section_des"="体验弹幕互动新玩法";
+"game_list_huran_title"="忽然玩法";
+"game_list_yuanyou_title"="元游玩法";
+"game_list_qunwan_title"="群玩玩法";
+"game_list_vender_title"="切换供应商";
+
 

@@ -8,13 +8,25 @@
 import UIKit
 
 class GameListCell: UICollectionViewCell {
-    private let imageView = UIImageView()
-    private let gameName = UILabel()
+    private lazy var imageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.layer.cornerRadius = 15
+        imageView.layer.masksToBounds = true
+        imageView.backgroundColor = .white
+        return imageView
+    }()
+    
+    private lazy var gameName : UILabel = {
+        let label = UILabel()
+        label.font = UIFont.joy_R_12
+        label.textColor = UIColor.joy_title_text
+        label.textAlignment = .center
+        return label
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        imageView.backgroundColor = .white
         contentView.addSubview(imageView)
         contentView.addSubview(gameName)
         
@@ -26,11 +38,9 @@ class GameListCell: UICollectionViewCell {
         }
         
         gameName.snp.makeConstraints { make in
-            make.top.equalTo(imageView.snp.bottom).offset(20)
+            make.top.equalTo(imageView.snp.bottom).offset(5)
             make.centerX.equalToSuperview()
         }
-        
-        gameName.textAlignment = .center
     }
     
     required init?(coder: NSCoder) {

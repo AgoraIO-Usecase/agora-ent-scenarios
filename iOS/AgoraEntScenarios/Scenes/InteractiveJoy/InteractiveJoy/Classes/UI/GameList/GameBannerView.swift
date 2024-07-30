@@ -10,7 +10,9 @@ import UIKit
 class GameBannerCell: UICollectionViewCell {
     lazy var imageView: UIImageView = {
         let imageView = UIImageView()
-        
+        imageView.contentMode = .scaleAspectFit
+        imageView.layer.cornerRadius = 16
+        imageView.layer.masksToBounds = true
         return imageView
     }()
     
@@ -22,6 +24,12 @@ class GameBannerCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        self.contentView.addSubview(imageView)
+        self.contentView.addSubview(titleLabel)
+        
+        imageView.snp.makeConstraints { make in
+            make.edges.equalTo(UIEdgeInsets.zero)
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -33,9 +41,9 @@ class GameBannerView: UIView {
     private var collectionView: UICollectionView!
     private lazy var cornerSubView: GameAdView = {
         let cornerView = GameAdView()
-        cornerView.imageView.image = UIImage.sceneImage(name: "ic_dhs.png")
-        cornerView.titleLabel.text = "时下最热"
-        cornerView.descriptionLabel.text = "体验弹幕互动新玩法"
+        cornerView.imageView.image = UIImage.sceneImage(name: "game_hot_ic")
+        cornerView.titleLabel.text = LanguageManager.localValue(key: "game_list_hot_section_title")
+        cornerView.descriptionLabel.text = LanguageManager.localValue(key: "game_list_hot_section_des")
         cornerView.layer.cornerRadius = 24
         cornerView.layer.masksToBounds = true
         cornerView.backgroundColor = .white
@@ -55,7 +63,6 @@ class GameBannerView: UIView {
         collectionView.register(GameBannerCell.self, forCellWithReuseIdentifier: "GameBannerCell")
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.backgroundColor = .purple
         collectionView.showsHorizontalScrollIndicator = false;
         self.addSubview(collectionView)
         collectionView.snp_makeConstraints { make in

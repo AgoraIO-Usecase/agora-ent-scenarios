@@ -11,29 +11,35 @@ enum BottomBarClickType {
     case left, right
 }
 
-class BottomBar: UIView {
+class GameListBottomBar: UIView {
     var gameSupplierCallback: ((BottomBarClickType) -> ())? = nil
+    
     private lazy var line: UIView = {
         let l = UIView()
         l.backgroundColor = UIColor.gray
         return l
     }()
     
+    var currentSelectText: String = LanguageManager.localValue(key: "game_list_huran_title")
+    
     private lazy var leftButton: UIButton = {
         let b = UIButton(type: .custom)
-        b.setTitle("切换供应", for: .normal)
-        b.setTitleColor(UIColor(hexString: "#040925")!, for: .normal)
-        b.titleLabel?.font = UIFont(name: "PingFangSC-Medium", size: 15)
+        b.setTitle(LanguageManager.localValue(key: "game_list_vender_title"), for: .normal)
+        b.setTitleColor(UIColor.joy_zi05, for: .normal)
+        b.titleLabel?.font = UIFont.joy_M_15
         b.addTargetFor(self, action: #selector(leftAction), for: .touchUpInside)
         b.titleLabel?.textAlignment = .center
+        b.setImage(UIImage.sceneImage(name: "arrow_ic"), for: .normal)
+        b.imageView?.contentMode = .scaleAspectFit
+        b.semanticContentAttribute = .forceRightToLeft
         return b
     }()
     
     private lazy var rightButton: UIButton = {
         let b = UIButton(type: .custom)
         b.setTitle("房间列表", for: .normal)
-        b.setTitleColor(UIColor(hexString: "#040925")!, for: .normal)
-        b.titleLabel?.font = UIFont(name: "PingFangSC-Medium", size: 15)
+        b.setTitleColor(UIColor.joy_zi05, for: .normal)
+        b.titleLabel?.font = UIFont.joy_M_15
         b.addTarget(self, action: #selector(rightAction), for: .touchUpInside)
         b.titleLabel?.textAlignment = .center
         return b

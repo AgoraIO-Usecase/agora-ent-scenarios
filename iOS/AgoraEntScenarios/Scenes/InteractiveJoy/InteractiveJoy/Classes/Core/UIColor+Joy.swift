@@ -51,6 +51,14 @@ extension UIColor {
         return UIColor(hexString: "7A59FB")!
     }
     
+    @objc static var joy_zi04: UIColor {
+        return UIColor(hexString: "7B7B7B")!
+    }
+    
+    @objc static var joy_zi05: UIColor {
+        return UIColor(hexString: "040925")!
+    }
+
     // 蒙版
     @objc static var joy_cover: UIColor {
         return UIColor(hexString: "000000")!.withAlphaComponent(0.25)

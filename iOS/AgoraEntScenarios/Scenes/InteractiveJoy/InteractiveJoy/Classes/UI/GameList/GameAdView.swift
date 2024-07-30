@@ -9,19 +9,19 @@ import UIKit
 class GameAdView: UIView {
     lazy var imageView: UIImageView = {
        let imageView = UIImageView()
-        imageView.backgroundColor = .purple
         return imageView
     }()
     
     lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "时下最热"
+        label.font = UIFont.joy_S_18
         return label
     }()
     
     lazy var descriptionLabel: UILabel = {
         let label = UILabel()
-        label.text = "体验弹幕新玩法"
+        label.font = UIFont.joy_R_16
+        label.textColor = UIColor.joy_zi04
         return label
     }()
     

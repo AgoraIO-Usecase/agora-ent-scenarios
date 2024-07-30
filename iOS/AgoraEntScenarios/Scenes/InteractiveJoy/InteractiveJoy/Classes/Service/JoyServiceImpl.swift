@@ -100,18 +100,25 @@ extension JoyServiceImpl: JoyServiceProtocol {
         }
     }
     
-    func createRoom(roomName: String, gameId: Int64, password: String, completion: @escaping (InteractiveJoyRoomInfo?, Error?) -> Void) {
+    func createRoom(gameRoomInfo: InteractiveJoyRoomInfo, completion: @escaping (InteractiveJoyRoomInfo?, Error?) -> Void) {
         JoyLogger.info("createRoom start")
         let createAt = Int64(Date().timeIntervalSince1970 * 1000)
+        let gameId = gameRoomInfo.gameId
+        let password = gameRoomInfo.password ?? ""
+        let badgeTitle = gameRoomInfo.badgeTitle
+        let thumbnailId = gameRoomInfo.thumbnailId ?? ""
+        let isPrivate = gameRoomInfo.isPrivate
         let roomInfo = AUIRoomInfo()
-        roomInfo.roomName = roomName
-        roomInfo.roomId = "\(arc4random_uniform(899999) + 100000)"
+        roomInfo.roomName = gameRoomInfo.roomName ?? ""
+        roomInfo.roomId = gameRoomInfo.roomId
         roomInfo.customPayload = [
             "roomUserCount": 1,
             "createdAt": createAt,
             "gameId": gameId,
             "password": password,
-            "isPrivate": !password.isEmpty
+            "isPrivate": isPrivate,
+            "badgeTitle": badgeTitle,
+            "thumbnailId": thumbnailId
         ]
 
         let owner = AUIUserThumbnailInfo()

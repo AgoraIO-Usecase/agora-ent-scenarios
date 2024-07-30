@@ -34,10 +34,10 @@ protocol JoyServiceProtocol: NSObjectProtocol {
     
     /// 创建房间
     /// - Parameters:
-    ///   - roomName: <#roomName description#>
+    ///   - gameRoomInfo: <#roomName description#>
     ///   - completion: <#completion description#>
-    func createRoom(roomName: String, gameId: Int64, password: String, completion: @escaping (InteractiveJoyRoomInfo?, Error?) -> Void)
-    
+//    func createRoom(roomName: String, gameId: Int64, password: String, completion: @escaping (InteractiveJoyRoomInfo?, Error?) -> Void)
+    func createRoom(gameRoomInfo: InteractiveJoyRoomInfo, completion: @escaping (InteractiveJoyRoomInfo?, Error?) -> Void)
     /// 加入一个房间
     /// - Parameters:
     ///   - roomInfo: <#roomInfo description#>

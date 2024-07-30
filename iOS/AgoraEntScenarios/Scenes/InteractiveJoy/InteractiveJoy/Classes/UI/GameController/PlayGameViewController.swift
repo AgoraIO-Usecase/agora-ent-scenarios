@@ -9,7 +9,7 @@ import UIKit
 import AgoraRtcKit
 import AgoraCommon
 
-class PlayGameController: UIViewController {
+class PlayGameViewController: UIViewController {
     static let SUDMGP_APP_ID = ""
     static let SUDMGP_APP_KEY = ""
     
@@ -31,6 +31,12 @@ class PlayGameController: UIViewController {
         let view = UIView()
         view.backgroundColor = .purple
         return view
+    }()
+    
+    private lazy var bottomBar: ShowRoomBottomBar = {
+        let bar = ShowRoomBottomBar(isBroadcastor: isRoomOwner())
+        bar.delegate = self
+        return bar
     }()
     
     private func _createRtcEngine() -> AgoraRtcEngineKit {
@@ -101,6 +107,13 @@ class PlayGameController: UIViewController {
             make.top.equalTo(UIDevice.current.aui_SafeDistanceTop)
         }
         
+        view.addSubview(bottomBar)
+        bottomBar.snp.makeConstraints { make in
+            make.bottom.equalToSuperview().offset(-UIDevice.current.aui_SafeDistanceBottom)
+            make.left.right.equalToSuperview()
+            make.height.equalTo(58)
+        }
+        
         gameManager.registerGameEventHandler(gameHandler)
         
         if roomInfo.gameId > 0 {
@@ -146,8 +159,8 @@ class PlayGameController: UIViewController {
     
     private func loadGame(gameId: Int64) {
         let sudGameConfigModel = SudGameLoadConfigModel()
-        sudGameConfigModel.appId = PlayGameController.SUDMGP_APP_ID
-        sudGameConfigModel.appKey = PlayGameController.SUDMGP_APP_KEY
+        sudGameConfigModel.appId = PlayGameViewController.SUDMGP_APP_ID
+        sudGameConfigModel.appKey = PlayGameViewController.SUDMGP_APP_KEY
         sudGameConfigModel.isTestEnv = true
         sudGameConfigModel.gameId = gameId
         sudGameConfigModel.roomId = roomInfo.roomId
@@ -156,6 +169,14 @@ class PlayGameController: UIViewController {
         sudGameConfigModel.userId = "\(userInfo?.userId)"
      
         gameManager.loadGame(sudGameConfigModel)
+    }
+    
+    private func isRoomOwner() -> Bool {
+        guard let currentUid = userInfo?.userId else {
+            return false
+        }
+        
+        return roomInfo.ownerId == currentUid
     }
     
     private func showEndGameAlert() {
@@ -224,7 +245,7 @@ class PlayGameController: UIViewController {
     
 }
 
-extension PlayGameController: AgoraRtcEngineDelegate {
+extension PlayGameViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, tokenPrivilegeWillExpire token: String) {
         guard let userInfo = userInfo else {
             assert(false, "userInfo == nil")
@@ -234,7 +255,7 @@ extension PlayGameController: AgoraRtcEngineDelegate {
     }
 }
 
-extension PlayGameController: JoyServiceListenerProtocol {
+extension PlayGameViewController: JoyServiceListenerProtocol {
     func onNetworkStatusChanged(status: JoyServiceNetworkStatus) {}
     
     func onUserListDidChanged(userList: [InteractiveJoyUserInfo]) {}
@@ -253,5 +274,23 @@ extension PlayGameController: JoyServiceListenerProtocol {
         alertController.addAction(confirmAction)
 
         self.present(alertController, animated: true, completion: nil)
+    }
+}
+
+extension PlayGameViewController: RoomBottomBarDelegate {
+    func onClickSendButton() {
+        
+    }
+    
+    func onClickGiftButton() {
+        
+    }
+    
+    func onClickLikeButton() {
+        
+    }
+    
+    func onClickDeployButton(isUp: Bool) {
+        
     }
 }

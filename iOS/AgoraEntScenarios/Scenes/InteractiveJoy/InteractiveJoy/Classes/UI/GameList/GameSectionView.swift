@@ -1,56 +1,38 @@
 //
-//  GameSection.swift
+//  GameSessionView.swift
 //  InteractiveJoy
 //
-//  Created by qinhui on 2024/7/29.
+//  Created by qinhui on 2024/7/26.
 //
 
-import Foundation
+import UIKit
 
-class GameMixedSectionView: SectionView {
-    lazy var gameAdView: GameAdView = {
-       let adView = GameAdView()
-        return adView
+class GameSectionView: UICollectionReusableView {
+    private lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = ""
+        label.textColor = UIColor(hexString: "#979CBB")!
+        label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
     
-    required init(frame: CGRect) {
+    override init(frame: CGRect) {
         super.init(frame: frame)
-        self.addSubview(gameAdView)
-        self.backgroundColor = .clear
-        
-        gameAdView.snp.makeConstraints { make in
-            make.left.equalTo(20)
-            make.right.equalTo(-20)
-            make.top.bottom.equalTo(0)
-        }
-        
-        titleLabel.isHidden = true
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-}
-
-class SectionView: UICollectionReusableView {
-    let titleLabel = UILabel()
-    
-    lazy var innerHeaderView: GameAdView = {
-        let view = GameAdView()
-        return view;
-    }()
-    
-    required override init(frame: CGRect) {
-        super.init(frame: frame)
-        self.addSubview(titleLabel)
-        titleLabel.snp.makeConstraints { make in
-            make.left.equalTo(34)
-            make.top.bottom.equalTo(self)
-        }
+    func setupTitle(title: String?) {
+        titleLabel.text = title
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    private func setupUI() {
+        addSubview(titleLabel)
+        titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20.fit).isActive = true
+        titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
     }
 }

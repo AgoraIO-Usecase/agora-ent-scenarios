@@ -8,77 +8,17 @@ class GameListViewController: UIViewController, UICollectionViewDataSource, UICo
     let mixedSessionReuseIdentifier = "GameMixedSectionView"
     private var userInfo: InteractiveJoyUserInfo!
     private var service: JoyServiceProtocol!
-    
-    lazy var dataArray: [GameModel] = {
-        return [
-            GameModel(gameSection: "休闲娱乐", games: [
-                Game(gameId: 1468434637562912769, gameName: "数字转轮", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "短道速滑", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "石头剪刀布", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "排雷兵", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "云蹦迪", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "美式8球", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "桌球", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "蛇梯", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "怪物消消", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "对战消消乐", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "连连看", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "跳一跳", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "欢乐大富翁", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "Carrom", gamePic: "ic_dhs.png"),
-            ]),
-            GameModel(gameSection: "射击格斗", games: [
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽2", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽3", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽4", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽5", gamePic: "ic_dhs.png")
-            ]),
-            GameModel(gameSection: "冒险闯关", games: [
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽2", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽3", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽4", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽5", gamePic: "ic_dhs.png")
-            ]),
-            GameModel(gameSection: "冒险闯关", games: [
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽2", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽3", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽4", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽5", gamePic: "ic_dhs.png")
-            ]),
-            GameModel(gameSection: "冒险闯关", games: [
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽2", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽3", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽4", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽5", gamePic: "ic_dhs.png")
-            ]),
-            GameModel(gameSection: "冒险闯关", games: [
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽2", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽3", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽4", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽5", gamePic: "ic_dhs.png")
-            ]),
-            GameModel(gameSection: "冒险闯关", games: [
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽2", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽3", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽4", gamePic: "ic_dhs.png"),
-                Game(gameId: 1468434637562912769, gameName: "超级玛丽5", gamePic: "ic_dhs.png")
-            ])
-        ]
-    }()
+    private var gameApi: GameApiManager = GameApiManager()
+    private var dataArray: [GameModel] = [GameModel]()
+    private var gameListType: GameVendor = .huRan
     
     private lazy var naviBar: JoyNavigationBar = {
-        let bar = JoyNavigationBar(frame: CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop, width: self.view.width, height: 44))
+        let bar = JoyNavigationBar(frame: CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop , width: self.view.width, height: 44))
         return bar
     }()
     
-    private lazy var bottomBar: BottomBar = {
-       let bar = BottomBar()
+    private lazy var bottomBar: GameListBottomBar = {
+       let bar = GameListBottomBar()
         return bar
     }()
     
@@ -113,7 +53,8 @@ class GameListViewController: UIViewController, UICollectionViewDataSource, UICo
     
     private lazy var headerView: GameBannerView = {
         let headerView = GameBannerView(frame: CGRect(x: 0, y: -346, width: CGRectGetWidth(view.bounds), height: 346))
-        headerView.setBanners(banners: [BannerModel(image: "", title: "体验弹幕互动新玩法")])
+        headerView.setBanners(banners: [BannerModel(image: "game_banner", title: "")])
+        
         return headerView
     }()
     
@@ -127,9 +68,9 @@ class GameListViewController: UIViewController, UICollectionViewDataSource, UICo
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidLayoutSubviews() {
-        let contentSize = self.collectionView.contentSize
-        self.backgroundView.frame = CGRect(origin: CGPoint(x: 20, y: 0), size: CGSize(width: CGRectGetWidth(view.bounds) - 20 * 2, height: contentSize.height))
+    deinit {
+        collectionView.removeObserver(self, forKeyPath: "contentSize")
+        print("")
     }
     
     override func viewDidLoad() {
@@ -177,8 +118,25 @@ class GameListViewController: UIViewController, UICollectionViewDataSource, UICo
         }
         
         collectionView.contentInset = UIEdgeInsets(top: 346, left: 0, bottom: safeAreaBottom + 50, right: 0)
+        collectionView.addObserver(self, forKeyPath: "contentSize", options: .new, context: nil)
+        fetchGameList(vender: .huRan)
     }
     
+    private func fetchGameList(vender: GameVendor) {
+        self.gameApi.getGameList(vendor: vender) { [weak self] error, list in
+            if let error = error {
+                return
+            }
+            
+            guard let list = list else {return}
+            self?.gameListType = vender
+            self?.dataArray = list
+            self?.collectionView.reloadData()
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
+                self?.viewDidLayoutSubviews()
+            }
+        }
+    }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return dataArray.count
@@ -202,14 +160,17 @@ class GameListViewController: UIViewController, UICollectionViewDataSource, UICo
         
         let totalSpacing = layout.minimumInteritemSpacing * 3 + layout.sectionInset.left + layout.sectionInset.right + 14 * 2
         let width = (collectionView.bounds.width - totalSpacing) / 4
-        return CGSize(width: width, height: width + 40)
+        let height = (width * 91) / 62
+        return CGSize(width: width, height: height)
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
             if indexPath.section == 0 {
                 let sectionView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: mixedSessionReuseIdentifier, for: indexPath) as! GameMixedSectionView
-                sectionView.titleLabel.text = dataArray[indexPath.section].gameSection
+                sectionView.gameAdView.titleLabel.text = LanguageManager.localValue(key: "game_list_rex_section_title")
+                sectionView.gameAdView.descriptionLabel.text = LanguageManager.localValue(key: "game_list_rex_section_des")
+                sectionView.gameAdView.imageView.image = UIImage.sceneImage(name: "game_relaxation_ic")
                 return sectionView
             }
             let sectionView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: sessionReuseIdentifier, for: indexPath) as! SectionView
@@ -228,9 +189,20 @@ class GameListViewController: UIViewController, UICollectionViewDataSource, UICo
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let game = self.dataArray[indexPath.section].games[indexPath.item]
+        let gameId = game.gameId
+        let gameName = game.gameName
+        let gameUrl = game.gameUrl
+        if gameListType != .huRan {
+            let webGameViewController = PlayWebGameViewController()
+            webGameViewController.title = gameName
+            webGameViewController.url = gameUrl
+            self.navigationController?.pushViewController(webGameViewController, animated: true)
+            return
+        }
+        
         let presentView = VRCreateRoomPresentView.shared
         let vc = VRCreateViewController()
-        let gameId = self.dataArray[indexPath.section].games[indexPath.item].gameId
         presentView.showView(with: CGRect(x: 0, y: (self.view.bounds.size.height ?? 0) - 343, width: self.view.bounds.width ?? 0, height: 343), vc: vc)
         self.view.addSubview(presentView)
         
@@ -242,12 +214,19 @@ class GameListViewController: UIViewController, UICollectionViewDataSource, UICo
             presentView.dismiss()
             guard let self = self else {return}
             SVProgressHUD.show()
-            service.createRoom(roomName: name, gameId: gameId, password: pwd) { [weak self] roomInfo, error in
+            var gameRoomInfo = InteractiveJoyRoomInfo()
+            gameRoomInfo.roomName = name
+            gameRoomInfo.gameId = gameId
+            gameRoomInfo.password = pwd
+            gameRoomInfo.isPrivate = !pwd.isEmpty
+            gameRoomInfo.roomId = "\(arc4random_uniform(899999) + 100000)"
+            gameRoomInfo.badgeTitle = gameName
+            service.createRoom(gameRoomInfo: gameRoomInfo) { [weak self] roomInfo, error in
                 SVProgressHUD.dismiss()
                 guard let self = self, error == nil else {return}
                 guard let roomInfo = roomInfo else {return}
                 
-                let gameVC = PlayGameController(userInfo: self.userInfo, service: self.service, roomInfo: roomInfo)
+                let gameVC = PlayGameViewController(userInfo: self.userInfo, service: self.service, roomInfo: roomInfo)
                 let gameId = self.dataArray[indexPath.section].games[indexPath.item].gameId
                 gameVC.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(gameVC, animated: true)
@@ -257,34 +236,38 @@ class GameListViewController: UIViewController, UICollectionViewDataSource, UICo
 }
 
 extension GameListViewController {
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "contentSize" {
+            guard let contentSize = change?[.newKey] as? CGSize else {return}
+            self.backgroundView.frame = CGRect(origin: CGPoint(x: 20, y: 0), size: CGSize(width: CGRectGetWidth(view.bounds) - 20 * 2, height: contentSize.height))
+        }
+    }
+    
     func showActionSheet() {
-        let alertController = UIAlertController(title: "切换供应商", message: nil, preferredStyle: .actionSheet)
-        let option1 = UIAlertAction(title: "忽然玩法", style: .default) { action in
-            print("忽然玩法 selected")
+        let customAlertController = CustomAlertController(title: LanguageManager.localValue(key: "game_list_vender_title"), message: nil)
+        let actionTitle1 = LanguageManager.localValue(key: "game_list_huran_title")
+        let actionTitle2 = LanguageManager.localValue(key: "game_list_yuanyou_title")
+        let actionTitle3 = LanguageManager.localValue(key: "game_list_qunwan_title")
+        let actionTitle4 = LanguageManager.localValue(key: "authorized_cancel")
+        customAlertController.addAction(title: actionTitle1, style: .default) { _ in
+            self.bottomBar.currentSelectText = actionTitle1
+            self.fetchGameList(vender: .huRan)
         }
-            
-        let option2 = UIAlertAction(title: "元游玩法", style: .default) { action in
-            print("元游玩法 selected")
+        customAlertController.addAction(title: actionTitle2, style: .default) { _ in
+            self.bottomBar.currentSelectText = actionTitle2
+            self.fetchGameList(vender: .yuanyou)
         }
-            
-        let option3 = UIAlertAction(title: "群玩玩法", style: .default) { action in
-            print("群玩玩法 selected")
+        customAlertController.addAction(title: actionTitle3, style: .default) { _ in
+            self.bottomBar.currentSelectText = actionTitle3
+            self.fetchGameList(vender: .qunwan)
         }
-            
-        let cancelAction = UIAlertAction(title: "取消", style: .cancel)
-        
-        alertController.addAction(option1)
-        alertController.addAction(option2)
-        alertController.addAction(option3)
-        alertController.addAction(cancelAction)
-        
-        if let popoverController = alertController.popoverPresentationController {
-            popoverController.sourceView = self.view
-            popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
-            popoverController.permittedArrowDirections = []
+        customAlertController.addAction(title: actionTitle4, style: .cancel) { _ in
+            self.bottomBar.currentSelectText = actionTitle4
         }
-        
-        self.present(alertController, animated: true, completion: nil)
+        customAlertController.modalPresentationStyle = .overFullScreen
+        customAlertController.modalTransitionStyle = .crossDissolve
+        customAlertController.selectedTitle = bottomBar.currentSelectText
+        self.present(customAlertController, animated: true, completion: nil)
     }
 }
 
@@ -303,4 +286,5 @@ class RoundedBackgroundView: UIView {
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         return nil
     }
+    
 }

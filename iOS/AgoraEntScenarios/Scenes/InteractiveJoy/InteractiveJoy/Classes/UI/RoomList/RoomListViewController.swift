@@ -169,7 +169,7 @@ extension RoomListViewController {
                 return
             }
             
-            let gameVC = PlayGameController(userInfo: self.userInfo, service: self.service, roomInfo: roomInfo)
+            let gameVC = PlayGameViewController(userInfo: self.userInfo, service: self.service, roomInfo: roomInfo)
             gameVC.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(gameVC, animated: true)
         })

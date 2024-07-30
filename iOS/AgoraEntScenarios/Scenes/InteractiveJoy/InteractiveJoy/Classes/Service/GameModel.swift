@@ -21,11 +21,20 @@ class Game {
     var gameId: Int64
     var gameName: String
     var gamePic: String
-    
-    init(gameId: Int64, gameName: String, gamePic: String) {
+    var gameUrl: String
+    init(gameId: Int64, gameName: String, gamePic: String, gameUrl: String) {
         self.gameId = gameId
         self.gameName = gameName
         self.gamePic = gamePic
+        self.gameUrl = gameUrl
+    }
+    
+    convenience init(gameName: String, gamePic: String, gameUrl: String) {
+        self.init(gameId: 0, gameName: gameName, gamePic: gamePic, gameUrl: gameUrl)
+    }
+    
+    convenience init(gameId: Int64, gameName: String, gamePic: String) {
+        self.init(gameId: gameId, gameName: gameName, gamePic: gamePic, gameUrl: "")
     }
 }
 
