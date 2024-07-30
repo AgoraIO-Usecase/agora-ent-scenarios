@@ -75,7 +75,6 @@ extension AUIRoomInfo {
         chatRoomOwner.portrait = owner?.userAvatar ?? ""
         chatRoomOwner.uid = owner?.userId ?? ""
         chatRoomOwner.chat_uid = owner?.userId ?? ""
-        chatRoomOwner.chat_uid = owner?.userId ?? ""
         chatRoomOwner.rtc_uid = owner?.userId ?? ""
         model.owner = chatRoomOwner
         model.created_at = UInt(createTime)
