@@ -88,12 +88,12 @@ interface VoiceServiceListenerProtocol {
     fun onRoomDestroyed(roomId: String){}
 
     /**
-     *  聊天室自定义麦位属性发生变化
+     *  聊天室自定义属性发生变化
      * @param roomId 环信IM SDK聊天室id
      * @param attributeMap 变换的属性kv
      * @param fromId 谁操作发生的变化
      */
-    fun onSeatUpdated(roomId: String, attributeMap: Map<String, String>, fromId: String) {}
+    fun onAttributeMapUpdated(roomId: String, attributeMap: Map<String, String>, fromId: String) {}
 
     /**
      * rtm房间过期
@@ -106,6 +106,12 @@ interface VoiceServiceListenerProtocol {
      *
      */
     fun onSyncRoomDestroy() {}
+
+    /**
+     * rtm 房间人数
+     *
+     */
+    fun onSyncUserCountUpdate(userCount: Int){}
 }
 
 enum class VoiceRoomServiceKickedReason{

@@ -7,7 +7,6 @@ import io.agora.voice.common.constant.ConfigConstants
 
 object VoiceParameters {
     const val ROOM_USER_COUNT = "member_count"
-    const val ROOM_CLICK_COUNT = "click_count"
     const val ROOM_SOUND_EFFECT = "sound_effect"
     const val PASSWORD = "roomPassword"
     const val IS_PRIVATE = "is_private"
@@ -55,14 +54,6 @@ fun AUIRoomInfo.memberCount(): Int {
     return when (val userCount = customPayload[VoiceParameters.ROOM_USER_COUNT]) {
         is Int -> userCount
         is Long -> userCount.toInt()
-        else -> 0
-    }
-}
-
-fun AUIRoomInfo.clickCount(): Int {
-    return when (val clickCount = customPayload[VoiceParameters.ROOM_CLICK_COUNT]) {
-        is Int -> clickCount
-        is Long -> clickCount.toInt()
         else -> 0
     }
 }

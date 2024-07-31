@@ -1,13 +1,10 @@
 package io.agora.scene.voice.imkit.manager
 
-import android.os.Build
 import android.text.TextUtils
-import androidx.annotation.RequiresApi
 import io.agora.CallBack
 import io.agora.ValueCallBack
 import io.agora.chat.ChatClient
 import io.agora.chat.ChatRoomManager
-import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.model.annotation.MicClickAction
 import io.agora.scene.voice.model.annotation.MicStatus
@@ -17,9 +14,10 @@ import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
 import io.agora.scene.voice.imkit.custorm.CustomMsgType
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
 import io.agora.scene.voice.model.*
-import io.agora.voice.common.constant.ConfigConstants
+import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.voice.common.utils.GsonTools
 import io.agora.voice.common.utils.ThreadManager
+import java.util.concurrent.CountDownLatch
 
 class ChatroomProtocolDelegate constructor(private val roomId: String) {
     companion object {
@@ -35,28 +33,68 @@ class ChatroomProtocolDelegate constructor(private val roomId: String) {
      * 初始化麦位信息
      */
     fun initMicInfo(ownerBean: VoiceMemberModel, callBack: CallBack) {
-        val attributeMap = mutableMapOf<String, String>()
-        this@ChatroomProtocolDelegate.ownerBean = ownerBean
-        attributeMap["use_robot"] = "0"
-        attributeMap["robot_volume"] = "50"
-        attributeMap["mic_0"] = GsonTools.beanToString(VoiceMicInfoModel(0, ownerBean, MicStatus.Normal)).toString()
-        for (i in 1..7) {
-            val key = "mic_$i"
-            var status = MicStatus.Idle
-            if (i >= 6) status = MicStatus.BotInactive
-            val mBean = GsonTools.beanToString(VoiceMicInfoModel(i, null, status))
-            if (mBean != null) {
-                attributeMap[key] = mBean
+        ThreadManager.getInstance().runOnIOThread {
+            val latch = CountDownLatch(2)
+            var callbackCode = VoiceServiceProtocol.ERR_FAILED
+            var callbackError: String = ""
+            // 单次 kv 设置 10个
+
+            val attributeMap = mutableMapOf<String, String>()
+            this@ChatroomProtocolDelegate.ownerBean = ownerBean
+            attributeMap["mic_0"] = GsonTools.beanToString(VoiceMicInfoModel(0, ownerBean, MicStatus.Normal)).toString()
+            for (i in 1..7) {
+                val key = "mic_$i"
+                var status = MicStatus.Idle
+                if (i >= 6) status = MicStatus.BotInactive
+                val mBean = GsonTools.beanToString(VoiceMicInfoModel(i, null, status))
+                if (mBean != null) {
+                    attributeMap[key] = mBean
+                }
             }
-        }
-        roomManager.asyncSetChatroomAttributesForced(roomId, attributeMap, true) { code, result_map ->
-            if (code == 0 && result_map.isEmpty()) {
-                callBack.onSuccess()
-                ChatroomCacheManager.cacheManager.setMicInfo(attributeMap)
-                VoiceLogger.d(TAG, "initMicInfo update result onSuccess roomId:$roomId")
-            } else {
-                callBack.onError(code, result_map.toString())
-                VoiceLogger.e(TAG, "initMicInfo update result onError roomId:$roomId, $code $result_map ")
+            roomManager.asyncSetChatroomAttributesForced(roomId, attributeMap, true) { code, result_map ->
+                if (code == 0 && result_map.isEmpty()) {
+                    callbackCode = VoiceServiceProtocol.ERR_OK
+                    ChatroomCacheManager.cacheManager.setMicInfo(attributeMap)
+                    VoiceLogger.d(TAG, "initMicInfo update result onSuccess roomId:$roomId")
+                    latch.countDown()
+                } else {
+                    callbackCode = code
+                    callbackError = "initMicInfo onError roomId:$roomId, $code"
+                    VoiceLogger.e(TAG, "initMicInfo update result onError roomId:$roomId, $code $result_map ")
+                    latch.countDown()
+                }
+            }
+
+            val attributeMap2 = mutableMapOf<String, String>()
+            attributeMap2["use_robot"] = "0"
+            attributeMap2["robot_volume"] = "50"
+            attributeMap2["click_count"] = "3"
+
+            roomManager.asyncSetChatroomAttributesForced(roomId, attributeMap2, true) { code, result_map ->
+                if (code == 0 && result_map.isEmpty()) {
+                    callbackCode = VoiceServiceProtocol.ERR_OK
+                    VoiceLogger.d(TAG, "initOtherAttributes onSuccess roomId:$roomId")
+                    latch.countDown()
+                } else {
+                    callbackCode = code
+                    callbackError = "initOtherAttributes onError roomId:$roomId, $code"
+                    VoiceLogger.e(TAG, "initOtherAttributes onError roomId:$roomId, $code $result_map ")
+                    latch.countDown()
+                }
+            }
+            try {
+                latch.await()
+                ThreadManager.getInstance().runOnMainThread {
+                    if (callbackCode == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess()
+                    } else {
+                        callBack.onError(callbackCode, callbackError)
+                    }
+                }
+            } catch (e: Exception) {
+                ThreadManager.getInstance().runOnMainThread {
+                    callBack.onError(callbackCode, e.message ?: "initAttributes Exception ${e.message}")
+                }
             }
         }
     }
@@ -66,7 +104,15 @@ class ChatroomProtocolDelegate constructor(private val roomId: String) {
      */
     fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel, callback: ValueCallBack<VoiceRoomInfo>) {
         val keyList: MutableList<String> =
-            mutableListOf("ranking_list", "member_list", "gift_amount", "robot_volume", "use_robot", "room_bgm")
+            mutableListOf(
+                "ranking_list",
+                "member_list",
+                "gift_amount",
+                "robot_volume",
+                "use_robot",
+                "room_bgm",
+                "click_count"
+            )
         for (i in 0..7) {
             keyList.add("mic_$i")
         }
@@ -136,6 +182,11 @@ class ChatroomProtocolDelegate constructor(private val roomId: String) {
                             voiceRoomInfo.roomInfo?.useRobot = value == "1"
                         } else if (key == "room_bgm") {
                             voiceRoomInfo.bgmInfo = GsonTools.toBean(value, VoiceBgmModel::class.java)
+                        } else if (key == "click_count") {
+                            value.toIntOrNull()?.let {
+                                voiceRoomInfo.roomInfo?.clickCount = it
+                                ChatroomCacheManager.cacheManager.clickCountCache = it
+                            }
                         }
                     }
                     ChatroomCacheManager.cacheManager.clearMicInfo()
@@ -796,6 +847,32 @@ class ChatroomProtocolDelegate constructor(private val roomId: String) {
                 override fun onError(code: Int, error: String?) {
                     VoiceLogger.e(TAG, "update giftAmount onError: $code $error")
                     callback.onError(code, error)
+                }
+            })
+        }
+    }
+
+    /**
+     * 更新点击次数 +1, 房主更新
+     *
+     * @param chatUid
+     * @param callback
+     */
+    fun increaseClickCount(chatUid: String, callback: CallBack?) {
+        if (TextUtils.equals(ownerBean.chatUid, chatUid)) {
+            var clickCount = ChatroomCacheManager.cacheManager.clickCountCache
+            clickCount += 1
+            roomManager.asyncSetChatroomAttribute(roomId, "click_count", "$clickCount", true, object :
+                CallBack {
+                override fun onSuccess() {
+                    VoiceLogger.d(TAG, "update clickCount onSuccess: $clickCount")
+                    ChatroomCacheManager.cacheManager.clickCountCache = clickCount
+                    callback?.onSuccess()
+                }
+
+                override fun onError(code: Int, error: String?) {
+                    VoiceLogger.e(TAG, "update clickCount onError: $code $error")
+                    callback?.onError(code, error)
                 }
             })
         }

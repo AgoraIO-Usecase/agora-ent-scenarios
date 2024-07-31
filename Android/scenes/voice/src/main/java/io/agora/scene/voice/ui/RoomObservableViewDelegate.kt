@@ -942,6 +942,23 @@ class RoomObservableViewDelegate constructor(
             })
     }
 
+    // 用户加入房间，房主修改观看人数+1
+    fun onUserJoinedRoom() {
+        ChatroomIMManager.getInstance().increaseClickCount(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
+            object : CallBack {
+                override fun onSuccess() {
+                    ThreadManager.getInstance().runOnMainThread {
+                        iRoomTopView.onUpdateWatchCount(ChatroomIMManager.getInstance().clickCountCache)
+                    }
+                    EMLog.d(TAG, "increaseClickCount success")
+                }
+
+                override fun onError(code: Int, error: String) {
+                    EMLog.d(TAG, "increaseClickCount error$code $error")
+                }
+            })
+    }
+
     // 收到礼物消息回调
     fun receiveGift(roomId: String, message: ChatMessageData?) {
         val voiceGiftModel = ChatroomIMManager.getInstance().getGiftModel(message)
@@ -1070,13 +1087,27 @@ class RoomObservableViewDelegate constructor(
         }
     }
 
-    fun onSeatUpdated(attributeMap: Map<String, String>) {
+    /**
+     * IM 自定义字段更新
+     *
+     * @param attributeMap
+     */
+    fun onAttributeMapUpdated(attributeMap: Map<String, String>) {
         if (attributeMap.containsKey("gift_amount")) {
             attributeMap["gift_amount"]?.toIntOrNull()?.let {
                 voiceRoomModel.giftAmount = it
                 ChatroomIMManager.getInstance().giftAmountCache = it
                 ThreadManager.getInstance().runOnMainThread {
                     iRoomTopView.onUpdateGiftCount(it)
+                }
+            }
+        }
+        if (attributeMap.containsKey("click_count")) {
+            attributeMap["click_count"]?.toIntOrNull()?.let {
+                voiceRoomModel.clickCount = it
+                ChatroomIMManager.getInstance().setClickCountCache(it)
+                ThreadManager.getInstance().runOnMainThread {
+                    iRoomTopView.onUpdateWatchCount(it)
                 }
             }
         }

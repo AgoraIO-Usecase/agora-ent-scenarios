@@ -184,7 +184,7 @@ public class ChatroomConfigManager {
             @Override
             public void onAttributesUpdate(String roomId, Map<String, String> attributeMap, String from) {
                 voiceServiceProtocol.getSubscribeListeners().notifyEventHandlers(listener -> {
-                    listener.onSeatUpdated(roomId, attributeMap, from);
+                    listener.onAttributeMapUpdated(roomId, attributeMap, from);
                 });
             }
 

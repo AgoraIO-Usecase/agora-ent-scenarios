@@ -5,7 +5,6 @@ import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.VoiceRoomModel
 import io.agora.scene.voice.model.chatroomId
-import io.agora.scene.voice.model.clickCount
 import io.agora.scene.voice.model.isPrivate
 import io.agora.scene.voice.model.memberCount
 import io.agora.scene.voice.model.roomPassword
@@ -28,7 +27,6 @@ object RoomInfoConstructor {
         roomId = roomInfo.roomId
         isPrivate = roomInfo.isPrivate()
         memberCount = roomInfo.memberCount()
-        clickCount = roomInfo.clickCount()
         roomName = roomInfo.roomName
         soundEffect = roomInfo.soundEffect()
         chatroomId = roomInfo.chatroomId()

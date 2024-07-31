@@ -135,7 +135,6 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
     }
 
     override fun onUpdateMemberCount(count: Int) {
-        super.onUpdateMemberCount(count)
         if (count < 0) return
         if (this::roomDetailInfo.isInitialized) {
             roomDetailInfo.memberCount = count
@@ -145,7 +144,6 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
     }
 
     override fun onUpdateWatchCount(count: Int) {
-        super.onUpdateWatchCount(count)
         if (count < 0) return
         if (this::roomDetailInfo.isInitialized) {
             roomDetailInfo.clickCount = count
@@ -154,7 +152,6 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
     }
 
     override fun onUpdateGiftCount(count: Int) {
-        super.onUpdateGiftCount(count)
         if (count < 0) return
         if (this::roomDetailInfo.isInitialized) {
             roomDetailInfo.giftAmount = count

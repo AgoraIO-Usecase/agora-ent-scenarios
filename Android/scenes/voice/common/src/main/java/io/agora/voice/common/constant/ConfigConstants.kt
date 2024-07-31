@@ -5,6 +5,9 @@ package io.agora.voice.common.constant
  */
 object ConfigConstants {
 
+    // 机器人的数量
+    const val ROBOT_COUNT = 2
+
     // 可点击透明度
     const val ENABLE_ALPHA = 1.0f
 

@@ -871,6 +871,13 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         delegate.updateGiftAmount(chatUid, amount, callBack);
     }
 
+    /**
+     * 更新点击总数
+     */
+    public void increaseClickCount(String chatUid, CallBack callBack) {
+        delegate.increaseClickCount(chatUid, callBack);
+    }
+
     ////////////////////////////本地缓存管理//////////////////////////////
 
     /**
@@ -885,6 +892,21 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      */
     public int getGiftAmountCache() {
         return cacheManager.getGiftAmountCache();
+    }
+
+    /**
+     * 从服务端获取数据 clickCount
+     * @param count
+     */
+    public void setClickCountCache(int count) {
+        cacheManager.setClickCountCache(count);
+    }
+
+    /**
+     * 获取观看人数
+     */
+    public int getClickCountCache() {
+        return cacheManager.getClickCountCache();
     }
 
     /**

@@ -35,6 +35,7 @@ import io.agora.scene.voice.model.*
 import io.agora.scene.voice.netkit.VRCreateRoomResponse
 import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
+import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.net.callback.VRValueCallBack
 import kotlin.random.Random
 
@@ -244,13 +245,13 @@ class VoiceSyncManagerServiceImp(
         }
         mUserList.removeIf { it.userId == userInfo.userId }
         mUserList.add(userInfo)
-//        mObservableHelper.notifyEventHandlers { delegate ->
-//            delegate.onUserCountUpdate(mUserList.size)
-//        }
+        mObservableHelper.notifyEventHandlers { delegate ->
+            delegate.onSyncUserCountUpdate(mUserList.size + ConfigConstants.ROBOT_COUNT)
+        }
         val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return
         // 所有人都可修改用户数
-        cacheRoom.customPayload[VoiceParameters.ROOM_USER_COUNT] = mUserList.count() + 2 // 房主 + 机器人
-        cacheRoom.customPayload[VoiceParameters.ROOM_CLICK_COUNT] = cacheRoom.clickCount() + 1
+        cacheRoom.customPayload[VoiceParameters.ROOM_USER_COUNT] =
+            mUserList.size + ConfigConstants.ROBOT_COUNT // 房主 + 机器人
         mRoomManager.updateRoomInfo(VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(),
             voiceSceneId, cacheRoom, callback = { auiException, roomInfo ->
                 if (auiException == null) {
@@ -268,9 +269,9 @@ class VoiceSyncManagerServiceImp(
         }
         mUserList.removeIf { it.userId == userInfo.userId }
 
-//        mObservableHelper.notifyEventHandlers { delegate ->
-//            delegate.onUserCountUpdate(mUserList.size)
-//        }
+        mObservableHelper.notifyEventHandlers { delegate ->
+            delegate.onSyncUserCountUpdate(mUserList.size + ConfigConstants.ROBOT_COUNT)
+        }
         val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return
         // 所有人都可修改用户数
         cacheRoom.customPayload[VoiceParameters.ROOM_USER_COUNT] = mUserList.count() + 2
@@ -314,6 +315,9 @@ class VoiceSyncManagerServiceImp(
      */
     override fun subscribeListener(listener: VoiceServiceListenerProtocol) {
         mObservableHelper.subscribeEvent(listener)
+        if (mUserList.isNotEmpty()) {
+            listener.onSyncUserCountUpdate(mUserList.size + ConfigConstants.ROBOT_COUNT)
+        }
     }
 
     /**
@@ -399,7 +403,6 @@ class VoiceSyncManagerServiceImp(
                     }
                     this.createTime = createAt
                     this.customPayload[VoiceParameters.ROOM_USER_COUNT] = 2L // 两个机器人
-                    this.customPayload[VoiceParameters.ROOM_CLICK_COUNT] = 2L // 两个机器人
                     this.customPayload[VoiceParameters.ROOM_SOUND_EFFECT] = inputModel.soundEffect
                     this.customPayload[VoiceParameters.PASSWORD] = inputModel.password
                     this.customPayload[VoiceParameters.IS_PRIVATE] = inputModel.password.isNotEmpty()
