@@ -990,7 +990,6 @@ extension SpatialAudioSyncSerciceImp {
             return
         }
         var params = mic.kj.JSONObject()
-        params.removeValue(forKey: "up")
         SyncUtil
             .scene(id: selfRoomId)?
             .collection(className: kCollectionIdSeatInfo)
