@@ -33,6 +33,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="48dp"
@@ -43,6 +44,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutContent"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 

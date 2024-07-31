@@ -70,7 +70,7 @@ typedef enum : NSUInteger {
 
 - (void)didLeaveChours;
 
-- (BOOL)hasAvailableMicSeat;
+- (BOOL)enableShowJoinChorusButton;
 
 @end
 
