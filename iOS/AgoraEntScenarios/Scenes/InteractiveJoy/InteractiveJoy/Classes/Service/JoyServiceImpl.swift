@@ -12,8 +12,13 @@ import AgoraRtmKit
 import AgoraCommon
 
 private let kSceneId = "scene_play_zone_4.10.2"
+private let KCollectionRobotInfo = "robot_info"
 private let SYNC_SCENE_ROOM_STARTGAME_COLLECTION = "startGameCollection"
+private let robotUid = 3000000001
+private let headUrl = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/{head}.png"
+
 class JoyServiceImpl: NSObject {
+    private var mRobotMap: [String:PlayRobotInfo] = [String:PlayRobotInfo]()
     private var appId: String
     private var user: InteractiveJoyUserInfo
     private var rtmClient: AgoraRtmClientKit?
@@ -30,7 +35,6 @@ class JoyServiceImpl: NSObject {
     }
     
     private var isConnected: Bool = false
-    
     private lazy var roomManager = AUIRoomManagerImpl(sceneId: kSceneId)
     private lazy var syncManager: AUISyncManager = {
         let config = AUICommonConfig()
@@ -47,7 +51,6 @@ class JoyServiceImpl: NSObject {
         logConfig.fileSizeInKB = 1024
         logConfig.level = .info
         let manager = AUISyncManager(rtmClient: rtmClient, commonConfig: config, logConfig: logConfig)
-        
         return manager
     }()
     
@@ -73,9 +76,27 @@ class JoyServiceImpl: NSObject {
             self.isConnected = err == nil ? true : false
         }
     }
+    
+    private func getRobotCollection(roomId: String) -> AUIMapCollection? {
+        if roomId.isEmpty {
+            return nil
+        }
+        
+        let scene = syncManager.getScene(channelName: roomId)
+        return scene?.getCollection(key: KCollectionRobotInfo)
+    }
 }
 
 extension JoyServiceImpl: JoyServiceProtocol {
+    func getRobotList() -> [PlayRobotInfo] {
+        var robots = [PlayRobotInfo]()
+        mRobotMap.values.forEach { robot in
+            robots.append(robot)
+        }
+        
+        return robots
+    }
+    
     func getRoomList(completion: @escaping ([InteractiveJoyRoomInfo]) -> Void) {
         let fetchRoomList: () -> Void = {[weak self] in
             self?.roomService.getRoomList(lastCreateTime: 0, pageSize: 50)  {[weak self] info in
@@ -273,6 +294,43 @@ extension JoyServiceImpl: AUISceneRespDelegate {
             }
         }
     }
+    
+    func onWillInitSceneMetadata(channelName: String) -> [String : Any]? {
+        var robotMap = [String : Any]()
+        for i in (0..<10) {
+            let robotId1 = "\(robotUid + i * 2)"
+            let userInfo1 =  AUIUserThumbnailInfo()
+            userInfo1.userId = robotId1
+            userInfo1.userName = "机器人\(1 + i * 2)"
+            userInfo1.userAvatar = headUrl.replacingOccurrences(of: "{head}", with: "man\(i + 1)")
+
+            let modelMale = PlayRobotInfo()
+            modelMale.gender = "male"
+            modelMale.level = 1
+            modelMale.owner = userInfo1
+            
+            let modelMaleJson = JSONObject.toJsonString(modelMale)
+            robotMap[robotId1] = modelMaleJson
+            
+            let robotId2 = "\(robotUid + i * 2 + 1)"
+            let userInfo2 = AUIUserThumbnailInfo()
+            userInfo2.userId = robotId2
+            userInfo2.userName = "机器人\(2 + i * 2)"
+            userInfo2.userAvatar = headUrl.replacingOccurrences(of: "{head}", with: "woman\(i + 1)")
+            
+            let modelFemale = PlayRobotInfo()
+            modelFemale.gender = "female"
+            modelFemale.level = 1
+            modelFemale.owner = userInfo2
+            
+            let modelFemaleJson = JSONObject.toJsonString(modelFemale)
+            robotMap[robotId2] = modelFemaleJson
+            
+        }
+        return [
+            KCollectionRobotInfo: robotMap
+        ]
+    }
 }
 
 extension JoyServiceImpl: AUIUserRespDelegate {
@@ -406,6 +464,7 @@ extension JoyServiceImpl{
         let scene = getCurrentScene(with: channelName)
         scene?.userService.bindRespDelegate(delegate: self)
         scene?.bindRespDelegate(delegate: self)
+        innerSubscribeAll(roomId: channelName)
 //        syncManager.rtmManager.subscribeMessage(channelName: channelName, delegate: self)
     }
     
@@ -419,6 +478,24 @@ extension JoyServiceImpl{
     private func getCurrentScene(with channelName: String) -> AUIScene? {
         let scene = self.syncManager.getScene(channelName: channelName)
         return scene
+    }
+    
+    private func innerSubscribeAll(roomId: String) {
+        let robotCollection = getRobotCollection(roomId: roomId)
+        robotCollection?.subscribeAttributesDidChanged(callback: {channelName, observeKey, value in
+            if observeKey != KCollectionRobotInfo { return }
+            var robots = value.getMap() ?? [String : Any]()
+            var robotMap = [String: PlayRobotInfo]()
+            
+            robots.values.forEach { v in
+                guard let robot = JSONObject.toModel(PlayRobotInfo.self, value: v as? String), let userId = robot.owner?.userId else { return }
+                robotMap[userId] = robot
+            }
+                        
+            if self.mRobotMap.isEmpty {
+                self.mRobotMap.merge(robotMap) { (current, _) in current }
+            }
+        })
     }
 }
 

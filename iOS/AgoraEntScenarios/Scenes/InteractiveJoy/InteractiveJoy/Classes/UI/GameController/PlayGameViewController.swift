@@ -26,11 +26,16 @@ class PlayGameViewController: UIViewController {
     private var service: JoyServiceProtocol!
     private var roomInfo: InteractiveJoyRoomInfo!
     private lazy var rtcEngine: AgoraRtcEngineKit = _createRtcEngine()
-
-    lazy var gameView: UIView = {
+    
+    private lazy var gameView: UIView = {
         let view = UIView()
-        view.backgroundColor = .purple
         return view
+    }()
+    
+    private lazy var backgroundView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage.sceneImage(name: "play_zone_room_bg")
+        return imageView
     }()
     
     private lazy var bottomBar: ShowRoomBottomBar = {
@@ -69,7 +74,13 @@ class PlayGameViewController: UIViewController {
         return engine
     }
     
-    let gameHandler: GameEventHandler = GameEventHandler()
+    lazy var gameHandler: GameEventHandler = {
+        let handler = GameEventHandler()
+        handler.delegate = self
+        handler.robotInfoList = self.service.getRobotList()
+        return handler
+    }()
+    
     let gameManager: SudGameManager = SudGameManager()
     
     required init(userInfo: InteractiveJoyUserInfo, service: JoyServiceProtocol, roomInfo: InteractiveJoyRoomInfo) {
@@ -78,6 +89,15 @@ class PlayGameViewController: UIViewController {
         self.service = service
         self.roomInfo = roomInfo
         self.service.subscribeListener(listener: self)
+        let createdAt = roomInfo.createdAt ?? 0
+        navigationBar.roomInfoView.startTime(Int64(createdAt > 0 ? createdAt : Int64(Date().timeIntervalSince1970) * 1000))
+        navigationBar.roomInfoView.timerCallBack = {[weak self] duration in
+            if duration < 60 * 10 {
+                return
+            }
+            self?.navigationBar.roomInfoView.stopTime()
+            self?.onBackAction()
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -87,14 +107,25 @@ class PlayGameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.white
+        self.view.addSubview(backgroundView)
         self.view.addSubview(gameView)
         self.view.addSubview(navigationBar)
-        navigationBar.moreActionCallback = {
+        self.view.addSubview(bottomBar)
+        
+        navigationBar.moreActionCallback = { [weak self] in
+            guard let self = self else { return }
             
+            let dialog = AUiMoreDialog(frame: view.bounds)
+            self.view.addSubview(dialog)
+            dialog.show()
         }
         
         navigationBar.closeActionCallback = { [weak self] in
             self?.showEndGameAlert()
+        }
+        
+        backgroundView.snp.makeConstraints { make in
+            make.edges.equalTo(UIEdgeInsets.zero)
         }
         
         gameView.snp.makeConstraints { make in
@@ -107,7 +138,6 @@ class PlayGameViewController: UIViewController {
             make.top.equalTo(UIDevice.current.aui_SafeDistanceTop)
         }
         
-        view.addSubview(bottomBar)
         bottomBar.snp.makeConstraints { make in
             make.bottom.equalToSuperview().offset(-UIDevice.current.aui_SafeDistanceBottom)
             make.left.right.equalToSuperview()
@@ -166,7 +196,7 @@ class PlayGameViewController: UIViewController {
         sudGameConfigModel.roomId = roomInfo.roomId
         sudGameConfigModel.language = "zh-CN"
         sudGameConfigModel.gameView = gameView
-        sudGameConfigModel.userId = "\(userInfo?.userId)"
+        sudGameConfigModel.userId = "\(userInfo?.userId ?? 0)"
      
         gameManager.loadGame(sudGameConfigModel)
     }
@@ -243,6 +273,10 @@ class PlayGameViewController: UIViewController {
         }
     }
     
+    private func onBackAction() {
+        self.prepareClose()
+    }
+    
 }
 
 extension PlayGameViewController: AgoraRtcEngineDelegate {
@@ -278,19 +312,35 @@ extension PlayGameViewController: JoyServiceListenerProtocol {
 }
 
 extension PlayGameViewController: RoomBottomBarDelegate {
+    func onClickAudioButton(audioEnable: Bool) {
+        if audioEnable {
+            rtcEngine.adjustRecordingSignalVolume(100)
+        } else {
+            rtcEngine.adjustRecordingSignalVolume(0)
+        }
+    }
+    
     func onClickSendButton() {
         
     }
     
-    func onClickGiftButton() {
-        
+    func onClickRobotButton() {
+        gameHandler.addRobot()
     }
-    
-    func onClickLikeButton() {
+}
+
+extension PlayGameViewController: GameEventHandlerDelegate {
+    func onPlayerCaptainChanged(userId: String, model: MGCommonPlayerCaptainModel) {
+        var currentUidIsCaptain = false
+        guard let callbackUid = UInt(userId) else { return }
+        guard let currentUid = userInfo?.userId else { return }
         
-    }
-    
-    func onClickDeployButton(isUp: Bool) {
+        if model.isCaptain {
+            currentUidIsCaptain = currentUid == callbackUid
+        } else {
+            currentUidIsCaptain = !(currentUid == callbackUid)
+        }
         
+        self.bottomBar.robotEnable = currentUidIsCaptain
     }
 }

@@ -11,15 +11,17 @@ private let dotWidth: CGFloat = 5
 
 protocol RoomBottomBarDelegate: NSObjectProtocol {
     func onClickSendButton()
-    func onClickGiftButton()
-    func onClickLikeButton()
-    func onClickDeployButton(isUp: Bool)
+    func onClickAudioButton(audioEnable:Bool)
+    func onClickRobotButton()
 }
 
-
 class ShowRoomBottomBar: UIView {
-    
     weak var delegate: RoomBottomBarDelegate?
+    var robotEnable = false {
+        didSet {
+            self.createSubviews()
+        }
+    }
     
     private lazy var sendMessageButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -31,32 +33,23 @@ class ShowRoomBottomBar: UIView {
         return button
     }()
     
-    // 礼物
-    private lazy var giftButton: UIButton = {
+    // 麦克风开启静音
+    private lazy var audioButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setImage(UIImage.sceneImage(name: "bar_gift"), for: .normal)
+        button.setImage(UIImage.sceneImage(name: "ic_mic_closed"), for: .selected)
+        button.setImage(UIImage.sceneImage(name: "ic_mic_opened"), for: .normal)
+        button.imageView?.contentMode = .scaleAspectFit
         button.backgroundColor = .joy_cover
-        button.addTarget(self, action: #selector(didClickGiftButton), for: .touchUpInside)
+        button.addTarget(self, action: #selector(didClickAudioButton(sender:)), for: .touchUpInside)
         return button
     }()
     
-    private lazy var likeButton: UIButton = {
+    //机器人
+    private lazy var robotButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setImage(UIImage.sceneImage(name: "bar_like"), for: .normal)
+        button.setImage(UIImage.sceneImage(name: "play_zone_robot"), for: .normal)
         button.backgroundColor = .joy_cover
-        button.addTarget(self, action: #selector(didClickLikeButton), for: .touchUpInside)
-        return button
-    }()
-    
-    
-    private lazy var deployButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setImage(UIImage.sceneImage(name: "bar_deploy"), for: .normal)
-        button.backgroundColor = .joy_cover
-        button.addTarget(self, action: #selector(didClickDeployDownButton), for: .touchDown)
-        button.addTarget(self, action: #selector(didClickDeployUpButton), for: .touchUpInside)
-        button.addTarget(self, action: #selector(didClickDeployUpButton), for: .touchCancel)
-        button.addTarget(self, action: #selector(didClickDeployUpButton), for: .touchUpOutside)
+        button.addTarget(self, action: #selector(didClickRobotButton), for: .touchUpInside)
         return button
     }()
     
@@ -74,10 +67,12 @@ class ShowRoomBottomBar: UIView {
     }
     
     private func createSubviews(){
-        if isBroadcastor {
-            buttonArray = [likeButton, deployButton]
-        }else{
-            buttonArray = [giftButton, likeButton]
+        self.removeAllSubviews()
+        
+        if robotEnable {
+            buttonArray = [robotButton, audioButton]
+        } else {
+            buttonArray = [audioButton]
         }
         addSubview(sendMessageButton)
         sendMessageButton.sizeToFit()
@@ -127,31 +122,13 @@ class ShowRoomBottomBar: UIView {
         delegate?.onClickSendButton()
     }
     
-    @objc private func didClickGiftButton() {
-        delegate?.onClickGiftButton()
+    @objc private func didClickAudioButton(sender: UIButton) {
+        sender.isSelected = !sender.isSelected
+        delegate?.onClickAudioButton(audioEnable: sender.isSelected)
     }
     
-    @objc private func didClickLikeButton() {
-        delegate?.onClickLikeButton()
+    @objc private func didClickRobotButton() {
+        delegate?.onClickRobotButton()
     }
     
-    @objc private func didClickDeployDownButton() {
-        delegate?.onClickDeployButton(isUp: false)
-    }
-    
-    @objc private func didClickDeployUpButton() {
-        delegate?.onClickDeployButton(isUp: true)
-    }
-    
-    public func setDeployBtnHidden(isHidden: Bool) {
-        if buttonArray.contains(deployButton) {
-            deployButton.isHidden = isHidden
-        }
-    }
-    
-    public func setDeployBtn(with url: String) {
-        if let imgUrl = URL(string: url) {
-            deployButton.imageView?.sd_setImage(with: imgUrl)
-        }
-    }
 }

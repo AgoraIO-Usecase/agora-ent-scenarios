@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RTMSyncManager
 
 @objcMembers
 public class InteractiveJoyUserInfo: NSObject {
@@ -33,4 +34,10 @@ public class InteractiveJoyRoomInfo: NSObject {
     var createdAt: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
     
     var objectId: String = ""
+}
+
+class PlayRobotInfo: NSObject, Codable {
+    var gender: String?            //性别 male：男 female：女
+    var level: Int = 0             //机器人等级 1:简单 2：适中 3：困难
+    var owner: AUIUserThumbnailInfo?
 }

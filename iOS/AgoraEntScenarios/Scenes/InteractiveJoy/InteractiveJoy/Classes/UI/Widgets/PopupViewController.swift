@@ -23,6 +23,25 @@ class PopupViewController: UIViewController {
             make.height.equalTo(300)
         }
         
+        let cornerBackView = UIView()
+        cornerBackView.backgroundColor = .white
+        containerView.addSubview(cornerBackView)
+        cornerBackView.snp.makeConstraints { make in
+            make.top.right.left.equalTo(0)
+            make.height.equalTo(19)
+        }
+        
+        let cornerImageView = UIImageView()
+        cornerImageView.image = UIImage.sceneImage(name: "alert_corner_ic")
+        cornerBackView.addSubview(cornerImageView)
+        
+        cornerImageView.snp.makeConstraints { make in
+            make.height.equalTo(3)
+            make.width.equalTo(33)
+            make.centerX.equalTo(cornerBackView)
+            make.centerY.equalTo(cornerBackView)
+        }
+        
         let titleLabel = UILabel()
         titleLabel.text = "切换供应商"
         titleLabel.textAlignment = .center
@@ -30,7 +49,7 @@ class PopupViewController: UIViewController {
         containerView.addSubview(titleLabel)
         
         titleLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(16)
+            make.top.equalTo(cornerBackView.snp.bottom).offset(12)
             make.centerX.equalToSuperview()
         }
         
