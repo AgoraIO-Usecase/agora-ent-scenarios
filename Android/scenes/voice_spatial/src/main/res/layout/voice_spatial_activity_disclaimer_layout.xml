@@ -27,13 +27,13 @@
             android:layout_height="match_parent"
             android:paddingLeft="24dp"
             android:paddingRight="24dp"
-            android:background="@color/voice_white"
+            android:background="@android:color/white"
             android:paddingBottom="38dp"
             android:orientation="vertical">
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/content"
-                android:textSize="@dimen/voice_sp_16"
+                android:textSize="16sp"
                 android:layout_marginTop="20dp"
                 android:textColor="@color/voice_dark_grey_color_040925"
                 android:text="@string/voice_spatial_disclaimer_content_1"
@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"/>
 
             <com.google.android.material.textview.MaterialTextView
-                android:textSize="@dimen/voice_sp_16"
+                android:textSize="16sp"
                 android:layout_marginTop="50dp"
                 android:textColor="@color/voice_dark_grey_color_040925"
                 android:text="@string/voice_spatial_disclaimer_content_2"
@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"/>
 
             <com.google.android.material.textview.MaterialTextView
-                android:textSize="@dimen/voice_sp_16"
+                android:textSize="16sp"
                 android:layout_marginTop="50dp"
                 android:textColor="@color/voice_dark_grey_color_040925"
                 android:text="@string/voice_spatial_disclaimer_content_3"
@@ -58,7 +58,7 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/end"
-                android:textSize="@dimen/voice_sp_16"
+                android:textSize="16sp"
                 android:enabled="true"
                 android:clickable="true"
                 android:layout_marginTop="38dp"

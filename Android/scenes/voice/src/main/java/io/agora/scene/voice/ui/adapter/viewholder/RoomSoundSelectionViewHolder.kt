@@ -7,8 +7,8 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.voice.model.SoundSelectionBean
-import io.agora.voice.common.ui.adapter.BaseRecyclerViewAdapter
 import io.agora.voice.common.utils.DeviceTools.dp
 import io.agora.voice.common.utils.ResourcesTools
 import io.agora.scene.voice.R
@@ -24,7 +24,7 @@ class RoomSoundSelectionViewHolder(binding: VoiceItemRoomSoundSelectionBinding) 
                 mBinding.mtSoundSelectionCurrentName.text =
                     mBinding.root.context.getString(R.string.voice_chatroom_current_sound_selection)
                 mBinding.mcvSoundSelectionContent.strokeColor =
-                    ResourcesTools.getColor(context.resources, R.color.voice_main_color_009fff)
+                    ResourcesTools.getColor(itemView.context.resources, R.color.voice_main_color_009fff)
                 mBinding.ivSoundSelectionToggle.setImageResource(R.drawable.voice_icon_room_sound_listen)
                 mBinding.ivSoundSelected.isVisible = true
                 mBinding.llSoundSelectionTips.isVisible = false
@@ -35,7 +35,7 @@ class RoomSoundSelectionViewHolder(binding: VoiceItemRoomSoundSelectionBinding) 
                 mBinding.mtSoundSelectionCurrentName.isVisible = bindingAdapterPosition == 1
                 mBinding.llSoundSelectionTips.isVisible = bindingAdapterPosition == 1
                 mBinding.mcvSoundSelectionContent.strokeColor =
-                    ResourcesTools.getColor(context.resources, R.color.voice_dark_grey_color_eff4ff)
+                    ResourcesTools.getColor(itemView.context.resources, R.color.voice_dark_grey_color_eff4ff)
                 mBinding.ivSoundSelectionToggle.setImageResource(R.drawable.voice_icon_room_sound_toggle)
                 mBinding.ivSoundSelected.isVisible = false
             }
@@ -48,7 +48,7 @@ class RoomSoundSelectionViewHolder(binding: VoiceItemRoomSoundSelectionBinding) 
                 mBinding.llSoundCustomerUsage.removeAllViews()
                 mBinding.llSoundCustomerUsage.isInvisible = false
                 it.customer.forEach { customerBean ->
-                    val customerImage = AppCompatImageView(context)
+                    val customerImage = AppCompatImageView(itemView.context)
                     customerImage.setImageResource(customerBean.avatar)
                     val ivSize = 20.dp.toInt()
                     mBinding.llSoundCustomerUsage.addView(customerImage, LinearLayout.LayoutParams(ivSize, ivSize))
@@ -74,10 +74,11 @@ class RoomSoundSelectionFooterViewHolder(binding: VoiceItemSoundSelectionFooterB
     override fun binding(data: String?, selectedIndex: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mBinding.mtChatroomSoundSelectionMore.text =
-                Html.fromHtml(context.getString(R.string.voice_chatroom_sound_selection_more), Html.FROM_HTML_MODE_LEGACY)
+                Html.fromHtml(itemView.context.getString(R.string.voice_chatroom_sound_selection_more), Html
+                    .FROM_HTML_MODE_LEGACY)
         } else {
             mBinding.mtChatroomSoundSelectionMore.text =
-                Html.fromHtml(context.getString(R.string.voice_chatroom_sound_selection_more))
+                Html.fromHtml(itemView.context.getString(R.string.voice_chatroom_sound_selection_more))
         }
         mBinding.mtChatroomSoundSelectionMore.setOnClickListener {
             onItemChildClick("www.agora.io",it)

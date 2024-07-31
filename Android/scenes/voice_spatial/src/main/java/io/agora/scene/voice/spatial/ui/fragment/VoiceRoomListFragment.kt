@@ -12,21 +12,22 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialFragmentRoomListLayoutBinding
+import io.agora.scene.voice.spatial.global.IParserSource
+import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.model.VoiceRoomModel
+import io.agora.scene.voice.spatial.net.OnResourceParseCallback
+import io.agora.scene.voice.spatial.net.Resource
 import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
 import io.agora.scene.voice.spatial.ui.activity.ChatroomLiveActivity
 import io.agora.scene.voice.spatial.ui.widget.encryption.RoomEncryptionInputDialog
 import io.agora.scene.voice.spatial.viewmodel.VoiceCreateViewModel
-import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.BaseUiFragment
-import io.agora.voice.common.utils.FastClickTools
-import io.agora.voice.common.utils.ThreadManager
-import io.agora.voice.common.utils.ToastTools
+import io.agora.scene.widget.toast.CustomToast
+import io.agora.scene.widget.utils.UiUtils
 
-class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutBinding>() {
+class VoiceRoomListFragment : BaseViewBindingFragment<VoiceSpatialFragmentRoomListLayoutBinding>(), IParserSource {
     private lateinit var voiceRoomViewModel: VoiceCreateViewModel
     private var mAdapter: RoomListAdapter? = null
 
@@ -34,7 +35,10 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutB
 
     var itemCountListener: ((count: Int) -> Unit)? = null
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceSpatialFragmentRoomListLayoutBinding {
+    override fun getViewBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): VoiceSpatialFragmentRoomListLayoutBinding {
         return VoiceSpatialFragmentRoomListLayoutBinding.inflate(inflater, container, false)
     }
 
@@ -42,7 +46,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutB
         super.onViewCreated(view, savedInstanceState)
         voiceRoomViewModel = ViewModelProvider(this)[VoiceCreateViewModel::class.java]
         mAdapter = RoomListAdapter(null, this.context!!) { data, view ->
-            if (FastClickTools.isFastClick(view)) return@RoomListAdapter
+            if (UiUtils.isFastClick()) return@RoomListAdapter
             onItemClick(data)
         }
         binding?.apply {
@@ -97,8 +101,8 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutB
 
                 override fun onError(code: Int, message: String?) {
                     binding?.smartRefreshLayout?.finishRefresh()
-                    dismissLoading()
-                    ToastTools.show(requireActivity(), getString(R.string.voice_spatial_room_check_password))
+                    hideLoadingView()
+                    CustomToast.show(getString(R.string.voice_spatial_room_check_password))
                 }
             })
         }
@@ -111,14 +115,11 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutB
 
                 override fun onError(code: Int, message: String?) {
                     super.onError(code, message)
-                    dismissLoading()
+                    hideLoadingView()
                     if (code == VoiceServiceProtocol.ERR_ROOM_UNAVAILABLE) {
-                        ToastTools.show(
-                            requireActivity(),
-                            getString(R.string.voice_spatial_unavailable_tip)
-                        )
+                        CustomToast.show(getString(R.string.voice_spatial_unavailable_tip))
                     } else {
-                        ToastTools.show(requireActivity(), message ?: "")
+                        CustomToast.show( message ?: "")
                     }
                 }
             })
@@ -151,7 +152,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutB
             showInputDialog(voiceRoomModel)
         } else {
             // 房间列表进入需要置换 token 与获取 im 配置
-            showLoading(false)
+            showLoadingView()
             gotoJoinRoom(voiceRoomModel)
         }
     }
@@ -162,7 +163,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutB
             if (parentActivity != null) ChatroomLiveActivity.startActivity(parentActivity, it)
         }
 
-        dismissLoading()
+        hideLoadingView()
     }
 
     private fun showInputDialog(voiceRoomModel: VoiceRoomModel) {
@@ -174,7 +175,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutB
                 override fun onCancelClick() {}
                 override fun onConfirmClick(password: String) {
                     voiceRoomViewModel.checkPassword(voiceRoomModel.roomId, voiceRoomModel.roomPassword, password)
-                    showLoading(false)
+                    showLoadingView()
                 }
             })
             .show(childFragmentManager, "encryptionInputDialog")

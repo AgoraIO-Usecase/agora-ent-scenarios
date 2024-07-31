@@ -35,8 +35,8 @@
         android:layout_marginLeft="60dp"
         android:layout_marginRight="60dp"
         android:layout_centerInParent="true"
-        android:textColor="@color/voice_black"
-        android:textSize="@dimen/voice_sp_16"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
         android:maxLines="1"
         android:ellipsize="end"
         tools:text="标题"/>
@@ -63,10 +63,10 @@
             android:layout_centerVertical="true"
             android:paddingRight="15dp"
             android:paddingLeft="15dp"
-            android:textSize="@dimen/voice_sp_14"
+            android:textSize="14sp"
             android:maxLines="1"
             android:maxLength="10"
-            android:textColor="@color/voice_black"/>
+            android:textColor="@android:color/black"/>
 
     </RelativeLayout>
 

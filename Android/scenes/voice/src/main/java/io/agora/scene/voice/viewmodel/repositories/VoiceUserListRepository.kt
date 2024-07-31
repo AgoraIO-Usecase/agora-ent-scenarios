@@ -14,7 +14,9 @@ class VoiceUserListRepository : BaseRepository() {
     /**
      * voice chat protocol
      */
-    private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
+    private val voiceServiceProtocol by lazy {
+        VoiceServiceProtocol.serviceProtocol
+    }
 
     // 踢用户下麦
     fun kickOff(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {

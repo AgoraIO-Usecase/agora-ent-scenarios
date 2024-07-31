@@ -79,6 +79,7 @@ dependencies {
     implementation rootProject.ext.deps.annotation
     implementation rootProject.ext.deps.eventbus
     implementation rootProject.ext.deps.material
+    implementation rootProject.ext.deps.recyclerview
 
     kapt rootProject.ext.deps.arouter_kapt
     implementation rootProject.ext.deps.arouter

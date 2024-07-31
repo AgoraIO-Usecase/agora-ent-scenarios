@@ -112,7 +112,7 @@ class CreateRoomDialog constructor(
         }
         dismiss()
         activity?.let {
-            VoiceRoomSoundSelectionActivity.startActivity(it, roomName, !isPrivate, password, 0)
+            VoiceRoomSoundSelectionActivity.startActivity(it, roomName, !isPrivate, password)
         }
     }
 

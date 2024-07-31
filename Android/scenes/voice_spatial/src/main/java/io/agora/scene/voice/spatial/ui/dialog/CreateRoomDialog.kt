@@ -16,21 +16,21 @@ import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogCreateRoomBinding
+import io.agora.scene.voice.spatial.global.IParserSource
 import io.agora.scene.voice.spatial.model.VoiceRoomModel
+import io.agora.scene.voice.spatial.net.OnResourceParseCallback
+import io.agora.scene.voice.spatial.net.Resource
 import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
 import io.agora.scene.voice.spatial.ui.activity.ChatroomLiveActivity
 import io.agora.scene.voice.spatial.viewmodel.VoiceCreateViewModel
-import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.IParserSource
-import io.agora.voice.common.utils.ToastTools
+import io.agora.scene.widget.toast.CustomToast
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
 
 class CreateRoomDialog constructor(
     private val context: Context,
-): BaseBottomSheetDialogFragment<VoiceSpatialDialogCreateRoomBinding>(), IParserSource {
+) : BaseBottomSheetDialogFragment<VoiceSpatialDialogCreateRoomBinding>(), IParserSource {
 
     /** 当前选中的是第几个输入框*/
     private var currentPosition = 0
@@ -54,7 +54,12 @@ class CreateRoomDialog constructor(
         roomCreateViewModel = ViewModelProvider(this)[VoiceCreateViewModel::class.java]
         // 用户提示颜色
         val spannableString = SpannableString(getString(R.string.voice_spatial_create_room_tips))
-        spannableString.setSpan(ForegroundColorSpan(Color.parseColor("#FA396A")), 77, 118, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        spannableString.setSpan(
+            ForegroundColorSpan(Color.parseColor("#FA396A")),
+            77,
+            118,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
         mBinding.tvTips.text = spannableString
         // 随机名称
         randomName()
@@ -77,14 +82,17 @@ class CreateRoomDialog constructor(
         mBinding.btnCreateRoom.setOnClickListener {
             createRoom()
         }
-        mBinding.etCode.setOnTextChangeListener {  }
+        mBinding.etCode.setOnTextChangeListener { }
 
         activity?.window?.let { window ->
             val initialWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
             mBinding.root.viewTreeObserver.addOnGlobalLayoutListener {
                 Handler(Looper.getMainLooper()).postDelayed({
-                    if (mBinding == null) { return@postDelayed }
-                    val currentWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
+                    if (mBinding == null) {
+                        return@postDelayed
+                    }
+                    val currentWindowHeight =
+                        Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
                     if (currentWindowHeight < initialWindowHeight) {
                     } else {
                         mBinding.etCode.clearFocus()
@@ -105,13 +113,15 @@ class CreateRoomDialog constructor(
                     hideLoadingView()
                     when (code) {
                         VoiceServiceProtocol.ERR_LOGIN_ERROR -> {
-                            activity?.let { ToastTools.show(it, getString(R.string.voice_spatial_login_exception)) }
+                            CustomToast.show(getString(R.string.voice_spatial_login_exception))
                         }
+
                         VoiceServiceProtocol.ERR_ROOM_NAME_INCORRECT -> {
-                            activity?.let { ToastTools.show(it, getString(R.string.voice_spatial_name_rule)) }
+                            CustomToast.show(getString(R.string.voice_spatial_name_rule))
                         }
+
                         else -> {
-                            activity?.let { ToastTools.show(it, getString(R.string.voice_spatial_room_create_error)) }
+                            CustomToast.show(getString(R.string.voice_spatial_room_create_error))
                         }
                     }
                 }
@@ -140,7 +150,8 @@ class CreateRoomDialog constructor(
         val date = Date()
         val month = SimpleDateFormat("MM").format(date) //获取月份
         val day = SimpleDateFormat("dd").format(date) //获取分钟
-        val roomName = getString(R.string.voice_spatial_room_create_chat_3d_room) + "-" + month + day + "-" + (Math.random() * 999 + 1).roundToInt()
+        val roomName =
+            getString(R.string.voice_spatial_room_create_chat_3d_room) + "-" + month + day + "-" + (Math.random() * 999 + 1).roundToInt()
         mBinding.etRoomName.setText(roomName)
     }
 
@@ -156,7 +167,9 @@ class CreateRoomDialog constructor(
             ToastUtils.showToast(getString(R.string.voice_spatial_please_input_4_pwd))
             return
         }
-        if (!isPrivate) { password = "" }
+        if (!isPrivate) {
+            password = ""
+        }
         showLoadingView()
         roomCreateViewModel.createSpatialRoom(roomName, 0, password)
     }

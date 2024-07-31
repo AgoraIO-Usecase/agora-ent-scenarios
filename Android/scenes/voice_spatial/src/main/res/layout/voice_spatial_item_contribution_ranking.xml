@@ -69,7 +69,7 @@
         android:layout_marginEnd="15dp"
         android:gravity="end"
         android:textColor="@color/voice_dark_grey_color_6c7192"
-        android:textSize="@dimen/voice_sp_16"
+        android:textSize="16sp"
         android:drawablePadding="4dp"
         app:layout_constraintBottom_toBottomOf="@+id/ivAudienceAvatar"
         app:layout_constraintEnd_toEndOf="parent"
