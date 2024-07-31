@@ -1,10 +1,10 @@
 package io.agora.scene.voice.ui.adapter.viewholder
 
+import androidx.core.content.res.ResourcesCompat
+import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.voice.R
 import io.agora.scene.voice.model.MicManagerBean
 import io.agora.scene.voice.databinding.VoiceItemRoomMicManagerBinding
-import io.agora.voice.common.ui.adapter.BaseRecyclerViewAdapter
-import io.agora.voice.common.utils.ResourcesTools
 
 class RoomMicManagerViewHolder(binding: VoiceItemRoomMicManagerBinding) :
     BaseRecyclerViewAdapter.BaseViewHolder<VoiceItemRoomMicManagerBinding, MicManagerBean>(binding) {
@@ -13,11 +13,15 @@ class RoomMicManagerViewHolder(binding: VoiceItemRoomMicManagerBinding) :
             mBinding.mtMicManagerOperate.text = it.name
             if (it.enable) {
                 mBinding.mtMicManagerOperate.setTextColor(
-                    ResourcesTools.getColor(context.resources, R.color.voice_main_color_156ef3)
+                    ResourcesCompat.getColor(mBinding.root.context.resources, R.color.voice_main_color_156ef3, null)
                 )
             } else {
                 mBinding.mtMicManagerOperate.setTextColor(
-                    ResourcesTools.getColor(context.resources, R.color.voice_dark_grey_color_979cbb)
+                    ResourcesCompat.getColor(
+                        mBinding.root.context.resources,
+                        R.color.voice_dark_grey_color_979cbb,
+                        null
+                    )
                 )
             }
         }

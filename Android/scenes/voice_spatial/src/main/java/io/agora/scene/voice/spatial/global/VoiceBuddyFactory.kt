@@ -18,7 +18,7 @@ class VoiceBuddyFactory {
 
         @JvmStatic
         fun get(): VoiceBuddyFactory {
-            return VoiceBuddyFactory.Companion.instance
+            return instance
         }
     }
 

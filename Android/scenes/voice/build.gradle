@@ -39,7 +39,7 @@ dependencies {
     implementation project(":common:base")
     implementation project(':common:ui-widget')
     implementation project(':scenes:voice:common')
-
+    implementation project(':RTMSyncManager')
 
     kapt rootProject.ext.deps.arouter_kapt
     implementation rootProject.ext.deps.arouter
@@ -59,7 +59,6 @@ dependencies {
 
     implementation rootProject.ext.deps.bugly
     implementation rootProject.ext.deps.gson
-    implementation rootProject.ext.deps.syncManager
     implementation rootProject.ext.deps.svga_player
     implementation rootProject.ext.deps.agora_chat
 

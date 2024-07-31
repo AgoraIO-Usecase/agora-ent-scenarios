@@ -3,6 +3,7 @@ package io.agora.voice.common.net;
 import android.content.Context;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,7 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.agora.voice.common.net.model.VRHttpResponse;
-import io.agora.voice.common.utils.LogTools;
 
 class VRHttpClientController {
    private static final String TAG = VRHttpClientController.class.getSimpleName();
@@ -153,7 +153,7 @@ class VRHttpClientController {
     * @throws IOException
     */
    public void addParams(Map<String, String> params, OutputStream out) throws IOException {
-      LogTools.d(TAG, "request Map params = "+params.toString());
+      Log.d(TAG, "request Map params = "+params.toString());
       if (params == null || params.size() <= 0) {
          return;
       }
@@ -172,7 +172,7 @@ class VRHttpClientController {
     * @throws IOException
     */
    public void addParams(String params, OutputStream out) throws IOException {
-      LogTools.d(TAG, "request String params = "+params);
+      Log.d(TAG, "request String params = "+params);
       if(TextUtils.isEmpty(params)) {
          return;
       }
@@ -198,11 +198,11 @@ class VRHttpClientController {
     */
    private void printRequestInfo(boolean showInfo) throws IllegalStateException{
       if(showInfo && mConn != null) {
-         LogTools.d(TAG, "request start =========================== ");
-         LogTools.d(TAG, "request url = "+mConn.getURL());
-         LogTools.d(TAG, "request method = "+mConn.getRequestMethod());
-         LogTools.d(TAG, "request header = "+mConn.getRequestProperties().toString());
-         LogTools.d(TAG, "request end =========================== ");
+         Log.d(TAG, "request start =========================== ");
+         Log.d(TAG, "request url = "+mConn.getURL());
+         Log.d(TAG, "request method = "+mConn.getRequestMethod());
+         Log.d(TAG, "request header = "+mConn.getRequestProperties().toString());
+         Log.d(TAG, "request end =========================== ");
       }
    }
 
@@ -237,15 +237,15 @@ class VRHttpClientController {
          return;
       }
       if(showInfo) {//展示详细信息
-         LogTools.d(TAG, "response ==========================start =================");
-         LogTools.d(TAG, "content: "+response.content);
-         LogTools.d(TAG, "url: "+mConn.getURL().toString());
-         LogTools.d(TAG, "headers: "+mConn.getHeaderFields().toString());
-         LogTools.d(TAG, "response ==========================end =================");
+         Log.d(TAG, "response ==========================start =================");
+         Log.d(TAG, "content: "+response.content);
+         Log.d(TAG, "url: "+mConn.getURL().toString());
+         Log.d(TAG, "headers: "+mConn.getHeaderFields().toString());
+         Log.d(TAG, "response ==========================end =================");
       }else {//只展示相应码及错误信息
-         LogTools.d(TAG, "response code: "+response.code);
+         Log.d(TAG, "response code: "+response.code);
          if(response.code != HttpURLConnection.HTTP_OK) {
-            LogTools.d(TAG, "error message: "+response.content);
+            Log.d(TAG, "error message: "+response.content);
          }
       }
    }

@@ -2,13 +2,13 @@ package io.agora.scene.voice.spatial.model.constructor
 
 import android.content.Context
 import io.agora.scene.voice.spatial.R
+import io.agora.scene.voice.spatial.global.ConfigConstants
 import io.agora.scene.voice.spatial.model.BotMicInfoBean
 import io.agora.scene.voice.spatial.model.MicManagerBean
 import io.agora.scene.voice.spatial.model.VoiceMemberModel
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 import io.agora.scene.voice.spatial.model.annotation.MicClickAction
 import io.agora.scene.voice.spatial.model.annotation.MicStatus
-import io.agora.voice.common.constant.ConfigConstants
 
 internal object RoomMicConstructor {
 

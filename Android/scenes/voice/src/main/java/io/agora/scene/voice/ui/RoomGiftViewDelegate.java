@@ -13,6 +13,7 @@ import com.opensource.svgaplayer.SVGAVideoEntity;
 import org.jetbrains.annotations.NotNull;
 
 import io.agora.scene.voice.R;
+import io.agora.scene.voice.VoiceLogger;
 import io.agora.scene.voice.global.VoiceBuddyFactory;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
@@ -22,7 +23,6 @@ import io.agora.scene.voice.ui.widget.gift.ChatroomGiftView;
 import io.agora.scene.voice.ui.widget.gift.GiftBottomDialog;
 import io.agora.scene.voice.ui.widget.gift.OnSendClickListener;
 import io.agora.scene.voice.viewmodel.VoiceRoomLivingViewModel;
-import io.agora.voice.common.utils.LogTools;
 import io.agora.voice.common.utils.ThreadManager;
 
 public class RoomGiftViewDelegate {
@@ -52,8 +52,8 @@ public class RoomGiftViewDelegate {
     public void onRoomDetails(String roomId, String owner) {
         this.roomId = roomId;
         this.owner = owner;
-        LogTools.d("onRoomDetails", "owner: " + owner);
-        LogTools.d("onRoomDetails", "getUid: " + VoiceBuddyFactory.get().getVoiceBuddy().userId());
+        VoiceLogger.d("onRoomDetails", "owner: " + owner);
+        VoiceLogger.d("onRoomDetails", "getUid: " + VoiceBuddyFactory.get().getVoiceBuddy().userId());
     }
 
 
@@ -76,7 +76,7 @@ public class RoomGiftViewDelegate {
     }
 
     private void onSendGiftSuccess(View view, GiftBean giftBean,OnMsgCallBack msgCallBack) {
-        LogTools.d("sendGift", "Successfully reported");
+        VoiceLogger.d("sendGift", "Successfully reported");
         CustomMsgHelper.getInstance().sendGiftMsg(
                 VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
                 VoiceBuddyFactory.get().getVoiceBuddy().headUrl(),
@@ -84,7 +84,7 @@ public class RoomGiftViewDelegate {
                 new OnMsgCallBack() {
                     @Override
                     public void onSuccess(ChatMessageData message) {
-                        LogTools.d("MenuItemClick", "item_gift_onSuccess");
+                        VoiceLogger.d("MenuItemClick", "item_gift_onSuccess");
                         ThreadManager.getInstance().runOnMainThread(new Runnable() {
                             @Override
                             public void run() {
@@ -161,7 +161,7 @@ public class RoomGiftViewDelegate {
         svgaParser.decodeFromAssets(name, new SVGAParser.ParseCompletion() {
             @Override
             public void onComplete(@NotNull SVGAVideoEntity videoItem) {
-                LogTools.d("zzzz", "showGiftAction onComplete: ");
+                VoiceLogger.d("zzzz", "showGiftAction onComplete: ");
                 svgaImageView.setVideoItem(videoItem);
                 svgaImageView.stepToFrame(0, true);
                 startAnimationTask();
@@ -169,7 +169,7 @@ public class RoomGiftViewDelegate {
 
             @Override
             public void onError() {
-                LogTools.e("zzzz", "showGiftAction onError: ");
+                VoiceLogger.e("zzzz", "showGiftAction onError: ");
             }
 
         }, null);
@@ -181,11 +181,11 @@ public class RoomGiftViewDelegate {
             public void run() {
                 // 在这里执行具体的任务
                 Animation_time--;
-                LogTools.d("startActionTask", "Animation_time: " + Animation_time);
+                VoiceLogger.d("startActionTask", "Animation_time: " + Animation_time);
                 // 任务执行完后再次调用postDelayed开启下一次任务
                 if (Animation_time == 0) {
                     stopActionTask();
-                    LogTools.d("startActionTask", "isAnimating: " + svgaImageView.isAnimating());
+                    VoiceLogger.d("startActionTask", "isAnimating: " + svgaImageView.isAnimating());
                     if (svgaImageView.isAnimating()) {
                         svgaImageView.stopAnimation(true);
                     }

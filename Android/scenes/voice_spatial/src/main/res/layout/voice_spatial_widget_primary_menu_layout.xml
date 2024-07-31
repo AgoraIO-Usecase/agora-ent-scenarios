@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/voice_transparent"
+    android:background="@android:color/transparent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -9,7 +9,7 @@
         android:id="@+id/normal_layout"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:background="@color/voice_transparent"
+        android:background="@android:color/transparent"
         android:layout_width="match_parent"
         android:layout_height="55dp">
 
@@ -35,8 +35,8 @@
                 android:layout_marginStart="5dp"
                 android:paddingEnd="10dp"
                 android:text="@string/voice_spatial_input_chat_title"
-                android:textColor="@color/voice_white_80"
-                android:textSize="@dimen/voice_sp_12" />
+                android:textColor="@color/white_80_percent"
+                android:textSize="12sp" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -58,13 +58,13 @@
         android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        android:background="@color/voice_transparent"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/input_view"
         android:visibility="gone"
-        android:background="@color/voice_white"
+        android:background="@android:color/white"
         android:layout_width="match_parent"
         app:layout_constraintBottom_toTopOf="@+id/vKeyboardBg"
         android:layout_height="55dp">
@@ -89,7 +89,7 @@
                 app:layout_constraintRight_toLeftOf="@+id/icon_emoji"
                 android:layout_marginStart="18dp"
                 android:layout_marginEnd="5dp"
-                android:background="@color/voice_white"
+                android:background="@android:color/white"
                 android:hint="Aa"
                 android:imeOptions="actionDone"
                 android:inputType="text"
@@ -97,7 +97,7 @@
                 android:maxLength="80"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:textSize="@dimen/voice_sp_16"
+                android:textSize="16sp"
                 android:textColor="@color/voice_color_333333"
                 android:layout_width="0dp"
                 android:layout_height="22dp"/>
@@ -123,19 +123,10 @@
             android:layout_marginEnd="15dp"
             android:background="@drawable/voice_bg_room_bottom"
             android:gravity="center"
-            android:textColor="@color/voice_white"
-            android:textSize="@dimen/voice_sp_16"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
             android:layout_width="67dp"
             android:layout_height="36dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <io.agora.scene.voice.spatial.ui.widget.expression.ExpressionView
-        android:layout_below="@+id/normal_layout"
-        android:id="@+id/expression_view"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"/>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

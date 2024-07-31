@@ -7,6 +7,7 @@ import android.view.Gravity
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -14,20 +15,19 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
-import io.agora.scene.voice.spatial.BuildConfig
+import io.agora.scene.base.component.BaseViewBindingActivity
+import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialAgoraRoomListLayoutBinding
+import io.agora.scene.voice.spatial.utils.StatusBarCompat
 import io.agora.scene.voice.spatial.global.VoiceConfigManager
 import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
 import io.agora.scene.voice.spatial.ui.dialog.CreateRoomDialog
 import io.agora.scene.voice.spatial.ui.fragment.VoiceRoomListFragment
-import io.agora.voice.common.ui.BaseUiActivity
-import io.agora.voice.common.utils.DeviceTools
-import io.agora.voice.common.utils.FastClickTools
-import io.agora.voice.common.utils.ResourcesTools
-import io.agora.voice.common.utils.StatusBarCompat
+import io.agora.scene.voice.spatial.utils.ResourcesTools
+import io.agora.scene.widget.utils.UiUtils
 
-class VoiceRoomListActivity : BaseUiActivity<VoiceSpatialAgoraRoomListLayoutBinding>(){
+class VoiceRoomListActivity : BaseViewBindingActivity<VoiceSpatialAgoraRoomListLayoutBinding>() {
 
     private var title: TextView? = null
     private var index = 0
@@ -40,14 +40,9 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceSpatialAgoraRoomListLayoutBind
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        if (BuildConfig.is_modular){
-            // nothing
-        }else{
-            // library 初始化
-            ResourcesTools.isZh(this)
-            voiceServiceProtocol.reset()
-            VoiceConfigManager.initMain()
-        }
+        ResourcesTools.isZh(this)
+        voiceServiceProtocol.reset()
+        VoiceConfigManager.initMain()
     }
 
     override fun onDestroy() {
@@ -63,12 +58,12 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceSpatialAgoraRoomListLayoutBind
         initListener()
     }
 
-    private fun initListener() {
-        binding.titleBar.setOnBackPressListener{
+    override fun initListener() {
+        binding.titleBar.setOnBackPressListener {
             finish()
         }
         binding.btnCreateRoom.setOnClickListener {
-            if (FastClickTools.isFastClick(it)) return@setOnClickListener
+            if (UiUtils.isFastClick()) return@setOnClickListener
             CreateRoomDialog(this).show(supportFragmentManager, "CreateRoomDialog")
         }
         binding.agoraTabLayout.addOnTabSelectedListener(object : OnTabSelectedListener {
@@ -91,7 +86,7 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceSpatialAgoraRoomListLayoutBind
     private fun onTabLayoutSelected(tab: TabLayout.Tab) {
         tab.customView?.let {
             val tabText = it.findViewById<TextView>(R.id.tab_item_title)
-            tabText.setTextColor(ResourcesTools.getColor(resources, R.color.voice_dark_grey_color_040925))
+            tabText.setTextColor(ResourcesCompat.getColor(resources, R.color.voice_dark_grey_color_040925,null))
             tabText.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
             index = tab.position
             title = tabText
@@ -101,7 +96,7 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceSpatialAgoraRoomListLayoutBind
     private fun onTabLayoutUnselected(tab: TabLayout.Tab?) {
         tab?.customView?.let {
             val tabText = it.findViewById<TextView>(R.id.tab_item_title)
-            tabText.setTextColor(ResourcesTools.getColor(resources, R.color.voice_color_979cbb))
+            tabText.setTextColor(ResourcesCompat.getColor(resources, R.color.voice_color_979cbb,null))
             tabText.typeface = Typeface.defaultFromStyle(Typeface.NORMAL)
         }
     }
@@ -115,7 +110,7 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceSpatialAgoraRoomListLayoutBind
                 fragment.itemCountListener = { count ->
                     title?.let { textView ->
                         val layoutParams = textView.layoutParams
-                        layoutParams.height = DeviceTools.dp2px(baseContext, 26f)
+                        layoutParams.height = 26.dp.toInt()
                         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
                         textView.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
                         textView.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
@@ -126,7 +121,7 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceSpatialAgoraRoomListLayoutBind
                                 count.toString()
                             )
                         textView.setTextColor(
-                            ResourcesTools.getColor(
+                            ResourcesCompat.getColor(
                                 this@VoiceRoomListActivity.resources, R.color.voice_dark_grey_color_040925, null
                             )
                         )

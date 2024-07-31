@@ -1,11 +1,11 @@
 package io.agora.scene.voice.spatial.model.constructor
 
 import android.text.TextUtils
+import io.agora.scene.voice.spatial.global.ConfigConstants
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.RoomKitBean
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 import io.agora.scene.voice.spatial.model.VoiceRoomModel
-import io.agora.voice.common.constant.ConfigConstants
 
 /**
  * @author create by zhangwei03
@@ -17,7 +17,6 @@ object RoomInfoConstructor {
         roomId = voiceRoomModel.roomId
         channelId = voiceRoomModel.channelId
         ownerId = voiceRoomModel.owner?.userId ?: ""
-        roomType = voiceRoomModel.roomType
         isOwner = curUserIsHost(voiceRoomModel.owner?.userId)
         soundEffect = voiceRoomModel.soundEffect
     }
@@ -32,7 +31,7 @@ object RoomInfoConstructor {
      */
     fun extendMicInfoList(vMicInfoList: List<VoiceMicInfoModel>, roomType: Int, ownerUid: String): List<VoiceMicInfoModel> {
         val micInfoList = mutableListOf<VoiceMicInfoModel>()
-        val interceptIndex = if (roomType == ConfigConstants.RoomType.Common_Chatroom) 5 else 4
+        val interceptIndex =  4
         for (i in vMicInfoList.indices) {
             if (i > interceptIndex) break
             val serverMicInfo = vMicInfoList[i]

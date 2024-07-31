@@ -10,9 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import io.agora.scene.voice.R;
+import io.agora.scene.voice.VoiceLogger;
 import io.agora.scene.voice.model.GiftBean;
 import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter;
-import io.agora.voice.common.utils.LogTools;
 
 public class GiftListAdapter extends RoomBaseRecyclerViewAdapter<GiftBean> {
     private int selectedPosition = -1;
@@ -40,7 +40,7 @@ public class GiftListAdapter extends RoomBaseRecyclerViewAdapter<GiftBean> {
 
         @Override
         public void setData(GiftBean item, int position) {
-            LogTools.e("GiftListAdapter","setData: " + position);
+            VoiceLogger.d("GiftListAdapter","setData: " + position);
             ivGift.setImageResource(item.getResource());
             tvGiftName.setText(item.getName());
             price.setText(item.getPrice());

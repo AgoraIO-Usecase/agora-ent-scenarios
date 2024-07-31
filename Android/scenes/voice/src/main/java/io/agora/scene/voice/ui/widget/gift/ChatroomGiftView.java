@@ -29,13 +29,13 @@ import com.google.android.material.textview.MaterialTextView;
 import java.util.ArrayList;
 
 import io.agora.scene.voice.R;
+import io.agora.scene.voice.VoiceLogger;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 import io.agora.scene.voice.model.GiftBean;
 import io.agora.voice.common.utils.DeviceTools;
 import io.agora.voice.common.utils.ImageTools;
-import io.agora.voice.common.utils.LogTools;
 
 
 public class ChatroomGiftView extends LinearLayout {
@@ -188,7 +188,7 @@ public class ChatroomGiftView extends LinearLayout {
             try {
                 resId = context.getResources().getIdentifier(userPortrait, "drawable", context.getPackageName());
             } catch (Exception ignored) {
-                LogTools.e("getResources()", ignored.getMessage());
+                VoiceLogger.e("getResources()", ignored.getMessage());
             }
             if (resId != 0) {
                 avatar.setImageResource(resId);
@@ -207,7 +207,7 @@ public class ChatroomGiftView extends LinearLayout {
         @Override
         public int getItemCount() {
             if (messages != null && messages.size()>0){
-                LogTools.d("gift_view", "messages.size()" + messages.size());
+                VoiceLogger.d("gift_view", "messages.size()" + messages.size());
                 return messages.size();
             }else {
                 return 0;
@@ -227,9 +227,9 @@ public class ChatroomGiftView extends LinearLayout {
 
         public void refresh() {
             int positionStart = messages.size();
-            LogTools.d("room_refresh", "positionStart1 " + positionStart);
+            VoiceLogger.d("room_refresh", "positionStart1 " + positionStart);
             messages.addAll(CustomMsgHelper.getInstance().getGiftData(chatroomId));
-            LogTools.d("room_refresh", messages.size() + " positionStart: " + positionStart);
+            VoiceLogger.d("room_refresh", messages.size() + " positionStart: " + positionStart);
             if (messages.size() > 0) {
                 ((Activity) context).runOnUiThread(new Runnable() {
                     @Override

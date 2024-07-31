@@ -7,22 +7,21 @@ import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.*
 import io.agora.scene.base.AudioModeration
+import io.agora.scene.voice.spatial.VoiceSpatialLogger
+import io.agora.scene.voice.spatial.global.ConfigConstants
+import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.DataStreamInfo
 import io.agora.scene.voice.spatial.model.SeatPositionInfo
 import io.agora.scene.voice.spatial.model.SoundAudioBean
+import io.agora.scene.voice.spatial.net.callback.VRValueCallBack
 import io.agora.scene.voice.spatial.rtckit.listener.MediaPlayerObserver
 import io.agora.scene.voice.spatial.rtckit.listener.RtcMicVolumeListener
 import io.agora.scene.voice.spatial.rtckit.listener.RtcSpatialPositionListener
+import io.agora.scene.voice.spatial.utils.GsonTools
 import io.agora.spatialaudio.ILocalSpatialAudioEngine
 import io.agora.spatialaudio.LocalSpatialAudioConfig
 import io.agora.spatialaudio.RemoteVoicePositionInfo
-import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.net.callback.VRValueCallBack
-import io.agora.voice.common.utils.GsonTools
-import io.agora.voice.common.utils.LogTools.logD
-import io.agora.voice.common.utils.LogTools.logE
-import io.agora.voice.common.utils.ThreadManager
 
 
 /**
@@ -51,7 +50,7 @@ class AgoraRtcEngineController {
     private var spatial: ILocalSpatialAudioEngine? = null
 
     private val playerVoicePositionInfo = hashMapOf<Int, RemoteVoicePositionInfo>()
-    private var localVoicePositionInfoRun : Runnable? = null
+    private var localVoicePositionInfoRun: Runnable? = null
 
     private var dataStreamId: Int = 0
 
@@ -95,15 +94,15 @@ class AgoraRtcEngineController {
 
                 override fun onError(err: Int) {
                     super.onError(err)
-                    "voice rtc onError code:$err".logE(TAG)
+                    VoiceSpatialLogger.e(TAG, "voice rtc onError code:$err")
                 }
 
                 override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
                     super.onJoinChannelSuccess(channel, uid, elapsed)
-                    "voice rtc onJoinChannelSuccess channel:$channel,uid:$uid".logD(TAG)
+                    VoiceSpatialLogger.d(TAG, "voice rtc onJoinChannelSuccess channel:$channel,uid:$uid")
                     // 默认开启降噪
                     deNoise(VoiceBuddyFactory.get().rtcChannelTemp.AINSMode)
-                    dataStreamId = rtcEngine?.createDataStream(DataStreamConfig())?: 0
+                    dataStreamId = rtcEngine?.createDataStream(DataStreamConfig()) ?: 0
                     joinCallback?.onSuccess(true)
                 }
 
@@ -111,7 +110,7 @@ class AgoraRtcEngineController {
                     super.onStreamMessage(uid, streamId, data)
                     data?.let {
                         GsonTools.toBean(String(it), DataStreamInfo::class.java)?.apply {
-                            if(code == 101){
+                            if (code == 101) {
                                 onRemoteSpatialStreamMessage(uid, streamId, this)
                             }
                         }
@@ -152,12 +151,13 @@ class AgoraRtcEngineController {
                 rtcEngine = RtcEngineEx.create(config) as RtcEngineEx?
             } catch (e: Exception) {
                 e.printStackTrace()
-                "voice rtc engine init error:${e.message}".logE(TAG)
+                VoiceSpatialLogger.e(TAG, "voice rtc engine init error:${e.message}")
                 return false
             }
             return true
         }
     }
+
     /**
      * 初始化空间音频
      * 设置声音最大距离为 10
@@ -165,7 +165,7 @@ class AgoraRtcEngineController {
      * 距离单位1值为 1f
      */
     private fun setupSpatialAudio() {
-        "spatial setup spatial audio".logD("Spatial Voice")
+        VoiceSpatialLogger.d(TAG, "spatial setup spatial audio")
         val localSpatial = ILocalSpatialAudioEngine.create()
         val localSpatialAudioConfig = LocalSpatialAudioConfig()
         localSpatialAudioConfig.mRtcEngine = rtcEngine
@@ -175,6 +175,7 @@ class AgoraRtcEngineController {
         localSpatial.setDistanceUnit(1f)
         spatial = localSpatial
     }
+
     /**
      * 更新自己空间音频位置
      * @param pos 位置[x, y, z]
@@ -182,16 +183,17 @@ class AgoraRtcEngineController {
      * @param right 朝向[x, y, z]
      */
     public fun updateSelfPosition(pos: FloatArray, forward: FloatArray, right: FloatArray) {
-        "update self position: p: ${pos.contentToString()} f: ${forward.contentToString()} r: ${right.contentToString()}".logD("spatial_voice")
         localVoicePositionInfoRun = Runnable {
             spatial?.updateSelfPosition(
                 pos,
                 forward,
                 right,
-                floatArrayOf(0.0f, 0.0f, 1.0f))
+                floatArrayOf(0.0f, 0.0f, 1.0f)
+            )
         }
         localVoicePositionInfoRun?.run()
     }
+
     /**
      * 发送本地位置到远端
      */
@@ -202,22 +204,23 @@ class AgoraRtcEngineController {
                 dataStreamId,
                 GsonTools.beanToString(steamInfo)?.toByteArray()
             )
-            Log.d("pigpig", "$ret")
         }
     }
+
     /**
      * 更新远端音源的配置
      * 人声模糊关闭，空气衰减开启，衰减系数为0.5
      * @param uid 远端音源的uid
      */
     public fun setupRemoteSpatialAudio(uid: Int) {
-        "spatial setup remote: u: $uid".logD("Spatial Voice")
+        VoiceSpatialLogger.d(TAG, "spatial setup remote: u: $uid")
         val spatialAudioParams = SpatialAudioParams()
         spatialAudioParams.enable_blur = false
         spatialAudioParams.enable_air_absorb = true
         rtcEngine?.setRemoteUserSpatialAudioParams(uid, spatialAudioParams)
         spatial?.setRemoteAudioAttenuation(uid, 0.5, false)
     }
+
     /**
      * 更新远端音源的位置
      * @param pos 位置[x, y, z]
@@ -229,12 +232,17 @@ class AgoraRtcEngineController {
         position.forward = forward
         spatial?.updateRemotePosition(uid, position)
     }
+
     /**
      * 更新播放器音源位置
      * @param pos 位置[x, y, z]
      * @param forward 朝向[x, y, z]
      */
-    public fun updatePlayerPosition(pos: FloatArray, forward: FloatArray, soundSpeaker: Int = ConfigConstants.BotSpeaker.BotBlue) {
+    public fun updatePlayerPosition(
+        pos: FloatArray,
+        forward: FloatArray,
+        soundSpeaker: Int = ConfigConstants.BotSpeaker.BotBlue
+    ) {
         when (soundSpeaker) {
             ConfigConstants.BotSpeaker.BotBlue -> {
                 val position = RemoteVoicePositionInfo()
@@ -242,6 +250,7 @@ class AgoraRtcEngineController {
                 position.forward = forward
                 playerVoicePositionInfo[botBluePlayer!!.mediaPlayerId] = position
             }
+
             ConfigConstants.BotSpeaker.BotRed -> {
                 val position = RemoteVoicePositionInfo()
                 position.position = pos
@@ -250,6 +259,7 @@ class AgoraRtcEngineController {
             }
         }
     }
+
     /**
      * 处理远端空间位置变化产生的回调
      */
@@ -260,7 +270,10 @@ class AgoraRtcEngineController {
     }
 
     private fun checkJoinChannel(channelId: String, rtcUid: Int, soundEffect: Int, isBroadcaster: Boolean): Boolean {
-        "joinChannel $channelId,${VoiceBuddyFactory.get().getVoiceBuddy().rtcToken()}:$rtcUid".logD(TAG)
+        VoiceSpatialLogger.d(
+            TAG,
+            "joinChannel $channelId,${VoiceBuddyFactory.get().getVoiceBuddy().rtcToken()}:$rtcUid"
+        )
         if (channelId.isEmpty() || rtcUid < 0) {
             joinCallback?.onError(Constants.ERR_FAILED, "roomId or rtcUid illegal!")
             return false
@@ -274,9 +287,11 @@ class AgoraRtcEngineController {
                     setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY)
                     setAudioScenario(Constants.AUDIO_SCENARIO_GAME_STREAMING)
                 }
+
                 ConfigConstants.SoundSelection.Gaming_Buddy -> { // 游戏陪玩
                     setChannelProfile(Constants.CHANNEL_PROFILE_COMMUNICATION)
                 }
+
                 else -> { //专业主播
                     setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY)
                     setAudioScenario(Constants.AUDIO_SCENARIO_GAME_STREAMING)
@@ -301,13 +316,13 @@ class AgoraRtcEngineController {
             joinCallback?.onError(status ?: IRtcEngineEventHandler.ErrorCode.ERR_FAILED, "")
             return false
         }
-        mediaPlayer =  rtcEngine?.createMediaPlayer()?.apply {
+        mediaPlayer = rtcEngine?.createMediaPlayer()?.apply {
             registerPlayerObserver(firstMediaPlayerObserver)
         }
-        botBluePlayer =  rtcEngine?.createMediaPlayer()?.apply {
+        botBluePlayer = rtcEngine?.createMediaPlayer()?.apply {
             registerPlayerObserver(firstMediaPlayerObserver)
         }
-        botRedPlayer =  rtcEngine?.createMediaPlayer()?.apply {
+        botRedPlayer = rtcEngine?.createMediaPlayer()?.apply {
             registerPlayerObserver(firstMediaPlayerObserver)
         }
         return true
@@ -343,6 +358,7 @@ class AgoraRtcEngineController {
                     setParameters("{\"che.audio.nsng.enhfactorstastical\":200}")
                 }
             }
+
             ConfigConstants.AINSMode.AINS_High -> {
                 rtcEngine?.apply {
                     setParameters("{\"che.audio.ains_mode\":2}")
@@ -353,6 +369,7 @@ class AgoraRtcEngineController {
                     setParameters("{\"che.audio.nsng.enhfactorstastical\":200}")
                 }
             }
+
             else -> {
                 rtcEngine?.apply {
                     setParameters("{\"che.audio.ains_mode\":2}")
@@ -422,7 +439,7 @@ class AgoraRtcEngineController {
      * @param speakerType 模拟哪个机器人
      */
     fun playMusic(soundId: Int, audioUrl: String, speakerType: Int) {
-        "playMusic soundId:$soundId".logD(TAG)
+        VoiceSpatialLogger.d(TAG, "playMusic soundId:$soundId")
         resetMediaPlayer()
         openMediaPlayer(audioUrl, speakerType)
     }
@@ -469,6 +486,7 @@ class AgoraRtcEngineController {
             spatial?.setPlayerAttenuation(it, progress.toDouble(), false);
         }
     }
+
     /**
      * APM全链路音频开关
      */
@@ -482,7 +500,8 @@ class AgoraRtcEngineController {
                         "\"max_size_bytes\":\"120000000\"," +
                         "\"uuid\":\"123456789\"," +
                         "\"duration\":\"1200000\"}" +
-                        "}")
+                        "}"
+            )
         } else {
             rtcEngine?.setParameters("{\"rtc.debug.enable\": false}")
         }
@@ -553,7 +572,7 @@ class AgoraRtcEngineController {
 
     private val firstMediaPlayerObserver = object : MediaPlayerObserver() {
         override fun onPlayerStateChanged(state: MediaPlayerState?, error: MediaPlayerReason?) {
-            "firstMediaPlayerObserver onPlayerStateChanged state:$state error:$error".logD(TAG)
+            VoiceSpatialLogger.d(TAG, "firstMediaPlayerObserver onPlayerStateChanged state:$state error:$error")
             when (state) {
                 MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                     when (soundSpeakerType) {
@@ -564,6 +583,7 @@ class AgoraRtcEngineController {
                                 localVoicePositionInfoRun?.run()
                             }
                         }
+
                         ConfigConstants.BotSpeaker.BotRed -> {
                             botRedPlayer?.play()
                             playerVoicePositionInfo[botRedPlayer!!.mediaPlayerId]?.let {
@@ -571,6 +591,7 @@ class AgoraRtcEngineController {
                                 localVoicePositionInfoRun?.run()
                             }
                         }
+
                         ConfigConstants.BotSpeaker.BotBoth -> {
                             botBluePlayer?.play()
                             botRedPlayer?.play()
@@ -585,6 +606,7 @@ class AgoraRtcEngineController {
                                 localVoicePositionInfoRun?.run()
                             }
                         }
+
                         else -> {
                             mediaPlayer?.play()
                             playerVoicePositionInfo[mediaPlayer!!.mediaPlayerId]?.let {
@@ -594,6 +616,7 @@ class AgoraRtcEngineController {
                         }
                     }
                 }
+
                 MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
                     // 结束播放回调--->> 播放下一个，取队列第一个播放
                     ThreadManager.getInstance().runOnMainThread {
@@ -603,12 +626,14 @@ class AgoraRtcEngineController {
                         }
                     }
                 }
+
                 MediaPlayerState.PLAYER_STATE_PLAYING -> {
                     // 开始播放回调--->>
                     ThreadManager.getInstance().runOnMainThread {
                         micVolumeListener?.onBotVolume(soundSpeakerType, false)
                     }
                 }
+
                 else -> {}
             }
         }
@@ -625,16 +650,19 @@ class AgoraRtcEngineController {
                 botBluePlayer?.stop()
                 botBluePlayer?.open(url, 0)
             }
+
             ConfigConstants.BotSpeaker.BotRed -> {
                 botRedPlayer?.stop()
                 botRedPlayer?.open(url, 0)
             }
+
             ConfigConstants.BotSpeaker.BotBoth -> {
                 botBluePlayer?.stop()
                 botRedPlayer?.stop()
                 botBluePlayer?.open(url, 0)
                 botRedPlayer?.open(url, 0)
             }
+
             else -> {
                 mediaPlayer?.stop()
                 mediaPlayer?.open(url, 0)
