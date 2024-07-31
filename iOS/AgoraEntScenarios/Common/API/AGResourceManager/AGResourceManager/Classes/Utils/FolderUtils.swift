@@ -16,6 +16,7 @@ public func cleanAllResorce() {
 }
 #endif
 
+
 func getResourceCachePath(relativePath: String) -> String? {
     if let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first {
         let subdirectoryURL = cacheDirectory.appendingPathComponent("resourceManager/\(relativePath)")

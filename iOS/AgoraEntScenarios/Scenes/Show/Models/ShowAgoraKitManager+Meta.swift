@@ -188,6 +188,7 @@ extension ShowAgoraKitManager {
 extension ShowAgoraKitManager {
     
     private func enableAIVirtualBackground(){
+        showLogger.info("enableAIVirtualBackground", context: "Meta")
         let bg_src = AgoraVirtualBackgroundSource()
         bg_src.backgroundSourceType = .none
         let seg_prop = AgoraSegmentationProperty()
