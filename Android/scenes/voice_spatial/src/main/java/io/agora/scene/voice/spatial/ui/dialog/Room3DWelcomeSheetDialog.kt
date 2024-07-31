@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogRoomWelcomeBinding
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
+import io.agora.scene.voice.spatial.ui.BaseSheetDialog
 
 /**
  * ---------------------------------------------------------------------------------------------

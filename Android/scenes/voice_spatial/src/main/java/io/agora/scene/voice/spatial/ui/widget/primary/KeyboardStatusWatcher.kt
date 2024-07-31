@@ -12,7 +12,13 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
-import io.agora.voice.common.utils.*
+import io.agora.scene.voice.spatial.utils.NavigationUtils
+import io.agora.scene.voice.spatial.utils.StatusBarCompat
+import io.agora.scene.voice.spatial.utils.hasNavBar
+import io.agora.scene.voice.spatial.utils.isFullScreen
+import io.agora.scene.voice.spatial.utils.isPortrait
+import io.agora.scene.voice.spatial.utils.navBarHeight
+import io.agora.scene.voice.spatial.utils.screenHeight
 
 class KeyboardStatusWatcher(
     private val activity: FragmentActivity,

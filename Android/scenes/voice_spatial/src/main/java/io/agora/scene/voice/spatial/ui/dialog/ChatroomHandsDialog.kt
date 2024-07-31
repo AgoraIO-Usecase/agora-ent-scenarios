@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -16,18 +17,18 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.textview.MaterialTextView
+import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialRoomHandLayoutBinding
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
+import io.agora.scene.voice.spatial.ui.BaseSheetDialog
 import io.agora.scene.voice.spatial.ui.fragment.ChatroomInviteHandsFragment
 import io.agora.scene.voice.spatial.ui.fragment.ChatroomRaisedHandsFragment
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
-import io.agora.voice.common.utils.DeviceTools
-import io.agora.voice.common.utils.ResourcesTools
 
-class ChatroomHandsDialog constructor(): BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>() {
-    private val titles = intArrayOf(R.string.voice_spatial_room_raised_hands_title, R.string.voice_spatial_room_invite_hands_title)
+class ChatroomHandsDialog constructor() : BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>() {
+    private val titles =
+        intArrayOf(R.string.voice_spatial_room_raised_hands_title, R.string.voice_spatial_room_invite_hands_title)
     private val fragments: MutableList<Fragment> = mutableListOf()
     private var title: MaterialTextView? = null
     private var index = 0
@@ -46,8 +47,8 @@ class ChatroomHandsDialog constructor(): BaseSheetDialog<VoiceSpatialRoomHandLay
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        val activity = activity?:return
-        if (activity is DialogInterface.OnDismissListener){
+        val activity = activity ?: return
+        if (activity is DialogInterface.OnDismissListener) {
             activity.onDismiss(dialog)
         }
     }
@@ -72,14 +73,14 @@ class ChatroomHandsDialog constructor(): BaseSheetDialog<VoiceSpatialRoomHandLay
         binding?.tabLayout?.addOnTabSelectedListener(object : OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 tab.customView?.let {
-                    VoiceSpatialLogger.d(TAG,"onTabSelected：$mCount")
+                    VoiceSpatialLogger.d(TAG, "onTabSelected：$mCount")
                     index = tab.position
                     title = it.findViewById(R.id.mtTabText)
                     val tag_line = it.findViewById<ShapeableImageView>(R.id.tab_bg)
                     val layoutParams = title?.layoutParams.apply {
 
                     }
-                    layoutParams?.height = DeviceTools.dp2px(requireContext(), 26f)
+                    layoutParams?.height = 26.dp.toInt()
                     title?.apply {
                         setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
                         gravity = Gravity.CENTER
@@ -90,38 +91,38 @@ class ChatroomHandsDialog constructor(): BaseSheetDialog<VoiceSpatialRoomHandLay
                                 mCount.toString()
                             )
                         text = content
-                        setTextColor(ResourcesTools.getColor(resources, R.color.voice_dark_grey_color_040925))
+                        setTextColor(ResourcesCompat.getColor(resources, R.color.voice_dark_grey_color_040925, null))
                     }
 
-                    tag_line.setBackgroundColor(ResourcesTools.getColor(resources, R.color.voice_color_156ef3))
+                    tag_line.setBackgroundColor(ResourcesCompat.getColor(resources, R.color.voice_color_156ef3, null))
                 }
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) {
                 if (tab.customView != null) {
-                    VoiceSpatialLogger.d(TAG,"onTabUnselected：$mCount")
+                    VoiceSpatialLogger.d(TAG, "onTabUnselected：$mCount")
                     val title = tab.customView?.findViewById<MaterialTextView>(R.id.mtTabText)
                     val tag_line = tab.customView?.findViewById<ShapeableImageView>(R.id.tab_bg)
                     title?.apply {
                         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
                         setText(titles[tab.position])
                         setTypeface(null, Typeface.NORMAL)
-                        setTextColor(ResourcesTools.getColor(resources, R.color.voice_color_979cbb))
+                        setTextColor(ResourcesCompat.getColor(resources, R.color.voice_color_979cbb, null))
                     }
-                    tag_line?.setBackgroundColor(ResourcesTools.getColor(resources, R.color.voice_white))
+                    tag_line?.setBackgroundColor(ResourcesCompat.getColor(resources, android.R.color.white, null))
                 }
             }
 
             override fun onTabReselected(tab: TabLayout.Tab) {
-                VoiceSpatialLogger.d(TAG,"onTabReselected：")
+                VoiceSpatialLogger.d(TAG, "onTabReselected：")
                 title = tab.customView?.findViewById(R.id.mtTabText)
                 val tagLine = tab.customView?.findViewById<ShapeableImageView>(R.id.tab_bg)
                 title?.apply {
                     setText(titles[tab.position])
-                    setTextColor(ResourcesTools.getColor(resources, R.color.voice_dark_grey_color_040925))
+                    setTextColor(ResourcesCompat.getColor(resources, R.color.voice_dark_grey_color_040925, null))
                     setTypeface(null, Typeface.BOLD)
                 }
-                tagLine?.setBackgroundColor(ResourcesTools.getColor(resources,R.color.voice_color_156ef3))
+                tagLine?.setBackgroundColor(ResourcesCompat.getColor(resources, R.color.voice_color_156ef3, null))
             }
         })
         binding?.vpFragment?.currentItem = 0
@@ -143,7 +144,7 @@ class ChatroomHandsDialog constructor(): BaseSheetDialog<VoiceSpatialRoomHandLay
                                     R.string.voice_spatial_room_tab_layout_count,
                                     mCount.toString()
                                 )
-                                VoiceSpatialLogger.d(TAG,"getItemCount content1: $content")
+                                VoiceSpatialLogger.d(TAG, "getItemCount content1: $content")
                                 title?.text = content
                             }
                         }
@@ -157,7 +158,7 @@ class ChatroomHandsDialog constructor(): BaseSheetDialog<VoiceSpatialRoomHandLay
                                         R.string.voice_spatial_room_tab_layout_count,
                                         mCount.toString()
                                     )
-                                    VoiceSpatialLogger.d(TAG,"getItemCount content1: $content")
+                                    VoiceSpatialLogger.d(TAG, "getItemCount content1: $content")
                                     title?.text = content
                                 }
                             }

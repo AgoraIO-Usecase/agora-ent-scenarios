@@ -16,13 +16,13 @@ import androidx.constraintlayout.widget.ConstraintSet
 import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialViewRoom3dMicLayoutBinding
+import io.agora.scene.voice.spatial.global.ConfigConstants
+import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.model.OnItemMoveListener
 import io.agora.scene.voice.spatial.model.SeatPositionInfo
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 import io.agora.scene.voice.spatial.model.annotation.MicStatus
 import io.agora.scene.voice.spatial.model.constructor.RoomMicConstructor
-import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.utils.ThreadManager
 import kotlin.math.*
 
 class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {

@@ -15,7 +15,7 @@ import androidx.core.view.isVisible
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogRoomNoticeBinding
 import io.agora.scene.voice.spatial.model.RoomKitBean
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
+import io.agora.scene.voice.spatial.ui.BaseSheetDialog
 import java.util.regex.Pattern
 
 /**

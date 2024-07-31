@@ -6,9 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogBottomSheetAlertBinding
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
-import io.agora.voice.common.utils.DeviceTools.dp
+import io.agora.scene.voice.spatial.ui.BaseSheetDialog
 
 /**
  * 确定/取消

@@ -23,9 +23,15 @@ import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialActivityChatroomBinding
+import io.agora.scene.voice.spatial.global.ConfigConstants
+import io.agora.scene.voice.spatial.global.IParserSource
+import io.agora.scene.voice.spatial.utils.StatusBarCompat
+import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.*
 import io.agora.scene.voice.spatial.model.constructor.RoomInfoConstructor.convertByVoiceRoomModel
+import io.agora.scene.voice.spatial.net.OnResourceParseCallback
+import io.agora.scene.voice.spatial.net.Resource
 import io.agora.scene.voice.spatial.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.spatial.service.VoiceRoomServiceKickedReason
 import io.agora.scene.voice.spatial.service.VoiceRoomSubscribeDelegate
@@ -33,17 +39,11 @@ import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
 import io.agora.scene.voice.spatial.ui.dialog.VoiceRoomDebugOptionsDialog
 import io.agora.scene.voice.spatial.ui.widget.primary.MenuItemClickListener
 import io.agora.scene.voice.spatial.ui.widget.top.OnLiveTopClickListener
+import io.agora.scene.voice.spatial.utils.GsonTools
 import io.agora.scene.voice.spatial.viewmodel.VoiceRoomLivingViewModel
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
-import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.IParserSource
-import io.agora.voice.common.utils.GsonTools
-import io.agora.voice.common.utils.StatusBarCompat
-import io.agora.voice.common.utils.ThreadManager
-import io.agora.voice.common.utils.ToastTools
+import io.agora.scene.widget.toast.CustomToast
 import java.util.*
 
 class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroomBinding>(), VoiceRoomSubscribeDelegate,
@@ -166,15 +166,12 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
 
                 override fun onSuccess(data: Boolean?) {
-                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_spatial_join_room_success))
+                    CustomToast.show(getString(R.string.voice_spatial_join_room_success))
                     roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
                 }
 
                 override fun onError(code: Int, message: String?) {
-                    ToastTools.show(
-                        this@ChatroomLiveActivity,
-                        message ?: getString(R.string.voice_spatial_join_room_failed)
-                    )
+                    CustomToast.show(message ?: getString(R.string.voice_spatial_join_room_failed))
                     ThreadManager.getInstance().runOnMainThreadDelay({
                         finish()
                     }, 1000)
@@ -279,10 +276,10 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                 VoiceSpatialLogger.d(TAG, "userBeKicked $reason")
                 ThreadManager.getInstance().runOnMainThread {
                     if (reason == VoiceRoomServiceKickedReason.destroyed) {
-                        ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_spatial_room_close))
+                        CustomToast.show(getString(R.string.voice_spatial_room_close))
                         finish()
                     } else if (reason == VoiceRoomServiceKickedReason.removed) {
-                        ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_spatial_room_kick_member))
+                        CustomToast.show(getString(R.string.voice_spatial_room_kick_member))
                         finish()
                     }
                 }
@@ -322,7 +319,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                 if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
                 VoiceSpatialLogger.d(TAG, "onRoomDestroyed $roomId")
                 ThreadManager.getInstance().runOnMainThread {
-                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_spatial_room_close))
+                    CustomToast.show(getString(R.string.voice_spatial_room_close))
                     isRoomOwnerLeave = true
                     finish()
                 }
@@ -354,50 +351,45 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         roomLivingViewModel = ViewModelProvider(this)[VoiceRoomLivingViewModel::class.java]
         roomKitBean.convertByVoiceRoomModel(voiceRoomModel)
 
-        binding.chatBottom.initMenu(roomKitBean.roomType)
-        if (roomKitBean.roomType == ConfigConstants.RoomType.Common_Chatroom) { // 普通房间
-            binding.likeView.likeView.setOnClickListener { binding.likeView.addFavor() }
-            binding.rvChatroom3dMicLayout.isVisible = false
-        } else { // 空间音效房间
-            binding.likeView.isVisible = false
-            binding.rvChatroom3dMicLayout.isVisible = true
-            roomObservableDelegate = io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate(
-                this,
-                roomLivingViewModel,
-                roomKitBean,
-                binding.cTopView,
-                binding.rvChatroom3dMicLayout,
-                binding.chatBottom
-            )
-            roomObservableDelegate.showRoom3DWelcomeSheetDialog()
-            binding.rvChatroom3dMicLayout.setMyRtcUid(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid())
-            binding.rvChatroom3dMicLayout.onItemClickListener(
-                object :
-                    OnItemClickListener<VoiceMicInfoModel> {
-                    override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
-                        roomObservableDelegate.onUserMicClick(data)
-                    }
-                },
-                object :
-                    OnItemClickListener<VoiceMicInfoModel> {
-                    override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
-                        roomObservableDelegate.onBotMicClick(getString(R.string.voice_spatial_open_bot_prompt))
-                    }
-                },
-                object : OnItemMoveListener<VoiceMicInfoModel> {
-                    override fun onItemMove(data: VoiceMicInfoModel, position: SeatPositionInfo, viewType: Long) {
-                        super.onItemMove(data, position, viewType)
-                        val right = floatArrayOf(-position.forward[1], -position.forward[0], 0f)
-                        AgoraRtcEngineController.get().updateSelfPosition(
-                            floatArrayOf(position.x, position.y, 0f),
-                            position.forward,
-                            right
-                        )
-                        setSpatialSeatInfo(position)
-                    }
+        binding.chatBottom.initMenu(ConfigConstants.RoomType.Spatial_Chatroom)
+        // 空间音效房间
+        binding.rvChatroom3dMicLayout.isVisible = true
+        roomObservableDelegate = io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate(
+            this,
+            roomLivingViewModel,
+            roomKitBean,
+            binding.cTopView,
+            binding.rvChatroom3dMicLayout,
+            binding.chatBottom
+        )
+        roomObservableDelegate.showRoom3DWelcomeSheetDialog()
+        binding.rvChatroom3dMicLayout.setMyRtcUid(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid())
+        binding.rvChatroom3dMicLayout.onItemClickListener(
+            object :
+                OnItemClickListener<VoiceMicInfoModel> {
+                override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
+                    roomObservableDelegate.onUserMicClick(data)
                 }
-            ).setUpInitMicInfoMap()
-        }
+            },
+            object :
+                OnItemClickListener<VoiceMicInfoModel> {
+                override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
+                    roomObservableDelegate.onBotMicClick(getString(R.string.voice_spatial_open_bot_prompt))
+                }
+            },
+            object : OnItemMoveListener<VoiceMicInfoModel> {
+                override fun onItemMove(data: VoiceMicInfoModel, position: SeatPositionInfo, viewType: Long) {
+                    super.onItemMove(data, position, viewType)
+                    val right = floatArrayOf(-position.forward[1], -position.forward[0], 0f)
+                    AgoraRtcEngineController.get().updateSelfPosition(
+                        floatArrayOf(position.x, position.y, 0f),
+                        position.forward,
+                        right
+                    )
+                    setSpatialSeatInfo(position)
+                }
+            }
+        ).setUpInitMicInfoMap()
         binding.cTopView.setOnLiveTopClickListener(object : OnLiveTopClickListener {
             override fun onClickBack(view: View) {
                 onBackPressed()
@@ -440,7 +432,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             }
 
             override fun onInputLayoutClick() {
-                checkFocus(false)
+
             }
 
             override fun onSendMessage(content: String?) {
@@ -550,16 +542,6 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
     }
 
     private fun reset() {
-        if (roomKitBean.roomType == ConfigConstants.RoomType.Common_Chatroom) {
-            binding.chatBottom.hideExpressionView(false)
-            hideInput()
-            binding.chatBottom.showInput()
-            binding.likeView.isVisible = true
-            binding.chatBottom.hindViewChangeIcon()
-        }
-    }
-
-    private fun checkFocus(focus: Boolean) {
-        binding.likeView.isVisible = focus
+       // nothing
     }
 }

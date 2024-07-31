@@ -6,8 +6,8 @@ import androidx.core.view.isVisible
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialItemContributionRankingBinding
+import io.agora.scene.voice.spatial.global.ImageTools
 import io.agora.scene.voice.spatial.model.VoiceRankUserModel
-import io.agora.voice.common.utils.ImageTools
 
 class RoomContributionRankingViewHolder(val binding: VoiceSpatialItemContributionRankingBinding) :
     BaseRecyclerViewAdapter.BaseViewHolder<VoiceSpatialItemContributionRankingBinding, VoiceRankUserModel>(binding) {

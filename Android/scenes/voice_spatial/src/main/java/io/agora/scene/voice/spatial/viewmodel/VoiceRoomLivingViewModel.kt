@@ -4,16 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
+import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.*
+import io.agora.scene.voice.spatial.net.NetworkOnlyResource
+import io.agora.scene.voice.spatial.net.Resource
+import io.agora.scene.voice.spatial.net.SingleSourceLiveData
+import io.agora.scene.voice.spatial.net.callback.ResultCallBack
+import io.agora.scene.voice.spatial.net.callback.VRValueCallBack
 import io.agora.scene.voice.spatial.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.spatial.viewmodel.repositories.VoiceRoomLivingRepository
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.net.callback.ResultCallBack
-import io.agora.voice.common.net.callback.VRValueCallBack
-import io.agora.voice.common.utils.ThreadManager
-import io.agora.voice.common.viewmodel.NetworkOnlyResource
-import io.agora.voice.common.viewmodel.SingleSourceLiveData
 
 /**
  * 语聊房

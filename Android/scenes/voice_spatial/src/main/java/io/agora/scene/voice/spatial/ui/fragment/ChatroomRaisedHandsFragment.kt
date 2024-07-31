@@ -14,17 +14,17 @@ import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialFragmentHandsListLayoutBinding
+import io.agora.scene.voice.spatial.global.IParserSource
+import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.model.VoiceMemberModel
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
+import io.agora.scene.voice.spatial.net.OnResourceParseCallback
+import io.agora.scene.voice.spatial.net.Resource
 import io.agora.scene.voice.spatial.ui.adapter.ChatroomRaisedAdapter
+import io.agora.scene.voice.spatial.ui.adapter.RoomBaseRecyclerViewAdapter
 import io.agora.scene.voice.spatial.ui.dialog.ChatroomHandsDialog
 import io.agora.scene.voice.spatial.viewmodel.VoiceUserListViewModel
-import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.IParserSource
-import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter
-import io.agora.voice.common.utils.ThreadManager
-import io.agora.voice.common.utils.ToastTools
+import io.agora.scene.widget.toast.CustomToast
 
 class ChatroomRaisedHandsFragment : BaseViewBindingFragment<VoiceSpatialFragmentHandsListLayoutBinding>(),
     ChatroomRaisedAdapter.onActionListener, IParserSource {
@@ -132,9 +132,7 @@ class ChatroomRaisedHandsFragment : BaseViewBindingFragment<VoiceSpatialFragment
 
                     override fun onError(code: Int, message: String?) {
                         super.onError(code, message)
-                        activity?.let {
-                            ToastTools.show(it, getString(R.string.voice_spatial_room_agree_fail))
-                        }
+                        CustomToast.show(getString(R.string.voice_spatial_room_agree_fail))
                     }
                 })
             }

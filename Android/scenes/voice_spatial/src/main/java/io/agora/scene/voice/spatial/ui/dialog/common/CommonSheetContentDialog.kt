@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogBottomSheetContentBinding
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
+import io.agora.scene.voice.spatial.ui.BaseSheetDialog
 
 /**
  * content dialog 类似聊天室公告

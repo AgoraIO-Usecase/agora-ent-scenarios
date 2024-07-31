@@ -5,14 +5,14 @@ import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
+import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.*
 import io.agora.scene.voice.spatial.model.annotation.MicStatus
+import io.agora.scene.voice.spatial.utils.GsonTools
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
 import io.agora.syncmanager.rtm.Sync.JoinSceneCallback
-import io.agora.voice.common.utils.GsonTools
-import io.agora.voice.common.utils.ThreadManager
 import java.util.concurrent.CountDownLatch
 
 /**

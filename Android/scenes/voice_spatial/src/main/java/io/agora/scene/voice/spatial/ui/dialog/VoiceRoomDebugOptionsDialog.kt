@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogDebugOptionsBinding
 import io.agora.scene.voice.spatial.rtckit.AgoraRtcEngineController
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
+import io.agora.scene.voice.spatial.ui.BaseSheetDialog
 
 class VoiceRoomDebugOptionsDialog: BaseSheetDialog<VoiceSpatialDialogDebugOptionsBinding>() {
 

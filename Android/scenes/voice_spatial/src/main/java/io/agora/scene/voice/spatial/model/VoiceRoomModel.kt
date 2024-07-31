@@ -1,8 +1,8 @@
 package io.agora.scene.voice.spatial.model
 
 import androidx.annotation.DrawableRes
+import io.agora.scene.voice.spatial.global.ConfigConstants
 import io.agora.scene.voice.spatial.model.annotation.MicClickAction
-import io.agora.voice.common.constant.ConfigConstants
 import java.io.Serializable
 
 interface BaseRoomBean : IKeepProguard, Serializable {
@@ -17,7 +17,6 @@ data class RoomKitBean constructor(
     var chatroomId: String = "",
     var ownerId: String = "",
     var ownerChatUid: String = "",
-    var roomType: Int = ConfigConstants.RoomType.Common_Chatroom,
     var isOwner: Boolean = false,
     var soundEffect: Int = ConfigConstants.SoundSelection.Social_Chat
 ) : Serializable

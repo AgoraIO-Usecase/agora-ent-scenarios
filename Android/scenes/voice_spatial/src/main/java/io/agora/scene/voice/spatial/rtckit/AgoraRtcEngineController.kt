@@ -8,20 +8,20 @@ import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.*
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
+import io.agora.scene.voice.spatial.global.ConfigConstants
+import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.DataStreamInfo
 import io.agora.scene.voice.spatial.model.SeatPositionInfo
 import io.agora.scene.voice.spatial.model.SoundAudioBean
+import io.agora.scene.voice.spatial.net.callback.VRValueCallBack
 import io.agora.scene.voice.spatial.rtckit.listener.MediaPlayerObserver
 import io.agora.scene.voice.spatial.rtckit.listener.RtcMicVolumeListener
 import io.agora.scene.voice.spatial.rtckit.listener.RtcSpatialPositionListener
+import io.agora.scene.voice.spatial.utils.GsonTools
 import io.agora.spatialaudio.ILocalSpatialAudioEngine
 import io.agora.spatialaudio.LocalSpatialAudioConfig
 import io.agora.spatialaudio.RemoteVoicePositionInfo
-import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.net.callback.VRValueCallBack
-import io.agora.voice.common.utils.GsonTools
-import io.agora.voice.common.utils.ThreadManager
 
 
 /**
@@ -204,7 +204,6 @@ class AgoraRtcEngineController {
                 dataStreamId,
                 GsonTools.beanToString(steamInfo)?.toByteArray()
             )
-            Log.d("pigpig", "$ret")
         }
     }
 

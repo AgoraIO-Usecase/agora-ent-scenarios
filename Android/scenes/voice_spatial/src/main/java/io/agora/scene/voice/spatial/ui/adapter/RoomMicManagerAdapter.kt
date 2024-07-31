@@ -1,11 +1,11 @@
 package io.agora.scene.voice.spatial.ui.adapter
 
+import android.content.res.Resources
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialItemRoomMicManagerBinding
 import io.agora.scene.voice.spatial.model.MicManagerBean
 import io.agora.scene.voice.spatial.ui.adapter.viewholder.RoomMicManagerViewHolder
-import io.agora.voice.common.utils.DeviceTools
 
 class RoomMicManagerAdapter constructor(
     dataList: List<MicManagerBean>,
@@ -21,13 +21,13 @@ class RoomMicManagerAdapter constructor(
         val layoutParams = holder.mBinding.root.layoutParams
         when (dataList.size) {
             1 -> {
-                layoutParams.width = DeviceTools.getDisplaySize().width
+                layoutParams.width = Resources.getSystem().displayMetrics.widthPixels
             }
             2 -> {
-                layoutParams.width = DeviceTools.getDisplaySize().width/2
+                layoutParams.width = Resources.getSystem().displayMetrics.widthPixels /2
             }
             else -> {
-                layoutParams.width = DeviceTools.getDisplaySize().width / 3
+                layoutParams.width = Resources.getSystem().displayMetrics.widthPixels / 3
             }
         }
         holder.mBinding.root.layoutParams = layoutParams

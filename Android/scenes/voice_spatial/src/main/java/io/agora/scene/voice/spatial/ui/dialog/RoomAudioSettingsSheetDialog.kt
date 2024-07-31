@@ -11,13 +11,13 @@ import androidx.core.view.isVisible
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogAudioSettingBinding
+import io.agora.scene.voice.spatial.global.ConfigConstants
+import io.agora.scene.voice.spatial.global.ConfigConstants.DISABLE_ALPHA
+import io.agora.scene.voice.spatial.global.ConfigConstants.ENABLE_ALPHA
 import io.agora.scene.voice.spatial.model.RoomAudioSettingsBean
+import io.agora.scene.voice.spatial.ui.BaseSheetDialog
 import io.agora.scene.widget.doOnStopTrackingTouch
-import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.constant.ConfigConstants.DISABLE_ALPHA
-import io.agora.voice.common.constant.ConfigConstants.ENABLE_ALPHA
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
-import io.agora.voice.common.utils.ToastTools
+import io.agora.scene.widget.toast.CustomToast
 
 class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceSpatialDialogAudioSettingBinding>() {
 
@@ -80,7 +80,7 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceSpatialD
             }
             mcbAgoraBotDisable.setOnClickListener {
                 activity?.let {
-                    ToastTools.showTips(it, getString(R.string.voice_spatial_only_host_can_change_robot))
+                    CustomToast.showTips(getString(R.string.voice_spatial_only_host_can_change_robot))
                 }
             }
             mtSpatialAudioArrow.setOnClickListener {

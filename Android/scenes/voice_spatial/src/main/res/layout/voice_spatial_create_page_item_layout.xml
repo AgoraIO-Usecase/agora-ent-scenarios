@@ -23,8 +23,8 @@
         
         <TextView
             android:id="@+id/item_title"
-            android:textColor="@color/voice_white"
-            android:textSize="@dimen/voice_sp_16"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/item_text"
             android:layout_marginLeft="15dp"
@@ -41,8 +41,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:textColor="@color/voice_white"
-            android:textSize="@dimen/voice_sp_12"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
             android:maxHeight="36dp"
             android:maxLines="3"
             android:lineSpacingMultiplier="1.4"

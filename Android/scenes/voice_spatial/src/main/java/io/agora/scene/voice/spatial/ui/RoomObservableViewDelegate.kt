@@ -9,12 +9,17 @@ import com.google.gson.reflect.TypeToken
 import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
+import io.agora.scene.voice.spatial.global.ConfigConstants
+import io.agora.scene.voice.spatial.global.IParserSource
+import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.*
 import io.agora.scene.voice.spatial.model.annotation.MicClickAction
 import io.agora.scene.voice.spatial.model.annotation.MicStatus
 import io.agora.scene.voice.spatial.model.constructor.RoomInfoConstructor
 import io.agora.scene.voice.spatial.model.constructor.RoomSoundAudioConstructor
+import io.agora.scene.voice.spatial.net.OnResourceParseCallback
+import io.agora.scene.voice.spatial.net.Resource
 import io.agora.scene.voice.spatial.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.spatial.rtckit.listener.RtcMicVolumeListener
 import io.agora.scene.voice.spatial.rtckit.listener.RtcSpatialPositionListener
@@ -26,14 +31,9 @@ import io.agora.scene.voice.spatial.ui.dialog.common.CommonSheetAlertDialog
 import io.agora.scene.voice.spatial.ui.widget.mic.IRoomMicView
 import io.agora.scene.voice.spatial.ui.widget.primary.ChatPrimaryMenuView
 import io.agora.scene.voice.spatial.ui.widget.top.IRoomLiveTopView
+import io.agora.scene.voice.spatial.utils.GsonTools
 import io.agora.scene.voice.spatial.viewmodel.VoiceRoomLivingViewModel
-import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.IParserSource
-import io.agora.voice.common.utils.GsonTools
-import io.agora.voice.common.utils.ThreadManager
-import io.agora.voice.common.utils.ToastTools
+import io.agora.scene.widget.toast.CustomToast
 
 /**
  * @author create by zhangwei03
@@ -77,11 +77,11 @@ class RoomObservableViewDelegate constructor(
                 override fun onSuccess(data: Pair<String, Boolean>?) {
                     if (data?.second != true) return
                     voiceRoomModel.announcement = data.first
-                    ToastTools.show(activity, activity.getString(R.string.voice_spatial_notice_posted))
+                    CustomToast.show(activity.getString(R.string.voice_spatial_notice_posted))
                 }
 
                 override fun onError(code: Int, message: String?) {
-                    ToastTools.show(activity, activity.getString(R.string.voice_spatial_notice_posted_error))
+                    CustomToast.show(activity.getString(R.string.voice_spatial_notice_posted_error))
                 }
             })
         }
@@ -234,8 +234,8 @@ class RoomObservableViewDelegate constructor(
         roomLivingViewModel.startMicSeatApplyObservable().observe(activity) { result: Resource<Boolean> ->
             parseResource(result, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
-                    VoiceSpatialLogger.d(TAG,"start mic seat apply:$data")
-                    ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_submit_sent))
+                    VoiceSpatialLogger.d(TAG, "start mic seat apply:$data")
+                    CustomToast.show(activity.getString(R.string.voice_spatial_mic_submit_sent))
                     chatPrimaryMenuView.setShowHandStatus(false, true)
                     isRequesting = true
                 }
@@ -245,8 +245,8 @@ class RoomObservableViewDelegate constructor(
         roomLivingViewModel.cancelMicSeatApplyObservable().observe(activity) { result: Resource<Boolean> ->
             parseResource(result, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
-                    VoiceSpatialLogger.d(TAG,"cancel mic seat apply:$data")
-                    ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_cancel_apply_success))
+                    VoiceSpatialLogger.d(TAG, "cancel mic seat apply:$data")
+                    CustomToast.show( activity.getString(R.string.voice_spatial_mic_cancel_apply_success))
                     chatPrimaryMenuView.setShowHandStatus(false, false)
                     isRequesting = false
                 }
@@ -257,9 +257,9 @@ class RoomObservableViewDelegate constructor(
             parseResource(response, object : OnResourceParseCallback<VoiceMemberModel>() {
                 override fun onSuccess(data: VoiceMemberModel?) {
                     if (data?.micStatus == MicStatus.Normal) {
-                        ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_unmuted))
+                        CustomToast.show( activity.getString(R.string.voice_spatial_mic_unmuted))
                     } else {
-                        ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_muted))
+                        CustomToast.show( activity.getString(R.string.voice_spatial_mic_muted))
                     }
                     localUserMicInfo?.let {
                         it.member = data
@@ -274,8 +274,8 @@ class RoomObservableViewDelegate constructor(
         roomLivingViewModel.leaveMicObservable().observe(activity) { response: Resource<VoiceMicInfoModel> ->
             parseResource(response, object : OnResourceParseCallback<VoiceMicInfoModel>() {
                 override fun onSuccess(data: VoiceMicInfoModel?) {
-                    VoiceSpatialLogger.d(TAG,"leave mic：${data?.micIndex}")
-                    ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_off_stage))
+                    VoiceSpatialLogger.d(TAG, "leave mic：${data?.micIndex}")
+                    CustomToast.show( activity.getString(R.string.voice_spatial_mic_off_stage))
                     data?.let {
                         val newMicMap = mutableMapOf(it.micIndex to it)
                         dealMicDataMap(newMicMap)
@@ -288,8 +288,8 @@ class RoomObservableViewDelegate constructor(
         roomLivingViewModel.kickMicObservable().observe(activity) { response: Resource<VoiceMicInfoModel> ->
             parseResource(response, object : OnResourceParseCallback<VoiceMicInfoModel>() {
                 override fun onSuccess(data: VoiceMicInfoModel?) {
-                    VoiceSpatialLogger.d(TAG,"kick mic：${data?.micIndex}")
-                    ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_kicked_off))
+                    VoiceSpatialLogger.d(TAG, "kick mic：${data?.micIndex}")
+                    CustomToast.show( activity.getString(R.string.voice_spatial_mic_kicked_off))
                     data?.let {
                         val newMicMap = mutableMapOf(it.micIndex to it)
                         dealMicDataMap(newMicMap)
@@ -302,8 +302,8 @@ class RoomObservableViewDelegate constructor(
         roomLivingViewModel.forbidMicObservable().observe(activity) { response: Resource<VoiceMicInfoModel> ->
             parseResource(response, object : OnResourceParseCallback<VoiceMicInfoModel>() {
                 override fun onSuccess(data: VoiceMicInfoModel?) {
-                    VoiceSpatialLogger.d(TAG,"force mute mic：${data?.micIndex}")
-                    ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_muted))
+                    VoiceSpatialLogger.d(TAG, "force mute mic：${data?.micIndex}")
+                    CustomToast.show( activity.getString(R.string.voice_spatial_mic_muted))
                     data?.let {
                         val newMicMap = mutableMapOf(it.micIndex to it)
                         dealMicDataMap(newMicMap)
@@ -316,8 +316,8 @@ class RoomObservableViewDelegate constructor(
         roomLivingViewModel.cancelForbidMicObservable().observe(activity) { response: Resource<VoiceMicInfoModel> ->
             parseResource(response, object : OnResourceParseCallback<VoiceMicInfoModel>() {
                 override fun onSuccess(data: VoiceMicInfoModel?) {
-                    VoiceSpatialLogger.d(TAG,"cancel force mute mic：${data?.micIndex}")
-                    ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_unmuted))
+                    VoiceSpatialLogger.d(TAG, "cancel force mute mic：${data?.micIndex}")
+                    CustomToast.show(activity.getString(R.string.voice_spatial_mic_unmuted))
                     data?.let {
                         val newMicMap = mutableMapOf(it.micIndex to it)
                         dealMicDataMap(newMicMap)
@@ -331,7 +331,7 @@ class RoomObservableViewDelegate constructor(
             parseResource(response, object : OnResourceParseCallback<VoiceMicInfoModel>() {
                 override fun onSuccess(data: VoiceMicInfoModel?) {
                     VoiceSpatialLogger.d(TAG, "lock mic：${data?.micIndex}")
-                    ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_blocked))
+                    CustomToast.show( activity.getString(R.string.voice_spatial_mic_blocked))
                     data?.let {
                         val newMicMap = mutableMapOf(it.micIndex to it)
                         dealMicDataMap(newMicMap)
@@ -345,7 +345,7 @@ class RoomObservableViewDelegate constructor(
             parseResource(response, object : OnResourceParseCallback<VoiceMicInfoModel>() {
                 override fun onSuccess(data: VoiceMicInfoModel?) {
                     VoiceSpatialLogger.d(TAG, "cancel lock mic：${data?.micIndex}")
-                    ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_unblocked))
+                    CustomToast.show( activity.getString(R.string.voice_spatial_mic_unblocked))
                     data?.let {
                         val newMicMap = mutableMapOf(it.micIndex to it)
                         dealMicDataMap(newMicMap)
@@ -380,7 +380,7 @@ class RoomObservableViewDelegate constructor(
         roomLivingViewModel.changeMicObservable().observe(activity) { response: Resource<Map<Int, VoiceMicInfoModel>> ->
             parseResource(response, object : OnResourceParseCallback<Map<Int, VoiceMicInfoModel>>() {
                 override fun onSuccess(data: Map<Int, VoiceMicInfoModel>?) {
-                    ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_exchange_mic_success))
+                    CustomToast.show( activity.getString(R.string.voice_spatial_mic_exchange_mic_success))
                     data?.let {
                         // 更新麦位
                         dealMicDataMap(it)
@@ -389,7 +389,7 @@ class RoomObservableViewDelegate constructor(
                 }
 
                 override fun onError(code: Int, message: String?) {
-                    ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_exchange_mic_failed))
+                    CustomToast.show( activity.getString(R.string.voice_spatial_mic_exchange_mic_failed))
                 }
             })
         }
@@ -505,7 +505,7 @@ class RoomObservableViewDelegate constructor(
             arguments = Bundle().apply {
                 val audioSettingsInfo = RoomAudioSettingsBean(
                     enable = roomKitBean.isOwner,
-                    roomType = roomKitBean.roomType,
+                    roomType = ConfigConstants.RoomType.Spatial_Chatroom,
                     botOpen = robotInfo.useRobot,
                     botVolume = robotInfo.robotVolume,
                     soundSelection = roomKitBean.soundEffect,
@@ -671,7 +671,7 @@ class RoomObservableViewDelegate constructor(
                             if (data.enable) {
                                 showOwnerHandsDialog(micInfo.micIndex)
                             } else {
-                                ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_close_by_host))
+                                CustomToast.show(activity.getString(R.string.voice_spatial_mic_close_by_host))
                             }
                         }
 
@@ -685,7 +685,7 @@ class RoomObservableViewDelegate constructor(
                             if (data.enable) {
                                 roomLivingViewModel.cancelMuteMic(micInfo.micIndex)
                             } else {
-                                ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_close_by_host))
+                                CustomToast.show( activity.getString(R.string.voice_spatial_mic_close_by_host))
                             }
                         }
 
@@ -728,7 +728,7 @@ class RoomObservableViewDelegate constructor(
             roomMicMangerDialog.show(activity.supportFragmentManager, "RoomMicManagerSheetDialog")
         } else if (micInfo.micStatus == MicStatus.Lock || micInfo.micStatus == MicStatus.LockForceMute) {
             // 座位被锁麦
-            ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_close_by_host))
+            CustomToast.show( activity.getString(R.string.voice_spatial_mic_close_by_host))
         } else if ((micInfo.micStatus == MicStatus.Idle || micInfo.micStatus == MicStatus.ForceMute) && micInfo.member == null) {
             val mineMicIndex = iRoomMicView.findMicByUid(VoiceBuddyFactory.get().getVoiceBuddy().userId())
             if (mineMicIndex >= 0) {
@@ -741,7 +741,7 @@ class RoomObservableViewDelegate constructor(
                     })
             } else {
                 if (isRequesting) {
-                    ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_submit_sent))
+                    CustomToast.show(activity.getString(R.string.voice_spatial_mic_submit_sent))
                 } else {
                     showMemberHandsDialog(micInfo.micIndex)
                 }
@@ -767,7 +767,7 @@ class RoomObservableViewDelegate constructor(
                 // nothing
             }
         } else { // 成员
-            ToastTools.showTips(activity, activity.getString(R.string.voice_spatial_only_host_can_change_robot))
+            CustomToast.show( activity.getString(R.string.voice_spatial_only_host_can_change_robot))
         }
     }
 
@@ -883,7 +883,7 @@ class RoomObservableViewDelegate constructor(
     fun onClickBottomMic() {
         if (localUserMicInfo?.micStatus == MicStatus.ForceMute) {
             // 被禁言
-            ToastTools.show(activity, activity.getString(R.string.voice_spatial_mic_muted_by_host))
+            CustomToast.show( activity.getString(R.string.voice_spatial_mic_muted_by_host))
             return
         }
         val openAudio = localUserMicInfo?.member?.micStatus != MicStatus.Normal
@@ -1034,7 +1034,7 @@ class RoomObservableViewDelegate constructor(
         VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot = false
         AgoraRtcEngineController.get()
             .updateEffectVolume(robotInfo.robotVolume)
-        RoomSoundAudioConstructor.createRoomSoundAudioMap[roomKitBean.roomType]?.let {
+        RoomSoundAudioConstructor.createRoomSoundAudioMap[ConfigConstants.RoomType.Spatial_Chatroom]?.let {
             AgoraRtcEngineController.get().playMusic(it)
         }
     }

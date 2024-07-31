@@ -1,7 +1,6 @@
 package io.agora.scene.voice.spatial.ui.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,18 +13,18 @@ import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialFragmentHandsListLayoutBinding
+import io.agora.scene.voice.spatial.global.IParserSource
+import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.model.VoiceMemberModel
+import io.agora.scene.voice.spatial.net.OnResourceParseCallback
+import io.agora.scene.voice.spatial.net.Resource
 import io.agora.scene.voice.spatial.service.VoiceRoomSubscribeDelegate
 import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
 import io.agora.scene.voice.spatial.ui.adapter.ChatroomInviteAdapter
+import io.agora.scene.voice.spatial.ui.adapter.RoomBaseRecyclerViewAdapter
 import io.agora.scene.voice.spatial.ui.dialog.ChatroomHandsDialog
 import io.agora.scene.voice.spatial.viewmodel.VoiceUserListViewModel
-import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.IParserSource
-import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter
-import io.agora.voice.common.utils.ThreadManager
-import io.agora.voice.common.utils.ToastTools
+import io.agora.scene.widget.toast.CustomToast
 
 class ChatroomInviteHandsFragment : BaseViewBindingFragment<VoiceSpatialFragmentHandsListLayoutBinding>(),
     ChatroomInviteAdapter.onActionListener, IParserSource {
@@ -121,16 +120,12 @@ class ChatroomInviteHandsFragment : BaseViewBindingFragment<VoiceSpatialFragment
                 override fun onSuccess(data: Boolean?) {
                     VoiceSpatialLogger.d(TAG, "invitation mic：$data")
                     if (data != true) return
-                    activity?.let {
-                        ToastTools.show(it, getString(R.string.voice_spatial_room_invited))
-                    }
+                    CustomToast.show(getString(R.string.voice_spatial_room_invited))
                 }
 
                 override fun onError(code: Int, message: String?) {
                     super.onError(code, message)
-                    activity?.let {
-                        ToastTools.show(it, getString(R.string.voice_spatial_room_invitation_fail))
-                    }
+                    CustomToast.show(getString(R.string.voice_spatial_room_invitation_fail))
                 }
             })
         }

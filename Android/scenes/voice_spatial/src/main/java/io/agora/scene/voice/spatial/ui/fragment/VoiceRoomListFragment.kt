@@ -15,17 +15,17 @@ import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialFragmentRoomListLayoutBinding
+import io.agora.scene.voice.spatial.global.IParserSource
+import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.model.VoiceRoomModel
+import io.agora.scene.voice.spatial.net.OnResourceParseCallback
+import io.agora.scene.voice.spatial.net.Resource
 import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
 import io.agora.scene.voice.spatial.ui.activity.ChatroomLiveActivity
 import io.agora.scene.voice.spatial.ui.widget.encryption.RoomEncryptionInputDialog
 import io.agora.scene.voice.spatial.viewmodel.VoiceCreateViewModel
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.UiUtils
-import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.IParserSource
-import io.agora.voice.common.utils.ThreadManager
-import io.agora.voice.common.utils.ToastTools
 
 class VoiceRoomListFragment : BaseViewBindingFragment<VoiceSpatialFragmentRoomListLayoutBinding>(), IParserSource {
     private lateinit var voiceRoomViewModel: VoiceCreateViewModel
@@ -102,7 +102,7 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceSpatialFragmentRoomLi
                 override fun onError(code: Int, message: String?) {
                     binding?.smartRefreshLayout?.finishRefresh()
                     hideLoadingView()
-                    ToastTools.show(requireActivity(), getString(R.string.voice_spatial_room_check_password))
+                    CustomToast.show(getString(R.string.voice_spatial_room_check_password))
                 }
             })
         }
@@ -117,12 +117,9 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceSpatialFragmentRoomLi
                     super.onError(code, message)
                     hideLoadingView()
                     if (code == VoiceServiceProtocol.ERR_ROOM_UNAVAILABLE) {
-                        ToastTools.show(
-                            requireActivity(),
-                            getString(R.string.voice_spatial_unavailable_tip)
-                        )
+                        CustomToast.show(getString(R.string.voice_spatial_unavailable_tip))
                     } else {
-                        ToastTools.show(requireActivity(), message ?: "")
+                        CustomToast.show( message ?: "")
                     }
                 }
             })

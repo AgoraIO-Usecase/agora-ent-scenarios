@@ -8,13 +8,8 @@ import com.opensource.svgaplayer.utils.log.SVGALogger
  * @author create by zhangwei03
  */
 object VoiceConfigManager {
-
-    private val mLifecycleCallbacks =
-        UserActivityLifecycleCallbacks()
-
     @JvmStatic
     fun initMain() {
-        VoiceBuddyFactory.get().getVoiceBuddy().application().registerActivityLifecycleCallbacks(mLifecycleCallbacks)
         SVGAParser.shareParser().init( VoiceBuddyFactory.get().getVoiceBuddy().application())
         SVGALogger.setLogEnabled(true)
         SVGASoundManager.init()
@@ -22,11 +17,5 @@ object VoiceConfigManager {
     }
 
     fun unInitMain(){
-        VoiceBuddyFactory.get().getVoiceBuddy().application().unregisterActivityLifecycleCallbacks(mLifecycleCallbacks)
-    }
-
-    @JvmStatic
-    fun getLifecycleCallbacks(): UserActivityLifecycleCallbacks {
-        return mLifecycleCallbacks
     }
 }
