@@ -1126,7 +1126,8 @@ class VoiceSyncManagerServiceImp(
     private fun selectEmptySeat(index: Int): Int {
         // 判断该麦位是否可用
         val toSeat = micSeatMap[index.toString()]
-        if (toSeat != null && toSeat.member == null && toSeat.micStatus == MicStatus.Idle) {
+        if (toSeat != null && toSeat.member == null && (toSeat.micStatus == MicStatus.Idle||
+                    toSeat.micStatus == MicStatus.Mute || toSeat.micStatus == MicStatus.ForceMute)) {
             return index
         }
         var toIndex = -1
