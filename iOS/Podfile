@@ -50,6 +50,9 @@ def all_pods
   pod 'AgoraCommon', :path => 'AgoraEntScenarios'
   pod 'Joy', :path => 'AgoraEntScenarios/Scenes/Joy'
   pod 'InteractiveJoy', :path => 'AgoraEntScenarios/Scenes/InteractiveJoy'
+  
+  pod 'AUIIMKit', :path => 'AgoraEntScenarios/Common/UIComponents/AUIIMKit'
+  
   pod 'SocketRocket', '0.7.0'
   pod 'Agora-Scene-Utils', '1.1.0'
   
