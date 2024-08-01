@@ -1142,6 +1142,11 @@ class KTVSyncManagerServiceImp constructor(
 
             when (seatCmd) {
                 RoomSeatCmd.enterSeatCmd -> {
+                    val seatIndex = seatKey.toIntOrNull() ?: -1
+                    if (seatIndex < 0 || seatIndex > 7) {
+                        return@subscribeWillMerge AUICollectionException.ErrorCode.unknown.toException(msg = "not permitted")
+                    }
+                    KTVLogger.d(TAG, "subscribeWillMerge seatKey:$seatKey")
                     val willEnterSeatUserId = getUserId(newValue[seatKey])
                     if (oldValue.values.any { getUserId(it) == willEnterSeatUserId }) { // 用户已经在麦位
                         return@subscribeWillMerge AUICollectionException.ErrorCode.unknown.toException(msg = "user already enter seat")
@@ -1210,7 +1215,7 @@ class KTVSyncManagerServiceImp constructor(
             // 只允许修改 1～7 位置
             for (i in 1..7) {
                 val value = seatValueMap["$i"]
-                if (getUserId(value).isNullOrEmpty()) { //寻找空买为上麦
+                if (getUserId(value).isNullOrEmpty()) { //寻找空麦位上麦
                     val newValue = newItem.values.first()
                     tempItem["$i"] = newValue
                     return@subscribeValueWillChange tempItem
