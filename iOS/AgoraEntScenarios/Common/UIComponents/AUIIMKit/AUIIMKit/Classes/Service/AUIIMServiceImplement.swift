@@ -41,7 +41,7 @@ fileprivate let AUIChatRoomJoinedMember = "AUIChatRoomJoinedMember"
         self.login {[weak self] error in
             guard let self = self else { return }
             if error == nil {
-                self.joinedChatRoom(roomId: self.currentRoomId) { message, error in
+                self.joinChatRoom(roomId: self.currentRoomId) { message, error in
                     aui_info("joinedChatRoom:\(error == nil ? "successful!" : "\(error!.localizedDescription)")")
                 }
             }
