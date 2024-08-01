@@ -10,6 +10,7 @@ import RTMSyncManager
 import YYModel
 import AgoraRtmKit
 import AgoraCommon
+import AUIIMKit
 
 private let kSceneId = "scene_play_zone_4.10.2"
 private let KCollectionRobotInfo = "robot_info"
@@ -27,6 +28,21 @@ class JoyServiceImpl: NSObject {
     private var collectionBinded: Bool = false
     private var host: String
     private weak var listener: JoyServiceListenerProtocol?
+    
+    private(set) lazy var imService: AUIIMManagerServiceImplement = {
+        let user = AUIChatUserInfo()
+        user.userId = "\(self.user.userId)"
+        user.userAvatar = self.user.avatar
+        user.userName = self.user.userName
+        let commonConfig = AUIChatCommonConfig()
+        commonConfig.imAppKey = AppContext.shared.imAppKey
+        commonConfig.owner = user
+        AUIChatContext.shared.commonConfig = commonConfig
+        
+        let service = AUIIMManagerServiceImplement()
+        
+        return service
+    }()
     
     private var userList: [InteractiveJoyUserInfo] = [] {
         didSet {
@@ -74,6 +90,10 @@ class JoyServiceImpl: NSObject {
         syncManager.rtmManager.subscribeError(channelName: "", delegate: self)
         login { err in
             self.isConnected = err == nil ? true : false
+        }
+        
+        imService.loginChat { err in
+            
         }
     }
     
@@ -149,17 +169,29 @@ extension JoyServiceImpl: JoyServiceProtocol {
         roomInfo.owner = owner
 
         func create(roomInfo: AUIRoomInfo) {
-            roomService.createRoom(room: roomInfo) { [weak self] err, info in
-                guard let self = self else { return }
+            imService.createChatRoom(roomId: roomInfo.roomId, description: "") {[weak self] chatId, err in
+                guard let self = self else {return}
                 if let err = err {
-                    JoyLogger.info("enter scene fail: \(err.localizedDescription)")
                     completion(nil, err)
                     return
                 }
+                //TODO: add chatid to roomInfo && destroy chat room when room service create room fail
+                self.roomService.createRoom(room: roomInfo) { [weak self] err, info in
+                    guard let self = self else { return }
+                    if let err = err {
+                        JoyLogger.info("enter scene fail: \(err.localizedDescription)")
+                        completion(nil, err)
+                        return
+                    }
+                    
+                    completion(self.convertAUIRoomInfo2JoyRoomInfo(with: info ?? roomInfo), nil)
+                    self.imService.joinChatRoom(roomId: chatId!) { _, _ in
+                        
+                    }
+                }
+                self.subscribeAll(channelName: roomInfo.roomId)
                 
-                completion(self.convertAUIRoomInfo2JoyRoomInfo(with: info ?? roomInfo), nil)
             }
-            subscribeAll(channelName: roomInfo.roomId)
         }
 
         if isConnected == false {

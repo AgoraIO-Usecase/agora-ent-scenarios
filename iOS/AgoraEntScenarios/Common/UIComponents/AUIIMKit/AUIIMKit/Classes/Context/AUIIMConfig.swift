@@ -27,24 +27,25 @@ import Foundation
 
 @objcMembers
 open class AUIChatCommonConfig: NSObject {
+    //TODO(qinhui):现在依赖keycener里的，后续支持
     /// 声网AppId
-    public var appId: String = ""
-    public var appCert: String = ""
+//    public var appId: String = ""
+//    public var appCert: String = ""
     
     /// 环信AppKey(可选，如果没有用到后端IM服务可以不设置)
     public var imAppKey: String = ""
-    /// 环信ClientId(可选，如果没有用到后端IM服务可以不设置)
-    public var imClientId: String = ""
-    /// 环信ClientSecret(可选，如果没有用到后端IM服务可以不设置)
-    public var imClientSecret: String = ""
-    
+//    /// 环信ClientId(可选，如果没有用到后端IM服务可以不设置)
+//    public var imClientId: String = ""
+//    /// 环信ClientSecret(可选，如果没有用到后端IM服务可以不设置)
+//    public var imClientSecret: String = ""
     /// 域名(可选，如果没有用到后端服务可以不设置)
-    public var host: String = ""
+//    public var host: String = ""
+    
     /// 用户信息
     public var owner: AUIChatUserInfo?
     
     public func isValidate() -> Bool {
-        if appId.isEmpty || owner?.isEmpty() ?? true  {
+        if /*appId.isEmpty ||*/ owner?.isEmpty() ?? true  {
             return false
         }
         

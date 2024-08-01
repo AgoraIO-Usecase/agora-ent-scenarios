@@ -96,6 +96,7 @@ PODS:
     - AgoraCommon
     - AgoraRtcEngine_Special_iOS
     - AgoraSyncManager
+    - AUIIMKit
     - RTMSyncManager
     - SDWebImage
     - SnapKit
@@ -325,7 +326,7 @@ SPEC CHECKSUMS:
   fuLib: 43b6990d34caa47e0f12a61db57fe9bd2372f584
   FURenderKit: 29a1273700cd6de35b66042468a8a4c4c015e25a
   HXPhotoPicker: 541da99aa88b8eb0b6222ddfe37cacbd06d73300
-  InteractiveJoy: c1a7e200cb4cc42a0ad0a70a585b4dc16206b96e
+  InteractiveJoy: aa27a4b37826ee58ceabe6858154137f75fb9453
   Joy: 20168a64bfbd0c6053382991957335eb2d452576
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137

@@ -9,15 +9,10 @@ import Foundation
 
 open class AUIChatContext: NSObject {
     public static let shared: AUIChatContext = AUIChatContext()
-    public let currentUserInfo: AUIChatUserInfo = AUIChatUserInfo()
-    public var commonConfig: AUIChatCommonConfig? {
-        didSet {
-            guard let userInfo = commonConfig?.owner else {return}
-            currentUserInfo.userName = userInfo.userName
-            currentUserInfo.userId = userInfo.userId
-            currentUserInfo.userAvatar = userInfo.userAvatar
-        }
+    var currentUserInfo: AUIChatUserInfo? {
+        return commonConfig?.owner
     }
+    public var commonConfig: AUIChatCommonConfig?
     
     public var roomInfoMap: [String: AUIChatRoomInfo] = [:]
     public var roomConfigMap: [String: AUIChatCommonConfig] = [:]
@@ -36,7 +31,7 @@ open class AUIChatContext: NSObject {
     }
     
     public func isRoomOwner(channelName: String) ->Bool {
-        return isRoomOwner(channelName: channelName, userId: currentUserInfo.userId)
+        return isRoomOwner(channelName: channelName, userId: currentUserInfo?.userId ?? "")
     }
     
     public func isRoomOwner(channelName: String, userId: String) ->Bool {

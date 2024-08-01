@@ -56,4 +56,5 @@ TODO: Add long description of the pod here.
   s.dependency 'RTMSyncManager'
   s.dependency 'AgoraCommon'
   s.dependency 'SudMGPWrapper'
+  s.dependency 'AUIIMKit'
 end

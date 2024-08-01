@@ -8,6 +8,7 @@
 import UIKit
 import AgoraRtcKit
 import AgoraCommon
+import AUIIMKit
 
 class PlayGameViewController: UIViewController {
     static let SUDMGP_APP_ID = ""
@@ -31,6 +32,14 @@ class PlayGameViewController: UIViewController {
         let view = UIView()
         return view
     }()
+    
+    lazy var messageView: AUIChatListView = {
+        let chatListHeight = 200.0
+        let listView = AUIChatListView(frame: CGRect(x: 0, y:  self.view.frame.height - chatListHeight - 65, width: self.view.width, height: chatListHeight))
+        return listView
+    }()
+    
+    lazy var chatBinder: AUIIMViewBinder = AUIIMViewBinder()
     
     private lazy var backgroundView: UIImageView = {
         let imageView = UIImageView()
@@ -109,8 +118,13 @@ class PlayGameViewController: UIViewController {
         view.backgroundColor = UIColor.white
         self.view.addSubview(backgroundView)
         self.view.addSubview(gameView)
+        self.view.addSubview(messageView)
         self.view.addSubview(navigationBar)
         self.view.addSubview(bottomBar)
+        
+        if let service = service as? JoyServiceImpl {
+            chatBinder.bind(chat: self.messageView, chatService: service.imService)
+        }
         
         navigationBar.moreActionCallback = { [weak self] in
             guard let self = self else { return }

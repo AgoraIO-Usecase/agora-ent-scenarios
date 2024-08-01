@@ -14,8 +14,6 @@ public class InteractiveJoyUserInfo: NSObject {
     public var userName: String = ""
     public var avatar: String = ""
     public var createdAt: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
-    
-    var objectId: String = ""
 }
 
 @objcMembers
