@@ -45,6 +45,26 @@ class CustomAlertController: UIViewController {
             make.height.equalTo(300)
         }
         
+        let cornerBackView = UIView()
+        cornerBackView.backgroundColor = .white
+        containerView.addSubview(cornerBackView)
+//        addTopCornersRadius(to: cornerBackView, radius: 19)
+        cornerBackView.snp.makeConstraints { make in
+            make.top.right.left.equalTo(0)
+            make.height.equalTo(19)
+        }
+        
+        let cornerImageView = UIImageView()
+        cornerImageView.image = UIImage.sceneImage(name: "alert_corner_ic")
+        containerView.addSubview(cornerImageView)
+        
+        cornerImageView.snp.makeConstraints { make in
+            make.height.equalTo(3)
+            make.width.equalTo(33)
+            make.centerX.equalTo(cornerBackView)
+            make.centerY.equalTo(cornerBackView)
+        }
+        
         panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
         containerView.addGestureRecognizer(panGestureRecognizer)
         
@@ -60,7 +80,8 @@ class CustomAlertController: UIViewController {
             containerView.addSubview(titleLabel)
             
             titleLabel.snp.makeConstraints { make in
-                make.top.left.right.equalTo(0)
+                make.top.equalTo(cornerBackView.snp.bottom)
+                make.left.right.equalTo(0)
                 make.height.equalTo(60)
             }
         }
@@ -102,7 +123,23 @@ class CustomAlertController: UIViewController {
         }
     }
     
-    func createItem(title: String, style: UIAlertAction.Style) -> AlertViewItem {
+//    private func addTopCornersRadius(to view: UIView, radius: CGFloat) {
+//        let path = UIBezierPath(roundedRect: view.bounds,
+//                                byRoundingCorners: [.topLeft, .topRight],
+//                                cornerRadii: CGSize(width: radius, height: radius))
+//        
+//        let maskLayer = CAShapeLayer()
+//        maskLayer.path = path.cgPath
+//        view.layer.mask = maskLayer
+//        
+//        let borderLayer = CAShapeLayer()
+//        borderLayer.path = path.cgPath
+//        borderLayer.fillColor = view.backgroundColor?.cgColor
+//        borderLayer.frame = view.bounds
+//        view.layer.insertSublayer(borderLayer, at: 0)
+//    }
+        
+    private func createItem(title: String, style: UIAlertAction.Style) -> AlertViewItem {
         let item = AlertViewItem(type: .custom)
         item.title = title
         if let selectedTitle = selectedTitle, title == selectedTitle {
@@ -111,7 +148,7 @@ class CustomAlertController: UIViewController {
         return item
     }
     
-    @objc func buttonTapped(_ sender: AlertViewItem) {
+    @objc private func buttonTapped(_ sender: AlertViewItem) {
         guard let view = sender as? AlertViewItem, let title = view.title else {return}
         guard let action = actions.first(where: { $0.title == title }) else { return }
         action.handler?(UIAlertAction(title: title, style: action.style, handler: action.handler))
@@ -121,17 +158,17 @@ class CustomAlertController: UIViewController {
         dismissPopup()
     }
     
-    func clearAllSelectState() {
+    private func clearAllSelectState() {
         for item in items {
             item.select = false
         }
     }
     
-    @objc func dismissPopup() {
+    @objc private func dismissPopup() {
         self.dismiss(animated: true, completion: nil)
     }
     
-    @objc func handlePanGesture(_ recognizer: UIPanGestureRecognizer) {
+    @objc private func handlePanGesture(_ recognizer: UIPanGestureRecognizer) {
         let translation = recognizer.translation(in: view)
         
         if recognizer.state == .changed {

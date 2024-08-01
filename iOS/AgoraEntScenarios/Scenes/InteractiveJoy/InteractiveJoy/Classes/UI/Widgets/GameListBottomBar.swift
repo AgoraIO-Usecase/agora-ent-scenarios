@@ -17,6 +17,7 @@ class GameListBottomBar: UIView {
     private lazy var line: UIView = {
         let l = UIView()
         l.backgroundColor = UIColor.gray
+        l.alpha = 0.25
         return l
     }()
     
@@ -32,6 +33,8 @@ class GameListBottomBar: UIView {
         b.setImage(UIImage.sceneImage(name: "arrow_ic"), for: .normal)
         b.imageView?.contentMode = .scaleAspectFit
         b.semanticContentAttribute = .forceRightToLeft
+        b.imageEdgeInsets(UIEdgeInsets(top: 0, left: -7, bottom: 0, right: 7))
+        b.titleEdgeInsets(UIEdgeInsets(top: 0, left: 7, bottom: 0, right: -7))
         return b
     }()
     

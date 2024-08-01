@@ -7,6 +7,10 @@
 
 import Foundation
 
+protocol GameEventHandlerDelegate: NSObjectProtocol {
+    func onPlayerCaptainChanged(userId: String, model: MGCommonPlayerCaptainModel)
+}
+
 class GameEventHandler: SudGameBaseEventHandler {
     private func safeAreaInsets() -> UIEdgeInsets {
         if #available(iOS 11.0, *) {
@@ -14,6 +18,14 @@ class GameEventHandler: SudGameBaseEventHandler {
         }
         return .zero
     }
+    
+    //玩家列表
+    var playerSet: Set<Int64> = []
+    
+    //机器人列表
+    var robotInfoList: [PlayRobotInfo] = []
+    
+    weak var delegate: GameEventHandlerDelegate?
     
     override func onGetGameCfg() -> GameCfgModel {
         let gameCfgModel = GameCfgModel.default()
@@ -127,103 +139,66 @@ class GameEventHandler: SudGameBaseEventHandler {
     override func onGameDestroyed() {
         print("Game destroyed")
     }
-
-   
-    // MARK: - 游戏相关事件状态回调通知，以下回调指令根据业务需求实现相应与游戏交互功能，可选指令，根据自身应用需要实现与游戏交互
-    // Game-related event status callback notification. The following callback commands can interact with the game according to business requirements. Optional commands can interact with the game according to their own application needs
-
-    // 更多指令支持参阅 https://docs.sud.tech/zh-CN/app/Client/MGFSM/CommonStateGame.html
-    // Support more instructions refer to https://docs.sud.tech/en-US/app/Client/MGFSM/CommonStateGame.html
-
-    // 游戏: 准备按钮点击状态   MG_COMMON_SELF_CLICK_READY_BTN
-    // Game: Ready button click status MG_COMMON_SELF_CLICK_READY_BTN
-    override func onGameMGCommonSelfClickReadyBtn(_ handle: any ISudFSMStateHandle, model: MGCommonSelfClickReadyBtn) {
-        handle.success(sudFSMMGDecorator.handleMGSuccess())
-    }
     
-    // 游戏: 结算界面再来一局按钮点击状态   MG_COMMON_SELF_CLICK_GAME_SETTLE_AGAIN_BTN
-    // Game: Settlement interface again to a button click status MG_COMMON_SELF_CLICK_GAME_SETTLE_AGAIN_BTN
-    override func onGameMGCommonSelfClickGameSettleAgainBtn(_ handle: any ISudFSMStateHandle, model: MGCommonSelfClickGameSettleAgainBtn) {
-        handle.success(sudFSMMGDecorator.handleMGSuccess())
-    }
-    
-    // 游戏: 开始游戏按钮点击状态   MG_COMMON_SELF_CLICK_START_BTN
-    // Game: Start game button by clicking status MG_COMMON_SELF_CLICK_START_BTN
-    override func onGameMGCommonSelfClickStartBtn(_ handle: any ISudFSMStateHandle, model: MGCommonSelfClickStartBtn) {
-        handle.success(sudFSMMGDecorator.handleMGSuccess())
-    }
- 
-    // 通用状态-游戏
-    // 游戏: 公屏消息状态    MG_COMMON_PUBLIC_MESSAGE
-    // General status - Game
-    // Game: public screen message status MG_COMMON_PUBLIC_MESSAGE
-    override func onGameMGCommonPublicMessage(_ handle: any ISudFSMStateHandle, model: MGCommonPublicMessageModel) {
-        handle.success(sudFSMMGDecorator.handleMGSuccess())
-    }
-    
-
-    // 游戏: 关键词状态    MG_COMMON_KEY_WORD_TO_HIT
-    // Game: Keyword status MG_COMMON_KEY_WORD_TO_HIT
-    override func onGameMGCommonKeyWord(toHit handle: any ISudFSMStateHandle, model: MGCommonKeyWrodToHitModel) {
-        handle.success(sudFSMMGDecorator.handleMGSuccess())
-    }
-
-    // 游戏: 游戏状态   MG_COMMON_GAME_STATE
-    // Game: Game state MG_COMMON_GAME_STATE
-    
-    override func onGameMGCommonGameState(_ handle: ISudFSMStateHandle, model: MGCommonGameState) {
-        handle.success(sudFSMMGDecorator.handleMGSuccess())
-    }
-
-    // 游戏: ASR状态(开启和关闭语音识别状态)   MG_COMMON_GAME_ASR
-    // Game: ASR status (On and off speech recognition status) MG_COMMON_GAME_ASR
-    override func onGameMGCommonGameASR(_ handle: ISudFSMStateHandle, model: MGCommonGameASRModel) {
-        // 语音采集 || 停止采集
-        handle.success(sudFSMMGDecorator.handleMGSuccess())
-    }
-
-    // 玩家状态变化
-    // 玩家: 加入状态  MG_COMMON_PLAYER_IN
-    // Player status changes
-    // Player: Adds status MG_COMMON_PLAYER_IN
+    ///玩家装备变化
+    ///玩家: 加入状态  MG_COMMON_PLAYER_IN
     override func onPlayerMGCommonPlayer(in handle: any ISudFSMStateHandle, userId: String, model: MGCommonPlayerInModel) {
         handle.success(sudFSMMGDecorator.handleMGSuccess())
+        guard let userId = Int64(userId) else {return}
+        if model.isIn {
+            playerSet.insert(userId)
+        } else {
+            playerSet.remove(userId)
+        }
     }
-
-    // 玩家: 准备状态  MG_COMMON_PLAYER_READY
-    // Player: Ready status MG_COMMON_PLAYER_READY
-    override func onPlayerMGCommonPlayerReady(_ handle: ISudFSMStateHandle, userId: String, model: MGCommonPlayerReadyModel) {
+    
+    ///队长状态
+    override func onPlayerMGCommonPlayerCaptain(_ handle: any ISudFSMStateHandle, userId: String, model: MGCommonPlayerCaptainModel) {
         handle.success(sudFSMMGDecorator.handleMGSuccess())
+        self.delegate?.onPlayerCaptainChanged(userId: userId, model: model)
     }
-
-    // 玩家: 队长状态  MG_COMMON_PLAYER_CAPTAIN
-    // Player: Captain status MG_COMMON_PLAYER_CAPTAIN
-    override func onPlayerMGCommonPlayerCaptain(_ handle: ISudFSMStateHandle, userId: String, model: MGCommonPlayerCaptainModel) {
-        handle.success(sudFSMMGDecorator.handleMGSuccess())
+    
+    override func onGameLoadingProgress(_ stage: Int32, retCode: Int32, progress: Int32) {
+        if retCode == 0, progress == 100 {
+            
+        }
     }
+}
 
-    // 玩家: 游戏状态  MG_COMMON_PLAYER_PLAYING
-    // Player: Game status MG_COMMON_PLAYER_PLAYING
-    override func onPlayerMGCommonPlayerPlaying(_ handle: ISudFSMStateHandle, userId: String, model: MGCommonPlayerPlayingModel) {
-        handle.success(sudFSMMGDecorator.handleMGSuccess())
+extension GameEventHandler {
+    func supportRobots(gameId: Int64) -> Bool {
+        // TeenPatti, 德州扑克, 友尽闯关 暂时不支持机器人
+        let invalidGameIds: Set<Int64> = [1557194487352053761, 1557194155570024449, 1490944230389182466]
+        return !invalidGameIds.contains(gameId)
     }
-
-    // 你画我猜: 作画中状态  MG_DG_PAINTING
-    // You paint me guess: painting state MG_DG_PAINTING
-    override func onPlayerMGDGPainting(_ handle: ISudFSMStateHandle, userId: String, model: MGDGPaintingModel) {
-        handle.success(sudFSMMGDecorator.handleMGSuccess())
+    
+    func addRobot() {
+        guard let playRobot = findRobot() else { return }
+        var aiPlayerList = [AIPlayerInfoModel]()
+        var aiPlayerModel = AppCommonGameAddAIPlayersModel()
+        var aiPlayer = AIPlayerInfoModel()
+        aiPlayer.level = playRobot.level
+        if let owner = playRobot.owner {
+            aiPlayer.userId = owner.userId
+            aiPlayer.name = owner.userName
+            aiPlayer.avatar = owner.userAvatar
+        }
+        aiPlayer.gender = playRobot.gender
+        aiPlayerList.append(aiPlayer)
+        aiPlayerModel.aiPlayers = aiPlayerList
+        
+        sudFSTAPPDecorator.notifyAppCommonGameAddAIPlayers(aiPlayerModel)
     }
-
-    // 游戏: 麦克风状态   MG_COMMON_GAME_SELF_MICROPHONE
-    // Game: Microphone status MG_COMMON_GAME_SELF_MICROPHONE
-    override func onGameMGCommonGameSelfMicrophone(_ handle: ISudFSMStateHandle, model: MGCommonGameSelfMicrophone) {
-        handle.success(sudFSMMGDecorator.handleMGSuccess())
+    
+    func findRobot() -> PlayRobotInfo? {
+        for robot in robotInfoList {
+            guard let owner = robot.owner, let ownerId = Int64(owner.userId) else { continue }
+            if !playerSet.contains(ownerId) {
+                return robot
+            }
+        }
+        
+        return nil
     }
-
-    // 游戏: 耳机（听筒，扬声器）状态   MG_COMMON_GAME_SELF_HEADEPHONE
-    // Game: Headset (handset, speaker) status MG_COMMON_GAME_SELF_HEADEPHONE
-    override func onGameMGCommonGameSelfHeadphone(_ handle: ISudFSMStateHandle, model: MGCommonGameSelfHeadphone) {
-        handle.success(sudFSMMGDecorator.handleMGSuccess())
-    }
-
+    
 }

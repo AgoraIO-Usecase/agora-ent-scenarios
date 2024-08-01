@@ -53,6 +53,9 @@ protocol JoyServiceProtocol: NSObjectProtocol {
     /// 获取房间列表
     /// - Parameter completion: 完成回调
     func getRoomList(completion: @escaping ([InteractiveJoyRoomInfo]) -> Void)
+    
+    ///获取机器人列表
+    func getRobotList() -> [PlayRobotInfo]
 
     /// 订阅回调变化
     /// - Parameter listener: <#listener description#>

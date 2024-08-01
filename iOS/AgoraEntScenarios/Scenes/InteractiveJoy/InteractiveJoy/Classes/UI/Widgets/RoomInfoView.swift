@@ -53,6 +53,14 @@ class RoomInfoView: UIView {
         return label
     }()
     
+    //分割线
+    private lazy var lineView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.alpha = 0.35
+        return view
+    }()
+    
     // 直播标识
     private lazy var indicatorImageView: UIView = {
         let imageView = UIImageView()
@@ -111,16 +119,25 @@ class RoomInfoView: UIView {
             make.bottom.equalTo(-4)
         }
         
+        addSubview(lineView)
+        lineView.snp.makeConstraints { make in
+            make.left.equalTo(idLabel.snp.right).offset(4)
+            make.centerY.equalTo(idLabel)
+            make.height.equalTo(12)
+            make.width.equalTo(2)
+        }
+        
         addSubview(indicatorImageView)
         indicatorImageView.snp.makeConstraints { make in
-            make.left.equalTo(120)
+            make.left.equalTo(lineView.snp.right).offset(4)
+            make.width.height.equalTo(6)
             make.centerY.equalTo(idLabel)
         }
         
         addSubview(timeLabel)
         timeLabel.snp.makeConstraints { make in
-            make.bottom.equalTo(idLabel)
             make.left.equalTo(indicatorImageView.snp.right).offset(4)
+            make.centerY.equalTo(indicatorImageView)
         }
     }
     

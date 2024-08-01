@@ -53,7 +53,7 @@ class GameListViewController: UIViewController, UICollectionViewDataSource, UICo
     
     private lazy var headerView: GameBannerView = {
         let headerView = GameBannerView(frame: CGRect(x: 0, y: -346, width: CGRectGetWidth(view.bounds), height: 346))
-        headerView.setBanners(banners: [BannerModel(image: "game_banner", title: "")])
+        headerView.setBanners(banners: [BannerModel(image: "play_zone_banner", title: "")])
         
         return headerView
     }()

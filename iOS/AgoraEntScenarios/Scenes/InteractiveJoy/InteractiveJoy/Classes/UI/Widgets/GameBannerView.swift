@@ -10,9 +10,6 @@ import UIKit
 class GameBannerCell: UICollectionViewCell {
     lazy var imageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
-        imageView.layer.cornerRadius = 16
-        imageView.layer.masksToBounds = true
         return imageView
     }()
     
@@ -54,9 +51,8 @@ class GameBannerView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = frame.size
+        layout.itemSize = CGSizeMake(CGRectGetWidth(frame) - 20 * 2, 200)
         layout.scrollDirection = .horizontal
         
         collectionView = UICollectionView(frame: CGRect(origin: CGPointZero, size: frame.size), collectionViewLayout: layout)
@@ -64,6 +60,7 @@ class GameBannerView: UIView {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.showsHorizontalScrollIndicator = false;
+        collectionView.backgroundColor = .clear
         self.addSubview(collectionView)
         collectionView.snp_makeConstraints { make in
             make.top.equalTo(32)
