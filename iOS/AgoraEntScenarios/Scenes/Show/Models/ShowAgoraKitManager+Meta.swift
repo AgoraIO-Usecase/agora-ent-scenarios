@@ -37,29 +37,33 @@ extension ShowAgoraKitManager {
         
         self.sceneView = metaView
         let address = unsafeBitCast(metaView, to: Int64.self)
-        let value = 1//enable ? 1 : 0
-        engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", extension: "metakit",
-                                                     key:"enableSceneVideo",
-                                                     value:"{\"view\":\"\(address)\",\"enable\":\(value)}")
         
         // 指定渲染器输出分辨率
-        let resoultionW: Int = 720
-        let resoultionH: Int = 1280
+//        let resoultionW: Int = 720
+//        let resoultionH: Int = 1280
         // 指定背景特效能力
         let extra_dict = ["sceneIndex": 0, "backgroundEffect": true] as [String : Any]
         guard let extra_data = try? JSONSerialization.data(withJSONObject: extra_dict, options: []) else {return}
         let extra_str = String(data: extra_data, encoding: String.Encoding.utf8) ?? ""
-        let dict = ["view": String(address), 
-                    "config": ["width": resoultionW, "height": resoultionH, "extraInfo": extra_str] as [String : Any]
+        let dict = ["view": String(address),
+                    "config": [/*"width": resoultionW, "height": resoultionH, */"extraInfo": extra_str] as [String : Any]
         ] as [String : Any]
         
         guard let data = try? JSONSerialization.data(withJSONObject: dict, options: []) , let data_str = String(data: data, encoding: String.Encoding.utf8) else {
             return
         }
         // 把view的能力指定给渲染器
-        engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", extension: "metakit",
-                                                     key:"addSceneView",
-                                                     value: data_str)
+        engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", 
+                                               extension: "metakit",
+                                               key:"addSceneView",
+                                               value: data_str)
+        
+        // 开启远端编码传输
+        let value = 1//enable ? 1 : 0
+        engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", 
+                                               extension: "metakit",
+                                               key:"enableSceneVideo",
+                                               value:"{\"view\":\"\(address)\",\"enable\":\(value)}")
         self.metakit = metakit
     }
     
@@ -176,24 +180,24 @@ extension ShowAgoraKitManager {
     
     // 开关特效
     func setOffEffect3D(type:Effect3DType) {
-        showLogger.info("setOffEffect3D: \(type.rawValue)", context: "Meta")
             // 关闭
         let close_dict = ["id": type.rawValue, "enable": false] as [String : Any]
         let close_data = try? JSONSerialization.data(withJSONObject: close_dict, options: [])
         let close_info = String(data: close_data!, encoding: String.Encoding.utf8)
-        engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", extension: "metakit",key:"setEffectVideo", value:close_info!)
+        let ret = engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", extension: "metakit",key:"setEffectVideo", value:close_info!)
+        showLogger.info("setOffEffect3D: \(type.rawValue) ret: \(ret ?? -999)", context: "Meta")
     }
 }
 
 extension ShowAgoraKitManager {
     
     private func enableAIVirtualBackground(){
-        showLogger.info("enableAIVirtualBackground", context: "Meta")
         let bg_src = AgoraVirtualBackgroundSource()
         bg_src.backgroundSourceType = .none
         let seg_prop = AgoraSegmentationProperty()
         seg_prop.modelType = .agoraAi
-        engine?.enableVirtualBackground(true, backData: bg_src, segData: seg_prop)
+        let ret = engine?.enableVirtualBackground(true, backData: bg_src, segData: seg_prop)
+        showLogger.info("enableAIVirtualBackground ret: \(ret ?? -999)", context: "Meta")
     }
     
     // 开关特效
